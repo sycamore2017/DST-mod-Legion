@@ -1,4 +1,12 @@
 --------------------------------------------------------------------------
+--[[ Update Logs ]]--[[ 更新说明 ]]
+--------------------------------------------------------------------------
+
+--[[
+    1.可以种植松萝作物啦！松萝种子、松萝、烤松萝和松萝咕咾肉也随之回归
+]]
+
+--------------------------------------------------------------------------
 --[[ Globals ]]--[[ 全局 ]]
 --------------------------------------------------------------------------
 
@@ -33,8 +41,7 @@ Assets = {
     Asset("SOUNDPACKAGE", "sound/legion.fev"),   --吉他的声音
     Asset("SOUND", "sound/legion.fsb"),
 
-    -- Asset("ATLAS", "images/inventoryimages/statue_2019summer2.xml"), --预加载，给科技栏用的
-    -- Asset("IMAGE", "images/inventoryimages/statue_2019summer2.tex"),
+    --预加载，给科技栏用的
     Asset("ATLAS", "images/inventoryimages/hat_lichen.xml"),
     Asset("IMAGE", "images/inventoryimages/hat_lichen.tex"),
 
@@ -51,11 +58,11 @@ Assets = {
     Asset("IMAGE", "images/inventoryimages/petals_lily.tex"),
     Asset("ATLAS", "images/inventoryimages/petals_orchid.xml"),
     Asset("IMAGE", "images/inventoryimages/petals_orchid.tex"),
-    -- Asset("ATLAS", "images/inventoryimages/pineananas.xml"), --delete_crop
-    -- Asset("IMAGE", "images/inventoryimages/pineananas.tex"),
-    -- Asset("ATLAS", "images/inventoryimages/pineananas_cooked.xml"),
-    -- Asset("IMAGE", "images/inventoryimages/pineananas_cooked.tex"),
-    -- Asset("ATLAS", "images/inventoryimages/catmint.xml"),
+    Asset("ATLAS", "images/inventoryimages/pineananas.xml"),
+    Asset("IMAGE", "images/inventoryimages/pineananas.tex"),
+    Asset("ATLAS", "images/inventoryimages/pineananas_cooked.xml"),
+    Asset("IMAGE", "images/inventoryimages/pineananas_cooked.tex"),
+    -- Asset("ATLAS", "images/inventoryimages/catmint.xml"), --delete_crop
     -- Asset("IMAGE", "images/inventoryimages/catmint.tex"),
     Asset("ATLAS", "images/inventoryimages/albicans_cap.xml"),
     Asset("IMAGE", "images/inventoryimages/albicans_cap.tex"),
@@ -68,9 +75,9 @@ RegisterInventoryItemAtlas("images/inventoryimages/shyerry_cooked.xml", "shyerry
 RegisterInventoryItemAtlas("images/inventoryimages/petals_rose.xml", "petals_rose.tex")
 RegisterInventoryItemAtlas("images/inventoryimages/petals_lily.xml", "petals_lily.tex")
 RegisterInventoryItemAtlas("images/inventoryimages/petals_orchid.xml", "petals_orchid.tex")
--- RegisterInventoryItemAtlas("images/inventoryimages/pineananas.xml", "pineananas.tex") --delete_crop
--- RegisterInventoryItemAtlas("images/inventoryimages/pineananas_cooked.xml", "pineananas_cooked.tex")
--- RegisterInventoryItemAtlas("images/inventoryimages/catmint.xml", "catmint.tex")
+RegisterInventoryItemAtlas("images/inventoryimages/pineananas.xml", "pineananas.tex")
+RegisterInventoryItemAtlas("images/inventoryimages/pineananas_cooked.xml", "pineananas_cooked.tex")
+-- RegisterInventoryItemAtlas("images/inventoryimages/catmint.xml", "catmint.tex") --delete_crop
 RegisterInventoryItemAtlas("images/inventoryimages/albicans_cap.xml", "albicans_cap.tex")
 
 -- local IsServer = TheNet:GetIsServer() or TheNet:IsDedicated()

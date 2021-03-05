@@ -138,44 +138,41 @@ if TUNING.LEGION_FLASHANDCRUSH then
     }
 end
 
---delete_crop
---[[
 if CONFIGS_LEGION.LEGENDOFFALL then
     ingredients_legion.pineananas = {
         base = {
             cookable = { product = nil },
             floatable = {nil, "small", 0.2, 0.9},
-            edible = { hunger = 9.375, sanity = -10, health = 8, foodtype = nil, foodtype_secondary = nil },
+            edible = { hunger = 12, sanity = -10, health = 8, foodtype = nil, foodtype_secondary = nil },
             perishable = { product = nil, time = TUNING.PERISH_MED },
             stackable = { size = nil },
             burnable = {},
         },
         cooked = {
             floatable = {nil, "small", 0.2, 1},
-            edible = { hunger = 12.5, sanity = 5, health = 16, foodtype = nil, foodtype_secondary = nil },
+            edible = { hunger = 18.5, sanity = 5, health = 16, foodtype = nil, foodtype_secondary = nil },
             perishable = { product = nil, time = TUNING.PERISH_SUPERFAST },
             stackable = { size = nil },
             fuel = { value = nil },
             burnable = {},
         },
     }
-    ingredients_legion.catmint = {
-        base = {
-            floatable = {nil, "small", 0.08, 0.95},
-            edible = { hunger = 6, sanity = 10, health = 1, foodtype = nil, foodtype_secondary = nil },
-            perishable = { product = nil, time = TUNING.PERISH_SLOW },
-            stackable = { size = nil },
-            fuel = { value = nil },
-            burnable = {},
-            fn_common = function(inst)
-                inst:AddTag("catfood")
-                inst:AddTag("cattoy")
-                inst:AddTag("catmint")
-            end,
-        },
-    }
+    -- ingredients_legion.catmint = {
+    --     base = {
+    --         floatable = {nil, "small", 0.08, 0.95},
+    --         edible = { hunger = 6, sanity = 10, health = 1, foodtype = nil, foodtype_secondary = nil },
+    --         perishable = { product = nil, time = TUNING.PERISH_SLOW },
+    --         stackable = { size = nil },
+    --         fuel = { value = nil },
+    --         burnable = {},
+    --         fn_common = function(inst)
+    --             inst:AddTag("catfood")
+    --             inst:AddTag("cattoy")
+    --             inst:AddTag("catmint")
+    --         end,
+    --     },
+    -- }
 end
-]]--
 
 --------------------------------------------------------------------------
 --------------------------------------------------------------------------

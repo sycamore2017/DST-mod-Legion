@@ -566,28 +566,28 @@ if CONFIGS_LEGION.PRAYFORRAIN then
     }
 end
 
--- if CONFIGS_LEGION.LEGENDOFFALL then
---     foods_legion.dish_murmurananas =
---     {
---         test = function(cooker, names, tags)
---             return (names.pineananas or names.pineananas_cooked) and (tags.meat and tags.meat >= 3)
---                 and (not tags.monster or tags.monster <= 1)
---         end,
---         priority = 20,
---         foodtype = FOODTYPE.MEAT,
---         health = TUNING.HEALING_MEDLARGE/2,    --15
---         hunger = TUNING.CALORIES_SUPERHUGE,   --150
---         sanity = TUNING.SANITY_MED,    --15
---         perishtime = TUNING.PERISH_MED,   --10天
---         cooktime = 1,
---         potlevel = "low",
---         float = {nil, "small", 0.2, 1.05},
+if CONFIGS_LEGION.LEGENDOFFALL then
+    foods_legion.dish_murmurananas =
+    {
+        test = function(cooker, names, tags)
+            return (names.pineananas or names.pineananas_cooked) and (tags.meat and tags.meat >= 2)
+                and (not tags.monster or tags.monster <= 1)
+        end,
+        priority = 20,
+        foodtype = FOODTYPE.MEAT,
+        health = 18,
+        hunger = 150,
+        sanity = 12.5,
+        perishtime = TUNING.PERISH_MED,   --10天
+        cooktime = 1,
+        potlevel = "low",
+        float = {nil, "small", 0.2, 1.05},
 
---         cook_need = "(烤)松萝 肉度≥3",
---         cook_cant = "怪物度≤1",
---         recipe_count = 4,
---     }
--- end
+        cook_need = "(烤)松萝 肉度≥2",
+        cook_cant = "怪物度≤1",
+        recipe_count = 6,
+    }
+end
 
 if TUNING.LEGION_FLASHANDCRUSH then
     foods_legion.dish_wrappedshrimppaste =
