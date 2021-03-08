@@ -27,22 +27,9 @@ function UpgradeKit:Upgrade(doer, target)
 				dat.onupgradefn(self.inst, doer, target, result)
 			end
 			return true
-		else
-			return false
 		end
 	end
 	return false
-end
-
-function UpgradeKit:OnSave()
-	if self.data ~= nil then
-		return self.data
-	end
-	return {}
-end
-
-function UpgradeKit:OnLoad(data)
-	self:SetData(data)
 end
 
 return UpgradeKit
