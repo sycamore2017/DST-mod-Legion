@@ -92,12 +92,12 @@ if CONFIGS_LEGION.PRAYFORRAIN then
             return true
         end
 
-        if item:HasTag("fresh") or item:HasTag("stale") or item:HasTag("spoiled") then
+        if item:HasTag("smallcreature") then
             return true
         end
 
-        if item:HasTag("smallcreature") then
-            return true
+        if not (item:HasTag("fresh") or item:HasTag("stale") or item:HasTag("spoiled")) then
+            return false
         end
 
         for k, v in pairs(FOODTYPE) do

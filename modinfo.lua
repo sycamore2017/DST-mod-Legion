@@ -580,20 +580,20 @@ configuration_options =
         hover = "Auto-cleaning-up smelly things on the ground.",
         options =
         {
-            {description = "Yes(default)", data = true},
-            {description = "No", data = false},
+            {description = "Yes", data = true},
+            {description = "No(default)", data = false},
         },
-        default = true,
+        default = false,
     } or {
         name = "CleaningUpStench",
         label = "臭臭自动清理",
         hover = "自动清除掉在地上的臭东西(大便、鸟粪、腐烂物)。化作春泥更护花。",
         options =
         {
-            {description = "是(默认)", data = true},
-            {description = "否", data = false},
+            {description = "是", data = true},
+            {description = "否(默认)", data = false},
         },
-        default = true,
+        default = false,
     },
     L and {
         name = "BackCubChance",

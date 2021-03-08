@@ -94,6 +94,62 @@ function DressUp:initSwapList(item) --更新幻化数据
     end
 end
 
+function DressUp:initSwap(item, data) --更新幻化数据
+    if data ~= nil then
+        local buildskin = (not data.isnoskin) and item:GetSkinBuild() or nil
+
+        if data.buildfn ~= nil then
+            data.buildfn(self, item, buildskin)
+        else
+            local slot = self:GetDressSlot(item, data)
+            if slot == EQUIPSLOTS.HANDS then
+                if data.iswhip then
+                    self.swaplist["swap_object"] = self:GetDressData(buildskin, data.buildfile, data.buildsymbol, item.GUID, "swap")
+                    self.swaplist["whipline"] = self:GetDressData(buildskin, data.buildfile, "whipline", item.GUID, "swap")
+                else
+                    self.swaplist["swap_object"] = self:GetDressData(buildskin, data.buildfile, data.buildsymbol, item.GUID, "swap")
+                    self.swaplist["whipline"] = self:GetDressData(nil, nil, nil, nil, "clear")
+                end
+                self.swaplist["lantern_overlay"] = self:GetDressData(nil, nil, nil, nil, "clear")
+                --手臂的隐藏与显示不需要操作，因为需要跟随实际装备状态
+            elseif slot == EQUIPSLOTS.HEAD then
+                self.swaplist["swap_hat"] = self:GetDressData(buildskin, data.buildfile, data.buildsymbol, item.GUID, "swap")
+                if data.isopentop then
+                    self.swaplist["HAT"] = self:GetDressData(nil, nil, nil, nil, "show")
+                    self.swaplist["HAIR_HAT"] = self:GetDressData(nil, nil, nil, nil, "hide")
+                    self.swaplist["HAIR_NOHAT"] = self:GetDressData(nil, nil, nil, nil, "show")
+                    self.swaplist["HAIR"] = self:GetDressData(nil, nil, nil, nil, "show")
+
+                    self.swaplist["HEAD"] = self:GetDressData(nil, nil, nil, nil, "show")
+                    self.swaplist["HEAD_HAT"] = self:GetDressData(nil, nil, nil, nil, "hide")
+                else
+                    self.swaplist["HAT"] = self:GetDressData(nil, nil, nil, nil, "show")
+                    self.swaplist["HAIR_HAT"] = self:GetDressData(nil, nil, nil, nil, "show")
+                    self.swaplist["HAIR_NOHAT"] = self:GetDressData(nil, nil, nil, nil, "hide")
+                    self.swaplist["HAIR"] = self:GetDressData(nil, nil, nil, nil, "hide")
+
+                    self.swaplist["HEAD"] = self:GetDressData(nil, nil, nil, nil, "hide")
+                    self.swaplist["HEAD_HAT"] = self:GetDressData(nil, nil, nil, nil, "show")
+                end
+            elseif slot == EQUIPSLOTS.BODY or slot == EQUIPSLOTS.BACK or slot == EQUIPSLOTS.NECK then
+                if data.istallbody then
+                    self.swaplist["swap_body_tall"] = self:GetDressData(buildskin, data.buildfile, data.buildsymbol, item.GUID, "swap")
+                    self.swaplist["backpack"] = self:GetDressData(nil, nil, nil, nil, "clear")
+                    self.swaplist["swap_body"] = self:GetDressData(nil, nil, nil, nil, "clear")
+                elseif data.isbackpack then
+                    self.swaplist["backpack"] = self:GetDressData(buildskin, data.buildfile, "backpack", item.GUID, "swap")
+                    self.swaplist["swap_body"] = self:GetDressData(buildskin, data.buildfile, "swap_body", item.GUID, "swap")
+                    self.swaplist["swap_body_tall"] = self:GetDressData(nil, nil, nil, nil, "clear")
+                else
+                    self.swaplist["swap_body"] = self:GetDressData(buildskin, data.buildfile, data.buildsymbol, item.GUID, "swap")
+                    self.swaplist["backpack"] = self:GetDressData(nil, nil, nil, nil, "clear")
+                    self.swaplist["swap_body_tall"] = self:GetDressData(nil, nil, nil, nil, "clear")
+                end
+            end
+        end
+    end
+end
+
 function DressUp:UpdateReal() --更新幻化的实际展示效果
     for k,v in pairs(self.swaplist) do
         if v ~= nil then
@@ -156,12 +212,7 @@ function DressUp:PutOn(item) --幻化一个物品
 
     --更新幻化数据
     self.itemlist[slot] = item
-    self.swaplist = {}
-    for k,v in pairs(self.itemlist) do
-        if v ~= nil then
-            self:initSwapList(v)
-        end
-    end
+    self:initSwap(item, data)
     if data.equipfn ~= nil then
         data.equipfn(self.inst, item)
     end
