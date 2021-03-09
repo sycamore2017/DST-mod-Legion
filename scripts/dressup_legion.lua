@@ -25,7 +25,8 @@ local dressup_data =
         -- iswhip = nil,
         buildfile = "swap_spear",   --（通用）贴图文件名
         buildsymbol = "swap_spear", --（通用）贴图文件中的文件夹名
-        -- buildfn = nil,              --当通用机制不满足时，就在这个函数里自定义幻化信息。(dressup, item, buildskin)
+        -- buildfn = nil,              --当通用机制不满足时，在这个函数里自定义幻化信息。(dressup, item, buildskin)
+        -- unbuildfn = nil,            --当通用机制不满足时，在这个函数里自定义去幻信息。(dressup, item)
         -- equipfn = nil,              --幻化时函数。data.equipfn(player, item)
         -- unequipfn = nil,            --去幻时函数。data.unequipfn(player, item)
     },
