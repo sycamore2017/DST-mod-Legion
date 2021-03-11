@@ -2,7 +2,7 @@ local DressUp = Class(function(self, inst)
     self.inst = inst
     self.itemlist =
     {
-        -- body = { item = nil, swap = {结构与self.swaplist相同} },
+        -- body = { item = nil, swaps = {结构与self.swaplist相同} },
     }
     self.swaplist =
     {
@@ -37,21 +37,31 @@ function DressUp:GetDressSlot(item, data)
     end
 end
 
-function DressUp:UpdateReal() --更新幻化的实际展示效果
-    for k,v in pairs(self.swaplist) do
-        if v ~= nil then
-            if v.type == "swap" then
-                if v.buildskin ~= nil then
-                    self.inst.AnimState:OverrideItemSkinSymbol(k, v.buildskin, v.buildsymbol, v.guid, v.buildfile)
-                else
-                    self.inst.AnimState:OverrideSymbol(k, v.buildfile, v.buildsymbol)
+function DressUp:UpdateSwapList() --更新幻化表与实际展示效果
+    self.swaplist = {}
+    for slot,itemdata in pairs(self.itemlist) do
+        if itemdata ~= nil and itemdata.swaps ~= nil then
+            for k,v in pairs(self.itemdata.swaps) do
+                if v ~= nil then
+                    if self.swaplist[k] == nil then --只有未占用的才放入数据
+                        self.swaplist[k] = v
+
+                        --更新实际效果
+                        if v.type == "swap" then
+                            if v.buildskin ~= nil then
+                                self.inst.AnimState:OverrideItemSkinSymbol(k, v.buildskin, v.buildsymbol, v.guid, v.buildfile)
+                            else
+                                self.inst.AnimState:OverrideSymbol(k, v.buildfile, v.buildsymbol)
+                            end
+                        elseif v.type == "show" then
+                            self.inst.AnimState:Show(k)
+                        elseif v.type == "hide" then
+                            self.inst.AnimState:Hide(k)
+                        elseif v.type == "clear" then
+                            self.inst.AnimState:ClearOverrideSymbol(k)
+                        end
+                    end
                 end
-            elseif v.type == "show" then
-                self.inst.AnimState:Show(k)
-            elseif v.type == "hide" then
-                self.inst.AnimState:Hide(k)
-            elseif v.type == "clear" then
-                self.inst.AnimState:ClearOverrideSymbol(k)
             end
         end
     end
@@ -98,69 +108,72 @@ function DressUp:PutOn(item) --幻化一个物品
     self:TakeOff(slot)
 
     --增加幻化数据
-    self.itemlist[slot] = { item = item, swap = {} }
+    local itemswap = {}
     local buildskin = (not data.isnoskin) and item:GetSkinBuild() or nil
     if data.buildfn ~= nil then
-        data.buildfn(self, item, buildskin)
+        itemswap = data.buildfn(self, item, buildskin)
     else
         if slot == EQUIPSLOTS.HANDS then
             if data.iswhip then
-                self.swaplist["swap_object"] = self:GetDressData(buildskin, data.buildfile, data.buildsymbol, item.GUID, "swap")
-                self.swaplist["whipline"] = self:GetDressData(buildskin, data.buildfile, "whipline", item.GUID, "swap")
+                itemswap["swap_object"] = self:GetDressData(buildskin, data.buildfile, data.buildsymbol, item.GUID, "swap")
+                itemswap["whipline"] = self:GetDressData(buildskin, data.buildfile, "whipline", item.GUID, "swap")
             else
-                self.swaplist["swap_object"] = self:GetDressData(buildskin, data.buildfile, data.buildsymbol, item.GUID, "swap")
-                self.swaplist["whipline"] = self:GetDressData(nil, nil, nil, nil, "clear")
+                itemswap["swap_object"] = self:GetDressData(buildskin, data.buildfile, data.buildsymbol, item.GUID, "swap")
+                itemswap["whipline"] = self:GetDressData(nil, nil, nil, nil, "clear")
             end
-            self.swaplist["lantern_overlay"] = self:GetDressData(nil, nil, nil, nil, "clear")
+            itemswap["lantern_overlay"] = self:GetDressData(nil, nil, nil, nil, "clear")
             --手臂的隐藏与显示不需要操作，因为需要跟随实际装备状态
         elseif slot == EQUIPSLOTS.HEAD then
-            self.swaplist["swap_hat"] = self:GetDressData(buildskin, data.buildfile, data.buildsymbol, item.GUID, "swap")
+            itemswap["swap_hat"] = self:GetDressData(buildskin, data.buildfile, data.buildsymbol, item.GUID, "swap")
             if data.isopentop then
-                self.swaplist["HAT"] = self:GetDressData(nil, nil, nil, nil, "show")
-                self.swaplist["HAIR_HAT"] = self:GetDressData(nil, nil, nil, nil, "hide")
-                self.swaplist["HAIR_NOHAT"] = self:GetDressData(nil, nil, nil, nil, "show")
-                self.swaplist["HAIR"] = self:GetDressData(nil, nil, nil, nil, "show")
+                itemswap["HAT"] = self:GetDressData(nil, nil, nil, nil, "show")
+                itemswap["HAIR_HAT"] = self:GetDressData(nil, nil, nil, nil, "hide")
+                itemswap["HAIR_NOHAT"] = self:GetDressData(nil, nil, nil, nil, "show")
+                itemswap["HAIR"] = self:GetDressData(nil, nil, nil, nil, "show")
 
-                self.swaplist["HEAD"] = self:GetDressData(nil, nil, nil, nil, "show")
-                self.swaplist["HEAD_HAT"] = self:GetDressData(nil, nil, nil, nil, "hide")
+                itemswap["HEAD"] = self:GetDressData(nil, nil, nil, nil, "show")
+                itemswap["HEAD_HAT"] = self:GetDressData(nil, nil, nil, nil, "hide")
             else
-                self.swaplist["HAT"] = self:GetDressData(nil, nil, nil, nil, "show")
-                self.swaplist["HAIR_HAT"] = self:GetDressData(nil, nil, nil, nil, "show")
-                self.swaplist["HAIR_NOHAT"] = self:GetDressData(nil, nil, nil, nil, "hide")
-                self.swaplist["HAIR"] = self:GetDressData(nil, nil, nil, nil, "hide")
+                itemswap["HAT"] = self:GetDressData(nil, nil, nil, nil, "show")
+                itemswap["HAIR_HAT"] = self:GetDressData(nil, nil, nil, nil, "show")
+                itemswap["HAIR_NOHAT"] = self:GetDressData(nil, nil, nil, nil, "hide")
+                itemswap["HAIR"] = self:GetDressData(nil, nil, nil, nil, "hide")
 
-                self.swaplist["HEAD"] = self:GetDressData(nil, nil, nil, nil, "hide")
-                self.swaplist["HEAD_HAT"] = self:GetDressData(nil, nil, nil, nil, "show")
+                itemswap["HEAD"] = self:GetDressData(nil, nil, nil, nil, "hide")
+                itemswap["HEAD_HAT"] = self:GetDressData(nil, nil, nil, nil, "show")
             end
         elseif slot == EQUIPSLOTS.BODY or slot == EQUIPSLOTS.BACK or slot == EQUIPSLOTS.NECK then
             if data.istallbody then
-                self.swaplist["swap_body_tall"] = self:GetDressData(buildskin, data.buildfile, data.buildsymbol, item.GUID, "swap")
-                self.swaplist["backpack"] = self:GetDressData(nil, nil, nil, nil, "clear")
-                self.swaplist["swap_body"] = self:GetDressData(nil, nil, nil, nil, "clear")
+                itemswap["swap_body_tall"] = self:GetDressData(buildskin, data.buildfile, data.buildsymbol, item.GUID, "swap")
+                itemswap["backpack"] = self:GetDressData(nil, nil, nil, nil, "clear")
+                itemswap["swap_body"] = self:GetDressData(nil, nil, nil, nil, "clear")
             elseif data.isbackpack then
-                self.swaplist["backpack"] = self:GetDressData(buildskin, data.buildfile, "backpack", item.GUID, "swap")
-                self.swaplist["swap_body"] = self:GetDressData(buildskin, data.buildfile, "swap_body", item.GUID, "swap")
-                self.swaplist["swap_body_tall"] = self:GetDressData(nil, nil, nil, nil, "clear")
+                itemswap["backpack"] = self:GetDressData(buildskin, data.buildfile, "backpack", item.GUID, "swap")
+                itemswap["swap_body"] = self:GetDressData(buildskin, data.buildfile, "swap_body", item.GUID, "swap")
+                itemswap["swap_body_tall"] = self:GetDressData(nil, nil, nil, nil, "clear")
             else
-                self.swaplist["swap_body"] = self:GetDressData(buildskin, data.buildfile, data.buildsymbol, item.GUID, "swap")
-                self.swaplist["backpack"] = self:GetDressData(nil, nil, nil, nil, "clear")
-                self.swaplist["swap_body_tall"] = self:GetDressData(nil, nil, nil, nil, "clear")
+                itemswap["swap_body"] = self:GetDressData(buildskin, data.buildfile, data.buildsymbol, item.GUID, "swap")
+                itemswap["backpack"] = self:GetDressData(nil, nil, nil, nil, "clear")
+                itemswap["swap_body_tall"] = self:GetDressData(nil, nil, nil, nil, "clear")
             end
         end
     end
+    self.itemlist[slot] = { item = item, swaps = itemswap or {} }
 
     if data.equipfn ~= nil then
         data.equipfn(self.inst, item)
     end
-    self:UpdateReal()
+
+    self:UpdateSwapList()
 
     return true
 end
 
 function DressUp:TakeOff(slot)  --去幻某个装备栏的装备
-    if self.itemlist[slot] ~= nil then
-        local item = self.itemlist[slot]
-        self.itemlist[slot] = nil
+    if self.itemlist[slot] ~= nil and self.itemlist[slot].item ~= nil then
+        local item = self.itemlist[slot].item
+        local swaps = self.itemlist[slot].swaps
+        self.itemlist[slot] = { item = nil, swaps = {} }
         self.inst:RemoveChild(item)
 
         local data = DRESSUP_DATA_LEGION[item.prefab]
