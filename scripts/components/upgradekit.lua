@@ -26,6 +26,7 @@ function UpgradeKit:Upgrade(doer, target)
 			if dat.onupgradefn ~= nil then
 				dat.onupgradefn(self.inst, doer, target, result)
 			end
+			target:Remove()
 			return true
 		end
 	end

@@ -108,8 +108,7 @@ local function OnUpgrade(item, doer, target, result)
         end
     end
 
-    item:Remove()
-    target:Remove()
+    item:Remove() --该道具是一次性的
     DoBenefit(result)
 end
 
