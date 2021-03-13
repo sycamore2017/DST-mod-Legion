@@ -48,20 +48,23 @@ local dressup_data =
     lantern =
     {
         buildfn = function(dressup, item, buildskin)
-            dressup.swaplist["swap_object"] = dressup:GetDressData(
+            local itemswap = {}
+            itemswap["swap_object"] = dressup:GetDressData(
                 buildskin, "swap_lantern", "swap_lantern", item.GUID, "swap"
             )
 
             --提灯光效贴图没法控制了，就像鞭子类武器的鞭子击打动画一样没法强制改，只能跟随目前的装备类型才行。
             --比如，幻化鞭子后，装备海带鞭才会看见鞭子的击打动画；幻化提灯后，装备提灯时才会看见提灯光效
             if item.components.fueled:IsEmpty() then
-                dressup.swaplist["lantern_overlay"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
+                itemswap["lantern_overlay"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
             else
-                dressup.swaplist["lantern_overlay"] = dressup:GetDressData(
+                itemswap["lantern_overlay"] = dressup:GetDressData(
                     buildskin, "swap_lantern", "lantern_overlay", item.GUID, "swap"
                 )
             end
-            dressup.swaplist["whipline"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
+            itemswap["whipline"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
+
+            return itemswap
         end,
         equipfn = function(player, item)
             --幻化前需要关闭它，防止玩家发光
@@ -322,19 +325,31 @@ local dressup_data =
     oceanfishingrod = --海洋钓竿
     {
         buildfn = function(dressup, item, buildskin)
-            dressup.swaplist["swap_object"] = dressup:GetDressData(
+            local itemswap = {}
+            itemswap["swap_object"] = dressup:GetDressData(
                 buildskin, "swap_fishingrod_ocean", "swap_fishingrod_ocean", item.GUID, "swap"
             )
-            dressup.swaplist["fishingline"] = dressup:GetDressData(
+            itemswap["fishingline"] = dressup:GetDressData(
                 buildskin, "swap_fishingrod_ocean", "fishingline", item.GUID, "swap"
             )
-            dressup.swaplist["FX_fishing"] = dressup:GetDressData(
+            itemswap["FX_fishing"] = dressup:GetDressData(
                 buildskin, "swap_fishingrod_ocean", "FX_fishing", item.GUID, "swap"
             )
 
             --切记，手持物品一定要清除不相关贴图
-            dressup.swaplist["lantern_overlay"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
-            dressup.swaplist["whipline"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
+            itemswap["lantern_overlay"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
+            itemswap["whipline"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
+
+            return itemswap
+        end,
+        unbuildfn = function(dressup, item)
+            dressup:InitClear("swap_object")
+            dressup:InitClear("whipline")
+            dressup:InitClear("lantern_overlay")
+            dressup:InitHide("LANTERN_OVERLAY")
+
+            dressup:InitClear("fishingline")
+            dressup:InitClear("FX_fishing")
         end,
     },
     reskin_tool = --皮肤扫把
@@ -416,25 +431,28 @@ local dressup_data =
     -- bernie_inactive = --伯尼熊，机制特殊，精神值过低时会引发崩溃
     -- {
     --     buildfn = function(dressup, item, buildskin)
+    --         local itemswap = {}
     --         if item.components.fueled:IsEmpty() then
-    --             dressup.swaplist["swap_object"] = dressup:GetDressData(
+    --             itemswap["swap_object"] = dressup:GetDressData(
     --                 buildskin, "bernie_build", "swap_bernie_dead", item.GUID, "swap"
     --             )
-    --             dressup.swaplist["swap_object_bernie"] = dressup:GetDressData(
+    --             itemswap["swap_object_bernie"] = dressup:GetDressData(
     --                 buildskin, "bernie_build", "swap_bernie_dead_idle_willow", item.GUID, "swap"
     --             )
     --         else
-    --             dressup.swaplist["swap_object"] = dressup:GetDressData(
+    --             itemswap["swap_object"] = dressup:GetDressData(
     --                 buildskin, "bernie_build", "swap_bernie", item.GUID, "swap"
     --             )
-    --             dressup.swaplist["swap_object_bernie"] = dressup:GetDressData(
+    --             itemswap["swap_object_bernie"] = dressup:GetDressData(
     --                 buildskin, "bernie_build", "swap_bernie_idle_willow", item.GUID, "swap"
     --             )
     --         end
 
     --         --切记，手持物品一定要清除不相关贴图
-    --         dressup.swaplist["lantern_overlay"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
-    --         dressup.swaplist["whipline"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
+    --         itemswap["lantern_overlay"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
+    --         itemswap["whipline"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
+
+    --         return itemswap
     --     end,
     -- },
 
@@ -472,22 +490,26 @@ local dressup_data =
         buildfile = "hat_miner",
         buildsymbol = "swap_hat_off",
         buildfn = function(dressup, item, buildskin)
+            local itemswap = {}
+
             if item.components.fueled:IsEmpty() then
-                dressup.swaplist["swap_hat"] = dressup:GetDressData(
+                itemswap["swap_hat"] = dressup:GetDressData(
                     buildskin, "hat_miner", "swap_hat_off", item.GUID, "swap"
                 )
             else
-                dressup.swaplist["swap_hat"] = dressup:GetDressData(
+                itemswap["swap_hat"] = dressup:GetDressData(
                     buildskin, "hat_miner", "swap_hat", item.GUID, "swap"
                 )
             end
-            dressup.swaplist["HAT"] = dressup:GetDressData(nil, nil, nil, nil, "show")
-            dressup.swaplist["HAIR_HAT"] = dressup:GetDressData(nil, nil, nil, nil, "show")
-            dressup.swaplist["HAIR_NOHAT"] = dressup:GetDressData(nil, nil, nil, nil, "hide")
-            dressup.swaplist["HAIR"] = dressup:GetDressData(nil, nil, nil, nil, "hide")
+            itemswap["HAT"] = dressup:GetDressData(nil, nil, nil, nil, "show")
+            itemswap["HAIR_HAT"] = dressup:GetDressData(nil, nil, nil, nil, "show")
+            itemswap["HAIR_NOHAT"] = dressup:GetDressData(nil, nil, nil, nil, "hide")
+            itemswap["HAIR"] = dressup:GetDressData(nil, nil, nil, nil, "hide")
 
-            dressup.swaplist["HEAD"] = dressup:GetDressData(nil, nil, nil, nil, "hide")
-            dressup.swaplist["HEAD_HAT"] = dressup:GetDressData(nil, nil, nil, nil, "show")
+            itemswap["HEAD"] = dressup:GetDressData(nil, nil, nil, nil, "hide")
+            itemswap["HEAD_HAT"] = dressup:GetDressData(nil, nil, nil, nil, "show")
+
+            return itemswap
         end,
     },
     spiderhat =
@@ -546,29 +568,33 @@ local dressup_data =
     wathgrithrhat =
     {
         buildfn = function(dressup, item, buildskin)
+            local itemswap = {}
+
             if buildskin == "wathgrithrhat_valkyrie" then
-                dressup.swaplist["swap_hat"] = dressup:GetDressData(
+                itemswap["swap_hat"] = dressup:GetDressData(
                     buildskin, "hat_wathgrithr", "swap_hat", item.GUID, "swap"
                 )
-                dressup.swaplist["HAT"] = dressup:GetDressData(nil, nil, nil, nil, "show")
-                dressup.swaplist["HAIR_HAT"] = dressup:GetDressData(nil, nil, nil, nil, "hide")
-                dressup.swaplist["HAIR_NOHAT"] = dressup:GetDressData(nil, nil, nil, nil, "show")
-                dressup.swaplist["HAIR"] = dressup:GetDressData(nil, nil, nil, nil, "show")
+                itemswap["HAT"] = dressup:GetDressData(nil, nil, nil, nil, "show")
+                itemswap["HAIR_HAT"] = dressup:GetDressData(nil, nil, nil, nil, "hide")
+                itemswap["HAIR_NOHAT"] = dressup:GetDressData(nil, nil, nil, nil, "show")
+                itemswap["HAIR"] = dressup:GetDressData(nil, nil, nil, nil, "show")
 
-                dressup.swaplist["HEAD"] = dressup:GetDressData(nil, nil, nil, nil, "show")
-                dressup.swaplist["HEAD_HAT"] = dressup:GetDressData(nil, nil, nil, nil, "hide")
+                itemswap["HEAD"] = dressup:GetDressData(nil, nil, nil, nil, "show")
+                itemswap["HEAD_HAT"] = dressup:GetDressData(nil, nil, nil, nil, "hide")
             else
-                dressup.swaplist["swap_hat"] = dressup:GetDressData(
+                itemswap["swap_hat"] = dressup:GetDressData(
                     buildskin, "hat_wathgrithr", "swap_hat", item.GUID, "swap"
                 )
-                dressup.swaplist["HAT"] = dressup:GetDressData(nil, nil, nil, nil, "show")
-                dressup.swaplist["HAIR_HAT"] = dressup:GetDressData(nil, nil, nil, nil, "show")
-                dressup.swaplist["HAIR_NOHAT"] = dressup:GetDressData(nil, nil, nil, nil, "hide")
-                dressup.swaplist["HAIR"] = dressup:GetDressData(nil, nil, nil, nil, "hide")
+                itemswap["HAT"] = dressup:GetDressData(nil, nil, nil, nil, "show")
+                itemswap["HAIR_HAT"] = dressup:GetDressData(nil, nil, nil, nil, "show")
+                itemswap["HAIR_NOHAT"] = dressup:GetDressData(nil, nil, nil, nil, "hide")
+                itemswap["HAIR"] = dressup:GetDressData(nil, nil, nil, nil, "hide")
 
-                dressup.swaplist["HEAD"] = dressup:GetDressData(nil, nil, nil, nil, "hide")
-                dressup.swaplist["HEAD_HAT"] = dressup:GetDressData(nil, nil, nil, nil, "show")
+                itemswap["HEAD"] = dressup:GetDressData(nil, nil, nil, nil, "hide")
+                itemswap["HEAD_HAT"] = dressup:GetDressData(nil, nil, nil, nil, "show")
             end
+
+            return itemswap
         end,
     },
     icehat =
@@ -650,22 +676,26 @@ local dressup_data =
     walterhat =
     {
         buildfn = function(dressup, item, buildskin)
+            local itemswap = {}
+
             if dressup.inst.prefab == "walter" then
-                dressup.swaplist["swap_hat"] = dressup:GetDressData(
+                itemswap["swap_hat"] = dressup:GetDressData(
                     buildskin, "hat_walter", "swap_hat", item.GUID, "swap"
                 )
             else
-                dressup.swaplist["swap_hat"] = dressup:GetDressData(
+                itemswap["swap_hat"] = dressup:GetDressData(
                     buildskin, "hat_walter", "swap_hat_large", item.GUID, "swap"
                 )
             end
-            dressup.swaplist["HAT"] = dressup:GetDressData(nil, nil, nil, nil, "show")
-            dressup.swaplist["HAIR_HAT"] = dressup:GetDressData(nil, nil, nil, nil, "show")
-            dressup.swaplist["HAIR_NOHAT"] = dressup:GetDressData(nil, nil, nil, nil, "hide")
-            dressup.swaplist["HAIR"] = dressup:GetDressData(nil, nil, nil, nil, "hide")
+            itemswap["HAT"] = dressup:GetDressData(nil, nil, nil, nil, "show")
+            itemswap["HAIR_HAT"] = dressup:GetDressData(nil, nil, nil, nil, "show")
+            itemswap["HAIR_NOHAT"] = dressup:GetDressData(nil, nil, nil, nil, "hide")
+            itemswap["HAIR"] = dressup:GetDressData(nil, nil, nil, nil, "hide")
 
-            dressup.swaplist["HEAD"] = dressup:GetDressData(nil, nil, nil, nil, "hide")
-            dressup.swaplist["HEAD_HAT"] = dressup:GetDressData(nil, nil, nil, nil, "show")
+            itemswap["HEAD"] = dressup:GetDressData(nil, nil, nil, nil, "hide")
+            itemswap["HEAD_HAT"] = dressup:GetDressData(nil, nil, nil, nil, "show")
+
+            return itemswap
         end,
     },
     kelphat =
@@ -811,17 +841,20 @@ local dressup_data =
     amulet =
     {
         buildfn = function(dressup, item, buildskin)
+            local itemswap = {}
+
             if buildskin ~= nil then
-                dressup.swaplist["swap_body"] = dressup:GetDressData(
+                itemswap["swap_body"] = dressup:GetDressData(
                     buildskin, "torso_amulets", "swap_body", item.GUID, "swap"
                 )
             else
-                dressup.swaplist["swap_body"] = dressup:GetDressData(
+                itemswap["swap_body"] = dressup:GetDressData(
                     buildskin, "torso_amulets", "redamulet", item.GUID, "swap"
                 )
             end
-            dressup.swaplist["backpack"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
-            dressup.swaplist["swap_body_tall"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
+            itemswap["backpack"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
+
+            return itemswap
         end,
     },
     blueamulet =
@@ -887,14 +920,15 @@ local dressup_data =
     cavein_boulder =
     {
         isnoskin = true,
+        istallbody = true,
         buildfn = function(dressup, item, buildskin)
-            dressup.swaplist["swap_body_tall"] = dressup:GetDressData(
+            local itemswap = {}
+
+            itemswap["swap_body_tall"] = dressup:GetDressData(
                 buildskin, "swap_cavein_boulder", "swap_body"..tostring(item.variation or ""), item.GUID, "swap"
             )
 
-            --切记，身体的幻化记得屏蔽不相关贴图
-            dressup.swaplist["backpack"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
-            dressup.swaplist["swap_body"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
+            return itemswap
         end,
     },
     sunkenchest = --上锁的贝壳宝箱
@@ -988,20 +1022,27 @@ local dressup_data =
     {
         isnoskin = true,
         buildfn = function(dressup, item, buildskin)
+            local itemswap = {}
+
             if dressup.inst.prefab == "webber" then
-                dressup.swaplist["swap_body_tall"] = dressup:GetDressData(
+                itemswap["swap_body_tall"] = dressup:GetDressData(
                     buildskin, "swap_backcub", "swap_body", item.GUID, "swap"
                 )
-
-                dressup.swaplist["backpack"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
-                dressup.swaplist["swap_body"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
             else
-                dressup.swaplist["swap_body"] = dressup:GetDressData(
+                itemswap["swap_body"] = dressup:GetDressData(
                     buildskin, "swap_backcub", "swap_body", item.GUID, "swap"
                 )
+                itemswap["backpack"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
+            end
 
-                dressup.swaplist["backpack"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
-                dressup.swaplist["swap_body_tall"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
+            return itemswap
+        end,
+        unbuildfn = function(dressup, item)
+            if dressup.inst.prefab == "webber" then
+                dressup:InitClear("swap_body_tall")
+            else
+                dressup:InitClear("swap_body")
+                dressup:InitClear("backpack")
             end
         end,
     },
@@ -1073,17 +1114,21 @@ local dressup_data =
     {
         isnoskin = true,
         buildfn = function(dressup, item, buildskin)
+            local itemswap = {}
+
             if item.hasSetBroken then
-                dressup.swaplist["swap_object"] = dressup:GetDressData(
+                itemswap["swap_object"] = dressup:GetDressData(
                     buildskin, "swap_neverfade_broken", "swap_neverfade_broken", item.GUID, "swap"
                 )
             else
-                dressup.swaplist["swap_object"] = dressup:GetDressData(
+                itemswap["swap_object"] = dressup:GetDressData(
                     buildskin, "swap_neverfade", "swap_neverfade", item.GUID, "swap"
                 )
             end
-            dressup.swaplist["whipline"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
-            dressup.swaplist["lantern_overlay"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
+            itemswap["whipline"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
+            itemswap["lantern_overlay"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
+
+            return itemswap
         end,
     },
     orchitwigs =
@@ -1126,33 +1171,48 @@ local dressup_data =
     {
         isnoskin = true,
         buildfn = function(dressup, item, buildskin)
-            dressup.swaplist["swap_hat"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
-            dressup.swaplist["HAT"] = dressup:GetDressData(nil, nil, nil, nil, "show")
-            dressup.swaplist["HAIR_HAT"] = dressup:GetDressData(nil, nil, nil, nil, "hide")
-            dressup.swaplist["HAIR_NOHAT"] = dressup:GetDressData(nil, nil, nil, nil, "show")
-            dressup.swaplist["HAIR"] = dressup:GetDressData(nil, nil, nil, nil, "show")
+            local itemswap = {}
 
-            dressup.swaplist["HEAD"] = dressup:GetDressData(nil, nil, nil, nil, "show")
-            dressup.swaplist["HEAD_HAT"] = dressup:GetDressData(nil, nil, nil, nil, "hide")
+            itemswap["swap_hat"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
+            itemswap["HAT"] = dressup:GetDressData(nil, nil, nil, nil, "show")
+            itemswap["HAIR_HAT"] = dressup:GetDressData(nil, nil, nil, nil, "hide")
+            itemswap["HAIR_NOHAT"] = dressup:GetDressData(nil, nil, nil, nil, "show")
+            itemswap["HAIR"] = dressup:GetDressData(nil, nil, nil, nil, "show")
+
+            itemswap["HEAD"] = dressup:GetDressData(nil, nil, nil, nil, "show")
+            itemswap["HEAD_HAT"] = dressup:GetDressData(nil, nil, nil, nil, "hide")
+
+            return itemswap
         end,
+        unbuildfn = function(dressup, item) end, --没啥好恢复的
     },
     theemperorsmantle =
     {
         isnoskin = true,
         buildfn = function(dressup, item, buildskin)
-            dressup.swaplist["swap_body_tall"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
-            dressup.swaplist["backpack"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
-            dressup.swaplist["swap_body"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
+            local itemswap = {}
+
+            itemswap["swap_body_tall"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
+            -- itemswap["backpack"] = dressup:GetDressData(nil, nil, nil, nil, "clear") --undo
+            -- itemswap["swap_body"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
+
+            return itemswap
         end,
+        unbuildfn = function(dressup, item) end, --没啥好恢复的
     },
     theemperorsscepter =
     {
         isnoskin = true,
         buildfn = function(dressup, item, buildskin)
-            dressup.swaplist["swap_object"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
-            dressup.swaplist["whipline"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
-            dressup.swaplist["lantern_overlay"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
+            local itemswap = {}
+
+            itemswap["swap_object"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
+            itemswap["whipline"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
+            itemswap["lantern_overlay"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
+
+            return itemswap
         end,
+        unbuildfn = function(dressup, item) end, --没啥好恢复的
     },
 }
 
@@ -1211,15 +1271,17 @@ for k,v in pairs(pieces) do
     _G.DRESSUP_DATA_LEGION["chesspiece_"..v] =
     {
         isnoskin = true,
+        istallbody = true,
         buildfn = function(dressup, item, buildskin)
+            local itemswap = {}
+
             if item.materialid ~= nil and materials[item.materialid] ~= nil then
-                dressup.swaplist["swap_body_tall"] = dressup:GetDressData(
+                itemswap["swap_body_tall"] = dressup:GetDressData(
                     buildskin, "swap_chesspiece_"..v.."_"..materials[item.materialid], "swap_body", item.GUID, "swap"
                 )
-
-                dressup.swaplist["backpack"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
-                dressup.swaplist["swap_body"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
             end
+
+            return itemswap
         end,
     }
 end
@@ -1249,12 +1311,15 @@ for k,v in pairs(oversizecrops) do
     _G.DRESSUP_DATA_LEGION[k.."_oversized"] =
     {
         isnoskin = true,
+        istallbody = true,
         buildfn = function(dressup, item, buildskin)
-            dressup.swaplist["swap_body_tall"] = dressup:GetDressData(
+            local itemswap = {}
+
+            itemswap["swap_body_tall"] = dressup:GetDressData(
                 buildskin, v, "swap_body", item.GUID, "swap"
             )
-            dressup.swaplist["backpack"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
-            dressup.swaplist["swap_body"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
+
+            return itemswap
         end,
     }
     _G.DRESSUP_DATA_LEGION[k.."_oversized_waxed"] = _G.DRESSUP_DATA_LEGION[k.."_oversized"]

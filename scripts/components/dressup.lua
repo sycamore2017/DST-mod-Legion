@@ -1,8 +1,28 @@
+local function GetPriority(list)
+    local length = 0
+    for k,v in pairs(list) do
+        length = length + 1
+    end
+    return length
+end
+
+local function UnequipItem(player, slot)
+    if slot ~= nil then
+        local tool = player.components.inventory:GetEquippedItem(slot)
+        if tool ~= nil then
+            --inventory.GiveItem自带能否放进物品栏的控制
+            player.components.inventory:GiveItem(player.components.inventory:Unequip(slot))
+        end
+    end
+end
+
+local BODYTALL = "body_t"
+
 local DressUp = Class(function(self, inst)
     self.inst = inst
     self.itemlist =
     {
-        -- body = { item = nil, swaps = {结构与self.swaplist相同} },
+        -- body = { item = nil, swaps = {结构与self.swaplist相同}, priority = 0 },
     }
     self.swaplist =
     {
@@ -13,6 +33,7 @@ local DressUp = Class(function(self, inst)
         --     buildsymbol = nil,
         --     guid = nil,
         --     type = nil, --clear、swap、show、hide
+        --     priority = 0,
         -- }
     }
 end)
@@ -24,41 +45,80 @@ function DressUp:GetDressData(buildskin, buildfile, buildsymbol, guid, type)
         buildsymbol = buildsymbol,
         guid = guid,
         type = type,
+        priority = 0, --默认最高优先度，后面才更新
     }
 end
 
 function DressUp:GetDressSlot(item, data)
-    if item.components.equippable ~= nil then
-        return item.components.equippable.equipslot
-    elseif data.dressslot ~= nil then
+    if data.dressslot ~= nil then
         return data.dressslot
+    elseif data.istallbody then
+        return BODYTALL
+    elseif item.components.equippable ~= nil then
+        return item.components.equippable.equipslot
     else
         return nil
     end
 end
 
-function DressUp:UpdateSwapList() --更新幻化表与实际展示效果
+-----
+
+function DressUp:InitClear(symbol) --恢复实际展示的默认效果（清除）
+    if self.swaplist[symbol] ~= nil then --该通道有幻化数据的话，就不恢复
+        return
+    end
+    self.inst.AnimState:ClearOverrideSymbol(symbol)
+end
+
+function DressUp:InitHide(symbol) --恢复实际展示的默认效果（隐藏）
+    if self.swaplist[symbol] ~= nil then
+        return
+    end
+    self.inst.AnimState:Hide(symbol)
+end
+
+function DressUp:InitShow(symbol) --恢复实际展示的默认效果（显示）
+    if self.swaplist[symbol] ~= nil then
+        return
+    end
+    self.inst.AnimState:Show(symbol)
+end
+
+-----
+
+function DressUp:UpdateReal() --更新实际展示效果
+    for k,v in pairs(self.swaplist) do
+        if v ~= nil then
+            if v.type == "swap" then
+                if v.buildskin ~= nil then
+                    self.inst.AnimState:OverrideItemSkinSymbol(k, v.buildskin, v.buildsymbol, v.guid, v.buildfile)
+                else
+                    self.inst.AnimState:OverrideSymbol(k, v.buildfile, v.buildsymbol)
+                end
+            elseif v.type == "show" then
+                self.inst.AnimState:Show(k)
+            elseif v.type == "hide" then
+                self.inst.AnimState:Hide(k)
+            elseif v.type == "clear" then
+                self.inst.AnimState:ClearOverrideSymbol(k)
+            end
+        end
+    end
+end
+
+function DressUp:UpdateSwapList() --更新幻化表
     self.swaplist = {}
     for slot,itemdata in pairs(self.itemlist) do
         if itemdata ~= nil and itemdata.swaps ~= nil then
-            for k,v in pairs(self.itemdata.swaps) do
+            for k,v in pairs(itemdata.swaps) do
                 if v ~= nil then
-                    if self.swaplist[k] == nil then --只有未占用的才放入数据
+                    v.priority = itemdata.priority or 0
+                    if self.swaplist[k] == nil then
                         self.swaplist[k] = v
-
-                        --更新实际效果
-                        if v.type == "swap" then
-                            if v.buildskin ~= nil then
-                                self.inst.AnimState:OverrideItemSkinSymbol(k, v.buildskin, v.buildsymbol, v.guid, v.buildfile)
-                            else
-                                self.inst.AnimState:OverrideSymbol(k, v.buildfile, v.buildsymbol)
-                            end
-                        elseif v.type == "show" then
-                            self.inst.AnimState:Show(k)
-                        elseif v.type == "hide" then
-                            self.inst.AnimState:Hide(k)
-                        elseif v.type == "clear" then
-                            self.inst.AnimState:ClearOverrideSymbol(k)
+                    else
+                        local priorityold = self.swaplist[k].priority or 0
+                        if v.priority >= priorityold then --保存优先级数值大的那个
+                            self.swaplist[k] = v
                         end
                     end
                 end
@@ -104,8 +164,22 @@ function DressUp:PutOn(item) --幻化一个物品
         item.components.perishable:StopPerishing()
     end
 
-    --归还以前的幻化装备
-    self:TakeOff(slot)
+    --删除幻化数据
+    local itemdataold = nil
+    if self.itemlist[slot] ~= nil then
+        itemdataold = self.itemlist[slot]
+        self.itemlist[slot] = nil
+
+        --因为有数据删了，需要将优先级再次连续起来
+        for slot,itemdata in pairs(self.itemlist) do
+            if itemdata.priority > itemdataold.priority then
+                itemdata.priority = itemdata.priority - 1
+                for k,v in pairs(itemdata.swaps) do
+                    v.priority = itemdata.priority
+                end
+            end
+        end
+    end
 
     --增加幻化数据
     local itemswap = {}
@@ -143,92 +217,67 @@ function DressUp:PutOn(item) --幻化一个物品
                 itemswap["HEAD_HAT"] = self:GetDressData(nil, nil, nil, nil, "show")
             end
         elseif slot == EQUIPSLOTS.BODY or slot == EQUIPSLOTS.BACK or slot == EQUIPSLOTS.NECK then
-            if data.istallbody then
-                itemswap["swap_body_tall"] = self:GetDressData(buildskin, data.buildfile, data.buildsymbol, item.GUID, "swap")
-                itemswap["backpack"] = self:GetDressData(nil, nil, nil, nil, "clear")
-                itemswap["swap_body"] = self:GetDressData(nil, nil, nil, nil, "clear")
-            elseif data.isbackpack then
+            if data.isbackpack then
                 itemswap["backpack"] = self:GetDressData(buildskin, data.buildfile, "backpack", item.GUID, "swap")
                 itemswap["swap_body"] = self:GetDressData(buildskin, data.buildfile, "swap_body", item.GUID, "swap")
-                itemswap["swap_body_tall"] = self:GetDressData(nil, nil, nil, nil, "clear")
             else
                 itemswap["swap_body"] = self:GetDressData(buildskin, data.buildfile, data.buildsymbol, item.GUID, "swap")
                 itemswap["backpack"] = self:GetDressData(nil, nil, nil, nil, "clear")
-                itemswap["swap_body_tall"] = self:GetDressData(nil, nil, nil, nil, "clear")
             end
+        elseif slot == BODYTALL then
+            itemswap["swap_body_tall"] = self:GetDressData(buildskin, data.buildfile, data.buildsymbol, item.GUID, "swap")
         end
     end
-    self.itemlist[slot] = { item = item, swaps = itemswap or {} }
+
+    local prioritynew = GetPriority(self.itemlist)
+    self.itemlist[slot] = { item = item, swaps = itemswap or {}, priority = prioritynew }
 
     if data.equipfn ~= nil then
         data.equipfn(self.inst, item)
     end
 
     self:UpdateSwapList()
+    self:TakeOff(slot, itemdataold)
+    self:UpdateReal()
 
     return true
 end
 
-function DressUp:TakeOff(slot)  --去幻某个装备栏的装备
-    if self.itemlist[slot] ~= nil and self.itemlist[slot].item ~= nil then
-        local item = self.itemlist[slot].item
-        local swaps = self.itemlist[slot].swaps
-        self.itemlist[slot] = { item = nil, swaps = {} }
+function DressUp:TakeOff(slot, itemdata)  --去幻某个装备栏的装备
+    if itemdata ~= nil and itemdata.item ~= nil then
+        local item = itemdata.item
+
         self.inst:RemoveChild(item)
 
         local data = DRESSUP_DATA_LEGION[item.prefab]
 
-        --清除幻化数据
+        --初始化贴图状态
         if data ~= nil and data.unbuildfn ~= nil then
             data.unbuildfn(self, item)
         else
             if slot == EQUIPSLOTS.HANDS then
-                self.swaplist["swap_object"] = nil
-                self.swaplist["whipline"] = nil
-                self.swaplist["lantern_overlay"] = nil
+                self:InitClear("swap_object")
+                self:InitClear("whipline")
+                self:InitClear("lantern_overlay")
+                self:InitHide("LANTERN_OVERLAY")
             elseif slot == EQUIPSLOTS.HEAD then
-                self.swaplist["swap_hat"] = nil
-                self.swaplist["HAT"] = nil
-                self.swaplist["HAIR_HAT"] = nil
-                self.swaplist["HAIR_NOHAT"] = nil
-                self.swaplist["HAIR"] = nil
+                self:InitClear("swap_hat")
+                self:InitHide("HAT")
+                self:InitHide("HAIR_HAT")
+                self:InitShow("HAIR_NOHAT")
+                self:InitShow("HAIR")
 
-                self.swaplist["HEAD"] = nil
-                self.swaplist["HEAD_HAT"] = nil
+                self:InitShow("HEAD")
+                self:InitHide("HEAD_HAT")
             elseif slot == EQUIPSLOTS.BODY or slot == EQUIPSLOTS.BACK or slot == EQUIPSLOTS.NECK then
-                self.swaplist["swap_body_tall"] = nil
-                self.swaplist["backpack"] = nil
-                self.swaplist["swap_body"] = nil
+                self:InitClear("swap_body")
+                self:InitClear("backpack")
+            elseif slot == BODYTALL then
+                self:InitClear("swap_body_tall")
             end
         end
 
-        --卸下对应装备槽的装备，这样的话，就不用手动还原贴图了
-        local tool = self.inst.components.inventory:GetEquippedItem(slot)
-        if tool ~= nil then
-            self.inst.components.inventory:GiveItem(self.inst.components.inventory:Unequip(slot)) --inventory.GiveItem自带能否放进物品栏的控制
-        end
-
-        --还原贴图状态
-        if slot == EQUIPSLOTS.HANDS then
-            self.inst.AnimState:ClearOverrideSymbol("swap_object")
-            self.inst.AnimState:ClearOverrideSymbol("whipline")
-            self.inst.AnimState:ClearOverrideSymbol("lantern_overlay")
-            self.inst.AnimState:Hide("LANTERN_OVERLAY")
-        elseif slot == EQUIPSLOTS.HEAD then
-            self.inst.AnimState:ClearOverrideSymbol("swap_hat")
-            self.inst.AnimState:Hide("HAT")
-            self.inst.AnimState:Hide("HAIR_HAT")
-            self.inst.AnimState:Show("HAIR_NOHAT")
-            self.inst.AnimState:Show("HAIR")
-
-            self.inst.AnimState:Show("HEAD")
-            self.inst.AnimState:Hide("HEAD_HAT")
-        elseif slot == EQUIPSLOTS.BODY or slot == EQUIPSLOTS.BACK or slot == EQUIPSLOTS.NECK then
-            self.inst.AnimState:ClearOverrideSymbol("swap_body_tall")
-            self.inst.AnimState:ClearOverrideSymbol("swap_body")
-            self.inst.AnimState:ClearOverrideSymbol("backpack")
-        end
-        if data ~= nil and data.unequipfn ~= nil then --如果还有其他贴图要
+        if data ~= nil and data.unequipfn ~= nil then
             data.unequipfn(self.inst, item)
         end
 
@@ -239,7 +288,8 @@ function DressUp:TakeOff(slot)  --去幻某个装备栏的装备
         item:ReturnToScene()
         item.Transform:SetPosition(self.inst.Transform:GetWorldPosition())
         if item.components.inventoryitem ~= nil then
-            item.components.inventoryitem:OnDropped(true)
+            -- item.components.inventoryitem:OnDropped(true)
+            self.inst.components.inventory:GiveItem(item)
         end
         if item.brain ~= nil and item.brain.stopped then
             item.brain:Start()
@@ -250,18 +300,30 @@ end
 function DressUp:TakeOffAll()   --清除所有幻化效果
     self.swaplist = {}
     for k,v in pairs(self.itemlist) do
-        self:TakeOff(k)
+        if v ~= nil then
+            self:TakeOff(k, v)
+
+            --卸下对应装备槽的装备，这样的话，就不用手动还原装备的贴图了
+            if k == BODYTALL or k == EQUIPSLOTS.BODY then
+                UnequipItem(self.inst, EQUIPSLOTS.BACK)
+                UnequipItem(self.inst, EQUIPSLOTS.NECK)
+                UnequipItem(self.inst, EQUIPSLOTS.BODY)
+            else
+                UnequipItem(self.inst, k)
+            end
+        end
     end
+    self.itemlist = {}
 end
 
 function DressUp:OnSave()
-    local data = { items= {} }
+    local data = { items = {} }
     local refs = {}
 
     for k,v in pairs(self.itemlist) do
-        if v ~= nil then
-            data.items[k] = v:GetSaveRecord()
-            table.insert(refs, v.GUID)
+        if v ~= nil and v.item ~= nil then
+            data.items[k] = v.item:GetSaveRecord()
+            table.insert(refs, v.item.GUID)
         end
     end
 

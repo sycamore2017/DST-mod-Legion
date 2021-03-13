@@ -1,6 +1,6 @@
 local _G = GLOBAL
 -- local COOKING = require("cooking")
-local CONTAINERS = require("containers")
+local containers = require("containers")
 
 --------------------------------------------------------------------------
 --[[ 容器数据设定 ]]
@@ -20,6 +20,7 @@ if TUNING.LEGION_FLASHANDCRUSH then
             side_align_tip = 160,
         },
         type = "chest",
+        openlimit = 1,
     }
     for y = 2.5, -0.5, -1 do
         for x = 0, 2 do
@@ -40,6 +41,7 @@ if CONFIGS_LEGION.PRAYFORRAIN then
         },
         issidewidget = true,
         type = "pack",
+        openlimit = 1,
         priorityfn = function(container, item, slot)
             return item.prefab == "cane" or item.prefab == "ruins_bat" or item:HasTag("weapon")
         end
@@ -122,6 +124,7 @@ end
 --         },
 --         issidewidget = true,
 --         type = "pack",
+--         openlimit = 1,
 --         priorityfn = function(container, item, slot)
 --             local costs =
 --             {
@@ -166,32 +169,23 @@ end
 --[[ 修改容器注册函数 ]]
 --------------------------------------------------------------------------
 
---更新容器格子数量的最大值
 for k, v in pairs(params) do
-    CONTAINERS.MAXITEMSLOTS = math.max(CONTAINERS.MAXITEMSLOTS, v.widget.slotpos ~= nil and #v.widget.slotpos or 0)
+    containers.params[k] = v
+
+    --更新容器格子数量的最大值
+    containers.MAXITEMSLOTS = math.max(containers.MAXITEMSLOTS, v.widget.slotpos ~= nil and #v.widget.slotpos or 0)
 end
 
 --加入mod的容器
-local widgetsetup_old = CONTAINERS.widgetsetup
-function CONTAINERS.widgetsetup(container, prefab, data)
-    local t = params[prefab or container.inst.prefab]
-    if t ~= nil then   --是mod里用到的格子就注册，否则就返回官方的格子注册函数
-        for k, v in pairs(t) do
-            container[k] = v
-        end
-        container:SetNumSlots(container.widget.slotpos ~= nil and #container.widget.slotpos or 0)
-    else
-        return widgetsetup_old(container, prefab, data)
-    end
-end
-
---[[--注册slot可以用上面的办法，也可以用下面这个偷懒的办法，直接借用官方的
-local containers = require "containers"
-local oldwidgetsetup = containers.widgetsetup
-containers.widgetsetup = function(container, prefab)
-    if not prefab and container.inst.prefab == "portablecookpot" then
-        prefab = "cookpot"
-    end
-    oldwidgetsetup(container, prefab)
-end
-]]--
+-- local widgetsetup_old = containers.widgetsetup
+-- function containers.widgetsetup(container, prefab, data)
+--     local t = params[prefab or container.inst.prefab]
+--     if t ~= nil then   --是mod里用到的格子就注册，否则就返回官方的格子注册函数
+--         for k, v in pairs(t) do
+--             container[k] = v
+--         end
+--         container:SetNumSlots(container.widget.slotpos ~= nil and #container.widget.slotpos or 0)
+--     else
+--         return widgetsetup_old(container, prefab, data)
+--     end
+-- end
