@@ -32,6 +32,7 @@ local function SetLoot(inst, targetprefab)
         if targetprefab == "icebox" then
             inst.components.lootdropper:SetChanceLootTable('hiddenmoonlight_ice')
         elseif targetprefab == "saltbox" then
+            inst.AnimState:OverrideSymbol("base", "hiddenmoonlight", "saltbase")
             inst.components.lootdropper:SetChanceLootTable('hiddenmoonlight_salt')
         else
             inst.components.lootdropper:AddChanceLoot("hiddenmoonlight_item", 1)
