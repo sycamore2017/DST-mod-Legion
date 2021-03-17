@@ -35,6 +35,8 @@ local assets = {
     Asset("IMAGE", "images/inventoryimages/theemperorsmantle.tex"),
     Asset("ATLAS", "images/inventoryimages/theemperorsscepter.xml"),
     Asset("IMAGE", "images/inventoryimages/theemperorsscepter.tex"),
+    Asset("ATLAS", "images/inventoryimages/theemperorspendant.xml"),
+    Asset("IMAGE", "images/inventoryimages/theemperorspendant.tex"),
 }
 
 for k,v in pairs(assets) do
@@ -246,16 +248,23 @@ if CONFIGS_LEGION.DRESSUP then
     AddRecipe("theemperorsmantle",
     {
         Ingredient("nightmarefuel", 1),
-        Ingredient("silk", 1),
+        Ingredient("cutgrass", 1),
     }, 
     RECIPETABS.DRESS, TECH.NONE, nil, nil, nil, nil, nil, "images/inventoryimages/theemperorsmantle.xml", "theemperorsmantle.tex")
 
     AddRecipe("theemperorsscepter",
     {
         Ingredient("nightmarefuel", 1),
-        Ingredient("log", 1),
+        Ingredient("twigs", 1),
     }, 
     RECIPETABS.DRESS, TECH.NONE, nil, nil, nil, nil, nil, "images/inventoryimages/theemperorsscepter.xml", "theemperorsscepter.tex")
+
+    AddRecipe("theemperorspendant",
+    {
+        Ingredient("nightmarefuel", 1),
+        Ingredient("flint", 1),
+    }, 
+    RECIPETABS.DRESS, TECH.NONE, nil, nil, nil, nil, nil, "images/inventoryimages/theemperorspendant.xml", "theemperorspendant.tex")
 end
 
 --------------------------------------------------------------------------

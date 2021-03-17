@@ -1087,8 +1087,40 @@ local dressup_data =
     hat_cowboy =
     {
         isnoskin = true,
-        buildfile = "hat_cowboy",
-        buildsymbol = "swap_hat",
+        buildfn = function(dressup, item, buildskin)
+            local itemswap = {}
+
+            itemswap["swap_hat"] = dressup:GetDressData(
+                buildskin, "hat_cowboy", "swap_hat", item.GUID, "swap"
+            )
+            itemswap["HAT"] = dressup:GetDressData(nil, nil, nil, nil, "show")
+            itemswap["HAIR_HAT"] = dressup:GetDressData(nil, nil, nil, nil, "show")
+            itemswap["HAIR_NOHAT"] = dressup:GetDressData(nil, nil, nil, nil, "hide")
+            itemswap["HAIR"] = dressup:GetDressData(nil, nil, nil, nil, "hide")
+
+            itemswap["HEAD"] = dressup:GetDressData(nil, nil, nil, nil, "hide")
+            itemswap["HEAD_HAT"] = dressup:GetDressData(nil, nil, nil, nil, "show")
+
+            --增加牛仔围巾的贴图
+            itemswap["swap_body"] = dressup:GetDressData(
+                buildskin, "scarf_cowboy", "swap_body", item.GUID, "swap"
+            )
+
+            return itemswap
+        end,
+        unbuildfn = function(dressup, item)
+            dressup:InitClear("swap_hat")
+            dressup:InitHide("HAT")
+            dressup:InitHide("HAIR_HAT")
+            dressup:InitShow("HAIR_NOHAT")
+            dressup:InitShow("HAIR")
+
+            dressup:InitShow("HEAD")
+            dressup:InitHide("HEAD_HAT")
+
+            --还原牛仔围巾的效果
+            dressup:InitClear("swap_body")
+        end,
     },
     hat_lichen =
     {
@@ -1189,12 +1221,24 @@ local dressup_data =
     theemperorsmantle =
     {
         isnoskin = true,
+        istallbody = true,
         buildfn = function(dressup, item, buildskin)
             local itemswap = {}
 
             itemswap["swap_body_tall"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
-            -- itemswap["backpack"] = dressup:GetDressData(nil, nil, nil, nil, "clear") --undo
-            -- itemswap["swap_body"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
+
+            return itemswap
+        end,
+        unbuildfn = function(dressup, item) end, --没啥好恢复的
+    },
+    theemperorspendant =
+    {
+        isnoskin = true,
+        buildfn = function(dressup, item, buildskin)
+            local itemswap = {}
+
+            itemswap["backpack"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
+            itemswap["swap_body"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
 
             return itemswap
         end,
