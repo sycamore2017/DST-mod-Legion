@@ -73,6 +73,7 @@ local function MakeClothes(namepst, slot, fn_equip, fn_unequip)
         inst:AddComponent("inspectable")
 
         inst:AddComponent("equippable")
+        inst.components.equippable.equipslot = slot
         inst.components.equippable:SetOnEquip(fn_equip)
         inst.components.equippable:SetOnUnequip(fn_unequip)
 
@@ -95,6 +96,6 @@ local function MakeClothes(namepst, slot, fn_equip, fn_unequip)
 end
 
 return MakeClothes("crown", EQUIPSLOTS.HEAD, OnUnequip_crown, OnUnequip_crown),
-        MakeClothes("mantle", EQUIPSLOTS.BODY, OnUnequip_mantle, OnUnequip_mantle),
+        MakeClothes("mantle", EQUIPSLOTS.BACK or EQUIPSLOTS.BODY, OnUnequip_mantle, OnUnequip_mantle),
         MakeClothes("scepter", EQUIPSLOTS.HANDS, OnEquip_scepter, OnUnequip_scepter),
-        MakeClothes("pendant", EQUIPSLOTS.BODY, OnUnequip_pendant, OnUnequip_pendant)
+        MakeClothes("pendant", EQUIPSLOTS.NECK or EQUIPSLOTS.BODY, OnUnequip_pendant, OnUnequip_pendant)

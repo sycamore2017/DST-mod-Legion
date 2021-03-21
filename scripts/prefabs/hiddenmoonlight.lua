@@ -328,8 +328,9 @@ local function Fn()
     AddHauntableDropItemOrWork(inst)
 
     inst:WatchWorldState("issnowcovered", OnSnowCoveredChagned)
-    inst:DoTaskInTime(0.5, function()
+    inst:DoTaskInTime(0.3, function()
 		OnSnowCoveredChagned(inst)
+        inst.AnimState:SetTime(math.random() * inst.AnimState:GetCurrentAnimationLength())
 	end)
 
     inst.OnSave = OnSave
