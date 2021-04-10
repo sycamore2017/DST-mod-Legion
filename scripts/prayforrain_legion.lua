@@ -144,7 +144,7 @@ local function EquipFightItem(inst)
     if backpack ~= nil and backpack.components.container ~= nil then
         local item1 = backpack.components.container:FindItem(function(item)
             if item.components.weapon ~= nil and not item:HasTag("projectile") then
-                local dmg = item.components.weapon:GetDamage(inst, nil)
+                local dmg = item.components.weapon:GetDamage(inst, nil) or 0
                 if dmg > 17 or dmg <= 0 then
                     return true
                 end
