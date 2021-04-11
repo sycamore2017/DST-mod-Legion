@@ -186,7 +186,7 @@ local function MakePrefab(name, info)
                 assets = nil,
                 prefabs = nil,
                 cookable = { product = nil },
-                dryable = { product = nil, time = nil, build = nil, build_dried = nil },
+                dryable = { product = nil, time = nil, build = nil, build_dried = nil }, --build文件中需要以原料prefab名为通道名的文件夹
                 floatable = {nil, "small", 0.2, 0.9},
                 lure = {lure_data = TUNING.OCEANFISHING_LURE.BERRY, single_use = true, build = "oceanfishing_lure_mis", symbol = "hook_berries"},
                 edible = { hunger = 0, sanity = 0, health = 0, foodtype = nil, foodtype_secondary = nil },
@@ -197,6 +197,7 @@ local function MakePrefab(name, info)
                 fn_common = nil,
                 fn_server = nil,
             },
+            seed = {},
             cooked = {},
             dried = {},
             rotten = {},

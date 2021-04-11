@@ -66,6 +66,8 @@ Assets = {
     Asset("IMAGE", "images/inventoryimages/pineananas.tex"),
     Asset("ATLAS", "images/inventoryimages/pineananas_cooked.xml"),
     Asset("IMAGE", "images/inventoryimages/pineananas_cooked.tex"),
+    Asset("ATLAS", "images/inventoryimages/pineananas_seeds.xml"),
+    Asset("IMAGE", "images/inventoryimages/pineananas_seeds.tex"),
     -- Asset("ATLAS", "images/inventoryimages/catmint.xml"), --delete_crop
     -- Asset("IMAGE", "images/inventoryimages/catmint.tex"),
     Asset("ATLAS", "images/inventoryimages/albicans_cap.xml"),
@@ -81,6 +83,7 @@ RegisterInventoryItemAtlas("images/inventoryimages/petals_lily.xml", "petals_lil
 RegisterInventoryItemAtlas("images/inventoryimages/petals_orchid.xml", "petals_orchid.tex")
 RegisterInventoryItemAtlas("images/inventoryimages/pineananas.xml", "pineananas.tex")
 RegisterInventoryItemAtlas("images/inventoryimages/pineananas_cooked.xml", "pineananas_cooked.tex")
+RegisterInventoryItemAtlas("images/inventoryimages/pineananas_seeds.xml", "pineananas_seeds.tex")
 -- RegisterInventoryItemAtlas("images/inventoryimages/catmint.xml", "catmint.tex") --delete_crop
 RegisterInventoryItemAtlas("images/inventoryimages/albicans_cap.xml", "albicans_cap.tex")
 
