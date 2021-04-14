@@ -112,6 +112,8 @@ local InventoryPrefabsList = {  --每个元素的下标值为每种物品栏图�
     dish_wrappedshrimppaste = { build = "images_minisign5", },
     albicans_cap = { build = "images_minisign5", },
     theemperorspendant = { build = "images_minisign5", },
+    pineananas_oversized = { build = "images_minisign5", },
+    pineananas_oversized_waxed = { build = "images_minisign5", },
 }
 
 return InventoryPrefabsList

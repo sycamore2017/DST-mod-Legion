@@ -169,9 +169,6 @@ if CONFIGS_LEGION.LEGENDOFFALL then
         },
         oversized = {
             perishable = { product = nil, time = TUNING.PERISH_MED * 4 },
-            -- burnable = {},
-            workable = nil,
-            physicsradius = nil,
         },
         oversized_waxed = {},
         oversized_rotten = {},
@@ -214,6 +211,8 @@ local function MakePrefab(name, info)
                 fuel = { value = nil },
                 burnable = {},
                 has_seeds = false, --这个不用主动加，设置seeds时自动添加
+                nohauntable = false, --这个不用主动加，设置时自动添加
+                noInventoryItem = false,  --这个不用主动加，设置时自动添加
                 fn_common = nil,
                 fn_server = nil,
             },
@@ -222,8 +221,8 @@ local function MakePrefab(name, info)
             rotten = {},
             seeds = {},
             oversized = {
-                workable = { action = nil, left_max = nil },
-                physicsradius = nil,
+                workable = { action = nil, left_max = nil }, --必有的属性
+                physicsradius = nil,    --必有的属性
                 nohauntable = true, --这个不用主动加，设置时自动添加
             },
             oversized_waxed = {
@@ -295,20 +294,24 @@ local function MakePrefab(name, info)
 
         inst:AddComponent("inspectable")
 
-        inst:AddComponent("inventoryitem")
-        inst.components.inventoryitem.imagename = name
-        inst.components.inventoryitem.atlasname = "images/inventoryimages/"..name..".xml"
+        if not info.noInventoryItem then
+            inst:AddComponent("inventoryitem")
+            inst.components.inventoryitem.imagename = name
+            inst.components.inventoryitem.atlasname = "images/inventoryimages/"..name..".xml"
+        end
 
-        inst:AddComponent("bait")
+        if info.edible ~= nil then
+            inst:AddComponent("bait")
 
-        inst:AddComponent("tradable")
+            inst:AddComponent("tradable")
 
-        inst:AddComponent("edible")
-        inst.components.edible.healthvalue = info.edible.health or 0
-        inst.components.edible.hungervalue = info.edible.hunger or 0
-        inst.components.edible.sanityvalue = info.edible.sanity or 0
-        inst.components.edible.foodtype = info.edible.foodtype or FOODTYPE.VEGGIE
-        inst.components.edible.secondaryfoodtype = info.edible.foodtype_secondary
+            inst:AddComponent("edible")
+            inst.components.edible.healthvalue = info.edible.health or 0
+            inst.components.edible.hungervalue = info.edible.hunger or 0
+            inst.components.edible.sanityvalue = info.edible.sanity or 0
+            inst.components.edible.foodtype = info.edible.foodtype or FOODTYPE.VEGGIE
+            inst.components.edible.secondaryfoodtype = info.edible.foodtype_secondary
+        end
 
         if info.perishable ~= nil then
             inst:AddComponent("perishable")
@@ -370,39 +373,24 @@ local function MakePrefab(name, info)
 end
 
 local function MadePrefab(name, info)
-    local assets = {
-        Asset("ANIM", "anim/"..info.animstate.build..".zip"),
-        Asset("ATLAS", "images/inventoryimages/"..name..".xml"),
-        Asset("IMAGE", "images/inventoryimages/"..name..".tex"),
-    }
-    if info.assets ~= nil then
-        for i,v in ipairs(assets) do
-            table.insert(info.assets, v)
-        end
-    else
-        info.assets = assets
+    if info.assets == nil then info.assets = {} end
+    table.insert(info.assets, Asset("ANIM", "anim/"..info.animstate.build..".zip"))
+    if not info.noInventoryItem then
+        table.insert(info.assets, Asset("ATLAS", "images/inventoryimages/"..name..".xml"))
+        table.insert(info.assets, Asset("IMAGE", "images/inventoryimages/"..name..".tex"))
     end
 
-    local prefabs = {}
+    if info.prefabs == nil then info.prefabs = {} end
     if info.cookable ~= nil then
-        table.insert(prefabs, info.cookable.product)
+        table.insert(info.prefabs, info.cookable.product)
     end
     if info.dryable ~= nil then
-        table.insert(prefabs, info.dryable.product)
+        table.insert(info.prefabs, info.dryable.product)
     end
     if info.perishable ~= nil then
         local product = info.perishable.product or "spoiled_food"
-        table.insert(prefabs, product)
+        table.insert(info.prefabs, product)
         info.perishable.product = product
-    end
-    if info.prefabs ~= nil then
-        for i,v in ipairs(prefabs) do
-            if not table.contains(info.prefabs, v) then
-                table.insert(info.prefabs, v)
-            end
-        end
-    else
-        info.prefabs = prefabs
     end
 
     MakePrefab(name, info)
@@ -428,9 +416,8 @@ local function CalcWeightCoefficient_oversized(weight_data)
 end
 
 local function MakeLoots_oversized(inst, name)
-    local product = name
 	local seeds = name.."_seeds"
-    return {product, product, seeds, seeds, math.random() < 0.75 and product or seeds}
+    return {name, name, seeds, seeds, math.random() < 0.75 and name or seeds}
 end
 
 local function OnBurnt_oversized(inst)
@@ -438,14 +425,30 @@ local function OnBurnt_oversized(inst)
     inst:Remove()
 end
 
+local PlayWaxAnimation = function(inst)
+    inst.AnimState:PlayAnimation("wax_oversized", false)
+    inst.AnimState:PushAnimation("idle_oversized")
+end
+
+local function CancelWaxTask(inst)
+	if inst._waxtask ~= nil then
+		inst._waxtask:Cancel()
+		inst._waxtask = nil
+	end
+end
+
+local function StartWaxTask(inst)
+	if not inst.inlimbo and inst._waxtask == nil then
+		inst._waxtask = inst:DoTaskInTime(GetRandomMinMax(20, 40), PlayWaxAnimation)
+	end
+end
+
 ---
 
 local function MakeIngredient(name, data)
     if data.base ~= nil then
         local info = data.base
-        if info.animstate == nil then
-            info.animstate = {}
-        end
+        if info.animstate == nil then info.animstate = {} end
         if info.animstate.bank == nil then
             info.animstate.bank = name
         end
@@ -456,50 +459,34 @@ local function MakeIngredient(name, data)
             info.animstate.anim = "idle"
         end
 
-        local assets = {}
+        if info.assets == nil then info.assets = {} end
         if data.seeds ~= nil then
-            table.insert(assets, Asset("ANIM", "anim/oceanfishing_lure_mis.zip"))
+            table.insert(info.assets, Asset("ANIM", "anim/oceanfishing_lure_mis.zip"))
             info.has_seeds = true
         end
-        if info.assets ~= nil then
-            for i,v in ipairs(assets) do
-                table.insert(info.assets, v)
-            end
-        else
-            info.assets = assets
-        end
 
-        local prefabs = {}
+        if info.prefabs == nil then info.prefabs = {} end
         if info.cookable ~= nil then
             local product = data.cooked ~= nil and name.."_cooked" or info.cookable.product
-            table.insert(prefabs, product)
+            table.insert(info.prefabs, product)
             info.cookable.product = product
         end
         if info.dryable ~= nil then
             local product = data.dried ~= nil and name.."_dried" or info.dryable.product
-            table.insert(prefabs, product)
+            table.insert(info.prefabs, product)
             info.dryable.product = product
         end
         if info.perishable ~= nil then
             local product = data.rotten ~= nil and name.."_rotten" or (info.perishable.product or "spoiled_food")
-            table.insert(prefabs, product)
+            table.insert(info.prefabs, product)
             info.perishable.product = product
         end
         if data.seeds ~= nil then
-            table.insert(prefabs, name.."_seeds")
-            table.insert(prefabs, name.."_oversized")
-            table.insert(prefabs, name.."_oversized_waxed")
-            table.insert(prefabs, name.."_oversized_rotten")
-            table.insert(prefabs, "splash_green")
-        end
-        if info.prefabs ~= nil then
-            for i,v in ipairs(prefabs) do
-                if not table.contains(info.prefabs, v) then
-                    table.insert(info.prefabs, v)
-                end
-            end
-        else
-            info.prefabs = prefabs
+            table.insert(info.prefabs, name.."_seeds")
+            table.insert(info.prefabs, name.."_oversized")
+            table.insert(info.prefabs, name.."_oversized_waxed")
+            table.insert(info.prefabs, name.."_oversized_rotten")
+            table.insert(info.prefabs, "splash_green")
         end
 
         MakePrefab(name, info)
@@ -507,9 +494,7 @@ local function MakeIngredient(name, data)
 
     if data.cooked ~= nil then
         local info = data.cooked
-        if info.animstate == nil then
-            info.animstate = {}
-        end
+        if info.animstate == nil then info.animstate = {} end
         if info.animstate.bank == nil then
             info.animstate.bank = name
         end
@@ -525,9 +510,7 @@ local function MakeIngredient(name, data)
 
     if data.dried ~= nil then
         local info = data.dried
-        if info.animstate == nil then
-            info.animstate = {}
-        end
+        if info.animstate == nil then info.animstate = {} end
         if info.animstate.bank == nil then
             info.animstate.bank = name
         end
@@ -543,9 +526,7 @@ local function MakeIngredient(name, data)
 
     if data.rotten ~= nil then
         local info = data.rotten
-        if info.animstate == nil then
-            info.animstate = {}
-        end
+        if info.animstate == nil then info.animstate = {} end
         if info.animstate.bank == nil then
             info.animstate.bank = name
         end
@@ -561,9 +542,7 @@ local function MakeIngredient(name, data)
 
     if data.seeds ~= nil then
         local info = data.seeds
-        if info.animstate == nil then
-            info.animstate = {}
-        end
+        if info.animstate == nil then info.animstate = {} end
         if info.animstate.bank == nil then
             info.animstate.bank = name
         end
@@ -636,9 +615,7 @@ local function MakeIngredient(name, data)
 
     if data.oversized ~= nil then
         local info = data.oversized
-        if info.animstate == nil then
-            info.animstate = {}
-        end
+        if info.animstate == nil then info.animstate = {} end
         if info.animstate.bank == nil then
             info.animstate.bank = PLANT_DEFS[name].bank
         end
@@ -745,6 +722,7 @@ local function MakeIngredient(name, data)
             local coefficient = CalcWeightCoefficient_oversized(weight_data)
             inst.components.weighable:SetWeight(Lerp(weight_data[1], weight_data[2], coefficient))
 
+            inst:AddComponent("lootdropper")
             inst.components.lootdropper:SetLoot(MakeLoots_oversized(inst, name))
 
             MakeMediumBurnable(inst)
@@ -769,6 +747,182 @@ local function MakeIngredient(name, data)
         end
 
         MadePrefab(name.."_oversized", info)
+    end
+
+    if data.oversized_waxed ~= nil then
+        local info = data.oversized_waxed
+        if info.animstate == nil then info.animstate = {} end
+        if info.animstate.bank == nil then
+            info.animstate.bank = PLANT_DEFS[name].bank
+        end
+        if info.animstate.build == nil then
+            info.animstate.build = PLANT_DEFS[name].build
+        end
+        if info.animstate.anim == nil then
+            info.animstate.anim = "idle_oversized"
+        end
+
+        if info.workable ~= nil then
+            if info.workable.action == nil then
+                info.workable.action = ACTIONS.HAMMER
+            end
+            if info.workable.left_max == nil then
+                info.workable.left_max = 1
+            end
+        else
+            info.workable = { action = ACTIONS.HAMMER, left_max = 1 }
+        end
+        if info.physicsradius == nil then
+            info.physicsradius = 0.1
+        end
+        if info.nohauntable ~= false then
+            info.nohauntable = true
+        end
+
+        local fn_common = info.fn_common
+        info.fn_common = function(inst)
+            inst:AddTag("heavy")
+
+            inst.displayadjectivefn = function(inst)
+                return STRINGS.UI.HUD.WAXED
+            end
+            inst:SetPrefabNameOverride(name.."_oversized")
+
+            MakeHeavyObstaclePhysics(inst, info.physicsradius)
+            inst:SetPhysicsRadiusOverride(info.physicsradius)
+
+            inst._base_name = name
+
+            if fn_common ~= nil then fn_common(inst) end
+        end
+
+        local fn_server = info.fn_server
+        info.fn_server = function(inst)
+            inst:AddComponent("heavyobstaclephysics")
+            inst.components.heavyobstaclephysics:SetRadius(info.physicsradius)
+            inst.components.heavyobstaclephysics:MakeSmallObstacle()
+
+            inst.components.inventoryitem.cangoincontainer = false
+            inst.components.inventoryitem:SetSinks(true)
+
+            inst:AddComponent("equippable")
+            inst.components.equippable.equipslot = EQUIPSLOTS.BODY
+            inst.components.equippable:SetOnEquip(function(inst, owner)
+                owner.AnimState:OverrideSymbol("swap_body", info.animstate.build, "swap_body")
+            end)
+            inst.components.equippable:SetOnUnequip(OnUnequip_oversized)
+            inst.components.equippable.walkspeedmult = TUNING.HEAVY_SPEED_MULT
+
+            inst:AddComponent("workable")
+            inst.components.workable:SetWorkAction(info.workable.action)
+            inst.components.workable:SetOnFinishCallback(OnFinishWork_oversized)
+            inst.components.workable:SetWorkLeft(info.workable.left_max)
+
+            inst:AddComponent("submersible")
+            inst:AddComponent("symbolswapdata")
+            inst.components.symbolswapdata:SetData(info.animstate.build, "swap_body")
+
+            inst:AddComponent("lootdropper")
+            inst.components.lootdropper:SetLoot({"spoiled_food"})
+
+            MakeMediumBurnable(inst)
+            inst.components.burnable:SetOnBurntFn(OnBurnt_oversized)
+            MakeMediumPropagator(inst)
+
+            MakeHauntableWork(inst)
+
+            inst:ListenForEvent("onputininventory", CancelWaxTask)
+            inst:ListenForEvent("ondropped", StartWaxTask)
+
+            inst.OnEntitySleep = CancelWaxTask
+            inst.OnEntityWake = StartWaxTask
+
+            StartWaxTask(inst)
+
+            if fn_server ~= nil then fn_server(inst) end
+        end
+
+        MadePrefab(name.."_oversized_waxed", info)
+    end
+
+    if data.oversized_rotten ~= nil then
+        local info = data.oversized_rotten
+        if info.animstate == nil then info.animstate = {} end
+        if info.animstate.bank == nil then
+            info.animstate.bank = PLANT_DEFS[name].bank
+        end
+        if info.animstate.build == nil then
+            info.animstate.build = PLANT_DEFS[name].build
+        end
+        if info.animstate.anim == nil then
+            info.animstate.anim = "idle_rot_oversized"
+        end
+
+        if info.workable ~= nil then
+            if info.workable.action == nil then
+                info.workable.action = ACTIONS.HAMMER
+            end
+            if info.workable.left_max == nil then
+                info.workable.left_max = 1
+            end
+        else
+            info.workable = { action = ACTIONS.HAMMER, left_max = 1 }
+        end
+        if info.physicsradius == nil then
+            info.physicsradius = 0.1
+        end
+        if info.nohauntable ~= false then
+            info.nohauntable = true
+        end
+        if info.noInventoryItem ~= false then
+            info.noInventoryItem = true
+        end
+
+        local fn_common = info.fn_common
+        info.fn_common = function(inst)
+            MakeObstaclePhysics(inst, info.physicsradius)
+
+            inst:AddTag("farm_plant_killjoy")
+            inst:AddTag("pickable_harvest_str")
+            inst:AddTag("pickable")
+
+		    inst._base_name = name
+
+            if fn_common ~= nil then fn_common(inst) end
+        end
+
+        local fn_server = info.fn_server
+        info.fn_server = function(inst)
+            inst.components.inspectable.nameoverride = "VEGGIE_OVERSIZED_ROTTEN"
+
+            inst:AddComponent("workable")
+            inst.components.workable:SetWorkAction(info.workable.action)
+            inst.components.workable:SetOnFinishCallback(OnFinishWork_oversized)
+            inst.components.workable:SetWorkLeft(info.workable.left_max)
+
+            inst:AddComponent("pickable")
+            inst.components.pickable.onpickedfn = inst.Remove
+            inst.components.pickable:SetUp(nil)
+            inst.components.pickable.use_lootdropper_for_product = true
+            inst.components.pickable.picksound = "dontstarve/wilson/harvest_berries"
+
+            inst.components.inventoryitem.cangoincontainer = false
+            inst.components.inventoryitem.canbepickedup = false
+            inst.components.inventoryitem:SetSinks(true)
+
+            inst:AddComponent("lootdropper")
+            inst.components.lootdropper:SetLoot(PLANT_DEFS[name].loot_oversized_rot)
+
+            MakeMediumBurnable(inst)
+            inst.components.burnable:SetOnBurntFn(OnBurnt_oversized)
+            MakeMediumPropagator(inst)
+
+            MakeHauntableWork(inst)
+
+            if fn_server ~= nil then fn_server(inst) end
+        end
+
+        MadePrefab(name.."_oversized_rotten", info)
     end
 end
 

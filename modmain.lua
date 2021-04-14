@@ -5,9 +5,9 @@
 --[[
     1.可以种植松萝作物啦！松萝种子、松萝、烤松萝和松萝咕咾肉也随之回归
 
-    1.【祈雨祭】（1）月藏宝匣的样子会根据升级原物的种类变化了
+    1.【祈雨祭】（1）月藏宝匣的样子会根据升级原物的种类变化了；（2）月藏宝匣也能给热能石降温了
     2.【尘市蜃楼】（1）新增道具-皇帝的吊坠：毅力的象征；（2）牛仔帽的围巾装饰效果也能在幻化中生效了
-    3.
+    3.【额外物品包】向日葵也具有1花度了
 ]]
 
 --------------------------------------------------------------------------
@@ -49,7 +49,7 @@ Assets = {
     Asset("ATLAS", "images/inventoryimages/hat_lichen.xml"),
     Asset("IMAGE", "images/inventoryimages/hat_lichen.tex"),
 
-    --为了在菜谱里显示材料的图片，所以不管玩家设置，还是要注册一遍
+    --为了在菜谱和农谱里显示材料的图片，所以不管玩家设置，还是要注册一遍
     Asset("ATLAS", "images/inventoryimages/monstrain_leaf.xml"),
     Asset("IMAGE", "images/inventoryimages/monstrain_leaf.tex"),
     Asset("ATLAS", "images/inventoryimages/shyerry.xml"),
@@ -74,7 +74,7 @@ Assets = {
     Asset("IMAGE", "images/inventoryimages/albicans_cap.tex"),
 }
 
---为了在菜谱里显示材料的图片，所以不管玩家设置，还是要注册一遍
+--为了在菜谱和农谱里显示材料的图片，所以不管玩家设置，还是要注册一遍
 RegisterInventoryItemAtlas("images/inventoryimages/monstrain_leaf.xml", "monstrain_leaf.tex")
 RegisterInventoryItemAtlas("images/inventoryimages/shyerry.xml", "shyerry.tex")
 RegisterInventoryItemAtlas("images/inventoryimages/shyerry_cooked.xml", "shyerry_cooked.tex")
