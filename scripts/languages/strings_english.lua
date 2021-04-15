@@ -28,18 +28,19 @@ TUNING.LEGION_MOD_LANGUAGES = "english"
 
 S_NAMES.HAT_LICHEN = "Lichen Hairpin"
 S_RECIPE_DESC.HAT_LICHEN = "I have an \"idea\", like cartoons."
-S______GENERIC.DESCRIBE.HAT_LICHEN = "I have an \"idea\", truly."
---S_______WILLOW.DESCRIBE.HAT_LICHEN = "This is the opposite of burning."
---S_____WOLFGANG.DESCRIBE.HAT_LICHEN = "Wolfgang can eat in one bite!"
---S________WENDY.DESCRIBE.HAT_LICHEN = "I used to eat these with Abigail..."
---S_________WX78.DESCRIBE.HAT_LICHEN = "STICK ADDON INSTALLED"
---S_WICKERBOTTOM.DESCRIBE.HAT_LICHEN = "Well, isn't that refreshing?"
---S_______WOODIE.DESCRIBE.HAT_LICHEN = "I'd prefer maple taffy..."
---S______WAXWELL.DESCRIBE.HAT_LICHEN = "Hm... I don't know what I was expecting."
---S___WATHGRITHR.DESCRIBE.HAT_LICHEN = "I've somehow found a way to make it even LESS appealing!"
---S_______WEBBER.DESCRIBE.HAT_LICHEN = "Yaaay! Popsicle, popsicle!"
---S_______WINONA.DESCRIBE.HAT_LICHEN = "Great to cool off after some hard physical labor."
-S_____WORMWOOD.DESCRIBE.HAT_LICHEN = "Glowy Friends for head"
+S______GENERIC.DESCRIBE.HAT_LICHEN = "I have an \"idea\", for real!"
+S_______WILLOW.DESCRIBE.HAT_LICHEN = "You can't really LIGHT"
+S_____WOLFGANG.DESCRIBE.HAT_LICHEN = "Glowy little gadget."
+S________WENDY.DESCRIBE.HAT_LICHEN = "Abigail used to wear a hairpin like this on Sundays..."
+S_________WX78.DESCRIBE.HAT_LICHEN = "TEMPORARY ORGANIC SOURCE OF LIGHT."
+S_WICKERBOTTOM.DESCRIBE.HAT_LICHEN = "Literally radiant...pun intended."
+S_______WOODIE.DESCRIBE.HAT_LICHEN = "It ain't get along with the hairy."
+S______WAXWELL.DESCRIBE.HAT_LICHEN = "That's such a disgrace!"
+--S___WATHGRITHR.DESCRIBE.HAT_LICHEN = ""
+S_______WEBBER.DESCRIBE.HAT_LICHEN = "Wendy! Come see our new hairpin!"
+S_______WINONA.DESCRIBE.HAT_LICHEN = "For illumination, I'd better put it on for now."
+S_____WORMWOOD.DESCRIBE.HAT_LICHEN = "I'dah put a glowy buddy on my head!"
+S_________WURT.DESCRIBE.HAT_LICHEN = "It should be eaten, "
 
 --------------------------------------------------------------------------
 --[[ the power of flowers ]]--[[ 花香四溢 ]]
@@ -91,8 +92,8 @@ S______GENERIC.DESCRIBE.ROSEBUSH =  --对于某些角色，这里面的"she"可�
     WITHERED = "She is no longer beauteous.",
     GENERIC = "She's so different!",
     PICKED = "No one knows her beauty.",
-    --DISEASED = "Is weak. Sickly!",    --不会生病
-    --DISEASING = "Is looking shrivelly.",
+    -- DISEASED = "Is weak. Sickly!",    --不会生病
+    -- DISEASING = "Is looking shrivelly.",
     BURNING = "The niceness are disappearing!",
 }
 --[[
@@ -718,7 +719,7 @@ S______GENERIC.DESCRIBE.FOLIAGEATH_MYLOVE = "Pity, you just want to run away." -
 -- S_____WORMWOOD.DESCRIBE.FOLIAGEATH_MYLOVE = ""
 -- S_________WURT.DESCRIBE.FOLIAGEATH_MYLOVE = ""
 
---合成一吻长青时的台词
+-- 合成一吻长青时的台词
 S______GENERIC.ANNOUNCE_HIS_LOVE_WISH = "Wish forever but sometimes..." --Wish love lasts forever!
 -- S_______WILLOW.ANNOUNCE_HIS_LOVE_WISH = ""
 -- S_____WOLFGANG.ANNOUNCE_HIS_LOVE_WISH = ""
@@ -1643,8 +1644,87 @@ S_______WORTOX.DESCRIBE.HIDDENMOONLIGHT_ITEM = "I can feel it being called by a 
 -- S_______WALTER.DESCRIBE.HIDDENMOONLIGHT_ITEM = ""
 
 --------------------------------------------------------------------------
---[[ legends of the fall ]]--[[ 秋天传说 ]]
+--[[ legends of the fall ]]--[[ 丰饶传说 ]]
 --------------------------------------------------------------------------
+
+S_NAMES.PINEANANAS = "Pineananas"    --松萝
+S______GENERIC.DESCRIBE.PINEANANAS = "Eating it raw may numb my mouth."
+-- S_______WILLOW.DESCRIBE.PINEANANAS = ""
+-- S_____WOLFGANG.DESCRIBE.PINEANANAS = ""
+-- S________WENDY.DESCRIBE.PINEANANAS = ""
+-- S_________WX78.DESCRIBE.PINEANANAS = ""
+-- S_WICKERBOTTOM.DESCRIBE.PINEANANAS = ""
+-- S_______WOODIE.DESCRIBE.PINEANANAS = ""
+-- S______WAXWELL.DESCRIBE.PINEANANAS = ""
+-- S___WATHGRITHR.DESCRIBE.PINEANANAS = ""
+-- S_______WEBBER.DESCRIBE.PINEANANAS = ""
+-- S_______WINONA.DESCRIBE.PINEANANAS = ""
+-- S_______WORTOX.DESCRIBE.PINEANANAS = ""
+-- S_____WORMWOOD.DESCRIBE.PINEANANAS = ""
+-- S________WARLY.DESCRIBE.PINEANANAS = ""
+-- S_________WURT.DESCRIBE.PINEANANAS = ""
+-- S_______WALTER.DESCRIBE.PINEANANAS = ""
+
+S_NAMES.PINEANANAS_COOKED = "Roasted Pineananas"    --烤松萝
+S______GENERIC.DESCRIBE.PINEANANAS_COOKED = "It tastes much better after roasted."
+-- S_______WILLOW.DESCRIBE.PINEANANAS_COOKED = ""
+-- S_____WOLFGANG.DESCRIBE.PINEANANAS_COOKED = ""
+-- S________WENDY.DESCRIBE.PINEANANAS_COOKED = ""
+-- S_________WX78.DESCRIBE.PINEANANAS_COOKED = ""
+-- S_WICKERBOTTOM.DESCRIBE.PINEANANAS_COOKED = ""
+-- S_______WOODIE.DESCRIBE.PINEANANAS_COOKED = ""
+-- S______WAXWELL.DESCRIBE.PINEANANAS_COOKED = ""
+-- S___WATHGRITHR.DESCRIBE.PINEANANAS_COOKED = ""
+-- S_______WEBBER.DESCRIBE.PINEANANAS_COOKED = ""
+-- S_______WINONA.DESCRIBE.PINEANANAS_COOKED = ""
+-- S_______WORTOX.DESCRIBE.PINEANANAS_COOKED = ""
+-- S_____WORMWOOD.DESCRIBE.PINEANANAS_COOKED = ""
+-- S________WARLY.DESCRIBE.PINEANANAS_COOKED = ""
+-- S_________WURT.DESCRIBE.PINEANANAS_COOKED = ""
+-- S_______WALTER.DESCRIBE.PINEANANAS_COOKED = ""
+
+S_NAMES.PINEANANAS_SEEDS = "Chimeric Seeds"    --嵌合种子
+S______GENERIC.DESCRIBE.PINEANANAS_SEEDS = "I'm not sure if it should be a pine cone or pineapple seed."
+-- S_______WILLOW.DESCRIBE.PINEANANAS_SEEDS = ""
+-- S_____WOLFGANG.DESCRIBE.PINEANANAS_SEEDS = ""
+-- S________WENDY.DESCRIBE.PINEANANAS_SEEDS = ""
+-- S_________WX78.DESCRIBE.PINEANANAS_SEEDS = ""
+-- S_WICKERBOTTOM.DESCRIBE.PINEANANAS_SEEDS = ""
+-- S_______WOODIE.DESCRIBE.PINEANANAS_SEEDS = ""
+-- S______WAXWELL.DESCRIBE.PINEANANAS_SEEDS = ""
+-- S___WATHGRITHR.DESCRIBE.PINEANANAS_SEEDS = ""
+-- S_______WEBBER.DESCRIBE.PINEANANAS_SEEDS = ""
+-- S_______WINONA.DESCRIBE.PINEANANAS_SEEDS = ""
+-- S_______WORTOX.DESCRIBE.PINEANANAS_SEEDS = ""
+-- S_____WORMWOOD.DESCRIBE.PINEANANAS_SEEDS = ""
+-- S________WARLY.DESCRIBE.PINEANANAS_SEEDS = ""
+-- S_________WURT.DESCRIBE.PINEANANAS_SEEDS = ""
+-- S_______WALTER.DESCRIBE.PINEANANAS_SEEDS = ""
+
+S_NAMES.PINEANANAS_OVERSIZED = "Giant Pineananas"
+S______GENERIC.DESCRIBE.PINEANANAS_OVERSIZED = "What a big orange pinecone!"
+-- S_______WILLOW.DESCRIBE.PINEANANAS_OVERSIZED = ""
+-- S_____WOLFGANG.DESCRIBE.PINEANANAS_OVERSIZED = ""
+-- S________WENDY.DESCRIBE.PINEANANAS_OVERSIZED = ""
+-- S_________WX78.DESCRIBE.PINEANANAS_OVERSIZED = ""
+-- S_WICKERBOTTOM.DESCRIBE.PINEANANAS_OVERSIZED = ""
+-- S_______WOODIE.DESCRIBE.PINEANANAS_OVERSIZED = ""
+-- S______WAXWELL.DESCRIBE.PINEANANAS_OVERSIZED = ""
+-- S___WATHGRITHR.DESCRIBE.PINEANANAS_OVERSIZED = ""
+-- S_______WEBBER.DESCRIBE.PINEANANAS_OVERSIZED = ""
+-- S_______WINONA.DESCRIBE.PINEANANAS_OVERSIZED = ""
+-- S_______WORTOX.DESCRIBE.PINEANANAS_OVERSIZED = ""
+-- S_____WORMWOOD.DESCRIBE.PINEANANAS_OVERSIZED = ""
+S________WARLY.DESCRIBE.PINEANANAS_OVERSIZED = "I think of many sweet memori... err, dish!"
+-- S_________WURT.DESCRIBE.PINEANANAS_OVERSIZED = ""
+-- S_______WALTER.DESCRIBE.PINEANANAS_OVERSIZED = ""
+
+S_NAMES.PINEANANAS_OVERSIZED_ROTTEN = "Giant Rotting Pineananas"
+S_NAMES.FARM_PLANT_PINEANANAS = "Pineananas Tree"
+S_NAMES.KNOWN_PINEANANAS_SEEDS = "Pineananas Seeds"
+STRINGS.UI.PLANTREGISTRY.DESCRIPTIONS.PINEANANAS = "A straight foot is not afraid of a crooked shoe. -W"
+
+-----
 
 S_NAMES.PLANT_NORMAL_LEGION = "Crop"   --农作物(新型)
 S______GENERIC.DESCRIBE.PLANT_NORMAL_LEGION =
@@ -1796,60 +1876,6 @@ S______WAXWELL.DESCRIBE.FARMINGDUNGBALL = "I'm becoming more and more like a far
 S_______WEBBER.DESCRIBE.FARMINGDUNGBALL = "Kind of like playing with mud, kind of disgusting."
 --S_______WINONA.DESCRIBE.FARMINGDUNGBALL = "Great to cool off after some hard physical labor."
 S_______WORTOX.DESCRIBE.FARMINGDUNGBALL = "Hey, who dropped this in a snowball fight?"
-
-S_NAMES.PINEANANAS = "Pineananas"    --松萝
-S______GENERIC.DESCRIBE.PINEANANAS = "Eating it raw may numb my mouth."
--- S_______WILLOW.DESCRIBE.PINEANANAS = ""
--- S_____WOLFGANG.DESCRIBE.PINEANANAS = ""
--- S________WENDY.DESCRIBE.PINEANANAS = ""
--- S_________WX78.DESCRIBE.PINEANANAS = ""
--- S_WICKERBOTTOM.DESCRIBE.PINEANANAS = ""
--- S_______WOODIE.DESCRIBE.PINEANANAS = ""
--- S______WAXWELL.DESCRIBE.PINEANANAS = ""
--- S___WATHGRITHR.DESCRIBE.PINEANANAS = ""
--- S_______WEBBER.DESCRIBE.PINEANANAS = ""
--- S_______WINONA.DESCRIBE.PINEANANAS = ""
--- S_______WORTOX.DESCRIBE.PINEANANAS = ""
--- S_____WORMWOOD.DESCRIBE.PINEANANAS = ""
--- S________WARLY.DESCRIBE.PINEANANAS = ""
--- S_________WURT.DESCRIBE.PINEANANAS = ""
--- S_______WALTER.DESCRIBE.PINEANANAS = ""
-
-S_NAMES.PINEANANAS_COOKED = "Roasted Pineananas"    --烤松萝
-S______GENERIC.DESCRIBE.PINEANANAS_COOKED = "It tastes much better after roasted."
--- S_______WILLOW.DESCRIBE.PINEANANAS_COOKED = ""
--- S_____WOLFGANG.DESCRIBE.PINEANANAS_COOKED = ""
--- S________WENDY.DESCRIBE.PINEANANAS_COOKED = ""
--- S_________WX78.DESCRIBE.PINEANANAS_COOKED = ""
--- S_WICKERBOTTOM.DESCRIBE.PINEANANAS_COOKED = ""
--- S_______WOODIE.DESCRIBE.PINEANANAS_COOKED = ""
--- S______WAXWELL.DESCRIBE.PINEANANAS_COOKED = ""
--- S___WATHGRITHR.DESCRIBE.PINEANANAS_COOKED = ""
--- S_______WEBBER.DESCRIBE.PINEANANAS_COOKED = ""
--- S_______WINONA.DESCRIBE.PINEANANAS_COOKED = ""
--- S_______WORTOX.DESCRIBE.PINEANANAS_COOKED = ""
--- S_____WORMWOOD.DESCRIBE.PINEANANAS_COOKED = ""
--- S________WARLY.DESCRIBE.PINEANANAS_COOKED = ""
--- S_________WURT.DESCRIBE.PINEANANAS_COOKED = ""
--- S_______WALTER.DESCRIBE.PINEANANAS_COOKED = ""
-
-S_NAMES.PINEANANAS_SEEDS = "Pineananas Seeds"    --松萝种子
-S______GENERIC.DESCRIBE.PINEANANAS_SEEDS = "I'm not sure if it should be a pine cone or pineapple seed."
--- S_______WILLOW.DESCRIBE.PINEANANAS_SEEDS = ""
--- S_____WOLFGANG.DESCRIBE.PINEANANAS_SEEDS = ""
--- S________WENDY.DESCRIBE.PINEANANAS_SEEDS = ""
--- S_________WX78.DESCRIBE.PINEANANAS_SEEDS = ""
--- S_WICKERBOTTOM.DESCRIBE.PINEANANAS_SEEDS = ""
--- S_______WOODIE.DESCRIBE.PINEANANAS_SEEDS = ""
--- S______WAXWELL.DESCRIBE.PINEANANAS_SEEDS = ""
--- S___WATHGRITHR.DESCRIBE.PINEANANAS_SEEDS = ""
--- S_______WEBBER.DESCRIBE.PINEANANAS_SEEDS = ""
--- S_______WINONA.DESCRIBE.PINEANANAS_SEEDS = ""
--- S_______WORTOX.DESCRIBE.PINEANANAS_SEEDS = ""
--- S_____WORMWOOD.DESCRIBE.PINEANANAS_SEEDS = ""
--- S________WARLY.DESCRIBE.PINEANANAS_SEEDS = ""
--- S_________WURT.DESCRIBE.PINEANANAS_SEEDS = ""
--- S_______WALTER.DESCRIBE.PINEANANAS_SEEDS = ""
 
 S_NAMES.CROPGNAT = "Pest Swarm"    --植害虫群
 S______GENERIC.DESCRIBE.CROPGNAT = "Hey, stay away from my crops, pests!"

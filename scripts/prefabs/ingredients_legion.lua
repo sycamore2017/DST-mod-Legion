@@ -169,6 +169,11 @@ if CONFIGS_LEGION.LEGENDOFFALL then
         },
         oversized = {
             perishable = { product = nil, time = TUNING.PERISH_MED * 4 },
+            fn_server = function(inst)
+                local newLoot = inst.components.lootdropper.loot or {}
+                table.insert(newLoot, "pinecone")
+                inst.components.lootdropper:SetLoot(newLoot)
+            end
         },
         oversized_waxed = {},
         oversized_rotten = {},
@@ -906,6 +911,7 @@ local function MakeIngredient(name, data)
             inst.components.pickable.use_lootdropper_for_product = true
             inst.components.pickable.picksound = "dontstarve/wilson/harvest_berries"
 
+            inst:AddComponent("inventoryitem")
             inst.components.inventoryitem.cangoincontainer = false
             inst.components.inventoryitem.canbepickedup = false
             inst.components.inventoryitem:SetSinks(true)

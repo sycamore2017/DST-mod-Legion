@@ -150,7 +150,7 @@ PLANT_DEFS.pineananas = {
     --需肥类型：{S, 0, S}
 	nutrient_consumption = {TUNING.FARM_PLANT_CONSUME_NUTRIENT_LOW, 0, TUNING.FARM_PLANT_CONSUME_NUTRIENT_LOW},
 	--会生成的肥料
-	nutrient_restoration = {false, true, false},
+	nutrient_restoration = {nil, true, nil},
     --扫兴容忍度：0
 	max_killjoys_tolerance = TUNING.FARM_PLANT_KILLJOY_TOLERANCE,
     --是否随机种子
@@ -172,7 +172,7 @@ PLANT_DEFS.pineananas = {
 	--标签
 	plant_type_tag = "farm_plant_pineananas",
     --巨型产物腐烂后的收获物
-    loot_oversized_rot = {"spoiled_food", "spoiled_food", "spoiled_food", "pineananas_seeds", "fruitfly", "fruitfly"},
+    loot_oversized_rot = {"spoiled_food", "spoiled_food", "spoiled_food", "pineananas_seeds", "fruitfly", "fruitfly", "pinecone"},
     --家族化所需数量：4
 	family_min_count = TUNING.FARM_PLANT_SAME_FAMILY_MIN,
 	--家族化检索距离：5

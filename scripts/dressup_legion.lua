@@ -1351,6 +1351,9 @@ local oversizecrops =
 if CONFIGS_LEGION.ENABLEDMODS.MythWords then
     oversizecrops["gourd"] = "farm_plant_gourd"
 end
+if CONFIGS_LEGION.LEGENDOFFALL then
+    oversizecrops["pineananas"] = "farm_plant_pineananas"
+end
 for k,v in pairs(oversizecrops) do
     _G.DRESSUP_DATA_LEGION[k.."_oversized"] =
     {
