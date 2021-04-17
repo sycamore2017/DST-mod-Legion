@@ -588,27 +588,27 @@ if CONFIGS_LEGION.LEGENDOFFALL then
         cook_cant = "怪物度≤1",
         recipe_count = 6,
     }
-    -- foods_legion.dish_sosweetjarkfruit =
-    -- {
-    --     test = function(cooker, names, tags)
-    --         return names.pineananas and tags.frozen and (tags.sweetener and tags.sweetener >= 2)
-    --             and not tags.monster and not tags.meat
-    --     end,
-    --     priority = 20,
-    --     foodtype = FOODTYPE.VEGGIE,
-    --     health = 0,
-    --     hunger = 18,
-    --     sanity = 24,
-    --     perishtime = TUNING.PERISH_MED * 3,   --30天
-    --     stacksize = 2,
-    --     cooktime = 0.5,
-    --     potlevel = "low",
-    --     float = {nil, "small", 0.2, 1.05},
+    foods_legion.dish_sosweetjarkfruit =
+    {
+        test = function(cooker, names, tags)
+            return names.pineananas and tags.frozen and (tags.sweetener and tags.sweetener >= 2)
+                and not tags.monster and not tags.meat
+        end,
+        priority = 20,
+        foodtype = FOODTYPE.VEGGIE,
+        health = 0,
+        hunger = 18,
+        sanity = 24,
+        perishtime = TUNING.PERISH_MED * 3,   --30天
+        stacksize = 2,
+        cooktime = 0.5,
+        potlevel = "low",
+        float = {0.02, "small", 0.2, 0.9},
 
-    --     cook_need = "松萝 冰度 甜度≥2",
-    --     cook_cant = "怪物度 肉度",
-    --     recipe_count = 2,
-    -- }
+        cook_need = "松萝 冰度 甜度≥2",
+        cook_cant = "怪物度 肉度",
+        recipe_count = 2,
+    }
 end
 
 if TUNING.LEGION_FLASHANDCRUSH then

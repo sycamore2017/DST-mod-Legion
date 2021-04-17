@@ -1299,6 +1299,24 @@ S________WARLY.DESCRIBE.DISH_WRAPPEDSHRIMPPASTE = "啊，这菇，啊，这虾�
 S_________WURT.DESCRIBE.DISH_WRAPPEDSHRIMPPASTE = "做法实在是太残忍了，噗噗。"
 -- S_______WALTER.DESCRIBE.DISH_WRAPPEDSHRIMPPASTE = ""
 
+S_NAMES.DISH_SOSWEETJARKFRUIT = "甜到裂开的松萝蜜"
+S______GENERIC.DESCRIBE.DISH_SOSWEETJARKFRUIT = "这不是糖果超甜，这是糖果齁甜。"
+S_______WILLOW.DESCRIBE.DISH_SOSWEETJARKFRUIT = "这甜得掉牙了，大厨。"
+-- S_____WOLFGANG.DESCRIBE.DISH_SOSWEETJARKFRUIT = ""
+S________WENDY.DESCRIBE.DISH_SOSWEETJARKFRUIT = "刚好有两份，能分阿比盖尔一份。"
+S_________WX78.DESCRIBE.DISH_SOSWEETJARKFRUIT = "可悲的生物靠它积累脂肪。"
+S_WICKERBOTTOM.DESCRIBE.DISH_SOSWEETJARKFRUIT = "老年人不该吃这么不健康的食物。"
+S_______WOODIE.DESCRIBE.DISH_SOSWEETJARKFRUIT = "很多人问我糖水松萝到底甜不甜，额，甜！"
+S______WAXWELL.DESCRIBE.DISH_SOSWEETJARKFRUIT = "我一把年纪就别吃了。"
+S___WATHGRITHR.DESCRIBE.DISH_SOSWEETJARKFRUIT = "看我给你们表演吃一个，松萝，...，呕。"
+S_______WEBBER.DESCRIBE.DISH_SOSWEETJARKFRUIT = "欧耶，我的最最爱！" --只有韦伯本人格爱吃糖，而且蜘蛛不吃素，所以没说我们
+S_______WINONA.DESCRIBE.DISH_SOSWEETJARKFRUIT = "就没有人注意到它瓶子上有个裂口吗？"
+S_______WORTOX.DESCRIBE.DISH_SOSWEETJARKFRUIT = "爱情是糖，甜到忧伤。"
+S_____WORMWOOD.DESCRIBE.DISH_SOSWEETJARKFRUIT = "裂开！"
+S________WARLY.DESCRIBE.DISH_SOSWEETJARKFRUIT = "我与甜蜜有个约会。"
+-- S_________WURT.DESCRIBE.DISH_SOSWEETJARKFRUIT = ""
+S_______WALTER.DESCRIBE.DISH_SOSWEETJARKFRUIT = "这不是一道完美的料理，它裂开了。"
+
 --------------------------------------------------------------------------
 --[[ the sacrifice of rain ]]--[[ 祈雨祭 ]]
 --------------------------------------------------------------------------

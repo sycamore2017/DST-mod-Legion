@@ -1321,6 +1321,24 @@ S________WARLY.DESCRIBE.DISH_WRAPPEDSHRIMPPASTE = "Ah, the mushroom, the shrimp,
 S_________WURT.DESCRIBE.DISH_WRAPPEDSHRIMPPASTE = "It's cruel, glort."
 -- S_______WALTER.DESCRIBE.DISH_WRAPPEDSHRIMPPASTE = ""
 
+S_NAMES.DISH_SOSWEETJARKFRUIT = "So Sweet Jarkfruit" --甜到裂开的松萝蜜
+S______GENERIC.DESCRIBE.DISH_SOSWEETJARKFRUIT = "It was so sweet that I flustered."
+S_______WILLOW.DESCRIBE.DISH_SOSWEETJARKFRUIT = "Too sweet, chef."
+-- S_____WOLFGANG.DESCRIBE.DISH_SOSWEETJARKFRUIT = ""
+S________WENDY.DESCRIBE.DISH_SOSWEETJARKFRUIT = "There's two of them, and one for Abigail."
+S_________WX78.DESCRIBE.DISH_SOSWEETJARKFRUIT = "FUEL DETECTION: EXCESSIVE HEAT."
+S_WICKERBOTTOM.DESCRIBE.DISH_SOSWEETJARKFRUIT = "I shouldn't eat such unhealthy food."
+-- S_______WOODIE.DESCRIBE.DISH_SOSWEETJARKFRUIT = ""
+-- S______WAXWELL.DESCRIBE.DISH_SOSWEETJARKFRUIT = ""
+-- S___WATHGRITHR.DESCRIBE.DISH_SOSWEETJARKFRUIT = ""
+S_______WEBBER.DESCRIBE.DISH_SOSWEETJARKFRUIT = "Oh yeah, my favorite!"
+S_______WINONA.DESCRIBE.DISH_SOSWEETJARKFRUIT = "Did no one notice a crack in the bottle?"
+S_______WORTOX.DESCRIBE.DISH_SOSWEETJARKFRUIT = "Love is sugar, sweet to sadness."
+S_____WORMWOOD.DESCRIBE.DISH_SOSWEETJARKFRUIT = "Crack!"
+S________WARLY.DESCRIBE.DISH_SOSWEETJARKFRUIT = "I have an appointment with sweet lady."
+-- S_________WURT.DESCRIBE.DISH_SOSWEETJARKFRUIT = ""
+S_______WALTER.DESCRIBE.DISH_SOSWEETJARKFRUIT = "Not a perfect dish because it's cracked."
+
 --------------------------------------------------------------------------
 --[[ the sacrifice of rain ]]--[[ 祈雨祭 ]]
 --------------------------------------------------------------------------

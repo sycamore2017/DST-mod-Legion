@@ -494,7 +494,7 @@ local function MakeIngredient(name, data)
             table.insert(info.prefabs, "splash_green")
         end
 
-        MakePrefab(name, info)
+        MadePrefab(name, info)
     end
 
     if data.cooked ~= nil then
