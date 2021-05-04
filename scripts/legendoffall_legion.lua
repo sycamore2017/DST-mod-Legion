@@ -1,9 +1,10 @@
--- local prefabFiles = {
--- }
+local prefabFiles = {
+    "siving_rocks_legion",
+}
 
--- for k,v in pairs(prefabFiles) do
---     table.insert(PrefabFiles, v)
--- end
+for k,v in pairs(prefabFiles) do
+    table.insert(PrefabFiles, v)
+end
 
 -----
 
@@ -16,6 +17,10 @@ local assets = {
 
 for k,v in pairs(assets) do
     table.insert(Assets, v)
+end
+if not CONFIGS_LEGION.ENABLEDMODS.MythWords then
+    table.insert(Assets, Asset("ATLAS", "images/inventoryimages/siving_rocks.xml"))
+    table.insert(Assets, Asset("IMAGE", "images/inventoryimages/siving_rocks.tex"))
 end
 
 -----

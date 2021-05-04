@@ -19,7 +19,7 @@ if GetModConfigData("FlashAndCrush") then --电闪雷鸣 bool
     TUNING.LEGION_FLASHANDCRUSH = true
 end
 
-if GetModConfigData("DesertSecret") then --大漠隐情 bool
+if GetModConfigData("DesertSecret") then --尘市蜃楼 bool
     TUNING.LEGION_DESERTSECRET = true
 end
 

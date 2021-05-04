@@ -518,7 +518,7 @@ configuration_options =
     {name = "Title", label = "", options = {{description = "", data = ""},}, default = "",},
     {
         name = "Title",
-        label = L and "DesertSecret" or "大漠隐情",
+        label = L and "DesertSecret" or "尘市蜃楼",
         options = {{description = "", data = ""},},
         default = "",
     },
@@ -534,8 +534,8 @@ configuration_options =
         default = true,
     } or {
         name = "DesertSecret",
-        label = "开启\"大漠隐情\"",
-        hover = "允许添加\"大漠隐情\"的内容。黄沙之中，有座幻影般的古城和悲惨的命运。",
+        label = "开启\"尘市蜃楼\"",
+        hover = "允许添加\"尘市蜃楼\"的内容。黄沙之中，有座幻影般的古城和悲惨的命运。",
         options =
         {
             {description = "是", data = true},

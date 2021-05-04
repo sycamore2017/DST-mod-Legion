@@ -218,7 +218,7 @@ if GetModConfigData("FlashAndCrush") then --电闪雷鸣 bool
     TUNING.LEGION_TECHUNLOCK = GetModConfigData("TechUnlock") --设置新道具的科技解锁方式 "lootdropper" "prototyper"
 end
 
-if GetModConfigData("DesertSecret") then --大漠隐情 bool
+if GetModConfigData("DesertSecret") then --尘市蜃楼 bool
     TUNING.LEGION_DESERTSECRET = true
 
     if GetModConfigData("DressUp") then --启用幻化机制 bool

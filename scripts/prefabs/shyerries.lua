@@ -373,7 +373,7 @@ local prefabs_flower =
     "shyerry_cooked",
 }
 
-local function OnHaunt_flower(inst)    --被作祟时，这个特点我不会写在mod介绍里
+local function OnHaunt_flower(inst)
     if math.random() <= TUNING.HAUNT_CHANCE_ALWAYS then
         if math.random() <= 0.33 then
             if inst.components.pickable ~= nil then --已经要掉落果实了，不再能采集
