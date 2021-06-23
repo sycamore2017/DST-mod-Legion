@@ -4,6 +4,48 @@ local _G = GLOBAL
 local IsServer = TheNet:GetIsServer() or TheNet:IsDedicated()
 
 --------------------------------------------------------------------------
+--[[ 方便进行代码开发的各种自定义工具函数 ]]
+--------------------------------------------------------------------------
+
+--[ 地图图标注册 ]--
+_G.RegistMiniMapImage_legion = function(filename, fileaddresspre)
+    local fileaddresscut = (fileaddresspre or "images/map_icons/")..filename
+
+    table.insert(Assets, Asset("ATLAS", fileaddresscut..".xml"))
+    table.insert(Assets, Asset("IMAGE", fileaddresscut..".tex"))
+
+    AddMinimapAtlas(fileaddresscut..".xml")
+
+    --  接下来就需要在prefab定义里添加：
+    --      inst.entity:AddMiniMapEntity()
+    --      inst.MiniMapEntity:SetIcon("图片文件名.tex")
+end
+
+--[ 积雪监听(仅prefab定义时使用) ]--
+_G.MakeSnowCovered_comm_legion = function(inst)
+    inst.AnimState:OverrideSymbol("snow", "hiddenmoonlight", "emptysnow")
+
+    --  1、为了注册积雪的贴图，需要提前在assets中添加：
+    --      Asset("ANIM", "anim/hiddenmoonlight.zip")
+    --  2、同时，动画制作中，需要添加“snow”的通道
+end
+_G.MakeSnowCovered_serv_legion = function(inst, delaytime, delayfn)
+    local function OnSnowCoveredChagned(inst, covered)
+        if TheWorld.state.issnowcovered then
+            inst.AnimState:OverrideSymbol("snow", "hiddenmoonlight", "snow")
+        else
+            inst.AnimState:OverrideSymbol("snow", "hiddenmoonlight", "emptysnow")
+        end
+    end
+
+    inst:WatchWorldState("issnowcovered", OnSnowCoveredChagned)
+    inst:DoTaskInTime(delaytime, function()
+		OnSnowCoveredChagned(inst)
+        if delayfn ~= nil then delayfn(inst) end
+	end)
+end
+
+--------------------------------------------------------------------------
 --[[ 清理机制：让腐烂物、牛粪、鸟粪自动消失 ]]
 --------------------------------------------------------------------------
 

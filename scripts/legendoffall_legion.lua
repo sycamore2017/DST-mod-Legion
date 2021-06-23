@@ -13,6 +13,9 @@ local assets = {
     Asset("ANIM", "anim/mushroom_farm_foliage1_build.zip"), --蕨叶(森林)的蘑菇农场贴图
     Asset("ANIM", "anim/mushroom_farm_foliage2_build.zip"), --蕨叶(洞穴)的蘑菇农场贴图
     Asset("ANIM", "anim/farm_plant_pineananas.zip"),
+
+    Asset("ATLAS", "images/inventoryimages/siving_derivant_item.xml"), --预加载，给科技栏用的
+    Asset("IMAGE", "images/inventoryimages/siving_derivant_item.tex"),
 }
 
 for k,v in pairs(assets) do
@@ -33,6 +36,8 @@ local IsServer = TheNet:GetIsServer() or TheNet:IsDedicated()
 --------------------------------------------------------------------------
 
 AddIngredientValues({"pineananas"}, {veggie=1, fruit=1}, true, false)
+
+_G.RegistMiniMapImage_legion("siving_derivant")
 
 --------------------------------------------------------------------------
 --[[ 让蘑菇农场能种植新东西 ]]

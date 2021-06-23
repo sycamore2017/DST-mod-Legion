@@ -23,9 +23,6 @@ end
 -----
 
 local assets = {
-    Asset( "IMAGE", "images/map_icons/elecourmaline.tex" ),    --在地图上的图标
-    Asset( "ATLAS", "images/map_icons/elecourmaline.xml" ),
-
     Asset("ATLAS", "images/recasttab.xml"),
     Asset("IMAGE", "images/recasttab.tex"),
 
@@ -68,7 +65,7 @@ local upvaluehelper = require "hua_upvaluehelper"
 --[[ 电气石重铸台相关 ]]
 --------------------------------------------------------------------------
 
-AddMinimapAtlas("images/map_icons/elecourmaline.xml")
+_G.RegistMiniMapImage_legion("elecourmaline")
 
 if TUNING.LEGION_TECHUNLOCK == "lootdropper" then
     AddRecipe("tripleshovelaxe",

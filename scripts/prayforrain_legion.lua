@@ -19,19 +19,6 @@ end
 -----
 
 local assets = {
-    Asset( "IMAGE", "images/map_icons/monstrain.tex" ),    --在地图上的图标
-    Asset( "ATLAS", "images/map_icons/monstrain.xml" ),
-    Asset("IMAGE", "images/map_icons/agronssword.tex"),
-    Asset("ATLAS", "images/map_icons/agronssword.xml"),
-    Asset("IMAGE", "images/map_icons/giantsfoot.tex"),
-    Asset("ATLAS", "images/map_icons/giantsfoot.xml"),
-    Asset("IMAGE", "images/map_icons/refractedmoonlight.tex"),
-    Asset("ATLAS", "images/map_icons/refractedmoonlight.xml"),
-    Asset("IMAGE", "images/map_icons/moondungeon.tex"),
-    Asset("ATLAS", "images/map_icons/moondungeon.xml"),
-    Asset("IMAGE", "images/map_icons/hiddenmoonlight.tex"),
-    Asset("ATLAS", "images/map_icons/hiddenmoonlight.xml"),
-
     Asset("ANIM", "anim/ui_hiddenmoonlight_4x4.zip"),
 
     Asset("ATLAS", "images/inventoryimages/squamousfruit.xml"), --预加载，给科技栏用的
@@ -64,12 +51,12 @@ local _G = GLOBAL
 
 AddIngredientValues({"monstrain_leaf"}, {monster=1, veggie=.5}, false, false)
 
-AddMinimapAtlas("images/map_icons/monstrain.xml")
-AddMinimapAtlas("images/map_icons/agronssword.xml")
-AddMinimapAtlas("images/map_icons/giantsfoot.xml")
-AddMinimapAtlas("images/map_icons/refractedmoonlight.xml")
-AddMinimapAtlas("images/map_icons/moondungeon.xml")
-AddMinimapAtlas("images/map_icons/hiddenmoonlight.xml")
+_G.RegistMiniMapImage_legion("monstrain")
+_G.RegistMiniMapImage_legion("agronssword")
+_G.RegistMiniMapImage_legion("giantsfoot")
+_G.RegistMiniMapImage_legion("refractedmoonlight")
+_G.RegistMiniMapImage_legion("moondungeon")
+_G.RegistMiniMapImage_legion("hiddenmoonlight")
 
 if TUNING.LEGION_BOOKRECIPETABS == "magic" then
     AddRecipe("book_weather",

@@ -266,14 +266,6 @@ local function OnLoad(inst, data)
     DoBenefit(inst)
 end
 
-local function OnSnowCoveredChagned(inst, covered)
-    if TheWorld.state.issnowcovered then
-		inst.AnimState:OverrideSymbol("snow", "hiddenmoonlight", "snow")
-	else
-		inst.AnimState:OverrideSymbol("snow", "hiddenmoonlight", "emptysnow")
-	end
-end
-
 local function Fn()
     local inst = CreateEntity()
 
@@ -291,7 +283,7 @@ local function Fn()
     inst.AnimState:SetBank("hiddenmoonlight")
     inst.AnimState:SetBuild("hiddenmoonlight")
     inst.AnimState:PlayAnimation("closed", true)
-    inst.AnimState:OverrideSymbol("snow", "hiddenmoonlight", "emptysnow")
+    MakeSnowCovered_comm_legion(inst)
 
     inst.entity:SetPristine()
 
@@ -328,11 +320,9 @@ local function Fn()
 
     AddHauntableDropItemOrWork(inst)
 
-    inst:WatchWorldState("issnowcovered", OnSnowCoveredChagned)
-    inst:DoTaskInTime(0.3, function()
-		OnSnowCoveredChagned(inst)
+    MakeSnowCovered_serv_legion(inst, 0.1 + 0.3 * math.random(), function(inst)
         inst.AnimState:SetTime(math.random() * inst.AnimState:GetCurrentAnimationLength())
-	end)
+    end)
 
     inst.OnSave = OnSave
     inst.OnLoad = OnLoad

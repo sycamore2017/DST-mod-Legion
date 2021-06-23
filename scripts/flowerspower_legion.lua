@@ -21,15 +21,6 @@ end
 -----
 
 local assets = {
-    Asset( "IMAGE", "images/map_icons/rosebush.tex" ), --在地图上的图标
-    Asset( "ATLAS", "images/map_icons/rosebush.xml" ),
-    Asset( "IMAGE", "images/map_icons/lilybush.tex" ),
-    Asset( "ATLAS", "images/map_icons/lilybush.xml" ),
-    Asset( "IMAGE", "images/map_icons/orchidbush.tex" ),
-    Asset( "ATLAS", "images/map_icons/orchidbush.xml" ),
-    Asset( "IMAGE", "images/map_icons/neverfadebush.tex" ),
-    Asset( "ATLAS", "images/map_icons/neverfadebush.xml" ),
-
     Asset("ATLAS", "images/inventoryimages/rosorns.xml"), --预加载，给科技栏用的
     Asset("IMAGE", "images/inventoryimages/rosorns.tex"),
     Asset("ATLAS", "images/inventoryimages/lileaves.xml"),
@@ -57,10 +48,10 @@ local IsServer = TheNet:GetIsServer() or TheNet:IsDedicated()
 
 AddIngredientValues({"petals_rose", "petals_lily", "petals_orchid"}, {veggie=.5, petals_legion=1}, false, false)
 
-AddMinimapAtlas("images/map_icons/rosebush.xml")   --把对应图标加载为地图上能显示的图标
-AddMinimapAtlas("images/map_icons/lilybush.xml")
-AddMinimapAtlas("images/map_icons/orchidbush.xml")
-AddMinimapAtlas("images/map_icons/neverfadebush.xml")
+_G.RegistMiniMapImage_legion("rosebush")
+_G.RegistMiniMapImage_legion("lilybush")
+_G.RegistMiniMapImage_legion("orchidbush")
+_G.RegistMiniMapImage_legion("neverfadebush")
 
 AddRecipe("neverfade",
 {

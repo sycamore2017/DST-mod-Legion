@@ -18,9 +18,6 @@ end
 -----
 
 local assets = {
-    Asset( "IMAGE", "images/map_icons/shyerrytree.tex" ),    --在地图上的图标
-    Asset( "ATLAS", "images/map_icons/shyerrytree.xml" ),
-
     Asset("ATLAS", "images/inventoryimages/shyerrylog.xml"), --预加载，给科技栏用的
     Asset("IMAGE", "images/inventoryimages/shyerrylog.tex"),
     Asset("ATLAS", "images/inventoryimages/desertdefense.xml"),
@@ -52,7 +49,7 @@ local IsServer = TheNet:GetIsServer() or TheNet:IsDedicated()
 --[[ 颤栗树相关 ]]
 --------------------------------------------------------------------------
 
-AddMinimapAtlas("images/map_icons/shyerrytree.xml")
+_G.RegistMiniMapImage_legion("shyerrytree")
 
 AddIngredientValues({"shyerry"}, {fruit=4}, true, false) --AddIngredientValues(names, tags, cancook, candry)
 
