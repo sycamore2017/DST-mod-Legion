@@ -719,7 +719,7 @@ local function ShakeItOff(inst)
     end
 end
 
-local function OnWork(inst, worker, workleft)   --每次敲击地下城时进行的处理
+local function OnWork(inst, worker, workleft, numworks)   --每次敲击地下城时进行的处理
     inst.components.workable:SetWorkLeft(20)    --恢复工作量，永远都破坏不了
     inst.workTrigger = inst.workTrigger + 1
 

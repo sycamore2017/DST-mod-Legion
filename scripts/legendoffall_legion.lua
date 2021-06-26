@@ -38,6 +38,7 @@ local IsServer = TheNet:GetIsServer() or TheNet:IsDedicated()
 AddIngredientValues({"pineananas"}, {veggie=1, fruit=1}, true, false)
 
 _G.RegistMiniMapImage_legion("siving_derivant")
+_G.RegistMiniMapImage_legion("siving_thetree")
 
 --------------------------------------------------------------------------
 --[[ 让蘑菇农场能种植新东西 ]]

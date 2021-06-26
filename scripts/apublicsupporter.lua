@@ -45,6 +45,21 @@ _G.MakeSnowCovered_serv_legion = function(inst, delaytime, delayfn)
 	end)
 end
 
+--[ 光照监听(仅prefab定义时使用) ]--
+_G.IsTooDarkToGrow_legion = function(inst)
+	if TheWorld.state.isnight then
+		local x, y, z = inst.Transform:GetWorldPosition()
+		for i, v in ipairs(TheSim:FindEntities(x, 0, z, TUNING.DAYLIGHT_SEARCH_RANGE, { "daylight", "lightsource" })) do
+			local lightrad = v.Light:GetCalculatedRadius() * .7
+			if v:GetDistanceSqToPoint(x, y, z) < lightrad * lightrad then
+				return false
+			end
+		end
+		return true
+	end
+	return false
+end
+
 --------------------------------------------------------------------------
 --[[ 清理机制：让腐烂物、牛粪、鸟粪自动消失 ]]
 --------------------------------------------------------------------------

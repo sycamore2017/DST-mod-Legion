@@ -371,7 +371,7 @@ local function fn()
     inst.Light:SetRadius(0)
     inst.Light:SetFalloff(1)
     inst.Light:SetIntensity(.6) --光强
-    inst.Light:SetColour(15 / 255, 160 / 255, 180 / 255)
+    inst.Light:SetColour(15/255, 160/255, 180/255)
     -- inst.Light:EnableClientModulation(true)
 
     -- inst:AddTag("structure")
