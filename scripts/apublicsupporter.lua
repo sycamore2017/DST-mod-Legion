@@ -60,6 +60,72 @@ _G.IsTooDarkToGrow_legion = function(inst)
 	return false
 end
 
+--[ 计算最终位置(仅prefab定义时使用) ]--
+_G.GetCalculatedPos_legion = function(x, y, z, radius, angle)
+    local rad = radius or math.random() * 3
+    local ang = angle or math.random() * 2 * PI
+    return x + rad * math.cos(ang), y, z - rad * math.sin(ang)
+end
+
+--[ 垂直掉落一个物品(仅prefab定义时使用) ]--
+local easing = require("easing")
+_G.DropItem_legion = function(itemname, x, y, z, hitrange, hitdamage, fallingtime, fn_start, fn_doing, fn_end)
+	local item = SpawnPrefab(itemname)
+	if item ~= nil then
+        if fallingtime == nil then fallingtime = 5 * FRAMES end
+
+		item.Transform:SetPosition(x, y, z) --这里的y就得是下落前起始高度
+		item.fallingpos = item:GetPosition()
+		item.fallingpos.y = 0
+		if item.components.inventoryitem ~= nil then
+			item.components.inventoryitem.canbepickedup = false
+		end
+
+        if fn_start ~= nil then fn_start(item) end
+
+		item.fallingtask = item:DoPeriodicTask(
+            FRAMES,
+            function(inst, startpos, starttime)
+                local t = math.max(0, GetTime() - starttime)
+                local pos = startpos + (inst.fallingpos - startpos) * easing.inOutQuad(t, 0, 1, fallingtime)
+                if t < fallingtime and pos.y > 0 then
+                    inst.Transform:SetPosition(pos:Get())
+                    if fn_doing ~= nil then fn_doing(inst) end
+                else
+                    inst.Physics:Teleport(inst.fallingpos:Get())
+                    inst.fallingtask:Cancel()
+                    inst.fallingtask = nil
+                    inst.fallingpos = nil
+                    if inst.components.inventoryitem ~= nil then
+                        inst.components.inventoryitem.canbepickedup = true
+                    end
+
+                    if hitrange ~= nil then
+                        local someone = FindEntity(inst, hitrange,
+                            function(target)
+                                if target and target:IsValid() and
+                                    target.components.combat ~= nil and
+                                    target.components.health ~= nil and not target.components.health:IsDead()
+                                then
+                                    return true
+                                end
+                                return false
+                            end,
+                            {"_combat", "_health"}, {"NOCLICK", "FX", "shadow", "playerghost", "INLIMBO"}, nil
+                        )
+                        if someone ~= nil then
+                            someone.components.combat:GetAttacked(inst, hitdamage, nil)
+                        end
+                    end
+
+                    if fn_end ~= nil then fn_end(inst) end
+                end
+            end,
+            0, item:GetPosition(), GetTime()
+        )
+    end
+end
+
 --------------------------------------------------------------------------
 --[[ 清理机制：让腐烂物、牛粪、鸟粪自动消失 ]]
 --------------------------------------------------------------------------

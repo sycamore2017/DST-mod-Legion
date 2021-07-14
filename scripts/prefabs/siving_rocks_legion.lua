@@ -1,4 +1,5 @@
 local prefs = {}
+local wortox_soul_common = require("prefabs/wortox_soul_common")
 
 --------------------------------------------------------------------------
 --[[ 子圭石 ]]
@@ -103,6 +104,7 @@ local function MakeDerivant(data)
             inst.MiniMapEntity:SetIcon("siving_derivant.tex")
 
             inst:AddTag("siving_derivant")
+            inst:AddTag("silviculture") --这个标签能让《园林学》发挥作用
 
             inst.entity:SetPristine()
 
@@ -119,6 +121,16 @@ local function MakeDerivant(data)
             inst:AddComponent("workable")
 
             inst:AddComponent("timer")
+
+            inst:AddComponent("growable")
+            inst.components.growable.stages = {}
+            inst.components.growable:StopGrowing()
+            inst.components.growable.domagicgrowthfn = function(inst, doer)
+                if inst.components.timer:TimerExists("growup") then
+                    inst.components.timer:StopTimer("growup")
+                    inst:PushEvent("timerdone", { name = "growup" })
+                end
+            end
 
             if data.fn_server ~= nil then
                 data.fn_server(inst)
@@ -284,6 +296,102 @@ MakeDerivant({  --子圭森型岩
 --[[ 子圭神木 ]]
 --------------------------------------------------------------------------
 
+local function OnRestoreSoul(victim)
+    victim.nosoultask = nil
+end
+local function IsValidVictim(victim)
+    return wortox_soul_common.HasSoul(victim) and victim.components.health:IsDead()
+end
+local function LifeWalkToTree(inst, victim, numsouls)
+    local x, y, z = victim.Transform:GetWorldPosition()
+    inst:DoPeriodicTask(0.5, function()
+        
+    end, 0)
+
+    local life = SpawnPrefab("siving_lifesteal_fx")
+    if life ~= nil then
+        life
+        life.Transform:SetPosition(victim.Transform:GetWorldPosition())
+    end
+end
+
+local function OnEntityDropLoot(inst, data)
+    local victim = data.inst
+    if
+        victim ~= nil and
+        victim.nosoultask == nil and
+        victim:IsValid() and
+        (
+            victim == inst or
+            (
+                IsValidVictim(victim) and
+                inst:IsNear(victim, TUNING.WORTOX_SOULEXTRACT_RANGE)
+            )
+        )
+    then
+        --V2C: prevents multiple Wortoxes in range from spawning multiple souls per corpse
+        victim.nosoultask = victim:DoTaskInTime(5, OnRestoreSoul)
+
+        local health = victim.components.health ~= nil and victim.components.health.maxhealth or 100
+        LifeWalkToTree(inst, victim, health)
+    end
+end
+local function OnEntityDeath(inst, data)
+    if data.inst ~= nil and data.inst.components.lootdropper == nil then
+        OnEntityDropLoot(inst, data)
+    end
+end
+local function OnStarvedTrapSouls(inst, data)
+    local trap = data.trap
+    if
+        trap ~= nil and
+        trap.nosoultask == nil and
+        (data.numsouls or 0) > 0 and
+        trap:IsValid() and
+        inst:IsNear(trap, TUNING.WORTOX_SOULEXTRACT_RANGE)
+    then
+        --V2C: prevents multiple Wortoxes in range from spawning multiple souls per trap
+        trap.nosoultask = trap:DoTaskInTime(5, OnRestoreSoul)
+        LifeWalkToTree(inst, trap, data.numsouls*100)
+    end
+end
+
+local function AddLivesListen(inst)
+    print("这里是为了测试OnEntityWake是否在实体产生时就触发了")
+    if inst._onentitydroplootfn == nil then
+        inst._onentitydroplootfn = function(src, data) OnEntityDropLoot(inst, data) end
+        inst:ListenForEvent("entity_droploot", inst._onentitydroplootfn, TheWorld)
+    end
+    if inst._onentitydeathfn == nil then
+        inst._onentitydeathfn = function(src, data) OnEntityDeath(inst, data) end
+        inst:ListenForEvent("entity_death", inst._onentitydeathfn, TheWorld)
+    end
+    if inst._onstarvedtrapsoulsfn == nil then
+        inst._onstarvedtrapsoulsfn = function(src, data) OnStarvedTrapSouls(inst, data) end
+        inst:ListenForEvent("starvedtrapsouls", inst._onstarvedtrapsoulsfn, TheWorld)
+    end
+end
+local function RemoveLivesListen(inst)
+    if inst._onentitydroplootfn ~= nil then
+        inst:RemoveEventCallback("entity_droploot", inst._onentitydroplootfn, TheWorld)
+        inst._onentitydroplootfn = nil
+    end
+    if inst._onentitydeathfn ~= nil then
+        inst:RemoveEventCallback("entity_death", inst._onentitydeathfn, TheWorld)
+        inst._onentitydeathfn = nil
+    end
+    if inst._onstarvedtrapsoulsfn ~= nil then
+        inst:RemoveEventCallback("starvedtrapsouls", inst._onstarvedtrapsoulsfn, TheWorld)
+        inst._onstarvedtrapsoulsfn = nil
+    end
+end
+
+local function OnStealLife(inst, value)
+    
+end
+
+-----
+
 local function StateChange(inst) --0休眠状态(玄鸟死亡)、1正常状态(玄鸟活着，非春季)、2活力状态(玄鸟活着，春季)
     if inst.components.timer:TimerExists("birdrebirth") then --玄鸟死亡
         inst.countWorked = 0
@@ -305,86 +413,175 @@ local function StateChange(inst) --0休眠状态(玄鸟死亡)、1正常状态(�
 end
 
 table.insert(prefs, Prefab(
-        "siving_thetree",
-        function()
-            local inst = CreateEntity()
+    "siving_thetree",
+    function()
+        local inst = CreateEntity()
 
-            inst.entity:AddTransform()
-            inst.entity:AddSoundEmitter()
-            inst.entity:AddAnimState()
-            inst.entity:AddNetwork()
-            inst.entity:AddMiniMapEntity()
-            inst.entity:AddLight()
+        inst.entity:AddTransform()
+        inst.entity:AddSoundEmitter()
+        inst.entity:AddAnimState()
+        inst.entity:AddNetwork()
+        inst.entity:AddMiniMapEntity()
+        inst.entity:AddLight()
 
-            MakeObstaclePhysics(inst, 1.8)
+        MakeObstaclePhysics(inst, 1.8)
 
-            inst.AnimState:SetBank("siving_thetree")
-            inst.AnimState:SetBuild("siving_thetree")
-            inst.AnimState:PlayAnimation("idle")
+        inst.AnimState:SetBank("siving_thetree")
+        inst.AnimState:SetBuild("siving_thetree")
+        inst.AnimState:PlayAnimation("idle")
 
-            inst.MiniMapEntity:SetIcon("siving_thetree.tex")
+        inst.MiniMapEntity:SetIcon("siving_thetree.tex")
 
-            inst.Light:Enable(false)
-            inst.Light:SetRadius(3.5)
-            inst.Light:SetFalloff(1)
-            inst.Light:SetIntensity(.6)
-            inst.Light:SetColour(15/255, 180/255, 132/255)
+        inst.Light:Enable(false)
+        inst.Light:SetRadius(3.5)
+        inst.Light:SetFalloff(1)
+        inst.Light:SetIntensity(.6)
+        inst.Light:SetColour(15/255, 180/255, 132/255)
 
-            inst:AddTag("siving_thetree")
+        inst:AddTag("siving_thetree")
 
-            inst.entity:SetPristine()
+        inst.entity:SetPristine()
 
-            if not TheWorld.ismastersim then
-                return inst
+        if not TheWorld.ismastersim then
+            return inst
+        end
+
+        inst.countWorked = 0
+        inst.treeState = 1
+
+        inst:AddComponent("inspectable")
+
+        inst:AddComponent("lootdropper")
+
+        inst:AddComponent("workable")
+        inst.components.workable:SetWorkAction(ACTIONS.MINE)
+        inst.components.workable:SetWorkLeft(20)
+        inst.components.workable:SetOnWorkCallback(function(inst, worker, workleft, numworks)
+            inst.components.workable:SetWorkLeft(20)    --恢复工作量，永远都破坏不了
+
+            if inst.treeState > 0 then
+                inst.countWorked = inst.countWorked + 1
+
+                if inst.countWorked >= (inst.treeState == 1 and 30 or 20) then
+                    inst.countWorked = 0
+
+                    local x, y, z = GetCalculatedPos_legion(inst.Transform:GetWorldPosition(), 2+math.random()*3, nil)
+                    DropItem_legion("siving_rocks", x, y+9, z, 1, 18, 20*FRAMES, nil, nil, nil)
+                end
             end
+        end)
 
-            inst.countWorked = 0
-            inst.treeState = 1
+        inst:AddComponent("bloomer")
 
-            inst:AddComponent("inspectable")
+        MakeHauntableWork(inst)
 
-            inst:AddComponent("lootdropper")
-
-            inst:AddComponent("workable")
-            inst.components.workable:SetWorkAction(ACTIONS.MINE)
-            inst.components.workable:SetWorkLeft(20)
-            inst.components.workable:SetOnWorkCallback(function(inst, worker, workleft, numworks)
-                inst.components.workable:SetWorkLeft(20)    --恢复工作量，永远都破坏不了
-
-                if inst.treeState > 0 then
-                    inst.countWorked = inst.countWorked + 1
-
-                    if inst.countWorked >= (inst.treeState == 1 and 30 or 20) then
-                        inst.countWorked = 0
-                        --掉落子圭石
-                    end
-                end
-            end)
-
-            inst:AddComponent("bloomer")
-
-            MakeHauntableWork(inst)
-
-            inst:AddComponent("timer")
-            inst:ListenForEvent("timerdone", function(inst, data)
-                if data.name == "birdrebirth" then
-                    StateChange(inst)
-                end
-            end)
-
-            inst:WatchWorldState("isspring", StateChange)
-
-            inst.OnLoad = function(inst, data)
+        inst:AddComponent("timer")
+        inst:ListenForEvent("timerdone", function(inst, data)
+            if data.name == "birdrebirth" then
                 StateChange(inst)
             end
+        end)
 
+        inst:WatchWorldState("isspring", StateChange)
+
+        inst.taskState = inst:DoTaskInTime(0.1, StateChange)
+        inst.OnLoad = function(inst, data)
+            if inst.taskState ~= nil then
+                inst.taskState:Cancel()
+                inst.taskState = nil
+            end
+            StateChange(inst)
+        end
+
+        inst.OnEntityWake = AddLivesListen
+        inst.OnEntitySleep = RemoveLivesListen
+        AddLivesListen(inst)
+
+        return inst
+    end,
+    {
+        Asset("SCRIPT", "scripts/prefabs/wortox_soul_common.lua"),
+        Asset("ANIM", "anim/siving_thetree.zip"),
+    },
+    { "siving_rocks", "siving_lifesteal_fx" }
+))
+
+--------------------------------------------------------------------------
+--[[ 生命吸收的特效 ]]
+--------------------------------------------------------------------------
+
+table.insert(prefs, Prefab(
+    "siving_lifesteal_fx",
+    function()
+        local inst = CreateEntity()
+
+        inst.entity:AddTransform()
+        inst.entity:AddAnimState()
+        inst.entity:AddNetwork()
+
+        MakeGhostPhysics(inst, 1, 0.3)
+
+        inst.AnimState:SetBank("lifeplant_fx")
+        inst.AnimState:SetBuild("lifeplant_fx")
+        inst.AnimState:PlayAnimation("single"..math.random(1,3), true)
+        inst.AnimState:SetMultColour(15/255, 180/255, 132/255, 1)
+
+        inst:AddTag("flying")
+        inst:AddTag("NOCLICK")
+        inst:AddTag("FX")
+
+        inst.entity:SetPristine()
+        if not TheWorld.ismastersim then
             return inst
-        end,
-        {
-            Asset("ANIM", "anim/siving_thetree.zip"),
-        },
-        {}
-    ))
+        end
+
+        inst.persists = false
+        inst.movingTarget = nil
+        inst.isLast = false
+        inst.lifePower = nil
+
+        inst:AddComponent("locomotor")
+        inst.components.locomotor.walkspeed = 2
+        inst.components.locomotor.runspeed = 2
+        inst.components.locomotor:SetTriggersCreep(false)
+        inst.components.locomotor:EnableGroundSpeedMultiplier(false)
+        inst.components.locomotor.pathcaps = { ignorewalls = true, allowocean = true }
+
+        inst:AddComponent("bloomer")
+        inst.components.bloomer:PushBloom("lifesteal", "shaders/anim.ksh", 1)
+
+        inst:DoTaskInTime(0, function()
+            if inst.movingTarget == nil or not inst.movingTarget:IsValid() then
+                inst:Remove()
+            else
+                inst:ForceFacePoint(inst.movingTarget.Transform:GetWorldPosition())
+                inst.components.locomotor:WalkForward()
+                inst:DoPeriodicTask(0.1, function()
+                    if inst.movingTarget == nil or not inst.movingTarget:IsValid() then
+                        inst:Remove()
+                    elseif inst:GetDistanceSqToInst(inst.movingTarget) <= 3.3 then --1.8*1.8+0.06
+                        if inst.isLast then
+                            OnStealLife(inst.movingTarget, inst.lifePower)
+                        end
+                        inst:Remove()
+                    end
+                end, 0)
+            end
+        end)
+        inst.OnEntitySleep = function(inst)
+            if inst.isLast then
+                OnStealLife(inst.movingTarget, inst.lifePower)
+            end
+            inst:Remove()
+        end
+
+        return inst
+    end,
+    {
+        Asset("ANIM", "anim/lifeplant_fx.zip"),
+    },
+    nil
+))
 
 --------------------
 --------------------
