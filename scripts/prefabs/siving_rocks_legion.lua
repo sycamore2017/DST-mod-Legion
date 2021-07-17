@@ -296,23 +296,129 @@ MakeDerivant({  --子圭森型岩
 --[[ 子圭神木 ]]
 --------------------------------------------------------------------------
 
+local function DropRock(inst)
+    local x, y, z = GetCalculatedPos_legion(inst.Transform:GetWorldPosition(), 2+math.random()*3, nil)
+    DropItem_legion("siving_rocks", x, y+9, z, 1, 18, 20*FRAMES, nil, nil, nil)
+end
+local function OnStealLife(inst, value)
+    --子圭玄鸟在场上时，吸收的生命全部加给它
+    if inst.bossBird ~= nil and inst.bossBird.components.health ~= nil then
+        inst.bossBird.components.health:DoDelta(value, nil, inst.prefab)
+        return
+    end
+
+    inst.countHealth = inst.countHealth + value
+
+    if inst.treeState == 0 then --如果玄鸟死了，积累达到其生命最大值后，提前复活玄鸟(但不立即上场)
+        if inst.countHealth >= 10000 then
+            inst.components.timer:StopTimer("birdrebirth")
+			inst:PushEvent("timerdone", { name = "birdrebirth" })
+            inst.countHealth = inst.countHealth - 10000
+        end
+    else    --如果玄鸟活着(但没上场)，每500生命有几率掉落子圭石
+        if inst.countHealth >= 500 then
+            if math.random() < 0.3 then
+                DropRock(inst)
+            end
+            inst.countHealth = inst.countHealth - 500
+        end
+    end
+end
+local function TriggerLifeExtractTask(inst, doit)
+    if doit then
+        if inst.taskLifeExtract == nil then
+            local x, y, z = inst.Transform:GetWorldPosition()
+            local distancesq = TUNING.WORTOX_SOULHEAL_RANGE * TUNING.WORTOX_SOULHEAL_RANGE
+            local ents = nil
+
+            --每1秒吸取所有生物生命；每0.5秒产生吸取特效
+            inst.taskLifeExtract = inst:DoPeriodicTask(0.5, function()
+                local countent = 0
+                local entsnow = ents
+                if ents == nil then
+                    entsnow = TheSim:FindEntities(x, y, z, TUNING.WORTOX_SOULHEAL_RANGE,
+                    {"_combat", "_health"},
+                    {"NOCLICK", "FX", "shadow", "playerghost", "INLIMBO", "wall", "engineering", "siving"}, nil)
+                end
+
+                for k,v in pairs(entsnow) do
+                    if
+                        v.components.health ~= nil and not v.components.health:IsDead() and
+                        v.entity:IsVisible() and
+                        v:GetDistanceSqToPoint(x, y, z) <= distancesq
+                    then
+                        local life = SpawnPrefab("siving_lifesteal_fx")
+                        if life ~= nil then
+                            life.movingTarget = inst
+                            life.Transform:SetPosition(v.Transform:GetWorldPosition())
+                        end
+
+                        if ents ~= nil then
+                            v.components.health:DoDelta(-1, nil, (inst.nameoverride or inst.prefab), true, inst, true)
+                        end
+                        countent = countent + 1
+                    end
+                end
+
+                if ents == nil and countent > 0 then
+                    ents = entsnow
+                else
+                    ents = nil
+                    if countent > 0 then
+                        OnStealLife(inst, countent)
+                    end
+                end
+
+            end, 0)
+        end
+    else
+        if inst.taskLifeExtract ~= nil then
+            inst.taskLifeExtract:Cancel()
+            inst.taskLifeExtract = nil
+        end
+    end
+end
+
 local function OnRestoreSoul(victim)
     victim.nosoultask = nil
 end
 local function IsValidVictim(victim)
     return wortox_soul_common.HasSoul(victim) and victim.components.health:IsDead()
 end
-local function LifeWalkToTree(inst, victim, numsouls)
+local function LetLifeWalkToTree(inst, victim, healthvalue)
     local x, y, z = victim.Transform:GetWorldPosition()
-    inst:DoPeriodicTask(0.5, function()
-        
-    end, 0)
+    local count = 0
+    local countMax = healthvalue <= 600 and 3 or 6
+    local taskStealLife = nil
+    taskStealLife = inst:DoPeriodicTask(0.5, function()
+        if inst == nil or not inst:IsValid() then
+            if taskStealLife ~= nil then
+                taskStealLife:Cancel()
+                taskStealLife = nil
+            end
+            return
+        end
 
-    local life = SpawnPrefab("siving_lifesteal_fx")
-    if life ~= nil then
-        life
-        life.Transform:SetPosition(victim.Transform:GetWorldPosition())
-    end
+        count = count + 1
+
+        local life = SpawnPrefab("siving_lifesteal_fx")
+        if life ~= nil then
+            life.movingTarget = inst
+            if count >= countMax then
+                life.OnReachTarget = function()
+                    OnStealLife(inst, healthvalue)
+                end
+            end
+            life.Transform:SetPosition(x, y, z)
+        end
+
+        if count >= countMax then
+            if taskStealLife ~= nil then
+                taskStealLife:Cancel()
+                taskStealLife = nil
+            end
+        end
+    end, 0)
 end
 
 local function OnEntityDropLoot(inst, data)
@@ -333,7 +439,7 @@ local function OnEntityDropLoot(inst, data)
         victim.nosoultask = victim:DoTaskInTime(5, OnRestoreSoul)
 
         local health = victim.components.health ~= nil and victim.components.health.maxhealth or 100
-        LifeWalkToTree(inst, victim, health)
+        LetLifeWalkToTree(inst, victim, health)
     end
 end
 local function OnEntityDeath(inst, data)
@@ -352,7 +458,7 @@ local function OnStarvedTrapSouls(inst, data)
     then
         --V2C: prevents multiple Wortoxes in range from spawning multiple souls per trap
         trap.nosoultask = trap:DoTaskInTime(5, OnRestoreSoul)
-        LifeWalkToTree(inst, trap, data.numsouls*100)
+        LetLifeWalkToTree(inst, trap, data.numsouls*50)
     end
 end
 
@@ -370,6 +476,7 @@ local function AddLivesListen(inst)
         inst._onstarvedtrapsoulsfn = function(src, data) OnStarvedTrapSouls(inst, data) end
         inst:ListenForEvent("starvedtrapsouls", inst._onstarvedtrapsoulsfn, TheWorld)
     end
+    TriggerLifeExtractTask(inst, true)
 end
 local function RemoveLivesListen(inst)
     if inst._onentitydroplootfn ~= nil then
@@ -384,31 +491,27 @@ local function RemoveLivesListen(inst)
         inst:RemoveEventCallback("starvedtrapsouls", inst._onstarvedtrapsoulsfn, TheWorld)
         inst._onstarvedtrapsoulsfn = nil
     end
-end
-
-local function OnStealLife(inst, value)
-    
+    TriggerLifeExtractTask(inst, false)
 end
 
 -----
 
 local function StateChange(inst) --0休眠状态(玄鸟死亡)、1正常状态(玄鸟活着，非春季)、2活力状态(玄鸟活着，春季)
     if inst.components.timer:TimerExists("birdrebirth") then --玄鸟死亡
-        inst.countWorked = 0
         inst.treeState = 0
+        inst.bossBird = nil
         inst.components.bloomer:PopBloom("activetree")
         inst.Light:Enable(false)
-        return
-    end
-
-    if TheWorld.state.isspring then --春季
-        inst.treeState = 2
-        inst.components.bloomer:PushBloom("activetree", "shaders/anim.ksh", 1)
-        inst.Light:Enable(true)
     else
-        inst.treeState = 1
-        inst.components.bloomer:PopBloom("activetree")
-        inst.Light:Enable(false)
+        if TheWorld.state.isspring then --春季
+            inst.treeState = 2
+            inst.components.bloomer:PushBloom("activetree", "shaders/anim.ksh", 1)
+            inst.Light:Enable(true)
+        else
+            inst.treeState = 1
+            inst.components.bloomer:PopBloom("activetree")
+            inst.Light:Enable(false)
+        end
     end
 end
 
@@ -447,7 +550,10 @@ table.insert(prefs, Prefab(
         end
 
         inst.countWorked = 0
+        inst.countHealth = 0
         inst.treeState = 1
+        inst.taskLifeExtract = nil
+        inst.bossBird = nil
 
         inst:AddComponent("inspectable")
 
@@ -464,10 +570,10 @@ table.insert(prefs, Prefab(
 
                 if inst.countWorked >= (inst.treeState == 1 and 30 or 20) then
                     inst.countWorked = 0
-
-                    local x, y, z = GetCalculatedPos_legion(inst.Transform:GetWorldPosition(), 2+math.random()*3, nil)
-                    DropItem_legion("siving_rocks", x, y+9, z, 1, 18, 20*FRAMES, nil, nil, nil)
+                    DropRock(inst)
                 end
+
+                --undo:有几率产生boss
             end
         end)
 
@@ -485,7 +591,24 @@ table.insert(prefs, Prefab(
         inst:WatchWorldState("isspring", StateChange)
 
         inst.taskState = inst:DoTaskInTime(0.1, StateChange)
+        inst.OnSave = function(inst, data)
+            if inst.countWorked then
+                data.countWorked = inst.countWorked
+            end
+            if inst.countHealth then
+                data.countHealth = inst.countHealth
+            end
+        end
         inst.OnLoad = function(inst, data)
+            if data ~= nil then
+                if data.countWorked ~= nil then
+                    inst.countWorked = data.countWorked
+                end
+                if data.countHealth ~= nil then
+                    inst.countHealth = data.countHealth
+                end
+            end
+
             if inst.taskState ~= nil then
                 inst.taskState:Cancel()
                 inst.taskState = nil
@@ -529,6 +652,7 @@ table.insert(prefs, Prefab(
         inst:AddTag("flying")
         inst:AddTag("NOCLICK")
         inst:AddTag("FX")
+        inst:AddTag("NOBLOCK")
 
         inst.entity:SetPristine()
         if not TheWorld.ismastersim then
@@ -536,9 +660,9 @@ table.insert(prefs, Prefab(
         end
 
         inst.persists = false
+        inst.taskMove = nil
         inst.movingTarget = nil
-        inst.isLast = false
-        inst.lifePower = nil
+        inst.OnReachTarget = nil
 
         inst:AddComponent("locomotor")
         inst.components.locomotor.walkspeed = 2
@@ -556,12 +680,20 @@ table.insert(prefs, Prefab(
             else
                 inst:ForceFacePoint(inst.movingTarget.Transform:GetWorldPosition())
                 inst.components.locomotor:WalkForward()
-                inst:DoPeriodicTask(0.1, function()
+                inst.taskMove = inst:DoPeriodicTask(0.1, function()
                     if inst.movingTarget == nil or not inst.movingTarget:IsValid() then
+                        if inst.taskMove ~= nil then
+                            inst.taskMove:Cancel()
+                            inst.taskMove = nil
+                        end
                         inst:Remove()
                     elseif inst:GetDistanceSqToInst(inst.movingTarget) <= 3.3 then --1.8*1.8+0.06
-                        if inst.isLast then
-                            OnStealLife(inst.movingTarget, inst.lifePower)
+                        if inst.OnReachTarget ~= nil then
+                            inst.OnReachTarget()
+                        end
+                        if inst.taskMove ~= nil then
+                            inst.taskMove:Cancel()
+                            inst.taskMove = nil
                         end
                         inst:Remove()
                     end
@@ -569,8 +701,12 @@ table.insert(prefs, Prefab(
             end
         end)
         inst.OnEntitySleep = function(inst)
-            if inst.isLast then
-                OnStealLife(inst.movingTarget, inst.lifePower)
+            if inst.OnReachTarget ~= nil then
+                inst.OnReachTarget()
+            end
+            if inst.taskMove ~= nil then
+                inst.taskMove:Cancel()
+                inst.taskMove = nil
             end
             inst:Remove()
         end
