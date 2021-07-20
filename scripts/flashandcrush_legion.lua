@@ -533,7 +533,6 @@ end)
 AddStategraphActionHandler("wilson", ActionHandler(ACTIONS.GIVE_RIGHTCLICK, "give"))
 AddStategraphActionHandler("wilson_client", ActionHandler(ACTIONS.GIVE_RIGHTCLICK, "give"))    --在联机版中添加新动作需要对wilson和wilson_cient两个sg都进行state绑定
 
-
 --------------------------------------------------------------------------
 --[[ 让蘑菇和孢子可以修复素白蘑菇帽 ]]
 --------------------------------------------------------------------------

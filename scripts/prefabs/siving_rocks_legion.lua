@@ -21,8 +21,9 @@ if not CONFIGS_LEGION.ENABLEDMODS.MythWords then --未开启神话书说时才�
             inst.AnimState:SetBuild("myth_siving")
             inst.AnimState:PlayAnimation("siving_rocks")
 
-            inst.entity:SetPristine()
+            inst:AddTag("molebait")
 
+            inst.entity:SetPristine()
             if not TheWorld.ismastersim then
                 return inst
             end
@@ -33,6 +34,9 @@ if not CONFIGS_LEGION.ENABLEDMODS.MythWords then --未开启神话书说时才�
             inst:AddComponent("inspectable")
 
             inst:AddComponent("tradable")
+            inst.components.tradable.rocktribute = 6
+
+            inst:AddComponent("bait")
 
             inst:AddComponent("inventoryitem")
             inst.components.inventoryitem.imagename = "siving_rocks"
@@ -48,7 +52,7 @@ if not CONFIGS_LEGION.ENABLEDMODS.MythWords then --未开启神话书说时才�
             Asset("ATLAS", "images/inventoryimages/siving_rocks.xml"),
             Asset("IMAGE", "images/inventoryimages/siving_rocks.tex"),
         },
-        {}
+        nil
     ))
 end
 
@@ -291,6 +295,71 @@ MakeDerivant({  --子圭森型岩
         end)
     end,
 })
+
+table.insert(prefs, Prefab( --子圭一型岩(物品)
+    "siving_derivant_item",
+    function()
+        local inst = CreateEntity()
+
+        inst.entity:AddTransform()
+        inst.entity:AddAnimState()
+        inst.entity:AddNetwork()
+
+        MakeInventoryPhysics(inst)
+
+        inst.AnimState:SetBank("siving_derivants")
+        inst.AnimState:SetBuild("siving_derivants")
+        inst.AnimState:PlayAnimation("item")
+
+        inst:AddTag("molebait")
+
+        inst.entity:SetPristine()
+        if not TheWorld.ismastersim then
+            return inst
+        end
+
+        inst:AddComponent("stackable")
+        inst.components.stackable.maxsize = TUNING.STACK_SIZE_LARGEITEM
+
+        inst:AddComponent("inspectable")
+
+        inst:AddComponent("tradable")
+        inst.components.tradable.rocktribute = 12
+
+        inst:AddComponent("bait")
+
+        inst:AddComponent("inventoryitem")
+        inst.components.inventoryitem.imagename = "siving_derivant_item"
+        inst.components.inventoryitem.atlasname = "images/inventoryimages/siving_derivant_item.xml"
+        inst.components.inventoryitem:SetSinks(true)
+
+        inst:AddComponent("deployable")
+        inst.components.deployable.ondeploy = function(inst, pt, deployer)
+            local tree = SpawnPrefab("siving_derivant_lvl0")
+            if tree ~= nil then
+                tree.Transform:SetPosition(pt:Get())
+                inst.components.stackable:Get():Remove()
+
+                if deployer ~= nil and deployer.SoundEmitter ~= nil then
+                    deployer.SoundEmitter:PlaySound("dontstarve/wilson/plant_seeds")
+                end
+            end
+        end
+
+        MakeHauntableLaunchAndIgnite(inst)
+
+        return inst
+    end,
+    {
+        Asset("ANIM", "anim/siving_derivants.zip"),
+        Asset("ATLAS", "images/inventoryimages/siving_derivant_item.xml"),
+        Asset("IMAGE", "images/inventoryimages/siving_derivant_item.tex"),
+    },
+    { "siving_derivant_lvl0" }
+))
+
+--子圭一型岩(placer)
+table.insert(prefs, MakePlacer("siving_derivant_item_placer", "siving_derivants", "siving_derivants", "lvl0"))
 
 --------------------------------------------------------------------------
 --[[ 子圭神木 ]]
@@ -717,6 +786,130 @@ table.insert(prefs, Prefab(
         Asset("ANIM", "anim/lifeplant_fx.zip"),
     },
     nil
+))
+
+--------------------------------------------------------------------------
+--[[ 子圭栽培土(物品) ]]
+--------------------------------------------------------------------------
+
+table.insert(prefs, Prefab(
+    "siving_soil_item",
+    function()
+        local inst = CreateEntity()
+
+        inst.entity:AddTransform()
+        inst.entity:AddAnimState()
+        inst.entity:AddNetwork()
+
+        MakeInventoryPhysics(inst)
+
+        inst.AnimState:SetBank("siving_soil")
+        inst.AnimState:SetBuild("siving_soil")
+        inst.AnimState:PlayAnimation("item")
+
+        inst:AddTag("molebait")
+
+        inst.entity:SetPristine()
+        if not TheWorld.ismastersim then
+            return inst
+        end
+
+        inst:AddComponent("stackable")
+        inst.components.stackable.maxsize = TUNING.STACK_SIZE_MEDITEM
+
+        inst:AddComponent("inspectable")
+
+        inst:AddComponent("tradable")
+        inst.components.tradable.rocktribute = 12
+
+        inst:AddComponent("bait")
+
+        inst:AddComponent("inventoryitem")
+        inst.components.inventoryitem.imagename = "siving_soil_item"
+        inst.components.inventoryitem.atlasname = "images/inventoryimages/siving_soil_item.xml"
+        inst.components.inventoryitem:SetSinks(true)
+
+        inst:AddComponent("deployable")
+        inst.components.deployable.ondeploy = function(inst, pt, deployer)
+            local tree = SpawnPrefab("siving_soil")
+            if tree ~= nil then
+                tree.Transform:SetPosition(pt:Get())
+                inst.components.stackable:Get():Remove()
+
+                if deployer ~= nil and deployer.SoundEmitter ~= nil then
+                    deployer.SoundEmitter:PlaySound("dontstarve/wilson/plant_seeds")
+                end
+            end
+        end
+
+        MakeHauntableLaunchAndIgnite(inst)
+
+        return inst
+    end,
+    {
+        Asset("ANIM", "anim/farm_soil.zip"), --官方栽培土动画模板（为了placer加载的）
+        Asset("ANIM", "anim/siving_soil.zip"),
+        Asset("ATLAS", "images/inventoryimages/siving_soil_item.xml"),
+        Asset("IMAGE", "images/inventoryimages/siving_soil_item.tex"),
+    },
+    { "siving_soil" }
+))
+
+--子圭栽培土(placer)
+table.insert(prefs, MakePlacer("siving_derivant_item_placer", "farm_soil", "siving_soil", "till_idle"))
+
+--------------------------------------------------------------------------
+--[[ 子圭栽培土 ]]
+--------------------------------------------------------------------------
+
+table.insert(prefs, Prefab(
+    "siving_soil",
+    function()
+        local inst = CreateEntity()
+
+        inst.entity:AddTransform()
+        inst.entity:AddAnimState()
+        inst.entity:AddNetwork()
+
+        MakeInventoryPhysics(inst)
+
+        inst.AnimState:SetBank("farm_soil")
+        inst.AnimState:SetBuild("siving_soil")
+        -- inst.AnimState:PlayAnimation("till_idle")
+
+        inst:AddTag("soil_legion")
+
+        inst.entity:SetPristine()
+        if not TheWorld.ismastersim then
+            return inst
+        end
+
+        inst:DoTaskInTime(0, function()
+            inst.AnimState:PlayAnimation("till_rise")
+            inst.AnimState:PushAnimation("till_idle", false)
+        end)
+
+        inst:AddComponent("inspectable")
+
+        inst:AddComponent("lootdropper")
+
+        inst:AddComponent("workable")
+        inst.components.workable:SetWorkAction(ACTIONS.DIG)
+        inst.components.workable:SetWorkLeft(1)
+        inst.components.workable:SetOnFinishCallback(function(inst, worker)
+            inst.components.lootdropper:SpawnLootPrefab("siving_soil_item")
+            inst:Remove()
+        end)
+
+        MakeHauntableWork(inst)
+
+        return inst
+    end,
+    {
+        Asset("ANIM", "anim/farm_soil.zip"), --官方栽培土动画模板
+        Asset("ANIM", "anim/siving_soil.zip"),
+    },
+    { "siving_soil_item" }
 ))
 
 --------------------

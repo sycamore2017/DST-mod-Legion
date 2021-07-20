@@ -118,7 +118,7 @@ if IsServer then
 end
 
 --------------------------------------------------------------------------
---[[ 新增作物-松萝 ]]
+--[[ 新增作物：松萝 ]]
 --------------------------------------------------------------------------
 
 --新增作物收获物与种子设定（只是为了种子几率，并不会主动生成prefab）
@@ -198,3 +198,107 @@ PLANT_DEFS.pineananas = {
     --图鉴信息(hidden 表示这个阶段不显示)
     plantregistryinfo = PLANT_DEFS.pepper.plantregistryinfo,
 }
+
+--------------------------------------------------------------------------
+--[[ 添加新动作：让种子能种在子圭栽培土里 ]]
+--------------------------------------------------------------------------
+
+local WEIGHTED_SEED_TABLE = require("prefabs/weed_defs").weighted_seed_table
+
+local function PickFarmPlant()
+	if math.random() < TUNING.FARM_PLANT_RANDOMSEED_WEED_CHANCE then
+		return weighted_random_choice(WEIGHTED_SEED_TABLE)
+	else
+		local weights = {}
+		for k, v in pairs(VEGGIES) do
+			weights[k] = v.seed_weight * (
+                (PLANT_DEFS[k] and PLANT_DEFS[k].good_seasons[TheWorld.state.season]) and TUNING.SEED_WEIGHT_SEASON_MOD or 1
+            )
+		end
+
+		return "farm_plant_"..weighted_random_choice(weights)
+	end
+    return "weed_forgetmelots"
+end
+local function OnPlant(seed, doer, soil)
+    if seed.components.farmplantable ~= nil and seed.components.farmplantable.plant ~= nil then
+        local pt = soil:GetPosition()
+
+        local plant_prefab = FunctionOrValue(seed.components.farmplantable.plant, seed)
+        if plant_prefab == "farm_plant_randomseed" then
+            plant_prefab = PickFarmPlant()
+        end
+
+        local plant = SpawnPrefab(plant_prefab.."_legion")
+        if plant ~= nil then
+            plant.Transform:SetPosition(pt:Get())
+            -- plant:PushEvent("on_planted", { doer = doer, seed = seed, in_soil = true })
+            if plant.SoundEmitter ~= nil then
+				plant.SoundEmitter:PlaySound("dontstarve/common/plant")
+			end
+            TheWorld:PushEvent("itemplanted", { doer = doer, pos = pt })
+
+            soil:Remove()
+            seed:Remove()
+
+            return true
+        end
+    end
+    return false
+end
+
+local PLANTSOIL_LEGION = Action({ theme_music = "farming" })
+PLANTSOIL_LEGION.id = "PLANTSOIL_LEGION"
+PLANTSOIL_LEGION.str = STRINGS.ACTIONS_LEGION.PLANTSOIL_LEGION
+PLANTSOIL_LEGION.fn = function(act)
+    if
+        act.invobject ~= nil and
+        act.doer.components.inventory ~= nil and
+        act.target ~= nil and act.target:HasTag("soil_legion")
+    then
+        local seed = act.doer.components.inventory:RemoveItem(act.invobject)
+        if seed ~= nil then
+            if OnPlant(seed, act.doer, act.target) then
+                return true
+            end
+
+            act.doer.components.inventory:GiveItem(seed)
+        end
+    end
+end
+AddAction(PLANTSOIL_LEGION)
+
+AddComponentAction("USEITEM", "farmplantable", function(inst, doer, target, actions, right)
+    if target:HasTag("soil_legion") and not target:HasTag("NOCLICK") then
+        table.insert(actions, ACTIONS.PLANTSOIL_LEGION)
+    end
+end)
+
+AddStategraphActionHandler("wilson", ActionHandler(ACTIONS.PLANTSOIL_LEGION, function(inst, action)
+    if
+        inst:HasTag("fastbuilder") or inst:HasTag("fastpicker")
+        or ( --八戒要不饥饿时空手采摘才会加快
+            inst:HasTag("pigsy")
+            and inst.replica.inventory:GetEquippedItem(EQUIPSLOTS.HANDS) == nil
+            and inst.replica.hunger:GetCurrent() >= 50
+        )
+    then
+        return "domediumaction"
+    else
+        return "dolongaction"
+    end
+end))
+AddStategraphActionHandler("wilson_client", ActionHandler(ACTIONS.PLANTSOIL_LEGION, function(inst, action)
+    if
+        inst:HasTag("fastbuilder") or inst:HasTag("fastpicker")
+        or ( --八戒要不饥饿时空手采摘才会加快
+            inst:HasTag("pigsy")
+            and inst.replica.inventory:GetEquippedItem(EQUIPSLOTS.HANDS) == nil
+            and inst.replica.hunger:GetCurrent() >= 50
+        )
+    then
+        return "domediumaction"
+    else
+        return "dolongaction"
+    end
+end))

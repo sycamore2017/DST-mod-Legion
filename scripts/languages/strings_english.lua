@@ -47,20 +47,20 @@ S_________WURT.DESCRIBE.HAT_LICHEN = "It should be eaten, "
 --------------------------------------------------------------------------
 
 S_NAMES.ROSORNS = "Rosorns"
-S______GENERIC.DESCRIBE.ROSORNS = "Roses always touch my heart directly."
+S______GENERIC.DESCRIBE.ROSORNS = "I am so defenseless in front of love."
 --S_______WILLOW.DESCRIBE.ROSORNS = "This is the opposite of burning."
 --S_____WOLFGANG.DESCRIBE.ROSORNS = "Wolfgang can eat in one bite!"
---S________WENDY.DESCRIBE.ROSORNS = "I used to eat these with Abigail..."
+S________WENDY.DESCRIBE.ROSORNS = "I am so vulnerable in front of love."
 --S_________WX78.DESCRIBE.ROSORNS = "STICK ADDON INSTALLED"
 --S_WICKERBOTTOM.DESCRIBE.ROSORNS = "Well, isn't that refreshing?"
 --S_______WOODIE.DESCRIBE.ROSORNS = "I'd prefer maple taffy..."
 --S______WAXWELL.DESCRIBE.ROSORNS = "Hm... I don't know what I was expecting."
 --S___WATHGRITHR.DESCRIBE.ROSORNS = "I've somehow found a way to make it even LESS appealing!"
 --S_______WEBBER.DESCRIBE.ROSORNS = "Yaaay! Popsicle, popsicle!"
---S_______WINONA.DESCRIBE.ROSORNS = "Great to cool off after some hard physical labor."
+S_______WINONA.DESCRIBE.ROSORNS = "Rose's fragrance always strikes me deep in my heart..."
 
 S_NAMES.LILEAVES = "Lileaves"
-S______GENERIC.DESCRIBE.LILEAVES = "I was deeply poisoned by loving it."
+S______GENERIC.DESCRIBE.LILEAVES = "Love's poison makes me helpless."
 --S_______WILLOW.DESCRIBE.LILEAVES = "This is the opposite of burning."
 --S_____WOLFGANG.DESCRIBE.LILEAVES = "Wolfgang can eat in one bite!"
 --S________WENDY.DESCRIBE.LILEAVES = "I used to eat these with Abigail..."
@@ -88,9 +88,9 @@ S______GENERIC.DESCRIBE.ORCHITWIGS = "It's not striking, but I just like it."
 S_NAMES.ROSEBUSH = "Rose Bush"
 S______GENERIC.DESCRIBE.ROSEBUSH =  --对于某些角色，这里面的"she"可以做点手脚，嘿嘿
 {
-    BARREN = "It can't recover without my help.",
-    WITHERED = "She is no longer beauteous.",
-    GENERIC = "She's so different!",
+    BARREN = "She can't get through this on her own.",
+    WITHERED = "Her beauty shrinks with her under the blazing sunlight.",
+    GENERIC = "Beautiful, but horn-y.",
     PICKED = "No one knows her beauty.",
     -- DISEASED = "Is weak. Sickly!",    --不会生病
     -- DISEASING = "Is looking shrivelly.",
@@ -2320,7 +2320,7 @@ S_________WURT.DESCRIBE.SOUL_CONTRACTS =
 }
 
 --------------------------------------------------------------------------
---[[ desert secret ]]--[[ 尘市蜃楼 ]]
+--[[ desert secret ]]--[[ 大漠隐情 ]]
 --------------------------------------------------------------------------
 
 S_NAMES.DESERTDEFENSE = "Desert Defense"   --砂之抵御

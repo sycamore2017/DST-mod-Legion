@@ -588,7 +588,7 @@ S________WENDY.DESCRIBE.SACHET = "掩盖死亡的恶臭。"
 S_________WX78.DESCRIBE.SACHET = "正在验证气味模块"
 S_WICKERBOTTOM.DESCRIBE.SACHET = "用于营造优雅的阅读环境。"
 S_______WOODIE.DESCRIBE.SACHET = "闻起来还不错，嗯？"
-S______WAXWELL.DESCRIBE.SACHET = "优雅男士的必需品。"
+S______WAXWELL.DESCRIBE.SACHET = "优雅男士的必需品。" --哈哈
 S___WATHGRITHR.DESCRIBE.SACHET = "闻起来像精灵。"
 S_______WEBBER.DESCRIBE.SACHET = "好棒！我们闻起来棒棒的！"
 S_______WINONA.DESCRIBE.SACHET = "花里胡哨的。"
@@ -945,9 +945,9 @@ STRINGS.UI.COOKBOOK.DISH_RICEDUMPLING = "塞满你的胃，喜欢这感觉么"
 S______GENERIC.DESCRIBE.DISH_RICEDUMPLING = "散发着自然的香气。"
 --S_______WILLOW.DESCRIBE.DISH_RICEDUMPLING = "This is the opposite of burning."
 --S_____WOLFGANG.DESCRIBE.DISH_RICEDUMPLING = "Wolfgang can eat in one bite!"
-S________WENDY.DESCRIBE.DISH_RICEDUMPLING = "长太息以掩涕兮，哀民生之多艰。"
+S________WENDY.DESCRIBE.DISH_RICEDUMPLING = "长太息以掩涕兮，哀民生之多艰。" --牛逼
 --S_________WX78.DESCRIBE.DISH_RICEDUMPLING = "STICK ADDON INSTALLED"
-S_WICKERBOTTOM.DESCRIBE.DISH_RICEDUMPLING = "也许我应该把这个丢进河里喂鱼。"
+S_WICKERBOTTOM.DESCRIBE.DISH_RICEDUMPLING = "也许我应该把这个丢进河里献给屈原。"
 --S_______WOODIE.DESCRIBE.DISH_RICEDUMPLING = "I'd prefer maple taffy..."
 S______WAXWELL.DESCRIBE.DISH_RICEDUMPLING = "看到这东西我的胃就不舒服。"
 --S___WATHGRITHR.DESCRIBE.DISH_RICEDUMPLING = "I've somehow found a way to make it even LESS appealing!"
@@ -1030,7 +1030,7 @@ S______GENERIC.ANNOUNCE_ATTACH_BUFF_BATDISGUISE = "感觉像穿了一套隐形�
 -- S_______WORTOX.ANNOUNCE_ATTACH_BUFF_BATDISGUISE = ""
 -- S________WARLY.ANNOUNCE_ATTACH_BUFF_BATDISGUISE = ""
 --
-S______GENERIC.ANNOUNCE_DETACH_BUFF_BATDISGUISE = "我既不是蝙蝠，也没有钱。"
+S______GENERIC.ANNOUNCE_DETACH_BUFF_BATDISGUISE = "好吧，其实我既不是蝙蝠，也没有钱。"
 -- S_______WILLOW.ANNOUNCE_DETACH_BUFF_BATDISGUISE = ""
 -- S_____WOLFGANG.ANNOUNCE_DETACH_BUFF_BATDISGUISE = ""
 -- S________WENDY.ANNOUNCE_DETACH_BUFF_BATDISGUISE = ""
@@ -2324,7 +2324,7 @@ S_________WURT.DESCRIBE.SOUL_CONTRACTS =
 }
 
 --------------------------------------------------------------------------
---[[ desert secret ]]--[[ 尘市蜃楼 ]]
+--[[ desert secret ]]--[[ 大漠隐情 ]]
 --------------------------------------------------------------------------
 
 S_NAMES.DESERTDEFENSE = "砂之抵御"
