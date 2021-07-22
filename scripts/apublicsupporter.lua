@@ -269,7 +269,7 @@ end
 --[[ 修改传粉组件，防止非花朵但是也具有flower标签的东西被非法生成出来 ]]
 --------------------------------------------------------------------------
 
-if CONFIGS_LEGION.FLOWERSPOWER then --4种花丛、香包需要
+if CONFIGS_LEGION.FLOWERSPOWER or CONFIGS_LEGION.LEGENDOFFALL then --4种花丛、香包、丰饶传说需要
     AddComponentPostInit("pollinator", function(self)
         --local CreateFlower_old = self.CreateFlower
         self.CreateFlower = function(self)

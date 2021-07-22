@@ -60,8 +60,8 @@ local function onattack(inst, owner, target)    --攻击直接扣血，而不考
         target.components.health:DoDelta(-damageNum, nil, (inst.nameoverride or inst.prefab), true, owner, true)
 
         --推出事件，让被攻击者能播放被攻击动画，并标记仇恨，武器攻击力为0时才需要这句话，后面代码也是如此
-        target:PushEvent("attacked", { attacker = owner, damage = damageNum, damageresolved = damageNum, weapon = inst })
-        if target.components.combat ~= nil and target.components.combat.onhitfn ~= nil then
+        target:PushEvent("attacked", { attacker = owner, damage = damageNum, damageresolved = damageNum, weapon = inst, noimpactsound = target.components.combat.noimpactsound })
+        if target.components.combat.onhitfn ~= nil then
             target.components.combat.onhitfn(target, owner, damageNum)
         end
 
@@ -77,6 +77,21 @@ local function onattack(inst, owner, target)    --攻击直接扣血，而不考
                 target.components.combat.onkilledbyother(target, owner)
             end
         end
+
+        --由于女武神的攻击时歌唱值加点与武器攻击力直接挂钩(不想改动SingingInspiration组件)
+        --所以这边主动给歌唱值补充没加上的点数
+        if owner.components.singinginspiration ~= nil then
+            local singing = owner.components.singinginspiration
+            if singing.validvictimfn ~= nil and not singing.validvictimfn(target) then
+                return
+            end
+            singing:DoDelta(
+                (51 * TUNING.INSPIRATION_GAIN_RATE)
+                * (1 - singing:GetPercent())
+                * (target:HasTag("epic") and TUNING.INSPIRATION_GAIN_EPIC_BONUS or 1)
+            )
+        end
+
     end
 end
 
