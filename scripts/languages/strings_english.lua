@@ -2709,3 +2709,14 @@ if CONFIGS_LEGION.ENABLEDMODS.CraftPot then
         NEWMOON = "specific to NewMoon Day",
     }
 end
+
+STRINGS.CROP_LEGION = {
+    SEED = "Planted {crop} Seed",
+    SPROUT = "{crop} Sprout",
+    SMALL = "{crop} Shoot",
+    GROWING = "Growing {crop}",
+    GROWN = "Mature {crop}",
+    HUGE = "Huge Mature {crop}",
+    ROT = "Withered {crop}",
+    HUGE_ROT = "Huge Rotten {crop}",
+}

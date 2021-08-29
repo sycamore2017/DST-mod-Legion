@@ -296,11 +296,11 @@ return {
           height = 0,
           visible = true,
           properties = {
-            ["data.setepitaph"] = "桐雀春深锁梧生。\n            --枫"
+            ["data.setepitaph"] = "桐雀春深锁梧生。\n            --梧生"
           }
         },
         -- {
-        --   name = "长青",
+        --   name = "学院路陈伟霆",
         --   type = "gravestone", --3/1
         --   shape = "rectangle",
         --   x = 96,
@@ -309,7 +309,7 @@ return {
         --   height = 0,
         --   visible = true,
         --   properties = {
-        --     ["data.setepitaph"] = "对不起宝贝，我忘了。\n            --长青"
+        --     ["data.setepitaph"] = "宝，你咋这么傻！\n            --学院路陈伟霆"
         --   }
         -- },
         {

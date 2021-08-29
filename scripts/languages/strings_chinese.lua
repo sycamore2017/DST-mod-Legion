@@ -2739,3 +2739,14 @@ if CONFIGS_LEGION.ENABLEDMODS.CraftPot then
     S_NAMES.DAIRY = "乳度"
     S_NAMES.FAT = "脂度"
 end
+
+STRINGS.CROP_LEGION = {
+    SEED = "种下的{crop}种子",
+    SPROUT = "{crop}芽",
+    SMALL = "{crop}苗",
+    GROWING = "在生长的{crop}",
+    GROWN = "成熟的{crop}",
+    HUGE = "丰硕的{crop}",
+    ROT = "枯萎的{crop}",
+    HUGE_ROT = "腐烂的丰硕{crop}",
+}

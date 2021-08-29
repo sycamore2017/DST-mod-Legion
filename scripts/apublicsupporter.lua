@@ -272,39 +272,43 @@ end
 if CONFIGS_LEGION.FLOWERSPOWER or CONFIGS_LEGION.LEGENDOFFALL then --4种花丛、香包、丰饶传说需要
     AddComponentPostInit("pollinator", function(self)
         --local CreateFlower_old = self.CreateFlower
-        self.CreateFlower = function(self)
+        self.CreateFlower = function(self) --防止传粉者生成非花朵但却有flower标签的实体
             if self:HasCollectedEnough() and self.inst:IsOnValidGround() then
                 local parentFlower = GetRandomItem(self.flowers)
                 local flower
 
-                if parentFlower.prefab ~= "flower"
+                if
+                    parentFlower.prefab ~= "flower"
                     and parentFlower.prefab ~= "flower_rose"
                     and parentFlower.prefab ~= "planted_flower"
-                    and parentFlower.prefab ~= "flower_evil" then
-                    flower = SpawnPrefab("flower_rose") --非花朵的东西就改成玫瑰花
+                    and parentFlower.prefab ~= "flower_evil"
+                then
+                    flower = SpawnPrefab(math.random()<0.3 and "flower_rose" or "flower")
                 else
                     flower = SpawnPrefab(parentFlower.prefab)
                 end
 
-                flower.planted = true   --这里需要改成true，不然会被世界当成一个生成点
-                flower.Transform:SetPosition(self.inst.Transform:GetWorldPosition())
-                self.flowers = {}
+                if flower ~= nil then
+                    flower.planted = true   --这里需要改成true，不然会被世界当成一个生成点
+                    flower.Transform:SetPosition(self.inst.Transform:GetWorldPosition())
+                    self.flowers = {}
+                end
             end
         end
 
-        -- if CONFIGS_LEGION.LEGENDOFFALL then --传粉者能提高农作物的产量
-        --     -- local Pollinate_old = self.Pollinate
-        --     self.Pollinate = function(self, flower)
-        --         if self:CanPollinate(flower) then
-        --             table.insert(self.flowers, flower)
-        --             self.target = nil
-
-        --             if flower.components.crop ~= nil and flower.components.crop.numpollinated ~= nil then
-        --                 flower.components.crop.numpollinated = flower.components.crop.numpollinated + 1
-        --             end
-        --         end
-        --     end
-        -- end
+        if CONFIGS_LEGION.LEGENDOFFALL then --传粉者能给作物传粉
+            local Pollinate_old = self.Pollinate
+            self.Pollinate = function(self, flower)
+                if self:CanPollinate(flower) then
+                    if flower.components.perennialcrop ~= nil then
+                        flower.components.perennialcrop:Pollinate(self.inst)
+                    end
+                end
+                if Pollinate_old ~= nil then
+                    Pollinate_old(self, flower)
+                end
+            end
+        end
     end)
 end
 
@@ -315,7 +319,7 @@ end
 local InventoryPrefabsList = require("mod_inventoryprefabs_list")  --mod中有物品栏图片的prefabs的表
 
 local function minisign_init(inst)
-    local OnDrawnFn_old = inst.components.drawable.ondrawnfn   
+    local OnDrawnFn_old = inst.components.drawable.ondrawnfn
     inst.components.drawable:SetOnDrawnFn(function(inst, image, src, atlas, bgimage, bgatlas) --这里image是所用图片的名字，而非prefab的名字
         if OnDrawnFn_old ~= nil then
             OnDrawnFn_old(inst, image, src, atlas, bgimage, bgatlas)
