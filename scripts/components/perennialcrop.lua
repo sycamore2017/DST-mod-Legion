@@ -6,6 +6,17 @@ local function onflower(self)
     end
 end
 
+local function onsick(self)
+	if self.sickness <= 0 then
+		self.inst.AnimState:SetMultColour(1, 1, 1, 1)
+	elseif self.sickness >= 0.3 then
+		self.inst.AnimState:SetMultColour(0.6, 0.6, 0.6, 1)
+	else
+		local color = 1 - self.sickness/0.3 * 0.4
+		self.inst.AnimState:SetMultColour(color, color, color, 1)
+	end
+end
+
 local PerennialCrop = Class(function(self, inst)
 	self.inst = inst
 
@@ -49,10 +60,13 @@ local PerennialCrop = Class(function(self, inst)
 	self.regrowstage = 1 --枯萎或者采摘后重新开始生长的阶段（原创）
 	self.goodseasons = {} --喜好季节：{autumn = true, winter = true, spring = true, summer = true}
 	self.killjoystolerance = 0 --扫兴容忍度：一般都为0
+	self.fn_stage = nil --每次设定生长阶段时额外触发的函数：fn(inst, isfull)
+	self.fn_defend = nil --作物被采集/破坏时会寻求庇护的函数：fn(inst, target)
 end,
 nil,
 {
     isflower = onflower,
+	sickness = onsick,
 })
 
 function PerennialCrop:SetUp(data)
@@ -66,6 +80,7 @@ function PerennialCrop:SetUp(data)
 	self.regrowstage = data.regrowStage or 1
 	self.goodseasons = data.goodSeasons or {}
 	self.killjoystolerance = data.killjoysTolerance or 0
+	self.fn_stage = data.fn_stage
 
 	self.stage_max = #data.stages
 end
@@ -152,8 +167,22 @@ function PerennialCrop:SetStage(stage, ishuge, isrotten, pushanim, skip)
 	if rotten or stage == self.stage_max then --腐烂、巨型、成熟阶段都是可采摘的
 		if self.inst.components.pickable == nil then
             self.inst:AddComponent("pickable")
-            -- self.inst.components.pickable.onpickedfn = OnPicked
         end
+		self.inst.components.pickable.onpickedfn = function(inst, doer)
+			local crop = inst.components.perennialcrop
+			crop:SetStage(crop.regrowstage, false, false, true, false)
+			crop:StartGrowing()
+			crop.num_nutrient = 0
+			crop.num_moisture = 0
+			crop.num_tended = 0
+			crop.infested = 0
+			crop.pollinated = 0
+			crop.num_perfect = nil
+
+			if crop.fn_defend ~= nil then
+				crop.fn_defend(inst, doer)
+			end
+		end
 	    self.inst.components.pickable:SetUp(nil)
 		self.inst.components.pickable.use_lootdropper_for_product = true
 		self.inst.components.pickable.picksound = rotten and "dontstarve/wilson/harvest_berries" or "dontstarve/wilson/pickup_plants"
@@ -164,6 +193,11 @@ function PerennialCrop:SetStage(stage, ishuge, isrotten, pushanim, skip)
 	--设置是否可照顾
 	if self.inst.components.farmplanttendable ~= nil then
 		self.inst.components.farmplanttendable:SetTendable(tendable)
+	end
+
+	--额外设置
+	if self.fn_stage ~= nil then
+		self.fn_stage(self.inst, not self.isrotten and self.stage == self.stage_max) --第二个参数为：是否成熟/巨型成熟
 	end
 end
 
@@ -232,14 +266,18 @@ function PerennialCrop:DoGrowth(skip)
 		if self.can_getsick then
 			if self.nutrientsick >= self.cost_nutrient then --预防疾病肥料的消耗
 				self.nutrientsick = self.nutrientsick - self.cost_nutrient
-				self.sickness = math.max(0, self.sickness-0.06)
+				if self.sickness > 0 then
+					self.sickness = math.max(0, self.sickness-0.06)
+				end
 			else
-				self.sickness = math.min(1, self.sickness+0.02)
+				if self.sickness < 1 then
+					self.sickness = math.min(1, self.sickness+0.02)
+				end
 				if math.random() < self.sickness then
 					--undo：产生虫群
 				end
 			end
-		else
+		elseif self.sickness > 0 then
 			self.sickness = 0
 		end
 		if self.moisture >= self.cost_moisture then --水分的积累
@@ -337,6 +375,10 @@ function PerennialCrop:OnEntitySleep()
 end
 
 function PerennialCrop:OnEntityWake()
+	if self.inst.components.burnable ~= nil and self.inst.components.burnable:IsBurning() then
+		return
+	end
+
     if self.timedata.start ~= nil and self.timedata.all ~= nil then
 		--把目前已经经过的时间归入生长中去
 		local dt = GetTime() - self.timedata.start
@@ -420,6 +462,25 @@ end
 
 function PerennialCrop:TendTo(doer)
 	self.num_tended = self.num_tended + 1
+end
+
+function PerennialCrop:DoMagicGrowth(doer, dt)
+	--着火时无法被催熟
+	if self.inst.components.burnable ~= nil and self.inst.components.burnable:IsBurning() then
+		return false
+	end
+
+	--成熟状态是无法被催熟的
+	if not self.isrotten and self.stage == self.stage_max then
+		return true
+	end
+
+	if dt == nil then
+		self:DoGrowth(false)
+	else
+		self:LongUpdate(dt, false)
+	end
+	return true
 end
 
 return PerennialCrop

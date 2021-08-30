@@ -111,6 +111,10 @@ for k,v in pairs(PLANT_DEFS) do
 			regrowStage = 1, --枯萎或者采摘后重新开始生长的阶段（原创）
 			goodSeasons = v.good_seasons, --喜好季节：{autumn = true, winter = true, spring = true, summer = true}
 			killjoysTolerance = v.max_killjoys_tolerance, --扫兴容忍度：一般都为0
+
+			fn_common = v.fn_common, --额外设定函数（通用）：fn(inst)
+			fn_server = v.fn_server, --额外设定函数（主机）：fn(inst)
+			fn_stage = v.fn_stage, --每次设定生长阶段时额外触发的函数：fn(inst, isfull)
 		}
 
 		--确定花期map（其他mod想要增加花期，可仿造目前格式写在PLANT_DEFS中即可）
@@ -208,7 +212,7 @@ for k,v in pairs(WEED_DEFS) do
 	local data = {
 		assets = nil,
 		prefabs = nil,
-		tags = v.tags, --undo：请关注extra_tags，可能会用到
+		tags = v.tags or v.extra_tags,
 		build = v.build,	--贴图
 		bank = v.bank,		--动画模板
 		fireproof = v.fireproof == true, --是否防火
@@ -228,6 +232,10 @@ for k,v in pairs(WEED_DEFS) do
 		regrowStage = 1, --枯萎或者采摘后重新开始生长的阶段（原创）
 		goodSeasons = v.good_seasons or {}, --喜好季节：{autumn = true, winter = true, spring = true, summer = true}
 		killjoysTolerance = v.killjoysTolerance or 1, --扫兴容忍度：杂草为1，容忍度比作物高
+
+		fn_common = v.fn_common, --额外设定函数（通用）：fn(inst)
+		fn_server = v.fn_server or v.masterpostinit, --额外设定函数（主机）：fn(inst)
+		-- fn_stage = v.fn_stage or v.OnMakeFullFn, --每次设定生长阶段时额外触发的函数：fn(inst, isfull)
 	}
 
 	--确定花期map（其他mod想要增加花期，可仿造目前格式写在PLANT_DEFS中即可）
@@ -299,7 +307,7 @@ for k,v in pairs(WEED_DEFS) do
 			Asset("ANIM", "anim/siving_soil.zip"),
 			Asset("SCRIPT", "scripts/prefabs/weed_defs.lua"),
 		})
-		InitPrefabs(data, v.prefabs, { --undo：请关注prefab_deps数据，可能用得到
+		InitPrefabs(data, v.prefabs or v.prefab_deps, {
 			"spoiled_food",
 			"farm_plant_happy",
 			"farm_plant_unhappy",
@@ -311,6 +319,13 @@ for k,v in pairs(WEED_DEFS) do
 			data.sounds = {
 				grow_rot = "farming/common/farm/rot",
 			}
+		end
+
+		--设置其他
+		if k ~= "weed_tillweed" then --不能设置犁地草的犁地效果
+			data.fn_stage = v.fn_stage or v.OnMakeFullFn
+		else
+			data.fn_stage = v.fn_stage
 		end
 
 		defs[k] = data
@@ -387,6 +402,10 @@ local function MakePlant(data)
 				end
 			end
 
+			if data.fn_common ~= nil then
+				data.fn_common(inst)
+			end
+
 			inst.entity:SetPristine()
 			if not TheWorld.ismastersim then
 				return inst
@@ -399,7 +418,21 @@ local function MakePlant(data)
 					return "BURNING"
 				end
 
-				--undo：这里直接用官方的台词即可，根据不同阶段状态返回不同台词
+				if inst.components.perennialcrop ~= nil then
+					local crop = inst.components.perennialcrop
+
+					if crop.stagedata.name == "seed" then
+						return "SEED"
+					elseif crop.isrotten then
+						return crop.ishuge and "ROTTEN_OVERSIZED" or "ROTTEN"
+					elseif crop.stage == crop.stage_max then
+						return crop.ishuge and "FULL_OVERSIZED" or "FULL"
+					else
+						return "GROWING"
+					end
+				end
+
+				return nil
 			end
 
 			inst:AddComponent("hauntable")
@@ -407,14 +440,56 @@ local function MakePlant(data)
 
 			inst:AddComponent("lootdropper")
 			inst.components.lootdropper:SetLootSetupFn(function(lootdropper)
-				--undo
+				if inst.components.perennialcrop ~= nil then
+					local crop = inst.components.perennialcrop
+					local numfruitplus = crop.pollinated >= crop.pollinated_max
+
+					if crop.ishuge then
+						if crop.isrotten then
+							lootdropper:SetLoot(data.loot_huge_rot)
+						else
+							lootdropper:SetLoot(numfruitplus and {data.product_huge, data.product} or {data.product_huge})
+						end
+					elseif crop.stage < crop.stage_max then
+						if crop.isrotten then
+							lootdropper:SetLoot({"spoiled_food"})
+						else
+							local loot = math.random() < 0.5 and {"cutgrass"} or {"twigs"}
+							if crop.isflower then
+								table.insert(loot, "petals")
+							end
+							lootdropper:SetLoot(loot)
+						end
+					else
+						local numfruit = 1
+						if crop.num_perfect ~= nil then
+							if crop.num_perfect >= 5 then
+								numfruit = 3
+							elseif crop.num_perfect > 2 then
+								numfruit = 2
+							end
+						end
+						if numfruitplus then
+							numfruit = numfruit + 1
+						end
+
+						local loot = {}
+						local product = crop.isrotten and "spoiled_food" or (data.product or "cutgrass")
+						for i = 1, numfruit, 1 do
+							table.insert(loot, product)
+						end
+						lootdropper:SetLoot(loot)
+					end
+				end
 			end)
 
 			inst:AddComponent("workable")
 			inst.components.workable:SetWorkAction(ACTIONS.DIG)
 			inst.components.workable:SetWorkLeft(1)
 			inst.components.workable:SetOnFinishCallback(function(inst, worker)
-				-- call_for_reinforcements(inst, worker) --查看附近是否有旋针花
+				if inst.components.perennialcrop ~= nil and inst.components.perennialcrop.fn_defend ~= nil then
+					inst.components.perennialcrop.fn_defend(inst, worker)
+				end
 				RemovePlant(inst, "dirt_puff")
 			end)
 
@@ -425,10 +500,14 @@ local function MakePlant(data)
 					RemovePlant(inst, "ash")
 				end)
 				inst.components.burnable:SetOnIgniteFn(function(inst, source, doer)
-					--undo：停止生长
+					if inst.components.perennialcrop ~= nil then
+						inst.components.perennialcrop:OnEntitySleep()
+					end
 				end)
 				inst.components.burnable:SetOnExtinguishFn(function(inst)
-					--undo：继续生长
+					if inst.components.perennialcrop ~= nil then
+						inst.components.perennialcrop:OnEntityWake()
+					end
 				end)
 			end
 
@@ -436,12 +515,10 @@ local function MakePlant(data)
 			inst.components.growable.stages = {}
 			inst.components.growable:StopGrowing()
 			inst.components.growable.domagicgrowthfn = function(inst, doer)
-				-- if inst.canGrow then
-				-- 	inst.components.timer:StopTimer("growup")
-				-- 	inst:PushEvent("timerdone", { name = "growup" })
-				-- end
-
-				--undo：用魔法书时，加速成长，但不会加速腐烂
+				if inst:IsValid() and inst.components.perennialcrop ~= nil then
+					return inst.components.perennialcrop:DoMagicGrowth(doer, 2*TUNING.TOTAL_DAY_TIME)
+				end
+				return false
 			end
 
 			inst:AddComponent("farmplanttendable")
@@ -449,13 +526,36 @@ local function MakePlant(data)
 				if inst.components.perennialcrop ~= nil then
 					inst.components.perennialcrop:TendTo(doer)
 				end
+
+				inst:DoTaskInTime(0.5 + math.random() * 0.5, function()
+					SpawnPrefab("farm_plant_happy").Transform:SetPosition(inst.Transform:GetWorldPosition())
+				end)
+
 				return true
 			end
 
 			inst:AddComponent("perennialcrop")
 			inst.components.perennialcrop:SetUp(data)
+			inst.components.perennialcrop.fn_defend = function(inst, target)
+				if target ~= nil then
+					inst:RemoveTag("farm_plant_defender")
+
+					local x, y, z = inst.Transform:GetWorldPosition()
+					local defenders = TheSim:FindEntities(x, y, z, TUNING.FARM_PLANT_DEFENDER_SEARCH_DIST, {"farm_plant_defender"})
+					for _, defender in ipairs(defenders) do
+						if defender.components.burnable == nil or not defender.components.burnable.burning then
+							defender:PushEvent("defend_farm_plant", {source = inst, target = target})
+							break
+						end
+					end
+				end
+			end
 			inst.components.perennialcrop:SetStage(1, false, false, true, false)
 			inst.components.perennialcrop:StartGrowing()
+
+			if data.fn_server ~= nil then
+				data.fn_server(inst)
+			end
 
 			return inst
 		end,
