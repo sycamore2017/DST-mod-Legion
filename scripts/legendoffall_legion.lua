@@ -318,3 +318,68 @@ AddStategraphActionHandler("wilson_client", ActionHandler(ACTIONS.PLANTSOIL_LEGI
         return "dolongaction"
     end
 end))
+
+--------------------------------------------------------------------------
+--[[ 让施肥组件能作用于多年生作物 ]]
+--------------------------------------------------------------------------
+
+local FERTILIZE_old = ACTIONS.FERTILIZE.fn
+ACTIONS.FERTILIZE.fn = function(act)
+    if
+        act.invobject ~= nil and act.invobject.components.fertilizer ~= nil
+        and act.target ~= nil and act.target.components.perennialcrop ~= nil
+        and act.doer ~= nil and not (act.doer.components.rider ~= nil and act.doer.components.rider:IsRiding())
+    then
+        if act.target.components.perennialcrop:Fertilize(act.invobject, act.doer) then
+            act.invobject.components.fertilizer:OnApplied(act.doer, act.target)
+            return true
+        else
+            return false
+        end
+    end
+    return FERTILIZE_old(act)
+end
+
+--------------------------------------------------------------------------
+--[[ 添加新动作：让浇水组件能作用于多年生作物 ]]
+--------------------------------------------------------------------------
+
+local POUR_WATER_LEGION = Action({})
+POUR_WATER_LEGION.id = "POUR_WATER_LEGION"
+-- POUR_WATER_LEGION.str = STRINGS.ACTIONS.POUR_WATER
+POUR_WATER_LEGION.stroverridefn = function(act)
+    return (act.target:HasTag("fire") or act.target:HasTag("smolder"))
+        and STRINGS.ACTIONS.POUR_WATER.EXTINGUISH or STRINGS.ACTIONS.POUR_WATER.GENERIC
+end
+POUR_WATER_LEGION.fn = function(act)
+    if act.invobject ~= nil and act.invobject:IsValid() then
+        if act.invobject.components.finiteuses ~= nil and act.invobject.components.finiteuses:GetUses() <= 0 then
+			return false, (act.invobject:HasTag("wateringcan") and "OUT_OF_WATER" or nil)
+        end
+
+        if act.target ~= nil and act.target:IsValid() then
+            act.invobject.components.wateryprotection:SpreadProtection(act.target) --耐久消耗在这里面的
+
+            if act.target.components.perennialcrop ~= nil then
+                act.target.components.perennialcrop:PourWater(act.invobject, act.doer, nil)
+            end
+        end
+
+        return true
+    end
+    return false
+end
+AddAction(POUR_WATER_LEGION)
+
+AddComponentAction("EQUIPPED", "wateryprotection", function(inst, doer, target, actions, right)
+    if right and target:HasTag("needwater") then
+        table.insert(actions, ACTIONS.POUR_WATER_LEGION)
+    end
+end)
+
+AddStategraphActionHandler("wilson", ActionHandler(ACTIONS.POUR_WATER_LEGION, function(inst, action)
+    return action.invobject ~= nil
+        and (action.invobject:HasTag("wateringcan") and "pour")
+        or "dolongaction"
+end))
+AddStategraphActionHandler("wilson_client", ActionHandler(ACTIONS.POUR_WATER_LEGION, "pour"))

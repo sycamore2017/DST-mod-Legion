@@ -103,7 +103,7 @@ for k,v in pairs(PLANT_DEFS) do
 			product_huge = v.product_oversized, --巨型产物 代码名称
 			seed = v.seed, --种子 代码名称
 			loot_huge_rot = v.loot_oversized_rot, --巨型产物腐烂后的收获物
-			costMoisture = 2, --需水量
+			costMoisture = 1, --需水量
 			costNutrient = 2, --需肥类型(这里只需要一个量即可，不需要关注肥料类型)
 			canGetSick = v.canGetSick ~= false, --是否能产生病虫害（原创）
 			stages = {}, --该植物生长有几个阶段，每个阶段的动画,以及是否处在花期（原创）
@@ -165,11 +165,11 @@ for k,v in pairs(PLANT_DEFS) do
 			if v.costMoisture ~= nil then --获取自定义的需水量
 				data.costMoisture = v.costMoisture
 			elseif v.moisture == TUNING.FARM_PLANT_DRINK_LOW then
-				data.costMoisture = 2
+				data.costMoisture = 1
 			elseif v.moisture == TUNING.FARM_PLANT_DRINK_MED then
-				data.costMoisture = 4
+				data.costMoisture = 2
 			elseif v.moisture == TUNING.FARM_PLANT_DRINK_HIGH then
-				data.costMoisture = 8
+				data.costMoisture = 4
 			end
 
 			--重新改需肥量
@@ -177,6 +177,11 @@ for k,v in pairs(PLANT_DEFS) do
 				if v3 ~= nil and data.costNutrient < v3 then
 					data.costNutrient = v3
 				end
+			end
+			if data.costNutrient > 2 and data.costNutrient <= 4 then
+				data.costNutrient = 3
+			elseif data.costNutrient > 4 then
+				data.costNutrient = 4
 			end
 
 			--确定再生的阶段
@@ -224,7 +229,7 @@ for k,v in pairs(WEED_DEFS) do
 		-- product_huge = nil, --巨型产物 代码名称
 		-- seed = nil, --种子 代码名称
 		-- loot_huge_rot = nil, --巨型产物腐烂后的收获物
-		costMoisture = 2, --需水量
+		costMoisture = 1, --需水量
 		costNutrient = 2, --需肥类型(这里只需要一个量即可，不需要关注肥料类型)
 		canGetSick = v.canGetSick ~= false, --是否能产生病虫害（原创）
 		stages = {}, --该植物生长有几个阶段，每个阶段的动画,以及是否处在花期（原创）
@@ -277,11 +282,11 @@ for k,v in pairs(WEED_DEFS) do
 		if v.costMoisture ~= nil then --获取自定义的需水量
 			data.costMoisture = v.costMoisture
 		elseif v.moisture == TUNING.FARM_PLANT_DRINK_LOW then
-			data.costMoisture = 2
+			data.costMoisture = 1
 		elseif v.moisture == TUNING.FARM_PLANT_DRINK_MED then
-			data.costMoisture = 4
+			data.costMoisture = 2
 		elseif v.moisture == TUNING.FARM_PLANT_DRINK_HIGH then
-			data.costMoisture = 8
+			data.costMoisture = 4
 		end
 
 		--重新改需肥量
@@ -289,6 +294,11 @@ for k,v in pairs(WEED_DEFS) do
 			if v3 ~= nil and data.costNutrient < v3 then
 				data.costNutrient = v3
 			end
+		end
+		if data.costNutrient > 2 and data.costNutrient <= 4 then
+			data.costNutrient = 3
+		elseif data.costNutrient > 4 then
+			data.costNutrient = 4
 		end
 
 		--确定再生的阶段

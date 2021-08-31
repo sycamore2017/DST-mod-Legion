@@ -42,10 +42,10 @@ local PerennialCrop = Class(function(self, inst)
 	self.num_tended = 0 --被照顾次数
 	self.num_perfect = nil --成熟时结算出的：完美指数（决定果实数量或者是否巨型）
 
-	self.moisture_max = 16 --最大蓄水量
-	self.nutrient_max = 16 --最大蓄肥量（生长必需）
-	self.nutrientgrow_max = 16 --最大蓄肥量（生长加速）
-	self.nutrientsick_max = 16 --最大蓄肥量（预防疾病）
+	self.moisture_max = 8 --最大蓄水量
+	self.nutrient_max = 32 --最大蓄肥量（生长必需）
+	self.nutrientgrow_max = 32 --最大蓄肥量（生长加速）
+	self.nutrientsick_max = 32 --最大蓄肥量（预防疾病）
 	self.stage_max = 2 --最大生长阶段
 	self.pollinated_max = 6 --被授粉次数大于等于该值就能增加产量
 	self.infested_max = 10 --被骚扰次数大于等于该值就会立即进入腐烂/枯萎阶段
@@ -53,7 +53,7 @@ local PerennialCrop = Class(function(self, inst)
 	self.weights = nil --重量范围
 	self.sounds = {} --音效
 	self.cost_moisture = 1 --需水量
-	self.cost_nutrient = 1 --需肥类型(这里只需要一个量即可，不需要关注肥料类型)
+	self.cost_nutrient = 2 --需肥类型(这里只需要一个量即可，不需要关注肥料类型)
 	self.can_getsick = true --是否能产生病虫害（原创）
 	self.stages = nil --该植物生长有几个阶段，每个阶段的动画,以及是否处在花期（原创）
 	self.stages_other = nil --巨大化阶段、巨大化枯萎、枯萎等阶段的数据
@@ -69,11 +69,39 @@ nil,
 	sickness = onsick,
 })
 
+local function TriggerNutrient(self)
+	if
+		self.nutrient >= self.nutrient_max
+		and self.nutrientgrow >= self.nutrientgrow_max
+		and self.nutrientsick >= self.nutrientsick_max
+	then
+		if self.inst:HasTag("fertilizable") then
+			self.inst:RemoveTag("fertilizable")
+		end
+	else
+		if not self.inst:HasTag("fertilizable") then
+			self.inst:AddTag("fertilizable")
+		end
+	end
+end
+
+local function TriggerMoisture(self)
+	if self.moisture >= self.moisture_max then
+		if self.inst:HasTag("needwater") then
+			self.inst:RemoveTag("needwater")
+		end
+	else
+		if not self.inst:HasTag("needwater") then
+			self.inst:AddTag("needwater")
+		end
+	end
+end
+
 function PerennialCrop:SetUp(data)
 	self.weights = data.weights
 	self.sounds = data.sounds or {}
 	self.cost_moisture = data.costMoisture or 1
-	self.cost_nutrient = data.costNutrient or 1
+	self.cost_nutrient = data.costNutrient or 2
 	self.can_getsick = data.canGetSick
 	self.stages = data.stages
 	self.stages_other = data.stages_other
@@ -146,7 +174,7 @@ function PerennialCrop:SetStage(stage, ishuge, isrotten, pushanim, skip)
 	self.isrotten = rotten
 	self.ishuge = huge
 
-	if skip then --如果跳过，就不设置动画和是否可采摘
+	if skip then --如果跳过，就不设置接下来的操作
 		return
 	end
 
@@ -199,6 +227,9 @@ function PerennialCrop:SetStage(stage, ishuge, isrotten, pushanim, skip)
 	if self.fn_stage ~= nil then
 		self.fn_stage(self.inst, not self.isrotten and self.stage == self.stage_max) --第二个参数为：是否成熟/巨型成熟
 	end
+
+	TriggerNutrient(self)
+	TriggerMoisture(self)
 end
 
 function PerennialCrop:GetNextStage()
@@ -447,6 +478,8 @@ end
 
 function PerennialCrop:OnRemoveFromEntity()
     self.inst:RemoveTag("flower")
+	self.inst:RemoveTag("fertilizable")
+	self.inst:RemoveTag("needwater")
     if self.taskgrow ~= nil then
 		self.taskgrow:Cancel()
 		self.taskgrow = nil
@@ -481,6 +514,49 @@ function PerennialCrop:DoMagicGrowth(doer, dt)
 		self:LongUpdate(dt, false)
 	end
 	return true
+end
+
+function PerennialCrop:Fertilize(item, doer)
+	if item.components.fertilizer ~= nil and item.components.fertilizer.nutrients ~= nil then
+		local nutrients = item.components.fertilizer.nutrients
+		local isdone = false
+
+		--1号肥：预防疾病
+		if nutrients[1] ~= nil and nutrients[1] > 0 and self.nutrientsick < self.nutrientsick_max then
+			self.nutrientsick = math.min(self.nutrientsick_max, self.nutrientsick+nutrients[1])
+			isdone = true
+		end
+		--2号肥：加速生长
+		if nutrients[2] ~= nil and nutrients[2] > 0 and self.nutrientgrow < self.nutrientgrow_max then
+			self.nutrientgrow = math.min(self.nutrientgrow_max, self.nutrientgrow+nutrients[2])
+			isdone = true
+		end
+		--3号肥：生长必需
+		if nutrients[3] ~= nil and nutrients[3] > 0 and self.nutrient < self.nutrient_max then
+			self.nutrient = math.min(self.nutrient_max, self.nutrient+nutrients[3])
+			isdone = true
+		end
+
+		if isdone then
+			if self.inst.components.burnable ~= nil then --快着火时能阻止着火
+				self.inst.components.burnable:StopSmoldering()
+			end
+			if item.components.fertilizer.fertilize_sound ~= nil then
+				self.inst.SoundEmitter:PlaySound(item.components.fertilizer.fertilize_sound)
+			end
+			TriggerNutrient(self)
+			return true
+		end
+	end
+
+	return false
+end
+
+function PerennialCrop:PourWater(item, doer, value)
+	if self.moisture < self.moisture_max then
+		self.moisture = math.min(self.moisture_max, self.moisture+(value or 6))
+		TriggerMoisture(self)
+	end
 end
 
 return PerennialCrop

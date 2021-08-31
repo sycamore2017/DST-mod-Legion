@@ -27,6 +27,8 @@ if TUNING.LEGION_FLASHANDCRUSH then
             table.insert(params.beefalo.widget.slotpos, Vector3(75 * x - 75 * 2 + 75, 75 * y - 75 * 2 + 75, 0))
         end
     end
+
+    params.beefalo.itemtestfn = containers.params.bundle_container.itemtestfn
 end
 
 if CONFIGS_LEGION.PRAYFORRAIN then
