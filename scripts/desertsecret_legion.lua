@@ -2,7 +2,6 @@ local prefabFiles = {
     "desertdefense",        --砂之抵御
     -- "lilypond",             --荷花池相关特效
     "shyerries",            --颤栗树相关
-    "buff_healthstorage",   --加血buff
     "sand_spike_legion",    --对玩家友好的沙之咬
     "guitar_whitewood",     --白木吉他
 }

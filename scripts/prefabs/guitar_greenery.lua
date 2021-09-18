@@ -271,7 +271,7 @@ local function MakeGreeneryFx(name, build)
         -- inst.Transform:SetScale(0.6, 0.6, 0.6)
         -- inst.AnimState:OverrideSymbol("needle", "guitar_miguel_fx", "needle")
         inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
-        
+
         inst:ListenForEvent("animover", function()
             if inst.ending then
                  inst:Remove()

@@ -66,7 +66,7 @@ local function ReleaseSporesEffect(inst, owner)
                 if (ent.components.debuffable ~= nil and ent.components.debuffable:IsEnabled()) and
                     not (ent.components.health ~= nil and ent.components.health:IsDead())
                 then
-                    ent.buff_sporeresistance_time = TUNING.SEG_TIME * 6 --3分钟
+                    ent.time_l_sporeresistance = { add = TUNING.SEG_TIME*6, max = TUNING.SEG_TIME*30 }
                     ent.components.debuffable:AddDebuff("buff_sporeresistance", "buff_sporeresistance")
                 end
             elseif ent.prefab == "mushroom_light2" then

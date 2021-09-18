@@ -13,7 +13,6 @@ local prefabFiles = {
     "tripleshovelaxe",          --铲斧-三用型
     "hat_albicans_mushroom",    --素白蘑菇帽
     "albicansmushroomhat_fx",   --素白蘑菇帽相关fx
-    "buff_sporeresistance",     --孢子抵抗力buff
 }
 
 for k,v in pairs(prefabFiles) do

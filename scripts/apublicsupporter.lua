@@ -834,6 +834,7 @@ if CONFIGS_LEGION.FLOWERSPOWER or TUNING.LEGION_SUPERBCUISINE then --青锋剑�
                     wortox = true,
                     wurt = true,
                     wx78 = true,
+                    wanda = true,
 
                     monkey_king = true,
                     myth_yutu = true,
@@ -841,6 +842,7 @@ if CONFIGS_LEGION.FLOWERSPOWER or TUNING.LEGION_SUPERBCUISINE then --青锋剑�
                     pigsy = true,
                     white_bone = true,
                     yangjian = true,
+                    yama_commissioners = true,
                 }
                 if notpickylist[player.prefab] then
                     return false

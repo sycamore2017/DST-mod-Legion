@@ -41,17 +41,12 @@ local ghost_builds =
 local theta1 = 0
 local theta2 = 2 * PI / 3
 local theta3 = theta2 * 2
-local theta = 
+local theta =
 {
     theta1,
     theta2,
     theta3,
 }
-
--- local function GetRealOwner(inst)
---     local owner = inst.components.inventoryitem.owner --这样的owner可能是背包，背包也有inventoryitem组件
---     return owner.components.inventoryitem ~= nil and owner.components.inventoryitem:GetGrandOwner() or owner --找出真正的owner
--- end
 
 local function PlayStart(inst, owner)
     owner.AnimState:OverrideSymbol("swap_guitar","swap_guitar_miguel","swap_guitar_miguel")
@@ -146,7 +141,7 @@ local function PlayDoing(inst, owner)
             table.insert(inst.ghostfriends, ghost)
         end
 
-        local ents = TheSim:FindEntities(x, y, z, 25, { "farm_plant" }, { "FX", "DECOR", "INLIMBO" })
+        local ents = TheSim:FindEntities(x, y, z, 25, { "tendable_farmplant" }, { "FX", "DECOR", "INLIMBO" })
         for i, v in ipairs(ents) do
             if v.components.farmplanttendable ~= nil then
                 v.components.farmplanttendable:TendTo(owner)

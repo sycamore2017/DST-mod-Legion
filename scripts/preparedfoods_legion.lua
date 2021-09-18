@@ -635,11 +635,12 @@ if TUNING.LEGION_FLASHANDCRUSH then
 
         prefabs = { "buff_sporeresistance" },
         oneat_desc = STRINGS.UI.COOKBOOK.DISH_WRAPPEDSHRIMPPASTE,
-        oneatenfn = function(inst, eater)   --食用后获得优化的加血buff
+        oneatenfn = function(inst, eater)
             if eater.components.debuffable ~= nil and eater.components.debuffable:IsEnabled() and
                 not (eater.components.health ~= nil and eater.components.health:IsDead()) and
-                not eater:HasTag("playerghost") then
-                eater.buff_sporeresistance_time = TUNING.SEG_TIME * 24 --12分钟
+                not eater:HasTag("playerghost")
+            then
+                eater.time_l_sporeresistance = { add = TUNING.SEG_TIME*24, max = TUNING.SEG_TIME*30 }
                 eater.components.debuffable:AddDebuff("buff_sporeresistance", "buff_sporeresistance")
             end
         end,

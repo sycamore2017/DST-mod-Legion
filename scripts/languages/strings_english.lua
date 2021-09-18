@@ -19,6 +19,7 @@ local S_______WORTOX = STRINGS.CHARACTERS.WORTOX       --沃托克斯的台词
 local S_____WORMWOOD = STRINGS.CHARACTERS.WORMWOOD     --沃姆伍德的台词
 local S_________WURT = STRINGS.CHARACTERS.WURT         --沃特的台词
 local S_______WALTER = STRINGS.CHARACTERS.WALTER       --沃尔特的台词
+local S________WANDA = STRINGS.CHARACTERS.WANDA        --旺达的台词
 
 TUNING.LEGION_MOD_LANGUAGES = "english"
 

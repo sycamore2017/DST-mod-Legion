@@ -200,77 +200,8 @@ end
 
 -------------------------------------------------------------
 
-local assets_fx = {
-  Asset("ANIM", "anim/lavaarena_heal_projectile.zip"),
-  Asset("ANIM", "anim/boltwingout_fx.zip"),
-}
-
--- local function PlaySound(inst, sound)
---     inst.SoundEmitter:PlaySound(sound)
--- end
-
-local function PlayAnim(proxy)
-    local inst = CreateEntity()
-
-    inst:AddTag("FX")
-    inst:AddTag("NOCLICK")
-    --[[Non-networked entity]]
-    inst.entity:SetCanSleep(false)
-    inst.persists = false
-
-    inst.entity:AddTransform()
-    inst.entity:AddAnimState()
-
-    --如果想让特效能设置父实体，则需要这一截代码
-    local parent = proxy.entity:GetParent()
-    if parent ~= nil then
-        inst.entity:SetParent(parent.entity)
-    end
-
-    inst.Transform:SetFromProxy(proxy.GUID)
-
-    -- inst.entity:AddSoundEmitter()
-    -- inst:DoTaskInTime(0, PlaySound, "dontstarve/creatures/together/stalker/shield")
-
-    inst.AnimState:SetBank("lavaarena_heal_projectile")
-    inst.AnimState:SetBuild("boltwingout_fx")
-    inst.AnimState:SetFinalOffset(-1)
-    inst.AnimState:PlayAnimation("hit")
-    
-    inst:ListenForEvent("animover", inst.Remove)
-end
-
-local function fn_fx()
-  local inst = CreateEntity()
-
-  inst.entity:AddTransform()
-  inst.entity:AddNetwork()
-
-  --Dedicated server does not need to spawn the local fx
-  if not TheNet:IsDedicated() then
-      --Delay one frame so that we are positioned properly before starting the effect
-      --or in case we are about to be removed
-      inst:DoTaskInTime(0, PlayAnim, inst)
-  end
-
-  inst:AddTag("FX")
-  
-  inst.entity:SetPristine()
-
-  if not TheWorld.ismastersim then
-      return inst
-  end
-
-  inst.persists = false
-  inst:DoTaskInTime(1, inst.Remove)
-
-  return inst
-end
-
--------------------------------------------------------------
-
 local assets_shuck = {
-  -- Asset("ANIM", "anim/spider_cocoon.zip"),
+  Asset("ANIM", "anim/spider_cocoon.zip"), --官方蜘蛛巢动画
   Asset("ANIM", "anim/boltwingout_shuck.zip"),
 }
 
@@ -413,5 +344,4 @@ local function fn_shuck()
 end
 
 return Prefab("boltwingout", fn, assets, prefabs),
-        Prefab("boltwingout_fx", fn_fx, assets_fx),
         Prefab("boltwingout_shuck", fn_shuck, assets_shuck)

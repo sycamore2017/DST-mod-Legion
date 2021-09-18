@@ -8,6 +8,7 @@
     3.【电闪雷鸣】（1）牛铃和紫金葫芦等(具有容器的、无法放入打包纸的、不可摧毁的)道具不再能放入驮运鞍具中
 
     4.【美味佳肴】（1）新增料理油鱼寿司
+    --undo：素白蘑菇帽的技能可以治愈作物的病害、虫群和脱壳之翅
 ]]
 
 --------------------------------------------------------------------------
@@ -32,6 +33,7 @@ PrefabFiles = {
     -- "guitar_greenery",
     -- "aatest_anim",
     "fx_legion",                --特效
+    "buffs_legion",             --buff
 }
 
 Assets = {
@@ -344,11 +346,6 @@ if CONFIGS_LEGION.ENABLEDMODS.CraftPot then
 end
 if TUNING.LEGION_SUPERBCUISINE then
     table.insert(PrefabFiles, "foods_cookpot")
-    table.insert(PrefabFiles, "debuff_panicvolcano")
-
-    table.insert(PrefabFiles, "buff_strengthenhancer")
-    table.insert(PrefabFiles, "buff_bestappetite")
-    table.insert(PrefabFiles, "buff_batdisguise")
 
     -- AddIngredientValues({"plantmeat"}, {meat=.5, veggie=.5}, true, false)   --食人花肉块茎
     -- AddIngredientValues({"batwing"}, {meat=.5}, true, false)    --蝙蝠翅膀，虽然可以晾晒，但是得到的不是蝙蝠翅膀干，而是小肉干，所以candry不能填true

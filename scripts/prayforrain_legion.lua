@@ -9,7 +9,6 @@ local prefabFiles = {
     "refractedmoonlight",       --月折宝剑
     "hiddenmoonlight",          --月藏宝匣
     "moon_dungeon",             --月的地下城
-    "buff_hungerretarder",      --减缓饥饿值下降的buff
 }
 
 for k,v in pairs(prefabFiles) do

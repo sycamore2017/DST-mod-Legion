@@ -60,7 +60,7 @@ local function PlayFail(inst, owner, talktype)
 end
 
 local function PlayStart(inst, owner)
-    owner.AnimState:OverrideSymbol("swap_guitar","swap_guitar_whitewood","swap_guitar_whitewood")
+    owner.AnimState:OverrideSymbol("swap_guitar", "swap_guitar_whitewood", "swap_guitar_whitewood")
 
     --开始联弹等待阶段
     if owner.fourhands_task ~= nil then
@@ -121,7 +121,7 @@ local function PlayStart(inst, owner)
 end
 
 local function PlayDoing(inst, owner)
-    owner.AnimState:PlayAnimation("soothingplay_loop", true) --之所以把动画改到这里而不是写进sg中，是为了兼容多种弹奏动画
+    owner.AnimState:PlayAnimation("soothingplay_loop", true) --之所以把动画改到这里而不是写进sg中，是为了兼容多种弹奏动画。建议写进PlayStart，并改造一下sg
 
     --尝试联弹失败，弹奏也失败
     if owner.fourhands_status == -1 then
@@ -170,7 +170,7 @@ local function PlayDoing(inst, owner)
 
             inst.playcount = inst.playcount + 1
             if inst.playcount % 5 == 0 then --每五秒照料一次作物
-                local ents = TheSim:FindEntities(x, y, z, RANGE_PLAY, { "farm_plant" }, { "FX", "DECOR", "INLIMBO" })
+                local ents = TheSim:FindEntities(x, y, z, RANGE_PLAY, { "tendable_farmplant" }, { "FX", "DECOR", "INLIMBO" })
                 for i, v in ipairs(ents) do
                     if v.components.farmplanttendable ~= nil then
                         v.components.farmplanttendable:TendTo(owner)

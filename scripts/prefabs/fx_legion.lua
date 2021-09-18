@@ -2,152 +2,185 @@
 --[[ 无需网络组建功能的特效创建通用函数 ]]
 --------------------------------------------------------------------------
 
-local function MakeNonNetworkedFx(name, animfn, assets, prefabs, needsound, faces)
-	local function AnimFn(proxy)
-	    local inst = CreateEntity()
+local prefs = {}
 
-	    inst:AddTag("FX")
-	    inst:AddTag("NOCLICK")
-	    --[[Non-networked entity]]
-	    inst.entity:SetCanSleep(false)
-	    inst.persists = false
+local function MakeFx(data)
+	table.insert(prefs, Prefab(
+		data.name,
+		function()
+			local inst = CreateEntity()
 
-	    inst.entity:AddTransform()
-        inst.entity:AddAnimState()
-        if needsound then
-            inst.entity:AddSoundEmitter()
-        end
+			inst.entity:AddTransform()
+			inst.entity:AddNetwork()
 
-        local parent = proxy.entity:GetParent()
-        if parent ~= nil then
-            inst.entity:SetParent(parent.entity)
-        end
+			--Dedicated server does not need to spawn the local fx
+			if not TheNet:IsDedicated() then
+				--Delay one frame so that we are positioned properly before starting the effect
+				--or in case we are about to be removed
+				inst:DoTaskInTime(0, function(proxy)
+					local inst2 = CreateEntity()
 
-	    inst.Transform:SetFromProxy(proxy.GUID)
+					--[[Non-networked entity]]
 
-	    if animfn ~= nil then
-	    	animfn(inst)
-	    end
+					inst2.entity:AddTransform()
+					inst2.entity:AddAnimState()
+					inst2.entity:SetCanSleep(false)
+					inst2.persists = false
 
-	    inst:ListenForEvent("animover", inst.Remove)
-	end
+                    inst2:AddTag("FX")
 
-    local function Fn()
-        local inst = CreateEntity()
+					local parent = proxy.entity:GetParent()
+					if parent ~= nil then
+						inst2.entity:SetParent(parent.entity)
+					end
+					inst2.Transform:SetFromProxy(proxy.GUID)
 
-        inst.entity:AddTransform()
-        inst.entity:AddNetwork()
+					if data.fn_anim ~= nil then
+						data.fn_anim(inst2)
+					end
 
-        --Dedicated server does not need to spawn the local fx
-        if not TheNet:IsDedicated() then
-            --Delay one frame so that we are positioned properly before starting the effect
-            --or in case we are about to be removed
-            inst:DoTaskInTime(0, AnimFn)
-        end
+                    if data.fn_remove ~= nil then
+						data.fn_remove(inst2)
+                    else
+                        inst2:ListenForEvent("animover", inst2.Remove)
+					end
+				end)
+			end
 
-        if faces > 0 then
-            if faces == 4 then
-                inst.Transform:SetFourFaced()
-            elseif faces == 8 then
-                inst.Transform:SetEightFaced()
-            elseif faces == 6 then
-                inst.Transform:SetSixFaced()
-            elseif faces == 2 then
-                inst.Transform:SetTwoFaced()
-            end
-        end
+            inst:AddTag("FX")
 
-        inst:AddTag("FX")
+            if data.fn_common ~= nil then
+				data.fn_common(inst)
+			end
 
-        inst.entity:SetPristine()
+			inst.entity:SetPristine()
+			if not TheWorld.ismastersim then
+				return inst
+			end
 
-        if not TheWorld.ismastersim then
-            return inst
-        end
+			inst.persists = false
+			inst:DoTaskInTime(1, inst.Remove)
 
-        inst.persists = false
-        inst:DoTaskInTime(1, inst.Remove)
-
-        return inst
-    end
-
-    return Prefab(name, Fn, assets, prefabs)
+			return inst
+		end,
+		data.assets,
+		data.prefabs
+	))
 end
 
 ---------------
 ---------------
 
-local prefs = {}
-
 if CONFIGS_LEGION.FLOWERSPOWER then
-    table.insert(prefs, MakeNonNetworkedFx( --兰草花剑：飞溅花瓣
-        "impact_orchid_fx",
-        function(inst)
+    MakeFx({ --兰草花剑：飞溅花瓣
+        name = "impact_orchid_fx",
+        assets = {
+            Asset("ANIM", "anim/impact_orchid.zip"),
+            Asset("ANIM", "anim/impact.zip"), --官方击中特效动画模板
+        },
+        prefabs = nil,
+        fn_common = nil,
+        fn_anim = function(inst)
             inst.AnimState:SetBank("impact")
             inst.AnimState:SetBuild("impact_orchid")
             inst.AnimState:PlayAnimation("idle")
             inst.AnimState:SetFinalOffset(-1)
         end,
-        {
-            Asset("ANIM", "anim/impact_orchid.zip"),
-            Asset("ANIM", "anim/impact.zip"), --官方击中特效动画模板
+        fn_remove = nil,
+    })
+    MakeFx({ --永不凋零：损坏自己庇佑玩家的特效
+        name = "neverfade_shield",
+        assets = {
+            Asset("ANIM", "anim/stalker_shield.zip"), --官方影织者护盾动画模板
+            Asset("ANIM", "anim/neverfade_shield.zip"),
         },
-        nil, false, 0
-    ))
+        prefabs = nil,
+        fn_common = nil,
+        fn_anim = function(inst)
+            inst.entity:AddSoundEmitter()
+            inst:DoTaskInTime(0, function(inst)
+                inst.SoundEmitter:PlaySound("dontstarve/creatures/together/stalker/shield")
+            end)
+
+            inst.AnimState:SetBank("stalker_shield")
+            inst.AnimState:SetBuild("neverfade_shield")
+            -- inst.AnimState:PlayAnimation("idle"..tostring(math.random(1, 3)))
+            inst.AnimState:PlayAnimation("idle1")   --原图太大了，所以我去除了多余的贴图，只用了这个动画里的贴图
+            -- inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
+            -- inst.AnimState:SetSortOrder(1)
+            -- inst.AnimState:SetScale(1.5, 1.5)
+            -- inst.AnimState:SetMultColour(140/255, 239/255, 255/255, 1)
+            inst.AnimState:SetScale(Vector3(-1, 1, 1):Get())
+            inst.AnimState:SetFinalOffset(2)
+        end,
+        fn_remove = nil,
+    })
 end
 
 if CONFIGS_LEGION.PRAYFORRAIN then
-    table.insert(prefs, MakeNonNetworkedFx( --艾力冈的剑：燃血
-        "agronssword_fx",
-        function(inst)
+    MakeFx({ --艾力冈的剑：燃血
+        name = "agronssword_fx",
+        assets = {
+            Asset("ANIM", "anim/lavaarena_boarrior_fx.zip"),    --需要官方的动画模板
+            Asset("ANIM", "anim/agronssword_fx.zip"),
+        },
+        prefabs = nil,
+        fn_common = nil,
+        fn_anim = function(inst)
             inst.AnimState:SetBank("lavaarena_boarrior_fx")
             inst.AnimState:SetBuild("agronssword_fx")
             inst.AnimState:PlayAnimation("ground_hit_1")
             inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
             inst.AnimState:SetFinalOffset(1)
         end,
-        {
+        fn_remove = nil,
+    })
+    MakeFx({ --月折宝剑：凝血
+        name = "refractedmoonlight_fx",
+        assets = {
             Asset("ANIM", "anim/lavaarena_boarrior_fx.zip"),    --需要官方的动画模板
-            Asset("ANIM", "anim/agronssword_fx.zip"),
+            Asset("ANIM", "anim/refractedmoonlight_fx.zip"),
         },
-        nil, false, 0
-    ))
-    table.insert(prefs, MakeNonNetworkedFx( --月折宝剑：凝血
-        "refractedmoonlight_fx",
-        function(inst)
+        prefabs = nil,
+        fn_common = nil,
+        fn_anim = function(inst)
             inst.AnimState:SetBank("lavaarena_boarrior_fx")
             inst.AnimState:SetBuild("refractedmoonlight_fx")
             inst.AnimState:PlayAnimation("ground_hit_1")
             inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
             inst.AnimState:SetFinalOffset(1)
         end,
-        {
-            Asset("ANIM", "anim/lavaarena_boarrior_fx.zip"),    --需要官方的动画模板
-            Asset("ANIM", "anim/refractedmoonlight_fx.zip"),
-        },
-        nil, false, 0
-    ))
+        fn_remove = nil,
+    })
 end
 
 if TUNING.LEGION_FLASHANDCRUSH then
-    table.insert(prefs, MakeNonNetworkedFx( --素白蘑菇帽：作物疾病的治愈时，消散的细菌
-        "escapinggerms_fx",
-        function(inst)
+    MakeFx({ --素白蘑菇帽：作物疾病的治愈时，消散的细菌
+        name = "escapinggerms_fx",
+        assets = {
+            Asset("ANIM", "anim/lavaarena_boarrior_fx.zip"),    --需要官方的动画模板
+            Asset("ANIM", "anim/agronssword_fx.zip"),           --套用已有的贴图
+        },
+        prefabs = nil,
+        fn_common = nil,
+        fn_anim = function(inst)
             inst.AnimState:SetBank("lavaarena_boarrior_fx")
             inst.AnimState:SetBuild("agronssword_fx")
             inst.AnimState:PlayAnimation("ground_hit_1")
             inst.AnimState:SetFinalOffset(1)
             inst.AnimState:SetMultColour(40/255, 40/255, 40/255, 1)
         end,
-        {
-            Asset("ANIM", "anim/lavaarena_boarrior_fx.zip"),    --需要官方的动画模板
-            Asset("ANIM", "anim/agronssword_fx.zip"),           --套用已有的贴图
+        fn_remove = nil,
+    })
+    MakeFx({ --素白蘑菇帽：玩家身上不断冒出的孢子
+        name = "residualspores_fx",
+        assets = {
+            Asset("ANIM", "anim/wormwood_pollen_fx.zip"),    --需要官方的动画模板
+            Asset("ANIM", "anim/residualspores_fx.zip"),
         },
-        nil, false, 0
-    ))
-    table.insert(prefs, MakeNonNetworkedFx( --素白蘑菇帽：玩家身上不断冒出的孢子
-        "residualspores_fx",
-        function(inst)
+        prefabs = nil,
+        fn_common = nil,
+        fn_anim = function(inst)
             inst.AnimState:SetBank("wormwood_pollen_fx")
             inst.AnimState:SetBuild("residualspores_fx")
             inst.AnimState:PlayAnimation("pollen"..math.random(1, 5))
@@ -162,15 +195,18 @@ if TUNING.LEGION_FLASHANDCRUSH then
                 inst.AnimState:SetMultColour(165/255, 187/255, 237/255, 1)
             end
         end,
-        {
-            Asset("ANIM", "anim/wormwood_pollen_fx.zip"),    --需要官方的动画模板
-            Asset("ANIM", "anim/residualspores_fx.zip"),
+        fn_remove = nil,
+    })
+
+    MakeFx({ --芬布尔斧：击中时贴地扩散的闪电
+        name = "fimbul_cracklebase_fx",
+        assets = {
+            Asset("ANIM", "anim/fimbul_static_fx.zip"),
+            Asset("ANIM", "anim/lavaarena_hammer_attack_fx.zip"), --官方熔炉锤子大招特效动画模板
         },
-        nil, false, 0
-    ))
-    table.insert(prefs, MakeNonNetworkedFx( --芬布尔斧：击中时贴地扩散的闪电
-        "fimbul_cracklebase_fx",
-        function(inst)
+        prefabs = nil,
+        fn_common = nil,
+        fn_anim = function(inst)
             inst.AnimState:SetBank("lavaarena_hammer_attack_fx")
             inst.AnimState:SetBuild("fimbul_static_fx")
             inst.AnimState:PlayAnimation("crackle_projection")
@@ -181,15 +217,17 @@ if TUNING.LEGION_FLASHANDCRUSH then
             inst.AnimState:SetScale(1.3, 1.3)
             inst.AnimState:SetMultColour(140/255, 239/255, 255/255, 1)
         end,
-        {
-            Asset("ANIM", "anim/fimbul_static_fx.zip"),
-            Asset("ANIM", "anim/lavaarena_hammer_attack_fx.zip"), --官方熔炉锤子大招特效动画模板
-        },
-        nil, false, 0
-    ))
-    -- table.insert(prefs, MakeNonNetworkedFx( --芬布尔斧：重锤技能电光
-    --     "fimbul_attack_fx",
-    --     function(inst)
+        fn_remove = nil,
+    })
+    -- MakeFx({ --芬布尔斧：重锤技能电光
+    --     name = "fimbul_attack_fx",
+    --     assets = {
+    --         Asset("ANIM", "anim/fimbul_attack_fx.zip"),
+    --         Asset("ANIM", "anim/lavaarena_hammer_attack_fx.zip"), --官方熔炉锤子大招特效动画模板
+    --     },
+    --     prefabs = nil,
+    --     fn_common = nil,
+    --     fn_anim = function(inst)
     --         inst.AnimState:SetBank("lavaarena_hammer_attack_fx")
     --         inst.AnimState:SetBuild("fimbul_attack_fx")
     --         inst.AnimState:PlayAnimation("crackle_hit")
@@ -197,33 +235,40 @@ if TUNING.LEGION_FLASHANDCRUSH then
     --         inst.AnimState:SetSortOrder(1)
     --         inst.AnimState:SetScale(1.8, 1.8)
     --     end,
-    --     {
-    --         Asset("ANIM", "anim/fimbul_attack_fx.zip"),
-    --         Asset("ANIM", "anim/lavaarena_hammer_attack_fx.zip"), --官方熔炉锤子大招特效动画模板
-    --     },
-    --     nil, false, 0
-    -- ))
-    table.insert(prefs, MakeNonNetworkedFx( --重铸boss：远程飞溅攻击特效
-        "fimbul_teleport_fx",
-        function(inst)
+    --     fn_remove = nil,
+    -- })
+    MakeFx({ --重铸boss：远程飞溅攻击特效
+        name = "fimbul_teleport_fx",
+        assets = {
+            Asset("ANIM", "anim/fimbul_teleport_fx.zip"),
+            Asset("ANIM", "anim/lavaarena_creature_teleport.zip"), --官方熔炉敌人出场特效动画模板
+        },
+        prefabs = nil,
+        fn_common = nil,
+        fn_anim = function(inst)
             inst.AnimState:SetBank("lavaarena_creature_teleport")
             inst.AnimState:SetBuild("fimbul_teleport_fx")
             inst.AnimState:PlayAnimation("spawn_medium")
             inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
             inst.AnimState:SetSortOrder(1)
 
+            inst.entity:AddSoundEmitter()
             inst.SoundEmitter:PlaySound("dontstarve/characters/wx78/spark")
             inst.SoundEmitter:PlaySound("dontstarve/common/lava_arena/portal_player")
         end,
-        {
-            Asset("ANIM", "anim/fimbul_teleport_fx.zip"),
-            Asset("ANIM", "anim/lavaarena_creature_teleport.zip"), --官方熔炉敌人出场特效动画模板
+        fn_remove = nil,
+    })
+    MakeFx({ --重铸boss：战吼时的爆炸
+        name = "fimbul_explode_fx",
+        assets = {
+            Asset("ANIM", "anim/fimbul_explode_fx.zip"),
+            Asset("ANIM", "anim/explode.zip"), --官方爆炸特效动画模板
         },
-        nil, true, 0
-    ))
-    table.insert(prefs, MakeNonNetworkedFx( --重铸boss：战吼时的爆炸
-        "fimbul_explode_fx",
-        function(inst)
+        prefabs = nil,
+        fn_common = function(inst)
+            inst.Transform:SetFourFaced()
+        end,
+        fn_anim = function(inst)
             inst.AnimState:SetBank("explode")
             inst.AnimState:SetBuild("fimbul_explode_fx")
             inst.AnimState:PlayAnimation("small")
@@ -231,17 +276,21 @@ if TUNING.LEGION_FLASHANDCRUSH then
             inst.AnimState:SetLightOverride(1)
             inst.AnimState:SetScale(3, 3, 3)
 
+            inst.entity:AddSoundEmitter()
             inst.SoundEmitter:PlaySound("dontstarve/common/blackpowder_explo")
         end,
-        {
-            Asset("ANIM", "anim/fimbul_explode_fx.zip"),
-            Asset("ANIM", "anim/explode.zip"), --官方爆炸特效动画模板
+        fn_remove = nil,
+    })
+
+    MakeFx({ --米格尔吉他：飘散的万寿菊花瓣
+        name = "guitar_miguel_float_fx",
+        assets = {
+            Asset("ANIM", "anim/pine_needles.zip"), --官方砍树掉落松针特效
+            Asset("ANIM", "anim/guitar_miguel_fx.zip"),
         },
-        nil, true, 4
-    ))
-    table.insert(prefs, MakeNonNetworkedFx( --米格尔吉他：飘散的万寿菊花瓣
-        "guitar_miguel_float_fx",
-        function(inst)
+        prefabs = nil,
+        fn_common = nil,
+        fn_anim = function(inst)
             inst.AnimState:SetBank("pine_needles")
             inst.AnimState:SetBuild("pine_needles")
             inst.AnimState:PlayAnimation(math.random() < 0.5 and "fall" or "chop")
@@ -250,18 +299,20 @@ if TUNING.LEGION_FLASHANDCRUSH then
             inst.AnimState:OverrideSymbol("needle", "guitar_miguel_fx", "needle")
             inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
         end,
-        {
-            Asset("ANIM", "anim/pine_needles.zip"), --官方砍树掉落松针特效
-            Asset("ANIM", "anim/guitar_miguel_fx.zip"),
-        },
-        nil, false, 0
-    ))
+        fn_remove = nil,
+    })
 end
 
 if TUNING.LEGION_DESERTSECRET then
-    table.insert(prefs, MakeNonNetworkedFx( --白木吉他：弹奏时的飘动音符
-        "guitar_whitewood_doing_fx",
-        function(inst)
+    MakeFx({ --白木吉他：弹奏时的飘动音符
+        name = "guitar_whitewood_doing_fx",
+        assets = {
+            Asset("ANIM", "anim/guitar_whitewood_doing_fx.zip"),
+            Asset("ANIM", "anim/fx_wathgrithr_buff.zip"), --官方战歌特效动画模板
+        },
+        prefabs = nil,
+        fn_common = nil,
+        fn_anim = function(inst)
             local anims =
             {
                 "fx_durability",
@@ -275,12 +326,27 @@ if TUNING.LEGION_DESERTSECRET then
             inst.AnimState:OverrideSymbol("fx_icon", "guitar_whitewood_doing_fx", "fx_icon")
             inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
         end,
-        {
-            Asset("ANIM", "anim/guitar_whitewood_doing_fx.zip"),
-            Asset("ANIM", "anim/fx_wathgrithr_buff.zip"), --官方战歌特效动画模板
+        fn_remove = nil,
+    })
+end
+
+if CONFIGS_LEGION.LEGENDOFFALL then
+    MakeFx({ --脱壳之翅：逃脱时的茸毛特效
+        name = "boltwingout_fx",
+        assets = {
+            Asset("ANIM", "anim/lavaarena_heal_projectile.zip"), --官方的熔炉奶杖击中特效动画
+            Asset("ANIM", "anim/boltwingout_fx.zip"),
         },
-        nil, false, 0
-    ))
+        prefabs = nil,
+        fn_common = nil,
+        fn_anim = function(inst)
+            inst.AnimState:SetBank("lavaarena_heal_projectile")
+            inst.AnimState:SetBuild("boltwingout_fx")
+            inst.AnimState:SetFinalOffset(-1)
+            inst.AnimState:PlayAnimation("hit")
+        end,
+        fn_remove = nil,
+    })
 end
 
 ---------------

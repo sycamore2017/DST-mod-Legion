@@ -366,7 +366,8 @@ table.insert(prefs, MakePlacer("siving_derivant_item_placer", "siving_derivants"
 --------------------------------------------------------------------------
 
 local function DropRock(inst)
-    local x, y, z = GetCalculatedPos_legion(inst.Transform:GetWorldPosition(), 2+math.random()*3, nil)
+    local xx, yy, zz = inst.Transform:GetWorldPosition()
+    local x, y, z = GetCalculatedPos_legion(xx, yy, zz, 2+math.random()*3, nil)
     DropItem_legion("siving_rocks", x, y+9, z, 1, 18, 20*FRAMES, nil, nil, nil)
 end
 local function OnStealLife(inst, value)

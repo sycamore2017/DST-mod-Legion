@@ -149,16 +149,18 @@ local function fn()
     --inst.foleysound = "dontstarve/movement/foley/backpack"
 
     MakeInventoryFloatable(inst, "small", 0, nil, false, -9)
-
-    local OnLandedServer_old = inst.components.floater.OnLandedServer
-    inst.components.floater.OnLandedServer = function(self) --掉进海里时使用自己的动画
-        if not self.showing_effect and self:ShouldShowEffect() then
-            inst.AnimState:PlayAnimation("anim_water", true)
-        end
-        OnLandedServer_old(self)
-    end
     inst.components.floater.OnLandedClient = function(self) --取消掉进海里时生成的波纹特效
         self.showing_effect = true
+    end
+    local OnLandedServer_old = inst.components.floater.OnLandedServer
+    inst.components.floater.OnLandedServer = function(self) --掉进海里时使用自己的水面动画
+        OnLandedServer_old(self)
+        inst.AnimState:PlayAnimation(self:IsFloating() and "anim_water" or "anim", true)
+    end
+    local OnNoLongerLandedServer_old = inst.components.floater.OnNoLongerLandedServer
+    inst.components.floater.OnNoLongerLandedServer = function(self) --非待在海里时使用自己的陆地动画
+        OnNoLongerLandedServer_old(self)
+        inst.AnimState:PlayAnimation(self:IsFloating() and "anim_water" or "anim", true)
     end
 
     inst.entity:SetPristine()

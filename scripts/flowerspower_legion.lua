@@ -6,8 +6,6 @@ local prefabFiles = {
     "neverfade",                --永不凋零
     "sachet",                   --香包
     "neverfade_butterfly",      --永不凋零的蝴蝶
-    "neverfade_shield",         --永不凋零的护盾
-    "buff_butterflysblessing",  --蝴蝶庇佑的buff
 }
 
 if GLOBAL.CONFIGS_LEGION.FOLIAGEATHCHANCE > 0 then
