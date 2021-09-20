@@ -31,8 +31,6 @@ local function fn()
 
     inst:AddComponent("inspectable")
 
-    MakeHauntableLaunchAndIgnite(inst)
-
     inst:AddComponent("tradable") --尘市蜃楼部分里的砂之女巫会想要这个的
     -- inst.components.tradable.goldvalue = TUNING.GOLD_VALUES.MEAT * 2
 
@@ -45,6 +43,8 @@ local function fn()
 
     MakeSmallBurnable(inst, TUNING.SMALL_BURNTIME)
     MakeSmallPropagator(inst)
+
+    MakeHauntableLaunchAndIgnite(inst)
 
     return inst
 end

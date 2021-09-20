@@ -49,26 +49,33 @@ local function onequip(inst, owner)
         inst.components.container:Open(owner)
     end
 
-    if owner.components.combat ~= nil then
-        inst.GetAttacked_old = owner.components.combat.GetAttacked
+    if owner.components.combat ~= nil and owner.set_l_bolt == nil then
+        owner.GetAttacked_old = owner.components.combat.GetAttacked
         owner.components.combat.GetAttacked = function(self, attacker, damage, weapon, stimuli)
+            if not owner.set_l_bolt then
+                return owner.GetAttacked_old(self, attacker, damage, weapon, stimuli)
+            end
+
             local attackerinfact = weapon or attacker
 
-            if (self.inst.components.rider ~= nil and self.inst.components.rider:IsRiding()) --在骑牛
+            if
+                (self.inst.components.rider ~= nil and self.inst.components.rider:IsRiding()) --在骑牛
                 or self.inst:HasTag("beaver") --变成了海狸
                 or self.inst.sg:HasStateTag("busy") --在做特殊动作，攻击sg不会带这个标签
                 or stimuli == "darkness" --黑暗攻击
                 or attackerinfact == nil --无实物的攻击
-                or damage <= 0 then
-                inst.GetAttacked_old(self, attacker, damage, weapon, stimuli)
-                return
+                or damage <= 0
+            then
+                return owner.GetAttacked_old(self, attacker, damage, weapon, stimuli)
             end
 
             --识别特定数量的材料来触发金蝉脱壳效果
             local finalitem = nil
             inst.components.container:FindItem(function(item)
-                if BOLTCOST[item.prefab] ~= nil
-                    and BOLTCOST[item.prefab] <= (item.components.stackable ~= nil and item.components.stackable:StackSize() or 1) then
+                if
+                    BOLTCOST[item.prefab] ~= nil
+                    and BOLTCOST[item.prefab] <= (item.components.stackable ~= nil and item.components.stackable:StackSize() or 1)
+                then
                     finalitem = item
                     return true
                 end
@@ -98,10 +105,11 @@ local function onequip(inst, owner)
                     attacker.components.combat:SetTarget(nil)
                 end
             else
-                inst.GetAttacked_old(self, attacker, damage, weapon, stimuli)
+                owner.GetAttacked_old(self, attacker, damage, weapon, stimuli)
             end
         end
     end
+    owner.set_l_bolt = true
 end
 
 local function onunequip(inst, owner)
@@ -111,9 +119,7 @@ local function onunequip(inst, owner)
         inst.components.container:Close(owner)
     end
 
-    if owner.components.combat ~= nil then
-        owner.components.combat.GetAttacked = inst.GetAttacked_old
-    end
+    owner.set_l_bolt = false
 end
 
 local function onburnt(inst)

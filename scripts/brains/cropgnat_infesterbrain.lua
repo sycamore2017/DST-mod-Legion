@@ -11,18 +11,19 @@ local function GetValid(target)
     if target ~= nil and target:IsValid() then
         return target
     end
-
     return nil
 end
 
 local function GetLightTarget(inst)
     if TheWorld.state.isday or TheWorld.state.isfullmoon then --白天或月圆夜，肯定不需要寻求光源
         inst.lighttarget = nil
-    elseif inst.lighttarget == nil or --非白天，必定需要找光源
+    elseif
+        inst.lighttarget == nil or --非白天，必定需要找光源
         not inst.lighttarget:IsValid() or --无效的
         not inst.lighttarget.entity:IsVisible() or --不可见的
         inst.lighttarget:IsInLimbo() or --被装起来的
-        not (inst.lighttarget:HasTag("daylight") or inst.lighttarget:HasTag("lightsource")) then --不再是光源
+        not (inst.lighttarget:HasTag("daylight") or inst.lighttarget:HasTag("lightsource")) --不再是光源
+    then
         inst.lighttarget = FindEntity(inst, 16, nil, nil, { "INLIMBO" }, { "daylight", "lightsource" })
     end
 
@@ -30,19 +31,22 @@ local function GetLightTarget(inst)
 end
 
 local function GetInfestTarget(inst)
-    if inst.infesttarget == nil or --没有侵扰对象
+    if
+        inst.infesttarget == nil or --没有侵扰对象
         not inst.infesttarget:IsValid() or --无效的
         not inst.infesttarget.entity:IsVisible() or --不可见的
         inst.infesttarget:IsInLimbo() or --被装起来的
         (inst.infesttarget.components.health == nil or inst.infesttarget.components.health:IsDead()) or --已经死掉
-        inst:GetDistanceSqToInst(inst.infesttarget) > 1225 then --距离超过35*35
-
+        inst:GetDistanceSqToInst(inst.infesttarget) > 1225 --距离超过35*35
+    then
         if inst.infesttarget ~= nil then
             inst.infesttarget.infester = nil --清除以前的标记
         end
+
         inst.infesttarget = FindEntity(inst, 16, function(guy)
             return GetValid(guy.infester) == nil and inst.components.combat:CanTarget(guy)
         end, {"character", "_combat", "_health"}, {"FX", "NOCLICK", "INLIMBO", "playerghost", "largecreature", "nognatinfest"}, nil)
+
         if inst.infesttarget ~= nil then
             inst.infesttarget.infester = inst --做个标记，一个虫群只能认领一个侵扰对象
         end
@@ -55,10 +59,12 @@ local function GetCombatTarget(inst)
     --光源对象优先进行判断
     if inst.lighttarget ~= nil then
         --光源对象就是侵扰对象，或者光源对象可攻击，并且攻击对象只能是有"character"标签的才能攻击
-        if inst.infesttarget == inst.lighttarget or
-            (inst.lighttarget:HasTag("character") and inst.components.combat:CanTarget(inst.lighttarget)) then
+        if
+            inst.infesttarget == inst.lighttarget or
+            (inst.lighttarget:HasTag("character") and inst.components.combat:CanTarget(inst.lighttarget))
+        then
             inst.components.combat:SetTarget(inst.lighttarget)
-        --一般来说光源是附着在其他对象上的，这里需要进一步判断
+            --一般来说光源是附着在其他对象上的，这里需要进一步判断
         else
             --先判断实体的附主
             local grandowner = inst.lighttarget.entity ~= nil and inst.lighttarget.entity:GetParent()
@@ -142,7 +148,7 @@ function CropGnat_InfesterBrain:OnStart()
     local root =
         PriorityNode(
         {
-            WhileNode(function() return self.inst.components.hauntable and self.inst.components.hauntable.panic end, "PanicHaunted", Panic(self.inst)),          
+            WhileNode(function() return self.inst.components.hauntable and self.inst.components.hauntable.panic end, "PanicHaunted", Panic(self.inst)),
             -- WhileNode(function() return self.inst.components.health.takingfiredamage end, "OnFire", Panic(self.inst)),
 
             --睡觉ing
@@ -169,7 +175,7 @@ function CropGnat_InfesterBrain:OnStart()
                 Wander(self.inst, function() return self.inst.components.knownlocations:GetLocation("home") end, 20)
             )
         }, 0.5)
-    
+
     self.bt = BT(self.inst, root)
 end
 

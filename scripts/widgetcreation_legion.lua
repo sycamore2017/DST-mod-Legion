@@ -1,5 +1,4 @@
 local _G = GLOBAL
--- local COOKING = require("cooking")
 local containers = require("containers")
 
 --------------------------------------------------------------------------
@@ -114,58 +113,58 @@ if CONFIGS_LEGION.PRAYFORRAIN then
     end
 end
 
--- if CONFIGS_LEGION.LEGENDOFFALL then
---     params.boltwingout =
---     {
---         widget =
---         {
---             slotpos = {},
---             animbank = "ui_backpack_2x4",
---             animbuild = "ui_backpack_2x4",
---             pos = Vector3(-5, -70, 0),
---         },
---         issidewidget = true,
---         type = "pack",
---         openlimit = 1,
---         priorityfn = function(container, item, slot)
---             local costs =
---             {
---                 stinger = 3,            --蜂刺
---                 honey = 5,              --蜂蜜
---                 royal_jelly = 0.1,      --蜂王浆
---                 honeycomb = 0.25,       --蜂巢
---                 beeswax = 0.2,          --蜂蜡
---                 bee = 0.5,              --蜜蜂
---                 killerbee = 0.45,       --杀人蜂
+if CONFIGS_LEGION.LEGENDOFFALL then
+    params.boltwingout =
+    {
+        widget =
+        {
+            slotpos = {},
+            animbank = "ui_backpack_2x4",
+            animbuild = "ui_backpack_2x4",
+            pos = Vector3(-5, -70, 0),
+        },
+        issidewidget = true,
+        type = "pack",
+        openlimit = 1,
+        priorityfn = function(container, item, slot)
+            local costs =
+            {
+                stinger = 3,            --蜂刺
+                honey = 5,              --蜂蜜
+                royal_jelly = 0.1,      --蜂王浆
+                honeycomb = 0.25,       --蜂巢
+                beeswax = 0.2,          --蜂蜡
+                bee = 0.5,              --蜜蜂
+                killerbee = 0.45,       --杀人蜂
 
---                 mosquitosack = 1,       --蚊子血袋
---                 mosquito = 0.45,        --蚊子
+                mosquitosack = 1,       --蚊子血袋
+                mosquito = 0.45,        --蚊子
 
---                 ahandfulofwings = 0.25, --一捧翅膀
+                ahandfulofwings = 0.25, --一捧翅膀
 
---                 glommerwings = 0.25,    --格罗姆翅膀
---                 glommerfuel = 0.5,      --格罗姆黏液
+                glommerwings = 0.25,    --格罗姆翅膀
+                glommerfuel = 0.5,      --格罗姆黏液
 
---                 butterflywings = 3,     --蝴蝶翅膀
---                 butter = 0.1,           --黄油
---                 butterfly = 0.6,        --蝴蝶
+                butterflywings = 3,     --蝴蝶翅膀
+                butter = 0.1,           --黄油
+                butterfly = 0.6,        --蝴蝶
 
---                 raindonate = 0.45,      --雨蝇
+                raindonate = 0.45,      --雨蝇
 
---                 wormlight = 0.25,       --神秘浆果
---                 wormlight_lesser = 1,   --神秘小浆果
+                wormlight = 0.25,       --神秘浆果
+                wormlight_lesser = 1,   --神秘小浆果
 
---                 moonbutterflywings = 1, --月蛾翅膀
---                 moonbutterfly = 0.3,    --月蛾
---             }
---             return costs[item.prefab] ~= nil
---         end
---     }
---     for y = 0, 3 do
---         table.insert(params.boltwingout.widget.slotpos, Vector3(-162, -75 * y + 114, 0))
---         table.insert(params.boltwingout.widget.slotpos, Vector3(-162 + 75, -75 * y + 114, 0))
---     end
--- end
+                moonbutterflywings = 1, --月蛾翅膀
+                moonbutterfly = 0.3,    --月蛾
+            }
+            return costs[item.prefab] ~= nil
+        end
+    }
+    for y = 0, 3 do
+        table.insert(params.boltwingout.widget.slotpos, Vector3(-162, -75 * y + 114, 0))
+        table.insert(params.boltwingout.widget.slotpos, Vector3(-162 + 75, -75 * y + 114, 0))
+    end
+end
 
 --------------------------------------------------------------------------
 --[[ 修改容器注册函数 ]]
@@ -177,6 +176,7 @@ for k, v in pairs(params) do
     --更新容器格子数量的最大值
     containers.MAXITEMSLOTS = math.max(containers.MAXITEMSLOTS, v.widget.slotpos ~= nil and #v.widget.slotpos or 0)
 end
+params = nil
 
 --加入mod的容器
 -- local widgetsetup_old = containers.widgetsetup

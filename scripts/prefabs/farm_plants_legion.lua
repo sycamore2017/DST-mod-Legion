@@ -202,10 +202,10 @@ for k,v in pairs(PLANT_DEFS) do
 			})
 			InitPrefabs(data, v.prefabs, {
 				"spoiled_food",
-				"farm_plant_happy",
-				"farm_plant_unhappy",
+				"farm_plant_happy", "farm_plant_unhappy",
 				"siving_soil",
 				"dirt_puff",
+				"cropgnat", "cropgnat_infester"
 			})
 
 			defs[k] = data
@@ -319,10 +319,10 @@ for k,v in pairs(WEED_DEFS) do
 		})
 		InitPrefabs(data, v.prefabs or v.prefab_deps, {
 			"spoiled_food",
-			"farm_plant_happy",
-			"farm_plant_unhappy",
+			"farm_plant_happy", "farm_plant_unhappy",
 			"siving_soil",
 			"dirt_puff",
+			"cropgnat", "cropgnat_infester"
 		})
 
 		if data.sounds == nil then
@@ -356,6 +356,37 @@ local function RemovePlant(inst, lastprefab)
 	inst:Remove()
 end
 
+local function IsTooDarkToGrow(inst)
+	if inst.components.perennialcrop ~= nil and inst.components.perennialcrop:CanGrowInDark() then
+		return false
+	end
+	return IsTooDarkToGrow_legion(inst)
+end
+
+local function UpdateGrowing(inst)
+	if inst.components.perennialcrop ~= nil then
+		if (inst.components.burnable == nil or not inst.components.burnable.burning) and not IsTooDarkToGrow(inst) then
+			inst.components.perennialcrop:Resume()
+		else
+			inst.components.perennialcrop:Pause()
+		end
+	end
+end
+
+local function OnIsDark(inst)
+	UpdateGrowing(inst)
+	if TheWorld.state.isnight then
+		if inst.nighttask == nil then
+			inst.nighttask = inst:DoPeriodicTask(5, UpdateGrowing, math.random() * 5)
+		end
+	else
+		if inst.nighttask ~= nil then
+			inst.nighttask:Cancel()
+			inst.nighttask = nil
+		end
+	end
+end
+
 local function MakePlant(data)
 	return Prefab(
 		data.prefab,
@@ -376,6 +407,7 @@ local function MakePlant(data)
 			inst:SetPhysicsRadiusOverride(TUNING.FARM_PLANT_PHYSICS_RADIUS)
 
 			inst:AddTag("plant")
+			inst:AddTag("crop_legion")
 			inst:AddTag("tendable_farmplant") -- for farmplanttendable component
 			if data.tags ~= nil then
 				for k, v in pairs(data.tags) do
@@ -510,14 +542,10 @@ local function MakePlant(data)
 					RemovePlant(inst, "ash")
 				end)
 				inst.components.burnable:SetOnIgniteFn(function(inst, source, doer)
-					if inst.components.perennialcrop ~= nil then
-						inst.components.perennialcrop:OnEntitySleep()
-					end
+					UpdateGrowing(inst)
 				end)
 				inst.components.burnable:SetOnExtinguishFn(function(inst)
-					if inst.components.perennialcrop ~= nil then
-						inst.components.perennialcrop:OnEntityWake()
-					end
+					UpdateGrowing(inst)
 				end)
 			end
 
@@ -562,6 +590,9 @@ local function MakePlant(data)
 			end
 			inst.components.perennialcrop:SetStage(1, false, false, true, false)
 			inst.components.perennialcrop:StartGrowing()
+
+			inst:WatchWorldState("isnight", OnIsDark) --黑暗中无法继续生长
+			inst:DoTaskInTime(0, OnIsDark)
 
 			if data.fn_server ~= nil then
 				data.fn_server(inst)

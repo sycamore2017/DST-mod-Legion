@@ -1,13 +1,7 @@
 require("stategraphs/commonstates")
 
 local function IsTargetAround(inst)
-    local target
-    if inst.lighttarget ~= nil then
-        target = inst.lighttarget
-    else
-        target = inst.infesttarget
-    end
-
+    local target = inst.lighttarget or inst.infesttarget
     if target ~= nil and target:IsValid() then
         if inst:GetDistanceSqToPoint(target.Transform:GetWorldPosition()) <= 144 then
             inst.components.locomotor.runspeed = 6
@@ -22,7 +16,7 @@ local function IsTargetAround(inst)
     end
 end
 
-local actionhandlers = 
+local actionhandlers =
 {
     --nothing
 }
@@ -55,10 +49,11 @@ local events=
     end),
     EventHandler("death", function(inst) inst.sg:GoToState("death") end),
     EventHandler("knockedout", function(inst)
-        if not inst.components.health:IsDead() and --没死
+        if
+            not inst.components.health:IsDead() and --没死
             not (inst.components.hauntable and inst.components.hauntable.panic) and --没有被作祟
-            not inst.components.health.takingfiredamage then --没有着火
-
+            not inst.components.health.takingfiredamage --没有着火
+        then
             if inst.sg:HasStateTag("landed") then --已经在睡觉了，重新进入，重载状态
                 inst.sg:GoToState("land")
             elseif not inst.sg:HasStateTag("landing") then --没有正准备睡觉，进入睡觉状态
@@ -66,7 +61,7 @@ local events=
             end
         end
     end),
-    EventHandler("doinfest", function(inst) 
+    EventHandler("doinfest", function(inst)
         if not inst.sg:HasStateTag("busy") and not inst.components.health:IsDead() then
             inst.sg:GoToState("doinfest")
         end
@@ -80,7 +75,7 @@ local states=
     State{
         name = "moving",
         tags = {"moving", "canrotate"},
-        
+
         onenter = function(inst, pst)
             if inst.components.locomotor:WantsToRun() then
                 inst.sg:GoToState("running", true)
@@ -92,7 +87,7 @@ local states=
                     inst.AnimState:PlayAnimation("idle_loop")
                 end
                 inst.components.locomotor:WalkForward()
-            end  
+            end
         end,
 
         events =
@@ -113,13 +108,13 @@ local states=
                     inst.sg:GoToState("moving")
                 end
             end),
-        },        
+        },
     },
-    
+
     State{
         name = "running",
         tags = {"moving", "runrunrun", "canrotate"},
-        
+
         onenter = function(inst, pre)
             if not inst.components.locomotor:WantsToRun() then
                 inst.sg:GoToState("moving", true)
@@ -137,10 +132,10 @@ local states=
                 else
                     inst.AnimState:PlayAnimation("run_loop")
                 end
-                inst.components.locomotor:RunForward()       
+                inst.components.locomotor:RunForward()
             end
         end,
-        
+
         events =
         {
             EventHandler("animover", function(inst)
@@ -186,7 +181,7 @@ local states=
             end
         end,
 
-        events=
+        events =
         {
             EventHandler("animover", function(inst)
                 if inst.sg.statemem.wantstomove then
@@ -205,7 +200,7 @@ local states=
         onenter = function(inst)
             inst.AnimState:PlayAnimation("spawn")
         end,
-        
+
         events =
         {
             EventHandler("animover", function(inst) inst.sg:GoToState("idle") end),
@@ -215,7 +210,7 @@ local states=
     State{
         name = "attack",
         tags = {"busy"},
-        
+
         onenter = function(inst, target)
             inst.Physics:Stop()
             inst.sg.statemem.target = target
@@ -224,15 +219,15 @@ local states=
 
             inst.components.combat.laststartattacktime = GetTime() --更新攻击时间，不然一直为nil，导致无时间周期的攻击
         end,
-        
+
         timeline=
         {
+            TimeEvent(18*FRAMES, function(inst) inst.SoundEmitter:PlaySound(inst.sounds.attack) end),
             TimeEvent(20*FRAMES, function(inst)
                 inst.components.combat:DoAttack(inst.sg.statemem.target)
             end),
-            TimeEvent(18*FRAMES, function(inst) inst.SoundEmitter:PlaySound(inst.sounds.attack) end),
         },
- 
+
         events=
         {
             EventHandler("animqueueover", function(inst)
@@ -244,28 +239,25 @@ local states=
     State{
         name = "doinfest",
         tags = {"busy"},
-        
+
         onenter = function(inst)
             inst.Physics:Stop()
             inst.AnimState:PlayAnimation("attack_pre")
             inst.AnimState:PushAnimation("attack_pst", false)
         end,
-        
+
         timeline=
         {
+            TimeEvent(18*FRAMES, function(inst) inst.SoundEmitter:PlaySound(inst.sounds.attack) end),
             TimeEvent(20*FRAMES, function(inst)
                 if inst.infesttarget ~= nil and inst.infesttarget:IsValid() and inst:GetDistanceSqToInst(inst.infesttarget) <= 0.25 then
-                    if inst.infesttarget.components.crop ~= nil then
-                        inst.infesttarget.components.crop:DoInfest()
+                    if inst.OnInfestPlant ~= nil then
+                        inst.OnInfestPlant(inst, inst.infesttarget)
                     end
-                    if inst.components.timer ~= nil then
-                        inst.components.timer:StartTimer("infest_cd", TUNING.SEG_TIME * 2) --重新开始侵扰计时
-                    end
-                end             
+                end
             end),
-            TimeEvent(18*FRAMES, function(inst) inst.SoundEmitter:PlaySound(inst.sounds.attack) end),
         },
- 
+
         events=
         {
             EventHandler("animqueueover", function(inst)
@@ -282,7 +274,7 @@ local states=
             inst.AnimState:PlayAnimation("hit")
             inst.SoundEmitter:PlaySound(inst.sounds.hit)
         end,
-        
+
         events =
         {
             EventHandler("animover", function(inst) inst.sg:GoToState("idle") end),
@@ -292,12 +284,12 @@ local states=
     State{ --从地上飞起来
         name = "takeoff",
         tags = {"busy"},
-        
+
         onenter = function(inst)
             inst.Physics:Stop()
             inst.AnimState:PlayAnimation("sleep_pst")
         end,
-        
+
         events =
         {
             EventHandler("animover", function(inst) inst.sg:GoToState("idle") end),
@@ -307,12 +299,12 @@ local states=
     State{ --准备着地
         name = "land_pre",
         tags = {"busy", "landing"},
-        
+
         onenter = function(inst)
             inst.Physics:Stop()
             inst.AnimState:PlayAnimation("sleep_pre")
         end,
-        
+
         events=
         {
             EventHandler("animover", function(inst)
@@ -343,7 +335,6 @@ local states=
             --睡觉时解除无敌状态
             inst.components.health.invincible = false
             inst.components.combat.noimpactsound = nil
-            -- inst:RemoveTag("no_durability_loss_on_hit")
 
             LandFlyingCreature(inst)
         end,
@@ -370,7 +361,6 @@ local states=
             --醒来时恢复无敌状态
             inst.components.health.invincible = true
             inst.components.combat.noimpactsound = true
-            -- inst:AddTag("no_durability_loss_on_hit")
             RaiseFlyingCreature(inst)
         end,
     },

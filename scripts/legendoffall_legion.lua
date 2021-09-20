@@ -1,6 +1,8 @@
 local prefabFiles = {
     "siving_rocks_legion",
     "farm_plants_legion",
+    "cropgnat",
+    "ahandfulofwings",
 }
 
 for k,v in pairs(prefabFiles) do
@@ -17,6 +19,10 @@ local assets = {
 
     Asset("ATLAS", "images/inventoryimages/siving_soil_item.xml"), --预加载，给科技栏用的
     Asset("IMAGE", "images/inventoryimages/siving_soil_item.tex"),
+    Asset("ATLAS", "images/inventoryimages/ahandfulofwings.xml"),
+    Asset("IMAGE", "images/inventoryimages/ahandfulofwings.tex"),
+    Asset("ATLAS", "images/inventoryimages/boltwingout.xml"),
+    Asset("IMAGE", "images/inventoryimages/boltwingout.tex"),
 }
 
 for k,v in pairs(assets) do
@@ -41,20 +47,30 @@ AddIngredientValues({"pineananas"}, {veggie=1, fruit=1}, true, false)
 _G.RegistMiniMapImage_legion("siving_derivant")
 _G.RegistMiniMapImage_legion("siving_thetree")
 
-AddRecipe("siving_soil_item",
-{
-    Ingredient("siving_rocks", 6, "images/inventoryimages/siving_rocks.xml"),
-    Ingredient("pinecone", 20),
-}, 
-RECIPETABS.FARM, TECH.MAGIC_TWO, nil, nil, nil, nil, nil, "images/inventoryimages/siving_soil_item.xml", "siving_soil_item.tex")
+AddRecipe(
+    "siving_soil_item", {
+        Ingredient("siving_rocks", 6, "images/inventoryimages/siving_rocks.xml"),
+        Ingredient("pinecone", 20),
+    }, RECIPETABS.FARM, TECH.MAGIC_TWO, nil, nil, nil, nil, nil,
+    "images/inventoryimages/siving_soil_item.xml", "siving_soil_item.tex"
+)
 
 --这个配方用来便于绿宝石法杖分解
-AddRecipe("siving_soil",
-{
-    Ingredient("siving_rocks", 6, "images/inventoryimages/siving_rocks.xml"),
-    Ingredient("pinecone", 20),
-}, 
-nil, TECH.LOST)
+AddRecipe(
+    "siving_soil", {
+        Ingredient("siving_rocks", 6, "images/inventoryimages/siving_rocks.xml"),
+        Ingredient("pinecone", 20),
+    }, nil, TECH.LOST
+)
+
+AddRecipe(
+    "boltwingout", {
+        Ingredient("ahandfulofwings", 36, "images/inventoryimages/ahandfulofwings.xml"),
+        Ingredient("glommerwings", 1),
+        Ingredient("stinger", 36),
+    }, RECIPETABS.SURVIVAL, TECH.SCIENCE_TWO, nil, nil, nil, nil, nil,
+    "images/inventoryimages/boltwingout.xml", "boltwingout.tex"
+)
 
 --------------------------------------------------------------------------
 --[[ 让蘑菇农场能种植新东西 ]]

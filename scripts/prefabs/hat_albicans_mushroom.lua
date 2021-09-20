@@ -57,7 +57,7 @@ local function ReleaseSporesEffect(inst, owner)
     local ents = TheSim:FindEntities(x, y, z, 3.5,
         nil,
         { "DECOR", "NOCLICK", "FX", "shadow", "playerghost", "INLIMBO" },
-        { "player", "lamp", "mushroom_farm" }
+        { "player", "lamp", "mushroom_farm", "crop_legion" }
     )
 
     for i, ent in pairs(ents) do
@@ -102,6 +102,8 @@ local function ReleaseSporesEffect(inst, owner)
                         end
                     end
                 end
+            elseif ent.components.perennialcrop ~= nil then
+                ent.components.perennialcrop:Cure(owner)
             end
     	end
     end

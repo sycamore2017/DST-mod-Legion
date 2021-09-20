@@ -10,18 +10,19 @@ local function GetValid(target)
     if target ~= nil and target:IsValid() then
         return target
     end
-
     return nil
 end
 
 local function GetLightTarget(inst)
     if TheWorld.state.isday or TheWorld.state.isfullmoon then --白天或月圆夜，肯定不需要寻求光源
         inst.lighttarget = nil
-    elseif inst.lighttarget == nil or --非白天，必定需要找光源
+    elseif
+        inst.lighttarget == nil or --非白天，必定需要找光源
         not inst.lighttarget:IsValid() or --无效的
         not inst.lighttarget.entity:IsVisible() or --不可见的
         inst.lighttarget:IsInLimbo() or --被装起来的
-        not (inst.lighttarget:HasTag("daylight") or inst.lighttarget:HasTag("lightsource")) then --不再是光源
+        not (inst.lighttarget:HasTag("daylight") or inst.lighttarget:HasTag("lightsource")) --不再是光源
+    then
         inst.lighttarget = FindEntity(inst, 16, nil, nil, { "INLIMBO" }, { "daylight", "lightsource" })
     end
 
@@ -29,20 +30,27 @@ local function GetLightTarget(inst)
 end
 
 local function GetInfestTarget(inst)
-    if inst.infesttarget == nil or --没有侵扰对象
+    if
+        inst.infesttarget == nil or --没有侵扰对象
         not inst.infesttarget:IsValid() or --无效的
         not inst.infesttarget.entity:IsVisible() or --不可见的
         inst.infesttarget:IsInLimbo() or --被装起来的
-        (inst.infesttarget.components.crop ~= nil and inst.infesttarget:HasTag("withered")) or --已经枯萎
-        inst:GetDistanceSqToInst(inst.infesttarget) > 1225 then --距离超过35*35
-
+        inst.infesttarget:HasTag("nognatinfest") or --已经不能被侵扰了
+        inst.infesttarget:HasTag("withered") or --枯萎了
+        inst:GetDistanceSqToInst(inst.infesttarget) > 1225 --距离超过35*35
+    then
         if inst.infesttarget ~= nil then
             inst.infesttarget.infester = nil --清除以前的标记
         end
+
         inst.infesttarget = FindEntity(inst, 16, function(guy)
-            --寻找还未被侵扰、未枯萎的农作物
-            return GetValid(guy.infester) == nil and guy.components.crop ~= nil and not guy.components.crop.withered
-        end, nil, {"FX", "NOCLICK", "INLIMBO", "nognatinfest"}, nil)
+            if GetValid(guy.infester) == nil then --还未被虫群认领
+                return guy.components.perennialcrop ~= nil --多年生作物
+                        or guy.components.pickable ~= nil --可采摘植物
+            end
+            return false
+        end, nil, { "FX", "NOCLICK", "INLIMBO", "nognatinfest", "withered" }, { "crop_legion", "witherable" })
+
         if inst.infesttarget ~= nil then
             inst.infesttarget.infester = inst --做个标记，一个虫群只能认领一个侵扰对象
         end

@@ -63,7 +63,7 @@ local function MakeGnat(name, isinfester)
         inst:AddTag("insect")   --昆虫标签
         inst:AddTag("flying")
         inst:AddTag("smallcreature")
-        inst:AddTag("hostile") --这个标签使玩家不需强制攻击即可直接攻击自己
+        inst:AddTag("hostile")
         -- inst:AddTag("no_durability_loss_on_hit") --单机版才有的标签，被打之后不会减少武器耐久
         inst:AddTag("ignorewalkableplatformdrowning")
 
@@ -96,7 +96,7 @@ local function MakeGnat(name, isinfester)
         ------------------
 
         inst:AddComponent("lootdropper")
-        inst.components.lootdropper:SetLoot( {"ahandfulofwings"} )
+        inst.components.lootdropper:SetLoot({"ahandfulofwings"})
 
         ------------------
 
@@ -143,7 +143,6 @@ local function MakeGnat(name, isinfester)
             if inst.components.freezable then
                 inst.components.health.invincible = false
                 inst.components.combat.noimpactsound = nil
-                -- inst:RemoveTag("no_durability_loss_on_hit")
                 inst.SoundEmitter:KillSound("buzz")
             end
         end)
@@ -152,7 +151,6 @@ local function MakeGnat(name, isinfester)
             if inst.components.freezable then
                 inst.components.health.invincible = true
                 inst.components.combat.noimpactsound = true
-                -- inst:AddTag("no_durability_loss_on_hit")
                 inst.SoundEmitter:PlaySound(inst.sounds.buzz, "buzz")
             end
         end)
@@ -189,6 +187,39 @@ local function MakeGnat(name, isinfester)
             -- inst.components.combat:SetRetargetFunction(10, function(inst) end)
 
             inst:AddComponent("timer")
+            inst.OnInfestPlant = function(inst, plant)
+                if plant.components.perennialcrop ~= nil then
+                    if not plant.components.perennialcrop:Infest(inst, 1) then
+                        plant.infester = nil
+                        if inst.infesttarget ~= nil then
+                            inst.infesttarget = nil
+                        end
+                    end
+                elseif plant.components.pickable ~= nil then
+                    if plant.components.pickable:CanBeFertilized() then --已经枯萎了
+                        plant.infest_l_times = nil
+                        plant.infester = nil
+                        if inst.infesttarget ~= nil then
+                            inst.infesttarget = nil
+                        end
+                    else
+                        if plant.infest_l_times == nil then
+                            plant.infest_l_times = 1
+                        else
+                            plant.infest_l_times = plant.infest_l_times + 1
+                            if plant.infest_l_times >= 6 then --达到了侵害次数（侵害次数懒得做保存机制了）
+                                plant.components.pickable:MakeBarren()
+                                plant.infest_l_times = nil
+                                plant.infester = nil
+                                if inst.infesttarget ~= nil then
+                                    inst.infesttarget = nil
+                                end
+                            end
+                        end
+                    end
+                end
+                inst.components.timer:StartTimer("infest_cd", TUNING.SEG_TIME * 2) --重新开始侵扰计时
+            end
         end
 
         return inst
