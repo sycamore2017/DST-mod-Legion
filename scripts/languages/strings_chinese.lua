@@ -1726,232 +1726,101 @@ STRINGS.UI.PLANTREGISTRY.DESCRIPTIONS.PINEANANAS = "根深不怕风摇动，树�
 
 -----
 
-S_NAMES.PLANT_NORMAL_LEGION = "农作物"
-S______GENERIC.DESCRIBE.PLANT_NORMAL_LEGION =
-{
-    WITHERED = "唉，只是需要水而已。",
-    READY = "我希望马上吃掉它。",
-    FLORESCENCE = "我希望它快点结果。",
-    YOUTH = "我希望它快点开花。",
-    GROWING = "我希望它快点长大。",
-}
-S_______WILLOW.DESCRIBE.PLANT_NORMAL_LEGION =
-{
-    WITHERED = "才这点温度就蔫了，就这？",
-    READY = "终于长好了，我等的花都谢了。",
-    FLORESCENCE = "快给我结果！",
-    YOUTH = "快给我开花！",
-    GROWING = "快给我长大！",
-}
-S_______WEBBER.DESCRIBE.PLANT_NORMAL_LEGION =
-{
-    WITHERED = "唉，本该种另一颗种子的。",
-    READY = "耶！收获时间到！",
-    FLORESCENCE = "哇！快快结果吧。",
-    YOUTH = "嘿，快快开花吧。",
-    GROWING = "嗯，快快长大吧。",
-}
-S___WATHGRITHR.DESCRIBE.PLANT_NORMAL_LEGION =
-{
-    WITHERED = "我就知道，脆弱如蝼蚁。",
-    READY = "真正的战士不需要，但她的朋友们需要！",
-    FLORESCENCE = "像我一样，在自己的领地大放光彩！",
-    YOUTH = "我看不到它有任何的可取之处。",
-    GROWING = "真正的战士是不需要种地的。",
-}
--- S_____WOLFGANG.DESCRIBE.PLANT_NORMAL_LEGION =
--- {
---     WITHERED = "What a pity! Waiting to be watered, but...",
---     READY = "Oho! Waiting to be eaten!",
---     FLORESCENCE = "Gee! Waiting for you to bear fruit.",
---     YOUTH = "Meh. Waiting for you to bloom.",
---     GROWING = "Mmmm. Waiting for you to grow up.",
--- }
--- S________WENDY.DESCRIBE.PLANT_NORMAL_LEGION =
--- {
---     WITHERED = "What a pity! Waiting to be watered, but...",
---     READY = "Oho! Waiting to be eaten!",
---     FLORESCENCE = "Gee! Waiting for you to bear fruit.",
---     YOUTH = "Meh. Waiting for you to bloom.",
---     GROWING = "Mmmm. Waiting for you to grow up.",
--- }
--- S_________WX78.DESCRIBE.PLANT_NORMAL_LEGION =
--- {
---     WITHERED = "What a pity! Waiting to be watered, but...",
---     READY = "Oho! Waiting to be eaten!",
---     FLORESCENCE = "Gee! Waiting for you to bear fruit.",
---     YOUTH = "Meh. Waiting for you to bloom.",
---     GROWING = "Mmmm. Waiting for you to grow up.",
--- }
--- S_WICKERBOTTOM.DESCRIBE.PLANT_NORMAL_LEGION =
--- {
---     WITHERED = "What a pity! Waiting to be watered, but...",
---     READY = "Oho! Waiting to be eaten!",
---     FLORESCENCE = "Gee! Waiting for you to bear fruit.",
---     YOUTH = "Meh. Waiting for you to bloom.",
---     GROWING = "Mmmm. Waiting for you to grow up.",
--- }
--- S_______WOODIE.DESCRIBE.PLANT_NORMAL_LEGION =
--- {
---     WITHERED = "What a pity! Waiting to be watered, but...",
---     READY = "Oho! Waiting to be eaten!",
---     FLORESCENCE = "Gee! Waiting for you to bear fruit.",
---     YOUTH = "Meh. Waiting for you to bloom.",
---     GROWING = "Mmmm. Waiting for you to grow up.",
--- }
--- S______WAXWELL.DESCRIBE.PLANT_NORMAL_LEGION =
--- {
---     WITHERED = "What a pity! Waiting to be watered, but...",
---     READY = "Oho! Waiting to be eaten!",
---     FLORESCENCE = "Gee! Waiting for you to bear fruit.",
---     YOUTH = "Meh. Waiting for you to bloom.",
---     GROWING = "Mmmm. Waiting for you to grow up.",
--- }
--- S_______WINONA.DESCRIBE.PLANT_NORMAL_LEGION =
--- {
---     WITHERED = "What a pity! Waiting to be watered, but...",
---     READY = "Oho! Waiting to be eaten!",
---     FLORESCENCE = "Gee! Waiting for you to bear fruit.",
---     YOUTH = "Meh. Waiting for you to bloom.",
---     GROWING = "Mmmm. Waiting for you to grow up.",
--- }
-S________WARLY.DESCRIBE.PLANT_NORMAL_LEGION =
-{
-    WITHERED = "对不起，这道菜卖光了。",
-    READY = "快啦，你点的菜就要做好了。",
-    FLORESCENCE = "别催，你点的菜马上就好。",
-    YOUTH = "马上就好了，你点的菜正在长。",
-    GROWING = "别着急，你点的菜才发芽。",
-}
--- S_______WORTOX.DESCRIBE.PLANT_NORMAL_LEGION =
--- {
---     WITHERED = "What a pity! Waiting to be watered, but...",
---     READY = "Oho! Waiting to be eaten!",
---     FLORESCENCE = "Gee! Waiting for you to bear fruit.",
---     YOUTH = "Meh. Waiting for you to bloom.",
---     GROWING = "Mmmm. Waiting for you to grow up.",
--- }
-S_____WORMWOOD.DESCRIBE.PLANT_NORMAL_LEGION =
-{
-    WITHERED = "抱歉朋友，本应该特别关照你的。",
-    READY = "噢，这是位老朋友了。",
-    FLORESCENCE = "瞧瞧你，都乐开花了。",
-    YOUTH = "朋友，成熟一点，好吗。",
-    GROWING = "可爱的小朋友。",
-}
--- S_________WURT.DESCRIBE.PLANT_NORMAL_LEGION =
--- {
---     WITHERED = "What a pity! Waiting to be watered, but...",
---     READY = "Oho! Waiting to be eaten!",
---     FLORESCENCE = "Gee! Waiting for you to bear fruit.",
---     YOUTH = "Meh. Waiting for you to bloom.",
---     GROWING = "Mmmm. Waiting for you to grow up.",
--- }
-
-S_NAMES.FARMINGDUNGBALL_ITEM = "栽培肥料球"
-S_RECIPE_DESC.FARMINGDUNGBALL_ITEM = "种子该待的地方。"
-S______GENERIC.DESCRIBE.FARMINGDUNGBALL_ITEM = "真是恶心！我并不想知道它的制作过程。"
---S_______WILLOW.DESCRIBE.FARMINGDUNGBALL_ITEM = "This is the opposite of burning."
---S_____WOLFGANG.DESCRIBE.FARMINGDUNGBALL_ITEM = "Wolfgang can eat in one bite!"
-S________WENDY.DESCRIBE.FARMINGDUNGBALL_ITEM = "灰姑娘以前可能也做过这个。"
-S_________WX78.DESCRIBE.FARMINGDUNGBALL_ITEM = "所有人都讨厌的东西不一定是完全没用的。"
-S_WICKERBOTTOM.DESCRIBE.FARMINGDUNGBALL_ITEM = "这种方法一般用于玉米栽培。"
---S_______WOODIE.DESCRIBE.FARMINGDUNGBALL_ITEM = "I'd prefer maple taffy..."
-S______WAXWELL.DESCRIBE.FARMINGDUNGBALL_ITEM = "我越来越像个农民了。"
---S___WATHGRITHR.DESCRIBE.FARMINGDUNGBALL_ITEM = "I've somehow found a way to make it even LESS appealing!"
-S_______WEBBER.DESCRIBE.FARMINGDUNGBALL_ITEM = "有点像玩泥巴，也有点臭臭的。"
---S_______WINONA.DESCRIBE.FARMINGDUNGBALL_ITEM = "Great to cool off after some hard physical labor."
-S_______WORTOX.DESCRIBE.FARMINGDUNGBALL_ITEM = "嘻嘻嘻，我应该在打雪仗的时候用这个。"
-
-S_NAMES.FARMINGDUNGBALL = "栽培肥料堆"
-S______GENERIC.DESCRIBE.FARMINGDUNGBALL = "真是恶心！我并不想知道它的制作过程。"
---S_______WILLOW.DESCRIBE.FARMINGDUNGBALL = "This is the opposite of burning."
---S_____WOLFGANG.DESCRIBE.FARMINGDUNGBALL = "Wolfgang can eat in one bite!"
-S________WENDY.DESCRIBE.FARMINGDUNGBALL = "灰姑娘以前可能也做过这个。"
-S_________WX78.DESCRIBE.FARMINGDUNGBALL = "所有人都讨厌的东西不一定是完全没用的。"
-S_WICKERBOTTOM.DESCRIBE.FARMINGDUNGBALL = "这种方法一般用于玉米栽培。"
---S_______WOODIE.DESCRIBE.FARMINGDUNGBALL = "I'd prefer maple taffy..."
-S______WAXWELL.DESCRIBE.FARMINGDUNGBALL = "我越来越像个农民了。"
---S___WATHGRITHR.DESCRIBE.FARMINGDUNGBALL = "I've somehow found a way to make it even LESS appealing!"
-S_______WEBBER.DESCRIBE.FARMINGDUNGBALL = "有点像玩泥巴，也有点臭臭的。"
---S_______WINONA.DESCRIBE.FARMINGDUNGBALL = "Great to cool off after some hard physical labor."
-S_______WORTOX.DESCRIBE.FARMINGDUNGBALL = "嘿，谁在打雪仗时掉的这个？"
-
 S_NAMES.CROPGNAT = "植害虫群"
 S______GENERIC.DESCRIBE.CROPGNAT = "嘿！离我的作物远点，小害虫们！"
 S_______WILLOW.DESCRIBE.CROPGNAT = "它们也喜欢火吗？"
 S_____WOLFGANG.DESCRIBE.CROPGNAT = "幸运的是，它们不会叮咬沃尔夫冈。"
--- S________WENDY.DESCRIBE.CROPGNAT = "Baby's always so cute, grown one's not."
--- S_________WX78.DESCRIBE.CROPGNAT = "STICK ADDON INSTALLED"
+-- S________WENDY.DESCRIBE.CROPGNAT = ""
+-- S_________WX78.DESCRIBE.CROPGNAT = ""
 S_WICKERBOTTOM.DESCRIBE.CROPGNAT = "最好找到方法解决它们，不然就会颗粒无收。"
--- S_______WOODIE.DESCRIBE.CROPGNAT = "Hah. Not as funny as Chaplin."
--- S______WAXWELL.DESCRIBE.CROPGNAT = "Hm... No Monster child, no future trouble."
--- S___WATHGRITHR.DESCRIBE.CROPGNAT = "I've somehow found a way to make it even LESS appealing!"
+-- S_______WOODIE.DESCRIBE.CROPGNAT = ""
+-- S______WAXWELL.DESCRIBE.CROPGNAT = ""
+-- S___WATHGRITHR.DESCRIBE.CROPGNAT = ""
 S_______WEBBER.DESCRIBE.CROPGNAT = "在我打坏邻居家窗户的时候他们也叫我小害虫！"
--- S_______WINONA.DESCRIBE.CROPGNAT = "Neither the Keystone, nor a key thing."
--- S_______WORTOX.DESCRIBE.CROPGNAT = "Hey, who dropped this in a snowball fight?"
+-- S_______WINONA.DESCRIBE.CROPGNAT = ""
+-- S_______WORTOX.DESCRIBE.CROPGNAT = ""
 S_____WORMWOOD.DESCRIBE.CROPGNAT = "会伤害植物朋友的朋友。"
+S________WARLY.DESCRIBE.CROPGNAT = "住手！优秀的食材快被你们毁了！"
+S_________WURT.DESCRIBE.CROPGNAT = "给我留条活路吧，小东西们。"
+S_______WALTER.DESCRIBE.CROPGNAT = "优秀的管理者会管好自己的作物。"
+S________WANDA.DESCRIBE.CROPGNAT = "我可没时间管这些虫子。"
 
 S_NAMES.CROPGNAT_INFESTER = "叮咬虫群"
 S______GENERIC.DESCRIBE.CROPGNAT_INFESTER = "小心点，这些飞虫会叮咬人。"
 S_______WILLOW.DESCRIBE.CROPGNAT_INFESTER = "这些蠢虫子会被我的火光吸引。"
 S_____WOLFGANG.DESCRIBE.CROPGNAT_INFESTER = "噢，这些小怪物会咬人！"
--- S________WENDY.DESCRIBE.CROPGNAT_INFESTER = "Baby's always so cute, grown one's not."
+-- S________WENDY.DESCRIBE.CROPGNAT_INFESTER = ""
 S_________WX78.DESCRIBE.CROPGNAT_INFESTER = "它们连铁皮都咬？"
 S_WICKERBOTTOM.DESCRIBE.CROPGNAT_INFESTER = "具备攻击性的趋光生物。"
--- S_______WOODIE.DESCRIBE.CROPGNAT_INFESTER = "Hah. Not as funny as Chaplin."
--- S______WAXWELL.DESCRIBE.CROPGNAT_INFESTER = "Hm... No Monster child, no future trouble."
--- S___WATHGRITHR.DESCRIBE.CROPGNAT_INFESTER = "I've somehow found a way to make it even LESS appealing!"
--- S_______WEBBER.DESCRIBE.CROPGNAT_INFESTER = "We don't want to grow up, do you?"
+-- S_______WOODIE.DESCRIBE.CROPGNAT_INFESTER = ""
+-- S______WAXWELL.DESCRIBE.CROPGNAT_INFESTER = ""
+-- S___WATHGRITHR.DESCRIBE.CROPGNAT_INFESTER = ""
+-- S_______WEBBER.DESCRIBE.CROPGNAT_INFESTER = ""
 S_______WINONA.DESCRIBE.CROPGNAT_INFESTER = "我的天，它们太吵了。"
 S_______WORTOX.DESCRIBE.CROPGNAT_INFESTER = "哈哈，你得习惯在野外的生活。"
 S_____WORMWOOD.DESCRIBE.CROPGNAT_INFESTER = "会叮咬朋友的朋友。"
+S________WARLY.DESCRIBE.CROPGNAT_INFESTER = "别逼我拿你们下饭！"
+-- S_________WURT.DESCRIBE.CROPGNAT_INFESTER = ""
+-- S_______WALTER.DESCRIBE.CROPGNAT_INFESTER = ""
+S________WANDA.DESCRIBE.CROPGNAT_INFESTER = "我现在可有大把时间治治你们！"
 
 S_NAMES.AHANDFULOFWINGS = "一捧翅膀"
 S______GENERIC.DESCRIBE.AHANDFULOFWINGS = "一捧非常小的昆虫翅膀。"
--- S_______WILLOW.DESCRIBE.AHANDFULOFWINGS = "Stupid bugs will be attracted by my fire."
--- S_____WOLFGANG.DESCRIBE.AHANDFULOFWINGS = "Ouch! these little monsters bite!"
--- S________WENDY.DESCRIBE.AHANDFULOFWINGS = "Baby's always so cute, grown one's not."
--- S_________WX78.DESCRIBE.AHANDFULOFWINGS = "THEY BITE EVEN THE IRON?"
--- S_WICKERBOTTOM.DESCRIBE.AHANDFULOFWINGS = "Aggressive and can be attracted by light."
--- S_______WOODIE.DESCRIBE.AHANDFULOFWINGS = "Hah. Not as funny as Chaplin."
--- S______WAXWELL.DESCRIBE.AHANDFULOFWINGS = "Hm... No Monster child, no future trouble."
--- S___WATHGRITHR.DESCRIBE.AHANDFULOFWINGS = "I've somehow found a way to make it even LESS appealing!"
--- S_______WEBBER.DESCRIBE.AHANDFULOFWINGS = "We don't want to grow up, do you?"
--- S_______WINONA.DESCRIBE.AHANDFULOFWINGS = "Oh my, the noise is terrible."
--- S_______WORTOX.DESCRIBE.AHANDFULOFWINGS = "Hah, you have to get used to this in the wild."
--- S_____WORMWOOD.DESCRIBE.AHANDFULOFWINGS = "Some friends who would bite a friend."
+S_______WILLOW.DESCRIBE.AHANDFULOFWINGS = "残忍又恶心。"
+-- S_____WOLFGANG.DESCRIBE.AHANDFULOFWINGS = ""
+-- S________WENDY.DESCRIBE.AHANDFULOFWINGS = ""
+-- S_________WX78.DESCRIBE.AHANDFULOFWINGS = ""
+S_WICKERBOTTOM.DESCRIBE.AHANDFULOFWINGS = "是的，它们终于被消灭了。"
+-- S_______WOODIE.DESCRIBE.AHANDFULOFWINGS = ""
+-- S______WAXWELL.DESCRIBE.AHANDFULOFWINGS = ""
+S___WATHGRITHR.DESCRIBE.AHANDFULOFWINGS = "解决它们可轻松了。"
+-- S_______WEBBER.DESCRIBE.AHANDFULOFWINGS = ""
+-- S_______WINONA.DESCRIBE.AHANDFULOFWINGS = ""
+-- S_______WORTOX.DESCRIBE.AHANDFULOFWINGS = ""
+S_____WORMWOOD.DESCRIBE.AHANDFULOFWINGS = "坏朋友们的遗物。"
+-- S________WARLY.DESCRIBE.AHANDFULOFWINGS = ""
+S_________WURT.DESCRIBE.AHANDFULOFWINGS = "这可真解气，格罗噗。"
+-- S_______WALTER.DESCRIBE.AHANDFULOFWINGS = ""
+-- S________WANDA.DESCRIBE.AHANDFULOFWINGS = ""
 
 S_NAMES.BOLTWINGOUT = "脱壳之翅"
 S_RECIPE_DESC.BOLTWINGOUT = "金蝉脱壳，逃之夭夭。"
 S______GENERIC.DESCRIBE.BOLTWINGOUT = "命悬一线，死里逃生。"
--- S_______WILLOW.DESCRIBE.BOLTWINGOUT = "Stupid bugs will be attracted by my fire."
--- S_____WOLFGANG.DESCRIBE.BOLTWINGOUT = "Ouch! these little monsters bite!"
--- S________WENDY.DESCRIBE.BOLTWINGOUT = "Baby's always so cute, grown one's not."
+-- S_______WILLOW.DESCRIBE.BOLTWINGOUT = ""
+S_____WOLFGANG.DESCRIBE.BOLTWINGOUT = "我像风一样自由..."
+-- S________WENDY.DESCRIBE.BOLTWINGOUT = ""
 S_________WX78.DESCRIBE.BOLTWINGOUT = "短时间加速设备"
--- S_WICKERBOTTOM.DESCRIBE.BOLTWINGOUT = "Aggressive and can be attracted by light."
--- S_______WOODIE.DESCRIBE.BOLTWINGOUT = "Hah. Not as funny as Chaplin."
+-- S_WICKERBOTTOM.DESCRIBE.BOLTWINGOUT = ""
+-- S_______WOODIE.DESCRIBE.BOLTWINGOUT = ""
 S______WAXWELL.DESCRIBE.BOLTWINGOUT = "学习昆虫的生存之道。"
 S___WATHGRITHR.DESCRIBE.BOLTWINGOUT = "啧啧，真正的战士从不逃跑！"
--- S_______WEBBER.DESCRIBE.BOLTWINGOUT = "We don't want to grow up, do you?"
+S_______WEBBER.DESCRIBE.BOLTWINGOUT = "我们会忍术啦！"
 S_______WINONA.DESCRIBE.BOLTWINGOUT = "I just wanna run... hide it away!" --这句是英语歌词，所以不翻译
 S_______WORTOX.DESCRIBE.BOLTWINGOUT = "切，我用灵魂也能做出这个效果。"
--- S_____WORMWOOD.DESCRIBE.BOLTWINGOUT = "Some friends who would bite a friend."
+-- S_____WORMWOOD.DESCRIBE.BOLTWINGOUT = ""
+-- S________WARLY.DESCRIBE.BOLTWINGOUT = ""
+-- S_________WURT.DESCRIBE.BOLTWINGOUT = ""
+S_______WALTER.DESCRIBE.BOLTWINGOUT = "能让我实现逃跑策略的有用道具。"
+S________WANDA.DESCRIBE.BOLTWINGOUT = "我能以空间形式溜走。"
 
 S_NAMES.BOLTWINGOUT_SHUCK = "羽化后的壳"
 S______GENERIC.DESCRIBE.BOLTWINGOUT_SHUCK = "哈哈，很多生物都看不出来这只是一个壳而已。"
 S_______WILLOW.DESCRIBE.BOLTWINGOUT_SHUCK = "好大一只假虫子，烧掉烧掉！"
--- S_____WOLFGANG.DESCRIBE.BOLTWINGOUT_SHUCK = "Ouch! these little monsters bite!"
--- S________WENDY.DESCRIBE.BOLTWINGOUT_SHUCK = "Baby's always so cute, grown one's not."
+S_____WOLFGANG.DESCRIBE.BOLTWINGOUT_SHUCK = "就像你的温柔，无法挽留。"
+-- S________WENDY.DESCRIBE.BOLTWINGOUT_SHUCK = ""
 S_________WX78.DESCRIBE.BOLTWINGOUT_SHUCK = "狡猾的虫子！"
--- S_WICKERBOTTOM.DESCRIBE.BOLTWINGOUT_SHUCK = "Aggressive and can be attracted by light."
--- S_______WOODIE.DESCRIBE.BOLTWINGOUT_SHUCK = "Hah. Not as funny as Chaplin."
+-- S_WICKERBOTTOM.DESCRIBE.BOLTWINGOUT_SHUCK = ""
+-- S_______WOODIE.DESCRIBE.BOLTWINGOUT_SHUCK = ""
 S______WAXWELL.DESCRIBE.BOLTWINGOUT_SHUCK = "三十六计，走为上策。"
--- S___WATHGRITHR.DESCRIBE.BOLTWINGOUT_SHUCK = "I've somehow found a way to make it even LESS appealing!"
+S___WATHGRITHR.DESCRIBE.BOLTWINGOUT_SHUCK = "还残留着懦弱的气息。"
 S_______WEBBER.DESCRIBE.BOLTWINGOUT_SHUCK = "我们蜕皮之后也会丢掉老旧的皮。"
 S_______WINONA.DESCRIBE.BOLTWINGOUT_SHUCK = "这壳才不是随便丢掉的，它自有用途。"
--- S_______WORTOX.DESCRIBE.BOLTWINGOUT_SHUCK = "Hah, you have to get used to this in the wild."
+-- S_______WORTOX.DESCRIBE.BOLTWINGOUT_SHUCK = ""
 S_____WORMWOOD.DESCRIBE.BOLTWINGOUT_SHUCK = "嘿朋友，你还在里面吗？"
+-- S________WARLY.DESCRIBE.BOLTWINGOUT_SHUCK = ""
+-- S_________WURT.DESCRIBE.BOLTWINGOUT_SHUCK = ""
+S_______WALTER.DESCRIBE.BOLTWINGOUT_SHUCK = "有时候逃跑也是一种策略。"
+S________WANDA.DESCRIBE.BOLTWINGOUT_SHUCK = "居然留下了痕迹，等等，我明白了。"
 
 S_NAMES.CATMINT = "猫薄荷"
 S______GENERIC.DESCRIBE.CATMINT = "有清香的味道。"
@@ -1969,6 +1838,8 @@ S_______WORTOX.DESCRIBE.CATMINT = "算了，我不会喜欢这个。"
 S_____WORMWOOD.DESCRIBE.CATMINT = "你好啊，香香的朋友。"
 S________WARLY.DESCRIBE.CATMINT = "我能拿来当做调料就好了。"
 S_________WURT.DESCRIBE.CATMINT = "作为素食者，我很喜欢。"
+-- S_______WALTER.DESCRIBE.CATMINT = ""
+-- S________WANDA.DESCRIBE.CATMINT = ""
 
 S_NAMES.CATTENBALL = "猫线球"
 S______GENERIC.DESCRIBE.CATTENBALL = "尽管是从胃里倒腾出来的，但还是很可爱。"
@@ -1986,6 +1857,122 @@ S_______WORTOX.DESCRIBE.CATTENBALL = "看看看，和我一样的颜色呢。"
 -- S_____WORMWOOD.DESCRIBE.CATTENBALL = ""
 -- S________WARLY.DESCRIBE.CATTENBALL = ""
 S_________WURT.DESCRIBE.CATTENBALL = "住在荒漠幻影里的那位老婆婆肯定很喜欢这个。"
+-- S_______WALTER.DESCRIBE.CATTENBALL = ""
+-- S________WANDA.DESCRIBE.CATTENBALL = ""
+
+S_NAMES.SIVING_ROCKS = "子圭石"
+S______GENERIC.DESCRIBE.SIVING_ROCKS = "生命的力量在其中涌动。"
+S_______WILLOW.DESCRIBE.SIVING_ROCKS = "没错，我一点想烧的想法都没有。"
+S_____WOLFGANG.DESCRIBE.SIVING_ROCKS = "漂亮的小石头。"
+S________WENDY.DESCRIBE.SIVING_ROCKS = "说不痛苦那是假的，毕竟我的心也是肉做的。"
+S_________WX78.DESCRIBE.SIVING_ROCKS = "和我一样，是非碳基生命。"
+S_WICKERBOTTOM.DESCRIBE.SIVING_ROCKS = "我很震惊，这矿石居然有生命的活性！"
+S_______WOODIE.DESCRIBE.SIVING_ROCKS = "它轮廓和形状都很像一片叶子。"
+S______WAXWELL.DESCRIBE.SIVING_ROCKS = "这，难道就是传说中的..."
+S___WATHGRITHR.DESCRIBE.SIVING_ROCKS = "难道是世界之树的落叶？！"
+S_______WEBBER.DESCRIBE.SIVING_ROCKS = "嘻嘻，稀有的石头增加了！"
+S_______WINONA.DESCRIBE.SIVING_ROCKS = "神秘的绿色在其中看着我。"
+S_______WORTOX.DESCRIBE.SIVING_ROCKS = "在这个世界，的确不常见。"
+S_____WORMWOOD.DESCRIBE.SIVING_ROCKS = "石头朋友的一部分。"
+S________WARLY.DESCRIBE.SIVING_ROCKS = "不涉及我的领域，不多说。"
+S_________WURT.DESCRIBE.SIVING_ROCKS = "我在我的故乡见过。"
+S_______WALTER.DESCRIBE.SIVING_ROCKS = "啊哈，物种大发现！"
+S________WANDA.DESCRIBE.SIVING_ROCKS = "在阳光下，它很耀眼。"
+
+S_NAMES.SIVING_DERIVANT_ITEM = "未种下的子圭一型岩"
+S______GENERIC.DESCRIBE.SIVING_DERIVANT_ITEM = "我倒想看看它会长成什么样。"
+-- S_______WILLOW.DESCRIBE.SIVING_DERIVANT_ITEM = ""
+-- S_____WOLFGANG.DESCRIBE.SIVING_DERIVANT_ITEM = ""
+-- S________WENDY.DESCRIBE.SIVING_DERIVANT_ITEM = ""
+-- S_________WX78.DESCRIBE.SIVING_DERIVANT_ITEM = ""
+S_WICKERBOTTOM.DESCRIBE.SIVING_DERIVANT_ITEM = "栽种后值得研究一番。"
+-- S_______WOODIE.DESCRIBE.SIVING_DERIVANT_ITEM = ""
+S______WAXWELL.DESCRIBE.SIVING_DERIVANT_ITEM = "费尽心思从怪鸟那里抢过来的，可别让我失望。"
+S___WATHGRITHR.DESCRIBE.SIVING_DERIVANT_ITEM = "难道是世界树的衍生物？！"
+-- S_______WEBBER.DESCRIBE.SIVING_DERIVANT_ITEM = ""
+-- S_______WINONA.DESCRIBE.SIVING_DERIVANT_ITEM = ""
+-- S_______WORTOX.DESCRIBE.SIVING_DERIVANT_ITEM = ""
+S_____WORMWOOD.DESCRIBE.SIVING_DERIVANT_ITEM = "石头朋友的孩子，还在睡觉呢。"
+-- S________WARLY.DESCRIBE.SIVING_DERIVANT_ITEM = ""
+S_________WURT.DESCRIBE.SIVING_DERIVANT_ITEM = "这是它的种子，需要种土里。"
+-- S_______WALTER.DESCRIBE.SIVING_DERIVANT_ITEM = ""
+-- S________WANDA.DESCRIBE.SIVING_DERIVANT_ITEM = ""
+
+S_NAMES.SIVING_DERIVANT_LVL0 = "子圭一型岩"
+S______GENERIC.DESCRIBE.SIVING_DERIVANT_LVL0 = "没看出在生长的痕迹。"
+-- S_______WILLOW.DESCRIBE.SIVING_DERIVANT_LVL0 = ""
+-- S_____WOLFGANG.DESCRIBE.SIVING_DERIVANT_LVL0 = ""
+-- S________WENDY.DESCRIBE.SIVING_DERIVANT_LVL0 = ""
+-- S_________WX78.DESCRIBE.SIVING_DERIVANT_LVL0 = ""
+S_WICKERBOTTOM.DESCRIBE.SIVING_DERIVANT_LVL0 = "值得研究一番。"
+-- S_______WOODIE.DESCRIBE.SIVING_DERIVANT_LVL0 = ""
+-- S______WAXWELL.DESCRIBE.SIVING_DERIVANT_LVL0 = ""
+S___WATHGRITHR.DESCRIBE.SIVING_DERIVANT_LVL0 = "希望它能长成世界树。"
+-- S_______WEBBER.DESCRIBE.SIVING_DERIVANT_LVL0 = ""
+-- S_______WINONA.DESCRIBE.SIVING_DERIVANT_LVL0 = ""
+-- S_______WORTOX.DESCRIBE.SIVING_DERIVANT_LVL0 = ""
+S_____WORMWOOD.DESCRIBE.SIVING_DERIVANT_LVL0 = "石头朋友的孩子，它醒了。"
+-- S________WARLY.DESCRIBE.SIVING_DERIVANT_LVL0 = ""
+S_________WURT.DESCRIBE.SIVING_DERIVANT_LVL0 = "种下去就等着吧，格洛噗。"
+-- S_______WALTER.DESCRIBE.SIVING_DERIVANT_LVL0 = ""
+S________WANDA.DESCRIBE.SIVING_DERIVANT_LVL0 = "它需要的可不止一点时间。"
+
+S_NAMES.SIVING_DERIVANT_LVL1 = "子圭木型岩"
+S______GENERIC.DESCRIBE.SIVING_DERIVANT_LVL1 = "谢天谢地，终于长一小截了。"
+-- S_______WILLOW.DESCRIBE.SIVING_DERIVANT_LVL1 = ""
+-- S_____WOLFGANG.DESCRIBE.SIVING_DERIVANT_LVL1 = ""
+S________WENDY.DESCRIBE.SIVING_DERIVANT_LVL1 = "真是充满希望。"
+-- S_________WX78.DESCRIBE.SIVING_DERIVANT_LVL1 = ""
+S_WICKERBOTTOM.DESCRIBE.SIVING_DERIVANT_LVL1 = "不错，值得继续观察。"
+-- S_______WOODIE.DESCRIBE.SIVING_DERIVANT_LVL1 = ""
+-- S______WAXWELL.DESCRIBE.SIVING_DERIVANT_LVL1 = ""
+-- S___WATHGRITHR.DESCRIBE.SIVING_DERIVANT_LVL1 = ""
+-- S_______WEBBER.DESCRIBE.SIVING_DERIVANT_LVL1 = ""
+-- S_______WINONA.DESCRIBE.SIVING_DERIVANT_LVL1 = ""
+-- S_______WORTOX.DESCRIBE.SIVING_DERIVANT_LVL1 = ""
+S_____WORMWOOD.DESCRIBE.SIVING_DERIVANT_LVL1 = "它很健康地在长高呢。"
+-- S________WARLY.DESCRIBE.SIVING_DERIVANT_LVL1 = ""
+-- S_________WURT.DESCRIBE.SIVING_DERIVANT_LVL1 = ""
+-- S_______WALTER.DESCRIBE.SIVING_DERIVANT_LVL1 = ""
+S________WANDA.DESCRIBE.SIVING_DERIVANT_LVL1 = "它需要不止一点时间来继续生长。"
+
+S_NAMES.SIVING_DERIVANT_LVL2 = "子圭林型岩"
+S______GENERIC.DESCRIBE.SIVING_DERIVANT_LVL2 = "真棒，长得还不错。"
+-- S_______WILLOW.DESCRIBE.SIVING_DERIVANT_LVL2 = ""
+-- S_____WOLFGANG.DESCRIBE.SIVING_DERIVANT_LVL2 = ""
+-- S________WENDY.DESCRIBE.SIVING_DERIVANT_LVL2 = ""
+-- S_________WX78.DESCRIBE.SIVING_DERIVANT_LVL2 = ""
+S_WICKERBOTTOM.DESCRIBE.SIVING_DERIVANT_LVL2 = "我会继续研究下去的。"
+-- S_______WOODIE.DESCRIBE.SIVING_DERIVANT_LVL2 = ""
+-- S______WAXWELL.DESCRIBE.SIVING_DERIVANT_LVL2 = ""
+-- S___WATHGRITHR.DESCRIBE.SIVING_DERIVANT_LVL2 = ""
+-- S_______WEBBER.DESCRIBE.SIVING_DERIVANT_LVL2 = ""
+-- S_______WINONA.DESCRIBE.SIVING_DERIVANT_LVL2 = ""
+-- S_______WORTOX.DESCRIBE.SIVING_DERIVANT_LVL2 = ""
+S_____WORMWOOD.DESCRIBE.SIVING_DERIVANT_LVL2 = "个头都比我高了。"
+-- S________WARLY.DESCRIBE.SIVING_DERIVANT_LVL2 = ""
+S_________WURT.DESCRIBE.SIVING_DERIVANT_LVL2 = "我从来没种活过，噗噜！"
+-- S_______WALTER.DESCRIBE.SIVING_DERIVANT_LVL2 = ""
+S________WANDA.DESCRIBE.SIVING_DERIVANT_LVL2 = "这时间对我来说就是一小会。"
+
+S_NAMES.SIVING_DERIVANT_LVL3 = "子圭森型岩"
+S______GENERIC.DESCRIBE.SIVING_DERIVANT_LVL3 = "这石头长得很茂盛。"
+S_______WILLOW.DESCRIBE.SIVING_DERIVANT_LVL3 = "又没法烧，差评。"
+-- S_____WOLFGANG.DESCRIBE.SIVING_DERIVANT_LVL3 = ""
+-- S________WENDY.DESCRIBE.SIVING_DERIVANT_LVL3 = ""
+-- S_________WX78.DESCRIBE.SIVING_DERIVANT_LVL3 = ""
+S_WICKERBOTTOM.DESCRIBE.SIVING_DERIVANT_LVL3 = "应该是它的最终形态了。"
+S_______WOODIE.DESCRIBE.SIVING_DERIVANT_LVL3 = "它可不吃斧头那一套。"
+-- S______WAXWELL.DESCRIBE.SIVING_DERIVANT_LVL3 = ""
+-- S___WATHGRITHR.DESCRIBE.SIVING_DERIVANT_LVL3 = ""
+-- S_______WEBBER.DESCRIBE.SIVING_DERIVANT_LVL3 = ""
+-- S_______WINONA.DESCRIBE.SIVING_DERIVANT_LVL3 = ""
+S_______WORTOX.DESCRIBE.SIVING_DERIVANT_LVL3 = "长得再好也是没有灵魂的家伙。"
+S_____WORMWOOD.DESCRIBE.SIVING_DERIVANT_LVL3 = "成熟的石头朋友了。"
+S________WARLY.DESCRIBE.SIVING_DERIVANT_LVL3 = "这里啥都有，最不缺的就是奇怪。"
+S_________WURT.DESCRIBE.SIVING_DERIVANT_LVL3 = "故乡的森林深处，都是这玩意。"
+-- S_______WALTER.DESCRIBE.SIVING_DERIVANT_LVL3 = ""
+S________WANDA.DESCRIBE.SIVING_DERIVANT_LVL3 = "真神奇啊，但我见怪不怪了。"
 
 --------------------------------------------------------------------------
 --[[ flash and crush ]]--[[ 电闪雷鸣 ]]

@@ -334,16 +334,6 @@ local function ClearStatusAilments(inst)
     end
 end
 
-local function ForceStopHeavyLifting(inst)
-    if inst.components.inventory:IsHeavyLifting() then
-        inst.components.inventory:DropItem(
-            inst.components.inventory:Unequip(EQUIPSLOTS.BODY),
-            true,
-            true
-        )
-    end
-end
-
 ------
 
 local shocked_enter = State{
@@ -352,7 +342,7 @@ local shocked_enter = State{
 
     onenter = function(inst)
         ClearStatusAilments(inst)
-        ForceStopHeavyLifting(inst)
+        _G.ForceStopHeavyLifting_legion(inst)
         inst.components.locomotor:Stop()
         inst:ClearBufferedAction()
 

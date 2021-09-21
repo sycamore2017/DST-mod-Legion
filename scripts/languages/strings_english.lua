@@ -720,7 +720,7 @@ S______GENERIC.DESCRIBE.FOLIAGEATH_MYLOVE = "Pity, you just want to run away." -
 -- S_____WORMWOOD.DESCRIBE.FOLIAGEATH_MYLOVE = ""
 -- S_________WURT.DESCRIBE.FOLIAGEATH_MYLOVE = ""
 
--- 合成一吻长青时的台词
+-- 合成青锋剑时的台词
 S______GENERIC.ANNOUNCE_HIS_LOVE_WISH = "Wish forever but sometimes..." --Wish love lasts forever!
 -- S_______WILLOW.ANNOUNCE_HIS_LOVE_WISH = ""
 -- S_____WOLFGANG.ANNOUNCE_HIS_LOVE_WISH = ""
@@ -1745,232 +1745,101 @@ STRINGS.UI.PLANTREGISTRY.DESCRIPTIONS.PINEANANAS = "A straight foot is not afrai
 
 -----
 
-S_NAMES.PLANT_NORMAL_LEGION = "Crop"   --农作物(新型)
-S______GENERIC.DESCRIBE.PLANT_NORMAL_LEGION =
-{
-    WITHERED = "What a pity! Waiting to be watered, but...",
-    READY = "Oho! Waiting to be eaten!",
-    FLORESCENCE = "Gee! Waiting for you to bear fruit.",
-    YOUTH = "Meh. Waiting for you to bloom.",
-    GROWING = "Mmmm. Waiting for you to grow up.",
-}
--- S_______WILLOW.DESCRIBE.PLANT_NORMAL_LEGION =
--- {
---     WITHERED = "What a pity! Waiting to be watered, but...",
---     READY = "Oho! Waiting to be eaten!",
---     FLORESCENCE = "Gee! Waiting for you to bear fruit.",
---     YOUTH = "Meh. Waiting for you to bloom.",
---     GROWING = "Mmmm. Waiting for you to grow up.",
--- }
--- S_____WOLFGANG.DESCRIBE.PLANT_NORMAL_LEGION =
--- {
---     WITHERED = "What a pity! Waiting to be watered, but...",
---     READY = "Oho! Waiting to be eaten!",
---     FLORESCENCE = "Gee! Waiting for you to bear fruit.",
---     YOUTH = "Meh. Waiting for you to bloom.",
---     GROWING = "Mmmm. Waiting for you to grow up.",
--- }
--- S________WENDY.DESCRIBE.PLANT_NORMAL_LEGION =
--- {
---     WITHERED = "What a pity! Waiting to be watered, but...",
---     READY = "Oho! Waiting to be eaten!",
---     FLORESCENCE = "Gee! Waiting for you to bear fruit.",
---     YOUTH = "Meh. Waiting for you to bloom.",
---     GROWING = "Mmmm. Waiting for you to grow up.",
--- }
--- S_________WX78.DESCRIBE.PLANT_NORMAL_LEGION =
--- {
---     WITHERED = "What a pity! Waiting to be watered, but...",
---     READY = "Oho! Waiting to be eaten!",
---     FLORESCENCE = "Gee! Waiting for you to bear fruit.",
---     YOUTH = "Meh. Waiting for you to bloom.",
---     GROWING = "Mmmm. Waiting for you to grow up.",
--- }
--- S_WICKERBOTTOM.DESCRIBE.PLANT_NORMAL_LEGION =
--- {
---     WITHERED = "What a pity! Waiting to be watered, but...",
---     READY = "Oho! Waiting to be eaten!",
---     FLORESCENCE = "Gee! Waiting for you to bear fruit.",
---     YOUTH = "Meh. Waiting for you to bloom.",
---     GROWING = "Mmmm. Waiting for you to grow up.",
--- }
--- S_______WOODIE.DESCRIBE.PLANT_NORMAL_LEGION =
--- {
---     WITHERED = "What a pity! Waiting to be watered, but...",
---     READY = "Oho! Waiting to be eaten!",
---     FLORESCENCE = "Gee! Waiting for you to bear fruit.",
---     YOUTH = "Meh. Waiting for you to bloom.",
---     GROWING = "Mmmm. Waiting for you to grow up.",
--- }
--- S______WAXWELL.DESCRIBE.PLANT_NORMAL_LEGION =
--- {
---     WITHERED = "What a pity! Waiting to be watered, but...",
---     READY = "Oho! Waiting to be eaten!",
---     FLORESCENCE = "Gee! Waiting for you to bear fruit.",
---     YOUTH = "Meh. Waiting for you to bloom.",
---     GROWING = "Mmmm. Waiting for you to grow up.",
--- }
--- S___WATHGRITHR.DESCRIBE.PLANT_NORMAL_LEGION =
--- {
---     WITHERED = "What a pity! Waiting to be watered, but...",
---     READY = "Oho! Waiting to be eaten!",
---     FLORESCENCE = "Gee! Waiting for you to bear fruit.",
---     YOUTH = "Meh. Waiting for you to bloom.",
---     GROWING = "Mmmm. Waiting for you to grow up.",
--- }
--- S_______WEBBER.DESCRIBE.PLANT_NORMAL_LEGION =
--- {
---     WITHERED = "What a pity! Waiting to be watered, but...",
---     READY = "Oho! Waiting to be eaten!",
---     FLORESCENCE = "Gee! Waiting for you to bear fruit.",
---     YOUTH = "Meh. Waiting for you to bloom.",
---     GROWING = "Mmmm. Waiting for you to grow up.",
--- }
--- S_______WINONA.DESCRIBE.PLANT_NORMAL_LEGION =
--- {
---     WITHERED = "What a pity! Waiting to be watered, but...",
---     READY = "Oho! Waiting to be eaten!",
---     FLORESCENCE = "Gee! Waiting for you to bear fruit.",
---     YOUTH = "Meh. Waiting for you to bloom.",
---     GROWING = "Mmmm. Waiting for you to grow up.",
--- }
--- S_______WORTOX.DESCRIBE.PLANT_NORMAL_LEGION =
--- {
---     WITHERED = "What a pity! Waiting to be watered, but...",
---     READY = "Oho! Waiting to be eaten!",
---     FLORESCENCE = "Gee! Waiting for you to bear fruit.",
---     YOUTH = "Meh. Waiting for you to bloom.",
---     GROWING = "Mmmm. Waiting for you to grow up.",
--- }
-S_____WORMWOOD.DESCRIBE.PLANT_NORMAL_LEGION =
-{
-    WITHERED = "Sorry, I should have paid special attention to you.",
-    READY = "Oh, this is an old friend.",
-    FLORESCENCE = "Look at you, blooming.",
-    YOUTH = "Friend, be mature, OK?",
-    GROWING = "Lovely child.",
-}
-S________WARLY.DESCRIBE.PLANT_NORMAL_LEGION =
-{
-    WITHERED = "Sorry, this dish is sold out.",
-    READY = "Soon, your order will be ready.",
-    FLORESCENCE = "Don't rush, your order will be ready in a minute.",
-    YOUTH = "Be ready soon. Your order is growing.",
-    GROWING = "Don't worry, the dish you ordered just sprouts.",
-}
--- S_________WURT.DESCRIBE.PLANT_NORMAL_LEGION =
--- {
---     WITHERED = "What a pity! Waiting to be watered, but...",
---     READY = "Oho! Waiting to be eaten!",
---     FLORESCENCE = "Gee! Waiting for you to bear fruit.",
---     YOUTH = "Meh. Waiting for you to bloom.",
---     GROWING = "Mmmm. Waiting for you to grow up.",
--- }
-
-S_NAMES.FARMINGDUNGBALL_ITEM = "Cultivated Soil Ball"    --栽培肥料球
-S_RECIPE_DESC.FARMINGDUNGBALL_ITEM = "This is where the seeds should stay."
-S______GENERIC.DESCRIBE.FARMINGDUNGBALL_ITEM = "Nausea! I don't want to know about the process of making it."
---S_______WILLOW.DESCRIBE.FARMINGDUNGBALL_ITEM = "This is the opposite of burning."
---S_____WOLFGANG.DESCRIBE.FARMINGDUNGBALL_ITEM = "Wolfgang can eat in one bite!"
-S________WENDY.DESCRIBE.FARMINGDUNGBALL_ITEM = "Cinderella may have done this before."
-S_________WX78.DESCRIBE.FARMINGDUNGBALL_ITEM = "IT'S NOT USELESS THAT EVERYONE HATES."
-S_WICKERBOTTOM.DESCRIBE.FARMINGDUNGBALL_ITEM = "This method is usually used for maize cultivation."
---S_______WOODIE.DESCRIBE.FARMINGDUNGBALL_ITEM = "I'd prefer maple taffy..."
-S______WAXWELL.DESCRIBE.FARMINGDUNGBALL_ITEM = "I'm becoming more and more like a farmer."
---S___WATHGRITHR.DESCRIBE.FARMINGDUNGBALL_ITEM = "I've somehow found a way to make it even LESS appealing!"
-S_______WEBBER.DESCRIBE.FARMINGDUNGBALL_ITEM = "Kind of like playing with mud, kind of disgusting."
---S_______WINONA.DESCRIBE.FARMINGDUNGBALL_ITEM = "Great to cool off after some hard physical labor."
-S_______WORTOX.DESCRIBE.FARMINGDUNGBALL_ITEM = "Hee-hee, I should use this for snowball fights."
-
-S_NAMES.FARMINGDUNGBALL = "A Pile of Cultivated Soil"    --栽培肥料堆
-S______GENERIC.DESCRIBE.FARMINGDUNGBALL = "Nausea! I don't want to know about the process of making it."
---S_______WILLOW.DESCRIBE.FARMINGDUNGBALL = "This is the opposite of burning."
---S_____WOLFGANG.DESCRIBE.FARMINGDUNGBALL = "Wolfgang can eat in one bite!"
-S________WENDY.DESCRIBE.FARMINGDUNGBALL = "Cinderella may have done this before."
-S_________WX78.DESCRIBE.FARMINGDUNGBALL = "IT'S NOT USELESS THAT EVERYONE HATES."
-S_WICKERBOTTOM.DESCRIBE.FARMINGDUNGBALL = "This method is usually used for maize cultivation."
---S_______WOODIE.DESCRIBE.FARMINGDUNGBALL = "I'd prefer maple taffy..."
-S______WAXWELL.DESCRIBE.FARMINGDUNGBALL = "I'm becoming more and more like a farmer."
---S___WATHGRITHR.DESCRIBE.FARMINGDUNGBALL = "I've somehow found a way to make it even LESS appealing!"
-S_______WEBBER.DESCRIBE.FARMINGDUNGBALL = "Kind of like playing with mud, kind of disgusting."
---S_______WINONA.DESCRIBE.FARMINGDUNGBALL = "Great to cool off after some hard physical labor."
-S_______WORTOX.DESCRIBE.FARMINGDUNGBALL = "Hey, who dropped this in a snowball fight?"
-
 S_NAMES.CROPGNAT = "Pest Swarm"    --植害虫群
 S______GENERIC.DESCRIBE.CROPGNAT = "Hey, stay away from my crops, pests!"
 S_______WILLOW.DESCRIBE.CROPGNAT = "Do they like fire, too?"
 S_____WOLFGANG.DESCRIBE.CROPGNAT = "Fortunately, they don't bite Wolfgang."
--- S________WENDY.DESCRIBE.CROPGNAT = "Baby's always so cute, grown one's not."
--- S_________WX78.DESCRIBE.CROPGNAT = "STICK ADDON INSTALLED"
+-- S________WENDY.DESCRIBE.CROPGNAT = ""
+-- S_________WX78.DESCRIBE.CROPGNAT = ""
 S_WICKERBOTTOM.DESCRIBE.CROPGNAT = "Find ways to kill them early, or we'll get nothing!"
--- S_______WOODIE.DESCRIBE.CROPGNAT = "Hah. Not as funny as Chaplin."
--- S______WAXWELL.DESCRIBE.CROPGNAT = "Hm... No Monster child, no future trouble."
--- S___WATHGRITHR.DESCRIBE.CROPGNAT = "I've somehow found a way to make it even LESS appealing!"
+-- S_______WOODIE.DESCRIBE.CROPGNAT = ""
+-- S______WAXWELL.DESCRIBE.CROPGNAT = ""
+-- S___WATHGRITHR.DESCRIBE.CROPGNAT = ""
 S_______WEBBER.DESCRIBE.CROPGNAT = "Broke the windows of my neighbours and they called me a pest."
--- S_______WINONA.DESCRIBE.CROPGNAT = "Neither the Keystone, nor a key thing."
--- S_______WORTOX.DESCRIBE.CROPGNAT = "Hey, who dropped this in a snowball fight?"
+-- S_______WINONA.DESCRIBE.CROPGNAT = ""
+-- S_______WORTOX.DESCRIBE.CROPGNAT = ""
 S_____WORMWOOD.DESCRIBE.CROPGNAT = "Some friends who would hurt a plant friend."
+-- S________WARLY.DESCRIBE.CROPGNAT = ""
+-- S_________WURT.DESCRIBE.CROPGNAT = ""
+-- S_______WALTER.DESCRIBE.CROPGNAT = ""
+-- S________WANDA.DESCRIBE.CROPGNAT = ""
 
 S_NAMES.CROPGNAT_INFESTER = "Gnat Swarm"    --叮咬虫群
 S______GENERIC.DESCRIBE.CROPGNAT_INFESTER = "Be careful, these flying bugs bite."
 S_______WILLOW.DESCRIBE.CROPGNAT_INFESTER = "Stupid bugs will be attracted by my fire."
 S_____WOLFGANG.DESCRIBE.CROPGNAT_INFESTER = "Ouch! these little monsters bite!"
--- S________WENDY.DESCRIBE.CROPGNAT_INFESTER = "Baby's always so cute, grown one's not."
+-- S________WENDY.DESCRIBE.CROPGNAT_INFESTER = ""
 S_________WX78.DESCRIBE.CROPGNAT_INFESTER = "THEY BITE EVEN THE IRON?"
 S_WICKERBOTTOM.DESCRIBE.CROPGNAT_INFESTER = "Aggressive and can be attracted by light."
--- S_______WOODIE.DESCRIBE.CROPGNAT_INFESTER = "Hah. Not as funny as Chaplin."
--- S______WAXWELL.DESCRIBE.CROPGNAT_INFESTER = "Hm... No Monster child, no future trouble."
--- S___WATHGRITHR.DESCRIBE.CROPGNAT_INFESTER = "I've somehow found a way to make it even LESS appealing!"
--- S_______WEBBER.DESCRIBE.CROPGNAT_INFESTER = "We don't want to grow up, do you?"
+-- S_______WOODIE.DESCRIBE.CROPGNAT_INFESTER = ""
+-- S______WAXWELL.DESCRIBE.CROPGNAT_INFESTER = ""
+-- S___WATHGRITHR.DESCRIBE.CROPGNAT_INFESTER = ""
+-- S_______WEBBER.DESCRIBE.CROPGNAT_INFESTER = ""
 S_______WINONA.DESCRIBE.CROPGNAT_INFESTER = "Oh my, the noise is terrible."
 S_______WORTOX.DESCRIBE.CROPGNAT_INFESTER = "Hah, you have to get used to this in the wild."
 S_____WORMWOOD.DESCRIBE.CROPGNAT_INFESTER = "Some friends who would bite a friend."
+-- S________WARLY.DESCRIBE.CROPGNAT_INFESTER = ""
+-- S_________WURT.DESCRIBE.CROPGNAT_INFESTER = ""
+-- S_______WALTER.DESCRIBE.CROPGNAT_INFESTER = ""
+-- S________WANDA.DESCRIBE.CROPGNAT_INFESTER = ""
 
 S_NAMES.AHANDFULOFWINGS = "A Handful of Wings"    --一捧翅膀
 S______GENERIC.DESCRIBE.AHANDFULOFWINGS = "A handful of very small insect wings."
--- S_______WILLOW.DESCRIBE.AHANDFULOFWINGS = "Stupid bugs will be attracted by my fire."
--- S_____WOLFGANG.DESCRIBE.AHANDFULOFWINGS = "Ouch! these little monsters bite!"
--- S________WENDY.DESCRIBE.AHANDFULOFWINGS = "Baby's always so cute, grown one's not."
--- S_________WX78.DESCRIBE.AHANDFULOFWINGS = "THEY BITE EVEN THE IRON?"
--- S_WICKERBOTTOM.DESCRIBE.AHANDFULOFWINGS = "Aggressive and can be attracted by light."
--- S_______WOODIE.DESCRIBE.AHANDFULOFWINGS = "Hah. Not as funny as Chaplin."
--- S______WAXWELL.DESCRIBE.AHANDFULOFWINGS = "Hm... No Monster child, no future trouble."
--- S___WATHGRITHR.DESCRIBE.AHANDFULOFWINGS = "I've somehow found a way to make it even LESS appealing!"
--- S_______WEBBER.DESCRIBE.AHANDFULOFWINGS = "We don't want to grow up, do you?"
--- S_______WINONA.DESCRIBE.AHANDFULOFWINGS = "Oh my, the noise is terrible."
--- S_______WORTOX.DESCRIBE.AHANDFULOFWINGS = "Hah, you have to get used to this in the wild."
--- S_____WORMWOOD.DESCRIBE.AHANDFULOFWINGS = "Some friends who would bite a friend."
+-- S_______WILLOW.DESCRIBE.AHANDFULOFWINGS = ""
+-- S_____WOLFGANG.DESCRIBE.AHANDFULOFWINGS = ""
+-- S________WENDY.DESCRIBE.AHANDFULOFWINGS = ""
+-- S_________WX78.DESCRIBE.AHANDFULOFWINGS = ""
+-- S_WICKERBOTTOM.DESCRIBE.AHANDFULOFWINGS = ""
+-- S_______WOODIE.DESCRIBE.AHANDFULOFWINGS = ""
+-- S______WAXWELL.DESCRIBE.AHANDFULOFWINGS = ""
+-- S___WATHGRITHR.DESCRIBE.AHANDFULOFWINGS = ""
+-- S_______WEBBER.DESCRIBE.AHANDFULOFWINGS = ""
+-- S_______WINONA.DESCRIBE.AHANDFULOFWINGS = ""
+-- S_______WORTOX.DESCRIBE.AHANDFULOFWINGS = ""
+-- S_____WORMWOOD.DESCRIBE.AHANDFULOFWINGS = ""
+-- S________WARLY.DESCRIBE.AHANDFULOFWINGS = ""
+-- S_________WURT.DESCRIBE.AHANDFULOFWINGS = ""
+-- S_______WALTER.DESCRIBE.AHANDFULOFWINGS = ""
+-- S________WANDA.DESCRIBE.AHANDFULOFWINGS = ""
 
 S_NAMES.BOLTWINGOUT = "Boltwing-out"    --脱壳之翅
 S_RECIPE_DESC.BOLTWINGOUT = "Make a bolt for it."
 S______GENERIC.DESCRIBE.BOLTWINGOUT = "It's like a bolt out of threats."
--- S_______WILLOW.DESCRIBE.BOLTWINGOUT = "Stupid bugs will be attracted by my fire."
--- S_____WOLFGANG.DESCRIBE.BOLTWINGOUT = "Ouch! these little monsters bite!"
--- S________WENDY.DESCRIBE.BOLTWINGOUT = "Baby's always so cute, grown one's not."
--- S_________WX78.DESCRIBE.BOLTWINGOUT = "THEY BITE EVEN THE IRON?"
--- S_WICKERBOTTOM.DESCRIBE.BOLTWINGOUT = "Aggressive and can be attracted by light."
--- S_______WOODIE.DESCRIBE.BOLTWINGOUT = "Hah. Not as funny as Chaplin."
+-- S_______WILLOW.DESCRIBE.BOLTWINGOUT = ""
+-- S_____WOLFGANG.DESCRIBE.BOLTWINGOUT = ""
+-- S________WENDY.DESCRIBE.BOLTWINGOUT = ""
+-- S_________WX78.DESCRIBE.BOLTWINGOUT = ""
+-- S_WICKERBOTTOM.DESCRIBE.BOLTWINGOUT = ""
+-- S_______WOODIE.DESCRIBE.BOLTWINGOUT = ""
 S______WAXWELL.DESCRIBE.BOLTWINGOUT = "Learning the way of insect survival."
 S___WATHGRITHR.DESCRIBE.BOLTWINGOUT = "Tsk-tsk! A real warrior never runs away!"
--- S_______WEBBER.DESCRIBE.BOLTWINGOUT = "We don't want to grow up, do you?"
+-- S_______WEBBER.DESCRIBE.BOLTWINGOUT = ""
 S_______WINONA.DESCRIBE.BOLTWINGOUT = "I just wanna run... hide it away!"
 S_______WORTOX.DESCRIBE.BOLTWINGOUT = "Meh, I can do the same thing with souls."
--- S_____WORMWOOD.DESCRIBE.BOLTWINGOUT = "Some friends who would bite a friend."
+-- S_____WORMWOOD.DESCRIBE.BOLTWINGOUT = ""
+-- S________WARLY.DESCRIBE.BOLTWINGOUT = ""
+-- S_________WURT.DESCRIBE.BOLTWINGOUT = ""
+-- S_______WALTER.DESCRIBE.BOLTWINGOUT = ""
+-- S________WANDA.DESCRIBE.BOLTWINGOUT = ""
 
 S_NAMES.BOLTWINGOUT_SHUCK = "Post-eclosion Shuck"  --羽化后的壳
 S______GENERIC.DESCRIBE.BOLTWINGOUT_SHUCK = "Hah! Most creatures don't know it's just a shuck."
 S_______WILLOW.DESCRIBE.BOLTWINGOUT_SHUCK = "What a big fake bug, I can burn it!"
--- S_____WOLFGANG.DESCRIBE.BOLTWINGOUT_SHUCK = "Ouch! these little monsters bite!"
--- S________WENDY.DESCRIBE.BOLTWINGOUT_SHUCK = "Baby's always so cute, grown one's not."
+-- S_____WOLFGANG.DESCRIBE.BOLTWINGOUT_SHUCK = ""
+-- S________WENDY.DESCRIBE.BOLTWINGOUT_SHUCK = ""
 S_________WX78.DESCRIBE.BOLTWINGOUT_SHUCK = "A CRAFTY BUG!"
--- S_WICKERBOTTOM.DESCRIBE.BOLTWINGOUT_SHUCK = "Aggressive and can be attracted by light."
--- S_______WOODIE.DESCRIBE.BOLTWINGOUT_SHUCK = "Hah. Not as funny as Chaplin."
+-- S_WICKERBOTTOM.DESCRIBE.BOLTWINGOUT_SHUCK = ""
+-- S_______WOODIE.DESCRIBE.BOLTWINGOUT_SHUCK = ""
 S______WAXWELL.DESCRIBE.BOLTWINGOUT_SHUCK = "For the weak, escape is the best policy."
--- S___WATHGRITHR.DESCRIBE.BOLTWINGOUT_SHUCK = "I've somehow found a way to make it even LESS appealing!"
+-- S___WATHGRITHR.DESCRIBE.BOLTWINGOUT_SHUCK = ""
 S_______WEBBER.DESCRIBE.BOLTWINGOUT_SHUCK = "We'll not want our old skin after molting."
 S_______WINONA.DESCRIBE.BOLTWINGOUT_SHUCK = "The shuck is not a shuck."
--- S_______WORTOX.DESCRIBE.BOLTWINGOUT_SHUCK = "Hah, you have to get used to this in the wild."
+-- S_______WORTOX.DESCRIBE.BOLTWINGOUT_SHUCK = ""
 S_____WORMWOOD.DESCRIBE.BOLTWINGOUT_SHUCK = "Hey friend, are you still here?"
+-- S________WARLY.DESCRIBE.BOLTWINGOUT_SHUCK = ""
+-- S_________WURT.DESCRIBE.BOLTWINGOUT_SHUCK = ""
+-- S_______WALTER.DESCRIBE.BOLTWINGOUT_SHUCK = ""
+-- S________WANDA.DESCRIBE.BOLTWINGOUT_SHUCK = ""
 
 S_NAMES.CATMINT = "Catmint"   --猫薄荷
 S______GENERIC.DESCRIBE.CATMINT = "It smells clean and natural."
@@ -1988,6 +1857,8 @@ S_______WORTOX.DESCRIBE.CATMINT = "Nah, I don't like it."
 S_____WORMWOOD.DESCRIBE.CATMINT = "Hello, fragrant friend."
 S________WARLY.DESCRIBE.CATMINT = "I wish I could use it as a spice."
 S_________WURT.DESCRIBE.CATMINT = "Good for vegetarianism, good for me."
+-- S_______WALTER.DESCRIBE.CATMINT = ""
+-- S________WANDA.DESCRIBE.CATMINT = ""
 
 S_NAMES.CATTENBALL = "Cat Wool Ball"   --猫线球
 S______GENERIC.DESCRIBE.CATTENBALL = "Although it's poured from the stomach, it's lovely."
@@ -2005,6 +1876,122 @@ S_______WORTOX.DESCRIBE.CATTENBALL = "Look! it's the same color as me."
 -- S_____WORMWOOD.DESCRIBE.CATTENBALL = ""
 -- S________WARLY.DESCRIBE.CATTENBALL = ""
 S_________WURT.DESCRIBE.CATTENBALL = "A witch living in the desert mirage would love this!"
+-- S_______WALTER.DESCRIBE.CATTENBALL = ""
+-- S________WANDA.DESCRIBE.CATTENBALL = ""
+
+S_NAMES.SIVING_ROCKS = "Siving Stone"   --子圭石
+S______GENERIC.DESCRIBE.SIVING_ROCKS = "A lively power is roaming about its inside."
+S_______WILLOW.DESCRIBE.SIVING_ROCKS = "Yes, I don't want to burn at all."
+S_____WOLFGANG.DESCRIBE.SIVING_ROCKS = "Pretty little stone."
+S________WENDY.DESCRIBE.SIVING_ROCKS = "I'm wasting my time, I got nothing to do."
+S_________WX78.DESCRIBE.SIVING_ROCKS = "Like me, non carbon based life."
+S_WICKERBOTTOM.DESCRIBE.SIVING_ROCKS = "I'm shocked that this ore has life activity!"
+S_______WOODIE.DESCRIBE.SIVING_ROCKS = "It looks like a leaf."
+S______WAXWELL.DESCRIBE.SIVING_ROCKS = "Is this the legendary ..."
+S___WATHGRITHR.DESCRIBE.SIVING_ROCKS = "Is it fallen leaves of the world tree?!"
+S_______WEBBER.DESCRIBE.SIVING_ROCKS = "Hee hee, the rare stones have increased!"
+S_______WINONA.DESCRIBE.SIVING_ROCKS = "Mysterious green looks at me in it."
+S_______WORTOX.DESCRIBE.SIVING_ROCKS = "It's really unusual in this world."
+S_____WORMWOOD.DESCRIBE.SIVING_ROCKS = "Part of a stone friend."
+S________WARLY.DESCRIBE.SIVING_ROCKS = "If it doesn't involve my field, I won't say more."
+S_________WURT.DESCRIBE.SIVING_ROCKS = "I've seen this in my hometown."
+S_______WALTER.DESCRIBE.SIVING_ROCKS = "Aha, species discovery!"
+S________WANDA.DESCRIBE.SIVING_ROCKS = "It's dazzling in the sun."
+
+S_NAMES.SIVING_DERIVANT_ITEM = "Unplanted Siving Derivant-zero"  --未种下的子圭一型岩
+S______GENERIC.DESCRIBE.SIVING_DERIVANT_ITEM = "I'd like to see what it will look like."
+-- S_______WILLOW.DESCRIBE.SIVING_DERIVANT_ITEM = ""
+-- S_____WOLFGANG.DESCRIBE.SIVING_DERIVANT_ITEM = ""
+-- S________WENDY.DESCRIBE.SIVING_DERIVANT_ITEM = ""
+-- S_________WX78.DESCRIBE.SIVING_DERIVANT_ITEM = ""
+S_WICKERBOTTOM.DESCRIBE.SIVING_DERIVANT_ITEM = "It is worth studying after planting."
+-- S_______WOODIE.DESCRIBE.SIVING_DERIVANT_ITEM = ""
+S______WAXWELL.DESCRIBE.SIVING_DERIVANT_ITEM = "It's rare, don't let me down."
+S___WATHGRITHR.DESCRIBE.SIVING_DERIVANT_ITEM = "Is it a derivant of the world tree?!"
+-- S_______WEBBER.DESCRIBE.SIVING_DERIVANT_ITEM = ""
+-- S_______WINONA.DESCRIBE.SIVING_DERIVANT_ITEM = ""
+-- S_______WORTOX.DESCRIBE.SIVING_DERIVANT_ITEM = ""
+S_____WORMWOOD.DESCRIBE.SIVING_DERIVANT_ITEM = "Stone friend's child is still sleeping."
+-- S________WARLY.DESCRIBE.SIVING_DERIVANT_ITEM = ""
+S_________WURT.DESCRIBE.SIVING_DERIVANT_ITEM = "This is its seed, which needs to be planted in the soil."
+-- S_______WALTER.DESCRIBE.SIVING_DERIVANT_ITEM = ""
+-- S________WANDA.DESCRIBE.SIVING_DERIVANT_ITEM = ""
+
+S_NAMES.SIVING_DERIVANT_LVL0 = "Siving Derivant-zero"    --子圭一型岩
+S______GENERIC.DESCRIBE.SIVING_DERIVANT_LVL0 = "No sign of growth."
+-- S_______WILLOW.DESCRIBE.SIVING_DERIVANT_LVL0 = ""
+-- S_____WOLFGANG.DESCRIBE.SIVING_DERIVANT_LVL0 = ""
+-- S________WENDY.DESCRIBE.SIVING_DERIVANT_LVL0 = ""
+-- S_________WX78.DESCRIBE.SIVING_DERIVANT_LVL0 = ""
+S_WICKERBOTTOM.DESCRIBE.SIVING_DERIVANT_LVL0 = "It's worth studying."
+-- S_______WOODIE.DESCRIBE.SIVING_DERIVANT_LVL0 = ""
+-- S______WAXWELL.DESCRIBE.SIVING_DERIVANT_LVL0 = ""
+S___WATHGRITHR.DESCRIBE.SIVING_DERIVANT_LVL0 = "I hope it can grow into a world tree."
+-- S_______WEBBER.DESCRIBE.SIVING_DERIVANT_LVL0 = ""
+-- S_______WINONA.DESCRIBE.SIVING_DERIVANT_LVL0 = ""
+-- S_______WORTOX.DESCRIBE.SIVING_DERIVANT_LVL0 = ""
+S_____WORMWOOD.DESCRIBE.SIVING_DERIVANT_LVL0 = "Stone friend's child wakes up."
+-- S________WARLY.DESCRIBE.SIVING_DERIVANT_LVL0 = ""
+S_________WURT.DESCRIBE.SIVING_DERIVANT_LVL0 = "Just wait for it, glorp."
+-- S_______WALTER.DESCRIBE.SIVING_DERIVANT_LVL0 = ""
+S________WANDA.DESCRIBE.SIVING_DERIVANT_LVL0 = "It takes more than a little time."
+
+S_NAMES.SIVING_DERIVANT_LVL1 = "Siving Derivant-one"    --子圭木型岩
+S______GENERIC.DESCRIBE.SIVING_DERIVANT_LVL1 = "Great, it's finally grown up a little."
+-- S_______WILLOW.DESCRIBE.SIVING_DERIVANT_LVL1 = ""
+-- S_____WOLFGANG.DESCRIBE.SIVING_DERIVANT_LVL1 = ""
+S________WENDY.DESCRIBE.SIVING_DERIVANT_LVL1 = "Full of hope."
+-- S_________WX78.DESCRIBE.SIVING_DERIVANT_LVL1 = ""
+S_WICKERBOTTOM.DESCRIBE.SIVING_DERIVANT_LVL1 = "Yes, it's worth watching."
+-- S_______WOODIE.DESCRIBE.SIVING_DERIVANT_LVL1 = ""
+-- S______WAXWELL.DESCRIBE.SIVING_DERIVANT_LVL1 = ""
+-- S___WATHGRITHR.DESCRIBE.SIVING_DERIVANT_LVL1 = ""
+-- S_______WEBBER.DESCRIBE.SIVING_DERIVANT_LVL1 = ""
+-- S_______WINONA.DESCRIBE.SIVING_DERIVANT_LVL1 = ""
+-- S_______WORTOX.DESCRIBE.SIVING_DERIVANT_LVL1 = ""
+S_____WORMWOOD.DESCRIBE.SIVING_DERIVANT_LVL1 = "Growing healthily."
+-- S________WARLY.DESCRIBE.SIVING_DERIVANT_LVL1 = ""
+-- S_________WURT.DESCRIBE.SIVING_DERIVANT_LVL1 = ""
+-- S_______WALTER.DESCRIBE.SIVING_DERIVANT_LVL1 = ""
+S________WANDA.DESCRIBE.SIVING_DERIVANT_LVL1 = "It needs more than a little time to grow."
+
+S_NAMES.SIVING_DERIVANT_LVL2 = "Siving Derivant-two"    --子圭林型岩
+S______GENERIC.DESCRIBE.SIVING_DERIVANT_LVL2 = "That's great, it looks good."
+-- S_______WILLOW.DESCRIBE.SIVING_DERIVANT_LVL2 = ""
+-- S_____WOLFGANG.DESCRIBE.SIVING_DERIVANT_LVL2 = ""
+-- S________WENDY.DESCRIBE.SIVING_DERIVANT_LVL2 = ""
+-- S_________WX78.DESCRIBE.SIVING_DERIVANT_LVL2 = ""
+S_WICKERBOTTOM.DESCRIBE.SIVING_DERIVANT_LVL2 = "I will continue to study it."
+-- S_______WOODIE.DESCRIBE.SIVING_DERIVANT_LVL2 = ""
+-- S______WAXWELL.DESCRIBE.SIVING_DERIVANT_LVL2 = ""
+-- S___WATHGRITHR.DESCRIBE.SIVING_DERIVANT_LVL2 = ""
+-- S_______WEBBER.DESCRIBE.SIVING_DERIVANT_LVL2 = ""
+-- S_______WINONA.DESCRIBE.SIVING_DERIVANT_LVL2 = ""
+-- S_______WORTOX.DESCRIBE.SIVING_DERIVANT_LVL2 = ""
+S_____WORMWOOD.DESCRIBE.SIVING_DERIVANT_LVL2 = "Taller than me."
+-- S________WARLY.DESCRIBE.SIVING_DERIVANT_LVL2 = ""
+S_________WURT.DESCRIBE.SIVING_DERIVANT_LVL2 = "I've never planted it alive, florpt!"
+-- S_______WALTER.DESCRIBE.SIVING_DERIVANT_LVL2 = ""
+S________WANDA.DESCRIBE.SIVING_DERIVANT_LVL2 = "This time is a little time for me."
+
+S_NAMES.SIVING_DERIVANT_LVL3 = "Siving Derivant-three"  --子圭森型岩
+S______GENERIC.DESCRIBE.SIVING_DERIVANT_LVL3 = "The stone grows luxuriantly."
+S_______WILLOW.DESCRIBE.SIVING_DERIVANT_LVL3 = "Can't burn it again. Give it a bad comment."
+-- S_____WOLFGANG.DESCRIBE.SIVING_DERIVANT_LVL3 = ""
+-- S________WENDY.DESCRIBE.SIVING_DERIVANT_LVL3 = ""
+-- S_________WX78.DESCRIBE.SIVING_DERIVANT_LVL3 = ""
+S_WICKERBOTTOM.DESCRIBE.SIVING_DERIVANT_LVL3 = "Should be its final form."
+S_______WOODIE.DESCRIBE.SIVING_DERIVANT_LVL3 = "Axe can't work with it."
+-- S______WAXWELL.DESCRIBE.SIVING_DERIVANT_LVL3 = ""
+-- S___WATHGRITHR.DESCRIBE.SIVING_DERIVANT_LVL3 = ""
+-- S_______WEBBER.DESCRIBE.SIVING_DERIVANT_LVL3 = ""
+-- S_______WINONA.DESCRIBE.SIVING_DERIVANT_LVL3 = ""
+S_______WORTOX.DESCRIBE.SIVING_DERIVANT_LVL3 = "No matter how good it looks, it has no soul."
+S_____WORMWOOD.DESCRIBE.SIVING_DERIVANT_LVL3 = "Mature stone friends."
+S________WARLY.DESCRIBE.SIVING_DERIVANT_LVL3 = "The least rare is strange."
+S_________WURT.DESCRIBE.SIVING_DERIVANT_LVL3 = "Deep in the forest of my hometown, all these things."
+-- S_______WALTER.DESCRIBE.SIVING_DERIVANT_LVL3 = ""
+S________WANDA.DESCRIBE.SIVING_DERIVANT_LVL3 = "It's amazing, but not surprised."
 
 --------------------------------------------------------------------------
 --[[ flash and crush ]]--[[ 电闪雷鸣 ]]

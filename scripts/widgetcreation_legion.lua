@@ -157,7 +157,7 @@ if CONFIGS_LEGION.LEGENDOFFALL then
                 moonbutterflywings = 1, --月蛾翅膀
                 moonbutterfly = 0.3,    --月蛾
             }
-            return costs[item.prefab] ~= nil
+            return costs[item.prefab] ~= nil or item:HasTag("yes_boltout")
         end
     }
     for y = 0, 3 do

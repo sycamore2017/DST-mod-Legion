@@ -52,49 +52,51 @@ local function onequip(inst, owner)
     if owner.components.combat ~= nil and owner.set_l_bolt == nil then
         owner.GetAttacked_old = owner.components.combat.GetAttacked
         owner.components.combat.GetAttacked = function(self, attacker, damage, weapon, stimuli)
-            if not owner.set_l_bolt then
-                return owner.GetAttacked_old(self, attacker, damage, weapon, stimuli)
+            if
+                not self.inst.set_l_bolt
+                or (self.inst.components.health == nil or self.inst.components.health:IsDead())
+            then
+                return self.inst.GetAttacked_old(self, attacker, damage, weapon, stimuli)
             end
 
-            local attackerinfact = weapon or attacker
-
+            local attackerinfact = weapon or attacker --武器写在前面是为了优先躲避远程武器
             if
                 (self.inst.components.rider ~= nil and self.inst.components.rider:IsRiding()) --在骑牛
-                or self.inst:HasTag("beaver") --变成了海狸
                 or self.inst.sg:HasStateTag("busy") --在做特殊动作，攻击sg不会带这个标签
                 or stimuli == "darkness" --黑暗攻击
                 or attackerinfact == nil --无实物的攻击
                 or damage <= 0
             then
-                return owner.GetAttacked_old(self, attacker, damage, weapon, stimuli)
+                return self.inst.GetAttacked_old(self, attacker, damage, weapon, stimuli)
             end
 
             --识别特定数量的材料来触发金蝉脱壳效果
-            local finalitem = nil
-            inst.components.container:FindItem(function(item)
+            local finalitem = inst.components.container:FindItem(function(item)
+                local value = item.bolt_l_value or BOLTCOST[item.prefab]
                 if
-                    BOLTCOST[item.prefab] ~= nil
-                    and BOLTCOST[item.prefab] <= (item.components.stackable ~= nil and item.components.stackable:StackSize() or 1)
+                    value ~= nil and
+                    value <= (item.components.stackable ~= nil and item.components.stackable:StackSize() or 1)
                 then
-                    finalitem = item
                     return true
                 end
                 return false
             end)
 
             if finalitem ~= nil then
-                --删除对应数量的材料
-                if BOLTCOST[finalitem.prefab] >= 1 then
-                    if finalitem.components.stackable ~= nil then
-                        finalitem.components.stackable:Get(BOLTCOST[finalitem.prefab]):Remove()
-                    else
-                        finalitem:Remove()
-                    end
-                elseif math.random() <= BOLTCOST[finalitem.prefab] then
-                    if finalitem.components.stackable ~= nil then
-                        finalitem.components.stackable:Get():Remove()
-                    else
-                        finalitem:Remove()
+                local value = finalitem.bolt_l_value or BOLTCOST[finalitem.prefab]
+                if value ~= nil then --删除对应数量的材料
+                    if value >= 1 then
+                        if finalitem.components.stackable ~= nil then
+                            finalitem.components.stackable:Get(value):Remove()
+                        else
+                            finalitem:Remove()
+                        end
+                    elseif math.random() < value then
+                        if finalitem.components.stackable ~= nil then
+                            finalitem.components.stackable:Get():Remove()
+                        else
+                            finalitem:Remove()
+                        end
                     end
                 end
 
@@ -105,7 +107,7 @@ local function onequip(inst, owner)
                     attacker.components.combat:SetTarget(nil)
                 end
             else
-                owner.GetAttacked_old(self, attacker, damage, weapon, stimuli)
+                self.inst.GetAttacked_old(self, attacker, damage, weapon, stimuli)
             end
         end
     end
@@ -127,9 +129,7 @@ local function onburnt(inst)
         inst.components.container:DropEverything()
         inst.components.container:Close()
     end
-
     SpawnPrefab("ash").Transform:SetPosition(inst.Transform:GetWorldPosition())
-
     inst:Remove()
 end
 
@@ -160,7 +160,6 @@ local function fn()
 
     inst:AddTag("backpack")
 
-    -- inst.foleysound = "legion/foleysound/dragonfly_flap"
     inst.foleysound = "legion/foleysound/insect"
 
     MakeInventoryFloatable(inst, "small", 0.2, 0.45)
@@ -213,7 +212,7 @@ local assets_shuck = {
 
 local function AttractEnemies(inst)
     local pos = inst:GetPosition()
-    local ents = TheSim:FindEntities(pos.x, pos.y, pos.z, 8, { "_combat" }, { "DECOR", "NOCLICK", "FX", "shadow", "playerghost", "INLIMBO" })
+    local ents = TheSim:FindEntities(pos.x, pos.y, pos.z, 8, { "_combat" }, { "DECOR", "NOCLICK", "FX", "playerghost", "INLIMBO" })
     for k, v in pairs(ents) do
         if v ~= inst and v.components.combat ~= nil and v.components.combat:CanTarget(inst) then
             v.components.combat:SetTarget(inst)
@@ -259,10 +258,13 @@ end
 local function OnKilled(inst)
     inst.AnimState:PlayAnimation("cocoon_dead")
 
-    -- RemovePhysicsColliders(inst)
-
     inst.SoundEmitter:KillSound("loop")
     inst.SoundEmitter:PlaySound("dontstarve/creatures/spider/spiderLair_destroy")
+
+    if inst.task_remove ~= nil then
+        inst.task_remove:Cancel()
+        inst.task_remove = nil
+    end
 end
 
 local function OnEntityWake(inst)
@@ -271,6 +273,11 @@ end
 
 local function OnEntitySleep(inst)
     inst.SoundEmitter:KillSound("loop")
+    if inst.task_remove ~= nil then
+        inst.task_remove:Cancel()
+        inst.task_remove = nil
+    end
+
     inst:Remove()
 end
 
@@ -279,10 +286,9 @@ local function OnHaunt(inst)
         OnHit(inst)
         inst.components.hauntable.hauntvalue = TUNING.HAUNT_COOLDOWN_MEDIUM
 
-        if math.random() <= 0.33 then --有33%的几率再次吸引敌人，应该有特殊的作用吧
-            AttractEnemies(inst)
+        if inst.task_remove ~= nil then
+            AttractEnemies(inst) --再次吸引敌人，应该有特殊的作用吧
         end
-
         return true
     end
     return false
@@ -340,8 +346,12 @@ local function fn_shuck()
     MakeSnowCovered(inst)
 
     inst:DoTaskInTime(0, OnInit)
+    inst.task_remove = inst:DoTaskInTime(15+math.random()*3, function(inst)
+        inst.task_remove = nil
+        inst.components.health:Kill() --该函数自带当前生命的判断
+    end)
 
-    inst.persists = false --保存时不会被记录下来
+    inst.persists = false
 
     inst.OnEntitySleep = OnEntitySleep
     inst.OnEntityWake = OnEntityWake

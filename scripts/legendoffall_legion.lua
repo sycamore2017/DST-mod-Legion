@@ -3,6 +3,7 @@ local prefabFiles = {
     "farm_plants_legion",
     "cropgnat",
     "ahandfulofwings",
+    "boltwingout",
 }
 
 for k,v in pairs(prefabFiles) do
@@ -399,3 +400,90 @@ AddStategraphActionHandler("wilson", ActionHandler(ACTIONS.POUR_WATER_LEGION, fu
         or "dolongaction"
 end))
 AddStategraphActionHandler("wilson_client", ActionHandler(ACTIONS.POUR_WATER_LEGION, "pour"))
+
+--------------------------------------------------------------------------
+--[[ 脱壳之翅的sg ]]
+--------------------------------------------------------------------------
+
+AddStategraphState("wilson", State{
+    name = "boltout",
+    tags = { "busy", "doing", "nointerrupt", "canrotate" },
+
+    onenter = function(inst, data)
+        if data == nil or data.escapepos == nil then
+            inst.sg:GoToState("idle", true)
+            return
+        end
+
+        _G.ForceStopHeavyLifting_legion(inst) --虽然目前的触发条件并不可能有背着重物的情况，因为本身就是背包的功能，但是为了兼容性...
+        inst.components.locomotor:Stop()
+        inst:ClearBufferedAction()
+
+        -- inst.components.inventory:Hide()    --物品栏与科技栏消失
+        -- inst:PushEvent("ms_closepopups")    --关掉打开着的箱子、冰箱等
+        if inst.components.playercontroller ~= nil then
+            inst.components.playercontroller:EnableMapControls(false)   --不能打开地图
+            inst.components.playercontroller:Enable(false)  --玩家不能操控
+            inst.components.playercontroller:RemotePausePrediction()
+        end
+
+        inst.AnimState:PlayAnimation("slide_pre")
+        inst.AnimState:PushAnimation("slide_loop")
+        inst.SoundEmitter:PlaySound("legion/common/slide_boltout")
+
+        SpawnPrefab("boltwingout_fx").Transform:SetPosition(inst.Transform:GetWorldPosition())
+        SpawnPrefab("boltwingout_shuck").Transform:SetPosition(inst.Transform:GetWorldPosition())
+
+        local angle = inst:GetAngleToPoint(data.escapepos) + 180 + 45 * (1 - 2 * math.random())
+        if angle > 360 then
+            angle = angle - 360
+        end
+        inst.Transform:SetRotation(angle)
+        inst.Physics:SetMotorVel(20, 0, 0)
+        -- inst.components.locomotor:EnableGroundSpeedMultiplier(false) --为了神话书说的腾云
+
+        inst.sg:SetTimeout(0.3)
+    end,
+
+    onupdate = function(inst, dt) --每帧刷新加速度，不这样写的话，若玩家在进入该sg前在左右横跳会导致加速度停止
+        inst.Physics:SetMotorVel(21, 0, 0)
+    end,
+
+    ontimeout = function(inst)
+        inst.sg:GoToState("boltout_pst")
+    end,
+
+    onexit = function(inst)
+        inst.Physics:Stop()
+        -- inst.components.locomotor:EnableGroundSpeedMultiplier(true)
+
+        -- inst.components.inventory:Show()
+        if inst.components.playercontroller ~= nil then
+            inst.components.playercontroller:EnableMapControls(true)
+            inst.components.playercontroller:Enable(true)
+        end
+    end,
+})
+AddStategraphState("wilson", State{
+    name = "boltout_pst",
+    -- tags = {"evade","no_stun"},
+
+    onenter = function(inst)
+        inst.AnimState:PlayAnimation("slide_pst")
+    end,
+
+    events =
+    {
+        EventHandler("animover", function(inst)
+            inst.sg:GoToState("idle")
+        end ),
+    }
+})
+
+AddStategraphEvent("wilson", EventHandler("boltout",
+    function(inst, data)
+        if not inst.sg:HasStateTag("busy") and inst.components.health ~= nil and not inst.components.health:IsDead() then
+            inst.sg:GoToState("boltout", data)
+        end
+    end)
+)

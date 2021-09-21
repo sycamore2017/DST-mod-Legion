@@ -126,6 +126,17 @@ _G.DropItem_legion = function(itemname, x, y, z, hitrange, hitdamage, fallingtim
     end
 end
 
+--[ sg：sg中卸下装备的重物 ]--
+_G.ForceStopHeavyLifting_legion = function(inst)
+    if inst.components.inventory:IsHeavyLifting() then
+        inst.components.inventory:DropItem(
+            inst.components.inventory:Unequip(EQUIPSLOTS.BODY),
+            true,
+            true
+        )
+    end
+end
+
 --------------------------------------------------------------------------
 --[[ 清理机制：让腐烂物、牛粪、鸟粪自动消失 ]]
 --------------------------------------------------------------------------
