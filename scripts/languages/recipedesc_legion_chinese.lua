@@ -275,6 +275,26 @@ return {
             cook_cant = "怪物/菜/肉/鱼/蛋/脂/乳度 非食",
             recipe_count = 6,
         },
+        koalefig_trunk = {
+            cook_need = "(烤)无花果 (烤)冬/夏象鼻",
+            cook_cant = nil,
+            recipe_count = 6,
+        },
+        figatoni = {
+            cook_need = "(烤)无花果 菜度≥2",
+            cook_cant = "肉度",
+            recipe_count = 6,
+        },
+        figkabab = {
+            cook_need = "(烤)无花果 树枝 肉度≥1",
+            cook_cant = "怪物度≤1",
+            recipe_count = 6,
+        },
+        frognewton = {
+            cook_need = "(烤)无花果 (烤)蛙腿",
+            cook_cant = nil,
+            recipe_count = 6,
+        },
     },
     warly = {
         nightmarepie = {

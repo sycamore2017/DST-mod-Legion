@@ -99,6 +99,5 @@ local function GenerateSpicedFoods(foods)
 end
 
 GenerateSpicedFoods(require("preparedfoods_legion"))
-GenerateSpicedFoods(require("preparedfoods_particular"))
 
 return foods_spiced

@@ -184,9 +184,6 @@ local prefs = {}
 for k, v in pairs(require("preparedfoods_legion")) do
     table.insert(prefs, MakePreparedFood(v))
 end
-for k, v in pairs(require("preparedfoods_particular")) do
-    table.insert(prefs, MakePreparedFood(v))
-end
 for k, v in pairs(require("preparedfoods_spiced")) do
     table.insert(prefs, MakePreparedFood(v))
 end

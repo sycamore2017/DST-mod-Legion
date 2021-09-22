@@ -9,8 +9,7 @@
                  （3）新增脱壳之翅
     3.【电闪雷鸣】（1）牛铃和紫金葫芦等(具有容器的、无法放入打包纸的、不可摧毁的)道具不再能放入驮运鞍具中；
                  （2）素白蘑菇帽的技能可以治愈多年生作物的病/害
-
-    4.【美味佳肴】（1）新增料理油鱼寿司
+    4.【美味佳肴】（1）新增料理：果泥香煎鱼。满足群友们的恶趣味[滑稽]
 ]]
 
 --------------------------------------------------------------------------
@@ -363,15 +362,6 @@ if TUNING.LEGION_SUPERBCUISINE then
     AddIngredientValues({"foliage"}, {decoration=1}, false, false)   --蕨叶
 
     for k, recipe in pairs(require("preparedfoods_legion")) do
-        table.insert(Assets, Asset("ATLAS", "images/cookbookimages/"..recipe.name..".xml"))
-        table.insert(Assets, Asset("IMAGE", "images/cookbookimages/"..recipe.name..".tex"))
-
-        AddCookerRecipe("cookpot", recipe)
-        AddCookerRecipe("portablecookpot", recipe)
-        RegisterInventoryItemAtlas("images/cookbookimages/"..recipe.name..".xml", recipe.name..".tex")
-    end
-
-    for k, recipe in pairs(require("preparedfoods_particular")) do
         table.insert(Assets, Asset("ATLAS", "images/cookbookimages/"..recipe.name..".xml"))
         table.insert(Assets, Asset("IMAGE", "images/cookbookimages/"..recipe.name..".tex"))
 

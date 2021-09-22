@@ -358,9 +358,6 @@ table.insert(prefs, Prefab( --子圭一型岩(物品)
     { "siving_derivant_lvl0" }
 ))
 
---子圭一型岩(placer)
-table.insert(prefs, MakePlacer("siving_derivant_item_placer", "siving_derivants", "siving_derivants", "lvl0"))
-
 --------------------------------------------------------------------------
 --[[ 子圭神木 ]]
 --------------------------------------------------------------------------
@@ -387,7 +384,7 @@ local function OnStealLife(inst, value)
         end
     else    --如果玄鸟活着(但没上场)，每500生命有几率掉落子圭石
         if inst.countHealth >= 500 then
-            if math.random() < 0.3 then
+            if math.random() < 0.1 then
                 DropRock(inst)
             end
             inst.countHealth = inst.countHealth - 500
@@ -597,13 +594,13 @@ table.insert(prefs, Prefab(
         inst.entity:AddMiniMapEntity()
         inst.entity:AddLight()
 
+        inst.MiniMapEntity:SetIcon("siving_thetree.tex")
+
         MakeObstaclePhysics(inst, 1.8)
 
         inst.AnimState:SetBank("siving_thetree")
         inst.AnimState:SetBuild("siving_thetree")
         inst.AnimState:PlayAnimation("idle")
-
-        inst.MiniMapEntity:SetIcon("siving_thetree.tex")
 
         inst.Light:Enable(false)
         inst.Light:SetRadius(3.5)
@@ -809,6 +806,7 @@ table.insert(prefs, Prefab(
         inst.AnimState:PlayAnimation("item")
 
         inst:AddTag("molebait")
+        inst:AddTag("eyeturret") --眼球塔的专属标签，但为了deployable组件的摆放名字而使用（显示为“放置”）
 
         inst.entity:SetPristine()
         if not TheWorld.ismastersim then
@@ -842,6 +840,7 @@ table.insert(prefs, Prefab(
                 end
             end
         end
+        inst.components.deployable:SetDeploySpacing(DEPLOYSPACING.MEDIUM) --和草根一样的放置范围限制
 
         MakeHauntableLaunchAndIgnite(inst)
 
