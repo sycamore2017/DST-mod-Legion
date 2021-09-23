@@ -400,13 +400,11 @@ AddStategraphState("wilson", shocked_enter)
 AddStategraphState("wilson", shocked_exit)
 
 --通过api添加触电响应函数
-AddStategraphEvent("wilson", EventHandler("beshocked",
-    function(inst)
-        if inst.components.health ~= nil and not inst.components.health:IsDead() then
-            inst.sg:GoToState("shocked_enter")
-        end
-    end)
-)
+AddStategraphEvent("wilson", EventHandler("beshocked", function(inst)
+    if inst.components.health ~= nil and not inst.components.health:IsDead() then
+        inst.sg:GoToState("shocked_enter")
+    end
+end))
 
 --------------------------------------------------------------------------
 --[[ 修改beefalo以适应新的牛鞍 ]]

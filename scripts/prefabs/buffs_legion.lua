@@ -188,6 +188,10 @@ local function BuffTalk_end(target, buff)
     target:PushEvent("foodbuffdetached", { buff = "ANNOUNCE_DETACH_"..string.upper(buff.prefab), priority = 1 })
 end
 
+local function IsAlive(inst)
+    return inst.components.health ~= nil and not inst.components.health:IsDead() and not inst:HasTag("playerghost")
+end
+
 --------------------------------------------------------------------------
 --[[ 蝙蝠伪装：不会被蝙蝠攻击 ]]
 --------------------------------------------------------------------------
@@ -353,7 +357,7 @@ MakeBuff({
 --------------------------------------------------------------------------
 
 local function OnTick_healthstorage(inst, target)
-    if target.components.health ~= nil and not target.components.health:IsDead() and not target:HasTag("playerghost") then
+    if IsAlive(target) then
         if target.components.health:IsHurt() then --需要加血
             target.components.health:DoDelta(2, nil, "shyerry")
             inst.times = inst.times - 1
@@ -461,11 +465,13 @@ MakeBuff({
         if buff.task == nil then
             buff.task = buff:DoPeriodicTask(0.7, function()
                 buff:DoTaskInTime(math.random()*0.6, function()
-                    if not (target.sg:HasStateTag("nomorph") or
-                        target.sg:HasStateTag("silentmorph") or
-                        target.sg:HasStateTag("ghostbuild") or
-                        target.components.health:IsDead()) and
-                        target.entity:IsVisible()
+                    if
+                        not (
+                            target.components.health == nil or target.components.health:IsDead() or
+                            target.sg:HasStateTag("nomorph") or
+                            target.sg:HasStateTag("silentmorph") or
+                            target.sg:HasStateTag("ghostbuild")
+                        ) and target.entity:IsVisible()
                     then
                         SpawnPrefab("residualspores_fx").Transform:SetPosition(target.Transform:GetWorldPosition())
                     end
@@ -580,6 +586,91 @@ MakeBuff({
             fx.components.debuff:Stop()
         end)
     end,
+})
+
+--------------------------------------------------------------------------
+--[[ 腹得流油：不断拉粑粑（主要是鱼的油脂） ]]
+--------------------------------------------------------------------------
+
+local function StartOilFlowing(buff, inst)
+    if buff.task ~= nil then
+        buff.task:Cancel()
+    end
+    buff.task = inst:DoPeriodicTask(1.5, function(inst)
+        if IsAlive(inst) and inst.components.hunger ~= nil and not inst.components.hunger:IsStarving() then
+            if math.random() < 0.4 then
+                local poop = SpawnPrefab(math.random() < 0.005 and "beeswax" or "poop")
+                if poop ~= nil then
+                    ------让粑粑飞
+                    local x1, y1, z1 = inst.Transform:GetWorldPosition()
+                    local angle = inst.Transform:GetRotation() + 20 - math.random()*40
+                    local x2, y2, z2 = GetCalculatedPos_legion(x1, y1, z1, 0.2+math.random()*0.8, -angle*DEGREES) --玩家背后位置
+                    local vec = Vector3(x2-x1, y2-y1, z2-z1):Normalize()
+                    poop.Transform:SetPosition(x2, y2+0.5, z2)
+                    -- poop.Physics:Teleport(x2, y2+0.5, z2)
+                    poop.Physics:SetVel(vec.x*3, 3, vec.z*3)
+
+                    if inst:HasTag("player") then
+                        ------说尴尬的话
+                        if inst.components.talker ~= nil and not inst:HasTag("mime") and math.random() < 0.15 then
+                            local words = STRINGS.CHARACTERS[string.upper(inst.prefab)]
+                            if words ~= nil and words.BUFF_OILFLOW ~= nil then
+                                words = words.BUFF_OILFLOW
+                            else
+                                words = STRINGS.CHARACTERS.GENERIC.BUFF_OILFLOW
+                            end
+                            inst.components.talker:Say(GetRandomItem(words))
+                        end
+
+                        ------让玩家向前推进
+                        inst:PushEvent("awkwardpropeller", { angle = angle })
+                    elseif inst.Physics ~= nil then
+                        ------让对象向前推进
+                        inst.Transform:SetRotation(angle)
+                        inst.Physics:SetMotorVel(5, 0, 0) --这里没设置停下来，不会一直飞吧，应该有摩擦阻力以及自我行走打断才对
+                    end
+
+                    ------增加潮湿度
+                    if inst.components.moisture ~= nil then
+                        inst.components.moisture:DoDelta(1.5)
+                    end
+
+                    ------饥饿值消耗
+                    inst.components.hunger:DoDelta(-3.5)
+                    if inst.components.hunger:IsStarving() then
+                        buff.components.debuff:Stop()
+                    end
+                end
+            end
+            return
+        end
+        buff.components.debuff:Stop()
+    end, 3)
+end
+
+MakeBuff({
+    name = "buff_oilflow",
+    assets = nil,
+    prefabs = { "poop", "beeswax" },
+    time_key = "time_l_oilflow",
+    time_default = TUNING.SEG_TIME*16, --8分钟
+    notimer = nil,
+    fn_start = function(buff, target)
+        BuffTalk_start(target, buff)
+        StartOilFlowing(buff, target)
+    end,
+    fn_again = function(buff, target)
+        BuffTalk_start(target, buff)
+        StartOilFlowing(buff, target)
+    end,
+    fn_end = function(buff, target)
+        BuffTalk_end(target, buff)
+        if buff.task ~= nil then
+            buff.task:Cancel()
+            buff.task = nil
+        end
+    end,
+    fn_server = nil,
 })
 
 --------------------

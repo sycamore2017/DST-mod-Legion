@@ -515,6 +515,7 @@ local foods_legion =
         oneat_desc = STRINGS.UI.COOKBOOK.DISH_NEWORLEANSWINGS,
         oneatenfn = function(inst, eater)
             if CanBuff(eater) then
+                eater.time_l_batdisguise = { replace_min = TUNING.SEG_TIME*8 }
                 eater.components.debuffable:AddDebuff("buff_batdisguise", "buff_batdisguise")
             end
         end,
@@ -651,6 +652,7 @@ local foods_legion =
                 --加强攻击力
                 if CanBuff(eater) then
                     if eater.components.combat ~= nil then --这个buff需要攻击组件
+                        eater.time_l_strengthenhancer = { replace_min = TUNING.SEG_TIME*16 }
                         eater.components.debuffable:AddDebuff("buff_strengthenhancer", "buff_strengthenhancer")
                     end
                 end
@@ -727,6 +729,7 @@ local foods_legion =
         oneatenfn = function(inst, eater)
             if eater:HasTag("player") then
                 if CanBuff(eater) then
+                    eater.time_l_bestappetite = { replace_min = TUNING.SEG_TIME*2 }
                     eater.components.debuffable:AddDebuff("buff_bestappetite", "buff_bestappetite")
                 end
             end
@@ -756,6 +759,7 @@ local foods_legion =
         oneat_desc = STRINGS.UI.COOKBOOK.DISH_FRIEDFISHWITHPUREE,
         oneatenfn = function(inst, eater)
             if CanBuff(eater) and eater.components.hunger ~= nil then
+                eater.time_l_oilflow = { replace_min = TUNING.SEG_TIME*16 }
                 eater.components.debuffable:AddDebuff("buff_oilflow", "buff_oilflow")
             end
         end,
@@ -942,9 +946,10 @@ if CONFIGS_LEGION.PRAYFORRAIN then
 
         prefabs = { "buff_hungerretarder" },
         oneat_desc = STRINGS.UI.COOKBOOK.DISH_RICEDUMPLING,
-        oneatenfn = function(inst, eater)   --食用后3分钟内暂停饥饿下降
+        oneatenfn = function(inst, eater)   --食用后3分钟内饥饿下降大大减慢
             if CanBuff(eater) then
                 if eater.components.hunger ~= nil then --这个buff需要有饥饿值组件
+                    eater.time_l_hungerretarder = { replace_min = TUNING.SEG_TIME*6 }
                     eater.components.debuffable:AddDebuff("buff_hungerretarder", "buff_hungerretarder")
                 end
             end

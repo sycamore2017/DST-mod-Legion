@@ -60,7 +60,7 @@ if CONFIGS_LEGION.PRAYFORRAIN then
             burnable = {},
             fn_server = function(inst)
                 inst.components.edible:SetOnEatenFn(function(food, eater)
-                    if eater.components.moisture then
+                    if eater.components.moisture ~= nil then
                         eater.components.moisture:DoDelta(-100)
                     end
                 end)

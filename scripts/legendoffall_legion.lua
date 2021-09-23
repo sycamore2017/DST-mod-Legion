@@ -480,10 +480,8 @@ AddStategraphState("wilson", State{
     }
 })
 
-AddStategraphEvent("wilson", EventHandler("boltout",
-    function(inst, data)
-        if not inst.sg:HasStateTag("busy") and inst.components.health ~= nil and not inst.components.health:IsDead() then
-            inst.sg:GoToState("boltout", data)
-        end
-    end)
-)
+AddStategraphEvent("wilson", EventHandler("boltout", function(inst, data)
+    if not inst.sg:HasStateTag("busy") and inst.components.health ~= nil and not inst.components.health:IsDead() then
+        inst.sg:GoToState("boltout", data)
+    end
+end))

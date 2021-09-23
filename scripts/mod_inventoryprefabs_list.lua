@@ -115,6 +115,7 @@ local InventoryPrefabsList = {  --每个元素的下标值为每种物品栏图�
     pineananas_oversized = { build = "images_minisign5", },
     pineananas_oversized_waxed = { build = "images_minisign5", },
     dish_sosweetjarkfruit = { build = "images_minisign5", },
+    dish_friedfishwithpuree = { build = "images_minisign5", },
 }
 
 return InventoryPrefabsList

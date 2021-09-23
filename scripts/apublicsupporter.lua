@@ -61,10 +61,10 @@ _G.IsTooDarkToGrow_legion = function(inst)
 end
 
 --[ 计算最终位置(仅prefab定义时使用) ]--
-_G.GetCalculatedPos_legion = function(x, y, z, radius, angle)
+_G.GetCalculatedPos_legion = function(x, y, z, radius, theta)
     local rad = radius or math.random() * 3
-    local ang = angle or math.random() * 2 * PI
-    return x + rad * math.cos(ang), y, z - rad * math.sin(ang)
+    local the = theta or math.random() * 2 * PI
+    return x + rad * math.cos(the), y, z - rad * math.sin(the)
 end
 
 --[ 垂直掉落一个物品(仅prefab定义时使用) ]--
@@ -746,11 +746,27 @@ if TUNING.LEGION_FLASHANDCRUSH then --灵魂契约书需要
 end
 
 --------------------------------------------------------------------------
---[[ 增加惊恐sg ]]
+--[[ 食物sg ]]
 --------------------------------------------------------------------------
 
+local function WakePlayerUp(inst)
+    if inst.sg:HasStateTag("bedroll") or inst.sg:HasStateTag("tent") or inst.sg:HasStateTag("waking") then
+        if inst.sleepingbag ~= nil and inst.sg:HasStateTag("sleeping") then
+            inst.sleepingbag.components.sleepingbag:DoWakeUp()
+            inst.sleepingbag = nil
+        end
+        return false
+    else
+        return true
+    end
+end
+
 if TUNING.LEGION_SUPERBCUISINE then
-    local volcanopaniced = State{
+    --------------------------------------------------------------------------
+    --[[ 惊恐sg ]]
+    --------------------------------------------------------------------------
+
+    AddStategraphState("wilson", State{
         name = "volcanopaniced",
         tags = { "busy", "nopredict", "nodangle", "canrotate" },
 
@@ -792,24 +808,51 @@ if TUNING.LEGION_SUPERBCUISINE then
         ontimeout = function(inst)
             inst.sg:RemoveStateTag("busy")
         end,
-    }
+    })
 
-    AddStategraphState("wilson", volcanopaniced)
+    AddStategraphEvent("wilson", EventHandler("bevolcanopaniced", function(inst)
+        if inst.components.health ~= nil and not inst.components.health:IsDead() and not inst.sg:HasStateTag("busy") then
+            if WakePlayerUp(inst) then
+                inst.sg:GoToState("volcanopaniced")
+            end
+        end
+    end))
 
-    AddStategraphEvent("wilson", EventHandler("bevolcanopaniced",
-        function(inst)
-            if inst.components.health ~= nil and not inst.components.health:IsDead() and not inst.sg:HasStateTag("busy") then
-                if inst.sg:HasStateTag("bedroll") or inst.sg:HasStateTag("tent") or inst.sg:HasStateTag("waking") then
-                    if inst.sleepingbag ~= nil and inst.sg:HasStateTag("sleeping") then
-                        inst.sleepingbag.components.sleepingbag:DoWakeUp()
-                        inst.sleepingbag = nil
-                    end
+    --------------------------------------------------------------------------
+    --[[ 尴尬推进sg ]]
+    --------------------------------------------------------------------------
+
+    AddStategraphState("wilson", State{
+        name = "awkwardpropeller",
+        tags = { "doing", "canrotate" },
+
+        onenter = function(inst, data)
+            local i = 0
+            
+
+            inst.sg:SetTimeout(0.3)
+        end,
+
+        ontimeout = function(inst)
+            inst.sg:GoToState("idle", true)
+        end,
+
+        onexit = function(inst)
+            
+        end,
+    })
+
+    AddStategraphEvent("wilson", EventHandler("awkwardpropeller", function(inst, data)
+        if not inst.sg:HasStateTag("busy") and inst.components.health ~= nil and not inst.components.health:IsDead() then
+            if WakePlayerUp(inst) then
+                if inst.components.rider:IsRiding() then
+                    --将玩家甩下背（因为被玩家恶心到了）
                 else
-                    inst.sg:GoToState("volcanopaniced")
+                    inst.sg:GoToState("awkwardpropeller", data)
                 end
             end
-        end)
-    )
+        end
+    end))
 end
 
 --------------------------------------------------------------------------
