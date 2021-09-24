@@ -748,8 +748,8 @@ local foods_legion =
         sanity = 6,
         perishtime = TUNING.PERISH_SUPERFAST,   --3天
         cooktime = 0.75,
-        potlevel = "low",
-        float = {nil, "small", 0.2, 0.9},
+        potlevel = nil,
+        float = {0.02, "small", 0.2, 1.1},
 
         cook_need = "无花果 小饵鱼/甜味鱼",
         cook_cant = "树枝",

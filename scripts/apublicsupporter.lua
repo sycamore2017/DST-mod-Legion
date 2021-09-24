@@ -824,29 +824,58 @@ if TUNING.LEGION_SUPERBCUISINE then
 
     AddStategraphState("wilson", State{
         name = "awkwardpropeller",
-        tags = { "doing", "canrotate" },
+        tags = { "pausepredict" },
 
         onenter = function(inst, data)
-            local i = 0
-            
+            _G.ForceStopHeavyLifting_legion(inst)
+            -- inst.components.locomotor:Stop()
+            -- inst:ClearBufferedAction()
 
-            inst.sg:SetTimeout(0.3)
+            inst.AnimState:PlayAnimation("hit")
+
+            -- inst.SoundEmitter:PlaySound("dontstarve/wilson/hit")
+            inst.SoundEmitter:PlaySound("dontstarve/wilson/hungry")
+
+            if data ~= nil and data.angle ~= nil then
+                inst.Transform:SetRotation(data.angle)
+            end
+            inst.Physics:SetMotorVel(3, 0, 0)
+
+            inst.sg:SetTimeout(0.2)
         end,
 
         ontimeout = function(inst)
-            inst.sg:GoToState("idle", true)
+            inst.Physics:Stop()
+            inst.sg.statemem.speedfinish = true
         end,
 
+        events =
+        {
+            EventHandler("animover", function(inst)
+                if inst.AnimState:AnimDone() then
+                    inst.sg:GoToState("idle")
+                end
+            end),
+        },
+
         onexit = function(inst)
-            
+            if not inst.sg.statemem.speedfinish then
+                inst.Physics:Stop()
+            end
         end,
     })
 
     AddStategraphEvent("wilson", EventHandler("awkwardpropeller", function(inst, data)
         if not inst.sg:HasStateTag("busy") and inst.components.health ~= nil and not inst.components.health:IsDead() then
             if WakePlayerUp(inst) then
-                if inst.components.rider:IsRiding() then
-                    --将玩家甩下背（因为被玩家恶心到了）
+                --将玩家甩下背（因为被玩家恶心到了）
+                local mount = inst.components.rider ~= nil and inst.components.rider:GetMount() or nil
+                if mount ~= nil and mount.components.rideable ~= nil then
+                    if mount._bucktask ~= nil then
+                        mount._bucktask:Cancel()
+                        mount._bucktask = nil
+                    end
+                    mount.components.rideable:Buck()
                 else
                     inst.sg:GoToState("awkwardpropeller", data)
                 end

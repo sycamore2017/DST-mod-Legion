@@ -598,21 +598,20 @@ local function StartOilFlowing(buff, inst)
     end
     buff.task = inst:DoPeriodicTask(1.5, function(inst)
         if IsAlive(inst) and inst.components.hunger ~= nil and not inst.components.hunger:IsStarving() then
-            if math.random() < 0.4 then
+            if math.random() < 0.6 then
                 local poop = SpawnPrefab(math.random() < 0.005 and "beeswax" or "poop")
                 if poop ~= nil then
                     ------让粑粑飞
                     local x1, y1, z1 = inst.Transform:GetWorldPosition()
                     local angle = inst.Transform:GetRotation() + 20 - math.random()*40
-                    local x2, y2, z2 = GetCalculatedPos_legion(x1, y1, z1, 0.2+math.random()*0.8, -angle*DEGREES) --玩家背后位置
-                    local vec = Vector3(x2-x1, y2-y1, z2-z1):Normalize()
-                    poop.Transform:SetPosition(x2, y2+0.5, z2)
-                    -- poop.Physics:Teleport(x2, y2+0.5, z2)
-                    poop.Physics:SetVel(vec.x*3, 3, vec.z*3)
+                    local theta = (angle+180)*DEGREES
+                    poop.Transform:SetPosition(x1, y1+0.5, z1)
+                    --SetMotorVel()会一直给加速度，SetVel()则会受到摩擦阻力和重力影响
+                    poop.Physics:SetVel(2.5*math.cos(theta), 2, -2.5*math.sin(theta))
 
                     if inst:HasTag("player") then
                         ------说尴尬的话
-                        if inst.components.talker ~= nil and not inst:HasTag("mime") and math.random() < 0.15 then
+                        if inst.components.talker ~= nil and not inst:HasTag("mime") and math.random() < 0.4 then
                             local words = STRINGS.CHARACTERS[string.upper(inst.prefab)]
                             if words ~= nil and words.BUFF_OILFLOW ~= nil then
                                 words = words.BUFF_OILFLOW
@@ -632,7 +631,7 @@ local function StartOilFlowing(buff, inst)
 
                     ------增加潮湿度
                     if inst.components.moisture ~= nil then
-                        inst.components.moisture:DoDelta(1.5)
+                        inst.components.moisture:DoDelta(0.5)
                     end
 
                     ------饥饿值消耗
