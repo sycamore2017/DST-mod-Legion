@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<spriter_data scml_version="1.0" generator="BrashMonkey Spriter" generator_version="r7">
+    <folder id="0" name="item">
+        <file id="0" name="item/item-0.png" width="252" height="272" pivot_x="0.484127" pivot_y="0.150735"/>
+    </folder>
+    <folder id="1" name="soil01">
+        <file id="0" name="soil01/soil01-0.png" width="59" height="57" pivot_x="0.500424" pivot_y="0.5"/>
+        <file id="1" name="soil01/soil01-1.png" width="66" height="54" pivot_x="0.432955" pivot_y="0.460648"/>
+        <file id="2" name="soil01/soil01-2.png" width="56" height="56" pivot_x="0.488839" pivot_y="0.490458"/>
+        <file id="3" name="soil01/soil01-3.png" width="112" height="64" pivot_x="0.464397" pivot_y="0.223242"/>
+        <file id="4" name="soil01/soil01-4.png" width="104" height="69" pivot_x="0.422115" pivot_y="0.181069"/>
+        <file id="5" name="soil01/soil01-5.png" width="117" height="84" pivot_x="0.434188" pivot_y="0.176488"/>
+        <file id="6" name="soil01/soil01-6.png" width="113" height="92" pivot_x="0.458186" pivot_y="0.136685"/>
+        <file id="7" name="soil01/soil01-7.png" width="121" height="82" pivot_x="0.569215" pivot_y="0.193902"/>
+        <file id="8" name="soil01/soil01-8.png" width="125" height="68" pivot_x="0.6223" pivot_y="0.353148"/>
+    </folder>
+    <entity id="0" name="siving_soil">
+        <animation id="0" name="till_idle" length="34" interval="100">
+            <mainline>
+                <key id="0">
+                    <object_ref id="0" timeline="5" key="0" z_index="0"/>
+                    <object_ref id="1" timeline="4" key="0" z_index="1"/>
+                    <object_ref id="2" timeline="3" key="0" z_index="2"/>
+                    <object_ref id="3" timeline="2" key="0" z_index="3"/>
+                    <object_ref id="4" timeline="1" key="0" z_index="4"/>
+                    <object_ref id="5" timeline="0" key="0" z_index="5"/>
+                </key>
+                <key id="1" time="34">
+                    <object_ref id="0" timeline="5" key="1" z_index="0"/>
+                    <object_ref id="1" timeline="4" key="1" z_index="1"/>
+                    <object_ref id="2" timeline="3" key="1" z_index="2"/>
+                    <object_ref id="3" timeline="2" key="1" z_index="3"/>
+                    <object_ref id="4" timeline="1" key="1" z_index="4"/>
+                    <object_ref id="5" timeline="0" key="1" z_index="5"/>
+                </key>
+            </mainline>
+            <timeline id="0" name="soil01_0">
+                <key id="0" spin="0">
+                    <object folder="1" file="5" x="7.4" y="-33.75" angle="0" scale_x="1.01637" scale_y="0.957992"/>
+                </key>
+                <key id="1" time="34" spin="0">
+                    <object folder="1" file="5" x="7.4" y="-33.75" angle="0" scale_x="1.01637" scale_y="0.957992"/>
+                </key>
+            </timeline>
+            <timeline id="1" name="soil01_1">
+                <key id="0" spin="0">
+                    <object folder="1" file="6" x="-70.75" y="-33.85" angle="0" scale_x="1.01637" scale_y="0.957992"/>
+                </key>
+                <key id="1" time="34" spin="0">
+                    <object folder="1" file="6" x="-70.75" y="-33.85" angle="0" scale_x="1.01637" scale_y="0.957992"/>
+                </key>
+            </timeline>
+            <timeline id="2" name="soil01_2">
+                <key id="0" spin="0">
+                    <object folder="1" file="7" x="67.4" y="-14.35" angle="0" scale_x="1.01637" scale_y="0.957992"/>
+                </key>
+                <key id="1" time="34" spin="0">
+                    <object folder="1" file="7" x="67.4" y="-14.35" angle="0" scale_x="1.01637" scale_y="0.957992"/>
+                </key>
+            </timeline>
+            <timeline id="3" name="soil01_3">
+                <key id="0" spin="0">
+                    <object folder="1" file="0" x="-45.95" y="36.55" angle="0" scale_x="1.34627" scale_y="1.26894"/>
+                </key>
+                <key id="1" time="34" spin="0">
+                    <object folder="1" file="0" x="-45.95" y="36.55" angle="0" scale_x="1.34627" scale_y="1.26894"/>
+                </key>
+            </timeline>
+            <timeline id="4" name="soil01_4">
+                <key id="0" spin="0">
+                    <object folder="1" file="2" x="37.25" y="34.3" angle="0.000015" scale_x="1.34627" scale_y="1.26894"/>
+                </key>
+                <key id="1" time="34" spin="0">
+                    <object folder="1" file="2" x="37.25" y="34.3" angle="0.000015" scale_x="1.34627" scale_y="1.26894"/>
+                </key>
+            </timeline>
+            <timeline id="5" name="soil01_5">
+                <key id="0" spin="0">
+                    <object folder="1" file="1" x="-9" y="31.45" angle="31.5811" scale_x="1.34031" scale_y="1.26434"/>
+                </key>
+                <key id="1" time="34" spin="0">
+                    <object folder="1" file="1" x="-9" y="31.45" angle="31.5811" scale_x="1.34031" scale_y="1.26434"/>
+                </key>
+            </timeline>
+        </animation>
+        <animation id="1" name="item" length="1000" interval="100">
+            <mainline>
+                <key id="0">
+                    <object_ref id="0" timeline="0" key="0" z_index="0"/>
+                </key>
+            </mainline>
+            <timeline id="0" name="item-0">
+                <key id="0" spin="0">
+                    <object folder="0" file="0" y="-3"/>
+                </key>
+            </timeline>
+        </animation>
+    </entity>
+</spriter_data>

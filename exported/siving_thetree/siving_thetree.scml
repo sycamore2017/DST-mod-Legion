@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<spriter_data scml_version="1.0" generator="BrashMonkey Spriter" generator_version="r7">
+    <folder id="0" name="trunk">
+        <file id="0" name="trunk/trunk-0.png" width="1379" height="1390" pivot_x="0.53621" pivot_y="0.146565"/>
+        <file id="1" name="trunk/trunk-1.png" width="596" height="1204" pivot_x="0.619195" pivot_y="0.0565749"/>
+    </folder>
+    <folder id="1" name="leaf">
+        <file id="0" name="leaf/leaf-0.png" width="831" height="1147" pivot_x="0.92616" pivot_y="0.029008"/>
+    </folder>
+    <entity id="0" name="siving_thetree">
+        <animation id="0" name="idle" length="1000" interval="100">
+            <mainline>
+                <key id="0">
+                    <object_ref id="0" timeline="0" key="0" z_index="0"/>
+                    <object_ref id="1" timeline="1" key="0" z_index="1"/>
+                    <object_ref id="2" timeline="2" key="0" z_index="2"/>
+                </key>
+            </mainline>
+            <timeline id="0" name="trunk-0">
+                <key id="0" spin="0">
+                    <object folder="0" file="0" x="16.5" y="21.116935"/>
+                </key>
+            </timeline>
+            <timeline id="1" name="trunk-1">
+                <key id="0" spin="0">
+                    <object folder="0" file="1" x="29.832473" y="1157.781692"/>
+                </key>
+            </timeline>
+            <timeline id="2" name="leaf-0">
+                <key id="0" spin="0">
+                    <object folder="1" file="0" x="-26.997792" y="2252.160744"/>
+                </key>
+            </timeline>
+        </animation>
+    </entity>
+</spriter_data>

@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<spriter_data scml_version="1.0" generator="BrashMonkey Spriter" generator_version="r7">
+    <folder id="0" name="foliageath">
+        <file id="0" name="foliageath/foliageath.png" width="256" height="256" pivot_x="0.5" pivot_y="0.5"/>
+    </folder>
+    <folder id="1" name="foliageath_bullkelp_root">
+        <file id="0" name="foliageath_bullkelp_root/foliageath_bullkelp_root.png" width="256" height="256" pivot_x="0.5" pivot_y="0.5"/>
+    </folder>
+    <folder id="2" name="foliageath_foliageath">
+        <file id="0" name="foliageath_foliageath/foliageath_foliageath.png" width="256" height="256" pivot_x="0.5" pivot_y="0.5"/>
+    </folder>
+    <folder id="3" name="foliageath_hambat">
+        <file id="0" name="foliageath_hambat/foliageath_hambat.png" width="256" height="256" pivot_x="0.5" pivot_y="0.5"/>
+    </folder>
+    <folder id="4" name="foliageath_lileaves">
+        <file id="0" name="foliageath_lileaves/foliageath_lileaves.png" width="256" height="256" pivot_x="0.5" pivot_y="0.5"/>
+    </folder>
+    <folder id="5" name="foliageath_neverfade">
+        <file id="0" name="foliageath_neverfade/foliageath_neverfade.png" width="256" height="256" pivot_x="0.5" pivot_y="0.5"/>
+    </folder>
+    <folder id="6" name="foliageath_orchitwigs">
+        <file id="0" name="foliageath_orchitwigs/foliageath_orchitwigs.png" width="256" height="256" pivot_x="0.5" pivot_y="0.5"/>
+    </folder>
+    <folder id="7" name="foliageath_rosorns">
+        <file id="0" name="foliageath_rosorns/foliageath_rosorns.png" width="256" height="256" pivot_x="0.5" pivot_y="0.5"/>
+    </folder>
+    <folder id="8" name="albicans_cap">
+        <file id="0" name="albicans_cap/albicans_cap.png" width="256" height="256" pivot_x="0.5" pivot_y="0.5"/>
+    </folder>
+    <folder id="9" name="dish_braisedmeatwithfoliages">
+        <file id="0" name="dish_braisedmeatwithfoliages/dish_braisedmeatwithfoliages.png" width="256" height="256" pivot_x="0.5" pivot_y="0.5"/>
+    </folder>
+    <folder id="10" name="dish_farewellcupcake">
+        <file id="0" name="dish_farewellcupcake/dish_farewellcupcake.png" width="256" height="256" pivot_x="0.5" pivot_y="0.5"/>
+    </folder>
+    <folder id="11" name="dish_wrappedshrimppaste">
+        <file id="0" name="dish_wrappedshrimppaste/dish_wrappedshrimppaste.png" width="256" height="256" pivot_x="0.5" pivot_y="0.5"/>
+    </folder>
+    <folder id="12" name="hiddenmoonlight_item">
+        <file id="0" name="hiddenmoonlight_item/hiddenmoonlight_item.png" width="256" height="256" pivot_x="0.5" pivot_y="0.5"/>
+    </folder>
+    <folder id="13" name="theemperorspendant">
+        <file id="0" name="theemperorspendant/theemperorspendant.png" width="256" height="256" pivot_x="0.5" pivot_y="0.5"/>
+    </folder>
+    <folder id="14" name="pineananas_oversized">
+        <file id="0" name="pineananas_oversized/pineananas_oversized.png" width="256" height="256" pivot_x="0.5" pivot_y="0.5"/>
+    </folder>
+    <folder id="15" name="pineananas_oversized_waxed">
+        <file id="0" name="pineananas_oversized_waxed/pineananas_oversized_waxed.png" width="256" height="256" pivot_x="0.5" pivot_y="0.5"/>
+    </folder>
+    <folder id="16" name="dish_sosweetjarkfruit">
+        <file id="0" name="dish_sosweetjarkfruit/dish_sosweetjarkfruit.png" width="256" height="256" pivot_x="0.5" pivot_y="0.5"/>
+    </folder>
+    <folder id="17" name="dish_friedfishwithpuree">
+        <file id="0" name="dish_friedfishwithpuree/dish_friedfishwithpuree.png" width="256" height="256" pivot_x="0.5" pivot_y="0.5"/>
+    </folder>
+    <folder id="18" name="siving_derivant_item">
+        <file id="0" name="siving_derivant_item/siving_derivant_item.png" width="256" height="256" pivot_x="0.5" pivot_y="0.5"/>
+    </folder>
+    <folder id="19" name="siving_soil_item">
+        <file id="0" name="siving_soil_item/siving_soil_item.png" width="256" height="256" pivot_x="0.5" pivot_y="0.5"/>
+    </folder>
+    <entity id="0" name="images_minisign5">
+        <animation id="0" name="idle" length="1000" interval="100">
+            <mainline>
+                <key id="0">
+                    <object_ref id="0" timeline="0" key="0" z_index="0"/>
+                </key>
+            </mainline>
+            <timeline id="0" name="foliageath">
+                <key id="0" spin="0">
+                    <object folder="0" file="0" angle="0"/>
+                </key>
+            </timeline>
+        </animation>
+    </entity>
+</spriter_data>
