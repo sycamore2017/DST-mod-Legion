@@ -61,8 +61,6 @@ end
 --------------------------------------------------------------------------
 
 local function MakeDerivant(data)
-    local realname = "siving_derivant_"..data.name
-
     local function UpdateGrowing(inst)
         if IsTooDarkToGrow_legion(inst) then
             inst.components.timer:PauseTimer("growup")
@@ -86,7 +84,7 @@ local function MakeDerivant(data)
     end
 
     table.insert(prefs, Prefab(
-        realname,
+        "siving_derivant_"..data.name,
         function()
             local inst = CreateEntity()
 
@@ -95,6 +93,7 @@ local function MakeDerivant(data)
             inst.entity:AddAnimState()
             inst.entity:AddNetwork()
             inst.entity:AddMiniMapEntity()
+            inst.entity:AddLight()
 
             if data.obstacleradius ~= nil then
                 MakeObstaclePhysics(inst, data.obstacleradius)
@@ -106,6 +105,12 @@ local function MakeDerivant(data)
             MakeSnowCovered_comm_legion(inst)
 
             inst.MiniMapEntity:SetIcon("siving_derivant.tex")
+
+            inst.Light:Enable(false)
+            inst.Light:SetRadius(1.5)
+            inst.Light:SetFalloff(1)
+            inst.Light:SetIntensity(.6)
+            inst.Light:SetColour(15/255, 180/255, 132/255)
 
             inst:AddTag("siving_derivant")
             inst:AddTag("silviculture") --这个标签能让《园林学》发挥作用
@@ -129,6 +134,7 @@ local function MakeDerivant(data)
             inst:AddComponent("growable")
             inst.components.growable.stages = {}
             inst.components.growable:StopGrowing()
+            inst.components.growable.magicgrowable = true --非常规造林学生效标志（其他会由组件来施行）
             inst.components.growable.domagicgrowthfn = function(inst, doer)
                 if inst.components.timer:TimerExists("growup") then
                     inst.components.timer:StopTimer("growup")
@@ -142,6 +148,28 @@ local function MakeDerivant(data)
 
             inst:WatchWorldState("isnight", OnIsDark)
             MakeSnowCovered_serv_legion(inst, 0, OnIsDark)
+
+            inst:AddComponent("bloomer")
+
+            inst.treeState = 0
+            inst.OnTreeLive = function(inst, state)
+                inst.treeState = state
+                if state == 2 then
+                    inst.AnimState:PlayAnimation(data.name.."_live")
+                    inst.components.bloomer:PushBloom("activetree", "shaders/anim.ksh", 1)
+                    inst.Light:SetRadius(1.5)
+                    inst.Light:Enable(true)
+                elseif state == 1 then
+                    inst.AnimState:PlayAnimation(data.name)
+                    inst.components.bloomer:PushBloom("activetree", "shaders/anim.ksh", 1)
+                    inst.Light:SetRadius(0.8)
+                    inst.Light:Enable(true)
+                else
+                    inst.AnimState:PlayAnimation(data.name)
+                    inst.components.bloomer:PopBloom("activetree")
+                    inst.Light:Enable(false)
+                end
+            end
 
             MakeHauntableWork(inst)
 
@@ -160,10 +188,26 @@ local function DropRock(inst, chance)
         inst.components.lootdropper:SpawnLootPrefab("siving_rocks")
     end
 end
+local function SetTimer_derivant(inst, time, nextname)
+    inst.components.timer:StartTimer("growup", time)
+    inst:ListenForEvent("timerdone", function(inst, data)
+        if data.name == "growup" then
+            inst.SoundEmitter:PlaySound("dontstarve/common/together/marble_shrub/grow")
+            local tree = SpawnPrefab(nextname)
+            if tree ~= nil then
+                if inst.treeState ~= 0 then
+                    tree.OnTreeLive(tree, inst.treeState)
+                end
+                tree.Transform:SetPosition(inst.Transform:GetWorldPosition())
+            end
+            inst:Remove()
+        end
+    end)
+end
 
 MakeDerivant({  --子圭一型岩
     name = "lvl0",
-    obstacleradius = nil,
+    obstacleradius = 0.18,
     prefabs = { "siving_derivant_item", "siving_derivant_lvl1" },
     fn_server = function(inst)
         inst.components.workable:SetWorkAction(ACTIONS.DIG)
@@ -172,27 +216,19 @@ MakeDerivant({  --子圭一型岩
             inst.components.lootdropper:SpawnLootPrefab("siving_derivant_item")
             inst:Remove()
         end)
-
-        inst.components.timer:StartTimer("growup", TUNING.TOTAL_DAY_TIME * 6)
-        inst:ListenForEvent("timerdone", function(inst, data)
-            if data.name == "growup" then
-                inst.SoundEmitter:PlaySound("dontstarve/common/together/marble_shrub/grow")
-                SpawnPrefab("siving_derivant_lvl1").Transform:SetPosition(inst.Transform:GetWorldPosition())
-                inst:Remove()
-            end
-        end)
+        SetTimer_derivant(inst, TUNING.TOTAL_DAY_TIME * 6, "siving_derivant_lvl1")
     end,
 })
 MakeDerivant({  --子圭木型岩
     name = "lvl1",
-    obstacleradius = 1,
+    obstacleradius = 0.18,
     prefabs = { "siving_rocks", "siving_derivant_lvl0", "siving_derivant_lvl2" },
     fn_server = function(inst)
         inst.components.workable:SetWorkAction(ACTIONS.MINE)
         inst.components.workable:SetWorkLeft(6)
         inst.components.workable:SetOnWorkCallback(function(inst, worker, workleft)
             if workleft > 0 then
-                DropRock(inst, 0.04)
+                DropRock(inst, 0.02)
             end
         end)
         inst.components.workable:SetOnFinishCallback(function(inst, worker)
@@ -204,27 +240,19 @@ MakeDerivant({  --子圭木型岩
 
             inst:Remove()
         end)
-
-        inst.components.timer:StartTimer("growup", TUNING.TOTAL_DAY_TIME * 7.5)
-        inst:ListenForEvent("timerdone", function(inst, data)
-            if data.name == "growup" then
-                inst.SoundEmitter:PlaySound("dontstarve/common/together/marble_shrub/grow")
-                SpawnPrefab("siving_derivant_lvl2").Transform:SetPosition(inst.Transform:GetWorldPosition())
-                inst:Remove()
-            end
-        end)
+        SetTimer_derivant(inst, TUNING.TOTAL_DAY_TIME * 7.5, "siving_derivant_lvl2")
     end,
 })
 MakeDerivant({  --子圭林型岩
     name = "lvl2",
-    obstacleradius = 1,
+    obstacleradius = 0.18,
     prefabs = { "siving_rocks", "siving_derivant_lvl1", "siving_derivant_lvl3" },
     fn_server = function(inst)
         inst.components.workable:SetWorkAction(ACTIONS.MINE)
-        inst.components.workable:SetWorkLeft(12)
+        inst.components.workable:SetWorkLeft(9)
         inst.components.workable:SetOnWorkCallback(function(inst, worker, workleft)
             if workleft > 0 then
-                DropRock(inst, 0.06)
+                DropRock(inst, 0.03)
             end
         end)
         inst.components.workable:SetOnFinishCallback(function(inst, worker)
@@ -238,27 +266,19 @@ MakeDerivant({  --子圭林型岩
 
             inst:Remove()
         end)
-
-        inst.components.timer:StartTimer("growup", TUNING.TOTAL_DAY_TIME * 8)
-        inst:ListenForEvent("timerdone", function(inst, data)
-            if data.name == "growup" then
-                inst.SoundEmitter:PlaySound("dontstarve/common/together/marble_shrub/grow")
-                SpawnPrefab("siving_derivant_lvl3").Transform:SetPosition(inst.Transform:GetWorldPosition())
-                inst:Remove()
-            end
-        end)
+        SetTimer_derivant(inst, TUNING.TOTAL_DAY_TIME * 8, "siving_derivant_lvl3")
     end,
 })
 MakeDerivant({  --子圭森型岩
     name = "lvl3",
-    obstacleradius = 1,
+    obstacleradius = 0.18,
     prefabs = { "siving_rocks", "siving_derivant_lvl2" },
     fn_server = function(inst)
         inst.components.workable:SetWorkAction(ACTIONS.MINE)
         inst.components.workable:SetWorkLeft(12)
         inst.components.workable:SetOnWorkCallback(function(inst, worker, workleft)
             if workleft > 0 then
-                DropRock(inst, 0.08)
+                DropRock(inst, 0.04)
             end
         end)
         inst.components.workable:SetOnFinishCallback(function(inst, worker)
@@ -278,11 +298,12 @@ MakeDerivant({  --子圭森型岩
         inst:ListenForEvent("timerdone", function(inst, data)
             if data.name == "growup" then
                 inst.components.timer:StartTimer("growup", TUNING.TOTAL_DAY_TIME * 6)
-
+                print("--22--------")
                 local x,y,z = inst.Transform:GetWorldPosition()
-                local ents = TheSim:FindEntities(x,y,z, 8)
+                local ents = TheSim:FindEntities(x,y,z, 8) --undo:会识别玩家物品栏里的，改改吧
                 local numloot = 0
                 for i,ent in ipairs(ents) do
+                    print("----------")
                     if ent.prefab == "siving_rocks" then
                         numloot = numloot + 1
                         if numloot >= 2 then
@@ -296,76 +317,14 @@ MakeDerivant({  --子圭森型岩
     end,
 })
 
-table.insert(prefs, Prefab( --子圭一型岩(物品)
-    "siving_derivant_item",
-    function()
-        local inst = CreateEntity()
-
-        inst.entity:AddTransform()
-        inst.entity:AddAnimState()
-        inst.entity:AddNetwork()
-
-        MakeInventoryPhysics(inst)
-
-        inst.AnimState:SetBank("siving_derivants")
-        inst.AnimState:SetBuild("siving_derivants")
-        inst.AnimState:PlayAnimation("item")
-
-        inst:AddTag("molebait")
-
-        inst.entity:SetPristine()
-        if not TheWorld.ismastersim then
-            return inst
-        end
-
-        inst:AddComponent("stackable")
-        inst.components.stackable.maxsize = TUNING.STACK_SIZE_LARGEITEM
-
-        inst:AddComponent("inspectable")
-
-        inst:AddComponent("tradable")
-        inst.components.tradable.rocktribute = 12
-
-        inst:AddComponent("bait")
-
-        inst:AddComponent("inventoryitem")
-        inst.components.inventoryitem.imagename = "siving_derivant_item"
-        inst.components.inventoryitem.atlasname = "images/inventoryimages/siving_derivant_item.xml"
-        inst.components.inventoryitem:SetSinks(true)
-
-        inst:AddComponent("deployable")
-        inst.components.deployable.ondeploy = function(inst, pt, deployer)
-            local tree = SpawnPrefab("siving_derivant_lvl0")
-            if tree ~= nil then
-                tree.Transform:SetPosition(pt:Get())
-                inst.components.stackable:Get():Remove()
-
-                if deployer ~= nil and deployer.SoundEmitter ~= nil then
-                    deployer.SoundEmitter:PlaySound("dontstarve/wilson/plant_seeds")
-                end
-            end
-        end
-
-        MakeHauntableLaunchAndIgnite(inst)
-
-        return inst
-    end,
-    {
-        Asset("ANIM", "anim/siving_derivants.zip"),
-        Asset("ATLAS", "images/inventoryimages/siving_derivant_item.xml"),
-        Asset("IMAGE", "images/inventoryimages/siving_derivant_item.tex"),
-    },
-    { "siving_derivant_lvl0" }
-))
-
 --------------------------------------------------------------------------
 --[[ 子圭神木 ]]
 --------------------------------------------------------------------------
 
 local function DropRock(inst)
     local xx, yy, zz = inst.Transform:GetWorldPosition()
-    local x, y, z = GetCalculatedPos_legion(xx, yy, zz, 2+math.random()*3, nil)
-    DropItem_legion("siving_rocks", x, y+9, z, 1, 18, 20*FRAMES, nil, nil, nil)
+    local x, y, z = GetCalculatedPos_legion(xx, yy, zz, 2.6+math.random()*3, nil)
+    DropItem_legion("siving_rocks", x, y+13, z, 1.5, 18, 15*FRAMES, nil, nil, nil)
 end
 local function OnStealLife(inst, value)
     --子圭玄鸟在场上时，吸收的生命全部加给它
@@ -395,7 +354,7 @@ local function TriggerLifeExtractTask(inst, doit)
     if doit then
         if inst.taskLifeExtract == nil then
             local x, y, z = inst.Transform:GetWorldPosition()
-            local distancesq = TUNING.WORTOX_SOULHEAL_RANGE * TUNING.WORTOX_SOULHEAL_RANGE
+            local distancesq = 400
             local ents = nil
 
             --每1秒吸取所有生物生命；每0.5秒产生吸取特效
@@ -403,13 +362,19 @@ local function TriggerLifeExtractTask(inst, doit)
                 local countent = 0
                 local entsnow = ents
                 if ents == nil then
-                    entsnow = TheSim:FindEntities(x, y, z, TUNING.WORTOX_SOULHEAL_RANGE,
-                    {"_combat", "_health"},
-                    {"NOCLICK", "FX", "shadow", "playerghost", "INLIMBO", "wall", "engineering", "siving"}, nil)
+                    entsnow = TheSim:FindEntities(x, y, z, 20,
+                        nil,
+                        {"NOCLICK", "FX", "shadow", "playerghost", "INLIMBO", "wall", "engineering", "siving"},
+                        {"siving_derivant", "_health"}
+                    )
                 end
 
                 for k,v in pairs(entsnow) do
-                    if
+                    if v:HasTag("siving_derivant") then
+                        if v.treeState ~= nil and inst.treeState ~= v.treeState then
+                            v.OnTreeLive(v, inst.treeState)
+                        end
+                    elseif
                         v.components.health ~= nil and not v.components.health:IsDead() and
                         v.entity:IsVisible() and
                         v:GetDistanceSqToPoint(x, y, z) <= distancesq
@@ -421,7 +386,7 @@ local function TriggerLifeExtractTask(inst, doit)
                         end
 
                         if ents ~= nil then
-                            v.components.health:DoDelta(-1, nil, (inst.nameoverride or inst.prefab), true, inst, true)
+                            v.components.health:DoDelta(-1, true, inst.prefab, nil, inst, true)
                         end
                         countent = countent + 1
                     end
@@ -530,7 +495,6 @@ local function OnStarvedTrapSouls(inst, data)
 end
 
 local function AddLivesListen(inst)
-    print("这里是为了测试OnEntityWake是否在实体产生时就触发了")
     if inst._onentitydroplootfn == nil then
         inst._onentitydroplootfn = function(src, data) OnEntityDropLoot(inst, data) end
         inst:ListenForEvent("entity_droploot", inst._onentitydroplootfn, TheWorld)
@@ -567,17 +531,22 @@ local function StateChange(inst) --0休眠状态(玄鸟死亡)、1正常状态(�
     if inst.components.timer:TimerExists("birdrebirth") then --玄鸟死亡
         inst.treeState = 0
         inst.bossBird = nil
+        inst.AnimState:SetBuild("siving_thetree")
         inst.components.bloomer:PopBloom("activetree")
         inst.Light:Enable(false)
     else
         if TheWorld.state.isspring then --春季
             inst.treeState = 2
+            inst.AnimState:SetBuild("siving_thetree_live")
             inst.components.bloomer:PushBloom("activetree", "shaders/anim.ksh", 1)
+            inst.Light:SetRadius(8)
             inst.Light:Enable(true)
         else
             inst.treeState = 1
-            inst.components.bloomer:PopBloom("activetree")
-            inst.Light:Enable(false)
+            inst.AnimState:SetBuild("siving_thetree")
+            inst.components.bloomer:PushBloom("activetree", "shaders/anim.ksh", 1)
+            inst.Light:SetRadius(5)
+            inst.Light:Enable(true)
         end
     end
 end
@@ -596,14 +565,15 @@ table.insert(prefs, Prefab(
 
         inst.MiniMapEntity:SetIcon("siving_thetree.tex")
 
-        MakeObstaclePhysics(inst, 1.8)
+        MakeObstaclePhysics(inst, 2.6)
 
         inst.AnimState:SetBank("siving_thetree")
         inst.AnimState:SetBuild("siving_thetree")
         inst.AnimState:PlayAnimation("idle")
+        inst.AnimState:SetScale(1.3, 1.3)
 
         inst.Light:Enable(false)
-        inst.Light:SetRadius(3.5)
+        inst.Light:SetRadius(6)
         inst.Light:SetFalloff(1)
         inst.Light:SetIntensity(.6)
         inst.Light:SetColour(15/255, 180/255, 132/255)
@@ -683,15 +653,15 @@ table.insert(prefs, Prefab(
             StateChange(inst)
         end
 
-        inst.OnEntityWake = AddLivesListen
+        inst.OnEntityWake = AddLivesListen --实体产生时，在玩家范围内就会执行
         inst.OnEntitySleep = RemoveLivesListen
-        AddLivesListen(inst)
 
         return inst
     end,
     {
         Asset("SCRIPT", "scripts/prefabs/wortox_soul_common.lua"),
         Asset("ANIM", "anim/siving_thetree.zip"),
+        Asset("ANIM", "anim/siving_thetree_live.zip"),
     },
     { "siving_rocks", "siving_lifesteal_fx" }
 ))
@@ -709,12 +679,14 @@ table.insert(prefs, Prefab(
         inst.entity:AddAnimState()
         inst.entity:AddNetwork()
 
-        MakeGhostPhysics(inst, 1, 0.3)
+        MakeGhostPhysics(inst, 1, 0.15)
+        RemovePhysicsColliders(inst)
 
         inst.AnimState:SetBank("lifeplant_fx")
         inst.AnimState:SetBuild("lifeplant_fx")
         inst.AnimState:PlayAnimation("single"..math.random(1,3), true)
         inst.AnimState:SetMultColour(15/255, 180/255, 132/255, 1)
+        inst.AnimState:SetScale(0.6, 0.6)
 
         inst:AddTag("flying")
         inst:AddTag("NOCLICK")
@@ -856,7 +828,7 @@ table.insert(prefs, Prefab(
 ))
 
 --子圭栽培土(placer)
-table.insert(prefs, MakePlacer("siving_derivant_item_placer", "farm_soil", "siving_soil", "till_idle"))
+table.insert(prefs, MakePlacer("siving_soil_item_placer", "farm_soil", "siving_soil", "till_idle"))
 
 --------------------------------------------------------------------------
 --[[ 子圭栽培土 ]]

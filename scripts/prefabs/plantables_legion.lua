@@ -22,7 +22,7 @@ local function MakePlantable(name, data)
 
         inst.AnimState:SetBank(data.animstate.bank)
         inst.AnimState:SetBuild(data.animstate.build)
-        inst.AnimState:PlayAnimation(data.anim)
+        inst.AnimState:PlayAnimation(data.animstate.anim)
 
         if data.floater ~= nil then
             MakeInventoryFloatable(inst, data.floater[2], data.floater[3], data.floater[4])
@@ -269,8 +269,47 @@ if CONFIGS_LEGION.LEGENDOFFALL then
             mode = nil,
             spacing = nil,
         },
-        fn_common = nil,
-        fn_server = nil,
+        fn_common = function(inst)
+            inst.entity:AddLight()
+
+            inst.Light:Enable(false)
+            inst.Light:SetRadius(0.3)
+            inst.Light:SetFalloff(1)
+            inst.Light:SetIntensity(.6)
+            inst.Light:SetColour(15/255, 180/255, 132/255)
+
+            inst:AddTag("siving_derivant")
+        end,
+        fn_server = function(inst)
+            inst:AddComponent("bloomer")
+
+            inst.treeState = 0
+            inst.OnTreeLive = function(inst, state)
+                inst.treeState = state
+                if state == 2 then
+                    inst.AnimState:PlayAnimation("item_live")
+                    inst.components.bloomer:PushBloom("activetree", "shaders/anim.ksh", 1)
+                    inst.Light:SetRadius(0.6)
+                    inst.Light:Enable(true)
+                elseif state == 1 then
+                    inst.AnimState:PlayAnimation("item")
+                    inst.components.bloomer:PushBloom("activetree", "shaders/anim.ksh", 1)
+                    inst.Light:SetRadius(0.3)
+                    inst.Light:Enable(true)
+                else
+                    inst.AnimState:PlayAnimation("item")
+                    inst.components.bloomer:PopBloom("activetree")
+                    inst.Light:Enable(false)
+                end
+            end
+
+            inst.components.inventoryitem:SetOnDroppedFn(function(inst)
+				inst.OnTreeLive(inst, 0) --不知道为啥捡起时已经关闭光源了，但还是发了光，所以这里丢弃时再次关闭光源
+			end)
+            inst.components.inventoryitem:SetOnPickupFn(function(inst)
+				inst.OnTreeLive(inst, nil)
+			end)
+        end,
     }
 end
 

@@ -552,6 +552,7 @@ local function MakePlant(data)
 			inst:AddComponent("growable")
 			inst.components.growable.stages = {}
 			inst.components.growable:StopGrowing()
+			inst.components.growable.magicgrowable = true --非常规造林学生效标志（其他会由组件来施行）
 			inst.components.growable.domagicgrowthfn = function(inst, doer)
 				if inst:IsValid() and inst.components.perennialcrop ~= nil then
 					return inst.components.perennialcrop:DoMagicGrowth(doer, 2*TUNING.TOTAL_DAY_TIME)

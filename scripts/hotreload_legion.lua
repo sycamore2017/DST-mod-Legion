@@ -6,8 +6,11 @@
 
 local hot = {
 	--k: prefab名   v: 对应的lua文件名
-	hiddenmoonlight = 'hiddenmoonlight',
-	hiddenmoonlight_item = 'hiddenmoonlight',
+	-- siving_derivant_lvl0 = 'siving_rocks_legion',
+	-- siving_derivant_lvl1 = 'siving_rocks_legion',
+	-- siving_derivant_lvl2 = 'siving_rocks_legion',
+	-- siving_derivant_lvl3 = 'siving_rocks_legion',
+	-- siving_thetree = 'siving_rocks_legion',
 }
 local old_sp = GLOBAL.SpawnPrefab
 function GLOBAL.SpawnPrefab(prefab, ...)
