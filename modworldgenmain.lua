@@ -23,6 +23,10 @@ if GetModConfigData("DesertSecret") then --尘市蜃楼 bool
     TUNING.LEGION_DESERTSECRET = true
 end
 
+if GetModConfigData("LegendOfFall") then --丰饶传说 bool
+    TUNING.LEGION_LEGENDOFFALL = true
+end
+
 --语言设置
 local isChinese = GetModConfigData("Language") == "chinese"
 
@@ -121,6 +125,21 @@ if TUNING.LEGION_DESERTSECRET then
     end)
     AddTaskPreInit("BigBatCave", function(task)    --协助者墓园会出现在蝙蝠地形
         task.room_choices["HelperSquare"] = 1
+    end)
+end
+
+if TUNING.LEGION_LEGENDOFFALL then
+    LAYOUTS["SivingCenter"] = STATICLAYOUT.Get("map/static_layouts/sivingcenter", {
+        start_mask = _G.PLACE_MASK.IGNORE_IMPASSABLE_BARREN_RESERVED,
+		fill_mask = _G.PLACE_MASK.IGNORE_IMPASSABLE_BARREN_RESERVED,
+		layout_position = _G.LAYOUT_POSITION.CENTER,
+		disable_transform = true
+    })
+
+    require("map/rooms/forest/rooms_legendoffall")
+
+    AddTaskPreInit("GreenForest", function(task)    --子圭之源会出现在绿蘑菇森林
+        task.room_choices["SivingSource"] = 1
     end)
 end
 

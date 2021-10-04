@@ -37,6 +37,7 @@ local function GetInfestTarget(inst)
         inst.infesttarget:IsInLimbo() or --被装起来的
         inst.infesttarget:HasTag("nognatinfest") or --已经不能被侵扰了
         inst.infesttarget:HasTag("withered") or --枯萎了
+        inst.infesttarget:HasTag("barren") or --贫瘠了
         inst:GetDistanceSqToInst(inst.infesttarget) > 1225 --距离超过35*35
     then
         if inst.infesttarget ~= nil then
@@ -49,7 +50,7 @@ local function GetInfestTarget(inst)
                         or guy.components.pickable ~= nil --可采摘植物
             end
             return false
-        end, nil, { "FX", "NOCLICK", "INLIMBO", "nognatinfest", "withered" }, { "crop_legion", "witherable" })
+        end, nil, { "FX", "INLIMBO", "nognatinfest", "withered", "barren" }, { "crop_legion", "witherable" })
 
         if inst.infesttarget ~= nil then
             inst.infesttarget.infester = inst --做个标记，一个虫群只能认领一个侵扰对象

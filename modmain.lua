@@ -10,6 +10,9 @@
     3.【电闪雷鸣】（1）牛铃和紫金葫芦等(具有容器的、无法放入打包纸的、不可摧毁的)道具不再能放入驮运鞍具中；
                  （2）素白蘑菇帽的技能可以治愈多年生作物的病/害
     4.【美味佳肴】（1）新增料理：果泥香煎鱼。满足群友们的恶趣味[滑稽]
+
+    --undo: 采集多年生针刺旋花会直接消失
+    --子圭树我想再弄大一点
 ]]
 
 --------------------------------------------------------------------------
@@ -207,7 +210,7 @@ if GetModConfigData("PrayForRain") then --祈雨祭 bool
     TUNING.LEGION_BOOKRECIPETABS = GetModConfigData("BookRecipetabs") --设置多变的云的制作栏 "bookbuilder" "magic"
 end
 
-if GetModConfigData("LegendOfFall") then --秋天传说 bool
+if GetModConfigData("LegendOfFall") then --丰饶传说 bool
     _G.CONFIGS_LEGION.LEGENDOFFALL = true
 
     -- TUNING.LEGION_GROWTHRATE = GetModConfigData("GrowthRate") --设置生长速度 int 0.7 1 1.5 2

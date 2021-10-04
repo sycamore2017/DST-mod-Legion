@@ -150,6 +150,7 @@ if CONFIGS_LEGION.LEGENDOFFALL then
                 butterfly = 0.6,        --蝴蝶
 
                 raindonate = 0.45,      --雨蝇
+                fireflies = 0.45,       --萤火虫
 
                 wormlight = 0.25,       --神秘浆果
                 wormlight_lesser = 1,   --神秘小浆果

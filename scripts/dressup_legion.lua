@@ -260,12 +260,6 @@ local dressup_data =
         buildfile = "swap_spike",
         buildsymbol = "swap_spike",
     },
-    propsign =
-    {
-        isnoskin = true,
-        buildfile = "swap_sign_elite",
-        buildsymbol = "swap_sign_elite",
-    },
     bullkelp_root =
     {
         isnoskin = true,
@@ -408,6 +402,10 @@ local dressup_data =
         buildfile = "swap_premiumwateringcan",
         buildsymbol = "swap_premiumwateringcan",
     },
+    pocketwatch_weapon = { --警告表
+        buildfile = "pocketwatch_weapon",
+        buildsymbol = "swap_object",
+    },
     -- minifan = --有贴图之外的实体，不做幻化
     -- {
     --     buildfile = "swap_minifan",
@@ -454,6 +452,11 @@ local dressup_data =
 
     --         return itemswap
     --     end,
+    -- },
+    -- propsign = { --猪王比赛的木牌：会在重启后自动消失，所以不能被幻化
+    --     isnoskin = true,
+    --     buildfile = "swap_sign_elite",
+    --     buildsymbol = "swap_sign_elite",
     -- },
 
     -------------------------------
@@ -756,6 +759,10 @@ local dressup_data =
         buildfile = "hat_nutrientsgoggles",
         buildsymbol = "swap_hat",
     },
+    moonstorm_goggleshat = { --天文护目镜
+        buildfile = "hat_moonstorm_goggles",
+        buildsymbol = "swap_hat",
+    },
 
     -------------------------------
     --身体-------------------------
@@ -987,6 +994,24 @@ local dressup_data =
     {
         isbackpack = true,
         buildfile = "seedpouch",
+    },
+    oceantreenut = { --疙瘩树果
+        isnoskin = true,
+        istallbody = true,
+        buildfile = "oceantreenut",
+        buildsymbol = "swap_body",
+    },
+    carnival_vest_a = { --叽叽喳喳围巾
+        isbackpack = true,
+        buildfile = "carnival_vest_a",
+    },
+    carnival_vest_b = { --叽叽喳喳斗篷
+        isbackpack = true,
+        buildfile = "carnival_vest_b",
+    },
+    carnival_vest_c = { --叽叽喳喳小披肩
+        isbackpack = true,
+        buildfile = "carnival_vest_c",
     },
     -- moon_altar --月科技系列的可搬动建筑，独一无二的，不能幻化
     -- sculpture_knighthead = --骑士的大理石碎片。全图唯一性，不做幻化
@@ -1306,6 +1331,7 @@ local pieces =
     "beequeen",
     "antlion",
     "minotaur",
+    "guardianphase3",
 }
 local materials =
 {

@@ -17,6 +17,7 @@ local assets = {
     Asset("ANIM", "anim/mushroom_farm_foliage1_build.zip"), --蕨叶(森林)的蘑菇农场贴图
     Asset("ANIM", "anim/mushroom_farm_foliage2_build.zip"), --蕨叶(洞穴)的蘑菇农场贴图
     Asset("ANIM", "anim/farm_plant_pineananas.zip"),
+    Asset("ANIM", "anim/player_actions_roll.zip"), --脱壳之翅所需动作（来自单机版）
 
     Asset("ATLAS", "images/inventoryimages/siving_soil_item.xml"), --预加载，给科技栏用的
     Asset("IMAGE", "images/inventoryimages/siving_soil_item.tex"),

@@ -298,12 +298,14 @@ MakeDerivant({  --子圭森型岩
         inst:ListenForEvent("timerdone", function(inst, data)
             if data.name == "growup" then
                 inst.components.timer:StartTimer("growup", TUNING.TOTAL_DAY_TIME * 6)
-                print("--22--------")
                 local x,y,z = inst.Transform:GetWorldPosition()
-                local ents = TheSim:FindEntities(x,y,z, 8) --undo:会识别玩家物品栏里的，改改吧
+                local ents = TheSim:FindEntities(x,y,z, 6,
+                    nil,
+                    {"NOCLICK", "FX", "INLIMBO"},
+                    nil
+                )
                 local numloot = 0
                 for i,ent in ipairs(ents) do
-                    print("----------")
                     if ent.prefab == "siving_rocks" then
                         numloot = numloot + 1
                         if numloot >= 2 then
