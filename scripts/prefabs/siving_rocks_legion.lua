@@ -95,13 +95,12 @@ local function MakeDerivant(data)
             inst.entity:AddMiniMapEntity()
             inst.entity:AddLight()
 
-            if data.obstacleradius ~= nil then
-                MakeObstaclePhysics(inst, data.obstacleradius)
-            end
+            MakeObstaclePhysics(inst, 0.2)
 
             inst.AnimState:SetBank("siving_derivants")
             inst.AnimState:SetBuild("siving_derivants")
             inst.AnimState:PlayAnimation(data.name)
+            inst.AnimState:SetScale(1.3, 1.3)
             MakeSnowCovered_comm_legion(inst)
 
             inst.MiniMapEntity:SetIcon("siving_derivant.tex")
@@ -113,7 +112,7 @@ local function MakeDerivant(data)
             inst.Light:SetColour(15/255, 180/255, 132/255)
 
             inst:AddTag("siving_derivant")
-            inst:AddTag("silviculture") --这个标签能让《园林学》发挥作用
+            inst:AddTag("silviculture") --这个标签能让《造林学》发挥作用
 
             inst.entity:SetPristine()
 
@@ -134,7 +133,7 @@ local function MakeDerivant(data)
             inst:AddComponent("growable")
             inst.components.growable.stages = {}
             inst.components.growable:StopGrowing()
-            inst.components.growable.magicgrowable = true --非常规造林学生效标志（其他会由组件来施行）
+            inst.components.growable.magicgrowable = true --非常规造林学有效标志（其他会由组件来施行）
             inst.components.growable.domagicgrowthfn = function(inst, doer)
                 if inst.components.timer:TimerExists("growup") then
                     inst.components.timer:StopTimer("growup")
@@ -207,7 +206,6 @@ end
 
 MakeDerivant({  --子圭一型岩
     name = "lvl0",
-    obstacleradius = 0.18,
     prefabs = { "siving_derivant_item", "siving_derivant_lvl1" },
     fn_server = function(inst)
         inst.components.workable:SetWorkAction(ACTIONS.DIG)
@@ -221,7 +219,6 @@ MakeDerivant({  --子圭一型岩
 })
 MakeDerivant({  --子圭木型岩
     name = "lvl1",
-    obstacleradius = 0.18,
     prefabs = { "siving_rocks", "siving_derivant_lvl0", "siving_derivant_lvl2" },
     fn_server = function(inst)
         inst.components.workable:SetWorkAction(ACTIONS.MINE)
@@ -245,7 +242,6 @@ MakeDerivant({  --子圭木型岩
 })
 MakeDerivant({  --子圭林型岩
     name = "lvl2",
-    obstacleradius = 0.18,
     prefabs = { "siving_rocks", "siving_derivant_lvl1", "siving_derivant_lvl3" },
     fn_server = function(inst)
         inst.components.workable:SetWorkAction(ACTIONS.MINE)
@@ -271,7 +267,6 @@ MakeDerivant({  --子圭林型岩
 })
 MakeDerivant({  --子圭森型岩
     name = "lvl3",
-    obstacleradius = 0.18,
     prefabs = { "siving_rocks", "siving_derivant_lvl2" },
     fn_server = function(inst)
         inst.components.workable:SetWorkAction(ACTIONS.MINE)

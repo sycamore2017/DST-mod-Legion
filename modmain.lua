@@ -4,15 +4,16 @@
 
 --[[
     1.【花香四溢】（1）女武神使用带刺蔷薇攻击能积累歌唱值了
-    2.【丰饶传说】（1）新增子圭神木、子圭岩的洞穴地形，以及子圭栽培土带来的多年生作物
-                 （2）新增植害虫群和叮咬虫群，会侵害植物（侵害多年生作物、草丛、浆果丛等）
-                 （3）新增脱壳之翅
+    2.【丰饶传说】（1）新增子圭神木、子圭岩的洞穴地形
+                 （2）新增植害虫群和叮咬虫群。植害虫群会侵害植物（多年生作物、草丛、浆果丛等）
+                 （3）新增脱壳之翅。哈撒给又回来啦！
+                 （4）新增子圭栽培土。种植的作物能具备多年生、花期等特性
     3.【电闪雷鸣】（1）牛铃和紫金葫芦等(具有容器的、无法放入打包纸的、不可摧毁的)道具不再能放入驮运鞍具中；
                  （2）素白蘑菇帽的技能可以治愈多年生作物的病/害
     4.【美味佳肴】（1）新增料理：果泥香煎鱼。满足群友们的恶趣味[滑稽]
-
-    --undo: 采集多年生针刺旋花会直接消失
-    --子圭树我想再弄大一点
+    5.【尘市蜃楼】（1）新增了叽叽喳喳围巾、天体护目镜、疙瘩树果等物品的幻化
+                 （2）装备幻象法杖后用鼠标右键自己也能解除幻化了（以前只能右键装备栏的幻象法杖来解除）
+    6.【mod兼容】（1）优化了代码，使得无论在Steam还是Wegame都能更好兼容工艺锅mod和神话书说mod（maybe）
 ]]
 
 --------------------------------------------------------------------------
@@ -46,6 +47,7 @@ Assets = {
     Asset("ANIM", "anim/images_minisign3.zip"),
     Asset("ANIM", "anim/images_minisign4.zip"),
     Asset("ANIM", "anim/images_minisign5.zip"),
+    Asset("ANIM", "anim/images_minisign6.zip"),
 
     Asset("ANIM", "anim/playguitar.zip"),   --弹吉他动画模板
     Asset("SOUNDPACKAGE", "sound/legion.fev"),   --吉他的声音
@@ -172,20 +174,9 @@ RegisterInventoryItemAtlas("images/inventoryimages/albicans_cap.xml", "albicans_
 --[[ Options ]]--[[ 各项设置 ]]
 --------------------------------------------------------------------------
 
--- local TETVB = KnownModIndex:IsModEnabled("workshop-1402200186")  --Tropical Experience | The Volcano Biome
--- local DSTW = KnownModIndex:IsModEnabled("workshop-607654103")    --DST Warly
--- local HEXIE = KnownModIndex:IsModEnabled("workshop-841471368")    --河蟹防熊锁
-
-_G.CONFIGS_LEGION =
-{
+_G.CONFIGS_LEGION = {
     ENABLEDMODS = {},
 }
-
---神话书说
-_G.CONFIGS_LEGION.ENABLEDMODS.MythWords = KnownModIndex:IsModEnabled("workshop-1699194522") or
-                                            KnownModIndex:IsModEnabled("workshop-1991746508")
---工艺锅（Craft Pot）
-_G.CONFIGS_LEGION.ENABLEDMODS.CraftPot = KnownModIndex:IsModEnabled("workshop-727774324")
 
 if GetModConfigData("FlowersPower") then --花香四溢 bool
     _G.CONFIGS_LEGION.FLOWERSPOWER = true
@@ -287,7 +278,10 @@ end
 --[[ superb cuisine ]]--[[ 美味佳肴 ]]
 --------------------------------------------------------------------------
 
-if CONFIGS_LEGION.ENABLEDMODS.CraftPot then
+if TUNING.LEGION_SUPERBCUISINE then
+    table.insert(PrefabFiles, "foods_cookpot")
+
+    ------为工艺锅mod加的（此时并不明确是否启用了该mod）
     local assets_craftpot = {
         Asset("ATLAS", "images/foodtags/foodtag_gel.xml"),
         Asset("IMAGE", "images/foodtags/foodtag_gel.tex"),
@@ -305,51 +299,6 @@ if CONFIGS_LEGION.ENABLEDMODS.CraftPot then
     for k,v in pairs(assets_craftpot) do
         table.insert(Assets, v)
     end
-
-    --写这个是为了注册特殊烹饪条件(craft pot的机制)
-    AddIngredientValues({"craftpot"}, {
-        fallfullmoon = 1,
-        winterfeast = 1,
-        hallowednights = 1,
-        newmoon = 1,
-    }, false, false)
-
-    if AddFoodTag ~= nil then
-        AddFoodTag('gel', {
-            name = STRINGS.NAMES_LEGION.GEL,
-            tex = "foodtag_gel.tex",
-            atlas = "images/foodtags/foodtag_gel.xml"
-        })
-        AddFoodTag('petals_legion', {
-            name = STRINGS.NAMES_LEGION.PETALS_LEGION,
-            tex = "foodtag_petals.tex",
-            atlas = "images/foodtags/foodtag_petals.xml"
-        })
-        AddFoodTag('fallfullmoon', {
-            name = STRINGS.NAMES_LEGION.FALLFULLMOON,
-            tex = "foodtag_fallfullmoon.tex",
-            atlas = "images/foodtags/foodtag_fallfullmoon.xml"
-        })
-        AddFoodTag('winterfeast', {
-            name = STRINGS.NAMES_LEGION.WINTERSFEAST,
-            tex = "foodtag_winterfeast.tex",
-            atlas = "images/foodtags/foodtag_winterfeast.xml"
-        })
-        AddFoodTag('hallowednights', {
-            name = STRINGS.NAMES_LEGION.HALLOWEDNIGHTS,
-            tex = "foodtag_hallowednights.tex",
-            atlas = "images/foodtags/foodtag_hallowednights.xml"
-        })
-        AddFoodTag('newmoon', {
-            name = STRINGS.NAMES_LEGION.NEWMOON,
-            tex = "foodtag_newmoon.tex",
-            atlas = "images/foodtags/foodtag_newmoon.xml"
-        })
-        --这里本来想把冰度、菜度等图标都改为自己的图标，但是原mod里的图标其实更简单直接，适合新手，所以就不弄啦
-    end
-end
-if TUNING.LEGION_SUPERBCUISINE then
-    table.insert(PrefabFiles, "foods_cookpot")
 
     -- AddIngredientValues({"plantmeat"}, {meat=.5, veggie=.5}, true, false)   --食人花肉块茎
     -- AddIngredientValues({"batwing"}, {meat=.5}, true, false)    --蝙蝠翅膀，虽然可以晾晒，但是得到的不是蝙蝠翅膀干，而是小肉干，所以candry不能填true
@@ -572,3 +521,120 @@ end)
 --         inst.components.hounded:SetSpawnData(houndspawn)
 --     end
 -- end)
+
+--------------------------------------------------------------------------
+--[[ mod之间的兼容 ]]
+--------------------------------------------------------------------------
+
+--AddSimPostInit()在所有mod加载完毕后才执行，这时能更准确判定是否启用某mod，不用考虑优先级
+AddSimPostInit(function()
+	-- table.insert(Assets, Asset("ANIM", "anim/player_actions_roll.zip")) --这个函数里没法再注册动画数据了
+
+    ----------
+    --神话书说
+    ----------
+    _G.CONFIGS_LEGION.ENABLEDMODS.MythWords = TUNING.MYTH_WORDS_MOD_OPEN
+    if TUNING.MYTH_WORDS_MOD_OPEN then
+        if CONFIGS_LEGION.DRESSUP then
+            ------给神话的巨型葫芦添加幻化
+            _G.DRESSUP_DATA_LEGION["gourd_oversized"] = {
+                isnoskin = true,
+                istallbody = true,
+                buildfn = function(dressup, item, buildskin)
+                    local itemswap = {}
+
+                    itemswap["swap_body_tall"] = dressup:GetDressData(
+                        buildskin, "farm_plant_gourd", "swap_body", item.GUID, "swap"
+                    )
+
+                    return itemswap
+                end,
+            }
+            _G.DRESSUP_DATA_LEGION["gourd_oversized_waxed"] = _G.DRESSUP_DATA_LEGION["gourd_oversized"]
+        end
+    end
+
+    ----------
+    --工艺锅（Craft Pot）
+    ----------
+    _G.CONFIGS_LEGION.ENABLEDMODS.CraftPot = AddFoodTag ~= nil --AddFoodTag()是该mod里的全局函数
+    if CONFIGS_LEGION.ENABLEDMODS.CraftPot then
+        if TUNING.LEGION_SUPERBCUISINE then
+            --写这个是为了注册特殊烹饪条件(craft pot的机制)
+            AddIngredientValues({"craftpot"}, {
+                fallfullmoon = 1,
+                winterfeast = 1,
+                hallowednights = 1,
+                newmoon = 1,
+            }, false, false)
+
+            if TUNING.LEGION_MOD_LANGUAGES == "chinese" then
+                STRINGS.NAMES_LEGION = {
+                    GEL = "黏液度",
+                    PETALS_LEGION = "花度",
+                    FALLFULLMOON = "秋季月圆天专属",
+                    WINTERSFEAST = "冬季盛宴专属",
+                    HALLOWEDNIGHTS = "疯狂万圣专属",
+                    NEWMOON = "新月天专属",
+                }
+
+                --帮craft pot翻译下吧
+                STRINGS.NAMES.FROZEN = "冰度"
+                STRINGS.NAMES.VEGGIE = "菜度"
+                STRINGS.NAMES.SWEETENER = "甜度"
+                -- STRINGS.NAMES.MEAT = "肉度" --和大肉重名了，不能这样改
+                -- STRINGS.NAMES.FISH = "鱼度" --和鱼重名了，不能这样改
+                STRINGS.NAMES.MONSTER = "怪物度"
+                STRINGS.NAMES.FRUIT = "果度"
+                STRINGS.NAMES.EGG = "蛋度"
+                STRINGS.NAMES.INEDIBLE = "非食"
+                STRINGS.NAMES.MAGIC = "魔法度"
+                STRINGS.NAMES.DECORATION = "装饰度"
+                STRINGS.NAMES.SEED = "种子度"
+                STRINGS.NAMES.DAIRY = "乳度"
+                STRINGS.NAMES.FAT = "脂度"
+            else
+                STRINGS.NAMES_LEGION = {
+                    GEL = "Gel",
+                    PETALS_LEGION = "Petals",
+                    FALLFULLMOON = "specific to Fall FullMoon Day",
+                    WINTERSFEAST = "specific to Winter Feast",
+                    HALLOWEDNIGHTS = "specific to Hallowed Nights",
+                    NEWMOON = "specific to NewMoon Day",
+                }
+            end
+
+            AddFoodTag('gel', {
+                name = STRINGS.NAMES_LEGION.GEL,
+                tex = "foodtag_gel.tex",
+                atlas = "images/foodtags/foodtag_gel.xml"
+            })
+            AddFoodTag('petals_legion', {
+                name = STRINGS.NAMES_LEGION.PETALS_LEGION,
+                tex = "foodtag_petals.tex",
+                atlas = "images/foodtags/foodtag_petals.xml"
+            })
+            AddFoodTag('fallfullmoon', {
+                name = STRINGS.NAMES_LEGION.FALLFULLMOON,
+                tex = "foodtag_fallfullmoon.tex",
+                atlas = "images/foodtags/foodtag_fallfullmoon.xml"
+            })
+            AddFoodTag('winterfeast', {
+                name = STRINGS.NAMES_LEGION.WINTERSFEAST,
+                tex = "foodtag_winterfeast.tex",
+                atlas = "images/foodtags/foodtag_winterfeast.xml"
+            })
+            AddFoodTag('hallowednights', {
+                name = STRINGS.NAMES_LEGION.HALLOWEDNIGHTS,
+                tex = "foodtag_hallowednights.tex",
+                atlas = "images/foodtags/foodtag_hallowednights.xml"
+            })
+            AddFoodTag('newmoon', {
+                name = STRINGS.NAMES_LEGION.NEWMOON,
+                tex = "foodtag_newmoon.tex",
+                atlas = "images/foodtags/foodtag_newmoon.xml"
+            })
+            --这里本来想把冰度、菜度等图标都改为自己的图标，但是原mod里的图标其实更简单直接，适合新手，所以就不弄啦
+        end
+    end
+end)

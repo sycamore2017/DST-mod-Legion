@@ -2881,33 +2881,6 @@ STRINGS.ACTIONS_LEGION = {
 }
 STRINGS.ACTIONS.GIVE.SCABBARD = "入鞘"  --青枝绿叶放入武器的名字
 
-if CONFIGS_LEGION.ENABLEDMODS.CraftPot then
-    STRINGS.NAMES_LEGION = {
-        GEL = "黏液度",
-        PETALS_LEGION = "花度",
-        FALLFULLMOON = "秋季月圆天专属",
-        WINTERSFEAST = "冬季盛宴专属",
-        HALLOWEDNIGHTS = "疯狂万圣专属",
-        NEWMOON = "新月天专属",
-    }
-
-    --帮craft pot翻译下吧
-    S_NAMES.FROZEN = "冰度"
-    S_NAMES.VEGGIE = "菜度"
-    S_NAMES.SWEETENER = "甜度"
-    -- S_NAMES.MEAT = "肉度" --和大肉重名了，不能这样改
-    -- S_NAMES.FISH = "鱼度" --和鱼重名了，不能这样改
-    S_NAMES.MONSTER = "怪物度"
-    S_NAMES.FRUIT = "果度"
-    S_NAMES.EGG = "蛋度"
-    S_NAMES.INEDIBLE = "非食"
-    S_NAMES.MAGIC = "魔法度"
-    S_NAMES.DECORATION = "装饰度"
-    S_NAMES.SEED = "种子度"
-    S_NAMES.DAIRY = "乳度"
-    S_NAMES.FAT = "脂度"
-end
-
 STRINGS.CROP_LEGION = {
     SEED = "种下的{crop}种子",
     SPROUT = "{crop}芽",

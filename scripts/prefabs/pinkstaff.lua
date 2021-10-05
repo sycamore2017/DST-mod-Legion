@@ -27,7 +27,9 @@ end
 local function DressUpItem(staff, target)
     local caster = staff.components.inventoryitem.owner
     if caster ~= nil and caster.components.dressup ~= nil then
-        if target == nil then --解除幻化
+        if target == nil then --解除幻化（右键装备栏的法杖）
+            caster.components.dressup:TakeOffAll()
+        elseif target == caster then --解除幻化（右键玩家自己）
             caster.components.dressup:TakeOffAll()
         else                  --添加幻化
             local didit = caster.components.dressup:PutOn(target)
@@ -44,6 +46,8 @@ end
 
 local function DressUpTest(doer, target, pos)
     if target == nil then --解除幻化，也是可以生效的
+        return true
+    elseif target == doer then --对自己施法：解除幻化
         return true
     elseif DRESSUP_DATA_LEGION[target.prefab] ~= nil then
         return true

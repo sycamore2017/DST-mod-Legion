@@ -332,10 +332,23 @@ for k,v in pairs(WEED_DEFS) do
 		end
 
 		--设置其他
-		if k ~= "weed_tillweed" then --不能设置犁地草的犁地效果
-			data.fn_stage = v.fn_stage or v.OnMakeFullFn
-		else
+		if k == "weed_tillweed" then --不能设置犁地草的犁地效果
 			data.fn_stage = v.fn_stage
+		elseif k == "weed_ivy" then --针刺旋花：官方代码写错了，所以这里修正一下（Klei码师看我看我！！！）
+			if v.fn_stage == nil then
+				data.fn_stage = function(inst, isfull)
+					local has_tag = inst:HasTag("farm_plant_defender")
+					if isfull and not has_tag then
+						inst:AddTag("farm_plant_defender")
+					elseif not isfull and has_tag then
+						inst:RemoveTag("farm_plant_defender") --修改：Remove()改为RemoveTag()！！！
+					end
+				end
+			else
+				data.fn_stage = v.fn_stage
+			end
+		else
+			data.fn_stage = v.fn_stage or v.OnMakeFullFn
 		end
 
 		defs[k] = data

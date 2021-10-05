@@ -2867,17 +2867,6 @@ STRINGS.ACTIONS_LEGION = {
 }
 STRINGS.ACTIONS.GIVE.SCABBARD = "Put into"  --青枝绿叶放入武器的名字
 
-if CONFIGS_LEGION.ENABLEDMODS.CraftPot then
-    STRINGS.NAMES_LEGION = {
-        GEL = "Gel",
-        PETALS_LEGION = "Petals",
-        FALLFULLMOON = "specific to Fall FullMoon Day",
-        WINTERSFEAST = "specific to Winter Feast",
-        HALLOWEDNIGHTS = "specific to Hallowed Nights",
-        NEWMOON = "specific to NewMoon Day",
-    }
-end
-
 STRINGS.CROP_LEGION = {
     SEED = "Planted {crop} Seed",
     SPROUT = "{crop} Sprout",

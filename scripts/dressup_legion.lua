@@ -1357,8 +1357,7 @@ for k,v in pairs(pieces) do
 end
 
 --统一添加各种巨型作物的幻化数据
-local oversizecrops =
-{
+local oversizecrops = {
     asparagus = "farm_plant_asparagus",
     garlic = "farm_plant_garlic",
     pumpkin = "farm_plant_pumpkin",
@@ -1374,15 +1373,11 @@ local oversizecrops =
     durian = "farm_plant_durian_build",
     carrot = "farm_plant_carrot",
 }
-if CONFIGS_LEGION.ENABLEDMODS.MythWords then
-    oversizecrops["gourd"] = "farm_plant_gourd"
-end
 if CONFIGS_LEGION.LEGENDOFFALL then
     oversizecrops["pineananas"] = "farm_plant_pineananas"
 end
 for k,v in pairs(oversizecrops) do
-    _G.DRESSUP_DATA_LEGION[k.."_oversized"] =
-    {
+    _G.DRESSUP_DATA_LEGION[k.."_oversized"] = {
         isnoskin = true,
         istallbody = true,
         buildfn = function(dressup, item, buildskin)

@@ -119,6 +119,8 @@ local InventoryPrefabsList = {  --每个元素的下标值为每种物品栏图�
     siving_derivant_item = { build = "images_minisign5", },
     siving_soil_item = { build = "images_minisign5", },
     --101
+
+    siving_rocks = { build = "images_minisign6", },
 }
 
 return InventoryPrefabsList

@@ -25,14 +25,12 @@ local assets = {
     Asset("IMAGE", "images/inventoryimages/ahandfulofwings.tex"),
     Asset("ATLAS", "images/inventoryimages/boltwingout.xml"),
     Asset("IMAGE", "images/inventoryimages/boltwingout.tex"),
+    Asset("ATLAS", "images/inventoryimages/siving_rocks.xml"), --mod之间注册相同的文件是有效的
+    Asset("IMAGE", "images/inventoryimages/siving_rocks.tex"),
 }
 
 for k,v in pairs(assets) do
     table.insert(Assets, v)
-end
-if not CONFIGS_LEGION.ENABLEDMODS.MythWords then
-    table.insert(Assets, Asset("ATLAS", "images/inventoryimages/siving_rocks.xml"))
-    table.insert(Assets, Asset("IMAGE", "images/inventoryimages/siving_rocks.tex"))
 end
 
 -----
