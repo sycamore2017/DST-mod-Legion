@@ -130,20 +130,18 @@ for k,v in pairs(PLANT_DEFS) do
 				time = nil --生长时间、或枯萎时间、或重生时间
 			}
 
-			if v2.hidden then
-				if v2.text == "oversized" then
-					stage.name = "huge"
-					stage.time = 6 * TUNING.TOTAL_DAY_TIME --巨型作物，6天后枯萎
-					data.stages_other.huge = stage
-				elseif v2.text == "rotting" then
-					stage.name = "rot"
-					stage.time = 4 * TUNING.TOTAL_DAY_TIME --枯萎作物，4天后重新开始生长
-					data.stages_other.rot = stage
-				elseif v2.text == "oversized_rotting" then
-					stage.name = "huge_rot"
-					stage.time = 5 * TUNING.TOTAL_DAY_TIME --巨型枯萎作物，5天后重新开始生长
-					data.stages_other.huge_rot = stage
-				end
+			if v2.text == "oversized" then
+				stage.name = "huge"
+				stage.time = 6 * TUNING.TOTAL_DAY_TIME --巨型作物，6天后枯萎
+				data.stages_other.huge = stage
+			elseif v2.text == "rotting" then
+				stage.name = "rot"
+				stage.time = 4 * TUNING.TOTAL_DAY_TIME --枯萎作物，4天后重新开始生长
+				data.stages_other.rot = stage
+			elseif v2.text == "oversized_rotting" then
+				stage.name = "huge_rot"
+				stage.time = 5 * TUNING.TOTAL_DAY_TIME --巨型枯萎作物，5天后重新开始生长
+				data.stages_other.huge_rot = stage
 			else
 				table.insert(data.stages, stage)
 			end
@@ -359,12 +357,12 @@ end
 --[[ 作物实体代码 ]]
 --------------------------------------------------------------------------
 
-local function RemovePlant(inst, lastprefab)
+local function RemovePlant(inst, lastprefab, soilprefab)
 	local x, y, z = inst.Transform:GetWorldPosition()
 	if lastprefab ~= nil then
 		SpawnPrefab(lastprefab).Transform:SetPosition(x, y, z)
 	end
-	SpawnPrefab("siving_soil").Transform:SetPosition(x, y, z)
+	SpawnPrefab(soilprefab).Transform:SetPosition(x, y, z)
 	inst.components.lootdropper:DropLoot()
 	inst:Remove()
 end
@@ -397,6 +395,13 @@ local function OnIsDark(inst)
 			inst.nighttask:Cancel()
 			inst.nighttask = nil
 		end
+	end
+end
+
+local function OnIsRaining(inst)
+	--不管雨始还是雨停，增加一半的蓄水量(反正一场雨结束，总共只加最大蓄水量的数值)
+	if inst.components.perennialcrop ~= nil then
+		inst.components.perennialcrop:PourWater(nil, nil, inst.components.perennialcrop.moisture_max/2)
 	end
 end
 
@@ -545,14 +550,14 @@ local function MakePlant(data)
 				if inst.components.perennialcrop ~= nil and inst.components.perennialcrop.fn_defend ~= nil then
 					inst.components.perennialcrop.fn_defend(inst, worker)
 				end
-				RemovePlant(inst, "dirt_puff")
+				RemovePlant(inst, "dirt_puff", "siving_soil_item") --被破坏，生成未放置的栽培土
 			end)
 
 			if not data.fireproof then
 				MakeSmallBurnable(inst)
 				MakeSmallPropagator(inst)
 				inst.components.burnable:SetOnBurntFn(function(inst)
-					RemovePlant(inst, "ash")
+					RemovePlant(inst, "ash", "siving_soil") --被烧掉，生成被放置的栽培土
 				end)
 				inst.components.burnable:SetOnIgniteFn(function(inst, source, doer)
 					UpdateGrowing(inst)
@@ -605,8 +610,22 @@ local function MakePlant(data)
 			inst.components.perennialcrop:SetStage(1, false, false, true, false)
 			inst.components.perennialcrop:StartGrowing()
 
+			inst:AddComponent("moisture") --浇水机制由潮湿度组件控制（能让水球、神话的玉净瓶等起作用）
+			inst.components.moisture.OnUpdate = function(self, ...) return end --取消下雨时的潮湿度增加
+			inst.components.moisture.OnSave = function(self, ...) return end
+			inst.components.moisture.OnLoad = function(self, ...) return end
+			inst.components.moisture.DoDelta = function(self, num, ...)
+				if num > 0 and self.inst.components.perennialcrop ~= nil then
+					self.inst.components.perennialcrop:PourWater(nil, nil, num)
+				end
+			end
+
+			inst:WatchWorldState("israining", OnIsRaining) --下雨时补充水分
 			inst:WatchWorldState("isnight", OnIsDark) --黑暗中无法继续生长
-			inst:DoTaskInTime(0, OnIsDark)
+			inst:DoTaskInTime(0, function()
+				-- OnIsRaining(inst) --不能写在这，不然每次进入游戏都会增加水分
+				OnIsDark(inst)
+			end)
 
 			if data.fn_server ~= nil then
 				data.fn_server(inst)

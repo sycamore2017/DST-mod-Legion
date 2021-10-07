@@ -296,6 +296,11 @@ end
 function PerennialCrop:DoGrowth(skip)
 	local data = self:GetNextStage()
 
+	--如果此时在下雨/雪，蓄水量直接加满
+	if TheWorld.state.israining or TheWorld.state.issnowing then
+		self:PourWater(nil, nil, self.moisture_max)
+	end
+
 	if data.justgrown then
 		if self.nutrient >= self.cost_nutrient then --生长必需肥料的积累
 			self.nutrient = self.nutrient - self.cost_nutrient
@@ -327,7 +332,9 @@ function PerennialCrop:DoGrowth(skip)
 		elseif self.sickness > 0 then
 			self.sickness = 0
 		end
-		if self.moisture >= self.cost_moisture then --水分的积累
+		if TheWorld.state.israining or TheWorld.state.issnowing then --如果此时在下雨/雪，积累而不会耗自身水分
+			self.num_moisture = self.num_moisture + 1
+		elseif self.moisture >= self.cost_moisture then --水分的积累
 			self.moisture = self.moisture - self.cost_moisture
 			self.num_moisture = self.num_moisture + 1
 		end

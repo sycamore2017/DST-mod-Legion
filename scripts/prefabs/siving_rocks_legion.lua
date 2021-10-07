@@ -325,7 +325,10 @@ local function DropRock(inst)
 end
 local function OnStealLife(inst, value)
     --子圭玄鸟在场上时，吸收的生命全部加给它
-    if inst.bossBird ~= nil and inst.bossBird.components.health ~= nil then
+    if
+        inst.bossBird ~= nil and
+        inst.bossBird.components.health ~= nil and not inst.bossBird.components.health:IsDead()
+    then
         inst.bossBird.components.health:DoDelta(value, nil, inst.prefab)
         return
     end
@@ -597,7 +600,9 @@ table.insert(prefs, Prefab(
         inst.components.workable:SetWorkAction(ACTIONS.MINE)
         inst.components.workable:SetWorkLeft(20)
         inst.components.workable:SetOnWorkCallback(function(inst, worker, workleft, numworks)
-            inst.components.workable:SetWorkLeft(20)    --恢复工作量，永远都破坏不了
+            if workleft <= 0 then
+                inst.components.workable:SetWorkLeft(20)    --恢复工作量，永远都破坏不了
+            end
 
             if inst.treeState > 0 then
                 inst.countWorked = inst.countWorked + 1

@@ -24,8 +24,6 @@ local BOLTCOST =
     mosquitosack = 1,       --蚊子血袋
     mosquito = 0.45,        --蚊子
 
-    ahandfulofwings = 0.25, --一捧翅膀
-
     glommerwings = 0.25,    --格罗姆翅膀
     glommerfuel = 0.5,      --格罗姆黏液
 
@@ -33,14 +31,20 @@ local BOLTCOST =
     butter = 0.1,           --黄油
     butterfly = 0.6,        --蝴蝶
 
-    raindonate = 0.45,      --雨蝇
-    fireflies = 0.45,       --萤火虫
-
     wormlight = 0.25,       --神秘浆果
     wormlight_lesser = 1,   --神秘小浆果
 
     moonbutterflywings = 1, --月蛾翅膀
     moonbutterfly = 0.3,    --月蛾
+
+    ahandfulofwings = 0.25, --一捧翅膀
+    raindonate = 0.45,      --雨蝇
+    fireflies = 0.45,       --萤火虫
+
+    dragon_scales = 0.1,    --龙鳞
+    lavae_egg = 0.06,       --岩浆虫卵
+    lavae_egg_cracked = 0.06,--岩浆虫卵(孵化中)
+    lavae_cocoon = 0.03,    --冷冻虫卵
 }
 
 local function onequip(inst, owner)
