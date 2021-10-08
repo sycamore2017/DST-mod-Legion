@@ -473,6 +473,19 @@ local function MakePlant(data)
 
 			inst:AddComponent("inspectable")
 			inst.components.inspectable.nameoverride = "FARM_PLANT"
+			inst.components.inspectable.descriptionfn = function(inst, doer) --提示自身的生长数据
+				if doer.components.inventory ~= nil then
+					local hat = doer.components.inventory:GetEquippedItem(EQUIPSLOTS.HEAD)
+					if hat == nil then
+						if doer:HasTag("plantkin") then
+							
+						end
+					elseif hat:HasTag("plantinspector") then
+					elseif hat:HasTag("detailedplanthappiness") then
+					end
+					return nil
+				end
+			end
 			inst.components.inspectable.getstatus = function(inst)
 				if inst.components.burnable ~= nil and inst.components.burnable:IsBurning() then
 					return "BURNING"
@@ -577,17 +590,13 @@ local function MakePlant(data)
 				end
 				return false
 			end
+			inst.components.growable.GetCurrentStageData = function(self) return { tendable = false } end
 
 			inst:AddComponent("farmplanttendable")
 			inst.components.farmplanttendable.ontendtofn = function(inst, doer)
 				if inst.components.perennialcrop ~= nil then
-					inst.components.perennialcrop:TendTo(doer)
+					inst.components.perennialcrop:TendTo(doer, true)
 				end
-
-				inst:DoTaskInTime(0.5 + math.random() * 0.5, function()
-					SpawnPrefab("farm_plant_happy").Transform:SetPosition(inst.Transform:GetWorldPosition())
-				end)
-
 				return true
 			end
 

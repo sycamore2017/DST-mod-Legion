@@ -336,15 +336,17 @@ AddStategraphActionHandler("wilson_client", ActionHandler(ACTIONS.PLANTSOIL_LEGI
 end))
 
 --------------------------------------------------------------------------
---[[ 让施肥组件能作用于多年生作物 ]]
+--[[ 施肥相关的多年生作物兼容 ]]
 --------------------------------------------------------------------------
 
-local FERTILIZE_old = ACTIONS.FERTILIZE.fn
-ACTIONS.FERTILIZE.fn = function(act)
+------施肥新动作
+local FERTILIZE_LEGION = Action({ priority = 1 })
+FERTILIZE_LEGION.id = "FERTILIZE_LEGION"
+FERTILIZE_LEGION.str = STRINGS.ACTIONS.FERTILIZE
+FERTILIZE_LEGION.fn = function(act)
     if
         act.invobject ~= nil and act.invobject.components.fertilizer ~= nil
         and act.target ~= nil and act.target.components.perennialcrop ~= nil
-        and act.doer ~= nil and not (act.doer.components.rider ~= nil and act.doer.components.rider:IsRiding())
     then
         if act.target.components.perennialcrop:Fertilize(act.invobject, act.doer) then
             act.invobject.components.fertilizer:OnApplied(act.doer, act.target)
@@ -353,7 +355,109 @@ ACTIONS.FERTILIZE.fn = function(act)
             return false
         end
     end
-    return FERTILIZE_old(act)
+end
+AddAction(FERTILIZE_LEGION)
+
+AddComponentAction("USEITEM", "fertilizer", function(inst, doer, target, actions, right)
+    if
+        (inst:HasTag("fert1") and target:HasTag("fertable1")) or
+        (inst:HasTag("fert2") and target:HasTag("fertable2")) or
+        (inst:HasTag("fert3") and target:HasTag("fertable3"))
+    then
+        table.insert(actions, ACTIONS.FERTILIZE_LEGION)
+    end
+end)
+
+AddStategraphActionHandler("wilson", ActionHandler(ACTIONS.FERTILIZE_LEGION, "doshortaction"))
+AddStategraphActionHandler("wilson_client", ActionHandler(ACTIONS.FERTILIZE_LEGION, "doshortaction"))
+
+------肥料组件兼容
+if IsServer then
+    AddComponentPostInit("fertilizer", function(self)
+        local SetNutrients_old = self.SetNutrients
+        self.SetNutrients = function(self, ...)
+            SetNutrients_old(self, ...)
+            local nutrients = self.nutrients
+            if nutrients[1] ~= nil and nutrients[1] > 0 then
+                self.inst:AddTag("fert1")
+            end
+            if nutrients[2] ~= nil and nutrients[2] > 0 then
+                self.inst:AddTag("fert2")
+            end
+            if nutrients[3] ~= nil and nutrients[3] > 0 then
+                self.inst:AddTag("fert3")
+            end
+        end
+    end)
+end
+
+--------------------------------------------------------------------------
+--[[ 照顾相关的与多年生作物兼容 ]]
+--------------------------------------------------------------------------
+
+if IsServer then
+    ------让果蝇能取消多年生作物照顾
+    local ATTACKPLANT_old = ACTIONS.ATTACKPLANT.fn
+    ACTIONS.ATTACKPLANT.fn = function(act)
+        if act.target ~= nil and act.target.components.perennialcrop ~= nil then
+            return act.target.components.perennialcrop:TendTo(act.doer, false)
+        end
+        return ATTACKPLANT_old(act)
+    end
+
+    ------让 寻找作物照顾机制 能兼容多年生作物（两种果蝇、土地爷用到了）
+    require "behaviours/findfarmplant"
+    if FindFarmPlant then
+        local function IsNearFollowPos(self, plant)
+            local followpos = self.getfollowposfn(self.inst)
+            local plantpos = plant:GetPosition()
+            return distsq(followpos.x, followpos.z, plantpos.x, plantpos.z) < 400
+        end
+
+        local Visit_old = FindFarmPlant.Visit
+        FindFarmPlant.Visit = function(self, ...)
+            if self.status == READY then
+                --找可照顾的多年生作物
+                self.inst.planttarget = FindEntity(self.inst, 20, function(plant)
+                    if
+                        plant.components.perennialcrop ~= nil and
+                        plant.components.perennialcrop:Tendable(self.inst, self.wantsstressed) and
+                        IsNearFollowPos(self, plant) and
+                        (self.validplantfn == nil or self.validplantfn(self.inst, plant))
+                    then
+                        return true
+                    end
+                end, { "crop_legion" }, nil)
+
+                if self.inst.planttarget then
+                    local action = BufferedAction(self.inst, self.inst.planttarget, self.action, nil, nil, nil, 0.1)
+                    self.inst.components.locomotor:PushAction(action, self.shouldrun)
+                    self.status = RUNNING
+                end
+            end
+            if self.inst.planttarget and self.inst.planttarget.components.perennialcrop ~= nil then
+                if self.status == RUNNING then
+                    local plant = self.inst.planttarget
+                    if
+                        not plant:IsValid() or not IsNearFollowPos(self, plant) or
+                        not plant.components.perennialcrop.tendable or
+                        not (self.validplantfn == nil or self.validplantfn(self.inst, plant))
+                    then
+                        self.inst.planttarget = nil
+                        self.status = FAILED
+                    end
+
+                    if not plant.components.perennialcrop:Tendable(self.inst, self.wantsstressed) then
+                        self.inst.planttarget = nil
+                        self.status = SUCCESS
+                    end
+                end
+                return
+            end
+            Visit_old(self, ...)
+        end
+
+    end
 end
 
 --------------------------------------------------------------------------

@@ -8,6 +8,8 @@
 （2）龙鳞片、岩浆虫卵等物品也能被脱壳之翅所用了
 （3）玩家开凿子圭神木岩，能应用工作效率加成了
 （4）下雨时能给多年生作物浇水了
+（5）坏坏果蝇、友好果蝇、土地公等生物能照顾/干扰照顾多年生作物了
+（6）1号肥改为对应加速生长，2号肥改为对应预防疾病（以前的对应是相反的）；施肥机制优化，某种肥力施满了就不再能施对应肥力的肥料了
 *【mod兼容】
 （1）【黑化排队论2】兼容了多年生作物的播种和浇水
 （2）【神话书说】葫芦的多年生作物的成熟状态显示动画正常了
@@ -526,10 +528,11 @@ end)
 ----------
 --黑化排队论2(有好几个版本，但组件好像是相同的)
 ----------
-AddComponentPostInit("actionqueuer", function(self, inst)
+AddComponentPostInit("actionqueuer", function(self)
 	if self.AddAction then
 		self.AddAction("leftclick", "PLANTSOIL_LEGION", true)
         self.AddAction("rightclick", "POUR_WATER_LEGION", true)
+        self.AddAction("leftclick", "FERTILIZE_LEGION", true)
 	end
 end)
 

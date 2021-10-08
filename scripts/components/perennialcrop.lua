@@ -40,6 +40,8 @@ local PerennialCrop = Class(function(self, inst)
 	self.ishuge = false --是否是巨型成熟
 	self.infested = 0 --被骚扰次数
 	self.taskgrow = nil
+	self.tendable = false --当前阶段是否能被照顾
+	self.tended = false --当前阶段是否已经照顾过了
 	self.timedata = {
 		start = nil, --开始进行生长的时间点
 		left = nil, --当暂停生长时，达到下一个阶段的剩余时间
@@ -81,18 +83,22 @@ nil,
 })
 
 local function TriggerNutrient(self)
-	if
-		self.nutrient >= self.nutrient_max
-		and self.nutrientgrow >= self.nutrientgrow_max
-		and self.nutrientsick >= self.nutrientsick_max
-	then
-		if self.inst:HasTag("fertilizable") then
-			self.inst:RemoveTag("fertilizable")
-		end
+	if self.nutrient >= self.nutrient_max then
+		self.inst:RemoveTag("fertable3")
 	else
-		if not self.inst:HasTag("fertilizable") then
-			self.inst:AddTag("fertilizable")
-		end
+		self.inst:AddTag("fertable3")
+	end
+
+	if self.nutrientgrow >= self.nutrientgrow_max then
+		self.inst:RemoveTag("fertable1")
+	else
+		self.inst:AddTag("fertable1")
+	end
+
+	if self.nutrientsick >= self.nutrientsick_max then
+		self.inst:RemoveTag("fertable2")
+	else
+		self.inst:AddTag("fertable2")
 	end
 end
 
@@ -233,6 +239,8 @@ function PerennialCrop:SetStage(stage, ishuge, isrotten, pushanim, skip)
 	if self.inst.components.farmplanttendable ~= nil then
 		self.inst.components.farmplanttendable:SetTendable(tendable)
 	end
+	self.tendable = tendable
+	self.tended = false
 
 	--额外设置
 	if self.fn_stage ~= nil then
@@ -469,6 +477,7 @@ function PerennialCrop:OnSave()
 		num_moisture = self.num_moisture > 0 and self.num_moisture or nil,
 		num_tended = self.num_tended > 0 and self.num_tended or nil,
 		num_perfect = self.num_perfect ~= nil and self.num_perfect or nil,
+		tended = self.tended or nil,
     }
 
 	if self.timedata.paused then
@@ -503,6 +512,15 @@ function PerennialCrop:OnLoad(data)
 	self.num_perfect = data.num_perfect ~= nil and data.num_perfect or nil
 
 	self:SetStage(self.stage, self.ishuge, self.isrotten, false, false)
+
+	--恢复当前阶段的照顾情况
+	self.tended = data.tended and true or false
+	if self.tended and self.tendable then --若已经照顾过，且当前阶段可被照顾，则不能再被照顾
+		if self.inst.components.farmplanttendable ~= nil then
+			self.inst.components.farmplanttendable:SetTendable(false)
+		end
+	end
+
 	self:OnEntitySleep() --把task取消，根据情况继续
 	if data.time_paused then
 		self.timedata.paused = true
@@ -548,7 +566,10 @@ end
 
 function PerennialCrop:OnRemoveFromEntity()
     self.inst:RemoveTag("flower")
-	self.inst:RemoveTag("fertilizable")
+	-- self.inst:RemoveTag("fertilizable")
+	self.inst:RemoveTag("fertable1")
+	self.inst:RemoveTag("fertable2")
+	self.inst:RemoveTag("fertable3")
 	self.inst:RemoveTag("needwater")
 	self.inst:AddTag("nognatinfest")
     if self.taskgrow ~= nil then
@@ -590,8 +611,41 @@ function PerennialCrop:Cure(doer) --治疗
 	self.sickness = 0
 end
 
-function PerennialCrop:TendTo(doer) --照顾
-	self.num_tended = self.num_tended + 1
+function PerennialCrop:Tendable(doer, wish) --是否能照顾
+	if not self.tendable then
+		return false
+	end
+
+	if wish == nil or wish then --希望是照顾
+		return not self.tended
+	else --希望是取消照顾
+		return self.tended
+	end
+end
+
+function PerennialCrop:TendTo(doer, wish) --照顾
+	if not self:Tendable(doer, wish) then
+		return false
+	end
+
+	if wish == nil or wish then --希望是照顾
+		self.num_tended = self.num_tended + 1
+		self.tended = true
+	else --希望是取消照顾
+		self.num_tended = self.num_tended - 1
+		self.tended = false
+	end
+	if self.inst.components.farmplanttendable ~= nil then
+		self.inst.components.farmplanttendable:SetTendable(not self.tended)
+	end
+	self.inst:DoTaskInTime(0.5 + math.random() * 0.5, function()
+		local fx = SpawnPrefab(self.tended and "farm_plant_happy" or "farm_plant_unhappy")
+		if fx ~= nil then
+			fx.Transform:SetPosition(self.inst.Transform:GetWorldPosition())
+		end
+	end)
+
+	return true
 end
 
 function PerennialCrop:DoMagicGrowth(doer, dt) -- 催熟
@@ -623,14 +677,14 @@ function PerennialCrop:Fertilize(item, doer) --施肥
 		local nutrients = item.components.fertilizer.nutrients
 		local isdone = false
 
-		--1号肥：预防疾病
-		if nutrients[1] ~= nil and nutrients[1] > 0 and self.nutrientsick < self.nutrientsick_max then
-			self.nutrientsick = math.min(self.nutrientsick_max, self.nutrientsick+nutrients[1])
+		--1号肥：加速生长
+		if nutrients[1] ~= nil and nutrients[1] > 0 and self.nutrientgrow < self.nutrientgrow_max then
+			self.nutrientgrow = math.min(self.nutrientgrow_max, self.nutrientgrow+nutrients[1])
 			isdone = true
 		end
-		--2号肥：加速生长
-		if nutrients[2] ~= nil and nutrients[2] > 0 and self.nutrientgrow < self.nutrientgrow_max then
-			self.nutrientgrow = math.min(self.nutrientgrow_max, self.nutrientgrow+nutrients[2])
+		--2号肥：预防疾病
+		if nutrients[2] ~= nil and nutrients[2] > 0 and self.nutrientsick < self.nutrientsick_max then
+			self.nutrientsick = math.min(self.nutrientsick_max, self.nutrientsick+nutrients[2])
 			isdone = true
 		end
 		--3号肥：生长必需
