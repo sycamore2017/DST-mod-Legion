@@ -113,6 +113,33 @@ local function TriggerMoisture(self)
 		end
 	end
 end
+-- tostring(value)
+local function GetDetailString(self, doer, type)
+	local titles = TUNING.LEGION_MOD_LANGUAGES == "chinese" and {
+		nutrients = "肥力",
+		moisture = "水分",
+		sickness = "疾病",
+		num_tended = "照料",
+		pollinated = "授粉",
+	} or {
+		nutrients = "Nutr ",
+		moisture = "Mois ",
+		sickness = "Sick ",
+		num_tended = "Tend ",
+		pollinated = "Pollinat ",
+	}
+
+	if type == 2 then
+		return titles.nutrients..tostring(self.nutrientgrow).."/"..tostring(self.nutrientsick).."/"..tostring(self.nutrient)
+			..", "..titles.moisture..tostring(self.moisture)
+			..", "..titles.sickness..tostring(self.sickness)
+			..", "..titles.num_tended..tostring(self.num_tended)
+			..", "..titles.pollinated..tostring(self.pollinated)
+	else
+		return titles.nutrients..tostring(self.nutrientgrow).."/"..tostring(self.nutrientsick).."/"..tostring(self.nutrient)
+			..", "..titles.moisture..tostring(self.moisture)
+	end
+end
 
 function PerennialCrop:SetUp(data)
 	self.weights = data.weights
@@ -713,6 +740,32 @@ function PerennialCrop:PourWater(item, doer, value) --浇水
 		self.moisture = math.min(self.moisture_max, self.moisture+(value or 6))
 		TriggerMoisture(self)
 	end
+end
+
+function PerennialCrop:SayDetail(doer, dotalk) --介绍细节
+	if
+		doer ~= nil and doer:HasTag("player") and not doer:HasTag("mime") and doer.components.inventory ~= nil
+	then
+		local str = nil
+		local hat = doer.components.inventory:GetEquippedItem(EQUIPSLOTS.HEAD)
+
+		if hat == nil then
+			if doer:HasTag("plantkin") then
+				str = GetDetailString(self, doer, 1)
+			end
+		elseif hat:HasTag("detailedplanthappiness") then
+			str = GetDetailString(self, doer, 2)
+		elseif hat:HasTag("plantinspector") then
+			str = GetDetailString(self, doer, 1)
+		end
+
+		if dotalk and str ~= nil and doer.components.talker ~= nil then
+			doer.components.talker:Say(str)
+		end
+
+		return str
+	end
+	return nil
 end
 
 return PerennialCrop

@@ -600,12 +600,16 @@ table.insert(prefs, Prefab(
         inst.components.workable:SetWorkAction(ACTIONS.MINE)
         inst.components.workable:SetWorkLeft(20)
         inst.components.workable:SetOnWorkCallback(function(inst, worker, workleft, numworks)
-            if workleft <= 0 then
-                inst.components.workable:SetWorkLeft(20)    --恢复工作量，永远都破坏不了
+            inst.components.workable:SetWorkLeft(20)    --恢复工作量，永远都破坏不了
+
+            if numworks == nil then
+                numworks = 1
+            elseif numworks >= 8 then --这里时为了防止直接破坏型（比如熊大、战车的撞击）
+                numworks = 2
             end
 
             if inst.treeState > 0 then
-                inst.countWorked = inst.countWorked + 1
+                inst.countWorked = inst.countWorked + numworks
 
                 if inst.countWorked >= (inst.treeState == 1 and 30 or 20) then
                     inst.countWorked = 0

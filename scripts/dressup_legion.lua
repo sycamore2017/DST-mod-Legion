@@ -749,12 +749,12 @@ local dressup_data =
         buildfile = "hat_straw_perd",
         buildsymbol = "swap_hat",
     },
-    plantregistryhat = --农研帽
+    plantregistryhat = --耕作先驱帽
     {
         buildfile = "hat_plantregistry",
         buildsymbol = "swap_hat",
     },
-    nutrientsgoggleshat = --远古农研帽
+    nutrientsgoggleshat = --高级耕作先驱帽
     {
         buildfile = "hat_nutrientsgoggles",
         buildsymbol = "swap_hat",

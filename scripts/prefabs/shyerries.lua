@@ -299,6 +299,7 @@ local function createtree(name, buildname, iswild, workleft, physicsize, scalesi
         inst:AddTag("shyerry")
         inst:AddTag("plant") --植物标签，和植物人相关的
         -- inst:AddTag("tree") --不能有这个标签，会让农场书报错
+        inst:AddTag("boulder") --使巨鹿、熊獾的移动能撞烂自己
 
         inst:SetPrefabNameOverride(iswild and "shyerrytree" or "shyerrytree_planted")
 

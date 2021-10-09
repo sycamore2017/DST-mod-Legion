@@ -474,17 +474,10 @@ local function MakePlant(data)
 			inst:AddComponent("inspectable")
 			inst.components.inspectable.nameoverride = "FARM_PLANT"
 			inst.components.inspectable.descriptionfn = function(inst, doer) --提示自身的生长数据
-				if doer.components.inventory ~= nil then
-					local hat = doer.components.inventory:GetEquippedItem(EQUIPSLOTS.HEAD)
-					if hat == nil then
-						if doer:HasTag("plantkin") then
-							
-						end
-					elseif hat:HasTag("plantinspector") then
-					elseif hat:HasTag("detailedplanthappiness") then
-					end
-					return nil
+				if inst.components.perennialcrop ~= nil then
+					return inst.components.perennialcrop:SayDetail(doer, false)
 				end
+				return nil
 			end
 			inst.components.inspectable.getstatus = function(inst)
 				if inst.components.burnable ~= nil and inst.components.burnable:IsBurning() then
