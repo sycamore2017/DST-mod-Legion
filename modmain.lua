@@ -41,6 +41,7 @@ PrefabFiles = {
     -- "aatest_anim",
     "fx_legion",                --特效
     "buffs_legion",             --buff
+    "skinprefabs_legion",       --skined_legion
 }
 
 Assets = {
@@ -523,6 +524,12 @@ end)
 --         inst.components.hounded:SetSpawnData(houndspawn)
 --     end
 -- end)
+
+--------------------------------------------------------------------------
+--[[ 皮肤 ]]
+--------------------------------------------------------------------------
+
+modimport("scripts/skin/skin_legion.lua") --skined_legion
 
 --------------------------------------------------------------------------
 --[[ mod之间的兼容 ]]

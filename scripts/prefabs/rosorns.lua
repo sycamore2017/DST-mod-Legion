@@ -11,7 +11,12 @@ local function OnEquip(inst, owner) --装备武器时
     --覆盖人物的swap_object这个symbol。swap_object，是人物身上的一个symbol，
     --swap_myitem_build，则是我们之前准备好的，用于手持武器的build，
     --swap_myitem就是存放手持武器的图片的文件夹的名字，mod tools自动把它输出为一个symbol。
-    owner.AnimState:OverrideSymbol("swap_object", "swap_rosorns", "swap_rosorns")
+    if inst.skin_legion ~= nil then
+        owner.AnimState:OverrideSymbol("swap_object", "swap_spear_mirrorrose", "swap_spear")
+    else
+        owner.AnimState:OverrideSymbol("swap_object", "swap_rosorns", "swap_rosorns")
+    end
+
     owner.AnimState:Show("ARM_carry") --显示持物手
     owner.AnimState:Hide("ARM_normal") --隐藏普通的手
 end
