@@ -19,15 +19,13 @@ end
 -----
 
 local assets = {
-    Asset("ATLAS", "images/inventoryimages/rosorns.xml"), --预加载，给科技栏用的
-    Asset("IMAGE", "images/inventoryimages/rosorns.tex"),
     Asset("ATLAS", "images/inventoryimages/lileaves.xml"),
     Asset("IMAGE", "images/inventoryimages/lileaves.tex"),
     Asset("ATLAS", "images/inventoryimages/orchitwigs.xml"),
     Asset("IMAGE", "images/inventoryimages/orchitwigs.tex"),
     Asset("ATLAS", "images/inventoryimages/neverfade.xml"),
     Asset("IMAGE", "images/inventoryimages/neverfade.tex"),
-    Asset("ATLAS", "images/inventoryimages/sachet.xml"),
+    Asset("ATLAS", "images/inventoryimages/sachet.xml"), --预加载，给科技栏用的
     Asset("IMAGE", "images/inventoryimages/sachet.tex"),
 }
 

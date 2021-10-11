@@ -11,14 +11,22 @@ local IsServer = TheNet:GetIsServer() or TheNet:IsDedicated()
 local rarityRepay = "ProofOfPurchase"
 local rarityFree = "Event"
 
-function _G.rosorns_clear_fn(inst) --【服务端】
-    inst.AnimState:SetBank("rosorns")
-    inst.AnimState:SetBuild("rosorns")
-    inst.AnimState:PlayAnimation("idle")
+_G.SKIN_PREFABS_LEGION = {
+    rosorns = {
+        assets = nil, --仅仅是用于初始化注册
+        image = { name = nil, atlas = nil }, --提前注册，让客户端科技栏使用的皮肤图片
+        fn_start = function(skined, skindata) --应用皮肤时的函数
+            local inst = skined.inst
+            inst.AnimState:SetBank("rosorns")
+            inst.AnimState:SetBuild("rosorns")
+            inst.AnimState:PlayAnimation("idle")
 
-    inst.components.inventoryitem.atlasname = "images/inventoryimages/rosorns.xml"
-    inst.components.inventoryitem:ChangeImageName("rosorns")
-end
+            inst.components.inventoryitem.atlasname = skindata.image.atlas
+			inst.components.inventoryitem:ChangeImageName(skindata.image.name)
+        end,
+        fn_end = nil, --取消皮肤时的函数
+    },
+}
 
 _G.SKINS_LEGION = {
 	rosorns_spell = {
@@ -29,6 +37,8 @@ _G.SKINS_LEGION = {
 		release_group = 555,
 		build_name_override = nil, --皮肤名称(居然是小写)
 
+        skin_idx = nil,
+        skin_id = "61627d927bbb727be174c4a0",
 		assets = { --仅仅是用于初始化注册
 			Asset("ANIM", "anim/skin/swap_spear_mirrorrose.zip"),
 			Asset("ANIM", "anim/skin/spear_mirrorrose.zip"),
@@ -36,22 +46,49 @@ _G.SKINS_LEGION = {
 		image = { name = nil, atlas = nil }, --提前注册，让客户端科技栏使用的皮肤图片
 		anim = { bank = "spear_mirrorrose", build = "spear_mirrorrose", anim = nil },
         namestr = { chs = "施咒蔷薇", eng = "Rose Spell Staff" }, --皮肤名字
+        fn_start = function(skined, skindata) --应用皮肤时的函数
+            local inst = skined.inst
+            inst.AnimState:SetBank(skindata.anim.bank)
+			inst.AnimState:SetBuild(skindata.anim.build)
+			inst.AnimState:PlayAnimation(skindata.anim.anim)
+
+            inst.components.inventoryitem.atlasname = skindata.image.atlas
+			inst.components.inventoryitem:ChangeImageName(skindata.image.name)
+        end,
+        fn_end = nil, --取消皮肤时的函数
     },
 }
 
+_G.SKIN_IDS_LEGION = {
+    -- ["61627d927bbb727be174c4a0"] = { rosorns_spell = true, },
+}
+_G.SKIN_IDX_LEGION = {
+    -- [1] = "rosorns_spell",
+}
+
 local ischinese = TUNING.LEGION_MOD_LANGUAGES == "chinese"
+local skin_idx = 1
 for skinname,v in pairs(_G.SKINS_LEGION) do
+    _G.SKIN_IDX_LEGION[skin_idx] = skinname
+    v.skin_idx = skin_idx
+    skin_idx = skin_idx + 1
+
+    if _G.SKIN_IDS_LEGION[v.skin_id] == nil then
+        _G.SKIN_IDS_LEGION[v.skin_id] = {}
+    end
+    _G.SKIN_IDS_LEGION[v.skin_id][skinname] = true
+
 	if v.image ~= nil then
 		if v.image.name == nil then
-			v.image.name = skinname..".tex"
+			v.image.name = skinname
 		end
 		if v.image.atlas == nil then
 			v.image.atlas = "images/inventoryimages_skin/"..skinname..".xml"
 		end
 
         table.insert(Assets, Asset("ATLAS", v.image.atlas))
-        table.insert(Assets, Asset("IMAGE", "images/inventoryimages_skin/"..v.image.name))
-        RegisterInventoryItemAtlas(v.image.atlas, v.image.name)
+        table.insert(Assets, Asset("IMAGE", "images/inventoryimages_skin/"..v.image.name..".tex"))
+        RegisterInventoryItemAtlas(v.image.atlas, v.image.name..".tex")
 	end
 	if v.anim ~= nil then
 		if v.anim.bank == nil then
@@ -89,6 +126,27 @@ for skinname,v in pairs(_G.SKINS_LEGION) do
         table.insert(_G.PREFAB_SKINS[v.base_prefab], skinname)
     end
 end
+for baseprefab,v in pairs(_G.SKIN_PREFABS_LEGION) do
+    if v.image ~= nil then
+		if v.image.name == nil then
+			v.image.name = baseprefab
+		end
+		if v.image.atlas == nil then
+			v.image.atlas = "images/inventoryimages/"..baseprefab..".xml"
+		end
+
+        table.insert(Assets, Asset("ATLAS", v.image.atlas))
+        table.insert(Assets, Asset("IMAGE", "images/inventoryimages/"..v.image.name..".tex"))
+        RegisterInventoryItemAtlas(v.image.atlas, v.image.name..".tex")
+	end
+    if v.assets ~= nil then
+        for kk,ast in pairs(v.assets) do
+            table.insert(Assets, ast)
+        end
+    end
+    _G[baseprefab.."_clear_fn"] = function(inst) end --【服务端】给CreatePrefabSkin()用的
+end
+skin_idx = nil
 ischinese = nil
 
 ------重新生成一遍PREFAB_SKINS_IDS(在prefabskins.lua中被定义)
@@ -100,6 +158,7 @@ for prefab,skins in pairs(_G.PREFAB_SKINS) do
 	end
 end
 
+--undo:test
 AddRecipe(
     "rosorns", {
         Ingredient("siving_rocks", 6, "images/inventoryimages/siving_rocks.xml"),
@@ -110,27 +169,19 @@ AddRecipe(
 STRINGS.RECIPE_DESC.ROSORNS = "测试啊"
 
 --------------------------------------------------------------------------
---[[ 资源注册 ]]
+--[[ 修改SpawnPrefab()以应用皮肤机制 ]]
 --------------------------------------------------------------------------
 
--- local prefabFiles = {
---     "fimbul_axe",
--- }
-
--- for k,v in pairs(prefabFiles) do
---     table.insert(PrefabFiles, v)
--- end
-
------
-
--- local assets = {
---     Asset("ATLAS", "images/inventoryimages/dualwrench.xml"),
---     Asset("IMAGE", "images/inventoryimages/dualwrench.tex"),
--- }
-
--- for k,v in pairs(assets) do
---     table.insert(Assets, v)
--- end
+local SpawnPrefab_old = _G.SpawnPrefab
+_G.SpawnPrefab = function(name, skin, skin_id, creator)
+    --【服务端】环境
+    local prefab = SpawnPrefab_old(name, skin, skin_id, creator)
+    if prefab ~= nil and creator ~= nil then
+        prefab.skin_legion = skin
+        prefab.skin_ownerid_legion = creator
+    end
+    return prefab
+end
 
 --------------------------------------------------------------------------
 --[[ 修改皮肤的网络判定函数 ]]
@@ -154,11 +205,11 @@ _G.ValidateRecipeSkinRequest = function(user_id, prefab_name, skin, ...)
 end
 
 --------------------------------------------------------------------------
---[[ 修改ui以显示mod皮肤 ]]
+--[[ 修改制作栏ui以显示mod皮肤 ]]
 --------------------------------------------------------------------------
 
 AddClassPostConstruct("widgets/recipepopup", function(self)
-    ------【客户端】获取玩家拥有的皮肤
+    ------【客户端】环境
     local GetSkinsList_old = self.GetSkinsList
     self.GetSkinsList = function(self, ...)
         self.skins_list = GetSkinsList_old(self, ...)
@@ -180,9 +231,4 @@ AddClassPostConstruct("widgets/recipepopup", function(self)
 
         return self.skins_list
     end
-
-    ------【客户端】生成玩家的皮肤选项
-    --local _GSO = self.GetSkinOptions
-    -- self.GetSkinOptions = function(self)
-    -- end
 end)
