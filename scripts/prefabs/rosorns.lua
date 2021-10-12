@@ -1,29 +1,25 @@
 local assets =
 {
-    Asset("ANIM", "anim/rosorns.zip"),--这个是放在地上的动画文件
-    Asset("ANIM", "anim/swap_rosorns.zip"), --这个是手上动画
+    Asset("ANIM", "anim/rosorns.zip"),
+    Asset("ANIM", "anim/swap_rosorns.zip"),
     Asset("ATLAS", "images/inventoryimages/rosorns.xml"),
     Asset("IMAGE", "images/inventoryimages/rosorns.tex"),
 }
 
-local function OnEquip(inst, owner) --装备武器时
-    --这句话的含义是，用swap_myitem_build这个文件里的swap_myitem这个symbol，
-    --覆盖人物的swap_object这个symbol。swap_object，是人物身上的一个symbol，
-    --swap_myitem_build，则是我们之前准备好的，用于手持武器的build，
-    --swap_myitem就是存放手持武器的图片的文件夹的名字，mod tools自动把它输出为一个symbol。
-    if inst.skin_legion ~= nil then
-        owner.AnimState:OverrideSymbol("swap_object", "swap_spear_mirrorrose", "swap_spear")
+local function OnEquip(inst, owner)
+    local skindata = inst.components.skinedlegion ~= nil and inst.components.skinedlegion:GetSkinedData() or nil
+    if skindata ~= nil and skindata.fn_onEquip ~= nil then
+        skindata.fn_onEquip(skindata, inst, owner)
     else
         owner.AnimState:OverrideSymbol("swap_object", "swap_rosorns", "swap_rosorns")
+        owner.AnimState:Show("ARM_carry")
+        owner.AnimState:Hide("ARM_normal")
     end
-
-    owner.AnimState:Show("ARM_carry") --显示持物手
-    owner.AnimState:Hide("ARM_normal") --隐藏普通的手
 end
 
-local function OnUnequip(inst, owner)   --放下武器时
-    owner.AnimState:Hide("ARM_carry") --隐藏持物手
-    owner.AnimState:Show("ARM_normal") --显示普通的手
+local function OnUnequip(inst, owner)
+    owner.AnimState:Hide("ARM_carry")
+    owner.AnimState:Show("ARM_normal")
 end
 
 local function onattack(inst, owner, target)    --攻击直接扣血，而不考虑防御系数
@@ -100,26 +96,23 @@ local function onattack(inst, owner, target)    --攻击直接扣血，而不考
     end
 end
 
---这个函数就是实际创建物体的函数，上面所有定义到的函数，变量，都需要直接或者间接地在这个函数中使用，才能起作用
 local function fn()
-    local inst = CreateEntity()--创建一个实体，常见的各种inst，根源就是在这里。
+    local inst = CreateEntity()
 
-    inst.entity:AddTransform()--给实体添加转换组件，这主要涉及的是空间位置的转换和获取
-    inst.entity:AddAnimState()--给实体添加动画组件，从而实体能在游戏上显示出来。
+    inst.entity:AddTransform()
+    inst.entity:AddAnimState()
     inst.entity:AddNetwork()
 
-    --给实体设定为"物品"的物理属性，这是一个写在data\scripts\standardcomponents里的标准函数，
-    --类似的还有MakeCharacterPhysics，就是设定"人物"的物理属性，基本上所有会动的生物，都会有MakeCharacterPhysics
     MakeInventoryPhysics(inst)
 
-    inst.AnimState:SetBank("rosorns")--设置实体的bank，此处是指放在地上的时候，下同
-    inst.AnimState:SetBuild("rosorns")--设置实体的build
-    inst.AnimState:PlayAnimation("idle")--设置实体播放的动画
+    inst.AnimState:SetBank("rosorns")
+    inst.AnimState:SetBuild("rosorns")
+    inst.AnimState:PlayAnimation("idle")
 
-    inst:AddTag("sharp") --武器的标签跟攻击方式跟攻击音效有关 没有特殊的话就用这两个
+    inst:AddTag("sharp")
     inst:AddTag("pointy")
-    inst:AddTag("show_spoilage")    --显示新鲜度
-    inst:AddTag("icebox_valid")     --能装进冰箱
+    inst:AddTag("show_spoilage")
+    inst:AddTag("icebox_valid")
 
     --weapon (from weapon component) added to pristine state for optimization
     inst:AddTag("weapon")
@@ -131,36 +124,35 @@ local function fn()
         self.inst.AnimState:SetFloatParams(0.15, 1, 0.1)
     end
 
-    inst.entity:SetPristine()
+    inst:AddComponent("skinedlegion")
 
-    --如果不是主机，直接返回(也就是后面的代码客机不需要加载，只需要主机执行)，让大部分的代码快只需要主机运行，减少客机的负担
-    if not TheWorld.ismastersim then 
+    inst.entity:SetPristine()
+    if not TheWorld.ismastersim then
         return inst
     end
 
-    inst:AddComponent("inventoryitem")--添加物品栏物品组件，只有有了这个组件，你才能把这个物品捡起放到物品栏里。
+    inst:AddComponent("inventoryitem")
     inst.components.inventoryitem.imagename = "rosorns"
     inst.components.inventoryitem.atlasname = "images/inventoryimages/rosorns.xml"
 
-    inst:AddComponent("inspectable") --可检查组件
+    inst:AddComponent("inspectable")
 
-    inst:AddComponent("equippable")--添加可装备组件，有了这个组件，你才能装备物品
-    --设定物品在装备和卸下时执行的函数。在前面定义的两个函数是OnEquip，OnUnequip里，
-    --我们主要是围绕着改变人物外形设定了一些基本代码。 在装上的时候，会让人物的持物手显示出来，普通手隐藏，卸下时则反过来。
-    --需要注意的是，OnEquip，OnUnequip都是本地函数，要想让它们发挥作用，就必须要通过这里的组件接口来实现。
+    inst:AddComponent("equippable")
     inst.components.equippable:SetOnEquip(OnEquip)
     inst.components.equippable:SetOnUnequip(OnUnequip)
 
-    inst:AddComponent("weapon") --增加武器组件 有了这个才可以打人
-    inst.components.weapon:SetDamage(0) --设置伤害，如果为0会吸引不了仇恨、不触发被攻击动画，击杀影怪也不加精神
+    inst:AddComponent("weapon")
+    inst.components.weapon:SetDamage(0)
     inst.components.weapon:SetOnAttack(onattack)
 
-    inst:AddComponent("perishable") --会腐烂
+    inst:AddComponent("perishable")
     inst.components.perishable:SetPerishTime(TUNING.PERISH_FASTISH)   --8*total_day_time*perish_warp,
     inst.components.perishable:StartPerishing()
     inst.components.perishable.onperishreplacement = "spoiled_food"
 
-    MakeHauntableLaunchAndPerish(inst)  --作祟相关函数
+    MakeHauntableLaunchAndPerish(inst)
+
+    inst.components.skinedlegion:SetOnPreLoad()
 
     return inst
 end

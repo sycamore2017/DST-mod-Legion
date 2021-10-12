@@ -2,7 +2,6 @@
 
 local _G = GLOBAL
 local IsServer = TheNet:GetIsServer() or TheNet:IsDedicated()
--- local dataSkins = require("skin/skinsdata_legion")
 
 --------------------------------------------------------------------------
 --[[ 全局皮肤总数据，以及修改 ]]
@@ -15,8 +14,7 @@ _G.SKIN_PREFABS_LEGION = {
     rosorns = {
         assets = nil, --仅仅是用于初始化注册
         image = { name = nil, atlas = nil }, --提前注册，让客户端科技栏使用的皮肤图片
-        fn_start = function(skined, skindata) --应用皮肤时的函数
-            local inst = skined.inst
+        fn_start = function(inst, skindata) --应用皮肤时的函数
             inst.AnimState:SetBank("rosorns")
             inst.AnimState:SetBuild("rosorns")
             inst.AnimState:PlayAnimation("idle")
@@ -46,8 +44,7 @@ _G.SKINS_LEGION = {
 		image = { name = nil, atlas = nil }, --提前注册，让客户端科技栏使用的皮肤图片
 		anim = { bank = "spear_mirrorrose", build = "spear_mirrorrose", anim = nil },
         namestr = { chs = "施咒蔷薇", eng = "Rose Spell Staff" }, --皮肤名字
-        fn_start = function(skined, skindata) --应用皮肤时的函数
-            local inst = skined.inst
+        fn_start = function(inst, skindata) --应用皮肤时的函数
             inst.AnimState:SetBank(skindata.anim.bank)
 			inst.AnimState:SetBuild(skindata.anim.build)
 			inst.AnimState:PlayAnimation(skindata.anim.anim)
@@ -56,6 +53,12 @@ _G.SKINS_LEGION = {
 			inst.components.inventoryitem:ChangeImageName(skindata.image.name)
         end,
         fn_end = nil, --取消皮肤时的函数
+
+        fn_onEquip = function(skindata, inst, owner)
+            owner.AnimState:OverrideSymbol("swap_object", "swap_spear_mirrorrose", "swap_spear")
+            owner.AnimState:Show("ARM_carry")
+            owner.AnimState:Hide("ARM_normal")
+        end,
     },
 }
 
@@ -172,15 +175,22 @@ STRINGS.RECIPE_DESC.ROSORNS = "测试啊"
 --[[ 修改SpawnPrefab()以应用皮肤机制 ]]
 --------------------------------------------------------------------------
 
-local SpawnPrefab_old = _G.SpawnPrefab
-_G.SpawnPrefab = function(name, skin, skin_id, creator)
-    --【服务端】环境
-    local prefab = SpawnPrefab_old(name, skin, skin_id, creator)
-    if prefab ~= nil and creator ~= nil then
-        prefab.skin_legion = skin
-        prefab.skin_ownerid_legion = creator
+if IsServer then
+    local SpawnPrefab_old = _G.SpawnPrefab
+    _G.SpawnPrefab = function(name, skin, skin_id, creator)
+        --【服务端】环境
+        if skin ~= nil and SKINS_LEGION[skin] ~= nil then
+            local prefab = SpawnPrefab_old(name, nil, nil, creator)
+            if prefab ~= nil and creator ~= nil then
+                if prefab.components.skinedlegion ~= nil then
+                    prefab.components.skinedlegion:SetSkin(skin)
+                end
+            end
+            return prefab
+        else
+            return SpawnPrefab_old(name, skin, skin_id, creator)
+        end
     end
-    return prefab
 end
 
 --------------------------------------------------------------------------
