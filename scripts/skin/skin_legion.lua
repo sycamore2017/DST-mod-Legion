@@ -63,6 +63,7 @@ _G.SKINS_LEGION = {
 }
 
 _G.SKIN_IDS_LEGION = {
+    ["freeskins"] = {}, --免费皮肤全部装这里面，skin_id设置为"freeskins"就好了
     -- ["61627d927bbb727be174c4a0"] = { rosorns_spell = true, },
 }
 _G.SKIN_IDX_LEGION = {
@@ -242,3 +243,238 @@ AddClassPostConstruct("widgets/recipepopup", function(self)
         return self.skins_list
     end
 end)
+
+--------------------------------------------------------------------------
+--[[ 给玩家实体增加已有皮肤获取与管理机制
+    Tip：
+        TheNet:GetIsMasterSimulation()  --是否为服务器世界(主机+云服)
+        TheNet:GetIsServer()            --是否为主机世界(玩家本地电脑开的，既跑进程，也要运行ui)
+        TheNet:IsDedicated()            --是否为云服世界(只跑进程，不运行ui)
+        TheShard:IsSecondary()          --是否为副世界(所以，not TheShard:IsSecondary() 就能确定是主世界了)
+        TheShard:GetShardId()           --获取当前世界的ID
+
+        世界分为3种
+            1、主世界(运行主服务器代码，与客户端通信)、
+            2、副世界(运行副服务器代码，与客户端通信)、
+            3、客户端世界(运行客户端代码，与当前所处的服务器世界通信)
+        例如，1个玩家用本地电脑开含洞穴存档，则世界有主世界(与房主客户端世界是同一个)、洞穴世界(副世界)、客户端(其他玩家的各有一个)。
+            开了含洞穴云服存档，则世界有主世界(云服)、洞穴世界(副世界)、客户端(所有玩家各有一个)
+        modmain会在每个世界都加载一次
+
+        TheWorld.ismastersim        --是否为服务器世界(主机+云服。本质上就是 TheNet:GetIsMasterSimulation())
+        TheWorld.ismastershard      --是否为主世界(本质上就是 TheWorld.ismastersim and not TheShard:IsSecondary())
+]]--
+--------------------------------------------------------------------------
+
+local fn_GetSkinData = nil
+local fn_skinDataDirty = nil
+if IsServer then
+    --不想麻烦地写在世界里了，换个方式
+    -- AddPrefabPostInit("shard_network", function(inst) --这个prefab只存在于服务器世界里（且只能存在一个）
+    --     inst:AddComponent("shard_skin_legion")
+    -- end)
+
+    _G.skinData_cache_legion = {
+        -- Kxx_xxxx = {
+        --     errcount = 0,
+        --     loadtag = nil, --空值-未开始、1-成功、-1-失败、0-加载中
+        --     task = nil,
+        --     lastquerytime = nil, --上次请求时的现实时间
+        --     skins = nil,
+        -- },
+    }
+
+    local function StopQueryTask(state)
+        if state.task ~= nil then
+            state.task:Cancel()
+            state.task = nil
+        end
+        state.errcount = 0
+    end
+
+    local function SetNet_skinIdx(player, skindata)
+        if skindata == nil then
+            player._skin_idxs1:set({ [1] = 0 })
+        else
+            local idxs1 = { [1] = 0 }
+            -- local idxs2 = {} --备用
+            local i = 0
+            for skinname,v in pairs(skindata) do
+                local skin = SKINS_LEGION[skinname]
+                if skin ~= nil then
+                    i = i + 1
+                    if i <= 25 then
+                        idxs1[i] = skin.skin_idx
+                    -- elseif i <= 50 then
+                    --     idxs2[i] = skin.skin_idx
+                    else
+                        break
+                    end
+                end
+            end
+
+            player._skin_idxs1:set(idxs1)
+            -- if i > 25 then
+            --     player._skin_idxs2:set(idxs2)
+            -- end
+        end
+        player.skinData_legion = skindata
+    end
+
+    fn_GetSkinData = function(player, userid, delaytime)
+        if TheWorld == nil then
+            return
+        end
+
+        local state = {
+            errcount = 0,
+            loadtag = nil,
+            task = nil,
+            lastquerytime = os.time(),
+            skins = nil,
+        }
+        local isbind = nil
+        state.task = TheWorld:DoPeriodicTask(3, function()
+            --参数有效性判断
+            local user_id = player ~= nil and player.userid or userid
+            if user_id == nil or user_id == "" then
+                if state.errcount >= 2 then
+                    StopQueryTask(state)
+                else
+                    state.errcount = state.errcount + 1
+                end
+                return
+            end
+
+            --是否已经在进行请求的判断
+            if not isbind then
+                local skinData_cache = skinData_cache_legion[user_id]
+                if skinData_cache ~= nil then
+                    if skinData_cache.loadtag == 0 then --有 正在进行 的请求，放弃当前操作
+                        StopQueryTask(state)
+                        return
+                    elseif skinData_cache.loadtag == 1 then --有 已完成 的请求，放弃当前操作，并处理已有数据
+                        StopQueryTask(state)
+                        if player ~= nil then
+                            SetNet_skinIdx(player, skinData_cache.skins)
+                            skinData_cache.loadtag = nil --被用过后才恢复初始值
+                        end
+                        return
+                    end
+                    StopQueryTask(skinData_cache) --其他情况，取消已有task
+                end
+                skinData_cache_legion[user_id] = state
+                isbind = true
+            end
+
+            --实体有效性判断
+            if player ~= nil and not player:IsValid() then
+                StopQueryTask(state)
+                state.loadtag = nil
+                return
+            end
+
+            --task请求状态判断
+            if state.loadtag == 0 then --加载中，等一会
+                return
+            elseif state.loadtag == -1 then --失败了，开始计失败次数
+                if state.errcount >= 2 then
+                    StopQueryTask(state)
+                    return
+                else
+                    state.errcount = state.errcount + 1
+                end
+            elseif state.loadtag == 1 then --成功啦！结束task
+                StopQueryTask(state)
+                return
+            end
+
+            state.loadtag = 0
+            TheSim:QueryServer(
+                "https://fireleaves.cn/account/locakedSkin?mid=6041a52be3a3fb1f530b550a&id="..user_id,
+                function(result_json, isSuccessful, resultCode)
+                    if isSuccessful and string.len(result_json) > 1 and resultCode == 200 then
+                        local status, data = pcall( function() return json.decode(result_json) end )
+                        print("------------skined: ", tostring(result_json)) --test
+                        if not status then
+                            print("[SkinUser_legion] Faild to parse quest json for "
+                                ..tostring(user_id).."! ", tostring(status)
+                            )
+                            state.loadtag = -1
+                        else
+                            local skins = nil
+                            if data ~= nil then
+                                if data.lockedSkin ~= nil and type(data.lockedSkin) == "table" then
+                                    for kk,skinid in pairs(data.lockedSkin) do
+                                        local skinkeys = SKIN_IDS_LEGION[skinid]
+                                        if skinkeys ~= nil then
+                                            if skins == nil then
+                                                skins = {}
+                                            end
+                                            for skinname,vv in pairs(skinkeys) do
+                                                if SKINS_LEGION[skinname] ~= nil then
+                                                    skins[skinname] = true
+                                                end
+                                            end
+                                        end
+                                    end
+                                end
+                            end
+                            if player ~= nil then
+                                SetNet_skinIdx(player, skins)
+                                state.loadtag = nil
+                            else
+                                state.loadtag = 1
+                            end
+                            state.skins = skins
+                            StopQueryTask(state)
+                        end
+                    else
+                        state.loadtag = -1
+                    end
+                end,
+            "GET")
+
+        end, delaytime)
+    end
+else
+    fn_skinDataDirty = function(inst, valuekey)
+        local idxs = inst[valuekey]:value()
+        if idxs ~= nil and #idxs > 0 then
+            if idxs[1] == 0 then --第一个元素为0代表想清除皮肤数据
+                inst.skinData_legion = nil
+            else
+                if inst.skinData_legion == nil then
+                    inst.skinData_legion = {}
+                end
+                for k,v in pairs(idxs) do
+                    if SKIN_IDX_LEGION[v] ~= nil then
+                        inst.skinData_legion[SKIN_IDX_LEGION[v]] = true
+                    end
+                end
+            end
+        end
+    end
+end
+
+AddPlayerPostInit(function(inst)
+    inst.skinData_legion = nil
+    inst._skin_idxs1 = net_bytearray(inst.GUID, "localplayer._skin_idxs1", "skin_data1_l_dirty")
+    --net_bytearray只能装31个元素，所以这里可以准备一下多个变量
+    -- inst._skin_idxs2 = net_bytearray(inst.GUID, "localplayer._skin_idxs2", "skin_data2_l_dirty")
+
+    if IsServer then
+        fn_GetSkinData(inst, 0.5)
+    else
+        inst:ListenForEvent("skin_data1_l_dirty", function()
+            fn_skinDataDirty(inst, "_skin_idxs1")
+        end)
+        -- inst:ListenForEvent("skin_data2_l_dirty", function() --备用
+        --     fn_skinDataDirty(inst, "_skin_idxs2")
+        -- end)
+    end
+end)
+
+--------------------------------------------------------------------------
+--[[ 玩家实体监听当前世界的皮肤数据并管理自己客户端皮肤数据 ]]
+--------------------------------------------------------------------------
