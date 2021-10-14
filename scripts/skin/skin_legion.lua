@@ -23,6 +23,9 @@ _G.SKIN_PREFABS_LEGION = {
 			inst.components.inventoryitem:ChangeImageName(skindata.image.name)
         end,
         fn_end = nil, --取消皮肤时的函数
+
+        exchangefx = { prefab = nil, offset_y = nil, scale = nil },
+        -- fn_spawnSkinExchangeFx = function(inst, skindata)end, --皮肤交换时的特效生成函数，替换exchangefx的默认方式
     },
 }
 
@@ -59,6 +62,9 @@ _G.SKINS_LEGION = {
             owner.AnimState:Show("ARM_carry")
             owner.AnimState:Hide("ARM_normal")
         end,
+
+        exchangefx = { prefab = nil, offset_y = nil, scale = nil },
+        -- fn_spawnSkinExchangeFx = function(inst, skindata)end, --皮肤交换时的特效生成函数，替换exchangefx的默认方式
     },
 }
 
@@ -113,6 +119,11 @@ for skinname,v in pairs(_G.SKINS_LEGION) do
             table.insert(Assets, ast)
         end
     end
+    if v.exchangefx ~= nil then
+        if v.exchangefx.prefab == nil then
+            v.exchangefx.prefab = "explode_reskin"
+        end
+    end
 
     table.insert(v.skin_tags, string.upper(skinname))
     table.insert(v.skin_tags, "CRAFTABLE")
@@ -148,6 +159,11 @@ for baseprefab,v in pairs(_G.SKIN_PREFABS_LEGION) do
             table.insert(Assets, ast)
         end
     end
+    if v.exchangefx ~= nil then
+        if v.exchangefx.prefab == nil then
+            v.exchangefx.prefab = "explode_reskin"
+        end
+    end
     _G[baseprefab.."_clear_fn"] = function(inst) end --【服务端】给CreatePrefabSkin()用的
 end
 skin_idx = nil
@@ -171,28 +187,6 @@ AddRecipe(
     "images/inventoryimages/rosorns.xml", "rosorns.tex"
 )
 STRINGS.RECIPE_DESC.ROSORNS = "测试啊"
-
---------------------------------------------------------------------------
---[[ 修改SpawnPrefab()以应用皮肤机制 ]]
---------------------------------------------------------------------------
-
-if IsServer then
-    local SpawnPrefab_old = _G.SpawnPrefab
-    _G.SpawnPrefab = function(name, skin, skin_id, creator)
-        --【服务端】环境
-        if skin ~= nil and SKINS_LEGION[skin] ~= nil then
-            local prefab = SpawnPrefab_old(name, nil, nil, creator)
-            if prefab ~= nil and creator ~= nil then
-                if prefab.components.skinedlegion ~= nil then
-                    prefab.components.skinedlegion:SetSkin(skin)
-                end
-            end
-            return prefab
-        else
-            return SpawnPrefab_old(name, skin, skin_id, creator)
-        end
-    end
-end
 
 --------------------------------------------------------------------------
 --[[ 修改皮肤的网络判定函数 ]]
@@ -219,19 +213,30 @@ end
 --[[ 修改制作栏ui以显示mod皮肤 ]]
 --------------------------------------------------------------------------
 
+local function DoYouHaveSkin(skinname, myskins)
+    if SKIN_IDS_LEGION.freeskins[skinname] then
+        return true
+    elseif myskins ~= nil and myskins[skinname] then
+        return true
+    end
+    return false
+end
+
 AddClassPostConstruct("widgets/recipepopup", function(self)
     ------【客户端】环境
     local GetSkinsList_old = self.GetSkinsList
     self.GetSkinsList = function(self, ...)
-        self.skins_list = GetSkinsList_old(self, ...)
+        if self.owner == nil then
+            return GetSkinsList_old(self, ...)
+        end
 
-        --undo这里需要确定玩家是否拥有该皮肤
-        if self.recipe and PREFAB_SKINS[self.recipe.product] then
-            for _, item_type in pairs(PREFAB_SKINS[self.recipe.product]) do
-                if SKINS_LEGION[item_type] then
+        GetSkinsList_old(self, ...)
+        if self.recipe and SKIN_PREFABS_LEGION[self.recipe.product] and PREFAB_SKINS[self.recipe.product] then
+            for _, skinname in pairs(PREFAB_SKINS[self.recipe.product]) do
+                if DoYouHaveSkin(skinname, self.owner.skinData_legion) then
                     local data  = {
                         type = type, --不知道是啥
-                        item = item_type, --就是这个皮肤的名字
+                        item = skinname, --这个皮肤的名字
                         timestamp = -10000,
                         -- ismodskin = true, --多加的变量，用来标记mod皮肤
                     }
@@ -268,6 +273,7 @@ end)
 
 local fn_GetSkinData = nil
 local fn_skinDataDirty = nil
+local SetNet_skinIdx = nil
 if IsServer then
     --不想麻烦地写在世界里了，换个方式
     -- AddPrefabPostInit("shard_network", function(inst) --这个prefab只存在于服务器世界里（且只能存在一个）
@@ -275,7 +281,7 @@ if IsServer then
     -- end)
 
     _G.skinData_cache_legion = {
-        -- Kxx_xxxx = {
+        -- Kxx_xxxx = { --用户ID
         --     errcount = 0,
         --     loadtag = nil, --空值-未开始、1-成功、-1-失败、0-加载中
         --     task = nil,
@@ -292,7 +298,7 @@ if IsServer then
         state.errcount = 0
     end
 
-    local function SetNet_skinIdx(player, skindata)
+    SetNet_skinIdx = function(player, skindata)
         if skindata == nil then
             player._skin_idxs1:set({ [1] = 0 })
         else
@@ -321,6 +327,7 @@ if IsServer then
         player.skinData_legion = skindata
     end
 
+    ------获取玩家已有皮肤数据
     fn_GetSkinData = function(player, userid, delaytime)
         if TheWorld == nil then
             return
@@ -332,17 +339,14 @@ if IsServer then
             task = nil,
             lastquerytime = os.time(),
             skins = nil,
+            used = nil,
         }
         local isbind = nil
         state.task = TheWorld:DoPeriodicTask(3, function()
             --参数有效性判断
             local user_id = player ~= nil and player.userid or userid
             if user_id == nil or user_id == "" then
-                if state.errcount >= 2 then
-                    StopQueryTask(state)
-                else
-                    state.errcount = state.errcount + 1
-                end
+                StopQueryTask(state)
                 return
             end
 
@@ -353,25 +357,32 @@ if IsServer then
                     if skinData_cache.loadtag == 0 then --有 正在进行 的请求，放弃当前操作
                         StopQueryTask(state)
                         return
-                    elseif skinData_cache.loadtag == 1 then --有 已完成 的请求，放弃当前操作，并处理已有数据
-                        StopQueryTask(state)
-                        if player ~= nil then
-                            SetNet_skinIdx(player, skinData_cache.skins)
-                            skinData_cache.loadtag = nil --被用过后才恢复初始值
+                    elseif skinData_cache.loadtag == 1 then --有 已完成 的请求，放弃当前操作，处理已有数据
+                        if not skinData_cache.used then
+                            StopQueryTask(state)
+                            if player ~= nil and player:IsValid() then
+                                SetNet_skinIdx(player, skinData_cache.skins)
+                                skinData_cache.used = true
+                            end
+                            return
                         end
-                        return
+                        if skinData_cache.lastquerytime ~= nil then --3分钟之内不会重复请求
+                            local timedelay = os.difftime(os.time(), skinData_cache.lastquerytime)
+                            if timedelay <= 60*3 then
+                                StopQueryTask(state)
+                                if player ~= nil and player:IsValid() then
+                                    SetNet_skinIdx(player, skinData_cache.skins)
+                                    skinData_cache.used = true
+                                end
+                                return
+                            end
+                        end
                     end
                     StopQueryTask(skinData_cache) --其他情况，取消已有task
+                    state.skins = skinData_cache.skins --记下以前的结果，防止请求失败没数据返回
                 end
                 skinData_cache_legion[user_id] = state
                 isbind = true
-            end
-
-            --实体有效性判断
-            if player ~= nil and not player:IsValid() then
-                StopQueryTask(state)
-                state.loadtag = nil
-                return
             end
 
             --task请求状态判断
@@ -395,7 +406,7 @@ if IsServer then
                 function(result_json, isSuccessful, resultCode)
                     if isSuccessful and string.len(result_json) > 1 and resultCode == 200 then
                         local status, data = pcall( function() return json.decode(result_json) end )
-                        print("------------skined: ", tostring(result_json)) --test
+                        print("------------skined: ", tostring(result_json))
                         if not status then
                             print("[SkinUser_legion] Faild to parse quest json for "
                                 ..tostring(user_id).."! ", tostring(status)
@@ -420,12 +431,13 @@ if IsServer then
                                     end
                                 end
                             end
-                            if player ~= nil then
+                            if player ~= nil and player:IsValid() then
                                 SetNet_skinIdx(player, skins)
-                                state.loadtag = nil
+                                state.used = true
                             else
-                                state.loadtag = 1
+                                state.used = nil
                             end
+                            state.loadtag = 1
                             state.skins = skins
                             StopQueryTask(state)
                         end
@@ -437,6 +449,94 @@ if IsServer then
 
         end, delaytime)
     end
+
+    --------------------------------------------------------------------------
+    --[[ 修改SpawnPrefab()以应用皮肤机制 ]]
+    --------------------------------------------------------------------------
+
+    local SpawnPrefab_old = _G.SpawnPrefab
+    _G.SpawnPrefab = function(name, skin, skin_id, creator)
+        --【服务端】环境
+        if skin ~= nil and SKINS_LEGION[skin] ~= nil and creator ~= nil then
+            local prefab = SpawnPrefab_old(name, nil, nil, creator)
+            if prefab ~= nil then
+                if prefab.components.skinedlegion ~= nil then
+                    if SKIN_IDS_LEGION.freeskins[skin] then
+                        prefab.components.skinedlegion:SetSkin(skin)
+                    elseif skinData_cache_legion ~= nil and skinData_cache_legion[creator] ~= nil then
+                        local skins = skinData_cache_legion[creator].skins
+                        if skins ~= nil and skins[skin] then
+                            prefab.components.skinedlegion:SetSkin(skin)
+                        end
+                    end
+                end
+            end
+            return prefab
+        else
+            return SpawnPrefab_old(name, skin, skin_id, creator)
+        end
+    end
+
+    --------------------------------------------------------------------------
+    --[[ 修改清洁扫把以应用皮肤机制 ]]
+    --------------------------------------------------------------------------
+
+    AddPrefabPostInit("reskin_tool", function(inst)
+        if inst.components.spellcaster ~= nil then
+            local can_cast_fn_old = inst.components.spellcaster.can_cast_fn
+            inst.components.spellcaster:SetCanCastFn(function(doer, target, pos, ...)
+                if target.components.skinedlegion ~= nil then
+                    return true
+                end
+                if can_cast_fn_old ~= nil then
+                    return can_cast_fn_old(doer, target, pos, ...)
+                end
+            end)
+
+            local spell_old = inst.components.spellcaster.spell
+            inst.components.spellcaster:SetSpellFn(function(tool, target, pos, ...)
+                if target ~= nil and target.components.skinedlegion ~= nil then
+                    tool:DoTaskInTime(0, function()
+                        local doer = tool.components.inventoryitem.owner
+                        local skins = PREFAB_SKINS[target.prefab]
+
+                        local skinname_new = nil
+                        local skinweight = nil
+                        local skinname_old = target.components.skinedlegion:GetSkin()
+                        local skinweight_old = 0
+                        if skinname_old ~= nil and SKINS_LEGION[skinname_old] ~= nil then
+                            skinweight_old = SKINS_LEGION[skinname_old].skin_idx
+                        end
+
+                        if skins ~= nil then
+                            for _,skinname in pairs(skins) do
+                                if DoYouHaveSkin(skinname, doer.skinData_legion) then
+                                    if SKINS_LEGION[skinname] ~= nil then
+                                        local weight = SKINS_LEGION[skinname].skin_idx
+                                        if weight > skinweight_old then
+                                            if skinweight == nil or skinweight > weight then
+                                                skinweight = weight
+                                                skinname_new = skinname
+                                            end
+                                        end
+                                    end
+                                end
+                            end
+                        end
+                        if skinname_new ~= skinname_old then
+                            target.components.skinedlegion:SetSkin(skinname_new)
+                        end
+                        target.components.skinedlegion:SpawnSkinExchangeFx(skinname_new) --不管有没有交换成功，都释放特效
+                    end)
+                    return
+                end
+                if spell_old ~= nil then
+                    return spell_old(tool, target, pos, ...)
+                end
+            end)
+        end
+    end)
+
 else
     fn_skinDataDirty = function(inst, valuekey)
         local idxs = inst[valuekey]:value()
@@ -465,6 +565,47 @@ AddPlayerPostInit(function(inst)
 
     if IsServer then
         fn_GetSkinData(inst, 0.5)
+
+        --还是让玩家实体存储自己的皮肤数据吧，免得网络问题导致皮肤没法用
+        local OnSave_old = inst.OnSave
+        local OnLoad_old = inst.OnLoad
+        inst.OnSave = function(inst, data)
+            if OnSave_old ~= nil then
+                OnSave_old(inst, data)
+            end
+
+            if inst.skinData_legion ~= nil then
+                local skins = nil
+                for skinname,v in pairs(inst.skinData_legion) do
+                    if skins == nil then
+                        skins = {}
+                    end
+                    skins[skinname] = true
+                end
+                if skins ~= nil then
+                    data.skinData_legion = skins
+                end
+            end
+        end
+        inst.OnLoad = function(inst, data)
+            if OnLoad_old ~= nil then
+                OnLoad_old(inst, data)
+            end
+            if data ~= nil and data.skinData_legion ~= nil then
+                local skinData_cache = skinData_cache_legion[inst.userid]
+                if skinData_cache ~= nil then
+                    if skinData_cache.skins == nil then
+                        skinData_cache.skins = data.skinData_legion
+                    end
+                    
+                else
+                    skinData_cache_legion[inst.userid] = {
+                        skins = data.skinData_legion
+                    }
+                end
+                SetNet_skinIdx(inst, skinData_cache.skins)
+            end
+        end
     else
         inst:ListenForEvent("skin_data1_l_dirty", function()
             fn_skinDataDirty(inst, "_skin_idxs1")
@@ -476,5 +617,12 @@ AddPlayerPostInit(function(inst)
 end)
 
 --------------------------------------------------------------------------
---[[ 玩家实体监听当前世界的皮肤数据并管理自己客户端皮肤数据 ]]
+--[[ RPC使用讲解
+    Tip:
+        【客户端发送请求】SendModRPCToServer(GetModRPC("LegionSkined", "RefreshSkinData"), 参数2, 参数3, ...)
+        【服务器监听与响应请求】
+            AddModRPCHandler("LegionSkined", "RefreshSkinData", function(player, 参数2, ...) --第一个参数固定为发起请求的玩家
+                --做你想做的
+            end)
+]]--
 --------------------------------------------------------------------------

@@ -9,7 +9,7 @@ local SkinedLegion = Class(function(self, inst)
 		--【客户端】环境
         self.inst:ListenForEvent("skin_idx_l_dirty", function()
 			local idx = self._skin_idx:value()
-            if idx and SKIN_IDX_LEGION[idx] ~= nil then
+            if idx ~= nil and idx ~= 0 and SKIN_IDX_LEGION[idx] ~= nil then
                 self.skin = SKIN_IDX_LEGION[idx]
 				self.inst.skinname = self.skin --这个变量控制着“审视自我”、“审视他人”时的皮肤设置
 			else
@@ -43,11 +43,10 @@ function SkinedLegion:SetSkin(skinname)
 		return true
 	end
 
-	local skin_data_last = self:GetSkinData(self.skin)
 	local skin_data = self:GetSkinData(skinname)
-
 	if skin_data ~= nil then
 		--取消前一个皮肤的效果
+		local skin_data_last = self:GetSkinData(self.skin)
 		if skin_data_last ~= nil then
 			if skin_data_last.fn_end ~= nil then
 				skin_data_last.fn_end(self.inst, skin_data_last)
@@ -59,7 +58,7 @@ function SkinedLegion:SetSkin(skinname)
 		end
 
 		if skinname == nil then --代表恢复原皮肤
-			self._skin_idx:set(nil)
+			self._skin_idx:set(0)
 			self.skin = nil
 			self.inst.skinname = nil
 		else
@@ -103,6 +102,29 @@ function SkinedLegion:SetOnPreLoad(onpreloadfn) --提前加载皮肤数据，好
 		end
 		if onpreloadfn ~= nil then
 			onpreloadfn(inst, data, ...)
+		end
+	end
+end
+
+function SkinedLegion:SpawnSkinExchangeFx(skinname)
+	local skindata = self:GetSkinData(skinname)
+	if skindata ~= nil then
+		if skindata.fn_spawnSkinExchangeFx ~= nil then
+			skindata.fn_spawnSkinExchangeFx(self.inst, skindata)
+		elseif skindata.exchangefx ~= nil then
+			local fx = SpawnPrefab(skindata.exchangefx.prefab)
+			if fx ~= nil then
+				if skindata.exchangefx.scale ~= nil then
+					fx.Transform:SetScale(skindata.exchangefx.scale, skindata.exchangefx.scale, skindata.exchangefx.scale)
+				end
+				if skindata.exchangefx.offset_y ~= nil then
+					local fx_pos_x, fx_pos_y, fx_pos_z = self.inst.Transform:GetWorldPosition()
+					fx_pos_y = fx_pos_y + skindata.exchangefx.offset_y
+					fx.Transform:SetPosition(fx_pos_x, fx_pos_y, fx_pos_z)
+				else
+					fx.Transform:SetPosition(self.inst.Transform:GetWorldPosition())
+				end
+			end
 		end
 	end
 end
