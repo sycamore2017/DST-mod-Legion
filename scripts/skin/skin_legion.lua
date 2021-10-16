@@ -13,19 +13,35 @@ local rarityFree = "Event"
 _G.SKIN_PREFABS_LEGION = {
     rosorns = {
         assets = nil, --仅仅是用于初始化注册
-        image = { name = nil, atlas = nil }, --提前注册，让客户端科技栏使用的皮肤图片
-        fn_start = function(inst, skindata) --应用皮肤时的函数
-            inst.AnimState:SetBank("rosorns")
-            inst.AnimState:SetBuild("rosorns")
-            inst.AnimState:PlayAnimation("idle")
+        image = { name = nil, atlas = nil, setable = true, }, --提前注册，或者皮肤初始化使用
 
-            inst.components.inventoryitem.atlasname = skindata.image.atlas
-			inst.components.inventoryitem:ChangeImageName(skindata.image.name)
-        end,
-        fn_end = nil, --取消皮肤时的函数
+        anim = { --皮肤初始化使用
+            bank = nil, build = nil,
+            anim = nil, isloop_anim = nil, animpush = nil, isloop_animpush = nil,
+            setable = true,
+        },
+        -- fn_anim = function(inst)end, --处于地面时的动画设置，替换anim的默认方式
+
+        -- fn_start = function(inst)end, --应用皮肤时的函数
+        -- fn_end = nil, --取消皮肤时的函数
+
+        equip = { symbol = "swap_object", build = "swap_rosorns", file = "swap_rosorns" },
+        -- fn_equip = function(inst, owner)end, --装备时的贴图切换函数，替换equip的默认方式
+        -- fn_unequip = function(inst, owner)end, --卸下装备时的贴图切换函数
+
+        -- fn_onAttack = function(inst, owner, target)end, --攻击时的函数
 
         exchangefx = { prefab = nil, offset_y = nil, scale = nil },
-        -- fn_spawnSkinExchangeFx = function(inst, skindata)end, --皮肤交换时的特效生成函数，替换exchangefx的默认方式
+        -- fn_spawnSkinExchangeFx = function(inst)end, --皮肤交换时的特效生成函数，替换exchangefx的默认方式
+
+        floater = { --底部切除比例，水纹动画后缀，水纹高度位置偏移，水纹大小，是否有水纹
+            cut = 0.15, size = "small", offset_y = 0.4, scale = 0.5, nofx = nil,
+            -- anim = {
+            --     bank = nil, build = nil,
+            --     anim = nil, isloop_anim = nil, animpush = nil, isloop_animpush = nil,
+            -- },
+            -- fn_anim = function(inst)end, --处于水中时的动画设置，替换anim的默认方式
+        },
     },
 }
 
@@ -44,27 +60,41 @@ _G.SKINS_LEGION = {
 			Asset("ANIM", "anim/skin/swap_spear_mirrorrose.zip"),
 			Asset("ANIM", "anim/skin/spear_mirrorrose.zip"),
 		},
-		image = { name = nil, atlas = nil }, --提前注册，让客户端科技栏使用的皮肤图片
-		anim = { bank = "spear_mirrorrose", build = "spear_mirrorrose", anim = nil },
+		image = { name = nil, atlas = nil, setable = true, }, --提前注册，或者皮肤初始化使用
         namestr = { chs = "施咒蔷薇", eng = "Rose Spell Staff" }, --皮肤名字
-        fn_start = function(inst, skindata) --应用皮肤时的函数
-            inst.AnimState:SetBank(skindata.anim.bank)
-			inst.AnimState:SetBuild(skindata.anim.build)
-			inst.AnimState:PlayAnimation(skindata.anim.anim)
 
-            inst.components.inventoryitem.atlasname = skindata.image.atlas
-			inst.components.inventoryitem:ChangeImageName(skindata.image.name)
-        end,
-        fn_end = nil, --取消皮肤时的函数
+		anim = { --皮肤初始化使用
+            bank = "spear_mirrorrose", build = "spear_mirrorrose",
+            anim = nil, isloop_anim = nil, animpush = nil, isloop_animpush = nil,
+            setable = true,
+        },
+        -- fn_anim = function(inst)end, --处于地面时的动画设置，替换anim的默认方式
 
-        fn_onEquip = function(skindata, inst, owner)
-            owner.AnimState:OverrideSymbol("swap_object", "swap_spear_mirrorrose", "swap_spear")
-            owner.AnimState:Show("ARM_carry")
-            owner.AnimState:Hide("ARM_normal")
+        -- fn_start = function(inst)end, --应用皮肤时的函数
+        -- fn_end = nil, --取消皮肤时的函数
+
+        equip = { symbol = "swap_object", build = "swap_spear_mirrorrose", file = "swap_spear" },
+        -- fn_equip = function(inst, owner)end, --装备时的贴图切换函数，替换equip的默认方式
+        -- fn_unequip = function(inst, owner)end, --卸下装备时的贴图切换函数
+
+        fn_onAttack = function(inst, owner, target) --攻击时的函数
+            local fx = SpawnPrefab("wanda_attack_pocketwatch_normal_fx")
+            if fx ~= nil then
+                fx.Transform:SetPosition(target.Transform:GetWorldPosition())
+            end
         end,
 
         exchangefx = { prefab = nil, offset_y = nil, scale = nil },
-        -- fn_spawnSkinExchangeFx = function(inst, skindata)end, --皮肤交换时的特效生成函数，替换exchangefx的默认方式
+        -- fn_spawnSkinExchangeFx = function(inst)end, --皮肤交换时的特效生成函数，替换exchangefx的默认方式
+
+        floater = { --底部切除比例，水纹动画后缀，水纹高度位置偏移，水纹大小，是否有水纹
+            cut = 0.15, size = "small", offset_y = 0.4, scale = 0.5, nofx = nil,
+            -- anim = {
+            --     bank = nil, build = nil,
+            --     anim = nil, isloop_anim = nil, animpush = nil, isloop_animpush = nil,
+            -- },
+            -- fn_anim = function(inst)end, --处于水中时的动画设置，替换anim的默认方式
+        },
     },
 }
 
@@ -75,6 +105,33 @@ _G.SKIN_IDS_LEGION = {
 _G.SKIN_IDX_LEGION = {
     -- [1] = "rosorns_spell",
 }
+
+------
+
+local function InitData_anim(anim, bank, build)
+    if anim.bank == nil then
+        anim.bank = bank
+    end
+    if anim.build == nil then
+        anim.build = build
+    end
+    if anim.anim == nil then
+        anim.anim = "idle"
+    end
+    if anim.animpush ~= nil then
+        anim.isloop_anim = nil
+        if anim.isloop_animpush ~= true then
+            anim.isloop_animpush = false
+        end
+    else
+        anim.isloop_animpush = nil
+        if anim.isloop_anim ~= true then
+            anim.isloop_anim = false
+        end
+    end
+end
+
+------
 
 local ischinese = TUNING.LEGION_MOD_LANGUAGES == "chinese"
 local skin_idx = 1
@@ -95,21 +152,22 @@ for skinname,v in pairs(_G.SKINS_LEGION) do
 		if v.image.atlas == nil then
 			v.image.atlas = "images/inventoryimages_skin/"..skinname..".xml"
 		end
+        if v.image.setable ~= false then
+            v.image.setable = true
+        end
 
         table.insert(Assets, Asset("ATLAS", v.image.atlas))
         table.insert(Assets, Asset("IMAGE", "images/inventoryimages_skin/"..v.image.name..".tex"))
         RegisterInventoryItemAtlas(v.image.atlas, v.image.name..".tex")
 	end
 	if v.anim ~= nil then
-		if v.anim.bank == nil then
-			v.anim.bank = skinname
-		end
-		if v.anim.build == nil then
-			v.anim.build = skinname
-		end
-		if v.anim.anim == nil then
-			v.anim.anim = "idle"
-		end
+		InitData_anim(v.anim, skinname, skinname)
+        if v.anim.setable ~= false then
+            v.anim.setable = true
+        end
+	end
+    if v.floater ~= nil and v.floater.anim ~= nil then
+		InitData_anim(v.floater.anim, v.anim.bank, v.anim.bank.build)
 	end
 	if v.build_name_override == nil then
 		v.build_name_override = skinname
@@ -142,6 +200,15 @@ for skinname,v in pairs(_G.SKINS_LEGION) do
     end
 end
 for baseprefab,v in pairs(_G.SKIN_PREFABS_LEGION) do
+    if v.anim ~= nil then
+		InitData_anim(v.anim, baseprefab, baseprefab)
+        if v.anim.setable ~= false then
+            v.anim.setable = true
+        end
+	end
+    if v.floater ~= nil and v.floater.anim ~= nil then
+		InitData_anim(v.floater.anim, v.anim.bank, v.anim.bank.build)
+	end
     if v.image ~= nil then
 		if v.image.name == nil then
 			v.image.name = baseprefab
@@ -149,6 +216,9 @@ for baseprefab,v in pairs(_G.SKIN_PREFABS_LEGION) do
 		if v.image.atlas == nil then
 			v.image.atlas = "images/inventoryimages/"..baseprefab..".xml"
 		end
+        if v.image.setable ~= false then
+            v.image.setable = true
+        end
 
         table.insert(Assets, Asset("ATLAS", v.image.atlas))
         table.insert(Assets, Asset("IMAGE", "images/inventoryimages/"..v.image.name..".tex"))
@@ -262,12 +332,14 @@ end)
             1、主世界(运行主服务器代码，与客户端通信)、
             2、副世界(运行副服务器代码，与客户端通信)、
             3、客户端世界(运行客户端代码，与当前所处的服务器世界通信)
-        例如，1个玩家用本地电脑开含洞穴存档，则世界有主世界(与房主客户端世界是同一个)、洞穴世界(副世界)、客户端(其他玩家的各有一个)。
-            开了含洞穴云服存档，则世界有主世界(云服)、洞穴世界(副世界)、客户端(所有玩家各有一个)
+        例如，1个玩家用本地电脑开无洞穴存档，则世界有主世界(与房主客户端世界是同一个)、客户端(其他玩家的各有一个)。
+            开了含洞穴的本地存档或云服存档，则世界有主世界(主机或云服)、洞穴世界(副世界)、客户端(所有玩家各有一个)
         modmain会在每个世界都加载一次
 
         TheWorld.ismastersim        --是否为服务器世界(主机+云服。本质上就是 TheNet:GetIsMasterSimulation())
         TheWorld.ismastershard      --是否为主世界(本质上就是 TheWorld.ismastersim and not TheShard:IsSecondary())
+        TheNet:GetIsServer() or TheNet:IsDedicated() --是否为非客户端世界，这个是最精确的判定方式
+        not TheNet:IsDedicated()    --这个方式也能判定客户端，但是无法排除客户端和服务端为一体的世界的情况
 ]]--
 --------------------------------------------------------------------------
 
@@ -406,7 +478,7 @@ if IsServer then
                 function(result_json, isSuccessful, resultCode)
                     if isSuccessful and string.len(result_json) > 1 and resultCode == 200 then
                         local status, data = pcall( function() return json.decode(result_json) end )
-                        print("------------skined: ", tostring(result_json))
+                        -- print("------------skined: ", tostring(result_json))
                         if not status then
                             print("[SkinUser_legion] Faild to parse quest json for "
                                 ..tostring(user_id).."! ", tostring(status)
@@ -526,7 +598,7 @@ if IsServer then
                         if skinname_new ~= skinname_old then
                             target.components.skinedlegion:SetSkin(skinname_new)
                         end
-                        target.components.skinedlegion:SpawnSkinExchangeFx(skinname_new) --不管有没有交换成功，都释放特效
+                        target.components.skinedlegion:SpawnSkinExchangeFx() --不管有没有交换成功，都释放特效
                     end)
                     return
                 end
@@ -591,19 +663,22 @@ AddPlayerPostInit(function(inst)
             if OnLoad_old ~= nil then
                 OnLoad_old(inst, data)
             end
-            if data ~= nil and data.skinData_legion ~= nil then
-                local skinData_cache = skinData_cache_legion[inst.userid]
-                if skinData_cache ~= nil then
-                    if skinData_cache.skins == nil then
-                        skinData_cache.skins = data.skinData_legion
-                    end
-                    
-                else
+
+            local skinData_cache = skinData_cache_legion[inst.userid]
+            if skinData_cache == nil then
+                if data ~= nil and data.skinData_legion ~= nil then
                     skinData_cache_legion[inst.userid] = {
                         skins = data.skinData_legion
                     }
+                    SetNet_skinIdx(inst, data.skinData_legion)
                 end
-                SetNet_skinIdx(inst, skinData_cache.skins)
+            else
+                if data ~= nil and data.skinData_legion ~= nil then
+                    skinData_cache.skins = data.skinData_legion
+                end
+                if skinData_cache.skins ~= nil then --即使玩家自己没缓存，看能不能拿全局的缓存数据
+                    SetNet_skinIdx(inst, skinData_cache.skins)
+                end
             end
         end
     else
@@ -615,6 +690,41 @@ AddPlayerPostInit(function(inst)
         -- end)
     end
 end)
+
+--------------------------------------------------------------------------
+--[[ 修改审视自我按钮的弹出界面，增加皮肤界面触发按钮 ]]
+--------------------------------------------------------------------------
+
+if not TheNet:IsDedicated() then
+    if TUNING.LEGION_MOD_LANGUAGES == "chinese" then
+        local ImageButton = require "widgets/imagebutton"
+        local PlayerAvatarPopup = require "widgets/playeravatarpopup"
+
+        local Layout_old = PlayerAvatarPopup.Layout
+        PlayerAvatarPopup.Layout = function(self, ...)
+            Layout_old(self, ...)
+            if not TheInput:ControllerAttached() then
+                if self.close_button then
+                    self.close_button:SetPosition(90, -269)
+                end
+
+                self.x_button = self.proot:AddChild(
+                    ImageButton("images/global_redux.xml", "button_carny_long_normal.tex",
+                        "button_carny_long_hover.tex", "button_carny_long_disabled.tex", "button_carny_long_down.tex")
+                )
+                self.x_button.image:SetScale(.5)
+                self.x_button:SetFont(CHATFONT)
+                self.x_button:SetPosition(-80, -271)
+                self.x_button.text:SetColour(0,0,0,1)
+                self.x_button:SetTextSize(26)
+                self.x_button:SetText("棱镜里皮肤铺")
+                self.x_button:SetOnClick(function()
+                    self:Close()
+                end)
+            end
+        end
+    end
+end
 
 --------------------------------------------------------------------------
 --[[ RPC使用讲解

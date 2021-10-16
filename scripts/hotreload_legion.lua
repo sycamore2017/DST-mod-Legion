@@ -26,7 +26,7 @@ end
 
 local class = {
 	--路径名
-	-- 'map/static_layouts/helpercemetery_zh',
+	-- "widgets/dressupavatarpopup",
 	-- 'map/static_layouts/helpercemetery',
 	-- 'map/rooms/forest/rooms_desertsecret',
 	-- 'hotreload_legion',
