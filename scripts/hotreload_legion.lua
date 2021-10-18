@@ -26,12 +26,12 @@ end
 
 local class = {
 	--路径名
-	-- "widgets/dressupavatarpopup",
+	"widgets/skinlegiondialog",
 	-- 'map/static_layouts/helpercemetery',
 	-- 'map/rooms/forest/rooms_desertsecret',
 	-- 'hotreload_legion',
 }
-local old_re = GLOBAL.require
+local old_re = GLOBAL.require --！！！请把require写成_G.require，不然可能不成功
 function GLOBAL.require(path)
 	for _, v in pairs(class)do
 		if v == path then

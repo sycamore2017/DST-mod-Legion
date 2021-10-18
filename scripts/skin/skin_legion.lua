@@ -2,6 +2,7 @@
 
 local _G = GLOBAL
 local IsServer = TheNet:GetIsServer() or TheNet:IsDedicated()
+local ischinese = TUNING.LEGION_MOD_LANGUAGES == "chinese"
 
 --------------------------------------------------------------------------
 --[[ 全局皮肤总数据，以及修改 ]]
@@ -59,9 +60,17 @@ _G.SKINS_LEGION = {
 		assets = { --仅仅是用于初始化注册
 			Asset("ANIM", "anim/skin/swap_spear_mirrorrose.zip"),
 			Asset("ANIM", "anim/skin/spear_mirrorrose.zip"),
+            Asset("ANIM", "anim/skin/rosorns_spell.zip"),
 		},
 		image = { name = nil, atlas = nil, setable = true, }, --提前注册，或者皮肤初始化使用
-        namestr = { chs = "施咒蔷薇", eng = "Rose Spell Staff" }, --皮肤名字
+
+        string = ischinese and { --皮肤字符
+            name = "施咒蔷薇", collection = "MAGICSPELL", access = "DONATE",
+            description = "据说\"梅林花园里的每一朵蔷薇都蕴含了危险的魔法\"。当然，这是当地教会的说辞。自从众人举着火把去过她的花园后，蔷薇如同梅林的灰烬一般，在此绝迹...",
+        } or {
+            name = "Rose Spell Staff", collection = "MAGICSPELL", access = "DONATE",
+            description = "It's said that every rose in Merlin garden has dangerous magic. Although, this is only rhetoric of the local church. Since people went to her garden with torches, roses dissipated like the ashes of Merlin.",
+        },
 
 		anim = { --皮肤初始化使用
             bank = "spear_mirrorrose", build = "spear_mirrorrose",
@@ -106,6 +115,32 @@ _G.SKIN_IDX_LEGION = {
     -- [1] = "rosorns_spell",
 }
 
+if ischinese then
+    STRINGS.SKIN_LEGION = {
+        UNKNOWN_STORY = "这个故事不值一提。",
+        COLLECTION = {
+            UNKNOWN = "陌生系列",
+            MAGICSPELL = "魔咒系列",
+        },
+        ACCESS = {
+            UNKNOWN = "无法获取。",
+            DONATE = "通过打赏获取。",
+        },
+    }
+else
+    STRINGS.SKIN_LEGION = {
+        UNKNOWN_STORY = "The story is not worth mentioning.",
+        COLLECTION = {
+            UNKNOWN = "Strange Collection",
+            MAGICSPELL = "Rose Spell Staff",
+        },
+        ACCESS = {
+            UNKNOWN = "Unable to get.",
+            DONATE = "Get it by donation.",
+        },
+    }
+end
+
 ------
 
 local function InitData_anim(anim, bank, build)
@@ -133,7 +168,6 @@ end
 
 ------
 
-local ischinese = TUNING.LEGION_MOD_LANGUAGES == "chinese"
 local skin_idx = 1
 for skinname,v in pairs(_G.SKINS_LEGION) do
     _G.SKIN_IDX_LEGION[skin_idx] = skinname
@@ -186,11 +220,7 @@ for skinname,v in pairs(_G.SKINS_LEGION) do
     table.insert(v.skin_tags, string.upper(skinname))
     table.insert(v.skin_tags, "CRAFTABLE")
 
-    if ischinese then
-        STRINGS.SKIN_NAMES[skinname] = v.namestr.chs
-    else
-        STRINGS.SKIN_NAMES[skinname] = v.namestr.eng
-    end
+    STRINGS.SKIN_NAMES[skinname] = v.string.name
 
     ------修改PREFAB_SKINS(在prefabskins.lua中被定义)
     if _G.PREFAB_SKINS[v.base_prefab] == nil then
@@ -699,6 +729,12 @@ if not TheNet:IsDedicated() then
     if TUNING.LEGION_MOD_LANGUAGES == "chinese" then
         local ImageButton = require "widgets/imagebutton"
         local PlayerAvatarPopup = require "widgets/playeravatarpopup"
+        -- local SkinLegionDialog = require "widgets/skinlegiondialog"
+
+        local right_root = nil
+        AddClassPostConstruct("widgets/controls", function(self)
+            right_root = self.right_root
+        end)
 
         local Layout_old = PlayerAvatarPopup.Layout
         PlayerAvatarPopup.Layout = function(self, ...)
@@ -708,17 +744,30 @@ if not TheNet:IsDedicated() then
                     self.close_button:SetPosition(90, -269)
                 end
 
-                self.x_button = self.proot:AddChild(
+                if right_root and right_root.skinshop_legion then --再次打开人物自检面板时，需要关闭已有的商城页面
+                    right_root.skinshop_legion:Kill()
+                    right_root.skinshop_legion = nil
+                end
+
+                self.skinshop_l_button = self.proot:AddChild(
                     ImageButton("images/global_redux.xml", "button_carny_long_normal.tex",
                         "button_carny_long_hover.tex", "button_carny_long_disabled.tex", "button_carny_long_down.tex")
                 )
-                self.x_button.image:SetScale(.5)
-                self.x_button:SetFont(CHATFONT)
-                self.x_button:SetPosition(-80, -271)
-                self.x_button.text:SetColour(0,0,0,1)
-                self.x_button:SetTextSize(26)
-                self.x_button:SetText("棱镜里皮肤铺")
-                self.x_button:SetOnClick(function()
+                self.skinshop_l_button.image:SetScale(.5)
+                self.skinshop_l_button:SetFont(CHATFONT)
+                self.skinshop_l_button:SetPosition(-80, -271)
+                self.skinshop_l_button.text:SetColour(0,0,0,1)
+                self.skinshop_l_button:SetTextSize(26)
+                self.skinshop_l_button:SetText("棱镜皮肤铺")
+                self.skinshop_l_button:SetOnClick(function()
+                    if right_root then
+                        if right_root.skinshop_legion then
+                            right_root.skinshop_legion:Kill()
+                        end
+                        local SkinLegionDialog = _G.require("widgets/skinlegiondialog")
+                        right_root.skinshop_legion = right_root:AddChild(SkinLegionDialog(self.owner, "tttest"))
+                        right_root.skinshop_legion:SetPosition(-380, 0)
+                    end
                     self:Close()
                 end)
             end
