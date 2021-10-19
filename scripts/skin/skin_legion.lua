@@ -66,9 +66,11 @@ _G.SKINS_LEGION = {
 
         string = ischinese and { --皮肤字符
             name = "施咒蔷薇", collection = "MAGICSPELL", access = "DONATE",
-            description = "据说\"梅林花园里的每一朵蔷薇都蕴含了危险的魔法\"。当然，这是当地教会的说辞。自从众人举着火把去过她的花园后，蔷薇如同梅林的灰烬一般，在此绝迹...",
+            descitem = "解锁“带刺蔷薇”皮肤，以及攻击特效。",
+            description = "据说\"梅林花园里的每一朵蔷薇都蕴含了危险的魔法\"。当然，这是当地教会的说辞。于是众人举着火把去过她的花园后，当晚花火摇曳，蔷薇如同梅林的灰烬一般，在此绝迹...",
         } or {
             name = "Rose Spell Staff", collection = "MAGICSPELL", access = "DONATE",
+            descitem = "Unlock \"Rosorns\" skin and attack fx.",
             description = "It's said that every rose in Merlin garden has dangerous magic. Although, this is only rhetoric of the local church. Since people went to her garden with torches, roses dissipated like the ashes of Merlin.",
         },
 
@@ -87,8 +89,10 @@ _G.SKINS_LEGION = {
         -- fn_unequip = function(inst, owner)end, --卸下装备时的贴图切换函数
 
         fn_onAttack = function(inst, owner, target) --攻击时的函数
-            local fx = SpawnPrefab("wanda_attack_pocketwatch_normal_fx")
+            -- local fx = SpawnPrefab("wanda_attack_pocketwatch_normal_fx")
+            local fx = SpawnPrefab("rosorns_spell_fx")
             if fx ~= nil then
+                print("??????")
                 fx.Transform:SetPosition(target.Transform:GetWorldPosition())
             end
         end,
@@ -122,9 +126,13 @@ if ischinese then
             UNKNOWN = "陌生系列",
             MAGICSPELL = "魔咒系列",
         },
+        UI_ACCESS = "获取",
+        UI_INPUT_CDK = "请输入兑换码",
+        UI_LOAD_CDK = "兑换中...",
         ACCESS = {
-            UNKNOWN = "无法获取。",
-            DONATE = "通过打赏获取。",
+            UNKNOWN = "无法获取",
+            DONATE = "通过打赏获取",
+            FREE = "自动获取",
         },
     }
 else
@@ -134,9 +142,13 @@ else
             UNKNOWN = "Strange Collection",
             MAGICSPELL = "Rose Spell Staff",
         },
+        UI_ACCESS = "Get It",
+        UI_INPUT_CDK = "Please enter CDK",
+        UI_LOAD_CDK = "Redeeming...",
         ACCESS = {
-            UNKNOWN = "Unable to get.",
-            DONATE = "Get it by donation.",
+            UNKNOWN = "Unable to get",
+            DONATE = "Get it by donation",
+            FREE = "Free access",
         },
     }
 end

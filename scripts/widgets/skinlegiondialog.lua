@@ -14,6 +14,7 @@ local ItemImage = require "widgets/redux/itemimage"
 local ClothingExplorerPanel = require "widgets/redux/clothingexplorerpanel"
 local AccountItemFrame = require "widgets/redux/accountitemframe"
 local ScrollableList = require "widgets/scrollablelist"
+local PopupDialogScreen = require "screens/redux/popupdialog"
 
 local function GetCollection(skin)
     local data = SKINS_LEGION[skin]
@@ -42,6 +43,36 @@ local function GetAccess(skin)
     end
 end
 
+local function GetDescItem(skin)
+    local data = SKINS_LEGION[skin]
+    if data ~= nil and data.string ~= nil and data.string.descitem ~= nil then
+        return data.string.descitem
+    else
+        return ""
+    end
+end
+
+function PushPopupDialog(self, title, message, buttontext, fn)
+    if self.context_popup ~= nil then
+        TheFrontEnd:PopScreen(self.context_popup)
+    end
+
+    self.context_popup = PopupDialogScreen(title, message, {
+        {
+            text = buttontext or STRINGS.UI.POPUPDIALOG.OK,
+            cb = function()
+                TheFrontEnd:PopScreen(self.context_popup)
+                self.context_popup = nil
+                if fn then fn() end
+            end
+        }
+    })
+    TheFrontEnd:PushScreen(self.context_popup)
+
+    local screen = TheFrontEnd:GetActiveScreen()
+    if screen then screen:Enable() end
+end
+
 local SkinLegionDialog = Class(Widget, function(self, owner, text)
 	Widget._ctor(self, "SkinLegionDialog")
 
@@ -54,45 +85,53 @@ local SkinLegionDialog = Class(Widget, function(self, owner, text)
     self.bg:SetScale(.51, .74)
     self.bg:SetPosition(0, 0)
 
-    --竖线
-    -- self.vertical_line = self.proot:AddChild(Image("images/ui.xml", "line_vertical_5.tex"))
-    -- self.vertical_line:SetScale(.5, .6)
-    -- self.vertical_line:SetPosition(45, 8)
+    self.button_close = self.proot:AddChild(TEMPLATES.SmallButton(STRINGS.UI.PLAYER_AVATAR.CLOSE, 26, .5, function() self:Close() end))
+    self.button_close:SetPosition(0, -215)
 
-    -- self.x_button = self.proot:AddChild(
-    --     ImageButton("images/global_redux.xml", "button_carny_long_normal.tex",
-    --         "button_carny_long_hover.tex", "button_carny_long_disabled.tex", "button_carny_long_down.tex")
-    -- )
-    -- self.x_button.image:SetScale(.5)
-    -- self.x_button:SetFont(CHATFONT)
-    -- self.x_button:SetPosition(0, -220)
-    -- self.x_button.text:SetColour(0,0,0,1)
-    -- self.x_button:SetTextSize(26)
-    -- self.x_button:SetText("关闭")
-    -- self.x_button:SetOnClick(function()
-    --     self:Close()
-    -- end)
+    self.horizontal_line3 = self.proot:AddChild(Image("images/quagmire_recipebook.xml", "quagmire_recipe_line.tex"))
+    self.horizontal_line3:SetScale(.32, .25)
+    self.horizontal_line3:SetPosition(140, -105)
 
-    self.x_button = self.proot:AddChild(TEMPLATES.SmallButton(STRINGS.UI.PLAYER_AVATAR.CLOSE, 26, .5, function() self:Close() end))
-    self.x_button:SetPosition(0, -215)
+    self.input_cdk = self.proot:AddChild(TEMPLATES2.StandardSingleLineTextEntry(nil, 200, 40))
+    self.input_cdk.textbox:SetTextLengthLimit(20)
+    self.input_cdk.textbox:SetForceEdit(true)
+    self.input_cdk.textbox:EnableWordWrap(false)
+    self.input_cdk.textbox:EnableScrollEditWindow(true)
+    -- self.input_cdk.textbox:SetHelpTextEdit("")
+    -- self.input_cdk.textbox:SetHelpTextApply('输入CDK')
+    self.input_cdk.textbox:SetTextPrompt(STRINGS.SKIN_LEGION.UI_INPUT_CDK, UICOLOURS.GREY)
+    self.input_cdk.textbox.prompt:SetHAlign(ANCHOR_MIDDLE)
+    self.input_cdk.textbox:SetCharacterFilter("-0123456789QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm")
+    self.input_cdk:SetOnGainFocus( function() self.input_cdk.textbox:OnGainFocus() end )
+    self.input_cdk:SetOnLoseFocus( function() self.input_cdk.textbox:OnLoseFocus() end )
+    self.input_cdk:SetPosition(140, -130)
+    self.input_cdk.focus_forward = self.input_cdk.textbox
 
-    -- self.y_button = self.proot:AddChild(
-    --     ImageButton("images/global_redux.xml", "button_carny_long_normal.tex",
-    --         "button_carny_long_hover.tex", "button_carny_long_disabled.tex", "button_carny_long_down.tex")
-    -- )
-    -- self.y_button.image:SetScale(.5)
-    -- self.y_button:SetFont(CHATFONT)
-    -- self.y_button:SetPosition(160, -220)
-    -- self.y_button.text:SetColour(0,0,0,1)
-    -- self.y_button:SetTextSize(26)
-    -- self.y_button:SetText("测试")
-    -- self.y_button:SetOnClick(function()
-    --     self:SetItems()
-    -- end)
+    self.button_cdk = self.proot:AddChild(
+        ImageButton("images/global_redux.xml", "button_carny_long_normal.tex",
+            "button_carny_long_hover.tex", "button_carny_long_disabled.tex", "button_carny_long_down.tex")
+    )
+    self.button_cdk.image:SetScale(.3, .35)
+    self.button_cdk:SetFont(CHATFONT)
+    self.button_cdk:SetPosition(140, -165)
+    self.button_cdk.text:SetColour(0,0,0,1)
+    self.button_cdk:SetTextSize(20)
+    self.button_cdk:SetText(STRINGS.UI.MAINSCREEN.REDEEM)
+    self.button_cdk:SetOnClick(function()
+        --undo: 检测cdk是否正常
+        local cdk = self.input_cdk.textbox:GetString()
+        if cdk == nil or cdk == "" or cdk:utf8len() <= 6 then
+            PushPopupDialog(self, "轻声提醒", "请输入正确的兑换码。", "知道啦", nil)
+            return
+        end
+        self.button_cdk:SetText(STRINGS.SKIN_LEGION.UI_LOAD_CDK)
+        self.input_cdk.textbox:SetString("")
+    end)
 
 	self.buttons = {}
 
     self.selected_item = nil
+    self.context_popup = nil
     self:SetItems()
 
 	-- self.default_focus = self.menu
@@ -153,71 +192,6 @@ function SkinLegionDialog:SetItems(itemsnew)
             item_id = "rosorns_spell",
             owned_count = 0,
             isnew = math.random() < 0.5,
-        },
-        {
-            item_key = "rosorns_spell",
-            item_id = "rosorns_spell",
-            owned_count = 2
-        },
-        {
-            item_key = "rosorns_spell",
-            item_id = "rosorns_spell",
-            owned_count = 2
-        },
-        {
-            item_key = "rosorns_spell",
-            item_id = "rosorns_spell",
-            owned_count = 2
-        },
-        {
-            item_key = "rosorns_spell",
-            item_id = "rosorns_spell",
-            owned_count = 2
-        },
-        {
-            item_key = "rosorns_spell",
-            item_id = "rosorns_spell",
-            owned_count = 2
-        },
-        {
-            item_key = "rosorns_spell",
-            item_id = "rosorns_spell",
-            owned_count = 2
-        },
-        {
-            item_key = "rosorns_spell",
-            item_id = "rosorns_spell",
-            owned_count = 2
-        },
-        {
-            item_key = "willow_rose",
-            item_id = "rosorns_spell",
-            owned_count = 2
-        },
-        {
-            item_key = "rosorns_spell",
-            item_id = "rosorns_spell",
-            owned_count = 99
-        },
-        {
-            item_key = "rosorns_spell",
-            item_id = "rosorns_spell",
-            owned_count = 2
-        },
-        {
-            item_key = "rosorns_spell",
-            item_id = "rosorns_spell",
-            owned_count = 5
-        },
-        {
-            item_key = "rosorns_spell",
-            item_id = "rosorns_spell",
-            owned_count = 4
-        },
-        {
-            item_key = "rosorns_spell",
-            item_id = "rosorns_spell",
-            owned_count = 3
         },
         {
             item_key = "rosorns_spell",
@@ -293,6 +267,7 @@ function SkinLegionDialog:SetItemInfo(item)
             self.label_skindesc = nil
             self.label_skinaccess = nil
             self.horizontal_line2 = nil
+            self.label_skindescitem = nil
             self.button_access = nil
         end
     else
@@ -375,8 +350,9 @@ function SkinLegionDialog:SetItemInfo(item)
                     self.button_access:SetPosition(50, -212)
                     self.button_access.text:SetColour(0,0,0,1)
                     self.button_access:SetTextSize(20)
-                    self.button_access:SetText("获取") --undo：英文化
+                    self.button_access:SetText(STRINGS.SKIN_LEGION.UI_ACCESS)
                     self.button_access:SetOnClick(function()
+                        --undo: 跳转打赏网页
                         self:Close()
                     end)
                 end
@@ -393,6 +369,17 @@ function SkinLegionDialog:SetItemInfo(item)
             self.horizontal_line2:SetScale(.32, .25)
             self.horizontal_line2:SetPosition(-5, -227)
         end
+
+        if self.label_skindescitem == nil then
+            self.label_skindescitem = self.panel_iteminfo:AddChild(Text(CHATFONT, 20))
+            self.label_skindescitem:SetPosition(0, -263)
+            self.label_skindescitem:SetColour(UICOLOURS.BROWN_DARK)
+            self.label_skindescitem:SetHAlign(ANCHOR_LEFT)
+            self.label_skindescitem:SetVAlign(ANCHOR_TOP)
+            self.label_skindescitem:EnableWordWrap(true)
+            self.label_skindescitem:SetRegionSize(180, 60)
+        end
+        self.label_skindescitem:SetString(GetDescItem(item.item_key))
     end
 end
 
