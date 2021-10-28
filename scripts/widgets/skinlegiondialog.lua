@@ -73,40 +73,47 @@ function PushPopupDialog(self, title, message, buttontext, fn)
     if screen then screen:Enable() end
 end
 
-local SkinLegionDialog = Class(Widget, function(self, owner, text)
+local SkinLegionDialog = Class(Widget, function(self, owner)
 	Widget._ctor(self, "SkinLegionDialog")
 
+    if not owner or owner.userid == nil or owner.userid == "" then
+        self:Kill()
+        return
+    end
     self.owner = owner
 
     self.proot = self:AddChild(Widget("ROOT"))
     self.proot:SetPosition(0, 0, 0)
 
+    --整体背景图
     self.bg = self.proot:AddChild(TEMPLATES.CenterPanel(nil, nil, true))
     self.bg:SetScale(.51, .74)
     self.bg:SetPosition(0, 0)
 
+    --关闭弹窗按钮
     self.button_close = self.proot:AddChild(TEMPLATES.SmallButton(STRINGS.UI.PLAYER_AVATAR.CLOSE, 26, .5, function() self:Close() end))
     self.button_close:SetPosition(0, -215)
 
+    --cdk兑换区域的分割线
     self.horizontal_line3 = self.proot:AddChild(Image("images/quagmire_recipebook.xml", "quagmire_recipe_line.tex"))
     self.horizontal_line3:SetScale(.32, .25)
     self.horizontal_line3:SetPosition(140, -105)
 
+    --cdk输入框
     self.input_cdk = self.proot:AddChild(TEMPLATES2.StandardSingleLineTextEntry(nil, 200, 40))
     self.input_cdk.textbox:SetTextLengthLimit(20)
-    self.input_cdk.textbox:SetForceEdit(true)
     self.input_cdk.textbox:EnableWordWrap(false)
     self.input_cdk.textbox:EnableScrollEditWindow(true)
-    -- self.input_cdk.textbox:SetHelpTextEdit("")
-    -- self.input_cdk.textbox:SetHelpTextApply('输入CDK')
     self.input_cdk.textbox:SetTextPrompt(STRINGS.SKIN_LEGION.UI_INPUT_CDK, UICOLOURS.GREY)
     self.input_cdk.textbox.prompt:SetHAlign(ANCHOR_MIDDLE)
+    self.input_cdk.textbox:SetHAlign(ANCHOR_MIDDLE)
     self.input_cdk.textbox:SetCharacterFilter("-0123456789QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm")
     self.input_cdk:SetOnGainFocus( function() self.input_cdk.textbox:OnGainFocus() end )
     self.input_cdk:SetOnLoseFocus( function() self.input_cdk.textbox:OnLoseFocus() end )
     self.input_cdk:SetPosition(140, -130)
     self.input_cdk.focus_forward = self.input_cdk.textbox
 
+    --cdk确认输入按钮
     self.button_cdk = self.proot:AddChild(
         ImageButton("images/global_redux.xml", "button_carny_long_normal.tex",
             "button_carny_long_hover.tex", "button_carny_long_disabled.tex", "button_carny_long_down.tex")
@@ -128,80 +135,46 @@ local SkinLegionDialog = Class(Widget, function(self, owner, text)
         self.input_cdk.textbox:SetString("")
     end)
 
-	self.buttons = {}
-
     self.selected_item = nil
     self.context_popup = nil
-    self:SetItems()
+    self.items = nil
+
+    --初始化皮肤项
+    local items = {}
+    local myskins = SKINS_CACHE_L[owner.userid]
+    for skinname,v in pairs(SKINS_LEGION) do
+        local item = {
+            item_key = skinname,
+            item_id = skinname, --(不管)
+            owned_count = 0, --已拥有数量(不管)
+            isnew = false, --是否新皮肤(不管)
+            isfocused = false, --是否处于被鼠标移入状态(不管)
+            isselected = false, --是否处于选中状态
+            isowned = false, --是否拥有该皮肤
+            isunlockable = v.string.access == "DONATE", --是否可解锁
+            idx = nil,
+            context = nil, --存下的组件
+        }
+        -- if myskins ~= nil and myskins[skinname] then
+        --     item.isowned = true
+        -- end
+        items[skinname] = item
+    end
+    self:SetItems(items)
 
 	-- self.default_focus = self.menu
 end)
 
 function SkinLegionDialog:SetItems(itemsnew)
+    --先清除已有数据
     self:SetItemInfo()
     if self.option_items ~= nil then
         self.option_items:Kill()
     end
-
-    self.items = {
-        {
-            item_key = "rosorns_spell",
-            item_id = "rosorns_spell", --(不管)
-            owned_count = 0, --已拥有数量(不管)
-            isnew = false, --是否新皮肤(不管)
-            context = nil, --存下的组件
-            isselected = false, --是否处于选中状态
-            isfocused = false, --是否处于被鼠标移入状态(不管)
-            isowned = true, --是否拥有该皮肤
-            isunlockable = true, --是否可解锁
-            idx = 1,
-        },
-        {
-            item_key = "rosorns_spell",
-            item_id = "rosorns_spell",
-            owned_count = 0,
-            isowned = false,
-            isunlockable = true,
-        },
-        {
-            item_key = "rosorns_spell",
-            item_id = "rosorns_spell",
-            owned_count = 2,
-            isowned = true,
-        },
-        {
-            item_key = "rosorns_spell",
-            item_id = "rosorns_spell",
-            owned_count = 2
-        },
-        {
-            item_key = "wilson_rose",
-            item_id = "rosorns_spell",
-            owned_count = 0,
-            isnew = math.random() < 0.5,
-            isunlockable = true,
-        },
-        {
-            item_key = "rosorns_spell",
-            item_id = "rosorns_spell",
-            owned_count = 2,
-            isnew = math.random() < 0.5,
-        },
-        {
-            item_key = "rosorns_spell",
-            item_id = "rosorns_spell",
-            owned_count = 0,
-            isnew = math.random() < 0.5,
-        },
-        {
-            item_key = "rosorns_spell",
-            item_id = "rosorns_spell",
-            owned_count = 2
-        },
-    }
+    self.items_list = {} --皮肤组，1组3个ui
+    self.items = itemsnew
 
     local start_x = -160
-    self.items_list = {}
     local itemcount = 0
     local x = start_x
     local item_w = nil
@@ -215,7 +188,7 @@ function SkinLegionDialog:SetItems(itemsnew)
         }))
         a:ApplyDataToWidget(self, v, nil)
         a.frame:SetAge(v.isnew)
-        v.context = a
+        v.context = a --记下皮肤项对应的ui，方便后续更改
         -- a.warn_marker:Show()
         -- if a.frame.age_text then
         --     a.frame.age_text:SetString("拥有")
@@ -237,9 +210,8 @@ function SkinLegionDialog:SetItems(itemsnew)
 
         itemcount = itemcount + 1
         v.idx = itemcount
-        if itemcount%3 == 0 then
+        if itemcount%3 == 0 then --一排最多摆3个皮肤
             item_w = nil
-            -- itemcount = 0
             x = start_x
         else
             x = x + 78
@@ -352,8 +324,14 @@ function SkinLegionDialog:SetItemInfo(item)
                     self.button_access:SetTextSize(20)
                     self.button_access:SetText(STRINGS.SKIN_LEGION.UI_ACCESS)
                     self.button_access:SetOnClick(function()
-                        --undo: 跳转打赏网页
-                        self:Close()
+                        local skin = SKINS_LEGION[item.item_key]
+                        if skin ~= nil then
+                            VisitURL("https://wap.fireleaves.cn/#/qrcode?userId="..self.owner.userid
+                                .."&skinId="..skin.skin_id)
+                            PushPopupDialog(self, "感谢支持！", "打赏成功了吗？请点击按钮刷新皮肤数据。", "弄好啦", function()
+                                --undo: 向服务器发送更新请求
+                            end)
+                        end
                     end)
                 end
             else
@@ -390,17 +368,16 @@ function SkinLegionDialog:SetInteractionState(item)
 end
 
 function SkinLegionDialog:OnControl(control, down)
-    if SkinLegionDialog._base.OnControl(self,control, down) then return true end
+    if SkinLegionDialog._base.OnControl(self, control, down) then return true end
 
-    if control == CONTROL_CANCEL and not down then
-        if #self.buttons > 1 and self.buttons[#self.buttons] then
-            self.buttons[#self.buttons].cb()
-            TheFrontEnd:GetSound():PlaySound("dontstarve/HUD/click_move")
-            return true
-        end
-    end
+    -- if control == CONTROL_CANCEL and not down then
+    --     if #self.buttons > 1 and self.buttons[#self.buttons] then
+    --         self.buttons[#self.buttons].cb()
+    --         TheFrontEnd:GetSound():PlaySound("dontstarve/HUD/click_move")
+    --         return true
+    --     end
+    -- end
 end
-
 
 function SkinLegionDialog:Close()
 	self:Kill()

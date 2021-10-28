@@ -4,6 +4,9 @@ local _G = GLOBAL
 local IsServer = TheNet:GetIsServer() or TheNet:IsDedicated()
 local ischinese = TUNING.LEGION_MOD_LANGUAGES == "chinese"
 
+table.insert(Assets, Asset("ATLAS", "images/icon_skinbar_shadow_l.xml"))
+table.insert(Assets, Asset("IMAGE", "images/icon_skinbar_shadow_l.tex"))
+
 --------------------------------------------------------------------------
 --[[ 全局皮肤总数据，以及修改 ]]
 --------------------------------------------------------------------------
@@ -325,10 +328,10 @@ end
 --[[ 修改制作栏ui以显示mod皮肤 ]]
 --------------------------------------------------------------------------
 
-local function DoYouHaveSkin(skinname, myskins)
+local function DoYouHaveSkin(skinname, userid)
     if SKIN_IDS_LEGION.freeskins[skinname] then
         return true
-    elseif myskins ~= nil and myskins[skinname] then
+    elseif userid ~= nil and SKINS_CACHE_L[userid] ~= nil and SKINS_CACHE_L[userid][skinname] then
         return true
     end
     return false
@@ -345,7 +348,7 @@ AddClassPostConstruct("widgets/recipepopup", function(self)
         GetSkinsList_old(self, ...)
         if self.recipe and SKIN_PREFABS_LEGION[self.recipe.product] and PREFAB_SKINS[self.recipe.product] then
             for _, skinname in pairs(PREFAB_SKINS[self.recipe.product]) do
-                if DoYouHaveSkin(skinname, self.owner.skinData_legion) then
+                if DoYouHaveSkin(skinname, self.owner.userid) then
                     local data  = {
                         type = type, --不知道是啥
                         item = skinname, --这个皮肤的名字
@@ -358,6 +361,39 @@ AddClassPostConstruct("widgets/recipepopup", function(self)
         end
 
         return self.skins_list
+    end
+end)
+
+--------------------------------------------------------------------------
+--[[ RPC使用讲解
+    Tip:
+        !!!所有参数建议弄成数字类型或者字符类型
+
+        【客户端发送请求给服务器】SendModRPCToServer(GetModRPC("LegionSkined", "RefreshSkinData"), 参数2, 参数3, ...)
+        【服务器监听与响应请求】
+            AddModRPCHandler("LegionSkined", "RefreshSkinData", function(player, 参数2, ...) --第一个参数固定为发起请求的玩家
+                --做你想做的
+            end)
+
+        【服务端发送请求给客户端】SendModRPCToClient(GetClientModRPC("LegionSkined", "RefreshSkinData"), 玩家ID, 参数2, 参数3, ...)
+        --若 玩家ID 为table，则服务端会向table里的全部玩家ID都发送请求
+        【客户端监听与响应请求】
+            AddClientModRPCHandler("LegionSkined", "RefreshSkinData", function(参数2, ...) --通过 ThePlayer 确定客户端玩家
+                --做你想做的
+            end)
+]]--
+--------------------------------------------------------------------------
+
+AddClientModRPCHandler("LegionSkined", "SkinHandle", function(handletype, data, ...)
+    if handletype and type(handletype) == "number" then
+        if handletype == 1 then --更新客户端皮肤数据
+            if data and type(data) == "string" then
+                local success, result = pcall(json.decode, data)
+                if result and ThePlayer and ThePlayer.userid then
+                    SKINS_CACHE_L[ThePlayer.userid] = result
+                end
+            end
+        end
     end
 end)
 
@@ -385,121 +421,85 @@ end)
 ]]--
 --------------------------------------------------------------------------
 
-local fn_GetSkinData = nil
-local fn_skinDataDirty = nil
-local SetNet_skinIdx = nil
+_G.SKINS_NET_L = { --不管客户端还是服务端，都用这个变量
+    -- Kxx_xxxx = { --用户ID
+    --     errcount = 0,
+    --     loadtag = nil, --空值-未开始、1-成功、-1-失败、0-加载中
+    --     task = nil,
+    --     lastquerytime = nil, --上次请求时的现实时间
+    -- },
+}
+_G.SKINS_CACHE_L = { --不管客户端还是服务端，都用这个变量
+    -- Kxx_xxxx = { --用户ID
+    --     skinname1 = true,
+    --     skinname2 = true,
+    -- },
+}
+
 if IsServer then
     --不想麻烦地写在世界里了，换个方式
     -- AddPrefabPostInit("shard_network", function(inst) --这个prefab只存在于服务器世界里（且只能存在一个）
     --     inst:AddComponent("shard_skin_legion")
     -- end)
 
-    _G.skinData_cache_legion = {
-        -- Kxx_xxxx = { --用户ID
-        --     errcount = 0,
-        --     loadtag = nil, --空值-未开始、1-成功、-1-失败、0-加载中
-        --     task = nil,
-        --     lastquerytime = nil, --上次请求时的现实时间
-        --     skins = nil,
-        -- },
-    }
-
-    local function StopQueryTask(state)
-        if state.task ~= nil then
-            state.task:Cancel()
-            state.task = nil
+    local function FnRpc_s2c(userid, handletype, data)
+        if data == nil then
+            data = {}
         end
-        state.errcount = 0
+
+        local success, result = pcall(json.encode, data)
+        if success then
+            SendModRPCToClient(GetClientModRPC("LegionSkined", "SkinHandle"), userid, handletype, result)
+        end
     end
 
-    SetNet_skinIdx = function(player, skindata)
-        if skindata == nil then
-            player._skin_idxs1:set({ [1] = 0 })
-        else
-            local idxs1 = { [1] = 0 }
-            -- local idxs2 = {} --备用
-            local i = 0
-            for skinname,v in pairs(skindata) do
-                local skin = SKINS_LEGION[skinname]
-                if skin ~= nil then
-                    i = i + 1
-                    if i <= 25 then
-                        idxs1[i] = skin.skin_idx
-                    -- elseif i <= 50 then
-                    --     idxs2[i] = skin.skin_idx
-                    else
-                        break
-                    end
-                end
-            end
-
-            player._skin_idxs1:set(idxs1)
-            -- if i > 25 then
-            --     player._skin_idxs2:set(idxs2)
-            -- end
-        end
-        player.skinData_legion = skindata
-    end
-
-    ------获取玩家已有皮肤数据
-    fn_GetSkinData = function(player, userid, delaytime)
+    local function GetLegionSkins(player, userid, delaytime)
         if TheWorld == nil then
             return
         end
 
-        local state = {
-            errcount = 0,
-            loadtag = nil,
-            task = nil,
-            lastquerytime = os.time(),
-            skins = nil,
-            used = nil,
-        }
-        local isbind = nil
-        state.task = TheWorld:DoPeriodicTask(3, function()
-            --参数有效性判断
-            local user_id = player ~= nil and player.userid or userid
-            if user_id == nil or user_id == "" then
-                StopQueryTask(state)
+        local user_id = player ~= nil and player.userid or userid
+        if user_id == nil or user_id == "" then
+            return
+        end
+
+        local ositemnow = os.time() or 0
+        local state = SKINS_NET_L[user_id]
+        if state == nil then
+            state = {
+                errcount = 0,
+                loadtag = nil,
+                task = nil,
+                lastquerytime = ositemnow,
+            }
+            SKINS_NET_L[user_id] = state
+        else
+            if state.lastquerytime == nil then
+                state.lastquerytime = ositemnow
+            elseif (ositemnow-state.lastquerytime) < 180 then --3分钟内，不重复调用
                 return
             end
 
-            --是否已经在进行请求的判断
-            if not isbind then
-                local skinData_cache = skinData_cache_legion[user_id]
-                if skinData_cache ~= nil then
-                    if skinData_cache.loadtag == 0 then --有 正在进行 的请求，放弃当前操作
-                        StopQueryTask(state)
-                        return
-                    elseif skinData_cache.loadtag == 1 then --有 已完成 的请求，放弃当前操作，处理已有数据
-                        if not skinData_cache.used then
-                            StopQueryTask(state)
-                            if player ~= nil and player:IsValid() then
-                                SetNet_skinIdx(player, skinData_cache.skins)
-                                skinData_cache.used = true
-                            end
-                            return
-                        end
-                        if skinData_cache.lastquerytime ~= nil then --3分钟之内不会重复请求
-                            local timedelay = os.difftime(os.time(), skinData_cache.lastquerytime)
-                            if timedelay <= 60*3 then
-                                StopQueryTask(state)
-                                if player ~= nil and player:IsValid() then
-                                    SetNet_skinIdx(player, skinData_cache.skins)
-                                    skinData_cache.used = true
-                                end
-                                return
-                            end
-                        end
-                    end
-                    StopQueryTask(skinData_cache) --其他情况，取消已有task
-                    state.skins = skinData_cache.skins --记下以前的结果，防止请求失败没数据返回
+            if state.task ~= nil then --还有任务在进行？
+                if state.loadtag == 0 then --只要没在进行中，就结束以前的
+                    return
+                else
+                    state.task:Cancel()
+                    state.task = nil
                 end
-                skinData_cache_legion[user_id] = state
-                isbind = true
             end
+        end
 
-            --task请求状态判断
+        local function StopQueryTask(state)
+            if state.task ~= nil then
+                state.task:Cancel()
+                state.task = nil
+            end
+            state.errcount = 0
+        end
+
+        state.task = TheWorld:DoPeriodicTask(3, function()
+            --请求状态判断
             if state.loadtag == 0 then --加载中，等一会
                 return
             elseif state.loadtag == -1 then --失败了，开始计失败次数
@@ -515,8 +515,8 @@ if IsServer then
             end
 
             state.loadtag = 0
-            TheSim:QueryServer(
-                "https://fireleaves.cn/account/locakedSkin?mid=6041a52be3a3fb1f530b550a&id="..user_id,
+            state.lastquerytime = os.time() or 0
+            TheSim:QueryServer("https://fireleaves.cn/account/locakedSkin?mid=6041a52be3a3fb1f530b550a&id="..user_id,
                 function(result_json, isSuccessful, resultCode)
                     if isSuccessful and string.len(result_json) > 1 and resultCode == 200 then
                         local status, data = pcall( function() return json.decode(result_json) end )
@@ -545,22 +545,20 @@ if IsServer then
                                     end
                                 end
                             end
-                            if player ~= nil and player:IsValid() then
-                                SetNet_skinIdx(player, skins)
-                                state.used = true
-                            else
-                                state.used = nil
+                            if skins ~= nil then --如果数据库皮肤为空，就不该把本地皮肤数据给直接清除
+                                SKINS_CACHE_L[user_id] = skins
                             end
                             state.loadtag = 1
-                            state.skins = skins
                             StopQueryTask(state)
+                            if player ~= nil and player:IsValid() then --该给玩家客户端传数据了
+                                FnRpc_s2c(user_id, 1, SKINS_CACHE_L[user_id])
+                            end
                         end
                     else
                         state.loadtag = -1
                     end
                 end,
             "GET")
-
         end, delaytime)
     end
 
@@ -571,17 +569,12 @@ if IsServer then
     local SpawnPrefab_old = _G.SpawnPrefab
     _G.SpawnPrefab = function(name, skin, skin_id, creator)
         --【服务端】环境
-        if skin ~= nil and SKINS_LEGION[skin] ~= nil and creator ~= nil then
+        if skin ~= nil and creator ~= nil and SKINS_LEGION[skin] ~= nil then
             local prefab = SpawnPrefab_old(name, nil, nil, creator)
             if prefab ~= nil then
                 if prefab.components.skinedlegion ~= nil then
-                    if SKIN_IDS_LEGION.freeskins[skin] then
+                    if DoYouHaveSkin(skin, creator) then
                         prefab.components.skinedlegion:SetSkin(skin)
-                    elseif skinData_cache_legion ~= nil and skinData_cache_legion[creator] ~= nil then
-                        local skins = skinData_cache_legion[creator].skins
-                        if skins ~= nil and skins[skin] then
-                            prefab.components.skinedlegion:SetSkin(skin)
-                        end
                     end
                 end
             end
@@ -624,7 +617,7 @@ if IsServer then
 
                         if skins ~= nil then
                             for _,skinname in pairs(skins) do
-                                if DoYouHaveSkin(skinname, doer.skinData_legion) then
+                                if DoYouHaveSkin(skinname, doer.userid) then
                                     if SKINS_LEGION[skinname] ~= nil then
                                         local weight = SKINS_LEGION[skinname].skin_idx
                                         if weight > skinweight_old then
@@ -651,35 +644,11 @@ if IsServer then
         end
     end)
 
-else
-    fn_skinDataDirty = function(inst, valuekey)
-        local idxs = inst[valuekey]:value()
-        if idxs ~= nil and #idxs > 0 then
-            if idxs[1] == 0 then --第一个元素为0代表想清除皮肤数据
-                inst.skinData_legion = nil
-            else
-                if inst.skinData_legion == nil then
-                    inst.skinData_legion = {}
-                end
-                for k,v in pairs(idxs) do
-                    if SKIN_IDX_LEGION[v] ~= nil then
-                        inst.skinData_legion[SKIN_IDX_LEGION[v]] = true
-                    end
-                end
-            end
-        end
-    end
-end
+    --------------------------------------------------------------------------
+    --[[ 修改玩家实体以应用皮肤机制 ]]
+    --------------------------------------------------------------------------
 
-AddPlayerPostInit(function(inst)
-    inst.skinData_legion = nil
-    inst._skin_idxs1 = net_bytearray(inst.GUID, "localplayer._skin_idxs1", "skin_data1_l_dirty")
-    --net_bytearray只能装31个元素，所以这里可以准备一下多个变量
-    -- inst._skin_idxs2 = net_bytearray(inst.GUID, "localplayer._skin_idxs2", "skin_data2_l_dirty")
-
-    if IsServer then
-        fn_GetSkinData(inst, 0.5)
-
+    AddPlayerPostInit(function(inst)
         --还是让玩家实体存储自己的皮肤数据吧，免得网络问题导致皮肤没法用
         local OnSave_old = inst.OnSave
         local OnLoad_old = inst.OnLoad
@@ -688,16 +657,16 @@ AddPlayerPostInit(function(inst)
                 OnSave_old(inst, data)
             end
 
-            if inst.skinData_legion ~= nil then
+            if SKINS_CACHE_L[inst.userid] ~= nil then
                 local skins = nil
-                for skinname,v in pairs(inst.skinData_legion) do
+                for skinname,v in pairs(SKINS_CACHE_L[inst.userid]) do
                     if skins == nil then
                         skins = {}
                     end
                     skins[skinname] = true
                 end
                 if skins ~= nil then
-                    data.skinData_legion = skins
+                    data.skins_legion = skins
                 end
             end
         end
@@ -706,32 +675,22 @@ AddPlayerPostInit(function(inst)
                 OnLoad_old(inst, data)
             end
 
-            local skinData_cache = skinData_cache_legion[inst.userid]
-            if skinData_cache == nil then
-                if data ~= nil and data.skinData_legion ~= nil then
-                    skinData_cache_legion[inst.userid] = {
-                        skins = data.skinData_legion
-                    }
-                    SetNet_skinIdx(inst, data.skinData_legion)
-                end
-            else
-                if data ~= nil and data.skinData_legion ~= nil then
-                    skinData_cache.skins = data.skinData_legion
-                end
-                if skinData_cache.skins ~= nil then --即使玩家自己没缓存，看能不能拿全局的缓存数据
-                    SetNet_skinIdx(inst, skinData_cache.skins)
-                end
+            if data ~= nil and data.skins_legion ~= nil then
+                SKINS_CACHE_L[inst.userid] = data.skins_legion --先存下来，等服务器皮肤数据确认后才传给客户端
             end
         end
-    else
-        inst:ListenForEvent("skin_data1_l_dirty", function()
-            fn_skinDataDirty(inst, "_skin_idxs1")
+
+        --实体生成后，开始调取接口获取皮肤数据
+        inst.task_skin_l = inst:DoTaskInTime(0.1, function()
+            inst.task_skin_l = nil
+            GetLegionSkins(inst, inst.userid, 0.5)
+
+            if inst.userid ~= nil and SKINS_CACHE_L[inst.userid] ~= nil then --提前给玩家传输服务器的皮肤数据
+                FnRpc_s2c(inst.userid, 1, SKINS_CACHE_L[inst.userid])
+            end
         end)
-        -- inst:ListenForEvent("skin_data2_l_dirty", function() --备用
-        --     fn_skinDataDirty(inst, "_skin_idxs2")
-        -- end)
-    end
-end)
+    end)
+end
 
 --------------------------------------------------------------------------
 --[[ 修改审视自我按钮的弹出界面，增加皮肤界面触发按钮 ]]
@@ -739,61 +698,74 @@ end)
 
 if not TheNet:IsDedicated() then
     if TUNING.LEGION_MOD_LANGUAGES == "chinese" then
-        local ImageButton = require "widgets/imagebutton"
+        -- local ImageButton = require "widgets/imagebutton"
         local PlayerAvatarPopup = require "widgets/playeravatarpopup"
+        local TEMPLATES = require "widgets/templates"
         -- local SkinLegionDialog = require "widgets/skinlegiondialog"
 
-        local right_root = nil
-        AddClassPostConstruct("widgets/controls", function(self)
-            right_root = self.right_root
-        end)
+        -- local right_root = nil
+        -- AddClassPostConstruct("widgets/controls", function(self)
+        --     right_root = self.right_root
+        -- end)
 
         local Layout_old = PlayerAvatarPopup.Layout
         PlayerAvatarPopup.Layout = function(self, ...)
             Layout_old(self, ...)
             if not TheInput:ControllerAttached() then
-                if self.close_button then
-                    self.close_button:SetPosition(90, -269)
+                -- if self.close_button then
+                --     self.close_button:SetPosition(90, -269)
+                -- end
+
+                local right_root = nil
+                if ThePlayer and ThePlayer.HUD and ThePlayer.HUD.controls and ThePlayer.HUD.controls.right_root then
+                    right_root = ThePlayer.HUD.controls.right_root
+                else
+                    return
                 end
 
-                if right_root and right_root.skinshop_legion then --再次打开人物自检面板时，需要关闭已有的商城页面
+                if right_root.skinshop_legion then --再次打开人物自检面板时，需要关闭已有的铺子页面
                     right_root.skinshop_legion:Kill()
                     right_root.skinshop_legion = nil
                 end
 
-                self.skinshop_l_button = self.proot:AddChild(
-                    ImageButton("images/global_redux.xml", "button_carny_long_normal.tex",
-                        "button_carny_long_hover.tex", "button_carny_long_disabled.tex", "button_carny_long_down.tex")
-                )
-                self.skinshop_l_button.image:SetScale(.5)
-                self.skinshop_l_button:SetFont(CHATFONT)
-                self.skinshop_l_button:SetPosition(-80, -271)
-                self.skinshop_l_button.text:SetColour(0,0,0,1)
-                self.skinshop_l_button:SetTextSize(26)
-                self.skinshop_l_button:SetText("棱镜皮肤铺")
-                self.skinshop_l_button:SetOnClick(function()
-                    if right_root then
+                self.skinshop_l_button = self.proot:AddChild(TEMPLATES.IconButton(
+                    "images/icon_skinbar_shadow_l.xml", "icon_skinbar_shadow_l.tex", "棱镜鸡毛铺", false, false,
+                    function()
                         if right_root.skinshop_legion then
                             right_root.skinshop_legion:Kill()
                         end
-                        local SkinLegionDialog = _G.require("widgets/skinlegiondialog")
-                        right_root.skinshop_legion = right_root:AddChild(SkinLegionDialog(self.owner, "tttest"))
+                        local SkinLegionDialog = _G.require("widgets/skinlegiondialog") --test
+                        right_root.skinshop_legion = right_root:AddChild(SkinLegionDialog(self.owner))
                         right_root.skinshop_legion:SetPosition(-380, 0)
-                    end
-                    self:Close()
-                end)
+                        self:Close()
+                    end,
+                    nil, "self_inspect_mod.tex"
+                ))
+                self.skinshop_l_button.icon:SetScale(.7)
+                self.skinshop_l_button.icon:SetPosition(-4, 6)
+                self.skinshop_l_button:SetScale(0.65)
+                self.skinshop_l_button:SetPosition(-100, -273)
+
+                -- self.skinshop_l_button = self.proot:AddChild(
+                --     ImageButton("images/global_redux.xml", "button_carny_long_normal.tex",
+                --         "button_carny_long_hover.tex", "button_carny_long_disabled.tex", "button_carny_long_down.tex")
+                -- )
+                -- self.skinshop_l_button.image:SetScale(0.2, 0.5)
+                -- self.skinshop_l_button:SetFont(CHATFONT)
+                -- self.skinshop_l_button:SetPosition(-80, -271)
+                -- self.skinshop_l_button.text:SetColour(0,0,0,1)
+                -- self.skinshop_l_button:SetTextSize(26)
+                -- self.skinshop_l_button:SetText("*")
+                -- self.skinshop_l_button:SetOnClick(function()
+                --     if right_root.skinshop_legion then
+                --         right_root.skinshop_legion:Kill()
+                --     end
+                --     local SkinLegionDialog = _G.require("widgets/skinlegiondialog") --test
+                --     right_root.skinshop_legion = right_root:AddChild(SkinLegionDialog(self.owner))
+                --     right_root.skinshop_legion:SetPosition(-380, 0)
+                --     self:Close()
+                -- end)
             end
         end
     end
 end
-
---------------------------------------------------------------------------
---[[ RPC使用讲解
-    Tip:
-        【客户端发送请求】SendModRPCToServer(GetModRPC("LegionSkined", "RefreshSkinData"), 参数2, 参数3, ...)
-        【服务器监听与响应请求】
-            AddModRPCHandler("LegionSkined", "RefreshSkinData", function(player, 参数2, ...) --第一个参数固定为发起请求的玩家
-                --做你想做的
-            end)
-]]--
---------------------------------------------------------------------------
