@@ -58,7 +58,7 @@ _G.SKINS_LEGION = {
 		release_group = 555,
 		build_name_override = nil, --皮肤名称(居然是小写)
 
-        skin_idx = nil,
+        skin_idx = 1, --只能我来确定的数据了，谁叫[key]形式的下标不能按代码顺序呢
         skin_id = "61627d927bbb727be174c4a0",
 		assets = { --仅仅是用于初始化注册
 			Asset("ANIM", "anim/skin/swap_spear_mirrorrose.zip"),
@@ -95,7 +95,6 @@ _G.SKINS_LEGION = {
             -- local fx = SpawnPrefab("wanda_attack_pocketwatch_normal_fx")
             local fx = SpawnPrefab("rosorns_spell_fx")
             if fx ~= nil then
-                print("??????")
                 fx.Transform:SetPosition(target.Transform:GetWorldPosition())
             end
         end,
@@ -183,11 +182,8 @@ end
 
 ------
 
-local skin_idx = 1
 for skinname,v in pairs(_G.SKINS_LEGION) do
-    _G.SKIN_IDX_LEGION[skin_idx] = skinname
-    v.skin_idx = skin_idx
-    skin_idx = skin_idx + 1
+    _G.SKIN_IDX_LEGION[v.skin_idx] = skinname
 
     if _G.SKIN_IDS_LEGION[v.skin_id] == nil then
         _G.SKIN_IDS_LEGION[v.skin_id] = {}
@@ -281,7 +277,6 @@ for baseprefab,v in pairs(_G.SKIN_PREFABS_LEGION) do
     end
     _G[baseprefab.."_clear_fn"] = function(inst) end --【服务端】给CreatePrefabSkin()用的
 end
-skin_idx = nil
 ischinese = nil
 
 ------重新生成一遍PREFAB_SKINS_IDS(在prefabskins.lua中被定义)
@@ -365,39 +360,6 @@ AddClassPostConstruct("widgets/recipepopup", function(self)
 end)
 
 --------------------------------------------------------------------------
---[[ RPC使用讲解
-    Tip:
-        !!!所有参数建议弄成数字类型或者字符类型
-
-        【客户端发送请求给服务器】SendModRPCToServer(GetModRPC("LegionSkined", "RefreshSkinData"), 参数2, 参数3, ...)
-        【服务器监听与响应请求】
-            AddModRPCHandler("LegionSkined", "RefreshSkinData", function(player, 参数2, ...) --第一个参数固定为发起请求的玩家
-                --做你想做的
-            end)
-
-        【服务端发送请求给客户端】SendModRPCToClient(GetClientModRPC("LegionSkined", "RefreshSkinData"), 玩家ID, 参数2, 参数3, ...)
-        --若 玩家ID 为table，则服务端会向table里的全部玩家ID都发送请求
-        【客户端监听与响应请求】
-            AddClientModRPCHandler("LegionSkined", "RefreshSkinData", function(参数2, ...) --通过 ThePlayer 确定客户端玩家
-                --做你想做的
-            end)
-]]--
---------------------------------------------------------------------------
-
-AddClientModRPCHandler("LegionSkined", "SkinHandle", function(handletype, data, ...)
-    if handletype and type(handletype) == "number" then
-        if handletype == 1 then --更新客户端皮肤数据
-            if data and type(data) == "string" then
-                local success, result = pcall(json.decode, data)
-                if result and ThePlayer and ThePlayer.userid then
-                    SKINS_CACHE_L[ThePlayer.userid] = result
-                end
-            end
-        end
-    end
-end)
-
---------------------------------------------------------------------------
 --[[ 给玩家实体增加已有皮肤获取与管理机制
     Tip：
         TheNet:GetIsMasterSimulation()  --是否为服务器世界(主机+云服)
@@ -421,7 +383,8 @@ end)
 ]]--
 --------------------------------------------------------------------------
 
-_G.SKINS_NET_L = { --不管客户端还是服务端，都用这个变量
+--不管客户端还是服务端，都用这个变量
+_G.SKINS_NET_L = {
     -- Kxx_xxxx = { --用户ID
     --     errcount = 0,
     --     loadtag = nil, --空值-未开始、1-成功、-1-失败、0-加载中
@@ -429,13 +392,16 @@ _G.SKINS_NET_L = { --不管客户端还是服务端，都用这个变量
     --     lastquerytime = nil, --上次请求时的现实时间
     -- },
 }
-_G.SKINS_CACHE_L = { --不管客户端还是服务端，都用这个变量
+_G.SKINS_NET_CDK_L = {} --内容和 SKINS_NET_L 一样
+_G.SKINS_CACHE_L = {
     -- Kxx_xxxx = { --用户ID
     --     skinname1 = true,
     --     skinname2 = true,
     -- },
 }
 
+local GetLegionSkins = nil
+local DoLegionCdk = nil
 if IsServer then
     --不想麻烦地写在世界里了，换个方式
     -- AddPrefabPostInit("shard_network", function(inst) --这个prefab只存在于服务器世界里（且只能存在一个）
@@ -453,7 +419,15 @@ if IsServer then
         end
     end
 
-    local function GetLegionSkins(player, userid, delaytime)
+    local function StopQueryTask(stat)
+        if stat.task ~= nil then
+            stat.task:Cancel()
+            stat.task = nil
+        end
+        stat.errcount = 0
+    end
+
+    local function QueryManage(States, player, userid, fnname, isget, times, fns)
         if TheWorld == nil then
             return
         end
@@ -464,7 +438,7 @@ if IsServer then
         end
 
         local ositemnow = os.time() or 0
-        local state = SKINS_NET_L[user_id]
+        local state = States[user_id]
         if state == nil then
             state = {
                 errcount = 0,
@@ -472,11 +446,17 @@ if IsServer then
                 task = nil,
                 lastquerytime = ositemnow,
             }
-            SKINS_NET_L[user_id] = state
+            States[user_id] = state
         else
             if state.lastquerytime == nil then
                 state.lastquerytime = ositemnow
-            elseif (ositemnow-state.lastquerytime) < 180 then --3分钟内，不重复调用
+            elseif times.force ~= nil then --主动刷新时，xx秒内不重复调用
+                if (ositemnow-state.lastquerytime) < times.force then
+                    fns.err(state, user_id, 1)
+                    return
+                end
+            elseif (ositemnow-state.lastquerytime) < times.cut then --自动刷新时，xx秒内，不重复调用
+                fns.err(state, user_id, 2)
                 return
             end
 
@@ -488,14 +468,7 @@ if IsServer then
                     state.task = nil
                 end
             end
-        end
-
-        local function StopQueryTask(state)
-            if state.task ~= nil then
-                state.task:Cancel()
-                state.task = nil
-            end
-            state.errcount = 0
+            state.loadtag = nil --初始化状态
         end
 
         state.task = TheWorld:DoPeriodicTask(3, function()
@@ -503,8 +476,9 @@ if IsServer then
             if state.loadtag == 0 then --加载中，等一会
                 return
             elseif state.loadtag == -1 then --失败了，开始计失败次数
-                if state.errcount >= 2 then
+                if state.errcount >= 1 then --失败两次的话，就结束
                     StopQueryTask(state)
+                    fns.err(state, user_id, 3)
                     return
                 else
                     state.errcount = state.errcount + 1
@@ -516,50 +490,112 @@ if IsServer then
 
             state.loadtag = 0
             state.lastquerytime = os.time() or 0
-            TheSim:QueryServer("https://fireleaves.cn/account/locakedSkin?mid=6041a52be3a3fb1f530b550a&id="..user_id,
-                function(result_json, isSuccessful, resultCode)
-                    if isSuccessful and string.len(result_json) > 1 and resultCode == 200 then
-                        local status, data = pcall( function() return json.decode(result_json) end )
-                        -- print("------------skined: ", tostring(result_json))
-                        if not status then
-                            print("[SkinUser_legion] Faild to parse quest json for "
-                                ..tostring(user_id).."! ", tostring(status)
-                            )
-                            state.loadtag = -1
-                        else
-                            local skins = nil
-                            if data ~= nil then
-                                if data.lockedSkin ~= nil and type(data.lockedSkin) == "table" then
-                                    for kk,skinid in pairs(data.lockedSkin) do
-                                        local skinkeys = SKIN_IDS_LEGION[skinid]
-                                        if skinkeys ~= nil then
-                                            if skins == nil then
-                                                skins = {}
-                                            end
-                                            for skinname,vv in pairs(skinkeys) do
-                                                if SKINS_LEGION[skinname] ~= nil then
-                                                    skins[skinname] = true
-                                                end
-                                            end
+
+            local urlparams = fns.urlparams(state, user_id)
+            if urlparams == nil then
+                StopQueryTask(state)
+                fns.err(state, user_id, 4)
+                return
+            end
+
+            TheSim:QueryServer(urlparams, function(result_json, isSuccessful, resultCode)
+                if isSuccessful and string.len(result_json) > 1 and resultCode == 200 then
+                    local status, data = pcall( function() return json.decode(result_json) end )
+                    -- print("------------skined: ", tostring(result_json))
+                    if not status then
+                        print("["..fnname.."] Faild to parse quest json for "
+                            ..tostring(user_id).."! ", tostring(status)
+                        )
+                        state.loadtag = -1
+                    else
+                        fns.handle(state, user_id, data)
+                    end
+                else
+                    state.loadtag = -1
+                end
+            end, isget and "GET" or "POST", (not isget) and fns.params(state, user_id) or nil)
+        end, times.delay)
+    end
+
+    GetLegionSkins = function(player, userid, delaytime, force)
+        QueryManage(
+            SKINS_NET_L, player, userid, "GetLegionSkins", true,
+            { force = force and 5 or nil, cut = 180, delay = delaytime },
+            {
+                urlparams = function(state, user_id)
+                    return "https://fireleaves.cn/account/locakedSkin?mid=6041a52be3a3fb1f530b550a&id="..user_id
+                end,
+                handle = function(state, user_id, data)
+                    local skins = nil
+                    if data ~= nil then
+                        if data.lockedSkin ~= nil and type(data.lockedSkin) == "table" then
+                            for kk,skinid in pairs(data.lockedSkin) do
+                                local skinkeys = SKIN_IDS_LEGION[skinid]
+                                if skinkeys ~= nil then
+                                    if skins == nil then
+                                        skins = {}
+                                    end
+                                    for skinname,vv in pairs(skinkeys) do
+                                        if SKINS_LEGION[skinname] ~= nil then
+                                            skins[skinname] = true
                                         end
                                     end
                                 end
                             end
-                            if skins ~= nil then --如果数据库皮肤为空，就不该把本地皮肤数据给直接清除
-                                SKINS_CACHE_L[user_id] = skins
-                            end
-                            state.loadtag = 1
-                            StopQueryTask(state)
-                            if player ~= nil and player:IsValid() then --该给玩家客户端传数据了
-                                FnRpc_s2c(user_id, 1, SKINS_CACHE_L[user_id])
-                            end
                         end
+                    end
+                    if skins ~= nil then --如果数据库皮肤为空，就不该把本地皮肤数据给直接清除
+                        SKINS_CACHE_L[user_id] = skins
+                    end
+                    state.loadtag = 1
+                    StopQueryTask(state)
+                    if player ~= nil and player:IsValid() then --该给玩家客户端传数据了
+                        FnRpc_s2c(user_id, 1, SKINS_CACHE_L[user_id])
+                    end
+                end,
+                err = function(state, user_id, errcode)
+                    --errcode==1：主动刷新太频繁
+                    --errcode==2：自动刷新太频繁
+                    --errcode==3：3次接口调用都失败了
+                    --errcode==4：接口参数不对
+                end
+            }
+        )
+    end
+
+    DoLegionCdk = function(player, userid, cdk)
+        QueryManage(
+            SKINS_NET_CDK_L, player, userid, "DoLegionCdk", false,
+            { force = nil, cut = 5, delay = 0 },
+            {
+                urlparams = function(state, user_id)
+                    return "https://fireleaves.cn/cdk/use"
+                end,
+                params = function(state, user_id)
+                    return json.encode({
+                        cdkStr = cdk,
+                        id = user_id
+                    })
+                end,
+                handle = function(state, user_id, data)
+                    local stat = -1
+                    if data ~= nil and data.code == 0 then
+                        stat = 1
+                        state.loadtag = 1
+                        GetLegionSkins(player, userid, 0, true) --cdk兑换成功，重新获取皮肤数据
                     else
                         state.loadtag = -1
                     end
+                    StopQueryTask(state)
+                    if player ~= nil and player:IsValid() then
+                        FnRpc_s2c(user_id, 2, { state = stat, pop = -1 })
+                    end
                 end,
-            "GET")
-        end, delaytime)
+                err = function(state, user_id, errcode)
+                    print("----问题是?："..tostring(errcode))
+                end
+            }
+        )
     end
 
     --------------------------------------------------------------------------
@@ -683,7 +719,7 @@ if IsServer then
         --实体生成后，开始调取接口获取皮肤数据
         inst.task_skin_l = inst:DoTaskInTime(0.1, function()
             inst.task_skin_l = nil
-            GetLegionSkins(inst, inst.userid, 0.5)
+            GetLegionSkins(inst, inst.userid, 0.5, false)
 
             if inst.userid ~= nil and SKINS_CACHE_L[inst.userid] ~= nil then --提前给玩家传输服务器的皮肤数据
                 FnRpc_s2c(inst.userid, 1, SKINS_CACHE_L[inst.userid])
@@ -691,6 +727,84 @@ if IsServer then
         end)
     end)
 end
+
+--------------------------------------------------------------------------
+--[[ RPC使用讲解
+    Tip:
+        !!!所有参数建议弄成数字类型或者字符类型
+
+        【客户端发送请求给服务器】SendModRPCToServer(GetModRPC("LegionSkined", "RefreshSkinData"), 参数2, 参数3, ...)
+        【服务器监听与响应请求】
+            AddModRPCHandler("LegionSkined", "RefreshSkinData", function(player, 参数2, ...) --第一个参数固定为发起请求的玩家
+                --做你想做的
+            end)
+
+        【服务端发送请求给客户端】SendModRPCToClient(GetClientModRPC("LegionSkined", "RefreshSkinData"), 玩家ID, 参数2, 参数3, ...)
+        --若 玩家ID 为table，则服务端会向table里的全部玩家ID都发送请求
+        【客户端监听与响应请求】
+            AddClientModRPCHandler("LegionSkined", "RefreshSkinData", function(参数2, ...) --通过 ThePlayer 确定客户端玩家
+                --做你想做的
+            end)
+]]--
+--------------------------------------------------------------------------
+
+local function GetRightRoot()
+    if ThePlayer and ThePlayer.HUD and ThePlayer.HUD.controls then
+        return ThePlayer.HUD.controls.right_root
+    end
+    return nil
+end
+
+--客户端响应服务器请求【客户端环境】
+AddClientModRPCHandler("LegionSkined", "SkinHandle", function(handletype, data, ...)
+    if handletype and type(handletype) == "number" then
+        if handletype == 1 then --更新客户端皮肤数据
+            if data and type(data) == "string" then
+                local success, result = pcall(json.decode, data)
+                if result and ThePlayer and ThePlayer.userid then
+                    SKINS_CACHE_L[ThePlayer.userid] = result
+
+                    --获取数据后，主动更新皮肤铺界面
+                    local right_root = GetRightRoot()
+                    if right_root ~= nil and right_root.skinshop_legion then
+                        right_root.skinshop_legion:ResetItems()
+                    end
+                end
+            end
+
+        elseif handletype == 2 then
+            if data and type(data) == "string" then
+                local success, result = pcall(json.decode, data)
+                if result then
+                    --获取数据后，主动更新cdk输入框
+                    local right_root = GetRightRoot()
+                    if right_root ~= nil and right_root.skinshop_legion then
+                        right_root.skinshop_legion:SetCdkState(result.state, result.pop)
+                    end
+                end
+            end
+
+        end
+    end
+end)
+
+--服务端响应客户端请求【服务端环境】
+AddModRPCHandler("LegionSkined", "BarHandle", function(player, handletype, data, ...)
+    if handletype and type(handletype) == "number" then
+        if handletype == 1 then --主动刷新皮肤
+            if player and GetLegionSkins ~= nil then
+                GetLegionSkins(player, player.userid, 0, true)
+            end
+        elseif handletype == 2 then --cdk兑换
+            if player and data and DoLegionCdk ~= nil and type(data) == "string" then
+                local success, result = pcall(json.decode, data)
+                if result and result.cdk ~= nil and result.cdk ~= "" and result.cdk:utf8len() > 6 then
+                    DoLegionCdk(player, player.userid, result.cdk)
+                end
+            end
+        end
+    end
+end)
 
 --------------------------------------------------------------------------
 --[[ 修改审视自我按钮的弹出界面，增加皮肤界面触发按钮 ]]
@@ -716,10 +830,8 @@ if not TheNet:IsDedicated() then
                 --     self.close_button:SetPosition(90, -269)
                 -- end
 
-                local right_root = nil
-                if ThePlayer and ThePlayer.HUD and ThePlayer.HUD.controls and ThePlayer.HUD.controls.right_root then
-                    right_root = ThePlayer.HUD.controls.right_root
-                else
+                local right_root = GetRightRoot()
+                if right_root == nil then
                     return
                 end
 
@@ -741,7 +853,7 @@ if not TheNet:IsDedicated() then
                     end,
                     nil, "self_inspect_mod.tex"
                 ))
-                self.skinshop_l_button.icon:SetScale(.7)
+                self.skinshop_l_button.icon:SetScale(.6)
                 self.skinshop_l_button.icon:SetPosition(-4, 6)
                 self.skinshop_l_button:SetScale(0.65)
                 self.skinshop_l_button:SetPosition(-100, -273)

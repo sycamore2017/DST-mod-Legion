@@ -52,6 +52,18 @@ local function GetDescItem(skin)
     end
 end
 
+local function DoRpc(type, data)
+    if data == nil then
+        SendModRPCToServer(GetModRPC("LegionSkined", "BarHandle"), type, nil)
+        return
+    end
+
+    local success, result  = pcall(json.encode, data)
+	if success then
+        SendModRPCToServer(GetModRPC("LegionSkined", "BarHandle"), type, result)
+	end
+end
+
 function PushPopupDialog(self, title, message, buttontext, fn)
     if self.context_popup ~= nil then
         TheFrontEnd:PopScreen(self.context_popup)
@@ -125,23 +137,61 @@ local SkinLegionDialog = Class(Widget, function(self, owner)
     self.button_cdk:SetTextSize(20)
     self.button_cdk:SetText(STRINGS.UI.MAINSCREEN.REDEEM)
     self.button_cdk:SetOnClick(function()
-        --undo: 检测cdk是否正常
+        if self.loadtag_cdk == 0 then
+            return
+        end
+
         local cdk = self.input_cdk.textbox:GetString()
         if cdk == nil or cdk == "" or cdk:utf8len() <= 6 then
             PushPopupDialog(self, "轻声提醒", "请输入正确的兑换码。", "知道啦", nil)
             return
         end
-        self.button_cdk:SetText(STRINGS.SKIN_LEGION.UI_LOAD_CDK)
-        self.input_cdk.textbox:SetString("")
+        self:SetCdkState(0, nil) --后续的状态更新需要服务端返回结果过来
+        DoRpc(2, { cdk = cdk })
     end)
 
     self.selected_item = nil
     self.context_popup = nil
     self.items = nil
 
+    self:ResetItems()
+
+	-- self.default_focus = self.menu
+end)
+
+function SkinLegionDialog:SetCdkState(state, poptype)
+    self.loadtag_cdk = state
+	if state == 0 then
+        self.button_cdk:SetText(STRINGS.SKIN_LEGION.UI_LOAD_CDK)
+    elseif state == 1 then
+        self.button_cdk:SetText(STRINGS.UI.MAINSCREEN.REDEEM)
+        self.input_cdk.textbox:SetString("")
+
+        if poptype then
+            PushPopupDialog(self, "感谢支持！", "兑换成功！来，试试看。", "好的", nil)
+        end
+    elseif state == -1 then
+        self.button_cdk:SetText(STRINGS.UI.MAINSCREEN.REDEEM)
+
+        if poptype then
+            if poptype == -1 then
+                PushPopupDialog(self, "小声提醒", "兑换失败！请检查兑换码是否有效，输入是否正确，网络有无问题，是否已拥有欲兑换的皮肤。实在不行请联系作者。", "知道了", nil)
+            end
+        end
+    else
+        self.button_cdk:SetText(STRINGS.UI.MAINSCREEN.REDEEM)
+        self.input_cdk.textbox:SetString("")
+    end
+end
+
+function SkinLegionDialog:ResetItems()
+    --记下之前选中的皮肤
+	local selected_skin = self.selected_item ~= nil and self.selected_item.item_key or nil
+    local selected_item = nil
+
     --初始化皮肤项
     local items = {}
-    local myskins = SKINS_CACHE_L[owner.userid]
+    local myskins = SKINS_CACHE_L[self.owner.userid]
     for skinname,v in pairs(SKINS_LEGION) do
         local item = {
             item_key = skinname,
@@ -155,15 +205,23 @@ local SkinLegionDialog = Class(Widget, function(self, owner)
             idx = nil,
             context = nil, --存下的组件
         }
-        -- if myskins ~= nil and myskins[skinname] then
-        --     item.isowned = true
-        -- end
-        items[skinname] = item
+        if myskins ~= nil and myskins[skinname] then
+            item.isowned = true
+        end
+        items[v.skin_idx or skinname] = item
+
+        if selected_item == nil and selected_skin ~= nil and selected_skin == skinname then
+            selected_item = item
+        end
     end
     self:SetItems(items)
 
-	-- self.default_focus = self.menu
-end)
+    if selected_item ~= nil then --恢复之前选中的皮肤
+        self:SetItemInfo(selected_item)
+    else --默认选中第一个
+        self:SetItemInfo(items[1])
+    end
+end
 
 function SkinLegionDialog:SetItems(itemsnew)
     --先清除已有数据
@@ -261,6 +319,7 @@ function SkinLegionDialog:SetItemInfo(item)
             self.panel_iteminfo:SetPosition(startpos_x, startpos_y)
         end
 
+        --皮肤名称
         if self.label_skinname == nil then
             self.label_skinname = self.panel_iteminfo:AddChild(Text(UIFONT, 30))
             self.label_skinname:SetColour(UICOLOURS.GOLD_SELECTED)
@@ -270,6 +329,7 @@ function SkinLegionDialog:SetItemInfo(item)
         end
         self.label_skinname:SetString(GetSkinName(item.item_key))
 
+        --皮肤品质
         if self.label_skinrarity == nil then
             self.label_skinrarity = self.panel_iteminfo:AddChild(Text(HEADERFONT, 20))
             -- self.label_skinrarity:SetHAlign(ANCHOR_LEFT)
@@ -279,12 +339,14 @@ function SkinLegionDialog:SetItemInfo(item)
         self.label_skinrarity:SetString(GetCollection(item.item_key))
         self.label_skinrarity:SetColour(GetColorForItem(item.item_key))
 
+        --标题分割线
         if self.horizontal_line == nil then
             self.horizontal_line = self.panel_iteminfo:AddChild(Image("images/quagmire_recipebook.xml", "quagmire_recipe_line_break.tex"))
             self.horizontal_line:SetScale(.45, .3)
             self.horizontal_line:SetPosition(-3, -38)
         end
 
+        --皮肤小故事
         if self.label_skindesc == nil then
             self.label_skindesc = self.panel_iteminfo:AddChild(Text(CHATFONT, 21))
             self.label_skindesc:SetPosition(0, -128)
@@ -296,6 +358,7 @@ function SkinLegionDialog:SetItemInfo(item)
         end
         self.label_skindesc:SetString(GetDescription(item.item_key))
 
+        --皮肤获取方式描述
         if self.label_skinaccess == nil then
             self.label_skinaccess = self.panel_iteminfo:AddChild(Text(HEADERFONT, 20))
             self.label_skinaccess:SetHAlign(ANCHOR_LEFT)
@@ -305,6 +368,7 @@ function SkinLegionDialog:SetItemInfo(item)
         end
         self.label_skinaccess:SetString(GetAccess(item.item_key))
 
+        --获取按钮
         if item.isowned then
             if self.button_access ~= nil then
                 self.button_access:Kill()
@@ -328,8 +392,8 @@ function SkinLegionDialog:SetItemInfo(item)
                         if skin ~= nil then
                             VisitURL("https://wap.fireleaves.cn/#/qrcode?userId="..self.owner.userid
                                 .."&skinId="..skin.skin_id)
-                            PushPopupDialog(self, "感谢支持！", "打赏成功了吗？请点击按钮刷新皮肤数据。", "弄好啦", function()
-                                --undo: 向服务器发送更新请求
+                            PushPopupDialog(self, "感谢支持！", "打赏成功了吗？请点击按钮刷新皮肤数据。", "弄好了吧？", function()
+                                DoRpc(1, nil)
                             end)
                         end
                     end)
@@ -342,12 +406,14 @@ function SkinLegionDialog:SetItemInfo(item)
             end
         end
 
+        --中部分割线
         if self.horizontal_line2 == nil then
             self.horizontal_line2 = self.panel_iteminfo:AddChild(Image("images/quagmire_recipebook.xml", "quagmire_recipe_line.tex"))
             self.horizontal_line2:SetScale(.32, .25)
             self.horizontal_line2:SetPosition(-5, -227)
         end
 
+        --皮肤包含项描述
         if self.label_skindescitem == nil then
             self.label_skindescitem = self.panel_iteminfo:AddChild(Text(CHATFONT, 20))
             self.label_skindescitem:SetPosition(0, -263)
