@@ -5,6 +5,11 @@ local containers = require("containers")
 --[[ 容器数据设定 ]]
 --------------------------------------------------------------------------
 
+----------
+--mod兼容：Show Me (中文)。并没有什么用，优先级比棱镜高，即使加上了数据，代码早就执行过了
+----------
+TUNING.MONITOR_CHESTS = TUNING.MONITOR_CHESTS or {}
+
 local params = {}
 
 if TUNING.LEGION_FLASHANDCRUSH then
@@ -111,6 +116,7 @@ if CONFIGS_LEGION.PRAYFORRAIN then
 
         return false
     end
+    TUNING.MONITOR_CHESTS.hiddenmoonlight = true
 end
 
 if CONFIGS_LEGION.LEGENDOFFALL then

@@ -3,16 +3,10 @@
 --------------------------------------------------------------------------
 
 --[[
-*【丰饶传说】
-（1）多年生作物被挖起来时，子圭栽培土也会被挖起来
-（2）龙鳞片、岩浆虫卵等物品也能被脱壳之翅所用了
-（3）玩家开凿子圭神木岩，能应用工作效率加成了
-（4）下雨、水球、多变的云的攻击效果、玉净瓶能给多年生作物浇水了
-（5）坏坏果蝇、友好果蝇、土地公等生物能照顾/干扰照顾多年生作物了
-（6）1号肥改为对应加速生长，2号肥改为对应预防疾病（以前的对应是相反的）；施肥机制优化，某种肥力施满了就不再能施对应肥力的肥料了
-（7）戴上“耕作先驱帽”和“高级耕作先驱帽”后给多年生作物检查/施肥/浇水时，能提示肥力、水分等数据了
-*【尘市蜃楼】
-（1）巨鹿、熊獾、蟾蜍等生物的移动碰撞能破坏颤栗树了
+*【棱镜鸡毛铺】
+（1）在“审视自我”面板增加了一个小按钮，点击可进入棱镜鸡毛铺
+*【电闪雷鸣】
+（1）灵魂契约不会再尝试给旺达加血了
 *【mod兼容】
 （1）【黑化排队论2】兼容了多年生作物的播种、浇水和施肥
 （2）【神话书说】葫芦的多年生作物的成熟状态显示动画正常了
@@ -253,7 +247,7 @@ end
 --[[ hot reload ]]--[[ 热更新机制 ]]
 --------------------------------------------------------------------------
 
-modimport("scripts/hotreload_legion.lua")
+-- modimport("scripts/hotreload_legion.lua")
 
 --------------------------------------------------------------------------
 --[[ compatibility enhancement ]]--[[ 兼容性修改 ]]
@@ -325,8 +319,21 @@ if TUNING.LEGION_SUPERBCUISINE then
         RegisterInventoryItemAtlas("images/cookbookimages/"..recipe.name..".xml", recipe.name..".tex")
     end
 
-    for k, recipe in pairs(require("preparedfoods_spiced")) do
+    local foodrecipes_spice = require("preparedfoods_spiced")
+    for k, recipe in pairs(foodrecipes_spice) do
         AddCookerRecipe("portablespicer", recipe)
+    end
+
+    --官方的便携香料站代码没改新机制，这里用另类方式手动改一下。等官方更新了我就删除了。相关文件 prefabs\portablespicer.lua
+    local IsModCookingProduct_old = IsModCookingProduct
+    _G.IsModCookingProduct = function(cooker, name)
+        if foodrecipes_spice[name] ~= nil then
+            return false
+        end
+        if IsModCookingProduct_old ~= nil then
+            return IsModCookingProduct_old(cooker, name)
+        end
+        return false
     end
 
     if CONFIGS_LEGION.BETTERCOOKBOOK then
@@ -529,7 +536,7 @@ end)
 --[[ 皮肤 ]]
 --------------------------------------------------------------------------
 
-modimport("scripts/skin/skin_legion.lua") --skined_legion
+modimport("scripts/skin_legion.lua") --skined_legion
 
 --------------------------------------------------------------------------
 --[[ mod之间的兼容 ]]

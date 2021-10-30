@@ -254,7 +254,9 @@ local function ContractsDoHeal(inst)
     local targets = {}
     local x, y, z = inst.Transform:GetWorldPosition()
     for i, v in ipairs(AllPlayers) do
-        if not (v.components.health:IsDead() or v:HasTag("playerghost") or v.components.health.invincible) and
+        if
+            not v:HasTag("health_as_oldage") and --旺达没法被加血，所以不管她了
+            not (v.components.health:IsDead() or v:HasTag("playerghost") or v.components.health.invincible) and
             v.entity:IsVisible() and
             v:GetDistanceSqToPoint(x, y, z) < 324 and
             (v.components.health:GetMaxWithPenalty() - v.components.health.currenthealth) > 0.1 --排除满血玩家
@@ -283,7 +285,9 @@ local function UpadateHealTag(inst)
     local targets = {}
     local x, y, z = inst.Transform:GetWorldPosition()
     for i, v in ipairs(AllPlayers) do
-        if not (v.components.health:IsDead() or v:HasTag("playerghost") or v.components.health.invincible) and
+        if
+            not v:HasTag("health_as_oldage") and --旺达没法被加血，所以不管她了
+            not (v.components.health:IsDead() or v:HasTag("playerghost") or v.components.health.invincible) and
             v.entity:IsVisible() and
             v:GetDistanceSqToPoint(x, y, z) < 100 and
             (v.components.health:GetMaxWithPenalty() - v.components.health.currenthealth) >= 15

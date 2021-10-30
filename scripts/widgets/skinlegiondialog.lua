@@ -1,18 +1,12 @@
 local Widget = require "widgets/widget"
 local Screen = require "widgets/screen"
-local Button = require "widgets/button"
 local AnimButton = require "widgets/animbutton"
-local Menu = require "widgets/menu"
 local Text = require "widgets/text"
 local Image = require "widgets/image"
 local ImageButton = require "widgets/imagebutton"
-local UIAnim = require "widgets/uianim"
-local Widget = require "widgets/widget"
 local TEMPLATES = require "widgets/templates"
 local TEMPLATES2 = require "widgets/redux/templates"
 local ItemImage = require "widgets/redux/itemimage"
-local ClothingExplorerPanel = require "widgets/redux/clothingexplorerpanel"
-local AccountItemFrame = require "widgets/redux/accountitemframe"
 local ScrollableList = require "widgets/scrollablelist"
 local PopupDialogScreen = require "screens/redux/popupdialog"
 
@@ -102,10 +96,6 @@ local SkinLegionDialog = Class(Widget, function(self, owner)
     self.bg:SetScale(.51, .74)
     self.bg:SetPosition(0, 0)
 
-    --关闭弹窗按钮
-    self.button_close = self.proot:AddChild(TEMPLATES.SmallButton(STRINGS.UI.PLAYER_AVATAR.CLOSE, 26, .5, function() self:Close() end))
-    self.button_close:SetPosition(0, -215)
-
     --cdk兑换区域的分割线
     self.horizontal_line3 = self.proot:AddChild(Image("images/quagmire_recipebook.xml", "quagmire_recipe_line.tex"))
     self.horizontal_line3:SetScale(.32, .25)
@@ -150,6 +140,23 @@ local SkinLegionDialog = Class(Widget, function(self, owner)
         DoRpc(2, { cdk = cdk })
     end)
 
+    --关闭弹窗按钮
+    self.button_close = self.proot:AddChild(TEMPLATES.SmallButton(STRINGS.UI.PLAYER_AVATAR.CLOSE, 26, .5, function() self:Close() end))
+    self.button_close:SetPosition(0, -215)
+
+    --主动刷新皮肤按钮
+    self.button_regetskins = self.proot:AddChild(TEMPLATES.IconButton(
+        "images/button_icons.xml", "refresh.tex", "刷新我的皮肤", false, false,
+        function()
+            DoRpc(1, nil)
+        end,
+        nil, "self_inspect_mod.tex"
+    ))
+    self.button_regetskins.icon:SetScale(.15)
+    self.button_regetskins.icon:SetPosition(-5, 6)
+    self.button_regetskins:SetScale(0.65)
+    self.button_regetskins:SetPosition(110, -220)
+
     self.selected_item = nil
     self.context_popup = nil
     self.items = nil
@@ -174,9 +181,17 @@ function SkinLegionDialog:SetCdkState(state, poptype)
         self.button_cdk:SetText(STRINGS.UI.MAINSCREEN.REDEEM)
 
         if poptype then
-            if poptype == -1 then
-                PushPopupDialog(self, "小声提醒", "兑换失败！请检查兑换码是否有效，输入是否正确，网络有无问题，是否已拥有欲兑换的皮肤。实在不行请联系作者。", "知道了", nil)
+            local str = nil
+            if poptype == -1 or poptype == 4 then
+                str = "兑换失败！请检查兑换码、网络、已有皮肤情况。实在不行请联系作者。"
+            elseif poptype == 2 then
+                str = "操作太快了，请等几秒再试试。"
+            elseif poptype == 3 then
+                str = "服务器调用失败，请联系作者反馈情况。"
+            else
+                str = "未知情况["..tostring(poptype).."]：请联系作者反馈情况。"
             end
+            PushPopupDialog(self, "小声提醒", str, "知道了", nil)
         end
     else
         self.button_cdk:SetText(STRINGS.UI.MAINSCREEN.REDEEM)

@@ -15,20 +15,18 @@ end
 
 -----
 
-local prefabs =
-{
+local prefabs = {
     "spoiled_food",
 }
 
 local function MakePreparedFood(data)
     local realname = data.basename or data.name
-    local assets =
-    {
-        Asset("ANIM", "anim/"..realname..".zip"),
+    local assets = {
+        Asset("ANIM", "anim/"..(data.overridebuild or realname)..".zip"),
         Asset("ATLAS", "images/inventoryimages/"..realname..".xml"),
         Asset("IMAGE", "images/inventoryimages/"..realname..".tex"),
     }
-    
+
     local spicename = data.spice ~= nil and string.lower(data.spice) or nil
     if spicename ~= nil then
         table.insert(assets, Asset("ANIM", "anim/spices.zip"))
@@ -44,10 +42,6 @@ local function MakePreparedFood(data)
                 table.insert(foodprefabs, v)
             end
         end
-    end
-
-    local function DisplayNameFn(inst)
-        return subfmt(STRINGS.NAMES[data.spice.."_FOOD"], { food = STRINGS.NAMES[string.upper(data.basename)] })
     end
 
     local function fn()
@@ -73,11 +67,11 @@ local function MakePreparedFood(data)
             --设置作为背景的料理图
             inst.inv_image_bg = { atlas = "images/inventoryimages/"..realname..".xml", image = realname..".tex" }
         else
-            inst.AnimState:SetBuild(realname)   --对于mod菜品，只能是一种菜品一个动画文件，所有名字全为该菜品的名字
-            inst.AnimState:SetBank(realname)
+            inst.AnimState:SetBuild(data.overridebuild or realname)
+            inst.AnimState:SetBank(data.overridebuild or realname)
         end
         inst.AnimState:PlayAnimation("idle")
-        inst.AnimState:OverrideSymbol("swap_food", realname, realname)
+        inst.AnimState:OverrideSymbol("swap_food", data.overridebuild or realname, realname)
 
         inst:AddTag("preparedfood")
         if data.tags then
@@ -89,7 +83,9 @@ local function MakePreparedFood(data)
         if data.basename ~= nil then
             inst:SetPrefabNameOverride(data.basename)
             if data.spice ~= nil then
-                inst.displaynamefn = DisplayNameFn
+                inst.displaynamefn = function(inst)
+                    return subfmt(STRINGS.NAMES[data.spice.."_FOOD"], { food = STRINGS.NAMES[string.upper(data.basename)] })
+                end
             end
         end
 
@@ -109,6 +105,8 @@ local function MakePreparedFood(data)
         if not TheWorld.ismastersim then
             return inst
         end
+
+        inst.food_symbol_build = data.overridebuild or realname
 
         inst:AddComponent("edible")
         inst.components.edible.healthvalue = data.health

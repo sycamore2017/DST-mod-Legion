@@ -288,16 +288,6 @@ for prefab,skins in pairs(_G.PREFAB_SKINS) do
 	end
 end
 
---undo:test
-AddRecipe(
-    "rosorns", {
-        Ingredient("siving_rocks", 6, "images/inventoryimages/siving_rocks.xml"),
-        Ingredient("pinecone", 20),
-    }, RECIPETABS.FARM, TECH.MAGIC_TWO, nil, nil, nil, nil, nil,
-    "images/inventoryimages/rosorns.xml", "rosorns.tex"
-)
-STRINGS.RECIPE_DESC.ROSORNS = "测试啊"
-
 --------------------------------------------------------------------------
 --[[ 修改皮肤的网络判定函数 ]]
 --------------------------------------------------------------------------
@@ -556,7 +546,7 @@ if IsServer then
                 err = function(state, user_id, errcode)
                     --errcode==1：主动刷新太频繁
                     --errcode==2：自动刷新太频繁
-                    --errcode==3：3次接口调用都失败了
+                    --errcode==3：2次接口调用都失败了
                     --errcode==4：接口参数不对
                 end
             }
@@ -592,7 +582,17 @@ if IsServer then
                     end
                 end,
                 err = function(state, user_id, errcode)
-                    print("----问题是?："..tostring(errcode))
+                    if player ~= nil and player:IsValid() then
+                        local pop = -1
+                        if errcode == 1 or errcode == 2 then
+                            pop = 2
+                        elseif errcode == 3 then
+                            pop = 3
+                        elseif errcode == 4 then
+                            pop = 4
+                        end
+                        FnRpc_s2c(user_id, 2, { state = -1, pop = pop })
+                    end
                 end
             }
         )
@@ -815,7 +815,7 @@ if not TheNet:IsDedicated() then
         -- local ImageButton = require "widgets/imagebutton"
         local PlayerAvatarPopup = require "widgets/playeravatarpopup"
         local TEMPLATES = require "widgets/templates"
-        -- local SkinLegionDialog = require "widgets/skinlegiondialog"
+        local SkinLegionDialog = require "widgets/skinlegiondialog"
 
         -- local right_root = nil
         -- AddClassPostConstruct("widgets/controls", function(self)
@@ -846,7 +846,7 @@ if not TheNet:IsDedicated() then
                         if right_root.skinshop_legion then
                             right_root.skinshop_legion:Kill()
                         end
-                        local SkinLegionDialog = _G.require("widgets/skinlegiondialog") --test
+                        -- local SkinLegionDialog = _G.require("widgets/skinlegiondialog") --test
                         right_root.skinshop_legion = right_root:AddChild(SkinLegionDialog(self.owner))
                         right_root.skinshop_legion:SetPosition(-380, 0)
                         self:Close()
@@ -872,7 +872,6 @@ if not TheNet:IsDedicated() then
                 --     if right_root.skinshop_legion then
                 --         right_root.skinshop_legion:Kill()
                 --     end
-                --     local SkinLegionDialog = _G.require("widgets/skinlegiondialog") --test
                 --     right_root.skinshop_legion = right_root:AddChild(SkinLegionDialog(self.owner))
                 --     right_root.skinshop_legion:SetPosition(-380, 0)
                 --     self:Close()

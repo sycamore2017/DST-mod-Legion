@@ -9,8 +9,7 @@ end
 
 local foods_legion =
 {
-    dish_duriantartare =
-    {
+    dish_duriantartare = {
         test = function(cooker, names, tags)
             return (names.durian or names.durian_cooked) and tags.meat and (tags.monster and tags.monster > 2)
         end,
@@ -24,6 +23,8 @@ local foods_legion =
         cooktime = 0.5,
         potlevel = "low",
         float = {nil, "small", 0.2, 1.05},
+        -- overridebuild = nil, --替换料理build，这样所有料理都可以共享一个build了
+        -- overridesymbolname = nil, --替换烹饪锅的料理贴图的symbol
 
         cook_need = "(烤)榴莲 肉度 怪物度>2",
         cook_cant = nil,
@@ -46,8 +47,7 @@ local foods_legion =
         end,
     },
 
-    dish_merrychristmassalad =
-    {
+    dish_merrychristmassalad = {
         test = function(cooker, names, tags)
             return names.twiggy_nut and names.corn and names.carrot and (tags.veggie and tags.veggie >= 3)
                     and (
@@ -132,8 +132,7 @@ local foods_legion =
         end,
     },
 
-    dish_sugarlesstrickmakercupcakes =
-    {
+    dish_sugarlesstrickmakercupcakes = {
         test = function(cooker, names, tags)
             return names.pumpkin and tags.egg and tags.magic and tags.monster and not tags.meat
                     and (
@@ -201,8 +200,7 @@ local foods_legion =
         end,
     },
 
-    dish_flowermooncake =
-    {
+    dish_flowermooncake = {
         test = function(cooker, names, tags)
             return
                 (
@@ -327,8 +325,7 @@ local foods_legion =
         end,
     },
 
-    dish_farewellcupcake =
-    {
+    dish_farewellcupcake = {
         test = function(cooker, names, tags)
             return (names.red_cap or names.red_cap_cooked) and tags.monster and tags.decoration
                 and ( --新月那天才能做出来
@@ -359,8 +356,7 @@ local foods_legion =
         end,
     },
 
-    dish_braisedmeatwithfoliages =
-    {
+    dish_braisedmeatwithfoliages = {
         test = function(cooker, names, tags)
             return (names.foliage and names.foliage >= 2) and (tags.meat and tags.meat >= 1)
                 and not tags.inedible and not tags.sweetener
@@ -380,8 +376,7 @@ local foods_legion =
         recipe_count = 6,
     },
 
-    dish_fleshnapoleon =
-    {
+    dish_fleshnapoleon = {
         test = function(cooker, names, tags)
             return ((names.wormlight_lesser and names.wormlight_lesser > 1) or names.wormlight)
                 and not tags.meat and not tags.inedible and not tags.frozen
@@ -429,8 +424,7 @@ local foods_legion =
         end,
     },
 
-    dish_beggingmeat =
-    {
+    dish_beggingmeat = {
         test = function(cooker, names, tags)
             return names.ash and tags.meat and (not tags.monster or tags.monster <= 1) and not tags.sweetener and not tags.frozen
         end,
@@ -470,8 +464,7 @@ local foods_legion =
         end,
     },
 
-    dish_frenchsnailsbaked =
-    {
+    dish_frenchsnailsbaked = {
         test = function(cooker, names, tags)
             return names.slurtleslime and names.cutlichen and tags.meat and (not tags.monster or tags.monster <= 1)
         end,
@@ -493,8 +486,7 @@ local foods_legion =
         oneat_desc = STRINGS.UI.COOKBOOK.DISH_FRENCHSNAILSBAKED,
     },
 
-    dish_neworleanswings =
-    {
+    dish_neworleanswings = {
         test = function(cooker, names, tags)
             return (names.batwing or names.batwing_cooked) and (tags.meat and tags.meat >= 2) and (not tags.monster or tags.monster <= 2)
         end,
@@ -521,8 +513,7 @@ local foods_legion =
         end,
     },
 
-    dish_fishjoyramen =
-    {
+    dish_fishjoyramen = {
         test = function(cooker, names, tags)
             return (names.plantmeat or names.plantmeat_cooked) and tags.fish and (not tags.monster or tags.monster <= 1)
                 and not tags.inedible and not tags.sweetener
@@ -577,8 +568,7 @@ local foods_legion =
         end,
     },
 
-    dish_roastedmarshmallows =
-    {
+    dish_roastedmarshmallows = {
         test = function(cooker, names, tags)
             return names.glommerfuel and tags.sweetener and names.twigs and not tags.meat and not tags.frozen and not tags.egg
         end,
@@ -598,8 +588,7 @@ local foods_legion =
         recipe_count = 6,
     },
 
-    dish_pomegranatejelly =
-    {
+    dish_pomegranatejelly = {
         test = function(cooker, names, tags)
             return (names.pomegranate or names.pomegranate_cooked) and
                 (tags.gel or names.slurtleslime or names.glommerfuel or names.phlegm) and
@@ -620,8 +609,7 @@ local foods_legion =
         recipe_count = 6,
     },
 
-    dish_medicinalliquor =
-    {
+    dish_medicinalliquor = {
         test = function(cooker, names, tags)
             return names.furtuft and tags.frozen and not tags.meat and not tags.sweetener
                 and not tags.egg and (tags.inedible and tags.inedible <= 1)
@@ -703,8 +691,7 @@ local foods_legion =
         end,
     },
 
-    dish_bananamousse =
-    {
+    dish_bananamousse = {
         test = function(cooker, names, tags)
             return (names.cave_banana or names.cave_banana_cooked) and (tags.fruit and tags.fruit > 1) and tags.egg
                 and not tags.meat and not tags.inedible and not tags.monster
@@ -804,8 +791,7 @@ local foods_legion =
 }
 
 if CONFIGS_LEGION.FLOWERSPOWER then
-    foods_legion.dish_chilledrosejuice =
-    {
+    foods_legion.dish_chilledrosejuice = {
         test = function(cooker, names, tags)
             return (names.petals_rose and names.petals_rose > 1) and tags.frozen and (tags.fruit and tags.fruit >= 1)
                 and not tags.meat and not tags.monster
@@ -847,8 +833,7 @@ if CONFIGS_LEGION.FLOWERSPOWER then
         end,
     }
 
-    foods_legion.dish_twistedrolllily =
-    {
+    foods_legion.dish_twistedrolllily = {
         test = function(cooker, names, tags)
             return (names.petals_lily and names.petals_lily > 1) and (tags.meat and tags.meat >= 1) and (tags.veggie and tags.veggie >= 2)
         end,
@@ -886,8 +871,7 @@ if CONFIGS_LEGION.FLOWERSPOWER then
         end,
     }
 
-    foods_legion.dish_orchidcake =
-    {
+    foods_legion.dish_orchidcake = {
         test = function(cooker, names, tags)
             return (names.petals_orchid and names.petals_orchid > 1) and (tags.veggie and tags.veggie >= 1.5) and tags.fruit
                 and not tags.meat and not tags.monster
@@ -925,8 +909,7 @@ if CONFIGS_LEGION.FLOWERSPOWER then
 end
 
 if CONFIGS_LEGION.PRAYFORRAIN then
-    foods_legion.dish_ricedumpling =
-    {
+    foods_legion.dish_ricedumpling = {
         test = function(cooker, names, tags)
             return names.monstrain_leaf and (tags.veggie and tags.veggie >= 2.5) and tags.egg and not tags.meat
         end,
@@ -958,8 +941,7 @@ if CONFIGS_LEGION.PRAYFORRAIN then
 end
 
 if CONFIGS_LEGION.LEGENDOFFALL then
-    foods_legion.dish_murmurananas =
-    {
+    foods_legion.dish_murmurananas = {
         test = function(cooker, names, tags)
             return (names.pineananas or names.pineananas_cooked) and (tags.meat and tags.meat >= 2)
                 and (not tags.monster or tags.monster <= 1)
@@ -978,8 +960,7 @@ if CONFIGS_LEGION.LEGENDOFFALL then
         cook_cant = "怪物度≤1",
         recipe_count = 6,
     }
-    foods_legion.dish_sosweetjarkfruit =
-    {
+    foods_legion.dish_sosweetjarkfruit = {
         test = function(cooker, names, tags)
             return names.pineananas and tags.frozen and (tags.sweetener and tags.sweetener >= 2)
                 and not tags.monster and not tags.meat
@@ -1002,8 +983,7 @@ if CONFIGS_LEGION.LEGENDOFFALL then
 end
 
 if TUNING.LEGION_FLASHANDCRUSH then
-    foods_legion.dish_wrappedshrimppaste =
-    {
+    foods_legion.dish_wrappedshrimppaste = {
         test = function(cooker, names, tags)
             return names.wobster_sheller_land and names.albicans_cap and (tags.decoration and tags.decoration >= 1)
                 and not tags.fruit and not tags.monster
@@ -1035,8 +1015,7 @@ if TUNING.LEGION_FLASHANDCRUSH then
 end
 
 if TUNING.LEGION_DESERTSECRET then
-    foods_legion.dish_shyerryjam =
-    {
+    foods_legion.dish_shyerryjam = {
         test = function(cooker, names, tags)
             return names.shyerry and not tags.veggie and not tags.monster
                 and not tags.egg and not tags.meat and not tags.inedible and not tags.frozen
@@ -1072,6 +1051,9 @@ if CONFIGS_LEGION.BETTERCOOKBOOK then
         v.name = k
         v.weight = v.weight or 1
         v.priority = v.priority or 0
+        if v.overridebuild == nil then
+            v.overridebuild = "dishes_legion"
+        end
 
         -- v.cookbook_category = "portablecookpot" --如果要设置为便携烹饪锅专属，可以写这个
         -- v.cookbook_category = "cookpot"
@@ -1087,6 +1069,9 @@ else
         v.name = k
         v.weight = v.weight or 1
         v.priority = v.priority or 0
+        if v.overridebuild == nil then
+            v.overridebuild = "dishes_legion"
+        end
     end
 end
 

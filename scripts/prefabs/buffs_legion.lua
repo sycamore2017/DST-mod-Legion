@@ -63,7 +63,7 @@ local function StartTimer_extend(buff, target, timekey, timedefault)
 end
 
 local function InitTimerBuff(inst, data)
-    inst.components.debuff:SetAttachedFn(function(inst, target)
+    inst.components.debuff:SetAttachedFn(function(inst, target, ...)
         inst.entity:SetParent(target.entity)
         inst.Transform:SetPosition(0, 0, 0) --in case of loading
         inst:ListenForEvent("death", function()
@@ -73,7 +73,7 @@ local function InitTimerBuff(inst, data)
         StartTimer_attach(inst, target, data.time_key, data.time_default)
 
         if data.fn_start ~= nil then
-            data.fn_start(inst, target)
+            data.fn_start(inst, target, ...)
         end
     end)
     inst.components.debuff:SetDetachedFn(function(inst, target)
@@ -82,11 +82,11 @@ local function InitTimerBuff(inst, data)
         end
         inst:Remove()
     end)
-    inst.components.debuff:SetExtendedFn(function(inst, target)
+    inst.components.debuff:SetExtendedFn(function(inst, target, ...)
         StartTimer_extend(inst, target, data.time_key, data.time_default)
 
         if data.fn_again ~= nil then
-            data.fn_again(inst, target)
+            data.fn_again(inst, target, ...)
         end
     end)
 
@@ -99,7 +99,7 @@ local function InitTimerBuff(inst, data)
 end
 
 local function InitNoTimerBuff(inst, data)
-    inst.components.debuff:SetAttachedFn(function(inst, target)
+    inst.components.debuff:SetAttachedFn(function(inst, target, ...)
         inst.entity:SetParent(target.entity)
         inst.Transform:SetPosition(0, 0, 0) --in case of loading
         inst:ListenForEvent("death", function()
@@ -107,7 +107,7 @@ local function InitNoTimerBuff(inst, data)
         end, target)
 
         if data.fn_start ~= nil then
-            data.fn_start(inst, target)
+            data.fn_start(inst, target, ...)
         end
     end)
     inst.components.debuff:SetDetachedFn(function(inst, target)
@@ -116,9 +116,9 @@ local function InitNoTimerBuff(inst, data)
         end
         inst:Remove()
     end)
-    inst.components.debuff:SetExtendedFn(function(inst, target)
+    inst.components.debuff:SetExtendedFn(function(inst, target, ...)
         if data.fn_again ~= nil then
-            data.fn_again(inst, target)
+            data.fn_again(inst, target, ...)
         end
     end)
 end
@@ -530,7 +530,9 @@ local function AlignToTarget(inst, target)
 end
 
 local function OnChangeFollowSymbol(inst, target, followsymbol, followoffset)
-    inst.Follower:FollowSymbol(target.GUID, followsymbol, followoffset.x, followoffset.y, followoffset.z)
+    if followsymbol ~= nil and followoffset ~= nil then
+        inst.Follower:FollowSymbol(target.GUID, followsymbol, followoffset.x, followoffset.y, followoffset.z)
+    end
 end
 
 MakeBuff({
