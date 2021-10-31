@@ -38,6 +38,8 @@ local DressUp = Class(function(self, inst)
     }
 end)
 
+
+
 function DressUp:GetDressData(buildskin, buildfile, buildsymbol, guid, type)
     return {
         buildskin = buildskin,
@@ -47,6 +49,26 @@ function DressUp:GetDressData(buildskin, buildfile, buildsymbol, guid, type)
         type = type,
         priority = 0, --默认最高优先度，后面才更新
     }
+end
+
+function DressUp:SetDressTop(itemswap)
+    itemswap["HAT"] = self:GetDressData(nil, nil, nil, nil, "show")
+    itemswap["HAIR_HAT"] = self:GetDressData(nil, nil, nil, nil, "show")
+    itemswap["HAIR_NOHAT"] = self:GetDressData(nil, nil, nil, nil, "hide")
+    itemswap["HAIR"] = self:GetDressData(nil, nil, nil, nil, "hide")
+
+    itemswap["HEAD"] = self:GetDressData(nil, nil, nil, nil, "hide")
+    itemswap["HEAD_HAT"] = self:GetDressData(nil, nil, nil, nil, "show")
+end
+
+function DressUp:SetDressOpenTop(itemswap)
+    itemswap["HAT"] = self:GetDressData(nil, nil, nil, nil, "show")
+    itemswap["HAIR_HAT"] = self:GetDressData(nil, nil, nil, nil, "hide")
+    itemswap["HAIR_NOHAT"] = self:GetDressData(nil, nil, nil, nil, "show")
+    itemswap["HAIR"] = self:GetDressData(nil, nil, nil, nil, "show")
+
+    itemswap["HEAD"] = self:GetDressData(nil, nil, nil, nil, "show")
+    itemswap["HEAD_HAT"] = self:GetDressData(nil, nil, nil, nil, "hide")
 end
 
 function DressUp:GetDressSlot(item, data)
@@ -200,21 +222,9 @@ function DressUp:PutOn(item) --幻化一个物品
         elseif slot == EQUIPSLOTS.HEAD then
             itemswap["swap_hat"] = self:GetDressData(buildskin, data.buildfile, data.buildsymbol, item.GUID, "swap")
             if data.isopentop then
-                itemswap["HAT"] = self:GetDressData(nil, nil, nil, nil, "show")
-                itemswap["HAIR_HAT"] = self:GetDressData(nil, nil, nil, nil, "hide")
-                itemswap["HAIR_NOHAT"] = self:GetDressData(nil, nil, nil, nil, "show")
-                itemswap["HAIR"] = self:GetDressData(nil, nil, nil, nil, "show")
-
-                itemswap["HEAD"] = self:GetDressData(nil, nil, nil, nil, "show")
-                itemswap["HEAD_HAT"] = self:GetDressData(nil, nil, nil, nil, "hide")
+                self:SetDressOpenTop(itemswap)
             else
-                itemswap["HAT"] = self:GetDressData(nil, nil, nil, nil, "show")
-                itemswap["HAIR_HAT"] = self:GetDressData(nil, nil, nil, nil, "show")
-                itemswap["HAIR_NOHAT"] = self:GetDressData(nil, nil, nil, nil, "hide")
-                itemswap["HAIR"] = self:GetDressData(nil, nil, nil, nil, "hide")
-
-                itemswap["HEAD"] = self:GetDressData(nil, nil, nil, nil, "hide")
-                itemswap["HEAD_HAT"] = self:GetDressData(nil, nil, nil, nil, "show")
+                self:SetDressTop(itemswap)
             end
         elseif slot == EQUIPSLOTS.BODY or slot == EQUIPSLOTS.BACK or slot == EQUIPSLOTS.NECK then
             if data.isbackpack then

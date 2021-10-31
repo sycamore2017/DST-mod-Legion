@@ -8,8 +8,8 @@
 *【电闪雷鸣】
 （1）灵魂契约不会再尝试给旺达加血了
 *【mod兼容】
-（1）【黑化排队论2】兼容了多年生作物的播种、浇水和施肥
-（2）【神话书说】葫芦的多年生作物的成熟状态显示动画正常了
+（1）【智能小木牌】兼容了月藏宝匣
+（2）【神话书说】幻化机制能应用到神话书说大部分装备了(人物专属道具除外)
 ]]
 
 --------------------------------------------------------------------------
@@ -564,7 +564,8 @@ AddSimPostInit(function()
     if TUNING.MYTH_WORDS_MOD_OPEN then
         if CONFIGS_LEGION.DRESSUP then
             ------给神话的巨型葫芦添加幻化
-            _G.DRESSUP_DATA_LEGION["gourd_oversized"] = {
+            local DRESSUP_DATA = _G.DRESSUP_DATA_LEGION
+            DRESSUP_DATA["gourd_oversized"] = {
                 isnoskin = true,
                 istallbody = true,
                 buildfn = function(dressup, item, buildskin)
@@ -577,7 +578,154 @@ AddSimPostInit(function()
                     return itemswap
                 end,
             }
-            _G.DRESSUP_DATA_LEGION["gourd_oversized_waxed"] = _G.DRESSUP_DATA_LEGION["gourd_oversized"]
+            DRESSUP_DATA["gourd_oversized_waxed"] = DRESSUP_DATA["gourd_oversized"]
+
+            DRESSUP_DATA["xzhat_mk"] = { --行者帽
+                isnoskin = true,
+                buildfn = function(dressup, item, buildskin)
+                    local itemswap = {}
+
+                    local mythskin = item.components.myth_itemskin
+                    local skindata = mythskin.swap or mythskin.data.default.swap
+                    itemswap["swap_hat"] = dressup:GetDressData(
+                        nil, skindata.build, skindata.folder, item.GUID, "swap"
+                    )
+                    if mythskin.skin:value() == "ear" then
+                        dressup:SetDressOpenTop(itemswap)
+                    else
+                        dressup:SetDressTop(itemswap)
+                    end
+
+                    return itemswap
+                end,
+            }
+            DRESSUP_DATA["cassock"] = { --袈裟
+                isnoskin = true, buildfile = "cassock", buildsymbol = "swap_body",
+            }
+            DRESSUP_DATA["kam_lan_cassock"] = { --锦斓袈裟
+                isnoskin = true, buildfile = "kam_Lan_cassock", buildsymbol = "swap_body",
+            }
+            DRESSUP_DATA["myth_lotusleaf"] = { --莲叶
+                isnoskin = true, buildfile = "myth_lotusleaf_umbrella", buildsymbol = "swap_leaves",
+            }
+            DRESSUP_DATA["myth_lotusleaf_hat"] = { --莲叶帽
+                isnoskin = true, buildfile = "myth_lotusleaf_hat", buildsymbol = "swap_hat",
+            }
+            DRESSUP_DATA["bone_blade"] = { --骨刃
+                isnoskin = true,
+                buildfn = function(dressup, item, buildskin)
+                    local itemswap = {}
+
+                    local mythskin = item.components.myth_itemskin
+                    local skindata = mythskin.swap or mythskin.data.default.swap
+                    itemswap["swap_object"] = dressup:GetDressData(
+                        nil, skindata.build, skindata.folder, item.GUID, "swap"
+                    )
+                    itemswap["whipline"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
+                    itemswap["lantern_overlay"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
+
+                    return itemswap
+                end,
+            }
+            DRESSUP_DATA["bone_wand"] = { --骨杖
+                isnoskin = true,
+                buildfn = function(dressup, item, buildskin)
+                    local itemswap = {}
+
+                    local mythskin = item.components.myth_itemskin
+                    local skindata = mythskin.swap or mythskin.data.default.swap
+                    itemswap["swap_object"] = dressup:GetDressData(
+                        nil, skindata.build, skindata.folder, item.GUID, "swap"
+                    )
+                    itemswap["whipline"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
+                    itemswap["lantern_overlay"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
+
+                    return itemswap
+                end,
+            }
+            DRESSUP_DATA["bone_whip"] = { --骨鞭
+                isnoskin = true,
+                buildfn = function(dressup, item, buildskin)
+                    local itemswap = {}
+
+                    local key = item.components.myth_itemskin.skin:value()
+                    if key == nil or key == "" or key == 'default' then
+                        key = 'none'
+                    end
+                    itemswap["swap_object"] = dressup:GetDressData(
+                        nil, "bone_whip", "swap_whip_"..key, item.GUID, "swap"
+                    )
+                    itemswap["whipline"] = dressup:GetDressData(
+                        nil, "bone_whip", "whipline_"..key, item.GUID, "swap"
+                    )
+                    itemswap["lantern_overlay"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
+
+                    return itemswap
+                end,
+            }
+            DRESSUP_DATA["pigsy_hat"] = { --墨兰帽
+                isnoskin = true,
+                buildfn = function(dressup, item, buildskin)
+                    local itemswap = {}
+
+                    local mythskin = item.components.myth_itemskin
+                    local skindata = mythskin.swap or mythskin.data.default.swap
+                    itemswap["swap_hat"] = dressup:GetDressData(
+                        nil, skindata.build, skindata.folder, item.GUID, "swap"
+                    )
+                    dressup:SetDressOpenTop(itemswap)
+
+                    return itemswap
+                end,
+            }
+            DRESSUP_DATA["bananafan_big"] = { --芭蕉宝扇
+                isnoskin = true, buildfile = "swap_bananafan_big", buildsymbol = "swap_fan",
+            }
+            DRESSUP_DATA["myth_ruyi"] = { --莹月如意
+                isnoskin = true, buildfile = "myth_ruyi", buildsymbol = "swap_ruyi",
+            }
+            DRESSUP_DATA["siving_hat"] = { --子圭战盔
+                isnoskin = true, buildfile = "siving_hat", buildsymbol = "swap_hat",
+            }
+            DRESSUP_DATA["armorsiving"] = { --子圭战甲
+                isnoskin = true, buildfile = "armor_siving", buildsymbol = "swap_body",
+            }
+            DRESSUP_DATA["myth_qxj"] = { --七星剑
+                isnoskin = true, buildfile = "myth_qxj", buildsymbol = "swap_qxj",
+            }
+            DRESSUP_DATA["wb_armorbone"] = { --坚骨披
+                isnoskin = true, dressslot = EQUIPSLOTS.BODY, buildfile = "wb_armorbone", buildsymbol = "swap_body",
+            }
+            DRESSUP_DATA["wb_armorblood"] = { --血色霓
+                isnoskin = true, dressslot = EQUIPSLOTS.BODY, buildfile = "wb_armorblood", buildsymbol = "swap_body",
+            }
+            DRESSUP_DATA["wb_armorfog"] = { --雾隐裳
+                isnoskin = true, dressslot = EQUIPSLOTS.BODY, buildfile = "wb_armorfog", buildsymbol = "swap_body",
+            }
+            DRESSUP_DATA["wb_armorgreed"] = { --不魇衣
+                isnoskin = true, dressslot = EQUIPSLOTS.BODY, buildfile = "wb_armorgreed", buildsymbol = "swap_body",
+            }
+            DRESSUP_DATA["wb_armorlight"] = { --盈风绸
+                isnoskin = true, dressslot = EQUIPSLOTS.BODY, buildfile = "wb_armorlight", buildsymbol = "swap_body",
+            }
+            DRESSUP_DATA["wb_armorstorage"] = { --蕴玄袍
+                isnoskin = true, dressslot = EQUIPSLOTS.BODY, buildfile = "wb_armorstorage", buildsymbol = "swap_body",
+            }
+            DRESSUP_DATA["purple_gourd"] = { --紫金红葫芦
+                isnoskin = true, buildfile = "purple_gourd", buildsymbol = "swap_2",
+            }
+            DRESSUP_DATA["myth_fuchen"] = { --拂尘
+                isnoskin = true, iswhip = true, buildfile = "swap_myth_fuchen", buildsymbol = "swap_whip",
+            }
+            DRESSUP_DATA["myth_weapon_syf"] = { --霜钺斧
+                isnoskin = true, buildfile = "myth_weapon_syf", buildsymbol = "swap",
+            }
+            DRESSUP_DATA["myth_weapon_gtt"] = { --扢挞藤
+                isnoskin = true, buildfile = "myth_weapon_gtt", buildsymbol = "swap",
+            }
+            DRESSUP_DATA["myth_weapon_syd"] = { --暑熠刀
+                isnoskin = true, buildfile = "myth_weapon_syd", buildsymbol = "swap",
+            }
         end
     end
 

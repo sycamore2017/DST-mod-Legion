@@ -115,7 +115,6 @@ local function MakeDerivant(data)
             inst:AddTag("silviculture") --这个标签能让《造林学》发挥作用
 
             inst.entity:SetPristine()
-
             if not TheWorld.ismastersim then
                 return inst
             end

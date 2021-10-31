@@ -327,6 +327,10 @@ local function Fn()
     inst.OnSave = OnSave
     inst.OnLoad = OnLoad
 
+    if TUNING.SMART_SIGN_DRAW_ENABLE then
+		SMART_SIGN_DRAW(inst)
+	end
+
     return inst
 end
 

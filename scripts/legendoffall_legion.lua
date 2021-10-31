@@ -4,6 +4,7 @@ local prefabFiles = {
     "cropgnat",
     "ahandfulofwings",
     "boltwingout",
+    "siving_managers",
 }
 
 for k,v in pairs(prefabFiles) do

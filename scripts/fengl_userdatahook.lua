@@ -1,17 +1,18 @@
---[[
-    作者:风铃
-    版本:1
+--[[作者:风铃
+    版本:3
     需要的自提
     用于hook animstate之类的userdata
-]]
 
+    v3更新
+    增加了 args 用于存放传入参数 可以用于修改然后传递后后面的函数
+]]
 --调用示例1 临时hook和取消
 --[[
     --需要有一键GLOBAL
     require "UserDataHook"
 
 	local hook1 = UserDataHook.MakeHook("AnimState","SetBank",function(x,y,z) print("hook成功1",x,y,z) end)
-    local hook2 = UserDataHook.MakeHook("AnimState","SetBank",function(x,y,z) print("hook成功2",x,y,z) return true end)       -返回true提前返回
+    local hook2 = UserDataHook.MakeHook("AnimState","SetBank",function(x,y,z) print("hook成功2",x,y,z) return true,1,2,3 end)       -返回true提前返回 1,2,3
     local hook3 = UserDataHook.MakeHook("AnimState","SetBank",function(x,y,z) print("hook成功3",x,y,z) end)
     UserDataHook.Hook(ThePlayer，hook1)
     UserDataHook.Hook(ThePlayer，hook2)
@@ -34,20 +35,41 @@
     end)
 ]]--
 
+
+--调用示例2 修改AnimState.SetBuild 的参数
+--[[
+    --需要有一键GLOBAL
+    require "UserDataHook"
+    local hook1
+	hook1 = UserDataHook.MakeHook("AnimState","SetBuild",function(x,y,z)
+        local args = hook1.args
+        if args and args[1] == "wilsonhook" then
+            args[1] = "wilson"
+        end
+        return false
+    end)
+    AddPlayerPostInit(function(inst)
+        UserDataHook.Hook(inst,hook1)
+    end)
+]]--
+
 global("UserDataHook")
-local currentversion = 1
+local currentversion = 3
 if not UserDataHook then
     UserDataHook = {}
 end
+local path = debug.getinfo(function() end).source
 --检测到更高或者同版本的自动返回高版本的
 if UserDataHook.version and UserDataHook.version >= currentversion then
-    print("UserDataHookFind,return v",UserDataHook.version)
+    print("UserDataHookFind,return v",UserDataHook.version,path)
     return UserDataHook
 end
 if UserDataHook.version and UserDataHook.version < currentversion then
-    print("UserDataHookUpdate",UserDataHook.version,"to",currentversion)
+    print("UserDataHookUpdate",UserDataHook.version,"to",currentversion,path)
+elseif UserDataHook.version and UserDataHook.version >= currentversion then
+    print("UserDataHookNewVesion",UserDataHook.version,currentversion,path)
 else
-    print("UserDataHookLoad",currentversion)
+    print("UserDataHookLoad",currentversion,path)
 end
 --如果不存在则开始覆盖
 UserDataHook.version = currentversion
@@ -84,7 +106,7 @@ UserDataHook.meta = {__index = function(tb,k) --找不到的默认用这个表�
         end
         if _G[tb.name][k] then   --找到原来的函数了
             local tbname = tb.name
-            local fn = function(t,...) 
+            local fn = function(t,...)
                 return _G[tbname][k](t.inst.userdatas[tbname],...)
             end
             U.hooks[tb.name][k] = fn        --缓存生成的镜像函数
@@ -94,13 +116,16 @@ UserDataHook.meta = {__index = function(tb,k) --找不到的默认用这个表�
     end
 end}
 function UserDataHook.MakeHook(dataname,fnname,fn)
-    --hook哪个userdata的哪个函数 
+    --hook哪个userdata的哪个函数
     --例如 MakeHook("AnimState","SetBank",fn)
     --fn 定义 参数 inst,原参数  返回 true or false,返回值     返回true停止调用 并返回返回值 否则继续自动调用下一个
     return {
         dataname = dataname,
         fnname   = fnname,
-        fn = fn
+        fn = fn,
+        args = {},      --调用参数              --hook调用的时候自动填充
+        data = {},      --用于保存一些数据      由hook自己保存
+        env = {},       --用于保存环境信息      --hook调用的时候自动填充  暂时还不知道放什么 先预留
     }
 end
 
@@ -126,13 +151,17 @@ function UserDataHook.Hook(inst,hook)
     else
         fn = function(t,...)        --hook链函数           --没有就重新生成
             if t and t.name and t.inst then
-                local hooks = t.inst.userdatahooks[dataname][fnname] 
+                local hooks = t.inst.userdatahooks[dataname][fnname]
+                local args = {...}
+                local env = {}
                 if hooks then
                     for k,v in pairs(hooks) do              --遍历hook链
-                        local rettable = {v.fn(t.inst,...)}
+                        v.args = args
+                        v.env = env
+                        local rettable = {v.fn(t.inst,unpack(v.args))}
                         if rettable and rettable[1] then table.remove(rettable,1) return unpack(rettable) end        --有返回返回true 就全部返回
                     end
-                    return t.inst.userdatas[dataname][fnname](t.inst.userdatas[dataname],...)       --调用官方原版函数
+                    return t.inst.userdatas[dataname][fnname](t.inst.userdatas[dataname],unpack(args))       --调用官方原版函数
                 end
             end
         end 
@@ -140,6 +169,7 @@ function UserDataHook.Hook(inst,hook)
         U.hooks[dataname][fnname.."_hook"]  = fn        --保存函数 用来复用
     end
     rawset(inst[dataname],fnname,fn)
+    return inst.userdatas[dataname][fnname]
 end
 
 
@@ -159,3 +189,16 @@ function UserDataHook.UnHook(inst,hook) --取消hook
         end
     end
 end
+
+function UserDataHook.Call(inst,hook,...)
+    --传入 hook 或者 {"AnimState","SetBank"} 这样的
+    --快速取未hook的函数
+
+    if not inst.userdatas  then return end
+    local data = hook.dataname or hook[1]
+    local fn  = hook.fnname or hook[2]
+    if data and fn and inst.userdatas[data] and inst.userdatas[data][fn] then
+        return inst.userdatas[data][fn](inst.userdatas[data],...)
+    end
+end
+return U

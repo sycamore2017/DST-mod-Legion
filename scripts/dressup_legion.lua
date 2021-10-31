@@ -9,14 +9,12 @@ table.insert(Assets, Asset("ANIM", "anim/hat_straw_perd.zip"))
 --[[ 全局幻化数据 ]]
 --------------------------------------------------------------------------
 
-local dressup_data =
-{
+local dressup_data = {
     -------------------------------
     --手部-------------------------
     -------------------------------
 
-    spear =
-    {
+    spear = {
         -- dressslot = nil,            --如果是非装备的幻化道具，就需要定义这个
         -- isnoskin = nil,             --是否有皮肤（主要针对mod物品）
         -- isopentop = nil,
@@ -203,8 +201,7 @@ local dressup_data =
         buildfile = "swap_nightstick",
         buildsymbol = "swap_nightstick",
     },
-    whip =
-    {
+    whip = {
         iswhip = true,
         buildfile = "swap_whip",
         buildsymbol = "swap_whip",
@@ -488,8 +485,7 @@ local dressup_data =
         buildfile = "hat_bee",
         buildsymbol = "swap_hat",
     },
-    minerhat =
-    {
+    minerhat = {
         buildfile = "hat_miner",
         buildsymbol = "swap_hat_off",
         buildfn = function(dressup, item, buildskin)
@@ -504,13 +500,7 @@ local dressup_data =
                     buildskin, "hat_miner", "swap_hat", item.GUID, "swap"
                 )
             end
-            itemswap["HAT"] = dressup:GetDressData(nil, nil, nil, nil, "show")
-            itemswap["HAIR_HAT"] = dressup:GetDressData(nil, nil, nil, nil, "show")
-            itemswap["HAIR_NOHAT"] = dressup:GetDressData(nil, nil, nil, nil, "hide")
-            itemswap["HAIR"] = dressup:GetDressData(nil, nil, nil, nil, "hide")
-
-            itemswap["HEAD"] = dressup:GetDressData(nil, nil, nil, nil, "hide")
-            itemswap["HEAD_HAT"] = dressup:GetDressData(nil, nil, nil, nil, "show")
+            dressup:SetDressTop(itemswap)
 
             return itemswap
         end,
@@ -568,8 +558,7 @@ local dressup_data =
         buildfile = "hat_mole",
         buildsymbol = "swap_hat",
     },
-    wathgrithrhat =
-    {
+    wathgrithrhat = {
         buildfn = function(dressup, item, buildskin)
             local itemswap = {}
 
@@ -577,24 +566,12 @@ local dressup_data =
                 itemswap["swap_hat"] = dressup:GetDressData(
                     buildskin, "hat_wathgrithr", "swap_hat", item.GUID, "swap"
                 )
-                itemswap["HAT"] = dressup:GetDressData(nil, nil, nil, nil, "show")
-                itemswap["HAIR_HAT"] = dressup:GetDressData(nil, nil, nil, nil, "hide")
-                itemswap["HAIR_NOHAT"] = dressup:GetDressData(nil, nil, nil, nil, "show")
-                itemswap["HAIR"] = dressup:GetDressData(nil, nil, nil, nil, "show")
-
-                itemswap["HEAD"] = dressup:GetDressData(nil, nil, nil, nil, "show")
-                itemswap["HEAD_HAT"] = dressup:GetDressData(nil, nil, nil, nil, "hide")
+                dressup:SetDressOpenTop(itemswap)
             else
                 itemswap["swap_hat"] = dressup:GetDressData(
                     buildskin, "hat_wathgrithr", "swap_hat", item.GUID, "swap"
                 )
-                itemswap["HAT"] = dressup:GetDressData(nil, nil, nil, nil, "show")
-                itemswap["HAIR_HAT"] = dressup:GetDressData(nil, nil, nil, nil, "show")
-                itemswap["HAIR_NOHAT"] = dressup:GetDressData(nil, nil, nil, nil, "hide")
-                itemswap["HAIR"] = dressup:GetDressData(nil, nil, nil, nil, "hide")
-
-                itemswap["HEAD"] = dressup:GetDressData(nil, nil, nil, nil, "hide")
-                itemswap["HEAD_HAT"] = dressup:GetDressData(nil, nil, nil, nil, "show")
+                dressup:SetDressTop(itemswap)
             end
 
             return itemswap
@@ -676,8 +653,7 @@ local dressup_data =
         buildfile = "hat_skeleton",
         buildsymbol = "swap_hat",
     },
-    walterhat =
-    {
+    walterhat = {
         buildfn = function(dressup, item, buildskin)
             local itemswap = {}
 
@@ -690,13 +666,7 @@ local dressup_data =
                     buildskin, "hat_walter", "swap_hat_large", item.GUID, "swap"
                 )
             end
-            itemswap["HAT"] = dressup:GetDressData(nil, nil, nil, nil, "show")
-            itemswap["HAIR_HAT"] = dressup:GetDressData(nil, nil, nil, nil, "show")
-            itemswap["HAIR_NOHAT"] = dressup:GetDressData(nil, nil, nil, nil, "hide")
-            itemswap["HAIR"] = dressup:GetDressData(nil, nil, nil, nil, "hide")
-
-            itemswap["HEAD"] = dressup:GetDressData(nil, nil, nil, nil, "hide")
-            itemswap["HEAD_HAT"] = dressup:GetDressData(nil, nil, nil, nil, "show")
+            dressup:SetDressTop(itemswap)
 
             return itemswap
         end,
@@ -742,8 +712,7 @@ local dressup_data =
             end
         end,
     },
-    perd = --火鸡
-    {
+    perd = { --火鸡
         isnoskin = true,
         dressslot = EQUIPSLOTS.HEAD,
         buildfile = "hat_straw_perd",
@@ -919,8 +888,7 @@ local dressup_data =
         buildfile = "torso_hawaiian",
         buildsymbol = "swap_body",
     },
-    beargervest =
-    {
+    beargervest = {
         buildfile = "torso_bearger",
         buildsymbol = "swap_body",
     },
@@ -1109,8 +1077,7 @@ local dressup_data =
         buildfile = "hat_albicans_mushroom",
         buildsymbol = "swap_hat",
     },
-    hat_cowboy =
-    {
+    hat_cowboy = {
         isnoskin = true,
         buildfn = function(dressup, item, buildskin)
             local itemswap = {}
@@ -1118,13 +1085,7 @@ local dressup_data =
             itemswap["swap_hat"] = dressup:GetDressData(
                 buildskin, "hat_cowboy", "swap_hat", item.GUID, "swap"
             )
-            itemswap["HAT"] = dressup:GetDressData(nil, nil, nil, nil, "show")
-            itemswap["HAIR_HAT"] = dressup:GetDressData(nil, nil, nil, nil, "show")
-            itemswap["HAIR_NOHAT"] = dressup:GetDressData(nil, nil, nil, nil, "hide")
-            itemswap["HAIR"] = dressup:GetDressData(nil, nil, nil, nil, "hide")
-
-            itemswap["HEAD"] = dressup:GetDressData(nil, nil, nil, nil, "hide")
-            itemswap["HEAD_HAT"] = dressup:GetDressData(nil, nil, nil, nil, "show")
+            dressup:SetDressTop(itemswap)
 
             --增加牛仔围巾的贴图
             itemswap["swap_body"] = dressup:GetDressData(
@@ -1167,8 +1128,7 @@ local dressup_data =
         buildfile = "swap_lileaves",
         buildsymbol = "swap_lileaves",
     },
-    neverfade =
-    {
+    neverfade = {
         isnoskin = true,
         buildfn = function(dressup, item, buildskin)
             local itemswap = {}
@@ -1206,11 +1166,26 @@ local dressup_data =
         buildfile = "swap_refractedmoonlight",
         buildsymbol = "swap_refractedmoonlight",
     },
-    rosorns =
-    {
+    rosorns = {
         isnoskin = true,
-        buildfile = "swap_rosorns",
-        buildsymbol = "swap_rosorns",
+        buildfn = function(dressup, item, buildskin)
+            local itemswap = {}
+
+            local skindata = item.components.skinedlegion:GetSkinedData()
+            if skindata ~= nil and skindata.equip ~= nil then
+                itemswap["swap_object"] = dressup:GetDressData(
+                    nil, skindata.equip.build, skindata.equip.file, item.GUID, "swap"
+                )
+            else
+                itemswap["swap_object"] = dressup:GetDressData(
+                    nil, "swap_rosorns", "swap_rosorns", item.GUID, "swap"
+                )
+            end
+            itemswap["whipline"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
+            itemswap["lantern_overlay"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
+
+            return itemswap
+        end,
     },
     sachet =
     {
@@ -1224,20 +1199,13 @@ local dressup_data =
         buildfile = "swap_tripleshovelaxe",
         buildsymbol = "swap_tripleshovelaxe",
     },
-    theemperorscrown =
-    {
+    theemperorscrown = {
         isnoskin = true,
         buildfn = function(dressup, item, buildskin)
             local itemswap = {}
 
             itemswap["swap_hat"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
-            itemswap["HAT"] = dressup:GetDressData(nil, nil, nil, nil, "show")
-            itemswap["HAIR_HAT"] = dressup:GetDressData(nil, nil, nil, nil, "hide")
-            itemswap["HAIR_NOHAT"] = dressup:GetDressData(nil, nil, nil, nil, "show")
-            itemswap["HAIR"] = dressup:GetDressData(nil, nil, nil, nil, "show")
-
-            itemswap["HEAD"] = dressup:GetDressData(nil, nil, nil, nil, "show")
-            itemswap["HEAD_HAT"] = dressup:GetDressData(nil, nil, nil, nil, "hide")
+            dressup:SetDressOpenTop(itemswap)
 
             return itemswap
         end,
@@ -1301,8 +1269,7 @@ for k,v in pairs(dressup_data) do
 end
 
 --统一添加各种雕像的幻化数据
-local pieces =
-{
+local pieces = {
     "pawn",
     "rook",
     "knight",
@@ -1333,8 +1300,7 @@ local pieces =
     "minotaur",
     "guardianphase3",
 }
-local materials =
-{
+local materials = {
     "marble", "stone", "moonglass",
 }
 for k,v in pairs(pieces) do
