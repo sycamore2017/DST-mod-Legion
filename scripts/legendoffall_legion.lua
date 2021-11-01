@@ -47,6 +47,8 @@ AddIngredientValues({"pineananas"}, {veggie=1, fruit=1}, true, false)
 
 _G.RegistMiniMapImage_legion("siving_derivant")
 _G.RegistMiniMapImage_legion("siving_thetree")
+_G.RegistMiniMapImage_legion("siving_ctlwater")
+_G.RegistMiniMapImage_legion("siving_ctldirt")
 
 AddRecipe(
     "siving_soil_item", {
