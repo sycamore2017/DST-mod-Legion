@@ -5,10 +5,11 @@ local prefs = {}
 --------------------------------------------------------------------------
 
 local ctlFuledItems = {
-    ice = { moisture = 50, nutrients = nil },
-    icehat = { moisture = 500, nutrients = { 8, nil, 8 } },
-    wintercooking_mulleddrink = { moisture = 50, nutrients = { 2, 2, 8 } },
-    waterballoon = { moisture = 100, nutrients = { nil, 2, nil } },
+    ice = { moisture = 100, nutrients = nil },
+    icehat = { moisture = 1000, nutrients = { 8, nil, 8 } },
+    wintercooking_mulleddrink = { moisture = 100, nutrients = { 2, 2, 8 } },
+    waterballoon = { moisture = 400, nutrients = { nil, 2, nil } },
+    oceanfish_medium_8_inv = { moisture = 200, nutrients = { 16, nil, nil } }, --冰鲷鱼
 }
 
 local function MakeItem(data)
@@ -91,13 +92,13 @@ local function MakeConstruct(data)
     local basename = "siving_ctl"..data.name
 
     local function CanAcceptMoisture(botanyctl, test)
-        if test ~= nil and (botanyctl.ctltype == 1 or botanyctl.ctltype == 3) then
+        if test ~= nil and (botanyctl.type == 1 or botanyctl.type == 3) then
             return botanyctl.moisture < botanyctl.moisture_max
         end
         return nil
     end
     local function CanAcceptNutrients(botanyctl, test)
-        if test ~= nil and (botanyctl.ctltype == 2 or botanyctl.ctltype == 3) then
+        if test ~= nil and (botanyctl.type == 2 or botanyctl.type == 3) then
             if test[1] ~= nil and test[1] ~= 0 and botanyctl.nutrients[1] < botanyctl.nutrient_max then
                 return true
             elseif test[2] ~= nil and test[2] ~= 0 and botanyctl.nutrients[2] < botanyctl.nutrient_max then
@@ -109,6 +110,24 @@ local function MakeConstruct(data)
             end
         end
         return nil
+    end
+
+    local function DoFunction(inst, doit)
+        if inst.task_function ~= nil then
+            inst.task_function:Cancel()
+            inst.task_function = nil
+        end
+        if not doit then
+            return
+        end
+
+        local time = 235 + math.random()*10
+        inst.task_function = inst:DoPeriodicTask(time, function()
+            if TheWorld.state.israining or TheWorld.state.issnowing then --下雨时补充水分
+                inst.components.botanycontroller:SetValue(800, nil, true)
+            end
+            inst.components.botanycontroller:DoAreaFunction()
+        end, math.random()*2)
     end
 
     table.insert(prefs, Prefab(
@@ -154,6 +173,7 @@ local function MakeConstruct(data)
                         item.Transform:SetPosition(inst.Transform:GetWorldPosition())
                     end
                     inst.components.botanycontroller:TriggerPlant(false)
+                    DoFunction(inst, false)
                     inst:Remove()
                 end
             end)
@@ -173,15 +193,12 @@ local function MakeConstruct(data)
                 fx.Transform:SetPosition(x, y, z)
                 fx:SetMaterial("rock")
                 inst.components.botanycontroller:TriggerPlant(false)
+                DoFunction(inst, false)
                 inst:Remove()
             end)
 
             inst:AddComponent("hauntable")
             inst.components.hauntable:SetHauntValue(TUNING.HAUNT_SMALL)
-            inst.components.hauntable.cooldown = TUNING.HAUNT_COOLDOWN_HUGE
-            inst.components.hauntable:SetOnHauntFn(function(inst)
-                --undo:作祟时直接触发一次施肥/浇水
-            end)
 
             inst:AddComponent("trader")
             inst.components.trader:SetAcceptTest(function(inst, item, giver)
@@ -228,12 +245,12 @@ local function MakeConstruct(data)
                     local value_m = nil
                     if waterypro ~= nil then
                         if waterypro.addwetness == nil or waterypro.addwetness == 0 then
-                            value_m = 10
+                            value_m = 20
                         else
                             value_m = waterypro.addwetness
                         end
                         if item.components.finiteuses ~= nil then
-                            value_m = value_m * item.components.finiteuses:GetUses() /2 --普通水壶是+500
+                            value_m = value_m * item.components.finiteuses:GetUses() --普通水壶是+1000
                         else
                             value_m = value_m * 10
                         end
@@ -261,8 +278,10 @@ local function MakeConstruct(data)
                 end
             end
             inst.components.trader.onrefuse = function(inst, giver, item)
-                if giver ~= nil and giver.siv_ctl_traded ~= nil and giver.components.talker ~= nil then
-                    giver.components.talker:Say(GetString(giver, "DESCRIBE", { "SIVING_CTLALL", giver.siv_ctl_traded }))
+                if giver ~= nil and giver.siv_ctl_traded ~= nil then
+                    if giver.components.talker ~= nil then
+                        giver.components.talker:Say(GetString(giver, "DESCRIBE", { "SIVING_CTLALL", giver.siv_ctl_traded }))
+                    end
                     giver.siv_ctl_traded = nil
                 end
             end
@@ -270,24 +289,57 @@ local function MakeConstruct(data)
             inst.components.trader.acceptnontradable = true
 
             inst:AddComponent("botanycontroller")
-            inst.components.botanycontroller.type = data.ctltype
 
+            inst.task_function = nil
             inst:DoTaskInTime(0.1+math.random()*0.4, function()
                 inst.components.botanycontroller:TriggerPlant(true)
+                DoFunction(inst, true)
             end)
-            --undo:下雨时，自动吸收水分
+
+            if data.fn_server ~= nil then
+                data.fn_server(inst)
+            end
 
             return inst
         end,
         data.assets,
         data.prefabs
     ))
-    table.insert(prefs, MakePlacer(basename.."_item_placer", basename, basename, "palcer"))
 end
 
 --------------------------------------------------------------------------
 --[[ 子圭·利川 ]]
 --------------------------------------------------------------------------
+
+local function AddBar(inst, data)
+    local fx = SpawnPrefab("siving_ctl_bar")
+    if fx ~= nil then
+        -- fx.Transform:SetNoFaced()
+
+        fx.AnimState:SetBank(data.bank)
+        fx.AnimState:SetBuild(data.build)
+        fx.AnimState:PlayAnimation(data.anim)
+
+        inst:AddChild(fx)
+        fx.Transform:SetPosition(data.x, data.y, data.z)
+        if data.scale ~= nil then
+            fx.Transform:SetScale(data.scale, data.scale, data.scale)
+        end
+
+        inst[data.barkey] = fx
+    end
+end
+local function SetBar(inst, barkey, anim, value, valuemax)
+    if inst[barkey] ~= nil then
+        if value <= 0 then
+            inst[barkey].AnimState:SetPercent(anim, 0)
+        elseif value < valuemax then
+            inst[barkey].AnimState:SetPercent(anim, value/valuemax)
+        else
+            inst[barkey].AnimState:SetPercent(anim, 1)
+        end
+    end
+end
 
 MakeItem({
     name = "water",
@@ -305,8 +357,24 @@ MakeConstruct({
     assets = {
         Asset("ANIM", "anim/siving_ctlwater.zip"),
     },
-    prefabs = { "siving_ctlwater_item" },
+    prefabs = { "siving_ctlwater_item", "siving_ctl_bar" },
     ctltype = 1,
+    fn_server = function(inst)
+        inst.components.botanycontroller.type = 1
+        inst.components.botanycontroller.onbarchange = function(botanyctl)
+            SetBar(inst, "siv_bar", "anim", botanyctl.moisture, botanyctl.moisture_max)
+        end
+
+        inst:WatchWorldState("israining", function(inst)
+            inst.components.botanycontroller:SetValue(200, nil, true) --下雨/雪开始与结束时，直接恢复一定水分
+        end)
+
+        AddBar(inst, {
+            key = "siv_bar",
+            bank = "", build = "", anim = "anim",
+            x = 0, y = 0, z = 0, scale = nil
+        })
+    end,
 })
 
 --------------------------------------------------------------------------
@@ -329,8 +397,32 @@ MakeConstruct({
     assets = {
         Asset("ANIM", "anim/siving_ctldirt.zip"),
     },
-    prefabs = { "siving_ctldirt_item" },
+    prefabs = { "siving_ctldirt_item", "siving_ctl_bar" },
     ctltype = 2,
+    fn_server = function(inst)
+        inst.components.botanycontroller.type = 2
+        inst.components.botanycontroller.onbarchange = function(botanyctl)
+            SetBar(inst, "siv_bar1", "anim1", botanyctl.nutrients[1], botanyctl.nutrient_max)
+            SetBar(inst, "siv_bar2", "anim2", botanyctl.nutrients[2], botanyctl.nutrient_max)
+            SetBar(inst, "siv_bar3", "anim3", botanyctl.nutrients[3], botanyctl.nutrient_max)
+        end
+
+        AddBar(inst, {
+            key = "siv_bar1",
+            bank = "", build = "", anim = "anim1",
+            x = 0, y = 0, z = 0, scale = nil
+        })
+        AddBar(inst, {
+            key = "siv_bar2",
+            bank = "", build = "", anim = "anim2",
+            x = 0, y = 0, z = 0, scale = nil
+        })
+        AddBar(inst, {
+            key = "siv_bar3",
+            bank = "", build = "", anim = "anim3",
+            x = 0, y = 0, z = 0, scale = nil
+        })
+    end,
 })
 
 --------------------------------------------------------------------------
@@ -338,6 +430,38 @@ MakeConstruct({
 --------------------------------------------------------------------------
 
 --all
+
+--------------------------------------------------------------------------
+--[[ 状态栏 ]]
+--------------------------------------------------------------------------
+
+table.insert(prefs, Prefab(
+    "siving_ctl_bar",
+    function()
+        local inst = CreateEntity()
+
+        inst.entity:AddTransform()
+        inst.entity:AddAnimState()
+        inst.entity:AddNetwork()
+
+        -- inst.AnimState:SetBank(basename)
+        -- inst.AnimState:SetBuild(basename)
+        -- inst.AnimState:PlayAnimation(barkey)
+
+        inst:AddTag("FX")
+
+        inst.entity:SetPristine()
+        if not TheWorld.ismastersim then
+            return inst
+        end
+
+        inst.persists = false
+
+        return inst
+    end,
+    nil,
+    nil
+))
 
 --------------------
 --------------------
