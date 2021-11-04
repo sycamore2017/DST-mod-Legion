@@ -611,11 +611,42 @@ local function MakePlant(data)
 			end
 			inst.components.perennialcrop:SetStage(1, false, false, true, false)
 			inst.components.perennialcrop:StartGrowing()
+			inst.components.perennialcrop.onctlchange = function(inst, ctls)
+				local types = {}
+				for guid,ctl in pairs(ctls) do
+					if ctl:IsValid() and ctl.components.botanycontroller ~= nil then
+						local type = ctl.components.botanycontroller.type
+						if type == 3 then
+							types[3] = true
+							break
+						elseif type == 2 then
+							types[2] = true
+						elseif type == 1 then
+							types[1] = true
+						end
+
+						if types[2] and types[1] then
+							types[3] = true
+							break
+						end
+					end
+				end
+
+				if types[3] or (types[2] and types[1]) then
+					inst.AnimState:OverrideSymbol("soil01", "siving_soil", "soil04")
+				elseif types[2] then
+					inst.AnimState:OverrideSymbol("soil01", "siving_soil", "soil03")
+				elseif types[1] then
+					inst.AnimState:OverrideSymbol("soil01", "siving_soil", "soil02")
+				else
+					inst.AnimState:OverrideSymbol("soil01", "siving_soil", "soil01")
+				end
+			end
 
 			inst:AddComponent("moisture") --浇水机制由潮湿度组件控制（能让水球、神话的玉净瓶等起作用）
-			inst.components.moisture.OnUpdate = function(self, ...) return end --取消下雨时的潮湿度增加
-			inst.components.moisture.OnSave = function(self, ...) return end
-			inst.components.moisture.OnLoad = function(self, ...) return end
+			inst.components.moisture.OnUpdate = function(self, ...) end --取消下雨时的潮湿度增加
+			inst.components.moisture.OnSave = function(self, ...) end
+			inst.components.moisture.OnLoad = function(self, ...) end
 			inst.components.moisture.DoDelta = function(self, num, ...)
 				if num > 0 and self.inst.components.perennialcrop ~= nil then
 					self.inst.components.perennialcrop:PourWater(nil, nil, num)

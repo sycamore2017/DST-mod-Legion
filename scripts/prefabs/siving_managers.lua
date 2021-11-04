@@ -29,7 +29,7 @@ local function MakeItem(data)
             inst.AnimState:SetBuild(basename)
             inst.AnimState:PlayAnimation("item")
 
-            inst:SetPrefabNameOverride(basename)
+            inst:AddTag("eyeturret") --眼球塔的专属标签，但为了deployable组件的摆放名字而使用（显示为“放置”）
 
             inst.entity:SetPristine()
             if not TheWorld.ismastersim then
@@ -150,6 +150,7 @@ local function MakeConstruct(data)
             inst.AnimState:PlayAnimation("idle")
 
             inst:AddTag("structure")
+            inst:AddTag("siving_ctl")
 
             inst.entity:SetPristine()
             if not TheWorld.ismastersim then

@@ -28,6 +28,10 @@ local assets = {
     Asset("IMAGE", "images/inventoryimages/boltwingout.tex"),
     Asset("ATLAS", "images/inventoryimages/siving_rocks.xml"), --mod之间注册相同的文件是有效的
     Asset("IMAGE", "images/inventoryimages/siving_rocks.tex"),
+    Asset("ATLAS", "images/inventoryimages/siving_ctlwater_item.xml"),
+    Asset("IMAGE", "images/inventoryimages/siving_ctlwater_item.tex"),
+    Asset("ATLAS", "images/inventoryimages/siving_ctldirt_item.xml"),
+    Asset("IMAGE", "images/inventoryimages/siving_ctldirt_item.tex"),
 }
 
 for k,v in pairs(assets) do
@@ -57,6 +61,30 @@ AddRecipe(
     }, RECIPETABS.FARM, TECH.MAGIC_TWO, nil, nil, nil, nil, nil,
     "images/inventoryimages/siving_soil_item.xml", "siving_soil_item.tex"
 )
+AddRecipe(
+    "siving_ctlwater_item", {
+        Ingredient("siving_rocks", 30, "images/inventoryimages/siving_rocks.xml"),
+        Ingredient("greengem", 1),
+        Ingredient("townportaltalisman", 10),
+    }, RECIPETABS.FARM, TECH.MAGIC_THREE, nil, nil, nil, nil, nil,
+    "images/inventoryimages/siving_ctlwater_item.xml", "siving_ctlwater_item.tex"
+)
+AddRecipe(
+    "siving_ctldirt_item", {
+        Ingredient("siving_rocks", 30, "images/inventoryimages/siving_rocks.xml"),
+        Ingredient("greengem", 1),
+        Ingredient("moonglass", 10),
+    }, RECIPETABS.FARM, TECH.MAGIC_THREE, nil, nil, nil, nil, nil,
+    "images/inventoryimages/siving_ctldirt_item.xml", "siving_ctldirt_item.tex"
+)
+AddRecipe(
+    "boltwingout", {
+        Ingredient("ahandfulofwings", 36, "images/inventoryimages/ahandfulofwings.xml"),
+        Ingredient("glommerwings", 1),
+        Ingredient("stinger", 36),
+    }, RECIPETABS.SURVIVAL, TECH.SCIENCE_TWO, nil, nil, nil, nil, nil,
+    "images/inventoryimages/boltwingout.xml", "boltwingout.tex"
+)
 
 --这个配方用来便于绿宝石法杖分解
 AddRecipe(
@@ -65,14 +93,19 @@ AddRecipe(
         Ingredient("pinecone", 20),
     }, nil, TECH.LOST
 )
-
 AddRecipe(
-    "boltwingout", {
-        Ingredient("ahandfulofwings", 36, "images/inventoryimages/ahandfulofwings.xml"),
-        Ingredient("glommerwings", 1),
-        Ingredient("stinger", 36),
-    }, RECIPETABS.SURVIVAL, TECH.SCIENCE_TWO, nil, nil, nil, nil, nil,
-    "images/inventoryimages/boltwingout.xml", "boltwingout.tex"
+    "siving_ctlwater", {
+        Ingredient("siving_rocks", 30, "images/inventoryimages/siving_rocks.xml"),
+        Ingredient("greengem", 1),
+        Ingredient("moonglass", 10),
+    }, nil, TECH.LOST
+)
+AddRecipe(
+    "siving_ctldirt", {
+        Ingredient("siving_rocks", 30, "images/inventoryimages/siving_rocks.xml"),
+        Ingredient("greengem", 1),
+        Ingredient("townportaltalisman", 10),
+    }, nil, TECH.LOST
 )
 
 --------------------------------------------------------------------------
@@ -235,7 +268,7 @@ PLANT_DEFS.pineananas = {
 }
 
 --------------------------------------------------------------------------
---[[ 添加新动作：让种子能种在子圭栽培土里 ]]
+--[[ 添加新动作：让种子能种在 子圭·垄 里 ]]
 --------------------------------------------------------------------------
 
 local WEIGHTED_SEED_TABLE = require("prefabs/weed_defs").weighted_seed_table
@@ -275,6 +308,18 @@ local function OnPlant(seed, doer, soil)
 
             soil:Remove()
             seed:Remove()
+
+            --寻找周围的管理器
+            local ents = TheSim:FindEntities(pt.x, pt.y, pt.z, 20,
+                { "siving_ctl" },
+                { "NOCLICK", "FX", "INLIMBO" },
+                nil
+            )
+            for _,v in pairs(ents) do
+                if v:IsValid() and v.components.botanycontroller ~= nil then
+                    plant.components.perennialcrop:TriggerController(v, true, true)
+                end
+            end
 
             return true
         end

@@ -53,6 +53,8 @@ local PerennialCrop = Class(function(self, inst)
 	self.num_moisture = 0 --吸收水分次数
 	self.num_tended = 0 --被照顾次数
 	self.num_perfect = nil --成熟时结算出的：完美指数（决定果实数量或者是否巨型）
+	self.ctls = {}
+	self.onctlchange = nil
 
 	self.moisture_max = 8 --最大蓄水量
 	self.nutrient_max = 32 --最大蓄肥量（生长必需）
@@ -101,7 +103,6 @@ local function TriggerNutrient(self)
 		self.inst:AddTag("fertable2")
 	end
 end
-
 local function TriggerMoisture(self)
 	if self.moisture >= self.moisture_max then
 		if self.inst:HasTag("needwater") then
@@ -113,7 +114,6 @@ local function TriggerMoisture(self)
 		end
 	end
 end
--- tostring(value)
 local function GetDetailString(self, doer, type)
 	local titles = TUNING.LEGION_MOD_LANGUAGES == "chinese" and {
 		nutrients = "肥力",
@@ -337,6 +337,8 @@ function PerennialCrop:DoGrowth(skip)
 	end
 
 	if data.justgrown then
+		self:CostController() --计算消耗之前，先从管理器拿取资源
+
 		if self.nutrient >= self.cost_nutrient then --生长必需肥料的积累
 			self.nutrient = self.nutrient - self.cost_nutrient
 			self.num_nutrient = self.num_nutrient + 1
@@ -766,6 +768,92 @@ function PerennialCrop:SayDetail(doer, dotalk) --介绍细节
 		return str
 	end
 	return nil
+end
+
+local function ComputValue(valuectl, valueneed)
+	local _mo = 0
+	if valuectl >= valueneed then
+		_mo = valueneed
+		valueneed = 0
+	else
+		_mo = valuectl
+		valueneed = valueneed - valuectl
+	end
+	return valueneed, _mo
+end
+function PerennialCrop:CostController()
+	local need_mo = math.max(0, self.moisture_max - self.moisture)
+	local need_n1 = math.max(0, self.nutrientgrow_max - self.nutrientgrow)
+	local need_n2 = math.max(0, self.nutrientsick_max - self.nutrientsick)
+	local need_n3 = math.max(0, self.nutrient_max - self.nutrient)
+
+	if need_mo == 0 and need_n1 == 0 and need_n2 == 0 and need_n3 == 0 then
+		return
+	end
+
+	local _mo = 0
+	for _,ctl in pairs(self.ctls) do
+		if ctl and ctl:IsValid() and ctl.components.botanycontroller ~= nil then
+			local botanyctl = ctl.components.botanycontroller
+			local change = false
+			if need_mo > 0 and (botanyctl.type == 1 or botanyctl.type == 3) and botanyctl.moisture > 0 then
+				need_mo, _mo = ComputValue(botanyctl.moisture, need_mo)
+				botanyctl.moisture = botanyctl.moisture - _mo
+				self.moisture = self.moisture + _mo
+				change = true
+			end
+			if botanyctl.type == 2 or botanyctl.type == 3 then
+				if need_n1 > 0 and botanyctl.nutrients[1] > 0 then
+					need_n1, _mo = ComputValue(botanyctl.nutrients[1], need_n1)
+					botanyctl.nutrients[1] = botanyctl.nutrients[1] - _mo
+					self.nutrientgrow = self.nutrientgrow + _mo
+					change = true
+				end
+				if need_n2 > 0 and botanyctl.nutrients[2] > 0 then
+					need_n2, _mo = ComputValue(botanyctl.nutrients[2], need_n2)
+					botanyctl.nutrients[2] = botanyctl.nutrients[2] - _mo
+					self.nutrientsick = self.nutrientsick + _mo
+					change = true
+				end
+				if need_n3 > 0 and botanyctl.nutrients[3] > 0 then
+					need_n3, _mo = ComputValue(botanyctl.nutrients[3], need_n3)
+					botanyctl.nutrients[3] = botanyctl.nutrients[3] - _mo
+					self.nutrient = self.nutrient + _mo
+					change = true
+				end
+			end
+			if change then
+				botanyctl:SetBars()
+			end
+		end
+	end
+end
+
+function PerennialCrop:TriggerController(ctl, isadd, noupdate)
+	if ctl.GUID == nil then
+		return
+	end
+
+	if isadd then
+		self.ctls[ctl.GUID] = ctl
+	else
+		self.ctls[ctl.GUID] = nil
+	end
+
+	--更新一下已有的管理器
+	if not noupdate then
+		local newctls = {}
+		for _,c in pairs(self.ctls) do
+			if c ~= nil and c:IsValid() and c.GUID ~= nil and c.components.botanycontroller ~= nil then
+				newctls[c.GUID] = c
+			end
+		end
+		self.ctls = newctls
+	end
+
+	if self.onctlchange ~= nil then
+		self.onctlchange(self.inst, self.ctls)
+	end
 end
 
 return PerennialCrop

@@ -327,43 +327,41 @@ end
 --[[ 重写小木牌(插在地上的)的绘图机制，让小木牌可以画上本mod里的物品 ]]
 --------------------------------------------------------------------------
 
-local InventoryPrefabsList = require("mod_inventoryprefabs_list")  --mod中有物品栏图片的prefabs的表
+if IsServer then
+    local InventoryPrefabsList = require("mod_inventoryprefabs_list")  --mod中有物品栏图片的prefabs的表
 
-local function minisign_init(inst)
-    local OnDrawnFn_old = inst.components.drawable.ondrawnfn
-    inst.components.drawable:SetOnDrawnFn(function(inst, image, src, atlas, bgimage, bgatlas) --这里image是所用图片的名字，而非prefab的名字
-        if OnDrawnFn_old ~= nil then
-            OnDrawnFn_old(inst, image, src, atlas, bgimage, bgatlas)
-        end
+    local function minisign_init(inst)
+        local OnDrawnFn_old = inst.components.drawable.ondrawnfn
+        inst.components.drawable:SetOnDrawnFn(function(inst, image, src, atlas, bgimage, bgatlas) --这里image是所用图片的名字，而非prefab的名字
+            if OnDrawnFn_old ~= nil then
+                OnDrawnFn_old(inst, image, src, atlas, bgimage, bgatlas)
+            end
+            --src在重载后就没了，所以没法让信息存在src里
+            if inst.use_high_symbol then
+                if image ~= nil and InventoryPrefabsList[image] ~= nil then
+                    inst.AnimState:OverrideSymbol("SWAP_SIGN_HIGH", InventoryPrefabsList[image].build, image)
+                end
+                if bgimage ~= nil and InventoryPrefabsList[bgimage] ~= nil then
+                    inst.AnimState:OverrideSymbol("SWAP_SIGN_BG_HIGH", InventoryPrefabsList[bgimage].build, bgimage)
+                end
+            else
+                if image ~= nil and InventoryPrefabsList[image] ~= nil then
+                    inst.AnimState:OverrideSymbol("SWAP_SIGN", InventoryPrefabsList[image].build, image)
+                end
+                if bgimage ~= nil and InventoryPrefabsList[bgimage] ~= nil then
+                    inst.AnimState:OverrideSymbol("SWAP_SIGN_BG", InventoryPrefabsList[bgimage].build, bgimage)
+                end
+            end
+        end)
+    end
 
-        if inst.use_high_symbol then
-            if image ~= nil and InventoryPrefabsList[image] ~= nil then
-                inst.AnimState:OverrideSymbol("SWAP_SIGN_HIGH", InventoryPrefabsList[image].build, image)
-            end
-            if bgimage ~= nil and InventoryPrefabsList[bgimage] ~= nil then
-                inst.AnimState:OverrideSymbol("SWAP_SIGN_BG_HIGH", InventoryPrefabsList[bgimage].build, bgimage)
-            end
-        else
-            if image ~= nil and InventoryPrefabsList[image] ~= nil then
-                inst.AnimState:OverrideSymbol("SWAP_SIGN", InventoryPrefabsList[image].build, image)
-            end
-            if bgimage ~= nil and InventoryPrefabsList[bgimage] ~= nil then
-                inst.AnimState:OverrideSymbol("SWAP_SIGN_BG", InventoryPrefabsList[bgimage].build, bgimage)
-            end
-        end
+    AddPrefabPostInit("minisign", function(inst)
+        minisign_init(inst)
+    end)
+    AddPrefabPostInit("minisign_drawn", function(inst)
+        minisign_init(inst)
     end)
 end
-
-AddPrefabPostInit("minisign", function(inst)
-    if TheWorld.ismastersim then
-        minisign_init(inst)
-    end
-end)
-AddPrefabPostInit("minisign_drawn", function(inst)
-    if TheWorld.ismastersim then
-        minisign_init(inst)
-    end
-end)
 
 --------------------------------------------------------------------------
 --[[ 弹吉他相关 ]]
