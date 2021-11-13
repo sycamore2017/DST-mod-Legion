@@ -2194,7 +2194,11 @@ S______GENERIC.DESCRIBE.SIVING_CTLWATER_ITEM = "It can control moisture after be
 -- S________WANDA.DESCRIBE.SIVING_CTLWATER_ITEM = ""
 
 S_NAMES.SIVING_CTLWATER = "Siving·Eau" --子圭·利川
-S______GENERIC.DESCRIBE.SIVING_CTLWATER = "It can transport water to the surrounding soil."
+S______GENERIC.DESCRIBE.SIVING_CTLWATER = {
+    GENERIC = "It can transport water to the surrounding soil.",
+    ISFULL = "The contents are full.",
+    REFUSE = "It's not something it can control.",
+}
 -- S_______WILLOW.DESCRIBE.SIVING_CTLWATER = ""
 -- S_____WOLFGANG.DESCRIBE.SIVING_CTLWATER = ""
 -- S________WENDY.DESCRIBE.SIVING_CTLWATER = ""
@@ -2233,7 +2237,11 @@ S______GENERIC.DESCRIBE.SIVING_CTLDIRT_ITEM = "It can control nutrients after be
 -- S________WANDA.DESCRIBE.SIVING_CTLDIRT_ITEM = ""
 
 S_NAMES.SIVING_CTLDIRT = "Siving·Alim" --子圭·益矩
-S______GENERIC.DESCRIBE.SIVING_CTLDIRT = "It can transport nutrients to the surrounding soil."
+S______GENERIC.DESCRIBE.SIVING_CTLDIRT = {
+    GENERIC = "It can transport nutrients to the surrounding soil.",
+    ISFULL = "The contents are full.",
+    REFUSE = "It's not something it can control.",
+}
 -- S_______WILLOW.DESCRIBE.SIVING_CTLDIRT = ""
 -- S_____WOLFGANG.DESCRIBE.SIVING_CTLDIRT = ""
 -- S________WENDY.DESCRIBE.SIVING_CTLDIRT = ""

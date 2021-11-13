@@ -47,6 +47,7 @@ local function MakeItem(data)
             inst.components.inventoryitem:SetSinks(true)
 
             inst:AddComponent("deployable")
+            inst.components.deployable:SetDeploySpacing(DEPLOYSPACING.MEDIUM)
             inst.components.deployable.ondeploy = function(inst, pt, deployer)
                 local tree = SpawnPrefab(basename)
                 if tree ~= nil then
@@ -85,7 +86,7 @@ local function MakeItem(data)
         data.assets,
         data.prefabs
     ))
-    table.insert(prefs, MakePlacer(basename.."_item_placer", basename, basename, "palcer"))
+    table.insert(prefs, MakePlacer(basename.."_item_placer", basename, basename, "idle"))
 end
 
 local function MakeConstruct(data)
@@ -140,7 +141,7 @@ local function MakeConstruct(data)
             inst.entity:AddMiniMapEntity()
             inst.entity:AddNetwork()
 
-            inst:SetPhysicsRadiusOverride(.5)
+            inst:SetPhysicsRadiusOverride(.16)
             MakeObstaclePhysics(inst, inst.physicsradiusoverride)
 
             inst.MiniMapEntity:SetIcon(basename..".tex")
@@ -268,7 +269,12 @@ local function MakeConstruct(data)
                         else
                             item.components.finiteuses:Use(1)
                         end
-                        return
+                        if giver and giver.components.inventory ~= nil then
+                            -- item.prevslot = nil
+                            -- item.prevcontainer = nil
+                            giver.components.inventory:GiveItem(item, nil, giver:GetPosition() or nil)
+                            return
+                        end
                     end
                 end
 
@@ -281,7 +287,7 @@ local function MakeConstruct(data)
             inst.components.trader.onrefuse = function(inst, giver, item)
                 if giver ~= nil and giver.siv_ctl_traded ~= nil then
                     if giver.components.talker ~= nil then
-                        giver.components.talker:Say(GetString(giver, "DESCRIBE", { "SIVING_CTLALL", giver.siv_ctl_traded }))
+                        giver.components.talker:Say(GetString(giver, "DESCRIBE", { string.upper(basename), giver.siv_ctl_traded }))
                     end
                     giver.siv_ctl_traded = nil
                 end
@@ -319,10 +325,11 @@ local function AddBar(inst, data)
 
         fx.AnimState:SetBank(data.bank)
         fx.AnimState:SetBuild(data.build)
-        fx.AnimState:PlayAnimation(data.anim)
+        -- fx.AnimState:PlayAnimation(data.anim)
+        fx.AnimState:SetPercent(data.anim, 0)
 
         inst:AddChild(fx)
-        fx.Transform:SetPosition(data.x, data.y, data.z)
+        fx.Follower:FollowSymbol(inst.GUID, "base", data.x, data.y, data.z)
         if data.scale ~= nil then
             fx.Transform:SetScale(data.scale, data.scale, data.scale)
         end
@@ -362,19 +369,25 @@ MakeConstruct({
     ctltype = 1,
     fn_server = function(inst)
         inst.components.botanycontroller.type = 1
-        inst.components.botanycontroller.onbarchange = function(botanyctl)
-            SetBar(inst, "siv_bar", "anim", botanyctl.moisture, botanyctl.moisture_max)
-        end
 
         inst:WatchWorldState("israining", function(inst)
             inst.components.botanycontroller:SetValue(200, nil, true) --下雨/雪开始与结束时，直接恢复一定水分
         end)
 
-        AddBar(inst, {
-            key = "siv_bar",
-            bank = "", build = "", anim = "anim",
-            x = 0, y = 0, z = 0, scale = nil
-        })
+        inst:DoTaskInTime(0, function()
+            AddBar(inst, {
+                barkey = "siv_bar",
+                bank = "siving_ctlwater", build = "siving_ctlwater", anim = "bar",
+                x = 0, y = -180, z = 0, scale = nil
+            })
+            inst.components.botanycontroller.onbarchange = function(botanyctl)
+                SetBar(inst, "siv_bar", "bar", botanyctl.moisture, botanyctl.moisture_max)
+            end
+
+            inst:DoTaskInTime(0.5, function()
+                inst.components.botanycontroller:onbarchange()
+            end)
+        end)
     end,
 })
 
@@ -402,27 +415,33 @@ MakeConstruct({
     ctltype = 2,
     fn_server = function(inst)
         inst.components.botanycontroller.type = 2
-        inst.components.botanycontroller.onbarchange = function(botanyctl)
-            SetBar(inst, "siv_bar1", "anim1", botanyctl.nutrients[1], botanyctl.nutrient_max)
-            SetBar(inst, "siv_bar2", "anim2", botanyctl.nutrients[2], botanyctl.nutrient_max)
-            SetBar(inst, "siv_bar3", "anim3", botanyctl.nutrients[3], botanyctl.nutrient_max)
-        end
 
-        AddBar(inst, {
-            key = "siv_bar1",
-            bank = "", build = "", anim = "anim1",
-            x = 0, y = 0, z = 0, scale = nil
-        })
-        AddBar(inst, {
-            key = "siv_bar2",
-            bank = "", build = "", anim = "anim2",
-            x = 0, y = 0, z = 0, scale = nil
-        })
-        AddBar(inst, {
-            key = "siv_bar3",
-            bank = "", build = "", anim = "anim3",
-            x = 0, y = 0, z = 0, scale = nil
-        })
+        inst:DoTaskInTime(0, function()
+            AddBar(inst, {
+                barkey = "siv_bar1",
+                bank = "siving_ctldirt", build = "siving_ctldirt", anim = "bar1",
+                x = -48, y = -140, z = 0, scale = nil
+            })
+            AddBar(inst, {
+                barkey = "siv_bar2",
+                bank = "siving_ctldirt", build = "siving_ctldirt", anim = "bar2",
+                x = -5, y = -140, z = 0, scale = nil
+            })
+            AddBar(inst, {
+                barkey = "siv_bar3",
+                bank = "siving_ctldirt", build = "siving_ctldirt", anim = "bar3",
+                x = 39, y = -140, z = 0, scale = nil
+            })
+            inst.components.botanycontroller.onbarchange = function(botanyctl)
+                SetBar(inst, "siv_bar1", "bar1", botanyctl.nutrients[1], botanyctl.nutrient_max)
+                SetBar(inst, "siv_bar2", "bar2", botanyctl.nutrients[2], botanyctl.nutrient_max)
+                SetBar(inst, "siv_bar3", "bar3", botanyctl.nutrients[3], botanyctl.nutrient_max)
+            end
+
+            inst:DoTaskInTime(0.5, function()
+                inst.components.botanycontroller:onbarchange()
+            end)
+        end)
     end,
 })
 
@@ -444,10 +463,11 @@ table.insert(prefs, Prefab(
         inst.entity:AddTransform()
         inst.entity:AddAnimState()
         inst.entity:AddNetwork()
+        inst.entity:AddFollower()
 
-        -- inst.AnimState:SetBank(basename)
-        -- inst.AnimState:SetBuild(basename)
-        -- inst.AnimState:PlayAnimation(barkey)
+        -- inst.AnimState:SetBank("siving_ctldirt")
+        -- inst.AnimState:SetBuild("siving_ctldirt")
+        -- inst.AnimState:PlayAnimation("bar2")
 
         inst:AddTag("FX")
 

@@ -62,6 +62,12 @@ function BotanyController:TriggerPlant(isadd)
     end
 end
 
+local function SetReleaseFx(x, y, z)
+    local fx = SpawnPrefab("farm_plant_happy")
+    if fx ~= nil then
+        fx.Transform:SetPosition(x, y, z)
+    end
+end
 local function isEmptyNutrients(self)
     return self.nutrients[1] <= 0 and self.nutrients[2] <= 0 and self.nutrients[3] <= 0
 end
@@ -147,7 +153,7 @@ local function ComputSoils(self, fn_tile, fn_wither, fn_check)
                 if fn_tile(self, x+k1, 0, z+k2) and fn_check(self) then
                     self:SetBars()
                     if not isasleep then --睡眠状态就不释放特效
-                        --特效
+                        SetReleaseFx(x, y, z)
                     end
                     return
                 end
@@ -156,6 +162,7 @@ local function ComputSoils(self, fn_tile, fn_wither, fn_check)
     end
 
     --特效
+    SetReleaseFx(x, y, z)
 
     if isasleep then --睡眠状态就不查找枯萎作物
         self:SetBars()
