@@ -6,6 +6,7 @@ local ischinese = TUNING.LEGION_MOD_LANGUAGES == "chinese"
 
 table.insert(Assets, Asset("ATLAS", "images/icon_skinbar_shadow_l.xml"))
 table.insert(Assets, Asset("IMAGE", "images/icon_skinbar_shadow_l.tex"))
+table.insert(Assets, Asset("ANIM", "anim/images_minisign_skins.zip"))
 
 --------------------------------------------------------------------------
 --[[ 全局皮肤总数据，以及修改 ]]
@@ -15,6 +16,7 @@ local rarityRepay = "ProofOfPurchase"
 local rarityFree = "Event"
 
 _G.SKIN_PREFABS_LEGION = {
+    --[[
     rosorns = {
         assets = nil, --仅仅是用于初始化注册
         image = { name = nil, atlas = nil, setable = true, }, --提前注册，或者皮肤初始化使用
@@ -47,12 +49,45 @@ _G.SKIN_PREFABS_LEGION = {
             -- fn_anim = function(inst)end, --处于水中时的动画设置，替换anim的默认方式
         },
     },
+    ]]--
+
+    hat_lichen = {
+        assets = nil,
+        image = { name = nil, atlas = nil, setable = true, },
+        anim = {
+            bank = nil, build = nil,
+            anim = nil, isloop_anim = nil, animpush = nil, isloop_animpush = nil,
+            setable = true,
+        },
+        equip = { symbol = "swap_hat", build = "hat_lichen", file = "swap_hat" },
+        exchangefx = { prefab = nil, offset_y = nil, scale = nil },
+        floater = {
+            cut = 0.03, size = "med", offset_y = 0.2, scale = 0.5, nofx = nil,
+        },
+    },
+    rosebush = {
+        assets = nil,
+        fn_anim = function(inst)
+            inst.AnimState:SetBank("berrybush2")
+            inst.AnimState:SetBuild("rosebush")
+        end,
+        exchangefx = { prefab = nil, offset_y = nil, scale = 1.5 },
+    },
+    lilybush = {
+        assets = nil,
+        fn_anim = function(inst)
+            inst.AnimState:SetBank("berrybush2")
+            inst.AnimState:SetBuild("lilybush")
+        end,
+        exchangefx = { prefab = nil, offset_y = nil, scale = 1.5 },
+    },
 }
 
 _G.SKINS_LEGION = {
+    --[[
 	rosorns_spell = {
         base_prefab = "rosorns",
-		type = "item", --item物品皮肤，base人物皮肤
+		type = "item", --item物品、建筑等皮肤，base人物皮肤
 		rarity = rarityRepay,
 		skin_tags = {},
 		release_group = 555,
@@ -111,6 +146,95 @@ _G.SKINS_LEGION = {
             -- fn_anim = function(inst)end, --处于水中时的动画设置，替换anim的默认方式
         },
     },
+    ]]--
+
+    hat_lichen_emo_que = {
+        base_prefab = "hat_lichen",
+		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
+
+        skin_idx = 3,
+        skin_id = "61909c584c724c6f40e779fa",
+		assets = {
+			Asset("ANIM", "anim/skin/hat_lichen_emo_que.zip"),
+		},
+		image = { name = nil, atlas = nil, setable = true, },
+
+        string = ischinese and {
+            name = "“困惑”发卡", collection = "EMOTICON", access = "DONATE",
+            descitem = "解锁“苔衣发卡”皮肤。",
+            description = "我有个疑问。不对，我为啥会有这个想法？就在我想提出问题时，心里就会有个阴影质疑我的问题：“你提出这些问题难道不该想想是你自己的问题还是真的有问题”。然后我又会问它，凭什么你这个问题觉得我的问题有问题！",
+        } or {
+            name = "Question Hairpin", collection = "EMOTICON", access = "DONATE",
+            descitem = "Unlock \"Lichen Hairpin\" skin.",
+            description = "The story was not translated.",
+        },
+
+		anim = {
+            bank = nil, build = nil,
+            anim = nil, isloop_anim = nil, animpush = nil, isloop_animpush = nil,
+            setable = true,
+        },
+        equip = { symbol = "swap_hat", build = "hat_lichen_emo_que", file = "swap_hat" },
+        exchangefx = { prefab = nil, offset_y = nil, scale = nil },
+        floater = {
+            cut = 0.03, size = "small", offset_y = 0.15, scale = 0.5, nofx = nil,
+        },
+    },
+    rosebush_marble = {
+        base_prefab = "rosebush",
+		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
+
+        skin_idx = 1,
+        skin_id = "619108a04c724c6f40e77bd4",
+		assets = {
+            Asset("ANIM", "anim/berrybush.zip"), --官方浆果丛动画
+			Asset("ANIM", "anim/skin/rosebush_marble.zip"),
+		},
+
+        string = ischinese and {
+            name = "理盛赤蔷", collection = "MARBLE", access = "DONATE",
+            descitem = "解锁“蔷薇花丛”皮肤。",
+            description = "这个故事我读了大概。她为爱痴狂，执拗地追求心上人。",
+        } or {
+            name = "Rose Marble Pot", collection = "MARBLE", access = "DONATE",
+            descitem = "Unlock \"Rose Bush\" skin.",
+            description = "The story was not translated.",
+        },
+
+		fn_anim = function(inst)
+            --官方代码写得挺好，直接改动画模板居然能继承已有的动画播放和symbol切换状态
+            inst.AnimState:SetBank("berrybush")
+            inst.AnimState:SetBuild("rosebush_marble")
+        end,
+        exchangefx = { prefab = nil, offset_y = nil, scale = 1.5 },
+    },
+    lilybush_marble = {
+        base_prefab = "lilybush",
+		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
+
+        skin_idx = 2,
+        skin_id = "619116c74c724c6f40e77c40",
+		assets = {
+            Asset("ANIM", "anim/berrybush.zip"), --官方浆果丛动画
+			Asset("ANIM", "anim/skin/lilybush_marble.zip"),
+		},
+
+        string = ischinese and {
+            name = "理盛截莲", collection = "MARBLE", access = "DONATE",
+            descitem = "解锁“蹄莲花丛”皮肤。",
+            description = "这个故事我读了大概。她为爱痴狂，执拗地追求心上人。",
+        } or {
+            name = "Rose Marble Pot", collection = "MARBLE", access = "DONATE",
+            descitem = "Unlock \"Lily Bush\" skin.",
+            description = "The story was not translated.",
+        },
+
+		fn_anim = function(inst)
+            inst.AnimState:SetBank("berrybush")
+            inst.AnimState:SetBuild("lilybush_marble")
+        end,
+        exchangefx = { prefab = nil, offset_y = nil, scale = nil },
+    },
 }
 
 _G.SKIN_IDS_LEGION = {
@@ -127,6 +251,9 @@ if ischinese then
         COLLECTION = {
             UNKNOWN = "陌生系列",
             MAGICSPELL = "魔咒系列",
+            EMOTICON = "颜表情系列",
+            MARBLE = "大理石园丁系列",
+            THANKS = "江湖一枝花系列",
         },
         UI_ACCESS = "获取",
         UI_INPUT_CDK = "请输入兑换码",
@@ -142,7 +269,10 @@ else
         UNKNOWN_STORY = "The story is not worth mentioning.",
         COLLECTION = {
             UNKNOWN = "Strange Collection",
-            MAGICSPELL = "Rose Spell Staff",
+            MAGICSPELL = "Magic Spell Collection",
+            EMOTICON = "Emoticon Collection",
+            MARBLE = "Marble Gardener Collection",
+            THANKS = "Heartfelt Thanks Collection",
         },
         UI_ACCESS = "Get It",
         UI_INPUT_CDK = "Please enter CDK",

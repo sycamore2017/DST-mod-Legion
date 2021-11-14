@@ -10,6 +10,8 @@ local ctlFuledItems = {
     wintercooking_mulleddrink = { moisture = 100, nutrients = { 2, 2, 8 } },
     waterballoon = { moisture = 400, nutrients = { nil, 2, nil } },
     oceanfish_medium_8_inv = { moisture = 200, nutrients = { 16, nil, nil } }, --冰鲷鱼
+    watermelonicle = { moisture = 200, nutrients = { 8, 8, 16 } },
+    icecream = { moisture = 200, nutrients = { 24, 24, 24 } },
 }
 
 local function MakeItem(data)

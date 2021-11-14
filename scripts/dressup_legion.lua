@@ -1108,12 +1108,25 @@ local dressup_data = {
             dressup:InitClear("swap_body")
         end,
     },
-    hat_lichen =
-    {
+    hat_lichen = {
         isnoskin = true,
-        isopentop = true,
-        buildfile = "hat_lichen",
-        buildsymbol = "swap_hat",
+        buildfn = function(dressup, item, buildskin)
+            local itemswap = {}
+
+            local skindata = item.components.skinedlegion:GetSkinedData()
+            if skindata ~= nil and skindata.equip ~= nil then
+                itemswap["swap_hat"] = dressup:GetDressData(
+                    nil, skindata.equip.build, skindata.equip.file, item.GUID, "swap"
+                )
+            else
+                itemswap["swap_hat"] = dressup:GetDressData(
+                    nil, "hat_lichen", "swap_hat", item.GUID, "swap"
+                )
+            end
+            dressup:SetDressOpenTop(itemswap)
+
+            return itemswap
+        end,
     },
     hat_mermbreathing =
     {

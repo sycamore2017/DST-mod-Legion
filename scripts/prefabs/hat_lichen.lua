@@ -11,7 +11,12 @@ local prefabs =
 }
 
 local function lichen_equip(inst, owner)    --装备时
-    HAT_OPENTOP_ONEQUIP_LEGION(inst, owner, "hat_lichen", "swap_hat")
+    local skindata = inst.components.skinedlegion:GetSkinedData()
+    if skindata ~= nil and skindata.equip ~= nil then
+        HAT_OPENTOP_ONEQUIP_LEGION(inst, owner, skindata.equip.build, skindata.equip.file)
+    else
+        HAT_OPENTOP_ONEQUIP_LEGION(inst, owner, "hat_lichen", "swap_hat")
+    end
 
     -- owner:AddTag("ignoreMeat")  --添加忽略带着肉的标签
 
@@ -61,15 +66,10 @@ local function fn(Sim)
     inst:AddTag("open_top_hat")
     inst:AddTag("ignoreMeat")
 
-    MakeInventoryFloatable(inst, "med", 0.2, 0.5)
-    local OnLandedClient_old = inst.components.floater.OnLandedClient
-    inst.components.floater.OnLandedClient = function(self)
-        OnLandedClient_old(self)
-        self.inst.AnimState:SetFloatParams(0.03, 1, self.bob_percent)
-    end
+    inst:AddComponent("skinedlegion")
+    inst.components.skinedlegion:InitWithFloater("hat_lichen")
 
     inst.entity:SetPristine()
-
     if not TheWorld.ismastersim then
         return inst
     end
@@ -90,15 +90,14 @@ local function fn(Sim)
     inst:AddComponent("equippable") --装备组件
     inst.components.equippable.equipslot = EQUIPSLOTS.HEAD --装在头上
     inst.components.equippable.dapperness = TUNING.DAPPERNESS_MED  --添加增加精神值效果，和高礼帽一样
-    --inst.components.equippable:SetOnEquip(onequip) --装备
-    --inst.components.equippable:SetOnEquip(opentop_onequip) --这个用于不会遮住头发的帽子，例如花环
-    --inst.components.equippable:SetOnUnequip(onunequip) --解除装备
     inst.components.equippable:SetOnEquip(lichen_equip)
     inst.components.equippable:SetOnUnequip(lichen_unequip)
 
-    inst:AddComponent("tradable") --可交易组件  有了这个就可以给猪猪 
+    inst:AddComponent("tradable") --可交易组件  有了这个就可以给猪猪
 
     MakeHauntableLaunchAndPerish(inst)
+
+    inst.components.skinedlegion:SetOnPreLoad()
 
     return inst
 end

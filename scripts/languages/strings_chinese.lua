@@ -2178,7 +2178,7 @@ S_NAMES.SIVING_CTLWATER = "子圭·利川"
 S______GENERIC.DESCRIBE.SIVING_CTLWATER = {
     GENERIC = "它能像心脏一样向周围土壤输送水分。",
     ISFULL = "储存的水分足够了。",
-    REFUSE = "不是它能掌控的东西。",
+    REFUSE = "这东西水分太少了。",
 }
 -- S_______WILLOW.DESCRIBE.SIVING_CTLWATER = ""
 -- S_____WOLFGANG.DESCRIBE.SIVING_CTLWATER = ""
@@ -2221,7 +2221,7 @@ S_NAMES.SIVING_CTLDIRT = "子圭·益矩"
 S______GENERIC.DESCRIBE.SIVING_CTLDIRT = {
     GENERIC = "它能像心脏一样向周围土壤输送养分。",
     ISFULL = "储藏的养分足够了。",
-    REFUSE = "不是它能掌控的东西。",
+    REFUSE = "这东西不能化作养料。",
 }
 -- S_______WILLOW.DESCRIBE.SIVING_CTLDIRT = ""
 -- S_____WOLFGANG.DESCRIBE.SIVING_CTLDIRT = ""
