@@ -174,7 +174,7 @@ PULLOUTSWORD.str = STRINGS.ACTIONS_LEGION.PULLOUTSWORD
 PULLOUTSWORD.fn = function(act)
     local obj = act.target or act.invobject
 
-    if obj ~= nil and obj.components.swordscabbard ~= nil then
+    if obj ~= nil and obj.components.swordscabbard ~= nil and act.doer ~= nil then
         obj.components.swordscabbard:BreakUp(act.doer)
         return true
     end

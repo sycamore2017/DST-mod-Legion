@@ -28,9 +28,18 @@ function SwordScabbard:Merge(sword)
         sword.task_recover = sword:DoPeriodicTask(6, sword.OnScabbardRecoveredFn, 6) --大概三天多一点的时间就能完全恢复
     end
 
-    self.inst.components.inventoryitem.atlasname = "images/inventoryimages/foliageath_"..sword.prefab..".xml"
-    self.inst.components.inventoryitem:ChangeImageName("foliageath_"..sword.prefab)
-    self.inst.AnimState:PlayAnimation(sword.prefab)
+    local skindata = sword.components.skinedlegion ~= nil and sword.components.skinedlegion:GetSkinedData() or nil
+    if skindata ~= nil and skindata.scabbard ~= nil then
+        self.inst.components.inventoryitem.atlasname = skindata.scabbard.atlas
+        self.inst.components.inventoryitem:ChangeImageName(skindata.scabbard.image)
+        self.inst.AnimState:SetBank(skindata.scabbard.bank)
+        self.inst.AnimState:SetBuild(skindata.scabbard.build)
+        self.inst.AnimState:PlayAnimation(skindata.scabbard.anim)
+    else
+        self.inst.components.inventoryitem.atlasname = "images/inventoryimages/foliageath_"..sword.prefab..".xml"
+        self.inst.components.inventoryitem:ChangeImageName("foliageath_"..sword.prefab)
+        self.inst.AnimState:PlayAnimation(sword.prefab)
+    end
 
     self.inst:AddTag("swordscabbardcouple")
 end
@@ -51,7 +60,18 @@ function SwordScabbard:BeTogether(beforeinst, sword)
     self.inst.SoundEmitter:PlaySound("dontstarve/common/telebase_gemplace")
 end
 
+local function SetPos(inst, x, y, z)
+    if inst.Physics ~= nil then
+        inst.Physics:Teleport(x, y, z)
+    else
+        inst.Transform:SetPosition(x, y, z)
+    end
+end
 function SwordScabbard:BreakUp(player)
+    if player == nil or player.components.inventory == nil then
+        return false
+    end
+
     local sword = self.child
     self.inst:RemoveChild(self.child)
     self.child:ReturnToScene()
@@ -68,46 +88,45 @@ function SwordScabbard:BreakUp(player)
     local foliageath = SpawnPrefab("foliageath")
     local container = self.inst.components.inventoryitem:GetContainer()
     if container ~= nil then
+        local x, y, z = player.Transform:GetWorldPosition()
         local slot = self.inst.components.inventoryitem:GetSlotNum()
         -- local player = self.inst.components.inventoryitem:GetGrandOwner()
         self.inst:Remove()
-        container:GiveItem(foliageath, slot)
+        if not container:GiveItem(foliageath, slot) and not player.components.inventory:GiveItem(foliageath) then
+            SetPos(foliageath, x, y, z) --没成功就直接设置位置
+        end
 
         --将剑直接装在手上
         if
-            sword.components.equippable ~= nil
-            and player ~= nil and player:HasTag("player") and player.components.inventory ~= nil
+            sword.components.equippable ~= nil and player:HasTag("player")
             -- and (self.inst.components.perishable == nil or self.inst.components.perishable.perishremainingtime > 0)
         then
-            player.components.inventory:Equip(sword)
+            if not player.components.inventory:Equip(sword) and not player.components.inventory:GiveItem(sword) then
+                SetPos(sword, x, y, z)
+            end
         else
-            container:GiveItem(sword)
+            if not container:GiveItem(sword) and not player.components.inventory:GiveItem(sword) then
+                SetPos(sword, x, y, z)
+            end
         end
     else
         local x, y, z = self.inst.Transform:GetWorldPosition()
         self.inst:Remove()
-
-        if foliageath.Physics ~= nil then
-            foliageath.Physics:Teleport(x, y, z)
-        else
-            foliageath.Transform:SetPosition(x, y, z)
-        end
+        SetPos(foliageath, x, y, z)
 
         --将剑直接装在手上
         if
-            player ~= nil and player:HasTag("player") and player.components.inventory ~= nil
+            player:HasTag("player")
             -- and (self.inst.components.perishable == nil or self.inst.components.perishable.perishremainingtime > 0)
         then
-            if sword.components.equippable ~= nil then
-                player.components.inventory:Equip(sword)
-            else
-                player.components.inventory:GiveItem(sword)
+            if sword.components.equippable == nil or not player.components.inventory:Equip(sword) then
+                if not player.components.inventory:GiveItem(sword) then
+                    SetPos(sword, x, y, z)
+                end
             end
         else
-            if sword.Physics ~= nil then
-                sword.Physics:Teleport(x, y, z)
-            else
-                sword.Transform:SetPosition(x, y, z)
+            if not player.components.inventory:GiveItem(sword) then
+                SetPos(sword, x, y, z)
             end
         end
     end

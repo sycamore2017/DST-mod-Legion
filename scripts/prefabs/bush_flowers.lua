@@ -122,12 +122,10 @@ local function MakeBush(data)
             inst.components.pickable.makefullfn = function(inst) --果实成熟期
                 local anim = "idle"
                 local berries = nil
-                if inst.components.pickable ~= nil then
-                    if inst.components.pickable:CanBePicked() then
-                        berries = inst.components.pickable.cycles_left ~= nil and inst.components.pickable.cycles_left / inst.components.pickable.max_cycles or 1
-                    elseif inst.components.pickable:IsBarren() then
-                        anim = "dead"
-                    end
+                if inst.components.pickable:CanBePicked() then
+                    berries = inst.components.pickable.cycles_left ~= nil and inst.components.pickable.cycles_left / inst.components.pickable.max_cycles or 1
+                elseif inst.components.pickable:IsBarren() then
+                    anim = "dead"
                 end
                 if anim ~= "idle" then
                     inst.AnimState:PlayAnimation(anim)
@@ -184,11 +182,12 @@ local function getregentimefn(inst, time)
 end
 
 local function SpawnMyLoot(bush, picker, itemname, itemnumber, mustdrop)
-    if picker.components.inventory ~= nil and not mustdrop then
+    if not mustdrop and picker and picker.components.inventory ~= nil then
+        local pos = picker:GetPosition()
         for i = 1, itemnumber do
             local item = SpawnPrefab(itemname)
             if item ~= nil then
-                picker.components.inventory:GiveItem(item)
+                picker.components.inventory:GiveItem(item, nil, pos)
             end
         end
     elseif bush.components.lootdropper ~= nil then
@@ -196,13 +195,14 @@ local function SpawnMyLoot(bush, picker, itemname, itemnumber, mustdrop)
             bush.components.lootdropper:SpawnLootPrefab(itemname)
         end
     else
+        local x, y, z = bush.Transform:GetWorldPosition()
         for i = 1, itemnumber do
             local item = SpawnPrefab(itemname)
             if item ~= nil then
                 if item.Physics ~= nil then
-                    item.Physics:Teleport(bush.Transform:GetWorldPosition())
+                    item.Physics:Teleport(x, y, z)
                 else
-                    item.Transform:SetPosition(bush.Transform:GetWorldPosition())
+                    item.Transform:SetPosition(x, y, z)
                 end
             end
         end
@@ -238,53 +238,51 @@ MakeBush({
         inst.components.pickable.max_cycles = TUNING.BERRYBUSH_CYCLES + math.random(2)
         inst.components.pickable.cycles_left = inst.components.pickable.max_cycles
         inst.components.pickable.onpickedfn = function(inst, picker)
-            if inst.components.pickable ~= nil then
-                if inst.components.pickable:IsBarren() then
-                    inst.AnimState:PlayAnimation("idle_to_dead")
-                    inst.AnimState:PushAnimation("dead", false)
-                    setberries(inst, nil)
+            if inst.components.pickable:IsBarren() then
+                inst.AnimState:PlayAnimation("idle_to_dead")
+                inst.AnimState:PushAnimation("dead", false)
+                setberries(inst, nil)
 
-                    inst:RemoveTag("flower")   --移除花的标签
-                else
-                    inst.AnimState:PlayAnimation("picked")
-                    inst.AnimState:PushAnimation("idle")
-                    setberriesonanimover(inst)
-                end
+                inst:RemoveTag("flower")   --移除花的标签
+            else
+                inst.AnimState:PlayAnimation("picked")
+                inst.AnimState:PushAnimation("idle")
+                setberriesonanimover(inst)
+            end
 
-                --采集时被刺伤
-                if
-                    picker.components.combat ~= nil and
-                    not (
-                        picker.components.inventory ~= nil and
-                        (
-                            picker.components.inventory:EquipHasTag("bramble_resistant") or
-                            (CONFIGS_LEGION.ENABLEDMODS.MythWords and picker.components.inventory:Has("thorns_pill", 1))
-                        )
+            --采集时被刺伤
+            if
+                picker.components.combat ~= nil and
+                not (
+                    picker.components.inventory ~= nil and
+                    (
+                        picker.components.inventory:EquipHasTag("bramble_resistant") or
+                        (CONFIGS_LEGION.ENABLEDMODS.MythWords and picker.components.inventory:Has("thorns_pill", 1))
                     )
-                then
-                    picker.components.combat:GetAttacked(inst, TUNING.MARSHBUSH_DAMAGE) --荆棘的伤害值
+                )
+            then
+                picker.components.combat:GetAttacked(inst, TUNING.MARSHBUSH_DAMAGE) --荆棘的伤害值
 
-                    if math.random() <= 0.01 and picker.task_pick_rosebush == nil and picker.components.talker ~= nil then
-                        picker.task_pick_rosebush = picker:DoTaskInTime(0, function()
-                            picker.components.talker:Say(GetString(picker, "ANNOUNCE_PICK_ROSEBUSH"))
-                            picker.task_pick_rosebush = nil
-                        end)
-                    else
-                        picker:PushEvent("thorns")
-                    end
-                end
-
-                local loot = math.random()
-                if loot <= 0.3 then    --30%几率掉落花瓣,60%几率掉落树枝，10%几率掉落玫瑰枝条
-                    SpawnMyLoot(inst, picker, "petals", 1, false)
-                elseif loot <= 0.9 then
-                    SpawnMyLoot(inst, picker, "twigs", 1, false)
+                if math.random() <= 0.01 and picker.task_pick_rosebush == nil and picker.components.talker ~= nil then
+                    picker.task_pick_rosebush = picker:DoTaskInTime(0, function()
+                        picker.components.talker:Say(GetString(picker, "ANNOUNCE_PICK_ROSEBUSH"))
+                        picker.task_pick_rosebush = nil
+                    end)
                 else
-                    SpawnMyLoot(inst, picker, "cutted_rosebush", 1, true) --掉落玫瑰枝条
+                    picker:PushEvent("thorns")
                 end
-                if math.random() <= CONFIGS_LEGION.FLOWERWEAPONSCHANCE then --3%几率掉落剑
-                    SpawnMyLoot(inst, picker, "rosorns", 1, true)
-                end
+            end
+
+            local loot = math.random()
+            if loot <= 0.3 then    --30%几率掉落花瓣,60%几率掉落树枝，10%几率掉落玫瑰枝条
+                SpawnMyLoot(inst, picker, "petals", 1, false)
+            elseif loot <= 0.9 then
+                SpawnMyLoot(inst, picker, "twigs", 1, false)
+            else
+                SpawnMyLoot(inst, picker, "cutted_rosebush", 1, true) --掉落玫瑰枝条
+            end
+            if math.random() <= CONFIGS_LEGION.FLOWERWEAPONSCHANCE then --3%几率掉落剑
+                SpawnMyLoot(inst, picker, "rosorns", 1, true)
             end
         end
 
@@ -359,30 +357,28 @@ MakeBush({
         inst.components.pickable.max_cycles = TUNING.BERRYBUSH_CYCLES + math.random(2)
         inst.components.pickable.cycles_left = inst.components.pickable.max_cycles
         inst.components.pickable.onpickedfn = function(inst, picker)
-            if inst.components.pickable ~= nil then
-                if inst.components.pickable:IsBarren() then
-                    inst.AnimState:PlayAnimation("idle_to_dead")
-                    inst.AnimState:PushAnimation("dead", false)
-                    setberries(inst, nil)
+            if inst.components.pickable:IsBarren() then
+                inst.AnimState:PlayAnimation("idle_to_dead")
+                inst.AnimState:PushAnimation("dead", false)
+                setberries(inst, nil)
 
-                    inst:RemoveTag("flower")   --移除花的标签
-                else
-                    inst.AnimState:PlayAnimation("picked")
-                    inst.AnimState:PushAnimation("idle")
-                    setberriesonanimover(inst)
-                end
+                inst:RemoveTag("flower")   --移除花的标签
+            else
+                inst.AnimState:PlayAnimation("picked")
+                inst.AnimState:PushAnimation("idle")
+                setberriesonanimover(inst)
+            end
 
-                local loot = math.random()
-                if loot <= 0.6 then    --30%几率掉落2花瓣,60%几率掉落1花瓣，10%几率掉落蹄莲幼苗
-                    SpawnMyLoot(inst, picker, "petals", 1, false)
-                elseif loot <= 0.9 then
-                    SpawnMyLoot(inst, picker, "petals", 2, false)
-                else
-                    SpawnMyLoot(inst, picker, "cutted_lilybush", 1, true) --掉落蹄莲幼苗
-                end
-                if math.random() <= CONFIGS_LEGION.FLOWERWEAPONSCHANCE then --3%几率掉落剑
-                    SpawnMyLoot(inst, picker, "lileaves", 1, true)
-                end
+            local loot = math.random()
+            if loot <= 0.6 then    --30%几率掉落2花瓣,60%几率掉落1花瓣，10%几率掉落蹄莲幼苗
+                SpawnMyLoot(inst, picker, "petals", 1, false)
+            elseif loot <= 0.9 then
+                SpawnMyLoot(inst, picker, "petals", 2, false)
+            else
+                SpawnMyLoot(inst, picker, "cutted_lilybush", 1, true) --掉落蹄莲幼苗
+            end
+            if math.random() <= CONFIGS_LEGION.FLOWERWEAPONSCHANCE then --3%几率掉落剑
+                SpawnMyLoot(inst, picker, "lileaves", 1, true)
             end
         end
 
@@ -442,6 +438,9 @@ MakeBush({
         inst:AddTag("flower")
         inst:AddTag("witherable")
         inst:AddTag("renewable")
+
+        inst:AddComponent("skinedlegion")
+        inst.components.skinedlegion:Init("orchidbush")
     end,
     fn_server = function(inst)
         inst:AddComponent("witherable")
@@ -455,30 +454,28 @@ MakeBush({
         inst.components.pickable.max_cycles = TUNING.BERRYBUSH_CYCLES + math.random(2)
         inst.components.pickable.cycles_left = inst.components.pickable.max_cycles
         inst.components.pickable.onpickedfn = function(inst, picker)
-            if inst.components.pickable ~= nil then
-                if inst.components.pickable:IsBarren() then
-                    inst.AnimState:PlayAnimation("idle_to_dead")
-                    inst.AnimState:PushAnimation("dead", false)
-                    setberries(inst, nil)
+            if inst.components.pickable:IsBarren() then
+                inst.AnimState:PlayAnimation("idle_to_dead")
+                inst.AnimState:PushAnimation("dead", false)
+                setberries(inst, nil)
 
-                    inst:RemoveTag("flower")   --移除花的标签
-                else
-                    inst.AnimState:PlayAnimation("picked")
-                    inst.AnimState:PushAnimation("idle")
-                    setberriesonanimover(inst)
-                end
+                inst:RemoveTag("flower")   --移除花的标签
+            else
+                inst.AnimState:PlayAnimation("picked")
+                inst.AnimState:PushAnimation("idle")
+                setberriesonanimover(inst)
+            end
 
-                local loot = math.random()
-                if loot <= 0.6 then    --30%几率掉落花瓣,60%几率掉落干草，10%几率掉落兰花种子
-                    SpawnMyLoot(inst, picker, "cutgrass", 1, false)
-                elseif loot <= 0.9 then
-                    SpawnMyLoot(inst, picker, "petals", 1, false)
-                else
-                    SpawnMyLoot(inst, picker, "cutted_orchidbush", 1, true) --掉落兰花种子
-                end
-                if math.random() <= CONFIGS_LEGION.FLOWERWEAPONSCHANCE then --3%几率掉落剑
-                    SpawnMyLoot(inst, picker, "orchitwigs", 1, true)
-                end
+            local loot = math.random()
+            if loot <= 0.6 then    --30%几率掉落花瓣,60%几率掉落干草，10%几率掉落兰花种子
+                SpawnMyLoot(inst, picker, "cutgrass", 1, false)
+            elseif loot <= 0.9 then
+                SpawnMyLoot(inst, picker, "petals", 1, false)
+            else
+                SpawnMyLoot(inst, picker, "cutted_orchidbush", 1, true) --掉落兰花种子
+            end
+            if math.random() <= CONFIGS_LEGION.FLOWERWEAPONSCHANCE then --3%几率掉落剑
+                SpawnMyLoot(inst, picker, "orchitwigs", 1, true)
             end
         end
 
@@ -516,6 +513,8 @@ MakeBush({
         MakeNoGrowInWinter(inst)    --冬季停止生长
         MakeMediumBurnable(inst)
         MakeSmallPropagator(inst)
+
+        inst.components.skinedlegion:SetOnPreLoad()
     end,
 })
 
@@ -529,13 +528,16 @@ MakeBush({
         Asset("ANIM", "anim/berrybush2.zip"), --官方猪村浆果丛动画
         Asset("ANIM", "anim/neverfadebush.zip"),
     },
-    prefabs = { "neverfade" },
+    prefabs = { "neverfade", "petals" },
     fn_common = function(inst)
         MakeSmallObstaclePhysics(inst, .1)
         inst:AddTag("flower")
+
+        inst:AddComponent("skinedlegion")
+        inst.components.skinedlegion:Init("neverfadebush")
     end,
     fn_server = function(inst)
-        inst.components.pickable:SetUp("neverfade", TUNING.TOTAL_DAY_TIME * 3) --3天的成熟时间
+        inst.components.pickable:SetUp("petals", TUNING.TOTAL_DAY_TIME * 3) --3天的成熟时间
         inst.components.pickable.ontransplantfn = function(inst)
             inst.components.pickable:MakeEmpty()    --直接进入生长状态
         end
@@ -545,12 +547,31 @@ MakeBush({
         inst.components.pickable.max_cycles = TUNING.BERRYBUSH_CYCLES + math.random(2)
         inst.components.pickable.cycles_left = inst.components.pickable.max_cycles
         inst.components.pickable.onpickedfn = function(inst, picker)
-            if inst.components.pickable ~= nil then
-                inst.AnimState:PlayAnimation("picked")
-                setberries(inst, nil)
-                inst:ListenForEvent("animover", inst.Remove)    --动画播放完毕时去除实体
+            local item = SpawnPrefab("neverfade")
+            if item ~= nil then
+                local linkdata = inst.components.skinedlegion:GetLinkedSkins() or nil
+                if linkdata ~= nil and item.components.skinedlegion ~= nil then
+                    item.components.skinedlegion:SetSkin(linkdata.sword)
+                end
+
+                if picker and picker.components.inventory ~= nil then
+                    picker.components.inventory:GiveItem(item, nil, picker:GetPosition())
+                else
+                    local x, y, z = inst.Transform:GetWorldPosition()
+                    if item.Physics ~= nil then
+                        item.Physics:Teleport(x, y, z)
+                    else
+                        item.Transform:SetPosition(x, y, z)
+                    end
+                end
             end
+
+            inst.AnimState:PlayAnimation("picked")
+            setberries(inst, nil)
+            inst:ListenForEvent("animover", inst.Remove)    --动画播放完毕时去除实体
         end
+
+        inst.components.skinedlegion:SetOnPreLoad()
     end,
 })
 

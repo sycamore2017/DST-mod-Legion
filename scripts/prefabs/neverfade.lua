@@ -23,12 +23,40 @@ local prefabs =
     "buff_butterflysblessing",
 }
 
-local function onequip(inst, owner) --装备武器时
-    if inst.hasSetBroken then
-        owner.AnimState:OverrideSymbol("swap_object", "swap_neverfade_broken", "swap_neverfade_broken")
+local function ChangeSymbol(inst, owner, skindata)
+    if skindata ~= nil and skindata.equip ~= nil then
+        if inst.hasSetBroken then
+            owner.AnimState:OverrideSymbol("swap_object", skindata.equip.build_broken, skindata.equip.file_broken)
+        else
+            owner.AnimState:OverrideSymbol("swap_object", skindata.equip.build, skindata.equip.file)
+        end
     else
-        owner.AnimState:OverrideSymbol("swap_object", "swap_neverfade", "swap_neverfade")
+        if inst.hasSetBroken then
+            owner.AnimState:OverrideSymbol("swap_object", "swap_neverfade_broken", "swap_neverfade_broken")
+        else
+            owner.AnimState:OverrideSymbol("swap_object", "swap_neverfade", "swap_neverfade")
+        end
+    end
+end
+local function ChangeInvImg(inst, skindata)
+    if skindata ~= nil and skindata.fn_start ~= nil then
+        skindata.fn_start(inst)
+    else
+        if inst.hasSetBroken then
+            --改变物品栏图片，先改atlasname，再改贴图
+            inst.components.inventoryitem.atlasname = "images/inventoryimages/neverfade_broken.xml"
+            inst.components.inventoryitem:ChangeImageName("neverfade_broken")
+        else
+            inst.components.inventoryitem.atlasname = "images/inventoryimages/neverfade.xml"
+            inst.components.inventoryitem:ChangeImageName("neverfade")
+        end
+    end
+end
 
+local function onequip(inst, owner) --装备武器时
+    ChangeSymbol(inst, owner, inst.components.skinedlegion:GetSkinedData())
+
+    if not inst.hasSetBroken then
         if owner.components.health ~= nil then
             inst.healthRedirect_old = owner.components.health.redirect --记下原有的函数，方便以后恢复
 
@@ -100,7 +128,13 @@ local function onattack(inst, owner, target)
             if inst.attackTrigger >= 10 then   --如果达到10，添加buff
                 if owner.components.debuffable ~= nil and owner.components.debuffable:IsEnabled() and
                     not (owner.components.health ~= nil and owner.components.health:IsDead()) and
-                    not owner:HasTag("playerghost") then
+                    not owner:HasTag("playerghost")
+                then
+                    local skin = inst.components.skinedlegion:GetSkinedData()
+                    if skin ~= nil then
+                        owner.butterfly_skin_l = skin.butterfly
+                    end
+
                     owner.components.debuffable:AddDebuff("buff_butterflysblessing", "buff_butterflysblessing")
                 end
                 inst.attackTrigger = 0
@@ -111,18 +145,17 @@ end
 
 local function onfinished(inst)
     if not inst.hasSetBroken then
+        inst.hasSetBroken = true
+        inst.attackTrigger = 0
         inst.components.weapon:SetDamage(TUNING.TORCH_DAMAGE)   --17攻击力
         inst.components.weapon:SetOnAttack(nil)
 
-        --改变物品栏图片，先改atlasname，再改贴图
-        inst.components.inventoryitem.atlasname = "images/inventoryimages/neverfade_broken.xml"
-        inst.components.inventoryitem:ChangeImageName("neverfade_broken")
-
+        ChangeInvImg(inst, inst.components.skinedlegion:GetSkinedData())
         -- inst.components.equippable.dapperness = 0
         if inst.components.equippable:IsEquipped() then
             local owner = inst.components.inventoryitem.owner
             if owner ~= nil then
-                owner.AnimState:OverrideSymbol("swap_object", "swap_neverfade_broken", "swap_neverfade_broken")
+                ChangeSymbol(inst, owner, inst.components.skinedlegion:GetSkinedData())
 
                 if owner.components.health ~= nil then
                     owner.components.health.redirect = inst.healthRedirect_old
@@ -134,9 +167,6 @@ local function onfinished(inst)
                 end
             end
         end
-
-        inst.hasSetBroken = true
-        inst.attackTrigger = 0
     end
 end
 
@@ -146,14 +176,12 @@ local function OnRecovered(inst) --每次被剑鞘恢复时执行的函数
         inst.components.finiteuses:SetUses(newvalue)
 
         if inst.hasSetBroken then
+            inst.hasSetBroken = false
+
             inst.components.weapon:SetDamage(55)
             inst.components.weapon:SetOnAttack(onattack)
 
-            --改变物品栏图片，先改atlasname，再改贴图
-            inst.components.inventoryitem.atlasname = "images/inventoryimages/neverfade.xml"
-            inst.components.inventoryitem:ChangeImageName("neverfade")
-
-            inst.hasSetBroken = false
+            ChangeInvImg(inst, inst.components.skinedlegion:GetSkinedData())
         end
     end
 
@@ -166,6 +194,11 @@ end
 local function ondeploy(inst, pt, deployer) --这里是右键种植时的函数
     local tree = SpawnPrefab("neverfadebush")
     if tree ~= nil then
+        local linkdata = inst.components.skinedlegion:GetLinkedSkins() or nil
+        if linkdata ~= nil and tree.components.skinedlegion ~= nil then
+            tree.components.skinedlegion:SetSkin(linkdata.bush)
+        end
+
         tree.Transform:SetPosition(pt:Get())
         inst:Remove()
         tree.components.pickable:OnTransplant()
@@ -196,12 +229,8 @@ local function fn()
     --weapon (from weapon component) added to pristine state for optimization
     inst:AddTag("weapon")
 
-    MakeInventoryFloatable(inst, "med", 0.4, 0.5)
-    local OnLandedClient_old = inst.components.floater.OnLandedClient
-    inst.components.floater.OnLandedClient = function(self)
-        OnLandedClient_old(self)
-        self.inst.AnimState:SetFloatParams(0.12, 1, 0.1)
-    end
+    inst:AddComponent("skinedlegion")
+    inst.components.skinedlegion:InitWithFloater("neverfade") --客户端才初始化时居然获取不了inst.prefab
 
     inst.entity:SetPristine()
 
@@ -240,6 +269,8 @@ local function fn()
     inst.components.deployable:SetDeploySpacing(DEPLOYSPACING.MEDIUM)   --草根一样的种植所需范围
 
     MakeHauntableLaunch(inst)  --作祟相关函数
+
+    inst.components.skinedlegion:SetOnPreLoad()
 
     return inst
 end

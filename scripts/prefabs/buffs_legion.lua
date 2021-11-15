@@ -246,10 +246,22 @@ MakeBuff({
 --[[ 蝴蝶庇佑：100%抵挡一次任何攻击 ]]
 --------------------------------------------------------------------------
 
-local function SpawnButterfly(target)
+local function GetSkin(buff, player)
+    if player.butterfly_skin_l ~= nil then
+        return player.butterfly_skin_l
+    end
+end
+
+local function SpawnButterfly(buff, target)
     local butterfly = SpawnPrefab("neverfade_butterfly")
     if target.components.leader ~= nil then
         target.components.leader:AddFollower(butterfly)
+
+        local skin = GetSkin(buff, target)
+        if skin ~= nil then
+            butterfly.AnimState:SetBank(skin.bank)
+            butterfly.AnimState:SetBuild(skin.build)
+        end
 
         local x, y, z = target.Transform:GetWorldPosition()
         local x2, y2, z2 = GetCalculatedPos_legion(x, y, z, 1+math.random()*2, nil)
@@ -262,7 +274,7 @@ end
 
 local function AddButterfly(buff, player)
     buff.countbutterflies = buff.countbutterflies + 1
-    buff.blessingbutterflies[buff.countbutterflies] = SpawnButterfly(player)
+    buff.blessingbutterflies[buff.countbutterflies] = SpawnButterfly(buff, player)
     player.countblessing = buff.countbutterflies --更新玩家的数据
 end
 

@@ -14,6 +14,7 @@ table.insert(Assets, Asset("ANIM", "anim/images_minisign_skins.zip"))
 
 local rarityRepay = "ProofOfPurchase"
 local rarityFree = "Event"
+local raritySpecial = "HeirloomElegant"
 
 _G.SKIN_PREFABS_LEGION = {
     --[[
@@ -51,20 +52,6 @@ _G.SKIN_PREFABS_LEGION = {
     },
     ]]--
 
-    hat_lichen = {
-        assets = nil,
-        image = { name = nil, atlas = nil, setable = true, },
-        anim = {
-            bank = nil, build = nil,
-            anim = nil, isloop_anim = nil, animpush = nil, isloop_animpush = nil,
-            setable = true,
-        },
-        equip = { symbol = "swap_hat", build = "hat_lichen", file = "swap_hat" },
-        exchangefx = { prefab = nil, offset_y = nil, scale = nil },
-        floater = {
-            cut = 0.03, size = "med", offset_y = 0.2, scale = 0.5, nofx = nil,
-        },
-    },
     rosebush = {
         assets = nil,
         fn_anim = function(inst)
@@ -81,6 +68,63 @@ _G.SKIN_PREFABS_LEGION = {
         end,
         exchangefx = { prefab = nil, offset_y = nil, scale = 1.5 },
     },
+    orchidbush = {
+        assets = nil,
+        fn_anim = function(inst)
+            inst.AnimState:SetBank("berrybush2")
+            inst.AnimState:SetBuild("orchidbush")
+        end,
+        exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
+    },
+
+    neverfade = {
+        assets = nil,
+        anim = {
+            bank = nil, build = nil,
+            anim = nil, isloop_anim = nil, animpush = nil, isloop_animpush = nil,
+            setable = true,
+        },
+        fn_start = function(inst)
+            if inst.hasSetBroken then
+                inst.components.inventoryitem.atlasname = "images/inventoryimages/neverfade_broken.xml"
+                inst.components.inventoryitem:ChangeImageName("neverfade_broken")
+            else
+                inst.components.inventoryitem.atlasname = "images/inventoryimages/neverfade.xml"
+                inst.components.inventoryitem:ChangeImageName("neverfade")
+            end
+        end,
+        equip = {
+            symbol = "swap_object", build = "swap_neverfade", file = "swap_neverfade",
+            build_broken = "swap_neverfade_broken", file_broken = "swap_neverfade_broken"
+        },
+        exchangefx = { prefab = nil, offset_y = nil, scale = nil },
+        floater = {
+            cut = 0.12, size = "med", offset_y = 0.4, scale = 0.5, nofx = nil,
+        },
+    },
+    neverfadebush = {
+        assets = nil,
+        fn_anim = function(inst)
+            inst.AnimState:SetBank("berrybush2")
+            inst.AnimState:SetBuild("neverfadebush")
+        end,
+        exchangefx = { prefab = nil, offset_y = 0.9, scale = nil },
+    },
+
+    hat_lichen = {
+        assets = nil,
+        image = { name = nil, atlas = nil, setable = true, },
+        anim = {
+            bank = nil, build = nil,
+            anim = nil, isloop_anim = nil, animpush = nil, isloop_animpush = nil,
+            setable = true,
+        },
+        equip = { symbol = "swap_hat", build = "hat_lichen", file = "swap_hat" },
+        exchangefx = { prefab = nil, offset_y = nil, scale = nil },
+        floater = {
+            cut = 0.03, size = "med", offset_y = 0.2, scale = 0.5, nofx = nil,
+        },
+    },
 }
 
 _G.SKINS_LEGION = {
@@ -95,6 +139,7 @@ _G.SKINS_LEGION = {
 
         skin_idx = 1, --只能我来确定的数据了，谁叫[key]形式的下标不能按代码顺序呢
         skin_id = "61627d927bbb727be174c4a0",
+        noshopshow = nil, --为true的话，就不在鸡毛铺里展示
 		assets = { --仅仅是用于初始化注册
 			Asset("ANIM", "anim/skin/swap_spear_mirrorrose.zip"),
 			Asset("ANIM", "anim/skin/spear_mirrorrose.zip"),
@@ -148,38 +193,6 @@ _G.SKINS_LEGION = {
     },
     ]]--
 
-    hat_lichen_emo_que = {
-        base_prefab = "hat_lichen",
-		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
-
-        skin_idx = 3,
-        skin_id = "61909c584c724c6f40e779fa",
-		assets = {
-			Asset("ANIM", "anim/skin/hat_lichen_emo_que.zip"),
-		},
-		image = { name = nil, atlas = nil, setable = true, },
-
-        string = ischinese and {
-            name = "“困惑”发卡", collection = "EMOTICON", access = "DONATE",
-            descitem = "解锁“苔衣发卡”皮肤。",
-            description = "我有个疑问。不对，我为啥会有这个想法？就在我想提出问题时，心里就会有个阴影质疑我的问题：“你提出这些问题难道不该想想是你自己的问题还是真的有问题”。然后我又会问它，凭什么你这个问题觉得我的问题有问题！",
-        } or {
-            name = "Question Hairpin", collection = "EMOTICON", access = "DONATE",
-            descitem = "Unlock \"Lichen Hairpin\" skin.",
-            description = "The story was not translated.",
-        },
-
-		anim = {
-            bank = nil, build = nil,
-            anim = nil, isloop_anim = nil, animpush = nil, isloop_animpush = nil,
-            setable = true,
-        },
-        equip = { symbol = "swap_hat", build = "hat_lichen_emo_que", file = "swap_hat" },
-        exchangefx = { prefab = nil, offset_y = nil, scale = nil },
-        floater = {
-            cut = 0.03, size = "small", offset_y = 0.15, scale = 0.5, nofx = nil,
-        },
-    },
     rosebush_marble = {
         base_prefab = "rosebush",
 		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
@@ -193,8 +206,8 @@ _G.SKINS_LEGION = {
 
         string = ischinese and {
             name = "理盛赤蔷", collection = "MARBLE", access = "DONATE",
-            descitem = "解锁“蔷薇花丛”皮肤。",
-            description = "这个故事我读了大概。她为爱痴狂，执拗地追求心上人。",
+            descitem = "解锁\"蔷薇花丛\"皮肤。",
+            description = "故事还没写好。",
         } or {
             name = "Rose Marble Pot", collection = "MARBLE", access = "DONATE",
             descitem = "Unlock \"Rose Bush\" skin.",
@@ -221,10 +234,10 @@ _G.SKINS_LEGION = {
 
         string = ischinese and {
             name = "理盛截莲", collection = "MARBLE", access = "DONATE",
-            descitem = "解锁“蹄莲花丛”皮肤。",
-            description = "这个故事我读了大概。她为爱痴狂，执拗地追求心上人。",
+            descitem = "解锁\"蹄莲花丛\"皮肤。",
+            description = "故事还没写好。",
         } or {
-            name = "Rose Marble Pot", collection = "MARBLE", access = "DONATE",
+            name = "Lily Marble Pot", collection = "MARBLE", access = "DONATE",
             descitem = "Unlock \"Lily Bush\" skin.",
             description = "The story was not translated.",
         },
@@ -234,6 +247,144 @@ _G.SKINS_LEGION = {
             inst.AnimState:SetBuild("lilybush_marble")
         end,
         exchangefx = { prefab = nil, offset_y = nil, scale = nil },
+    },
+    orchidbush_marble = {
+        base_prefab = "orchidbush",
+		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
+
+        skin_idx = 3,
+        skin_id = "6191d0514c724c6f40e77eb9",
+		assets = {
+            Asset("ANIM", "anim/berrybush.zip"), --官方浆果丛动画
+			Asset("ANIM", "anim/skin/orchidbush_marble.zip"),
+		},
+
+        string = ischinese and {
+            name = "理盛瀑兰", collection = "MARBLE", access = "DONATE",
+            descitem = "解锁\"兰草花丛\"皮肤。",
+            description = "故事还没写好。",
+        } or {
+            name = "Orchid Marble Pot", collection = "MARBLE", access = "DONATE",
+            descitem = "Unlock \"Orchid Bush\" skin.",
+            description = "The story was not translated.",
+        },
+
+		fn_anim = function(inst)
+            inst.AnimState:SetBank("berrybush")
+            inst.AnimState:SetBuild("orchidbush_marble")
+        end,
+        exchangefx = { prefab = nil, offset_y = 1.3, scale = nil },
+    },
+
+    neverfade_thanks = {
+        base_prefab = "neverfade",
+		type = "item", skin_tags = {}, release_group = 555, rarity = raritySpecial,
+
+        skin_idx = 4,
+        skin_id = "6191d8f74c724c6f40e77ed0",
+		assets = {
+			Asset("ANIM", "anim/skin/neverfade_thanks.zip"),
+            Asset("ANIM", "anim/skin/neverfade_butterfly_thanks.zip"),
+            Asset("ATLAS", "images/inventoryimages_skin/neverfade_thanks.xml"),
+            Asset("IMAGE", "images/inventoryimages_skin/neverfade_thanks.tex"),
+            Asset("ATLAS", "images/inventoryimages_skin/neverfade_thanks_broken.xml"),
+            Asset("IMAGE", "images/inventoryimages_skin/neverfade_thanks_broken.tex"),
+            Asset("ATLAS", "images/inventoryimages_skin/foliageath_neverfade_thanks.xml"),
+            Asset("IMAGE", "images/inventoryimages_skin/foliageath_neverfade_thanks.tex"),
+		},
+
+        string = ischinese and {
+            name = "扶伤", collection = "THANKS", access = "SPECIAL",
+            descitem = "解锁\"永不凋零\"、\"永不凋零花丛\"、\"庇佑蝴蝶\"以及入鞘后的皮肤。",
+            description = "感谢大家支持，故事还没写好。",
+        } or {
+            name = "FuShang", collection = "THANKS", access = "SPECIAL",
+            descitem = "Unlock \"Neverfade\", \"Neverfade Bush\", and \"Neverfade Butterfly\" skin.",
+            description = "The story was not translated.",
+        },
+
+		anim = {
+            bank = nil, build = nil,
+            anim = nil, isloop_anim = nil, animpush = nil, isloop_animpush = nil,
+            setable = true,
+        },
+        fn_start = function(inst)
+            if inst.hasSetBroken then
+                inst.components.inventoryitem.atlasname = "images/inventoryimages_skin/neverfade_thanks_broken.xml"
+                inst.components.inventoryitem:ChangeImageName("neverfade_thanks_broken")
+            else
+                inst.components.inventoryitem.atlasname = "images/inventoryimages_skin/neverfade_thanks.xml"
+                inst.components.inventoryitem:ChangeImageName("neverfade_thanks")
+            end
+        end,
+        equip = {
+            symbol = "swap_object", build = "neverfade_thanks", file = "normal_swap",
+            build_broken = "neverfade_thanks", file_broken = "broken_swap"
+        },
+        scabbard = {
+            anim = "idle_cover", bank = "neverfade_thanks", build = "neverfade_thanks",
+            image = "foliageath_neverfade_thanks", atlas = "images/inventoryimages_skin/foliageath_neverfade_thanks.xml",
+        },
+        butterfly = { bank = "butterfly", build = "neverfade_butterfly_thanks" },
+        exchangefx = { prefab = nil, offset_y = nil, scale = nil },
+        floater = {
+            cut = 0.12, size = "med", offset_y = 0.4, scale = 0.5, nofx = nil,
+        },
+        linkedskins = { bush = "neverfadebush_thanks" },
+    },
+    neverfadebush_thanks = {
+        base_prefab = "neverfadebush",
+		type = "item", skin_tags = {}, release_group = 555, rarity = raritySpecial,
+
+        skin_idx = 4,
+        skin_id = "6191d8f74c724c6f40e77ed0",
+        noshopshow = true,
+		assets = {
+			Asset("ANIM", "anim/skin/neverfadebush_thanks.zip"),
+		},
+        string = {
+            name = ischinese and "扶伤剑冢" or "FuShang Tomb", collection = "THANKS", access = "SPECIAL",
+        },
+
+		fn_anim = function(inst)
+            inst.AnimState:SetBank("neverfadebush_thanks")
+            inst.AnimState:SetBuild("neverfadebush_thanks")
+        end,
+        exchangefx = { prefab = nil, offset_y = 1.2, scale = nil },
+        linkedskins = { sword = "neverfade_thanks", },
+    },
+
+    hat_lichen_emo_que = {
+        base_prefab = "hat_lichen",
+		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
+
+        skin_idx = 5,
+        skin_id = "61909c584c724c6f40e779fa",
+		assets = {
+			Asset("ANIM", "anim/skin/hat_lichen_emo_que.zip"),
+		},
+		image = { name = nil, atlas = nil, setable = true, },
+
+        string = ischinese and {
+            name = "\"困惑\"发卡", collection = "EMOTICON", access = "DONATE",
+            descitem = "解锁\"苔衣发卡\"皮肤。",
+            description = "我有个疑问。不对，我为啥会有这个想法？就在我想提出问题时，心里就会有个阴影质疑我的问题：\"你提出这些问题难道不该想想是你自己的问题还是真的有问题\"。然后我又会问它，凭什么你这个问题觉得我的问题有问题！",
+        } or {
+            name = "Question Hairpin", collection = "EMOTICON", access = "DONATE",
+            descitem = "Unlock \"Lichen Hairpin\" skin.",
+            description = "The story was not translated.",
+        },
+
+		anim = {
+            bank = nil, build = nil,
+            anim = nil, isloop_anim = nil, animpush = nil, isloop_animpush = nil,
+            setable = true,
+        },
+        equip = { symbol = "swap_hat", build = "hat_lichen_emo_que", file = "swap_hat" },
+        exchangefx = { prefab = nil, offset_y = nil, scale = nil },
+        floater = {
+            cut = 0.03, size = "small", offset_y = 0.15, scale = 0.5, nofx = nil,
+        },
     },
 }
 
@@ -262,6 +413,7 @@ if ischinese then
             UNKNOWN = "无法获取",
             DONATE = "通过打赏获取",
             FREE = "自动获取",
+            SPECIAL = "通过特殊方式获取",
         },
     }
 else
@@ -281,6 +433,7 @@ else
             UNKNOWN = "Unable to get",
             DONATE = "Get it by donation",
             FREE = "Free access",
+            SPECIAL = "Get it by special ways",
         },
     }
 end
@@ -364,10 +517,12 @@ for skinname,v in pairs(_G.SKINS_LEGION) do
     STRINGS.SKIN_NAMES[skinname] = v.string.name
 
     ------修改PREFAB_SKINS(在prefabskins.lua中被定义)
-    if _G.PREFAB_SKINS[v.base_prefab] == nil then
-        _G.PREFAB_SKINS[v.base_prefab] = { skinname }
-    else
-        table.insert(_G.PREFAB_SKINS[v.base_prefab], skinname)
+    if v.base_prefab ~= nil then
+        if _G.PREFAB_SKINS[v.base_prefab] == nil then
+            _G.PREFAB_SKINS[v.base_prefab] = { skinname }
+        else
+            table.insert(_G.PREFAB_SKINS[v.base_prefab], skinname)
+        end
     end
 end
 for baseprefab,v in pairs(_G.SKIN_PREFABS_LEGION) do

@@ -86,6 +86,14 @@ function SkinedLegion:GetSkinedData()
 	return self._skindata
 end
 
+function SkinedLegion:GetLinkedSkins()
+	if self._skindata ~= nil then
+		return self._skindata.linkedskins
+	else
+		return nil
+	end
+end
+
 function SkinedLegion:Init(prefab)
 	self._skindata = SKIN_PREFABS_LEGION[prefab]
 end

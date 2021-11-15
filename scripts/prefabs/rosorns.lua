@@ -7,12 +7,7 @@ local assets =
 }
 
 local function OnEquip(inst, owner)
-    local skindata = inst.components.skinedlegion:GetSkinedData()
-    if skindata ~= nil and skindata.equip ~= nil then
-        owner.AnimState:OverrideSymbol("swap_object", skindata.equip.build, skindata.equip.file)
-    else
-        owner.AnimState:OverrideSymbol("swap_object", "swap_rosorns", "swap_rosorns")
-    end
+    owner.AnimState:OverrideSymbol("swap_object", "swap_rosorns", "swap_rosorns")
     owner.AnimState:Show("ARM_carry")
     owner.AnimState:Hide("ARM_normal")
 end
@@ -93,10 +88,10 @@ local function onattack(inst, owner, target)    --攻击直接扣血，而不考
             )
         end
 
-        local skindata = inst.components.skinedlegion:GetSkinedData()
-        if skindata ~= nil and skindata.fn_onAttack ~= nil then
-            skindata.fn_onAttack(inst, owner, target)
-        end
+        -- local skindata = inst.components.skinedlegion:GetSkinedData()
+        -- if skindata ~= nil and skindata.fn_onAttack ~= nil then
+        --     skindata.fn_onAttack(inst, owner, target)
+        -- end
     end
 end
 
@@ -121,8 +116,12 @@ local function fn()
     --weapon (from weapon component) added to pristine state for optimization
     inst:AddTag("weapon")
 
-    inst:AddComponent("skinedlegion")
-    inst.components.skinedlegion:InitWithFloater("rosorns") --客户端才初始化时居然获取不了inst.prefab
+    MakeInventoryFloatable(inst, "small", 0.4, 0.5)
+    local OnLandedClient_old = inst.components.floater.OnLandedClient
+    inst.components.floater.OnLandedClient = function(self)
+        OnLandedClient_old(self)
+        self.inst.AnimState:SetFloatParams(0.15, 1, 0.1)
+    end
 
     inst.entity:SetPristine()
     if not TheWorld.ismastersim then
@@ -149,8 +148,6 @@ local function fn()
     inst.components.perishable.onperishreplacement = "spoiled_food"
 
     MakeHauntableLaunchAndPerish(inst)
-
-    inst.components.skinedlegion:SetOnPreLoad()
 
     return inst
 end
