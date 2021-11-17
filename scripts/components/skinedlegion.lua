@@ -275,6 +275,12 @@ function SkinedLegion:OnSetSkinServer(skindata, skindata_last)
 				inst.components.floater:OnLandedClient()
 			end
 		end
+		--placer
+		if skindata.placer ~= nil then
+			inst.overridedeployplacername = skindata.placer.name
+		else
+			inst.overridedeployplacername = nil
+		end
 
 		if skindata.fn_start ~= nil then
 			skindata.fn_start(inst)
@@ -300,6 +306,12 @@ function SkinedLegion:OnSetSkinClient(skindata, skindata_last)
 				inst.components.floater:OnNoLongerLandedClient()
 				inst.components.floater:OnLandedClient()
 			end
+		end
+		--placer
+		if skindata.placer ~= nil then
+			inst.overridedeployplacername = skindata.placer.name
+		else
+			inst.overridedeployplacername = nil
 		end
 	end
 end

@@ -114,6 +114,15 @@ local function MakeConstruct(data)
         end
         return nil
     end
+    local function GiveItemBack(inst, giver, item)
+        if giver and giver.components.inventory ~= nil then
+            -- item.prevslot = nil
+            -- item.prevcontainer = nil
+            giver.components.inventory:GiveItem(item, nil, giver:GetPosition() or nil)
+        else
+            item.Transform:SetPosition(inst.Transform:GetWorldPosition())
+        end
+    end
 
     local function DoFunction(inst, doit)
         if inst.task_function ~= nil then
@@ -265,18 +274,20 @@ local function MakeConstruct(data)
                         true
                     )
 
-                    if item.components.finiteuses ~= nil then
+                    if item.components.fertilizer ~= nil then
+                        item.components.fertilizer:OnApplied(giver, inst) --删除以及特殊机制就在其中
+                        if item.components.finiteuses ~= nil and item.components.finiteuses:GetUses() > 0 then
+                            GiveItemBack(inst, giver, item)
+                        end
+                        return
+                    elseif item.components.finiteuses ~= nil then
                         if item.prefab == "wateringcan" or item.prefab == "premiumwateringcan" then
                             item.components.finiteuses:Use(1000)
                         else
                             item.components.finiteuses:Use(1)
                         end
-                        if giver and giver.components.inventory ~= nil then
-                            -- item.prevslot = nil
-                            -- item.prevcontainer = nil
-                            giver.components.inventory:GiveItem(item, nil, giver:GetPosition() or nil)
-                            return
-                        end
+                        GiveItemBack(inst, giver, item)
+                        return
                     end
                 end
 

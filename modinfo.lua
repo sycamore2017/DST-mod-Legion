@@ -6,7 +6,7 @@ local L = locale ~= "zh" and locale ~= "zhr" --true-英文; false-中文
 --     zh = "[DST] 棱镜",
 -- })
 
-name = L and "[DST] Legion(test)" or "[DST] 棱镜(test)"
+name = L and "[DST] Legion" or "[DST] 棱镜"
 author = "ti_Tout"
 version = "6.8.3" --每次更新时为了上传必须更改
 description =

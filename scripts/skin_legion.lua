@@ -79,6 +79,7 @@ _G.SKIN_PREFABS_LEGION = {
 
     neverfade = {
         assets = nil,
+        image = { name = nil, atlas = nil, setable = false, },
         anim = {
             bank = nil, build = nil,
             anim = nil, isloop_anim = nil, animpush = nil, isloop_animpush = nil,
@@ -190,6 +191,7 @@ _G.SKINS_LEGION = {
             -- },
             -- fn_anim = function(inst)end, --处于水中时的动画设置，替换anim的默认方式
         },
+        placer = { name = nil, bank = nil, build = nil, anim = "dead" }, --自定义的placer
     },
     ]]--
 
@@ -207,7 +209,7 @@ _G.SKINS_LEGION = {
         string = ischinese and {
             name = "理盛赤蔷", collection = "MARBLE", access = "DONATE",
             descitem = "解锁\"蔷薇花丛\"皮肤。",
-            description = "故事还没写好。",
+            description = "他和妻子辛苦半生，买下一个不知名庄园。庄园幽静，有些偏僻，但很快便被幸福浸满。他喜欢园艺，常和孩子一起用蔷薇等花束将庄园装点。好羡慕，曾经那么热闹非凡。他离世后，孩子卖掉庄园离开。好遗憾，只剩稀疏红蔷绽放证明着曾经的幸福。",
         } or {
             name = "Rose Marble Pot", collection = "MARBLE", access = "DONATE",
             descitem = "Unlock \"Rose Bush\" skin.",
@@ -235,7 +237,7 @@ _G.SKINS_LEGION = {
         string = ischinese and {
             name = "理盛截莲", collection = "MARBLE", access = "DONATE",
             descitem = "解锁\"蹄莲花丛\"皮肤。",
-            description = "故事还没写好。",
+            description = "她和自己的\"孩子们\"被强制带到庄园。庄园幽静，非常偏僻，但很快变得喧闹不已，孩子们可喜欢这里了。照顾小孩的工作可不容易，也经常见她在水池边种小簇蹄莲。越种越多，喧闹声也逐渐不见踪影。感觉到自己命不久矣，她给自己也种了一簇。",
         } or {
             name = "Lily Marble Pot", collection = "MARBLE", access = "DONATE",
             descitem = "Unlock \"Lily Bush\" skin.",
@@ -292,6 +294,7 @@ _G.SKINS_LEGION = {
             Asset("ATLAS", "images/inventoryimages_skin/foliageath_neverfade_thanks.xml"),
             Asset("IMAGE", "images/inventoryimages_skin/foliageath_neverfade_thanks.tex"),
 		},
+        image = { name = nil, atlas = nil, setable = false, },
 
         string = ischinese and {
             name = "扶伤", collection = "THANKS", access = "SPECIAL",
@@ -328,9 +331,10 @@ _G.SKINS_LEGION = {
         butterfly = { bank = "butterfly", build = "neverfade_butterfly_thanks" },
         exchangefx = { prefab = nil, offset_y = nil, scale = nil },
         floater = {
-            cut = 0.12, size = "med", offset_y = 0.4, scale = 0.5, nofx = nil,
+            cut = 0.05, size = "small", offset_y = 0.15, scale = 0.5, nofx = nil,
         },
         linkedskins = { bush = "neverfadebush_thanks" },
+        placer = { name = nil, bank = "neverfadebush_thanks", build = "neverfadebush_thanks", anim = "dead" },
     },
     neverfadebush_thanks = {
         base_prefab = "neverfadebush",
@@ -508,6 +512,32 @@ for skinname,v in pairs(_G.SKINS_LEGION) do
     if v.exchangefx ~= nil then
         if v.exchangefx.prefab == nil then
             v.exchangefx.prefab = "explode_reskin"
+        end
+    end
+    if v.placer ~= nil then
+        if v.placer.name == nil then
+            v.placer.name = skinname.."_placer"
+        end
+        if v.anim ~= nil then
+            if v.placer.bank == nil then
+                v.placer.bank = v.anim.bank
+            end
+            if v.placer.build == nil then
+                v.placer.build = v.anim.build
+            end
+            if v.placer.anim == nil then
+                v.placer.anim = v.anim.anim
+            end
+        else
+            if v.placer.bank == nil then
+                v.placer.bank = skinname
+            end
+            if v.placer.build == nil then
+                v.placer.build = skinname
+            end
+            if v.placer.anim == nil then
+                v.placer.anim = "idle"
+            end
         end
     end
 

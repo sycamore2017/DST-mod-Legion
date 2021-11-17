@@ -249,6 +249,21 @@ MakeBuff({
 local function GetSkin(buff, player)
     if player.butterfly_skin_l ~= nil then
         return player.butterfly_skin_l
+    elseif buff.flyskins ~= nil then
+        local kk = nil
+        local vv = nil
+        for k,v in pairs(buff.flyskins) do
+            if v ~= nil then
+                vv = v
+                kk = k
+            end
+        end
+        if kk == nil then
+            buff.flyskins = nil
+        else
+            buff.flyskins[kk] = nil
+        end
+        return vv
     end
 end
 
@@ -258,9 +273,10 @@ local function SpawnButterfly(buff, target)
         target.components.leader:AddFollower(butterfly)
 
         local skin = GetSkin(buff, target)
-        if skin ~= nil then
+        if skin ~= nil and skin.bank ~= nil and skin.build ~= nil then
             butterfly.AnimState:SetBank(skin.bank)
             butterfly.AnimState:SetBuild(skin.build)
+            butterfly.skin_l = skin
         end
 
         local x, y, z = target.Transform:GetWorldPosition()
@@ -350,15 +366,30 @@ MakeBuff({
         buff.precount = nil --记录保存下的数量（OnLoad()比OnAttached()先执行）
         buff.countbutterflies = 0 --记录蝴蝶的数量，并作为下标
         buff.blessingbutterflies = {} --记录了每只蝴蝶的数据
+        buff.flyskins = nil
 
         buff.OnSave = function(inst, data)
             if inst.countbutterflies >= 2 then --只保存大于1数量的数量，因为初始化时本身肯定就有1只蝴蝶
                 data.countbutterflies = inst.countbutterflies
             end
+
+            local flyskins = nil
+            for k,v in pairs(inst.blessingbutterflies) do
+                if v and not v.dead and v.skin_l ~= nil then
+                    if flyskins == nil then
+                        flyskins = {}
+                    end
+                    table.insert(flyskins, v.skin_l)
+                end
+            end
+            if flyskins ~= nil then
+                data.flyskins = flyskins
+            end
         end
         buff.OnLoad = function(inst, data)
-            if data ~= nil and data.countbutterflies ~= nil then
+            if data ~= nil then
                 inst.precount = data.countbutterflies
+                inst.flyskins = data.flyskins
             end
         end
     end,
