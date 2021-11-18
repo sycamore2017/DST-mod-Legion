@@ -117,7 +117,7 @@ _G.SKIN_PREFABS_LEGION = {
         image = { name = nil, atlas = nil, setable = true, },
         anim = {
             bank = nil, build = nil,
-            anim = nil, isloop_anim = nil, animpush = nil, isloop_animpush = nil,
+            anim = "anim", isloop_anim = nil, animpush = nil, isloop_animpush = nil,
             setable = true,
         },
         equip = { symbol = "swap_hat", build = "hat_lichen", file = "swap_hat" },
@@ -264,7 +264,7 @@ _G.SKINS_LEGION = {
         string = ischinese and {
             name = "理盛瀑兰", collection = "MARBLE", access = "DONATE",
             descitem = "解锁\"兰草花丛\"皮肤。",
-            description = "故事还没写好。",
+            description = "这庄园是最近令他欣喜的发现。庄园幽深，远离人烟，古典的大理石装潢，长满了各色花草，着实令这个隐居者着迷。他走遍庄园，看见了大厅的破烂玩具与黑板，卧室里发黄全家福，后山有长着兰草的墓碑。庄园无声述说着历史的变迁。",
         } or {
             name = "Orchid Marble Pot", collection = "MARBLE", access = "DONATE",
             descitem = "Unlock \"Orchid Bush\" skin.",
@@ -645,8 +645,9 @@ AddClassPostConstruct("widgets/recipepopup", function(self)
             return GetSkinsList_old(self, ...)
         end
 
-        GetSkinsList_old(self, ...)
+        ----!!!希望 The Architect Pack 能改一下代码写法，应该只修改自己mod里的东西而不是把其他mod的东西也改了
         if self.recipe and SKIN_PREFABS_LEGION[self.recipe.product] and PREFAB_SKINS[self.recipe.product] then
+            self.skins_list = {}
             for _, skinname in pairs(PREFAB_SKINS[self.recipe.product]) do
                 if DoYouHaveSkin(skinname, self.owner.userid) then
                     local data  = {
@@ -658,11 +659,14 @@ AddClassPostConstruct("widgets/recipepopup", function(self)
                     table.insert(self.skins_list, data)
                 end
             end
+            return self.skins_list
+        else
+            return GetSkinsList_old(self, ...)
         end
-
-        return self.skins_list
     end
 end)
+
+--undo：建筑的皮肤placer请看playercontroller.StartBuildPlacementMode
 
 --------------------------------------------------------------------------
 --[[ 给玩家实体增加已有皮肤获取与管理机制
