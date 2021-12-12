@@ -196,13 +196,24 @@ function SkinedLegion:SetOnPreLoad(onpreloadfn) --提前加载皮肤数据，好
 	end
 end
 
-function SkinedLegion:SpawnSkinExchangeFx(skinname)
+function SkinedLegion:SpawnSkinExchangeFx(skinname, tool)
 	local skindata = skinname == nil and self._skindata or self:GetSkinData(skinname)
 	if skindata ~= nil then
 		if skindata.fn_spawnSkinExchangeFx ~= nil then
 			skindata.fn_spawnSkinExchangeFx(self.inst)
 		elseif skindata.exchangefx ~= nil then
-			local fx = SpawnPrefab(skindata.exchangefx.prefab)
+			local fx = nil
+			if skindata.exchangefx.prefab ~= nil then
+				fx = SpawnPrefab(skindata.exchangefx.prefab)
+			elseif tool ~= nil then
+				fx = "explode_reskin"
+				local skin_fx = SKIN_FX_PREFAB[tool:GetSkinName()]
+				if skin_fx ~= nil and skin_fx[1] ~= nil then
+					fx = skin_fx[1]
+				end
+				fx = SpawnPrefab(fx)
+			end
+
 			if fx ~= nil then
 				if skindata.exchangefx.scale ~= nil then
 					fx.Transform:SetScale(skindata.exchangefx.scale, skindata.exchangefx.scale, skindata.exchangefx.scale)

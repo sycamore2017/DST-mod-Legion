@@ -3,25 +3,32 @@
 --------------------------------------------------------------------------
 
 --[[
-*【棱镜鸡毛铺】
-（1）在“审视自我”面板增加了一个小按钮，点击可进入棱镜鸡毛铺
-*【美味佳肴】
-（1）修复食用无糖捣蛋鬼蛋糕引发的崩溃
-*【电闪雷鸣】
-（1）灵魂契约不会再尝试给旺达加血了
-*【丰饶传说】
-（1）新增建筑：子圭·利川、子圭·益矩。管理你的农田与作物
-*【mod兼容】
-（1）【智能小木牌】兼容了月藏宝匣
-（2）【神话书说】幻化机制能应用到神话书说大部分装备了(人物专属道具除外)
-
 *【鸡毛铺】
-（1）修复苔衣发卡皮肤地面动画隐藏问题
-（2）
+（1）离线模式下不支持皮肤功能了
+（2）皮肤界面不再展示玩家未拥有的特殊获取方式的皮肤
+（3）扫把切换棱镜皮肤时也能应用扫把的皮肤特效了
 *【mod兼容】
-（1）未兼容：使用【Too Many Items Plus】直接生成带皮肤的三花花丛会崩溃
-（2）未兼容：【The Architect Pack】与棱镜的皮肤系统完全不兼容，它的写法有问题，也不好兼容
-（3）已兼容：【多肉植物！】修复崩溃问题
+（1）
+
+--新道具和雕像的幻化兼容
+--皮肤历史记录，用来花丛栽种placer优化
+
+--兼容青竹洲商店：
+if CONFIGS_LEGION ~= nil then --开启了《棱镜》
+    local chancemap = { 1, 3, 7, 10, 15}
+    AddBambooShopItems("rareitem", {
+        tourmalinecore = { --电气石
+            img_tex = "tourmalinecore.tex", img_atlas = "images/inventoryimages/tourmalinecore.xml",
+            buy = { value = 320, chance = chancemap[1], count_min = 1, count_max = 1, stacksize = 5, },
+            sell = { value = 160, chance = chancemap[1], count_min = 1, count_max = 1, stacksize = 5, },
+        },
+        shyerrylog = { --宽大的木墩
+            img_tex = "shyerrylog.tex", img_atlas = "images/inventoryimages/shyerrylog.xml",
+            buy = { value = 4, chance = chancemap[5], count_min = 3, count_max = 6, stacksize = 20, },
+            sell = { value = 2, chance = chancemap[5], count_min = 4, count_max = 8, stacksize = 20, },
+        }
+    })
+end
 ]]
 
 --------------------------------------------------------------------------
@@ -548,7 +555,9 @@ end)
 --[[ 皮肤 ]]
 --------------------------------------------------------------------------
 
-modimport("scripts/skin_legion.lua") --skined_legion
+if TheNet:IsOnlineMode() then --离线模式不能有皮肤功能(因为离线模式下的klei账户ID与联网模式下的不一样)
+    modimport("scripts/skin_legion.lua") --skined_legion
+end
 
 --------------------------------------------------------------------------
 --[[ mod之间的兼容 ]]

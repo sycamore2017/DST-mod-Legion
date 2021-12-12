@@ -138,9 +138,10 @@ _G.SKINS_LEGION = {
 		release_group = 555,
 		build_name_override = nil, --皮肤名称(居然是小写)
 
-        skin_idx = 1, --只能我来确定的数据了，谁叫[key]形式的下标不能按代码顺序呢
+        skin_idx = 1, --[key]形式的下标不能按代码顺序，后面会统一排序的
         skin_id = "61627d927bbb727be174c4a0",
         noshopshow = nil, --为true的话，就不在鸡毛铺里展示
+        onlyownedshow = true, --为true的话，只有玩家拥有该皮肤才在鸡毛铺里展示
 		assets = { --仅仅是用于初始化注册
 			Asset("ANIM", "anim/skin/swap_spear_mirrorrose.zip"),
 			Asset("ANIM", "anim/skin/spear_mirrorrose.zip"),
@@ -180,7 +181,7 @@ _G.SKINS_LEGION = {
             end
         end,
 
-        exchangefx = { prefab = nil, offset_y = nil, scale = nil },
+        exchangefx = { prefab = nil, offset_y = nil, scale = nil }, --prefab填了的话，就会替换扫把的皮肤切换特效
         -- fn_spawnSkinExchangeFx = function(inst)end, --皮肤交换时的特效生成函数，替换exchangefx的默认方式
 
         floater = { --底部切除比例，水纹动画后缀，水纹高度位置偏移，水纹大小，是否有水纹
@@ -199,7 +200,6 @@ _G.SKINS_LEGION = {
         base_prefab = "rosebush",
 		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
 
-        skin_idx = 1,
         skin_id = "619108a04c724c6f40e77bd4",
 		assets = {
             Asset("ANIM", "anim/berrybush.zip"), --官方浆果丛动画
@@ -227,7 +227,6 @@ _G.SKINS_LEGION = {
         base_prefab = "lilybush",
 		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
 
-        skin_idx = 2,
         skin_id = "619116c74c724c6f40e77c40",
 		assets = {
             Asset("ANIM", "anim/berrybush.zip"), --官方浆果丛动画
@@ -254,7 +253,6 @@ _G.SKINS_LEGION = {
         base_prefab = "orchidbush",
 		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
 
-        skin_idx = 3,
         skin_id = "6191d0514c724c6f40e77eb9",
 		assets = {
             Asset("ANIM", "anim/berrybush.zip"), --官方浆果丛动画
@@ -282,8 +280,8 @@ _G.SKINS_LEGION = {
         base_prefab = "neverfade",
 		type = "item", skin_tags = {}, release_group = 555, rarity = raritySpecial,
 
-        skin_idx = 4,
         skin_id = "6191d8f74c724c6f40e77ed0",
+        onlyownedshow = true,
 		assets = {
 			Asset("ANIM", "anim/skin/neverfade_thanks.zip"),
             Asset("ANIM", "anim/skin/neverfade_butterfly_thanks.zip"),
@@ -299,7 +297,7 @@ _G.SKINS_LEGION = {
         string = ischinese and {
             name = "扶伤", collection = "THANKS", access = "SPECIAL",
             descitem = "解锁\"永不凋零\"、\"永不凋零花丛\"、\"庇佑蝴蝶\"以及入鞘后的皮肤。",
-            description = "感谢大家支持，故事还没写好。",
+            description = "雌雄狂刀疯狂挥舞，招招致命。他手持青玉扶伤剑，欲以还击。刹时刀光四射青光蝶影，一刺一避一挥一转，双方都要使取命一击。最后，只见玉断剑折，有身影逍遥离去。恶徒终除，十年血案终有结果。",
         } or {
             name = "FuShang", collection = "THANKS", access = "SPECIAL",
             descitem = "Unlock \"Neverfade\", \"Neverfade Bush\", and \"Neverfade Butterfly\" skin.",
@@ -340,7 +338,6 @@ _G.SKINS_LEGION = {
         base_prefab = "neverfadebush",
 		type = "item", skin_tags = {}, release_group = 555, rarity = raritySpecial,
 
-        skin_idx = 4,
         skin_id = "6191d8f74c724c6f40e77ed0",
         noshopshow = true,
 		assets = {
@@ -362,7 +359,6 @@ _G.SKINS_LEGION = {
         base_prefab = "hat_lichen",
 		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
 
-        skin_idx = 5,
         skin_id = "61909c584c724c6f40e779fa",
 		assets = {
 			Asset("ANIM", "anim/skin/hat_lichen_emo_que.zip"),
@@ -469,9 +465,17 @@ end
 
 ------
 
-for skinname,v in pairs(_G.SKINS_LEGION) do
-    _G.SKIN_IDX_LEGION[v.skin_idx] = skinname
+local skinidxes = { --用以皮肤排序
+    "rosebush_marble", "lilybush_marble", "orchidbush_marble",
+    "neverfade_thanks", "neverfadebush_thanks",
+    "hat_lichen_emo_que",
+}
+for i,skinname in pairs(skinidxes) do
+    _G.SKIN_IDX_LEGION[i] = skinname
+    _G.SKINS_LEGION[skinname].skin_idx = i
+end
 
+for skinname,v in pairs(_G.SKINS_LEGION) do
     if _G.SKIN_IDS_LEGION[v.skin_id] == nil then
         _G.SKIN_IDS_LEGION[v.skin_id] = {}
     end
@@ -509,11 +513,11 @@ for skinname,v in pairs(_G.SKINS_LEGION) do
             table.insert(Assets, ast)
         end
     end
-    if v.exchangefx ~= nil then
-        if v.exchangefx.prefab == nil then
-            v.exchangefx.prefab = "explode_reskin"
-        end
-    end
+    -- if v.exchangefx ~= nil then
+    --     if v.exchangefx.prefab == nil then
+    --         v.exchangefx.prefab = "explode_reskin"
+    --     end
+    -- end
     if v.placer ~= nil then
         if v.placer.name == nil then
             v.placer.name = skinname.."_placer"
@@ -585,11 +589,11 @@ for baseprefab,v in pairs(_G.SKIN_PREFABS_LEGION) do
             table.insert(Assets, ast)
         end
     end
-    if v.exchangefx ~= nil then
-        if v.exchangefx.prefab == nil then
-            v.exchangefx.prefab = "explode_reskin"
-        end
-    end
+    -- if v.exchangefx ~= nil then
+    --     if v.exchangefx.prefab == nil then
+    --         v.exchangefx.prefab = "explode_reskin"
+    --     end
+    -- end
     _G[baseprefab.."_clear_fn"] = function(inst) end --【服务端】给CreatePrefabSkin()用的
 end
 ischinese = nil
@@ -988,7 +992,7 @@ if IsServer then
                         if skinname_new ~= skinname_old then
                             target.components.skinedlegion:SetSkin(skinname_new)
                         end
-                        target.components.skinedlegion:SpawnSkinExchangeFx() --不管有没有交换成功，都释放特效
+                        target.components.skinedlegion:SpawnSkinExchangeFx(nil, tool) --不管有没有交换成功，都释放特效
                     end)
                     return
                 end

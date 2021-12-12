@@ -65,7 +65,7 @@ AddRecipe(
     "siving_ctlwater_item", {
         Ingredient("siving_rocks", 30, "images/inventoryimages/siving_rocks.xml"),
         Ingredient("greengem", 1),
-        Ingredient("townportaltalisman", 10),
+        Ingredient("moonglass", 10),
     }, RECIPETABS.FARM, TECH.MAGIC_THREE, nil, nil, nil, nil, nil,
     "images/inventoryimages/siving_ctlwater_item.xml", "siving_ctlwater_item.tex"
 )
@@ -73,7 +73,7 @@ AddRecipe(
     "siving_ctldirt_item", {
         Ingredient("siving_rocks", 30, "images/inventoryimages/siving_rocks.xml"),
         Ingredient("greengem", 1),
-        Ingredient("moonglass", 10),
+        Ingredient("townportaltalisman", 10),
     }, RECIPETABS.FARM, TECH.MAGIC_THREE, nil, nil, nil, nil, nil,
     "images/inventoryimages/siving_ctldirt_item.xml", "siving_ctldirt_item.tex"
 )

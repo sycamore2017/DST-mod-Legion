@@ -207,27 +207,33 @@ function SkinLegionDialog:ResetItems()
     --初始化皮肤项
     local items = {}
     local myskins = SKINS_CACHE_L[self.owner.userid]
-    for skinname,v in pairs(SKINS_LEGION) do
-        if not v.noshopshow then
-            local item = {
-                item_key = skinname,
-                item_id = skinname, --(不管)
-                owned_count = 0, --已拥有数量(不管)
-                isnew = false, --是否新皮肤(不管)
-                isfocused = false, --是否处于被鼠标移入状态(不管)
-                isselected = false, --是否处于选中状态
-                isowned = false, --是否拥有该皮肤
-                isunlockable = v.string.access == "DONATE", --是否可解锁
-                idx = nil,
-                context = nil, --存下的组件
-            }
-            if myskins ~= nil and myskins[skinname] then
-                item.isowned = true
-            end
-            items[v.skin_idx or skinname] = item
+    for idx,skinname in pairs(SKIN_IDX_LEGION) do
+        local v = SKINS_LEGION[skinname]
+        if v ~= nil then
+            if not v.noshopshow then
+                local isowned = false
+                if myskins ~= nil and myskins[skinname] then
+                    isowned = true
+                end
+                if not v.onlyownedshow or isowned then
+                    local item = {
+                        item_key = skinname,
+                        item_id = skinname, --(不管)
+                        owned_count = 0, --已拥有数量(不管)
+                        isnew = false, --是否新皮肤(不管)
+                        isfocused = false, --是否处于被鼠标移入状态(不管)
+                        isselected = false, --是否处于选中状态
+                        isowned = isowned, --是否拥有该皮肤
+                        isunlockable = v.string.access == "DONATE", --是否可解锁
+                        idx = nil,
+                        context = nil, --存下的组件
+                    }
+                    table.insert(items, item)
 
-            if selected_item == nil and selected_skin ~= nil and selected_skin == skinname then
-                selected_item = item
+                    if selected_item == nil and selected_skin ~= nil and selected_skin == skinname then
+                        selected_item = item
+                    end
+                end
             end
         end
     end
