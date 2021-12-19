@@ -220,6 +220,7 @@ PLANT_DEFS.pineananas = {
     --贴图与动画
     build = "farm_plant_pineananas",
     bank = "farm_plant_pineananas",
+    build_rotten = "farm_plant_pineananas",
     --生长时间
     grow_time = PLANT_DEFS.dragonfruit.grow_time,
     --需水量：低

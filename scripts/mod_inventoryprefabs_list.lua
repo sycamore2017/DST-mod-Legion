@@ -123,6 +123,7 @@ local InventoryPrefabsList = {  --每个元素的下标值为每种物品栏图�
     siving_rocks = { build = "images_minisign6", },
     siving_ctlwater_item = { build = "images_minisign6", },
     siving_ctldirt_item = { build = "images_minisign6", },
+    pineananas_oversized_rotten = { build = "images_minisign6", },
 
     --skins
     hat_lichen_emo_que = { build = "images_minisign_skins", },

@@ -52,39 +52,41 @@ local regrowMaps = {
 	gourd = 3,
 }
 
-local function InitAssets(data, assetspre, assetsbase)
-	if assetspre ~= nil then
-		for k, v in pairs(assetspre) do
-			table.insert(assetsbase, v)
-		end
-	end
+--mod里再次加载农场作物的动画会导致官方的作物动画不显示。不清楚为啥
+-- local function InitAssets(data, assetspre, assetsbase)
+-- 	if assetspre ~= nil then
+-- 		for k, v in pairs(assetspre) do
+-- 			table.insert(assetsbase, v)
+-- 		end
+-- 	end
 
-	if data.bank ~= data.build then
-		table.insert(assetsbase, Asset("ANIM", "anim/"..data.build..".zip"))
-	end
+-- 	if data.bank ~= data.build then
+-- 		table.insert(assetsbase, Asset("ANIM", "anim/"..data.build..".zip"))
+-- 	end
 
-	data.assets = assetsbase
-end
+-- 	data.assets = assetsbase
+-- end
 
-local function InitPrefabs(data, prefabspre, prefabsbase)
-	if prefabspre ~= nil then
-		for k, v in pairs(prefabspre) do
-			table.insert(prefabsbase, v)
-		end
-	end
+--官方的prefabs注册不清楚有啥用，然后还会导致问题，那么，不写了
+-- local function InitPrefabs(data, prefabspre, prefabsbase)
+-- 	if prefabspre ~= nil then
+-- 		for k, v in pairs(prefabspre) do
+-- 			table.insert(prefabsbase, v)
+-- 		end
+-- 	end
 
-	if data.product ~= nil then
-		table.insert(prefabsbase, data.product)
-	end
-	if data.product_huge ~= nil then
-		table.insert(prefabsbase, data.product_huge)
-	end
-	if data.seed ~= nil then
-		table.insert(prefabsbase, data.seed)
-	end
+-- 	if data.product ~= nil then
+-- 		table.insert(prefabsbase, data.product)
+-- 	end
+-- 	if data.product_huge ~= nil then
+-- 		table.insert(prefabsbase, data.product_huge)
+-- 	end
+-- 	if data.seed ~= nil then
+-- 		table.insert(prefabsbase, data.seed)
+-- 	end
 
-	data.prefabs = prefabsbase
-end
+-- 	data.prefabs = prefabsbase
+-- end
 
 for k,v in pairs(PLANT_DEFS) do
 	if k ~= "randomseed" then
@@ -193,18 +195,18 @@ for k,v in pairs(PLANT_DEFS) do
 			end
 
 			--确定资源
-			InitAssets(data, v.assets, {
-				Asset("ANIM", "anim/"..data.bank..".zip"),
-				Asset("ANIM", "anim/siving_soil.zip"),
-				Asset("SCRIPT", "scripts/prefabs/farm_plant_defs.lua"),
-			})
-			InitPrefabs(data, v.prefabs, {
-				"spoiled_food",
-				"farm_plant_happy", "farm_plant_unhappy",
-				"siving_soil",
-				"dirt_puff",
-				"cropgnat", "cropgnat_infester"
-			})
+			-- InitAssets(data, v.assets, {
+			-- 	Asset("ANIM", "anim/"..data.bank..".zip"),
+			-- 	Asset("ANIM", "anim/siving_soil.zip"),
+			-- 	-- Asset("SCRIPT", "scripts/prefabs/farm_plant_defs.lua"),
+			-- })
+			-- InitPrefabs(data, v.prefabs, {
+			-- 	"spoiled_food",
+			-- 	"farm_plant_happy", "farm_plant_unhappy",
+			-- 	"siving_soil",
+			-- 	"dirt_puff",
+			-- 	"cropgnat", "cropgnat_infester"
+			-- })
 
 			defs[k] = data
 		end
@@ -310,18 +312,18 @@ for k,v in pairs(WEED_DEFS) do
 		end
 
 		--确定资源
-		InitAssets(data, v.assets, {
-			Asset("ANIM", "anim/"..data.bank..".zip"),
-			Asset("ANIM", "anim/siving_soil.zip"),
-			Asset("SCRIPT", "scripts/prefabs/weed_defs.lua"),
-		})
-		InitPrefabs(data, v.prefabs or v.prefab_deps, {
-			"spoiled_food",
-			"farm_plant_happy", "farm_plant_unhappy",
-			"siving_soil",
-			"dirt_puff",
-			"cropgnat", "cropgnat_infester"
-		})
+		-- InitAssets(data, v.assets, {
+		-- 	Asset("ANIM", "anim/"..data.bank..".zip"),
+		-- 	Asset("ANIM", "anim/siving_soil.zip"),
+		-- 	Asset("SCRIPT", "scripts/prefabs/weed_defs.lua"),
+		-- })
+		-- InitPrefabs(data, v.prefabs or v.prefab_deps, {
+		-- 	"spoiled_food",
+		-- 	"farm_plant_happy", "farm_plant_unhappy",
+		-- 	"siving_soil",
+		-- 	"dirt_puff",
+		-- 	"cropgnat", "cropgnat_infester"
+		-- })
 
 		if data.sounds == nil then
 			data.sounds = {

@@ -7,10 +7,15 @@
 （1）离线模式下不支持皮肤功能了
 （2）皮肤界面不再展示玩家未拥有的特殊获取方式的皮肤
 （3）扫把切换棱镜皮肤时也能应用扫把的皮肤特效了
+*【尘市蜃楼】
+（1）新增腐烂巨型作物、克苏鲁之眼雕像、眼面具、恐怖盾牌、哑铃、土豆袋的幻化
+*【丰饶传说】
+（1）腐烂巨型松萝也可以搬运，以及放上健身房了
+（2）修复部分官方巨型作物隐形问题（因为官方动画名重复了，mod再次调用导致有效的那个被覆盖）
 *【mod兼容】
-（1）
+（1）【神话书说】修正了行者帽的幻化效果
 
---新道具和雕像的幻化兼容
+
 --皮肤历史记录，用来花丛栽种placer优化
 
 --兼容青竹洲商店：
@@ -589,17 +594,16 @@ AddSimPostInit(function()
             DRESSUP_DATA["gourd_oversized"] = {
                 isnoskin = true,
                 istallbody = true,
-                buildfn = function(dressup, item, buildskin)
-                    local itemswap = {}
-
-                    itemswap["swap_body_tall"] = dressup:GetDressData(
-                        buildskin, "farm_plant_gourd", "swap_body", item.GUID, "swap"
-                    )
-
-                    return itemswap
-                end,
+                buildfile = "farm_plant_gourd",
+                buildsymbol = "swap_body",
             }
             DRESSUP_DATA["gourd_oversized_waxed"] = DRESSUP_DATA["gourd_oversized"]
+            -- DRESSUP_DATA["gourd_oversized_rotten"] = { --神话还没改
+            --     isnoskin = true,
+            --     istallbody = true,
+            --     buildfile = "farm_plant_gourd",
+            --     buildsymbol = "swap_body_rotten",
+            -- }
 
             DRESSUP_DATA["xzhat_mk"] = { --行者帽
                 isnoskin = true,
@@ -607,17 +611,55 @@ AddSimPostInit(function()
                     local itemswap = {}
 
                     local mythskin = item.components.myth_itemskin
+                    local skinname = mythskin.skin:value()
                     local skindata = mythskin.swap or mythskin.data.default.swap
-                    itemswap["swap_hat"] = dressup:GetDressData(
-                        nil, skindata.build, skindata.folder, item.GUID, "swap"
-                    )
-                    if mythskin.skin:value() == "ear" then
+                    if skinname == "ear" then
+                        itemswap["swap_hat"] = dressup:GetDressData(
+                            nil, skindata.build, skindata.folder, item.GUID, "swap"
+                        )
                         dressup:SetDressOpenTop(itemswap)
+                        itemswap["swap_face"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
+                        itemswap["hair"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
+                    elseif skinname == "horse" then
+                        itemswap["hair"] = dressup:GetDressData(
+                            nil, skindata.build, skindata.folder, item.GUID, "swap"
+                        )
+                        dressup:SetDressOpenTop(itemswap)
+                        itemswap["swap_face"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
+                        itemswap["swap_hat"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
+                        itemswap["HAT"] = dressup:GetDressData(nil, nil, nil, nil, "show")
+                        itemswap["HAIR_HAT"] = dressup:GetDressData(nil, nil, nil, nil, "show")
+                    elseif skinname == "wine" then
+                        itemswap["swap_face"] = dressup:GetDressData(
+                            nil, skindata.build, skindata.folder, item.GUID, "swap"
+                        )
+                        dressup:SetDressOpenTop(itemswap)
+                        itemswap["hair"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
+                        itemswap["swap_hat"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
                     else
+                        skindata = mythskin.data.default.swap
+                        itemswap["swap_hat"] = dressup:GetDressData(
+                            nil, skindata.build, skindata.folder, item.GUID, "swap"
+                        )
                         dressup:SetDressTop(itemswap)
+                        itemswap["swap_face"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
+                        itemswap["hair"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
                     end
 
                     return itemswap
+                end,
+                unbuildfn = function(dressup, item)
+                    dressup:InitClear("swap_hat")
+                    dressup:InitHide("HAT")
+                    dressup:InitHide("HAIR_HAT")
+                    dressup:InitShow("HAIR_NOHAT")
+                    dressup:InitShow("HAIR")
+
+                    dressup:InitShow("HEAD")
+                    dressup:InitHide("HEAD_HAT")
+
+                    dressup:InitClear("hair")
+                    dressup:InitClear("swap_face")
                 end,
             }
             DRESSUP_DATA["cassock"] = { --袈裟

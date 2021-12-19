@@ -43,8 +43,7 @@ local dressup_data = {
         buildfile = "swap_nightmaresword",
         buildsymbol = "swap_nightmaresword",
     },
-    lantern =
-    {
+    lantern = {
         buildfn = function(dressup, item, buildskin)
             local itemswap = {}
             itemswap["swap_object"] = dressup:GetDressData(
@@ -389,8 +388,7 @@ local dressup_data = {
         buildfile = "swap_goldenhoe",
         buildsymbol = "swap_goldenhoe",
     },
-    wateringcan =
-    {
+    wateringcan = {
         buildfile = "swap_wateringcan",
         buildsymbol = "swap_wateringcan",
     },
@@ -402,6 +400,31 @@ local dressup_data = {
     pocketwatch_weapon = { --警告表
         buildfile = "pocketwatch_weapon",
         buildsymbol = "swap_object",
+    },
+    shieldofterror = { --恐怖盾牌
+        buildfn = function(dressup, item, buildskin)
+            local itemswap = {}
+            itemswap["lantern_overlay"] = dressup:GetDressData(
+                buildskin, "swap_eye_shield", "swap_shield", item.GUID, "swap"
+            )
+            itemswap["LANTERN_OVERLAY"] = dressup:GetDressData(nil, nil, nil, nil, "show")
+            itemswap["swap_object"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
+            itemswap["whipline"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
+
+            return itemswap
+        end,
+    },
+    dumbbell = { --哑铃
+        buildfile = "swap_dumbbell",
+        buildsymbol = "swap_dumbbell",
+    },
+    dumbbell_golden = { --黄金哑铃
+        buildfile = "swap_dumbbell_golden",
+        buildsymbol = "swap_dumbbell_golden",
+    },
+    dumbbell_gem = { --宝石哑铃
+        buildfile = "swap_dumbbell_gem",
+        buildsymbol = "swap_dumbbell_gem",
     },
     -- minifan = --有贴图之外的实体，不做幻化
     -- {
@@ -723,13 +746,16 @@ local dressup_data = {
         buildfile = "hat_plantregistry",
         buildsymbol = "swap_hat",
     },
-    nutrientsgoggleshat = --高级耕作先驱帽
-    {
+    nutrientsgoggleshat = { --高级耕作先驱帽
         buildfile = "hat_nutrientsgoggles",
         buildsymbol = "swap_hat",
     },
     moonstorm_goggleshat = { --天文护目镜
         buildfile = "hat_moonstorm_goggles",
+        buildsymbol = "swap_hat",
+    },
+    eyemaskhat = { --眼面具
+        buildfile = "hat_eyemask",
         buildsymbol = "swap_hat",
     },
 
@@ -798,8 +824,7 @@ local dressup_data = {
         isbackpack = true,
         buildfile = "candybag",
     },
-    piggyback =
-    {
+    piggyback = {
         isbackpack = true,
         buildfile = "swap_piggyback",
     },
@@ -892,9 +917,7 @@ local dressup_data = {
         buildfile = "torso_bearger",
         buildsymbol = "swap_body",
     },
-    cavein_boulder =
-    {
-        isnoskin = true,
+    cavein_boulder = { --洞穴落石
         istallbody = true,
         buildfn = function(dressup, item, buildskin)
             local itemswap = {}
@@ -946,6 +969,12 @@ local dressup_data = {
         isnoskin = true,
         istallbody = true,
         buildfile = "swap_glass_block",
+        buildsymbol = "swap_body",
+    },
+    potatosack = { --土豆袋
+        isnoskin = true,
+        istallbody = true,
+        buildfile = "potato_sack",
         buildsymbol = "swap_body",
     },
     armor_bramble = --荆棘甲
@@ -1325,6 +1354,8 @@ local pieces = {
     "antlion",
     "minotaur",
     "guardianphase3",
+    "eyeofterror",
+    "twinsofterror"
 }
 local materials = {
     "marble", "stone", "moonglass",
@@ -1365,24 +1396,35 @@ local oversizecrops = {
     durian = "farm_plant_durian_build",
     carrot = "farm_plant_carrot",
 }
-if CONFIGS_LEGION.LEGENDOFFALL then
-    oversizecrops["pineananas"] = "farm_plant_pineananas"
-end
 for k,v in pairs(oversizecrops) do
     _G.DRESSUP_DATA_LEGION[k.."_oversized"] = {
         isnoskin = true,
         istallbody = true,
-        buildfn = function(dressup, item, buildskin)
-            local itemswap = {}
-
-            itemswap["swap_body_tall"] = dressup:GetDressData(
-                buildskin, v, "swap_body", item.GUID, "swap"
-            )
-
-            return itemswap
-        end,
+        buildfile = v,
+        buildsymbol = "swap_body",
     }
     _G.DRESSUP_DATA_LEGION[k.."_oversized_waxed"] = _G.DRESSUP_DATA_LEGION[k.."_oversized"]
+    _G.DRESSUP_DATA_LEGION[k.."_oversized_rotten"] = {
+        isnoskin = true,
+        istallbody = true,
+        buildfile = "farm_plant_"..k.."_rotten_build",
+        buildsymbol = "swap_body",
+    }
+end
+if CONFIGS_LEGION.LEGENDOFFALL then
+    _G.DRESSUP_DATA_LEGION["pineananas_oversized"] = {
+        isnoskin = true,
+        istallbody = true,
+        buildfile = "farm_plant_pineananas",
+        buildsymbol = "swap_body",
+    }
+    _G.DRESSUP_DATA_LEGION["pineananas_oversized_waxed"] = _G.DRESSUP_DATA_LEGION["pineananas_oversized"]
+    _G.DRESSUP_DATA_LEGION["pineananas_oversized_rotten"] = {
+        isnoskin = true,
+        istallbody = true,
+        buildfile = "farm_plant_pineananas",
+        buildsymbol = "swap_body_rotten",
+    }
 end
 
 -------------------

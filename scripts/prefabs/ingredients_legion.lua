@@ -386,15 +386,15 @@ local function MadePrefab(name, info)
     end
 
     if info.prefabs == nil then info.prefabs = {} end
-    if info.cookable ~= nil then
-        table.insert(info.prefabs, info.cookable.product)
-    end
-    if info.dryable ~= nil then
-        table.insert(info.prefabs, info.dryable.product)
-    end
+    -- if info.cookable ~= nil then
+    --     table.insert(info.prefabs, info.cookable.product)
+    -- end
+    -- if info.dryable ~= nil then
+    --     table.insert(info.prefabs, info.dryable.product)
+    -- end
     if info.perishable ~= nil then
         local product = info.perishable.product or "spoiled_food"
-        table.insert(info.prefabs, product)
+        -- table.insert(info.prefabs, product)
         info.perishable.product = product
     end
 
@@ -473,25 +473,25 @@ local function MakeIngredient(name, data)
         if info.prefabs == nil then info.prefabs = {} end
         if info.cookable ~= nil then
             local product = data.cooked ~= nil and name.."_cooked" or info.cookable.product
-            table.insert(info.prefabs, product)
+            -- table.insert(info.prefabs, product)
             info.cookable.product = product
         end
         if info.dryable ~= nil then
             local product = data.dried ~= nil and name.."_dried" or info.dryable.product
-            table.insert(info.prefabs, product)
+            -- table.insert(info.prefabs, product)
             info.dryable.product = product
         end
         if info.perishable ~= nil then
             local product = data.rotten ~= nil and name.."_rotten" or (info.perishable.product or "spoiled_food")
-            table.insert(info.prefabs, product)
+            -- table.insert(info.prefabs, product)
             info.perishable.product = product
         end
         if data.seeds ~= nil then
-            table.insert(info.prefabs, name.."_seeds")
-            table.insert(info.prefabs, name.."_oversized")
-            table.insert(info.prefabs, name.."_oversized_waxed")
-            table.insert(info.prefabs, name.."_oversized_rotten")
-            table.insert(info.prefabs, "splash_green")
+            -- table.insert(info.prefabs, name.."_seeds")
+            -- table.insert(info.prefabs, name.."_oversized")
+            -- table.insert(info.prefabs, name.."_oversized_waxed")
+            -- table.insert(info.prefabs, name.."_oversized_rotten")
+            -- table.insert(info.prefabs, "splash_green")
         end
 
         MadePrefab(name, info)
@@ -558,11 +558,12 @@ local function MakeIngredient(name, data)
             info.animstate.anim = "seeds"
         end
 
-        if info.prefabs ~= nil then
-            table.insert(info.prefabs, "farm_plant_"..name)
-        else
-            info.prefabs = { "farm_plant_"..name }
-        end
+        --不知道为什么，和作物有关联的话会导致巨型作物动画不显示
+        -- if info.prefabs ~= nil then
+        --     table.insert(info.prefabs, "farm_plant_"..name)
+        -- else
+        --     info.prefabs = { "farm_plant_"..name }
+        -- end
 
         local fn_common = info.fn_common
         info.fn_common = function(inst)
@@ -652,7 +653,9 @@ local function MakeIngredient(name, data)
         info.fn_common = function(inst)
             inst:AddTag("heavy")
             inst:AddTag("waxable")
+            inst:AddTag("oversized_veggie")
             inst:AddTag("show_spoilage")
+            inst.gymweight = 4
 
             MakeHeavyObstaclePhysics(inst, info.physicsradius)
             inst:SetPhysicsRadiusOverride(info.physicsradius)
@@ -668,21 +671,42 @@ local function MakeIngredient(name, data)
 
             inst:AddComponent("heavyobstaclephysics")
             inst.components.heavyobstaclephysics:SetRadius(info.physicsradius)
-            inst.components.heavyobstaclephysics:MakeSmallObstacle()
+            -- inst.components.heavyobstaclephysics:MakeSmallObstacle()
 
+            inst.components.perishable.onperishreplacement = nil
             inst.components.perishable:SetOnPerishFn(function(inst)
-                if inst.components.inventoryitem:GetGrandOwner() ~= nil then
+                -- vars for rotting on a gym
+                local gym = nil
+                local rot = nil
+                local slot = nil
+
+                if
+                    inst.components.inventoryitem:GetGrandOwner() ~= nil and
+                    not inst.components.inventoryitem:GetGrandOwner():HasTag("gym")
+                then
                     local loots = {}
-                    for i = 1, #inst.components.lootdropper.loot do
+                    for i=1, #inst.components.lootdropper.loot do
                         table.insert(loots, "spoiled_food")
                     end
                     inst.components.lootdropper:SetLoot(loots)
                     inst.components.lootdropper:DropLoot()
                 else
-                    SpawnPrefab(inst.prefab.."_rotten").Transform:SetPosition(inst.Transform:GetWorldPosition())
+                    rot = SpawnPrefab(inst.prefab.."_rotten")
+                    rot.Transform:SetPosition(inst.Transform:GetWorldPosition())
+                    if
+                        inst.components.inventoryitem:GetGrandOwner() and
+                        inst.components.inventoryitem:GetGrandOwner():HasTag("gym")
+                    then
+                        gym = inst.components.inventoryitem:GetGrandOwner()
+                        slot = gym.components.inventory:GetItemSlot(inst)
+                    end
                 end
 
                 inst:Remove()
+
+                if gym and rot then
+                    gym.components.mightygym:LoadWeight(rot, slot)
+                end
             end)
 
             inst.components.inventoryitem.cangoincontainer = false
@@ -787,6 +811,8 @@ local function MakeIngredient(name, data)
         local fn_common = info.fn_common
         info.fn_common = function(inst)
             inst:AddTag("heavy")
+            inst:AddTag("oversized_veggie")
+            inst.gymweight = 4
 
             inst.displayadjectivefn = function(inst)
                 return STRINGS.UI.HUD.WAXED
@@ -805,7 +831,7 @@ local function MakeIngredient(name, data)
         info.fn_server = function(inst)
             inst:AddComponent("heavyobstaclephysics")
             inst.components.heavyobstaclephysics:SetRadius(info.physicsradius)
-            inst.components.heavyobstaclephysics:MakeSmallObstacle()
+            -- inst.components.heavyobstaclephysics:MakeSmallObstacle()
 
             inst.components.inventoryitem.cangoincontainer = false
             inst.components.inventoryitem:SetSinks(true)
@@ -879,17 +905,21 @@ local function MakeIngredient(name, data)
         if info.nohauntable ~= false then
             info.nohauntable = true
         end
-        if info.noInventoryItem ~= false then
-            info.noInventoryItem = true
-        end
+        -- if info.noInventoryItem ~= false then
+        --     info.noInventoryItem = true
+        -- end
 
         local fn_common = info.fn_common
         info.fn_common = function(inst)
-            MakeObstaclePhysics(inst, info.physicsradius)
-
+            inst:AddTag("heavy")
             inst:AddTag("farm_plant_killjoy")
             inst:AddTag("pickable_harvest_str")
             inst:AddTag("pickable")
+            inst:AddTag("oversized_veggie")
+            inst.gymweight = 3
+
+            MakeHeavyObstaclePhysics(inst, info.physicsradius)
+            inst:SetPhysicsRadiusOverride(info.physicsradius)
 
 		    inst._base_name = name
 
@@ -898,6 +928,9 @@ local function MakeIngredient(name, data)
 
         local fn_server = info.fn_server
         info.fn_server = function(inst)
+            inst:AddComponent("heavyobstaclephysics")
+            inst.components.heavyobstaclephysics:SetRadius(info.physicsradius)
+
             inst.components.inspectable.nameoverride = "VEGGIE_OVERSIZED_ROTTEN"
 
             inst:AddComponent("workable")
@@ -911,10 +944,20 @@ local function MakeIngredient(name, data)
             inst.components.pickable.use_lootdropper_for_product = true
             inst.components.pickable.picksound = "dontstarve/wilson/harvest_berries"
 
-            inst:AddComponent("inventoryitem")
             inst.components.inventoryitem.cangoincontainer = false
-            inst.components.inventoryitem.canbepickedup = false
             inst.components.inventoryitem:SetSinks(true)
+
+            inst:AddComponent("equippable")
+            inst.components.equippable.equipslot = EQUIPSLOTS.BODY
+            inst.components.equippable:SetOnEquip(function(inst, owner)
+                owner.AnimState:OverrideSymbol("swap_body", info.animstate.build, "swap_body_rotten")
+            end)
+            inst.components.equippable:SetOnUnequip(OnUnequip_oversized)
+            inst.components.equippable.walkspeedmult = TUNING.HEAVY_SPEED_MULT
+
+            inst:AddComponent("submersible")
+            inst:AddComponent("symbolswapdata")
+            inst.components.symbolswapdata:SetData(info.animstate.build, "swap_body_rotten")
 
             inst:AddComponent("lootdropper")
             inst.components.lootdropper:SetLoot(PLANT_DEFS[name].loot_oversized_rot)
