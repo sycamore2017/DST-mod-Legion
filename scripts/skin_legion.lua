@@ -192,7 +192,10 @@ _G.SKINS_LEGION = {
             -- },
             -- fn_anim = function(inst)end, --处于水中时的动画设置，替换anim的默认方式
         },
-        placer = { name = nil, bank = nil, build = nil, anim = "dead" }, --自定义的placer
+        placer = { --自定义的placer
+            name = nil, bank = nil, build = nil, anim = "dead",
+            prefabs = { "prefab1", "prefab2" }, --哪些物品的placer，可对应多个。若为空则表示只用overridedeployplacername机制
+        },
     },
     ]]--
 
@@ -222,6 +225,10 @@ _G.SKINS_LEGION = {
             inst.AnimState:SetBuild("rosebush_marble")
         end,
         exchangefx = { prefab = nil, offset_y = nil, scale = 1.5 },
+        placer = {
+            name = nil, bank = "berrybush", build = "rosebush_marble", anim = "dead",
+            prefabs = { "dug_rosebush", "cutted_rosebush" },
+        },
     },
     lilybush_marble = {
         base_prefab = "lilybush",
@@ -248,6 +255,10 @@ _G.SKINS_LEGION = {
             inst.AnimState:SetBuild("lilybush_marble")
         end,
         exchangefx = { prefab = nil, offset_y = nil, scale = nil },
+        placer = {
+            name = nil, bank = "berrybush", build = "lilybush_marble", anim = "dead",
+            prefabs = { "dug_lilybush", "cutted_lilybush" },
+        },
     },
     orchidbush_marble = {
         base_prefab = "orchidbush",
@@ -274,6 +285,10 @@ _G.SKINS_LEGION = {
             inst.AnimState:SetBuild("orchidbush_marble")
         end,
         exchangefx = { prefab = nil, offset_y = 1.3, scale = nil },
+        placer = {
+            name = nil, bank = "berrybush", build = "orchidbush_marble", anim = "dead",
+            prefabs = { "dug_orchidbush", "cutted_orchidbush" },
+        },
     },
 
     neverfade_thanks = {
@@ -332,7 +347,9 @@ _G.SKINS_LEGION = {
             cut = 0.05, size = "small", offset_y = 0.15, scale = 0.5, nofx = nil,
         },
         linkedskins = { bush = "neverfadebush_thanks" },
-        placer = { name = nil, bank = "neverfadebush_thanks", build = "neverfadebush_thanks", anim = "dead" },
+        placer = {
+            name = nil, bank = "neverfadebush_thanks", build = "neverfadebush_thanks", anim = "dead", prefabs = nil,
+        },
     },
     neverfadebush_thanks = {
         base_prefab = "neverfadebush",
@@ -706,12 +723,52 @@ _G.SKINS_NET_L = {
     -- },
 }
 _G.SKINS_NET_CDK_L = {} --内容和 SKINS_NET_L 一样
-_G.SKINS_CACHE_L = {
+_G.SKINS_CACHE_L = { --已有皮肤缓存
     -- Kxx_xxxx = { --用户ID
     --     skinname1 = true,
     --     skinname2 = true,
     -- },
 }
+_G.SKINS_CACHE_EX_L = { --皮肤切换缓存
+    -- Kxx_xxxx = { --用户ID
+    --     prefab1 = { name = skinname1, placer = placername1 },
+    --     prefab2 = { name = skinname2, placer = placername2 },
+    -- },
+}
+
+local function SaveExSkin(userid, skin_name, skin_data, skin_data_old)
+    if userid == nil then
+        return
+    end
+
+    local caches = SKINS_CACHE_EX_L[userid]
+    if caches == nil then
+        SKINS_CACHE_EX_L[userid] = {}
+        caches = SKINS_CACHE_EX_L[userid]
+    else
+        --先把以前的清除了
+        if
+            skin_data_old ~= nil and skin_data_old.placer ~= nil and skin_data_old.placer.prefabs ~= nil
+        then
+            for _,v in pairs(skin_data_old.placer.prefabs) do
+                caches[v] = nil
+            end
+        end
+    end
+
+    --再更新目前的
+    if
+        skin_name ~= nil and
+        skin_data ~= nil and skin_data.placer ~= nil and skin_data.placer.prefabs ~= nil
+    then
+        for _,v in pairs(skin_data.placer.prefabs) do
+            caches[v] = {
+                name = skin_name,
+                placer = skin_data.placer.name
+            }
+        end
+    end
+end
 
 local GetLegionSkins = nil
 local DoLegionCdk = nil
@@ -965,6 +1022,7 @@ if IsServer then
                     tool:DoTaskInTime(0, function()
                         local doer = tool.components.inventoryitem.owner
                         local skins = PREFAB_SKINS[target.prefab]
+                        local skin_data_old = target.components.skinedlegion:GetSkinedData()
 
                         local skinname_new = nil
                         local skinweight = nil
@@ -991,6 +1049,11 @@ if IsServer then
                         end
                         if skinname_new ~= skinname_old then
                             target.components.skinedlegion:SetSkin(skinname_new)
+
+                            --交换记录
+                            local skin_name = target.components.skinedlegion:GetSkin()
+                            SaveExSkin(doer.userid, skin_name, target.components.skinedlegion:GetSkinedData(), skin_data_old)
+                            FnRpc_s2c(doer.userid, 4, { new = skin_name, old = skinname_old })
                         end
                         target.components.skinedlegion:SpawnSkinExchangeFx(nil, tool) --不管有没有交换成功，都释放特效
                     end)
@@ -1028,14 +1091,43 @@ if IsServer then
                     data.skins_legion = skins
                 end
             end
+            if SKINS_CACHE_EX_L[inst.userid] ~= nil then
+                local skins = nil
+                for prefabname,v in pairs(SKINS_CACHE_EX_L[inst.userid]) do
+                    if v.name ~= nil and v.placer ~= nil then --目前只需要这几个数据
+                        if skins == nil then
+                            skins = {}
+                        end
+                        skins[prefabname] = {
+                            name = v.name,
+                            placer = v.placer
+                        }
+                    end
+                end
+                if skins ~= nil then
+                    data.skins_ex_legion = skins
+                end
+            end
         end
         inst.OnLoad = function(inst, data)
             if OnLoad_old ~= nil then
                 OnLoad_old(inst, data)
             end
 
-            if data ~= nil and data.skins_legion ~= nil then
-                SKINS_CACHE_L[inst.userid] = data.skins_legion --先存下来，等服务器皮肤数据确认后才传给客户端
+             --先存下来，等服务器皮肤数据确认后才传给客户端
+            if data ~= nil then
+                if data.skins_legion ~= nil then
+                    SKINS_CACHE_L[inst.userid] = data.skins_legion
+                end
+                if data.skins_ex_legion ~= nil then
+                    local newdata = {}
+                    for prefabname,v in pairs(data.skins_ex_legion) do
+                        if v.name ~= nil and SKINS_LEGION[v.name] ~= nil then --检查皮肤完整性
+                            newdata[prefabname] = v
+                        end
+                    end
+                    SKINS_CACHE_EX_L[inst.userid] = newdata
+                end
             end
         end
 
@@ -1044,8 +1136,13 @@ if IsServer then
             inst.task_skin_l = nil
             GetLegionSkins(inst, inst.userid, 0.5, false)
 
-            if inst.userid ~= nil and SKINS_CACHE_L[inst.userid] ~= nil then --提前给玩家传输服务器的皮肤数据
-                FnRpc_s2c(inst.userid, 1, SKINS_CACHE_L[inst.userid])
+            if inst.userid ~= nil then --提前给玩家传输服务器的皮肤数据
+                if SKINS_CACHE_L[inst.userid] ~= nil then
+                    FnRpc_s2c(inst.userid, 1, SKINS_CACHE_L[inst.userid])
+                end
+                if SKINS_CACHE_EX_L[inst.userid] ~= nil then
+                    FnRpc_s2c(inst.userid, 3, SKINS_CACHE_EX_L[inst.userid])
+                end
             end
         end)
     end)
@@ -1095,7 +1192,7 @@ AddClientModRPCHandler("LegionSkined", "SkinHandle", function(handletype, data, 
                 end
             end
 
-        elseif handletype == 2 then
+        elseif handletype == 2 then --反馈cdk结果
             if data and type(data) == "string" then
                 local success, result = pcall(json.decode, data)
                 if result then
@@ -1103,6 +1200,26 @@ AddClientModRPCHandler("LegionSkined", "SkinHandle", function(handletype, data, 
                     local right_root = GetRightRoot()
                     if right_root ~= nil and right_root.skinshop_legion then
                         right_root.skinshop_legion:SetCdkState(result.state, result.pop)
+                    end
+                end
+            end
+
+        elseif handletype == 3 then --更新客户端皮肤交换缓存
+            if data and type(data) == "string" then
+                local success, result = pcall(json.decode, data)
+                if result and ThePlayer and ThePlayer.userid then
+                    SKINS_CACHE_EX_L[ThePlayer.userid] = result
+                end
+            end
+
+        elseif handletype == 4 then --更新单个的客户端皮肤交换缓存
+            if data and type(data) == "string" then
+                local success, result = pcall(json.decode, data)
+                if result and ThePlayer and ThePlayer.userid then
+                    if result.new ~= nil or result.old ~= nil then
+                        local skin_data = result.new ~= nil and SKINS_LEGION[result.new] or nil
+                        local skin_data_old = result.old ~= nil and SKINS_LEGION[result.old] or nil
+                        SaveExSkin(ThePlayer.userid, result.new, skin_data, skin_data_old)
                     end
                 end
             end
@@ -1202,4 +1319,27 @@ if not TheNet:IsDedicated() then
             end
         end
     end
+end
+
+--------------------------------------------------------------------------
+--[[ placer应用兼容皮肤的切换缓存 ]]
+--------------------------------------------------------------------------
+
+local inventoryitem_replica = require("components/inventoryitem_replica")
+
+local GetDeployPlacerName_old = inventoryitem_replica.GetDeployPlacerName
+inventoryitem_replica.GetDeployPlacerName = function(self, ...)
+    local placerold = GetDeployPlacerName_old(self, ...)
+    if placerold == "gridplacer" then
+        return placerold
+    end
+
+    if ThePlayer and ThePlayer.userid and SKINS_CACHE_EX_L[ThePlayer.userid] ~= nil then
+        local data = SKINS_CACHE_EX_L[ThePlayer.userid]
+        if data[self.inst.prefab] ~= nil then
+            return data[self.inst.prefab].placer or placerold
+        end
+    end
+
+    return placerold
 end

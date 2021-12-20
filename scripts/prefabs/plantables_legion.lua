@@ -86,7 +86,20 @@ local function MakePlantable(name, data)
 
         inst:AddComponent("deployable")
         inst.components.deployable.ondeploy = function(inst, pt, deployer)
-            local tree = SpawnPrefab(data.deployable.prefab)
+            local skinname = nil
+            local tree = nil
+            if deployer and deployer.userid and SKINS_CACHE_EX_L[deployer.userid] ~= nil then
+                local data = SKINS_CACHE_EX_L[deployer.userid]
+                if data[name] ~= nil then
+                    skinname = data[name].name
+                end
+            end
+            if skinname == nil then
+                tree = SpawnPrefab(data.deployable.prefab)
+            else
+                tree = SpawnPrefab(data.deployable.prefab, skinname, nil, deployer.userid)
+            end
+
             if tree ~= nil then
                 tree.Transform:SetPosition(pt:Get())
 
