@@ -1355,7 +1355,8 @@ end)
 --------------------------------------------------------------------------
 
 if not TheNet:IsDedicated() then
-    if TUNING.LEGION_MOD_LANGUAGES == "chinese" then
+     --离线模式不能有皮肤界面功能(因为离线模式下的klei账户ID与联网模式下的不一样)
+    if TheNet:IsOnlineMode() and TUNING.LEGION_MOD_LANGUAGES == "chinese" then
         -- local ImageButton = require "widgets/imagebutton"
         local PlayerAvatarPopup = require "widgets/playeravatarpopup"
         local TEMPLATES = require "widgets/templates"

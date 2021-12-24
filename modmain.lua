@@ -559,9 +559,7 @@ end)
 --[[ 皮肤 ]]
 --------------------------------------------------------------------------
 
-if TheNet:IsOnlineMode() then --离线模式不能有皮肤功能(因为离线模式下的klei账户ID与联网模式下的不一样)
-    modimport("scripts/skin_legion.lua") --skined_legion
-end
+modimport("scripts/skin_legion.lua") --skined_legion
 
 --------------------------------------------------------------------------
 --[[ mod之间的兼容 ]]
