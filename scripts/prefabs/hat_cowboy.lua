@@ -1,7 +1,6 @@
 local assets =
 {
     Asset("ANIM", "anim/hat_cowboy.zip"),
-    Asset("ANIM", "anim/scarf_cowboy.zip"),
 	Asset("ATLAS", "images/inventoryimages/hat_cowboy.xml"),   --物品栏图片
     Asset("IMAGE", "images/inventoryimages/hat_cowboy.tex"),
 }
@@ -40,18 +39,26 @@ end
 
 local function CowboyOnUnEquip(owner, data)
     if data ~= nil and data.eslot == EQUIPSLOTS.BODY and owner.components.inventory ~= nil then
-        owner.AnimState:OverrideSymbol("swap_body", "scarf_cowboy", "swap_body")
+        owner.AnimState:OverrideSymbol("swap_body", owner.scarf_skin_l or "hat_cowboy", "swap_body")
     end
 end
 
 local function onequip(inst, owner) --佩戴
-    HAT_ONEQUIP_LEGION(inst, owner, "hat_cowboy", "swap_hat")
+    local skindata = inst.components.skinedlegion:GetSkinedData()
+    if skindata ~= nil and skindata.equip ~= nil then
+        HAT_ONEQUIP_LEGION(inst, owner, skindata.equip.build, skindata.equip.file)
+        owner.scarf_skin_l = skindata.equip.build
+    else
+        HAT_ONEQUIP_LEGION(inst, owner, "hat_cowboy", "swap_hat")
+        owner.scarf_skin_l = nil
+    end
 
     if owner:HasTag("player") then
         if owner.components.inventory ~= nil then
             local equippedArmor = owner.components.inventory:GetEquippedItem(EQUIPSLOTS.BODY) or nil --获取衣服
             if equippedArmor == nil then    --没有穿啥衣服时，换上牛仔围巾
-                owner.AnimState:OverrideSymbol("swap_body", "scarf_cowboy", "swap_body")  --与传统帽子不同的是，这个帽子会有红色牛仔围巾的套装效果
+                --与传统帽子不同的是，这个帽子会有红色牛仔围巾的套装效果
+                owner.AnimState:OverrideSymbol("swap_body", owner.scarf_skin_l or "hat_cowboy", "swap_body")
             end
         end
 
@@ -85,6 +92,7 @@ end
 
 local function onunequip(inst, owner)   --卸下
     HAT_ONUNEQUIP_LEGION(inst, owner)
+    owner.scarf_skin_l = nil
 
     if owner:HasTag("player") then
         if owner.components.inventory ~= nil then
@@ -131,12 +139,8 @@ local function fn(Sim)
     --waterproofer (from waterproofer component) added to pristine state for optimization
     inst:AddTag("waterproofer")
 
-    MakeInventoryFloatable(inst, "med", 0.2, 0.8)
-    local OnLandedClient_old = inst.components.floater.OnLandedClient
-    inst.components.floater.OnLandedClient = function(self)
-        OnLandedClient_old(self)
-        self.inst.AnimState:SetFloatParams(0.03, 1, self.bob_percent)
-    end
+    inst:AddComponent("skinedlegion")
+    inst.components.skinedlegion:InitWithFloater("hat_cowboy")
 
     inst.entity:SetPristine()
 
@@ -168,9 +172,11 @@ local function fn(Sim)
     inst.components.fueled:InitializeFuelLevel(TUNING.TOPHAT_PERISHTIME)    --8天的佩戴时间
     inst.components.fueled:SetDepletedFn(inst.Remove)
 
-    inst:AddComponent("tradable") --可交易组件，有了这个就可以给猪猪 
+    inst:AddComponent("tradable") --可交易组件，有了这个就可以给猪猪
 
     MakeHauntableLaunch(inst)
+
+    inst.components.skinedlegion:SetOnPreLoad()
 
     return inst
 end

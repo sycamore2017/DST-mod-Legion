@@ -585,8 +585,20 @@ AddStategraphState("wilson", State{
         inst.AnimState:PushAnimation("slide_loop")
         inst.SoundEmitter:PlaySound("legion/common/slide_boltout")
 
-        SpawnPrefab("boltwingout_fx").Transform:SetPosition(inst.Transform:GetWorldPosition())
-        SpawnPrefab("boltwingout_shuck").Transform:SetPosition(inst.Transform:GetWorldPosition())
+        local x,y,z = inst.Transform:GetWorldPosition()
+        if inst.bolt_skin_l ~= nil then
+            SpawnPrefab(inst.bolt_skin_l.fx or "boltwingout_fx").Transform:SetPosition(x, y, z)
+            local shuck = SpawnPrefab("boltwingout_shuck")
+            if shuck ~= nil then
+                if inst.bolt_skin_l.build ~= nil then
+                    shuck.AnimState:SetBuild(inst.bolt_skin_l.build)
+                end
+                shuck.Transform:SetPosition(x, y, z)
+            end
+        else
+            SpawnPrefab("boltwingout_fx").Transform:SetPosition(x, y, z)
+            SpawnPrefab("boltwingout_shuck").Transform:SetPosition(x, y, z)
+        end
 
         local angle = inst:GetAngleToPoint(data.escapepos) + 180 + 45 * (1 - 2 * math.random())
         if angle > 360 then

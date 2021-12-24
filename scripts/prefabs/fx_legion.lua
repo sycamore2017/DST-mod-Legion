@@ -382,6 +382,22 @@ if CONFIGS_LEGION.LEGENDOFFALL then
         end,
         fn_remove = nil,
     })
+    MakeFx({ --脱壳之翅：逃脱时的茸毛特效（枯叶飞舞皮肤）
+        name = "boltwingout_fx_disguiser",
+        assets = {
+            Asset("ANIM", "anim/lavaarena_heal_projectile.zip"), --官方的熔炉奶杖击中特效动画
+            Asset("ANIM", "anim/skin/boltwingout_fx_disguiser.zip"),
+        },
+        prefabs = nil,
+        fn_common = nil,
+        fn_anim = function(inst)
+            inst.AnimState:SetBank("lavaarena_heal_projectile")
+            inst.AnimState:SetBuild("boltwingout_fx_disguiser")
+            inst.AnimState:SetFinalOffset(-1)
+            inst.AnimState:PlayAnimation("hit")
+        end,
+        fn_remove = nil,
+    })
 end
 
 ---------------

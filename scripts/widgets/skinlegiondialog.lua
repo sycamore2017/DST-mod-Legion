@@ -212,7 +212,7 @@ function SkinLegionDialog:ResetItems()
         if v ~= nil then
             if not v.noshopshow then
                 local isowned = false
-                if myskins ~= nil and myskins[skinname] then
+                if v.skin_id == "freeskins" or (myskins ~= nil and myskins[skinname]) then
                     isowned = true
                 end
                 if not v.onlyownedshow or isowned then

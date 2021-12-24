@@ -7,13 +7,14 @@ local ischinese = TUNING.LEGION_MOD_LANGUAGES == "chinese"
 table.insert(Assets, Asset("ATLAS", "images/icon_skinbar_shadow_l.xml"))
 table.insert(Assets, Asset("IMAGE", "images/icon_skinbar_shadow_l.tex"))
 table.insert(Assets, Asset("ANIM", "anim/images_minisign_skins.zip"))
+table.insert(PrefabFiles, "skinprefabs_legion")
 
 --------------------------------------------------------------------------
 --[[ 全局皮肤总数据，以及修改 ]]
 --------------------------------------------------------------------------
 
 local rarityRepay = "ProofOfPurchase"
-local rarityFree = "Event"
+local rarityFree = "Distinguished"
 local raritySpecial = "HeirloomElegant"
 
 _G.SKIN_PREFABS_LEGION = {
@@ -124,6 +125,37 @@ _G.SKIN_PREFABS_LEGION = {
         exchangefx = { prefab = nil, offset_y = nil, scale = nil },
         floater = {
             cut = 0.03, size = "med", offset_y = 0.2, scale = 0.5, nofx = nil,
+        },
+    },
+
+    hat_cowboy = {
+        assets = nil,
+        image = { name = nil, atlas = nil, setable = true, },
+        anim = {
+            bank = nil, build = nil,
+            anim = "anim", isloop_anim = nil, animpush = nil, isloop_animpush = nil,
+            setable = true,
+        },
+        equip = { symbol = "swap_hat", build = "hat_cowboy", file = "swap_hat" },
+        exchangefx = { prefab = nil, offset_y = nil, scale = nil },
+        floater = {
+            cut = 0.03, size = "med", offset_y = 0.2, scale = 0.8, nofx = nil,
+        },
+    },
+
+    boltwingout = {
+        assets = nil,
+        image = { name = nil, atlas = nil, setable = true, },
+        anim = {
+            bank = "swap_boltwingout", build = "swap_boltwingout",
+            anim = "idle", isloop_anim = nil, animpush = nil, isloop_animpush = nil,
+            setable = true,
+        },
+        equip = { symbol = "swap_body", build = "swap_boltwingout", file = "swap_body" },
+        boltdata = { fx = "boltwingout_fx", build = nil },
+        exchangefx = { prefab = nil, offset_y = nil, scale = nil },
+        floater = {
+            cut = 0.09, size = "small", offset_y = 0.2, scale = 0.45, nofx = nil,
         },
     },
 }
@@ -403,6 +435,72 @@ _G.SKINS_LEGION = {
             cut = 0.03, size = "small", offset_y = 0.15, scale = 0.5, nofx = nil,
         },
     },
+
+    hat_cowboy_tvplay = {
+        base_prefab = "hat_cowboy",
+		type = "item", skin_tags = {}, release_group = 555, rarity = rarityFree,
+
+        skin_id = "freeskins",
+		assets = {
+			Asset("ANIM", "anim/skin/hat_cowboy_tvplay.zip"),
+		},
+		image = { name = nil, atlas = nil, setable = true, },
+
+        string = ischinese and {
+            name = "卡尔的警帽，永远", collection = "TVPLAY", access = "FREE",
+            descitem = "解锁\"牛仔帽\"皮肤。",
+            description = "卡尔回基地途中拐过树丛时被突然冲出的三个丧尸扑倒，慌忙解决麻烦后感到肚子刺痛，掀起衬衣发现自己已被咬伤...年过三十的卡尔惊醒，看了看还在熟睡的妻女，又望了望桌上警徽虽早已脱落但保养还算完好的警帽，感叹还好只是梦一场。",
+        } or {
+            name = "Carl's Forever Police Cap", collection = "TVPLAY", access = "FREE",
+            descitem = "Unlock \"Stetson\" skin.",
+            description = "The story was not translated.",
+        },
+
+		anim = {
+            bank = nil, build = nil,
+            anim = nil, isloop_anim = nil, animpush = nil, isloop_animpush = nil,
+            setable = true,
+        },
+        equip = { symbol = "swap_hat", build = "hat_cowboy_tvplay", file = "swap_hat" },
+        exchangefx = { prefab = nil, offset_y = nil, scale = nil },
+        floater = {
+            cut = 0.03, size = "med", offset_y = 0.2, scale = 0.8, nofx = nil,
+        },
+    },
+
+    boltwingout_disguiser = {
+        base_prefab = "boltwingout",
+		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
+
+        skin_id = "61c57daadb102b0b8a50ae95",
+		assets = {
+			Asset("ANIM", "anim/skin/boltwingout_disguiser.zip"),
+            Asset("ANIM", "anim/skin/boltwingout_shuck_disguiser.zip"),
+		},
+		image = { name = nil, atlas = nil, setable = true, },
+
+        string = ischinese and {
+            name = "枯叶飞舞", collection = "DISGUISER", access = "DONATE",
+            descitem = "解锁\"脱壳之翅\"、\"羽化后的壳\"的皮肤。",
+            description = "它进化出了一对枯叶般的翅膀。饿了，花丛中有落叶辗转；恋了，风中有落叶双双飞舞；累了，树干上有落叶停留。这不夺人耳目的一生，最终也会悄悄离场。",
+        } or {
+            name = "Fallen Dance", collection = "DISGUISER", access = "DONATE",
+            descitem = "Unlock \"Boltwing-out\", \"Post-eclosion Shuck\" skin.",
+            description = "The story was not translated.",
+        },
+
+		anim = {
+            bank = nil, build = nil,
+            anim = nil, isloop_anim = nil, animpush = nil, isloop_animpush = nil,
+            setable = true,
+        },
+        equip = { symbol = "swap_body", build = "boltwingout_disguiser", file = "swap_body" },
+        boltdata = { fx = "boltwingout_fx_disguiser", build = "boltwingout_shuck_disguiser" },
+        exchangefx = { prefab = nil, offset_y = nil, scale = nil },
+        floater = {
+            cut = nil, size = "med", offset_y = 0.1, scale = 0.8, nofx = nil,
+        },
+    },
 }
 
 _G.SKIN_IDS_LEGION = {
@@ -422,6 +520,8 @@ if ischinese then
             EMOTICON = "颜表情系列",
             MARBLE = "大理石园丁系列",
             THANKS = "江湖一枝花系列",
+            TVPLAY = "剧迷系列",
+            DISGUISER = "伪装学者系列",
         },
         UI_ACCESS = "获取",
         UI_INPUT_CDK = "请输入兑换码",
@@ -442,6 +542,8 @@ else
             EMOTICON = "Emoticon Collection",
             MARBLE = "Marble Gardener Collection",
             THANKS = "Heartfelt Thanks Collection",
+            TVPLAY = "TV Play Fans Collection",
+            DISGUISER = "Master of Disguise Collection",
         },
         UI_ACCESS = "Get It",
         UI_INPUT_CDK = "Please enter CDK",
@@ -483,6 +585,8 @@ end
 ------
 
 local skinidxes = { --用以皮肤排序
+    "hat_cowboy_tvplay",
+    "boltwingout_disguiser",
     "rosebush_marble", "lilybush_marble", "orchidbush_marble",
     "neverfade_thanks", "neverfadebush_thanks",
     "hat_lichen_emo_que",

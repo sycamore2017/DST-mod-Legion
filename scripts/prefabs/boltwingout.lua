@@ -48,7 +48,14 @@ local BOLTCOST =
 }
 
 local function onequip(inst, owner)
-    owner.AnimState:OverrideSymbol("swap_body", "swap_boltwingout", "swap_body")
+    local skindata = inst.components.skinedlegion:GetSkinedData()
+    if skindata ~= nil and skindata.equip ~= nil then
+        owner.AnimState:OverrideSymbol(skindata.equip.symbol, skindata.equip.build, skindata.equip.file)
+        owner.bolt_skin_l = skindata.boltdata
+    else
+        owner.AnimState:OverrideSymbol("swap_body", "swap_boltwingout", "swap_body")
+        owner.bolt_skin_l = nil
+    end
 
     if inst.components.container ~= nil then
         inst.components.container:Open(owner)
@@ -64,6 +71,11 @@ local function onequip(inst, owner)
                 return self.inst.GetAttacked_old(self, attacker, damage, weapon, stimuli)
             end
 
+            local backpack = self.inst.components.inventory:GetEquippedItem(EQUIPSLOTS.BACK or EQUIPSLOTS.BODY) or nil
+            if backpack == nil or backpack.components.container == nil then
+                return
+            end
+
             local attackerinfact = weapon or attacker --武器写在前面是为了优先躲避远程武器
             if
                 (self.inst.components.rider ~= nil and self.inst.components.rider:IsRiding()) --在骑牛
@@ -76,7 +88,7 @@ local function onequip(inst, owner)
             end
 
             --识别特定数量的材料来触发金蝉脱壳效果
-            local finalitem = inst.components.container:FindItem(function(item)
+            local finalitem = backpack.components.container:FindItem(function(item)
                 local value = item.bolt_l_value or BOLTCOST[item.prefab]
                 if
                     value ~= nil and
@@ -121,6 +133,7 @@ end
 
 local function onunequip(inst, owner)
     owner.AnimState:ClearOverrideSymbol("swap_body")
+    owner.bolt_skin_l = nil
 
     if inst.components.container ~= nil then
         inst.components.container:Close(owner)
@@ -167,12 +180,8 @@ local function fn()
 
     inst.foleysound = "legion/foleysound/insect"
 
-    MakeInventoryFloatable(inst, "small", 0.2, 0.45)
-    local OnLandedClient_old = inst.components.floater.OnLandedClient
-    inst.components.floater.OnLandedClient = function(self)
-        OnLandedClient_old(self)
-        self.inst.AnimState:SetFloatParams(0.09, 1, self.bob_percent)
-    end
+    inst:AddComponent("skinedlegion")
+    inst.components.skinedlegion:InitWithFloater("boltwingout")
 
     inst.entity:SetPristine()
 
@@ -204,6 +213,8 @@ local function fn()
     inst.components.burnable:SetOnExtinguishFn(onextinguish)
 
     MakeHauntableLaunchAndDropFirstItem(inst)
+
+    inst.components.skinedlegion:SetOnPreLoad()
 
     return inst
 end

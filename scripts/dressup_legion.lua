@@ -1040,8 +1040,7 @@ local dressup_data = {
         buildfile = "swap_agronssword",
         buildsymbol = "swap_agronssword",
     },
-    backcub =
-    {
+    backcub = {
         isnoskin = true,
         buildfn = function(dressup, item, buildskin)
             local itemswap = {}
@@ -1068,11 +1067,25 @@ local dressup_data = {
             end
         end,
     },
-    boltwingout =
-    {
+    boltwingout = {
         isnoskin = true,
-        buildfile = "swap_boltwingout",
-        buildsymbol = "swap_body",
+        buildfn = function(dressup, item, buildskin)
+            local itemswap = {}
+
+            local skindata = item.components.skinedlegion:GetSkinedData()
+            if skindata ~= nil and skindata.equip ~= nil then
+                itemswap["swap_body"] = dressup:GetDressData(
+                    nil, skindata.equip.build, skindata.equip.file, item.GUID, "swap"
+                )
+            else
+                itemswap["swap_body"] = dressup:GetDressData(
+                    nil, "swap_boltwingout", "swap_body", item.GUID, "swap"
+                )
+            end
+            itemswap["backpack"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
+
+            return itemswap
+        end,
     },
     -- book_weather --该道具贴图切换比较特殊，不做幻化
     desertdefense =
@@ -1111,15 +1124,23 @@ local dressup_data = {
         buildfn = function(dressup, item, buildskin)
             local itemswap = {}
 
-            itemswap["swap_hat"] = dressup:GetDressData(
-                buildskin, "hat_cowboy", "swap_hat", item.GUID, "swap"
-            )
+            local skindata = item.components.skinedlegion:GetSkinedData()
+            if skindata ~= nil and skindata.equip ~= nil then
+                itemswap["swap_hat"] = dressup:GetDressData(
+                    nil, skindata.equip.build, skindata.equip.file, item.GUID, "swap"
+                )
+                itemswap["swap_body"] = dressup:GetDressData(
+                    nil, skindata.equip.build, "swap_body", item.GUID, "swap"
+                )
+            else
+                itemswap["swap_hat"] = dressup:GetDressData(
+                    nil, "hat_cowboy", "swap_hat", item.GUID, "swap"
+                )
+                itemswap["swap_body"] = dressup:GetDressData(
+                    nil, "hat_cowboy", "swap_body", item.GUID, "swap"
+                )
+            end
             dressup:SetDressTop(itemswap)
-
-            --增加牛仔围巾的贴图
-            itemswap["swap_body"] = dressup:GetDressData(
-                buildskin, "scarf_cowboy", "swap_body", item.GUID, "swap"
-            )
 
             return itemswap
         end,

@@ -59,7 +59,6 @@ PrefabFiles = {
     -- "aatest_anim",
     "fx_legion",                --特效
     "buffs_legion",             --buff
-    "skinprefabs_legion",       --skined_legion
 }
 
 Assets = {
