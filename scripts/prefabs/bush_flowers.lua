@@ -408,7 +408,7 @@ MakeBush({
                             inst.components.lootdropper:SpawnLootPrefab("cutted_lilybush")    --掉落蹄莲幼苗
                         end
                     end
-                    inst.components.lootdropper:SpawnLootPrefab("cutted_lilybush")
+                    inst.components.lootdropper:SpawnLootPrefab("dug_lilybush")
                 end
             end
             inst:Remove()
