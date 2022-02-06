@@ -88,6 +88,23 @@ if CONFIGS_LEGION.FLOWERSPOWER then
         end,
         fn_remove = nil,
     })
+    MakeFx({ --兰草花剑：飞溅花瓣（粉色追猎皮肤）
+        name = "impact_orchid_fx_disguiser",
+        assets = {
+            Asset("ANIM", "anim/lavaarena_heal_projectile.zip"), --官方的熔炉奶杖击中特效动画
+            Asset("ANIM", "anim/skin/impact_orchid_fx_disguiser.zip"),
+        },
+        prefabs = nil,
+        fn_common = nil,
+        fn_anim = function(inst)
+            inst.AnimState:SetBank("lavaarena_heal_projectile")
+            inst.AnimState:SetBuild("impact_orchid_fx_disguiser")
+            inst.AnimState:SetFinalOffset(-1)
+            inst.AnimState:PlayAnimation("hit")
+            inst.AnimState:SetScale(0.7, 0.7)
+        end,
+        fn_remove = nil,
+    })
     MakeFx({ --永不凋零：损坏自己庇佑玩家的特效
         name = "neverfade_shield",
         assets = {

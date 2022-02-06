@@ -78,6 +78,24 @@ _G.SKIN_PREFABS_LEGION = {
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
     },
 
+    orchitwigs = {
+        assets = nil,
+        image = { name = nil, atlas = nil, setable = false, },
+        anim = {
+            bank = nil, build = nil,
+            anim = nil, isloop_anim = nil, animpush = nil, isloop_animpush = nil,
+            setable = true,
+        },
+        equip = {
+            symbol = "swap_object", build = "swap_orchitwigs", file = "swap_orchitwigs",
+            atkfx = "impact_orchid_fx",
+        },
+        exchangefx = { prefab = nil, offset_y = nil, scale = nil },
+        floater = {
+            cut = 0.15, size = "small", offset_y = 0.4, scale = 0.5, nofx = nil,
+        },
+    },
+
     neverfade = {
         assets = nil,
         image = { name = nil, atlas = nil, setable = false, },
@@ -323,6 +341,53 @@ _G.SKINS_LEGION = {
         },
     },
 
+    orchitwigs_disguiser = {
+        base_prefab = "orchitwigs",
+		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
+
+        skin_id = "61ff45880a30fc7fca0db5e5",
+		assets = {
+			Asset("ANIM", "anim/skin/orchitwigs_disguiser.zip"),
+            Asset("ATLAS", "images/inventoryimages_skin/orchitwigs_disguiser.xml"),
+            Asset("IMAGE", "images/inventoryimages_skin/orchitwigs_disguiser.tex"),
+            Asset("ATLAS", "images/inventoryimages_skin/foliageath_orchitwigs_disguiser.xml"),
+            Asset("IMAGE", "images/inventoryimages_skin/foliageath_orchitwigs_disguiser.tex"),
+		},
+        image = { name = nil, atlas = nil, setable = true, },
+
+        string = ischinese and {
+            name = "粉色追猎", collection = "DISGUISER", access = "DONATE",
+            descitem = "解锁\"兰草花穗\"皮肤。",
+            description = "这片粉色花园是它的生活的点点滴滴。它打点自己的小天地，也借花谋生。它藏在自己的伪装里，招蜂引蝶，追猎而食。芸芸言它残勤劳心害美丽身，它无所顾忌，刹那间伸出死亡利爪又消失于粉脂。",
+        } or {
+            name = "Orchitwigs", collection = "DISGUISER", access = "DONATE",
+            descitem = "Unlock \"Orchitwigs\" skin.",
+            description = "The story was not translated.",
+        },
+
+		anim = {
+            bank = nil, build = nil,
+            anim = nil, isloop_anim = nil, animpush = nil, isloop_animpush = nil,
+            setable = true,
+        },
+        equip = {
+            symbol = "swap_object", build = "orchitwigs_disguiser", file = "swap_object",
+            atkfx = "impact_orchid_fx_disguiser",
+        },
+        scabbard = {
+            anim = "idle_cover", bank = "orchitwigs_disguiser", build = "orchitwigs_disguiser",
+            image = "foliageath_orchitwigs_disguiser", atlas = "images/inventoryimages_skin/foliageath_orchitwigs_disguiser.xml",
+        },
+        exchangefx = { prefab = nil, offset_y = nil, scale = nil },
+        floater = {
+            cut = 0.05, size = "small", offset_y = 0.15, scale = 0.5, nofx = nil,
+        },
+        -- linkedskins = { bush = "orchidbush_disguiser" },
+        -- placer = {
+        --     name = nil, bank = "orchidbush_disguiser", build = "orchidbush_disguiser", anim = "dead", prefabs = nil,
+        -- },
+    },
+
     neverfade_thanks = {
         base_prefab = "neverfade",
 		type = "item", skin_tags = {}, release_group = 555, rarity = raritySpecial,
@@ -433,6 +498,37 @@ _G.SKINS_LEGION = {
         exchangefx = { prefab = nil, offset_y = nil, scale = nil },
         floater = {
             cut = 0.03, size = "small", offset_y = 0.15, scale = 0.5, nofx = nil,
+        },
+    },
+    hat_lichen_disguiser = {
+        base_prefab = "hat_lichen",
+		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
+
+        skin_id = "61f15bf4db102b0b8a529c66",
+		assets = {
+			Asset("ANIM", "anim/skin/hat_lichen_disguiser.zip"),
+		},
+		image = { name = nil, atlas = nil, setable = true, },
+
+        string = ischinese and {
+            name = "深渊的星", collection = "DISGUISER", access = "DONATE",
+            descitem = "解锁\"苔衣发卡\"皮肤。",
+            description = "洋流之下，是暗流涌动的深渊。终年阴暗，这里的生物都渴望光明。偶尔会有忽闪忽闪的淡蓝色星光，小小鱼虾们前去追寻。越游越近，突现一张长满尖牙的恐怖大嘴一口咬了下来。",
+        } or {
+            name = "Abyss Star Hairpin", collection = "DISGUISER", access = "DONATE",
+            descitem = "Unlock \"Lichen Hairpin\" skin.",
+            description = "The story was not translated.",
+        },
+
+		anim = {
+            bank = nil, build = nil,
+            anim = nil, isloop_anim = nil, animpush = nil, isloop_animpush = nil,
+            setable = true,
+        },
+        equip = { symbol = "swap_hat", build = "hat_lichen_disguiser", file = "swap_hat" },
+        exchangefx = { prefab = nil, offset_y = nil, scale = nil },
+        floater = {
+            cut = 0.03, size = "med", offset_y = 0.2, scale = 0.5, nofx = nil,
         },
     },
 
@@ -586,7 +682,7 @@ end
 
 local skinidxes = { --用以皮肤排序
     "hat_cowboy_tvplay",
-    "boltwingout_disguiser",
+    "orchitwigs_disguiser", "hat_lichen_disguiser", "boltwingout_disguiser",
     "rosebush_marble", "lilybush_marble", "orchidbush_marble",
     "neverfade_thanks", "neverfadebush_thanks",
     "hat_lichen_emo_que",

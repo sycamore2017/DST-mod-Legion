@@ -132,6 +132,9 @@ local InventoryPrefabsList = {  --每个元素的下标值为每种物品栏图�
     foliageath_neverfade_thanks = { build = "images_minisign_skins", },
     hat_cowboy_tvplay = { build = "images_minisign_skins", },
     boltwingout_disguiser = { build = "images_minisign_skins", },
+    hat_lichen_disguiser = { build = "images_minisign_skins", },
+    orchitwigs_disguiser = { build = "images_minisign_skins", },
+    foliageath_orchitwigs_disguiser = { build = "images_minisign_skins", },
 }
 
 return InventoryPrefabsList

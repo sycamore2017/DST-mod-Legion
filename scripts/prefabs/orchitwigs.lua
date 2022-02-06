@@ -17,7 +17,13 @@ if not TheNet:GetPVPEnabled() then
 end
 
 local function OnEquip(inst, owner) --装备武器时
-    owner.AnimState:OverrideSymbol("swap_object", "swap_orchitwigs", "swap_orchitwigs")
+    local skindata = inst.components.skinedlegion:GetSkinedData()
+    if skindata ~= nil and skindata.equip ~= nil then
+        owner.AnimState:OverrideSymbol("swap_object", skindata.equip.build, skindata.equip.file)
+    else
+        owner.AnimState:OverrideSymbol("swap_object", "swap_orchitwigs", "swap_orchitwigs")
+    end
+
     owner.AnimState:Show("ARM_carry") --显示持物手
     owner.AnimState:Hide("ARM_normal") --隐藏普通的手
 end
@@ -29,7 +35,12 @@ end
 
 local function onattack(inst, owner, target)
     if target ~= nil and target:IsValid() then
-        local snap = SpawnPrefab("impact_orchid_fx")   --攻击时的特效
+        local skindata = inst.components.skinedlegion:GetSkinedData()
+        local snap = nil
+        if skindata ~= nil and skindata.equip ~= nil then
+            snap = skindata.equip.atkfx
+        end
+        snap = SpawnPrefab(snap or "impact_orchid_fx")
         if snap ~= nil then
             local x, y, z = inst.Transform:GetWorldPosition()
             local x1, y1, z1 = target.Transform:GetWorldPosition()
@@ -71,16 +82,11 @@ local function fn()
     --weapon (from weapon component) added to pristine state for optimization
     inst:AddTag("weapon")
 
-    MakeInventoryFloatable(inst, "small", 0.4, 0.5)
-    local OnLandedClient_old = inst.components.floater.OnLandedClient
-    inst.components.floater.OnLandedClient = function(self)
-        OnLandedClient_old(self)
-        self.inst.AnimState:SetFloatParams(0.15, 1, 0.1)
-    end
+    inst:AddComponent("skinedlegion")
+    inst.components.skinedlegion:InitWithFloater("orchitwigs") --客户端才初始化时居然获取不了inst.prefab
 
     inst.entity:SetPristine()
-
-    if not TheWorld.ismastersim then 
+    if not TheWorld.ismastersim then
         return inst
     end
 
@@ -90,7 +96,7 @@ local function fn()
 
     inst:AddComponent("inspectable") --可检查组件
 
-    inst:AddComponent("equippable")--添加可装备组件，有了这个组件，你才能装备物品  
+    inst:AddComponent("equippable")--添加可装备组件，有了这个组件，你才能装备物品
     inst.components.equippable:SetOnEquip( OnEquip )
     inst.components.equippable:SetOnUnequip( OnUnequip )
 
@@ -104,6 +110,8 @@ local function fn()
     inst.components.perishable.onperishreplacement = "spoiled_food"
 
     MakeHauntableLaunchAndPerish(inst)  --作祟相关函数
+
+    inst.components.skinedlegion:SetOnPreLoad()
 
     return inst
 end
