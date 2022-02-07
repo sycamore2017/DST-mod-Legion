@@ -101,61 +101,61 @@ local SkinLegionDialog = Class(Widget, function(self, owner)
     self.horizontal_line3:SetScale(.32, .25)
     self.horizontal_line3:SetPosition(140, -105)
 
-    --cdk输入框
-    self.input_cdk = self.proot:AddChild(TEMPLATES2.StandardSingleLineTextEntry(nil, 200, 40))
-    self.input_cdk.textbox:SetTextLengthLimit(20)
-    self.input_cdk.textbox:EnableWordWrap(false)
-    self.input_cdk.textbox:EnableScrollEditWindow(true)
-    self.input_cdk.textbox:SetTextPrompt(STRINGS.SKIN_LEGION.UI_INPUT_CDK, UICOLOURS.GREY)
-    self.input_cdk.textbox.prompt:SetHAlign(ANCHOR_MIDDLE)
-    self.input_cdk.textbox:SetHAlign(ANCHOR_MIDDLE)
-    self.input_cdk.textbox:SetCharacterFilter("-0123456789QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm")
-    self.input_cdk:SetOnGainFocus( function() self.input_cdk.textbox:OnGainFocus() end )
-    self.input_cdk:SetOnLoseFocus( function() self.input_cdk.textbox:OnLoseFocus() end )
-    self.input_cdk:SetPosition(140, -130)
-    self.input_cdk.focus_forward = self.input_cdk.textbox
+    --cdk输入框(tip: 皮肤获取通道删除)
+    -- self.input_cdk = self.proot:AddChild(TEMPLATES2.StandardSingleLineTextEntry(nil, 200, 40))
+    -- self.input_cdk.textbox:SetTextLengthLimit(20)
+    -- self.input_cdk.textbox:EnableWordWrap(false)
+    -- self.input_cdk.textbox:EnableScrollEditWindow(true)
+    -- self.input_cdk.textbox:SetTextPrompt(STRINGS.SKIN_LEGION.UI_INPUT_CDK, UICOLOURS.GREY)
+    -- self.input_cdk.textbox.prompt:SetHAlign(ANCHOR_MIDDLE)
+    -- self.input_cdk.textbox:SetHAlign(ANCHOR_MIDDLE)
+    -- self.input_cdk.textbox:SetCharacterFilter("-0123456789QWERTYUIOPASDFGHJKLZXCVBNMqwertyuiopasdfghjklzxcvbnm")
+    -- self.input_cdk:SetOnGainFocus( function() self.input_cdk.textbox:OnGainFocus() end )
+    -- self.input_cdk:SetOnLoseFocus( function() self.input_cdk.textbox:OnLoseFocus() end )
+    -- self.input_cdk:SetPosition(140, -130)
+    -- self.input_cdk.focus_forward = self.input_cdk.textbox
 
-    --cdk确认输入按钮
-    self.button_cdk = self.proot:AddChild(
-        ImageButton("images/global_redux.xml", "button_carny_long_normal.tex",
-            "button_carny_long_hover.tex", "button_carny_long_disabled.tex", "button_carny_long_down.tex")
-    )
-    self.button_cdk.image:SetScale(.3, .35)
-    self.button_cdk:SetFont(CHATFONT)
-    self.button_cdk:SetPosition(140, -165)
-    self.button_cdk.text:SetColour(0,0,0,1)
-    self.button_cdk:SetTextSize(20)
-    self.button_cdk:SetText(STRINGS.UI.MAINSCREEN.REDEEM)
-    self.button_cdk:SetOnClick(function()
-        if self.loadtag_cdk == 0 then
-            return
-        end
+    --cdk确认输入按钮(tip: 皮肤获取通道删除)
+    -- self.button_cdk = self.proot:AddChild(
+    --     ImageButton("images/global_redux.xml", "button_carny_long_normal.tex",
+    --         "button_carny_long_hover.tex", "button_carny_long_disabled.tex", "button_carny_long_down.tex")
+    -- )
+    -- self.button_cdk.image:SetScale(.3, .35)
+    -- self.button_cdk:SetFont(CHATFONT)
+    -- self.button_cdk:SetPosition(140, -165)
+    -- self.button_cdk.text:SetColour(0,0,0,1)
+    -- self.button_cdk:SetTextSize(20)
+    -- self.button_cdk:SetText(STRINGS.UI.MAINSCREEN.REDEEM)
+    -- self.button_cdk:SetOnClick(function()
+    --     if self.loadtag_cdk == 0 then
+    --         return
+    --     end
 
-        local cdk = self.input_cdk.textbox:GetString()
-        if cdk == nil or cdk == "" or cdk:utf8len() <= 6 then
-            PushPopupDialog(self, "轻声提醒", "请输入正确的兑换码。", "知道啦", nil)
-            return
-        end
-        self:SetCdkState(0, nil) --后续的状态更新需要服务端返回结果过来
-        DoRpc(2, { cdk = cdk })
-    end)
+    --     local cdk = self.input_cdk.textbox:GetString()
+    --     if cdk == nil or cdk == "" or cdk:utf8len() <= 6 then
+    --         PushPopupDialog(self, "轻声提醒", "请输入正确的兑换码。", "知道啦", nil)
+    --         return
+    --     end
+    --     self:SetCdkState(0, nil) --后续的状态更新需要服务端返回结果过来
+    --     DoRpc(2, { cdk = cdk })
+    -- end)
 
     --关闭弹窗按钮
     self.button_close = self.proot:AddChild(TEMPLATES.SmallButton(STRINGS.UI.PLAYER_AVATAR.CLOSE, 26, .5, function() self:Close() end))
     self.button_close:SetPosition(0, -215)
 
-    --主动刷新皮肤按钮
-    self.button_regetskins = self.proot:AddChild(TEMPLATES.IconButton(
-        "images/button_icons.xml", "refresh.tex", "刷新我的皮肤", false, false,
-        function()
-            DoRpc(1, nil)
-        end,
-        nil, "self_inspect_mod.tex"
-    ))
-    self.button_regetskins.icon:SetScale(.15)
-    self.button_regetskins.icon:SetPosition(-5, 6)
-    self.button_regetskins:SetScale(0.65)
-    self.button_regetskins:SetPosition(110, -220)
+    --主动刷新皮肤按钮(tip: 皮肤获取通道删除)
+    -- self.button_regetskins = self.proot:AddChild(TEMPLATES.IconButton(
+    --     "images/button_icons.xml", "refresh.tex", "刷新我的皮肤", false, false,
+    --     function()
+    --         DoRpc(1, nil)
+    --     end,
+    --     nil, "self_inspect_mod.tex"
+    -- ))
+    -- self.button_regetskins.icon:SetScale(.15)
+    -- self.button_regetskins.icon:SetPosition(-5, 6)
+    -- self.button_regetskins:SetScale(0.65)
+    -- self.button_regetskins:SetPosition(110, -220)
 
     self.selected_item = nil
     self.context_popup = nil
@@ -391,43 +391,43 @@ function SkinLegionDialog:SetItemInfo(item)
         end
         self.label_skinaccess:SetString(GetAccess(item.item_key))
 
-        --获取按钮
-        if item.isowned then
-            if self.button_access ~= nil then
-                self.button_access:Kill()
-                self.button_access = nil
-            end
-        else
-            if item.isunlockable then
-                if self.button_access == nil then
-                    self.button_access = self.panel_iteminfo:AddChild(
-                        ImageButton("images/global_redux.xml", "button_carny_long_normal.tex",
-                            "button_carny_long_hover.tex", "button_carny_long_disabled.tex", "button_carny_long_down.tex")
-                    )
-                    self.button_access.image:SetScale(.2, .35)
-                    self.button_access:SetFont(CHATFONT)
-                    self.button_access:SetPosition(50, -212)
-                    self.button_access.text:SetColour(0,0,0,1)
-                    self.button_access:SetTextSize(20)
-                    self.button_access:SetText(STRINGS.SKIN_LEGION.UI_ACCESS)
-                    self.button_access:SetOnClick(function()
-                        local skin = SKINS_LEGION[item.item_key]
-                        if skin ~= nil then
-                            VisitURL("https://wap.fireleaves.cn/#/qrcode?userId="..self.owner.userid
-                                .."&skinId="..skin.skin_id)
-                            PushPopupDialog(self, "感谢支持！", "打赏成功了吗？请点击按钮刷新皮肤数据。", "弄好了吧？", function()
-                                DoRpc(1, nil)
-                            end)
-                        end
-                    end)
-                end
-            else
-                if self.button_access ~= nil then
-                    self.button_access:Kill()
-                    self.button_access = nil
-                end
-            end
-        end
+        --获取按钮(tip: 皮肤获取通道删除)
+        -- if item.isowned then
+        --     if self.button_access ~= nil then
+        --         self.button_access:Kill()
+        --         self.button_access = nil
+        --     end
+        -- else
+        --     if item.isunlockable then
+        --         if self.button_access == nil then
+        --             self.button_access = self.panel_iteminfo:AddChild(
+        --                 ImageButton("images/global_redux.xml", "button_carny_long_normal.tex",
+        --                     "button_carny_long_hover.tex", "button_carny_long_disabled.tex", "button_carny_long_down.tex")
+        --             )
+        --             self.button_access.image:SetScale(.2, .35)
+        --             self.button_access:SetFont(CHATFONT)
+        --             self.button_access:SetPosition(50, -212)
+        --             self.button_access.text:SetColour(0,0,0,1)
+        --             self.button_access:SetTextSize(20)
+        --             self.button_access:SetText(STRINGS.SKIN_LEGION.UI_ACCESS)
+        --             self.button_access:SetOnClick(function()
+        --                 local skin = SKINS_LEGION[item.item_key]
+        --                 if skin ~= nil then
+        --                     VisitURL("https://wap.fireleaves.cn/#/qrcode?userId="..self.owner.userid
+        --                         .."&skinId="..skin.skin_id)
+        --                     PushPopupDialog(self, "感谢支持！", "打赏成功了吗？请点击按钮刷新皮肤数据。", "弄好了吧？", function()
+        --                         DoRpc(1, nil)
+        --                     end)
+        --                 end
+        --             end)
+        --         end
+        --     else
+        --         if self.button_access ~= nil then
+        --             self.button_access:Kill()
+        --             self.button_access = nil
+        --         end
+        --     end
+        -- end
 
         --中部分割线
         if self.horizontal_line2 == nil then

@@ -6,11 +6,15 @@
 *【鸡毛铺】
 （1）新增“粉色追猎”、“深渊的星”两个免费皮肤
 （2）皮肤获取通道、cdk兑换通道已完全关闭。还没有兑换cdk的玩家可私聊群主解决
+*【祈雨祭】
+（1）多变的云不再能无消耗给耕地浇水(每次浇水消耗2耐久)
+*【丰饶传说】
+（1）子圭·益矩会在耕地缺肥超过50%后才开始加肥
 *【尘市蜃楼】
 （1）新增最近新出的两个雕像的幻化
 *【mod兼容】
-（1）【神话书说】修正了行者帽的幻化效果、新增药篓的幻化
-（2）【神话书说】在熊猫人店铺中加入了棱镜的物品
+（1）【神话书说】新增竹药篓、铸铁头盔、铸铁大刀和铸铁战甲的幻化
+（2）【神话书说】在熊猫人店铺中加入了棱镜的物品(电气石、雨蝇、松萝相关、花丛相关)
 
 
 
@@ -734,6 +738,35 @@ AddSimPostInit(function()
                     return itemswap
                 end,
             }
+            DRESSUP_DATA["myth_bamboo_basket"] = { --竹药篓
+                isnoskin = true,
+                buildfn = function(dressup, item, buildskin)
+                    local itemswap = {}
+
+                    local mythskin = item.components.myth_itemskin
+                    local skinname = mythskin.skin:value()
+                    local skindata = mythskin.swap or mythskin.data.default.swap
+                    if skinname == "apricot" then
+                        itemswap["swap_body_tall"] = dressup:GetDressData(
+                            nil, skindata.build, "swap_none", item.GUID, "swap"
+                        )
+                    else
+                        itemswap["backpack"] = dressup:GetDressData(
+                            nil, skindata.build, skindata.folder, item.GUID, "swap"
+                        )
+                        itemswap["swap_body"] = dressup:GetDressData(
+                            nil, skindata.build, skindata.folder, item.GUID, "swap"
+                        )
+                    end
+
+                    return itemswap
+                end,
+                unbuildfn = function(dressup, item)
+                    dressup:InitClear("swap_body_tall")
+                    dressup:InitClear("backpack")
+                    dressup:InitClear("swap_body")
+                end,
+            }
             DRESSUP_DATA["bananafan_big"] = { --芭蕉宝扇
                 isnoskin = true, buildfile = "swap_bananafan_big", buildsymbol = "swap_fan",
             }
@@ -782,6 +815,89 @@ AddSimPostInit(function()
             DRESSUP_DATA["myth_weapon_syd"] = { --暑熠刀
                 isnoskin = true, buildfile = "myth_weapon_syd", buildsymbol = "swap",
             }
+            DRESSUP_DATA["myth_iron_helmet"] = { --铸铁头盔
+                isnoskin = true, buildfile = "myth_iron_helmet", buildsymbol = "swap_hat",
+            }
+            DRESSUP_DATA["myth_iron_broadsword"] = { --铸铁大刀
+                isnoskin = true, buildfile = "myth_iron_broadsword", buildsymbol = "swap_object",
+            }
+            DRESSUP_DATA["myth_iron_battlegear"] = { --铸铁战甲
+                isnoskin = true, buildfile = "myth_iron_battlegear", buildsymbol = "swap_body",
+            }
+        end
+
+        if _G.rawget(_G, "AddBambooShopItems") then
+            local chancemap = { 1, 3, 7, 10, 15 }
+            _G.AddBambooShopItems("rareitem", {
+                tourmalinecore = {
+                    img_tex = "tourmalinecore.tex", img_atlas = "images/inventoryimages/tourmalinecore.xml",
+                    buy = { value = 320, chance = chancemap[1], count_min = 1, count_max = 1, stacksize = 5, },
+                    sell = { value = 180, chance = chancemap[1], count_min = 1, count_max = 1, stacksize = 5, }
+                },
+            })
+            _G.AddBambooShopItems("ingredient", {
+                pineananas = {
+                    img_tex = "pineananas.tex", img_atlas = "images/inventoryimages/pineananas.xml",
+                    buy = { value = 5, chance = chancemap[2], count_min = 3, count_max = 5, stacksize = 20, },
+                    sell = { value = 2, chance = chancemap[2], count_min = 3, count_max = 5, stacksize = 20, },
+                },
+            })
+            _G.AddBambooShopItems("plants", {
+                pineananas_seeds = {
+                    img_tex = "pineananas_seeds.tex", img_atlas = "images/inventoryimages/pineananas_seeds.xml",
+                    buy = { value = 12, chance = chancemap[3], count_min = 2, count_max = 3, stacksize = 10, num_mix = 4, },
+                    sell = { value = nil, chance = chancemap[3], count_min = 2, count_max = 3, stacksize = 10, num_mix = 4, }
+                },
+                pineananas_oversized = {
+                    img_tex = "pineananas_oversized.tex", img_atlas = "images/inventoryimages/pineananas_oversized.xml",
+                    buy = { value = nil, chance = chancemap[5], count_min = 1, count_max = 2, stacksize = 5, },
+                    sell = { value = 10, chance = chancemap[5], count_min = 1, count_max = 2, stacksize = 5, }
+                },
+                dug_rosebush = {
+                    img_tex = "dug_rosebush.tex", img_atlas = "images/inventoryimages/dug_rosebush.xml",
+                    buy = { value = 15, chance = chancemap[2], count_min = 1, count_max = 3, stacksize = 10, },
+                    sell = { value = nil, chance = chancemap[2], count_min = 1, count_max = 3, stacksize = 10, },
+                },
+                dug_lilybush = {
+                    img_tex = "dug_lilybush.tex", img_atlas = "images/inventoryimages/dug_lilybush.xml",
+                    buy = { value = 15, chance = chancemap[2], count_min = 1, count_max = 3, stacksize = 10, },
+                    sell = { value = nil, chance = chancemap[2], count_min = 1, count_max = 3, stacksize = 10, },
+                },
+                dug_orchidbush = {
+                    img_tex = "dug_orchidbush.tex", img_atlas = "images/inventoryimages/dug_orchidbush.xml",
+                    buy = { value = 15, chance = chancemap[2], count_min = 1, count_max = 3, stacksize = 10, },
+                    sell = { value = nil, chance = chancemap[2], count_min = 1, count_max = 3, stacksize = 10, },
+                },
+                cutted_rosebush = {
+                    img_tex = "cutted_rosebush.tex", img_atlas = "images/inventoryimages/cutted_rosebush.xml",
+                    buy = { value = 15, chance = chancemap[2], count_min = 1, count_max = 3, stacksize = 20, },
+                    sell = { value = 6, chance = chancemap[2], count_min = 2, count_max = 4, stacksize = 20, },
+                },
+                cutted_lilybush = {
+                    img_tex = "cutted_lilybush.tex", img_atlas = "images/inventoryimages/cutted_lilybush.xml",
+                    buy = { value = 15, chance = chancemap[2], count_min = 1, count_max = 3, stacksize = 20, },
+                    sell = { value = 6, chance = chancemap[2], count_min = 2, count_max = 4, stacksize = 20, },
+                },
+                cutted_orchidbush = {
+                    img_tex = "cutted_orchidbush.tex", img_atlas = "images/inventoryimages/cutted_orchidbush.xml",
+                    buy = { value = 15, chance = chancemap[2], count_min = 1, count_max = 3, stacksize = 20, },
+                    sell = { value = 6, chance = chancemap[2], count_min = 2, count_max = 4, stacksize = 20, },
+                },
+            })
+            _G.AddBambooShopItems("animals", {
+                raindonate = {
+                    img_tex = "raindonate.tex", img_atlas = "images/inventoryimages/raindonate.xml",
+                    buy = { value = 10, chance = chancemap[3], count_min = 2, count_max = 4, stacksize = 10, },
+                    sell = { value = 5, chance = chancemap[3], count_min = 2, count_max = 4, stacksize = 10, },
+                },
+            })
+            _G.AddBambooShopItems("construct", {
+                shyerrylog = {
+                    img_tex = "shyerrylog.tex", img_atlas = "images/inventoryimages/shyerrylog.xml",
+                    buy = { value = 4, chance = chancemap[4], count_min = 3, count_max = 5, stacksize = 20, },
+                    sell = { value = 2, chance = chancemap[4], count_min = 3, count_max = 5, stacksize = 20, },
+                },
+            })
         end
     end
 

@@ -627,7 +627,7 @@ if ischinese then
         UI_LOAD_CDK = "兑换中...",
         ACCESS = {
             UNKNOWN = "无法获取",
-            DONATE = "通过打赏获取",
+            DONATE = "通过回忆获取", --通过打赏获取
             FREE = "自动获取",
             SPECIAL = "通过特殊方式获取",
         },
@@ -649,7 +649,7 @@ else
         UI_LOAD_CDK = "Redeeming...",
         ACCESS = {
             UNKNOWN = "Unable to get",
-            DONATE = "Get it by donation",
+            DONATE = "Get it by memory", --Get it by donation
             FREE = "Free access",
             SPECIAL = "Get it by special ways",
         },

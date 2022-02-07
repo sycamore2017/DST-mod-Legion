@@ -73,7 +73,7 @@ local function isEmptyNutrients(self)
 end
 local function ComputNutrient(self, idx, _n)
     _n = 100 - _n
-    if _n > 0 then
+    if _n > 50 then --缺肥超过50%才开始加肥，这样也许能减少搭配种植时肥料的消耗
         local n_now = self.nutrients[idx]
         if n_now > _n then
             self.nutrients[idx] = n_now - _n

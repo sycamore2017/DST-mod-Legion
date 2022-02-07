@@ -130,6 +130,11 @@ local function fn()
     else
         inst.components.wateryprotection:AddIgnoreTag("player")  --PVE，防止所有玩家被打湿
     end
+    inst.components.wateryprotection.onspreadprotectionfn = function(inst)
+        if inst.components.finiteuses ~= nil then
+            inst.components.finiteuses:Use(2)
+        end
+    end
 
     inst:AddComponent("finiteuses")
     inst.components.finiteuses:SetMaxUses(200)
