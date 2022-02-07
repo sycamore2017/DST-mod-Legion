@@ -11,19 +11,27 @@ local prefabs =
 }
 
 local function lichen_equip(inst, owner)    --装备时
+    if inst._light == nil or not inst._light:IsValid() then
+        inst._light = SpawnPrefab("lichenhatlight") --生成光源
+        inst._light.entity:SetParent(owner.entity)  --给光源设置父节点
+    end
+
     local skindata = inst.components.skinedlegion:GetSkinedData()
     if skindata ~= nil and skindata.equip ~= nil then
-        HAT_OPENTOP_ONEQUIP_LEGION(inst, owner, skindata.equip.build, skindata.equip.file)
+        if skindata.equip.isopenhat then
+            HAT_OPENTOP_ONEQUIP_LEGION(inst, owner, skindata.equip.build, skindata.equip.file)
+        else
+            HAT_ONEQUIP_LEGION(inst, owner, skindata.equip.build, skindata.equip.file)
+        end
+        if skindata.equip.lightcolor ~= nil then
+            local rgb = skindata.equip.lightcolor
+            inst._light.Light:SetColour(rgb.r, rgb.g, rgb.b)
+        end
     else
         HAT_OPENTOP_ONEQUIP_LEGION(inst, owner, "hat_lichen", "swap_hat")
     end
 
     -- owner:AddTag("ignoreMeat")  --添加忽略带着肉的标签
-
-    if inst._light == nil or not inst._light:IsValid() then
-        inst._light = SpawnPrefab("lichenhatlight") --生成光源
-        inst._light.entity:SetParent(owner.entity)  --给光源设置父节点
-    end
 
     local soundemitter = owner ~= nil and owner.SoundEmitter or inst.SoundEmitter
     soundemitter:PlaySound("dontstarve/common/minerhatAddFuel") --添加装备时的音效

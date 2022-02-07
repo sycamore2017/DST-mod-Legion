@@ -99,9 +99,8 @@ if CONFIGS_LEGION.FLOWERSPOWER then
         fn_anim = function(inst)
             inst.AnimState:SetBank("lavaarena_heal_projectile")
             inst.AnimState:SetBuild("impact_orchid_fx_disguiser")
-            inst.AnimState:SetFinalOffset(-1)
+            -- inst.AnimState:SetFinalOffset(-1)
             inst.AnimState:PlayAnimation("hit")
-            inst.AnimState:SetScale(0.7, 0.7)
         end,
         fn_remove = nil,
     })

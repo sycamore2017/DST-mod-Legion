@@ -139,7 +139,7 @@ _G.SKIN_PREFABS_LEGION = {
             anim = "anim", isloop_anim = nil, animpush = nil, isloop_animpush = nil,
             setable = true,
         },
-        equip = { symbol = "swap_hat", build = "hat_lichen", file = "swap_hat" },
+        equip = { symbol = "swap_hat", build = "hat_lichen", file = "swap_hat", isopenhat = true },
         exchangefx = { prefab = nil, offset_y = nil, scale = nil },
         floater = {
             cut = 0.03, size = "med", offset_y = 0.2, scale = 0.5, nofx = nil,
@@ -343,9 +343,9 @@ _G.SKINS_LEGION = {
 
     orchitwigs_disguiser = {
         base_prefab = "orchitwigs",
-		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
+		type = "item", skin_tags = {}, release_group = 555, rarity = rarityFree,
 
-        skin_id = "61ff45880a30fc7fca0db5e5",
+        skin_id = "freeskins", --61ff45880a30fc7fca0db5e5
 		assets = {
 			Asset("ANIM", "anim/skin/orchitwigs_disguiser.zip"),
             Asset("ATLAS", "images/inventoryimages_skin/orchitwigs_disguiser.xml"),
@@ -356,11 +356,11 @@ _G.SKINS_LEGION = {
         image = { name = nil, atlas = nil, setable = true, },
 
         string = ischinese and {
-            name = "粉色追猎", collection = "DISGUISER", access = "DONATE",
+            name = "粉色追猎", collection = "DISGUISER", access = "FREE",
             descitem = "解锁\"兰草花穗\"皮肤。",
             description = "这片粉色花园是它的生活的点点滴滴。它打点自己的小天地，也借花谋生。它藏在自己的伪装里，招蜂引蝶，追猎而食。芸芸言它残勤劳心害美丽身，它无所顾忌，刹那间伸出死亡利爪又消失于粉脂。",
         } or {
-            name = "Orchitwigs", collection = "DISGUISER", access = "DONATE",
+            name = "Orchitwigs", collection = "DISGUISER", access = "FREE",
             descitem = "Unlock \"Orchitwigs\" skin.",
             description = "The story was not translated.",
         },
@@ -494,7 +494,7 @@ _G.SKINS_LEGION = {
             anim = nil, isloop_anim = nil, animpush = nil, isloop_animpush = nil,
             setable = true,
         },
-        equip = { symbol = "swap_hat", build = "hat_lichen_emo_que", file = "swap_hat" },
+        equip = { symbol = "swap_hat", build = "hat_lichen_emo_que", file = "swap_hat", isopenhat = true },
         exchangefx = { prefab = nil, offset_y = nil, scale = nil },
         floater = {
             cut = 0.03, size = "small", offset_y = 0.15, scale = 0.5, nofx = nil,
@@ -502,20 +502,20 @@ _G.SKINS_LEGION = {
     },
     hat_lichen_disguiser = {
         base_prefab = "hat_lichen",
-		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
+		type = "item", skin_tags = {}, release_group = 555, rarity = rarityFree,
 
-        skin_id = "61f15bf4db102b0b8a529c66",
+        skin_id = "freeskins", --61f15bf4db102b0b8a529c66
 		assets = {
 			Asset("ANIM", "anim/skin/hat_lichen_disguiser.zip"),
 		},
 		image = { name = nil, atlas = nil, setable = true, },
 
         string = ischinese and {
-            name = "深渊的星", collection = "DISGUISER", access = "DONATE",
+            name = "深渊的星", collection = "DISGUISER", access = "FREE",
             descitem = "解锁\"苔衣发卡\"皮肤。",
             description = "洋流之下，是暗流涌动的深渊。终年阴暗，这里的生物都渴望光明。偶尔会有忽闪忽闪的淡蓝色星光，小小鱼虾们前去追寻。越游越近，突现一张长满尖牙的恐怖大嘴一口咬了下来。",
         } or {
-            name = "Abyss Star Hairpin", collection = "DISGUISER", access = "DONATE",
+            name = "Abyss Star Hairpin", collection = "DISGUISER", access = "FREE",
             descitem = "Unlock \"Lichen Hairpin\" skin.",
             description = "The story was not translated.",
         },
@@ -525,10 +525,13 @@ _G.SKINS_LEGION = {
             anim = nil, isloop_anim = nil, animpush = nil, isloop_animpush = nil,
             setable = true,
         },
-        equip = { symbol = "swap_hat", build = "hat_lichen_disguiser", file = "swap_hat" },
+        equip = {
+            symbol = "swap_hat", build = "hat_lichen_disguiser", file = "swap_hat",
+            isopenhat = false, lightcolor = { r = 0, g = 1, b = 1 }
+        },
         exchangefx = { prefab = nil, offset_y = nil, scale = nil },
         floater = {
-            cut = 0.03, size = "med", offset_y = 0.2, scale = 0.5, nofx = nil,
+            cut = 0.03, size = "med", offset_y = 0.2, scale = 0.7, nofx = nil,
         },
     },
 
@@ -681,10 +684,10 @@ end
 ------
 
 local skinidxes = { --用以皮肤排序
+    "neverfade_thanks", "neverfadebush_thanks",
     "hat_cowboy_tvplay",
     "orchitwigs_disguiser", "hat_lichen_disguiser", "boltwingout_disguiser",
     "rosebush_marble", "lilybush_marble", "orchidbush_marble",
-    "neverfade_thanks", "neverfadebush_thanks",
     "hat_lichen_emo_que",
 }
 for i,skinname in pairs(skinidxes) do

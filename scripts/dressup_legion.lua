@@ -1168,12 +1168,17 @@ local dressup_data = {
                 itemswap["swap_hat"] = dressup:GetDressData(
                     nil, skindata.equip.build, skindata.equip.file, item.GUID, "swap"
                 )
+                if skindata.equip.isopenhat then
+                    dressup:SetDressOpenTop(itemswap)
+                else
+                    dressup:SetDressTop(itemswap)
+                end
             else
                 itemswap["swap_hat"] = dressup:GetDressData(
                     nil, "hat_lichen", "swap_hat", item.GUID, "swap"
                 )
+                dressup:SetDressOpenTop(itemswap)
             end
-            dressup:SetDressOpenTop(itemswap)
 
             return itemswap
         end,

@@ -85,51 +85,84 @@ function SwordScabbard:BreakUp(player)
         sword.task_recover = nil
     end
 
+    local x, y, z = self.inst.Transform:GetWorldPosition()
     local foliageath = SpawnPrefab("foliageath")
-    local container = self.inst.components.inventoryitem:GetContainer()
-    if container ~= nil then
-        local x, y, z = player.Transform:GetWorldPosition()
-        local slot = self.inst.components.inventoryitem:GetSlotNum()
-        -- local player = self.inst.components.inventoryitem:GetGrandOwner()
-        self.inst:Remove()
-        if not container:GiveItem(foliageath, slot) and not player.components.inventory:GiveItem(foliageath) then
-            SetPos(foliageath, x, y, z) --没成功就直接设置位置
-        end
+    if foliageath ~= nil then
+        foliageath.Transform:SetPosition(x, y, z)
 
-        --将剑直接装在手上
-        if
-            sword.components.equippable ~= nil and player:HasTag("player")
-            -- and (self.inst.components.perishable == nil or self.inst.components.perishable.perishremainingtime > 0)
-        then
-            if not player.components.inventory:Equip(sword) and not player.components.inventory:GiveItem(sword) then
-                SetPos(sword, x, y, z)
-            end
+        local owner = self.inst.components.inventoryitem ~= nil and self.inst.components.inventoryitem.owner or nil
+        local holder = owner ~= nil and (owner.components.inventory or owner.components.container) or nil
+        if holder ~= nil then
+            local slot = holder:GetItemSlot(self.inst)
+            self.inst:Remove()
+            holder:GiveItem(foliageath, slot)
         else
-            if not container:GiveItem(sword) and not player.components.inventory:GiveItem(sword) then
-                SetPos(sword, x, y, z)
-            end
-        end
-    else
-        local x, y, z = self.inst.Transform:GetWorldPosition()
-        self.inst:Remove()
-        SetPos(foliageath, x, y, z)
-
-        --将剑直接装在手上
-        if
-            player:HasTag("player")
-            -- and (self.inst.components.perishable == nil or self.inst.components.perishable.perishremainingtime > 0)
-        then
-            if sword.components.equippable == nil or not player.components.inventory:Equip(sword) then
-                if not player.components.inventory:GiveItem(sword) then
-                    SetPos(sword, x, y, z)
-                end
-            end
-        else
-            if not player.components.inventory:GiveItem(sword) then
-                SetPos(sword, x, y, z)
-            end
+            self.inst:Remove()
         end
     end
+
+    --将剑直接装在手上
+    sword.Transform:SetPosition(x, y, z)
+    if
+        sword.components.equippable ~= nil and player:HasTag("player")
+        -- and (self.inst.components.perishable == nil or self.inst.components.perishable.perishremainingtime > 0)
+    then
+        if not player.components.inventory:Equip(sword) then
+            player.components.inventory:GiveItem(sword)
+        end
+    else
+        player.components.inventory:GiveItem(sword)
+    end
+
+
+
+
+
+    -- local foliageath = SpawnPrefab("foliageath")
+    -- local container = self.inst.components.inventoryitem:GetContainer()
+    -- if container ~= nil then
+    --     local x, y, z = player.Transform:GetWorldPosition()
+    --     local slot = self.inst.components.inventoryitem:GetSlotNum()
+    --     -- local player = self.inst.components.inventoryitem:GetGrandOwner()
+    --     self.inst:Remove()
+    --     if not container:GiveItem(foliageath, slot) and not player.components.inventory:GiveItem(foliageath) then
+    --         SetPos(foliageath, x, y, z) --没成功就直接设置位置
+    --     end
+
+    --     --将剑直接装在手上
+    --     if
+    --         sword.components.equippable ~= nil and player:HasTag("player")
+    --         -- and (self.inst.components.perishable == nil or self.inst.components.perishable.perishremainingtime > 0)
+    --     then
+    --         if not player.components.inventory:Equip(sword) and not player.components.inventory:GiveItem(sword) then
+    --             SetPos(sword, x, y, z)
+    --         end
+    --     else
+    --         if not container:GiveItem(sword) and not player.components.inventory:GiveItem(sword) then
+    --             SetPos(sword, x, y, z)
+    --         end
+    --     end
+    -- else
+    --     local x, y, z = self.inst.Transform:GetWorldPosition()
+    --     self.inst:Remove()
+    --     SetPos(foliageath, x, y, z)
+
+    --     --将剑直接装在手上
+    --     if
+    --         player:HasTag("player")
+    --         -- and (self.inst.components.perishable == nil or self.inst.components.perishable.perishremainingtime > 0)
+    --     then
+    --         if sword.components.equippable == nil or not player.components.inventory:Equip(sword) then
+    --             if not player.components.inventory:GiveItem(sword) then
+    --                 SetPos(sword, x, y, z)
+    --             end
+    --         end
+    --     else
+    --         if not player.components.inventory:GiveItem(sword) then
+    --             SetPos(sword, x, y, z)
+    --         end
+    --     end
+    -- end
 end
 
 function SwordScabbard:OnSave()
