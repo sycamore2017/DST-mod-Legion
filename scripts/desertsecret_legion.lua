@@ -210,57 +210,66 @@ AddIngredientValues({"shyerry"}, {fruit=4}, true, false) --AddIngredientValues(n
 --[[ 新制作物 ]]
 --------------------------------------------------------------------------
 
-AddRecipe("desertdefense",  --这里的名字也对应prefabs里lua文件里的.inventoryitem.imagename的设定
-{
-    Ingredient("townportaltalisman", 3),
-    Ingredient("goldnugget", 3),
-    Ingredient("turf_desertdirt", 1),
-}, 
-RECIPETABS.MAGIC, TECH.MAGIC_THREE, nil, nil, nil, nil, nil, "images/inventoryimages/desertdefense.xml", "desertdefense.tex")
-
-AddRecipe("guitar_whitewood",
-{
-    Ingredient("shyerrylog", 1, "images/inventoryimages/shyerrylog.xml"),
-    Ingredient("steelwool", 1),
-}, 
-RECIPETABS.SURVIVAL, TECH.SCIENCE_ONE, nil, nil, nil, nil, nil, "images/inventoryimages/guitar_whitewood.xml", "guitar_whitewood.tex")
+AddRecipe2(
+    "desertdefense", {
+        Ingredient("townportaltalisman", 3),
+        Ingredient("goldnugget", 3),
+        Ingredient("turf_desertdirt", 1),
+    }, TECH.MAGIC_THREE, {
+        atlas = "images/inventoryimages/desertdefense.xml", image = "desertdefense.tex"
+    }, { "WEAPONS", "MAGIC", "ARMOUR" }
+)
+AddRecipe2(
+    "guitar_whitewood", {
+        Ingredient("shyerrylog", 1, "images/inventoryimages/shyerrylog.xml"),
+        Ingredient("steelwool", 1),
+    }, TECH.SCIENCE_ONE, {
+        atlas = "images/inventoryimages/guitar_whitewood.xml", image = "guitar_whitewood.tex"
+    }, { "GARDENING", "TOOLS" }
+)
 
 if CONFIGS_LEGION.DRESSUP then
-    AddRecipe("pinkstaff",
-    {
-        Ingredient("glommerwings", 1),
-        Ingredient("livinglog", 1),
-        Ingredient("glommerfuel", 1),
-    },
-    RECIPETABS.MAGIC, TECH.MAGIC_TWO, nil, nil, nil, nil, nil, "images/inventoryimages/pinkstaff.xml", "pinkstaff.tex")
-
-    AddRecipe("theemperorscrown",
-    {
-        Ingredient("nightmarefuel", 1),
-        Ingredient("rocks", 1),
-    }, 
-    RECIPETABS.DRESS, TECH.NONE, nil, nil, nil, nil, nil, "images/inventoryimages/theemperorscrown.xml", "theemperorscrown.tex")
-
-    AddRecipe("theemperorsmantle",
-    {
-        Ingredient("nightmarefuel", 1),
-        Ingredient("cutgrass", 1),
-    }, 
-    RECIPETABS.DRESS, TECH.NONE, nil, nil, nil, nil, nil, "images/inventoryimages/theemperorsmantle.xml", "theemperorsmantle.tex")
-
-    AddRecipe("theemperorsscepter",
-    {
-        Ingredient("nightmarefuel", 1),
-        Ingredient("twigs", 1),
-    }, 
-    RECIPETABS.DRESS, TECH.NONE, nil, nil, nil, nil, nil, "images/inventoryimages/theemperorsscepter.xml", "theemperorsscepter.tex")
-
-    AddRecipe("theemperorspendant",
-    {
-        Ingredient("nightmarefuel", 1),
-        Ingredient("flint", 1),
-    }, 
-    RECIPETABS.DRESS, TECH.NONE, nil, nil, nil, nil, nil, "images/inventoryimages/theemperorspendant.xml", "theemperorspendant.tex")
+    AddRecipe2(
+        "pinkstaff", {
+            Ingredient("glommerwings", 1),
+            Ingredient("livinglog", 1),
+            Ingredient("glommerfuel", 1),
+        }, TECH.MAGIC_TWO, {
+            atlas = "images/inventoryimages/pinkstaff.xml", image = "pinkstaff.tex"
+        }, { "MAGIC", "DECOR" }
+    )
+    AddRecipe2(
+        "theemperorscrown", {
+            Ingredient("nightmarefuel", 1),
+            Ingredient("rocks", 1),
+        }, TECH.NONE, {
+            atlas = "images/inventoryimages/theemperorscrown.xml", image = "theemperorscrown.tex"
+        }, { "CLOTHING", "DECOR" }
+    )
+    AddRecipe2(
+        "theemperorsmantle", {
+            Ingredient("nightmarefuel", 1),
+            Ingredient("cutgrass", 1),
+        }, TECH.NONE, {
+            atlas = "images/inventoryimages/theemperorsmantle.xml", image = "theemperorsmantle.tex"
+        }, { "CLOTHING", "DECOR" }
+    )
+    AddRecipe2(
+        "theemperorsscepter", {
+            Ingredient("nightmarefuel", 1),
+            Ingredient("twigs", 1),
+        }, TECH.NONE, {
+            atlas = "images/inventoryimages/theemperorsscepter.xml", image = "theemperorsscepter.tex"
+        }, { "CLOTHING", "DECOR" }
+    )
+    AddRecipe2(
+        "theemperorspendant", {
+            Ingredient("nightmarefuel", 1),
+            Ingredient("flint", 1),
+        }, TECH.NONE, {
+            atlas = "images/inventoryimages/theemperorspendant.xml", image = "theemperorspendant.tex"
+        }, { "CLOTHING", "DECOR" }
+    )
 end
 
 --------------------------------------------------------------------------

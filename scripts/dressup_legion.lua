@@ -1354,14 +1354,6 @@ if not _G.rawget(_G, "DRESSUP_DATA_LEGION") then
 end
 for k,v in pairs(dressup_data) do
     _G.DRESSUP_DATA_LEGION[k] = v
-
-    -- if v.isnorecipe then --增加统一配方，让幻象法杖能生效
-    --     AddRecipe(k,
-    --     {
-    --         Ingredient("nightmarefuel", 1),
-    --     },
-    --     nil, TECH.LOST, nil, nil, true)
-    -- end
 end
 
 --统一添加各种雕像的幻化数据

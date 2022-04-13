@@ -2287,10 +2287,6 @@ S______GENERIC.DESCRIBE.SIVING_CTLAll = {
 --[[ flash and crush ]]--[[ 电闪雷鸣 ]]
 --------------------------------------------------------------------------
 
-STRINGS.UI.CRAFTING.ELECOURMALINE_ONE = "使用电气重铸台制造一个原型！"
-STRINGS.UI.CRAFTING.ELECOURMALINE_TWO = "看起来这个重铸台没有被完全激活！"
-STRINGS.UI.CRAFTING.ELECOURMALINE_THREE = "看起来这个重铸台没有被完全激活！"
-
 S_NAMES.ELECOURMALINE = "电气重铸台"
 S______GENERIC.DESCRIBE.ELECOURMALINE = "电与创造力量的结晶。"
 --S_______WILLOW.DESCRIBE.ELECOURMALINE = "Oh! So cute, like my Bernie."
@@ -3009,6 +3005,15 @@ STRINGS.ACTIONS_LEGION = {
     USE_UPGRADEKIT = "组装升级", --升级套件的升级动作的名字
 }
 STRINGS.ACTIONS.GIVE.SCABBARD = "入鞘"  --青枝绿叶放入武器的名字
+
+STRINGS.ACTIONS.OPEN_CRAFTING.RECAST = "激发灵感" --靠近解锁时的前置提示。名字与AddPrototyperDef里的action_str一致
+STRINGS.UI.CRAFTING_STATION_FILTERS.RECAST = "重铸"
+STRINGS.UI.CRAFTING_FILTERS.RECAST = "重铸"
+
+--NEEDS..新tech的名字
+STRINGS.UI.CRAFTING.NEEDSELECOURMALINE_ONE = "寻找电气重铸台激发灵感！"
+STRINGS.UI.CRAFTING.NEEDSELECOURMALINE_TWO = "看起来这个重铸台没有被完全激活！"
+STRINGS.UI.CRAFTING.NEEDSELECOURMALINE_THREE = "寻找激活的电气重铸台激发灵感！"
 
 STRINGS.CROP_LEGION = {
     SEED = "种下的{crop}种子",

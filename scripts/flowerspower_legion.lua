@@ -49,21 +49,25 @@ _G.RegistMiniMapImage_legion("lilybush")
 _G.RegistMiniMapImage_legion("orchidbush")
 _G.RegistMiniMapImage_legion("neverfadebush")
 
-AddRecipe("neverfade",
-{
-    Ingredient("rosorns", 1, "images/inventoryimages/rosorns.xml"),
-    Ingredient("lileaves", 1, "images/inventoryimages/lileaves.xml"),
-    Ingredient("orchitwigs", 1, "images/inventoryimages/orchitwigs.xml"),
-}, 
-RECIPETABS.MAGIC, TECH.MAGIC_THREE, nil, nil, nil, nil, nil, "images/inventoryimages/neverfade.xml", "neverfade.tex")
+AddRecipe2(
+    "neverfade", {
+        Ingredient("rosorns", 1, "images/inventoryimages/rosorns.xml"),
+        Ingredient("lileaves", 1, "images/inventoryimages/lileaves.xml"),
+        Ingredient("orchitwigs", 1, "images/inventoryimages/orchitwigs.xml"),
+    }, TECH.MAGIC_THREE, {
+        atlas = "images/inventoryimages/neverfade.xml", image = "neverfade.tex"
+    }, { "WEAPONS", "MAGIC" }
+)
 
-AddRecipe("sachet",
-{
-    Ingredient("petals_rose", 3, "images/inventoryimages/petals_rose.xml"),
-    Ingredient("petals_lily", 3, "images/inventoryimages/petals_lily.xml"),
-    Ingredient("petals_orchid", 3, "images/inventoryimages/petals_orchid.xml"),
-}, 
-RECIPETABS.DRESS, TECH.NONE, nil, nil, nil, nil, nil, "images/inventoryimages/sachet.xml", "sachet.tex")
+AddRecipe2(
+    "sachet", {
+        Ingredient("petals_rose", 3, "images/inventoryimages/petals_rose.xml"),
+        Ingredient("petals_lily", 3, "images/inventoryimages/petals_lily.xml"),
+        Ingredient("petals_orchid", 3, "images/inventoryimages/petals_orchid.xml"),
+    }, TECH.NONE, {
+        atlas = "images/inventoryimages/sachet.xml", image = "sachet.tex"
+    }, { "CLOTHING" }
+)
 
 --------------------------------------------------------------------------
 --[[ 给三种花丛增加自然再生方式，防止绝种 ]]

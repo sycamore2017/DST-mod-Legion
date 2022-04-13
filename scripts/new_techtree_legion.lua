@@ -19,6 +19,23 @@ TechTree.Create = function(t)
 end
 
 --------------------------------------------------------------------------
+--[[ 新制作栏兼容 ]]
+--------------------------------------------------------------------------
+
+AddPrototyperDef("elecourmaline", { --第一个参数是指玩家靠近时会解锁科技的prefab名
+	icon_atlas = "images/station_recast.xml", icon_image = "station_recast.tex",
+	is_crafting_station = true,
+	action_str = "RECAST", --台词已在语言文件中
+	filter_text = STRINGS.UI.CRAFTING_STATION_FILTERS.RECAST --台词已在语言文件中
+})
+
+AddRecipeFilter({
+	name = "RECAST",
+	atlas = "images/station_recast.xml", image = "station_recast.tex",
+	custom_pos = true
+})
+
+--------------------------------------------------------------------------
 --[[ 制作等级中加入自己的部分 ]]
 --------------------------------------------------------------------------
 

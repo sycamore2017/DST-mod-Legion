@@ -2306,10 +2306,6 @@ S______GENERIC.DESCRIBE.SIVING_CTLAll = {
 --[[ flash and crush ]]--[[ 电闪雷鸣 ]]
 --------------------------------------------------------------------------
 
-STRINGS.UI.CRAFTING.ELECOURMALINE_ONE = "Use a elecourmaline to build a prototype!"
-STRINGS.UI.CRAFTING.ELECOURMALINE_TWO = "It seems that this stone is not fully activated!"
-STRINGS.UI.CRAFTING.ELECOURMALINE_THREE = "It seems that this stone is not fully activated!"
-
 S_NAMES.ELECOURMALINE = "Elecourmaline"    --电气重铸台
 S______GENERIC.DESCRIBE.ELECOURMALINE = "It contains the power of electricity and creation."
 --S_______WILLOW.DESCRIBE.ELECOURMALINE = "Oh! So cute, like my Bernie."
@@ -2995,6 +2991,15 @@ STRINGS.ACTIONS_LEGION = {
     USE_UPGRADEKIT = "Assembly upgrade", --升级套件的升级动作的名字
 }
 STRINGS.ACTIONS.GIVE.SCABBARD = "Put into"  --青枝绿叶放入武器的名字
+
+STRINGS.ACTIONS.OPEN_CRAFTING.RECAST = "Brainstorming with" --靠近解锁时的前置提示。名字与AddPrototyperDef里的action_str一致
+STRINGS.UI.CRAFTING_STATION_FILTERS.RECAST = "Recast"
+STRINGS.UI.CRAFTING_FILTERS.RECAST = "Recast"
+
+--NEEDS..新tech的名字
+STRINGS.UI.CRAFTING.NEEDSELECOURMALINE_ONE = "Find the Elecourmaline to build this!"
+STRINGS.UI.CRAFTING.NEEDSELECOURMALINE_TWO = "It seems that this stone is not fully activated!"
+STRINGS.UI.CRAFTING.NEEDSELECOURMALINE_THREE = "Find the activated Elecourmaline to build this!"
 
 STRINGS.CROP_LEGION = {
     SEED = "Planted {crop} Seed",

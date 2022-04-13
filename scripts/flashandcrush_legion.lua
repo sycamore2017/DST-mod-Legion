@@ -22,8 +22,8 @@ end
 -----
 
 local assets = {
-    Asset("ATLAS", "images/recasttab.xml"),
-    Asset("IMAGE", "images/recasttab.tex"),
+    Asset("ATLAS", "images/station_recast.xml"),
+    Asset("IMAGE", "images/station_recast.tex"),
 
     Asset("ANIM", "anim/albicansspore_fx.zip"),
     Asset("ANIM", "anim/mushroom_farm_albicans_cap_build.zip"), --竹荪的蘑菇农场贴图
@@ -67,168 +67,200 @@ local upvaluehelper = require "hua_upvaluehelper"
 _G.RegistMiniMapImage_legion("elecourmaline")
 
 if TUNING.LEGION_TECHUNLOCK == "lootdropper" then
-    AddRecipe("tripleshovelaxe",
-    {
-        Ingredient("axe", 1),
-        Ingredient("pickaxe", 1),
-        Ingredient("shovel", 1),
-    }, 
-    RECIPETABS.TOOLS, TECH.LOST, nil, nil, nil, nil, nil, "images/inventoryimages/tripleshovelaxe.xml", "tripleshovelaxe.tex")
+    AddRecipe2(
+        "tripleshovelaxe", {
+            Ingredient("axe", 1),
+            Ingredient("pickaxe", 1),
+            Ingredient("shovel", 1),
+        }, TECH.LOST, {
+            atlas = "images/inventoryimages/tripleshovelaxe.xml", image = "tripleshovelaxe.tex"
+        }, { "RECAST", "TOOLS" }
+    )
 
-    AddRecipe("dualwrench",
-    {
-        Ingredient("hammer", 1),
-        Ingredient("goldnugget", 1),
-        Ingredient("pitchfork", 1),
-    }, 
-    RECIPETABS.TOOLS, TECH.LOST, nil, nil, nil, nil, nil, "images/inventoryimages/dualwrench.xml", "dualwrench.tex")
+    AddRecipe2(
+        "dualwrench", {
+            Ingredient("hammer", 1),
+            Ingredient("goldnugget", 1),
+            Ingredient("pitchfork", 1),
+        }, TECH.LOST, {
+            atlas = "images/inventoryimages/dualwrench.xml", image = "dualwrench.tex"
+        }, { "RECAST", "TOOLS" }
+    )
 
-    AddRecipe("icire_rock",
-    {
-        Ingredient("amulet", 1),
-        Ingredient("heatrock", 2),
-        Ingredient("blueamulet", 1),
-    }, 
-    RECIPETABS.SURVIVAL, TECH.LOST, nil, nil, nil, nil, nil, "images/inventoryimages/icire_rock.xml", "icire_rock.tex")
+    AddRecipe2(
+        "icire_rock", {
+            Ingredient("amulet", 1),
+            Ingredient("heatrock", 2),
+            Ingredient("blueamulet", 1),
+        }, TECH.LOST, {
+            atlas = "images/inventoryimages/icire_rock.xml", image = "icire_rock.tex"
+        }, { "RECAST", "WINTER", "SUMMER" }
+    )
 
-    AddRecipe("hat_cowboy",
-    {
-        Ingredient("beefalohat", 1),
-        Ingredient("rainhat", 1),
-        Ingredient("tophat", 1),
-    }, 
-    RECIPETABS.DRESS, TECH.LOST, nil, nil, nil, nil, nil, "images/inventoryimages/hat_cowboy.xml", "hat_cowboy.tex")
+    AddRecipe2(
+        "hat_cowboy", {
+            Ingredient("beefalohat", 1),
+            Ingredient("rainhat", 1),
+            Ingredient("tophat", 1),
+        }, TECH.LOST, {
+            atlas = "images/inventoryimages/hat_cowboy.xml", image = "hat_cowboy.tex"
+        }, { "RECAST", "RAIN", "SUMMER", "RIDING", "CLOTHING" }
+    )
 
-    AddRecipe("guitar_miguel",
-    {
-        Ingredient("panflute", 1),
-        Ingredient("onemanband", 1),
-    }, 
-    RECIPETABS.MAGIC, TECH.LOST, nil, nil, nil, nil, nil, "images/inventoryimages/guitar_miguel.xml", "guitar_miguel.tex")
+    AddRecipe2(
+        "guitar_miguel", {
+            Ingredient("panflute", 1),
+            Ingredient("onemanband", 1),
+        }, TECH.LOST, {
+            atlas = "images/inventoryimages/guitar_miguel.xml", image = "guitar_miguel.tex"
+        }, { "RECAST", "GARDENING", "MAGIC" }
+    )
 
-    AddRecipe("web_hump_item",
-    {
-        Ingredient("monstermeat_dried", 12),
-        Ingredient("minisign_item", 2),
-        Ingredient("silk", 12),
-    }, 
-    RECIPETABS.TOWN, TECH.LOST, nil, nil, nil, nil, nil, "images/inventoryimages/web_hump_item.xml", "web_hump_item.tex")
+    AddRecipe2(
+        "web_hump_item", {
+            Ingredient("monstermeat_dried", 12),
+            Ingredient("minisign_item", 2),
+            Ingredient("silk", 12),
+        }, TECH.LOST, {
+            atlas = "images/inventoryimages/web_hump_item.xml", image = "web_hump_item.tex"
+        }, { "RECAST", "STRUCTURES", "DECOR" }
+    )
 
-    AddRecipe("saddle_baggage",
-    {
-        Ingredient("bedroll_straw", 1),
-        Ingredient("saddle_basic", 1),
-        Ingredient("bundlewrap", 2),
-    }, 
-    RECIPETABS.TOOLS, TECH.LOST, nil, nil, nil, nil, nil, "images/inventoryimages/saddle_baggage.xml", "saddle_baggage.tex")
+    AddRecipe2(
+        "saddle_baggage", {
+            Ingredient("bedroll_straw", 1),
+            Ingredient("saddle_basic", 1),
+            Ingredient("bundlewrap", 2),
+        }, TECH.LOST, {
+            atlas = "images/inventoryimages/saddle_baggage.xml", image = "saddle_baggage.tex"
+        }, { "RECAST", "RIDING", "COOKING", "CONTAINERS" }
+    )
 
-    AddRecipe("hat_albicans_mushroom",
-    {
-        Ingredient("red_mushroomhat", 1),
-        Ingredient("green_mushroomhat", 1),
-        Ingredient("blue_mushroomhat", 1),
-    }, 
-    RECIPETABS.DRESS, TECH.LOST, nil, nil, nil, nil, nil, "images/inventoryimages/hat_albicans_mushroom.xml", "hat_albicans_mushroom.tex")
+    AddRecipe2(
+        "hat_albicans_mushroom", {
+            Ingredient("red_mushroomhat", 1),
+            Ingredient("green_mushroomhat", 1),
+            Ingredient("blue_mushroomhat", 1),
+        }, TECH.LOST, {
+            atlas = "images/inventoryimages/hat_albicans_mushroom.xml", image = "hat_albicans_mushroom.tex"
+        }, { "RECAST", "CLOTHING", "SUMMER", "GARDENING", "RAIN" }
+    )
 
-    AddRecipe("soul_contracts",
-    {
-        Ingredient("wortox_soul", 20),
-        Ingredient("waxwelljournal", 1),
-        Ingredient("nightmarefuel", 20),
-    }, 
-    RECIPETABS.MAGIC, TECH.LOST, nil, nil, nil, nil, nil, "images/inventoryimages/soul_contracts.xml", "soul_contracts.tex")
+    AddRecipe2(
+        "soul_contracts", {
+            Ingredient("wortox_soul", 20),
+            Ingredient("waxwelljournal", 1),
+            Ingredient("nightmarefuel", 20),
+        }, TECH.LOST, {
+            atlas = "images/inventoryimages/soul_contracts.xml", image = "soul_contracts.tex"
+        }, { "RECAST", "RESTORATION", "MAGIC" }
+    )
 else
-    local Recast = AddRecipeTab("RECAST", 100, "images/recasttab.xml", "recasttab.tex", nil, true)
+    AddRecipe2(
+        "tripleshovelaxe", {
+            Ingredient("axe", 1),
+            Ingredient("pickaxe", 1),
+            Ingredient("shovel", 1),
+        }, TECH.ELECOURMALINE_ONE, {
+            nounlock = true,
+            atlas = "images/inventoryimages/tripleshovelaxe.xml", image = "tripleshovelaxe.tex"
+        }, { "RECAST", "TOOLS" }
+    )
 
-    --因为用AddRecipeTab("NAME")这个接口建立的制作栏的名字默认显示也为"NAME"，不符合我的要求，所以这里重新定义一次
-    if TUNING.LEGION_MOD_LANGUAGES == "chinese" then
-        STRINGS.TABS.RECAST = "重铸"
-    elseif TUNING.LEGION_MOD_LANGUAGES == "portuguese" then
-        STRINGS.TABS.RECAST = "Reformulação"
-    else
-        STRINGS.TABS.RECAST = "Recast"
-    end
+    AddRecipe2(
+        "dualwrench", {
+            Ingredient("hammer", 1),
+            Ingredient("goldnugget", 1),
+            Ingredient("pitchfork", 1),
+        }, TECH.ELECOURMALINE_ONE, {
+            nounlock = true,
+            atlas = "images/inventoryimages/dualwrench.xml", image = "dualwrench.tex"
+        }, { "RECAST", "TOOLS" }
+    )
 
-    AddRecipe("tripleshovelaxe",
-    {
-        Ingredient("axe", 1),
-        Ingredient("pickaxe", 1),
-        Ingredient("shovel", 1),
-    }, 
-    Recast, TECH.ELECOURMALINE_ONE, nil, nil, true, nil, nil, "images/inventoryimages/tripleshovelaxe.xml", "tripleshovelaxe.tex")
+    AddRecipe2(
+        "icire_rock", {
+            Ingredient("amulet", 1),
+            Ingredient("heatrock", 2),
+            Ingredient("blueamulet", 1),
+        }, TECH.ELECOURMALINE_ONE, {
+            nounlock = true,
+            atlas = "images/inventoryimages/icire_rock.xml", image = "icire_rock.tex"
+        }, { "RECAST", "WINTER", "SUMMER" }
+    )
 
-    AddRecipe("dualwrench",
-    {
-        Ingredient("hammer", 1),
-        Ingredient("goldnugget", 1),
-        Ingredient("pitchfork", 1),
-    },                                        --为true，因为这种制作类型是类似于远古科技，不可保留
-    Recast, TECH.ELECOURMALINE_ONE, nil, nil, true, nil, nil, "images/inventoryimages/dualwrench.xml", "dualwrench.tex")
+    AddRecipe2(
+        "hat_cowboy", {
+            Ingredient("beefalohat", 1),
+            Ingredient("rainhat", 1),
+            Ingredient("tophat", 1),
+        }, TECH.ELECOURMALINE_THREE, {
+            nounlock = true,
+            atlas = "images/inventoryimages/hat_cowboy.xml", image = "hat_cowboy.tex"
+        }, { "RECAST", "RAIN", "SUMMER", "RIDING", "CLOTHING" }
+    )
 
-    AddRecipe("icire_rock",
-    {
-        Ingredient("amulet", 1),
-        Ingredient("heatrock", 2),
-        Ingredient("blueamulet", 1),
-    }, 
-    Recast, TECH.ELECOURMALINE_ONE, nil, nil, true, nil, nil, "images/inventoryimages/icire_rock.xml", "icire_rock.tex")
+    AddRecipe2(
+        "guitar_miguel", {
+            Ingredient("panflute", 1),
+            Ingredient("onemanband", 1),
+        }, TECH.ELECOURMALINE_THREE, {
+            nounlock = true,
+            atlas = "images/inventoryimages/guitar_miguel.xml", image = "guitar_miguel.tex"
+        }, { "RECAST", "GARDENING", "MAGIC" }
+    )
 
-    AddRecipe("hat_cowboy",
-    {
-        Ingredient("beefalohat", 1),
-        Ingredient("rainhat", 1),
-        Ingredient("tophat", 1),
-    }, 
-    Recast, TECH.ELECOURMALINE_THREE, nil, nil, true, nil, nil, "images/inventoryimages/hat_cowboy.xml", "hat_cowboy.tex")
+    AddRecipe2(
+        "web_hump_item", {
+            Ingredient("monstermeat_dried", 12),
+            Ingredient("minisign_item", 2),
+            Ingredient("silk", 12),
+        }, TECH.ELECOURMALINE_THREE, {
+            nounlock = true, builder_tag = "spiderwhisperer",
+            atlas = "images/inventoryimages/web_hump_item.xml", image = "web_hump_item.tex"
+        }, { "RECAST", "STRUCTURES", "DECOR", "CHARACTER" }
+    )
 
-    AddRecipe("guitar_miguel",
-    {
-        Ingredient("panflute", 1),
-        Ingredient("onemanband", 1),
-    }, 
-    Recast, TECH.ELECOURMALINE_THREE, nil, nil, true, nil, nil, "images/inventoryimages/guitar_miguel.xml", "guitar_miguel.tex")
+    AddRecipe2(
+        "saddle_baggage", {
+            Ingredient("bedroll_straw", 1),
+            Ingredient("saddle_basic", 1),
+            Ingredient("bundlewrap", 2),
+        }, TECH.ELECOURMALINE_THREE, {
+            nounlock = true,
+            atlas = "images/inventoryimages/saddle_baggage.xml", image = "saddle_baggage.tex"
+        }, { "RECAST", "RIDING", "COOKING", "CONTAINERS" }
+    )
 
-    AddRecipe("web_hump_item",
-    {
-        Ingredient("monstermeat_dried", 12),
-        Ingredient("minisign_item", 1),
-        Ingredient("silk", 12),
-    }, 
-    Recast, TECH.ELECOURMALINE_THREE, nil, nil, true, nil, "spiderwhisperer", "images/inventoryimages/web_hump_item.xml", "web_hump_item.tex")
+    AddRecipe2(
+        "hat_albicans_mushroom", {
+            Ingredient("red_mushroomhat", 1),
+            Ingredient("green_mushroomhat", 1),
+            Ingredient("blue_mushroomhat", 1),
+        }, TECH.ELECOURMALINE_THREE, {
+            nounlock = true,
+            atlas = "images/inventoryimages/hat_albicans_mushroom.xml", image = "hat_albicans_mushroom.tex"
+        }, { "RECAST", "CLOTHING", "SUMMER", "GARDENING", "RAIN" }
+    )
 
-    AddRecipe("saddle_baggage",
-    {
-        Ingredient("bedroll_straw", 1),
-        Ingredient("saddle_basic", 1),
-        Ingredient("bundlewrap", 2),
-    }, 
-    Recast, TECH.ELECOURMALINE_THREE, nil, nil, true, nil, nil, "images/inventoryimages/saddle_baggage.xml", "saddle_baggage.tex")
-
-    AddRecipe("hat_albicans_mushroom",
-    {
-        Ingredient("red_mushroomhat", 1),
-        Ingredient("green_mushroomhat", 1),
-        Ingredient("blue_mushroomhat", 1),
-    }, 
-    Recast, TECH.ELECOURMALINE_THREE, nil, nil, true, nil, nil, "images/inventoryimages/hat_albicans_mushroom.xml", "hat_albicans_mushroom.tex")
-
-    AddRecipe("soul_contracts",
-    {
-        Ingredient("wortox_soul", 20),
-        Ingredient("waxwelljournal", 1),
-        Ingredient("nightmarefuel", 20),
-    }, 
-    Recast, TECH.ELECOURMALINE_THREE, nil, nil, true, nil, "soulstealer", "images/inventoryimages/soul_contracts.xml", "soul_contracts.tex")
+    AddRecipe2(
+        "soul_contracts", {
+            Ingredient("wortox_soul", 20),
+            Ingredient("waxwelljournal", 1),
+            Ingredient("nightmarefuel", 20),
+        }, TECH.ELECOURMALINE_THREE, {
+            nounlock = true, builder_tag = "soulstealer",
+            atlas = "images/inventoryimages/soul_contracts.xml", image = "soul_contracts.tex"
+        }, { "RECAST", "RESTORATION", "MAGIC", "CHARACTER" }
+    )
 end
 
 --这个配方用来便于绿宝石法杖分解
-AddRecipe("web_hump",
-{
+AddDeconstructRecipe("web_hump", {
     Ingredient("monstermeat_dried", 12),
     Ingredient("minisign_item", 2),
-    Ingredient("silk", 12),
-}, 
-nil, TECH.LOST)
+    Ingredient("silk", 12)
+})
 
 --------------------------------------------------------------------------
 --[[ 修改基础函数以给生物添加触电组件 ]]

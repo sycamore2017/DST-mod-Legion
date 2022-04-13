@@ -464,13 +464,14 @@ end
 --苔衣发卡的作用
 ----------
 
-AddRecipe("hat_lichen",  --这里的名字也对应prefabs里lua文件里的.inventoryitem.imagename的设定
-{
-    Ingredient("lightbulb", 6),
-    Ingredient("cutlichen", 4),
-}, 
-RECIPETABS.LIGHT, TECH.NONE, nil, nil, nil, nil, nil, "images/inventoryimages/hat_lichen.xml", "hat_lichen.tex")
---Recipe = Class(function(self, name, ingredients, tab, level, placer, min_spacing, nounlock, numtogive, builder_tag, atlas, image, testfn)
+AddRecipe2(
+    "hat_lichen", {
+        Ingredient("lightbulb", 6),
+        Ingredient("cutlichen", 4),
+    }, TECH.NONE, {
+        atlas = "images/inventoryimages/hat_lichen.xml", image = "hat_lichen.tex"
+    }, { "CLOTHING", "LIGHT" }
+)
 
 AddPrefabPostInit("bunnyman", function(inst)    --通过api重写兔人的识别敌人函数
     if TheWorld.ismastersim then

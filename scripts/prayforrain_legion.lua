@@ -58,43 +58,52 @@ _G.RegistMiniMapImage_legion("moondungeon")
 _G.RegistMiniMapImage_legion("hiddenmoonlight")
 
 if TUNING.LEGION_BOOKRECIPETABS == "magic" then
-    AddRecipe("book_weather",
-    {
-        Ingredient("papyrus", 1),
-        Ingredient("squamousfruit", 1, "images/inventoryimages/squamousfruit.xml"),
-        Ingredient("raindonate", 1, "images/inventoryimages/raindonate.xml"),
-    }, 
-    RECIPETABS.MAGIC, TECH.MAGIC_THREE, nil, nil, nil, nil, nil, "images/inventoryimages/book_weather.xml", "book_weather.tex")
+    AddRecipe2(
+        "book_weather", {
+            Ingredient("papyrus", 1),
+            Ingredient("squamousfruit", 1, "images/inventoryimages/squamousfruit.xml"),
+            Ingredient("raindonate", 1, "images/inventoryimages/raindonate.xml"),
+        }, TECH.MAGIC_THREE, {
+            atlas = "images/inventoryimages/book_weather.xml", image = "book_weather.tex"
+        }, { "MAGIC", "WEAPONS", "RAIN" }
+    )
 else
-    AddRecipe("book_weather",
-    {
-        Ingredient("papyrus", 1),
-        Ingredient("squamousfruit", 1, "images/inventoryimages/squamousfruit.xml"),
-        Ingredient("raindonate", 1, "images/inventoryimages/raindonate.xml"),
-    }, 
-    CUSTOM_RECIPETABS.BOOKS, TECH.MAGIC_THREE, nil, nil, nil, nil, "bookbuilder", "images/inventoryimages/book_weather.xml", "book_weather.tex")
+    AddRecipe2(
+        "book_weather", {
+            Ingredient("papyrus", 1),
+            Ingredient("squamousfruit", 1, "images/inventoryimages/squamousfruit.xml"),
+            Ingredient("raindonate", 1, "images/inventoryimages/raindonate.xml"),
+        }, TECH.MAGIC_THREE, {
+            builder_tag = "bookbuilder",
+            atlas = "images/inventoryimages/book_weather.xml", image = "book_weather.tex"
+        }, { "MAGIC", "WEAPONS", "RAIN", "CHARACTER" }
+    )
 end
 
-AddRecipe("hat_mermbreathing",
-{
-    Ingredient("merm_scales", 3, "images/inventoryimages/merm_scales.xml"),
-},
-RECIPETABS.DRESS, TECH.SCIENCE_TWO, nil, nil, nil, nil, nil, "images/inventoryimages/hat_mermbreathing.xml", "hat_mermbreathing.tex")
-
-AddRecipe("giantsfoot",
-{
-    Ingredient("merm_scales", 3, "images/inventoryimages/merm_scales.xml"),
-    Ingredient("pigskin", 3),
-    Ingredient("manrabbit_tail", 3),
-}, 
-RECIPETABS.SURVIVAL, TECH.SCIENCE_TWO, nil, nil, nil, nil, nil, "images/inventoryimages/giantsfoot.xml", "giantsfoot.tex")
-
-AddRecipe("hiddenmoonlight_item",
-{
-    Ingredient("bluemooneye", 2),
-    Ingredient("turf_shellbeach", 2),
-}, 
-RECIPETABS.FARM, TECH.LOST, nil, nil, nil, nil, nil, "images/inventoryimages/hiddenmoonlight_item.xml", "hiddenmoonlight_item.tex")
+AddRecipe2(
+    "hat_mermbreathing", {
+        Ingredient("merm_scales", 3, "images/inventoryimages/merm_scales.xml"),
+    }, TECH.SCIENCE_TWO, {
+        atlas = "images/inventoryimages/hat_mermbreathing.xml", image = "hat_mermbreathing.tex"
+    }, { "CLOTHING" }
+)
+AddRecipe2(
+    "giantsfoot", {
+        Ingredient("merm_scales", 3, "images/inventoryimages/merm_scales.xml"),
+        Ingredient("pigskin", 3),
+        Ingredient("manrabbit_tail", 3),
+    }, TECH.SCIENCE_TWO, {
+        atlas = "images/inventoryimages/giantsfoot.xml", image = "giantsfoot.tex"
+    }, { "CLOTHING", "CONTAINERS" }
+)
+AddRecipe2(
+    "hiddenmoonlight_item", {
+        Ingredient("bluemooneye", 2),
+        Ingredient("turf_shellbeach", 2),
+    }, TECH.LOST, {
+        atlas = "images/inventoryimages/hiddenmoonlight_item.xml", image = "hiddenmoonlight_item.tex"
+    }, { "STRUCTURES", "CONTAINERS", "COOKING" }
+)
 
 --------------------------------------------------------------------------
 --[[ 修改鱼人，使其可以掉落鱼鳞 ]]
