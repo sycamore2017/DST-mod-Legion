@@ -861,76 +861,54 @@ local function DoYouHaveSkin(skinname, userid)
     return false
 end
 
+--旧制作栏改动
 -- AddClassPostConstruct("widgets/recipepopup", function(self)
---     ------【客户端】环境
---     local GetSkinsList_old = self.GetSkinsList
---     self.GetSkinsList = function(self, ...)
---         if self.owner == nil then
---             return GetSkinsList_old(self, ...)
---         end
-
---         ----!!!希望 The Architect Pack 能改一下代码写法，应该只修改自己mod里的东西而不是把其他mod的东西也改了
---         if self.recipe and SKIN_PREFABS_LEGION[self.recipe.product] and PREFAB_SKINS[self.recipe.product] then
---             self.skins_list = {}
---             for _, skinname in pairs(PREFAB_SKINS[self.recipe.product]) do
---                 if DoYouHaveSkin(skinname, self.owner.userid) then
---                     local data  = {
---                         type = type, --不知道是啥
---                         item = skinname, --这个皮肤的名字
---                         timestamp = -10000,
---                         -- ismodskin = true, --多加的变量，用来标记mod皮肤
---                     }
---                     table.insert(self.skins_list, data)
---                 end
---             end
---             return self.skins_list
---         else
---             return GetSkinsList_old(self, ...)
---         end
---     end
 -- end)
 
+--新制作栏改动
 AddClassPostConstruct("widgets/redux/craftingmenu_skinselector", function(self)
     ------【客户端】环境
-    local GetSkinsList_old = self.GetSkinsList
-    self.GetSkinsList = function(self, ...) --会在点击物品制作格子时触发
-        if self.recipe and SKIN_PREFABS_LEGION[self.recipe.product] and PREFAB_SKINS[self.recipe.product] then
-            if not self.timestamp then self.timestamp = -10000 end
-            local skins_list = {}
-            for _, skinname in pairs(PREFAB_SKINS[self.recipe.product]) do
-                if DoYouHaveSkin(skinname, self.owner.userid) then
-                    local data  = {
-                        type = type, --不知道是啥
-                        item = skinname, --这个皮肤的名字
-                        timestamp = -10000
-                    }
-                    table.insert(skins_list, data)
+    if self.recipe and SKIN_PREFABS_LEGION[self.recipe.product] then
+        local GetSkinsList_old = self.GetSkinsList
+        self.GetSkinsList = function(self, ...) --会在点击物品制作格子时触发
+            if PREFAB_SKINS[self.recipe.product] then
+                if not self.timestamp then self.timestamp = -10000 end
+                local skins_list = {}
+                for _, skinname in pairs(PREFAB_SKINS[self.recipe.product]) do
+                    if DoYouHaveSkin(skinname, self.owner.userid) then
+                        local data  = {
+                            type = type, --不知道是啥
+                            item = skinname, --这个皮肤的名字
+                            timestamp = -10000
+                        }
+                        table.insert(skins_list, data)
 
-                    if data.timestamp > self.timestamp then
-                        self.timestamp = data.timestamp
+                        if data.timestamp > self.timestamp then
+                            self.timestamp = data.timestamp
+                        end
                     end
                 end
+                return skins_list
+            else
+                return GetSkinsList_old(self, ...)
             end
-            return skins_list
-        else
-            return GetSkinsList_old(self, ...)
         end
-    end
 
-    --官方代码提前且只执行了一次，所以这里只能重新执行一次部分逻辑，把mod皮肤加进去
-    self.skins_list = self:GetSkinsList()
-    self.skins_options = self:GetSkinOptions()
-    if #self.skins_options == 1 then
-		self.spinner.fgimage:SetPosition(0, 0)
-		self.spinner.fgimage:SetScale(1.2)
-		self.spinner.text:Hide()
-	else
-		self.spinner.fgimage:SetPosition(0, 15)
-		self.spinner.fgimage:SetScale(1)
-		self.spinner.text:Show()
-	end
-    self.spinner:SetWrapEnabled(#self.skins_options > 1)
-	self.spinner:SetOptions(self.skins_options)
+        --官方代码提前且只执行了一次，所以这里只能重新执行一次部分逻辑，把mod皮肤加进去
+        self.skins_list = self:GetSkinsList()
+        self.skins_options = self:GetSkinOptions()
+        if #self.skins_options == 1 then
+            self.spinner.fgimage:SetPosition(0, 0)
+            self.spinner.fgimage:SetScale(1.2)
+            self.spinner.text:Hide()
+        else
+            self.spinner.fgimage:SetPosition(0, 15)
+            self.spinner.fgimage:SetScale(1)
+            self.spinner.text:Show()
+        end
+        self.spinner:SetWrapEnabled(#self.skins_options > 1)
+        self.spinner:SetOptions(self.skins_options)
+    end
 end)
 
 --undo：建筑的皮肤placer请看playercontroller.StartBuildPlacementMode

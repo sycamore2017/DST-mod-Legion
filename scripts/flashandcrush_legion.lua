@@ -13,6 +13,7 @@ local prefabFiles = {
     "tripleshovelaxe",          --铲斧-三用型
     "hat_albicans_mushroom",    --素白蘑菇帽
     "albicansmushroomhat_fx",   --素白蘑菇帽相关fx
+    "explodingfruitcake",       --爆炸水果蛋糕
 }
 
 for k,v in pairs(prefabFiles) do
@@ -46,6 +47,8 @@ local assets = {
     Asset("IMAGE", "images/inventoryimages/hat_albicans_mushroom.tex"),
     Asset("ATLAS", "images/inventoryimages/soul_contracts.xml"),
     Asset("IMAGE", "images/inventoryimages/soul_contracts.tex"),
+    Asset("ATLAS", "images/inventoryimages/explodingfruitcake.xml"),
+    Asset("IMAGE", "images/inventoryimages/explodingfruitcake.tex"),
 }
 
 for k,v in pairs(assets) do
@@ -95,6 +98,15 @@ if TUNING.LEGION_TECHUNLOCK == "lootdropper" then
         }, TECH.LOST, {
             atlas = "images/inventoryimages/icire_rock.xml", image = "icire_rock.tex"
         }, { "RECAST", "WINTER", "SUMMER" }
+    )
+
+    AddRecipe2(
+        "explodingfruitcake", {
+            Ingredient("winter_food4", 1),
+            Ingredient("gunpowder", 1),
+        }, TECH.LOST, {
+            atlas = "images/inventoryimages/explodingfruitcake.xml", image = "explodingfruitcake.tex"
+        }, { "RECAST", "WEAPONS" }
     )
 
     AddRecipe2(
@@ -187,6 +199,16 @@ else
             nounlock = true,
             atlas = "images/inventoryimages/icire_rock.xml", image = "icire_rock.tex"
         }, { "RECAST", "WINTER", "SUMMER" }
+    )
+
+    AddRecipe2(
+        "explodingfruitcake", {
+            Ingredient("winter_food4", 1),
+            Ingredient("gunpowder", 1),
+        }, TECH.ELECOURMALINE_ONE, {
+            nounlock = true,
+            atlas = "images/inventoryimages/explodingfruitcake.xml", image = "explodingfruitcake.tex"
+        }, { "RECAST", "WEAPONS" }
     )
 
     AddRecipe2(
