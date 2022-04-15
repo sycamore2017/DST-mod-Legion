@@ -352,6 +352,30 @@ if TUNING.LEGION_FLASHANDCRUSH then
         end,
         fn_remove = nil,
     })
+
+    MakeFx({ --爆炸水果蛋糕：爆炸特效
+        name = "explode_fruitcake",
+        assets = {
+            Asset("ANIM", "anim/explode.zip"), --官方爆炸特效动画模板
+        },
+        prefabs = nil,
+        fn_common = function(inst)
+            inst.Transform:SetFourFaced()
+        end,
+        fn_anim = function(inst)
+            inst.AnimState:SetBank("explode")
+            inst.AnimState:SetBuild("explode")
+            inst.AnimState:PlayAnimation("small_firecrackers")
+            inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
+            inst.AnimState:SetLightOverride(1)
+            inst.AnimState:SetScale(1.4, 1.4, 1.4)
+
+            inst.entity:AddSoundEmitter()
+            inst.SoundEmitter:PlaySoundWithParams("dontstarve/common/together/fire_cracker", { start = math.random() })
+            inst.SoundEmitter:PlaySound("dontstarve/creatures/slurtle/mound_explode")
+        end,
+        fn_remove = nil,
+    })
 end
 
 if TUNING.LEGION_DESERTSECRET then

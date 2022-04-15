@@ -61,7 +61,7 @@ local function fn()
 
     inst:AddComponent("tool")
     inst.components.tool:SetAction(ACTIONS.HAMMER)  --添加锤子功能
-    
+
     --添加草叉功能
     inst:AddInherentAction(ACTIONS.TERRAFORM)
     inst:AddComponent("terraformer")

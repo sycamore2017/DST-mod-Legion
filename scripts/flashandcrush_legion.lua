@@ -103,7 +103,7 @@ if TUNING.LEGION_TECHUNLOCK == "lootdropper" then
     AddRecipe2(
         "explodingfruitcake", {
             Ingredient("winter_food4", 1),
-            Ingredient("gunpowder", 1),
+            Ingredient("gunpowder", 2),
         }, TECH.LOST, {
             atlas = "images/inventoryimages/explodingfruitcake.xml", image = "explodingfruitcake.tex"
         }, { "RECAST", "WEAPONS" }
@@ -204,7 +204,7 @@ else
     AddRecipe2(
         "explodingfruitcake", {
             Ingredient("winter_food4", 1),
-            Ingredient("gunpowder", 1),
+            Ingredient("gunpowder", 2),
         }, TECH.ELECOURMALINE_ONE, {
             nounlock = true,
             atlas = "images/inventoryimages/explodingfruitcake.xml", image = "explodingfruitcake.tex"

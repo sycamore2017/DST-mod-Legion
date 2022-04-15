@@ -70,7 +70,8 @@ local function AddSpecialLoot(inst)
         "web_hump_item_blueprint",
         "saddle_baggage_blueprint",
         "hat_albicans_mushroom_blueprint",
-        "soul_contracts_blueprint"
+        "soul_contracts_blueprint",
+        "explodingfruitcake_blueprint"
     }
     -- inst.components.lootdropper:AddChanceLoot(drops[math.random(#drops)], 1)
     inst.components.lootdropper:AddChanceLoot(table.remove(drops, math.random(#drops)), 1)

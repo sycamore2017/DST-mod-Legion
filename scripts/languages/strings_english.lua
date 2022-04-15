@@ -2612,6 +2612,26 @@ S_________WURT.DESCRIBE.SOUL_CONTRACTS =
     ONLYONE = "Enough negative emotions.",
 }
 
+S_NAMES.EXPLODINGFRUITCAKE = "Exploding Fruitcake" --爆炸水果蛋糕
+S_RECIPE_DESC.EXPLODINGFRUITCAKE = "Sweet bomb-bomb, bite or light!"
+S______GENERIC.DESCRIBE.EXPLODINGFRUITCAKE = "A gift full of malice."
+S_______WILLOW.DESCRIBE.EXPLODINGFRUITCAKE = "Bomb-bomb, it's all blown up."
+-- S_____WOLFGANG.DESCRIBE.EXPLODINGFRUITCAKE = ""
+S________WENDY.DESCRIBE.EXPLODINGFRUITCAKE = "I did it, so what..."
+S_________WX78.DESCRIBE.EXPLODINGFRUITCAKE = "AFTER ANALYSIS: CAN I MAKE THIS?"
+S_WICKERBOTTOM.DESCRIBE.EXPLODINGFRUITCAKE = "How to detonate, light it or bite it?"
+-- S_______WOODIE.DESCRIBE.EXPLODINGFRUITCAKE = ""
+S______WAXWELL.DESCRIBE.EXPLODINGFRUITCAKE = "The world between us..."
+S___WATHGRITHR.DESCRIBE.EXPLODINGFRUITCAKE = "Fighting fair and square is my style!"
+S_______WEBBER.DESCRIBE.EXPLODINGFRUITCAKE = "Wow, a cake!"
+S_______WINONA.DESCRIBE.EXPLODINGFRUITCAKE = "No tech at all. The leads are so obvious? !"
+S_______WORTOX.DESCRIBE.EXPLODINGFRUITCAKE = "I won't do such a prank that will kill someone!"
+S_____WORMWOOD.DESCRIBE.EXPLODINGFRUITCAKE = "Sweet, need a bite."
+S________WARLY.DESCRIBE.EXPLODINGFRUITCAKE = "Sugarcoated bullet, be careful."
+-- S_________WURT.DESCRIBE.EXPLODINGFRUITCAKE = ""
+-- S_______WALTER.DESCRIBE.EXPLODINGFRUITCAKE = ""
+S________WANDA.DESCRIBE.EXPLODINGFRUITCAKE = "Fortunately, I have time to stop this tragedy."
+
 --------------------------------------------------------------------------
 --[[ desert secret ]]--[[ 尘市蜃楼 ]]
 --------------------------------------------------------------------------
