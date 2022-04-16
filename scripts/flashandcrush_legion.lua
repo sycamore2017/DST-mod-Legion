@@ -575,38 +575,6 @@ AddStategraphActionHandler("wilson", ActionHandler(ACTIONS.GIVE_RIGHTCLICK, "giv
 AddStategraphActionHandler("wilson_client", ActionHandler(ACTIONS.GIVE_RIGHTCLICK, "give"))    --在联机版中添加新动作需要对wilson和wilson_cient两个sg都进行state绑定
 
 --------------------------------------------------------------------------
---[[ 让蘑菇和孢子可以修复素白蘑菇帽 ]]
---------------------------------------------------------------------------
-
-_G.MATERIALS.FUNGUS = "fungus"
-
-if IsServer then
-    local fungus_needchange =
-    {
-        red_cap = 0.05,
-        green_cap = 0.05,
-        blue_cap = 0.05,
-        albicans_cap = 0.15, --素白菇
-        spore_small = 0.15,  --绿蘑菇孢子
-        spore_medium = 0.15, --红蘑菇孢子
-        spore_tall = 0.15,   --蓝蘑菇孢子
-        moon_cap = 0.2,      --月亮蘑菇
-        shroom_skin = 1,
-    }
-
-    for k,v in pairs(fungus_needchange) do
-        AddPrefabPostInit(k, function(inst)
-            if inst.components.repairer == nil then
-                inst:AddComponent("repairer")
-            end
-            inst.components.repairer.repairmaterial = MATERIALS.FUNGUS
-            -- inst.components.repairer.healthrepairvalue = TUNING.REPAIR_LOGS_HEALTH
-            inst.components.repairer.perishrepairpercent = v
-        end)
-    end
-end
-
---------------------------------------------------------------------------
 --[[ 素白蘑菇帽的打喷嚏释放其技能的sg ]]
 --------------------------------------------------------------------------
 

@@ -141,6 +141,7 @@ local function fn(Sim)
 
     inst:AddTag("hat")
     inst:AddTag("show_spoilage")
+    inst.repairable_l = true
 
     --waterproofer (from waterproofer component) added to pristine state for optimization
     inst:AddTag("waterproofer")
@@ -153,7 +154,6 @@ local function fn(Sim)
     end
 
     inst.entity:SetPristine()
-
     if not TheWorld.ismastersim then
         return inst
     end
@@ -183,10 +183,6 @@ local function fn(Sim)
     inst.components.perishable:SetPerishTime(TUNING.PERISH_SLOW) --15天新鲜度
     inst.components.perishable:StartPerishing()
     inst.components.perishable:SetOnPerishFn(inst.Remove)
-
-    inst:AddComponent("repairable")
-    inst.components.repairable.repairmaterial = MATERIALS.FUNGUS
-    inst.components.repairable.announcecanfix = false
 
     inst:AddComponent("useableitem")
     inst.components.useableitem:SetOnUseFn(onuse)

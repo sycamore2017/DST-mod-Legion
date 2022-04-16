@@ -3021,6 +3021,35 @@ STRINGS.UI.CRAFTING.NEEDSELECOURMALINE_ONE = "Find the Elecourmaline to build th
 STRINGS.UI.CRAFTING.NEEDSELECOURMALINE_TWO = "It seems that this stone is not fully activated!"
 STRINGS.UI.CRAFTING.NEEDSELECOURMALINE_THREE = "Find the activated Elecourmaline to build this!"
 
+STRINGS.ACTIONS.REPAIR_LEGION = {
+    GENERIC = "Repair",
+}
+S______GENERIC.ACTIONFAIL.REPAIR_LEGION = {
+    GUITAR = "There's nothing to fix.",
+    FUNGUS = "It's fresh and no need to repair."
+}
+-- S_______WILLOW.ACTIONFAIL.REPAIR_LEGION =
+-- S_____WOLFGANG.ACTIONFAIL.REPAIR_LEGION =
+-- S________WENDY.ACTIONFAIL.REPAIR_LEGION =
+-- S_________WX78.ACTIONFAIL.REPAIR_LEGION =
+-- S_WICKERBOTTOM.ACTIONFAIL.REPAIR_LEGION =
+-- S_______WOODIE.ACTIONFAIL.REPAIR_LEGION =
+-- S______WAXWELL.ACTIONFAIL.REPAIR_LEGION =
+-- S___WATHGRITHR.ACTIONFAIL.REPAIR_LEGION =
+S_______WEBBER.ACTIONFAIL.REPAIR_LEGION = {
+    GUITAR = "It's none of our business.",
+    FUNGUS = "We can't see what's wrong with our several eyes."
+}
+S_______WINONA.ACTIONFAIL.REPAIR_LEGION = {
+    GUITAR = "Perfect as ever.",
+    FUNGUS = "It's perfect."
+}
+-- S_______WORTOX.ACTIONFAIL.REPAIR_LEGION =
+-- S_____WORMWOOD.ACTIONFAIL.REPAIR_LEGION =
+-- S________WARLY.ACTIONFAIL.REPAIR_LEGION =
+-- S_________WURT.ACTIONFAIL.REPAIR_LEGION =
+-- S_______WALTER.ACTIONFAIL.REPAIR_LEGION =
+
 STRINGS.CROP_LEGION = {
     SEED = "Planted {crop} Seed",
     SPROUT = "{crop} Sprout",

@@ -276,8 +276,6 @@ end
 --[[ 玩具彩蛋生成 ]]
 --------------------------------------------------------------------------
 
---梧生最终也没有做到一吻长青
-
 -- if IsServer then
 --     local function OnEntityWake_toywe(inst, toyprefab, physicsradius)
 --         if inst.lasttoytime == nil then

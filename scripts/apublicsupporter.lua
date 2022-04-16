@@ -601,32 +601,179 @@ if TUNING.LEGION_FLASHANDCRUSH or TUNING.LEGION_DESERTSECRET then --米格尔吉
 
         return "playguitar_client"
     end))
+end
 
-    --------------------------------------------------------------------------
-    --[[ 让蜘蛛丝和钢羊绒可以修复白木吉他 ]]
-    --------------------------------------------------------------------------
+--------------------------------------------------------------------------
+--[[ 统一化的修复组件 ]]
+--------------------------------------------------------------------------
 
-    if TUNING.LEGION_DESERTSECRET then
-        _G.FUELTYPE.GUITAR = "GUITAR"
+if TUNING.LEGION_FLASHANDCRUSH or TUNING.LEGION_DESERTSECRET then --素白蘑菇帽和白木吉他需要
+    _G.FUELTYPE.GUITAR = "GUITAR"
 
-        if IsServer then
-            local guitar_needchange =
-            {
-                silk = TUNING.TOTAL_DAY_TIME * 0.1,
-                steelwool = TUNING.TOTAL_DAY_TIME * 0.9, --由于钢羊绒已经有燃料组件，这个修改会导致它无法再作为燃料
-            }
+    local function Fn_try_guitar(inst, doer, target, actions, right)
+        if doer.replica.rider ~= nil and doer.replica.rider:IsRiding() then --骑牛时只能修复自己的携带物品
+            if not (target.replica.inventoryitem ~= nil and target.replica.inventoryitem:IsGrandOwner(doer)) then
+                return false
+            end
+        elseif doer.replica.inventory ~= nil and doer.replica.inventory:IsHeavyLifting() then --不能背重物
+            return false
+        end
 
-            for k,v in pairs(guitar_needchange) do
-                AddPrefabPostInit(k, function(inst)
-                    if inst.components.fuel == nil then
-                        inst:AddComponent("fuel")
-                    end
-                    inst.components.fuel.fuelvalue = v
-                    inst.components.fuel.fueltype = FUELTYPE.GUITAR
-                end)
+        if target:HasTag(FUELTYPE.GUITAR.."_fueled") then
+            return true
+        end
+
+        return false
+    end
+    local function Fn_do_guitar(doer, item, target, value)
+        if
+            item ~= nil and target ~= nil and
+            doer ~= nil and doer.components.inventory ~= nil and
+            target.components.fueled ~= nil and target.components.fueled.accepting and
+            target.components.fueled:GetPercent() < 1
+        then
+            local useditem = doer.components.inventory:RemoveItem(item) --不做说明的话，一次只取一个
+            if useditem then
+                local fueled = target.components.fueled
+                fueled:DoDelta(value*fueled.bonusmult*(doer.mult_repairl or 1), doer)
+
+                if useditem.components.fuel ~= nil then
+                    useditem.components.fuel:Taken(fueled.inst)
+                end
+                useditem:Remove()
+
+                if fueled.ontakefuelfn ~= nil then
+                    fueled.ontakefuelfn(fueled.inst, value)
+                end
+                fueled.inst:PushEvent("takefuel", { fuelvalue = value })
+
+                return true
             end
         end
+        return false, "GUITAR"
     end
+
+    _G.REPAIRERS_L = {
+        silk = {
+            fn_try = Fn_try_guitar, --【客户端】
+            fn_sg = function(doer, action) --【服务端、客户端】
+                return "dolongaction"
+            end,
+            fn_do = function(act) --【服务端】
+                return Fn_do_guitar(act.doer, act.invobject, act.target, TUNING.TOTAL_DAY_TIME * 0.1)
+            end,
+        },
+        steelwool = {
+            fn_try = Fn_try_guitar,
+            fn_sg = function(doer, action)
+                return "dolongaction"
+            end,
+            fn_do = function(act)
+                return Fn_do_guitar(act.doer, act.invobject, act.target, TUNING.TOTAL_DAY_TIME * 0.9)
+            end,
+        }
+    }
+
+    if TUNING.LEGION_FLASHANDCRUSH then
+        local function Fn_try_fungus(inst, doer, target, actions, right)
+            if doer.replica.rider ~= nil and doer.replica.rider:IsRiding() then --骑牛时只能修复自己的携带物品
+                if not (target.replica.inventoryitem ~= nil and target.replica.inventoryitem:IsGrandOwner(doer)) then
+                    return false
+                end
+            elseif doer.replica.inventory ~= nil and doer.replica.inventory:IsHeavyLifting() then --不能背重物
+                return false
+            end
+
+            if target.repairable_l then
+                return true
+            end
+
+            return false
+        end
+
+        local function Fn_do_fungus(doer, item, target, value)
+            if
+                item ~= nil and target ~= nil and
+                doer ~= nil and doer.components.inventory ~= nil and
+                target.components.perishable ~= nil and target.components.perishable.perishremainingtime ~= nil and
+                target.components.perishable.perishremainingtime < target.components.perishable.perishtime
+            then
+                local useditem = doer.components.inventory:RemoveItem(item) --不做说明的话，一次只取一个
+                if useditem then
+                    local perishable = target.components.perishable
+                    perishable:SetPercent(perishable:GetPercent() + value)
+
+                    useditem:Remove()
+
+                    return true
+                end
+            end
+            return false, "FUNGUS"
+        end
+
+        local fungus_needchange = {
+            red_cap = 0.05,
+            green_cap = 0.05,
+            blue_cap = 0.05,
+            albicans_cap = 0.15, --素白菇
+            spore_small = 0.15,  --绿蘑菇孢子
+            spore_medium = 0.15, --红蘑菇孢子
+            spore_tall = 0.15,   --蓝蘑菇孢子
+            moon_cap = 0.2,      --月亮蘑菇
+            shroom_skin = 1,
+        }
+        for k,v in pairs(fungus_needchange) do
+            _G.REPAIRERS_L[k] = {
+                fn_try = Fn_try_fungus,
+                fn_sg = function(doer, action)
+                    return "doshortaction"
+                end,
+                fn_do = function(act)
+                    return Fn_do_fungus(act.doer, act.invobject, act.target, v)
+                end,
+            }
+        end
+    end
+
+    if IsServer then
+        for k,v in pairs(REPAIRERS_L) do
+            AddPrefabPostInit(k, function(inst)
+                inst:AddComponent("repairerlegion")
+            end)
+        end
+    end
+
+    ------
+
+    local REPAIR_LEGION = Action({ priority = 1, mount_valid = false })
+    REPAIR_LEGION.id = "REPAIR_LEGION"
+    REPAIR_LEGION.str = STRINGS.ACTIONS.REPAIR_LEGION
+    REPAIR_LEGION.strfn = function(act)
+        return "GENERIC"
+    end
+    REPAIR_LEGION.fn = function(act)
+        if act.invobject ~= nil and REPAIRERS_L[act.invobject.prefab] then
+            return REPAIRERS_L[act.invobject.prefab].fn_do(act)
+        end
+    end
+    AddAction(REPAIR_LEGION)
+
+    AddComponentAction("USEITEM", "repairerlegion", function(inst, doer, target, actions, right)
+        if right and REPAIRERS_L[inst.prefab] and REPAIRERS_L[inst.prefab].fn_try(inst, doer, target, actions, right) then
+            table.insert(actions, ACTIONS.REPAIR_LEGION)
+        end
+    end)
+
+    AddStategraphActionHandler("wilson", ActionHandler(ACTIONS.REPAIR_LEGION, function(inst, action)
+        if action.invobject ~= nil and REPAIRERS_L[action.invobject.prefab] then
+            return REPAIRERS_L[action.invobject.prefab].fn_sg(inst, action)
+        end
+    end))
+    AddStategraphActionHandler("wilson_client", ActionHandler(ACTIONS.REPAIR_LEGION, function(inst, action)
+        if action.invobject ~= nil and REPAIRERS_L[action.invobject.prefab] then
+            return REPAIRERS_L[action.invobject.prefab].fn_sg(inst, action)
+        end
+    end))
 end
 
 --------------------------------------------------------------------------
