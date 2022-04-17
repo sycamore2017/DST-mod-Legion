@@ -608,71 +608,9 @@ end
 --------------------------------------------------------------------------
 
 if TUNING.LEGION_FLASHANDCRUSH or TUNING.LEGION_DESERTSECRET then --素白蘑菇帽和白木吉他需要
-    _G.FUELTYPE.GUITAR = "GUITAR"
-
-    local function Fn_try_guitar(inst, doer, target, actions, right)
-        if doer.replica.rider ~= nil and doer.replica.rider:IsRiding() then --骑牛时只能修复自己的携带物品
-            if not (target.replica.inventoryitem ~= nil and target.replica.inventoryitem:IsGrandOwner(doer)) then
-                return false
-            end
-        elseif doer.replica.inventory ~= nil and doer.replica.inventory:IsHeavyLifting() then --不能背重物
-            return false
-        end
-
-        if target:HasTag(FUELTYPE.GUITAR.."_fueled") then
-            return true
-        end
-
-        return false
+    if not _G.rawget(_G, "REPAIRERS_L") then
+        _G.REPAIRERS_L = {}
     end
-    local function Fn_do_guitar(doer, item, target, value)
-        if
-            item ~= nil and target ~= nil and
-            doer ~= nil and doer.components.inventory ~= nil and
-            target.components.fueled ~= nil and target.components.fueled.accepting and
-            target.components.fueled:GetPercent() < 1
-        then
-            local useditem = doer.components.inventory:RemoveItem(item) --不做说明的话，一次只取一个
-            if useditem then
-                local fueled = target.components.fueled
-                fueled:DoDelta(value*fueled.bonusmult*(doer.mult_repairl or 1), doer)
-
-                if useditem.components.fuel ~= nil then
-                    useditem.components.fuel:Taken(fueled.inst)
-                end
-                useditem:Remove()
-
-                if fueled.ontakefuelfn ~= nil then
-                    fueled.ontakefuelfn(fueled.inst, value)
-                end
-                fueled.inst:PushEvent("takefuel", { fuelvalue = value })
-
-                return true
-            end
-        end
-        return false, "GUITAR"
-    end
-
-    _G.REPAIRERS_L = {
-        silk = {
-            fn_try = Fn_try_guitar, --【客户端】
-            fn_sg = function(doer, action) --【服务端、客户端】
-                return "dolongaction"
-            end,
-            fn_do = function(act) --【服务端】
-                return Fn_do_guitar(act.doer, act.invobject, act.target, TUNING.TOTAL_DAY_TIME * 0.1)
-            end,
-        },
-        steelwool = {
-            fn_try = Fn_try_guitar,
-            fn_sg = function(doer, action)
-                return "dolongaction"
-            end,
-            fn_do = function(act)
-                return Fn_do_guitar(act.doer, act.invobject, act.target, TUNING.TOTAL_DAY_TIME * 0.9)
-            end,
-        }
-    }
 
     if TUNING.LEGION_FLASHANDCRUSH then
         local function Fn_try_fungus(inst, doer, target, actions, right)
@@ -733,6 +671,72 @@ if TUNING.LEGION_FLASHANDCRUSH or TUNING.LEGION_DESERTSECRET then --素白蘑菇
                 end,
             }
         end
+    end
+
+    if TUNING.LEGION_DESERTSECRET then
+        _G.FUELTYPE.GUITAR = "GUITAR"
+
+        local function Fn_try_guitar(inst, doer, target, actions, right)
+            if doer.replica.rider ~= nil and doer.replica.rider:IsRiding() then --骑牛时只能修复自己的携带物品
+                if not (target.replica.inventoryitem ~= nil and target.replica.inventoryitem:IsGrandOwner(doer)) then
+                    return false
+                end
+            elseif doer.replica.inventory ~= nil and doer.replica.inventory:IsHeavyLifting() then --不能背重物
+                return false
+            end
+
+            if target:HasTag(FUELTYPE.GUITAR.."_fueled") then
+                return true
+            end
+
+            return false
+        end
+        local function Fn_do_guitar(doer, item, target, value)
+            if
+                item ~= nil and target ~= nil and
+                doer ~= nil and doer.components.inventory ~= nil and
+                target.components.fueled ~= nil and target.components.fueled.accepting and
+                target.components.fueled:GetPercent() < 1
+            then
+                local useditem = doer.components.inventory:RemoveItem(item) --不做说明的话，一次只取一个
+                if useditem then
+                    local fueled = target.components.fueled
+                    fueled:DoDelta(value*fueled.bonusmult*(doer.mult_repairl or 1), doer)
+
+                    if useditem.components.fuel ~= nil then
+                        useditem.components.fuel:Taken(fueled.inst)
+                    end
+                    useditem:Remove()
+
+                    if fueled.ontakefuelfn ~= nil then
+                        fueled.ontakefuelfn(fueled.inst, value)
+                    end
+                    fueled.inst:PushEvent("takefuel", { fuelvalue = value })
+
+                    return true
+                end
+            end
+            return false, "GUITAR"
+        end
+
+        _G.REPAIRERS_L["silk"] = {
+            fn_try = Fn_try_guitar, --【客户端】
+            fn_sg = function(doer, action) --【服务端、客户端】
+                return "dolongaction"
+            end,
+            fn_do = function(act) --【服务端】
+                return Fn_do_guitar(act.doer, act.invobject, act.target, TUNING.TOTAL_DAY_TIME * 0.1)
+            end,
+        }
+        _G.REPAIRERS_L["steelwool"] = {
+            fn_try = Fn_try_guitar,
+            fn_sg = function(doer, action)
+                return "dolongaction"
+            end,
+            fn_do = function(act)
+                return Fn_do_guitar(act.doer, act.invobject, act.target, TUNING.TOTAL_DAY_TIME * 0.9)
+            end,
+        }
     end
 
     if IsServer then
