@@ -2984,6 +2984,45 @@ S______GENERIC.DESCRIBE.THEEMPERORSPENDANT = "A determined man don't believe thi
 -- S_________WURT.DESCRIBE.THEEMPERORSPENDANT = ""
 -- S_______WALTER.DESCRIBE.THEEMPERORSPENDANT = ""
 
+S_NAMES.MAT_WHITEWOOD_ITEM = "Unplaced White Wood Mat" --未放置的白木地垫
+S_RECIPE_DESC.MAT_WHITEWOOD_ITEM = "Give your feet a woody feel."
+S______GENERIC.DESCRIBE.MAT_WHITEWOOD_ITEM = "White wood chips for decorating the ground."
+-- S_______WILLOW.DESCRIBE.MAT_WHITEWOOD_ITEM = ""
+-- S_____WOLFGANG.DESCRIBE.MAT_WHITEWOOD_ITEM = ""
+-- S________WENDY.DESCRIBE.MAT_WHITEWOOD_ITEM = ""
+-- S_________WX78.DESCRIBE.MAT_WHITEWOOD_ITEM = ""
+-- S_WICKERBOTTOM.DESCRIBE.MAT_WHITEWOOD_ITEM = ""
+-- S_______WOODIE.DESCRIBE.MAT_WHITEWOOD_ITEM = ""
+-- S______WAXWELL.DESCRIBE.MAT_WHITEWOOD_ITEM = ""
+-- S___WATHGRITHR.DESCRIBE.MAT_WHITEWOOD_ITEM = ""
+-- S_______WEBBER.DESCRIBE.MAT_WHITEWOOD_ITEM = ""
+-- S_______WINONA.DESCRIBE.MAT_WHITEWOOD_ITEM = ""
+-- S_______WORTOX.DESCRIBE.MAT_WHITEWOOD_ITEM = ""
+-- S_____WORMWOOD.DESCRIBE.MAT_WHITEWOOD_ITEM = ""
+-- S________WARLY.DESCRIBE.MAT_WHITEWOOD_ITEM = ""
+-- S_________WURT.DESCRIBE.MAT_WHITEWOOD_ITEM = ""
+-- S_______WALTER.DESCRIBE.MAT_WHITEWOOD_ITEM = ""
+-- S________WANDA.DESCRIBE.MAT_WHITEWOOD_ITEM = ""
+
+S_NAMES.MAT_WHITEWOOD = "White Wood Mat" --白木地垫
+S______GENERIC.DESCRIBE.MAT_WHITEWOOD = "A layer of cushion makes me feel more down-to-earth."
+-- S_______WILLOW.DESCRIBE.MAT_WHITEWOOD = ""
+-- S_____WOLFGANG.DESCRIBE.MAT_WHITEWOOD = ""
+-- S________WENDY.DESCRIBE.MAT_WHITEWOOD = ""
+-- S_________WX78.DESCRIBE.MAT_WHITEWOOD = ""
+-- S_WICKERBOTTOM.DESCRIBE.MAT_WHITEWOOD = ""
+-- S_______WOODIE.DESCRIBE.MAT_WHITEWOOD = ""
+-- S______WAXWELL.DESCRIBE.MAT_WHITEWOOD = ""
+-- S___WATHGRITHR.DESCRIBE.MAT_WHITEWOOD = ""
+-- S_______WEBBER.DESCRIBE.MAT_WHITEWOOD = ""
+-- S_______WINONA.DESCRIBE.MAT_WHITEWOOD = ""
+-- S_______WORTOX.DESCRIBE.MAT_WHITEWOOD = ""
+-- S_____WORMWOOD.DESCRIBE.MAT_WHITEWOOD = ""
+-- S________WARLY.DESCRIBE.MAT_WHITEWOOD = ""
+-- S_________WURT.DESCRIBE.MAT_WHITEWOOD = ""
+-- S_______WALTER.DESCRIBE.MAT_WHITEWOOD = ""
+-- S________WANDA.DESCRIBE.MAT_WHITEWOOD = ""
+
 --------------------------------------------------------------------------
 --[[ other ]]--[[ 其他 ]]
 --------------------------------------------------------------------------
@@ -3023,10 +3062,12 @@ STRINGS.UI.CRAFTING.NEEDSELECOURMALINE_THREE = "Find the activated Elecourmaline
 
 STRINGS.ACTIONS.REPAIR_LEGION = {
     GENERIC = "Repair",
+    MERGE = "Merge",
 }
 S______GENERIC.ACTIONFAIL.REPAIR_LEGION = {
     GUITAR = "There's nothing to fix.",
-    FUNGUS = "It's fresh and no need to repair."
+    FUNGUS = "It's fresh and no need to repair.",
+    MAT = "Already the biggest.",
 }
 -- S_______WILLOW.ACTIONFAIL.REPAIR_LEGION =
 -- S_____WOLFGANG.ACTIONFAIL.REPAIR_LEGION =
@@ -3038,11 +3079,13 @@ S______GENERIC.ACTIONFAIL.REPAIR_LEGION = {
 -- S___WATHGRITHR.ACTIONFAIL.REPAIR_LEGION =
 S_______WEBBER.ACTIONFAIL.REPAIR_LEGION = {
     GUITAR = "It's none of our business.",
-    FUNGUS = "We can't see what's wrong with our several eyes."
+    FUNGUS = "We can't see what's wrong with our several eyes.",
+    MAT = "OK, that's good.",
 }
 S_______WINONA.ACTIONFAIL.REPAIR_LEGION = {
     GUITAR = "Perfect as ever.",
-    FUNGUS = "It's perfect."
+    FUNGUS = "It's perfect.",
+    MAT = "I think this is the maximum limit for it to remain strong.",
 }
 -- S_______WORTOX.ACTIONFAIL.REPAIR_LEGION =
 -- S_____WORMWOOD.ACTIONFAIL.REPAIR_LEGION =

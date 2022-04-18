@@ -675,6 +675,7 @@ if TUNING.LEGION_FLASHANDCRUSH or TUNING.LEGION_DESERTSECRET then --素白蘑菇
 
     if TUNING.LEGION_DESERTSECRET then
         _G.FUELTYPE.GUITAR = "GUITAR"
+        _G.UPGRADETYPES.MAT_L = "mat_l"
 
         local function Fn_try_guitar(inst, doer, target, actions, right)
             if doer.replica.rider ~= nil and doer.replica.rider:IsRiding() then --骑牛时只能修复自己的携带物品
@@ -737,13 +738,39 @@ if TUNING.LEGION_FLASHANDCRUSH or TUNING.LEGION_DESERTSECRET then --素白蘑菇
                 return Fn_do_guitar(act.doer, act.invobject, act.target, TUNING.TOTAL_DAY_TIME * 0.9)
             end,
         }
+        _G.REPAIRERS_L["mat_whitewood_item"] = {
+            noapiset = true,
+            fn_try = function(inst, doer, target, actions, right)
+                if
+                    (doer.replica.rider == nil or not doer.replica.rider:IsRiding()) and
+                    (doer.replica.inventory == nil or not doer.replica.inventory:IsHeavyLifting()) and
+                    target:HasTag(UPGRADETYPES.MAT_L.."_upgradeable")
+                then
+                    return true
+                end
+                return false
+            end,
+            fn_sg = function(doer, action) return "doshortaction" end,
+            fn_do = function(act)
+                if
+                    act.invobject and act.target and
+                    act.target.components.upgradeable and act.target.components.upgradeable:CanUpgrade()
+                then
+                    act.target.components.upgradeable:Upgrade(act.invobject, act.doer) --物品删除已经在其中
+                    return true
+                end
+                return false, "MAT"
+            end,
+        }
     end
 
     if IsServer then
         for k,v in pairs(REPAIRERS_L) do
-            AddPrefabPostInit(k, function(inst)
-                inst:AddComponent("repairerlegion")
-            end)
+            if not v.noapiset then
+                AddPrefabPostInit(k, function(inst)
+                    inst:AddComponent("repairerlegion")
+                end)
+            end
         end
     end
 
@@ -753,6 +780,11 @@ if TUNING.LEGION_FLASHANDCRUSH or TUNING.LEGION_DESERTSECRET then --素白蘑菇
     REPAIR_LEGION.id = "REPAIR_LEGION"
     REPAIR_LEGION.str = STRINGS.ACTIONS.REPAIR_LEGION
     REPAIR_LEGION.strfn = function(act)
+        if act.invobject ~= nil then
+            if act.invobject.prefab == "mat_whitewood_item" then
+                return "MERGE"
+            end
+        end
         return "GENERIC"
     end
     REPAIR_LEGION.fn = function(act)

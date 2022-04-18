@@ -1,19 +1,19 @@
-local assets =
-{
+--------------------------------------------------------------------------
+--[[ 白木吉他 ]]
+--------------------------------------------------------------------------
+
+local assets_guitar = {
     Asset("ANIM", "anim/guitar_whitewood.zip"),
     Asset("ANIM", "anim/swap_guitar_whitewood.zip"),
     Asset("ATLAS", "images/inventoryimages/guitar_whitewood.xml"),
     Asset("IMAGE", "images/inventoryimages/guitar_whitewood.tex"),
 }
 
-local prefabs =
-{
+local prefabs_guitar = {
     "battlesong_attach",
     "battlesong_detach",
     "guitar_whitewood_doing_fx",
 }
-
-------
 
 local TIME_FOURHANDSPLAY = 1.5
 local RANGE_FOURHANDSPLAY = 10
@@ -45,8 +45,6 @@ local function SpawnFx(fx, target, scale, xOffset, yOffset, zOffset)
 
     return fx
 end
-
------
 
 local function PlayFail(inst, owner, talktype)
     if talktype ~= nil and owner.components.talker ~= nil then
@@ -253,7 +251,7 @@ local function OnFinished(inst)
     inst.broken = true
 end
 
-local function Fn()
+local function Fn_guitar()
     local inst = CreateEntity()
 
     inst.entity:AddTransform()
@@ -276,7 +274,6 @@ local function Fn()
     end
 
     inst.entity:SetPristine()
-
     if not TheWorld.ismastersim then
         return inst
     end
@@ -304,6 +301,176 @@ local function Fn()
     return inst
 end
 
-----------
+--------------------------------------------------------------------------
+--[[ 白木地垫 ]]
+--------------------------------------------------------------------------
 
-return Prefab("guitar_whitewood", Fn, assets, prefabs)
+local assets_mat_item = {
+    Asset("ANIM", "anim/mat_whitewood.zip"),
+    Asset("ATLAS", "images/inventoryimages/mat_whitewood_item.xml"),
+    Asset("IMAGE", "images/inventoryimages/mat_whitewood_item.tex"),
+}
+
+local prefabs_mat_item = {
+    "mat_whitewood"
+}
+
+local function Fn_mat_item()
+    local inst = CreateEntity()
+
+    inst.entity:AddTransform()
+    inst.entity:AddAnimState()
+    inst.entity:AddNetwork()
+
+    MakeInventoryPhysics(inst)
+
+    -- inst:AddTag("guitar")
+
+    inst.AnimState:SetBank("mat_whitewood")
+    inst.AnimState:SetBuild("mat_whitewood")
+    inst.AnimState:PlayAnimation("item")
+
+    MakeInventoryFloatable(inst, "med", 0.3, 0.6)
+    local OnLandedClient_old = inst.components.floater.OnLandedClient
+    inst.components.floater.OnLandedClient = function(self)
+        OnLandedClient_old(self)
+        self.inst.AnimState:SetFloatParams(0.1, 1, self.bob_percent)
+    end
+
+    inst.entity:SetPristine()
+    if not TheWorld.ismastersim then
+        return inst
+    end
+
+    inst:AddComponent("inspectable")
+
+    inst:AddComponent("stackable")
+    inst.components.stackable.maxsize = TUNING.STACK_SIZE_SMALLITEM
+
+    inst:AddComponent("inventoryitem")
+    inst.components.inventoryitem.imagename = "mat_whitewood_item"
+    inst.components.inventoryitem.atlasname = "images/inventoryimages/mat_whitewood_item.xml"
+
+    inst:AddComponent("repairerlegion")
+
+    inst:AddComponent("edible")
+    inst.components.edible.foodtype = FOODTYPE.WOOD
+    inst.components.edible.healthvalue = 0
+    inst.components.edible.hungervalue = 0
+
+    inst:AddComponent("deployable")
+    inst.components.deployable.ondeploy = function(inst, pt, deployer)
+        local tree = SpawnPrefab("mat_whitewood")
+        if tree ~= nil then
+            tree.Transform:SetPosition(pt:Get())
+            inst.components.stackable:Get():Remove()
+            tree.SoundEmitter:PlaySound("dontstarve/common/place_structure_wood")
+        end
+    end
+    inst.components.deployable:SetDeployMode(DEPLOYMODE.WALL)
+    -- inst.components.deployable:SetDeploySpacing(DEPLOYSPACING.MEDIUM)
+
+    inst:AddComponent("fuel")
+    inst.components.fuel.fuelvalue = TUNING.SMALL_FUEL
+
+    MakeSmallBurnable(inst, TUNING.SMALL_BURNTIME)
+    MakeSmallPropagator(inst)
+
+    MakeHauntableLaunch(inst)
+
+    return inst
+end
+
+-----
+
+local assets_mat = {
+    Asset("ANIM", "anim/mat_whitewood.zip"),
+}
+
+local prefabs_mat = {
+    "mat_whitewood_item"
+}
+
+local function Fn_mat()
+    local inst = CreateEntity()
+
+    inst.entity:AddTransform()
+    inst.entity:AddSoundEmitter()
+    inst.entity:AddAnimState()
+    inst.entity:AddNetwork()
+
+    -- MakeObstaclePhysics(inst, .5)
+
+    -- inst:AddTag("guitar")
+
+    inst.AnimState:SetBank("mat_whitewood")
+    inst.AnimState:SetBuild("mat_whitewood")
+    inst.AnimState:PlayAnimation("idle1")
+    inst.AnimState:SetOrientation(ANIM_ORIENTATION.OnGround)
+    inst.AnimState:SetLayer(LAYER_BACKGROUND)
+    inst.AnimState:SetSortOrder(2)
+
+    inst.entity:SetPristine()
+    if not TheWorld.ismastersim then
+        return inst
+    end
+
+    -- inst:AddComponent("inspectable")
+
+    inst:AddComponent("lootdropper")
+
+    inst:AddComponent("workable")
+    inst.components.workable:SetWorkAction(ACTIONS.HAMMER)
+    inst.components.workable:SetWorkLeft(1)
+    inst.components.workable:SetOnFinishCallback(function(inst)
+        inst.components.lootdropper:DropLoot()
+
+        local fx = SpawnPrefab("collapse_small")
+        fx.Transform:SetPosition(inst.Transform:GetWorldPosition())
+        fx:SetMaterial("wood")
+
+        inst:Remove()
+    end)
+
+    inst:AddComponent("upgradeable")
+    inst.components.upgradeable.upgradetype = UPGRADETYPES.MAT_L
+    inst.components.upgradeable.onupgradefn = function(inst, doer, item)
+        inst.SoundEmitter:PlaySound("dontstarve/common/place_structure_wood")
+    end
+    inst.components.upgradeable.onstageadvancefn = function(inst)
+        local stagenow = inst.components.upgradeable:GetStage()
+        inst.AnimState:PlayAnimation("idle"..tostring(stagenow))
+
+        stagenow = math.floor(stagenow/2)
+        if stagenow > 0 then
+            local loots = {}
+            for i = 1, stagenow, 1 do
+                table.insert(loots, "mat_whitewood_item")
+            end
+            inst.components.lootdropper:SetLoot(loots)
+        else
+            inst.components.lootdropper:SetLoot(nil)
+        end
+    end
+    inst.components.upgradeable.numstages = 5
+    inst.components.upgradeable.upgradesperstage = 1
+
+    inst.OnLoad = function(inst, data) --由于 upgradeable 组件不会自己重新初始化，只能这里再初始化
+        inst.components.upgradeable.onstageadvancefn(inst)
+    end
+
+    -- MakeSmallBurnable(inst, TUNING.SMALL_BURNTIME) --贴近地面，不会着火
+    -- MakeSmallPropagator(inst)
+
+    MakeHauntableLaunch(inst)
+
+    return inst
+end
+
+-----
+-----
+
+return Prefab("guitar_whitewood", Fn_guitar, assets_guitar, prefabs_guitar),
+        Prefab("mat_whitewood_item", Fn_mat_item, assets_mat_item, prefabs_mat_item),
+        MakePlacer("mat_whitewood_item_placer", "mat_whitewood", "mat_whitewood", "idle1"),
+        Prefab("mat_whitewood", Fn_mat, assets_mat, prefabs_mat)

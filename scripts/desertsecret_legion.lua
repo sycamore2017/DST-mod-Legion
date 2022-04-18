@@ -3,7 +3,7 @@ local prefabFiles = {
     -- "lilypond",             --荷花池相关特效
     "shyerries",            --颤栗树相关
     "sand_spike_legion",    --对玩家友好的沙之咬
-    "guitar_whitewood",     --白木吉他
+    "whitewoods",           --白木相关
 }
 
 for k,v in pairs(prefabFiles) do
@@ -33,6 +33,8 @@ local assets = {
     Asset("IMAGE", "images/inventoryimages/theemperorsscepter.tex"),
     Asset("ATLAS", "images/inventoryimages/theemperorspendant.xml"),
     Asset("IMAGE", "images/inventoryimages/theemperorspendant.tex"),
+    Asset("ATLAS", "images/inventoryimages/mat_whitewood_item.xml"),
+    Asset("IMAGE", "images/inventoryimages/mat_whitewood_item.tex"),
 }
 
 for k,v in pairs(assets) do
@@ -45,7 +47,7 @@ local _G = GLOBAL
 local IsServer = TheNet:GetIsServer() or TheNet:IsDedicated()
 
 --------------------------------------------------------------------------
---[[ 颤栗树相关 ]]
+--[[ 基础 ]]
 --------------------------------------------------------------------------
 
 _G.RegistMiniMapImage_legion("shyerrytree")
@@ -227,6 +229,17 @@ AddRecipe2(
         atlas = "images/inventoryimages/guitar_whitewood.xml", image = "guitar_whitewood.tex"
     }, { "GARDENING", "TOOLS" }
 )
+AddRecipe2(
+    "mat_whitewood_item", {
+        Ingredient("shyerrylog", 1, "images/inventoryimages/shyerrylog.xml"),
+    }, TECH.NONE, {
+        atlas = "images/inventoryimages/mat_whitewood_item.xml", image = "mat_whitewood_item.tex"
+    }, { "DECOR" }
+)
+
+AddDeconstructRecipe("mat_whitewood", {
+    Ingredient("shyerrylog", 1, "images/inventoryimages/shyerrylog.xml")
+})
 
 if CONFIGS_LEGION.DRESSUP then
     AddRecipe2(

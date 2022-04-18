@@ -295,6 +295,16 @@ return {
             cook_cant = nil,
             recipe_count = 6,
         },
+        frozenbananadaiquiri = {
+            cook_need = "(烤)香蕉 冰度≥1",
+            cook_cant = nil,
+            recipe_count = 6,
+        },
+        bunnystew = {
+            cook_need = "肉度<1 冰度≥2",
+            cook_cant = "非食",
+            recipe_count = 6,
+        },
     },
     warly = {
         nightmarepie = {
