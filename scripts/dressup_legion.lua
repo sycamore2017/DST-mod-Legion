@@ -1502,8 +1502,8 @@ local SymbolCommDealFn = function(inst, animstate, symbol)
 end
 
 local hook_OverrideSymbol = UserDataHook.MakeHook("AnimState","OverrideSymbol",
-    function(inst, symbol, ...)
-        -- print(build)
+    function(inst, symbol, build, file)
+        -- print("----"..symbol.."-"..build.."-"..file)
         return SymbolCommDealFn(inst, inst.userdatas.AnimState, symbol)
     end
 )

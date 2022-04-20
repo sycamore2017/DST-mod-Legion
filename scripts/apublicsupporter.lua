@@ -756,7 +756,21 @@ if TUNING.LEGION_FLASHANDCRUSH or TUNING.LEGION_DESERTSECRET then --素白蘑菇
                     act.invobject and act.target and
                     act.target.components.upgradeable and act.target.components.upgradeable:CanUpgrade()
                 then
-                    act.target.components.upgradeable:Upgrade(act.invobject, act.doer) --物品删除已经在其中
+                    local upgradeable = act.target.components.upgradeable
+                    upgradeable.numupgrades = upgradeable.numupgrades + 1
+
+                    if act.invobject.components.stackable then
+                        act.invobject.components.stackable:Get(1):Remove()
+                    else
+                        act.invobject:Remove()
+                    end
+
+                    if upgradeable.onupgradefn then
+                        upgradeable.onupgradefn(upgradeable.inst, act.doer, act.invobject)
+                    end
+                    if upgradeable.numupgrades >= upgradeable.upgradesperstage then
+                        upgradeable:AdvanceStage()
+                    end
                     return true
                 end
                 return false, "MAT"

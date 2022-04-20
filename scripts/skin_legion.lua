@@ -360,7 +360,7 @@ _G.SKINS_LEGION = {
             descitem = "解锁\"兰草花穗\"皮肤。",
             description = "这片粉色花园是它的生活的点点滴滴。它打点自己的小天地，也借花谋生。它藏在自己的伪装里，招蜂引蝶，追猎而食。芸芸言它残勤劳心害美丽身，它无所顾忌，刹那间伸出死亡利爪又消失于粉脂。",
         } or {
-            name = "Orchitwigs", collection = "DISGUISER", access = "FREE",
+            name = "Pink Orchitwigs", collection = "DISGUISER", access = "FREE",
             descitem = "Unlock \"Orchitwigs\" skin.",
             description = "The story was not translated.",
         },
@@ -386,6 +386,38 @@ _G.SKINS_LEGION = {
         -- placer = {
         --     name = nil, bank = "orchidbush_disguiser", build = "orchidbush_disguiser", anim = "dead", prefabs = nil,
         -- },
+    },
+    orchidbush_disguiser = {
+        base_prefab = "orchidbush",
+		type = "item", skin_tags = {}, release_group = 555, rarity = raritySpecial,
+
+        skin_id = "626029b9c340bf24ab31057a",
+        onlyownedshow = true,
+		assets = {
+            Asset("ANIM", "anim/berrybush.zip"), --官方浆果丛动画
+			Asset("ANIM", "anim/skin/orchidbush_disguiser.zip"),
+		},
+
+        string = ischinese and {
+            name = "粉色猎园", collection = "DISGUISER", access = "SPECIAL",
+            descitem = "解锁\"兰草花丛\"皮肤。",
+            description = "猎人从不离开它的狩猎花园，毕竟这里有生活的点点滴滴。直至忽来风雨将猎人打落花枝，它不见踪迹。日月轮转，花开花落，它等了好久好久，始终不见猎人归来，它知道再也见不到那潇洒身影与狩猎姿态。\"猎人会回来的\"，它这样说道。",
+        } or {
+            name = "Pink Orchid Bush", collection = "DISGUISER", access = "SPECIAL",
+            descitem = "Unlock \"Orchid Bush\" skin.",
+            description = "The story was not translated.",
+        },
+
+		fn_anim = function(inst)
+            inst.AnimState:SetBank("berrybush")
+            inst.AnimState:SetBuild("orchidbush_disguiser")
+        end,
+        exchangefx = { prefab = nil, offset_y = 1.3, scale = nil },
+        linkedskins = { orchitwigs = "orchitwigs_disguiser" },
+        placer = {
+            name = nil, bank = "berrybush", build = "orchidbush_disguiser", anim = "dead",
+            prefabs = { "dug_orchidbush", "cutted_orchidbush" },
+        },
     },
 
     neverfade_thanks = {
@@ -686,7 +718,7 @@ end
 local skinidxes = { --用以皮肤排序
     "neverfade_thanks", "neverfadebush_thanks",
     "hat_cowboy_tvplay",
-    "orchitwigs_disguiser", "hat_lichen_disguiser", "boltwingout_disguiser",
+    "orchitwigs_disguiser", "orchidbush_disguiser", "hat_lichen_disguiser", "boltwingout_disguiser",
     "rosebush_marble", "lilybush_marble", "orchidbush_marble",
     "hat_lichen_emo_que",
 }

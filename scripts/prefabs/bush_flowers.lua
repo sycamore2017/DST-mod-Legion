@@ -181,7 +181,7 @@ local function getregentimefn(inst, time)
         + TUNING.BERRY_REGROW_VARIANCE * math.random()
 end
 
-local function SpawnMyLoot(bush, picker, itemname, itemnumber, mustdrop)
+local function SpawnMyLoot(bush, picker, itemname, itemnumber, mustdrop, checkskin)
     if not mustdrop and picker and picker.components.inventory ~= nil then
         local pos = picker:GetPosition()
         for i = 1, itemnumber do
@@ -191,6 +191,16 @@ local function SpawnMyLoot(bush, picker, itemname, itemnumber, mustdrop)
             end
         end
     elseif bush.components.lootdropper ~= nil then
+        if checkskin and picker then
+            local skindata = bush.components.skinedlegion:GetSkinedData()
+            if skindata and skindata.linkedskins and skindata.linkedskins[itemname] then
+                skindata = skindata.linkedskins[itemname]
+                for i = 1, itemnumber do
+                    bush.components.lootdropper:SpawnLootPrefab(itemname, nil, skindata, nil, picker.userid)
+                end
+                return
+            end
+        end
         for i = 1, itemnumber do
             bush.components.lootdropper:SpawnLootPrefab(itemname)
         end
@@ -475,7 +485,7 @@ MakeBush({
                 SpawnMyLoot(inst, picker, "cutted_orchidbush", 1, true) --掉落兰花种子
             end
             if math.random() <= CONFIGS_LEGION.FLOWERWEAPONSCHANCE then --3%几率掉落剑
-                SpawnMyLoot(inst, picker, "orchitwigs", 1, true)
+                SpawnMyLoot(inst, picker, "orchitwigs", 1, true, true)
             end
         end
 

@@ -233,13 +233,10 @@ AddRecipe2(
     "mat_whitewood_item", {
         Ingredient("shyerrylog", 1, "images/inventoryimages/shyerrylog.xml"),
     }, TECH.NONE, {
+        numtogive = 6,
         atlas = "images/inventoryimages/mat_whitewood_item.xml", image = "mat_whitewood_item.tex"
     }, { "DECOR" }
 )
-
-AddDeconstructRecipe("mat_whitewood", {
-    Ingredient("shyerrylog", 1, "images/inventoryimages/shyerrylog.xml")
-})
 
 if CONFIGS_LEGION.DRESSUP then
     AddRecipe2(

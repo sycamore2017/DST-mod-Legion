@@ -521,8 +521,8 @@ local function fn_contracts()
     inst.components.inventoryitem.nobounce = true
 
     inst:AddComponent("finiteuses")
-    inst.components.finiteuses:SetMaxUses(20)
-    inst.components.finiteuses:SetUses(20)
+    inst.components.finiteuses:SetMaxUses(25)
+    inst.components.finiteuses:SetUses(25)
     inst:ListenForEvent("percentusedchange", PercentChanged_contracts)
 
     inst:AddComponent("fuel")

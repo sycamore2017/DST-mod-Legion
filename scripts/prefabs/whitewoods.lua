@@ -324,13 +324,13 @@ local function Fn_mat_item()
 
     MakeInventoryPhysics(inst)
 
-    -- inst:AddTag("guitar")
+    inst:AddTag("eyeturret") --眼球塔的专属标签，但为了deployable组件的摆放名字而使用（显示为“放置”）
 
     inst.AnimState:SetBank("mat_whitewood")
     inst.AnimState:SetBuild("mat_whitewood")
     inst.AnimState:PlayAnimation("item")
 
-    MakeInventoryFloatable(inst, "med", 0.3, 0.6)
+    MakeInventoryFloatable(inst, "med", 0.3, 0.8)
     local OnLandedClient_old = inst.components.floater.OnLandedClient
     inst.components.floater.OnLandedClient = function(self)
         OnLandedClient_old(self)
@@ -367,7 +367,7 @@ local function Fn_mat_item()
             tree.SoundEmitter:PlaySound("dontstarve/common/place_structure_wood")
         end
     end
-    inst.components.deployable:SetDeployMode(DEPLOYMODE.WALL)
+    -- inst.components.deployable:SetDeployMode(DEPLOYMODE.WALL)
     -- inst.components.deployable:SetDeploySpacing(DEPLOYSPACING.MEDIUM)
 
     inst:AddComponent("fuel")
@@ -401,7 +401,7 @@ local function Fn_mat()
 
     -- MakeObstaclePhysics(inst, .5)
 
-    -- inst:AddTag("guitar")
+    inst:AddTag("NOBLOCK")
 
     inst.AnimState:SetBank("mat_whitewood")
     inst.AnimState:SetBuild("mat_whitewood")
@@ -472,5 +472,5 @@ end
 
 return Prefab("guitar_whitewood", Fn_guitar, assets_guitar, prefabs_guitar),
         Prefab("mat_whitewood_item", Fn_mat_item, assets_mat_item, prefabs_mat_item),
-        MakePlacer("mat_whitewood_item_placer", "mat_whitewood", "mat_whitewood", "idle1"),
+        MakePlacer("mat_whitewood_item_placer", "mat_whitewood", "mat_whitewood", "idle1", true),
         Prefab("mat_whitewood", Fn_mat, assets_mat, prefabs_mat)

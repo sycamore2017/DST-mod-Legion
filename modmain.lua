@@ -825,6 +825,9 @@ AddSimPostInit(function()
             DRESSUP_DATA["myth_iron_battlegear"] = { --铸铁战甲
                 isnoskin = true, buildfile = "myth_iron_battlegear", buildsymbol = "swap_body",
             }
+            DRESSUP_DATA["myth_food_tr"] = { --糖人
+                isnoskin = true, buildfile = "swap_myth_food_tr", buildsymbol = "image",
+            }
         end
 
         if _G.rawget(_G, "AddBambooShopItems") then
