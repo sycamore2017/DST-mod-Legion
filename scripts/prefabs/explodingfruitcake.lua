@@ -88,6 +88,12 @@ local function fn()
     inst.components.edible.foodtype = FOODTYPE.GOODIES
     inst.components.edible.secondaryfoodtype = FOODTYPE.VEGGIE
     inst.components.edible:SetOnEatenFn(function(inst, eater)
+        --如果是一次性吃完类型的对象，直接爆炸吧，反正都要整体删除了
+        if eater.components.eater and eater.components.eater.eatwholestack then
+            inst.components.explosive:OnBurnt()
+            return
+        end
+
         --由于食用时会主动消耗一个，而爆炸会消耗全部，为了达到一次吃只炸一个的效果，新生成一个完成爆炸效果
         eater:DoTaskInTime(1.5+math.random(), function()
             if eater:IsValid() and not eater:IsInLimbo() then
