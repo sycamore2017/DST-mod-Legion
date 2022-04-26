@@ -394,7 +394,7 @@ _G.SKINS_LEGION = {
         skin_id = "626029b9c340bf24ab31057a",
         onlyownedshow = true,
 		assets = {
-            Asset("ANIM", "anim/berrybush.zip"), --官方浆果丛动画
+            Asset("ANIM", "anim/berrybush2.zip"), --官方浆果丛动画
 			Asset("ANIM", "anim/skin/orchidbush_disguiser.zip"),
 		},
 
@@ -409,13 +409,13 @@ _G.SKINS_LEGION = {
         },
 
 		fn_anim = function(inst)
-            inst.AnimState:SetBank("berrybush")
+            inst.AnimState:SetBank("berrybush2")
             inst.AnimState:SetBuild("orchidbush_disguiser")
         end,
         exchangefx = { prefab = nil, offset_y = 1.3, scale = nil },
         linkedskins = { orchitwigs = "orchitwigs_disguiser" },
         placer = {
-            name = nil, bank = "berrybush", build = "orchidbush_disguiser", anim = "dead",
+            name = nil, bank = "berrybush2", build = "orchidbush_disguiser", anim = "dead",
             prefabs = { "dug_orchidbush", "cutted_orchidbush" },
         },
     },

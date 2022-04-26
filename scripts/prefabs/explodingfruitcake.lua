@@ -50,6 +50,7 @@ local function fn()
 
     inst:AddTag("molebait")
     inst:AddTag("explosive")
+    inst:AddTag("pre-preparedfood")
 
     inst.entity:SetPristine()
     if not TheWorld.ismastersim then
