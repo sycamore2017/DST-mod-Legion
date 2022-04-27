@@ -663,6 +663,19 @@ AddIngredientValues({"albicans_cap"}, {veggie=2}, false, false)
 --[[ 灵魂契约书瞬移、加血相关 ]]
 --------------------------------------------------------------------------
 
+local function FindItemWithoutContainer(inst, fn)
+    local inventory = inst.components.inventory
+
+    for k,v in pairs(inventory.itemslots) do
+        if v and fn(v) then
+            return v
+        end
+    end
+    if inventory.activeitem and fn(inventory.activeitem) then
+        return inventory.activeitem
+    end
+end
+
 -- 辅助沃托克斯管理灵魂
 local onsetonwer_f = false
 local ondropitem_f = false
@@ -704,7 +717,7 @@ AddPrefabPostInit("wortox", function(inst)
                 local CheckSoulsRemoved_old = upvaluehelper.Get(OnDropItem, "CheckSoulsRemoved")
                 if CheckSoulsRemoved_old ~= nil then
                     local function CheckSoulsRemoved_new(inst)
-                        local book = FINDITEMWITHOUTCONTAINER(inst, function(item)
+                        local book = FindItemWithoutContainer(inst, function(item)
                             return item:HasTag("soulcontracts")
                         end)
                         if book ~= nil and book.components.finiteuses ~= nil then
@@ -740,9 +753,8 @@ if IsServer then
                         inst,
                         TUNING.WORTOX_SOULSTEALER_RANGE,
                         function(item)
-                            --寻找未装满、未燃烧的契约书
+                            --寻找未装满的契约书
                             return item:IsValid() and item.entity:IsVisible() and
-                                -- (item.components.burnable ~= nil and not item.components.burnable:IsBurning()) and
                                 (item.components.finiteuses ~= nil and item.components.finiteuses:GetPercent() < 1)
                         end,
                         { "soulcontracts" },
@@ -762,12 +774,13 @@ if IsServer then
         --优化灵魂进入契约或者玩家时的逻辑
         local OnHit_old = inst.components.projectile.onhit
         inst.components.projectile:SetOnHitFn(function(inst, attacker, target)
+            print("hahahaah")
             if target ~= nil then
                 local book = nil
-                if target:HasTag("soulcontracts") then --进入契约书
+                if target:HasTag("soulcontracts") then --进入地面的契约书
                     book = target
-                elseif target.components.inventory ~= nil then --击中玩家时，有携带契约书的话，直接跳过灵魂进入物品栏过程，给书恢复耐久，并且释放多余灵魂
-                    book = FINDITEMWITHOUTCONTAINER(target, function(item)
+                elseif target.components.inventory ~= nil then --击中玩家时，有携带契约书的话
+                    book = FindItemWithoutContainer(target, function(item)
                         if item:HasTag("soulcontracts") then
                             return true
                         end
@@ -781,10 +794,29 @@ if IsServer then
                     fx.Transform:SetPosition(inst.Transform:GetWorldPosition())
                     fx:Setup(target)
 
-                    --契约书增加耐久
+                    --直接跳过灵魂进入物品栏过程，给书恢复耐久，并且释放多余灵魂
                     if book.components.finiteuses ~= nil and book._SoulHealing ~= nil then
-                        if book.components.finiteuses:GetPercent() >= 1 then
-                            book._SoulHealing(book)
+                        if book.components.finiteuses:GetPercent() >= 1 then --耐久满了
+                            if target.components.inventory == nil then --地面的书，触发加血效果
+                                book._SoulHealing(book)
+                            else --物品栏的书，如果携带的灵魂满了才释放加血效果
+                                local souls = target.components.inventory:FindItems(function(item)
+                                    return item.prefab == "wortox_soul"
+                                end)
+                                local soulscount = 0
+                                for i, v in ipairs(souls) do
+                                    soulscount = soulscount +
+                                        (v.components.stackable ~= nil and v.components.stackable:StackSize() or 1)
+                                end
+                                if soulscount >= TUNING.WORTOX_MAX_SOULS then --灵魂满了，释放加血效果
+                                    book._SoulHealing(target)
+                                else --灵魂没有满，直接给玩家灵魂
+                                    if OnHit_old ~= nil then
+                                        OnHit_old(inst, attacker, target)
+                                        return
+                                    end
+                                end
+                            end
                         else
                             book.components.finiteuses:SetUses(book.components.finiteuses:GetUses() + 1)
                         end
@@ -813,7 +845,7 @@ if IsServer then
             and act_pos ~= nil
             and act.doer.components.inventory ~= nil
         then
-            local contracts = FINDITEMWITHOUTCONTAINER(act.doer, function(item)
+            local contracts = FindItemWithoutContainer(act.doer, function(item)
                 return item:HasTag("soulcontracts") and
                     item.components.finiteuses ~= nil and
                     item.components.finiteuses:GetUses() > 0

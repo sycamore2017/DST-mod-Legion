@@ -319,21 +319,29 @@ end
 
 -----
 
+local function FindItemWithoutContainer(inst, fn)
+    local inventory = inst.components.inventory
+
+    for k,v in pairs(inventory.itemslots) do
+        if v and fn(v) then
+            return v
+        end
+    end
+    if inventory.activeitem and fn(inventory.activeitem) then
+        return inventory.activeitem
+    end
+end
 local function OnWortoxGetContracts(inst, owner)
-    --寻找灵魂和契约书
-    local hasContracts = false
-    local souls = FINDITEMSWITHOUTCONTAINER(owner, function(item)
-        if item.prefab == "wortox_soul" then
+    --寻找包里的其他契约书
+    local otherbook = FindItemWithoutContainer(owner, function(item)
+        if item:HasTag("soulcontracts") and item ~= inst then
             return true
-        elseif item:HasTag("soulcontracts") and item ~= inst then --背包里已有其他契约书
-            hasContracts = true
-            return false
         end
         return false
     end)
 
     --每个玩家最多拥有1本契约书
-    if hasContracts then
+    if otherbook ~= nil then
         owner:DoTaskInTime(0.2, function()
             owner.components.inventory:DropItem(inst)
             if owner.components.talker ~= nil then
@@ -342,37 +350,16 @@ local function OnWortoxGetContracts(inst, owner)
         end)
 
         return
-    elseif  --捡起不是自己的契约书
-        owner:HasTag("soulstealer") and --非沃托克斯玩家捡起，不会设定跟随
+    end
+
+    --实现契约丢地上时自动跟随玩家
+    if
         inst.components.follower ~= nil and
-        inst.components.follower:GetLeader() ~= owner and
+        inst.components.follower:GetLeader() ~= owner and --捡起不是自己的契约书
         owner.components.leader ~= nil
     then
         owner.components.leader:RemoveFollowersByTag("soulcontracts") --清除已有跟随的契约书
         owner.components.leader:AddFollower(inst) --提前设定跟随者，因为丢弃时已经获取不到owner了
-    end
-
-    --签订契约，释放多余的灵魂
-    local count = 0
-    for i, v in ipairs(souls) do
-        count = count + (v.components.stackable ~= nil and v.components.stackable:StackSize() or 1)
-        v:Remove()
-    end
-    if count > 0 and inst.components.finiteuses ~= nil then
-        local soulovernum = count + inst.components.finiteuses:GetUses() - inst.components.finiteuses.total
-        if soulovernum > 0 then
-            for k = 1, soulovernum do
-                --这里指定参数为owner，因为inst此时在物品栏里，获取不到正确的位置
-                inst._SoulHealing(owner)
-            end
-            inst.components.finiteuses:SetUses(inst.components.finiteuses.total)
-            owner:PushEvent("soultoomany")
-        else
-            inst.components.finiteuses:SetUses(count + inst.components.finiteuses:GetUses())
-            if inst.components.finiteuses:GetPercent() > 0.8 then
-                owner:PushEvent("soultoomany")
-            end
-        end
     end
 end
 
@@ -406,11 +393,9 @@ local function OnDropped_contracts(inst) --丢在地上时
         StopUpadateHealTag(inst)
     end
 
-    if inst.components.follower:GetLeader() ~= nil then
-        -- setDropPostion(inst, FRAMES)
-        -- setDropPostion(inst, FRAMES * 2)
-        setDropPostion(inst, FRAMES * 6)
-    end
+    -- if inst.components.follower:GetLeader() ~= nil then --当初为啥要重新设定一遍位置呢，难道是跟随组件的问题？
+    --     setDropPostion(inst, FRAMES * 6)
+    -- end
 end
 
 -----
@@ -447,17 +432,10 @@ local function FuelTaken_contracts(inst, taker) --被当作燃料消耗时
     StopUpadateHealTag(inst)
 end
 
--- local function OnBurnt_contracts(inst) --燃烧殆尽时
---     SoulLeaking(inst, inst)
---     StopUpadateHealTag(inst)
---     SpawnPrefab("ash").Transform:SetPosition(inst.Transform:GetWorldPosition())
---     inst:Remove()
--- end
-
 -----
 
 local function PercentChanged_contracts(inst, data) --耐久变化时
-    if inst.components.inventoryitem ~= nil and data ~= nil and data.percent ~= nil then
+    if data ~= nil and data.percent ~= nil then
         if data.percent <= 0 then --耐久用光
             if not inst:HasTag("nosoulleft") then
                 inst:AddTag("nosoulleft")
@@ -469,7 +447,9 @@ local function PercentChanged_contracts(inst, data) --耐久变化时
                 inst:RemoveTag("nosoulleft")
             end
 
-            StartUpadateHealTag(inst)
+            if inst.components.inventoryitem.owner == nil then --不在背包里时
+                StartUpadateHealTag(inst)
+            end
         end
     end
 end
@@ -492,8 +472,6 @@ local function fn_contracts()
     inst:AddTag("ignorewalkableplatformdrowning")
     inst:AddTag("NOBLOCK")
     inst:AddTag("flying")
-
-    -- MakeInventoryFloatable(inst, "small", 0.1, 0.75)
 
     inst.entity:SetPristine()
 
@@ -519,6 +497,7 @@ local function fn_contracts()
     inst.components.inventoryitem.atlasname = "images/inventoryimages/soul_contracts.xml"
     inst.components.inventoryitem.pushlandedevents = false
     inst.components.inventoryitem.nobounce = true
+    inst.components.inventoryitem.canbepickedup = true
 
     inst:AddComponent("finiteuses")
     inst.components.finiteuses:SetMaxUses(25)
@@ -528,10 +507,6 @@ local function fn_contracts()
     inst:AddComponent("fuel")
     inst.components.fuel.fuelvalue = TUNING.MED_FUEL
     inst.components.fuel:SetOnTakenFn(FuelTaken_contracts)
-
-    -- MakeSmallBurnable(inst, TUNING.MED_BURNTIME)
-    -- MakeSmallPropagator(inst)
-    -- inst.components.burnable:SetOnBurntFn(OnBurnt_contracts)
 
     inst:AddComponent("hauntable")
     inst.components.hauntable.cooldown = TUNING.HAUNT_COOLDOWN_SMALL
