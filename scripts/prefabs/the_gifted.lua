@@ -353,13 +353,11 @@ local function OnWortoxGetContracts(inst, owner)
     end
 
     --实现契约丢地上时自动跟随玩家
-    if
-        inst.components.follower ~= nil and
-        inst.components.follower:GetLeader() ~= owner and --捡起不是自己的契约书
-        owner.components.leader ~= nil
-    then
+    if owner.components.leader ~= nil then
         owner.components.leader:RemoveFollowersByTag("soulcontracts") --清除已有跟随的契约书
         owner.components.leader:AddFollower(inst) --提前设定跟随者，因为丢弃时已经获取不到owner了
+    else
+        inst.components.follower:SetLeader(owner)
     end
 end
 
@@ -472,6 +470,7 @@ local function fn_contracts()
     inst:AddTag("ignorewalkableplatformdrowning")
     inst:AddTag("NOBLOCK")
     inst:AddTag("flying")
+    inst:AddTag("bookstaying")
 
     inst.entity:SetPristine()
 
@@ -497,11 +496,11 @@ local function fn_contracts()
     inst.components.inventoryitem.atlasname = "images/inventoryimages/soul_contracts.xml"
     inst.components.inventoryitem.pushlandedevents = false
     inst.components.inventoryitem.nobounce = true
-    inst.components.inventoryitem.canbepickedup = true
+    inst.components.inventoryitem.canbepickedup = false
 
     inst:AddComponent("finiteuses")
-    inst.components.finiteuses:SetMaxUses(25)
-    inst.components.finiteuses:SetUses(25)
+    inst.components.finiteuses:SetMaxUses(20)
+    inst.components.finiteuses:SetUses(20)
     inst:ListenForEvent("percentusedchange", PercentChanged_contracts)
 
     inst:AddComponent("fuel")
@@ -512,7 +511,7 @@ local function fn_contracts()
     inst.components.hauntable.cooldown = TUNING.HAUNT_COOLDOWN_SMALL
     inst.components.hauntable:SetOnHauntFn(OnHaunt_contracts)
 
-    inst:AddComponent("soulcontracts") --这个组件只是为了灵魂食用机制，和瞬移、加血无关
+    inst:AddComponent("soulcontracts") --这个组件只是为了食用、捡起、跟随机制，和瞬移、加血无关
 
     inst:ListenForEvent("onputininventory", OnPutInInventory_contracts)
     inst:ListenForEvent("ondropped", OnDropped_contracts)

@@ -774,7 +774,6 @@ if IsServer then
         --优化灵魂进入契约或者玩家时的逻辑
         local OnHit_old = inst.components.projectile.onhit
         inst.components.projectile:SetOnHitFn(function(inst, attacker, target)
-            print("hahahaah")
             if target ~= nil then
                 local book = nil
                 if target:HasTag("soulcontracts") then --进入地面的契约书
@@ -863,94 +862,94 @@ if IsServer then
 end
 
 --------------------------------------------------------------------------
---[[ 灵魂契约书食用相关 ]]
+--[[ 灵魂契约的摄食动作 ]]
 --------------------------------------------------------------------------
 
-local eat_contracts = State{
-    name = "eat_contracts",
-    tags = { "busy", "nodangle" },
+-- local eat_contracts = State{
+--     name = "eat_contracts",
+--     tags = { "busy", "nodangle" },
 
-    onenter = function(inst, foodinfo)
-        inst.components.locomotor:Stop()
+--     onenter = function(inst, foodinfo)
+--         inst.components.locomotor:Stop()
 
-        local feed = foodinfo and foodinfo.feed
-        if feed ~= nil then
-            inst.components.locomotor:Clear()
-            inst:ClearBufferedAction()
-            inst.sg.statemem.feed = foodinfo.feed
-            inst.sg.statemem.feeder = foodinfo.feeder
-            inst.sg:AddStateTag("pausepredict")
-            if inst.components.playercontroller ~= nil then
-                inst.components.playercontroller:RemotePausePrediction()
-            end
-        elseif inst:GetBufferedAction() then
-            feed = inst:GetBufferedAction().invobject
-        end
+--         local feed = foodinfo and foodinfo.feed
+--         if feed ~= nil then
+--             inst.components.locomotor:Clear()
+--             inst:ClearBufferedAction()
+--             inst.sg.statemem.feed = foodinfo.feed
+--             inst.sg.statemem.feeder = foodinfo.feeder
+--             inst.sg:AddStateTag("pausepredict")
+--             if inst.components.playercontroller ~= nil then
+--                 inst.components.playercontroller:RemotePausePrediction()
+--             end
+--         elseif inst:GetBufferedAction() then
+--             feed = inst:GetBufferedAction().invobject
+--         end
 
-        inst.SoundEmitter:PlaySound("dontstarve/wilson/eat", "eating")
+--         inst.SoundEmitter:PlaySound("dontstarve/wilson/eat", "eating")
 
-        if feed ~= nil and feed.components.soulcontracts ~= nil then
-            inst.sg.statemem.soulfx = SpawnPrefab("wortox_eat_soul_fx")
-            inst.sg.statemem.soulfx.Transform:SetRotation(inst.Transform:GetRotation())
-            inst.sg.statemem.soulfx.entity:SetParent(inst.entity)
-            if inst.components.rider:IsRiding() then
-                inst.sg.statemem.soulfx:MakeMounted()
-            end
-        end
+--         if feed ~= nil and feed.components.soulcontracts ~= nil then
+--             inst.sg.statemem.soulfx = SpawnPrefab("wortox_eat_soul_fx")
+--             inst.sg.statemem.soulfx.Transform:SetRotation(inst.Transform:GetRotation())
+--             inst.sg.statemem.soulfx.entity:SetParent(inst.entity)
+--             if inst.components.rider:IsRiding() then
+--                 inst.sg.statemem.soulfx:MakeMounted()
+--             end
+--         end
 
-        if inst.components.inventory:IsHeavyLifting() and not inst.components.rider:IsRiding() then
-            inst.AnimState:PlayAnimation("heavy_eat")
-        else
-            inst.AnimState:PlayAnimation("eat_pre")
-            inst.AnimState:PushAnimation("eat", false)
-        end
+--         if inst.components.inventory:IsHeavyLifting() and not inst.components.rider:IsRiding() then
+--             inst.AnimState:PlayAnimation("heavy_eat")
+--         else
+--             inst.AnimState:PlayAnimation("eat_pre")
+--             inst.AnimState:PushAnimation("eat", false)
+--         end
 
-        inst.components.hunger:Pause()
-    end,
+--         inst.components.hunger:Pause()
+--     end,
 
-    timeline =
-    {
-        TimeEvent(28 * FRAMES, function(inst)
-            if inst.sg.statemem.feed == nil then
-                --触发这里action.fn的食用来自于自己吃
-                inst:PerformBufferedAction()
-            elseif inst.sg.statemem.feeder ~= nil and
-                inst.sg.statemem.feed.components.soulcontracts ~= nil and
-                inst.sg.statemem.feed.components.soulcontracts:CanEat(inst.sg.statemem.feeder)
-            then
-                --触发这里的食用来自于别人的喂食
-                inst.sg.statemem.feed.components.soulcontracts:EatSoul(inst.sg.statemem.feeder)
-            end
-        end),
-        TimeEvent(30 * FRAMES, function(inst)
-            inst.sg:RemoveStateTag("busy")
-            inst.sg:RemoveStateTag("pausepredict")
-        end),
-        TimeEvent(70 * FRAMES, function(inst)
-            inst.SoundEmitter:KillSound("eating")
-        end),
-    },
+--     timeline =
+--     {
+--         TimeEvent(28 * FRAMES, function(inst)
+--             if inst.sg.statemem.feed == nil then
+--                 --触发这里action.fn的食用来自于自己吃
+--                 inst:PerformBufferedAction()
+--             elseif inst.sg.statemem.feeder ~= nil and
+--                 inst.sg.statemem.feed.components.soulcontracts ~= nil and
+--                 inst.sg.statemem.feed.components.soulcontracts:CanEat(inst.sg.statemem.feeder)
+--             then
+--                 --触发这里的食用来自于别人的喂食
+--                 inst.sg.statemem.feed.components.soulcontracts:EatSoul(inst.sg.statemem.feeder)
+--             end
+--         end),
+--         TimeEvent(30 * FRAMES, function(inst)
+--             inst.sg:RemoveStateTag("busy")
+--             inst.sg:RemoveStateTag("pausepredict")
+--         end),
+--         TimeEvent(70 * FRAMES, function(inst)
+--             inst.SoundEmitter:KillSound("eating")
+--         end),
+--     },
 
-    events =
-    {
-        EventHandler("animqueueover", function(inst)
-            if inst.AnimState:AnimDone() then
-                inst.sg:GoToState("idle")
-            end
-        end),
-    },
+--     events =
+--     {
+--         EventHandler("animqueueover", function(inst)
+--             if inst.AnimState:AnimDone() then
+--                 inst.sg:GoToState("idle")
+--             end
+--         end),
+--     },
 
-    onexit = function(inst)
-        inst.SoundEmitter:KillSound("eating")
-        if not GetGameModeProperty("no_hunger") then
-            inst.components.hunger:Resume()
-        end
-        if inst.sg.statemem.soulfx ~= nil then
-            inst.sg.statemem.soulfx:Remove()
-        end
-    end,
-}
-AddStategraphState("wilson", eat_contracts)
+--     onexit = function(inst)
+--         inst.SoundEmitter:KillSound("eating")
+--         if not GetGameModeProperty("no_hunger") then
+--             inst.components.hunger:Resume()
+--         end
+--         if inst.sg.statemem.soulfx ~= nil then
+--             inst.sg.statemem.soulfx:Remove()
+--         end
+--     end,
+-- }
+-- AddStategraphState("wilson", eat_contracts)
 
 ----------
 
@@ -967,14 +966,6 @@ EAT_CONTRACTS.fn = function(act)
 end
 AddAction(EAT_CONTRACTS)
 
---喂食别人
--- AddComponentAction("USEITEM", "soulcontracts", function(inst, doer, target, actions, right)
---     --在鼠标上的对象指向其他对象时，触发
---     if doer == target and target:HasTag("souleater") and not inst:HasTag("nosoulleft") then
---         table.insert(actions, ACTIONS.EAT_CONTRACTS)
---     end
--- end)
---携带
 AddComponentAction("INVENTORY", "soulcontracts", function(inst, doer, actions, right)
     --鼠标指向物品栏里的对象时，或者在鼠标上的对象指向玩家自己时，触发
     if doer:HasTag("souleater") and not inst:HasTag("nosoulleft") then
@@ -986,12 +977,25 @@ AddStategraphActionHandler("wilson", ActionHandler(ACTIONS.EAT_CONTRACTS, functi
     if inst.sg:HasStateTag("busy") then
         return
     end
-    local obj = action.target or action.invobject
+
+    local obj = action.target or action.invobject --实际上invobject才有数据
     if obj == nil or obj.components.soulcontracts == nil or not obj.components.soulcontracts:CanEat(inst) then
         return
     end
 
-    return "eat_contracts"
+    --这样设置是为了使用原版的sg，不然要是官方改了什么细节我还得跟着改
+    -- action.invobject = SpawnPrefab("wortox_soul") --tip：动作触发物品不能被修改，改了就会导致动作失败
+    inst:DoTaskInTime(0, function() --增加摄食灵魂时的特效（因为不满足sg里的条件，所以这里我自己加了特效）
+        if inst.sg and inst.sg.statemem then
+            inst.sg.statemem.soulfx = SpawnPrefab("wortox_eat_soul_fx")
+            inst.sg.statemem.soulfx.entity:SetParent(inst.entity)
+            if inst.components.rider:IsRiding() then
+                inst.sg.statemem.soulfx:MakeMounted()
+            end
+        end
+    end)
+
+    return "eat"
 end))
 AddStategraphActionHandler("wilson_client", ActionHandler(ACTIONS.EAT_CONTRACTS, function(inst, action)
     if inst.sg:HasStateTag("busy") or inst:HasTag("busy") or not inst:HasTag("souleater") then
@@ -1004,3 +1008,101 @@ AddStategraphActionHandler("wilson_client", ActionHandler(ACTIONS.EAT_CONTRACTS,
         return "eat" --这里可以直接用客机的sg
     end
 end))
+
+--------------------------------------------------------------------------
+--[[ 灵魂契约的收回动作 ]]
+--------------------------------------------------------------------------
+
+local PICKUP_CONTRACTS = Action({ mount_valid=true })
+PICKUP_CONTRACTS.id = "PICKUP_CONTRACTS"
+PICKUP_CONTRACTS.str = STRINGS.ACTIONS_LEGION.PICKUP_CONTRACTS
+PICKUP_CONTRACTS.fn = function(act)
+    if
+        act.doer.components.inventory ~= nil and
+        act.target ~= nil and
+        act.target.components.soulcontracts ~= nil and
+        not act.target:IsInLimbo()
+    then
+        return act.target.components.soulcontracts:PickUp(act.doer)
+    end
+end
+AddAction(PICKUP_CONTRACTS)
+
+AddComponentAction("SCENE", "inventoryitem", function(inst, doer, actions, right)
+    if
+        doer.replica.inventory ~= nil and doer.replica.inventory:GetNumSlots() > 0 and
+        not right
+    then
+        table.insert(actions, ACTIONS.PICKUP_CONTRACTS)
+    end
+end)
+
+AddStategraphActionHandler("wilson", ActionHandler(ACTIONS.PICKUP_CONTRACTS, function(inst, action)
+    return (inst.components.rider ~= nil and inst.components.rider:IsRiding()) and "domediumaction" or "doshortaction"
+end))
+AddStategraphActionHandler("wilson_client", ActionHandler(ACTIONS.PICKUP_CONTRACTS, function(inst, action)
+    return (inst.replica.rider ~= nil and inst.replica.rider:IsRiding()) and "domediumaction" or "doshortaction"
+end))
+
+--------------------------------------------------------------------------
+--[[ 灵魂契约的跟随状态切换动作 ]]
+--------------------------------------------------------------------------
+
+local EXSTAY_CONTRACTS = Action({ mount_valid=true, distance=20 })
+EXSTAY_CONTRACTS.id = "EXSTAY_CONTRACTS"
+EXSTAY_CONTRACTS.str = STRINGS.ACTIONS.EXSTAY_CONTRACTS
+EXSTAY_CONTRACTS.strfn = function(act)
+    if act.target ~= nil then
+        if act.target:HasTag("bookstaying") then
+            return "GENERIC"
+        end
+    end
+    return "STAY"
+end
+EXSTAY_CONTRACTS.fn = function(act)
+    if
+        act.target ~= nil and not act.target:IsInLimbo() and
+        act.target.components.soulcontracts ~= nil
+    then
+        return act.target.components.soulcontracts:TriggerStaying(
+            not act.target.components.soulcontracts.staying, act.doer)
+    end
+
+    return false, "NORIGHT"
+end
+AddAction(EXSTAY_CONTRACTS)
+
+AddComponentAction("SCENE", "soulcontracts", function(inst, doer, actions, right)
+    if right then
+        table.insert(actions, ACTIONS.EXSTAY_CONTRACTS)
+    end
+end)
+
+AddStategraphActionHandler("wilson", ActionHandler(ACTIONS.EXSTAY_CONTRACTS, "veryquickcastspell"))
+AddStategraphActionHandler("wilson_client", ActionHandler(ACTIONS.EXSTAY_CONTRACTS, "veryquickcastspell"))
+
+--------------------------------------------------------------------------
+--[[ 灵魂契约的给予灵魂动作 ]]
+--------------------------------------------------------------------------
+
+local GIVE_CONTRACTS = Action({ priority=4, mount_valid=true })
+GIVE_CONTRACTS.id = "GIVE_CONTRACTS"
+GIVE_CONTRACTS.str = STRINGS.ACTIONS_LEGION.GIVE_CONTRACTS
+GIVE_CONTRACTS.fn = function(act)
+    if
+        act.invobject ~= nil and
+        act.target ~= nil and act.target.components.soulcontracts ~= nil
+    then
+        return act.target.components.soulcontracts:GiveSoul(act.doer, act.invobject)
+    end
+end
+AddAction(GIVE_CONTRACTS)
+
+AddComponentAction("USEITEM", "soul", function(inst, doer, target, actions, right)
+    if target and target:HasTag("soulcontracts") then
+        table.insert(actions, ACTIONS.GIVE_CONTRACTS)
+    end
+end)
+
+AddStategraphActionHandler("wilson", ActionHandler(ACTIONS.GIVE_CONTRACTS, "doshortaction"))
+AddStategraphActionHandler("wilson_client", ActionHandler(ACTIONS.GIVE_CONTRACTS, "doshortaction"))
