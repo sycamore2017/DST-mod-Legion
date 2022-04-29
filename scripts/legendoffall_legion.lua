@@ -287,9 +287,9 @@ local function PickFarmPlant()
 	end
     return "weed_forgetmelots"
 end
-local function OnPlant(seed, doer, soil)
+local function OnPlant(seed, doer, soilorcrop)
     if seed.components.farmplantable ~= nil and seed.components.farmplantable.plant ~= nil then
-        local pt = soil:GetPosition()
+        local pt = soilorcrop:GetPosition()
 
         local plant_prefab = FunctionOrValue(seed.components.farmplantable.plant, seed)
         if plant_prefab == "farm_plant_randomseed" then
@@ -305,7 +305,12 @@ local function OnPlant(seed, doer, soil)
 			end
             TheWorld:PushEvent("itemplanted", { doer = doer, pos = pt })
 
-            soil:Remove()
+            --替换原本的作物
+            if soilorcrop.components.perennialcrop ~= nil then
+                plant.components.perennialcrop:DisplayCrop(soilorcrop, doer)
+            end
+
+            soilorcrop:Remove()
             seed:Remove()
 
             --寻找周围的管理器
@@ -328,12 +333,21 @@ end
 
 local PLANTSOIL_LEGION = Action({ theme_music = "farming" })
 PLANTSOIL_LEGION.id = "PLANTSOIL_LEGION"
-PLANTSOIL_LEGION.str = STRINGS.ACTIONS.PLANTSOIL
+PLANTSOIL_LEGION.str = STRINGS.ACTIONS.PLANTSOIL_LEGION
+PLANTSOIL_LEGION.strfn = function(act)
+    if act.target ~= nil then
+        if act.target:HasTag("crop_legion") then
+            return "DISPLAY"
+        end
+    end
+    return "GENERIC"
+end
 PLANTSOIL_LEGION.fn = function(act)
     if
         act.invobject ~= nil and
         act.doer.components.inventory ~= nil and
-        act.target ~= nil and act.target:HasTag("soil_legion")
+        act.target ~= nil and
+        (act.target:HasTag("soil_legion") or act.target.components.perennialcrop ~= nil)
     then
         local seed = act.doer.components.inventory:RemoveItem(act.invobject)
         if seed ~= nil then
@@ -348,7 +362,7 @@ end
 AddAction(PLANTSOIL_LEGION)
 
 AddComponentAction("USEITEM", "farmplantable", function(inst, doer, target, actions, right)
-    if target:HasTag("soil_legion") and not target:HasTag("NOCLICK") then
+    if (target:HasTag("soil_legion") or target:HasTag("crop_legion")) and not target:HasTag("NOCLICK") then
         table.insert(actions, ACTIONS.PLANTSOIL_LEGION)
     end
 end)

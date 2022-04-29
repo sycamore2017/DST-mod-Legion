@@ -72,6 +72,7 @@ local PerennialCrop = Class(function(self, inst)
 	self.stages = nil --该植物生长有几个阶段，每个阶段的动画,以及是否处在花期（原创）
 	self.stages_other = nil --巨大化阶段、巨大化枯萎、枯萎等阶段的数据
 	self.regrowstage = 1 --枯萎或者采摘后重新开始生长的阶段（原创）
+	self.eternalstage = nil --长到这个阶段后，就不再往下生长（原创）
 	self.goodseasons = {} --喜好季节：{autumn = true, winter = true, spring = true, summer = true}
 	self.killjoystolerance = 0 --扫兴容忍度：一般都为0
 	self.fn_stage = nil --每次设定生长阶段时额外触发的函数：fn(inst, isfull)
@@ -150,6 +151,7 @@ function PerennialCrop:SetUp(data)
 	self.stages = data.stages
 	self.stages_other = data.stages_other
 	self.regrowstage = data.regrowStage or 1
+	self.eternalstage = data.eternalStage
 	self.goodseasons = data.goodSeasons or {}
 	self.killjoystolerance = data.killjoysTolerance or 0
 	self.fn_stage = data.fn_stage
@@ -286,9 +288,14 @@ function PerennialCrop:GetNextStage()
 		justgrown = false,
 		stagedata = nil,
 	}
+
 	if self.isrotten then --枯萎阶段->重生阶段
 		data.stage = self.regrowstage
 		data.stagedata = self.stages[data.stage]
+	elseif self.stage == self.eternalstage then --永恒阶段
+		data.stage = self.stage
+		data.stagedata = self.stages[data.stage]
+		data.ishuge = self.ishuge --如果永恒的话，也得维持巨大化吧
 	elseif self.stage >= self.stage_max then --成熟阶段->枯萎/巨型枯萎阶段
 		if self.ishuge and self.stages_other.huge_rot ~= nil then
 			data.stage = self.stage_max
@@ -854,6 +861,25 @@ function PerennialCrop:TriggerController(ctl, isadd, noupdate)
 	if self.onctlchange ~= nil then
 		self.onctlchange(self.inst, self.ctls)
 	end
+end
+
+function PerennialCrop:DisplayCrop(oldcrop, doer) --替换作物：把它的养料占为己有
+	local oldcpt = oldcrop.components.perennialcrop
+
+	self.nutrientgrow = math.min(self.nutrientgrow_max, self.nutrientgrow+oldcpt.nutrientgrow)
+	self.nutrientsick = math.min(self.nutrientsick_max, self.nutrientsick+oldcpt.nutrientsick)
+	self.nutrient = math.min(self.nutrient_max, self.nutrient+oldcpt.nutrient)
+	TriggerNutrient(self)
+
+	self:PourWater(nil, nil, oldcpt.moisture)
+
+	oldcrop.components.lootdropper:DropLoot()
+
+	if oldcpt.fn_defend ~= nil and doer then
+		oldcpt.fn_defend(oldcrop, doer)
+	end
+	local x, y, z = oldcrop.Transform:GetWorldPosition()
+	SpawnPrefab("dirt_puff").Transform:SetPosition(x, y, z)
 end
 
 return PerennialCrop

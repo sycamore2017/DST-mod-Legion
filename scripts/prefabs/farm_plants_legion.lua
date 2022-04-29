@@ -52,7 +52,7 @@ local regrowMaps = {
 	gourd = 3,
 }
 
---mod里再次加载农场作物的动画会导致官方的作物动画不显示。不清楚为啥
+--mod里再次加载农场作物的动画会导致官方的作物动画不显示。因为官方作物动画有加载顺序限制，一旦mod里引用会导致顺序变化
 -- local function InitAssets(data, assetspre, assetsbase)
 -- 	if assetspre ~= nil then
 -- 		for k, v in pairs(assetspre) do
@@ -111,6 +111,7 @@ for k,v in pairs(PLANT_DEFS) do
 			stages = {}, --该植物生长有几个阶段，每个阶段的动画,以及是否处在花期（原创）
 			stages_other = { huge = nil, huge_rot = nil, rot = nil }, --巨大化阶段、巨大化枯萎、枯萎等阶段的数据
 			regrowStage = 1, --枯萎或者采摘后重新开始生长的阶段（原创）
+			eternalStage = v.eternalStage, --长到这个阶段后，就不再往下生长（原创）
 			goodSeasons = v.good_seasons, --喜好季节：{autumn = true, winter = true, spring = true, summer = true}
 			killjoysTolerance = v.max_killjoys_tolerance, --扫兴容忍度：一般都为0
 
@@ -235,6 +236,7 @@ for k,v in pairs(WEED_DEFS) do
 		stages = {}, --该植物生长有几个阶段，每个阶段的动画,以及是否处在花期（原创）
 		stages_other = { rot = nil }, --枯萎等阶段的数据
 		regrowStage = 1, --枯萎或者采摘后重新开始生长的阶段（原创）
+		eternalStage = v.eternalStage, --长到这个阶段后，就不再往下生长（原创）
 		goodSeasons = v.good_seasons or {}, --喜好季节：{autumn = true, winter = true, spring = true, summer = true}
 		killjoysTolerance = v.killjoysTolerance or 1, --扫兴容忍度：杂草为1，容忍度比作物高
 
@@ -309,6 +311,11 @@ for k,v in pairs(WEED_DEFS) do
 		end
 		if data.regrowStage >= countstage then
 			data.regrowStage = 1
+		end
+
+		--确定永恒生长阶段
+		if data.eternalStage == nil then
+			data.eternalStage = countstage --默认就是最终阶段
 		end
 
 		--确定资源
