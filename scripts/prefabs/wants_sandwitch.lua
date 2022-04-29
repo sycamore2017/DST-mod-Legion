@@ -133,7 +133,6 @@ local prefabs = {}
 --     table.insert(prefabs, Prefab("cattenball", Fn_cattenball, assets_cattenball, nil))
 -- end
 
---梧生最终也没有做到一吻长青
 -- if TUNING.LEGION_DESERTSECRET then
 --     table.insert(prefabs, MakeToyWe("toy_spongebob"))
 --     table.insert(prefabs, MakeToyWe("toy_patrickstar"))

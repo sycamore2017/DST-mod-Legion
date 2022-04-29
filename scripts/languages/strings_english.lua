@@ -3050,6 +3050,7 @@ STRINGS.ACTIONS_LEGION = {
     GIVE_CONTRACTS = "Give", --给予灵魂给契约书的名字
     PULLOUTSWORD = "Pull out", --拔剑出鞘动作的名字
     USE_UPGRADEKIT = "Assembly upgrade", --升级套件的升级动作的名字
+    MAKE = "Make", --打窝器容器的按钮名字
 }
 STRINGS.ACTIONS.GIVE.SCABBARD = "Put into"  --青枝绿叶放入武器的名字
 

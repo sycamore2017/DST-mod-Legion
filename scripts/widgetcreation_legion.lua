@@ -120,10 +120,8 @@ if CONFIGS_LEGION.PRAYFORRAIN then
 end
 
 if CONFIGS_LEGION.LEGENDOFFALL then
-    params.boltwingout =
-    {
-        widget =
-        {
+    params.boltwingout = {
+        widget = {
             slotpos = {},
             animbank = "ui_backpack_2x4",
             animbuild = "ui_backpack_2x4",
@@ -133,8 +131,7 @@ if CONFIGS_LEGION.LEGENDOFFALL then
         type = "pack",
         openlimit = 1,
         priorityfn = function(container, item, slot)
-            local costs =
-            {
+            local costs = {
                 stinger = 3,            --蜂刺
                 honey = 5,              --蜂蜜
                 royal_jelly = 0.1,      --蜂王浆
@@ -175,6 +172,51 @@ if CONFIGS_LEGION.LEGENDOFFALL then
         table.insert(params.boltwingout.widget.slotpos, Vector3(-162, -75 * y + 114, 0))
         table.insert(params.boltwingout.widget.slotpos, Vector3(-162 + 75, -75 * y + 114, 0))
     end
+
+    ------
+
+    params.fishhomingtool = {
+        widget = {
+            slotpos = {
+                Vector3(-37.5, 32 + 4, 0),
+                Vector3(37.5, 32 + 4, 0),
+                Vector3(-37.5, -(32 + 4), 0),
+                Vector3(37.5, -(32 + 4), 0),
+            },
+            animbank = "ui_bundle_2x2",
+            animbuild = "ui_bundle_2x2",
+            pos = Vector3(200, 0, 0),
+            side_align_tip = 120,
+            buttoninfo = {
+                text = STRINGS.ACTIONS_LEGION.MAKE,
+                position = Vector3(0, -100, 0),
+            }
+        },
+        type = "cooker",
+    }
+
+    function params.fishhomingtool.itemtestfn(container, item, slot)
+        if
+            FISHHOMING_INGREDIENTS_L[item.prefab] ~= nil or
+            item:HasTag("edible_MEAT") or item:HasTag("edible_VEGGIE") or item:HasTag("edible_MONSTER")
+        then
+            return true
+        end
+        return false
+    end
+
+    function params.fishhomingtool.widget.buttoninfo.fn(inst, doer)
+        if inst.components.container ~= nil then
+            BufferedAction(doer, inst, ACTIONS.WRAPBUNDLE):Do()
+        elseif inst.replica.container ~= nil and not inst.replica.container:IsBusy() then
+            SendRPCToServer(RPC.DoWidgetButtonAction, ACTIONS.WRAPBUNDLE.code, inst, ACTIONS.WRAPBUNDLE.mod_name)
+        end
+    end
+
+    function params.fishhomingtool.widget.buttoninfo.validfn(inst)
+        return inst.replica.container ~= nil and not inst.replica.container:IsEmpty()
+    end
+
 end
 
 --------------------------------------------------------------------------

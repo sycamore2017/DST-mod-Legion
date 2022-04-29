@@ -5,6 +5,7 @@ local prefabFiles = {
     "ahandfulofwings",
     "boltwingout",
     "siving_managers",
+    "fishhomingtools",
 }
 
 for k,v in pairs(prefabFiles) do
@@ -663,3 +664,68 @@ AddStategraphEvent("wilson", EventHandler("boltout", function(inst, data)
         inst.sg:GoToState("boltout", data)
     end
 end))
+
+--------------------------------------------------------------------------
+--[[ 打窝器中能加入的材料 ]]
+--------------------------------------------------------------------------
+
+if not _G.rawget(_G, "FISHHOMING_INGREDIENTS_L") then
+    _G.FISHHOMING_INGREDIENTS_L = {}
+end
+
+local fishhoming_ingredients = {
+    goldnugget =    { hardy = 1, lucky = 1 },
+    stinger =       { pasty = 1 },
+    ice =           { pasty = 1 },
+    ash =           { dusty = 1 },
+}
+for name,data in pairs(fishhoming_ingredients) do
+    _G.FISHHOMING_INGREDIENTS_L[name] = data
+end
+fishhoming_ingredients = nil
+
+--------------------------------------------------------------------------
+--[[ 打窝器与包裹组件的兼容 ]]
+--------------------------------------------------------------------------
+
+if IsServer then
+    AddComponentPostInit("bundler", function(self)
+        local OnFinishBundling_old = self.OnFinishBundling
+        self.OnFinishBundling = function(self, ...)
+            if
+                self.wrappedprefab == "fishhomingbag" and
+                self.bundlinginst ~= nil and
+                self.bundlinginst.components.container ~= nil and
+                not self.bundlinginst.components.container:IsEmpty()
+            then
+                local wrapped = SpawnPrefab(self.wrappedprefab, self.wrappedskinname)
+                if wrapped ~= nil then
+                    if wrapped.components.fishhomingbag ~= nil then
+                        wrapped.components.fishhomingbag:Make(self.bundlinginst.components.container, self.inst)
+                        self.bundlinginst:Remove()
+                        self.bundlinginst = nil
+                        self.itemprefab = nil
+                        self.wrappedprefab = nil
+                        self.wrappedskinname = nil
+                        self.wrappedskin_id = nil
+                        if self.inst.components.inventory ~= nil then
+                            self.inst.components.inventory:GiveItem(wrapped, nil, self.inst:GetPosition())
+                        else
+                            if wrapped.components.inventoryitem ~= nil then
+                                wrapped.components.inventoryitem:DoDropPhysics(self.inst.Transform:GetWorldPosition())
+                            elseif wrapped.Physics ~= nil then
+                                wrapped.Physics:Teleport(self.inst.Transform:GetWorldPosition())
+                            else
+                                wrapped.Transform:SetPosition(self.inst.Transform:GetWorldPosition())
+                            end
+                        end
+                        return
+                    else
+                        wrapped:Remove()
+                    end
+                end
+            end
+            OnFinishBundling_old(self, ...)
+        end
+    end)
+end

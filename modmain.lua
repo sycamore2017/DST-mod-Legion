@@ -3,37 +3,7 @@
 --------------------------------------------------------------------------
 
 --[[
-*【鸡毛铺】
-（1）新增“粉色追猎”、“深渊的星”两个免费皮肤
-（2）皮肤获取通道、cdk兑换通道已完全关闭。还没有兑换cdk的玩家可私聊群主解决
-*【祈雨祭】
-（1）多变的云不再能无消耗给耕地浇水(每次浇水消耗2耐久)
-*【丰饶传说】
-（1）子圭·益矩会在耕地缺肥超过50%后才开始加肥
-*【尘市蜃楼】
-（1）新增最近新出的两个雕像的幻化
-*【mod兼容】
-（1）【神话书说】新增竹药篓、铸铁头盔、铸铁大刀和铸铁战甲的幻化
-（2）【神话书说】在熊猫人店铺中加入了棱镜的物品(电气石、雨蝇、松萝相关、花丛相关)
 
-
-
---兼容青竹洲商店：
-if CONFIGS_LEGION ~= nil then --开启了《棱镜》
-    local chancemap = { 1, 3, 7, 10, 15}
-    AddBambooShopItems("rareitem", {
-        tourmalinecore = { --电气石
-            img_tex = "tourmalinecore.tex", img_atlas = "images/inventoryimages/tourmalinecore.xml",
-            buy = { value = 320, chance = chancemap[1], count_min = 1, count_max = 1, stacksize = 5, },
-            sell = { value = 160, chance = chancemap[1], count_min = 1, count_max = 1, stacksize = 5, },
-        },
-        shyerrylog = { --宽大的木墩
-            img_tex = "shyerrylog.tex", img_atlas = "images/inventoryimages/shyerrylog.xml",
-            buy = { value = 4, chance = chancemap[5], count_min = 3, count_max = 6, stacksize = 20, },
-            sell = { value = 2, chance = chancemap[5], count_min = 4, count_max = 8, stacksize = 20, },
-        }
-    })
-end
 ]]
 
 --------------------------------------------------------------------------
@@ -281,7 +251,7 @@ modimport("scripts/apublicsupporter.lua")
 if
     TUNING.LEGION_FLASHANDCRUSH or  --驮物牛鞍
     CONFIGS_LEGION.PRAYFORRAIN or    --巨人之脚、月藏宝匣
-    CONFIGS_LEGION.LEGENDOFFALL          --脱壳之翅
+    CONFIGS_LEGION.LEGENDOFFALL          --脱壳之翅、打窝器
 then
     modimport("scripts/widgetcreation_legion.lua")
 end
