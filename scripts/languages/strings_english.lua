@@ -2302,6 +2302,75 @@ S______GENERIC.DESCRIBE.SIVING_CTLAll = {
 -- S_______WALTER.DESCRIBE.SIVING_CTLAll = ""
 -- S________WANDA.DESCRIBE.SIVING_CTLAll = ""
 
+S_NAMES.FISHHOMINGTOOL_NORMAL = "Fish-homing Bait Maker" --简易打窝饵制作器
+S_RECIPE_DESC.FISHHOMINGTOOL_NORMAL = "Disposable aquatic animal bait maker."
+S______GENERIC.DESCRIBE.FISHHOMINGTOOL_NORMAL = "It's said that every good angler has his own unique recipe."
+-- S_______WILLOW.DESCRIBE.FISHHOMINGTOOL_NORMAL = ""
+-- S_____WOLFGANG.DESCRIBE.FISHHOMINGTOOL_NORMAL = ""
+-- S________WENDY.DESCRIBE.FISHHOMINGTOOL_NORMAL = ""
+-- S_________WX78.DESCRIBE.FISHHOMINGTOOL_NORMAL = ""
+-- S_WICKERBOTTOM.DESCRIBE.FISHHOMINGTOOL_NORMAL = ""
+-- S_______WOODIE.DESCRIBE.FISHHOMINGTOOL_NORMAL = ""
+-- S______WAXWELL.DESCRIBE.FISHHOMINGTOOL_NORMAL = ""
+-- S___WATHGRITHR.DESCRIBE.FISHHOMINGTOOL_NORMAL = ""
+-- S_______WEBBER.DESCRIBE.FISHHOMINGTOOL_NORMAL = ""
+S_______WINONA.DESCRIBE.FISHHOMINGTOOL_NORMAL = "The craft is really bad."
+-- S_______WORTOX.DESCRIBE.FISHHOMINGTOOL_NORMAL = ""
+-- S_____WORMWOOD.DESCRIBE.FISHHOMINGTOOL_NORMAL = ""
+S________WARLY.DESCRIBE.FISHHOMINGTOOL_NORMAL = "Even as a fish cook, I'm the best!"
+S_________WURT.DESCRIBE.FISHHOMINGTOOL_NORMAL = "Find their preferences for each fish, flurph!"
+-- S_______WALTER.DESCRIBE.FISHHOMINGTOOL_NORMAL = ""
+-- S________WANDA.DESCRIBE.FISHHOMINGTOOL_NORMAL = ""
+
+STRINGS.FISHHOMING1_LEGION = {
+    HARDY = "Hardy ",
+    PASTY = "Pasty ",
+    DUSTY = "Powdery "
+}
+STRINGS.FISHHOMING2_LEGION = {
+    MEAT = "Meat ",
+    VEGGIE = "Vegg ",
+    MONSTER = "Weird "
+}
+STRINGS.FISHHOMING3_LEGION = {
+    LUCKY = "Lucky ", --金锦鲤、花锦鲤
+    FROZEN = "Frozen ", --冰鲷鱼
+    HOT = "Hot ", --炽热太阳鱼
+    STICKY = "Sticky ", --甜味鱼
+    SLIPPERY = "Slippery ", --口水鱼
+    FRAGRANT = "Fragrant ", --花朵金枪鱼
+    WRINKLED = "Wrinkled ", --落叶比目鱼
+    COMICAL = "Comical ", --爆米花鱼、玉米鳕鱼
+    SHINY = "Shiny ", --鱿鱼
+    BLOODY = "Bloody ", --岩石大白鲨
+    WHISPERING = "Whispering ", --一角鲸
+    ROTTEN = "Rotten ", --龙虾
+    RUSTY = "Rusty ", --月光龙虾
+    SHAKING = "Shaking ", --海黾
+    GRASSY = "Grassy ", --草鳄鱼
+    EVIL = "Evil ", --邪天翁
+    FRIZZY = "Frizzy ", --海鹦鹉
+}
+
+S_NAMES.FISHHOMINGBAG = "Fish-homing Bait" --打窝饵
+S______GENERIC.DESCRIBE.FISHHOMINGBAG = "The Bait thrown into water to attract fish."
+-- S_______WILLOW.DESCRIBE.FISHHOMINGBAG = ""
+-- S_____WOLFGANG.DESCRIBE.FISHHOMINGBAG = ""
+-- S________WENDY.DESCRIBE.FISHHOMINGBAG = ""
+S_________WX78.DESCRIBE.FISHHOMINGBAG = "STUPID AQUATIC CREATURES!"
+S_WICKERBOTTOM.DESCRIBE.FISHHOMINGBAG = "Suits the appetite of aquatic organisms."
+-- S_______WOODIE.DESCRIBE.FISHHOMINGBAG = ""
+-- S______WAXWELL.DESCRIBE.FISHHOMINGBAG = ""
+-- S___WATHGRITHR.DESCRIBE.FISHHOMINGBAG = ""
+-- S_______WEBBER.DESCRIBE.FISHHOMINGBAG = ""
+-- S_______WINONA.DESCRIBE.FISHHOMINGBAG = ""
+-- S_______WORTOX.DESCRIBE.FISHHOMINGBAG = ""
+S_____WORMWOOD.DESCRIBE.FISHHOMINGBAG = "Fish, food, mermmerm..."
+S________WARLY.DESCRIBE.FISHHOMINGBAG = "Fish, here comes food!"
+S_________WURT.DESCRIBE.FISHHOMINGBAG = "Flurph, which lovely fish will be attracted by it today?"
+S_______WALTER.DESCRIBE.FISHHOMINGBAG = "I remember a man who said he went fishing but never opened the fishing bag."
+S________WANDA.DESCRIBE.FISHHOMINGBAG = "Well, someone just wants to waste time fishing, right?"
+
 --------------------------------------------------------------------------
 --[[ flash and crush ]]--[[ 电闪雷鸣 ]]
 --------------------------------------------------------------------------

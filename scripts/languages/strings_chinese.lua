@@ -2283,6 +2283,75 @@ S______GENERIC.DESCRIBE.SIVING_CTLAll = {
 -- S_______WALTER.DESCRIBE.SIVING_CTLAll = ""
 -- S________WANDA.DESCRIBE.SIVING_CTLAll = ""
 
+S_NAMES.FISHHOMINGTOOL_NORMAL = "简易打窝饵制作器"
+S_RECIPE_DESC.FISHHOMINGTOOL_NORMAL = "一次性的打窝饵料制作器。"
+S______GENERIC.DESCRIBE.FISHHOMINGTOOL_NORMAL = "据说每个垂钓好手都有自己独特的配方。"
+-- S_______WILLOW.DESCRIBE.FISHHOMINGTOOL_NORMAL = ""
+-- S_____WOLFGANG.DESCRIBE.FISHHOMINGTOOL_NORMAL = ""
+-- S________WENDY.DESCRIBE.FISHHOMINGTOOL_NORMAL = ""
+-- S_________WX78.DESCRIBE.FISHHOMINGTOOL_NORMAL = ""
+-- S_WICKERBOTTOM.DESCRIBE.FISHHOMINGTOOL_NORMAL = ""
+-- S_______WOODIE.DESCRIBE.FISHHOMINGTOOL_NORMAL = ""
+-- S______WAXWELL.DESCRIBE.FISHHOMINGTOOL_NORMAL = ""
+-- S___WATHGRITHR.DESCRIBE.FISHHOMINGTOOL_NORMAL = ""
+-- S_______WEBBER.DESCRIBE.FISHHOMINGTOOL_NORMAL = ""
+S_______WINONA.DESCRIBE.FISHHOMINGTOOL_NORMAL = "做工实在不咋地，用一次就会坏了。"
+-- S_______WORTOX.DESCRIBE.FISHHOMINGTOOL_NORMAL = ""
+-- S_____WORMWOOD.DESCRIBE.FISHHOMINGTOOL_NORMAL = ""
+S________WARLY.DESCRIBE.FISHHOMINGTOOL_NORMAL = "就算是做鱼类的厨师，我也是有两把刷子的。"
+S_________WURT.DESCRIBE.FISHHOMINGTOOL_NORMAL = "给每种鱼儿找到它们的喜好，浮勒浮。"
+-- S_______WALTER.DESCRIBE.FISHHOMINGTOOL_NORMAL = ""
+-- S________WANDA.DESCRIBE.FISHHOMINGTOOL_NORMAL = ""
+
+STRINGS.FISHHOMING1_LEGION = {
+    HARDY = "粒状",
+    PASTY = "糊状",
+    DUSTY = "粉状"
+}
+STRINGS.FISHHOMING2_LEGION = {
+    MEAT = "荤",
+    VEGGIE = "素",
+    MONSTER = "怪"
+}
+STRINGS.FISHHOMING3_LEGION = {
+    LUCKY = "好彩来", --金锦鲤、花锦鲤
+    FROZEN = "好凉凉", --冰鲷鱼
+    HOT = "烫烫的", --炽热太阳鱼
+    STICKY = "黏乎乎", --甜味鱼
+    SLIPPERY = "麻溜的", --口水鱼
+    FRAGRANT = "香喷喷", --花朵金枪鱼
+    WRINKLED = "皱巴巴", --落叶比目鱼
+    COMICAL = "滑稽的", --爆米花鱼、玉米鳕鱼
+    SHINY = "亮晶晶", --鱿鱼
+    BLOODY = "血腥味", --岩石大白鲨
+    WHISPERING = "低语的", --一角鲸
+    ROTTEN = "发烂发臭", --龙虾
+    RUSTY = "生锈的", --月光龙虾
+    SHAKING = "摇摆的", --海黾
+    GRASSY = "青草味", --草鳄鱼
+    EVIL = "坏坏的", --邪天翁
+    FRIZZY = "蠕动的", --海鹦鹉
+}
+
+S_NAMES.FISHHOMINGBAG = "打窝饵"
+S______GENERIC.DESCRIBE.FISHHOMINGBAG = "丢进水里吸引鱼儿的饵料。"
+-- S_______WILLOW.DESCRIBE.FISHHOMINGBAG = ""
+-- S_____WOLFGANG.DESCRIBE.FISHHOMINGBAG = ""
+-- S________WENDY.DESCRIBE.FISHHOMINGBAG = ""
+S_________WX78.DESCRIBE.FISHHOMINGBAG = "愚蠢的水中生物！"
+S_WICKERBOTTOM.DESCRIBE.FISHHOMINGBAG = "很对水栖生物的胃口。"
+-- S_______WOODIE.DESCRIBE.FISHHOMINGBAG = ""
+-- S______WAXWELL.DESCRIBE.FISHHOMINGBAG = ""
+-- S___WATHGRITHR.DESCRIBE.FISHHOMINGBAG = ""
+-- S_______WEBBER.DESCRIBE.FISHHOMINGBAG = ""
+-- S_______WINONA.DESCRIBE.FISHHOMINGBAG = ""
+-- S_______WORTOX.DESCRIBE.FISHHOMINGBAG = ""
+S_____WORMWOOD.DESCRIBE.FISHHOMINGBAG = "鱼鱼，饭饭，饿饿..."
+S________WARLY.DESCRIBE.FISHHOMINGBAG = "鱼儿们，菜来咯！"
+S_________WURT.DESCRIBE.FISHHOMINGBAG = "浮勒浮，今天是哪条可爱的鱼儿要被它吸引呢？"
+S_______WALTER.DESCRIBE.FISHHOMINGBAG = "我记得某电影里男主角说去钓鱼却从没打开过钓具袋..."
+S________WANDA.DESCRIBE.FISHHOMINGBAG = "好了好了，某人就是想挥霍时间钓鱼对吧。"
+
 --------------------------------------------------------------------------
 --[[ flash and crush ]]--[[ 电闪雷鸣 ]]
 --------------------------------------------------------------------------

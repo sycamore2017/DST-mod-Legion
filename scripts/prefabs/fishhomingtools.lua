@@ -32,7 +32,7 @@ local function Fn_cont()
 end
 
 --------------------------------------------------------------------------
---[[ 简易打窝器 ]]
+--[[ 简易打窝饵制作器 ]]
 --------------------------------------------------------------------------
 
 local assets_normal = {
@@ -102,7 +102,7 @@ local function Fn_normal()
 end
 
 --------------------------------------------------------------------------
---[[ 打窝饵袋 ]]
+--[[ 打窝饵 ]]
 --------------------------------------------------------------------------
 
 local assets_bag = {
@@ -197,6 +197,36 @@ local function Fn_bag()
 
     MakeInventoryFloatable(inst, "small", 0.1, 0.8)
 
+    inst.displaynamefn = function(inst)
+        local namepre = ""
+
+        for k,str in pairs(STRINGS.FISHHOMING2_LEGION) do
+            if inst:HasTag("FH_"..k) then
+                namepre = str
+                break
+            end
+        end
+
+        for k,str in pairs(STRINGS.FISHHOMING1_LEGION) do
+            if inst:HasTag("FH_"..k) then
+                namepre = str..namepre
+                break
+            end
+        end
+
+        local times = 0
+        for k,str in pairs(STRINGS.FISHHOMING3_LEGION) do
+            if inst:HasTag("FH_"..k) then
+                namepre = str..namepre
+                times = times + 1
+
+                if times >= 2 then break end
+            end
+        end
+
+		return namepre..STRINGS.NAMES.FISHHOMINGBAG
+    end
+
     inst.entity:SetPristine()
     if not TheWorld.ismastersim then
         return inst
@@ -210,10 +240,8 @@ local function Fn_bag()
     inst:AddComponent("inspectable")
 
     inst:AddComponent("inventoryitem")
-    -- inst.components.inventoryitem.imagename = "fishhomingbag"
-    -- inst.components.inventoryitem.atlasname = "images/inventoryimages/fishhomingbag.xml"
-    inst.components.inventoryitem.imagename = "chum"
-    inst.components.inventoryitem.atlasname = "images/inventoryimages/chum.xml"
+    inst.components.inventoryitem.imagename = "icire_rock5"
+    inst.components.inventoryitem.atlasname = "images/inventoryimages/icire_rock5.xml"
 
     inst:AddComponent("equippable")
     inst.components.equippable:SetOnEquip(OnEquip)
