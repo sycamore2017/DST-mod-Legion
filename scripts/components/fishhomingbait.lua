@@ -1,60 +1,56 @@
-local FishHomingBag = Class(function(self, inst)
+local FishHomingBait = Class(function(self, inst)
 	self.inst = inst
 	self.times = 1
 	self.prefabs = nil
-	self.details = nil
 	self.type_eat = "veggie"
 	self.type_shape = "dusty"
 	self.type_special = nil
-	self.images = {
-		dusty = { img="icire_rock5", atlas="images/inventoryimages/icire_rock5.xml" },
-		pasty = { img="icire_rock4", atlas="images/inventoryimages/icire_rock4.xml" },
-		hardy = { img="icire_rock1", atlas="images/inventoryimages/icire_rock1.xml" }
-	}
+	self.isbaiting = false
+
 	self.onmakefn = nil
+	self.oninitfn = nil
+
+	self.task_baiting = nil
 end)
 
-function FishHomingBag:InitSelf()
-	if self.details == nil then
-		self.inst:RemoveTag("FH_VEGGIE")
-		self.inst:RemoveTag("FH_MEAT")
-		self.inst:RemoveTag("FH_MONSTER")
-		self.inst:RemoveTag("FH_HARDY")
-		self.inst:RemoveTag("FH_PASTY")
-		self.inst:RemoveTag("FH_DUSTY")
+function FishHomingBait:InitSelf()
+	if self.oninitfn ~= nil then
+		self.oninitfn(self.inst)
+	end
+
+	if self.isbaiting then
 		return
 	end
 
-	self.inst:AddTag("FH_"..self.type_eat)
-	if self.type_eat == "meat" then
-		self.inst:RemoveTag("FH_VEGGIE")
-		self.inst:RemoveTag("FH_MONSTER")
-	elseif self.type_eat == "monster" then
-		self.inst:RemoveTag("FH_VEGGIE")
-		self.inst:RemoveTag("FH_MEAT")
+	for k,_ in pairs(STRINGS.FISHHOMING2_LEGION) do
+		if self.type_eat == string.lower(k) then
+			self.inst:AddTag("FH_"..k)
+		else
+			self.inst:RemoveTag("FH_"..k)
+		end
+	end
+
+	for k,_ in pairs(STRINGS.FISHHOMING1_LEGION) do
+		if self.type_shape == string.lower(k) then
+			self.inst:AddTag("FH_"..k)
+		else
+			self.inst:RemoveTag("FH_"..k)
+		end
+	end
+
+	if self.type_special == nil then
+		for k,_ in pairs(STRINGS.FISHHOMING3_LEGION) do
+			self.inst:RemoveTag("FH_"..k)
+		end
 	else
-		self.inst:RemoveTag("FH_MEAT")
-		self.inst:RemoveTag("FH_MONSTER")
+		for k,_ in pairs(STRINGS.FISHHOMING3_LEGION) do
+			if self.type_special[string.lower(k)] then
+				self.inst:AddTag("FH_"..k)
+			else
+				self.inst:RemoveTag("FH_"..k)
+			end
+		end
 	end
-
-	self.inst:AddTag("FH_"..self.type_shape)
-	if self.type_shape == "pasty" then
-		self.inst:RemoveTag("FH_HARDY")
-		self.inst:RemoveTag("FH_DUSTY")
-	elseif self.type_shape == "hardy" then
-		self.inst:RemoveTag("FH_DUSTY")
-		self.inst:RemoveTag("FH_PASTY")
-	else
-		self.inst:RemoveTag("FH_HARDY")
-		self.inst:RemoveTag("FH_PASTY")
-	end
-
-	if self.images[self.type_shape] ~= nil then
-		self.inst.components.inventoryitem.atlasname = self.images[self.type_shape].atlas
-		self.inst.components.inventoryitem:ChangeImageName(self.images[self.type_shape].img)
-	end
-
-
 end
 
 local function FindMaxKey(details, k1, k2, k3)
@@ -92,9 +88,52 @@ local function FindMaxKey(details, k1, k2, k3)
 	end
 end
 local function FindOtherKeys(other)
-	
+	local key_max = {}
+	local num_max = 0
+	local key_max2 = {}
+	local num_max2 = 0
+
+	--找出最大值
+	for k,num in pairs(other) do
+		if num then
+			if num > num_max then
+				num_max = num
+				key_max = {}
+				table.insert(key_max, k)
+			elseif num == num_max then
+				table.insert(key_max, k)
+			end
+		end
+	end
+
+	--找出第二最大值
+	for k,num in pairs(other) do
+		if num and num < num_max then
+			if num > num_max2 then
+				num_max2 = num
+				key_max2 = {}
+				table.insert(key_max2, k)
+			elseif num == num_max2 then
+				table.insert(key_max2, k)
+			end
+		end
+	end
+
+	if num_max <= 0 and num_max2 <= 0 then
+		return nil
+	end
+
+	local res = {}
+	if num_max > 0 then
+		res[ key_max[math.random(#key_max)] ] = true
+	end
+	if num_max2 > 0 then
+		res[ key_max2[math.random(#key_max2)] ] = true
+	end
+	print("zehshi:"..tostring(key_max[1]).."-"..tostring(key_max2[1]))
+	return res
 end
-function FishHomingBag:Make(container, doer)
+function FishHomingBait:Make(container, doer)
 	local details = {
 		hardy = 0, pasty = 0, dusty = 0,
 		meat = 0, veggie = 0, monster = 0
@@ -141,7 +180,7 @@ function FishHomingBag:Make(container, doer)
 	end
 
 	if self.onmakefn ~= nil then
-		self.onmakefn(self, container, doer)
+		self.onmakefn(self, container, doer, details, details_other)
 	end
 
 	self.type_eat = FindMaxKey(details, "veggie", "meat", "monster")
@@ -149,11 +188,11 @@ function FishHomingBag:Make(container, doer)
 	self.type_special = FindOtherKeys(details_other)
 
 	self.times = math.ceil(self.times/2) --根据总数量确定释放功能的次数(最多 4格*40叠加/2=80次)
-	self.details = details
+
 	self:InitSelf()
 end
 
-function FishHomingBag:OnSave()
+function FishHomingBait:OnSave()
     local data = {}
 
 	if self.times > 1 then
@@ -169,13 +208,11 @@ function FishHomingBag:OnSave()
 		end
 	end
 
-	if self.details ~= nil then
-		data.details = {}
-		for k,num in pairs(self.details) do
-			if num ~= nil and num > 0 then
-				data.details[k] = num
-			end
-		end
+	if self.type_eat ~= "veggie" then
+		data.type_eat = self.type_eat
+	end
+	if self.type_shape ~= "dusty" then
+		data.type_shape = self.type_shape
 	end
 
     if self.prefabs ~= nil then
@@ -190,7 +227,7 @@ function FishHomingBag:OnSave()
     return data
 end
 
-function FishHomingBag:OnLoad(data)
+function FishHomingBait:OnLoad(data)
     if data ~= nil then
         if data.times ~= nil then
 			self.times = data.times
@@ -203,33 +240,40 @@ function FishHomingBag:OnLoad(data)
 			end
 		end
 
-		if data.details ~= nil then
-			self.details = {
-				hardy = data.details.hardy or 0,
-				pasty = data.details.pasty or 0,
-				dusty = data.details.dusty or 0,
-				meat = data.details.meat or 0,
-				veggie = data.details.veggie or 0,
-				monster = data.details.monster or 0
-			}
-			for k,num in pairs(data.details) do
-				if num ~= nil and self.details[k] == nil then
-					self.details[k] = num
-				end
-			end
-
-			self.type_eat = FindMaxKey(self.details, "veggie", "meat", "monster")
-			self.type_shape = FindMaxKey(self.details, "hardy", "pasty", "dusty")
+		if data.type_eat ~= nil then
+			self.type_eat = data.type_eat
+		end
+		if data.type_shape ~= nil then
+			self.type_shape = data.type_shape
 		end
 
-		self:InitSelf()
-
 		if data.prefabs ~= nil then
+			self.prefabs = {}
 			for _,name in pairs(data.prefabs) do
 				self.prefabs[name] = true
 			end
 		end
+
+		self:InitSelf()
     end
 end
 
-return FishHomingBag
+function FishHomingBait:Handover(baiting)
+    local baitcpt = baiting.components.fishhomingbait
+	baitcpt.times = self.times
+	baitcpt.prefabs = self.prefabs
+	baitcpt.type_eat = self.type_eat
+	baitcpt.type_shape = self.type_shape
+	baitcpt.type_special = self.type_special
+end
+
+function FishHomingBait:Baiting()
+    local periodtime = 9
+	if self.type_shape == "hardy" then
+		periodtime = 24
+	elseif self.type_shape == "pasty" then
+		periodtime = 15
+	end
+end
+
+return FishHomingBait

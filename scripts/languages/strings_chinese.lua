@@ -2329,28 +2329,28 @@ STRINGS.FISHHOMING3_LEGION = {
     RUSTY = "生锈的", --月光龙虾
     SHAKING = "摇摆的", --海黾
     GRASSY = "青草味", --草鳄鱼
-    EVIL = "坏坏的", --邪天翁
+    EVIL = "拽拽的", --邪天翁
     FRIZZY = "蠕动的", --海鹦鹉
 }
 
-S_NAMES.FISHHOMINGBAG = "打窝饵"
-S______GENERIC.DESCRIBE.FISHHOMINGBAG = "丢进水里吸引鱼儿的饵料。"
--- S_______WILLOW.DESCRIBE.FISHHOMINGBAG = ""
--- S_____WOLFGANG.DESCRIBE.FISHHOMINGBAG = ""
--- S________WENDY.DESCRIBE.FISHHOMINGBAG = ""
-S_________WX78.DESCRIBE.FISHHOMINGBAG = "愚蠢的水中生物！"
-S_WICKERBOTTOM.DESCRIBE.FISHHOMINGBAG = "很对水栖生物的胃口。"
--- S_______WOODIE.DESCRIBE.FISHHOMINGBAG = ""
--- S______WAXWELL.DESCRIBE.FISHHOMINGBAG = ""
--- S___WATHGRITHR.DESCRIBE.FISHHOMINGBAG = ""
--- S_______WEBBER.DESCRIBE.FISHHOMINGBAG = ""
--- S_______WINONA.DESCRIBE.FISHHOMINGBAG = ""
--- S_______WORTOX.DESCRIBE.FISHHOMINGBAG = ""
-S_____WORMWOOD.DESCRIBE.FISHHOMINGBAG = "鱼鱼，饭饭，饿饿..."
-S________WARLY.DESCRIBE.FISHHOMINGBAG = "鱼儿们，菜来咯！"
-S_________WURT.DESCRIBE.FISHHOMINGBAG = "浮勒浮，今天是哪条可爱的鱼儿要被它吸引呢？"
-S_______WALTER.DESCRIBE.FISHHOMINGBAG = "我记得某电影里男主角说去钓鱼却从没打开过钓具袋..."
-S________WANDA.DESCRIBE.FISHHOMINGBAG = "好了好了，某人就是想挥霍时间钓鱼对吧。"
+S_NAMES.FISHHOMINGBAIT = "打窝饵"
+S______GENERIC.DESCRIBE.FISHHOMINGBAIT = "丢进水里吸引鱼儿的饵料。"
+-- S_______WILLOW.DESCRIBE.FISHHOMINGBAIT = ""
+-- S_____WOLFGANG.DESCRIBE.FISHHOMINGBAIT = ""
+-- S________WENDY.DESCRIBE.FISHHOMINGBAIT = ""
+S_________WX78.DESCRIBE.FISHHOMINGBAIT = "愚蠢的水中生物！"
+S_WICKERBOTTOM.DESCRIBE.FISHHOMINGBAIT = "很对水栖生物的胃口。"
+-- S_______WOODIE.DESCRIBE.FISHHOMINGBAIT = ""
+-- S______WAXWELL.DESCRIBE.FISHHOMINGBAIT = ""
+-- S___WATHGRITHR.DESCRIBE.FISHHOMINGBAIT = ""
+-- S_______WEBBER.DESCRIBE.FISHHOMINGBAIT = ""
+-- S_______WINONA.DESCRIBE.FISHHOMINGBAIT = ""
+-- S_______WORTOX.DESCRIBE.FISHHOMINGBAIT = ""
+S_____WORMWOOD.DESCRIBE.FISHHOMINGBAIT = "鱼鱼，饭饭，饿饿..."
+S________WARLY.DESCRIBE.FISHHOMINGBAIT = "鱼儿们，菜来咯！"
+S_________WURT.DESCRIBE.FISHHOMINGBAIT = "浮勒浮，今天是哪条可爱的鱼儿要被它吸引呢？"
+S_______WALTER.DESCRIBE.FISHHOMINGBAIT = "我记得某电影里男主角说去钓鱼却从没打开过钓具袋..."
+S________WANDA.DESCRIBE.FISHHOMINGBAIT = "好了好了，某人就是想挥霍时间钓鱼对吧。"
 
 --------------------------------------------------------------------------
 --[[ flash and crush ]]--[[ 电闪雷鸣 ]]

@@ -674,15 +674,126 @@ if not _G.rawget(_G, "FISHHOMING_INGREDIENTS_L") then
 end
 
 local fishhoming_ingredients = {
-    goldnugget =    { hardy = 1, lucky = 1 },
-    stinger =       { pasty = 1 },
-    ice =           { pasty = 1 },
-    ash =           { dusty = 1 },
+    goldnugget =        { hardy = 1, lucky = 1, shiny = 1 }, --金锦鲤、花锦鲤
+    lucky_goldnugget =  { hardy = 1, lucky = 1 },
+    goldenaxe =         { hardy = 6, lucky = 6 },
+    goldenpickaxe =     { hardy = 6, lucky = 6 },
+    goldenshovel =      { hardy = 6, lucky = 6 },
+    compass =           { hardy = 6, dusty = 6, lucky = 6 },
+    bluegem =           { hardy = 1, frozen = 1 }, --冰鲷鱼
+    bluemooneye =       { hardy = 6, frozen = 6 },
+    slingshotammo_freeze={hardy = 2, frozen = 1 },
+    purplegem =         { hardy = 2, frozen = 1, hot = 1 },
+    icestaff =          { hardy = 6, frozen = 6 },
+    blueamulet =        { hardy = 6, frozen = 6 },
+    wx78module_cold =   { hardy = 6, frozen = 6 },
+    fireflies =         { dusty = 1, hot = 1, shiny = 1, frizzy = 1 }, --炽热太阳鱼
+    dragon_scales =     { hardy = 1, dusty = 1, hot = 10, evil = 10 },
+    lavae_egg =         { hardy = 6, pasty = 6, hot = 6, frizzy = 6 },
+    lavae_egg_cracked = { hardy = 6, pasty = 6, hot = 8, frizzy = 6 },
+    lavae_cocoon =      { hardy = 6, pasty = 6, hot = 3, frizzy = 5 },
+    redgem =            { hardy = 1, hot = 1 },
+    firestaff =         { hardy = 6, hot = 6 },
+    amulet =            { hardy = 6, hot = 6 },
+    wx78module_heat =   { hardy = 6, hot = 6 },
+    redmooneye =        { hardy = 6, hot = 6 },
+    honey =             { pasty = 1, sticky = 1 }, --甜味鱼
+    royal_jelly =       { pasty = 1, sticky = 6, shiny = 1 },
+    honeycomb =         { pasty = 1, dusty = 1, sticky = 6 },
+    beeswax =           { pasty = 1, hardy = 1, sticky = 1 },
+    butter =            { pasty = 1, sticky = 6 },
+    treegrowthsolution ={ pasty = 1, veggie = 1, sticky = 3, whispering = 2, shaking = 1 },
+    fig =               { pasty = 1, veggie = 1, grassy = 1, shaking = 1 },
+    fig_cooked =        { pasty = 1, veggie = 1, sticky = 2, shaking = 1 },
+    glommerfuel =       { pasty = 1, sticky = 2, whispering = 2 }, --一角鲸
+    glommerwings =      { dusty = 1, whispering = 2, shaking = 2 },
+    nightmarefuel =     {            whispering = 1 },
+    pinkstaff =         { pasty = 5, hardy = 6, sticky = 6, whispering = 6 },
+    horn =              { dusty = 6, hardy = 6, whispering = 6, lucky = 6 },
+    rock_avocado_fruit ={ hardy = 1, veggie = 1, grassy = 1 }, --草鳄鱼
+    rock_avocado_fruit_ripe = { hardy = 1, pasty = 1, veggie = 1, grassy = 1 },
+    rock_avocado_fruit_ripe_cooked = { pasty = 1, veggie = 1 },
+    cactus_meat =       { pasty = 1, veggie = 1, grassy = 1 },
+    cactus_meat_cooked ={ pasty = 1, veggie = 1 },
+    bird_egg =          { pasty = 1, dusty = 1, slippery = 1 }, --口水鱼
+    bird_egg_cooked =   { pasty = 1, dusty = 1 },
+    egg =               { pasty = 1, dusty = 1, slippery = 1 },
+    egg_cooked =        { pasty = 1, dusty = 1 },
+    tallbirdegg =       { pasty = 6, dusty = 6, slippery = 6 },
+    tallbirdegg_cooked ={ pasty = 6, dusty = 6 },
+    petals_rose =       { pasty = 1, veggie = 1, fragrant = 1 }, --花朵金枪鱼
+    petals_lily =       { pasty = 1, veggie = 1, fragrant = 1 },
+    petals_orchid =     { dusty = 1, veggie = 1, fragrant = 1 },
+    forgetmelots =      { pasty = 1, fragrant = 1 },
+    myth_lotus_flower = { pasty = 1, veggie = 1, fragrant = 1 },
+    moon_tree_blossom = { dusty = 1, fragrant = 1 },
+    bathbomb =          { dusty = 1, fragrant = 1 },
+    meat_dried =        { hardy = 1, meat = 1, wrinkled = 1 }, --落叶比目鱼
+    smallmeat_dried =   { hardy = 1, meat = 1, wrinkled = 1 },
+    monstermeat_dried = { hardy = 1, meat = 1, monster = 1, wrinkled = 1 },
+    cutted_rosebush =   { hardy = 1, pasty = 1, fragrant = 1, wrinkled = 1, grassy = 1 },
+    cutted_lilybush =   { hardy = 1, pasty = 1, fragrant = 1, wrinkled = 1, grassy = 1 },
+    cutted_orchidbush = { hardy = 1, pasty = 1, fragrant = 1, wrinkled = 1, grassy = 1 },
+    lightbulb =         { dusty = 1, shiny = 1 }, --鱿鱼
+    lightflier =        { dusty = 1, pasty = 1, shiny = 1, shaking = 1 },
+    spore_small =       { dusty = 1, shiny = 1 },
+    spore_medium =      { dusty = 1, shiny = 1 },
+    spore_tall =        { dusty = 1, shiny = 1 },
+    meat =              { pasty = 1, meat = 1, bloody = 1 }, --岩石大白鲨
+    monstermeat =       { pasty = 1, meat = 1, monster = 1, bloody = 1 },
+    dish_duriantartare ={ pasty = 1, meat = 2, monster = 2, bloody = 2 },
+    monstertartare =    { pasty = 1, meat = 2, monster = 2, bloody = 2 },
+    houndstooth =       { hardy = 1, dusty = 1, bloody = 1 },
+    compost =           { pasty = 1, veggie = 1, rotten = 1 }, --龙虾
+    fertilizer =        { pasty = 1, hardy = 1, rotten = 1 },
+    slingshotammo_poop ={ hardy = 1, rotten = 1 },
+    compostwrap =       { pasty = 1, dusty = 1, hardy = 1, rotten = 1 },
+    spoiled_fish =      { pasty = 6, hardy = 6, rotten = 6 },
+    spoiled_fish_small ={ pasty = 5, hardy = 5, rotten = 5 },
+    poop =              { pasty = 1, veggie = 1, rotten = 1 },
+    razor =             { hardy = 6, rusty = 6 }, --月光龙虾
+    moonglass =         { hardy = 1, dusty = 1, rusty = 1 },
+    mutator_moon =      { pasty = 1, dusty = 1, rusty = 1 },
+    moonglassaxe =      { hardy = 6, dusty = 5, rusty = 6 },
+    glasscutter =       { hardy = 6, dusty = 5, rusty = 6 },
+    turf_meteor =       { hardy = 2, pasty = 2, dusty = 2, rusty = 1 },
+    moonstorm_goggleshat={hardy = 6, dusty = 6, veggie = 5, rusty = 6 },
+    spear_wathgrithr =  { hardy = 6, rusty = 6 },
+    axe =               { hardy = 6, rusty = 6 },
+    pickaxe =           { hardy = 6, rusty = 6 },
+    shovel =            { hardy = 6, rusty = 6 },
+    pitchfork =         { hardy = 6, veggie = 1, rusty = 6 },
+    spear =             { hardy = 6, rusty = 6 },
+    bee =               { pasty = 1, dusty = 1, frizzy = 1, shaking = 1 }, --海黾
+    killerbee =         { dusty = 1, frizzy = 1, shaking = 1 },
+    stinger =           { dusty = 1, frizzy = 1, shaking = 1 },
+    mosquitosack =      { pasty = 1, frizzy = 1, shaking = 1 },
+    mosquito =          { pasty = 1, frizzy = 1, shaking = 1 },
+    raindonate =        { pasty = 1, shaking = 1 },
+    ahandfulofwings =   { pasty = 1, dusty = 1, shaking = 1 },
+    wormlight =         { pasty = 1, veggie = 2, frizzy = 1 }, --海鹦鹉
+    wormlight_lesser =  { pasty = 1, veggie = 1, frizzy = 1 },
+    minotaurhorn =      { pasty = 1, dusty = 1, hardy = 1, evil = 10, meat = 1 }, --邪天翁
+    malbatross_feather ={ dusty = 1, evil = 1 },
+    malbatross_beak =   { dusty = 1, hardy = 1, evil = 10 },
+    deerclops_eyeball = { pasty = 1, evil = 10, frozen = 10, meat = 1, monster = 1 },
+    ice =               { pasty = 1 }, --其他
+    ash =               { dusty = 1 },
+    icehat =            { pasty = 6 },
+    spoiled_food =      { pasty = 1, dusty = 1, hardy = 1 },
 }
 for name,data in pairs(fishhoming_ingredients) do
     _G.FISHHOMING_INGREDIENTS_L[name] = data
 end
 fishhoming_ingredients = nil
+
+--爆米花鱼、玉米鳕鱼
+for k = 1, _G.NUM_TRINKETS do
+    _G.FISHHOMING_INGREDIENTS_L["trinket_"..tostring(k)] = { comical = 1 }
+end
+for k = 1, _G.NUM_HALLOWEEN_ORNAMENTS do
+    _G.FISHHOMING_INGREDIENTS_L["halloween_ornament_"..tostring(k)] = { comical = 1, monster = 1 }
+end
 
 --------------------------------------------------------------------------
 --[[ 打窝器与包裹组件的兼容 ]]
@@ -693,15 +804,15 @@ if IsServer then
         local OnFinishBundling_old = self.OnFinishBundling
         self.OnFinishBundling = function(self, ...)
             if
-                self.wrappedprefab == "fishhomingbag" and
+                self.wrappedprefab == "fishhomingbait" and
                 self.bundlinginst ~= nil and
                 self.bundlinginst.components.container ~= nil and
                 not self.bundlinginst.components.container:IsEmpty()
             then
                 local wrapped = SpawnPrefab(self.wrappedprefab, self.wrappedskinname)
                 if wrapped ~= nil then
-                    if wrapped.components.fishhomingbag ~= nil then
-                        wrapped.components.fishhomingbag:Make(self.bundlinginst.components.container, self.inst)
+                    if wrapped.components.fishhomingbait ~= nil then
+                        wrapped.components.fishhomingbait:Make(self.bundlinginst.components.container, self.inst)
                         self.bundlinginst:Remove()
                         self.bundlinginst = nil
                         self.itemprefab = nil

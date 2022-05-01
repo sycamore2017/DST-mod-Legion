@@ -2352,24 +2352,24 @@ STRINGS.FISHHOMING3_LEGION = {
     FRIZZY = "Frizzy ", --海鹦鹉
 }
 
-S_NAMES.FISHHOMINGBAG = "Fish-homing Bait" --打窝饵
-S______GENERIC.DESCRIBE.FISHHOMINGBAG = "The Bait thrown into water to attract fish."
--- S_______WILLOW.DESCRIBE.FISHHOMINGBAG = ""
--- S_____WOLFGANG.DESCRIBE.FISHHOMINGBAG = ""
--- S________WENDY.DESCRIBE.FISHHOMINGBAG = ""
-S_________WX78.DESCRIBE.FISHHOMINGBAG = "STUPID AQUATIC CREATURES!"
-S_WICKERBOTTOM.DESCRIBE.FISHHOMINGBAG = "Suits the appetite of aquatic organisms."
--- S_______WOODIE.DESCRIBE.FISHHOMINGBAG = ""
--- S______WAXWELL.DESCRIBE.FISHHOMINGBAG = ""
--- S___WATHGRITHR.DESCRIBE.FISHHOMINGBAG = ""
--- S_______WEBBER.DESCRIBE.FISHHOMINGBAG = ""
--- S_______WINONA.DESCRIBE.FISHHOMINGBAG = ""
--- S_______WORTOX.DESCRIBE.FISHHOMINGBAG = ""
-S_____WORMWOOD.DESCRIBE.FISHHOMINGBAG = "Fish, food, mermmerm..."
-S________WARLY.DESCRIBE.FISHHOMINGBAG = "Fish, here comes food!"
-S_________WURT.DESCRIBE.FISHHOMINGBAG = "Flurph, which lovely fish will be attracted by it today?"
-S_______WALTER.DESCRIBE.FISHHOMINGBAG = "I remember a man who said he went fishing but never opened the fishing bag."
-S________WANDA.DESCRIBE.FISHHOMINGBAG = "Well, someone just wants to waste time fishing, right?"
+S_NAMES.FISHHOMINGBAIT = "Fish-homing Bait" --打窝饵
+S______GENERIC.DESCRIBE.FISHHOMINGBAIT = "The Bait thrown into water to attract fish."
+-- S_______WILLOW.DESCRIBE.FISHHOMINGBAIT = ""
+-- S_____WOLFGANG.DESCRIBE.FISHHOMINGBAIT = ""
+-- S________WENDY.DESCRIBE.FISHHOMINGBAIT = ""
+S_________WX78.DESCRIBE.FISHHOMINGBAIT = "STUPID AQUATIC CREATURES!"
+S_WICKERBOTTOM.DESCRIBE.FISHHOMINGBAIT = "Suits the appetite of aquatic organisms."
+-- S_______WOODIE.DESCRIBE.FISHHOMINGBAIT = ""
+-- S______WAXWELL.DESCRIBE.FISHHOMINGBAIT = ""
+-- S___WATHGRITHR.DESCRIBE.FISHHOMINGBAIT = ""
+-- S_______WEBBER.DESCRIBE.FISHHOMINGBAIT = ""
+-- S_______WINONA.DESCRIBE.FISHHOMINGBAIT = ""
+-- S_______WORTOX.DESCRIBE.FISHHOMINGBAIT = ""
+S_____WORMWOOD.DESCRIBE.FISHHOMINGBAIT = "Fish, food, mermmerm..."
+S________WARLY.DESCRIBE.FISHHOMINGBAIT = "Fish, here comes food!"
+S_________WURT.DESCRIBE.FISHHOMINGBAIT = "Flurph, which lovely fish will be attracted by it today?"
+S_______WALTER.DESCRIBE.FISHHOMINGBAIT = "I remember a man who said he went fishing but never opened the fishing bag."
+S________WANDA.DESCRIBE.FISHHOMINGBAIT = "Well, someone just wants to waste time fishing, right?"
 
 --------------------------------------------------------------------------
 --[[ flash and crush ]]--[[ 电闪雷鸣 ]]

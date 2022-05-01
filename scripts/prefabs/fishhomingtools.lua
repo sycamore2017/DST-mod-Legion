@@ -45,7 +45,7 @@ local assets_normal = {
 
 local prefabs_normal = {
     "fishhomingtool_container",
-    "fishhomingbag"
+    "fishhomingbait"
 }
 
 local function Fn_normal()
@@ -80,11 +80,11 @@ local function Fn_normal()
     -- inst.components.inventoryitem.imagename = "fishhomingtool_normal"
     -- inst.components.inventoryitem.atlasname = "images/inventoryimages/fishhomingtool_normal.xml"
     inst.components.inventoryitem.imagename = "bundlewrap"
-    inst.components.inventoryitem.atlasname = "images/inventoryimages/bundlewrap.xml"
+    -- inst.components.inventoryitem.atlasname = "images/inventoryimages/bundlewrap.xml"
     inst.components.inventoryitem:SetSinks(true)
 
     inst:AddComponent("bundlemaker")
-    inst.components.bundlemaker:SetBundlingPrefabs("fishhomingtool_container", "fishhomingbag")
+    inst.components.bundlemaker:SetBundlingPrefabs("fishhomingtool_container", "fishhomingbait")
     inst.components.bundlemaker:SetOnStartBundlingFn(function(inst, doer)
         inst.components.stackable:Get():Remove()
     end)
@@ -106,27 +106,31 @@ end
 --------------------------------------------------------------------------
 
 local assets_bag = {
-    -- Asset("ANIM", "anim/fishhomingbag.zip"),
-    -- Asset("ATLAS", "images/inventoryimages/fishhomingbag.xml"),
-    -- Asset("IMAGE", "images/inventoryimages/fishhomingbag.tex"),
+    -- Asset("ANIM", "anim/fishhomingbait.zip"),
+    -- Asset("ATLAS", "images/inventoryimages/fishhomingbait.xml"),
+    -- Asset("IMAGE", "images/inventoryimages/fishhomingbait.tex"),
 
     Asset("ANIM", "anim/swap_chum_pouch.zip"),
     Asset("ANIM", "anim/chum_pouch.zip"),
 }
 
 local prefabs_bag = {
-    -- name,
-    -- containerprefab,
+    "fishhomingbaiting"
 }
 
 local function OnHit(inst, attacker, target)
     local x, y, z = inst.Transform:GetWorldPosition()
 
     if not TheWorld.Map:IsOceanAtPoint(x, y, z) then
-        SpawnPrefab("fishhomingbag").Transform:SetPosition(x, y, z)
+        SpawnPrefab("fishhomingbait").Transform:SetPosition(x, y, z)
     else
         SpawnPrefab("splash_green").Transform:SetPosition(x, y, z)
-        SpawnPrefab("chum_aoe").Transform:SetPosition(x, y, z)
+
+        local baiting = SpawnPrefab("fishhomingbaiting")
+        if baiting ~= nil then
+            baiting.Transform:SetPosition(x, y, z)
+            inst.components.fishhomingbait:Handover(baiting)
+        end
     end
 
     inst:Remove()
@@ -224,13 +228,19 @@ local function Fn_bag()
             end
         end
 
-		return namepre..STRINGS.NAMES.FISHHOMINGBAG
+		return namepre..STRINGS.NAMES.FISHHOMINGBAIT
     end
 
     inst.entity:SetPristine()
     if not TheWorld.ismastersim then
         return inst
     end
+
+    inst.baitimgs_l = {
+		dusty = { img = "icire_rock5", atlas = "images/inventoryimages/icire_rock5.xml" },
+		pasty = { img = "icire_rock4", atlas = "images/inventoryimages/icire_rock4.xml" },
+		hardy = { img = "icire_rock1", atlas = "images/inventoryimages/icire_rock1.xml" }
+	}
 
     inst:AddComponent("locomotor")
 
@@ -240,8 +250,8 @@ local function Fn_bag()
     inst:AddComponent("inspectable")
 
     inst:AddComponent("inventoryitem")
-    inst.components.inventoryitem.imagename = "icire_rock5"
-    inst.components.inventoryitem.atlasname = "images/inventoryimages/icire_rock5.xml"
+    inst.components.inventoryitem.imagename = inst.baitimgs_l.dusty.img
+    inst.components.inventoryitem.atlasname = inst.baitimgs_l.dusty.atlas
 
     inst:AddComponent("equippable")
     inst.components.equippable:SetOnEquip(OnEquip)
@@ -253,9 +263,66 @@ local function Fn_bag()
     inst:AddComponent("forcecompostable")
     inst.components.forcecompostable.green = true
 
-    inst:AddComponent("fishhomingbag")
+    inst:AddComponent("fishhomingbait")
+    inst.components.fishhomingbait.oninitfn = function(inst)
+        local type_shape = inst.components.fishhomingbait.type_shape
+        if inst.baitimgs_l[type_shape] ~= nil then
+            inst.components.inventoryitem.atlasname = inst.baitimgs_l[type_shape].atlas
+            inst.components.inventoryitem:ChangeImageName(inst.baitimgs_l[type_shape].img)
+        end
+    end
 
     MakeHauntableLaunch(inst)
+
+    return inst
+end
+
+--------------------------------------------------------------------------
+--[[ 使用中的打窝饵 ]]
+--------------------------------------------------------------------------
+
+local assets_baiting = {
+    Asset("ANIM", "anim/fish_chum.zip"),
+}
+
+local prefabs_baiting = {
+    "chumpiece",
+}
+
+local function Fn_baiting()
+    local inst = CreateEntity()
+
+    inst.entity:AddTransform()
+    inst.entity:AddAnimState()
+    inst.entity:AddSoundEmitter()
+    inst.entity:AddNetwork()
+
+    inst.AnimState:SetBank("fish_chum")
+    inst.AnimState:SetBuild("fish_chum")
+    inst.AnimState:PlayAnimation("fish_chum_base_pre")
+    inst.AnimState:PushAnimation("fish_chum_base_idle", true)
+    inst.AnimState:SetOrientation(ANIM_ORIENTATION.OnGround)
+    inst.AnimState:SetLayer(LAYER_BELOW_GROUND)
+    inst.AnimState:SetSortOrder(3)
+    inst.AnimState:SetFinalOffset(3)
+
+    inst:AddTag("FX")
+    inst:AddTag("NOCLICK")
+    -- inst:AddTag("chum")
+
+    inst.SoundEmitter:PlaySound("dontstarve/creatures/together/toad_stool/spore_cloud_LP", "spore_loop")
+
+    inst.entity:SetPristine()
+    if not TheWorld.ismastersim then
+        return inst
+    end
+
+    inst:AddComponent("fishhomingbait")
+    inst.components.fishhomingbait.isbaiting = true
+
+    inst:DoTaskInTime(3 + math.random()*3, function()
+        inst.components.fishhomingbait:Baiting()
+    end)
 
     return inst
 end
@@ -264,4 +331,5 @@ end
 
 return Prefab("fishhomingtool_container", Fn_cont, assets_cont),
     Prefab("fishhomingtool_normal", Fn_normal, assets_normal, prefabs_normal),
-    Prefab("fishhomingbag", Fn_bag, assets_bag, prefabs_bag)
+    Prefab("fishhomingbait", Fn_bag, assets_bag, prefabs_bag),
+    Prefab("fishhomingbaiting", Fn_baiting, assets_baiting, prefabs_baiting)
