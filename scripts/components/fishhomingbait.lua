@@ -9,8 +9,10 @@ local FishHomingBait = Class(function(self, inst)
 
 	self.onmakefn = nil
 	self.oninitfn = nil
+	self.ongetpreysfn = nil
 
 	self.task_baiting = nil
+	self.preys = nil
 end)
 
 function FishHomingBait:InitSelf()
@@ -130,7 +132,7 @@ local function FindOtherKeys(other)
 	if num_max2 > 0 then
 		res[ key_max2[math.random(#key_max2)] ] = true
 	end
-	print("zehshi:"..tostring(key_max[1]).."-"..tostring(key_max2[1]))
+	-- print("zehshi:"..tostring(key_max[1]).."-"..tostring(key_max2[1]))
 	return res
 end
 function FishHomingBait:Make(container, doer)
@@ -267,12 +269,335 @@ function FishHomingBait:Handover(baiting)
 	baitcpt.type_special = self.type_special
 end
 
-function FishHomingBait:Baiting()
-    local periodtime = 9
-	if self.type_shape == "hardy" then
-		periodtime = 24
-	elseif self.type_shape == "pasty" then
-		periodtime = 15
+function FishHomingBait:GetPreys()
+	local preys = { normal = nil, special = nil, allweight = nil }
+	local chance_lit = 1
+	local chance_low = 3
+	local chance_med = 5
+	local chance_high = 8
+	local list = {
+		oceanfish_small_1 = { --小孔雀鱼
+			hardy = nil, pasty = nil, dusty = chance_high,
+			meat = chance_med, veggie = chance_med, monster = chance_low
+		},
+		oceanfish_small_2 = { --针鼻喷墨鱼
+			hardy = nil, pasty = chance_med, dusty = chance_high,
+			meat = chance_med, veggie = chance_med, monster = chance_low
+		},
+		oceanfish_small_3 = { --小饵鱼
+			hardy = chance_low, pasty = chance_med, dusty = chance_high,
+			meat = chance_high, veggie = nil, monster = nil
+		},
+		oceanfish_small_4 = { --三文鱼苗
+			hardy = chance_med, pasty = nil, dusty = chance_high,
+			meat = chance_med, veggie = chance_med, monster = chance_low
+		},
+		oceanfish_small_5 = { --爆米花鱼
+			hardy = nil, pasty = chance_lit, dusty = chance_lit,
+			meat = nil, veggie = chance_lit, monster = nil,
+			comical = 0.2
+		},
+		oceanfish_small_6 = { --落叶比目鱼
+			hardy = 0, pasty = nil, dusty = nil,
+			meat = nil, veggie = 0, monster = nil,
+			wrinkled = 0.01
+		},
+		oceanfish_small_7 = { --花朵金枪鱼
+			hardy = 0, pasty = 0, dusty = nil,
+			meat = nil, veggie = 0, monster = nil,
+			fragrant = 0.01
+		},
+		oceanfish_small_8 = { --炽热太阳鱼
+			hardy = nil, pasty = nil, dusty = 0,
+			meat = 0, veggie = nil, monster = nil,
+			hot = 0.01
+		},
+		oceanfish_small_9 = { --口水鱼
+			hardy = nil, pasty = 0, dusty = 0,
+			meat = nil, veggie = 0, monster = nil,
+			slippery = 0.1
+		},
+		oceanfish_medium_1 = { --泥鱼
+			hardy = chance_high, pasty = nil, dusty = nil,
+			meat = chance_med, veggie = chance_med, monster = chance_med
+		},
+		oceanfish_medium_2 = { --斑鱼
+			hardy = chance_high, pasty = chance_high, dusty = nil,
+			meat = chance_high, veggie = nil, monster = nil
+		},
+		oceanfish_medium_3 = { --浮夸狮子鱼
+			hardy = chance_high, pasty = chance_med, dusty = nil,
+			meat = chance_high, veggie = nil, monster = chance_med
+		},
+		oceanfish_medium_4 = { --黑鲶鱼
+			hardy = chance_high, pasty = nil, dusty = nil,
+			meat = chance_high, veggie = nil, monster = chance_high
+		},
+		oceanfish_medium_5 = { --玉米鳕鱼
+			hardy = chance_low, pasty = chance_lit, dusty = nil,
+			meat = nil, veggie = chance_lit, monster = nil,
+			comical = 0.2
+		},
+		oceanfish_medium_6 = { --花锦鲤
+			hardy = nil, pasty = nil, dusty = 0,
+			meat = 0, veggie = 0, monster = nil,
+			lucky = 0.1
+		},
+		oceanfish_medium_7 = { --金锦鲤
+			hardy = nil, pasty = nil, dusty = 0,
+			meat = 0, veggie = 0, monster = nil,
+			lucky = 0.1
+		},
+		oceanfish_medium_8 = { --冰鲷鱼
+			hardy = nil, pasty = 0, dusty = nil,
+			meat = 0, veggie = 0, monster = 0,
+			frozen = 0.01
+		},
+		oceanfish_medium_9 = { --甜味鱼
+			hardy = nil, pasty = nil, dusty = 0,
+			meat = nil, veggie = 0, monster = nil,
+			sticky = 0.1
+		},
+		squid = { --鱿鱼
+			hardy = 0, pasty = 0, dusty = 0,
+			meat = 0, veggie = nil, monster = 0,
+			shiny = 0.1
+		},
+		shark = { --岩石大白鲨
+			hardy = nil, pasty = 0, dusty = 0,
+			meat = 0, veggie = nil, monster = 0,
+			bloody = 0.04
+		},
+		gnarwail = { --一角鲸
+			hardy = 0, pasty = nil, dusty = nil,
+			meat = 0, veggie = nil, monster = nil,
+			whispering = 0.04
+		},
+		wobster_sheller = { --龙虾
+			hardy = nil, pasty = nil, dusty = 0,
+			meat = nil, veggie = nil, monster = 0,
+			rotten = 0.1
+		},
+		wobster_moonglass = { --月光龙虾
+			hardy = nil, pasty = 0, dusty = nil,
+			meat = nil, veggie = nil, monster = nil,
+			rusty = 0.1
+		},
+		spider_water = { --海黾
+			hardy = nil, pasty = nil, dusty = 0,
+			meat = 0, veggie = nil, monster = 0,
+			shaking = 0.2
+		},
+		grassgator = { --草鳄鱼
+			hardy = nil, pasty = nil, dusty = 0,
+			meat = nil, veggie = 0, monster = nil,
+			grassy = 0.06
+		},
+		puffin = { --海鹦鹉
+			hardy = nil, pasty = nil, dusty = 0,
+			meat = nil, veggie = nil, monster = nil,
+			frizzy = 0.1
+		},
+		malbatross = { --邪天翁
+			hardy = nil, pasty = nil, dusty = nil,
+			meat = nil, veggie = nil, monster = 0,
+			evil = 0.09
+		},
+	}
+
+	if TheWorld.state.isspring then
+		list.oceanfish_small_7.fragrant = 0.1
+	elseif TheWorld.state.issummer then
+		list.oceanfish_small_8.hot = 0.1
+	elseif TheWorld.state.isautumn then
+		list.oceanfish_small_6.wrinkled = 0.1
+	else
+		list.oceanfish_medium_8.frozen = 0.1
+	end
+
+	if self.ongetpreysfn ~= nil then
+		self.ongetpreysfn(self, preys, list)
+	end
+
+	local allweight = 0
+	local weight = 0
+	local specialchance = 0
+	local specialmult = 1
+	for prefab,data in pairs(list) do
+		if data ~= nil then
+			if self.type_special ~= nil then
+				for k,bo in pairs(self.type_special) do
+					if bo and data[k] ~= nil then
+						specialchance = specialchance + data[k]
+					end
+				end
+			end
+
+			if specialchance > 0 then --说明是特殊对象
+				if data[self.type_eat] ~= nil then
+					specialmult = specialmult + 0.25
+				end
+				if data[self.type_shape] ~= nil then
+					specialmult = specialmult + 0.25
+				end
+
+				if preys.special == nil then
+					preys.special = {}
+				end
+				preys.special[prefab] = specialchance*specialmult
+			else
+				if data[self.type_eat] ~= nil then
+					weight = weight + data[self.type_eat]
+				end
+				if data[self.type_shape] ~= nil then
+					weight = weight + data[self.type_shape]
+				end
+				if weight > 0 then
+					if preys.normal == nil then
+						preys.normal = {}
+					end
+					preys.normal[prefab] = { min = allweight, max = allweight+weight }
+					allweight = allweight+weight
+				end
+			end
+
+			weight = 0
+			specialchance = 0
+			specialmult = 1
+		end
+	end
+
+	if preys.normal ~= nil or preys.special ~= nil then
+		if allweight > 0 then
+			preys.allweight = allweight
+		end
+		self.preys = preys
+	else
+		self.preys =  nil
+	end
+end
+
+local function GetRandomPoint(x, y, z, radius, forceradius)
+    local rad = forceradius or math.random()*(radius or 1)
+    local angle = math.random() * 2 * PI
+
+    return x + rad * math.cos(angle), y, z - rad * math.sin(angle)
+end
+function FishHomingBait:SpawnBaited(prefab, x,y,z)
+	local x2, y2, z2 = GetRandomPoint(x, y, z, 8, nil)
+	local herdtag = "herd_"..prefab
+	local herds = TheSim:FindEntities(x, y, z, TUNING.SCHOOL_SPAWNER_FISH_CHECK_RADIUS,
+						{ "herd" }, nil, nil)
+	local herdtoadd = nil
+
+	--寻找附近一个群体自动加入
+	for _,v in ipairs(herds) do
+		if
+			v.components.herd ~= nil and
+			v.components.herd.membertag == herdtag and
+			not v.components.herd.membercount:IsFull()
+		then
+			herdtoadd = v
+			break
+		end
+	end
+
+	if herdtoadd == nil then
+		herdtoadd = SpawnPrefab("schoolherd_"..prefab)
+		if herdtoadd ~= nil then
+			herdtoadd.Transform:SetPosition(x2, y2, z2)
+		end
+	end
+
+	if herdtoadd ~= nil then
+		local fish = SpawnPrefab(prefab)
+		if fish ~= nil then
+			fish.Physics:Teleport(x2, y2, z2)
+			fish.Transform:SetRotation(math.random()*360)
+			fish.components.herdmember:Enable(true)
+			fish.components.herdmember.herdprefab = herdtoadd.prefab
+			fish.sg:GoToState("arrive")
+			herdtoadd.components.herd:AddMember(fish)
+		end
+	end
+
+end
+
+function FishHomingBait:Baiting(periodtime)
+	if self.times <= 0 then
+		self:RemoveSelf()
+		return
+	end
+
+	if periodtime == nil then
+		if self.type_shape == "hardy" then
+			periodtime = 16
+		elseif self.type_shape == "pasty" then
+			periodtime = 10
+		else
+			periodtime = 7
+		end
+		self:GetPreys()
+	end
+
+	if self.preys == nil then
+		self:RemoveSelf()
+		return
+	end
+
+	self.task_baiting = self.inst:DoTaskInTime(periodtime+math.random()*2.5-1, function(inst)
+		self.task_baiting = nil
+		if self.preys == nil then
+			self:RemoveSelf()
+			return
+		end
+
+		local x, y, z = inst.Transform:GetWorldPosition()
+		local numbaited = #TheSim:FindEntities(x, y, z, TUNING.SCHOOL_SPAWNER_FISH_CHECK_RADIUS,
+						{ "baited" }, { "INLIMBO" }, nil)
+		if numbaited < 20 then
+			self.times = self.times - 1
+
+			if self.preys.special ~= nil then
+				local rand = nil
+				local hasspecial = false
+				for prefab,chance in pairs(self.preys.special) do
+					if chance ~= nil then
+						rand = math.random()
+						if rand < chance then
+							self:SpawnBaited(prefab, x,y,z)
+							hasspecial = true
+						end
+					end
+				end
+				if hasspecial then
+					self:Baiting(periodtime)
+					return
+				end
+			end
+			if self.preys.normal ~= nil then
+				local rand = math.random()*self.preys.allweight
+				for prefab,data in pairs(self.preys.normal) do
+					if data and rand >= data.min and rand < data.max then
+						self:SpawnBaited(prefab, x,y,z)
+						break
+					end
+				end
+			end
+		else
+			if math.random() < 0.25 then
+				self.times = self.times - 1
+			end
+		end
+
+		self:Baiting(periodtime)
+	end)
+end
+
+function FishHomingBait:RemoveSelf()
+	if self.task_baiting ~= nil then
+		self.task_baiting:Cancel()
+		self.task_baiting = nil
 	end
 end
 

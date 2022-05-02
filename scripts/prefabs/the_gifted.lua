@@ -290,7 +290,7 @@ local function UpadateHealTag(inst)
             not (v.components.health:IsDead() or v:HasTag("playerghost") or v.components.health.invincible) and
             v.entity:IsVisible() and
             v:GetDistanceSqToPoint(x, y, z) < 100 and
-            (v.components.health:GetMaxWithPenalty() - v.components.health.currenthealth) >= 15
+            (v.components.health:GetMaxWithPenalty() - v.components.health.currenthealth) >= 10
         then
             table.insert(targets, v)
         end
