@@ -750,7 +750,8 @@ local fishhoming_ingredients = {
     compostwrap =       { pasty = 1, dusty = 1, hardy = 1, rotten = 1 },
     spoiled_fish =      { pasty = 6, hardy = 6, rotten = 6 },
     spoiled_fish_small ={ pasty = 5, hardy = 5, rotten = 5 },
-    poop =              { pasty = 1, veggie = 1, rotten = 1 },
+    poop =              { pasty = 1, dusty = 1, veggie = 1, rotten = 1 },
+    guano =             { pasty = 1, rotten = 1 },
     razor =             { hardy = 6, rusty = 6 }, --月光龙虾
     moonglass =         { hardy = 1, dusty = 1, rusty = 1 },
     mutator_moon =      { pasty = 1, dusty = 1, rusty = 1 },
@@ -781,6 +782,12 @@ local fishhoming_ingredients = {
     ash =               { dusty = 1 },
     icehat =            { pasty = 6 },
     spoiled_food =      { pasty = 1, dusty = 1, hardy = 1 },
+    silk =              { pasty = 1, dusty = 1, monster = 1 },
+    beefalowool =       { pasty = 1, dusty = 1, meat = 1 },
+    flint =             { hardy = 1, dusty = 1 },
+    twigs =             { pasty = 1, dusty = 1, hardy = 1, veggie = 1 },
+    cutgrass =          { pasty = 1, dusty = 1, hardy = 1, veggie = 1 },
+    cutreeds =          { pasty = 1, hardy = 1, veggie = 1 },
 }
 for name,data in pairs(fishhoming_ingredients) do
     _G.FISHHOMING_INGREDIENTS_L[name] = data

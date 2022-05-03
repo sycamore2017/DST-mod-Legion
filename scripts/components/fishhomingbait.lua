@@ -10,9 +10,14 @@ local FishHomingBait = Class(function(self, inst)
 	self.onmakefn = nil
 	self.oninitfn = nil
 	self.ongetpreysfn = nil
+	self.spawnbaitedfn = nil
+	self.onspawnchumsfn = nil
 
 	self.task_baiting = nil
 	self.preys = nil
+	self.eviled = nil
+
+	self.task_chums = nil
 end)
 
 function FishHomingBait:InitSelf()
@@ -226,6 +231,10 @@ function FishHomingBait:OnSave()
 		end
 	end
 
+	if self.eviled then
+		data.eviled = true
+	end
+
     return data
 end
 
@@ -254,6 +263,10 @@ function FishHomingBait:OnLoad(data)
 			for _,name in pairs(data.prefabs) do
 				self.prefabs[name] = true
 			end
+		end
+
+		if data.eviled then
+			self.eviled = true
 		end
 
 		self:InitSelf()
@@ -398,12 +411,20 @@ function FishHomingBait:GetPreys()
 			meat = nil, veggie = nil, monster = nil,
 			frizzy = 0.1
 		},
-		malbatross = { --邪天翁
+		-- malbatross = { --邪天翁
+		-- 	hardy = nil, pasty = nil, dusty = nil,
+		-- 	meat = nil, veggie = nil, monster = 0,
+		-- 	evil = 0.09
+		-- },
+	}
+
+	if not self.eviled then
+		list.malbatross = {
 			hardy = nil, pasty = nil, dusty = nil,
 			meat = nil, veggie = nil, monster = 0,
 			evil = 0.09
-		},
-	}
+		}
+	end
 
 	if TheWorld.state.isspring then
 		list.oceanfish_small_7.fragrant = 0.1
@@ -416,7 +437,7 @@ function FishHomingBait:GetPreys()
 	end
 
 	if self.ongetpreysfn ~= nil then
-		self.ongetpreysfn(self, preys, list)
+		self.ongetpreysfn(self.inst, preys, list)
 	end
 
 	local allweight = 0
@@ -483,32 +504,170 @@ local function GetRandomPoint(x, y, z, radius, forceradius)
 
     return x + rad * math.cos(angle), y, z - rad * math.sin(angle)
 end
+function FishHomingBait:GetSpawnPoint(x, y, z, radius)
+	local x2, y2, z2 = GetRandomPoint(x, y, z, radius, nil)
+	local offset = FindSwimmableOffset(Vector3(x2, y2, z2), math.random()*2*PI, 2, 8, false, nil, nil, true)
+	if offset then
+		return x2+offset.x, y2+offset.y, z2+offset.z
+	end
+end
+
 function FishHomingBait:SpawnBaited(prefab, x,y,z)
-	local x2, y2, z2 = GetRandomPoint(x, y, z, 8, nil)
+	if self.spawnbaitedfn ~= nil and self.spawnbaitedfn(self.inst, prefab, x,y,z) then
+		return
+	end
+
+	---------------鱿鱼
+
+	if prefab == "squid" then
+		local x2, y2, z2 = self:GetSpawnPoint(x, y, z, math.random()*6+6)
+		if x2 == nil then return end
+		local herds = TheSim:FindEntities(x, y, z, TUNING.SCHOOL_SPAWNER_FISH_CHECK_RADIUS,
+							{ "herd" }, nil, nil)
+		local herdtoadd = nil
+
+		for _,v in ipairs(herds) do
+			if
+				v.components.herd ~= nil and
+				v.components.herd.membertag == prefab and
+				not v.components.herd:IsFull()
+			then
+				herdtoadd = v
+				break
+			end
+		end
+		if herdtoadd == nil then
+			herdtoadd = SpawnPrefab("squidherd")
+			if herdtoadd ~= nil then
+				herdtoadd.Transform:SetPosition(x2, y2, z2)
+			end
+		end
+		if herdtoadd ~= nil then
+			local squid = SpawnPrefab(prefab)
+			squid.Transform:SetPosition(x2, y2, z2)
+			squid:PushEvent("spawn")
+			squid:AddTag("baited")
+			herdtoadd.components.herd:AddMember(squid)
+		end
+
+		return
+	end
+
+	---------------岩石大白鲨
+
+	if prefab == "shark" then
+		local x2, y2, z2 = self:GetSpawnPoint(x, y, z, math.random()*8+10)
+		if x2 == nil then return end
+		if TheWorld.Map:GetPlatformAtPoint(x2, z2) == nil then
+			local shark = SpawnPrefab(prefab)
+			shark.Transform:SetPosition(x2, 0, z2)
+			shark.components.amphibiouscreature:OnEnterOcean()
+			shark.sg:GoToState("eat_pre")
+			shark:AddTag("baited")
+			local player = FindClosestPlayerInRangeSq(x2, 0, z2, 20*20, true)
+			if player then
+				shark:ForceFacePoint(player.Transform:GetWorldPosition())
+			end
+		end
+
+		return
+	end
+
+	---------------一角鲸
+
+	if prefab == "gnarwail" then
+		local x2, y2, z2 = self:GetSpawnPoint(x, y, z, math.random()*8+6)
+		if x2 == nil then return end
+		if TheWorld.Map:GetPlatformAtPoint(x2, z2) == nil then
+			local gnarwail = SpawnPrefab(prefab)
+			gnarwail.Transform:SetPosition(x2, 0, z2)
+			gnarwail.sg:GoToState("emerge")
+			gnarwail:AddTag("baited")
+		end
+
+		return
+	end
+
+	---------------龙虾、月光龙虾、海黾、草鳄鱼
+
+	if
+		prefab == "wobster_sheller" or prefab == "wobster_moonglass" or
+		prefab == "spider_water" or
+		prefab == "grassgator"
+	then
+		local x2, y2, z2
+		if prefab == "grassgator" then
+			x2, y2, z2 = self:GetSpawnPoint(x, y, z, math.random()*8+6)
+		else
+			x2, y2, z2 = self:GetSpawnPoint(x, y, z, 10)
+		end
+		if x2 == nil then return end
+		local baited = SpawnPrefab(prefab)
+		baited.Transform:SetPosition(x2, 0, z2)
+		baited:AddTag("baited")
+
+		return
+	end
+
+	---------------海鹦鹉
+
+	if prefab == "puffin" then
+		local birdspawner = TheWorld.components.birdspawner
+		if birdspawner == nil then return end
+
+		local x2, y2, z2 = GetRandomPoint(x, y, z, 12, nil)
+		if x2 == nil then return end
+		local bird = birdspawner:SpawnBird(Vector3(x2, y2, z2), true)
+		if bird ~= nil then
+			bird:AddTag("baited")
+		end
+
+		return
+	end
+
+	---------------邪天翁
+
+	if prefab == "malbatross" then
+		local x2, y2, z2 = self:GetSpawnPoint(x, y, z, math.random()*10+10)
+		if x2 == nil then return end
+		local the_malbatross = TheSim:FindFirstEntityWithTag("malbatross") or SpawnPrefab("malbatross")
+		if the_malbatross ~= nil then
+			the_malbatross.Physics:Teleport(x2, y2, z2)
+			the_malbatross.components.knownlocations:RememberLocation("home", Vector3(x2, y2, z2))
+			-- the_malbatross.components.entitytracker:TrackEntity("feedingshoal", target_shoal)
+			the_malbatross.sg:GoToState("arrive")
+			the_malbatross:AddTag("baited")
+			self.eviled = true
+		end
+
+		return
+	end
+
+	---------------其他鱼类
+
+	local x2, y2, z2 = self:GetSpawnPoint(x, y, z, 10)
+	if x2 == nil then return end
 	local herdtag = "herd_"..prefab
 	local herds = TheSim:FindEntities(x, y, z, TUNING.SCHOOL_SPAWNER_FISH_CHECK_RADIUS,
 						{ "herd" }, nil, nil)
 	local herdtoadd = nil
 
-	--寻找附近一个群体自动加入
-	for _,v in ipairs(herds) do
+	for _,v in ipairs(herds) do --寻找附近一个群体自动加入
 		if
 			v.components.herd ~= nil and
 			v.components.herd.membertag == herdtag and
-			not v.components.herd.membercount:IsFull()
+			not v.components.herd:IsFull()
 		then
 			herdtoadd = v
 			break
 		end
 	end
-
 	if herdtoadd == nil then
 		herdtoadd = SpawnPrefab("schoolherd_"..prefab)
 		if herdtoadd ~= nil then
 			herdtoadd.Transform:SetPosition(x2, y2, z2)
 		end
 	end
-
 	if herdtoadd ~= nil then
 		local fish = SpawnPrefab(prefab)
 		if fish ~= nil then
@@ -517,10 +676,64 @@ function FishHomingBait:SpawnBaited(prefab, x,y,z)
 			fish.components.herdmember:Enable(true)
 			fish.components.herdmember.herdprefab = herdtoadd.prefab
 			fish.sg:GoToState("arrive")
+			fish:AddTag("baited")
 			herdtoadd.components.herd:AddMember(fish)
 		end
 	end
 
+end
+
+local function SpawnChumPieces(inst)
+    if inst._num_chumpieces < 8 then
+        local x, y, z = inst.Transform:GetWorldPosition()
+        local x2, y2, z2 = GetRandomPoint(x, y, z, 3, nil)
+        if TheWorld.Map:IsOceanAtPoint(x2, 0, z2, false) then
+            local piece = SpawnPrefab("chumpiece")
+
+            piece.Transform:SetPosition(x2, 0, z2)
+            piece._source = inst
+
+			if piece.components.edible ~= nil then
+				if math.random() < 0.25 then
+					piece.components.edible.secondaryfoodtype = FOODTYPE.BERRY
+				end
+			end
+
+            inst._chumpieces[piece] = true
+            inst._num_chumpieces = inst._num_chumpieces + 1
+
+            piece:ListenForEvent("onremove", function(piece)
+				local chum_aoe = piece._source
+				if chum_aoe ~= nil then
+					chum_aoe._chumpieces[piece] = nil
+					chum_aoe._num_chumpieces = chum_aoe._num_chumpieces - 1
+					if chum_aoe.persists then
+						chum_aoe:_spawn_chum_piece_fn()
+					end
+				end
+			end)
+        end
+    end
+end
+function FishHomingBait:SpawnChums()
+	if self.task_chums ~= nil then
+		return
+	end
+
+	self.inst._chumpieces = {}
+    self.inst._num_chumpieces = 0
+	self.inst._spawn_chum_piece_fn = SpawnChumPieces
+	if self.onspawnchumsfn ~= nil then
+		self.onspawnchumsfn(self.inst)
+	end
+	self.task_chums = self.inst:DoPeriodicTask(0.6, self.inst._spawn_chum_piece_fn)
+	self.inst:ListenForEvent("onremove", function(inst)
+		for k,_ in pairs(inst._chumpieces) do
+			if k:IsValid() then
+				k:Remove()
+			end
+		end
+	end)
 end
 
 function FishHomingBait:Baiting(periodtime)
@@ -535,7 +748,7 @@ function FishHomingBait:Baiting(periodtime)
 		elseif self.type_shape == "pasty" then
 			periodtime = 10
 		else
-			periodtime = 7
+			periodtime = 6
 		end
 		self:GetPreys()
 	end
@@ -592,6 +805,7 @@ function FishHomingBait:Baiting(periodtime)
 
 		self:Baiting(periodtime)
 	end)
+	self:SpawnChums()
 end
 
 function FishHomingBait:RemoveSelf()
@@ -599,6 +813,19 @@ function FishHomingBait:RemoveSelf()
 		self.task_baiting:Cancel()
 		self.task_baiting = nil
 	end
+	if self.task_chums ~= nil then
+		self.task_chums:Cancel()
+		self.task_chums = nil
+	end
+	-- self.inst._chumpieces = nil
+    -- self.inst._num_chumpieces = nil
+	-- self.inst._spawn_chum_piece_fn = nil
+
+	self.inst.SoundEmitter:KillSound("spore_loop")
+    self.inst.persists = false
+    -- self.inst:RemoveTag("chum")
+    self.inst:DoTaskInTime(2, self.inst.Remove) --anim len + 0.5 sec
+    self.inst.AnimState:PlayAnimation("fish_chum_base_pst")
 end
 
 return FishHomingBait
