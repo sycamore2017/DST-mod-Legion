@@ -109,6 +109,17 @@ if TUNING.LEGION_TECHUNLOCK == "lootdropper" then
         }, { "RECAST", "WEAPONS" }
     )
 
+    if CONFIGS_LEGION.LEGENDOFFALL then
+        AddRecipe2(
+            "fishhomingtool_awesome", {
+                Ingredient("fishhomingtool_normal", 5, "images/inventoryimages/fishhomingtool_normal.xml"),
+                Ingredient("chum", 2),
+            }, TECH.LOST, {
+                atlas = "images/inventoryimages/fishhomingtool_awesome.xml", image = "fishhomingtool_awesome.tex"
+            }, { "RECAST", "FISHING" }
+        )
+    end
+
     AddRecipe2(
         "hat_cowboy", {
             Ingredient("beefalohat", 1),
@@ -210,6 +221,18 @@ else
             atlas = "images/inventoryimages/explodingfruitcake.xml", image = "explodingfruitcake.tex"
         }, { "RECAST", "WEAPONS" }
     )
+
+    if CONFIGS_LEGION.LEGENDOFFALL then
+        AddRecipe2(
+            "fishhomingtool_awesome", {
+                Ingredient("fishhomingtool_normal", 5, "images/inventoryimages/fishhomingtool_normal.xml"),
+                Ingredient("chum", 2),
+            }, TECH.ELECOURMALINE_ONE, {
+                nounlock = true,
+                atlas = "images/inventoryimages/fishhomingtool_awesome.xml", image = "fishhomingtool_awesome.tex"
+            }, { "RECAST", "FISHING" }
+        )
+    end
 
     AddRecipe2(
         "hat_cowboy", {

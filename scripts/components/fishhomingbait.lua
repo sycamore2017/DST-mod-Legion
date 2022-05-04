@@ -73,6 +73,9 @@ local function FindMaxKey(details, k1, k2, k3)
 		if details[k1] > details[k3] then
 			return math.random() > 0.5 and k1 or k2
 		elseif details[k1] == details[k3] then
+			if details[k1] <= 0 then
+				return k1
+			end
 			local rand = math.random()
 			if rand <= 0.33 then
 				return k1
@@ -152,7 +155,7 @@ function FishHomingBait:Make(container, doer)
 	for i = 1, container:GetNumSlots() do
 		local item = container:GetItemInSlot(i)
 		if item ~= nil then
-			local mult = item.components.stackable ~= nil and item.components.stackable:StackSize() or 1
+			local mult = item.components.stackable ~= nil and item.components.stackable:StackSize() or 5
 
 			if FISHHOMING_INGREDIENTS_L[item.prefab] ~= nil then
 				local idata = FISHHOMING_INGREDIENTS_L[item.prefab]
@@ -172,7 +175,7 @@ function FishHomingBait:Make(container, doer)
 			elseif item.components.edible ~= nil then
 				if item.components.edible.foodtype == FOODTYPE.MEAT then
 					details.meat = details.meat + mult
-				elseif item.components.edible.foodtype == FOODTYPE.VEGGIE then
+				elseif item.components.edible.foodtype == FOODTYPE.VEGGIE or item.components.edible.foodtype == FOODTYPE.SEEDS then
 					details.veggie = details.veggie + mult
 				elseif item.components.edible.foodtype == FOODTYPE.MONSTER then
 					details.monster = details.monster + mult
@@ -191,7 +194,7 @@ function FishHomingBait:Make(container, doer)
 	end
 
 	self.type_eat = FindMaxKey(details, "veggie", "meat", "monster")
-	self.type_shape = FindMaxKey(details, "hardy", "pasty", "dusty")
+	self.type_shape = FindMaxKey(details, "dusty", "pasty", "hardy")
 	self.type_special = FindOtherKeys(details_other)
 
 	self.times = math.ceil(self.times/2) --根据总数量确定释放功能的次数(最多 4格*40叠加/2=80次)
@@ -280,6 +283,7 @@ function FishHomingBait:Handover(baiting)
 	baitcpt.type_eat = self.type_eat
 	baitcpt.type_shape = self.type_shape
 	baitcpt.type_special = self.type_special
+	baitcpt:InitSelf()
 end
 
 function FishHomingBait:GetPreys()
@@ -374,12 +378,12 @@ function FishHomingBait:GetPreys()
 		squid = { --鱿鱼
 			hardy = 0, pasty = 0, dusty = 0,
 			meat = 0, veggie = nil, monster = 0,
-			shiny = 0.1
+			shiny = 0.02
 		},
 		shark = { --岩石大白鲨
 			hardy = nil, pasty = 0, dusty = 0,
 			meat = 0, veggie = nil, monster = 0,
-			bloody = 0.04
+			bloody = 0.02
 		},
 		gnarwail = { --一角鲸
 			hardy = 0, pasty = nil, dusty = nil,
@@ -399,32 +403,24 @@ function FishHomingBait:GetPreys()
 		spider_water = { --海黾
 			hardy = nil, pasty = nil, dusty = 0,
 			meat = 0, veggie = nil, monster = 0,
-			shaking = 0.2
+			shaking = 0.1
 		},
 		grassgator = { --草鳄鱼
 			hardy = nil, pasty = nil, dusty = 0,
 			meat = nil, veggie = 0, monster = nil,
-			grassy = 0.06
+			grassy = 0.04
 		},
 		puffin = { --海鹦鹉
 			hardy = nil, pasty = nil, dusty = 0,
 			meat = nil, veggie = nil, monster = nil,
-			frizzy = 0.1
+			frizzy = 0.06
 		},
-		-- malbatross = { --邪天翁
-		-- 	hardy = nil, pasty = nil, dusty = nil,
-		-- 	meat = nil, veggie = nil, monster = 0,
-		-- 	evil = 0.09
-		-- },
-	}
-
-	if not self.eviled then
-		list.malbatross = {
+		malbatross = { --邪天翁
 			hardy = nil, pasty = nil, dusty = nil,
 			meat = nil, veggie = nil, monster = 0,
 			evil = 0.09
-		}
-	end
+		},
+	}
 
 	if TheWorld.state.isspring then
 		list.oceanfish_small_7.fragrant = 0.1
@@ -514,13 +510,13 @@ end
 
 function FishHomingBait:SpawnBaited(prefab, x,y,z)
 	if self.spawnbaitedfn ~= nil and self.spawnbaitedfn(self.inst, prefab, x,y,z) then
-		return
+		return true
 	end
 
 	---------------鱿鱼
 
 	if prefab == "squid" then
-		local x2, y2, z2 = self:GetSpawnPoint(x, y, z, math.random()*6+6)
+		local x2, y2, z2 = self:GetSpawnPoint(x, y, z, math.random()*8+10)
 		if x2 == nil then return end
 		local herds = TheSim:FindEntities(x, y, z, TUNING.SCHOOL_SPAWNER_FISH_CHECK_RADIUS,
 							{ "herd" }, nil, nil)
@@ -550,7 +546,7 @@ function FishHomingBait:SpawnBaited(prefab, x,y,z)
 			herdtoadd.components.herd:AddMember(squid)
 		end
 
-		return
+		return true
 	end
 
 	---------------岩石大白鲨
@@ -568,6 +564,7 @@ function FishHomingBait:SpawnBaited(prefab, x,y,z)
 			if player then
 				shark:ForceFacePoint(player.Transform:GetWorldPosition())
 			end
+			return true
 		end
 
 		return
@@ -583,6 +580,7 @@ function FishHomingBait:SpawnBaited(prefab, x,y,z)
 			gnarwail.Transform:SetPosition(x2, 0, z2)
 			gnarwail.sg:GoToState("emerge")
 			gnarwail:AddTag("baited")
+			return true
 		end
 
 		return
@@ -597,7 +595,7 @@ function FishHomingBait:SpawnBaited(prefab, x,y,z)
 	then
 		local x2, y2, z2
 		if prefab == "grassgator" then
-			x2, y2, z2 = self:GetSpawnPoint(x, y, z, math.random()*8+6)
+			x2, y2, z2 = self:GetSpawnPoint(x, y, z, math.random()*10+8)
 		else
 			x2, y2, z2 = self:GetSpawnPoint(x, y, z, 10)
 		end
@@ -606,7 +604,7 @@ function FishHomingBait:SpawnBaited(prefab, x,y,z)
 		baited.Transform:SetPosition(x2, 0, z2)
 		baited:AddTag("baited")
 
-		return
+		return true
 	end
 
 	---------------海鹦鹉
@@ -622,12 +620,12 @@ function FishHomingBait:SpawnBaited(prefab, x,y,z)
 			bird:AddTag("baited")
 		end
 
-		return
+		return true
 	end
 
 	---------------邪天翁
 
-	if prefab == "malbatross" then
+	if prefab == "malbatross" and not self.eviled then
 		local x2, y2, z2 = self:GetSpawnPoint(x, y, z, math.random()*10+10)
 		if x2 == nil then return end
 		local the_malbatross = TheSim:FindFirstEntityWithTag("malbatross") or SpawnPrefab("malbatross")
@@ -640,12 +638,12 @@ function FishHomingBait:SpawnBaited(prefab, x,y,z)
 			self.eviled = true
 		end
 
-		return
+		return true
 	end
 
 	---------------其他鱼类
 
-	local x2, y2, z2 = self:GetSpawnPoint(x, y, z, 10)
+	local x2, y2, z2 = self:GetSpawnPoint(x, y, z, 12)
 	if x2 == nil then return end
 	local herdtag = "herd_"..prefab
 	local herds = TheSim:FindEntities(x, y, z, TUNING.SCHOOL_SPAWNER_FISH_CHECK_RADIUS,
@@ -681,6 +679,7 @@ function FishHomingBait:SpawnBaited(prefab, x,y,z)
 		end
 	end
 
+	return true
 end
 
 local function SpawnChumPieces(inst)
@@ -694,8 +693,11 @@ local function SpawnChumPieces(inst)
             piece._source = inst
 
 			if piece.components.edible ~= nil then
-				if math.random() < 0.25 then
+				local rand = math.random()
+				if rand < 0.25 then
 					piece.components.edible.secondaryfoodtype = FOODTYPE.BERRY
+				elseif rand < 0.5 then
+					piece.components.edible.secondaryfoodtype = FOODTYPE.VEGGIE
 				end
 			end
 
@@ -766,11 +768,9 @@ function FishHomingBait:Baiting(periodtime)
 		end
 
 		local x, y, z = inst.Transform:GetWorldPosition()
-		local numbaited = #TheSim:FindEntities(x, y, z, TUNING.SCHOOL_SPAWNER_FISH_CHECK_RADIUS,
+		local numbaited = #TheSim:FindEntities(x, y, z, 20,
 						{ "baited" }, { "INLIMBO" }, nil)
 		if numbaited < 20 then
-			self.times = self.times - 1
-
 			if self.preys.special ~= nil then
 				local rand = nil
 				local hasspecial = false
@@ -778,7 +778,9 @@ function FishHomingBait:Baiting(periodtime)
 					if chance ~= nil then
 						rand = math.random()
 						if rand < chance then
-							self:SpawnBaited(prefab, x,y,z)
+							if self:SpawnBaited(prefab, x,y,z) then --吸引到才减少次数
+								self.times = self.times - 1
+							end
 							hasspecial = true
 						end
 					end
@@ -792,7 +794,9 @@ function FishHomingBait:Baiting(periodtime)
 				local rand = math.random()*self.preys.allweight
 				for prefab,data in pairs(self.preys.normal) do
 					if data and rand >= data.min and rand < data.max then
-						self:SpawnBaited(prefab, x,y,z)
+						if self:SpawnBaited(prefab, x,y,z) then --吸引到才减少次数
+							self.times = self.times - 1
+						end
 						break
 					end
 				end

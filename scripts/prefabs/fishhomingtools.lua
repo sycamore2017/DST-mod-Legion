@@ -36,11 +36,9 @@ end
 --------------------------------------------------------------------------
 
 local assets_normal = {
-    -- Asset("ANIM", "anim/fishhomingtool_normal.zip"),
-    -- Asset("ATLAS", "images/inventoryimages/fishhomingtool_normal.xml"),
-    -- Asset("IMAGE", "images/inventoryimages/fishhomingtool_normal.tex"),
-
-    Asset("ANIM", "anim/bundle.zip"),
+    Asset("ANIM", "anim/fishhomingtool_normal.zip"),
+    Asset("ATLAS", "images/inventoryimages/fishhomingtool_normal.xml"),
+    Asset("IMAGE", "images/inventoryimages/fishhomingtool_normal.tex"),
 }
 
 local prefabs_normal = {
@@ -57,14 +55,9 @@ local function Fn_normal()
 
     MakeInventoryPhysics(inst)
 
-    -- inst.AnimState:SetBank("fishhomingtool_normal")
-    -- inst.AnimState:SetBuild("fishhomingtool_normal")
-    -- inst.AnimState:PlayAnimation("idle")
-    inst.AnimState:SetBank("bundle")
-    inst.AnimState:SetBuild("bundle")
+    inst.AnimState:SetBank("fishhomingtool_normal")
+    inst.AnimState:SetBuild("fishhomingtool_normal")
     inst.AnimState:PlayAnimation("idle")
-
-    -- inst:AddTag(tag)
 
     inst.entity:SetPristine()
     if not TheWorld.ismastersim then
@@ -77,10 +70,8 @@ local function Fn_normal()
     inst:AddComponent("inspectable")
 
     inst:AddComponent("inventoryitem")
-    -- inst.components.inventoryitem.imagename = "fishhomingtool_normal"
-    -- inst.components.inventoryitem.atlasname = "images/inventoryimages/fishhomingtool_normal.xml"
-    inst.components.inventoryitem.imagename = "bundlewrap"
-    -- inst.components.inventoryitem.atlasname = "images/inventoryimages/bundlewrap.xml"
+    inst.components.inventoryitem.imagename = "fishhomingtool_normal"
+    inst.components.inventoryitem.atlasname = "images/inventoryimages/fishhomingtool_normal.xml"
     inst.components.inventoryitem:SetSinks(true)
 
     inst:AddComponent("bundlemaker")
@@ -94,7 +85,55 @@ local function Fn_normal()
 
     MakeSmallBurnable(inst, TUNING.SMALL_BURNTIME)
     MakeSmallPropagator(inst)
-    -- inst.components.propagator.flashpoint = 10 + math.random() * 5
+
+    MakeHauntableLaunchAndIgnite(inst)
+
+    return inst
+end
+
+--------------------------------------------------------------------------
+--[[ 专业打窝饵制作器 ]]
+--------------------------------------------------------------------------
+
+local assets_awesome = {
+    Asset("ANIM", "anim/fishhomingtool_awesome.zip"),
+    Asset("ATLAS", "images/inventoryimages/fishhomingtool_awesome.xml"),
+    Asset("IMAGE", "images/inventoryimages/fishhomingtool_awesome.tex"),
+}
+
+local function Fn_awesome()
+    local inst = CreateEntity()
+
+    inst.entity:AddTransform()
+    inst.entity:AddAnimState()
+    inst.entity:AddNetwork()
+
+    MakeInventoryPhysics(inst)
+
+    inst.AnimState:SetBank("fishhomingtool_awesome")
+    inst.AnimState:SetBuild("fishhomingtool_awesome")
+    inst.AnimState:PlayAnimation("idle")
+
+    inst.entity:SetPristine()
+    if not TheWorld.ismastersim then
+        return inst
+    end
+
+    inst:AddComponent("inspectable")
+
+    inst:AddComponent("inventoryitem")
+    inst.components.inventoryitem.imagename = "fishhomingtool_awesome"
+    inst.components.inventoryitem.atlasname = "images/inventoryimages/fishhomingtool_awesome.xml"
+    inst.components.inventoryitem:SetSinks(true)
+
+    inst:AddComponent("bundlemaker")
+    inst.components.bundlemaker:SetBundlingPrefabs("fishhomingtool_container", "fishhomingbait")
+    inst.components.bundlemaker:SetOnStartBundlingFn(function(inst, doer)
+        inst:Remove()
+    end)
+
+    inst:AddComponent("fuel")
+    inst.components.fuel.fuelvalue = TUNING.MED_FUEL
 
     MakeHauntableLaunchAndIgnite(inst)
 
@@ -106,12 +145,13 @@ end
 --------------------------------------------------------------------------
 
 local assets_bag = {
-    -- Asset("ANIM", "anim/fishhomingbait.zip"),
-    -- Asset("ATLAS", "images/inventoryimages/fishhomingbait.xml"),
-    -- Asset("IMAGE", "images/inventoryimages/fishhomingbait.tex"),
-
-    Asset("ANIM", "anim/swap_chum_pouch.zip"),
-    Asset("ANIM", "anim/chum_pouch.zip"),
+    Asset("ANIM", "anim/fishhomingbait.zip"),
+    Asset("ATLAS", "images/inventoryimages/fishhomingbait1.xml"),
+    Asset("IMAGE", "images/inventoryimages/fishhomingbait1.tex"),
+    Asset("ATLAS", "images/inventoryimages/fishhomingbait2.xml"),
+    Asset("IMAGE", "images/inventoryimages/fishhomingbait2.tex"),
+    Asset("ATLAS", "images/inventoryimages/fishhomingbait3.xml"),
+    Asset("IMAGE", "images/inventoryimages/fishhomingbait3.tex"),
 }
 
 local prefabs_bag = {
@@ -139,6 +179,7 @@ local function OnThrown(inst)
     inst:AddTag("NOCLICK")
     inst.persists = false
 
+    inst.AnimState:SetBank("chum_pouch")
     inst.AnimState:PlayAnimation("spin_loop")
 
     inst.Physics:SetMass(1)
@@ -158,7 +199,7 @@ local function OnAddProjectile(inst)
 end
 
 local function OnEquip(inst, owner)
-    owner.AnimState:OverrideSymbol("swap_object", "swap_chum_pouch", "swap_chum_pouch")
+    owner.AnimState:OverrideSymbol("swap_object", "fishhomingbait", "swap_object")
     owner.AnimState:Show("ARM_carry")
     owner.AnimState:Hide("ARM_normal")
 end
@@ -179,9 +220,9 @@ local function Fn_bag()
 
     MakeInventoryPhysics(inst)
 
-    inst.AnimState:SetBank("chum_pouch")
-    inst.AnimState:SetBuild("chum_pouch")
-    inst.AnimState:PlayAnimation("idle")
+    inst.AnimState:SetBank("fishhomingbait")
+    inst.AnimState:SetBuild("fishhomingbait")
+    inst.AnimState:PlayAnimation("idle1")
     inst.AnimState:SetDeltaTimeMultiplier(.75)
 
     inst:AddComponent("reticule")
@@ -237,9 +278,9 @@ local function Fn_bag()
     end
 
     inst.baitimgs_l = {
-		dusty = { img = "icire_rock5", atlas = "images/inventoryimages/icire_rock5.xml" },
-		pasty = { img = "icire_rock4", atlas = "images/inventoryimages/icire_rock4.xml" },
-		hardy = { img = "icire_rock1", atlas = "images/inventoryimages/icire_rock1.xml" }
+		dusty = { img = "fishhomingbait1", atlas = "images/inventoryimages/fishhomingbait1.xml", anim = "idle1" },
+		pasty = { img = "fishhomingbait2", atlas = "images/inventoryimages/fishhomingbait2.xml", anim = "idle2" },
+		hardy = { img = "fishhomingbait3", atlas = "images/inventoryimages/fishhomingbait3.xml", anim = "idle3" }
 	}
 
     inst:AddComponent("locomotor")
@@ -269,6 +310,7 @@ local function Fn_bag()
         if inst.baitimgs_l[type_shape] ~= nil then
             inst.components.inventoryitem.atlasname = inst.baitimgs_l[type_shape].atlas
             inst.components.inventoryitem:ChangeImageName(inst.baitimgs_l[type_shape].img)
+            inst.AnimState:PlayAnimation(inst.baitimgs_l[type_shape].anim)
         end
     end
 
@@ -283,6 +325,7 @@ end
 
 local assets_baiting = {
     Asset("ANIM", "anim/fish_chum.zip"),
+    -- Asset("ANIM", "anim/pollen_chum.zip"),
 }
 
 local prefabs_baiting = {
@@ -297,6 +340,8 @@ local function Fn_baiting()
     inst.entity:AddSoundEmitter()
     inst.entity:AddNetwork()
 
+    -- inst.AnimState:SetBank("pollen_chum")
+    -- inst.AnimState:SetBuild("pollen_chum")
     inst.AnimState:SetBank("fish_chum")
     inst.AnimState:SetBuild("fish_chum")
     inst.AnimState:PlayAnimation("fish_chum_base_pre")
@@ -317,8 +362,29 @@ local function Fn_baiting()
         return inst
     end
 
+    inst.baitcolors_l = {
+		meat = { r = 138/255, g = 109/255, b = 94/255 },
+		monster = { r = 91/255, g = 59/255, b = 123/255 },
+		veggie = { r = 163/255, g = 187/255, b = 169/255 },
+	}
+
     inst:AddComponent("fishhomingbait")
     inst.components.fishhomingbait.isbaiting = true
+    inst.components.fishhomingbait.oninitfn = function(inst)
+        local type_eat = inst.components.fishhomingbait.type_eat
+        type_eat = inst.baitcolors_l[type_eat]
+        if type_eat ~= nil then
+            inst.AnimState:SetMultColour(type_eat.r, type_eat.g, type_eat.b, 0.5)
+        end
+        local type_shape = inst.components.fishhomingbait.type_shape
+        if type_shape == "hardy" then
+            inst.AnimState:SetScale(0.5, 0.5)
+        elseif type_shape == "pasty" then
+            inst.AnimState:SetScale(0.75, 0.75)
+        else
+            inst.AnimState:SetScale(1, 1)
+        end
+    end
 
     inst:DoTaskInTime(3 + math.random()*3, function()
         inst.components.fishhomingbait:Baiting()
@@ -331,5 +397,6 @@ end
 
 return Prefab("fishhomingtool_container", Fn_cont, assets_cont),
     Prefab("fishhomingtool_normal", Fn_normal, assets_normal, prefabs_normal),
+    Prefab("fishhomingtool_awesome", Fn_awesome, assets_awesome, prefabs_normal),
     Prefab("fishhomingbait", Fn_bag, assets_bag, prefabs_bag),
     Prefab("fishhomingbaiting", Fn_baiting, assets_baiting, prefabs_baiting)

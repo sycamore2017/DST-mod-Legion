@@ -33,6 +33,10 @@ local assets = {
     Asset("IMAGE", "images/inventoryimages/siving_ctlwater_item.tex"),
     Asset("ATLAS", "images/inventoryimages/siving_ctldirt_item.xml"),
     Asset("IMAGE", "images/inventoryimages/siving_ctldirt_item.tex"),
+    Asset("ATLAS", "images/inventoryimages/fishhomingtool_normal.xml"),
+    Asset("IMAGE", "images/inventoryimages/fishhomingtool_normal.tex"),
+    Asset("ATLAS", "images/inventoryimages/fishhomingtool_awesome.xml"),
+    Asset("IMAGE", "images/inventoryimages/fishhomingtool_awesome.tex"),
 }
 
 for k,v in pairs(assets) do
@@ -89,6 +93,14 @@ AddRecipe2(
     }, TECH.SCIENCE_TWO, {
         atlas = "images/inventoryimages/boltwingout.xml", image = "boltwingout.tex"
     }, { "ARMOUR", "CONTAINERS" }
+)
+AddRecipe2(
+    "fishhomingtool_normal", {
+        Ingredient("cutreeds", 1),
+        Ingredient("stinger", 1),
+    }, TECH.SCIENCE_ONE, {
+        atlas = "images/inventoryimages/fishhomingtool_normal.xml", image = "fishhomingtool_normal.tex"
+    }, { "FISHING" }
 )
 
 --这个配方用来便于绿宝石法杖分解
@@ -697,6 +709,7 @@ local fishhoming_ingredients = {
     amulet =            { hardy = 6, hot = 6 },
     wx78module_heat =   { hardy = 6, hot = 6 },
     redmooneye =        { hardy = 6, hot = 6 },
+    batbat =            { hardy = 6, pasty = 6, hot = 6, frozen = 6, monster = 1 },
     honey =             { pasty = 1, sticky = 1 }, --甜味鱼
     royal_jelly =       { pasty = 1, sticky = 6, shiny = 1 },
     honeycomb =         { pasty = 1, dusty = 1, sticky = 6 },
@@ -730,7 +743,7 @@ local fishhoming_ingredients = {
     bathbomb =          { dusty = 1, fragrant = 1 },
     meat_dried =        { hardy = 1, meat = 1, wrinkled = 1 }, --落叶比目鱼
     smallmeat_dried =   { hardy = 1, meat = 1, wrinkled = 1 },
-    monstermeat_dried = { hardy = 1, meat = 1, monster = 1, wrinkled = 1 },
+    monstermeat_dried = { hardy = 1, meat = 1, monster = 2, wrinkled = 1 },
     cutted_rosebush =   { hardy = 1, pasty = 1, fragrant = 1, wrinkled = 1, grassy = 1 },
     cutted_lilybush =   { hardy = 1, pasty = 1, fragrant = 1, wrinkled = 1, grassy = 1 },
     cutted_orchidbush = { hardy = 1, pasty = 1, fragrant = 1, wrinkled = 1, grassy = 1 },
@@ -740,9 +753,9 @@ local fishhoming_ingredients = {
     spore_medium =      { dusty = 1, shiny = 1 },
     spore_tall =        { dusty = 1, shiny = 1 },
     meat =              { pasty = 1, meat = 1, bloody = 1 }, --岩石大白鲨
-    monstermeat =       { pasty = 1, meat = 1, monster = 1, bloody = 1 },
-    dish_duriantartare ={ pasty = 1, meat = 2, monster = 2, bloody = 2 },
-    monstertartare =    { pasty = 1, meat = 2, monster = 2, bloody = 2 },
+    monstermeat =       { pasty = 1, meat = 1, monster = 2, bloody = 1 },
+    dish_duriantartare ={ pasty = 1, meat = 2, monster = 4, bloody = 2 },
+    monstertartare =    { pasty = 1, meat = 2, monster = 4, bloody = 2 },
     houndstooth =       { hardy = 1, dusty = 1, bloody = 1 },
     compost =           { pasty = 1, veggie = 1, rotten = 1 }, --龙虾
     fertilizer =        { pasty = 1, hardy = 1, rotten = 1 },
@@ -752,6 +765,7 @@ local fishhoming_ingredients = {
     spoiled_fish_small ={ pasty = 5, hardy = 5, rotten = 5 },
     poop =              { pasty = 1, dusty = 1, veggie = 1, rotten = 1 },
     guano =             { pasty = 1, rotten = 1 },
+    rottenegg =         { pasty = 1, hardy = 1, rotten = 1, slippery = 1 },
     razor =             { hardy = 6, rusty = 6 }, --月光龙虾
     moonglass =         { hardy = 1, dusty = 1, rusty = 1 },
     mutator_moon =      { pasty = 1, dusty = 1, rusty = 1 },
@@ -788,6 +802,19 @@ local fishhoming_ingredients = {
     twigs =             { pasty = 1, dusty = 1, hardy = 1, veggie = 1 },
     cutgrass =          { pasty = 1, dusty = 1, hardy = 1, veggie = 1 },
     cutreeds =          { pasty = 1, hardy = 1, veggie = 1 },
+    hambat =            { hardy = 6, pasty = 6, meat = 2 },
+    feather_crow =      { hardy = 1, pasty = 1, dusty = 1 },
+    feather_robin =     { hardy = 1, pasty = 1, dusty = 1, hot = 1 },
+    feather_robin_winter={hardy = 1, pasty = 1, dusty = 1, frozen = 1 },
+    feather_canary =    { hardy = 1, pasty = 1, dusty = 1, shiny = 1 },
+    furtuft =           { pasty = 1, dusty = 1 },
+    phlegm =            { pasty = 1, slippery = 1, sticky = 1 },
+    slurtleslime =      { pasty = 1, slippery = 1, sticky = 1 },
+    twiggy_nut =        { hardy = 1, dusty = 1, veggie = 1 },
+    acorn =             { hardy = 1, pasty = 1, dusty = 1, veggie = 1 },
+    pinecone =          { hardy = 1, dusty = 1, veggie = 1 },
+    log =               { hardy = 1, dusty = 1, veggie = 1 },
+    petals_evil =       { pasty = 1, veggie = 1, monster = 2 },
 }
 for name,data in pairs(fishhoming_ingredients) do
     _G.FISHHOMING_INGREDIENTS_L[name] = data
@@ -807,6 +834,15 @@ end
 --------------------------------------------------------------------------
 
 if IsServer then
+    local function DropItem(inst, item)
+        if item.components.inventoryitem ~= nil then
+            item.components.inventoryitem:DoDropPhysics(inst.Transform:GetWorldPosition())
+        elseif item.Physics ~= nil then
+            item.Physics:Teleport(inst.Transform:GetWorldPosition())
+        else
+            item.Transform:SetPosition(inst.Transform:GetWorldPosition())
+        end
+    end
     AddComponentPostInit("bundler", function(self)
         local OnFinishBundling_old = self.OnFinishBundling
         self.OnFinishBundling = function(self, ...)
@@ -816,7 +852,18 @@ if IsServer then
                 self.bundlinginst.components.container ~= nil and
                 not self.bundlinginst.components.container:IsEmpty()
             then
-                local wrapped = SpawnPrefab(self.wrappedprefab, self.wrappedskinname)
+                if self.itemprefab == "fishhomingtool_awesome" then --专业制作器是无限使用的
+                    local item = SpawnPrefab(self.itemprefab, self.itemskinname, nil, self.inst.userid)
+                    if item ~= nil then
+                        if self.inst.components.inventory ~= nil then
+                            self.inst.components.inventory:GiveItem(item, nil, self.inst:GetPosition())
+                        else
+                            DropItem(self.inst, item)
+                        end
+                    end
+                end
+
+                local wrapped = SpawnPrefab(self.wrappedprefab, self.wrappedskinname, nil, self.inst.userid)
                 if wrapped ~= nil then
                     if wrapped.components.fishhomingbait ~= nil then
                         wrapped.components.fishhomingbait:Make(self.bundlinginst.components.container, self.inst)
@@ -829,13 +876,7 @@ if IsServer then
                         if self.inst.components.inventory ~= nil then
                             self.inst.components.inventory:GiveItem(wrapped, nil, self.inst:GetPosition())
                         else
-                            if wrapped.components.inventoryitem ~= nil then
-                                wrapped.components.inventoryitem:DoDropPhysics(self.inst.Transform:GetWorldPosition())
-                            elseif wrapped.Physics ~= nil then
-                                wrapped.Physics:Teleport(self.inst.Transform:GetWorldPosition())
-                            else
-                                wrapped.Transform:SetPosition(self.inst.Transform:GetWorldPosition())
-                            end
+                            DropItem(self.inst, wrapped)
                         end
                         return
                     else

@@ -126,6 +126,11 @@ local InventoryPrefabsList = {  --每个元素的下标值为每种物品栏图�
     pineananas_oversized_rotten = { build = "images_minisign6", },
     explodingfruitcake = { build = "images_minisign6", },
     mat_whitewood_item = { build = "images_minisign6", },
+    fishhomingtool_normal = { build = "images_minisign6", },
+    fishhomingtool_awesome = { build = "images_minisign6", },
+    fishhomingbait1 = { build = "images_minisign6", },
+    fishhomingbait2 = { build = "images_minisign6", },
+    fishhomingbait3 = { build = "images_minisign6", },
 
     --skins
     hat_lichen_emo_que = { build = "images_minisign_skins", },

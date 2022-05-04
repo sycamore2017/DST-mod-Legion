@@ -73,10 +73,13 @@ local function AddSpecialLoot(inst)
         "soul_contracts_blueprint",
         "explodingfruitcake_blueprint"
     }
-    -- inst.components.lootdropper:AddChanceLoot(drops[math.random(#drops)], 1)
+    if CONFIGS_LEGION.LEGENDOFFALL then
+        table.insert(drops, "fishhomingtool_awesome_blueprint")
+        inst.components.lootdropper:AddChanceLoot(table.remove(drops, math.random(#drops)), 1)
+    end
     inst.components.lootdropper:AddChanceLoot(table.remove(drops, math.random(#drops)), 1)
     inst.components.lootdropper:AddChanceLoot(table.remove(drops, math.random(#drops)), 1)
-    -- inst.components.lootdropper:AddChanceLoot(math.random() < .33 and "mushroom_light2_blueprint" or "mushroom_light_blueprint", 1)
+    inst.components.lootdropper:AddChanceLoot(table.remove(drops, math.random(#drops)), 1)
 end
 
 local function OverrideSymbols(inst, isirritated)   --修改一系列贴图等

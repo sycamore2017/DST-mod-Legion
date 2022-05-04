@@ -551,9 +551,6 @@ MakeBush({
         inst.components.pickable.ontransplantfn = function(inst)
             inst.components.pickable:MakeEmpty()    --直接进入生长状态
         end
-        inst.components.pickable.getregentimefn = function(inst)
-            return getregentimefn(inst, TUNING.TOTAL_DAY_TIME * 3)
-        end
         inst.components.pickable.max_cycles = TUNING.BERRYBUSH_CYCLES + math.random(2)
         inst.components.pickable.cycles_left = inst.components.pickable.max_cycles
         inst.components.pickable.onpickedfn = function(inst, picker)

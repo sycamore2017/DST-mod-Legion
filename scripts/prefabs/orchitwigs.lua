@@ -55,7 +55,7 @@ local function onattack(inst, owner, target)
             if ent ~= target and ent ~= owner and owner.components.combat:IsValidTarget(ent) and
                 (owner.components.leader ~= nil and not owner.components.leader:IsFollower(ent)) then
                     owner:PushEvent("onareaattackother", { target = ent, weapon = inst, stimuli = nil })
-                    ent.components.combat:GetAttacked(owner, TUNING.MULTITOOL_DAMAGE, inst, nil) --34x0.9=30.6
+                    ent.components.combat:GetAttacked(owner, 30.6, inst, nil)
             end
         end
     end
@@ -101,7 +101,7 @@ local function fn()
     inst.components.equippable:SetOnUnequip( OnUnequip )
 
     inst:AddComponent("weapon") --增加武器组件 有了这个才可以打人
-    inst.components.weapon:SetDamage(TUNING.MULTITOOL_DAMAGE) --设置伤害，如果为0会吸引不了仇恨、不触发被攻击动画
+    inst.components.weapon:SetDamage(30.6) --设置伤害，如果为0会吸引不了仇恨、不触发被攻击动画
     inst.components.weapon:SetOnAttack(onattack)
 
     inst:AddComponent("perishable") --会腐烂
