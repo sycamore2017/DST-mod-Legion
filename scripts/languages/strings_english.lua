@@ -3073,7 +3073,7 @@ S______GENERIC.DESCRIBE.THEEMPERORSPENDANT = "A determined man don't believe thi
 -- S_________WURT.DESCRIBE.THEEMPERORSPENDANT = ""
 -- S_______WALTER.DESCRIBE.THEEMPERORSPENDANT = ""
 
-S_NAMES.MAT_WHITEWOOD_ITEM = "Unplaced White Wood Mat" --未放置的白木地垫
+S_NAMES.MAT_WHITEWOOD_ITEM = "White Wood Mat" --白木地垫
 S_RECIPE_DESC.MAT_WHITEWOOD_ITEM = "Give your feet a woody feel."
 S______GENERIC.DESCRIBE.MAT_WHITEWOOD_ITEM = "White wood chips for decorating the ground."
 -- S_______WILLOW.DESCRIBE.MAT_WHITEWOOD_ITEM = ""
@@ -3082,7 +3082,7 @@ S______GENERIC.DESCRIBE.MAT_WHITEWOOD_ITEM = "White wood chips for decorating th
 -- S_________WX78.DESCRIBE.MAT_WHITEWOOD_ITEM = ""
 -- S_WICKERBOTTOM.DESCRIBE.MAT_WHITEWOOD_ITEM = ""
 -- S_______WOODIE.DESCRIBE.MAT_WHITEWOOD_ITEM = ""
--- S______WAXWELL.DESCRIBE.MAT_WHITEWOOD_ITEM = ""
+S______WAXWELL.DESCRIBE.MAT_WHITEWOOD_ITEM = "A layer of cushion makes me feel more down-to-earth."
 -- S___WATHGRITHR.DESCRIBE.MAT_WHITEWOOD_ITEM = ""
 -- S_______WEBBER.DESCRIBE.MAT_WHITEWOOD_ITEM = ""
 -- S_______WINONA.DESCRIBE.MAT_WHITEWOOD_ITEM = ""
@@ -3092,25 +3092,6 @@ S______GENERIC.DESCRIBE.MAT_WHITEWOOD_ITEM = "White wood chips for decorating th
 -- S_________WURT.DESCRIBE.MAT_WHITEWOOD_ITEM = ""
 -- S_______WALTER.DESCRIBE.MAT_WHITEWOOD_ITEM = ""
 -- S________WANDA.DESCRIBE.MAT_WHITEWOOD_ITEM = ""
-
-S_NAMES.MAT_WHITEWOOD = "White Wood Mat" --白木地垫
-S______GENERIC.DESCRIBE.MAT_WHITEWOOD = "A layer of cushion makes me feel more down-to-earth."
--- S_______WILLOW.DESCRIBE.MAT_WHITEWOOD = ""
--- S_____WOLFGANG.DESCRIBE.MAT_WHITEWOOD = ""
--- S________WENDY.DESCRIBE.MAT_WHITEWOOD = ""
--- S_________WX78.DESCRIBE.MAT_WHITEWOOD = ""
--- S_WICKERBOTTOM.DESCRIBE.MAT_WHITEWOOD = ""
--- S_______WOODIE.DESCRIBE.MAT_WHITEWOOD = ""
--- S______WAXWELL.DESCRIBE.MAT_WHITEWOOD = ""
--- S___WATHGRITHR.DESCRIBE.MAT_WHITEWOOD = ""
--- S_______WEBBER.DESCRIBE.MAT_WHITEWOOD = ""
--- S_______WINONA.DESCRIBE.MAT_WHITEWOOD = ""
--- S_______WORTOX.DESCRIBE.MAT_WHITEWOOD = ""
--- S_____WORMWOOD.DESCRIBE.MAT_WHITEWOOD = ""
--- S________WARLY.DESCRIBE.MAT_WHITEWOOD = ""
--- S_________WURT.DESCRIBE.MAT_WHITEWOOD = ""
--- S_______WALTER.DESCRIBE.MAT_WHITEWOOD = ""
--- S________WANDA.DESCRIBE.MAT_WHITEWOOD = ""
 
 --------------------------------------------------------------------------
 --[[ other ]]--[[ 其他 ]]

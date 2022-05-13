@@ -199,7 +199,13 @@ local function OnAddProjectile(inst)
 end
 
 local function OnEquip(inst, owner)
-    owner.AnimState:OverrideSymbol("swap_object", "fishhomingbait", "swap_object")
+    local type_shape = inst.components.fishhomingbait.type_shape
+    if inst.baitimgs_l[type_shape] ~= nil then
+        owner.AnimState:OverrideSymbol("swap_object", "fishhomingbait", inst.baitimgs_l[type_shape].swap)
+    else
+        owner.AnimState:OverrideSymbol("swap_object", "fishhomingbait", "swap1")
+    end
+
     owner.AnimState:Show("ARM_carry")
     owner.AnimState:Hide("ARM_normal")
 end
@@ -278,9 +284,18 @@ local function Fn_bag()
     end
 
     inst.baitimgs_l = {
-		dusty = { img = "fishhomingbait1", atlas = "images/inventoryimages/fishhomingbait1.xml", anim = "idle1" },
-		pasty = { img = "fishhomingbait2", atlas = "images/inventoryimages/fishhomingbait2.xml", anim = "idle2" },
-		hardy = { img = "fishhomingbait3", atlas = "images/inventoryimages/fishhomingbait3.xml", anim = "idle3" }
+		dusty = {
+            img = "fishhomingbait1", atlas = "images/inventoryimages/fishhomingbait1.xml",
+            anim = "idle1", swap = "swap1"
+        },
+		pasty = {
+            img = "fishhomingbait2", atlas = "images/inventoryimages/fishhomingbait2.xml",
+            anim = "idle2", swap = "swap2"
+        },
+		hardy = {
+            img = "fishhomingbait3", atlas = "images/inventoryimages/fishhomingbait3.xml",
+            anim = "idle3", swap = "swap3"
+        }
 	}
 
     inst:AddComponent("locomotor")
