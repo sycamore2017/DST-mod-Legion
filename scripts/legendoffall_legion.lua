@@ -757,8 +757,9 @@ local fishhoming_ingredients = {
     dish_duriantartare ={ pasty = 1, meat = 2, monster = 4, bloody = 2 },
     monstertartare =    { pasty = 1, meat = 2, monster = 4, bloody = 2 },
     houndstooth =       { hardy = 1, dusty = 1, bloody = 1 },
+    spiderhat =         { pasty = 6, dusty = 6, bloody = 6, monster = 6 },
     compost =           { pasty = 1, veggie = 1, rotten = 1 }, --龙虾
-    fertilizer =        { pasty = 1, hardy = 1, rotten = 1 },
+    fertilizer =        { pasty = 6, hardy = 6, rotten = 6 },
     slingshotammo_poop ={ hardy = 1, rotten = 1 },
     compostwrap =       { pasty = 1, dusty = 1, hardy = 1, rotten = 1 },
     spoiled_fish =      { pasty = 6, hardy = 6, rotten = 6 },
@@ -796,7 +797,8 @@ local fishhoming_ingredients = {
     ash =               { dusty = 1 },
     icehat =            { pasty = 6 },
     spoiled_food =      { pasty = 1, dusty = 1, hardy = 1 },
-    silk =              { pasty = 1, dusty = 1, monster = 1 },
+    silk =              { pasty = 1, dusty = 1 },
+    spidergland =       { pasty = 1, monster = 1 },
     beefalowool =       { pasty = 1, dusty = 1, meat = 1 },
     flint =             { hardy = 1, dusty = 1 },
     twigs =             { pasty = 1, dusty = 1, hardy = 1, veggie = 1 },
@@ -815,11 +817,18 @@ local fishhoming_ingredients = {
     pinecone =          { hardy = 1, dusty = 1, veggie = 1 },
     log =               { hardy = 1, dusty = 1, veggie = 1 },
     petals_evil =       { pasty = 1, veggie = 1, monster = 2 },
+    siving_rocks =      { hardy = 1, pasty = 1, dusty = 1 },
+    --圣诞小玩意
 }
 for name,data in pairs(fishhoming_ingredients) do
     _G.FISHHOMING_INGREDIENTS_L[name] = data
 end
 fishhoming_ingredients = nil
+
+--冬季盛宴小食物
+for k = 1, _G.NUM_WINTERFOOD do
+    _G.FISHHOMING_INGREDIENTS_L["winter_food"..tostring(k)] = { hardy = 1, pasty = 1, dusty = 1 }
+end
 
 --爆米花鱼、玉米鳕鱼
 for k = 1, _G.NUM_TRINKETS do
@@ -853,7 +862,7 @@ if IsServer then
                 not self.bundlinginst.components.container:IsEmpty()
             then
                 if self.itemprefab == "fishhomingtool_awesome" then --专业制作器是无限使用的
-                    local item = SpawnPrefab(self.itemprefab, self.itemskinname, nil, self.inst.userid)
+                    local item = SpawnPrefab(self.itemprefab, self.itemskinname)
                     if item ~= nil then
                         if self.inst.components.inventory ~= nil then
                             self.inst.components.inventory:GiveItem(item, nil, self.inst:GetPosition())
@@ -863,7 +872,7 @@ if IsServer then
                     end
                 end
 
-                local wrapped = SpawnPrefab(self.wrappedprefab, self.wrappedskinname, nil, self.inst.userid)
+                local wrapped = SpawnPrefab(self.wrappedprefab, self.wrappedskinname)
                 if wrapped ~= nil then
                     if wrapped.components.fishhomingbait ~= nil then
                         wrapped.components.fishhomingbait:Make(self.bundlinginst.components.container, self.inst)

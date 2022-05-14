@@ -55,7 +55,7 @@ _G.SKIN_PREFABS_LEGION = {
 
     rosebush = {
         assets = nil,
-        fn_anim = function(inst)
+        fn_start = function(inst)
             inst.AnimState:SetBank("berrybush2")
             inst.AnimState:SetBuild("rosebush")
         end,
@@ -63,7 +63,7 @@ _G.SKIN_PREFABS_LEGION = {
     },
     lilybush = {
         assets = nil,
-        fn_anim = function(inst)
+        fn_start = function(inst)
             inst.AnimState:SetBank("berrybush2")
             inst.AnimState:SetBuild("lilybush")
         end,
@@ -71,7 +71,7 @@ _G.SKIN_PREFABS_LEGION = {
     },
     orchidbush = {
         assets = nil,
-        fn_anim = function(inst)
+        fn_start = function(inst)
             inst.AnimState:SetBank("berrybush2")
             inst.AnimState:SetBuild("orchidbush")
         end,
@@ -80,7 +80,7 @@ _G.SKIN_PREFABS_LEGION = {
 
     orchitwigs = {
         assets = nil,
-        image = { name = nil, atlas = nil, setable = false, },
+        image = { name = nil, atlas = nil, setable = true, },
         anim = {
             bank = nil, build = nil,
             anim = nil, isloop_anim = nil, animpush = nil, isloop_animpush = nil,
@@ -124,7 +124,7 @@ _G.SKIN_PREFABS_LEGION = {
     },
     neverfadebush = {
         assets = nil,
-        fn_anim = function(inst)
+        fn_start = function(inst)
             inst.AnimState:SetBank("berrybush2")
             inst.AnimState:SetBuild("neverfadebush")
         end,
@@ -175,6 +175,59 @@ _G.SKIN_PREFABS_LEGION = {
         floater = {
             cut = 0.09, size = "small", offset_y = 0.2, scale = 0.45, nofx = nil,
         },
+    },
+
+    fishhomingtool_awesome = {
+        assets = nil,
+        image = { name = nil, atlas = nil, setable = true, },
+        anim = {
+            bank = nil, build = nil,
+            anim = nil, isloop_anim = nil, animpush = nil, isloop_animpush = nil,
+            setable = true,
+        },
+        fn_start = function(inst)
+            inst.components.bundlemaker:SetSkinData()
+        end,
+        equip = { symbol = "swap_object", build = "fishhomingtool_awesome", file = "swap" },
+        exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
+    },
+    fishhomingtool_normal = {
+        assets = nil,
+        image = { name = nil, atlas = nil, setable = true, },
+        anim = {
+            bank = nil, build = nil,
+            anim = nil, isloop_anim = nil, animpush = nil, isloop_animpush = nil,
+            setable = true,
+        },
+        fn_start = function(inst)
+            inst.components.bundlemaker:SetSkinData()
+        end,
+        exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
+    },
+    fishhomingbait = {
+        fn_start = function(inst)
+            inst.baitimgs_l = {
+                dusty = {
+                    img = "fishhomingbait1", atlas = "images/inventoryimages/fishhomingbait1.xml",
+                    anim = "idle1", swap = "swap1", symbol = "base1", build = "fishhomingbait"
+                },
+                pasty = {
+                    img = "fishhomingbait2", atlas = "images/inventoryimages/fishhomingbait2.xml",
+                    anim = "idle2", swap = "swap2", symbol = "base2", build = "fishhomingbait"
+                },
+                hardy = {
+                    img = "fishhomingbait3", atlas = "images/inventoryimages/fishhomingbait3.xml",
+                    anim = "idle3", swap = "swap3", symbol = "base3", build = "fishhomingbait"
+                }
+            }
+            inst.AnimState:SetBank("fishhomingbait")
+            inst.AnimState:SetBuild("fishhomingbait")
+            if inst.components.fishhomingbait and inst.components.fishhomingbait.oninitfn then
+                inst.components.fishhomingbait.oninitfn(inst)
+            end
+        end,
+        -- baiting = nil,
+        exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
     },
 }
 
@@ -269,7 +322,7 @@ _G.SKINS_LEGION = {
             description = "The story was not translated.",
         },
 
-		fn_anim = function(inst)
+		fn_start = function(inst)
             --官方代码写得挺好，直接改动画模板居然能继承已有的动画播放和symbol切换状态
             inst.AnimState:SetBank("berrybush")
             inst.AnimState:SetBuild("rosebush_marble")
@@ -300,7 +353,7 @@ _G.SKINS_LEGION = {
             description = "The story was not translated.",
         },
 
-		fn_anim = function(inst)
+		fn_start = function(inst)
             inst.AnimState:SetBank("berrybush")
             inst.AnimState:SetBuild("lilybush_marble")
         end,
@@ -330,7 +383,7 @@ _G.SKINS_LEGION = {
             description = "The story was not translated.",
         },
 
-		fn_anim = function(inst)
+		fn_start = function(inst)
             inst.AnimState:SetBank("berrybush")
             inst.AnimState:SetBuild("orchidbush_marble")
         end,
@@ -389,7 +442,7 @@ _G.SKINS_LEGION = {
     },
     orchidbush_disguiser = {
         base_prefab = "orchidbush",
-		type = "item", skin_tags = {}, release_group = 555, rarity = raritySpecial,
+		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
 
         skin_id = "626029b9c340bf24ab31057a",
         onlyownedshow = true,
@@ -408,7 +461,7 @@ _G.SKINS_LEGION = {
             description = "The story was not translated.",
         },
 
-		fn_anim = function(inst)
+		fn_start = function(inst)
             inst.AnimState:SetBank("berrybush2")
             inst.AnimState:SetBuild("orchidbush_disguiser")
         end,
@@ -493,7 +546,7 @@ _G.SKINS_LEGION = {
             name = ischinese and "扶伤剑冢" or "FuShang Tomb", collection = "THANKS", access = "SPECIAL",
         },
 
-		fn_anim = function(inst)
+		fn_start = function(inst)
             inst.AnimState:SetBank("neverfadebush_thanks")
             inst.AnimState:SetBuild("neverfadebush_thanks")
         end,
@@ -632,11 +685,136 @@ _G.SKINS_LEGION = {
             cut = nil, size = "med", offset_y = 0.1, scale = 0.8, nofx = nil,
         },
     },
+
+    fishhomingtool_awesome_thanks = {
+        base_prefab = "fishhomingtool_awesome",
+		type = "item", skin_tags = {}, release_group = 555, rarity = raritySpecial,
+
+        skin_id = "627f66c0c340bf24ab311783",
+        onlyownedshow = true,
+		assets = {
+			Asset("ANIM", "anim/skin/fishhomingtool_awesome_thanks.zip")
+		},
+        image = { name = nil, atlas = nil, setable = true, },
+
+        string = ischinese and {
+            name = "云烟", collection = "THANKS", access = "SPECIAL",
+            descitem = "解锁\"简易打窝饵制作器\"、\"专业打窝饵制作器\"和\"打窝饵\"的皮肤。",
+            description = "\"早闻浮生儿与扶伤剑现任持有者有着密不可分的联系。近日密探来报说扶伤剑已断，预感这次势在必得，并派人在京城散播浮生儿已被捉入衙内的消息...\"当夜丑时，云烟之雾浑浊庭院异响，\"上钩了\"，一名颓郁男子隐匿于烟雾中等待时机。",
+        } or {
+            name = "YunYan", collection = "THANKS", access = "SPECIAL",
+            descitem = "Unlock \"Fish-homing Bait Maker\", \"Fish-homing Bait Maker+\", and \"Fish-homing Bait\" skin.",
+            description = "The story was not translated.",
+        },
+
+        anim = {
+            bank = nil, build = nil,
+            anim = nil, isloop_anim = nil, animpush = nil, isloop_animpush = nil,
+            setable = true,
+        },
+        fn_start = function(inst)
+            inst.components.bundlemaker:SetSkinData("fishhomingbait_thanks", nil)
+        end,
+        equip = { symbol = "swap_object", build = "fishhomingtool_awesome_thanks", file = "swap" },
+        exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
+    },
+    fishhomingtool_normal_thanks = {
+        base_prefab = "fishhomingtool_normal",
+		type = "item", skin_tags = {}, release_group = 555, rarity = raritySpecial,
+
+        skin_id = "627f66c0c340bf24ab311783",
+        noshopshow = true,
+		assets = {
+			Asset("ANIM", "anim/skin/fishhomingtool_normal_thanks.zip")
+		},
+        image = { name = nil, atlas = nil, setable = true, },
+
+        string = {
+            name = ischinese and "云烟草" or "YunYan Cigarette", collection = "THANKS", access = "SPECIAL",
+        },
+
+        anim = {
+            bank = nil, build = nil,
+            anim = nil, isloop_anim = nil, animpush = nil, isloop_animpush = nil,
+            setable = true,
+        },
+        fn_start = function(inst)
+            inst.components.bundlemaker:SetSkinData("fishhomingbait_thanks", nil)
+        end,
+        exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
+    },
+    fishhomingbait_thanks = {
+        base_prefab = "fishhomingbait",
+		type = "item", skin_tags = {}, release_group = 555, rarity = raritySpecial,
+
+        skin_id = "627f66c0c340bf24ab311783",
+        noshopshow = true,
+		assets = {
+            Asset("ANIM", "anim/pollen_chum.zip"), --官方藤壶花粉动画
+			Asset("ANIM", "anim/skin/fishhomingbait_thanks.zip"),
+            Asset("ATLAS", "images/inventoryimages_skin/fishhomingbait1_thanks.xml"),
+            Asset("IMAGE", "images/inventoryimages_skin/fishhomingbait1_thanks.tex"),
+            Asset("ATLAS", "images/inventoryimages_skin/fishhomingbait2_thanks.xml"),
+            Asset("IMAGE", "images/inventoryimages_skin/fishhomingbait2_thanks.tex"),
+            Asset("ATLAS", "images/inventoryimages_skin/fishhomingbait3_thanks.xml"),
+            Asset("IMAGE", "images/inventoryimages_skin/fishhomingbait3_thanks.tex"),
+		},
+        image = { name = nil, atlas = nil, setable = false }, --皮肤展示需要一个同prefab名的图片
+
+        string = {
+            name = ischinese and "云烟瓶" or "YunYan Bottle", collection = "THANKS", access = "SPECIAL",
+        },
+
+        fn_start = function(inst)
+            inst.baitimgs_l = {
+                dusty = {
+                    img = "fishhomingbait1_thanks", atlas = "images/inventoryimages_skin/fishhomingbait1_thanks.xml",
+                    anim = "idle1", swap = "swap1", symbol = "base1", build = "fishhomingbait_thanks"
+                },
+                pasty = {
+                    img = "fishhomingbait2_thanks", atlas = "images/inventoryimages_skin/fishhomingbait2_thanks.xml",
+                    anim = "idle2", swap = "swap2", symbol = "base2", build = "fishhomingbait_thanks"
+                },
+                hardy = {
+                    img = "fishhomingbait3_thanks", atlas = "images/inventoryimages_skin/fishhomingbait3_thanks.xml",
+                    anim = "idle3", swap = "swap3", symbol = "base3", build = "fishhomingbait_thanks"
+                }
+            }
+            inst.AnimState:SetBank("fishhomingbait_thanks")
+            inst.AnimState:SetBuild("fishhomingbait_thanks")
+            if inst.components.fishhomingbait and inst.components.fishhomingbait.oninitfn then
+                inst.components.fishhomingbait.oninitfn(inst)
+            end
+        end,
+        baiting = { bank = "pollen_chum", build = "pollen_chum" },
+        exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
+    },
 }
 
 _G.SKIN_IDS_LEGION = {
     ["freeskins"] = {}, --免费皮肤全部装这里面，skin_id设置为"freeskins"就好了
-    -- ["61627d927bbb727be174c4a0"] = { rosorns_spell = true, },
+    ["6278c409c340bf24ab311522"] = { --余生(8)
+        neverfade_thanks = true, neverfadebush_thanks = true,
+        fishhomingtool_awesome_thanks = true, fishhomingtool_normal_thanks = true, fishhomingbait_thanks = true,
+        orchidbush_disguiser = true, boltwingout_disguiser = true,
+        rosebush_marble = true, lilybush_marble = true, orchidbush_marble = true,
+        hat_lichen_emo_que = true,
+    },
+    ["6278c450c340bf24ab311528"] = { --回忆(5)
+        boltwingout_disguiser = true,
+        rosebush_marble = true, lilybush_marble = true, orchidbush_marble = true,
+        hat_lichen_emo_que = true,
+    },
+    ["6278c487c340bf24ab31152c"] = { --1鸣惊人(6)
+        neverfade_thanks = true, neverfadebush_thanks = true,
+        boltwingout_disguiser = true,
+        rosebush_marble = true, lilybush_marble = true, orchidbush_marble = true,
+        hat_lichen_emo_que = true,
+    },
+    ["6278c4acc340bf24ab311530"] = { --2度梅开(2)
+        orchidbush_disguiser = true,
+        fishhomingtool_awesome_thanks = true, fishhomingtool_normal_thanks = true, fishhomingbait_thanks = true,
+    },
 }
 _G.SKIN_IDX_LEGION = {
     -- [1] = "rosorns_spell",
@@ -717,6 +895,7 @@ end
 
 local skinidxes = { --用以皮肤排序
     "neverfade_thanks", "neverfadebush_thanks",
+    "fishhomingtool_awesome_thanks", "fishhomingtool_normal_thanks", "fishhomingbait_thanks",
     "hat_cowboy_tvplay",
     "orchitwigs_disguiser", "orchidbush_disguiser", "hat_lichen_disguiser", "boltwingout_disguiser",
     "rosebush_marble", "lilybush_marble", "orchidbush_marble",
@@ -1241,11 +1420,11 @@ if IsServer then
     local SpawnPrefab_old = _G.SpawnPrefab
     _G.SpawnPrefab = function(name, skin, skin_id, creator)
         --【服务端】环境
-        if skin ~= nil and creator ~= nil and SKINS_LEGION[skin] ~= nil then
+        if skin ~= nil and SKINS_LEGION[skin] ~= nil then
             local prefab = SpawnPrefab_old(name, nil, nil, creator)
             if prefab ~= nil then
                 if prefab.components.skinedlegion ~= nil then
-                    if DoYouHaveSkin(skin, creator) then
+                    if creator == nil or DoYouHaveSkin(skin, creator) then
                         prefab.components.skinedlegion:SetSkin(skin)
                     end
                 end

@@ -1347,6 +1347,49 @@ local dressup_data = {
         end,
         unbuildfn = function(dressup, item) end, --没啥好恢复的
     },
+    fishhomingtool_awesome = {
+        isnoskin = true,
+        dressslot = EQUIPSLOTS.HANDS,
+        buildfn = function(dressup, item, buildskin)
+            local itemswap = {}
+
+            local skindata = item.components.skinedlegion:GetSkinedData()
+            if skindata ~= nil and skindata.equip ~= nil then
+                itemswap["swap_object"] = dressup:GetDressData(
+                    nil, skindata.equip.build, skindata.equip.file, item.GUID, "swap"
+                )
+            else
+                itemswap["swap_object"] = dressup:GetDressData(
+                    nil, "fishhomingtool_awesome", "swap", item.GUID, "swap"
+                )
+            end
+            itemswap["whipline"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
+            itemswap["lantern_overlay"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
+
+            return itemswap
+        end,
+    },
+    fishhomingbait = {
+        isnoskin = true,
+        buildfn = function(dressup, item, buildskin)
+            local itemswap = {}
+
+            local data = item.baitimgs_l[item.components.fishhomingbait.type_shape]
+            if data ~= nil then
+                itemswap["swap_object"] = dressup:GetDressData(
+                    nil, data.build, data.swap, item.GUID, "swap"
+                )
+            else
+                itemswap["swap_object"] = dressup:GetDressData(
+                    nil, "fishhomingbait", "swap1", item.GUID, "swap"
+                )
+            end
+            itemswap["whipline"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
+            itemswap["lantern_overlay"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
+
+            return itemswap
+        end,
+    },
 }
 
 if not _G.rawget(_G, "DRESSUP_DATA_LEGION") then

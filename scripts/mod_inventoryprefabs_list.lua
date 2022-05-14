@@ -142,6 +142,11 @@ local InventoryPrefabsList = {  --每个元素的下标值为每种物品栏图�
     hat_lichen_disguiser = { build = "images_minisign_skins", },
     orchitwigs_disguiser = { build = "images_minisign_skins", },
     foliageath_orchitwigs_disguiser = { build = "images_minisign_skins", },
+    fishhomingtool_normal_thanks = { build = "images_minisign_skins", },
+    fishhomingtool_awesome_thanks = { build = "images_minisign_skins", },
+    fishhomingbait1_thanks = { build = "images_minisign_skins", },
+    fishhomingbait2_thanks = { build = "images_minisign_skins", },
+    fishhomingbait3_thanks = { build = "images_minisign_skins", },
 }
 
 return InventoryPrefabsList
