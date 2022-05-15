@@ -18,7 +18,7 @@ local InventoryPrefabsList = {  --每个元素的下标值为每种物品栏图�
     cutted_lilybush = { build = "images_minisign1", },
     -- portablecookpot_item = { build = "images_minisign1", },
     hat_cowboy = { build = "images_minisign1", },
-    desertdefense = { build = "images_minisign1", },
+    -- desertdefense = { build = "images_minisign1", },
     hat_lichen = { build = "images_minisign1", },
     agronssword = { build = "images_minisign1", },
     --20
@@ -131,6 +131,8 @@ local InventoryPrefabsList = {  --每个元素的下标值为每种物品栏图�
     fishhomingbait1 = { build = "images_minisign6", },
     fishhomingbait2 = { build = "images_minisign6", },
     fishhomingbait3 = { build = "images_minisign6", },
+    triplegoldenshovelaxe = { build = "images_minisign6", },
+    desertdefense = { build = "images_minisign6", },
 
     --skins
     hat_lichen_emo_que = { build = "images_minisign_skins", },
@@ -147,6 +149,11 @@ local InventoryPrefabsList = {  --每个元素的下标值为每种物品栏图�
     fishhomingbait1_thanks = { build = "images_minisign_skins", },
     fishhomingbait2_thanks = { build = "images_minisign_skins", },
     fishhomingbait3_thanks = { build = "images_minisign_skins", },
+    icire_rock1_era = { build = "images_minisign_skins", },
+    icire_rock2_era = { build = "images_minisign_skins", },
+    icire_rock3_era = { build = "images_minisign_skins", },
+    icire_rock4_era = { build = "images_minisign_skins", },
+    icire_rock5_era = { build = "images_minisign_skins", },
 }
 
 return InventoryPrefabsList

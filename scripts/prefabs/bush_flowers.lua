@@ -178,7 +178,7 @@ local function getregentimefn(inst, time)
     local num_cycles_passed = math.max(0, max_cycles - cycles_left)
     return time
         + TUNING.BERRY_REGROW_INCREASE * num_cycles_passed
-        + TUNING.BERRY_REGROW_VARIANCE * math.random()
+        + TUNING.TOTAL_DAY_TIME * math.random()
 end
 
 local function SpawnMyLoot(bush, picker, itemname, itemnumber, mustdrop, checkskin)

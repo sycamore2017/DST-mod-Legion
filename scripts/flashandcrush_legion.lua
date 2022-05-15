@@ -10,7 +10,7 @@ local prefabFiles = {
     "guitar_miguel",            --米格尔的吉他
     "the_gifted",               --重铸科技，针对每个角色的独有制作物
     "saddle_baggage",           --驮物牛鞍
-    "tripleshovelaxe",          --铲斧-三用型
+    "tripleshovelaxes",          --铲斧-三用型
     "hat_albicans_mushroom",    --素白蘑菇帽
     "albicansmushroomhat_fx",   --素白蘑菇帽相关fx
     "explodingfruitcake",       --爆炸水果蛋糕
@@ -31,6 +31,8 @@ local assets = {
 
     Asset("ATLAS", "images/inventoryimages/tripleshovelaxe.xml"), --预加载，给科技栏用的
     Asset("IMAGE", "images/inventoryimages/tripleshovelaxe.tex"),
+    Asset("ATLAS", "images/inventoryimages/triplegoldenshovelaxe.xml"),
+    Asset("IMAGE", "images/inventoryimages/triplegoldenshovelaxe.tex"),
     Asset("ATLAS", "images/inventoryimages/dualwrench.xml"),
     Asset("IMAGE", "images/inventoryimages/dualwrench.tex"),
     Asset("ATLAS", "images/inventoryimages/icire_rock.xml"),
@@ -79,7 +81,6 @@ if TUNING.LEGION_TECHUNLOCK == "lootdropper" then
             atlas = "images/inventoryimages/tripleshovelaxe.xml", image = "tripleshovelaxe.tex"
         }, { "RECAST", "TOOLS" }
     )
-
     AddRecipe2(
         "dualwrench", {
             Ingredient("hammer", 1),
@@ -89,7 +90,6 @@ if TUNING.LEGION_TECHUNLOCK == "lootdropper" then
             atlas = "images/inventoryimages/dualwrench.xml", image = "dualwrench.tex"
         }, { "RECAST", "TOOLS" }
     )
-
     AddRecipe2(
         "icire_rock", {
             Ingredient("amulet", 1),
@@ -99,7 +99,6 @@ if TUNING.LEGION_TECHUNLOCK == "lootdropper" then
             atlas = "images/inventoryimages/icire_rock.xml", image = "icire_rock.tex"
         }, { "RECAST", "WINTER", "SUMMER" }
     )
-
     AddRecipe2(
         "explodingfruitcake", {
             Ingredient("winter_food4", 1),
@@ -108,7 +107,6 @@ if TUNING.LEGION_TECHUNLOCK == "lootdropper" then
             atlas = "images/inventoryimages/explodingfruitcake.xml", image = "explodingfruitcake.tex"
         }, { "RECAST", "WEAPONS" }
     )
-
     if CONFIGS_LEGION.LEGENDOFFALL then
         AddRecipe2(
             "fishhomingtool_awesome", {
@@ -121,6 +119,15 @@ if TUNING.LEGION_TECHUNLOCK == "lootdropper" then
     end
 
     AddRecipe2(
+        "triplegoldenshovelaxe", {
+            Ingredient("goldenaxe", 2),
+            Ingredient("goldenpickaxe", 2),
+            Ingredient("goldenshovel", 2),
+        }, TECH.LOST, {
+            atlas = "images/inventoryimages/triplegoldenshovelaxe.xml", image = "triplegoldenshovelaxe.tex"
+        }, { "RECAST", "TOOLS" }
+    )
+    AddRecipe2(
         "hat_cowboy", {
             Ingredient("beefalohat", 1),
             Ingredient("rainhat", 1),
@@ -129,7 +136,6 @@ if TUNING.LEGION_TECHUNLOCK == "lootdropper" then
             atlas = "images/inventoryimages/hat_cowboy.xml", image = "hat_cowboy.tex"
         }, { "RECAST", "RAIN", "SUMMER", "RIDING", "CLOTHING" }
     )
-
     AddRecipe2(
         "guitar_miguel", {
             Ingredient("panflute", 1),
@@ -138,7 +144,6 @@ if TUNING.LEGION_TECHUNLOCK == "lootdropper" then
             atlas = "images/inventoryimages/guitar_miguel.xml", image = "guitar_miguel.tex"
         }, { "RECAST", "GARDENING", "MAGIC" }
     )
-
     AddRecipe2(
         "web_hump_item", {
             Ingredient("monstermeat_dried", 12),
@@ -148,7 +153,6 @@ if TUNING.LEGION_TECHUNLOCK == "lootdropper" then
             atlas = "images/inventoryimages/web_hump_item.xml", image = "web_hump_item.tex"
         }, { "RECAST", "STRUCTURES", "DECOR" }
     )
-
     AddRecipe2(
         "saddle_baggage", {
             Ingredient("bedroll_straw", 1),
@@ -158,7 +162,6 @@ if TUNING.LEGION_TECHUNLOCK == "lootdropper" then
             atlas = "images/inventoryimages/saddle_baggage.xml", image = "saddle_baggage.tex"
         }, { "RECAST", "RIDING", "COOKING", "CONTAINERS" }
     )
-
     AddRecipe2(
         "hat_albicans_mushroom", {
             Ingredient("red_mushroomhat", 1),
@@ -168,7 +171,6 @@ if TUNING.LEGION_TECHUNLOCK == "lootdropper" then
             atlas = "images/inventoryimages/hat_albicans_mushroom.xml", image = "hat_albicans_mushroom.tex"
         }, { "RECAST", "CLOTHING", "SUMMER", "GARDENING", "RAIN" }
     )
-
     AddRecipe2(
         "soul_contracts", {
             Ingredient("wortox_soul", 20),
@@ -189,7 +191,6 @@ else
             atlas = "images/inventoryimages/tripleshovelaxe.xml", image = "tripleshovelaxe.tex"
         }, { "RECAST", "TOOLS" }
     )
-
     AddRecipe2(
         "dualwrench", {
             Ingredient("hammer", 1),
@@ -200,7 +201,6 @@ else
             atlas = "images/inventoryimages/dualwrench.xml", image = "dualwrench.tex"
         }, { "RECAST", "TOOLS" }
     )
-
     AddRecipe2(
         "icire_rock", {
             Ingredient("amulet", 1),
@@ -211,7 +211,6 @@ else
             atlas = "images/inventoryimages/icire_rock.xml", image = "icire_rock.tex"
         }, { "RECAST", "WINTER", "SUMMER" }
     )
-
     AddRecipe2(
         "explodingfruitcake", {
             Ingredient("winter_food4", 1),
@@ -221,7 +220,6 @@ else
             atlas = "images/inventoryimages/explodingfruitcake.xml", image = "explodingfruitcake.tex"
         }, { "RECAST", "WEAPONS" }
     )
-
     if CONFIGS_LEGION.LEGENDOFFALL then
         AddRecipe2(
             "fishhomingtool_awesome", {
@@ -235,6 +233,16 @@ else
     end
 
     AddRecipe2(
+        "triplegoldenshovelaxe", {
+            Ingredient("goldenaxe", 2),
+            Ingredient("goldenpickaxe", 2),
+            Ingredient("goldenshovel", 2),
+        }, TECH.ELECOURMALINE_THREE, {
+            nounlock = true,
+            atlas = "images/inventoryimages/triplegoldenshovelaxe.xml", image = "triplegoldenshovelaxe.tex"
+        }, { "RECAST", "TOOLS" }
+    )
+    AddRecipe2(
         "hat_cowboy", {
             Ingredient("beefalohat", 1),
             Ingredient("rainhat", 1),
@@ -244,7 +252,6 @@ else
             atlas = "images/inventoryimages/hat_cowboy.xml", image = "hat_cowboy.tex"
         }, { "RECAST", "RAIN", "SUMMER", "RIDING", "CLOTHING" }
     )
-
     AddRecipe2(
         "guitar_miguel", {
             Ingredient("panflute", 1),
@@ -254,7 +261,6 @@ else
             atlas = "images/inventoryimages/guitar_miguel.xml", image = "guitar_miguel.tex"
         }, { "RECAST", "GARDENING", "MAGIC" }
     )
-
     AddRecipe2(
         "web_hump_item", {
             Ingredient("monstermeat_dried", 12),
@@ -265,7 +271,6 @@ else
             atlas = "images/inventoryimages/web_hump_item.xml", image = "web_hump_item.tex"
         }, { "RECAST", "STRUCTURES", "DECOR", "CHARACTER" }
     )
-
     AddRecipe2(
         "saddle_baggage", {
             Ingredient("bedroll_straw", 1),
@@ -276,7 +281,6 @@ else
             atlas = "images/inventoryimages/saddle_baggage.xml", image = "saddle_baggage.tex"
         }, { "RECAST", "RIDING", "COOKING", "CONTAINERS" }
     )
-
     AddRecipe2(
         "hat_albicans_mushroom", {
             Ingredient("red_mushroomhat", 1),
@@ -287,7 +291,6 @@ else
             atlas = "images/inventoryimages/hat_albicans_mushroom.xml", image = "hat_albicans_mushroom.tex"
         }, { "RECAST", "CLOTHING", "SUMMER", "GARDENING", "RAIN" }
     )
-
     AddRecipe2(
         "soul_contracts", {
             Ingredient("wortox_soul", 20),

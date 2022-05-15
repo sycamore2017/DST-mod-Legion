@@ -1,14 +1,10 @@
-local assets =
-{
-    Asset("ANIM", "anim/desertdefense.zip"),--这个是放在地上的动画文件
-    Asset("ANIM", "anim/swap_desertdefense.zip"), --这个是手上动画
-    --Asset("ANIM", "anim/swap_desertdefense_combat.zip"), --这个是攻击时的动画
+local assets = {
+    Asset("ANIM", "anim/desertdefense.zip"),
     Asset("ATLAS", "images/inventoryimages/desertdefense.xml"),
     Asset("IMAGE", "images/inventoryimages/desertdefense.tex"),
 }
 
-local prefabs =
-{
+local prefabs = {
     "sandspike_legion",    --对玩家友好的沙之咬
 }
 
@@ -19,12 +15,6 @@ local damage_raining = 17       --34*0.5
 local absorb_sandstorms = 0.8
 local absorb_normal = 0.6
 local absorb_raining = 0.4
-
-local function removespike(sspike)   --删除生成的沙咬
-    if sspike ~= nil and sspike.components.health ~= nil then
-        sspike.components.health:DoDelta(-200)
-    end
-end
 
 local function OnBlocked(owner, data)
     -- owner.SoundEmitter:PlaySound("dontstarve/common/together/teleport_sand/out")    --被攻击时播放像沙的声音
@@ -65,8 +55,8 @@ local function OnBlocked(owner, data)
                 if map:IsVisualGroundAtPoint(xxx, 0, zzz) then --不在水中
                     local sspike = SpawnPrefab("sandspike_legion")
                     if sspike ~= nil then
+                        sspike.iscounterattack = true
                         sspike.Transform:SetPosition(xxx, 0, zzz)
-                        sspike:ListenForEvent("animover", removespike, sspike)
                     end
                 end
             end
@@ -117,7 +107,8 @@ local function onisraining(inst)    --下雨时属性降低
 end
 
 local function OnEquip(inst, owner) --装备武器时
-    owner.AnimState:OverrideSymbol("swap_object", "swap_desertdefense", "swap_desertdefense")
+    owner.AnimState:OverrideSymbol("lantern_overlay", "desertdefense", "swap_shield")
+    owner.AnimState:HideSymbol("swap_object")
 
     --本来是想让这个和书本的攻击一样来低频率高伤害的方式攻击，但是由于会导致读书时也用本武器来显示动画，所以干脆去除了
     --owner.AnimState:OverrideSymbol("book_open", "swap_book_elemental", "book_open")
@@ -126,12 +117,13 @@ local function OnEquip(inst, owner) --装备武器时
 
     owner.AnimState:Show("ARM_carry") --显示持物手
     owner.AnimState:Hide("ARM_normal") --隐藏普通的手
- 
+    owner.AnimState:Show("LANTERN_OVERLAY")
+
     onisraining(inst)   --装备时先更新一次
 
     inst:ListenForEvent("blocked", OnBlocked, owner)
     inst:ListenForEvent("attacked", OnBlocked, owner)
-    
+
     inst:WatchWorldState("israining", onisraining)
     inst:WatchWorldState("issummer", onisraining)
 
@@ -159,6 +151,9 @@ local function OnUnequip(inst, owner)   --放下武器时
 
     owner.AnimState:Hide("ARM_carry") --隐藏持物手
     owner.AnimState:Show("ARM_normal") --显示普通的手
+    owner.AnimState:ClearOverrideSymbol("lantern_overlay")
+    owner.AnimState:Hide("LANTERN_OVERLAY")
+    owner.AnimState:ShowSymbol("swap_object")
 
     inst:RemoveEventCallback("blocked", OnBlocked, owner)
     inst:RemoveEventCallback("attacked", OnBlocked, owner)
@@ -189,20 +184,13 @@ local function fn()
     inst.AnimState:PlayAnimation("idle")--设置实体播放的动画
 
     inst:AddTag("combatredirect")   --代表这个武器会给予伤害对象重定义函数
+    -- inst:AddTag("toolpunch")
 
     --weapon (from weapon component) added to pristine state for optimization
     inst:AddTag("weapon")
 
-    -- MakeInventoryFloatable(inst, "med", 0.1, {1.1, 0.5, 1.1}, true, -9, {
-    --     sym_build = "swap_desertdefense",
-    --     sym_name = "swap_desertdefense",
-    --     bank = "desertdefense",
-    --     anim = "idle"
-    -- })
-
     inst.entity:SetPristine()
-
-    if not TheWorld.ismastersim then 
+    if not TheWorld.ismastersim then
         return inst
     end
 

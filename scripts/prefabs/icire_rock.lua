@@ -16,7 +16,7 @@ local assets =
     Asset("ANIM", "anim/heat_rock.zip"), --官方热能石动画模板
 }
 
-local prefabs = 
+local prefabs =
 {
     "heatrocklight",
 }
@@ -67,13 +67,9 @@ end
 
 local function UpdateImages(inst, range)
     inst.currentTempRange = range
-    local newname = "icire_rock"..tostring(range)
-
     inst.AnimState:PlayAnimation(tostring(range), true)
-    
-    --改变物品栏图片，先改atlasname，再改贴图
-    inst.components.inventoryitem.atlasname = "images/inventoryimages/"..newname..".xml"
-    inst.components.inventoryitem:ChangeImageName(newname)
+
+    inst.changeimgfn(inst)
 
     --最冷与最热都会发光
     if range == 1 then
@@ -165,7 +161,7 @@ local function fn()
     inst.AnimState:OverrideSymbol("rock", "icire_rock", "rock")
     inst.AnimState:OverrideSymbol("shadow", "icire_rock", "shadow")
 
-    inst:AddTag("heatrock") --为了防止和热能石互相导热
+    inst:AddTag("heatrock")
     inst:AddTag("icebox_valid")
     inst:AddTag("bait")
     inst:AddTag("molebait") --吸引鼹鼠
@@ -173,8 +169,10 @@ local function fn()
     --HASHEATER (from heater component) added to pristine state for optimization
     inst:AddTag("HASHEATER")
 
-    inst.entity:SetPristine()
+    inst:AddComponent("skinedlegion")
+    inst.components.skinedlegion:Init("icire_rock")
 
+    inst.entity:SetPristine()
     if not TheWorld.ismastersim then
         return inst
     end
@@ -188,7 +186,7 @@ local function fn()
     inst.components.inventoryitem:SetSinks(true) --它是热能石的浓缩版，应该要沉入水底
 
     inst:AddComponent("tradable")
-    -- inst.components.tradable.rocktribute = 6
+    inst.components.tradable.rocktribute = 10
 
     inst:AddComponent("temperature")
     inst.components.temperature.current = TheWorld.state.temperature
@@ -207,6 +205,12 @@ local function fn()
     -- inst.components.fueled:InitializeFuelLevel(100)
     -- inst.components.fueled:SetDepletedFn(inst.Remove)
 
+    inst.changeimgfn = function(inst)
+        local newname = "icire_rock"..tostring(inst.currentTempRange)
+        inst.components.inventoryitem.atlasname = "images/inventoryimages/"..newname..".xml"
+        inst.components.inventoryitem:ChangeImageName(newname)
+    end
+
     inst:ListenForEvent("temperaturedelta", TemperatureChange)
     inst.currentTempRange = 0
 
@@ -223,6 +227,8 @@ local function fn()
     -- inst.OnSave = OnSave
     -- inst.OnLoad = OnLoad
     inst.OnRemoveEntity = OnRemove
+
+    inst.components.skinedlegion:SetOnPreLoad()
 
     return inst
 end

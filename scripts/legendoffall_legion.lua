@@ -818,7 +818,7 @@ local fishhoming_ingredients = {
     log =               { hardy = 1, dusty = 1, veggie = 1 },
     petals_evil =       { pasty = 1, veggie = 1, monster = 2 },
     siving_rocks =      { hardy = 1, pasty = 1, dusty = 1 },
-    --圣诞小玩意
+    --圣诞小玩意：全部可加入，不过没有任何属性
 }
 for name,data in pairs(fishhoming_ingredients) do
     _G.FISHHOMING_INGREDIENTS_L[name] = data

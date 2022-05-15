@@ -63,6 +63,7 @@ local function AddSpecialLoot(inst)
     local drops =
     {
         "tripleshovelaxe_blueprint",
+        "triplegoldenshovelaxe_blueprint",
         "dualwrench_blueprint",
         "hat_cowboy_blueprint",
         "icire_rock_blueprint",
@@ -77,6 +78,7 @@ local function AddSpecialLoot(inst)
         table.insert(drops, "fishhomingtool_awesome_blueprint")
         inst.components.lootdropper:AddChanceLoot(table.remove(drops, math.random(#drops)), 1)
     end
+    inst.components.lootdropper:AddChanceLoot(table.remove(drops, math.random(#drops)), 1)
     inst.components.lootdropper:AddChanceLoot(table.remove(drops, math.random(#drops)), 1)
     inst.components.lootdropper:AddChanceLoot(table.remove(drops, math.random(#drops)), 1)
     inst.components.lootdropper:AddChanceLoot(table.remove(drops, math.random(#drops)), 1)

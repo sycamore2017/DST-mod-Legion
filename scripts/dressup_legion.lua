@@ -1088,11 +1088,10 @@ local dressup_data = {
         end,
     },
     -- book_weather --该道具贴图切换比较特殊，不做幻化
-    desertdefense =
-    {
+    desertdefense = {
         isnoskin = true,
-        buildfile = "swap_desertdefense",
-        buildsymbol = "swap_desertdefense",
+        buildfile = "desertdefense",
+        buildsymbol = "swap_shield",
     },
     dualwrench =
     {
@@ -1289,11 +1288,15 @@ local dressup_data = {
         buildfile = "sachet",
         buildsymbol = "swap_body",
     },
-    tripleshovelaxe =
-    {
+    tripleshovelaxe = {
         isnoskin = true,
-        buildfile = "swap_tripleshovelaxe",
-        buildsymbol = "swap_tripleshovelaxe",
+        buildfile = "tripleshovelaxe",
+        buildsymbol = "swap",
+    },
+    triplegoldenshovelaxe = {
+        isnoskin = true,
+        buildfile = "triplegoldenshovelaxe",
+        buildsymbol = "swap",
     },
     theemperorscrown = {
         isnoskin = true,

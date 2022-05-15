@@ -229,6 +229,21 @@ _G.SKIN_PREFABS_LEGION = {
         -- baiting = nil,
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
     },
+
+    icire_rock = {
+		fn_start = function(inst)
+            inst.AnimState:OverrideSymbol("rock", "icire_rock", "rock")
+            inst.AnimState:OverrideSymbol("shadow", "icire_rock", "shadow")
+
+            inst.changeimgfn = function(inst)
+                local newname = "icire_rock"..tostring(inst.currentTempRange)
+                inst.components.inventoryitem.atlasname = "images/inventoryimages/"..newname..".xml"
+                inst.components.inventoryitem:ChangeImageName(newname)
+            end
+            inst.changeimgfn(inst)
+        end,
+        exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
+    },
 }
 
 _G.SKINS_LEGION = {
@@ -700,7 +715,7 @@ _G.SKINS_LEGION = {
         string = ischinese and {
             name = "云烟", collection = "THANKS", access = "SPECIAL",
             descitem = "解锁\"简易打窝饵制作器\"、\"专业打窝饵制作器\"和\"打窝饵\"的皮肤。",
-            description = "\"早闻浮生儿与扶伤剑现任持有者有着密不可分的联系。近日密探来报说扶伤剑已断，预感这次势在必得，并派人在京城散播浮生儿已被捉入衙内的消息...\"当夜丑时，云烟之雾浑浊庭院异响，\"上钩了\"，一名颓郁男子隐匿于烟雾中等待时机。",
+            description = "\"早闻浮生儿与扶伤剑现任持有者有着密不可分的联系。近日密探来报说扶伤剑已断，预感这次势在必得，并派人在京城散播浮生儿已被捉入衙内的消息...\"当夜丑时，云烟之雾开始浑浊，随后突然庭院异响，\"上钩了\"，一名颓郁男子正隐匿于烟雾中等待时机。",
         } or {
             name = "YunYan", collection = "THANKS", access = "SPECIAL",
             descitem = "Unlock \"Fish-homing Bait Maker\", \"Fish-homing Bait Maker+\", and \"Fish-homing Bait\" skin.",
@@ -789,6 +804,52 @@ _G.SKINS_LEGION = {
         baiting = { bank = "pollen_chum", build = "pollen_chum" },
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
     },
+
+    icire_rock_era = {
+        base_prefab = "icire_rock",
+		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
+
+        skin_id = "6280d4f2c340bf24ab3118b1",
+        onlyownedshow = true,
+		assets = {
+            -- Asset("ANIM", "anim/heat_rock.zip"), --官方热能石动画模板。因为本体也引用了，所以这不重复引用
+			Asset("ANIM", "anim/skin/icire_rock_era.zip"),
+            Asset("ATLAS", "images/inventoryimages_skin/icire_rock1_era.xml"),
+            Asset("IMAGE", "images/inventoryimages_skin/icire_rock1_era.tex"),
+            Asset("ATLAS", "images/inventoryimages_skin/icire_rock2_era.xml"),
+            Asset("IMAGE", "images/inventoryimages_skin/icire_rock2_era.tex"),
+            Asset("ATLAS", "images/inventoryimages_skin/icire_rock3_era.xml"),
+            Asset("IMAGE", "images/inventoryimages_skin/icire_rock3_era.tex"),
+            Asset("ATLAS", "images/inventoryimages_skin/icire_rock4_era.xml"),
+            Asset("IMAGE", "images/inventoryimages_skin/icire_rock4_era.tex"),
+            Asset("ATLAS", "images/inventoryimages_skin/icire_rock5_era.xml"),
+            Asset("IMAGE", "images/inventoryimages_skin/icire_rock5_era.tex"),
+		},
+		image = { name = nil, atlas = nil, setable = false, },
+
+        string = ischinese and {
+            name = "被封存的窸窣", collection = "ERA", access = "SPECIAL",
+            descitem = "解锁\"鸳鸯石\"的皮肤。",
+            description = "我走进了一家博物馆，刹那，仿佛听到一阵朦朦胧胧的低语，又或是窸窸窣窣的昆虫振翅声。向着声音的方向看去，有一颗西瓜大小的精美琥珀。走进后，里面居然还包裹了一只仿佛仍活着的带翅昆虫。诧异的是，我感受到了它对生命突然凝滞的不甘...",
+        } or {
+            name = "Sealed Rustle", collection = "ERA", access = "SPECIAL",
+            descitem = "Unlock \"Icire Stone\" skin.",
+            description = "The story was not translated.",
+        },
+
+		fn_start = function(inst)
+            inst.AnimState:OverrideSymbol("rock", "icire_rock_era", "rock")
+            inst.AnimState:OverrideSymbol("shadow", "icire_rock_era", "shadow")
+
+            inst.changeimgfn = function(inst)
+                local newname = "icire_rock"..tostring(inst.currentTempRange).."_era"
+                inst.components.inventoryitem.atlasname = "images/inventoryimages_skin/"..newname..".xml"
+                inst.components.inventoryitem:ChangeImageName(newname)
+            end
+            inst.changeimgfn(inst)
+        end,
+        exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
+    },
 }
 
 _G.SKIN_IDS_LEGION = {
@@ -796,6 +857,7 @@ _G.SKIN_IDS_LEGION = {
     ["6278c409c340bf24ab311522"] = { --余生(8)
         neverfade_thanks = true, neverfadebush_thanks = true,
         fishhomingtool_awesome_thanks = true, fishhomingtool_normal_thanks = true, fishhomingbait_thanks = true,
+        icire_rock_era = true,
         orchidbush_disguiser = true, boltwingout_disguiser = true,
         rosebush_marble = true, lilybush_marble = true, orchidbush_marble = true,
         hat_lichen_emo_que = true,
@@ -814,6 +876,7 @@ _G.SKIN_IDS_LEGION = {
     ["6278c4acc340bf24ab311530"] = { --2度梅开(2)
         orchidbush_disguiser = true,
         fishhomingtool_awesome_thanks = true, fishhomingtool_normal_thanks = true, fishhomingbait_thanks = true,
+        icire_rock_era = true,
     },
 }
 _G.SKIN_IDX_LEGION = {
@@ -826,11 +889,13 @@ if ischinese then
         COLLECTION = {
             UNKNOWN = "陌生系列",
             MAGICSPELL = "魔咒系列",
-            EMOTICON = "颜表情系列",
+            EMOTICON = "网上冲浪系列",
             MARBLE = "大理石园丁系列",
             THANKS = "江湖一枝花系列",
             TVPLAY = "剧迷系列",
             DISGUISER = "伪装学者系列",
+            ERA = "先古回响系列",
+            OLDPIC = "念旧系列",
         },
         UI_ACCESS = "获取",
         UI_INPUT_CDK = "请输入兑换码",
@@ -848,11 +913,13 @@ else
         COLLECTION = {
             UNKNOWN = "Strange Collection",
             MAGICSPELL = "Magic Spell Collection",
-            EMOTICON = "Emoticon Collection",
+            EMOTICON = "Surf Net Collection",
             MARBLE = "Marble Gardener Collection",
             THANKS = "Heartfelt Thanks Collection",
             TVPLAY = "TV Play Fans Collection",
             DISGUISER = "Master of Disguise Collection",
+            ERA = "Era Echo Collection",
+            OLDPIC = "Nostalgia Collection",
         },
         UI_ACCESS = "Get It",
         UI_INPUT_CDK = "Please enter CDK",
@@ -897,7 +964,9 @@ local skinidxes = { --用以皮肤排序
     "neverfade_thanks", "neverfadebush_thanks",
     "fishhomingtool_awesome_thanks", "fishhomingtool_normal_thanks", "fishhomingbait_thanks",
     "hat_cowboy_tvplay",
-    "orchitwigs_disguiser", "orchidbush_disguiser", "hat_lichen_disguiser", "boltwingout_disguiser",
+    "hat_lichen_disguiser", "orchitwigs_disguiser",
+    "orchidbush_disguiser", "boltwingout_disguiser",
+    "icire_rock_era",
     "rosebush_marble", "lilybush_marble", "orchidbush_marble",
     "hat_lichen_emo_que",
 }

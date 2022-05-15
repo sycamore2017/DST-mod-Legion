@@ -4,11 +4,11 @@ local assets =
     Asset("ANIM", "anim/sand_splash_fx.zip"),
 }
 
-local block_assets =
-{
-    Asset("ANIM", "anim/sand_block.zip"),
-    Asset("ANIM", "anim/sand_splash_fx.zip"),
-}
+-- local block_assets =
+-- {
+--     Asset("ANIM", "anim/sand_block.zip"),
+--     Asset("ANIM", "anim/sand_splash_fx.zip"),
+-- }
 
 local SPIKE_SIZES =
 {
@@ -40,7 +40,7 @@ local function ChangeToObstacle(inst)
     inst:RemoveEventCallback("animover", ChangeToObstacle)
     local x, y, z = inst.Transform:GetWorldPosition()
     inst.Physics:Stop()
-    inst.Physics:SetMass(0) 
+    inst.Physics:SetMass(0)
     inst.Physics:ClearCollisionMask()
     inst.Physics:CollidesWith(COLLISION.ITEMS)
     inst.Physics:CollidesWith(COLLISION.CHARACTERS)
@@ -66,18 +66,18 @@ local function SpikeLaunch(inst, launcher, basespeed, startheight, startradius)
     inst.Physics:SetVel(cosa * speed, speed * 5 + math.random() * 2, sina * speed)
 end
 
-local COLLAPSIBLE_WORK_ACTIONS =
-{
-    CHOP = true,
-    DIG = true,
-    HAMMER = true,
-    MINE = true,
-}
-local COLLAPSIBLE_TAGS = { "_combat", "pickable", "campfire" }
-for k, v in pairs(COLLAPSIBLE_WORK_ACTIONS) do
-    table.insert(COLLAPSIBLE_TAGS, k.."_workable")
-end
-local NON_COLLAPSIBLE_TAGS = { "player", "antlion", "groundspike", "flying", "shadow", "ghost", "playerghost", "FX", "NOCLICK", "DECOR", "INLIMBO" }
+-- local COLLAPSIBLE_WORK_ACTIONS =
+-- {
+--     CHOP = true,
+--     DIG = true,
+--     HAMMER = true,
+--     MINE = true,
+-- }
+local COLLAPSIBLE_TAGS = { "_combat" }
+-- for k, v in pairs(COLLAPSIBLE_WORK_ACTIONS) do
+--     table.insert(COLLAPSIBLE_TAGS, k.."_workable")
+-- end
+local NON_COLLAPSIBLE_TAGS = { "player", "companion", "antlion", "groundspike", "flying", "shadow", "ghost", "playerghost", "FX", "NOCLICK", "DECOR", "INLIMBO", "wall" }
 
 local function DoBreak(inst)
     inst.task = nil
@@ -85,7 +85,11 @@ local function DoBreak(inst)
 end
 
 local function DoDamage(inst, OnIgnite)
-    inst.task = inst:DoTaskInTime(GetRandomMinMax(unpack(TUNING.SANDSPIKE.LIFETIME[string.upper(inst.animname)])), DoBreak)
+    if inst.iscounterattack then
+        inst.task = inst:DoTaskInTime(0.5+2*math.random(), DoBreak)
+    else
+        inst.task = inst:DoTaskInTime(GetRandomMinMax(unpack(TUNING.SANDSPIKE.LIFETIME[string.upper(inst.animname)])), DoBreak)
+    end
     inst:RemoveTag("notarget")
     inst.Physics:SetActive(true)
     inst:AddComponent("inspectable")
@@ -106,40 +110,40 @@ local function DoDamage(inst, OnIgnite)
     local ents = TheSim:FindEntities(x, 0, z, inst.spikeradius + DAMAGE_RADIUS_PADDING, nil, NON_COLLAPSIBLE_TAGS, COLLAPSIBLE_TAGS)
     for i, v in ipairs(ents) do
         if v:IsValid() then
-            local isworkable = false
-            if v.components.workable ~= nil then
-                local work_action = v.components.workable:GetWorkAction()
-                --V2C: nil action for campfires
-                --     allow digging spawners (e.g. rabbithole)
-                isworkable = (
-                    (work_action == nil and v:HasTag("campfire")) or
-                    (v.components.workable:CanBeWorked() and COLLAPSIBLE_WORK_ACTIONS[work_action.id])
-                )
-            end
-            if isworkable then
-                v.components.workable:Destroy(inst)
-                if v:IsValid() and v:HasTag("stump") then
-                    v:Remove()
-                end
-            elseif v.components.pickable ~= nil
-                and v.components.pickable:CanBePicked()
-                and not v:HasTag("intense") then
-                local num = v.components.pickable.numtoharvest or 1
-                local product = v.components.pickable.product
-                local x1, y1, z1 = v.Transform:GetWorldPosition()
-                v.components.pickable:Pick(inst) -- only calling this to trigger callbacks on the object
-                if product ~= nil and num > 0 then
-                    for i = 1, num do
-                        SpawnPrefab(product).Transform:SetPosition(x1, 0, z1)
-                    end
-                end
-            elseif v.components.combat ~= nil
+            -- local isworkable = false
+            -- if v.components.workable ~= nil then
+            --     local work_action = v.components.workable:GetWorkAction()
+            --     --V2C: nil action for campfires
+            --     --     allow digging spawners (e.g. rabbithole)
+            --     isworkable = (
+            --         (work_action == nil and v:HasTag("NPC_workable")) or
+            --         (v.components.workable:CanBeWorked() and COLLAPSIBLE_WORK_ACTIONS[work_action.id])
+            --     )
+            -- end
+            -- if isworkable then
+            --     v.components.workable:Destroy(inst)
+            --     if v:IsValid() and v:HasTag("stump") then
+            --         v:Remove()
+            --     end
+            -- elseif v.components.pickable ~= nil
+            --     and v.components.pickable:CanBePicked()
+            --     and not v:HasTag("intense") then
+            --     local num = v.components.pickable.numtoharvest or 1
+            --     local product = v.components.pickable.product
+            --     local x1, y1, z1 = v.Transform:GetWorldPosition()
+            --     v.components.pickable:Pick(inst) -- only calling this to trigger callbacks on the object
+            --     if product ~= nil and num > 0 then
+            --         for i = 1, num do
+            --             SpawnPrefab(product).Transform:SetPosition(x1, 0, z1)
+            --         end
+            --     end
+            -- else
+            if v.components.combat ~= nil
                 and v.components.health ~= nil
                 and not v.components.health:IsDead() then
                 if v.components.locomotor == nil then --就这里，导致可以秒杀触手等没有移动组件但有战斗组件的实体
                     v.components.health:Kill()
-                elseif not isblock
-                    and inst.components.combat:IsValidTarget(v) then
+                elseif not isblock and inst.components.combat:IsValidTarget(v) then
                     inst.components.combat:DoAttack(v)
                 end
             end
@@ -273,7 +277,7 @@ local function MakeSpikeFn(shape, size)
         inst.Physics:SetCapsule(inst.spikeradius, 2)
 
         inst:AddTag("notarget")
-        inst:AddTag("hostile")
+        -- inst:AddTag("hostile")
         inst:AddTag("groundspike")
 
         --For impact sound
@@ -281,7 +285,6 @@ local function MakeSpikeFn(shape, size)
         inst:AddTag("stone")
 
         inst.entity:SetPristine()
-
         if not TheWorld.ismastersim then
             return inst
         end
@@ -295,7 +298,7 @@ local function MakeSpikeFn(shape, size)
 
         inst:AddComponent("combat")
         inst.components.combat:SetDefaultDamage(TUNING.SANDSPIKE.DAMAGE[string.upper(inst.animname)])
-        inst.components.combat.playerdamagepercent = .5
+        -- inst.components.combat.playerdamagepercent = .5
         inst.components.combat:SetKeepTargetFunction(KeepTargetFn)
 
         inst:ListenForEvent("animover", StartSpikeAnim)

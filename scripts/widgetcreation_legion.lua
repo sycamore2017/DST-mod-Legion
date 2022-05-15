@@ -198,8 +198,8 @@ if CONFIGS_LEGION.LEGENDOFFALL then
     function params.fishhomingtool.itemtestfn(container, item, slot)
         if
             FISHHOMING_INGREDIENTS_L[item.prefab] ~= nil or
-            item:HasTag("edible_MEAT") or
-            item:HasTag("edible_VEGGIE") or item:HasTag("edible_MONSTER") or item:HasTag("edible_SEEDS")
+            item:HasTag("edible_MEAT") or item:HasTag("edible_VEGGIE") or item:HasTag("edible_MONSTER") or
+            item:HasTag("edible_SEEDS") or item:HasTag("winter_ornament")
         then
             return true
         end
