@@ -29,6 +29,7 @@ PrefabFiles = {
     -- "aatest_anim",
     "fx_legion",                --特效
     "buffs_legion",             --buff
+    "shield_legion",            --盾类武器
 }
 
 Assets = {
@@ -309,6 +310,7 @@ if TUNING.LEGION_SUPERBCUISINE then
 
         AddCookerRecipe("cookpot", recipe)
         AddCookerRecipe("portablecookpot", recipe)
+        AddCookerRecipe("archive_cookpot", recipe)
         RegisterInventoryItemAtlas("images/cookbookimages/"..recipe.name..".xml", recipe.name..".tex")
     end
 

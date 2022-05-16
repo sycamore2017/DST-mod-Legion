@@ -1,5 +1,4 @@
 local prefabFiles = {
-    "desertdefense",        --砂之抵御
     -- "lilypond",             --荷花池相关特效
     "shyerries",            --颤栗树相关
     "sand_spike_legion",    --对玩家友好的沙之咬
@@ -19,8 +18,8 @@ end
 local assets = {
     Asset("ATLAS", "images/inventoryimages/shyerrylog.xml"), --预加载，给科技栏用的
     Asset("IMAGE", "images/inventoryimages/shyerrylog.tex"),
-    Asset("ATLAS", "images/inventoryimages/desertdefense.xml"),
-    Asset("IMAGE", "images/inventoryimages/desertdefense.tex"),
+    Asset("ATLAS", "images/inventoryimages/shield_l_sand.xml"),
+    Asset("IMAGE", "images/inventoryimages/shield_l_sand.tex"),
     Asset("ATLAS", "images/inventoryimages/guitar_whitewood.xml"),
     Asset("IMAGE", "images/inventoryimages/guitar_whitewood.tex"),
     Asset("ATLAS", "images/inventoryimages/pinkstaff.xml"),
@@ -213,12 +212,12 @@ AddIngredientValues({"shyerry"}, {fruit=4}, true, false) --AddIngredientValues(n
 --------------------------------------------------------------------------
 
 AddRecipe2(
-    "desertdefense", {
+    "shield_l_sand", {
         Ingredient("townportaltalisman", 3),
         Ingredient("goldnugget", 3),
         Ingredient("turf_desertdirt", 1),
     }, TECH.MAGIC_THREE, {
-        atlas = "images/inventoryimages/desertdefense.xml", image = "desertdefense.tex"
+        atlas = "images/inventoryimages/shield_l_sand.xml", image = "shield_l_sand.tex"
     }, { "WEAPONS", "MAGIC", "ARMOUR" }
 )
 AddRecipe2(

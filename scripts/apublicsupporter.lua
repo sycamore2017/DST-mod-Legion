@@ -191,7 +191,7 @@ end
 --[[ 修改rider组件，重新构造combat的redirectdamagefn函数以适应更多元的机制 ]]
 --------------------------------------------------------------------------
 
-if CONFIGS_LEGION.FLOWERSPOWER or TUNING.LEGION_DESERTSECRET then --永不凋零、砂之抵御需要
+if IsServer then
     function GLOBAL.RebuildRedirectDamageFn(player) --重新构造combat的redirectdamagefn函数
         if player.components.combat ~= nil then
             --初始化
@@ -234,9 +234,10 @@ if CONFIGS_LEGION.FLOWERSPOWER or TUNING.LEGION_DESERTSECRET then --永不凋零
                         self.inst.redirect_table[target.prefab] = self.inst.components.combat.redirectdamagefn
                     end
                 end
+
+                --再重构combat的redirectdamagefn
+                RebuildRedirectDamageFn(self.inst)
             end
-            --再重构combat的redirectdamagefn
-            RebuildRedirectDamageFn(self.inst)
         end
 
         local ActualDismount_old = self.ActualDismount
@@ -246,9 +247,10 @@ if CONFIGS_LEGION.FLOWERSPOWER or TUNING.LEGION_DESERTSECRET then --永不凋零
                 --清除骑牛保护的旧函数
                 if self.inst.components.combat ~= nil then
                     self.inst.redirect_table[ex_mount.prefab] = nil
+
+                    --因为下牛时redirectdamagefn被还原，所以这里还要重新定义一遍
+                    RebuildRedirectDamageFn(self.inst)
                 end
-                --因为下牛时redirectdamagefn被还原，所以这里还要重新定义一遍
-                RebuildRedirectDamageFn(self.inst)
             end
         end
     end)
@@ -628,11 +630,9 @@ if TUNING.LEGION_FLASHANDCRUSH or TUNING.LEGION_DESERTSECRET then --素白蘑菇
 
             return false
         end
-
         local function Fn_do_fungus(doer, item, target, value)
             if
                 item ~= nil and target ~= nil and
-                doer ~= nil and doer.components.inventory ~= nil and
                 target.components.perishable ~= nil and target.components.perishable.perishremainingtime ~= nil and
                 target.components.perishable.perishremainingtime < target.components.perishable.perishtime
             then
@@ -695,7 +695,6 @@ if TUNING.LEGION_FLASHANDCRUSH or TUNING.LEGION_DESERTSECRET then --素白蘑菇
         local function Fn_do_guitar(doer, item, target, value)
             if
                 item ~= nil and target ~= nil and
-                doer ~= nil and doer.components.inventory ~= nil and
                 target.components.fueled ~= nil and target.components.fueled.accepting and
                 target.components.fueled:GetPercent() < 1
             then
@@ -775,6 +774,41 @@ if TUNING.LEGION_FLASHANDCRUSH or TUNING.LEGION_DESERTSECRET then --素白蘑菇
                 end
                 return false, "MAT"
             end,
+        }
+
+        _G.REPAIRERS_L["townportaltalisman"] = {
+            fn_try = function(inst, doer, target, actions, right)
+                if not target:HasTag("repair_sand") then
+                    return false
+                end
+
+                if doer.replica.rider ~= nil and doer.replica.rider:IsRiding() then --骑牛时只能修复自己的携带物品
+                    if not (target.replica.inventoryitem ~= nil and target.replica.inventoryitem:IsGrandOwner(doer)) then
+                        return false
+                    end
+                elseif doer.replica.inventory ~= nil and doer.replica.inventory:IsHeavyLifting() then --不能背重物
+                    return false
+                end
+
+                return true
+            end,
+            fn_sg = function(doer, action)
+                return "dolongaction"
+            end,
+            fn_do = function(act)
+                if
+                    act.target ~= nil and
+                    act.target.components.armor ~= nil and act.target.components.armor:GetPercent() < 1
+                then
+                    local useditem = act.doer.components.inventory:RemoveItem(act.invobject) --不做说明的话，一次只取一个
+                    if useditem then
+                        act.target.components.armor:Repair(315*(act.doer.mult_repairl or 1))
+                        useditem:Remove()
+                        return true
+                    end
+                end
+                return false, "GUITAR"
+            end
         }
     end
 
@@ -1169,3 +1203,190 @@ if CONFIGS_LEGION.PRAYFORRAIN then --月藏宝匣需要
     AddStategraphActionHandler("wilson", ActionHandler(ACTIONS.USE_UPGRADEKIT, "dolongaction"))
     AddStategraphActionHandler("wilson_client", ActionHandler(ACTIONS.USE_UPGRADEKIT, "dolongaction"))
 end
+
+--------------------------------------------------------------------------
+--[[ 盾反机制 ]]
+--------------------------------------------------------------------------
+
+AddStategraphState("wilson", State{
+    name = "atk_shield_l",
+    tags = { "atk_shield", "busy", "notalking", "nointerrupt", "autopredict" },
+
+    onenter = function(inst)
+        if inst.components.combat:InCooldown() then
+            inst:ClearBufferedAction()
+            inst.sg:GoToState("idle", true)
+            return
+        end
+
+        local equip = inst.components.inventory:GetEquippedItem(EQUIPSLOTS.HANDS)
+        if
+            equip == nil or equip.components.shieldlegion == nil or
+            not equip.components.shieldlegion:CanAttack(inst)
+        then
+            inst:ClearBufferedAction()
+            inst.sg:GoToState("idle", true)
+            return
+        end
+        inst.sg.statemem.shield = equip
+
+        inst.components.locomotor:Stop()
+        if inst.components.rider:IsRiding() then
+            inst.AnimState:PlayAnimation("player_atk_pre")
+            inst.AnimState:PushAnimation("player_atk", false)
+        else
+            inst.AnimState:PlayAnimation("toolpunch")
+        end
+        inst.SoundEmitter:PlaySound("dontstarve/wilson/attack_whoosh", nil, inst.sg.statemem.attackvol, true)
+        inst.sg:SetTimeout(13 * FRAMES)
+
+        local buffaction = inst:GetBufferedAction()
+        -- inst.components.combat:BattleCry()
+        if buffaction ~= nil then
+            inst:FacePoint(buffaction:GetActionPoint():Get())
+        end
+
+        equip.components.shieldlegion:StartAttack(inst)
+    end,
+
+    timeline = {
+        TimeEvent(8 * FRAMES, function(inst)
+            inst:PerformBufferedAction()
+            if --盾反失败的话，此时该能被打断sg了
+                inst.sg.statemem.shield == nil or
+                not inst.sg.statemem.shield.components.shieldlegion.issuccess
+            then
+                inst.sg:RemoveStateTag("nointerrupt")
+                -- inst.sg:RemoveStateTag("busy")
+            end
+        end)
+    },
+
+    ontimeout = function(inst)
+        inst.sg:RemoveStateTag("atk_shield")
+        inst.sg:RemoveStateTag("busy")
+        inst.sg:RemoveStateTag("nointerrupt")
+        inst.sg:AddStateTag("idle")
+    end,
+
+    events = {
+        EventHandler("equip", function(inst) inst.sg:GoToState("idle") end),
+        EventHandler("unequip", function(inst) inst.sg:GoToState("idle") end),
+        EventHandler("animqueueover", function(inst)
+            if inst.AnimState:AnimDone() then
+                inst.sg:GoToState("idle")
+            end
+        end),
+    },
+
+    onexit = function(inst)
+        if inst.sg.statemem.shield then
+            inst.sg.statemem.shield.components.shieldlegion:FinishAttack(inst)
+        end
+    end,
+})
+
+AddStategraphState("wilson_client", State{
+    name = "atk_shield_l",
+    tags = { "atk_shield", "notalking", "abouttoattack" },
+
+    onenter = function(inst)
+        if inst.replica.combat ~= nil then
+            if inst.replica.combat:InCooldown() then
+                inst.sg:RemoveStateTag("abouttoattack")
+                inst:ClearBufferedAction()
+                inst.sg:GoToState("idle", true)
+                return
+            end
+        end
+
+        local equip = inst.replica.inventory:GetEquippedItem(EQUIPSLOTS.HANDS)
+        if equip == nil or not equip:HasTag("canshieldatk") then
+            inst.sg:RemoveStateTag("abouttoattack")
+            inst:ClearBufferedAction()
+            inst.sg:GoToState("idle", true)
+            return
+        end
+
+        inst.components.locomotor:Stop()
+        local rider = inst.replica.rider
+        if rider ~= nil and rider:IsRiding() then
+            inst.AnimState:PlayAnimation("player_atk_pre")
+            inst.AnimState:PushAnimation("player_atk", false)
+        else
+            inst.AnimState:PlayAnimation("toolpunch")
+        end
+        inst.SoundEmitter:PlaySound("dontstarve/wilson/attack_weapon", nil, nil, true)
+        inst.sg:SetTimeout(13 * FRAMES)
+
+        local buffaction = inst:GetBufferedAction()
+        if buffaction ~= nil then
+            inst:PerformPreviewBufferedAction()
+            inst:FacePoint(buffaction:GetActionPoint():Get())
+        end
+    end,
+
+    timeline ={
+        TimeEvent(8 * FRAMES, function(inst)
+            inst:ClearBufferedAction()
+            inst.sg:RemoveStateTag("abouttoattack")
+        end)
+    },
+
+    ontimeout = function(inst)
+        inst.sg:RemoveStateTag("atk_shield")
+        inst.sg:AddStateTag("idle")
+    end,
+
+    events = {
+        EventHandler("animqueueover", function(inst)
+            if inst.AnimState:AnimDone() then
+                inst.sg:GoToState("idle")
+            end
+        end),
+    },
+
+    -- onexit = nil
+})
+
+local ATTACK_SHIELD_L = Action({ priority=12, rmb=true, mount_valid=true, distance=36 })
+ATTACK_SHIELD_L.id = "ATTACK_SHIELD_L"
+ATTACK_SHIELD_L.str = STRINGS.ACTIONS_LEGION.ATTACK_SHIELD_L
+ATTACK_SHIELD_L.fn = function(act)
+    return true
+end
+AddAction(ATTACK_SHIELD_L)
+
+AddComponentAction("POINT", "shieldlegion", function(inst, doer, pos, actions, right)
+    if
+        right and inst:HasTag("canshieldatk") and
+        not TheWorld.Map:IsGroundTargetBlocked(pos) and
+        not doer:HasTag("steeringboat")
+    then
+        table.insert(actions, ACTIONS.ATTACK_SHIELD_L)
+    end
+end)
+
+AddStategraphActionHandler("wilson", ActionHandler(ACTIONS.ATTACK_SHIELD_L, function(inst, action)
+    if
+        inst.sg:HasStateTag("atk_shield") or inst.sg:HasStateTag("busy") or inst:HasTag("busy") or
+        action.invobject == nil
+        -- or action.invobject.components.shieldlegion == nil or
+        -- not action.invobject.components.shieldlegion:CanAttack(inst)
+    then
+        return
+    end
+
+    return "atk_shield_l"
+end))
+AddStategraphActionHandler("wilson_client", ActionHandler(ACTIONS.ATTACK_SHIELD_L, function(inst, action)
+    if
+        inst.sg:HasStateTag("atk_shield") or inst:HasTag("busy") or
+        action.invobject == nil
+        -- or not action.invobject:HasTag("canshieldatk")
+    then
+        return
+    end
+
+    return "atk_shield_l"
+end))

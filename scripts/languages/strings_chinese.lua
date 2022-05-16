@@ -2751,24 +2751,24 @@ S________WANDA.DESCRIBE.EXPLODINGFRUITCAKE = "还好我有时间阻止这场悲�
 --[[ desert secret ]]--[[ 尘市蜃楼 ]]
 --------------------------------------------------------------------------
 
-S_NAMES.DESERTDEFENSE = "砂之抵御"
-S_RECIPE_DESC.DESERTDEFENSE = "借用大地的力量，保护与反击。"
-S______GENERIC.DESCRIBE.DESERTDEFENSE =
+S_NAMES.SHIELD_L_SAND = "砂之抵御"
+S_RECIPE_DESC.SHIELD_L_SAND = "借用大地的力量，保护与反击。"
+S______GENERIC.DESCRIBE.SHIELD_L_SAND =
 {
     GENERIC = "我能感受到其中大地的力量，应该吧。",
     WEAK = "这雨切断了它与大地的联系！",
     INSANE = "我已经无法集中精神了！",
 }
---S_______WILLOW.DESCRIBE.DESERTDEFENSE = ""
---S_____WOLFGANG.DESCRIBE.DESERTDEFENSE = ""
-S________WENDY.DESCRIBE.DESERTDEFENSE = "我不能一直逃避，我总得去面对一切。"
-S_________WX78.DESCRIBE.DESERTDEFENSE = "防火墙，启动！"
-S_WICKERBOTTOM.DESCRIBE.DESERTDEFENSE = "它的魔法可以保护我免于受伤。"
---S_______WOODIE.DESCRIBE.DESERTDEFENSE = ""
---S______WAXWELL.DESCRIBE.DESERTDEFENSE = ""
---S_______WEBBER.DESCRIBE.DESERTDEFENSE = ""
-S___WATHGRITHR.DESCRIBE.DESERTDEFENSE = "作我明镜，作我利剑与护盾！"
---S_______WINONA.DESCRIBE.DESERTDEFENSE = ""
+S_______WILLOW.DESCRIBE.SHIELD_L_SAND = "还好它不防火，不然本姑娘可要生气了。"
+--S_____WOLFGANG.DESCRIBE.SHIELD_L_SAND = ""
+S________WENDY.DESCRIBE.SHIELD_L_SAND = "我不能一直逃避，我总得去面对一切。"
+S_________WX78.DESCRIBE.SHIELD_L_SAND = "防火墙，启动！"
+S_WICKERBOTTOM.DESCRIBE.SHIELD_L_SAND = "它的魔法可以保护我免于雷电。"
+--S_______WOODIE.DESCRIBE.SHIELD_L_SAND = ""
+--S______WAXWELL.DESCRIBE.SHIELD_L_SAND = ""
+--S_______WEBBER.DESCRIBE.SHIELD_L_SAND = ""
+S___WATHGRITHR.DESCRIBE.SHIELD_L_SAND = "作我明镜，作我利剑与护盾！"
+--S_______WINONA.DESCRIBE.SHIELD_L_SAND = ""
 
 
 S_NAMES.SHYERRYTREE = "颤栗树"
@@ -3157,6 +3157,7 @@ STRINGS.ACTIONS_LEGION = {
     PULLOUTSWORD = "出鞘", --拔剑出鞘动作的名字
     USE_UPGRADEKIT = "组装升级", --升级套件的升级动作的名字
     MAKE = "制作", --打窝器容器的按钮名字
+    ATTACK_SHIELD_L = "盾击", --盾牌类道具通用动作的名字
 }
 STRINGS.ACTIONS.GIVE.SCABBARD = "入鞘"  --青枝绿叶放入武器的名字
 

@@ -402,17 +402,9 @@ local dressup_data = {
         buildsymbol = "swap_object",
     },
     shieldofterror = { --恐怖盾牌
-        buildfn = function(dressup, item, buildskin)
-            local itemswap = {}
-            itemswap["lantern_overlay"] = dressup:GetDressData(
-                buildskin, "swap_eye_shield", "swap_shield", item.GUID, "swap"
-            )
-            itemswap["LANTERN_OVERLAY"] = dressup:GetDressData(nil, nil, nil, nil, "show")
-            itemswap["swap_object"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
-            itemswap["whipline"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
-
-            return itemswap
-        end,
+        isshield = true,
+        buildfile = "swap_eye_shield",
+        buildsymbol = "swap_shield",
     },
     dumbbell = { --哑铃
         buildfile = "swap_dumbbell",
@@ -1088,10 +1080,28 @@ local dressup_data = {
         end,
     },
     -- book_weather --该道具贴图切换比较特殊，不做幻化
-    desertdefense = {
+    shield_l_sand = {
         isnoskin = true,
-        buildfile = "desertdefense",
-        buildsymbol = "swap_shield",
+        -- isshield = true,
+        buildfn = function(dressup, item, buildskin)
+            local itemswap = {}
+
+            local skindata = item.components.skinedlegion:GetSkinedData()
+            if skindata ~= nil and skindata.equip ~= nil then
+                itemswap["lantern_overlay"] = dressup:GetDressData(
+                    nil, skindata.equip.build, skindata.equip.file, item.GUID, "swap"
+                )
+            else
+                itemswap["lantern_overlay"] = dressup:GetDressData(
+                    nil, "shield_l_sand", "swap_shield", item.GUID, "swap"
+                )
+            end
+            itemswap["LANTERN_OVERLAY"] = dressup:GetDressData(nil, nil, nil, nil, "show")
+            itemswap["swap_object"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
+            itemswap["whipline"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
+
+            return itemswap
+        end,
     },
     dualwrench =
     {

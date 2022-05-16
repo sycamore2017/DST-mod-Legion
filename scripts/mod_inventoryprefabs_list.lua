@@ -18,7 +18,7 @@ local InventoryPrefabsList = {  --每个元素的下标值为每种物品栏图�
     cutted_lilybush = { build = "images_minisign1", },
     -- portablecookpot_item = { build = "images_minisign1", },
     hat_cowboy = { build = "images_minisign1", },
-    -- desertdefense = { build = "images_minisign1", },
+    desertdefense = { build = "images_minisign1", },
     hat_lichen = { build = "images_minisign1", },
     agronssword = { build = "images_minisign1", },
     --20
@@ -132,7 +132,8 @@ local InventoryPrefabsList = {  --每个元素的下标值为每种物品栏图�
     fishhomingbait2 = { build = "images_minisign6", },
     fishhomingbait3 = { build = "images_minisign6", },
     triplegoldenshovelaxe = { build = "images_minisign6", },
-    desertdefense = { build = "images_minisign6", },
+    shield_l_sand = { build = "images_minisign6", },
+    shield_l_log = { build = "images_minisign6", },
 
     --skins
     hat_lichen_emo_que = { build = "images_minisign_skins", },

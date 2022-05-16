@@ -210,14 +210,21 @@ function DressUp:PutOn(item) --幻化一个物品
         itemswap = data.buildfn(self, item, buildskin)
     else
         if slot == EQUIPSLOTS.HANDS then
-            if data.iswhip then
-                itemswap["swap_object"] = self:GetDressData(buildskin, data.buildfile, data.buildsymbol, item.GUID, "swap")
-                itemswap["whipline"] = self:GetDressData(buildskin, data.buildfile, "whipline", item.GUID, "swap")
-            else
-                itemswap["swap_object"] = self:GetDressData(buildskin, data.buildfile, data.buildsymbol, item.GUID, "swap")
+            if data.isshield then
+                itemswap["lantern_overlay"] = self:GetDressData(buildskin, data.buildfile, data.buildsymbol, item.GUID, "swap")
+                itemswap["LANTERN_OVERLAY"] = self:GetDressData(nil, nil, nil, nil, "show")
+                itemswap["swap_object"] = self:GetDressData(nil, nil, nil, nil, "clear")
                 itemswap["whipline"] = self:GetDressData(nil, nil, nil, nil, "clear")
+            else
+                if data.iswhip then
+                    itemswap["swap_object"] = self:GetDressData(buildskin, data.buildfile, data.buildsymbol, item.GUID, "swap")
+                    itemswap["whipline"] = self:GetDressData(buildskin, data.buildfile, "whipline", item.GUID, "swap")
+                else
+                    itemswap["swap_object"] = self:GetDressData(buildskin, data.buildfile, data.buildsymbol, item.GUID, "swap")
+                    itemswap["whipline"] = self:GetDressData(nil, nil, nil, nil, "clear")
+                end
+                itemswap["lantern_overlay"] = self:GetDressData(nil, nil, nil, nil, "clear")
             end
-            itemswap["lantern_overlay"] = self:GetDressData(nil, nil, nil, nil, "clear")
             --手臂的隐藏与显示不需要操作，因为需要跟随实际装备状态
         elseif slot == EQUIPSLOTS.HEAD then
             itemswap["swap_hat"] = self:GetDressData(buildskin, data.buildfile, data.buildsymbol, item.GUID, "swap")

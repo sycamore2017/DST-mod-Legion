@@ -244,6 +244,18 @@ _G.SKIN_PREFABS_LEGION = {
         end,
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
     },
+
+    shield_l_sand = {
+        assets = nil,
+        image = { name = nil, atlas = nil, setable = true, },
+        anim = {
+            bank = "shield_l_sand", build = "shield_l_sand",
+            anim = "idle", isloop_anim = nil, animpush = nil, isloop_animpush = nil,
+            setable = true,
+        },
+        equip = { symbol = nil, build = "shield_l_sand", file = "swap_shield" },
+        exchangefx = { prefab = nil, offset_y = nil, scale = nil },
+    },
 }
 
 _G.SKINS_LEGION = {

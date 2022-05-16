@@ -2747,26 +2747,24 @@ S________WANDA.DESCRIBE.EXPLODINGFRUITCAKE = "Fortunately, I have time to stop t
 --[[ desert secret ]]--[[ 尘市蜃楼 ]]
 --------------------------------------------------------------------------
 
-S_NAMES.DESERTDEFENSE = "Desert Defense"   --砂之抵御
-S_RECIPE_DESC.DESERTDEFENSE = "Use the earth power to protect and fight back."
-S______GENERIC.DESCRIBE.DESERTDEFENSE =
+S_NAMES.SHIELD_L_SAND = "Desert Defense"   --砂之抵御
+S_RECIPE_DESC.SHIELD_L_SAND = "Use the earth power to protect and fight back."
+S______GENERIC.DESCRIBE.SHIELD_L_SAND =
 {
     GENERIC = "I can feel the power of the earth, maybe?",
     WEAK = "Maybe I can't use it in the rain!",
     INSANE = "Maybe I'm too insane to do it!",
 }
---[[
---S_______WILLOW.DESCRIBE.DESERTDEFENSE = "This is the opposite of burning."
---S_____WOLFGANG.DESCRIBE.DESERTDEFENSE = "Wolfgang can eat in one bite!"
-S________WENDY.DESCRIBE.DESERTDEFENSE = "I can't always escape, I have to face everything."
-S_________WX78.DESCRIBE.DESERTDEFENSE = "FIREWALL, START!"
---S_WICKERBOTTOM.DESCRIBE.DESERTDEFENSE = "Well, isn't that refreshing?"
---S_______WOODIE.DESCRIBE.DESERTDEFENSE = "I'd prefer maple taffy..."
---S______WAXWELL.DESCRIBE.DESERTDEFENSE = "Hm... I don't know what I was expecting."
-S___WATHGRITHR.DESCRIBE.DESERTDEFENSE = "Be my mirror, my sword and shield!"
---S_______WEBBER.DESCRIBE.DESERTDEFENSE = "Yaaay! Popsicle, popsicle!"
---S_______WINONA.DESCRIBE.DESERTDEFENSE = "Great to cool off after some hard physical labor."
-]]--
+--S_______WILLOW.DESCRIBE.SHIELD_L_SAND = ""
+--S_____WOLFGANG.DESCRIBE.SHIELD_L_SAND = ""
+S________WENDY.DESCRIBE.SHIELD_L_SAND = "I can't always escape, I have to face everything."
+S_________WX78.DESCRIBE.SHIELD_L_SAND = "FIREWALL, START!"
+--S_WICKERBOTTOM.DESCRIBE.SHIELD_L_SAND = ""
+--S_______WOODIE.DESCRIBE.SHIELD_L_SAND = ""
+--S______WAXWELL.DESCRIBE.SHIELD_L_SAND = ""
+S___WATHGRITHR.DESCRIBE.SHIELD_L_SAND = "Be my mirror, my sword and shield!"
+--S_______WEBBER.DESCRIBE.SHIELD_L_SAND = ""
+--S_______WINONA.DESCRIBE.SHIELD_L_SAND = ""
 
 S_NAMES.SHYERRYTREE = "Treembling"    --颤栗树
 S______GENERIC.DESCRIBE.SHYERRYTREE =
@@ -3143,6 +3141,7 @@ STRINGS.ACTIONS_LEGION = {
     PULLOUTSWORD = "Pull out", --拔剑出鞘动作的名字
     USE_UPGRADEKIT = "Assembly upgrade", --升级套件的升级动作的名字
     MAKE = "Make", --打窝器容器的按钮名字
+    ATTACK_SHIELD_L = "Protective attack", --盾牌类道具通用动作的名字
 }
 STRINGS.ACTIONS.GIVE.SCABBARD = "Put into"  --青枝绿叶放入武器的名字
 
