@@ -71,6 +71,41 @@ end
 ---------------
 ---------------
 
+-- MakeFx({ --盾击：护盾图标
+--     name = "shield_protect_l_fx",
+--     assets = {
+--         Asset("ANIM", "anim/lavaarena_sunder_armor.zip"), --官方的熔炉破甲buff特效动画
+--     },
+--     prefabs = nil,
+--     fn_common = nil,
+--     fn_anim = function(inst)
+--         inst.AnimState:SetBank("lavaarena_sunder_armor")
+--         inst.AnimState:SetBuild("lavaarena_sunder_armor")
+--         inst.AnimState:PlayAnimation("pre")
+--         inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
+--         inst.AnimState:SetFinalOffset(3)
+--         inst.AnimState:SetScale(0.7, 0.7)
+--     end,
+--     fn_remove = nil,
+-- })
+MakeFx({ --盾击：盾反成功特效
+    name = "shield_attack_l_fx",
+    assets = {
+        Asset("ANIM", "anim/lavaarena_beetletaur_fx.zip"), --官方的熔炉甲虫猪防御特效动画
+    },
+    prefabs = nil,
+    fn_common = nil,
+    fn_anim = function(inst)
+        inst.AnimState:SetBank("lavaarena_beetletaur_fx")
+        inst.AnimState:SetBuild("lavaarena_beetletaur_fx")
+        inst.AnimState:PlayAnimation("defend_fx")
+        inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
+        inst.AnimState:SetFinalOffset(3)
+        inst.AnimState:SetScale(0.6, 0.6)
+    end,
+    fn_remove = nil,
+})
+
 if CONFIGS_LEGION.FLOWERSPOWER then
     MakeFx({ --兰草花剑：飞溅花瓣
         name = "impact_orchid_fx",

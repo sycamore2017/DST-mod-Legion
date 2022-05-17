@@ -776,38 +776,52 @@ if TUNING.LEGION_FLASHANDCRUSH or TUNING.LEGION_DESERTSECRET then --素白蘑菇
             end,
         }
 
+        local function Fn_try_sand(inst, doer, target, actions, right)
+            if not target:HasTag("repair_sand") then
+                return false
+            end
+
+            if doer.replica.rider ~= nil and doer.replica.rider:IsRiding() then --骑牛时只能修复自己的携带物品
+                if not (target.replica.inventoryitem ~= nil and target.replica.inventoryitem:IsGrandOwner(doer)) then
+                    return false
+                end
+            elseif doer.replica.inventory ~= nil and doer.replica.inventory:IsHeavyLifting() then --不能背重物
+                return false
+            end
+
+            return true
+        end
+        local function Fn_do_sand(doer, item, target, value)
+            if
+                target ~= nil and
+                target.components.armor ~= nil and target.components.armor:GetPercent() < 1
+            then
+                local useditem = doer.components.inventory:RemoveItem(item) --不做说明的话，一次只取一个
+                if useditem then
+                    target.components.armor:Repair(value*(doer.mult_repairl or 1))
+                    useditem:Remove()
+                    return true
+                end
+            end
+            return false, "GUITAR"
+        end
+
         _G.REPAIRERS_L["townportaltalisman"] = {
-            fn_try = function(inst, doer, target, actions, right)
-                if not target:HasTag("repair_sand") then
-                    return false
-                end
-
-                if doer.replica.rider ~= nil and doer.replica.rider:IsRiding() then --骑牛时只能修复自己的携带物品
-                    if not (target.replica.inventoryitem ~= nil and target.replica.inventoryitem:IsGrandOwner(doer)) then
-                        return false
-                    end
-                elseif doer.replica.inventory ~= nil and doer.replica.inventory:IsHeavyLifting() then --不能背重物
-                    return false
-                end
-
-                return true
-            end,
+            fn_try = Fn_try_sand,
             fn_sg = function(doer, action)
                 return "dolongaction"
             end,
             fn_do = function(act)
-                if
-                    act.target ~= nil and
-                    act.target.components.armor ~= nil and act.target.components.armor:GetPercent() < 1
-                then
-                    local useditem = act.doer.components.inventory:RemoveItem(act.invobject) --不做说明的话，一次只取一个
-                    if useditem then
-                        act.target.components.armor:Repair(315*(act.doer.mult_repairl or 1))
-                        useditem:Remove()
-                        return true
-                    end
-                end
-                return false, "GUITAR"
+                return Fn_do_sand(act.doer, act.invobject, act.target, 315)
+            end
+        }
+        _G.REPAIRERS_L["turf_desertdirt"] = {
+            fn_try = Fn_try_sand,
+            fn_sg = function(doer, action)
+                return "dolongaction"
+            end,
+            fn_do = function(act)
+                return Fn_do_sand(act.doer, act.invobject, act.target, 525)
             end
         }
     end
@@ -1250,7 +1264,7 @@ AddStategraphState("wilson", State{
     end,
 
     timeline = {
-        TimeEvent(8 * FRAMES, function(inst)
+        TimeEvent(9 * FRAMES, function(inst)
             inst:PerformBufferedAction()
             if --盾反失败的话，此时该能被打断sg了
                 inst.sg.statemem.shield == nil or
@@ -1281,7 +1295,7 @@ AddStategraphState("wilson", State{
 
     onexit = function(inst)
         if inst.sg.statemem.shield then
-            inst.sg.statemem.shield.components.shieldlegion:FinishAttack(inst)
+            inst.sg.statemem.shield.components.shieldlegion:FinishAttack(inst, true)
         end
     end,
 })
@@ -1327,7 +1341,7 @@ AddStategraphState("wilson_client", State{
     end,
 
     timeline ={
-        TimeEvent(8 * FRAMES, function(inst)
+        TimeEvent(9 * FRAMES, function(inst)
             inst:ClearBufferedAction()
             inst.sg:RemoveStateTag("abouttoattack")
         end)

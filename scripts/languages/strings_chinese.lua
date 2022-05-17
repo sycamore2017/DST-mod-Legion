@@ -3148,6 +3148,26 @@ S_______WEBBER.DESCRIBE.BACKCUB = "我们不想长大啊，你呢？"
 -- S_____WORMWOOD.DESCRIBE.BACKCUB = ""
 -- S_________WURT.DESCRIBE.BACKCUB = ""
 
+S_NAMES.SHIELD_L_LOG = "木盾"
+S_RECIPE_DESC.SHIELD_L_LOG = "防御与反击的初步尝试。"
+S______GENERIC.DESCRIBE.SHIELD_L_LOG = "好简陋的盾牌，也许能用用看。"
+-- S_______WILLOW.DESCRIBE.SHIELD_L_LOG = ""
+S_____WOLFGANG.DESCRIBE.SHIELD_L_LOG = "上面的涂鸦有点艺术感呢。"
+-- S________WENDY.DESCRIBE.SHIELD_L_LOG = ""
+-- S_________WX78.DESCRIBE.SHIELD_L_LOG = ""
+-- S_WICKERBOTTOM.DESCRIBE.SHIELD_L_LOG = ""
+S_______WOODIE.DESCRIBE.SHIELD_L_LOG = "不是很趁手。"
+S______WAXWELL.DESCRIBE.SHIELD_L_LOG = "我才不要拿着个破盾在那傻傻地挥来挥去。"
+S___WATHGRITHR.DESCRIBE.SHIELD_L_LOG = "为勇士们提供了新的战斗思路。"
+-- S_______WEBBER.DESCRIBE.SHIELD_L_LOG = ""
+-- S_______WINONA.DESCRIBE.SHIELD_L_LOG = ""
+S_______WORTOX.DESCRIBE.SHIELD_L_LOG = "躲不开的时候溜走就行了，哪还需要这破盾。"
+S_____WORMWOOD.DESCRIBE.SHIELD_L_LOG = "呜呜，朋友身躯成了我的壁垒。"
+-- S________WARLY.DESCRIBE.SHIELD_L_LOG = ""
+-- S_________WURT.DESCRIBE.SHIELD_L_LOG = ""
+-- S_______WALTER.DESCRIBE.SHIELD_L_LOG = ""
+-- S________WANDA.DESCRIBE.SHIELD_L_LOG = ""
+
 STRINGS.ACTIONS_LEGION = {
     PLAYGUITAR = "弹", --弹琴动作的名字
     GIVE_RIGHTCLICK = "给", --右键喂牛动作的名字

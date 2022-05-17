@@ -1103,6 +1103,12 @@ local dressup_data = {
             return itemswap
         end,
     },
+    shield_l_log = {
+        isnoskin = true,
+        isshield = true,
+        buildfile = "shield_l_log",
+        buildsymbol = "swap_shield",
+    },
     dualwrench =
     {
         isnoskin = true,

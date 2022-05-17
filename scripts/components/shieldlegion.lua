@@ -11,13 +11,20 @@ local ShieldLegion = Class(function(self, inst)
     self.canatk = true
     self.issuccess = false
 
+    self.fxdata = {
+        prefab = "shield_attack_l_fx",
+        symbol = "lantern_overlay",
+        offsetx = 10, offsety = 0
+    }
+
     self.time = nil
-    self.delta = 7 * FRAMES --FRAMES为0.033秒。并且盾击sg动画总时长为 13*FRAMES。最好小于 8*FRAMES
+    self.delta = 8 * FRAMES --FRAMES为0.033秒。并且盾击sg动画总时长为 13*FRAMES。最好小于 9*FRAMES
     self.armormult_success = 1 --盾反成功时的损害系数
     self.armormult_ranged = 1 --抵挡远程攻击时的损害系数
 
     -- self.startfn = nil
     -- self.atkfn = nil
+    -- self.atkstayingfn = nil
     -- self.atkfailfn = nil
     -- self.armortakedmgfn = nil
     -- self.resultfn = nil
@@ -28,7 +35,7 @@ nil,
 })
 
 function ShieldLegion:CanAttack(doer)
-    return self.canatk and self.time == nil
+    return self.canatk and self.time == nil and not self.inst._brokenshield
 end
 
 function ShieldLegion:StartAttack(doer)
@@ -39,6 +46,16 @@ function ShieldLegion:StartAttack(doer)
     end
 end
 
+function ShieldLegion:SetFollowedFx(target, data)
+    if data == nil then
+        return
+    end
+    local fx = SpawnPrefab(data.prefab)
+    fx.entity:SetParent(target.entity)
+    fx.entity:AddFollower()
+    fx.Follower:FollowSymbol(target.GUID, data.symbol, data.offsetx or 0, data.offsety or 0, 0)
+    return fx
+end
 function ShieldLegion:Counterattack(doer, attacker, data, radius, dmgmult)
     if
         attacker == nil or not attacker:IsValid() or attacker.components.combat == nil or
@@ -83,12 +100,6 @@ function ShieldLegion:ArmorTakeDamage(doer, attacker, data)
     end
 end
 function ShieldLegion:GetAttacked(doer, attacker, damage, weapon, stimuli)
-    if self.issuccess then --一次sg的时间，盾反成功后完全无敌
-        --盾反持续期间函数undo
-        return self.inst
-    end
-
-    local restarget = nil
     local data = {
         damage = damage, --实际伤害
         armordamage = damage, --盾会承受的伤害
@@ -96,6 +107,16 @@ function ShieldLegion:GetAttacked(doer, attacker, damage, weapon, stimuli)
         stimuli = stimuli,
         israngedweapon = false
     }
+
+    if self.issuccess then --一次sg的时间，盾反成功后完全无敌
+        if self.atkstayingfn ~= nil then
+            self.atkstayingfn(self.inst, doer, attacker, data)
+        end
+        self:SetFollowedFx(doer, self.fxdata) --盾保特效
+        return self.inst
+    end
+
+    local restarget = nil
 
     if --远程武器分为两类，一类是有projectile组件、一类是weapon组件中有projectile属性
         weapon ~= nil and (
@@ -118,13 +139,13 @@ function ShieldLegion:GetAttacked(doer, attacker, damage, weapon, stimuli)
             restarget = self.inst
             data.armordamage = data.armordamage*self.armormult_success
             self.issuccess = true
+            self:SetFollowedFx(doer, self.fxdata) --盾保特效
         else
             if self.atkfailfn ~= nil then
                 self.atkfailfn(self.inst, doer, attacker, data)
             end
+            self:FinishAttack(doer)
         end
-
-        self:FinishAttack(doer)
     end
 
     if restarget ~= nil then
@@ -134,7 +155,7 @@ function ShieldLegion:GetAttacked(doer, attacker, damage, weapon, stimuli)
     return restarget
 end
 
-function ShieldLegion:FinishAttack(doer)
+function ShieldLegion:FinishAttack(doer, issgend)
     if self.time ~= nil then
         self.time = nil
         if self.resultfn ~= nil then
@@ -142,6 +163,11 @@ function ShieldLegion:FinishAttack(doer)
         end
     end
     self.issuccess = false
+
+    -- if self.fx_protect ~= nil and self.fx_protect:IsValid() then
+    --     self.fx_protect:Remove()
+    --     self.fx_protect = nil
+    -- end
 end
 
 return ShieldLegion
