@@ -214,9 +214,9 @@ AddIngredientValues({"shyerry"}, {fruit=4}, true, false) --AddIngredientValues(n
 AddRecipe2(
     "shield_l_sand", {
         Ingredient("townportaltalisman", 6),
-        Ingredient("goldnugget", 3),
+        Ingredient("shield_l_log", 1, "images/inventoryimages/shield_l_log.xml"),
         Ingredient("turf_desertdirt", 3),
-    }, TECH.MAGIC_THREE, {
+    }, TECH.LOST, {
         atlas = "images/inventoryimages/shield_l_sand.xml", image = "shield_l_sand.tex"
     }, { "WEAPONS", "ARMOUR" }
 )

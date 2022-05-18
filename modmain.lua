@@ -71,6 +71,8 @@ Assets = {
     -- Asset("IMAGE", "images/inventoryimages/catmint.tex"),
     Asset("ATLAS", "images/inventoryimages/albicans_cap.xml"),
     Asset("IMAGE", "images/inventoryimages/albicans_cap.tex"),
+    Asset("ATLAS", "images/inventoryimages/shield_l_log.xml"),
+    Asset("IMAGE", "images/inventoryimages/shield_l_log.tex"),
 }
 
 --为了在菜谱和农谱里显示材料的图片，所以不管玩家设置，还是要注册一遍
@@ -86,7 +88,7 @@ RegisterInventoryItemAtlas("images/inventoryimages/pineananas_seeds.xml", "pinea
 -- RegisterInventoryItemAtlas("images/inventoryimages/catmint.xml", "catmint.tex") --delete_crop
 RegisterInventoryItemAtlas("images/inventoryimages/albicans_cap.xml", "albicans_cap.tex")
 
--- local IsServer = TheNet:GetIsServer() or TheNet:IsDedicated()
+local IsServer = TheNet:GetIsServer() or TheNet:IsDedicated()
 
 --------------------------------------------------------------------------
 --[[ Test ]]--[[ test ]]
@@ -404,33 +406,14 @@ end
 --[[ other ]]--[[ 其他补充 ]]
 --------------------------------------------------------------------------
 
-----------
---靠背熊背包的来源
-----------
-
-if GetModConfigData("BackCubChance") > 0 then
-    SetSharedLootTable( 'bearger_legion',
-    {
-        {'meat',             1.00},
-        {'meat',             1.00},
-        {'meat',             1.00},
-        {'meat',             1.00},
-        {'meat',             1.00},
-        {'meat',             1.00},
-        {'meat',             1.00},
-        {'meat',             1.00},
-        {'bearger_fur',      1.00},
-        {'chesspiece_bearger_sketch', 1.00},
-
-        {'backcub',          GetModConfigData("BackCubChance")},
-    })
-
-    AddPrefabPostInit("bearger", function(inst)    --通过api重写熊獾的掉落物
-        if TheWorld.ismastersim then
-            inst.components.lootdropper:SetChanceLootTable('bearger_legion')
-        end
-    end)
-end
+AddRecipe2(
+    "shield_l_log", {
+        Ingredient("boards", 2),
+        Ingredient("rope", 2),
+    }, TECH.SCIENCE_ONE, {
+        atlas = "images/inventoryimages/shield_l_log.xml", image = "shield_l_log.tex"
+    }, { "WEAPONS", "ARMOUR" }
+)
 
 ----------
 --苔衣发卡的作用

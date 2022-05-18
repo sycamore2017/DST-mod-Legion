@@ -838,7 +838,7 @@ if TUNING.LEGION_FLASHANDCRUSH or TUNING.LEGION_DESERTSECRET then --素白蘑菇
 
     ------
 
-    local REPAIR_LEGION = Action({ priority = 1, mount_valid = false })
+    local REPAIR_LEGION = Action({ priority = 1, mount_valid = true })
     REPAIR_LEGION.id = "REPAIR_LEGION"
     REPAIR_LEGION.str = STRINGS.ACTIONS.REPAIR_LEGION
     REPAIR_LEGION.strfn = function(act)
@@ -1404,3 +1404,20 @@ AddStategraphActionHandler("wilson_client", ActionHandler(ACTIONS.ATTACK_SHIELD_
 
     return "atk_shield_l"
 end))
+
+--------------------------------------------------------------------------
+--[[ 世界修改 ]]
+--------------------------------------------------------------------------
+
+if IsServer then
+    if GetModConfigData("BackCubChance") > 0 or TUNING.LEGION_DESERTSECRET then
+        AddPrefabPostInit("world", function(inst)
+            if GetModConfigData("BackCubChance") > 0 and LootTables['bearger'] then
+                table.insert(LootTables['bearger'], {'backcub', GetModConfigData("BackCubChance")})
+            end
+            if TUNING.LEGION_DESERTSECRET and LootTables['antlion'] then
+                table.insert(LootTables['antlion'], {'shield_l_sand_blueprint', 1})
+            end
+        end)
+    end
+end

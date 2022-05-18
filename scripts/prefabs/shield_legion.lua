@@ -5,7 +5,17 @@ local prefs = {}
 --------------------------------------------------------------------------
 
 local function OnEquipFn(inst, owner)
-    owner.AnimState:OverrideSymbol("lantern_overlay", inst.prefab, "swap_shield")
+    if inst.components.skinedlegion ~= nil then
+        local skindata = inst.components.skinedlegion:GetSkinedData()
+        if skindata ~= nil and skindata.equip ~= nil then
+            owner.AnimState:OverrideSymbol("lantern_overlay", skindata.equip.build, skindata.equip.file)
+        else
+            owner.AnimState:OverrideSymbol("lantern_overlay", inst.prefab, "swap_shield")
+        end
+    else
+        owner.AnimState:OverrideSymbol("lantern_overlay", inst.prefab, "swap_shield")
+    end
+
     owner.AnimState:HideSymbol("swap_object")
 
     --本来是想让这个和书本的攻击一样来低频率高伤害的方式攻击，但是由于会导致读书时也用本武器来显示动画，所以干脆去除了
@@ -396,7 +406,7 @@ MakeShield({
         "shield_attack_l_fx",
     },
     fn_common = function(inst)
-        MakeInventoryFloatable(inst, "med", 0.2, 0.8)
+        MakeInventoryFloatable(inst, "small", 0.2, 0.9)
         -- local OnLandedClient_old = inst.components.floater.OnLandedClient
         -- inst.components.floater.OnLandedClient = function(self)
         --     OnLandedClient_old(self)

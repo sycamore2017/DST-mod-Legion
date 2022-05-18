@@ -462,10 +462,6 @@ _G.SKINS_LEGION = {
         floater = {
             cut = 0.05, size = "small", offset_y = 0.15, scale = 0.5, nofx = nil,
         },
-        -- linkedskins = { bush = "orchidbush_disguiser" },
-        -- placer = {
-        --     name = nil, bank = "orchidbush_disguiser", build = "orchidbush_disguiser", anim = "dead", prefabs = nil,
-        -- },
     },
     orchidbush_disguiser = {
         base_prefab = "orchidbush",
@@ -862,14 +858,75 @@ _G.SKINS_LEGION = {
         end,
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
     },
+    shield_l_sand_era = {
+        base_prefab = "shield_l_sand",
+		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
+
+        skin_id = "62845917c340bf24ab311969",
+        onlyownedshow = true,
+		assets = {
+			Asset("ANIM", "anim/skin/shield_l_sand_era.zip"),
+		},
+		image = { name = nil, atlas = nil, setable = true, },
+
+        string = ischinese and {
+            name = "坚硬头骨低鸣", collection = "ERA", access = "SPECIAL",
+            descitem = "解锁\"砂之抵御\"的皮肤。",
+            description = "在一个不起眼的角落它孤独着，被摆在那里，整个头部包括头甲都暴露在外，身体却只剩部分脊骨。某一瞬间，我仿佛看到了，与族群走散，在孤独与绝望的低鸣中被捕食者包围...还好，在生命尽头，大地之母将它怀抱，将它灵魂轻揉。",
+        } or {
+            name = "Squealing Skull", collection = "ERA", access = "SPECIAL",
+            descitem = "Unlock \"Desert Defense\" skin.",
+            description = "The story was not translated.",
+        },
+
+        anim = {
+            bank = nil, build = nil,
+            anim = nil, isloop_anim = nil, animpush = nil, isloop_animpush = nil,
+            setable = true,
+        },
+        equip = {
+            symbol = "lantern_overlay", build = "shield_l_sand_era", file = "swap_shield"
+        },
+        exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
+    },
+    shield_l_sand_op = {
+        base_prefab = "shield_l_sand",
+		type = "item", skin_tags = {}, release_group = 555, rarity = rarityFree,
+
+        skin_id = "freeskins",
+		assets = {
+			Asset("ANIM", "anim/skin/shield_l_sand_op.zip"),
+		},
+		image = { name = nil, atlas = nil, setable = true, },
+
+        string = ischinese and {
+            name = "旧稿", collection = "OLDPIC", access = "FREE",
+            descitem = "解锁\"砂之抵御\"的皮肤。",
+            description = "画完就觉得左右貌似不太整齐，但是都画好，不想再改。现在我绘画时会不时左右翻转来查看画面的问题，也算是一个进步吧。贴图上结合了沙之石的纹路以及大量向外突出的晶石，中间是金块，现在想想金块不足以被摆在中间好像很重要似的。",
+        } or {
+            name = "Squealing Skull", collection = "OLDPIC", access = "FREE",
+            descitem = "Unlock \"Desert Defense\" skin.",
+            description = "The story was not translated.",
+        },
+
+        anim = {
+            bank = nil, build = nil,
+            anim = nil, isloop_anim = nil, animpush = nil, isloop_animpush = nil,
+            setable = true,
+        },
+        equip = {
+            symbol = "lantern_overlay", build = "shield_l_sand_op", file = "swap_shield"
+        },
+        exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
+    },
 }
 
 _G.SKIN_IDS_LEGION = {
     ["freeskins"] = {}, --免费皮肤全部装这里面，skin_id设置为"freeskins"就好了
-    ["6278c409c340bf24ab311522"] = { --余生(8)
+    ["6278c409c340bf24ab311522"] = { --余生(10)
         neverfade_thanks = true, neverfadebush_thanks = true,
         fishhomingtool_awesome_thanks = true, fishhomingtool_normal_thanks = true, fishhomingbait_thanks = true,
-        icire_rock_era = true,
+        icire_rock_era = true, shield_l_sand_era = true,
         orchidbush_disguiser = true, boltwingout_disguiser = true,
         rosebush_marble = true, lilybush_marble = true, orchidbush_marble = true,
         hat_lichen_emo_que = true,
@@ -885,10 +942,10 @@ _G.SKIN_IDS_LEGION = {
         rosebush_marble = true, lilybush_marble = true, orchidbush_marble = true,
         hat_lichen_emo_que = true,
     },
-    ["6278c4acc340bf24ab311530"] = { --2度梅开(2)
+    ["6278c4acc340bf24ab311530"] = { --2度梅开(4)
         orchidbush_disguiser = true,
         fishhomingtool_awesome_thanks = true, fishhomingtool_normal_thanks = true, fishhomingbait_thanks = true,
-        icire_rock_era = true,
+        icire_rock_era = true, shield_l_sand_era = true,
     },
 }
 _G.SKIN_IDX_LEGION = {
@@ -975,10 +1032,9 @@ end
 local skinidxes = { --用以皮肤排序
     "neverfade_thanks", "neverfadebush_thanks",
     "fishhomingtool_awesome_thanks", "fishhomingtool_normal_thanks", "fishhomingbait_thanks",
-    "hat_cowboy_tvplay",
-    "hat_lichen_disguiser", "orchitwigs_disguiser",
+    "shield_l_sand_op", "hat_cowboy_tvplay", "hat_lichen_disguiser", "orchitwigs_disguiser",
     "orchidbush_disguiser", "boltwingout_disguiser",
-    "icire_rock_era",
+    "icire_rock_era", "shield_l_sand_era",
     "rosebush_marble", "lilybush_marble", "orchidbush_marble",
     "hat_lichen_emo_que",
 }
