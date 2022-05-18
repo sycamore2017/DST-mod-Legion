@@ -1224,14 +1224,14 @@ end
 
 AddStategraphState("wilson", State{
     name = "atk_shield_l",
-    tags = { "atk_shield", "busy", "notalking", "nointerrupt", "autopredict" },
+    tags = { "atk_shield", "busy", "notalking", "autopredict" },
 
     onenter = function(inst)
-        if inst.components.combat:InCooldown() then
-            inst:ClearBufferedAction()
-            inst.sg:GoToState("idle", true)
-            return
-        end
+        -- if inst.components.combat:InCooldown() then
+        --     inst:ClearBufferedAction()
+        --     inst.sg:GoToState("idle", true)
+        --     return
+        -- end
 
         local equip = inst.components.inventory:GetEquippedItem(EQUIPSLOTS.HANDS)
         if
@@ -1264,22 +1264,14 @@ AddStategraphState("wilson", State{
     end,
 
     timeline = {
-        TimeEvent(9 * FRAMES, function(inst)
+        TimeEvent(8 * FRAMES, function(inst)
             inst:PerformBufferedAction()
-            if --盾反失败的话，此时该能被打断sg了
-                inst.sg.statemem.shield == nil or
-                not inst.sg.statemem.shield.components.shieldlegion.issuccess
-            then
-                inst.sg:RemoveStateTag("nointerrupt")
-                -- inst.sg:RemoveStateTag("busy")
-            end
         end)
     },
 
     ontimeout = function(inst)
         inst.sg:RemoveStateTag("atk_shield")
         inst.sg:RemoveStateTag("busy")
-        inst.sg:RemoveStateTag("nointerrupt")
         inst.sg:AddStateTag("idle")
     end,
 
@@ -1305,14 +1297,14 @@ AddStategraphState("wilson_client", State{
     tags = { "atk_shield", "notalking", "abouttoattack" },
 
     onenter = function(inst)
-        if inst.replica.combat ~= nil then
-            if inst.replica.combat:InCooldown() then
-                inst.sg:RemoveStateTag("abouttoattack")
-                inst:ClearBufferedAction()
-                inst.sg:GoToState("idle", true)
-                return
-            end
-        end
+        -- if inst.replica.combat ~= nil then
+        --     if inst.replica.combat:InCooldown() then
+        --         inst.sg:RemoveStateTag("abouttoattack")
+        --         inst:ClearBufferedAction()
+        --         inst.sg:GoToState("idle", true)
+        --         return
+        --     end
+        -- end
 
         local equip = inst.replica.inventory:GetEquippedItem(EQUIPSLOTS.HANDS)
         if equip == nil or not equip:HasTag("canshieldatk") then
@@ -1341,7 +1333,7 @@ AddStategraphState("wilson_client", State{
     end,
 
     timeline ={
-        TimeEvent(9 * FRAMES, function(inst)
+        TimeEvent(8 * FRAMES, function(inst)
             inst:ClearBufferedAction()
             inst.sg:RemoveStateTag("abouttoattack")
         end)

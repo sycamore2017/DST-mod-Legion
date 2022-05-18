@@ -18,7 +18,7 @@ local ShieldLegion = Class(function(self, inst)
     }
 
     self.time = nil
-    self.delta = 8 * FRAMES --FRAMES为0.033秒。并且盾击sg动画总时长为 13*FRAMES。最好小于 9*FRAMES
+    self.delta = 9 * FRAMES --FRAMES为0.033秒。并且盾击sg动画总时长为 13*FRAMES，最好小于这个值
     self.armormult_success = 1 --盾反成功时的损害系数
     self.armormult_ranged = 1 --抵挡远程攻击时的损害系数
 
@@ -132,6 +132,9 @@ function ShieldLegion:GetAttacked(doer, attacker, damage, weapon, stimuli)
 
     if self.time ~= nil then
         if GetTime()-self.time < self.delta then --达成盾反条件
+            if doer.sg:HasStateTag("atk_shield") then --加入防打断标签，这样本次sg后续被攻击不会进入被攻击sg
+                doer.sg:AddStateTag("nointerrupt")
+            end
             if self.atkfn ~= nil then
                 self.atkfn(self.inst, doer, attacker, data)
             end
