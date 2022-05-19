@@ -347,7 +347,7 @@ if TUNING.LEGION_DESERTSECRET then
 
                 OnBlocked(doer, { attacker = attacker })
 
-                if inst.components.shieldlegion:Counterattack(doer, attacker, data, 8, 4) then --此时敌人近
+                if inst.components.shieldlegion:Counterattack(doer, attacker, data, 8, 3.5) then --此时敌人近
                     local x1, y1, z1 = attacker.Transform:GetWorldPosition()
                     local angle = -math.atan2(z1 - z, x1 - x)
                     snap.Transform:SetRotation(angle * RADIANS)
@@ -357,11 +357,9 @@ if TUNING.LEGION_DESERTSECRET then
                 end
             end
             inst.components.shieldlegion.atkstayingfn = function(inst, doer, attacker, data)
-                inst.components.shieldlegion:Counterattack(doer, attacker, data, 8, 4)
+                inst.components.shieldlegion:Counterattack(doer, attacker, data, 8, 3.5)
             end
-            inst.components.shieldlegion.atkfailfn = function(inst, doer, attacker, data)
-                inst.components.shieldlegion:Counterattack(doer, attacker, data, 4, 0.4) --即使盾反失败也要攻击一下
-            end
+            -- inst.components.shieldlegion.atkfailfn = function(inst, doer, attacker, data) end
 
             inst.components.weapon:SetDamage(damage_normal)
 
@@ -440,9 +438,9 @@ MakeShield({
         inst.components.shieldlegion.atkstayingfn = function(inst, doer, attacker, data)
             inst.components.shieldlegion:Counterattack(doer, attacker, data, 6, 2.5)
         end
-        inst.components.shieldlegion.atkfailfn = function(inst, doer, attacker, data)
-            inst.components.shieldlegion:Counterattack(doer, attacker, data, 4, 0.1) --即使盾反失败也要攻击一下
-        end
+        -- inst.components.shieldlegion.atkfailfn = function(inst, doer, attacker, data)
+        --     inst.components.shieldlegion:Counterattack(doer, attacker, data, 4, 0.1) --即使盾反失败也要攻击一下
+        -- end
 
         inst.components.weapon:SetDamage(27.2) --34*0.8
 

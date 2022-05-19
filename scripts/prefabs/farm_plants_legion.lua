@@ -363,7 +363,7 @@ for k,v in pairs(WEED_DEFS) do
 end
 
 --------------------------------------------------------------------------
---[[ 作物实体代码 ]]
+--[[ 子圭·垄的多年生植物 ]]
 --------------------------------------------------------------------------
 
 local function RemovePlant(inst, lastprefab, soilprefab)
@@ -377,19 +377,17 @@ local function RemovePlant(inst, lastprefab, soilprefab)
 end
 
 local function IsTooDarkToGrow(inst)
-	if inst.components.perennialcrop ~= nil and inst.components.perennialcrop:CanGrowInDark() then
+	if inst.components.perennialcrop:CanGrowInDark() then
 		return false
 	end
 	return IsTooDarkToGrow_legion(inst)
 end
 
 local function UpdateGrowing(inst)
-	if inst.components.perennialcrop ~= nil then
-		if (inst.components.burnable == nil or not inst.components.burnable.burning) and not IsTooDarkToGrow(inst) then
-			inst.components.perennialcrop:Resume()
-		else
-			inst.components.perennialcrop:Pause()
-		end
+	if (inst.components.burnable == nil or not inst.components.burnable.burning) and not IsTooDarkToGrow(inst) then
+		inst.components.perennialcrop:Resume()
+	else
+		inst.components.perennialcrop:Pause()
 	end
 end
 
@@ -409,9 +407,7 @@ end
 
 local function OnIsRaining(inst)
 	--不管雨始还是雨停，增加一半的蓄水量(反正一场雨结束，总共只加最大蓄水量的数值)
-	if inst.components.perennialcrop ~= nil then
-		inst.components.perennialcrop:PourWater(nil, nil, inst.components.perennialcrop.moisture_max/2)
-	end
+	inst.components.perennialcrop:PourWater(nil, nil, inst.components.perennialcrop.moisture_max/2)
 end
 
 local function MakePlant(data)
@@ -483,31 +479,24 @@ local function MakePlant(data)
 			inst:AddComponent("inspectable")
 			inst.components.inspectable.nameoverride = "FARM_PLANT"
 			inst.components.inspectable.descriptionfn = function(inst, doer) --提示自身的生长数据
-				if inst.components.perennialcrop ~= nil then
-					return inst.components.perennialcrop:SayDetail(doer, false)
-				end
-				return nil
+				return inst.components.perennialcrop:SayDetail(doer, false)
 			end
 			inst.components.inspectable.getstatus = function(inst)
 				if inst.components.burnable ~= nil and inst.components.burnable:IsBurning() then
 					return "BURNING"
 				end
 
-				if inst.components.perennialcrop ~= nil then
-					local crop = inst.components.perennialcrop
+				local crop = inst.components.perennialcrop
 
-					if crop.stagedata.name == "seed" then
-						return "SEED"
-					elseif crop.isrotten then
-						return crop.ishuge and "ROTTEN_OVERSIZED" or "ROTTEN"
-					elseif crop.stage == crop.stage_max then
-						return crop.ishuge and "FULL_OVERSIZED" or "FULL"
-					else
-						return "GROWING"
-					end
+				if crop.stagedata.name == "seed" then
+					return "SEED"
+				elseif crop.isrotten then
+					return crop.ishuge and "ROTTEN_OVERSIZED" or "ROTTEN"
+				elseif crop.stage == crop.stage_max then
+					return crop.ishuge and "FULL_OVERSIZED" or "FULL"
+				else
+					return "GROWING"
 				end
-
-				return nil
 			end
 
 			inst:AddComponent("hauntable")
@@ -515,46 +504,44 @@ local function MakePlant(data)
 
 			inst:AddComponent("lootdropper")
 			inst.components.lootdropper:SetLootSetupFn(function(lootdropper)
-				if inst.components.perennialcrop ~= nil then
-					local crop = inst.components.perennialcrop
-					local numfruitplus = crop.pollinated >= crop.pollinated_max
+				local crop = inst.components.perennialcrop
+				local numfruitplus = crop.pollinated >= crop.pollinated_max
 
-					if crop.ishuge then
-						if crop.isrotten then
-							lootdropper:SetLoot(data.loot_huge_rot)
-						else
-							lootdropper:SetLoot(numfruitplus and {data.product_huge, data.product} or {data.product_huge})
-						end
-					elseif crop.stage < crop.stage_max then
-						if crop.isrotten then
-							lootdropper:SetLoot({"spoiled_food"})
-						else
-							local loot = math.random() < 0.5 and {"cutgrass"} or {"twigs"}
-							if crop.isflower then
-								table.insert(loot, "petals")
-							end
-							lootdropper:SetLoot(loot)
-						end
+				if crop.ishuge then
+					if crop.isrotten then
+						lootdropper:SetLoot(data.loot_huge_rot)
 					else
-						local numfruit = 1
-						if crop.num_perfect ~= nil then
-							if crop.num_perfect >= 5 then
-								numfruit = 3
-							elseif crop.num_perfect > 2 then
-								numfruit = 2
-							end
-						end
-						if numfruitplus then
-							numfruit = numfruit + 1
-						end
-
-						local loot = {}
-						local product = crop.isrotten and "spoiled_food" or (data.product or "cutgrass")
-						for i = 1, numfruit, 1 do
-							table.insert(loot, product)
+						lootdropper:SetLoot(numfruitplus and {data.product_huge, data.product} or {data.product_huge})
+					end
+				elseif crop.stage < crop.stage_max then
+					if crop.isrotten then
+						lootdropper:SetLoot({"spoiled_food"})
+					else
+						local loot = math.random() < 0.5 and {"cutgrass"} or {"twigs"}
+						if crop.isflower then
+							table.insert(loot, "petals")
 						end
 						lootdropper:SetLoot(loot)
 					end
+				else
+					local numfruit = 1
+					if crop.num_perfect ~= nil then
+						if crop.num_perfect >= 5 then
+							numfruit = 3
+						elseif crop.num_perfect > 2 then
+							numfruit = 2
+						end
+					end
+					if numfruitplus then
+						numfruit = numfruit + 1
+					end
+
+					local loot = {}
+					local product = crop.isrotten and "spoiled_food" or (data.product or "cutgrass")
+					for i = 1, numfruit, 1 do
+						table.insert(loot, product)
+					end
+					lootdropper:SetLoot(loot)
 				end
 			end)
 
@@ -562,7 +549,7 @@ local function MakePlant(data)
 			inst.components.workable:SetWorkAction(ACTIONS.DIG)
 			inst.components.workable:SetWorkLeft(1)
 			inst.components.workable:SetOnFinishCallback(function(inst, worker)
-				if inst.components.perennialcrop ~= nil and inst.components.perennialcrop.fn_defend ~= nil then
+				if inst.components.perennialcrop.fn_defend ~= nil then
 					inst.components.perennialcrop.fn_defend(inst, worker)
 				end
 				RemovePlant(inst, "dirt_puff", "siving_soil_item") --被破坏，生成未放置的栽培土
@@ -587,7 +574,7 @@ local function MakePlant(data)
 			inst.components.growable:StopGrowing()
 			inst.components.growable.magicgrowable = true --非常规造林学生效标志（其他会由组件来施行）
 			inst.components.growable.domagicgrowthfn = function(inst, doer)
-				if inst:IsValid() and inst.components.perennialcrop ~= nil then
+				if inst:IsValid() then
 					return inst.components.perennialcrop:DoMagicGrowth(doer, 2*TUNING.TOTAL_DAY_TIME)
 				end
 				return false
@@ -596,9 +583,7 @@ local function MakePlant(data)
 
 			inst:AddComponent("farmplanttendable")
 			inst.components.farmplanttendable.ontendtofn = function(inst, doer)
-				if inst.components.perennialcrop ~= nil then
-					inst.components.perennialcrop:TendTo(doer, true)
-				end
+				inst.components.perennialcrop:TendTo(doer, true)
 				return true
 			end
 
@@ -657,7 +642,7 @@ local function MakePlant(data)
 			inst.components.moisture.OnSave = function(self, ...) end
 			inst.components.moisture.OnLoad = function(self, ...) end
 			inst.components.moisture.DoDelta = function(self, num, ...)
-				if num > 0 and self.inst.components.perennialcrop ~= nil then
+				if num > 0 then
 					self.inst.components.perennialcrop:PourWater(nil, nil, num)
 				end
 			end
@@ -680,11 +665,182 @@ local function MakePlant(data)
 	)
 end
 
+--------------------------------------------------------------------------
+--[[ 旧版的多年生植物 ]]
+--------------------------------------------------------------------------
+
+local function MakePlant2(cropprefab, sets)
+	local assets = sets.assets or {}
+	table.insert(assets, Asset("ANIM", "anim/"..sets.bank..".zip"))
+	if sets.bank ~= sets.build then
+		table.insert(assets, Asset("ANIM", "anim/"..sets.build..".zip"))
+	end
+	table.insert(assets, Asset("ANIM", "anim/crop_soil_legion.zip"))
+
+	return Prefab(
+		"plant_"..cropprefab.."_l",
+		function()
+			local inst = CreateEntity()
+
+			inst.entity:AddTransform()
+			inst.entity:AddAnimState()
+			inst.entity:AddSoundEmitter()
+			inst.entity:AddNetwork()
+
+			inst.AnimState:SetBank(sets.bank)
+			inst.AnimState:SetBuild(sets.build)
+			inst.AnimState:PlayAnimation(sets.leveldata[1].anim)
+			-- if sets.bank == "plant_normal_legion" then
+			-- 	inst.AnimState:OverrideSymbol("dirt", "crop_soil_legion", "dirt")
+			-- else
+			-- 	inst.AnimState:OverrideSymbol("soil", "crop_soil_legion", "soil")
+			-- end
+
+			inst:AddTag("plant")
+			inst:AddTag("crop2_legion")
+			inst:AddTag("tendable_farmplant") -- for farmplanttendable component
+
+			inst.displaynamefn = function(inst) --名字，主要是特殊的阶段加点前缀
+			end
+
+			if sets.fn_common ~= nil then
+				sets.fn_common(inst)
+			end
+
+			inst.entity:SetPristine()
+			if not TheWorld.ismastersim then
+				return inst
+			end
+
+			inst:AddComponent("inspectable")
+			inst.components.inspectable.nameoverride = "PLANT_CROP_L" --用来统一描述，懒得每种作物都搞个描述了
+    		inst.components.inspectable.getstatus = function(inst)
+				-- local crop = inst.components.crop
+				-- return (crop == nil and "GROWING")
+				-- 	or (inst:HasTag("withered") and "WITHERED")
+				-- 	or (crop:IsReadyForHarvest() and "READY")
+				-- 	or (crop.cropdata.leveldata[crop.level].youth and "YOUTH")
+				-- 	or (crop.cropdata.leveldata[crop.level].bloom and "FLORESCENCE")
+				-- 	or "GROWING"
+			end
+
+			inst:AddComponent("lootdropper")
+			inst.components.lootdropper:SetLootSetupFn(function(lootdropper)
+				
+			end)
+
+			inst:AddComponent("hauntable")
+			inst.components.hauntable:SetHauntValue(TUNING.HAUNT_TINY)
+			inst.components.hauntable:SetOnHauntFn(function(inst, haunter)
+				-- if inst.components.crop ~= nil and math.random() <= TUNING.HAUNT_CHANCE_OFTEN then
+				-- 	local harvested, product = inst.components.crop:Harvest(haunter)
+				-- 	if not harvested then --没有成熟，就施肥
+				-- 		local fert = SpawnPrefab("spoiled_food")
+				-- 		if fert.components.fertilizer ~= nil then
+				-- 			fert.components.fertilizer.fertilize_sound = nil
+				-- 		end
+				-- 		inst.components.crop:Fertilize(fert, haunter)
+				-- 	end
+				-- 	return true
+				-- end
+				return false
+			end)
+
+			inst:AddComponent("growable")
+			inst.components.growable.stages = {}
+			inst.components.growable:StopGrowing()
+			inst.components.growable.magicgrowable = true --非常规造林学生效标志（其他会由组件来施行）
+			inst.components.growable.domagicgrowthfn = function(inst, doer)
+				-- if inst:IsValid() then
+				-- 	return inst.components.perennialcrop:DoMagicGrowth(doer, 2*TUNING.TOTAL_DAY_TIME)
+				-- end
+				return false
+			end
+			inst.components.growable.GetCurrentStageData = function(self) return { tendable = false } end
+
+			inst:AddComponent("farmplanttendable")
+			inst.components.farmplanttendable.ontendtofn = function(inst, doer)
+				-- inst.components.perennialcrop:TendTo(doer, true)
+				return true
+			end
+
+			inst:AddComponent("moisture") --浇水机制由潮湿度组件控制（能让水球、神话的玉净瓶等起作用）
+			inst.components.moisture.OnUpdate = function(self, ...) end --取消下雨时的潮湿度增加
+			inst.components.moisture.OnSave = function(self, ...) end
+			inst.components.moisture.OnLoad = function(self, ...) end
+			inst.components.moisture.DoDelta = function(self, num, ...)
+				if num > 0 then
+					-- self.inst.components.perennialcrop:PourWater(nil, nil, num)
+				end
+			end
+
+			inst:AddComponent("workable")
+			inst.components.workable:SetWorkAction(ACTIONS.DIG)
+			inst.components.workable:SetWorkLeft(1)
+			inst.components.workable:SetOnFinishCallback(function(inst, worker)
+				
+			end)
+
+			if not sets.fireproof then
+				MakeSmallBurnable(inst)
+				MakeSmallPropagator(inst)
+				inst.components.burnable:SetOnBurntFn(function(inst)
+					-- RemovePlant(inst, "ash", "siving_soil") --被烧掉，生成被放置的栽培土
+				end)
+				inst.components.burnable:SetOnIgniteFn(function(inst, source, doer)
+					-- UpdateGrowing(inst)
+				end)
+				inst.components.burnable:SetOnExtinguishFn(function(inst)
+					-- UpdateGrowing(inst)
+				end)
+			end
+
+			inst:AddComponent("perennialcrop2")
+			inst.components.perennialcrop2:SetUp(cropprefab, sets)
+			inst.components.perennialcrop2.fn_defend = function(inst, target)
+				if target ~= nil then
+					inst:RemoveTag("farm_plant_defender")
+
+					local x, y, z = inst.Transform:GetWorldPosition()
+					local defenders = TheSim:FindEntities(x, y, z, TUNING.FARM_PLANT_DEFENDER_SEARCH_DIST, {"farm_plant_defender"})
+					for _, defender in ipairs(defenders) do
+						if defender.components.burnable == nil or not defender.components.burnable.burning then
+							defender:PushEvent("defend_farm_plant", {source = inst, target = target})
+							break
+						end
+					end
+				end
+			end
+			inst.components.perennialcrop2:SetStage(1, false, false, true, false)
+			inst.components.perennialcrop2:StartGrowing()
+
+			-- inst:WatchWorldState("israining", OnIsRaining) --下雨时补充水分
+			-- inst:WatchWorldState("isnight", OnIsDark) --黑暗中无法继续生长
+			-- inst:DoTaskInTime(0, function()
+			-- 	-- OnIsRaining(inst) --不能写在这，不然每次进入游戏都会增加水分
+			-- 	OnIsDark(inst)
+			-- end)
+
+			if sets.fn_server ~= nil then
+				sets.fn_server(inst)
+			end
+
+			return inst
+		end,
+		assets,
+		sets.prefabs
+	)
+end
+
 --------------------
 --------------------
 
 for k,v in pairs(defs) do
 	table.insert(prefs, MakePlant(v))
+end
+
+for k,v in pairs(CROPS_DATA_LEGION) do
+	table.insert(prefs, MakePlant2(k, v))
 end
 
 return unpack(prefs)
