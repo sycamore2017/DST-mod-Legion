@@ -27,7 +27,7 @@ local function onnutrient(self)
     end
 end
 
-local PerennialCrop = Class(function(self, inst)
+local PerennialCrop2 = Class(function(self, inst)
 	self.inst = inst
 
 	self.cropprefab = "corn"
@@ -39,7 +39,8 @@ local PerennialCrop = Class(function(self, inst)
 
 	self.pollinated_max = 3 --被授粉次数大于等于该值就能增加产量
 	self.infested_max = 10 --被骚扰次数大于等于该值就会立即进入腐烂/枯萎阶段
-	self.can_getsick = true --是否能产生病虫害
+	self.getsickchance = 0.001 --产生病虫害几率
+	self.cangrowindrak = false --能否在黑暗中生长
 
 	self.stage = 1 --当前生长阶段
 	self.isflower = false --当前阶段是否开花
@@ -56,14 +57,16 @@ local PerennialCrop = Class(function(self, inst)
 	self.taskgrow = nil
 	self.timedata = {
 		start = nil, --开始进行生长的时间点
-		left = nil, --当暂停生长时，达到下一个阶段的剩余时间
+		left = nil, --剩余生长时间（不包括生长系数）
 		paused = false, --是否暂停生长
-		all = nil, --到下一个阶段的全局时间（包含缩减与增加的时间）
+		mult = nil, --当前生长时间系数
+		all = nil, --到下一个阶段的全局时间（不包括缩减或增加的时间）
 	}
 
 	self.ctls = {}
 	self.onctlchange = nil
 
+	self.fn_overripe = nil --过熟时触发：fn(inst, numloot)
 	self.fn_stage = nil --每次设定生长阶段时额外触发的函数：fn(inst, isfull)
 	self.fn_defend = nil --作物被采集/破坏时会寻求庇护的函数：fn(inst, target)
 end,
@@ -75,16 +78,20 @@ nil,
 	donenutrient = onnutrient
 })
 
-function PerennialCrop:SetUp(cropprefab, data)
+function PerennialCrop2:SetUp(cropprefab, data)
 	self.cropprefab = cropprefab
 	self.stage_max = #data.leveldata
 	self.leveldata = data.leveldata
 	self.growthmults = data.growthmults or { [1] = 1, [2] = 1, [3] = 1, [4] = 0 }
 	self.regrowstage = data.regrowStage or 1
 	self.maturedanim = data.maturedanim
+	self.cangrowindrak = data.cangrowindrak == true
+	self.getsickchance = data.getsickchance or 0.001
+	self.fn_overripe = data.fn_overripe
+	self.fn_stage = data.fn_stage
 end
 
-function PerennialCrop:SetStage(stage, isrotten, skip)
+function PerennialCrop2:SetStage(stage, isrotten, skip)
 	if stage == nil or stage < 1 then
 		stage = 1
 	elseif stage > self.stage_max then
@@ -94,31 +101,22 @@ function PerennialCrop:SetStage(stage, isrotten, skip)
 	--确定当前的阶段
 	local rotten = false
 	local level = nil
-	local levelstate = -1 -- -1什么都不做，1全改为true，0全改为false
 
 	level = self.leveldata[stage]
 	if isrotten then
 		if level.deadanim == nil then --枯萎了，但是没有枯萎状态，回到第一个阶段
 			level = self.leveldata[1]
 			stage = 1
-			levelstate = 0
 		else
 			rotten = true
-			levelstate = 1
 		end
 	else
 		if stage == self.stage_max then --成熟时
 			if self.numfruit == nil or self.numfruit <= 0 then --没有果实，回到再生阶段
 				stage = self.regrowstage
 				level = self.leveldata[stage]
-				levelstate = 0
 			end
-		elseif stage ~= self.stage then --阶段发生变化
-			levelstate = 0
 		end
-	end
-	if stage == self.stage_max then --已经成熟，不再需要做任何操作
-		levelstate = 1
 	end
 
 	--修改当前阶段数据
@@ -126,15 +124,6 @@ function PerennialCrop:SetStage(stage, isrotten, skip)
 	self.level = level
 	self.isflower = not rotten and level.bloom == true
 	self.isrotten = rotten
-	if levelstate == 1 then
-		self.donemoisture = true
-		self.donenutrient = true
-		self.donetendable = true
-	elseif levelstate == 0 then
-		self.donemoisture = false
-		self.donenutrient = false
-		self.donetendable = false
-	end
 
 	if skip then --如果跳过，就不设置接下来的操作
 		return
@@ -143,6 +132,9 @@ function PerennialCrop:SetStage(stage, isrotten, skip)
 	--设置动画
 	if rotten then
 		self.inst.AnimState:PlayAnimation(level.deadanim, false)
+		self.donemoisture = true --枯萎了，必定不能操作
+		self.donenutrient = true
+		self.donetendable = true
 	elseif stage == self.stage_max and self.maturedanim ~= nil then
 		local minnum = #self.maturedanim
 		minnum = math.min(minnum, self.numfruit)
@@ -188,10 +180,9 @@ function PerennialCrop:SetStage(stage, isrotten, skip)
 	end
 end
 
-function PerennialCrop:GetNextStage()
+function PerennialCrop2:GetNextStage()
 	local data = {
 		stage = 1,
-		isrotten = false,
 		justgrown = false,
 		overripe = false,
 		level = nil,
@@ -199,7 +190,7 @@ function PerennialCrop:GetNextStage()
 
 	if self.isrotten then --枯萎阶段->1阶段
 		data.stage = 1
-	elseif self.level.time == nil then --永恒阶段
+	elseif self.level.time == nil or self.level.time == 0 then --永恒阶段
 		data.stage = self.stage
 	elseif self.stage >= self.stage_max then --成熟阶段->再生阶段（过熟）
 		data.stage = self.regrowstage
@@ -213,173 +204,298 @@ function PerennialCrop:GetNextStage()
 	return data
 end
 
-function PerennialCrop:GetGrowTime(time)
-	if time == nil then
-		time = self.level.time or 60
+function PerennialCrop2:GetGrowTime(time)
+	local data = {
+		mult = 1,
+		time = nil
+	}
+
+	if self.isrotten then --枯萎了的话，2天后重生
+		data.time = time or (2*TUNING.TOTAL_DAY_TIME)
+		return data
+	else
+		data.time = time or self.level.time
 	end
-	if TheWorld.state.season == "winter" then
-		time = time * self.growthmults[4]
-	elseif TheWorld.state.season == "summer" then
-		time = time * self.growthmults[2]
-	elseif TheWorld.state.season == "spring" then
-		time = time * self.growthmults[1]
-	else --默认为秋，其他mod的特殊季节默认都为秋季
-		time = time * self.growthmults[3]
+	if self.stage == self.stage_max then --成熟了的话，过熟时间无法进行加成
+		return data
 	end
 
-	local multspecial = 1
+	if TheWorld.state.season == "winter" then
+		data.mult = self.growthmults[4]
+	elseif TheWorld.state.season == "summer" then
+		data.mult = self.growthmults[2]
+	elseif TheWorld.state.season == "spring" then
+		data.mult = self.growthmults[1]
+	else --默认为秋，其他mod的特殊季节默认都为秋季
+		data.mult = self.growthmults[3]
+	end
+	if data.mult <= 0 then
+		data.mult = 0
+		return data
+	end
+
 	if self.donemoisture then
-		multspecial = multspecial - 0.1
+		data.mult = data.mult - 0.15
 	end
 	if self.donenutrient then
-		multspecial = multspecial - 0.2
+		data.mult = data.mult - 0.2
 	end
 	if self.donetendable then
-		multspecial = multspecial - 0.1
+		data.mult = data.mult - 0.15
 	end
 
-	return time * (
-		(TheWorld.state.season == "winter" and 1.4 or 1) --冬季的减速
-		- (
-			self.stage ~= self.stage_max and ( --没成熟时才应用加速效果
-				(self.nutrientgrow > 0 and 1/7 or 0) --肥料的加速
-				+ (self.goodseasons[TheWorld.state.season] and 1/7 or 0) --季节的加速
-			) or 0
-		)
-	)
+	if data.mult <= 0 then --如果不小心数值设置错误导致小于0，这里强制改回有效数值
+		data.mult = 0.05
+	end
+
+	return data
 end
 
-function PerennialCrop:DoGrowth(skip)
+local function CanAcceptNutrients(botanyctl, test)
+	if test ~= nil and (botanyctl.type == 2 or botanyctl.type == 3) then
+		if test[1] ~= nil and test[1] ~= 0 and botanyctl.nutrients[1] < botanyctl.nutrient_max then
+			return true
+		elseif test[2] ~= nil and test[2] ~= 0 and botanyctl.nutrients[2] < botanyctl.nutrient_max then
+			return true
+		elseif test[3] ~= nil and test[3] ~= 0 and botanyctl.nutrients[3] < botanyctl.nutrient_max then
+			return true
+		else
+			return false
+		end
+	end
+	return nil
+end
+function PerennialCrop2:DoGrowth(skip)
 	local data = self:GetNextStage()
 
-	--如果此时在下雨/雪，蓄水量直接加满
-	if TheWorld.state.israining or TheWorld.state.issnowing then
-		self:PourWater(nil, nil, self.moisture_max)
+	if data.justgrown or data.overripe then --生长和过熟时都会产生虫群
+		if self.getsickchance > 0 and math.random() < self.getsickchance then
+			local bugs = SpawnPrefab(math.random()<0.7 and "cropgnat" or "cropgnat_infester")
+			if bugs ~= nil then
+				bugs.Transform:SetPosition(self.inst.Transform:GetWorldPosition())
+			end
+		end
 	end
 
 	if data.justgrown then
-		self:CostController() --计算消耗之前，先从管理器拿取资源
-
-		if self.nutrient >= self.cost_nutrient then --生长必需肥料的积累
-			self.nutrient = self.nutrient - self.cost_nutrient
-			self.num_nutrient = self.num_nutrient + 1
-			if self.infested > 0 then
-				self.infested = math.max(0, self.infested-3)
+		if data.stage == self.stage_max then --如果成熟了，开始计算果子数量
+			local num = self.pollinated >= self.pollinated_max and 2 or 1
+			local rand = math.random()
+			if rand < 0.5 then --50%几率两个果实
+				num = num + 1
+			elseif rand < 0.85 then --35%几率三个果实
+				num = num + 2
 			end
+			self.numfruit = num
 		end
-		if self.nutrientgrow >= self.cost_nutrient then --加速生长肥料的消耗
-			self.nutrientgrow = self.nutrientgrow - self.cost_nutrient
-		end
-		if self.can_getsick then
-			if self.nutrientsick >= self.cost_nutrient then --预防疾病肥料的消耗
-				self.nutrientsick = self.nutrientsick - self.cost_nutrient
-				if self.sickness > 0 then
-					self.sickness = math.max(0, self.sickness-0.06)
-				end
-			else
-				if self.sickness < 1 then
-					self.sickness = math.min(1, self.sickness+0.02)
-				end
-			end
-			if self.sickness > 0 and math.random() < (self.sickness/10) then --产生虫群（避免生成太多，这里还需要减少几率）
-				local bugs = SpawnPrefab(math.random()<0.7 and "cropgnat" or "cropgnat_infester")
-				if bugs ~= nil then
-					bugs.Transform:SetPosition(self.inst.Transform:GetWorldPosition())
+	elseif data.stage == self.regrowstage or data.stage == 1 then --重新开始生长时，清空某些数据
+		--如果过熟了，掉落果子，给周围植物、土地和子圭管理者施肥
+		if data.overripe and self.numfruit ~= nil and self.numfruit > 0 then
+			local numloot = 0
+			local numpoop = 0
+			for i = 1, self.numfruit, 1 do
+				if math.random() < 0.6 then
+					numpoop = numpoop + 1
+				else
+					numloot = numloot + 1
 				end
 			end
-		elseif self.sickness > 0 then
-			self.sickness = 0
+
+			if numpoop > 0 then
+				for _,ctl in pairs(self.ctls) do
+					if ctl and ctl:IsValid() and ctl.components.botanycontroller ~= nil then
+						local botanyctl = ctl.components.botanycontroller
+						local nutrients = {42,42,42}
+						if CanAcceptNutrients(botanyctl, nutrients) then
+							for i = 1, numpoop, 1 do
+								botanyctl:SetValue(nil, nutrients, true)
+								numpoop = numpoop - 1
+								if numpoop <= 0 or not CanAcceptNutrients(botanyctl, nutrients) then
+									break
+								end
+							end
+						end
+
+						if numpoop <= 0 then
+							break
+						end
+					end
+				end
+
+				local x, y, z = self.inst.Transform:GetWorldPosition()
+				if numpoop > 0 then
+					for i = 1, numpoop, 1 do
+						local hastile = false
+						for k1 = -4, 4, 4 do --只影响周围半径一格的地皮，但感觉最多可涉及到3格地皮
+							for k2 = -4, 4, 4 do
+								local tile = TheWorld.Map:GetTileAtPoint(x+k1, 0, z+k2)
+								if tile == GROUND.FARMING_SOIL then
+									hastile = true
+									TheWorld.components.farming_manager:AddTileNutrients(x+k1, z+k2, 8, 8, 8)
+								end
+							end
+						end
+						if hastile then
+							numpoop = numpoop - 1
+							if numpoop <= 0 then
+								break
+							end
+						else
+							break
+						end
+					end
+				end
+
+				if numpoop > 0 then
+					for i = 1, numpoop, 1 do
+						local hasset = false
+						local ents = TheSim:FindEntities(x, y, z, 5,
+							nil,
+							{ "NOCLICK", "FX", "INLIMBO" },
+							{ "crop_legion", "crop2_legion", "witherable" }
+						)
+						for _,v in pairs(ents) do
+							if v:IsValid() then
+								local cpt = nil
+								if v.components.pickable ~= nil then
+									if v.components.pickable:CanBeFertilized() then
+										cpt = v.components.pickable
+									end
+								elseif v.components.perennialcrop ~= nil then
+									cpt = v.components.perennialcrop
+								elseif v.components.perennialcrop2 ~= nil then
+									cpt = v.components.perennialcrop2
+								end
+
+								if cpt ~= nil then
+									local poop = SpawnPrefab("glommerfuel")
+									if poop ~= nil then
+										if hasset then
+											cpt:Fertilize(poop, nil)
+										else
+											hasset = cpt:Fertilize(poop, nil)
+										end
+										poop:Remove()
+									end
+								end
+							end
+						end
+
+						if hasset then
+							numpoop = numpoop -1
+							if numpoop <= 0 then
+								break
+							end
+						else
+							break
+						end
+					end
+				end
+
+				if numpoop > 0 then
+					for i = 1, numpoop, 1 do
+						self.inst.components.lootdropper:SpawnLootPrefab("spoiled_food")
+					end
+				end
+			end
+
+			if self.fn_overripe ~= nil then
+				self.fn_overripe(self.inst, numloot)
+			elseif numloot > 0 then
+				for i = 1, numloot, 1 do
+					self.inst.components.lootdropper:SpawnLootPrefab(self.cropprefab)
+				end
+			end
 		end
-		if TheWorld.state.israining or TheWorld.state.issnowing then --如果此时在下雨/雪，积累而不会耗自身水分
-			self.num_moisture = self.num_moisture + 1
-		elseif self.moisture >= self.cost_moisture then --水分的积累
-			self.moisture = self.moisture - self.cost_moisture
-			self.num_moisture = self.num_moisture + 1
-		end
 
-		if data.stage == self.stage_max then --如果成熟了
-			local stagegrow = self.stage_max - self.regrowstage
-			local countgrow = self.killjoystolerance
-
-			if self.num_moisture >= stagegrow then --生长必需浇水
-				countgrow = countgrow + 1
-			end
-			if self.num_nutrient >= stagegrow then --生长必需施肥
-				countgrow = countgrow + 1
-			end
-			if self.goodseasons[TheWorld.state.season] then --在喜好的季节
-				countgrow = countgrow + 1
-			end
-			if self.sickness <= 0.1 then --病害程度很低
-				countgrow = countgrow + 1
-			end
-			if self.num_tended >= 1 and self.num_tended >= (stagegrow-1) then --被照顾次数至少得是生长阶段总数的-1次
-				countgrow = countgrow + 1
-			end
-
-			self.num_perfect = countgrow
-			if countgrow >= 5 and self.stages_other.huge ~= nil then --判断是否巨型
-				data.ishuge = true
-			end
-
-			--结算完成，清空某些数据
-			self.num_nutrient = 0
-			self.num_moisture = 0
-			self.num_tended = 0
-		end
-	elseif data.stage == self.regrowstage then --重新开始生长时，清空某些数据
 		self.infested = 0
 		self.pollinated = 0
-		self.num_perfect = nil
+		self.numfruit = nil
 	end
 
-	if skip then
-		self:SetStage(data.stage, data.ishuge, data.isrotten, false, true)
-	else
-		self:SetStage(data.stage, data.ishuge, data.isrotten, true, false)
-		self:StartGrowing()
+	if data.stage == self.stage_max then --成熟了，必定不能操作
+		self.donemoisture = true
+		self.donenutrient = true
+		self.donetendable = true
+	else --因为是生长，必定能操作
+		self.donemoisture = false
+		self.donenutrient = false
+		self.donetendable = false
+
+		--如果此时在下雨/雪 undo
+		-- if TheWorld.state.israining or TheWorld.state.issnowing then
+		-- 	self:PourWater(nil, nil, self.moisture_max)
+		-- end
+		-- self:CostController() --计算消耗之前，先从管理器拿取资源
 	end
+
+	self:SetStage(data.stage, false, skip)
+	self:StartGrowing(nil, skip)
 end
 
-function PerennialCrop:StartGrowing(time)
-	self.timedata.start = GetTime()
-	self.timedata.paused = false
-	self.timedata.left = nil
-	self.timedata.all = time or self:GetGrowTime()
-
+function PerennialCrop2:StartGrowing(lefttime, skip)
 	if self.taskgrow ~= nil then
 		self.taskgrow:Cancel()
 		self.taskgrow = nil
 	end
-	if not self.inst:IsAsleep() then
-		self.taskgrow = self.inst:DoTaskInTime(self.timedata.all, function(inst, self)
-			self.taskgrow = nil
+
+	local data = self:GetGrowTime()
+	if data.time == nil or data.time <= 0 then --永恒阶段
+		self.timedata.all = nil
+		self.timedata.mult = nil
+		self.timedata.start = nil
+		self.timedata.paused = false
+		self.timedata.left = nil
+		return
+	else
+		if data.mult <= 0 then --生长暂停
+			self.timedata.mult = nil
 			self.timedata.start = nil
 			self.timedata.all = nil
+			self.timedata.left = lefttime or data.time
+			self.timedata.paused = true
+			return
+		else
+			self.timedata.mult = data.mult
+			self.timedata.start = GetTime()
+			self.timedata.all = lefttime or data.time
+			self.timedata.left = nil
+			self.timedata.paused = false
+		end
+	end
+
+	if not skip and not self.inst:IsAsleep() then
+		--实际任务时间是剩余时间*生长系数
+		self.taskgrow = self.inst:DoTaskInTime(self.timedata.all*data.mult, function(inst, self)
+			self.timedata.all = nil
+			self.timedata.mult = nil
+			self.timedata.start = nil
+			self.timedata.left = nil
 			self:DoGrowth(false)
 		end, self)
 	end
 end
 
-function PerennialCrop:LongUpdate(dt, isloop)
-	if self.timedata.paused then
+function PerennialCrop2:LongUpdate(dt, isloop)
+	if self.timedata.paused or self.timedata.mult == nil then --暂停了、生长停滞、或者是永恒阶段
 		return
 	end
 
-    if self.timedata.start ~= nil and self.timedata.all ~= nil then
-		if dt > self.timedata.all then --经过的时间可以让作物长到下一阶段，并且有多余的
-			dt = dt - self.timedata.all
+    if self.timedata.start and self.timedata.all then
+		local alltime = self.timedata.all*self.timedata.mult --将时间转化为带mult的
+		if dt > alltime then --经过的时间可以让作物长到下一阶段，并且有多余的
 			self:DoGrowth(true)
-			self.timedata.start = GetTime()
-			self.timedata.all = self:GetGrowTime()
-			self:LongUpdate(dt, true) --经过这次成长，由于经过时间dt还没完，继续下一次判定
-		elseif dt == self.timedata.all then
+			if self.timedata.mult then --生长没有停滞
+				self:LongUpdate(dt - alltime, true) --经过这次成长，由于经过时间dt还没完，继续下一次判定
+			else
+				self:SetStage(self.stage, self.isrotten, false) --由于不再继续生长，把没有改变的动画和可采摘性补上
+			end
+		elseif dt == alltime then
 			self:DoGrowth(false)
 		else --经过的时间不足以让作物长到下一个阶段
-			self:StartGrowing(self.timedata.all - dt)
+			self:StartGrowing((alltime - dt)/self.timedata.mult, false)
 			if isloop then
-				--把没有改变的动画和可采摘性补上
-				self:SetStage(self.stage, self.ishuge, self.isrotten, true, false)
+				self:SetStage(self.stage, self.isrotten, false) --把没有改变的动画和可采摘性补上
 			end
 		end
 	else
@@ -387,19 +503,19 @@ function PerennialCrop:LongUpdate(dt, isloop)
 	end
 end
 
-function PerennialCrop:OnEntitySleep()
+function PerennialCrop2:OnEntitySleep()
     if self.taskgrow ~= nil then
 		self.taskgrow:Cancel()
 		self.taskgrow = nil
 	end
 end
 
-function PerennialCrop:OnEntityWake()
-	if self.timedata.paused then
+function PerennialCrop2:OnEntityWake()
+	if self.timedata.paused or self.timedata.mult == nil then --暂停了、生长停滞、或者是永恒阶段
 		return
 	end
 
-    if self.timedata.start ~= nil and self.timedata.all ~= nil then
+    if self.timedata.start ~= nil then
 		--把目前已经经过的时间归入生长中去
 		local dt = GetTime() - self.timedata.start
 		if dt >= 0 then
@@ -488,54 +604,41 @@ function PerennialCrop:OnLoad(data)
 	end
 end
 
-function PerennialCrop:Pause()
-	if self.timedata.paused then
+function PerennialCrop2:Pause()
+	if self.timedata.paused or self.timedata.mult == nil then --暂停了、生长停滞、或者是永恒阶段
 		return
 	end
 
 	self:OnEntityWake() --先更新已生长的数据
 	self:OnEntitySleep()
 	self.timedata.paused = true
-	self.timedata.left = self.timedata.all --更新数据后，self.timedata.start就是当前时间，所以不必再判断
+	self.timedata.left = self.timedata.all --更新数据后，self.timedata.all就是当前剩余时间，所以不必再判断
 	self.timedata.start = nil
 	self.timedata.all = nil
+	self.timedata.mult = nil
 end
 
-function PerennialCrop:Resume()
-    if not self.timedata.paused then
+function PerennialCrop2:Resume()
+    if not self.timedata.paused or self.timedata.left == nil then --没有暂停，或没有暂停后的必要数据
 		return
 	end
 
 	self:StartGrowing(self.timedata.left)
 end
 
-function PerennialCrop:CanGrowInDark()
-	--腐烂、巨型、成熟时，在黑暗中也要计算时间了
-	return self.isrotten or self.ishuge or self.stage == self.stage_max
+function PerennialCrop2:CanGrowInDark()
+	--枯萎、成熟时，在黑暗中也要计算时间了
+	return self.isrotten or self.stage == self.stage_max or self.cangrowindrak
 end
 
-function PerennialCrop:OnRemoveFromEntity()
-    self.inst:RemoveTag("flower")
-	-- self.inst:RemoveTag("fertilizable")
-	self.inst:RemoveTag("fertable1")
-	self.inst:RemoveTag("fertable2")
-	self.inst:RemoveTag("fertable3")
-	self.inst:RemoveTag("needwater")
-	self.inst:AddTag("nognatinfest")
-    if self.taskgrow ~= nil then
-		self.taskgrow:Cancel()
-		self.taskgrow = nil
-	end
-end
-
-function PerennialCrop:Pollinate(doer, value) --授粉
+function PerennialCrop2:Pollinate(doer, value) --授粉
     if self.isrotten or self.stage == self.stage_max or self.pollinated >= self.pollinated_max then
 		return
 	end
 	self.pollinated = self.pollinated + (value or 1)
 end
 
-function PerennialCrop:Infest(doer, value) --侵害
+function PerennialCrop2:Infest(doer, value) --侵害
 	if self.isrotten then
 		return false
 	end
@@ -543,11 +646,12 @@ function PerennialCrop:Infest(doer, value) --侵害
 	self.infested = self.infested + (value or 1)
 	if self.infested >= self.infested_max then
 		self.infested = 0
-		self:SetStage(self.stage, self.ishuge, true, true, false)
-		if self.timedata.paused then
-			self.timedata.left = nil --不用管，StartGrowing()时会自动设置的
+		self:SetStage(self.stage, true, false)
+		if self.timedata.paused then --StartGrowing()会自己启动task，所以这里只能我先算了
+			self.timedata.mult = nil
 			self.timedata.start = nil
 			self.timedata.all = nil
+			self.timedata.left = self:GetGrowTime().time
 		else
 			self:StartGrowing()
 		end
@@ -556,60 +660,59 @@ function PerennialCrop:Infest(doer, value) --侵害
 	return true
 end
 
-function PerennialCrop:Cure(doer) --治疗
+function PerennialCrop2:Cure(doer) --治疗
 	self.infested = 0
-	self.sickness = 0
 end
 
-function PerennialCrop:Tendable(doer, wish) --是否能照顾
-	if not self.tendable then
+function PerennialCrop2:Tendable(doer, wish) --是否能照顾
+	if self.isrotten or self.stage == self.stage_max then
 		return false
 	end
 
 	if wish == nil or wish then --希望是照顾
-		return not self.tended
+		return not self.donetendable
 	else --希望是取消照顾
-		return self.tended
+		return self.donetendable
 	end
 end
 
-function PerennialCrop:TendTo(doer, wish) --照顾
+function PerennialCrop2:TendTo(doer, wish) --照顾
 	if not self:Tendable(doer, wish) then
 		return false
 	end
 
 	if wish == nil or wish then --希望是照顾
-		self.num_tended = self.num_tended + 1
-		self.tended = true
+		self.donetendable = true
 	else --希望是取消照顾
-		self.num_tended = self.num_tended - 1
-		self.tended = false
+		self.donetendable = false
 	end
 	if self.inst.components.farmplanttendable ~= nil then
-		self.inst.components.farmplanttendable:SetTendable(not self.tended)
+		self.inst.components.farmplanttendable:SetTendable(not self.donetendable)
 	end
 	self.inst:DoTaskInTime(0.5 + math.random() * 0.5, function()
-		local fx = SpawnPrefab(self.tended and "farm_plant_happy" or "farm_plant_unhappy")
+		local fx = SpawnPrefab(self.donetendable and "farm_plant_happy" or "farm_plant_unhappy")
 		if fx ~= nil then
 			fx.Transform:SetPosition(self.inst.Transform:GetWorldPosition())
 		end
 	end)
 
+	--undo刷新生长时间
+
 	return true
 end
 
-function PerennialCrop:DoMagicGrowth(doer, dt) -- 催熟
+function PerennialCrop2:DoMagicGrowth(doer, dt) --催熟
 	--着火时无法被催熟
 	if self.inst.components.burnable ~= nil and self.inst.components.burnable:IsBurning() then
 		return false
 	end
 
 	--暂停生长时无法被催熟
-	if self.timedata.paused then
+	if self.timedata.paused or self.timedata.mult == nil then
 		return false
 	end
 
-	--成熟状态是无法被催熟的
+	--成熟状态是无法被催熟的（枯萎时可以催熟）
 	if not self.isrotten and self.stage == self.stage_max then
 		return true
 	end
@@ -622,73 +725,36 @@ function PerennialCrop:DoMagicGrowth(doer, dt) -- 催熟
 	return true
 end
 
-function PerennialCrop:Fertilize(item, doer) --施肥
+function PerennialCrop2:Fertilize(item, doer) --施肥
+	if self.isrotten or self.donenutrient or self.stage == self.stage_max then
+		return false
+	end
+
 	if item.components.fertilizer ~= nil and item.components.fertilizer.nutrients ~= nil then
-		local nutrients = item.components.fertilizer.nutrients
-		local isdone = false
+		if self.inst.components.burnable ~= nil then --快着火时能阻止着火
+			self.inst.components.burnable:StopSmoldering()
+		end
+		if item.components.fertilizer.fertilize_sound ~= nil then
+			self.inst.SoundEmitter:PlaySound(item.components.fertilizer.fertilize_sound)
+		end
+		self.donenutrient = true
+		--更新生长时间undo
 
-		--1号肥：加速生长
-		if nutrients[1] ~= nil and nutrients[1] > 0 and self.nutrientgrow < self.nutrientgrow_max then
-			self.nutrientgrow = math.min(self.nutrientgrow_max, self.nutrientgrow+nutrients[1])
-			isdone = true
-		end
-		--2号肥：预防疾病
-		if nutrients[2] ~= nil and nutrients[2] > 0 and self.nutrientsick < self.nutrientsick_max then
-			self.nutrientsick = math.min(self.nutrientsick_max, self.nutrientsick+nutrients[2])
-			isdone = true
-		end
-		--3号肥：生长必需
-		if nutrients[3] ~= nil and nutrients[3] > 0 and self.nutrient < self.nutrient_max then
-			self.nutrient = math.min(self.nutrient_max, self.nutrient+nutrients[3])
-			isdone = true
-		end
-
-		if isdone then
-			if self.inst.components.burnable ~= nil then --快着火时能阻止着火
-				self.inst.components.burnable:StopSmoldering()
-			end
-			if item.components.fertilizer.fertilize_sound ~= nil then
-				self.inst.SoundEmitter:PlaySound(item.components.fertilizer.fertilize_sound)
-			end
-			TriggerNutrient(self)
-			return true
-		end
+		return true
 	end
 
 	return false
 end
 
-function PerennialCrop:PourWater(item, doer, value) --浇水
-	if self.moisture < self.moisture_max then
-		self.moisture = math.min(self.moisture_max, self.moisture+(value or 6))
-		TriggerMoisture(self)
+function PerennialCrop2:PourWater(item, doer, value) --浇水
+	if self.isrotten or self.donemoisture or self.stage == self.stage_max then
+		return false
 	end
-end
 
-function PerennialCrop:SayDetail(doer, dotalk) --介绍细节
-	if
-		doer ~= nil and doer:HasTag("player") and not doer:HasTag("mime") and doer.components.inventory ~= nil
-	then
-		local str = nil
-		local hat = doer.components.inventory:GetEquippedItem(EQUIPSLOTS.HEAD)
+	self.donemoisture = true
+	--undo更新生长时间
 
-		if hat == nil then
-			if doer:HasTag("plantkin") then
-				str = GetDetailString(self, doer, 1)
-			end
-		elseif hat:HasTag("detailedplanthappiness") then
-			str = GetDetailString(self, doer, 2)
-		elseif hat:HasTag("plantinspector") then
-			str = GetDetailString(self, doer, 1)
-		end
-
-		if dotalk and str ~= nil and doer.components.talker ~= nil then
-			doer.components.talker:Say(str)
-		end
-
-		return str
-	end
-	return nil
+	return true
 end
 
 local function ComputValue(valuectl, valueneed)

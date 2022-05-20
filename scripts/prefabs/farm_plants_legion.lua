@@ -811,7 +811,7 @@ local function MakePlant2(cropprefab, sets)
 					end
 				end
 			end
-			inst.components.perennialcrop2:SetStage(1, false, false, true, false)
+			inst.components.perennialcrop2:SetStage(1, false, false)
 			inst.components.perennialcrop2:StartGrowing()
 
 			-- inst:WatchWorldState("israining", OnIsRaining) --下雨时补充水分
