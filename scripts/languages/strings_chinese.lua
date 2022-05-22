@@ -2372,6 +2372,40 @@ S_________WURT.DESCRIBE.FISHHOMINGBAIT = "浮勒浮，今天是哪条可爱的�
 S_______WALTER.DESCRIBE.FISHHOMINGBAIT = "我记得某电影里男主角说去钓鱼却从没打开过钓具袋..."
 S________WANDA.DESCRIBE.FISHHOMINGBAIT = "好了好了，某人就是想挥霍时间钓鱼对吧。"
 
+STRINGS.PLANT_CROP_L = {
+    WITHERED = "枯萎",
+    BLUE = "沮丧",
+    DRY = "干燥",
+    FEEBLE = "虚弱",
+    PREPOSITION = "的",
+    FLORESCENCE = "花期",
+}
+S_NAMES.PLANT_CARROT_L = "胡萝卜"
+S_NAMES.PLANT_CORN_L = "玉米杆"
+S_NAMES.PLANT_PUMPKIN_L = "南瓜架"
+S_NAMES.PLANT_EGGPLANT_L = "茄巢"
+S_NAMES.PLANT_DURIAN_L = "榴莲柳"
+S_NAMES.PLANT_POMEGRANATE_L = "石榴树"
+S_NAMES.PLANT_DRAGONFRUIT_L = "火龙果树"
+S_NAMES.PLANT_WATERMELON_L = "西瓜草"
+S_NAMES.PLANT_PINEANANAS_L = "松萝树"
+S_NAMES.PLANT_ONION_L = "洋葱圈"
+S_NAMES.PLANT_PEPPER_L = "薄荷椒"
+S_NAMES.PLANT_POTATO_L = "三地薯"
+S_NAMES.PLANT_GARLIC_L = "鸡毛蒜"
+S_NAMES.PLANT_TOMATO_L = "刺茄"
+S_NAMES.PLANT_ASPARAGUS_L = "芦笋丛"
+S_NAMES.PLANT_MANDRAKE_L = "培植曼德拉草"
+S_NAMES.PLANT_GOURD_L = "葫芦藤"
+
+S______GENERIC.DESCRIBE.PLANT_CROP_L = {
+    WITHERED = "已经枯萎了，就待春风吹又生...",
+    SPROUT = "已经发芽了，接下来会是什么样子呢...",
+    GROWING = "长吧，长吧，我会等到丰饶号角吹响的那天...",
+    FLORESCENCE = "开花了，正是招蜂引蝶的好时候...",
+    READY = "感谢我的付出与等待，更感谢自然的慷慨馈赠！",
+}
+
 --------------------------------------------------------------------------
 --[[ flash and crush ]]--[[ 电闪雷鸣 ]]
 --------------------------------------------------------------------------

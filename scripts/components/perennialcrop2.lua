@@ -67,6 +67,7 @@ local PerennialCrop2 = Class(function(self, inst)
 	self.onctlchange = nil
 
 	self.fn_overripe = nil --过熟时触发：fn(inst, numloot)
+	self.fn_loot = nil --获取收获物时触发：fn(inst, loot)
 	self.fn_stage = nil --每次设定生长阶段时额外触发的函数：fn(inst, isfull)
 	self.fn_defend = nil --作物被采集/破坏时会寻求庇护的函数：fn(inst, target)
 end,
@@ -88,6 +89,7 @@ function PerennialCrop2:SetUp(cropprefab, data)
 	self.cangrowindrak = data.cangrowindrak == true
 	self.getsickchance = data.getsickchance or 0.001
 	self.fn_overripe = data.fn_overripe
+	self.fn_loot = data.fn_loot
 	self.fn_stage = data.fn_stage
 end
 
@@ -155,12 +157,12 @@ function PerennialCrop2:SetStage(stage, isrotten, skip)
 			local regrowstage = crop.isrotten and 1 or crop.regrowstage --枯萎之后，只能从第一阶段开始
 			crop:SetStage(regrowstage, false, false)
 			crop:StartGrowing()
-			crop.infested = 0
-			crop.pollinated = 0
-			crop.numfruit = nil
 			if crop.fn_defend ~= nil then
 				crop.fn_defend(inst, doer)
 			end
+			crop.infested = 0
+			crop.pollinated = 0
+			crop.numfruit = nil
 		end
 	    self.inst.components.pickable:SetUp(nil)
 		self.inst.components.pickable.use_lootdropper_for_product = true
@@ -422,11 +424,11 @@ function PerennialCrop2:DoGrowth(skip)
 		self.donenutrient = false
 		self.donetendable = false
 
-		--如果此时在下雨/雪 undo
-		-- if TheWorld.state.israining or TheWorld.state.issnowing then
-		-- 	self:PourWater(nil, nil, self.moisture_max)
-		-- end
-		-- self:CostController() --计算消耗之前，先从管理器拿取资源
+		--如果此时在下雨/雪
+		if TheWorld.state.israining or TheWorld.state.issnowing then
+			self.donemoisture = true
+		end
+		self:CostController() --从管理器拿取资源
 	end
 
 	self:SetStage(data.stage, false, skip)
@@ -511,6 +513,7 @@ function PerennialCrop2:OnEntitySleep()
 end
 
 function PerennialCrop2:OnEntityWake()
+	--已经暂停的话，继续时会自己刷新的，不需要这里强制刷新
 	if self.timedata.paused or self.timedata.mult == nil then --暂停了、生长停滞、或者是永恒阶段
 		return
 	end
@@ -519,6 +522,7 @@ function PerennialCrop2:OnEntityWake()
 		--把目前已经经过的时间归入生长中去
 		local dt = GetTime() - self.timedata.start
 		if dt >= 0 then
+			self:OnEntitySleep()
 			self:LongUpdate(dt, false)
 			return
 		end
@@ -526,24 +530,16 @@ function PerennialCrop2:OnEntityWake()
 	self:StartGrowing() --数据丢失的话，就只能重新开始了
 end
 
-function PerennialCrop:OnSave()
-    local data =
-    {
-        moisture = self.moisture > 0 and self.moisture or nil,
-        nutrient = self.nutrient > 0 and self.nutrient or nil,
-		nutrientgrow = self.nutrientgrow > 0 and self.nutrientgrow or nil,
-        nutrientsick = self.nutrientsick > 0 and self.nutrientsick or nil,
-		sickness = self.sickness > 0 and self.sickness or nil,
-		stage = self.stage ~= 1 and self.stage or nil,
-		isrotten = self.isrotten or nil,
-		ishuge = self.ishuge or nil,
-		infested = self.infested > 0 and self.infested or nil,
+function PerennialCrop2:OnSave()
+    local data = {
+        donemoisture = self.donemoisture == true or nil,
+        donenutrient = self.donenutrient == true or nil,
+		donetendable = self.donetendable == true or nil,
+        stage = self.stage > 1 and self.stage or nil,
+		isrotten = self.isrotten == true or nil,
+		numfruit = self.numfruit ~= nil and self.numfruit or nil,
 		pollinated = self.pollinated > 0 and self.pollinated or nil,
-		num_nutrient = self.num_nutrient > 0 and self.num_nutrient or nil,
-		num_moisture = self.num_moisture > 0 and self.num_moisture or nil,
-		num_tended = self.num_tended > 0 and self.num_tended or nil,
-		num_perfect = self.num_perfect ~= nil and self.num_perfect or nil,
-		tended = self.tended or nil,
+		infested = self.infested > 0 and self.infested or nil,
     }
 
 	if self.timedata.paused then
@@ -551,53 +547,43 @@ function PerennialCrop:OnSave()
 		data.time_left = self.timedata.left
 	elseif self.timedata.start ~= nil and self.timedata.all ~= nil then
 		data.time_all = self.timedata.all
+		data.time_mult = self.timedata.mult
 		data.time_dt = GetTime() - self.timedata.start
 	end
 
-    return next(data) ~= nil and data or nil
+    return data
 end
 
-function PerennialCrop:OnLoad(data)
+function PerennialCrop2:OnLoad(data)
     if data == nil then
         return
     end
 
-	self.moisture = data.moisture ~= nil and data.moisture or 0
-	self.nutrient = data.nutrient ~= nil and data.nutrient or 0
-	self.nutrientgrow = data.nutrientgrow ~= nil and data.nutrientgrow or 0
-	self.nutrientsick = data.nutrientsick ~= nil and data.nutrientsick or 0
-	self.sickness = data.sickness ~= nil and data.sickness or 0
-	self.stage = data.stage ~= nil and data.stage or 1
-	self.isrotten = data.isrotten and true or false
-	self.ishuge = data.ishuge and true or false
-	self.infested = data.infested ~= nil and data.infested or 0
-	self.pollinated = data.pollinated ~= nil and data.pollinated or 0
-	self.num_nutrient = data.num_nutrient ~= nil and data.num_nutrient or 0
-	self.num_moisture = data.num_moisture ~= nil and data.num_moisture or 0
-	self.num_tended = data.num_tended ~= nil and data.num_tended or 0
-	self.num_perfect = data.num_perfect ~= nil and data.num_perfect or nil
-
-	self:SetStage(self.stage, self.ishuge, self.isrotten, false, false)
-
-	--恢复当前阶段的照顾情况
-	self.tended = data.tended and true or false
-	if self.tended and self.tendable then --若已经照顾过，且当前阶段可被照顾，则不能再被照顾
-		if self.inst.components.farmplanttendable ~= nil then
-			self.inst.components.farmplanttendable:SetTendable(false)
-		end
+	self.donemoisture = data.donemoisture ~= nil
+	self.donenutrient = data.donenutrient ~= nil
+	self.donetendable = data.donetendable ~= nil
+	if data.stage ~= nil then
+		self.stage = data.stage
 	end
+	self.isrotten = data.isrotten ~= nil
+	self.numfruit = data.numfruit
+	self.pollinated = data.pollinated or 0
+	self.infested = data.infested or 0
 
+	self:SetStage(self.stage, self.isrotten, false)
 	self:OnEntitySleep() --把task取消，根据情况继续
-	if data.time_paused then
+	if data.time_paused and data.time_left ~= nil then
 		self.timedata.paused = true
 		self.timedata.left = data.time_left
 		self.timedata.start = nil
 		self.timedata.all = nil
+		self.timedata.mult = nil
 	elseif data.time_dt ~= nil and data.time_all ~= nil then
 		self.timedata.paused = false
 		self.timedata.left = nil
 		self.timedata.start = GetTime()
 		self.timedata.all = data.time_all
+		self.timedata.mult = data.time_mult or 1
 		self:LongUpdate(data.time_dt, false)
 	else
 		self:StartGrowing() --数据丢失的话，就只能重新开始了
@@ -647,14 +633,7 @@ function PerennialCrop2:Infest(doer, value) --侵害
 	if self.infested >= self.infested_max then
 		self.infested = 0
 		self:SetStage(self.stage, true, false)
-		if self.timedata.paused then --StartGrowing()会自己启动task，所以这里只能我先算了
-			self.timedata.mult = nil
-			self.timedata.start = nil
-			self.timedata.all = nil
-			self.timedata.left = self:GetGrowTime().time
-		else
-			self:StartGrowing()
-		end
+		self:StartGrowing() --开始枯萎计时
 	end
 
 	return true
@@ -689,14 +668,16 @@ function PerennialCrop2:TendTo(doer, wish) --照顾
 	if self.inst.components.farmplanttendable ~= nil then
 		self.inst.components.farmplanttendable:SetTendable(not self.donetendable)
 	end
-	self.inst:DoTaskInTime(0.5 + math.random() * 0.5, function()
-		local fx = SpawnPrefab(self.donetendable and "farm_plant_happy" or "farm_plant_unhappy")
-		if fx ~= nil then
-			fx.Transform:SetPosition(self.inst.Transform:GetWorldPosition())
-		end
-	end)
+	if not self.inst:IsAsleep() then
+		self.inst:DoTaskInTime(0.5 + math.random() * 0.5, function()
+			local fx = SpawnPrefab(self.donetendable and "farm_plant_happy" or "farm_plant_unhappy")
+			if fx ~= nil then
+				fx.Transform:SetPosition(self.inst.Transform:GetWorldPosition())
+			end
+		end)
+	end
 
-	--undo刷新生长时间
+	self:OnEntityWake() --更新生长时间
 
 	return true
 end
@@ -720,6 +701,7 @@ function PerennialCrop2:DoMagicGrowth(doer, dt) --催熟
 	if dt == nil then
 		self:DoGrowth(false)
 	else
+		self:OnEntitySleep()
 		self:LongUpdate(dt, false)
 	end
 	return true
@@ -738,7 +720,7 @@ function PerennialCrop2:Fertilize(item, doer) --施肥
 			self.inst.SoundEmitter:PlaySound(item.components.fertilizer.fertilize_sound)
 		end
 		self.donenutrient = true
-		--更新生长时间undo
+		self:OnEntityWake() --更新生长时间
 
 		return true
 	end
@@ -752,71 +734,70 @@ function PerennialCrop2:PourWater(item, doer, value) --浇水
 	end
 
 	self.donemoisture = true
-	--undo更新生长时间
+	self:OnEntityWake() --更新生长时间
 
 	return true
 end
 
-local function ComputValue(valuectl, valueneed)
-	local _mo = 0
-	if valuectl >= valueneed then
-		_mo = valueneed
-		valueneed = 0
-	else
-		_mo = valuectl
-		valueneed = valueneed - valuectl
+function PerennialCrop2:CostController()
+	if self.isrotten or self.stage == self.stage_max then
+		return
 	end
-	return valueneed, _mo
-end
-function PerennialCrop:CostController()
-	local need_mo = math.max(0, self.moisture_max - self.moisture)
-	local need_n1 = math.max(0, self.nutrientgrow_max - self.nutrientgrow)
-	local need_n2 = math.max(0, self.nutrientsick_max - self.nutrientsick)
-	local need_n3 = math.max(0, self.nutrient_max - self.nutrient)
-
-	if need_mo == 0 and need_n1 == 0 and need_n2 == 0 and need_n3 == 0 then
+	if self.donemoisture and self.donenutrient and self.donetendable then
 		return
 	end
 
-	local _mo = 0
 	for _,ctl in pairs(self.ctls) do
 		if ctl and ctl:IsValid() and ctl.components.botanycontroller ~= nil then
 			local botanyctl = ctl.components.botanycontroller
 			local change = false
-			if need_mo > 0 and (botanyctl.type == 1 or botanyctl.type == 3) and botanyctl.moisture > 0 then
-				need_mo, _mo = ComputValue(botanyctl.moisture, need_mo)
-				botanyctl.moisture = botanyctl.moisture - _mo
-				self.moisture = self.moisture + _mo
+			if not self.donemoisture and (botanyctl.type == 1 or botanyctl.type == 3) and botanyctl.moisture > 0 then
+				botanyctl.moisture = math.max(botanyctl.moisture - 15, 0)
+				self.donemoisture = true
 				change = true
 			end
-			if botanyctl.type == 2 or botanyctl.type == 3 then
-				if need_n1 > 0 and botanyctl.nutrients[1] > 0 then
-					need_n1, _mo = ComputValue(botanyctl.nutrients[1], need_n1)
-					botanyctl.nutrients[1] = botanyctl.nutrients[1] - _mo
-					self.nutrientgrow = self.nutrientgrow + _mo
+
+			if not self.donenutrient and (botanyctl.type == 2 or botanyctl.type == 3) then
+				if botanyctl.nutrients[3] > 0 then
+					botanyctl.nutrients[3] = math.max(botanyctl.nutrients[3] - 5, 0)
+					self.donenutrient = true
 					change = true
-				end
-				if need_n2 > 0 and botanyctl.nutrients[2] > 0 then
-					need_n2, _mo = ComputValue(botanyctl.nutrients[2], need_n2)
-					botanyctl.nutrients[2] = botanyctl.nutrients[2] - _mo
-					self.nutrientsick = self.nutrientsick + _mo
+				elseif botanyctl.nutrients[2] > 0 then
+					botanyctl.nutrients[2] = math.max(botanyctl.nutrients[2] - 5, 0)
+					self.donenutrient = true
 					change = true
-				end
-				if need_n3 > 0 and botanyctl.nutrients[3] > 0 then
-					need_n3, _mo = ComputValue(botanyctl.nutrients[3], need_n3)
-					botanyctl.nutrients[3] = botanyctl.nutrients[3] - _mo
-					self.nutrient = self.nutrient + _mo
+				elseif botanyctl.nutrients[1] > 0 then
+					botanyctl.nutrients[1] = math.max(botanyctl.nutrients[1] - 5, 0)
+					self.donenutrient = true
 					change = true
 				end
 			end
+
+			if not self.donetendable and botanyctl.type == 3 then
+				self.donetendable = true
+				change = true
+				if not self.inst:IsAsleep() then
+					self.inst:DoTaskInTime(0.5 + math.random() * 0.5, function()
+						local fx = SpawnPrefab("farm_plant_happy")
+						if fx ~= nil then
+							fx.Transform:SetPosition(self.inst.Transform:GetWorldPosition())
+						end
+					end)
+				end
+			end
+
 			if change then
 				botanyctl:SetBars()
+			end
+
+			if self.donemoisture and self.donenutrient and self.donetendable then
+				break
 			end
 		end
 	end
 end
 
-function PerennialCrop:TriggerController(ctl, isadd, noupdate)
+function PerennialCrop2:TriggerController(ctl, isadd, noupdate)
 	if ctl.GUID == nil then
 		return
 	end
@@ -843,15 +824,15 @@ function PerennialCrop:TriggerController(ctl, isadd, noupdate)
 	end
 end
 
-function PerennialCrop:DisplayCrop(oldcrop, doer) --替换作物：把它的养料占为己有
-	local oldcpt = oldcrop.components.perennialcrop
+function PerennialCrop2:DisplayCrop(oldcrop, doer) --替换作物：把它的养料占为己有
+	local oldcpt = oldcrop.components.perennialcrop2
 
-	self.nutrientgrow = math.min(self.nutrientgrow_max, self.nutrientgrow+oldcpt.nutrientgrow)
-	self.nutrientsick = math.min(self.nutrientsick_max, self.nutrientsick+oldcpt.nutrientsick)
-	self.nutrient = math.min(self.nutrient_max, self.nutrient+oldcpt.nutrient)
-	TriggerNutrient(self)
-
-	self:PourWater(nil, nil, oldcpt.moisture)
+	if oldcpt.donemoisture then
+		self.donemoisture = true
+	end
+	if oldcpt.donenutrient then
+		self.donenutrient = true
+	end
 
 	oldcrop.components.lootdropper:DropLoot()
 
@@ -862,4 +843,4 @@ function PerennialCrop:DisplayCrop(oldcrop, doer) --替换作物：把它的养�
 	SpawnPrefab("dirt_puff").Transform:SetPosition(x, y, z)
 end
 
-return PerennialCrop
+return PerennialCrop2

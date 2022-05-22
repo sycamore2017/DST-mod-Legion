@@ -2391,6 +2391,40 @@ S_________WURT.DESCRIBE.FISHHOMINGBAIT = "Flurph, which lovely fish will be attr
 S_______WALTER.DESCRIBE.FISHHOMINGBAIT = "I remember a man who said he went fishing but never opened the fishing bag."
 S________WANDA.DESCRIBE.FISHHOMINGBAIT = "Well, someone just wants to waste time fishing, right?"
 
+STRINGS.PLANT_CROP_L = {
+    WITHERED = "Withered ",
+    BLUE = "Blue ",
+    DRY = "Dry ",
+    FEEBLE = "Feeble ",
+    PREPOSITION = "",
+    FLORESCENCE = "Blooming ",
+}
+S_NAMES.PLANT_CARROT_L = "Carrot Plant"
+S_NAMES.PLANT_CORN_L = "Corn Plant"
+S_NAMES.PLANT_PUMPKIN_L = "Pumpkin Rack"
+S_NAMES.PLANT_EGGPLANT_L = "Eggplant Nest"
+S_NAMES.PLANT_DURIAN_L = "Durian Willow"
+S_NAMES.PLANT_POMEGRANATE_L = "Pomegranate Tree"
+S_NAMES.PLANT_DRAGONFRUIT_L = "Pitaya Tree"
+S_NAMES.PLANT_WATERMELON_L = "Watermelon Grass"
+S_NAMES.PLANT_PINEANANAS_L = "Pineananas Tree"
+S_NAMES.PLANT_ONION_L = "Onion Ring"
+S_NAMES.PLANT_PEPPER_L = "Pepper Mint"
+S_NAMES.PLANT_POTATO_L = "Triple Potato"
+S_NAMES.PLANT_GARLIC_L = "Feather Garlic"
+S_NAMES.PLANT_TOMATO_L = "Tomato Bramble"
+S_NAMES.PLANT_ASPARAGUS_L = "Asparagus Clump"
+S_NAMES.PLANT_MANDRAKE_L = "Planted Mandrake"
+S_NAMES.PLANT_GOURD_L = "Gourd Vine"
+
+S______GENERIC.DESCRIBE.PLANT_CROP_L = {
+    WITHERED = "It will be born again when spring breeze blows...",
+    SPROUT = "What will it look like next...",
+    GROWING = "I will wait until the day when the horn of harvest blows...",
+    FLORESCENCE = "Flowering is a good time to attract bees and butterflies...",
+    READY = "Thank nature for its generous gifts!",
+}
+
 --------------------------------------------------------------------------
 --[[ flash and crush ]]--[[ 电闪雷鸣 ]]
 --------------------------------------------------------------------------

@@ -280,7 +280,7 @@ PLANT_DEFS.pineananas = {
 }
 
 --------------------------------------------------------------------------
---[[ 添加新动作：让种子能种在 子圭·垄 里 ]]
+--[[ 添加新动作：让种子能种在 子圭·垄 和 旧版作物 里 ]]
 --------------------------------------------------------------------------
 
 local WEIGHTED_SEED_TABLE = require("prefabs/weed_defs").weighted_seed_table
@@ -343,13 +343,15 @@ local function OnPlant(seed, doer, soilorcrop)
     end
     return false
 end
+local function OnPlant2(seed, doer, crop) --undo
+end
 
 local PLANTSOIL_LEGION = Action({ theme_music = "farming" })
 PLANTSOIL_LEGION.id = "PLANTSOIL_LEGION"
 PLANTSOIL_LEGION.str = STRINGS.ACTIONS.PLANTSOIL_LEGION
 PLANTSOIL_LEGION.strfn = function(act)
     if act.target ~= nil then
-        if act.target:HasTag("crop_legion") then
+        if act.target:HasTag("crop_legion") or act.target:HasTag("crop2_legion") then
             return "DISPLAY"
         end
     end
@@ -360,12 +362,21 @@ PLANTSOIL_LEGION.fn = function(act)
         act.invobject ~= nil and
         act.doer.components.inventory ~= nil and
         act.target ~= nil and
-        (act.target:HasTag("soil_legion") or act.target.components.perennialcrop ~= nil)
+        (
+            act.target:HasTag("soil_legion") or
+            act.target.components.perennialcrop ~= nil or act.target.components.perennialcrop2 ~= nil
+        )
     then
         local seed = act.doer.components.inventory:RemoveItem(act.invobject)
         if seed ~= nil then
-            if OnPlant(seed, act.doer, act.target) then
-                return true
+            if act.target.components.perennialcrop2 ~= nil then
+                if OnPlant2(seed, act.doer, act.target) then
+                    return true
+                end
+            else
+                if OnPlant(seed, act.doer, act.target) then
+                    return true
+                end
             end
 
             act.doer.components.inventory:GiveItem(seed)
@@ -379,8 +390,9 @@ AddComponentAction("USEITEM", "farmplantable", function(inst, doer, target, acti
         table.insert(actions, ACTIONS.PLANTSOIL_LEGION)
     end
 end)
+--undo得新找个组件来应用了动作了
 
-AddStategraphActionHandler("wilson", ActionHandler(ACTIONS.PLANTSOIL_LEGION, function(inst, action)
+local function FnSgPlantLegion(inst, action)
     if
         inst:HasTag("fastbuilder") or inst:HasTag("fastpicker")
         or ( --八戒要不饥饿时空手采摘才会加快
@@ -393,21 +405,9 @@ AddStategraphActionHandler("wilson", ActionHandler(ACTIONS.PLANTSOIL_LEGION, fun
     else
         return "dolongaction"
     end
-end))
-AddStategraphActionHandler("wilson_client", ActionHandler(ACTIONS.PLANTSOIL_LEGION, function(inst, action)
-    if
-        inst:HasTag("fastbuilder") or inst:HasTag("fastpicker")
-        or ( --八戒要不饥饿时空手采摘才会加快
-            inst:HasTag("pigsy")
-            and inst.replica.inventory:GetEquippedItem(EQUIPSLOTS.HANDS) == nil
-            and inst.replica.hunger:GetCurrent() >= 50
-        )
-    then
-        return "domediumaction"
-    else
-        return "dolongaction"
-    end
-end))
+end
+AddStategraphActionHandler("wilson", ActionHandler(ACTIONS.PLANTSOIL_LEGION, FnSgPlantLegion))
+AddStategraphActionHandler("wilson_client", ActionHandler(ACTIONS.PLANTSOIL_LEGION, FnSgPlantLegion))
 
 --------------------------------------------------------------------------
 --[[ 施肥相关的多年生作物兼容 ]]
@@ -987,6 +987,28 @@ _G.CROPS_DATA_LEGION.eggplant = {
         [2] = "level6_2",
         [3] = "level6_3",
     },
+    fn_loot = function(inst, loots)
+        local crop = inst.components.perennialcrop2
+        if crop.stage == crop.stage_max then
+            if crop.numfruit ~= nil and crop.numfruit > 0 then
+                if crop.isrotten then
+                    for i = 1, crop.numfruit, 1 do
+                        table.insert(loots, "spoiled_food")
+                    end
+                    if math.random() < 0.4 then
+                        table.insert(loots, "rottenegg")
+                    end
+                else
+                    for i = 1, crop.numfruit, 1 do
+                        table.insert(loots, crop.cropprefab)
+                    end
+                    if math.random() < 0.4 then
+                        table.insert(loots, "bird_egg")
+                    end
+                end
+            end
+        end
+    end
 }
 _G.CROPS_DATA_LEGION.durian = {
     growthmults = { [1] = 0.8, [2] = 1.2, [3] = 1.2, [4] = 0 }, --春
@@ -1006,6 +1028,25 @@ _G.CROPS_DATA_LEGION.durian = {
         [2] = "level6_durian_2",
         [3] = "level6_durian_3",
     },
+    fn_loot = function(inst, loots)
+        local crop = inst.components.perennialcrop2
+        if crop.stage == crop.stage_max then
+            if crop.numfruit ~= nil and crop.numfruit > 0 then
+                if crop.isrotten then
+                    for i = 1, crop.numfruit, 1 do
+                        table.insert(loots, "spoiled_food")
+                    end
+                else
+                    for i = 1, crop.numfruit, 1 do
+                        table.insert(loots, crop.cropprefab)
+                    end
+                end
+                if math.random() < 0.05 then
+                    table.insert(loots, "livinglog")
+                end
+            end
+        end
+    end
 }
 _G.CROPS_DATA_LEGION.pomegranate = {
     growthmults = { [1] = 0.8, [2] = 0.8, [3] = 1.2, [4] = 0 }, --春夏
@@ -1082,6 +1123,25 @@ _G.CROPS_DATA_LEGION.pineananas = {
         [2] = "level6_2",
         [3] = "level6_3",
     },
+    fn_loot = function(inst, loots)
+        local crop = inst.components.perennialcrop2
+        if crop.stage == crop.stage_max then
+            if crop.numfruit ~= nil and crop.numfruit > 0 then
+                if crop.isrotten then
+                    for i = 1, crop.numfruit, 1 do
+                        table.insert(loots, "spoiled_food")
+                    end
+                else
+                    for i = 1, crop.numfruit, 1 do
+                        table.insert(loots, crop.cropprefab)
+                    end
+                end
+                if math.random() < 0.05 then
+                    table.insert(loots, "pinecone")
+                end
+            end
+        end
+    end
 }
 _G.CROPS_DATA_LEGION.onion = {
     growthmults = { [1] = 0.8, [2] = 0.8, [3] = 0.8, [4] = 0 }, --春秋夏
@@ -1117,7 +1177,29 @@ _G.CROPS_DATA_LEGION.pepper = {
         [1] = "level5_1",
         [2] = "level5_2",
         [3] = "level5_3",
-    }
+    },
+    fn_loot = function(inst, loots)
+        local crop = inst.components.perennialcrop2
+        if crop.stage == crop.stage_max then
+            if crop.numfruit ~= nil and crop.numfruit > 0 then
+                if crop.isrotten then
+                    for i = 1, crop.numfruit, 1 do
+                        table.insert(loots, "spoiled_food")
+                    end
+                    if math.random() < 0.4 then
+                        table.insert(loots, "spoiled_food")
+                    end
+                else
+                    for i = 1, crop.numfruit, 1 do
+                        table.insert(loots, crop.cropprefab)
+                    end
+                    if math.random() < 0.4 then
+                        -- table.insert(loots, "mint_l") --undo
+                    end
+                end
+            end
+        end
+    end
 }
 _G.CROPS_DATA_LEGION.potato = {
     growthmults = { [1] = 0.8, [2] = 1.2, [3] = 0.8, [4] = 1.5 }, --春秋冬
@@ -1153,7 +1235,29 @@ _G.CROPS_DATA_LEGION.garlic = {
         [1] = "level5_1",
         [2] = "level5_2",
         [3] = "level5_3",
-    }
+    },
+    fn_loot = function(inst, loots)
+        local crop = inst.components.perennialcrop2
+        if crop.stage == crop.stage_max then
+            if crop.numfruit ~= nil and crop.numfruit > 0 then
+                if crop.isrotten then
+                    for i = 1, crop.numfruit, 1 do
+                        table.insert(loots, "spoiled_food")
+                    end
+                else
+                    for i = 1, crop.numfruit, 1 do
+                        table.insert(loots, crop.cropprefab)
+                    end
+                end
+                local rand = math.random()
+                if rand < 0.03 then
+                    table.insert(loots, "feather_crow")
+                elseif rand < 0.05 then
+                    table.insert(loots, "feather_robin")
+                end
+            end
+        end
+    end
 }
 _G.CROPS_DATA_LEGION.tomato = {
     growthmults = { [1] = 0.8, [2] = 0.8, [3] = 0.8, [4] = 0 }, --春夏秋
@@ -1196,13 +1300,58 @@ _G.CROPS_DATA_LEGION.mandrake = {
     regrowstage = 1,
     bank = "crop_legion_mandrake",
     build = "crop_legion_mandrake",
+    getsickchance = 0,
     leveldata = {
         [1] = { anim = "level1", time = time_years * 0.16, deadanim = "dead1", witheredprefab = {"cutgrass"}, },
         [2] = { anim = "level2", time = time_years * 0.24, deadanim = "dead1", witheredprefab = {"cutgrass"}, },
         [3] = { anim = "level3", time = time_years * 0.36, deadanim = "dead1", witheredprefab = {"cutgrass"}, },
         [4] = { anim = "level4", time = time_years * 0.24, deadanim = "dead1", witheredprefab = {"cutgrass"}, },
         [5] = { anim = "level5", time = nil,               deadanim = "dead1", witheredprefab = {"cutgrass"}, },
-    }
+    },
+    fn_loot = function(inst, loots)
+        local crop = inst.components.perennialcrop2
+        if crop.isrotten then
+            table.insert(loots, "livinglog")
+            table.insert(loots, "livinglog")
+        elseif crop.stage == crop.stage_max then
+            table.insert(loots, "mandrake")
+        end
+    end,
+    fn_defend = function(inst, target)
+        local doer = target or inst
+        if doer.SoundEmitter then
+            doer.SoundEmitter:PlaySound("dontstarve/creatures/mandrake/death")
+        else
+            inst.SoundEmitter:PlaySound("dontstarve/creatures/mandrake/death")
+        end
+        doer:DoTaskInTime(0.5, function()
+            local x, y, z = inst.Transform:GetWorldPosition()
+            local time = TUNING.MANDRAKE_SLEEP_TIME
+            local ents = TheSim:FindEntities(x, y, z, TUNING.MANDRAKE_SLEEP_RANGE_COOKED, nil,
+                { "playerghost", "FX", "DECOR", "INLIMBO" }, { "sleeper", "player" })
+            for i, v in ipairs(ents) do
+                if
+                    not (v.components.freezable ~= nil and v.components.freezable:IsFrozen()) and
+                    not (v.components.pinnable ~= nil and v.components.pinnable:IsStuck()) and
+                    not (v.components.fossilizable ~= nil and v.components.fossilizable:IsFossilized())
+                then
+                    local mount = v.components.rider ~= nil and v.components.rider:GetMount() or nil
+                    if mount ~= nil then
+                        mount:PushEvent("ridersleep", { sleepiness = 7, sleeptime = time + math.random() })
+                    end
+                    if v:HasTag("player") then
+                        v:PushEvent("yawn", { grogginess = 4, knockoutduration = time + math.random() })
+                    elseif v.components.sleeper ~= nil then
+                        v.components.sleeper:AddSleepiness(7, time + math.random())
+                    elseif v.components.grogginess ~= nil then
+                        v.components.grogginess:AddGrogginess(4, time + math.random())
+                    else
+                        v:PushEvent("knockedout")
+                    end
+                end
+            end
+        end)
+    end
 }
 
 if _G.CONFIGS_LEGION.ENABLEDMODS.MythWords then

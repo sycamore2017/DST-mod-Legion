@@ -524,7 +524,7 @@ function PerennialCrop:OnSave()
 		data.time_dt = GetTime() - self.timedata.start
 	end
 
-    return next(data) ~= nil and data or nil
+    return data
 end
 
 function PerennialCrop:OnLoad(data)
@@ -532,20 +532,20 @@ function PerennialCrop:OnLoad(data)
         return
     end
 
-	self.moisture = data.moisture ~= nil and data.moisture or 0
-	self.nutrient = data.nutrient ~= nil and data.nutrient or 0
-	self.nutrientgrow = data.nutrientgrow ~= nil and data.nutrientgrow or 0
-	self.nutrientsick = data.nutrientsick ~= nil and data.nutrientsick or 0
-	self.sickness = data.sickness ~= nil and data.sickness or 0
-	self.stage = data.stage ~= nil and data.stage or 1
+	self.moisture = data.moisture or 0
+	self.nutrient = data.nutrient or 0
+	self.nutrientgrow = data.nutrientgrow or 0
+	self.nutrientsick = data.nutrientsick or 0
+	self.sickness = data.sickness or 0
+	self.stage = data.stage or 1
 	self.isrotten = data.isrotten and true or false
 	self.ishuge = data.ishuge and true or false
-	self.infested = data.infested ~= nil and data.infested or 0
-	self.pollinated = data.pollinated ~= nil and data.pollinated or 0
-	self.num_nutrient = data.num_nutrient ~= nil and data.num_nutrient or 0
-	self.num_moisture = data.num_moisture ~= nil and data.num_moisture or 0
-	self.num_tended = data.num_tended ~= nil and data.num_tended or 0
-	self.num_perfect = data.num_perfect ~= nil and data.num_perfect or nil
+	self.infested = data.infested or 0
+	self.pollinated = data.pollinated or 0
+	self.num_nutrient = data.num_nutrient or 0
+	self.num_moisture = data.num_moisture or 0
+	self.num_tended = data.num_tended or 0
+	self.num_perfect = data.num_perfect or nil
 
 	self:SetStage(self.stage, self.ishuge, self.isrotten, false, false)
 
@@ -674,12 +674,14 @@ function PerennialCrop:TendTo(doer, wish) --照顾
 	if self.inst.components.farmplanttendable ~= nil then
 		self.inst.components.farmplanttendable:SetTendable(not self.tended)
 	end
-	self.inst:DoTaskInTime(0.5 + math.random() * 0.5, function()
-		local fx = SpawnPrefab(self.tended and "farm_plant_happy" or "farm_plant_unhappy")
-		if fx ~= nil then
-			fx.Transform:SetPosition(self.inst.Transform:GetWorldPosition())
-		end
-	end)
+	if not self.inst:IsAsleep() then
+		self.inst:DoTaskInTime(0.5 + math.random() * 0.5, function()
+			local fx = SpawnPrefab(self.tended and "farm_plant_happy" or "farm_plant_unhappy")
+			if fx ~= nil then
+				fx.Transform:SetPosition(self.inst.Transform:GetWorldPosition())
+			end
+		end)
+	end
 
 	return true
 end

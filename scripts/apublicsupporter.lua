@@ -315,6 +315,8 @@ if CONFIGS_LEGION.FLOWERSPOWER or CONFIGS_LEGION.LEGENDOFFALL then --4种花丛�
                 if self:CanPollinate(flower) then
                     if flower.components.perennialcrop ~= nil then
                         flower.components.perennialcrop:Pollinate(self.inst)
+                    elseif flower.components.perennialcrop2 ~= nil then
+                        flower.components.perennialcrop2:Pollinate(self.inst)
                     end
                 end
                 if Pollinate_old ~= nil then
