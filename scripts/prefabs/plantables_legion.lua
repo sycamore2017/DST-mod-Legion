@@ -1,4 +1,4 @@
--- require "prefabutil"
+local prefabs = {}
 
 local function MakePlantable(name, data)
     local assets =
@@ -114,7 +114,7 @@ local function MakePlantable(name, data)
                 end
 
                 if deployer ~= nil and deployer.SoundEmitter ~= nil then
-                    deployer.SoundEmitter:PlaySound("dontstarve/common/plant")
+                    deployer.SoundEmitter:PlaySound(data.deployable.sound or "dontstarve/common/plant")
                 end
             end
         end
@@ -246,8 +246,7 @@ if CONFIGS_LEGION.FLOWERSPOWER then
         end,
         fn_server = nil,
     }
-    plantables.cutted_orchidbush =
-    {
+    plantables.cutted_orchidbush = {
         animstate = { bank = "orchidbush", build = "orchidbush", anim = "cutted", anim_palcer = "dead", },
         floater = {nil, "large", 0.1, 0.55},
         stacksize = TUNING.STACK_SIZE_SMALLITEM,
@@ -259,13 +258,12 @@ if CONFIGS_LEGION.FLOWERSPOWER then
         },
         deployable = {
             prefab = "orchidbush",
-            mode = DEPLOYMODE.PLANT,
-            spacing = DEPLOYSPACING.MEDIUM,
+            mode = DEPLOYMODE.PLANT, spacing = DEPLOYSPACING.MEDIUM
         },
         fn_common = function(inst)
             inst:AddTag("deployedplant")
         end,
-        fn_server = nil,
+        fn_server = nil
     }
 end
 
@@ -323,15 +321,34 @@ if CONFIGS_LEGION.LEGENDOFFALL then
 			end)
         end,
     }
+
+    for k,v in pairs(CROPS_DATA_LEGION) do
+        plantables["seeds_"..k.."_l"] = {
+            deployable = {
+                prefab = "plant_"..k.."_l",
+                mode = DEPLOYMODE.PLANT, spacing = DEPLOYSPACING.MEDIUM,
+                sound = "dontstarve/wilson/plant_seeds"
+            },
+            fn_common = function(inst)
+                inst:AddTag("deployedplant")
+                inst.overridedeployplacername = "seeds_crop_l_placer"
+            end,
+            fn_server = function(inst)
+                
+            end
+        }
+    end
+    table.insert(prefabs, MakePlacer("seeds_crop_l_placer", "crop_soil_legion", "crop_soil_legion", "placer"))
 end
 
 --------------------
 --------------------
 
-local prefabs = {}
 for i, v in pairs(plantables) do
     table.insert(prefabs, MakePlantable(i, v))
-    table.insert(prefabs, MakePlacer(i.."_placer", v.animstate.bank, v.animstate.build, v.animstate.anim_palcer))
+    if v.animstate.anim_palcer ~= nil then
+        table.insert(prefabs, MakePlacer(i.."_placer", v.animstate.bank, v.animstate.build, v.animstate.anim_palcer))
+    end
 end
 
 return unpack(prefabs)

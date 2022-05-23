@@ -53,6 +53,7 @@ local IsServer = TheNet:GetIsServer() or TheNet:IsDedicated()
 --------------------------------------------------------------------------
 
 AddIngredientValues({"pineananas"}, {veggie=1, fruit=1}, true, false)
+AddIngredientValues({"mint_l"}, {veggie=.5}, false, false)
 
 _G.RegistMiniMapImage_legion("siving_derivant")
 _G.RegistMiniMapImage_legion("siving_thetree")
@@ -1266,7 +1267,7 @@ _G.CROPS_DATA_LEGION.pepper = {
                         table.insert(loots, crop.cropprefab)
                     end
                     if math.random() < 0.4 then
-                        -- table.insert(loots, "mint_l") --undo
+                        table.insert(loots, "mint_l")
                     end
                 end
             end
@@ -1446,4 +1447,75 @@ if _G.CONFIGS_LEGION.ENABLEDMODS.MythWords then
             [3] = "level6_3",
         },
     }
+end
+
+--------------------------------------------------------------------------
+--[[ 修改浣猫，让猫薄荷对其产生特殊作用 ]]
+--------------------------------------------------------------------------
+
+if IsServer then
+    AddPrefabPostInit("catcoon", function(inst)
+        local onaccept_old = inst.components.trader.onaccept
+        inst.components.trader.onaccept = function(cat, giver, item)
+            if not item:HasTag("catmint") then
+                onaccept_old(cat, giver, item)
+                return
+            end
+
+            if cat.components.sleeper:IsAsleep() then
+                cat.components.sleeper:WakeUp()
+            end
+            if cat.components.combat.target == giver then
+                cat.components.combat:SetTarget(nil)
+                cat.SoundEmitter:PlaySound("dontstarve_DLC001/creatures/catcoon/pickup")
+
+                -->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+                cat.excitedaboutmint = nil --取消兴奋
+                --<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+            elseif giver.components.leader ~= nil then
+                if giver.components.minigame_participator == nil then
+                    giver:PushEvent("makefriend")
+                    giver.components.leader:AddFollower(cat)
+                end
+
+                -->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+                cat.last_hairball_time = GetTime()
+                cat.hairball_friend_interval = math.random(2,4)
+                cat.components.follower:AddLoyaltyTime(TUNING.CATCOON_LOYALTY_PER_ITEM * 5) --提升了跟随的时间
+                cat.excitedaboutmint = true --兴奋时间到
+                --<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+                if not cat.sg:HasStateTag("busy") then
+                    cat:FacePoint(giver.Transform:GetWorldPosition())
+                    cat.sg:GoToState("pawground")
+                end
+            end
+            item:Remove()
+        end
+
+        local PickRandomGift_old = inst.PickRandomGift
+        inst.PickRandomGift = function(cat, tier)
+            if cat.excitedaboutmint then
+                if --处于兴奋中，有跟随对象，并且，没有攻击目标，或者自己的攻击目标不是跟随对象
+                    cat.components.follower and cat.components.follower.leader and
+                    cat.components.combat.target ~= cat.components.follower.leader
+                then
+                    if math.random() < 0.1 then
+                        --恭喜，得到猫线球，退出兴奋状态
+                        cat.excitedaboutmint = nil
+                        return "cattenball"
+                    else
+                        --如果没有吐出猫线球，则减少下一次呕吐的间隔。因为在brain中已经算好这次的间隔了，所以在这只需减少即可
+                        if cat.hairball_friend_interval ~= nil then
+                            cat.hairball_friend_interval = cat.hairball_friend_interval / 4
+                        end
+                    end
+                else
+                    cat.excitedaboutmint = nil
+                end
+            end
+
+            return PickRandomGift_old(cat, tier)
+        end
+    end)
 end

@@ -1,0 +1,254 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<spriter_data scml_version="1.0" generator="BrashMonkey Spriter" generator_version="r7">
+    <folder id="0" name="farmingdung">
+        <file id="0" name="farmingdung/farmingdung-0.png" width="64" height="60" pivot_x="0.500391" pivot_y="0.5"/>
+        <file id="1" name="farmingdung/farmingdung-1.png" width="72" height="60" pivot_x="0.438542" pivot_y="0.464583"/>
+        <file id="2" name="farmingdung/farmingdung-2.png" width="60" height="60" pivot_x="0.489583" pivot_y="0.490417"/>
+        <file id="3" name="farmingdung/farmingdung-5.png" width="152" height="100" pivot_x="0.439638" pivot_y="0.295"/>
+        <file id="4" name="farmingdung/farmingdung-6.png" width="140" height="108" pivot_x="0.446786" pivot_y="0.234722"/>
+        <file id="5" name="farmingdung/farmingdung-7.png" width="184" height="92" pivot_x="0.435054" pivot_y="0.27962"/>
+    </folder>
+    <folder id="1" name="wormwood">
+        <file id="0" name="wormwood/wormwood-0.png" width="64" height="60" pivot_x="0.500391" pivot_y="0.5"/>
+        <file id="1" name="wormwood/wormwood-1.png" width="72" height="60" pivot_x="0.438542" pivot_y="0.464583"/>
+        <file id="2" name="wormwood/wormwood-2.png" width="60" height="60" pivot_x="0.489583" pivot_y="0.490417"/>
+        <file id="3" name="wormwood/wormwood-5.png" width="152" height="100" pivot_x="0.439638" pivot_y="0.295"/>
+        <file id="4" name="wormwood/wormwood-6.png" width="140" height="108" pivot_x="0.446786" pivot_y="0.234722"/>
+        <file id="5" name="wormwood/wormwood-7.png" width="184" height="92" pivot_x="0.435054" pivot_y="0.27962"/>
+    </folder>
+    <folder id="2" name="sprout">
+        <file id="0" name="sprout/sprout-0.png" width="150" height="117" pivot_x="0.486667" pivot_y="0.102564"/>
+    </folder>
+    <folder id="3" name="soil">
+        <file id="0" name="soil/soil-0.png" width="64" height="60" pivot_x="0.500391" pivot_y="0.5"/>
+        <file id="1" name="soil/soil-1.png" width="72" height="60" pivot_x="0.438542" pivot_y="0.464583"/>
+        <file id="2" name="soil/soil-2.png" width="60" height="60" pivot_x="0.489583" pivot_y="0.490417"/>
+        <file id="3" name="soil/soil-5.png" width="152" height="100" pivot_x="0.439638" pivot_y="0.295"/>
+        <file id="4" name="soil/soil-6.png" width="140" height="108" pivot_x="0.446786" pivot_y="0.234722"/>
+        <file id="5" name="soil/soil-7.png" width="184" height="92" pivot_x="0.435054" pivot_y="0.27962"/>
+    </folder>
+    <entity id="0" name="crop_soil_legion">
+        <animation id="0" name="soil" length="1000" interval="100">
+            <mainline>
+                <key id="0">
+                    <object_ref id="0" timeline="5" key="0" z_index="0"/>
+                    <object_ref id="1" timeline="4" key="0" z_index="1"/>
+                    <object_ref id="2" timeline="3" key="0" z_index="2"/>
+                    <object_ref id="3" timeline="2" key="0" z_index="3"/>
+                    <object_ref id="4" timeline="1" key="0" z_index="4"/>
+                    <object_ref id="5" timeline="0" key="0" z_index="5"/>
+                </key>
+            </mainline>
+            <timeline id="0" name="soil-5">
+                <key id="0" spin="0">
+                    <object folder="3" file="3" x="-0.167196" y="-27.298894" angle="359" scale_x="0.57549" scale_y="0.54242"/>
+                </key>
+            </timeline>
+            <timeline id="1" name="soil-6">
+                <key id="0" spin="0">
+                    <object folder="3" file="4" x="-35.448983" y="-23.082499" angle="359" scale_x="0.55" scale_y="0.51842"/>
+                </key>
+            </timeline>
+            <timeline id="2" name="soil-7">
+                <key id="0" spin="0">
+                    <object folder="3" file="5" x="28.073746" y="-13.739701" angle="359" scale_x="0.55" scale_y="0.51842"/>
+                </key>
+            </timeline>
+            <timeline id="3" name="soil-0">
+                <key id="0" spin="0">
+                    <object folder="3" file="0" x="-28.610044" y="10.603275" angle="359" scale_x="0.72853" scale_y="0.68669"/>
+                </key>
+            </timeline>
+            <timeline id="4" name="soil-2">
+                <key id="0" spin="0">
+                    <object folder="3" file="2" x="16.432842" y="12.667483" angle="359" scale_x="0.72853" scale_y="0.68669"/>
+                </key>
+            </timeline>
+            <timeline id="5" name="soil-1">
+                <key id="0" spin="0">
+                    <object folder="3" file="1" x="-8.591274" y="11.504037" angle="30.582" scale_x="0.7253" scale_y="0.68418"/>
+                </key>
+            </timeline>
+        </animation>
+        <animation id="1" name="soil_dung" length="1000" interval="100">
+            <mainline>
+                <key id="0">
+                    <object_ref id="0" timeline="5" key="0" z_index="0"/>
+                    <object_ref id="1" timeline="4" key="0" z_index="1"/>
+                    <object_ref id="2" timeline="3" key="0" z_index="2"/>
+                    <object_ref id="3" timeline="2" key="0" z_index="3"/>
+                    <object_ref id="4" timeline="1" key="0" z_index="4"/>
+                    <object_ref id="5" timeline="0" key="0" z_index="5"/>
+                </key>
+            </mainline>
+            <timeline id="0" name="farmingdung-5">
+                <key id="0" spin="0">
+                    <object folder="0" file="3" x="-0.167196" y="-27.298894" angle="359" scale_x="0.57549" scale_y="0.54242"/>
+                </key>
+            </timeline>
+            <timeline id="1" name="farmingdung-6">
+                <key id="0" spin="0">
+                    <object folder="0" file="4" x="-35.448983" y="-23.082499" angle="359" scale_x="0.55" scale_y="0.51842"/>
+                </key>
+            </timeline>
+            <timeline id="2" name="farmingdung-7">
+                <key id="0" spin="0">
+                    <object folder="0" file="5" x="28.073746" y="-13.739701" angle="359" scale_x="0.55" scale_y="0.51842"/>
+                </key>
+            </timeline>
+            <timeline id="3" name="farmingdung-0">
+                <key id="0" spin="0">
+                    <object folder="0" file="0" x="-28.610044" y="10.603275" angle="359" scale_x="0.72853" scale_y="0.68669"/>
+                </key>
+            </timeline>
+            <timeline id="4" name="farmingdung-2">
+                <key id="0" spin="0">
+                    <object folder="0" file="2" x="16.432842" y="12.667483" angle="359" scale_x="0.72853" scale_y="0.68669"/>
+                </key>
+            </timeline>
+            <timeline id="5" name="farmingdung-1">
+                <key id="0" spin="0">
+                    <object folder="0" file="1" x="-8.591274" y="11.504037" angle="30.582" scale_x="0.7253" scale_y="0.68418"/>
+                </key>
+            </timeline>
+        </animation>
+        <animation id="2" name="soil_wormwood" length="1000" interval="100">
+            <mainline>
+                <key id="0">
+                    <object_ref id="0" timeline="5" key="0" z_index="0"/>
+                    <object_ref id="1" timeline="4" key="0" z_index="1"/>
+                    <object_ref id="2" timeline="3" key="0" z_index="2"/>
+                    <object_ref id="3" timeline="2" key="0" z_index="3"/>
+                    <object_ref id="4" timeline="1" key="0" z_index="4"/>
+                    <object_ref id="5" timeline="0" key="0" z_index="5"/>
+                </key>
+            </mainline>
+            <timeline id="0" name="wormwood-5">
+                <key id="0" spin="0">
+                    <object folder="1" file="3" x="-0.167196" y="-27.298894" angle="359" scale_x="0.57549" scale_y="0.54242"/>
+                </key>
+            </timeline>
+            <timeline id="1" name="wormwood-6">
+                <key id="0" spin="0">
+                    <object folder="1" file="4" x="-35.448983" y="-23.082499" angle="359" scale_x="0.55" scale_y="0.51842"/>
+                </key>
+            </timeline>
+            <timeline id="2" name="wormwood-7">
+                <key id="0" spin="0">
+                    <object folder="1" file="5" x="28.073746" y="-13.739701" angle="359" scale_x="0.55" scale_y="0.51842"/>
+                </key>
+            </timeline>
+            <timeline id="3" name="wormwood-0">
+                <key id="0" spin="0">
+                    <object folder="1" file="0" x="-28.610044" y="10.603275" angle="359" scale_x="0.72853" scale_y="0.68669"/>
+                </key>
+            </timeline>
+            <timeline id="4" name="wormwood-2">
+                <key id="0" spin="0">
+                    <object folder="1" file="2" x="16.432842" y="12.667483" angle="359" scale_x="0.72853" scale_y="0.68669"/>
+                </key>
+            </timeline>
+            <timeline id="5" name="wormwood-1">
+                <key id="0" spin="0">
+                    <object folder="1" file="1" x="-8.591274" y="11.504037" angle="30.582" scale_x="0.7253" scale_y="0.68418"/>
+                </key>
+            </timeline>
+        </animation>
+        <animation id="3" name="placer" length="1000" interval="100">
+            <mainline>
+                <key id="0">
+                    <object_ref id="0" timeline="5" key="0" z_index="0"/>
+                    <object_ref id="1" timeline="4" key="0" z_index="1"/>
+                    <object_ref id="2" timeline="3" key="0" z_index="2"/>
+                    <object_ref id="3" timeline="2" key="0" z_index="3"/>
+                    <object_ref id="4" timeline="6" key="0" z_index="4"/>
+                    <object_ref id="5" timeline="1" key="0" z_index="5"/>
+                    <object_ref id="6" timeline="0" key="0" z_index="6"/>
+                </key>
+            </mainline>
+            <timeline id="0" name="soil-5">
+                <key id="0" spin="0">
+                    <object folder="3" file="3" x="-0.167196" y="-27.298894" angle="359" scale_x="0.57549" scale_y="0.54242"/>
+                </key>
+            </timeline>
+            <timeline id="1" name="soil-6">
+                <key id="0" spin="0">
+                    <object folder="3" file="4" x="-35.448983" y="-23.082499" angle="359" scale_x="0.55" scale_y="0.51842"/>
+                </key>
+            </timeline>
+            <timeline id="2" name="soil-7">
+                <key id="0" spin="0">
+                    <object folder="3" file="5" x="28.073746" y="-13.739701" angle="359" scale_x="0.55" scale_y="0.51842"/>
+                </key>
+            </timeline>
+            <timeline id="3" name="soil-0">
+                <key id="0" spin="0">
+                    <object folder="3" file="0" x="-28.610044" y="10.603275" angle="359" scale_x="0.72853" scale_y="0.68669"/>
+                </key>
+            </timeline>
+            <timeline id="4" name="soil-2">
+                <key id="0" spin="0">
+                    <object folder="3" file="2" x="16.432842" y="12.667483" angle="359" scale_x="0.72853" scale_y="0.68669"/>
+                </key>
+            </timeline>
+            <timeline id="5" name="soil-1">
+                <key id="0" spin="0">
+                    <object folder="3" file="1" x="-8.591274" y="11.504037" angle="30.582" scale_x="0.7253" scale_y="0.68418"/>
+                </key>
+            </timeline>
+            <timeline id="6" name="sprout-0_000">
+                <key id="0" spin="0">
+                    <object folder="2" file="0" x="-0.80124" y="5.81781" angle="2.288" scale_x="0.6146" scale_y="0.6146"/>
+                </key>
+            </timeline>
+        </animation>
+        <animation id="4" name="placer_wormwood" length="1000" interval="100">
+            <mainline>
+                <key id="0">
+                    <object_ref id="0" timeline="5" key="0" z_index="0"/>
+                    <object_ref id="1" timeline="4" key="0" z_index="1"/>
+                    <object_ref id="2" timeline="3" key="0" z_index="2"/>
+                    <object_ref id="3" timeline="2" key="0" z_index="3"/>
+                    <object_ref id="4" timeline="6" key="0" z_index="4"/>
+                    <object_ref id="5" timeline="1" key="0" z_index="5"/>
+                    <object_ref id="6" timeline="0" key="0" z_index="6"/>
+                </key>
+            </mainline>
+            <timeline id="0" name="wormwood-5">
+                <key id="0" spin="0">
+                    <object folder="1" file="3" x="-0.167196" y="-27.298894" angle="359" scale_x="0.57549" scale_y="0.54242"/>
+                </key>
+            </timeline>
+            <timeline id="1" name="wormwood-6">
+                <key id="0" spin="0">
+                    <object folder="1" file="4" x="-35.448983" y="-23.082499" angle="359" scale_x="0.55" scale_y="0.51842"/>
+                </key>
+            </timeline>
+            <timeline id="2" name="wormwood-7">
+                <key id="0" spin="0">
+                    <object folder="1" file="5" x="28.073746" y="-13.739701" angle="359" scale_x="0.55" scale_y="0.51842"/>
+                </key>
+            </timeline>
+            <timeline id="3" name="wormwood-0">
+                <key id="0" spin="0">
+                    <object folder="1" file="0" x="-28.610044" y="10.603275" angle="359" scale_x="0.72853" scale_y="0.68669"/>
+                </key>
+            </timeline>
+            <timeline id="4" name="wormwood-2">
+                <key id="0" spin="0">
+                    <object folder="1" file="2" x="16.432842" y="12.667483" angle="359" scale_x="0.72853" scale_y="0.68669"/>
+                </key>
+            </timeline>
+            <timeline id="5" name="wormwood-1">
+                <key id="0" spin="0">
+                    <object folder="1" file="1" x="-8.591274" y="11.504037" angle="30.582" scale_x="0.7253" scale_y="0.68418"/>
+                </key>
+            </timeline>
+            <timeline id="6" name="sprout-0">
+                <key id="0" spin="0">
+                    <object folder="2" file="0" x="-0.801244" y="5.817807" angle="2.287708" scale_x="0.614603" scale_y="0.614603"/>
+                </key>
+            </timeline>
+        </animation>
+    </entity>
+</spriter_data>

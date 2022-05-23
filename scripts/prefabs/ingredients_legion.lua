@@ -178,21 +178,21 @@ if CONFIGS_LEGION.LEGENDOFFALL then
         oversized_waxed = {},
         oversized_rotten = {},
     }
-    -- ingredients_legion.catmint = {
-    --     base = {
-    --         floatable = {nil, "small", 0.08, 0.95},
-    --         edible = { hunger = 6, sanity = 10, health = 1, foodtype = nil, foodtype_secondary = nil },
-    --         perishable = { product = nil, time = TUNING.PERISH_SLOW },
-    --         stackable = { size = nil },
-    --         fuel = { value = nil },
-    --         burnable = {},
-    --         fn_common = function(inst)
-    --             inst:AddTag("catfood")
-    --             inst:AddTag("cattoy")
-    --             inst:AddTag("catmint")
-    --         end,
-    --     },
-    -- }
+    ingredients_legion.mint_l = {
+        base = {
+            floatable = {nil, "small", 0.08, 0.95},
+            edible = { hunger = 6, sanity = 8, health = 0, foodtype = nil, foodtype_secondary = nil },
+            perishable = { product = nil, time = TUNING.PERISH_MED },
+            stackable = { size = nil },
+            fuel = { value = nil },
+            burnable = {},
+            fn_common = function(inst)
+                inst:AddTag("catfood")
+                inst:AddTag("cattoy")
+                inst:AddTag("catmint")
+            end,
+        },
+    }
 end
 
 --------------------------------------------------------------------------
@@ -217,7 +217,6 @@ local function MakePrefab(name, info)
                 burnable = {},
                 has_seeds = false, --这个不用主动加，设置seeds时自动添加
                 nohauntable = false, --这个不用主动加，设置时自动添加
-                noInventoryItem = false,  --这个不用主动加，设置时自动添加
                 fn_common = nil,
                 fn_server = nil,
             },
@@ -292,18 +291,15 @@ local function MakePrefab(name, info)
         end
 
         inst.entity:SetPristine()
-
         if not TheWorld.ismastersim then
             return inst
         end
 
         inst:AddComponent("inspectable")
 
-        if not info.noInventoryItem then
-            inst:AddComponent("inventoryitem")
-            inst.components.inventoryitem.imagename = name
-            inst.components.inventoryitem.atlasname = "images/inventoryimages/"..name..".xml"
-        end
+        inst:AddComponent("inventoryitem")
+        inst.components.inventoryitem.imagename = name
+        inst.components.inventoryitem.atlasname = "images/inventoryimages/"..name..".xml"
 
         if info.edible ~= nil then
             inst:AddComponent("bait")
@@ -380,10 +376,8 @@ end
 local function MadePrefab(name, info)
     if info.assets == nil then info.assets = {} end
     table.insert(info.assets, Asset("ANIM", "anim/"..info.animstate.build..".zip"))
-    if not info.noInventoryItem then
-        table.insert(info.assets, Asset("ATLAS", "images/inventoryimages/"..name..".xml"))
-        table.insert(info.assets, Asset("IMAGE", "images/inventoryimages/"..name..".tex"))
-    end
+    table.insert(info.assets, Asset("ATLAS", "images/inventoryimages/"..name..".xml"))
+    table.insert(info.assets, Asset("IMAGE", "images/inventoryimages/"..name..".tex"))
 
     if info.prefabs == nil then info.prefabs = {} end
     -- if info.cookable ~= nil then
@@ -905,9 +899,6 @@ local function MakeIngredient(name, data)
         if info.nohauntable ~= false then
             info.nohauntable = true
         end
-        -- if info.noInventoryItem ~= false then
-        --     info.noInventoryItem = true
-        -- end
 
         local fn_common = info.fn_common
         info.fn_common = function(inst)

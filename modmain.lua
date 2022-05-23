@@ -67,8 +67,8 @@ Assets = {
     Asset("IMAGE", "images/inventoryimages/pineananas_cooked.tex"),
     Asset("ATLAS", "images/inventoryimages/pineananas_seeds.xml"),
     Asset("IMAGE", "images/inventoryimages/pineananas_seeds.tex"),
-    -- Asset("ATLAS", "images/inventoryimages/catmint.xml"), --delete_crop
-    -- Asset("IMAGE", "images/inventoryimages/catmint.tex"),
+    Asset("ATLAS", "images/inventoryimages/mint_l.xml"),
+    Asset("IMAGE", "images/inventoryimages/mint_l.tex"),
     Asset("ATLAS", "images/inventoryimages/albicans_cap.xml"),
     Asset("IMAGE", "images/inventoryimages/albicans_cap.tex"),
     Asset("ATLAS", "images/inventoryimages/shield_l_log.xml"),
@@ -85,7 +85,7 @@ RegisterInventoryItemAtlas("images/inventoryimages/petals_orchid.xml", "petals_o
 RegisterInventoryItemAtlas("images/inventoryimages/pineananas.xml", "pineananas.tex")
 RegisterInventoryItemAtlas("images/inventoryimages/pineananas_cooked.xml", "pineananas_cooked.tex")
 RegisterInventoryItemAtlas("images/inventoryimages/pineananas_seeds.xml", "pineananas_seeds.tex")
--- RegisterInventoryItemAtlas("images/inventoryimages/catmint.xml", "catmint.tex") --delete_crop
+RegisterInventoryItemAtlas("images/inventoryimages/mint_l.xml", "mint_l.tex")
 RegisterInventoryItemAtlas("images/inventoryimages/albicans_cap.xml", "albicans_cap.tex")
 
 local IsServer = TheNet:GetIsServer() or TheNet:IsDedicated()

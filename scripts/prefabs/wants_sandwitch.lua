@@ -1,77 +1,11 @@
---------------------------------------------------------------------------
---[[ 猫线球 ]]
---------------------------------------------------------------------------
-
-local assets_cattenball =
-{
-    Asset("ANIM", "anim/toy_legion.zip"),
-    Asset("ATLAS", "images/inventoryimages/cattenball.xml"),
-    Asset("IMAGE", "images/inventoryimages/cattenball.tex"),
-}
-
-local function Fn_cattenball()
-    local inst = CreateEntity()
-
-    inst.entity:AddTransform()
-    inst.entity:AddAnimState()
-    inst.entity:AddNetwork()
-
-    MakeInventoryPhysics(inst)
-
-    inst.AnimState:SetBank("toy_legion")
-    inst.AnimState:SetBuild("toy_legion")
-    inst.AnimState:PlayAnimation("toy_cattenball")
-
-    inst:AddTag("cattoy") --能给浣猫
-
-    MakeInventoryFloatable(inst, "med", 0.25, 0.5)
-    local OnLandedClient_old = inst.components.floater.OnLandedClient
-    inst.components.floater.OnLandedClient = function(self)
-        OnLandedClient_old(self)
-        self.inst.AnimState:SetFloatParams(0.08, 1, self.bob_percent)
-    end
-
-    inst.entity:SetPristine()
-
-    if not TheWorld.ismastersim then
-        return inst
-    end
-
-    inst:AddComponent("inspectable")
-
-    inst:AddComponent("stackable")
-    inst.components.stackable.maxsize = TUNING.STACK_SIZE_SMALLITEM
-
-    inst:AddComponent("inventoryitem")
-    inst.components.inventoryitem.imagename = "cattenball"
-    inst.components.inventoryitem.atlasname = "images/inventoryimages/cattenball.xml"
-
-    inst:AddComponent("tradable")
-    inst.components.tradable.goldvalue = 9
-
-    inst:AddComponent("fuel")
-    inst.components.fuel.fuelvalue = TUNING.SMALL_FUEL
-
-    MakeSmallBurnable(inst, TUNING.SMALL_BURNTIME)
-    MakeSmallPropagator(inst)
-    MakeHauntableLaunchAndIgnite(inst)
-
-    return inst
-end
+local prefs = {}
 
 --------------------------------------------------------------------------
---[[ 玩具小海绵与玩具小海星 ]]
+--[[ 通用函数 ]]
 --------------------------------------------------------------------------
 
-local function MakeToyWe(name)
-    local assets_toywe =
-    {
-        Asset("ANIM", "anim/toy_legion.zip"),
-        Asset("ATLAS", "images/inventoryimages/"..name..".xml"),
-        Asset("IMAGE", "images/inventoryimages/"..name..".tex"),
-    }
-
-    local function Fn_toywe()
+local function MakeToy(sets)
+    table.insert(prefs, Prefab(sets.name, function()
         local inst = CreateEntity()
 
         inst.entity:AddTransform()
@@ -82,55 +16,150 @@ local function MakeToyWe(name)
 
         inst.AnimState:SetBank("toy_legion")
         inst.AnimState:SetBuild("toy_legion")
-        inst.AnimState:PlayAnimation(name)
+        inst.AnimState:PlayAnimation("toy_"..sets.name)
 
-        inst:AddTag("cattoy") --能给浣猫
+        if sets.floatable ~= nil then
+            MakeInventoryFloatable(inst, sets.floatable[2], sets.floatable[3], sets.floatable[4])
+            if sets.floatable[1] ~= nil then
+                local OnLandedClient_old = inst.components.floater.OnLandedClient
+                inst.components.floater.OnLandedClient = function(self)
+                    OnLandedClient_old(self)
+                    self.inst.AnimState:SetFloatParams(sets.floatable[1], 1, self.bob_percent)
+                end
+            end
+        end
 
-        MakeInventoryFloatable(inst, "med", 0.3, 0.6)
-        local OnLandedClient_old = inst.components.floater.OnLandedClient
-        inst.components.floater.OnLandedClient = function(self)
-            OnLandedClient_old(self)
-            self.inst.AnimState:SetFloatParams(0.06, 1, self.bob_percent)
+        if sets.fn_common ~= nil then
+            sets.fn_common(inst)
         end
 
         inst.entity:SetPristine()
-
         if not TheWorld.ismastersim then
             return inst
         end
 
         inst:AddComponent("inspectable")
 
-        --独一无二！
-        -- inst:AddComponent("stackable")
-        -- inst.components.stackable.maxsize = TUNING.STACK_SIZE_SMALLITEM
-
         inst:AddComponent("inventoryitem")
-        inst.components.inventoryitem.imagename = name
-        inst.components.inventoryitem.atlasname = "images/inventoryimages/"..name..".xml"
+        inst.components.inventoryitem.imagename = sets.name
+        inst.components.inventoryitem.atlasname = "images/inventoryimages/"..sets.name..".xml"
 
-        inst:AddComponent("tradable")
-        inst.components.tradable.goldvalue = 1 --每四个月记得来加1
+        if sets.stackable ~= nil then
+            inst:AddComponent("stackable")
+            inst.components.stackable.maxsize = sets.stackable
+        end
 
-        inst:AddComponent("fuel")
-        inst.components.fuel.fuelvalue = TUNING.SMALL_FUEL
+        if sets.tradable ~= nil then
+            inst:AddComponent("tradable")
+            inst.components.tradable.goldvalue = sets.tradable
+        end
 
-        MakeSmallBurnable(inst, TUNING.SMALL_BURNTIME)
-        MakeSmallPropagator(inst)
-        MakeHauntableLaunchAndIgnite(inst)
+        if sets.fuel ~= nil then
+            inst:AddComponent("fuel")
+            inst.components.fuel.fuelvalue = sets.fuel
+        end
+
+        MakeHauntableLaunch(inst)
+
+        if sets.fn_server ~= nil then
+            sets.fn_server(inst)
+        end
 
         return inst
-    end
-
-    return Prefab(name, Fn_toywe, assets_toywe)
+    end, sets.assets, sets.prefabs))
 end
 
 --------------------------------------------------------------------------
+--[[ 猫线球 ]]
+--------------------------------------------------------------------------
 
-local prefabs = {}
+if CONFIGS_LEGION.LEGENDOFFALL then
+    MakeToy({
+        name = "cattenball",
+        assets = {
+            Asset("ANIM", "anim/toy_legion.zip"),
+            Asset("ATLAS", "images/inventoryimages/cattenball.xml"),
+            Asset("IMAGE", "images/inventoryimages/cattenball.tex"),
+        },
+        prefabs = nil,
+        floatable = { 0.08, "med", 0.25, 0.5 },
+        stackable = TUNING.STACK_SIZE_MEDITEM,
+        tradable = 9,
+        fuel = TUNING.SMALL_FUEL,
+        fn_common = function(inst)
+            inst:AddTag("cattoy") --能给浣猫
+        end,
+        fn_server = function(inst)
+            MakeSmallBurnable(inst, TUNING.SMALL_BURNTIME)
+            MakeSmallPropagator(inst)
+        end
+    })
+end
 
--- if CONFIGS_LEGION.LEGENDOFFALL then
---     table.insert(prefabs, Prefab("cattenball", Fn_cattenball, assets_cattenball, nil))
+--------------------------------------------------------------------------
+--[[ 玩具小海绵与玩具小海星 ]]
+--------------------------------------------------------------------------
+
+-- local function MakeToyWe(name)
+--     local assets_toywe =
+--     {
+--         Asset("ANIM", "anim/toy_legion.zip"),
+--         Asset("ATLAS", "images/inventoryimages/"..name..".xml"),
+--         Asset("IMAGE", "images/inventoryimages/"..name..".tex"),
+--     }
+
+--     local function Fn_toywe()
+--         local inst = CreateEntity()
+
+--         inst.entity:AddTransform()
+--         inst.entity:AddAnimState()
+--         inst.entity:AddNetwork()
+
+--         MakeInventoryPhysics(inst)
+
+--         inst.AnimState:SetBank("toy_legion")
+--         inst.AnimState:SetBuild("toy_legion")
+--         inst.AnimState:PlayAnimation(name)
+
+--         inst:AddTag("cattoy") --能给浣猫
+
+--         MakeInventoryFloatable(inst, "med", 0.3, 0.6)
+--         local OnLandedClient_old = inst.components.floater.OnLandedClient
+--         inst.components.floater.OnLandedClient = function(self)
+--             OnLandedClient_old(self)
+--             self.inst.AnimState:SetFloatParams(0.06, 1, self.bob_percent)
+--         end
+
+--         inst.entity:SetPristine()
+
+--         if not TheWorld.ismastersim then
+--             return inst
+--         end
+
+--         inst:AddComponent("inspectable")
+
+--         --独一无二！
+--         -- inst:AddComponent("stackable")
+--         -- inst.components.stackable.maxsize = TUNING.STACK_SIZE_SMALLITEM
+
+--         inst:AddComponent("inventoryitem")
+--         inst.components.inventoryitem.imagename = name
+--         inst.components.inventoryitem.atlasname = "images/inventoryimages/"..name..".xml"
+
+--         inst:AddComponent("tradable")
+--         inst.components.tradable.goldvalue = 1 --每四个月记得来加1
+
+--         inst:AddComponent("fuel")
+--         inst.components.fuel.fuelvalue = TUNING.SMALL_FUEL
+
+--         MakeSmallBurnable(inst, TUNING.SMALL_BURNTIME)
+--         MakeSmallPropagator(inst)
+--         MakeHauntableLaunchAndIgnite(inst)
+
+--         return inst
+--     end
+
+--     return Prefab(name, Fn_toywe, assets_toywe)
 -- end
 
 -- if TUNING.LEGION_DESERTSECRET then
@@ -138,4 +167,7 @@ local prefabs = {}
 --     table.insert(prefabs, MakeToyWe("toy_patrickstar"))
 -- end
 
-return unpack(prefabs)
+--------------------
+--------------------
+
+return unpack(prefs)

@@ -134,6 +134,7 @@ local InventoryPrefabsList = {  --每个元素的下标值为每种物品栏图�
     triplegoldenshovelaxe = { build = "images_minisign6", },
     shield_l_sand = { build = "images_minisign6", },
     shield_l_log = { build = "images_minisign6", },
+    mint_l = { build = "images_minisign6", },
 
     --skins
     hat_lichen_emo_que = { build = "images_minisign_skins", },
