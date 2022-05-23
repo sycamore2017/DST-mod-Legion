@@ -193,6 +193,11 @@ local function MakeGnat(name, isinfester)
                         plant.infester = nil
                         inst.infesttarget = nil
                     end
+                elseif plant.components.perennialcrop2 ~= nil then
+                    if not plant.components.perennialcrop2:Infest(inst, 1) then
+                        plant.infester = nil
+                        inst.infesttarget = nil
+                    end
                 elseif plant.components.pickable ~= nil then
                     if plant.components.pickable:CanBeFertilized() then --已经枯萎/贫瘠了
                         plant.infest_l_times = nil

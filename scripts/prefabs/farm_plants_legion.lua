@@ -709,11 +709,11 @@ local function MakePlant2(cropprefab, sets)
 			inst.AnimState:SetBank(sets.bank)
 			inst.AnimState:SetBuild(sets.build)
 			inst.AnimState:PlayAnimation(sets.leveldata[1].anim)
-			-- if sets.bank == "plant_normal_legion" then
-			-- 	inst.AnimState:OverrideSymbol("dirt", "crop_soil_legion", "dirt")
-			-- else
-			-- 	inst.AnimState:OverrideSymbol("soil", "crop_soil_legion", "soil")
-			-- end
+			if sets.bank == "plant_normal_legion" then
+				-- inst.AnimState:OverrideSymbol("dirt", "crop_soil_legion", "dirt")
+			else
+				inst.AnimState:OverrideSymbol("soil", "crop_soil_legion", "soil")
+			end
 
 			inst:AddTag("plant")
 			inst:AddTag("crop2_legion")
@@ -728,7 +728,7 @@ local function MakePlant2(cropprefab, sets)
 						namepre = namepre..STRINGS.PLANT_CROP_L["BLUE"]
 					end
 					if inst:HasTag("needwater") then --可以浇水
-						namepre = STRINGS.PLANT_CROP_L["DRY"]
+						namepre = namepre..STRINGS.PLANT_CROP_L["DRY"]
 					end
 					if inst:HasTag("fertableall") then --可以施肥
 						namepre = namepre..STRINGS.PLANT_CROP_L["FEEBLE"]

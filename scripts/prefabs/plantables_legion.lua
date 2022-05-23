@@ -270,8 +270,7 @@ if CONFIGS_LEGION.FLOWERSPOWER then
 end
 
 if CONFIGS_LEGION.LEGENDOFFALL then
-    plantables.siving_derivant_item = --[[ 子圭一型岩(物品) ]]
-    {
+    plantables.siving_derivant_item = { --[[ 子圭一型岩(物品) ]]
         animstate = { bank = "siving_derivants", build = "siving_derivants", anim = "item", anim_palcer = "lvl0", },
         floater = nil,
         stacksize = TUNING.STACK_SIZE_LARGEITEM,

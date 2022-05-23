@@ -84,7 +84,7 @@ function PerennialCrop2:SetUp(cropprefab, data)
 	self.stage_max = #data.leveldata
 	self.leveldata = data.leveldata
 	self.growthmults = data.growthmults or { [1] = 1, [2] = 1, [3] = 1, [4] = 0 }
-	self.regrowstage = data.regrowStage or 1
+	self.regrowstage = data.regrowstage or 1
 	self.maturedanim = data.maturedanim
 	self.cangrowindrak = data.cangrowindrak == true
 	self.getsickchance = data.getsickchance or 0.001

@@ -51,13 +51,15 @@ end
 function BotanyController:TriggerPlant(isadd)
     local x, y, z = self.inst.Transform:GetWorldPosition()
     local ents = TheSim:FindEntities(x, y, z, 21,
-        { "crop_legion" },
+        nil,
         { "NOCLICK", "FX", "INLIMBO" },
-        nil
+        { "crop_legion", "crop2_legion" }
     )
     for _,v in pairs(ents) do
         if v.components.perennialcrop ~= nil then
             v.components.perennialcrop:TriggerController(self.inst, isadd)
+        elseif v.components.perennialcrop2 ~= nil then
+            v.components.perennialcrop2:TriggerController(self.inst, isadd)
         end
     end
 end
@@ -104,18 +106,48 @@ local function ComputMoisture(self, x, y, z)
     end
 end
 local function WitherComputMoisture(self, v)
-    if
-        v.components.witherable ~= nil and
-        not v.components.witherable:IsProtected() and
-        (v.components.witherable:CanWither() or v.components.witherable:CanRejuvenate()) --枯萎中或已经缺水性枯萎
-    then
-        v.components.witherable:Protect(TUNING.FIRESUPPRESSOR_PROTECTION_TIME)
-        self.moisture = math.max(0, self.moisture-5)
-        return true
+    if v.components.witherable ~= nil then
+        if
+            not v.components.witherable:IsProtected() and
+            (v.components.witherable:CanWither() or v.components.witherable:CanRejuvenate()) --枯萎中或已经缺水性枯萎
+        then
+            v.components.witherable:Protect(TUNING.FIRESUPPRESSOR_PROTECTION_TIME)
+            self.moisture = math.max(0, self.moisture-5)
+            return true
+        end
+    elseif v.components.perennialcrop2 ~= nil then
+        if v.components.perennialcrop2:PourWater(nil, nil, 1) then
+            self.moisture = math.max(0, self.moisture-5)
+            return true
+        end
     end
 end
 local function WitherComputNutrients(self, v)
-    if
+    if v.components.perennialcrop2 ~= nil then
+        local cpt = v.components.perennialcrop2
+        if cpt.isrotten or cpt.donenutrient or cpt.stage == cpt.stage_max then
+            return false
+        end
+
+        local idx = nil
+        if self.nutrients[3] > 0 then
+            idx = 3
+        elseif self.nutrients[2] > 0 then
+            idx = 2
+        elseif self.nutrients[1] > 0 then
+            idx = 1
+        else
+            return true --按理来说不应该能运行到这里
+        end
+
+        local poop = SpawnPrefab("poop")
+        if poop ~= nil then
+            cpt:Fertilize(poop, nil)
+            poop:Remove()
+            self.nutrients[idx] = math.max(0, self.nutrients[idx] - 5)
+            return true
+        end
+    elseif
         v.components.pickable ~= nil and
         v.components.pickable:CanBeFertilized() --贫瘠或缺水枯萎
     then
@@ -170,9 +202,9 @@ local function ComputSoils(self, fn_tile, fn_wither, fn_check)
     end
 
     local ents = TheSim:FindEntities(x, y, z, 20,
-        { "witherable" }, --不需要考虑子圭作物，因为机制已经有了
+        nil,
         { "NOCLICK", "FX", "INLIMBO" },
-        nil
+        { "witherable", "crop2_legion" } --不需要考虑子圭作物，因为机制已经有了
     )
     for _,v in pairs(ents) do
         if v:IsValid() then
