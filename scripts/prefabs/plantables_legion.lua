@@ -1,11 +1,11 @@
 local prefabs = {}
 
 local function MakePlantable(name, data)
-    local assets =
-    {
+    local imgname = data.overrideimage or name
+    local assets = {
         Asset("ANIM", "anim/"..data.animstate.build..".zip"),
-        Asset("ATLAS", "images/inventoryimages/"..name..".xml"),
-        Asset("IMAGE", "images/inventoryimages/"..name..".tex"),
+        Asset("ATLAS", "images/inventoryimages/"..imgname..".xml"),
+        Asset("IMAGE", "images/inventoryimages/"..imgname..".tex")
     }
     if data.animstate.build ~= data.animstate.bank then
         table.insert(assets, Asset("ANIM", "anim/"..data.animstate.bank..".zip"))
@@ -48,8 +48,8 @@ local function MakePlantable(name, data)
         inst:AddComponent("inspectable")
 
         inst:AddComponent("inventoryitem")
-        inst.components.inventoryitem.imagename = name
-        inst.components.inventoryitem.atlasname = "images/inventoryimages/"..name..".xml"
+        inst.components.inventoryitem.imagename = imgname
+        inst.components.inventoryitem.atlasname = "images/inventoryimages/"..imgname..".xml"
         if data.floater == nil then
             inst.components.inventoryitem:SetSinks(true)
         end
@@ -323,22 +323,47 @@ if CONFIGS_LEGION.LEGENDOFFALL then
     }
 
     for k,v in pairs(CROPS_DATA_LEGION) do
-        plantables["seeds_"..k.."_l"] = {
+        local seedsprefab = "seeds_"..k.."_l"
+        local cropprefab = "plant_"..k.."_l"
+        plantables[seedsprefab] = {
+            animstate = { bank = "seeds_crop_l", build = "seeds_crop_l", anim = "idle", anim_palcer = nil },
+            overrideimage = "seeds_crop_l",
+            floater = {nil, "small", 0.2, 1.2},
+            stacksize = TUNING.STACK_SIZE_SMALLITEM,
+            fuelvalue = TUNING.SMALL_FUEL,
+            burnable = {
+                time = TUNING.SMALL_BURNTIME,
+                fxsize = "small",
+                lightedsize = "small",
+            },
             deployable = {
-                prefab = "plant_"..k.."_l",
+                prefab = cropprefab,
                 mode = DEPLOYMODE.PLANT, spacing = DEPLOYSPACING.MEDIUM,
                 sound = "dontstarve/wilson/plant_seeds"
             },
             fn_common = function(inst)
                 inst:AddTag("deployedplant")
-                inst.overridedeployplacername = "seeds_crop_l_placer"
+                -- inst.overridedeployplacername = seedsprefab.."_placer" --这个可以让placer换成另一个
+
+                inst.displaynamefn = function(inst)
+                    return STRINGS.NAMES[string.upper(cropprefab)]..STRINGS.PLANT_CROP_L["SEEDS"]
+                end
             end,
             fn_server = function(inst)
-                
+                inst.components.inspectable.nameoverride = "SEEDS_CROP_L"
+
+                inst:AddComponent("plantablelegion")
+                inst.components.plantablelegion.plant = cropprefab
             end
         }
+        table.insert(prefabs, MakePlacer(
+            seedsprefab.."_placer", v.bank, v.build, v.leveldata[1].anim,
+            nil, nil, nil, nil, nil, nil, function(inst)
+                inst.AnimState:Pause() --不想让placer动起来
+                inst.AnimState:OverrideSymbol("soil", "crop_soil_legion", "soil")
+            end
+        ))
     end
-    table.insert(prefabs, MakePlacer("seeds_crop_l_placer", "crop_soil_legion", "crop_soil_legion", "placer"))
 end
 
 --------------------

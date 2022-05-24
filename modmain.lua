@@ -88,7 +88,7 @@ RegisterInventoryItemAtlas("images/inventoryimages/pineananas_seeds.xml", "pinea
 RegisterInventoryItemAtlas("images/inventoryimages/mint_l.xml", "mint_l.tex")
 RegisterInventoryItemAtlas("images/inventoryimages/albicans_cap.xml", "albicans_cap.tex")
 
-local IsServer = TheNet:GetIsServer() or TheNet:IsDedicated()
+-- local IsServer = TheNet:GetIsServer() or TheNet:IsDedicated()
 
 --------------------------------------------------------------------------
 --[[ Test ]]--[[ test ]]

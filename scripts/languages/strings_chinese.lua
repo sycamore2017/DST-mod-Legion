@@ -2379,6 +2379,7 @@ STRINGS.PLANT_CROP_L = {
     FEEBLE = "虚弱",
     PREPOSITION = "的",
     FLORESCENCE = "花期",
+    SEEDS = "异种",
 }
 S_NAMES.PLANT_CARROT_L = "胡萝卜"
 S_NAMES.PLANT_CORN_L = "玉米杆"
@@ -2395,7 +2396,7 @@ S_NAMES.PLANT_POTATO_L = "三地薯"
 S_NAMES.PLANT_GARLIC_L = "鸡毛蒜"
 S_NAMES.PLANT_TOMATO_L = "刺茄"
 S_NAMES.PLANT_ASPARAGUS_L = "芦笋丛"
-S_NAMES.PLANT_MANDRAKE_L = "培植曼德拉草"
+S_NAMES.PLANT_MANDRAKE_L = "培植曼草"
 S_NAMES.PLANT_GOURD_L = "葫芦藤"
 
 S______GENERIC.DESCRIBE.PLANT_CROP_L = {
@@ -2405,6 +2406,24 @@ S______GENERIC.DESCRIBE.PLANT_CROP_L = {
     FLORESCENCE = "开花了，正是招蜂引蝶的好时候...",
     READY = "感谢我的付出与等待，更感谢自然的慷慨馈赠！",
 }
+
+S______GENERIC.DESCRIBE.SEEDS_CROP_L = "经过特殊环境催化，它已经变异了。"
+-- S_______WILLOW.DESCRIBE.SEEDS_CROP_L = ""
+-- S_____WOLFGANG.DESCRIBE.SEEDS_CROP_L = ""
+-- S________WENDY.DESCRIBE.SEEDS_CROP_L = ""
+-- S_________WX78.DESCRIBE.SEEDS_CROP_L = ""
+S_WICKERBOTTOM.DESCRIBE.SEEDS_CROP_L = "这样的变异让它离无机物更近了一步。"
+-- S_______WOODIE.DESCRIBE.SEEDS_CROP_L = ""
+-- S______WAXWELL.DESCRIBE.SEEDS_CROP_L = ""
+-- S___WATHGRITHR.DESCRIBE.SEEDS_CROP_L = ""
+S_______WEBBER.DESCRIBE.SEEDS_CROP_L = "放心吧，我们不会用另类的眼光看待它。"
+-- S_______WINONA.DESCRIBE.SEEDS_CROP_L = ""
+-- S_______WORTOX.DESCRIBE.SEEDS_CROP_L = ""
+S_____WORMWOOD.DESCRIBE.SEEDS_CROP_L = "宝宝，变了。"
+-- S________WARLY.DESCRIBE.SEEDS_CROP_L = ""
+-- S_________WURT.DESCRIBE.SEEDS_CROP_L = ""
+-- S_______WALTER.DESCRIBE.SEEDS_CROP_L = ""
+-- S________WANDA.DESCRIBE.SEEDS_CROP_L = ""
 
 --------------------------------------------------------------------------
 --[[ flash and crush ]]--[[ 电闪雷鸣 ]]

@@ -395,7 +395,7 @@ PLANTSOIL_LEGION.fn = function(act)
     if
         act.invobject ~= nil and
         act.doer.components.inventory ~= nil and
-        act.target ~= nil and
+        act.target ~= nil and act.target:IsValid() and
         (
             act.target:HasTag("soil_legion") or
             act.target.components.perennialcrop ~= nil or act.target.components.perennialcrop2 ~= nil

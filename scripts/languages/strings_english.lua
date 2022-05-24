@@ -2398,9 +2398,10 @@ STRINGS.PLANT_CROP_L = {
     FEEBLE = "Feeble ",
     PREPOSITION = "",
     FLORESCENCE = "Blooming ",
+    SEEDS = " Xeeds",
 }
 S_NAMES.PLANT_CARROT_L = "Carrot Plant"
-S_NAMES.PLANT_CORN_L = "Corn Plant"
+S_NAMES.PLANT_CORN_L = "Corn Straw"
 S_NAMES.PLANT_PUMPKIN_L = "Pumpkin Rack"
 S_NAMES.PLANT_EGGPLANT_L = "Eggplant Nest"
 S_NAMES.PLANT_DURIAN_L = "Durian Willow"
@@ -2424,6 +2425,24 @@ S______GENERIC.DESCRIBE.PLANT_CROP_L = {
     FLORESCENCE = "Flowering is a good time to attract bees and butterflies...",
     READY = "Thank nature for its generous gifts!",
 }
+
+S______GENERIC.DESCRIBE.SEEDS_CROP_L = "After special environmental catalysis, it has mutated."
+-- S_______WILLOW.DESCRIBE.SEEDS_CROP_L = ""
+-- S_____WOLFGANG.DESCRIBE.SEEDS_CROP_L = ""
+-- S________WENDY.DESCRIBE.SEEDS_CROP_L = ""
+-- S_________WX78.DESCRIBE.SEEDS_CROP_L = ""
+S_WICKERBOTTOM.DESCRIBE.SEEDS_CROP_L = "Variation makes it more inorganic."
+-- S_______WOODIE.DESCRIBE.SEEDS_CROP_L = ""
+-- S______WAXWELL.DESCRIBE.SEEDS_CROP_L = ""
+-- S___WATHGRITHR.DESCRIBE.SEEDS_CROP_L = ""
+S_______WEBBER.DESCRIBE.SEEDS_CROP_L = "Don't worry, we won't look at it differently."
+-- S_______WINONA.DESCRIBE.SEEDS_CROP_L = ""
+-- S_______WORTOX.DESCRIBE.SEEDS_CROP_L = ""
+S_____WORMWOOD.DESCRIBE.SEEDS_CROP_L = "Baby, different."
+-- S________WARLY.DESCRIBE.SEEDS_CROP_L = ""
+-- S_________WURT.DESCRIBE.SEEDS_CROP_L = ""
+-- S_______WALTER.DESCRIBE.SEEDS_CROP_L = ""
+-- S________WANDA.DESCRIBE.SEEDS_CROP_L = ""
 
 --------------------------------------------------------------------------
 --[[ flash and crush ]]--[[ 电闪雷鸣 ]]

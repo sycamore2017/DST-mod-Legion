@@ -854,8 +854,7 @@ local function MakePlant2(cropprefab, sets)
 					crop.fn_defend(inst, worker)
 				end
 				inst.worked_l = true
-				-- RemovePlant(inst, "dirt_puff", crop.cropprefab.."seeds_l") --归还种子undo
-				RemovePlant(inst, "dirt_puff", nil)
+				RemovePlant(inst, "dirt_puff", "seeds_"..crop.cropprefab.."_l")
 			end)
 
 			if not sets.fireproof then
@@ -863,8 +862,7 @@ local function MakePlant2(cropprefab, sets)
 				MakeSmallPropagator(inst)
 				inst.components.burnable:SetOnBurntFn(function(inst)
 					inst.worked_l = true
-					-- RemovePlant(inst, nil, inst.components.perennialcrop2.cropprefab.."seeds_l") --归还种子undo
-					RemovePlant(inst)
+					RemovePlant(inst, nil, "seeds_"..inst.components.perennialcrop2.cropprefab.."_l")
 				end)
 				inst.components.burnable:SetOnIgniteFn(function(inst, source, doer)
 					UpdateGrowing(inst)
