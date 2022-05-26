@@ -4,7 +4,7 @@ local prefabFiles = {
     "cropgnat",
     "ahandfulofwings",
     "boltwingout",
-    "siving_managers",
+    "siving_related",
     "fishhomingtools",
 }
 
@@ -1397,8 +1397,8 @@ _G.CROPS_DATA_LEGION.mandrake = {
         else
             inst.SoundEmitter:PlaySound("dontstarve/creatures/mandrake/death")
         end
+        local x, y, z = doer.Transform:GetWorldPosition()
         doer:DoTaskInTime(0.5, function()
-            local x, y, z = inst.Transform:GetWorldPosition()
             local time = TUNING.MANDRAKE_SLEEP_TIME
             local ents = TheSim:FindEntities(x, y, z, TUNING.MANDRAKE_SLEEP_RANGE_COOKED, nil,
                 { "playerghost", "FX", "DECOR", "INLIMBO" }, { "sleeper", "player" })

@@ -155,14 +155,22 @@ function PerennialCrop2:SetStage(stage, isrotten, skip)
 		self.inst.components.pickable.onpickedfn = function(inst, doer)
 			local crop = inst.components.perennialcrop2
 			local regrowstage = crop.isrotten and 1 or crop.regrowstage --枯萎之后，只能从第一阶段开始
-			crop:SetStage(regrowstage, false, false)
-			crop:StartGrowing()
 			if crop.fn_defend ~= nil then
 				crop.fn_defend(inst, doer)
 			end
 			crop.infested = 0
 			crop.pollinated = 0
 			crop.numfruit = nil
+			crop.donenutrient = false
+			crop.donetendable = false
+			if TheWorld.state.israining or TheWorld.state.issnowing then --如果此时在下雨/雪
+				crop.donemoisture = true
+			else
+				crop.donemoisture = false
+			end
+			crop:CostController() --从管理器拿取资源
+			crop:SetStage(regrowstage, false, false)
+			crop:StartGrowing()
 		end
 	    self.inst.components.pickable:SetUp(nil)
 		self.inst.components.pickable.use_lootdropper_for_product = true
@@ -424,8 +432,7 @@ function PerennialCrop2:DoGrowth(skip)
 		self.donenutrient = false
 		self.donetendable = false
 
-		--如果此时在下雨/雪
-		if TheWorld.state.israining or TheWorld.state.issnowing then
+		if TheWorld.state.israining or TheWorld.state.issnowing then --如果此时在下雨/雪
 			self.donemoisture = true
 		end
 		self:CostController() --从管理器拿取资源
@@ -834,6 +841,7 @@ function PerennialCrop2:DisplayCrop(oldcrop, doer) --替换作物：把它的养
 		self.donenutrient = true
 	end
 
+	oldcrop.components.lootdropper:SpawnLootPrefab("seeds_"..oldcpt.cropprefab.."_l")
 	oldcrop.components.lootdropper:DropLoot()
 
 	if oldcpt.fn_defend ~= nil and doer then

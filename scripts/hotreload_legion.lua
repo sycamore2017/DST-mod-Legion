@@ -6,8 +6,8 @@
 
 local hot = {
 	--k: prefab名   v: 对应的lua文件名
-	-- siving_ctlwater = 'siving_managers',
-	-- siving_ctldirt = 'siving_managers',
+	-- siving_ctlwater = 'siving_related',
+	-- siving_ctldirt = 'siving_related',
 	-- siving_derivant_lvl2 = 'siving_rocks_legion',
 	-- siving_derivant_lvl3 = 'siving_rocks_legion',
 	-- siving_thetree = 'siving_rocks_legion',
