@@ -2425,6 +2425,46 @@ S_____WORMWOOD.DESCRIBE.SEEDS_CROP_L = "宝宝，变了。"
 -- S_______WALTER.DESCRIBE.SEEDS_CROP_L = ""
 -- S________WANDA.DESCRIBE.SEEDS_CROP_L = ""
 
+S_NAMES.SIVING_TURN = "子圭·育"
+S_RECIPE_DESC.SIVING_TURN = "转昨日繁茂，生明日种种。"
+S______GENERIC.DESCRIBE.SIVING_TURN = {
+    GENERIC = "这是能重现昨日的时空穿梭机吗？",
+    DONE = "包裹得很完整了，拿下来试试。",
+    DOING = "放上去的东西被不明碎片包裹着。",
+    NOENERGY = "这又不是永动机，找点它需要的能量吧。"
+}
+-- S_______WILLOW.DESCRIBE.SIVING_TURN = ""
+-- S_____WOLFGANG.DESCRIBE.SIVING_TURN = ""
+-- S________WENDY.DESCRIBE.SIVING_TURN = ""
+-- S_________WX78.DESCRIBE.SIVING_TURN = ""
+S_WICKERBOTTOM.DESCRIBE.SIVING_TURN = {
+    GENERIC = "包含了引力装置，看起来能放上某些物品。",
+    DONE = "转化完成了，真像个茧。",
+    DOING = "在进行某种特殊的基因转化。",
+    NOENERGY = "能量用尽了，它的构成就是它的能源。"
+}
+-- S_______WOODIE.DESCRIBE.SIVING_TURN = ""
+-- S______WAXWELL.DESCRIBE.SIVING_TURN = ""
+-- S___WATHGRITHR.DESCRIBE.SIVING_TURN = ""
+-- S_______WEBBER.DESCRIBE.SIVING_TURN = ""
+-- S_______WINONA.DESCRIBE.SIVING_TURN = ""
+S_______WORTOX.DESCRIBE.SIVING_TURN = {
+    GENERIC = "没有翅膀，但却能够带着你到处飞翔。",
+    DONE = "不管今天是什么结果，都是最好的安排。",
+    DOING = "日子像旋转木马，在脑海里转不停。",
+    NOENERGY = "再转一圈吧那些自作多情的相逢。"
+}
+S_____WORMWOOD.DESCRIBE.SIVING_TURN = {
+    GENERIC = "摩天轮轮？",
+    DONE = "小宝宝，在里面！",
+    DOING = "转转转...",
+    NOENERGY = "它饿了。"
+}
+-- S________WARLY.DESCRIBE.SIVING_TURN = ""
+-- S_________WURT.DESCRIBE.SIVING_TURN = ""
+-- S_______WALTER.DESCRIBE.SIVING_TURN = ""
+-- S________WANDA.DESCRIBE.SIVING_TURN = ""
+
 --------------------------------------------------------------------------
 --[[ flash and crush ]]--[[ 电闪雷鸣 ]]
 --------------------------------------------------------------------------

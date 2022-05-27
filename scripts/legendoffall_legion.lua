@@ -59,6 +59,7 @@ _G.RegistMiniMapImage_legion("siving_derivant")
 _G.RegistMiniMapImage_legion("siving_thetree")
 _G.RegistMiniMapImage_legion("siving_ctlwater")
 _G.RegistMiniMapImage_legion("siving_ctldirt")
+_G.RegistMiniMapImage_legion("siving_turn")
 
 AddRecipe2(
     "siving_soil_item", {
@@ -70,7 +71,7 @@ AddRecipe2(
 )
 AddRecipe2(
     "siving_ctlwater_item", {
-        Ingredient("siving_rocks", 30, "images/inventoryimages/siving_rocks.xml"),
+        Ingredient("siving_rocks", 20, "images/inventoryimages/siving_rocks.xml"),
         Ingredient("greengem", 1),
         Ingredient("moonglass", 10),
     }, TECH.MAGIC_THREE, {
@@ -79,7 +80,7 @@ AddRecipe2(
 )
 AddRecipe2(
     "siving_ctldirt_item", {
-        Ingredient("siving_rocks", 30, "images/inventoryimages/siving_rocks.xml"),
+        Ingredient("siving_rocks", 20, "images/inventoryimages/siving_rocks.xml"),
         Ingredient("greengem", 1),
         Ingredient("townportaltalisman", 10),
     }, TECH.MAGIC_THREE, {
@@ -102,6 +103,16 @@ AddRecipe2(
     }, TECH.SCIENCE_ONE, {
         atlas = "images/inventoryimages/fishhomingtool_normal.xml", image = "fishhomingtool_normal.tex"
     }, { "FISHING" }
+)
+AddRecipe2(
+    "siving_turn", {
+        Ingredient("siving_rocks", 40, "images/inventoryimages/siving_rocks.xml"),
+        Ingredient("siving_derivant_item", 1, "images/inventoryimages/siving_derivant_item.xml"),
+        Ingredient("seeds", 40),
+    }, TECH.MAGIC_THREE, {
+        placer="siving_turn_placer",
+        atlas = "images/inventoryimages/siving_turn.xml", image = "siving_turn.tex"
+    }, { "MAGIC", "GARDENING", "STRUCTURES" }
 )
 
 --这个配方用来便于绿宝石法杖分解

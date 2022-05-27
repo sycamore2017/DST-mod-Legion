@@ -544,6 +544,84 @@ table.insert(prefs, Prefab(
     nil
 ))
 
+--------------------------------------------------------------------------
+--[[ 子圭·育 ]]
+--------------------------------------------------------------------------
+
+table.insert(prefs, Prefab(
+    "siving_turn",
+    function()
+        local inst = CreateEntity()
+
+        inst.entity:AddTransform()
+        inst.entity:AddAnimState()
+        inst.entity:AddMiniMapEntity()
+        inst.entity:AddNetwork()
+
+        inst:SetPhysicsRadiusOverride(.16)
+        MakeObstaclePhysics(inst, inst.physicsradiusoverride)
+
+        inst.MiniMapEntity:SetIcon("siving_turn.tex")
+
+        inst.AnimState:SetBank("siving_turn")
+        inst.AnimState:SetBuild("siving_turn")
+        inst.AnimState:PlayAnimation("idle")
+
+        inst:AddTag("structure")
+        -- inst:AddTag("siving_ctl")
+
+        inst.entity:SetPristine()
+        if not TheWorld.ismastersim then
+            return inst
+        end
+
+        inst:AddComponent("inspectable")
+
+        inst:AddComponent("workable")
+        inst.components.workable:SetWorkAction(ACTIONS.HAMMER)
+        inst.components.workable:SetWorkLeft(5)
+        inst.components.workable:SetOnWorkCallback(function(inst, worker)
+            if not inst:HasTag("burnt") then
+                inst.AnimState:PlayAnimation("hit")
+                inst.AnimState:PushAnimation("idle_empty", true)
+                inst.components.mightygym:UnloadWeight()
+            end
+        end)
+        inst.components.workable:SetOnFinishCallback(function(inst, worker)
+            inst.components.lootdropper:DropLoot()
+            local fx = SpawnPrefab("collapse_big")
+            fx.Transform:SetPosition(inst.Transform:GetWorldPosition())
+            fx:SetMaterial("rock")
+            inst:Remove()
+        end)
+
+        inst:AddComponent("hauntable")
+        inst.components.hauntable:SetHauntValue(TUNING.HAUNT_SMALL)
+
+        inst:AddComponent("trader")
+        inst.components.trader:SetAcceptTest(AcceptTest)
+        inst.components.trader.onaccept = OnAccept
+        inst.components.trader.onrefuse = function(inst, giver, item)
+            if giver ~= nil and giver.siv_ctl_traded ~= nil then
+                if giver.components.talker ~= nil then
+                    giver.components.talker:Say(GetString(giver, "DESCRIBE", { string.upper(basename), giver.siv_ctl_traded }))
+                end
+                giver.siv_ctl_traded = nil
+            end
+        end
+        inst.components.trader.deleteitemonaccept = false --收到物品不马上移除，根据具体物品决定
+        inst.components.trader.acceptnontradable = true
+
+        return inst
+    end,
+    {
+        Asset("ANIM", "anim/siving_turn.zip")
+    },
+    {}
+))
+
+table.insert(prefabs, MakePlacer("siving_turn_placer", "siving_turn", "siving_turn", "idle"))
+
 --------------------
 --------------------
 

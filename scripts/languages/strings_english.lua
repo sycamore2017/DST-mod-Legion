@@ -2444,6 +2444,41 @@ S_____WORMWOOD.DESCRIBE.SEEDS_CROP_L = "Baby, different."
 -- S_______WALTER.DESCRIBE.SEEDS_CROP_L = ""
 -- S________WANDA.DESCRIBE.SEEDS_CROP_L = ""
 
+S_NAMES.SIVING_TURN = "Siving·Trans" --子圭·育
+S_RECIPE_DESC.SIVING_TURN = "Yesterday flourishing, tomorrow full of things."
+S______GENERIC.DESCRIBE.SIVING_TURN = {
+    GENERIC = "Is this the time shuttle?",
+    DONE = "Complete, can take it down.",
+    DOING = "It was wrapped in unidentified fragments.",
+    NOENERGY = "Find some energy for this non perpetual motion machine."
+}
+-- S_______WILLOW.DESCRIBE.SIVING_TURN = ""
+-- S_____WOLFGANG.DESCRIBE.SIVING_TURN = ""
+-- S________WENDY.DESCRIBE.SIVING_TURN = ""
+-- S_________WX78.DESCRIBE.SIVING_TURN = ""
+S_WICKERBOTTOM.DESCRIBE.SIVING_TURN = {
+    GENERIC = "Contains gravitational device, which seems to be able to hold some objects.",
+    DONE = "Transformation is finished. It looks like a cocoon.",
+    DOING = "It is carrying out some special gene transformation.",
+    NOENERGY = "The energy is exhausted, but its composition is its energy."
+}
+-- S_______WOODIE.DESCRIBE.SIVING_TURN = ""
+-- S______WAXWELL.DESCRIBE.SIVING_TURN = ""
+-- S___WATHGRITHR.DESCRIBE.SIVING_TURN = ""
+-- S_______WEBBER.DESCRIBE.SIVING_TURN = ""
+-- S_______WINONA.DESCRIBE.SIVING_TURN = ""
+-- S_______WORTOX.DESCRIBE.SIVING_TURN = ""
+S_____WORMWOOD.DESCRIBE.SIVING_TURN = {
+    GENERIC = "Wheel wheel?",
+    DONE = "Strange baby, inside!",
+    DOING = "Spinning...",
+    NOENERGY = "It's hungry."
+}
+-- S________WARLY.DESCRIBE.SIVING_TURN = ""
+-- S_________WURT.DESCRIBE.SIVING_TURN = ""
+-- S_______WALTER.DESCRIBE.SIVING_TURN = ""
+-- S________WANDA.DESCRIBE.SIVING_TURN = ""
+
 --------------------------------------------------------------------------
 --[[ flash and crush ]]--[[ 电闪雷鸣 ]]
 --------------------------------------------------------------------------
