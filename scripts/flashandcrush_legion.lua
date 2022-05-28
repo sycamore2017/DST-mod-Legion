@@ -336,7 +336,7 @@ local function AddShockableComponent_fire(inst, sym, offset, level)
         else
             inst.canshockable = nil
         end
-        inst.components.shockable:InitStaticFx(sym, offset or Vector3(0, 0, 1), level)    --这里的设置是为了让着火的sympol被设定的优先级高一些，覆盖的冰冻的sympol
+        inst.components.shockable:InitStaticFx(sym, offset or Vector3(0, 0, 1), level)    --这里的设置是为了让着火的symbol被设定的优先级高一些，覆盖的冰冻的symbol
     end
 end
 

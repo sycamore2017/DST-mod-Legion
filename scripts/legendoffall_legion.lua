@@ -1530,3 +1530,86 @@ if IsServer then
         end
     end)
 end
+
+--------------------------------------------------------------------------
+--[[ 子圭·育的相关 ]]
+--------------------------------------------------------------------------
+
+if not _G.rawget(_G, "TRANS_DATA_LEGION") then --对于global来说，不能直接检测是否有某个元素，需要用rawget才行
+    _G.TRANS_DATA_LEGION = {}
+end
+
+local mapseeds = {
+    carrot_oversized = {
+        swap = { build = "farm_plant_carrot", file = "swap_body", symboltype = "3" },
+        fruit = "seeds_carrot_l"
+    },
+    corn_oversized = {
+        swap = { build = "farm_plant_corn_build", file = "swap_body", symboltype = "3" },
+        fruit = "seeds_corn_l"
+    },
+    pumpkin_oversized = {
+        swap = { build = "farm_plant_pumpkin", file = "swap_body", symboltype = "3" },
+        fruit = "seeds_pumpkin_l"
+    },
+    eggplant_oversized = {
+        swap = { build = "farm_plant_eggplant_build", file = "swap_body", symboltype = "3" },
+        fruit = "seeds_eggplant_l"
+    },
+    durian_oversized = {
+        swap = { build = "farm_plant_durian_build", file = "swap_body", symboltype = "3" },
+        fruit = "seeds_durian_l"
+    },
+    pomegranate_oversized = {
+        swap = { build = "farm_plant_pomegranate_build", file = "swap_body", symboltype = "3" },
+        fruit = "seeds_pomegranate_l"
+    },
+    dragonfruit_oversized = {
+        swap = { build = "farm_plant_dragonfruit_build", file = "swap_body", symboltype = "3" },
+        fruit = "seeds_dragonfruit_l"
+    },
+    watermelon_oversized = {
+        swap = { build = "farm_plant_watermelon_build", file = "swap_body", symboltype = "3" },
+        fruit = "seeds_watermelon_l"
+    },
+    pineananas_oversized = {
+        swap = { build = "farm_plant_pineananas", file = "swap_body", symboltype = "3" },
+        fruit = "seeds_pineananas_l"
+    },
+    onion_oversized = {
+        swap = { build = "farm_plant_onion_build", file = "swap_body", symboltype = "3" },
+        fruit = "seeds_onion_l"
+    },
+    pepper_oversized = {
+        swap = { build = "farm_plant_pepper", file = "swap_body", symboltype = "3" },
+        fruit = "seeds_pepper_l"
+    },
+    potato_oversized = {
+        swap = { build = "farm_plant_potato", file = "swap_body", symboltype = "3" },
+        fruit = "seeds_potato_l"
+    },
+    garlic_oversized = {
+        swap = { build = "farm_plant_garlic", file = "swap_body", symboltype = "3" },
+        fruit = "seeds_garlic_l"
+    },
+    tomato_oversized = {
+        swap = { build = "farm_plant_tomato", file = "swap_body", symboltype = "3" },
+        fruit = "seeds_tomato_l"
+    },
+    asparagus_oversized = {
+        swap = { build = "farm_plant_asparagus", file = "swap_body", symboltype = "3" },
+        fruit = "seeds_asparagus_l"
+    },
+    mandrake = {
+        swap = { build = "farm_plant_pepper", file = "swap_body", symboltype = "1" }, --undo
+        time = 10*TUNING.TOTAL_DAY_TIME, fruit = "seeds_mandrake_l"
+    },
+    gourd_oversized = {
+        swap = { build = "farm_plant_gourd", file = "swap_body", symboltype = "3" },
+        fruit = "seeds_gourd_l"
+    },
+}
+for k,v in pairs(mapseeds) do
+    _G.TRANS_DATA_LEGION[k] = v
+end
+mapseeds = nil

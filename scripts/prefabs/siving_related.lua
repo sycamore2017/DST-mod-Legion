@@ -555,13 +555,20 @@ table.insert(prefs, Prefab(
 
         inst.entity:AddTransform()
         inst.entity:AddAnimState()
+        inst.entity:AddSoundEmitter()
         inst.entity:AddMiniMapEntity()
+        inst.entity:AddLight()
         inst.entity:AddNetwork()
 
-        inst:SetPhysicsRadiusOverride(.16)
-        MakeObstaclePhysics(inst, inst.physicsradiusoverride)
+        MakeObstaclePhysics(inst, .5)
 
         inst.MiniMapEntity:SetIcon("siving_turn.tex")
+
+        inst.Light:Enable(false)
+        inst.Light:SetRadius(2)
+        inst.Light:SetFalloff(1.5)
+        inst.Light:SetIntensity(.5)
+        inst.Light:SetColour(35/255, 167/255, 172/255)
 
         inst.AnimState:SetBank("siving_turn")
         inst.AnimState:SetBuild("siving_turn")
@@ -576,6 +583,20 @@ table.insert(prefs, Prefab(
         end
 
         inst:AddComponent("inspectable")
+        inst.components.inspectable.getstatus = function(inst)
+            -- local crop = inst.components.perennialcrop2
+            -- return (crop == nil and "GROWING")
+            --     or (crop.isrotten and "WITHERED")
+            --     or (crop.stage == crop.stage_max and "READY")
+            --     or (crop.isflower and "FLORESCENCE")
+            --     or (crop.stage <= 2 and "SPROUT")
+            --     or "GROWING"
+        end
+
+        inst:AddComponent("hauntable")
+        inst.components.hauntable:SetHauntValue(TUNING.HAUNT_TINY)
+
+        inst:AddComponent("genetrans") --实在不想做无谓的代码优化了，所以该组件与该实体的耦合性特别特别强
 
         inst:AddComponent("workable")
         inst.components.workable:SetWorkAction(ACTIONS.HAMMER)
@@ -594,9 +615,6 @@ table.insert(prefs, Prefab(
             fx:SetMaterial("rock")
             inst:Remove()
         end)
-
-        inst:AddComponent("hauntable")
-        inst.components.hauntable:SetHauntValue(TUNING.HAUNT_SMALL)
 
         inst:AddComponent("trader")
         inst.components.trader:SetAcceptTest(AcceptTest)
