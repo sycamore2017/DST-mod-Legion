@@ -560,7 +560,7 @@ table.insert(prefs, Prefab(
         inst.entity:AddLight()
         inst.entity:AddNetwork()
 
-        MakeObstaclePhysics(inst, .5)
+        MakeObstaclePhysics(inst, .35)
 
         inst.MiniMapEntity:SetIcon("siving_turn.tex")
 
@@ -575,7 +575,7 @@ table.insert(prefs, Prefab(
         inst.AnimState:PlayAnimation("idle")
 
         inst:AddTag("structure")
-        -- inst:AddTag("siving_ctl")
+        inst:AddTag("genetrans")
 
         inst.entity:SetPristine()
         if not TheWorld.ismastersim then
@@ -584,13 +584,49 @@ table.insert(prefs, Prefab(
 
         inst:AddComponent("inspectable")
         inst.components.inspectable.getstatus = function(inst)
-            -- local crop = inst.components.perennialcrop2
-            -- return (crop == nil and "GROWING")
-            --     or (crop.isrotten and "WITHERED")
-            --     or (crop.stage == crop.stage_max and "READY")
-            --     or (crop.isflower and "FLORESCENCE")
-            --     or (crop.stage <= 2 and "SPROUT")
-            --     or "GROWING"
+            local cpt = inst.components.genetrans
+            return (cpt == nil and "GENERIC")
+                or (cpt.fruit and "DONE")
+                or (cpt.energytime <= 0 and "NOENERGY")
+                or (cpt.seed and "DOING")
+                or "GENERIC"
+        end
+
+        inst:AddComponent("lootdropper")
+        inst.components.lootdropper:SetLootSetupFn(function(lootdropper)
+            local cpt = lootdropper.inst.components.genetrans
+            if cpt.fruit then
+                local loots = {}
+                local number = cpt.fruit == "seeds_mandrake_l" and 1 or math.random(2,3)
+                for i = 1, number, 1 do
+                    table.insert(loots, cpt.fruit)
+                end
+                lootdropper:SetLoot(loots)
+            end
+        end)
+        inst.components.lootdropper.GenerateLoot = function(self)
+            local loots = {}
+
+            if self.lootsetupfn then
+                self.lootsetupfn(self)
+            end
+            if self.loot then
+                for k,v in ipairs(self.loot) do
+                    table.insert(loots, v)
+                end
+            end
+
+            if self.inst.worked_l then
+                self.inst.worked_l = nil
+                local recipe = AllRecipes[self.inst.prefab]
+                if recipe then
+                    local recipeloot = self:GetRecipeLoot(recipe)
+                    for k,v in ipairs(recipeloot) do
+                        table.insert(loots, v)
+                    end
+                end
+            end
+            return loots
         end
 
         inst:AddComponent("hauntable")
@@ -602,13 +638,27 @@ table.insert(prefs, Prefab(
         inst.components.workable:SetWorkAction(ACTIONS.HAMMER)
         inst.components.workable:SetWorkLeft(5)
         inst.components.workable:SetOnWorkCallback(function(inst, worker)
-            if not inst:HasTag("burnt") then
+            local cpt = inst.components.genetrans
+            if cpt.energytime > 0 and (cpt.fruit or cpt.seed) then
+                inst.AnimState:PlayAnimation("hit_on")
+                inst.AnimState:PushAnimation("on", true)
+            else
                 inst.AnimState:PlayAnimation("hit")
-                inst.AnimState:PushAnimation("idle_empty", true)
-                inst.components.mightygym:UnloadWeight()
+                inst.AnimState:PushAnimation("idle", false)
             end
         end)
         inst.components.workable:SetOnFinishCallback(function(inst, worker)
+            local cpt = inst.components.genetrans
+            if cpt.seed then
+                inst:RemoveChild(cpt.seed)
+                cpt.seed:ReturnToScene()
+                cpt.seed.Transform:SetPosition(inst.Transform:GetWorldPosition())
+                if cpt.seed.components.perishable ~= nil then
+                    cpt.seed.components.perishable:StartPerishing()
+                end
+                cpt.seed = nil
+            end
+            inst.worked_l = true
             inst.components.lootdropper:DropLoot()
             local fx = SpawnPrefab("collapse_big")
             fx.Transform:SetPosition(inst.Transform:GetWorldPosition())
@@ -616,29 +666,47 @@ table.insert(prefs, Prefab(
             inst:Remove()
         end)
 
-        inst:AddComponent("trader")
-        inst.components.trader:SetAcceptTest(AcceptTest)
-        inst.components.trader.onaccept = OnAccept
-        inst.components.trader.onrefuse = function(inst, giver, item)
-            if giver ~= nil and giver.siv_ctl_traded ~= nil then
-                if giver.components.talker ~= nil then
-                    giver.components.talker:Say(GetString(giver, "DESCRIBE", { string.upper(basename), giver.siv_ctl_traded }))
-                end
-                giver.siv_ctl_traded = nil
-            end
+        return inst
+    end,
+    { Asset("ANIM", "anim/siving_turn.zip") },
+    { "siving_turn_fruit" }
+))
+
+table.insert(prefs, MakePlacer("siving_turn_placer", "siving_turn", "siving_turn", "idle"))
+
+--------------------------------------------------------------------------
+--[[ 子圭·育之果 ]]
+--------------------------------------------------------------------------
+
+table.insert(prefs, Prefab(
+    "siving_turn_fruit",
+    function()
+        local inst = CreateEntity()
+
+        inst.entity:AddTransform()
+        inst.entity:AddAnimState()
+        inst.entity:AddNetwork()
+        inst.entity:AddFollower()
+
+        inst.AnimState:SetBank("siving_turn")
+        inst.AnimState:SetBuild("siving_turn")
+        inst.AnimState:SetPercent("fruit", 0)
+        inst.AnimState:SetFinalOffset(3)
+
+        inst:AddTag("FX")
+
+        inst.entity:SetPristine()
+        if not TheWorld.ismastersim then
+            return inst
         end
-        inst.components.trader.deleteitemonaccept = false --收到物品不马上移除，根据具体物品决定
-        inst.components.trader.acceptnontradable = true
+
+        inst.persists = false
 
         return inst
     end,
-    {
-        Asset("ANIM", "anim/siving_turn.zip")
-    },
-    {}
+    nil,
+    nil
 ))
-
-table.insert(prefabs, MakePlacer("siving_turn_placer", "siving_turn", "siving_turn", "idle"))
 
 --------------------
 --------------------

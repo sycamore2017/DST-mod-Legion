@@ -1415,3 +1415,23 @@ if IsServer then
         end)
     end
 end
+
+--------------------------------------------------------------------------
+--[[ 给予动作的完善 ]]
+--------------------------------------------------------------------------
+
+if CONFIGS_LEGION.FLOWERSPOWER or CONFIGS_LEGION.LEGENDOFFALL then
+    local give_strfn_old = ACTIONS.GIVE.strfn
+    ACTIONS.GIVE.strfn = function(act)
+        if act.target ~= nil then
+            if act.target:HasTag("swordscabbard") then
+                return "SCABBARD"
+            elseif act.target:HasTag("genetrans") then
+                if act.invobject and act.invobject.prefab == "siving_rocks" then
+                    return "NEEDENERGY"
+                end
+            end
+        end
+        return give_strfn_old(act)
+    end
+end

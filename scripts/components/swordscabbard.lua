@@ -113,9 +113,9 @@ function SwordScabbard:OnSave()
     local refs = {}
 
     if self.child ~= nil then
-        data.child = self.child:GetSaveRecord()
-        data.childid = self.child.GUID
-        refs = { data.childid }
+        data.child, refs = self.child:GetSaveRecord()
+        -- data.childid = self.child.GUID
+        -- refs = { data.childid }
 
         -- if self.inst.components.perishable ~= nil then
         --     -- data.perishtime = self.inst.components.perishable.perishtime

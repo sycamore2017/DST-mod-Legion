@@ -3252,6 +3252,7 @@ STRINGS.ACTIONS_LEGION = {
     ATTACK_SHIELD_L = "Protective attack", --盾牌类道具通用动作的名字
 }
 STRINGS.ACTIONS.GIVE.SCABBARD = "Put into"  --青枝绿叶放入武器的名字
+STRINGS.ACTIONS.PICK.GENETRANS = "Take down"  --收获子圭·育的名字
 
 STRINGS.ACTIONS.OPEN_CRAFTING.RECAST = "Brainstorming with" --靠近解锁时的前置提示。名字与AddPrototyperDef里的action_str一致
 STRINGS.UI.CRAFTING_STATION_FILTERS.RECAST = "Recast"
@@ -3381,3 +3382,37 @@ STRINGS.ACTIONS.PLANTSOIL_LEGION = {
     GENERIC = "Plant",
     DISPLAY = "Replant"
 }
+
+STRINGS.ACTIONS.GENETRANS = {
+    GENERIC = "Put On",
+    CHARGE = "Charge",
+}
+S______GENERIC.ACTIONFAIL.GENETRANS = {
+    DONE = "Take down the transformed one first.",
+    GROWING = "Something is already here.",
+    ENERGYOUT = "Needs to be charged before it can start.",
+    WRONGITEM = "This is not what it can transform.",
+    ENERGYMAX = "Already full of life energy."
+}
+-- S_______WILLOW.ACTIONFAIL.GENETRANS =
+-- S_____WOLFGANG.ACTIONFAIL.GENETRANS =
+-- S________WENDY.ACTIONFAIL.GENETRANS =
+-- S_________WX78.ACTIONFAIL.GENETRANS =
+-- S_WICKERBOTTOM.ACTIONFAIL.GENETRANS =
+-- S_______WOODIE.ACTIONFAIL.GENETRANS =
+-- S______WAXWELL.ACTIONFAIL.GENETRANS =
+-- S___WATHGRITHR.ACTIONFAIL.GENETRANS =
+-- S_______WEBBER.ACTIONFAIL.GENETRANS =
+-- S_______WINONA.ACTIONFAIL.GENETRANS =
+-- S_______WORTOX.ACTIONFAIL.GENETRANS =
+-- S_____WORMWOOD.ACTIONFAIL.GENETRANS =
+S________WARLY.ACTIONFAIL.GENETRANS = {
+    DONE = "You can only put one dish on a plate at same time!",
+    GROWING = "One pot can only cook one dish at same time!",
+    NOENERGY = "The stove is out of fire.",
+    WRONGITEM = "Wrong ingredients.",
+    ENERGYMAX = "Maximum power has been reached."
+}
+-- S_________WURT.ACTIONFAIL.GENETRANS =
+-- S_______WALTER.ACTIONFAIL.GENETRANS =
+-- S________WANDA.ACTIONFAIL.GENETRANS =

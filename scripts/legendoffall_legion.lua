@@ -37,6 +37,8 @@ local assets = {
     Asset("IMAGE", "images/inventoryimages/fishhomingtool_normal.tex"),
     Asset("ATLAS", "images/inventoryimages/fishhomingtool_awesome.xml"),
     Asset("IMAGE", "images/inventoryimages/fishhomingtool_awesome.tex"),
+    Asset("ATLAS", "images/inventoryimages/siving_turn.xml"),
+    Asset("IMAGE", "images/inventoryimages/siving_turn.tex"),
 }
 
 for k,v in pairs(assets) do
@@ -1601,8 +1603,8 @@ local mapseeds = {
         fruit = "seeds_asparagus_l"
     },
     mandrake = {
-        swap = { build = "farm_plant_pepper", file = "swap_body", symboltype = "1" }, --undo
-        time = 10*TUNING.TOTAL_DAY_TIME, fruit = "seeds_mandrake_l"
+        swap = { build = "siving_turn", file = "swap_mandrake", symboltype = "1" },
+        fruit = "seeds_mandrake_l", time = 10*TUNING.TOTAL_DAY_TIME
     },
     gourd_oversized = {
         swap = { build = "farm_plant_gourd", file = "swap_body", symboltype = "3" },
@@ -1613,3 +1615,82 @@ for k,v in pairs(mapseeds) do
     _G.TRANS_DATA_LEGION[k] = v
 end
 mapseeds = nil
+
+------放入与充能的动作
+local GENETRANS = Action({ mount_valid=false, encumbered_valid=true })
+GENETRANS.id = "GENETRANS"
+GENETRANS.str = STRINGS.ACTIONS.GENETRANS
+GENETRANS.strfn = function(act)
+    if act.invobject ~= nil then
+        if act.invobject.prefab == "siving_rocks" then
+            return "CHARGE"
+        end
+    end
+    return "GENERIC"
+end
+GENETRANS.fn = function(act)
+    if act.target ~= nil and act.target.components.genetrans ~= nil and act.doer ~= nil then
+        local material
+        if
+            act.doer.components.inventory ~= nil and act.doer.components.inventory:IsHeavyLifting() and
+            not (act.doer.components.rider ~= nil and act.doer.components.rider:IsRiding())
+        then
+            material = act.doer.components.inventory:GetEquippedItem(EQUIPSLOTS.BODY)
+        else
+            material = act.invobject
+        end
+        if material ~= nil then
+            if material.prefab == "siving_rocks" then
+                return act.target.components.genetrans:Charge(material, act.doer)
+            else
+                return act.target.components.genetrans:SetUp(material, act.doer, false)
+            end
+        end
+    end
+end
+AddAction(GENETRANS)
+
+AddComponentAction("SCENE", "genetrans", function(inst, doer, actions, right)
+    if
+        right and
+        (doer.replica.inventory ~= nil and doer.replica.inventory:IsHeavyLifting()) and
+        not (doer.replica.rider ~= nil and doer.replica.rider:IsRiding())
+    then
+        local item = doer.replica.inventory:GetEquippedItem(EQUIPSLOTS.BODY)
+        if item ~= nil then
+            if TRANS_DATA_LEGION[item.prefab] ~= nil then
+                table.insert(actions, ACTIONS.GENETRANS)
+            end
+        end
+    end
+end)
+AddComponentAction("USEITEM", "inventoryitem", function(inst, doer, target, actions, right)
+    if
+        right and
+        (inst.prefab == "siving_rocks" or TRANS_DATA_LEGION[inst.prefab] ~= nil) and
+        target:HasTag("genetrans") and
+        not (doer.replica.inventory ~= nil and doer.replica.inventory:IsHeavyLifting()) and
+        not (doer.replica.rider ~= nil and doer.replica.rider:IsRiding())
+    then
+        table.insert(actions, ACTIONS.GENETRANS)
+    end
+end)
+
+local function FnSgGeneTrans(inst, action)
+    if inst.replica.inventory ~= nil and inst.replica.inventory:IsHeavyLifting() then
+        return "domediumaction"
+    else
+        return "give"
+    end
+end
+AddStategraphActionHandler("wilson", ActionHandler(ACTIONS.GENETRANS, FnSgGeneTrans))
+AddStategraphActionHandler("wilson_client", ActionHandler(ACTIONS.GENETRANS, FnSgGeneTrans))
+
+------修改采集动作的名称
+local pick_strfn_old = ACTIONS.PICK.strfn
+ACTIONS.PICK.strfn = function(act)
+    if act.target ~= nil and act.target:HasTag("genetrans") then
+        return "GENETRANS"
+    end
+    return pick_strfn_old(act)
+end
