@@ -136,4 +136,4 @@ local function fn()
     return inst
 end
 
-return Prefab( "sachet", fn, assets, prefabs)
+return Prefab("sachet", fn, assets, prefabs)

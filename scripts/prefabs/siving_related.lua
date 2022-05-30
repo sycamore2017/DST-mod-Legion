@@ -12,6 +12,10 @@ local ctlFuledItems = {
     oceanfish_medium_8_inv = { moisture = 200, nutrients = { 16, nil, nil } }, --冰鲷鱼
     watermelonicle = { moisture = 200, nutrients = { 8, 8, 16 } },
     icecream = { moisture = 200, nutrients = { 24, 24, 24 } },
+    cutted_rosebush = { moisture = nil, nutrients = { 5, 5, 8 } },
+    cutted_lilybush = { moisture = nil, nutrients = { 5, 5, 8 } },
+    cutted_orchidbush = { moisture = nil, nutrients = { 5, 5, 8 } },
+    sachet = { moisture = nil, nutrients = { 40, 40, 64 } },
 }
 
 local function MakeItem(data)

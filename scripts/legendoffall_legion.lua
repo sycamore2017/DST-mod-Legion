@@ -995,8 +995,7 @@ end
 
 local time_annual = 20*TUNING.TOTAL_DAY_TIME
 local time_years = 25 * TUNING.TOTAL_DAY_TIME
-local time_day = TUNING.TOTAL_DAY_TIME
--- local time_day = TUNING.LEGION_OVERRIPETIME ~= 0 and TUNING.LEGION_OVERRIPETIME * TUNING.TOTAL_DAY_TIME or TUNING.TOTAL_DAY_TIME
+local time_day = TUNING.TOTAL_DAY_TIME*(_G.CONFIGS_LEGION.X_OVERRIPETIME or 1)
 
 _G.CROPS_DATA_LEGION.carrot = {
     growthmults = { [1] = 0.8, [2] = 1.2, [3] = 0.8, [4] = 1.5 }, --秋冬春。小于1为加速生长，大于1为延缓生长，为0停止生长

@@ -1214,7 +1214,7 @@ end
 -- end)
 
 --新制作栏改动
-AddClassPostConstruct("widgets/redux/craftingmenu_skinselector", function(self)
+AddClassPostConstruct("widgets/redux/craftingmenu_skinselector", function(self, recipe, owner, skin_name)
     ------【客户端】环境
     if self.recipe and SKIN_PREFABS_LEGION[self.recipe.product] then
         local GetSkinsList_old = self.GetSkinsList
@@ -1256,6 +1256,7 @@ AddClassPostConstruct("widgets/redux/craftingmenu_skinselector", function(self)
         end
         self.spinner:SetWrapEnabled(#self.skins_options > 1)
         self.spinner:SetOptions(self.skins_options)
+        self.spinner:SetSelectedIndex(skin_name == nil and 1 or self:GetIndexForSkin(skin_name) or 1)
     end
 end)
 

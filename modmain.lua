@@ -199,8 +199,8 @@ if GetModConfigData("LegendOfFall") then --丰饶传说 bool
 
     -- TUNING.LEGION_GROWTHRATE = GetModConfigData("GrowthRate") --设置生长速度 int 0.7 1 1.5 2
     -- TUNING.LEGION_CROPYIELDS = GetModConfigData("CropYields") --设置果实数量 int 0 1 2 3
-    -- TUNING.LEGION_OVERRIPETIME = GetModConfigData("OverripeTime") --设置过熟的时间倍数 int 1 2 0
-    -- TUNING.LEGION_PESTRISK = GetModConfigData("PestRisk") --设置虫害几率 double 0.007 0.012
+    _G.CONFIGS_LEGION.X_OVERRIPETIME = GetModConfigData("OverripeTime") --设置过熟的时间倍数 int 1 2 0
+    _G.CONFIGS_LEGION.X_PESTRISK = GetModConfigData("PestRisk") --设置虫害几率 double 0.007 0.012
 end
 
 if GetModConfigData("FlashAndCrush") then --电闪雷鸣 bool

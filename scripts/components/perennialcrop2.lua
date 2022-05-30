@@ -39,7 +39,7 @@ local PerennialCrop2 = Class(function(self, inst)
 
 	self.pollinated_max = 3 --被授粉次数大于等于该值就能增加产量
 	self.infested_max = 10 --被骚扰次数大于等于该值就会立即进入腐烂/枯萎阶段
-	self.getsickchance = 0.001 --产生病虫害几率
+	self.getsickchance = CONFIGS_LEGION.X_PESTRISK or 0.007 --产生病虫害几率
 	self.cangrowindrak = false --能否在黑暗中生长
 
 	self.stage = 1 --当前生长阶段

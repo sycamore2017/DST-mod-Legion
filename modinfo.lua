@@ -6,7 +6,7 @@ local L = locale ~= "zh" and locale ~= "zhr" --true-英文; false-中文
 --     zh = "[DST] 棱镜",
 -- })
 
-name = L and "[DST] Legion" or "[DST] 棱镜"
+name = L and "[DST] Legion(test)" or "[DST] 棱镜(test)"
 author = "ti_Tout"
 version = "7.0.0" --每次更新时为了上传必须更改
 description =
@@ -402,64 +402,64 @@ configuration_options =
     --     },
     --     default = 0,
     -- },
-    -- L and {
-    --     name = "OverripeTime",
-    --     label = "Overripe Time",
-    --     hover = "Set overripe time of Crops.",
-    --     options =
-    --     {
-    --         {description = "1x(default)", data = 1},
-    --         {description = "2x", data = 2},
-    --         {description = "3x", data = 3},
-    --         {description = "Never", data = 0},
-    --     },
-    --     default = 1,
-    -- } or {
-    --     name = "OverripeTime",
-    --     label = "农作物过熟时间",
-    --     hover = "设置农作物过熟的时间。果子熟透了就要掉地上，自然规律真奇妙。",
-    --     options =
-    --     {
-    --         {description = "1倍(默认)", data = 1},
-    --         {description = "2倍", data = 2},
-    --         {description = "3倍", data = 3},
-    --         {description = "不过熟", data = 0},
-    --     },
-    --     default = 1,
-    -- },
-    -- L and {
-    --     name = "PestRisk",
-    --     label = "Pest Risk",
-    --     hover = "Set the chance of pest infestation.",
-    --     options =
-    --     {
-    --         {description = "Never", data = -1},
-    --         {description = "0.07%", data = 0.0007},
-    --         {description = "0.2%", data = 0.002},
-    --         {description = "0.7%(default)", data = 0.007},
-    --         {description = "1.2%", data = 0.012},
-    --         {description = "2.0%", data = 0.020},
-    --         {description = "10.0%", data = 0.100},
-    --         {description = "Always", data = 1.000},
-    --     },
-    --     default = 0.007,
-    -- } or {
-    --     name = "PestRisk",
-    --     label = "农作物虫害率",
-    --     hover = "设置农作物害虫产生几率。种好你的田，管好你的地！",
-    --     options =
-    --     {
-    --         {description = "不产生", data = -1},
-    --         {description = "0.07%", data = 0.0007},
-    --         {description = "0.2%", data = 0.002},
-    --         {description = "0.7%(默认)", data = 0.007},
-    --         {description = "1.2%", data = 0.012},
-    --         {description = "2.0%", data = 0.020},
-    --         {description = "10.0%", data = 0.100},
-    --         {description = "总是产生", data = 1.000},
-    --     },
-    --     default = 0.007,
-    -- },
+    L and {
+        name = "OverripeTime",
+        label = "Overripe Time",
+        hover = "Set overripe time of X-crops.",
+        options =
+        {
+            {description = "1x(default)", data = 1},
+            {description = "2x", data = 2},
+            {description = "3x", data = 3},
+            {description = "Never", data = 0},
+        },
+        default = 1,
+    } or {
+        name = "OverripeTime",
+        label = "异种作物过熟时间",
+        hover = "设置异种作物过熟的时间。果子熟透了就要掉地上，自然规律真奇妙。",
+        options =
+        {
+            {description = "1倍(默认)", data = 1},
+            {description = "2倍", data = 2},
+            {description = "3倍", data = 3},
+            {description = "不过熟", data = 0},
+        },
+        default = 1,
+    },
+    L and {
+        name = "PestRisk",
+        label = "Pest Risk",
+        hover = "Set the chance of pest infestation about X-crops.",
+        options =
+        {
+            {description = "Never", data = 0},
+            {description = "0.07%", data = 0.0007},
+            {description = "0.2%", data = 0.002},
+            {description = "0.7%(default)", data = 0.007},
+            {description = "1.2%", data = 0.012},
+            {description = "2.0%", data = 0.020},
+            {description = "10.0%", data = 0.100},
+            {description = "Always", data = 1.000},
+        },
+        default = 0.007,
+    } or {
+        name = "PestRisk",
+        label = "异种作物虫害率",
+        hover = "设置异种作物害虫产生几率。种好你的田，管好你的地！",
+        options =
+        {
+            {description = "不产生", data = 0},
+            {description = "0.07%", data = 0.0007},
+            {description = "0.2%", data = 0.002},
+            {description = "0.7%(默认)", data = 0.007},
+            {description = "1.2%", data = 0.012},
+            {description = "2.0%", data = 0.020},
+            {description = "10.0%", data = 0.100},
+            {description = "总是产生", data = 1.000},
+        },
+        default = 0.007,
+    },
 
     -----
 
