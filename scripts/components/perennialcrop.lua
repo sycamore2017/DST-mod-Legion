@@ -447,18 +447,21 @@ function PerennialCrop:StartGrowing(time)
 	end
 end
 
-function PerennialCrop:LongUpdate(dt, isloop)
+function PerennialCrop:LongUpdate(dt, isloop, ismagic)
 	if self.timedata.paused then
 		return
 	end
 
     if self.timedata.start ~= nil and self.timedata.all ~= nil then
 		if dt > self.timedata.all then --经过的时间可以让作物长到下一阶段，并且有多余的
-			dt = dt - self.timedata.all
+			if ismagic and not self.isrotten and (self.stage+1) == self.stage_max then --防止魔法催熟导致过熟
+				self:DoGrowth(false)
+				return
+			end
 			self:DoGrowth(true)
 			self.timedata.start = GetTime()
 			self.timedata.all = self:GetGrowTime()
-			self:LongUpdate(dt, true) --经过这次成长，由于经过时间dt还没完，继续下一次判定
+			self:LongUpdate(dt-self.timedata.all, true) --经过这次成长，由于经过时间dt还没完，继续下一次判定
 		elseif dt == self.timedata.all then
 			self:DoGrowth(false)
 		else --经过的时间不足以让作物长到下一个阶段
@@ -705,7 +708,7 @@ function PerennialCrop:DoMagicGrowth(doer, dt) -- 催熟
 	if dt == nil then
 		self:DoGrowth(false)
 	else
-		self:LongUpdate(dt, false)
+		self:LongUpdate(dt, false, true)
 	end
 	return true
 end

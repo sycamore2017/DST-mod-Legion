@@ -823,7 +823,7 @@ if TUNING.LEGION_FLASHANDCRUSH or TUNING.LEGION_DESERTSECRET then --素白蘑菇
                 return "dolongaction"
             end,
             fn_do = function(act)
-                return Fn_do_sand(act.doer, act.invobject, act.target, 525)
+                return Fn_do_sand(act.doer, act.invobject, act.target, 315)
             end
         }
     end

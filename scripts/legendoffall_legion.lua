@@ -102,7 +102,7 @@ AddRecipe2(
     "fishhomingtool_normal", {
         Ingredient("cutreeds", 1),
         Ingredient("stinger", 1),
-    }, TECH.SCIENCE_ONE, {
+    }, TECH.FISHING_ONE, {
         atlas = "images/inventoryimages/fishhomingtool_normal.xml", image = "fishhomingtool_normal.tex"
     }, { "FISHING" }
 )
@@ -904,6 +904,7 @@ local fishhoming_ingredients = {
     log =               { hardy = 1, dusty = 1, veggie = 1 },
     petals_evil =       { pasty = 1, veggie = 1, monster = 2 },
     siving_rocks =      { hardy = 1, pasty = 1, dusty = 1 },
+    goose_feather =     { hardy = 1, pasty = 1, dusty = 1, evil = 1 },
     --圣诞小玩意：全部可加入，不过没有任何属性
 }
 for name,data in pairs(fishhoming_ingredients) do
@@ -1438,28 +1439,25 @@ _G.CROPS_DATA_LEGION.mandrake = {
         end)
     end
 }
-
-if _G.CONFIGS_LEGION.ENABLEDMODS.MythWords then
-    _G.CROPS_DATA_LEGION.gourd = {
-        growthmults = { [1] = 1.2, [2] = 1.2, [3] = 0.8, [4] = 0 }, --秋
-        regrowstage = 4,
-        bank = "crop_mythword_gourd",
-        build = "crop_mythword_gourd",
-        leveldata = {
-            [1] = { anim = "level1", time = time_years * 0.05, deadanim = "dead1", witheredprefab = {"cutgrass"}, },
-            [2] = { anim = "level2", time = time_years * 0.15, deadanim = "dead1", witheredprefab = {"cutgrass"}, },
-            [3] = { anim = "level3", time = time_years * 0.20, deadanim = "dead2", witheredprefab = {"cutgrass"}, },
-            [4] = { anim = "level4", time = time_years * 0.20, deadanim = "dead2", witheredprefab = {"cutgrass"}, },
-            [5] = { anim = "level5", time = time_years * 0.40, deadanim = "dead2", witheredprefab = {"cutgrass", "cutgrass"}, bloom = true, },
-            [6] = { anim = "level6", time = time_day   * 6.00, deadanim = "dead2", witheredprefab = {"cutgrass", "rope"}, },
-        },
-        maturedanim = {
-            [1] = "level6_1",
-            [2] = "level6_2",
-            [3] = "level6_3",
-        },
+_G.CROPS_DATA_LEGION.gourd = {
+    growthmults = { [1] = 1.2, [2] = 1.2, [3] = 0.8, [4] = 0 }, --秋
+    regrowstage = 4,
+    bank = "crop_mythword_gourd",
+    build = "crop_mythword_gourd",
+    leveldata = {
+        [1] = { anim = "level1", time = time_years * 0.05, deadanim = "dead1", witheredprefab = {"cutgrass"}, },
+        [2] = { anim = "level2", time = time_years * 0.15, deadanim = "dead1", witheredprefab = {"cutgrass"}, },
+        [3] = { anim = "level3", time = time_years * 0.20, deadanim = "dead2", witheredprefab = {"cutgrass"}, },
+        [4] = { anim = "level4", time = time_years * 0.20, deadanim = "dead2", witheredprefab = {"cutgrass"}, },
+        [5] = { anim = "level5", time = time_years * 0.40, deadanim = "dead2", witheredprefab = {"cutgrass", "cutgrass"}, bloom = true, },
+        [6] = { anim = "level6", time = time_day   * 6.00, deadanim = "dead2", witheredprefab = {"cutgrass", "rope"}, },
+    },
+    maturedanim = {
+        [1] = "level6_1",
+        [2] = "level6_2",
+        [3] = "level6_3",
     }
-end
+}
 
 --------------------------------------------------------------------------
 --[[ 修改浣猫，让猫薄荷对其产生特殊作用 ]]
@@ -1608,7 +1606,7 @@ local mapseeds = {
     gourd_oversized = {
         swap = { build = "farm_plant_gourd", file = "swap_body", symboltype = "3" },
         fruit = "seeds_gourd_l"
-    },
+    }
 }
 for k,v in pairs(mapseeds) do
     _G.TRANS_DATA_LEGION[k] = v

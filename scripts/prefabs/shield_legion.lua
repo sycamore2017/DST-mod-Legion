@@ -168,13 +168,9 @@ if TUNING.LEGION_DESERTSECRET then
     local absorb_raining = 0.4
     local absorb_broken = 0.1
 
-    local mult_success_sandstorms = 0
-    local mult_success_normal = 0.15
-    local mult_success_raining = 0.4
-
-    local mult_ranged_sandstorms = 0
-    local mult_ranged_normal = 0.5
-    local mult_ranged_raining = 1
+    local mult_success_sandstorms = 0.1
+    local mult_success_normal = 0.3
+    local mult_success_raining = 0.6
 
     local function OnBlocked(owner, data)
         -- owner.SoundEmitter:PlaySound("dontstarve/common/together/teleport_sand/out")    --被攻击时播放像沙的声音
@@ -243,14 +239,12 @@ if TUNING.LEGION_DESERTSECRET then
                 shield.components.weapon:SetDamage(damage_sandstorms)
                 shield.components.armor:SetAbsorption(absorb_sandstorms)
                 shield.components.shieldlegion.armormult_success = mult_success_sandstorms
-                shield.components.shieldlegion.armormult_ranged = mult_ranged_sandstorms
                 return
             end
         end
         shield.components.weapon:SetDamage(damage_normal)
         shield.components.armor:SetAbsorption(absorb_normal)
         shield.components.shieldlegion.armormult_success = mult_success_normal
-        shield.components.shieldlegion.armormult_ranged = mult_ranged_normal
     end
     local function onisraining(inst)    --下雨时属性降低
         local owner = inst.components.inventoryitem.owner
@@ -264,7 +258,6 @@ if TUNING.LEGION_DESERTSECRET then
                 inst.components.weapon:SetDamage(damage_raining)
                 inst.components.armor:SetAbsorption(absorb_raining)
                 inst.components.shieldlegion.armormult_success = mult_success_raining
-                inst.components.shieldlegion.armormult_ranged = mult_ranged_raining
             end
         else
             if inst._brokenshield then
@@ -338,7 +331,6 @@ if TUNING.LEGION_DESERTSECRET then
             inst.components.equippable.insulated = true --设为true，就能防电
 
             inst.components.shieldlegion.armormult_success = mult_success_normal
-            inst.components.shieldlegion.armormult_ranged = mult_ranged_normal
             inst.components.shieldlegion.atkfn = function(inst, doer, attacker, data)
                 local snap = SpawnPrefab("impact")
                 local x, y, z = doer.Transform:GetWorldPosition()
@@ -418,8 +410,7 @@ MakeShield({
         inst.components.equippable:SetOnEquip(OnEquipFn)
         inst.components.equippable:SetOnUnequip(OnUnequipFn)
 
-        inst.components.shieldlegion.armormult_success = 0.25
-        inst.components.shieldlegion.armormult_ranged = 0.7
+        inst.components.shieldlegion.armormult_success = 0.5
         inst.components.shieldlegion.atkfn = function(inst, doer, attacker, data)
             local snap = SpawnPrefab("impact")
             local x, y, z = doer.Transform:GetWorldPosition()

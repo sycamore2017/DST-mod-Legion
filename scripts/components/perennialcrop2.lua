@@ -485,7 +485,7 @@ function PerennialCrop2:StartGrowing(lefttime, skip)
 	end
 end
 
-function PerennialCrop2:LongUpdate(dt, isloop)
+function PerennialCrop2:LongUpdate(dt, isloop, ismagic)
 	if self.timedata.paused or self.timedata.mult == nil then --暂停了、生长停滞、或者是永恒阶段
 		return
 	end
@@ -493,6 +493,10 @@ function PerennialCrop2:LongUpdate(dt, isloop)
     if self.timedata.start and self.timedata.all then
 		local alltime = self.timedata.all*self.timedata.mult --将时间转化为带mult的
 		if dt > alltime then --经过的时间可以让作物长到下一阶段，并且有多余的
+			if ismagic and not self.isrotten and (self.stage+1) == self.stage_max then --防止魔法催熟导致过熟
+				self:DoGrowth(false)
+				return
+			end
 			self:DoGrowth(true)
 			if self.timedata.mult then --生长没有停滞
 				self:LongUpdate(dt - alltime, true) --经过这次成长，由于经过时间dt还没完，继续下一次判定
@@ -709,7 +713,7 @@ function PerennialCrop2:DoMagicGrowth(doer, dt) --催熟
 		self:DoGrowth(false)
 	else
 		self:OnEntitySleep()
-		self:LongUpdate(dt, false)
+		self:LongUpdate(dt, false, true)
 	end
 	return true
 end

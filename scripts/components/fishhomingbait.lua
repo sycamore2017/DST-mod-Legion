@@ -134,8 +134,20 @@ local function FindOtherKeys(other)
 	end
 
 	local res = {}
+
 	if num_max > 0 then
-		res[ key_max[math.random(#key_max)] ] = true
+		local max_count = #key_max
+		if max_count == 1 then
+			res[key_max[1]] = true
+		elseif max_count == 2 then
+			res[key_max[1]] = true
+			res[key_max[2]] = true
+			return res
+		elseif max_count >= 3 then
+			res[table.remove(key_max, math.random(max_count))] = true
+			res[key_max[math.random(max_count-1)]] = true
+			return res
+		end
 	end
 	if num_max2 > 0 then
 		res[ key_max2[math.random(#key_max2)] ] = true

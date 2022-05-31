@@ -20,7 +20,6 @@ local ShieldLegion = Class(function(self, inst)
     self.time = nil
     self.delta = 9 * FRAMES --FRAMES为0.033秒。并且盾击sg动画总时长为 13*FRAMES，最好小于这个值
     self.armormult_success = 1 --盾反成功时的损害系数
-    self.armormult_ranged = 1 --抵挡远程攻击时的损害系数
 
     -- self.startfn = nil
     -- self.atkfn = nil
@@ -86,7 +85,8 @@ function ShieldLegion:Counterattack(doer, attacker, data, radius, dmgmult)
                 (attacker:GetIsWet() and 1 or 0)
             )
         or 1
-    local dmg = (doer.components.combat:CalcDamage(attacker, self.inst, mult) + (data.damage or 0)) * (dmgmult or 1)
+    local dmg = doer.components.combat:CalcDamage(attacker, self.inst, mult)
+                + ( (data.damage or 0) * (dmgmult or 1) )
     attacker.components.combat:GetAttacked(doer, dmg, self.inst, stimuli)
 
     return true
@@ -126,7 +126,6 @@ function ShieldLegion:GetAttacked(doer, attacker, damage, weapon, stimuli)
         )
     then
         data.israngedweapon = true
-        data.armordamage = data.armordamage*self.armormult_ranged
         restarget = self.inst
     end
 
