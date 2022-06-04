@@ -388,7 +388,7 @@ MakeBush({
                 SpawnMyLoot(inst, picker, "cutted_lilybush", 1, true) --掉落蹄莲幼苗
             end
             if math.random() <= CONFIGS_LEGION.FLOWERWEAPONSCHANCE then --3%几率掉落剑
-                SpawnMyLoot(inst, picker, "lileaves", 1, true)
+                SpawnMyLoot(inst, picker, "lileaves", 1, true, true)
             end
         end
 

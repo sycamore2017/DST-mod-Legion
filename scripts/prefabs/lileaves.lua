@@ -7,7 +7,12 @@ local assets =
 }
 
 local function OnEquip(inst, owner) --装备武器时
-    owner.AnimState:OverrideSymbol("swap_object", "swap_lileaves", "swap_lileaves")
+    local skindata = inst.components.skinedlegion:GetSkinedData()
+    if skindata ~= nil and skindata.equip ~= nil then
+        owner.AnimState:OverrideSymbol("swap_object", skindata.equip.build, skindata.equip.file)
+    else
+        owner.AnimState:OverrideSymbol("swap_object", "swap_lileaves", "swap_lileaves")
+    end
     owner.AnimState:Show("ARM_carry") --显示持物手
     owner.AnimState:Hide("ARM_normal") --隐藏普通的手
 end
@@ -49,15 +54,10 @@ local function fn()
     --weapon (from weapon component) added to pristine state for optimization
     inst:AddTag("weapon")
 
-    MakeInventoryFloatable(inst, "small", 0.4, 0.5)
-    local OnLandedClient_old = inst.components.floater.OnLandedClient
-    inst.components.floater.OnLandedClient = function(self)
-        OnLandedClient_old(self)
-        self.inst.AnimState:SetFloatParams(0.15, 1, 0.1)
-    end
+    inst:AddComponent("skinedlegion")
+    inst.components.skinedlegion:InitWithFloater("lileaves")
 
     inst.entity:SetPristine()
-
     if not TheWorld.ismastersim then
         return inst
     end
@@ -82,6 +82,8 @@ local function fn()
     inst.components.perishable.onperishreplacement = "spoiled_food"
 
     MakeHauntableLaunchAndPerish(inst)  --作祟相关函数
+
+    inst.components.skinedlegion:SetOnPreLoad()
 
     return inst
 end

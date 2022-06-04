@@ -568,14 +568,14 @@ local function OnAttacked(inst, data)
 		if not inst.components.combat:HasTarget() then	--如果这样设置，会盯准某个攻击者一直打
 			inst.components.combat:SetTarget(data.attacker)
         end
-        
+
         if inst.irritated then --暴怒状态时，被攻击会电击
             if data.attacker.components.health ~= nil and not data.attacker.components.health:IsDead() and
                 (data.weapon == nil or ((data.weapon.components.weapon == nil or data.weapon.components.weapon.projectile == nil) and data.weapon.components.projectile == nil)) and
                 not (data.attacker.components.inventory ~= nil and data.attacker.components.inventory:IsInsulated()) then
 
                 data.attacker.components.health:DoDelta(-15, nil, inst.prefab, nil, inst)
-                if data.attacker:HasTag("player") then
+                if data.attacker:HasTag("player") and not data.attacker.sg:HasStateTag("dead") then
                     data.attacker.sg:GoToState("electrocute")
                 end
             end

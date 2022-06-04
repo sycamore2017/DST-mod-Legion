@@ -35,7 +35,8 @@ local function Fn()
     --weapon (from weapon component) added to pristine state for optimization
     inst:AddTag("weapon")
 
-    MakeInventoryFloatable(inst, "med", 0.15, 0.4)
+    inst:AddComponent("skinedlegion")
+    inst.components.skinedlegion:InitWithFloater("tripleshovelaxe")
 
     inst.entity:SetPristine()
     if not TheWorld.ismastersim then
@@ -70,11 +71,18 @@ local function Fn()
 
     inst:AddComponent("equippable")
     inst.components.equippable:SetOnEquip(function(inst, owner)
-        owner.AnimState:OverrideSymbol("swap_object", "tripleshovelaxe", "swap")
+        local skindata = inst.components.skinedlegion:GetSkinedData()
+        if skindata ~= nil and skindata.equip ~= nil then
+            owner.AnimState:OverrideSymbol("swap_object", skindata.equip.build, skindata.equip.file)
+        else
+            owner.AnimState:OverrideSymbol("swap_object", "tripleshovelaxe", "swap")
+        end
         owner.AnimState:Show("ARM_carry")
         owner.AnimState:Hide("ARM_normal")
     end)
     inst.components.equippable:SetOnUnequip(OnUnequip)
+
+    inst.components.skinedlegion:SetOnPreLoad()
 
     return inst
 end
@@ -111,7 +119,8 @@ local function Fn_gold()
     --weapon (from weapon component) added to pristine state for optimization
     inst:AddTag("weapon")
 
-    MakeInventoryFloatable(inst, "med", 0.15, 0.4)
+    inst:AddComponent("skinedlegion")
+    inst.components.skinedlegion:InitWithFloater("triplegoldenshovelaxe")
 
     inst.entity:SetPristine()
     if not TheWorld.ismastersim then
@@ -147,11 +156,18 @@ local function Fn_gold()
 
     inst:AddComponent("equippable")
     inst.components.equippable:SetOnEquip(function(inst, owner)
-        owner.AnimState:OverrideSymbol("swap_object", "triplegoldenshovelaxe", "swap")
+        local skindata = inst.components.skinedlegion:GetSkinedData()
+        if skindata ~= nil and skindata.equip ~= nil then
+            owner.AnimState:OverrideSymbol("swap_object", skindata.equip.build, skindata.equip.file)
+        else
+            owner.AnimState:OverrideSymbol("swap_object", "triplegoldenshovelaxe", "swap")
+        end
         owner.AnimState:Show("ARM_carry")
         owner.AnimState:Hide("ARM_normal")
     end)
     inst.components.equippable:SetOnUnequip(OnUnequip)
+
+    inst.components.skinedlegion:SetOnPreLoad()
 
     return inst
 end

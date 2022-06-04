@@ -111,7 +111,7 @@ local function MakeShield(data)
 
             inst:AddTag("combatredirect")   --代表这个武器会给予伤害对象重定义函数
             inst:AddTag("allow_action_on_impassable")
-            -- inst:AddTag("toolpunch")
+            inst:AddTag("shield_l")
 
             --weapon (from weapon component) added to pristine state for optimization
             inst:AddTag("weapon")
@@ -392,19 +392,11 @@ MakeShield({
         Asset("IMAGE", "images/inventoryimages/shield_l_log.tex"),
     },
     prefabs = {
-        "sandspike_legion",    --对玩家友好的沙之咬
         "shield_attack_l_fx",
     },
     fn_common = function(inst)
-        MakeInventoryFloatable(inst, "small", 0.2, 0.9)
-        -- local OnLandedClient_old = inst.components.floater.OnLandedClient
-        -- inst.components.floater.OnLandedClient = function(self)
-        --     OnLandedClient_old(self)
-        --     self.inst.AnimState:SetFloatParams(0.15, 1, self.bob_percent)
-        -- end
-
-        -- inst:AddComponent("skinedlegion")
-        -- inst.components.skinedlegion:Init("shield_l_log")
+        inst:AddComponent("skinedlegion")
+        inst.components.skinedlegion:InitWithFloater("shield_l_log")
     end,
     fn_server = function(inst)
         inst.components.equippable:SetOnEquip(OnEquipFn)
@@ -444,7 +436,7 @@ MakeShield({
         MakeSmallBurnable(inst, TUNING.SMALL_BURNTIME)
         MakeSmallPropagator(inst)
 
-        -- inst.components.skinedlegion:SetOnPreLoad()
+        inst.components.skinedlegion:SetOnPreLoad()
     end,
 })
 

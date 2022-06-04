@@ -1101,13 +1101,30 @@ local dressup_data = {
             itemswap["whipline"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
 
             return itemswap
-        end,
+        end
     },
     shield_l_log = {
         isnoskin = true,
-        isshield = true,
-        buildfile = "shield_l_log",
-        buildsymbol = "swap_shield",
+        -- isshield = true,
+        buildfn = function(dressup, item, buildskin)
+            local itemswap = {}
+
+            local skindata = item.components.skinedlegion:GetSkinedData()
+            if skindata ~= nil and skindata.equip ~= nil then
+                itemswap["lantern_overlay"] = dressup:GetDressData(
+                    nil, skindata.equip.build, skindata.equip.file, item.GUID, "swap"
+                )
+            else
+                itemswap["lantern_overlay"] = dressup:GetDressData(
+                    nil, "shield_l_log", "swap_shield", item.GUID, "swap"
+                )
+            end
+            itemswap["LANTERN_OVERLAY"] = dressup:GetDressData(nil, nil, nil, nil, "show")
+            itemswap["swap_object"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
+            itemswap["whipline"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
+
+            return itemswap
+        end
     },
     dualwrench =
     {
@@ -1205,11 +1222,26 @@ local dressup_data = {
         buildfile = "hat_mermbreathing",
         buildsymbol = "swap_hat",
     },
-    lileaves =
-    {
+    lileaves = {
         isnoskin = true,
-        buildfile = "swap_lileaves",
-        buildsymbol = "swap_lileaves",
+        buildfn = function(dressup, item, buildskin)
+            local itemswap = {}
+
+            local skindata = item.components.skinedlegion:GetSkinedData()
+            if skindata ~= nil and skindata.equip ~= nil then
+                itemswap["swap_object"] = dressup:GetDressData(
+                    nil, skindata.equip.build, skindata.equip.file, item.GUID, "swap"
+                )
+            else
+                itemswap["swap_object"] = dressup:GetDressData(
+                    nil, "swap_lileaves", "swap_lileaves", item.GUID, "swap"
+                )
+            end
+            itemswap["whipline"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
+            itemswap["lantern_overlay"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
+
+            return itemswap
+        end
     },
     neverfade = {
         isnoskin = true,
@@ -1263,7 +1295,7 @@ local dressup_data = {
             itemswap["lantern_overlay"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
 
             return itemswap
-        end,
+        end
     },
     pinkstaff =
     {
@@ -1306,13 +1338,45 @@ local dressup_data = {
     },
     tripleshovelaxe = {
         isnoskin = true,
-        buildfile = "tripleshovelaxe",
-        buildsymbol = "swap",
+        buildfn = function(dressup, item, buildskin)
+            local itemswap = {}
+
+            local skindata = item.components.skinedlegion:GetSkinedData()
+            if skindata ~= nil and skindata.equip ~= nil then
+                itemswap["swap_object"] = dressup:GetDressData(
+                    nil, skindata.equip.build, skindata.equip.file, item.GUID, "swap"
+                )
+            else
+                itemswap["swap_object"] = dressup:GetDressData(
+                    nil, "tripleshovelaxe", "swap", item.GUID, "swap"
+                )
+            end
+            itemswap["whipline"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
+            itemswap["lantern_overlay"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
+
+            return itemswap
+        end
     },
     triplegoldenshovelaxe = {
         isnoskin = true,
-        buildfile = "triplegoldenshovelaxe",
-        buildsymbol = "swap",
+        buildfn = function(dressup, item, buildskin)
+            local itemswap = {}
+
+            local skindata = item.components.skinedlegion:GetSkinedData()
+            if skindata ~= nil and skindata.equip ~= nil then
+                itemswap["swap_object"] = dressup:GetDressData(
+                    nil, skindata.equip.build, skindata.equip.file, item.GUID, "swap"
+                )
+            else
+                itemswap["swap_object"] = dressup:GetDressData(
+                    nil, "triplegoldenshovelaxe", "swap", item.GUID, "swap"
+                )
+            end
+            itemswap["whipline"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
+            itemswap["lantern_overlay"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
+
+            return itemswap
+        end
     },
     theemperorscrown = {
         isnoskin = true,

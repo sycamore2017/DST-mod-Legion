@@ -159,6 +159,13 @@ local InventoryPrefabsList = {  --每个元素的下标值为每种物品栏图�
     icire_rock5_era = { build = "images_minisign_skins", },
     shield_l_sand_era = { build = "images_minisign_skins", },
     shield_l_sand_op = { build = "images_minisign_skins", },
+    shield_l_log_emo_pride = { build = "images_minisign_skins", },
+    shield_l_log_emo_fist = { build = "images_minisign_skins", },
+    shield_l_log_era = { build = "images_minisign_skins", },
+    lileaves_era = { build = "images_minisign_skins", },
+    foliageath_lileaves_era = { build = "images_minisign_skins", },
+    tripleshovelaxe_era = { build = "images_minisign_skins", },
+    triplegoldenshovelaxe_era = { build = "images_minisign_skins", },
 }
 
 return InventoryPrefabsList

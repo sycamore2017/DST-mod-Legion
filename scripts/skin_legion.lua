@@ -78,6 +78,22 @@ _G.SKIN_PREFABS_LEGION = {
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
     },
 
+    lileaves = {
+        assets = nil,
+        image = { name = nil, atlas = nil, setable = true, },
+        anim = {
+            bank = nil, build = nil,
+            anim = nil, isloop_anim = nil, animpush = nil, isloop_animpush = nil,
+            setable = true,
+        },
+        equip = {
+            symbol = "swap_object", build = "swap_lileaves", file = "swap_lileaves"
+        },
+        exchangefx = { prefab = nil, offset_y = nil, scale = nil },
+        floater = {
+            cut = 0.15, size = "small", offset_y = 0.4, scale = 0.5, nofx = nil,
+        },
+    },
     orchitwigs = {
         assets = nil,
         image = { name = nil, atlas = nil, setable = true, },
@@ -245,6 +261,20 @@ _G.SKIN_PREFABS_LEGION = {
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
     },
 
+    shield_l_log = {
+        assets = nil,
+        image = { name = nil, atlas = nil, setable = true, },
+        anim = {
+            bank = "shield_l_log", build = "shield_l_log",
+            anim = "idle", isloop_anim = nil, animpush = nil, isloop_animpush = nil,
+            setable = true,
+        },
+        equip = { symbol = nil, build = "shield_l_log", file = "swap_shield" },
+        exchangefx = { prefab = nil, offset_y = nil, scale = 0.7 },
+        floater = {
+            cut = nil, size = "small", offset_y = 0.2, scale = 0.9, nofx = nil,
+        },
+    },
     shield_l_sand = {
         assets = nil,
         image = { name = nil, atlas = nil, setable = true, },
@@ -255,6 +285,39 @@ _G.SKIN_PREFABS_LEGION = {
         },
         equip = { symbol = nil, build = "shield_l_sand", file = "swap_shield" },
         exchangefx = { prefab = nil, offset_y = nil, scale = nil },
+    },
+
+    tripleshovelaxe = {
+        assets = nil,
+        image = { name = nil, atlas = nil, setable = true, },
+        anim = {
+            bank = nil, build = nil,
+            anim = nil, isloop_anim = nil, animpush = nil, isloop_animpush = nil,
+            setable = true,
+        },
+        equip = {
+            symbol = "swap_object", build = "tripleshovelaxe", file = "swap"
+        },
+        exchangefx = { prefab = nil, offset_y = nil, scale = nil },
+        floater = {
+            cut = nil, size = "med", offset_y = 0.15, scale = 0.4, nofx = nil,
+        },
+    },
+    triplegoldenshovelaxe = {
+        assets = nil,
+        image = { name = nil, atlas = nil, setable = true, },
+        anim = {
+            bank = nil, build = nil,
+            anim = nil, isloop_anim = nil, animpush = nil, isloop_animpush = nil,
+            setable = true,
+        },
+        equip = {
+            symbol = "swap_object", build = "triplegoldenshovelaxe", file = "swap"
+        },
+        exchangefx = { prefab = nil, offset_y = nil, scale = nil },
+        floater = {
+            cut = nil, size = "med", offset_y = 0.15, scale = 0.4, nofx = nil,
+        },
     },
 }
 
@@ -341,7 +404,7 @@ _G.SKINS_LEGION = {
 
         string = ischinese and {
             name = "理盛赤蔷", collection = "MARBLE", access = "DONATE",
-            descitem = "解锁\"蔷薇花丛\"皮肤。",
+            descitem = "解锁\"蔷薇花丛\"的皮肤。",
             description = "他和妻子辛苦半生，买下一个不知名庄园。庄园幽静，有些偏僻，但很快便被幸福浸满。他喜欢园艺，常和孩子一起用蔷薇等花束将庄园装点。好羡慕，曾经那么热闹非凡。他离世后，孩子卖掉庄园离开。好遗憾，只剩稀疏红蔷绽放证明着曾经的幸福。",
         } or {
             name = "Rose Marble Pot", collection = "MARBLE", access = "DONATE",
@@ -372,7 +435,7 @@ _G.SKINS_LEGION = {
 
         string = ischinese and {
             name = "理盛截莲", collection = "MARBLE", access = "DONATE",
-            descitem = "解锁\"蹄莲花丛\"皮肤。",
+            descitem = "解锁\"蹄莲花丛\"的皮肤。",
             description = "她和自己的\"孩子们\"被强制带到庄园。庄园幽静，非常偏僻，但很快变得喧闹不已，孩子们可喜欢这里了。照顾小孩的工作可不容易，也经常见她在水池边种小簇蹄莲。越种越多，喧闹声也逐渐不见踪影。感觉到自己命不久矣，她给自己也种了一簇。",
         } or {
             name = "Lily Marble Pot", collection = "MARBLE", access = "DONATE",
@@ -402,7 +465,7 @@ _G.SKINS_LEGION = {
 
         string = ischinese and {
             name = "理盛瀑兰", collection = "MARBLE", access = "DONATE",
-            descitem = "解锁\"兰草花丛\"皮肤。",
+            descitem = "解锁\"兰草花丛\"的皮肤。",
             description = "这庄园是最近令他欣喜的发现。庄园幽深，远离人烟，古典的大理石装潢，长满了各色花草，着实令这个隐居者着迷。他走遍庄园，看见了大厅的破烂玩具与黑板，卧室里发黄全家福，后山有长着兰草的墓碑。庄园无声述说着历史的变迁。",
         } or {
             name = "Orchid Marble Pot", collection = "MARBLE", access = "DONATE",
@@ -437,7 +500,7 @@ _G.SKINS_LEGION = {
 
         string = ischinese and {
             name = "粉色追猎", collection = "DISGUISER", access = "FREE",
-            descitem = "解锁\"兰草花穗\"皮肤。",
+            descitem = "解锁\"兰草花穗\"以及入鞘后的皮肤。",
             description = "这片粉色花园是它的生活的点点滴滴。它打点自己的小天地，也借花谋生。它藏在自己的伪装里，招蜂引蝶，追猎而食。芸芸言它残勤劳心害美丽身，它无所顾忌，刹那间伸出死亡利爪又消失于粉脂。",
         } or {
             name = "Pink Orchitwigs", collection = "DISGUISER", access = "FREE",
@@ -476,7 +539,7 @@ _G.SKINS_LEGION = {
 
         string = ischinese and {
             name = "粉色猎园", collection = "DISGUISER", access = "SPECIAL",
-            descitem = "解锁\"兰草花丛\"皮肤。",
+            descitem = "解锁\"兰草花丛\"的皮肤。",
             description = "猎人从不离开它的狩猎花园，毕竟这里有生活的点点滴滴。直至忽来风雨将猎人打落花枝，它不见踪迹。日月轮转，花开花落，它等了好久好久，始终不见猎人归来，它知道再也见不到那潇洒身影与狩猎姿态。\"猎人会回来的\"，它这样说道。",
         } or {
             name = "Pink Orchid Bush", collection = "DISGUISER", access = "SPECIAL",
@@ -589,7 +652,7 @@ _G.SKINS_LEGION = {
 
         string = ischinese and {
             name = "\"困惑\"发卡", collection = "EMOTICON", access = "DONATE",
-            descitem = "解锁\"苔衣发卡\"皮肤。",
+            descitem = "解锁\"苔衣发卡\"的皮肤。",
             description = "我有个疑问。不对，我为啥会有这个想法？就在我想提出问题时，心里就会有个阴影质疑我的问题：\"你提出这些问题难道不该想想是你自己的问题还是真的有问题\"。然后我又会问它，凭什么你这个问题觉得我的问题有问题！",
         } or {
             name = "Question Hairpin", collection = "EMOTICON", access = "DONATE",
@@ -620,7 +683,7 @@ _G.SKINS_LEGION = {
 
         string = ischinese and {
             name = "深渊的星", collection = "DISGUISER", access = "FREE",
-            descitem = "解锁\"苔衣发卡\"皮肤。",
+            descitem = "解锁\"苔衣发卡\"的皮肤。",
             description = "洋流之下，是暗流涌动的深渊。终年阴暗，这里的生物都渴望光明。偶尔会有忽闪忽闪的淡蓝色星光，小小鱼虾们前去追寻。越游越近，突现一张长满尖牙的恐怖大嘴一口咬了下来。",
         } or {
             name = "Abyss Star Hairpin", collection = "DISGUISER", access = "FREE",
@@ -655,7 +718,7 @@ _G.SKINS_LEGION = {
 
         string = ischinese and {
             name = "卡尔的警帽，永远", collection = "TVPLAY", access = "FREE",
-            descitem = "解锁\"牛仔帽\"皮肤。",
+            descitem = "解锁\"牛仔帽\"的皮肤。",
             description = "卡尔回基地途中拐过树丛时被突然冲出的三个丧尸扑倒，慌忙解决麻烦后感到肚子刺痛，掀起衬衣发现自己已被咬伤...年过三十的卡尔惊醒，看了看还在熟睡的妻女，又望了望桌上警徽虽早已脱落但保养还算完好的警帽，感叹还好只是梦一场。",
         } or {
             name = "Carl's Forever Police Cap", collection = "TVPLAY", access = "FREE",
@@ -813,51 +876,108 @@ _G.SKINS_LEGION = {
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
     },
 
-    icire_rock_era = {
-        base_prefab = "icire_rock",
-		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
+    shield_l_log_emo_pride = {
+        base_prefab = "shield_l_log",
+		type = "item", skin_tags = {}, release_group = 555, rarity = rarityFree,
 
-        skin_id = "6280d4f2c340bf24ab3118b1",
-        onlyownedshow = true,
+        skin_id = "freeskins",
 		assets = {
-            -- Asset("ANIM", "anim/heat_rock.zip"), --官方热能石动画模板。因为本体也引用了，所以这不重复引用
-			Asset("ANIM", "anim/skin/icire_rock_era.zip"),
-            Asset("ATLAS", "images/inventoryimages_skin/icire_rock1_era.xml"),
-            Asset("IMAGE", "images/inventoryimages_skin/icire_rock1_era.tex"),
-            Asset("ATLAS", "images/inventoryimages_skin/icire_rock2_era.xml"),
-            Asset("IMAGE", "images/inventoryimages_skin/icire_rock2_era.tex"),
-            Asset("ATLAS", "images/inventoryimages_skin/icire_rock3_era.xml"),
-            Asset("IMAGE", "images/inventoryimages_skin/icire_rock3_era.tex"),
-            Asset("ATLAS", "images/inventoryimages_skin/icire_rock4_era.xml"),
-            Asset("IMAGE", "images/inventoryimages_skin/icire_rock4_era.tex"),
-            Asset("ATLAS", "images/inventoryimages_skin/icire_rock5_era.xml"),
-            Asset("IMAGE", "images/inventoryimages_skin/icire_rock5_era.tex"),
+			Asset("ANIM", "anim/skin/shield_l_log_emo_pride.zip"),
 		},
-		image = { name = nil, atlas = nil, setable = false, },
+		image = { name = nil, atlas = nil, setable = true, },
 
         string = ischinese and {
-            name = "被封存的窸窣", collection = "ERA", access = "SPECIAL",
-            descitem = "解锁\"鸳鸯石\"的皮肤。",
-            description = "我走进了一家博物馆，刹那，仿佛听到一阵朦朦胧胧的低语，又或是窸窸窣窣的昆虫振翅声。向着声音的方向看去，有一颗西瓜大小的精美琥珀。走进后，里面居然还包裹了一只仿佛仍活着的带翅昆虫。诧异的是，我感受到了它对生命突然凝滞的不甘...",
+            name = "爱上彩虹", collection = "EMOTICON", access = "FREE",
+            descitem = "解锁\"木盾\"的皮肤。",
+            description = "多一丝宽容，你就少一份疑惑；多一丝爱心，你就少一份怨恨；多一丝理解，你就少一份紧张。你我都是独一无二，为自己骄傲吧。"
         } or {
-            name = "Sealed Rustle", collection = "ERA", access = "SPECIAL",
-            descitem = "Unlock \"Icire Stone\" skin.",
+            name = "Love Rainbow", collection = "EMOTICON", access = "FREE",
+            descitem = "Unlock \"Log Shield\" skin.",
+            description = "More tolerance,less doubt.More love,less resentment.More understanding,less nervousness.You and I are unique.Be proud of yourself.",
+        },
+
+        anim = {
+            bank = nil, build = nil,
+            anim = nil, isloop_anim = nil, animpush = nil, isloop_animpush = nil,
+            setable = true,
+        },
+        equip = {
+            symbol = "lantern_overlay", build = "shield_l_log_emo_pride", file = "swap_shield"
+        },
+        exchangefx = { prefab = nil, offset_y = nil, scale = 0.7 },
+        floater = {
+            cut = nil, size = "small", offset_y = 0.2, scale = 0.9, nofx = nil,
+        },
+    },
+    shield_l_log_emo_fist = {
+        base_prefab = "shield_l_log",
+		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
+
+        skin_id = "629b0d278c2f781db2f77ef8",
+        onlyownedshow = true,
+		assets = {
+			Asset("ANIM", "anim/skin/shield_l_log_emo_fist.zip"),
+		},
+		image = { name = nil, atlas = nil, setable = true, },
+
+        string = ischinese and {
+            name = "重拳出击", collection = "EMOTICON", access = "SPECIAL",
+            descitem = "解锁\"木盾\"的皮肤。",
+            description = "观点不一，骂Ta；羡慕嫉妒，恨Ta；没有黑点？监视Ta。不管发生什么，敲起键盘如同打拳，咬文嚼字断章取义也能搞得鸡飞狗跳。非我皆是恶，活在自己的世界，这就是拳的意义。打的就是你，陌生人。"
+        } or {
+            name = "Punch Quest", collection = "EMOTICON", access = "SPECIAL",
+            descitem = "Unlock \"Log Shield\" skin.",
             description = "The story was not translated.",
         },
 
-		fn_start = function(inst)
-            inst.AnimState:OverrideSymbol("rock", "icire_rock_era", "rock")
-            inst.AnimState:OverrideSymbol("shadow", "icire_rock_era", "shadow")
-
-            inst.changeimgfn = function(inst)
-                local newname = "icire_rock"..tostring(inst.currentTempRange).."_era"
-                inst.components.inventoryitem.atlasname = "images/inventoryimages_skin/"..newname..".xml"
-                inst.components.inventoryitem:ChangeImageName(newname)
-            end
-            inst.changeimgfn(inst)
-        end,
-        exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
+        anim = {
+            bank = nil, build = nil,
+            anim = nil, isloop_anim = nil, animpush = nil, isloop_animpush = nil,
+            setable = true,
+        },
+        equip = {
+            symbol = "lantern_overlay", build = "shield_l_log_emo_fist", file = "swap_shield"
+        },
+        exchangefx = { prefab = nil, offset_y = nil, scale = 0.6 },
+        floater = {
+            cut = nil, size = "small", offset_y = 0.2, scale = 0.8, nofx = nil,
+        },
     },
+    shield_l_log_era = {
+        base_prefab = "shield_l_log",
+		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
+
+        skin_id = "629b0d088c2f781db2f77ef4",
+        onlyownedshow = true,
+		assets = {
+			Asset("ANIM", "anim/skin/shield_l_log_era.zip"),
+		},
+		image = { name = nil, atlas = nil, setable = true, },
+
+        string = ischinese and {
+            name = "洋流之下匍匐", collection = "ERA", access = "SPECIAL",
+            descitem = "解锁\"木盾\"的皮肤。",
+            description = "奔涌回转的洋流，它们的大家族聚集着散布于看似沉寂的海床。沙子上沾满了行动的足迹，都是它们漫无目的的匍匐寻找。在一段时光里，能顽强地生存在这里，真的是太不可思议了。"
+        } or {
+            name = "Under Current Crawl", collection = "ERA", access = "SPECIAL",
+            descitem = "Unlock \"Log Shield\" skin.",
+            description = "The story was not translated.",
+        },
+
+        anim = {
+            bank = nil, build = nil,
+            anim = nil, isloop_anim = nil, animpush = nil, isloop_animpush = nil,
+            setable = true,
+        },
+        equip = {
+            symbol = "lantern_overlay", build = "shield_l_log_era", file = "swap_shield"
+        },
+        exchangefx = { prefab = nil, offset_y = nil, scale = 0.7 },
+        floater = {
+            cut = nil, size = "small", offset_y = 0.2, scale = 0.8, nofx = nil,
+        },
+    },
+
     shield_l_sand_era = {
         base_prefab = "shield_l_sand",
 		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
@@ -919,33 +1039,217 @@ _G.SKINS_LEGION = {
         },
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
     },
+
+    icire_rock_era = {
+        base_prefab = "icire_rock",
+		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
+
+        skin_id = "6280d4f2c340bf24ab3118b1",
+        onlyownedshow = true,
+		assets = {
+            -- Asset("ANIM", "anim/heat_rock.zip"), --官方热能石动画模板。因为本体也引用了，所以这不重复引用
+			Asset("ANIM", "anim/skin/icire_rock_era.zip"),
+            Asset("ATLAS", "images/inventoryimages_skin/icire_rock1_era.xml"),
+            Asset("IMAGE", "images/inventoryimages_skin/icire_rock1_era.tex"),
+            Asset("ATLAS", "images/inventoryimages_skin/icire_rock2_era.xml"),
+            Asset("IMAGE", "images/inventoryimages_skin/icire_rock2_era.tex"),
+            Asset("ATLAS", "images/inventoryimages_skin/icire_rock3_era.xml"),
+            Asset("IMAGE", "images/inventoryimages_skin/icire_rock3_era.tex"),
+            Asset("ATLAS", "images/inventoryimages_skin/icire_rock4_era.xml"),
+            Asset("IMAGE", "images/inventoryimages_skin/icire_rock4_era.tex"),
+            Asset("ATLAS", "images/inventoryimages_skin/icire_rock5_era.xml"),
+            Asset("IMAGE", "images/inventoryimages_skin/icire_rock5_era.tex"),
+		},
+		image = { name = nil, atlas = nil, setable = false, },
+
+        string = ischinese and {
+            name = "被封存的窸窣", collection = "ERA", access = "SPECIAL",
+            descitem = "解锁\"鸳鸯石\"的皮肤。",
+            description = "我走进了一家博物馆，刹那，仿佛听到一阵朦朦胧胧的低语，又或是窸窸窣窣的昆虫振翅声。向着声音的方向看去，有一颗西瓜大小的精美琥珀。走进后，里面居然还包裹了一只仿佛仍活着的带翅昆虫。诧异的是，我感受到了它对生命突然凝滞的不甘...",
+        } or {
+            name = "Sealed Rustle", collection = "ERA", access = "SPECIAL",
+            descitem = "Unlock \"Icire Stone\" skin.",
+            description = "The story was not translated.",
+        },
+
+		fn_start = function(inst)
+            inst.AnimState:OverrideSymbol("rock", "icire_rock_era", "rock")
+            inst.AnimState:OverrideSymbol("shadow", "icire_rock_era", "shadow")
+
+            inst.changeimgfn = function(inst)
+                local newname = "icire_rock"..tostring(inst.currentTempRange).."_era"
+                inst.components.inventoryitem.atlasname = "images/inventoryimages_skin/"..newname..".xml"
+                inst.components.inventoryitem:ChangeImageName(newname)
+            end
+            inst.changeimgfn(inst)
+        end,
+        exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
+    },
+
+    lilybush_era = {
+        base_prefab = "lilybush",
+		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
+
+        skin_id = "629b0d5f8c2f781db2f77f0d",
+        onlyownedshow = true,
+		assets = {
+            Asset("ANIM", "anim/berrybush2.zip"), --官方浆果丛动画
+			Asset("ANIM", "anim/skin/lilybush_era.zip"),
+		},
+
+        string = ischinese and {
+            name = "满布大地婆娑", collection = "ERA", access = "SPECIAL",
+            descitem = "解锁\"蹄莲花丛\"、\"蹄莲翠叶\"以及入鞘后的皮肤。",
+            -- description = "" --undo
+            description = "猎人从不离开它的狩猎花园，毕竟这里有生活的点点滴滴。直至忽来风雨将猎人打落花枝，它不见踪迹。日月轮转，花开花落，它等了好久好久，始终不见猎人归来，它知道再也见不到那潇洒身影与狩猎姿态。\"猎人会回来的\"，它这样说道。",
+        } or {
+            name = "Platycerium Bush", collection = "ERA", access = "SPECIAL",
+            descitem = "Unlock \"Lily Bush\", \"Lileaves\" skin.",
+            description = "The story was not translated.",
+        },
+
+		fn_start = function(inst)
+            inst.AnimState:SetBank("berrybush2")
+            inst.AnimState:SetBuild("lilybush_era")
+        end,
+        exchangefx = { prefab = nil, offset_y = nil, scale = 1.5 },
+        linkedskins = { lileaves = "lileaves_era" },
+        placer = {
+            name = nil, bank = "berrybush2", build = "lilybush_era", anim = "dead",
+            prefabs = { "dug_lilybush", "cutted_lilybush" },
+        }
+    },
+    lileaves_era = {
+        base_prefab = "lileaves",
+		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
+
+        skin_id = "629b0d5f8c2f781db2f77f0d",
+        noshopshow = true,
+		assets = {
+			Asset("ANIM", "anim/skin/lileaves_era.zip"),
+            Asset("ATLAS", "images/inventoryimages_skin/lileaves_era.xml"),
+            Asset("IMAGE", "images/inventoryimages_skin/lileaves_era.tex"),
+            Asset("ATLAS", "images/inventoryimages_skin/foliageath_lileaves_era.xml"),
+            Asset("IMAGE", "images/inventoryimages_skin/foliageath_lileaves_era.tex"),
+		},
+        image = { name = nil, atlas = nil, setable = true, },
+
+        string = {
+            name = ischinese and "花叶婆娑" or "Platycerium Leaves", collection = "ERA", access = "SPECIAL",
+        },
+
+		anim = {
+            bank = nil, build = nil,
+            anim = nil, isloop_anim = nil, animpush = nil, isloop_animpush = nil,
+            setable = true,
+        },
+        equip = {
+            symbol = "swap_object", build = "lileaves_era", file = "swap_object"
+        },
+        scabbard = {
+            anim = "idle_cover", bank = "lileaves_era", build = "lileaves_era",
+            image = "foliageath_lileaves_era", atlas = "images/inventoryimages_skin/foliageath_lileaves_era.xml",
+        },
+        exchangefx = { prefab = nil, offset_y = nil, scale = nil },
+        floater = {
+            cut = 0.05, size = "small", offset_y = 0.15, scale = 0.5, nofx = nil,
+        },
+    },
+
+    triplegoldenshovelaxe_era = {
+        base_prefab = "triplegoldenshovelaxe",
+		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
+
+        skin_id = "629b0d848c2f781db2f77f11",
+        onlyownedshow = true,
+		assets = {
+			Asset("ANIM", "anim/skin/triplegoldenshovelaxe_era.zip"),
+            Asset("ATLAS", "images/inventoryimages_skin/triplegoldenshovelaxe_era.xml"),
+            Asset("IMAGE", "images/inventoryimages_skin/triplegoldenshovelaxe_era.tex"),
+		},
+        image = { name = nil, atlas = nil, setable = true, },
+
+        string = ischinese and {
+            name = "长河探索叮咚", collection = "ERA", access = "SPECIAL",
+            descitem = "解锁\"斧铲-三用型\"、\"斧铲-黄金三用型\"的皮肤。",
+            -- description = ""undo
+            description = "这片粉色花园是它的生活的点点滴滴。它打点自己的小天地，也借花谋生。它藏在自己的伪装里，招蜂引蝶，追猎而食。芸芸言它残勤劳心害美丽身，它无所顾忌，刹那间伸出死亡利爪又消失于粉脂。",
+        } or {
+            name = "Era River Explorer", collection = "ERA", access = "SPECIAL",
+            descitem = "Unlock \"Triple-shovelaxe\", \"Snazzy Triple-shovelaxe\" skin.",
+            description = "The story was not translated.",
+        },
+
+		anim = {
+            bank = nil, build = nil,
+            anim = nil, isloop_anim = nil, animpush = nil, isloop_animpush = nil,
+            setable = true,
+        },
+        equip = {
+            symbol = "swap_object", build = "triplegoldenshovelaxe_era", file = "swap"
+        },
+        exchangefx = { prefab = nil, offset_y = nil, scale = nil },
+        floater = {
+            cut = nil, size = "med", offset_y = 0.15, scale = 0.4, nofx = nil
+        },
+    },
+    tripleshovelaxe_era = {
+        base_prefab = "tripleshovelaxe",
+		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
+
+        skin_id = "629b0d848c2f781db2f77f11",
+        noshopshow = true,
+		assets = {
+			Asset("ANIM", "anim/skin/tripleshovelaxe_era.zip"),
+            Asset("ATLAS", "images/inventoryimages_skin/tripleshovelaxe_era.xml"),
+            Asset("IMAGE", "images/inventoryimages_skin/tripleshovelaxe_era.tex"),
+		},
+        image = { name = nil, atlas = nil, setable = true, },
+
+        string = {
+            name = ischinese and "谷地发现叮咚" or "Era Valley Explorer", collection = "ERA", access = "SPECIAL",
+        },
+
+		anim = {
+            bank = nil, build = nil,
+            anim = nil, isloop_anim = nil, animpush = nil, isloop_animpush = nil,
+            setable = true,
+        },
+        equip = {
+            symbol = "swap_object", build = "tripleshovelaxe_era", file = "swap"
+        },
+        exchangefx = { prefab = nil, offset_y = nil, scale = nil },
+        floater = {
+            cut = nil, size = "med", offset_y = 0.15, scale = 0.4, nofx = nil
+        },
+    },
 }
 
 _G.SKIN_IDS_LEGION = {
     ["freeskins"] = {}, --免费皮肤全部装这里面，skin_id设置为"freeskins"就好了
-    ["6278c409c340bf24ab311522"] = { --余生(10)
+    ["6278c409c340bf24ab311522"] = { --余生
         neverfade_thanks = true, neverfadebush_thanks = true,
         fishhomingtool_awesome_thanks = true, fishhomingtool_normal_thanks = true, fishhomingbait_thanks = true,
-        icire_rock_era = true, shield_l_sand_era = true,
+        triplegoldenshovelaxe_era = true, tripleshovelaxe_era = true, lilybush_era = true, lileaves_era = true, icire_rock_era = true, shield_l_log_era = true, shield_l_sand_era = true,
         orchidbush_disguiser = true, boltwingout_disguiser = true,
         rosebush_marble = true, lilybush_marble = true, orchidbush_marble = true,
-        hat_lichen_emo_que = true,
+        shield_l_log_emo_fist = true, hat_lichen_emo_que = true,
     },
     ["6278c450c340bf24ab311528"] = { --回忆(5)
         boltwingout_disguiser = true,
         rosebush_marble = true, lilybush_marble = true, orchidbush_marble = true,
         hat_lichen_emo_que = true,
     },
-    ["6278c487c340bf24ab31152c"] = { --1鸣惊人(6)
+    ["6278c487c340bf24ab31152c"] = { --1鸣惊人(7)
         neverfade_thanks = true, neverfadebush_thanks = true,
-        boltwingout_disguiser = true,
+        orchidbush_disguiser = true, boltwingout_disguiser = true,
         rosebush_marble = true, lilybush_marble = true, orchidbush_marble = true,
         hat_lichen_emo_que = true,
     },
-    ["6278c4acc340bf24ab311530"] = { --2度梅开(4)
-        orchidbush_disguiser = true,
+    ["6278c4acc340bf24ab311530"] = { --2度梅开(7)
         fishhomingtool_awesome_thanks = true, fishhomingtool_normal_thanks = true, fishhomingbait_thanks = true,
-        icire_rock_era = true, shield_l_sand_era = true,
+        triplegoldenshovelaxe_era = true, tripleshovelaxe_era = true, lilybush_era = true, lileaves_era = true, icire_rock_era = true, shield_l_log_era = true, shield_l_sand_era = true,
+        shield_l_log_emo_fist = true,
     },
 }
 _G.SKIN_IDX_LEGION = {
@@ -1032,11 +1336,12 @@ end
 local skinidxes = { --用以皮肤排序
     "neverfade_thanks", "neverfadebush_thanks",
     "fishhomingtool_awesome_thanks", "fishhomingtool_normal_thanks", "fishhomingbait_thanks",
-    "shield_l_sand_op", "hat_cowboy_tvplay", "hat_lichen_disguiser", "orchitwigs_disguiser",
+    "triplegoldenshovelaxe_era", "tripleshovelaxe_era", "lilybush_era", "lileaves_era", "icire_rock_era", "shield_l_log_era", "shield_l_sand_era",
     "orchidbush_disguiser", "boltwingout_disguiser",
-    "icire_rock_era", "shield_l_sand_era",
     "rosebush_marble", "lilybush_marble", "orchidbush_marble",
-    "hat_lichen_emo_que",
+    "shield_l_log_emo_fist", "hat_lichen_emo_que",
+
+    "shield_l_log_emo_pride", "shield_l_sand_op", "hat_cowboy_tvplay", "hat_lichen_disguiser", "orchitwigs_disguiser",
 }
 for i,skinname in pairs(skinidxes) do
     _G.SKIN_IDX_LEGION[i] = skinname
