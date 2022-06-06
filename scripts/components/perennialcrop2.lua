@@ -612,7 +612,7 @@ function PerennialCrop2:Pause()
 	self.timedata.left = self.timedata.all --更新数据后，self.timedata.all就是当前剩余时间，所以不必再判断
 	self.timedata.start = nil
 	self.timedata.all = nil
-	self.timedata.mult = nil
+	-- self.timedata.mult = nil
 end
 
 function PerennialCrop2:Resume()

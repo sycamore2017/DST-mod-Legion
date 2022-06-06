@@ -6,8 +6,87 @@ local ischinese = TUNING.LEGION_MOD_LANGUAGES == "chinese"
 
 table.insert(Assets, Asset("ATLAS", "images/icon_skinbar_shadow_l.xml"))
 table.insert(Assets, Asset("IMAGE", "images/icon_skinbar_shadow_l.tex"))
-table.insert(Assets, Asset("ANIM", "anim/images_minisign_skins.zip"))
+table.insert(Assets, Asset("ANIM", "anim/images_minisign_skins1.zip"))
+table.insert(PrefabFiles, "fx_ranimbowspark")
 table.insert(PrefabFiles, "skinprefabs_legion")
+
+--------------------------------------------------------------------------
+--[[ 特效设置 ]]
+--------------------------------------------------------------------------
+
+local TRAIL_FLAGS = { "shadowtrail" }
+local function cane_do_trail(inst)
+    local owner = inst.components.inventoryitem:GetGrandOwner() or inst
+    if not owner.entity:IsVisible() then
+        return
+    end
+
+    local x, y, z = owner.Transform:GetWorldPosition()
+    if owner.sg ~= nil and owner.sg:HasStateTag("moving") then
+        local theta = -owner.Transform:GetRotation() * DEGREES
+        local speed = owner.components.locomotor:GetRunSpeed() * .1
+        x = x + speed * math.cos(theta)
+        z = z + speed * math.sin(theta)
+    end
+    local mounted = owner.components.rider ~= nil and owner.components.rider:IsRiding()
+    local map = TheWorld.Map
+    local offset = FindValidPositionByFan(
+        math.random() * 2 * PI,
+        (mounted and 1 or .5) + math.random() * .5,
+        4,
+        function(offset)
+            local pt = Vector3(x + offset.x, 0, z + offset.z)
+            return map:IsPassableAtPoint(pt:Get())
+                and not map:IsPointNearHole(pt)
+                and #TheSim:FindEntities(pt.x, 0, pt.z, .7, TRAIL_FLAGS) <= 0
+        end
+    )
+
+    if offset ~= nil then
+        SpawnPrefab(inst.trail_fx).Transform:SetPosition(x + offset.x, 0, z + offset.z)
+    end
+end
+local function cane_equipped(inst, data)
+    if inst.vfx_fx ~= nil then
+        if inst._vfx_fx_inst == nil then
+            inst._vfx_fx_inst = SpawnPrefab(inst.vfx_fx)
+            inst._vfx_fx_inst.entity:AddFollower()
+        end
+        inst._vfx_fx_inst.entity:SetParent(data.owner.entity)
+        inst._vfx_fx_inst.Follower:FollowSymbol(data.owner.GUID, "swap_object", 0, inst.vfx_fx_offset or 0, 0)
+    end
+    if inst.trail_fx ~= nil and inst._trailtask == nil then
+        inst._trailtask = inst:DoPeriodicTask(6 * FRAMES, cane_do_trail, 2 * FRAMES)
+    end
+end
+local function cane_unequipped(inst, owner)
+    if inst._vfx_fx_inst ~= nil then
+        inst._vfx_fx_inst:Remove()
+        inst._vfx_fx_inst = nil
+    end
+    if inst._trailtask ~= nil then
+        inst._trailtask:Cancel()
+        inst._trailtask = nil
+    end
+end
+
+local function FxInit(inst, data, vfx_fx_offset)
+    inst.vfx_fx = data[1] ~= nil and data[1]:len() > 0 and data[1] or nil
+    inst.trail_fx = data[2]
+    if inst.vfx_fx ~= nil or inst.trail_fx ~= nil then
+        inst:ListenForEvent("equipped", cane_equipped)
+        inst:ListenForEvent("unequipped", cane_unequipped)
+        if inst.vfx_fx ~= nil then
+            inst.vfx_fx_offset = vfx_fx_offset or -105
+            inst:ListenForEvent("onremove", cane_unequipped)
+        end
+    end
+end
+local function FxClear(inst)
+    inst:RemoveEventCallback("equipped", cane_equipped)
+    inst:RemoveEventCallback("unequipped", cane_unequipped)
+    inst:RemoveEventCallback("onremove", cane_unequipped)
+end
 
 --------------------------------------------------------------------------
 --[[ 全局皮肤总数据，以及修改 ]]
@@ -317,6 +396,25 @@ _G.SKIN_PREFABS_LEGION = {
         exchangefx = { prefab = nil, offset_y = nil, scale = nil },
         floater = {
             cut = nil, size = "med", offset_y = 0.15, scale = 0.4, nofx = nil,
+        },
+    },
+
+    backcub = {
+        assets = nil,
+        image = { name = nil, atlas = nil, setable = true, },
+        anim = {
+            bank = "backcub", build = "backcub",
+            anim = "anim", isloop_anim = true, animpush = nil, isloop_animpush = nil,
+            setable = true,
+        },
+        equip = { symbol = "swap_body", build = "swap_backcub", file = "swap_body" },
+        exchangefx = { prefab = nil, offset_y = nil, scale = nil },
+        floater = {
+            cut = nil, size = nil, offset_y = nil, scale = nil, nofx = true,
+            anim = {
+                bank = "backcub", build = "backcub",
+                anim = "anim_water", isloop_anim = true, animpush = nil, isloop_animpush = nil,
+            }
         },
     },
 }
@@ -908,6 +1006,11 @@ _G.SKINS_LEGION = {
         floater = {
             cut = nil, size = "small", offset_y = 0.2, scale = 0.9, nofx = nil,
         },
+
+        fn_start = function(inst)
+            FxInit(inst, {"fx_ranimbowspark"}, -10)
+        end,
+        fn_end = FxClear
     },
     shield_l_log_emo_fist = {
         base_prefab = "shield_l_log",
@@ -957,7 +1060,7 @@ _G.SKINS_LEGION = {
         string = ischinese and {
             name = "洋流之下匍匐", collection = "ERA", access = "SPECIAL",
             descitem = "解锁\"木盾\"的皮肤。",
-            description = "奔涌回转的洋流，它们的大家族聚集着散布于看似沉寂的海床。沙子上沾满了行动的足迹，都是它们漫无目的的匍匐寻找。在一段时光里，能顽强地生存在这里，真的是太不可思议了。"
+            description = "奔涌回转的洋流，它们的大家族聚集着散布于看似沉寂的海床。沙子上沾满了行动的足迹，都是它们漫无目的的匍匐寻找。在一段时光里，能顽强地生存在这里，真的是太不可思议了。抱着科学研究的心态，决定去那里走走，一定有更多我能听到的。"
         } or {
             name = "Under Current Crawl", collection = "ERA", access = "SPECIAL",
             descitem = "Unlock \"Log Shield\" skin.",
@@ -1100,8 +1203,7 @@ _G.SKINS_LEGION = {
         string = ischinese and {
             name = "满布大地婆娑", collection = "ERA", access = "SPECIAL",
             descitem = "解锁\"蹄莲花丛\"、\"蹄莲翠叶\"以及入鞘后的皮肤。",
-            -- description = "" --undo
-            description = "猎人从不离开它的狩猎花园，毕竟这里有生活的点点滴滴。直至忽来风雨将猎人打落花枝，它不见踪迹。日月轮转，花开花落，它等了好久好久，始终不见猎人归来，它知道再也见不到那潇洒身影与狩猎姿态。\"猎人会回来的\"，它这样说道。",
+            description = "从奇异的地下河暗道中返回后，脑海中不断回响洞内的蓝色荧光。细长的蕨叶互相轻触，随风摆动，巨大的蓝色花朵极具迷幻色彩，让人目不暇接陷入其中。花叶婆娑的样子真的久久不能忘怀，仿佛有股魔力将思绪不断拉回昨日。"
         } or {
             name = "Platycerium Bush", collection = "ERA", access = "SPECIAL",
             descitem = "Unlock \"Lily Bush\", \"Lileaves\" skin.",
@@ -1127,8 +1229,6 @@ _G.SKINS_LEGION = {
         noshopshow = true,
 		assets = {
 			Asset("ANIM", "anim/skin/lileaves_era.zip"),
-            Asset("ATLAS", "images/inventoryimages_skin/lileaves_era.xml"),
-            Asset("IMAGE", "images/inventoryimages_skin/lileaves_era.tex"),
             Asset("ATLAS", "images/inventoryimages_skin/foliageath_lileaves_era.xml"),
             Asset("IMAGE", "images/inventoryimages_skin/foliageath_lileaves_era.tex"),
 		},
@@ -1164,16 +1264,13 @@ _G.SKINS_LEGION = {
         onlyownedshow = true,
 		assets = {
 			Asset("ANIM", "anim/skin/triplegoldenshovelaxe_era.zip"),
-            Asset("ATLAS", "images/inventoryimages_skin/triplegoldenshovelaxe_era.xml"),
-            Asset("IMAGE", "images/inventoryimages_skin/triplegoldenshovelaxe_era.tex"),
 		},
         image = { name = nil, atlas = nil, setable = true, },
 
         string = ischinese and {
             name = "长河探索叮咚", collection = "ERA", access = "SPECIAL",
             descitem = "解锁\"斧铲-三用型\"、\"斧铲-黄金三用型\"的皮肤。",
-            -- description = ""undo
-            description = "这片粉色花园是它的生活的点点滴滴。它打点自己的小天地，也借花谋生。它藏在自己的伪装里，招蜂引蝶，追猎而食。芸芸言它残勤劳心害美丽身，它无所顾忌，刹那间伸出死亡利爪又消失于粉脂。",
+            description = "几年前我参加了学校组织的考古活动，地点在一个新发现的古老河道。老师同学们在附近叮叮咚咚敲着找着，我发现了一条凿有奇怪图腾的地下河入口，莫名被吸引进去，洞内闪着蓝色荧光并有细流经过，待我出来时，已是次日傍晚。"
         } or {
             name = "Era River Explorer", collection = "ERA", access = "SPECIAL",
             descitem = "Unlock \"Triple-shovelaxe\", \"Snazzy Triple-shovelaxe\" skin.",
@@ -1201,8 +1298,6 @@ _G.SKINS_LEGION = {
         noshopshow = true,
 		assets = {
 			Asset("ANIM", "anim/skin/tripleshovelaxe_era.zip"),
-            Asset("ATLAS", "images/inventoryimages_skin/tripleshovelaxe_era.xml"),
-            Asset("IMAGE", "images/inventoryimages_skin/tripleshovelaxe_era.tex"),
 		},
         image = { name = nil, atlas = nil, setable = true, },
 
@@ -1221,6 +1316,39 @@ _G.SKINS_LEGION = {
         exchangefx = { prefab = nil, offset_y = nil, scale = nil },
         floater = {
             cut = nil, size = "med", offset_y = 0.15, scale = 0.4, nofx = nil
+        },
+    },
+
+    backcub_fans = {
+        base_prefab = "backcub",
+		type = "item", skin_tags = {}, release_group = 555, rarity = rarityFree,
+
+        skin_id = "629cca398c2f781db2f78092",
+        onlyownedshow = true,
+		assets = {
+			Asset("ANIM", "anim/skin/backcub_fans.zip"),
+		},
+		image = { name = nil, atlas = nil, setable = true, },
+
+        string = ischinese and {
+            name = "饭仔", collection = "FANS", access = "FREE",
+            descitem = "解锁\"靠背熊\"的皮肤。",
+            description = "他叫饭仔，有着简单的几个爱好。吃饭饭，能吃就行；睡觉觉，要抱着他最爱的偶像抱枕才睡得着；不过，他最喜欢的还是给朋友们爱的抱抱。\n--感谢白饭的绘制",
+        } or {
+            name = "Kid Fan", collection = "FANS", access = "FREE",
+            descitem = "Unlock \"Backcub\" skin.",
+            description = "The story was not translated.",
+        },
+
+		anim = {
+            bank = nil, build = nil,
+            anim = nil, isloop_anim = nil, animpush = nil, isloop_animpush = nil,
+            setable = true,
+        },
+        equip = { symbol = "swap_body", build = "backcub_fans", file = "swap_body" },
+        exchangefx = { prefab = nil, offset_y = nil, scale = nil },
+        floater = {
+            cut = nil, size = "med", offset_y = 0.1, scale = 1.1, nofx = nil,
         },
     },
 }
@@ -1269,13 +1397,14 @@ if ischinese then
             DISGUISER = "伪装学者系列",
             ERA = "先古回响系列",
             OLDPIC = "念旧系列",
+            FANS = "饭制系列",
         },
         UI_ACCESS = "获取",
         UI_INPUT_CDK = "请输入兑换码",
         UI_LOAD_CDK = "兑换中...",
         ACCESS = {
             UNKNOWN = "无法获取",
-            DONATE = "通过回忆获取", --通过打赏获取
+            DONATE = "通过回忆获取",
             FREE = "自动获取",
             SPECIAL = "通过特殊方式获取",
         },
@@ -1293,6 +1422,7 @@ else
             DISGUISER = "Master of Disguise Collection",
             ERA = "Era Echo Collection",
             OLDPIC = "Nostalgia Collection",
+            FANS = "Fans Creation",
         },
         UI_ACCESS = "Get It",
         UI_INPUT_CDK = "Please enter CDK",
@@ -1336,12 +1466,12 @@ end
 local skinidxes = { --用以皮肤排序
     "neverfade_thanks", "neverfadebush_thanks",
     "fishhomingtool_awesome_thanks", "fishhomingtool_normal_thanks", "fishhomingbait_thanks",
-    "triplegoldenshovelaxe_era", "tripleshovelaxe_era", "lilybush_era", "lileaves_era", "icire_rock_era", "shield_l_log_era", "shield_l_sand_era",
+    "triplegoldenshovelaxe_era", "tripleshovelaxe_era", "lilybush_era", "lileaves_era", "shield_l_log_era", "icire_rock_era", "shield_l_sand_era",
     "orchidbush_disguiser", "boltwingout_disguiser",
     "rosebush_marble", "lilybush_marble", "orchidbush_marble",
     "shield_l_log_emo_fist", "hat_lichen_emo_que",
 
-    "shield_l_log_emo_pride", "shield_l_sand_op", "hat_cowboy_tvplay", "hat_lichen_disguiser", "orchitwigs_disguiser",
+    "shield_l_log_emo_pride", "shield_l_sand_op", "hat_cowboy_tvplay", "hat_lichen_disguiser", "orchitwigs_disguiser", "backcub_fans"
 }
 for i,skinname in pairs(skinidxes) do
     _G.SKIN_IDX_LEGION[i] = skinname

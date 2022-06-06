@@ -5,16 +5,11 @@ local containers = require("containers")
 --[[ 容器数据设定 ]]
 --------------------------------------------------------------------------
 
-----------
---mod兼容：Show Me (中文)。并没有什么用，优先级比棱镜高，即使加上了数据，代码早就执行过了
-----------
-TUNING.MONITOR_CHESTS = TUNING.MONITOR_CHESTS or {}
-
+local showmeneed = { "backcub" }
 local params = {}
 
 if TUNING.LEGION_FLASHANDCRUSH then
-    params.beefalo =
-    {
+    params.beefalo = {
         widget =
         {
             slotpos = {},
@@ -33,11 +28,11 @@ if TUNING.LEGION_FLASHANDCRUSH then
     end
 
     params.beefalo.itemtestfn = containers.params.bundle_container.itemtestfn
+    table.insert(showmeneed, "beefalo")
 end
 
 if CONFIGS_LEGION.PRAYFORRAIN then
-    params.giantsfoot =
-    {
+    params.giantsfoot = {
         widget =
         {
             slotpos = {},
@@ -57,8 +52,7 @@ if CONFIGS_LEGION.PRAYFORRAIN then
         table.insert(params.giantsfoot.widget.slotpos, Vector3(-162 + 75, -75 * y + 114, 0))
     end
 
-    params.hiddenmoonlight =
-    {
+    params.hiddenmoonlight = {
         widget =
         {
             slotpos = {},
@@ -116,7 +110,8 @@ if CONFIGS_LEGION.PRAYFORRAIN then
 
         return false
     end
-    TUNING.MONITOR_CHESTS.hiddenmoonlight = true
+    table.insert(showmeneed, "giantsfoot")
+    table.insert(showmeneed, "hiddenmoonlight")
 end
 
 if CONFIGS_LEGION.LEGENDOFFALL then
@@ -218,6 +213,7 @@ if CONFIGS_LEGION.LEGENDOFFALL then
         return inst.replica.container ~= nil and not inst.replica.container:IsEmpty()
     end
 
+    table.insert(showmeneed, "boltwingout")
 end
 
 --------------------------------------------------------------------------
@@ -245,3 +241,29 @@ params = nil
 --         return widgetsetup_old(container, prefab, data)
 --     end
 -- end
+
+----------
+--mod兼容：Show Me (中文)
+----------
+
+------以下代码参考自风铃草大佬的穹妹------
+--showme优先级如果比本mod高，那么这部分代码会生效
+for k, mod in pairs(ModManager.mods) do
+    if mod and _G.rawget(mod, "SHOWME_STRINGS") then --showme特有的全局变量
+        if
+            mod.postinitfns and mod.postinitfns.PrefabPostInit and
+            mod.postinitfns.PrefabPostInit.treasurechest
+        then
+            for _,v in ipairs(showmeneed) do
+				mod.postinitfns.PrefabPostInit[v] = mod.postinitfns.PrefabPostInit.treasurechest
+			end
+        end
+        break --及时跳出来循环？
+    end
+end
+
+--showme优先级如果比本mod低，那么这部分代码会生效
+TUNING.MONITOR_CHESTS = TUNING.MONITOR_CHESTS or {}
+for _, v in ipairs(showmeneed) do
+	TUNING.MONITOR_CHESTS[v] = true
+end

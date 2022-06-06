@@ -340,16 +340,8 @@ local function OnPlant(seed, doer, soilorcrop)
             soilorcrop:Remove()
             seed:Remove()
 
-            --寻找周围的管理器
-            local ents = TheSim:FindEntities(pt.x, pt.y, pt.z, 20,
-                { "siving_ctl" },
-                { "NOCLICK", "FX", "INLIMBO" },
-                nil
-            )
-            for _,v in pairs(ents) do
-                if v:IsValid() and v.components.botanycontroller ~= nil then
-                    plant.components.perennialcrop:TriggerController(v, true, true)
-                end
+            if plant.fn_planted then
+                plant.fn_planted(plant, pt)
             end
 
             return true
@@ -375,16 +367,8 @@ local function OnPlant2(seed, doer, crop)
             crop:Remove()
             seed:Remove()
 
-            --寻找周围的管理器
-            local ents = TheSim:FindEntities(pt.x, pt.y, pt.z, 20,
-                { "siving_ctl" },
-                { "NOCLICK", "FX", "INLIMBO" },
-                nil
-            )
-            for _,v in pairs(ents) do
-                if v:IsValid() and v.components.botanycontroller ~= nil then
-                    plant.components.perennialcrop2:TriggerController(v, true, true)
-                end
+            if plant.fn_planted then
+                plant.fn_planted(plant, pt)
             end
 
             return true
@@ -541,84 +525,82 @@ ACTIONS.INTERACT_WITH.strfn = function(act)
     return strfn_INTERACT_WITH(act)
 end
 
-if IsServer then
-    ------让果蝇能取消多年生作物照顾
-    local ATTACKPLANT_old = ACTIONS.ATTACKPLANT.fn
-    ACTIONS.ATTACKPLANT.fn = function(act)
-        if act.target ~= nil then
-            if act.target.components.perennialcrop ~= nil then
-                return act.target.components.perennialcrop:TendTo(act.doer, false)
-            elseif act.target.components.perennialcrop2 ~= nil then
-                return act.target.components.perennialcrop2:TendTo(act.doer, false)
-            end
+------让果蝇能取消多年生作物照顾
+local ATTACKPLANT_old = ACTIONS.ATTACKPLANT.fn
+ACTIONS.ATTACKPLANT.fn = function(act)
+    if act.target ~= nil then
+        if act.target.components.perennialcrop ~= nil then
+            return act.target.components.perennialcrop:TendTo(act.doer, false)
+        elseif act.target.components.perennialcrop2 ~= nil then
+            return act.target.components.perennialcrop2:TendTo(act.doer, false)
         end
-        return ATTACKPLANT_old(act)
+    end
+    return ATTACKPLANT_old(act)
+end
+
+------让 寻找作物照顾机制 能兼容多年生作物（两种果蝇、土地爷用到了）
+require "behaviours/findfarmplant"
+if FindFarmPlant then
+    local function IsNearFollowPos(self, plant)
+        local followpos = self.getfollowposfn(self.inst)
+        local plantpos = plant:GetPosition()
+        return distsq(followpos.x, followpos.z, plantpos.x, plantpos.z) < 400
     end
 
-    ------让 寻找作物照顾机制 能兼容多年生作物（两种果蝇、土地爷用到了）
-    require "behaviours/findfarmplant"
-    if FindFarmPlant then
-        local function IsNearFollowPos(self, plant)
-            local followpos = self.getfollowposfn(self.inst)
-            local plantpos = plant:GetPosition()
-            return distsq(followpos.x, followpos.z, plantpos.x, plantpos.z) < 400
+    local Visit_old = FindFarmPlant.Visit
+    FindFarmPlant.Visit = function(self, ...)
+        if self.status == READY then
+            --找可照顾的多年生作物
+            self.inst.planttarget = FindEntity(self.inst, 20, function(plant)
+                if
+                    ( (
+                        plant.components.perennialcrop ~= nil and
+                        plant.components.perennialcrop:Tendable(self.inst, self.wantsstressed)
+                    ) or (
+                        plant.components.perennialcrop2 ~= nil and
+                        plant.components.perennialcrop2:Tendable(self.inst, self.wantsstressed)
+                    ) ) and
+                    IsNearFollowPos(self, plant) and
+                    (self.validplantfn == nil or self.validplantfn(self.inst, plant))
+                then
+                    return true
+                end
+            end, nil, nil, { "crop_legion", "crop2_legion" })
+
+            if self.inst.planttarget then
+                local action = BufferedAction(self.inst, self.inst.planttarget, self.action, nil, nil, nil, 0.1)
+                self.inst.components.locomotor:PushAction(action, self.shouldrun)
+                self.status = RUNNING
+            end
         end
+        if
+            self.inst.planttarget and (
+                self.inst.planttarget.components.perennialcrop ~= nil or
+                self.inst.planttarget.components.perennialcrop2 ~= nil
+            )
+        then
+            if self.status == RUNNING then
+                local plant = self.inst.planttarget
+                local cropcpt = plant.components.perennialcrop or plant.components.perennialcrop2
+                if
+                    not plant or not plant:IsValid() or not IsNearFollowPos(self, plant) or
+                    (plant.components.perennialcrop ~= nil and not cropcpt.tendable) or
+                    not (self.validplantfn == nil or self.validplantfn(self.inst, plant))
+                then
+                    self.inst.planttarget = nil
+                    self.status = FAILED
+                end
 
-        local Visit_old = FindFarmPlant.Visit
-        FindFarmPlant.Visit = function(self, ...)
-            if self.status == READY then
-                --找可照顾的多年生作物
-                self.inst.planttarget = FindEntity(self.inst, 20, function(plant)
-                    if
-                        ( (
-                            plant.components.perennialcrop ~= nil and
-                            plant.components.perennialcrop:Tendable(self.inst, self.wantsstressed)
-                        ) or (
-                            plant.components.perennialcrop2 ~= nil and
-                            plant.components.perennialcrop2:Tendable(self.inst, self.wantsstressed)
-                        ) ) and
-                        IsNearFollowPos(self, plant) and
-                        (self.validplantfn == nil or self.validplantfn(self.inst, plant))
-                    then
-                        return true
-                    end
-                end, nil, nil, { "crop_legion", "crop2_legion" })
-
-                if self.inst.planttarget then
-                    local action = BufferedAction(self.inst, self.inst.planttarget, self.action, nil, nil, nil, 0.1)
-                    self.inst.components.locomotor:PushAction(action, self.shouldrun)
-                    self.status = RUNNING
+                if not cropcpt:Tendable(self.inst, self.wantsstressed) then
+                    self.inst.planttarget = nil
+                    self.status = SUCCESS
                 end
             end
-            if
-                self.inst.planttarget and (
-                    self.inst.planttarget.components.perennialcrop ~= nil or
-                    self.inst.planttarget.components.perennialcrop2 ~= nil
-                )
-            then
-                if self.status == RUNNING then
-                    local plant = self.inst.planttarget
-                    local cropcpt = plant.components.perennialcrop or plant.components.perennialcrop2
-                    if
-                        not plant:IsValid() or not IsNearFollowPos(self, plant) or
-                        (cropcpt.tendable ~= nil and not cropcpt.tendable) or
-                        not (self.validplantfn == nil or self.validplantfn(self.inst, plant))
-                    then
-                        self.inst.planttarget = nil
-                        self.status = FAILED
-                    end
-
-                    if not cropcpt:Tendable(self.inst, self.wantsstressed) then
-                        self.inst.planttarget = nil
-                        self.status = SUCCESS
-                    end
-                end
-                return
-            end
-            Visit_old(self, ...)
+            return
         end
-
+        Visit_old(self, ...)
     end
+
 end
 
 --------------------------------------------------------------------------
@@ -1004,7 +986,7 @@ _G.CROPS_DATA_LEGION.carrot = {
     bank = "plant_normal_legion",
     build = "plant_normal_legion",
     leveldata = {
-        [1] = { anim = "level1_carrot", time = time_annual * 0.05, deadanim = "dead123_carrot", witheredprefab = {"cutgrass"}, },
+        [1] = { anim = "level1_carrot", time = time_annual * 0.05, deadanim = "dead123_carrot", witheredprefab = nil, },
         [2] = { anim = "level2_carrot", time = time_annual * 0.15, deadanim = "dead123_carrot", witheredprefab = {"cutgrass"}, },
         [3] = { anim = "level3_carrot", time = time_annual * 0.20, deadanim = "dead123_carrot", witheredprefab = {"cutgrass"}, },
         [4] = { anim = "level4_carrot", time = time_annual * 0.20, deadanim = "dead456_carrot", witheredprefab = {"cutgrass"} },
@@ -1023,7 +1005,7 @@ _G.CROPS_DATA_LEGION.corn = {
     bank = "plant_normal_legion",
     build = "plant_normal_legion",
     leveldata = {
-        [1] = { anim = "level1_corn", time = time_annual * 0.05, deadanim = "dead123_corn", witheredprefab = {"cutgrass"}, },
+        [1] = { anim = "level1_corn", time = time_annual * 0.05, deadanim = "dead123_corn", witheredprefab = nil, },
         [2] = { anim = "level2_corn", time = time_annual * 0.15, deadanim = "dead123_corn", witheredprefab = {"twigs"}, },
         [3] = { anim = "level3_corn", time = time_annual * 0.20, deadanim = "dead123_corn", witheredprefab = {"twigs"}, },
         [4] = { anim = "level4_corn", time = time_annual * 0.20, deadanim = "dead456_corn", witheredprefab = {"twigs"}, },
@@ -1042,7 +1024,7 @@ _G.CROPS_DATA_LEGION.pumpkin = {
     bank = "plant_normal_legion",
     build = "plant_normal_legion",
     leveldata = {
-        [1] = { anim = "level1_pumpkin", time = time_years * 0.05, deadanim = "dead123_pumpkin", witheredprefab = {"cutgrass"}, },
+        [1] = { anim = "level1_pumpkin", time = time_years * 0.05, deadanim = "dead123_pumpkin", witheredprefab = nil, },
         [2] = { anim = "level2_pumpkin", time = time_years * 0.15, deadanim = "dead123_pumpkin", witheredprefab = {"cutgrass"}, },
         [3] = { anim = "level3_pumpkin", time = time_years * 0.20, deadanim = "dead123_pumpkin", witheredprefab = {"cutgrass"}, },
         [4] = { anim = "level4_pumpkin", time = time_years * 0.20, deadanim = "dead456_pumpkin", witheredprefab = {"cutgrass"}, },
@@ -1061,7 +1043,7 @@ _G.CROPS_DATA_LEGION.eggplant = {
     bank = "crop_legion_eggplant",
     build = "crop_legion_eggplant",
     leveldata = {
-        [1] = { anim = "level1", time = time_years * 0.05, deadanim = "dead1", witheredprefab = {"cutgrass"}, },
+        [1] = { anim = "level1", time = time_years * 0.05, deadanim = "dead1", witheredprefab = nil, },
         [2] = { anim = "level2", time = time_years * 0.15, deadanim = "dead1", witheredprefab = {"cutgrass"}, },
         [3] = { anim = "level3", time = time_years * 0.20, deadanim = "dead1", witheredprefab = {"cutgrass"}, },
         [4] = { anim = "level4", time = time_years * 0.20, deadanim = "dead2", witheredprefab = {"cutgrass"}, },
@@ -1102,7 +1084,7 @@ _G.CROPS_DATA_LEGION.durian = {
     bank = "plant_normal_legion",
     build = "plant_normal_legion",
     leveldata = {
-        [1] = { anim = "level1_durian", time = time_years * 0.05, deadanim = "dead123_durian", witheredprefab = {"cutgrass"}, },
+        [1] = { anim = "level1_durian", time = time_years * 0.05, deadanim = "dead123_durian", witheredprefab = nil, },
         [2] = { anim = "level2_durian", time = time_years * 0.15, deadanim = "dead123_durian", witheredprefab = {"twigs"}, },
         [3] = { anim = "level3_durian", time = time_years * 0.20, deadanim = "dead123_durian", witheredprefab = {"twigs"}, },
         [4] = { anim = "level4_durian", time = time_years * 0.20, deadanim = "dead456_durian", witheredprefab = {"log"}, },
@@ -1140,7 +1122,7 @@ _G.CROPS_DATA_LEGION.pomegranate = {
     bank = "plant_normal_legion",
     build = "plant_normal_legion",
     leveldata = {
-        [1] = { anim = "level1_pomegranate", time = time_years * 0.05, deadanim = "dead123_pomegranate", witheredprefab = {"twigs"}, },
+        [1] = { anim = "level1_pomegranate", time = time_years * 0.05, deadanim = "dead123_pomegranate", witheredprefab = nil, },
         [2] = { anim = "level2_pomegranate", time = time_years * 0.15, deadanim = "dead123_pomegranate", witheredprefab = {"twigs"}, },
         [3] = { anim = "level3_pomegranate", time = time_years * 0.20, deadanim = "dead123_pomegranate", witheredprefab = {"twigs"}, },
         [4] = { anim = "level4_pomegranate", time = time_years * 0.20, deadanim = "dead456_pomegranate", witheredprefab = {"log"}, },
@@ -1159,7 +1141,7 @@ _G.CROPS_DATA_LEGION.dragonfruit = {
     bank = "plant_normal_legion",
     build = "plant_normal_legion",
     leveldata = {
-        [1] = { anim = "level1_dragonfruit", time = time_years * 0.05, deadanim = "dead123_dragonfruit", witheredprefab = {"cutgrass"}, },
+        [1] = { anim = "level1_dragonfruit", time = time_years * 0.05, deadanim = "dead123_dragonfruit", witheredprefab = nil, },
         [2] = { anim = "level2_dragonfruit", time = time_years * 0.15, deadanim = "dead123_dragonfruit", witheredprefab = {"twigs"}, },
         [3] = { anim = "level3_dragonfruit", time = time_years * 0.20, deadanim = "dead123_dragonfruit", witheredprefab = {"twigs"}, },
         [4] = { anim = "level4_dragonfruit", time = time_years * 0.20, deadanim = "dead456_dragonfruit", witheredprefab = {"log"}, },
@@ -1178,7 +1160,7 @@ _G.CROPS_DATA_LEGION.watermelon = {
     bank = "plant_normal_legion",
     build = "plant_normal_legion",
     leveldata = {
-        [1] = { anim = "level1_watermelon", time = time_annual * 0.05, deadanim = "dead123_watermelon", witheredprefab = {"cutgrass"}, },
+        [1] = { anim = "level1_watermelon", time = time_annual * 0.05, deadanim = "dead123_watermelon", witheredprefab = nil, },
         [2] = { anim = "level2_watermelon", time = time_annual * 0.15, deadanim = "dead123_watermelon", witheredprefab = {"cutgrass"}, },
         [3] = { anim = "level3_watermelon", time = time_annual * 0.20, deadanim = "dead123_watermelon", witheredprefab = {"cutgrass"}, },
         [4] = { anim = "level4_watermelon", time = time_annual * 0.20, deadanim = "dead456_watermelon", witheredprefab = {"cutgrass"}, },
@@ -1197,7 +1179,7 @@ _G.CROPS_DATA_LEGION.pineananas = {
     bank = "crop_legion_pineananas",
     build = "crop_legion_pineananas",
     leveldata = {
-        [1] = { anim = "level1", time = time_years * 0.05, deadanim = "dead1", witheredprefab = {"twigs"}, },
+        [1] = { anim = "level1", time = time_years * 0.05, deadanim = "dead1", witheredprefab = nil, },
         [2] = { anim = "level2", time = time_years * 0.15, deadanim = "dead1", witheredprefab = {"twigs"}, },
         [3] = { anim = "level3", time = time_years * 0.20, deadanim = "dead1", witheredprefab = {"log"}, },
         [4] = { anim = "level4", time = time_years * 0.20, deadanim = "dead2", witheredprefab = {"log"}, },
@@ -1235,7 +1217,7 @@ _G.CROPS_DATA_LEGION.onion = {
     bank = "crop_legion_onion",
     build = "crop_legion_onion",
     leveldata = {
-        [1] = { anim = "level1", time = time_annual * 0.20, deadanim = "dead1", witheredprefab = {"cutgrass"}, },
+        [1] = { anim = "level1", time = time_annual * 0.20, deadanim = "dead1", witheredprefab = nil, },
         [2] = { anim = "level2", time = time_annual * 0.15, deadanim = "dead1", witheredprefab = {"cutgrass"}, },
         [3] = { anim = "level3", time = time_annual * 0.20, deadanim = "dead2", witheredprefab = {"cutgrass"}, },
         [4] = { anim = "level4", time = time_annual * 0.45, deadanim = "dead2", witheredprefab = {"cutgrass"}, bloom = true, },
@@ -1253,7 +1235,7 @@ _G.CROPS_DATA_LEGION.pepper = {
     bank = "crop_legion_pepper",
     build = "crop_legion_pepper",
     leveldata = {
-        [1] = { anim = "level1", time = time_years * 0.15, deadanim = "dead1", witheredprefab = {"cutgrass"}, },
+        [1] = { anim = "level1", time = time_years * 0.15, deadanim = "dead1", witheredprefab = nil, },
         [2] = { anim = "level2", time = time_years * 0.20, deadanim = "dead1", witheredprefab = {"cutgrass"}, },
         [3] = { anim = "level3", time = time_years * 0.25, deadanim = "dead2", witheredprefab = {"cutgrass"}, },
         [4] = { anim = "level4", time = time_years * 0.40, deadanim = "dead2", witheredprefab = {"cutgrass"}, bloom = true, },
@@ -1293,7 +1275,7 @@ _G.CROPS_DATA_LEGION.potato = {
     bank = "crop_legion_potato",
     build = "crop_legion_potato",
     leveldata = {
-        [1] = { anim = "level1", time = time_annual * 0.20, deadanim = "dead1", witheredprefab = {"cutgrass"}, },
+        [1] = { anim = "level1", time = time_annual * 0.20, deadanim = "dead1", witheredprefab = nil, },
         [2] = { anim = "level2", time = time_annual * 0.15, deadanim = "dead1", witheredprefab = {"cutgrass"}, },
         [3] = { anim = "level3", time = time_annual * 0.20, deadanim = "dead2", witheredprefab = {"cutgrass", "potato"}, },
         [4] = { anim = "level4", time = time_annual * 0.45, deadanim = "dead2", witheredprefab = {"cutgrass", "potato"}, bloom = true, },
@@ -1311,7 +1293,7 @@ _G.CROPS_DATA_LEGION.garlic = {
     bank = "crop_legion_garlic",
     build = "crop_legion_garlic",
     leveldata = {
-        [1] = { anim = "level1", time = time_annual * 0.20, deadanim = "dead1", witheredprefab = {"cutgrass"}, },
+        [1] = { anim = "level1", time = time_annual * 0.20, deadanim = "dead1", witheredprefab = nil, },
         [2] = { anim = "level2", time = time_annual * 0.15, deadanim = "dead1", witheredprefab = {"cutgrass"}, },
         [3] = { anim = "level3", time = time_annual * 0.20, deadanim = "dead2", witheredprefab = {"cutgrass"}, },
         [4] = { anim = "level4", time = time_annual * 0.45, deadanim = "dead2", witheredprefab = {"cutgrass"}, bloom = true, },
@@ -1351,7 +1333,7 @@ _G.CROPS_DATA_LEGION.tomato = {
     bank = "crop_legion_tomato",
     build = "crop_legion_tomato",
     leveldata = {
-        [1] = { anim = "level1", time = time_years * 0.15, deadanim = "dead1", witheredprefab = {"cutgrass"}, },
+        [1] = { anim = "level1", time = time_years * 0.15, deadanim = "dead1", witheredprefab = nil, },
         [2] = { anim = "level2", time = time_years * 0.20, deadanim = "dead1", witheredprefab = {"twigs"}, },
         [3] = { anim = "level3", time = time_years * 0.25, deadanim = "dead2", witheredprefab = {"twigs"}, },
         [4] = { anim = "level4", time = time_years * 0.40, deadanim = "dead2", witheredprefab = {"twigs"}, bloom = true, },
@@ -1369,7 +1351,7 @@ _G.CROPS_DATA_LEGION.asparagus = {
     bank = "crop_legion_asparagus",
     build = "crop_legion_asparagus",
     leveldata = {
-        [1] = { anim = "level1", time = time_years * 0.15, deadanim = "dead1", witheredprefab = {"cutgrass"}, },
+        [1] = { anim = "level1", time = time_years * 0.15, deadanim = "dead1", witheredprefab = nil, },
         [2] = { anim = "level2", time = time_years * 0.20, deadanim = "dead1", witheredprefab = {"cutgrass"}, },
         [3] = { anim = "level3", time = time_years * 0.25, deadanim = "dead2", witheredprefab = {"cutgrass", "cutgrass"}, },
         [4] = { anim = "level4", time = time_years * 0.40, deadanim = "dead2", witheredprefab = {"cutgrass", "cutgrass"}, },
@@ -1388,7 +1370,7 @@ _G.CROPS_DATA_LEGION.mandrake = {
     build = "crop_legion_mandrake",
     getsickchance = 0,
     leveldata = {
-        [1] = { anim = "level1", time = time_years * 0.16, deadanim = "dead1", witheredprefab = {"cutgrass"}, },
+        [1] = { anim = "level1", time = time_years * 0.16, deadanim = "dead1", witheredprefab = nil, },
         [2] = { anim = "level2", time = time_years * 0.24, deadanim = "dead1", witheredprefab = {"cutgrass"}, },
         [3] = { anim = "level3", time = time_years * 0.36, deadanim = "dead1", witheredprefab = {"cutgrass"}, },
         [4] = { anim = "level4", time = time_years * 0.24, deadanim = "dead1", witheredprefab = {"cutgrass"}, },
@@ -1445,7 +1427,7 @@ _G.CROPS_DATA_LEGION.gourd = {
     bank = "crop_mythword_gourd",
     build = "crop_mythword_gourd",
     leveldata = {
-        [1] = { anim = "level1", time = time_years * 0.05, deadanim = "dead1", witheredprefab = {"cutgrass"}, },
+        [1] = { anim = "level1", time = time_years * 0.05, deadanim = "dead1", witheredprefab = nil, },
         [2] = { anim = "level2", time = time_years * 0.15, deadanim = "dead1", witheredprefab = {"cutgrass"}, },
         [3] = { anim = "level3", time = time_years * 0.20, deadanim = "dead2", witheredprefab = {"cutgrass"}, },
         [4] = { anim = "level4", time = time_years * 0.20, deadanim = "dead2", witheredprefab = {"cutgrass"}, },

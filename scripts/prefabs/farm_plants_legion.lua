@@ -673,6 +673,23 @@ local function MakePlant(data)
 				OnIsDark(inst)
 			end)
 
+			inst.fn_planted = function(inst, pt)
+				--寻找周围的管理器
+				local ents = TheSim:FindEntities(pt.x, pt.y, pt.z, 20,
+					{ "siving_ctl" },
+					{ "NOCLICK", "FX", "INLIMBO" },
+					nil
+				)
+				for _,v in pairs(ents) do
+					if v:IsValid() and v.components.botanycontroller ~= nil then
+						inst.components.perennialcrop:TriggerController(v, true, true)
+					end
+				end
+				if TheWorld.state.israining then
+					inst.components.perennialcrop:PourWater(nil, nil, inst.components.perennialcrop.moisture_max/2)
+				end
+			end
+
 			if data.fn_server ~= nil then
 				data.fn_server(inst)
 			end
@@ -903,6 +920,27 @@ local function MakePlant2(cropprefab, sets)
 
 			--季节变换时更新生长速度，我觉得没必要了，因为OnEntityWake就已经更新得很勤了
 			-- inst:WatchWorldState("iswinter", TogglePickable)
+
+			inst.fn_planted = function(inst, pt)
+				local cpt = inst.components.perennialcrop2
+				local ents = TheSim:FindEntities(pt.x, pt.y, pt.z, 20, --寻找周围的管理器
+					{ "siving_ctl" },
+					{ "NOCLICK", "FX", "INLIMBO" },
+					nil
+				)
+				for _,v in pairs(ents) do
+					if v:IsValid() and v.components.botanycontroller ~= nil then
+						cpt:TriggerController(v, true, true)
+					end
+				end
+				if TheWorld.state.israining then
+					cpt:PourWater(nil, nil, 1)
+				end
+				cpt:CostController() --从管理器拿取资源
+				if cpt.donemoisture or cpt.donenutrient or cpt.donetendable then
+					cpt:StartGrowing() --由于 CostController() 不会主动更新生长时间，这里手动更新
+				end
+			end
 
 			if sets.fn_server ~= nil then
 				sets.fn_server(inst)

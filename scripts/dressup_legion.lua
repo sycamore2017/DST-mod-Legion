@@ -1038,13 +1038,27 @@ local dressup_data = {
             local itemswap = {}
 
             if dressup.inst.prefab == "webber" then
-                itemswap["swap_body_tall"] = dressup:GetDressData(
-                    buildskin, "swap_backcub", "swap_body", item.GUID, "swap"
-                )
+                local skindata = item.components.skinedlegion:GetSkinedData()
+                if skindata ~= nil and skindata.equip ~= nil then
+                    itemswap["swap_body_tall"] = dressup:GetDressData(
+                        nil, skindata.equip.build, skindata.equip.file, item.GUID, "swap"
+                    )
+                else
+                    itemswap["swap_body_tall"] = dressup:GetDressData(
+                        buildskin, "swap_backcub", "swap_body", item.GUID, "swap"
+                    )
+                end
             else
-                itemswap["swap_body"] = dressup:GetDressData(
-                    buildskin, "swap_backcub", "swap_body", item.GUID, "swap"
-                )
+                local skindata = item.components.skinedlegion:GetSkinedData()
+                if skindata ~= nil and skindata.equip ~= nil then
+                    itemswap["swap_body"] = dressup:GetDressData(
+                        nil, skindata.equip.build, skindata.equip.file, item.GUID, "swap"
+                    )
+                else
+                    itemswap["swap_body"] = dressup:GetDressData(
+                        buildskin, "swap_backcub", "swap_body", item.GUID, "swap"
+                    )
+                end
                 itemswap["backpack"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
             end
 

@@ -673,6 +673,7 @@ if TUNING.LEGION_FLASHANDCRUSH or TUNING.LEGION_DESERTSECRET then --素白蘑菇
                 end,
             }
         end
+        fungus_needchange = nil
     end
 
     if TUNING.LEGION_DESERTSECRET then
@@ -808,24 +809,25 @@ if TUNING.LEGION_FLASHANDCRUSH or TUNING.LEGION_DESERTSECRET then --素白蘑菇
             return false, "GUITAR"
         end
 
-        _G.REPAIRERS_L["townportaltalisman"] = {
-            fn_try = Fn_try_sand,
-            fn_sg = function(doer, action)
-                return "dolongaction"
-            end,
-            fn_do = function(act)
-                return Fn_do_sand(act.doer, act.invobject, act.target, 315)
-            end
+        local rock_needchange = {
+            townportaltalisman = 315,
+            turf_desertdirt = 105,
+            cutstone = 157.5,
+            rocks = 52.5,
+            flint = 52.5
         }
-        _G.REPAIRERS_L["turf_desertdirt"] = {
-            fn_try = Fn_try_sand,
-            fn_sg = function(doer, action)
-                return "dolongaction"
-            end,
-            fn_do = function(act)
-                return Fn_do_sand(act.doer, act.invobject, act.target, 315)
-            end
-        }
+        for k,v in pairs(rock_needchange) do
+            _G.REPAIRERS_L[k] = {
+                fn_try = Fn_try_sand,
+                fn_sg = function(doer, action)
+                    return "dolongaction"
+                end,
+                fn_do = function(act)
+                    return Fn_do_sand(act.doer, act.invobject, act.target, v)
+                end
+            }
+        end
+        rock_needchange = nil
     end
 
     if IsServer then

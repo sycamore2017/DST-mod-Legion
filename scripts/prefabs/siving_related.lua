@@ -552,6 +552,25 @@ table.insert(prefs, Prefab(
 --[[ 子圭·育 ]]
 --------------------------------------------------------------------------
 
+local function OnDeconstruct(inst, worker)
+    local cpt = inst.components.genetrans
+    if cpt.seed then
+        inst:RemoveChild(cpt.seed)
+        cpt.seed:ReturnToScene()
+        cpt.seed.Transform:SetPosition(inst.Transform:GetWorldPosition())
+        if cpt.seed.components.perishable ~= nil then
+            cpt.seed.components.perishable:StartPerishing()
+        end
+        cpt.seed = nil
+    end
+
+    inst.components.lootdropper:DropLoot()
+    local fx = SpawnPrefab("collapse_big")
+    fx.Transform:SetPosition(inst.Transform:GetWorldPosition())
+    fx:SetMaterial("rock")
+    inst:Remove()
+end
+
 table.insert(prefs, Prefab(
     "siving_turn",
     function()
@@ -652,23 +671,11 @@ table.insert(prefs, Prefab(
             end
         end)
         inst.components.workable:SetOnFinishCallback(function(inst, worker)
-            local cpt = inst.components.genetrans
-            if cpt.seed then
-                inst:RemoveChild(cpt.seed)
-                cpt.seed:ReturnToScene()
-                cpt.seed.Transform:SetPosition(inst.Transform:GetWorldPosition())
-                if cpt.seed.components.perishable ~= nil then
-                    cpt.seed.components.perishable:StartPerishing()
-                end
-                cpt.seed = nil
-            end
             inst.worked_l = true
-            inst.components.lootdropper:DropLoot()
-            local fx = SpawnPrefab("collapse_big")
-            fx.Transform:SetPosition(inst.Transform:GetWorldPosition())
-            fx:SetMaterial("rock")
-            inst:Remove()
+            OnDeconstruct(inst, worker)
         end)
+
+        inst:ListenForEvent("ondeconstructstructure", OnDeconstruct)
 
         return inst
     end,

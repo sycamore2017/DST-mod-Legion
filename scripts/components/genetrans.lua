@@ -17,9 +17,6 @@ local GeneTrans = Class(function(self, inst)
 		prefab = "siving_turn_fruit", symbol = "followed", x = 0, y = 0, z = 0
 	}
 	self.fx = nil
-
-	-- self.fn_setup = nil --fn(cpt, seed, doer)
-
 end)
 
 local function SetSeedAnim(self)
@@ -225,7 +222,7 @@ function GeneTrans:TriggerPickable(can)
 		end
 		self.inst.components.pickable:SetUp(nil)
 		self.inst.components.pickable.use_lootdropper_for_product = true
-		self.inst.components.pickable.picksound = "dontstarve/wilson/harvest_berries" --undo 声音
+		self.inst.components.pickable.picksound = "dontstarve/common/destroy_magic"
 	else
 		self.inst:RemoveComponent("pickable")
 	end

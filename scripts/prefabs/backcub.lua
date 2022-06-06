@@ -13,7 +13,7 @@ local prefabs =
 }
 
 local function toground(inst)
-    inst.AnimState:PlayAnimation("anim", true)
+    -- inst.AnimState:PlayAnimation("anim", true)
 
     if inst.SoundEmitter then
         if inst.soundtask == nil then
@@ -26,10 +26,12 @@ local function toground(inst)
 end
 
 local function onequip(inst, owner)
-    if owner.prefab == "webber" then
-        owner.AnimState:OverrideSymbol("swap_body_tall", "swap_backcub", "swap_body")
+    local symbol = owner.prefab == "webber" and "swap_body_tall" or "swap_body"
+    local skindata = inst.components.skinedlegion:GetSkinedData()
+    if skindata ~= nil and skindata.equip ~= nil then
+        owner.AnimState:OverrideSymbol(symbol, skindata.equip.build, skindata.equip.file)
     else
-        owner.AnimState:OverrideSymbol("swap_body", "swap_backcub", "swap_body")
+        owner.AnimState:OverrideSymbol(symbol, "swap_backcub", "swap_body")
     end
 
     if inst.components.container ~= nil then
@@ -148,23 +150,26 @@ local function fn()
 
     --inst.foleysound = "dontstarve/movement/foley/backpack"
 
-    MakeInventoryFloatable(inst, "small", 0, nil, false, -9)
-    inst.components.floater.OnLandedClient = function(self) --取消掉进海里时生成的波纹特效
-        self.showing_effect = true
-    end
-    local OnLandedServer_old = inst.components.floater.OnLandedServer
-    inst.components.floater.OnLandedServer = function(self) --掉进海里时使用自己的水面动画
-        OnLandedServer_old(self)
-        inst.AnimState:PlayAnimation(self:IsFloating() and "anim_water" or "anim", true)
-    end
-    local OnNoLongerLandedServer_old = inst.components.floater.OnNoLongerLandedServer
-    inst.components.floater.OnNoLongerLandedServer = function(self) --非待在海里时使用自己的陆地动画
-        OnNoLongerLandedServer_old(self)
-        inst.AnimState:PlayAnimation(self:IsFloating() and "anim_water" or "anim", true)
-    end
+    --漂浮动画与地面动画的修改
+    -- MakeInventoryFloatable(inst, "small", 0, nil, false, -9)
+    -- inst.components.floater.OnLandedClient = function(self) --取消掉进海里时生成的波纹特效
+    --     self.showing_effect = true
+    -- end
+    -- local OnLandedServer_old = inst.components.floater.OnLandedServer
+    -- inst.components.floater.OnLandedServer = function(self) --掉进海里时使用自己的水面动画
+    --     OnLandedServer_old(self)
+    --     inst.AnimState:PlayAnimation(self:IsFloating() and "anim_water" or "anim", true)
+    -- end
+    -- local OnNoLongerLandedServer_old = inst.components.floater.OnNoLongerLandedServer
+    -- inst.components.floater.OnNoLongerLandedServer = function(self) --非待在海里时使用自己的陆地动画
+    --     OnNoLongerLandedServer_old(self)
+    --     inst.AnimState:PlayAnimation(self:IsFloating() and "anim_water" or "anim", true)
+    -- end
+
+    inst:AddComponent("skinedlegion")
+    inst.components.skinedlegion:InitWithFloater("backcub")
 
     inst.entity:SetPristine()
-
     if not TheWorld.ismastersim then
         inst.OnEntityReplicated = function(inst) inst.replica.container:WidgetSetup("piggyback") end     --直接用官方的slot需要主客机都申明一遍
         return inst
@@ -198,6 +203,8 @@ local function fn()
     toground(inst)
 
     -- MakeHauntableLaunchAndDropFirstItem(inst)    --不能被作祟
+
+    inst.components.skinedlegion:SetOnPreLoad()
 
     return inst
 end

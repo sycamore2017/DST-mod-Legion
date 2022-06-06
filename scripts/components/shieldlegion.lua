@@ -18,8 +18,10 @@ local ShieldLegion = Class(function(self, inst)
     }
 
     self.time = nil
-    self.delta = 9 * FRAMES --FRAMES为0.033秒。并且盾击sg动画总时长为 13*FRAMES，最好小于这个值
+    self.delta = 8 * FRAMES --FRAMES为0.033秒。并且盾击sg动画总时长为 13*FRAMES，最好小于这个值
     self.armormult_success = 1 --盾反成功时的损害系数
+
+    self.hurtsoundoverride = nil --缓存的玩家的声音数据
 
     -- self.startfn = nil
     -- self.atkfn = nil
@@ -85,8 +87,8 @@ function ShieldLegion:Counterattack(doer, attacker, data, radius, dmgmult)
                 (attacker:GetIsWet() and 1 or 0)
             )
         or 1
-    local dmg = doer.components.combat:CalcDamage(attacker, self.inst, mult)
-                + ( (data.damage or 0) * (dmgmult or 1) )
+    local dmg = doer.components.combat:CalcDamage(attacker, self.inst, mult) * (dmgmult or 1)
+                + ( (data.damage or 0) * 0.1 )
     attacker.components.combat:GetAttacked(doer, dmg, self.inst, stimuli)
 
     return true
@@ -142,6 +144,9 @@ function ShieldLegion:GetAttacked(doer, attacker, damage, weapon, stimuli)
             data.armordamage = data.armordamage*self.armormult_success
             self.issuccess = true
             self:SetFollowedFx(doer, self.fxdata) --盾保特效
+
+            self.hurtsoundoverride = doer.hurtsoundoverride
+            doer.hurtsoundoverride = self.inst.hurtsoundoverride
         else
             if self.atkfailfn ~= nil then
                 self.atkfailfn(self.inst, doer, attacker, data)
@@ -165,6 +170,8 @@ function ShieldLegion:FinishAttack(doer, issgend)
         end
     end
     self.issuccess = false
+
+    doer.hurtsoundoverride = self.hurtsoundoverride
 
     -- if self.fx_protect ~= nil and self.fx_protect:IsValid() then
     --     self.fx_protect:Remove()

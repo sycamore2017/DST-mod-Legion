@@ -219,11 +219,15 @@ if TUNING.LEGION_DESERTSECRET then
             end
         end
     end
-    local function onsandstorm(owner)    --沙尘暴中属性上升
-        local shield = owner ~= nil and owner.components.inventory:GetEquippedItem(EQUIPSLOTS.HANDS) or nil
-
-        if shield == nil or shield.prefab ~= "shield_l_sand" then
-            return
+    local function onsandstorm(owner, area, weapon) --沙尘暴中属性上升
+        local shield = nil
+        if weapon ~= nil and weapon.prefab == "shield_l_sand" then
+            shield = weapon
+        else
+            shield = owner ~= nil and owner.components.inventory:GetEquippedItem(EQUIPSLOTS.HANDS) or nil
+            if shield == nil or shield.prefab ~= "shield_l_sand" then
+                return
+            end
         end
 
         if shield._brokenshield then
@@ -246,7 +250,7 @@ if TUNING.LEGION_DESERTSECRET then
         shield.components.armor:SetAbsorption(absorb_normal)
         shield.components.shieldlegion.armormult_success = mult_success_normal
     end
-    local function onisraining(inst)    --下雨时属性降低
+    local function onisraining(inst) --下雨时属性降低
         local owner = inst.components.inventoryitem.owner
 
         if TheWorld.state.israining then
@@ -264,7 +268,7 @@ if TUNING.LEGION_DESERTSECRET then
                 inst.components.weapon:SetDamage(damage_broken)
                 inst.components.armor:SetAbsorption(absorb_broken)
             else
-                onsandstorm(owner)   --不下雨时就刷新一次
+                onsandstorm(owner, nil, inst)   --不下雨时就刷新一次
             end
             if not TheWorld:HasTag("cave") and TheWorld.state.issummer then --不是在洞穴里，并且夏天时才会开始沙尘暴的监听
                 if owner ~= nil then
@@ -330,6 +334,7 @@ if TUNING.LEGION_DESERTSECRET then
             end)
             inst.components.equippable.insulated = true --设为true，就能防电
 
+            inst.hurtsoundoverride = "dontstarve/creatures/together/antlion/sfx/break"
             inst.components.shieldlegion.armormult_success = mult_success_normal
             inst.components.shieldlegion.atkfn = function(inst, doer, attacker, data)
                 local snap = SpawnPrefab("impact")
@@ -339,7 +344,7 @@ if TUNING.LEGION_DESERTSECRET then
 
                 OnBlocked(doer, { attacker = attacker })
 
-                if inst.components.shieldlegion:Counterattack(doer, attacker, data, 8, 3.5) then --此时敌人近
+                if inst.components.shieldlegion:Counterattack(doer, attacker, data, 8, 3) then --此时敌人近
                     local x1, y1, z1 = attacker.Transform:GetWorldPosition()
                     local angle = -math.atan2(z1 - z, x1 - x)
                     snap.Transform:SetRotation(angle * RADIANS)
@@ -349,7 +354,7 @@ if TUNING.LEGION_DESERTSECRET then
                 end
             end
             inst.components.shieldlegion.atkstayingfn = function(inst, doer, attacker, data)
-                inst.components.shieldlegion:Counterattack(doer, attacker, data, 8, 3.5)
+                inst.components.shieldlegion:Counterattack(doer, attacker, data, 8, 1.5)
             end
             -- inst.components.shieldlegion.atkfailfn = function(inst, doer, attacker, data) end
 
@@ -402,6 +407,7 @@ MakeShield({
         inst.components.equippable:SetOnEquip(OnEquipFn)
         inst.components.equippable:SetOnUnequip(OnUnequipFn)
 
+        inst.hurtsoundoverride = "dontstarve/wilson/hit_armour"
         inst.components.shieldlegion.armormult_success = 0.5
         inst.components.shieldlegion.atkfn = function(inst, doer, attacker, data)
             local snap = SpawnPrefab("impact")
@@ -419,7 +425,7 @@ MakeShield({
             end
         end
         inst.components.shieldlegion.atkstayingfn = function(inst, doer, attacker, data)
-            inst.components.shieldlegion:Counterattack(doer, attacker, data, 6, 2.5)
+            inst.components.shieldlegion:Counterattack(doer, attacker, data, 6, 0.8)
         end
         -- inst.components.shieldlegion.atkfailfn = function(inst, doer, attacker, data)
         --     inst.components.shieldlegion:Counterattack(doer, attacker, data, 4, 0.1) --即使盾反失败也要攻击一下

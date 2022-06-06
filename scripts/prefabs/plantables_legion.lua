@@ -116,6 +116,10 @@ local function MakePlantable(name, data)
                 if deployer ~= nil and deployer.SoundEmitter ~= nil then
                     deployer.SoundEmitter:PlaySound(data.deployable.sound or "dontstarve/common/plant")
                 end
+
+                if tree.fn_planted then
+                    tree.fn_planted(tree, pt)
+                end
             end
         end
         if data.deployable.mode ~= nil then
