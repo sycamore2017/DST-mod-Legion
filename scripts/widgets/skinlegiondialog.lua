@@ -144,18 +144,18 @@ local SkinLegionDialog = Class(Widget, function(self, owner)
     self.button_close = self.proot:AddChild(TEMPLATES.SmallButton(STRINGS.UI.PLAYER_AVATAR.CLOSE, 26, .5, function() self:Close() end))
     self.button_close:SetPosition(0, -215)
 
-    --主动刷新皮肤按钮(tip: 皮肤获取通道删除)
-    -- self.button_regetskins = self.proot:AddChild(TEMPLATES.IconButton(
-    --     "images/button_icons.xml", "refresh.tex", "刷新我的皮肤", false, false,
-    --     function()
-    --         DoRpc(1, nil)
-    --     end,
-    --     nil, "self_inspect_mod.tex"
-    -- ))
-    -- self.button_regetskins.icon:SetScale(.15)
-    -- self.button_regetskins.icon:SetPosition(-5, 6)
-    -- self.button_regetskins:SetScale(0.65)
-    -- self.button_regetskins:SetPosition(110, -220)
+    --主动刷新皮肤按钮
+    self.button_regetskins = self.proot:AddChild(TEMPLATES.IconButton(
+        "images/button_icons.xml", "refresh.tex", "刷新我的皮肤", false, false,
+        function()
+            DoRpc(1, nil)
+        end,
+        nil, "self_inspect_mod.tex"
+    ))
+    self.button_regetskins.icon:SetScale(.15)
+    self.button_regetskins.icon:SetPosition(-5, 6)
+    self.button_regetskins:SetScale(0.65)
+    self.button_regetskins:SetPosition(110, -220)
 
     self.selected_item = nil
     self.context_popup = nil

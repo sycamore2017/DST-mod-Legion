@@ -815,7 +815,7 @@ local function MakePlant2(cropprefab, sets)
 					for i = 1, 3, 1 do
 						table.insert(loots, "petals")
 					end
-				elseif #loots <= 0 then
+				elseif crop.stage > 1 and #loots <= 0 then
 					table.insert(loots, crop.isrotten and "spoiled_food" or "cutgrass")
 				end
 

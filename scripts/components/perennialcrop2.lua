@@ -79,6 +79,14 @@ nil,
 	donenutrient = onnutrient
 })
 
+function PerennialCrop2:DebugString()
+	local test = self.taskgrow == nil and "no_task,阶段" or "ye_task,阶段"
+	test = test..tostring(self.stage)..",start"..tostring(self.timedata.start)..",left"..tostring(self.timedata.left)
+		..",paused"..tostring(self.timedata.paused)..",mult"..tostring(self.timedata.mult)
+		..",all"..tostring(self.timedata.all)
+	print(test)
+end
+
 function PerennialCrop2:SetUp(cropprefab, data)
 	self.cropprefab = cropprefab
 	self.stage_max = #data.leveldata
@@ -341,7 +349,8 @@ function PerennialCrop2:DoGrowth(skip)
 								local tile = TheWorld.Map:GetTileAtPoint(x+k1, 0, z+k2)
 								if tile == GROUND.FARMING_SOIL then
 									hastile = true
-									TheWorld.components.farming_manager:AddTileNutrients(x+k1, z+k2, 8, 8, 8)
+									local tile_x, tile_z = TheWorld.Map:GetTileCoordsAtPoint(x+k1, 0, z+k2)
+									TheWorld.components.farming_manager:AddTileNutrients(tile_x, tile_z, 8, 8, 8)
 								end
 							end
 						end
@@ -483,6 +492,8 @@ function PerennialCrop2:StartGrowing(lefttime, skip)
 			self:DoGrowth(false)
 		end, self)
 	end
+
+	-- self:DebugString()
 end
 
 function PerennialCrop2:LongUpdate(dt, isloop, ismagic)
@@ -514,6 +525,9 @@ function PerennialCrop2:LongUpdate(dt, isloop, ismagic)
 	else
 		self:StartGrowing() --数据丢失的话，就只能重新开始了
 	end
+
+	-- print("longupdate---------------")
+	-- self:DebugString()
 end
 
 function PerennialCrop2:OnEntitySleep()

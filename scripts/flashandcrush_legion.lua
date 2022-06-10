@@ -569,38 +569,56 @@ end)
 --[[ 新增专属喂牛动作以适应新的牛鞍 ]]
 --------------------------------------------------------------------------
 
---目前的问题是喂食动作优先级比给予动作高了，以前给予比喂食优先级高，所以这里才额外添加给予动作。得改了 undo
+------右键存放动作------
 
--- local GIVE_RIGHTCLICK = Action({ priority = 1, canforce = true, mount_valid = false, rangecheckfn = ACTIONS.GIVE.rangecheckfn })
--- GIVE_RIGHTCLICK.id = "GIVE_RIGHTCLICK"    --这个操作的id
--- GIVE_RIGHTCLICK.str = STRINGS.ACTIONS_LEGION.GIVE_RIGHTCLICK    --这个操作的名字，比如法杖是castspell，蜗牛壳甲是use
--- GIVE_RIGHTCLICK.fn = function(act) --这个操作执行时进行的功能函数
---     if act.target ~= nil then
---         if act.target.components.trader ~= nil then
---             local able, reason = act.target.components.trader:AbleToAccept(act.invobject, act.doer)
---             if not able then
---                 return false, reason
---             end
---             act.target.components.trader:AcceptGift(act.doer, act.invobject)
---             return true
---         end
---     end
--- end
--- AddAction(GIVE_RIGHTCLICK) --向游戏注册一个动作
+local STORE_BEEF_L = Action({ priority = 2, mount_valid = true })
+STORE_BEEF_L.id = "STORE_BEEF_L" --这个操作的id
+STORE_BEEF_L.str = STRINGS.ACTIONS_LEGION.STORE_BEEF_L --这个操作的名字，比如法杖是castspell，蜗牛壳甲是use
+STORE_BEEF_L.fn = ACTIONS.STORE.fn --这个操作执行时进行的功能函数
+AddAction(STORE_BEEF_L) --向游戏注册一个动作
 
---往具有某组件的物品添加动作的检测函数，如果满足条件，就向人物的动作可执行表中加入某个动作。right表示是否是右键动作
--- AddComponentAction("USEITEM", "tradable", function(inst, doer, target, actions, right)
---     if right and target:HasTag("trader")
---         and target:HasTag("saddleable") --目标是可骑行的
---         and target.replica.container ~= nil and target.replica.container:CanBeOpened() --容器组件可打开
---         and not (doer.replica.rider ~= nil and doer.replica.rider:IsRiding()) then --不能骑着牛给东西
---         table.insert(actions, ACTIONS.RUMMAGE) --这里为动作的id
---     end
--- end)
+if not _G.rawget(_G, "CA_U_INVENTORYITEM_L") then --ComponentAction_USEITEM_inventoryitem_legion
+    _G.CA_U_INVENTORYITEM_L = {}
+end
+table.insert(_G.CA_U_INVENTORYITEM_L, function(inst, doer, target, actions, right)
+    if
+        right and inst.replica.inventoryitem ~= nil
+        and target:HasTag("saddleable") --目标是可骑行的
+        and target.replica.container ~= nil and target.replica.container:CanBeOpened()
+        and inst.replica.inventoryitem:IsGrandOwner(doer)
+    then
+        table.insert(actions, ACTIONS.STORE_BEEF_L)
+        return true
+    end
+    return false
+end)
 
 --将一个动作与state绑定
--- AddStategraphActionHandler("wilson", ActionHandler(ACTIONS.GIVE_RIGHTCLICK, "give"))
--- AddStategraphActionHandler("wilson_client", ActionHandler(ACTIONS.GIVE_RIGHTCLICK, "give"))    --在联机版中添加新动作需要对wilson和wilson_cient两个sg都进行state绑定
+AddStategraphActionHandler("wilson", ActionHandler(ACTIONS.STORE_BEEF_L, "give"))
+AddStategraphActionHandler("wilson_client", ActionHandler(ACTIONS.STORE_BEEF_L, "give")) --在联机版中添加新动作需要对wilson和wilson_cient两个sg都进行state绑定
+
+------左键喂食动作------
+
+local FEED_BEEF_L = Action({ priority = 1, mount_valid = true, canforce=true, rangecheckfn = ACTIONS.GIVE.rangecheckfn })
+FEED_BEEF_L.id = "FEED_BEEF_L"
+FEED_BEEF_L.str = STRINGS.ACTIONS_LEGION.FEED_BEEF_L
+FEED_BEEF_L.fn = ACTIONS.GIVE.fn
+AddAction(FEED_BEEF_L)
+
+AddComponentAction("USEITEM", "tradable", function(inst, doer, target, actions, right)
+    if
+        target:HasTag("trader") and target:HasTag("saddleable") and
+        not (
+            doer.replica.rider ~= nil and doer.replica.rider:IsRiding() and
+            not (target.replica.inventoryitem ~= nil and target.replica.inventoryitem:IsGrandOwner(doer))
+        )
+    then
+        table.insert(actions, ACTIONS.FEED_BEEF_L) --非要我重新写一个动作才让这个动作生效，无语
+    end
+end)
+
+AddStategraphActionHandler("wilson", ActionHandler(ACTIONS.FEED_BEEF_L, "give"))
+AddStategraphActionHandler("wilson_client", ActionHandler(ACTIONS.FEED_BEEF_L, "give"))
 
 --------------------------------------------------------------------------
 --[[ 素白蘑菇帽的打喷嚏释放其技能的sg ]]

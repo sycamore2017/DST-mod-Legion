@@ -1643,7 +1643,11 @@ AddComponentAction("SCENE", "genetrans", function(inst, doer, actions, right)
         end
     end
 end)
-AddComponentAction("USEITEM", "inventoryitem", function(inst, doer, target, actions, right)
+
+if not _G.rawget(_G, "CA_U_INVENTORYITEM_L") then --ComponentAction_USEITEM_inventoryitem_legion
+    _G.CA_U_INVENTORYITEM_L = {}
+end
+table.insert(_G.CA_U_INVENTORYITEM_L, function(inst, doer, target, actions, right)
     if
         right and
         (inst.prefab == "siving_rocks" or TRANS_DATA_LEGION[inst.prefab] ~= nil) and
@@ -1652,7 +1656,9 @@ AddComponentAction("USEITEM", "inventoryitem", function(inst, doer, target, acti
         not (doer.replica.rider ~= nil and doer.replica.rider:IsRiding())
     then
         table.insert(actions, ACTIONS.GENETRANS)
+        return true
     end
+    return false
 end)
 
 local function FnSgGeneTrans(inst, action)

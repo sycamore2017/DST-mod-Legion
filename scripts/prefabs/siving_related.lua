@@ -625,6 +625,8 @@ table.insert(prefs, Prefab(
                     table.insert(loots, cpt.fruit)
                 end
                 lootdropper:SetLoot(loots)
+            else
+                lootdropper:SetLoot(nil)
             end
         end)
         inst.components.lootdropper.GenerateLoot = function(self)

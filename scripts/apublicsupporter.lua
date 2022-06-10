@@ -799,12 +799,26 @@ if TUNING.LEGION_FLASHANDCRUSH or TUNING.LEGION_DESERTSECRET then --素白蘑菇
                 target ~= nil and
                 target.components.armor ~= nil and target.components.armor:GetPercent() < 1
             then
-                local useditem = doer.components.inventory:RemoveItem(item) --不做说明的话，一次只取一个
-                if useditem then
-                    target.components.armor:Repair(value*(doer.mult_repairl or 1))
-                    useditem:Remove()
-                    return true
+                value = value*(doer.mult_repairl or 1)
+                local cpt = target.components.armor
+                local need = math.ceil((cpt.maxcondition - cpt.condition) / value)
+                if need > 1 then --最后一次很可能会比较浪费，所以不主动填满
+                    need = need - 1
                 end
+
+                if item.components.stackable ~= nil then
+                    local stack = item.components.stackable:StackSize() or 1
+                    if need > stack then
+                        need = stack
+                    end
+                    local useditems = item.components.stackable:Get(need)
+                    useditems:Remove()
+                else
+                    need = 1
+                    item:Remove()
+                end
+                cpt:Repair(value*need)
+                return true
             end
             return false, "GUITAR"
         end
@@ -1401,6 +1415,8 @@ AddStategraphActionHandler("wilson_client", ActionHandler(ACTIONS.ATTACK_SHIELD_
     return "atk_shield_l"
 end))
 
+
+
 --------------------------------------------------------------------------
 --[[ 世界修改 ]]
 --------------------------------------------------------------------------
@@ -1436,4 +1452,18 @@ if CONFIGS_LEGION.FLOWERSPOWER or CONFIGS_LEGION.LEGENDOFFALL then
         end
         return give_strfn_old(act)
     end
+end
+
+--------------------------------------------------------------------------
+--[[ 组件动作响应的全局化 ]]
+--------------------------------------------------------------------------
+
+if TUNING.LEGION_FLASHANDCRUSH or CONFIGS_LEGION.LEGENDOFFALL then
+    AddComponentAction("USEITEM", "inventoryitem", function(inst, doer, target, actions, right)
+        for _,fn in ipairs(CA_U_INVENTORYITEM_L) do
+            if fn(inst, doer, target, actions, right) then
+                return
+            end
+        end
+    end)
 end
