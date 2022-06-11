@@ -27,10 +27,6 @@ local function OnEquipFn(inst, owner)
     owner.AnimState:Hide("ARM_normal") --隐藏普通的手
     owner.AnimState:Show("LANTERN_OVERLAY")
 
-    --初始化
-    if owner.redirect_table == nil then
-        owner.redirect_table = {}
-    end
     RebuildRedirectDamageFn(owner) --全局函数：重新构造combat的redirectdamagefn函数
     --登记远程保护的函数
     if owner.redirect_table[inst.prefab] == nil then
@@ -55,10 +51,6 @@ local function OnUnequipFn(inst, owner)
     --清除自己的redirectdamagefn函数
     if owner.redirect_table ~= nil then
         owner.redirect_table[inst.prefab] = nil
-    end
-
-    if owner.components.locomotor ~= nil then
-        owner._runinsandstorm = false
     end
 end
 
@@ -98,16 +90,16 @@ local function MakeShield(data)
 	table.insert(prefs, Prefab(
 		data.name,
 		function()
-            local inst = CreateEntity()--创建一个实体，常见的各种inst，根源就是在这里。
-            inst.entity:AddTransform()--给实体添加转换组件，这主要涉及的是空间位置的转换和获取
-            inst.entity:AddAnimState()--给实体添加动画组件，从而实体能在游戏上显示出来。
+            local inst = CreateEntity()
+            inst.entity:AddTransform()
+            inst.entity:AddAnimState()
             inst.entity:AddNetwork()
 
             MakeInventoryPhysics(inst)
 
-            inst.AnimState:SetBank(data.name)--设置实体的bank，动画模板，包含了动画的名称、运动轨迹、全部通道数据
-            inst.AnimState:SetBuild(data.name)--设置实体的build，贴图模板，包含了贴图、中心点
-            inst.AnimState:PlayAnimation("idle")--设置实体播放的动画
+            inst.AnimState:SetBank(data.name)
+            inst.AnimState:SetBuild(data.name)
+            inst.AnimState:PlayAnimation("idle")
 
             inst:AddTag("combatredirect")   --代表这个武器会给予伤害对象重定义函数
             inst:AddTag("allow_action_on_impassable")
@@ -125,22 +117,22 @@ local function MakeShield(data)
                 return inst
             end
 
-            inst:AddComponent("inspectable") --可检查组件
+            inst:AddComponent("inspectable")
 
-            inst:AddComponent("inventoryitem")  --添加物品栏物品组件，只有有了这个组件，你才能把这个物品捡起放到物品栏里。
+            inst:AddComponent("inventoryitem")
             inst.components.inventoryitem.imagename = data.name
             inst.components.inventoryitem.atlasname = "images/inventoryimages/"..data.name..".xml"
 
             inst:AddComponent("shieldlegion")
 
-            inst:AddComponent("equippable")--添加可装备组件，有了这个组件，你才能装备物品
+            inst:AddComponent("equippable")
             inst.components.equippable.equipslot = EQUIPSLOTS.HANDS
 
-            inst:AddComponent("weapon") --增加武器组件
+            inst:AddComponent("weapon")
 
-            inst:AddComponent("armor")  --增加防具组件
+            inst:AddComponent("armor")
 
-            MakeHauntableLaunch(inst)  --作祟相关函数
+            MakeHauntableLaunch(inst)
 
             if data.fn_server ~= nil then
                 data.fn_server(inst)
@@ -330,6 +322,10 @@ if TUNING.LEGION_DESERTSECRET then
                 inst:StopWatchingWorldState("israining", onisraining)
                 inst:StopWatchingWorldState("issummer", onisraining)
 
+                if owner.components.locomotor ~= nil then
+                    owner._runinsandstorm = false
+                end
+
                 OnUnequipFn(inst, owner)
             end)
             inst.components.equippable.insulated = true --设为true，就能防电
@@ -340,7 +336,6 @@ if TUNING.LEGION_DESERTSECRET then
                 local snap = SpawnPrefab("impact")
                 local x, y, z = doer.Transform:GetWorldPosition()
                 snap.Transform:SetScale(2, 2, 2)
-                snap.Transform:SetPosition(x, y, z)
 
                 OnBlocked(doer, { attacker = attacker })
 
@@ -413,7 +408,6 @@ MakeShield({
             local snap = SpawnPrefab("impact")
             local x, y, z = doer.Transform:GetWorldPosition()
             snap.Transform:SetScale(2, 2, 2)
-            snap.Transform:SetPosition(x, y, z)
 
             if inst.components.shieldlegion:Counterattack(doer, attacker, data, 6, 2.5) then --此时敌人近
                 local x1, y1, z1 = attacker.Transform:GetWorldPosition()
@@ -445,6 +439,93 @@ MakeShield({
         inst.components.skinedlegion:SetOnPreLoad()
     end,
 })
+
+--------------------------------------------------------------------------
+--[[ 恐怖盾牌的机械火焰 ]]
+--------------------------------------------------------------------------
+
+table.insert(prefs, Prefab("shieldterror_fire", function()
+    local inst = CreateEntity()
+
+    inst.entity:AddTransform()
+    inst.entity:AddAnimState()
+    inst.entity:AddLight()
+    inst.entity:AddNetwork()
+
+    MakeInventoryPhysics(inst)
+
+    inst.AnimState:SetBank("coldfire_fire")
+    inst.AnimState:SetBuild("coldfire_fire")
+    inst.AnimState:PlayAnimation("level1", true)
+    inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
+    inst.AnimState:SetRayTestOnBB(true)
+    inst.AnimState:SetScale(0.6, 0.6, 0.6)
+    -- inst.AnimState:SetFinalOffset(3)
+
+    inst.Light:Enable(true)
+    inst.Light:SetRadius(0.3)
+    inst.Light:SetFalloff(0.3)
+    inst.Light:SetIntensity(.3)
+    if math.random() < 0.5 then
+        inst.Light:SetColour(99/255, 226/255, 11/255)
+        inst.AnimState:SetMultColour(99/255, 226/255, 11/255, 0.8)
+    else
+        inst.Light:SetColour(13/255, 226/255, 141/255)
+        inst.AnimState:SetMultColour(13/255, 226/255, 141/255, 0.8)
+    end
+
+    inst:AddTag("FX")
+
+    --HASHEATER (from heater component) added to pristine state for optimization
+    inst:AddTag("HASHEATER")
+
+    inst.entity:SetPristine()
+    if not TheWorld.ismastersim then
+        return inst
+    end
+
+    inst.persists = false
+
+    inst._belly = nil
+
+    inst._taskfire = inst:DoPeriodicTask(2, function(inst)
+        local number = 0
+        local x, y, z = inst.Transform:GetWorldPosition()
+        local ents = TheSim:FindEntities(x, y, z, 2,
+            { "_combat", "_health" }, { "NOCLICK", "INLIMBO", "balloon", "structure", "wall", "player" })
+        for _,v in ipairs(ents) do
+            if
+                v.entity:IsVisible() and (
+                    v.components.combat ~= nil and v.components.combat.target ~= nil
+                    and v.components.combat.target:HasTag("player")
+                ) and v.components.health ~= nil and not v.components.health:IsDead()
+            then
+                v.components.health:DoDelta(-5, nil, "NIL", true, nil, true)
+                number = number + 4
+            end
+        end
+
+        if number > 0 and inst._belly ~= nil then
+            if inst._belly:IsValid() then
+                if inst._belly.components.armor ~= nil and inst._belly.components.armor:GetPercent() < 1 then
+                    inst._belly.components.armor:Repair(number)
+                end
+            else
+                inst._belly = nil
+            end
+        end
+
+        if math.random() < 0.2 then
+            inst._taskfire:Cancel()
+            inst._taskfire = nil
+            inst:Remove()
+        end
+    end, 0)
+
+    return inst
+end, {
+    Asset("ANIM", "anim/coldfire_fire.zip")
+}, nil))
 
 --------------------
 --------------------

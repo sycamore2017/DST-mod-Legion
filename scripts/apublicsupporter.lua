@@ -193,11 +193,11 @@ end
 
 if IsServer then
     function GLOBAL.RebuildRedirectDamageFn(player) --重新构造combat的redirectdamagefn函数
+        --初始化
+        if player.redirect_table == nil then
+            player.redirect_table = {}
+        end
         if player.components.combat ~= nil then
-            --初始化
-            if player.redirect_table == nil then
-                player.redirect_table = {}
-            end
             --重新定义combat的redirectdamagefn
             player.components.combat.redirectdamagefn = function(victim, attacker, damage, weapon, stimuli)
                 local redirect = nil
@@ -1415,7 +1415,98 @@ AddStategraphActionHandler("wilson_client", ActionHandler(ACTIONS.ATTACK_SHIELD_
     return "atk_shield_l"
 end))
 
+------给恐怖盾牌增加盾反机制------
 
+local function FlingItem_terror(dropper, loot, pt, flingtargetpos, flingtargetvariance)
+    loot.Transform:SetPosition(pt:Get())
+
+    local min_speed = 2
+    local max_speed = 5.5
+    local y_speed = 6
+    local y_speed_variance = 2
+
+    if loot.Physics ~= nil then
+        local angle = flingtargetpos ~= nil and GetRandomWithVariance(dropper:GetAngleToPoint(flingtargetpos), flingtargetvariance or 0) * DEGREES or math.random() * 2 * PI
+        local speed = min_speed + math.random() * (max_speed - min_speed)
+        if loot:IsAsleep() then
+            local radius = .5 * speed + (dropper.Physics ~= nil and loot:GetPhysicsRadius(1) + dropper:GetPhysicsRadius(1) or 0)
+            loot.Transform:SetPosition(
+                pt.x + math.cos(angle) * radius,
+                0,
+                pt.z - math.sin(angle) * radius
+            )
+        else
+            local sinangle = math.sin(angle)
+            local cosangle = math.cos(angle)
+            loot.Physics:SetVel(speed * cosangle, GetRandomWithVariance(y_speed, y_speed_variance), speed * -sinangle)
+        end
+    end
+end
+
+AddPrefabPostInit("shieldofterror", function(inst)
+    inst:AddTag("combatredirect")   --代表这个武器会给予伤害对象重定义函数
+    inst:AddTag("allow_action_on_impassable")
+    inst:AddTag("shield_l")
+    inst:RemoveTag("toolpunch")
+
+    if IsServer then
+        inst:AddComponent("shieldlegion")
+        inst.hurtsoundoverride = "terraria1/robo_eyeofterror/charge"
+        inst.components.shieldlegion.armormult_success = 0
+        inst.components.shieldlegion.atkfn = function(inst, doer, attacker, data)
+            if inst.components.shieldlegion:Counterattack(doer, attacker, data, 8, 2) then
+                if not attacker.components.health:IsDead() then
+                    if attacker.task_fire_l == nil then
+                        attacker.components.combat.externaldamagetakenmultipliers:SetModifier("shieldterror_fire", 1.1)
+                    else
+                        attacker.task_fire_l:Cancel()
+                        attacker.task_fire_l = nil
+                    end
+                    attacker.task_fire_l = inst:DoTaskInTime(8, function(inst)
+                        attacker.task_fire_l = nil
+                        attacker.components.combat.externaldamagetakenmultipliers:RemoveModifier("shieldterror_fire")
+                    end)
+                end
+            end
+
+            local doerpos = doer:GetPosition()
+            for i = 1, math.random(2, 3), 1 do
+                local snap = SpawnPrefab("shieldterror_fire")
+                snap._belly = inst
+                if attacker ~= nil then
+                    FlingItem_terror(doer, snap, doerpos, attacker:GetPosition(), 40)
+                else
+                    FlingItem_terror(doer, snap, doerpos)
+                end
+            end
+        end
+        inst.components.shieldlegion.atkstayingfn = function(inst, doer, attacker, data)
+            inst.components.shieldlegion:Counterattack(doer, attacker, data, 8, 0.5)
+        end
+        -- inst.components.shieldlegion.atkfailfn = function(inst, doer, attacker, data) end
+
+        local onequip_old = inst.components.equippable.onequipfn
+        local onunequip_old = inst.components.equippable.onunequipfn
+        inst.components.equippable.onequipfn = function(inst, owner, ...)
+            onequip_old(inst, owner, ...)
+            RebuildRedirectDamageFn(owner) --全局函数：重新构造combat的redirectdamagefn函数
+            --登记远程保护的函数
+            if owner.redirect_table[inst.prefab] == nil then
+                owner.redirect_table[inst.prefab] = function(victim, attacker, damage, weapon, stimuli)
+                    --只要这里不为nil，就能吸收所有远程伤害，反正武器没有health组件，所以在伤害计算时会直接被判断给取消掉
+                    return inst.components.shieldlegion:GetAttacked(victim, attacker, damage, weapon, stimuli)
+                end
+            end
+        end
+        inst.components.equippable.onunequipfn = function(inst, owner, ...)
+            onunequip_old(inst, owner, ...)
+            --清除自己的redirectdamagefn函数
+            if owner.redirect_table ~= nil then
+                owner.redirect_table[inst.prefab] = nil
+            end
+        end
+    end
+end)
 
 --------------------------------------------------------------------------
 --[[ 世界修改 ]]

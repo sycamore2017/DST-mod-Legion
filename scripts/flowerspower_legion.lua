@@ -79,7 +79,7 @@ if IsServer then
             local hasBush = false
             local flower = nil
             local x, y, z = inst.Transform:GetWorldPosition()
-            local ents = TheSim:FindEntities(x, y, z, 8) --检测周围物体
+            local ents = TheSim:FindEntities(x, y, z, 8, nil, { "NOCLICK", "FX", "INLIMBO" }) --检测周围物体
 
             for i, ent in ipairs(ents) do
                 if ent.prefab == inst.bushCreater.name then
