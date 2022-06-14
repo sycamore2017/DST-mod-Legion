@@ -1019,7 +1019,7 @@ _G.CROPS_DATA_LEGION.corn = {
     },
 }
 _G.CROPS_DATA_LEGION.pumpkin = {
-    growthmults = { [1] = 1, [2] = 1.2, [3] = 0.8, [4] = 1.5 }, --秋冬
+    growthmults = { [1] = 1.2, [2] = 1.2, [3] = 0.8, [4] = 1.5 }, --秋冬
     regrowstage = 4,
     bank = "plant_normal_legion",
     build = "plant_normal_legion",
