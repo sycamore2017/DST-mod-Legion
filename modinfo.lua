@@ -8,7 +8,7 @@ local L = locale ~= "zh" and locale ~= "zhr" --true-英文; false-中文
 
 name = L and "[DST] Legion" or "[DST] 棱镜"
 author = "ti_Tout"
-version = "7.0.2" --每次更新时为了上传必须更改
+version = "7.0.3" --每次更新时为了上传必须更改
 description =
     L and "Thanks for using this mod!\n                                           [version]"..version.."  [file]1392778117\n\n*As you can see, this mod includes much of the imagination of the mod makers. I really want to make this mod like a DLC, can we wait until it happens?\n\nSpecial thanks：半夏微暖半夏凉(Code consultant)、羽中就是他(Guest artist)、Mr鲁鲁(Lines writer)"
     or "感谢订阅本mod！                                    [版本]"..version.."  [文件]1392778117\n\n*如你所见，本mod包括了作者的很多的脑洞，我也很想把这个mod做成像DLC一样的规模，敬请期待吧。\n*本mod为个人爱好所做，禁止任何个人或组织转载、除自用外的修改、发布或其他形式的侵犯本mod权益的行为！\n\n特别感谢：半夏微暖半夏凉(代码指导)、羽中就是他(客串画佬)、Mr鲁鲁(台词写者)"

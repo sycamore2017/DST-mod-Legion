@@ -6,6 +6,7 @@ local prefabFiles = {
     "boltwingout",
     "siving_related",
     "fishhomingtools",
+    "boss_siving_phoenix"
 }
 
 for k,v in pairs(prefabFiles) do

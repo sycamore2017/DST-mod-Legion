@@ -10,7 +10,8 @@ local hot = {
 	-- siving_ctldirt = 'siving_related',
 	-- siving_derivant_lvl2 = 'siving_rocks_legion',
 	-- siving_derivant_lvl3 = 'siving_rocks_legion',
-	-- siving_thetree = 'siving_rocks_legion',
+	siving_foenix = 'boss_siving_phoenix',
+	siving_moenix = 'boss_siving_phoenix',
 }
 local old_sp = GLOBAL.SpawnPrefab
 function GLOBAL.SpawnPrefab(prefab, ...)
