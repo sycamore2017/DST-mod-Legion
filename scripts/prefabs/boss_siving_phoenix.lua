@@ -104,12 +104,12 @@ MakeBoss({
     name = "siving_foenix",
     assets = {
         Asset("ANIM", "anim/buzzard_basic.zip"), --官方秃鹫动画模板
-        Asset("ANIM", "anim/siving_moenix.zip"),
+        Asset("ANIM", "anim/siving_foenix.zip"),
     },
     prefabs = {  },
     fn_common = function(inst)
-        inst.AnimState:SetBuild("siving_moenix")
-        inst.AnimState:PlayAnimation("death", true)
+        inst.AnimState:SetBuild("siving_foenix")
+        inst.AnimState:PlayAnimation("atk", true)
     end,
     fn_server = function(inst)
         inst.components.lootdropper:SetChanceLootTable('siving_foenix')

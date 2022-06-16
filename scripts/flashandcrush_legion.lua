@@ -599,7 +599,7 @@ AddStategraphActionHandler("wilson_client", ActionHandler(ACTIONS.STORE_BEEF_L, 
 
 ------左键喂食动作------
 
-local FEED_BEEF_L = Action({ priority = 1, mount_valid = true, canforce=true, rangecheckfn = ACTIONS.GIVE.rangecheckfn })
+local FEED_BEEF_L = Action({ priority = -1, mount_valid = true, canforce=true, rangecheckfn = ACTIONS.GIVE.rangecheckfn })
 FEED_BEEF_L.id = "FEED_BEEF_L"
 FEED_BEEF_L.str = STRINGS.ACTIONS_LEGION.FEED_BEEF_L
 FEED_BEEF_L.fn = ACTIONS.GIVE.fn
@@ -608,6 +608,7 @@ AddAction(FEED_BEEF_L)
 AddComponentAction("USEITEM", "tradable", function(inst, doer, target, actions, right)
     if
         target:HasTag("trader") and target:HasTag("saddleable") and
+        target.replica.container ~= nil and target.replica.container:CanBeOpened() and --该动作只针对驮运鞍具的牛
         not (
             doer.replica.rider ~= nil and doer.replica.rider:IsRiding() and
             not (target.replica.inventoryitem ~= nil and target.replica.inventoryitem:IsGrandOwner(doer))
