@@ -63,6 +63,16 @@
         <file id="5" name="buzzard_wing/buzzard_wing-5.png" width="168" height="280" pivot_x="0.863092" pivot_y="0.934645"/>
         <file id="6" name="buzzard_wing/buzzard_wing-6.png" width="296" height="196" pivot_x="0.88564" pivot_y="0.636865"/>
     </folder>
+    <folder id="8" name="buzzard_angryeye">
+        <file id="0" name="buzzard_angryeye/buzzard_angryeye-0.png" width="28" height="24" pivot_x="0.301768" pivot_y="0.541687"/>
+        <file id="1" name="buzzard_angryeye/buzzard_angryeye-1.png" width="24" height="20" pivot_x="0.287479" pivot_y="0.587525"/>
+        <file id="2" name="buzzard_angryeye/buzzard_angryeye-2.png" width="24" height="24" pivot_x="0.272917" pivot_y="0.571896"/>
+        <file id="3" name="buzzard_angryeye/buzzard_angryeye-3.png" width="28" height="24" pivot_x="0.298196" pivot_y="0.525021"/>
+        <file id="4" name="buzzard_angryeye/buzzard_angryeye-4.png" width="28" height="24" pivot_x="0.294625" pivot_y="0.553146"/>
+        <file id="5" name="buzzard_angryeye/buzzard_angryeye-5.png" width="24" height="20" pivot_x="0.290604" pivot_y="0.587525"/>
+        <file id="6" name="buzzard_angryeye/buzzard_angryeye-6.png" width="28" height="24" pivot_x="0.292839" pivot_y="0.575021"/>
+        <file id="7" name="buzzard_angryeye/buzzard_angryeye-7.png" width="28" height="20" pivot_x="0.302661" pivot_y="0.595025"/>
+    </folder>
     <entity id="0" name="siving_foenix">
         <animation id="0" name="anim_90s" length="67" interval="100">
             <mainline>
