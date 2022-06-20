@@ -80,6 +80,108 @@ local function MakeBoss(data)
     ))
 end
 
+------
+------
+
+local function OnEquip(inst, owner)
+    owner.AnimState:OverrideSymbol("swap_object", inst.prefab, "swap")
+    owner.AnimState:Show("ARM_carry")
+    owner.AnimState:Hide("ARM_normal")
+end
+local function OnUnequip(inst, owner)
+    owner.AnimState:Hide("ARM_carry")
+    owner.AnimState:Show("ARM_normal")
+end
+
+local function OnDropped(inst)
+    inst.AnimState:SetOrientation(ANIM_ORIENTATION.Default)
+    inst.AnimState:PlayAnimation("item", false)
+    inst.components.inventoryitem.pushlandedevents = true
+    inst:PushEvent("on_landed")
+end
+local function OnThrown(inst, owner, target, attacker)
+    inst.AnimState:SetOrientation(ANIM_ORIENTATION.OnGround)
+    inst.AnimState:PlayAnimation("shoot", false)
+    inst.components.inventoryitem.pushlandedevents = false
+    --undo 声音
+end
+local function OnHit(inst, owner, target)
+    OnDropped(inst)
+end
+local function OnMiss(inst, owner, target)
+    OnDropped(inst)
+end
+
+local function MakeWeapon(data)
+    table.insert(prefs, Prefab(
+        data.name,
+        function()
+            local inst = CreateEntity()
+
+            inst.entity:AddTransform()
+            inst.entity:AddAnimState()
+            inst.entity:AddSoundEmitter()
+            inst.entity:AddNetwork()
+
+            MakeInventoryPhysics(inst)
+            RemovePhysicsColliders(inst)
+
+            inst:AddTag("thrown")
+
+            --weapon (from weapon component) added to pristine state for optimization
+            inst:AddTag("weapon")
+
+            --projectile (from projectile component) added to pristine state for optimization
+            inst:AddTag("projectile")
+
+            inst.AnimState:SetBank(data.name)
+            inst.AnimState:SetBuild(data.name)
+            inst.AnimState:PlayAnimation("item", false)
+            -- inst.Transform:SetEightFaced()
+            -- inst.AnimState:SetRayTestOnBB(true)
+
+            if data.fn_common ~= nil then
+                data.fn_common(inst)
+            end
+
+            inst.entity:SetPristine()
+            if not TheWorld.ismastersim then
+                return inst
+            end
+
+            inst:AddComponent("inspectable")
+
+            inst:AddComponent("inventoryitem")
+            inst.components.inventoryitem.imagename = data.name
+            inst.components.inventoryitem.atlasname = "images/inventoryimages/"..data.name..".xml"
+            inst.components.inventoryitem:SetOnDroppedFn(OnDropped)
+
+            inst:AddComponent("equippable")
+            inst.components.equippable:SetOnEquip(OnEquip)
+            inst.components.equippable:SetOnUnequip(OnUnequip)
+
+            inst:AddComponent("weapon")
+            inst.components.weapon:SetRange(12, 14)
+
+            inst:AddComponent("projectilelegion")
+            inst.components.projectile:SetSpeed(45)
+            inst.components.projectile:SetOnThrownFn(OnThrown)
+            inst.components.projectile:SetOnHitFn(OnHit)
+            inst.components.projectile:SetOnMissFn(OnMiss)
+
+            MakeHauntableLaunch(inst)
+
+            if data.fn_server ~= nil then
+                data.fn_server(inst)
+            end
+
+            return inst
+        end,
+        data.assets,
+        data.prefabs
+    ))
+end
+
 --------------------------------------------------------------------------
 --[[ 子圭玄鸟（雌） ]]
 --------------------------------------------------------------------------
@@ -157,6 +259,25 @@ MakeBoss({
 --------------------------------------------------------------------------
 
 --玩家武器
+MakeWeapon({
+    name = "siving_feather_real",
+    assets = {
+        Asset("ANIM", "anim/siving_feather_real.zip"),
+        Asset("ATLAS", "images/inventoryimages/siving_feather_real.xml"),
+        Asset("IMAGE", "images/inventoryimages/siving_feather_real.tex"),
+    },
+    prefabs = nil,
+    fn_common = function(inst)
+        
+    end,
+    fn_server = function(inst)
+        inst.components.weapon:SetDamage(61.2) --34*1.8
+
+        inst:AddComponent("stackable")
+        inst.components.stackable.maxsize = TUNING.STACK_SIZE_MEDITEM
+    end
+})
+
 --BOSS产物
 
 --------------------------------------------------------------------------

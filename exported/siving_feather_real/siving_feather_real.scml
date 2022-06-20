@@ -49,19 +49,7 @@
                 </key>
             </timeline>
         </animation>
-        <animation id="1" name="item_down" length="100" interval="100">
-            <mainline>
-                <key id="0">
-                    <object_ref id="0" timeline="0" key="0" z_index="0"/>
-                </key>
-            </mainline>
-            <timeline id="0" name="base-0">
-                <key id="0" spin="0">
-                    <object folder="0" file="0" y="-2" angle="0"/>
-                </key>
-            </timeline>
-        </animation>
-        <animation id="2" name="idle_downleft" length="100" interval="100">
+        <animation id="1" name="idle_downleft" length="100" interval="100">
             <mainline>
                 <key id="0">
                     <object_ref id="0" timeline="0" key="0" z_index="0"/>
@@ -73,19 +61,7 @@
                 </key>
             </timeline>
         </animation>
-        <animation id="3" name="item_downleft" length="100" interval="100">
-            <mainline>
-                <key id="0">
-                    <object_ref id="0" timeline="0" key="0" z_index="0"/>
-                </key>
-            </mainline>
-            <timeline id="0" name="base-0">
-                <key id="0" spin="0">
-                    <object folder="0" file="1" y="-2" angle="0" scale_x="-1"/>
-                </key>
-            </timeline>
-        </animation>
-        <animation id="4" name="idle_downright" length="100" interval="100">
+        <animation id="2" name="idle_downright" length="100" interval="100">
             <mainline>
                 <key id="0">
                     <object_ref id="0" timeline="0" key="0" z_index="0"/>
@@ -97,19 +73,7 @@
                 </key>
             </timeline>
         </animation>
-        <animation id="5" name="item_downright" length="100" interval="100">
-            <mainline>
-                <key id="0">
-                    <object_ref id="0" timeline="0" key="0" z_index="0"/>
-                </key>
-            </mainline>
-            <timeline id="0" name="base-0">
-                <key id="0" spin="0">
-                    <object folder="0" file="1" y="-2" angle="0"/>
-                </key>
-            </timeline>
-        </animation>
-        <animation id="6" name="idle_left" length="100" interval="100">
+        <animation id="3" name="idle_left" length="100" interval="100">
             <mainline>
                 <key id="0">
                     <object_ref id="0" timeline="0" key="0" z_index="0"/>
@@ -121,19 +85,7 @@
                 </key>
             </timeline>
         </animation>
-        <animation id="7" name="item_left" length="100" interval="100">
-            <mainline>
-                <key id="0">
-                    <object_ref id="0" timeline="0" key="0" z_index="0"/>
-                </key>
-            </mainline>
-            <timeline id="0" name="base-0">
-                <key id="0" spin="0">
-                    <object folder="0" file="2" y="-2" angle="0"/>
-                </key>
-            </timeline>
-        </animation>
-        <animation id="8" name="idle_right" length="100" interval="100">
+        <animation id="4" name="idle_right" length="100" interval="100">
             <mainline>
                 <key id="0">
                     <object_ref id="0" timeline="0" key="0" z_index="0"/>
@@ -145,19 +97,7 @@
                 </key>
             </timeline>
         </animation>
-        <animation id="9" name="item_right" length="100" interval="100">
-            <mainline>
-                <key id="0">
-                    <object_ref id="0" timeline="0" key="0" z_index="0"/>
-                </key>
-            </mainline>
-            <timeline id="0" name="base-0">
-                <key id="0" spin="0">
-                    <object folder="0" file="2" y="-2" angle="0" scale_x="-1"/>
-                </key>
-            </timeline>
-        </animation>
-        <animation id="10" name="idle_up" length="100" interval="100">
+        <animation id="5" name="idle_up" length="100" interval="100">
             <mainline>
                 <key id="0">
                     <object_ref id="0" timeline="0" key="0" z_index="0"/>
@@ -169,19 +109,7 @@
                 </key>
             </timeline>
         </animation>
-        <animation id="11" name="item_up" length="100" interval="100">
-            <mainline>
-                <key id="0">
-                    <object_ref id="0" timeline="0" key="0" z_index="0"/>
-                </key>
-            </mainline>
-            <timeline id="0" name="base-0">
-                <key id="0" spin="0">
-                    <object folder="0" file="0" y="-2" angle="0" scale_x="-1"/>
-                </key>
-            </timeline>
-        </animation>
-        <animation id="12" name="idle_upleft" length="100" interval="100">
+        <animation id="6" name="idle_upleft" length="100" interval="100">
             <mainline>
                 <key id="0">
                     <object_ref id="0" timeline="0" key="0" z_index="0"/>
@@ -193,19 +121,7 @@
                 </key>
             </timeline>
         </animation>
-        <animation id="13" name="item_upleft" length="100" interval="100">
-            <mainline>
-                <key id="0">
-                    <object_ref id="0" timeline="0" key="0" z_index="0"/>
-                </key>
-            </mainline>
-            <timeline id="0" name="base-0">
-                <key id="0" spin="0">
-                    <object folder="0" file="1" y="-2" angle="0"/>
-                </key>
-            </timeline>
-        </animation>
-        <animation id="14" name="idle_upright" length="100" interval="100">
+        <animation id="7" name="idle_upright" length="100" interval="100">
             <mainline>
                 <key id="0">
                     <object_ref id="0" timeline="0" key="0" z_index="0"/>
@@ -217,7 +133,7 @@
                 </key>
             </timeline>
         </animation>
-        <animation id="15" name="item_upright" length="100" interval="100">
+        <animation id="8" name="item" length="100" interval="100">
             <mainline>
                 <key id="0">
                     <object_ref id="0" timeline="0" key="0" z_index="0"/>
@@ -225,11 +141,11 @@
             </mainline>
             <timeline id="0" name="base-0">
                 <key id="0" spin="0">
-                    <object folder="0" file="1" y="-2" angle="0" scale_x="-1"/>
+                    <object folder="0" file="0" y="-2" angle="0"/>
                 </key>
             </timeline>
         </animation>
-        <animation id="16" name="shoot" length="167" interval="100">
+        <animation id="9" name="shoot" length="167" interval="100">
             <mainline>
                 <key id="0">
                     <object_ref id="0" timeline="0" key="0" z_index="0"/>
@@ -239,7 +155,7 @@
                     <object_ref id="0" timeline="0" key="0" z_index="0"/>
                     <object_ref id="1" timeline="1" key="1" z_index="1"/>
                 </key>
-                <key id="2" time="120">
+                <key id="2" time="160">
                     <object_ref id="0" timeline="0" key="1" z_index="0"/>
                     <object_ref id="1" timeline="1" key="2" z_index="1"/>
                 </key>
@@ -252,7 +168,7 @@
                 <key id="0" spin="0">
                     <object folder="1" file="0" angle="90"/>
                 </key>
-                <key id="1" time="120" spin="0">
+                <key id="1" time="160" spin="0">
                     <object folder="1" file="0" angle="90"/>
                 </key>
                 <key id="2" time="167" spin="0">
@@ -266,15 +182,15 @@
                 <key id="1" time="14" spin="0">
                     <object folder="2" file="0" x="-6.320125" angle="90" scale_x="0.1" scale_y="0.8"/>
                 </key>
-                <key id="2" time="120" spin="0">
-                    <object folder="2" file="0" x="-10" angle="90"/>
+                <key id="2" time="160" spin="0">
+                    <object folder="2" file="0" x="28" angle="90" scale_y="2"/>
                 </key>
                 <key id="3" time="167" spin="0">
-                    <object folder="2" file="0" x="-10" angle="90"/>
+                    <object folder="2" file="0" x="28" angle="90" scale_y="2"/>
                 </key>
             </timeline>
         </animation>
-        <animation id="17" name="shoot2" length="167" interval="100">
+        <animation id="10" name="shoot2" length="167" interval="100">
             <mainline>
                 <key id="0">
                     <object_ref id="0" timeline="0" key="0" z_index="0"/>
@@ -284,7 +200,7 @@
                     <object_ref id="0" timeline="0" key="1" z_index="0"/>
                     <object_ref id="1" timeline="1" key="1" z_index="1"/>
                 </key>
-                <key id="2" time="120">
+                <key id="2" time="160">
                     <object_ref id="0" timeline="0" key="2" z_index="0"/>
                     <object_ref id="1" timeline="1" key="2" z_index="1"/>
                 </key>
@@ -300,7 +216,7 @@
                 <key id="1" time="14" spin="0">
                     <object folder="1" file="0" y="65" angle="0" scale_x="1.2" scale_y="1.2"/>
                 </key>
-                <key id="2" time="120" spin="0">
+                <key id="2" time="160" spin="0">
                     <object folder="1" file="0" y="65" angle="0" scale_x="1.2" scale_y="1.2"/>
                 </key>
                 <key id="3" time="167" spin="0">
@@ -314,11 +230,11 @@
                 <key id="1" time="14" spin="0">
                     <object folder="2" file="0" y="77.64548" angle="0" scale_x="0.1" scale_y="1.2"/>
                 </key>
-                <key id="2" time="120" spin="0">
-                    <object folder="2" file="0" y="77.64548" angle="0" scale_x="1.2" scale_y="1.5"/>
+                <key id="2" time="160" spin="0">
+                    <object folder="2" file="0" y="37.64548" angle="0" scale_x="1.2" scale_y="2.2"/>
                 </key>
                 <key id="3" time="167" spin="0">
-                    <object folder="2" file="0" y="77.64548" angle="0" scale_x="1.2" scale_y="1.5"/>
+                    <object folder="2" file="0" y="37.64548" angle="0" scale_x="1.2" scale_y="2.2"/>
                 </key>
             </timeline>
         </animation>

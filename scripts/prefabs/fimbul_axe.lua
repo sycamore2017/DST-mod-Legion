@@ -33,6 +33,8 @@ end
 
 local function OnDropped(inst)
     inst.AnimState:PlayAnimation("idle")
+    inst.components.inventoryitem.pushlandedevents = true
+    inst:PushEvent("on_landed")
 end
 
 local function OnUnequip(inst, owner)
@@ -45,6 +47,7 @@ local function OnThrown(inst, owner, target)
         owner.SoundEmitter:PlaySound("dontstarve/wilson/boomerang_throw")
     end
     inst.AnimState:PlayAnimation("spin_loop", true)
+    inst.components.inventoryitem.pushlandedevents = false
 end
 
 local function ReturnToOwner(inst, owner)
@@ -105,10 +108,8 @@ local function GiveSomeShock(inst, owner, target)  --击中时的特殊效果
 end
 
 local function OnHit(inst, owner, target)
-    if owner ~= target then
-        GiveSomeShock(inst, owner, target)
-        DelayReturnToOwner(inst, owner)
-    end
+    GiveSomeShock(inst, owner, target)
+    DelayReturnToOwner(inst, owner)
 end
 
 local function OnMiss(inst, owner, target)
