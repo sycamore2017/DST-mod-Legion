@@ -112,6 +112,34 @@ local function OnMiss(inst, owner, target)
     OnDropped(inst)
 end
 
+local function ReticuleTargetFn()
+    return Vector3(ThePlayer.entity:LocalToWorldSpace(6.5, 0, 0))
+end
+local function ReticuleMouseTargetFn(inst, mousepos)
+    if mousepos ~= nil then
+        local x, y, z = inst.Transform:GetWorldPosition()
+        local dx = mousepos.x - x
+        local dz = mousepos.z - z
+        local l = dx * dx + dz * dz
+        if l <= 0 then
+            return inst.components.reticule.targetpos
+        end
+        l = 6.5 / math.sqrt(l)
+        return Vector3(x + dx * l, 0, z + dz * l)
+    end
+end
+local function ReticuleUpdatePositionFn(inst, pos, reticule, ease, smoothing, dt)
+    local x, y, z = inst.Transform:GetWorldPosition()
+    reticule.Transform:SetPosition(x, 0, z)
+    local rot = -math.atan2(pos.z - z, pos.x - x) / DEGREES
+    if ease and dt ~= nil then
+        local rot0 = reticule.Transform:GetRotation()
+        local drot = rot - rot0
+        rot = Lerp((drot > 180 and rot0 + 360) or (drot < -180 and rot0 - 360) or rot0, rot, dt * smoothing)
+    end
+    reticule.Transform:SetRotation(rot)
+end
+
 local function MakeWeapon(data)
     table.insert(prefs, Prefab(
         data.name,
@@ -126,19 +154,31 @@ local function MakeWeapon(data)
             MakeInventoryPhysics(inst)
             RemovePhysicsColliders(inst)
 
-            inst:AddTag("thrown")
+            inst:AddTag("sharp")
+            inst:AddTag("skill_throw")
 
             --weapon (from weapon component) added to pristine state for optimization
             inst:AddTag("weapon")
-
-            --projectile (from projectile component) added to pristine state for optimization
-            inst:AddTag("projectile")
 
             inst.AnimState:SetBank(data.name)
             inst.AnimState:SetBuild(data.name)
             inst.AnimState:PlayAnimation("item", false)
             -- inst.Transform:SetEightFaced()
             -- inst.AnimState:SetRayTestOnBB(true)
+
+            inst:AddComponent("aoetargeting")
+            inst.components.aoetargeting:SetAlwaysValid(true)
+            inst.components.aoetargeting.reticule.reticuleprefab = "reticulelongmulti"
+            inst.components.aoetargeting.reticule.pingprefab = "reticulelongmultiping"
+            inst.components.aoetargeting.reticule.targetfn = ReticuleTargetFn
+            inst.components.aoetargeting.reticule.mousetargetfn = ReticuleMouseTargetFn
+            inst.components.aoetargeting.reticule.updatepositionfn = ReticuleUpdatePositionFn
+            inst.components.aoetargeting.reticule.validcolour = { 117/255, 1, 1, 1 }
+            inst.components.aoetargeting.reticule.invalidcolour = { 0, 72/255, 72/255, 1 }
+            inst.components.aoetargeting.reticule.ease = true
+            inst.components.aoetargeting.reticule.mouseenabled = true
+
+            inst.projectiledelay = 4 * FRAMES
 
             if data.fn_common ~= nil then
                 data.fn_common(inst)
@@ -168,6 +208,11 @@ local function MakeWeapon(data)
             inst.components.projectile:SetOnThrownFn(OnThrown)
             inst.components.projectile:SetOnHitFn(OnHit)
             inst.components.projectile:SetOnMissFn(OnMiss)
+
+            inst:AddComponent("skillspelllegion")
+	        inst.components.skillspelllegion.fn_spell = function(inst, caster, pos, options)
+                --取下羽毛，丢出
+            end
 
             MakeHauntableLaunch(inst)
 
@@ -266,7 +311,10 @@ MakeWeapon({
         Asset("ATLAS", "images/inventoryimages/siving_feather_real.xml"),
         Asset("IMAGE", "images/inventoryimages/siving_feather_real.tex"),
     },
-    prefabs = nil,
+    prefabs = {
+        "reticulelongmulti",
+        "reticulelongmultiping"
+    },
     fn_common = function(inst)
         
     end,

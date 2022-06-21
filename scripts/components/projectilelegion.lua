@@ -4,6 +4,11 @@ local ProjectileLegion = Class(function(self, inst)
 	self.bulletradius = 2.5 --子弹半径(影响击中的最小距离)
 	self.speed = 20 --抛射速度
 	self.stimuli = nil
+	self.hittargets = {} --把已经被攻击过的对象记下来，防止重复攻击
+	self.exclude_tags = { "INLIMBO", "wall" }
+	if not TheNet:GetPVPEnabled() then
+		table.insert(self.exclude_tags, "player")
+	end
 
 	self.onthrown = nil
 	self.onprehit = nil
@@ -47,6 +52,7 @@ function ProjectileLegion:Stop()
     self.owner = nil
 	self.dest = nil
 	self.start = nil
+	self.hittargets = {}
 end
 
 function ProjectileLegion:Miss()
@@ -97,27 +103,31 @@ end
 
 function ProjectileLegion:OnUpdate(dt)
 	local current = self.inst:GetPosition()
-	if self.shootrange ~= nil and distsq(self.start, current) > self.shootrange*self.shootrange then
+	if self.shootrange ~= nil and distsq(self.start, current) >= self.shootrange*self.shootrange then
 		self:Miss()
 	else
-		local validtargets = {}
-		local target = nil
 		local x, y, z = current:Get()
-		local ents = TheSim:FindEntities(x, y, z, 3, nil, COMMON_FNS.GetPlayerExcludeTags(self.attacker))
+		local ents = TheSim:FindEntities(x, y, z, 7, { "_combat" }, self.exclude_tags)
 		for _,ent in ipairs(ents) do
-			if ent.entity:IsValid() and ent.entity:IsVisible() and ent.components.health and not ent.components.health:IsDead() then
-				local hitrange = ent:GetPhysicsRadius(0) + self.hitdist
-				local currentrange = distsq(current, ent:GetPosition())
-				if hitrange > currentrange then table.insert(validtargets, {target = ent, hitrange = hitrange, currentrange = currentrange}) end
+			if
+				ent ~= self.attacker and not self.hittargets[ent] and ent.entity:IsVisible() and --有效
+				ent.components.health ~= nil and not ent.components.health:IsDead() and --还活着
+				( --sg非无敌状态
+					ent.sg == nil or
+					not (ent.sg:HasStateTag("flight") or ent.sg:HasStateTag("invisible"))
+				) and
+				(self.bulletradius+ent:GetPhysicsRadius(0))^2 >= distsq(current, ent:GetPosition()) and --范围内
+				(
+					(ent.components.combat ~= nil and ent.components.combat.target == self.attacker) or
+					(
+						(ent.components.domesticatable == nil or not ent.components.domesticatable:IsDomesticated()) and
+						(self.attacker.components.leader == nil or not self.attacker.components.leader:IsFollower(ent))
+					)
+				)
+			then
+				self:Hit(ent)
+				self.hittargets[ent] = true
 			end
-		end
-		for _,data in pairs(validtargets) do
-			if target == nil or data.currentrange - data.hitrange < target.range then
-				target = {ent = data.target, range = data.currentrange - data.hitrange}
-			end
-		end
-		if target ~= nil then
-			self:Hit(target.ent)
 		end
 	end
 end
@@ -126,8 +136,7 @@ local function OnShow(inst, self)
     self.delaytask = nil
     inst:Show()
 end
-
-function AimedProjectile:DelayVisibility(duration)
+function ProjectileLegion:DelayVisibility(duration)
     if self.delaytask ~= nil then
         self.delaytask:Cancel()
     end
@@ -135,4 +144,4 @@ function AimedProjectile:DelayVisibility(duration)
     self.delaytask = self.inst:DoTaskInTime(duration, OnShow, self)
 end
 
-return AimedProjectile
+return ProjectileLegion
