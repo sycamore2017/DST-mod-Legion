@@ -1309,7 +1309,6 @@ AddStategraphState("wilson", State{
         end
     end,
 })
-
 AddStategraphState("wilson_client", State{
     name = "atk_shield_l",
     tags = { "atk_shield", "notalking", "abouttoattack" },
@@ -1554,6 +1553,182 @@ if TUNING.LEGION_FLASHANDCRUSH or CONFIGS_LEGION.LEGENDOFFALL then
         for _,fn in ipairs(CA_U_INVENTORYITEM_L) do
             if fn(inst, doer, target, actions, right) then
                 return
+            end
+        end
+    end)
+end
+
+--------------------------------------------------------------------------
+--[[ 武器技能 ]]
+--------------------------------------------------------------------------
+
+if CONFIGS_LEGION.LEGENDOFFALL then
+    AddStategraphState("wilson", State{
+        name = "skill_l_throw",
+        tags = { "doing", "busy", "nointerrupt", "nomorph" },
+
+        onenter = function(inst)
+            local buffaction = inst:GetBufferedAction()
+            local equip = inst.components.inventory:GetEquippedItem(EQUIPSLOTS.HANDS)
+            inst.components.locomotor:Stop()
+            inst.AnimState:PlayAnimation("atk_pre")
+
+            if buffaction ~= nil and buffaction.pos ~= nil then
+                inst:ForceFacePoint(buffaction:GetActionPoint():Get())
+            end
+
+            if (equip ~= nil and equip.projectiledelay or 0) > 0 then
+                --V2C: Projectiles don't show in the initial delayed frames so that
+                --     when they do appear, they're already in front of the player.
+                --     Start the attack early to keep animation in sync.
+                inst.sg.statemem.projectiledelay = 7 * FRAMES - equip.projectiledelay
+                if inst.sg.statemem.projectiledelay <= 0 then
+                    inst.sg.statemem.projectiledelay = nil
+                end
+            end
+
+            inst.SoundEmitter:PlaySound("dontstarve/wilson/attack_weapon")
+        end,
+
+        onupdate = function(inst, dt)
+            if (inst.sg.statemem.projectiledelay or 0) > 0 then
+                inst.sg.statemem.projectiledelay = inst.sg.statemem.projectiledelay - dt
+                if inst.sg.statemem.projectiledelay <= 0 then
+                    inst.sg:RemoveStateTag("nointerrupt")
+                    inst:PerformBufferedAction()
+                end
+            end
+        end,
+
+        timeline = {
+            TimeEvent(7 * FRAMES, function(inst)
+                if inst.sg.statemem.projectiledelay == nil then
+                    inst.sg:RemoveStateTag("nointerrupt")
+                    inst:PerformBufferedAction()
+                end
+            end),
+            TimeEvent(18 * FRAMES, function(inst)
+                inst.sg:GoToState("idle", true)
+            end),
+        },
+
+        events = {
+            EventHandler("animover", function(inst)
+                if inst.AnimState:AnimDone() then
+                    if inst.AnimState:IsCurrentAnimation("atk_pre") then
+                        inst.AnimState:PlayAnimation("throw")
+                        inst.AnimState:SetTime(6 * FRAMES)
+                    else
+                        inst.sg:GoToState("idle")
+                    end
+                end
+            end),
+        },
+
+        -- onexit = function(inst) end,
+    })
+    AddStategraphState("wilson_client", State{
+        name = "skill_l_throw",
+        tags = { "doing", "busy", "nointerrupt" },
+
+        onenter = function(inst)
+            inst.components.locomotor:Stop()
+            inst.AnimState:PlayAnimation("atk_pre")
+            inst.AnimState:PushAnimation("atk_lag", false)
+
+            local buffaction = inst:GetBufferedAction()
+            if buffaction ~= nil then
+                inst:PerformPreviewBufferedAction()
+
+                if buffaction.pos ~= nil then
+                    inst:ForceFacePoint(buffaction:GetActionPoint():Get())
+                end
+            end
+
+            inst.sg:SetTimeout(2)
+        end,
+
+        onupdate = function(inst)
+            if inst:HasTag("doing") then
+                if inst.entity:FlattenMovementPrediction() then
+                    inst.sg:GoToState("idle", "noanim")
+                end
+            elseif inst.bufferedaction == nil then
+                inst.sg:GoToState("idle")
+            end
+        end,
+
+        ontimeout = function(inst)
+            inst:ClearBufferedAction()
+            inst.sg:GoToState("idle")
+        end,
+    })
+
+    ACTIONS.CASTAOE.priority = -5
+    ACTIONS.CASTAOE.mount_valid = true
+    local CASTAOE_old = ACTIONS.CASTAOE.fn
+    ACTIONS.CASTAOE.fn = function(act)
+        local act_pos = act:GetActionPoint()
+        if
+            act.invobject ~= nil and
+            act.invobject.components.skillspelllegion ~= nil and
+            act.invobject.components.skillspelllegion:CanCast(act.doer, act_pos)
+        then
+            act.invobject.components.skillspelllegion:CastSpell(act.doer, act_pos)
+            return true
+        end
+        return CASTAOE_old(act)
+    end
+
+    AddComponentAction("POINT", "skillspelllegion", function(inst, doer, pos, actions, right)
+        if
+            right and
+            (inst.components.aoetargeting == nil or inst.components.aoetargeting:IsEnabled()) and
+            (
+                inst.components.aoetargeting ~= nil and inst.components.aoetargeting.alwaysvalid or
+                (TheWorld.Map:IsAboveGroundAtPoint(pos:Get()) and not TheWorld.Map:IsGroundTargetBlocked(pos))
+            )
+        then
+            table.insert(actions, ACTIONS.CASTAOE)
+        end
+    end)
+
+    --给动作sg响应加入特殊动画
+    AddStategraphPostInit("wilson", function(sg)
+        for k, v in pairs(sg.actionhandlers) do
+            if v["action"]["id"] == "CASTAOE" then
+                local deststate_old = v.deststate
+                v.deststate = function(inst, action)
+                    if action.invobject ~= nil then
+                        if action.invobject:HasTag("skill_feather") then
+                            if not inst.sg:HasStateTag("busy") and not inst:HasTag("busy") then
+                                return "skill_l_throw"
+                            end
+                            return --进入这层后就不能执行原版逻辑了
+                        end
+                    end
+                    return deststate_old(inst, action)
+                end
+                break
+            end
+        end
+    end)
+    AddStategraphPostInit("wilson_client", function(sg)
+        for k, v in pairs(sg.actionhandlers) do
+            if v["action"]["id"] == "CASTAOE" then
+                local deststate_old = v.deststate
+                v.deststate = function(inst, action)
+                    if action.invobject ~= nil then
+                        if action.invobject:HasTag("skill_feather") then
+                            if not inst.sg:HasStateTag("busy") and not inst:HasTag("busy") then
+                                return "skill_l_throw"
+                            end
+                            return --进入这层后就不能执行原版逻辑了
+                        end
+                    end
+                    return deststate_old(inst, action)
+                end
+                break
             end
         end
     end)

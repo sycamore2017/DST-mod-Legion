@@ -2479,6 +2479,44 @@ S_____WORMWOOD.DESCRIBE.SIVING_TURN = {
 -- S_______WALTER.DESCRIBE.SIVING_TURN = ""
 -- S________WANDA.DESCRIBE.SIVING_TURN = ""
 
+S_NAMES.SIVING_FEATHER_REAL = "Main Siving Feather" --子圭玄鸟正羽
+S______GENERIC.DESCRIBE.SIVING_FEATHER_REAL = "I can't wait to pierce something."
+S_______WILLOW.DESCRIBE.SIVING_FEATHER_REAL = "Feather split!"
+S_____WOLFGANG.DESCRIBE.SIVING_FEATHER_REAL = "Sharp fly-cutter."
+S________WENDY.DESCRIBE.SIVING_FEATHER_REAL = "So sharp that it will scratch my hand."
+-- S_________WX78.DESCRIBE.SIVING_FEATHER_REAL = ""
+S_WICKERBOTTOM.DESCRIBE.SIVING_FEATHER_REAL = "With rock texture, it's sharper than it looks."
+-- S_______WOODIE.DESCRIBE.SIVING_FEATHER_REAL = ""
+-- S______WAXWELL.DESCRIBE.SIVING_FEATHER_REAL = ""
+S___WATHGRITHR.DESCRIBE.SIVING_FEATHER_REAL = "A thousand cuts is just a prelude."
+S_______WEBBER.DESCRIBE.SIVING_FEATHER_REAL = "Do you want to do it?!"
+-- S_______WINONA.DESCRIBE.SIVING_FEATHER_REAL = ""
+S_______WORTOX.DESCRIBE.SIVING_FEATHER_REAL = "It will eat away at my soul, not easy to use."
+-- S_____WORMWOOD.DESCRIBE.SIVING_FEATHER_REAL = ""
+S________WARLY.DESCRIBE.SIVING_FEATHER_REAL = "Yes, I'll cut them into thin shreds!"
+-- S_________WURT.DESCRIBE.SIVING_FEATHER_REAL = ""
+S_______WALTER.DESCRIBE.SIVING_FEATHER_REAL = "Better than my slingshot."
+S________WANDA.DESCRIBE.SIVING_FEATHER_REAL = "I wish it could cut off my nightmare."
+
+S_NAMES.SIVING_FEATHER_FAKE = "Siving Feather" --子圭玄鸟绒羽
+S______GENERIC.DESCRIBE.SIVING_FEATHER_FAKE = "I'm going to slap people! Each of you!"
+S_______WILLOW.DESCRIBE.SIVING_FEATHER_FAKE = "Feather throw!"
+S_____WOLFGANG.DESCRIBE.SIVING_FEATHER_FAKE = "A throwing knife that is not very sharp."
+-- S________WENDY.DESCRIBE.SIVING_FEATHER_FAKE = ""
+-- S_________WX78.DESCRIBE.SIVING_FEATHER_FAKE = ""
+-- S_WICKERBOTTOM.DESCRIBE.SIVING_FEATHER_FAKE = ""
+-- S_______WOODIE.DESCRIBE.SIVING_FEATHER_FAKE = ""
+S______WAXWELL.DESCRIBE.SIVING_FEATHER_FAKE = "As wild as magic!"
+S___WATHGRITHR.DESCRIBE.SIVING_FEATHER_FAKE = "Can it be called a party without a fight?"
+S_______WEBBER.DESCRIBE.SIVING_FEATHER_FAKE = "Better than toy darts."
+-- S_______WINONA.DESCRIBE.SIVING_FEATHER_FAKE = ""
+S_______WORTOX.DESCRIBE.SIVING_FEATHER_FAKE = "I'd love to try it out and see who's faster."
+-- S_____WORMWOOD.DESCRIBE.SIVING_FEATHER_FAKE = ""
+-- S________WARLY.DESCRIBE.SIVING_FEATHER_FAKE = ""
+-- S_________WURT.DESCRIBE.SIVING_FEATHER_FAKE = ""
+S_______WALTER.DESCRIBE.SIVING_FEATHER_FAKE = "Fun, I want to have some fun, now!"
+-- S________WANDA.DESCRIBE.SIVING_FEATHER_FAKE = ""
+
 --------------------------------------------------------------------------
 --[[ flash and crush ]]--[[ 电闪雷鸣 ]]
 --------------------------------------------------------------------------
@@ -3453,3 +3491,6 @@ S________WARLY.ACTIONFAIL.FEED_BEEF_L = S________WARLY.ACTIONFAIL.GIVE
 S_________WURT.ACTIONFAIL.FEED_BEEF_L = S_________WURT.ACTIONFAIL.GIVE
 S_______WALTER.ACTIONFAIL.FEED_BEEF_L = S_______WALTER.ACTIONFAIL.GIVE
 S________WANDA.ACTIONFAIL.FEED_BEEF_L = S________WANDA.ACTIONFAIL.GIVE
+
+STRINGS.ACTIONS.CASTAOE.SIVING_FEATHER_REAL = "Feather Split"
+STRINGS.ACTIONS.CASTAOE.SIVING_FEATHER_FAKE = "Feather Throw"

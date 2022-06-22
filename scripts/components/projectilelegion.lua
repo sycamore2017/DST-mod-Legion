@@ -1,7 +1,7 @@
 local ProjectileLegion = Class(function(self, inst)
     self.inst = inst
 	self.shootrange = nil --最远抛射距离
-	self.bulletradius = 2.5 --子弹半径(影响击中的最小距离)
+	self.bulletradius = 1.5 --子弹半径(影响击中的最小距离)
 	self.speed = 20 --抛射速度
 	self.stimuli = nil
 	self.hittargets = {} --把已经被攻击过的对象记下来，防止重复攻击
@@ -16,14 +16,16 @@ local ProjectileLegion = Class(function(self, inst)
     self.onmiss = nil
 end)
 
-function ProjectileLegion:RotateToTarget(dest)
-	local direction = (dest - self.inst:GetPosition()):GetNormalized()
-    local angle = math.acos(direction:Dot(Vector3(1, 0, 0))) / DEGREES
+function ProjectileLegion:RotateToTarget(dest, angle)
+	if angle == nil then
+		local direction = (dest - self.inst:GetPosition()):GetNormalized()
+    	angle = math.acos(direction:Dot(Vector3(1, 0, 0))) / DEGREES
+	end
     self.inst.Transform:SetRotation(angle)
     self.inst:FacePoint(dest)
 end
 
-function ProjectileLegion:Throw(owner, targetpos, attacker)
+function ProjectileLegion:Throw(owner, targetpos, attacker, angle)
 	self.owner = owner --由武器产生的投射物，或者本身就是个远程投射物
 	self.attacker = attacker --真正发起攻击的对象
 	self.start = owner:GetPosition()
@@ -36,16 +38,17 @@ function ProjectileLegion:Throw(owner, targetpos, attacker)
 	end
 
 	self.inst.Physics:ClearCollidesWith(COLLISION.LIMITS)
-	self:RotateToTarget(self.dest)
+	self:RotateToTarget(self.dest, angle)
 	self.inst.Physics:SetMotorVel(self.speed, 0, 0)
 	self.inst:StartUpdatingComponent(self)
-	self.inst:PushEvent("onthrown", { thrower = attacker or owner, dest = targetpos })
+	self.inst:PushEvent("onthrown", { thrower = attacker, dest = targetpos })
 	if self.onthrown ~= nil then
 		self.onthrown(self.inst, owner, targetpos, attacker)
 	end
 end
 
 function ProjectileLegion:Stop()
+	self.inst.Physics:Stop()
 	self.inst.Physics:CollidesWith(COLLISION.LIMITS)
     self.inst:StopUpdatingComponent(self)
 	self.attacker = nil
@@ -103,32 +106,33 @@ end
 
 function ProjectileLegion:OnUpdate(dt)
 	local current = self.inst:GetPosition()
+
+	local x, y, z = current:Get()
+	local ents = TheSim:FindEntities(x, y, z, 7, { "_combat" }, self.exclude_tags)
+	for _,ent in ipairs(ents) do
+		if
+			ent ~= self.attacker and not self.hittargets[ent] and ent.entity:IsVisible() and --有效
+			ent.components.health ~= nil and not ent.components.health:IsDead() and --还活着
+			( --sg非无敌状态
+				ent.sg == nil or
+				not (ent.sg:HasStateTag("flight") or ent.sg:HasStateTag("invisible"))
+			) and
+			(self.bulletradius+ent:GetPhysicsRadius(0))^2 >= distsq(current, ent:GetPosition()) and --范围内
+			(
+				(ent.components.combat ~= nil and ent.components.combat.target == self.attacker) or
+				(
+					(ent.components.domesticatable == nil or not ent.components.domesticatable:IsDomesticated()) and
+					(self.attacker.components.leader == nil or not self.attacker.components.leader:IsFollower(ent))
+				)
+			)
+		then
+			self:Hit(ent)
+			self.hittargets[ent] = true
+		end
+	end
+
 	if self.shootrange ~= nil and distsq(self.start, current) >= self.shootrange*self.shootrange then
 		self:Miss()
-	else
-		local x, y, z = current:Get()
-		local ents = TheSim:FindEntities(x, y, z, 7, { "_combat" }, self.exclude_tags)
-		for _,ent in ipairs(ents) do
-			if
-				ent ~= self.attacker and not self.hittargets[ent] and ent.entity:IsVisible() and --有效
-				ent.components.health ~= nil and not ent.components.health:IsDead() and --还活着
-				( --sg非无敌状态
-					ent.sg == nil or
-					not (ent.sg:HasStateTag("flight") or ent.sg:HasStateTag("invisible"))
-				) and
-				(self.bulletradius+ent:GetPhysicsRadius(0))^2 >= distsq(current, ent:GetPosition()) and --范围内
-				(
-					(ent.components.combat ~= nil and ent.components.combat.target == self.attacker) or
-					(
-						(ent.components.domesticatable == nil or not ent.components.domesticatable:IsDomesticated()) and
-						(self.attacker.components.leader == nil or not self.attacker.components.leader:IsFollower(ent))
-					)
-				)
-			then
-				self:Hit(ent)
-				self.hittargets[ent] = true
-			end
-		end
 	end
 end
 

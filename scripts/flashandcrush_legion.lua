@@ -1075,15 +1075,6 @@ PICKUP_CONTRACTS.fn = function(act)
 end
 AddAction(PICKUP_CONTRACTS)
 
-AddComponentAction("SCENE", "inventoryitem", function(inst, doer, actions, right)
-    if
-        doer.replica.inventory ~= nil and doer.replica.inventory:GetNumSlots() > 0 and
-        not right
-    then
-        table.insert(actions, ACTIONS.PICKUP_CONTRACTS)
-    end
-end)
-
 AddStategraphActionHandler("wilson", ActionHandler(ACTIONS.PICKUP_CONTRACTS, function(inst, action)
     return (inst.components.rider ~= nil and inst.components.rider:IsRiding()) and "domediumaction" or "doshortaction"
 end))
@@ -1122,6 +1113,8 @@ AddAction(EXSTAY_CONTRACTS)
 AddComponentAction("SCENE", "soulcontracts", function(inst, doer, actions, right)
     if right then
         table.insert(actions, ACTIONS.EXSTAY_CONTRACTS)
+    elseif doer.replica.inventory ~= nil and doer.replica.inventory:GetNumSlots() > 0 then
+        table.insert(actions, ACTIONS.PICKUP_CONTRACTS)
     end
 end)
 

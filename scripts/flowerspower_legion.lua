@@ -143,15 +143,6 @@ end
 --[[ 青枝绿叶的修改 ]]
 --------------------------------------------------------------------------
 
---入鞘，修改给予动作的名称
-local give_strfn_old = ACTIONS.GIVE.strfn
-ACTIONS.GIVE.strfn = function(act)
-    if act.target ~= nil and act.target:HasTag("swordscabbard") then
-        return "SCABBARD"
-    end
-    return give_strfn_old(act)
-end
-
 --给给予动作加入短动画
 AddStategraphPostInit("wilson", function(sg)
     for k, v in pairs(sg.actionhandlers) do

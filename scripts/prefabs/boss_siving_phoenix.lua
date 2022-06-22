@@ -97,18 +97,17 @@ local function OnDropped(inst)
     inst.AnimState:SetOrientation(ANIM_ORIENTATION.Default)
     inst.AnimState:PlayAnimation("item", false)
     inst.components.inventoryitem.pushlandedevents = true
+    inst.components.inventoryitem.canbepickedup = true
     inst:PushEvent("on_landed")
 end
-local function OnThrown(inst, owner, target, attacker)
+local function OnThrown(inst, owner, targetpos, attacker)
     inst.AnimState:SetOrientation(ANIM_ORIENTATION.OnGround)
     inst.AnimState:PlayAnimation("shoot", false)
     inst.components.inventoryitem.pushlandedevents = false
+    inst.components.inventoryitem.canbepickedup = false
     --undo 声音
 end
-local function OnHit(inst, owner, target)
-    OnDropped(inst)
-end
-local function OnMiss(inst, owner, target)
+local function OnMiss(inst, pos, attacker)
     OnDropped(inst)
 end
 
@@ -155,7 +154,7 @@ local function MakeWeapon(data)
             RemovePhysicsColliders(inst)
 
             inst:AddTag("sharp")
-            inst:AddTag("skill_throw")
+            inst:AddTag("skill_feather")
 
             --weapon (from weapon component) added to pristine state for optimization
             inst:AddTag("weapon")
@@ -164,7 +163,6 @@ local function MakeWeapon(data)
             inst.AnimState:SetBuild(data.name)
             inst.AnimState:PlayAnimation("item", false)
             -- inst.Transform:SetEightFaced()
-            -- inst.AnimState:SetRayTestOnBB(true)
 
             inst:AddComponent("aoetargeting")
             inst.components.aoetargeting:SetAlwaysValid(true)
@@ -179,6 +177,8 @@ local function MakeWeapon(data)
             inst.components.aoetargeting.reticule.mouseenabled = true
 
             inst.projectiledelay = 4 * FRAMES
+
+            MakeInventoryFloatable(inst, "small", 0.2, 0.6)
 
             if data.fn_common ~= nil then
                 data.fn_common(inst)
@@ -201,18 +201,15 @@ local function MakeWeapon(data)
             inst.components.equippable:SetOnUnequip(OnUnequip)
 
             inst:AddComponent("weapon")
-            inst.components.weapon:SetRange(12, 14)
+            inst.components.weapon:SetRange(-1, -1) --人物默认攻击距离为3、3
 
             inst:AddComponent("projectilelegion")
-            inst.components.projectile:SetSpeed(45)
-            inst.components.projectile:SetOnThrownFn(OnThrown)
-            inst.components.projectile:SetOnHitFn(OnHit)
-            inst.components.projectile:SetOnMissFn(OnMiss)
+            inst.components.projectilelegion.shootrange = 13
+            inst.components.projectilelegion.speed = 45
+            inst.components.projectilelegion.onthrown = OnThrown
+            inst.components.projectilelegion.onmiss = OnMiss
 
             inst:AddComponent("skillspelllegion")
-	        inst.components.skillspelllegion.fn_spell = function(inst, caster, pos, options)
-                --取下羽毛，丢出
-            end
 
             MakeHauntableLaunch(inst)
 
@@ -315,14 +312,65 @@ MakeWeapon({
         "reticulelongmulti",
         "reticulelongmultiping"
     },
-    fn_common = function(inst)
-        
-    end,
+    -- fn_common = function(inst) end,
     fn_server = function(inst)
+        inst.components.equippable.equipstack = true --装备时可以叠加装备
+
         inst.components.weapon:SetDamage(61.2) --34*1.8
 
         inst:AddComponent("stackable")
         inst.components.stackable.maxsize = TUNING.STACK_SIZE_MEDITEM
+
+        inst.components.skillspelllegion.fn_spell = function(inst, caster, pos, options)
+            if caster.components.inventory then
+                local doerpos = caster:GetPosition()
+                local items = inst.components.stackable:Get(5)
+                items = caster.components.inventory:DropItem(items, true)
+
+                local angles = {}
+                local poss = {}
+                local num = items.components.stackable:StackSize() or 1
+                local direction = (pos - doerpos):GetNormalized() --单位向量
+    	        local angle = math.acos(direction:Dot(Vector3(1, 0, 0))) / DEGREES --这个角度是动画的，不能用来做物理的角度
+                local ang_lag = 2.5
+
+                if num == 1 then
+                    angles = { 0 }
+                    poss[1] = pos
+                else
+                    if num == 2 then
+                        angles = { -ang_lag, ang_lag }
+                    elseif num == 3 then
+                        angles = { -2*ang_lag, 0, 2*ang_lag }
+                    elseif num == 4 then
+                        angles = { -3*ang_lag, -ang_lag, ang_lag, 3*ang_lag }
+                    elseif num == 5 then
+                        angles = { -4*ang_lag, -2*ang_lag, 0, 2*ang_lag, 4*ang_lag }
+                    end
+
+                    local ang = caster:GetAngleToPoint(pos.x, pos.y, pos.z) --原始角度，单位:度，比如33
+                    for i,v in ipairs(angles) do
+                        v = v + math.random()*2 - 1
+                        angles[i] = v
+                        local an = (ang+v)*DEGREES
+                        poss[i] = Vector3(doerpos.x+math.cos(an), 0, doerpos.z-math.sin(an))
+                    end
+                end
+
+                for i,v in ipairs(angles) do
+                    local item = items.components.stackable:Get()
+                    item.Transform:SetPosition(doerpos:Get())
+                    item.components.projectilelegion:Throw(inst, poss[i], caster, angle+v)
+                    item.components.projectilelegion:DelayVisibility(inst.projectiledelay)
+                end
+
+                if caster.components.health ~= nil and not caster.components.health:IsDead() then
+                    caster.components.health:DoDelta(-3*num, true, "siving_feather_real", false, nil, true)
+                end
+
+                return true
+            end
+        end
     end
 })
 
