@@ -107,51 +107,30 @@ local function OnThrown(inst, owner, targetpos, attacker)
     inst.components.inventoryitem.canbepickedup = false
     --undo 声音
 end
-
-local function CheckPulling(doer)
-    if doer.task_checkpull == nil and doer.shootingmap_l ~= nil then
-        local finished = true
-        for _,v in ipairs(doer.shootingmap_l) do
-            if v and v:IsValid() then
-                if not v.shootingstate_l then
-                    finished = false
-                    break
-                end
-            end
-        end
-        if finished then
-            print("---成功了")
-            --undo 先检查物品栏是否有所需道具才能拉回
-            doer:AddTag("skill_feather")
-            doer.task_checkpull = doer:DoTaskInTime(3, function()
-                doer.task_checkpull = nil
-                doer:RemoveTag("skill_feather")
-                doer.shootingmap_l = nil
-                print("---结束了")
-            end)
-        else
-            doer.task_checkpull = doer:DoTaskInTime(0, function()
-                doer.task_checkpull = nil
-                CheckPulling(doer)
-            end)
-        end
-    end
-end
 local function OnMiss(inst, pos, attacker)
     if inst.components.projectilelegion.isgoback then
         inst.components.projectilelegion.isgoback = nil
-        if attacker.components.inventory ~= nil then
-            if not attacker.components.inventory:Equip(inst) then
-                attacker.components.inventory:GiveItem(inst)
+        if attacker and attacker.sivfeathers_l ~= nil then
+            local num = 0
+            for _,v in ipairs(attacker.sivfeathers_l) do
+                if v and not v.isbroken then
+                    num = num + 1
+                end
             end
-        else
-            OnDropped(inst)
+            attacker.sivfeathers_l = nil
+            if num > 0 then
+                if num > 1 then
+                    inst.components.finiteuses:SetUses(num)
+                end
+                inst.components.inventoryitem.canbepickedup = true
+                if not attacker.components.inventory:Equip(inst) then
+                    attacker.components.inventory:GiveItem(inst)
+                end
+                return
+            end
         end
+        inst:Remove()
     else
-        inst.shootingstate_l = true
-        if attacker then
-            CheckPulling(attacker)
-        end
         OnDropped(inst)
     end
 end
@@ -182,6 +161,16 @@ local function ReticuleUpdatePositionFn(inst, pos, reticule, ease, smoothing, dt
         rot = Lerp((drot > 180 and rot0 + 360) or (drot < -180 and rot0 - 360) or rot0, rot, dt * smoothing)
     end
     reticule.Transform:SetRotation(rot)
+end
+
+local function PercentChanged(inst, data)
+    if data.percent ~= nil then
+        if data.percent <= 0.2 then
+            inst:RemoveTag("union_l")
+        else
+            inst:AddTag("union_l")
+        end
+    end
 end
 
 local function MakeWeapon(data)
@@ -221,7 +210,7 @@ local function MakeWeapon(data)
             inst.components.aoetargeting.reticule.ease = true
             inst.components.aoetargeting.reticule.mouseenabled = true
 
-            inst.projectiledelay = 4 * FRAMES
+            inst.projectiledelay = 2 * FRAMES
 
             MakeInventoryFloatable(inst, "small", 0.2, 0.6)
 
@@ -244,9 +233,19 @@ local function MakeWeapon(data)
             inst:AddComponent("equippable")
             inst.components.equippable:SetOnEquip(OnEquip)
             inst.components.equippable:SetOnUnequip(OnUnequip)
+            -- inst.components.equippable.equipstack = true --装备时可以叠加装备
 
             inst:AddComponent("weapon")
             inst.components.weapon:SetRange(-1, -1) --人物默认攻击距离为3、3
+
+            inst:AddComponent("finiteuses")
+            inst.components.finiteuses:SetMaxUses(5)
+            inst.components.finiteuses:SetUses(1)
+            inst.components.finiteuses.Use = function(self, ...) end
+            inst.components.finiteuses.SetPercent = function(self, amount)
+                self:SetUses(self.total * (math.max(amount, 0.2)))
+            end
+            inst:ListenForEvent("percentusedchange", PercentChanged)
 
             inst:AddComponent("projectilelegion")
             inst.components.projectilelegion.shootrange = 13
@@ -255,6 +254,72 @@ local function MakeWeapon(data)
             inst.components.projectilelegion.onmiss = OnMiss
 
             inst:AddComponent("skillspelllegion")
+            inst.components.skillspelllegion.fn_spell = function(inst, caster, pos, options)
+                if caster.components.inventory then
+                    local doerpos = caster:GetPosition()
+                    local items = caster.components.inventory:RemoveItem(inst)
+
+                    local angles = {}
+                    local poss = {}
+                    local num = math.ceil(inst.components.finiteuses:GetUses()) or 1
+                    local direction = (pos - doerpos):GetNormalized() --单位向量
+                    local angle = math.acos(direction:Dot(Vector3(1, 0, 0))) / DEGREES --这个角度是动画的，不能用来做物理的角度
+                    local ang_lag = 2.5
+
+                    if num == 1 then
+                        angles = { 0 }
+                        poss[1] = pos
+                    else
+                        if num == 2 then
+                            angles = { -ang_lag, ang_lag }
+                        elseif num == 3 then
+                            angles = { -2*ang_lag, 0, 2*ang_lag }
+                        elseif num == 4 then
+                            angles = { -3*ang_lag, -ang_lag, ang_lag, 3*ang_lag }
+                        elseif num == 5 then
+                            angles = { -4*ang_lag, -2*ang_lag, 0, 2*ang_lag, 4*ang_lag }
+                        end
+    
+                        local ang = caster:GetAngleToPoint(pos.x, pos.y, pos.z) --原始角度，单位:度，比如33
+                        for i,v in ipairs(angles) do
+                            v = v + math.random()*2 - 1
+                            angles[i] = v
+                            local an = (ang+v)*DEGREES
+                            poss[i] = Vector3(doerpos.x+math.cos(an), 0, doerpos.z-math.sin(an))
+                        end
+                    end
+
+                    if items == inst then
+                        inst:Remove()
+                    else
+                        items:Remove()
+                        inst:Remove()
+                    end
+
+                    local feathers = {}
+                    for i,v in ipairs(angles) do
+                        local item = SpawnPrefab(data.name)
+                        item.Transform:SetPosition(doerpos:Get())
+                        feathers[i] = item
+                        item.components.projectilelegion:Throw(inst, poss[i], caster, angle+v)
+                        item.components.projectilelegion:DelayVisibility(inst.projectiledelay)
+                    end
+
+                    if caster.components.health ~= nil and not caster.components.health:IsDead() then
+                        caster.components.health:DoDelta(-3*num, true, data.name, false, nil, true)
+                        if not caster.components.health:IsDead() then
+                            --undo 如果背包里有对应材料时才产生这个
+                            local line = SpawnPrefab("siving_feather_line")
+                            caster.sivfeathers_l = feathers
+                            if not caster.components.inventory:Equip(line) then
+                                line:Remove()
+                            end
+                        end
+                    end
+
+                    return true
+                end
+            end
 
             MakeHauntableLaunch(inst)
 
@@ -355,71 +420,12 @@ MakeWeapon({
     },
     prefabs = {
         "reticulelongmulti",
-        "reticulelongmultiping"
+        "reticulelongmultiping",
+        "siving_feather_line"
     },
     -- fn_common = function(inst) end,
     fn_server = function(inst)
-        inst.components.equippable.equipstack = true --装备时可以叠加装备
-
         inst.components.weapon:SetDamage(61.2) --34*1.8
-
-        inst:AddComponent("stackable")
-        inst.components.stackable.maxsize = TUNING.STACK_SIZE_MEDITEM
-
-        inst.components.skillspelllegion.fn_spell = function(inst, caster, pos, options)
-            if caster.components.inventory then
-                local doerpos = caster:GetPosition()
-                local items = inst.components.stackable:Get(5)
-                items = caster.components.inventory:DropItem(items, true)
-
-                local angles = {}
-                local poss = {}
-                local num = items.components.stackable:StackSize() or 1
-                local direction = (pos - doerpos):GetNormalized() --单位向量
-    	        local angle = math.acos(direction:Dot(Vector3(1, 0, 0))) / DEGREES --这个角度是动画的，不能用来做物理的角度
-                local ang_lag = 2.5
-
-                if num == 1 then
-                    angles = { 0 }
-                    poss[1] = pos
-                else
-                    if num == 2 then
-                        angles = { -ang_lag, ang_lag }
-                    elseif num == 3 then
-                        angles = { -2*ang_lag, 0, 2*ang_lag }
-                    elseif num == 4 then
-                        angles = { -3*ang_lag, -ang_lag, ang_lag, 3*ang_lag }
-                    elseif num == 5 then
-                        angles = { -4*ang_lag, -2*ang_lag, 0, 2*ang_lag, 4*ang_lag }
-                    end
-
-                    local ang = caster:GetAngleToPoint(pos.x, pos.y, pos.z) --原始角度，单位:度，比如33
-                    for i,v in ipairs(angles) do
-                        v = v + math.random()*2 - 1
-                        angles[i] = v
-                        local an = (ang+v)*DEGREES
-                        poss[i] = Vector3(doerpos.x+math.cos(an), 0, doerpos.z-math.sin(an))
-                    end
-                end
-
-                caster.shootingmap_l = {}
-                for i,v in ipairs(angles) do
-                    local item = items.components.stackable:Get()
-                    item.Transform:SetPosition(doerpos:Get())
-                    caster.shootingmap_l[i] = item
-                    item.shootingstate_l = false
-                    item.components.projectilelegion.isgoback = nil
-                    item.components.projectilelegion:Throw(inst, poss[i], caster, angle+v)
-                    item.components.projectilelegion:DelayVisibility(inst.projectiledelay)
-                end
-
-                if caster.components.health ~= nil and not caster.components.health:IsDead() then
-                    caster.components.health:DoDelta(-3*num, true, "siving_feather_real", false, nil, true)
-                end
-
-                return true
-            end
-        end
     end
 })
 
@@ -431,6 +437,60 @@ MakeWeapon({
 
 --玩家武器
 --BOSS产物
+
+--------------------------------------------------------------------------
+--[[ 临时的羽刃拉扯器 ]]
+--------------------------------------------------------------------------
+
+table.insert(prefs, Prefab(
+    "siving_feather_line",
+    function()
+        local inst = CreateEntity()
+
+        inst.entity:AddTransform()
+        inst.entity:AddNetwork()
+
+        -- inst:AddTag("FX")
+
+        inst.entity:SetPristine()
+        if not TheWorld.ismastersim then
+            return inst
+        end
+
+        inst.persists = false
+        inst.lineowner = nil --指向能提供丝线的物品
+
+        inst:AddComponent("skillsteplegion")
+        inst.components.skillsteplegion.fn_spell = function(inst, doer, pos, options)
+            --undo 先检查物品栏是否有所需道具才能拉回
+            if doer.sivfeathers_l ~= nil then
+                local doit = false
+                local doerpos = doer:GetPosition()
+                for _,v in ipairs(doer.sivfeathers_l) do
+                    if v and v:IsValid() then
+                        if v.components.projectilelegion ~= nil then
+                            v.components.projectilelegion.isgoback = true
+                            v.components.projectilelegion:Throw(v, doerpos, doer)
+                        end
+                        doit = true
+                    end
+                end
+                -- if doit then
+                --     --undo消耗丝线
+                -- end
+            end
+        end
+
+        inst:DoTaskInTime(3, inst.Remove)
+
+        return inst
+    end,
+    {
+        Asset("ATLAS", "images/inventoryimages/siving_feather_line.xml"),
+        Asset("IMAGE", "images/inventoryimages/siving_feather_line.tex"),
+    },
+    nil
+))
 
 --------------------
 --------------------

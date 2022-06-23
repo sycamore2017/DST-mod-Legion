@@ -1816,33 +1816,14 @@ if CONFIGS_LEGION.LEGENDOFFALL then
     PULL_FEATHER_L.id = "PULL_FEATHER_L"
     PULL_FEATHER_L.str = STRINGS.ACTIONS_LEGION.PULL_FEATHER_L
     PULL_FEATHER_L.fn = function(act)
-        --undo 先检查物品栏是否有所需道具才能拉回
-        if act.doer.shootingmap_l ~= nil then
-            local doerpos = act.doer:GetPosition()
-            for _,v in ipairs(act.doer.shootingmap_l) do
-                if v and v:IsValid() then
-                    v.shootingstate_l = nil
-                    if v.components.projectilelegion ~= nil then
-                        v.components.projectilelegion.isgoback = true
-                        v.components.projectilelegion:Throw(v, doerpos, act.doer)
-                    end
-                end
-            end
-        end
-
-        act.doer:RemoveTag("skill_feather")
-        act.doer.shootingmap_l = nil
-        if act.doer.task_checkpull ~= nil then
-            act.doer.task_checkpull:Cancel()
-            act.doer.task_checkpull = nil
-        end
+        
         return true
     end
     AddAction(PULL_FEATHER_L)
 
-    AddComponentAction("POINT", "projectilelegion", function(inst, doer, pos, actions, right)
+    AddComponentAction("POINT", "skillsteplegion", function(inst, doer, pos, actions, right)
         if
-            not right and doer:HasTag("skill_feather") and
+            right and
             not TheWorld.Map:IsGroundTargetBlocked(pos)
         then
             table.insert(actions, ACTIONS.PULL_FEATHER_L)
