@@ -107,8 +107,53 @@ local function OnThrown(inst, owner, targetpos, attacker)
     inst.components.inventoryitem.canbepickedup = false
     --undo 声音
 end
+
+local function CheckPulling(doer)
+    if doer.task_checkpull == nil and doer.shootingmap_l ~= nil then
+        local finished = true
+        for _,v in ipairs(doer.shootingmap_l) do
+            if v and v:IsValid() then
+                if not v.shootingstate_l then
+                    finished = false
+                    break
+                end
+            end
+        end
+        if finished then
+            print("---成功了")
+            --undo 先检查物品栏是否有所需道具才能拉回
+            doer:AddTag("skill_feather")
+            doer.task_checkpull = doer:DoTaskInTime(3, function()
+                doer.task_checkpull = nil
+                doer:RemoveTag("skill_feather")
+                doer.shootingmap_l = nil
+                print("---结束了")
+            end)
+        else
+            doer.task_checkpull = doer:DoTaskInTime(0, function()
+                doer.task_checkpull = nil
+                CheckPulling(doer)
+            end)
+        end
+    end
+end
 local function OnMiss(inst, pos, attacker)
-    OnDropped(inst)
+    if inst.components.projectilelegion.isgoback then
+        inst.components.projectilelegion.isgoback = nil
+        if attacker.components.inventory ~= nil then
+            if not attacker.components.inventory:Equip(inst) then
+                attacker.components.inventory:GiveItem(inst)
+            end
+        else
+            OnDropped(inst)
+        end
+    else
+        inst.shootingstate_l = true
+        if attacker then
+            CheckPulling(attacker)
+        end
+        OnDropped(inst)
+    end
 end
 
 local function ReticuleTargetFn()
@@ -357,9 +402,13 @@ MakeWeapon({
                     end
                 end
 
+                caster.shootingmap_l = {}
                 for i,v in ipairs(angles) do
                     local item = items.components.stackable:Get()
                     item.Transform:SetPosition(doerpos:Get())
+                    caster.shootingmap_l[i] = item
+                    item.shootingstate_l = false
+                    item.components.projectilelegion.isgoback = nil
                     item.components.projectilelegion:Throw(inst, poss[i], caster, angle+v)
                     item.components.projectilelegion:DelayVisibility(inst.projectiledelay)
                 end

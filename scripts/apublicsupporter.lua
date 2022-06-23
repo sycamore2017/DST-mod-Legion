@@ -1587,6 +1587,14 @@ if CONFIGS_LEGION.LEGENDOFFALL then
                 end
             end
 
+            --进入时应该清除这个数据，防止数据错位
+            inst:RemoveTag("skill_feather")
+            inst.shootingmap_l = nil
+            if inst.task_checkpull ~= nil then
+                inst.task_checkpull:Cancel()
+                inst.task_checkpull = nil
+            end
+
             inst.SoundEmitter:PlaySound("dontstarve/wilson/attack_weapon")
         end,
 
@@ -1684,6 +1692,7 @@ if CONFIGS_LEGION.LEGENDOFFALL then
         if
             right and
             (inst.components.aoetargeting == nil or inst.components.aoetargeting:IsEnabled()) and
+            not doer:HasTag("skill_feather") and
             (
                 inst.components.aoetargeting ~= nil and inst.components.aoetargeting.alwaysvalid or
                 (TheWorld.Map:IsAboveGroundAtPoint(pos:Get()) and not TheWorld.Map:IsGroundTargetBlocked(pos))
@@ -1732,4 +1741,128 @@ if CONFIGS_LEGION.LEGENDOFFALL then
             end
         end
     end)
+
+    ------拉回羽毛的动作
+
+    AddStategraphState("wilson", State{
+        name = "pull_feather_l",
+        tags = { "doing", "busy", "nointerrupt", "nomorph" },
+
+        onenter = function(inst)
+            inst.components.locomotor:Stop()
+            inst.AnimState:PlayAnimation("atk_pre")
+
+            if inst.shootingmap_l ~= nil then
+                for _,v in ipairs(inst.shootingmap_l) do
+                    if v and v:IsValid() then
+                        inst:ForceFacePoint(v.Transform:GetWorldPosition())
+                        break
+                    end
+                end
+            end
+        end,
+
+        timeline = {
+            TimeEvent(7 * FRAMES, function(inst)
+                inst.sg:RemoveStateTag("nointerrupt")
+                inst:PerformBufferedAction()
+            end),
+            TimeEvent(18 * FRAMES, function(inst)
+                inst.sg:GoToState("idle", true)
+            end),
+        },
+
+        events = {
+            EventHandler("animover", function(inst)
+                if inst.AnimState:AnimDone() then
+                    if inst.AnimState:IsCurrentAnimation("atk_pre") then
+                        inst.AnimState:PlayAnimation("throw")
+                        inst.AnimState:SetTime(6 * FRAMES)
+                    else
+                        inst.sg:GoToState("idle")
+                    end
+                end
+            end),
+        }
+    })
+    AddStategraphState("wilson_client", State{
+        name = "pull_feather_l",
+        tags = { "doing", "busy", "nointerrupt" },
+
+        onenter = function(inst)
+            inst.components.locomotor:Stop()
+            inst.AnimState:PlayAnimation("atk_pre")
+            inst.AnimState:PushAnimation("atk_lag", false)
+            inst.sg:SetTimeout(2)
+        end,
+
+        onupdate = function(inst)
+            if inst:HasTag("doing") then
+                if inst.entity:FlattenMovementPrediction() then
+                    inst.sg:GoToState("idle", "noanim")
+                end
+            elseif inst.bufferedaction == nil then
+                inst.sg:GoToState("idle")
+            end
+        end,
+
+        ontimeout = function(inst)
+            inst:ClearBufferedAction()
+            inst.sg:GoToState("idle")
+        end,
+    })
+
+    local PULL_FEATHER_L = Action({ priority=12, rmb=true, mount_valid=true, distance=36 })
+    PULL_FEATHER_L.id = "PULL_FEATHER_L"
+    PULL_FEATHER_L.str = STRINGS.ACTIONS_LEGION.PULL_FEATHER_L
+    PULL_FEATHER_L.fn = function(act)
+        --undo 先检查物品栏是否有所需道具才能拉回
+        if act.doer.shootingmap_l ~= nil then
+            local doerpos = act.doer:GetPosition()
+            for _,v in ipairs(act.doer.shootingmap_l) do
+                if v and v:IsValid() then
+                    v.shootingstate_l = nil
+                    if v.components.projectilelegion ~= nil then
+                        v.components.projectilelegion.isgoback = true
+                        v.components.projectilelegion:Throw(v, doerpos, act.doer)
+                    end
+                end
+            end
+        end
+
+        act.doer:RemoveTag("skill_feather")
+        act.doer.shootingmap_l = nil
+        if act.doer.task_checkpull ~= nil then
+            act.doer.task_checkpull:Cancel()
+            act.doer.task_checkpull = nil
+        end
+        return true
+    end
+    AddAction(PULL_FEATHER_L)
+
+    AddComponentAction("POINT", "projectilelegion", function(inst, doer, pos, actions, right)
+        if
+            not right and doer:HasTag("skill_feather") and
+            not TheWorld.Map:IsGroundTargetBlocked(pos)
+        then
+            table.insert(actions, ACTIONS.PULL_FEATHER_L)
+        end
+    end)
+
+    AddStategraphActionHandler("wilson", ActionHandler(ACTIONS.PULL_FEATHER_L, function(inst, action)
+        if
+            inst.sg:HasStateTag("busy") or inst:HasTag("busy")
+        then
+            return
+        end
+        return "pull_feather_l"
+    end))
+    AddStategraphActionHandler("wilson_client", ActionHandler(ACTIONS.PULL_FEATHER_L, function(inst, action)
+        if
+            inst.sg:HasStateTag("busy") or inst:HasTag("busy")
+        then
+            return
+        end
+        return "pull_feather_l"
+    end))
 end

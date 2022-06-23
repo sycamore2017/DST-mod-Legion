@@ -1,6 +1,7 @@
 local ProjectileLegion = Class(function(self, inst)
     self.inst = inst
 	self.shootrange = nil --最远抛射距离
+	self.isgoback = nil --是否为返回玩家
 	self.bulletradius = 1.5 --子弹半径(影响击中的最小距离)
 	self.speed = 20 --抛射速度
 	self.stimuli = nil
@@ -131,7 +132,11 @@ function ProjectileLegion:OnUpdate(dt)
 		end
 	end
 
-	if self.shootrange ~= nil and distsq(self.start, current) >= self.shootrange*self.shootrange then
+	if self.isgoback then
+		if distsq(self.dest, current) <= self.bulletradius*self.bulletradius then
+			self:Miss()
+		end
+	elseif self.shootrange ~= nil and distsq(self.start, current) >= self.shootrange*self.shootrange then
 		self:Miss()
 	end
 end

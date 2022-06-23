@@ -3310,6 +3310,7 @@ STRINGS.ACTIONS_LEGION = {
     USE_UPGRADEKIT = "组装升级", --升级套件的升级动作的名字
     MAKE = "制作", --打窝器容器的按钮名字
     ATTACK_SHIELD_L = "盾击", --盾牌类道具通用动作的名字
+    PULL_FEATHER_L = "羽刃合收", --拉回子圭羽毛动作的名字
 }
 STRINGS.ACTIONS.GIVE.SCABBARD = "入鞘"  --青枝绿叶放入武器的名字
 STRINGS.ACTIONS.PICK.GENETRANS = "解开"  --收获子圭·育的名字

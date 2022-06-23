@@ -22,6 +22,7 @@ local function onattack(inst, owner, target)    --攻击直接扣血，而不考
         target ~= nil and target:IsValid()
         and not target:HasTag("alwaysblock")    --有了这个标签，什么天神都伤害不了
         and target.prefab ~= "laozi"        --无法伤害神话书说里的太上老君
+        and target.components.combat ~= nil --档案馆的哨兵蜈蚣壳可能会没有战斗组件
         and target.components.health ~= nil and not target.components.health:IsDead() --已经死亡则不再攻击
     then
         --获取电击buff攻击加成
