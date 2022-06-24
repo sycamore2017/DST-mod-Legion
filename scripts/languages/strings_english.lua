@@ -2517,6 +2517,25 @@ S_______WORTOX.DESCRIBE.SIVING_FEATHER_FAKE = "I'd love to try it out and see wh
 S_______WALTER.DESCRIBE.SIVING_FEATHER_FAKE = "Fun, I want to have some fun, now!"
 -- S________WANDA.DESCRIBE.SIVING_FEATHER_FAKE = ""
 
+S_NAMES.SIVING_FEATHER_LINE = "Siving Away"
+S______GENERIC.DESCRIBE.SIVING_FEATHER_LINE = "Hidden threads, tugging at one end of each feather."
+S_______WILLOW.DESCRIBE.SIVING_FEATHER_LINE = "Like the queen of blade."
+-- S_____WOLFGANG.DESCRIBE.SIVING_FEATHER_LINE = ""
+S________WENDY.DESCRIBE.SIVING_FEATHER_LINE = "I wonder if Abigail is controlled by me like a feather."
+-- S_________WX78.DESCRIBE.SIVING_FEATHER_LINE = ""
+S_WICKERBOTTOM.DESCRIBE.SIVING_FEATHER_LINE = "Every time it reciprocates, the thread may be broken."
+S_______WOODIE.DESCRIBE.SIVING_FEATHER_LINE = "Lucy and I are too familiar with this trick."
+S______WAXWELL.DESCRIBE.SIVING_FEATHER_LINE = "Feathers, like puppets, are used to hurt rather than play."
+S___WATHGRITHR.DESCRIBE.SIVING_FEATHER_LINE = "Soldiers with wings should also learn this!"
+S_______WEBBER.DESCRIBE.SIVING_FEATHER_LINE = "We're playing yo yo."
+S_______WINONA.DESCRIBE.SIVING_FEATHER_LINE = "Sharp feathers will shuttle back and forth under my traction."
+S_______WORTOX.DESCRIBE.SIVING_FEATHER_LINE = "The red line of fate will entangle you and me."
+S_____WORMWOOD.DESCRIBE.SIVING_FEATHER_LINE = "Tug of war."
+S________WARLY.DESCRIBE.SIVING_FEATHER_LINE = "This technique is also used to cut meat."
+-- S_________WURT.DESCRIBE.SIVING_FEATHER_LINE = ""
+S_______WALTER.DESCRIBE.SIVING_FEATHER_LINE = "I tried to add this to slingshot, but never succeeded."
+-- S________WANDA.DESCRIBE.SIVING_FEATHER_LINE = ""
+
 --------------------------------------------------------------------------
 --[[ flash and crush ]]--[[ 电闪雷鸣 ]]
 --------------------------------------------------------------------------

@@ -122,9 +122,14 @@ local function OnMiss(inst, pos, attacker)
                 if num > 1 then
                     inst.components.finiteuses:SetUses(num)
                 end
-                inst.components.inventoryitem.canbepickedup = true
-                if not attacker.components.inventory:Equip(inst) then
-                    attacker.components.inventory:GiveItem(inst)
+
+                if attacker:IsValid() then
+                    inst.components.inventoryitem.canbepickedup = true
+                    if not attacker.components.inventory:Equip(inst) then
+                        attacker.components.inventory:GiveItem(inst)
+                    end
+                else --此时攻击者实体无效了(可能是掉线了)，就掉地上吧
+                    OnDropped(inst)
                 end
                 return
             end
@@ -311,6 +316,7 @@ local function MakeWeapon(data)
                             --undo 如果背包里有对应材料时才产生这个
                             local line = SpawnPrefab("siving_feather_line")
                             caster.sivfeathers_l = feathers
+                            line.linedoer = caster
                             if not caster.components.inventory:Equip(line) then
                                 line:Remove()
                             end
@@ -442,6 +448,13 @@ MakeWeapon({
 --[[ 临时的羽刃拉扯器 ]]
 --------------------------------------------------------------------------
 
+local function RemoveLine(inst)
+    if inst.linedoer ~= nil then
+        inst.linedoer.sivfeathers_l = nil
+    end
+    inst:Remove()
+end
+
 table.insert(prefs, Prefab(
     "siving_feather_line",
     function()
@@ -449,6 +462,8 @@ table.insert(prefs, Prefab(
 
         inst.entity:AddTransform()
         inst.entity:AddNetwork()
+
+        MakeInventoryPhysics(inst)
 
         -- inst:AddTag("FX")
 
@@ -459,29 +474,74 @@ table.insert(prefs, Prefab(
 
         inst.persists = false
         inst.lineowner = nil --指向能提供丝线的物品
+        inst.linedoer = nil --指发起这个动作的玩家
+
+        inst:AddComponent("inspectable")
+
+        inst:AddComponent("inventoryitem")
+        inst.components.inventoryitem.imagename = "siving_feather_line"
+        inst.components.inventoryitem.atlasname = "images/inventoryimages/siving_feather_line.xml"
+        inst.components.inventoryitem:SetOnDroppedFn(RemoveLine)
+
+        inst:AddComponent("equippable")
+        -- inst.components.equippable:SetOnEquip()
+        inst.components.equippable:SetOnUnequip(RemoveLine)
 
         inst:AddComponent("skillsteplegion")
         inst.components.skillsteplegion.fn_spell = function(inst, doer, pos, options)
             --undo 先检查物品栏是否有所需道具才能拉回
             if doer.sivfeathers_l ~= nil then
-                local doit = false
+                local throwed = false
                 local doerpos = doer:GetPosition()
                 for _,v in ipairs(doer.sivfeathers_l) do
                     if v and v:IsValid() then
-                        if v.components.projectilelegion ~= nil then
+                        --如果在背包里，就删除自己，可以防止被其他对象捡起，而导致数量增加
+                        if v.components.inventoryitem ~= nil and v.components.inventoryitem:IsHeld() then
+                            v:Remove()
+                        elseif v.components.projectilelegion ~= nil then
                             v.components.projectilelegion.isgoback = true
                             v.components.projectilelegion:Throw(v, doerpos, doer)
+                            throwed = true
                         end
-                        doit = true
                     end
                 end
-                -- if doit then
-                --     --undo消耗丝线
-                -- end
+
+                --undo消耗丝线
+
+                inst.linedoer = nil --拉回触发时，提前把这个数据清除，就不会解除玩家的数据了
+                if not throwed then --如果没有能拉回来的羽毛，那就直接结算拉回的结果
+                    local num = 0
+                    local itemname = nil
+                    for _,v in ipairs(doer.sivfeathers_l) do
+                        if v and not v.isbroken then
+                            num = num + 1
+                            if not itemname then
+                                itemname = v.prefab
+                            end
+                            if v:IsValid() then
+                                v:Remove()
+                            end
+                        end
+                    end
+                    doer.sivfeathers_l = nil
+                    if num > 0 and itemname then
+                        local newitem = SpawnPrefab(itemname)
+                        if newitem then
+                            if num > 1 and newitem.components.finiteuses ~= nil then
+                                newitem.components.finiteuses:SetUses(num)
+                            end
+                            newitem.Transform:SetPosition(doerpos:Get())
+
+                            if not doer.components.inventory:Equip(newitem) then
+                                doer.components.inventory:GiveItem(newitem)
+                            end
+                        end
+                    end
+                end
             end
         end
 
-        inst:DoTaskInTime(3, inst.Remove)
+        inst.task_remove = inst:DoTaskInTime(3, RemoveLine)
 
         return inst
     end,

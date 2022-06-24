@@ -2503,6 +2503,25 @@ S_______WORTOX.DESCRIBE.SIVING_FEATHER_FAKE = "很想试试和它比谁的速度
 S_______WALTER.DESCRIBE.SIVING_FEATHER_FAKE = "乐子，我要找些乐子，现在就要！"
 -- S________WANDA.DESCRIBE.SIVING_FEATHER_FAKE = ""
 
+S_NAMES.SIVING_FEATHER_LINE = "牵羽牵寻"
+S______GENERIC.DESCRIBE.SIVING_FEATHER_LINE = "隐秘的丝线，牵动着每根羽毛的一端。"
+S_______WILLOW.DESCRIBE.SIVING_FEATHER_LINE = "就像刀锋女王一样在战斗。"
+-- S_____WOLFGANG.DESCRIBE.SIVING_FEATHER_LINE = ""
+S________WENDY.DESCRIBE.SIVING_FEATHER_LINE = "有时候我会反思，阿比盖尔是否也像羽毛一般被我牵制。"
+-- S_________WX78.DESCRIBE.SIVING_FEATHER_LINE = ""
+S_WICKERBOTTOM.DESCRIBE.SIVING_FEATHER_LINE = "每次往复，丝线都可能会被扯断。"
+S_______WOODIE.DESCRIBE.SIVING_FEATHER_LINE = "露西和我对这招太熟悉了。"
+S______WAXWELL.DESCRIBE.SIVING_FEATHER_LINE = "羽毛如同傀儡，用来伤害而不是戏剧。"
+S___WATHGRITHR.DESCRIBE.SIVING_FEATHER_LINE = "有翅膀的战士也应该学一下这招！"
+S_______WEBBER.DESCRIBE.SIVING_FEATHER_LINE = "我们在玩悠悠球，你来吗？"
+S_______WINONA.DESCRIBE.SIVING_FEATHER_LINE = "锋利的羽毛会在我的牵引下来回穿梭。"
+S_______WORTOX.DESCRIBE.SIVING_FEATHER_LINE = "命运的红线，将你我拉扯纠缠。"
+S_____WORMWOOD.DESCRIBE.SIVING_FEATHER_LINE = "拉锯战。"
+S________WARLY.DESCRIBE.SIVING_FEATHER_LINE = "切菜也是有这种手法的，但我一般不用。"
+-- S_________WURT.DESCRIBE.SIVING_FEATHER_LINE = ""
+S_______WALTER.DESCRIBE.SIVING_FEATHER_LINE = "我也想给弹弓加这个，但没成功过。"
+-- S________WANDA.DESCRIBE.SIVING_FEATHER_LINE = ""
+
 --------------------------------------------------------------------------
 --[[ flash and crush ]]--[[ 电闪雷鸣 ]]
 --------------------------------------------------------------------------

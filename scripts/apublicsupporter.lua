@@ -1692,7 +1692,6 @@ if CONFIGS_LEGION.LEGENDOFFALL then
         if
             right and
             (inst.components.aoetargeting == nil or inst.components.aoetargeting:IsEnabled()) and
-            not doer:HasTag("skill_feather") and
             (
                 inst.components.aoetargeting ~= nil and inst.components.aoetargeting.alwaysvalid or
                 (TheWorld.Map:IsAboveGroundAtPoint(pos:Get()) and not TheWorld.Map:IsGroundTargetBlocked(pos))
@@ -1752,8 +1751,8 @@ if CONFIGS_LEGION.LEGENDOFFALL then
             inst.components.locomotor:Stop()
             inst.AnimState:PlayAnimation("atk_pre")
 
-            if inst.shootingmap_l ~= nil then
-                for _,v in ipairs(inst.shootingmap_l) do
+            if inst.sivfeathers_l ~= nil then
+                for _,v in ipairs(inst.sivfeathers_l) do
                     if v and v:IsValid() then
                         inst:ForceFacePoint(v.Transform:GetWorldPosition())
                         break
@@ -1763,7 +1762,7 @@ if CONFIGS_LEGION.LEGENDOFFALL then
         end,
 
         timeline = {
-            TimeEvent(7 * FRAMES, function(inst)
+            TimeEvent(3 * FRAMES, function(inst)
                 inst.sg:RemoveStateTag("nointerrupt")
                 inst:PerformBufferedAction()
             end),
@@ -1816,8 +1815,13 @@ if CONFIGS_LEGION.LEGENDOFFALL then
     PULL_FEATHER_L.id = "PULL_FEATHER_L"
     PULL_FEATHER_L.str = STRINGS.ACTIONS_LEGION.PULL_FEATHER_L
     PULL_FEATHER_L.fn = function(act)
-        
-        return true
+        if
+            act.invobject ~= nil and
+            act.invobject.components.skillsteplegion ~= nil
+        then
+            act.invobject.components.skillsteplegion:CastSpell(act.doer)
+            return true
+        end
     end
     AddAction(PULL_FEATHER_L)
 
