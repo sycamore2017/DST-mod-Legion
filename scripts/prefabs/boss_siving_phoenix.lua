@@ -87,10 +87,16 @@ local function OnEquip(inst, owner)
     owner.AnimState:OverrideSymbol("swap_object", inst.prefab, "swap")
     owner.AnimState:Show("ARM_carry")
     owner.AnimState:Hide("ARM_normal")
+
+    owner:AddTag("s_l_throw") --skill_legion_throw
+    owner:AddTag("siv_feather")
 end
 local function OnUnequip(inst, owner)
     owner.AnimState:Hide("ARM_carry")
     owner.AnimState:Show("ARM_normal")
+
+    owner:RemoveTag("s_l_throw") --skill_legion_throw
+    owner:RemoveTag("siv_feather")
 end
 
 local function OnDropped(inst)
@@ -105,7 +111,8 @@ local function OnThrown(inst, owner, targetpos, attacker)
     inst.AnimState:PlayAnimation("shoot", false)
     inst.components.inventoryitem.pushlandedevents = false
     inst.components.inventoryitem.canbepickedup = false
-    --undo 声音
+    inst:PushEvent("on_no_longer_landed")
+    inst.SoundEmitter:PlaySound("dontstarve/creatures/leif/swipe", nil, 0.3)
 end
 local function OnMiss(inst, pos, attacker)
     if inst.components.projectilelegion.isgoback then
@@ -120,10 +127,15 @@ local function OnMiss(inst, pos, attacker)
             attacker.sivfeathers_l = nil
             if num > 0 then
                 if num > 1 then
-                    inst.components.finiteuses:SetUses(num)
+                    inst.components.stackable:SetStackSize(num)
                 end
 
                 if attacker:IsValid() then
+                    local line = attacker.components.inventory:GetEquippedItem(EQUIPSLOTS.HANDS)
+                    if line and line.prefab == "siving_feather_line" and line:IsValid() then
+                        attacker.components.inventory:RemoveItem(line, true)
+                        line:Remove()
+                    end
                     inst.components.inventoryitem.canbepickedup = true
                     if not attacker.components.inventory:Equip(inst) then
                         attacker.components.inventory:GiveItem(inst)
@@ -137,9 +149,14 @@ local function OnMiss(inst, pos, attacker)
         inst:Remove()
     else
         OnDropped(inst)
+        inst.components.inventoryitem.canbepickedup = false
+        inst:DoTaskInTime(4.5, function(inst) --暂时不能被捡起，防止拉回前被偷走
+            inst.components.inventoryitem.canbepickedup = true
+        end)
     end
 end
 
+--[[
 local function ReticuleTargetFn()
     return Vector3(ThePlayer.entity:LocalToWorldSpace(6.5, 0, 0))
 end
@@ -167,16 +184,7 @@ local function ReticuleUpdatePositionFn(inst, pos, reticule, ease, smoothing, dt
     end
     reticule.Transform:SetRotation(rot)
 end
-
-local function PercentChanged(inst, data)
-    if data.percent ~= nil then
-        if data.percent <= 0.2 then
-            inst:RemoveTag("union_l")
-        else
-            inst:AddTag("union_l")
-        end
-    end
-end
+]]--
 
 local function MakeWeapon(data)
     table.insert(prefs, Prefab(
@@ -193,7 +201,9 @@ local function MakeWeapon(data)
             RemovePhysicsColliders(inst)
 
             inst:AddTag("sharp")
-            inst:AddTag("skill_feather")
+            inst:AddTag("s_l_throw") --skill_legion_throw
+            inst:AddTag("siv_feather")
+            inst:AddTag("allow_action_on_impassable")
 
             --weapon (from weapon component) added to pristine state for optimization
             inst:AddTag("weapon")
@@ -203,21 +213,27 @@ local function MakeWeapon(data)
             inst.AnimState:PlayAnimation("item", false)
             -- inst.Transform:SetEightFaced()
 
-            inst:AddComponent("aoetargeting")
-            inst.components.aoetargeting:SetAlwaysValid(true)
-            inst.components.aoetargeting.reticule.reticuleprefab = "reticulelongmulti"
-            inst.components.aoetargeting.reticule.pingprefab = "reticulelongmultiping"
-            inst.components.aoetargeting.reticule.targetfn = ReticuleTargetFn
-            inst.components.aoetargeting.reticule.mousetargetfn = ReticuleMouseTargetFn
-            inst.components.aoetargeting.reticule.updatepositionfn = ReticuleUpdatePositionFn
-            inst.components.aoetargeting.reticule.validcolour = { 117/255, 1, 1, 1 }
-            inst.components.aoetargeting.reticule.invalidcolour = { 0, 72/255, 72/255, 1 }
-            inst.components.aoetargeting.reticule.ease = true
-            inst.components.aoetargeting.reticule.mouseenabled = true
+            --Tip：官方的战斗辅助组件。加上后就能右键先瞄准再触发攻击。缺点是会导致其他对象的右键动作全部不起作用
+            -- inst:AddComponent("aoetargeting")
+            -- inst.components.aoetargeting:SetAlwaysValid(true)
+            -- inst.components.aoetargeting.reticule.reticuleprefab = "reticulelongmulti"
+            -- inst.components.aoetargeting.reticule.pingprefab = "reticulelongmultiping"
+            -- inst.components.aoetargeting.reticule.targetfn = ReticuleTargetFn
+            -- inst.components.aoetargeting.reticule.mousetargetfn = ReticuleMouseTargetFn
+            -- inst.components.aoetargeting.reticule.updatepositionfn = ReticuleUpdatePositionFn
+            -- inst.components.aoetargeting.reticule.validcolour = { 117/255, 1, 1, 1 }
+            -- inst.components.aoetargeting.reticule.invalidcolour = { 0, 72/255, 72/255, 1 }
+            -- inst.components.aoetargeting.reticule.ease = true
+            -- inst.components.aoetargeting.reticule.mouseenabled = true
 
             inst.projectiledelay = 2 * FRAMES
 
-            MakeInventoryFloatable(inst, "small", 0.2, 0.6)
+            MakeInventoryFloatable(inst, "small", 0.2, 0.5)
+            local OnLandedClient_old = inst.components.floater.OnLandedClient
+            inst.components.floater.OnLandedClient = function(self)
+                OnLandedClient_old(self)
+                self.inst.AnimState:SetFloatParams(0.04, 1, self.bob_percent)
+            end
 
             if data.fn_common ~= nil then
                 data.fn_common(inst)
@@ -230,6 +246,9 @@ local function MakeWeapon(data)
 
             inst:AddComponent("inspectable")
 
+            inst:AddComponent("stackable")
+            inst.components.stackable.maxsize = TUNING.STACK_SIZE_MEDITEM
+
             inst:AddComponent("inventoryitem")
             inst.components.inventoryitem.imagename = data.name
             inst.components.inventoryitem.atlasname = "images/inventoryimages/"..data.name..".xml"
@@ -238,19 +257,10 @@ local function MakeWeapon(data)
             inst:AddComponent("equippable")
             inst.components.equippable:SetOnEquip(OnEquip)
             inst.components.equippable:SetOnUnequip(OnUnequip)
-            -- inst.components.equippable.equipstack = true --装备时可以叠加装备
+            inst.components.equippable.equipstack = true --装备时可以叠加装备
 
             inst:AddComponent("weapon")
-            inst.components.weapon:SetRange(-1, -1) --人物默认攻击距离为3、3
-
-            inst:AddComponent("finiteuses")
-            inst.components.finiteuses:SetMaxUses(5)
-            inst.components.finiteuses:SetUses(1)
-            inst.components.finiteuses.Use = function(self, ...) end
-            inst.components.finiteuses.SetPercent = function(self, amount)
-                self:SetUses(self.total * (math.max(amount, 0.2)))
-            end
-            inst:ListenForEvent("percentusedchange", PercentChanged)
+            inst.components.weapon:SetRange(-1.5, -1.5) --人物默认攻击距离为3、3
 
             inst:AddComponent("projectilelegion")
             inst.components.projectilelegion.shootrange = 13
@@ -262,14 +272,13 @@ local function MakeWeapon(data)
             inst.components.skillspelllegion.fn_spell = function(inst, caster, pos, options)
                 if caster.components.inventory then
                     local doerpos = caster:GetPosition()
-                    local items = caster.components.inventory:RemoveItem(inst)
-
+                    local num = inst.components.stackable:StackSize()
                     local angles = {}
                     local poss = {}
-                    local num = math.ceil(inst.components.finiteuses:GetUses()) or 1
                     local direction = (pos - doerpos):GetNormalized() --单位向量
                     local angle = math.acos(direction:Dot(Vector3(1, 0, 0))) / DEGREES --这个角度是动画的，不能用来做物理的角度
                     local ang_lag = 2.5
+                    local items = caster.components.inventory:RemoveItem(inst, true)
 
                     if num == 1 then
                         angles = { 0 }
@@ -281,10 +290,10 @@ local function MakeWeapon(data)
                             angles = { -2*ang_lag, 0, 2*ang_lag }
                         elseif num == 4 then
                             angles = { -3*ang_lag, -ang_lag, ang_lag, 3*ang_lag }
-                        elseif num == 5 then
+                        else --最多5个
                             angles = { -4*ang_lag, -2*ang_lag, 0, 2*ang_lag, 4*ang_lag }
                         end
-    
+
                         local ang = caster:GetAngleToPoint(pos.x, pos.y, pos.z) --原始角度，单位:度，比如33
                         for i,v in ipairs(angles) do
                             v = v + math.random()*2 - 1
@@ -294,24 +303,20 @@ local function MakeWeapon(data)
                         end
                     end
 
-                    if items == inst then
-                        inst:Remove()
-                    else
-                        items:Remove()
-                        inst:Remove()
-                    end
-
                     local feathers = {}
                     for i,v in ipairs(angles) do
-                        local item = SpawnPrefab(data.name)
+                        local item = items.components.stackable:Get(1)
                         item.Transform:SetPosition(doerpos:Get())
                         feathers[i] = item
-                        item.components.projectilelegion:Throw(inst, poss[i], caster, angle+v)
-                        item.components.projectilelegion:DelayVisibility(inst.projectiledelay)
+                        item.components.projectilelegion:Throw(item, poss[i], caster, angle+v)
+                        item.components.projectilelegion:DelayVisibility(item.projectiledelay)
                     end
 
+                    if num > 5 then --5个都丢出去了，剩下的还给玩家 undo 如果不能拉回，那就不用卸下装备
+                        caster.components.inventory:GiveItem(items)
+                    end
                     if caster.components.health ~= nil and not caster.components.health:IsDead() then
-                        caster.components.health:DoDelta(-3*num, true, data.name, false, nil, true)
+                        caster.components.health:DoDelta(-4*num, true, data.name, false, nil, true)
                         if not caster.components.health:IsDead() then
                             --undo 如果背包里有对应材料时才产生这个
                             local line = SpawnPrefab("siving_feather_line")
@@ -448,11 +453,29 @@ MakeWeapon({
 --[[ 临时的羽刃拉扯器 ]]
 --------------------------------------------------------------------------
 
+local function RemoveFromOnwer(inst)
+    if inst.components.inventoryitem ~= nil then
+        local owner = inst.components.inventoryitem:GetGrandOwner()
+        if owner then
+            local cpt = owner.components.inventory or owner.components.container
+            if cpt then
+                local reomveditem = cpt:RemoveItem(inst, true, true)
+                if reomveditem then
+                    reomveditem:Remove()
+                    return
+                end
+            end
+        end
+    end
+    inst:Remove()
+end
 local function RemoveLine(inst)
     if inst.linedoer ~= nil then
         inst.linedoer.sivfeathers_l = nil
     end
-    inst:Remove()
+    inst:DoTaskInTime(0, function()
+        RemoveFromOnwer(inst)
+    end)
 end
 
 table.insert(prefs, Prefab(
@@ -465,7 +488,9 @@ table.insert(prefs, Prefab(
 
         MakeInventoryPhysics(inst)
 
-        -- inst:AddTag("FX")
+        inst:AddTag("s_l_pull") --skill_legion_pull
+        inst:AddTag("siv_line")
+        inst:AddTag("allow_action_on_impassable")
 
         inst.entity:SetPristine()
         if not TheWorld.ismastersim then
@@ -484,20 +509,27 @@ table.insert(prefs, Prefab(
         inst.components.inventoryitem:SetOnDroppedFn(RemoveLine)
 
         inst:AddComponent("equippable")
-        -- inst.components.equippable:SetOnEquip()
-        inst.components.equippable:SetOnUnequip(RemoveLine)
+        inst.components.equippable:SetOnEquip(function(inst, owner)
+            owner:AddTag("s_l_pull") --skill_legion_pull
+            owner:AddTag("siv_line")
+        end)
+        inst.components.equippable:SetOnUnequip(function(inst, owner)
+            owner:RemoveTag("s_l_pull")
+            owner:RemoveTag("siv_line")
+            RemoveLine(inst)
+        end)
 
-        inst:AddComponent("skillsteplegion")
-        inst.components.skillsteplegion.fn_spell = function(inst, doer, pos, options)
+        inst:AddComponent("skillspelllegion")
+        inst.components.skillspelllegion.fn_spell = function(inst, doer, pos, options)
             --undo 先检查物品栏是否有所需道具才能拉回
             if doer.sivfeathers_l ~= nil then
                 local throwed = false
                 local doerpos = doer:GetPosition()
                 for _,v in ipairs(doer.sivfeathers_l) do
                     if v and v:IsValid() then
-                        --如果在背包里，就删除自己，可以防止被其他对象捡起，而导致数量增加
+                        --如果在背包里，就删除自己
                         if v.components.inventoryitem ~= nil and v.components.inventoryitem:IsHeld() then
-                            v:Remove()
+                            RemoveFromOnwer(v)
                         elseif v.components.projectilelegion ~= nil then
                             v.components.projectilelegion.isgoback = true
                             v.components.projectilelegion:Throw(v, doerpos, doer)
@@ -527,8 +559,8 @@ table.insert(prefs, Prefab(
                     if num > 0 and itemname then
                         local newitem = SpawnPrefab(itemname)
                         if newitem then
-                            if num > 1 and newitem.components.finiteuses ~= nil then
-                                newitem.components.finiteuses:SetUses(num)
+                            if num > 1 and newitem.components.stackable ~= nil then
+                                newitem.components.stackable:SetStackSize(num)
                             end
                             newitem.Transform:SetPosition(doerpos:Get())
 
@@ -541,7 +573,7 @@ table.insert(prefs, Prefab(
             end
         end
 
-        inst.task_remove = inst:DoTaskInTime(3, RemoveLine)
+        inst.task_remove = inst:DoTaskInTime(3.5, RemoveLine)
 
         return inst
     end,

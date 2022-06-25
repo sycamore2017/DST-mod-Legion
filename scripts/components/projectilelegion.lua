@@ -2,7 +2,7 @@ local ProjectileLegion = Class(function(self, inst)
     self.inst = inst
 	self.shootrange = nil --最远抛射距离
 	self.isgoback = nil --是否为返回玩家
-	self.bulletradius = 1.5 --子弹半径(影响击中的最小距离)
+	self.bulletradius = 1.2 --子弹半径(影响击中的最小距离)
 	self.speed = 20 --抛射速度
 	self.stimuli = nil
 	self.hittargets = {} --把已经被攻击过的对象记下来，防止重复攻击
@@ -31,6 +31,13 @@ function ProjectileLegion:Throw(owner, targetpos, attacker, angle)
 	self.attacker = attacker --真正发起攻击的对象
 	self.start = owner:GetPosition()
 	self.dest = targetpos
+
+	if self.isgoback then --StartUpdatingComponent会在下一帧执行，但是很可能在这一帧就飞远了
+		if distsq(self.dest, self.start) <= self.bulletradius*self.bulletradius then
+			self:Miss()
+			return
+		end
+	end
 
 	if attacker ~= nil and self.launchoffset ~= nil then
 		local x, y, z = self.inst.Transform:GetWorldPosition()
@@ -150,7 +157,7 @@ function ProjectileLegion:DelayVisibility(duration)
         self.delaytask:Cancel()
     end
     self.inst:Hide()
-    self.delaytask = self.inst:DoTaskInTime(duration, OnShow, self)
+    self.delaytask = self.inst:DoTaskInTime(duration or FRAMES, OnShow, self)
 end
 
 return ProjectileLegion

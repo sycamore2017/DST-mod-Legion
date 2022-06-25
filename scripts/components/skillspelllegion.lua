@@ -4,12 +4,14 @@ local SkillSpellLegion = Class(function(self, inst)
 end)
 
 function SkillSpellLegion:CanCast(caster, pos)
-	return self.inst.components.aoetargeting ~= nil and self.inst.components.aoetargeting.alwaysvalid or
-		(
-			TheWorld.Map:IsPassableAtPoint(pos:Get()) and
-			not TheWorld.Map:IsGroundTargetBlocked(pos) and
-			TheWorld.Map:IsAboveGroundAtPoint(pos:Get())
-		)
+	--Tip：官方的战斗辅助组件。与官方一样的判定方式
+	-- return self.inst.components.aoetargeting ~= nil and self.inst.components.aoetargeting.alwaysvalid or
+	-- 	(
+	-- 		TheWorld.Map:IsPassableAtPoint(pos:Get()) and
+	-- 		not TheWorld.Map:IsGroundTargetBlocked(pos) and
+	-- 		TheWorld.Map:IsAboveGroundAtPoint(pos:Get())
+	-- 	)
+	return true
 end
 
 function SkillSpellLegion:CastSpell(caster, pos, options)

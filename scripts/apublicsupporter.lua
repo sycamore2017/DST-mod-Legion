@@ -1563,8 +1563,144 @@ end
 --------------------------------------------------------------------------
 
 if CONFIGS_LEGION.LEGENDOFFALL then
+    local RC_SKILL_L = Action({ priority=1.5, rmb=true, mount_valid=true, distance=36 })
+    RC_SKILL_L.id = "RC_SKILL_L" --rightclick_skillspell_legion
+    RC_SKILL_L.str = STRINGS.ACTIONS.RC_SKILL_L
+    RC_SKILL_L.strfn = function(act)
+        if act.doer ~= nil then
+            if act.doer:HasTag("siv_feather") then
+                return "FEATHERTHROW"
+            elseif act.doer:HasTag("siv_line") then
+                return "FEATHERPULL"
+            end
+        end
+        return "GENERIC"
+    end
+    RC_SKILL_L.fn = function(act)
+        local weapon = act.invobject or act.doer.components.inventory:GetEquippedItem(EQUIPSLOTS.HANDS)
+        if weapon and weapon.components.skillspelllegion ~= nil then
+            local pos = act.target and act.target:GetPosition() or act:GetActionPoint()
+            if weapon.components.skillspelllegion:CanCast(act.doer, pos) then
+                weapon.components.skillspelllegion:CastSpell(act.doer, pos)
+                return true
+            end
+        end
+    end
+    AddAction(RC_SKILL_L)
+
+    AddComponentAction("POINT", "skillspelllegion", function(inst, doer, pos, actions, right)
+        --Tip：官方的战斗辅助组件。战斗辅助组件绑定了 ACTIONS.CASTAOE，不能用其他动作
+        -- if
+        --     right and
+        --     (inst.components.aoetargeting == nil or inst.components.aoetargeting:IsEnabled()) and
+        --     (
+        --         inst.components.aoetargeting ~= nil and inst.components.aoetargeting.alwaysvalid or
+        --         (TheWorld.Map:IsAboveGroundAtPoint(pos:Get()) and not TheWorld.Map:IsGroundTargetBlocked(pos))
+        --     )
+        -- then
+        --     table.insert(actions, ACTIONS.CASTAOE)
+        -- end
+
+        if
+            right and
+            not TheWorld.Map:IsGroundTargetBlocked(pos)
+        then
+            table.insert(actions, ACTIONS.RC_SKILL_L)
+        end
+    end)
+    AddComponentAction("SCENE", "inspectable", function(inst, doer, actions, right)
+        if right then
+            if
+                doer:HasTag("s_l_pull") or
+                (doer:HasTag("s_l_throw") and doer ~= inst) ----不应该是自己为目标
+            then
+                table.insert(actions, ACTIONS.RC_SKILL_L)
+            end
+        end
+    end)
+
+    AddStategraphActionHandler("wilson", ActionHandler(ACTIONS.RC_SKILL_L, function(inst, action)
+        if inst.sg:HasStateTag("busy") or inst:HasTag("busy") then
+            return
+        end
+        if inst:HasTag("s_l_throw") then
+            return "s_l_throw"
+        elseif inst:HasTag("s_l_pull") then
+            return "s_l_pull"
+        end
+    end))
+    AddStategraphActionHandler("wilson_client", ActionHandler(ACTIONS.RC_SKILL_L, function(inst, action)
+        if inst.sg:HasStateTag("busy") or inst:HasTag("busy") then
+            return
+        end
+        if inst:HasTag("s_l_throw") then
+            return "s_l_throw"
+        elseif inst:HasTag("s_l_pull") then
+            return "s_l_pull"
+        end
+    end))
+
+    --Tip：官方的战斗辅助组件。战斗辅助组件绑定了 ACTIONS.CASTAOE，不能用其他动作
+    --[[
+    ACTIONS.CASTAOE.mount_valid = true
+    local CASTAOE_old = ACTIONS.CASTAOE.fn
+    ACTIONS.CASTAOE.fn = function(act)
+        local act_pos = act:GetActionPoint()
+        if
+            act.invobject ~= nil and
+            act.invobject.components.skillspelllegion ~= nil and
+            act.invobject.components.skillspelllegion:CanCast(act.doer, act_pos)
+        then
+            act.invobject.components.skillspelllegion:CastSpell(act.doer, act_pos)
+            return true
+        end
+        return CASTAOE_old(act)
+    end
+
+    --给动作sg响应加入特殊动画
+    AddStategraphPostInit("wilson", function(sg)
+        for k, v in pairs(sg.actionhandlers) do
+            if v["action"]["id"] == "CASTAOE" then
+                local deststate_old = v.deststate
+                v.deststate = function(inst, action)
+                    if action.invobject ~= nil then
+                        if action.invobject:HasTag("s_l_throw") then
+                            if not inst.sg:HasStateTag("busy") and not inst:HasTag("busy") then
+                                return "s_l_throw"
+                            end
+                            return --进入这层后就不能执行原版逻辑了
+                        end
+                    end
+                    return deststate_old(inst, action)
+                end
+                break
+            end
+        end
+    end)
+    AddStategraphPostInit("wilson_client", function(sg)
+        for k, v in pairs(sg.actionhandlers) do
+            if v["action"]["id"] == "CASTAOE" then
+                local deststate_old = v.deststate
+                v.deststate = function(inst, action)
+                    if action.invobject ~= nil then
+                        if action.invobject:HasTag("s_l_throw") then
+                            if not inst.sg:HasStateTag("busy") and not inst:HasTag("busy") then
+                                return "s_l_throw"
+                            end
+                            return --进入这层后就不能执行原版逻辑了
+                        end
+                    end
+                    return deststate_old(inst, action)
+                end
+                break
+            end
+        end
+    end)
+    ]]--
+
+    ------发射羽毛的动作sg
     AddStategraphState("wilson", State{
-        name = "skill_l_throw",
+        name = "s_l_throw",
         tags = { "doing", "busy", "nointerrupt", "nomorph" },
 
         onenter = function(inst)
@@ -1573,8 +1709,12 @@ if CONFIGS_LEGION.LEGENDOFFALL then
             inst.components.locomotor:Stop()
             inst.AnimState:PlayAnimation("atk_pre")
 
-            if buffaction ~= nil and buffaction.pos ~= nil then
-                inst:ForceFacePoint(buffaction:GetActionPoint():Get())
+            if buffaction ~= nil then
+                if buffaction.target ~= nil then
+                    inst:ForceFacePoint(buffaction.target.Transform:GetWorldPosition())
+                elseif buffaction.pos ~= nil then
+                    inst:ForceFacePoint(buffaction:GetActionPoint():Get())
+                end
             end
 
             if (equip ~= nil and equip.projectiledelay or 0) > 0 then
@@ -1585,14 +1725,6 @@ if CONFIGS_LEGION.LEGENDOFFALL then
                 if inst.sg.statemem.projectiledelay <= 0 then
                     inst.sg.statemem.projectiledelay = nil
                 end
-            end
-
-            --进入时应该清除这个数据，防止数据错位
-            inst:RemoveTag("skill_feather")
-            inst.shootingmap_l = nil
-            if inst.task_checkpull ~= nil then
-                inst.task_checkpull:Cancel()
-                inst.task_checkpull = nil
             end
 
             inst.SoundEmitter:PlaySound("dontstarve/wilson/attack_weapon")
@@ -1636,7 +1768,7 @@ if CONFIGS_LEGION.LEGENDOFFALL then
         -- onexit = function(inst) end,
     })
     AddStategraphState("wilson_client", State{
-        name = "skill_l_throw",
+        name = "s_l_throw",
         tags = { "doing", "busy", "nointerrupt" },
 
         onenter = function(inst)
@@ -1648,7 +1780,9 @@ if CONFIGS_LEGION.LEGENDOFFALL then
             if buffaction ~= nil then
                 inst:PerformPreviewBufferedAction()
 
-                if buffaction.pos ~= nil then
+                if buffaction.target ~= nil then
+                    inst:ForceFacePoint(buffaction.target.Transform:GetWorldPosition())
+                elseif buffaction.pos ~= nil then
                     inst:ForceFacePoint(buffaction:GetActionPoint():Get())
                 end
             end
@@ -1671,80 +1805,9 @@ if CONFIGS_LEGION.LEGENDOFFALL then
             inst.sg:GoToState("idle")
         end,
     })
-
-    ACTIONS.CASTAOE.priority = -5
-    ACTIONS.CASTAOE.mount_valid = true
-    local CASTAOE_old = ACTIONS.CASTAOE.fn
-    ACTIONS.CASTAOE.fn = function(act)
-        local act_pos = act:GetActionPoint()
-        if
-            act.invobject ~= nil and
-            act.invobject.components.skillspelllegion ~= nil and
-            act.invobject.components.skillspelllegion:CanCast(act.doer, act_pos)
-        then
-            act.invobject.components.skillspelllegion:CastSpell(act.doer, act_pos)
-            return true
-        end
-        return CASTAOE_old(act)
-    end
-
-    AddComponentAction("POINT", "skillspelllegion", function(inst, doer, pos, actions, right)
-        if
-            right and
-            (inst.components.aoetargeting == nil or inst.components.aoetargeting:IsEnabled()) and
-            (
-                inst.components.aoetargeting ~= nil and inst.components.aoetargeting.alwaysvalid or
-                (TheWorld.Map:IsAboveGroundAtPoint(pos:Get()) and not TheWorld.Map:IsGroundTargetBlocked(pos))
-            )
-        then
-            table.insert(actions, ACTIONS.CASTAOE)
-        end
-    end)
-
-    --给动作sg响应加入特殊动画
-    AddStategraphPostInit("wilson", function(sg)
-        for k, v in pairs(sg.actionhandlers) do
-            if v["action"]["id"] == "CASTAOE" then
-                local deststate_old = v.deststate
-                v.deststate = function(inst, action)
-                    if action.invobject ~= nil then
-                        if action.invobject:HasTag("skill_feather") then
-                            if not inst.sg:HasStateTag("busy") and not inst:HasTag("busy") then
-                                return "skill_l_throw"
-                            end
-                            return --进入这层后就不能执行原版逻辑了
-                        end
-                    end
-                    return deststate_old(inst, action)
-                end
-                break
-            end
-        end
-    end)
-    AddStategraphPostInit("wilson_client", function(sg)
-        for k, v in pairs(sg.actionhandlers) do
-            if v["action"]["id"] == "CASTAOE" then
-                local deststate_old = v.deststate
-                v.deststate = function(inst, action)
-                    if action.invobject ~= nil then
-                        if action.invobject:HasTag("skill_feather") then
-                            if not inst.sg:HasStateTag("busy") and not inst:HasTag("busy") then
-                                return "skill_l_throw"
-                            end
-                            return --进入这层后就不能执行原版逻辑了
-                        end
-                    end
-                    return deststate_old(inst, action)
-                end
-                break
-            end
-        end
-    end)
-
-    ------拉回羽毛的动作
-
+    ------拉回羽毛的动作sg
     AddStategraphState("wilson", State{
-        name = "pull_feather_l",
+        name = "s_l_pull",
         tags = { "doing", "busy", "nointerrupt", "nomorph" },
 
         onenter = function(inst)
@@ -1785,7 +1848,7 @@ if CONFIGS_LEGION.LEGENDOFFALL then
         }
     })
     AddStategraphState("wilson_client", State{
-        name = "pull_feather_l",
+        name = "s_l_pull",
         tags = { "doing", "busy", "nointerrupt" },
 
         onenter = function(inst)
@@ -1810,44 +1873,4 @@ if CONFIGS_LEGION.LEGENDOFFALL then
             inst.sg:GoToState("idle")
         end,
     })
-
-    local PULL_FEATHER_L = Action({ priority=12, rmb=true, mount_valid=true, distance=36 })
-    PULL_FEATHER_L.id = "PULL_FEATHER_L"
-    PULL_FEATHER_L.str = STRINGS.ACTIONS_LEGION.PULL_FEATHER_L
-    PULL_FEATHER_L.fn = function(act)
-        if
-            act.invobject ~= nil and
-            act.invobject.components.skillsteplegion ~= nil
-        then
-            act.invobject.components.skillsteplegion:CastSpell(act.doer)
-            return true
-        end
-    end
-    AddAction(PULL_FEATHER_L)
-
-    AddComponentAction("POINT", "skillsteplegion", function(inst, doer, pos, actions, right)
-        if
-            right and
-            not TheWorld.Map:IsGroundTargetBlocked(pos)
-        then
-            table.insert(actions, ACTIONS.PULL_FEATHER_L)
-        end
-    end)
-
-    AddStategraphActionHandler("wilson", ActionHandler(ACTIONS.PULL_FEATHER_L, function(inst, action)
-        if
-            inst.sg:HasStateTag("busy") or inst:HasTag("busy")
-        then
-            return
-        end
-        return "pull_feather_l"
-    end))
-    AddStategraphActionHandler("wilson_client", ActionHandler(ACTIONS.PULL_FEATHER_L, function(inst, action)
-        if
-            inst.sg:HasStateTag("busy") or inst:HasTag("busy")
-        then
-            return
-        end
-        return "pull_feather_l"
-    end))
 end

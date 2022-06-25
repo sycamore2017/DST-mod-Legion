@@ -3308,7 +3308,6 @@ STRINGS.ACTIONS_LEGION = {
     USE_UPGRADEKIT = "Assembly upgrade", --升级套件的升级动作的名字
     MAKE = "Make", --打窝器容器的按钮名字
     ATTACK_SHIELD_L = "Protective attack", --盾牌类道具通用动作的名字
-    PULL_FEATHER_L = "Feather Retrieve", --拉回子圭羽毛动作的名字
 }
 STRINGS.ACTIONS.GIVE.SCABBARD = "Put into"  --青枝绿叶放入武器的名字
 STRINGS.ACTIONS.PICK.GENETRANS = "Take down"  --收获子圭·育的名字
@@ -3512,5 +3511,8 @@ S_________WURT.ACTIONFAIL.FEED_BEEF_L = S_________WURT.ACTIONFAIL.GIVE
 S_______WALTER.ACTIONFAIL.FEED_BEEF_L = S_______WALTER.ACTIONFAIL.GIVE
 S________WANDA.ACTIONFAIL.FEED_BEEF_L = S________WANDA.ACTIONFAIL.GIVE
 
-STRINGS.ACTIONS.CASTAOE.SIVING_FEATHER_REAL = "Feather Split"
-STRINGS.ACTIONS.CASTAOE.SIVING_FEATHER_FAKE = "Feather Throw"
+STRINGS.ACTIONS.RC_SKILL_L = {
+    GENERIC = "Spell",
+    FEATHERTHROW = "Feather Split",
+    FEATHERPULL = "Feather Retrieve"
+}
