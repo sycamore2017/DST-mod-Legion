@@ -1273,9 +1273,12 @@ AddStategraphState("wilson", State{
         inst.sg:SetTimeout(13 * FRAMES)
 
         local buffaction = inst:GetBufferedAction()
-        -- inst.components.combat:BattleCry()
         if buffaction ~= nil then
-            inst:FacePoint(buffaction:GetActionPoint():Get())
+            if buffaction.target ~= nil then
+                inst:ForceFacePoint(buffaction.target.Transform:GetWorldPosition())
+            elseif buffaction.pos ~= nil then
+                inst:ForceFacePoint(buffaction:GetActionPoint():Get())
+            end
         end
 
         equip.components.shieldlegion:StartAttack(inst)
@@ -1345,7 +1348,12 @@ AddStategraphState("wilson_client", State{
         local buffaction = inst:GetBufferedAction()
         if buffaction ~= nil then
             inst:PerformPreviewBufferedAction()
-            inst:FacePoint(buffaction:GetActionPoint():Get())
+
+            if buffaction.target ~= nil then
+                inst:ForceFacePoint(buffaction.target.Transform:GetWorldPosition())
+            elseif buffaction.pos ~= nil then
+                inst:ForceFacePoint(buffaction:GetActionPoint():Get())
+            end
         end
     end,
 
@@ -1393,7 +1401,7 @@ end)
 AddStategraphActionHandler("wilson", ActionHandler(ACTIONS.ATTACK_SHIELD_L, function(inst, action)
     if
         inst.sg:HasStateTag("atk_shield") or inst.sg:HasStateTag("busy") or inst:HasTag("busy") or
-        action.invobject == nil
+        (action.invobject == nil and action.target == nil)
         -- or action.invobject.components.shieldlegion == nil or
         -- not action.invobject.components.shieldlegion:CanAttack(inst)
     then
@@ -1405,7 +1413,7 @@ end))
 AddStategraphActionHandler("wilson_client", ActionHandler(ACTIONS.ATTACK_SHIELD_L, function(inst, action)
     if
         inst.sg:HasStateTag("atk_shield") or inst:HasTag("busy") or
-        action.invobject == nil
+        (action.invobject == nil and action.target == nil)
         -- or not action.invobject:HasTag("canshieldatk")
     then
         return
@@ -1441,7 +1449,6 @@ local function FlingItem_terror(dropper, loot, pt, flingtargetpos, flingtargetva
         end
     end
 end
-
 AddPrefabPostInit("shieldofterror", function(inst)
     inst:AddTag("combatredirect")   --代表这个武器会给予伤害对象重定义函数
     inst:AddTag("allow_action_on_impassable")
@@ -1558,6 +1565,26 @@ if TUNING.LEGION_FLASHANDCRUSH or CONFIGS_LEGION.LEGENDOFFALL then
     end)
 end
 
+_G.CA_S_INSPECTABLE_L = { --ComponentAction_SCENE_INSPECTABLE_legion
+    function(inst, doer, actions, right)
+        if right then
+            local item = doer.replica.inventory:GetEquippedItem(EQUIPSLOTS.HANDS)
+            if item ~= nil and item:HasTag("canshieldatk") then
+                table.insert(actions, ACTIONS.ATTACK_SHIELD_L)
+                return true
+            end
+        end
+        return false
+    end
+}
+AddComponentAction("SCENE", "inspectable", function(inst, doer, actions, right)
+    for _,fn in ipairs(CA_S_INSPECTABLE_L) do
+        if fn(inst, doer, actions, right) then
+            return
+        end
+    end
+end)
+
 --------------------------------------------------------------------------
 --[[ 武器技能 ]]
 --------------------------------------------------------------------------
@@ -1608,15 +1635,17 @@ if CONFIGS_LEGION.LEGENDOFFALL then
             table.insert(actions, ACTIONS.RC_SKILL_L)
         end
     end)
-    AddComponentAction("SCENE", "inspectable", function(inst, doer, actions, right)
+    table.insert(_G.CA_S_INSPECTABLE_L, function(inst, doer, actions, right)
         if right then
             if
                 doer:HasTag("s_l_pull") or
                 (doer:HasTag("s_l_throw") and doer ~= inst) ----不应该是自己为目标
             then
                 table.insert(actions, ACTIONS.RC_SKILL_L)
+                return true
             end
         end
+        return false
     end)
 
     AddStategraphActionHandler("wilson", ActionHandler(ACTIONS.RC_SKILL_L, function(inst, action)
@@ -1704,11 +1733,11 @@ if CONFIGS_LEGION.LEGENDOFFALL then
         tags = { "doing", "busy", "nointerrupt", "nomorph" },
 
         onenter = function(inst)
-            local buffaction = inst:GetBufferedAction()
             local equip = inst.components.inventory:GetEquippedItem(EQUIPSLOTS.HANDS)
             inst.components.locomotor:Stop()
             inst.AnimState:PlayAnimation("atk_pre")
 
+            local buffaction = inst:GetBufferedAction()
             if buffaction ~= nil then
                 if buffaction.target ~= nil then
                     inst:ForceFacePoint(buffaction.target.Transform:GetWorldPosition())
@@ -1812,7 +1841,8 @@ if CONFIGS_LEGION.LEGENDOFFALL then
 
         onenter = function(inst)
             inst.components.locomotor:Stop()
-            inst.AnimState:PlayAnimation("atk_pre")
+            inst.AnimState:PlayAnimation("catch_pre")
+            inst.AnimState:PushAnimation("catch", false)
 
             if inst.sivfeathers_l ~= nil then
                 for _,v in ipairs(inst.sivfeathers_l) do
@@ -1829,20 +1859,15 @@ if CONFIGS_LEGION.LEGENDOFFALL then
                 inst.sg:RemoveStateTag("nointerrupt")
                 inst:PerformBufferedAction()
             end),
-            TimeEvent(18 * FRAMES, function(inst)
-                inst.sg:GoToState("idle", true)
+            TimeEvent(6 * FRAMES, function(inst)
+                inst.sg:RemoveStateTag("busy")
             end),
         },
 
         events = {
-            EventHandler("animover", function(inst)
+            EventHandler("animqueueover", function(inst)
                 if inst.AnimState:AnimDone() then
-                    if inst.AnimState:IsCurrentAnimation("atk_pre") then
-                        inst.AnimState:PlayAnimation("throw")
-                        inst.AnimState:SetTime(6 * FRAMES)
-                    else
-                        inst.sg:GoToState("idle")
-                    end
+                    inst.sg:GoToState("idle")
                 end
             end),
         }
@@ -1853,8 +1878,9 @@ if CONFIGS_LEGION.LEGENDOFFALL then
 
         onenter = function(inst)
             inst.components.locomotor:Stop()
-            inst.AnimState:PlayAnimation("atk_pre")
-            inst.AnimState:PushAnimation("atk_lag", false)
+            inst.AnimState:PlayAnimation("catch_pre")
+            inst.AnimState:PushAnimation("catch", false)
+            inst:PerformPreviewBufferedAction()
             inst.sg:SetTimeout(2)
         end,
 
