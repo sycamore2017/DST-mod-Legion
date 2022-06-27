@@ -4,6 +4,12 @@ local prefs = {}
 --[[ 通用 ]]
 --------------------------------------------------------------------------
 
+local LineMap = {
+    silk = 2,
+    steelwool = 20,
+    cattenball = 15
+}
+
 local function MakeBoss(data)
     table.insert(prefs, Prefab(
         data.name,
@@ -61,7 +67,7 @@ local function MakeBoss(data)
             -- inst.components.combat:SetAttackPeriod(3.5)
             -- inst.components.combat:SetRetargetFunction(1, RetargetFn)
             -- inst.components.combat:SetKeepTargetFunction(KeepTargetFn)
-            -- inst.components.combat:SetHurtSound("dontstarve_DLC001/creatures/moose/hurt") --undo
+            -- inst.components.combat:SetHurtSound("dontstarve_DLC001/creatures/moose/hurt")
 
             -- inst:ListenForEvent("attacked", OnAttacked)
             -- inst:ListenForEvent("timerdone", ontimerdone)
@@ -92,6 +98,7 @@ local function OnEquip(inst, owner)
     owner:AddTag("siv_feather")
 end
 local function OnUnequip(inst, owner)
+    owner.AnimState:ClearOverrideSymbol("swap_object")
     owner.AnimState:Hide("ARM_carry")
     owner.AnimState:Show("ARM_normal")
 
@@ -114,7 +121,7 @@ local function OnThrown(inst, owner, targetpos, attacker)
     inst:PushEvent("on_no_longer_landed")
     inst.SoundEmitter:PlaySound("dontstarve/creatures/leif/swipe", nil, 0.3)
 end
-local function OnMiss(inst, pos, attacker)
+local function OnMiss(inst, targetpos, attacker)
     if inst.components.projectilelegion.isgoback then
         inst.components.projectilelegion.isgoback = nil
         if attacker and attacker.sivfeathers_l ~= nil then
@@ -263,7 +270,6 @@ local function MakeWeapon(data)
             inst.components.weapon:SetRange(-1.5, -1.5) --人物默认攻击距离为3、3
 
             inst:AddComponent("projectilelegion")
-            inst.components.projectilelegion.shootrange = 13
             inst.components.projectilelegion.speed = 45
             inst.components.projectilelegion.onthrown = OnThrown
             inst.components.projectilelegion.onmiss = OnMiss
@@ -272,13 +278,27 @@ local function MakeWeapon(data)
             inst.components.skillspelllegion.fn_spell = function(inst, caster, pos, options)
                 if caster.components.inventory then
                     local doerpos = caster:GetPosition()
-                    local num = inst.components.stackable:StackSize()
                     local angles = {}
                     local poss = {}
                     local direction = (pos - doerpos):GetNormalized() --单位向量
                     local angle = math.acos(direction:Dot(Vector3(1, 0, 0))) / DEGREES --这个角度是动画的，不能用来做物理的角度
                     local ang_lag = 2.5
-                    local items = caster.components.inventory:RemoveItem(inst, true)
+
+                    --查询是否有能拉回的材料
+                    local lines = caster.components.inventory:FindItems(function(i)
+                        if i.line_l_value ~= nil or LineMap[i.prefab] then
+                            return true
+                        end
+                    end)
+
+                    local items = nil --需要丢出去的羽毛
+                    local num = inst.components.stackable:StackSize()
+                    if num <= 5 then
+                        items = caster.components.inventory:RemoveItem(inst, true)
+                    else
+                        items = inst.components.stackable:Get(5)
+                        items.components.inventoryitem:OnRemoved() --由于此时还处于物品栏状态，需要恢复为非物品栏状态
+                    end
 
                     if num == 1 then
                         angles = { 0 }
@@ -312,13 +332,9 @@ local function MakeWeapon(data)
                         item.components.projectilelegion:DelayVisibility(item.projectiledelay)
                     end
 
-                    if num > 5 then --5个都丢出去了，剩下的还给玩家 undo 如果不能拉回，那就不用卸下装备
-                        caster.components.inventory:GiveItem(items)
-                    end
                     if caster.components.health ~= nil and not caster.components.health:IsDead() then
                         caster.components.health:DoDelta(-4*num, true, data.name, false, nil, true)
-                        if not caster.components.health:IsDead() then
-                            --undo 如果背包里有对应材料时才产生这个
+                        if not caster.components.health:IsDead() and #lines > 0 then
                             local line = SpawnPrefab("siving_feather_line")
                             caster.sivfeathers_l = feathers
                             line.linedoer = caster
@@ -430,13 +446,15 @@ MakeWeapon({
         Asset("IMAGE", "images/inventoryimages/siving_feather_real.tex"),
     },
     prefabs = {
-        "reticulelongmulti",
-        "reticulelongmultiping",
+        -- "reticulelongmulti", --Tip：官方的战斗辅助组件
+        -- "reticulelongmultiping",
         "siving_feather_line"
     },
     -- fn_common = function(inst) end,
     fn_server = function(inst)
         inst.components.weapon:SetDamage(61.2) --34*1.8
+
+        inst.components.projectilelegion.shootrange = 13
     end
 })
 
@@ -447,6 +465,36 @@ MakeWeapon({
 --------------------------------------------------------------------------
 
 --玩家武器
+MakeWeapon({
+    name = "siving_feather_fake",
+    assets = {
+        Asset("ANIM", "anim/siving_feather_fake.zip"),
+        Asset("ATLAS", "images/inventoryimages/siving_feather_fake.xml"),
+        Asset("IMAGE", "images/inventoryimages/siving_feather_fake.tex"),
+    },
+    prefabs = {
+        -- "reticulelongmulti", --Tip：官方的战斗辅助组件
+        -- "reticulelongmultiping",
+        "siving_feather_line"
+    },
+    -- fn_common = function(inst) end,
+    fn_server = function(inst)
+        inst.components.weapon:SetDamage(40.8) --34*1.2
+
+        inst.components.projectilelegion.shootrange = 10
+        inst.components.projectilelegion.onhit = function(inst, targetpos, doer, target)
+            if not inst.isbroken and math.random() < 0.05 then
+                inst.isbroken = true
+                inst.Physics:Stop()
+                inst:StopUpdatingComponent(inst.components.projectilelegion)
+                inst:DoTaskInTime(0, function()
+                    inst:Remove()
+                end)
+            end
+        end
+    end
+})
+
 --BOSS产物
 
 --------------------------------------------------------------------------
@@ -498,7 +546,6 @@ table.insert(prefs, Prefab(
         end
 
         inst.persists = false
-        inst.lineowner = nil --指向能提供丝线的物品
         inst.linedoer = nil --指发起这个动作的玩家
 
         inst:AddComponent("inspectable")
@@ -521,12 +568,62 @@ table.insert(prefs, Prefab(
 
         inst:AddComponent("skillspelllegion")
         inst.components.skillspelllegion.fn_spell = function(inst, doer, pos, options)
-            --undo 先检查物品栏是否有所需道具才能拉回
             if doer.sivfeathers_l ~= nil then
+                --查询能拉回的材料
+                local lines = doer.components.inventory:FindItems(function(i)
+                    if i.line_l_value ~= nil or LineMap[i.prefab] then
+                        return true
+                    end
+                end)
+                if #lines <= 0 then --没有能拉回的材料，直接结束
+                    return
+                end
+
+                local cost = nil
+                if doer.feather_l_value == nil then --提前加1，用来消耗
+                    cost = 1
+                else
+                    cost = doer.feather_l_value + 1
+                end
+                for _,v in ipairs(lines) do
+                    local value = v.line_l_value or LineMap[v.prefab]
+                    if cost < value then --还未到消耗之时
+                        break
+                    end
+
+                    if v.components.stackable == nil then
+                        local costitem = doer.components.inventory:RemoveItem(v, nil, true)
+                        if costitem then
+                            costitem:Remove()
+                        end
+                        cost = cost - value
+                    else
+                        local num = v.components.stackable:StackSize()
+                        for i = 1, num, 1 do
+                            local costitem = doer.components.inventory:RemoveItem(v, nil, true)
+                            if costitem then
+                                costitem:Remove()
+                            end
+                            cost = cost - value
+                            if cost < value then
+                                break
+                            end
+                        end
+                    end
+                    if cost < value then
+                        break
+                    end
+                end
+                if cost <= 0 then
+                    doer.feather_l_value = nil
+                else
+                    doer.feather_l_value = cost
+                end
+
                 local throwed = false
                 local doerpos = doer:GetPosition()
                 for _,v in ipairs(doer.sivfeathers_l) do
-                    if v and v:IsValid() then
+                    if v and v:IsValid() and not v.isbroken then
                         --如果在背包里，就删除自己
                         if v.components.inventoryitem ~= nil and v.components.inventoryitem:IsHeld() then
                             RemoveFromOnwer(v)
@@ -537,8 +634,6 @@ table.insert(prefs, Prefab(
                         end
                     end
                 end
-
-                --undo消耗丝线
 
                 inst.linedoer = nil --拉回触发时，提前把这个数据清除，就不会解除玩家的数据了
                 if not throwed then --如果没有能拉回来的羽毛，那就直接结算拉回的结果
@@ -568,6 +663,8 @@ table.insert(prefs, Prefab(
                                 doer.components.inventory:GiveItem(newitem)
                             end
                         end
+                    else
+                        RemoveLine(inst)
                     end
                 end
             end

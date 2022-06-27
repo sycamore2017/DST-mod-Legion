@@ -139,6 +139,9 @@ function ProjectileLegion:OnUpdate(dt)
 		end
 	end
 
+	if self.inst.isbroken then
+		return
+	end
 	if self.isgoback then
 		if distsq(self.dest, current) <= self.bulletradius*self.bulletradius then
 			self:Miss()
