@@ -18,7 +18,6 @@ local assets =
 local prefabs =
 {
     "neverfadebush",
-    -- "neverfade_butterfly",
     "neverfade_shield",
     "buff_butterflysblessing",
 }
@@ -198,10 +197,16 @@ local function ondeploy(inst, pt, deployer) --这里是右键种植时的函数
         if linkdata ~= nil and tree.components.skinedlegion ~= nil then
             tree.components.skinedlegion:SetSkin(linkdata.bush)
         end
-
         tree.Transform:SetPosition(pt:Get())
+
+        local percent = inst.components.finiteuses:GetPercent()
         inst:Remove()
         tree.components.pickable:OnTransplant()
+        if percent > 0 then
+            tree.components.pickable:LongUpdate(
+                math.min(TUNING.TOTAL_DAY_TIME*2, TUNING.TOTAL_DAY_TIME*3*percent)
+            )
+        end
         if deployer ~= nil and deployer.SoundEmitter ~= nil then
             deployer.SoundEmitter:PlaySound("dontstarve/common/plant")
         end

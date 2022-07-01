@@ -18,16 +18,14 @@ local function LeaderPos(inst)
         leader = inst --如果没有领导者就以自己为中心徘徊
     end
 
-    if leader and 
-       leader:IsValid() then
+    if leader and leader:IsValid() then
         return Vector3(leader.Transform:GetWorldPosition())
     end
 end
 
 local function GoHomeAction(inst)
     local flower = inst --原地消失
-    if flower and 
-       flower:IsValid() then
+    if flower and flower:IsValid() then
         return BufferedAction(inst, flower, ACTIONS.GOHOME, nil, Vector3(flower.Transform:GetWorldPosition()))
     end
 end
@@ -47,9 +45,9 @@ function Neverfade_ButterflyBrain:OnStart()
             Follow(self.inst, function() return self.inst.components.follower.leader end, MIN_FOLLOW, MED_FOLLOW, MAX_FOLLOW, true),
             Wander(self.inst, LeaderPos, MAX_WANDER_DIST),
         },1)
-    
+
     self.bt = BT(self.inst, root)
-         
+
 end
 
 return Neverfade_ButterflyBrain

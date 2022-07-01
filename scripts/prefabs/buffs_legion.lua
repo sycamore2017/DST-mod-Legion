@@ -308,15 +308,11 @@ local function DeleteButterfly(buff, player)
 end
 
 local function RegisterRedirectDamageFn(buff, player) --登记自己的redirectdamagefn函数
-    --初始化
-    if player.redirect_table == nil then
-        player.redirect_table = {}
-    end
-    --登记庇佑的函数
+    RebuildRedirectDamageFn(player) --全局函数：重新构造combat的redirectdamagefn函数
     if player.redirect_table[buff.prefab] == nil then
         player.redirect_table[buff.prefab] = function(victim, attacker, damage, weapon, stimuli)
-            if damage > 0 or stimuli == "electric" or stimuli == "darkness" then --骑牛也可以发动效果，爱屋及乌
-                if buff.countbutterflies > 0 then
+            if buff.countbutterflies ~= nil and buff.countbutterflies > 0 then
+                if damage > 0 or stimuli == "electric" or stimuli == "darkness" then --骑牛也可以发动效果，爱屋及乌
                     local redirect = buff.blessingbutterflies[buff.countbutterflies]
                     DeleteButterfly(buff, victim)
                     return redirect
@@ -343,8 +339,6 @@ MakeBuff({
         else
             AddButterfly(buff, target)
         end
-
-        RebuildRedirectDamageFn(target) --全局函数：重新构造combat的redirectdamagefn函数
         RegisterRedirectDamageFn(buff, target)
     end,
     fn_again = function(buff, target)
@@ -361,6 +355,7 @@ MakeBuff({
         end
         buff.countbutterflies = 0
         buff.blessingbutterflies = {}
+        target.countblessing = 0 --一般触发这里都是因为玩家死亡，此时应该清除玩家的数据
     end,
     fn_server = function(buff)
         buff.precount = nil --记录保存下的数量（OnLoad()比OnAttached()先执行）
