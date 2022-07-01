@@ -45,6 +45,7 @@ function ProjectileLegion:Throw(owner, targetpos, attacker, angle)
 		self.inst.Transform:SetPosition(x + self.launchoffset.x * math.cos(facing_angle), y + self.launchoffset.y, z - self.launchoffset.x * math.sin(facing_angle))
 	end
 
+	self.hittargets = {}
 	self.inst.Physics:ClearCollidesWith(COLLISION.LIMITS)
 	self:RotateToTarget(self.dest, angle)
 	self.inst.Physics:SetMotorVel(self.speed, 0, 0)

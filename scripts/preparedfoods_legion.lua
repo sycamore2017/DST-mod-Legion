@@ -20,7 +20,7 @@ local foods_legion =
         hunger = 62.5,
         sanity = 0,
         perishtime = TUNING.PERISH_FAST, --6天
-        cooktime = 0.5,
+        cooktime = 0.5, --【Tip】基础时间20秒，最终用时= cooktime*20
         potlevel = "low",
         float = {nil, "small", 0.2, 1.05},
         -- overridebuild = nil, --替换料理build，这样所有料理都可以共享一个build了

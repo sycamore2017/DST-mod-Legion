@@ -286,6 +286,11 @@ local protector_data =  --每种保护者的详细数据
         stage = "lighthouse",
         realLootOdds = 0.1
     },
+    mutated_penguin = {
+        num = 5,
+        stage = "staycool",
+        realLootOdds = 0.03
+    },
 
     --特殊类型的保护
     iceexplosion = { 

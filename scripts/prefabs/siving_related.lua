@@ -724,6 +724,92 @@ table.insert(prefs, Prefab(
     nil
 ))
 
+--------------------------------------------------------------------------
+--[[ 子圭面具 ]]
+--------------------------------------------------------------------------
+
+local function MakeMask(data)
+    table.insert(prefs, Prefab(
+        data.name,
+        function()
+            local inst = CreateEntity()
+
+            inst.entity:AddTransform()
+            inst.entity:AddAnimState()
+            inst.entity:AddNetwork()
+
+            MakeInventoryPhysics(inst)
+
+            inst:AddTag("hat")
+            inst:AddTag("allow_action_on_impassable")
+
+            inst.AnimState:SetBank(data.name)
+            inst.AnimState:SetBuild(data.name)
+            inst.AnimState:PlayAnimation("idle")
+
+            MakeInventoryFloatable(inst, "small", 0.2, 0.5)
+            local OnLandedClient_old = inst.components.floater.OnLandedClient
+            inst.components.floater.OnLandedClient = function(self)
+                OnLandedClient_old(self)
+                self.inst.AnimState:SetFloatParams(0.04, 1, self.bob_percent)
+            end
+
+            if data.fn_common ~= nil then
+                data.fn_common(inst)
+            end
+
+            inst.entity:SetPristine()
+            if not TheWorld.ismastersim then
+                return inst
+            end
+
+            inst:AddComponent("inspectable")
+
+            inst:AddComponent("stackable")
+            inst.components.stackable.maxsize = TUNING.STACK_SIZE_MEDITEM
+
+            inst:AddComponent("inventoryitem")
+            inst.components.inventoryitem.imagename = data.name
+            inst.components.inventoryitem.atlasname = "images/inventoryimages/"..data.name..".xml"
+            inst.components.inventoryitem:SetOnDroppedFn(OnDropped)
+
+            inst:AddComponent("equippable")
+            inst.components.equippable:SetOnEquip(OnEquip)
+            inst.components.equippable:SetOnUnequip(OnUnequip)
+            inst.components.equippable.equipstack = true --装备时可以叠加装备
+
+            MakeHauntableLaunch(inst)
+
+            if data.fn_server ~= nil then
+                data.fn_server(inst)
+            end
+
+            return inst
+        end,
+        data.assets,
+        data.prefabs
+    ))
+end
+
+------子圭·汲
+-- MakeMask({
+--     name = "siving_mask",
+--     assets = {
+--         Asset("ANIM", "anim/siving_mask.zip"),
+--         Asset("ATLAS", "images/inventoryimages/siving_mask.xml"),
+--         Asset("IMAGE", "images/inventoryimages/siving_mask.tex"),
+--     },
+--     prefabs = {
+--         -- "siving_feather_line"
+--     },
+--     -- fn_common = function(inst) end,
+--     fn_server = function(inst)
+        
+--     end
+-- })
+
+------子圭·歃
+
 --------------------
 --------------------
 

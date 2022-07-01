@@ -297,20 +297,21 @@ local dressup_data = {
         buildfile = "swap_bottle",
         buildsymbol = "swap_bottle",
     },
-    oar = --木桨
-    {
+    oar = { --木桨
         buildfile = "swap_oar",
-        buildsymbol = "swap_oar",
+        buildsymbol = "swap_oar"
     },
-    oar_driftwood = --浮木桨
-    {
+    oar_driftwood = { --浮木桨
         buildfile = "swap_oar_driftwood",
-        buildsymbol = "swap_oar_driftwood",
+        buildsymbol = "swap_oar_driftwood"
     },
-    malbatross_beak = --邪天翁喙
-    {
+    oar_monkey = { --战桨
+        buildfile = "swap_oar_monkey",
+        buildsymbol = "swap_oar_monkey"
+    },
+    malbatross_beak = { --邪天翁喙
         buildfile = "swap_malbatross_beak",
-        buildsymbol = "swap_malbatross_beak",
+        buildsymbol = "swap_malbatross_beak"
     },
     oceanfishingrod = --海洋钓竿
     {
@@ -417,6 +418,14 @@ local dressup_data = {
     dumbbell_gem = { --宝石哑铃
         buildfile = "swap_dumbbell_gem",
         buildsymbol = "swap_dumbbell_gem",
+    },
+    dumbbell_marble = { --大理石哑铃
+        buildfile = "swap_dumbbell_marble",
+        buildsymbol = "swap_dumbbell_marble"
+    },
+    cutless = { --木头短剑
+        buildfile = "cutless",
+        buildsymbol = "swap_cutless"
     },
     -- minifan = --有贴图之外的实体，不做幻化
     -- {
@@ -590,7 +599,7 @@ local dressup_data = {
             end
 
             return itemswap
-        end,
+        end
     },
     icehat =
     {
@@ -686,8 +695,7 @@ local dressup_data = {
             return itemswap
         end,
     },
-    kelphat =
-    {
+    kelphat = {
         isopentop = true,
         buildfile = "hat_kelp",
         buildsymbol = "swap_hat",
@@ -703,8 +711,7 @@ local dressup_data = {
         buildfile = "hat_cookiecutter",
         buildsymbol = "swap_hat",
     },
-    batnosehat =
-    {
+    batnosehat = {
         isnoskin = true,
         buildfile = "hat_batnose",
         buildsymbol = "swap_hat",
@@ -749,6 +756,34 @@ local dressup_data = {
     eyemaskhat = { --眼面具
         buildfile = "hat_eyemask",
         buildsymbol = "swap_hat",
+    },
+    balloonhat = {
+        buildfile = "hat_balloon",
+        buildsymbol = "swap_hat",
+    },
+    monkey_mediumhat = { --船长的三角帽
+        buildfile = "hat_monkey_medium",
+        buildsymbol = "swap_hat",
+    },
+    monkey_smallhat = { --海盗头巾
+        buildfile = "hat_monkey_small",
+        buildsymbol = "swap_hat",
+    },
+    polly_rogershat = { --波莉·罗杰的帽子
+        buildfn = function(dressup, item, buildskin)
+            local itemswap = {}
+            local symbol = "swap_hat"
+            if not item.components.spawner.child or item.components.spawner.child.components.health:IsDead() then
+                symbol = "swap_hat2"
+            end
+
+            itemswap["swap_hat"] = dressup:GetDressData(
+                buildskin, "hat_polly_rogers", symbol, item.GUID, "swap"
+            )
+            dressup:SetDressTop(itemswap)
+
+            return itemswap
+        end
     },
 
     -------------------------------
@@ -969,18 +1004,15 @@ local dressup_data = {
         buildfile = "potato_sack",
         buildsymbol = "swap_body",
     },
-    armor_bramble = --荆棘甲
-    {
+    armor_bramble = { --荆棘甲
         buildfile = "armor_bramble",
         buildsymbol = "swap_body",
     },
-    spicepack =
-    {
+    spicepack = {
         isbackpack = true,
         buildfile = "swap_chefpack",
     },
-    seedpouch =
-    {
+    seedpouch = {
         isbackpack = true,
         buildfile = "seedpouch",
     },
@@ -1001,6 +1033,10 @@ local dressup_data = {
     carnival_vest_c = { --叽叽喳喳小披肩
         isbackpack = true,
         buildfile = "carnival_vest_c",
+    },
+    balloonvest = {
+        buildfile = "balloonvest",
+        buildsymbol = "swap_body"
     },
     -- moon_altar --月科技系列的可搬动建筑，独一无二的，不能幻化
     -- sculpture_knighthead = --骑士的大理石碎片。全图唯一性，不做幻化
