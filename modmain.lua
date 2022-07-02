@@ -293,20 +293,30 @@ if TUNING.LEGION_SUPERBCUISINE then
         table.insert(Assets, v)
     end
 
-    -- AddIngredientValues({"plantmeat"}, {meat=.5, veggie=.5}, true, false)   --食人花肉块茎
-    -- AddIngredientValues({"batwing"}, {meat=.5}, true, false)    --蝙蝠翅膀，虽然可以晾晒，但是得到的不是蝙蝠翅膀干，而是小肉干，所以candry不能填true
-    AddIngredientValues({"ash"}, {inedible=1}, false, false)    --灰烬
-    AddIngredientValues({"slurtleslime"}, {gel=1}, false, false)    --蜗牛黏液
-    AddIngredientValues({"glommerfuel"}, {gel=1}, false, false)    --格罗姆黏液
-    AddIngredientValues({"phlegm"}, {gel=1}, false, false)    --钢羊黏痰
-    -- AddIngredientValues({"wormlight_lesser"}, {veggie=.5}, false, false)    --发光小浆果
-    -- AddIngredientValues({"wormlight"}, {veggie=1}, false, false)    --发光浆果
-    AddIngredientValues({"furtuft"}, {inedible=1}, false, false)    --熊毛屑(非熊皮)
+    -- AddIngredientValues({"plantmeat"}, {meat=.5, veggie=.5}, true, false) --食人花肉块茎
+    -- AddIngredientValues({"batwing"}, {meat=.5}, true, false) --蝙蝠翅膀，虽然可以晾晒，但是得到的不是蝙蝠翅膀干，而是小肉干，所以candry不能填true
+    AddIngredientValues({"ash"}, {inedible=1}, false, false) --灰烬
+    AddIngredientValues({"slurtleslime"}, {gel=1}, false, false) --蜗牛黏液
+    AddIngredientValues({"glommerfuel"}, {gel=1}, false, false) --格罗姆黏液
+    AddIngredientValues({"phlegm"}, {gel=1}, false, false) --钢羊黏痰
+    -- AddIngredientValues({"wormlight_lesser"}, {veggie=.5}, false, false) --发光小浆果
+    -- AddIngredientValues({"wormlight"}, {veggie=1}, false, false) --发光浆果
+    AddIngredientValues({"furtuft"}, {inedible=1}, false, false) --熊毛屑(非熊皮)
     AddIngredientValues({"twiggy_nut"}, {inedible=1}, false, false) --添加树枝树种作为新的料理原材料
-    AddIngredientValues({"moon_tree_blossom"}, {veggie=.5, petals_legion=1}, false, false)   --月树花
-    AddIngredientValues({"foliage"}, {decoration=1}, false, false)   --蕨叶
+    AddIngredientValues({"moon_tree_blossom"}, {veggie=.5, petals_legion=1}, false, false) --月树花
+    AddIngredientValues({"foliage"}, {decoration=1}, false, false) --蕨叶
+    AddIngredientValues({"horn"}, {inedible=1, decoration=2}, false, false) --牛角
 
     for k, recipe in pairs(require("preparedfoods_legion")) do
+        table.insert(Assets, Asset("ATLAS", "images/cookbookimages/"..recipe.name..".xml"))
+        table.insert(Assets, Asset("IMAGE", "images/cookbookimages/"..recipe.name..".tex"))
+
+        AddCookerRecipe("cookpot", recipe)
+        AddCookerRecipe("portablecookpot", recipe)
+        AddCookerRecipe("archive_cookpot", recipe)
+        RegisterInventoryItemAtlas("images/cookbookimages/"..recipe.name..".xml", recipe.name..".tex")
+    end
+    for k, recipe in pairs(require("prepareditems_legion")) do
         table.insert(Assets, Asset("ATLAS", "images/cookbookimages/"..recipe.name..".xml"))
         table.insert(Assets, Asset("IMAGE", "images/cookbookimages/"..recipe.name..".tex"))
 
@@ -321,7 +331,7 @@ if TUNING.LEGION_SUPERBCUISINE then
         AddCookerRecipe("portablespicer", recipe)
     end
 
-    --官方的便携香料站代码没改新机制，这里用另类方式手动改一下。等官方更新了我就删除了。相关文件 prefabs\portablespicer.lua
+    --官方的便携香料站代码没改新机制，这里用另类方式手动改一下。等官方修复了我就删除。相关文件 prefabs\portablespicer.lua
     local IsModCookingProduct_old = IsModCookingProduct
     _G.IsModCookingProduct = function(cooker, name)
         if foodrecipes_spice[name] ~= nil then
@@ -333,6 +343,7 @@ if TUNING.LEGION_SUPERBCUISINE then
         return false
     end
 
+    --食谱中官方料理的修改
     if CONFIGS_LEGION.BETTERCOOKBOOK then
         local cookbookui_legion = require("widgets/cookbookui_legion")
         local fooduidata_legion = require("languages/recipedesc_legion_chinese")

@@ -1462,6 +1462,66 @@ S_____WORMWOOD.BUFF_OILFLOW = {
 -- S_______WALTER.BUFF_OILFLOW = ""
 -- S________WANDA.BUFF_OILFLOW = ""
 
+S_NAMES.DISH_TOMAHAWKSTEAK = "Steak Tomahawk" --牛排战斧
+STRINGS.UI.COOKBOOK.DISH_TOMAHAWKSTEAK = "Favorite axe of the king of one-upmanship"
+S______GENERIC.DESCRIBE.DISH_TOMAHAWKSTEAK = {
+    GENERIC = "Would anyone like a steak that was fried hard and brown?",
+    CHOP = "Cut it down!",
+    ATK = "Come and fight!",
+}
+S_______WILLOW.DESCRIBE.DISH_TOMAHAWKSTEAK = {
+    GENERIC = "What kind of idiot wastes food to make such things!",
+    CHOP = "Take my move!",
+    ATK = "One-on-one is the real deal!",
+}
+S_____WOLFGANG.DESCRIBE.DISH_TOMAHAWKSTEAK = {
+    GENERIC = "It's not edible, unfortunately.",
+    CHOP = "Wolfgang, the force is great!",
+    ATK = "Wolfgang is an undefeated one-on-one legend!",
+}
+-- S________WENDY.DESCRIBE.DISH_TOMAHAWKSTEAK = ""
+-- S_________WX78.DESCRIBE.DISH_TOMAHAWKSTEAK = ""
+S_WICKERBOTTOM.DESCRIBE.DISH_TOMAHAWKSTEAK = {
+    GENERIC = "A special fragrance and perhaps a surprising effect.",
+    CHOP = "Just cut to the perfect angle.",
+    ATK = "We can have a battle of knowledge!",
+}
+S_______WOODIE.DESCRIBE.DISH_TOMAHAWKSTEAK = {
+    GENERIC = "Nature's favorite, meat-scented axe.",
+    CHOP = "A treeless world is about to be reached.",
+    ATK = "Other troublemakers go away!",
+}
+-- S______WAXWELL.DESCRIBE.DISH_TOMAHAWKSTEAK = ""
+S___WATHGRITHR.DESCRIBE.DISH_TOMAHAWKSTEAK = {
+    GENERIC = "I already expected the enemy to fight me with drooling mouths.",
+    CHOP = "I am invincible, er, in terms of chopping.",
+    ATK = "A showdown that's all about you and me!",
+}
+-- S_______WEBBER.DESCRIBE.DISH_TOMAHAWKSTEAK = ""
+S_______WINONA.DESCRIBE.DISH_TOMAHAWKSTEAK = {
+    GENERIC = "An axe that cannot be used as a gourmet food is not a good weapon.",
+    CHOP = "Nice axe!",
+    ATK = "How about a fair match?",
+}
+S_______WORTOX.DESCRIBE.DISH_TOMAHAWKSTEAK = {
+    GENERIC = "The lure of food.",
+    CHOP = "No matter how thick trunk also to fall under my crispy axe!",
+    ATK = "I have unilaterally issued a challenge to you!",
+}
+S_____WORMWOOD.DESCRIBE.DISH_TOMAHAWKSTEAK = {
+    GENERIC = "Fragrance, ah no, bad bad!",
+    CHOP = "Gently, without pain.",
+    ATK = "Come, come, come!",
+}
+S________WARLY.DESCRIBE.DISH_TOMAHAWKSTEAK = {
+    GENERIC = "To challenge the natural taste buds.",
+    CHOP = "As easy as chopping vegetables.",
+    ATK = "Have you eaten? If not, eat my axe!",
+}
+-- S_________WURT.DESCRIBE.DISH_TOMAHAWKSTEAK = ""
+-- S_______WALTER.DESCRIBE.DISH_TOMAHAWKSTEAK = ""
+-- S________WANDA.DESCRIBE.DISH_TOMAHAWKSTEAK = ""
+
 --------------------------------------------------------------------------
 --[[ the sacrifice of rain ]]--[[ 祈雨祭 ]]
 --------------------------------------------------------------------------

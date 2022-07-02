@@ -1,20 +1,3 @@
-local function OnIgniteFn(inst)
-    inst.SoundEmitter:PlaySound("dontstarve/common/blackpowder_fuse_LP", "hiss")
-    DefaultBurnFn(inst)
-end
-
-local function OnExtinguishFn(inst)
-    inst.SoundEmitter:KillSound("hiss")
-    DefaultExtinguishFn(inst)
-end
-
-local function OnExplodeFn(inst)
-    inst.SoundEmitter:KillSound("hiss")
-    SpawnPrefab("explode_small").Transform:SetPosition(inst.Transform:GetWorldPosition())
-end
-
------
-
 local prefabs = {
     "spoiled_food",
 }
@@ -50,10 +33,6 @@ local function MakePreparedFood(data)
         inst.entity:AddTransform()
         inst.entity:AddAnimState()
         inst.entity:AddNetwork()
-
-        if data.name == "dish_frenchsnailsbaked" then    --法式焗蜗牛有声音
-            inst.entity:AddSoundEmitter()
-        end
 
         MakeInventoryPhysics(inst)
 
@@ -100,8 +79,11 @@ local function MakePreparedFood(data)
             end
         end
 
-        inst.entity:SetPristine()
+        if data.fn_common ~= nil then
+            data.fn_common(inst)
+        end
 
+        inst.entity:SetPristine()
         if not TheWorld.ismastersim then
             return inst
         end
@@ -147,21 +129,10 @@ local function MakePreparedFood(data)
 			inst.components.perishable.onperishreplacement = "spoiled_food"
 		end
 
-        if realname == "dish_frenchsnailsbaked" then    --法式焗蜗牛具有点燃爆炸效果
-            MakeSmallBurnable(inst, 3 + math.random() * 3)  --延时着火
-            inst.components.burnable:SetOnBurntFn(nil)
-            inst.components.burnable:SetOnIgniteFn(OnIgniteFn)
-            inst.components.burnable:SetOnExtinguishFn(OnExtinguishFn)
-
-            inst:AddComponent("explosive")
-            inst.components.explosive:SetOnExplodeFn(OnExplodeFn)
-            inst.components.explosive.explosivedamage = TUNING.SLURTLESLIME_EXPLODE_DAMAGE
-            inst.components.explosive.buildingdamage = 1
-            inst.components.explosive.lightonexplode = false
-        else
-            MakeSmallBurnable(inst) --可点燃
+        if not data.noburnable then
+            MakeSmallBurnable(inst)
+            MakeSmallPropagator(inst)
         end
-        MakeSmallPropagator(inst)
 
         MakeHauntableLaunchAndPerish(inst)
 
@@ -169,12 +140,17 @@ local function MakePreparedFood(data)
 
         inst:AddComponent("tradable")
 
+        if data.fn_server ~= nil then
+            data.fn_server(inst)
+        end
+
         return inst
     end
 
     return Prefab(data.name, fn, assets, foodprefabs)
 end
 
+----------
 ----------
 
 local prefs = {}

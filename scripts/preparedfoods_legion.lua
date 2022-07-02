@@ -7,8 +7,26 @@ local function CanBuff(inst)
         not inst:HasTag("playerghost")
 end
 
-local foods_legion =
-{
+------
+
+local function OnIgniteFn(inst)
+    inst.SoundEmitter:PlaySound("dontstarve/common/blackpowder_fuse_LP", "hiss")
+    DefaultBurnFn(inst)
+end
+
+local function OnExtinguishFn(inst)
+    inst.SoundEmitter:KillSound("hiss")
+    DefaultExtinguishFn(inst)
+end
+
+local function OnExplodeFn(inst)
+    inst.SoundEmitter:KillSound("hiss")
+    SpawnPrefab("explode_small").Transform:SetPosition(inst.Transform:GetWorldPosition())
+end
+
+------
+
+local foods_legion = {
     dish_duriantartare = {
         test = function(cooker, names, tags)
             return (names.durian or names.durian_cooked) and tags.meat and (tags.monster and tags.monster > 2)
@@ -20,6 +38,7 @@ local foods_legion =
         hunger = 62.5,
         sanity = 0,
         perishtime = TUNING.PERISH_FAST, --6天
+        -- cookpot_perishtime = 0, --在烹饪锅上的新鲜度时间，能替换perishtime
         cooktime = 0.5, --【Tip】基础时间20秒，最终用时= cooktime*20
         potlevel = "low",
         float = {nil, "small", 0.2, 1.05},
@@ -484,6 +503,23 @@ local foods_legion =
         recipe_count = 6,
 
         oneat_desc = STRINGS.UI.COOKBOOK.DISH_FRENCHSNAILSBAKED,
+
+        noburnable = true,
+        fn_common = function(inst)
+            inst.entity:AddSoundEmitter()
+        end,
+        fn_server = function(inst)
+            MakeSmallBurnable(inst, 3 + math.random() * 3)  --延时着火
+            inst.components.burnable:SetOnBurntFn(nil)
+            inst.components.burnable:SetOnIgniteFn(OnIgniteFn)
+            inst.components.burnable:SetOnExtinguishFn(OnExtinguishFn)
+
+            inst:AddComponent("explosive")
+            inst.components.explosive:SetOnExplodeFn(OnExplodeFn)
+            inst.components.explosive.explosivedamage = TUNING.SLURTLESLIME_EXPLODE_DAMAGE
+            inst.components.explosive.buildingdamage = 1
+            inst.components.explosive.lightonexplode = false
+        end
     },
 
     dish_neworleanswings = {
@@ -1045,6 +1081,9 @@ if TUNING.LEGION_DESERTSECRET then
         end,
     }
 end
+
+------
+------
 
 if CONFIGS_LEGION.BETTERCOOKBOOK then
     for k,v in pairs(foods_legion) do

@@ -1440,6 +1440,66 @@ S_____WORMWOOD.BUFF_OILFLOW = {
 -- S_______WALTER.BUFF_OILFLOW = ""
 -- S________WANDA.BUFF_OILFLOW = ""
 
+S_NAMES.DISH_TOMAHAWKSTEAK = "牛排战斧"
+STRINGS.UI.COOKBOOK.DISH_TOMAHAWKSTEAK = "单挑之王最爱的斧头"
+S______GENERIC.DESCRIBE.DISH_TOMAHAWKSTEAK = {
+    GENERIC = "煎得又硬又糙的牛排，会有人喜欢吗？",
+    CHOP = "砍倒啦！",
+    ATK = "有本事来单挑啊！",
+}
+S_______WILLOW.DESCRIBE.DISH_TOMAHAWKSTEAK = {
+    GENERIC = "哪个小鬼浪费粮食做这种东西！？",
+    CHOP = "吃我一招！",
+    ATK = "单挑才是真本事！",
+}
+S_____WOLFGANG.DESCRIBE.DISH_TOMAHAWKSTEAK = {
+    GENERIC = "这不能吃吗，可惜了。",
+    CHOP = "沃尔夫冈，力大无穷！",
+    ATK = "沃尔夫冈可是一对一的不败传奇！",
+}
+-- S________WENDY.DESCRIBE.DISH_TOMAHAWKSTEAK = ""
+-- S_________WX78.DESCRIBE.DISH_TOMAHAWKSTEAK = ""
+S_WICKERBOTTOM.DESCRIBE.DISH_TOMAHAWKSTEAK = {
+    GENERIC = "有着特殊的香味，也许还有出人意料的效果。",
+    CHOP = "刚刚砍到了完美的角度。",
+    ATK = "咱们可以来个知识的较量！",
+}
+S_______WOODIE.DESCRIBE.DISH_TOMAHAWKSTEAK = {
+    GENERIC = "大自然的最爱，肉香斧头。",
+    CHOP = "无树存活的世界就要达成了。",
+    ATK = "其他闹事的给我走远点！",
+}
+-- S______WAXWELL.DESCRIBE.DISH_TOMAHAWKSTEAK = ""
+S___WATHGRITHR.DESCRIBE.DISH_TOMAHAWKSTEAK = {
+    GENERIC = "我已预想到敌人会流着口水与我战斗。",
+    CHOP = "我是战无不胜的，额，砍树方面。",
+    ATK = "这是一场只关于你我的对决！",
+}
+-- S_______WEBBER.DESCRIBE.DISH_TOMAHAWKSTEAK = ""
+S_______WINONA.DESCRIBE.DISH_TOMAHAWKSTEAK = {
+    GENERIC = "不能当美食的斧子不是好武器。",
+    CHOP = "好斧子！",
+    ATK = "公平较量，怎么样？",
+}
+S_______WORTOX.DESCRIBE.DISH_TOMAHAWKSTEAK = {
+    GENERIC = "美食的诱惑。",
+    CHOP = "多粗壮的树干也要拜倒在我的酥肉斧头下！",
+    ATK = "我单方面给你下达了挑战书！",
+}
+S_____WORMWOOD.DESCRIBE.DISH_TOMAHAWKSTEAK = {
+    GENERIC = "香香，啊不对，坏坏！",
+    CHOP = "轻轻的，不痛。",
+    ATK = "来来来！",
+}
+S________WARLY.DESCRIBE.DISH_TOMAHAWKSTEAK = {
+    GENERIC = "我要挑战自然的味蕾。",
+    CHOP = "切菜一样容易。",
+    ATK = "吃了吗，没吃的话，吃我一斧！",
+}
+-- S_________WURT.DESCRIBE.DISH_TOMAHAWKSTEAK = ""
+-- S_______WALTER.DESCRIBE.DISH_TOMAHAWKSTEAK = ""
+-- S________WANDA.DESCRIBE.DISH_TOMAHAWKSTEAK = ""
+
 --------------------------------------------------------------------------
 --[[ the sacrifice of rain ]]--[[ 祈雨祭 ]]
 --------------------------------------------------------------------------
