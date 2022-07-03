@@ -1,3 +1,7 @@
+--------------------------------------------------------------------------
+--[[ 食物类料理 ]]
+--------------------------------------------------------------------------
+
 local prefabs = {
     "spoiled_food",
 }
@@ -149,6 +153,141 @@ local function MakePreparedFood(data)
 
     return Prefab(data.name, fn, assets, foodprefabs)
 end
+
+--------------------------------------------------------------------------
+--[[ 物品类料理 ]]
+--------------------------------------------------------------------------
+
+------牛排战斧------
+
+local function UpdateAxe(inst)
+    local value = 61.2 * inst.components.perishable:GetPercent()
+    value = Remap(value, 0, 61.2, 37.4, 61.2)
+    inst.components.weapon:SetDamage(value)
+
+    value = 1.66 * inst.components.perishable:GetPercent()
+    value = Remap(value, 0, 1.66, 1, 1.66)
+    inst.components.tool.actions[ACTIONS.CHOP] = value
+end
+local function AfterWorking(inst, data)
+    if
+        data.target and data.target:IsValid() and
+        data.target.components.workable ~= nil and
+        data.target.components.workable:CanBeWorked() and
+        data.target.components.workable:GetWorkAction() == ACTIONS.CHOP and
+        math.random() < 0.05
+    then
+        data.target.components.workable:Destroy(inst)
+        if inst.components.talker ~= nil then
+            inst.components.talker:Say(GetString(inst, "DESCRIBE", { "DISH_TOMAHAWKSTEAK", "CHOP" }))
+        end
+    end
+end
+
+table.insert(prefs, Prefab(
+    "dish_tomahawksteak",
+    function()
+        local inst = CreateEntity()
+
+        inst.entity:AddTransform()
+        inst.entity:AddAnimState()
+        inst.entity:AddNetwork()
+
+        MakeInventoryPhysics(inst)
+
+        inst.AnimState:SetBank("dish_tomahawksteak")
+        inst.AnimState:SetBuild("dish_tomahawksteak")
+        inst.AnimState:PlayAnimation("idle")
+
+        inst:AddTag("sharp")
+
+        --tool (from tool component) added to pristine state for optimization
+        inst:AddTag("tool")
+
+        --weapon (from weapon component) added to pristine state for optimization
+        inst:AddTag("weapon")
+
+        MakeInventoryFloatable(inst, "small", 0.4, 0.5)
+        -- local OnLandedClient_old = inst.components.floater.OnLandedClient
+        -- inst.components.floater.OnLandedClient = function(self)
+        --     OnLandedClient_old(self)
+        --     self.inst.AnimState:SetFloatParams(0.15, 1, self.bob_percent)
+        -- end
+
+        inst.entity:SetPristine()
+        if not TheWorld.ismastersim then
+            return inst
+        end
+
+        inst:AddComponent("inspectable")
+
+        inst:AddComponent("inventoryitem")
+        inst.components.inventoryitem.imagename = "dish_tomahawksteak"
+        inst.components.inventoryitem.atlasname = "images/inventoryimages/dish_tomahawksteak.xml"
+
+        inst:AddComponent("perishable")
+        inst.components.perishable:SetPerishTime(TUNING.PERISH_MED)
+        inst.components.perishable:StartPerishing()
+        inst.components.perishable.onperishreplacement = "boneshard"
+
+        inst:AddComponent("tool")
+        inst.components.tool:SetAction(ACTIONS.CHOP, 1.66)
+
+        inst:AddComponent("weapon")
+        inst.components.weapon:SetDamage(61.2) --34x1.8
+        inst.components.weapon:SetOnAttack(function(inst, owner, target)
+            UpdateAxe(inst)
+            if target ~= nil then
+                local hasenemy = false
+                local x, y, z = owner.Transform:GetWorldPosition()
+                local ents = TheSim:FindEntities(x, y, z, 16, { "_combat" }, {"NOCLICK", "INLIMBO", "player"})
+                for _,v in ipairs(ents) do
+                    if
+                        v ~= target and v:IsValid()
+                        and v.components.health ~= nil and not v.components.health:IsDead()
+                        and v.components.combat ~= nil and v.components.combat.target == owner
+                    then
+                        v.components.combat:DropTarget(false)
+                        hasenemy = true
+                    end
+                end
+                if hasenemy and math.random() < 0.1 then
+                    if owner.components.talker ~= nil then
+                        owner.components.talker:Say(GetString(owner, "DESCRIBE", { "DISH_TOMAHAWKSTEAK", "ATK" }))
+                    end
+                end
+            end
+        end)
+
+        inst:AddComponent("equippable")
+        inst.components.equippable:SetOnEquip(function(inst, owner)
+            UpdateAxe(inst)
+            owner.AnimState:OverrideSymbol("swap_object", "dish_tomahawksteak", "swap")
+            owner.AnimState:Show("ARM_carry")
+            owner.AnimState:Hide("ARM_normal")
+            owner:ListenForEvent("working", AfterWorking)
+        end)
+        inst.components.equippable:SetOnUnequip(function(inst, owner)
+            UpdateAxe(inst)
+            owner.AnimState:Hide("ARM_carry")
+            owner.AnimState:Show("ARM_normal")
+            owner:RemoveEventCallback("working", AfterWorking)
+        end)
+
+        inst.OnLoad = function(inst, data)
+            UpdateAxe(inst)
+        end
+
+        MakeHauntableLaunchAndPerish(inst)
+
+        return inst
+    end, {
+        Asset("ANIM", "anim/dish_tomahawksteak.zip"),
+        Asset("ATLAS", "images/inventoryimages/dish_tomahawksteak.xml"),
+        Asset("IMAGE", "images/inventoryimages/dish_tomahawksteak.tex"),
+    },
+    nil
+))
 
 ----------
 ----------

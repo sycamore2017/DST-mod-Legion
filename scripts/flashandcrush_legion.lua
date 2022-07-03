@@ -116,6 +116,15 @@ if TUNING.LEGION_TECHUNLOCK == "lootdropper" then
                 atlas = "images/inventoryimages/fishhomingtool_awesome.xml", image = "fishhomingtool_awesome.tex"
             }, { "RECAST", "FISHING" }
         )
+        AddRecipe2(
+            "siving_mask_gold", {
+                Ingredient("wathgrithrhat", 1),
+                Ingredient("siving_mask", 1, "images/inventoryimages/siving_mask.xml"),
+                Ingredient("dish_shyerryjam", 1, "images/inventoryimages/dish_shyerryjam.xml"),
+            }, TECH.LOST, {
+                atlas = "images/inventoryimages/siving_mask_gold.xml", image = "siving_mask_gold.tex"
+            }, { "RECAST", "ARMOUR", "MAGIC", "RESTORATION" }
+        )
     end
 
     AddRecipe2(
@@ -229,6 +238,16 @@ else
                 nounlock = true,
                 atlas = "images/inventoryimages/fishhomingtool_awesome.xml", image = "fishhomingtool_awesome.tex"
             }, { "RECAST", "FISHING" }
+        )
+        AddRecipe2(
+            "siving_mask_gold", {
+                Ingredient("wathgrithrhat", 1),
+                Ingredient("siving_mask", 1, "images/inventoryimages/siving_mask.xml"),
+                Ingredient("dish_shyerryjam", 1, "images/inventoryimages/dish_shyerryjam.xml"),
+            }, TECH.ELECOURMALINE_THREE, {
+                nounlock = true,
+                atlas = "images/inventoryimages/siving_mask_gold.xml", image = "siving_mask_gold.tex"
+            }, { "RECAST", "ARMOUR", "MAGIC", "RESTORATION" }
         )
     end
 

@@ -1,12 +1,10 @@
-local assets =
-{
+local assets = {
     Asset("ANIM", "anim/foliageath.zip"),
     Asset("ATLAS", "images/inventoryimages/foliageath.xml"),
     Asset("IMAGE", "images/inventoryimages/foliageath.tex"),
 }
 
-local prefabs =
-{
+local prefabs = {
     "foliageath_together",
     "foliageath_mylove",
 }
@@ -20,6 +18,7 @@ local function ItemTradeTest(inst, item)
         hambat = true,
         bullkelp_root = true,
         foliageath = true,
+        dish_tomahawksteak = true,
     }
     if item == nil then
         return false
@@ -67,7 +66,6 @@ local function fn()
     end
 
     inst.entity:SetPristine()
-
     if not TheWorld.ismastersim then
         return inst
     end
@@ -95,8 +93,7 @@ end
 ----------------------------
 ----------------------------
 
-local assets_together =
-{
+local assets_together = {
     Asset("ANIM", "anim/foliageath.zip"),
     Asset("ATLAS", "images/inventoryimages/foliageath_rosorns.xml"),
     Asset("IMAGE", "images/inventoryimages/foliageath_rosorns.tex"),
@@ -112,10 +109,11 @@ local assets_together =
     Asset("IMAGE", "images/inventoryimages/foliageath_bullkelp_root.tex"),
     Asset("ATLAS", "images/inventoryimages/foliageath_foliageath.xml"),
     Asset("IMAGE", "images/inventoryimages/foliageath_foliageath.tex"),
+    Asset("ATLAS", "images/inventoryimages/foliageath_dish_tomahawksteak.xml"),
+    Asset("IMAGE", "images/inventoryimages/foliageath_dish_tomahawksteak.tex"),
 }
 
-local prefabs_together =
-{
+local prefabs_together = {
     "foliageath",
 }
 
@@ -144,11 +142,10 @@ local function MakeIt(name, ismylove)
         local OnLandedClient_old = inst.components.floater.OnLandedClient
         inst.components.floater.OnLandedClient = function(self)
             OnLandedClient_old(self)
-            self.inst.AnimState:SetFloatParams(0.15, 1, 0.1)
+            self.inst.AnimState:SetFloatParams(0.15, 1, self.bob_percent)
         end
 
         inst.entity:SetPristine()
-
         if not TheWorld.ismastersim then
             return inst
         end

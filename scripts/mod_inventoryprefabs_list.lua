@@ -137,6 +137,8 @@ local InventoryPrefabsList = {  --每个元素的下标值为每种物品栏图�
     mint_l = { build = "images_minisign6", },
     seeds_crop_l = { build = "images_minisign6", },
 
+    siving_feather_fake = { build = "images_minisign6", },
+    siving_feather_real = { build = "images_minisign6", },
     dish_tomahawksteak = { build = "images_minisign6", },
 
     --skins

@@ -40,6 +40,10 @@ local assets = {
     Asset("IMAGE", "images/inventoryimages/fishhomingtool_awesome.tex"),
     Asset("ATLAS", "images/inventoryimages/siving_turn.xml"),
     Asset("IMAGE", "images/inventoryimages/siving_turn.tex"),
+    Asset("ATLAS", "images/inventoryimages/siving_mask.xml"),
+    Asset("IMAGE", "images/inventoryimages/siving_mask.tex"),
+    Asset("ATLAS", "images/inventoryimages/siving_mask_gold.xml"),
+    Asset("IMAGE", "images/inventoryimages/siving_mask_gold.tex"),
 }
 
 for k,v in pairs(assets) do
@@ -116,6 +120,14 @@ AddRecipe2(
         placer="siving_turn_placer",
         atlas = "images/inventoryimages/siving_turn.xml", image = "siving_turn.tex"
     }, { "MAGIC", "GARDENING", "STRUCTURES" }
+)
+AddRecipe2(
+    "siving_mask", {
+        Ingredient("siving_rocks", 12, "images/inventoryimages/siving_rocks.xml"),
+        Ingredient("reviver", 2),
+    }, TECH.LOST, {
+        atlas = "images/inventoryimages/siving_mask.xml", image = "siving_mask.tex"
+    }, { "ARMOUR", "MAGIC", "RESTORATION" }
 )
 
 --这个配方用来便于绿宝石法杖分解

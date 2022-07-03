@@ -1001,7 +1001,7 @@ if CONFIGS_LEGION.LEGENDOFFALL then
             return names.pineananas and tags.frozen and (tags.sweetener and tags.sweetener >= 2)
                 and not tags.monster and not tags.meat
         end,
-        priority = 20,
+        priority = 51, --比太真mod的奇异甜食优先级高一点，防止被顶替
         foodtype = FOODTYPE.VEGGIE,
         health = 0,
         hunger = 18,

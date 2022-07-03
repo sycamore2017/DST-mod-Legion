@@ -1,5 +1,4 @@
-local assets =
-{
+local assets = {
     Asset("ANIM", "anim/fimbul_axe.zip"),
     Asset("ANIM", "anim/swap_fimbul_axe.zip"),
     Asset("ATLAS", "images/inventoryimages/fimbul_axe.xml"),
@@ -7,8 +6,7 @@ local assets =
     Asset("ANIM", "anim/boomerang.zip"), --官方回旋镖动画模板
 }
 
-local prefabs =
-{
+local prefabs = {
     "fimbul_lightning",
     "fimbul_cracklebase_fx",
 }
@@ -189,7 +187,7 @@ local function fn()
     inst.components.projectile:SetOnHitFn(OnHit)        --敌方或者自己被击中时
     inst.components.projectile:SetOnMissFn(OnMiss)      --丢失目标时？
     --inst.components.projectile:SetOnCaughtFn(OnCaught)--被抓住时
-    
+
     inst:AddComponent("inventoryitem")
     inst.components.inventoryitem.imagename = "fimbul_axe"
     inst.components.inventoryitem.atlasname = "images/inventoryimages/fimbul_axe.xml"

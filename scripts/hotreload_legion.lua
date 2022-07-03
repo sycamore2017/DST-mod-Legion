@@ -13,6 +13,7 @@ local hot = {
 	siving_foenix = 'boss_siving_phoenix',
 	siving_moenix = 'boss_siving_phoenix',
 	siving_feather_real = 'boss_siving_phoenix',
+	dish_tomahawksteak = 'foods_cookpot',
 }
 local old_sp = GLOBAL.SpawnPrefab
 function GLOBAL.SpawnPrefab(prefab, ...)
