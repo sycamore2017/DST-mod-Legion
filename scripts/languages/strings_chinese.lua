@@ -1400,7 +1400,7 @@ S_______WALTER.ANNOUNCE_DETACH_BUFF_OILFLOW = "这将是我一生的污点。"
 S________WANDA.ANNOUNCE_DETACH_BUFF_OILFLOW = "我后悔了，真的。"
 --
 S______GENERIC.BUFF_OILFLOW = {
-    "我滴乖乖...", "...", "... ...", "......", "这下要社死了。", "可不能让人看见。", "噢不！",
+    "我滴乖乖...", "...", "... ...", "……", "这下要社死了。", "可不能让人看见。", "噢不！",
     "啥时候停啊？", "噩梦何时醒来？", "疯球了...", "快停下！", "不要啊...", "洗手间在哪里？！",
     "此刻我只想离开地球。", "不...", "停停停！", "这...", "快虚脱了。", "不！", "...！", "唉...",
     "真是不好意思。", "抱歉...", "抱歉！",
@@ -1410,14 +1410,14 @@ S______GENERIC.BUFF_OILFLOW = {
 -- S________WENDY.BUFF_OILFLOW = ""
 -- S_________WX78.BUFF_OILFLOW = ""
 S_WICKERBOTTOM.BUFF_OILFLOW = {
-    "我就知道。", "那个料理有问题...", "这里可没有洗手间。", "不！", "...！", "...", "... ...", "......",
+    "我就知道。", "那个料理有问题...", "这里可没有洗手间。", "不！", "...！", "...", "... ...", "……",
     "不...", "这...", "别看见我，别看见我...", "吃一堑长一智。", "身体吃不消了。", "此刻没有优雅可言。",
     "我还没老到这个程度吧。", "人有三急...", "快想想有什么药可以治治。", "我想我知道原因了...",
     "冷静！这位女士...", "没什么大不了的。", "让你见笑了。", "老了还得受这般折腾。",
 }
 -- S_______WOODIE.BUFF_OILFLOW = ""
 S______WAXWELL.BUFF_OILFLOW = {
-    "我就知道。", "那道菜有问题...", "这里没有洗手间。", "不！", "...！", "...", "... ...", "......",
+    "我就知道。", "那道菜有问题...", "这里没有洗手间。", "不！", "...！", "...", "... ...", "……",
     "不...", "这...", "别看见我，别看见我...", "吃一堑长一智。", "身体吃不消了。", "此刻没有体面可言。",
     "我还没老到这个程度吧。", "人有三急...", "快想想有什么办法。", "我想我知道原因了...",
     "冷静！", "没什么大不了的。", "让你见笑了。", "太不体面了！", "老了还得受这般折腾。",
@@ -1426,13 +1426,13 @@ S______WAXWELL.BUFF_OILFLOW = {
 -- S_______WEBBER.BUFF_OILFLOW = ""
 -- S_______WINONA.BUFF_OILFLOW = ""
 S_______WORTOX.BUFF_OILFLOW = {
-    "你好啊，小朋友。", "见到你很高兴...", "噢，啥时候结束啊！", "不！", "...！", "...", "... ...", "......",
+    "你好啊，小朋友。", "见到你很高兴...", "噢，啥时候结束啊！", "不！", "...！", "...", "... ...", "……",
     "不...", "这...", "你好...", "给我整无语了。", "唉...", "唉。", "真是低俗的恶作剧。", "好好笑！",
     "一点都不好笑。", "哈哈哈哈，真是尴尬...", "尴尬。", "不好意思。", "请问，洗手间在哪里？", "我应该溜走。",
     "嗨...", "化作春泥更护花...", "嘿！看什么看！", "没有文化的人不伤心...", "看啥看，没见过恶魔拉粑粑吗！",
 }
 S_____WORMWOOD.BUFF_OILFLOW = {
-    "很奇怪。", "不过也是好事。", "对我来说还好。", "亩产一万斤...", "...", "... ...", "......", "哈哈。",
+    "很奇怪。", "不过也是好事。", "对我来说还好。", "亩产一万斤...", "...", "... ...", "……", "哈哈。",
     "这下朋友们有福啦。", "太好了。", "我越来越饿了...", "噢...", "还好。", "有意思。", "这...",
 }
 -- S________WARLY.BUFF_OILFLOW = ""
@@ -2581,6 +2581,46 @@ S________WARLY.DESCRIBE.SIVING_FEATHER_LINE = "切菜也是有这种手法的，
 -- S_________WURT.DESCRIBE.SIVING_FEATHER_LINE = ""
 S_______WALTER.DESCRIBE.SIVING_FEATHER_LINE = "我也想给弹弓加这个，但没成功过。"
 -- S________WANDA.DESCRIBE.SIVING_FEATHER_LINE = ""
+
+S_NAMES.SIVING_MASK = "子圭·汲"
+S_RECIPE_DESC.SIVING_MASK = "以命换命的戴价。"
+S______GENERIC.DESCRIBE.SIVING_MASK = "一块会吸血的石头面具。"
+S_______WILLOW.DESCRIBE.SIVING_MASK = "为我燃烧生命吧，卑微的仆人们！"
+-- S_____WOLFGANG.DESCRIBE.SIVING_MASK = ""
+S________WENDY.DESCRIBE.SIVING_MASK = "还好它不会伤害到阿比盖尔。"
+-- S_________WX78.DESCRIBE.SIVING_MASK = ""
+S_WICKERBOTTOM.DESCRIBE.SIVING_MASK = "使用了一种不好的魔法，不当使用会噬主。"
+-- S_______WOODIE.DESCRIBE.SIVING_MASK = ""
+S______WAXWELL.DESCRIBE.SIVING_MASK = "也许我能在这个面具下活得久一点。"
+S___WATHGRITHR.DESCRIBE.SIVING_MASK = "卑鄙的败者才喜欢这样的伎俩。"
+S_______WEBBER.DESCRIBE.SIVING_MASK = "我们都觉得这样做不对！" --因为蜘蛛是群居生物，韦伯善良，所以都不想使用这个装备
+-- S_______WINONA.DESCRIBE.SIVING_MASK = ""
+S_______WORTOX.DESCRIBE.SIVING_MASK = "戴上它就化身为不需要被邀请进屋的吸血鬼，啊哈哈哈！"
+S_____WORMWOOD.DESCRIBE.SIVING_MASK = "它很少对朋友们产生敌意。"
+S________WARLY.DESCRIBE.SIVING_MASK = "吃啥补啥，对吧。"
+-- S_________WURT.DESCRIBE.SIVING_MASK = ""
+-- S_______WALTER.DESCRIBE.SIVING_MASK = ""
+S________WANDA.DESCRIBE.SIVING_MASK = "时间也会这样的魔法，慢慢带走所有人的生命。"
+
+S_NAMES.SIVING_MASK_GOLD = "子圭·歃"
+S_RECIPE_DESC.SIVING_MASK_GOLD = "生命呼叫转移。"
+S______GENERIC.DESCRIBE.SIVING_MASK_GOLD = "一块玩弄生命的精致碎金面具。"
+S_______WILLOW.DESCRIBE.SIVING_MASK_GOLD = "为火焰女王献上生命吧，卑微的仆人们！"
+S_____WOLFGANG.DESCRIBE.SIVING_MASK_GOLD = "沃尔夫冈愿意献出自己成就他人。"
+S________WENDY.DESCRIBE.SIVING_MASK_GOLD = "尝试过用它复活阿比盖尔，失败了，一如既往。"
+S_________WX78.DESCRIBE.SIVING_MASK_GOLD = "被它复活时，我居然感受到了一点温暖。"
+S_WICKERBOTTOM.DESCRIBE.SIVING_MASK_GOLD = "对生命魔法的控制更加成熟，不会伤到自己。"
+S_______WOODIE.DESCRIBE.SIVING_MASK_GOLD = "早点想到它就能挽回露西了……"
+S______WAXWELL.DESCRIBE.SIVING_MASK_GOLD = "我会隐藏身份，直到胜利的到来。"
+S___WATHGRITHR.DESCRIBE.SIVING_MASK_GOLD = "堕落之主就擅用这样的手段。"
+S_______WEBBER.DESCRIBE.SIVING_MASK_GOLD = "我们只会更加厌恶这种东西！"
+S_______WINONA.DESCRIBE.SIVING_MASK_GOLD = "我的命运由我做主！"
+S_______WORTOX.DESCRIBE.SIVING_MASK_GOLD = "戴上它就化身为肉身不灭的德古拉，呀哈哈哈！"
+S_____WORMWOOD.DESCRIBE.SIVING_MASK_GOLD = "感觉不对。"
+S________WARLY.DESCRIBE.SIVING_MASK_GOLD = "吃的是草，产的是超级棒的奶！"
+-- S_________WURT.DESCRIBE.SIVING_MASK_GOLD = ""
+-- S_______WALTER.DESCRIBE.SIVING_MASK_GOLD = ""
+S________WANDA.DESCRIBE.SIVING_MASK_GOLD = "它比时间的魔法更高效与残忍。"
 
 --------------------------------------------------------------------------
 --[[ flash and crush ]]--[[ 电闪雷鸣 ]]

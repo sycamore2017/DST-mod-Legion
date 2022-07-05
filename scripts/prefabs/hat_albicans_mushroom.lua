@@ -18,7 +18,7 @@ local prefabs =
 }
 
 local function onequip(inst, owner)
-    HAT_ONEQUIP_LEGION(inst, owner, "hat_albicans_mushroom", "swap_hat")
+    HAT_ONEQUIP_L(inst, owner, "hat_albicans_mushroom", "swap_hat")
 
     inst.components.periodicspawner:Start()
 
@@ -28,7 +28,7 @@ local function onequip(inst, owner)
 end
 
 local function onunequip(inst, owner)
-    HAT_ONUNEQUIP_LEGION(inst, owner)
+    HAT_ONUNEQUIP_L(inst, owner)
 
     inst.components.periodicspawner:Stop()
 

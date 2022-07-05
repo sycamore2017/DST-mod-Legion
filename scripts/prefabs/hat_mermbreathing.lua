@@ -29,7 +29,7 @@ local function onPretendingMerm(owner, data)
 end
 
 local function onequip(inst, owner) --佩戴
-    HAT_OPENTOP_ONEQUIP_LEGION(inst, owner, "hat_mermbreathing", "swap_hat")
+    HAT_OPENTOP_ONEQUIP_L(inst, owner, "hat_mermbreathing", "swap_hat")
 
     if owner.components.moisture then
         owner:ListenForEvent("moisturedelta", onPretendingMerm)
@@ -42,7 +42,7 @@ local function onequip(inst, owner) --佩戴
 end
 
 local function onunequip(inst, owner)   --卸下
-    HAT_ONUNEQUIP_LEGION(inst, owner)
+    HAT_ONUNEQUIP_L(inst, owner)
 
     if owner.components.moisture then
         owner:RemoveEventCallback("moisturedelta", onPretendingMerm)

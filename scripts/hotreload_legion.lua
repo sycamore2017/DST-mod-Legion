@@ -6,14 +6,12 @@
 
 local hot = {
 	--k: prefab名   v: 对应的lua文件名
-	-- siving_ctlwater = 'siving_related',
-	-- siving_ctldirt = 'siving_related',
-	-- siving_derivant_lvl2 = 'siving_rocks_legion',
-	-- siving_derivant_lvl3 = 'siving_rocks_legion',
 	siving_foenix = 'boss_siving_phoenix',
 	siving_moenix = 'boss_siving_phoenix',
 	siving_feather_real = 'boss_siving_phoenix',
 	dish_tomahawksteak = 'foods_cookpot',
+	siving_mask = 'siving_related',
+	siving_mask_gold = 'siving_related',
 }
 local old_sp = GLOBAL.SpawnPrefab
 function GLOBAL.SpawnPrefab(prefab, ...)

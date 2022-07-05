@@ -741,18 +741,11 @@ local function MakeMask(data)
             MakeInventoryPhysics(inst)
 
             inst:AddTag("hat")
-            inst:AddTag("allow_action_on_impassable")
+            inst:AddTag("open_top_hat")
 
             inst.AnimState:SetBank(data.name)
             inst.AnimState:SetBuild(data.name)
             inst.AnimState:PlayAnimation("idle")
-
-            MakeInventoryFloatable(inst, "small", 0.2, 0.5)
-            local OnLandedClient_old = inst.components.floater.OnLandedClient
-            inst.components.floater.OnLandedClient = function(self)
-                OnLandedClient_old(self)
-                self.inst.AnimState:SetFloatParams(0.04, 1, self.bob_percent)
-            end
 
             if data.fn_common ~= nil then
                 data.fn_common(inst)
@@ -763,22 +756,37 @@ local function MakeMask(data)
                 return inst
             end
 
-            inst:AddComponent("inspectable")
+            inst.healthcounter = 0
+            inst.lifetarget = nil
 
-            inst:AddComponent("stackable")
-            inst.components.stackable.maxsize = TUNING.STACK_SIZE_MEDITEM
+            inst:AddComponent("inspectable")
 
             inst:AddComponent("inventoryitem")
             inst.components.inventoryitem.imagename = data.name
             inst.components.inventoryitem.atlasname = "images/inventoryimages/"..data.name..".xml"
-            inst.components.inventoryitem:SetOnDroppedFn(OnDropped)
+            inst.components.inventoryitem:SetSinks(true) --它是石头做的，不可漂浮
 
             inst:AddComponent("equippable")
-            inst.components.equippable:SetOnEquip(OnEquip)
-            inst.components.equippable:SetOnUnequip(OnUnequip)
-            inst.components.equippable.equipstack = true --装备时可以叠加装备
+            inst.components.equippable.equipslot = EQUIPSLOTS.HEAD
+
+            inst:AddComponent("armor")
+
+            inst:AddComponent("tradable")
 
             MakeHauntableLaunch(inst)
+
+            inst.OnSave = function(inst, data)
+                if inst.healthcounter > 0 then
+                    data.healthcounter = inst.healthcounter
+                end
+            end
+            inst.OnLoad = function(inst, data)
+                if data ~= nil then
+                    if data.healthcounter ~= nil then
+                        inst.healthcounter = data.healthcounter
+                    end
+                end
+            end
 
             if data.fn_server ~= nil then
                 data.fn_server(inst)
@@ -791,22 +799,100 @@ local function MakeMask(data)
     ))
 end
 
+local function CancelTask_life(inst, owner)
+    if inst.task_life ~= nil then
+        inst.task_life:Cancel()
+        inst.task_life = nil
+    end
+end
+local function SpawnLifeFx(target, owner)
+    local life = SpawnPrefab("siving_lifesteal_fx")
+    if life ~= nil then
+        life.movingTarget = owner
+        life.Transform:SetPosition(target.Transform:GetWorldPosition())
+    end
+end
+
 ------子圭·汲
--- MakeMask({
---     name = "siving_mask",
---     assets = {
---         Asset("ANIM", "anim/siving_mask.zip"),
---         Asset("ATLAS", "images/inventoryimages/siving_mask.xml"),
---         Asset("IMAGE", "images/inventoryimages/siving_mask.tex"),
---     },
---     prefabs = {
---         -- "siving_feather_line"
---     },
---     -- fn_common = function(inst) end,
---     fn_server = function(inst)
-        
---     end
--- })
+MakeMask({
+    name = "siving_mask",
+    assets = {
+        Asset("ANIM", "anim/siving_mask.zip"),
+        Asset("ATLAS", "images/inventoryimages/siving_mask.xml"),
+        Asset("IMAGE", "images/inventoryimages/siving_mask.tex"),
+    },
+    prefabs = {
+        "siving_lifesteal_fx"
+    },
+    fn_common = function(inst)
+        inst:AddTag("siving_mask")
+    end,
+    fn_server = function(inst)
+        inst.healthcounter_max = 80
+
+        inst.components.equippable:SetOnEquip(function(inst, owner)
+            HAT_OPENTOP_ONEQUIP_L(inst, owner, "siving_mask", "swap_hat")
+
+            local notags = {"NOCLICK", "FX", "shadow", "playerghost", "ghost", "INLIMBO", "wall", "structure"}
+            if owner:HasTag("player") then --佩戴者是玩家时，不吸收其他玩家
+                table.insert(notags, "player")
+            end
+            local _taskcounter = 0
+            inst.task_life = inst:DoPeriodicTask(0.5, function()
+                if not owner:IsValid() then
+                    CancelTask_life(inst, owner)
+                end
+
+                ----计数器管理
+                _taskcounter = _taskcounter + 1
+                local doit = false
+                if _taskcounter % 4 == 0 then --每过两秒
+                    doit = true
+                    _taskcounter = 0
+                end
+
+                ----吸取对象的管理
+                local x, y, z = owner.Transform:GetWorldPosition()
+                local target = inst.lifetarget
+                if --吸血对象失效了，重新找新对象
+                    target == nil or not target:IsValid() or
+                    target.components.health == nil or target.components.health:IsDead() or
+                    target:GetDistanceSqToPoint(x, y, z) > 324 --18*18
+                then
+                    target = FindEntity(owner, 18, function(ent, finder)
+                            if
+                                ent.prefab ~= finder.prefab and --不吸收同类
+                                ent.components.health ~= nil and not ent.components.health:IsDead()
+                            then
+                                return true
+                            end
+                        end,
+                        {"_health"}, notags, nil
+                    )
+                    inst.lifetarget = target
+                end
+
+                ----积累的获取
+                if target ~= nil then
+                    SpawnLifeFx(target, owner)
+                    if doit then
+                        inst.healthcounter = math.min(inst.healthcounter_max, inst.healthcounter + 2) --积累生命2
+                        target.components.health:DoDelta(-2, true, "siving_mask", false, nil, true) --吸取2生命
+                    end
+                end
+
+                ----积累的使用
+            end, 1)
+        end)
+        inst.components.equippable:SetOnUnequip(function(inst, owner)
+            HAT_ONUNEQUIP_L(inst, owner)
+
+            CancelTask_life(inst, owner)
+        end)
+
+        inst.components.armor:InitCondition(315, 0.75)
+    end
+})
 
 ------子圭·歃
 -- siving_mask_gold

@@ -934,7 +934,7 @@ end
 --[[ 全局：帽子相关贴图切换通用函数 ]]
 --------------------------------------------------------------------------
 
-_G.HAT_ONEQUIP_LEGION = function(inst, owner, buildname, foldername)
+_G.HAT_ONEQUIP_L = function(inst, owner, buildname, foldername)
     owner.AnimState:OverrideSymbol("swap_hat", buildname, foldername)
     owner.AnimState:Show("HAT")
     owner.AnimState:Show("HAIR_HAT")
@@ -947,7 +947,7 @@ _G.HAT_ONEQUIP_LEGION = function(inst, owner, buildname, foldername)
     end
 end
 
-_G.HAT_OPENTOP_ONEQUIP_LEGION = function(inst, owner, buildname, foldername)
+_G.HAT_OPENTOP_ONEQUIP_L = function(inst, owner, buildname, foldername)
     owner.AnimState:OverrideSymbol("swap_hat", buildname, foldername)
     owner.AnimState:Show("HAT")
     owner.AnimState:Hide("HAIR_HAT")
@@ -958,7 +958,7 @@ _G.HAT_OPENTOP_ONEQUIP_LEGION = function(inst, owner, buildname, foldername)
     owner.AnimState:Hide("HEAD_HAT")
 end
 
-_G.HAT_ONUNEQUIP_LEGION = function(inst, owner)
+_G.HAT_ONUNEQUIP_L = function(inst, owner)
     owner.AnimState:ClearOverrideSymbol("swap_hat")
     owner.AnimState:Hide("HAT")
     owner.AnimState:Hide("HAIR_HAT")

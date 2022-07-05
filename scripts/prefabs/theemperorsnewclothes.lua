@@ -1,5 +1,5 @@
 local function OnUnequip_crown(inst, owner)
-    HAT_ONUNEQUIP_LEGION(inst, owner)
+    HAT_ONUNEQUIP_L(inst, owner)
 end
 
 ------------

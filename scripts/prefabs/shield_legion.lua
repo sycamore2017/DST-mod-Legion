@@ -286,7 +286,7 @@ if TUNING.LEGION_DESERTSECRET then
             inst.components.skinedlegion:Init("shield_l_sand")
         end,
         fn_server = function(inst)
-            inst.components.inventoryitem:SetSinks(true) --它是石头做的，应该要沉入水底
+            inst.components.inventoryitem:SetSinks(true) --它是石头做的，不可漂浮
 
             inst.components.equippable:SetOnEquip(function(inst, owner)
                 OnEquipFn(inst, owner)

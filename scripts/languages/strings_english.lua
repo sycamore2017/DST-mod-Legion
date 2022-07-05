@@ -2577,7 +2577,7 @@ S_______WORTOX.DESCRIBE.SIVING_FEATHER_FAKE = "I'd love to try it out and see wh
 S_______WALTER.DESCRIBE.SIVING_FEATHER_FAKE = "Fun, I want to have some fun, now!"
 -- S________WANDA.DESCRIBE.SIVING_FEATHER_FAKE = ""
 
-S_NAMES.SIVING_FEATHER_LINE = "Siving Away"
+S_NAMES.SIVING_FEATHER_LINE = "Silked Away" --牵羽牵寻
 S______GENERIC.DESCRIBE.SIVING_FEATHER_LINE = "Hidden threads, tugging at one end of each feather."
 S_______WILLOW.DESCRIBE.SIVING_FEATHER_LINE = "Like the queen of blade."
 -- S_____WOLFGANG.DESCRIBE.SIVING_FEATHER_LINE = ""
@@ -2595,6 +2595,46 @@ S________WARLY.DESCRIBE.SIVING_FEATHER_LINE = "This technique is also used to cu
 -- S_________WURT.DESCRIBE.SIVING_FEATHER_LINE = ""
 S_______WALTER.DESCRIBE.SIVING_FEATHER_LINE = "I tried to add this to slingshot, but never succeeded."
 -- S________WANDA.DESCRIBE.SIVING_FEATHER_LINE = ""
+
+S_NAMES.SIVING_MASK = "Siving·Absor" --子圭·汲
+S_RECIPE_DESC.SIVING_MASK = "What is the wearing price of life."
+S______GENERIC.DESCRIBE.SIVING_MASK = "A stone mask that draws blood."
+S_______WILLOW.DESCRIBE.SIVING_MASK = "Burn your lives for me, humble servants!"
+-- S_____WOLFGANG.DESCRIBE.SIVING_MASK = ""
+S________WENDY.DESCRIBE.SIVING_MASK = "Luckily it won't harm Abigail."
+-- S_________WX78.DESCRIBE.SIVING_MASK = ""
+S_WICKERBOTTOM.DESCRIBE.SIVING_MASK = "A magic, difficult to control. Improper use will damage yourself."
+-- S_______WOODIE.DESCRIBE.SIVING_MASK = ""
+S______WAXWELL.DESCRIBE.SIVING_MASK = "Maybe I can live a little longer under this mask."
+S___WATHGRITHR.DESCRIBE.SIVING_MASK = "Only the despicable losers who enjoy such tricks."
+S_______WEBBER.DESCRIBE.SIVING_MASK = "We all thought it was wrong!" --因为蜘蛛是群居生物，韦伯善良，所以都不想使用这个装备
+-- S_______WINONA.DESCRIBE.SIVING_MASK = ""
+S_______WORTOX.DESCRIBE.SIVING_MASK = "Disguised as a vampire who doesn't need to be invited into the house, ahahahaha!"
+S_____WORMWOOD.DESCRIBE.SIVING_MASK = "It rarely becomes hostile to friends."
+S________WARLY.DESCRIBE.SIVING_MASK = "Eat what supplements you, right?"
+-- S_________WURT.DESCRIBE.SIVING_MASK = ""
+-- S_______WALTER.DESCRIBE.SIVING_MASK = ""
+S________WANDA.DESCRIBE.SIVING_MASK = "Time will also slowly take away lives of all in this way."
+
+S_NAMES.SIVING_MASK_GOLD = "Siving·Movili" --子圭·歃
+S_RECIPE_DESC.SIVING_MASK_GOLD = "Call for lives."
+S______GENERIC.DESCRIBE.SIVING_MASK_GOLD = "A mask of exquisite broken gold that plays with life."
+S_______WILLOW.DESCRIBE.SIVING_MASK_GOLD = "Give your lives for the queen of flames, humble servants!"
+S_____WOLFGANG.DESCRIBE.SIVING_MASK_GOLD = "Wolfgang is willing to give of himself to save others."
+S________WENDY.DESCRIBE.SIVING_MASK_GOLD = "Tried to resurrect Abigail with it and failed, as always."
+S_________WX78.DESCRIBE.SIVING_MASK_GOLD = "I ACTUALLY FELT A LITTLE WARMTH WHEN I WAS SAVED BY IT."
+S_WICKERBOTTOM.DESCRIBE.SIVING_MASK_GOLD = "More mature control of life magic without hurting yourself."
+S_______WOODIE.DESCRIBE.SIVING_MASK_GOLD = "If only then, it would have been possible to get Lucy back."
+S______WAXWELL.DESCRIBE.SIVING_MASK_GOLD = "I'll hide my identity until the victory comes."
+S___WATHGRITHR.DESCRIBE.SIVING_MASK_GOLD = "The lord of fallen excels in such tactics."
+S_______WEBBER.DESCRIBE.SIVING_MASK_GOLD = "We only get more disgusted with this stuff!"
+S_______WINONA.DESCRIBE.SIVING_MASK_GOLD = "I am the master of my destiny!"
+S_______WORTOX.DESCRIBE.SIVING_MASK_GOLD = "Incarnate as the fleshless Dracula, yah ha ha!"
+S_____WORMWOOD.DESCRIBE.SIVING_MASK_GOLD = "It doesn't feel right."
+S________WARLY.DESCRIBE.SIVING_MASK_GOLD = "Eats grass, produces superb milk!"
+-- S_________WURT.DESCRIBE.SIVING_MASK_GOLD = ""
+-- S_______WALTER.DESCRIBE.SIVING_MASK_GOLD = ""
+S________WANDA.DESCRIBE.SIVING_MASK_GOLD = "More efficient and cruel than the magic of time."
 
 --------------------------------------------------------------------------
 --[[ flash and crush ]]--[[ 电闪雷鸣 ]]

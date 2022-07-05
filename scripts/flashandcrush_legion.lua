@@ -118,8 +118,9 @@ if TUNING.LEGION_TECHUNLOCK == "lootdropper" then
         )
         AddRecipe2(
             "siving_mask_gold", {
-                Ingredient("wathgrithrhat", 1),
+                Ingredient("goggleshat", 1),
                 Ingredient("siving_mask", 1, "images/inventoryimages/siving_mask.xml"),
+                Ingredient("siving_derivant_item", 1, "images/inventoryimages/siving_derivant_item.xml"),
                 Ingredient("dish_shyerryjam", 1, "images/inventoryimages/dish_shyerryjam.xml"),
             }, TECH.LOST, {
                 atlas = "images/inventoryimages/siving_mask_gold.xml", image = "siving_mask_gold.tex"
@@ -241,8 +242,9 @@ else
         )
         AddRecipe2(
             "siving_mask_gold", {
-                Ingredient("wathgrithrhat", 1),
+                Ingredient("goggleshat", 1),
                 Ingredient("siving_mask", 1, "images/inventoryimages/siving_mask.xml"),
+                Ingredient("siving_derivant_item", 1, "images/inventoryimages/siving_derivant_item.xml"),
                 Ingredient("dish_shyerryjam", 1, "images/inventoryimages/dish_shyerryjam.xml"),
             }, TECH.ELECOURMALINE_THREE, {
                 nounlock = true,

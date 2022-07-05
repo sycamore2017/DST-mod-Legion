@@ -1097,6 +1097,12 @@ if CONFIGS_LEGION.BETTERCOOKBOOK then
         -- v.cookbook_category = "portablecookpot" --如果要设置为便携烹饪锅专属，可以写这个
         -- v.cookbook_category = "cookpot"
         -- v.cookbook_category = "mod" --官方在AddCookerRecipe时就设置好了，所以，cookbook_category字段不需要自己写
+        if v.cookbook_tex == nil then
+            v.cookbook_tex = k..".tex"
+        end
+        if v.cookbook_atlas == nil then
+            v.cookbook_atlas = "images/cookbookimages/"..k..".xml"
+        end
         v.recipe_count = v.recipe_count or 1
         v.custom_cookbook_details_fn = function(data, self, top, left) --不用给英语环境的使用这个，因为文本太长，不可能装得下
             local root = cookbookui_legion(data, self, top, left)
@@ -1110,6 +1116,13 @@ else
         v.priority = v.priority or 0
         if v.overridebuild == nil then
             v.overridebuild = "dishes_legion"
+        end
+
+        if v.cookbook_tex == nil then
+            v.cookbook_tex = k..".tex"
+        end
+        if v.cookbook_atlas == nil then
+            v.cookbook_atlas = "images/cookbookimages/"..k..".xml"
         end
     end
 end
