@@ -353,50 +353,74 @@ local function TriggerLifeExtractTask(inst, doit)
     if doit then
         if inst.taskLifeExtract == nil then
             local x, y, z = inst.Transform:GetWorldPosition()
-            local distancesq = 400
             local ents = nil
+            local _taskcounter = 0
 
-            --每1秒吸取所有生物生命；每0.5秒产生吸取特效
+            ----每2秒吸取所有生物生命；每0.5秒产生吸取特效
             inst.taskLifeExtract = inst:DoPeriodicTask(0.5, function()
-                local countent = 0
-                local entsnow = ents
-                if ents == nil then
-                    entsnow = TheSim:FindEntities(x, y, z, 20,
+                ----计数器管理
+                _taskcounter = _taskcounter + 1
+                local doit2 = false
+                if _taskcounter % 4 == 0 then --每过两秒
+                    doit2 = true
+                    _taskcounter = 0
+                end
+
+                ----吸收对象的更新
+                if doit2 or ents == nil then
+                    ents = TheSim:FindEntities(x, y, z, 20,
                         nil,
-                        {"NOCLICK", "FX", "shadow", "playerghost", "INLIMBO", "wall", "engineering", "siving"},
+                        {"NOCLICK", "shadow", "playerghost", "ghost",
+                            "INLIMBO", "wall", "structure", "balloon", "siving"},
                         {"siving_derivant", "_health"}
                     )
                 end
 
-                for k,v in pairs(entsnow) do
-                    if v:HasTag("siving_derivant") then
-                        if v.treeState ~= nil and inst.treeState ~= v.treeState then
-                            v.OnTreeLive(v, inst.treeState)
-                        end
-                    elseif
-                        v.components.health ~= nil and not v.components.health:IsDead() and
-                        v.entity:IsVisible() and
-                        v:GetDistanceSqToPoint(x, y, z) <= distancesq
-                    then
-                        local life = SpawnPrefab("siving_lifesteal_fx")
-                        if life ~= nil then
-                            life.movingTarget = inst
-                            life.Transform:SetPosition(v.Transform:GetWorldPosition())
-                        end
+                local cost = inst.treeState == 2 and 4 or 2
+                local costall = 0
 
-                        if ents ~= nil then
-                            v.components.health:DoDelta(-1, true, inst.prefab, nil, inst, true)
+                for _,v in ipairs(ents) do
+                    if v and v:IsValid() and v.entity:IsVisible() then
+                        if v:HasTag("siving_derivant") then
+                            if v.treeState ~= nil and inst.treeState ~= v.treeState then
+                                v.OnTreeLive(v, inst.treeState)
+                            end
+                        elseif
+                            v.components.health ~= nil and not v.components.health:IsDead() and
+                            v:GetDistanceSqToPoint(x, y, z) <= 400
+                        then
+                            ----特效生成
+                            if v.components.inventory == nil or not v.components.inventory:EquipHasTag("siv_BFF") then
+                                local life = SpawnPrefab("siving_lifesteal_fx")
+                                if life ~= nil then
+                                    life.movingTarget = inst
+                                    life.Transform:SetPosition(v.Transform:GetWorldPosition())
+                                end
+                            end
+                            ----吸血
+                            if doit2 then
+                                local costnow = cost
+                                if v.components.inventory ~= nil then
+                                    if v.components.inventory:EquipHasTag("siv_BFF") then
+                                        costnow = 0
+                                    elseif v.components.inventory:EquipHasTag("siv_BF") then
+                                        costnow = costnow / 2
+                                    end
+                                end
+                                if costnow > 0 then
+                                    v.components.health:DoDelta(-costnow, true, inst.prefab, false, inst, true)
+                                    costall = costall + costnow
+                                end
+                            end
                         end
-                        countent = countent + 1
                     end
                 end
 
-                if ents == nil and countent > 0 then
-                    ents = entsnow
-                else
-                    ents = nil
-                    if countent > 0 then
-                        OnStealLife(inst, countent)
+                if doit2 then
+                    if costall > 0 then
+                        OnStealLife(inst, costall)
+                    else
+                        ents = nil
                     end
                 end
 

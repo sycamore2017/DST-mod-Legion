@@ -381,6 +381,77 @@ local function MakeConstruct(data)
     ))
 end
 
+local function MakeMask(data)
+    table.insert(prefs, Prefab(
+        data.name,
+        function()
+            local inst = CreateEntity()
+
+            inst.entity:AddTransform()
+            inst.entity:AddAnimState()
+            inst.entity:AddNetwork()
+
+            MakeInventoryPhysics(inst)
+
+            inst:AddTag("hat")
+            inst:AddTag("open_top_hat")
+
+            inst.AnimState:SetBank(data.name)
+            inst.AnimState:SetBuild(data.name)
+            inst.AnimState:PlayAnimation("idle")
+
+            if data.fn_common ~= nil then
+                data.fn_common(inst)
+            end
+
+            inst.entity:SetPristine()
+            if not TheWorld.ismastersim then
+                return inst
+            end
+
+            inst.healthcounter = 0
+            inst.lifetarget = nil
+
+            inst:AddComponent("inspectable")
+
+            inst:AddComponent("inventoryitem")
+            inst.components.inventoryitem.imagename = data.name
+            inst.components.inventoryitem.atlasname = "images/inventoryimages/"..data.name..".xml"
+            inst.components.inventoryitem:SetSinks(true) --它是石头做的，不可漂浮
+
+            inst:AddComponent("equippable")
+            inst.components.equippable.equipslot = EQUIPSLOTS.HEAD
+
+            inst:AddComponent("armor")
+
+            inst:AddComponent("tradable")
+
+            MakeHauntableLaunch(inst)
+
+            inst.OnSave = function(inst, data)
+                if inst.healthcounter > 0 then
+                    data.healthcounter = inst.healthcounter
+                end
+            end
+            inst.OnLoad = function(inst, data)
+                if data ~= nil then
+                    if data.healthcounter ~= nil then
+                        inst.healthcounter = data.healthcounter
+                    end
+                end
+            end
+
+            if data.fn_server ~= nil then
+                data.fn_server(inst)
+            end
+
+            return inst
+        end,
+        data.assets,
+        data.prefabs
+    ))
+end
+
 --------------------------------------------------------------------------
 --[[ 子圭·利川 ]]
 --------------------------------------------------------------------------
@@ -725,85 +796,15 @@ table.insert(prefs, Prefab(
 ))
 
 --------------------------------------------------------------------------
---[[ 子圭面具 ]]
+--[[ 子圭·汲 ]]
 --------------------------------------------------------------------------
-
-local function MakeMask(data)
-    table.insert(prefs, Prefab(
-        data.name,
-        function()
-            local inst = CreateEntity()
-
-            inst.entity:AddTransform()
-            inst.entity:AddAnimState()
-            inst.entity:AddNetwork()
-
-            MakeInventoryPhysics(inst)
-
-            inst:AddTag("hat")
-            inst:AddTag("open_top_hat")
-
-            inst.AnimState:SetBank(data.name)
-            inst.AnimState:SetBuild(data.name)
-            inst.AnimState:PlayAnimation("idle")
-
-            if data.fn_common ~= nil then
-                data.fn_common(inst)
-            end
-
-            inst.entity:SetPristine()
-            if not TheWorld.ismastersim then
-                return inst
-            end
-
-            inst.healthcounter = 0
-            inst.lifetarget = nil
-
-            inst:AddComponent("inspectable")
-
-            inst:AddComponent("inventoryitem")
-            inst.components.inventoryitem.imagename = data.name
-            inst.components.inventoryitem.atlasname = "images/inventoryimages/"..data.name..".xml"
-            inst.components.inventoryitem:SetSinks(true) --它是石头做的，不可漂浮
-
-            inst:AddComponent("equippable")
-            inst.components.equippable.equipslot = EQUIPSLOTS.HEAD
-
-            inst:AddComponent("armor")
-
-            inst:AddComponent("tradable")
-
-            MakeHauntableLaunch(inst)
-
-            inst.OnSave = function(inst, data)
-                if inst.healthcounter > 0 then
-                    data.healthcounter = inst.healthcounter
-                end
-            end
-            inst.OnLoad = function(inst, data)
-                if data ~= nil then
-                    if data.healthcounter ~= nil then
-                        inst.healthcounter = data.healthcounter
-                    end
-                end
-            end
-
-            if data.fn_server ~= nil then
-                data.fn_server(inst)
-            end
-
-            return inst
-        end,
-        data.assets,
-        data.prefabs
-    ))
-end
 
 local function CancelTask_life(inst, owner)
     if inst.task_life ~= nil then
         inst.task_life:Cancel()
         inst.task_life = nil
     end
+    inst.lifetarget = nil
 end
 local function SpawnLifeFx(target, owner)
     local life = SpawnPrefab("siving_lifesteal_fx")
@@ -813,7 +814,32 @@ local function SpawnLifeFx(target, owner)
     end
 end
 
-------子圭·汲
+local function DrinkLife(mask, target, value)
+    mask.healthcounter = math.min(mask.healthcounter_max, mask.healthcounter + value) --积累生命
+    target.components.health:DoDelta(-value, true, mask.prefab, false, nil, true) --吸取生命
+end
+local function HealOwner(mask, owner)
+    if
+        owner.components.health ~= nil and
+        not owner.components.health:IsDead() and owner.components.health:IsHurt()
+    then
+        owner.components.health:DoDelta(2, true, nil, true, nil, true)
+        mask.healthcounter = mask.healthcounter - 4
+        return true
+    end
+    return false
+end
+local function HealArmor(mask)
+    if
+        mask.components.armor:GetPercent() < 1
+    then
+        mask.components.armor:Repair(40)
+        mask.healthcounter = mask.healthcounter - 20
+        return true
+    end
+    return false
+end
+
 MakeMask({
     name = "siving_mask",
     assets = {
@@ -825,15 +851,20 @@ MakeMask({
         "siving_lifesteal_fx"
     },
     fn_common = function(inst)
-        inst:AddTag("siving_mask")
+        inst:AddTag("siv_BF")
+        inst:AddTag("siv_mask")
     end,
     fn_server = function(inst)
+        inst.feather_l_reducer = -0.5
         inst.healthcounter_max = 80
 
         inst.components.equippable:SetOnEquip(function(inst, owner)
             HAT_OPENTOP_ONEQUIP_L(inst, owner, "siving_mask", "swap_hat")
 
-            local notags = {"NOCLICK", "FX", "shadow", "playerghost", "ghost", "INLIMBO", "wall", "structure"}
+            local notags = {
+                "NOCLICK", "shadow", "playerghost", "ghost",
+                "INLIMBO", "wall", "structure", "balloon", "siving"
+            }
             if owner:HasTag("player") then --佩戴者是玩家时，不吸收其他玩家
                 table.insert(notags, "player")
             end
@@ -841,6 +872,7 @@ MakeMask({
             inst.task_life = inst:DoPeriodicTask(0.5, function()
                 if not owner:IsValid() then
                     CancelTask_life(inst, owner)
+                    return
                 end
 
                 ----计数器管理
@@ -872,21 +904,35 @@ MakeMask({
                     inst.lifetarget = target
                 end
 
-                ----积累的获取
-                if target ~= nil then
+                ----积累的管理
+                if target ~= nil then --有可吸收对象时
                     SpawnLifeFx(target, owner)
                     if doit then
-                        inst.healthcounter = math.min(inst.healthcounter_max, inst.healthcounter + 2) --积累生命2
-                        target.components.health:DoDelta(-2, true, "siving_mask", false, nil, true) --吸取2生命
+                        DrinkLife(inst, target, 2)
+                        if inst.healthcounter >= 4 then
+                            if not HealOwner(inst, owner) then --优先为玩家恢复生命
+                                if inst.healthcounter >= 20 then --其次才是恢复自己的耐久
+                                    HealArmor(inst)
+                                end
+                            end
+                        end
+                    end
+                else --不存在可吸收对象时
+                    if doit then
+                        if inst.components.armor:GetPercent() < 1 then --自己损坏了
+                            if owner.components.health ~= nil and not owner.components.health:IsDead() then
+                                DrinkLife(inst, owner, 2)
+                            end
+                            if inst.healthcounter >= 20 then
+                                HealArmor(inst)
+                            end
+                        end
                     end
                 end
-
-                ----积累的使用
             end, 1)
         end)
         inst.components.equippable:SetOnUnequip(function(inst, owner)
             HAT_ONUNEQUIP_L(inst, owner)
-
             CancelTask_life(inst, owner)
         end)
 
@@ -894,8 +940,136 @@ MakeMask({
     end
 })
 
-------子圭·歃
--- siving_mask_gold
+--------------------------------------------------------------------------
+--[[ 子圭·歃 ]]
+--------------------------------------------------------------------------
+
+local function OnAttackOther(owner, data)
+    if
+        owner.components.inventory ~= nil and
+        data.target ~= nil and data.target:IsValid() and
+        data.target.components.health ~= nil and not data.target.components.health:IsDead() and
+        not (
+            data.target:HasTag("shadow") or
+            data.target:HasTag("ghost") or
+            data.target:HasTag("wall") or
+            data.target:HasTag("structure") or
+            data.target:HasTag("balloon")
+        )
+    then
+        local mask = owner.components.inventory:GetEquippedItem(EQUIPSLOTS.HEAD)
+        if mask ~= nil and mask.prefab == "siving_mask_gold" then
+            mask.lifetarget = data.target
+        end
+    end
+end
+
+MakeMask({
+    name = "siving_mask_gold",
+    assets = {
+        Asset("ANIM", "anim/siving_mask_gold.zip"),
+        Asset("ATLAS", "images/inventoryimages/siving_mask_gold.xml"),
+        Asset("IMAGE", "images/inventoryimages/siving_mask_gold.tex"),
+    },
+    prefabs = {
+        "siving_lifesteal_fx"
+    },
+    fn_common = function(inst)
+        inst:AddTag("siv_BFF")
+        inst:AddTag("siv_mask2")
+    end,
+    fn_server = function(inst)
+        inst.feather_l_reducer = -1
+        inst.healthcounter_max = 135
+
+        inst.components.equippable:SetOnEquip(function(inst, owner)
+            HAT_OPENTOP_ONEQUIP_L(inst, owner, "siving_mask_gold", "swap_hat")
+
+            owner:ListenForEvent("onattackother", OnAttackOther)
+
+            local notags = {
+                "NOCLICK", "shadow", "playerghost", "ghost",
+                "INLIMBO", "wall", "structure", "balloon", "siving"
+            }
+            if owner:HasTag("player") then --佩戴者是玩家时，不吸收其他玩家
+                table.insert(notags, "player")
+            end
+            local _taskcounter = 0
+            inst.task_life = inst:DoPeriodicTask(0.5, function()
+                if not owner:IsValid() then
+                    CancelTask_life(inst, owner)
+                    return
+                end
+
+                ----计数器管理
+                _taskcounter = _taskcounter + 1
+                local doit = false
+                if _taskcounter % 4 == 0 then --每过两秒
+                    doit = true
+                    _taskcounter = 0
+                end
+
+                ----吸取对象的管理
+                local x, y, z = owner.Transform:GetWorldPosition()
+                local target = inst.lifetarget
+                if --吸血对象失效了，重新找新对象
+                    target == nil or not target:IsValid() or
+                    target.components.health == nil or target.components.health:IsDead() or
+                    target:GetDistanceSqToPoint(x, y, z) > 400 --20*20
+                then
+                    target = FindEntity(owner, 20, function(ent, finder)
+                            if
+                                ent.prefab ~= finder.prefab and --不吸收同类
+                                ent.components.health ~= nil and not ent.components.health:IsDead() and (
+                                    (ent.components.combat ~= nil and ent.components.combat.target == finder) or
+                                    ( --不攻击驯化的对象、自己的跟随者
+                                        (ent.components.domesticatable == nil or not ent.components.domesticatable:IsDomesticated()) and
+                                        (finder.components.leader == nil or not finder.components.leader:IsFollower(ent))
+                                    )
+                                )
+                            then
+                                return true
+                            end
+                        end,
+                        {"_health"}, notags, nil
+                    )
+                    inst.lifetarget = target
+                end
+
+                ----特效
+                if target ~= nil then
+                    SpawnLifeFx(target, owner)
+                end
+
+                ----积累的管理
+                if doit then
+                    if target ~= nil then
+                        DrinkLife(inst, target, 4)
+                    end
+                    if inst.healthcounter >= 4 then
+                        if not HealOwner(inst, owner) then --优先为玩家恢复生命
+                            if inst.healthcounter >= 20 then --其次才是恢复自己的耐久
+                                HealArmor(inst)
+                            end
+                        end
+                    end
+                end
+            end, 1)
+        end)
+        inst.components.equippable:SetOnUnequip(function(inst, owner)
+            HAT_ONUNEQUIP_L(inst, owner)
+            CancelTask_life(inst, owner)
+            owner:RemoveEventCallback("onattackother", OnAttackOther)
+        end)
+
+        inst.components.armor:InitCondition(735, 0.8)
+
+        -- inst:AddComponent("lifebender") --御血神通！然而并不是
+        -- inst.components.lifebender.fn_bend = function(inst, doer, pos, options)
+        --     return true
+        -- end
+    end
+})
 
 --------------------
 --------------------

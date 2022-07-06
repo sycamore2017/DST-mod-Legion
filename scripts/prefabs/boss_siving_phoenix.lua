@@ -333,7 +333,16 @@ local function MakeWeapon(data)
                     end
 
                     if caster.components.health ~= nil and not caster.components.health:IsDead() then
-                        caster.components.health:DoDelta(-4*num, true, data.name, false, nil, true)
+                        local mask = caster.components.inventory:GetEquippedItem(EQUIPSLOTS.HEAD)
+                        if mask ~= nil and mask.feather_l_reducer ~= nil then
+                            mask = mask.feather_l_reducer
+                        else
+                            mask = 0
+                        end
+                        if caster.feather_l_reducer ~= nil then --简单地兼容其他东西
+                            mask = mask + caster.feather_l_reducer
+                        end
+                        caster.components.health:DoDelta(-(4 + mask)*num, true, data.name, false, nil, true)
                         if not caster.components.health:IsDead() and #lines > 0 then
                             local line = SpawnPrefab("siving_feather_line")
                             caster.sivfeathers_l = feathers
