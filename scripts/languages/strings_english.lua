@@ -3616,3 +3616,9 @@ STRINGS.ACTIONS.RC_SKILL_L = {
     FEATHERTHROW = "Feather Split",
     FEATHERPULL = "Feather Retrieve"
 }
+
+STRINGS.ACTIONS.LIFEBEND = {
+    GENERIC = "Rejuvenate",
+    REVIVE = "Giving Life",
+    CURE = "Heal"
+}

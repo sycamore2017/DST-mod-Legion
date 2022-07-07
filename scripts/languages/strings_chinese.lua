@@ -3691,3 +3691,9 @@ STRINGS.ACTIONS.RC_SKILL_L = {
     FEATHERTHROW = "羽刃分掷",
     FEATHERPULL = "羽刃合收"
 }
+
+STRINGS.ACTIONS.LIFEBEND = {
+    GENERIC = "恢复生机",
+    REVIVE = "以命换命",
+    CURE = "治愈"
+}

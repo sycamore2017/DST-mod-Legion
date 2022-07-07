@@ -1064,10 +1064,13 @@ MakeMask({
 
         inst.components.armor:InitCondition(735, 0.8)
 
-        -- inst:AddComponent("lifebender") --御血神通！然而并不是
-        -- inst.components.lifebender.fn_bend = function(inst, doer, pos, options)
-        --     return true
-        -- end
+        inst:AddComponent("lifebender") --御血神通！然而并不
+        inst.components.lifebender.fn_bend = function(mask, doer, target, options)
+            -- if  then
+                
+            -- end
+            return true
+        end
     end
 })
 

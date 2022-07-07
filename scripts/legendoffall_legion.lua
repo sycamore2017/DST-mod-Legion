@@ -1692,3 +1692,69 @@ ACTIONS.PICK.strfn = function(act)
     end
     return pick_strfn_old(act)
 end
+
+--------------------------------------------------------------------------
+--[[ 子圭面具的相关 ]]
+--------------------------------------------------------------------------
+
+------御血神通的动作
+local LIFEBEND = Action({ mount_valid=true, priority=1.3 })
+LIFEBEND.id = "LIFEBEND"
+LIFEBEND.str = STRINGS.ACTIONS.LIFEBEND
+LIFEBEND.strfn = function(act)
+    local target = act.target
+    if target.prefab == "flower_withered" then --枯萎花
+        return "GENERIC"
+    elseif target:HasTag("playerghost") or target:HasTag("ghost") then --玩家鬼魂、幽灵
+        return "REVIVE"
+    elseif target:HasTag("_health") then --有生命组件的对象
+        return "CURE"
+    -- elseif
+    --     target:HasTag("withered") or --枯萎的植物
+    --     target:HasTag("farm_plant") or --作物
+    --     target:HasTag("crop_legion") or --子圭垄植物
+    --     target:HasTag("crop2_legion") --异种植物
+    -- then
+    --     return "GENERIC"
+    end
+    return "GENERIC"
+end
+LIFEBEND.fn = function(act)
+    if act.doer ~= nil and act.invobject ~= nil and act.invobject.components.lifebender ~= nil then
+        return act.invobject.components.lifebender:Do(act.doer, act.target)
+    end
+end
+AddAction(LIFEBEND)
+
+AddComponentAction("EQUIPPED", "lifebender", function(inst, doer, target, actions, right)
+    if
+        right and
+        (doer.replica.inventory ~= nil and not doer.replica.inventory:IsHeavyLifting())
+    then
+        if target.prefab == "flower_withered" then --枯萎花
+            table.insert(actions, ACTIONS.LIFEBEND)
+        elseif target:HasTag("playerghost") or target:HasTag("ghost") then --玩家鬼魂、幽灵
+            table.insert(actions, ACTIONS.LIFEBEND)
+        elseif target:HasTag("_health") then --有生命组件的对象
+            if
+                target:HasTag("shadow") or
+                target:HasTag("wall") or
+                target:HasTag("structure") or
+                target:HasTag("balloon")
+            then
+                return
+            end
+            table.insert(actions, ACTIONS.LIFEBEND)
+        elseif
+            target:HasTag("withered") or --枯萎的植物
+            target:HasTag("farm_plant") or --作物
+            target:HasTag("crop_legion") or --子圭垄植物
+            target:HasTag("crop2_legion") --异种植物
+        then
+            table.insert(actions, ACTIONS.LIFEBEND)
+        end
+    end
+end)
+
+AddStategraphActionHandler("wilson", ActionHandler(ACTIONS.LIFEBEND, "give"))
+AddStategraphActionHandler("wilson_client", ActionHandler(ACTIONS.LIFEBEND, "give"))
