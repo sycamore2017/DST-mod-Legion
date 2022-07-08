@@ -1709,13 +1709,6 @@ LIFEBEND.strfn = function(act)
         return "REVIVE"
     elseif target:HasTag("_health") then --有生命组件的对象
         return "CURE"
-    -- elseif
-    --     target:HasTag("withered") or --枯萎的植物
-    --     target:HasTag("farm_plant") or --作物
-    --     target:HasTag("crop_legion") or --子圭垄植物
-    --     target:HasTag("crop2_legion") --异种植物
-    -- then
-    --     return "GENERIC"
     end
     return "GENERIC"
 end
@@ -1728,7 +1721,7 @@ AddAction(LIFEBEND)
 
 AddComponentAction("EQUIPPED", "lifebender", function(inst, doer, target, actions, right)
     if
-        right and
+        right and doer ~= target and
         (doer.replica.inventory ~= nil and not doer.replica.inventory:IsHeavyLifting())
     then
         if target.prefab == "flower_withered" then --枯萎花
@@ -1746,7 +1739,7 @@ AddComponentAction("EQUIPPED", "lifebender", function(inst, doer, target, action
             end
             table.insert(actions, ACTIONS.LIFEBEND)
         elseif
-            target:HasTag("withered") or --枯萎的植物
+            target:HasTag("withered") or target:HasTag("barren") or --枯萎的植物
             target:HasTag("farm_plant") or --作物
             target:HasTag("crop_legion") or --子圭垄植物
             target:HasTag("crop2_legion") --异种植物

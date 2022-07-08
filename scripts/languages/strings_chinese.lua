@@ -3697,3 +3697,40 @@ STRINGS.ACTIONS.LIFEBEND = {
     REVIVE = "以命换命",
     CURE = "治愈"
 }
+S______GENERIC.ACTIONFAIL.LIFEBEND = {
+    NOLIFE = "我给不了更多生命了。",
+    GHOST = "它的灵魂已经残缺到无法挽回的地步。",
+    NOTHURT = "生命足够，不需要我输送。",
+    NOWITHERED = "它长得好好的，没问题！"
+}
+-- S_______WILLOW.ACTIONFAIL.LIFEBEND =
+-- S_____WOLFGANG.ACTIONFAIL.LIFEBEND =
+S________WENDY.ACTIONFAIL.LIFEBEND = {
+    NOLIFE = "我的生命已经见底，还要想着付出吗。",
+    GHOST = "虽然尝试过很多次，但我还不想放弃。",
+    NOTHURT = "你不再需要我了，对吗？",
+    NOWITHERED = "看看你，长得太好了，一生也还完美。"
+}
+S_________WX78.ACTIONFAIL.LIFEBEND = {
+    NOLIFE = "警告：自我生命能量不足！",
+    GHOST = "我居然会尝试复活一个孤魂野鬼。",
+    NOTHURT = "扫描：机能正常。",
+    NOWITHERED = "扫描：状态正常。"
+}
+-- S_WICKERBOTTOM.ACTIONFAIL.LIFEBEND =
+-- S_______WOODIE.ACTIONFAIL.LIFEBEND =
+-- S______WAXWELL.ACTIONFAIL.LIFEBEND =
+-- S___WATHGRITHR.ACTIONFAIL.LIFEBEND =
+-- S_______WEBBER.ACTIONFAIL.LIFEBEND =
+-- S_______WINONA.ACTIONFAIL.LIFEBEND =
+-- S________WARLY.ACTIONFAIL.LIFEBEND =
+-- S_______WORTOX.ACTIONFAIL.LIFEBEND =
+S_____WORMWOOD.ACTIONFAIL.LIFEBEND = {
+    NOLIFE = "养分不够。",
+    GHOST = "没反应。",
+    NOTHURT = "健康。",
+    NOWITHERED = "茁壮！"
+}
+-- S_________WURT.ACTIONFAIL.LIFEBEND =
+-- S_______WALTER.ACTIONFAIL.LIFEBEND =
+-- S________WANDA.ACTIONFAIL.LIFEBEND =

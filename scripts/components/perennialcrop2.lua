@@ -371,7 +371,7 @@ function PerennialCrop2:DoGrowth(skip)
 						local ents = TheSim:FindEntities(x, y, z, 5,
 							nil,
 							{ "NOCLICK", "FX", "INLIMBO" },
-							{ "crop_legion", "crop2_legion", "witherable" }
+							{ "crop_legion", "crop2_legion", "withered", "barren" }
 						)
 						for _,v in pairs(ents) do
 							if v:IsValid() then

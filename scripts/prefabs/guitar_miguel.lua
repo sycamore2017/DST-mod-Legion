@@ -89,7 +89,7 @@ local function PlayDoing(inst, owner)
         if inst.taskcount % 3 == 0 then --每15秒，复活1个周围的玩家
             local player = FindEntity(owner, 25, nil, {"playerghost"}, {"INLIMBO"}, nil)
             if player ~= nil then
-                player:PushEvent("respawnfromghost")
+                player:PushEvent("respawnfromghost", { source = inst, user = owner })
                 inst.components.finiteuses:Use(1)
 
                 local xp, yp, zp = player.Transform:GetWorldPosition()

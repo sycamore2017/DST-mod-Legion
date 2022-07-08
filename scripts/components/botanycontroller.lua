@@ -109,7 +109,10 @@ local function WitherComputMoisture(self, v)
     if v.components.witherable ~= nil then
         if
             not v.components.witherable:IsProtected() and
-            (v.components.witherable:CanWither() or v.components.witherable:CanRejuvenate()) --枯萎中或已经缺水性枯萎
+            (
+                v.components.witherable:CanWither() or --快要枯萎，提前浇水
+                v.components.witherable:CanRejuvenate() --已经缺水性枯萎
+            )
         then
             v.components.witherable:Protect(TUNING.FIRESUPPRESSOR_PROTECTION_TIME)
             self.moisture = math.max(0, self.moisture-5)
@@ -204,7 +207,7 @@ local function ComputSoils(self, fn_tile, fn_wither, fn_check)
     local ents = TheSim:FindEntities(x, y, z, 20,
         nil,
         { "NOCLICK", "FX", "INLIMBO" },
-        { "witherable", "crop2_legion" } --不需要考虑子圭作物，因为机制已经有了
+        { "witherable", "barren", "crop2_legion" } --不需要考虑子圭作物，因为机制已经有了
     )
     for _,v in pairs(ents) do
         if v:IsValid() then
