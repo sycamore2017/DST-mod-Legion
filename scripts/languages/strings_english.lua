@@ -3622,3 +3622,40 @@ STRINGS.ACTIONS.LIFEBEND = {
     REVIVE = "Giving Life",
     CURE = "Heal"
 }
+S______GENERIC.ACTIONFAIL.LIFEBEND = {
+    NOLIFE = "I can't give life anymore.",
+    GHOST = "Its soul is crippled beyond repair.",
+    NOTHURT = "Life is enough without me bending it.",
+    NOWITHERED = "It's growing nicely!"
+}
+-- S_______WILLOW.ACTIONFAIL.LIFEBEND =
+-- S_____WOLFGANG.ACTIONFAIL.LIFEBEND =
+S________WENDY.ACTIONFAIL.LIFEBEND = {
+    NOLIFE = "I have reached the end of my life.",
+    GHOST = "Many attempts, but I don't want to give up yet.",
+    NOTHURT = "You don't need me anymore, do you?",
+    NOWITHERED = "Too good looking and still perfect in life."
+}
+S_________WX78.ACTIONFAIL.LIFEBEND = {
+    NOLIFE = "WARNING: LOW SELF LIFE ENERGY!",
+    GHOST = "RESURRECTING A LONE GHOST? NO!",
+    NOTHURT = "SCAN: NORMAL FUNCTION.",
+    NOWITHERED = "SCAN: NORMAL STATUS."
+}
+-- S_WICKERBOTTOM.ACTIONFAIL.LIFEBEND =
+-- S_______WOODIE.ACTIONFAIL.LIFEBEND =
+-- S______WAXWELL.ACTIONFAIL.LIFEBEND =
+-- S___WATHGRITHR.ACTIONFAIL.LIFEBEND =
+-- S_______WEBBER.ACTIONFAIL.LIFEBEND =
+-- S_______WINONA.ACTIONFAIL.LIFEBEND =
+-- S________WARLY.ACTIONFAIL.LIFEBEND =
+-- S_______WORTOX.ACTIONFAIL.LIFEBEND =
+S_____WORMWOOD.ACTIONFAIL.LIFEBEND = {
+    NOLIFE = "Not enough nutrients.",
+    GHOST = "No response.",
+    NOTHURT = "Healthy.",
+    NOWITHERED = "Thriving!"
+}
+-- S_________WURT.ACTIONFAIL.LIFEBEND =
+-- S_______WALTER.ACTIONFAIL.LIFEBEND =
+-- S________WANDA.ACTIONFAIL.LIFEBEND =
