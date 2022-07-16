@@ -16,6 +16,17 @@ local function UnequipItem(player, slot)
     end
 end
 
+local function OnReroll(inst)
+    local self = inst.components.dressup
+    self.swaplist = {}
+    for k,v in pairs(self.itemlist) do
+        if v ~= nil then
+            -- self:TakeOff(k, v) --undo
+        end
+    end
+    self.itemlist = {}
+end
+
 local BODYTALL = "body_t"
 
 local DressUp = Class(function(self, inst)
@@ -36,6 +47,8 @@ local DressUp = Class(function(self, inst)
         --     priority = 0,
         -- }
     }
+
+    -- inst:ListenForEvent("ms_playerreroll", OnReroll) --undo
 end)
 
 

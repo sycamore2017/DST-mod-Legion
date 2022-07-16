@@ -1265,8 +1265,7 @@ local dressup_data = {
             return itemswap
         end,
     },
-    hat_mermbreathing =
-    {
+    hat_mermbreathing = {
         isnoskin = true,
         isopentop = true,
         buildfile = "hat_mermbreathing",
@@ -1566,6 +1565,18 @@ local dressup_data = {
 
             return itemswap
         end,
+    },
+    siving_mask = {
+        isnoskin = true,
+        isopentop = true,
+        buildfile = "siving_mask",
+        buildsymbol = "swap_hat",
+    },
+    siving_mask_gold = {
+        isnoskin = true,
+        isopentop = true,
+        buildfile = "siving_mask_gold",
+        buildsymbol = "swap_hat",
     },
 }
 

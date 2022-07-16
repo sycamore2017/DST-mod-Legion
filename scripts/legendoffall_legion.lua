@@ -1406,7 +1406,7 @@ _G.CROPS_DATA_LEGION.mandrake = {
             inst.SoundEmitter:PlaySound("dontstarve/creatures/mandrake/death")
         end
         local x, y, z = doer.Transform:GetWorldPosition()
-        doer:DoTaskInTime(0.5, function()
+        doer:DoTaskInTime(0.4+0.2*math.random(), function()
             local time = TUNING.MANDRAKE_SLEEP_TIME
             local ents = TheSim:FindEntities(x, y, z, TUNING.MANDRAKE_SLEEP_RANGE_COOKED, nil,
                 { "playerghost", "FX", "DECOR", "INLIMBO" }, { "sleeper", "player" })
@@ -1421,7 +1421,9 @@ _G.CROPS_DATA_LEGION.mandrake = {
                         mount:PushEvent("ridersleep", { sleepiness = 7, sleeptime = time + math.random() })
                     end
                     if v:HasTag("player") then
-                        v:PushEvent("yawn", { grogginess = 4, knockoutduration = time + math.random() })
+                        if v.sg == nil or not v.sg:HasStateTag("yawn") then
+                            v:PushEvent("yawn", { grogginess = 4, knockoutduration = 5 + math.random() })
+                        end
                     elseif v.components.sleeper ~= nil then
                         v.components.sleeper:AddSleepiness(7, time + math.random())
                     elseif v.components.grogginess ~= nil then

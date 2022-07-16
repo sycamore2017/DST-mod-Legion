@@ -547,6 +547,8 @@ MakeBush({
         inst.components.skinedlegion:Init("neverfadebush")
     end,
     fn_server = function(inst)
+        inst:AddComponent("lootdropper")
+
         inst.components.pickable:SetUp("petals", TUNING.TOTAL_DAY_TIME * 3) --3天的成熟时间
         inst.components.pickable.ontransplantfn = function(inst)
             inst.components.pickable:MakeEmpty()    --直接进入生长状态
@@ -554,23 +556,23 @@ MakeBush({
         inst.components.pickable.max_cycles = TUNING.BERRYBUSH_CYCLES + math.random(2)
         inst.components.pickable.cycles_left = inst.components.pickable.max_cycles
         inst.components.pickable.onpickedfn = function(inst, picker)
-            local item = SpawnPrefab("neverfade")
-            if item ~= nil then
-                local linkdata = inst.components.skinedlegion:GetLinkedSkins() or nil
-                if linkdata ~= nil and item.components.skinedlegion ~= nil then
-                    item.components.skinedlegion:SetSkin(linkdata.sword)
-                end
-
-                if picker and picker.components.inventory ~= nil then
+            local linkdata = inst.components.skinedlegion:GetLinkedSkins() or nil
+            if linkdata ~= nil then
+                linkdata = linkdata.sword
+            end
+            if picker and picker.prefab ~= "hermitcrab" and picker.components.inventory ~= nil then
+                local item = SpawnPrefab("neverfade", linkdata)
+                if item ~= nil then
                     picker.components.inventory:GiveItem(item, nil, picker:GetPosition())
-                else
-                    local x, y, z = inst.Transform:GetWorldPosition()
-                    if item.Physics ~= nil then
-                        item.Physics:Teleport(x, y, z)
-                    else
-                        item.Transform:SetPosition(x, y, z)
-                    end
                 end
+            else
+                -- local x, y, z = inst.Transform:GetWorldPosition()
+                -- if item.Physics ~= nil then
+                --     item.Physics:Teleport(x, y, z)
+                -- else
+                --     item.Transform:SetPosition(x, y, z)
+                -- end
+                inst.components.lootdropper:SpawnLootPrefab("neverfade", nil, linkdata, nil, picker and picker.userid or nil)
             end
 
             inst.AnimState:PlayAnimation("picked")
