@@ -1,3 +1,5 @@
+local prefs = {}
+
 --------------------------------------------------------------------------
 --[[ 食物类料理 ]]
 --------------------------------------------------------------------------
@@ -291,8 +293,6 @@ table.insert(prefs, Prefab(
 
 ----------
 ----------
-
-local prefs = {}
 
 for k, v in pairs(require("preparedfoods_legion")) do
     table.insert(prefs, MakePreparedFood(v))
