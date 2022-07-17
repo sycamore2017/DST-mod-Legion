@@ -201,6 +201,9 @@ table.insert(prefs, Prefab(
         inst.AnimState:SetBuild("dish_tomahawksteak")
         inst.AnimState:PlayAnimation("idle")
 
+        inst:AddTag("show_spoilage")
+        inst:AddTag("icebox_valid")
+
         inst:AddTag("sharp")
 
         --tool (from tool component) added to pristine state for optimization
@@ -209,7 +212,7 @@ table.insert(prefs, Prefab(
         --weapon (from weapon component) added to pristine state for optimization
         inst:AddTag("weapon")
 
-        MakeInventoryFloatable(inst, "small", 0.4, 0.5)
+        MakeInventoryFloatable(inst, "small", 0.2, 0.75)
         -- local OnLandedClient_old = inst.components.floater.OnLandedClient
         -- inst.components.floater.OnLandedClient = function(self)
         --     OnLandedClient_old(self)

@@ -810,6 +810,7 @@ local function SpawnLifeFx(target, owner)
     local life = SpawnPrefab("siving_lifesteal_fx")
     if life ~= nil then
         life.movingTarget = owner
+        life.minDistanceSq = 1.02
         life.Transform:SetPosition(target.Transform:GetWorldPosition())
     end
 end
@@ -840,6 +841,27 @@ local function HealArmor(mask)
     return false
 end
 
+local function GetSwapSymbol(owner)
+    local maps = {
+        wolfgang = true,
+        waxwell = true,
+        wathgrithr = true,
+        winona = true,
+        wortox = true,
+        wormwood = true,
+        wurt = true,
+        pigman = true,
+        pigguard = true,
+        moonpig = true,
+        bunnyman = true
+    }
+    if owner.sivmask_swapsymbol or maps[owner.prefab] then
+        return "swap_other"
+    else
+        return "swap_hat"
+    end
+end
+
 MakeMask({
     name = "siving_mask",
     assets = {
@@ -859,7 +881,7 @@ MakeMask({
         inst.healthcounter_max = 80
 
         inst.components.equippable:SetOnEquip(function(inst, owner)
-            HAT_OPENTOP_ONEQUIP_L(inst, owner, "siving_mask", "swap_hat")
+            HAT_OPENTOP_ONEQUIP_L(inst, owner, "siving_mask", GetSwapSymbol(owner))
 
             local notags = {
                 "NOCLICK", "shadow", "playerghost", "ghost",
@@ -999,7 +1021,8 @@ MakeMask({
         Asset("IMAGE", "images/inventoryimages/siving_mask_gold.tex"),
     },
     prefabs = {
-        "siving_lifesteal_fx"
+        "siving_lifesteal_fx",
+        "life_trans_fx"
     },
     fn_common = function(inst)
         inst:AddTag("siv_BFF")
@@ -1010,7 +1033,7 @@ MakeMask({
         inst.healthcounter_max = 135
 
         inst.components.equippable:SetOnEquip(function(inst, owner)
-            HAT_OPENTOP_ONEQUIP_L(inst, owner, "siving_mask_gold", "swap_hat")
+            HAT_OPENTOP_ONEQUIP_L(inst, owner, "siving_mask_gold", GetSwapSymbol(owner))
 
             owner:ListenForEvent("onattackother", OnAttackOther)
 
@@ -1097,13 +1120,13 @@ MakeMask({
                 return false
             end
 
-            --整体缺特效 undo
             if target.prefab == "flower_withered" then --枯萎花
                 if CalcuCost(mask, doer, 5) then
                     local flower = SpawnPrefab("planted_flower")
                     if flower ~= nil then
                         flower.Transform:SetPosition(target.Transform:GetWorldPosition())
                         target:Remove()
+                        target = flower
                     end
                 else
                     return false, "NOLIFE"
@@ -1206,6 +1229,14 @@ MakeMask({
                         return false, "NOWITHERED"
                     end
                 end
+            end
+
+            local fx = SpawnPrefab("life_trans_fx")
+            if fx ~= nil then
+                fx.Transform:SetPosition(target.Transform:GetWorldPosition())
+            end
+            if doer.SoundEmitter ~= nil then
+                doer.SoundEmitter:PlaySound("monkeyisland/wonkycurse/curse_fx")
             end
 
             return true

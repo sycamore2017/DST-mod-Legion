@@ -1568,15 +1568,67 @@ local dressup_data = {
     },
     siving_mask = {
         isnoskin = true,
-        isopentop = true,
-        buildfile = "siving_mask",
-        buildsymbol = "swap_hat",
+        buildfn = function(dressup, item, buildskin)
+            local itemswap = {}
+
+            local maps = {
+                wolfgang = true,
+                waxwell = true,
+                wathgrithr = true,
+                winona = true,
+                wortox = true,
+                wormwood = true,
+                wurt = true,
+                pigman = true,
+                pigguard = true,
+                moonpig = true,
+                bunnyman = true
+            }
+            if dressup.inst.sivmask_swapsymbol or maps[dressup.inst.prefab] then
+                maps = "swap_other"
+            else
+                maps = "swap_hat"
+            end
+
+            itemswap["swap_hat"] = dressup:GetDressData(
+                nil, "siving_mask", maps, item.GUID, "swap"
+            )
+            dressup:SetDressOpenTop(itemswap)
+
+            return itemswap
+        end
     },
     siving_mask_gold = {
         isnoskin = true,
-        isopentop = true,
-        buildfile = "siving_mask_gold",
-        buildsymbol = "swap_hat",
+        buildfn = function(dressup, item, buildskin)
+            local itemswap = {}
+
+            local maps = {
+                wolfgang = true,
+                waxwell = true,
+                wathgrithr = true,
+                winona = true,
+                wortox = true,
+                wormwood = true,
+                wurt = true,
+                pigman = true,
+                pigguard = true,
+                moonpig = true,
+                bunnyman = true
+            }
+            if dressup.inst.sivmask_swapsymbol or maps[dressup.inst.prefab] then
+                maps = "swap_other"
+            else
+                maps = "swap_hat"
+            end
+
+            itemswap["swap_hat"] = dressup:GetDressData(
+                nil, "siving_mask_gold", maps, item.GUID, "swap"
+            )
+            dressup:SetDressOpenTop(itemswap)
+
+            return itemswap
+        end
     },
 }
 

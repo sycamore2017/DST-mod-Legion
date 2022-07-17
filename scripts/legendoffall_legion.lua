@@ -1715,40 +1715,49 @@ LIFEBEND.strfn = function(act)
     return "GENERIC"
 end
 LIFEBEND.fn = function(act)
-    if act.doer ~= nil and act.invobject ~= nil and act.invobject.components.lifebender ~= nil then
-        return act.invobject.components.lifebender:Do(act.doer, act.target)
+    if act.doer ~= nil and act.doer.components.inventory ~= nil then
+        local item = act.doer.components.inventory:GetEquippedItem(EQUIPSLOTS.HEAD)
+        if item ~= nil and item.components.lifebender ~= nil then
+            return item.components.lifebender:Do(act.doer, act.target)
+        end
     end
 end
 AddAction(LIFEBEND)
 
-AddComponentAction("EQUIPPED", "lifebender", function(inst, doer, target, actions, right)
-    if
-        right and doer ~= target and
-        (doer.replica.inventory ~= nil and not doer.replica.inventory:IsHeavyLifting())
-    then
-        if target.prefab == "flower_withered" then --枯萎花
-            table.insert(actions, ACTIONS.LIFEBEND)
-        elseif target:HasTag("playerghost") or target:HasTag("ghost") then --玩家鬼魂、幽灵
-            table.insert(actions, ACTIONS.LIFEBEND)
-        elseif target:HasTag("_health") then --有生命组件的对象
-            if
-                target:HasTag("shadow") or
-                target:HasTag("wall") or
-                target:HasTag("structure") or
-                target:HasTag("balloon")
+--Tip："EQUIPPED"类型只识别手持道具，其他装备栏位置的不识别
+-- AddComponentAction("EQUIPPED", "lifebender", function(inst, doer, target, actions, right) end)
+table.insert(_G.CA_S_INSPECTABLE_L, function(inst, doer, actions, right)
+    if right and doer ~= inst and (doer.replica.inventory ~= nil and not doer.replica.inventory:IsHeavyLifting()) then
+        local item = doer.replica.inventory:GetEquippedItem(EQUIPSLOTS.HEAD)
+        if item ~= nil and item:HasTag("siv_mask2") then
+            if inst.prefab == "flower_withered" then --枯萎花
+                table.insert(actions, ACTIONS.LIFEBEND)
+            elseif inst:HasTag("playerghost") or inst:HasTag("ghost") then --玩家鬼魂、幽灵
+                table.insert(actions, ACTIONS.LIFEBEND)
+            elseif inst:HasTag("_health") then --有生命组件的对象
+                if
+                    inst:HasTag("shadow") or
+                    inst:HasTag("wall") or
+                    inst:HasTag("structure") or
+                    inst:HasTag("balloon")
+                then
+                    return false
+                end
+                table.insert(actions, ACTIONS.LIFEBEND)
+            elseif
+                inst:HasTag("withered") or inst:HasTag("barren") or --枯萎的植物
+                inst:HasTag("farm_plant") or --作物
+                inst:HasTag("crop_legion") or --子圭垄植物
+                inst:HasTag("crop2_legion") --异种植物
             then
-                return
+                table.insert(actions, ACTIONS.LIFEBEND)
+            else
+                return false
             end
-            table.insert(actions, ACTIONS.LIFEBEND)
-        elseif
-            target:HasTag("withered") or target:HasTag("barren") or --枯萎的植物
-            target:HasTag("farm_plant") or --作物
-            target:HasTag("crop_legion") or --子圭垄植物
-            target:HasTag("crop2_legion") --异种植物
-        then
-            table.insert(actions, ACTIONS.LIFEBEND)
+            return true
         end
     end
+    return false
 end)
 
 AddStategraphActionHandler("wilson", ActionHandler(ACTIONS.LIFEBEND, "give"))

@@ -731,6 +731,8 @@ table.insert(prefs, Prefab(
         inst.taskMove = nil
         inst.movingTarget = nil
         inst.OnReachTarget = nil
+        inst.minDistanceSq = 3.3 --1.8*1.8+0.06
+        inst._count = 0
 
         inst:AddComponent("locomotor")
         inst.components.locomotor.walkspeed = 2
@@ -755,7 +757,7 @@ table.insert(prefs, Prefab(
                             inst.taskMove = nil
                         end
                         inst:Remove()
-                    elseif inst:GetDistanceSqToInst(inst.movingTarget) <= 3.3 then --1.8*1.8+0.06
+                    elseif inst._count >= 129 or inst:GetDistanceSqToInst(inst.movingTarget) <= inst.minDistanceSq then
                         if inst.OnReachTarget ~= nil then
                             inst.OnReachTarget()
                         end
@@ -764,6 +766,9 @@ table.insert(prefs, Prefab(
                             inst.taskMove = nil
                         end
                         inst:Remove()
+                    else --更新目标地点
+                        inst:ForceFacePoint(inst.movingTarget.Transform:GetWorldPosition())
+                        inst._count = inst._count + 1
                     end
                 end, 0)
             end

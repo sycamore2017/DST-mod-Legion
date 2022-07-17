@@ -267,7 +267,7 @@ local function MakeWeapon(data)
             inst.components.equippable.equipstack = true --装备时可以叠加装备
 
             inst:AddComponent("weapon")
-            inst.components.weapon:SetRange(-1.5, -1.5) --人物默认攻击距离为3、3
+            inst.components.weapon:SetRange(-1, -1) --人物默认攻击距离为3、3
 
             inst:AddComponent("projectilelegion")
             inst.components.projectilelegion.speed = 45

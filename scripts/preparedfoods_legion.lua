@@ -349,7 +349,7 @@ local foods_legion = {
             return (names.red_cap or names.red_cap_cooked) and tags.monster and tags.decoration
                 and ( --新月那天才能做出来
                     tags.newmoon or --一定要用or
-                    TheWorld and TheWorld.state
+                    TheWorld and TheWorld.state and not TheWorld:HasTag("cave") --洞穴永远是新月，这里得多加个洞穴判定
                     and TheWorld.state.moonphase == "new"
                 )
         end,

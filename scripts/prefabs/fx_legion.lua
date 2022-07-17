@@ -473,6 +473,24 @@ if CONFIGS_LEGION.LEGENDOFFALL then
         end,
         fn_remove = nil,
     })
+    MakeFx({ --子圭·歃：生命转移特效
+        name = "life_trans_fx",
+        assets = {
+            Asset("ANIM", "anim/life_trans_fx.zip"),
+            Asset("ANIM", "anim/cursed_fx.zip"), --官方猴子诅咒特效动画模板
+        },
+        prefabs = nil,
+        fn_common = nil,
+        fn_anim = function(inst)
+            inst.AnimState:SetBank("cursed_fx")
+            inst.AnimState:SetBuild("life_trans_fx")
+            inst.AnimState:PlayAnimation("idle")
+            inst.AnimState:OverrideSymbol("monkey_fx_parts", "life_trans_fx", "fx_fur_part") --不想显示这部分
+            inst.AnimState:SetFinalOffset(3)
+            inst.AnimState:SetScale(0.65, 0.65)
+        end,
+        fn_remove = nil,
+    })
 end
 
 ---------------
