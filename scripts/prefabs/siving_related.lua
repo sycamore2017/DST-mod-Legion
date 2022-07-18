@@ -958,7 +958,7 @@ MakeMask({
             CancelTask_life(inst, owner)
         end)
 
-        inst.components.armor:InitCondition(315, 0.75)
+        inst.components.armor:InitCondition(315, 0.7)
     end
 })
 
@@ -1112,7 +1112,7 @@ MakeMask({
             owner:RemoveEventCallback("onattackother", OnAttackOther)
         end)
 
-        inst.components.armor:InitCondition(735, 0.8)
+        inst.components.armor:InitCondition(735, 0.75)
 
         inst:AddComponent("lifebender") --御血神通！然而并不
         inst.components.lifebender.fn_bend = function(mask, doer, target, options)
@@ -1125,6 +1125,18 @@ MakeMask({
                     local flower = SpawnPrefab("planted_flower")
                     if flower ~= nil then
                         flower.Transform:SetPosition(target.Transform:GetWorldPosition())
+                        target:Remove()
+                        target = flower
+                    end
+                else
+                    return false, "NOLIFE"
+                end
+            elseif target.prefab == "mandrake" then --死掉的曼德拉草
+                if CalcuCost(mask, doer, 20) then
+                    local flower = SpawnPrefab("mandrake_planted")
+                    if flower ~= nil then
+                        flower.Transform:SetPosition(target.Transform:GetWorldPosition())
+                        flower:replant()
                         target:Remove()
                         target = flower
                     end

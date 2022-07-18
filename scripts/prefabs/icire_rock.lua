@@ -165,6 +165,7 @@ local function fn()
     inst:AddTag("icebox_valid")
     inst:AddTag("bait")
     inst:AddTag("molebait") --吸引鼹鼠
+    inst:AddTag("NORATCHECK") --mod兼容：永不妥协。该道具不算鼠潮分
 
     --HASHEATER (from heater component) added to pristine state for optimization
     inst:AddTag("HASHEATER")

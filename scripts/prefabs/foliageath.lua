@@ -22,6 +22,8 @@ local function ItemTradeTest(inst, item)
     }
     if item == nil then
         return false
+    elseif item.foliageath_data ~= nil then --兼容其他mod
+        return true
     elseif not tradeableSwords[item.prefab] then
         return false, "WRONGSWORD"
     end
@@ -54,6 +56,7 @@ local function fn()
     inst.AnimState:PlayAnimation("lonely")
 
     inst:AddTag("swordscabbard")
+    inst:AddTag("NORATCHECK") --mod兼容：永不妥协。该道具不算鼠潮分
 
     --trader (from trader component) added to pristine state for optimization
     inst:AddTag("trader")
@@ -130,13 +133,14 @@ local function MakeIt(name, ismylove)
 
         inst.AnimState:SetBank("foliageath")
         inst.AnimState:SetBuild("foliageath")
-        inst.AnimState:PlayAnimation("lonely")
+        inst.AnimState:PlayAnimation("hambat")
 
         if ismylove then
             inst:AddTag("feelmylove")
         else
             inst:SetPrefabNameOverride("foliageath")
         end
+        inst:AddTag("NORATCHECK") --mod兼容：永不妥协。该道具不算鼠潮分
 
         MakeInventoryFloatable(inst, "small", 0.4, 0.5)
         local OnLandedClient_old = inst.components.floater.OnLandedClient
@@ -153,6 +157,8 @@ local function MakeIt(name, ismylove)
         inst:AddComponent("inspectable")
 
         inst:AddComponent("inventoryitem")
+        inst.components.inventoryitem.imagename = "foliageath_hambat" --默认是火腿棒入鞘后的贴图
+        inst.components.inventoryitem.atlasname = "images/inventoryimages/foliageath_hambat.xml"
 
         if not ismylove then
             inst.components.inspectable.getstatus = function(inst)

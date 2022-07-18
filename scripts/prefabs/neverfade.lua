@@ -169,24 +169,29 @@ local function onfinished(inst)
     end
 end
 
-local function OnRecovered(inst) --每次被剑鞘恢复时执行的函数
-    local newvalue = inst.components.finiteuses:GetUses() + 1
-    if newvalue <= inst.components.finiteuses.total then
-        inst.components.finiteuses:SetUses(newvalue)
-
-        if inst.hasSetBroken then
-            inst.hasSetBroken = false
-
-            inst.components.weapon:SetDamage(55)
-            inst.components.weapon:SetOnAttack(onattack)
-
-            ChangeInvImg(inst, inst.components.skinedlegion:GetSkinedData())
-        end
+local function OnRecovered(inst, dt, player) --每次被剑鞘恢复时执行的函数
+    if inst.components.finiteuses:GetPercent() >= 1 then
+        return
     end
 
-    if newvalue >= inst.components.finiteuses.total and inst.task_recover ~= nil then
-        inst.task_recover:Cancel()
-        inst.task_recover = nil
+    local value = dt * 250/(TUNING.TOTAL_DAY_TIME*3) --后面一截是每秒该恢复多少耐久
+    if value >= 1 then
+        value = math.floor(value)
+    else
+        return
+    end
+
+    local newvalue = inst.components.finiteuses:GetUses() + value
+    newvalue = math.min(250, newvalue)
+    inst.components.finiteuses:SetUses(newvalue)
+
+    if inst.hasSetBroken then
+        inst.hasSetBroken = false
+
+        inst.components.weapon:SetDamage(55)
+        inst.components.weapon:SetOnAttack(onattack)
+
+        ChangeInvImg(inst, inst.components.skinedlegion:GetSkinedData())
     end
 end
 

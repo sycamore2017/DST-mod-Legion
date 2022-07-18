@@ -471,6 +471,7 @@ local function fn_contracts()
     inst:AddTag("NOBLOCK")
     inst:AddTag("flying")
     inst:AddTag("bookstaying")
+    inst:AddTag("NORATCHECK") --mod兼容：永不妥协。该道具不算鼠潮分
 
     inst.entity:SetPristine()
 

@@ -178,12 +178,12 @@ AddAction(PULLOUTSWORD)
 
 --往具有某组件的物品添加动作的检测函数，如果满足条件，就向人物的动作可执行表中加入某个动作。right表示是否是右键动作
 AddComponentAction("INVENTORY", "swordscabbard", function(inst, doer, actions, right)
-    if doer.replica.inventory:GetActiveItem() ~= inst and inst:HasTag("swordscabbardcouple") then
+    if doer.replica.inventory:GetActiveItem() ~= inst then
         table.insert(actions, ACTIONS.PULLOUTSWORD)
     end
 end)
 AddComponentAction("SCENE", "swordscabbard", function(inst, doer, actions, right)
-    if right and inst:HasTag("swordscabbardcouple") then
+    if right then
         table.insert(actions, ACTIONS.PULLOUTSWORD)
     end
 end)
@@ -194,15 +194,14 @@ AddStategraphActionHandler("wilson_client", ActionHandler(ACTIONS.PULLOUTSWORD, 
 
 if IsServer then
     if CONFIGS_LEGION.FOLIAGEATHCHANCE > 0 then
-        --砍冬青树有几率掉青枝绿叶
-        local trees =
-        {
+        --砍粗壮常青树有几率掉青枝绿叶
+        local trees = {
             "evergreen_sparse",
             "evergreen_sparse_normal",
             "evergreen_sparse_tall",
-            "evergreen_sparse_short",
+            "evergreen_sparse_short"
         }
-        for k,v in pairs(trees) do
+        for _,v in pairs(trees) do
             AddPrefabPostInit(v, function(inst)
                 if inst.components.workable ~= nil then
                     local onfinish_old = inst.components.workable.onfinish
@@ -219,6 +218,16 @@ if IsServer then
                 end
             end)
         end
-    end
 
+        --粗壮常青树的树精有几率掉青枝绿叶
+        AddPrefabPostInit("leif_sparse", function(inst)
+            inst:ListenForEvent("death", function(inst, data)
+                if inst.components.lootdropper ~= nil then
+                    if math.random() < 10*CONFIGS_LEGION.FOLIAGEATHCHANCE then
+                        inst.components.lootdropper:SpawnLootPrefab("foliageath")
+                    end
+                end
+            end)
+        end)
+    end
 end

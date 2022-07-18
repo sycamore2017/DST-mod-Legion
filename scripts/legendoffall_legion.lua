@@ -1705,7 +1705,7 @@ LIFEBEND.id = "LIFEBEND"
 LIFEBEND.str = STRINGS.ACTIONS.LIFEBEND
 LIFEBEND.strfn = function(act)
     local target = act.target
-    if target.prefab == "flower_withered" then --枯萎花
+    if target.prefab == "flower_withered" or target.prefab == "mandrake" then --枯萎花、死掉的曼德拉草
         return "GENERIC"
     elseif target:HasTag("playerghost") or target:HasTag("ghost") then --玩家鬼魂、幽灵
         return "REVIVE"
@@ -1730,7 +1730,7 @@ table.insert(_G.CA_S_INSPECTABLE_L, function(inst, doer, actions, right)
     if right and doer ~= inst and (doer.replica.inventory ~= nil and not doer.replica.inventory:IsHeavyLifting()) then
         local item = doer.replica.inventory:GetEquippedItem(EQUIPSLOTS.HEAD)
         if item ~= nil and item:HasTag("siv_mask2") then
-            if inst.prefab == "flower_withered" then --枯萎花
+            if inst.prefab == "flower_withered" or inst.prefab == "mandrake" then --枯萎花、死掉的曼德拉草
                 table.insert(actions, ACTIONS.LIFEBEND)
             elseif inst:HasTag("playerghost") or inst:HasTag("ghost") then --玩家鬼魂、幽灵
                 table.insert(actions, ACTIONS.LIFEBEND)

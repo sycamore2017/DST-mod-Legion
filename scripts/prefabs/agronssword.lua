@@ -80,6 +80,7 @@ local function fn()
     inst:AddTag("irreplaceable")    --这个标签会防止被猴子、食人花、坎普斯等拿走
     inst:AddTag("nonpotatable") --这个貌似是使其下线时会自动掉落
     inst:AddTag("hide_percentage")  --这个标签能让护甲耐久比例不显示出来
+    inst:AddTag("NORATCHECK") --mod兼容：永不妥协。该道具不算鼠潮分
 
     --weapon (from weapon component) added to pristine state for optimization
     inst:AddTag("weapon")

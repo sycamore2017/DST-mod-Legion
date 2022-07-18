@@ -147,6 +147,7 @@ local function fn()
     inst.AnimState:PlayAnimation("anim", true)
 
     inst:AddTag("backpack")
+    inst:AddTag("NORATCHECK") --mod兼容：永不妥协。该道具不算鼠潮分
 
     --inst.foleysound = "dontstarve/movement/foley/backpack"
 
