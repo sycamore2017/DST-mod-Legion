@@ -243,7 +243,7 @@ end
 --[[ hot reload ]]--[[ 热更新机制 ]]
 --------------------------------------------------------------------------
 
-modimport("scripts/hotreload_legion.lua")
+-- modimport("scripts/hotreload_legion.lua")
 
 --------------------------------------------------------------------------
 --[[ compatibility enhancement ]]--[[ 兼容性修改 ]]
@@ -870,6 +870,135 @@ AddSimPostInit(function()
             })
         end
     end
+
+    ----------
+    --额外物品包
+    ----------
+    if CONFIGS_LEGION.DRESSUP and _G.rawget(_G, "aipCountTable") then
+        local DRESSUP_DATA = _G.DRESSUP_DATA_LEGION
+        DRESSUP_DATA["aip_armor_gambler"] = { --赌徒护甲
+            isnoskin = true, buildfile = "aip_armor_gambler", buildsymbol = "swap_body"
+        }
+        DRESSUP_DATA["aip_beehave"] = { --蜂语
+            isnoskin = true, buildfile = "aip_beehave_swap", buildsymbol = "aip_beehave_swap"
+        }
+        DRESSUP_DATA["aip_dou_scepter"] = { --神秘权杖1
+            isnoskin = true, buildfile = "aip_dou_scepter_swap", buildsymbol = "aip_dou_scepter_swap"
+        }
+        DRESSUP_DATA["aip_dou_empower_scepter"] = { --神秘权杖2
+            isnoskin = true, buildfile = "aip_dou_empower_scepter_swap", buildsymbol = "aip_dou_empower_scepter_swap"
+        }
+        DRESSUP_DATA["aip_dou_huge_scepter"] = DRESSUP_DATA["aip_dou_empower_scepter"] --神秘权杖3
+        DRESSUP_DATA["aip_dou_scepter_lock"] = DRESSUP_DATA["aip_dou_empower_scepter"] --神秘权杖4
+        DRESSUP_DATA["aip_fish_sword"] = { --鱼刀
+            isnoskin = true, buildfile = "aip_fish_sword_swap", buildsymbol = "aip_fish_sword_swap"
+        }
+        DRESSUP_DATA["aip_krampus_plus"] = { --守财奴的背包
+            isnoskin = true, isbackpack = true,
+            buildfile = "aip_krampus_plus", buildsymbol = "swap_body"
+        }
+        DRESSUP_DATA["aip_oar_woodead"] = { --树精木浆
+            isnoskin = true, buildfile = "aip_oar_woodead_swap", buildsymbol = "aip_oar_woodead_swap"
+        }
+        -- DRESSUP_DATA["aip_oldone_marble_head_lock"] = { --捆绑的头颅
+        --     isnoskin = true, istallbody = true,
+        --     buildfile = "aip_oldone_marble_head_lock", buildsymbol = "swap_body"
+        -- }
+        -- DRESSUP_DATA["aip_oldone_marble_head"] = { --头颅部件
+        --     isnoskin = true, istallbody = true,
+        --     buildfile = "aip_oldone_marble_head", buildsymbol = "swap_body"
+        -- }
+        -- DRESSUP_DATA["aip_oldone_snowball"] = { --雪球（有bug不敢加了）
+        --     isnoskin = true, istallbody = true,
+        --     buildfile = "aip_oldone_snowball", buildsymbol = "swap_body"
+        -- }
+        DRESSUP_DATA["aip_suwu"] = { --子卿
+            isnoskin = true, buildfile = "aip_suwu_swap", buildsymbol = "aip_suwu_swap"
+        }
+        DRESSUP_DATA["aip_track_tool"] = { --月轨测量仪
+            isnoskin = true, buildfile = "aip_track_tool_swap", buildsymbol = "aip_track_tool_swap"
+        }
+        DRESSUP_DATA["aip_xinyue_hoe"] = { --心悦锄
+            isnoskin = true, buildfile = "aip_xinyue_hoe_swap", buildsymbol = "aip_xinyue_hoe_swap"
+        }
+        DRESSUP_DATA["popcorngun"] = { --玉米枪
+            isnoskin = true, buildfile = "swap_popcorn_gun", buildsymbol = "swap_popcorn_gun"
+        }
+        DRESSUP_DATA["aip_wizard_hat"] = { --闹鬼巫师帽
+            isnoskin = true, buildfile = "aip_wizard_hat", buildsymbol = "swap_hat"
+        }
+        DRESSUP_DATA["aip_horse_head"] = { --马头
+            isnoskin = true,
+            buildfn = function(dressup, item, buildskin)
+                local itemswap = {}
+
+                itemswap["swap_hat"] = dressup:GetDressData(
+                    buildskin, "aip_horse_head", "swap_hat", item.GUID, "swap"
+                )
+                dressup:SetDressTop(itemswap)
+                itemswap["HEAD_HAT"] = dressup:GetDressData(nil, nil, nil, nil, "hide")
+
+                return itemswap
+            end
+        }
+        DRESSUP_DATA["aip_som"] = { --谜之声
+            isnoskin = true,
+            buildfn = function(dressup, item, buildskin)
+                local itemswap = {}
+
+                itemswap["swap_hat"] = dressup:GetDressData(
+                    buildskin, "aip_som", "swap_hat", item.GUID, "swap"
+                )
+                dressup:SetDressTop(itemswap)
+                itemswap["HEAD_HAT"] = dressup:GetDressData(nil, nil, nil, nil, "hide")
+
+                return itemswap
+            end
+        }
+        DRESSUP_DATA["aip_blue_glasses"] = { --岚色眼镜
+            isnoskin = true, isopentop = true,
+            buildfile = "aip_blue_glasses", buildsymbol = "swap_hat"
+        }
+        DRESSUP_DATA["aip_oldone_fisher"] = { --鱼仔帽
+            isnoskin = true, buildfile = "aip_oldone_fisher", buildsymbol = "swap_hat"
+        }
+        DRESSUP_DATA["aip_joker_face"] = { --诙谐面具
+            isnoskin = true, isopentop = true,
+            buildfile = "aip_joker_face", buildsymbol = "swap_hat"
+        }
+
+        --各种雕像
+        local pieces = {
+            "aip_moon",
+            "aip_doujiang",
+            "aip_deer",
+            "aip_mouth",
+            "aip_octupus",
+            "aip_fish"
+        }
+        local materials = {
+            "marble", "stone", "moonglass",
+        }
+        for k,v in pairs(pieces) do
+            _G.DRESSUP_DATA_LEGION["chesspiece_"..v] = {
+                isnoskin = true,
+                istallbody = true,
+                buildfn = function(dressup, item, buildskin)
+                    local itemswap = {}
+
+                    if item.materialid ~= nil and materials[item.materialid] ~= nil then
+                        itemswap["swap_body_tall"] = dressup:GetDressData(
+                            buildskin, "swap_chesspiece_"..v.."_"..materials[item.materialid], "swap_body", item.GUID, "swap"
+                        )
+                    end
+
+                    return itemswap
+                end
+            }
+        end
+    end
+
+    --本来想给某mod做幻化兼容的，要不是看在有粉丝想要，我才不会浪费时间做这个，结果代码加密+粉丝主动要来的代码也是假的(也可能是过期的)。总结，不搞了，拜拜
 
     ----------
     --工艺锅（Craft Pot）

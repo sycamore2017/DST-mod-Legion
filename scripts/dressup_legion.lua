@@ -1188,8 +1188,7 @@ local dressup_data = {
         buildfile = "swap_fimbul_axe",
         buildsymbol = "swap_fimbul_axe",
     },
-    giantsfoot =
-    {
+    giantsfoot = {
         isnoskin = true,
         isbackpack = true,
         buildfile = "giantsfoot",
@@ -1678,7 +1677,7 @@ local pieces = {
 local materials = {
     "marble", "stone", "moonglass",
 }
-for k,v in pairs(pieces) do
+for _,v in pairs(pieces) do
     _G.DRESSUP_DATA_LEGION["chesspiece_"..v] =
     {
         isnoskin = true,
@@ -1696,6 +1695,7 @@ for k,v in pairs(pieces) do
         end,
     }
 end
+pieces = nil
 
 --统一添加各种巨型作物的幻化数据
 local oversizecrops = {

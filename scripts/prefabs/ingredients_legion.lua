@@ -148,11 +148,11 @@ if CONFIGS_LEGION.LEGENDOFFALL then
             perishable = { product = nil, time = TUNING.PERISH_MED },
             stackable = { size = nil },
             burnable = {},
-            fn_server = function(inst)
-                --TIP: 要想能在作物秤上显示，需要自己的build里有个 build名..01 的通道
-                inst:AddComponent("weighable")
-                inst.components.weighable.type = TROPHYSCALE_TYPES.OVERSIZEDVEGGIES
-            end
+            -- fn_server = function(inst)
+                
+            --     inst:AddComponent("weighable")
+            --     inst.components.weighable.type = TROPHYSCALE_TYPES.OVERSIZEDVEGGIES
+            -- end
         },
         cooked = {
             floatable = {nil, "small", 0.2, 1},
@@ -360,6 +360,7 @@ local function MakePrefab(name, info)
         end
 
         if info.has_seeds then
+            --TIP: 要想能在作物秤上显示，需要自己的build里有个 build名..01 的通道
             inst:AddComponent("weighable")
             inst.components.weighable.type = TROPHYSCALE_TYPES.OVERSIZEDVEGGIES
         end
