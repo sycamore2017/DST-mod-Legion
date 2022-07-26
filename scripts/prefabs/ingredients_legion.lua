@@ -147,12 +147,7 @@ if CONFIGS_LEGION.LEGENDOFFALL then
             edible = { hunger = 12, sanity = -10, health = 8, foodtype = nil, foodtype_secondary = nil },
             perishable = { product = nil, time = TUNING.PERISH_MED },
             stackable = { size = nil },
-            burnable = {},
-            -- fn_server = function(inst)
-                
-            --     inst:AddComponent("weighable")
-            --     inst.components.weighable.type = TROPHYSCALE_TYPES.OVERSIZEDVEGGIES
-            -- end
+            burnable = {}
         },
         cooked = {
             floatable = {nil, "small", 0.2, 1},

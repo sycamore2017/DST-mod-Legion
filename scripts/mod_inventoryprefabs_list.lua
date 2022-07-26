@@ -172,6 +172,11 @@ local InventoryPrefabsList = {  --每个元素的下标值为每种物品栏图�
     foliageath_lileaves_era = { build = "images_minisign_skins1", },
     tripleshovelaxe_era = { build = "images_minisign_skins1", },
     triplegoldenshovelaxe_era = { build = "images_minisign_skins1", },
+    icire_rock1_collector = { build = "images_minisign_skins1", },
+    icire_rock2_collector = { build = "images_minisign_skins1", },
+    icire_rock3_collector = { build = "images_minisign_skins1", },
+    icire_rock4_collector = { build = "images_minisign_skins1", },
+    icire_rock5_collector = { build = "images_minisign_skins1", },
 }
 
 return InventoryPrefabsList
