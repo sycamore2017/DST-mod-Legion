@@ -1194,7 +1194,7 @@ _G.SKINS_LEGION = {
     },
     icire_rock_collector = {
         base_prefab = "icire_rock",
-		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
+		type = "item", skin_tags = {}, release_group = 555, rarity = raritySpecial,
 
         skin_id = "62df65b58c2f781db2f7998a",
         onlyownedshow = true,
@@ -1216,7 +1216,7 @@ _G.SKINS_LEGION = {
         string = ischinese and {
             name = "占星石", collection = "COLLECTOR", access = "SPECIAL",
             descitem = "解锁\"鸳鸯石\"的皮肤。",
-            description = "我走进了一家博物馆，刹那，仿佛听到一阵朦朦胧胧的低语，又或是窸窸窣窣的昆虫振翅声。向着声音的方向看去，有一颗西瓜大小的精美琥珀。走进后，里面居然还包裹了一只仿佛仍活着的带翅昆虫。诧异的是，我感受到了它对生命突然凝滞的不甘...",
+            description = "我族世代守护占星石，并流传着一个不可思议的秘密。占星石每三百年都会选中一位族人，只有他能读懂占星预言。到那时只要听从星的指导，就能让我族发扬兴盛，摆脱命运安排。然而，距离上一位族人逝去已过快四百年，占星石也只剩隐隐的光。"
         } or {
             name = "Astrological Stone", collection = "COLLECTOR", access = "SPECIAL",
             descitem = "Unlock \"Icire Stone\" skin.",
@@ -1226,13 +1226,15 @@ _G.SKINS_LEGION = {
 		fn_start = function(inst)
             inst.AnimState:SetBank("icire_rock_collector")
             inst.AnimState:SetBuild("icire_rock_collector")
+            inst.AnimState:ClearOverrideSymbol("rock")
+            inst.AnimState:ClearOverrideSymbol("shadow")
 
             inst.changeimgfn = function(inst)
                 local newname = "icire_rock"..tostring(inst.currentTempRange).."_collector"
                 inst.components.inventoryitem.atlasname = "images/inventoryimages_skin/"..newname..".xml"
                 inst.components.inventoryitem:ChangeImageName(newname)
             end
-            -- inst.changeimgfn(inst)
+            inst.changeimgfn(inst)
         end,
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
     },
@@ -1516,6 +1518,7 @@ end
 local skinidxes = { --用以皮肤排序
     "neverfade_thanks", "neverfadebush_thanks",
     "fishhomingtool_awesome_thanks", "fishhomingtool_normal_thanks", "fishhomingbait_thanks",
+    "icire_rock_collector",
     "triplegoldenshovelaxe_era", "tripleshovelaxe_era", "lilybush_era", "lileaves_era", "shield_l_log_era", "icire_rock_era", "shield_l_sand_era",
     "orchidbush_disguiser", "boltwingout_disguiser",
     "rosebush_marble", "lilybush_marble", "orchidbush_marble",
