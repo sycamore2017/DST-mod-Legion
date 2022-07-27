@@ -76,6 +76,7 @@ local function AddSpecialLoot(inst)
     }
     if CONFIGS_LEGION.LEGENDOFFALL then
         table.insert(drops, "fishhomingtool_awesome_blueprint")
+        table.insert(drops, "siving_mask_gold_blueprint")
         inst.components.lootdropper:AddChanceLoot(table.remove(drops, math.random(#drops)), 1)
     end
     inst.components.lootdropper:AddChanceLoot(table.remove(drops, math.random(#drops)), 1)

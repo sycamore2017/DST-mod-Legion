@@ -225,7 +225,7 @@ end
 --[[ 沃托克斯 ]]
 --------------------------------------------------------------------------
 
--- local wortox_soul_common = require("prefabs/wortox_soul_common")
+local wortox_soul_common = require("prefabs/wortox_soul_common")
 
 local assets_contracts =
 {
@@ -234,7 +234,7 @@ local assets_contracts =
     Asset("ATLAS", "images/inventoryimages/soul_contracts.xml"),
     Asset("IMAGE", "images/inventoryimages/soul_contracts.tex"),
     Asset("SOUND", "sound/together.fsb"),   --官方音效包
-    -- Asset("SCRIPT", "scripts/prefabs/wortox_soul_common.lua"), --官方灵魂通用功能函数文件
+    Asset("SCRIPT", "scripts/prefabs/wortox_soul_common.lua"), --官方灵魂通用功能函数文件
 }
 
 local prefabs_contracts =
@@ -242,7 +242,7 @@ local prefabs_contracts =
     "wortox_soul_heal_fx",
     "wortox_soul",          --物品栏里的灵魂
     -- "wortox_soul_spawn",    --地面的灵魂
-    "wortox_eat_soul_fx",
+    -- "wortox_eat_soul_fx",
     "wortox_soul_in_fx",    --灵魂被吸收时的特效
 }
 
@@ -251,51 +251,25 @@ local brain_contracts = require("brains/soul_contractsbrain")
 -----
 
 local function ContractsDoHeal(inst)
-    local targets = {}
-    local x, y, z = inst.Transform:GetWorldPosition()
-    for i, v in ipairs(AllPlayers) do
-        if
-            not v:HasTag("health_as_oldage") and --旺达没法被加血，所以不管她了
-            not (v.components.health:IsDead() or v:HasTag("playerghost") or v.components.health.invincible) and
-            v.entity:IsVisible() and
-            v:GetDistanceSqToPoint(x, y, z) < 324 and
-            (v.components.health:GetMaxWithPenalty() - v.components.health.currenthealth) > 0.1 --排除满血玩家
-        then
-            table.insert(targets, v)
-        end
-    end
-    if #targets > 0 then
-        local amt = TUNING.HEALING_MED - math.min(8, #targets) + 1
-        for i, v in ipairs(targets) do
-            --always heal, but don't stack visual fx
-            v.components.health:DoDelta(amt, nil, "soul_contracts")
-            if v.blocksoulhealfxtask == nil then
-                v.blocksoulhealfxtask = v:DoTaskInTime(.5, function(v)
-                    v.blocksoulhealfxtask = nil
-                end)
-                local fx = SpawnPrefab("wortox_soul_heal_fx")
-                fx.entity:AddFollower():FollowSymbol(v.GUID, v.components.combat.hiteffectsymbol, 0, -50, 0)
-                fx:Setup(v)
-            end
-        end
-    end
+    wortox_soul_common.DoHeal(inst)
 end
 
 local function UpadateHealTag(inst)
-    local targets = {}
+    local shouldheal = false
     local x, y, z = inst.Transform:GetWorldPosition()
-    for i, v in ipairs(AllPlayers) do
+    for _,v in ipairs(AllPlayers) do
         if
+            v.entity:IsVisible() and
             not v:HasTag("health_as_oldage") and --旺达没法被加血，所以不管她了
             not (v.components.health:IsDead() or v:HasTag("playerghost") or v.components.health.invincible) and
-            v.entity:IsVisible() and
-            v:GetDistanceSqToPoint(x, y, z) < 100 and
-            (v.components.health:GetMaxWithPenalty() - v.components.health.currenthealth) >= 10
+            (v.components.health:GetMaxWithPenalty() - v.components.health.currenthealth) >= 10 and
+            v:GetDistanceSqToPoint(x, y, z) < TUNING.WORTOX_SOULHEAL_RANGE * TUNING.WORTOX_SOULHEAL_RANGE --64
         then
-            table.insert(targets, v)
+            shouldheal = true
+            break
         end
     end
-    if #targets > 0 then
+    if shouldheal then
         inst._needheal = true
     else
         inst._needheal = false
@@ -371,14 +345,14 @@ local function OnPutInInventory_contracts(inst) --放进物品栏时(在鼠标�
     end
 end
 
-local function setDropPostion(inst, time)
-    inst:DoTaskInTime(time, function ()
-        if inst.components.follower:GetLeader() ~= nil and inst.Physics ~= nil then
-            -- inst.Transform:SetPosition(inst.components.follower:GetLeader().Transform:GetWorldPosition())
-            inst.Physics:Teleport(inst.components.follower:GetLeader().Transform:GetWorldPosition())
-        end
-    end)
-end
+-- local function setDropPostion(inst, time)
+--     inst:DoTaskInTime(time, function ()
+--         if inst.components.follower:GetLeader() ~= nil and inst.Physics ~= nil then
+--             -- inst.Transform:SetPosition(inst.components.follower:GetLeader().Transform:GetWorldPosition())
+--             inst.Physics:Teleport(inst.components.follower:GetLeader().Transform:GetWorldPosition())
+--         end
+--     end)
+-- end
 
 local function OnDropped_contracts(inst) --丢在地上时
     if inst.sg ~= nil then
@@ -500,8 +474,8 @@ local function fn_contracts()
     inst.components.inventoryitem.canbepickedup = false
 
     inst:AddComponent("finiteuses")
-    inst.components.finiteuses:SetMaxUses(20)
-    inst.components.finiteuses:SetUses(20)
+    inst.components.finiteuses:SetMaxUses(40)
+    inst.components.finiteuses:SetUses(40)
     inst:ListenForEvent("percentusedchange", PercentChanged_contracts)
 
     inst:AddComponent("fuel")
@@ -512,7 +486,7 @@ local function fn_contracts()
     inst.components.hauntable.cooldown = TUNING.HAUNT_COOLDOWN_SMALL
     inst.components.hauntable:SetOnHauntFn(OnHaunt_contracts)
 
-    inst:AddComponent("soulcontracts") --这个组件只是为了食用、捡起、跟随机制，和瞬移、加血无关
+    inst:AddComponent("soulcontracts")
 
     inst:ListenForEvent("onputininventory", OnPutInInventory_contracts)
     inst:ListenForEvent("ondropped", OnDropped_contracts)

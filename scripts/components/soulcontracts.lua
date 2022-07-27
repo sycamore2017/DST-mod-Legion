@@ -23,18 +23,38 @@ nil,
     staying = onstaying
 })
 
-function SoulContracts:CanEat(eater)
-    return self.inst.components.finiteuses ~= nil and
-        self.inst.components.finiteuses:GetUses() > 0 and
-        eater.components.souleater ~= nil
-end
+function SoulContracts:ReturnSouls(doer)
+    if
+        doer.components.inventory ~= nil and doer.components.inventory.isopen and
+        self.inst.components.finiteuses ~= nil and self.inst.components.finiteuses:GetUses() > 0
+    then
+        local souls = doer.components.inventory:FindItems(function(item)
+            return item.prefab == "wortox_soul"
+        end)
+        local soulscount = 0
+        for i, v in ipairs(souls) do
+            soulscount = soulscount +
+                (v.components.stackable ~= nil and v.components.stackable:StackSize() or 1)
+        end
 
-function SoulContracts:EatSoul(eater)
-    -- self.inst:PushEvent("oneatsoul", { soul = self.inst })
-    if eater.components.souleater.oneatsoulfn ~= nil then
-        eater.components.souleater.oneatsoulfn(eater, self.inst)
+        if soulscount >= TUNING.WORTOX_MAX_SOULS then --携带灵魂已达到上限，直接释放这个灵魂
+            if self.inst._SoulHealing ~= nil then
+                self.inst._SoulHealing(doer)
+                self.inst.components.finiteuses:Use(1)
+            end
+        else
+            soulscount = TUNING.WORTOX_MAX_SOULS - soulscount
+            soulscount = math.ceil( math.min(soulscount, self.inst.components.finiteuses:GetUses()) )
+            local soul = SpawnPrefab("wortox_soul")
+            if soul ~= nil then
+                if soulscount > 1 and soul.components.stackable ~= nil then
+                    soul.components.stackable:SetStackSize(soulscount)
+                end
+            end
+            doer.components.inventory:GiveItem(soul, nil, doer:GetPosition())
+            self.inst.components.finiteuses:Use(soulscount)
+        end
     end
-    self.inst.components.finiteuses:Use(1)
 
     return true
 end

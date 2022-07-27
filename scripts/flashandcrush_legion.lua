@@ -744,6 +744,7 @@ local function FindItemWithoutContainer(inst, fn)
     end
 end
 
+--[[
 -- 辅助沃托克斯管理灵魂
 local onsetonwer_f = false
 local ondropitem_f = false
@@ -760,9 +761,13 @@ AddPrefabPostInit("wortox", function(inst)
             local GetPointSpecialActions_old = upvaluehelper.Get(OnSetOwner, "GetPointSpecialActions")
             if GetPointSpecialActions_old ~= nil then
                 local function GetPointSpecialActions_new(inst, pos, useitem, right)
-                    if right and useitem == nil and (inst.replica.rider == nil or not inst.replica.rider:IsRiding()) then
+                    if
+                        right and useitem == nil and
+                        not TheWorld.Map:IsGroundTargetBlocked(pos) and
+                        (inst.replica.rider == nil or not inst.replica.rider:IsRiding())
+                    then
                         local items = inst.replica.inventory:GetItems()
-                        for k,v in pairs(items) do
+                        for _,v in pairs(items) do
                             if v:HasTag("soulcontracts") and not v:HasTag("nosoulleft") then
                                 return { ACTIONS.BLINK }
                             end
@@ -805,10 +810,23 @@ AddPrefabPostInit("wortox", function(inst)
             OnDropItem = nil
         end
     end
-
+    
 end)
+]]--
 
 if IsServer then
+    local function GetSouls(inst)
+        local souls = inst.components.inventory:FindItems(function(item)
+            return item.prefab == "wortox_soul"
+        end)
+        local soulscount = 0
+        for i, v in ipairs(souls) do
+            soulscount = soulscount +
+                (v.components.stackable ~= nil and v.components.stackable:StackSize() or 1)
+        end
+        return souls, soulscount
+    end
+
     local seeksoulstealer_f = false
     AddPrefabPostInit("wortox_soul_spawn", function(inst)
         --灵魂优先寻找契约
@@ -843,54 +861,47 @@ if IsServer then
         local OnHit_old = inst.components.projectile.onhit
         inst.components.projectile:SetOnHitFn(function(inst, attacker, target)
             if target ~= nil then
-                local book = nil
                 if target:HasTag("soulcontracts") then --进入地面的契约书
-                    book = target
-                elseif target.components.inventory ~= nil then --击中玩家时，有携带契约书的话
-                    book = FindItemWithoutContainer(target, function(item)
-                        if item:HasTag("soulcontracts") then
-                            return true
-                        end
-                        return false
-                    end)
-                end
-
-                if book ~= nil then
                     --命中特效
                     local fx = SpawnPrefab("wortox_soul_in_fx")
                     fx.Transform:SetPosition(inst.Transform:GetWorldPosition())
                     fx:Setup(target)
 
-                    --直接跳过灵魂进入物品栏过程，给书恢复耐久，并且释放多余灵魂
-                    if book.components.finiteuses ~= nil and book._SoulHealing ~= nil then
-                        if book.components.finiteuses:GetPercent() >= 1 then --耐久满了
-                            if target.components.inventory == nil then --地面的书，触发加血效果
-                                book._SoulHealing(book)
-                            else --物品栏的书，如果携带的灵魂满了才释放加血效果
-                                local souls = target.components.inventory:FindItems(function(item)
-                                    return item.prefab == "wortox_soul"
-                                end)
-                                local soulscount = 0
-                                for i, v in ipairs(souls) do
-                                    soulscount = soulscount +
-                                        (v.components.stackable ~= nil and v.components.stackable:StackSize() or 1)
-                                end
-                                if soulscount >= TUNING.WORTOX_MAX_SOULS then --灵魂满了，释放加血效果
-                                    book._SoulHealing(target)
-                                else --灵魂没有满，直接给玩家灵魂
-                                    if OnHit_old ~= nil then
-                                        OnHit_old(inst, attacker, target)
-                                        return
-                                    end
-                                end
-                            end
+                    if target.components.finiteuses ~= nil and target._SoulHealing ~= nil then
+                        if target.components.finiteuses:GetPercent() >= 1 then
+                            target._SoulHealing(target)
                         else
-                            book.components.finiteuses:SetUses(book.components.finiteuses:GetUses() + 1)
+                            target.components.finiteuses:SetUses(target.components.finiteuses:GetUses() + 1)
                         end
                     end
-
                     inst:Remove()
                     return
+                elseif target.components.inventory ~= nil then --击中玩家时，有携带契约书的话
+                    local book = FindItemWithoutContainer(target, function(item)
+                        if item:HasTag("soulcontracts") then
+                            return true
+                        end
+                        return false
+                    end)
+                    if book ~= nil then
+                        local souls, count = GetSouls(target)
+                        if count >= TUNING.WORTOX_MAX_SOULS then --灵魂达到上限，由契约来吸收
+                            if book.components.finiteuses ~= nil and book._SoulHealing ~= nil then
+                                if book.components.finiteuses:GetPercent() >= 1 then
+                                    book._SoulHealing(book)
+                                else
+                                    book.components.finiteuses:SetUses(book.components.finiteuses:GetUses() + 1)
+                                end
+                            end
+
+                            local fx = SpawnPrefab("wortox_soul_in_fx")
+                            fx.Transform:SetPosition(inst.Transform:GetWorldPosition())
+                            fx:Setup(target)
+
+                            inst:Remove()
+                            return
+                        end
+                    end
                 end
             end
 
@@ -901,181 +912,60 @@ if IsServer then
     end)
 
     --瞬移动作响应时能消耗契约书中的灵魂
-    local BLINK_fn_old = ACTIONS.BLINK.fn
-    ACTIONS.BLINK.fn = function(act)
-        local act_pos = act:GetActionPoint()
-        if act.invobject == nil
-            and act.doer ~= nil
-            and act.doer:HasTag("soulstealer")
-            and act.doer.sg ~= nil
-            and act.doer.sg.currentstate.name == "portal_jumpin_pre"
-            and act_pos ~= nil
-            and act.doer.components.inventory ~= nil
-        then
-            local contracts = FindItemWithoutContainer(act.doer, function(item)
-                return item:HasTag("soulcontracts") and
-                    item.components.finiteuses ~= nil and
-                    item.components.finiteuses:GetUses() > 0
-            end)
+    -- local BLINK_fn_old = ACTIONS.BLINK.fn
+    -- ACTIONS.BLINK.fn = function(act)
+    --     local act_pos = act:GetActionPoint()
+    --     if act.invobject == nil
+    --         and act.doer ~= nil
+    --         and act.doer:HasTag("soulstealer")
+    --         and act.doer.sg ~= nil
+    --         and act.doer.sg.currentstate.name == "portal_jumpin_pre"
+    --         and act_pos ~= nil
+    --         and act.doer.components.inventory ~= nil
+    --     then
+    --         local contracts = FindItemWithoutContainer(act.doer, function(item)
+    --             return item:HasTag("soulcontracts") and
+    --                 item.components.finiteuses ~= nil and
+    --                 item.components.finiteuses:GetUses() > 0
+    --         end)
 
-            if contracts ~= nil then
-                contracts.components.finiteuses:Use(1)
-                act.doer.sg:GoToState("portal_jumpin", act_pos)
-                return true
-            end
-        end
+    --         if contracts ~= nil then
+    --             contracts.components.finiteuses:Use(1)
+    --             act.doer.sg:GoToState("portal_jumpin", act_pos)
+    --             return true
+    --         end
+    --     end
 
-        return BLINK_fn_old(act)
-    end
+    --     return BLINK_fn_old(act)
+    -- end
 end
 
 --------------------------------------------------------------------------
---[[ 灵魂契约的摄食动作 ]]
+--[[ 灵魂契约的索取动作 ]]
 --------------------------------------------------------------------------
 
--- local eat_contracts = State{
---     name = "eat_contracts",
---     tags = { "busy", "nodangle" },
-
---     onenter = function(inst, foodinfo)
---         inst.components.locomotor:Stop()
-
---         local feed = foodinfo and foodinfo.feed
---         if feed ~= nil then
---             inst.components.locomotor:Clear()
---             inst:ClearBufferedAction()
---             inst.sg.statemem.feed = foodinfo.feed
---             inst.sg.statemem.feeder = foodinfo.feeder
---             inst.sg:AddStateTag("pausepredict")
---             if inst.components.playercontroller ~= nil then
---                 inst.components.playercontroller:RemotePausePrediction()
---             end
---         elseif inst:GetBufferedAction() then
---             feed = inst:GetBufferedAction().invobject
---         end
-
---         inst.SoundEmitter:PlaySound("dontstarve/wilson/eat", "eating")
-
---         if feed ~= nil and feed.components.soulcontracts ~= nil then
---             inst.sg.statemem.soulfx = SpawnPrefab("wortox_eat_soul_fx")
---             inst.sg.statemem.soulfx.Transform:SetRotation(inst.Transform:GetRotation())
---             inst.sg.statemem.soulfx.entity:SetParent(inst.entity)
---             if inst.components.rider:IsRiding() then
---                 inst.sg.statemem.soulfx:MakeMounted()
---             end
---         end
-
---         if inst.components.inventory:IsHeavyLifting() and not inst.components.rider:IsRiding() then
---             inst.AnimState:PlayAnimation("heavy_eat")
---         else
---             inst.AnimState:PlayAnimation("eat_pre")
---             inst.AnimState:PushAnimation("eat", false)
---         end
-
---         inst.components.hunger:Pause()
---     end,
-
---     timeline =
---     {
---         TimeEvent(28 * FRAMES, function(inst)
---             if inst.sg.statemem.feed == nil then
---                 --触发这里action.fn的食用来自于自己吃
---                 inst:PerformBufferedAction()
---             elseif inst.sg.statemem.feeder ~= nil and
---                 inst.sg.statemem.feed.components.soulcontracts ~= nil and
---                 inst.sg.statemem.feed.components.soulcontracts:CanEat(inst.sg.statemem.feeder)
---             then
---                 --触发这里的食用来自于别人的喂食
---                 inst.sg.statemem.feed.components.soulcontracts:EatSoul(inst.sg.statemem.feeder)
---             end
---         end),
---         TimeEvent(30 * FRAMES, function(inst)
---             inst.sg:RemoveStateTag("busy")
---             inst.sg:RemoveStateTag("pausepredict")
---         end),
---         TimeEvent(70 * FRAMES, function(inst)
---             inst.SoundEmitter:KillSound("eating")
---         end),
---     },
-
---     events =
---     {
---         EventHandler("animqueueover", function(inst)
---             if inst.AnimState:AnimDone() then
---                 inst.sg:GoToState("idle")
---             end
---         end),
---     },
-
---     onexit = function(inst)
---         inst.SoundEmitter:KillSound("eating")
---         if not GetGameModeProperty("no_hunger") then
---             inst.components.hunger:Resume()
---         end
---         if inst.sg.statemem.soulfx ~= nil then
---             inst.sg.statemem.soulfx:Remove()
---         end
---     end,
--- }
--- AddStategraphState("wilson", eat_contracts)
-
-----------
-
-local EAT_CONTRACTS = Action({ mount_valid=true })
-EAT_CONTRACTS.id = "EAT_CONTRACTS"
-EAT_CONTRACTS.str = STRINGS.ACTIONS_LEGION.EAT_CONTRACTS
-EAT_CONTRACTS.fn = function(act)
+local RETURN_CONTRACTS = Action({ mount_valid=true })
+RETURN_CONTRACTS.id = "RETURN_CONTRACTS"
+RETURN_CONTRACTS.str = STRINGS.ACTIONS_LEGION.RETURN_CONTRACTS
+RETURN_CONTRACTS.fn = function(act)
     local obj = act.target or act.invobject
     if obj ~= nil then
-        if obj.components.soulcontracts ~= nil and obj.components.soulcontracts:CanEat(act.doer) then
-            return obj.components.soulcontracts:EatSoul(act.doer)
+        if obj.components.soulcontracts ~= nil then
+            return obj.components.soulcontracts:ReturnSouls(act.doer)
         end
     end
 end
-AddAction(EAT_CONTRACTS)
+AddAction(RETURN_CONTRACTS)
 
 AddComponentAction("INVENTORY", "soulcontracts", function(inst, doer, actions, right)
     --鼠标指向物品栏里的对象时，或者在鼠标上的对象指向玩家自己时，触发
-    if doer:HasTag("souleater") and not inst:HasTag("nosoulleft") then
-        table.insert(actions, ACTIONS.EAT_CONTRACTS)
+    if not inst:HasTag("nosoulleft") then
+        table.insert(actions, ACTIONS.RETURN_CONTRACTS)
     end
 end)
 
-AddStategraphActionHandler("wilson", ActionHandler(ACTIONS.EAT_CONTRACTS, function(inst, action)
-    if inst.sg:HasStateTag("busy") then
-        return
-    end
-
-    local obj = action.target or action.invobject --实际上invobject才有数据
-    if obj == nil or obj.components.soulcontracts == nil or not obj.components.soulcontracts:CanEat(inst) then
-        return
-    end
-
-    --这样设置是为了使用原版的sg，不然要是官方改了什么细节我还得跟着改
-    -- action.invobject = SpawnPrefab("wortox_soul") --tip：动作触发物品不能被修改，改了就会导致动作失败
-    inst:DoTaskInTime(0, function() --增加摄食灵魂时的特效（因为不满足sg里的条件，所以这里我自己加了特效）
-        if inst.sg and inst.sg.statemem then
-            inst.sg.statemem.soulfx = SpawnPrefab("wortox_eat_soul_fx")
-            inst.sg.statemem.soulfx.entity:SetParent(inst.entity)
-            if inst.components.rider:IsRiding() then
-                inst.sg.statemem.soulfx:MakeMounted()
-            end
-        end
-    end)
-
-    return "eat"
-end))
-AddStategraphActionHandler("wilson_client", ActionHandler(ACTIONS.EAT_CONTRACTS, function(inst, action)
-    if inst.sg:HasStateTag("busy") or inst:HasTag("busy") or not inst:HasTag("souleater") then
-        return
-    end
-    local obj = action.target or action.invobject
-    if obj == nil then
-        return
-    elseif obj:HasTag("soulcontracts") and not obj:HasTag("nosoulleft") then
-        return "eat" --这里可以直接用客机的sg
-    end
-end))
+AddStategraphActionHandler("wilson", ActionHandler(ACTIONS.RETURN_CONTRACTS, "doshortaction"))
+AddStategraphActionHandler("wilson_client", ActionHandler(ACTIONS.RETURN_CONTRACTS, "doshortaction"))
 
 --------------------------------------------------------------------------
 --[[ 灵魂契约的收回动作 ]]

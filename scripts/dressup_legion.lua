@@ -313,8 +313,7 @@ local dressup_data = {
         buildfile = "swap_malbatross_beak",
         buildsymbol = "swap_malbatross_beak"
     },
-    oceanfishingrod = --海洋钓竿
-    {
+    oceanfishingrod = { --海洋钓竿
         buildfn = function(dressup, item, buildskin)
             local itemswap = {}
             itemswap["swap_object"] = dressup:GetDressData(
@@ -426,6 +425,10 @@ local dressup_data = {
     cutless = { --木头短剑
         buildfile = "cutless",
         buildsymbol = "swap_cutless"
+    },
+    firepen = { --抒焰笔
+        buildfile = "firepen",
+        buildsymbol = "swap_firepen"
     },
     -- minifan = --有贴图之外的实体，不做幻化
     -- {
