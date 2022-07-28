@@ -1186,6 +1186,7 @@ if CONFIGS_LEGION.FLOWERSPOWER or TUNING.LEGION_SUPERBCUISINE then --青锋剑�
                             --V2C: fruitcake hack. see how long this code stays untouched - _-"
                             return false
                         elseif inst.components.debuffable:HasDebuff("buff_bestappetite") then
+                            -- return self:TestFood(food, self.preferseating) --这里需要改成caneat，不能按照喜好来
                             return self:TestFood(food, self.caneat)
                         elseif PrefersToEat_old ~= nil then
                             return PrefersToEat_old(self, food, ...)

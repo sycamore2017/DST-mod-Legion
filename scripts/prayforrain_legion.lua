@@ -60,9 +60,9 @@ _G.RegistMiniMapImage_legion("hiddenmoonlight")
 if TUNING.LEGION_BOOKRECIPETABS == "magic" then
     AddRecipe2(
         "book_weather", {
-            Ingredient("papyrus", 1),
-            Ingredient("squamousfruit", 1, "images/inventoryimages/squamousfruit.xml"),
-            Ingredient("raindonate", 1, "images/inventoryimages/raindonate.xml"),
+            Ingredient("papyrus", 4),
+            Ingredient("squamousfruit", 3, "images/inventoryimages/squamousfruit.xml"),
+            Ingredient("raindonate", 3, "images/inventoryimages/raindonate.xml"),
         }, TECH.MAGIC_THREE, {
             atlas = "images/inventoryimages/book_weather.xml", image = "book_weather.tex"
         }, { "MAGIC", "WEAPONS", "RAIN" }
@@ -70,9 +70,9 @@ if TUNING.LEGION_BOOKRECIPETABS == "magic" then
 else
     AddRecipe2(
         "book_weather", {
-            Ingredient("papyrus", 1),
-            Ingredient("squamousfruit", 1, "images/inventoryimages/squamousfruit.xml"),
-            Ingredient("raindonate", 1, "images/inventoryimages/raindonate.xml"),
+            Ingredient("book_rain", 1),
+            Ingredient("squamousfruit", 2, "images/inventoryimages/squamousfruit.xml"),
+            Ingredient("raindonate", 2, "images/inventoryimages/raindonate.xml"),
         }, TECH.MAGIC_THREE, {
             builder_tag = "bookbuilder",
             atlas = "images/inventoryimages/book_weather.xml", image = "book_weather.tex"
