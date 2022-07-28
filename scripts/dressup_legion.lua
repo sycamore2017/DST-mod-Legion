@@ -430,6 +430,10 @@ local dressup_data = {
         buildfile = "firepen",
         buildsymbol = "swap_firepen"
     },
+    fence_rotator = { --栅栏刺钉
+        buildfile = "fence_rotator",
+        buildsymbol = "swap_fence_rotator"
+    },
     -- minifan = --有贴图之外的实体，不做幻化
     -- {
     --     buildfile = "swap_minifan",

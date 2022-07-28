@@ -8,9 +8,11 @@ local prefabs = {
     "waterballoon_splash", "fx_book_rain"
 }
 
-local function FixSymbol(owner, data)
-    -- owner.AnimState:OverrideSymbol("book_open", "book_weather", "book_open")
-    owner.AnimState:OverrideSymbol("book_closed", "book_weather", "book_closed") --书籍攻击贴图在这里面
+local function FixSymbol(owner, data) --因为书籍的攻击贴图会因为读书而被替换，所以这里重新覆盖一次
+    if data and data.statename == "attack" then
+        -- owner.AnimState:OverrideSymbol("book_open", "book_weather", "book_open")
+        owner.AnimState:OverrideSymbol("book_closed", "book_weather", "book_closed") --书籍攻击贴图在这里面
+    end
 end
 
 local function OnEquip(inst, owner)
