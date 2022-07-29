@@ -434,6 +434,32 @@ local dressup_data = {
         buildfile = "fence_rotator",
         buildsymbol = "swap_fence_rotator"
     },
+    bernie_inactive = {
+        buildfn = function(dressup, item, buildskin)
+            local itemswap = {}
+            if item.components.fueled:IsEmpty() then
+                itemswap["swap_object"] = dressup:GetDressData(
+                    buildskin, "bernie_build", "swap_bernie_dead", item.GUID, "swap"
+                )
+                itemswap["swap_object_bernie"] = dressup:GetDressData(
+                    buildskin, "bernie_build", "swap_bernie_dead_idle_willow", item.GUID, "swap"
+                )
+            else
+                itemswap["swap_object"] = dressup:GetDressData(
+                    buildskin, "bernie_build", "swap_bernie", item.GUID, "swap"
+                )
+                itemswap["swap_object_bernie"] = dressup:GetDressData(
+                    buildskin, "bernie_build", "swap_bernie_idle_willow", item.GUID, "swap"
+                )
+            end
+
+            --切记，手持物品一定要清除不相关贴图
+            itemswap["lantern_overlay"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
+            itemswap["whipline"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
+
+            return itemswap
+        end,
+    },
     -- minifan = --有贴图之外的实体，不做幻化
     -- {
     --     buildfile = "swap_minifan",
@@ -453,33 +479,6 @@ local dressup_data = {
     -- {
     --     buildfile = "swap_lucy_axe",lucy
     --     buildsymbol = "swap_lucy_axe",
-    -- },
-    -- bernie_inactive = --伯尼熊，机制特殊，精神值过低时会引发崩溃
-    -- {
-    --     buildfn = function(dressup, item, buildskin)
-    --         local itemswap = {}
-    --         if item.components.fueled:IsEmpty() then
-    --             itemswap["swap_object"] = dressup:GetDressData(
-    --                 buildskin, "bernie_build", "swap_bernie_dead", item.GUID, "swap"
-    --             )
-    --             itemswap["swap_object_bernie"] = dressup:GetDressData(
-    --                 buildskin, "bernie_build", "swap_bernie_dead_idle_willow", item.GUID, "swap"
-    --             )
-    --         else
-    --             itemswap["swap_object"] = dressup:GetDressData(
-    --                 buildskin, "bernie_build", "swap_bernie", item.GUID, "swap"
-    --             )
-    --             itemswap["swap_object_bernie"] = dressup:GetDressData(
-    --                 buildskin, "bernie_build", "swap_bernie_idle_willow", item.GUID, "swap"
-    --             )
-    --         end
-
-    --         --切记，手持物品一定要清除不相关贴图
-    --         itemswap["lantern_overlay"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
-    --         itemswap["whipline"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
-
-    --         return itemswap
-    --     end,
     -- },
     -- propsign = { --猪王比赛的木牌：会在重启后自动消失，所以不能被幻化
     --     isnoskin = true,
@@ -1367,16 +1366,16 @@ local dressup_data = {
         buildfn = function(dressup, item, buildskin)
             local itemswap = {}
 
-            -- local skindata = item.components.skinedlegion:GetSkinedData()
-            -- if skindata ~= nil and skindata.equip ~= nil then
-            --     itemswap["swap_object"] = dressup:GetDressData(
-            --         nil, skindata.equip.build, skindata.equip.file, item.GUID, "swap"
-            --     )
-            -- else
+            local skindata = item.components.skinedlegion:GetSkinedData()
+            if skindata ~= nil and skindata.equip ~= nil then
+                itemswap["swap_object"] = dressup:GetDressData(
+                    nil, skindata.equip.build, skindata.equip.file, item.GUID, "swap"
+                )
+            else
                 itemswap["swap_object"] = dressup:GetDressData(
                     nil, "swap_rosorns", "swap_rosorns", item.GUID, "swap"
                 )
-            -- end
+            end
             itemswap["whipline"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
             itemswap["lantern_overlay"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
 
@@ -1768,6 +1767,7 @@ local SymbolCommDealFn = function(inst, animstate, symbol)
         local swapdata = inst.components.dressup.swaplist[symbol]
         if swapdata.type == "swap" then
             if swapdata.buildskin ~= nil then
+                --Tip：一个皮肤物品第一次使用这个函数时，在那一帧内必须没被删除，否则该函数会引起崩溃
                 animstate:OverrideItemSkinSymbol(
                     symbol,
                     swapdata.buildskin,

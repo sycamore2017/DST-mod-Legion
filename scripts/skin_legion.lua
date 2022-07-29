@@ -157,6 +157,22 @@ _G.SKIN_PREFABS_LEGION = {
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
     },
 
+    rosorns = {
+        assets = nil,
+        image = { name = nil, atlas = nil, setable = true, },
+        anim = {
+            bank = nil, build = nil,
+            anim = nil, isloop_anim = nil, animpush = nil, isloop_animpush = nil,
+            setable = true,
+        },
+        equip = {
+            symbol = "swap_object", build = "swap_rosorns", file = "swap_rosorns"
+        },
+        exchangefx = { prefab = nil, offset_y = nil, scale = nil },
+        floater = {
+            cut = 0.15, size = "small", offset_y = 0.4, scale = 0.5, nofx = nil
+        },
+    },
     lileaves = {
         assets = nil,
         image = { name = nil, atlas = nil, setable = true, },
@@ -1401,6 +1417,80 @@ _G.SKINS_LEGION = {
             cut = nil, size = "med", offset_y = 0.1, scale = 1.1, nofx = nil,
         },
     },
+
+    rosebush_collector = {
+        base_prefab = "rosebush",
+		type = "item", skin_tags = {}, release_group = 555, rarity = raritySpecial,
+
+        skin_id = "62e3c3a98c2f781db2f79abc",
+        onlyownedshow = true,
+		assets = {
+            Asset("ANIM", "anim/berrybush.zip"), --官方浆果丛动画
+			Asset("ANIM", "anim/skin/rosebush_collector.zip"),
+		},
+
+        string = ischinese and {
+            name = "朽星棘", collection = "COLLECTOR", access = "SPECIAL",
+            descitem = "解锁\"蔷薇花丛\"、\"带刺蔷薇\"以及入鞘后的皮肤。",
+            description = "在花费大量时间和兵力后，终于在极其遥远的星云残骸中找到传说中能贯穿星辰的神剑。当他霸气地在高台上举起这把闪耀神剑，剑体很快碎裂，化作无数金色闪光向地面飘去。在众人诧异中，地面开始干枯龟裂，水晶般的荆棘开始在整个星球蔓延。",
+        } or {
+            name = "Star Blighted Thorns", collection = "COLLECTOR", access = "SPECIAL",
+            descitem = "Unlock \"Rose Bush\", \"Rosorns\" skin.",
+            description = "The story was not translated.",
+        },
+
+		fn_start = function(inst)
+            --官方代码写得挺好，直接改动画模板居然能继承已有的动画播放和symbol切换状态
+            inst.AnimState:SetBank("berrybush")
+            inst.AnimState:SetBuild("rosebush_collector")
+        end,
+        exchangefx = { prefab = nil, offset_y = nil, scale = 1.5 },
+        linkedskins = { rosorns = "rosorns_collector" },
+        placer = {
+            name = nil, bank = "berrybush", build = "rosebush_collector", anim = "dead",
+            prefabs = { "dug_rosebush", "cutted_rosebush" },
+        },
+    },
+    rosorns_collector = {
+        base_prefab = "rosorns",
+		type = "item", skin_tags = {}, release_group = 555, rarity = raritySpecial,
+
+        skin_id = "62e3c3a98c2f781db2f79abc",
+        noshopshow = true,
+		assets = {
+			Asset("ANIM", "anim/skin/rosorns_collector.zip"),
+            Asset("ATLAS", "images/inventoryimages_skin/foliageath_rosorns_collector.xml"),
+            Asset("IMAGE", "images/inventoryimages_skin/foliageath_rosorns_collector.tex"),
+		},
+        image = { name = nil, atlas = nil, setable = true, },
+
+        string = {
+            name = ischinese and "贯星剑" or "Star Pierced Sword", collection = "COLLECTOR", access = "SPECIAL",
+        },
+
+		anim = {
+            bank = nil, build = nil,
+            anim = nil, isloop_anim = nil, animpush = nil, isloop_animpush = nil,
+            setable = true,
+        },
+        equip = {
+            symbol = "swap_object", build = "rosorns_collector", file = "swap_object"
+        },
+        fn_onAttack = function(inst, owner, target)
+            local fx = SpawnPrefab("rosorns_collector_fx")
+            if fx ~= nil then
+                fx.Transform:SetPosition(target.Transform:GetWorldPosition())
+            end
+        end,
+        scabbard = {
+            anim = "idle_cover", bank = "rosorns_collector", build = "rosorns_collector",
+            image = "foliageath_rosorns_collector", atlas = "images/inventoryimages_skin/foliageath_rosorns_collector.xml",
+        },
+        exchangefx = { prefab = nil, offset_y = nil, scale = nil },
+        floater = {
+            nofx = true
+        },
+    },
 }
 
 _G.SKIN_IDS_LEGION = {
@@ -1412,6 +1502,7 @@ _G.SKIN_IDS_LEGION = {
         orchidbush_disguiser = true, boltwingout_disguiser = true,
         rosebush_marble = true, lilybush_marble = true, orchidbush_marble = true,
         shield_l_log_emo_fist = true, hat_lichen_emo_que = true,
+        rosebush_collector = true, rosorns_collector = true,
     },
     ["6278c450c340bf24ab311528"] = { --回忆(5)
         boltwingout_disguiser = true,
@@ -1428,6 +1519,9 @@ _G.SKIN_IDS_LEGION = {
         fishhomingtool_awesome_thanks = true, fishhomingtool_normal_thanks = true, fishhomingbait_thanks = true,
         triplegoldenshovelaxe_era = true, tripleshovelaxe_era = true, lilybush_era = true, lileaves_era = true, icire_rock_era = true, shield_l_log_era = true, shield_l_sand_era = true,
         shield_l_log_emo_fist = true,
+    },
+    ["6278c4eec340bf24ab311534"] = { --3尺垂涎
+        rosebush_collector = true, rosorns_collector = true,
     },
 }
 _G.SKIN_IDX_LEGION = {
@@ -1518,7 +1612,7 @@ end
 local skinidxes = { --用以皮肤排序
     "neverfade_thanks", "neverfadebush_thanks",
     "fishhomingtool_awesome_thanks", "fishhomingtool_normal_thanks", "fishhomingbait_thanks",
-    "icire_rock_collector",
+    "icire_rock_collector", "rosebush_collector", "rosorns_collector",
     "triplegoldenshovelaxe_era", "tripleshovelaxe_era", "lilybush_era", "lileaves_era", "shield_l_log_era", "icire_rock_era", "shield_l_sand_era",
     "orchidbush_disguiser", "boltwingout_disguiser",
     "rosebush_marble", "lilybush_marble", "orchidbush_marble",

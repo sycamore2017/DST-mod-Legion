@@ -5,7 +5,6 @@ local function GetPriority(list)
     end
     return length
 end
-
 local function UnequipItem(player, slot)
     if slot ~= nil then
         local tool = player.components.inventory:GetEquippedItem(slot)
@@ -15,13 +14,30 @@ local function UnequipItem(player, slot)
         end
     end
 end
+local function CreateItem(self, itemdata, setpos)
+    local creator = self.origin ~= nil and TheWorld.meta.session_identifier ~= self.origin
+                            and { sessionid = self.origin } or nil
+    local item = SpawnPrefab(itemdata.prefab, itemdata.skinname, itemdata.skin_id, creator)
+    if item ~= nil and item:IsValid() then
+        if setpos then
+            item.Transform:SetPosition(self.inst.Transform:GetWorldPosition())
+        end
+        item:SetPersistData(itemdata.data)
+        return item
+    end
+end
 
 local function OnReroll(inst)
     local self = inst.components.dressup
     self.swaplist = {}
-    for k,v in pairs(self.itemlist) do
-        if v ~= nil then
-            -- self:TakeOff(k, v) --undo
+    for _,v in pairs(self.itemlist) do
+        if v ~= nil and v.item ~= nil then
+            local item = CreateItem(self, v.item, true)
+            if item ~= nil then
+                if item.components.inventoryitem ~= nil then
+                    item.components.inventoryitem:OnDropped(true)
+                end
+            end
         end
     end
     self.itemlist = {}
@@ -31,12 +47,11 @@ local BODYTALL = "body_t"
 
 local DressUp = Class(function(self, inst)
     self.inst = inst
-    self.itemlist =
-    {
+    self.origin = nil
+    self.itemlist = {
         -- body = { item = nil, swaps = {结构与self.swaplist相同}, priority = 0 },
     }
-    self.swaplist =
-    {
+    self.swaplist = {
         -- swap_object =
         -- {
         --     buildskin = nil,
@@ -48,10 +63,8 @@ local DressUp = Class(function(self, inst)
         -- }
     }
 
-    -- inst:ListenForEvent("ms_playerreroll", OnReroll) --undo
+    inst:ListenForEvent("ms_playerreroll", OnReroll) --重选人物时
 end)
-
-
 
 function DressUp:GetDressData(buildskin, buildfile, buildsymbol, guid, type)
     return {
@@ -125,6 +138,7 @@ function DressUp:UpdateReal() --更新实际展示效果
     for k,v in pairs(self.swaplist) do
         if v ~= nil then
             if v.type == "swap" then
+                -- print("通道"..tostring(k).."皮肤"..tostring(v.buildskin).."动画内通道"..tostring(v.buildsymbol).."guid"..tostring(v.guid).."动画"..tostring(v.buildfile))
                 if v.buildskin ~= nil then
                     self.inst.AnimState:OverrideItemSkinSymbol(k, v.buildskin, v.buildsymbol, v.guid, v.buildfile)
                 else
@@ -162,7 +176,7 @@ function DressUp:UpdateSwapList() --更新幻化表
     end
 end
 
-function DressUp:PutOn(item) --幻化一个物品
+function DressUp:PutOn(item, loaddata) --幻化一个物品
     local data = DRESSUP_DATA_LEGION[item.prefab]
     if data == nil then
         return false
@@ -171,32 +185,6 @@ function DressUp:PutOn(item) --幻化一个物品
     local slot = self:GetDressSlot(item, data)
     if slot == nil then
         return false
-    end
-
-    --妥善隐藏装备
-    if item.brain ~= nil and not item.brain.stopped then --停掉脑子
-        item.brain:Stop()
-    end
-    if item.components.burnable ~= nil then --灭掉火源
-        if item.components.burnable:IsBurning() then
-            item.components.burnable:Extinguish(true, TUNING.FIRESUPPRESSOR_EXTINGUISH_HEAT_PERCENT)
-        elseif item.components.burnable:IsSmoldering() then
-            item.components.burnable:Extinguish(true)
-        end
-    end
-    if item.components.container ~= nil then --背包的话需要丢弃全部物品
-        item.components.container:DropEverything()
-        item.components.container:Close()
-        -- item.components.container.canbeopened = false --不要管是否能打开，免得让不能打开的容器在幻化解除后能打开了
-    end
-    self.inst:AddChild(item)
-    item.Transform:SetPosition(0,0,0)
-    item:RemoveFromScene()
-    if item.components.fueled ~= nil then --停止耐久消耗
-        item.components.fueled:StopConsuming()
-    end
-    if item.components.perishable ~= nil then --停止腐烂
-        item.components.perishable:StopPerishing()
     end
 
     --删除幻化数据
@@ -259,25 +247,58 @@ function DressUp:PutOn(item) --幻化一个物品
         end
     end
 
-    local prioritynew = GetPriority(self.itemlist)
-    self.itemlist[slot] = { item = item, swaps = itemswap or {}, priority = prioritynew }
+    --妥善处理装备
+    if item.components.container ~= nil then --背包的话需要丢弃全部物品
+        item.components.container:DropEverything()
+        item.components.container:Close()
+    end
+    -- if item.brain ~= nil and not item.brain.stopped then --停掉脑子
+    --     item.brain:Stop()
+    -- end
+    -- if item.components.burnable ~= nil then --灭掉火源
+    --     if item.components.burnable:IsBurning() then
+    --         item.components.burnable:Extinguish(true, TUNING.FIRESUPPRESSOR_EXTINGUISH_HEAT_PERCENT)
+    --     elseif item.components.burnable:IsSmoldering() then
+    --         item.components.burnable:Extinguish(true)
+    --     end
+    -- end
+    -- if item.components.fueled ~= nil then --停止耐久消耗
+    --     item.components.fueled:StopConsuming()
+    -- end
+    -- if item.components.perishable ~= nil then --停止腐烂
+    --     item.components.perishable:StopPerishing()
+    -- end
 
     if data.equipfn ~= nil then
         data.equipfn(self.inst, item)
+    end
+
+    local prioritynew = GetPriority(self.itemlist)
+    if loaddata == nil then
+        self.itemlist[slot] = { item = item:GetSaveRecord(), swaps = itemswap or {}, priority = prioritynew }
+        self.origin = TheWorld.meta.session_identifier
+    else
+        self.itemlist[slot] = { item = loaddata, swaps = itemswap or {}, priority = prioritynew }
     end
 
     self:UpdateSwapList()
     self:TakeOff(slot, itemdataold)
     self:UpdateReal()
 
+    item:RemoveFromScene()
+    item:DoTaskInTime(0.2, function() --必需滞后删除！
+        item:Remove()
+    end)
+
     return true
 end
 
 function DressUp:TakeOff(slot, itemdata)  --去幻某个装备栏的装备
     if itemdata ~= nil and itemdata.item ~= nil then
-        local item = itemdata.item
-
-        self.inst:RemoveChild(item)
+        local item = CreateItem(self, itemdata.item, true)
+        if item == nil then
+            return
+        end
 
         local data = DRESSUP_DATA_LEGION[item.prefab]
 
@@ -312,18 +333,15 @@ function DressUp:TakeOff(slot, itemdata)  --去幻某个装备栏的装备
         end
 
         --归还幻化装备
-        if item.components.perishable ~= nil then
-            item.components.perishable:StartPerishing()
-        end
-        item:ReturnToScene()
-        item.Transform:SetPosition(self.inst.Transform:GetWorldPosition())
+        -- if item.components.perishable ~= nil then
+        --     item.components.perishable:StartPerishing()
+        -- end
         if item.components.inventoryitem ~= nil then
-            -- item.components.inventoryitem:OnDropped(true)
             self.inst.components.inventory:GiveItem(item)
         end
-        if item.brain ~= nil and item.brain.stopped then
-            item.brain:Start()
-        end
+        -- if item.brain ~= nil and item.brain.stopped then
+        --     item.brain:Start()
+        -- end
     end
 end
 
@@ -344,28 +362,32 @@ function DressUp:TakeOffAll()   --清除所有幻化效果
         end
     end
     self.itemlist = {}
+    self.origin = nil
 end
 
 function DressUp:OnSave()
     local data = { items = {} }
-    local refs = {}
+    local hasitem = false
 
     for k,v in pairs(self.itemlist) do
         if v ~= nil and v.item ~= nil then
-            data.items[k] = v.item:GetSaveRecord()
-            table.insert(refs, v.item.GUID)
+            data.items[k] = v.item
+            hasitem = true
         end
     end
-
-    return data, refs
+    if hasitem then
+        data.origin = self.origin
+        return data
+    end
 end
 
 function DressUp:OnLoad(data, newents)
     if data ~= nil and data.items ~= nil then
-        for k, v in pairs(data.items) do
-            local item = SpawnSaveRecord(v, newents)
+        self.origin = data.origin
+        for _, v in pairs(data.items) do
+            local item = CreateItem(self, v, false)
             if item ~= nil then
-                self:PutOn(item)
+                self:PutOn(item, v)
             end
         end
     end
