@@ -564,9 +564,50 @@ _G.SKINS_LEGION = {
             inst.AnimState:SetBuild("lilybush_marble")
         end,
         exchangefx = { prefab = nil, offset_y = nil, scale = nil },
+        linkedskins = { lileaves = "lileaves_marble" },
         placer = {
             name = nil, bank = "berrybush", build = "lilybush_marble", anim = "dead",
             prefabs = { "dug_lilybush", "cutted_lilybush" },
+        },
+    },
+    lileaves_marble = {
+        base_prefab = "lileaves",
+		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
+
+        -- skin_id = "629b0d5f8c2f781db2f77f0d",
+        onlyownedshow = true,
+		assets = {
+			Asset("ANIM", "anim/skin/lileaves_marble.zip"),
+            Asset("ATLAS", "images/inventoryimages_skin/foliageath_lileaves_marble.xml"),
+            Asset("IMAGE", "images/inventoryimages_skin/foliageath_lileaves_marble.tex"),
+		},
+        image = { name = nil, atlas = nil, setable = true, },
+
+        string = ischinese and {
+            name = "石莲长枪", collection = "MARBLE", access = "SPECIAL",
+            descitem = "解锁\"蹄莲翠叶\"以及入鞘后的皮肤。",
+            description = "路途中，他发现一具伤痕累累的遗体，旁边还有一把精致的大理石长枪。他偷看了信封，顺路去了信中提到的地方，告诉了新娘一切。新娘伤心欲绝，拔掉了湖边所有蹄莲，拜托他沿路撒下。之后，据说新娘将长枪绑在身上，投入了湖中。",
+        } or {
+            name = "Marble Lilance", collection = "MARBLE", access = "SPECIAL",
+            descitem = "Unlock \"Lileaves\" skin.",
+            description = "The story was not translated.",
+        },
+
+		anim = {
+            bank = nil, build = nil,
+            anim = nil, isloop_anim = nil, animpush = nil, isloop_animpush = nil,
+            setable = true,
+        },
+        equip = {
+            symbol = "swap_object", build = "lileaves_marble", file = "swap_object"
+        },
+        scabbard = {
+            anim = "idle_cover", isloop = nil, bank = "lileaves_marble", build = "lileaves_marble",
+            image = "foliageath_lileaves_marble", atlas = "images/inventoryimages_skin/foliageath_lileaves_marble.xml",
+        },
+        exchangefx = { prefab = nil, offset_y = nil, scale = nil },
+        floater = {
+            cut = 0.05, size = "small", offset_y = 0.15, scale = 0.5, nofx = nil,
         },
     },
     orchidbush_marble = {
@@ -634,7 +675,7 @@ _G.SKINS_LEGION = {
             atkfx = "impact_orchid_fx_disguiser",
         },
         scabbard = {
-            anim = "idle_cover", bank = "orchitwigs_disguiser", build = "orchitwigs_disguiser",
+            anim = "idle_cover", isloop = nil, bank = "orchitwigs_disguiser", build = "orchitwigs_disguiser",
             image = "foliageath_orchitwigs_disguiser", atlas = "images/inventoryimages_skin/foliageath_orchitwigs_disguiser.xml",
         },
         exchangefx = { prefab = nil, offset_y = nil, scale = nil },
@@ -722,7 +763,7 @@ _G.SKINS_LEGION = {
             build_broken = "neverfade_thanks", file_broken = "broken_swap"
         },
         scabbard = {
-            anim = "idle_cover", bank = "neverfade_thanks", build = "neverfade_thanks",
+            anim = "idle_cover", isloop = nil, bank = "neverfade_thanks", build = "neverfade_thanks",
             image = "foliageath_neverfade_thanks", atlas = "images/inventoryimages_skin/foliageath_neverfade_thanks.xml",
         },
         butterfly = { bank = "butterfly", build = "neverfade_butterfly_thanks" },
@@ -1313,7 +1354,7 @@ _G.SKINS_LEGION = {
             symbol = "swap_object", build = "lileaves_era", file = "swap_object"
         },
         scabbard = {
-            anim = "idle_cover", bank = "lileaves_era", build = "lileaves_era",
+            anim = "idle_cover", isloop = nil, bank = "lileaves_era", build = "lileaves_era",
             image = "foliageath_lileaves_era", atlas = "images/inventoryimages_skin/foliageath_lileaves_era.xml",
         },
         exchangefx = { prefab = nil, offset_y = nil, scale = nil },
@@ -1432,7 +1473,7 @@ _G.SKINS_LEGION = {
         string = ischinese and {
             name = "朽星棘", collection = "COLLECTOR", access = "SPECIAL",
             descitem = "解锁\"蔷薇花丛\"、\"带刺蔷薇\"以及入鞘后的皮肤。",
-            description = "在花费大量时间和兵力后，终于在极其遥远的星云残骸中找到传说中能贯穿星辰的神剑。当他霸气地在高台上举起这把闪耀神剑，剑体很快碎裂，化作无数金色闪光向地面飘去。在众人诧异中，地面开始干枯龟裂，水晶般的荆棘开始在整个星球蔓延。",
+            description = "用尽毕生精力，终于在极其遥远的星云残骸中找到传说中能贯穿星辰的神剑。当他自豪地在高台上举起这把闪耀神剑，剑体很快碎裂化作无数金色闪光向地面飘去。在众人诧异中，地面开始干枯龟裂，水晶般的荆棘开始在整个星球蔓延。",
         } or {
             name = "Star Blighted Thorns", collection = "COLLECTOR", access = "SPECIAL",
             descitem = "Unlock \"Rose Bush\", \"Rosorns\" skin.",
@@ -1470,7 +1511,7 @@ _G.SKINS_LEGION = {
 
 		anim = {
             bank = nil, build = nil,
-            anim = nil, isloop_anim = nil, animpush = nil, isloop_animpush = nil,
+            anim = nil, isloop_anim = true, animpush = nil, isloop_animpush = nil,
             setable = true,
         },
         equip = {
@@ -1483,7 +1524,7 @@ _G.SKINS_LEGION = {
             end
         end,
         scabbard = {
-            anim = "idle_cover", bank = "rosorns_collector", build = "rosorns_collector",
+            anim = "idle_cover", isloop = true, bank = "rosorns_collector", build = "rosorns_collector",
             image = "foliageath_rosorns_collector", atlas = "images/inventoryimages_skin/foliageath_rosorns_collector.xml",
         },
         exchangefx = { prefab = nil, offset_y = nil, scale = nil },

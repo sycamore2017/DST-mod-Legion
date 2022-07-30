@@ -385,7 +385,7 @@ function DressUp:OnLoad(data, newents)
     if data ~= nil and data.items ~= nil then
         self.origin = data.origin
         for _, v in pairs(data.items) do
-            local item = CreateItem(self, v, false)
+            local item = CreateItem(self, v, true)
             if item ~= nil then
                 self:PutOn(item, v)
             end

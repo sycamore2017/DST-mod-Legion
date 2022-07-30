@@ -12,13 +12,13 @@ function SwordScabbard:SetAnim(sword)
         self.inst.components.inventoryitem:ChangeImageName(skindata.scabbard.image)
         self.inst.AnimState:SetBank(skindata.scabbard.bank)
         self.inst.AnimState:SetBuild(skindata.scabbard.build)
-        self.inst.AnimState:PlayAnimation(skindata.scabbard.anim)
+        self.inst.AnimState:PlayAnimation(skindata.scabbard.anim, skindata.scabbard.isloop)
     elseif sword.foliageath_data ~= nil then --兼容其他mod
         self.inst.components.inventoryitem.atlasname = sword.foliageath_data.atlas
         self.inst.components.inventoryitem:ChangeImageName(sword.foliageath_data.image)
         self.inst.AnimState:SetBank(sword.foliageath_data.bank)
         self.inst.AnimState:SetBuild(sword.foliageath_data.build)
-        self.inst.AnimState:PlayAnimation(sword.foliageath_data.anim)
+        self.inst.AnimState:PlayAnimation(sword.foliageath_data.anim, sword.foliageath_data.isloop)
     else
         self.inst.components.inventoryitem.atlasname = "images/inventoryimages/foliageath_"..sword.prefab..".xml"
         self.inst.components.inventoryitem:ChangeImageName("foliageath_"..sword.prefab)

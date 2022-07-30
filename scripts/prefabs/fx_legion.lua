@@ -123,7 +123,7 @@ if CONFIGS_LEGION.FLOWERSPOWER then
         end,
         fn_remove = nil,
     })
-    MakeFx({ --兰草花剑：飞溅花瓣（粉色追猎皮肤）
+    MakeFx({ --粉色追猎：飞溅花瓣
         name = "impact_orchid_fx_disguiser",
         assets = {
             Asset("ANIM", "anim/lavaarena_heal_projectile.zip"), --官方的熔炉奶杖击中特效动画
@@ -187,7 +187,7 @@ if CONFIGS_LEGION.FLOWERSPOWER then
     -- MakeFx({ --施咒蔷薇：火花爆炸2
     --     name = "rosorns_spell_fx",
     --     assets = {
-    --         Asset("ANIM", "anim/lavaarena_heal_projectile.zip"), --官方熔炉燃烧瓶特效动画模板
+    --         Asset("ANIM", "anim/lavaarena_heal_projectile.zip"), --官方熔炉生命法杖攻击特效动画模板
     --     },
     --     prefabs = nil,
     --     fn_common = nil,
@@ -204,17 +204,17 @@ if CONFIGS_LEGION.FLOWERSPOWER then
     MakeFx({ --贯星剑：闪光炸裂
         name = "rosorns_collector_fx",
         assets = {
-            Asset("ANIM", "anim/lavaarena_heal_projectile.zip"), --官方熔炉燃烧瓶特效动画模板
+            Asset("ANIM", "anim/lavaarena_heal_projectile.zip"), --官方熔炉生命法杖攻击特效动画模板
+            Asset("ANIM", "anim/skin/rosorns_collector_fx.zip"),
         },
         prefabs = nil,
         fn_common = nil,
         fn_anim = function(inst)
             inst.AnimState:SetBank("lavaarena_heal_projectile")
-            inst.AnimState:SetBuild("lavaarena_heal_projectile")
-            inst.AnimState:PlayAnimation("hit")
+            inst.AnimState:SetBuild("rosorns_collector_fx")
+            inst.AnimState:PlayAnimation("cast")
             inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
             inst.AnimState:SetFinalOffset(1)
-            -- inst.AnimState:SetScale(0.7, 0.7)
         end,
         fn_remove = nil,
     })
