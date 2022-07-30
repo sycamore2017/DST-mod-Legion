@@ -61,7 +61,7 @@ local function fn()
     --trader (from trader component) added to pristine state for optimization
     inst:AddTag("trader")
 
-    MakeInventoryFloatable(inst, "small", 0.4, 0.5)
+    MakeInventoryFloatable(inst, "small", 0.4, 0.65)
     local OnLandedClient_old = inst.components.floater.OnLandedClient
     inst.components.floater.OnLandedClient = function(self)
         OnLandedClient_old(self)
@@ -142,7 +142,7 @@ local function MakeIt(name, ismylove)
         end
         inst:AddTag("NORATCHECK") --mod兼容：永不妥协。该道具不算鼠潮分
 
-        MakeInventoryFloatable(inst, "small", 0.4, 0.5)
+        MakeInventoryFloatable(inst, "small", 0.4, 0.65)
         local OnLandedClient_old = inst.components.floater.OnLandedClient
         inst.components.floater.OnLandedClient = function(self)
             OnLandedClient_old(self)

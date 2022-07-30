@@ -552,7 +552,7 @@ _G.SKINS_LEGION = {
         string = ischinese and {
             name = "理盛截莲", collection = "MARBLE", access = "DONATE",
             descitem = "解锁\"蹄莲花丛\"的皮肤。",
-            description = "她和自己的\"孩子们\"被强制带到庄园。庄园幽静，非常偏僻，但很快变得喧闹不已，孩子们可喜欢这里了。照顾小孩的工作可不容易，也经常见她在水池边种小簇蹄莲。越种越多，喧闹声也逐渐不见踪影。感觉到自己命不久矣，她给自己也种了一簇。",
+            description = "他们给自己办了个简单的婚礼，在初遇的湖边种下许多蹄莲以作纪念。很快边境传来战争，男人决定要去前线，兴冲冲为自己打造了一把精致的长枪。临别前，妻子交予他一封沾满泪痕的信件，男人送给妻子一盆精致的蹄莲。"
         } or {
             name = "Lily Marble Pot", collection = "MARBLE", access = "DONATE",
             descitem = "Unlock \"Lily Bush\" skin.",
@@ -574,7 +574,7 @@ _G.SKINS_LEGION = {
         base_prefab = "lileaves",
 		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
 
-        -- skin_id = "629b0d5f8c2f781db2f77f0d",
+        skin_id = "62e535bd8c2f781db2f79ae7",
         onlyownedshow = true,
 		assets = {
 			Asset("ANIM", "anim/skin/lileaves_marble.zip"),
@@ -586,7 +586,7 @@ _G.SKINS_LEGION = {
         string = ischinese and {
             name = "石莲长枪", collection = "MARBLE", access = "SPECIAL",
             descitem = "解锁\"蹄莲翠叶\"以及入鞘后的皮肤。",
-            description = "路途中，他发现一具伤痕累累的遗体，旁边还有一把精致的大理石长枪。他偷看了信封，顺路去了信中提到的地方，告诉了新娘一切。新娘伤心欲绝，拔掉了湖边所有蹄莲，拜托他沿路撒下。之后，据说新娘将长枪绑在身上，投入了湖中。",
+            description = "逃难途中，他发现一具伤痕累累的遗体，旁边还有一把精致的大理石长枪。他偷看了信封，顺路去了信中提到的地方，告诉了女人一切。女人伤心欲绝，拔掉了湖边所有蹄莲，拜托他沿路撒下。之后，据说她将长枪绑在身上，投入了湖中。"
         } or {
             name = "Marble Lilance", collection = "MARBLE", access = "SPECIAL",
             descitem = "Unlock \"Lileaves\" skin.",
@@ -607,7 +607,7 @@ _G.SKINS_LEGION = {
         },
         exchangefx = { prefab = nil, offset_y = nil, scale = nil },
         floater = {
-            cut = 0.05, size = "small", offset_y = 0.15, scale = 0.5, nofx = nil,
+            cut = 0.15, size = "small", offset_y = 0.4, scale = 0.6, nofx = nil,
         },
     },
     orchidbush_marble = {
@@ -1563,6 +1563,7 @@ _G.SKIN_IDS_LEGION = {
     },
     ["6278c4eec340bf24ab311534"] = { --3尺垂涎
         rosebush_collector = true, rosorns_collector = true,
+        lileaves_marble = true,
     },
 }
 _G.SKIN_IDX_LEGION = {
@@ -1656,7 +1657,7 @@ local skinidxes = { --用以皮肤排序
     "icire_rock_collector", "rosebush_collector", "rosorns_collector",
     "triplegoldenshovelaxe_era", "tripleshovelaxe_era", "lilybush_era", "lileaves_era", "shield_l_log_era", "icire_rock_era", "shield_l_sand_era",
     "orchidbush_disguiser", "boltwingout_disguiser",
-    "rosebush_marble", "lilybush_marble", "orchidbush_marble",
+    "rosebush_marble", "lilybush_marble", "lileaves_marble", "orchidbush_marble",
     "shield_l_log_emo_fist", "hat_lichen_emo_que",
 
     "shield_l_log_emo_pride", "shield_l_sand_op", "hat_cowboy_tvplay", "hat_lichen_disguiser", "orchitwigs_disguiser", "backcub_fans"
