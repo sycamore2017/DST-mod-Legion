@@ -542,9 +542,9 @@ _G.SKINS_LEGION = {
     },
     rosorns_marble = {
         base_prefab = "rosorns",
-		type = "item", skin_tags = {}, release_group = 555, rarity = raritySpecial,
+		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
 
-        -- skin_id = "62e3c3a98c2f781db2f79abc",
+        skin_id = "62e639928c2f781db2f79b3d",
         onlyownedshow = true,
 		assets = {
 			Asset("ANIM", "anim/skin/rosorns_marble.zip"),
@@ -556,9 +556,9 @@ _G.SKINS_LEGION = {
         string = ischinese and {
             name = "落薇剪", collection = "MARBLE", access = "SPECIAL",
             descitem = "解锁\"带刺蔷薇\"以及入鞘后的皮肤。",
-            description = "逃难途中，他发现一具伤痕累累的遗体，旁边还有一把精致的大理石长枪。他偷看了信封，顺路去了信中提到的地方，告诉了女人一切。女人伤心欲绝，拔掉了湖边所有蹄莲，拜托他沿路撒下。之后，据说她将长枪绑在身上，投入了湖中。"
+            description = "几十年后，曾经的孩子们都已到垂暮之年，一起买回了幼时庄园，决意在这养老。多年无人照看，现在仅剩的几株蔷薇，被老人们精心修剪，悉心照料，很快又长成了记忆里的模样。寂静的庄园仿佛又响起了小孩欢跳的脚步和大声的嬉笑。"
         } or {
-            name = "Marble Lilance", collection = "MARBLE", access = "SPECIAL",
+            name = "Falling Petals Scissors", collection = "MARBLE", access = "SPECIAL",
             descitem = "Unlock \"Rosorns\" skin.",
             description = "The story was not translated.",
         },

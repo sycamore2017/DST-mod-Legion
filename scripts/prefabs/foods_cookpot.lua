@@ -164,11 +164,11 @@ end
 
 local function UpdateAxe(inst)
     local value = 61.2 * inst.components.perishable:GetPercent()
-    value = Remap(value, 0, 61.2, 37.4, 61.2)
+    value = Remap(value, 0, 61.2, 47.6, 61.2)
     inst.components.weapon:SetDamage(value)
 
     value = 1.66 * inst.components.perishable:GetPercent()
-    value = Remap(value, 0, 1.66, 1, 1.66)
+    value = Remap(value, 0, 1.66, 1.2, 1.66)
     inst.components.tool.actions[ACTIONS.CHOP] = value
 end
 local function AfterWorking(inst, data)
