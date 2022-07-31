@@ -534,9 +534,56 @@ _G.SKINS_LEGION = {
             inst.AnimState:SetBuild("rosebush_marble")
         end,
         exchangefx = { prefab = nil, offset_y = nil, scale = 1.5 },
+        linkedskins = { rosorns = "rosorns_marble" },
         placer = {
             name = nil, bank = "berrybush", build = "rosebush_marble", anim = "dead",
             prefabs = { "dug_rosebush", "cutted_rosebush" },
+        },
+    },
+    rosorns_marble = {
+        base_prefab = "rosorns",
+		type = "item", skin_tags = {}, release_group = 555, rarity = raritySpecial,
+
+        -- skin_id = "62e3c3a98c2f781db2f79abc",
+        onlyownedshow = true,
+		assets = {
+			Asset("ANIM", "anim/skin/rosorns_marble.zip"),
+            Asset("ATLAS", "images/inventoryimages_skin/foliageath_rosorns_marble.xml"),
+            Asset("IMAGE", "images/inventoryimages_skin/foliageath_rosorns_marble.tex"),
+		},
+        image = { name = nil, atlas = nil, setable = true, },
+
+        string = ischinese and {
+            name = "落薇剪", collection = "MARBLE", access = "SPECIAL",
+            descitem = "解锁\"带刺蔷薇\"以及入鞘后的皮肤。",
+            description = "逃难途中，他发现一具伤痕累累的遗体，旁边还有一把精致的大理石长枪。他偷看了信封，顺路去了信中提到的地方，告诉了女人一切。女人伤心欲绝，拔掉了湖边所有蹄莲，拜托他沿路撒下。之后，据说她将长枪绑在身上，投入了湖中。"
+        } or {
+            name = "Marble Lilance", collection = "MARBLE", access = "SPECIAL",
+            descitem = "Unlock \"Rosorns\" skin.",
+            description = "The story was not translated.",
+        },
+
+		anim = {
+            bank = nil, build = nil,
+            anim = nil, isloop_anim = true, animpush = nil, isloop_animpush = nil,
+            setable = true,
+        },
+        equip = {
+            symbol = "swap_object", build = "rosorns_marble", file = "swap_object"
+        },
+        fn_onAttack = function(inst, owner, target)
+            local fx = SpawnPrefab("rosorns_marble_fx")
+            if fx ~= nil then
+                fx.Transform:SetPosition(target.Transform:GetWorldPosition())
+            end
+        end,
+        scabbard = {
+            anim = "idle_cover", isloop = true, bank = "rosorns_marble", build = "rosorns_marble",
+            image = "foliageath_rosorns_marble", atlas = "images/inventoryimages_skin/foliageath_rosorns_marble.xml",
+        },
+        exchangefx = { prefab = nil, offset_y = nil, scale = nil },
+        floater = {
+            cut = 0.15, size = "small", offset_y = 0.4, scale = 0.5, nofx = nil,
         },
     },
     lilybush_marble = {
@@ -623,7 +670,7 @@ _G.SKINS_LEGION = {
         string = ischinese and {
             name = "理盛瀑兰", collection = "MARBLE", access = "DONATE",
             descitem = "解锁\"兰草花丛\"的皮肤。",
-            description = "这庄园是最近令他欣喜的发现。庄园幽深，远离人烟，古典的大理石装潢，长满了各色花草，着实令这个隐居者着迷。他走遍庄园，看见了大厅的破烂玩具与黑板，卧室里发黄全家福，后山有长着兰草的墓碑。庄园无声述说着历史的变迁。",
+            description = "铁匠一眼钟情于那位卖花女子。朝思暮想，每天都来她这买一束兰花，只为能说上几句话。他很想说出来，无法言语就用行动来表达。他不惜划破双手，打造了铁艺花架，将之前买的所有兰花都种在花架上面。匆忙送于她便跑开。"
         } or {
             name = "Orchid Marble Pot", collection = "MARBLE", access = "DONATE",
             descitem = "Unlock \"Orchid Bush\" skin.",
@@ -635,9 +682,51 @@ _G.SKINS_LEGION = {
             inst.AnimState:SetBuild("orchidbush_marble")
         end,
         exchangefx = { prefab = nil, offset_y = 1.3, scale = nil },
+        linkedskins = { orchitwigs = "orchitwigs_marble" },
         placer = {
             name = nil, bank = "berrybush", build = "orchidbush_marble", anim = "dead",
             prefabs = { "dug_orchidbush", "cutted_orchidbush" },
+        },
+    },
+    orchitwigs_marble = {
+        base_prefab = "orchitwigs",
+		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
+
+        skin_id = "62e61d158c2f781db2f79b1e",
+        onlyownedshow = true,
+		assets = {
+			Asset("ANIM", "anim/skin/orchitwigs_marble.zip"),
+            Asset("ATLAS", "images/inventoryimages_skin/foliageath_orchitwigs_marble.xml"),
+            Asset("IMAGE", "images/inventoryimages_skin/foliageath_orchitwigs_marble.tex"),
+		},
+        image = { name = nil, atlas = nil, setable = true, },
+
+        string = ischinese and {
+            name = "铁艺兰珊", collection = "MARBLE", access = "SPECIAL",
+            descitem = "解锁\"兰草花穗\"以及入鞘后的皮肤。",
+            description = "铁匠后来知道她每天卖花很晚都要走夜路回家，于是打造了一把精致的铁艺剑，剑心处嵌有几朵玻璃兰花。这次，他不再羞怯，当面将其赠予女子。大伙早就看出两人心意，都纷纷停下为他两拍手起哄。两人欢喜相拥。"
+        } or {
+            name = "Ironchid", collection = "MARBLE", access = "SPECIAL",
+            descitem = "Unlock \"Orchitwigs\" skin.",
+            description = "The story was not translated.",
+        },
+
+		anim = {
+            bank = nil, build = nil,
+            anim = nil, isloop_anim = nil, animpush = nil, isloop_animpush = nil,
+            setable = true,
+        },
+        equip = {
+            symbol = "swap_object", build = "orchitwigs_marble", file = "swap_object",
+            atkfx = "impact_orchid_fx_marble",
+        },
+        scabbard = {
+            anim = "idle_cover", isloop = nil, bank = "orchitwigs_marble", build = "orchitwigs_marble",
+            image = "foliageath_orchitwigs_marble", atlas = "images/inventoryimages_skin/foliageath_orchitwigs_marble.xml",
+        },
+        exchangefx = { prefab = nil, offset_y = nil, scale = nil },
+        floater = {
+            cut = 0.05, size = "small", offset_y = 0.15, scale = 0.5, nofx = nil,
         },
     },
 
@@ -1561,9 +1650,9 @@ _G.SKIN_IDS_LEGION = {
         triplegoldenshovelaxe_era = true, tripleshovelaxe_era = true, lilybush_era = true, lileaves_era = true, icire_rock_era = true, shield_l_log_era = true, shield_l_sand_era = true,
         shield_l_log_emo_fist = true,
     },
-    ["6278c4eec340bf24ab311534"] = { --3尺垂涎
+    ["6278c4eec340bf24ab311534"] = { --3尺垂涎 4
         rosebush_collector = true, rosorns_collector = true,
-        lileaves_marble = true,
+        rosorns_marble = true, lileaves_marble = true, orchitwigs_marble = true,
     },
 }
 _G.SKIN_IDX_LEGION = {
@@ -1657,7 +1746,7 @@ local skinidxes = { --用以皮肤排序
     "icire_rock_collector", "rosebush_collector", "rosorns_collector",
     "triplegoldenshovelaxe_era", "tripleshovelaxe_era", "lilybush_era", "lileaves_era", "shield_l_log_era", "icire_rock_era", "shield_l_sand_era",
     "orchidbush_disguiser", "boltwingout_disguiser",
-    "rosebush_marble", "lilybush_marble", "lileaves_marble", "orchidbush_marble",
+    "rosebush_marble", "rosorns_marble", "lilybush_marble", "lileaves_marble", "orchidbush_marble", "orchitwigs_marble",
     "shield_l_log_emo_fist", "hat_lichen_emo_que",
 
     "shield_l_log_emo_pride", "shield_l_sand_op", "hat_cowboy_tvplay", "hat_lichen_disguiser", "orchitwigs_disguiser", "backcub_fans"

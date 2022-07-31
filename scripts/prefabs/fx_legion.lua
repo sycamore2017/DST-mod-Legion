@@ -119,7 +119,7 @@ if CONFIGS_LEGION.FLOWERSPOWER then
             inst.AnimState:SetBank("impact")
             inst.AnimState:SetBuild("impact_orchid")
             inst.AnimState:PlayAnimation("idle")
-            inst.AnimState:SetFinalOffset(-1)
+            inst.AnimState:SetFinalOffset(1)
         end,
         fn_remove = nil,
     })
@@ -134,8 +134,24 @@ if CONFIGS_LEGION.FLOWERSPOWER then
         fn_anim = function(inst)
             inst.AnimState:SetBank("lavaarena_heal_projectile")
             inst.AnimState:SetBuild("impact_orchid_fx_disguiser")
-            -- inst.AnimState:SetFinalOffset(-1)
             inst.AnimState:PlayAnimation("hit")
+            inst.AnimState:SetFinalOffset(1)
+        end,
+        fn_remove = nil,
+    })
+    MakeFx({ --铁艺兰珊：飞溅花瓣
+        name = "impact_orchid_fx_marble",
+        assets = {
+            Asset("ANIM", "anim/lavaarena_heal_projectile.zip"), --官方的熔炉奶杖击中特效动画
+            Asset("ANIM", "anim/skin/impact_orchid_fx_marble.zip"),
+        },
+        prefabs = nil,
+        fn_common = nil,
+        fn_anim = function(inst)
+            inst.AnimState:SetBank("lavaarena_heal_projectile")
+            inst.AnimState:SetBuild("impact_orchid_fx_marble")
+            inst.AnimState:PlayAnimation("hit")
+            inst.AnimState:SetFinalOffset(1)
         end,
         fn_remove = nil,
     })
@@ -187,7 +203,7 @@ if CONFIGS_LEGION.FLOWERSPOWER then
     -- MakeFx({ --施咒蔷薇：火花爆炸2
     --     name = "rosorns_spell_fx",
     --     assets = {
-    --         Asset("ANIM", "anim/lavaarena_heal_projectile.zip"), --官方熔炉生命法杖攻击特效动画模板
+    --         Asset("ANIM", "anim/lavaarena_heal_projectile.zip"), --官方的熔炉奶杖击中特效动画
     --     },
     --     prefabs = nil,
     --     fn_common = nil,
@@ -204,7 +220,7 @@ if CONFIGS_LEGION.FLOWERSPOWER then
     MakeFx({ --贯星剑：闪光炸裂
         name = "rosorns_collector_fx",
         assets = {
-            Asset("ANIM", "anim/lavaarena_heal_projectile.zip"), --官方熔炉生命法杖攻击特效动画模板
+            Asset("ANIM", "anim/lavaarena_heal_projectile.zip"), --官方的熔炉奶杖击中特效动画
             Asset("ANIM", "anim/skin/rosorns_collector_fx.zip"),
         },
         prefabs = nil,
@@ -214,6 +230,22 @@ if CONFIGS_LEGION.FLOWERSPOWER then
             inst.AnimState:SetBuild("rosorns_collector_fx")
             inst.AnimState:PlayAnimation("cast")
             inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
+            inst.AnimState:SetFinalOffset(1)
+        end,
+        fn_remove = nil,
+    })
+    MakeFx({ --落薇剪：一剪没
+        name = "rosorns_marble_fx",
+        assets = {
+            Asset("ANIM", "anim/boomerang.zip"), --官方的回旋镖动画
+            Asset("ANIM", "anim/skin/rosorns_marble_fx.zip"),
+        },
+        prefabs = nil,
+        fn_common = nil,
+        fn_anim = function(inst)
+            inst.AnimState:SetBank("boomerang")
+            inst.AnimState:SetBuild("rosorns_marble_fx")
+            inst.AnimState:PlayAnimation("used")
             inst.AnimState:SetFinalOffset(1)
         end,
         fn_remove = nil,

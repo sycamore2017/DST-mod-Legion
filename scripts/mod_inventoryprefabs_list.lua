@@ -182,6 +182,10 @@ local InventoryPrefabsList = {  --每个元素的下标值为每种物品栏图�
     foliageath_rosorns_collector = { build = "images_minisign_skins1", },
     lileaves_marble = { build = "images_minisign_skins1", },
     foliageath_lileaves_marble = { build = "images_minisign_skins1", },
+    orchitwigs_marble = { build = "images_minisign_skins1", },
+    foliageath_orchitwigs_marble = { build = "images_minisign_skins1", },
+    rosorns_marble = { build = "images_minisign_skins1", },
+    foliageath_rosorns_marble = { build = "images_minisign_skins1", },
 }
 
 return InventoryPrefabsList
