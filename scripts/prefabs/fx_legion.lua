@@ -354,6 +354,42 @@ if TUNING.LEGION_FLASHANDCRUSH then
         end,
         fn_remove = nil,
     })
+    MakeFx({ --跃星杖：飘散的星星
+        name = "fimbul_axe_collector_fx",
+        assets = {
+            Asset("ANIM", "anim/skin/fimbul_axe_collector.zip"),
+        },
+        prefabs = nil,
+        fn_common = nil,
+        fn_anim = function(inst)
+            inst.AnimState:SetBank("fimbul_axe_collector")
+            inst.AnimState:SetBuild("fimbul_axe_collector")
+            inst.AnimState:PlayAnimation("star"..tostring(math.random(4)))
+            inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
+            inst.AnimState:SetFinalOffset(1)
+        end,
+        fn_remove = nil,
+    })
+    MakeFx({ --跃星杖：炸落的星星
+        name = "fimbul_axe_collector2_fx",
+        assets = {
+            Asset("ANIM", "anim/explode.zip"), --官方爆炸特效动画模板
+            Asset("ANIM", "anim/skin/fimbul_axe_collector2_fx.zip"),
+        },
+        prefabs = nil,
+        fn_common = function(inst)
+            inst.Transform:SetFourFaced()
+        end,
+        fn_anim = function(inst)
+            inst.AnimState:SetBank("explode")
+            inst.AnimState:SetBuild("fimbul_axe_collector2_fx")
+            inst.AnimState:PlayAnimation("small_firecrackers")
+            inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
+            inst.AnimState:SetLightOverride(1)
+            inst.AnimState:SetScale(1.65, 1.65, 1.65)
+        end,
+        fn_remove = nil,
+    })
     -- MakeFx({ --芬布尔斧：重锤技能电光
     --     name = "fimbul_attack_fx",
     --     assets = {

@@ -1188,11 +1188,26 @@ local dressup_data = {
         buildfile = "swap_dualwrench",
         buildsymbol = "swap_dualwrench",
     },
-    fimbul_axe =
-    {
+    fimbul_axe = {
         isnoskin = true,
-        buildfile = "swap_fimbul_axe",
-        buildsymbol = "swap_fimbul_axe",
+        buildfn = function(dressup, item, buildskin)
+            local itemswap = {}
+
+            local skindata = item.components.skinedlegion:GetSkinedData()
+            if skindata ~= nil and skindata.equip ~= nil then
+                itemswap["swap_object"] = dressup:GetDressData(
+                    nil, skindata.equip.build, skindata.equip.file, item.GUID, "swap"
+                )
+            else
+                itemswap["swap_object"] = dressup:GetDressData(
+                    nil, "fimbul_axe", "swap_base", item.GUID, "swap"
+                )
+            end
+            itemswap["whipline"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
+            itemswap["lantern_overlay"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
+
+            return itemswap
+        end
     },
     giantsfoot = {
         isnoskin = true,
@@ -1380,7 +1395,7 @@ local dressup_data = {
             itemswap["lantern_overlay"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
 
             return itemswap
-        end,
+        end
     },
     sachet = {
         isnoskin = true,

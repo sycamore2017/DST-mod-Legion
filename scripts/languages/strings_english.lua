@@ -1748,7 +1748,7 @@ S______WAXWELL.DESCRIBE.REFRACTEDMOONLIGHT = "Only those who are healthy can wie
 -- S_______WEBBER.DESCRIBE.REFRACTEDMOONLIGHT = "If I could, I would be out of this world with my legion!"
 -- S_______WINONA.DESCRIBE.REFRACTEDMOONLIGHT = "I am a laborer, not a slave, I'm my own!"
 
-S_NAMES.MOONDUNGEON = "Moon Dungeon"   --月的地下城
+S_NAMES.MOONDUNGEON = "Moon Castle"   --月的地下城
 S______GENERIC.DESCRIBE.MOONDUNGEON =
 {
     SLEEP = "Is that a fossilized fossil?",

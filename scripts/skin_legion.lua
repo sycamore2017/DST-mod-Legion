@@ -88,6 +88,13 @@ local function FxClear(inst)
     inst:RemoveEventCallback("onremove", cane_unequipped)
 end
 
+------
+
+local function GetSpawnPoint(pos, radius)
+    local angle = math.random() * 2 * PI
+    return pos.x + radius * math.cos(angle), pos.y, pos.z - radius * math.sin(angle)
+end
+
 --------------------------------------------------------------------------
 --[[ 全局皮肤总数据，以及修改 ]]
 --------------------------------------------------------------------------
@@ -433,6 +440,23 @@ _G.SKIN_PREFABS_LEGION = {
                 bank = "backcub", build = "backcub",
                 anim = "anim_water", isloop_anim = true, animpush = nil, isloop_animpush = nil,
             }
+        },
+    },
+
+    fimbul_axe = {
+        assets = nil,
+        image = { name = nil, atlas = nil, setable = true, },
+        anim = {
+            bank = "boomerang", build = nil,
+            anim = nil, isloop_anim = nil, animpush = nil, isloop_animpush = nil,
+            setable = true,
+        },
+        equip = {
+            symbol = "swap_object", build = "fimbul_axe", file = "swap_base"
+        },
+        exchangefx = { prefab = nil, offset_y = nil, scale = nil },
+        floater = {
+            cut = nil, size = "med", offset_y = 0.1, scale = 0.6, nofx = nil
         },
     },
 }
@@ -1621,6 +1645,69 @@ _G.SKINS_LEGION = {
             nofx = true
         },
     },
+
+    fimbul_axe_collector = {
+        base_prefab = "fimbul_axe",
+		type = "item", skin_tags = {}, release_group = 555, rarity = raritySpecial,
+
+        skin_id = "62e775148c2f781db2f79ba1",
+        onlyownedshow = true,
+		assets = {
+			Asset("ANIM", "anim/skin/fimbul_axe_collector.zip")
+		},
+        image = { name = nil, atlas = nil, setable = true, },
+
+        string = ischinese and {
+            name = "跃星杖", collection = "COLLECTOR", access = "SPECIAL",
+            descitem = "解锁\"芬布尔斧\"的皮肤。",
+            description = "十七年前，盛夏流星群给一对不育夫妻带来了孩子。现在，女婴已长大，每晚抚摸碎星吊坠望着璀璨的星空着迷。丈夫含泪将当初藏起的其余碎星还给了女孩。流星群再次出现，女孩感恩后，跃向天空，如一颗星星般耀眼。"
+        } or {
+            name = "Star Leaping Staff", collection = "COLLECTOR", access = "SPECIAL",
+            descitem = "Unlock \"Fimbul's Axe\" skin.",
+            description = "The story was not translated.",
+        },
+
+		anim = {
+            bank = nil, build = nil,
+            anim = nil, isloop_anim = true, animpush = nil, isloop_animpush = nil,
+            setable = true,
+        },
+        equip = {
+            symbol = "swap_object", build = "fimbul_axe_collector", file = "swap_base"
+        },
+        fn_onThrown = function(inst, owner, target)
+            if owner:HasTag("player") then
+                owner.AnimState:OverrideSymbol("swap_object", "fimbul_axe_collector", "swap_throw")
+                owner.AnimState:Show("ARM_carry")
+                owner.AnimState:Hide("ARM_normal")
+            end
+            if inst.task_skinfx ~= nil then
+                inst.task_skinfx:Cancel()
+            end
+            inst.task_skinfx = inst:DoPeriodicTask(0.08, function()
+                local fx = SpawnPrefab("fimbul_axe_collector_fx")
+                if fx ~= nil then
+                    fx.Transform:SetPosition(GetSpawnPoint(inst:GetPosition(), 0.2+math.random()*1.5))
+                end
+            end, 0)
+        end,
+        fn_onLightning = function(inst)
+            local fx = SpawnPrefab("fimbul_axe_collector2_fx")
+            if fx ~= nil then
+                fx.Transform:SetPosition(inst.Transform:GetWorldPosition())
+            end
+        end,
+        fn_onThrownEnd = function(inst)
+            if inst.task_skinfx ~= nil then
+                inst.task_skinfx:Cancel()
+                inst.task_skinfx = nil
+            end
+        end,
+        exchangefx = { prefab = nil, offset_y = nil, scale = nil },
+        floater = {
+            cut = nil, size = "med", offset_y = 0.1, scale = 0.6, nofx = nil
+        },
+    },
 }
 
 _G.SKIN_IDS_LEGION = {
@@ -1650,8 +1737,8 @@ _G.SKIN_IDS_LEGION = {
         triplegoldenshovelaxe_era = true, tripleshovelaxe_era = true, lilybush_era = true, lileaves_era = true, icire_rock_era = true, shield_l_log_era = true, shield_l_sand_era = true,
         shield_l_log_emo_fist = true,
     },
-    ["6278c4eec340bf24ab311534"] = { --3尺垂涎 4
-        rosebush_collector = true, rosorns_collector = true,
+    ["6278c4eec340bf24ab311534"] = { --3尺垂涎 5
+        rosebush_collector = true, rosorns_collector = true, fimbul_axe_collector = true,
         rosorns_marble = true, lileaves_marble = true, orchitwigs_marble = true,
     },
 }
@@ -1743,7 +1830,7 @@ end
 local skinidxes = { --用以皮肤排序
     "neverfade_thanks", "neverfadebush_thanks",
     "fishhomingtool_awesome_thanks", "fishhomingtool_normal_thanks", "fishhomingbait_thanks",
-    "icire_rock_collector", "rosebush_collector", "rosorns_collector",
+    "icire_rock_collector", "fimbul_axe_collector", "rosebush_collector", "rosorns_collector",
     "triplegoldenshovelaxe_era", "tripleshovelaxe_era", "lilybush_era", "lileaves_era", "shield_l_log_era", "icire_rock_era", "shield_l_sand_era",
     "orchidbush_disguiser", "boltwingout_disguiser",
     "rosebush_marble", "rosorns_marble", "lilybush_marble", "lileaves_marble", "orchidbush_marble", "orchitwigs_marble",

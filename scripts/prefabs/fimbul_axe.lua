@@ -1,6 +1,5 @@
 local assets = {
     Asset("ANIM", "anim/fimbul_axe.zip"),
-    Asset("ANIM", "anim/swap_fimbul_axe.zip"),
     Asset("ATLAS", "images/inventoryimages/fimbul_axe.xml"),
     Asset("IMAGE", "images/inventoryimages/fimbul_axe.tex"),
     Asset("ANIM", "anim/boomerang.zip"), --官方回旋镖动画模板
@@ -17,6 +16,11 @@ local function OnFinished(inst)
     inst.AnimState:PlayAnimation("used")
     inst:ListenForEvent("animover", inst.Remove)
 
+    local skindata = inst.components.skinedlegion:GetSkinedData()
+    if skindata ~= nil and skindata.fn_onThrownEnd ~= nil then
+        skindata.fn_onThrownEnd(inst)
+    end
+
     if inst.returntask ~= nil then
         inst.returntask:Cancel()
         inst.returntask = nil
@@ -24,7 +28,12 @@ local function OnFinished(inst)
 end
 
 local function OnEquip(inst, owner)
-    owner.AnimState:OverrideSymbol("swap_object", "swap_fimbul_axe", "swap_fimbul_axe")
+    local skindata = inst.components.skinedlegion:GetSkinedData()
+    if skindata ~= nil and skindata.equip ~= nil then
+        owner.AnimState:OverrideSymbol("swap_object", skindata.equip.build, skindata.equip.file)
+    else
+        owner.AnimState:OverrideSymbol("swap_object", "fimbul_axe", "swap_base")
+    end
     owner.AnimState:Show("ARM_carry")
     owner.AnimState:Hide("ARM_normal")
 end
@@ -33,6 +42,11 @@ local function OnDropped(inst)
     inst.AnimState:PlayAnimation("idle")
     inst.components.inventoryitem.pushlandedevents = true
     inst:PushEvent("on_landed")
+
+    local skindata = inst.components.skinedlegion:GetSkinedData()
+    if skindata ~= nil and skindata.fn_onThrownEnd ~= nil then
+        skindata.fn_onThrownEnd(inst)
+    end
 end
 
 local function OnUnequip(inst, owner)
@@ -46,26 +60,35 @@ local function OnThrown(inst, owner, target)
     end
     inst.AnimState:PlayAnimation("spin_loop", true)
     inst.components.inventoryitem.pushlandedevents = false
+
+    local skindata = inst.components.skinedlegion:GetSkinedData()
+    if skindata ~= nil and skindata.fn_onThrown ~= nil then
+        skindata.fn_onThrown(inst, owner, target)
+    end
 end
 
 local function ReturnToOwner(inst, owner)
-    if owner ~= nil then
+    if owner ~= nil and owner:IsValid() then
         -- owner.SoundEmitter:PlaySound("dontstarve/wilson/boomerang_return")
         -- inst.components.projectile:Throw(owner, owner)
 
-        if not (owner.components.health ~= nil and owner.components.health:IsDead()) then  --玩家还活着，自动接住
+        if not (owner.components.health ~= nil and owner.components.health:IsDead()) then --玩家还活着，自动接住
+            local skindata = inst.components.skinedlegion:GetSkinedData()
+            if skindata ~= nil and skindata.fn_onThrownEnd ~= nil then
+                skindata.fn_onThrownEnd(inst)
+            end
+
             --如果使用者已装备手持武器，就放进物品栏，没有的话就直接装备上
-            if inst.components.equippable ~= nil and not owner.components.inventory:GetEquippedItem(inst.components.equippable.equipslot) then
+            if not owner.components.inventory:GetEquippedItem(inst.components.equippable.equipslot) then
                 owner.components.inventory:Equip(inst)
             else
                 owner.components.inventory:GiveItem(inst)
             end
-        else                                                                               --玩家已死亡，落到地面
-            OnDropped(inst)
+            return
         end
     end
+    OnDropped(inst)
 end
-
 local function DelayReturnToOwner(inst, owner)
     -- inst:Hide()
     inst.returntask = inst:DoTaskInTime(1, function()
@@ -95,6 +118,12 @@ local function GiveSomeShock(inst, owner, target)  --击中时的特殊效果
     end
 
     if givelightning then
+        local skindata = inst.components.skinedlegion:GetSkinedData()
+        if skindata ~= nil and skindata.fn_onLightning ~= nil then
+            skindata.fn_onLightning(inst)
+            return
+        end
+
         if not TheWorld:HasTag("cave") then
             local lightning = SpawnPrefab("fimbul_lightning")
             lightning.Transform:SetPosition(x, y, z)
@@ -109,7 +138,6 @@ local function OnHit(inst, owner, target)
     GiveSomeShock(inst, owner, target)
     DelayReturnToOwner(inst, owner)
 end
-
 local function OnMiss(inst, owner, target)
     if owner == target then
         OnDropped(inst)
@@ -153,12 +181,14 @@ local function fn()
     --projectile (from projectile component) added to pristine state for optimization
     inst:AddTag("projectile")
 
-    MakeInventoryFloatable(inst, "med", 0.1, {1.3, 0.6, 1.3}, true, -9, {
-        sym_build = "swap_fimbul_axe",
-        sym_name = "swap_fimbul_axe",
-        bank = "fimbul_axe",
-        anim = "idle"
-    })
+    -- MakeInventoryFloatable(inst, "med", 0.1, {1.3, 0.6, 1.3}, true, -9, {
+    --     sym_build = "swap_fimbul_axe",
+    --     sym_name = "swap_fimbul_axe",
+    --     bank = "fimbul_axe",
+    --     anim = "idle"
+    -- })
+    inst:AddComponent("skinedlegion")
+    inst.components.skinedlegion:InitWithFloater("fimbul_axe")
 
     inst.entity:SetPristine()
 
@@ -204,6 +234,8 @@ local function fn()
     if TheNet:GetPVPEnabled() then
         isPVP = true
     end
+
+    inst.components.skinedlegion:SetOnPreLoad()
 
     return inst
 end
