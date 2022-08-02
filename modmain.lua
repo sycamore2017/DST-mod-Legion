@@ -540,6 +540,7 @@ AddComponentPostInit("actionqueuer", function(self)
 		self.AddAction("leftclick", "PLANTSOIL_LEGION", true)
         self.AddAction("rightclick", "POUR_WATER_LEGION", true)
         self.AddAction("leftclick", "FERTILIZE_LEGION", true)
+        self.AddAction("leftclick", "FEED_BEEF_L", true)
 	end
 end)
 

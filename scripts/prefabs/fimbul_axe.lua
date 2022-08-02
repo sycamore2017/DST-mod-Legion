@@ -120,7 +120,7 @@ local function GiveSomeShock(inst, owner, target)  --击中时的特殊效果
     if givelightning then
         local skindata = inst.components.skinedlegion:GetSkinedData()
         if skindata ~= nil and skindata.fn_onLightning ~= nil then
-            skindata.fn_onLightning(inst)
+            skindata.fn_onLightning(inst, owner, target)
             return
         end
 

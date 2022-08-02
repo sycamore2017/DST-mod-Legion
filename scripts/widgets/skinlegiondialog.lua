@@ -371,7 +371,7 @@ function SkinLegionDialog:SetItemInfo(item)
 
         --皮肤小故事
         if self.label_skindesc == nil then
-            self.label_skindesc = self.panel_iteminfo:AddChild(Text(CHATFONT, 21))
+            self.label_skindesc = self.panel_iteminfo:AddChild(Text(CHATFONT, 20))
             self.label_skindesc:SetPosition(0, -128)
             self.label_skindesc:SetColour(UICOLOURS.BROWN_DARK)
             self.label_skindesc:SetHAlign(ANCHOR_LEFT)

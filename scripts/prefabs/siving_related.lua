@@ -16,9 +16,9 @@ local ctlFuledItems = {
     cutted_lilybush = { moisture = nil, nutrients = { 5, 5, 8 } },
     cutted_orchidbush = { moisture = nil, nutrients = { 5, 5, 8 } },
     sachet = { moisture = nil, nutrients = { 8, 8, 8 } },
-    rosorns = { moisture = nil, nutrients = { 10, 10, 24 } },
-    lileaves = { moisture = nil, nutrients = { 10, 24, 10 } },
-    orchitwigs = { moisture = nil, nutrients = { 24, 10, 10 } },
+    rosorns = { moisture = nil, nutrients = { 12, 12, 48 } },
+    lileaves = { moisture = nil, nutrients = { 12, 48, 12 } },
+    orchitwigs = { moisture = nil, nutrients = { 48, 12, 12 } },
 }
 
 local function MakeItem(data)

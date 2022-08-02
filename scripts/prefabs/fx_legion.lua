@@ -390,6 +390,26 @@ if TUNING.LEGION_FLASHANDCRUSH then
         end,
         fn_remove = nil,
     })
+    MakeFx({ --跃星杖：扩大的星星
+        name = "fimbul_axe_collector3_fx",
+        assets = {
+            Asset("ANIM", "anim/skin/fimbul_axe_collector3_fx.zip"),
+        },
+        prefabs = nil,
+        fn_common = nil,
+        fn_anim = function(inst)
+            inst.AnimState:SetBank("fimbul_axe_collector3_fx")
+            inst.AnimState:SetBuild("fimbul_axe_collector3_fx")
+            inst.AnimState:PlayAnimation("idle")
+            inst.AnimState:SetScale(1.6, 1.6)
+            inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
+            inst.AnimState:SetFinalOffset(1)
+
+            inst.entity:AddSoundEmitter()
+            inst.SoundEmitter:PlaySound("dontstarve/common/together/celestial_orb/active")
+        end,
+        fn_remove = nil,
+    })
     -- MakeFx({ --芬布尔斧：重锤技能电光
     --     name = "fimbul_attack_fx",
     --     assets = {

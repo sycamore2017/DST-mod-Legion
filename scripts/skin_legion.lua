@@ -456,7 +456,7 @@ _G.SKIN_PREFABS_LEGION = {
         },
         exchangefx = { prefab = nil, offset_y = nil, scale = nil },
         floater = {
-            cut = nil, size = "med", offset_y = 0.1, scale = 0.6, nofx = nil
+            cut = 0.1, size = "med", offset_y = 0.3, scale = 0.5, nofx = nil
         },
     },
 }
@@ -1691,10 +1691,15 @@ _G.SKINS_LEGION = {
                 end
             end, 0)
         end,
-        fn_onLightning = function(inst)
+        fn_onLightning = function(inst, owner, target)
+            local x, y, z = target.Transform:GetWorldPosition()
             local fx = SpawnPrefab("fimbul_axe_collector2_fx")
             if fx ~= nil then
-                fx.Transform:SetPosition(inst.Transform:GetWorldPosition())
+                fx.Transform:SetPosition(x, y, z)
+            end
+            fx = SpawnPrefab("fimbul_axe_collector3_fx")
+            if fx ~= nil then
+                fx.Transform:SetPosition(x, y, z)
             end
         end,
         fn_onThrownEnd = function(inst)
@@ -1705,7 +1710,7 @@ _G.SKINS_LEGION = {
         end,
         exchangefx = { prefab = nil, offset_y = nil, scale = nil },
         floater = {
-            cut = nil, size = "med", offset_y = 0.1, scale = 0.6, nofx = nil
+            cut = 0.1, size = "med", offset_y = 0.3, scale = 0.4, nofx = nil
         },
     },
 }
