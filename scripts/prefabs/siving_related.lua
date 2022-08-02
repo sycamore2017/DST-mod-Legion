@@ -891,7 +891,7 @@ MakeMask({
                 table.insert(notags, "player")
             end
             local _taskcounter = 0
-            inst.task_life = inst:DoPeriodicTask(0.5, function()
+            inst.task_life = inst:DoPeriodicTask(0.5, function(inst)
                 if not owner:IsValid() then
                     CancelTask_life(inst, owner)
                     return
@@ -1045,7 +1045,7 @@ MakeMask({
                 table.insert(notags, "player")
             end
             local _taskcounter = 0
-            inst.task_life = inst:DoPeriodicTask(0.5, function()
+            inst.task_life = inst:DoPeriodicTask(0.5, function(inst)
                 if not owner:IsValid() then
                     CancelTask_life(inst, owner)
                     return

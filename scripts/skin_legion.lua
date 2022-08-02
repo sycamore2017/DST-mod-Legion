@@ -1722,9 +1722,9 @@ _G.SKIN_IDS_LEGION = {
         fishhomingtool_awesome_thanks = true, fishhomingtool_normal_thanks = true, fishhomingbait_thanks = true,
         triplegoldenshovelaxe_era = true, tripleshovelaxe_era = true, lilybush_era = true, lileaves_era = true, icire_rock_era = true, shield_l_log_era = true, shield_l_sand_era = true,
         orchidbush_disguiser = true, boltwingout_disguiser = true,
-        rosebush_marble = true, lilybush_marble = true, orchidbush_marble = true,
+        rosebush_marble = true, lilybush_marble = true, orchidbush_marble = true, rosorns_marble = true, lileaves_marble = true, orchitwigs_marble = true,
         shield_l_log_emo_fist = true, hat_lichen_emo_que = true,
-        rosebush_collector = true, rosorns_collector = true,
+        rosebush_collector = true, rosorns_collector = true, fimbul_axe_collector = true,
     },
     ["6278c450c340bf24ab311528"] = { --回忆(5)
         boltwingout_disguiser = true,
