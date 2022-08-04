@@ -130,7 +130,10 @@ local ui = Class(Widget, function(self,data,parent,top,left)
 	MakeDetailsLine(self, column_offset_x, y - 2, .3, "quagmire_recipe_line_veryshort.tex")
 	y = y - 8
 	y = y - body_font_size/2
-	local str = STRINGS.UI.FOOD_TYPES[data.recipe_def.foodtype or FOODTYPE.GENERIC]  or STRINGS.UI.COOKBOOK.FOOD_TYPE_UNKNOWN
+	local str = STRINGS.UI.FOOD_TYPES[data.recipe_def.foodtype or FOODTYPE.GENERIC] or STRINGS.UI.COOKBOOK.FOOD_TYPE_UNKNOWN
+	if data.recipe_def.secondaryfoodtype ~= nil then
+		str = str.."、"..(STRINGS.UI.FOOD_TYPES[data.recipe_def.secondaryfoodtype] or STRINGS.UI.COOKBOOK.FOOD_TYPE_UNKNOWN)
+	end
 	local tags = self:AddChild(Text(HEADERFONT, body_font_size, str, UICOLOURS.BROWN_DARK))
 	tags:SetPosition(column_offset_x, y)
 	y = y - body_font_size/2 - 4

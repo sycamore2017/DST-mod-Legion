@@ -459,6 +459,43 @@ _G.SKIN_PREFABS_LEGION = {
             cut = 0.1, size = "med", offset_y = 0.3, scale = 0.5, nofx = nil
         },
     },
+
+    siving_derivant_lvl0 = {
+        assets = nil,
+        fn_start = function(inst)
+            inst.AnimState:SetBank("siving_derivants")
+            inst.AnimState:SetBuild("siving_derivants")
+            inst.AnimState:SetScale(1.3, 1.3)
+        end,
+        exchangefx = { prefab = nil, offset_y = nil, scale = 1.5 },
+    },
+    siving_derivant_lvl1 = {
+        assets = nil,
+        fn_start = function(inst)
+            inst.AnimState:SetBank("siving_derivants")
+            inst.AnimState:SetBuild("siving_derivants")
+            inst.AnimState:SetScale(1.3, 1.3)
+        end,
+        exchangefx = { prefab = nil, offset_y = nil, scale = 1.5 },
+    },
+    siving_derivant_lvl2 = {
+        assets = nil,
+        fn_start = function(inst)
+            inst.AnimState:SetBank("siving_derivants")
+            inst.AnimState:SetBuild("siving_derivants")
+            inst.AnimState:SetScale(1.3, 1.3)
+        end,
+        exchangefx = { prefab = nil, offset_y = nil, scale = 1.5 },
+    },
+    siving_derivant_lvl3 = {
+        assets = nil,
+        fn_start = function(inst)
+            inst.AnimState:SetBank("siving_derivants")
+            inst.AnimState:SetBuild("siving_derivants")
+            inst.AnimState:SetScale(1.3, 1.3)
+        end,
+        exchangefx = { prefab = nil, offset_y = nil, scale = 1.5 },
+    },
 }
 
 _G.SKINS_LEGION = {
@@ -1713,11 +1750,205 @@ _G.SKINS_LEGION = {
             cut = 0.1, size = "med", offset_y = 0.3, scale = 0.4, nofx = nil
         },
     },
+
+    siving_derivant_lvl0_thanks = {
+        base_prefab = "siving_derivant_lvl0",
+		type = "item", skin_tags = {}, release_group = 555, rarity = raritySpecial,
+
+        skin_id = "62eb6e0e8c2f781db2f79cc2",
+        onlyownedshow = true,
+		assets = {
+			Asset("ANIM", "anim/skin/siving_derivants_thanks.zip"),
+            Asset("ANIM", "anim/skin/siving_derivant_lvl0_thanks.zip"), --为了swap-icon
+		},
+
+        string = ischinese and {
+            name = "梨花开", collection = "THANKS", access = "SPECIAL",
+            descitem = "解锁4型\"子圭岩\"的皮肤。",
+            description = "柳氏抱着一把断剑，拖着伤痕累累的身体，跌跌撞撞回到自己栖身的洞穴。洞外平平无奇，洞内别有洞天，周围长满了发着微光的奇异银叶树。她将断剑插在阵法中心，随后所有树上的微光逐渐向断剑聚拢，而自己的伤口也神奇地开始愈合。"
+        } or {
+            name = "Snowflake Pine", collection = "THANKS", access = "SPECIAL",
+            descitem = "Unlock all \"Siving Derivant\" skin.",
+            description = "The story was not translated.",
+        },
+
+		fn_start = function(inst)
+            inst.AnimState:SetBank("siving_derivants_thanks")
+            inst.AnimState:SetBuild("siving_derivants_thanks")
+            inst.AnimState:SetScale(1.3, 1.3)
+        end,
+        exchangefx = { prefab = nil, offset_y = nil, scale = 1.5 },
+        linkedskins = { down = nil, up = "siving_derivant_lvl1_thanks" },
+        placer = {
+            name = nil, bank = "siving_derivants_thanks", build = "siving_derivants_thanks", anim = "lvl0",
+            prefabs = { "siving_derivant_item" },
+        },
+    },
+    siving_derivant_lvl1_thanks = {
+        base_prefab = "siving_derivant_lvl1",
+		type = "item", skin_tags = {}, release_group = 555, rarity = raritySpecial,
+
+        skin_id = "62eb6e0e8c2f781db2f79cc2",
+        noshopshow = true,
+		assets = {
+			Asset("ANIM", "anim/skin/siving_derivants_thanks.zip"),
+		},
+
+        string = {
+            name = ischinese and "梨花开" or "Snowflake Pine", collection = "THANKS", access = "SPECIAL",
+        },
+
+		fn_start = function(inst)
+            inst.AnimState:SetBank("siving_derivants_thanks")
+            inst.AnimState:SetBuild("siving_derivants_thanks")
+            inst.AnimState:SetScale(1.3, 1.3)
+        end,
+        exchangefx = { prefab = nil, offset_y = nil, scale = 1.5 },
+        linkedskins = { down = "siving_derivant_lvl0_thanks", up = "siving_derivant_lvl2_thanks" }
+    },
+    siving_derivant_lvl2_thanks = {
+        base_prefab = "siving_derivant_lvl2",
+		type = "item", skin_tags = {}, release_group = 555, rarity = raritySpecial,
+
+        skin_id = "62eb6e0e8c2f781db2f79cc2",
+        noshopshow = true,
+		assets = {
+			Asset("ANIM", "anim/skin/siving_derivants_thanks.zip"),
+		},
+
+        string = {
+            name = ischinese and "梨花开" or "Snowflake Pine", collection = "THANKS", access = "SPECIAL",
+        },
+
+		fn_start = function(inst)
+            inst.AnimState:SetBank("siving_derivants_thanks")
+            inst.AnimState:SetBuild("siving_derivants_thanks")
+            inst.AnimState:SetScale(1.3, 1.3)
+        end,
+        exchangefx = { prefab = nil, offset_y = nil, scale = 1.5 },
+        linkedskins = { down = "siving_derivant_lvl1_thanks", up = "siving_derivant_lvl3_thanks" }
+    },
+    siving_derivant_lvl3_thanks = {
+        base_prefab = "siving_derivant_lvl3",
+		type = "item", skin_tags = {}, release_group = 555, rarity = raritySpecial,
+
+        skin_id = "62eb6e0e8c2f781db2f79cc2",
+        noshopshow = true,
+		assets = {
+			Asset("ANIM", "anim/skin/siving_derivants_thanks.zip"),
+		},
+
+        string = {
+            name = ischinese and "梨花开" or "Snowflake Pine", collection = "THANKS", access = "SPECIAL",
+        },
+
+		fn_start = function(inst)
+            inst.AnimState:SetBank("siving_derivants_thanks")
+            inst.AnimState:SetBuild("siving_derivants_thanks")
+            inst.AnimState:SetScale(1.3, 1.3)
+        end,
+        exchangefx = { prefab = nil, offset_y = nil, scale = 1.5 },
+        linkedskins = { down = "siving_derivant_lvl2_thanks", up = nil }
+    },
+    siving_derivant_lvl0_thanks2 = {
+        base_prefab = "siving_derivant_lvl0",
+		type = "item", skin_tags = {}, release_group = 555, rarity = raritySpecial,
+
+        skin_id = "62eb6e0e8c2f781db2f79cc2",
+        noshopshow = true,
+		assets = {
+			Asset("ANIM", "anim/skin/siving_derivants_thanks2.zip"),
+		},
+
+        string = {
+            name = ischinese and "梨带雨" or "Snowflake Prayer Pine", collection = "THANKS", access = "SPECIAL",
+        },
+
+		fn_start = function(inst)
+            inst.AnimState:SetBank("siving_derivants_thanks2")
+            inst.AnimState:SetBuild("siving_derivants_thanks2")
+            inst.AnimState:SetScale(1.3, 1.3)
+        end,
+        exchangefx = { prefab = nil, offset_y = nil, scale = 1.5 },
+        linkedskins = { down = nil, up = "siving_derivant_lvl1_thanks2" },
+        placer = {
+            name = nil, bank = "siving_derivants_thanks2", build = "siving_derivants_thanks2", anim = "lvl0",
+            prefabs = { "siving_derivant_item" },
+        },
+    },
+    siving_derivant_lvl1_thanks2 = {
+        base_prefab = "siving_derivant_lvl1",
+		type = "item", skin_tags = {}, release_group = 555, rarity = raritySpecial,
+
+        skin_id = "62eb6e0e8c2f781db2f79cc2",
+        noshopshow = true,
+		assets = {
+			Asset("ANIM", "anim/skin/siving_derivants_thanks2.zip"),
+		},
+
+        string = {
+            name = ischinese and "梨带雨" or "Snowflake Prayer Pine", collection = "THANKS", access = "SPECIAL",
+        },
+
+		fn_start = function(inst)
+            inst.AnimState:SetBank("siving_derivants_thanks2")
+            inst.AnimState:SetBuild("siving_derivants_thanks2")
+            inst.AnimState:SetScale(1.3, 1.3)
+        end,
+        exchangefx = { prefab = nil, offset_y = nil, scale = 1.5 },
+        linkedskins = { down = "siving_derivant_lvl0_thanks2", up = "siving_derivant_lvl2_thanks2" }
+    },
+    siving_derivant_lvl2_thanks2 = {
+        base_prefab = "siving_derivant_lvl2",
+		type = "item", skin_tags = {}, release_group = 555, rarity = raritySpecial,
+
+        skin_id = "62eb6e0e8c2f781db2f79cc2",
+        noshopshow = true,
+		assets = {
+			Asset("ANIM", "anim/skin/siving_derivants_thanks2.zip"),
+		},
+
+        string = {
+            name = ischinese and "梨带雨" or "Snowflake Prayer Pine", collection = "THANKS", access = "SPECIAL",
+        },
+
+		fn_start = function(inst)
+            inst.AnimState:SetBank("siving_derivants_thanks2")
+            inst.AnimState:SetBuild("siving_derivants_thanks2")
+            inst.AnimState:SetScale(1.3, 1.3)
+        end,
+        exchangefx = { prefab = nil, offset_y = nil, scale = 1.5 },
+        linkedskins = { down = "siving_derivant_lvl1_thanks2", up = "siving_derivant_lvl3_thanks2" }
+    },
+    siving_derivant_lvl3_thanks2 = {
+        base_prefab = "siving_derivant_lvl3",
+		type = "item", skin_tags = {}, release_group = 555, rarity = raritySpecial,
+
+        skin_id = "62eb6e0e8c2f781db2f79cc2",
+        noshopshow = true,
+		assets = {
+			Asset("ANIM", "anim/skin/siving_derivants_thanks2.zip"),
+		},
+
+        string = {
+            name = ischinese and "梨带雨" or "Snowflake Prayer Pine", collection = "THANKS", access = "SPECIAL",
+        },
+
+		fn_start = function(inst)
+            inst.AnimState:SetBank("siving_derivants_thanks2")
+            inst.AnimState:SetBuild("siving_derivants_thanks2")
+            inst.AnimState:SetScale(1.3, 1.3)
+        end,
+        exchangefx = { prefab = nil, offset_y = nil, scale = 1.5 },
+        linkedskins = { down = "siving_derivant_lvl2_thanks2", up = nil }
+    },
 }
 
 _G.SKIN_IDS_LEGION = {
     ["freeskins"] = {}, --免费皮肤全部装这里面，skin_id设置为"freeskins"就好了
     ["6278c409c340bf24ab311522"] = { --余生
+        siving_derivant_lvl0_thanks = true, siving_derivant_lvl1_thanks = true, siving_derivant_lvl2_thanks = true, siving_derivant_lvl3_thanks = true,
+        siving_derivant_lvl0_thanks2 = true, siving_derivant_lvl1_thanks2 = true, siving_derivant_lvl2_thanks2 = true, siving_derivant_lvl3_thanks2 = true,
         neverfade_thanks = true, neverfadebush_thanks = true,
         fishhomingtool_awesome_thanks = true, fishhomingtool_normal_thanks = true, fishhomingbait_thanks = true,
         triplegoldenshovelaxe_era = true, tripleshovelaxe_era = true, lilybush_era = true, lileaves_era = true, icire_rock_era = true, shield_l_log_era = true, shield_l_sand_era = true,
@@ -1731,6 +1962,12 @@ _G.SKIN_IDS_LEGION = {
         rosebush_marble = true, lilybush_marble = true, orchidbush_marble = true,
         hat_lichen_emo_que = true,
     },
+    ["62eb7b148c2f781db2f79cf8"] = { --花潮(6+3)
+        rosebush_marble = true, lilybush_marble = true, orchidbush_marble = true, rosorns_marble = true, lileaves_marble = true, orchitwigs_marble = true,
+        rosebush_collector = true, rosorns_collector = true,
+        lilybush_era = true, lileaves_era = true,
+        orchidbush_disguiser = true,
+    },
     ["6278c487c340bf24ab31152c"] = { --1鸣惊人(7)
         neverfade_thanks = true, neverfadebush_thanks = true,
         orchidbush_disguiser = true, boltwingout_disguiser = true,
@@ -1742,9 +1979,11 @@ _G.SKIN_IDS_LEGION = {
         triplegoldenshovelaxe_era = true, tripleshovelaxe_era = true, lilybush_era = true, lileaves_era = true, icire_rock_era = true, shield_l_log_era = true, shield_l_sand_era = true,
         shield_l_log_emo_fist = true,
     },
-    ["6278c4eec340bf24ab311534"] = { --3尺垂涎 5
+    ["6278c4eec340bf24ab311534"] = { --3尺垂涎 6
         rosebush_collector = true, rosorns_collector = true, fimbul_axe_collector = true,
         rosorns_marble = true, lileaves_marble = true, orchitwigs_marble = true,
+        siving_derivant_lvl0_thanks = true, siving_derivant_lvl1_thanks = true, siving_derivant_lvl2_thanks = true, siving_derivant_lvl3_thanks = true,
+        siving_derivant_lvl0_thanks2 = true, siving_derivant_lvl1_thanks2 = true, siving_derivant_lvl2_thanks2 = true, siving_derivant_lvl3_thanks2 = true,
     },
 }
 _G.SKIN_IDX_LEGION = {
@@ -1835,6 +2074,8 @@ end
 local skinidxes = { --用以皮肤排序
     "neverfade_thanks", "neverfadebush_thanks",
     "fishhomingtool_awesome_thanks", "fishhomingtool_normal_thanks", "fishhomingbait_thanks",
+    "siving_derivant_lvl0_thanks", "siving_derivant_lvl1_thanks", "siving_derivant_lvl2_thanks", "siving_derivant_lvl3_thanks",
+    "siving_derivant_lvl0_thanks2", "siving_derivant_lvl1_thanks2", "siving_derivant_lvl2_thanks2", "siving_derivant_lvl3_thanks2",
     "icire_rock_collector", "fimbul_axe_collector", "rosebush_collector", "rosorns_collector",
     "triplegoldenshovelaxe_era", "tripleshovelaxe_era", "lilybush_era", "lileaves_era", "shield_l_log_era", "icire_rock_era", "shield_l_sand_era",
     "orchidbush_disguiser", "boltwingout_disguiser",

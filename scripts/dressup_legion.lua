@@ -1604,14 +1604,15 @@ local dressup_data = {
                 moonpig = true,
                 bunnyman = true
             }
+            local symbolname = nil
             if dressup.inst.sivmask_swapsymbol or maps[dressup.inst.prefab] then
-                maps = "swap_other"
+                symbolname = "swap_other"
             else
-                maps = "swap_hat"
+                symbolname = "swap_hat"
             end
 
             itemswap["swap_hat"] = dressup:GetDressData(
-                nil, "siving_mask", maps, item.GUID, "swap"
+                nil, "siving_mask", symbolname, item.GUID, "swap"
             )
             dressup:SetDressOpenTop(itemswap)
 
@@ -1636,14 +1637,15 @@ local dressup_data = {
                 moonpig = true,
                 bunnyman = true
             }
+            local symbolname = nil
             if dressup.inst.sivmask_swapsymbol or maps[dressup.inst.prefab] then
-                maps = "swap_other"
+                symbolname = "swap_other"
             else
-                maps = "swap_hat"
+                symbolname = "swap_hat"
             end
 
             itemswap["swap_hat"] = dressup:GetDressData(
-                nil, "siving_mask_gold", maps, item.GUID, "swap"
+                nil, "siving_mask_gold", symbolname, item.GUID, "swap"
             )
             dressup:SetDressOpenTop(itemswap)
 

@@ -30,7 +30,7 @@ local foods_legion = {
 
         --这一截是不起效的代码
         -- float = {nil, "small", 0.2, 1.05},
-        -- foodtype = FOODTYPE.MEAT,
+        foodtype = FOODTYPE.MEAT,
         -- secondaryfoodtype = nil,
         health = 0,
         hunger = 1,

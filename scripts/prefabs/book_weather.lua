@@ -43,14 +43,22 @@ local function onattack(inst, owner, target)
     if target ~= nil and target:IsValid() then
         SpawnPrefab("waterballoon_splash").Transform:SetPosition(target.Transform:GetWorldPosition())
 
-        inst.components.wateryprotection:SpreadProtection(target)
+        inst.components.wateryprotection:SpreadProtection(target) --潮湿度组件增加潮湿
 
-        if target.components.health ~= nil and not target.components.health:IsDead() then
+        if
+            target.components.health ~= nil and not target.components.health:IsDead() and
+            not target:HasTag("likewateroffducksback")
+        then
+            if target.components.inventoryitem ~= nil then --物品组件增加潮湿
+                target.components.inventoryitem:AddMoisture(TUNING.OCEAN_WETNESS)
+                return
+            end
+
             if target.task_l_iswet == nil then
                 if target:HasTag("wet") then
                     return
                 end
-                target:AddTag("wet")
+                target:AddTag("wet") --标签方式增加潮湿
             else
                 target.task_l_iswet:Cancel()
             end

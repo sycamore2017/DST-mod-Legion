@@ -114,6 +114,9 @@ local function MakeDerivant(data)
             inst:AddTag("siving_derivant")
             inst:AddTag("silviculture") --这个标签能让《造林学》发挥作用
 
+            inst:AddComponent("skinedlegion")
+            inst.components.skinedlegion:Init("siving_derivant_"..data.name)
+
             inst.entity:SetPristine()
             if not TheWorld.ismastersim then
                 return inst
@@ -171,6 +174,8 @@ local function MakeDerivant(data)
 
             MakeHauntableWork(inst)
 
+            inst.components.skinedlegion:SetOnPreLoad()
+
             return inst
         end,
         {
@@ -191,7 +196,13 @@ local function SetTimer_derivant(inst, time, nextname)
     inst:ListenForEvent("timerdone", function(inst, data)
         if data.name == "growup" then
             inst.SoundEmitter:PlaySound("dontstarve/common/together/marble_shrub/grow")
-            local tree = SpawnPrefab(nextname)
+            local tree = nil
+            local skindata = inst.components.skinedlegion:GetSkinedData()
+            if skindata and skindata.linkedskins and skindata.linkedskins.up then
+                tree = SpawnPrefab(nextname, skindata.linkedskins.up)
+            else
+                tree = SpawnPrefab(nextname)
+            end
             if tree ~= nil then
                 if inst.treeState ~= 0 then
                     tree.OnTreeLive(tree, inst.treeState)
@@ -201,6 +212,25 @@ local function SetTimer_derivant(inst, time, nextname)
             inst:Remove()
         end
     end)
+end
+local function SpawnSkinedPrefab(inst, itemname)
+    local x, y, z = inst.Transform:GetWorldPosition()
+    SpawnPrefab("rock_break_fx").Transform:SetPosition(x, y, z)
+    SpawnPrefab("collapse_small").Transform:SetPosition(x, y, z)
+
+    local tree = nil
+    local skindata = inst.components.skinedlegion:GetSkinedData()
+    if skindata and skindata.linkedskins and skindata.linkedskins.down then
+        tree = SpawnPrefab(itemname, skindata.linkedskins.down)
+    else
+        tree = SpawnPrefab(itemname)
+    end
+    if tree ~= nil then
+        if inst.treeState ~= 0 then
+            tree.OnTreeLive(tree, inst.treeState)
+        end
+        tree.Transform:SetPosition(x, y, z)
+    end
 end
 
 MakeDerivant({  --子圭一型岩
@@ -228,12 +258,8 @@ MakeDerivant({  --子圭木型岩
             end
         end)
         inst.components.workable:SetOnFinishCallback(function(inst, worker)
-            local x, y, z = inst.Transform:GetWorldPosition()
-            SpawnPrefab("rock_break_fx").Transform:SetPosition(x, y, z)
-            SpawnPrefab("collapse_small").Transform:SetPosition(x, y, z)
-            SpawnPrefab("siving_derivant_lvl0").Transform:SetPosition(x, y, z)
+            SpawnSkinedPrefab(inst, "siving_derivant_lvl0")
             DropRock(inst, 0.5)
-
             inst:Remove()
         end)
         SetTimer_derivant(inst, TUNING.TOTAL_DAY_TIME * 7.5, "siving_derivant_lvl2")
@@ -251,14 +277,9 @@ MakeDerivant({  --子圭林型岩
             end
         end)
         inst.components.workable:SetOnFinishCallback(function(inst, worker)
-            local x, y, z = inst.Transform:GetWorldPosition()
-            SpawnPrefab("rock_break_fx").Transform:SetPosition(x, y, z)
-            SpawnPrefab("collapse_small").Transform:SetPosition(x, y, z)
-            SpawnPrefab("siving_derivant_lvl1").Transform:SetPosition(x, y, z)
-
+            SpawnSkinedPrefab(inst, "siving_derivant_lvl1")
             inst.components.lootdropper:SpawnLootPrefab("siving_rocks")
             DropRock(inst, 0.5)
-
             inst:Remove()
         end)
         SetTimer_derivant(inst, TUNING.TOTAL_DAY_TIME * 8, "siving_derivant_lvl3")
@@ -276,15 +297,10 @@ MakeDerivant({  --子圭森型岩
             end
         end)
         inst.components.workable:SetOnFinishCallback(function(inst, worker)
-            local x, y, z = inst.Transform:GetWorldPosition()
-            SpawnPrefab("rock_break_fx").Transform:SetPosition(x, y, z)
-            SpawnPrefab("collapse_small").Transform:SetPosition(x, y, z)
-            SpawnPrefab("siving_derivant_lvl2").Transform:SetPosition(x, y, z)
-
+            SpawnSkinedPrefab(inst, "siving_derivant_lvl2")
             inst.components.lootdropper:SpawnLootPrefab("siving_rocks")
             inst.components.lootdropper:SpawnLootPrefab("siving_rocks")
             DropRock(inst, 0.5)
-
             inst:Remove()
         end)
 
