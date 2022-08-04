@@ -1967,6 +1967,7 @@ _G.SKIN_IDS_LEGION = {
         rosebush_collector = true, rosorns_collector = true,
         lilybush_era = true, lileaves_era = true,
         orchidbush_disguiser = true,
+        shield_l_log_era = true, --这一个是多给的(当做花泥)
     },
     ["6278c487c340bf24ab31152c"] = { --1鸣惊人(7)
         neverfade_thanks = true, neverfadebush_thanks = true,
