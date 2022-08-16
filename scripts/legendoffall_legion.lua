@@ -34,6 +34,8 @@ local assets = {
     Asset("IMAGE", "images/inventoryimages/siving_ctlwater_item.tex"),
     Asset("ATLAS", "images/inventoryimages/siving_ctldirt_item.xml"),
     Asset("IMAGE", "images/inventoryimages/siving_ctldirt_item.tex"),
+    Asset("ATLAS", "images/inventoryimages/siving_ctlall_item.xml"),
+    Asset("IMAGE", "images/inventoryimages/siving_ctlall_item.tex"),
     Asset("ATLAS", "images/inventoryimages/fishhomingtool_normal.xml"),
     Asset("IMAGE", "images/inventoryimages/fishhomingtool_normal.tex"),
     Asset("ATLAS", "images/inventoryimages/fishhomingtool_awesome.xml"),
@@ -66,7 +68,9 @@ _G.RegistMiniMapImage_legion("siving_derivant")
 _G.RegistMiniMapImage_legion("siving_thetree")
 _G.RegistMiniMapImage_legion("siving_ctlwater")
 _G.RegistMiniMapImage_legion("siving_ctldirt")
+_G.RegistMiniMapImage_legion("siving_ctlall")
 _G.RegistMiniMapImage_legion("siving_turn")
+_G.RegistMiniMapImage_legion("plant_crop_l")
 
 AddRecipe2(
     "siving_soil_item", {

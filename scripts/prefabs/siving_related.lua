@@ -497,7 +497,6 @@ MakeItem({
     prefabs = { "siving_ctlwater" },
     sound = "dontstarve/common/rain_meter_craft",
 })
-
 MakeConstruct({
     name = "water",
     assets = {
@@ -519,7 +518,7 @@ MakeConstruct({
                 x = 0, y = -180, z = 0, scale = nil
             })
             inst.components.botanycontroller.onbarchange = function(botanyctl)
-                SetBar(inst, "siv_bar", "bar", botanyctl.moisture, botanyctl.moisture_max)
+                SetBar(botanyctl.inst, "siv_bar", "bar", botanyctl.moisture, botanyctl.moisture_max)
             end
 
             inst:DoTaskInTime(0.5, function()
@@ -543,7 +542,6 @@ MakeItem({
     prefabs = { "siving_ctldirt" },
     sound = "dontstarve/common/winter_meter_craft",
 })
-
 MakeConstruct({
     name = "dirt",
     assets = {
@@ -571,9 +569,9 @@ MakeConstruct({
                 x = 39, y = -140, z = 0, scale = nil
             })
             inst.components.botanycontroller.onbarchange = function(botanyctl)
-                SetBar(inst, "siv_bar1", "bar1", botanyctl.nutrients[1], botanyctl.nutrient_max)
-                SetBar(inst, "siv_bar2", "bar2", botanyctl.nutrients[2], botanyctl.nutrient_max)
-                SetBar(inst, "siv_bar3", "bar3", botanyctl.nutrients[3], botanyctl.nutrient_max)
+                SetBar(botanyctl.inst, "siv_bar1", "bar1", botanyctl.nutrients[1], botanyctl.nutrient_max)
+                SetBar(botanyctl.inst, "siv_bar2", "bar2", botanyctl.nutrients[2], botanyctl.nutrient_max)
+                SetBar(botanyctl.inst, "siv_bar3", "bar3", botanyctl.nutrients[3], botanyctl.nutrient_max)
             end
 
             inst:DoTaskInTime(0.5, function()
@@ -587,7 +585,64 @@ MakeConstruct({
 --[[ 子圭·崇溟 ]]
 --------------------------------------------------------------------------
 
---all
+MakeItem({
+    name = "all",
+    assets = {
+        Asset("ANIM", "anim/siving_ctlall.zip"),
+        Asset("ATLAS", "images/inventoryimages/siving_ctlall_item.xml"),
+        Asset("IMAGE", "images/inventoryimages/siving_ctlall_item.tex"),
+    },
+    prefabs = { "siving_ctlall" },
+    sound = "dontstarve/common/winter_meter_craft",
+})
+MakeConstruct({
+    name = "all",
+    assets = {
+        Asset("ANIM", "anim/siving_ctlall.zip"),
+        Asset("ANIM", "anim/siving_ctlwater.zip"),
+        Asset("ANIM", "anim/siving_ctldirt.zip"),
+    },
+    prefabs = { "siving_ctlall_item", "siving_ctl_bar" },
+    ctltype = 3,
+    fn_server = function(inst)
+        inst.components.botanycontroller.type = 3
+        inst.components.botanycontroller.moisture_max = 6000
+        inst.components.botanycontroller.nutrient_max = 2400
+
+        inst:DoTaskInTime(0, function()
+            AddBar(inst, {
+                barkey = "siv_bar1",
+                bank = "siving_ctldirt", build = "siving_ctldirt", anim = "bar1",
+                x = -53, y = -335, z = 0, scale = nil
+            })
+            AddBar(inst, {
+                barkey = "siv_bar2",
+                bank = "siving_ctldirt", build = "siving_ctldirt", anim = "bar2",
+                x = -10, y = -360, z = 0, scale = nil
+            })
+            AddBar(inst, {
+                barkey = "siv_bar3",
+                bank = "siving_ctldirt", build = "siving_ctldirt", anim = "bar3",
+                x = 34, y = -335, z = 0, scale = nil
+            })
+            AddBar(inst, {
+                barkey = "siv_bar4",
+                bank = "siving_ctlwater", build = "siving_ctlwater", anim = "bar",
+                x = -10, y = -297, z = 0, scale = nil
+            })
+            inst.components.botanycontroller.onbarchange = function(botanyctl)
+                SetBar(botanyctl.inst, "siv_bar1", "bar1", botanyctl.nutrients[1], botanyctl.nutrient_max)
+                SetBar(botanyctl.inst, "siv_bar2", "bar2", botanyctl.nutrients[2], botanyctl.nutrient_max)
+                SetBar(botanyctl.inst, "siv_bar3", "bar3", botanyctl.nutrients[3], botanyctl.nutrient_max)
+                SetBar(botanyctl.inst, "siv_bar4", "bar", botanyctl.moisture, botanyctl.moisture_max)
+            end
+
+            inst:DoTaskInTime(0.5, function()
+                inst.components.botanycontroller:onbarchange()
+            end)
+        end)
+    end,
+})
 
 --------------------------------------------------------------------------
 --[[ 状态栏 ]]

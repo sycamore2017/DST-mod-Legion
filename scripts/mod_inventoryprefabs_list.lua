@@ -143,6 +143,8 @@ local InventoryPrefabsList = {  --每个元素的下标值为每种物品栏图�
     siving_mask = { build = "images_minisign6", },
     siving_mask_gold = { build = "images_minisign6", },
 
+    siving_ctlall_item = { build = "images_minisign6", },
+
     --skins
     hat_lichen_emo_que = { build = "images_minisign_skins1", },
     neverfade_thanks = { build = "images_minisign_skins1", },

@@ -126,6 +126,16 @@ if TUNING.LEGION_TECHUNLOCK == "lootdropper" then
                 atlas = "images/inventoryimages/siving_mask_gold.xml", image = "siving_mask_gold.tex"
             }, { "RECAST", "ARMOUR", "MAGIC", "RESTORATION" }
         )
+        AddRecipe2(
+            "siving_ctlall_item", {
+                Ingredient("siving_ctlwater_item", 1, "images/inventoryimages/siving_ctlwater_item.xml"),
+                Ingredient("siving_ctldirt_item", 1, "images/inventoryimages/siving_ctldirt_item.xml"),
+                Ingredient("siving_derivant_item", 1, "images/inventoryimages/siving_derivant_item.xml"),
+                Ingredient("singingshell_octave4", 1, nil, nil, "singingshell_octave4_1.tex")
+            }, TECH.LOST, {
+                atlas = "images/inventoryimages/siving_ctlall_item.xml", image = "siving_ctlall_item.tex"
+            }, { "RECAST", "MAGIC", "GARDENING", "STRUCTURES" }
+        )
     end
 
     AddRecipe2(
@@ -250,6 +260,17 @@ else
                 nounlock = true,
                 atlas = "images/inventoryimages/siving_mask_gold.xml", image = "siving_mask_gold.tex"
             }, { "RECAST", "ARMOUR", "MAGIC", "RESTORATION" }
+        )
+        AddRecipe2(
+            "siving_ctlall_item", {
+                Ingredient("siving_ctlwater_item", 1, "images/inventoryimages/siving_ctlwater_item.xml"),
+                Ingredient("siving_ctldirt_item", 1, "images/inventoryimages/siving_ctldirt_item.xml"),
+                Ingredient("siving_derivant_item", 1, "images/inventoryimages/siving_derivant_item.xml"),
+                Ingredient("singingshell_octave4", 1, nil, nil, "singingshell_octave4_1.tex")
+            }, TECH.ELECOURMALINE_THREE, {
+                nounlock = true,
+                atlas = "images/inventoryimages/siving_ctlall_item.xml", image = "siving_ctlall_item.tex"
+            }, { "RECAST", "MAGIC", "GARDENING", "STRUCTURES" }
         )
     end
 

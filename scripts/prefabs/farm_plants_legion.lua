@@ -720,6 +720,7 @@ local function MakePlant2(cropprefab, sets)
 
 			inst.entity:AddTransform()
 			inst.entity:AddAnimState()
+			inst.entity:AddMiniMapEntity()
 			inst.entity:AddSoundEmitter()
 			inst.entity:AddNetwork()
 
@@ -731,6 +732,8 @@ local function MakePlant2(cropprefab, sets)
 			else
 				inst.AnimState:OverrideSymbol("soil", "crop_soil_legion", "soil")
 			end
+
+			inst.MiniMapEntity:SetIcon("plant_crop_l.tex")
 
 			inst:AddTag("plant")
 			inst:AddTag("crop2_legion")
