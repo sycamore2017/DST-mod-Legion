@@ -306,7 +306,7 @@ return {
             recipe_count = 6,
         },
         bananajuice = {
-            cook_need = "(烤)香蕉≥2 冰度≥2",
+            cook_need = "(烤)香蕉≥2",
             cook_cant = nil,
             recipe_count = 6,
         },

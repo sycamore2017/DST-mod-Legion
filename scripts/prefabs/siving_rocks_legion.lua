@@ -34,7 +34,8 @@ if not CONFIGS_LEGION.ENABLEDMODS.MythWords then --未开启神话书说时才�
             inst:AddComponent("inspectable")
 
             inst:AddComponent("tradable")
-            inst.components.tradable.rocktribute = 6
+            inst.components.tradable.rocktribute = 6 --延缓 0.33x6 天地震
+            inst.components.tradable.goldvalue = 4 --换1个砂之石或4金块
 
             inst:AddComponent("bait")
 
@@ -841,7 +842,8 @@ table.insert(prefs, Prefab(
         inst:AddComponent("inspectable")
 
         inst:AddComponent("tradable")
-        inst.components.tradable.rocktribute = 12
+        inst.components.tradable.rocktribute = 18 --延缓 0.33x18 天地震
+        inst.components.tradable.goldvalue = 15 --换1个砂之石或15金块
 
         inst:AddComponent("bait")
 

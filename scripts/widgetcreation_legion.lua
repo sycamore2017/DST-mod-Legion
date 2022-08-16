@@ -27,7 +27,13 @@ if TUNING.LEGION_FLASHANDCRUSH then
         end
     end
 
-    params.beefalo.itemtestfn = containers.params.bundle_container.itemtestfn
+    if containers.params and containers.params.bundle_container then --还是希望和官方保持一致，免得官方修改我还得跟着改
+        params.beefalo.itemtestfn = containers.params.bundle_container.itemtestfn
+    else
+        params.beefalo.itemtestfn = function(container, item, slot)
+            return not (item:HasTag("irreplaceable") or item:HasTag("_container") or item:HasTag("bundle") or item:HasTag("nobundling"))
+        end
+    end
     table.insert(showmeneed, "beefalo")
 end
 

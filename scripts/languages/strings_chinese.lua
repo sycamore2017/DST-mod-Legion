@@ -3392,7 +3392,7 @@ local SURVIVAL_TIPS = { --介绍探险技巧
     "白色的蘑菇帽产生的孢子有很强的的药用价值。生理上，能增强抵抗力，物理上，沾满皮肤也能减少我受到的伤害。",
     "靠近某块奇异的巨石后我突发奇想做出来了几种多功能工具，它们用起来实在是太方便了，我觉得我就是个天才……",
     "专业的钓鱼者都会提前给鱼儿们打窝，不仅能吸引不同的鱼类，提高钓鱼效率，而且有时甚至会吸引到一些不速之客。",
-    "我觉得，蟹族因其当时的科技或魔法水平不够，只能将子圭神木岩封印到地下，但现在就不同了，我们能用先进的思想与技术将其为我所用……",
+    "子圭·育能将一些植物转化成另一种新生长特性的形态，我把这种新形态称为异种。",
     "子圭·垄中蕴含了足够的生命力，能维持作物不断循环生长。",
     "像宽大的木墩和活木这些木料，堆在一起就可以培植孢子植物了。不过这类植物似乎很怕冷，总是活不过大雪皑皑。",
     "小时候奶奶经常跟我说，雨蝇是益虫，逝去时会导致下雨。至今，我都记着她这句话。",
@@ -3405,19 +3405,20 @@ local LORE_TIPS = { --介绍故事背景
     "莱克阿米特每次被打败都会反思，精进技巧提升力量，至今没人知道它的上限到底在哪。",
     "灵魂契约和众多无辜灵魂签下了不平等契约，唯独与其主人不会签订协议，大概是他还有利用价值吧……",
     "有一把不常见的花刃剑，坚硬洁白，能不断保护它的主人，当主人遇到致命威胁时甚至会断掉自己使主人得以保命。",
+    "有位从嗷嗷大陆来的探险家在月亮上修建了一座城堡，里面聚集了各种怪物守卫者，都是为了保护一把传说中的宝剑。这把剑能折射月光为其所用，只有健康无恙的持有者能发挥它最大的力量……",
 }
 local CONTROL_TIPS_NOT_CONSOLE = { --介绍键鼠控制
     "盾击动作的前8帧内被攻击，就能成功触发盾反。",
 }
 
 for i,str in ipairs(SURVIVAL_TIPS) do
-    AddLoadingTip(STRINGS.UI.LOADING_SCREEN_OTHER_TIPS, "TIP_L"..tostring(i), "“"..str.."”-W")
+    AddLoadingTip(STRINGS.UI.LOADING_SCREEN_OTHER_TIPS, "TIP_L"..tostring(i), "【棱镜】“"..str.."”-W")
 end
 for i,str in ipairs(LORE_TIPS) do
-    AddLoadingTip(STRINGS.UI.LOADING_SCREEN_OTHER_TIPS, "TIP_L"..tostring(i), str)
+    AddLoadingTip(STRINGS.UI.LOADING_SCREEN_OTHER_TIPS, "TIP_L"..tostring(i), "【棱镜】"..str)
 end
 for i,str in ipairs(CONTROL_TIPS_NOT_CONSOLE) do
-    AddLoadingTip(STRINGS.UI.LOADING_SCREEN_OTHER_TIPS, "TIP_L"..tostring(i), str)
+    AddLoadingTip(STRINGS.UI.LOADING_SCREEN_OTHER_TIPS, "TIP_L"..tostring(i), "【棱镜】"..str)
 end
 
 SURVIVAL_TIPS = nil

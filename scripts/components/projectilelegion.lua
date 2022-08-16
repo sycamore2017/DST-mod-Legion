@@ -26,17 +26,23 @@ function ProjectileLegion:RotateToTarget(dest, angle)
     self.inst:FacePoint(dest)
 end
 
+local function PositionFix(pos)
+	return Vector3(pos.x, 0, pos.z)
+end
+
 function ProjectileLegion:Throw(owner, targetpos, attacker, angle)
 	self.owner = owner --由武器产生的投射物，或者本身就是个远程投射物
 	self.attacker = attacker --真正发起攻击的对象
 	self.start = owner:GetPosition()
-	self.dest = targetpos
 
 	if self.isgoback then --StartUpdatingComponent会在下一帧执行，但是很可能在这一帧就飞远了
+		self.dest = PositionFix(targetpos)
 		if distsq(self.dest, self.start) <= self.bulletradius*self.bulletradius then
 			self:Miss()
 			return
 		end
+	else
+		self.dest = targetpos
 	end
 
 	if attacker ~= nil and self.launchoffset ~= nil then

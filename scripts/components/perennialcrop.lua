@@ -335,6 +335,40 @@ function PerennialCrop:GetGrowTime(time)
 	)
 end
 
+local function ComputNutrient(self, nowkey, maxkey, have)
+	if self[nowkey] < self[maxkey] and have > 0 then
+		have = math.min(have, self[maxkey] - self[nowkey])
+		self[nowkey] = self[nowkey] + have
+		return -have
+	end
+	return 0
+end
+function PerennialCrop:CostFromLand() --从耕地吸取所需养料、水分
+	local x, y, z = self.inst.Transform:GetWorldPosition()
+	local tile = TheWorld.Map:GetTileAtPoint(x, 0, z)
+	if tile == GROUND.FARMING_SOIL then
+		local farmmgr = TheWorld.components.farming_manager
+		local tile_x, tile_z = TheWorld.Map:GetTileCoordsAtPoint(x, y, z)
+    	local _n1, _n2, _n3 = farmmgr:GetTileNutrients(tile_x, tile_z)
+
+		--加水
+		if self.moisture < self.moisture_max then
+			if farmmgr:IsSoilMoistAtPoint(x, y, z) then
+				local n = self.moisture_max - self.moisture
+				self:PourWater(nil, nil, n)
+				farmmgr:AddSoilMoistureAtPoint(x, y, z, -n)
+			end
+		end
+
+		_n3 = ComputNutrient(self, "nutrient", "nutrient_max", _n3)
+		_n2 = ComputNutrient(self, "nutrientgrow", "nutrientgrow_max", _n2)
+		_n1 = ComputNutrient(self, "nutrientsick", "nutrientsick_max", _n1)
+		if _n3 < 0 or _n2 < 0 or _n1 < 0 then
+			farmmgr:AddTileNutrients(tile_x, tile_z, _n1, _n2, _n3)
+			TriggerNutrient(self)
+		end
+	end
+end
 function PerennialCrop:DoGrowth(skip)
 	local data = self:GetNextStage()
 
@@ -344,7 +378,16 @@ function PerennialCrop:DoGrowth(skip)
 	end
 
 	if data.justgrown then
+		--因为提前施肥和浇水不产生什么影响，所以种子播种时不需要消耗养料水分，于是逻辑就不需要单独提取出来
 		self:CostController() --计算消耗之前，先从管理器拿取资源
+		if
+			self.moisture < self.moisture_max or
+			self.nutrient < self.nutrient_max or
+			self.nutrientgrow < self.nutrientgrow_max or
+			self.nutrientsick < self.nutrientsick_max
+		then --还需要水分或养料，从耕地里汲取
+			self:CostFromLand()
+		end
 
 		if self.nutrient >= self.cost_nutrient then --生长必需肥料的积累
 			self.nutrient = self.nutrient - self.cost_nutrient
@@ -798,8 +841,9 @@ function PerennialCrop:CostController()
 	local need_n1 = math.max(0, self.nutrientgrow_max - self.nutrientgrow)
 	local need_n2 = math.max(0, self.nutrientsick_max - self.nutrientsick)
 	local need_n3 = math.max(0, self.nutrient_max - self.nutrient)
+	local tendable = self:Tendable()
 
-	if need_mo == 0 and need_n1 == 0 and need_n2 == 0 and need_n3 == 0 then
+	if need_mo == 0 and need_n1 == 0 and need_n2 == 0 and need_n3 == 0 and not tendable then
 		return
 	end
 
@@ -834,8 +878,18 @@ function PerennialCrop:CostController()
 					change = true
 				end
 			end
+
+			if tendable and botanyctl.type == 3 then
+				self:TendTo(botanyctl)
+				tendable = false
+			end
+
 			if change then
 				botanyctl:SetBars()
+			end
+
+			if need_mo <= 0 and need_n1 <= 0 and need_n2 <= 0 and need_n3 <= 0 and not tendable then
+				break
 			end
 		end
 	end

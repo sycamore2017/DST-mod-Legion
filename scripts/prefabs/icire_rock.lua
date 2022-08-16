@@ -187,7 +187,8 @@ local function fn()
     inst.components.inventoryitem:SetSinks(true) --它是热能石的浓缩版，应该要沉入水底
 
     inst:AddComponent("tradable")
-    inst.components.tradable.rocktribute = 10
+    inst.components.tradable.rocktribute = 10 --延缓 0.33x10 天地震
+    inst.components.tradable.goldvalue = 7 --换1个砂之石或7金块
 
     inst:AddComponent("temperature")
     inst.components.temperature.current = TheWorld.state.temperature

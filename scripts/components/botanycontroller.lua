@@ -6,7 +6,7 @@ local BotanyController = Class(function(self, inst)
     self.nutrients = { 0, 0, 0 }
     self.onbarchange = nil
 
-    self.moisture_max = 1600
+    self.moisture_max = 2000
     self.nutrient_max = 800
 end)
 

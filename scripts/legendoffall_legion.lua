@@ -602,12 +602,13 @@ if FindFarmPlant then
                 then
                     self.inst.planttarget = nil
                     self.status = FAILED
-                end
-
-                if not cropcpt:Tendable(self.inst, self.wantsstressed) then
+                elseif not cropcpt:Tendable(self.inst, self.wantsstressed) then
                     self.inst.planttarget = nil
                     self.status = SUCCESS
                 end
+            else
+                self.inst.planttarget = nil
+                self.status = FAILED
             end
             return
         end

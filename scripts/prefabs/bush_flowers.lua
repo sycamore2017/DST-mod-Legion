@@ -196,7 +196,7 @@ local function SpawnMyLoot(bush, picker, itemname, itemnumber, mustdrop, checksk
             if skindata and skindata.linkedskins and skindata.linkedskins[itemname] then
                 skindata = skindata.linkedskins[itemname]
                 for i = 1, itemnumber do
-                    bush.components.lootdropper:SpawnLootPrefab(itemname, nil, skindata, nil, picker.userid)
+                    bush.components.lootdropper:SpawnLootPrefab(itemname, nil, skindata, nil, nil)
                 end
                 return
             end

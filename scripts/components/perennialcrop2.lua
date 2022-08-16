@@ -171,12 +171,8 @@ function PerennialCrop2:SetStage(stage, isrotten, skip)
 			crop.numfruit = nil
 			crop.donenutrient = false
 			crop.donetendable = false
-			if TheWorld.state.israining or TheWorld.state.issnowing then --如果此时在下雨/雪
-				crop.donemoisture = true
-			else
-				crop.donemoisture = false
-			end
-			crop:CostController() --从管理器拿取资源
+			crop.donemoisture = false
+			crop:CostNutrition()
 			crop:SetStage(regrowstage, false, false)
 			crop:StartGrowing()
 		end
@@ -267,6 +263,54 @@ function PerennialCrop2:GetGrowTime(time)
 	end
 
 	return data
+end
+
+function PerennialCrop2:CostFromLand() --从耕地吸取所需养料、水分
+	local x, y, z = self.inst.Transform:GetWorldPosition()
+	local tile = TheWorld.Map:GetTileAtPoint(x, 0, z)
+	if tile == GROUND.FARMING_SOIL then
+		local farmmgr = TheWorld.components.farming_manager
+		local tile_x, tile_z = TheWorld.Map:GetTileCoordsAtPoint(x, y, z)
+    	local _n1, _n2, _n3 = farmmgr:GetTileNutrients(tile_x, tile_z)
+
+		--加水
+		if not self.donemoisture then
+			if farmmgr:IsSoilMoistAtPoint(x, y, z) then
+				self.donemoisture = true
+				farmmgr:AddSoilMoistureAtPoint(x, y, z, -2.5)
+			end
+		end
+
+		--施肥
+		if not self.donenutrient then
+			if _n3 > 0 then
+				_n3 = -3
+				_n2 = 0
+				_n1 = 0
+			elseif _n2 > 0 then
+				_n3 = 0
+				_n2 = -3
+				_n1 = 0
+			elseif _n1 > 0 then
+				_n3 = 0
+				_n2 = 0
+				_n1 = -3
+			end
+			if _n3 < 0 or _n2 < 0 or _n1 < 0 then
+				self.donenutrient = true
+				farmmgr:AddTileNutrients(tile_x, tile_z, _n1, _n2, _n3)
+			end
+		end
+	end
+end
+function PerennialCrop2:CostNutrition() --养料水分索取
+	if TheWorld.state.israining or TheWorld.state.issnowing then --如果此时在下雨/雪
+		self.donemoisture = true
+	end
+	self:CostController() --从管理器拿取资源
+	if not self.donemoisture or not self.donenutrient then --还需要水分或养料，从耕地里汲取
+		self:CostFromLand()
+	end
 end
 
 local function CanAcceptNutrients(botanyctl, test)
@@ -440,11 +484,7 @@ function PerennialCrop2:DoGrowth(skip)
 		self.donemoisture = false
 		self.donenutrient = false
 		self.donetendable = false
-
-		if TheWorld.state.israining or TheWorld.state.issnowing then --如果此时在下雨/雪
-			self.donemoisture = true
-		end
-		self:CostController() --从管理器拿取资源
+		self:CostNutrition()
 	end
 
 	self:SetStage(data.stage, false, skip)
@@ -777,22 +817,22 @@ function PerennialCrop2:CostController()
 			local botanyctl = ctl.components.botanycontroller
 			local change = false
 			if not self.donemoisture and (botanyctl.type == 1 or botanyctl.type == 3) and botanyctl.moisture > 0 then
-				botanyctl.moisture = math.max(botanyctl.moisture - 15, 0)
+				botanyctl.moisture = math.max(botanyctl.moisture - 2.5, 0)
 				self.donemoisture = true
 				change = true
 			end
 
 			if not self.donenutrient and (botanyctl.type == 2 or botanyctl.type == 3) then
 				if botanyctl.nutrients[3] > 0 then
-					botanyctl.nutrients[3] = math.max(botanyctl.nutrients[3] - 5, 0)
+					botanyctl.nutrients[3] = math.max(botanyctl.nutrients[3] - 3, 0)
 					self.donenutrient = true
 					change = true
 				elseif botanyctl.nutrients[2] > 0 then
-					botanyctl.nutrients[2] = math.max(botanyctl.nutrients[2] - 5, 0)
+					botanyctl.nutrients[2] = math.max(botanyctl.nutrients[2] - 3, 0)
 					self.donenutrient = true
 					change = true
 				elseif botanyctl.nutrients[1] > 0 then
-					botanyctl.nutrients[1] = math.max(botanyctl.nutrients[1] - 5, 0)
+					botanyctl.nutrients[1] = math.max(botanyctl.nutrients[1] - 3, 0)
 					self.donenutrient = true
 					change = true
 				end
@@ -800,7 +840,7 @@ function PerennialCrop2:CostController()
 
 			if not self.donetendable and botanyctl.type == 3 then
 				self.donetendable = true
-				change = true
+				-- change = true --这种不算消耗的
 				if not self.inst:IsAsleep() then
 					self.inst:DoTaskInTime(0.5 + math.random() * 0.5, function()
 						local fx = SpawnPrefab("farm_plant_happy")

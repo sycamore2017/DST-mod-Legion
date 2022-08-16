@@ -1,10 +1,8 @@
-local assets =
-{
+local assets = {
     Asset("ANIM", "anim/moondungeon.zip"),
 }
 
-local prefabs =
-{
+local prefabs = {
     "staff_castinglight",   --释放怪物时的自身的发光特效
     --"rock_break_fx",    --虽说是特效，其实只是个用来播放声音(矿石破碎时)的载体
     "collapse_big", --建筑物损坏时的灰尘特效
@@ -88,8 +86,7 @@ SetSharedLootTable( 'dungeon_loot_5',
 
 -----
 
-local dungeon_protector =   --普通级保护者
-{
+local dungeon_protector = { --普通级保护者
     "bishop",
     "rook",
     "knight",
@@ -123,16 +120,14 @@ local dungeon_protector =   --普通级保护者
     "goodnight",
 }
 
-local dungeon_protector_boss =  --boss级保护者
-{
+local dungeon_protector_boss = { --boss级保护者
     "deerclops",
     "bearger",
     "stalker_forest",
     "moose",
 }
 
-local protector_data =  --每种保护者的详细数据
-{
+local protector_data = { --每种保护者的详细数据
     --boss级别的保护者
     deerclops = {
         num = 0,            --出现数量的基数
@@ -334,7 +329,15 @@ local function GetDungeonProtector(inst, protector, protdata)
     monster.AnimState:SetMultColour(49/255, 82/255, 156/255, 0.35) --前三个是颜色值，第四个是透明度
 
     if monster.components.lootdropper ~= nil then
-        if math.random() >= protdata.realLootOdds then
+        if protector == "stalker_forest" then --森林影织者还是掉落一些关键物品吧，不然好没用
+            monster.components.lootdropper:SetLoot(nil)
+            monster.components.lootdropper:AddChanceLoot("fossil_piece", 1.0)
+            monster.components.lootdropper:AddChanceLoot("fossil_piece", 1.0)
+            monster.components.lootdropper:AddChanceLoot("fossil_piece", 1.0)
+            monster.components.lootdropper:AddChanceLoot("fossil_piece", 1.0)
+            monster.components.lootdropper:AddChanceLoot("fossil_piece", 0.5)
+            monster.components.lootdropper:AddChanceLoot("fossil_piece", 0.25)
+        elseif math.random() >= protdata.realLootOdds then --代替它原本的掉落物
             monster.components.lootdropper:SetLoot(nil)
             monster.components.lootdropper:SetChanceLootTable('dungeon_loot_5')
         end
@@ -350,8 +353,7 @@ local function GetSpawnNumber(num)
     return (result > 0 and result) or 1
 end
 
-local protector_stage = --各种保护者的生成方式
-{
+local protector_stage = { --各种保护者的生成方式
     --圆的阵势在月光中产生
     starsky = function(inst, worker, protector, protdata)
         local timetime = 0
@@ -797,7 +799,7 @@ local function create()
     inst.entity:AddNetwork()
 
     inst.Transform:SetScale(4, 4, 4)
-    MakeObstaclePhysics(inst, 5)
+    MakeObstaclePhysics(inst, 4.7)
 
     inst.AnimState:SetBank("moondungeon")
     inst.AnimState:SetBuild("moondungeon")

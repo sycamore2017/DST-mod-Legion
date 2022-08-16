@@ -30,7 +30,7 @@ TUNING.LEGION_MOD_LANGUAGES = "english"
 S_NAMES.HAT_LICHEN = "Lichen Hairpin"
 S_RECIPE_DESC.HAT_LICHEN = "I have an \"idea\"! Just like in cartoons."
 S______GENERIC.DESCRIBE.HAT_LICHEN = "An idea that's taken form!"
-S_______WILLOW.DESCRIBE.HAT_LICHEN = "Why not just light it on fire?"
+S_______WILLOW.DESCRIBE.HAT_LICHEN = "You can't really LIGHT it."
 S_____WOLFGANG.DESCRIBE.HAT_LICHEN = "Glowy little gadget."
 S________WENDY.DESCRIBE.HAT_LICHEN = "Abigail used to wear a hairpin like this on Sundays..."
 S_________WX78.DESCRIBE.HAT_LICHEN = "TEMPORARY ORGANIC SOURCE OF LIGHT."
@@ -58,7 +58,7 @@ S________WENDY.DESCRIBE.ROSORNS = "I am so vulnerable in front of love."
 --S______WAXWELL.DESCRIBE.ROSORNS = "Hm... I don't know what I was expecting."
 --S___WATHGRITHR.DESCRIBE.ROSORNS = "I've somehow found a way to make it even LESS appealing!"
 --S_______WEBBER.DESCRIBE.ROSORNS = "Yaaay! Popsicle, popsicle!"
-S_______WINONA.DESCRIBE.ROSORNS = "Rose's fragrance always strikes me deep in my heart..."
+S_______WINONA.DESCRIBE.ROSORNS = "A rose's fragrance always strikes me deep in my heart..."
 
 S_NAMES.LILEAVES = "Lileaves"
 S______GENERIC.DESCRIBE.LILEAVES = "Love's poison makes me helpless."
@@ -636,7 +636,7 @@ S______WAXWELL.DESCRIBE.NEVERFADE = "Hm... this is something created by another 
 S_____WORMWOOD.DESCRIBE.NEVERFADE = "Strong friend."
 
 S_NAMES.SACHET = "Sachet"    --香包
-S_RECIPE_DESC.SACHET = "Cover up your stinky sweat."
+S_RECIPE_DESC.SACHET = "Hides your scent."
 S______GENERIC.DESCRIBE.SACHET = "Should I smell like flowers?"
 --S_______WILLOW.DESCRIBE.SACHET = "This is the opposite of burning."
 S_____WOLFGANG.DESCRIBE.SACHET = "To be honest, this is too feminine..."
@@ -650,17 +650,17 @@ S_______WEBBER.DESCRIBE.SACHET = "Great! We smell sweet!"
 --S_______WINONA.DESCRIBE.SACHET = "Great to cool off after some hard physical labor."
 S_____WORMWOOD.DESCRIBE.SACHET = "Friend inside?"
 
-S______GENERIC.ANNOUNCE_PICK_ROSEBUSH = "I wish I could hug you, till you're really being free."
+S______GENERIC.ANNOUNCE_PICK_ROSEBUSH = "I wish I could help you."
 -- S_______WILLOW.ANNOUNCE_PICK_ROSEBUSH = ""
 -- S_____WOLFGANG.ANNOUNCE_PICK_ROSEBUSH = ""
 -- S________WENDY.ANNOUNCE_PICK_ROSEBUSH = ""
-S_________WX78.ANNOUNCE_PICK_ROSEBUSH = "SAME BAD HAPPENS EVERYDAY."
+S_________WX78.ANNOUNCE_PICK_ROSEBUSH = "A DAMAGING PLANT..."
 -- S_WICKERBOTTOM.ANNOUNCE_PICK_ROSEBUSH = ""
 -- S_______WOODIE.ANNOUNCE_PICK_ROSEBUSH = ""
-S______WAXWELL.ANNOUNCE_PICK_ROSEBUSH = "You switched to his body?"
+S______WAXWELL.ANNOUNCE_PICK_ROSEBUSH = "You switched to this body?"
 -- S___WATHGRITHR.ANNOUNCE_PICK_ROSEBUSH = ""
 -- S_______WEBBER.ANNOUNCE_PICK_ROSEBUSH = ""
-S_______WINONA.ANNOUNCE_PICK_ROSEBUSH = "One day I will be you."
+S_______WINONA.ANNOUNCE_PICK_ROSEBUSH = "One day I will be with you."
 -- S_______WORTOX.ANNOUNCE_PICK_ROSEBUSH = ""
 -- S________WARLY.ANNOUNCE_PICK_ROSEBUSH = ""
 
@@ -669,7 +669,7 @@ S_NAMES.FOLIAGEATH = "Foliageath" --青枝绿叶
 S______GENERIC.DESCRIBE.FOLIAGEATH =
 {
     MERGED = "Seems like I found it's purpose.",
-    GENERIC = "Who is it waiting for?",
+    GENERIC = "Who or what is it waiting for?",
 }
 -- S_______WILLOW.DESCRIBE.FOLIAGEATH = ""
 -- S_____WOLFGANG.DESCRIBE.FOLIAGEATH = ""
@@ -742,7 +742,7 @@ S______GENERIC.ANNOUNCE_HIS_LOVE_WISH = "Wish it could last forever but sometime
 --------------------------------------------------------------------------
 
 S_NAMES.PETALS_ROSE = "Rose Petals"
-S______GENERIC.DESCRIBE.PETALS_ROSE = "A rose is a rose!"
+S______GENERIC.DESCRIBE.PETALS_ROSE = "A rose is a rose, and it blooms for no one but itself."
 --S_______WILLOW.DESCRIBE.PETALS_ROSE = "This is the opposite of burning."
 --S_____WOLFGANG.DESCRIBE.PETALS_ROSE = "Wolfgang can eat in one bite!"
 --S________WENDY.DESCRIBE.PETALS_ROSE = "I used to eat these with Abigail..."
@@ -755,7 +755,7 @@ S______WAXWELL.DESCRIBE.PETALS_ROSE = "Wise men don’t believe in roses."
 S_______WINONA.DESCRIBE.PETALS_ROSE = "A rose is a rose, Just like everybody knows."
 
 S_NAMES.PETALS_LILY = "Lily Petals"
-S______GENERIC.DESCRIBE.PETALS_LILY = "A lily is a lily!"
+S______GENERIC.DESCRIBE.PETALS_LILY = "A lily is a lily, and the soul of the deceased being restored to innocence."
 S_______WILLOW.DESCRIBE.PETALS_LILY = "If the ground below us turned to dust, Would he come to me?"
 --S_____WOLFGANG.DESCRIBE.PETALS_LILY = "Wolfgang can eat in one bite!"
 S________WENDY.DESCRIBE.PETALS_LILY = "I'd like it if he say it's a nice gift."
@@ -768,7 +768,7 @@ S_______WEBBER.DESCRIBE.PETALS_LILY = "If we were to bring her some flowers, wou
 --S_______WINONA.DESCRIBE.PETALS_LILY = "Great to cool off after some hard physical labor."
 
 S_NAMES.PETALS_ORCHID = "Orchid Petals"
-S______GENERIC.DESCRIBE.PETALS_ORCHID = "A orchid is a orchid!"
+S______GENERIC.DESCRIBE.PETALS_ORCHID = "An orchid is an orchid, and the love of the soul of the deceased."
 --S_______WILLOW.DESCRIBE.PETALS_ORCHID = "This is the opposite of burning."
 --S_____WOLFGANG.DESCRIBE.PETALS_ORCHID = "Wolfgang can eat in one bite!"
 --S________WENDY.DESCRIBE.PETALS_ORCHID = "I used to eat these with Abigail..."
@@ -823,7 +823,7 @@ S______GENERIC.DESCRIBE.DISH_ORCHIDCAKE = "I seemed to hear a quiet voice that c
 --S_______WINONA.DESCRIBE.DISH_ORCHIDCAKE = "Great to cool off after some hard physical labor."
 
 S_NAMES.DISH_FLESHNAPOLEON = "Flesh Napoleon"    --真果拿破仑
-STRINGS.UI.COOKBOOK.DISH_FLESHNAPOLEON = "Skin glow"
+STRINGS.UI.COOKBOOK.DISH_FLESHNAPOLEON = "Glowing skin"
 S______GENERIC.DESCRIBE.DISH_FLESHNAPOLEON = "The brightest star in the night sky is coming!"
 --S_______WILLOW.DESCRIBE.DISH_FLESHNAPOLEON = "This is the opposite of burning."
 --S_____WOLFGANG.DESCRIBE.DISH_FLESHNAPOLEON = "Wolfgang can eat in one bite!"
@@ -837,7 +837,7 @@ S______GENERIC.DESCRIBE.DISH_FLESHNAPOLEON = "The brightest star in the night sk
 --S_______WINONA.DESCRIBE.DISH_FLESHNAPOLEON = "Great to cool off after some hard physical labor."
 
 S_NAMES.DISH_BEGGINGMEAT = "Begging Meat"    --叫花焖肉
-STRINGS.UI.COOKBOOK.DISH_BEGGINGMEAT = "Hunger emergency"
+STRINGS.UI.COOKBOOK.DISH_BEGGINGMEAT = "Extra hunger in an emergency"
 S______GENERIC.DESCRIBE.DISH_BEGGINGMEAT = "For the moment, at least I don't have to beg for survival."
 --S_______WILLOW.DESCRIBE.DISH_BEGGINGMEAT = "This is the opposite of burning."
 --S_____WOLFGANG.DESCRIBE.DISH_BEGGINGMEAT = "Wolfgang can eat in one bite!"
@@ -941,7 +941,7 @@ S________WENDY.DESCRIBE.DISH_MEDICINALLIQUOR = {
 --S_______WOODIE.DESCRIBE.DISH_MEDICINALLIQUOR =
 --S______WAXWELL.DESCRIBE.DISH_MEDICINALLIQUOR =
 S___WATHGRITHR.DESCRIBE.DISH_MEDICINALLIQUOR = {
-    GENERIC = "Feel no pain! fight to death!",
+    GENERIC = "Feel no pain! Fight to the death!",
     DRUNK = "Oh, just water!",
 }
 S_______WEBBER.DESCRIBE.DISH_MEDICINALLIQUOR = {
@@ -997,13 +997,13 @@ S_WICKERBOTTOM.DESCRIBE.DISH_DURIANTARTARE = "Umm... the meat is still raw, and 
 --S___WATHGRITHR.DESCRIBE.DISH_DURIANTARTARE = "I've somehow found a way to make it even LESS appealing!"
 S_______WEBBER.DESCRIBE.DISH_DURIANTARTARE = "A lump of raw meat, cool!"
 --S_______WINONA.DESCRIBE.DISH_DURIANTARTARE = "Great to cool off after some hard physical labor."
-S_______WORTOX.DESCRIBE.DISH_DURIANTARTARE = "Whose flesh is this, with a little yummy soul remained."
+S_______WORTOX.DESCRIBE.DISH_DURIANTARTARE = "Whose flesh is this, a yummy little remnant of it's soul remains."
 
 S_NAMES.DISH_MERRYCHRISTMASSALAD = "\"Merry Christmas\" Salad"    --“圣诞快乐”沙拉
 STRINGS.UI.COOKBOOK.DISH_MERRYCHRISTMASSALAD = "Produces a gift"
-S______GENERIC.DESCRIBE.DISH_MERRYCHRISTMASSALAD = "Look at the Christmas tree, and eat a christmas tree."
+S______GENERIC.DESCRIBE.DISH_MERRYCHRISTMASSALAD = "Look at the Christmas tree, now eat the christmas tree."
 -- S_______WILLOW.DESCRIBE.DISH_MERRYCHRISTMASSALAD = "Mess! needs a fire!"
-S_____WOLFGANG.DESCRIBE.DISH_MERRYCHRISTMASSALAD = "Wolfgang wants a gift, Santa Claus, please."
+S_____WOLFGANG.DESCRIBE.DISH_MERRYCHRISTMASSALAD = "Wolfgang wants a gift Santa Claus, please."
 --S________WENDY.DESCRIBE.DISH_MERRYCHRISTMASSALAD = "I used to eat these with Abigail..."
 --S_________WX78.DESCRIBE.DISH_MERRYCHRISTMASSALAD = "STICK ADDON INSTALLED"
 -- S_WICKERBOTTOM.DESCRIBE.DISH_MERRYCHRISTMASSALAD = "Umm... the meat is still raw, and it stinks."
@@ -1029,7 +1029,7 @@ S______WAXWELL.DESCRIBE.DISH_MURMURANANAS = "This cuisine will never disappear o
 
 S_NAMES.DISH_SHYERRYJAM = "Shyerry Jam"    --颤栗果酱
 STRINGS.UI.COOKBOOK.DISH_SHYERRYJAM = "Self-healing in moderation"
-S______GENERIC.DESCRIBE.DISH_SHYERRYJAM = "I'd love to pour it over scones or make a pie, then eat it."
+S______GENERIC.DESCRIBE.DISH_SHYERRYJAM = "I'd love to pour it over scones or make a pie with it."
 -- S_______WILLOW.DESCRIBE.DISH_SHYERRYJAM = "This is the opposite of burning."
 -- S_____WOLFGANG.DESCRIBE.DISH_SHYERRYJAM = "Wolfgang loves it so much that he wants to eat it again!"
 -- S________WENDY.DESCRIBE.DISH_SHYERRYJAM = "I used to eat these with Abigail..."
@@ -1042,7 +1042,7 @@ S_________WX78.DESCRIBE.DISH_SHYERRYJAM = "NO DESSERT, JUST EAT IT DIRECTLY."
 -- S_______WINONA.DESCRIBE.DISH_SHYERRYJAM = "Great to cool off after some hard physical labor."
 -- S_______WORTOX.DESCRIBE.DISH_SHYERRYJAM = "Whose flesh is this, with a little yummy soul remained."
 
-S_NAMES.DISH_SUGARLESSTRICKMAKERCUPCAKES = "Sugarless Trickmaker Cupcakes"   --无糖捣蛋鬼纸杯蛋糕
+S_NAMES.DISH_SUGARLESSTRICKMAKERCUPCAKES = "Sugarless Trickster Cupcakes"   --无糖捣蛋鬼纸杯蛋糕
 STRINGS.UI.COOKBOOK.DISH_SUGARLESSTRICKMAKERCUPCAKES = "Naughty elves will help you"
 S______GENERIC.DESCRIBE.DISH_SUGARLESSTRICKMAKERCUPCAKES =
 {
@@ -1067,12 +1067,12 @@ S_________WX78.DESCRIBE.DISH_SUGARLESSTRICKMAKERCUPCAKES =
 {
     GENERIC = "MY BODY CRAVES DEOXYRIBOSE.",
     TRICKED = "SUDDEN WARNING!",
-    TREAT = "JUST GIVE YOU SOMTHING I DON'T WANT.",
+    TREAT = "I'LL JUST GIVE YOU SOMTHING I DON'T WANT.",
 }
 S_WICKERBOTTOM.DESCRIBE.DISH_SUGARLESSTRICKMAKERCUPCAKES =
 {
     GENERIC = "I believe it's a trick.",
-    TRICKED = "This is not allowed in library!",
+    TRICKED = "That's not allowed in a library!",
     TREAT = "Here's your candy.",
 }
 -- S_______WOODIE.DESCRIBE.DISH_SUGARLESSTRICKMAKERCUPCAKES = ""
@@ -1106,10 +1106,10 @@ S________WARLY.DESCRIBE.DISH_SUGARLESSTRICKMAKERCUPCAKES =
 -- S_________WURT.DESCRIBE.DISH_SUGARLESSTRICKMAKERCUPCAKES = ""
 
 S_NAMES.DISH_FLOWERMOONCAKE = "Flower Mooncake"    --鲜花月饼
-STRINGS.UI.COOKBOOK.DISH_FLOWERMOONCAKE = "Get the power of missing"
+STRINGS.UI.COOKBOOK.DISH_FLOWERMOONCAKE = "Obtain power from longing"
 S______GENERIC.DESCRIBE.DISH_FLOWERMOONCAKE =
 {
-    GENERIC = "The scent of flowers, like my yearning.",
+    GENERIC = "The scent of yearning.",
     HAPPY = "I will always have someone important on my mind.",
     LONELY = "Lonely and sad.",
 }
@@ -1118,14 +1118,14 @@ S______GENERIC.DESCRIBE.DISH_FLOWERMOONCAKE =
 S________WENDY.DESCRIBE.DISH_FLOWERMOONCAKE =
 {
     GENERIC = "Come, Abigail, enjoy the moon with me!",
-    HAPPY = "So nostalgic for the day we sat on the table cloth on the grass.",
+    HAPPY = "So nostalgic for the day we had a picnic.",
     LONELY = "Unprecedented loneliness is eroding me.",
 }
 S_________WX78.DESCRIBE.DISH_FLOWERMOONCAKE =
 {
     GENERIC = "LOW VALUE FUEL.",
-    HAPPY = "UNKNOWN INTRUDER IS TRYING TO REPAIR THE EMOTIONAL COMPONENT.",
-    LONELY = "STILL WRONG, THE EMOTIONAL COMPONENT IS NOT RESPONDING.",
+    HAPPY = "UNKNOWN INTRUDER IS TRYING TO REPAIR THE EMOTION MODULE.",
+    LONELY = "STILL WRONG, THE EMOTIONAL MODULE IS NOT RESPONDING.",
 }
 -- S_WICKERBOTTOM.DESCRIBE.DISH_FLOWERMOONCAKE = ""
 -- S_______WOODIE.DESCRIBE.DISH_FLOWERMOONCAKE = ""
@@ -1161,13 +1161,13 @@ S______GENERIC.DESCRIBE.DISH_FAREWELLCUPCAKE = "So easy to be careless, but take
 -- S_____WOLFGANG.DESCRIBE.DISH_FAREWELLCUPCAKE = ""
 S________WENDY.DESCRIBE.DISH_FAREWELLCUPCAKE = "Failures, let everyone down, including ourselves."
 -- S_________WX78.DESCRIBE.DISH_FAREWELLCUPCAKE = ""
-S_WICKERBOTTOM.DESCRIBE.DISH_FAREWELLCUPCAKE = "Unfortunately, most of people are act self-awareness."
+S_WICKERBOTTOM.DESCRIBE.DISH_FAREWELLCUPCAKE = "Unfortunately, some lack the self-awareness to not make this decision."
 S_______WOODIE.DESCRIBE.DISH_FAREWELLCUPCAKE = "People are alienated from each other with a broken heart."
 S______WAXWELL.DESCRIBE.DISH_FAREWELLCUPCAKE = "My life is not worth mentioning."
 S___WATHGRITHR.DESCRIBE.DISH_FAREWELLCUPCAKE = "Don't you have enough?"
-S_______WEBBER.DESCRIBE.DISH_FAREWELLCUPCAKE = "Come on! Our pure spiritual world."
+S_______WEBBER.DESCRIBE.DISH_FAREWELLCUPCAKE = "It's not my decision to make, we have to decide together."
 -- S_______WINONA.DESCRIBE.DISH_FAREWELLCUPCAKE = ""
-S_______WORTOX.DESCRIBE.DISH_FAREWELLCUPCAKE = "Sorry, it's so painful to be alive and I'm not done yet."
+S_______WORTOX.DESCRIBE.DISH_FAREWELLCUPCAKE = "Sorry, it may be painful to be alive but I'm not done yet."
 -- S_____WORMWOOD.DESCRIBE.DISH_FAREWELLCUPCAKE = ""
 -- S________WARLY.DESCRIBE.DISH_FAREWELLCUPCAKE = ""
 S_________WURT.DESCRIBE.DISH_FAREWELLCUPCAKE = "To deliberately believe in lies while knowing their false."
@@ -1187,13 +1187,13 @@ S_______WOODIE.DESCRIBE.DISH_BRAISEDMEATWITHFOLIAGES = "It goes well with rice."
 -- S_______WINONA.DESCRIBE.DISH_BRAISEDMEATWITHFOLIAGES = ""
 -- S_______WORTOX.DESCRIBE.DISH_BRAISEDMEATWITHFOLIAGES = ""
 -- S_____WORMWOOD.DESCRIBE.DISH_BRAISEDMEATWITHFOLIAGES = ""
-S________WARLY.DESCRIBE.DISH_BRAISEDMEATWITHFOLIAGES = "It's not easy to make fat meat non greasy."
+S________WARLY.DESCRIBE.DISH_BRAISEDMEATWITHFOLIAGES = "It's not easy to make fat meat not greasy."
 -- S_________WURT.DESCRIBE.DISH_BRAISEDMEATWITHFOLIAGES = ""
 -- S_______WALTER.DESCRIBE.DISH_BRAISEDMEATWITHFOLIAGES = ""
 
 S_NAMES.DISH_WRAPPEDSHRIMPPASTE = "Wrapped Mushrimp" --白菇虾滑卷
-STRINGS.UI.COOKBOOK.DISH_WRAPPEDSHRIMPPASTE = "Enhance resistance"
-S______GENERIC.DESCRIBE.DISH_WRAPPEDSHRIMPPASTE = "Great! The outer layer locks well the shrimp meat essence."
+STRINGS.UI.COOKBOOK.DISH_WRAPPEDSHRIMPPASTE = "Enhances resistance"
+S______GENERIC.DESCRIBE.DISH_WRAPPEDSHRIMPPASTE = "Great! The outer layer locks well the shrimp essence."
 -- S_______WILLOW.DESCRIBE.DISH_WRAPPEDSHRIMPPASTE = ""
 -- S_____WOLFGANG.DESCRIBE.DISH_WRAPPEDSHRIMPPASTE = ""
 -- S________WENDY.DESCRIBE.DISH_WRAPPEDSHRIMPPASTE = ""
@@ -1203,47 +1203,47 @@ S_______WOODIE.DESCRIBE.DISH_WRAPPEDSHRIMPPASTE = "So delicious. Can I have the 
 -- S______WAXWELL.DESCRIBE.DISH_WRAPPEDSHRIMPPASTE = ""
 -- S___WATHGRITHR.DESCRIBE.DISH_WRAPPEDSHRIMPPASTE = ""
 -- S_______WEBBER.DESCRIBE.DISH_WRAPPEDSHRIMPPASTE = ""
-S_______WINONA.DESCRIBE.DISH_WRAPPEDSHRIMPPASTE = "Made smooth and delicate taste, it's not me."
+S_______WINONA.DESCRIBE.DISH_WRAPPEDSHRIMPPASTE = "A smooth and delicate taste, it's just not me."
 -- S_______WORTOX.DESCRIBE.DISH_WRAPPEDSHRIMPPASTE = ""
-S_____WORMWOOD.DESCRIBE.DISH_WRAPPEDSHRIMPPASTE = "Beautiful friend, suitable, making beautiful meal."
+S_____WORMWOOD.DESCRIBE.DISH_WRAPPEDSHRIMPPASTE = "Beautiful friend, making a beautiful meal."
 S________WARLY.DESCRIBE.DISH_WRAPPEDSHRIMPPASTE = "Ah, the mushroom, the shrimp, my life has reached the peak!"
 S_________WURT.DESCRIBE.DISH_WRAPPEDSHRIMPPASTE = "It's cruel, glort."
 -- S_______WALTER.DESCRIBE.DISH_WRAPPEDSHRIMPPASTE = ""
 
 S_NAMES.DISH_SOSWEETJARKFRUIT = "So Sweet Jarkfruit" --甜到裂开的松萝蜜
-S______GENERIC.DESCRIBE.DISH_SOSWEETJARKFRUIT = "It was so sweet that I flustered."
+S______GENERIC.DESCRIBE.DISH_SOSWEETJARKFRUIT = "It was so sweet that I got flustered."
 S_______WILLOW.DESCRIBE.DISH_SOSWEETJARKFRUIT = "Too sweet, chef."
 -- S_____WOLFGANG.DESCRIBE.DISH_SOSWEETJARKFRUIT = ""
-S________WENDY.DESCRIBE.DISH_SOSWEETJARKFRUIT = "There's two of them, and one for Abigail."
+S________WENDY.DESCRIBE.DISH_SOSWEETJARKFRUIT = "There's two of them, one for me and one for Abigail."
 S_________WX78.DESCRIBE.DISH_SOSWEETJARKFRUIT = "FUEL DETECTION: EXCESSIVE HEAT."
 S_WICKERBOTTOM.DESCRIBE.DISH_SOSWEETJARKFRUIT = "I shouldn't eat such unhealthy food."
 -- S_______WOODIE.DESCRIBE.DISH_SOSWEETJARKFRUIT = ""
 -- S______WAXWELL.DESCRIBE.DISH_SOSWEETJARKFRUIT = ""
 -- S___WATHGRITHR.DESCRIBE.DISH_SOSWEETJARKFRUIT = ""
-S_______WEBBER.DESCRIBE.DISH_SOSWEETJARKFRUIT = "Oh yeah, my favorite!"
+S_______WEBBER.DESCRIBE.DISH_SOSWEETJARKFRUIT = "So sweet, I'm in heaven!"
 S_______WINONA.DESCRIBE.DISH_SOSWEETJARKFRUIT = "Did no one notice a crack in the bottle?"
-S_______WORTOX.DESCRIBE.DISH_SOSWEETJARKFRUIT = "Love is sugar, sweet to sadness."
+S_______WORTOX.DESCRIBE.DISH_SOSWEETJARKFRUIT = "Love is to sugar, as sweet is to sadness."
 S_____WORMWOOD.DESCRIBE.DISH_SOSWEETJARKFRUIT = "Crack!"
-S________WARLY.DESCRIBE.DISH_SOSWEETJARKFRUIT = "I have an appointment with sweet lady."
+S________WARLY.DESCRIBE.DISH_SOSWEETJARKFRUIT = "I have an appointment with a sweet lady."
 -- S_________WURT.DESCRIBE.DISH_SOSWEETJARKFRUIT = ""
 S_______WALTER.DESCRIBE.DISH_SOSWEETJARKFRUIT = "Not a perfect dish because it's cracked."
 
 S_NAMES.DISH_FRIEDFISHWITHPUREE = "Fried Fish With Puree" --果泥香煎鱼
-STRINGS.UI.COOKBOOK.DISH_FRIEDFISHWITHPUREE = "Let you can't stop flow"
+STRINGS.UI.COOKBOOK.DISH_FRIEDFISHWITHPUREE = "Can't stop the flow"
 S______GENERIC.DESCRIBE.DISH_FRIEDFISHWITHPUREE = "So crisp, so luscious, so nice!"
-S_______WILLOW.DESCRIBE.DISH_FRIEDFISHWITHPUREE = "The flame made it look good."
+S_______WILLOW.DESCRIBE.DISH_FRIEDFISHWITHPUREE = "The flame makes it look good."
 S_____WOLFGANG.DESCRIBE.DISH_FRIEDFISHWITHPUREE = "Delicious is best."
 -- S________WENDY.DESCRIBE.DISH_FRIEDFISHWITHPUREE = ""
 -- S_________WX78.DESCRIBE.DISH_FRIEDFISHWITHPUREE = ""
 S_WICKERBOTTOM.DESCRIBE.DISH_FRIEDFISHWITHPUREE = "Honestly, the fish looks suspicious."
-S_______WOODIE.DESCRIBE.DISH_FRIEDFISHWITHPUREE = "Finish it quickly, I have work to do."
+S_______WOODIE.DESCRIBE.DISH_FRIEDFISHWITHPUREE = "I want to finish it quickly, I have work to do."
 -- S______WAXWELL.DESCRIBE.DISH_FRIEDFISHWITHPUREE = ""
 S___WATHGRITHR.DESCRIBE.DISH_FRIEDFISHWITHPUREE = "Why not try it."
 -- S_______WEBBER.DESCRIBE.DISH_FRIEDFISHWITHPUREE = ""
 -- S_______WINONA.DESCRIBE.DISH_FRIEDFISHWITHPUREE = ""
-S_______WORTOX.DESCRIBE.DISH_FRIEDFISHWITHPUREE = "The trick, nah, the dish is so funny."
+S_______WORTOX.DESCRIBE.DISH_FRIEDFISHWITHPUREE = "Hmm, this seems like a trick. Kind of funny."
 -- S_____WORMWOOD.DESCRIBE.DISH_FRIEDFISHWITHPUREE = ""
-S________WARLY.DESCRIBE.DISH_FRIEDFISHWITHPUREE = "With years of cooking experience, don't eat!"
+S________WARLY.DESCRIBE.DISH_FRIEDFISHWITHPUREE = "With years of cooking experience, I emplore you to not eat it!"
 S_________WURT.DESCRIBE.DISH_FRIEDFISHWITHPUREE = "Those who eat fish will be punished by it."
 -- S_______WALTER.DESCRIBE.DISH_FRIEDFISHWITHPUREE = ""
 S________WANDA.DESCRIBE.DISH_FRIEDFISHWITHPUREE = "Haha, not only your time is passing."
@@ -1332,7 +1332,7 @@ S______GENERIC.ANNOUNCE_ATTACH_BUFF_HUNGERRETARDER = "No appetite at all."
 -- S_________WX78.ANNOUNCE_ATTACH_BUFF_HUNGERRETARDER = ""
 S_WICKERBOTTOM.ANNOUNCE_ATTACH_BUFF_HUNGERRETARDER = "This food boosts my satiety."
 -- S_______WOODIE.ANNOUNCE_ATTACH_BUFF_HUNGERRETARDER = ""
-S______WAXWELL.ANNOUNCE_ATTACH_BUFF_HUNGERRETARDER = "Not well for my old stomach."
+S______WAXWELL.ANNOUNCE_ATTACH_BUFF_HUNGERRETARDER = "Not good for my old stomach."
 -- S___WATHGRITHR.ANNOUNCE_ATTACH_BUFF_HUNGERRETARDER = ""
 -- S_______WEBBER.ANNOUNCE_ATTACH_BUFF_HUNGERRETARDER = ""
 S_______WINONA.ANNOUNCE_ATTACH_BUFF_HUNGERRETARDER = "The less hungry you are, the better you can work."
@@ -1348,9 +1348,9 @@ S______GENERIC.ANNOUNCE_DETACH_BUFF_HUNGERRETARDER = "Good luck comes when you h
 -- S_____WOLFGANG.ANNOUNCE_DETACH_BUFF_HUNGERRETARDER = ""
 -- S________WENDY.ANNOUNCE_DETACH_BUFF_HUNGERRETARDER = ""
 -- S_________WX78.ANNOUNCE_DETACH_BUFF_HUNGERRETARDER = ""
-S_WICKERBOTTOM.ANNOUNCE_DETACH_BUFF_HUNGERRETARDER = "Satiety returns to normal."
+S_WICKERBOTTOM.ANNOUNCE_DETACH_BUFF_HUNGERRETARDER = "Hunger returns to normal."
 -- S_______WOODIE.ANNOUNCE_DETACH_BUFF_HUNGERRETARDER = ""
-S______WAXWELL.ANNOUNCE_DETACH_BUFF_HUNGERRETARDER = "My stomach felt better at last."
+S______WAXWELL.ANNOUNCE_DETACH_BUFF_HUNGERRETARDER = "My stomach feels better at last."
 -- S___WATHGRITHR.ANNOUNCE_DETACH_BUFF_HUNGERRETARDER = ""
 -- S_______WEBBER.ANNOUNCE_DETACH_BUFF_HUNGERRETARDER = ""
 S_______WINONA.ANNOUNCE_DETACH_BUFF_HUNGERRETARDER = "Even if you're hungry, you have to keep working."
@@ -1364,18 +1364,18 @@ S_______WINONA.ANNOUNCE_DETACH_BUFF_HUNGERRETARDER = "Even if you're hungry, you
 --力量增幅buff
 -- S______GENERIC.ANNOUNCE_ATTACH_BUFF_STRENGTHENHANCER = "" --属于药酒的buff，但是药酒已经会让玩家说话了，所以这里不再重复说
 --
-S______GENERIC.ANNOUNCE_DETACH_BUFF_STRENGTHENHANCER = "The power enhancement effect has disappeared."
+S______GENERIC.ANNOUNCE_DETACH_BUFF_STRENGTHENHANCER = "The power enhancement effect has faded."
 S_______WILLOW.ANNOUNCE_DETACH_BUFF_STRENGTHENHANCER = "The burning of muscles is over."
 S_____WOLFGANG.ANNOUNCE_DETACH_BUFF_STRENGTHENHANCER = "Wolfgang felt the disappearance of brute force."
 -- S________WENDY.ANNOUNCE_DETACH_BUFF_STRENGTHENHANCER = ""
-S_________WX78.ANNOUNCE_DETACH_BUFF_STRENGTHENHANCER = "OVERLOAD OPERATION OF THE FORCE COMPONENT IS OVER."
-S_WICKERBOTTOM.ANNOUNCE_DETACH_BUFF_STRENGTHENHANCER = "The power gained by shortcut will not last long after all."
+S_________WX78.ANNOUNCE_DETACH_BUFF_STRENGTHENHANCER = "OVERLOAD OPERATION IS OVER."
+S_WICKERBOTTOM.ANNOUNCE_DETACH_BUFF_STRENGTHENHANCER = "The power gained by a shortcut doesn't last long after all."
 -- S_______WOODIE.ANNOUNCE_DETACH_BUFF_STRENGTHENHANCER = ""
 -- S______WAXWELL.ANNOUNCE_DETACH_BUFF_STRENGTHENHANCER = ""
 S___WATHGRITHR.ANNOUNCE_DETACH_BUFF_STRENGTHENHANCER = "This power dissipated after all."
 S_______WEBBER.ANNOUNCE_DETACH_BUFF_STRENGTHENHANCER = "Our little hands have become weak again."
 -- S_______WINONA.ANNOUNCE_DETACH_BUFF_STRENGTHENHANCER = ""
-S_______WORTOX.ANNOUNCE_DETACH_BUFF_STRENGTHENHANCER = "I wish my strength could last 10000 years."
+S_______WORTOX.ANNOUNCE_DETACH_BUFF_STRENGTHENHANCER = "I wish my strength could've lasted 10000 years."
 -- S_____WORMWOOD.ANNOUNCE_DETACH_BUFF_STRENGTHENHANCER = ""
 S________WARLY.ANNOUNCE_DETACH_BUFF_STRENGTHENHANCER = "Extra power has been completely digested."
 -- S_________WURT.ANNOUNCE_DETACH_BUFF_STRENGTHENHANCER = ""
@@ -1399,30 +1399,30 @@ S_____WORMWOOD.ANNOUNCE_ATTACH_BUFF_OILFLOW = "Come on!"
 S________WARLY.ANNOUNCE_ATTACH_BUFF_OILFLOW = "Is that how curious I am?"
 -- S_________WURT.ANNOUNCE_ATTACH_BUFF_OILFLOW = ""
 S_______WALTER.ANNOUNCE_ATTACH_BUFF_OILFLOW = "Walter has to be adventurous."
-S________WANDA.ANNOUNCE_ATTACH_BUFF_OILFLOW = "There is no back!"
+S________WANDA.ANNOUNCE_ATTACH_BUFF_OILFLOW = "There is no going back!"
 --
-S______GENERIC.ANNOUNCE_DETACH_BUFF_OILFLOW = "Oh, finally, now I just want to find a hole to hide."
+S______GENERIC.ANNOUNCE_DETACH_BUFF_OILFLOW = "Oh, finally, now I just want to find a hole to hide in."
 S_______WILLOW.ANNOUNCE_DETACH_BUFF_OILFLOW = "I don't want to talk to anyone right now!"
-S_____WOLFGANG.ANNOUNCE_DETACH_BUFF_OILFLOW = "Wolfgang finished it."
+S_____WOLFGANG.ANNOUNCE_DETACH_BUFF_OILFLOW = "Wolfgang is finished."
 S________WENDY.ANNOUNCE_DETACH_BUFF_OILFLOW = "Do you think this will happen to me?"
 S_________WX78.ANNOUNCE_DETACH_BUFF_OILFLOW = "FUEL SYSTEM HAS BEEN REPAIRED."
 S_WICKERBOTTOM.ANNOUNCE_DETACH_BUFF_OILFLOW = "Fortunately, no one saw it. There's no shame."
-S_______WOODIE.ANNOUNCE_DETACH_BUFF_OILFLOW = "It should be solved in the field. We can't waste it."
+S_______WOODIE.ANNOUNCE_DETACH_BUFF_OILFLOW = "It should be used. We can't waste it."
 S______WAXWELL.ANNOUNCE_DETACH_BUFF_OILFLOW = "Where is my dignity?!"
-S___WATHGRITHR.ANNOUNCE_DETACH_BUFF_OILFLOW = "It has nothing to do with the glory of fighter."
+S___WATHGRITHR.ANNOUNCE_DETACH_BUFF_OILFLOW = "This has nothing to do with the glory of fighter."
 S_______WEBBER.ANNOUNCE_DETACH_BUFF_OILFLOW = "Oh, that's too bad. I'll be scolded by mom."
 S_______WINONA.ANNOUNCE_DETACH_BUFF_OILFLOW = "It's over. There's a lot to clean up."
-S_______WORTOX.ANNOUNCE_DETACH_BUFF_OILFLOW = "Amazing, I feel like my soul is about to be pulled out."
+S_______WORTOX.ANNOUNCE_DETACH_BUFF_OILFLOW = "Amazing, I feel like my soul was about to be pulled out."
 S_____WORMWOOD.ANNOUNCE_DETACH_BUFF_OILFLOW = "A wonderful experience."
 S________WARLY.ANNOUNCE_DETACH_BUFF_OILFLOW = "Curiosity killed the cat."
-S_________WURT.ANNOUNCE_DETACH_BUFF_OILFLOW = "So funny, I used to have cows that did this."
+S_________WURT.ANNOUNCE_DETACH_BUFF_OILFLOW = "So funny, I used to have beefalos that did this."
 S_______WALTER.ANNOUNCE_DETACH_BUFF_OILFLOW = "This will be a stain on my life."
 S________WANDA.ANNOUNCE_DETACH_BUFF_OILFLOW = "I regret it, truely."
 --
 S______GENERIC.BUFF_OILFLOW = {
-    "OMG...", "...", "... ...", "......", "It's embarrassing.", "It can't be seen.", "Oh, no!",
+    "OMG...", "...", "... ...", "......", "This is embarrassing.", "Don't look at me.", "Oh, no!",
     "When does it stop?", "Am I having a nightmare?", "Crazy...", "Stop!", "No...", "Where is the toilet?!",
-    "Now I just want to leave the earth.", "No.", "Stop, stop, stop!", "This...", "I'm collapsing.", "No!", "...!",
+    "I just want to die.", "No.", "Stop, stop, stop!", "This...", "I'm collapsing.", "No!", "...!",
     "I'm so sorry.", "Sorry...", "Sorry!", "Ah...",
 }
 -- S_______WILLOW.BUFF_OILFLOW = ""
@@ -1430,28 +1430,28 @@ S______GENERIC.BUFF_OILFLOW = {
 -- S________WENDY.BUFF_OILFLOW = ""
 -- S_________WX78.BUFF_OILFLOW = ""
 S_WICKERBOTTOM.BUFF_OILFLOW = {
-    "I knew it.", "Something wrong with that dish.", "There's no bathroom.", "No!", "...!", "...", "... ...",
-    "No...", "This...", "Don't see me, don't see me...", "Learn from mistakes.", "I can't bear it.", "......",
-    "I'm not old enough.", "Nature calls...", "Think about what medicine you can cure.", "I think I know why...",
-    "Chill, lady!", "It's no big deal.", "Why do I have to suffer so much?", "This moment, no elegance.",
+    "I knew it.", "Something was wrong with that dish.", "Where's the bathroom.", "No!", "...!", "...", "... ...",
+    "No...", "This...", "Don't look at me, don't look at me...", "Learn from my mistakes.", "I can't bear it.", "......",
+    "I'm not old enough for this to be happening to me.", "Nature calls...", "Maybe we can look at this like medicine...", "I think I know why...",
+    "Chill, lady!", "It's no big deal.", "Why do I have to suffer so much?", "This moment is devoid of elegance.",
 }
 -- S_______WOODIE.BUFF_OILFLOW = ""
 S______WAXWELL.BUFF_OILFLOW = {
-    "I knew it.", "Something wrong with that food.", "There's no bathroom.", "No!", "...!", "...", "... ...",
-    "No...", "This...", "Don't see me, don't see me...", "Learn from mistakes.", "I can't bear it.", "......",
-    "I'm not old enough.", "Nature calls...", "Think about what you can do.", "I think I know why...",
+    "I knew it.", "Something was wrong with that food.", "There's no bathroom.", "No!", "...!", "...", "... ...",
+    "No...", "This...", "Don't look at me, don't look at me...", "Learn from my mistakes.", "I can't bear it.", "......",
+    "I'm not old enough for this to be happening to me.", "Nature calls...", "What can I do?!", "I think I know why...",
     "Calm down!", "It's no big deal.", "What a disgrace!", "Why do I have to suffer so much?",
-    "This moment, no propriety.",
+    "This moment is devoid of class.",
 }
 -- S___WATHGRITHR.BUFF_OILFLOW = ""
 -- S_______WEBBER.BUFF_OILFLOW = ""
 -- S_______WINONA.BUFF_OILFLOW = ""
 S_______WORTOX.BUFF_OILFLOW = {
-    "Hello, little thing.", "Glad to meet you.", "Ah, when will it end?", "No!", "...!", "...", "... ...", "......",
-    "No...", "This...", "Hi...", "I have nothing to say.", "Well...", "Well.", "What a vulgar prank!", "Funny!",
+    "Hello, little thing. Heh.", "Oh well.", "What are you looking at?!", "Hello!", "...!", "...", "... ...", "......",
+    "No...", "This...", "Hi...", "Hmm.", "Well...", "Well.", "What a vulgar prank!", "Funny!",
     "Not funny at all.", "Haha, haha, so embarrassing.", "Embarrassing.", "Excuse me, where is the bathroom?",
-    "嗨...", "I'm doing good for the lawn.", "Hey! There's nothing.", "A careless person won't be sad.",
-    "I should slip away.", "Sorry...", "Go away! Haven't you seen demon poop?",
+    "Hmm...", "I'm doing good for the lawn.", "Hey! There's nothing.", "A careless person would be sad.",
+    "I should slip away.", "Sorry...", "Go away! Haven't you seen a demon poop?",
 }
 S_____WORMWOOD.BUFF_OILFLOW = {
     "Strange.", "But it's good.", "Not bad for me.", "Can't stop?", "...", "... ...", "......", "Haha.", "This...",
@@ -1471,25 +1471,25 @@ S______GENERIC.DESCRIBE.DISH_TOMAHAWKSTEAK = {
 }
 S_______WILLOW.DESCRIBE.DISH_TOMAHAWKSTEAK = {
     GENERIC = "What kind of idiot wastes food to make such things!",
-    CHOP = "Take my move!",
+    CHOP = "Take my hits!",
     ATK = "One-on-one is the real deal!",
 }
 S_____WOLFGANG.DESCRIBE.DISH_TOMAHAWKSTEAK = {
     GENERIC = "It's not edible, unfortunately.",
-    CHOP = "Wolfgang, the force is great!",
+    CHOP = "The force of Wolfgang's axe is great!",
     ATK = "Wolfgang is an undefeated one-on-one legend!",
 }
 -- S________WENDY.DESCRIBE.DISH_TOMAHAWKSTEAK = ""
 -- S_________WX78.DESCRIBE.DISH_TOMAHAWKSTEAK = ""
 S_WICKERBOTTOM.DESCRIBE.DISH_TOMAHAWKSTEAK = {
-    GENERIC = "A special fragrance and perhaps a surprising effect.",
-    CHOP = "Just cut to the perfect angle.",
-    ATK = "We can have a battle of knowledge!",
+    GENERIC = "A special fragrance and perhaps a surprising function.",
+    CHOP = "Just cut at the perfect angle.",
+    ATK = "We can have a battle of wits!",
 }
 S_______WOODIE.DESCRIBE.DISH_TOMAHAWKSTEAK = {
     GENERIC = "Nature's favorite, meat-scented axe.",
     CHOP = "A treeless world is about to be reached.",
-    ATK = "Other troublemakers go away!",
+    ATK = "Other troublemakers leave me be!",
 }
 -- S______WAXWELL.DESCRIBE.DISH_TOMAHAWKSTEAK = ""
 S___WATHGRITHR.DESCRIBE.DISH_TOMAHAWKSTEAK = {
@@ -1500,12 +1500,12 @@ S___WATHGRITHR.DESCRIBE.DISH_TOMAHAWKSTEAK = {
 -- S_______WEBBER.DESCRIBE.DISH_TOMAHAWKSTEAK = ""
 S_______WINONA.DESCRIBE.DISH_TOMAHAWKSTEAK = {
     GENERIC = "An axe that cannot be used as a gourmet food is not a good weapon.",
-    CHOP = "Nice axe!",
+    CHOP = "Not bad for meat!",
     ATK = "How about a fair match?",
 }
 S_______WORTOX.DESCRIBE.DISH_TOMAHAWKSTEAK = {
-    GENERIC = "The lure of food.",
-    CHOP = "No matter how thick trunk also to fall under my crispy axe!",
+    GENERIC = "The allure of food.",
+    CHOP = "No matter how thick the trunk it will fall to my crispy axe!",
     ATK = "I have unilaterally issued a challenge to you!",
 }
 S_____WORMWOOD.DESCRIBE.DISH_TOMAHAWKSTEAK = {
@@ -1514,7 +1514,7 @@ S_____WORMWOOD.DESCRIBE.DISH_TOMAHAWKSTEAK = {
     ATK = "Come, come, come!",
 }
 S________WARLY.DESCRIBE.DISH_TOMAHAWKSTEAK = {
-    GENERIC = "To challenge the natural taste buds.",
+    GENERIC = "A challenge to the natural taste buds.",
     CHOP = "As easy as chopping vegetables.",
     ATK = "Have you eaten? If not, eat my axe!",
 }
@@ -1682,7 +1682,7 @@ S_________WURT.ANNOUNCE_READ_BOOK.BOOK_WEATHER_SUNNY = "Arid, dry, waterless, bl
 S_________WURT.ANNOUNCE_READ_BOOK.BOOK_WEATHER_RAINY = "Drizzle, sprinkle, downpour, that's sweet."
 
 S_NAMES.MERM_SCALES = "Drippy Scales"  --鱼鳞
-S______GENERIC.DESCRIBE.MERM_SCALES = "Ewwwwwwww, smell a strong fishy smell."
+S______GENERIC.DESCRIBE.MERM_SCALES = "Ewwwwwwww, such smell a strong fish smell."
 --S_______WILLOW.DESCRIBE.MERM_SCALES = "This is the opposite of burning."
 --S_____WOLFGANG.DESCRIBE.MERM_SCALES = "Wolfgang can eat in one bite!"
 --S________WENDY.DESCRIBE.MERM_SCALES = "Contrary to Ms Squid's magic."
@@ -1705,7 +1705,7 @@ S________WENDY.DESCRIBE.HAT_MERMBREATHING = "Contrary to Ms Squid's magic."
 --S_______WOODIE.DESCRIBE.HAT_MERMBREATHING = ""
 --S______WAXWELL.DESCRIBE.HAT_MERMBREATHING = ""
 --S___WATHGRITHR.DESCRIBE.HAT_MERMBREATHING = ""
-S_______WEBBER.DESCRIBE.HAT_MERMBREATHING = "I can swim freely! er... need a fish tail."
+S_______WEBBER.DESCRIBE.HAT_MERMBREATHING = "I can swim freely! er... nevermind I need a fish tail."
 --S_______WINONA.DESCRIBE.HAT_MERMBREATHING = ""
 
 S_NAMES.AGRONSSWORD = "Agron's Sword"  --艾力冈的剑
@@ -1748,11 +1748,11 @@ S______WAXWELL.DESCRIBE.REFRACTEDMOONLIGHT = "Only those who are healthy can wie
 -- S_______WEBBER.DESCRIBE.REFRACTEDMOONLIGHT = "If I could, I would be out of this world with my legion!"
 -- S_______WINONA.DESCRIBE.REFRACTEDMOONLIGHT = "I am a laborer, not a slave, I'm my own!"
 
-S_NAMES.MOONDUNGEON = "Moon Castle"   --月的地下城
+S_NAMES.MOONDUNGEON = "Moon Oubliette"   --月的地下城
 S______GENERIC.DESCRIBE.MOONDUNGEON =
 {
-    SLEEP = "Is that a fossilized fossil?",
-    GENERIC = "Someone burned up his whole life and built it here.",
+    SLEEP = "Is that a fossilized... fossil?",
+    GENERIC = "Someone burned up their whole life and built it into this.",
 }
 --[[
 S_______WILLOW.DESCRIBE.MOONDUNGEON =
@@ -1815,9 +1815,9 @@ S________WENDY.DESCRIBE.HIDDENMOONLIGHT = "Light moonlight, somewhere in my hear
 -- S_________WX78.DESCRIBE.HIDDENMOONLIGHT = ""
 S_WICKERBOTTOM.DESCRIBE.HIDDENMOONLIGHT = "The flow of time in this box is slower than on the outside."
 -- S_______WOODIE.DESCRIBE.HIDDENMOONLIGHT = ""
-S______WAXWELL.DESCRIBE.HIDDENMOONLIGHT = "Moon's magic is more than that!"
+S______WAXWELL.DESCRIBE.HIDDENMOONLIGHT = "Such a waste to use it like that."
 -- S___WATHGRITHR.DESCRIBE.HIDDENMOONLIGHT = ""
-S_______WEBBER.DESCRIBE.HIDDENMOONLIGHT = "Yeah! Reach in and catch what you think."
+S_______WEBBER.DESCRIBE.HIDDENMOONLIGHT = "Yeah! Reach in and grab anything you want."
 -- S_______WINONA.DESCRIBE.HIDDENMOONLIGHT = ""
 -- S_______WORTOX.DESCRIBE.HIDDENMOONLIGHT = ""
 S_____WORMWOOD.DESCRIBE.HIDDENMOONLIGHT = "Hollow, like me."
@@ -1838,7 +1838,7 @@ S______WAXWELL.DESCRIBE.HIDDENMOONLIGHT_ITEM = "A box powered by moonlight."
 S___WATHGRITHR.DESCRIBE.HIDDENMOONLIGHT_ITEM = "Hope it's not Pandora's box."
 -- S_______WEBBER.DESCRIBE.HIDDENMOONLIGHT_ITEM = ""
 S_______WINONA.DESCRIBE.HIDDENMOONLIGHT_ITEM = "The inspiration of moon!"
-S_______WORTOX.DESCRIBE.HIDDENMOONLIGHT_ITEM = "I can feel it being called by a box full of food."
+S_______WORTOX.DESCRIBE.HIDDENMOONLIGHT_ITEM = "I can feel it calling for food."
 -- S_____WORMWOOD.DESCRIBE.HIDDENMOONLIGHT_ITEM = ""
 -- S________WARLY.DESCRIBE.HIDDENMOONLIGHT_ITEM = ""
 -- S_________WURT.DESCRIBE.HIDDENMOONLIGHT_ITEM = ""
@@ -1937,7 +1937,7 @@ S_WICKERBOTTOM.DESCRIBE.CROPGNAT = "Find ways to kill them early, or we'll get n
 -- S_______WOODIE.DESCRIBE.CROPGNAT = ""
 -- S______WAXWELL.DESCRIBE.CROPGNAT = ""
 -- S___WATHGRITHR.DESCRIBE.CROPGNAT = ""
-S_______WEBBER.DESCRIBE.CROPGNAT = "Broke the windows of my neighbours and they called me a pest."
+S_______WEBBER.DESCRIBE.CROPGNAT = "I broke my neighbours neighbor's window before and they called me a pest."
 -- S_______WINONA.DESCRIBE.CROPGNAT = ""
 -- S_______WORTOX.DESCRIBE.CROPGNAT = ""
 S_____WORMWOOD.DESCRIBE.CROPGNAT = "Some friends who would hurt a plant friend."
@@ -1947,7 +1947,7 @@ S_____WORMWOOD.DESCRIBE.CROPGNAT = "Some friends who would hurt a plant friend."
 -- S________WANDA.DESCRIBE.CROPGNAT = ""
 
 S_NAMES.CROPGNAT_INFESTER = "Gnat Swarm"    --叮咬虫群
-S______GENERIC.DESCRIBE.CROPGNAT_INFESTER = "Be careful, these flying bugs bite."
+S______GENERIC.DESCRIBE.CROPGNAT_INFESTER = "Be careful, these bugs bite."
 S_______WILLOW.DESCRIBE.CROPGNAT_INFESTER = "Stupid bugs will be attracted by my fire."
 S_____WOLFGANG.DESCRIBE.CROPGNAT_INFESTER = "Ouch! these little monsters bite!"
 -- S________WENDY.DESCRIBE.CROPGNAT_INFESTER = ""
@@ -1996,7 +1996,7 @@ S______GENERIC.DESCRIBE.BOLTWINGOUT = "Bolt out of threats."
 S______WAXWELL.DESCRIBE.BOLTWINGOUT = "Learning the way of insect survival."
 S___WATHGRITHR.DESCRIBE.BOLTWINGOUT = "Tsk-tsk! A real warrior never runs away!"
 -- S_______WEBBER.DESCRIBE.BOLTWINGOUT = ""
-S_______WINONA.DESCRIBE.BOLTWINGOUT = "I just wanna run... Hide it away!"
+S_______WINONA.DESCRIBE.BOLTWINGOUT = "I just wanna run and hide away!"
 S_______WORTOX.DESCRIBE.BOLTWINGOUT = "Meh, I can do the same thing with souls."
 -- S_____WORMWOOD.DESCRIBE.BOLTWINGOUT = ""
 -- S________WARLY.DESCRIBE.BOLTWINGOUT = ""
@@ -2063,7 +2063,7 @@ S_________WURT.DESCRIBE.CATTENBALL = "A witch living in the desert mirage would 
 
 S_NAMES.SIVING_ROCKS = "Siving Stone"   --子圭石
 S______GENERIC.DESCRIBE.SIVING_ROCKS = "A lively power is roaming inside."
-S_______WILLOW.DESCRIBE.SIVING_ROCKS = "Yes, I don't want to burn at all."
+S_______WILLOW.DESCRIBE.SIVING_ROCKS = "Weird, I don't want to burn it at all."
 S_____WOLFGANG.DESCRIBE.SIVING_ROCKS = "Pretty little stone."
 S________WENDY.DESCRIBE.SIVING_ROCKS = "I'm wasting my time, I got nothing to do."
 S_________WX78.DESCRIBE.SIVING_ROCKS = "LIKE ME, NON-CARBON BASED LIFE."
@@ -2071,8 +2071,8 @@ S_WICKERBOTTOM.DESCRIBE.SIVING_ROCKS = "I'm shocked that this ore has life activ
 S_______WOODIE.DESCRIBE.SIVING_ROCKS = "It looks like a leaf."
 S______WAXWELL.DESCRIBE.SIVING_ROCKS = "Is this the legendary..."
 S___WATHGRITHR.DESCRIBE.SIVING_ROCKS = "Is it fallen leaves of the world tree?!"
-S_______WEBBER.DESCRIBE.SIVING_ROCKS = "Hee hee, the rare stones have increased!"
-S_______WINONA.DESCRIBE.SIVING_ROCKS = "Mysterious green looks at me in it."
+S_______WEBBER.DESCRIBE.SIVING_ROCKS = "Hee hee, our rare stones collection has increased!"
+S_______WINONA.DESCRIBE.SIVING_ROCKS = "I feel like it's looking back at me."
 S_______WORTOX.DESCRIBE.SIVING_ROCKS = "Really unusual for this to be in this world."
 S_____WORMWOOD.DESCRIBE.SIVING_ROCKS = "Part of a stone friend."
 S________WARLY.DESCRIBE.SIVING_ROCKS = "If it doesn't involve my field, I won't say more."
@@ -2080,8 +2080,8 @@ S_________WURT.DESCRIBE.SIVING_ROCKS = "I've seen this in my hometown."
 S_______WALTER.DESCRIBE.SIVING_ROCKS = "Aha, species discovery!"
 S________WANDA.DESCRIBE.SIVING_ROCKS = "It's dazzling in the sun."
 
-S_NAMES.SIVING_DERIVANT_ITEM = "Unplanted Siving Derivant-zero"  --未种下的子圭一型岩
-S______GENERIC.DESCRIBE.SIVING_DERIVANT_ITEM = "I'd like to see what it will look like."
+S_NAMES.SIVING_DERIVANT_ITEM = "Siving Derivant"  --未种下的子圭一型岩
+S______GENERIC.DESCRIBE.SIVING_DERIVANT_ITEM = "I'd like to see what it'll look like."
 -- S_______WILLOW.DESCRIBE.SIVING_DERIVANT_ITEM = ""
 -- S_____WOLFGANG.DESCRIBE.SIVING_DERIVANT_ITEM = ""
 -- S________WENDY.DESCRIBE.SIVING_DERIVANT_ITEM = ""
@@ -2095,12 +2095,12 @@ S___WATHGRITHR.DESCRIBE.SIVING_DERIVANT_ITEM = "Is it a derivant of the world tr
 -- S_______WORTOX.DESCRIBE.SIVING_DERIVANT_ITEM = ""
 S_____WORMWOOD.DESCRIBE.SIVING_DERIVANT_ITEM = "Stone friend's child is still sleeping."
 -- S________WARLY.DESCRIBE.SIVING_DERIVANT_ITEM = ""
-S_________WURT.DESCRIBE.SIVING_DERIVANT_ITEM = "This is its seed, which needs to be planted in the soil."
+S_________WURT.DESCRIBE.SIVING_DERIVANT_ITEM = "This is it's seed, which needs to be planted in the soil."
 -- S_______WALTER.DESCRIBE.SIVING_DERIVANT_ITEM = ""
 -- S________WANDA.DESCRIBE.SIVING_DERIVANT_ITEM = ""
 
-S_NAMES.SIVING_DERIVANT_LVL0 = "Siving Derivant-zero"    --子圭一型岩
-S______GENERIC.DESCRIBE.SIVING_DERIVANT_LVL0 = "No sign of growth."
+S_NAMES.SIVING_DERIVANT_LVL0 = "Siving Derivant"    --子圭一型岩
+S________WANDA.DESCRIBE.SIVING_DERIVANT_LVL0 = "It's going to take some time."
 -- S_______WILLOW.DESCRIBE.SIVING_DERIVANT_LVL0 = ""
 -- S_____WOLFGANG.DESCRIBE.SIVING_DERIVANT_LVL0 = ""
 -- S________WENDY.DESCRIBE.SIVING_DERIVANT_LVL0 = ""
@@ -2118,13 +2118,13 @@ S_________WURT.DESCRIBE.SIVING_DERIVANT_LVL0 = "Just wait for it, glorp."
 -- S_______WALTER.DESCRIBE.SIVING_DERIVANT_LVL0 = ""
 S________WANDA.DESCRIBE.SIVING_DERIVANT_LVL0 = "It takes more than a little time."
 
-S_NAMES.SIVING_DERIVANT_LVL1 = "Siving Derivant-one"    --子圭木型岩
+S_NAMES.SIVING_DERIVANT_LVL1 = "Siving Derivant"    --子圭木型岩
 S______GENERIC.DESCRIBE.SIVING_DERIVANT_LVL1 = "Great, it's finally grown up a little."
 -- S_______WILLOW.DESCRIBE.SIVING_DERIVANT_LVL1 = ""
 -- S_____WOLFGANG.DESCRIBE.SIVING_DERIVANT_LVL1 = ""
 S________WENDY.DESCRIBE.SIVING_DERIVANT_LVL1 = "Full of hope."
 -- S_________WX78.DESCRIBE.SIVING_DERIVANT_LVL1 = ""
-S_WICKERBOTTOM.DESCRIBE.SIVING_DERIVANT_LVL1 = "Yes, it's worth watching."
+S_WICKERBOTTOM.DESCRIBE.SIVING_DERIVANT_LVL1 = "Worth watching for sure."
 -- S_______WOODIE.DESCRIBE.SIVING_DERIVANT_LVL1 = ""
 -- S______WAXWELL.DESCRIBE.SIVING_DERIVANT_LVL1 = ""
 -- S___WATHGRITHR.DESCRIBE.SIVING_DERIVANT_LVL1 = ""
@@ -2135,9 +2135,9 @@ S_____WORMWOOD.DESCRIBE.SIVING_DERIVANT_LVL1 = "Growing steadily."
 -- S________WARLY.DESCRIBE.SIVING_DERIVANT_LVL1 = ""
 -- S_________WURT.DESCRIBE.SIVING_DERIVANT_LVL1 = ""
 -- S_______WALTER.DESCRIBE.SIVING_DERIVANT_LVL1 = ""
-S________WANDA.DESCRIBE.SIVING_DERIVANT_LVL1 = "It needs more than a little time to grow."
+S________WANDA.DESCRIBE.SIVING_DERIVANT_LVL1 = "It needs more than just a little more time to grow."
 
-S_NAMES.SIVING_DERIVANT_LVL2 = "Siving Derivant-two"    --子圭林型岩
+S_NAMES.SIVING_DERIVANT_LVL2 = "Siving Derivant"    --子圭林型岩
 S______GENERIC.DESCRIBE.SIVING_DERIVANT_LVL2 = "That's great, it looks good."
 -- S_______WILLOW.DESCRIBE.SIVING_DERIVANT_LVL2 = ""
 -- S_____WOLFGANG.DESCRIBE.SIVING_DERIVANT_LVL2 = ""
@@ -2150,33 +2150,33 @@ S_WICKERBOTTOM.DESCRIBE.SIVING_DERIVANT_LVL2 = "I will continue to study it."
 -- S_______WEBBER.DESCRIBE.SIVING_DERIVANT_LVL2 = ""
 -- S_______WINONA.DESCRIBE.SIVING_DERIVANT_LVL2 = ""
 -- S_______WORTOX.DESCRIBE.SIVING_DERIVANT_LVL2 = ""
-S_____WORMWOOD.DESCRIBE.SIVING_DERIVANT_LVL2 = "Taller than me."
+S_____WORMWOOD.DESCRIBE.SIVING_DERIVANT_LVL2 = "It's taller than me!"
 -- S________WARLY.DESCRIBE.SIVING_DERIVANT_LVL2 = ""
 S_________WURT.DESCRIBE.SIVING_DERIVANT_LVL2 = "I've never planted it alive, florpt!"
 -- S_______WALTER.DESCRIBE.SIVING_DERIVANT_LVL2 = ""
-S________WANDA.DESCRIBE.SIVING_DERIVANT_LVL2 = "This time is a little time for me."
+S________WANDA.DESCRIBE.SIVING_DERIVANT_LVL2 = "Almost time no time at all for me."
 
-S_NAMES.SIVING_DERIVANT_LVL3 = "Siving Derivant-three"  --子圭森型岩
+S_NAMES.SIVING_DERIVANT_LVL3 = "Siving Derivant"  --子圭森型岩
 S______GENERIC.DESCRIBE.SIVING_DERIVANT_LVL3 = "The stone grows luxuriantly."
-S_______WILLOW.DESCRIBE.SIVING_DERIVANT_LVL3 = "Can't burn it again. Give it a bad comment."
+S_______WILLOW.DESCRIBE.SIVING_DERIVANT_LVL3 = "Doesn't burn. I don't like it."
 -- S_____WOLFGANG.DESCRIBE.SIVING_DERIVANT_LVL3 = ""
 -- S________WENDY.DESCRIBE.SIVING_DERIVANT_LVL3 = ""
 -- S_________WX78.DESCRIBE.SIVING_DERIVANT_LVL3 = ""
 S_WICKERBOTTOM.DESCRIBE.SIVING_DERIVANT_LVL3 = "Should be its final form."
-S_______WOODIE.DESCRIBE.SIVING_DERIVANT_LVL3 = "Axe can't work with it."
+S_______WOODIE.DESCRIBE.SIVING_DERIVANT_LVL3 = "Axes don't seem to do anything to it."
 -- S______WAXWELL.DESCRIBE.SIVING_DERIVANT_LVL3 = ""
 -- S___WATHGRITHR.DESCRIBE.SIVING_DERIVANT_LVL3 = ""
 -- S_______WEBBER.DESCRIBE.SIVING_DERIVANT_LVL3 = ""
 -- S_______WINONA.DESCRIBE.SIVING_DERIVANT_LVL3 = ""
 S_______WORTOX.DESCRIBE.SIVING_DERIVANT_LVL3 = "No matter how good it looks, it has no soul."
 S_____WORMWOOD.DESCRIBE.SIVING_DERIVANT_LVL3 = "Mature stone friends."
-S________WARLY.DESCRIBE.SIVING_DERIVANT_LVL3 = "The least rare is strange."
-S_________WURT.DESCRIBE.SIVING_DERIVANT_LVL3 = "Deep in the forest of my hometown, all these things."
+S________WARLY.DESCRIBE.SIVING_DERIVANT_LVL3 = "Strange."
+S_________WURT.DESCRIBE.SIVING_DERIVANT_LVL3 = "Deep in the forest of my hometown there's lots of these."
 -- S_______WALTER.DESCRIBE.SIVING_DERIVANT_LVL3 = ""
-S________WANDA.DESCRIBE.SIVING_DERIVANT_LVL3 = "It's amazing, but not surprised."
+S________WANDA.DESCRIBE.SIVING_DERIVANT_LVL3 = "It's amazing, but I'm also not surprised."
 
 S_NAMES.SIVING_THETREE = "Siving Alpha" --子圭神木岩
-S______GENERIC.DESCRIBE.SIVING_THETREE = "My whole life is bowed to its mysterious majesty."
+S______GENERIC.DESCRIBE.SIVING_THETREE = "My life bows to its mysterious majesty."
 S_______WILLOW.DESCRIBE.SIVING_THETREE = "It cannot burn, but it can burn the fire of life."
 S_____WOLFGANG.DESCRIBE.SIVING_THETREE = "Wolfgang shouldn't be so close to Kryptonite."
 S________WENDY.DESCRIBE.SIVING_THETREE = "Leading me to death peacefully, what a relief."
@@ -2184,22 +2184,22 @@ S_________WX78.DESCRIBE.SIVING_THETREE = "EAGER TO TAKE LIFE."
 S_WICKERBOTTOM.DESCRIBE.SIVING_THETREE = "DANGER! It has a life attraction like a black hole."
 S_______WOODIE.DESCRIBE.SIVING_THETREE = "Lucy, don't try to chop it down."
 S______WAXWELL.DESCRIBE.SIVING_THETREE = "It doesn't look like Charlie's work."
-S___WATHGRITHR.DESCRIBE.SIVING_THETREE = "Hail Yggdrasill!"
+S___WATHGRITHR.DESCRIBE.SIVING_THETREE = "Ode to Yggdrasill!"
 S_______WEBBER.DESCRIBE.SIVING_THETREE = "We really want to climb up and play."
-S_______WINONA.DESCRIBE.SIVING_THETREE = "See, what beautiful lines."
-S_______WORTOX.DESCRIBE.SIVING_THETREE = "The thing wants my life, but my soul is better."
+S_______WINONA.DESCRIBE.SIVING_THETREE = "What beautiful lines."
+S_______WORTOX.DESCRIBE.SIVING_THETREE = "This thing wants my life, but my soul is too strong for it."
 S_____WORMWOOD.DESCRIBE.SIVING_THETREE = "Is this still a friend?"
 S________WARLY.DESCRIBE.SIVING_THETREE = "My life is as delicious as my cooking."
 S_________WURT.DESCRIBE.SIVING_THETREE = "Why isn't it as safe as home, glorp?"
 S_______WALTER.DESCRIBE.SIVING_THETREE = "The closer to the truth, the more dangerous it is."
-S________WANDA.DESCRIBE.SIVING_THETREE = "As soon as I get close to it, my time is passing."
+S________WANDA.DESCRIBE.SIVING_THETREE = "As soon as I get close to it I start aging..."
 
-S_NAMES.SIVING_SOIL_ITEM = "Unplaced Siving·Sols"   --未放置的子圭·垄
-S_RECIPE_DESC.SIVING_SOIL_ITEM = "Start from seed, enter life cycle."
+S_NAMES.SIVING_SOIL_ITEM = "Siving-Sols"   --未放置的子圭·垄
+S_RECIPE_DESC.SIVING_SOIL_ITEM = "An unusual soil bursting with life energy."
 S______GENERIC.DESCRIBE.SIVING_SOIL_ITEM = "Put it down, and plant a seed."
 -- S_______WILLOW.DESCRIBE.SIVING_SOIL_ITEM = ""
 -- S_____WOLFGANG.DESCRIBE.SIVING_SOIL_ITEM = ""
-S________WENDY.DESCRIBE.SIVING_SOIL_ITEM = "Little seed will be trapped in the cage of soul."
+S________WENDY.DESCRIBE.SIVING_SOIL_ITEM = "Traps seeds souls in the cage of life."
 -- S_________WX78.DESCRIBE.SIVING_SOIL_ITEM = ""
 S_WICKERBOTTOM.DESCRIBE.SIVING_SOIL_ITEM = "It can provide an environment for plant regeneration."
 -- S_______WOODIE.DESCRIBE.SIVING_SOIL_ITEM = ""
@@ -2207,34 +2207,34 @@ S_WICKERBOTTOM.DESCRIBE.SIVING_SOIL_ITEM = "It can provide an environment for pl
 S___WATHGRITHR.DESCRIBE.SIVING_SOIL_ITEM = "I don't really need this, but my friends do."
 -- S_______WEBBER.DESCRIBE.SIVING_SOIL_ITEM = ""
 -- S_______WINONA.DESCRIBE.SIVING_SOIL_ITEM = ""
-S_______WORTOX.DESCRIBE.SIVING_SOIL_ITEM = "Winter snow is quilt, spring snow is ghost."
+S_______WORTOX.DESCRIBE.SIVING_SOIL_ITEM = "Living soil, how unusual."
 -- S_____WORMWOOD.DESCRIBE.SIVING_SOIL_ITEM = ""
 S________WARLY.DESCRIBE.SIVING_SOIL_ITEM = "Fresh ingredients grower."
-S_________WURT.DESCRIBE.SIVING_SOIL_ITEM = "I'm interested when I see this, florp."
+S_________WURT.DESCRIBE.SIVING_SOIL_ITEM = "I'm interested, florp."
 -- S_______WALTER.DESCRIBE.SIVING_SOIL_ITEM = ""
 -- S________WANDA.DESCRIBE.SIVING_SOIL_ITEM = ""
 
-S_NAMES.SIVING_SOIL = "Siving·Sols"    --子圭·垄
-S______GENERIC.DESCRIBE.SIVING_SOIL = "First step of planting, big step of being stuffed."
-S_______WILLOW.DESCRIBE.SIVING_SOIL = "Sow, germinate, mature, burn. Just do it!"
+S_NAMES.SIVING_SOIL = "Siving-Sols"    --子圭·垄
+S______GENERIC.DESCRIBE.SIVING_SOIL = "First step of planting, one big step of being stuffed."
+S_______WILLOW.DESCRIBE.SIVING_SOIL = "Sow, germinate, mature, burn!"
 S_____WOLFGANG.DESCRIBE.SIVING_SOIL = "My industrious hands are ready."
 S________WENDY.DESCRIBE.SIVING_SOIL = "I'm still considering whether to continue."
 S_________WX78.DESCRIBE.SIVING_SOIL = "THIS CAN BE A SOURCE OF CLEAN FUEL."
 S_WICKERBOTTOM.DESCRIBE.SIVING_SOIL = "The regeneration environment has been placed."
-S_______WOODIE.DESCRIBE.SIVING_SOIL = "Who remembers that I was just an ordinary woodcutter."
+S_______WOODIE.DESCRIBE.SIVING_SOIL = "Who remembers when I was just an ordinary lumberjack..."
 S______WAXWELL.DESCRIBE.SIVING_SOIL = "Even if I have to do this, I have to be a decent farmer."
 S___WATHGRITHR.DESCRIBE.SIVING_SOIL = "I prefer a wonderful battle."
 S_______WEBBER.DESCRIBE.SIVING_SOIL = "What time is it? It's Cultivation time!"
 S_______WINONA.DESCRIBE.SIVING_SOIL = "Nothing to say about sowing."
 S_______WORTOX.DESCRIBE.SIVING_SOIL = "You must reap what you have sown."
 S_____WORMWOOD.DESCRIBE.SIVING_SOIL = "Baby's cradle, advanced edition!"
-S________WARLY.DESCRIBE.SIVING_SOIL = "Then you just need to sow some seeds."
+S________WARLY.DESCRIBE.SIVING_SOIL = "Now you just need to sow some seeds."
 S_________WURT.DESCRIBE.SIVING_SOIL = "I'm so excited. What should I plant."
 S_______WALTER.DESCRIBE.SIVING_SOIL = "This will get me the planting medal."
 S________WANDA.DESCRIBE.SIVING_SOIL = "Will the crops fall into the cycle of time?"
 
-S_NAMES.SIVING_CTLWATER_ITEM = "Unplaced Siving·Eau" --未放置的子圭·利川
-S_RECIPE_DESC.SIVING_CTLWATER_ITEM = "Controls moisture in every inch."
+S_NAMES.SIVING_CTLWATER_ITEM = "Siving-Eau" --未放置的子圭·利川
+S_RECIPE_DESC.SIVING_CTLWATER_ITEM = "It can control moisture after being placed."
 S______GENERIC.DESCRIBE.SIVING_CTLWATER_ITEM = "It can control moisture after being placed."
 -- S_______WILLOW.DESCRIBE.SIVING_CTLWATER_ITEM = ""
 -- S_____WOLFGANG.DESCRIBE.SIVING_CTLWATER_ITEM = ""
@@ -2253,7 +2253,7 @@ S______GENERIC.DESCRIBE.SIVING_CTLWATER_ITEM = "It can control moisture after be
 -- S_______WALTER.DESCRIBE.SIVING_CTLWATER_ITEM = ""
 -- S________WANDA.DESCRIBE.SIVING_CTLWATER_ITEM = ""
 
-S_NAMES.SIVING_CTLWATER = "Siving·Eau" --子圭·利川
+S_NAMES.SIVING_CTLWATER = "Siving-Eau" --子圭·利川
 S______GENERIC.DESCRIBE.SIVING_CTLWATER = {
     GENERIC = "It can transport water to the surrounding soil.",
     ISFULL = "It's full.",
@@ -2276,8 +2276,8 @@ S______GENERIC.DESCRIBE.SIVING_CTLWATER = {
 -- S_______WALTER.DESCRIBE.SIVING_CTLWATER = ""
 -- S________WANDA.DESCRIBE.SIVING_CTLWATER = ""
 
-S_NAMES.SIVING_CTLDIRT_ITEM = "Unplaced Siving·Alim" --未放置的子圭·益矩
-S_RECIPE_DESC.SIVING_CTLDIRT_ITEM = "Controls nutrients in every inch."
+S_NAMES.SIVING_CTLDIRT_ITEM = "Siving-Alim" --未放置的子圭·益矩
+S_RECIPE_DESC.SIVING_CTLDIRT_ITEM = "It can control nutrients in the soil after being placed."
 S______GENERIC.DESCRIBE.SIVING_CTLDIRT_ITEM = "It can control nutrients after being placed."
 -- S_______WILLOW.DESCRIBE.SIVING_CTLDIRT_ITEM = ""
 -- S_____WOLFGANG.DESCRIBE.SIVING_CTLDIRT_ITEM = ""
@@ -2296,7 +2296,7 @@ S______GENERIC.DESCRIBE.SIVING_CTLDIRT_ITEM = "It can control nutrients after be
 -- S_______WALTER.DESCRIBE.SIVING_CTLDIRT_ITEM = ""
 -- S________WANDA.DESCRIBE.SIVING_CTLDIRT_ITEM = ""
 
-S_NAMES.SIVING_CTLDIRT = "Siving·Alim" --子圭·益矩
+S_NAMES.SIVING_CTLDIRT = "Siving-Alim" --子圭·益矩
 S______GENERIC.DESCRIBE.SIVING_CTLDIRT = {
     GENERIC = "It can transport nutrients to the surrounding soil.",
     ISFULL = "It's full.",
@@ -2319,8 +2319,8 @@ S______GENERIC.DESCRIBE.SIVING_CTLDIRT = {
 -- S_______WALTER.DESCRIBE.SIVING_CTLDIRT = ""
 -- S________WANDA.DESCRIBE.SIVING_CTLDIRT = ""
 
-S_NAMES.SIVING_CTLAll_ITEM = "Unplaced Siving·Ridge" --未放置的子圭·崇溟
-S_RECIPE_DESC.SIVING_CTLAll_ITEM = "Controls soil in every inch."
+S_NAMES.SIVING_CTLAll_ITEM = "Siving-Ridge" --未放置的子圭·崇溟
+S_RECIPE_DESC.SIVING_CTLAll_ITEM = "It can control soil after being placed."
 S______GENERIC.DESCRIBE.SIVING_CTLAll_ITEM = "It can control soil after being placed."
 -- S_______WILLOW.DESCRIBE.SIVING_CTLAll_ITEM = ""
 -- S_____WOLFGANG.DESCRIBE.SIVING_CTLAll_ITEM = ""
@@ -2339,7 +2339,7 @@ S______GENERIC.DESCRIBE.SIVING_CTLAll_ITEM = "It can control soil after being pl
 -- S_______WALTER.DESCRIBE.SIVING_CTLAll_ITEM = ""
 -- S________WANDA.DESCRIBE.SIVING_CTLAll_ITEM = ""
 
-S_NAMES.SIVING_CTLAll = "Siving·Ridge" --子圭·崇溟
+S_NAMES.SIVING_CTLAll = "Siving-Ridge" --子圭·崇溟
 S______GENERIC.DESCRIBE.SIVING_CTLAll = {
     GENERIC = "It can transport water and nutrients to the surrounding soil.",
     ISFULL = "It's full.",
@@ -2362,7 +2362,7 @@ S______GENERIC.DESCRIBE.SIVING_CTLAll = {
 -- S_______WALTER.DESCRIBE.SIVING_CTLAll = ""
 -- S________WANDA.DESCRIBE.SIVING_CTLAll = ""
 
-S_NAMES.FISHHOMINGTOOL_NORMAL = "Fish-homing Bait Maker" --简易打窝饵制作器
+S_NAMES.FISHHOMINGTOOL_NORMAL = "Fish-Homing Bait Maker" --简易打窝饵制作器
 S_RECIPE_DESC.FISHHOMINGTOOL_NORMAL = "Disposable aquatic animal bait maker."
 S______GENERIC.DESCRIBE.FISHHOMINGTOOL_NORMAL = "It's said that every good angler has their own unique recipe."
 -- S_______WILLOW.DESCRIBE.FISHHOMINGTOOL_NORMAL = ""
@@ -2382,9 +2382,9 @@ S_________WURT.DESCRIBE.FISHHOMINGTOOL_NORMAL = "Find their preferences for each
 -- S_______WALTER.DESCRIBE.FISHHOMINGTOOL_NORMAL = ""
 -- S________WANDA.DESCRIBE.FISHHOMINGTOOL_NORMAL = ""
 
-S_NAMES.FISHHOMINGTOOL_AWESOME = "Fish-homing Bait Maker+" --专业打窝饵制作器
+S_NAMES.FISHHOMINGTOOL_AWESOME = "Pro Fish-Homing Bait Maker" --专业打窝饵制作器
 S_RECIPE_DESC.FISHHOMINGTOOL_AWESOME = "Professional aquatic animal bait maker."
-S______GENERIC.DESCRIBE.FISHHOMINGTOOL_AWESOME = "Every awesome angler has their own unique tool and recipe."
+S______GENERIC.DESCRIBE.FISHHOMINGTOOL_AWESOME = "It's said that every good angler has their own unique recipe."
 -- S_______WILLOW.DESCRIBE.FISHHOMINGTOOL_AWESOME = ""
 -- S_____WOLFGANG.DESCRIBE.FISHHOMINGTOOL_AWESOME = ""
 -- S________WENDY.DESCRIBE.FISHHOMINGTOOL_AWESOME = ""
@@ -2398,7 +2398,7 @@ S_______WINONA.DESCRIBE.FISHHOMINGTOOL_AWESOME = "Amazing craftsmanship."
 -- S_______WORTOX.DESCRIBE.FISHHOMINGTOOL_AWESOME = ""
 -- S_____WORMWOOD.DESCRIBE.FISHHOMINGTOOL_AWESOME = ""
 S________WARLY.DESCRIBE.FISHHOMINGTOOL_AWESOME = "I won't just cook fish, I'll cook the entire ocean."
-S_________WURT.DESCRIBE.FISHHOMINGTOOL_AWESOME = "Find their preferences for friends of sea, flurph!"
+S_________WURT.DESCRIBE.FISHHOMINGTOOL_AWESOME = "A tool to find the preferences of my sea friends, flurph!"
 -- S_______WALTER.DESCRIBE.FISHHOMINGTOOL_AWESOME = ""
 S________WANDA.DESCRIBE.FISHHOMINGTOOL_AWESOME = "It's better to build a fishing net directly."
 
@@ -2409,7 +2409,7 @@ STRINGS.FISHHOMING1_LEGION = {
 }
 STRINGS.FISHHOMING2_LEGION = {
     MEAT = "Meat ",
-    VEGGIE = "Vegg ",
+    VEGGIE = "Veggie ",
     MONSTER = "Weird "
 }
 STRINGS.FISHHOMING3_LEGION = {
@@ -2432,7 +2432,7 @@ STRINGS.FISHHOMING3_LEGION = {
     FRIZZY = "Frizzy ", --海鹦鹉
 }
 
-S_NAMES.FISHHOMINGBAIT = "Fish-homing Bait" --打窝饵
+S_NAMES.FISHHOMINGBAIT = "Fish-Homing Bait" --打窝饵
 S______GENERIC.DESCRIBE.FISHHOMINGBAIT = "Throw it into water to attract fish."
 -- S_______WILLOW.DESCRIBE.FISHHOMINGBAIT = ""
 -- S_____WOLFGANG.DESCRIBE.FISHHOMINGBAIT = ""
@@ -2448,7 +2448,7 @@ S_WICKERBOTTOM.DESCRIBE.FISHHOMINGBAIT = "Suits the appetite of aquatic organism
 S_____WORMWOOD.DESCRIBE.FISHHOMINGBAIT = "Fish, food, mermmerm..."
 S________WARLY.DESCRIBE.FISHHOMINGBAIT = "Hey fishies, here comes food!"
 S_________WURT.DESCRIBE.FISHHOMINGBAIT = "Flurph, which lovely fish will be attracted by it today?"
-S_______WALTER.DESCRIBE.FISHHOMINGBAIT = "I remember a man who said he went fishing but never opened the fishing bag."
+S_______WALTER.DESCRIBE.FISHHOMINGBAIT = "I remember a man who said he went fishing but never opened his bait bag."
 S________WANDA.DESCRIBE.FISHHOMINGBAIT = "Well, someone just wants to waste time fishing, right?"
 
 STRINGS.PLANT_CROP_L = {
@@ -2466,7 +2466,7 @@ S_NAMES.PLANT_PUMPKIN_L = "Pumpkin Rack"
 S_NAMES.PLANT_EGGPLANT_L = "Eggplant Nest"
 S_NAMES.PLANT_DURIAN_L = "Durian Willow"
 S_NAMES.PLANT_POMEGRANATE_L = "Pomegranate Tree"
-S_NAMES.PLANT_DRAGONFRUIT_L = "Pitaya Tree"
+S_NAMES.PLANT_DRAGONFRUIT_L = "Dragon Fruit Tree"
 S_NAMES.PLANT_WATERMELON_L = "Watermelon Grass"
 S_NAMES.PLANT_PINEANANAS_L = "Pineananas Tree"
 S_NAMES.PLANT_ONION_L = "Onion Ring"
@@ -2504,8 +2504,8 @@ S_____WORMWOOD.DESCRIBE.SEEDS_CROP_L = "Baby, different."
 -- S_______WALTER.DESCRIBE.SEEDS_CROP_L = ""
 -- S________WANDA.DESCRIBE.SEEDS_CROP_L = ""
 
-S_NAMES.SIVING_TURN = "Siving·Trans" --子圭·育
-S_RECIPE_DESC.SIVING_TURN = "Yesterday flourishing, tomorrow full of things."
+S_NAMES.SIVING_TURN = "Siving-Trans" --子圭·育
+S_RECIPE_DESC.SIVING_TURN = "An odd thing that transforms giant crops. Yesterday a giant crop flourishing and tomorrow full of wonder."
 S______GENERIC.DESCRIBE.SIVING_TURN = {
     GENERIC = "Is this the time shuttle?",
     DONE = "The transformation is finished. I can take it down now.",
@@ -2517,10 +2517,10 @@ S______GENERIC.DESCRIBE.SIVING_TURN = {
 -- S________WENDY.DESCRIBE.SIVING_TURN = ""
 -- S_________WX78.DESCRIBE.SIVING_TURN = ""
 S_WICKERBOTTOM.DESCRIBE.SIVING_TURN = {
-    GENERIC = "Contains gravitational device, which seems to be able to hold some objects.",
-    DONE = "Transformation is finished. It looks like a cocoon.",
+    GENERIC = "Contains a gravitational device, which seems to be able to hold some objects.",
+    DONE = "Transformation is finished. It kinda looks like a cocoon.",
     DOING = "It is carrying out some special gene transformation.",
-    NOENERGY = "The energy is exhausted, but its composition is its energy."
+    NOENERGY = "It's energy is exhausted, but it's composition is it's energy."
 }
 -- S_______WOODIE.DESCRIBE.SIVING_TURN = ""
 -- S______WAXWELL.DESCRIBE.SIVING_TURN = ""
@@ -2539,29 +2539,29 @@ S_____WORMWOOD.DESCRIBE.SIVING_TURN = {
 -- S_______WALTER.DESCRIBE.SIVING_TURN = ""
 -- S________WANDA.DESCRIBE.SIVING_TURN = ""
 
-S_NAMES.SIVING_FEATHER_REAL = "Main Siving Feather" --子圭玄鸟正羽
-S______GENERIC.DESCRIBE.SIVING_FEATHER_REAL = "I can't wait to pierce something."
+S_NAMES.SIVING_FEATHER_REAL = "True Siving Feather" --子圭玄鸟正羽
+S______GENERIC.DESCRIBE.SIVING_FEATHER_REAL = "I can't wait to pierce something with it."
 S_______WILLOW.DESCRIBE.SIVING_FEATHER_REAL = "Feather split!"
-S_____WOLFGANG.DESCRIBE.SIVING_FEATHER_REAL = "Sharp fly-cutter."
-S________WENDY.DESCRIBE.SIVING_FEATHER_REAL = "So sharp that it will scratch my hand."
+S_____WOLFGANG.DESCRIBE.SIVING_FEATHER_REAL = "A sharp fly-cutter."
+S________WENDY.DESCRIBE.SIVING_FEATHER_REAL = "So sharp that it can cut my hand."
 -- S_________WX78.DESCRIBE.SIVING_FEATHER_REAL = ""
-S_WICKERBOTTOM.DESCRIBE.SIVING_FEATHER_REAL = "With rock texture, it's sharper than it looks."
+S_WICKERBOTTOM.DESCRIBE.SIVING_FEATHER_REAL = "With a rocky texture, it's sharper than it looks."
 -- S_______WOODIE.DESCRIBE.SIVING_FEATHER_REAL = ""
 -- S______WAXWELL.DESCRIBE.SIVING_FEATHER_REAL = ""
-S___WATHGRITHR.DESCRIBE.SIVING_FEATHER_REAL = "A thousand cuts is just a prelude."
+S___WATHGRITHR.DESCRIBE.SIVING_FEATHER_REAL = "A thousand cuts is just the prelude."
 S_______WEBBER.DESCRIBE.SIVING_FEATHER_REAL = "Do you want to do it?!"
 -- S_______WINONA.DESCRIBE.SIVING_FEATHER_REAL = ""
-S_______WORTOX.DESCRIBE.SIVING_FEATHER_REAL = "It will eat away at my soul, not easy to use."
+S_______WORTOX.DESCRIBE.SIVING_FEATHER_REAL = "It eats away at my soul, not something easy to use."
 -- S_____WORMWOOD.DESCRIBE.SIVING_FEATHER_REAL = ""
-S________WARLY.DESCRIBE.SIVING_FEATHER_REAL = "Yes, I'll cut them into thin shreds!"
+S________WARLY.DESCRIBE.SIVING_FEATHER_REAL = "I'll cut them into thin slices!"
 -- S_________WURT.DESCRIBE.SIVING_FEATHER_REAL = ""
 S_______WALTER.DESCRIBE.SIVING_FEATHER_REAL = "Better than my slingshot."
-S________WANDA.DESCRIBE.SIVING_FEATHER_REAL = "I wish it could cut off my nightmare."
+S________WANDA.DESCRIBE.SIVING_FEATHER_REAL = "I wish it could cut away this nightmare."
 
 S_NAMES.SIVING_FEATHER_FAKE = "Siving Feather" --子圭玄鸟绒羽
-S______GENERIC.DESCRIBE.SIVING_FEATHER_FAKE = "I'm going to slap people! Each of you!"
+S______GENERIC.DESCRIBE.SIVING_FEATHER_FAKE = "I'm going to slap people! All of you!"
 S_______WILLOW.DESCRIBE.SIVING_FEATHER_FAKE = "Feather throw!"
-S_____WOLFGANG.DESCRIBE.SIVING_FEATHER_FAKE = "A throwing knife that is not very sharp."
+S_____WOLFGANG.DESCRIBE.SIVING_FEATHER_FAKE = "A throwing knife that is not all that sharp."
 -- S________WENDY.DESCRIBE.SIVING_FEATHER_FAKE = ""
 -- S_________WX78.DESCRIBE.SIVING_FEATHER_FAKE = ""
 -- S_WICKERBOTTOM.DESCRIBE.SIVING_FEATHER_FAKE = ""
@@ -2574,57 +2574,57 @@ S_______WORTOX.DESCRIBE.SIVING_FEATHER_FAKE = "I'd love to try it out and see wh
 -- S_____WORMWOOD.DESCRIBE.SIVING_FEATHER_FAKE = ""
 -- S________WARLY.DESCRIBE.SIVING_FEATHER_FAKE = ""
 -- S_________WURT.DESCRIBE.SIVING_FEATHER_FAKE = ""
-S_______WALTER.DESCRIBE.SIVING_FEATHER_FAKE = "Fun, I want to have some fun, now!"
+S_______WALTER.DESCRIBE.SIVING_FEATHER_FAKE = "Oh fun! I want to try it now!"
 -- S________WANDA.DESCRIBE.SIVING_FEATHER_FAKE = ""
 
 S_NAMES.SIVING_FEATHER_LINE = "Silked Away" --牵羽牵寻
 S______GENERIC.DESCRIBE.SIVING_FEATHER_LINE = "Hidden threads, tugging at one end of each feather."
-S_______WILLOW.DESCRIBE.SIVING_FEATHER_LINE = "Like the queen of blade."
+S_______WILLOW.DESCRIBE.SIVING_FEATHER_LINE = "Like the queen of blades."
 -- S_____WOLFGANG.DESCRIBE.SIVING_FEATHER_LINE = ""
-S________WENDY.DESCRIBE.SIVING_FEATHER_LINE = "I wonder if Abigail is controlled by me like a feather."
+S________WENDY.DESCRIBE.SIVING_FEATHER_LINE = "I wonder if Abigail is controlled by me like this."
 -- S_________WX78.DESCRIBE.SIVING_FEATHER_LINE = ""
-S_WICKERBOTTOM.DESCRIBE.SIVING_FEATHER_LINE = "Every time it reciprocates, the thread may be broken."
+S_WICKERBOTTOM.DESCRIBE.SIVING_FEATHER_LINE = "Every time it reciprocates, a thread can break."
 S_______WOODIE.DESCRIBE.SIVING_FEATHER_LINE = "Lucy and I are too familiar with this trick."
-S______WAXWELL.DESCRIBE.SIVING_FEATHER_LINE = "Feathers, like puppets, are used to hurt rather than play."
-S___WATHGRITHR.DESCRIBE.SIVING_FEATHER_LINE = "Soldiers with wings should also learn this!"
-S_______WEBBER.DESCRIBE.SIVING_FEATHER_LINE = "We're playing yo yo."
-S_______WINONA.DESCRIBE.SIVING_FEATHER_LINE = "Sharp feathers will shuttle back and forth under my traction."
-S_______WORTOX.DESCRIBE.SIVING_FEATHER_LINE = "The red line of fate will entangle you and me."
+S______WAXWELL.DESCRIBE.SIVING_FEATHER_LINE = "These puppet like feathers are used to hurt rather than entertain."
+S___WATHGRITHR.DESCRIBE.SIVING_FEATHER_LINE = "Valkyries should also learn this!"
+S_______WEBBER.DESCRIBE.SIVING_FEATHER_LINE = "It's like a yoyo."
+S_______WINONA.DESCRIBE.SIVING_FEATHER_LINE = "Sharp feathers will shuttle back and forth under my command."
+S_______WORTOX.DESCRIBE.SIVING_FEATHER_LINE = "The red string of fate will entangle you and me."
 S_____WORMWOOD.DESCRIBE.SIVING_FEATHER_LINE = "Tug of war."
 S________WARLY.DESCRIBE.SIVING_FEATHER_LINE = "This technique is also used to cut meat."
 -- S_________WURT.DESCRIBE.SIVING_FEATHER_LINE = ""
 S_______WALTER.DESCRIBE.SIVING_FEATHER_LINE = "I tried to add this to slingshot, but never succeeded."
 -- S________WANDA.DESCRIBE.SIVING_FEATHER_LINE = ""
 
-S_NAMES.SIVING_MASK = "Siving·Absor" --子圭·汲
-S_RECIPE_DESC.SIVING_MASK = "What is the wearing price of life."
+S_NAMES.SIVING_MASK = "Siving-Absor" --子圭·汲
+S_RECIPE_DESC.SIVING_MASK = "What is the price of wearing life."
 S______GENERIC.DESCRIBE.SIVING_MASK = "A stone mask that draws blood."
 S_______WILLOW.DESCRIBE.SIVING_MASK = "Burn your lives for me, humble servants!"
 -- S_____WOLFGANG.DESCRIBE.SIVING_MASK = ""
 S________WENDY.DESCRIBE.SIVING_MASK = "Luckily it won't harm Abigail."
 -- S_________WX78.DESCRIBE.SIVING_MASK = ""
-S_WICKERBOTTOM.DESCRIBE.SIVING_MASK = "A magic, difficult to control. Improper use will damage yourself."
+S_WICKERBOTTOM.DESCRIBE.SIVING_MASK = "A magic, difficult to control. Improper use will make you hurt yourself."
 -- S_______WOODIE.DESCRIBE.SIVING_MASK = ""
-S______WAXWELL.DESCRIBE.SIVING_MASK = "Maybe I can live a little longer under this mask."
-S___WATHGRITHR.DESCRIBE.SIVING_MASK = "Only the despicable losers who enjoy such tricks."
-S_______WEBBER.DESCRIBE.SIVING_MASK = "We all thought it was wrong!" --因为蜘蛛是群居生物，韦伯善良，所以都不想使用这个装备
+S______WAXWELL.DESCRIBE.SIVING_MASK = "Maybe I can live a little longer behind this mask."
+S___WATHGRITHR.DESCRIBE.SIVING_MASK = "Only despicable losers would enjoy such tricks."
+S_______WEBBER.DESCRIBE.SIVING_MASK = "We all think this is wrong!" --因为蜘蛛是群居生物，韦伯善良，所以都不想使用这个装备
 -- S_______WINONA.DESCRIBE.SIVING_MASK = ""
 S_______WORTOX.DESCRIBE.SIVING_MASK = "Disguised as a vampire who doesn't need to be invited into the house, ahahahaha!"
 S_____WORMWOOD.DESCRIBE.SIVING_MASK = "It rarely becomes hostile to friends."
-S________WARLY.DESCRIBE.SIVING_MASK = "Eat what supplements you, right?"
+S________WARLY.DESCRIBE.SIVING_MASK = "Eat what sates you, right?"
 -- S_________WURT.DESCRIBE.SIVING_MASK = ""
 -- S_______WALTER.DESCRIBE.SIVING_MASK = ""
-S________WANDA.DESCRIBE.SIVING_MASK = "Time will also slowly take away lives of all in this way."
+S________WANDA.DESCRIBE.SIVING_MASK = "Time will also slowly take away the lives of all in a similar way."
 
-S_NAMES.SIVING_MASK_GOLD = "Siving·Movili" --子圭·歃
-S_RECIPE_DESC.SIVING_MASK_GOLD = "Call for lives."
+S_NAMES.SIVING_MASK_GOLD = "Siving-Movili" --子圭·歃
+S_RECIPE_DESC.SIVING_MASK_GOLD = "Calls for lives."
 S______GENERIC.DESCRIBE.SIVING_MASK_GOLD = "A mask of exquisite broken gold that plays with life."
 S_______WILLOW.DESCRIBE.SIVING_MASK_GOLD = "Give your lives for the queen of flames, humble servants!"
 S_____WOLFGANG.DESCRIBE.SIVING_MASK_GOLD = "Wolfgang is willing to give of himself to save others."
 S________WENDY.DESCRIBE.SIVING_MASK_GOLD = "Tried to resurrect Abigail with it and failed, as always."
 S_________WX78.DESCRIBE.SIVING_MASK_GOLD = "I ACTUALLY FELT A LITTLE WARMTH WHEN I WAS SAVED BY IT."
 S_WICKERBOTTOM.DESCRIBE.SIVING_MASK_GOLD = "More mature control of life magic without hurting yourself."
-S_______WOODIE.DESCRIBE.SIVING_MASK_GOLD = "If only then, it would have been possible to get Lucy back."
+S_______WOODIE.DESCRIBE.SIVING_MASK_GOLD = "If only it would have been possible to get Lucy back."
 S______WAXWELL.DESCRIBE.SIVING_MASK_GOLD = "I'll hide my identity until the victory comes."
 S___WATHGRITHR.DESCRIBE.SIVING_MASK_GOLD = "The lord of fallen excels in such tactics."
 S_______WEBBER.DESCRIBE.SIVING_MASK_GOLD = "We only get more disgusted with this stuff!"
@@ -2694,7 +2694,7 @@ S______GENERIC.DESCRIBE.HAT_COWBOY = "Aha! let's riiiiiiide!"
 -- S_______WEBBER.DESCRIBE.HAT_COWBOY = ""
 -- S_______WINONA.DESCRIBE.HAT_COWBOY = ""
 
-S_NAMES.DUALWRENCH = "Dual-wrench"    --扳手-双用型
+S_NAMES.DUALWRENCH = "Dual-Wrench"    --扳手-双用型
 S_RECIPE_DESC.DUALWRENCH = "Definitely the wrong way to use it."
 S______GENERIC.DESCRIBE.DUALWRENCH = "This is definitely the wrong way to use it."
 --S_______WILLOW.DESCRIBE.DUALWRENCH = "This is the opposite of burning."
@@ -2717,7 +2717,7 @@ S______GENERIC.DESCRIBE.ELECARMET = "I thought it was the end, but just the begi
 --S_WICKERBOTTOM.DESCRIBE.ELECARMET = "Well, isn't that refreshing?"
 --S_______WOODIE.DESCRIBE.ELECARMET = "I'd prefer maple taffy..."
 --S______WAXWELL.DESCRIBE.ELECARMET = "Hm... I don't know what I was expecting."
-S___WATHGRITHR.DESCRIBE.ELECARMET = "My greatest enemy, called Fimbul."
+S___WATHGRITHR.DESCRIBE.ELECARMET = "My greatest enemy, a Fimbul."
 --S_______WEBBER.DESCRIBE.ELECARMET = "Yaaay! Popsicle, popsicle!"
 --S_______WINONA.DESCRIBE.ELECARMET = "Great to cool off after some hard physical labor."
 
@@ -2761,7 +2761,7 @@ S______GENERIC.DESCRIBE.GUITAR_MIGUEL = "I'll cross life and death to make you r
 --S_______WILLOW.DESCRIBE.GUITAR_MIGUEL = "This is the opposite of burning."
 --S_____WOLFGANG.DESCRIBE.GUITAR_MIGUEL = "Wolfgang can eat in one bite!"
 -- S________WENDY.DESCRIBE.GUITAR_MIGUEL = "Hello from the other side, Abigail."
-S_________WX78.DESCRIBE.GUITAR_MIGUEL = "NOT MY BUILD FUNCTION TO IMPRESS OTHERS BY MELODY."
+S_________WX78.DESCRIBE.GUITAR_MIGUEL = "IT IS NOT MY FUNCTION TO IMPRESS OTHERS."
 --S_WICKERBOTTOM.DESCRIBE.GUITAR_MIGUEL = "Well, isn't that refreshing?"
 --S_______WOODIE.DESCRIBE.GUITAR_MIGUEL = "I'd prefer maple taffy..."
 --S______WAXWELL.DESCRIBE.GUITAR_MIGUEL = "Hm... I don't know what I was expecting."
@@ -2836,7 +2836,7 @@ S_______WOODIE.DESCRIBE.TRIPLESHOVELAXE = "Even the best axe can't replace Lucy.
 -- S_______WEBBER.DESCRIBE.TRIPLESHOVELAXE = ""
 -- S_______WINONA.DESCRIBE.TRIPLESHOVELAXE = ""
 -- S_______WORTOX.DESCRIBE.TRIPLESHOVELAXE = ""
-S_____WORMWOOD.DESCRIBE.TRIPLESHOVELAXE = "Ugh, a sharp weapon of the natural destroyer."
+S_____WORMWOOD.DESCRIBE.TRIPLESHOVELAXE = "Ugh, a sharp weapon of the nature destroyer."
 -- S________WARLY.DESCRIBE.TRIPLESHOVELAXE = ""
 -- S_________WURT.DESCRIBE.TRIPLESHOVELAXE = ""
 -- S_______WALTER.DESCRIBE.TRIPLESHOVELAXE = ""
@@ -2920,7 +2920,7 @@ S_WICKERBOTTOM.DESCRIBE.ALBICANS_CAP = "Strange, it should grow deep in the bamb
 -- S___WATHGRITHR.DESCRIBE.ALBICANS_CAP = ""
 S_______WEBBER.DESCRIBE.ALBICANS_CAP = "A mushroom wearing a skirt!"
 -- S_______WINONA.DESCRIBE.ALBICANS_CAP = ""
-S_______WORTOX.DESCRIBE.ALBICANS_CAP = "Side to give up while love you."
+S_______WORTOX.DESCRIBE.ALBICANS_CAP = "A sacred mushroom like this doesn't belong here."
 -- S_____WORMWOOD.DESCRIBE.ALBICANS_CAP = ""
 -- S________WARLY.DESCRIBE.ALBICANS_CAP = ""
 -- S_________WURT.DESCRIBE.ALBICANS_CAP = ""
@@ -2938,12 +2938,12 @@ S______GENERIC.DESCRIBE.SOUL_CONTRACTS =
 S________WENDY.DESCRIBE.SOUL_CONTRACTS =
 {
     GENERIC = "Roaring, crying, regretting...",
-    ONLYONE = "No turning back once the hands are stained.",
+    ONLYONE = "No turning back once my hands are stained.",
 }
 S_________WX78.DESCRIBE.SOUL_CONTRACTS =
 {
     GENERIC = "THIS ENHANCES THE HATE MODULE!",
-    ONLYONE = "OVERLOAD THE HATE MODULE!",
+    ONLYONE = "OVERLOADING THE HATE MODULE!",
 }
 -- S_WICKERBOTTOM.DESCRIBE.SOUL_CONTRACTS = ""
 -- S_______WOODIE.DESCRIBE.SOUL_CONTRACTS = ""
@@ -2953,12 +2953,12 @@ S_________WX78.DESCRIBE.SOUL_CONTRACTS =
 -- S_______WINONA.DESCRIBE.SOUL_CONTRACTS = ""
 S_______WORTOX.DESCRIBE.SOUL_CONTRACTS =
 {
-    GENERIC = "Hohoho, I can control my soulself better!",
+    GENERIC = "Hohoho, I can control my soul self better!",
     ONLYONE = "I don't want to lose myself.",
 }
 S_____WORMWOOD.DESCRIBE.SOUL_CONTRACTS =
 {
-    GENERIC = "The glitter on my chest locked heart too.",
+    GENERIC = "Similar to the glittering in my chest.",
     ONLYONE = "No need.",
 }
 -- S________WARLY.DESCRIBE.SOUL_CONTRACTS = ""
@@ -2983,7 +2983,7 @@ S_______WEBBER.DESCRIBE.EXPLODINGFRUITCAKE = "Wow, a cake!"
 S_______WINONA.DESCRIBE.EXPLODINGFRUITCAKE = "No tact at all. The leads are so obvious!?"
 S_______WORTOX.DESCRIBE.EXPLODINGFRUITCAKE = "I wouldn't do a prank that would kill someone!"
 S_____WORMWOOD.DESCRIBE.EXPLODINGFRUITCAKE = "Ooo, Sweets!"
-S________WARLY.DESCRIBE.EXPLODINGFRUITCAKE = "A Sugarcoated bullet, be careful."
+S________WARLY.DESCRIBE.EXPLODINGFRUITCAKE = "A sugarcoated bullet, be careful."
 -- S_________WURT.DESCRIBE.EXPLODINGFRUITCAKE = ""
 -- S_______WALTER.DESCRIBE.EXPLODINGFRUITCAKE = ""
 S________WANDA.DESCRIBE.EXPLODINGFRUITCAKE = "Fortunately, I have time to stop this tragedy."
@@ -2993,11 +2993,11 @@ S________WANDA.DESCRIBE.EXPLODINGFRUITCAKE = "Fortunately, I have time to stop t
 --------------------------------------------------------------------------
 
 S_NAMES.SHIELD_L_SAND = "Desert Defense"   --砂之抵御
-S_RECIPE_DESC.SHIELD_L_SAND = "Use the earth power to protect and fight back."
+S_RECIPE_DESC.SHIELD_L_SAND = "Use the power of the earth to fight back."
 S______GENERIC.DESCRIBE.SHIELD_L_SAND =
 {
-    GENERIC = "I can feel the power of the earth, maybe?",
-    WEAK = "Maybe I can't use it in the rain!",
+    GENERIC = "I can feel the power of the earth!",
+    WEAK = "Maybe I can't use it in the rain?",
     INSANE = "Maybe I'm too insane?",
 }
 --S_______WILLOW.DESCRIBE.SHIELD_L_SAND = ""
@@ -3032,11 +3032,11 @@ S_WICKERBOTTOM.DESCRIBE.SHYERRYTREE =
 -- S_______WEBBER.DESCRIBE.SHYERRYTREE = "Indeed, we have too little territory."
 -- S_______WINONA.DESCRIBE.SHYERRYTREE = "My, my! my best wrench!"
 
-S_NAMES.SHYERRYTREE_PLANTED = "Planted Treembling"    --栽种的颤栗树
+S_NAMES.SHYERRYTREE_PLANTED = "Treembling Core"    --栽种的颤栗树
 S______GENERIC.DESCRIBE.SHYERRYTREE_PLANTED =
 {
-    BURNING = "A precious tree in burning!",
-    GENERIC = "Hard transplanted tree still have only one or two leaves.",
+    BURNING = "The core in burning!",
+    GENERIC = "The most important part of the Treembling, it's normally underground!",
 }
 -- S_______WILLOW.DESCRIBE.SHYERRYTREE_PLANTED = "This is the opposite of burning."
 -- S_____WOLFGANG.DESCRIBE.SHYERRYTREE_PLANTED = "Wolfgang can eat in one bite!"
@@ -3053,7 +3053,7 @@ S_NAMES.SHYERRYFLOWER = "Abloom Treembling"    --颤栗花
 S______GENERIC.DESCRIBE.SHYERRYFLOWER =
 {
     BURNING = "A precious flower in burning!",
-    GENERIC = "It looks as if it did bear before it blossomed.",
+    GENERIC = "A blooming treembling, don't scare it!",
 }
 -- S_______WILLOW.DESCRIBE.SHYERRYFLOWER = "This is the opposite of burning."
 -- S_____WOLFGANG.DESCRIBE.SHYERRYFLOWER = "Wolfgang can eat in one bite!"
@@ -3084,7 +3084,7 @@ S_WICKERBOTTOM.DESCRIBE.SHYERRY = "Rich in nutrition, good for your health."
 -- S_______WINONA.DESCRIBE.SHYERRY = "My, my! my best wrench!"
 
 S_NAMES.SHYERRY_COOKED = "Roasted Shyerry"    --烤颤栗果
-S______GENERIC.DESCRIBE.SHYERRY_COOKED = "Wow, what a blue roasted orange!"
+S______GENERIC.DESCRIBE.SHYERRY_COOKED = "Wow, it looks like a blue orange!"
 -- S_______WILLOW.DESCRIBE.SHYERRY_COOKED = "This is the opposite of burning."
 -- S_____WOLFGANG.DESCRIBE.SHYERRY_COOKED = "Wolfgang can eat in one bite!"
 -- S________WENDY.DESCRIBE.SHYERRY_COOKED = "Hello from the other side, Abigail."
@@ -3181,7 +3181,7 @@ S______WAXWELL.DESCRIBE.GUITAR_WHITEWOOD =
 {
     GENERIC = "The violin is more elegant.",
     FAILED = "Well, I'm an assistant now?",
-    HUNGRY = "Now, time for me to eat, and the others play.",
+    HUNGRY = "Now, time for me to eat, the others can play.",
 }
 -- S___WATHGRITHR.DESCRIBE.GUITAR_WHITEWOOD = ""
 -- S_______WEBBER.DESCRIBE.GUITAR_WHITEWOOD = ""
@@ -3202,9 +3202,9 @@ S_______WORTOX.DESCRIBE.GUITAR_WHITEWOOD =
 -- S_________WURT.DESCRIBE.GUITAR_WHITEWOOD = ""
 S_______WALTER.DESCRIBE.GUITAR_WHITEWOOD =
 {
-    GENERIC = "You'll be surprised. I can play it when I'm three.",
-    FAILED = "Don't give up. I'll make it.",
-    HUNGRY = "There's the dinner bell, you know.",
+    GENERIC = "You'll be surprised. I could play it when I was three.",
+    FAILED = "Don't give up. I'll get it right next time.",
+    HUNGRY = "And that's the dinner bell.",
 }
 
 -- S_NAMES.TOY_SPONGEBOB = "Spongebob Toy"    --玩具小海绵
@@ -3244,8 +3244,8 @@ S_______WALTER.DESCRIBE.GUITAR_WHITEWOOD =
 -- S_______WALTER.DESCRIBE.TOY_PATRICKSTAR = ""
 
 S_NAMES.PINKSTAFF = "Illusion Staff"    --幻象法杖
-S_RECIPE_DESC.PINKSTAFF = "Illusion is eternal beauty."
-S______GENERIC.DESCRIBE.PINKSTAFF = "Is this real? I'm imagining a real illusion."
+S_RECIPE_DESC.PINKSTAFF = "Illusion can provide eternal beauty."
+S______GENERIC.DESCRIBE.PINKSTAFF = "Is this real? It might be an illusion."
 -- S_______WILLOW.DESCRIBE.PINKSTAFF = ""
 -- S_____WOLFGANG.DESCRIBE.PINKSTAFF = ""
 -- S________WENDY.DESCRIBE.PINKSTAFF = ""
@@ -3264,7 +3264,7 @@ S______GENERIC.DESCRIBE.PINKSTAFF = "Is this real? I'm imagining a real illusion
 
 S_NAMES.THEEMPERORSCROWN = "The Emperor's Crown"  --皇帝的王冠
 S_RECIPE_DESC.THEEMPERORSCROWN = "The symbol of sagacity."
-S______GENERIC.DESCRIBE.THEEMPERORSCROWN = "A wise man don't believe this symbol."
+S______GENERIC.DESCRIBE.THEEMPERORSCROWN = "A wise man won't believe this symbol."
 -- S_______WILLOW.DESCRIBE.THEEMPERORSCROWN = ""
 -- S_____WOLFGANG.DESCRIBE.THEEMPERORSCROWN = ""
 -- S________WENDY.DESCRIBE.THEEMPERORSCROWN = ""
@@ -3283,7 +3283,7 @@ S______GENERIC.DESCRIBE.THEEMPERORSCROWN = "A wise man don't believe this symbol
 
 S_NAMES.THEEMPERORSMANTLE = "The Emperor's Mantle"    --皇帝的披风
 S_RECIPE_DESC.THEEMPERORSMANTLE = "The symbol of gallantry."
-S______GENERIC.DESCRIBE.THEEMPERORSMANTLE = "A fearless man don't believe this symbol."
+S______GENERIC.DESCRIBE.THEEMPERORSMANTLE = "A fearless man won't believe this symbol."
 -- S_______WILLOW.DESCRIBE.THEEMPERORSMANTLE = ""
 -- S_____WOLFGANG.DESCRIBE.THEEMPERORSMANTLE = ""
 -- S________WENDY.DESCRIBE.THEEMPERORSMANTLE = ""
@@ -3301,8 +3301,8 @@ S______GENERIC.DESCRIBE.THEEMPERORSMANTLE = "A fearless man don't believe this s
 -- S_______WALTER.DESCRIBE.THEEMPERORSMANTLE = ""
 
 S_NAMES.THEEMPERORSSCEPTER = "The Emperor's Scepter"  --皇帝的权杖
-S_RECIPE_DESC.THEEMPERORSSCEPTER = "The symbol of dignitary."
-S______GENERIC.DESCRIBE.THEEMPERORSSCEPTER = "A guileless man don't believe this symbol."
+S_RECIPE_DESC.THEEMPERORSSCEPTER = "The symbol of a dignitary."
+S______GENERIC.DESCRIBE.THEEMPERORSSCEPTER = "A guileless man won't believe this symbol."
 -- S_______WILLOW.DESCRIBE.THEEMPERORSSCEPTER = ""
 -- S_____WOLFGANG.DESCRIBE.THEEMPERORSSCEPTER = ""
 -- S________WENDY.DESCRIBE.THEEMPERORSSCEPTER = ""
@@ -3321,7 +3321,7 @@ S______GENERIC.DESCRIBE.THEEMPERORSSCEPTER = "A guileless man don't believe this
 
 S_NAMES.THEEMPERORSPENDANT = "The Emperor's Pendant" --皇帝的吊坠
 S_RECIPE_DESC.THEEMPERORSPENDANT = "The symbol of will."
-S______GENERIC.DESCRIBE.THEEMPERORSPENDANT = "A determined man don't believe this symbol."
+S______GENERIC.DESCRIBE.THEEMPERORSPENDANT = "A determined man won't believe this symbol."
 -- S_______WILLOW.DESCRIBE.THEEMPERORSPENDANT = ""
 -- S_____WOLFGANG.DESCRIBE.THEEMPERORSPENDANT = ""
 -- S________WENDY.DESCRIBE.THEEMPERORSPENDANT = ""
@@ -3339,7 +3339,7 @@ S______GENERIC.DESCRIBE.THEEMPERORSPENDANT = "A determined man don't believe thi
 -- S_______WALTER.DESCRIBE.THEEMPERORSPENDANT = ""
 
 S_NAMES.MAT_WHITEWOOD_ITEM = "White Wood Mat" --白木地垫
-S_RECIPE_DESC.MAT_WHITEWOOD_ITEM = "Gives your feet a woody feel."
+S_RECIPE_DESC.MAT_WHITEWOOD_ITEM = "Gives your feet a nice woody feel."
 S______GENERIC.DESCRIBE.MAT_WHITEWOOD_ITEM = "White wood chips for decorating the ground."
 -- S_______WILLOW.DESCRIBE.MAT_WHITEWOOD_ITEM = ""
 -- S_____WOLFGANG.DESCRIBE.MAT_WHITEWOOD_ITEM = ""
@@ -3366,11 +3366,11 @@ S_NAMES.BACKCUB = "Back Cub"    --靠背熊
 S______GENERIC.DESCRIBE.BACKCUB = "Hey, I think it likes my back."
 S_______WILLOW.DESCRIBE.BACKCUB = "Oh! So cute, like my Bernie."
 --S_____WOLFGANG.DESCRIBE.BACKCUB = ""
-S________WENDY.DESCRIBE.BACKCUB = "Baby's always so cute, grown one's not."
+S________WENDY.DESCRIBE.BACKCUB = "It's babies are always so cute, now the adults are a different story."
 --S_________WX78.DESCRIBE.BACKCUB = ""
 --S_WICKERBOTTOM.DESCRIBE.BACKCUB = ""
 --S_______WOODIE.DESCRIBE.BACKCUB = ""
-S______WAXWELL.DESCRIBE.BACKCUB = "Hm... No Monster child, no future trouble."
+S______WAXWELL.DESCRIBE.BACKCUB = "Hm... with no monster child there'd be no future trouble..."
 --S___WATHGRITHR.DESCRIBE.BACKCUB = ""
 S_______WEBBER.DESCRIBE.BACKCUB = "We don't want to grow up, do you?"
 -- S_______WINONA.DESCRIBE.BACKCUB = ""
@@ -3385,12 +3385,12 @@ S_____WOLFGANG.DESCRIBE.SHIELD_L_LOG = "The pattern on it is a little artistic."
 -- S________WENDY.DESCRIBE.SHIELD_L_LOG = ""
 -- S_________WX78.DESCRIBE.SHIELD_L_LOG = ""
 -- S_WICKERBOTTOM.DESCRIBE.SHIELD_L_LOG = ""
-S_______WOODIE.DESCRIBE.SHIELD_L_LOG = "Not handy."
-S______WAXWELL.DESCRIBE.SHIELD_L_LOG = "I'm not going to wave around with a ridiculous shield."
-S___WATHGRITHR.DESCRIBE.SHIELD_L_LOG = "The new fighting ideas for a warrior."
+S_______WOODIE.DESCRIBE.SHIELD_L_LOG = "Not too handy."
+S______WAXWELL.DESCRIBE.SHIELD_L_LOG = "I'm not going to wave around this ridiculous shield."
+S___WATHGRITHR.DESCRIBE.SHIELD_L_LOG = "A new fighting idea for a warrior!"
 -- S_______WEBBER.DESCRIBE.SHIELD_L_LOG = ""
 -- S_______WINONA.DESCRIBE.SHIELD_L_LOG = ""
-S_______WORTOX.DESCRIBE.SHIELD_L_LOG = "Just slip away when I can't hide, so I don't need a board."
+S_______WORTOX.DESCRIBE.SHIELD_L_LOG = "I just slip away when I can't hide, so I don't need this."
 S_____WORMWOOD.DESCRIBE.SHIELD_L_LOG = "Friends' body has become my barrier."
 -- S________WARLY.DESCRIBE.SHIELD_L_LOG = ""
 -- S_________WURT.DESCRIBE.SHIELD_L_LOG = ""
@@ -3405,7 +3405,7 @@ STRINGS.ACTIONS_LEGION = {
     PICKUP_CONTRACTS = "Put away", --捡起契约书的名字
     GIVE_CONTRACTS = "Give", --给予灵魂给契约书的名字
     PULLOUTSWORD = "Pull out", --拔剑出鞘动作的名字
-    USE_UPGRADEKIT = "Assembly upgrade", --升级套件的升级动作的名字
+    USE_UPGRADEKIT = "Assemble upgrade", --升级套件的升级动作的名字
     MAKE = "Make", --打窝器容器的按钮名字
     ATTACK_SHIELD_L = "Protective attack", --盾牌类道具通用动作的名字
 }
@@ -3419,7 +3419,7 @@ STRINGS.UI.CRAFTING_FILTERS.RECAST = "Recast"
 --NEEDS..新tech的名字
 STRINGS.UI.CRAFTING.NEEDSELECOURMALINE_ONE = "Find the Elecourmaline to build this!"
 STRINGS.UI.CRAFTING.NEEDSELECOURMALINE_TWO = "It seems that this stone is not fully activated!"
-STRINGS.UI.CRAFTING.NEEDSELECOURMALINE_THREE = "Find the activated Elecourmaline to build this!"
+STRINGS.UI.CRAFTING.NEEDSELECOURMALINE_THREE = "Find an activated Elecourmaline to build this!"
 
 STRINGS.ACTIONS.REPAIR_LEGION = {
     GENERIC = "Repair",
@@ -3440,7 +3440,7 @@ S______GENERIC.ACTIONFAIL.REPAIR_LEGION = {
 -- S___WATHGRITHR.ACTIONFAIL.REPAIR_LEGION =
 S_______WEBBER.ACTIONFAIL.REPAIR_LEGION = {
     GUITAR = "It's none of our business.",
-    FUNGUS = "We can't see what's wrong with our several eyes.",
+    FUNGUS = "We can't see what's wrong even with our several eyes.",
     MAT = "OK, that's good.",
 }
 S_______WINONA.ACTIONFAIL.REPAIR_LEGION = {
@@ -3565,9 +3565,9 @@ S______GENERIC.ACTIONFAIL.GENETRANS = {
 -- S_______WORTOX.ACTIONFAIL.GENETRANS =
 -- S_____WORMWOOD.ACTIONFAIL.GENETRANS =
 S________WARLY.ACTIONFAIL.GENETRANS = {
-    DONE = "You can only put one dish on a plate at same time!",
+    DONE = "You can only put one dish on this plate at same time!",
     GROWING = "A pot can only cook one dish at same time!",
-    NOENERGY = "The stove is out of fire.",
+    NOENERGY = "This stove is out of fuel.",
     WRONGITEM = "Wrong ingredients.",
     ENERGYMAX = "Maximum power has been reached."
 }
@@ -3619,13 +3619,13 @@ STRINGS.ACTIONS.RC_SKILL_L = {
 
 STRINGS.ACTIONS.LIFEBEND = {
     GENERIC = "Rejuvenate",
-    REVIVE = "Giving Life",
+    REVIVE = "Resurrect",
     CURE = "Heal"
 }
 S______GENERIC.ACTIONFAIL.LIFEBEND = {
-    NOLIFE = "I can't give life anymore.",
-    GHOST = "Its soul is crippled beyond repair.",
-    NOTHURT = "Life is enough without me bending it.",
+    NOLIFE = "I'm out of life.",
+    GHOST = "It's soul is crippled beyond repair.",
+    NOTHURT = "Your health is already topped off!",
     NOWITHERED = "It's growing nicely!"
 }
 -- S_______WILLOW.ACTIONFAIL.LIFEBEND =
@@ -3634,10 +3634,10 @@ S________WENDY.ACTIONFAIL.LIFEBEND = {
     NOLIFE = "I have reached the end of my life.",
     GHOST = "Many attempts, but I don't want to give up yet.",
     NOTHURT = "You don't need me anymore, do you?",
-    NOWITHERED = "Too good looking and still perfect in life."
+    NOWITHERED = "Still in perfect health."
 }
 S_________WX78.ACTIONFAIL.LIFEBEND = {
-    NOLIFE = "WARNING: LOW SELF LIFE ENERGY!",
+    NOLIFE = "WARNING: LOW LIFE ENERGY!",
     GHOST = "RESURRECTING A LONE GHOST? NO!",
     NOTHURT = "SCAN: NORMAL FUNCTION.",
     NOWITHERED = "SCAN: NORMAL STATUS."

@@ -40,12 +40,17 @@ local function onequip(inst, owner)
 
     inst.updatetask = inst:DoPeriodicTask(5, function()
         if not TheWorld.state.iswinter and TheWorld.state.isday then
+            if not owner:IsValid() then
+                inst.updatetask:Cancel()
+                inst.updatetask = nil
+                return
+            end
             local x,y,z = owner.Transform:GetWorldPosition()
             local ents = TheSim:FindEntities(x,y,z, 6, {"flower"})
             for k,v in pairs(ents) do
                 if math.random() < 0.1 then
                     local fly = SpawnPrefab("butterfly")
-
+ 
                     if fly.components.pollinator ~= nil then
                         fly.components.pollinator:Pollinate(v)
                     end

@@ -824,7 +824,7 @@ local function HealOwner(mask, owner)
         owner.components.health ~= nil and
         not owner.components.health:IsDead() and owner.components.health:IsHurt()
     then
-        owner.components.health:DoDelta(2, true, nil, true, nil, true)
+        owner.components.health:DoDelta(2, true, "debug_key", true, nil, true) --对旺达的回血只有特定原因才能成功
         mask.healthcounter = mask.healthcounter - 4
         return true
     end
@@ -885,7 +885,7 @@ MakeMask({
 
             local notags = {
                 "NOCLICK", "shadow", "playerghost", "ghost",
-                "INLIMBO", "wall", "structure", "balloon", "siving"
+                "INLIMBO", "wall", "structure", "balloon", "siving", "glommer", "friendlyfruitfly", "boat"
             }
             if owner:HasTag("player") then --佩戴者是玩家时，不吸收其他玩家
                 table.insert(notags, "player")
@@ -1039,7 +1039,7 @@ MakeMask({
 
             local notags = {
                 "NOCLICK", "shadow", "playerghost", "ghost",
-                "INLIMBO", "wall", "structure", "balloon", "siving"
+                "INLIMBO", "wall", "structure", "balloon", "siving", "glommer", "friendlyfruitfly", "boat"
             }
             if owner:HasTag("player") then --佩戴者是玩家时，不吸收其他玩家
                 table.insert(notags, "player")

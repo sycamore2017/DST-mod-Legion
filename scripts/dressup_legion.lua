@@ -872,8 +872,7 @@ local dressup_data = {
         buildfile = "swap_one_man_band",
         buildsymbol = "swap_body_tall",
     },
-    amulet =
-    {
+    amulet = {
         buildfn = function(dressup, item, buildskin)
             local itemswap = {}
 
@@ -889,7 +888,7 @@ local dressup_data = {
             itemswap["backpack"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
 
             return itemswap
-        end,
+        end
     },
     blueamulet =
     {
@@ -911,10 +910,23 @@ local dressup_data = {
         buildfile = "torso_amulets",
         buildsymbol = "orangeamulet",
     },
-    yellowamulet =
-    {
-        buildfile = "torso_amulets",
-        buildsymbol = "yellowamulet",
+    yellowamulet = {
+        buildfn = function(dressup, item, buildskin)
+            local itemswap = {}
+
+            if buildskin ~= nil then
+                itemswap["swap_body"] = dressup:GetDressData(
+                    buildskin, "torso_amulets", "swap_body", item.GUID, "swap"
+                )
+            else
+                itemswap["swap_body"] = dressup:GetDressData(
+                    buildskin, "torso_amulets", "yellowamulet", item.GUID, "swap"
+                )
+            end
+            itemswap["backpack"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
+
+            return itemswap
+        end
     },
     raincoat =
     {
