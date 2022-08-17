@@ -1527,128 +1527,72 @@ S________WARLY.DESCRIBE.DISH_TOMAHAWKSTEAK = {
 --------------------------------------------------------------------------
 
 S_NAMES.RAINDONATE = "Raindonate"    --雨蝇
-S______GENERIC.DESCRIBE.RAINDONATE =
-{
+S______GENERIC.DESCRIBE.RAINDONATE = {
     GENERIC = "Elders said that the killing of it would start to rain.",
     HELD = "Look, a blue winged insect!",
 }
---S_______WILLOW.DESCRIBE.RAINDONATE = "This is the opposite of burning."
---S_____WOLFGANG.DESCRIBE.RAINDONATE = "Wolfgang can eat in one bite!"
---S________WENDY.DESCRIBE.RAINDONATE = "I used to eat these with Abigail..."
---S_________WX78.DESCRIBE.RAINDONATE = "STICK ADDON INSTALLED"
---S_WICKERBOTTOM.DESCRIBE.RAINDONATE = "Well, isn't that refreshing?"
---S_______WOODIE.DESCRIBE.RAINDONATE = "I'd prefer maple taffy..."
---S______WAXWELL.DESCRIBE.RAINDONATE = "Hm... I don't know what I was expecting."
---S___WATHGRITHR.DESCRIBE.RAINDONATE = "I've somehow found a way to make it even LESS appealing!"
---S_______WEBBER.DESCRIBE.RAINDONATE = "Yaaay! Popsicle, popsicle!"
---S_______WINONA.DESCRIBE.RAINDONATE = "Great to cool off after some hard physical labor."
+-- S_______WILLOW.DESCRIBE.RAINDONATE = ""
+-- S_____WOLFGANG.DESCRIBE.RAINDONATE = ""
+-- S________WENDY.DESCRIBE.RAINDONATE = ""
+-- S_________WX78.DESCRIBE.RAINDONATE = ""
+-- S_WICKERBOTTOM.DESCRIBE.RAINDONATE = ""
+-- S_______WOODIE.DESCRIBE.RAINDONATE = ""
+-- S______WAXWELL.DESCRIBE.RAINDONATE = ""
+-- S___WATHGRITHR.DESCRIBE.RAINDONATE = ""
+-- S_______WEBBER.DESCRIBE.RAINDONATE = ""
+-- S_______WINONA.DESCRIBE.RAINDONATE = ""
+-- S_______WORTOX.DESCRIBE.RAINDONATE = ""
+-- S_____WORMWOOD.DESCRIBE.RAINDONATE = ""
+-- S________WARLY.DESCRIBE.RAINDONATE = ""
+-- S_________WURT.DESCRIBE.RAINDONATE = ""
+-- S_______WALTER.DESCRIBE.RAINDONATE = ""
+-- S________WANDA.DESCRIBE.RAINDONATE = ""
 
 S_NAMES.MONSTRAIN = "Monstrain"   --雨竹
-S______GENERIC.DESCRIBE.MONSTRAIN =
-{
+S______GENERIC.DESCRIBE.MONSTRAIN = {
     SUMMER = "The water at the bottom fled.",
     WINTER = "The water at the bottom solidified.",
     GENERIC = "Careful! Don't touch the juice of it!",
     PICKED = "I'll just take a look.",
 }
---[[
-S_______WILLOW.DESCRIBE.MONSTRAIN =
-{
-    SUMMER = "The water at the bottom fled.",
-    WINTER = "The water at the bottom solidified.",
-    GENERIC = "Careful! Don't touch the juice of it!",
-    PICKED = "I'll just take a look.",
-}
-S_____WOLFGANG.DESCRIBE.MONSTRAIN =
-{
-    SUMMER = "The water at the bottom fled.",
-    WINTER = "The water at the bottom solidified.",
-    GENERIC = "Careful! Don't touch the juice of it!",
-    PICKED = "I'll just take a look.",
-}
-S________WENDY.DESCRIBE.MONSTRAIN =
-{
-    SUMMER = "The water at the bottom fled.",
-    WINTER = "The water at the bottom solidified.",
-    GENERIC = "Careful! Don't touch the juice of it!",
-    PICKED = "I'll just take a look.",
-}
-S_________WX78.DESCRIBE.MONSTRAIN =
-{
-    SUMMER = "The water at the bottom fled.",
-    WINTER = "The water at the bottom solidified.",
-    GENERIC = "Careful! Don't touch the juice of it!",
-    PICKED = "I'll just take a look.",
-}
-S_WICKERBOTTOM.DESCRIBE.MONSTRAIN =
-{
-    SUMMER = "The water at the bottom fled.",
-    WINTER = "The water at the bottom solidified.",
-    GENERIC = "Careful! Don't touch the juice of it!",
-    PICKED = "I'll just take a look.",
-}
-S_______WOODIE.DESCRIBE.MONSTRAIN =
-{
-    SUMMER = "The water at the bottom fled.",
-    WINTER = "The water at the bottom solidified.",
-    GENERIC = "Careful! Don't touch the juice of it!",
-    PICKED = "I'll just take a look.",
-}
-S______WAXWELL.DESCRIBE.MONSTRAIN =
-{
-    SUMMER = "The water at the bottom fled.",
-    WINTER = "The water at the bottom solidified.",
-    GENERIC = "Careful! Don't touch the juice of it!",
-    PICKED = "I'll just take a look.",
-}
-S___WATHGRITHR.DESCRIBE.MONSTRAIN =
-{
-    SUMMER = "The water at the bottom fled.",
-    WINTER = "The water at the bottom solidified.",
-    GENERIC = "Careful! Don't touch the juice of it!",
-    PICKED = "I'll just take a look.",
-}
-S_______WEBBER.DESCRIBE.MONSTRAIN =
-{
-    SUMMER = "The water at the bottom fled.",
-    WINTER = "The water at the bottom solidified.",
-    GENERIC = "Careful! Don't touch the juice of it!",
-    PICKED = "I'll just take a look.",
-}
-S_______WINONA.DESCRIBE.MONSTRAIN =
-{
-    SUMMER = "The water at the bottom fled.",
-    WINTER = "The water at the bottom solidified.",
-    GENERIC = "Careful! Don't touch the juice of it!",
-    PICKED = "I'll just take a look.",
-}
-]]--
 
 S_NAMES.SQUAMOUSFRUIT = "Squamous Fruit"    --鳞果
 S______GENERIC.DESCRIBE.SQUAMOUSFRUIT = "Wow, edible pinecone."
---S_______WILLOW.DESCRIBE.SQUAMOUSFRUIT = "This is the opposite of burning."
---S_____WOLFGANG.DESCRIBE.SQUAMOUSFRUIT = "Wolfgang can eat in one bite!"
---S________WENDY.DESCRIBE.SQUAMOUSFRUIT = "I used to eat these with Abigail..."
---S_________WX78.DESCRIBE.SQUAMOUSFRUIT = "STICK ADDON INSTALLED"
---S_WICKERBOTTOM.DESCRIBE.SQUAMOUSFRUIT = "Well, isn't that refreshing?"
+-- S_______WILLOW.DESCRIBE.SQUAMOUSFRUIT = ""
+-- S_____WOLFGANG.DESCRIBE.SQUAMOUSFRUIT = ""
+-- S________WENDY.DESCRIBE.SQUAMOUSFRUIT = ""
+-- S_________WX78.DESCRIBE.SQUAMOUSFRUIT = ""
+-- S_WICKERBOTTOM.DESCRIBE.SQUAMOUSFRUIT = ""
 S_______WOODIE.DESCRIBE.SQUAMOUSFRUIT = "A pinecone that can't grow up."
---S______WAXWELL.DESCRIBE.SQUAMOUSFRUIT = "Hm... I don't know what I was expecting."
---S___WATHGRITHR.DESCRIBE.SQUAMOUSFRUIT = "I've somehow found a way to make it even LESS appealing!"
+-- S______WAXWELL.DESCRIBE.SQUAMOUSFRUIT = ""
+-- S___WATHGRITHR.DESCRIBE.SQUAMOUSFRUIT = ""
 S_______WEBBER.DESCRIBE.SQUAMOUSFRUIT = "Wow, pinecone with our favorite color."
---S_______WINONA.DESCRIBE.SQUAMOUSFRUIT = "Great to cool off after some hard physical labor."
+-- S_______WINONA.DESCRIBE.SQUAMOUSFRUIT = ""
+-- S_______WORTOX.DESCRIBE.SQUAMOUSFRUIT = ""
+-- S_____WORMWOOD.DESCRIBE.SQUAMOUSFRUIT = ""
+-- S________WARLY.DESCRIBE.SQUAMOUSFRUIT = ""
+-- S_________WURT.DESCRIBE.SQUAMOUSFRUIT = ""
+-- S_______WALTER.DESCRIBE.SQUAMOUSFRUIT = ""
+-- S________WANDA.DESCRIBE.SQUAMOUSFRUIT = ""
 
 S_NAMES.MONSTRAIN_LEAF = "Monstrain Leaf"    --雨竹叶
 S______GENERIC.DESCRIBE.MONSTRAIN_LEAF = "When I eat it, it eats me."
---S_______WILLOW.DESCRIBE.MONSTRAIN_LEAF = "This is the opposite of burning."
---S_____WOLFGANG.DESCRIBE.MONSTRAIN_LEAF = "Wolfgang can eat in one bite!"
---S________WENDY.DESCRIBE.MONSTRAIN_LEAF = "I used to eat these with Abigail..."
---S_________WX78.DESCRIBE.MONSTRAIN_LEAF = "STICK ADDON INSTALLED"
---S_WICKERBOTTOM.DESCRIBE.MONSTRAIN_LEAF = "Well, isn't that refreshing?"
---S_______WOODIE.DESCRIBE.MONSTRAIN_LEAF = "Oops, a pinecone that cannot grow up."
---S______WAXWELL.DESCRIBE.MONSTRAIN_LEAF = "Hm... I don't know what I was expecting."
---S___WATHGRITHR.DESCRIBE.MONSTRAIN_LEAF = "I've somehow found a way to make it even LESS appealing!"
---S_______WEBBER.DESCRIBE.MONSTRAIN_LEAF = "Wow, pinecone with our favorite color."
---S_______WINONA.DESCRIBE.MONSTRAIN_LEAF = "Great to cool off after some hard physical labor."
+-- S_______WILLOW.DESCRIBE.MONSTRAIN_LEAF = ""
+-- S_____WOLFGANG.DESCRIBE.MONSTRAIN_LEAF = ""
+-- S________WENDY.DESCRIBE.MONSTRAIN_LEAF = ""
+-- S_________WX78.DESCRIBE.MONSTRAIN_LEAF = ""
+-- S_WICKERBOTTOM.DESCRIBE.MONSTRAIN_LEAF = ""
+-- S_______WOODIE.DESCRIBE.MONSTRAIN_LEAF = ""
+-- S______WAXWELL.DESCRIBE.MONSTRAIN_LEAF = ""
+-- S___WATHGRITHR.DESCRIBE.MONSTRAIN_LEAF = ""
+-- S_______WEBBER.DESCRIBE.MONSTRAIN_LEAF = ""
+-- S_______WINONA.DESCRIBE.MONSTRAIN_LEAF = ""
+-- S_______WORTOX.DESCRIBE.MONSTRAIN_LEAF = ""
+-- S_____WORMWOOD.DESCRIBE.MONSTRAIN_LEAF = ""
+-- S________WARLY.DESCRIBE.MONSTRAIN_LEAF = ""
+-- S_________WURT.DESCRIBE.MONSTRAIN_LEAF = ""
+-- S_______WALTER.DESCRIBE.MONSTRAIN_LEAF = ""
+-- S________WANDA.DESCRIBE.MONSTRAIN_LEAF = ""
 
 S_NAMES.BOOK_WEATHER = "Changing Clouds"    --多变的云
 S_RECIPE_DESC.BOOK_WEATHER = "Stir the clouds with your heart."

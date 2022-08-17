@@ -168,8 +168,8 @@ local function PlayDoing(inst, owner)
 
             inst.playcount = inst.playcount + 1
             if inst.playcount % 5 == 0 then --每五秒照料一次作物
-                local ents = TheSim:FindEntities(x, y, z, RANGE_PLAY, { "tendable_farmplant" }, { "FX", "DECOR", "INLIMBO" })
-                for i, v in ipairs(ents) do
+                local ents = TheSim:FindEntities(x, y, z, RANGE_PLAY, { "tendable_farmplant" }, { "INLIMBO" })
+                for _,v in ipairs(ents) do
                     if v.components.farmplanttendable ~= nil then
                         v.components.farmplanttendable:TendTo(owner)
                     end

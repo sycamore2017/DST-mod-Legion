@@ -854,6 +854,11 @@ AddSimPostInit(function()
                     buy = { value = 15, chance = chancemap[2], count_min = 1, count_max = 3, stacksize = 20, },
                     sell = { value = 6, chance = chancemap[2], count_min = 2, count_max = 4, stacksize = 20, },
                 },
+                dug_monstrain = {
+                    img_tex = "dug_monstrain.tex", img_atlas = "images/inventoryimages/dug_monstrain.xml",
+                    buy = { value = 10, chance = chancemap[2], count_min = 1, count_max = 3, stacksize = 20, },
+                    sell = { value = 5, chance = chancemap[2], count_min = 2, count_max = 4, stacksize = 20, },
+                },
             })
             _G.AddBambooShopItems("animals", {
                 raindonate = {

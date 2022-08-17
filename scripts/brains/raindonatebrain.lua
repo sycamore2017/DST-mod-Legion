@@ -19,9 +19,10 @@ local AVOID_PLAYER_DIST = 3
 local AVOID_PLAYER_STOP = 6
 
 local function GoHomeAction(inst)
-    if inst.components.homeseeker and 
-       inst.components.homeseeker.home and 
-       inst.components.homeseeker.home:IsValid() then
+    if inst.components.homeseeker and
+       inst.components.homeseeker.home and
+       inst.components.homeseeker.home:IsValid()
+    then
         return BufferedAction(inst, inst.components.homeseeker.home, ACTIONS.GOHOME)
     end
 end
@@ -61,7 +62,7 @@ function RaindonateBrain:OnStart()
         --走位攻击
         WhileNode( function() return self.inst.components.combat.target == nil or not self.inst.components.combat:InCooldown() end, "AttackMomentarily",
             ChaseAndAttack(self.inst, SpringCombatMod(MAX_CHASE_TIME), SpringCombatMod(MAX_CHASE_DIST))
-        ),   
+        ),
         WhileNode( function() return self.inst.components.combat.target ~= nil and self.inst.components.combat:InCooldown() end, "Dodge",
             RunAway(self.inst, function() return self.inst.components.combat.target end, RUN_AWAY_DIST, STOP_RUN_AWAY_DIST)
         ),
@@ -69,7 +70,7 @@ function RaindonateBrain:OnStart()
         --徘徊
         Wander(self.inst, function() return GetWanderPos(self.inst) end, MAX_WANDER_DIST, {minwalktime=0.1,randwalktime=0.1,minwaittime=0.0,randwaittime=0.0})
     }, .25)
-    
+
     self.bt = BT(self.inst, root)
 end
 
@@ -84,7 +85,7 @@ function RaindonateBrain:OnInitializationComplete()
     ]]----------------------------------------------------
     ------------------------------------------------------
 
-    self.inst.components.knownlocations:RememberLocation("home", Point(self.inst.Transform:GetWorldPosition()), true)
+    self.inst.components.knownlocations:RememberLocation("home", self.inst:GetPosition(), true)
 end
 
 return RaindonateBrain

@@ -938,6 +938,8 @@ local function MakePlant2(cropprefab, sets)
 				end
 				cpt:CostNutrition()
 				if cpt.donemoisture or cpt.donenutrient or cpt.donetendable then
+					--由于走的不是正常流程，这里得补上对照料的纠正
+					inst.components.farmplanttendable:SetTendable(not cpt.donetendable)
 					cpt:StartGrowing() --由于 CostNutrition() 不会主动更新生长时间，这里手动更新
 				end
 			end

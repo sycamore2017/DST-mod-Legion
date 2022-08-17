@@ -833,6 +833,7 @@ local fishhoming_ingredients = {
     cutted_rosebush =   { hardy = 1, pasty = 1, fragrant = 1, wrinkled = 1, grassy = 1 },
     cutted_lilybush =   { hardy = 1, pasty = 1, fragrant = 1, wrinkled = 1, grassy = 1 },
     cutted_orchidbush = { hardy = 1, pasty = 1, fragrant = 1, wrinkled = 1, grassy = 1 },
+    dug_monstrain =     { hardy = 1, pasty = 1, monster = 1 },
     lightbulb =         { dusty = 1, shiny = 1 }, --鱿鱼
     lightflier =        { dusty = 1, pasty = 1, shiny = 1, shaking = 1 },
     spore_small =       { dusty = 1, shiny = 1 },
@@ -1608,6 +1609,10 @@ local mapseeds = {
     gourd_oversized = {
         swap = { build = "farm_plant_gourd", file = "swap_body", symboltype = "3" },
         fruit = "seeds_gourd_l"
+    },
+    squamousfruit = {
+        swap = { build = "squamousfruit", file = "swap_turn", symboltype = "1" },
+        fruit = "dug_monstrain", time = 2*TUNING.TOTAL_DAY_TIME
     }
 }
 for k,v in pairs(mapseeds) do

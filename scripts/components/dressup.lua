@@ -15,9 +15,7 @@ local function UnequipItem(player, slot)
     end
 end
 local function CreateItem(self, itemdata, setpos)
-    local creator = self.origin ~= nil and TheWorld.meta.session_identifier ~= self.origin
-                            and { sessionid = self.origin } or nil
-    local item = SpawnPrefab(itemdata.prefab, itemdata.skinname, itemdata.skin_id, creator)
+    local item = SpawnPrefab(itemdata.prefab, itemdata.skinname, itemdata.skin_id)
     if item ~= nil and item:IsValid() then
         if setpos then
             item.Transform:SetPosition(self.inst.Transform:GetWorldPosition())
@@ -47,7 +45,6 @@ local BODYTALL = "body_t"
 
 local DressUp = Class(function(self, inst)
     self.inst = inst
-    self.origin = nil
     self.itemlist = {
         -- body = { item = nil, swaps = {结构与self.swaplist相同}, priority = 0 },
     }
@@ -276,7 +273,6 @@ function DressUp:PutOn(item, loaddata) --幻化一个物品
     local prioritynew = GetPriority(self.itemlist)
     if loaddata == nil then
         self.itemlist[slot] = { item = item:GetSaveRecord(), swaps = itemswap or {}, priority = prioritynew }
-        self.origin = TheWorld.meta.session_identifier
     else
         self.itemlist[slot] = { item = loaddata, swaps = itemswap or {}, priority = prioritynew }
     end
@@ -362,7 +358,6 @@ function DressUp:TakeOffAll()   --清除所有幻化效果
         end
     end
     self.itemlist = {}
-    self.origin = nil
 end
 
 function DressUp:OnSave()
@@ -376,14 +371,12 @@ function DressUp:OnSave()
         end
     end
     if hasitem then
-        data.origin = self.origin
         return data
     end
 end
 
 function DressUp:OnLoad(data, newents)
     if data ~= nil and data.items ~= nil then
-        self.origin = data.origin
         for _, v in pairs(data.items) do
             local item = CreateItem(self, v, true)
             if item ~= nil then

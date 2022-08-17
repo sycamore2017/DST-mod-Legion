@@ -145,8 +145,7 @@ end
 local plantables = {}
 
 if CONFIGS_LEGION.FLOWERSPOWER then
-    plantables.dug_rosebush =
-    {
+    plantables.dug_rosebush = {
         animstate = { bank = "berrybush2", build = "rosebush", anim = "dropped", anim_palcer = "dead", },
         floater = {0.03, "large", 0.2, {0.65, 0.5, 0.65}},  --漂浮参数（底部切割比例, 波纹动画, 波纹所处位置比例, 波纹大小）
         stacksize = TUNING.STACK_SIZE_LARGEITEM,            --最大堆叠数
@@ -166,8 +165,7 @@ if CONFIGS_LEGION.FLOWERSPOWER then
         end,
         fn_server = nil,
     }
-    plantables.dug_lilybush =
-    {
+    plantables.dug_lilybush = {
         animstate = { bank = "berrybush2", build = "lilybush", anim = "dropped", anim_palcer = "dead", },
         floater = {0.03, "large", 0.2, {0.65, 0.5, 0.65}},
         stacksize = TUNING.STACK_SIZE_LARGEITEM,
@@ -187,8 +185,7 @@ if CONFIGS_LEGION.FLOWERSPOWER then
         end,
         fn_server = nil,
     }
-    plantables.dug_orchidbush =
-    {
+    plantables.dug_orchidbush = {
         animstate = { bank = "berrybush2", build = "orchidbush", anim = "dropped", anim_palcer = "dead", },
         floater = {nil, "large", 0.1, {0.65, 0.5, 0.65}},
         stacksize = TUNING.STACK_SIZE_LARGEITEM,
@@ -208,8 +205,7 @@ if CONFIGS_LEGION.FLOWERSPOWER then
         end,
         fn_server = nil,
     }
-    plantables.cutted_rosebush =
-    {
+    plantables.cutted_rosebush = {
         animstate = { bank = "rosebush", build = "rosebush", anim = "cutted", anim_palcer = "dead", },
         floater = {nil, "large", 0.1, 0.55},
         stacksize = TUNING.STACK_SIZE_SMALLITEM,
@@ -229,8 +225,7 @@ if CONFIGS_LEGION.FLOWERSPOWER then
         end,
         fn_server = nil,
     }
-    plantables.cutted_lilybush =
-    {
+    plantables.cutted_lilybush = {
         animstate = { bank = "lilybush", build = "lilybush", anim = "cutted", anim_palcer = "dead", },
         floater = {nil, "large", 0.1, 0.55},
         stacksize = TUNING.STACK_SIZE_SMALLITEM,
@@ -368,6 +363,35 @@ if CONFIGS_LEGION.LEGENDOFFALL then
             end
         ))
     end
+end
+
+if CONFIGS_LEGION.PRAYFORRAIN then
+    plantables.dug_monstrain = {
+        animstate = { bank = "monstrain", build = "monstrain", anim = "dropped", anim_palcer = "idle_summer", },
+        floater = {0.03, "large", 0.2, {0.65, 0.5, 0.65}},
+        stacksize = TUNING.STACK_SIZE_LARGEITEM,
+        fuelvalue = TUNING.SMALL_FUEL,
+        burnable = {
+            time = TUNING.SMALL_BURNTIME,
+            fxsize = "small",
+            lightedsize = "small",
+        },
+        deployable = {
+            prefab = "monstrain_wizen",
+            mode = DEPLOYMODE.PLANT,
+            spacing = nil,
+        },
+        fn_common = function(inst)
+            inst:AddTag("deployedplant")
+        end,
+        fn_server = nil,
+    }
+    -- table.insert(prefabs, MakePlacer(
+    --     "dug_monstrain_placer", "monstrain", "monstrain", "mod",
+    --     nil, nil, nil, nil, nil, nil, function(inst)
+    --         inst.AnimState:Hide("fruit")
+    --     end
+    -- ))
 end
 
 --------------------

@@ -721,8 +721,9 @@ function PerennialCrop:TendTo(doer, wish) --照顾
 		self.inst.components.farmplanttendable:SetTendable(not self.tended)
 	end
 	if not self.inst:IsAsleep() then
+		local tended = self.tended --记下此时状态，因为0.5秒后状态可能已经发生改变
 		self.inst:DoTaskInTime(0.5 + math.random() * 0.5, function()
-			local fx = SpawnPrefab(self.tended and "farm_plant_happy" or "farm_plant_unhappy")
+			local fx = SpawnPrefab(tended and "farm_plant_happy" or "farm_plant_unhappy")
 			if fx ~= nil then
 				fx.Transform:SetPosition(self.inst.Transform:GetWorldPosition())
 			end
@@ -880,7 +881,7 @@ function PerennialCrop:CostController()
 			end
 
 			if tendable and botanyctl.type == 3 then
-				self:TendTo(botanyctl)
+				self:TendTo(ctl)
 				tendable = false
 			end
 

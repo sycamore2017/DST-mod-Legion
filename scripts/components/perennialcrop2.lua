@@ -734,8 +734,9 @@ function PerennialCrop2:TendTo(doer, wish) --照顾
 		self.inst.components.farmplanttendable:SetTendable(not self.donetendable)
 	end
 	if not self.inst:IsAsleep() then
+		local tended = self.donetendable --记下此时状态，因为0.5秒后状态可能已经发生改变
 		self.inst:DoTaskInTime(0.5 + math.random() * 0.5, function()
-			local fx = SpawnPrefab(self.donetendable and "farm_plant_happy" or "farm_plant_unhappy")
+			local fx = SpawnPrefab(tended and "farm_plant_happy" or "farm_plant_unhappy")
 			if fx ~= nil then
 				fx.Transform:SetPosition(self.inst.Transform:GetWorldPosition())
 			end
@@ -805,9 +806,9 @@ function PerennialCrop2:PourWater(item, doer, value) --浇水
 end
 
 function PerennialCrop2:CostController()
-	if self.isrotten or self.stage == self.stage_max then
-		return
-	end
+	-- if self.isrotten or self.stage == self.stage_max then
+	-- 	return
+	-- end
 	if self.donemoisture and self.donenutrient and self.donetendable then
 		return
 	end

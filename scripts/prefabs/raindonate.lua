@@ -64,15 +64,16 @@ local function OnDropped(inst)  --被丢在地上时
         inst.sg:Start()
     end
 
-    if inst.components.knownlocations ~= nil then
-        inst.components.knownlocations:RememberLocation("home", Point(inst.Transform:GetWorldPosition()))
+    if inst.components.knownlocations ~= nil then --被丢弃时重新标记家的位置
+        inst.components.knownlocations:RememberLocation("home", inst:GetPosition())
     end
 end
 
 local function OnPickedUp(inst)
     inst.SoundEmitter:KillSound("buzz")
-    if inst.brain ~= nil then
-        inst.brain:Stop()
+    if inst.components.homeseeker then
+        inst.components.homeseeker:SetHome(nil)
+        inst:RemoveComponent("homeseeker")
     end
 end
 
@@ -96,10 +97,10 @@ local function SwapBelly(inst, size)    --换身体部分的贴图
     end
 end
 
-local function HuntingBug(inst, data)    --攻击时,直接杀死小型昆虫
+local function HuntingBug(inst, data) --攻击时,直接杀死小型昆虫
     if data.target:HasTag("smallcreature") and data.target:HasTag("insect") then
         if data.target.components.health ~= nil and not data.target.components.health:IsDead() then
-            data.target.components.health:DoDelta(-data.target.components.health.currenthealth, nil, "hunted", true, nil, true)
+            data.target.components.health:DoDelta(-data.target.components.health.currenthealth, nil, inst.prefab, true, nil, true)
         end
 
         if inst.components.health ~= nil and inst.components.health:GetPercent() < 1 then
@@ -121,7 +122,7 @@ end
 -- end
 
 local function OnDeath(inst)
-    if math.random() <= 0.33 then --33%几率下雨/雪
+    if math.random() < 0.33 then --33%几率下雨/雪
         TheWorld:PushEvent("ms_forceprecipitation", true)
     end
 end
@@ -146,23 +147,22 @@ local function raindonate()
     inst:AddTag("flying")
     inst:AddTag("smallcreature")
     inst:AddTag("cattoyairborne")
+    inst:AddTag("ignorewalkableplatformdrowning")
 
     inst.AnimState:SetBank("mosquito")  --使用官方的动画模板，因为反编译出来的动画模板有很多问题
     inst.AnimState:SetBuild("raindonate")
     inst.AnimState:PlayAnimation("idle")
     inst.AnimState:SetRayTestOnBB(true) --可点击范围变大？
 
-    MakeFeedableSmallLivestockPristine(inst)    --可以在背包里被喂食
+    MakeInventoryFloatable(inst)
+    MakeFeedableSmallLivestockPristine(inst) --可以在背包里被喂食
 
     inst.entity:SetPristine()
-
     if not TheWorld.ismastersim then
         return inst
     end
 
     inst:SetBrain(brain)
-
-    ----------
 
     inst:AddComponent("locomotor") --速度组件一定要写在sg声明之前
     inst.components.locomotor:EnableGroundSpeedMultiplier(false)
@@ -177,22 +177,20 @@ local function raindonate()
     inst.OnEntityWake = StartBuzz
     inst.OnEntitySleep = StopBuzz
 
-    -- inst:AddComponent("stackable")
-
     inst:AddComponent("inventoryitem")
+    inst.components.inventoryitem.nobounce = true
     inst.components.inventoryitem.canbepickedup = false
     inst.components.inventoryitem.canbepickedupalive = true
+    inst.components.inventoryitem.pushlandedevents = false
     inst.components.inventoryitem.imagename = "raindonate"
     inst.components.inventoryitem.atlasname = "images/inventoryimages/raindonate.xml"
-
-    ---------------------
 
     --inst:AddComponent("lootdropper")
     --inst.components.lootdropper:SetChanceLootTable('raindonate')
 
-    inst:AddComponent("tradable")
+    -- inst:AddComponent("stackable")
 
-     ------------------
+    inst:AddComponent("tradable")
 
     inst:AddComponent("workable")
     inst.components.workable:SetWorkAction(ACTIONS.NET) --用网捕捉
@@ -202,13 +200,9 @@ local function raindonate()
     MakeSmallBurnableCharacter(inst, "body", Vector3(0, -1, 1))
     MakeTinyFreezableCharacter(inst, "body", Vector3(0, -1, 1))
 
-    ------------------
-
     inst:AddComponent("health")
-    inst.components.health:SetMaxHealth(150)    --苍蝇是100
+    inst.components.health:SetMaxHealth(150) --苍蝇是100
     -- inst.components.health.ondelta = OnHealthDelta
-
-    ------------------
 
     inst:AddComponent("combat")
     inst.components.combat.hiteffectsymbol = "body"
@@ -223,24 +217,17 @@ local function raindonate()
 
     MakeHauntablePanic(inst)
 
-    ------------------
-
     inst:AddComponent("sleeper")
-
-    ------------------
+    inst.components.sleeper.watchlight = true
 
     inst:AddComponent("knownlocations")
-
-    ------------------
 
     inst:AddComponent("inspectable")
 
     -- inst:ListenForEvent("attacked", OnAttacked)
     inst:ListenForEvent("death", OnDeath)
 
-    MakeFeedableSmallLivestock(inst, TUNING.TOTAL_DAY_TIME * 2, nil, nil)
-    inst:ListenForEvent("onputininventory", OnPickedUp)
-    inst:ListenForEvent("ondropped", OnDropped)
+    MakeFeedableSmallLivestock(inst, TUNING.TOTAL_DAY_TIME * 2, OnPickedUp, OnDropped)
 
     return inst
 end

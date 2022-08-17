@@ -174,13 +174,18 @@ local function WitherComputNutrients(self, v)
         end
     end
 end
-local function ComputSoils(self, fn_tile, fn_wither, fn_check)
+local function ComputSoils(self, fn_tile, fn_wither, fn_check, fn_tend)
     if fn_check(self) then
         return
     end
 
     local isasleep = self.inst:IsAsleep()
     local x, y, z = self.inst.Transform:GetWorldPosition()
+
+    if fn_tend ~= nil then
+        fn_tend(self, x, y, z)
+    end
+
     for k1 = -28,28,4 do
         for k2 = -28,28,4 do
             local tile = TheWorld.Map:GetTileAtPoint(x+k1, 0, z+k2)
@@ -206,7 +211,7 @@ local function ComputSoils(self, fn_tile, fn_wither, fn_check)
 
     local ents = TheSim:FindEntities(x, y, z, 20,
         nil,
-        { "NOCLICK", "FX", "INLIMBO" },
+        { "NOCLICK", "INLIMBO" },
         { "witherable", "barren", "crop2_legion" } --不需要考虑子圭作物，因为机制已经有了
     )
     for _,v in pairs(ents) do
@@ -248,6 +253,14 @@ function BotanyController:DoAreaFunction()
             end,
             function(self)
                 return self.moisture <= 0 and isEmptyNutrients(self)
+            end,
+            function(self, x, y, z)
+                local ents = TheSim:FindEntities(x, y, z, 20, { "tendable_farmplant" }, { "INLIMBO" })
+                for _,v in ipairs(ents) do
+                    if v.components.farmplanttendable ~= nil then
+                        v.components.farmplanttendable:TendTo(self.inst)
+                    end
+                end
             end
         )
     end

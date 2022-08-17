@@ -641,7 +641,8 @@ AddStategraphActionHandler("wilson_client", ActionHandler(ACTIONS.STORE_BEEF_L, 
 
 ------左键喂食动作------
 
-local FEED_BEEF_L = Action({ priority = -1, mount_valid = true, canforce=true, rangecheckfn = ACTIONS.GIVE.rangecheckfn })
+--喂食的优先级得小于存放的
+local FEED_BEEF_L = Action({ priority = 1, mount_valid = true, canforce=true, rangecheckfn = ACTIONS.GIVE.rangecheckfn })
 FEED_BEEF_L.id = "FEED_BEEF_L"
 FEED_BEEF_L.str = STRINGS.ACTIONS_LEGION.FEED_BEEF_L
 FEED_BEEF_L.fn = ACTIONS.GIVE.fn

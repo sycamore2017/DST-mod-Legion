@@ -167,4 +167,3 @@ CommonStates.AddSleepStates(states,
 CommonStates.AddFrozenStates(states, StopBuzz, StartBuzz)
 
 return StateGraph("raindonate", states, events, "idle", actionhandlers)
-

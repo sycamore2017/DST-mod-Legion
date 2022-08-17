@@ -268,7 +268,7 @@ local function MakeConstruct(data)
             return
         end
 
-        local time = 235 + math.random()*10
+        local time = 210 + math.random()*10
         inst.task_function = inst:DoPeriodicTask(time, function()
             if TheWorld.state.israining or TheWorld.state.issnowing then --下雨时补充水分
                 inst.components.botanycontroller:SetValue(800, nil, true)
@@ -593,7 +593,7 @@ MakeItem({
         Asset("IMAGE", "images/inventoryimages/siving_ctlall_item.tex"),
     },
     prefabs = { "siving_ctlall" },
-    sound = "dontstarve/common/winter_meter_craft",
+    sound = "dontstarve/halloween_2018/madscience_machine/place",
 })
 MakeConstruct({
     name = "all",
@@ -749,7 +749,12 @@ table.insert(prefs, Prefab(
             local cpt = lootdropper.inst.components.genetrans
             if cpt.fruit then
                 local loots = {}
-                local number = cpt.fruit == "seeds_mandrake_l" and 1 or math.random(2,3)
+                local number
+                if cpt.fruit == "seeds_mandrake_l" or cpt.fruit == "dug_monstrain" then
+                    number = 1
+                else
+                    number = math.random(2,3)
+                end
                 for i = 1, number, 1 do
                     table.insert(loots, cpt.fruit)
                 end

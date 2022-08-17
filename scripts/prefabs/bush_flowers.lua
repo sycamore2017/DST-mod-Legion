@@ -196,7 +196,8 @@ local function SpawnMyLoot(bush, picker, itemname, itemnumber, mustdrop, checksk
             if skindata and skindata.linkedskins and skindata.linkedskins[itemname] then
                 skindata = skindata.linkedskins[itemname]
                 for i = 1, itemnumber do
-                    bush.components.lootdropper:SpawnLootPrefab(itemname, nil, skindata, nil, nil)
+                    --还是得检查用户ID，因为不是所有花丛都跟花剑绑定一起的
+                    bush.components.lootdropper:SpawnLootPrefab(itemname, nil, skindata, nil, picker.userid)
                 end
                 return
             end
