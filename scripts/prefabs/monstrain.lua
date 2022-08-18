@@ -6,6 +6,7 @@ local prefabs = {
     "raindonate",
     "squamousfruit",
     "monstrain_leaf",
+    "dug_monstrain",
 }
 
 -------------------------
@@ -129,7 +130,7 @@ local function shake(inst)
         )
     then
         inst.AnimState:PlayAnimation("shake")
-        inst.AnimState:PushAnimation("idle")
+        inst.AnimState:PushAnimation("idle", true)
     end
     cancelsetfruitonanimover(inst)
 end
@@ -171,7 +172,7 @@ end
 
 -------------------------------------
 
-local function monstrainfn()
+local function MonstrainFn()
     local inst = CreateEntity()
 
     inst.entity:AddTransform()
@@ -219,7 +220,29 @@ local function monstrainfn()
     inst.components.pickable.onregenfn = OnRegenFn
     inst.components.pickable.onpickedfn = OnPickedFn
     inst.components.pickable.makeemptyfn = MakeEmptyFn
-    --inst.components.pickable.ontransplantfn = ontransplantfn --不可移植
+    --inst.components.pickable.ontransplantfn = ontransplantfn
+
+    inst:AddComponent("workable")
+    inst.components.workable:SetWorkAction(ACTIONS.DIG)
+    inst.components.workable:SetWorkLeft(3)
+    inst.components.workable:SetOnWorkCallback(function(inst, worker, workleft, numworks)
+        shake(inst)
+    end)
+    inst.components.workable:SetOnFinishCallback(function(inst, worker)
+        inst.components.lootdropper:SpawnLootPrefab("dug_monstrain")
+        if not (TheWorld.state.iswinter or TheWorld.state.issummer) then
+            if inst.components.pickable:CanBePicked() then
+                inst.components.lootdropper:SpawnLootPrefab("squamousfruit")
+                if math.random() < 0.7 then
+                    inst.components.lootdropper:SpawnLootPrefab("monstrain_leaf")
+                end
+                if math.random() < 0.3 then
+                    inst.components.lootdropper:SpawnLootPrefab("monstrain_leaf")
+                end
+            end
+        end
+        inst:Remove()
+    end)
 
     inst:AddComponent("inspectable")
     inst.components.inspectable.getstatus = getstatus
@@ -240,4 +263,4 @@ local function monstrainfn()
     return inst
 end
 
-return Prefab("monstrain", monstrainfn, assets, prefabs)
+return Prefab("monstrain", MonstrainFn, assets, prefabs)

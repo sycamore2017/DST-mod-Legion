@@ -1531,22 +1531,37 @@ S______GENERIC.DESCRIBE.RAINDONATE = {
     GENERIC = "Elders said that the killing of it would start to rain.",
     HELD = "Look, a blue winged insect!",
 }
--- S_______WILLOW.DESCRIBE.RAINDONATE = ""
--- S_____WOLFGANG.DESCRIBE.RAINDONATE = ""
--- S________WENDY.DESCRIBE.RAINDONATE = ""
+S_______WILLOW.DESCRIBE.RAINDONATE = {
+    GENERIC = "A little bug named rain. I'll try to see if it can be ignited.",
+    HELD = "Watching you curl up, I decided not to burn you.",
+}
+S_____WOLFGANG.DESCRIBE.RAINDONATE = {
+    GENERIC = "Thin arms and legs. You must train your legs for fitness!",
+    HELD = "Eat more eggs and exercise your legs, little bug.",
+}
+S________WENDY.DESCRIBE.RAINDONATE = {
+    GENERIC = "There are always you in the fields and ponds.",
+    HELD = "I shouldn't have caught you, you always let me fall into sad memories.",
+}
 -- S_________WX78.DESCRIBE.RAINDONATE = ""
 -- S_WICKERBOTTOM.DESCRIBE.RAINDONATE = ""
 -- S_______WOODIE.DESCRIBE.RAINDONATE = ""
 -- S______WAXWELL.DESCRIBE.RAINDONATE = ""
 -- S___WATHGRITHR.DESCRIBE.RAINDONATE = ""
--- S_______WEBBER.DESCRIBE.RAINDONATE = ""
+S_______WEBBER.DESCRIBE.RAINDONATE = {
+    GENERIC = "Hey, fly to our hands!",
+    HELD = "See! A piece of cake.",
+}
 -- S_______WINONA.DESCRIBE.RAINDONATE = ""
 -- S_______WORTOX.DESCRIBE.RAINDONATE = ""
 -- S_____WORMWOOD.DESCRIBE.RAINDONATE = ""
 -- S________WARLY.DESCRIBE.RAINDONATE = ""
 -- S_________WURT.DESCRIBE.RAINDONATE = ""
 -- S_______WALTER.DESCRIBE.RAINDONATE = ""
--- S________WANDA.DESCRIBE.RAINDONATE = ""
+S________WANDA.DESCRIBE.RAINDONATE = {
+    GENERIC = "Don't fly away. I'm not interested in you.",
+    HELD = "Let me take a moment to think about whether to let you go.",
+}
 
 S_NAMES.MONSTRAIN = "Monstrain"   --雨竹
 S______GENERIC.DESCRIBE.MONSTRAIN = {
@@ -1555,6 +1570,50 @@ S______GENERIC.DESCRIBE.MONSTRAIN = {
     GENERIC = "Careful! Don't touch the juice of it!",
     PICKED = "I'll just take a look.",
 }
+S_____WORMWOOD.DESCRIBE.MONSTRAIN = {
+    SUMMER = "Hot! She's asleep.",
+    WINTER = "Cold! She's asleep.",
+    GENERIC = "Friend likes water very much.",
+    PICKED = "Should I comfort her?",
+}
+
+S_NAMES.MONSTRAIN_WIZEN = "Monstrain Tuber" --雨竹块茎
+S______GENERIC.DESCRIBE.MONSTRAIN_WIZEN = "Water, water, help!"
+S_______WILLOW.DESCRIBE.MONSTRAIN_WIZEN = "More water? It's so troublesome. Just burn it."
+-- S_____WOLFGANG.DESCRIBE.MONSTRAIN_WIZEN = ""
+-- S________WENDY.DESCRIBE.MONSTRAIN_WIZEN = ""
+S_________WX78.DESCRIBE.MONSTRAIN_WIZEN = "WATER IS NECESSARY FOR LIFE."
+S_WICKERBOTTOM.DESCRIBE.MONSTRAIN_WIZEN = "This plant is extremely dependent on water."
+S_______WOODIE.DESCRIBE.MONSTRAIN_WIZEN = "It's strange that it doesn't want poop."
+-- S______WAXWELL.DESCRIBE.MONSTRAIN_WIZEN = ""
+-- S___WATHGRITHR.DESCRIBE.MONSTRAIN_WIZEN = ""
+S_______WEBBER.DESCRIBE.MONSTRAIN_WIZEN = "Water it!"
+-- S_______WINONA.DESCRIBE.MONSTRAIN_WIZEN = ""
+S_______WORTOX.DESCRIBE.MONSTRAIN_WIZEN = "If I don't water it, it will die in front of me."
+S_____WORMWOOD.DESCRIBE.MONSTRAIN_WIZEN = "Water my friend right now!"
+-- S________WARLY.DESCRIBE.MONSTRAIN_WIZEN = ""
+-- S_________WURT.DESCRIBE.MONSTRAIN_WIZEN = ""
+-- S_______WALTER.DESCRIBE.MONSTRAIN_WIZEN = ""
+-- S________WANDA.DESCRIBE.MONSTRAIN_WIZEN = ""
+
+S_NAMES.DUG_MONSTRAIN = "Monstrain Tuber" --雨竹块茎
+S______GENERIC.DESCRIBE.DUG_MONSTRAIN = "So easy to dig? Why can't I dig before."
+-- S_______WILLOW.DESCRIBE.DUG_MONSTRAIN = ""
+S_____WOLFGANG.DESCRIBE.DUG_MONSTRAIN = "A poisonous taro. Wolfgang won't eat it."
+-- S________WENDY.DESCRIBE.DUG_MONSTRAIN = ""
+-- S_________WX78.DESCRIBE.DUG_MONSTRAIN = ""
+S_WICKERBOTTOM.DESCRIBE.DUG_MONSTRAIN = "Look at the eggs at the root. It's a wonderful symbiosis."
+-- S_______WOODIE.DESCRIBE.DUG_MONSTRAIN = ""
+-- S______WAXWELL.DESCRIBE.DUG_MONSTRAIN = ""
+-- S___WATHGRITHR.DESCRIBE.DUG_MONSTRAIN = ""
+-- S_______WEBBER.DESCRIBE.DUG_MONSTRAIN = ""
+-- S_______WINONA.DESCRIBE.DUG_MONSTRAIN = ""
+S_______WORTOX.DESCRIBE.DUG_MONSTRAIN = "Toxic. Why do I know? I observed it from my friends."
+S_____WORMWOOD.DESCRIBE.DUG_MONSTRAIN = "A water friend."
+S________WARLY.DESCRIBE.DUG_MONSTRAIN = "Maybe I can make it into konjac."
+-- S_________WURT.DESCRIBE.DUG_MONSTRAIN = ""
+-- S_______WALTER.DESCRIBE.DUG_MONSTRAIN = ""
+S________WANDA.DESCRIBE.DUG_MONSTRAIN = "I have seen many people poisoned by it."
 
 S_NAMES.SQUAMOUSFRUIT = "Squamous Fruit"    --鳞果
 S______GENERIC.DESCRIBE.SQUAMOUSFRUIT = "Wow, edible pinecone."
@@ -1570,7 +1629,7 @@ S_______WEBBER.DESCRIBE.SQUAMOUSFRUIT = "Wow, pinecone with our favorite color."
 -- S_______WINONA.DESCRIBE.SQUAMOUSFRUIT = ""
 -- S_______WORTOX.DESCRIBE.SQUAMOUSFRUIT = ""
 -- S_____WORMWOOD.DESCRIBE.SQUAMOUSFRUIT = ""
--- S________WARLY.DESCRIBE.SQUAMOUSFRUIT = ""
+S________WARLY.DESCRIBE.SQUAMOUSFRUIT = "You can't imagine that it can be eaten."
 -- S_________WURT.DESCRIBE.SQUAMOUSFRUIT = ""
 -- S_______WALTER.DESCRIBE.SQUAMOUSFRUIT = ""
 -- S________WANDA.DESCRIBE.SQUAMOUSFRUIT = ""
@@ -1578,10 +1637,10 @@ S_______WEBBER.DESCRIBE.SQUAMOUSFRUIT = "Wow, pinecone with our favorite color."
 S_NAMES.MONSTRAIN_LEAF = "Monstrain Leaf"    --雨竹叶
 S______GENERIC.DESCRIBE.MONSTRAIN_LEAF = "When I eat it, it eats me."
 -- S_______WILLOW.DESCRIBE.MONSTRAIN_LEAF = ""
--- S_____WOLFGANG.DESCRIBE.MONSTRAIN_LEAF = ""
+S_____WOLFGANG.DESCRIBE.MONSTRAIN_LEAF = "Wolfgang doesn't eat strange leaves."
 -- S________WENDY.DESCRIBE.MONSTRAIN_LEAF = ""
 -- S_________WX78.DESCRIBE.MONSTRAIN_LEAF = ""
--- S_WICKERBOTTOM.DESCRIBE.MONSTRAIN_LEAF = ""
+S_WICKERBOTTOM.DESCRIBE.MONSTRAIN_LEAF = "High temperature heating can eliminate its toxicity."
 -- S_______WOODIE.DESCRIBE.MONSTRAIN_LEAF = ""
 -- S______WAXWELL.DESCRIBE.MONSTRAIN_LEAF = ""
 -- S___WATHGRITHR.DESCRIBE.MONSTRAIN_LEAF = ""
@@ -1589,8 +1648,8 @@ S______GENERIC.DESCRIBE.MONSTRAIN_LEAF = "When I eat it, it eats me."
 -- S_______WINONA.DESCRIBE.MONSTRAIN_LEAF = ""
 -- S_______WORTOX.DESCRIBE.MONSTRAIN_LEAF = ""
 -- S_____WORMWOOD.DESCRIBE.MONSTRAIN_LEAF = ""
--- S________WARLY.DESCRIBE.MONSTRAIN_LEAF = ""
--- S_________WURT.DESCRIBE.MONSTRAIN_LEAF = ""
+S________WARLY.DESCRIBE.MONSTRAIN_LEAF = "More cooking can eliminate the toxicity."
+S_________WURT.DESCRIBE.MONSTRAIN_LEAF = "The books lady told me not to eat it, but it smells delicious."
 -- S_______WALTER.DESCRIBE.MONSTRAIN_LEAF = ""
 -- S________WANDA.DESCRIBE.MONSTRAIN_LEAF = ""
 
