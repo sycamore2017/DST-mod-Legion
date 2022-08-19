@@ -224,7 +224,7 @@ local function MonstrainFn()
 
     inst:AddComponent("workable")
     inst.components.workable:SetWorkAction(ACTIONS.DIG)
-    inst.components.workable:SetWorkLeft(3)
+    inst.components.workable:SetWorkLeft(2)
     inst.components.workable:SetOnWorkCallback(function(inst, worker, workleft, numworks)
         shake(inst)
     end)
@@ -233,10 +233,8 @@ local function MonstrainFn()
         if not (TheWorld.state.iswinter or TheWorld.state.issummer) then
             if inst.components.pickable:CanBePicked() then
                 inst.components.lootdropper:SpawnLootPrefab("squamousfruit")
-                if math.random() < 0.7 then
-                    inst.components.lootdropper:SpawnLootPrefab("monstrain_leaf")
-                end
-                if math.random() < 0.3 then
+                inst.components.lootdropper:SpawnLootPrefab("monstrain_leaf")
+                if math.random() < 0.5 then
                     inst.components.lootdropper:SpawnLootPrefab("monstrain_leaf")
                 end
             end
@@ -257,10 +255,122 @@ local function MonstrainFn()
         inst:WatchWorldState("iswinter", OnSeasonChange)
         inst:WatchWorldState("issummer", OnSeasonChange)
         inst:WatchWorldState("isnight", OnIsNight)
-        OnIsNight(inst)
+        if TheWorld.state.isnight or TheWorld.state.iswinter or TheWorld.state.issummer then
+            inst.components.childspawner:StopSpawning()
+            ReturnChildren(inst)
+        else
+            inst.components.childspawner:StartSpawning()
+        end
     end)
 
     return inst
 end
 
-return Prefab("monstrain", MonstrainFn, assets, prefabs)
+-------------------------------------
+
+local prefabs_tuber = {
+    "monstrain",
+    "dug_monstrain",
+}
+
+function OnMoistureDelta(inst, data)
+    if inst.components.moisture:GetMoisturePercent() >= 0.98 then --小于1是为了忽略干燥导致的损失(不然水壶得浇水5次)
+        local tree = SpawnPrefab("monstrain")
+        if tree ~= nil then
+            tree.AnimState:PlayAnimation("idle_summer", true)
+            tree.Transform:SetPosition(inst.Transform:GetWorldPosition())
+            OnSeasonChange(tree)
+            inst.SoundEmitter:PlaySound("farming/common/farm/rot")
+            inst:Remove()
+        end
+    end
+end
+
+local function TuberFn()
+    local inst = CreateEntity()
+
+    inst.entity:AddTransform()
+    inst.entity:AddAnimState()
+    inst.entity:AddMiniMapEntity()
+    inst.entity:AddSoundEmitter()
+    inst.entity:AddNetwork()
+
+    inst.MiniMapEntity:SetIcon("monstrain.tex")
+
+    inst.AnimState:SetBuild("monstrain")
+    inst.AnimState:SetBank("monstrain")
+    inst.AnimState:PlayAnimation("idle_summer", true)
+    inst.Transform:SetScale(1.4, 1.4, 1.4)
+
+    inst:AddTag("antlion_sinkhole_blocker")
+    inst:AddTag("birdblocker")
+    inst:AddTag("plant")
+    inst:AddTag("needwater2") --使其可被浇水，不过是我自己加的，官方没有
+
+    inst.entity:SetPristine()
+    if not TheWorld.ismastersim then
+        return inst
+    end
+
+    inst:AddComponent("inspectable")
+
+    inst:AddComponent("lootdropper")
+
+    inst:AddComponent("workable")
+    inst.components.workable:SetWorkAction(ACTIONS.DIG)
+    inst.components.workable:SetWorkLeft(1)
+    -- inst.components.workable:SetOnWorkCallback(function(inst, worker, workleft, numworks)end)
+    inst.components.workable:SetOnFinishCallback(function(inst, worker)
+        inst.components.lootdropper:SpawnLootPrefab("dug_monstrain")
+        inst:Remove()
+    end)
+
+    inst:AddComponent("timer")
+    inst.components.timer:StartTimer("dehydration", 3*TUNING.TOTAL_DAY_TIME)
+    inst:ListenForEvent("timerdone", function(inst, data)
+        if data.name == "dehydration" then
+            inst.components.lootdropper:SpawnLootPrefab("spoiled_food")
+            inst:Remove()
+        end
+    end)
+
+    inst:AddComponent("moisture")
+    inst:ListenForEvent("moisturedelta", OnMoistureDelta)
+
+    MakeHauntableIgnite(inst)
+
+    MakeSmallBurnable(inst, TUNING.SMALL_BURNTIME)
+    MakeSmallPropagator(inst)
+
+    inst.fn_planted = function(inst, pt)
+        inst:DoTaskInTime(0, function(inst)
+            --寻找周围的管理器
+            local ents = TheSim:FindEntities(pt.x, pt.y, pt.z, 20,
+                { "siving_ctl" },
+                { "NOCLICK", "INLIMBO" },
+                nil
+            )
+            for _,v in pairs(ents) do
+                if v.components.botanycontroller ~= nil then
+                    local cpt = v.components.botanycontroller
+                    if (cpt.type == 1 or cpt.type == 3) and cpt.moisture > 0 then
+                        local moicpt = inst.components.moisture
+                        local need = math.min(moicpt:GetMaxMoisture() - moicpt:GetMoisture(), cpt.moisture)
+                        moicpt:DoDelta(need, true)
+                        cpt.moisture = math.max(0, cpt.moisture-need)
+                        cpt:SetBars()
+
+                        if moicpt:GetMoisturePercent() >= 0.98 then
+                            return
+                        end
+                    end
+                end
+            end
+        end)
+    end
+
+    return inst
+end
+
+return Prefab("monstrain", MonstrainFn, assets, prefabs),
+        Prefab("monstrain_wizen", TuberFn, assets, prefabs_tuber)

@@ -1901,3 +1901,54 @@ if CONFIGS_LEGION.LEGENDOFFALL then
         end,
     })
 end
+
+--------------------------------------------------------------------------
+--[[ 添加新动作：让浇水组件能作用于多年生作物、雨竹块茎 ]]
+--------------------------------------------------------------------------
+
+if CONFIGS_LEGION.LEGENDOFFALL or CONFIGS_LEGION.PRAYFORRAIN then
+    local function ExtraPourWaterDist(doer, dest, bufferedaction)
+        return 1.5
+    end
+
+    local POUR_WATER_LEGION = Action({ rmb=true, extra_arrive_dist=ExtraPourWaterDist })
+    POUR_WATER_LEGION.id = "POUR_WATER_LEGION"
+    -- POUR_WATER_LEGION.str = STRINGS.ACTIONS.POUR_WATER
+    POUR_WATER_LEGION.stroverridefn = function(act)
+        return (act.target:HasTag("fire") or act.target:HasTag("smolder"))
+            and STRINGS.ACTIONS.POUR_WATER.EXTINGUISH or STRINGS.ACTIONS.POUR_WATER.GENERIC
+    end
+    POUR_WATER_LEGION.fn = function(act)
+        if act.invobject ~= nil and act.invobject:IsValid() then
+            if act.invobject.components.finiteuses ~= nil and act.invobject.components.finiteuses:GetUses() <= 0 then
+                return false, (act.invobject:HasTag("wateringcan") and "OUT_OF_WATER" or nil)
+            end
+
+            if act.target ~= nil and act.target:IsValid() then
+                act.invobject.components.wateryprotection:SpreadProtection(act.target) --耐久消耗在这里面的
+
+                --由于wateryprotection:SpreadProtection无法直接确定浇水者是谁，所以说话提示逻辑单独拿出来
+                if act.target.components.perennialcrop ~= nil then
+                    act.target.components.perennialcrop:SayDetail(act.doer, true)
+                end
+            end
+
+            return true
+        end
+        return false
+    end
+    AddAction(POUR_WATER_LEGION)
+
+    AddComponentAction("EQUIPPED", "wateryprotection", function(inst, doer, target, actions, right)
+        if right and (target:HasTag("needwater") or target:HasTag("needwater2")) then
+            table.insert(actions, ACTIONS.POUR_WATER_LEGION)
+        end
+    end)
+
+    AddStategraphActionHandler("wilson", ActionHandler(ACTIONS.POUR_WATER_LEGION, function(inst, action)
+        return action.invobject ~= nil
+            and (action.invobject:HasTag("wateringcan") and "pour")
+            or "dolongaction"
+    end))
+    AddStategraphActionHandler("wilson_client", ActionHandler(ACTIONS.POUR_WATER_LEGION, "pour"))
+end

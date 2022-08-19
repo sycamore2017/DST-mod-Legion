@@ -106,6 +106,12 @@ local function ComputMoisture(self, x, y, z)
     end
 end
 local function WitherComputMoisture(self, v)
+    if self.type == 3 then
+        if self.moisture <= 0 then
+            return false
+        end
+    end
+
     if v.components.witherable ~= nil then
         if
             not v.components.witherable:IsProtected() and
@@ -115,17 +121,33 @@ local function WitherComputMoisture(self, v)
             )
         then
             v.components.witherable:Protect(TUNING.FIRESUPPRESSOR_PROTECTION_TIME)
-            self.moisture = math.max(0, self.moisture-5)
+            self.moisture = math.max(0, self.moisture-2.5)
             return true
         end
     elseif v.components.perennialcrop2 ~= nil then
         if v.components.perennialcrop2:PourWater(nil, nil, 1) then
-            self.moisture = math.max(0, self.moisture-5)
+            self.moisture = math.max(0, self.moisture-2.5)
             return true
         end
+    elseif v.components.moisture ~= nil then
+        local moicpt = v.components.moisture
+        local need = math.min(moicpt:GetMaxMoisture() - moicpt:GetMoisture(), self.moisture)
+        if need > 0 then
+            moicpt:DoDelta(need, true)
+            self.moisture = math.max(0, self.moisture-need)
+            return true
+        end
+    elseif v.fn_l_needwater ~= nil then --兼容其他mod
+        return v.fn_l_needwater(v, self)
     end
 end
 local function WitherComputNutrients(self, v)
+    if self.type == 3 then
+        if isEmptyNutrients(self) then
+            return false
+        end
+    end
+
     if v.components.perennialcrop2 ~= nil then
         local cpt = v.components.perennialcrop2
         if cpt.isrotten or cpt.donenutrient or cpt.stage == cpt.stage_max then
@@ -140,14 +162,14 @@ local function WitherComputNutrients(self, v)
         elseif self.nutrients[1] > 0 then
             idx = 1
         else
-            return true --按理来说不应该能运行到这里
+            return false --按理来说不应该能运行到这里
         end
 
         local poop = SpawnPrefab("poop")
         if poop ~= nil then
             cpt:Fertilize(poop, nil)
             poop:Remove()
-            self.nutrients[idx] = math.max(0, self.nutrients[idx] - 5)
+            self.nutrients[idx] = math.max(0, self.nutrients[idx] - 3)
             return true
         end
     elseif
@@ -162,19 +184,21 @@ local function WitherComputNutrients(self, v)
         elseif self.nutrients[1] > 0 then
             idx = 1
         else
-            return true --按理来说不应该能运行到这里
+            return false --按理来说不应该能运行到这里
         end
 
         local poop = SpawnPrefab("poop")
         if poop ~= nil then
             v.components.pickable:Fertilize(poop, nil)
             poop:Remove()
-            self.nutrients[idx] = math.max(0, self.nutrients[idx] - 8)
+            self.nutrients[idx] = math.max(0, self.nutrients[idx] - 3)
             return true
         end
+    elseif v.fn_l_neednutrient ~= nil then --兼容其他mod
+        return v.fn_l_neednutrient(v, self)
     end
 end
-local function ComputSoils(self, fn_tile, fn_wither, fn_check, fn_tend)
+local function ComputSoils(self, fn_tile, fn_wither, fn_check, fn_tend, tags)
     if fn_check(self) then
         return
     end
@@ -209,11 +233,8 @@ local function ComputSoils(self, fn_tile, fn_wither, fn_check, fn_tend)
         return
     end
 
-    local ents = TheSim:FindEntities(x, y, z, 20,
-        nil,
-        { "NOCLICK", "INLIMBO" },
-        { "witherable", "barren", "crop2_legion" } --不需要考虑子圭作物，因为机制已经有了
-    )
+    --不需要考虑子圭作物，因为机制已经有了
+    local ents = TheSim:FindEntities(x, y, z, 20, nil, { "NOCLICK", "INLIMBO" }, tags)
     for _,v in pairs(ents) do
         if v:IsValid() then
             if fn_wither(self, v) and fn_check(self) then
@@ -231,13 +252,17 @@ function BotanyController:DoAreaFunction()
             WitherComputMoisture,
             function(self)
                 return self.moisture <= 0
-            end
+            end,
+            nil,
+            { "witherable", "barren", "crop2_legion", "needwater2" }
         )
     elseif self.type == 2 then
         ComputSoils(self,
             ComputNutrients,
             WitherComputNutrients,
-            isEmptyNutrients
+            isEmptyNutrients,
+            nil,
+            { "witherable", "barren", "crop2_legion", "neednutrient2" }
         )
     else
         ComputSoils(self,
@@ -261,7 +286,8 @@ function BotanyController:DoAreaFunction()
                         v.components.farmplanttendable:TendTo(self.inst)
                     end
                 end
-            end
+            end,
+            { "witherable", "barren", "crop2_legion", "needwater2", "neednutrient2" }
         )
     end
 end

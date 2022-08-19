@@ -622,51 +622,6 @@ if FindFarmPlant then
 end
 
 --------------------------------------------------------------------------
---[[ 添加新动作：让浇水组件能作用于多年生作物 ]]
---------------------------------------------------------------------------
-
-local POUR_WATER_LEGION = Action({})
-POUR_WATER_LEGION.id = "POUR_WATER_LEGION"
--- POUR_WATER_LEGION.str = STRINGS.ACTIONS.POUR_WATER
-POUR_WATER_LEGION.stroverridefn = function(act)
-    return (act.target:HasTag("fire") or act.target:HasTag("smolder"))
-        and STRINGS.ACTIONS.POUR_WATER.EXTINGUISH or STRINGS.ACTIONS.POUR_WATER.GENERIC
-end
-POUR_WATER_LEGION.fn = function(act)
-    if act.invobject ~= nil and act.invobject:IsValid() then
-        if act.invobject.components.finiteuses ~= nil and act.invobject.components.finiteuses:GetUses() <= 0 then
-			return false, (act.invobject:HasTag("wateringcan") and "OUT_OF_WATER" or nil)
-        end
-
-        if act.target ~= nil and act.target:IsValid() then
-            act.invobject.components.wateryprotection:SpreadProtection(act.target) --耐久消耗在这里面的
-
-            --由于wateryprotection:SpreadProtection无法直接确定浇水者是谁，所以说话提示逻辑单独拿出来
-            if act.target.components.perennialcrop ~= nil then
-                act.target.components.perennialcrop:SayDetail(act.doer, true)
-            end
-        end
-
-        return true
-    end
-    return false
-end
-AddAction(POUR_WATER_LEGION)
-
-AddComponentAction("EQUIPPED", "wateryprotection", function(inst, doer, target, actions, right)
-    if right and target:HasTag("needwater") then
-        table.insert(actions, ACTIONS.POUR_WATER_LEGION)
-    end
-end)
-
-AddStategraphActionHandler("wilson", ActionHandler(ACTIONS.POUR_WATER_LEGION, function(inst, action)
-    return action.invobject ~= nil
-        and (action.invobject:HasTag("wateringcan") and "pour")
-        or "dolongaction"
-end))
-AddStategraphActionHandler("wilson_client", ActionHandler(ACTIONS.POUR_WATER_LEGION, "pour"))
-
---------------------------------------------------------------------------
 --[[ 脱壳之翅的sg ]]
 --------------------------------------------------------------------------
 
@@ -833,7 +788,9 @@ local fishhoming_ingredients = {
     cutted_rosebush =   { hardy = 1, pasty = 1, fragrant = 1, wrinkled = 1, grassy = 1 },
     cutted_lilybush =   { hardy = 1, pasty = 1, fragrant = 1, wrinkled = 1, grassy = 1 },
     cutted_orchidbush = { hardy = 1, pasty = 1, fragrant = 1, wrinkled = 1, grassy = 1 },
-    dug_monstrain =     { hardy = 1, pasty = 1, monster = 1 },
+    dug_monstrain =     { hardy = 1, pasty = 1, veggie = 1, monster = 1 },
+    squamousfruit =     { hardy = 1, dusty = 1, veggie = 1, monster = 1 },
+    monstrain_leaf =    { pasty = 1, veggie = 1, monster = 1 },
     lightbulb =         { dusty = 1, shiny = 1 }, --鱿鱼
     lightflier =        { dusty = 1, pasty = 1, shiny = 1, shaking = 1 },
     spore_small =       { dusty = 1, shiny = 1 },

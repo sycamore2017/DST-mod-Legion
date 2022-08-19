@@ -367,8 +367,8 @@ end
 
 if CONFIGS_LEGION.PRAYFORRAIN then
     plantables.dug_monstrain = {
-        animstate = { bank = "monstrain", build = "monstrain", anim = "dropped", anim_palcer = "idle_summer", },
-        floater = {0.03, "large", 0.2, {0.65, 0.5, 0.65}},
+        animstate = { bank = "monstrain", build = "monstrain", anim = "dropped", anim_palcer = nil, },
+        floater = {nil, "small", 0.2, 1.2},
         stacksize = TUNING.STACK_SIZE_LARGEITEM,
         fuelvalue = TUNING.SMALL_FUEL,
         burnable = {
@@ -386,12 +386,13 @@ if CONFIGS_LEGION.PRAYFORRAIN then
         end,
         fn_server = nil,
     }
-    -- table.insert(prefabs, MakePlacer(
-    --     "dug_monstrain_placer", "monstrain", "monstrain", "mod",
-    --     nil, nil, nil, nil, nil, nil, function(inst)
-    --         inst.AnimState:Hide("fruit")
-    --     end
-    -- ))
+    table.insert(prefabs, MakePlacer(
+        "dug_monstrain_placer", "monstrain", "monstrain", "idle_summer",
+        nil, nil, nil, nil, nil, nil, function(inst)
+            inst.AnimState:Pause()
+            inst.Transform:SetScale(1.4, 1.4, 1.4)
+        end
+    ))
 end
 
 --------------------

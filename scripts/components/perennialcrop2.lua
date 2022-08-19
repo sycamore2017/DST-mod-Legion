@@ -95,10 +95,13 @@ function PerennialCrop2:SetUp(cropprefab, data)
 	self.regrowstage = data.regrowstage or 1
 	self.maturedanim = data.maturedanim
 	self.cangrowindrak = data.cangrowindrak == true
-	self.getsickchance = data.getsickchance or 0.001
 	self.fn_overripe = data.fn_overripe
 	self.fn_loot = data.fn_loot
 	self.fn_stage = data.fn_stage
+
+	if data.getsickchance and self.getsickchance > 0 then
+		self.getsickchance = data.getsickchance
+	end
 end
 
 function PerennialCrop2:SetStage(stage, isrotten, skip)
