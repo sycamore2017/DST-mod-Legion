@@ -145,6 +145,9 @@ local InventoryPrefabsList = {  --每个元素的下标值为每种物品栏图�
 
     siving_ctlall_item = { build = "images_minisign6", },
     dug_monstrain = { build = "images_minisign6", },
+    revolvedmoonlight_item = { build = "images_minisign6", },
+    revolvedmoonlight = { build = "images_minisign6", },
+    revolvedmoonlight_pro = { build = "images_minisign6", },
 
     --skins
     hat_lichen_emo_que = { build = "images_minisign_skins1", },

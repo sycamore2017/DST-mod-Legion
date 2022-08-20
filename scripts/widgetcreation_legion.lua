@@ -58,9 +58,10 @@ if CONFIGS_LEGION.PRAYFORRAIN then
         table.insert(params.giantsfoot.widget.slotpos, Vector3(-162 + 75, -75 * y + 114, 0))
     end
 
+    ------
+
     params.hiddenmoonlight = {
-        widget =
-        {
+        widget = {
             slotpos = {},
             animbank = "ui_chest_3x3",
             animbuild = "ui_hiddenmoonlight_4x4",
@@ -116,8 +117,62 @@ if CONFIGS_LEGION.PRAYFORRAIN then
 
         return false
     end
+
+    ------
+
+    params.revolvedmoonlight = {
+        widget = {
+            slotpos = {},
+            animbank = "ui_chest_3x3",
+            animbuild = "ui_revolvedmoonlight_4x3",
+            pos = Vector3(0, 200, 0),
+            side_align_tip = 160,
+        },
+        type = "chest",
+    }
+
+    for y = 2, 0, -1 do
+        for x = 0, 2 do
+            table.insert(params.revolvedmoonlight.widget.slotpos, Vector3(80 * x - 80 * 2 + 80, 80 * y - 80 * 2 + 80, 0))
+        end
+    end
+
+    if containers.params and containers.params.bundle_container then --还是希望和官方保持一致，免得官方修改我还得跟着改
+        params.revolvedmoonlight.itemtestfn = containers.params.bundle_container.itemtestfn
+    else
+        params.revolvedmoonlight.itemtestfn = function(container, item, slot)
+            return not (item:HasTag("irreplaceable") or item:HasTag("_container") or item:HasTag("bundle") or item:HasTag("nobundling"))
+        end
+    end
+
+    ------
+
+    params.revolvedmoonlight_pro = {
+        widget = {
+            slotpos = {},
+            animbank = "ui_chest_3x3",
+            animbuild = "ui_revolvedmoonlight_4x3",
+            pos = Vector3(0, 280, 0),
+            side_align_tip = 160,
+        },
+        type = "chest",
+    }
+
+    for y = 0, 2 do
+        table.insert(params.revolvedmoonlight_pro.widget.slotpos, Vector3(-114      , (-77 * y) + 37 - (y * 2), 0))
+        table.insert(params.revolvedmoonlight_pro.widget.slotpos, Vector3(-114 + 75 , (-77 * y) + 37 - (y * 2), 0))
+        table.insert(params.revolvedmoonlight_pro.widget.slotpos, Vector3(-114 + 150, (-77 * y) + 37 - (y * 2), 0))
+        table.insert(params.revolvedmoonlight_pro.widget.slotpos, Vector3(-114 + 225, (-77 * y) + 37 - (y * 2), 0))
+    end
+
+    params.revolvedmoonlight_pro.itemtestfn = params.revolvedmoonlight.itemtestfn
+
+    ------
+
     table.insert(showmeneed, "giantsfoot")
     table.insert(showmeneed, "hiddenmoonlight")
+    table.insert(showmeneed, "revolvedmoonlight")
+    table.insert(showmeneed, "revolvedmoonlight_pro")
 end
 
 if CONFIGS_LEGION.LEGENDOFFALL then

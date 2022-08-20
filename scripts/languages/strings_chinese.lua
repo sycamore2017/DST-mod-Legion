@@ -1721,75 +1721,40 @@ S___WATHGRITHR.DESCRIBE.GIANTSFOOT = "我出征约顿海姆的纪念品。"
 
 S_NAMES.REFRACTEDMOONLIGHT = "月折宝剑"
 S______GENERIC.DESCRIBE.REFRACTEDMOONLIGHT = "我的团啊！这是来自噢噢大陆的神器吗？"
--- S_______WILLOW.DESCRIBE.REFRACTEDMOONLIGHT = "A single faith can start a freedom fire."
--- S_____WOLFGANG.DESCRIBE.REFRACTEDMOONLIGHT = "It fills Wolfgang with courage!"
--- S________WENDY.DESCRIBE.REFRACTEDMOONLIGHT = "If I leave here, Abigail will leave me."
--- S_________WX78.DESCRIBE.REFRACTEDMOONLIGHT = "YEARN FOR HUMAN NATURE BUT... FEAR TO POSSESS IT."
+-- S_______WILLOW.DESCRIBE.REFRACTEDMOONLIGHT = ""
+-- S_____WOLFGANG.DESCRIBE.REFRACTEDMOONLIGHT = ""
+S________WENDY.DESCRIBE.REFRACTEDMOONLIGHT = "再强大的力量也挽回不了过去。"
+-- S_________WX78.DESCRIBE.REFRACTEDMOONLIGHT = ""
 S_WICKERBOTTOM.DESCRIBE.REFRACTEDMOONLIGHT = "只有身体健康的人才可以控制它的力量。"
--- S_______WOODIE.DESCRIBE.REFRACTEDMOONLIGHT = "Lucy comforts me, so I believe I can escape from here one day."
+-- S_______WOODIE.DESCRIBE.REFRACTEDMOONLIGHT = ""
 S______WAXWELL.DESCRIBE.REFRACTEDMOONLIGHT = "唯有完好无缺之人，才可驾驭它的力量。"
--- S___WATHGRITHR.DESCRIBE.REFRACTEDMOONLIGHT = "When the Bringer of Rain died, even Valhalla was moved."
--- S_______WEBBER.DESCRIBE.REFRACTEDMOONLIGHT = "If I could, I would be out of this world with my legion!"
--- S_______WINONA.DESCRIBE.REFRACTEDMOONLIGHT = "I am a laborer, not a slave, I'm my own!"
+-- S___WATHGRITHR.DESCRIBE.REFRACTEDMOONLIGHT = ""
+S_______WEBBER.DESCRIBE.REFRACTEDMOONLIGHT = "外星人也用这么简单的武器吗？"
+S_______WINONA.DESCRIBE.REFRACTEDMOONLIGHT = "月亮之上的宝物吗？"
+-- S_______WORTOX.DESCRIBE.REFRACTEDMOONLIGHT = ""
+S_____WORMWOOD.DESCRIBE.REFRACTEDMOONLIGHT = "大宝剑！"
+S________WARLY.DESCRIBE.REFRACTEDMOONLIGHT = "吃了吗，吃我一剑！"
+-- S_________WURT.DESCRIBE.REFRACTEDMOONLIGHT = ""
+-- S_______WALTER.DESCRIBE.REFRACTEDMOONLIGHT = ""
+-- S________WANDA.DESCRIBE.REFRACTEDMOONLIGHT = ""
 
 S_NAMES.MOONDUNGEON = "月的地下城"
-S______GENERIC.DESCRIBE.MOONDUNGEON =
-{
+S______GENERIC.DESCRIBE.MOONDUNGEON = {
     SLEEP = "那是古化石吗？",
-    GENERIC = "某人用毕生心血打造了这个奇怪建筑。",
+    GENERIC = "某人用毕生心血打造了这个奇怪建筑。"
 }
-S___WATHGRITHR.DESCRIBE.MOONDUNGEON =
-{
-    SLEEP = "摩尼的宫殿。",
-    GENERIC = "某人用毕生心血打造了这个奇怪建筑。",
+S_______WILLOW.DESCRIBE.MOONDUNGEON = {
+    SLEEP = "开门开门呐，我知道里面有东西！",
+    GENERIC = "看来火攻在这里不起效。"
 }
---[[
-S_______WILLOW.DESCRIBE.MOONDUNGEON =
-{
-    SLEEP = "Is that fossilized fossil?",
-    GENERIC = "Someone burned up his whole life and built it here.",
+S______WAXWELL.DESCRIBE.MOONDUNGEON = {
+    SLEEP = "旧暗影之王驾到，还不出门迎接？！",
+    GENERIC = "我居然没看出来这就是个陷阱之城。"
 }
-S_____WOLFGANG.DESCRIBE.MOONDUNGEON =
-{
-    SLEEP = "Is that fossilized fossil?",
-    GENERIC = "Someone burned up his whole life and built it here.",
+S___WATHGRITHR.DESCRIBE.MOONDUNGEON = {
+    SLEEP = "一座破旧宫殿。",
+    GENERIC = "和月神的宫殿风格完全不一样。"
 }
-S________WENDY.DESCRIBE.MOONDUNGEON =
-{
-    SLEEP = "Is that fossilized fossil?",
-    GENERIC = "Someone burned up his whole life and built it here.",
-}
-S_________WX78.DESCRIBE.MOONDUNGEON =
-{
-    SLEEP = "Is that fossilized fossil?",
-    GENERIC = "Someone burned up his whole life and built it here.",
-}
-S_WICKERBOTTOM.DESCRIBE.MOONDUNGEON =
-{
-    SLEEP = "Is that fossilized fossil?",
-    GENERIC = "Someone burned up his whole life and built it here.",
-}
-S_______WOODIE.DESCRIBE.MOONDUNGEON =
-{
-    SLEEP = "Is that fossilized fossil?",
-    GENERIC = "Someone burned up his whole life and built it here.",
-}
-S______WAXWELL.DESCRIBE.MOONDUNGEON =
-{
-    SLEEP = "Is that fossilized fossil?",
-    GENERIC = "Someone burned up his whole life and built it here.",
-}
-S_______WEBBER.DESCRIBE.MOONDUNGEON =
-{
-    SLEEP = "Is that fossilized fossil?",
-    GENERIC = "Someone burned up his whole life and built it here.",
-}
-S_______WINONA.DESCRIBE.MOONDUNGEON =
-{
-    SLEEP = "Is that fossilized fossil?",
-    GENERIC = "Someone burned up his whole life and built it here.",
-}
-]]--
 
 S_NAMES.HIDDENMOONLIGHT = "月藏宝匣"
 S______GENERIC.DESCRIBE.HIDDENMOONLIGHT = "里面如银河一般深邃。"
@@ -1805,11 +1770,12 @@ S_______WEBBER.DESCRIBE.HIDDENMOONLIGHT = "耶！伸手进去想到什么就能�
 -- S_______WINONA.DESCRIBE.HIDDENMOONLIGHT = ""
 -- S_______WORTOX.DESCRIBE.HIDDENMOONLIGHT = ""
 S_____WORMWOOD.DESCRIBE.HIDDENMOONLIGHT = "内心空洞，和我一样。"
--- S________WARLY.DESCRIBE.HIDDENMOONLIGHT = ""
--- S_________WURT.DESCRIBE.HIDDENMOONLIGHT = ""
-S_______WALTER.DESCRIBE.HIDDENMOONLIGHT = "噗噜，咋没有海浪的声音传出来呢？"
+S________WARLY.DESCRIBE.HIDDENMOONLIGHT = "比冰箱好用太多了。"
+S_________WURT.DESCRIBE.HIDDENMOONLIGHT = "噗噜，咋没有海浪的声音传出来呢？"
+-- S_______WALTER.DESCRIBE.HIDDENMOONLIGHT = ""
+S________WANDA.DESCRIBE.HIDDENMOONLIGHT = "我不会把昨天的食物拿到今天来的。"
 
-S_NAMES.HIDDENMOONLIGHT_ITEM = "未启用的月藏宝匣"
+S_NAMES.HIDDENMOONLIGHT_ITEM = "月藏宝匣套件"
 S_RECIPE_DESC.HIDDENMOONLIGHT_ITEM = "藏珍馐于星月交辉处。"
 S______GENERIC.DESCRIBE.HIDDENMOONLIGHT_ITEM = "它貌似是储食类箱子的升级套件。"
 -- S_______WILLOW.DESCRIBE.HIDDENMOONLIGHT_ITEM = ""
@@ -1824,9 +1790,49 @@ S___WATHGRITHR.DESCRIBE.HIDDENMOONLIGHT_ITEM = "希望别是潘多拉的盒子�
 S_______WINONA.DESCRIBE.HIDDENMOONLIGHT_ITEM = "这是月给予的灵感。"
 S_______WORTOX.DESCRIBE.HIDDENMOONLIGHT_ITEM = "我能感受到它正受装满食物的盒子的召唤。"
 -- S_____WORMWOOD.DESCRIBE.HIDDENMOONLIGHT_ITEM = ""
--- S________WARLY.DESCRIBE.HIDDENMOONLIGHT_ITEM = ""
+S________WARLY.DESCRIBE.HIDDENMOONLIGHT_ITEM = "太好了，我就差这个。"
 -- S_________WURT.DESCRIBE.HIDDENMOONLIGHT_ITEM = ""
 -- S_______WALTER.DESCRIBE.HIDDENMOONLIGHT_ITEM = ""
+S________WANDA.DESCRIBE.HIDDENMOONLIGHT_ITEM = "它的作用对我来说就那样吧。"
+
+S_NAMES.REVOLVEDMOONLIGHT = "月轮宝盘"
+S______GENERIC.DESCRIBE.REVOLVEDMOONLIGHT = "里面如月辉一般柔和。"
+-- S_______WILLOW.DESCRIBE.REVOLVEDMOONLIGHT = ""
+S_____WOLFGANG.DESCRIBE.REVOLVEDMOONLIGHT = "不管怎么弄的，俺成功了。"
+S________WENDY.DESCRIBE.REVOLVEDMOONLIGHT = "柔和月光，没有一丝温度。"
+-- S_________WX78.DESCRIBE.REVOLVEDMOONLIGHT = ""
+S_WICKERBOTTOM.DESCRIBE.REVOLVEDMOONLIGHT = "再加点黄宝石就能当夜灯了。"
+-- S_______WOODIE.DESCRIBE.REVOLVEDMOONLIGHT = ""
+S______WAXWELL.DESCRIBE.REVOLVEDMOONLIGHT = "月光都被它浪费了。"
+-- S___WATHGRITHR.DESCRIBE.REVOLVEDMOONLIGHT = ""
+S_______WEBBER.DESCRIBE.REVOLVEDMOONLIGHT = "漂亮的小玩具，还会发光呢！"
+S_______WINONA.DESCRIBE.REVOLVEDMOONLIGHT = "看起来还能再往其中装载黄宝石来提高亮度。"
+-- S_______WORTOX.DESCRIBE.REVOLVEDMOONLIGHT = ""
+-- S_____WORMWOOD.DESCRIBE.REVOLVEDMOONLIGHT = ""
+-- S________WARLY.DESCRIBE.REVOLVEDMOONLIGHT = ""
+-- S_________WURT.DESCRIBE.REVOLVEDMOONLIGHT = ""
+S_______WALTER.DESCRIBE.REVOLVEDMOONLIGHT = "闪闪发亮像个徽章。"
+S________WANDA.DESCRIBE.REVOLVEDMOONLIGHT = "月的魔法用来干这个确实很浪费。"
+
+S_NAMES.REVOLVEDMOONLIGHT_ITEM = "月轮宝盘套件"
+S_RECIPE_DESC.REVOLVEDMOONLIGHT_ITEM = "月影轮转，余辉漏洒。"
+S______GENERIC.DESCRIBE.REVOLVEDMOONLIGHT_ITEM = "它貌似是储物类背包的升级套件。"
+-- S_______WILLOW.DESCRIBE.REVOLVEDMOONLIGHT_ITEM = ""
+S_____WOLFGANG.DESCRIBE.REVOLVEDMOONLIGHT_ITEM = "有人能告诉沃尔夫冈这转盘怎么用吗？"
+-- S________WENDY.DESCRIBE.REVOLVEDMOONLIGHT_ITEM = ""
+S_________WX78.DESCRIBE.REVOLVEDMOONLIGHT_ITEM = "背包升级器。"
+S_WICKERBOTTOM.DESCRIBE.REVOLVEDMOONLIGHT_ITEM = "它和某些背包能完美适配。"
+-- S_______WOODIE.DESCRIBE.REVOLVEDMOONLIGHT_ITEM = ""
+S______WAXWELL.DESCRIBE.REVOLVEDMOONLIGHT_ITEM = "我已经不想评判这个了。"
+-- S___WATHGRITHR.DESCRIBE.REVOLVEDMOONLIGHT_ITEM = ""
+S_______WEBBER.DESCRIBE.REVOLVEDMOONLIGHT_ITEM = "它应该能有办法发光吧。"
+S_______WINONA.DESCRIBE.REVOLVEDMOONLIGHT_ITEM = "以我的工作经验能判断这是给背包用的。"
+-- S_______WORTOX.DESCRIBE.REVOLVEDMOONLIGHT_ITEM = ""
+-- S_____WORMWOOD.DESCRIBE.REVOLVEDMOONLIGHT_ITEM = ""
+-- S________WARLY.DESCRIBE.REVOLVEDMOONLIGHT_ITEM = ""
+-- S_________WURT.DESCRIBE.REVOLVEDMOONLIGHT_ITEM = ""
+S_______WALTER.DESCRIBE.REVOLVEDMOONLIGHT_ITEM = "也许能用它和沃比玩接飞盘游戏。"
+-- S________WANDA.DESCRIBE.REVOLVEDMOONLIGHT_ITEM = ""
 
 --------------------------------------------------------------------------
 --[[ legends of the fall ]]--[[ 丰饶传说 ]]

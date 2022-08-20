@@ -11,7 +11,8 @@ local hot = {
 	-- siving_feather_real = 'boss_siving_phoenix',
 	-- dish_tomahawksteak = 'foods_cookpot',
 	-- siving_mask = 'siving_related',
-	siving_ctlall = 'siving_related',
+	revolvedmoonlight = 'moonlight_legion',
+	revolvedmoonlight_pro = 'moonlight_legion',
 }
 local old_sp = GLOBAL.SpawnPrefab
 function GLOBAL.SpawnPrefab(prefab, ...)

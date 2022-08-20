@@ -7,7 +7,7 @@ local prefabFiles = {
     "agronssword",              --艾力冈的剑
     "giantsfoot",               --巨脚背包
     "refractedmoonlight",       --月折宝剑
-    "hiddenmoonlight",          --月藏宝匣
+    "moonlight_legion",         --月之宝器
     "moon_dungeon",             --月的地下城
 }
 
@@ -19,6 +19,7 @@ end
 
 local assets = {
     Asset("ANIM", "anim/ui_hiddenmoonlight_4x4.zip"),
+    Asset("ANIM", "anim/ui_revolvedmoonlight_4x3.zip"),
 
     Asset("ATLAS", "images/inventoryimages/squamousfruit.xml"), --预加载，给科技栏用的
     Asset("IMAGE", "images/inventoryimages/squamousfruit.tex"),
@@ -34,6 +35,8 @@ local assets = {
     Asset("IMAGE", "images/inventoryimages/giantsfoot.tex"),
     Asset("ATLAS", "images/inventoryimages/hiddenmoonlight_item.xml"),
     Asset("IMAGE", "images/inventoryimages/hiddenmoonlight_item.tex"),
+    Asset("ATLAS", "images/inventoryimages/revolvedmoonlight_item.xml"),
+    Asset("IMAGE", "images/inventoryimages/revolvedmoonlight_item.tex"),
 }
 
 for k,v in pairs(assets) do
@@ -103,6 +106,14 @@ AddRecipe2(
     }, TECH.LOST, {
         atlas = "images/inventoryimages/hiddenmoonlight_item.xml", image = "hiddenmoonlight_item.tex"
     }, { "STRUCTURES", "CONTAINERS", "COOKING" }
+)
+AddRecipe2(
+    "revolvedmoonlight_item", {
+        Ingredient("yellowmooneye", 2),
+        Ingredient("turf_meteor", 2),
+    }, TECH.LOST, {
+        atlas = "images/inventoryimages/revolvedmoonlight_item.xml", image = "revolvedmoonlight_item.tex"
+    }, { "LIGHT", "CONTAINERS" }
 )
 
 --------------------------------------------------------------------------
