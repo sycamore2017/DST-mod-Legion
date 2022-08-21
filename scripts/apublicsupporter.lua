@@ -611,25 +611,77 @@ end
 --[[ 统一化的修复组件 ]]
 --------------------------------------------------------------------------
 
-if TUNING.LEGION_FLASHANDCRUSH or TUNING.LEGION_DESERTSECRET then --素白蘑菇帽和白木吉他需要
+if --素白蘑菇帽、白木吉他、月轮宝盘需要
+    TUNING.LEGION_FLASHANDCRUSH or TUNING.LEGION_DESERTSECRET or CONFIGS_LEGION.PRAYFORRAIN
+then
     if not _G.rawget(_G, "REPAIRERS_L") then
         _G.REPAIRERS_L = {}
     end
 
-    if TUNING.LEGION_FLASHANDCRUSH then
-        local function Fn_try_fungus(inst, doer, target, actions, right)
-            if doer.replica.rider ~= nil and doer.replica.rider:IsRiding() then --骑牛时只能修复自己的携带物品
-                if not (target.replica.inventoryitem ~= nil and target.replica.inventoryitem:IsGrandOwner(doer)) then
-                    return false
-                end
-            elseif doer.replica.inventory ~= nil and doer.replica.inventory:IsHeavyLifting() then --不能背重物
+    local function CommonDoerCheck(doer, target)
+        if doer.replica.rider ~= nil and doer.replica.rider:IsRiding() then --骑牛时只能修复自己的携带物品
+            if not (target.replica.inventoryitem ~= nil and target.replica.inventoryitem:IsGrandOwner(doer)) then
                 return false
             end
-
-            if target.repairable_l then
-                return true
+        elseif doer.replica.inventory ~= nil and doer.replica.inventory:IsHeavyLifting() then --不能背重物
+            return false
+        end
+        return true
+    end
+    local function DoUpgrade(doer, item, target, itemvalue, ismax, defaultreason)
+        if item and target and target.components.upgradeable ~= nil then
+            local can, reason = target.components.upgradeable:CanUpgrade()
+            if not can then
+                return false, (reason or defaultreason)
             end
 
+            local cpt = target.components.upgradeable
+            local old_stage = cpt.stage
+            local numcost = 0
+            local num = 1
+            if ismax and item.components.stackable ~= nil then
+                num = item.components.stackable:StackSize()
+            end
+
+            for i = 1, num, 1 do
+                cpt.numupgrades = cpt.numupgrades + itemvalue
+                numcost = numcost + 1
+
+                if cpt.numupgrades >= cpt.upgradesperstage then --可以进入下一个阶段
+                    cpt.stage = cpt.stage + 1
+                    cpt.numupgrades = 0
+
+                    if not cpt:CanUpgrade() then
+                        break
+                    end
+                end
+            end
+
+            --把过程总结为一次，防止多次重复执行。不过可能会有一些顺序上的小问题，暂时应该不会出现
+            if cpt.onupgradefn then
+                cpt.onupgradefn(cpt.inst, doer, item)
+            end
+            if old_stage ~= cpt.stage and cpt.onstageadvancefn then --说明升级了
+                cpt.onstageadvancefn(cpt.inst)
+            end
+
+            if item.components.stackable ~= nil then
+                item.components.stackable:Get(numcost):Remove()
+            else
+                item:Remove()
+            end
+            return true
+        end
+        return false
+    end
+
+    if TUNING.LEGION_FLASHANDCRUSH then
+        local function Fn_try_fungus(inst, doer, target, actions, right)
+            if target.repair_fungus_l then
+                if CommonDoerCheck(doer, target) then
+                    return true
+                end
+            end
             return false
         end
         local function Fn_do_fungus(doer, item, target, value)
@@ -670,7 +722,7 @@ if TUNING.LEGION_FLASHANDCRUSH or TUNING.LEGION_DESERTSECRET then --素白蘑菇
                 end,
                 fn_do = function(act)
                     return Fn_do_fungus(act.doer, act.invobject, act.target, v)
-                end,
+                end
             }
         end
         fungus_needchange = nil
@@ -681,18 +733,11 @@ if TUNING.LEGION_FLASHANDCRUSH or TUNING.LEGION_DESERTSECRET then --素白蘑菇
         _G.UPGRADETYPES.MAT_L = "mat_l"
 
         local function Fn_try_guitar(inst, doer, target, actions, right)
-            if doer.replica.rider ~= nil and doer.replica.rider:IsRiding() then --骑牛时只能修复自己的携带物品
-                if not (target.replica.inventoryitem ~= nil and target.replica.inventoryitem:IsGrandOwner(doer)) then
-                    return false
-                end
-            elseif doer.replica.inventory ~= nil and doer.replica.inventory:IsHeavyLifting() then --不能背重物
-                return false
-            end
-
             if target:HasTag(FUELTYPE.GUITAR.."_fueled") then
-                return true
+                if CommonDoerCheck(doer, target) then
+                    return true
+                end
             end
-
             return false
         end
         local function Fn_do_guitar(doer, item, target, value)
@@ -729,7 +774,7 @@ if TUNING.LEGION_FLASHANDCRUSH or TUNING.LEGION_DESERTSECRET then --素白蘑菇
             end,
             fn_do = function(act) --【服务端】
                 return Fn_do_guitar(act.doer, act.invobject, act.target, TUNING.TOTAL_DAY_TIME * 0.1)
-            end,
+            end
         }
         _G.REPAIRERS_L["steelwool"] = {
             fn_try = Fn_try_guitar,
@@ -738,15 +783,15 @@ if TUNING.LEGION_FLASHANDCRUSH or TUNING.LEGION_DESERTSECRET then --素白蘑菇
             end,
             fn_do = function(act)
                 return Fn_do_guitar(act.doer, act.invobject, act.target, TUNING.TOTAL_DAY_TIME * 0.9)
-            end,
+            end
         }
         _G.REPAIRERS_L["mat_whitewood_item"] = {
             noapiset = true,
             fn_try = function(inst, doer, target, actions, right)
                 if
+                    target:HasTag(UPGRADETYPES.MAT_L.."_upgradeable") and
                     (doer.replica.rider == nil or not doer.replica.rider:IsRiding()) and
-                    (doer.replica.inventory == nil or not doer.replica.inventory:IsHeavyLifting()) and
-                    target:HasTag(UPGRADETYPES.MAT_L.."_upgradeable")
+                    (doer.replica.inventory == nil or not doer.replica.inventory:IsHeavyLifting())
                 then
                     return true
                 end
@@ -754,45 +799,17 @@ if TUNING.LEGION_FLASHANDCRUSH or TUNING.LEGION_DESERTSECRET then --素白蘑菇
             end,
             fn_sg = function(doer, action) return "doshortaction" end,
             fn_do = function(act)
-                if
-                    act.invobject and act.target and
-                    act.target.components.upgradeable and act.target.components.upgradeable:CanUpgrade()
-                then
-                    local upgradeable = act.target.components.upgradeable
-                    upgradeable.numupgrades = upgradeable.numupgrades + 1
-
-                    if act.invobject.components.stackable then
-                        act.invobject.components.stackable:Get(1):Remove()
-                    else
-                        act.invobject:Remove()
-                    end
-
-                    if upgradeable.onupgradefn then
-                        upgradeable.onupgradefn(upgradeable.inst, act.doer, act.invobject)
-                    end
-                    if upgradeable.numupgrades >= upgradeable.upgradesperstage then
-                        upgradeable:AdvanceStage()
-                    end
-                    return true
-                end
-                return false, "MAT"
-            end,
+                return DoUpgrade(act.doer, act.invobject, act.target, 1, false, "MAT")
+            end
         }
 
         local function Fn_try_sand(inst, doer, target, actions, right)
-            if not target:HasTag("repair_sand") then
-                return false
-            end
-
-            if doer.replica.rider ~= nil and doer.replica.rider:IsRiding() then --骑牛时只能修复自己的携带物品
-                if not (target.replica.inventoryitem ~= nil and target.replica.inventoryitem:IsGrandOwner(doer)) then
-                    return false
+            if target:HasTag("repair_sand") then
+                if CommonDoerCheck(doer, target) then
+                    return true
                 end
-            elseif doer.replica.inventory ~= nil and doer.replica.inventory:IsHeavyLifting() then --不能背重物
-                return false
             end
-
-            return true
+            return false
         end
         local function Fn_do_sand(doer, item, target, value)
             if
@@ -844,6 +861,25 @@ if TUNING.LEGION_FLASHANDCRUSH or TUNING.LEGION_DESERTSECRET then --素白蘑菇
         rock_needchange = nil
     end
 
+    if CONFIGS_LEGION.PRAYFORRAIN then
+        _G.UPGRADETYPES.REVOLVED_L = "revolved_l"
+
+        _G.REPAIRERS_L["yellowgem"] = {
+            fn_try = function(inst, doer, target, actions, right)
+                if target:HasTag(UPGRADETYPES.REVOLVED_L.."_upgradeable") then
+                    if CommonDoerCheck(doer, target) then
+                        return true
+                    end
+                end
+                return false
+            end,
+            fn_sg = function(doer, action) return "doshortaction" end,
+            fn_do = function(act)
+                return DoUpgrade(act.doer, act.invobject, act.target, 1, true, "YELLOWGEM")
+            end
+        }
+    end
+
     if IsServer then
         for k,v in pairs(REPAIRERS_L) do
             if not v.noapiset then
@@ -863,6 +899,8 @@ if TUNING.LEGION_FLASHANDCRUSH or TUNING.LEGION_DESERTSECRET then --素白蘑菇
         if act.invobject ~= nil then
             if act.invobject.prefab == "mat_whitewood_item" then
                 return "MERGE"
+            elseif act.invobject.prefab == "yellowgem" then
+                return "EMBED"
             end
         end
         return "GENERIC"

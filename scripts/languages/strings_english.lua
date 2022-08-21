@@ -3433,35 +3433,26 @@ STRINGS.UI.CRAFTING.NEEDSELECOURMALINE_THREE = "Find an activated Elecourmaline 
 STRINGS.ACTIONS.REPAIR_LEGION = {
     GENERIC = "Repair",
     MERGE = "Merge",
+    EMBED = "Embed"
 }
 S______GENERIC.ACTIONFAIL.REPAIR_LEGION = {
     GUITAR = "There's nothing to fix.",
     FUNGUS = "It's fresh and doesn't need to be repaired.",
     MAT = "Already the biggest it can be.",
+    YELLOWGEM = "It's already full of gems."
 }
--- S_______WILLOW.ACTIONFAIL.REPAIR_LEGION =
--- S_____WOLFGANG.ACTIONFAIL.REPAIR_LEGION =
--- S________WENDY.ACTIONFAIL.REPAIR_LEGION =
--- S_________WX78.ACTIONFAIL.REPAIR_LEGION =
--- S_WICKERBOTTOM.ACTIONFAIL.REPAIR_LEGION =
--- S_______WOODIE.ACTIONFAIL.REPAIR_LEGION =
--- S______WAXWELL.ACTIONFAIL.REPAIR_LEGION =
--- S___WATHGRITHR.ACTIONFAIL.REPAIR_LEGION =
 S_______WEBBER.ACTIONFAIL.REPAIR_LEGION = {
     GUITAR = "It's none of our business.",
     FUNGUS = "We can't see what's wrong even with our several eyes.",
     MAT = "OK, that's good.",
+    YELLOWGEM = "It seems that not everything can be infinite."
 }
 S_______WINONA.ACTIONFAIL.REPAIR_LEGION = {
     GUITAR = "Perfect as ever.",
     FUNGUS = "It's perfect.",
     MAT = "I think that's as big as it's going to get.",
+    YELLOWGEM = "Enough."
 }
--- S_______WORTOX.ACTIONFAIL.REPAIR_LEGION =
--- S_____WORMWOOD.ACTIONFAIL.REPAIR_LEGION =
--- S________WARLY.ACTIONFAIL.REPAIR_LEGION =
--- S_________WURT.ACTIONFAIL.REPAIR_LEGION =
--- S_______WALTER.ACTIONFAIL.REPAIR_LEGION =
 
 STRINGS.CROP_LEGION = {
     SEED = "Planted {crop} Seed",

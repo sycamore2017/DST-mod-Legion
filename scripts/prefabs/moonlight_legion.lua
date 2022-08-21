@@ -348,7 +348,7 @@ MakeItem({
     assets = {
         Asset("ANIM", "anim/revolvedmoonlight.zip"),
         Asset("ATLAS", "images/inventoryimages/revolvedmoonlight_item.xml"),
-        Asset("IMAGE", "images/inventoryimages/revolvedmoonlight_item.tex"),
+        Asset("IMAGE", "images/inventoryimages/revolvedmoonlight_item.tex")
     },
     prefabs = { "revolvedmoonlight", "revolvedmoonlight_pro" },
     floatable = { 0.1, "med", 0.3, 0.7 },
@@ -370,6 +370,33 @@ MakeItem({
 ----------
 ----------
 
+local function OnOpen_revolved(inst)
+    if inst.AnimState:IsCurrentAnimation("opened") or inst.AnimState:IsCurrentAnimation("open") then
+        return
+    end
+    inst.AnimState:PlayAnimation("open")
+    inst.AnimState:PushAnimation("opened", true)
+
+    if not inst.SoundEmitter:PlayingSound("idlesound1") then
+        inst.SoundEmitter:PlaySound("dontstarve/creatures/together/toad_stool/spore_cloud_LP", "idlesound1", 0.7)
+    end
+    if not inst.SoundEmitter:PlayingSound("idlesound2") then
+        inst.SoundEmitter:PlaySound("dontstarve/bee/bee_hive_LP", "idlesound2", 0.7)
+    end
+    inst.SoundEmitter:PlaySound("dontstarve/cave/mushtree_tall_spore_land", nil, 0.6)
+end
+local function OnClose_revolved(inst)
+    if inst.AnimState:IsCurrentAnimation("close") or inst.AnimState:IsCurrentAnimation("closed") then
+        return
+    end
+    inst.AnimState:PlayAnimation("close")
+    inst.AnimState:PushAnimation("closed")
+
+    inst.SoundEmitter:KillSound("idlesound1")
+    inst.SoundEmitter:KillSound("idlesound2")
+    inst.SoundEmitter:PlaySound("dontstarve/cave/mushtree_tall_spore_land", nil, 0.6)
+end
+
 local function MakeRevolved(sets)
     local widgetname = sets.ispro and "revolvedmoonlight_pro" or "revolvedmoonlight"
     table.insert(prefs, Prefab(sets.name, function()
@@ -385,12 +412,18 @@ local function MakeRevolved(sets)
 
         inst.AnimState:SetBank("revolvedmoonlight")
         inst.AnimState:SetBuild("revolvedmoonlight")
-        inst.AnimState:PlayAnimation("idle")
+        inst.AnimState:PlayAnimation("closed")
         inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
+
+        if sets.ispro then
+            inst.AnimState:OverrideSymbol("decorate", "revolvedmoonlight", "decoratepro")
+            inst.Light:SetIntensity(0.75)
+        else
+            inst.Light:SetIntensity(0.4)
+        end
 
         inst.Light:SetRadius(.6)
         inst.Light:SetFalloff(1)
-        inst.Light:SetIntensity(.6)
         inst.Light:SetColour(255/255, 234/255, 116/255)
         inst.Light:Enable(true)
 
@@ -402,6 +435,8 @@ local function MakeRevolved(sets)
                 self.inst.AnimState:SetFloatParams(sets.floatable[1], 1, self.bob_percent)
             end
         end
+
+        inst.repair_revolved_l = true
 
         -- if sets.fn_common ~= nil then
         --     sets.fn_common(inst)
@@ -421,28 +456,73 @@ local function MakeRevolved(sets)
 
         inst:AddComponent("container")
         inst.components.container:WidgetSetup(widgetname)
-        inst.components.container.onopenfn = OnOpen
-        inst.components.container.onclosefn = OnClose
+        inst.components.container.onopenfn = OnOpen_revolved
+        inst.components.container.onclosefn = OnClose_revolved
         inst.components.container.skipclosesnd = true
         inst.components.container.skipopensnd = true
 
-        inst.OnSave = function(inst, data)
-            if inst.upgradetarget ~= nil then
-                data.upgradetarget = inst.upgradetarget
+        inst:AddComponent("lootdropper")
+
+        inst:AddComponent("workable")
+        inst.components.workable:SetWorkAction(ACTIONS.HAMMER)
+        inst.components.workable:SetWorkLeft(5)
+        inst.components.workable:SetOnWorkCallback(function(inst, worker, workleft, numworks)
+            inst.AnimState:PlayAnimation("hit")
+            inst.AnimState:PushAnimation("closed")
+            inst.components.container:DropEverything()
+            inst.components.container:Close()
+        end)
+        inst.components.workable:SetOnFinishCallback(function(inst, worker)
+            inst.components.container:DropEverything()
+
+            --归还背包
+            local x, y, z = inst.Transform:GetWorldPosition()
+            local back = SpawnPrefab(sets.ispro and "krampus_sack" or "piggyback")
+            if back ~= nil then
+                back.Transform:SetPosition(x, y, z)
+                back = nil
             end
-            if not inst.canbenifit then
-                data.canbenifit = false
+
+            --归还宝石
+            local numgems = inst.components.upgradeable:GetStage() - 1
+            if numgems > 0 then
+                back = SpawnPrefab("yellowgem")
+                if back ~= nil then
+                    if numgems > 1 and back.components.stackable ~= nil then
+                        back.components.stackable:SetStackSize(numgems)
+                    end
+                    back.Transform:SetPosition(x, y, z)
+                    if back.components.inventoryitem ~= nil then
+                        back.components.inventoryitem:OnDropped(true)
+                    end
+                end
+            end
+            --归还套件
+            inst.components.lootdropper:SpawnLootPrefab("revolvedmoonlight_item")
+
+            --特效
+            local fx = SpawnPrefab("collapse_small")
+            fx.Transform:SetPosition(x, y, z)
+            fx:SetMaterial("stone")
+            inst:Remove()
+        end)
+
+        inst:AddComponent("upgradeable")
+        inst.components.upgradeable.upgradetype = UPGRADETYPES.REVOLVED_L
+        inst.components.upgradeable.onupgradefn = function(inst, doer, item)
+            inst.SoundEmitter:PlaySound("dontstarve/common/place_structure_wood") --undo
+        end
+        inst.components.upgradeable.onstageadvancefn = function(inst)
+            local stagenow = inst.components.upgradeable:GetStage()
+            if stagenow > 1 then
+                inst.Light:SetRadius(.6 + (stagenow-1)*0.627) --最大约10和19.5半径
             end
         end
-        inst.OnLoad = function(inst, data)
-            if data ~= nil then
-                if data.upgradetarget ~= nil then
-                    SetTarget_hidden(inst, data.upgradetarget)
-                end
-                if not data.canbenifit then
-                    inst.canbenifit = false
-                end
-            end
+        inst.components.upgradeable.numstages = sets.ispro and 31 or 16
+        inst.components.upgradeable.upgradesperstage = 1
+
+        inst.OnLoad = function(inst, data) --由于 upgradeable 组件不会自己重新初始化，只能这里再初始化
+            inst.components.upgradeable.onstageadvancefn(inst)
         end
 
         if TUNING.SMART_SIGN_DRAW_ENABLE then
@@ -457,9 +537,13 @@ local function MakeRevolved(sets)
     end, {
         Asset("ANIM", "anim/ui_chest_3x3.zip"), --官方的容器栏背景动画模板
         Asset("ANIM", "anim/ui_revolvedmoonlight_4x3.zip"),
-        Asset("ANIM", "anim/revolvedmoonlight.zip")
+        Asset("ANIM", "anim/revolvedmoonlight.zip"),
+        Asset("ATLAS", "images/inventoryimages/"..sets.name..".xml"),
+        Asset("IMAGE", "images/inventoryimages/"..sets.name..".tex")
     }, {
-        "revolvedmoonlight_item"
+        "revolvedmoonlight_item",
+        "collapse_small",
+        "yellowgem"
     }))
 end
 
