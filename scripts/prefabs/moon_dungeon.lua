@@ -341,8 +341,8 @@ local function GetDungeonProtector(inst, protector, protdata)
             monster.components.lootdropper:SetLoot(nil)
             monster.components.lootdropper:SetChanceLootTable('dungeon_loot_5')
         end
-        monster.components.lootdropper:AddChanceLoot("hiddenmoonlight_item_blueprint", 0.025)
-        monster.components.lootdropper:AddChanceLoot("revolvedmoonlight_item_blueprint", 0.025)
+        monster.components.lootdropper:AddChanceLoot("hiddenmoonlight_item_blueprint", 0.0225)
+        monster.components.lootdropper:AddChanceLoot("revolvedmoonlight_item_blueprint", 0.0225)
     end
     monster.persists = false    --这个变量用于退出游戏时，如果为false，就不进行自身的保存，默认为true
 

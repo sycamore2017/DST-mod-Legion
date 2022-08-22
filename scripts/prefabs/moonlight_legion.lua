@@ -397,6 +397,53 @@ local function OnClose_revolved(inst)
     inst.SoundEmitter:PlaySound("dontstarve/cave/mushtree_tall_spore_land", nil, 0.6)
 end
 
+local function ResetRadius(inst)
+    local stagenow = inst.components.upgradeable:GetStage()
+    if stagenow > 1 then
+        local rad = 0.25 + (stagenow-1)*0.25
+        if inst.components.inventoryitem.owner ~= nil then --被携带时，发光范围减半
+            rad = rad / 2
+            inst._light.Light:SetFalloff(0.65)
+        else
+            inst._light.Light:SetFalloff(0.7)
+        end
+        inst._light.Light:SetRadius(rad) --最大约2.75和5.25半径
+    end
+end
+local function OnOwnerChange(inst)
+    local newowners = {}
+    local owner = inst
+    while owner.components.inventoryitem ~= nil do
+        newowners[owner] = true
+
+        if inst._owners[owner] then
+            inst._owners[owner] = nil
+        else
+            inst:ListenForEvent("onputininventory", inst._onownerchange, owner)
+            inst:ListenForEvent("ondropped", inst._onownerchange, owner)
+        end
+
+        local nextowner = owner.components.inventoryitem.owner
+        if nextowner == nil then
+            break
+        end
+
+        owner = nextowner
+    end
+
+    ResetRadius(inst)
+    inst._light.entity:SetParent(owner.entity)
+
+    for k, v in pairs(inst._owners) do
+        if k:IsValid() then
+            inst:RemoveEventCallback("onputininventory", inst._onownerchange, k)
+            inst:RemoveEventCallback("ondropped", inst._onownerchange, k)
+        end
+    end
+
+    inst._owners = newowners
+end
+
 local function MakeRevolved(sets)
     local widgetname = sets.ispro and "revolvedmoonlight_pro" or "revolvedmoonlight"
     table.insert(prefs, Prefab(sets.name, function()
@@ -405,7 +452,6 @@ local function MakeRevolved(sets)
         inst.entity:AddTransform()
         inst.entity:AddAnimState()
         inst.entity:AddSoundEmitter()
-        inst.entity:AddLight()
         inst.entity:AddNetwork()
 
         MakeInventoryPhysics(inst)
@@ -413,19 +459,11 @@ local function MakeRevolved(sets)
         inst.AnimState:SetBank("revolvedmoonlight")
         inst.AnimState:SetBuild("revolvedmoonlight")
         inst.AnimState:PlayAnimation("closed")
-        inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
 
         if sets.ispro then
             inst.AnimState:OverrideSymbol("decorate", "revolvedmoonlight", "decoratepro")
-            inst.Light:SetIntensity(0.75)
-        else
-            inst.Light:SetIntensity(0.4)
+            inst:SetPrefabNameOverride("revolvedmoonlight")
         end
-
-        inst.Light:SetRadius(.6)
-        inst.Light:SetFalloff(1)
-        inst.Light:SetColour(255/255, 234/255, 116/255)
-        inst.Light:Enable(true)
 
         MakeInventoryFloatable(inst, sets.floatable[2], sets.floatable[3], sets.floatable[4])
         if sets.floatable[1] ~= nil then
@@ -453,6 +491,10 @@ local function MakeRevolved(sets)
         inst:AddComponent("inventoryitem")
         inst.components.inventoryitem.imagename = sets.name
         inst.components.inventoryitem.atlasname = "images/inventoryimages/"..sets.name..".xml"
+        inst.components.inventoryitem:SetOnPutInInventoryFn(function(inst)
+            inst.components.container:Close()
+            inst.AnimState:PlayAnimation("closed")
+        end)
 
         inst:AddComponent("container")
         inst.components.container:WidgetSetup(widgetname)
@@ -460,6 +502,7 @@ local function MakeRevolved(sets)
         inst.components.container.onclosefn = OnClose_revolved
         inst.components.container.skipclosesnd = true
         inst.components.container.skipopensnd = true
+        inst.components.container.droponopen = true
 
         inst:AddComponent("lootdropper")
 
@@ -469,6 +512,7 @@ local function MakeRevolved(sets)
         inst.components.workable:SetOnWorkCallback(function(inst, worker, workleft, numworks)
             inst.AnimState:PlayAnimation("hit")
             inst.AnimState:PushAnimation("closed")
+            inst.SoundEmitter:PlaySound("grotto/common/turf_crafting_station/hit")
             inst.components.container:DropEverything()
             inst.components.container:Close()
         end)
@@ -510,19 +554,28 @@ local function MakeRevolved(sets)
         inst:AddComponent("upgradeable")
         inst.components.upgradeable.upgradetype = UPGRADETYPES.REVOLVED_L
         inst.components.upgradeable.onupgradefn = function(inst, doer, item)
-            inst.SoundEmitter:PlaySound("dontstarve/common/place_structure_wood") --undo
+            inst.SoundEmitter:PlaySound("dontstarve/common/telebase_gemplace")
         end
-        inst.components.upgradeable.onstageadvancefn = function(inst)
-            local stagenow = inst.components.upgradeable:GetStage()
-            if stagenow > 1 then
-                inst.Light:SetRadius(.6 + (stagenow-1)*0.627) --最大约10和19.5半径
-            end
-        end
-        inst.components.upgradeable.numstages = sets.ispro and 31 or 16
+        inst.components.upgradeable.onstageadvancefn = ResetRadius
+        inst.components.upgradeable.numstages = sets.ispro and 21 or 11
         inst.components.upgradeable.upgradesperstage = 1
 
         inst.OnLoad = function(inst, data) --由于 upgradeable 组件不会自己重新初始化，只能这里再初始化
             inst.components.upgradeable.onstageadvancefn(inst)
+        end
+
+        --Create light
+        inst._light = SpawnPrefab("heatrocklight")
+        inst._light.Light:SetRadius(0.25)
+        inst._light.Light:SetFalloff(0.7) --Tip：削弱系数：相同半径时，值越小会让光照范围越大
+        inst._light.Light:SetColour(255/255, 242/255, 169/255)
+        inst._light.Light:SetIntensity(0.75)
+        inst._light.Light:Enable(true)
+        inst._owners = {}
+        inst._onownerchange = function() OnOwnerChange(inst) end
+        OnOwnerChange(inst)
+        inst.OnRemoveEntity = function(inst)
+            inst._light:Remove()
         end
 
         if TUNING.SMART_SIGN_DRAW_ENABLE then
@@ -543,7 +596,8 @@ local function MakeRevolved(sets)
     }, {
         "revolvedmoonlight_item",
         "collapse_small",
-        "yellowgem"
+        "yellowgem",
+        "heatrocklight"
     }))
 end
 

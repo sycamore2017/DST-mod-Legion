@@ -125,15 +125,15 @@ if CONFIGS_LEGION.PRAYFORRAIN then
             slotpos = {},
             animbank = "ui_chest_3x3",
             animbuild = "ui_revolvedmoonlight_4x3",
-            pos = Vector3(0, 200, 0),
+            pos = Vector3(0, 150, 0),
             side_align_tip = 160,
         },
         type = "chest",
     }
 
-    for y = 2, 0, -1 do
+    for y = 2, 1, -1 do
         for x = 0, 2 do
-            table.insert(params.revolvedmoonlight.widget.slotpos, Vector3(80 * x - 80 * 2 + 80, 80 * y - 80 * 2 + 80, 0))
+            table.insert(params.revolvedmoonlight.widget.slotpos, Vector3(80*x - 80*2 + 72, 80*y - 80*2 + 47, 0))
         end
     end
 
@@ -152,17 +152,17 @@ if CONFIGS_LEGION.PRAYFORRAIN then
             slotpos = {},
             animbank = "ui_chest_3x3",
             animbuild = "ui_revolvedmoonlight_4x3",
-            pos = Vector3(0, 280, 0),
+            pos = Vector3(0, 150, 0),
             side_align_tip = 160,
         },
         type = "chest",
     }
 
-    for y = 0, 2 do
-        table.insert(params.revolvedmoonlight_pro.widget.slotpos, Vector3(-114      , (-77 * y) + 37 - (y * 2), 0))
-        table.insert(params.revolvedmoonlight_pro.widget.slotpos, Vector3(-114 + 75 , (-77 * y) + 37 - (y * 2), 0))
-        table.insert(params.revolvedmoonlight_pro.widget.slotpos, Vector3(-114 + 150, (-77 * y) + 37 - (y * 2), 0))
-        table.insert(params.revolvedmoonlight_pro.widget.slotpos, Vector3(-114 + 225, (-77 * y) + 37 - (y * 2), 0))
+    for y = 0, 2 do --                                                    x轴基础               y轴基础
+        table.insert(params.revolvedmoonlight_pro.widget.slotpos, Vector3(-122      , (-77*y) + 80 - (y*2), 0))
+        table.insert(params.revolvedmoonlight_pro.widget.slotpos, Vector3(-122 + 75 , (-77*y) + 80 - (y*2), 0))
+        table.insert(params.revolvedmoonlight_pro.widget.slotpos, Vector3(-122 + 150, (-77*y) + 80 - (y*2), 0))
+        table.insert(params.revolvedmoonlight_pro.widget.slotpos, Vector3(-122 + 225, (-77*y) + 80 - (y*2), 0))
     end
 
     params.revolvedmoonlight_pro.itemtestfn = params.revolvedmoonlight.itemtestfn
