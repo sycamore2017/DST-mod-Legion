@@ -243,7 +243,7 @@ end
 --[[ hot reload ]]--[[ 热更新机制 ]]
 --------------------------------------------------------------------------
 
-modimport("scripts/hotreload_legion.lua")
+-- modimport("scripts/hotreload_legion.lua")
 
 --------------------------------------------------------------------------
 --[[ compatibility enhancement ]]--[[ 兼容性修改 ]]
@@ -253,8 +253,8 @@ modimport("scripts/apublicsupporter.lua")
 
 if
     TUNING.LEGION_FLASHANDCRUSH or  --驮物牛鞍
-    CONFIGS_LEGION.PRAYFORRAIN or    --巨人之脚、月藏宝匣
-    CONFIGS_LEGION.LEGENDOFFALL          --脱壳之翅、打窝器
+    CONFIGS_LEGION.PRAYFORRAIN or   --巨人之脚、月藏宝匣等
+    CONFIGS_LEGION.LEGENDOFFALL     --脱壳之翅、打窝器
 then
     modimport("scripts/widgetcreation_legion.lua")
 end

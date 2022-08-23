@@ -351,7 +351,7 @@ MakeItem({
         Asset("IMAGE", "images/inventoryimages/revolvedmoonlight_item.tex")
     },
     prefabs = { "revolvedmoonlight", "revolvedmoonlight_pro" },
-    floatable = { 0.1, "med", 0.3, 0.7 },
+    floatable = { 0.18, "small", 0.4, 0.55 },
     -- fn_common = function(inst)end,
     fn_server = function(inst)
         inst.components.upgradekit:SetData({
@@ -464,6 +464,9 @@ local function MakeRevolved(sets)
             inst.AnimState:OverrideSymbol("decorate", "revolvedmoonlight", "decoratepro")
             inst:SetPrefabNameOverride("revolvedmoonlight")
         end
+
+        inst:AddTag("irreplaceable") --这个标签会防止被猴子、食人花、坎普斯等拿走
+        inst:AddTag("NORATCHECK") --mod兼容：永不妥协。该道具不算鼠潮分
 
         MakeInventoryFloatable(inst, sets.floatable[2], sets.floatable[3], sets.floatable[4])
         if sets.floatable[1] ~= nil then
@@ -603,14 +606,14 @@ end
 
 MakeRevolved({
     name = "revolvedmoonlight",
-    floatable = { 0.1, "med", 0.3, 0.7 },
+    floatable = { 0.1, "med", 0.3, 0.3 },
     ispro = nil,
     -- fn_common = function(inst)end,
     -- fn_server = function(inst)end
 })
 MakeRevolved({
     name = "revolvedmoonlight_pro",
-    floatable = { 0.1, "med", 0.3, 0.7 },
+    floatable = { 0.1, "med", 0.3, 0.45 },
     ispro = true,
     -- fn_common = function(inst)end,
     -- fn_server = function(inst)end

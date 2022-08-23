@@ -440,7 +440,7 @@ _G.SKIN_PREFABS_LEGION = {
                 bank = "backcub", build = "backcub",
                 anim = "anim_water", isloop_anim = true, animpush = nil, isloop_animpush = nil,
             }
-        },
+        }
     },
 
     fimbul_axe = {
@@ -1608,6 +1608,42 @@ _G.SKINS_LEGION = {
             cut = nil, size = "med", offset_y = 0.1, scale = 1.1, nofx = nil,
         },
     },
+    backcub_thanks = {
+        base_prefab = "backcub",
+		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
+
+        skin_id = "62f235928c2f781db2f7a2dd",
+        onlyownedshow = true,
+		assets = {
+			Asset("ANIM", "anim/skin/backcub_thanks.zip")
+		},
+		image = { name = nil, atlas = nil, setable = true },
+
+        string = ischinese and {
+            name = "浮生儿", collection = "THANKS", access = "SPECIAL",
+            descitem = "解锁\"靠背熊\"的皮肤。",
+            description = "八年前柳氏逃难被迫闯入农神山，因伤势昏倒在溪边。次日清醒在银光粼粼的洞内，一只孤落的竹居食铁兽救了她。她砍下玉竹制成背篓给它当家并为其取名\"浮生儿\"。浮生儿知她终将离开，临行前将她的扶伤断剑叼到了洞穴中心..."
+        } or {
+            name = "Foosen", collection = "THANKS", access = "SPECIAL",
+            descitem = "Unlock \"Backcub\" skin.",
+            description = "The story was not translated."
+        },
+
+		anim = {
+            bank = nil, build = nil,
+            anim = nil, isloop_anim = true, animpush = nil, isloop_animpush = nil,
+            setable = true
+        },
+        equip = { symbol = "swap_body", build = "backcub_thanks", file = "swap_body" },
+        exchangefx = { prefab = nil, offset_y = nil, scale = nil },
+        floater = {
+            cut = nil, size = "med", offset_y = 0.1, scale = 1.1, nofx = nil,
+            anim = {
+                bank = "backcub_thanks", build = "backcub_thanks",
+                anim = "idle_water", isloop_anim = true, animpush = nil, isloop_animpush = nil
+            }
+        }
+    },
 
     rosebush_collector = {
         base_prefab = "rosebush",
@@ -1949,7 +1985,7 @@ _G.SKIN_IDS_LEGION = {
     ["6278c409c340bf24ab311522"] = { --余生
         siving_derivant_lvl0_thanks = true, siving_derivant_lvl1_thanks = true, siving_derivant_lvl2_thanks = true, siving_derivant_lvl3_thanks = true,
         siving_derivant_lvl0_thanks2 = true, siving_derivant_lvl1_thanks2 = true, siving_derivant_lvl2_thanks2 = true, siving_derivant_lvl3_thanks2 = true,
-        neverfade_thanks = true, neverfadebush_thanks = true,
+        neverfade_thanks = true, neverfadebush_thanks = true, backcub_thanks = true,
         fishhomingtool_awesome_thanks = true, fishhomingtool_normal_thanks = true, fishhomingbait_thanks = true,
         triplegoldenshovelaxe_era = true, tripleshovelaxe_era = true, lilybush_era = true, lileaves_era = true, icire_rock_era = true, shield_l_log_era = true, shield_l_sand_era = true,
         orchidbush_disguiser = true, boltwingout_disguiser = true,
@@ -1980,9 +2016,10 @@ _G.SKIN_IDS_LEGION = {
         triplegoldenshovelaxe_era = true, tripleshovelaxe_era = true, lilybush_era = true, lileaves_era = true, icire_rock_era = true, shield_l_log_era = true, shield_l_sand_era = true,
         shield_l_log_emo_fist = true,
     },
-    ["6278c4eec340bf24ab311534"] = { --3尺垂涎 6
+    ["6278c4eec340bf24ab311534"] = { --3尺垂涎(7)
         rosebush_collector = true, rosorns_collector = true, fimbul_axe_collector = true,
         rosorns_marble = true, lileaves_marble = true, orchitwigs_marble = true,
+        backcub_thanks = true,
         siving_derivant_lvl0_thanks = true, siving_derivant_lvl1_thanks = true, siving_derivant_lvl2_thanks = true, siving_derivant_lvl3_thanks = true,
         siving_derivant_lvl0_thanks2 = true, siving_derivant_lvl1_thanks2 = true, siving_derivant_lvl2_thanks2 = true, siving_derivant_lvl3_thanks2 = true,
     },
@@ -2077,6 +2114,7 @@ local skinidxes = { --用以皮肤排序
     "fishhomingtool_awesome_thanks", "fishhomingtool_normal_thanks", "fishhomingbait_thanks",
     "siving_derivant_lvl0_thanks", "siving_derivant_lvl1_thanks", "siving_derivant_lvl2_thanks", "siving_derivant_lvl3_thanks",
     "siving_derivant_lvl0_thanks2", "siving_derivant_lvl1_thanks2", "siving_derivant_lvl2_thanks2", "siving_derivant_lvl3_thanks2",
+    "backcub_thanks",
     "icire_rock_collector", "fimbul_axe_collector", "rosebush_collector", "rosorns_collector",
     "triplegoldenshovelaxe_era", "tripleshovelaxe_era", "lilybush_era", "lileaves_era", "shield_l_log_era", "icire_rock_era", "shield_l_sand_era",
     "orchidbush_disguiser", "boltwingout_disguiser",
