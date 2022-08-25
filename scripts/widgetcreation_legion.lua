@@ -82,8 +82,7 @@ if CONFIGS_LEGION.PRAYFORRAIN then
             return true
         end
 
-        local validitems = --特殊食材也能放入，比如树枝、灰烬等
-        {
+        local validitems = { --特殊食材也能放入，比如树枝、灰烬等
             ash = true,
             slurtleslime = true,
             glommerfuel = true,
@@ -96,6 +95,7 @@ if CONFIGS_LEGION.PRAYFORRAIN then
             nightmarefuel = true,
             boneshard = true,
             pigskin = true,
+            horn = true
         }
         if validitems[item.prefab] then
             return true
