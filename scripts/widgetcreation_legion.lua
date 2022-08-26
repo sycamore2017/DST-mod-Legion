@@ -77,27 +77,13 @@ if CONFIGS_LEGION.PRAYFORRAIN then
         end
     end
 
+    local cooking = require("cooking")
     function params.hiddenmoonlight.itemtestfn(container, item, slot)
         if item:HasTag("icebox_valid") then
             return true
         end
 
-        local validitems = { --特殊食材也能放入，比如树枝、灰烬等
-            ash = true,
-            slurtleslime = true,
-            glommerfuel = true,
-            phlegm = true,
-            furtuft = true,
-            twiggy_nut = true,
-            twigs = true,
-            honeycomb = true,
-            lightninggoathorn = true,
-            nightmarefuel = true,
-            boneshard = true,
-            pigskin = true,
-            horn = true
-        }
-        if validitems[item.prefab] then
+        if cooking.IsCookingIngredient(item.prefab) then --只要是烹饪食材，就能放入
             return true
         end
 
