@@ -11,8 +11,10 @@ table.insert(PrefabFiles, "fx_ranimbowspark")
 table.insert(PrefabFiles, "skinprefabs_legion")
 
 --------------------------------------------------------------------------
---[[ 特效设置 ]]
+--[[ 皮肤函数 ]]
 --------------------------------------------------------------------------
+
+------特效设置
 
 local TRAIL_FLAGS = { "shadowtrail" }
 local function cane_do_trail(inst)
@@ -86,6 +88,25 @@ local function FxClear(inst)
     inst:RemoveEventCallback("equipped", cane_equipped)
     inst:RemoveEventCallback("unequipped", cane_unequipped)
     inst:RemoveEventCallback("onremove", cane_unequipped)
+end
+
+------随机动画
+
+local function DoRandomAnim(inst)
+    if inst.skin_l_anims then
+        inst.AnimState:PlayAnimation(inst.skin_l_anims[ math.random(#inst.skin_l_anims) ], false)
+    end
+end
+local function SetRandomSkinAnim(inst, anims)
+    if inst.skin_l_anims == nil then
+        inst:ListenForEvent("animover", DoRandomAnim) --看起来被装备后，动画会自动暂停。所以我也不用主动关闭监听了
+    end
+    inst.skin_l_anims = anims
+    DoRandomAnim(inst)
+end
+local function CancelRandomSkinAnim(inst)
+    inst.skin_l_anims = nil
+    inst:RemoveEventCallback("animover", DoRandomAnim)
 end
 
 ------
@@ -1610,7 +1631,7 @@ _G.SKINS_LEGION = {
     },
     backcub_thanks = {
         base_prefab = "backcub",
-		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
+		type = "item", skin_tags = {}, release_group = 555, rarity = raritySpecial,
 
         skin_id = "62f235928c2f781db2f7a2dd",
         onlyownedshow = true,
@@ -1629,19 +1650,72 @@ _G.SKINS_LEGION = {
             description = "The story was not translated."
         },
 
-		anim = {
-            bank = nil, build = nil,
-            anim = nil, isloop_anim = true, animpush = nil, isloop_animpush = nil,
-            setable = true
-        },
+		fn_anim = function(inst)
+            SetRandomSkinAnim(inst, {
+                "idle1", "idle1", "idle1", "idle2", "idle3", "idle3", "idle4", "idle5"
+            })
+        end,
+        fn_start = function(inst)
+            inst.AnimState:SetBank("backcub_thanks")
+            inst.AnimState:SetBuild("backcub_thanks")
+        end,
+        fn_end = function(inst)
+            CancelRandomSkinAnim(inst)
+        end,
         equip = { symbol = "swap_body", build = "backcub_thanks", file = "swap_body" },
         exchangefx = { prefab = nil, offset_y = nil, scale = nil },
         floater = {
-            cut = nil, size = "med", offset_y = 0.1, scale = 1.1, nofx = nil,
-            anim = {
-                bank = "backcub_thanks", build = "backcub_thanks",
-                anim = "idle_water", isloop_anim = true, animpush = nil, isloop_animpush = nil
-            }
+            cut = nil, size = "med", offset_y = 0.1, scale = 0.9, nofx = nil,
+            fn_anim = function(inst)
+                SetRandomSkinAnim(inst, {
+                    "idle1_water", "idle1_water", "idle1_water", "idle2_water",
+                    "idle3_water", "idle3_water", "idle4_water", "idle5_water"
+                })
+            end
+        }
+    },
+    backcub_fans2 = {
+        base_prefab = "backcub",
+		type = "item", skin_tags = {}, release_group = 555, rarity = rarityFree,
+
+        skin_id = "6309c6e88c2f781db2f7ae20",
+        onlyownedshow = true,
+		assets = {
+			Asset("ANIM", "anim/skin/backcub_fans2.zip")
+		},
+		image = { name = nil, atlas = nil, setable = true },
+
+        string = ischinese and {
+            name = "饭豆子", collection = "FANS", access = "REWARD",
+            descitem = "解锁\"靠背熊\"的皮肤。",
+            description = "饭豆子睡着时思想喜欢飘向各处。暴雨来临，孩童们都被雷声吓得噩梦不断。饭豆子放下自己的美梦而去帮助他们改善梦境。一觉醒来，孩子们终记不得它的模样，只记得那沙子般细腻的柔软。\n--感谢白饭的绘制",
+        } or {
+            name = "Bean Fan", collection = "FANS", access = "REWARD",
+            descitem = "Unlock \"Backcub\" skin.",
+            description = "The story was not translated."
+        },
+
+		fn_anim = function(inst)
+            SetRandomSkinAnim(inst, {
+                "idle1", "idle1", "idle1", "idle1", "idle2", "idle3", "idle3"
+            })
+        end,
+        fn_start = function(inst)
+            inst.AnimState:SetBank("backcub_fans2")
+            inst.AnimState:SetBuild("backcub_fans2")
+        end,
+        fn_end = function(inst)
+            CancelRandomSkinAnim(inst)
+        end,
+        equip = { symbol = "swap_body", build = "backcub_fans2", file = "swap_body" },
+        exchangefx = { prefab = nil, offset_y = nil, scale = nil },
+        floater = {
+            cut = nil, size = "med", offset_y = 0.1, scale = 0.9, nofx = nil,
+            fn_anim = function(inst)
+                SetRandomSkinAnim(inst, {
+                    "idle1_water", "idle1_water", "idle1_water", "idle2_water"
+                })
+            end
         }
     },
 
@@ -1992,6 +2066,7 @@ _G.SKIN_IDS_LEGION = {
         rosebush_marble = true, lilybush_marble = true, orchidbush_marble = true, rosorns_marble = true, lileaves_marble = true, orchitwigs_marble = true,
         shield_l_log_emo_fist = true, hat_lichen_emo_que = true,
         rosebush_collector = true, rosorns_collector = true, fimbul_axe_collector = true,
+        backcub_fans2 = true,
     },
     ["6278c450c340bf24ab311528"] = { --回忆(5)
         boltwingout_disguiser = true,
@@ -2052,6 +2127,7 @@ if ischinese then
             DONATE = "通过回忆获取",
             FREE = "自动获取",
             SPECIAL = "通过特殊方式获取",
+            REWARD = "链锁奖励"
         },
     }
 else
@@ -2078,6 +2154,7 @@ else
             DONATE = "Get it by memory", --Get it by donation
             FREE = "Free access",
             SPECIAL = "Get it by special ways",
+            REWARD = "Collecting reward"
         },
     }
 end
@@ -2121,7 +2198,8 @@ local skinidxes = { --用以皮肤排序
     "rosebush_marble", "rosorns_marble", "lilybush_marble", "lileaves_marble", "orchidbush_marble", "orchitwigs_marble",
     "shield_l_log_emo_fist", "hat_lichen_emo_que",
 
-    "shield_l_log_emo_pride", "shield_l_sand_op", "hat_cowboy_tvplay", "hat_lichen_disguiser", "orchitwigs_disguiser", "backcub_fans"
+    "backcub_fans2", "backcub_fans",
+    "shield_l_log_emo_pride", "shield_l_sand_op", "hat_cowboy_tvplay", "hat_lichen_disguiser", "orchitwigs_disguiser"
 }
 for i,skinname in pairs(skinidxes) do
     _G.SKIN_IDX_LEGION[i] = skinname
@@ -2436,6 +2514,32 @@ if IsServer then
     --     inst:AddComponent("shard_skin_legion")
     -- end)
 
+    local function CheckSkinOwnedReward(skins)
+        if skins == nil then
+            return
+        end
+        if skins["backcub_fans2"] then
+            return
+        end
+
+        for skinname,_ in pairs(SKIN_IDS_LEGION["6278c487c340bf24ab31152c"]) do
+            if not skins[skinname] then
+                return
+            end
+        end
+        for skinname,_ in pairs(SKIN_IDS_LEGION["6278c4acc340bf24ab311530"]) do
+            if not skins[skinname] then
+                return
+            end
+        end
+        for skinname,_ in pairs(SKIN_IDS_LEGION["6278c4eec340bf24ab311534"]) do
+            if not skins[skinname] then
+                return
+            end
+        end
+        skins["backcub_fans2"] = true
+    end
+
     local function FnRpc_s2c(userid, handletype, data)
         if data == nil then
             data = {}
@@ -2570,6 +2674,7 @@ if IsServer then
                                     end
                                 end
                             end
+                            CheckSkinOwnedReward(skins)
                         end
                     end
                     if skins ~= nil then --如果数据库皮肤为空，就不该把本地皮肤数据给直接清除
@@ -2772,7 +2877,7 @@ if IsServer then
                 OnLoad_old(inst, data)
             end
 
-             --先存下来，等服务器皮肤数据确认后才传给客户端
+            --先存下来，等服务器皮肤数据确认后才传给客户端
             if data ~= nil then
                 if data.skins_legion ~= nil then
                     SKINS_CACHE_L[inst.userid] = data.skins_legion

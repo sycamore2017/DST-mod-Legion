@@ -15,13 +15,11 @@ local prefabs =
 local function toground(inst)
     -- inst.AnimState:PlayAnimation("anim", true)
 
-    if inst.SoundEmitter then
-        if inst.soundtask == nil then
-            inst.soundtask = inst:DoPeriodicTask(4, function()
-                inst.SoundEmitter:KillSound("sleep")
-                inst.SoundEmitter:PlaySound("dontstarve/creatures/monkey/sleep", "sleep")
-            end, 0)
-        end
+    if inst.soundtask == nil then
+        inst.soundtask = inst:DoPeriodicTask(4, function()
+            inst.SoundEmitter:KillSound("sleep")
+            inst.SoundEmitter:PlaySound("dontstarve/creatures/monkey/sleep", "sleep")
+        end, 0)
     end
 end
 
@@ -62,9 +60,7 @@ local function onequip(inst, owner)
                         else
                             finalitem:Remove()
                         end
-                        if inst.SoundEmitter then
-                            inst.SoundEmitter:PlaySound("dontstarve/HUD/feed")
-                        end
+                        inst.SoundEmitter:PlaySound("dontstarve/HUD/feed")
 
                         if math.random() < 0.15 then
                             local fur = SpawnPrefab("furtuft")
@@ -85,9 +81,7 @@ local function onequip(inst, owner)
         inst.soundtask:Cancel()
         inst.soundtask = nil
     end
-    if inst.SoundEmitter then
-        inst.SoundEmitter:KillSound("sleep")
-    end
+    inst.SoundEmitter:KillSound("sleep")
 end
 
 local function onunequip(inst, owner)
