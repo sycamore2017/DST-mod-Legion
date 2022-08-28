@@ -1,13 +1,12 @@
-local assets =
-{
+local assets = {
     Asset("ANIM", "anim/backcub.zip"),
     Asset("ANIM", "anim/swap_backcub.zip"),
     Asset("ATLAS", "images/inventoryimages/backcub.xml"),
     Asset("IMAGE", "images/inventoryimages/backcub.tex"),
+    Asset("ANIM", "anim/ui_piggyback_2x6.zip"),
 }
 
-local prefabs =
-{
+local prefabs = {
     "cookedsmallmeat",
     "furtuft",
 }
@@ -166,7 +165,7 @@ local function fn()
 
     inst.entity:SetPristine()
     if not TheWorld.ismastersim then
-        inst.OnEntityReplicated = function(inst) inst.replica.container:WidgetSetup("piggyback") end     --直接用官方的slot需要主客机都申明一遍
+        inst.OnEntityReplicated = function(inst) inst.replica.container:WidgetSetup("piggyback") end
         return inst
     end
 

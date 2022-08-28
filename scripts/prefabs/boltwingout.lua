@@ -1,18 +1,16 @@
-local assets =
-{
+local assets = {
     Asset("ANIM", "anim/swap_boltwingout.zip"),
     Asset("ATLAS", "images/inventoryimages/boltwingout.xml"),
     Asset("IMAGE", "images/inventoryimages/boltwingout.tex"),
+    Asset("ANIM", "anim/ui_piggyback_2x6.zip"),
 }
 
-local prefabs =
-{
+local prefabs = {
     "boltwingout_fx",
     "boltwingout_shuck",
 }
 
-local BOLTCOST =
-{
+local BOLTCOST = {
     stinger = 3,            --蜂刺
     honey = 5,              --蜂蜜
     royal_jelly = 0.1,      --蜂王浆

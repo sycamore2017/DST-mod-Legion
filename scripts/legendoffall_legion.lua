@@ -100,9 +100,9 @@ AddRecipe2(
 )
 AddRecipe2(
     "boltwingout", {
-        Ingredient("ahandfulofwings", 36, "images/inventoryimages/ahandfulofwings.xml"),
+        Ingredient("ahandfulofwings", 40, "images/inventoryimages/ahandfulofwings.xml"),
         Ingredient("glommerwings", 1),
-        Ingredient("stinger", 36),
+        Ingredient("stinger", 40),
     }, TECH.SCIENCE_TWO, {
         atlas = "images/inventoryimages/boltwingout.xml", image = "boltwingout.tex"
     }, { "ARMOUR", "CONTAINERS" }

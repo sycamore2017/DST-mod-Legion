@@ -79,8 +79,8 @@ local function fn()
 
     inst:AddTag("sharp") --武器的标签跟攻击方式跟攻击音效有关 没有特殊的话就用这两个
     inst:AddTag("pointy")
-    inst:AddTag("irreplaceable") --这个标签会防止被猴子、食人花、坎普斯等拿走
-    inst:AddTag("nonpotatable") --这个貌似是使其下线时会自动掉落
+    inst:AddTag("irreplaceable") --防止被猴子、食人花、坎普斯等拿走，防止被流星破坏，并使其下线时会自动掉落
+    inst:AddTag("nonpotatable") --这个貌似是？
     inst:AddTag("NORATCHECK") --mod兼容：永不妥协。该道具不算鼠潮分
 
     --weapon (from weapon component) added to pristine state for optimization

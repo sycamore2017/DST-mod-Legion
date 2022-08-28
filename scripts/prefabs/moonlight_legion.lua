@@ -284,7 +284,7 @@ table.insert(prefs, Prefab("hiddenmoonlight", function()
     inst:WatchWorldState("isfullmoon", DoBenefit)
     inst:ListenForEvent("onclose", DoBenefit)
 
-    AddHauntableDropItemOrWork(inst)
+    MakeHauntableLaunchAndDropFirstItem(inst)
 
     MakeSnowCovered_serv_legion(inst, 0.1 + 0.3 * math.random(), function(inst)
         inst.AnimState:SetTime(math.random() * inst.AnimState:GetCurrentAnimationLength())
@@ -465,7 +465,8 @@ local function MakeRevolved(sets)
             inst:SetPrefabNameOverride("revolvedmoonlight")
         end
 
-        inst:AddTag("irreplaceable") --这个标签会防止被猴子、食人花、坎普斯等拿走
+        inst:AddTag("meteor_protection") --防止被流星破坏
+        --因为有容器组件，所以不会被猴子、食人花、坎普斯等拿走
         inst:AddTag("NORATCHECK") --mod兼容：永不妥协。该道具不算鼠潮分
 
         MakeInventoryFloatable(inst, sets.floatable[2], sets.floatable[3], sets.floatable[4])

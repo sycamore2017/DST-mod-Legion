@@ -66,8 +66,7 @@ local SkinedLegion = Class(function(self, inst)
 				self.skin = nil
 				self.inst.skinname = nil
             end
-			self._skindata = self:GetSkinData(self.skin)
-			self:OnSetSkinClient(self._skindata, nil)
+			self:OnSetSkinClient(self:GetSkinData(self.skin), self._skindata)
         end)
     end
 end)
@@ -302,7 +301,15 @@ end
 ------以下均为【客户端】环境
 
 function SkinedLegion:OnSetSkinClient(skindata, skindata_last)
+	self._skindata = skindata
 	local inst = self.inst
+
+	if skindata_last ~= nil then
+		if skindata_last.fn_end_c ~= nil then
+			skindata_last.fn_end_c(inst)
+		end
+	end
+
 	if skindata ~= nil then
 		--漂浮
 		if inst.components.floater ~= nil and skindata.floater ~= nil then
@@ -323,6 +330,10 @@ function SkinedLegion:OnSetSkinClient(skindata, skindata_last)
 			inst.overridedeployplacername = skindata.placer.name
 		else
 			inst.overridedeployplacername = nil
+		end
+
+		if skindata.fn_start_c ~= nil then
+			skindata.fn_start_c(inst)
 		end
 	end
 end

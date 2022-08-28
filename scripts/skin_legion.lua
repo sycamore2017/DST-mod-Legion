@@ -137,8 +137,10 @@ _G.SKIN_PREFABS_LEGION = {
         },
         -- fn_anim = function(inst)end, --处于地面时的动画设置，替换anim的默认方式
 
-        -- fn_start = function(inst)end, --应用皮肤时的函数
-        -- fn_end = nil, --取消皮肤时的函数
+        -- fn_start = function(inst)end, --应用皮肤时的函数(服务端)
+        -- fn_end = nil, --取消皮肤时的函数(服务端)
+        -- fn_start_c = nil, --应用皮肤时的函数(客户端)
+        -- fn_end_c = nil, --取消皮肤时的函数(客户端)
 
         equip = { symbol = "swap_object", build = "swap_rosorns", file = "swap_rosorns" },
         -- fn_equip = function(inst, owner)end, --装备时的贴图切换函数，替换equip的默认方式
@@ -557,8 +559,10 @@ _G.SKINS_LEGION = {
         },
         -- fn_anim = function(inst)end, --处于地面时的动画设置，替换anim的默认方式
 
-        -- fn_start = function(inst)end, --应用皮肤时的函数
-        -- fn_end = nil, --取消皮肤时的函数
+        -- fn_start = function(inst)end, --应用皮肤时的函数(服务端)
+        -- fn_end = nil, --取消皮肤时的函数(服务端)
+        -- fn_start_c = nil, --应用皮肤时的函数(客户端)
+        -- fn_end_c = nil, --取消皮肤时的函数(客户端)
 
         equip = { symbol = "swap_object", build = "swap_spear_mirrorrose", file = "swap_spear" },
         -- fn_equip = function(inst, owner)end, --装备时的贴图切换函数，替换equip的默认方式
@@ -1643,7 +1647,7 @@ _G.SKINS_LEGION = {
         string = ischinese and {
             name = "浮生儿", collection = "THANKS", access = "SPECIAL",
             descitem = "解锁\"靠背熊\"的皮肤。",
-            description = "八年前柳氏逃难被迫闯入农神山，因伤势昏倒在溪边。次日清醒在银光粼粼的洞内，一只孤落的竹居食铁兽救了她。她砍下玉竹制成背篓给它当家并为其取名\"浮生儿\"。浮生儿知她终将离开，临行前将她的扶伤断剑叼到了洞穴中心..."
+            description = "竹居食铁兽的家人为了掩护兽子逃跑先与猎人周旋，而如今兽子孤身已然。某日在农神山溪边发现一位因伤昏倒的女子。它将女子驮到梨花洞治其伤愈其剑。女子用玉竹制成背篓给它当家并为其取名\"浮生儿\"。八年来一直躲避于此不断修炼，直至报仇之日到来！"
         } or {
             name = "Foosen", collection = "THANKS", access = "SPECIAL",
             descitem = "Unlock \"Backcub\" skin.",
@@ -1681,7 +1685,8 @@ _G.SKINS_LEGION = {
         skin_id = "6309c6e88c2f781db2f7ae20",
         onlyownedshow = true,
 		assets = {
-			Asset("ANIM", "anim/skin/backcub_fans2.zip")
+			Asset("ANIM", "anim/skin/backcub_fans2.zip"),
+            Asset("ANIM", "anim/skin/ui_backcub_fans2_2x6.zip"),
 		},
 		image = { name = nil, atlas = nil, setable = true },
 
@@ -1695,17 +1700,26 @@ _G.SKINS_LEGION = {
             description = "The story was not translated."
         },
 
-		fn_anim = function(inst)
-            SetRandomSkinAnim(inst, {
-                "idle1", "idle1", "idle1", "idle1", "idle2", "idle3", "idle3"
-            })
-        end,
         fn_start = function(inst)
             inst.AnimState:SetBank("backcub_fans2")
             inst.AnimState:SetBuild("backcub_fans2")
+            inst.components.container:WidgetSetup("backcub_fans2")
         end,
         fn_end = function(inst)
             CancelRandomSkinAnim(inst)
+            inst.components.container:WidgetSetup("piggyback")
+        end,
+        fn_start_c = function(inst)
+            inst.replica.container:WidgetSetup("backcub_fans2")
+        end,
+        fn_end_c = function(inst)
+            inst.replica.container:WidgetSetup("piggyback")
+        end,
+
+        fn_anim = function(inst)
+            SetRandomSkinAnim(inst, {
+                "idle1", "idle1", "idle1", "idle1", "idle2", "idle3", "idle3"
+            })
         end,
         equip = { symbol = "swap_body", build = "backcub_fans2", file = "swap_body" },
         exchangefx = { prefab = nil, offset_y = nil, scale = nil },
@@ -2154,7 +2168,7 @@ else
             DONATE = "Get it by memory", --Get it by donation
             FREE = "Free access",
             SPECIAL = "Get it by special ways",
-            REWARD = "Collecting reward"
+            REWARD = "Chain reward"
         },
     }
 end
@@ -2188,10 +2202,10 @@ end
 
 local skinidxes = { --用以皮肤排序
     "neverfade_thanks", "neverfadebush_thanks",
-    "fishhomingtool_awesome_thanks", "fishhomingtool_normal_thanks", "fishhomingbait_thanks",
     "siving_derivant_lvl0_thanks", "siving_derivant_lvl1_thanks", "siving_derivant_lvl2_thanks", "siving_derivant_lvl3_thanks",
     "siving_derivant_lvl0_thanks2", "siving_derivant_lvl1_thanks2", "siving_derivant_lvl2_thanks2", "siving_derivant_lvl3_thanks2",
     "backcub_thanks",
+    "fishhomingtool_awesome_thanks", "fishhomingtool_normal_thanks", "fishhomingbait_thanks",
     "icire_rock_collector", "fimbul_axe_collector", "rosebush_collector", "rosorns_collector",
     "triplegoldenshovelaxe_era", "tripleshovelaxe_era", "lilybush_era", "lileaves_era", "shield_l_log_era", "icire_rock_era", "shield_l_sand_era",
     "orchidbush_disguiser", "boltwingout_disguiser",

@@ -8,6 +8,22 @@ local containers = require("containers")
 local showmeneed = { "backcub" }
 local params = {}
 
+params.backcub_fans2 = {
+    widget = {
+        slotpos = {},
+        animbank = "ui_piggyback_2x6",
+        animbuild = "ui_backcub_fans2_2x6",
+        pos = Vector3(-5, -50, 0)
+    },
+    issidewidget = true,
+    type = "pack",
+    openlimit = 1
+}
+for y = 0, 5 do
+    table.insert(params.backcub_fans2.widget.slotpos, Vector3(-162, -75 * y + 170, 0))
+    table.insert(params.backcub_fans2.widget.slotpos, Vector3(-162 + 75, -75 * y + 170, 0))
+end
+
 if TUNING.LEGION_FLASHANDCRUSH then
     params.beefalo = {
         widget =
@@ -70,7 +86,6 @@ if CONFIGS_LEGION.PRAYFORRAIN then
         },
         type = "chest",
     }
-
     for y = 3, 0, -1 do
         for x = 0, 3 do
             table.insert(params.hiddenmoonlight.widget.slotpos, Vector3(80 * (x - 2) + 40, 80 * (y - 2) + 40, 0))
@@ -116,7 +131,6 @@ if CONFIGS_LEGION.PRAYFORRAIN then
         },
         type = "chest",
     }
-
     for y = 2, 1, -1 do
         for x = 0, 2 do
             table.insert(params.revolvedmoonlight.widget.slotpos, Vector3(80*x - 80*2 + 72, 80*y - 80*2 + 47, 0))
@@ -143,7 +157,6 @@ if CONFIGS_LEGION.PRAYFORRAIN then
         },
         type = "chest",
     }
-
     for y = 0, 2 do --                                                    x轴基础               y轴基础
         table.insert(params.revolvedmoonlight_pro.widget.slotpos, Vector3(-122      , (-77*y) + 80 - (y*2), 0))
         table.insert(params.revolvedmoonlight_pro.widget.slotpos, Vector3(-122 + 75 , (-77*y) + 80 - (y*2), 0))
@@ -165,9 +178,9 @@ if CONFIGS_LEGION.LEGENDOFFALL then
     params.boltwingout = {
         widget = {
             slotpos = {},
-            animbank = "ui_backpack_2x4",
-            animbuild = "ui_backpack_2x4",
-            pos = Vector3(-5, -70, 0),
+            animbank = "ui_piggyback_2x6",
+            animbuild = "ui_piggyback_2x6",
+            pos = Vector3(-5, -50, 0)
         },
         issidewidget = true,
         type = "pack",
@@ -210,9 +223,9 @@ if CONFIGS_LEGION.LEGENDOFFALL then
             return costs[item.prefab] ~= nil or item:HasTag("yes_boltout")
         end
     }
-    for y = 0, 3 do
-        table.insert(params.boltwingout.widget.slotpos, Vector3(-162, -75 * y + 114, 0))
-        table.insert(params.boltwingout.widget.slotpos, Vector3(-162 + 75, -75 * y + 114, 0))
+    for y = 0, 5 do
+        table.insert(params.boltwingout.widget.slotpos, Vector3(-162, -75 * y + 170, 0))
+        table.insert(params.boltwingout.widget.slotpos, Vector3(-162 + 75, -75 * y + 170, 0))
     end
 
     ------
