@@ -56,8 +56,8 @@ local function MakeBoss(data)
 
             inst:AddComponent("lootdropper")
 
-            -- inst:AddComponent("health")
-            -- inst.components.health:SetMaxHealth(9000)
+            inst:AddComponent("health")
+            inst.components.health:SetMaxHealth(9000)
 
             -- inst:AddComponent("combat")
             -- inst.components.combat:SetDefaultDamage(60)

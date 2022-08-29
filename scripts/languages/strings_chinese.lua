@@ -2166,16 +2166,86 @@ S_________WURT.DESCRIBE.SIVING_DERIVANT_LVL3 = "故乡的森林深处，都是�
 S________WANDA.DESCRIBE.SIVING_DERIVANT_LVL3 = "真神奇啊，但我见怪不怪了。"
 
 S_NAMES.SIVING_THETREE = "子圭神木岩"
-S______GENERIC.DESCRIBE.SIVING_THETREE = "我整个生命都拜倒在它的神秘威严之下。"
-S_______WILLOW.DESCRIBE.SIVING_THETREE = "它不能燃烧，但它能燃烧生命之火。"
-S_____WOLFGANG.DESCRIBE.SIVING_THETREE = "沃尔夫冈不应该离氪石这么近。"
-S________WENDY.DESCRIBE.SIVING_THETREE = "它正牵着我，和平地走向死亡，真是欣慰。"
-S_________WX78.DESCRIBE.SIVING_THETREE = "它渴望夺取生命。"
-S_WICKERBOTTOM.DESCRIBE.SIVING_THETREE = "危险！它有一股宛如黑洞般的生命吸引力。"
-S_______WOODIE.DESCRIBE.SIVING_THETREE = "露西，别想着砍它了，听我的没错。"
-S______WAXWELL.DESCRIBE.SIVING_THETREE = "看起来不像查理的作品。"
-S___WATHGRITHR.DESCRIBE.SIVING_THETREE = "青光闪过，神树永恒！"
-S_______WEBBER.DESCRIBE.SIVING_THETREE = "好想爬上去玩玩。"
+S______GENERIC.DESCRIBE.SIVING_THETREE = {
+    GENERIC = "我整个生命都拜倒在它的神秘威严之下。",
+    NEEDALL = "它说它需要黄宝石制品和告密的心。",
+    NEEDLIGHT = "它说它还需要黄宝石制品。",
+    NEEDHEALTH = "它说它还需要告密的心。",
+    NONEED = "看来都已经准备好了。",
+    NOTTHIS = "它不要这个。"
+}
+S_______WILLOW.DESCRIBE.SIVING_THETREE = {
+    GENERIC = "它不能燃烧，但它能燃烧生命之火。",
+    NEEDALL = "哼，居然找本姑娘要黄宝石制品和告密的心。",
+    NEEDLIGHT = "居然还要这么贵重的黄宝石制品。",
+    NEEDHEALTH = "为了告密的心，手都弄痛了，结果它还要？！",
+    NONEED = "本姑娘的任务终于结束了。",
+    NOTTHIS = "不要算了。"
+}
+S_____WOLFGANG.DESCRIBE.SIVING_THETREE = {
+    GENERIC = "沃尔夫冈不应该离氪石这么近。",
+    NEEDALL = "它想要沃尔夫冈的黄宝石制品和告密的心。",
+    NEEDLIGHT = "它还想要沃尔夫冈的黄宝石制品。",
+    NEEDHEALTH = "它还想要沃尔夫冈的告密的心。",
+    NONEED = "它不再需要沃尔夫冈了。",
+    NOTTHIS = "它看不起沃尔夫冈的东西吗。"
+}
+S________WENDY.DESCRIBE.SIVING_THETREE = {
+    GENERIC = "它正牵着我，和平地走向死亡，真是欣慰。",
+    NEEDALL = "献祭仪式需要黄宝石制品和告密的心。",
+    NEEDLIGHT = "献祭过程还要黄宝石制品。",
+    NEEDHEALTH = "献祭过程还要告密的心。",
+    NONEED = "所有物品都准备好了，开始吧。",
+    NOTTHIS = "这是多余的献祭物品。"
+}
+S_________WX78.DESCRIBE.SIVING_THETREE = {
+    GENERIC = "它渴望夺取生命。",
+    NEEDALL = "它要黄宝石制品和告密的心干嘛？",
+    NEEDLIGHT = "黄宝石制品，我为啥要给它这个。",
+    NEEDHEALTH = "告密的心，我为啥要给它这个。",
+    NONEED = "希望能给我更厉害的芯片。",
+    NOTTHIS = "没用的东西。"
+}
+S_WICKERBOTTOM.DESCRIBE.SIVING_THETREE = {
+    GENERIC = "危险！它有一股宛如黑洞般的生命吸引力。",
+    NEEDALL = "黄宝石制品和告密的心，它居然能和我心灵感应。",
+    NEEDLIGHT = "还要黄宝石制品，不懂这个外星生物的意图。",
+    NEEDHEALTH = "还要告密的心，不懂这个外星生物的意图。",
+    NONEED = "完毕，希望接下来的是知识的盛宴。",
+    NOTTHIS = "不需要这个。"
+}
+S_______WOODIE.DESCRIBE.SIVING_THETREE = {
+    GENERIC = "露西，别想着砍它了，听我的没错。",
+    NEEDALL = "黄宝石制品和告密的心，我要按照指示做吗，露西？",
+    NEEDLIGHT = "要求真多，还要黄宝石制品。",
+    NEEDHEALTH = "要求真多，还要告密的心。",
+    NONEED = "完工了，它要创造一片森林给我砍吗？",
+    NOTTHIS = "它不要这个。"
+}
+S______WAXWELL.DESCRIBE.SIVING_THETREE = {
+    GENERIC = "看起来不像查理的作品。",
+    NEEDALL = "神秘的石树需要黄宝石制品和告密的心，真可疑。",
+    NEEDLIGHT = "可疑的石树还要黄宝石制品。",
+    NEEDHEALTH = "可疑的石树还要告密的心。",
+    NONEED = "已经结束了。",
+    NOTTHIS = "不是这个。"
+}
+S___WATHGRITHR.DESCRIBE.SIVING_THETREE = {
+    GENERIC = "青光闪过，神树永恒！",
+    NEEDALL = "神树欲求黄宝石制品和告密的心，我马上再去找。",
+    NEEDLIGHT = "神树还需要黄宝石制品。",
+    NEEDHEALTH = "神树还需要告密的心。",
+    NONEED = "我已经准备好接受神树的恩赐了！",
+    NOTTHIS = "神树的要求很明确。"
+}
+S_______WEBBER.DESCRIBE.SIVING_THETREE = {
+    GENERIC = "好想爬上去玩玩。",
+    NEEDALL = "黄宝石玩具和告密心心，这两是啥来着？",
+    NEEDLIGHT = "黄宝石玩具不好找呀，还要吗。",
+    NEEDHEALTH = "告密心心不好做呀，还要吗。",
+    NONEED = "大功告成，我们要大玩一番！",
+    NOTTHIS = "不能用其他的代替吗？"
+}
 S_______WINONA.DESCRIBE.SIVING_THETREE = "看看，多精美的纹路。"
 S_______WORTOX.DESCRIBE.SIVING_THETREE = "这鬼东西想要我的命，但明明我的灵魂更好吃。"
 S_____WORMWOOD.DESCRIBE.SIVING_THETREE = "这还算朋友吗？"

@@ -620,8 +620,10 @@ table.insert(prefs, Prefab(
 
         inst:AddTag("siving_thetree")
 
-        inst.entity:SetPristine()
+        --trader (from trader component) added to pristine state for optimization
+        inst:AddTag("trader")
 
+        inst.entity:SetPristine()
         if not TheWorld.ismastersim then
             return inst
         end
@@ -631,10 +633,13 @@ table.insert(prefs, Prefab(
         inst.treeState = 1
         inst.taskLifeExtract = nil
         inst.bossBird = nil
+        inst.tradeditems = nil --已给予的物品
 
         inst:AddComponent("inspectable")
 
         inst:AddComponent("lootdropper")
+
+        inst:AddComponent("bloomer")
 
         inst:AddComponent("workable")
         inst.components.workable:SetWorkAction(ACTIONS.MINE)
@@ -655,12 +660,57 @@ table.insert(prefs, Prefab(
                     inst.countWorked = 0
                     DropRock(inst)
                 end
-
-                --undo:有几率产生boss
             end
         end)
 
-        inst:AddComponent("bloomer")
+        inst:AddComponent("trader")
+        inst.components.trader.acceptnontradable = true
+        inst.components.trader:SetAcceptTest(function(inst, item, giver)
+            local treeitems = {
+                reviver = true,
+                yellowamulet = true,
+                yellowstaff = true,
+                yellowmooneye = true
+            }
+            if treeitems[item.prefab] then
+                return true
+            else
+                return false
+            end
+        end)
+        inst.components.trader.onaccept = function(inst, giver, item)
+            if inst.tradeditems == nil then
+                inst.tradeditems = { light = 0, health = 0 }
+            end
+            if item.prefab == "reviver" then
+                inst.tradeditems.health = inst.tradeditems.health + 1
+            else
+                inst.tradeditems.light = inst.tradeditems.light + 1
+            end
+
+            if giver.components.talker ~= nil then
+                local wordkey
+                if inst.tradeditems.light < 2 then
+                    if inst.tradeditems.health < 8 then
+                        wordkey = "NEEDALL"
+                    else
+                        wordkey = "NEEDLIGHT"
+                    end
+                else
+                    if inst.tradeditems.health < 8 then
+                        wordkey = "NEEDHEALTH"
+                    else
+                        wordkey = "NONEED"
+                    end
+                end
+                giver.components.talker:Say(GetString(giver, "DESCRIBE", { "SIVING_THETREE", wordkey }))
+            end
+        end
+        inst.components.trader.onrefuse = function(inst, giver, item)
+            if giver.components.talker ~= nil then
+                giver.components.talker:Say(GetString(giver, "DESCRIBE", { "SIVING_THETREE", "NOTTHIS" }))
+            end
+        end
 
         MakeHauntableWork(inst)
 

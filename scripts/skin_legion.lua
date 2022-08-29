@@ -1647,7 +1647,7 @@ _G.SKINS_LEGION = {
         string = ischinese and {
             name = "浮生儿", collection = "THANKS", access = "SPECIAL",
             descitem = "解锁\"靠背熊\"的皮肤。",
-            description = "竹居食铁兽的家人为了掩护兽子逃跑先与猎人周旋，而如今兽子孤身已然。某日在农神山溪边发现一位因伤昏倒的女子。它将女子驮到梨花洞治其伤愈其剑。女子用玉竹制成背篓给它当家并为其取名\"浮生儿\"。八年来一直躲避于此不断修炼，直至报仇之日到来！"
+            description = "竹居食铁兽的家人为了掩护兽子逃跑先与猎人周旋，而如今兽子孤身已然。某日在农神山溪边发现一位因伤昏倒的女子。它将女子驮到梨花洞治其伤愈其剑。女子用玉竹制成背篓给它当家并为其取名\"浮生儿\"。八年来浮生儿一直相伴左右陪她修炼，直至出山之日的到来！"
         } or {
             name = "Foosen", collection = "THANKS", access = "SPECIAL",
             descitem = "Unlock \"Backcub\" skin.",
