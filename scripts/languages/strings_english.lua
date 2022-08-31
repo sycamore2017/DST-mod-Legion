@@ -2185,23 +2185,142 @@ S_________WURT.DESCRIBE.SIVING_DERIVANT_LVL3 = "Deep in the forest of my hometow
 S________WANDA.DESCRIBE.SIVING_DERIVANT_LVL3 = "It's amazing, but I'm also not surprised."
 
 S_NAMES.SIVING_THETREE = "Siving Alpha" --子圭神木岩
-S______GENERIC.DESCRIBE.SIVING_THETREE = "My life bows to its mysterious majesty."
-S_______WILLOW.DESCRIBE.SIVING_THETREE = "It cannot burn, but it can burn the fire of life."
-S_____WOLFGANG.DESCRIBE.SIVING_THETREE = "Wolfgang shouldn't be so close to Kryptonite."
-S________WENDY.DESCRIBE.SIVING_THETREE = "Leading me to death peacefully, what a relief."
-S_________WX78.DESCRIBE.SIVING_THETREE = "EAGER TO TAKE LIFE."
-S_WICKERBOTTOM.DESCRIBE.SIVING_THETREE = "DANGER! It has a life attraction like a black hole."
-S_______WOODIE.DESCRIBE.SIVING_THETREE = "Lucy, don't try to chop it down."
-S______WAXWELL.DESCRIBE.SIVING_THETREE = "It doesn't look like Charlie's work."
-S___WATHGRITHR.DESCRIBE.SIVING_THETREE = "Ode to Yggdrasill!"
-S_______WEBBER.DESCRIBE.SIVING_THETREE = "We really want to climb up and play."
-S_______WINONA.DESCRIBE.SIVING_THETREE = "What beautiful lines."
-S_______WORTOX.DESCRIBE.SIVING_THETREE = "This thing wants my life, but my soul is too strong for it."
-S_____WORMWOOD.DESCRIBE.SIVING_THETREE = "Is this still a friend?"
-S________WARLY.DESCRIBE.SIVING_THETREE = "My life is as delicious as my cooking."
-S_________WURT.DESCRIBE.SIVING_THETREE = "Why isn't it as safe as home, glorp?"
-S_______WALTER.DESCRIBE.SIVING_THETREE = "The closer to the truth, the more dangerous it is."
-S________WANDA.DESCRIBE.SIVING_THETREE = "As soon as I get close to it I start aging..."
+S______GENERIC.DESCRIBE.SIVING_THETREE = {
+    GENERIC = "My life bows to its mysterious majesty.",
+    NEEDALL = "It says it needs yellowgem products and Telltale Hearts.",
+    NEEDLIGHT = "It says it still needs yellowgem products.",
+    NEEDHEALTH = "It says it still needs Telltale Hearts.",
+    NONEED = "It seems that everything is ready.",
+    NOTTHIS = "It doesn't want this."
+}
+S_______WILLOW.DESCRIBE.SIVING_THETREE = {
+    GENERIC = "It cannot burn, but it can burn the fire of life.",
+    NEEDALL = "Hum, it unexpectedly asked me for yellowgem products and Telltale Hearts.",
+    NEEDLIGHT = "It even needs such precious yellowgem products.",
+    NEEDHEALTH = "My hand hurts for Telltale Hearts, but it still needs it?!",
+    NONEED = "Girl's mission is finally over.",
+    NOTTHIS = "Forget it."
+}
+S_____WOLFGANG.DESCRIBE.SIVING_THETREE = {
+    GENERIC = "Wolfgang shouldn't be so close to Kryptonite.",
+    NEEDALL = "It wants Wolfgang's yellowgem products and Telltale Hearts.",
+    NEEDLIGHT = "It still wants Wolfgang's yellowgem products.",
+    NEEDHEALTH = "It still wants Wolfgang's Telltale Hearts.",
+    NONEED = "It no longer needs Wolfgang.",
+    NOTTHIS = "Does it despise Wolfgang's items?"
+}
+S________WENDY.DESCRIBE.SIVING_THETREE = {
+    GENERIC = "Leading me to death peacefully, what a relief.",
+    NEEDALL = "The sacrificial ceremony needs yellowgem products and Telltale Hearts.",
+    NEEDLIGHT = "Yellowgem products are also needed in the sacrifice process.",
+    NEEDHEALTH = "Telltale Hearts are also needed in the sacrifice process.",
+    NONEED = "Everything is ready. Let's start the ceremony.",
+    NOTTHIS = "This is a useless sacrifice."
+}
+S_________WX78.DESCRIBE.SIVING_THETREE = {
+    GENERIC = "EAGER TO TAKE LIFE.",
+    NEEDALL = "WHY DOES IT WANT YELLOWGEM PRODUCTS AND TELLTALE HEARTS?",
+    NEEDLIGHT = "YELLOWGEM PRODUCTS. WHY SHOULD I GIVE IT THIS.",
+    NEEDHEALTH = "TELLTALE HEARTS. WHY SHOULD I GIVE IT THIS.",
+    NONEED = "I HOPE IT CAN GIVE ME MORE POWERFUL CHIPS.",
+    NOTTHIS = "USELESS."
+}
+S_WICKERBOTTOM.DESCRIBE.SIVING_THETREE = {
+    GENERIC = "DANGER! It has a life attraction like a black hole.",
+    NEEDALL = "Yellowgem products and Telltale Hearts, it can actually telepathize with me.",
+    NEEDLIGHT = "It also needs yellowgem products. I don't understand the intention of this alien.",
+    NEEDHEALTH = "It also needs Telltale Hearts. I don't understand the intention of this alien.",
+    NONEED = "That's it. I hope what follows is a feast of knowledge.",
+    NOTTHIS = "I don't need this."
+}
+S_______WOODIE.DESCRIBE.SIVING_THETREE = {
+    GENERIC = "Lucy, don't try to chop it down.",
+    NEEDALL = "Yellowgem products and Telltale Hearts, should I follow the instructions, Lucy?",
+    NEEDLIGHT = "It's really demanding. It still needs yellowgem products.",
+    NEEDHEALTH = "It's really demanding. It still needs Telltale Hearts.",
+    NONEED = "Finished. Will it create a forest for me to chop?",
+    NOTTHIS = "It doesn't want this."
+}
+S______WAXWELL.DESCRIBE.SIVING_THETREE = {
+    GENERIC = "It doesn't look like Charlie's work.",
+    NEEDALL = "The mysterious tree needs yellowgem products and Telltale Hearts. It's really suspicious.",
+    NEEDLIGHT = "Suspicious tree also need yellowgem products.",
+    NEEDHEALTH = "Suspicious tree also need Telltale Hearts.",
+    NONEED = "It's over.",
+    NOTTHIS = "Not this one."
+}
+S___WATHGRITHR.DESCRIBE.SIVING_THETREE = {
+    GENERIC = "Ode to Yggdrasill!",
+    NEEDALL = "Yggdrasil wants yellowgem products and Telltale Hearts. I'll find it right away.",
+    NEEDLIGHT = "Yggdrasil also needs yellowgem products.",
+    NEEDHEALTH = "Yggdrasil also needs Telltale Hearts.",
+    NONEED = "I'm ready to accept the gift of Yggdrasil!",
+    NOTTHIS = "The requirements of Yggdrasil are very clear."
+}
+S_______WEBBER.DESCRIBE.SIVING_THETREE = {
+    GENERIC = "We really want to climb up and play.",
+    NEEDALL = "Yellowgem toys and telltell hearts, what are these two?",
+    NEEDLIGHT = "Yellowgem toys are hard to find. Want more?",
+    NEEDHEALTH = "It's hard to make telltell hearts. Want more?",
+    NONEED = "It's done. We'll have a nice adventure time!",
+    NOTTHIS = "Can't we use other items?"
+}
+S_______WINONA.DESCRIBE.SIVING_THETREE = {
+    GENERIC = "What beautiful lines.",
+    NEEDALL = "Yellowgem products and Telltale Hearts. It has its own requirements?!",
+    NEEDLIGHT = "It still wants to absorb yellowgem products.",
+    NEEDHEALTH = "It still wants to absorb Telltale Hearts.",
+    NONEED = "What will happen after the transformation?",
+    NOTTHIS = "It won't want it."
+}
+S_______WORTOX.DESCRIBE.SIVING_THETREE = {
+    GENERIC = "This thing wants my life, but my soul is too strong for it.",
+    NEEDALL = "This thing told me that it wants yellowgem products and Telltale Hearts.",
+    NEEDLIGHT = "This thing said it also wanted yellowgem products.",
+    NEEDHEALTH = "This thing said it also wanted Telltale Hearts.",
+    NONEED = "I was deceived. I've got to run away!",
+    NOTTHIS = "Dear, this is wrong."
+}
+S_____WORMWOOD.DESCRIBE.SIVING_THETREE = {
+    GENERIC = "Is this still a friend?",
+    NEEDALL = "It wants yellow glitter and hearts.",
+    NEEDLIGHT = "It wants yellow glitter.",
+    NEEDHEALTH = "It wants hearts",
+    NONEED = "Done.",
+    NOTTHIS = "No."
+}
+S________WARLY.DESCRIBE.SIVING_THETREE = {
+    GENERIC = "My life is as delicious as my cooking.",
+    NEEDALL = "It said that yellowgem products and Telltale Hearts are the secret recipe of luxury feast.",
+    NEEDLIGHT = "The luxury feast also needs yellowgem products.",
+    NEEDHEALTH = "The luxury feast also needs Telltale Hearts.",
+    NONEED = "What will the luxury feast look like? I'm so curious!",
+    NOTTHIS = "I'm not here to make trouble."
+}
+S_________WURT.DESCRIBE.SIVING_THETREE = {
+    GENERIC = "Why isn't it as safe as home, glorp?",
+    NEEDALL = "I should have seen yellowgem products and Telltale Hearts somewhere.",
+    NEEDLIGHT = "It's asking me for yellowgem products, glort.",
+    NEEDHEALTH = "It's asking me for Telltale Hearts, glort.",
+    NONEED = "It says to show me the greatness of life, flort.",
+    NOTTHIS = "Grrr, it's wrong."
+}
+S_______WALTER.DESCRIBE.SIVING_THETREE = {
+    GENERIC = "The closer to the truth, the more dangerous it is.",
+    NEEDALL = "It needs yellowgem products and Telltale Hearts. Is it giving me orders?",
+    NEEDLIGHT = "It said it needed yellowgem products to save it.",
+    NEEDHEALTH = "It said it needed Telltale Hearts to save it.",
+    NONEED = "I saved you. Remember to send me a medal.",
+    NOTTHIS = "I shouldn't have made such a mistake."
+}
+S________WANDA.DESCRIBE.SIVING_THETREE = {
+    GENERIC = "As soon as I got close to it, I felt that my time was speeding up.",
+    NEEDALL = "I know what it wants, yellowgem products and Telltale Hearts!",
+    NEEDLIGHT = "Yellowgem products. I'll make the same mistake again.",
+    NEEDHEALTH = "Telltale Hearts. I just want to try another ending.",
+    NONEED = "I have been ready many times.",
+    NOTTHIS = "I don't think so."
+}
 
 S_NAMES.SIVING_SOIL_ITEM = "Siving-Sols"   --未放置的子圭·垄
 S_RECIPE_DESC.SIVING_SOIL_ITEM = "An unusual soil bursting with life energy."

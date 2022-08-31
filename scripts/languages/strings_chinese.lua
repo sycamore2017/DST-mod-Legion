@@ -2246,13 +2246,62 @@ S_______WEBBER.DESCRIBE.SIVING_THETREE = {
     NONEED = "大功告成，我们要大玩一番！",
     NOTTHIS = "不能用其他的代替吗？"
 }
-S_______WINONA.DESCRIBE.SIVING_THETREE = "看看，多精美的纹路。"
-S_______WORTOX.DESCRIBE.SIVING_THETREE = "这鬼东西想要我的命，但明明我的灵魂更好吃。"
-S_____WORMWOOD.DESCRIBE.SIVING_THETREE = "这还算朋友吗？"
-S________WARLY.DESCRIBE.SIVING_THETREE = "我的生命和我做的料理一样鲜美。"
-S_________WURT.DESCRIBE.SIVING_THETREE = "为什么它不像家乡的一样安全，格浪噗？"
-S_______WALTER.DESCRIBE.SIVING_THETREE = "离真相越近，往往就越危险。"
-S________WANDA.DESCRIBE.SIVING_THETREE = "一靠近它我就感到自己的时间在流逝。"
+S_______WINONA.DESCRIBE.SIVING_THETREE = {
+    GENERIC = "看看，多精美的纹路。",
+    NEEDALL = "黄宝石制品和告密的心，它居然有自己的要求？！",
+    NEEDLIGHT = "它还想吸收黄宝石制品。",
+    NEEDHEALTH = "它还想吸收告密的心。",
+    NONEED = "改造完毕，会发生什么呢？",
+    NOTTHIS = "它不会想要这个的。"
+}
+S_______WORTOX.DESCRIBE.SIVING_THETREE = {
+    GENERIC = "这鬼东西想要我的命，但明明我的灵魂更好吃。",
+    NEEDALL = "这鬼东西跟我说它要黄宝石制品和告密的心。",
+    NEEDLIGHT = "这鬼东西说它还要黄宝石制品。",
+    NEEDHEALTH = "这鬼东西说它还要告密的心。",
+    NONEED = "居然被摆了一道，我得赶紧溜了！",
+    NOTTHIS = "亲，这是不对的。"
+}
+S_____WORMWOOD.DESCRIBE.SIVING_THETREE = {
+    GENERIC = "这还算朋友吗？",
+    NEEDALL = "它要黄色亮晶晶和心。",
+    NEEDLIGHT = "还要黄色亮晶晶。",
+    NEEDHEALTH = "还要心。",
+    NONEED = "完成了。",
+    NOTTHIS = "不要。"
+}
+S________WARLY.DESCRIBE.SIVING_THETREE = {
+    GENERIC = "我的生命和我做的料理一样鲜美。",
+    NEEDALL = "它说黄宝石制品和告密的心是终极盛宴的秘方。",
+    NEEDLIGHT = "终极盛宴还需黄宝石制品。",
+    NEEDHEALTH = "终极盛宴还需告密的心。",
+    NONEED = "终极盛宴会是什么样子呢？我太好奇啦！",
+    NOTTHIS = "我可不是来捣乱的。"
+}
+S_________WURT.DESCRIBE.SIVING_THETREE = {
+    GENERIC = "为什么它不像家乡的一样安全，格浪噗？",
+    NEEDALL = "黄宝石制品和告密的心，我应该在哪见过。",
+    NEEDLIGHT = "它在向我索要黄宝石制品，嗝浪淌。",
+    NEEDHEALTH = "它在向我索要告密的心，嗝浪淌。",
+    NONEED = "它说要让我见识生命的力量，浮浪特。",
+    NOTTHIS = "呱，给错了。"
+}
+S_______WALTER.DESCRIBE.SIVING_THETREE = {
+    GENERIC = "离真相越近，往往就越危险。",
+    NEEDALL = "需黄宝石制品和告密的心，它是在给我下达命令吗？",
+    NEEDLIGHT = "它说还需要黄宝石制品才能拯救它。",
+    NEEDHEALTH = "它说还需要告密的心才能拯救它。",
+    NONEED = "我拯救了你，记得送我一块奖章。",
+    NOTTHIS = "这种错误我不该犯。"
+}
+S________WANDA.DESCRIBE.SIVING_THETREE = {
+    GENERIC = "一靠近它我就感到自己的时间在流逝。",
+    NEEDALL = "我知道它要什么，黄宝石制品和告密的心！",
+    NEEDLIGHT = "黄宝石制品，看来我又要重蹈覆辙了。",
+    NEEDHEALTH = "告密的心，我只是想试试另一个结局。",
+    NONEED = "轻车熟路，我已准备好了很多次。",
+    NOTTHIS = "看来不行，我只是想试试。"
+}
 
 S_NAMES.SIVING_SOIL_ITEM = "未放置的子圭·垄"
 S_RECIPE_DESC.SIVING_SOIL_ITEM = "从种子开始，入生命轮回。"

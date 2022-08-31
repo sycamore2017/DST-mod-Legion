@@ -340,28 +340,30 @@ local function DropRock(inst)
     DropItem_legion("siving_rocks", x, y+13, z, 1.5, 18, 15*FRAMES, nil, nil, nil)
 end
 local function OnStealLife(inst, value)
-    --子圭玄鸟在场上时，吸收的生命全部加给它
-    if
-        inst.bossBird ~= nil and
-        inst.bossBird.components.health ~= nil and not inst.bossBird.components.health:IsDead()
-    then
-        inst.bossBird.components.health:DoDelta(value, nil, inst.prefab)
-        return
-    end
-
     inst.countHealth = inst.countHealth + value
 
-    if inst.treeState == 0 then --如果玄鸟死了，积累达到其生命最大值后，提前复活玄鸟(但不立即上场)
-        if inst.countHealth >= 10000 then
-            inst.components.timer:StopTimer("birdrebirth")
-			inst:PushEvent("timerdone", { name = "birdrebirth" })
-            inst.countHealth = inst.countHealth - 10000
-        end
-    else    --如果玄鸟活着(但没上场)，每500生命有几率掉落子圭石
-        if inst.countHealth >= 500 then
-            if math.random() < 0.1 then
-                DropRock(inst)
+    if inst.bossBird ~= nil then --子圭玄鸟在场上时，吸收的生命用来恢复它们
+        if inst.countHealth >= 6 then
+            if
+                inst.bossBird.female ~= nil and inst.bossBird.female:IsValid() and
+                not inst.bossBird.female.components.health:IsDead() and
+                inst.bossBird.female.components.health:IsHurt()
+            then
+                inst.bossBird.female.components.health:DoDelta(3)
+                inst.countHealth = inst.countHealth - 3
             end
+            if
+                inst.bossBird.male ~= nil and inst.bossBird.male:IsValid() and
+                not inst.bossBird.male.components.health:IsDead() and
+                inst.bossBird.male.components.health:IsHurt()
+            then
+                inst.bossBird.male.components.health:DoDelta(3)
+                inst.countHealth = inst.countHealth - 3
+            end
+        end
+    else --如果没有玄鸟，每500生命必定掉落子圭石
+        if inst.countHealth >= 500 then
+            DropRock(inst)
             inst.countHealth = inst.countHealth - 500
         end
     end
@@ -570,7 +572,7 @@ end
 local function StateChange(inst) --0休眠状态(玄鸟死亡)、1正常状态(玄鸟活着，非春季)、2活力状态(玄鸟活着，春季)
     if inst.components.timer:TimerExists("birdrebirth") then --玄鸟死亡
         inst.treeState = 0
-        inst.bossBird = nil
+        inst.bossBirds = nil
         inst.AnimState:SetBuild("siving_thetree")
         inst.components.bloomer:PopBloom("activetree")
         inst.Light:Enable(false)
@@ -632,7 +634,7 @@ table.insert(prefs, Prefab(
         inst.countHealth = 0
         inst.treeState = 1
         inst.taskLifeExtract = nil
-        inst.bossBird = nil
+        inst.bossBirds = nil
         inst.tradeditems = nil --已给予的物品
 
         inst:AddComponent("inspectable")
@@ -666,6 +668,9 @@ table.insert(prefs, Prefab(
         inst:AddComponent("trader")
         inst.components.trader.acceptnontradable = true
         inst.components.trader:SetAcceptTest(function(inst, item, giver)
+            if inst.treeState == 0 then
+                return false
+            end
             local treeitems = {
                 reviver = true,
                 yellowamulet = true,
@@ -683,8 +688,10 @@ table.insert(prefs, Prefab(
                 inst.tradeditems = { light = 0, health = 0 }
             end
             if item.prefab == "reviver" then
+                OnStealLife(inst, 40)
                 inst.tradeditems.health = inst.tradeditems.health + 1
             else
+                OnStealLife(inst, 320)
                 inst.tradeditems.light = inst.tradeditems.light + 1
             end
 
@@ -705,6 +712,14 @@ table.insert(prefs, Prefab(
                 end
                 giver.components.talker:Say(GetString(giver, "DESCRIBE", { "SIVING_THETREE", wordkey }))
             end
+
+            if inst.tradeditems.light >= 2 and inst.tradeditems.health >= 8 then --达成条件，该召唤BOSS了
+                if inst.bossBirds == nil and not inst.components.timer:TimerExists("birdstart") then
+                    inst.components.timer:StartTimer("birdstart", 5)
+                    inst.tradeditems.light = inst.tradeditems.light - 2
+                    inst.tradeditems.health = inst.tradeditems.health - 8
+                end
+            end
         end
         inst.components.trader.onrefuse = function(inst, giver, item)
             if giver.components.talker ~= nil then
@@ -718,6 +733,7 @@ table.insert(prefs, Prefab(
         inst:ListenForEvent("timerdone", function(inst, data)
             if data.name == "birdrebirth" then
                 StateChange(inst)
+            elseif data.name == "birdstart" then
             end
         end)
 
@@ -731,6 +747,14 @@ table.insert(prefs, Prefab(
             if inst.countHealth then
                 data.countHealth = inst.countHealth
             end
+            if inst.tradeditems ~= nil then
+                if inst.tradeditems.health > 0 then
+                    data.traded_health = inst.tradeditems.health
+                end
+                if inst.tradeditems.light > 0 then
+                    data.traded_light = inst.tradeditems.light
+                end
+            end
         end
         inst.OnLoad = function(inst, data)
             if data ~= nil then
@@ -739,6 +763,15 @@ table.insert(prefs, Prefab(
                 end
                 if data.countHealth ~= nil then
                     inst.countHealth = data.countHealth
+                end
+                if data.traded_health ~= nil or data.traded_light ~= nil then
+                    inst.tradeditems = { light = 0, health = 0 }
+                    if data.traded_health ~= nil then
+                        inst.tradeditems.health = data.traded_health
+                    end
+                    if data.traded_light ~= nil then
+                        inst.tradeditems.light = data.traded_light
+                    end
                 end
             end
 
@@ -759,7 +792,12 @@ table.insert(prefs, Prefab(
         Asset("ANIM", "anim/siving_thetree.zip"),
         Asset("ANIM", "anim/siving_thetree_live.zip"),
     },
-    { "siving_rocks", "siving_lifesteal_fx" }
+    {
+        "siving_rocks",
+        "siving_lifesteal_fx",
+        "siving_foenix",
+        "siving_moenix"
+    }
 ))
 
 --------------------------------------------------------------------------
