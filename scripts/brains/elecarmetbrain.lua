@@ -71,7 +71,7 @@ local function StandKeep(inst)
 	if GetDistance(inst, inst.components.combat.target) <= inst.hit_range_sq then
 		return false
 	end
-	
+
 	if inst.standstill_target ~= nil then
 		if ValidTarget(inst.standstill_target) and GetDistance(inst, inst.standstill_target) <= 36 then
 			return true
@@ -79,7 +79,7 @@ local function StandKeep(inst)
 			inst.standstill_target = nil
 		end
 	end
-	
+
 	return false
 end
 
@@ -91,7 +91,7 @@ function ElecarmetBrain:OnStart()
 		Leash(self.inst, GetHomePos, 25, 15),	--最大牵制距离，最大随机步伐距离
 		Wander(self.inst, GetHomePos, 5),
     }, .25)
-    
+
     self.bt = BT(self.inst, root)
 end
 

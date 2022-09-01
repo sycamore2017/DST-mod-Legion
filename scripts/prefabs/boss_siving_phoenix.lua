@@ -10,6 +10,21 @@ local LineMap = {
     cattenball = 15
 }
 
+local DIST_REMOTE = 20
+local DIST_ATK = 4
+
+local function CheckMate(inst)
+    if inst.mate ~= nil then
+        if
+            not inst.mate:IsValid() or
+            inst.mate.components.health == nil or
+            inst.mate.components.health:IsDead()
+        then
+            inst.mate = nil
+        end
+    end
+end
+
 local function MakeBoss(data)
     table.insert(prefs, Prefab(
         data.name,
@@ -26,14 +41,22 @@ local function MakeBoss(data)
             inst.Transform:SetScale(1.5, 1.5, 1.5)
             inst.Transform:SetFourFaced()
 
-            MakeGiantCharacterPhysics(inst, 500, 0.5)
+            MakeTinyFlyingCharacterPhysics(inst, 500, 0.5) --飞行BOSS，主要是为了不对子圭羽毛产生碰撞
 
             inst:AddTag("epic")
+            -- inst:AddTag("noepicmusic")
+            inst:AddTag("scarytoprey")
             inst:AddTag("hostile")
             inst:AddTag("largecreature")
             inst:AddTag("siving")
+            inst:AddTag("flying")
+            inst:AddTag("ignorewalkableplatformdrowning")
 
             inst.AnimState:SetBank("buzzard")
+            inst.AnimState:SetBuild(data.name)
+            inst.AnimState:PlayAnimation("idle", true)
+
+            inst:SetPrefabNameOverride("siving_phoenix")
 
             if data.fn_common ~= nil then
                 data.fn_common(inst)
@@ -44,33 +67,76 @@ local function MakeBoss(data)
                 return inst
             end
 
-            -- inst:AddComponent("inspectable")
+            inst.tree = nil
+            inst.mate = nil --另一个伴侣
+            inst.iswarrior = true --BOSS站位（两个BOSS会在近战模式和护卫模式之间轮换占位）
+            inst.fn_onBorn = function(inst, tree)
+                inst.tree = tree
+                inst.components.knownlocations:RememberLocation("tree", tree:GetPosition(), false)
+                --undo 监听树的消失
+            end
 
-            -- inst:AddComponent("explosiveresist")
+            inst:AddComponent("locomotor") --locomotor must be constructed before the stategraph
+            inst.components.locomotor.walkspeed = 4
+            inst.components.locomotor.runspeed = 8
+            inst.components.locomotor:EnableGroundSpeedMultiplier(true)
+            inst.components.locomotor:SetTriggersCreep(true)
+            inst.components.locomotor.pathcaps = { ignorewalls = true, allowocean = true }
+
+            inst:AddComponent("health")
+            inst.components.health:SetMaxHealth(9000)
+            inst.components.health.destroytime = 3
+
+            inst:AddComponent("combat")
+            inst.components.combat:SetDefaultDamage(20)
+            -- inst.components.combat.playerdamagepercent = 0.5
+            inst.components.combat.hiteffectsymbol = "buzzard_body"
+            inst.components.combat:SetRange(DIST_ATK)
+            inst.components.combat:SetAttackPeriod(3)
+            inst.components.combat:SetRetargetFunction(3, function(inst) --寻找神木范围对自己有仇恨的对象
+                return FindEntity(inst.tree or inst, DIST_REMOTE+DIST_ATK,
+                        function(guy)
+                            return guy.components.combat.target == inst
+                                and inst.components.combat:CanTarget(guy)
+                        end,
+                        { "_combat" },
+                        { "INLIMBO" }
+                    )
+            end)
+            inst.components.combat:SetKeepTargetFunction(function(inst, target) --在神木范围里追踪目标
+                CheckMate(inst)
+
+                if inst.components.combat:CanTarget(target) then
+                    return target:GetDistanceSqToPoint(
+                            inst.components.knownlocations:GetLocation("tree") or
+                            inst.components.knownlocations:GetLocation("spawnpoint")
+                        ) < (DIST_REMOTE+DIST_ATK)*(DIST_REMOTE+DIST_ATK)
+                end
+            end)
+            -- inst.components.combat:SetHurtSound("dontstarve_DLC001/creatures/moose/hurt")
+
+            -- inst:AddComponent("eater")
+            -- inst.components.eater:SetDiet({ FOODGROUP.OMNI }, { FOODGROUP.OMNI })
+
+            inst:AddComponent("inspectable")
+
+            inst:AddComponent("explosiveresist")
 
             -- inst:AddComponent("sleeper")
 
-            -- inst:AddComponent("knownlocations")
+            inst:AddComponent("knownlocations")
 
             inst:AddComponent("timer")
 
             inst:AddComponent("lootdropper")
 
-            inst:AddComponent("health")
-            inst.components.health:SetMaxHealth(9000)
-
-            -- inst:AddComponent("combat")
-            -- inst.components.combat:SetDefaultDamage(60)
-            -- inst.components.combat.playerdamagepercent = 0.5
-            -- inst.components.combat.hiteffectsymbol = "buzzard_body"
-            -- inst.components.combat:SetRange(4)
-            -- inst.components.combat:SetAttackPeriod(3.5)
-            -- inst.components.combat:SetRetargetFunction(1, RetargetFn)
-            -- inst.components.combat:SetKeepTargetFunction(KeepTargetFn)
-            -- inst.components.combat:SetHurtSound("dontstarve_DLC001/creatures/moose/hurt")
+            -- inst:SetStateGraph("SGbuzzard")
+            -- inst:SetBrain(brain)
 
             -- inst:ListenForEvent("attacked", OnAttacked)
-            -- inst:ListenForEvent("timerdone", ontimerdone)
+            inst:ListenForEvent("timerdone", function(inst, data)
+                
+            end)
 
             -- inst.OnSave = OnSave
             -- inst.OnLoad = OnLoad
@@ -81,7 +147,10 @@ local function MakeBoss(data)
 
             return inst
         end,
-        data.assets,
+        {
+            Asset("ANIM", "anim/buzzard_basic.zip"), --官方秃鹫动画模板
+            Asset("ANIM", "anim/"..data.name..".zip"),
+        },
         data.prefabs
     ))
 end
@@ -382,29 +451,29 @@ SetSharedLootTable('siving_foenix', {
     {'siving_rocks',        1.00},
     {'siving_rocks',        1.00},
     {'siving_rocks',        1.00},
-    {'siving_rocks',        1.00},
-    {'siving_rocks',        1.00},
+    {'siving_rocks',        0.50},
+    {'siving_rocks',        0.50},
+    {'siving_rocks',        0.50},
+    {'siving_feather_fake',     1.00},
+    {'siving_feather_fake',     0.50},
     {'siving_derivant_item',    1.00},
-    {'siving_derivant_item',    0.20},
-    --undo 还差子圭面具和子圭羽毛
+    {'siving_derivant_item',    1.00},
+    {'siving_mask_blueprint',   1.00},
     -- {'chesspiece_moosegoose_sketch', 1.00},
 })
 
--- MakeBoss({
---     name = "siving_foenix",
---     assets = {
---         Asset("ANIM", "anim/buzzard_basic.zip"), --官方秃鹫动画模板
---         Asset("ANIM", "anim/siving_foenix.zip"),
---     },
---     prefabs = {  },
---     fn_common = function(inst)
---         inst.AnimState:SetBuild("siving_foenix")
---         inst.AnimState:PlayAnimation("atk", true)
---     end,
---     fn_server = function(inst)
---         inst.components.lootdropper:SetChanceLootTable('siving_foenix')
---     end
--- })
+MakeBoss({
+    name = "siving_foenix",
+    -- assets = nil,
+    prefabs = {  },
+    ismale = false,
+    fn_common = function(inst)
+        
+    end,
+    fn_server = function(inst)
+        inst.components.lootdropper:SetChanceLootTable('siving_foenix')
+    end
+})
 
 --------------------------------------------------------------------------
 --[[ 子圭玄鸟（雄） ]]
@@ -418,29 +487,31 @@ SetSharedLootTable('siving_moenix', {
     {'siving_rocks',        1.00},
     {'siving_rocks',        1.00},
     {'siving_rocks',        1.00},
-    {'siving_rocks',        1.00},
-    {'siving_rocks',        1.00},
-    {'siving_derivant_item',    1.00},
-    {'siving_derivant_item',    0.20},
-    --undo 还差子圭面具和子圭羽毛
+    {'siving_rocks',        0.50},
+    {'siving_rocks',        0.50},
+    {'siving_rocks',        0.50},
+    {'siving_feather_fake',     1.00},
+    {'siving_feather_fake',     1.00},
+    {'siving_feather_fake',     1.00},
+    {'siving_feather_fake',     0.50},
+    {'siving_feather_fake',     0.50},
+    {'siving_feather_real',     1.00},
+    {'siving_mask_blueprint',   1.00},
     -- {'chesspiece_moosegoose_sketch', 1.00},
 })
 
--- MakeBoss({
---     name = "siving_moenix",
---     assets = {
---         Asset("ANIM", "anim/buzzard_basic.zip"), --官方秃鹫动画模板
---         Asset("ANIM", "anim/siving_moenix.zip"),
---     },
---     prefabs = {  },
---     fn_common = function(inst)
---         inst.AnimState:SetBuild("siving_moenix")
---         inst.AnimState:PlayAnimation("frozen_loop_pst", true)
---     end,
---     fn_server = function(inst)
---         inst.components.lootdropper:SetChanceLootTable('siving_moenix')
---     end
--- })
+MakeBoss({
+    name = "siving_moenix",
+    -- assets = nil,
+    prefabs = {  },
+    ismale = true,
+    fn_common = function(inst)
+        
+    end,
+    fn_server = function(inst)
+        inst.components.lootdropper:SetChanceLootTable('siving_moenix')
+    end
+})
 
 --------------------------------------------------------------------------
 --[[ 子圭玄鸟正羽 ]]
