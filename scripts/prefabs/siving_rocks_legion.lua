@@ -339,27 +339,45 @@ local function DropRock(inst)
     local x, y, z = GetCalculatedPos_legion(xx, yy, zz, 2.6+math.random()*3, nil)
     DropItem_legion("siving_rocks", x, y+13, z, 1.5, 18, 15*FRAMES, nil, nil, nil)
 end
+local function IsValid(bird)
+    return bird ~= nil and bird:IsValid() and
+        bird.components.health ~= nil and not bird.components.health:IsDead()
+end
+local function CallBirdFarAway(bird, x, z)
+    if bird:GetDistanceSqToPoint(x, 0, z) >= 625 and not bird.sg:HasStateTag("takeoff") then
+        local spawnpos = bird.components.knownlocations:GetLocation("spawnpoint")
+        if spawnpos ~= nil then
+            x = spawnpos.x
+            z = spawnpos.z
+        end
+        if bird:IsAsleep() then --不在加载范围，直接回来
+            bird.Transform:SetPosition(x, 0, z)
+            bird.sg:GoToState("land")
+        else --在加载范围的话，就得先飞上天再消失
+            bird:PushEvent("dotakeoff", { x = x, y = 0, z = z })
+        end
+    end
+end
 local function OnStealLife(inst, value)
     inst.countHealth = inst.countHealth + value
 
-    if inst.bossBirds ~= nil then --子圭玄鸟在场上时，吸收的生命用来恢复它们
-        if inst.countHealth >= 6 then
-            if
-                inst.bossBirds.female ~= nil and inst.bossBirds.female:IsValid() and
-                not inst.bossBirds.female.components.health:IsDead() and
-                inst.bossBirds.female.components.health:IsHurt()
-            then
-                inst.bossBirds.female.components.health:DoDelta(3)
-                inst.countHealth = inst.countHealth - 3
-            end
-            if
-                inst.bossBirds.male ~= nil and inst.bossBirds.male:IsValid() and
-                not inst.bossBirds.male.components.health:IsDead() and
-                inst.bossBirds.male.components.health:IsHurt()
-            then
-                inst.bossBirds.male.components.health:DoDelta(3)
-                inst.countHealth = inst.countHealth - 3
-            end
+    if inst.bossBirds ~= nil then --子圭玄鸟在场上时，吸收的生命用来恢复它们(并且也要检查玄鸟的有效性)
+        if not IsValid(inst.bossBirds.female) then
+            inst.bossBirds.female = nil
+        elseif inst.countHealth >= 3 and inst.bossBirds.female.components.health:IsHurt() then
+            inst.bossBirds.female.components.health:DoDelta(3)
+            inst.countHealth = inst.countHealth - 3
+        end
+
+        if not IsValid(inst.bossBirds.male) then
+            inst.bossBirds.male = nil
+        elseif inst.countHealth >= 3 and inst.bossBirds.male.components.health:IsHurt() then
+            inst.bossBirds.male.components.health:DoDelta(3)
+            inst.countHealth = inst.countHealth - 3
+        end
+
+        if inst.bossBirds.male == nil and inst.bossBirds.female == nil then
+            inst.bossBirds = nil
         end
     else --如果没有玄鸟，每500生命必定掉落子圭石
         if inst.countHealth >= 500 then
@@ -445,10 +463,27 @@ local function TriggerLifeExtractTask(inst, doit)
                         end
                     end
 
+                    ------检查BOSS所在地，太远就召唤回来(防止玩家做些奇怪的传送操作)。检查BOSS站位是否需要轮换
                     if inst.bossBirds ~= nil then
-                        ------检查BOSS所在地
-
-                        ------检查BOSS站位是否需要轮换
+                        local birds = inst.bossBirds
+                        if birds.female ~= nil then
+                            CallBirdFarAway(birds.female, x, z)
+                            if birds.male ~= nil then
+                                CallBirdFarAway(birds.male, x, z)
+                                if birds.female.components.health.currenthealth >= birds.male.components.health.currenthealth then
+                                    birds.female.iswarrior = true
+                                    birds.male.iswarrior = false
+                                else
+                                    birds.female.iswarrior = false
+                                    birds.male.iswarrior = true
+                                end
+                            else
+                                birds.female.iswarrior = true
+                            end
+                        elseif birds.male ~= nil then
+                            CallBirdFarAway(birds.male, x, z)
+                            birds.male.iswarrior = true
+                        end
                     end
                 end
 
@@ -759,7 +794,7 @@ table.insert(prefs, Prefab(
                     inst.bossBirds.male = boss1
                     boss1.fn_onBorn(boss1, inst)
                     boss1.Transform:SetPosition(pos.x + offsetfinal.x, pos.y, pos.z + offsetfinal.z)
-                    -- boss1.sg:GoToState("glide") --undo
+                    boss1.sg:GoToState("land")
 
                     if offset2 ~= nil then
                         offsetfinal = offset2
@@ -768,7 +803,7 @@ table.insert(prefs, Prefab(
                     inst.bossBirds.female = boss2
                     boss2.fn_onBorn(boss2, inst)
                     boss2.Transform:SetPosition(pos.x + offsetfinal.x, pos.y, pos.z + offsetfinal.z)
-                    -- boss2.sg:GoToState("glide") --undo
+                    boss2.sg:GoToState("land")
 
                     boss1.mate = boss2
                     boss2.mate = boss1
@@ -833,6 +868,20 @@ table.insert(prefs, Prefab(
         end
         inst.OnEntityWake = AddLivesListen --实体产生时，在玩家范围内就会执行
         inst.OnEntitySleep = RemoveLivesListen
+        inst.OnRemoveEntity = function(inst) --自身被移除时，让玄鸟飞走消失(防止有人用特殊方法移除神木)
+            if inst.bossBirds ~= nil then
+                if IsValid(inst.bossBirds.female) then
+                    inst.bossBirds.female:PushEvent("dotakeoff", { remove = true })
+                    --没必要这么严格吧，哈哈
+                    -- inst.bossBirds.female.task_notree = inst.bossBirds.female:DoTaskInTime(5, function(bird)
+                    --     bird:Remove()
+                    -- end)
+                end
+                if IsValid(inst.bossBirds.male) then
+                    inst.bossBirds.male:PushEvent("dotakeoff", { remove = true })
+                end
+            end
+        end
 
         return inst
     end,

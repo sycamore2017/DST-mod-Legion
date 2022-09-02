@@ -10,18 +10,29 @@ local LineMap = {
     cattenball = 15
 }
 
-local DIST_REMOTE = 20
-local DIST_ATK = 4
+local DIST_MATE = 13 --离伴侣的最远距离
+local DIST_REMOTE = 20 --最大活动范围
+local DIST_ATK = 4 --普通攻击范围
 
+local function IsValid(one)
+    return one:IsValid() and
+        one.components.health ~= nil and not one.components.health:IsDead()
+end
 local function CheckMate(inst)
     if inst.mate ~= nil then
-        if
-            not inst.mate:IsValid() or
-            inst.mate.components.health == nil or
-            inst.mate.components.health:IsDead()
-        then
+        if not IsValid(inst.mate) then
             inst.mate = nil
+            inst.iswarrior = true
+            if inst.tree and inst.tree.bossBirds then
+                if inst.ismale then
+                    inst.tree.bossBirds.female = nil
+                else
+                    inst.tree.bossBirds.male = nil
+                end
+            end
         end
+    else
+        inst.iswarrior = true
     end
 end
 
@@ -73,7 +84,6 @@ local function MakeBoss(data)
             inst.fn_onBorn = function(inst, tree)
                 inst.tree = tree
                 inst.components.knownlocations:RememberLocation("tree", tree:GetPosition(), false)
-                --undo 监听树的消失
             end
 
             inst:AddComponent("locomotor") --locomotor must be constructed before the stategraph
@@ -91,29 +101,46 @@ local function MakeBoss(data)
             inst.components.combat:SetDefaultDamage(20)
             -- inst.components.combat.playerdamagepercent = 0.5
             inst.components.combat.hiteffectsymbol = "buzzard_body"
+            inst.components.combat.battlecryenabled = false
             inst.components.combat:SetRange(DIST_ATK)
             inst.components.combat:SetAttackPeriod(3)
-            inst.components.combat:SetRetargetFunction(3, function(inst) --寻找神木范围对自己有仇恨的对象
+            inst.components.combat:SetRetargetFunction(3, function(inst)
+                CheckMate(inst)
                 return FindEntity(inst.tree or inst, DIST_REMOTE+DIST_ATK,
-                        function(guy)
+                        inst.mate == nil and function(guy) --对自己有仇恨就行
                             return guy.components.combat.target == inst
                                 and inst.components.combat:CanTarget(guy)
+                        end or function(guy) --对自己有仇恨并且不能和伴侣的目标相同
+                            return guy.components.combat.target == inst
+                                and inst.components.combat:CanTarget(guy)
+                                and inst.mate.components.combat.target ~= guy
                         end,
                         { "_combat" },
-                        { "INLIMBO" }
+                        { "INLIMBO", "siving" }
                     )
             end)
-            inst.components.combat:SetKeepTargetFunction(function(inst, target) --在神木范围里追踪目标
+            inst.components.combat:SetKeepTargetFunction(function(inst, target)
                 CheckMate(inst)
-
                 if inst.components.combat:CanTarget(target) then
-                    return target:GetDistanceSqToPoint(
-                            inst.components.knownlocations:GetLocation("tree") or
-                            inst.components.knownlocations:GetLocation("spawnpoint")
-                        ) < (DIST_REMOTE+DIST_ATK)*(DIST_REMOTE+DIST_ATK)
+                    if inst.iswarrior or inst.mate == nil then --只需要不跑出神木范围就行
+                        return target:GetDistanceSqToPoint(
+                                inst.components.knownlocations:GetLocation("tree") or
+                                inst.components.knownlocations:GetLocation("spawnpoint")
+                            ) < (DIST_REMOTE+DIST_ATK)^2
+                    else --不跑得离伴侣以及神木范围太远就行
+                        return (
+                                target:GetDistanceSqToPoint(
+                                    inst.components.knownlocations:GetLocation("tree") or
+                                    inst.components.knownlocations:GetLocation("spawnpoint")
+                                ) < (DIST_REMOTE+DIST_ATK)^2
+                            ) and (
+                                target:GetDistanceSqToPoint(inst.mate:GetPosition()) < (DIST_MATE+DIST_ATK)^2
+                            )
+                    end
                 end
             end)
-            -- inst.components.combat:SetHurtSound("dontstarve_DLC001/creatures/moose/hurt")
+            -- inst.components.combat.bonusdamagefn --攻击时针对于被攻击对象的额外伤害值
+            -- inst.components.combat:SetHurtSound("dontstarve_DLC001/creatures/moose/hurt") --undo
 
             -- inst:AddComponent("eater")
             -- inst.components.eater:SetDiet({ FOODGROUP.OMNI }, { FOODGROUP.OMNI })
@@ -133,7 +160,26 @@ local function MakeBoss(data)
             -- inst:SetStateGraph("SGbuzzard")
             -- inst:SetBrain(brain)
 
-            -- inst:ListenForEvent("attacked", OnAttacked)
+            inst:ListenForEvent("attacked", function(inst, data)
+                if data.attacker and IsValid(data.attacker) then
+                    --将单次伤害超过120的部分反弹给攻击者
+                    if
+                        data.damage and data.damage > 120 and
+                        data.attacker.components.combat ~= nil
+                    then
+                        data.attacker.components.combat:GetAttacked(nil, data.damage-120) --为了不受到盾反伤害，不设定玄鸟为攻击者
+                        --反击特效 undo
+                        if not IsValid(data.attacker) then --攻击者死亡，就结束
+                            return
+                        end
+                    end
+
+                    --确定仇恨对象
+                    if inst.iswarrior then --谁离得近打谁
+                        
+                    end
+                end
+            end)
             inst:ListenForEvent("timerdone", function(inst, data)
                 
             end)
@@ -466,7 +512,6 @@ MakeBoss({
     name = "siving_foenix",
     -- assets = nil,
     prefabs = {  },
-    ismale = false,
     fn_common = function(inst)
         
     end,
@@ -504,11 +549,11 @@ MakeBoss({
     name = "siving_moenix",
     -- assets = nil,
     prefabs = {  },
-    ismale = true,
     fn_common = function(inst)
         
     end,
     fn_server = function(inst)
+        inst.ismale = true
         inst.components.lootdropper:SetChanceLootTable('siving_moenix')
     end
 })
