@@ -78,12 +78,21 @@ local function MakeBoss(data)
                 return inst
             end
 
+            inst.persists = false --由神木来控制保存机制
             inst.tree = nil
             inst.mate = nil --另一个伴侣
             inst.iswarrior = true --BOSS站位（两个BOSS会在近战模式和护卫模式之间轮换占位）
+            inst.isgrief = false --是否处于悲愤状态
             inst.fn_onBorn = function(inst, tree)
                 inst.tree = tree
                 inst.components.knownlocations:RememberLocation("tree", tree:GetPosition(), false)
+                -- if inst.task_checktree ~= nil then
+                --     inst.task_checktree:Cancel()
+                --     inst.task_checktree = nil
+                -- end
+            end
+            inst.fn_onGrief = function(inst, tree)
+                inst.isgrief = true
             end
 
             inst:AddComponent("locomotor") --locomotor must be constructed before the stategraph
@@ -175,17 +184,93 @@ local function MakeBoss(data)
                     end
 
                     --确定仇恨对象
-                    if inst.iswarrior then --谁离得近打谁
-                        
+                    CheckMate(inst)
+                    local lasttarget = inst.components.combat.target
+                    if inst.iswarrior or inst.mate == nil then --谁离得近打谁
+                        if data.attacker == lasttarget then
+                            --主动给伴侣解除和自己相同的仇恨对象
+                            if inst.mate ~= nil and lasttarget == inst.mate.components.combat.target then
+                                inst.mate.components.combat:SetTarget(nil)
+                            end
+                            return
+                        end
+
+                        if lasttarget ~= nil and IsValid(lasttarget) then
+                            if inst:GetDistanceSqToPoint(lasttarget:GetPosition()) > inst:GetDistanceSqToPoint(data.attacker:GetPosition()) then
+                                inst.components.combat:SetTarget(data.attacker)
+                                lasttarget = data.attacker
+                            end
+                        else
+                            inst.components.combat:SetTarget(data.attacker)
+                            lasttarget = data.attacker
+                        end
+
+                        --主动给伴侣解除和自己相同的仇恨对象
+                        if inst.mate ~= nil and lasttarget == inst.mate.components.combat.target then
+                            inst.mate.components.combat:SetTarget(nil)
+                        end
+                    else
+                        local matetarget = inst.mate.components.combat.target
+
+                        if data.attacker == lasttarget then
+                            if lasttarget == matetarget then
+                                inst.components.combat:SetTarget(nil)
+                            end
+                            return
+                        end
+
+                        if lasttarget ~= nil and IsValid(lasttarget) then
+                            if lasttarget == matetarget then --自己现有仇恨对象和伴侣相同，直接不管
+                                inst.components.combat:SetTarget(data.attacker)
+                            elseif
+                                data.attacker ~= matetarget and
+                                inst:GetDistanceSqToPoint(lasttarget:GetPosition()) > inst:GetDistanceSqToPoint(data.attacker:GetPosition())
+                            then
+                                inst.components.combat:SetTarget(data.attacker)
+                            end
+                        else
+                            if
+                                matetarget == nil or not IsValid(matetarget) or
+                                matetarget ~= data.attacker
+                            then
+                                inst.components.combat:SetTarget(data.attacker)
+                            end
+                        end
                     end
                 end
             end)
             inst:ListenForEvent("timerdone", function(inst, data)
-                
+                if data.name == "leave" then
+                    if inst:IsAsleep() then
+                        inst:Remove()
+                    else
+                        inst:PushEvent("dotakeoff", { remove = true })
+                    end
+                end
             end)
 
             -- inst.OnSave = OnSave
-            -- inst.OnLoad = OnLoad
+            inst.OnPreLoad = function(inst, data) --防止保存时正在飞起或降落导致重载时位置不对
+                local x, y, z = inst.Transform:GetWorldPosition()
+                if y > 0 then
+                    inst.Transform:SetPosition(x, 0, z)
+                end
+            end
+            -- inst.OnLoad = function(inst, data)end
+            inst.OnEntitySleep = function(inst)
+                inst.components.combat:SetTarget(nil)
+                if not inst.components.timer:TimerExists("leave") then
+                    inst.components.timer:StartTimer("leave", TUNING.TOTAL_DAY_TIME)
+                end
+            end
+            inst.OnRemoveEntity = function(inst)
+                CheckMate(inst)
+                if inst.mate == nil then --伙伴已经死亡的情况下，自己也死亡了，生蛋还是结束战斗，由神木控制
+                    if inst.tree ~= nil and inst.tree:IsValid() then
+                        inst.tree.fn_onBirdsDeath(inst.tree, inst)
+                    end
+                end
+            end
 
             if data.fn_server ~= nil then
                 data.fn_server(inst)
