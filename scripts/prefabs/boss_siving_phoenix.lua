@@ -14,6 +14,8 @@ local DIST_MATE = 13 --离伴侣的最远距离
 local DIST_REMOTE = 20 --最大活动范围
 local DIST_ATK = 4 --普通攻击范围
 
+local TIME_STAY = TUNING.TOTAL_DAY_TIME --无所事事的时间
+
 local function IsValid(one)
     return one:IsValid() and
         one.components.health ~= nil and not one.components.health:IsDead()
@@ -91,8 +93,36 @@ local function MakeBoss(data)
                 --     inst.task_checktree = nil
                 -- end
             end
-            inst.fn_onGrief = function(inst, tree)
+            inst.fn_onGrief = function(inst, tree, doroar)
                 inst.isgrief = true
+                inst.AnimState:OverrideSymbol("buzzard_eye", data.name, "buzzard_angryeye")
+                if doroar then
+                    inst:PushEvent("doroar")
+                end
+            end
+            inst.fn_onLeave = function(inst)
+                inst.OnRemoveEntity = nil
+                if inst.tree ~= nil and inst.tree:IsValid() then --玄鸟飞走，需要进行神木的后续完善
+                    CheckMate(inst)
+                    if inst.mate ~= nil then --两只鸟都活着，就只是飞走，不进入枯萎期
+                        inst.mate.tree = nil
+                        inst.mate.mate = nil
+                        inst.mate.OnRemoveEntity = nil
+                        inst.tree.fn_computTraded(inst.tree, 2, 8) --恢复已经消耗的祭品
+                        inst.tree.bossBirds = nil
+                    else --死了一只，此时剩下一只飞走，进入枯萎期
+                        inst.tree.rebirthed = true
+                        inst.tree.fn_onBirdsDeath(inst.tree, inst)
+                    end
+                end
+                inst.tree = nil
+                inst.mate = nil
+
+                if inst:IsAsleep() then
+                    inst:Remove()
+                else
+                    inst:PushEvent("dotakeoff", { remove = true })
+                end
             end
 
             inst:AddComponent("locomotor") --locomotor must be constructed before the stategraph
@@ -163,6 +193,7 @@ local function MakeBoss(data)
             inst:AddComponent("knownlocations")
 
             inst:AddComponent("timer")
+            inst.components.timer:StartTimer("leave", TIME_STAY)
 
             inst:AddComponent("lootdropper")
 
@@ -241,11 +272,7 @@ local function MakeBoss(data)
             end)
             inst:ListenForEvent("timerdone", function(inst, data)
                 if data.name == "leave" then
-                    if inst:IsAsleep() then
-                        inst:Remove()
-                    else
-                        inst:PushEvent("dotakeoff", { remove = true })
-                    end
+                    inst.fn_onLeave(inst)
                 end
             end)
 
@@ -260,7 +287,7 @@ local function MakeBoss(data)
             inst.OnEntitySleep = function(inst)
                 inst.components.combat:SetTarget(nil)
                 if not inst.components.timer:TimerExists("leave") then
-                    inst.components.timer:StartTimer("leave", TUNING.TOTAL_DAY_TIME)
+                    inst.components.timer:StartTimer("leave", TIME_STAY)
                 end
             end
             inst.OnRemoveEntity = function(inst)
@@ -269,6 +296,8 @@ local function MakeBoss(data)
                     if inst.tree ~= nil and inst.tree:IsValid() then
                         inst.tree.fn_onBirdsDeath(inst.tree, inst)
                     end
+                else --活下来的伴侣进入悲愤状态
+                    inst.mate.fn_onGrief(inst.mate, inst.tree, true)
                 end
             end
 
@@ -642,6 +671,133 @@ MakeBoss({
         inst.components.lootdropper:SetChanceLootTable('siving_moenix')
     end
 })
+
+--------------------------------------------------------------------------
+--[[ 子圭石子 ]]
+--------------------------------------------------------------------------
+
+local TIME_EGG = 30 --孵化时间
+
+local function SetEggState(inst, state)
+    inst.state = state
+    if state == 2 then
+        inst.AnimState:OverrideSymbol("eggbase", "siving_egg", "egg2")
+        inst.AnimState:PushAnimation("idle2", true)
+    elseif state == 3 then
+        inst.AnimState:OverrideSymbol("eggbase", "siving_egg", "egg3")
+        inst.AnimState:PushAnimation("idle3", true)
+    elseif state == 4 then
+        inst.AnimState:OverrideSymbol("eggbase", "siving_egg", "egg4")
+        inst.AnimState:PushAnimation("idle4", true)
+    else
+        inst.AnimState:ClearOverrideSymbol("eggbase")
+        inst.AnimState:PushAnimation("idle1", true)
+    end
+end
+
+table.insert(prefs, Prefab(
+    "siving_egg",
+    function()
+        local inst = CreateEntity()
+
+        inst.entity:AddTransform()
+        inst.entity:AddAnimState()
+        inst.entity:AddSoundEmitter()
+        inst.entity:AddNetwork()
+
+        MakeObstaclePhysics(inst, 0.7)
+
+        inst:AddTag("hostile")
+
+        inst.AnimState:SetBank("siving_egg")
+        inst.AnimState:SetBuild("siving_egg")
+        inst.AnimState:PlayAnimation("idle1", true)
+
+        inst.entity:SetPristine()
+        if not TheWorld.ismastersim then
+            return inst
+        end
+
+        inst.persists = false --由神木来控制保存机制
+        inst.ismale = false
+        inst.tree = nil
+        inst.state = 1
+
+        inst:AddComponent("inspectable")
+
+        inst:AddComponent("health")
+        inst.components.health:SetMaxHealth(300)
+
+        inst:AddComponent("combat")
+
+        inst:AddComponent("lootdropper")
+        inst.components.lootdropper:SetLoot({ "siving_rocks", "siving_rocks", "siving_rocks",
+            "siving_rocks", "siving_rocks", "siving_rocks" })
+
+        inst:AddComponent("timer")
+        inst.components.timer:StartTimer("state1", TIME_EGG*0.3)
+
+        inst:ListenForEvent("attacked", function(inst, data)
+            inst.AnimState:PlayAnimation("hit")
+            SetEggState(inst, inst.state)
+        end)
+        inst:ListenForEvent("timerdone", function(inst, data)
+            if data.name == "state1" then
+                SetEggState(inst, 2)
+                inst.components.timer:StartTimer("state2", TIME_EGG*0.35)
+            elseif data.name == "state2" then
+                SetEggState(inst, 3)
+                inst.components.timer:StartTimer("state3", TIME_EGG*0.35)
+            elseif data.name == "state3" then
+                SetEggState(inst, 4)
+                inst.components.timer:StartTimer("birth", 3)
+            elseif data.name == "birth" then
+                if inst:IsAsleep() then --玩家离开了，那就结束战斗吧
+                    if inst.tree ~= nil and inst.tree:IsValid() then
+                        inst.tree.rebirthed = true
+                        inst.tree.fn_onBirdsDeath(inst.tree, inst)
+                    end
+                else
+                    --破壳特效 undo
+                    local bird = SpawnPrefab(inst.ismale and "siving_moenix" or "siving_foenix")
+                    if bird ~= nil then
+                        bird.Transform:SetPosition(inst.Transform:GetWorldPosition())
+                        if inst.tree ~= nil and inst.tree:IsValid() then
+                            inst.tree.rebirthed = true
+                            inst.tree.bossBirds = {}
+                            inst.tree.bossBirds[inst.ismale and "male" or "female"] = bird
+                            bird.fn_onBorn(bird, inst.tree)
+                            bird.fn_onGrief(bird, inst.tree, true)
+                        end
+                    end
+                end
+                inst:Remove()
+            end
+        end)
+
+        inst.OnLoad = function(inst, data)
+            if inst.components.timer:TimerExists("state2") then
+                inst.components.timer:StopTimer("state1")
+                SetEggState(inst, 2)
+            elseif inst.components.timer:TimerExists("state3") then
+                inst.components.timer:StopTimer("state1")
+                SetEggState(inst, 3)
+            elseif inst.components.timer:TimerExists("birth") then
+                inst.components.timer:StopTimer("state1")
+                SetEggState(inst, 4)
+            end
+        end
+
+        return inst
+    end,
+    {
+        Asset("ANIM", "anim/siving_egg.zip")
+    },
+    {
+        "siving_foenix",
+        "siving_moenix"
+    }
+))
 
 --------------------------------------------------------------------------
 --[[ 子圭玄鸟正羽 ]]

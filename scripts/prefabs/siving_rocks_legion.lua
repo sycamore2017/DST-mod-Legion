@@ -739,15 +739,12 @@ table.insert(prefs, Prefab(
             end
         end)
         inst.components.trader.onaccept = function(inst, giver, item)
-            if inst.tradeditems == nil then
-                inst.tradeditems = { light = 0, health = 0 }
-            end
             if item.prefab == "reviver" then
                 OnStealLife(inst, 40)
-                inst.tradeditems.health = inst.tradeditems.health + 1
+                inst.fn_computTraded(inst, nil, 1)
             else
                 OnStealLife(inst, 320)
-                inst.tradeditems.light = inst.tradeditems.light + 1
+                inst.fn_computTraded(inst, 1, nil)
             end
 
             if giver.components.talker ~= nil then
@@ -775,8 +772,7 @@ table.insert(prefs, Prefab(
                     not inst.components.timer:TimerExists("birdstart2")
                 then
                     inst.components.timer:StartTimer("birdstart", 5)
-                    inst.tradeditems.light = inst.tradeditems.light - 2
-                    inst.tradeditems.health = inst.tradeditems.health - 8
+                    inst.fn_computTraded(inst, -2, -8)
                 end
             end
         end
@@ -821,11 +817,7 @@ table.insert(prefs, Prefab(
                 elseif data.name == "birdstart" then --一次没成功，再试一次
                     inst.components.timer:StartTimer("birdstart2", 10)
                 else --两次都没找到合适的位置下落，就不来了
-                    if inst.tradeditems == nil then
-                        inst.tradeditems = { light = 0, health = 0 }
-                    end
-                    inst.tradeditems.light = inst.tradeditems.light + 2
-                    inst.tradeditems.health = inst.tradeditems.health + 8
+                    inst.fn_computTraded(inst, 2, 8)
                 end
             end
         end)
@@ -864,6 +856,9 @@ table.insert(prefs, Prefab(
             end
             if IsValid(inst.bossEgg) then
                 data.egg = inst.bossEgg:GetSaveRecord()
+                if inst.bossEgg.ismale then
+                    data.eggismale = true
+                end
             end
             if inst.rebirthed then
                 data.rebirthed = true
@@ -878,13 +873,7 @@ table.insert(prefs, Prefab(
                     inst.countHealth = data.countHealth
                 end
                 if data.traded_health ~= nil or data.traded_light ~= nil then
-                    inst.tradeditems = { light = 0, health = 0 }
-                    if data.traded_health ~= nil then
-                        inst.tradeditems.health = data.traded_health
-                    end
-                    if data.traded_light ~= nil then
-                        inst.tradeditems.light = data.traded_light
-                    end
+                    inst.fn_computTraded(inst, data.traded_light, data.traded_health)
                 end
                 if data.male ~= nil or data.female ~= nil then
                     inst.bossBirds = {}
@@ -917,6 +906,12 @@ table.insert(prefs, Prefab(
                 end
                 if data.egg ~= nil then
                     inst.bossEgg = SpawnSaveRecord(data.egg, newents)
+                    if inst.bossEgg ~= nil then
+                        inst.bossEgg.tree = inst
+                        if data.eggismale then
+                            inst.bossEgg.ismale = true
+                        end
+                    end
                 end
                 if data.rebirthed then
                     inst.rebirthed = true
@@ -937,19 +932,32 @@ table.insert(prefs, Prefab(
         inst.OnEntitySleep = RemoveLivesListen
         inst.OnRemoveEntity = function(inst) --自身被移除时，让玄鸟飞走消失(防止有人用特殊方法移除神木)
             if inst.bossBirds ~= nil then
-                if IsValid(inst.bossBirds.female) then
-                    inst.bossBirds.female:PushEvent("dotakeoff", { remove = true })
-                    --没必要这么严格吧，哈哈
-                    -- inst.bossBirds.female.task_notree = inst.bossBirds.female:DoTaskInTime(5, function(bird)
-                    --     bird:Remove()
-                    -- end)
+                local female = inst.bossBirds.female
+                local male = inst.bossBirds.male
+                if IsValid(female) then
+                    female.tree = nil --反正神木已经被移除，玄鸟飞走时的完善操作不需要了
+                    female.mate = nil
+                    female:fn_onLeave()
                 end
-                if IsValid(inst.bossBirds.male) then
-                    inst.bossBirds.male:PushEvent("dotakeoff", { remove = true })
+                if IsValid(male) then
+                    male.tree = nil --反正神木已经被移除，玄鸟飞走时的完善操作不需要了
+                    male.mate = nil
+                    male:fn_onLeave()
                 end
             end
         end
 
+        inst.fn_computTraded = function(inst, light, health)
+            if inst.tradeditems == nil then
+                inst.tradeditems = { light = 0, health = 0 }
+            end
+            if light then
+                inst.tradeditems.light = inst.tradeditems.light + light
+            end
+            if health then
+                inst.tradeditems.health = inst.tradeditems.health + health
+            end
+        end
         inst.fn_onBirdsDeath = function(inst, bird)
             inst.bossBirds = nil
             if inst.rebirthed then --玄鸟已经重生过，最后一只玄鸟死亡后就让神木进入枯萎期
@@ -957,7 +965,13 @@ table.insert(prefs, Prefab(
                 inst.components.timer:StartTimer("birddeath", TUNING.TOTAL_DAY_TIME*15)
                 StateChange(inst)
             else --玄鸟第一次团灭，产生一个蛋供玩家选择
-
+                local egg = SpawnPrefab("siving_egg")
+                if egg ~= nil then
+                    egg.ismale = bird.ismale
+                    egg.tree = inst
+                    inst.bossEgg = egg
+                    egg.Transform:SetPosition(bird.Transform:GetWorldPosition())
+                end
             end
         end
 
@@ -966,7 +980,7 @@ table.insert(prefs, Prefab(
     {
         Asset("SCRIPT", "scripts/prefabs/wortox_soul_common.lua"),
         Asset("ANIM", "anim/siving_thetree.zip"),
-        Asset("ANIM", "anim/siving_thetree_live.zip"),
+        Asset("ANIM", "anim/siving_thetree_live.zip")
     },
     {
         "siving_rocks",
