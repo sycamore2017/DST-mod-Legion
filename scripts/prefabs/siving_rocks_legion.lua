@@ -334,14 +334,36 @@ MakeDerivant({  --子圭森型岩
 --[[ 子圭神木 ]]
 --------------------------------------------------------------------------
 
+local TIME_WITHER = TUNING.TOTAL_DAY_TIME * 15 --神木枯萎时间
+
+local function IsValid(bird)
+    return bird ~= nil and bird:IsValid() and
+        bird.components.health ~= nil and not bird.components.health:IsDead()
+end
+local function CheckBirds(inst)
+    if inst.bossBirds ~= nil then
+        if not IsValid(inst.bossBirds.female) then
+            inst.bossBirds.female = nil
+        end
+        if not IsValid(inst.bossBirds.male) then
+            inst.bossBirds.male = nil
+        end
+        if inst.bossBirds.male == nil and inst.bossBirds.female == nil then
+            inst.bossBirds = nil
+            return false
+        else
+            return true
+        end
+    end
+    return false
+end
+
+-----
+
 local function DropRock(inst)
     local xx, yy, zz = inst.Transform:GetWorldPosition()
     local x, y, z = GetCalculatedPos_legion(xx, yy, zz, 2.6+math.random()*3, nil)
     DropItem_legion("siving_rocks", x, y+13, z, 1.5, 18, 15*FRAMES, nil, nil, nil)
-end
-local function IsValid(bird)
-    return bird ~= nil and bird:IsValid() and
-        bird.components.health ~= nil and not bird.components.health:IsDead()
 end
 local function CallBirdFarAway(bird, x, z)
     if bird:GetDistanceSqToPoint(x, 0, z) >= 625 and not bird.sg:HasStateTag("takeoff") then
@@ -360,24 +382,24 @@ local function CallBirdFarAway(bird, x, z)
 end
 local function OnStealLife(inst, value)
     inst.countHealth = inst.countHealth + value
+    CheckBirds(inst)
 
     if inst.bossBirds ~= nil then --子圭玄鸟在场上时，吸收的生命用来恢复它们(也要检查其有效性)
-        if not IsValid(inst.bossBirds.female) then
-            inst.bossBirds.female = nil
-        elseif inst.countHealth >= 3 and inst.bossBirds.female.components.health:IsHurt() then
+        if
+            inst.countHealth >= 3 and
+            inst.bossBirds.female ~= nil and
+            inst.bossBirds.female.components.health:IsHurt()
+        then
             inst.bossBirds.female.components.health:DoDelta(3)
             inst.countHealth = inst.countHealth - 3
         end
-
-        if not IsValid(inst.bossBirds.male) then
-            inst.bossBirds.male = nil
-        elseif inst.countHealth >= 3 and inst.bossBirds.male.components.health:IsHurt() then
+        if
+            inst.countHealth >= 3 and
+            inst.bossBirds.male ~= nil and
+            inst.bossBirds.male.components.health:IsHurt()
+        then
             inst.bossBirds.male.components.health:DoDelta(3)
             inst.countHealth = inst.countHealth - 3
-        end
-
-        if inst.bossBirds.male == nil and inst.bossBirds.female == nil then
-            inst.bossBirds = nil
         end
     elseif inst.bossEgg ~= nil then --子圭蛋在场上时，吸收的生命用来恢复它(也要检查其有效性)
         if IsValid(inst.bossEgg) then
@@ -622,10 +644,51 @@ end
 
 -----
 
+local function ComputTraded(inst, light, health)
+    if inst.tradeditems == nil then
+        inst.tradeditems = { light = 0, health = 0 }
+    end
+    if light then
+        inst.tradeditems.light = inst.tradeditems.light + light
+    end
+    if health then
+        inst.tradeditems.health = inst.tradeditems.health + health
+    end
+end
+
+local function InitBird(inst, bird)
+    if inst.bossBirds == nil then
+        inst.bossBirds = {}
+    end
+    inst.bossBirds[bird.ismale and "male" or "female"] = bird
+    bird.tree = inst
+    bird.components.knownlocations:RememberLocation("tree", inst:GetPosition(), false)
+    bird.persists = false --由神木来控制保存机制
+
+    inst:ListenForEvent("death", inst.fn_onBirdDead, bird)
+    inst:ListenForEvent("onremove", inst.fn_onBirdDead, bird)
+end
+local function InitEgg(inst, egg, ismale)
+    if ismale then
+        egg.ismale = true
+    end
+    egg.tree = inst
+    inst.bossEgg = egg
+    inst.rebirthed = true
+    egg.persists = false --由神木来控制保存机制
+
+    inst:ListenForEvent("death", inst.fn_onEggDead, egg)
+    inst:ListenForEvent("onremove", inst.fn_onEggDead, egg)
+end
+
+-----
+
 local function StateChange(inst) --0休眠状态(玄鸟死亡)、1正常状态(玄鸟活着，非春季)、2活力状态(玄鸟活着，春季)
     if inst.components.timer:TimerExists("birddeath") then --玄鸟死亡
         inst.treeState = 0
         inst.bossBirds = nil
+        inst.bossEgg = nil
+        inst.rebirthed = false
         inst.AnimState:SetBuild("siving_thetree")
         inst.components.bloomer:PopBloom("activetree")
         inst.Light:Enable(false)
@@ -692,6 +755,58 @@ table.insert(prefs, Prefab(
         inst.rebirthed = false --玄鸟是否已经重生过了
         inst.tradeditems = nil --已给予的物品
 
+        inst.fn_onBirdDead = function(bird) --有玄鸟死亡时
+            CheckBirds(inst)
+            inst:RemoveEventCallback("death", inst.fn_onBirdDead, bird)
+            inst:RemoveEventCallback("onremove", inst.fn_onBirdDead, bird)
+
+            if inst.bossBirds == nil then --没有玄鸟了
+                if inst.rebirthed then --玄鸟已经重生过，神木进入枯萎期
+                    inst.components.timer:StopTimer("birddeath")
+                    inst.components.timer:StartTimer("birddeath", TIME_WITHER)
+                    StateChange(inst)
+                else --玄鸟第一次团灭，产生一个蛋供玩家选择
+                    local egg = SpawnPrefab("siving_egg")
+                    if egg ~= nil then
+                        InitEgg(inst, egg, bird.ismale)
+                        egg.Transform:SetPosition(bird.Transform:GetWorldPosition())
+                    end
+                end
+            else --还活着的那只鸟进入悲愤状态
+                if inst.bossBirds.male == nil then
+                    if inst.bossBirds.female ~= nil then
+                        inst.bossBirds.female.mate = nil
+                        inst.bossBirds.female.iswarrior = true
+                        inst.bossBirds.female:fn_onGrief(inst, true)
+                    end
+                else
+                    if inst.bossBirds.female == nil then
+                        inst.bossBirds.male.mate = nil
+                        inst.bossBirds.male.iswarrior = true
+                        inst.bossBirds.male:fn_onGrief(inst, true)
+                    end
+                end
+            end
+        end
+        inst.fn_onEggDead = function(egg) --有石子死亡时
+            inst.bossEgg = nil
+            inst:RemoveEventCallback("death", inst.fn_onEggDead, egg)
+            inst:RemoveEventCallback("onremove", inst.fn_onEggDead, egg)
+
+            if not egg.ishatched or inst:IsAsleep() then --玩家离开了，或不是正常孵化，神木进入枯萎期
+                inst.components.timer:StopTimer("birddeath")
+                inst.components.timer:StartTimer("birddeath", TIME_WITHER)
+                StateChange(inst)
+            else --孵化出悲愤状态的玄鸟
+                local bird = SpawnPrefab(egg.ismale and "siving_moenix" or "siving_foenix")
+                if bird ~= nil then
+                    bird.Transform:SetPosition(egg.Transform:GetWorldPosition())
+                    InitBird(inst, bird)
+                    bird:fn_onGrief(inst, true)
+                end
+            end
+        end
+
         inst:AddComponent("inspectable")
 
         inst:AddComponent("lootdropper")
@@ -741,10 +856,10 @@ table.insert(prefs, Prefab(
         inst.components.trader.onaccept = function(inst, giver, item)
             if item.prefab == "reviver" then
                 OnStealLife(inst, 40)
-                inst.fn_computTraded(inst, nil, 1)
+                ComputTraded(inst, nil, 1)
             else
                 OnStealLife(inst, 320)
-                inst.fn_computTraded(inst, 1, nil)
+                ComputTraded(inst, 1, nil)
             end
 
             if giver.components.talker ~= nil then
@@ -772,7 +887,7 @@ table.insert(prefs, Prefab(
                     not inst.components.timer:TimerExists("birdstart2")
                 then
                     inst.components.timer:StartTimer("birdstart", 5)
-                    inst.fn_computTraded(inst, -2, -8)
+                    ComputTraded(inst, -2, -8)
                 end
             end
         end
@@ -795,29 +910,26 @@ table.insert(prefs, Prefab(
 
                 if offset1 ~= nil or offset2 ~= nil then
                     local offsetfinal = offset1 or offset2
-                    inst.bossBirds = {}
 
                     local boss1 = SpawnPrefab("siving_moenix")
-                    inst.bossBirds.male = boss1
-                    boss1.fn_onBorn(boss1, inst)
                     boss1.Transform:SetPosition(pos.x + offsetfinal.x, pos.y, pos.z + offsetfinal.z)
+                    InitBird(inst, boss1)
                     boss1.sg:GoToState("land")
 
                     if offset2 ~= nil then
                         offsetfinal = offset2
                     end
                     local boss2 = SpawnPrefab("siving_foenix")
-                    inst.bossBirds.female = boss2
-                    boss2.fn_onBorn(boss2, inst)
                     boss2.Transform:SetPosition(pos.x + offsetfinal.x, pos.y, pos.z + offsetfinal.z)
+                    InitBird(inst, boss2)
                     boss2.sg:GoToState("land")
 
                     boss1.mate = boss2
                     boss2.mate = boss1
                 elseif data.name == "birdstart" then --一次没成功，再试一次
-                    inst.components.timer:StartTimer("birdstart2", 10)
+                    inst.components.timer:StartTimer("birdstart2", 9)
                 else --两次都没找到合适的位置下落，就不来了
-                    inst.fn_computTraded(inst, 2, 8)
+                    ComputTraded(inst, 2, 8)
                 end
             end
         end)
@@ -850,9 +962,6 @@ table.insert(prefs, Prefab(
                 if IsValid(inst.bossBirds.male) then
                     data.male = inst.bossBirds.male:GetSaveRecord()
                 end
-                if data.female or data.male then
-                    return
-                end
             end
             if IsValid(inst.bossEgg) then
                 data.egg = inst.bossEgg:GetSaveRecord()
@@ -873,23 +982,20 @@ table.insert(prefs, Prefab(
                     inst.countHealth = data.countHealth
                 end
                 if data.traded_health ~= nil or data.traded_light ~= nil then
-                    inst.fn_computTraded(inst, data.traded_light, data.traded_health)
+                    ComputTraded(inst, data.traded_light, data.traded_health)
                 end
                 if data.male ~= nil or data.female ~= nil then
-                    inst.bossBirds = {}
                     local boss1, boss2
                     if data.male ~= nil then
                         boss1 = SpawnSaveRecord(data.male, newents)
                         if boss1 ~= nil then
-                            inst.bossBirds.male = boss1
-                            boss1.fn_onBorn(boss1, inst)
+                            InitBird(inst, boss1)
                         end
                     end
                     if data.female ~= nil then
                         boss2 = SpawnSaveRecord(data.female, newents)
                         if boss2 ~= nil then
-                            inst.bossBirds.female = boss2
-                            boss2.fn_onBorn(boss2, inst)
+                            InitBird(inst, boss2)
                         end
                     end
 
@@ -897,24 +1003,19 @@ table.insert(prefs, Prefab(
                         boss1.mate = boss2
                         boss2.mate = boss1
                     elseif boss2 ~= nil then
-                        boss2.fn_onGrief(boss2, inst)
+                        boss2:fn_onGrief(inst)
                     elseif boss1 ~= nil then
-                        boss1.fn_onGrief(boss1, inst)
-                    else
-                        inst.bossBirds = nil
-                    end
-                end
-                if data.egg ~= nil then
-                    inst.bossEgg = SpawnSaveRecord(data.egg, newents)
-                    if inst.bossEgg ~= nil then
-                        inst.bossEgg.tree = inst
-                        if data.eggismale then
-                            inst.bossEgg.ismale = true
-                        end
+                        boss1:fn_onGrief(inst)
                     end
                 end
                 if data.rebirthed then
                     inst.rebirthed = true
+                end
+                if data.egg ~= nil then
+                    inst.bossEgg = SpawnSaveRecord(data.egg, newents)
+                    if inst.bossEgg ~= nil then
+                        InitEgg(inst, inst.bossEgg, data.eggismale)
+                    end
                 end
 
                 if inst.bossBirds ~= nil or inst.bossEgg ~= nil then
@@ -943,34 +1044,6 @@ table.insert(prefs, Prefab(
                     male.tree = nil --反正神木已经被移除，玄鸟飞走时的完善操作不需要了
                     male.mate = nil
                     male:fn_onLeave()
-                end
-            end
-        end
-
-        inst.fn_computTraded = function(inst, light, health)
-            if inst.tradeditems == nil then
-                inst.tradeditems = { light = 0, health = 0 }
-            end
-            if light then
-                inst.tradeditems.light = inst.tradeditems.light + light
-            end
-            if health then
-                inst.tradeditems.health = inst.tradeditems.health + health
-            end
-        end
-        inst.fn_onBirdsDeath = function(inst, bird)
-            inst.bossBirds = nil
-            if inst.rebirthed then --玄鸟已经重生过，最后一只玄鸟死亡后就让神木进入枯萎期
-                inst.components.timer:StopTimer("birddeath")
-                inst.components.timer:StartTimer("birddeath", TUNING.TOTAL_DAY_TIME*15)
-                StateChange(inst)
-            else --玄鸟第一次团灭，产生一个蛋供玩家选择
-                local egg = SpawnPrefab("siving_egg")
-                if egg ~= nil then
-                    egg.ismale = bird.ismale
-                    egg.tree = inst
-                    inst.bossEgg = egg
-                    egg.Transform:SetPosition(bird.Transform:GetWorldPosition())
                 end
             end
         end

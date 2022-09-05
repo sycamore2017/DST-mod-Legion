@@ -87,8 +87,7 @@ S______GENERIC.DESCRIBE.ORCHITWIGS = "It's not striking, but I just like it."
 --S_______WINONA.DESCRIBE.ORCHITWIGS = "Great to cool off after some hard physical labor."
 
 S_NAMES.ROSEBUSH = "Rose Bush"
-S______GENERIC.DESCRIBE.ROSEBUSH =  --对于某些角色，这里面的"she"可以做点手脚，嘿嘿
-{
+S______GENERIC.DESCRIBE.ROSEBUSH = {
     BARREN = "She can't get through this on her own.",
     WITHERED = "Her beauty shrinks with her under the blazing sunlight.",
     GENERIC = "Beautiful, but spikey.",
@@ -97,108 +96,6 @@ S______GENERIC.DESCRIBE.ROSEBUSH =  --对于某些角色，这里面的"she"可�
     -- DISEASING = "Is looking shrivelly.",
     BURNING = "It's beauty is going up in smoke!",
 }
---[[
-S_______WILLOW.DESCRIBE.ROSEBUSH =
-{
-    BARREN = "I need to poop on it.",
-    WITHERED = "Is too hot for bush.",
-    GENERIC = "Is full of food-balls!",
-    PICKED = "Eating part is gone.",
-    --DISEASED = "Is weak. Sickly!",    --不会生病
-    --DISEASING = "Is looking shrivelly.",
-    BURNING = "Ah! Is burning!",
-}
-S_____WOLFGANG.DESCRIBE.ROSEBUSH =
-{
-    BARREN = "I need to poop on it.",
-    WITHERED = "Is too hot for bush.",
-    GENERIC = "Is full of food-balls!",
-    PICKED = "Eating part is gone.",
-    --DISEASED = "Is weak. Sickly!",    --不会生病
-    --DISEASING = "Is looking shrivelly.",
-    BURNING = "Ah! Is burning!",
-}
-S________WENDY.DESCRIBE.ROSEBUSH =
-{
-    BARREN = "I need to poop on it.",
-    WITHERED = "Is too hot for bush.",
-    GENERIC = "Is full of food-balls!",
-    PICKED = "Eating part is gone.",
-    --DISEASED = "Is weak. Sickly!",    --不会生病
-    --DISEASING = "Is looking shrivelly.",
-    BURNING = "Ah! Is burning!",
-}
-S_________WX78.DESCRIBE.ROSEBUSH =
-{
-    BARREN = "I need to poop on it.",
-    WITHERED = "Is too hot for bush.",
-    GENERIC = "Is full of food-balls!",
-    PICKED = "Eating part is gone.",
-    --DISEASED = "Is weak. Sickly!",    --不会生病
-    --DISEASING = "Is looking shrivelly.",
-    BURNING = "Ah! Is burning!",
-}
-S_WICKERBOTTOM.DESCRIBE.ROSEBUSH =
-{
-    BARREN = "I need to poop on it.",
-    WITHERED = "Is too hot for bush.",
-    GENERIC = "Is full of food-balls!",
-    PICKED = "Eating part is gone.",
-    --DISEASED = "Is weak. Sickly!",    --不会生病
-    --DISEASING = "Is looking shrivelly.",
-    BURNING = "Ah! Is burning!",
-}
-S_______WOODIE.DESCRIBE.ROSEBUSH =
-{
-    BARREN = "I need to poop on it.",
-    WITHERED = "Is too hot for bush.",
-    GENERIC = "Is full of food-balls!",
-    PICKED = "Eating part is gone.",
-    --DISEASED = "Is weak. Sickly!",    --不会生病
-    --DISEASING = "Is looking shrivelly.",
-    BURNING = "Ah! Is burning!",
-}
-S______WAXWELL.DESCRIBE.ROSEBUSH =
-{
-    BARREN = "I need to poop on it.",
-    WITHERED = "Is too hot for bush.",
-    GENERIC = "Is full of food-balls!",
-    PICKED = "Eating part is gone.",
-    --DISEASED = "Is weak. Sickly!",    --不会生病
-    --DISEASING = "Is looking shrivelly.",
-    BURNING = "Ah! Is burning!",
-}
-S___WATHGRITHR.DESCRIBE.ROSEBUSH =
-{
-    BARREN = "I need to poop on it.",
-    WITHERED = "Is too hot for bush.",
-    GENERIC = "Is full of food-balls!",
-    PICKED = "Eating part is gone.",
-    --DISEASED = "Is weak. Sickly!",    --不会生病
-    --DISEASING = "Is looking shrivelly.",
-    BURNING = "Ah! Is burning!",
-}
-S_______WEBBER.DESCRIBE.ROSEBUSH =
-{
-    BARREN = "I need to poop on it.",
-    WITHERED = "Is too hot for bush.",
-    GENERIC = "Is full of food-balls!",
-    PICKED = "Eating part is gone.",
-    --DISEASED = "Is weak. Sickly!",    --不会生病
-    --DISEASING = "Is looking shrivelly.",
-    BURNING = "Ah! Is burning!",
-}
-S_______WINONA.DESCRIBE.ROSEBUSH =
-{
-    BARREN = "I need to poop on it.",
-    WITHERED = "Is too hot for bush.",
-    GENERIC = "Is full of food-balls!",
-    PICKED = "Eating part is gone.",
-    --DISEASED = "Is weak. Sickly!",    --不会生病
-    --DISEASING = "Is looking shrivelly.",
-    BURNING = "Ah! Is burning!",
-}
-]]--
 
 S_NAMES.DUG_ROSEBUSH = "Rose Bush"
 S______GENERIC.DESCRIBE.DUG_ROSEBUSH = "Although a rose is beautiful, it still has thorns."
@@ -227,8 +124,7 @@ S______GENERIC.DESCRIBE.CUTTED_ROSEBUSH = "This is a very common way of propagat
 --S_______WINONA.DESCRIBE.CUTTED_ROSEBUSH = "Great to cool off after some hard physical labor."
 
 S_NAMES.LILYBUSH = "Lily Bush"
-S______GENERIC.DESCRIBE.LILYBUSH =  --对于某些角色，这里面的"she"可以做点手脚，嘿嘿
-{
+S______GENERIC.DESCRIBE.LILYBUSH = {
     BARREN = "It can't recover without my help.",
     WITHERED = "She is no longer beauteous.",
     GENERIC = "She's so different!",
@@ -237,108 +133,6 @@ S______GENERIC.DESCRIBE.LILYBUSH =  --对于某些角色，这里面的"she"可�
     --DISEASING = "Is looking shrivelly.",
     BURNING = "It's beauty is going up in smoke!",
 }
---[[
-S_______WILLOW.DESCRIBE.LILYBUSH =
-{
-    BARREN = "I need to poop on it.",
-    WITHERED = "Is too hot for bush.",
-    GENERIC = "Is full of food-balls!",
-    PICKED = "Eating part is gone.",
-    --DISEASED = "Is weak. Sickly!",    --不会生病
-    --DISEASING = "Is looking shrivelly.",
-    BURNING = "Ah! Is burning!",
-}
-S_____WOLFGANG.DESCRIBE.LILYBUSH =
-{
-    BARREN = "I need to poop on it.",
-    WITHERED = "Is too hot for bush.",
-    GENERIC = "Is full of food-balls!",
-    PICKED = "Eating part is gone.",
-    --DISEASED = "Is weak. Sickly!",    --不会生病
-    --DISEASING = "Is looking shrivelly.",
-    BURNING = "Ah! Is burning!",
-}
-S________WENDY.DESCRIBE.LILYBUSH =
-{
-    BARREN = "I need to poop on it.",
-    WITHERED = "Is too hot for bush.",
-    GENERIC = "Is full of food-balls!",
-    PICKED = "Eating part is gone.",
-    --DISEASED = "Is weak. Sickly!",    --不会生病
-    --DISEASING = "Is looking shrivelly.",
-    BURNING = "Ah! Is burning!",
-}
-S_________WX78.DESCRIBE.LILYBUSH =
-{
-    BARREN = "I need to poop on it.",
-    WITHERED = "Is too hot for bush.",
-    GENERIC = "Is full of food-balls!",
-    PICKED = "Eating part is gone.",
-    --DISEASED = "Is weak. Sickly!",    --不会生病
-    --DISEASING = "Is looking shrivelly.",
-    BURNING = "Ah! Is burning!",
-}
-S_WICKERBOTTOM.DESCRIBE.LILYBUSH =
-{
-    BARREN = "I need to poop on it.",
-    WITHERED = "Is too hot for bush.",
-    GENERIC = "Is full of food-balls!",
-    PICKED = "Eating part is gone.",
-    --DISEASED = "Is weak. Sickly!",    --不会生病
-    --DISEASING = "Is looking shrivelly.",
-    BURNING = "Ah! Is burning!",
-}
-S_______WOODIE.DESCRIBE.LILYBUSH =
-{
-    BARREN = "I need to poop on it.",
-    WITHERED = "Is too hot for bush.",
-    GENERIC = "Is full of food-balls!",
-    PICKED = "Eating part is gone.",
-    --DISEASED = "Is weak. Sickly!",    --不会生病
-    --DISEASING = "Is looking shrivelly.",
-    BURNING = "Ah! Is burning!",
-}
-S______WAXWELL.DESCRIBE.LILYBUSH =
-{
-    BARREN = "I need to poop on it.",
-    WITHERED = "Is too hot for bush.",
-    GENERIC = "Is full of food-balls!",
-    PICKED = "Eating part is gone.",
-    --DISEASED = "Is weak. Sickly!",    --不会生病
-    --DISEASING = "Is looking shrivelly.",
-    BURNING = "Ah! Is burning!",
-}
-S___WATHGRITHR.DESCRIBE.LILYBUSH =
-{
-    BARREN = "I need to poop on it.",
-    WITHERED = "Is too hot for bush.",
-    GENERIC = "Is full of food-balls!",
-    PICKED = "Eating part is gone.",
-    --DISEASED = "Is weak. Sickly!",    --不会生病
-    --DISEASING = "Is looking shrivelly.",
-    BURNING = "Ah! Is burning!",
-}
-S_______WEBBER.DESCRIBE.LILYBUSH =
-{
-    BARREN = "I need to poop on it.",
-    WITHERED = "Is too hot for bush.",
-    GENERIC = "Is full of food-balls!",
-    PICKED = "Eating part is gone.",
-    --DISEASED = "Is weak. Sickly!",    --不会生病
-    --DISEASING = "Is looking shrivelly.",
-    BURNING = "Ah! Is burning!",
-}
-S_______WINONA.DESCRIBE.LILYBUSH =
-{
-    BARREN = "I need to poop on it.",
-    WITHERED = "Is too hot for bush.",
-    GENERIC = "Is full of food-balls!",
-    PICKED = "Eating part is gone.",
-    --DISEASED = "Is weak. Sickly!",    --不会生病
-    --DISEASING = "Is looking shrivelly.",
-    BURNING = "Ah! Is burning!",
-}
-]]--
 
 S_NAMES.DUG_LILYBUSH = "Lily Bush"
 S______GENERIC.DESCRIBE.DUG_LILYBUSH = "I can't wait to see it bloom once again."
@@ -367,8 +161,7 @@ S______GENERIC.DESCRIBE.CUTTED_LILYBUSH = "This is a very common way of propagat
 --S_______WINONA.DESCRIBE.CUTTED_LILYBUSH = "Great to cool off after some hard physical labor."
 
 S_NAMES.ORCHIDBUSH = "Orchid Bush"
-S______GENERIC.DESCRIBE.ORCHIDBUSH =  --对于某些角色，这里面的"she"可以做点手脚，嘿嘿
-{
+S______GENERIC.DESCRIBE.ORCHIDBUSH = {
     BARREN = "It can't recover without my help.",
     WITHERED = "She is no longer beauteous.",
     GENERIC = "She's so different!",
@@ -377,108 +170,6 @@ S______GENERIC.DESCRIBE.ORCHIDBUSH =  --对于某些角色，这里面的"she"�
     --DISEASING = "Is looking shrivelly.",
     BURNING = "It's beauty is going up in smoke!",
 }
---[[
-S_______WILLOW.DESCRIBE.ORCHIDBUSH =
-{
-    BARREN = "I need to poop on it.",
-    WITHERED = "Is too hot for bush.",
-    GENERIC = "Is full of food-balls!",
-    PICKED = "Eating part is gone.",
-    --DISEASED = "Is weak. Sickly!",    --不会生病
-    --DISEASING = "Is looking shrivelly.",
-    BURNING = "Ah! Is burning!",
-}
-S_____WOLFGANG.DESCRIBE.ORCHIDBUSH =
-{
-    BARREN = "I need to poop on it.",
-    WITHERED = "Is too hot for bush.",
-    GENERIC = "Is full of food-balls!",
-    PICKED = "Eating part is gone.",
-    --DISEASED = "Is weak. Sickly!",    --不会生病
-    --DISEASING = "Is looking shrivelly.",
-    BURNING = "Ah! Is burning!",
-}
-S________WENDY.DESCRIBE.ORCHIDBUSH =
-{
-    BARREN = "I need to poop on it.",
-    WITHERED = "Is too hot for bush.",
-    GENERIC = "Is full of food-balls!",
-    PICKED = "Eating part is gone.",
-    --DISEASED = "Is weak. Sickly!",    --不会生病
-    --DISEASING = "Is looking shrivelly.",
-    BURNING = "Ah! Is burning!",
-}
-S_________WX78.DESCRIBE.ORCHIDBUSH =
-{
-    BARREN = "I need to poop on it.",
-    WITHERED = "Is too hot for bush.",
-    GENERIC = "Is full of food-balls!",
-    PICKED = "Eating part is gone.",
-    --DISEASED = "Is weak. Sickly!",    --不会生病
-    --DISEASING = "Is looking shrivelly.",
-    BURNING = "Ah! Is burning!",
-}
-S_WICKERBOTTOM.DESCRIBE.ORCHIDBUSH =
-{
-    BARREN = "I need to poop on it.",
-    WITHERED = "Is too hot for bush.",
-    GENERIC = "Is full of food-balls!",
-    PICKED = "Eating part is gone.",
-    --DISEASED = "Is weak. Sickly!",    --不会生病
-    --DISEASING = "Is looking shrivelly.",
-    BURNING = "Ah! Is burning!",
-}
-S_______WOODIE.DESCRIBE.ORCHIDBUSH =
-{
-    BARREN = "I need to poop on it.",
-    WITHERED = "Is too hot for bush.",
-    GENERIC = "Is full of food-balls!",
-    PICKED = "Eating part is gone.",
-    --DISEASED = "Is weak. Sickly!",    --不会生病
-    --DISEASING = "Is looking shrivelly.",
-    BURNING = "Ah! Is burning!",
-}
-S______WAXWELL.DESCRIBE.ORCHIDBUSH =
-{
-    BARREN = "I need to poop on it.",
-    WITHERED = "Is too hot for bush.",
-    GENERIC = "Is full of food-balls!",
-    PICKED = "Eating part is gone.",
-    --DISEASED = "Is weak. Sickly!",    --不会生病
-    --DISEASING = "Is looking shrivelly.",
-    BURNING = "Ah! Is burning!",
-}
-S___WATHGRITHR.DESCRIBE.ORCHIDBUSH =
-{
-    BARREN = "I need to poop on it.",
-    WITHERED = "Is too hot for bush.",
-    GENERIC = "Is full of food-balls!",
-    PICKED = "Eating part is gone.",
-    --DISEASED = "Is weak. Sickly!",    --不会生病
-    --DISEASING = "Is looking shrivelly.",
-    BURNING = "Ah! Is burning!",
-}
-S_______WEBBER.DESCRIBE.ORCHIDBUSH =
-{
-    BARREN = "I need to poop on it.",
-    WITHERED = "Is too hot for bush.",
-    GENERIC = "Is full of food-balls!",
-    PICKED = "Eating part is gone.",
-    --DISEASED = "Is weak. Sickly!",    --不会生病
-    --DISEASING = "Is looking shrivelly.",
-    BURNING = "Ah! Is burning!",
-}
-S_______WINONA.DESCRIBE.ORCHIDBUSH =
-{
-    BARREN = "I need to poop on it.",
-    WITHERED = "Is too hot for bush.",
-    GENERIC = "Is full of food-balls!",
-    PICKED = "Eating part is gone.",
-    --DISEASED = "Is weak. Sickly!",    --不会生病
-    --DISEASING = "Is looking shrivelly.",
-    BURNING = "Ah! Is burning!",
-}
-]]--
 
 S_NAMES.DUG_ORCHIDBUSH = "Orchid Bush"
 S______GENERIC.DESCRIBE.DUG_ORCHIDBUSH = "How dainty."
@@ -507,8 +198,7 @@ S______GENERIC.DESCRIBE.CUTTED_ORCHIDBUSH = "This is a very common way of propag
 --S_______WINONA.DESCRIBE.CUTTED_ORCHIDBUSH = "Great to cool off after some hard physical labor."
 
 S_NAMES.NEVERFADEBUSH = "Neverfade Bush"
-S______GENERIC.DESCRIBE.NEVERFADEBUSH =
-{
+S______GENERIC.DESCRIBE.NEVERFADEBUSH = {
     --BARREN = "It can't recover without my help.",
     --WITHERED = "She is no longer beauteous.",
     GENERIC = "I knew it would never fade!",
@@ -517,108 +207,6 @@ S______GENERIC.DESCRIBE.NEVERFADEBUSH =
     --DISEASING = "Is looking shrivelly.",
     --BURNING = "It's beauty is going up in smoke!",
 }
---[[
-S_______WILLOW.DESCRIBE.NEVERFADEBUSH =
-{
-    BARREN = "I need to poop on it.",
-    WITHERED = "Is too hot for bush.",
-    GENERIC = "Is full of food-balls!",
-    PICKED = "Eating part is gone.",
-    --DISEASED = "Is weak. Sickly!",    --不会生病
-    --DISEASING = "Is looking shrivelly.",
-    BURNING = "Ah! Is burning!",
-}
-S_____WOLFGANG.DESCRIBE.NEVERFADEBUSH =
-{
-    BARREN = "I need to poop on it.",
-    WITHERED = "Is too hot for bush.",
-    GENERIC = "Is full of food-balls!",
-    PICKED = "Eating part is gone.",
-    --DISEASED = "Is weak. Sickly!",    --不会生病
-    --DISEASING = "Is looking shrivelly.",
-    BURNING = "Ah! Is burning!",
-}
-S________WENDY.DESCRIBE.NEVERFADEBUSH =
-{
-    BARREN = "I need to poop on it.",
-    WITHERED = "Is too hot for bush.",
-    GENERIC = "Is full of food-balls!",
-    PICKED = "Eating part is gone.",
-    --DISEASED = "Is weak. Sickly!",    --不会生病
-    --DISEASING = "Is looking shrivelly.",
-    BURNING = "Ah! Is burning!",
-}
-S_________WX78.DESCRIBE.NEVERFADEBUSH =
-{
-    BARREN = "I need to poop on it.",
-    WITHERED = "Is too hot for bush.",
-    GENERIC = "Is full of food-balls!",
-    PICKED = "Eating part is gone.",
-    --DISEASED = "Is weak. Sickly!",    --不会生病
-    --DISEASING = "Is looking shrivelly.",
-    BURNING = "Ah! Is burning!",
-}
-S_WICKERBOTTOM.DESCRIBE.NEVERFADEBUSH =
-{
-    BARREN = "I need to poop on it.",
-    WITHERED = "Is too hot for bush.",
-    GENERIC = "Is full of food-balls!",
-    PICKED = "Eating part is gone.",
-    --DISEASED = "Is weak. Sickly!",    --不会生病
-    --DISEASING = "Is looking shrivelly.",
-    BURNING = "Ah! Is burning!",
-}
-S_______WOODIE.DESCRIBE.NEVERFADEBUSH =
-{
-    BARREN = "I need to poop on it.",
-    WITHERED = "Is too hot for bush.",
-    GENERIC = "Is full of food-balls!",
-    PICKED = "Eating part is gone.",
-    --DISEASED = "Is weak. Sickly!",    --不会生病
-    --DISEASING = "Is looking shrivelly.",
-    BURNING = "Ah! Is burning!",
-}
-S______WAXWELL.DESCRIBE.NEVERFADEBUSH =
-{
-    BARREN = "I need to poop on it.",
-    WITHERED = "Is too hot for bush.",
-    GENERIC = "Is full of food-balls!",
-    PICKED = "Eating part is gone.",
-    --DISEASED = "Is weak. Sickly!",    --不会生病
-    --DISEASING = "Is looking shrivelly.",
-    BURNING = "Ah! Is burning!",
-}
-S___WATHGRITHR.DESCRIBE.NEVERFADEBUSH =
-{
-    BARREN = "I need to poop on it.",
-    WITHERED = "Is too hot for bush.",
-    GENERIC = "Is full of food-balls!",
-    PICKED = "Eating part is gone.",
-    --DISEASED = "Is weak. Sickly!",    --不会生病
-    --DISEASING = "Is looking shrivelly.",
-    BURNING = "Ah! Is burning!",
-}
-S_______WEBBER.DESCRIBE.NEVERFADEBUSH =
-{
-    BARREN = "I need to poop on it.",
-    WITHERED = "Is too hot for bush.",
-    GENERIC = "Is full of food-balls!",
-    PICKED = "Eating part is gone.",
-    --DISEASED = "Is weak. Sickly!",    --不会生病
-    --DISEASING = "Is looking shrivelly.",
-    BURNING = "Ah! Is burning!",
-}
-S_______WINONA.DESCRIBE.NEVERFADEBUSH =
-{
-    BARREN = "I need to poop on it.",
-    WITHERED = "Is too hot for bush.",
-    GENERIC = "Is full of food-balls!",
-    PICKED = "Eating part is gone.",
-    --DISEASED = "Is weak. Sickly!",    --不会生病
-    --DISEASING = "Is looking shrivelly.",
-    BURNING = "Ah! Is burning!",
-}
-]]--
 
 S_NAMES.NEVERFADE = "Neverfade"    --永不凋零
 S_RECIPE_DESC.NEVERFADE = "The power of flowers!"
@@ -2763,6 +2351,95 @@ S________WARLY.DESCRIBE.SIVING_MASK_GOLD = "Eats grass, produces superb milk!"
 -- S_________WURT.DESCRIBE.SIVING_MASK_GOLD = ""
 -- S_______WALTER.DESCRIBE.SIVING_MASK_GOLD = ""
 S________WANDA.DESCRIBE.SIVING_MASK_GOLD = "More efficient and cruel than the magic of time."
+
+S_NAMES.SIVING_EGG = "Siving Phoenix Egg" --子圭石子
+S______GENERIC.DESCRIBE.SIVING_EGG = "Should I break it or let it hatch?"
+-- S_______WILLOW.DESCRIBE.SIVING_EGG = ""
+-- S_____WOLFGANG.DESCRIBE.SIVING_EGG = ""
+S________WENDY.DESCRIBE.SIVING_EGG = "Before its birth, it's ready to die."
+-- S_________WX78.DESCRIBE.SIVING_EGG = ""
+S_WICKERBOTTOM.DESCRIBE.SIVING_EGG = "If it was born, it would probably be another hard battle."
+S_______WOODIE.DESCRIBE.SIVING_EGG = "My advice is to cut the grass and root out!"
+-- S______WAXWELL.DESCRIBE.SIVING_EGG = ""
+S___WATHGRITHR.DESCRIBE.SIVING_EGG = "Great soldiers should have compassion."
+S_______WEBBER.DESCRIBE.SIVING_EGG = "An interesting stone egg."
+-- S_______WINONA.DESCRIBE.SIVING_EGG = ""
+S_______WORTOX.DESCRIBE.SIVING_EGG = "There is an egg between life and death."
+S_____WORMWOOD.DESCRIBE.SIVING_EGG = "Rocky egg."
+S________WARLY.DESCRIBE.SIVING_EGG = "Be obedient, or I'll make you into fried eggs."
+-- S_________WURT.DESCRIBE.SIVING_EGG = ""
+-- S_______WALTER.DESCRIBE.SIVING_EGG = ""
+S________WANDA.DESCRIBE.SIVING_EGG = "Seriously, it will start the cycle of life again."
+
+S_NAMES.SIVING_PHOENIX = "Siving Phoenix" --子圭玄鸟
+S______GENERIC.DESCRIBE.SIVING_PHOENIX = {
+    GENERIC = "Can rock also give birth to life? A major scientific discovery!",
+    GRIEF = "It has people's thoughts!"
+}
+S_______WILLOW.DESCRIBE.SIVING_PHOENIX = {
+    GENERIC = "The bird can't burn, which gives me a headache.",
+    GRIEF = "Now you are alone."
+}
+S_____WOLFGANG.DESCRIBE.SIVING_PHOENIX = {
+    GENERIC = "Wolfgang wants to touch it.",
+    GRIEF = "Stone bird is angry!"
+}
+S________WENDY.DESCRIBE.SIVING_PHOENIX = {
+    GENERIC = "This is not what I expected.",
+    GRIEF = "Maybe the ceremony is not over yet."
+}
+S_________WX78.DESCRIBE.SIVING_PHOENIX = {
+    GENERIC = "THAT TREE IS NOT WORTH COOPERATING WITH.",
+    GRIEF = "THAT'S THE PRICE FOR LYING TO ME!"
+}
+S_WICKERBOTTOM.DESCRIBE.SIVING_PHOENIX = {
+    GENERIC = "This is the highest form of life of siving!",
+    GRIEF = "They seem to have the same thoughts and feelings as us."
+}
+S_______WOODIE.DESCRIBE.SIVING_PHOENIX = {
+    GENERIC = "Don't blame me for being too cruel, stupid birds.",
+    GRIEF = "There's one left!"
+}
+S______WAXWELL.DESCRIBE.SIVING_PHOENIX = {
+    GENERIC = "It's not the first time. I'm so gullible.",
+    GRIEF = "I will pay for my stupidity."
+}
+S___WATHGRITHR.DESCRIBE.SIVING_PHOENIX = {
+    GENERIC = "A great test of the sacred tree to the soldiers!",
+    GRIEF = "The trial is coming to an end."
+}
+S_______WEBBER.DESCRIBE.SIVING_PHOENIX = {
+    GENERIC = "They don't seem to want to play with us.",
+    GRIEF = "This is not our intention. Sorry."
+}
+S_______WINONA.DESCRIBE.SIVING_PHOENIX = {
+    GENERIC = "A very interesting thing happened. It's a bird shaped statue that can move!",
+    GRIEF = "This statue is crazy."
+}
+S_______WORTOX.DESCRIBE.SIVING_PHOENIX = {
+    GENERIC = "I can tell their gender.",
+    GRIEF = "Where's its partner?"
+}
+S_____WORMWOOD.DESCRIBE.SIVING_PHOENIX = {
+    GENERIC = "One rock bird, two rock birds.",
+    GRIEF = "One rock bird, mad."
+}
+S________WARLY.DESCRIBE.SIVING_PHOENIX = {
+    GENERIC = "Deception! I'll teach you a lesson.",
+    GRIEF = "I feel a little sorry for it."
+}
+S_________WURT.DESCRIBE.SIVING_PHOENIX = {
+    GENERIC = "Their existence moved me.",
+    GRIEF = "I definitely didn't do it. Please spare me, flort."
+}
+S_______WALTER.DESCRIBE.SIVING_PHOENIX = {
+    GENERIC = "Hello, can I draw a rock feather as a medal?",
+    GRIEF = "You're not happy. I'll ask you about the medal later."
+}
+S________WANDA.DESCRIBE.SIVING_PHOENIX = {
+    GENERIC = "I haven't completely defeated it in countless battles.",
+    GRIEF = "It fell into grief and indignation, as always."
+}
 
 --------------------------------------------------------------------------
 --[[ flash and crush ]]--[[ 电闪雷鸣 ]]

@@ -25,13 +25,6 @@ local function CheckMate(inst)
         if not IsValid(inst.mate) then
             inst.mate = nil
             inst.iswarrior = true
-            if inst.tree and inst.tree.bossBirds then
-                if inst.ismale then
-                    inst.tree.bossBirds.female = nil
-                else
-                    inst.tree.bossBirds.male = nil
-                end
-            end
         end
     else
         inst.iswarrior = true
@@ -80,19 +73,10 @@ local function MakeBoss(data)
                 return inst
             end
 
-            inst.persists = false --由神木来控制保存机制
             inst.tree = nil
             inst.mate = nil --另一个伴侣
             inst.iswarrior = true --BOSS站位（两个BOSS会在近战模式和护卫模式之间轮换占位）
             inst.isgrief = false --是否处于悲愤状态
-            inst.fn_onBorn = function(inst, tree)
-                inst.tree = tree
-                inst.components.knownlocations:RememberLocation("tree", tree:GetPosition(), false)
-                -- if inst.task_checktree ~= nil then
-                --     inst.task_checktree:Cancel()
-                --     inst.task_checktree = nil
-                -- end
-            end
             inst.fn_onGrief = function(inst, tree, doroar)
                 inst.isgrief = true
                 inst.AnimState:OverrideSymbol("buzzard_eye", data.name, "buzzard_angryeye")
@@ -108,11 +92,11 @@ local function MakeBoss(data)
                         inst.mate.tree = nil
                         inst.mate.mate = nil
                         inst.mate.OnRemoveEntity = nil
-                        inst.tree.fn_computTraded(inst.tree, 2, 8) --恢复已经消耗的祭品
+                        -- inst.tree.fn_computTraded(inst.tree, 2, 8) --恢复已经消耗的祭品
                         inst.tree.bossBirds = nil
                     else --死了一只，此时剩下一只飞走，进入枯萎期
                         inst.tree.rebirthed = true
-                        inst.tree.fn_onBirdsDeath(inst.tree, inst)
+                        -- inst.tree.fn_onBirdsDeath(inst.tree, inst)
                     end
                 end
                 inst.tree = nil
@@ -185,6 +169,9 @@ local function MakeBoss(data)
             -- inst.components.eater:SetDiet({ FOODGROUP.OMNI }, { FOODGROUP.OMNI })
 
             inst:AddComponent("inspectable")
+            inst.components.inspectable.getstatus = function(inst)
+                return inst.isgrief and "GRIEF" or "GENERIC"
+            end
 
             inst:AddComponent("explosiveresist")
 
@@ -193,7 +180,7 @@ local function MakeBoss(data)
             inst:AddComponent("knownlocations")
 
             inst:AddComponent("timer")
-            inst.components.timer:StartTimer("leave", TIME_STAY)
+            -- inst.components.timer:StartTimer("leave", TIME_STAY)
 
             inst:AddComponent("lootdropper")
 
@@ -271,9 +258,9 @@ local function MakeBoss(data)
                 end
             end)
             inst:ListenForEvent("timerdone", function(inst, data)
-                if data.name == "leave" then
-                    inst.fn_onLeave(inst)
-                end
+                -- if data.name == "leave" then
+                --     inst.fn_onLeave(inst)
+                -- end
             end)
 
             -- inst.OnSave = OnSave
@@ -286,15 +273,15 @@ local function MakeBoss(data)
             -- inst.OnLoad = function(inst, data)end
             inst.OnEntitySleep = function(inst)
                 inst.components.combat:SetTarget(nil)
-                if not inst.components.timer:TimerExists("leave") then
-                    inst.components.timer:StartTimer("leave", TIME_STAY)
-                end
+                -- if not inst.components.timer:TimerExists("leave") then
+                --     inst.components.timer:StartTimer("leave", TIME_STAY)
+                -- end
             end
             inst.OnRemoveEntity = function(inst)
                 CheckMate(inst)
                 if inst.mate == nil then --伙伴已经死亡的情况下，自己也死亡了，生蛋还是结束战斗，由神木控制
                     if inst.tree ~= nil and inst.tree:IsValid() then
-                        inst.tree.fn_onBirdsDeath(inst.tree, inst)
+                        -- inst.tree.fn_onBirdsDeath(inst.tree, inst)
                     end
                 else --活下来的伴侣进入悲愤状态
                     inst.mate.fn_onGrief(inst.mate, inst.tree, true)
@@ -695,6 +682,24 @@ local function SetEggState(inst, state)
     end
 end
 
+local function OnTimerDone_egg(inst, data)
+    if data.name == "state1" then
+        SetEggState(inst, 2)
+        inst.components.timer:StartTimer("state2", TIME_EGG*0.35)
+    elseif data.name == "state2" then
+        SetEggState(inst, 3)
+        inst.components.timer:StartTimer("state3", TIME_EGG*0.35)
+    elseif data.name == "state3" then
+        SetEggState(inst, 4)
+        inst.components.timer:StartTimer("birth", 3)
+    elseif data.name == "birth" then
+        --破壳特效 undo
+        --这里要生成玄鸟，在没树时
+        inst.ishatched = true
+        inst:Remove()
+    end
+end
+
 table.insert(prefs, Prefab(
     "siving_egg",
     function()
@@ -718,8 +723,8 @@ table.insert(prefs, Prefab(
             return inst
         end
 
-        inst.persists = false --由神木来控制保存机制
         inst.ismale = false
+        inst.ishatched = nil --是否正常孵化
         inst.tree = nil
         inst.state = 1
 
@@ -737,42 +742,14 @@ table.insert(prefs, Prefab(
         inst:AddComponent("timer")
         inst.components.timer:StartTimer("state1", TIME_EGG*0.3)
 
+        inst:ListenForEvent("timerdone", OnTimerDone_egg)
         inst:ListenForEvent("attacked", function(inst, data)
             inst.AnimState:PlayAnimation("hit")
             SetEggState(inst, inst.state)
         end)
-        inst:ListenForEvent("timerdone", function(inst, data)
-            if data.name == "state1" then
-                SetEggState(inst, 2)
-                inst.components.timer:StartTimer("state2", TIME_EGG*0.35)
-            elseif data.name == "state2" then
-                SetEggState(inst, 3)
-                inst.components.timer:StartTimer("state3", TIME_EGG*0.35)
-            elseif data.name == "state3" then
-                SetEggState(inst, 4)
-                inst.components.timer:StartTimer("birth", 3)
-            elseif data.name == "birth" then
-                if inst:IsAsleep() then --玩家离开了，那就结束战斗吧
-                    if inst.tree ~= nil and inst.tree:IsValid() then
-                        inst.tree.rebirthed = true
-                        inst.tree.fn_onBirdsDeath(inst.tree, inst)
-                    end
-                else
-                    --破壳特效 undo
-                    local bird = SpawnPrefab(inst.ismale and "siving_moenix" or "siving_foenix")
-                    if bird ~= nil then
-                        bird.Transform:SetPosition(inst.Transform:GetWorldPosition())
-                        if inst.tree ~= nil and inst.tree:IsValid() then
-                            inst.tree.rebirthed = true
-                            inst.tree.bossBirds = {}
-                            inst.tree.bossBirds[inst.ismale and "male" or "female"] = bird
-                            bird.fn_onBorn(bird, inst.tree)
-                            bird.fn_onGrief(bird, inst.tree, true)
-                        end
-                    end
-                end
-                inst:Remove()
-            end
+        inst:ListenForEvent("death", function(inst, data)
+            inst:RemoveEventCallback("timerdone", OnTimerDone_egg)
+            --破壳特效 undo
         end)
 
         inst.OnLoad = function(inst, data)
