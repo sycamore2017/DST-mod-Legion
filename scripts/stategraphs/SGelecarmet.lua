@@ -124,19 +124,19 @@ local events =
 {
     CommonHandlers.OnSleep(),
     CommonHandlers.OnLocomote(false, true),
+    CommonHandlers.OnDeath(),
     -- CommonHandlers.OnFreeze(),
     --CommonHandlers.OnAttacked(),
 
     EventHandler("attacked", function(inst) 
-        if inst.components.health ~= nil and not inst.components.health:IsDead() 
+        if
+            inst.components.health ~= nil and not inst.components.health:IsDead()
             and not inst.sg:HasStateTag("hit")
             and not inst.sg:HasStateTag("busy")
         then
             inst.sg:GoToState("hit")
         end
     end),
-
-    EventHandler("death", function(inst) inst.sg:GoToState("death") end),
 
     EventHandler("doattack", function(inst)   --可以进行普通攻击时，收到这个事件
         if not inst.sg:HasStateTag("busy") and inst.components.health ~= nil and not inst.components.health:IsDead() then
@@ -222,7 +222,7 @@ local states =
                 inst.SoundEmitter:PlaySound("dontstarve/forge2/beetletaur/chain_hit")
             end),
             TimeEvent(55 * FRAMES, function(inst) 
-                inst.SoundEmitter:PlaySound("dontstarve/creatures/lava_arena/boarrior/death_bodyfall") 
+                inst.SoundEmitter:PlaySound("dontstarve/creatures/lava_arena/boarrior/death_bodyfall")
             end),
             TimeEvent(70 * FRAMES, function(inst)  
                 inst.SoundEmitter:PlaySound("dontstarve/creatures/lava_arena/boarrior/bonehit2")

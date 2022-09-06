@@ -10,11 +10,16 @@ local LineMap = {
     cattenball = 15
 }
 
+local BossSounds = {
+    step = "dontstarve_DLC001/creatures/buzzard/hurt",
+    death = "dontstarve_DLC001/creatures/buzzard/death",
+    flyaway = "dontstarve_DLC001/creatures/buzzard/flyout",
+    flap = "dontstarve_DLC001/creatures/buzzard/flap"
+}
+
 local DIST_MATE = 13 --离伴侣的最远距离
 local DIST_REMOTE = 20 --最大活动范围
 local DIST_ATK = 4 --普通攻击范围
-
-local TIME_STAY = TUNING.TOTAL_DAY_TIME --无所事事的时间
 
 local function IsValid(one)
     return one:IsValid() and
@@ -64,15 +69,16 @@ local function MakeBoss(data)
 
             inst:SetPrefabNameOverride("siving_phoenix")
 
-            if data.fn_common ~= nil then
-                data.fn_common(inst)
-            end
+            -- if data.fn_common ~= nil then
+            --     data.fn_common(inst)
+            -- end
 
             inst.entity:SetPristine()
             if not TheWorld.ismastersim then
                 return inst
             end
 
+            inst.sounds = BossSounds
             inst.tree = nil
             inst.mate = nil --另一个伴侣
             inst.iswarrior = true --BOSS站位（两个BOSS会在近战模式和护卫模式之间轮换占位）
@@ -84,28 +90,13 @@ local function MakeBoss(data)
                     inst:PushEvent("doroar")
                 end
             end
-            inst.fn_onLeave = function(inst)
-                inst.OnRemoveEntity = nil
-                if inst.tree ~= nil and inst.tree:IsValid() then --玄鸟飞走，需要进行神木的后续完善
-                    CheckMate(inst)
-                    if inst.mate ~= nil then --两只鸟都活着，就只是飞走，不进入枯萎期
-                        inst.mate.tree = nil
-                        inst.mate.mate = nil
-                        inst.mate.OnRemoveEntity = nil
-                        -- inst.tree.fn_computTraded(inst.tree, 2, 8) --恢复已经消耗的祭品
-                        inst.tree.bossBirds = nil
-                    else --死了一只，此时剩下一只飞走，进入枯萎期
-                        inst.tree.rebirthed = true
-                        -- inst.tree.fn_onBirdsDeath(inst.tree, inst)
-                    end
-                end
+            inst.fn_leave = function(inst)
                 inst.tree = nil
                 inst.mate = nil
-
                 if inst:IsAsleep() then
                     inst:Remove()
                 else
-                    inst:PushEvent("dotakeoff", { remove = true })
+                    inst:PushEvent("dotakeoff")
                 end
             end
 
@@ -175,16 +166,26 @@ local function MakeBoss(data)
 
             inst:AddComponent("explosiveresist")
 
-            -- inst:AddComponent("sleeper")
+            inst:AddComponent("sleeper")
+            inst.components.sleeper:SetResistance(4)
+            inst.components.sleeper:SetSleepTest(function(inst)
+                return false
+            end)
+            inst.components.sleeper:SetWakeTest(function(inst)
+                return true
+            end)
 
             inst:AddComponent("knownlocations")
 
             inst:AddComponent("timer")
-            -- inst.components.timer:StartTimer("leave", TIME_STAY)
 
             inst:AddComponent("lootdropper")
 
-            -- inst:SetStateGraph("SGbuzzard")
+            MakeMediumFreezableCharacter(inst, "buzzard_body")
+
+            inst:AddComponent("hauntable")
+
+            inst:SetStateGraph("SGsiving_phoenix") --这个应该是指文件的名字，而不是数据的名字
             -- inst:SetBrain(brain)
 
             inst:ListenForEvent("attacked", function(inst, data)
@@ -259,7 +260,7 @@ local function MakeBoss(data)
             end)
             inst:ListenForEvent("timerdone", function(inst, data)
                 -- if data.name == "leave" then
-                --     inst.fn_onLeave(inst)
+                --     inst.fn_leave(inst)
                 -- end
             end)
 
@@ -273,20 +274,8 @@ local function MakeBoss(data)
             -- inst.OnLoad = function(inst, data)end
             inst.OnEntitySleep = function(inst)
                 inst.components.combat:SetTarget(nil)
-                -- if not inst.components.timer:TimerExists("leave") then
-                --     inst.components.timer:StartTimer("leave", TIME_STAY)
-                -- end
             end
-            inst.OnRemoveEntity = function(inst)
-                CheckMate(inst)
-                if inst.mate == nil then --伙伴已经死亡的情况下，自己也死亡了，生蛋还是结束战斗，由神木控制
-                    if inst.tree ~= nil and inst.tree:IsValid() then
-                        -- inst.tree.fn_onBirdsDeath(inst.tree, inst)
-                    end
-                else --活下来的伴侣进入悲愤状态
-                    inst.mate.fn_onGrief(inst.mate, inst.tree, true)
-                end
-            end
+            -- inst.OnRemoveEntity = function(inst)end
 
             if data.fn_server ~= nil then
                 data.fn_server(inst)
@@ -298,7 +287,7 @@ local function MakeBoss(data)
             Asset("ANIM", "anim/buzzard_basic.zip"), --官方秃鹫动画模板
             Asset("ANIM", "anim/"..data.name..".zip"),
         },
-        data.prefabs
+        {}
     ))
 end
 
@@ -612,10 +601,8 @@ SetSharedLootTable('siving_foenix', {
 MakeBoss({
     name = "siving_foenix",
     -- assets = nil,
-    prefabs = {  },
-    fn_common = function(inst)
-        
-    end,
+    -- prefabs = nil,
+    -- fn_common = function(inst)end,
     fn_server = function(inst)
         inst.components.lootdropper:SetChanceLootTable('siving_foenix')
     end
@@ -649,10 +636,8 @@ SetSharedLootTable('siving_moenix', {
 MakeBoss({
     name = "siving_moenix",
     -- assets = nil,
-    prefabs = {  },
-    fn_common = function(inst)
-        
-    end,
+    -- prefabs = nil,
+    -- fn_common = function(inst)end,
     fn_server = function(inst)
         inst.ismale = true
         inst.components.lootdropper:SetChanceLootTable('siving_moenix')
@@ -681,21 +666,30 @@ local function SetEggState(inst, state)
         inst.AnimState:PushAnimation("idle1", true)
     end
 end
-
 local function OnTimerDone_egg(inst, data)
     if data.name == "state1" then
         SetEggState(inst, 2)
         inst.components.timer:StartTimer("state2", TIME_EGG*0.35)
+        inst.SoundEmitter:PlaySound("dontstarve/creatures/egg/egg_hatch_crack")
     elseif data.name == "state2" then
         SetEggState(inst, 3)
         inst.components.timer:StartTimer("state3", TIME_EGG*0.35)
+        inst.SoundEmitter:PlaySound("dontstarve/creatures/egg/egg_hatch_crack")
     elseif data.name == "state3" then
         SetEggState(inst, 4)
         inst.components.timer:StartTimer("birth", 3)
+        --音效 undo
     elseif data.name == "birth" then
         --破壳特效 undo
-        --这里要生成玄鸟，在没树时
-        inst.ishatched = true
+        if inst.tree == nil or not inst.tree:IsValid() then --生成一个非BOSS战的玄鸟
+            local bird = SpawnPrefab(inst.ismale and "siving_moenix" or "siving_foenix")
+            if bird ~= nil then
+                bird.Transform:SetPosition(inst.Transform:GetWorldPosition())
+                bird.components.knownlocations:RememberLocation("spawnpoint", inst:GetPosition(), true)
+            end
+        else --BOSS战的玄鸟由神木在管理
+            inst.ishatched = true
+        end
         inst:Remove()
     end
 end
@@ -749,6 +743,7 @@ table.insert(prefs, Prefab(
         end)
         inst:ListenForEvent("death", function(inst, data)
             inst:RemoveEventCallback("timerdone", OnTimerDone_egg)
+            inst.components.lootdropper:DropLoot()
             --破壳特效 undo
         end)
 
