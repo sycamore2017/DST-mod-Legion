@@ -1,12 +1,6 @@
 require("constants")
 local cookbookui_legion = require "widgets/cookbookui_legion"
 
-local function CanBuff(inst)
-    return inst.components.debuffable ~= nil and inst.components.debuffable:IsEnabled() and
-        not (inst.components.health ~= nil and inst.components.health:IsDead()) and
-        not inst:HasTag("playerghost")
-end
-
 ------
 
 local function OnIgniteFn(inst)
@@ -207,8 +201,7 @@ local foods_legion = {
                             ent.components.sanity:DoDelta(-30)
                         end
                         sanitycount = sanitycount + 1
-
-                        ent.components.debuffable:AddDebuff("debuff_panicvolcano", "debuff_panicvolcano")
+                        ent:AddDebuff("debuff_panicvolcano", "debuff_panicvolcano")
                     end
                 end
             end
@@ -542,10 +535,8 @@ local foods_legion = {
         prefabs = { "buff_batdisguise" },
         oneat_desc = STRINGS.UI.COOKBOOK.DISH_NEWORLEANSWINGS,
         oneatenfn = function(inst, eater)
-            if CanBuff(eater) then
-                eater.time_l_batdisguise = { replace_min = TUNING.SEG_TIME*8 }
-                eater.components.debuffable:AddDebuff("buff_batdisguise", "buff_batdisguise")
-            end
+            eater.time_l_batdisguise = { replace_min = TUNING.SEG_TIME*8 }
+            eater:AddDebuff("buff_batdisguise", "buff_batdisguise")
         end,
     },
 
@@ -674,11 +665,9 @@ local foods_legion = {
                 end
 
                 --加强攻击力
-                if CanBuff(eater) then
-                    if eater.components.combat ~= nil then --这个buff需要攻击组件
-                        eater.time_l_strengthenhancer = { replace_min = TUNING.SEG_TIME*16 }
-                        eater.components.debuffable:AddDebuff("buff_strengthenhancer", "buff_strengthenhancer")
-                    end
+                if eater.components.combat ~= nil then --这个buff需要攻击组件
+                    eater.time_l_strengthenhancer = { replace_min = TUNING.SEG_TIME*16 }
+                    eater:AddDebuff("buff_strengthenhancer", "buff_strengthenhancer")
                 end
 
                 local drunkmap = {
@@ -705,15 +694,14 @@ local foods_legion = {
                         eater.groggy_time = nil
                     end
                     if eater.components.locomotor ~= nil then
-                        eater:AddTag("groggy")  --添加标签，走路会摇摇晃晃
-                        eater.components.locomotor:SetExternalSpeedMultiplier(eater, "grogginess", 0.4)
-
-                        eater.groggy_time = eater:DoTaskInTime(20+math.random()*8, function()
-                            if eater ~= nil and eater.components.locomotor ~= nil then
-                                eater:RemoveTag("groggy")
-                                eater.components.locomotor:RemoveExternalSpeedMultiplier(eater, "grogginess")
-                                eater.groggy_time = nil
+                        eater:AddTag("groggy") --添加标签，走路会摇摇晃晃
+                        eater.components.locomotor:SetExternalSpeedMultiplier(eater, "dish_medicinalliquor", 0.4)
+                        eater.groggy_time = eater:DoTaskInTime(20+math.random()*8, function(eater)
+                            if eater.components.locomotor ~= nil then
+                                eater.components.locomotor:RemoveExternalSpeedMultiplier(eater, "dish_medicinalliquor")
                             end
+                            eater:RemoveTag("groggy")
+                            eater.groggy_time = nil
                         end)
                     end
                 end
@@ -751,10 +739,8 @@ local foods_legion = {
         oneat_desc = STRINGS.UI.COOKBOOK.DISH_BANANAMOUSSE,
         oneatenfn = function(inst, eater)
             if eater:HasTag("player") then
-                if CanBuff(eater) then
-                    eater.time_l_bestappetite = { replace_min = TUNING.SEG_TIME*2 }
-                    eater.components.debuffable:AddDebuff("buff_bestappetite", "buff_bestappetite")
-                end
+                eater.time_l_bestappetite = { replace_min = TUNING.SEG_TIME*2 }
+                eater:AddDebuff("buff_bestappetite", "buff_bestappetite")
             end
         end,
     },
@@ -781,9 +767,9 @@ local foods_legion = {
         prefabs = { "buff_oilflow" },
         oneat_desc = STRINGS.UI.COOKBOOK.DISH_FRIEDFISHWITHPUREE,
         oneatenfn = function(inst, eater)
-            if CanBuff(eater) and eater.components.hunger ~= nil then
+            if eater.components.hunger ~= nil then
                 eater.time_l_oilflow = { replace_min = TUNING.SEG_TIME*16 }
-                eater.components.debuffable:AddDebuff("buff_oilflow", "buff_oilflow")
+                eater:AddDebuff("buff_oilflow", "buff_oilflow")
             end
         end,
     },
@@ -966,11 +952,9 @@ if CONFIGS_LEGION.PRAYFORRAIN then
         prefabs = { "buff_hungerretarder" },
         oneat_desc = STRINGS.UI.COOKBOOK.DISH_RICEDUMPLING,
         oneatenfn = function(inst, eater)   --食用后3分钟内饥饿下降大大减慢
-            if CanBuff(eater) then
-                if eater.components.hunger ~= nil then --这个buff需要有饥饿值组件
-                    eater.time_l_hungerretarder = { replace_min = TUNING.SEG_TIME*6 }
-                    eater.components.debuffable:AddDebuff("buff_hungerretarder", "buff_hungerretarder")
-                end
+            if eater.components.hunger ~= nil then --这个buff需要有饥饿值组件
+                eater.time_l_hungerretarder = { replace_min = TUNING.SEG_TIME*6 }
+                eater:AddDebuff("buff_hungerretarder", "buff_hungerretarder")
             end
         end,
     }
@@ -1042,10 +1026,8 @@ if TUNING.LEGION_FLASHANDCRUSH then
         prefabs = { "buff_sporeresistance" },
         oneat_desc = STRINGS.UI.COOKBOOK.DISH_WRAPPEDSHRIMPPASTE,
         oneatenfn = function(inst, eater)
-            if CanBuff(eater) then
-                eater.time_l_sporeresistance = { add = TUNING.SEG_TIME*24, max = TUNING.SEG_TIME*30 }
-                eater.components.debuffable:AddDebuff("buff_sporeresistance", "buff_sporeresistance")
-            end
+            eater.time_l_sporeresistance = { add = TUNING.SEG_TIME*24, max = TUNING.SEG_TIME*30 }
+            eater:AddDebuff("buff_sporeresistance", "buff_sporeresistance")
         end,
     }
 end
@@ -1074,10 +1056,8 @@ if TUNING.LEGION_DESERTSECRET then
         prefabs = { "buff_healthstorage" },
         oneat_desc = STRINGS.UI.COOKBOOK.DISH_SHYERRYJAM,
         oneatenfn = function(inst, eater)   --食用后获得优化的加血buff
-            if CanBuff(eater) then
-                eater.buff_healthstorage_times = 50 --因为buff相关组件不支持相同buff叠加时的数据传输，所以这里自己定义了一个传输方式
-                eater.components.debuffable:AddDebuff("buff_healthstorage", "buff_healthstorage")
-            end
+            eater.buff_healthstorage_times = 50 --因为buff相关组件不支持相同buff叠加时的数据传输，所以这里自己定义了一个传输方式
+            eater:AddDebuff("buff_healthstorage", "buff_healthstorage")
         end,
     }
 end

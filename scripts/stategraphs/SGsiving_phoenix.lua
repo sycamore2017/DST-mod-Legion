@@ -385,28 +385,6 @@ local states = {
             end
         end,
     },
-
-    State{
-        name = "stunned",
-        tags = {"busy"},
-
-        onenter = function(inst)
-            inst.Physics:Stop()
-            inst.AnimState:PlayAnimation("stunned_loop", true)
-            inst.sg:SetTimeout(GetRandomWithVariance(6, 2) )
-            if inst.components.inventoryitem then
-                inst.components.inventoryitem.canbepickedup = true
-            end
-        end,
-
-        onexit = function(inst)
-            if inst.components.inventoryitem then
-                inst.components.inventoryitem.canbepickedup = false
-            end
-        end,
-
-        ontimeout = function(inst) inst.sg:GoToState("flyaway") end,
-    },
 }
 
 CommonStates.AddCombatStates(states,

@@ -125,17 +125,11 @@ local function onattack(inst, owner, target)
             inst.attackTrigger = inst.attackTrigger + 1
 
             if inst.attackTrigger >= 10 then   --如果达到10，添加buff
-                if owner.components.debuffable ~= nil and owner.components.debuffable:IsEnabled() and
-                    not (owner.components.health ~= nil and owner.components.health:IsDead()) and
-                    not owner:HasTag("playerghost")
-                then
-                    local skin = inst.components.skinedlegion:GetSkinedData()
-                    if skin ~= nil then
-                        owner.butterfly_skin_l = skin.butterfly
-                    end
-
-                    owner.components.debuffable:AddDebuff("buff_butterflysblessing", "buff_butterflysblessing")
+                local skin = inst.components.skinedlegion:GetSkinedData()
+                if skin ~= nil then
+                    owner.butterfly_skin_l = skin.butterfly
                 end
+                owner:AddDebuff("buff_butterflysblessing", "buff_butterflysblessing")
                 inst.attackTrigger = 0
             end
         end

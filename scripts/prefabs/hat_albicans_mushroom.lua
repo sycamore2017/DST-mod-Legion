@@ -63,12 +63,8 @@ local function ReleaseSporesEffect(inst, owner)
     for i, ent in pairs(ents) do
         if ent ~= nil and ent:IsValid() and ent.entity:IsVisible() then
             if ent:HasTag("player") then
-                if (ent.components.debuffable ~= nil and ent.components.debuffable:IsEnabled()) and
-                    not (ent.components.health ~= nil and ent.components.health:IsDead())
-                then
-                    ent.time_l_sporeresistance = { add = TUNING.SEG_TIME*6, max = TUNING.SEG_TIME*30 }
-                    ent.components.debuffable:AddDebuff("buff_sporeresistance", "buff_sporeresistance")
-                end
+                ent.time_l_sporeresistance = { add = TUNING.SEG_TIME*6, max = TUNING.SEG_TIME*30 }
+                ent:AddDebuff("buff_sporeresistance", "buff_sporeresistance")
             elseif ent.prefab == "mushroom_light2" then
                 if ent.components.container ~= nil then
                     local numitems = ent.components.container:NumItems()

@@ -418,6 +418,10 @@ local function InitBird(inst, bird)
     bird.components.knownlocations:RememberLocation("tree", inst:GetPosition(), false)
     bird.persists = false --由神木来控制保存机制
 
+    local birdpos = bird:GetPosition()
+    birdpos.y = 0 --此时可能在飞，所以得强行改成0
+    bird.components.knownlocations:RememberLocation("spawnpoint", birdpos, false) --由于可能会被打包走，所以得重新设置
+
     inst:ListenForEvent("death", inst.fn_onBirdDead, bird)
     inst:ListenForEvent("onremove", inst.fn_onBirdDead, bird)
 end
@@ -839,7 +843,6 @@ table.insert(prefs, Prefab(
                 local bird = SpawnPrefab(egg.ismale and "siving_moenix" or "siving_foenix")
                 if bird ~= nil then
                     bird.Transform:SetPosition(egg.Transform:GetWorldPosition())
-                    bird.components.knownlocations:RememberLocation("spawnpoint", egg:GetPosition(), true)
                     InitBird(inst, bird)
                     bird:fn_onGrief(inst, true)
                 end

@@ -657,7 +657,7 @@ S______WAXWELL.DESCRIBE.DISH_RICEDUMPLING = "看到这东西我的胃就不舒�
 --S_______WINONA.DESCRIBE.DISH_RICEDUMPLING = "Great to cool off after some hard physical labor."
 
 S_NAMES.DISH_DURIANTARTARE = "怪味鞑靼"
-STRINGS.UI.COOKBOOK.DISH_DURIANTARTARE = "非常合怪物们的口味与其残暴的心里"
+STRINGS.UI.COOKBOOK.DISH_DURIANTARTARE = "非常合怪物们的口味与其残暴心理"
 S______GENERIC.DESCRIBE.DISH_DURIANTARTARE = "野蛮，血腥，难以下咽。"
 S_______WILLOW.DESCRIBE.DISH_DURIANTARTARE = "就不能拿火烤烤这坨肉？"
 --S_____WOLFGANG.DESCRIBE.DISH_DURIANTARTARE = "Wolfgang can eat in one bite!"

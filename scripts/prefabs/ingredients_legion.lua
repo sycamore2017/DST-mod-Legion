@@ -84,12 +84,8 @@ if TUNING.LEGION_DESERTSECRET then
             end,
             fn_server = function(inst)
                 inst.components.edible:SetOnEatenFn(function(food, eater)
-                    if eater.components.debuffable ~= nil and eater.components.debuffable:IsEnabled() and
-                        not (eater.components.health ~= nil and eater.components.health:IsDead()) and
-                        not eater:HasTag("playerghost") then
-                        eater.buff_healthstorage_times = 20 --因为buff相关组件不支持相同buff叠加时的数据传输，所以这里自己定义了一个传输方式
-                        eater.components.debuffable:AddDebuff("buff_healthstorage", "buff_healthstorage")
-                    end
+                    eater.buff_healthstorage_times = 20 --因为buff相关组件不支持相同buff叠加时的数据传输，所以这里自己定义了一个传输方式
+                    eater:AddDebuff("buff_healthstorage", "buff_healthstorage")
                 end)
 
                 inst:AddComponent("deployable")

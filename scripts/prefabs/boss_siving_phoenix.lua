@@ -21,6 +21,13 @@ local DIST_MATE = 13 --离伴侣的最远距离
 local DIST_REMOTE = 20 --最大活动范围
 local DIST_ATK = 4 --普通攻击范围
 
+local TIME_BUFF_WARBLE = 6
+
+local ATK_NORMAL = 20 --啄击攻击力
+local ATK_GRIEF = 10 --悲愤状态额外攻击力
+
+local TAGS_CANT = {"NOCLICK", "shadow", "playerghost", "ghost", "INLIMBO", "wall", "structure", "balloon", "siving"}
+
 local function IsValid(one)
     return one:IsValid() and
         one.components.health ~= nil and not one.components.health:IsDead()
@@ -33,6 +40,89 @@ local function CheckMate(inst)
         end
     else
         inst.iswarrior = true
+    end
+end
+local function GetDamage(inst, target, basedamage)
+    if inst.isgrief then
+        basedamage = basedamage + ATK_GRIEF
+    end
+    if target:HasTag("player") then
+        return basedamage
+    else
+        return basedamage*3
+    end
+end
+local function DoDefenselessATK(inst, target, basedamage)
+    target.components.health:DoDelta(
+        -GetDamage(inst, target, basedamage), nil, (inst.nameoverride or inst.prefab), true, inst, true)
+end
+
+local function MagicWarble(inst) --魔音绕梁
+    local x, y, z = inst.Transform:GetWorldPosition()
+    local ents = TheSim:FindEntities(x, 0, z, DIST_REMOTE, { "_combat", "_inventory" }, { "INLIMBO", "siving", "l_noears" })
+    for _, v in ipairs(ents) do
+        if
+            (v.components.health == nil or not v.components.health:IsDead()) and
+            v.components.inventory ~= nil and
+            v.components.locomotor ~= nil
+        then
+            local hat = v.components.inventory:GetEquippedItem(EQUIPSLOTS.HEAD)
+            v.components.inventory:DropEquipped(false)
+
+            --装备了兔耳罩就能避免后续的debuff
+            if hat ~= nil and (hat.prefab == "earmuffshat" or hat.protect_l_magicwarble) then
+                return
+            end
+
+            v.time_l_magicwarble = { replace_min = TIME_BUFF_WARBLE }
+            v:AddDebuff("debuff_magicwarble", "debuff_magicwarble")
+
+            if inst.isgrief then --悲愤状态：附加睡醒的移速缓慢状态
+                if v.task_groggy_warble ~= nil then
+                    v.task_groggy_warble:Cancel()
+                end
+                v:AddTag("groggy") --添加标签，走路会摇摇晃晃
+                v.components.locomotor:SetExternalSpeedMultiplier(v, "magicwarble", 0.4)
+                v.task_groggy_warble = v:DoTaskInTime(TIME_BUFF_WARBLE, function(v)
+                    if v.components.locomotor ~= nil then
+                        v.components.locomotor:RemoveExternalSpeedMultiplier(v, "magicwarble")
+                    end
+                    v:RemoveTag("groggy")
+                    v.task_groggy_warble = nil
+                end)
+            end
+        end
+    end
+end
+local function DiscerningPeck(inst, target) --啄击（因为替换了官方的普攻逻辑，所以整体得模仿官方的普攻逻辑）
+    if target == nil then
+        target = inst.components.combat.target
+    end
+    if
+        target ~= nil and
+        target.components.health ~= nil and not target.components.health:IsDead() and
+        inst.components.combat:CanHitTarget(target, nil) --计算距离和有效性
+    then
+        DoDefenselessATK(inst, target, ATK_NORMAL)
+        inst:PushEvent("onattackother", { target = target, weapon = nil, projectile = nil, stimuli = nil })
+        inst.components.combat.lastdoattacktime = GetTime()
+    else
+        inst:PushEvent("onmissother", { target = target, weapon = nil })
+    end
+    inst.components.combat:ClearAttackTemps()
+end
+local function ReleaseFlowers(inst) --寄生花
+    local x, y, z = inst.Transform:GetWorldPosition()
+    local ents = TheSim:FindEntities(x, 0, z, DIST_REMOTE, { "_combat", "_health" }, TAGS_CANT)
+    local numflowers = math.ceil(#ents / 3)
+    if numflowers > 0 then
+        for _, v in ipairs(ents) do
+            if
+                v.components.health ~= nil and not v.components.health:IsDead()
+            then
+                
+            end
+        end
     end
 end
 
@@ -86,6 +176,7 @@ local function MakeBoss(data)
             inst.fn_onGrief = function(inst, tree, doroar)
                 inst.isgrief = true
                 inst.AnimState:OverrideSymbol("buzzard_eye", data.name, "buzzard_angryeye")
+                inst.components.combat:SetDefaultDamage(ATK_NORMAL+ATK_GRIEF)
                 if doroar then
                     inst:PushEvent("doroar")
                 end
@@ -100,6 +191,10 @@ local function MakeBoss(data)
                 end
             end
 
+            inst.fn_magicWarble = MagicWarble
+            inst.fn_discerningPeck = DiscerningPeck
+            inst.fn_releaseFlowers = ReleaseFlowers
+
             inst:AddComponent("locomotor") --locomotor must be constructed before the stategraph
             inst.components.locomotor.walkspeed = 4
             inst.components.locomotor.runspeed = 8
@@ -112,7 +207,7 @@ local function MakeBoss(data)
             inst.components.health.destroytime = 3
 
             inst:AddComponent("combat")
-            inst.components.combat:SetDefaultDamage(20)
+            inst.components.combat:SetDefaultDamage(ATK_NORMAL)
             -- inst.components.combat.playerdamagepercent = 0.5
             inst.components.combat.hiteffectsymbol = "buzzard_body"
             inst.components.combat.battlecryenabled = false
@@ -287,7 +382,9 @@ local function MakeBoss(data)
             Asset("ANIM", "anim/buzzard_basic.zip"), --官方秃鹫动画模板
             Asset("ANIM", "anim/"..data.name..".zip"),
         },
-        {}
+        {
+            "debuff_magicwarble"
+        }
     ))
 end
 
@@ -685,7 +782,7 @@ local function OnTimerDone_egg(inst, data)
             local bird = SpawnPrefab(inst.ismale and "siving_moenix" or "siving_foenix")
             if bird ~= nil then
                 bird.Transform:SetPosition(inst.Transform:GetWorldPosition())
-                bird.components.knownlocations:RememberLocation("spawnpoint", inst:GetPosition(), true)
+                bird.components.knownlocations:RememberLocation("spawnpoint", inst:GetPosition(), false)
             end
         else --BOSS战的玄鸟由神木在管理
             inst.ishatched = true

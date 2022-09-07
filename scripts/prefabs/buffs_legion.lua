@@ -712,6 +712,42 @@ MakeBuff({
     fn_server = nil,
 })
 
+--------------------------------------------------------------------------
+--[[ 魔音绕耳：不断卸下装备 ]]
+--------------------------------------------------------------------------
+
+MakeBuff({
+    name = "debuff_magicwarble",
+    assets = nil,
+    prefabs = nil,
+    time_key = "time_l_magicwarble",
+    time_default = TUNING.SEG_TIME, --0.5分钟
+    notimer = nil,
+    fn_start = function(buff, target)
+        if target.task_l_magicwarble ~= nil then
+            target.task_l_magicwarble:Cancel()
+            target.task_l_magicwarble = nil
+        end
+        if target.components.inventory ~= nil then
+            target.task_l_magicwarble = target:DoPeriodicTask(0.9, function(v)
+                if v.components.inventory ~= nil then
+                    if v.components.health == nil or not v.components.health:IsDead() then
+                        v.components.inventory:DropEquipped(false)
+                    end
+                end
+            end, 1)
+        end
+    end,
+    fn_again = nil,
+    fn_end = function(buff, target)
+        if target.task_l_magicwarble ~= nil then
+            target.task_l_magicwarble:Cancel()
+            target.task_l_magicwarble = nil
+        end
+    end,
+    fn_server = nil,
+})
+
 --------------------
 --------------------
 
