@@ -56,6 +56,13 @@ local function DoDefenselessATK(inst, target, basedamage)
     target.components.health:DoDelta(
         -GetDamage(inst, target, basedamage), nil, (inst.nameoverride or inst.prefab), true, inst, true)
 end
+local function SpawnFlower(inst, target)
+    local flower = SpawnPrefab("siving_boss_flowerfx")
+    if flower ~= nil then
+        flower.Transform:SetPosition(target.Transform:GetWorldPosition())
+        flower:fn_onBind(inst, target)
+    end
+end
 
 local function MagicWarble(inst) --魔音绕梁
     local x, y, z = inst.Transform:GetWorldPosition()
@@ -111,17 +118,40 @@ local function DiscerningPeck(inst, target) --啄击（因为替换了官方的�
     end
     inst.components.combat:ClearAttackTemps()
 end
-local function ReleaseFlowers(inst) --寄生花
+local function ReleaseFlowers(inst) --花寄语
     local x, y, z = inst.Transform:GetWorldPosition()
     local ents = TheSim:FindEntities(x, 0, z, DIST_REMOTE, { "_combat", "_health" }, TAGS_CANT)
-    local numflowers = math.ceil(#ents / 3)
-    if numflowers > 0 then
+
+    if inst.isgrief then --悲愤状态的话，所有对象都寄生
         for _, v in ipairs(ents) do
             if
                 v.components.health ~= nil and not v.components.health:IsDead()
             then
-                
+                if v.components.inventory == nil or not v.components.inventory:EquipHasTag("siv_BFF") then
+                    SpawnFlower(inst, v)
+                end
             end
+        end
+        return
+    end
+
+    local count = 0
+    local groupget = false
+    for _, v in ipairs(ents) do
+        count = count + 1
+        if
+            not groupget and
+            v.components.health ~= nil and not v.components.health:IsDead() and
+            (count >= 3 or math.random() < 0.33)
+        then
+            if v.components.inventory == nil or not v.components.inventory:EquipHasTag("siv_BFF") then
+                groupget = true
+                SpawnFlower(inst, v)
+            end
+        end
+        if count >= 3 then
+            count = 0
+            groupget = false
         end
     end
 end
@@ -383,7 +413,8 @@ local function MakeBoss(data)
             Asset("ANIM", "anim/"..data.name..".zip"),
         },
         {
-            "debuff_magicwarble"
+            "debuff_magicwarble",
+            "siving_boss_flowerfx"
         }
     ))
 end
@@ -861,6 +892,112 @@ table.insert(prefs, Prefab(
     end,
     {
         Asset("ANIM", "anim/siving_egg.zip")
+    },
+    {
+        "siving_foenix",
+        "siving_moenix"
+    }
+))
+
+--------------------------------------------------------------------------
+--[[ 子圭寄生花 ]]
+--------------------------------------------------------------------------
+
+table.insert(prefs, Prefab( --特效
+    "siving_boss_flowerfx",
+    function()
+        local inst = CreateEntity()
+
+        inst.entity:AddTransform()
+        inst.entity:AddFollower()
+        inst.entity:AddAnimState()
+        inst.entity:AddNetwork()
+
+        inst:AddTag("NOCLICK")
+        inst:AddTag("FX")
+
+        inst.AnimState:SetBank("siving_boss_flower")
+        inst.AnimState:SetBuild("siving_boss_flower")
+        inst.AnimState:PlayAnimation("idle1", true)
+        inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
+        inst.AnimState:SetFinalOffset(3)
+
+        inst.entity:SetPristine()
+        if not TheWorld.ismastersim then
+            return inst
+        end
+
+        inst.persists = false
+        inst.bird = nil
+        inst.target = nil
+        inst.countHealth = 0
+        inst.state = 1
+
+        inst.fn_onBloom = function(target) --落地
+            inst:RemoveEventCallback("death", inst.fn_onBloom, target)
+            inst:RemoveEventCallback("onremove", inst.fn_onBloom, target)
+
+            if inst.task_bind ~= nil then
+                inst.task_bind:Cancel()
+                inst.task_bind = nil
+            end
+        end
+        inst.fn_onBind = function(inst, bird, target) --寄生
+            inst.bird = bird
+            inst.target = target
+            inst.entity:SetParent(target.entity)
+
+            --获取能跟随的symbol
+            local symbol = target.components.combat and target.components.combat.hiteffectsymbol or nil
+            if symbol == nil then
+                if target.components.freezable ~= nil then
+                    for _, v in pairs(target.components.freezable.fxdata) do
+                        if v.follow ~= nil then
+                            symbol = v.follow
+                            break
+                        end
+                    end
+                end
+                if symbol == nil then
+                    if target.components.burnable ~= nil then
+                        for _, v in pairs(target.components.burnable.fxdata) do
+                            if v.follow ~= nil then
+                                symbol = v.follow
+                                break
+                            end
+                        end
+                    end
+                end
+            end
+            if symbol ~= nil then
+                inst.Follower:FollowSymbol(target.GUID, symbol, 0, 0, 0)
+            end
+
+            inst:ListenForEvent("death", inst.fn_onBloom, target)
+            inst:ListenForEvent("onremove", inst.fn_onBloom, target)
+
+            inst.task_bind = inst:DoPeriodicTask(2, function(inst)
+                if IsValid(inst.target) then
+                    inst.target.components.health:DoDelta(-4, true, inst.prefab, false, inst, true)
+                    inst.countHealth = inst.countHealth + 4
+                    if inst.target.components.health:IsDead() then
+                        
+                    end
+                else
+                    inst.fn_onBloom(inst.target)
+                end
+            end, 2)
+        end
+
+        inst:AddComponent("timer")
+        inst.components.timer:StartTimer("state1", TIME_EGG*0.3)
+
+        inst:ListenForEvent("timerdone", OnTimerDone_egg)
+
+        return inst
+    end,
+    {
+        Asset("ANIM", "anim/siving_boss_flower.zip")
     },
     {
         "siving_foenix",

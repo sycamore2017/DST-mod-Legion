@@ -222,6 +222,7 @@ if CONFIGS_LEGION.FLOWERSPOWER then
         },
         fn_common = function(inst)
             inst:AddTag("deployedplant")
+            inst:AddTag("treeseed") --能使其放入种子袋
         end,
         fn_server = nil,
     }
@@ -242,6 +243,7 @@ if CONFIGS_LEGION.FLOWERSPOWER then
         },
         fn_common = function(inst)
             inst:AddTag("deployedplant")
+            inst:AddTag("treeseed") --能使其放入种子袋
         end,
         fn_server = nil,
     }
@@ -261,6 +263,7 @@ if CONFIGS_LEGION.FLOWERSPOWER then
         },
         fn_common = function(inst)
             inst:AddTag("deployedplant")
+            inst:AddTag("treeseed") --能使其放入种子袋
         end,
         fn_server = nil
     }
@@ -342,6 +345,7 @@ if CONFIGS_LEGION.LEGENDOFFALL then
             },
             fn_common = function(inst)
                 inst:AddTag("deployedplant")
+                inst:AddTag("treeseed") --能使其放入种子袋
                 -- inst.overridedeployplacername = seedsprefab.."_placer" --这个可以让placer换成另一个
 
                 inst.displaynamefn = function(inst)
