@@ -2441,6 +2441,25 @@ S________WANDA.DESCRIBE.SIVING_PHOENIX = {
     GRIEF = "It fell into grief and indignation, as always."
 }
 
+S_NAMES.SIVING_BOSS_FLOWER = "Siving Petalsite" --子圭寄生花
+S______GENERIC.DESCRIBE.SIVING_BOSS_FLOWER = "It grew out of my head. So terrible."
+S_______WILLOW.DESCRIBE.SIVING_BOSS_FLOWER = "I'm angry and going to tear it up!"
+-- S_____WOLFGANG.DESCRIBE.SIVING_BOSS_FLOWER = ""
+S________WENDY.DESCRIBE.SIVING_BOSS_FLOWER = "It thrives in silent killing."
+S_________WX78.DESCRIBE.SIVING_BOSS_FLOWER = "THE IRONMAN IN BLOSSOM."
+S_WICKERBOTTOM.DESCRIBE.SIVING_BOSS_FLOWER = "Note that this flower will heal the bird."
+S_______WOODIE.DESCRIBE.SIVING_BOSS_FLOWER = "Lucy told me to destroy it quickly."
+S______WAXWELL.DESCRIBE.SIVING_BOSS_FLOWER = "Neet... Hah... I can tell cold jokes too."
+S___WATHGRITHR.DESCRIBE.SIVING_BOSS_FLOWER = "My life is like endless fighting spirit. I don't need such tricks."
+S_______WEBBER.DESCRIBE.SIVING_BOSS_FLOWER = "The watermelon seeds I ate grew out of my head."
+-- S_______WINONA.DESCRIBE.SIVING_BOSS_FLOWER = ""
+S_______WORTOX.DESCRIBE.SIVING_BOSS_FLOWER = "Bleeding therapy can't cure my soul."
+S_____WORMWOOD.DESCRIBE.SIVING_BOSS_FLOWER = "A bad guy."
+S________WARLY.DESCRIBE.SIVING_BOSS_FLOWER = "It made me very weak, but my appetite increased greatly."
+S_________WURT.DESCRIBE.SIVING_BOSS_FLOWER = "Parasite, no, smelly petalsite!"
+S_______WALTER.DESCRIBE.SIVING_BOSS_FLOWER = "If only the injury could be so painless."
+S________WANDA.DESCRIBE.SIVING_BOSS_FLOWER = "My time isn't the water in the sponge for you to squeeze!"
+
 --------------------------------------------------------------------------
 --[[ flash and crush ]]--[[ 电闪雷鸣 ]]
 --------------------------------------------------------------------------

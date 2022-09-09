@@ -456,7 +456,11 @@ local function DropRock(inst)
     DropItem_legion("siving_rocks", x, y+13, z, 1.5, 18, 15*FRAMES, nil, nil, nil)
 end
 local function CallBirdFarAway(bird, x, z)
-    if bird:GetDistanceSqToPoint(x, 0, z) >= 625 and not bird.sg:HasStateTag("takeoff") then
+    if
+        not bird.iseye and
+        not bird.sg:HasStateTag("flight") and
+        bird:GetDistanceSqToPoint(x, 0, z) >= 625
+    then
         local spawnpos = bird.components.knownlocations:GetLocation("spawnpoint")
         if spawnpos ~= nil then
             x = spawnpos.x
@@ -799,6 +803,7 @@ table.insert(prefs, Prefab(
         inst.taskLifeExtract = nil
         inst.bossBirds = nil
         inst.bossEgg = nil
+        inst.myEye = nil --正在同目同心的玄鸟
         inst.rebirthed = false --玄鸟是否已经重生过了
         inst.tradeditems = nil --已给予的物品
 

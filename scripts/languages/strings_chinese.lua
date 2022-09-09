@@ -2534,6 +2534,25 @@ S________WANDA.DESCRIBE.SIVING_PHOENIX = {
     GRIEF = "它不爽了，一如既往。"
 }
 
+S_NAMES.SIVING_BOSS_FLOWER = "子圭寄生花"
+S______GENERIC.DESCRIBE.SIVING_BOSS_FLOWER = "从我头顶长出来的，太可怕了。"
+S_______WILLOW.DESCRIBE.SIVING_BOSS_FLOWER = "我生气了，我要撕碎这东西。"
+-- S_____WOLFGANG.DESCRIBE.SIVING_BOSS_FLOWER = ""
+S________WENDY.DESCRIBE.SIVING_BOSS_FLOWER = "于悄无声息的杀戮中盛放。"
+S_________WX78.DESCRIBE.SIVING_BOSS_FLOWER = "铁树开花。"
+S_WICKERBOTTOM.DESCRIBE.SIVING_BOSS_FLOWER = "这花朵将我的生命大量抽离，用以滋养子圭玄鸟。"
+S_______WOODIE.DESCRIBE.SIVING_BOSS_FLOWER = "露西告诉我，得赶紧打烂它。"
+S______WAXWELL.DESCRIBE.SIVING_BOSS_FLOWER = "啃老花...哈...我也是会讲冷笑话的。"
+S___WATHGRITHR.DESCRIBE.SIVING_BOSS_FLOWER = "我的生命亦如斗志无穷无尽，不需要这种伎俩。"
+S_______WEBBER.DESCRIBE.SIVING_BOSS_FLOWER = "吃下去的西瓜子从我头上长出来了。"
+-- S_______WINONA.DESCRIBE.SIVING_BOSS_FLOWER = ""
+S_______WORTOX.DESCRIBE.SIVING_BOSS_FLOWER = "吸血疗法可治不好我的灵魂。"
+S_____WORMWOOD.DESCRIBE.SIVING_BOSS_FLOWER = "偷树汁的坏蛋。"
+S________WARLY.DESCRIBE.SIVING_BOSS_FLOWER = "它从我头顶掉下来，然后我就非常虚弱，但食欲大增。"
+S_________WURT.DESCRIBE.SIVING_BOSS_FLOWER = "寄生虫，不，寄生臭花！"
+S_______WALTER.DESCRIBE.SIVING_BOSS_FLOWER = "如果受伤都能这么无痛就好了。"
+S________WANDA.DESCRIBE.SIVING_BOSS_FLOWER = "我的时间可不是海绵里的水让你随便挤。"
+
 --------------------------------------------------------------------------
 --[[ flash and crush ]]--[[ 电闪雷鸣 ]]
 --------------------------------------------------------------------------

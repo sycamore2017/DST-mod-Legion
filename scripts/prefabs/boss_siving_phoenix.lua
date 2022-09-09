@@ -155,6 +155,27 @@ local function ReleaseFlowers(inst) --花寄语
         end
     end
 end
+local function BeTreeEye(inst) --同目同心
+    if inst.tree == nil or not inst.tree:IsValid() then
+        return false
+    end
+
+    local tree = inst.tree
+    inst.brain:Stop()
+    inst:Hide()
+    inst:AddTag("invisible")
+    inst:AddTag("notarget")
+    inst.iseye = true
+    tree.myEye = inst
+
+    local pos = tree:GetPosition()
+    pos.y = 30
+    inst.Transform:SetPosition(pos:Get())
+
+    --产生一个木之眼
+
+    return true
+end
 
 local function MakeBoss(data)
     table.insert(prefs, Prefab(
@@ -203,6 +224,7 @@ local function MakeBoss(data)
             inst.mate = nil --另一个伴侣
             inst.iswarrior = true --BOSS站位（两个BOSS会在近战模式和护卫模式之间轮换占位）
             inst.isgrief = false --是否处于悲愤状态
+            inst.iseye = false --是否是木之眼状态
             inst.fn_onGrief = function(inst, tree, doroar)
                 inst.isgrief = true
                 inst.AnimState:OverrideSymbol("buzzard_eye", data.name, "buzzard_angryeye")
@@ -224,6 +246,7 @@ local function MakeBoss(data)
             inst.fn_magicWarble = MagicWarble
             inst.fn_discerningPeck = DiscerningPeck
             inst.fn_releaseFlowers = ReleaseFlowers
+            inst.fn_beTreeEye = BeTreeEye
 
             inst:AddComponent("locomotor") --locomotor must be constructed before the stategraph
             inst.components.locomotor.walkspeed = 4
@@ -835,6 +858,7 @@ table.insert(prefs, Prefab(
         MakeObstaclePhysics(inst, 0.7)
 
         inst:AddTag("hostile")
+        inst:AddTag("siving")
 
         inst.AnimState:SetBank("siving_egg")
         inst.AnimState:SetBuild("siving_egg")
@@ -903,6 +927,52 @@ table.insert(prefs, Prefab(
 --[[ 子圭寄生花 ]]
 --------------------------------------------------------------------------
 
+local HEALTH_FLOWER = 480
+local TIME_FLOWER = 9 --治疗玄鸟的延迟时间
+
+local function SetFlowerState(inst, value, pushanim)
+    local name = nil
+    if value <= HEALTH_FLOWER*0.33 then
+        if inst.state ~= 1 then
+            inst.state = 1
+            name = "idle1"
+            pushanim = false --没有to_idle1这个动画
+        end
+    elseif value <= HEALTH_FLOWER*0.66 then
+        if inst.state ~= 2 then
+            inst.state = 2
+            name = "idle2"
+        end
+    else
+        if inst.state ~= 3 then
+            inst.state = 3
+            name = "idle3"
+        end
+    end
+    if name ~= nil then
+        if pushanim then
+            inst.AnimState:PlayAnimation("to_"..name)
+            inst.AnimState:PushAnimation(name, true)
+        else
+            inst.AnimState:PlayAnimation(name, true)
+        end
+    end
+end
+local function GiveLife(target, value)
+    local health = target.components.health
+    if health:IsHurt() then
+        local need = health.maxhealth - health.currenthealth
+        if need >= value then
+            health:DoDelta(value)
+            return 0
+        else
+            health:DoDelta(need)
+            return value-need
+        end
+    end
+    return value
+end
+
 table.insert(prefs, Prefab( --特效
     "siving_boss_flowerfx",
     function()
@@ -928,22 +998,34 @@ table.insert(prefs, Prefab( --特效
         end
 
         inst.persists = false
-        inst.bird = nil
+        inst.tree = nil
         inst.target = nil
         inst.countHealth = 0
         inst.state = 1
 
-        inst.fn_onBloom = function(target) --落地
-            inst:RemoveEventCallback("death", inst.fn_onBloom, target)
-            inst:RemoveEventCallback("onremove", inst.fn_onBloom, target)
+        inst.fn_onUnbind = function(target) --落地
+            inst:RemoveEventCallback("death", inst.fn_onUnbind, target)
+            inst:RemoveEventCallback("onremove", inst.fn_onUnbind, target)
 
             if inst.task_bind ~= nil then
                 inst.task_bind:Cancel()
                 inst.task_bind = nil
             end
+            if inst.countHealth > 0 and inst.tree ~= nil then
+                local flower = SpawnPrefab("siving_boss_flower")
+                if flower ~= nil then
+                    flower.tree = inst.tree
+                    if inst.countHealth < HEALTH_FLOWER then
+                        flower.components.health:SetCurrentHealth(inst.countHealth)
+                    end
+                    SetFlowerState(flower, inst.countHealth, false)
+                    flower.Transform:SetPosition(target.Transform:GetWorldPosition())
+                end
+            end
+            inst:Remove()
         end
         inst.fn_onBind = function(inst, bird, target) --寄生
-            inst.bird = bird
+            inst.tree = bird.tree
             inst.target = target
             inst.entity:SetParent(target.entity)
 
@@ -973,26 +1055,30 @@ table.insert(prefs, Prefab( --特效
                 inst.Follower:FollowSymbol(target.GUID, symbol, 0, 0, 0)
             end
 
-            inst:ListenForEvent("death", inst.fn_onBloom, target)
-            inst:ListenForEvent("onremove", inst.fn_onBloom, target)
+            inst:ListenForEvent("death", inst.fn_onUnbind, target)
+            inst:ListenForEvent("onremove", inst.fn_onUnbind, target)
+
+            if inst._task_re ~= nil then
+                inst._task_re:Cancel()
+                inst._task_re = nil
+            end
 
             inst.task_bind = inst:DoPeriodicTask(2, function(inst)
                 if IsValid(inst.target) then
                     inst.target.components.health:DoDelta(-4, true, inst.prefab, false, inst, true)
-                    inst.countHealth = inst.countHealth + 4
-                    if inst.target.components.health:IsDead() then
-                        
+                    inst.countHealth = inst.countHealth + 40
+
+                    --宿主还没死，并且也没有达到吸血上限，就更新自己的动画
+                    if not inst.target.components.health:IsDead() and inst.countHealth < HEALTH_FLOWER then
+                        SetFlowerState(inst, inst.countHealth, true)
+                        return
                     end
-                else
-                    inst.fn_onBloom(inst.target)
                 end
+                inst.fn_onUnbind(inst.target)
             end, 2)
         end
 
-        inst:AddComponent("timer")
-        inst.components.timer:StartTimer("state1", TIME_EGG*0.3)
-
-        inst:ListenForEvent("timerdone", OnTimerDone_egg)
+        inst._task_re = inst:DoTaskInTime(1, inst.Remove)
 
         return inst
     end,
@@ -1000,9 +1086,107 @@ table.insert(prefs, Prefab( --特效
         Asset("ANIM", "anim/siving_boss_flower.zip")
     },
     {
-        "siving_foenix",
-        "siving_moenix"
+        "siving_boss_flower"
     }
+))
+
+table.insert(prefs, Prefab( --实体
+    "siving_boss_flower",
+    function()
+        local inst = CreateEntity()
+
+        inst.entity:AddTransform()
+        inst.entity:AddAnimState()
+        inst.entity:AddNetwork()
+        inst.entity:AddLight()
+
+        inst:AddTag("hostile")
+        inst:AddTag("siving")
+
+        inst.AnimState:SetBank("siving_boss_flower")
+        inst.AnimState:SetBuild("siving_boss_flower")
+        inst.AnimState:PlayAnimation("idle1", true)
+        inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
+
+        inst.Light:Enable(true)
+        inst.Light:SetRadius(.6)
+        inst.Light:SetFalloff(1)
+        inst.Light:SetIntensity(.5)
+        inst.Light:SetColour(15/255, 180/255, 132/255)
+
+        inst.entity:SetPristine()
+        if not TheWorld.ismastersim then
+            return inst
+        end
+
+        inst.persists = false
+        inst.tree = nil
+        inst.state = 3
+
+        inst:AddComponent("inspectable")
+
+        inst:AddComponent("health")
+        inst.components.health:SetMaxHealth(HEALTH_FLOWER)
+
+        inst:AddComponent("combat")
+
+        inst:ListenForEvent("attacked", function(inst, data)
+            inst.AnimState:PlayAnimation("hit"..tostring(inst.state))
+            inst.AnimState:PlayAnimation("idle"..tostring(inst.state), true)
+        end)
+        inst:ListenForEvent("death", function(inst, data)
+            if inst._task_health ~= nil then
+                inst._task_health:Cancel()
+                inst._task_health = nil
+            end
+            --消失的特效 undo
+        end)
+
+        inst._task_health = inst:DoTaskInTime(TIME_FLOWER, function(inst)
+            if inst.tree ~= nil and inst.tree:IsValid() then
+                local value = inst.components.health.currenthealth
+                local valuelast = 0
+                if inst.tree.bossBirds ~= nil then --优先直接给玄鸟加血(我嫌给神木再转给玄鸟的话太慢了)
+                    local female = inst.tree.bossBirds.female
+                    local male = inst.tree.bossBirds.male
+                    if female ~= nil and not IsValid(female) then
+                        female = nil
+                    end
+                    if male ~= nil and not IsValid(male) then
+                        male = nil
+                    end
+                    if female ~= nil or male ~= nil then
+                        if female ~= nil and male ~= nil then
+                            value = value/2
+                        end
+                        if female ~= nil then
+                            valuelast = valuelast + GiveLife(female, value)
+                        end
+                        if male ~= nil then
+                            valuelast = valuelast + GiveLife(male, value)
+                        end
+                    else
+                        valuelast = value
+                    end
+                else
+                    valuelast = value
+                end
+
+                if valuelast > 0 then --然后才是给神木增加生命计数器
+                    inst.tree.countHealth = inst.tree.countHealth + valuelast
+                end
+            end
+            --消失的特效 undo
+            inst._task_health = nil
+            inst:Remove()
+        end)
+
+        return inst
+    end,
+    {
+        Asset("ANIM", "anim/siving_boss_flower.zip")
+    },
+    nil
 ))
 
 --------------------------------------------------------------------------
