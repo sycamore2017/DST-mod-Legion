@@ -160,21 +160,12 @@ local function BeTreeEye(inst) --同目同心
         return false
     end
 
-    local tree = inst.tree
-    inst.brain:Stop()
-    inst:Hide()
-    inst:AddTag("invisible")
-    inst:AddTag("notarget")
-    inst.iseye = true
-    tree.myEye = inst
-
-    local pos = tree:GetPosition()
-    pos.y = 30
-    inst.Transform:SetPosition(pos:Get())
-
-    --产生一个木之眼
-
-    return true
+    local eye = SpawnPrefab("siving_boss_eye")
+    if eye ~= nil then
+        eye:fn_onBind(inst.tree, inst)
+        return true
+    end
+    return false
 end
 
 local function MakeBoss(data)
@@ -225,6 +216,7 @@ local function MakeBoss(data)
             inst.iswarrior = true --BOSS站位（两个BOSS会在近战模式和护卫模式之间轮换占位）
             inst.isgrief = false --是否处于悲愤状态
             inst.iseye = false --是否是木之眼状态
+            inst.eyefx = nil --木之眼实体
             inst.fn_onGrief = function(inst, tree, doroar)
                 inst.isgrief = true
                 inst.AnimState:OverrideSymbol("buzzard_eye", data.name, "buzzard_angryeye")
@@ -437,7 +429,8 @@ local function MakeBoss(data)
         },
         {
             "debuff_magicwarble",
-            "siving_boss_flowerfx"
+            "siving_boss_flowerfx",
+            "siving_boss_eye"
         }
     ))
 end
@@ -1187,6 +1180,135 @@ table.insert(prefs, Prefab( --实体
         Asset("ANIM", "anim/siving_boss_flower.zip")
     },
     nil
+))
+
+--------------------------------------------------------------------------
+--[[ 子圭之眼 ]]
+--------------------------------------------------------------------------
+
+local TIME_EYE = 9
+local TIME_EYE_GRIEF = 4.5
+local COUNT_EYE = 6
+local COUNT_EYE_GRIEF = 8
+
+table.insert(prefs, Prefab(
+    "siving_boss_eye",
+    function()
+        local inst = CreateEntity()
+
+        inst.entity:AddTransform()
+        inst.entity:AddFollower()
+        inst.entity:AddAnimState()
+        inst.entity:AddNetwork()
+
+        inst:AddTag("NOCLICK")
+        inst:AddTag("FX")
+
+        inst.AnimState:SetBank("siving_boss_eye")
+        inst.AnimState:SetBuild("siving_boss_eye")
+        inst.AnimState:PlayAnimation("bind")
+        inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
+        inst.AnimState:SetFinalOffset(3)
+
+        inst.entity:SetPristine()
+        if not TheWorld.ismastersim then
+            return inst
+        end
+
+        inst.AnimState:PushAnimation("idle", true)
+
+        inst.persists = false
+        inst.tree = nil
+        inst.bird = nil
+
+        inst.fn_onUnbind = function(inst, landpos) --解除
+            if inst.task_eye ~= nil then
+                inst.task_eye:Cancel()
+                inst.task_eye = nil
+            end
+            inst.tree.myEye = nil
+            if IsValid(inst.bird) then
+                inst.AnimState:PlayAnimation("unbind")
+                inst:ListenForEvent("animover", function(inst)
+                    inst.bird.iseye = false
+                    inst.bird.eyefx = nil
+                    inst.bird:RemoveTag("notarget")
+                    inst.bird:Show()
+                    inst.bird.brain:Start()
+                    if landpos == nil then
+                        landpos = inst.bird.components.knownlocations:GetLocation("spawnpoint") or inst.tree:GetPosition()
+                    end
+                    inst.bird.Transform:SetPosition(landpos.x, 30, landpos.z)
+                    inst.bird.sg:GoToState("glide")
+                    inst:Remove()
+                end)
+            else
+                inst:Remove()
+            end
+        end
+        inst.fn_onBind = function(inst, tree, bird) --化作
+            if inst._task_re ~= nil then
+                inst._task_re:Cancel()
+                inst._task_re = nil
+            end
+
+            bird.components.combat:SetTarget(nil)
+            bird.brain:Stop()
+            bird:Hide()
+            bird:AddTag("notarget")
+            bird.iseye = true
+            bird.eyefx = inst
+            tree.myEye = bird
+            inst.tree = tree
+            inst.bird = bird
+
+            local x, y, z = tree.Transform:GetWorldPosition()
+            inst.Transform:SetPosition(x, y, z)
+            bird.Transform:SetPosition(x, 30, z)
+
+            inst.entity:SetParent(tree.entity)
+            inst.Follower:FollowSymbol(tree.GUID, "trunk", 0, 0, 0)
+
+            local count = 0
+            local dt, countmax
+            if bird.isgrief then
+                dt = TIME_EYE_GRIEF
+                countmax = COUNT_EYE_GRIEF
+            else
+                dt = TIME_EYE
+                countmax = COUNT_EYE
+            end
+            inst.task_eye = inst:DoPeriodicTask(dt, function(inst)
+                count = count + 1
+                local landtarget = nil
+                local ents = TheSim:FindEntities(x, 0, z, DIST_REMOTE, { "_combat", "_health" }, TAGS_CANT)
+                for _, v in ipairs(ents) do
+                    if
+                        v.components.health ~= nil and not v.components.health:IsDead()
+                    then
+                        --undo 技能释放
+                        if landtarget == nil then --第一个应该是最近的吧？
+                            landtarget = v
+                        end
+                    end
+                end
+
+                if count >= countmax then
+                    inst:fn_onUnbind(landtarget and landtarget:GetPosition() or nil)
+                end
+            end, dt)
+        end
+
+        inst._task_re = inst:DoTaskInTime(1, inst.Remove)
+
+        return inst
+    end,
+    {
+        Asset("ANIM", "anim/siving_boss_eye.zip")
+    },
+    {
+        -- "siving_boss_flower"
+    }
 ))
 
 --------------------------------------------------------------------------
