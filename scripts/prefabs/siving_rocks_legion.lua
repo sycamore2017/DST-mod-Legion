@@ -788,6 +788,7 @@ table.insert(prefs, Prefab(
         inst.Light:SetColour(15/255, 180/255, 132/255)
 
         inst:AddTag("siving_thetree")
+        inst:AddTag("siving")
 
         --trader (from trader component) added to pristine state for optimization
         inst:AddTag("trader")

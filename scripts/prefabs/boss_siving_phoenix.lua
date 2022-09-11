@@ -20,11 +20,19 @@ local BossSounds = {
 local DIST_MATE = 13 --离伴侣的最远距离
 local DIST_REMOTE = 20 --最大活动范围
 local DIST_ATK = 4 --普通攻击范围
+local DIST_FLAP = 10 --羽乱舞射程
+local DIST_FEA_EXPLODE = 2.5 --精致子圭翎羽的爆炸半径
 
-local TIME_BUFF_WARBLE = 6
+local TIME_BUFF_WARBLE = 6 --魔音绕耳debuff持续时间
 
 local ATK_NORMAL = 20 --啄击攻击力
 local ATK_GRIEF = 10 --悲愤状态额外攻击力
+local ATK_FEA = 50 --子圭翎羽攻击力
+local ATK_FEA_REAL = 80 --精致子圭翎羽攻击力
+local ATK_FEA_EXPLODE = 100 --精致子圭翎羽的爆炸伤害
+
+local COUNT_FLAP = 3 --羽乱舞次数
+local COUNT_FLAP_GRIEF = 6 --羽乱舞次数（悲愤状态）
 
 local TAGS_CANT = {"NOCLICK", "shadow", "playerghost", "ghost", "INLIMBO", "wall", "structure", "balloon", "siving"}
 
@@ -46,6 +54,13 @@ local function GetDamage(inst, target, basedamage)
     if inst.isgrief then
         basedamage = basedamage + ATK_GRIEF
     end
+    if target:HasTag("player") then
+        return basedamage
+    else
+        return basedamage*3
+    end
+end
+local function GetDamage2(target, basedamage)
     if target:HasTag("player") then
         return basedamage
     else
@@ -167,6 +182,18 @@ local function BeTreeEye(inst) --同目同心
     end
     return false
 end
+local function FeathersFlap(inst) --羽乱舞
+    local x, y, z = inst.Transform:GetWorldPosition()
+    local num = math.random(3, 5)
+    for i = 1, num, 1 do
+        local fea = SpawnPrefab(math.random() < 0.2 and "siving_bossfea_real" or "siving_bossfea_fake")
+        if fea ~= nil then
+            fea.Transform:SetPosition(x, 0, z)
+            fea.components.projectilelegion:Throw(fea, Vector3(GetCalculatedPos_legion(x, 0, z, 2)), inst, nil)
+            fea.components.projectilelegion:DelayVisibility(fea.projectiledelay)
+        end
+    end
+end
 
 local function MakeBoss(data)
     table.insert(prefs, Prefab(
@@ -239,6 +266,7 @@ local function MakeBoss(data)
             inst.fn_discerningPeck = DiscerningPeck
             inst.fn_releaseFlowers = ReleaseFlowers
             inst.fn_beTreeEye = BeTreeEye
+            inst.fn_feathersFlap = FeathersFlap
 
             inst:AddComponent("locomotor") --locomotor must be constructed before the stategraph
             inst.components.locomotor.walkspeed = 4
@@ -430,7 +458,9 @@ local function MakeBoss(data)
         {
             "debuff_magicwarble",
             "siving_boss_flowerfx",
-            "siving_boss_eye"
+            "siving_boss_eye",
+            "siving_bossfea_real",
+            "siving_bossfea_fake"
         }
     ))
 end
@@ -707,6 +737,115 @@ local function MakeWeapon(data)
             end
 
             MakeHauntableLaunch(inst)
+
+            if data.fn_server ~= nil then
+                data.fn_server(inst)
+            end
+
+            return inst
+        end,
+        data.assets,
+        data.prefabs
+    ))
+end
+
+------
+------
+
+local function OnFinishWork_bossfeather(inst, worker)
+    inst.components.lootdropper:DropLoot()
+    --特效 undo
+    inst:Remove()
+end
+
+local function OnThrown_bossfeather(inst, owner, targetpos, attacker)
+    inst.AnimState:SetOrientation(ANIM_ORIENTATION.OnGround)
+    inst.AnimState:PlayAnimation("shoot3", false)
+    -- inst.components.inventoryitem.pushlandedevents = false
+    -- inst.components.inventoryitem.canbepickedup = false
+    inst.Physics:SetActive(false)
+    inst.components.workable:SetWorkable(false)
+    -- inst:PushEvent("on_no_longer_landed")
+    inst.SoundEmitter:PlaySound("dontstarve/creatures/leif/swipe", nil, 0.2)
+end
+local function OnMiss_bossfeather(inst, targetpos, attacker)
+    inst.AnimState:SetOrientation(ANIM_ORIENTATION.Default)
+    inst.AnimState:PlayAnimation("idle", false)
+    -- inst.components.inventoryitem.pushlandedevents = true
+    -- inst.components.inventoryitem.canbepickedup = true
+    inst.Physics:SetActive(true)
+    inst.components.workable:SetWorkable(true)
+    inst:PushEvent("on_landed")
+end
+
+local function MakeBossWeapon(data)
+    table.insert(prefs, Prefab(
+        data.name,
+        function()
+            local inst = CreateEntity()
+
+            inst.entity:AddTransform()
+            inst.entity:AddAnimState()
+            -- inst.entity:AddSoundEmitter()
+            inst.entity:AddNetwork()
+
+            inst:SetPhysicsRadiusOverride(1.5)
+            MakeWaterObstaclePhysics(inst, 1.5, 2, 0.75)
+            inst.Physics:SetActive(false)
+
+            inst:AddTag("sharp")
+            inst:AddTag("siv_boss_block") --用来被清场
+            inst:AddTag("ignorewalkableplatforms")
+
+            --weapon (from weapon component) added to pristine state for optimization
+            inst:AddTag("weapon")
+
+            inst.Transform:SetEightFaced()
+
+            inst.projectiledelay = 3 * FRAMES
+
+            MakeInventoryFloatable(inst, "small", 0.2, 0.5)
+            -- local OnLandedClient_old = inst.components.floater.OnLandedClient
+            -- inst.components.floater.OnLandedClient = function(self)
+            --     OnLandedClient_old(self)
+            --     self.inst.AnimState:SetFloatParams(0.04, 1, self.bob_percent)
+            -- end
+
+            if data.fn_common ~= nil then
+                data.fn_common(inst)
+            end
+
+            inst.entity:SetPristine()
+            if not TheWorld.ismastersim then
+                return inst
+            end
+
+            inst:AddComponent("inspectable")
+
+            inst:AddComponent("lootdropper")
+
+            inst:AddComponent("weapon")
+
+            inst:AddComponent("workable")
+            inst.components.workable:SetWorkAction(ACTIONS.MINE)
+            inst.components.workable:SetWorkLeft(1)
+            inst.components.workable:SetOnFinishCallback(OnFinishWork_bossfeather)
+
+            inst:AddComponent("projectilelegion")
+            inst.components.projectilelegion.speed = 45
+            inst.components.projectilelegion.shootrange = DIST_FLAP
+            inst.components.projectilelegion.onthrown = OnThrown_bossfeather
+            inst.components.projectilelegion.onmiss = OnMiss_bossfeather
+            inst.components.projectilelegion.exclude_tags = { "INLIMBO", "NOCLICK", "wall", "structure", "siving" }
+
+            MakeHauntableWork(inst)
+
+            inst:ListenForEvent("on_collide", function(inst, data) --被船撞时
+                local boat_physics = data.other.components.boatphysics
+                if boat_physics ~= nil then
+                    inst.components.workable:WorkedBy(data.other, 1)
+                end
+            end)
 
             if data.fn_server ~= nil then
                 data.fn_server(inst)
@@ -1336,7 +1475,58 @@ MakeWeapon({
     end
 })
 
---BOSS产物
+--BOSS产物：精致子圭翎羽
+MakeBossWeapon({
+    name = "siving_bossfea_real",
+    assets = {
+        Asset("ANIM", "anim/siving_feather_real.zip")
+    },
+    prefabs = {
+        -- "siving_feather_line"
+    },
+    fn_common = function(inst)
+        inst.entity:AddLight()
+        inst.Light:Enable(true)
+        inst.Light:SetRadius(.6)
+        inst.Light:SetFalloff(1)
+        inst.Light:SetIntensity(.5)
+        inst.Light:SetColour(15/255, 180/255, 132/255)
+
+        inst.AnimState:SetBank("siving_feather_real")
+        inst.AnimState:SetBuild("siving_feather_real")
+        inst.AnimState:PlayAnimation("idle", false)
+        inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
+    end,
+    fn_server = function(inst)
+        inst.components.lootdropper:AddChanceLoot("siving_rocks", 0.1)
+
+        inst.components.workable:SetOnFinishCallback(function(inst, worker)
+            --爆炸！
+            local x, y, z = inst.Transform:GetWorldPosition()
+            local ents = TheSim:FindEntities(x, y, z, DIST_FEA_EXPLODE, nil, { "INLIMBO", "NOCLICK", "FX", "siving" })
+            for _, v in ipairs(ents) do
+                if v ~= inst and v:IsValid() then
+                    if v.components.workable ~= nil then
+                        if v.components.workable:CanBeWorked() then
+                            v.components.workable:WorkedBy(inst, 3)
+                        end
+                    elseif
+                        v.components.combat ~= nil and
+                        not (v.components.health ~= nil and v.components.health:IsDead())
+                    then
+                        v.components.combat:GetAttacked(inst, GetDamage2(v, ATK_FEA_EXPLODE), nil)
+                    end
+                end
+            end
+
+            --爆炸特效 undo
+
+            OnFinishWork_bossfeather(inst, worker)
+        end)
+
+        inst.components.weapon:SetDamage(ATK_FEA_REAL)
+    end
+})
 
 --------------------------------------------------------------------------
 --[[ 子圭玄鸟绒羽 ]]
@@ -1373,7 +1563,26 @@ MakeWeapon({
     end
 })
 
---BOSS产物
+--BOSS产物：子圭翎羽
+MakeBossWeapon({
+    name = "siving_bossfea_fake",
+    assets = {
+        Asset("ANIM", "anim/siving_feather_fake.zip")
+    },
+    prefabs = {
+        -- "siving_feather_line"
+    },
+    fn_common = function(inst)
+        inst.AnimState:SetBank("siving_feather_fake")
+        inst.AnimState:SetBuild("siving_feather_fake")
+        inst.AnimState:PlayAnimation("idle", false)
+    end,
+    fn_server = function(inst)
+        inst.components.lootdropper:AddChanceLoot("siving_rocks", 0.02)
+
+        inst.components.weapon:SetDamage(ATK_FEA)
+    end
+})
 
 --------------------------------------------------------------------------
 --[[ 临时的羽刃拉扯器 ]]

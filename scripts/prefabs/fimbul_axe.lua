@@ -111,7 +111,7 @@ local function GiveSomeShock(inst, owner, target)  --击中时的特殊效果
                 if isPVP or not v:HasTag("player") then --只要是pvp模式就直接生效，若不是则只让非玩家生物触电
                     v.components.shockable:Shock(6)
                 end
-            elseif v.components.workable ~= nil then  --直接破坏可以砍的物体
+            elseif v.components.workable ~= nil and v.components.workable:CanBeWorked() then --直接破坏可以砍的物体
                 v.components.workable:Destroy(inst)
             end
         end
