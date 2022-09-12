@@ -1,4 +1,5 @@
 local prefs = {}
+local birdbrain = require("brains/siving_phoenixbrain")
 
 --------------------------------------------------------------------------
 --[[ 通用 ]]
@@ -14,7 +15,10 @@ local BossSounds = {
     step = "dontstarve_DLC001/creatures/buzzard/hurt",
     death = "dontstarve_DLC001/creatures/buzzard/death",
     flyaway = "dontstarve_DLC001/creatures/buzzard/flyout",
-    flap = "dontstarve_DLC001/creatures/buzzard/flap"
+    flap = "dontstarve_DLC001/creatures/buzzard/flap",
+    atk = "dontstarve_DLC001/creatures/buzzard/attack",
+    taunt = "dontstarve_DLC001/creatures/buzzard/taunt",
+    caw = "dontstarve_DLC001/creatures/buzzard/squack"
 }
 
 local DIST_MATE = 13 --离伴侣的最远距离
@@ -115,6 +119,8 @@ local function MagicWarble(inst) --魔音绕梁
             end
         end
     end
+
+    --特效 undo
 end
 local function DiscerningPeck(inst, target) --啄击（因为替换了官方的普攻逻辑，所以整体得模仿官方的普攻逻辑）
     if target == nil then
@@ -136,6 +142,8 @@ end
 local function ReleaseFlowers(inst) --花寄语
     local x, y, z = inst.Transform:GetWorldPosition()
     local ents = TheSim:FindEntities(x, 0, z, DIST_REMOTE, { "_combat", "_health" }, TAGS_CANT)
+
+    --特效 undo
 
     if inst.isgrief then --悲愤状态的话，所有对象都寄生
         for _, v in ipairs(ents) do
@@ -244,12 +252,12 @@ local function MakeBoss(data)
             inst.isgrief = false --是否处于悲愤状态
             inst.iseye = false --是否是木之眼状态
             inst.eyefx = nil --木之眼实体
-            inst.fn_onGrief = function(inst, tree, doroar)
+            inst.fn_onGrief = function(inst, tree, dotaunt)
                 inst.isgrief = true
                 inst.AnimState:OverrideSymbol("buzzard_eye", data.name, "buzzard_angryeye")
                 inst.components.combat:SetDefaultDamage(ATK_NORMAL+ATK_GRIEF)
-                if doroar then
-                    inst:PushEvent("doroar")
+                if dotaunt then
+                    inst:PushEvent("dotaunt")
                 end
             end
             inst.fn_leave = function(inst)
@@ -261,6 +269,11 @@ local function MakeBoss(data)
                     inst:PushEvent("dotakeoff")
                 end
             end
+
+            inst.COUNT_FLAP = COUNT_FLAP
+            inst.COUNT_FLAP_GRIEF = COUNT_FLAP_GRIEF
+            inst.DIST_FLAP = DIST_FLAP
+            inst.DIST_REMOTE = DIST_REMOTE
 
             inst.fn_magicWarble = MagicWarble
             inst.fn_discerningPeck = DiscerningPeck
@@ -354,7 +367,7 @@ local function MakeBoss(data)
             inst:AddComponent("hauntable")
 
             inst:SetStateGraph("SGsiving_phoenix") --这个应该是指文件的名字，而不是数据的名字
-            -- inst:SetBrain(brain)
+            inst:SetBrain(birdbrain)
 
             inst:ListenForEvent("attacked", function(inst, data)
                 if data.attacker and IsValid(data.attacker) then
@@ -757,7 +770,6 @@ local function OnFinishWork_bossfeather(inst, worker)
     --特效 undo
     inst:Remove()
 end
-
 local function OnThrown_bossfeather(inst, owner, targetpos, attacker)
     inst.AnimState:SetOrientation(ANIM_ORIENTATION.OnGround)
     inst.AnimState:PlayAnimation("shoot3", false)
@@ -786,7 +798,7 @@ local function MakeBossWeapon(data)
 
             inst.entity:AddTransform()
             inst.entity:AddAnimState()
-            -- inst.entity:AddSoundEmitter()
+            inst.entity:AddSoundEmitter()
             inst.entity:AddNetwork()
 
             inst:SetPhysicsRadiusOverride(1.5)
@@ -836,7 +848,7 @@ local function MakeBossWeapon(data)
             inst.components.projectilelegion.shootrange = DIST_FLAP
             inst.components.projectilelegion.onthrown = OnThrown_bossfeather
             inst.components.projectilelegion.onmiss = OnMiss_bossfeather
-            inst.components.projectilelegion.exclude_tags = { "INLIMBO", "NOCLICK", "wall", "structure", "siving" }
+            inst.components.projectilelegion.exclude_tags = { "INLIMBO", "NOCLICK", "siving" }
 
             MakeHauntableWork(inst)
 
@@ -1413,6 +1425,7 @@ table.insert(prefs, Prefab(
             if bird.isgrief then
                 dt = TIME_EYE_GRIEF
                 countmax = COUNT_EYE_GRIEF
+                --悲愤状态换贴图！undo
             else
                 dt = TIME_EYE
                 countmax = COUNT_EYE
@@ -1481,9 +1494,7 @@ MakeBossWeapon({
     assets = {
         Asset("ANIM", "anim/siving_feather_real.zip")
     },
-    prefabs = {
-        -- "siving_feather_line"
-    },
+    prefabs = nil,
     fn_common = function(inst)
         inst.entity:AddLight()
         inst.Light:Enable(true)
@@ -1516,12 +1527,15 @@ MakeBossWeapon({
                     then
                         v.components.combat:GetAttacked(inst, GetDamage2(v, ATK_FEA_EXPLODE), nil)
                     end
+                    v:PushEvent("explosion", { explosive = inst })
                 end
             end
 
-            --爆炸特效 undo
+            --爆炸特效(声音也在里面)
+            SpawnPrefab("explode_small_slurtle").Transform:SetPosition(x, y, z)
 
-            OnFinishWork_bossfeather(inst, worker)
+            inst.components.lootdropper:DropLoot()
+            inst:Remove()
         end)
 
         inst.components.weapon:SetDamage(ATK_FEA_REAL)

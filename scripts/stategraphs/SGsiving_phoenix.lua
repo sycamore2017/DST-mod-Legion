@@ -1,25 +1,55 @@
 require("stategraphs/commonstates")
 
+local function IsValid(one)
+    return one:IsValid() and
+        one.components.health ~= nil and not one.components.health:IsDead()
+end
 local function IsBusy(inst)
     return inst.sg:HasStateTag("busy") or inst.components.health:IsDead()
 end
 local function PlaySound(inst, key, name, volume)
     inst.SoundEmitter:PlaySound(inst.sounds[key], name, volume)
 end
+local function GetDistance(inst, target)--得到的是距离的平方
+    return target:GetDistanceSqToPoint(inst.Transform:GetWorldPosition())
+end
+local function GetTarget(inst) --优先获取自己的敌人，其次才是伴侣的敌人
+    local target = inst.components.combat.target
+    if target and IsValid(target) then
+        return target
+    end
+    if inst.mate and IsValid(inst.mate) then
+        target = inst.mate.components.combat.target
+        if target and IsValid(target) then
+            return target
+        end
+    end
+end
+local function CheckSkills(inst)
+    if inst.sg.mem.to_flyaway then
+        inst.sg:GoToState("flyaway", inst.sg.mem.to_flyaway)
+    elseif inst.sg.mem.to_taunt then
+        inst.sg:GoToState("taunt")
+    elseif inst.sg.mem.to_caw then
+        inst.sg:GoToState("caw")
+    elseif inst.sg.mem.to_flap then --羽乱舞对目标和距离有要求
+        local target = GetTarget(inst)
+        if target ~= nil and GetDistance(inst, target) <= (inst.DIST_FLAP)^2 then
+            inst.sg:GoToState("flap_pre")
+        end
+    else
+        return false
+    end
+    return true
+end
 
 local actionhandlers = {
-    ActionHandler(ACTIONS.EAT, "eat"),
-    ActionHandler(ACTIONS.GOHOME, function(inst)
-        if inst.components.health and not inst.components.health:IsDead() then
-            inst.sg:GoToState("flyaway")
-        end
-    end),
+    -- ActionHandler(ACTIONS.EAT, "eat")
 }
 
 local events = {
     CommonHandlers.OnSleep(),
     CommonHandlers.OnFreeze(),
-    -- CommonHandlers.OnAttack(),
     CommonHandlers.OnDeath(),
 
     EventHandler("locomote", function(inst)
@@ -33,6 +63,12 @@ local events = {
             if not inst.sg:HasStateTag("idle") then
                 inst.sg:GoToState("idle")
             end
+        end
+    end),
+    EventHandler("doattack", function(inst, params) --啄击
+        if IsBusy(inst) then return end
+        if not inst.sg:HasStateTag("attack") then
+            inst.sg:GoToState("attack", params)
         end
     end),
     EventHandler("attacked", function(inst)
@@ -54,7 +90,27 @@ local events = {
             end
         end
     end),
-
+    EventHandler("dotaunt", function(inst) --魔音绕梁
+        if IsBusy(inst) then
+            inst.sg.mem.to_taunt = true
+        else
+            inst.sg:GoToState("taunt")
+        end
+    end),
+    EventHandler("docaw", function(inst) --花寄语
+        if IsBusy(inst) then
+            inst.sg.mem.to_caw = true
+        else
+            inst.sg:GoToState("caw")
+        end
+    end),
+    EventHandler("doflap", function(inst) --羽乱舞
+        if IsBusy(inst) then
+            inst.sg.mem.to_flap = true
+        else
+            inst.sg:GoToState("flap_pre")
+        end
+    end),
 }
 
 local states = {
@@ -63,6 +119,9 @@ local states = {
         tags = {"idle", "canrotate"},
         onenter = function(inst, pushanim)
             inst.Physics:Stop()
+            if CheckSkills(inst) then
+                return
+            end
             if pushanim then
                 if type(pushanim) == "string" then
                     inst.AnimState:PlayAnimation(pushanim)
@@ -71,30 +130,15 @@ local states = {
             else
                 inst.AnimState:PlayAnimation("idle", true)
             end
-            inst.sg:SetTimeout(3 + math.random()*1)
-        end,
-
-        ontimeout= function(inst)
-			if inst.bufferedaction and inst.bufferedaction.action == ACTIONS.EAT then
-				inst.sg:GoToState("eat")
-			else
-				local r = math.random()
-				if r < .75 then
-					inst.sg:GoToState("idle")
-				else
-                    if inst.components.combat.target then
-                        inst.sg:GoToState("taunt")
-                    else
-					   inst.sg:GoToState("caw")
-                    end
-				end
-			end
-        end,
+        end
     },
     State{ --移动（跳跃式）
         name = "hop",
         tags = {"moving", "canrotate", "hopping"},
         onenter = function(inst)
+            if CheckSkills(inst) then
+                return
+            end
             inst.AnimState:PlayAnimation("hop")
             inst.components.locomotor:WalkForward()
             inst.sg:SetTimeout(2*math.random()+.5)
@@ -128,6 +172,28 @@ local states = {
             inst:RemoveTag("NOCLICK")
         end,
     },
+    State{ --啄击
+        name = "attack",
+        tags = {"attack", "busy"},
+        onenter = function(inst, params)
+            inst.components.locomotor:StopMoving()
+            inst.AnimState:PlayAnimation("atk")
+            inst.components.combat:StartAttack()
+            if params then
+                inst.sg.statemem.target = params.target
+            end
+        end,
+        events = {
+            EventHandler("animover", function(inst) inst.sg:GoToState("idle") end ),
+        },
+        timeline = {
+            TimeEvent(15*FRAMES, function(inst)
+                inst:fn_discerningPeck(inst.sg.statemem.target)
+                PlaySound(inst, "atk", nil, nil)
+            end),
+            TimeEvent(20*FRAMES, function(inst) inst.sg:RemoveStateTag("attack") end),
+        }
+    },
     State{ --受击
         name = "hit",
         tags = {"hit"},
@@ -158,6 +224,7 @@ local states = {
             else
                 inst.AnimState:PlayAnimation("takeoff_diagonal_pre")
             end
+            inst.sg.mem.to_flyaway = nil
             PlaySound(inst, "flyaway", nil, nil)
         end,
         ontimeout = function(inst)
@@ -178,7 +245,13 @@ local states = {
                         inst.Transform:SetPosition(params.x, params.y or 30, params.z)
                         inst.sg:GoToState("glide")
                         return
-                    -- elseif  then --同目同心
+                    elseif params.beeye then --同目同心
+                        if not inst:fn_beTreeEye() then
+                            local x, y, z = inst.Transform:GetWorldPosition()
+                            inst.Transform:SetPosition(x, 30, z)
+                            inst.sg:GoToState("glide")
+                        end
+                        return
                     end
                 end
                 inst:Remove() --飞上天就消失啦
@@ -221,183 +294,131 @@ local states = {
             inst.components.knownlocations:RememberLocation("spawnpoint", pos, true)
         end,
     },
-
-
-
-
-
-
-
-
-
-    
-
     State{ --魔音绕梁
         name = "taunt",
         tags = {"busy"},
-
         onenter = function(inst)
-            inst.Physics:Stop()
+            inst.components.locomotor:StopMoving()
             inst.AnimState:PlayAnimation("taunt")
+            inst.sg.mem.to_taunt = nil
         end,
-
-        timeline=
-        {
-            TimeEvent(FRAMES*0, function(inst) inst.SoundEmitter:PlaySound("dontstarve_DLC001/creatures/buzzard/taunt") end)
-        },
-
-        events=
-        {
-            EventHandler("animqueueover", function(inst) inst.sg:GoToState("idle") end),
-        },
-    },
-
-    State{
-        name = "caw",
-        tags = {"idle"},
-        onenter= function(inst)
-            inst.AnimState:PlayAnimation("caw")
-        end,
-
-        timeline=
-        {
-            TimeEvent(FRAMES*0, function(inst) inst.SoundEmitter:PlaySound("dontstarve_DLC001/creatures/buzzard/squack") end)
-        },
-
-        events=
-        {
-            EventHandler("animover", function(inst) if math.random() < .5 then inst.sg:GoToState("caw") else inst.sg:GoToState("idle") end end ),
-        },
-    },
-
-    State{
-        name = "distress_pre",
-        tags = {"busy"},
-        onenter= function(inst)
-            inst.AnimState:PlayAnimation("flap_pre")
-        end,
-        events=
-        {
-            EventHandler("animover", function(inst) inst.sg:GoToState("distress") end ),
-        },
-    },
-
-    State{ --悲愤状态时能边跳边追着敌人攻击
-        name = "distress",
-        tags = {"busy"},
-
-        onenter = function(inst)
-            inst.AnimState:PlayAnimation("flap_loop")
-        end,
-
-        timeline=
-        {
-            TimeEvent(FRAMES*0, function(inst) inst.SoundEmitter:PlaySound("dontstarve_DLC001/creatures/buzzard/squack") end)
-        },
-
-        events=
-        {
-            EventHandler("animover", function(inst) inst.sg:GoToState("distress") end ),
-            EventHandler("onextinguish", function(inst) if not inst.components.health:IsDead() then inst.sg:GoToState("idle", "flap_pst") end end ),
-        },
-    },
-
-    
-
-    State{
-        name = "kill",
-        tags = {"busy", "canrotate"},
-        onenter = function(inst, data)
-            inst.AnimState:PushAnimation("atk", false)
-            if data and data.target:HasTag("prey") then
-                inst.sg.statemem.target = data.target
-            end
-        end,
-
-        timeline =
-        {
-            TimeEvent(15*FRAMES, function(inst)
-                if inst.sg.statemem.target ~= nil and inst.sg.statemem.target:IsValid() then
-                    inst:FacePoint(inst.sg.statemem.target.Transform:GetWorldPosition())
-                end
+        timeline = {
+            TimeEvent(FRAMES*0, function(inst)
+                PlaySound(inst, "taunt", nil, nil)
             end),
-            TimeEvent(27*FRAMES, function(inst)
-                inst.SoundEmitter:PlaySound("dontstarve_DLC001/creatures/buzzard/attack")
-                local target = inst.sg.statemem.target
-                if target ~= nil and
-                    target:IsValid() and
-                    inst:IsNear(target, TUNING.BUZZARD_ATTACK_RANGE) and
-                    inst.components.combat:CanAttack(target) then
-                    target.components.health:Kill()
-                end
+            TimeEvent(FRAMES*6, function(inst)
+                inst:fn_magicWarble()
             end)
         },
-
-        events =
-        {
-            EventHandler("animqueueover", function(inst) inst.sg:GoToState("idle") end)
+        events = {
+            EventHandler("animover", function(inst) inst.sg:GoToState("idle") end),
         },
     },
-
-    State{
-        name = "eat",
+    State{ --花寄语
+        name = "caw",
         tags = {"busy"},
-
         onenter = function(inst)
-            inst.Physics:Stop()
-            inst.AnimState:PlayAnimation("peck")
+            inst.components.locomotor:StopMoving()
+            inst.AnimState:PlayAnimation("caw")
+            inst.sg.mem.to_caw = nil
         end,
-
-        events=
-        {
+        timeline = {
+            TimeEvent(FRAMES*0, function(inst)
+                PlaySound(inst, "caw", nil, nil)
+            end),
+            TimeEvent(FRAMES*8, function(inst)
+                inst:fn_releaseFlowers()
+            end)
+        },
+        events = {
+            EventHandler("animover", function(inst) inst.sg:GoToState("idle") end),
+        },
+    },
+    State{ --羽乱舞 pre
+        name = "flap_pre",
+        tags = {"busy"},
+        onenter = function(inst)
+            inst.components.locomotor:StopMoving()
+            inst.AnimState:PlayAnimation("flap_pre")
+            inst.sg.mem.to_flap = nil
+        end,
+        events = {
             EventHandler("animover", function(inst)
-                if math.random() < .3 then
-					inst:PerformBufferedAction()
+                local params = { max = 1, now = 0, hop = nil }
+                if inst.isgrief then
+                    params.max = inst.COUNT_FLAP_GRIEF
+                    params.hop = true
+                else
+                    params.max = inst.COUNT_FLAP
                 end
-                inst.sg:GoToState("idle")
-                if inst.brain then
-                    inst.brain:ForceUpdate()
+                inst.sg:GoToState("flap", params)
+            end),
+        },
+    },
+    State{ --羽乱舞
+        name = "flap",
+        tags = {"attack", "busy"},
+        onenter = function(inst, params)
+            inst.AnimState:PlayAnimation("flap_loop")
+            inst.sg.statemem.params = params
+
+            --悲愤状态时能边跳边追着敌人攻击
+            if params.hop then
+                local target = GetTarget(inst)
+                if target ~= nil then
+                    inst:ForceFacePoint(target.Transform:GetWorldPosition())
+                    inst.components.locomotor:RunForward()
+                end
+            end
+        end,
+        timeline = {
+            TimeEvent(FRAMES*0, function(inst)
+                PlaySound(inst, "caw", nil, nil)
+            end),
+            TimeEvent(6*FRAMES, function(inst)
+                PlaySound(inst, "step", nil, nil)
+                if inst.sg.statemem.params.hop then
+                    inst.components.locomotor:StopMoving()
+                end
+            end),
+            TimeEvent(FRAMES*9, function(inst)
+                inst:fn_feathersFlap()
+            end)
+        },
+        events = {
+            EventHandler("animover", function(inst)
+                local params = inst.sg.statemem.params
+                params.now = params.now + 1
+                if params.now >= params.max then
+                    inst.sg:GoToState("idle")
+                else
+                    inst.sg:GoToState("flap", params)
                 end
             end),
         },
     },
-
-    
-
-    
-
-    State{
-        name = "fall",
-        tags = {"busy"},
+    State{ --吃东西
+        name = "eat",
+        tags = {"idle", "eat"},
         onenter = function(inst)
-            inst.Physics:Stop()
-            inst.AnimState:PlayAnimation("fall_loop", true)
+            inst.components.locomotor:StopMoving()
+            inst.AnimState:PlayAnimation("peck")
         end,
-
-        onupdate = function(inst)
-            local pt = Vector3(inst.Transform:GetWorldPosition())
-            if pt.y <= .2 then
-                pt.y = 0
-                inst.Physics:Stop()
-                inst.Physics:Teleport(pt.x,pt.y,pt.z)
-	            inst.DynamicShadow:Enable(true)
-                inst.sg:GoToState("stunned")
-            end
-        end,
+        timeline = {
+            TimeEvent(FRAMES*10, function(inst)
+                inst:PerformBufferedAction()
+            end)
+        },
+        events = {
+            EventHandler("animover", function(inst)
+                inst.sg:GoToState("idle")
+                -- if inst.brain then
+                --     inst.brain:ForceUpdate()
+                -- end
+            end),
+        },
     },
 }
-
-CommonStates.AddCombatStates(states,
-{
-    attacktimeline =
-    {
-        TimeEvent(15*FRAMES, function(inst)
-            inst.components.combat:DoAttack(inst.sg.statemem.target)
-            inst.SoundEmitter:PlaySound("dontstarve_DLC001/creatures/buzzard/attack")
-        end),
-        TimeEvent(20*FRAMES, function(inst) inst.sg:RemoveStateTag("attack") end),
-    },
-})
 
 CommonStates.AddSleepStates(states)
 CommonStates.AddFrozenStates(states)
