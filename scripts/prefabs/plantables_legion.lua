@@ -353,6 +353,8 @@ if CONFIGS_LEGION.LEGENDOFFALL then
                 end
             end,
             fn_server = function(inst)
+                inst.sivbird_l_food = 0.5 --能给予玄鸟换取子圭石
+
                 inst.components.inspectable.nameoverride = "SEEDS_CROP_L"
 
                 inst:AddComponent("plantablelegion")

@@ -415,7 +415,10 @@ local function MakeBoss(data)
                 end
                 local loveditems = {
                     myth_lotus_flower = 1,
-                    aip_veggie_sunflower = 1
+                    aip_veggie_sunflower = 1,
+                    cutted_rosebush = 1,
+                    cutted_lilybush = 1,
+                    cutted_orchidbush = 1
                 }
                 if loveditems[item.prefab] ~= nil or item.sivbird_l_food ~= nil then
                     --由于一次只给一个太慢了，这里手动从玩家身上全部拿下来
