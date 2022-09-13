@@ -25,7 +25,7 @@ local function GetTarget(inst) --优先获取自己的敌人，其次才是伴�
         end
     end
 end
-local function CheckSkills(inst)
+local function CheckSkills(inst, isidle)
     if inst.sg.mem.to_flyaway then
         if inst.sg.mem.to_flyaway.beeye then
             if inst:fn_canBeEye() then
@@ -43,13 +43,46 @@ local function CheckSkills(inst)
     elseif inst.sg.mem.to_caw then
         inst.sg:GoToState("caw")
         return true
-    elseif inst.sg.mem.to_flap then --羽乱舞对目标和距离有要求
-        local target = GetTarget(inst)
-        if target ~= nil and GetDistance(inst, target) <= (inst.DIST_FLAP)^2 then
-            inst.sg:GoToState("flap_pre")
+    elseif inst.sg.mem.to_feeded or inst._count_rock >= 1 then
+        inst.sg:GoToState("feeded")
+        return true
+    end
+
+    local target = GetTarget(inst)
+    if target ~= nil then --自己或伴侣有仇恨对象
+        if inst.sg.mem.to_flap then
+            if GetDistance(inst, target) <= (inst.DIST_FLAP)^2 then --羽乱舞对目标和距离有要求
+                inst.sg:GoToState("flap_pre")
+                return true
+            end
+        end
+        if not inst.components.combat:InCooldown() then --啄击冷却时间到了就自动尝试攻击最近的敌人
+            local x, y, z = inst.Transform:GetWorldPosition()
+            local ents = TheSim:FindEntities(x, 0, z, inst.DIST_ATK+1, { "_combat" }, { "INLIMBO", "siving" })
+            for _, v in ipairs(ents) do
+                if
+                    v:HasTag("player") or ( --对玩家无条件攻击
+                        v.components.combat ~= nil and
+                        v.components.combat.target ~= nil and
+                        v.components.combat.target:HasTag("siving") --只攻击对玄鸟有仇恨的对象
+                    )
+                then
+                    inst.sg:GoToState("attack", {target = v})
+                    return true
+                end
+            end
+        end
+    elseif isidle then
+        local rand = math.random()
+        if rand < 0.05 then
+            inst.sg:GoToState("feeded")
+            return true
+        elseif rand < 0.1 then
+            inst.sg:GoToState("refuse")
             return true
         end
     end
+
     return false
 end
 
@@ -129,6 +162,22 @@ local events = {
             inst.sg:GoToState("flap_pre")
         end
     end),
+
+    EventHandler("dofeeded", function(inst) --被喂食
+        if IsBusy(inst) or inst.sg:HasStateTag("eat") then
+            inst.sg.mem.to_feeded = true
+        else
+            inst.sg:GoToState("feeded")
+        end
+    end),
+    EventHandler("dorefuse", function(inst) --拒绝
+        if IsBusy(inst) or inst.components.combat.target ~= nil then
+            return
+        end
+        if not inst.sg:HasStateTag("eat") and not inst.sg:HasStateTag("refuse") then
+            inst.sg:GoToState("refuse")
+        end
+    end),
 }
 
 local states = {
@@ -137,7 +186,7 @@ local states = {
         tags = {"idle", "canrotate"},
         onenter = function(inst, pushanim)
             inst.Physics:Stop()
-            if CheckSkills(inst) then
+            if CheckSkills(inst, true) then
                 return
             end
             if pushanim then
@@ -154,7 +203,7 @@ local states = {
         name = "hop",
         tags = {"moving", "canrotate", "hopping"},
         onenter = function(inst)
-            if CheckSkills(inst) then
+            if CheckSkills(inst, false) then
                 return
             end
             inst.AnimState:PlayAnimation("hop")
@@ -244,6 +293,10 @@ local states = {
             end
             inst.sg.mem.to_flyaway = nil
             PlaySound(inst, "flyaway", nil, nil)
+
+            if params and params.beeye and inst.tree then
+                inst.tree.myEye = inst --提前占用，防止两只玄鸟一起化目
+            end
         end,
         ontimeout = function(inst)
             if inst.sg.statemem.vert then
@@ -265,6 +318,9 @@ local states = {
                         return
                     elseif params.beeye then --同目同心
                         if not inst:fn_beTreeEye() then
+                            if inst.tree then
+                                inst.tree.myEye = nil
+                            end
                             local x, y, z = inst.Transform:GetWorldPosition()
                             inst.Transform:SetPosition(x, 30, z)
                             inst.sg:GoToState("glide")
@@ -415,7 +471,47 @@ local states = {
             end),
         },
     },
-    State{ --吃东西
+    State{ --被喂食
+        name = "feeded",
+        tags = {"idle", "eat"},
+        onenter = function(inst)
+            inst.components.locomotor:StopMoving()
+            inst.AnimState:PlayAnimation("peck")
+        end,
+        timeline = {
+            TimeEvent(FRAMES*24, function(inst)
+                local num = math.floor(inst._count_rock)
+                if num >= 1 then
+                    local loot = SpawnPrefab("siving_rocks")
+                    if loot ~= nil then
+                        if num > 1 then --丢也得一起丢，不然很难捡
+                            loot.components.stackable:SetStackSize(num)
+                        end
+                        loot.components.inventoryitem:InheritMoisture(TheWorld.state.wetness, TheWorld.state.iswet)
+                        inst.components.lootdropper:FlingItem(loot, nil)
+                        loot:PushEvent("on_loot_dropped", {dropper = inst})
+                        inst:PushEvent("loot_prefab_spawned", {loot = loot})
+                        inst._count_rock = inst._count_rock - num
+                    end
+                end
+            end)
+        },
+        events = {
+            EventHandler("animover", function(inst) inst.sg:GoToState("idle") end)
+        }
+    },
+    State{ --拒绝
+        name = "refuse",
+        tags = {"idle", "refuse"},
+        onenter = function(inst)
+            inst.components.locomotor:StopMoving()
+            inst.AnimState:PlayAnimation("caw")
+        end,
+        events = {
+            EventHandler("animover", function(inst) inst.sg:GoToState("idle") end)
+        }
+    },
+    State{ --主动吃东西（没用到）
         name = "eat",
         tags = {"idle", "eat"},
         onenter = function(inst)
@@ -424,7 +520,7 @@ local states = {
         end,
         timeline = {
             TimeEvent(FRAMES*10, function(inst)
-                inst:PerformBufferedAction()
+                -- inst:PerformBufferedAction()
             end)
         },
         events = {

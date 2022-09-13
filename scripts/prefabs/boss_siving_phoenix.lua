@@ -268,6 +268,9 @@ local function MakeBoss(data)
             inst:AddTag("flying")
             inst:AddTag("ignorewalkableplatformdrowning")
 
+            --trader (from trader component) added to pristine state for optimization
+            inst:AddTag("trader")
+
             inst.AnimState:SetBank("buzzard")
             inst.AnimState:SetBuild(data.name)
             inst.AnimState:PlayAnimation("idle", true)
@@ -284,6 +287,7 @@ local function MakeBoss(data)
             end
 
             inst._count_atk = 0 --啄击次数
+            inst._count_rock = 0 --喂食后需要掉落的子圭石数量
 
             inst.sounds = BossSounds
             inst.tree = nil
@@ -310,7 +314,25 @@ local function MakeBoss(data)
                 end
             end
             inst.fn_canBeEye = function(inst)
-                return inst.tree ~= nil and inst.tree:IsValid() and inst.tree.myEye == nil
+                if
+                    inst.iswarrior and
+                    inst.tree ~= nil and inst.tree:IsValid()
+                then
+                    if inst.tree.myEye == nil then
+                        return true
+                    end
+                    if not IsValid(inst.tree.myEye) then
+                        inst.tree.myEye = nil
+                        return true
+                    end
+                    if not inst.tree.myEye.iseye then --木眼对象没有木眼标志(猜测可能正在进入木眼状态)
+                        if not inst.tree.myEye.sg:HasStateTag("flyaway") then --然而并没有在进入木眼状态
+                            inst.tree.myEye = nil
+                            return true
+                        end
+                    end
+                end
+                return false
             end
 
             inst.COUNT_FLAP = COUNT_FLAP
@@ -318,6 +340,7 @@ local function MakeBoss(data)
             inst.DIST_FLAP = DIST_FLAP
             inst.DIST_REMOTE = DIST_REMOTE
             inst.DIST_MATE = DIST_MATE
+            inst.DIST_ATK = DIST_ATK
 
             inst.fn_magicWarble = MagicWarble
             inst.fn_discerningPeck = DiscerningPeck
@@ -380,6 +403,37 @@ local function MakeBoss(data)
             end)
             -- inst.components.combat.bonusdamagefn --攻击时针对于被攻击对象的额外伤害值
             -- inst.components.combat:SetHurtSound("dontstarve_DLC001/creatures/moose/hurt") --undo
+
+            inst:AddComponent("trader")
+            inst.components.trader.acceptnontradable = true
+            inst.components.trader:SetAcceptTest(function(inst, item, giver)
+                if inst.components.combat.target ~= nil or inst.sg:HasStateTag("busy") then
+                    return false
+                end
+                local loveditems = {
+                    myth_lotus_flower = 1,
+                    aip_veggie_sunflower = 1
+                }
+                if loveditems[item.prefab] ~= nil or item.sivbird_l_food ~= nil then
+                    --由于一次只给一个太慢了，这里手动从玩家身上全部拿下来
+                    local num = item.components.stackable ~= nil and item.components.stackable.stacksize or 1
+                    if num > 1 then
+                        --拿走只剩1个，以供剩下的逻辑调用
+                        local itemlast = item.components.stackable:Get(num - 1)
+                        itemlast:Remove()
+                    end
+                    inst._count_rock = inst._count_rock + num*(loveditems[item.prefab] or item.sivbird_l_food)
+                    return true
+                else
+                    return false
+                end
+            end)
+            inst.components.trader.onaccept = function(inst, giver, item)
+                inst:PushEvent("dofeeded")
+            end
+            inst.components.trader.onrefuse = function(inst, giver, item)
+                inst:PushEvent("dorefuse")
+            end
 
             -- inst:AddComponent("eater")
             -- inst.components.eater:SetDiet({ FOODGROUP.OMNI }, { FOODGROUP.OMNI })

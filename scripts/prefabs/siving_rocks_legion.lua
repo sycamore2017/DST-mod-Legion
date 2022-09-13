@@ -880,6 +880,19 @@ table.insert(prefs, Prefab(
                     inst.countWorked = inst.countWorked - numall
                     DropRock(inst)
                 end
+
+                if worker ~= nil and inst.bossBirds ~= nil then --攻击破坏神木的对象
+                    local birds = inst.bossBirds
+                    if birds.female ~= nil and birds.female.iswarrior then
+                        if birds.female.components.combat:CanTarget(worker) then
+                            birds.female.components.combat:SetTarget(worker)
+                        end
+                    elseif birds.male ~= nil and birds.male.iswarrior then
+                        if birds.male.components.combat:CanTarget(worker) then
+                            birds.male.components.combat:SetTarget(worker)
+                        end
+                    end
+                end
             end
         end)
 
