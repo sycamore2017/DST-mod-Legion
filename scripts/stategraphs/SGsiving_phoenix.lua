@@ -27,20 +27,30 @@ local function GetTarget(inst) --优先获取自己的敌人，其次才是伴�
 end
 local function CheckSkills(inst)
     if inst.sg.mem.to_flyaway then
-        inst.sg:GoToState("flyaway", inst.sg.mem.to_flyaway)
-    elseif inst.sg.mem.to_taunt then
+        if inst.sg.mem.to_flyaway.beeye then
+            if inst:fn_canBeEye() then
+                inst.sg:GoToState("flyaway", inst.sg.mem.to_flyaway)
+                return true
+            end
+        else
+            inst.sg:GoToState("flyaway", inst.sg.mem.to_flyaway)
+            return true
+        end
+    end
+    if inst.sg.mem.to_taunt then
         inst.sg:GoToState("taunt")
+        return true
     elseif inst.sg.mem.to_caw then
         inst.sg:GoToState("caw")
+        return true
     elseif inst.sg.mem.to_flap then --羽乱舞对目标和距离有要求
         local target = GetTarget(inst)
         if target ~= nil and GetDistance(inst, target) <= (inst.DIST_FLAP)^2 then
             inst.sg:GoToState("flap_pre")
+            return true
         end
-    else
-        return false
     end
-    return true
+    return false
 end
 
 local actionhandlers = {
@@ -86,7 +96,15 @@ local events = {
                     inst.sg.mem.to_flyaway = params
                 end
             else
-                inst.sg:GoToState("flyaway", params)
+                if params.beeye then
+                    if inst:fn_canBeEye() then
+                        inst.sg:GoToState("flyaway", params)
+                    else
+                        inst.sg.mem.to_flyaway = params
+                    end
+                else
+                    inst.sg:GoToState("flyaway", params)
+                end
             end
         end
     end),

@@ -27,7 +27,11 @@ local DIST_ATK = 4 --普通攻击范围
 local DIST_FLAP = 10 --羽乱舞射程
 local DIST_FEA_EXPLODE = 2.5 --精致子圭翎羽的爆炸半径
 
-local TIME_BUFF_WARBLE = 6 --魔音绕耳debuff持续时间
+local TIME_BUFF_WARBLE = 6 --魔音绕耳debuff 持续时间
+local TIME_FLAP = 40 --羽乱舞 冷却时间
+local TIME_TAUNT = 100 --魔音绕梁 冷却时间
+local TIME_CAW = 120 --花寄语 冷却时间
+local TIME_EYE = 300 --同目同心 冷却时间
 
 local ATK_NORMAL = 20 --啄击攻击力
 local ATK_GRIEF = 10 --悲愤状态额外攻击力
@@ -72,6 +76,10 @@ local function GetDamage2(target, basedamage)
     end
 end
 local function DoDefenselessATK(inst, target, basedamage)
+    target.components.combat:GetAttacked(inst, 1, nil, nil) --为了进行一遍被攻击后的逻辑
+    if target.components.health == nil or target.components.health:IsDead() then
+        return
+    end
     target.components.health:DoDelta(
         -GetDamage(inst, target, basedamage), nil, (inst.nameoverride or inst.prefab), true, inst, true)
 end
@@ -80,6 +88,31 @@ local function SpawnFlower(inst, target)
     if flower ~= nil then
         flower.Transform:SetPosition(target.Transform:GetWorldPosition())
         flower:fn_onBind(inst, target)
+    end
+end
+local function SetBehaviorTree(inst, done)
+    if done == "atk" then
+        inst._count_atk = inst._count_atk + 1
+        if inst._count_atk >= 4 then --每啄击几下，进行一次羽乱舞
+            inst.components.timer:StopTimer("flap")
+            inst.sg.mem.to_flap = true --不用事件，回到idle时自己检查吧
+        end
+    elseif done == "flap" then
+        inst._count_atk = 0
+        inst.components.timer:StopTimer("flap")
+        inst.components.timer:StartTimer("flap", TIME_FLAP)
+    elseif done == "taunt" then
+        inst._count_atk = 0
+        inst.components.timer:StopTimer("taunt")
+        inst.components.timer:StartTimer("taunt", TIME_TAUNT)
+    elseif done == "caw" then
+        inst._count_atk = 0
+        inst.components.timer:StopTimer("caw")
+        inst.components.timer:StartTimer("caw", TIME_CAW)
+    elseif done == "eye" then
+        inst._count_atk = 0
+        inst.components.timer:StopTimer("eye")
+        inst.components.timer:StartTimer("eye", TIME_EYE)
     end
 end
 
@@ -120,7 +153,9 @@ local function MagicWarble(inst) --魔音绕梁
         end
     end
 
-    --特效 undo
+    --绑定跟随嘴巴的声音特效 undo
+
+    SetBehaviorTree(inst, "taunt")
 end
 local function DiscerningPeck(inst, target) --啄击（因为替换了官方的普攻逻辑，所以整体得模仿官方的普攻逻辑）
     if target == nil then
@@ -138,6 +173,7 @@ local function DiscerningPeck(inst, target) --啄击（因为替换了官方的�
         inst:PushEvent("onmissother", { target = target, weapon = nil })
     end
     inst.components.combat:ClearAttackTemps()
+    SetBehaviorTree(inst, "atk")
 end
 local function ReleaseFlowers(inst) --花寄语
     local x, y, z = inst.Transform:GetWorldPosition()
@@ -177,16 +213,17 @@ local function ReleaseFlowers(inst) --花寄语
             groupget = false
         end
     end
+
+    SetBehaviorTree(inst, "caw")
 end
 local function BeTreeEye(inst) --同目同心
-    if inst.tree == nil or not inst.tree:IsValid() then
-        return false
-    end
-
-    local eye = SpawnPrefab("siving_boss_eye")
-    if eye ~= nil then
-        eye:fn_onBind(inst.tree, inst)
-        return true
+    SetBehaviorTree(inst, "eye")
+    if inst:fn_canBeEye() then
+        local eye = SpawnPrefab("siving_boss_eye")
+        if eye ~= nil then
+            eye:fn_onBind(inst.tree, inst)
+            return true
+        end
     end
     return false
 end
@@ -201,6 +238,7 @@ local function FeathersFlap(inst) --羽乱舞
             fea.components.projectilelegion:DelayVisibility(fea.projectiledelay)
         end
     end
+    SetBehaviorTree(inst, "flap")
 end
 
 local function MakeBoss(data)
@@ -245,6 +283,8 @@ local function MakeBoss(data)
                 return inst
             end
 
+            inst._count_atk = 0 --啄击次数
+
             inst.sounds = BossSounds
             inst.tree = nil
             inst.mate = nil --另一个伴侣
@@ -269,11 +309,15 @@ local function MakeBoss(data)
                     inst:PushEvent("dotakeoff")
                 end
             end
+            inst.fn_canBeEye = function(inst)
+                return inst.tree ~= nil and inst.tree:IsValid() and inst.tree.myEye == nil
+            end
 
             inst.COUNT_FLAP = COUNT_FLAP
             inst.COUNT_FLAP_GRIEF = COUNT_FLAP_GRIEF
             inst.DIST_FLAP = DIST_FLAP
             inst.DIST_REMOTE = DIST_REMOTE
+            inst.DIST_MATE = DIST_MATE
 
             inst.fn_magicWarble = MagicWarble
             inst.fn_discerningPeck = DiscerningPeck
@@ -440,9 +484,15 @@ local function MakeBoss(data)
                 end
             end)
             inst:ListenForEvent("timerdone", function(inst, data)
-                -- if data.name == "leave" then
-                --     inst.fn_leave(inst)
-                -- end
+                if data.name == "flap" then
+                    inst:PushEvent("doflap")
+                elseif data.name == "taunt" then
+                    inst:PushEvent("dotaunt")
+                elseif data.name == "caw" then
+                    inst:PushEvent("docaw")
+                elseif data.name == "eye" then
+                    inst:PushEvent("dotakeoff", { beeye = true })
+                end
             end)
 
             -- inst.OnSave = OnSave
@@ -1377,7 +1427,6 @@ table.insert(prefs, Prefab(
                 inst.task_eye:Cancel()
                 inst.task_eye = nil
             end
-            inst.tree.myEye = nil
             if IsValid(inst.bird) then
                 inst.AnimState:PlayAnimation("unbind")
                 inst:ListenForEvent("animover", function(inst)
@@ -1391,9 +1440,11 @@ table.insert(prefs, Prefab(
                     end
                     inst.bird.Transform:SetPosition(landpos.x, 30, landpos.z)
                     inst.bird.sg:GoToState("glide")
+                    inst.tree.myEye = nil
                     inst:Remove()
                 end)
             else
+                inst.tree.myEye = nil
                 inst:Remove()
             end
         end
