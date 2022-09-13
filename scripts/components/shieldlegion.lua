@@ -41,6 +41,7 @@ end
 
 function ShieldLegion:StartAttack(doer)
     self.issuccess = false
+    doer.shield_l_success = nil
     self.time = GetTime()
     if self.startfn ~= nil then
         self.startfn(self.inst, doer)
@@ -143,6 +144,7 @@ function ShieldLegion:GetAttacked(doer, attacker, damage, weapon, stimuli)
             restarget = self.inst
             data.armordamage = data.armordamage*self.armormult_success
             self.issuccess = true
+            doer.shield_l_success = true --让玩家实体也能直接识别是否处于盾反成功中
             self:SetFollowedFx(doer, self.fxdata) --盾保特效
 
             self.hurtsoundoverride = doer.hurtsoundoverride
@@ -170,6 +172,7 @@ function ShieldLegion:FinishAttack(doer, issgend)
         end
     end
     self.issuccess = false
+    doer.shield_l_success = nil
 
     doer.hurtsoundoverride = self.hurtsoundoverride
 

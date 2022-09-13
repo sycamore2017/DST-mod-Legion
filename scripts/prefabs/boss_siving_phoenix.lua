@@ -76,8 +76,11 @@ local function GetDamage2(target, basedamage)
     end
 end
 local function DoDefenselessATK(inst, target, basedamage)
-    target.components.combat:GetAttacked(inst, 1, nil, nil) --为了进行一遍被攻击后的逻辑
-    if target.components.health == nil or target.components.health:IsDead() then
+    target.components.combat:GetAttacked(inst, 1, nil, nil) --为了进行一遍被攻击后的逻辑(这里能触发盾反)
+    if
+        target.components.health == nil or target.components.health:IsDead() or
+        target.shield_l_success --盾反成功
+    then
         return
     end
     target.components.health:DoDelta(
