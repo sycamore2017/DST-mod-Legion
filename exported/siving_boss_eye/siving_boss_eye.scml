@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<spriter_data scml_version="1.0" generator="BrashMonkey Spriter" generator_version="r7">
+    <folder id="0" name="base">
+        <file id="0" name="base/base-0.png" width="379" height="757" pivot_x="0.499" pivot_y="0.565"/>
+        <file id="1" name="base/base-1.png" width="379" height="757" pivot_x="0.499" pivot_y="0.565"/>
+        <file id="2" name="base/base-2.png" width="379" height="757" pivot_x="0.499" pivot_y="0.565"/>
+        <file id="3" name="base/base-3.png" width="379" height="757" pivot_x="0.499" pivot_y="0.565"/>
+        <file id="4" name="base/base-4.png" width="191" height="346" pivot_x="0.51" pivot_y="0.43"/>
+    </folder>
+    <folder id="1" name="eye">
+        <file id="0" name="eye/eye-0.png" width="176" height="294" pivot_x="0.5" pivot_y="0.5"/>
+        <file id="1" name="eye/eye-1.png" width="82" height="82" pivot_x="0.5" pivot_y="0.5"/>
+    </folder>
+    <folder id="2" name="fx">
+        <file id="0" name="fx/fx-0.png" width="87" height="734" pivot_x="0.54" pivot_y="0.02"/>
+        <file id="1" name="fx/fx-1.png" width="66" height="431" pivot_x="0.57" pivot_y="0.02"/>
+    </folder>
+    <folder id="3" name="griefeye">
+        <file id="0" name="griefeye/griefeye-0.png" width="176" height="294" pivot_x="0.5" pivot_y="0.5"/>
+        <file id="1" name="griefeye/griefeye-1.png" width="82" height="82" pivot_x="0.5" pivot_y="0.5"/>
+    </folder>
+    <entity id="0" name="siving_boss_eye">
+        <animation id="0" name="bind" length="1000" interval="100">
+            <mainline>
+                <key id="0"/>
+            </mainline>
+        </animation>
+        <animation id="1" name="unbind" length="1000" interval="100">
+            <mainline>
+                <key id="0"/>
+            </mainline>
+        </animation>
+        <animation id="2" name="idle" length="1000" interval="100">
+            <mainline>
+                <key id="0"/>
+            </mainline>
+        </animation>
+        <animation id="3" name="spell" length="1000" interval="100">
+            <mainline>
+                <key id="0"/>
+            </mainline>
+        </animation>
+    </entity>
+</spriter_data>

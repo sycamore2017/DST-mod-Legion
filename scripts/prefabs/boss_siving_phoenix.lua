@@ -1536,7 +1536,7 @@ table.insert(prefs, Prefab(
             if bird.isgrief then
                 dt = TIME_EYE_GRIEF
                 countmax = COUNT_EYE_GRIEF
-                --悲愤状态换贴图！undo
+                inst.AnimState:OverrideSymbol("eye", "siving_boss_eye", "griefeye")
             else
                 dt = TIME_EYE
                 countmax = COUNT_EYE
