@@ -41,6 +41,7 @@ end
 local function OnDropped(inst)
     inst.AnimState:PlayAnimation("idle")
     inst.components.inventoryitem.pushlandedevents = true
+    inst.components.inventoryitem.canbepickedup = true
     inst:PushEvent("on_landed")
 
     local skindata = inst.components.skinedlegion:GetSkinedData()
@@ -60,6 +61,7 @@ local function OnThrown(inst, owner, target)
     end
     inst.AnimState:PlayAnimation("spin_loop", true)
     inst.components.inventoryitem.pushlandedevents = false
+    inst.components.inventoryitem.canbepickedup = false
 
     local skindata = inst.components.skinedlegion:GetSkinedData()
     if skindata ~= nil and skindata.fn_onThrown ~= nil then
@@ -77,6 +79,7 @@ local function ReturnToOwner(inst, owner)
             if skindata ~= nil and skindata.fn_onThrownEnd ~= nil then
                 skindata.fn_onThrownEnd(inst)
             end
+            inst.components.inventoryitem.canbepickedup = true
 
             --如果使用者已装备手持武器，就放进物品栏，没有的话就直接装备上
             if not owner.components.inventory:GetEquippedItem(inst.components.equippable.equipslot) then
