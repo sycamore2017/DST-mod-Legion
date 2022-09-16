@@ -93,10 +93,11 @@ local actionhandlers = {
 local events = {
     CommonHandlers.OnSleep(),
     CommonHandlers.OnFreeze(),
+    CommonHandlers.OnAttacked(),
     CommonHandlers.OnDeath(),
 
     EventHandler("locomote", function(inst)
-        if IsBusy(inst) then return end
+        if (not inst.sg:HasStateTag("idle") and not inst.sg:HasStateTag("moving")) then return end
 
         if inst.components.locomotor:WantsToMoveForward() then
             if not inst.sg:HasStateTag("hopping") then
@@ -114,12 +115,12 @@ local events = {
             inst.sg:GoToState("attack", params)
         end
     end),
-    EventHandler("attacked", function(inst)
-        if IsBusy(inst) then return end
-        if not inst.sg:HasStateTag("hit") then --这次受击动画完毕才能下一个
-            inst.sg:GoToState("hit")
-        end
-    end),
+    -- EventHandler("attacked", function(inst)
+    --     if IsBusy(inst) then return end
+    --     if not inst.sg:HasStateTag("hit") then --这次受击动画完毕才能下一个
+    --         inst.sg:GoToState("hit")
+    --     end
+    -- end),
     EventHandler("dotakeoff", function(inst, params) --强制飞走
         if not inst.components.health:IsDead() then
             if inst.sg:HasStateTag("flyaway") then --正在飞，但不一定是我想要的那个
@@ -156,6 +157,9 @@ local events = {
         end
     end),
     EventHandler("doflap", function(inst) --羽乱舞
+        if GetTarget(inst) == nil then --没有敌人就不该乱放这个技能
+            return
+        end
         if IsBusy(inst) then
             inst.sg.mem.to_flap = true
         else
@@ -473,7 +477,7 @@ local states = {
     },
     State{ --被喂食
         name = "feeded",
-        tags = {"idle", "eat"},
+        tags = {"eat"},
         onenter = function(inst)
             inst.components.locomotor:StopMoving()
             inst.AnimState:PlayAnimation("peck")
@@ -502,7 +506,7 @@ local states = {
     },
     State{ --拒绝
         name = "refuse",
-        tags = {"idle", "refuse"},
+        tags = {"refuse"},
         onenter = function(inst)
             inst.components.locomotor:StopMoving()
             inst.AnimState:PlayAnimation("caw")
@@ -513,7 +517,7 @@ local states = {
     },
     State{ --主动吃东西（没用到）
         name = "eat",
-        tags = {"idle", "eat"},
+        tags = {"eat"},
         onenter = function(inst)
             inst.components.locomotor:StopMoving()
             inst.AnimState:PlayAnimation("peck")

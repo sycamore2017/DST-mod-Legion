@@ -23,15 +23,15 @@ local BossSounds = {
 
 local DIST_MATE = 13 --离伴侣的最远距离
 local DIST_REMOTE = 20 --最大活动范围
-local DIST_ATK = 4 --普通攻击范围
-local DIST_FLAP = 10 --羽乱舞射程
+local DIST_ATK = 3.5 --普通攻击范围
+local DIST_FLAP = 7 --羽乱舞射程
 local DIST_FEA_EXPLODE = 2.5 --精致子圭翎羽的爆炸半径
 
 local TIME_BUFF_WARBLE = 6 --魔音绕耳debuff 持续时间
 local TIME_FLAP = 40 --羽乱舞 冷却时间
-local TIME_TAUNT = 100 --魔音绕梁 冷却时间
-local TIME_CAW = 120 --花寄语 冷却时间
-local TIME_EYE = 300 --同目同心 冷却时间
+local TIME_TAUNT = 60 --魔音绕梁 冷却时间
+local TIME_CAW = 50 --花寄语 冷却时间
+local TIME_EYE = 100 --同目同心 冷却时间
 
 local ATK_NORMAL = 20 --啄击攻击力
 local ATK_GRIEF = 10 --悲愤状态额外攻击力
@@ -84,7 +84,7 @@ local function DoDefenselessATK(inst, target, basedamage)
         return
     end
     target.components.health:DoDelta(
-        -GetDamage(inst, target, basedamage), nil, (inst.nameoverride or inst.prefab), true, inst, true)
+        -GetDamage(inst, target, basedamage), nil, (inst.nameoverride or inst.prefab), false, inst, true)
 end
 local function SpawnFlower(inst, target)
     local flower = SpawnPrefab("siving_boss_flowerfx")
@@ -184,39 +184,16 @@ local function ReleaseFlowers(inst) --花寄语
 
     --特效 undo
 
-    if inst.isgrief then --悲愤状态的话，所有对象都寄生
-        for _, v in ipairs(ents) do
-            if
-                v.components.health ~= nil and not v.components.health:IsDead()
-            then
-                if v.components.inventory == nil or not v.components.inventory:EquipHasTag("siv_BFF") then
-                    SpawnFlower(inst, v)
-                end
-            end
-        end
-        return
-    end
-
-    local count = 0
-    local groupget = false
     for _, v in ipairs(ents) do
-        count = count + 1
         if
-            not groupget and
+            not v.hassivflower and --防止重复寄生
             v.components.health ~= nil and not v.components.health:IsDead() and
-            (count >= 3 or math.random() < 0.33)
+            (v.components.inventory == nil or not v.components.inventory:EquipHasTag("siv_BFF")) and
+            (inst.isgrief or math.random() < 0.33)
         then
-            if v.components.inventory == nil or not v.components.inventory:EquipHasTag("siv_BFF") then
-                groupget = true
-                SpawnFlower(inst, v)
-            end
-        end
-        if count >= 3 then
-            count = 0
-            groupget = false
+            SpawnFlower(inst, v)
         end
     end
-
     SetBehaviorTree(inst, "caw")
 end
 local function BeTreeEye(inst) --同目同心
@@ -232,7 +209,7 @@ local function BeTreeEye(inst) --同目同心
 end
 local function FeathersFlap(inst) --羽乱舞
     local x, y, z = inst.Transform:GetWorldPosition()
-    local num = math.random(3, 5)
+    local num = math.random(2, 3)
     for i = 1, num, 1 do
         local fea = SpawnPrefab(math.random() < 0.2 and "siving_bossfea_real" or "siving_bossfea_fake")
         if fea ~= nil then
@@ -257,10 +234,10 @@ local function MakeBoss(data)
             inst.entity:AddNetwork()
 
             inst.DynamicShadow:SetSize(2.5, 1.5)
-            inst.Transform:SetScale(1.5, 1.5, 1.5)
+            inst.Transform:SetScale(2.1, 2.1, 2.1)
             inst.Transform:SetFourFaced()
 
-            MakeTinyFlyingCharacterPhysics(inst, 500, 0.5) --飞行BOSS，主要是为了不对子圭羽毛产生碰撞
+            MakeGhostPhysics(inst, 1500, 1.2) --鬼魂类物理，主要是为了不对子圭羽毛产生碰撞
 
             inst:AddTag("epic")
             -- inst:AddTag("noepicmusic")
@@ -463,6 +440,10 @@ local function MakeBoss(data)
             inst:AddComponent("knownlocations")
 
             inst:AddComponent("timer")
+            inst.components.timer:StartTimer("flap", TIME_FLAP)
+            inst.components.timer:StartTimer("taunt", TIME_TAUNT)
+            inst.components.timer:StartTimer("caw", TIME_CAW)
+            inst.components.timer:StartTimer("eye", TIME_EYE)
 
             inst:AddComponent("lootdropper")
 
@@ -875,32 +856,8 @@ end
 ------
 ------
 
-local function OnFinishWork_bossfeather(inst, worker)
-    inst.components.lootdropper:DropLoot()
-    --特效 undo
-    inst:Remove()
-end
-local function OnThrown_bossfeather(inst, owner, targetpos, attacker)
-    inst.AnimState:SetOrientation(ANIM_ORIENTATION.OnGround)
-    inst.AnimState:PlayAnimation("shoot3", false)
-    -- inst.components.inventoryitem.pushlandedevents = false
-    -- inst.components.inventoryitem.canbepickedup = false
-    inst.Physics:SetActive(false)
-    inst.components.workable:SetWorkable(false)
-    -- inst:PushEvent("on_no_longer_landed")
-    inst.SoundEmitter:PlaySound("dontstarve/creatures/leif/swipe", nil, 0.2)
-end
-local function OnMiss_bossfeather(inst, targetpos, attacker)
-    inst.AnimState:SetOrientation(ANIM_ORIENTATION.Default)
-    inst.AnimState:PlayAnimation("idle", false)
-    -- inst.components.inventoryitem.pushlandedevents = true
-    -- inst.components.inventoryitem.canbepickedup = true
-    inst.Physics:SetActive(true)
-    inst.components.workable:SetWorkable(true)
-    inst:PushEvent("on_landed")
-end
-
 local function MakeBossWeapon(data)
+    local scale = 1.2
     table.insert(prefs, Prefab(
         data.name,
         function()
@@ -911,27 +868,18 @@ local function MakeBossWeapon(data)
             inst.entity:AddSoundEmitter()
             inst.entity:AddNetwork()
 
-            inst:SetPhysicsRadiusOverride(1.5)
-            MakeWaterObstaclePhysics(inst, 1.5, 2, 0.75)
-            inst.Physics:SetActive(false)
+            MakeInventoryPhysics(inst)
+            RemovePhysicsColliders(inst)
+
+            inst.Transform:SetScale(scale, scale, scale)
+            inst.AnimState:SetOrientation(ANIM_ORIENTATION.OnGround)
 
             inst:AddTag("sharp")
-            inst:AddTag("siv_boss_block") --用来被清场
-            inst:AddTag("ignorewalkableplatforms")
 
             --weapon (from weapon component) added to pristine state for optimization
             inst:AddTag("weapon")
 
-            inst.Transform:SetEightFaced()
-
             inst.projectiledelay = 3 * FRAMES
-
-            MakeInventoryFloatable(inst, "small", 0.2, 0.5)
-            -- local OnLandedClient_old = inst.components.floater.OnLandedClient
-            -- inst.components.floater.OnLandedClient = function(self)
-            --     OnLandedClient_old(self)
-            --     self.inst.AnimState:SetFloatParams(0.04, 1, self.bob_percent)
-            -- end
 
             if data.fn_common ~= nil then
                 data.fn_common(inst)
@@ -942,23 +890,84 @@ local function MakeBossWeapon(data)
                 return inst
             end
 
-            inst:AddComponent("inspectable")
-
-            inst:AddComponent("lootdropper")
+            inst.persists = false
 
             inst:AddComponent("weapon")
-
-            inst:AddComponent("workable")
-            inst.components.workable:SetWorkAction(ACTIONS.MINE)
-            inst.components.workable:SetWorkLeft(1)
-            inst.components.workable:SetOnFinishCallback(OnFinishWork_bossfeather)
 
             inst:AddComponent("projectilelegion")
             inst.components.projectilelegion.speed = 45
             inst.components.projectilelegion.shootrange = DIST_FLAP
-            inst.components.projectilelegion.onthrown = OnThrown_bossfeather
-            inst.components.projectilelegion.onmiss = OnMiss_bossfeather
+            inst.components.projectilelegion.onthrown = function(inst, owner, targetpos, attacker)
+                inst.AnimState:PlayAnimation("shoot3", false)
+                inst.SoundEmitter:PlaySound("dontstarve/creatures/leif/swipe", nil, 0.2)
+            end
+            inst.components.projectilelegion.onmiss = function(inst, targetpos, attacker)
+                local block = SpawnPrefab(data.name.."_block")
+                if block ~= nil then
+                    block.Transform:SetPosition(inst.Transform:GetWorldPosition())
+                end
+                inst:Remove()
+            end
             inst.components.projectilelegion.exclude_tags = { "INLIMBO", "NOCLICK", "siving" }
+
+            if data.fn_server ~= nil then
+                data.fn_server(inst)
+            end
+
+            return inst
+        end,
+        data.assets,
+        data.prefabs
+    ))
+    table.insert(prefs, Prefab(
+        data.name.."_block",
+        function()
+            local inst = CreateEntity()
+
+            inst.entity:AddTransform()
+            inst.entity:AddAnimState()
+            inst.entity:AddSoundEmitter()
+            inst.entity:AddNetwork()
+
+            inst:SetPhysicsRadiusOverride(0.15)
+            MakeWaterObstaclePhysics(inst, 0.15, 2, 0.75)
+
+            inst:AddTag("siv_boss_block") --用来被清场
+            inst:AddTag("ignorewalkableplatforms")
+
+            inst.Transform:SetScale(scale, scale, scale)
+            inst.Transform:SetEightFaced()
+
+            inst:SetPrefabNameOverride(data.name)
+
+            MakeInventoryFloatable(inst, "small", 0.2, 0.5)
+            -- local OnLandedClient_old = inst.components.floater.OnLandedClient
+            -- inst.components.floater.OnLandedClient = function(self)
+            --     OnLandedClient_old(self)
+            --     self.inst.AnimState:SetFloatParams(0.04, 1, self.bob_percent)
+            -- end
+
+            if data.fn_common2 ~= nil then
+                data.fn_common2(inst)
+            end
+
+            inst.entity:SetPristine()
+            if not TheWorld.ismastersim then
+                return inst
+            end
+
+            --加载水面特效
+            inst:DoTaskInTime(POPULATING and math.random()*5*FRAMES or 0, function(inst)
+                inst.components.floater:OnLandedServer()
+            end)
+
+            inst:AddComponent("inspectable")
+
+            inst:AddComponent("lootdropper")
+
+            inst:AddComponent("workable")
+            inst.components.workable:SetWorkAction(ACTIONS.MINE)
+            inst.components.workable:SetWorkLeft(1)
 
             MakeHauntableWork(inst)
 
@@ -969,14 +978,14 @@ local function MakeBossWeapon(data)
                 end
             end)
 
-            if data.fn_server ~= nil then
-                data.fn_server(inst)
+            if data.fn_server2 ~= nil then
+                data.fn_server2(inst)
             end
 
             return inst
         end,
         data.assets,
-        data.prefabs
+        data.prefabs2
     ))
 end
 
@@ -1085,7 +1094,6 @@ local function OnTimerDone_egg(inst, data)
         inst.components.timer:StartTimer("birth", 3)
         --音效 undo
     elseif data.name == "birth" then
-        --破壳特效 undo
         if inst.tree == nil or not inst.tree:IsValid() then --生成一个非BOSS战的玄鸟
             local bird = SpawnPrefab(inst.ismale and "siving_moenix" or "siving_foenix")
             if bird ~= nil then
@@ -1095,7 +1103,8 @@ local function OnTimerDone_egg(inst, data)
         else --BOSS战的玄鸟由神木在管理
             inst.ishatched = true
         end
-        inst:Remove()
+        inst.AnimState:PlayAnimation("break", false)
+        inst:ListenForEvent("animover", inst.Remove)
     end
 end
 
@@ -1150,7 +1159,8 @@ table.insert(prefs, Prefab(
         inst:ListenForEvent("death", function(inst, data)
             inst:RemoveEventCallback("timerdone", OnTimerDone_egg)
             inst.components.lootdropper:DropLoot()
-            --破壳特效 undo
+            inst.AnimState:PlayAnimation("break", false)
+            inst:ListenForEvent("animover", inst.Remove)
         end)
 
         inst.OnLoad = function(inst, data)
@@ -1253,6 +1263,7 @@ table.insert(prefs, Prefab( --特效
 
         inst.persists = false
         inst.tree = nil
+        inst.bird = nil
         inst.target = nil
         inst.countHealth = 0
         inst.state = 1
@@ -1260,32 +1271,43 @@ table.insert(prefs, Prefab( --特效
         inst.fn_onUnbind = function(target) --落地
             inst:RemoveEventCallback("death", inst.fn_onUnbind, target)
             inst:RemoveEventCallback("onremove", inst.fn_onUnbind, target)
+            target.hassivflower = nil
 
             if inst.task_bind ~= nil then
                 inst.task_bind:Cancel()
                 inst.task_bind = nil
             end
-            if inst.countHealth > 0 and inst.tree ~= nil then
+            if inst.countHealth > 0 then
                 local flower = SpawnPrefab("siving_boss_flower")
                 if flower ~= nil then
                     flower.tree = inst.tree
+                    flower.bird = inst.bird
                     if inst.countHealth < HEALTH_FLOWER then
                         flower.components.health:SetCurrentHealth(inst.countHealth)
                     end
                     SetFlowerState(flower, inst.countHealth, false)
-                    flower.Transform:SetPosition(target.Transform:GetWorldPosition())
+
+                    local x, y, z = target.Transform:GetWorldPosition()
+                    flower.Transform:SetPosition(x, 0.5, z)
                 end
             end
             inst:Remove()
         end
         inst.fn_onBind = function(inst, bird, target) --寄生
             inst.tree = bird.tree
+            inst.bird = bird
             inst.target = target
+            target.hassivflower = true
             inst.entity:SetParent(target.entity)
 
             --获取能跟随的symbol
-            local symbol = target.components.combat and target.components.combat.hiteffectsymbol or nil
-            if symbol == nil then
+            local symbol = target.components.debuffable and target.components.debuffable.followsymbol or nil
+            if symbol == nil or symbol == "" then
+                if target.components.combat ~= nil then
+                    symbol = target.components.combat.hiteffectsymbol
+                end
+            end
+            if symbol == nil or symbol == "" then
                 if target.components.freezable ~= nil then
                     for _, v in pairs(target.components.freezable.fxdata) do
                         if v.follow ~= nil then
@@ -1294,7 +1316,7 @@ table.insert(prefs, Prefab( --特效
                         end
                     end
                 end
-                if symbol == nil then
+                if symbol == nil or symbol == "" then
                     if target.components.burnable ~= nil then
                         for _, v in pairs(target.components.burnable.fxdata) do
                             if v.follow ~= nil then
@@ -1306,7 +1328,17 @@ table.insert(prefs, Prefab( --特效
                 end
             end
             if symbol ~= nil then
-                inst.Follower:FollowSymbol(target.GUID, symbol, 0, 0, 0)
+                local ox, oy, oz = 0, 0, 0
+                if target.components.debuffable ~= nil then
+                    local debuffable = target.components.debuffable
+                    ox = debuffable.followoffset.x
+                    oy = debuffable.followoffset.y
+                    oz = debuffable.followoffset.z
+                end
+                if oy == 0 then
+                    oy = -140
+                end
+                inst.Follower:FollowSymbol(target.GUID, symbol, ox, oy, oz)
             end
 
             inst:ListenForEvent("death", inst.fn_onUnbind, target)
@@ -1359,7 +1391,7 @@ table.insert(prefs, Prefab( --实体
 
         inst.AnimState:SetBank("siving_boss_flower")
         inst.AnimState:SetBuild("siving_boss_flower")
-        inst.AnimState:PlayAnimation("idle1", true)
+        inst.AnimState:PlayAnimation("idle3", true)
         inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
 
         inst.Light:Enable(true)
@@ -1375,6 +1407,7 @@ table.insert(prefs, Prefab( --实体
 
         inst.persists = false
         inst.tree = nil
+        inst.bird = nil
         inst.state = 3
 
         inst:AddComponent("inspectable")
@@ -1386,7 +1419,7 @@ table.insert(prefs, Prefab( --实体
 
         inst:ListenForEvent("attacked", function(inst, data)
             inst.AnimState:PlayAnimation("hit"..tostring(inst.state))
-            inst.AnimState:PlayAnimation("idle"..tostring(inst.state), true)
+            inst.AnimState:PushAnimation("idle"..tostring(inst.state), true)
         end)
         inst:ListenForEvent("death", function(inst, data)
             if inst._task_health ~= nil then
@@ -1429,8 +1462,16 @@ table.insert(prefs, Prefab( --实体
                 if valuelast > 0 then --然后才是给神木增加生命计数器
                     inst.tree.countHealth = inst.tree.countHealth + valuelast
                 end
+            elseif inst.bird ~= nil and IsValid(inst.bird) then
+                GiveLife(inst.bird, inst.components.health.currenthealth)
             end
-            --消失的特效 undo
+
+            local fx = SpawnPrefab("siving_boss_flower_fx")
+            if fx ~= nil then
+                local x, y, z = inst.Transform:GetWorldPosition()
+                fx.Transform:SetPosition(x, 0, z)
+            end
+
             inst._task_health = nil
             inst:Remove()
         end)
@@ -1440,7 +1481,7 @@ table.insert(prefs, Prefab( --实体
     {
         Asset("ANIM", "anim/siving_boss_flower.zip")
     },
-    nil
+    { "siving_boss_flower_fx" }
 ))
 
 --------------------------------------------------------------------------
@@ -1600,28 +1641,38 @@ MakeWeapon({
 })
 
 --BOSS产物：精致子圭翎羽
+local function AddWeaponLight(inst)
+    inst.entity:AddLight()
+    inst.Light:Enable(true)
+    inst.Light:SetRadius(.6)
+    inst.Light:SetFalloff(1)
+    inst.Light:SetIntensity(.5)
+    inst.Light:SetColour(15/255, 180/255, 132/255)
+    inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
+end
 MakeBossWeapon({
     name = "siving_bossfea_real",
     assets = {
         Asset("ANIM", "anim/siving_feather_real.zip")
     },
-    prefabs = nil,
+    prefabs = { "siving_bossfea_real_block" },
     fn_common = function(inst)
-        inst.entity:AddLight()
-        inst.Light:Enable(true)
-        inst.Light:SetRadius(.6)
-        inst.Light:SetFalloff(1)
-        inst.Light:SetIntensity(.5)
-        inst.Light:SetColour(15/255, 180/255, 132/255)
-
+        AddWeaponLight(inst)
+        inst.AnimState:SetBank("siving_feather_real")
+        inst.AnimState:SetBuild("siving_feather_real")
+    end,
+    fn_server = function(inst)
+        inst.components.weapon:SetDamage(ATK_FEA_REAL)
+    end,
+    prefabs2 = { "explode_small_slurtle" },
+    fn_common2 = function(inst)
+        AddWeaponLight(inst)
         inst.AnimState:SetBank("siving_feather_real")
         inst.AnimState:SetBuild("siving_feather_real")
         inst.AnimState:PlayAnimation("idle", false)
-        inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
     end,
-    fn_server = function(inst)
+    fn_server2 = function(inst)
         inst.components.lootdropper:AddChanceLoot("siving_rocks", 0.1)
-
         inst.components.workable:SetOnFinishCallback(function(inst, worker)
             --爆炸！
             local x, y, z = inst.Transform:GetWorldPosition()
@@ -1648,9 +1699,7 @@ MakeBossWeapon({
             inst.components.lootdropper:DropLoot()
             inst:Remove()
         end)
-
-        inst.components.weapon:SetDamage(ATK_FEA_REAL)
-    end
+    end,
 })
 
 --------------------------------------------------------------------------
@@ -1694,19 +1743,28 @@ MakeBossWeapon({
     assets = {
         Asset("ANIM", "anim/siving_feather_fake.zip")
     },
-    prefabs = {
-        -- "siving_feather_line"
-    },
+    prefabs = { "siving_bossfea_fake_block" },
     fn_common = function(inst)
+        inst.AnimState:SetBank("siving_feather_fake")
+        inst.AnimState:SetBuild("siving_feather_fake")
+    end,
+    fn_server = function(inst)
+        inst.components.weapon:SetDamage(ATK_FEA)
+    end,
+    prefabs2 = nil,
+    fn_common2 = function(inst)
         inst.AnimState:SetBank("siving_feather_fake")
         inst.AnimState:SetBuild("siving_feather_fake")
         inst.AnimState:PlayAnimation("idle", false)
     end,
-    fn_server = function(inst)
+    fn_server2 = function(inst)
         inst.components.lootdropper:AddChanceLoot("siving_rocks", 0.02)
-
-        inst.components.weapon:SetDamage(ATK_FEA)
-    end
+        inst.components.workable:SetOnFinishCallback(function(inst, worker)
+            inst.components.lootdropper:DropLoot()
+            --特效 undo
+            inst:Remove()
+        end)
+    end,
 })
 
 --------------------------------------------------------------------------

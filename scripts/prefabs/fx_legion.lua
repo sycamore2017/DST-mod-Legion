@@ -256,7 +256,7 @@ if CONFIGS_LEGION.PRAYFORRAIN then
     MakeFx({ --艾力冈的剑：燃血
         name = "agronssword_fx",
         assets = {
-            Asset("ANIM", "anim/lavaarena_boarrior_fx.zip"),    --需要官方的动画模板
+            Asset("ANIM", "anim/lavaarena_boarrior_fx.zip"), --需要官方的动画模板
             Asset("ANIM", "anim/agronssword_fx.zip"),
         },
         prefabs = nil,
@@ -593,6 +593,24 @@ if CONFIGS_LEGION.LEGENDOFFALL then
             inst.AnimState:OverrideSymbol("monkey_fx_parts", "life_trans_fx", "fx_fur_part") --不想显示这部分
             inst.AnimState:SetFinalOffset(3)
             inst.AnimState:SetScale(0.65, 0.65)
+        end,
+        fn_remove = nil,
+    })
+    MakeFx({ --子圭寄生花：消失特效
+        name = "siving_boss_flower_fx",
+        assets = {
+            Asset("ANIM", "anim/lavaarena_boarrior_fx.zip"), --官方的动画
+            Asset("ANIM", "anim/siving_boss_flower_fx.zip"),
+        },
+        prefabs = nil,
+        fn_common = nil,
+        fn_anim = function(inst)
+            inst.AnimState:SetBank("lavaarena_boarrior_fx")
+            inst.AnimState:SetBuild("siving_boss_flower_fx")
+            inst.AnimState:PlayAnimation("ground_hit_"..tostring(math.random(3)))
+            inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
+            inst.AnimState:SetFinalOffset(1)
+            inst.AnimState:SetMultColour(1/255, 248/255, 255/255, 1)
         end,
         fn_remove = nil,
     })
