@@ -18,7 +18,8 @@ local BossSounds = {
     flap = "dontstarve_DLC001/creatures/buzzard/flap",
     atk = "dontstarve_DLC001/creatures/buzzard/attack",
     taunt = "dontstarve_DLC001/creatures/buzzard/taunt",
-    caw = "dontstarve_DLC001/creatures/buzzard/squack"
+    caw = "dontstarve_DLC001/creatures/buzzard/squack",
+    hurt = "dontstarve_DLC001/creatures/buzzard/hurt"
 }
 
 local DIST_MATE = 13 --离伴侣的最远距离
@@ -29,9 +30,9 @@ local DIST_FEA_EXPLODE = 2.5 --精致子圭翎羽的爆炸半径
 
 local TIME_BUFF_WARBLE = 6 --魔音绕耳debuff 持续时间
 local TIME_FLAP = 40 --羽乱舞 冷却时间
-local TIME_TAUNT = 60 --魔音绕梁 冷却时间
-local TIME_CAW = 50 --花寄语 冷却时间
-local TIME_EYE = 100 --同目同心 冷却时间
+local TIME_TAUNT = 60 --魔音绕梁 冷却时间 60
+local TIME_CAW = 50 --花寄语 冷却时间 50
+local TIME_EYE = 10 --同目同心 冷却时间 180
 
 local ATK_NORMAL = 20 --啄击攻击力
 local ATK_GRIEF = 10 --悲愤状态额外攻击力
@@ -155,9 +156,6 @@ local function MagicWarble(inst) --魔音绕梁
             end
         end
     end
-
-    --绑定跟随嘴巴的声音特效 undo
-
     SetBehaviorTree(inst, "taunt")
 end
 local function DiscerningPeck(inst, target) --啄击（因为替换了官方的普攻逻辑，所以整体得模仿官方的普攻逻辑）
@@ -197,7 +195,7 @@ local function ReleaseFlowers(inst) --花寄语
     SetBehaviorTree(inst, "caw")
 end
 local function BeTreeEye(inst) --同目同心
-    SetBehaviorTree(inst, "eye")
+    -- SetBehaviorTree(inst, "eye") --此时不进行冷却，等结束时才冷却
     if inst:fn_canBeEye() then
         local eye = SpawnPrefab("siving_boss_eye")
         if eye ~= nil then
@@ -231,6 +229,7 @@ local function MakeBoss(data)
             inst.entity:AddAnimState()
             inst.entity:AddSoundEmitter()
             inst.entity:AddDynamicShadow()
+            inst.entity:AddLight()
             inst.entity:AddNetwork()
 
             inst.DynamicShadow:SetSize(2.5, 1.5)
@@ -250,6 +249,13 @@ local function MakeBoss(data)
 
             --trader (from trader component) added to pristine state for optimization
             inst:AddTag("trader")
+
+            inst.Light:Enable(true)
+            inst.Light:SetRadius(2)
+            inst.Light:SetFalloff(1)
+            inst.Light:SetIntensity(.5)
+            inst.Light:SetColour(15/255, 180/255, 132/255)
+            inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
 
             inst.AnimState:SetBank("buzzard")
             inst.AnimState:SetBuild(data.name)
@@ -279,6 +285,7 @@ local function MakeBoss(data)
             inst.fn_onGrief = function(inst, tree, dotaunt)
                 inst.isgrief = true
                 inst.AnimState:OverrideSymbol("buzzard_eye", data.name, "buzzard_angryeye")
+                inst.Light:SetColour(255/255, 127/255, 82/255)
                 inst.components.combat:SetDefaultDamage(ATK_NORMAL+ATK_GRIEF)
                 if dotaunt then
                     inst:PushEvent("dotaunt")
@@ -301,6 +308,9 @@ local function MakeBoss(data)
                     if inst.tree.myEye == nil then
                         return true
                     end
+                    if inst.tree.myEye == inst then --因为提前占用了，所以是自己很正常
+                        return true
+                    end
                     if not IsValid(inst.tree.myEye) then
                         inst.tree.myEye = nil
                         return true
@@ -314,6 +324,26 @@ local function MakeBoss(data)
                 end
                 return false
             end
+            inst.fn_onFly = function(inst, params)
+                if params ~= nil then
+                    if params.x and params.z then
+                        inst.Transform:SetPosition(params.x, params.y or 30, params.z)
+                        inst.sg:GoToState("glide")
+                        return
+                    elseif params.beeye then --同目同心
+                        if not inst:fn_beTreeEye() then
+                            if inst.tree then
+                                inst.tree.myEye = nil
+                            end
+                            local x, y, z = inst.Transform:GetWorldPosition()
+                            inst.Transform:SetPosition(x, 30, z)
+                            inst.sg:GoToState("glide")
+                        end
+                        return
+                    end
+                end
+                inst:Remove() --飞上天就消失啦
+            end
 
             inst.COUNT_FLAP = COUNT_FLAP
             inst.COUNT_FLAP_GRIEF = COUNT_FLAP_GRIEF
@@ -321,6 +351,7 @@ local function MakeBoss(data)
             inst.DIST_REMOTE = DIST_REMOTE
             inst.DIST_MATE = DIST_MATE
             inst.DIST_ATK = DIST_ATK
+            inst.TIME_FLAP = TIME_FLAP
 
             inst.fn_magicWarble = MagicWarble
             inst.fn_discerningPeck = DiscerningPeck
@@ -382,7 +413,7 @@ local function MakeBoss(data)
                 end
             end)
             -- inst.components.combat.bonusdamagefn --攻击时针对于被攻击对象的额外伤害值
-            -- inst.components.combat:SetHurtSound("dontstarve_DLC001/creatures/moose/hurt") --undo
+            inst.components.combat:SetHurtSound(BossSounds.hurt) --undo
 
             inst:AddComponent("trader")
             inst.components.trader.acceptnontradable = true
@@ -564,7 +595,9 @@ local function MakeBoss(data)
             "siving_boss_flowerfx",
             "siving_boss_eye",
             "siving_bossfea_real",
-            "siving_bossfea_fake"
+            "siving_bossfea_fake",
+            "siving_boss_taunt_fx",
+            "siving_boss_caw_fx"
         }
     ))
 end
@@ -904,6 +937,7 @@ local function MakeBossWeapon(data)
             inst.components.projectilelegion.onmiss = function(inst, targetpos, attacker)
                 local block = SpawnPrefab(data.name.."_block")
                 if block ~= nil then
+                    block.Transform:SetRotation(inst.Transform:GetRotation())
                     block.Transform:SetPosition(inst.Transform:GetWorldPosition())
                 end
                 inst:Remove()
@@ -968,6 +1002,8 @@ local function MakeBossWeapon(data)
             inst:AddComponent("workable")
             inst.components.workable:SetWorkAction(ACTIONS.MINE)
             inst.components.workable:SetWorkLeft(1)
+
+            inst:AddComponent("savedrotation") --保存旋转角度的组件
 
             MakeHauntableWork(inst)
 
@@ -1118,7 +1154,7 @@ table.insert(prefs, Prefab(
         inst.entity:AddSoundEmitter()
         inst.entity:AddNetwork()
 
-        MakeObstaclePhysics(inst, 0.7)
+        MakeObstaclePhysics(inst, 0.4)
 
         inst:AddTag("hostile")
         inst:AddTag("siving")
@@ -1153,14 +1189,15 @@ table.insert(prefs, Prefab(
 
         inst:ListenForEvent("timerdone", OnTimerDone_egg)
         inst:ListenForEvent("attacked", function(inst, data)
-            inst.AnimState:PlayAnimation("hit")
-            SetEggState(inst, inst.state)
+            if not inst.components.health:IsDead() then
+                inst.AnimState:PlayAnimation("hit")
+                SetEggState(inst, inst.state)
+            end
         end)
         inst:ListenForEvent("death", function(inst, data)
             inst:RemoveEventCallback("timerdone", OnTimerDone_egg)
             inst.components.lootdropper:DropLoot()
             inst.AnimState:PlayAnimation("break", false)
-            inst:ListenForEvent("animover", inst.Remove)
         end)
 
         inst.OnLoad = function(inst, data)
@@ -1192,7 +1229,7 @@ table.insert(prefs, Prefab(
 --------------------------------------------------------------------------
 
 local HEALTH_FLOWER = 480
-local TIME_FLOWER = 9 --治疗玄鸟的延迟时间
+local TIME_FLOWER = 11 --治疗玄鸟的延迟时间
 
 local function SetFlowerState(inst, value, pushanim)
     local name = nil
@@ -1286,6 +1323,7 @@ table.insert(prefs, Prefab( --特效
                         flower.components.health:SetCurrentHealth(inst.countHealth)
                     end
                     SetFlowerState(flower, inst.countHealth, false)
+                    flower.Transform:SetRotation(target.Transform:GetRotation())
 
                     local x, y, z = target.Transform:GetWorldPosition()
                     flower.Transform:SetPosition(x, 0.5, z)
@@ -1389,6 +1427,8 @@ table.insert(prefs, Prefab( --实体
         inst:AddTag("hostile")
         inst:AddTag("siving")
 
+        inst.Transform:SetTwoFaced()
+
         inst.AnimState:SetBank("siving_boss_flower")
         inst.AnimState:SetBuild("siving_boss_flower")
         inst.AnimState:PlayAnimation("idle3", true)
@@ -1418,15 +1458,19 @@ table.insert(prefs, Prefab( --实体
         inst:AddComponent("combat")
 
         inst:ListenForEvent("attacked", function(inst, data)
-            inst.AnimState:PlayAnimation("hit"..tostring(inst.state))
-            inst.AnimState:PushAnimation("idle"..tostring(inst.state), true)
+            if not inst.components.health:IsDead() then
+                inst.AnimState:PlayAnimation("hit"..tostring(inst.state))
+                inst.AnimState:PushAnimation("idle"..tostring(inst.state), true)
+            end
         end)
         inst:ListenForEvent("death", function(inst, data)
             if inst._task_health ~= nil then
                 inst._task_health:Cancel()
                 inst._task_health = nil
             end
-            --消失的特效 undo
+            inst.Light:Enable(false)
+            inst.AnimState:ClearBloomEffectHandle()
+            inst.AnimState:PlayAnimation("dead"..tostring(inst.state), false)
         end)
 
         inst._task_health = inst:DoTaskInTime(TIME_FLOWER, function(inst)
@@ -1488,9 +1532,9 @@ table.insert(prefs, Prefab( --实体
 --[[ 子圭之眼 ]]
 --------------------------------------------------------------------------
 
-local TIME_EYE = 9
+local TIME_EYE = 4 --9
 local TIME_EYE_GRIEF = 4.5
-local COUNT_EYE = 6
+local COUNT_EYE = 1 --6
 local COUNT_EYE_GRIEF = 8
 
 table.insert(prefs, Prefab(
@@ -1510,14 +1554,14 @@ table.insert(prefs, Prefab(
         inst.AnimState:SetBuild("siving_boss_eye")
         inst.AnimState:PlayAnimation("bind")
         inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
+        inst.AnimState:SetScale(1.3, 1.3)
         inst.AnimState:SetFinalOffset(3)
+        inst.AnimState:SetSortOrder(3)
 
         inst.entity:SetPristine()
         if not TheWorld.ismastersim then
             return inst
         end
-
-        inst.AnimState:PushAnimation("idle", true)
 
         inst.persists = false
         inst.tree = nil
@@ -1533,14 +1577,13 @@ table.insert(prefs, Prefab(
                 inst:ListenForEvent("animover", function(inst)
                     inst.bird.iseye = false
                     inst.bird.eyefx = nil
-                    inst.bird:RemoveTag("notarget")
-                    inst.bird:Show()
-                    inst.bird.brain:Start()
                     if landpos == nil then
                         landpos = inst.bird.components.knownlocations:GetLocation("spawnpoint") or inst.tree:GetPosition()
                     end
                     inst.bird.Transform:SetPosition(landpos.x, 30, landpos.z)
+                    inst.bird:ReturnToScene()
                     inst.bird.sg:GoToState("glide")
+                    SetBehaviorTree(inst.bird, "eye")
                     inst.tree.myEye = nil
                     inst:Remove()
                 end)
@@ -1556,9 +1599,7 @@ table.insert(prefs, Prefab(
             end
 
             bird.components.combat:SetTarget(nil)
-            bird.brain:Stop()
-            bird:Hide()
-            bird:AddTag("notarget")
+            bird:RemoveFromScene()
             bird.iseye = true
             bird.eyefx = inst
             tree.myEye = bird
@@ -1567,10 +1608,13 @@ table.insert(prefs, Prefab(
 
             local x, y, z = tree.Transform:GetWorldPosition()
             inst.Transform:SetPosition(x, y, z)
-            bird.Transform:SetPosition(x, 30, z)
+            bird.Transform:SetPosition(x, 0, z)
 
             inst.entity:SetParent(tree.entity)
-            inst.Follower:FollowSymbol(tree.GUID, "trunk", 0, 0, 0)
+            inst.Follower:FollowSymbol(tree.GUID, "trunk", 0, -760, 0)
+
+            inst.AnimState:PlayAnimation("bind")
+            inst.AnimState:PushAnimation("idle", true)
 
             local count = 0
             local dt, countmax
@@ -1583,6 +1627,9 @@ table.insert(prefs, Prefab(
                 countmax = COUNT_EYE
             end
             inst.task_eye = inst:DoPeriodicTask(dt, function(inst)
+                inst.AnimState:PlayAnimation("spell")
+                inst.AnimState:PushAnimation("idle", true)
+
                 count = count + 1
                 local landtarget = nil
                 local ents = TheSim:FindEntities(x, 0, z, DIST_REMOTE, { "_combat", "_health" }, TAGS_CANT)

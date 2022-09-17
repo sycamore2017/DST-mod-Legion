@@ -86,6 +86,15 @@ local function CheckSkills(inst, isidle)
     return false
 end
 
+local function SetSoundFx(inst, name)
+    local fx = SpawnPrefab(name)
+    if fx ~= nil then
+        fx.entity:SetParent(inst.entity)
+        fx.entity:AddFollower()
+        fx.Follower:FollowSymbol(inst.GUID, "buzzard_beak", 0, 0, 0)
+    end
+end
+
 local actionhandlers = {
     -- ActionHandler(ACTIONS.EAT, "eat")
 }
@@ -158,6 +167,7 @@ local events = {
     end),
     EventHandler("doflap", function(inst) --羽乱舞
         if GetTarget(inst) == nil then --没有敌人就不该乱放这个技能
+            inst.components.timer:StartTimer("flap", inst.TIME_FLAP) --重设技能冷却
             return
         end
         if IsBusy(inst) then
@@ -286,7 +296,7 @@ local states = {
         name = "flyaway",
         tags = {"flight", "busy", "canrotate", "flyaway"},
         onenter = function(inst, params)
-            inst.Physics:Stop()
+            inst.components.locomotor:StopMoving()
             inst.sg:SetTimeout(.1+math.random()*.2)
             inst.sg.statemem.params = params
             inst.sg.statemem.vert = math.random() > .5
@@ -301,40 +311,37 @@ local states = {
             if params and params.beeye and inst.tree then
                 inst.tree.myEye = inst --提前占用，防止两只玄鸟一起化目
             end
+            inst.taks_fly = inst:DoTaskInTime(2.1, function(inst) --由于飞高了脱离玩家加载范围导致sg停止，所以得用非sg形式
+                inst.taks_fly = nil
+                inst:fn_onFly(params)
+            end)
         end,
         ontimeout = function(inst)
             if inst.sg.statemem.vert then
                 inst.AnimState:PushAnimation("takeoff_vertical_loop", true)
-                inst.Physics:SetMotorVel(-2+math.random()*4, 15+math.random()*5, -2+math.random()*4)
+                inst.Physics:SetMotorVel(-2+math.random()*4, 25+math.random()*5, -2+math.random()*4)
             else
                 inst.AnimState:PushAnimation("takeoff_diagonal_loop", true)
-                local x = 8+math.random()*8
-                inst.Physics:SetMotorVel(x, 15+math.random()*5, -2+math.random()*4)
+                -- local x = 8+math.random()*8
+                -- inst.Physics:SetMotorVel(x, 15+math.random()*5, -2+math.random()*4)
+                inst.Physics:SetMotorVel(-2+math.random()*4, 25+math.random()*5, -2+math.random()*4)
             end
         end,
         timeline = {
             TimeEvent(2, function(inst)
-                local params = inst.sg.statemem.params
-                if params ~= nil then
-                    if params.x and params.z then
-                        inst.Transform:SetPosition(params.x, params.y or 30, params.z)
-                        inst.sg:GoToState("glide")
-                        return
-                    elseif params.beeye then --同目同心
-                        if not inst:fn_beTreeEye() then
-                            if inst.tree then
-                                inst.tree.myEye = nil
-                            end
-                            local x, y, z = inst.Transform:GetWorldPosition()
-                            inst.Transform:SetPosition(x, 30, z)
-                            inst.sg:GoToState("glide")
-                        end
-                        return
-                    end
+                if inst.taks_fly ~= nil then --说明还没有执行呢
+                    inst.taks_fly:Cancel()
+                    inst.taks_fly = nil
+                    inst:fn_onFly(inst.sg.statemem.params)
                 end
-                inst:Remove() --飞上天就消失啦
             end),
-        }
+        },
+        onexit = function(inst)
+            if inst.taks_fly ~= nil then
+                inst.taks_fly:Cancel()
+                inst.taks_fly = nil
+            end
+        end
     },
     State{ --降落
         name = "glide",
@@ -370,7 +377,7 @@ local states = {
                 inst.Transform:SetPosition(pos:Get())
             end
             inst.components.knownlocations:RememberLocation("spawnpoint", pos, true)
-        end,
+        end
     },
     State{ --魔音绕梁
         name = "taunt",
@@ -386,6 +393,10 @@ local states = {
             end),
             TimeEvent(FRAMES*6, function(inst)
                 inst:fn_magicWarble()
+                SetSoundFx(inst, "siving_boss_taunt_fx")
+            end),
+            TimeEvent(FRAMES*11, function(inst)
+                SetSoundFx(inst, "siving_boss_taunt_fx")
             end)
         },
         events = {
@@ -406,6 +417,7 @@ local states = {
             end),
             TimeEvent(FRAMES*8, function(inst)
                 inst:fn_releaseFlowers()
+                SetSoundFx(inst, "siving_boss_caw_fx")
             end)
         },
         events = {

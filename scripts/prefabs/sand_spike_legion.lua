@@ -73,7 +73,7 @@ end
 --     HAMMER = true,
 --     MINE = true,
 -- }
-local COLLAPSIBLE_TAGS = { "_combat" }
+local COLLAPSIBLE_TAGS = { "_combat", "siv_boss_block" }
 -- for k, v in pairs(COLLAPSIBLE_WORK_ACTIONS) do
 --     table.insert(COLLAPSIBLE_TAGS, k.."_workable")
 -- end
@@ -108,7 +108,7 @@ local function DoDamage(inst, OnIgnite)
     local isblock = inst.animname == "block"
     local x, y, z = inst.Transform:GetWorldPosition()
     local ents = TheSim:FindEntities(x, 0, z, inst.spikeradius + DAMAGE_RADIUS_PADDING, nil, NON_COLLAPSIBLE_TAGS, COLLAPSIBLE_TAGS)
-    for i, v in ipairs(ents) do
+    for _, v in ipairs(ents) do
         if v:IsValid() then
             -- local isworkable = false
             -- if v.components.workable ~= nil then
@@ -138,13 +138,17 @@ local function DoDamage(inst, OnIgnite)
             --         end
             --     end
             -- else
-            if v.components.combat ~= nil
-                and v.components.health ~= nil
-                and not v.components.health:IsDead() then
-                if v.components.locomotor == nil then --就这里，导致可以秒杀触手等没有移动组件但有战斗组件的实体
-                    v.components.health:Kill()
-                elseif not isblock and inst.components.combat:IsValidTarget(v) then
-                    inst.components.combat:DoAttack(v)
+            if v.components.combat ~= nil then
+                if v.components.health ~= nil and not v.components.health:IsDead() then
+                    if v.components.locomotor == nil then --就这里，导致可以秒杀触手等没有移动组件但有战斗组件的实体
+                        v.components.health:Kill()
+                    elseif not isblock and inst.components.combat:IsValidTarget(v) then
+                        inst.components.combat:DoAttack(v)
+                    end
+                end
+            elseif v.components.workable ~= nil then
+                if v.components.workable:CanBeWorked() then
+                    v.components.workable:WorkedBy(inst, 3)
                 end
             end
         end

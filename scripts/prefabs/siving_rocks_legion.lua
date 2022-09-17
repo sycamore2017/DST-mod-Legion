@@ -457,9 +457,9 @@ local function DropRock(inst)
 end
 local function CallBirdFarAway(bird, x, z)
     if
-        not bird.iseye and
+        not bird.iseye and not bird:IsInLimbo() and
         not bird.sg:HasStateTag("flight") and
-        bird:GetDistanceSqToPoint(x, 0, z) >= 625
+        bird:GetDistanceSqToPoint(x, 0, z) >= 1225
     then
         local spawnpos = bird.components.knownlocations:GetLocation("spawnpoint")
         if spawnpos ~= nil then
@@ -492,10 +492,10 @@ local function OnStealLife(inst, value)
         GiveLife(inst, inst.bossBirds.male, 3)
     elseif inst.bossEgg ~= nil then --子圭蛋在场上时，吸收的生命用来恢复它(也要检查其有效性)
         GiveLife(inst, inst.bossEgg, 3)
-    else --如果没有玄鸟，每500生命必定掉落子圭石
-        if inst.countHealth >= 500 then
+    else --如果没有玄鸟，每700生命必定掉落子圭石
+        if inst.countHealth >= 700 then
             DropRock(inst)
-            inst.countHealth = inst.countHealth - 500
+            inst.countHealth = inst.countHealth - 700
         end
     end
 end

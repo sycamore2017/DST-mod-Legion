@@ -614,6 +614,49 @@ if CONFIGS_LEGION.LEGENDOFFALL then
         end,
         fn_remove = nil,
     })
+    MakeFx({ --魔音绕梁：音波特效
+        name = "siving_boss_taunt_fx",
+        assets = {
+            Asset("ANIM", "anim/bearger_ring_fx.zip"), --官方的动画
+        },
+        prefabs = nil,
+        fn_common = nil,
+        fn_anim = function(inst)
+            inst.AnimState:SetBank("bearger_ring_fx")
+            inst.AnimState:SetBuild("bearger_ring_fx")
+            inst.AnimState:PlayAnimation("idle")
+            inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
+            inst.AnimState:SetScale(0.5, 0.5)
+            inst.AnimState:SetFinalOffset(3)
+            inst.AnimState:SetSortOrder(3)
+            inst.AnimState:SetMultColour(111/255, 255/255, 2/255, 0.25)
+        end,
+        fn_remove = nil,
+    })
+    MakeFx({ --花寄语：音波特效
+        name = "siving_boss_caw_fx",
+        assets = {
+            Asset("ANIM", "anim/alterguardian_meteor.zip"), --官方的动画
+            Asset("ANIM", "anim/siving_boss_caw_fx.zip")
+        },
+        prefabs = nil,
+        fn_common = nil,
+        fn_anim = function(inst)
+            inst.AnimState:SetBank("alterguardian_meteor")
+            inst.AnimState:SetBuild("siving_boss_caw_fx")
+            inst.AnimState:PlayAnimation("meteorground_loop")
+            inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
+            inst.AnimState:SetScale(0.5, 0.5)
+            inst.AnimState:SetFinalOffset(3)
+            inst.AnimState:SetSortOrder(3)
+            inst.AnimState:SetMultColour(1/255, 248/255, 255/255, 0.4)
+        end,
+        fn_remove = function(inst)
+            inst:DoTaskInTime(0.8, function()
+                inst:Remove()
+            end)
+        end,
+    })
 end
 
 ---------------
