@@ -26,17 +26,6 @@ local function GetTarget(inst) --优先获取自己的敌人，其次才是伴�
     end
 end
 local function CheckSkills(inst, isidle)
-    if inst.sg.mem.to_flyaway then
-        if inst.sg.mem.to_flyaway.beeye then
-            if inst:fn_canBeEye() then
-                inst.sg:GoToState("flyaway", inst.sg.mem.to_flyaway)
-                return true
-            end
-        else
-            inst.sg:GoToState("flyaway", inst.sg.mem.to_flyaway)
-            return true
-        end
-    end
     if inst.sg.mem.to_taunt then
         inst.sg:GoToState("taunt")
         return true
@@ -49,6 +38,19 @@ local function CheckSkills(inst, isidle)
     end
 
     local target = GetTarget(inst)
+
+    if inst.sg.mem.to_flyaway then
+        if inst.sg.mem.to_flyaway.beeye then
+            if target ~= nil and inst:fn_canBeEye() then --要有敌人才会进行
+                inst.sg:GoToState("flyaway", inst.sg.mem.to_flyaway)
+                return true
+            end
+        else
+            inst.sg:GoToState("flyaway", inst.sg.mem.to_flyaway)
+            return true
+        end
+    end
+
     if target ~= nil then --自己或伴侣有仇恨对象
         if inst.sg.mem.to_flap then
             if GetDistance(inst, target) <= (inst.DIST_FLAP)^2 then --羽乱舞对目标和距离有要求
@@ -124,12 +126,6 @@ local events = {
             inst.sg:GoToState("attack", params)
         end
     end),
-    -- EventHandler("attacked", function(inst)
-    --     if IsBusy(inst) then return end
-    --     if not inst.sg:HasStateTag("hit") then --这次受击动画完毕才能下一个
-    --         inst.sg:GoToState("hit")
-    --     end
-    -- end),
     EventHandler("dotakeoff", function(inst, params) --强制飞走
         if not inst.components.health:IsDead() then
             if inst.sg:HasStateTag("flyaway") then --正在飞，但不一定是我想要的那个
@@ -139,8 +135,8 @@ local events = {
                     inst.sg.mem.to_flyaway = params
                 end
             else
-                if params.beeye then
-                    if inst:fn_canBeEye() then
+                if params and params.beeye then
+                    if GetTarget(inst) ~= nil and inst:fn_canBeEye() then --要有敌人才会进行
                         inst.sg:GoToState("flyaway", params)
                     else
                         inst.sg.mem.to_flyaway = params
@@ -311,31 +307,47 @@ local states = {
             if params and params.beeye and inst.tree then
                 inst.tree.myEye = inst --提前占用，防止两只玄鸟一起化目
             end
-            inst.taks_fly = inst:DoTaskInTime(2.1, function(inst) --由于飞高了脱离玩家加载范围导致sg停止，所以得用非sg形式
+            inst.taks_fly = inst:DoTaskInTime(2, function(inst) --由于飞高了脱离玩家加载范围导致sg停止，所以得用非sg形式
                 inst.taks_fly = nil
+                inst.sg.statemem.motor = nil
+                inst.Physics:Stop()
                 inst:fn_onFly(params)
             end)
         end,
         ontimeout = function(inst)
+            local motor = { x = 0, y = 20+math.random()*5, z = -2+math.random()*4 }
             if inst.sg.statemem.vert then
                 inst.AnimState:PushAnimation("takeoff_vertical_loop", true)
-                inst.Physics:SetMotorVel(-2+math.random()*4, 25+math.random()*5, -2+math.random()*4)
+                motor.x = -2+math.random()*4
             else
                 inst.AnimState:PushAnimation("takeoff_diagonal_loop", true)
-                -- local x = 8+math.random()*8
-                -- inst.Physics:SetMotorVel(x, 15+math.random()*5, -2+math.random()*4)
-                inst.Physics:SetMotorVel(-2+math.random()*4, 25+math.random()*5, -2+math.random()*4)
+                motor.x = 8+math.random()*8
             end
+            inst.Physics:SetMotorVel(motor.x, motor.y, motor.z)
+            inst.sg.statemem.motor = motor
         end,
-        timeline = {
-            TimeEvent(2, function(inst)
+        onupdate = function(inst)
+            if inst.taks_fly == nil then
+                return
+            end
+
+            local pt = Point(inst.Transform:GetWorldPosition())
+            if pt.y >= 30 or inst:IsAsleep() then
+                inst.sg.statemem.motor = nil
+                inst.Physics:Stop()
                 if inst.taks_fly ~= nil then --说明还没有执行呢
                     inst.taks_fly:Cancel()
                     inst.taks_fly = nil
                     inst:fn_onFly(inst.sg.statemem.params)
                 end
-            end),
-        },
+                return
+            end
+
+            local motor = inst.sg.statemem.motor
+            if motor then --持续给予加速度，防止物理碰撞后自己的速度受到影响
+                inst.Physics:SetMotorVel(motor.x, motor.y, motor.z)
+            end
+        end,
         onexit = function(inst)
             if inst.taks_fly ~= nil then
                 inst.taks_fly:Cancel()
@@ -345,7 +357,7 @@ local states = {
     },
     State{ --降落
         name = "glide",
-        tags = {"idle", "flight", "busy", "glide"},
+        tags = {"flight", "busy", "glide"},
         onenter = function(inst)
             inst.AnimState:PlayAnimation("glide", true)
             inst.Physics:SetMotorVelOverride(0, -15, 0)

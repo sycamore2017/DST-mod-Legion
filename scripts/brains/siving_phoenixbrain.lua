@@ -39,7 +39,7 @@ local CHASE_TIME = 10
 
 local function GetMatePos(inst)
     if
-        not inst.iswarrior and --护卫模式才需要跟着伴侣
+        inst.components.combat.target == nil and --没有仇恨时才需要跟着伴侣
         inst.mate ~= nil and
         not inst.mate.iseye and
         not inst.mate.sg:HasStateTag("flight")

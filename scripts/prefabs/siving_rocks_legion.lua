@@ -336,6 +336,7 @@ MakeDerivant({  --子圭森型岩
 
 local TIME_WITHER = TUNING.TOTAL_DAY_TIME * 15 --神木枯萎时间
 local TIME_FREE = TUNING.TOTAL_DAY_TIME --玄鸟无所事事最多停留的时间
+local TIME_EYE = 10 --同目同心 冷却时间 180
 
 local function IsValid(bird)
     return bird ~= nil and bird:IsValid() and
@@ -409,7 +410,19 @@ local function ComputTraded(inst, light, health)
         inst.tradeditems.health = inst.tradeditems.health + health
     end
 end
-local function InitBird(inst, bird)
+local function FixSpawnPoint(inst, one) --防止神木被挪动后，位置错位而太远
+    local mypos = one:GetPosition()
+    mypos.y = 0 --此时可能在飞，所以得强行改成0
+    if inst:GetDistanceSqToPoint(mypos) > one.DIST_SPAWN^2 then
+        mypos = inst:GetPosition() --距离太远，就设置神木自己为出生点。防止移动神木后，玄鸟相对位置变动
+        one.Transform:SetPosition(mypos.x, 0, mypos.z)
+        mypos.y = 0
+    end
+    if one.components.knownlocations then
+        one.components.knownlocations:RememberLocation("spawnpoint", mypos, false) --由于可能会被打包走，所以得重新设置
+    end
+end
+local function InitBird(inst, bird, isnew)
     if inst.bossBirds == nil then
         inst.bossBirds = {}
     end
@@ -418,9 +431,13 @@ local function InitBird(inst, bird)
     bird.components.knownlocations:RememberLocation("tree", inst:GetPosition(), false)
     bird.persists = false --由神木来控制保存机制
 
-    local birdpos = bird:GetPosition()
-    birdpos.y = 0 --此时可能在飞，所以得强行改成0
-    bird.components.knownlocations:RememberLocation("spawnpoint", birdpos, false) --由于可能会被打包走，所以得重新设置
+    if isnew then
+        local birdpos = bird:GetPosition()
+        birdpos.y = 0 --此时可能在飞，所以得强行改成0
+        bird.components.knownlocations:RememberLocation("spawnpoint", birdpos, false) --由于可能会被打包走，所以得重新设置
+    else
+        FixSpawnPoint(inst, bird)
+    end
 
     inst:ListenForEvent("death", inst.fn_onBirdDead, bird)
     inst:ListenForEvent("onremove", inst.fn_onBirdDead, bird)
@@ -433,6 +450,8 @@ local function InitEgg(inst, egg, ismale)
     inst.rebirthed = true
     egg.tree = inst
     egg.persists = false --由神木来控制保存机制
+
+    FixSpawnPoint(inst, egg)
 
     inst:ListenForEvent("death", inst.fn_onEggDead, egg)
     inst:ListenForEvent("onremove", inst.fn_onEggDead, egg)
@@ -577,7 +596,7 @@ local function TriggerLifeExtractTask(inst, doit)
                         end
                     end
 
-                    ------检查BOSS所在地，太远就召唤回来(防止玩家做些奇怪的传送操作)。检查BOSS站位是否需要轮换
+                    ------检查BOSS所在地，太远就召唤回来(防止玩家做些奇怪的传送操作)
                     if inst.bossBirds ~= nil then
                         local female = inst.bossBirds.female
                         local male = inst.bossBirds.male
@@ -595,7 +614,6 @@ local function TriggerLifeExtractTask(inst, doit)
 
                         if female == nil then
                             if male ~= nil then
-                                male.iswarrior = true
                                 if male.components.combat.target == nil then
                                     _freecounter = _freecounter + 2
                                 else
@@ -606,20 +624,12 @@ local function TriggerLifeExtractTask(inst, doit)
                             end
                         else
                             if male == nil then
-                                female.iswarrior = true
                                 if female.components.combat.target == nil then
                                     _freecounter = _freecounter + 2
                                 else
                                     _freecounter = 0
                                 end
                             else
-                                if female.components.health.currenthealth >= male.components.health.currenthealth then
-                                    female.iswarrior = true
-                                    male.iswarrior = false
-                                else
-                                    female.iswarrior = false
-                                    male.iswarrior = true
-                                end
                                 if female.components.combat.target == nil and male.components.combat.target == nil then
                                     _freecounter = _freecounter + 2
                                 else
@@ -808,9 +818,24 @@ table.insert(prefs, Prefab(
         inst.rebirthed = false --玄鸟是否已经重生过了
         inst.tradeditems = nil --已给予的物品
 
+        inst.TIME_EYE = TIME_EYE
+
         inst.fn_onBirdDead = function(bird) --有玄鸟死亡时
             CheckBirds(inst)
+            if bird.eyefx ~= nil then --兼容：如果是化目的玄鸟被奇怪删除，至少神木这边要恢复状态
+                inst.myEye = nil
+                if bird.eyefx:IsValid() then
+                    bird.eyefx:Remove()
+                end
+                if inst.bossBirds ~= nil then
+                    if not inst.components.timer:TimerExists("eye") then
+                        inst.components.timer:StartTimer("eye", TIME_EYE)
+                    end
+                end
+            end
+
             if inst.bossBirds == nil then --没有玄鸟了
+                inst.components.timer:StopTimer("eye")
                 if inst.rebirthed then --玄鸟已经重生过，神木进入枯萎期
                     inst.components.timer:StopTimer("birddeath")
                     inst.components.timer:StartTimer("birddeath", TIME_WITHER)
@@ -818,21 +843,19 @@ table.insert(prefs, Prefab(
                 else --玄鸟第一次团灭，产生一个蛋供玩家选择
                     local egg = SpawnPrefab("siving_egg")
                     if egg ~= nil then
-                        InitEgg(inst, egg, bird.ismale)
                         egg.Transform:SetPosition(bird.Transform:GetWorldPosition())
+                        InitEgg(inst, egg, bird.ismale)
                     end
                 end
             else --还活着的那只鸟进入悲愤状态
                 if inst.bossBirds.male == nil then
                     if inst.bossBirds.female ~= nil then
                         inst.bossBirds.female.mate = nil
-                        inst.bossBirds.female.iswarrior = true
                         inst.bossBirds.female:fn_onGrief(inst, true)
                     end
                 else
                     if inst.bossBirds.female == nil then
                         inst.bossBirds.male.mate = nil
-                        inst.bossBirds.male.iswarrior = true
                         inst.bossBirds.male:fn_onGrief(inst, true)
                     end
                 end
@@ -849,8 +872,11 @@ table.insert(prefs, Prefab(
                 local bird = SpawnPrefab(egg.ismale and "siving_moenix" or "siving_foenix")
                 if bird ~= nil then
                     bird.Transform:SetPosition(egg.Transform:GetWorldPosition())
-                    InitBird(inst, bird)
+                    InitBird(inst, bird, false) --这里会检查蛋的位置
                     bird:fn_onGrief(inst, true)
+
+                    inst.components.timer:StopTimer("eye")
+                    inst.components.timer:StartTimer("eye", TIME_EYE)
                 end
             end
         end
@@ -883,13 +909,30 @@ table.insert(prefs, Prefab(
 
                 if worker ~= nil and inst.bossBirds ~= nil then --攻击破坏神木的对象
                     local birds = inst.bossBirds
-                    if birds.female ~= nil and birds.female.iswarrior then
-                        if birds.female.components.combat:CanTarget(worker) then
-                            birds.female.components.combat:SetTarget(worker)
+                    if birds.female ~= nil then
+                        if birds.male ~= nil then
+                            local x, y, z = worker.Transform:GetWorldPosition()
+                            if --谁离得近就派谁
+                                birds.female:GetDistanceSqToPoint(x, y, z) <= birds.male:GetDistanceSqToPoint(x, y, z)
+                            then
+                                if birds.female.components.combat:CanTarget(worker) then
+                                    birds.female.components.combat:SetTarget(worker)
+                                end
+                            else
+                                if birds.male.components.combat:CanTarget(worker) then
+                                    birds.male.components.combat:SetTarget(worker)
+                                end
+                            end
+                        else
+                            if birds.female.components.combat:CanTarget(worker) then
+                                birds.female.components.combat:SetTarget(worker)
+                            end
                         end
-                    elseif birds.male ~= nil and birds.male.iswarrior then
-                        if birds.male.components.combat:CanTarget(worker) then
-                            birds.male.components.combat:SetTarget(worker)
+                    else
+                        if birds.male ~= nil then
+                            if birds.male.components.combat:CanTarget(worker) then
+                                birds.male.components.combat:SetTarget(worker)
+                            end
                         end
                     end
                 end
@@ -974,7 +1017,7 @@ table.insert(prefs, Prefab(
 
                     local boss1 = SpawnPrefab("siving_moenix")
                     boss1.Transform:SetPosition(pos.x + offsetfinal.x, 30, pos.z + offsetfinal.z)
-                    InitBird(inst, boss1)
+                    InitBird(inst, boss1, true)
                     boss1.sg:GoToState("glide")
 
                     if offset2 ~= nil then
@@ -982,11 +1025,14 @@ table.insert(prefs, Prefab(
                     end
                     local boss2 = SpawnPrefab("siving_foenix")
                     boss2.Transform:SetPosition(pos.x + offsetfinal.x, 30, pos.z + offsetfinal.z)
-                    InitBird(inst, boss2)
+                    InitBird(inst, boss2, true)
                     boss2.sg:GoToState("glide")
 
                     boss1.mate = boss2
                     boss2.mate = boss1
+
+                    inst.components.timer:StopTimer("eye")
+                    inst.components.timer:StartTimer("eye", TIME_EYE)
                 elseif data.name == "birdstart" then --一次没成功，再试一次
                     inst.components.timer:StartTimer("birdstart2", 9)
                 else --两次都没找到合适的位置下落，就不来了
@@ -1005,6 +1051,42 @@ table.insert(prefs, Prefab(
                         male = nil
                     end
                     EndFight(inst, male, female)
+                end
+            elseif data.name == "eye" then
+                if inst.bossBirds ~= nil and inst.myEye == nil then
+                    local female = inst.bossBirds.female
+                    local male = inst.bossBirds.male
+
+                    if IsValid(female) then --已经被赋予过化目，就不再继续了
+                        if female.sg.mem.to_flyaway and female.sg.mem.to_flyaway.beeye then
+                            return
+                        end
+                    else
+                        female = nil
+                    end
+                    if IsValid(male) then
+                        if male.sg.mem.to_flyaway and male.sg.mem.to_flyaway.beeye then
+                            return
+                        end
+                    else
+                        male = nil
+                    end
+
+                    if female ~= nil then
+                        if male ~= nil then --都活着情况下，谁血少谁去
+                            if female.components.health.currenthealth <= male.components.health.currenthealth then
+                                female:PushEvent("dotakeoff", { beeye = true })
+                            else
+                                male:PushEvent("dotakeoff", { beeye = true })
+                            end
+                        else
+                            female:PushEvent("dotakeoff", { beeye = true })
+                        end
+                    else
+                        if male ~= nil then
+                            male:PushEvent("dotakeoff", { beeye = true })
+                        end
+                    end
                 end
             end
         end)
@@ -1064,13 +1146,13 @@ table.insert(prefs, Prefab(
                     if data.male ~= nil then
                         boss1 = SpawnSaveRecord(data.male, newents)
                         if boss1 ~= nil then
-                            InitBird(inst, boss1)
+                            InitBird(inst, boss1, false)
                         end
                     end
                     if data.female ~= nil then
                         boss2 = SpawnSaveRecord(data.female, newents)
                         if boss2 ~= nil then
-                            InitBird(inst, boss2)
+                            InitBird(inst, boss2, false)
                         end
                     end
 
@@ -1093,6 +1175,13 @@ table.insert(prefs, Prefab(
                     end
                 end
 
+                if inst.bossBirds ~= nil then
+                    if not inst.components.timer:TimerExists("eye") then
+                        inst.components.timer:StartTimer("eye", TIME_EYE)
+                    end
+                else
+                    inst.components.timer:StopTimer("eye")
+                end
                 if inst.bossBirds ~= nil or inst.bossEgg ~= nil then
                     inst.components.timer:StopTimer("birddeath")
                 end

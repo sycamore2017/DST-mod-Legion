@@ -8,7 +8,7 @@
         <file id="4" name="base/base-4.png" width="191" height="346" pivot_x="0.51" pivot_y="0.43"/>
     </folder>
     <folder id="1" name="eye">
-        <file id="0" name="eye/eye-0.png" width="176" height="294" pivot_x="0.5" pivot_y="0.5"/>
+        <file id="0" name="eye/eye-0.png" width="2" height="2" pivot_x="0.5" pivot_y="0.5"/>
         <file id="1" name="eye/eye-1.png" width="82" height="82" pivot_x="0.5" pivot_y="0.5"/>
     </folder>
     <folder id="2" name="fx">

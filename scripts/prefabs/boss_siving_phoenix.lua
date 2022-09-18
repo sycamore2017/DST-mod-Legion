@@ -22,9 +22,10 @@ local BossSounds = {
     hurt = "dontstarve_DLC001/creatures/buzzard/hurt"
 }
 
-local DIST_MATE = 13 --离伴侣的最远距离
+local DIST_MATE = 9 --离伴侣的最远距离
 local DIST_REMOTE = 20 --最大活动范围
 local DIST_ATK = 3.5 --普通攻击范围
+local DIST_SPAWN = DIST_REMOTE + DIST_ATK --距离神木的最大距离
 local DIST_FLAP = 7 --羽乱舞射程
 local DIST_FEA_EXPLODE = 2.5 --精致子圭翎羽的爆炸半径
 
@@ -32,7 +33,6 @@ local TIME_BUFF_WARBLE = 6 --魔音绕耳debuff 持续时间
 local TIME_FLAP = 40 --羽乱舞 冷却时间
 local TIME_TAUNT = 60 --魔音绕梁 冷却时间 60
 local TIME_CAW = 50 --花寄语 冷却时间 50
-local TIME_EYE = 10 --同目同心 冷却时间 180
 
 local ATK_NORMAL = 20 --啄击攻击力
 local ATK_GRIEF = 10 --悲愤状态额外攻击力
@@ -53,10 +53,7 @@ local function CheckMate(inst)
     if inst.mate ~= nil then
         if not IsValid(inst.mate) then
             inst.mate = nil
-            inst.iswarrior = true
         end
-    else
-        inst.iswarrior = true
     end
 end
 local function GetDamage(inst, target, basedamage)
@@ -113,10 +110,6 @@ local function SetBehaviorTree(inst, done)
         inst._count_atk = 0
         inst.components.timer:StopTimer("caw")
         inst.components.timer:StartTimer("caw", TIME_CAW)
-    elseif done == "eye" then
-        inst._count_atk = 0
-        inst.components.timer:StopTimer("eye")
-        inst.components.timer:StartTimer("eye", TIME_EYE)
     end
 end
 
@@ -195,7 +188,6 @@ local function ReleaseFlowers(inst) --花寄语
     SetBehaviorTree(inst, "caw")
 end
 local function BeTreeEye(inst) --同目同心
-    -- SetBehaviorTree(inst, "eye") --此时不进行冷却，等结束时才冷却
     if inst:fn_canBeEye() then
         local eye = SpawnPrefab("siving_boss_eye")
         if eye ~= nil then
@@ -278,7 +270,6 @@ local function MakeBoss(data)
             inst.sounds = BossSounds
             inst.tree = nil
             inst.mate = nil --另一个伴侣
-            inst.iswarrior = true --BOSS站位（两个BOSS会在近战模式和护卫模式之间轮换占位）
             inst.isgrief = false --是否处于悲愤状态
             inst.iseye = false --是否是木之眼状态
             inst.eyefx = nil --木之眼实体
@@ -294,7 +285,10 @@ local function MakeBoss(data)
             inst.fn_leave = function(inst)
                 inst.tree = nil
                 inst.mate = nil
-                if inst:IsAsleep() then
+                if inst.eyefx ~= nil and inst.eyefx:IsValid() then
+                    inst.eyefx:Remove()
+                end
+                if inst:IsAsleep() or inst.iseye then
                     inst:Remove()
                 else
                     inst:PushEvent("dotakeoff")
@@ -302,7 +296,6 @@ local function MakeBoss(data)
             end
             inst.fn_canBeEye = function(inst)
                 if
-                    inst.iswarrior and
                     inst.tree ~= nil and inst.tree:IsValid()
                 then
                     if inst.tree.myEye == nil then
@@ -351,6 +344,7 @@ local function MakeBoss(data)
             inst.DIST_REMOTE = DIST_REMOTE
             inst.DIST_MATE = DIST_MATE
             inst.DIST_ATK = DIST_ATK
+            inst.DIST_SPAWN = DIST_SPAWN
             inst.TIME_FLAP = TIME_FLAP
 
             inst.fn_magicWarble = MagicWarble
@@ -379,12 +373,12 @@ local function MakeBoss(data)
             inst.components.combat:SetAttackPeriod(3)
             inst.components.combat:SetRetargetFunction(3, function(inst)
                 CheckMate(inst)
-                return FindEntity(inst.tree or inst, DIST_REMOTE+DIST_ATK,
+                return FindEntity(inst.tree or inst, DIST_SPAWN,
                         inst.mate == nil and function(guy) --对自己有仇恨就行
-                            return guy.components.combat.target == inst
+                            return (inst.isgrief or guy.components.combat.target == inst)
                                 and inst.components.combat:CanTarget(guy)
                         end or function(guy) --对自己有仇恨并且不能和伴侣的目标相同
-                            return guy.components.combat.target == inst
+                            return (inst.isgrief or guy.components.combat.target == inst)
                                 and inst.components.combat:CanTarget(guy)
                                 and inst.mate.components.combat.target ~= guy
                         end,
@@ -395,19 +389,20 @@ local function MakeBoss(data)
             inst.components.combat:SetKeepTargetFunction(function(inst, target)
                 CheckMate(inst)
                 if inst.components.combat:CanTarget(target) then
-                    if inst.iswarrior or inst.mate == nil then --只需要不跑出神木范围就行
+                    if inst.mate == nil then --只需要不跑出神木范围就行
                         return target:GetDistanceSqToPoint(
                                 inst.components.knownlocations:GetLocation("tree") or
                                 inst.components.knownlocations:GetLocation("spawnpoint")
-                            ) < (DIST_REMOTE+DIST_ATK)^2
+                            ) < DIST_SPAWN^2
                     else --不跑得离伴侣以及神木范围太远就行
                         return (
                                 target:GetDistanceSqToPoint(
                                     inst.components.knownlocations:GetLocation("tree") or
                                     inst.components.knownlocations:GetLocation("spawnpoint")
-                                ) < (DIST_REMOTE+DIST_ATK)^2
+                                ) < DIST_SPAWN^2
                             ) and (
-                                target:GetDistanceSqToPoint(inst.mate:GetPosition()) < (DIST_MATE+DIST_ATK)^2
+                                inst.mate.iseye or
+                                inst:GetDistanceSqToPoint(inst.mate:GetPosition()) < (DIST_MATE+DIST_ATK)^2
                             )
                     end
                 end
@@ -474,7 +469,6 @@ local function MakeBoss(data)
             inst.components.timer:StartTimer("flap", TIME_FLAP)
             inst.components.timer:StartTimer("taunt", TIME_TAUNT)
             inst.components.timer:StartTimer("caw", TIME_CAW)
-            inst.components.timer:StartTimer("eye", TIME_EYE)
 
             inst:AddComponent("lootdropper")
 
@@ -499,57 +493,58 @@ local function MakeBoss(data)
                         end
                     end
 
-                    --确定仇恨对象
                     CheckMate(inst)
+                    if inst.components.health:IsDead() then
+                        if inst.mate ~= nil then --自己被打死，伴侣仇恨攻击者
+                            inst.mate.components.combat:SetTarget(data.attacker)
+                        end
+                        return
+                    end
+
                     local lasttarget = inst.components.combat.target
-                    if inst.iswarrior or inst.mate == nil then --谁离得近打谁
+
+                    --保持伴侣和自己同时仇恨不同的对象
+                    if inst.mate == nil then
                         if data.attacker == lasttarget then
-                            --主动给伴侣解除和自己相同的仇恨对象
-                            if inst.mate ~= nil and lasttarget == inst.mate.components.combat.target then
-                                inst.mate.components.combat:SetTarget(nil)
-                            end
                             return
                         end
 
+                        --谁离得近打谁
                         if lasttarget ~= nil and IsValid(lasttarget) then
-                            if inst:GetDistanceSqToPoint(lasttarget:GetPosition()) > inst:GetDistanceSqToPoint(data.attacker:GetPosition()) then
+                            if
+                                inst:GetDistanceSqToPoint(lasttarget:GetPosition())
+                                > inst:GetDistanceSqToPoint(data.attacker:GetPosition())
+                            then
                                 inst.components.combat:SetTarget(data.attacker)
-                                lasttarget = data.attacker
                             end
                         else
                             inst.components.combat:SetTarget(data.attacker)
-                            lasttarget = data.attacker
-                        end
-
-                        --主动给伴侣解除和自己相同的仇恨对象
-                        if inst.mate ~= nil and lasttarget == inst.mate.components.combat.target then
-                            inst.mate.components.combat:SetTarget(nil)
                         end
                     else
                         local matetarget = inst.mate.components.combat.target
 
                         if data.attacker == lasttarget then
                             if lasttarget == matetarget then
-                                inst.components.combat:SetTarget(nil)
+                                inst.mate.components.combat:SetTarget(nil)
                             end
                             return
                         end
 
+                        --谁离得近打谁
                         if lasttarget ~= nil and IsValid(lasttarget) then
-                            if lasttarget == matetarget then --自己现有仇恨对象和伴侣相同，直接不管
-                                inst.components.combat:SetTarget(data.attacker)
-                            elseif
-                                data.attacker ~= matetarget and
-                                inst:GetDistanceSqToPoint(lasttarget:GetPosition()) > inst:GetDistanceSqToPoint(data.attacker:GetPosition())
+                            if
+                                inst:GetDistanceSqToPoint(lasttarget:GetPosition())
+                                > inst:GetDistanceSqToPoint(data.attacker:GetPosition())
                             then
                                 inst.components.combat:SetTarget(data.attacker)
+                                if data.attacker == matetarget then
+                                    inst.mate.components.combat:SetTarget(nil)
+                                end
                             end
                         else
-                            if
-                                matetarget == nil or not IsValid(matetarget) or
-                                matetarget ~= data.attacker
-                            then
-                                inst.components.combat:SetTarget(data.attacker)
+                            inst.components.combat:SetTarget(data.attacker)
+                            if data.attacker == matetarget then
+                                inst.mate.components.combat:SetTarget(nil)
                             end
                         end
                     end
@@ -562,8 +557,6 @@ local function MakeBoss(data)
                     inst:PushEvent("dotaunt")
                 elseif data.name == "caw" then
                     inst:PushEvent("docaw")
-                elseif data.name == "eye" then
-                    inst:PushEvent("dotakeoff", { beeye = true })
                 end
             end)
 
@@ -1173,6 +1166,8 @@ table.insert(prefs, Prefab(
         inst.tree = nil
         inst.state = 1
 
+        inst.DIST_SPAWN = DIST_SPAWN
+
         inst:AddComponent("inspectable")
 
         inst:AddComponent("health")
@@ -1532,10 +1527,24 @@ table.insert(prefs, Prefab( --实体
 --[[ 子圭之眼 ]]
 --------------------------------------------------------------------------
 
-local TIME_EYE = 4 --9
-local TIME_EYE_GRIEF = 4.5
+local TIME_EYE_DT = 4 --9
+local TIME_EYE_DT_GRIEF = 4.5
 local COUNT_EYE = 1 --6
 local COUNT_EYE_GRIEF = 8
+
+local function UnbindBird(inst, landpos)
+    inst.bird.iseye = false
+    inst.bird.eyefx = nil
+    if IsValid(inst.bird) then
+        if landpos == nil then
+            landpos = inst.bird.components.knownlocations:GetLocation("spawnpoint") or inst.tree:GetPosition()
+        end
+        inst.bird.Transform:SetPosition(landpos.x, 30, landpos.z)
+        inst.bird:ReturnToScene()
+        inst.bird.sg:GoToState("glide")
+        inst.bird._count_atk = 0
+    end
+end
 
 table.insert(prefs, Prefab(
     "siving_boss_eye",
@@ -1572,22 +1581,18 @@ table.insert(prefs, Prefab(
                 inst.task_eye:Cancel()
                 inst.task_eye = nil
             end
-            if IsValid(inst.bird) then
+
+            if inst.tree:IsValid() then
                 inst.AnimState:PlayAnimation("unbind")
                 inst:ListenForEvent("animover", function(inst)
-                    inst.bird.iseye = false
-                    inst.bird.eyefx = nil
-                    if landpos == nil then
-                        landpos = inst.bird.components.knownlocations:GetLocation("spawnpoint") or inst.tree:GetPosition()
-                    end
-                    inst.bird.Transform:SetPosition(landpos.x, 30, landpos.z)
-                    inst.bird:ReturnToScene()
-                    inst.bird.sg:GoToState("glide")
-                    SetBehaviorTree(inst.bird, "eye")
+                    UnbindBird(inst, landpos)
                     inst.tree.myEye = nil
                     inst:Remove()
                 end)
+                inst.tree.components.timer:StopTimer("eye")
+                inst.tree.components.timer:StartTimer("eye", inst.tree.TIME_EYE)
             else
+                UnbindBird(inst, landpos)
                 inst.tree.myEye = nil
                 inst:Remove()
             end
@@ -1598,7 +1603,14 @@ table.insert(prefs, Prefab(
                 inst._task_re = nil
             end
 
-            bird.components.combat:SetTarget(nil)
+            if bird.components.combat.target ~= nil then --把仇恨对象交给伴侣，不然仇恨就断了
+                CheckMate(bird)
+                if bird.mate ~= nil and bird.mate.components.combat.target == nil then
+                    bird.mate.components.combat:SetTarget(bird.components.combat.target)
+                end
+                bird.components.combat:SetTarget(nil)
+            end
+
             bird:RemoveFromScene()
             bird.iseye = true
             bird.eyefx = inst
@@ -1619,11 +1631,11 @@ table.insert(prefs, Prefab(
             local count = 0
             local dt, countmax
             if bird.isgrief then
-                dt = TIME_EYE_GRIEF
+                dt = TIME_EYE_DT_GRIEF
                 countmax = COUNT_EYE_GRIEF
                 inst.AnimState:OverrideSymbol("eye", "siving_boss_eye", "griefeye")
             else
-                dt = TIME_EYE
+                dt = TIME_EYE_DT
                 countmax = COUNT_EYE
             end
             inst.task_eye = inst:DoPeriodicTask(dt, function(inst)
