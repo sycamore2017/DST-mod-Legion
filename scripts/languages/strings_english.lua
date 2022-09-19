@@ -2498,6 +2498,25 @@ S________WARLY.DESCRIBE.SIVING_BOSSFEA_FAKE = "If only it could be used as a kit
 -- S_______WALTER.DESCRIBE.SIVING_BOSSFEA_FAKE = ""
 S________WANDA.DESCRIBE.SIVING_BOSSFEA_FAKE = "Not high lethality and low hit rate."
 
+S_NAMES.SIVING_BOSS_ROOT = "Siving Root Spike" --子圭突触
+S______GENERIC.DESCRIBE.SIVING_BOSS_ROOT = "Threat from the foot!"
+-- S_______WILLOW.DESCRIBE.SIVING_BOSS_ROOT = ""
+-- S_____WOLFGANG.DESCRIBE.SIVING_BOSS_ROOT = ""
+-- S________WENDY.DESCRIBE.SIVING_BOSS_ROOT = ""
+-- S_________WX78.DESCRIBE.SIVING_BOSS_ROOT = ""
+S_WICKERBOTTOM.DESCRIBE.SIVING_BOSS_ROOT = "Observe carefully, or..."
+S_______WOODIE.DESCRIBE.SIVING_BOSS_ROOT = "Upset. I need pickaxe now."
+-- S______WAXWELL.DESCRIBE.SIVING_BOSS_ROOT = ""
+S___WATHGRITHR.DESCRIBE.SIVING_BOSS_ROOT = "Hah, this is so easy."
+S_______WEBBER.DESCRIBE.SIVING_BOSS_ROOT = "Bare feet can easily feel dangers under the ground."
+S_______WINONA.DESCRIBE.SIVING_BOSS_ROOT = "It not only raided, but also blocked my way."
+S_______WORTOX.DESCRIBE.SIVING_BOSS_ROOT = "Be careful of butt pricked!"
+S_____WORMWOOD.DESCRIBE.SIVING_BOSS_ROOT = "A pointed root."
+-- S________WARLY.DESCRIBE.SIVING_BOSS_ROOT = ""
+S_________WURT.DESCRIBE.SIVING_BOSS_ROOT = "Grrr, it makes sneak attack!"
+-- S_______WALTER.DESCRIBE.SIVING_BOSS_ROOT = ""
+-- S________WANDA.DESCRIBE.SIVING_BOSS_ROOT = ""
+
 --------------------------------------------------------------------------
 --[[ flash and crush ]]--[[ 电闪雷鸣 ]]
 --------------------------------------------------------------------------

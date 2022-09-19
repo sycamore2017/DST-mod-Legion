@@ -2591,6 +2591,25 @@ S________WARLY.DESCRIBE.SIVING_BOSSFEA_FAKE = "这也许能是把好用的厨具
 -- S_______WALTER.DESCRIBE.SIVING_BOSSFEA_FAKE = ""
 S________WANDA.DESCRIBE.SIVING_BOSSFEA_FAKE = "没啥杀伤力，命中率还低。"
 
+S_NAMES.SIVING_BOSS_ROOT = "子圭突触"
+S______GENERIC.DESCRIBE.SIVING_BOSS_ROOT = "来自脚下的威胁！"
+-- S_______WILLOW.DESCRIBE.SIVING_BOSS_ROOT = ""
+-- S_____WOLFGANG.DESCRIBE.SIVING_BOSS_ROOT = ""
+-- S________WENDY.DESCRIBE.SIVING_BOSS_ROOT = ""
+-- S_________WX78.DESCRIBE.SIVING_BOSS_ROOT = ""
+S_WICKERBOTTOM.DESCRIBE.SIVING_BOSS_ROOT = "仔细观察，其实很好躲。"
+S_______WOODIE.DESCRIBE.SIVING_BOSS_ROOT = "真不爽，现在需要镐子了。"
+-- S______WAXWELL.DESCRIBE.SIVING_BOSS_ROOT = ""
+S___WATHGRITHR.DESCRIBE.SIVING_BOSS_ROOT = "这也太简单了吧。"
+S_______WEBBER.DESCRIBE.SIVING_BOSS_ROOT = "光脚丫就很容易感受到底下的震动。"
+S_______WINONA.DESCRIBE.SIVING_BOSS_ROOT = "不仅偷袭，还挡住了我的去路。"
+S_______WORTOX.DESCRIBE.SIVING_BOSS_ROOT = "小心屁屁被戳！"
+S_____WORMWOOD.DESCRIBE.SIVING_BOSS_ROOT = "尖尖的根。"
+-- S________WARLY.DESCRIBE.SIVING_BOSS_ROOT = ""
+S_________WURT.DESCRIBE.SIVING_BOSS_ROOT = "呱，它搞偷袭！"
+-- S_______WALTER.DESCRIBE.SIVING_BOSS_ROOT = ""
+-- S________WANDA.DESCRIBE.SIVING_BOSS_ROOT = ""
+
 --------------------------------------------------------------------------
 --[[ flash and crush ]]--[[ 电闪雷鸣 ]]
 --------------------------------------------------------------------------

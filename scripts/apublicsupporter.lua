@@ -111,9 +111,9 @@ _G.DropItem_legion = function(itemname, x, y, z, hitrange, hitdamage, fallingtim
                                 end
                                 return false
                             end,
-                            {"_combat", "_health"}, {"NOCLICK", "FX", "shadow", "playerghost", "INLIMBO"}, nil
+                            {"_combat", "_health"}, {"NOCLICK", "shadow", "playerghost", "INLIMBO"}, nil
                         )
-                        if someone ~= nil then
+                        if someone ~= nil and someone.components.combat:CanBeAttacked() then
                             someone.components.combat:GetAttacked(inst, hitdamage, nil)
                         end
                     end
@@ -1472,7 +1472,7 @@ local function FlingItem_terror(dropper, loot, pt, flingtargetpos, flingtargetva
     local y_speed_variance = 2
 
     if loot.Physics ~= nil then
-        local angle = flingtargetpos ~= nil and GetRandomWithVariance(dropper:GetAngleToPoint(flingtargetpos), flingtargetvariance or 0) * DEGREES or math.random() * 2 * PI
+        local angle = flingtargetpos ~= nil and GetRandomWithVariance(dropper:GetAngleToPoint(flingtargetpos), flingtargetvariance or 0) * DEGREES or math.random()*2*PI
         local speed = min_speed + math.random() * (max_speed - min_speed)
         if loot:IsAsleep() then
             local radius = .5 * speed + (dropper.Physics ~= nil and loot:GetPhysicsRadius(1) + dropper:GetPhysicsRadius(1) or 0)

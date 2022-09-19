@@ -28,6 +28,7 @@ local DIST_ATK = 3.5 --普通攻击范围
 local DIST_SPAWN = DIST_REMOTE + DIST_ATK --距离神木的最大距离
 local DIST_FLAP = 7 --羽乱舞射程
 local DIST_FEA_EXPLODE = 2.5 --精致子圭翎羽的爆炸半径
+local DIST_ROOT_ATK = 1.5 --子圭突触的攻击半径
 
 local TIME_BUFF_WARBLE = 6 --魔音绕耳debuff 持续时间
 local TIME_FLAP = 40 --羽乱舞 冷却时间
@@ -39,6 +40,7 @@ local ATK_GRIEF = 10 --悲愤状态额外攻击力
 local ATK_FEA = 50 --子圭翎羽攻击力
 local ATK_FEA_REAL = 80 --精致子圭翎羽攻击力
 local ATK_FEA_EXPLODE = 100 --精致子圭翎羽的爆炸伤害
+local ATK_ROOT = 100 --子圭突触攻击力
 
 local COUNT_FLAP = 3 --羽乱舞次数
 local COUNT_FLAP_GRIEF = 6 --羽乱舞次数（悲愤状态）
@@ -1527,10 +1529,10 @@ table.insert(prefs, Prefab( --实体
 --[[ 子圭之眼 ]]
 --------------------------------------------------------------------------
 
-local TIME_EYE_DT = 4 --9
-local TIME_EYE_DT_GRIEF = 4.5
-local COUNT_EYE = 1 --6
-local COUNT_EYE_GRIEF = 8
+local TIME_EYE_DT = 6
+local TIME_EYE_DT_GRIEF = 3
+local COUNT_EYE = 3 --6
+local COUNT_EYE_GRIEF = 6 --9
 
 local function UnbindBird(inst, landpos)
     inst.bird.iseye = false
@@ -1544,6 +1546,63 @@ local function UnbindBird(inst, landpos)
         inst.bird.sg:GoToState("glide")
         inst.bird._count_atk = 0
     end
+end
+local function EyeAttack(inst, dt, countnow, countmax)
+    inst.task_eye = inst:DoTaskInTime(dt, function(inst)
+        inst.AnimState:PlayAnimation("spell", true)
+        countnow = countnow + 1
+
+        --确定攻击者
+        local tar = nil
+        local x, y, z = inst.tree.Transform:GetWorldPosition()
+        if inst.bird.mate ~= nil and inst.bird.mate.components.combat.target ~= nil then
+            tar = inst.bird.mate.components.combat.target
+        else
+            local ents = TheSim:FindEntities(x, 0, z, DIST_SPAWN, { "_combat", "_health" }, TAGS_CANT)
+            for _, v in ipairs(ents) do
+                if v.components.health ~= nil and not v.components.health:IsDead() then
+                    if v:HasTag("player") then
+                        tar = v
+                        break
+                    elseif tar == nil then
+                        tar = v
+                    end
+                end
+            end
+        end
+
+        --确定攻击方向
+        local theta = nil
+        if tar ~= nil then
+            theta = inst.tree:GetAngleToPoint(tar:GetPosition()) * DEGREES
+        else
+            theta = math.random()*2*PI
+        end
+
+        --开始突袭！
+        local num = 0
+        local xx, yy, zz
+        inst.task_eye = inst:DoPeriodicTask(0.25, function(inst)
+            -- inst.AnimState:PushAnimation("idle", true)
+    
+            num = num + 1
+            xx, yy, zz = GetCalculatedPos_legion(x, 0, z, 6.1+num*2, theta)
+            if TheWorld.Map:IsAboveGroundAtPoint(xx, 0, zz) then
+                local root = SpawnPrefab("siving_boss_root")
+                if root ~= nil then
+                    root.Transform:SetPosition(xx, 0, zz)
+                    root.fn_onAttack(root, inst.bird)
+                end
+            end
+
+            
+    
+            if count >= countmax then
+                inst:fn_onUnbind(landtarget and landtarget:GetPosition() or nil)
+            end
+        end, 1)
+
+    end)
 end
 
 table.insert(prefs, Prefab(
@@ -1628,38 +1687,12 @@ table.insert(prefs, Prefab(
             inst.AnimState:PlayAnimation("bind")
             inst.AnimState:PushAnimation("idle", true)
 
-            local count = 0
-            local dt, countmax
             if bird.isgrief then
-                dt = TIME_EYE_DT_GRIEF
-                countmax = COUNT_EYE_GRIEF
                 inst.AnimState:OverrideSymbol("eye", "siving_boss_eye", "griefeye")
+                EyeAttack(inst, TIME_EYE_DT_GRIEF, 0, COUNT_EYE_GRIEF)
             else
-                dt = TIME_EYE_DT
-                countmax = COUNT_EYE
+                EyeAttack(inst, TIME_EYE_DT, 0, COUNT_EYE)
             end
-            inst.task_eye = inst:DoPeriodicTask(dt, function(inst)
-                inst.AnimState:PlayAnimation("spell")
-                inst.AnimState:PushAnimation("idle", true)
-
-                count = count + 1
-                local landtarget = nil
-                local ents = TheSim:FindEntities(x, 0, z, DIST_REMOTE, { "_combat", "_health" }, TAGS_CANT)
-                for _, v in ipairs(ents) do
-                    if
-                        v.components.health ~= nil and not v.components.health:IsDead()
-                    then
-                        --undo 技能释放
-                        if landtarget == nil then --第一个应该是最近的吧？
-                            landtarget = v
-                        end
-                    end
-                end
-
-                if count >= countmax then
-                    inst:fn_onUnbind(landtarget and landtarget:GetPosition() or nil)
-                end
-            end, dt)
         end
 
         inst._task_re = inst:DoTaskInTime(1, inst.Remove)
@@ -1670,8 +1703,177 @@ table.insert(prefs, Prefab(
         Asset("ANIM", "anim/siving_boss_eye.zip")
     },
     {
-        -- "siving_boss_flower"
+        "siving_boss_root"
     }
+))
+
+--------------------------------------------------------------------------
+--[[ 子圭突触 ]]
+--------------------------------------------------------------------------
+
+local function SetClosedPhysics(inst)
+    inst.Physics:SetCollisionGroup(COLLISION.OBSTACLES)
+    inst.Physics:ClearCollisionMask()
+    inst.Physics:CollidesWith(COLLISION.WORLD)
+    inst.Physics:CollidesWith(COLLISION.ITEMS)
+    inst.Physics:CollidesWith(COLLISION.CHARACTERS)
+    inst.Physics:CollidesWith(COLLISION.GIANTS)
+end
+local function SetOpenedPhysics(inst)
+    inst.Physics:SetCollisionGroup(COLLISION.OBSTACLES)
+    inst.Physics:ClearCollisionMask()
+    inst.Physics:CollidesWith(COLLISION.WORLD)
+    inst.Physics:CollidesWith(COLLISION.ITEMS)
+end
+
+table.insert(prefs, Prefab(
+    "siving_boss_root",
+    function()
+        local inst = CreateEntity()
+
+        inst.entity:AddTransform()
+        inst.entity:AddAnimState()
+        inst.entity:AddSoundEmitter()
+        inst.entity:AddNetwork()
+        inst.entity:AddLight()
+
+        inst:AddTag("siv_boss_block") --用来被清场
+        inst:AddTag("siving_derivant")
+
+        inst.AnimState:SetBank("atrium_fence")
+        inst.AnimState:SetBuild("siving_boss_root")
+        inst.AnimState:PlayAnimation("shrunk")
+        -- inst.AnimState:SetScale(1.3, 1.3)
+
+        inst.Light:Enable(false)
+        inst.Light:SetRadius(1.5)
+        inst.Light:SetFalloff(1)
+        inst.Light:SetIntensity(.6)
+        inst.Light:SetColour(15/255, 180/255, 132/255)
+
+        MakeObstaclePhysics(inst, 0.1)
+        SetOpenedPhysics(inst)
+
+        inst.entity:SetPristine()
+        if not TheWorld.ismastersim then
+            return inst
+        end
+
+        inst.fenceid = math.random(5)
+        inst.treeState = 0
+
+        inst.OnTreeLive = function(inst, state)
+            inst.treeState = state
+            if state == 2 then
+                -- inst.AnimState:SetBuild("siving_boss_root2") --undo
+                inst.components.bloomer:PushBloom("activetree", "shaders/anim.ksh", 1)
+                inst.Light:SetRadius(1.5)
+                inst.Light:Enable(true)
+            elseif state == 1 then
+                inst.AnimState:SetBuild("siving_boss_root")
+                inst.components.bloomer:PushBloom("activetree", "shaders/anim.ksh", 1)
+                inst.Light:SetRadius(0.8)
+                inst.Light:Enable(true)
+            else
+                inst.AnimState:SetBuild("siving_boss_root")
+                inst.components.bloomer:PopBloom("activetree")
+                inst.Light:Enable(false)
+            end
+        end
+        inst.fn_onAttack = function(inst, bird)
+            inst.AnimState:PlayAnimation("grow"..tostring(inst.fenceid))
+            inst.AnimState:PushAnimation("idle"..tostring(inst.fenceid), false)
+            inst.SoundEmitter:PlaySound("dontstarve/common/together/atrium/gate_spike")
+            inst.components.workable:SetWorkable(false)
+            inst._task_atk = inst:DoTaskInTime(0.3, function(inst)
+                inst._task_atk = nil
+
+                --攻击！破坏！
+                local x, y, z = inst.Transform:GetWorldPosition()
+                local ents = TheSim:FindEntities(x, 0, z, DIST_ROOT_ATK,
+                    nil, { "INLIMBO", "NOCLICK", "siving", "flying", "shadow", "ghost" },
+                    { "_combat", "CHOP_workable", "DIG_workable", "HAMMER_workable", "MINE_workable" }
+                )
+                for _, v in ipairs(ents) do
+                    if v.components.combat ~= nil then
+                        if v.components.health ~= nil and not v.components.health:IsDead() then
+                            if v.components.locomotor == nil then --可以秒杀触手等没有移动组件但有战斗组件的实体
+                                v.components.health:Kill()
+                            elseif v.components.combat:CanBeAttacked() then
+                                v.components.combat:GetAttacked(inst, GetDamage(bird or inst, v, ATK_ROOT))
+                            end
+                        end
+                    elseif v.components.workable ~= nil then
+                        if v.components.workable:CanBeWorked() then
+                            v.components.workable:WorkedBy(inst, 3)
+                        end
+                    end
+                end
+
+                SetClosedPhysics(inst)
+            end)
+            inst._task_work = inst:DoTaskInTime(3, function(inst)
+                inst._task_work = nil
+                inst.components.workable:SetWorkable(true)
+            end)
+        end
+        inst.fn_onClear = function(inst)
+            if inst._task_atk ~= nil then
+                inst._task_atk:Cancel()
+                inst._task_atk = nil
+            end
+            if inst._task_work ~= nil then
+                inst._task_work:Cancel()
+                inst._task_work = nil
+            end
+
+            inst.persists = false
+            inst:AddTag("NOCLICK")
+            inst.components.bloomer:PopBloom("activetree")
+            inst.Light:Enable(false)
+            inst.AnimState:PlayAnimation("shrink"..tostring(inst.fenceid))
+            inst:ListenForEvent("animover", function(inst)
+                inst:Remove()
+            end)
+            inst.SoundEmitter:PlaySound("dontstarve/common/together/atrium/retract")
+        end
+
+        inst:AddComponent("inspectable")
+
+        inst:AddComponent("bloomer")
+
+        inst:AddComponent("workable")
+        inst.components.workable:SetWorkAction(ACTIONS.MINE)
+        inst.components.workable:SetWorkLeft(1)
+        inst.components.workable:SetOnFinishCallback(function(inst, worker)
+            inst.components.lootdropper:DropLoot()
+            inst:fn_onClear()
+        end)
+
+        inst:AddComponent("lootdropper")
+        inst.components.lootdropper:AddChanceLoot("siving_rocks", 0.02)
+
+        MakeHauntableWork(inst)
+
+        inst.OnSave = function(inst, data)
+            data.fenceid = inst.fenceid
+        end
+        inst.OnLoad = function(inst, data)
+            if data ~= nil and data.fenceid ~= nil then
+                inst.fenceid = data.fenceid
+            end
+            inst.AnimState:PushAnimation("idle"..tostring(inst.fenceid), false)
+            SetClosedPhysics(inst)
+        end
+
+        return inst
+    end,
+    {
+        Asset("ANIM", "anim/siving_boss_root.zip"),
+        -- Asset("ANIM", "anim/siving_boss_root2.zip"),
+        Asset("ANIM", "anim/atrium_fence.zip")
+    },
+    nil
 ))
 
 --------------------------------------------------------------------------
@@ -1758,6 +1960,14 @@ MakeBossWeapon({
             inst.components.lootdropper:DropLoot()
             inst:Remove()
         end)
+
+        inst.fn_onClear = function(inst)
+            inst.persists = false
+            inst:AddTag("NOCLICK")
+            inst.Light:Enable(false)
+            inst.AnimState:ClearBloomEffectHandle()
+            ErodeAway(inst)
+        end
     end,
 })
 
@@ -1823,6 +2033,12 @@ MakeBossWeapon({
             --特效 undo
             inst:Remove()
         end)
+
+        inst.fn_onClear = function(inst)
+            inst.persists = false
+            inst:AddTag("NOCLICK")
+            ErodeAway(inst)
+        end
     end,
 })
 

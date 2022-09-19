@@ -456,6 +456,15 @@ local function InitEgg(inst, egg, ismale)
     inst:ListenForEvent("death", inst.fn_onEggDead, egg)
     inst:ListenForEvent("onremove", inst.fn_onEggDead, egg)
 end
+local function ClearBattlefield(inst) --打扫战场
+    local x, y, z = inst.Transform:GetWorldPosition()
+    local ents = TheSim:FindEntities(x, 0, z, 26, { "siv_boss_block" }, { "INLIMBO" })
+    for _, v in ipairs(ents) do
+        if v.fn_onClear ~= nil then
+            v:fn_onClear()
+        end
+    end
+end
 local function EndFight(inst, male, female) --中止战斗
     inst:OnRemoveEntity() --刚好这里面能移除所有BOSS战的对象
     if male ~= nil and female ~= nil then --玄鸟都活着，那就恢复献祭时的消耗
@@ -1224,6 +1233,7 @@ table.insert(prefs, Prefab(
                 inst.bossEgg = nil
             end
             inst.rebirthed = false
+            ClearBattlefield(inst)
         end
 
         return inst
