@@ -43,7 +43,7 @@ local ATK_FEA_EXPLODE = 100 --精致子圭翎羽的爆炸伤害
 local ATK_ROOT = 100 --子圭突触攻击力
 
 local COUNT_FLAP = 3 --羽乱舞次数
-local COUNT_FLAP_GRIEF = 6 --羽乱舞次数（悲愤状态）
+local COUNT_FLAP_GRIEF = 4 --羽乱舞次数（悲愤状态）
 
 local TAGS_CANT = {"NOCLICK", "shadow", "playerghost", "ghost", "INLIMBO", "wall", "structure", "balloon", "siving"}
 
@@ -238,7 +238,7 @@ local function MakeBoss(data)
             inst:AddTag("hostile")
             inst:AddTag("largecreature")
             inst:AddTag("siving")
-            inst:AddTag("flying")
+            -- inst:AddTag("flying")
             inst:AddTag("ignorewalkableplatformdrowning")
 
             --trader (from trader component) added to pristine state for optimization
@@ -483,15 +483,36 @@ local function MakeBoss(data)
 
             inst:ListenForEvent("attacked", function(inst, data)
                 if data.attacker and IsValid(data.attacker) then
-                    --将单次伤害超过120的部分反弹给攻击者
-                    if
-                        data.damage and data.damage > 120 and
-                        data.attacker.components.combat ~= nil
-                    then
-                        data.attacker.components.combat:GetAttacked(nil, data.damage-120) --为了不受到盾反伤害，不设定玄鸟为攻击者
-                        --反击特效 undo
-                        if not IsValid(data.attacker) then --攻击者死亡，就结束
-                            return
+                    if data.damage and data.attacker.components.combat ~= nil then
+                        --将单次伤害超过120的部分反弹给攻击者
+                        if data.damage > 120 then
+                            --为了不受到盾反伤害，不设定玄鸟为攻击者
+                            data.attacker.components.combat:GetAttacked(nil, data.damage-120)
+                            --反击特效 undo
+                            if not IsValid(data.attacker) then --攻击者死亡，就结束
+                                return
+                            end
+                        end
+
+                        --受到远程攻击，神木会帮忙做出惩罚
+                        if --远程武器分为两类，一类是有projectile组件、一类是weapon组件中有projectile属性
+                            data.attacker:HasTag("structure") or --针对建筑型攻击者
+                            (data.weapon ~= nil and (
+                                data.weapon.components.projectile ~= nil or
+                                data.weapon.components.projectilelegion ~= nil or
+                                data.weapon:HasTag("rangedweapon") or
+                                (data.weapon.components.weapon ~= nil and data.weapon.components.weapon.projectile ~= nil)
+                            ))
+                        then
+                            local x, y, z = data.attacker.Transform:GetWorldPosition()
+                            if TheWorld.Map:IsAboveGroundAtPoint(x, 0, z) then
+                                local root = SpawnPrefab("siving_boss_root")
+                                if root ~= nil then
+                                    root.Transform:SetPosition(x, 0, z)
+                                    root.OnTreeLive(root, inst.tree and inst.tree.treeState or 0)
+                                    root.fn_onAttack(root, inst)
+                                end
+                            end
                         end
                     end
 
@@ -592,7 +613,8 @@ local function MakeBoss(data)
             "siving_bossfea_real",
             "siving_bossfea_fake",
             "siving_boss_taunt_fx",
-            "siving_boss_caw_fx"
+            "siving_boss_caw_fx",
+            "siving_boss_root"
         }
     ))
 end
@@ -1122,8 +1144,10 @@ local function OnTimerDone_egg(inst, data)
         inst.SoundEmitter:PlaySound("dontstarve/creatures/egg/egg_hatch_crack")
     elseif data.name == "state3" then
         SetEggState(inst, 4)
-        inst.components.timer:StartTimer("birth", 3)
-        --音效 undo
+        inst.components.timer:StartTimer("birth", 2.5)
+        inst.task_sound = inst:DoPeriodicTask(0.2, function(inst)
+            inst.SoundEmitter:PlaySound("dontstarve/creatures/egg/egg_hatch_crack")
+        end, 0)
     elseif data.name == "birth" then
         if inst.tree == nil or not inst.tree:IsValid() then --生成一个非BOSS战的玄鸟
             local bird = SpawnPrefab(inst.ismale and "siving_moenix" or "siving_foenix")
@@ -1133,6 +1157,10 @@ local function OnTimerDone_egg(inst, data)
             end
         else --BOSS战的玄鸟由神木在管理
             inst.ishatched = true
+        end
+        if inst.task_sound ~= nil then
+            inst.task_sound:Cancel()
+            inst.task_sound = nil
         end
         inst.AnimState:PlayAnimation("break", false)
         inst:ListenForEvent("animover", inst.Remove)
@@ -1423,6 +1451,7 @@ table.insert(prefs, Prefab( --实体
 
         inst:AddTag("hostile")
         inst:AddTag("siving")
+        inst:AddTag("soulless") --没有灵魂
 
         inst.Transform:SetTwoFaced()
 
@@ -1529,10 +1558,10 @@ table.insert(prefs, Prefab( --实体
 --[[ 子圭之眼 ]]
 --------------------------------------------------------------------------
 
-local TIME_EYE_DT = 6
-local TIME_EYE_DT_GRIEF = 3
-local COUNT_EYE = 3 --6
-local COUNT_EYE_GRIEF = 6 --9
+local TIME_EYE_DT = 4
+local TIME_EYE_DT_GRIEF = 0.5
+local COUNT_EYE = 6 --6
+local COUNT_EYE_GRIEF = 9 --9
 
 local function UnbindBird(inst, landpos)
     inst.bird.iseye = false
@@ -1547,11 +1576,28 @@ local function UnbindBird(inst, landpos)
         inst.bird._count_atk = 0
     end
 end
+local function SpawnRoot(inst, x, z, theta, num)
+    if inst.bird.isgrief then
+        if num%2 == 1 then
+            theta = theta + 2*DEGREES
+        else
+            theta = theta - 2*DEGREES
+        end
+    end
+
+    local y = 0
+    x, y, z = GetCalculatedPos_legion(x, 0, z, 3+num*1.2, theta)
+    if TheWorld.Map:IsAboveGroundAtPoint(x, 0, z) then
+        local root = SpawnPrefab("siving_boss_root")
+        if root ~= nil then
+            root.Transform:SetPosition(x, 0, z)
+            root.OnTreeLive(root, inst.tree.treeState or 0)
+            root.fn_onAttack(root, inst.bird)
+        end
+    end
+end
 local function EyeAttack(inst, dt, countnow, countmax)
     inst.task_eye = inst:DoTaskInTime(dt, function(inst)
-        inst.AnimState:PlayAnimation("spell", true)
-        countnow = countnow + 1
-
         --确定攻击者
         local tar = nil
         local x, y, z = inst.tree.Transform:GetWorldPosition()
@@ -1571,6 +1617,14 @@ local function EyeAttack(inst, dt, countnow, countmax)
             end
         end
 
+        if countnow >= countmax then
+            inst.task_eye = nil
+            inst:fn_onUnbind(tar and tar:GetPosition() or nil)
+            return
+        end
+        inst.AnimState:PlayAnimation("spell", true)
+        countnow = countnow + 1
+
         --确定攻击方向
         local theta = nil
         if tar ~= nil then
@@ -1581,27 +1635,19 @@ local function EyeAttack(inst, dt, countnow, countmax)
 
         --开始突袭！
         local num = 0
-        local xx, yy, zz
-        inst.task_eye = inst:DoPeriodicTask(0.25, function(inst)
-            -- inst.AnimState:PushAnimation("idle", true)
-    
+        local nummax = math.random(15, 19)
+        inst.task_eye = inst:DoPeriodicTask(0.15, function(inst)
             num = num + 1
-            xx, yy, zz = GetCalculatedPos_legion(x, 0, z, 6.1+num*2, theta)
-            if TheWorld.Map:IsAboveGroundAtPoint(xx, 0, zz) then
-                local root = SpawnPrefab("siving_boss_root")
-                if root ~= nil then
-                    root.Transform:SetPosition(xx, 0, zz)
-                    root.fn_onAttack(root, inst.bird)
+            SpawnRoot(inst, x, z, theta, num)
+            if num >= nummax then
+                if inst.task_eye ~= nil then
+                    inst.task_eye:Cancel()
+                    inst.task_eye = nil
                 end
-            end
-
-            
-    
-            if count >= countmax then
-                inst:fn_onUnbind(landtarget and landtarget:GetPosition() or nil)
+                inst.AnimState:PlayAnimation("idle", true)
+                EyeAttack(inst, dt, countnow, countmax)
             end
         end, 1)
-
     end)
 end
 
@@ -1751,7 +1797,7 @@ table.insert(prefs, Prefab(
         inst.Light:SetIntensity(.6)
         inst.Light:SetColour(15/255, 180/255, 132/255)
 
-        MakeObstaclePhysics(inst, 0.1)
+        MakeObstaclePhysics(inst, 0.15)
         SetOpenedPhysics(inst)
 
         inst.entity:SetPristine()
@@ -1828,13 +1874,16 @@ table.insert(prefs, Prefab(
             end
 
             inst.persists = false
+            if inst:IsAsleep() then
+                inst:Remove()
+                return
+            end
+
             inst:AddTag("NOCLICK")
             inst.components.bloomer:PopBloom("activetree")
             inst.Light:Enable(false)
             inst.AnimState:PlayAnimation("shrink"..tostring(inst.fenceid))
-            inst:ListenForEvent("animover", function(inst)
-                inst:Remove()
-            end)
+            inst:DoTaskInTime(0.6, inst.Remove) --我嫌动画末尾太拖了，提前结束！
             inst.SoundEmitter:PlaySound("dontstarve/common/together/atrium/retract")
         end
 
@@ -1846,12 +1895,13 @@ table.insert(prefs, Prefab(
         inst.components.workable:SetWorkAction(ACTIONS.MINE)
         inst.components.workable:SetWorkLeft(1)
         inst.components.workable:SetOnFinishCallback(function(inst, worker)
+            SetOpenedPhysics(inst)
             inst.components.lootdropper:DropLoot()
             inst:fn_onClear()
         end)
 
         inst:AddComponent("lootdropper")
-        inst.components.lootdropper:AddChanceLoot("siving_rocks", 0.02)
+        inst.components.lootdropper:AddChanceLoot("siving_rocks", 0.001)
 
         MakeHauntableWork(inst)
 
@@ -1963,6 +2013,11 @@ MakeBossWeapon({
 
         inst.fn_onClear = function(inst)
             inst.persists = false
+            if inst:IsAsleep() then
+                inst:Remove()
+                return
+            end
+
             inst:AddTag("NOCLICK")
             inst.Light:Enable(false)
             inst.AnimState:ClearBloomEffectHandle()
@@ -2036,6 +2091,11 @@ MakeBossWeapon({
 
         inst.fn_onClear = function(inst)
             inst.persists = false
+            if inst:IsAsleep() then
+                inst:Remove()
+                return
+            end
+
             inst:AddTag("NOCLICK")
             ErodeAway(inst)
         end

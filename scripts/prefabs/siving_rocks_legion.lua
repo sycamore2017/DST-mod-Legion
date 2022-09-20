@@ -336,7 +336,7 @@ MakeDerivant({  --子圭森型岩
 
 local TIME_WITHER = TUNING.TOTAL_DAY_TIME * 15 --神木枯萎时间
 local TIME_FREE = TUNING.TOTAL_DAY_TIME --玄鸟无所事事最多停留的时间
-local TIME_EYE = 10 --同目同心 冷却时间 180
+local TIME_EYE = 150 --同目同心 冷却时间 150
 
 local function IsValid(bird)
     return bird ~= nil and bird:IsValid() and
@@ -458,7 +458,7 @@ local function InitEgg(inst, egg, ismale)
 end
 local function ClearBattlefield(inst) --打扫战场
     local x, y, z = inst.Transform:GetWorldPosition()
-    local ents = TheSim:FindEntities(x, 0, z, 26, { "siv_boss_block" }, { "INLIMBO" })
+    local ents = TheSim:FindEntities(x, 0, z, 30, { "siv_boss_block" }, { "INLIMBO" })
     for _, v in ipairs(ents) do
         if v.fn_onClear ~= nil then
             v:fn_onClear()
@@ -516,14 +516,14 @@ local function OnStealLife(inst, value)
     inst.countHealth = inst.countHealth + value
 
     if inst.bossBirds ~= nil then --子圭玄鸟在场上时，吸收的生命用来恢复它们(也要检查其有效性)
-        GiveLife(inst, inst.bossBirds.female, 3)
-        GiveLife(inst, inst.bossBirds.male, 3)
+        GiveLife(inst, inst.bossBirds.female, 6)
+        GiveLife(inst, inst.bossBirds.male, 6)
     elseif inst.bossEgg ~= nil then --子圭蛋在场上时，吸收的生命用来恢复它(也要检查其有效性)
-        GiveLife(inst, inst.bossEgg, 3)
+        GiveLife(inst, inst.bossEgg, 6)
     else --如果没有玄鸟，每700生命必定掉落子圭石
-        if inst.countHealth >= 700 then
+        if inst.countHealth >= 800 then
             DropRock(inst)
-            inst.countHealth = inst.countHealth - 700
+            inst.countHealth = inst.countHealth - 800
         end
     end
 end
@@ -849,6 +849,7 @@ table.insert(prefs, Prefab(
                     inst.components.timer:StopTimer("birddeath")
                     inst.components.timer:StartTimer("birddeath", TIME_WITHER)
                     StateChange(inst)
+                    inst:DoTaskInTime(1+math.random()*1.5, ClearBattlefield)
                 else --玄鸟第一次团灭，产生一个蛋供玩家选择
                     local egg = SpawnPrefab("siving_egg")
                     if egg ~= nil then
@@ -877,6 +878,7 @@ table.insert(prefs, Prefab(
                 inst.components.timer:StopTimer("birddeath")
                 inst.components.timer:StartTimer("birddeath", TIME_WITHER)
                 StateChange(inst)
+                inst:DoTaskInTime(1+math.random()*1.5, ClearBattlefield)
             else --孵化出悲愤状态的玄鸟
                 local bird = SpawnPrefab(egg.ismale and "siving_moenix" or "siving_foenix")
                 if bird ~= nil then
@@ -1028,6 +1030,7 @@ table.insert(prefs, Prefab(
                     boss1.Transform:SetPosition(pos.x + offsetfinal.x, 30, pos.z + offsetfinal.z)
                     InitBird(inst, boss1, true)
                     boss1.sg:GoToState("glide")
+                    boss1.sg.mem.to_caw = true
 
                     if offset2 ~= nil then
                         offsetfinal = offset2
@@ -1036,6 +1039,7 @@ table.insert(prefs, Prefab(
                     boss2.Transform:SetPosition(pos.x + offsetfinal.x, 30, pos.z + offsetfinal.z)
                     InitBird(inst, boss2, true)
                     boss2.sg:GoToState("glide")
+                    boss2.sg.mem.to_taunt = true
 
                     boss1.mate = boss2
                     boss2.mate = boss1

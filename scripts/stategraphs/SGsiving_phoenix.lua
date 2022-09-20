@@ -241,7 +241,9 @@ local states = {
         onenter = function(inst)
             inst.components.locomotor:StopMoving()
             inst.AnimState:PlayAnimation("death")
+            inst.AnimState:ClearBloomEffectHandle()
             inst:AddTag("NOCLICK")
+            inst.Light:Enable(false)
             inst.components.lootdropper:DropLoot(inst:GetPosition())
             PlaySound(inst, "death", nil, nil)
         end,

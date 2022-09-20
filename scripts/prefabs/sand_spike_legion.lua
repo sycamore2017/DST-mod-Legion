@@ -77,7 +77,7 @@ local COLLAPSIBLE_TAGS = { "_combat", "siv_boss_block" }
 -- for k, v in pairs(COLLAPSIBLE_WORK_ACTIONS) do
 --     table.insert(COLLAPSIBLE_TAGS, k.."_workable")
 -- end
-local NON_COLLAPSIBLE_TAGS = { "player", "companion", "antlion", "groundspike", "flying", "shadow", "ghost", "playerghost", "FX", "NOCLICK", "DECOR", "INLIMBO", "wall" }
+local NON_COLLAPSIBLE_TAGS = { "player", "companion", "antlion", "groundspike", "flying", "shadow", "ghost", "playerghost", "NOCLICK", "DECOR", "INLIMBO", "wall" }
 
 local function DoBreak(inst)
     inst.task = nil
