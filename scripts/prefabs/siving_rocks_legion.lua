@@ -520,7 +520,7 @@ local function OnStealLife(inst, value)
         GiveLife(inst, inst.bossBirds.male, 6)
     elseif inst.bossEgg ~= nil then --子圭蛋在场上时，吸收的生命用来恢复它(也要检查其有效性)
         GiveLife(inst, inst.bossEgg, 6)
-    else --如果没有玄鸟，每700生命必定掉落子圭石
+    else --如果没有玄鸟，每800生命必定掉落子圭石
         if inst.countHealth >= 800 then
             DropRock(inst)
             inst.countHealth = inst.countHealth - 800

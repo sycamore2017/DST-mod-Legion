@@ -2234,6 +2234,7 @@ STRINGS.FISHHOMING3_LEGION = {
     GRASSY = "青草味", --草鳄鱼
     EVIL = "拽拽的", --邪天翁
     FRIZZY = "蠕动的", --海鹦鹉
+    SALTY = "忒咸的", --饼干切割机
 }
 
 S_NAMES.FISHHOMINGBAIT = "打窝饵"

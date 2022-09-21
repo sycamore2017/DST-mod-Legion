@@ -70,7 +70,8 @@ local function fn(Sim)
     inst.AnimState:PlayAnimation("anim")
 
     inst:AddTag("hat")
-    inst:AddTag("show_spoilage")    --显示新鲜度的背景
+    inst:AddTag("show_spoilage") --显示新鲜度的背景
+    inst:AddTag("icebox_valid")
     inst:AddTag("open_top_hat")
     inst:AddTag("ignoreMeat")
 

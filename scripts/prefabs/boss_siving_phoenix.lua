@@ -32,6 +32,7 @@ local DIST_ROOT_ATK = 1.5 --子圭突触的攻击半径
 
 local TIME_BUFF_WARBLE = 6 --魔音绕耳debuff 持续时间
 local TIME_FLAP = 40 --羽乱舞 冷却时间
+local TIME_FEA_EXPLODE = 30 --精致子圭翎羽爆炸时间
 local TIME_TAUNT = 60 --魔音绕梁 冷却时间 60
 local TIME_CAW = 50 --花寄语 冷却时间 50
 
@@ -373,7 +374,7 @@ local function MakeBoss(data)
             inst.components.combat.battlecryenabled = false
             inst.components.combat:SetRange(DIST_ATK)
             inst.components.combat:SetAttackPeriod(3)
-            inst.components.combat:SetRetargetFunction(3, function(inst)
+            inst.components.combat:SetRetargetFunction(1.5, function(inst)
                 CheckMate(inst)
                 return FindEntity(inst.tree or inst, DIST_SPAWN,
                         inst.mate == nil and function(guy) --对自己有仇恨就行
@@ -1961,6 +1962,35 @@ local function AddWeaponLight(inst)
     inst.Light:SetColour(15/255, 180/255, 132/255)
     inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
 end
+local function ExplodeFeather(inst)
+    local x, y, z = inst.Transform:GetWorldPosition()
+    local ents = TheSim:FindEntities(x, y, z, DIST_FEA_EXPLODE, nil, { "INLIMBO", "NOCLICK", "FX", "siving" })
+    for _, v in ipairs(ents) do
+        if v ~= inst and v:IsValid() then
+            if v.components.workable ~= nil then
+                if v.components.workable:CanBeWorked() then
+                    if v:HasTag("siv_boss_block") then
+                        v.explode_chain_l = true --连锁爆炸
+                    end
+                    v.components.workable:WorkedBy(inst, 3)
+                end
+            elseif
+                v.components.combat ~= nil and
+                not (v.components.health ~= nil and v.components.health:IsDead())
+            then
+                v.components.combat:GetAttacked(inst, GetDamage2(v, ATK_FEA_EXPLODE), nil)
+            end
+            v:PushEvent("explosion", { explosive = inst })
+        end
+    end
+
+    --爆炸特效(声音也在里面)
+    SpawnPrefab("explode_small_slurtle").Transform:SetPosition(x, y, z)
+
+    inst.components.lootdropper:DropLoot()
+    inst:Remove()
+end
+
 MakeBossWeapon({
     name = "siving_bossfea_real",
     assets = {
@@ -1985,33 +2015,24 @@ MakeBossWeapon({
     fn_server2 = function(inst)
         inst.components.lootdropper:AddChanceLoot("siving_rocks", 0.1)
         inst.components.workable:SetOnFinishCallback(function(inst, worker)
-            --爆炸！
-            local x, y, z = inst.Transform:GetWorldPosition()
-            local ents = TheSim:FindEntities(x, y, z, DIST_FEA_EXPLODE, nil, { "INLIMBO", "NOCLICK", "FX", "siving" })
-            for _, v in ipairs(ents) do
-                if v ~= inst and v:IsValid() then
-                    if v.components.workable ~= nil then
-                        if v.components.workable:CanBeWorked() then
-                            v.components.workable:WorkedBy(inst, 3)
-                        end
-                    elseif
-                        v.components.combat ~= nil and
-                        not (v.components.health ~= nil and v.components.health:IsDead())
-                    then
-                        v.components.combat:GetAttacked(inst, GetDamage2(v, ATK_FEA_EXPLODE), nil)
-                    end
-                    v:PushEvent("explosion", { explosive = inst })
-                end
+            if inst.task_explode ~= nil then
+                inst.task_explode:Cancel()
+                inst.task_explode = nil
             end
+            ExplodeFeather(inst)
+        end)
 
-            --爆炸特效(声音也在里面)
-            SpawnPrefab("explode_small_slurtle").Transform:SetPosition(x, y, z)
-
-            inst.components.lootdropper:DropLoot()
-            inst:Remove()
+        inst.task_explode = inst:DoTaskInTime(TIME_FEA_EXPLODE, function(inst)
+            inst.task_explode = nil
+            ExplodeFeather(inst)
         end)
 
         inst.fn_onClear = function(inst)
+            if inst.task_explode ~= nil then
+                inst.task_explode:Cancel()
+                inst.task_explode = nil
+            end
+
             inst.persists = false
             if inst:IsAsleep() then
                 inst:Remove()
@@ -2075,7 +2096,7 @@ MakeBossWeapon({
     fn_server = function(inst)
         inst.components.weapon:SetDamage(ATK_FEA)
     end,
-    prefabs2 = nil,
+    prefabs2 = { "explode_small_slurtle" },
     fn_common2 = function(inst)
         inst.AnimState:SetBank("siving_feather_fake")
         inst.AnimState:SetBuild("siving_feather_fake")
@@ -2084,6 +2105,10 @@ MakeBossWeapon({
     fn_server2 = function(inst)
         inst.components.lootdropper:AddChanceLoot("siving_rocks", 0.02)
         inst.components.workable:SetOnFinishCallback(function(inst, worker)
+            if inst.explode_chain_l then --被连锁爆炸
+                ExplodeFeather(inst)
+                return
+            end
             inst.components.lootdropper:DropLoot()
             --特效 undo
             inst:Remove()

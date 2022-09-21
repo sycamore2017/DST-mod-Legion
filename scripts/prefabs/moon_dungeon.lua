@@ -331,12 +331,30 @@ local function GetDungeonProtector(inst, protector, protdata)
     if monster.components.lootdropper ~= nil then
         if protector == "stalker_forest" then --森林影织者还是掉落一些关键物品吧，不然好没用
             monster.components.lootdropper:SetLoot(nil)
-            monster.components.lootdropper:AddChanceLoot("fossil_piece", 1.0)
-            monster.components.lootdropper:AddChanceLoot("fossil_piece", 1.0)
-            monster.components.lootdropper:AddChanceLoot("fossil_piece", 1.0)
-            monster.components.lootdropper:AddChanceLoot("fossil_piece", 1.0)
-            monster.components.lootdropper:AddChanceLoot("fossil_piece", 0.5)
-            monster.components.lootdropper:AddChanceLoot("fossil_piece", 0.25)
+            monster.fn_l_onDead = function(monster) --官方检查了 persists 变量，所以这里换个写法
+                local lootdropper = monster.components.lootdropper
+                local mypos = monster:GetPosition()
+                lootdropper:SpawnLootPrefab("fossil_piece", mypos)
+                lootdropper:SpawnLootPrefab("fossil_piece", mypos)
+                lootdropper:SpawnLootPrefab("fossil_piece", mypos)
+                lootdropper:SpawnLootPrefab("fossil_piece", mypos)
+                if math.random() < 0.5 then
+                    lootdropper:SpawnLootPrefab("fossil_piece", mypos)
+                end
+                if math.random() < 0.25 then
+                    lootdropper:SpawnLootPrefab("fossil_piece", mypos)
+                end
+                if math.random() < 0.125 then
+                    lootdropper:SpawnLootPrefab("fossil_piece", mypos)
+                end
+                if math.random() < 0.0225 then
+                    lootdropper:SpawnLootPrefab("hiddenmoonlight_item_blueprint", mypos)
+                end
+                if math.random() < 0.0225 then
+                    lootdropper:SpawnLootPrefab("revolvedmoonlight_item_blueprint", mypos)
+                end
+            end
+            monster:ListenForEvent("death", monster.fn_l_onDead)
         elseif math.random() >= protdata.realLootOdds then --代替它原本的掉落物
             monster.components.lootdropper:SetLoot(nil)
             monster.components.lootdropper:SetChanceLootTable('dungeon_loot_5')

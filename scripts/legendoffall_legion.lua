@@ -759,6 +759,7 @@ local fishhoming_ingredients = {
     treegrowthsolution ={ pasty = 1, veggie = 1, sticky = 3, whispering = 2, shaking = 1 },
     fig =               { pasty = 1, veggie = 1, grassy = 1, shaking = 1 },
     fig_cooked =        { pasty = 1, veggie = 1, sticky = 2, shaking = 1 },
+    spice_sugar =       { pasty = 1, dusty = 1, sticky = 3 },
     glommerfuel =       { pasty = 1, sticky = 2, whispering = 2 }, --一角鲸
     glommerwings =      { dusty = 1, whispering = 2, shaking = 2 },
     nightmarefuel =     {            whispering = 1 },
@@ -837,6 +838,11 @@ local fishhoming_ingredients = {
     malbatross_feather ={ dusty = 1, evil = 1 },
     malbatross_beak =   { dusty = 1, hardy = 1, evil = 10 },
     deerclops_eyeball = { pasty = 1, evil = 10, frozen = 10, meat = 1, monster = 1 },
+    nitre =             { dusty = 1, hardy = 1, salty = 1 }, --饼干切割机
+    saltrock =          { dusty = 1, salty = 1 },
+    wintercooking_pickledherring = { pasty = 1, salty = 1 },
+    spice_salt =        { dusty = 1, pasty = 1, salty = 3 },
+    refined_dust =      { dusty = 3, hardy = 3, salty = 2 },
     ice =               { pasty = 1 }, --其他
     ash =               { dusty = 1 },
     icehat =            { pasty = 6 },

@@ -432,6 +432,11 @@ function FishHomingBait:GetPreys()
 			meat = nil, veggie = nil, monster = 0,
 			evil = 0.09
 		},
+		cookiecutter = { --饼干切割机
+			hardy = 0, pasty = nil, dusty = nil,
+			meat = nil, veggie = 0, monster = 0,
+			salty = 0.09
+		}
 	}
 
 	if TheWorld.state.isspring then
@@ -603,10 +608,11 @@ function FishHomingBait:SpawnBaited(prefab, x,y,z)
 	if
 		prefab == "wobster_sheller" or prefab == "wobster_moonglass" or
 		prefab == "spider_water" or
-		prefab == "grassgator"
+		prefab == "grassgator" or
+		prefab == "cookiecutter"
 	then
 		local x2, y2, z2
-		if prefab == "grassgator" then
+		if prefab == "grassgator" or prefab == "cookiecutter" then
 			x2, y2, z2 = self:GetSpawnPoint(x, y, z, math.random()*10+8)
 		else
 			x2, y2, z2 = self:GetSpawnPoint(x, y, z, 10)
