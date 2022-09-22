@@ -33,7 +33,7 @@ local DIST_ROOT_ATK = 1.5 --子圭突触的攻击半径
 local TIME_BUFF_WARBLE = 6 --魔音绕耳debuff 持续时间
 local TIME_FLAP = 40 --羽乱舞 冷却时间
 local TIME_FEA_EXPLODE = 30 --精致子圭翎羽爆炸时间
-local TIME_TAUNT = 60 --魔音绕梁 冷却时间 60
+local TIME_TAUNT = 50 --魔音绕梁 冷却时间 50
 local TIME_CAW = 50 --花寄语 冷却时间 50
 
 local ATK_NORMAL = 20 --啄击攻击力
