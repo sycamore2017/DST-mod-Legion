@@ -53,10 +53,8 @@ local function CheckSkills(inst, isidle)
 
     if target ~= nil then --自己或伴侣有仇恨对象
         if inst.sg.mem.to_flap then
-            if GetDistance(inst, target) <= (inst.DIST_FLAP)^2 then --羽乱舞对目标和距离有要求
-                inst.sg:GoToState("flap_pre")
-                return true
-            end
+            inst.sg:GoToState("flap_pre")
+            return true
         end
         if not inst.components.combat:InCooldown() then --啄击冷却时间到了就自动尝试攻击最近的敌人
             local x, y, z = inst.Transform:GetWorldPosition()
@@ -420,9 +418,10 @@ local states = {
     State{ --花寄语
         name = "caw",
         tags = {"busy"},
-        onenter = function(inst)
+        onenter = function(inst, params)
             inst.components.locomotor:StopMoving()
             inst.AnimState:PlayAnimation("caw")
+            inst.sg.statemem.params = params
             inst.sg.mem.to_caw = nil
         end,
         timeline = {
@@ -430,12 +429,20 @@ local states = {
                 PlaySound(inst, "caw", nil, nil)
             end),
             TimeEvent(FRAMES*8, function(inst)
-                inst:fn_releaseFlowers()
+                if inst.sg.statemem.params then
+                    inst:fn_releaseFlowers()
+                end
                 SetSoundFx(inst, "siving_boss_caw_fx")
             end)
         },
         events = {
-            EventHandler("animover", function(inst) inst.sg:GoToState("idle") end),
+            EventHandler("animover", function(inst)
+                if inst.sg.statemem.params then
+                    inst.sg:GoToState("idle")
+                else
+                    inst.sg:GoToState("caw", true) --我想让它叫两次
+                end
+            end),
         },
     },
     State{ --羽乱舞 pre

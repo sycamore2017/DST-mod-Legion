@@ -23,7 +23,7 @@ local BossSounds = {
 }
 
 local DIST_MATE = 9 --离伴侣的最远距离
-local DIST_REMOTE = 20 --最大活动范围
+local DIST_REMOTE = 25 --最大活动范围
 local DIST_ATK = 3.5 --普通攻击范围
 local DIST_SPAWN = DIST_REMOTE + DIST_ATK --距离神木的最大距离
 local DIST_FLAP = 7 --羽乱舞射程
@@ -46,7 +46,8 @@ local ATK_ROOT = 100 --子圭突触攻击力
 local COUNT_FLAP = 3 --羽乱舞次数
 local COUNT_FLAP_GRIEF = 4 --羽乱舞次数（悲愤状态）
 
-local TAGS_CANT = {"NOCLICK", "shadow", "playerghost", "ghost", "INLIMBO", "wall", "structure", "balloon", "siving"}
+local TAGS_CANT = { "NOCLICK", "shadow", "playerghost", "ghost",
+                    "INLIMBO", "wall", "structure", "balloon", "siving", "boat" }
 
 local function IsValid(one)
     return one:IsValid() and
@@ -92,6 +93,16 @@ local function SpawnFlower(inst, target)
     if flower ~= nil then
         flower.Transform:SetPosition(target.Transform:GetWorldPosition())
         flower:fn_onBind(inst, target)
+    end
+end
+local function SpawnRoot(bird, x, z, delaytime)
+    if TheWorld.Map:IsAboveGroundAtPoint(x, 0, z) then
+        local root = SpawnPrefab("siving_boss_root")
+        if root ~= nil then
+            root.Transform:SetPosition(x, 0, z)
+            root.OnTreeLive(root, bird.tree and bird.tree.treeState or 0)
+            root.fn_onAttack(root, bird, delaytime or 0.3)
+        end
     end
 end
 local function SetBehaviorTree(inst, done)
@@ -447,6 +458,9 @@ local function MakeBoss(data)
                 inst:PushEvent("dorefuse")
             end
 
+            inst:AddComponent("debuffable")
+            inst.components.debuffable:SetFollowSymbol("buzzard_body", 0, -200, 0)
+
             -- inst:AddComponent("eater")
             -- inst.components.eater:SetDiet({ FOODGROUP.OMNI }, { FOODGROUP.OMNI })
 
@@ -506,14 +520,7 @@ local function MakeBoss(data)
                             ))
                         then
                             local x, y, z = data.attacker.Transform:GetWorldPosition()
-                            if TheWorld.Map:IsAboveGroundAtPoint(x, 0, z) then
-                                local root = SpawnPrefab("siving_boss_root")
-                                if root ~= nil then
-                                    root.Transform:SetPosition(x, 0, z)
-                                    root.OnTreeLive(root, inst.tree and inst.tree.treeState or 0)
-                                    root.fn_onAttack(root, inst)
-                                end
-                            end
+                            SpawnRoot(inst, x, z)
                         end
                     end
 
@@ -525,6 +532,25 @@ local function MakeBoss(data)
                         return
                     end
 
+                    --现在是雌雄双打
+                    local lasttarget = inst.components.combat.target
+                    --谁离得近打谁
+                    if lasttarget ~= nil and IsValid(lasttarget) then
+                        if
+                            inst:GetDistanceSqToPoint(lasttarget:GetPosition())
+                            > inst:GetDistanceSqToPoint(data.attacker:GetPosition())
+                        then
+                            inst.components.combat:SetTarget(data.attacker)
+                        end
+                    else
+                        inst.components.combat:SetTarget(data.attacker)
+                    end
+                    lasttarget = inst.components.combat.target
+                    if lasttarget and inst.mate ~= nil and inst.mate.components.combat.target == nil then
+                        inst.mate.components.combat:SetTarget(lasttarget)
+                    end
+
+                    --[[
                     local lasttarget = inst.components.combat.target
 
                     --保持伴侣和自己同时仇恨不同的对象
@@ -572,6 +598,7 @@ local function MakeBoss(data)
                             end
                         end
                     end
+                    ]]--
                 end
             end)
             inst:ListenForEvent("timerdone", function(inst, data)
@@ -600,6 +627,11 @@ local function MakeBoss(data)
             if data.fn_server ~= nil then
                 data.fn_server(inst)
             end
+
+            inst:DoTaskInTime(0, function(i)
+                i.fx1 = SpawnPrefab("siving_treeprotect_fx")
+                i.fx1.entity:SetParent(i.entity)
+            end)
 
             return inst
         end,
@@ -960,7 +992,7 @@ local function MakeBossWeapon(data)
                 end
                 inst:Remove()
             end
-            inst.components.projectilelegion.exclude_tags = { "INLIMBO", "NOCLICK", "siving" }
+            inst.components.projectilelegion.exclude_tags = { "INLIMBO", "NOCLICK", "siving", "boat" }
 
             if data.fn_server ~= nil then
                 data.fn_server(inst)
@@ -1559,7 +1591,7 @@ table.insert(prefs, Prefab( --实体
 --[[ 子圭之眼 ]]
 --------------------------------------------------------------------------
 
-local TIME_EYE_DT = 4
+local TIME_EYE_DT = 2
 local TIME_EYE_DT_GRIEF = 0.5
 local COUNT_EYE = 6 --6
 local COUNT_EYE_GRIEF = 9 --9
@@ -1577,31 +1609,32 @@ local function UnbindBird(inst, landpos)
         inst.bird._count_atk = 0
     end
 end
-local function SpawnRoot(inst, x, z, theta, num)
-    if inst.bird.isgrief then
-        if num%2 == 1 then
-            theta = theta + 2*DEGREES
-        else
-            theta = theta - 2*DEGREES
-        end
+local function EyeATK1(inst)
+    if inst.task_eye2 ~= nil then
+        return
     end
-
-    local y = 0
-    x, y, z = GetCalculatedPos_legion(x, 0, z, 3+num*1.2, theta)
-    if TheWorld.Map:IsAboveGroundAtPoint(x, 0, z) then
-        local root = SpawnPrefab("siving_boss_root")
-        if root ~= nil then
-            root.Transform:SetPosition(x, 0, z)
-            root.OnTreeLive(root, inst.tree.treeState or 0)
-            root.fn_onAttack(root, inst.bird)
+    inst.task_eye2 = inst:DoPeriodicTask(1.5, function(inst)
+        if inst:IsAsleep() or inst.target == nil then
+            return
         end
-    end
+        local xx, yy, zz = inst.target.Transform:GetWorldPosition()
+        local numpot = inst.bird.isgrief and 7 or 5
+        local the = math.random()*2*PI
+        local the_dt = 2*PI/numpot
+        local emptykey = math.random(numpot)
+        local x2, y2, z2
+        for i = 1, numpot, 1 do
+            if emptykey ~= i then
+                x2, y2, z2 = GetCalculatedPos_legion(xx, 0, zz, 3.5, the+the_dt*(i-1))
+                SpawnRoot(inst.bird, x2, z2, 0.4)
+            end
+        end
+    end, 0.5)
 end
-local function EyeAttack(inst, dt, countnow, countmax)
+local function EyeAttack(inst, dt, countnow, countmax, x, z)
     inst.task_eye = inst:DoTaskInTime(dt, function(inst)
         --确定攻击者
         local tar = nil
-        local x, y, z = inst.tree.Transform:GetWorldPosition()
         if inst.bird.mate ~= nil and inst.bird.mate.components.combat.target ~= nil then
             tar = inst.bird.mate.components.combat.target
         else
@@ -1618,35 +1651,62 @@ local function EyeAttack(inst, dt, countnow, countmax)
             end
         end
 
+        --判定是否结束
         if countnow >= countmax then
             inst.task_eye = nil
             inst:fn_onUnbind(tar and tar:GetPosition() or nil)
             return
         end
+
+        --预备施法
         inst.AnimState:PlayAnimation("spell", true)
         countnow = countnow + 1
+        inst.target = tar
 
-        --确定攻击方向
+        --玩家逃避
+        if tar == nil then
+            --防御值+1层 undo
+        end
+
+        ------攻击方式1
+        EyeATK1(inst)
+
+        ------攻击方式2
         local theta = nil
+        local xx, yy, zz
         if tar ~= nil then
-            theta = inst.tree:GetAngleToPoint(tar:GetPosition()) * DEGREES
+            xx, yy, zz = tar.Transform:GetWorldPosition()
+            theta = math.atan2(z - zz, xx - x)
         else
             theta = math.random()*2*PI
         end
-
         --开始突袭！
         local num = 0
         local nummax = math.random(15, 19)
-        inst.task_eye = inst:DoPeriodicTask(0.15, function(inst)
+        local the = theta
+        inst.task_eye = inst:DoPeriodicTask(0.12, function(inst)
             num = num + 1
-            SpawnRoot(inst, x, z, theta, num)
+            if not inst:IsAsleep() then
+                if inst.bird.isgrief then
+                    if num%2 == 1 then
+                        the = theta + 2*DEGREES
+                    else
+                        the = theta - 2*DEGREES
+                    end
+                end
+                xx, yy, zz = GetCalculatedPos_legion(x, 0, z, 3+num*1.2, the)
+                SpawnRoot(inst.bird, xx, zz, 0.3)
+            end
             if num >= nummax then
                 if inst.task_eye ~= nil then
                     inst.task_eye:Cancel()
                     inst.task_eye = nil
                 end
+                if not inst.bird.isgrief then
+                    inst.target = nil
+                end
                 inst.AnimState:PlayAnimation("idle", true)
-                EyeAttack(inst, dt, countnow, countmax)
+                EyeAttack(inst, dt, countnow, countmax, x, z)
             end
         end, 1)
     end)
@@ -1681,22 +1741,33 @@ table.insert(prefs, Prefab(
         inst.persists = false
         inst.tree = nil
         inst.bird = nil
+        inst.target = nil
 
         inst.fn_onUnbind = function(inst, landpos) --解除
             if inst.task_eye ~= nil then
                 inst.task_eye:Cancel()
                 inst.task_eye = nil
             end
+            if inst.task_eye2 ~= nil then
+                inst.task_eye2:Cancel()
+                inst.task_eye2 = nil
+            end
 
             if inst.tree:IsValid() then
-                inst.AnimState:PlayAnimation("unbind")
-                inst:ListenForEvent("animover", function(inst)
+                inst.tree.components.timer:StopTimer("eye")
+                inst.tree.components.timer:StartTimer("eye", inst.tree.TIME_EYE)
+                if inst:IsAsleep() then
                     UnbindBird(inst, landpos)
                     inst.tree.myEye = nil
                     inst:Remove()
-                end)
-                inst.tree.components.timer:StopTimer("eye")
-                inst.tree.components.timer:StartTimer("eye", inst.tree.TIME_EYE)
+                else
+                    inst.AnimState:PlayAnimation("unbind")
+                    inst:ListenForEvent("animover", function(inst) --如果离玩家太远，动画会暂停
+                        UnbindBird(inst, landpos)
+                        inst.tree.myEye = nil
+                        inst:Remove()
+                    end)
+                end
             else
                 UnbindBird(inst, landpos)
                 inst.tree.myEye = nil
@@ -1736,9 +1807,9 @@ table.insert(prefs, Prefab(
 
             if bird.isgrief then
                 inst.AnimState:OverrideSymbol("eye", "siving_boss_eye", "griefeye")
-                EyeAttack(inst, TIME_EYE_DT_GRIEF, 0, COUNT_EYE_GRIEF)
+                EyeAttack(inst, TIME_EYE_DT_GRIEF, 0, COUNT_EYE_GRIEF, x, z)
             else
-                EyeAttack(inst, TIME_EYE_DT, 0, COUNT_EYE)
+                EyeAttack(inst, TIME_EYE_DT, 0, COUNT_EYE, x, z)
             end
         end
 
@@ -1827,18 +1898,18 @@ table.insert(prefs, Prefab(
                 inst.Light:Enable(false)
             end
         end
-        inst.fn_onAttack = function(inst, bird)
+        inst.fn_onAttack = function(inst, bird, delaytime)
             inst.AnimState:PlayAnimation("grow"..tostring(inst.fenceid))
             inst.AnimState:PushAnimation("idle"..tostring(inst.fenceid), false)
             inst.SoundEmitter:PlaySound("dontstarve/common/together/atrium/gate_spike")
             inst.components.workable:SetWorkable(false)
-            inst._task_atk = inst:DoTaskInTime(0.3, function(inst)
+            inst._task_atk = inst:DoTaskInTime(delaytime, function(inst)
                 inst._task_atk = nil
 
                 --攻击！破坏！
                 local x, y, z = inst.Transform:GetWorldPosition()
                 local ents = TheSim:FindEntities(x, 0, z, DIST_ROOT_ATK,
-                    nil, { "INLIMBO", "NOCLICK", "siving", "flying", "shadow", "ghost" },
+                    nil, { "INLIMBO", "NOCLICK", "siving", "shadow", "ghost" },
                     { "_combat", "CHOP_workable", "DIG_workable", "HAMMER_workable", "MINE_workable" }
                 )
                 for _, v in ipairs(ents) do
@@ -1859,7 +1930,7 @@ table.insert(prefs, Prefab(
 
                 SetClosedPhysics(inst)
             end)
-            inst._task_work = inst:DoTaskInTime(3, function(inst)
+            inst._task_work = inst:DoTaskInTime(delaytime+3, function(inst)
                 inst._task_work = nil
                 inst.components.workable:SetWorkable(true)
             end)
@@ -2307,6 +2378,78 @@ table.insert(prefs, Prefab(
     {
         Asset("ATLAS", "images/inventoryimages/siving_feather_line.xml"),
         Asset("IMAGE", "images/inventoryimages/siving_feather_line.tex"),
+    },
+    nil
+))
+
+--------------------------------------------------------------------------
+--[[ 神木特防的特效 ]]
+--------------------------------------------------------------------------
+
+table.insert(prefs, Prefab(
+    "siving_treeprotect_fx",
+    function()
+        local inst = CreateEntity()
+        inst.entity:AddTransform()
+        inst.entity:AddAnimState()
+        inst.entity:AddNetwork()
+
+        inst:AddTag("FX")
+
+        inst.AnimState:SetBank("terrariumchest_fx") --位于前面?
+        inst.AnimState:SetBuild("siving_treeprotect_fx")
+        inst.AnimState:PlayAnimation("idle_front", true)
+        inst.AnimState:SetScale(1.2, 1.2)
+        inst.AnimState:SetFinalOffset(1)
+
+        if not TheNet:IsDedicated() then --位于后面?
+            local fx_front = CreateEntity()
+            fx_front.entity:AddTransform()
+            fx_front.entity:AddAnimState()
+            fx_front.entity:SetParent(inst.entity)
+
+            fx_front:AddTag("FX")
+            fx_front:AddTag("CLASSIFIED")
+
+            fx_front.AnimState:SetBank("terrariumchest_fx")
+            fx_front.AnimState:SetBuild("siving_treeprotect_fx")
+            fx_front.AnimState:SetScale(1.2, 1.2)
+            fx_front.AnimState:SetFinalOffset(-3)
+
+            fx_front:DoTaskInTime(1, function(fx_front)
+                fx_front.AnimState:PlayAnimation("idle_front", true)
+            end)
+
+            local btm = CreateEntity()
+            btm.entity:AddTransform()
+            btm.entity:AddAnimState()
+            btm.entity:SetParent(inst.entity)
+
+            btm:AddTag("FX")
+            btm:AddTag("CLASSIFIED")
+
+            btm.AnimState:SetBank("lavaarena_beetletaur_fx")
+            btm.AnimState:SetBuild("lavaarena_beetletaur_fx")
+            btm.AnimState:PlayAnimation("attack_fx3", true)
+            btm.AnimState:SetOrientation(ANIM_ORIENTATION.OnGround)
+            btm.AnimState:SetLayer(LAYER_BACKGROUND)
+            btm.AnimState:SetScale(0.15, 0.15)
+            btm.AnimState:SetFinalOffset(-3)
+        end
+
+        inst.entity:SetPristine()
+        if not TheWorld.ismastersim then
+            return inst
+        end
+
+        inst.persists = false
+
+        return inst
+    end,
+    {
+        Asset("ANIM", "anim/terrariumchest_fx.zip"), --官方特拉瑞亚箱子的特效
+        Asset("ANIM", "anim/lavaarena_beetletaur_fx.zip"),
+        Asset("ANIM", "anim/siving_treeprotect_fx.zip")
     },
     nil
 ))

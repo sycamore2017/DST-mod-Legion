@@ -336,7 +336,8 @@ MakeDerivant({  --子圭森型岩
 
 local TIME_WITHER = TUNING.TOTAL_DAY_TIME * 15 --神木枯萎时间
 local TIME_FREE = TUNING.TOTAL_DAY_TIME --玄鸟无所事事最多停留的时间
-local TIME_EYE = 150 --同目同心 冷却时间 150
+local TIME_EYE = 100 --同目同心 冷却时间 121
+local DIST_HEALTH = 25
 
 local function IsValid(bird)
     return bird ~= nil and bird:IsValid() and
@@ -458,7 +459,7 @@ local function InitEgg(inst, egg, ismale)
 end
 local function ClearBattlefield(inst) --打扫战场
     local x, y, z = inst.Transform:GetWorldPosition()
-    local ents = TheSim:FindEntities(x, 0, z, 30, { "siv_boss_block" }, { "INLIMBO" })
+    local ents = TheSim:FindEntities(x, 0, z, DIST_HEALTH+5, { "siv_boss_block" }, { "INLIMBO" })
     for _, v in ipairs(ents) do
         if v.fn_onClear ~= nil then
             v:fn_onClear()
@@ -487,7 +488,7 @@ local function CallBirdFarAway(bird, x, z)
     if
         not bird.iseye and not bird:IsInLimbo() and
         not bird.sg:HasStateTag("flight") and
-        bird:GetDistanceSqToPoint(x, 0, z) >= 1225
+        bird:GetDistanceSqToPoint(x, 0, z) >= (DIST_HEALTH+5)^2
     then
         local spawnpos = bird.components.knownlocations:GetLocation("spawnpoint")
         if spawnpos ~= nil then
@@ -547,10 +548,10 @@ local function TriggerLifeExtractTask(inst, doit)
 
                 ----吸收对象的更新
                 if doit2 or ents == nil then
-                    ents = TheSim:FindEntities(x, y, z, 20,
+                    ents = TheSim:FindEntities(x, y, z, DIST_HEALTH,
                         nil,
                         {"NOCLICK", "shadow", "playerghost", "ghost",
-                            "INLIMBO", "wall", "structure", "balloon", "siving"},
+                            "INLIMBO", "wall", "structure", "balloon", "siving", "boat"},
                         {"siving_derivant", "_health"}
                     )
                 end
@@ -566,7 +567,7 @@ local function TriggerLifeExtractTask(inst, doit)
                             end
                         elseif
                             v.components.health ~= nil and not v.components.health:IsDead() and
-                            v:GetDistanceSqToPoint(x, y, z) <= 400
+                            v:GetDistanceSqToPoint(x, y, z) <= DIST_HEALTH^2
                         then
                             ----特效生成
                             if v.components.inventory == nil or not v.components.inventory:EquipHasTag("siv_BFF") then
@@ -715,7 +716,7 @@ local function OnEntityDropLoot(inst, data)
             victim == inst or
             (
                 IsValidVictim(victim) and
-                inst:IsNear(victim, TUNING.WORTOX_SOULEXTRACT_RANGE)
+                inst:IsNear(victim, DIST_HEALTH)
             )
         )
     then
@@ -738,7 +739,7 @@ local function OnStarvedTrapSouls(inst, data)
         trap.nosoultask == nil and
         (data.numsouls or 0) > 0 and
         trap:IsValid() and
-        inst:IsNear(trap, TUNING.WORTOX_SOULEXTRACT_RANGE)
+        inst:IsNear(trap, DIST_HEALTH)
     then
         --V2C: prevents multiple Wortoxes in range from spawning multiple souls per trap
         trap.nosoultask = trap:DoTaskInTime(5, OnRestoreSoul)
@@ -868,6 +869,10 @@ table.insert(prefs, Prefab(
                         inst.bossBirds.male.mate = nil
                         inst.bossBirds.male:fn_onGrief(inst, true)
                     end
+                end
+                if bird.sg.mem.to_flyaway and bird.sg.mem.to_flyaway.beeye then
+                    inst.components.timer:StopTimer("eye")
+                    inst.components.timer:StartTimer("eye", TIME_EYE)
                 end
             end
         end
