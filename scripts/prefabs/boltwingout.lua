@@ -226,7 +226,7 @@ local assets_shuck = {
 
 local function AttractEnemies(inst)
     local pos = inst:GetPosition()
-    local ents = TheSim:FindEntities(pos.x, pos.y, pos.z, 8, { "_combat" }, { "DECOR", "NOCLICK", "FX", "playerghost", "INLIMBO" })
+    local ents = TheSim:FindEntities(pos.x, pos.y, pos.z, 8, { "_combat" }, { "NOCLICK", "playerghost", "INLIMBO" })
     for k, v in pairs(ents) do
         if v ~= inst and v.components.combat ~= nil and v.components.combat:CanTarget(inst) then
             v.components.combat:SetTarget(inst)
@@ -324,7 +324,7 @@ local function fn_shuck()
 
     inst:AddTag("chewable") -- by werebeaver
     inst:AddTag("companion") --加companion和character标签是为了让大多数怪物能主动攻击自己，并且玩家攻击时不会主动以自己为目标
-    inst:AddTag("character")
+    -- inst:AddTag("character") --暗影触手会识别这个标签。而暗影触手的 retargetfn 里不对sg提前做判断，导致崩溃
     inst:AddTag("notraptrigger") --不会触发狗牙陷阱
     inst:AddTag("smashable") --为了不产生灵魂
 

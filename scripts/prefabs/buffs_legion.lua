@@ -566,7 +566,6 @@ MakeBuff({
 local function AlignToTarget(inst, target)
     inst.Transform:SetRotation(target.Transform:GetRotation())
 end
-
 local function OnChangeFollowSymbol(inst, target, followsymbol, followoffset)
     if followsymbol ~= nil and followoffset ~= nil then
         inst.Follower:FollowSymbol(target.GUID, followsymbol, followoffset.x, followoffset.y, followoffset.z)
@@ -596,7 +595,7 @@ MakeBuff({
     end,
     fn_again = nil,
     fn_end = function(buff, target)
-        local player = buff.entity ~= nil and buff.entity:GetParent()
+        local player = buff.entity:GetParent()
         if player ~= nil and player.components.talker ~= nil then
             player.components.talker:Say(GetString(player, "DESCRIBE", { "DISH_SUGARLESSTRICKMAKERCUPCAKES", "TRICKED" }))
         end
@@ -746,6 +745,138 @@ MakeBuff({
         end
     end,
     fn_server = nil,
+})
+
+--------------------------------------------------------------------------
+--[[ 神木光辉：增加防御力 ]]
+--------------------------------------------------------------------------
+
+local function OnChangeFollowSymbol_tree(inst, target, followsymbol, followoffset)
+    if target:HasTag("siving_boss") then --这个buff特效我想让它的位置在玄鸟头部
+        followsymbol = "buzzard_head"
+        followoffset = { x = 0, y = -20, z = 0 }
+    end
+    if followsymbol ~= nil and followoffset ~= nil then
+        inst.Follower:FollowSymbol(target.GUID, followsymbol, followoffset.x, followoffset.y, followoffset.z)
+    end
+end
+local function SetStateSymbol(buff, state)
+    if state == 1 then
+        buff.AnimState:OverrideSymbol("insidetooth2", "siving_treehalo_fx", "insidetooth2")
+    elseif state == 2 then
+        buff.AnimState:OverrideSymbol("insidetooth2", "siving_treehalo_fx", "base2")
+    else
+        buff.AnimState:OverrideSymbol("insidetooth2", "siving_treehalo_fx", "base3")
+    end
+end
+local function BuffSet_tree(buff, target)
+    local state = target.sign_l_treehalo --不要清除这个变量，我还要管理呢
+    if state == nil then --很可能是加载时
+        state = buff.state_l
+        buff.state_l = 0 --这样就可以把逻辑走完了
+        target.sign_l_treehalo = state
+    end
+
+    if state == 0 then
+        buff.state_l = 0
+        if buff:IsAsleep() then
+            buff:DoTaskInTime(0, function(fx) --下一帧再执行，不然加buff的函数里移除buff可能会崩
+                fx.components.debuff:Stop()
+            end)
+        else
+            buff.AnimState:PlayAnimation("pst")
+            buff:ListenForEvent("animover", function(fx)
+                fx.components.debuff:Stop()
+            end)
+        end
+        return
+    end
+
+    if buff.state_l ~= state then
+        if buff.state_l > 0 then
+            buff.AnimState:PlayAnimation("exchange")
+            if buff.task_ex ~= nil then
+                buff.task_ex:Cancel()
+            end
+            buff.task_ex = buff:DoTaskInTime(0.3, function(buff)
+                buff.task_ex = nil
+                SetStateSymbol(buff, buff.state_l)
+            end)
+        else
+            SetStateSymbol(buff, state)
+            buff.AnimState:PlayAnimation("pre")
+        end
+        buff.AnimState:PushAnimation("loop", true)
+        buff.state_l = state
+        if target.components.combat ~= nil then
+            if state == 3 then
+                target.components.combat.externaldamagetakenmultipliers:SetModifier(buff, 0.99)
+            elseif state == 2 then
+                target.components.combat.externaldamagetakenmultipliers:SetModifier(buff, 0.66)
+            elseif state == 1 then
+                target.components.combat.externaldamagetakenmultipliers:SetModifier(buff, 0.33)
+            end
+        end
+    end
+end
+
+MakeBuff({
+    name = "buff_treehalo",
+    assets = {
+        Asset("ANIM", "anim/siving_treehalo_fx.zip"),
+    },
+    prefabs = nil,
+    time_key = nil,
+    time_default = nil,
+    notimer = true,
+    addnetwork = true,
+    fn_start = function(buff, target, followsymbol, followoffset)
+        buff.entity:SetParent(target.entity)
+        OnChangeFollowSymbol_tree(buff, target, followsymbol, followoffset)
+        BuffSet_tree(buff, target)
+    end,
+    fn_again = function(buff, target, followsymbol, followoffset)
+        if buff.state_l > 0 then --结束动画有一阵子，期间再来就不算了
+            BuffSet_tree(buff, target)
+        end
+    end,
+    fn_end = function(buff, target)
+        if buff.task_ex ~= nil then
+            buff.task_ex:Cancel()
+            buff.task_ex = nil
+        end
+        if target:IsValid() and target.components.combat ~= nil then
+            target.components.combat.externaldamagetakenmultipliers:RemoveModifier(buff)
+        end
+    end,
+    fn_common = function(buff)
+        buff.entity:AddFollower()
+        buff.entity:AddAnimState()
+
+        buff:AddTag("FX")
+
+        buff.AnimState:SetBank("siving_treehalo_fx")
+        buff.AnimState:SetBuild("siving_treehalo_fx")
+        buff.AnimState:PlayAnimation("loop", true)
+        buff.AnimState:SetScale(0.35, 0.35)
+        buff.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
+        buff.AnimState:SetFinalOffset(-3) --让这个动画位于父体层级底部
+    end,
+    fn_server = function(buff)
+        buff.components.debuff:SetChangeFollowSymbolFn(OnChangeFollowSymbol_tree)
+
+        buff.state_l = 0
+        buff.OnSave = function(inst, data)
+            if inst.state_l > 0 then
+                data.state_l = inst.state_l
+            end
+        end
+        buff.OnLoad = function(inst, data) --这个比OnAttached更早执行
+            if data ~= nil and data.state_l ~= nil then
+                inst.state_l = data.state_l
+            end
+        end
+    end,
 })
 
 --------------------

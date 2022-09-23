@@ -105,6 +105,27 @@ local function SpawnRoot(bird, x, z, delaytime)
         end
     end
 end
+local function SetTreeBuff(inst, value)
+    value = inst.sign_l_treehalo + value
+    if value > 3 then
+        value = 3
+    elseif value < 0 then
+        value = 0
+    end
+    if inst.sign_l_treehalo == value then
+        return
+    end
+    inst.sign_l_treehalo = value
+
+    if value == 0 then --说明要清除buff了
+        if not inst.components.debuffable:HasDebuff("buff_treehalo") then
+            return --既然还没有buff，那就不用做什么
+        end
+    end
+
+    --即使是清除buff，也是通过赋值 sign_l_treehalo=0 后 AddDebuff 来解除buff
+    inst:AddDebuff("buff_treehalo", "buff_treehalo")
+end
 local function SetBehaviorTree(inst, done)
     if done == "atk" then
         inst._count_atk = inst._count_atk + 1
@@ -136,11 +157,18 @@ local function MagicWarble(inst) --魔音绕梁
             v.components.inventory ~= nil and
             v.components.locomotor ~= nil
         then
-            local hat = v.components.inventory:GetEquippedItem(EQUIPSLOTS.HEAD)
-            v.components.inventory:DropEquipped(false)
+            local inv = v.components.inventory
+            local hasprotect = false
+            for _, item in pairs(inv.equipslots) do
+                if item.prefab == "earmuffshat" or item.protect_l_magicwarble then
+                    hasprotect = true
+                else
+                    inv:DropItem(item, true, true)
+                end
+            end
 
             --装备了兔耳罩就能避免后续的debuff
-            if hat ~= nil and (hat.prefab == "earmuffshat" or hat.protect_l_magicwarble) then
+            if hasprotect then
                 return
             end
 
@@ -250,6 +278,7 @@ local function MakeBoss(data)
             inst:AddTag("hostile")
             inst:AddTag("largecreature")
             inst:AddTag("siving")
+            inst:AddTag("siving_boss")
             -- inst:AddTag("flying")
             inst:AddTag("ignorewalkableplatformdrowning")
 
@@ -282,6 +311,7 @@ local function MakeBoss(data)
             inst._count_rock = 0 --喂食后需要掉落的子圭石数量
 
             inst.sounds = BossSounds
+            inst.sign_l_treehalo = 0
             inst.tree = nil
             inst.mate = nil --另一个伴侣
             inst.isgrief = false --是否处于悲愤状态
@@ -628,11 +658,6 @@ local function MakeBoss(data)
                 data.fn_server(inst)
             end
 
-            inst:DoTaskInTime(0, function(i)
-                i.fx1 = SpawnPrefab("siving_treeprotect_fx")
-                i.fx1.entity:SetParent(i.entity)
-            end)
-
             return inst
         end,
         {
@@ -647,7 +672,8 @@ local function MakeBoss(data)
             "siving_bossfea_fake",
             "siving_boss_taunt_fx",
             "siving_boss_caw_fx",
-            "siving_boss_root"
+            "siving_boss_root",
+            "buff_treehalo"
         }
     ))
 end
@@ -1671,6 +1697,24 @@ local function EyeAttack(inst, dt, countnow, countmax, x, z)
         ------攻击方式1
         EyeATK1(inst)
 
+        ------第一次循环，给伴侣加1层buff
+        if countnow == 1 then
+            if inst.bird.mate ~= nil and IsValid(inst.bird.mate) then
+                inst.task_eye = inst:DoTaskInTime(1, function(inst)
+                    if inst.bird.mate ~= nil and IsValid(inst.bird.mate) then
+                        SetTreeBuff(inst.bird.mate, 1)
+                    end
+                    if not inst.bird.isgrief then
+                        inst.target = nil
+                    end
+                    inst.task_eye = nil
+                    inst.AnimState:PlayAnimation("idle", true)
+                    EyeAttack(inst, dt, countnow, countmax, x, z)
+                end)
+                return
+            end
+        end
+
         ------攻击方式2
         local theta = nil
         local xx, yy, zz
@@ -2378,78 +2422,6 @@ table.insert(prefs, Prefab(
     {
         Asset("ATLAS", "images/inventoryimages/siving_feather_line.xml"),
         Asset("IMAGE", "images/inventoryimages/siving_feather_line.tex"),
-    },
-    nil
-))
-
---------------------------------------------------------------------------
---[[ 神木特防的特效 ]]
---------------------------------------------------------------------------
-
-table.insert(prefs, Prefab(
-    "siving_treeprotect_fx",
-    function()
-        local inst = CreateEntity()
-        inst.entity:AddTransform()
-        inst.entity:AddAnimState()
-        inst.entity:AddNetwork()
-
-        inst:AddTag("FX")
-
-        inst.AnimState:SetBank("terrariumchest_fx") --位于前面?
-        inst.AnimState:SetBuild("siving_treeprotect_fx")
-        inst.AnimState:PlayAnimation("idle_front", true)
-        inst.AnimState:SetScale(1.2, 1.2)
-        inst.AnimState:SetFinalOffset(1)
-
-        if not TheNet:IsDedicated() then --位于后面?
-            local fx_front = CreateEntity()
-            fx_front.entity:AddTransform()
-            fx_front.entity:AddAnimState()
-            fx_front.entity:SetParent(inst.entity)
-
-            fx_front:AddTag("FX")
-            fx_front:AddTag("CLASSIFIED")
-
-            fx_front.AnimState:SetBank("terrariumchest_fx")
-            fx_front.AnimState:SetBuild("siving_treeprotect_fx")
-            fx_front.AnimState:SetScale(1.2, 1.2)
-            fx_front.AnimState:SetFinalOffset(-3)
-
-            fx_front:DoTaskInTime(1, function(fx_front)
-                fx_front.AnimState:PlayAnimation("idle_front", true)
-            end)
-
-            local btm = CreateEntity()
-            btm.entity:AddTransform()
-            btm.entity:AddAnimState()
-            btm.entity:SetParent(inst.entity)
-
-            btm:AddTag("FX")
-            btm:AddTag("CLASSIFIED")
-
-            btm.AnimState:SetBank("lavaarena_beetletaur_fx")
-            btm.AnimState:SetBuild("lavaarena_beetletaur_fx")
-            btm.AnimState:PlayAnimation("attack_fx3", true)
-            btm.AnimState:SetOrientation(ANIM_ORIENTATION.OnGround)
-            btm.AnimState:SetLayer(LAYER_BACKGROUND)
-            btm.AnimState:SetScale(0.15, 0.15)
-            btm.AnimState:SetFinalOffset(-3)
-        end
-
-        inst.entity:SetPristine()
-        if not TheWorld.ismastersim then
-            return inst
-        end
-
-        inst.persists = false
-
-        return inst
-    end,
-    {
-        Asset("ANIM", "anim/terrariumchest_fx.zip"), --官方特拉瑞亚箱子的特效
-        Asset("ANIM", "anim/lavaarena_beetletaur_fx.zip"),
-        Asset("ANIM", "anim/siving_treeprotect_fx.zip")
     },
     nil
 ))
