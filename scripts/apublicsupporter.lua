@@ -1770,11 +1770,15 @@ if CONFIGS_LEGION.LEGENDOFFALL then
     AddStategraphState("wilson", State{
         name = "s_l_throw",
         tags = { "doing", "busy", "nointerrupt", "nomorph" },
-
         onenter = function(inst)
             local equip = inst.components.inventory:GetEquippedItem(EQUIPSLOTS.HANDS)
             inst.components.locomotor:Stop()
-            inst.AnimState:PlayAnimation("atk_pre")
+            -- if inst.replica.rider ~= nil and inst.replica.rider:IsRiding() then
+            --     inst.AnimState:PlayAnimation("player_atk_pre")
+            -- else
+            --     inst.AnimState:PlayAnimation("atk_pre")
+            -- end
+            inst.AnimState:PlayAnimation("throw")
 
             local buffaction = inst:GetBufferedAction()
             if buffaction ~= nil then
@@ -1797,7 +1801,6 @@ if CONFIGS_LEGION.LEGENDOFFALL then
 
             inst.SoundEmitter:PlaySound("dontstarve/wilson/attack_weapon")
         end,
-
         onupdate = function(inst, dt)
             if (inst.sg.statemem.projectiledelay or 0) > 0 then
                 inst.sg.statemem.projectiledelay = inst.sg.statemem.projectiledelay - dt
@@ -1807,7 +1810,6 @@ if CONFIGS_LEGION.LEGENDOFFALL then
                 end
             end
         end,
-
         timeline = {
             TimeEvent(7 * FRAMES, function(inst)
                 if inst.sg.statemem.projectiledelay == nil then
@@ -1819,30 +1821,36 @@ if CONFIGS_LEGION.LEGENDOFFALL then
                 inst.sg:GoToState("idle", true)
             end),
         },
-
         events = {
             EventHandler("animover", function(inst)
                 if inst.AnimState:AnimDone() then
-                    if inst.AnimState:IsCurrentAnimation("atk_pre") then
-                        inst.AnimState:PlayAnimation("throw")
-                        inst.AnimState:SetTime(6 * FRAMES)
-                    else
+                    -- if
+                    --     inst.AnimState:IsCurrentAnimation("atk_pre") or
+                    --     inst.AnimState:IsCurrentAnimation("player_atk_pre")
+                    -- then
+                    --     inst.AnimState:PlayAnimation("throw")
+                    --     inst.AnimState:SetTime(6 * FRAMES)
+                    -- else
                         inst.sg:GoToState("idle")
-                    end
+                    -- end
                 end
             end),
         },
-
-        -- onexit = function(inst) end,
+        -- onexit = function(inst) end
     })
     AddStategraphState("wilson_client", State{
         name = "s_l_throw",
         tags = { "doing", "busy", "nointerrupt" },
-
         onenter = function(inst)
             inst.components.locomotor:Stop()
-            inst.AnimState:PlayAnimation("atk_pre")
-            inst.AnimState:PushAnimation("atk_lag", false)
+            -- if inst.replica.rider ~= nil and inst.replica.rider:IsRiding() then
+            --     inst.AnimState:PlayAnimation("player_atk_pre")
+            --     inst.AnimState:PushAnimation("player_atk_lag", false)
+            -- else
+            --     inst.AnimState:PlayAnimation("atk_pre")
+            --     inst.AnimState:PushAnimation("atk_lag", false)
+            -- end
+            inst.AnimState:PlayAnimation("throw")
 
             local buffaction = inst:GetBufferedAction()
             if buffaction ~= nil then
@@ -1857,27 +1865,26 @@ if CONFIGS_LEGION.LEGENDOFFALL then
 
             inst.sg:SetTimeout(2)
         end,
-
-        onupdate = function(inst)
-            if inst:HasTag("doing") then
-                if inst.entity:FlattenMovementPrediction() then
-                    inst.sg:GoToState("idle", "noanim")
-                end
-            elseif inst.bufferedaction == nil then
-                inst.sg:GoToState("idle")
-            end
-        end,
-
+        timeline = {
+            TimeEvent(7 * FRAMES, function(inst)
+                inst:ClearBufferedAction()
+            end)
+        },
         ontimeout = function(inst)
-            inst:ClearBufferedAction()
             inst.sg:GoToState("idle")
         end,
+        events = {
+            EventHandler("animover", function(inst)
+                if inst.AnimState:AnimDone() then
+                    inst.sg:GoToState("idle")
+                end
+            end),
+        }
     })
     ------拉回羽毛的动作sg
     AddStategraphState("wilson", State{
         name = "s_l_pull",
         tags = { "doing", "busy", "nointerrupt", "nomorph" },
-
         onenter = function(inst)
             inst.components.locomotor:Stop()
             inst.AnimState:PlayAnimation("catch_pre")
@@ -1892,7 +1899,6 @@ if CONFIGS_LEGION.LEGENDOFFALL then
                 end
             end
         end,
-
         timeline = {
             TimeEvent(3 * FRAMES, function(inst)
                 inst.sg:RemoveStateTag("nointerrupt")
@@ -1902,7 +1908,6 @@ if CONFIGS_LEGION.LEGENDOFFALL then
                 inst.sg:RemoveStateTag("busy")
             end),
         },
-
         events = {
             EventHandler("animqueueover", function(inst)
                 if inst.AnimState:AnimDone() then
@@ -1914,7 +1919,6 @@ if CONFIGS_LEGION.LEGENDOFFALL then
     AddStategraphState("wilson_client", State{
         name = "s_l_pull",
         tags = { "doing", "busy", "nointerrupt" },
-
         onenter = function(inst)
             inst.components.locomotor:Stop()
             inst.AnimState:PlayAnimation("catch_pre")
@@ -1922,7 +1926,6 @@ if CONFIGS_LEGION.LEGENDOFFALL then
             inst:PerformPreviewBufferedAction()
             inst.sg:SetTimeout(2)
         end,
-
         onupdate = function(inst)
             if inst:HasTag("doing") then
                 if inst.entity:FlattenMovementPrediction() then
@@ -1932,11 +1935,10 @@ if CONFIGS_LEGION.LEGENDOFFALL then
                 inst.sg:GoToState("idle")
             end
         end,
-
         ontimeout = function(inst)
             inst:ClearBufferedAction()
             inst.sg:GoToState("idle")
-        end,
+        end
     })
 end
 

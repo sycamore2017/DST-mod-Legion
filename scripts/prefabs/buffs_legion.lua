@@ -810,11 +810,11 @@ local function BuffSet_tree(buff, target)
         buff.state_l = state
         if target.components.combat ~= nil then
             if state == 3 then
-                target.components.combat.externaldamagetakenmultipliers:SetModifier(buff, 0.99)
+                target.components.combat.externaldamagetakenmultipliers:SetModifier(buff, 0.01)
             elseif state == 2 then
-                target.components.combat.externaldamagetakenmultipliers:SetModifier(buff, 0.66)
+                target.components.combat.externaldamagetakenmultipliers:SetModifier(buff, 0.34)
             elseif state == 1 then
-                target.components.combat.externaldamagetakenmultipliers:SetModifier(buff, 0.33)
+                target.components.combat.externaldamagetakenmultipliers:SetModifier(buff, 0.67)
             end
         end
     end

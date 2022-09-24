@@ -336,7 +336,7 @@ MakeDerivant({  --子圭森型岩
 
 local TIME_WITHER = TUNING.TOTAL_DAY_TIME * 15 --神木枯萎时间
 local TIME_FREE = TUNING.TOTAL_DAY_TIME --玄鸟无所事事最多停留的时间
-local TIME_EYE = 10 --同目同心 冷却时间 121
+local TIME_EYE = 60 --同目同心 冷却时间 60
 local DIST_HEALTH = 25
 
 local function IsValid(bird)

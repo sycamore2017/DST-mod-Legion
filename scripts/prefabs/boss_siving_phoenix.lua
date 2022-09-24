@@ -22,11 +22,11 @@ local BossSounds = {
     hurt = "dontstarve_DLC001/creatures/buzzard/hurt"
 }
 
-local DIST_MATE = 9 --离伴侣的最远距离
+local DIST_MATE = 15 --离伴侣的最远距离
 local DIST_REMOTE = 25 --最大活动范围
 local DIST_ATK = 3.5 --普通攻击范围
 local DIST_SPAWN = DIST_REMOTE + DIST_ATK --距离神木的最大距离
-local DIST_FLAP = 7 --羽乱舞射程
+local DIST_FLAP = 8 --羽乱舞射程
 local DIST_FEA_EXPLODE = 2.5 --精致子圭翎羽的爆炸半径
 local DIST_ROOT_ATK = 1.5 --子圭突触的攻击半径
 
@@ -36,12 +36,12 @@ local TIME_FEA_EXPLODE = 30 --精致子圭翎羽爆炸时间
 local TIME_TAUNT = 50 --魔音绕梁 冷却时间 50
 local TIME_CAW = 50 --花寄语 冷却时间 50
 
-local ATK_NORMAL = 20 --啄击攻击力
+local ATK_NORMAL = 15 --啄击攻击力
 local ATK_GRIEF = 10 --悲愤状态额外攻击力
-local ATK_FEA = 50 --子圭翎羽攻击力
-local ATK_FEA_REAL = 80 --精致子圭翎羽攻击力
+local ATK_FEA = 45 --子圭翎羽攻击力
+local ATK_FEA_REAL = 75 --精致子圭翎羽攻击力
 local ATK_FEA_EXPLODE = 100 --精致子圭翎羽的爆炸伤害
-local ATK_ROOT = 100 --子圭突触攻击力
+local ATK_ROOT = 80 --子圭突触攻击力
 
 local COUNT_FLAP = 3 --羽乱舞次数
 local COUNT_FLAP_GRIEF = 4 --羽乱舞次数（悲愤状态）
@@ -78,10 +78,11 @@ local function GetDamage2(target, basedamage)
     end
 end
 local function DoDefenselessATK(inst, target, basedamage)
-    target.components.combat:GetAttacked(inst, 1, nil, nil) --为了进行一遍被攻击后的逻辑(这里能触发盾反)
+    target.components.combat:GetAttacked(inst, 0.5, nil, nil) --为了进行一遍被攻击后的逻辑(这里能触发盾反)
     if
         target.components.health == nil or target.components.health:IsDead() or
-        target.shield_l_success --盾反成功
+        target.shield_l_success or --盾反成功
+        inst.components.combat.target == nil --脱壳之翅会在成功时将敌人仇恨清除
     then
         return
     end
@@ -115,9 +116,13 @@ local function SetTreeBuff(inst, value)
     if inst.sign_l_treehalo == value then
         return
     end
+    if inst.sign_l_treehalo <= 0 then --第一次加buff时
+        inst.count_toolatk = 0
+    end
     inst.sign_l_treehalo = value
 
     if value == 0 then --说明要清除buff了
+        inst.count_toolatk = 0
         if not inst.components.debuffable:HasDebuff("buff_treehalo") then
             return --既然还没有buff，那就不用做什么
         end
@@ -312,6 +317,7 @@ local function MakeBoss(data)
 
             inst.sounds = BossSounds
             inst.sign_l_treehalo = 0
+            inst.count_toolatk = 0 --被镐子类工具攻击次数
             inst.tree = nil
             inst.mate = nil --另一个伴侣
             inst.isgrief = false --是否处于悲愤状态
@@ -529,10 +535,10 @@ local function MakeBoss(data)
             inst:ListenForEvent("attacked", function(inst, data)
                 if data.attacker and IsValid(data.attacker) then
                     if data.damage and data.attacker.components.combat ~= nil then
-                        --将单次伤害超过120的部分反弹给攻击者
-                        if data.damage > 120 then
+                        --将单次伤害超过130的部分反弹给攻击者
+                        if data.damage > 130 then
                             --为了不受到盾反伤害，不设定玄鸟为攻击者
-                            data.attacker.components.combat:GetAttacked(nil, data.damage-120)
+                            data.attacker.components.combat:GetAttacked(nil, data.damage-130)
                             --反击特效 undo
                             if not IsValid(data.attacker) then --攻击者死亡，就结束
                                 return
@@ -560,6 +566,19 @@ local function MakeBoss(data)
                             inst.mate.components.combat:SetTarget(data.attacker)
                         end
                         return
+                    end
+
+                    if
+                        inst.sign_l_treehalo > 0 and
+                        data.weapon ~= nil and
+                        data.weapon.components.tool ~= nil and
+                        data.weapon.components.tool:CanDoAction(ACTIONS.MINE)
+                    then
+                        inst.count_toolatk = inst.count_toolatk + 1
+                        if inst.count_toolatk >= 4 then --达到4次就减少一层buff
+                            SetTreeBuff(inst, -1)
+                            inst.count_toolatk = 0
+                        end
                     end
 
                     --现在是雌雄双打
@@ -641,14 +660,24 @@ local function MakeBoss(data)
                 end
             end)
 
-            -- inst.OnSave = OnSave
+            inst.OnSave = function(inst, data)
+                if inst.sign_l_treehalo > 0 then
+                    data.sign_l_treehalo = inst.sign_l_treehalo
+                end
+            end
             inst.OnPreLoad = function(inst, data) --防止保存时正在飞起或降落导致重载时位置不对
                 local x, y, z = inst.Transform:GetWorldPosition()
                 if y > 0 then
                     inst.Transform:SetPosition(x, 0, z)
                 end
             end
-            -- inst.OnLoad = function(inst, data)end
+            inst.OnLoad = function(inst, data)
+                if data ~= nil and data.sign_l_treehalo ~= nil then
+                    inst:DoTaskInTime(0.2, function(inst)
+                        SetTreeBuff(inst, data.sign_l_treehalo)
+                    end)
+                end
+            end
             inst.OnEntitySleep = function(inst)
                 inst.components.combat:SetTarget(nil)
             end
@@ -890,6 +919,7 @@ local function MakeWeapon(data)
                     else
                         items = inst.components.stackable:Get(5)
                         items.components.inventoryitem:OnRemoved() --由于此时还处于物品栏状态，需要恢复为非物品栏状态
+                        num = 5
                     end
 
                     if num == 1 then
@@ -1106,13 +1136,6 @@ end
 --------------------------------------------------------------------------
 
 SetSharedLootTable('siving_foenix', {
-    {'siving_rocks',        1.00},
-    {'siving_rocks',        1.00},
-    {'siving_rocks',        1.00},
-    {'siving_rocks',        1.00},
-    {'siving_rocks',        1.00},
-    {'siving_rocks',        1.00},
-    {'siving_rocks',        1.00},
     {'siving_rocks',        0.50},
     {'siving_rocks',        0.50},
     {'siving_rocks',        0.50},
@@ -1139,13 +1162,6 @@ MakeBoss({
 --------------------------------------------------------------------------
 
 SetSharedLootTable('siving_moenix', {
-    {'siving_rocks',        1.00},
-    {'siving_rocks',        1.00},
-    {'siving_rocks',        1.00},
-    {'siving_rocks',        1.00},
-    {'siving_rocks',        1.00},
-    {'siving_rocks',        1.00},
-    {'siving_rocks',        1.00},
     {'siving_rocks',        0.50},
     {'siving_rocks',        0.50},
     {'siving_rocks',        0.50},
@@ -1617,10 +1633,10 @@ table.insert(prefs, Prefab( --实体
 --[[ 子圭之眼 ]]
 --------------------------------------------------------------------------
 
-local TIME_EYE_DT = 2
+local TIME_EYE_DT = 1.5
 local TIME_EYE_DT_GRIEF = 0.5
-local COUNT_EYE = 6 --6
-local COUNT_EYE_GRIEF = 9 --9
+local COUNT_EYE = 8 --8
+local COUNT_EYE_GRIEF = 11 --11
 
 local function UnbindBird(inst, landpos)
     inst.bird.iseye = false
@@ -1657,7 +1673,7 @@ local function EyeATK1(inst)
         end
     end, 0.5)
 end
-local function EyeAttack(inst, dt, countnow, countmax, x, z)
+local function EyeAttack(inst, dt, countnow, countmax, x, z, counthalo)
     inst.task_eye = inst:DoTaskInTime(dt, function(inst)
         --确定攻击者
         local tar = nil
@@ -1691,14 +1707,14 @@ local function EyeAttack(inst, dt, countnow, countmax, x, z)
 
         --玩家逃避
         if tar == nil then
-            --防御值+1层 undo
+            counthalo = counthalo + 1
         end
 
         ------攻击方式1
         EyeATK1(inst)
 
-        ------第一次循环，给伴侣加1层buff
-        if countnow == 1 then
+        ------加护盾
+        if countnow == 1 then --第一次循环，给伴侣加1层buff
             if inst.bird.mate ~= nil and IsValid(inst.bird.mate) then
                 inst.task_eye = inst:DoTaskInTime(1, function(inst)
                     if inst.bird.mate ~= nil and IsValid(inst.bird.mate) then
@@ -1709,10 +1725,27 @@ local function EyeAttack(inst, dt, countnow, countmax, x, z)
                     end
                     inst.task_eye = nil
                     inst.AnimState:PlayAnimation("idle", true)
-                    EyeAttack(inst, dt, countnow, countmax, x, z)
+                    EyeAttack(inst, dt, countnow, countmax, x, z, counthalo)
                 end)
                 return
             end
+        elseif countnow >= countmax and counthalo > 0 then ----最后一次循环，给伴侣和自己加buff
+            inst.task_eye = inst:DoTaskInTime(1, function(inst)
+                if IsValid(inst.bird) then
+                    SetTreeBuff(inst.bird, counthalo)
+                    counthalo = counthalo - 3
+                end
+                if counthalo > 0 and inst.bird.mate ~= nil and IsValid(inst.bird.mate) then
+                    SetTreeBuff(inst.bird.mate, counthalo)
+                end
+                if not inst.bird.isgrief then
+                    inst.target = nil
+                end
+                inst.task_eye = nil
+                inst.AnimState:PlayAnimation("idle", true)
+                EyeAttack(inst, dt, countnow, countmax, x, z, counthalo)
+            end)
+            return
         end
 
         ------攻击方式2
@@ -1750,7 +1783,7 @@ local function EyeAttack(inst, dt, countnow, countmax, x, z)
                     inst.target = nil
                 end
                 inst.AnimState:PlayAnimation("idle", true)
-                EyeAttack(inst, dt, countnow, countmax, x, z)
+                EyeAttack(inst, dt, countnow, countmax, x, z, counthalo)
             end
         end, 1)
     end)
@@ -1851,9 +1884,9 @@ table.insert(prefs, Prefab(
 
             if bird.isgrief then
                 inst.AnimState:OverrideSymbol("eye", "siving_boss_eye", "griefeye")
-                EyeAttack(inst, TIME_EYE_DT_GRIEF, 0, COUNT_EYE_GRIEF, x, z)
+                EyeAttack(inst, TIME_EYE_DT_GRIEF, 0, COUNT_EYE_GRIEF, x, z, 0)
             else
-                EyeAttack(inst, TIME_EYE_DT, 0, COUNT_EYE, x, z)
+                EyeAttack(inst, TIME_EYE_DT, 0, COUNT_EYE, x, z, 0)
             end
         end
 

@@ -627,7 +627,7 @@ end
 
 AddStategraphState("wilson", State{
     name = "boltout",
-    tags = { "busy", "doing", "nointerrupt", "canrotate" },
+    tags = { "busy", "doing", "nointerrupt", "canrotate", "boltout" },
 
     onenter = function(inst, data)
         if data == nil or data.escapepos == nil then
