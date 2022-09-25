@@ -334,7 +334,7 @@ MakeDerivant({  --子圭森型岩
 --[[ 子圭神木 ]]
 --------------------------------------------------------------------------
 
-local TIME_WITHER = TUNING.TOTAL_DAY_TIME * 15 --神木枯萎时间
+local TIME_WITHER = CONFIGS_LEGION.PHOENIXREBIRTHCYCLE or TUNING.TOTAL_DAY_TIME * 15 --神木枯萎时间
 local TIME_FREE = TUNING.TOTAL_DAY_TIME --玄鸟无所事事最多停留的时间
 local TIME_EYE = 60 --同目同心 冷却时间 60
 local DIST_HEALTH = 25
@@ -459,7 +459,7 @@ local function InitEgg(inst, egg, ismale)
 end
 local function ClearBattlefield(inst) --打扫战场
     local x, y, z = inst.Transform:GetWorldPosition()
-    local ents = TheSim:FindEntities(x, 0, z, DIST_HEALTH+5, { "siv_boss_block" }, { "INLIMBO" })
+    local ents = TheSim:FindEntities(x, 0, z, DIST_HEALTH+10, { "siv_boss_block" }, { "INLIMBO" })
     for _, v in ipairs(ents) do
         if v.fn_onClear ~= nil then
             v:fn_onClear()
@@ -650,6 +650,7 @@ local function TriggerLifeExtractTask(inst, doit)
 
                         if _freecounter >= TIME_FREE then --主动结束战斗
                             EndFight(inst, male, female)
+                            _freecounter = 0
                         end
                     end
                 end

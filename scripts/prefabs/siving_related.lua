@@ -1197,7 +1197,11 @@ MakeMask({
                     if flower ~= nil then
                         flower.Transform:SetPosition(target.Transform:GetWorldPosition())
                         flower:replant()
-                        target:Remove()
+                        if target.components.stackable ~= nil then
+                            target.components.stackable:Get():Remove()
+                        else
+                            target:Remove()
+                        end
                         target = flower
                     end
                 else

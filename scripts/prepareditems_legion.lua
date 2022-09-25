@@ -1,11 +1,11 @@
 require("constants")
 local cookbookui_legion = require "widgets/cookbookui_legion"
 
-local function CanBuff(inst)
-    return inst.components.debuffable ~= nil and inst.components.debuffable:IsEnabled() and
-        not (inst.components.health ~= nil and inst.components.health:IsDead()) and
-        not inst:HasTag("playerghost")
-end
+-- local function CanBuff(inst)
+--     return inst.components.debuffable ~= nil and inst.components.debuffable:IsEnabled() and
+--         not (inst.components.health ~= nil and inst.components.health:IsDead()) and
+--         not inst:HasTag("playerghost")
+-- end
 
 ------
 

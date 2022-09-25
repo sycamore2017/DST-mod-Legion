@@ -173,13 +173,14 @@ local function UpdateAxe(inst)
 end
 local function AfterWorking(inst, data)
     if
-        data.target and data.target:IsValid() and
+        data.target and
         data.target.components.workable ~= nil and
         data.target.components.workable:CanBeWorked() and
         data.target.components.workable:GetWorkAction() == ACTIONS.CHOP and
         math.random() < 0.05
     then
-        data.target.components.workable:Destroy(inst)
+        --TIP：事件机制会在发送者那边逻辑当前帧就处理完的。所以这里只需要设置关键变量 workleft=0 即可
+        data.target.components.workable.workleft = 0
         if inst.components.talker ~= nil then
             inst.components.talker:Say(GetString(inst, "DESCRIBE", { "DISH_TOMAHAWKSTEAK", "CHOP" }))
         end

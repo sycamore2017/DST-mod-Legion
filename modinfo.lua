@@ -460,6 +460,37 @@ configuration_options =
         },
         default = 0.007,
     },
+    L and {
+        name = "PhoenixRebirthCycle",
+        label = "Phoenix Rebirth Cycle",
+        hover = "Set the time for rebirth about Siving Phoenix.",
+        options = {
+            {description = "5秒", data = 5},
+            {description = "1天", data = 480},
+            {description = "5天", data = 2400},
+            {description = "10天", data = 4800},
+            {description = "15天(默认)", data = 7200},
+            {description = "20天", data = 9600},
+            {description = "25天", data = 12000},
+            {description = "30天", data = 14400},
+        },
+        default = 7200
+    } or {
+        name = "PhoenixRebirthCycle",
+        label = "玄鸟重生周期",
+        hover = "设置子圭玄鸟再生的所需时间。生死是个循环！",
+        options = {
+            {description = "5秒", data = 5},
+            {description = "1天", data = 480},
+            {description = "5天", data = 2400},
+            {description = "10天", data = 4800},
+            {description = "15天(默认)", data = 7200},
+            {description = "20天", data = 9600},
+            {description = "25天", data = 12000},
+            {description = "30天", data = 14400},
+        },
+        default = 7200
+    },
 
     -----
 

@@ -1,4 +1,4 @@
-AddRoom("MonsteraPatch", 
+AddRoom("MonsteraPatch",
 {
 	colour = {r=.8,g=1,b=.8,a=.50}, 
 	value = GROUND.MARSH,	--沼泽地皮
@@ -26,7 +26,7 @@ AddRoom("MoonDungeonPosition",
 {
 	colour={r=0.3,g=0.2,b=0.1,a=0.3},
 	value = GROUND.METEORMINE_NOISE,
-	contents =  
+	contents =
 	{
 		countstaticlayouts = {["MoonDungeon"] = 1}, -- using a static layout because this can force it to be in the center of the room
 		distributepercent = 0.12,

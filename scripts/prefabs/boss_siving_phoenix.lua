@@ -1041,10 +1041,13 @@ local function MakeBossWeapon(data)
                 inst.SoundEmitter:PlaySound("dontstarve/creatures/leif/swipe", nil, 0.2)
             end
             inst.components.projectilelegion.onmiss = function(inst, targetpos, attacker)
-                local block = SpawnPrefab(data.name.."_block")
-                if block ~= nil then
-                    block.Transform:SetRotation(inst.Transform:GetRotation())
-                    block.Transform:SetPosition(inst.Transform:GetWorldPosition())
+                local x, y, z = inst.Transform:GetWorldPosition()
+                if TheWorld.Map:IsAboveGroundAtPoint(x, 0, z) or TheWorld.Map:IsOceanTileAtPoint(x, 0, z) then
+                    local block = SpawnPrefab(data.name.."_block")
+                    if block ~= nil then
+                        block.Transform:SetRotation(inst.Transform:GetRotation())
+                        block.Transform:SetPosition(x, y, z)
+                    end
                 end
                 inst:Remove()
             end
