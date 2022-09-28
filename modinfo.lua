@@ -465,14 +465,14 @@ configuration_options =
         label = "Phoenix Rebirth Cycle",
         hover = "Set the time for rebirth about Siving Phoenix.",
         options = {
-            {description = "5秒", data = 5},
-            {description = "1天", data = 480},
-            {description = "5天", data = 2400},
-            {description = "10天", data = 4800},
-            {description = "15天(默认)", data = 7200},
-            {description = "20天", data = 9600},
-            {description = "25天", data = 12000},
-            {description = "30天", data = 14400},
+            {description = "5 sec", data = 5},
+            {description = "1 day", data = 480},
+            {description = "5 day", data = 2400},
+            {description = "10 day", data = 4800},
+            {description = "15 day(default)", data = 7200},
+            {description = "20 day", data = 9600},
+            {description = "25 day", data = 12000},
+            {description = "30 day", data = 14400},
         },
         default = 7200
     } or {
@@ -490,6 +490,46 @@ configuration_options =
             {description = "30天", data = 14400},
         },
         default = 7200
+    },
+    L and {
+        name = "PhoenixBattleDifficulty",
+        label = "Phoenix Battle Difficulty",
+        hover = "Set the difficulty of BOSS battle with Siving Phoenix.",
+        options = {
+            {description = "Effortlessly", data = 1},
+            {description = "Methodically(default)", data = 2},
+            {description = "Anxiously", data = 3}
+        },
+        default = 2
+    } or {
+        name = "PhoenixBattleDifficulty",
+        label = "玄鸟战斗难度",
+        hover = "设置子圭玄鸟BOSS战的难度。谁是战斗之王，我是手残之王。",
+        options = {
+            {description = "小菜一碟", data = 1},
+            {description = "普普通通(默认)", data = 2},
+            {description = "步履艰难", data = 3}
+        },
+        default = 2
+    },
+    L and {
+        name = "SivingRootTex",
+        label = "Siving Root Texture",
+        hover = "Set the texture of Siving Root to avoid intensive phobia.",
+        options = {
+            {description = "Mod(default)", data = 1},
+            {description = "Official", data = 2}
+        },
+        default = 1
+    } or {
+        name = "SivingRootTex",
+        label = "子圭突触贴图",
+        hover = "设置子圭突触的贴图。你要是对它密集恐惧症犯了就换成官方的图吧。",
+        options = {
+            {description = "mod贴图(默认)", data = 1},
+            {description = "官方图", data = 2}
+        },
+        default = 1
     },
 
     -----

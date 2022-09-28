@@ -339,6 +339,13 @@ local TIME_FREE = TUNING.TOTAL_DAY_TIME --玄鸟无所事事最多停留的时�
 local TIME_EYE = 60 --同目同心 冷却时间 60
 local DIST_HEALTH = 25
 
+if CONFIGS_LEGION.PHOENIXBATTLEDIFFICULTY == 1 then
+    TIME_FREE = TUNING.TOTAL_DAY_TIME * 2
+    TIME_EYE = 120
+elseif CONFIGS_LEGION.PHOENIXBATTLEDIFFICULTY == 3 then
+    TIME_EYE = 54
+end
+
 local function IsValid(bird)
     return bird ~= nil and bird:IsValid() and
         bird.components.health ~= nil and not bird.components.health:IsDead()

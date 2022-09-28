@@ -42,12 +42,61 @@ local ATK_FEA = 45 --子圭翎羽攻击力
 local ATK_FEA_REAL = 75 --精致子圭翎羽攻击力
 local ATK_FEA_EXPLODE = 100 --精致子圭翎羽的爆炸伤害
 local ATK_ROOT = 80 --子圭突触攻击力
+local ATK_HUTR = 130 --反伤上限
 
 local COUNT_FLAP = 3 --羽乱舞次数
 local COUNT_FLAP_GRIEF = 4 --羽乱舞次数（悲愤状态）
+local COUNT_FLAP_DT = 4 --每次羽乱舞的间隔攻击次数
+
+local TIME_EYE_DT = 1.5
+local TIME_EYE_DT_GRIEF = 0.6
+local COUNT_EYE = 8 --8
+local COUNT_EYE_GRIEF = 11 --11
 
 local TAGS_CANT = { "NOCLICK", "shadow", "playerghost", "ghost",
                     "INLIMBO", "wall", "structure", "balloon", "siving", "boat" }
+
+if CONFIGS_LEGION.PHOENIXBATTLEDIFFICULTY == 1 then
+    DIST_FLAP = 7
+    TIME_BUFF_WARBLE = 0
+    TIME_FLAP = 45
+    TIME_TAUNT = 70
+    TIME_CAW = 70
+    ATK_NORMAL = 10
+    ATK_GRIEF = 8
+    ATK_FEA = 30
+    ATK_FEA_REAL = 60
+    ATK_FEA_EXPLODE = 80
+    ATK_ROOT = 50
+    ATK_HUTR = 0
+    COUNT_FLAP = 2
+    COUNT_FLAP_GRIEF = 3
+    COUNT_FLAP_DT = 5
+    TIME_EYE_DT = 1.8
+    TIME_EYE_DT_GRIEF = 0.9
+    COUNT_EYE = 6
+    COUNT_EYE_GRIEF = 9
+elseif CONFIGS_LEGION.PHOENIXBATTLEDIFFICULTY == 3 then
+    DIST_FLAP = 10
+    TIME_BUFF_WARBLE = 10
+    TIME_FLAP = 35
+    TIME_TAUNT = 30
+    TIME_CAW = 30
+    ATK_NORMAL = 25
+    ATK_GRIEF = 15
+    ATK_FEA = 50
+    ATK_FEA_REAL = 80
+    ATK_FEA_EXPLODE = 150
+    ATK_ROOT = 100
+    ATK_HUTR = 80
+    COUNT_FLAP = 4
+    COUNT_FLAP_GRIEF = 5
+    COUNT_FLAP_DT = 3
+    TIME_EYE_DT = 1.3
+    TIME_EYE_DT_GRIEF = 0.5
+    COUNT_EYE = 10
+    COUNT_EYE_GRIEF = 13
+end
 
 local function IsValid(one)
     return one:IsValid() and
@@ -78,6 +127,38 @@ local function GetDamage2(target, basedamage)
     end
 end
 local function DoDefenselessATK(inst, target, basedamage)
+    local damage = GetDamage(inst, target, basedamage)
+    local combat = target.components.combat
+
+    combat.lastwasattackedtime = GetTime()
+    local blocked = false
+    local damageredirecttarget = combat.redirectdamagefn ~= nil and
+                                    combat.redirectdamagefn(target, inst, damage, nil, nil) or nil
+    local damageresolved = 0
+    local original_damage = damage
+    combat.lastattacker = inst
+
+    if damageredirecttarget == nil then
+        -- damage = damage * combat.externaldamagetakenmultipliers:Get()
+        if damage > 0 and not target.components.health:IsInvincible() then
+            local cause = inst == target and weapon or attacker
+            --V2C: guess we should try not to crash old mods that overwrote the health component
+            damageresolved = target.components.health:DoDelta(-damage, nil, cause ~= nil and (cause.nameoverride or cause.prefab) or "NIL", nil, cause)
+            damageresolved = damageresolved ~= nil and -damageresolved or damage
+            if self.inst.components.health:IsDead() then
+                if attacker ~= nil then
+                    attacker:PushEvent("killed", { victim = self.inst })
+                end
+                if self.onkilledbyother ~= nil then
+                    self.onkilledbyother(self.inst, attacker)
+                end
+            end
+        else
+            blocked = true
+        end
+    end
+
+
     target.components.combat:GetAttacked(inst, 0.5, nil, nil) --为了进行一遍被攻击后的逻辑(这里能触发盾反)
     if
         target.components.health == nil or target.components.health:IsDead() or
@@ -134,7 +215,7 @@ end
 local function SetBehaviorTree(inst, done)
     if done == "atk" then
         inst._count_atk = inst._count_atk + 1
-        if inst._count_atk >= 4 then --每啄击几下，进行一次羽乱舞
+        if inst._count_atk >= COUNT_FLAP_DT then --每啄击几下，进行一次羽乱舞
             inst.components.timer:StopTimer("flap")
             inst.sg.mem.to_flap = true --不用事件，回到idle时自己检查吧
         end
@@ -173,7 +254,7 @@ local function MagicWarble(inst) --魔音绕梁
             end
 
             --装备了兔耳罩就能避免后续的debuff
-            if hasprotect then
+            if hasprotect or TIME_BUFF_WARBLE <= 0 then
                 return
             end
 
@@ -405,7 +486,7 @@ local function MakeBoss(data)
 
             inst:AddComponent("locomotor") --locomotor must be constructed before the stategraph
             inst.components.locomotor.walkspeed = 4
-            inst.components.locomotor.runspeed = 8
+            inst.components.locomotor.runspeed = 5
             inst.components.locomotor:EnableGroundSpeedMultiplier(true)
             inst.components.locomotor:SetTriggersCreep(true)
             inst.components.locomotor.pathcaps = { ignorewalls = true, allowocean = true }
@@ -497,9 +578,6 @@ local function MakeBoss(data)
             inst:AddComponent("debuffable")
             inst.components.debuffable:SetFollowSymbol("buzzard_body", 0, -200, 0)
 
-            -- inst:AddComponent("eater")
-            -- inst.components.eater:SetDiet({ FOODGROUP.OMNI }, { FOODGROUP.OMNI })
-
             inst:AddComponent("inspectable")
             inst.components.inspectable.getstatus = function(inst)
                 return inst.isgrief and "GRIEF" or "GENERIC"
@@ -534,11 +612,11 @@ local function MakeBoss(data)
 
             inst:ListenForEvent("attacked", function(inst, data)
                 if data.attacker and IsValid(data.attacker) then
-                    if data.damage and data.attacker.components.combat ~= nil then
-                        --将单次伤害超过130的部分反弹给攻击者
-                        if data.damage > 130 then
+                    if ATK_HUTR > 0 and data.damage and data.attacker.components.combat ~= nil then
+                        --将单次伤害超过伤害上限的部分反弹给攻击者
+                        if data.damage > ATK_HUTR then
                             --为了不受到盾反伤害，不设定玄鸟为攻击者
-                            data.attacker.components.combat:GetAttacked(nil, data.damage-130)
+                            data.attacker.components.combat:GetAttacked(nil, data.damage-ATK_HUTR)
                             --反击特效 undo
                             if not IsValid(data.attacker) then --攻击者死亡，就结束
                                 return
@@ -1240,8 +1318,11 @@ local function OnTimerDone_egg(inst, data)
             inst.task_sound:Cancel()
             inst.task_sound = nil
         end
-        inst.AnimState:PlayAnimation("break", false)
-        inst:ListenForEvent("animover", inst.Remove)
+        local fx = SpawnPrefab("siving_egg_hatched_fx")
+        if fx ~= nil then
+            fx.Transform:SetPosition(inst.Transform:GetWorldPosition())
+        end
+        inst:Remove()
     end
 end
 
@@ -1323,7 +1404,8 @@ table.insert(prefs, Prefab(
     },
     {
         "siving_foenix",
-        "siving_moenix"
+        "siving_moenix",
+        "siving_egg_hatched_fx"
     }
 ))
 
@@ -1636,11 +1718,6 @@ table.insert(prefs, Prefab( --实体
 --[[ 子圭之眼 ]]
 --------------------------------------------------------------------------
 
-local TIME_EYE_DT = 1.5
-local TIME_EYE_DT_GRIEF = 0.5
-local COUNT_EYE = 8 --8
-local COUNT_EYE_GRIEF = 11 --11
-
 local function UnbindBird(inst, landpos)
     inst.bird.iseye = false
     inst.bird.eyefx = nil
@@ -1659,7 +1736,7 @@ local function EyeATK1(inst)
         return
     end
     inst.task_eye2 = inst:DoPeriodicTask(1.5, function(inst)
-        if inst:IsAsleep() or inst.target == nil then
+        if inst:IsAsleep() or inst.target == nil or not IsValid(inst.target) then
             return
         end
         local xx, yy, zz = inst.target.Transform:GetWorldPosition()
@@ -1939,7 +2016,12 @@ table.insert(prefs, Prefab(
         inst:AddTag("siving_derivant")
 
         inst.AnimState:SetBank("atrium_fence")
-        inst.AnimState:SetBuild("siving_boss_root")
+        if CONFIGS_LEGION.SIVINGROOTTEX == 1 then
+            inst.AnimState:SetBuild("siving_boss_root")
+        else
+            inst.AnimState:SetBuild("atrium_fence")
+            inst.AnimState:SetMultColour(80/255, 147/255, 150/255, 1)
+        end
         inst.AnimState:PlayAnimation("shrunk")
         -- inst.AnimState:SetScale(1.3, 1.3)
 
@@ -1960,24 +2042,43 @@ table.insert(prefs, Prefab(
         inst.fenceid = math.random(5)
         inst.treeState = 0
 
-        inst.OnTreeLive = function(inst, state)
-            inst.treeState = state
-            if state == 2 then
-                -- inst.AnimState:SetBuild("siving_boss_root2") --undo
-                inst.components.bloomer:PushBloom("activetree", "shaders/anim.ksh", 1)
-                inst.Light:SetRadius(1.5)
-                inst.Light:Enable(true)
-            elseif state == 1 then
-                inst.AnimState:SetBuild("siving_boss_root")
-                inst.components.bloomer:PushBloom("activetree", "shaders/anim.ksh", 1)
-                inst.Light:SetRadius(0.8)
-                inst.Light:Enable(true)
-            else
-                inst.AnimState:SetBuild("siving_boss_root")
-                inst.components.bloomer:PopBloom("activetree")
-                inst.Light:Enable(false)
+        if CONFIGS_LEGION.SIVINGROOTTEX == 1 then
+            inst.OnTreeLive = function(inst, state)
+                inst.treeState = state
+                if state == 2 then
+                    inst.AnimState:SetBuild("siving_boss_root2")
+                    inst.components.bloomer:PushBloom("activetree", "shaders/anim.ksh", 1)
+                    inst.Light:SetRadius(1.5)
+                    inst.Light:Enable(true)
+                elseif state == 1 then
+                    inst.AnimState:SetBuild("siving_boss_root")
+                    inst.components.bloomer:PushBloom("activetree", "shaders/anim.ksh", 1)
+                    inst.Light:SetRadius(0.8)
+                    inst.Light:Enable(true)
+                else
+                    inst.AnimState:SetBuild("siving_boss_root")
+                    inst.components.bloomer:PopBloom("activetree")
+                    inst.Light:Enable(false)
+                end
+            end
+        else
+            inst.OnTreeLive = function(inst, state)
+                inst.treeState = state
+                if state == 2 then
+                    inst.components.bloomer:PushBloom("activetree", "shaders/anim.ksh", 1)
+                    inst.Light:SetRadius(1.5)
+                    inst.Light:Enable(true)
+                elseif state == 1 then
+                    inst.components.bloomer:PushBloom("activetree", "shaders/anim.ksh", 1)
+                    inst.Light:SetRadius(0.8)
+                    inst.Light:Enable(true)
+                else
+                    inst.components.bloomer:PopBloom("activetree")
+                    inst.Light:Enable(false)
+                end
             end
         end
+
         inst.fn_onAttack = function(inst, bird, delaytime)
             inst.AnimState:PlayAnimation("grow"..tostring(inst.fenceid))
             inst.AnimState:PushAnimation("idle"..tostring(inst.fenceid), false)
@@ -2072,7 +2173,7 @@ table.insert(prefs, Prefab(
     end,
     {
         Asset("ANIM", "anim/siving_boss_root.zip"),
-        -- Asset("ANIM", "anim/siving_boss_root2.zip"),
+        Asset("ANIM", "anim/siving_boss_root2.zip"),
         Asset("ANIM", "anim/atrium_fence.zip")
     },
     nil

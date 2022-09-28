@@ -657,6 +657,22 @@ if CONFIGS_LEGION.LEGENDOFFALL then
             end)
         end,
     })
+    MakeFx({ --子圭石子：碎掉特效
+        name = "siving_egg_hatched_fx",
+        assets = {
+            Asset("ANIM", "anim/siving_egg.zip"),
+        },
+        prefabs = nil,
+        fn_common = nil,
+        fn_anim = function(inst)
+            inst.AnimState:SetBank("siving_egg")
+            inst.AnimState:SetBuild("siving_egg")
+            inst.AnimState:PlayAnimation("break")
+            inst.AnimState:OverrideSymbol("eggbase", "siving_egg", "egg4")
+            inst.AnimState:SetFinalOffset(3)
+        end,
+        fn_remove = nil,
+    })
 end
 
 ---------------

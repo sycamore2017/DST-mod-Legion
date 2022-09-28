@@ -3,38 +3,6 @@ require("behaviours/wander")
 require "behaviours/chaseandattack"
 require "behaviours/leash"
 
--- local SEE_FOOD_DIST = 15
--- local SEE_THREAT_DIST = 7.5
-
--- local NO_TAGS = { "FX", "NOCLICK", "DECOR", "INLIMBO" }
--- local FOOD_TAGS = {}
--- for i, v in ipairs(FOODGROUP.OMNI.types) do
---     table.insert(FOOD_TAGS, "edible_"..v)
--- end
-
--- local FINDTHREAT_MUST_TAGS = { "notarget" }
--- local FINDTHREAT_CANT_TAGS = { "player", "monster", "scarytoprey" }
-
-
--- local function CanEat(food)
---     return food:IsOnValidGround()
--- end
-
--- local function FindFood(inst, radius)
---     return FindEntity(inst, radius, CanEat, nil, NO_TAGS, FOOD_TAGS)
--- end
-
--- local function EatFoodAction(inst)  --Look for food to eat
---     if inst.sg:HasStateTag("busy") then
---         return
---     end
-
---     local food = FindFood(inst, SEE_FOOD_DIST)
---     return food ~= nil and BufferedAction(inst, food, ACTIONS.EAT) or nil
--- end
-
-
-
 local CHASE_TIME = 10
 
 local function GetMatePos(inst)
