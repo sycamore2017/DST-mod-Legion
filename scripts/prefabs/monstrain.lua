@@ -273,7 +273,7 @@ local prefabs_tuber = {
     "dug_monstrain",
 }
 
-function OnMoistureDelta(inst, data)
+local function OnMoistureDelta(inst, data)
     if inst.components.moisture:GetMoisturePercent() >= 0.98 then --小于1是为了忽略干燥导致的损失(不然水壶得浇水5次)
         local tree = SpawnPrefab("monstrain")
         if tree ~= nil then

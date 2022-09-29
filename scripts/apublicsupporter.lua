@@ -137,6 +137,112 @@ _G.ForceStopHeavyLifting_legion = function(inst)
     end
 end
 
+--[ 无视防御的攻击 ]--
+local function RecalculateModifier_combat_l(inst)
+    local m = inst._base
+    for source, src_params in pairs(inst._modifiers) do
+        for k, v in pairs(src_params.modifiers) do
+            if v > 1 then --大于1 是代表增伤。这里需要忽略的是减伤
+                m = inst._fn(m, v)
+            end
+        end
+    end
+    inst._modifier_l = m
+end
+_G.UndefendedATK_legion = function(inst, data)
+    if data == nil or data.target == nil then
+        return
+    end
+    local target = data.target
+
+    if
+        target.ban_l_undefended or --其他mod兼容：这个变量能防止被破防攻击
+        target.prefab == "laozi" --无法伤害神话书说里的太上老君
+    then
+        return
+    end
+
+    local health = target.components.health
+
+    if target.flag_l_undefended == nil then
+        --修改物品栏护甲机制
+        if target.components.inventory ~= nil then
+            local ApplyDamage_old = target.components.inventory.ApplyDamage
+            target.components.inventory.ApplyDamage = function(self, damage, attacker, weapon, ...)
+                if self.inst.flag_l_undefended == 1 then
+                    return damage
+                end
+                return ApplyDamage_old(self, damage, attacker, weapon, ...)
+            end
+        end
+
+        --修改战斗机制
+        if target.components.combat ~= nil then
+            local combat = target.components.combat
+            local mult = combat.externaldamagetakenmultipliers
+            local mult_Get = mult.Get
+            local mult_SetModifier = mult.SetModifier
+            local mult_RemoveModifier = mult.RemoveModifier
+            mult.Get = function(self, ...)
+                if self.inst.flag_l_undefended == 1 then
+                    return self._modifier_l or 1
+                end
+                return mult_Get(self, ...)
+            end
+            mult.SetModifier = function(self, ...)
+                mult_SetModifier(self, ...)
+                RecalculateModifier_combat_l(self)
+            end
+            mult.RemoveModifier = function(self, ...)
+                mult_RemoveModifier(self, ...)
+                RecalculateModifier_combat_l(self)
+            end
+            RecalculateModifier_combat_l(mult) --主动更新一次
+
+            local GetAttacked_old = combat.GetAttacked
+            combat.GetAttacked = function(self, ...)
+                if self.inst.flag_l_undefended == 1 then
+                    local notblocked = GetAttacked_old(self, ...)
+                    self.inst.flag_l_undefended = 0
+                    if --攻击完毕，恢复其防御力
+                        self.inst.health_l_undefended ~= nil and
+                        self.inst.components.health ~= nil --不要判断死亡(玩家)
+                    then
+                        self.inst.components.health.absorb = self.inst.health_l_undefended.absorb or 0
+                        self.inst.components.health.playerabsorb = self.inst.health_l_undefended.playerabsorb or 0
+                    end
+                    self.inst.health_l_undefended = nil
+                    return notblocked
+                else
+                    return GetAttacked_old(self, ...)
+                end
+            end
+        end
+
+        --修改生命机制
+        if health ~= nil then
+            local mult2 = health.externalabsorbmodifiers
+            local mult2_Get = mult2.Get
+            mult2.Get = function(self, ...)
+                if self.inst.flag_l_undefended == 1 then
+                    return 0
+                end
+                return mult2_Get(self, ...)
+            end
+        end
+    end
+
+    target.flag_l_undefended = 1
+    if health ~= nil then
+        target.health_l_undefended = {
+            absorb = health.absorb,
+            playerabsorb = health.playerabsorb
+        }
+        health.absorb = 0
+        health.playerabsorb = 0
+    end
+end
+
 --------------------------------------------------------------------------
 --[[ 清理机制：让腐烂物、牛粪、鸟粪自动消失 ]]
 --------------------------------------------------------------------------

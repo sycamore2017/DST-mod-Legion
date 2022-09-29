@@ -15,14 +15,27 @@ local function OnEquip(inst, owner)
 
     owner.AnimState:Show("ARM_carry")
     owner.AnimState:Hide("ARM_normal")
+
+    --TIP: "onattackother"事件在 targ.components.combat:GetAttacked 之前，所以能提前改攻击配置
+    owner:ListenForEvent("onattackother", UndefendedATK_legion)
 end
 
 local function OnUnequip(inst, owner)
     owner.AnimState:Hide("ARM_carry")
     owner.AnimState:Show("ARM_normal")
+
+    owner:RemoveEventCallback("onattackother", UndefendedATK_legion)
 end
 
-local function onattack(inst, owner, target)    --攻击直接扣血，而不考虑防御系数
+local function onattack(inst, owner, target)
+    if target ~= nil and target:IsValid() then
+        local skindata = inst.components.skinedlegion:GetSkinedData()
+        if skindata ~= nil and skindata.fn_onAttack ~= nil then
+            skindata.fn_onAttack(inst, owner, target)
+        end
+    end
+
+    --[[
     if
         target ~= nil and target:IsValid()
         and not target:HasTag("alwaysblock")    --有了这个标签，什么天神都伤害不了
@@ -99,6 +112,7 @@ local function onattack(inst, owner, target)    --攻击直接扣血，而不考
             skindata.fn_onAttack(inst, owner, target)
         end
     end
+    ]]--
 end
 
 local function fn()
@@ -141,7 +155,7 @@ local function fn()
     inst.components.equippable:SetOnUnequip(OnUnequip)
 
     inst:AddComponent("weapon")
-    inst.components.weapon:SetDamage(0)
+    inst.components.weapon:SetDamage(51)
     inst.components.weapon:SetOnAttack(onattack)
 
     inst:AddComponent("perishable")

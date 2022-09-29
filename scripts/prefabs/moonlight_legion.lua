@@ -410,6 +410,31 @@ local function ResetRadius(inst)
         inst._light.Light:SetRadius(rad) --最大约2.75和5.25半径
     end
 end
+local function IsValid(one)
+    return one:IsValid() and
+        one.components.health ~= nil and not one.components.health:IsDead()
+end
+local function TemperatureProtect(inst, owner)
+    if inst._owner_temp ~= nil then
+        if inst._owner_temp == owner then --监听对象没有发生变化，就结束
+            return
+        end
+        inst:RemoveEventCallback("startfreezing", inst.fn_onTempDelta, inst._owner_temp) --把以前的监听去除
+        inst:RemoveEventCallback("death", inst.fn_onTempDelta, inst._owner_temp)
+        inst._owner_temp = nil
+    end
+
+    --监听新的
+    if
+        owner and IsValid(owner) and
+        owner.components.temperature ~= nil
+    then
+        inst:ListenForEvent("startfreezing", inst.fn_onTempDelta, owner)
+        inst:ListenForEvent("death", inst.fn_onTempDelta, owner)
+        inst._owner_temp = owner
+        inst.fn_onTempDelta(owner)
+    end
+end
 local function OnOwnerChange(inst)
     local newowners = {}
     local owner = inst
@@ -442,6 +467,7 @@ local function OnOwnerChange(inst)
     end
 
     inst._owners = newowners
+    TemperatureProtect(inst, owner)
 end
 
 local function MakeRevolved(sets)
@@ -488,6 +514,11 @@ local function MakeRevolved(sets)
         if not TheWorld.ismastersim then
             inst.OnEntityReplicated = function(inst) inst.replica.container:WidgetSetup(widgetname) end
             return inst
+        end
+
+        inst._owner_temp = nil
+        inst.fn_onTempDelta = function(owner)
+            
         end
 
         inst:AddComponent("inspectable")

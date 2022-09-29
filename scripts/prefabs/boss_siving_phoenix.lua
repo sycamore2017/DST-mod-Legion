@@ -126,50 +126,6 @@ local function GetDamage2(target, basedamage)
         return basedamage*3
     end
 end
-local function DoDefenselessATK(inst, target, basedamage)
-    local damage = GetDamage(inst, target, basedamage)
-    local combat = target.components.combat
-
-    combat.lastwasattackedtime = GetTime()
-    local blocked = false
-    local damageredirecttarget = combat.redirectdamagefn ~= nil and
-                                    combat.redirectdamagefn(target, inst, damage, nil, nil) or nil
-    local damageresolved = 0
-    local original_damage = damage
-    combat.lastattacker = inst
-
-    if damageredirecttarget == nil then
-        -- damage = damage * combat.externaldamagetakenmultipliers:Get()
-        if damage > 0 and not target.components.health:IsInvincible() then
-            local cause = inst == target and weapon or attacker
-            --V2C: guess we should try not to crash old mods that overwrote the health component
-            damageresolved = target.components.health:DoDelta(-damage, nil, cause ~= nil and (cause.nameoverride or cause.prefab) or "NIL", nil, cause)
-            damageresolved = damageresolved ~= nil and -damageresolved or damage
-            if self.inst.components.health:IsDead() then
-                if attacker ~= nil then
-                    attacker:PushEvent("killed", { victim = self.inst })
-                end
-                if self.onkilledbyother ~= nil then
-                    self.onkilledbyother(self.inst, attacker)
-                end
-            end
-        else
-            blocked = true
-        end
-    end
-
-
-    target.components.combat:GetAttacked(inst, 0.5, nil, nil) --为了进行一遍被攻击后的逻辑(这里能触发盾反)
-    if
-        target.components.health == nil or target.components.health:IsDead() or
-        target.shield_l_success or --盾反成功
-        inst.components.combat.target == nil --脱壳之翅会在成功时将敌人仇恨清除
-    then
-        return
-    end
-    target.components.health:DoDelta(
-        -GetDamage(inst, target, basedamage), nil, (inst.nameoverride or inst.prefab), false, inst, true)
-end
 local function SpawnFlower(inst, target)
     local flower = SpawnPrefab("siving_boss_flowerfx")
     if flower ~= nil then
@@ -279,22 +235,17 @@ local function MagicWarble(inst) --魔音绕梁
     end
     SetBehaviorTree(inst, "taunt")
 end
-local function DiscerningPeck(inst, target) --啄击（因为替换了官方的普攻逻辑，所以整体得模仿官方的普攻逻辑）
+local function DiscerningPeck(inst, target) --啄击
     if target == nil then
         target = inst.components.combat.target
     end
-    if
-        target ~= nil and
-        target.components.health ~= nil and not target.components.health:IsDead() and
-        inst.components.combat:CanHitTarget(target, nil) --计算距离和有效性
-    then
-        DoDefenselessATK(inst, target, ATK_NORMAL)
-        inst:PushEvent("onattackother", { target = target, weapon = nil, projectile = nil, stimuli = nil })
-        inst.components.combat.lastdoattacktime = GetTime()
-    else
-        inst:PushEvent("onmissother", { target = target, weapon = nil })
+    if target ~= nil then
+        if inst.components.combat:CanHitTarget(target, nil) then
+            --能命中时，才会开始破防改造
+            UndefendedATK_legion(inst, { target = target })
+        end
+        inst.components.combat:DoAttack(target)
     end
-    inst.components.combat:ClearAttackTemps()
     SetBehaviorTree(inst, "atk")
 end
 local function ReleaseFlowers(inst) --花寄语
@@ -538,8 +489,15 @@ local function MakeBoss(data)
                     end
                 end
             end)
-            -- inst.components.combat.bonusdamagefn --攻击时针对于被攻击对象的额外伤害值
             inst.components.combat:SetHurtSound(BossSounds.hurt) --undo
+
+            --攻击时针对于被攻击对象的额外伤害值
+            inst.components.combat.bonusdamagefn = function(inst, target, damage, weapon)
+                if not target:HasTag("player") then
+                    return inst.components.combat.defaultdamage*2 --加上已有的伤害，就是3倍伤害啦
+                end
+                return 0
+            end
 
             inst:AddComponent("trader")
             inst.components.trader.acceptnontradable = true

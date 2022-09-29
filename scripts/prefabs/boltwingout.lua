@@ -71,7 +71,7 @@ local function onequip(inst, owner)
 
             local backpack = self.inst.components.inventory:GetEquippedItem(EQUIPSLOTS.BACK or EQUIPSLOTS.BODY) or nil
             if backpack == nil or backpack.components.container == nil then
-                return
+                return self.inst.GetAttacked_old(self, attacker, damage, weapon, stimuli)
             end
 
             local attackerinfact = weapon or attacker --武器写在前面是为了优先躲避远程武器
@@ -121,8 +121,9 @@ local function onequip(inst, owner)
                 if attacker ~= nil and attacker.components.combat ~= nil then
                     attacker.components.combat:SetTarget(nil)
                 end
+                return false
             else
-                self.inst.GetAttacked_old(self, attacker, damage, weapon, stimuli)
+                return self.inst.GetAttacked_old(self, attacker, damage, weapon, stimuli)
             end
         end
     end
