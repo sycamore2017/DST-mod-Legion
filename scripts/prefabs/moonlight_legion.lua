@@ -414,6 +414,12 @@ local function IsValid(one)
     return one:IsValid() and
         one.components.health ~= nil and not one.components.health:IsDead()
 end
+local function CancelTask_heat(inst)
+    if inst.task_heat ~= nil then
+        inst.task_heat:Cancel()
+        inst.task_heat = nil
+    end
+end
 local function TemperatureProtect(inst, owner)
     if inst._owner_temp ~= nil then
         if inst._owner_temp == owner then --监听对象没有发生变化，就结束
@@ -421,7 +427,10 @@ local function TemperatureProtect(inst, owner)
         end
         inst:RemoveEventCallback("startfreezing", inst.fn_onTempDelta, inst._owner_temp) --把以前的监听去除
         inst:RemoveEventCallback("death", inst.fn_onTempDelta, inst._owner_temp)
+        CancelTask_heat(inst)
         inst._owner_temp = nil
+    else
+        CancelTask_heat(inst)
     end
 
     --监听新的
@@ -432,7 +441,9 @@ local function TemperatureProtect(inst, owner)
         inst:ListenForEvent("startfreezing", inst.fn_onTempDelta, owner)
         inst:ListenForEvent("death", inst.fn_onTempDelta, owner)
         inst._owner_temp = owner
-        inst.fn_onTempDelta(owner)
+        if owner.components.temperature:IsFreezing() then
+            inst.fn_onTempDelta(owner)
+        end
     end
 end
 local function OnOwnerChange(inst)
@@ -517,8 +528,56 @@ local function MakeRevolved(sets)
         end
 
         inst._owner_temp = nil
+        inst.task_heat = nil
         inst.fn_onTempDelta = function(owner)
-            
+            if not IsValid(owner) or owner.components.temperature == nil then
+                TemperatureProtect(inst, nil)
+                return
+            end
+            if not inst.components.rechargeable:IsCharged() then --冷却期内不触发
+                return
+            end
+
+            local count = 1
+            local stagenow = inst.components.upgradeable:GetStage()
+            inst.components.rechargeable:Discharge(3+TUNING.TOTAL_DAY_TIME*(21-stagenow)/20)
+            CancelTask_heat(inst)
+            stagenow = 7+1.75*(stagenow-1) --7-42
+            inst.task_heat = inst:DoPeriodicTask(0.5, function(inst)
+                if
+                    inst._owner_temp == nil or
+                    not IsValid(inst._owner_temp) or
+                    inst._owner_temp.components.temperature == nil
+                then
+                    TemperatureProtect(inst, nil)
+                    return
+                end
+
+                local fx = SpawnPrefab("revolvedmoonlight_fx")
+                if fx ~= nil then
+                    fx.Transform:SetPosition(inst._owner_temp.Transform:GetWorldPosition())
+                end
+
+                if count < 1 then
+                    count = 1
+                    return
+                else
+                    count = 0
+                end
+
+                local temper = inst._owner_temp.components.temperature
+                if (temper.current+3.5) < temper.overheattemp then --可不能让温度太高了
+                    temper:SetTemperature(temper.current + 3.5)
+                else
+                    CancelTask_heat(inst)
+                    return
+                end
+
+                stagenow = stagenow - 3.5
+                if stagenow <= 0 then
+                    CancelTask_heat(inst)
+                end
+            end, 0)
         end
 
         inst:AddComponent("inspectable")
@@ -591,12 +650,26 @@ local function MakeRevolved(sets)
         inst.components.upgradeable.onupgradefn = function(inst, doer, item)
             inst.SoundEmitter:PlaySound("dontstarve/common/telebase_gemplace")
         end
-        inst.components.upgradeable.onstageadvancefn = ResetRadius
+        inst.components.upgradeable.onstageadvancefn = function(inst)
+            ResetRadius(inst)
+            inst.components.rechargeable:SetPercent(1) --每次升级，重置冷却时间
+        end
         inst.components.upgradeable.numstages = sets.ispro and 21 or 11
         inst.components.upgradeable.upgradesperstage = 1
 
+        inst:AddComponent("rechargeable")
+        inst.components.rechargeable:SetOnChargedFn(function(inst)
+            if
+                inst._owner_temp ~= nil and
+                inst._owner_temp.components.temperature ~= nil and
+                inst._owner_temp.components.temperature:IsFreezing()
+            then
+                inst.fn_onTempDelta(inst._owner_temp)
+            end
+        end)
+
         inst.OnLoad = function(inst, data) --由于 upgradeable 组件不会自己重新初始化，只能这里再初始化
-            inst.components.upgradeable.onstageadvancefn(inst)
+            ResetRadius(inst)
         end
 
         --Create light
@@ -632,7 +705,8 @@ local function MakeRevolved(sets)
         "revolvedmoonlight_item",
         "collapse_small",
         "yellowgem",
-        "heatrocklight"
+        "heatrocklight",
+        "revolvedmoonlight_fx"
     }))
 end
 

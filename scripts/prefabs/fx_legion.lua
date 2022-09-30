@@ -287,6 +287,29 @@ if CONFIGS_LEGION.PRAYFORRAIN then
         end,
         fn_remove = nil,
     })
+    MakeFx({ --月轮宝盘：光韵特效
+        name = "revolvedmoonlight_fx",
+        assets = {
+            Asset("ANIM", "anim/terrariumchest_fx.zip"), --官方盒中泰拉箱子的特效
+            Asset("ANIM", "anim/revolvedmoonlight_fx.zip")
+        },
+        prefabs = nil,
+        fn_common = nil,
+        fn_anim = function(inst)
+            inst.AnimState:SetBank("terrariumchest_fx")
+            inst.AnimState:SetBuild("revolvedmoonlight_fx")
+            inst.AnimState:PlayAnimation("idle_front")
+            if math.random() < 0.65 then
+                inst.AnimState:SetMultColour(255/255, 249/255, 67/255, 0.9)
+            else
+                inst.AnimState:SetMultColour(1/255, 251/255, 255/255, 0.6)
+            end
+            inst.AnimState:SetScale(1.2, 1.2)
+            inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
+            inst.AnimState:SetFinalOffset(3)
+        end,
+        fn_remove = nil,
+    })
 end
 
 if TUNING.LEGION_FLASHANDCRUSH then
