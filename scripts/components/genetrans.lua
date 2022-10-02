@@ -45,6 +45,21 @@ local function SetLight(self, islight)
 		-- end
 	end
 end
+local function SpawnFx(self)
+	self.fx = SpawnPrefab(self.fxdata.prefab)
+
+	local skindata = self.inst.components.skinedlegion:GetSkinedData()
+	if skindata ~= nil and skindata.fruit ~= nil then
+		
+	end
+
+	self.fx.entity:SetParent(self.inst.entity)
+	self.fx.entity:AddFollower()
+	self.fx.Follower:FollowSymbol(
+		self.inst.GUID, self.fxdata.symbol, --TIP: 跟随通道时，默认跟随通道文件夹里ID=0的
+		self.fxdata.x, self.fxdata.y, self.fxdata.z
+	)
+end
 
 function GeneTrans:SetUp(seeds, doer, isinit)
 	if not isinit then --初始化时，以下条件不能做限制
@@ -78,13 +93,7 @@ function GeneTrans:SetUp(seeds, doer, isinit)
 
 	--设置果实的动画
 	if self.fx == nil or not self.fx:IsValid() then
-		self.fx = SpawnPrefab(self.fxdata.prefab)
-		self.fx.entity:SetParent(self.inst.entity)
-		self.fx.entity:AddFollower()
-		self.fx.Follower:FollowSymbol(
-			self.inst.GUID, self.fxdata.symbol, --TIP: 跟随通道时，默认跟随通道文件夹里ID=0的
-			self.fxdata.x, self.fxdata.y, self.fxdata.z
-		)
+		SpawnFx(self)
 	end
 	self.fx.AnimState:OverrideSymbol("swap", trans.swap.build, trans.swap.file)
 	if trans.swap.symboltype == "3" then
@@ -329,13 +338,7 @@ function GeneTrans:OnLoad(data, newents)
 	end
 	if data.fruit ~= nil then
 		self.fruit = PrefabExists(data.fruit) and data.fruit or "siving_rocks"
-		self.fx = SpawnPrefab(self.fxdata.prefab)
-		self.fx.entity:SetParent(self.inst.entity)
-		self.fx.entity:AddFollower()
-		self.fx.Follower:FollowSymbol(
-			self.inst.GUID, self.fxdata.symbol,
-			self.fxdata.x, self.fxdata.y, self.fxdata.z
-		)
+		SpawnFx(self)
 		self:CostEnergy(0)
 		SetSeedAnim(self)
 		self:TriggerPickable(true)

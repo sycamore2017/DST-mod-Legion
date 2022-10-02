@@ -729,6 +729,9 @@ table.insert(prefs, Prefab(
         inst:AddTag("structure")
         inst:AddTag("genetrans")
 
+        inst:AddComponent("skinedlegion")
+        inst.components.skinedlegion:Init("siving_turn")
+
         inst.entity:SetPristine()
         if not TheWorld.ismastersim then
             return inst
@@ -812,6 +815,8 @@ table.insert(prefs, Prefab(
         end)
 
         inst:ListenForEvent("ondeconstructstructure", OnDeconstruct)
+
+        inst.components.skinedlegion:SetOnPreLoad()
 
         return inst
     end,
