@@ -14,7 +14,8 @@ local GeneTrans = Class(function(self, inst)
 	}
 
 	self.fxdata = {
-		prefab = "siving_turn_fruit", symbol = "followed", x = 0, y = 0, z = 0
+		prefab = "siving_turn_fruit", symbol = "followed", x = 0, y = 0, z = 0,
+		skinname = "siving_turn"
 	}
 	self.fx = nil
 end)
@@ -49,12 +50,12 @@ local function SpawnFx(self)
 	self.fx = SpawnPrefab(self.fxdata.prefab)
 
 	local skindata = self.inst.components.skinedlegion:GetSkinedData()
-	if skindata ~= nil and skindata.fruit ~= nil then
-		
+	if skindata ~= nil and skindata.fn_fruit ~= nil then
+		skindata.fn_fruit(self)
 	end
 
 	self.fx.entity:SetParent(self.inst.entity)
-	self.fx.entity:AddFollower()
+	-- self.fx.entity:AddFollower()
 	self.fx.Follower:FollowSymbol(
 		self.inst.GUID, self.fxdata.symbol, --TIP: 跟随通道时，默认跟随通道文件夹里ID=0的
 		self.fxdata.x, self.fxdata.y, self.fxdata.z

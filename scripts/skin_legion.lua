@@ -116,6 +116,23 @@ local function GetSpawnPoint(pos, radius)
     return pos.x + radius * math.cos(angle), pos.y, pos.z - radius * math.sin(angle)
 end
 
+------
+
+local function fn_siving_turn_fruit(genetrans, skinname)
+    if genetrans.fx ~= nil then
+        genetrans.fx.AnimState:SetBank(skinname)
+        genetrans.fx.AnimState:SetBuild(skinname)
+    end
+    genetrans.fxdata.skinname = skinname
+end
+local function fn_siving_turn(inst, skinname)
+    inst.AnimState:SetBank(skinname)
+    inst.AnimState:SetBuild(skinname)
+    if inst.components.genetrans ~= nil and inst.components.genetrans.fxdata.skinname ~= skinname then
+        fn_siving_turn_fruit(inst.components.genetrans, skinname)
+    end
+end
+
 --------------------------------------------------------------------------
 --[[ 全局皮肤总数据，以及修改 ]]
 --------------------------------------------------------------------------
@@ -516,6 +533,17 @@ _G.SKIN_PREFABS_LEGION = {
             inst.AnimState:SetBank("siving_derivants")
             inst.AnimState:SetBuild("siving_derivants")
             inst.AnimState:SetScale(1.3, 1.3)
+        end,
+        exchangefx = { prefab = nil, offset_y = nil, scale = 1.5 },
+    },
+
+    siving_turn = {
+        assets = nil,
+        fn_start = function(inst)
+            fn_siving_turn(inst, "siving_turn")
+        end,
+        fn_fruit = function(genetrans)
+            fn_siving_turn_fruit(genetrans, "siving_turn")
         end,
         exchangefx = { prefab = nil, offset_y = nil, scale = 1.5 },
     },
@@ -1816,7 +1844,7 @@ _G.SKINS_LEGION = {
 		assets = {
 			Asset("ANIM", "anim/skin/fimbul_axe_collector.zip")
 		},
-        image = { name = nil, atlas = nil, setable = true, },
+        image = { name = nil, atlas = nil, setable = true },
 
         string = ischinese and {
             name = "跃星杖", collection = "COLLECTOR", access = "SPECIAL",
@@ -1873,6 +1901,40 @@ _G.SKINS_LEGION = {
         floater = {
             cut = 0.1, size = "med", offset_y = 0.3, scale = 0.4, nofx = nil
         },
+    },
+
+    siving_turn_collector = {
+        base_prefab = "siving_turn",
+		type = "item", skin_tags = {}, release_group = 555, rarity = raritySpecial,
+
+        skin_id = "62eb8b9e8c2f781db2f79d21",
+        onlyownedshow = true,
+		assets = {
+			Asset("ANIM", "anim/skin/siving_turn_collector.zip"),
+		},
+        image = { name = nil, atlas = nil, setable = false, },
+
+        string = ischinese and {
+            name = "转星移", collection = "COLLECTOR", access = "LUCK",
+            descitem = "解锁\"子圭·育\"的皮肤。",
+            description = "用尽毕生精力，终于在极其遥远的星云残骸中找到传说中能贯穿星辰的神剑。当他自豪地在高台上举起这把闪耀神剑，剑体很快碎裂化作无数金色闪光向地面飘去。在众人诧异中，地面开始干枯龟裂，水晶般的荆棘开始在整个星球蔓延。",
+        } or {
+            name = "Revolving Star", collection = "COLLECTOR", access = "LUCK",
+            descitem = "Unlock \"Siving-Trans\" skin.",
+            description = "The story was not translated.",
+        },
+
+		fn_start = function(inst)
+            fn_siving_turn(inst, "siving_turn_collector")
+        end,
+        fn_fruit = function(genetrans)
+            fn_siving_turn_fruit(genetrans, "siving_turn_collector")
+        end,
+        exchangefx = { prefab = nil, offset_y = nil, scale = 1.5 },
+        -- placer = {
+        --     name = nil, bank = "berrybush", build = "rosebush_collector", anim = "dead",
+        --     prefabs = { "dug_rosebush", "cutted_rosebush" },
+        -- },
     },
 
     siving_derivant_lvl0_thanks = {
@@ -2079,7 +2141,7 @@ _G.SKIN_IDS_LEGION = {
         orchidbush_disguiser = true, boltwingout_disguiser = true,
         rosebush_marble = true, lilybush_marble = true, orchidbush_marble = true, rosorns_marble = true, lileaves_marble = true, orchitwigs_marble = true,
         shield_l_log_emo_fist = true, hat_lichen_emo_que = true,
-        rosebush_collector = true, rosorns_collector = true, fimbul_axe_collector = true,
+        rosebush_collector = true, rosorns_collector = true, fimbul_axe_collector = true, siving_turn_collector = true,
         backcub_fans2 = true,
     },
     ["6278c450c340bf24ab311528"] = { --回忆(5)
@@ -2141,7 +2203,8 @@ if ischinese then
             DONATE = "通过回忆获取",
             FREE = "自动获取",
             SPECIAL = "通过特殊方式获取",
-            REWARD = "链锁奖励"
+            REWARD = "链锁奖励",
+            LUCK = "幸运眷顾"
         },
     }
 else
@@ -2168,7 +2231,8 @@ else
             DONATE = "Get it by memory", --Get it by donation
             FREE = "Free access",
             SPECIAL = "Get it by special ways",
-            REWARD = "Chain reward"
+            REWARD = "Chain reward",
+            LUCK = "Get it by luck"
         },
     }
 end
@@ -2206,7 +2270,7 @@ local skinidxes = { --用以皮肤排序
     "siving_derivant_lvl0_thanks2", "siving_derivant_lvl1_thanks2", "siving_derivant_lvl2_thanks2", "siving_derivant_lvl3_thanks2",
     "backcub_thanks",
     "fishhomingtool_awesome_thanks", "fishhomingtool_normal_thanks", "fishhomingbait_thanks",
-    "icire_rock_collector", "fimbul_axe_collector", "rosebush_collector", "rosorns_collector",
+    "siving_turn_collector", "icire_rock_collector", "fimbul_axe_collector", "rosebush_collector", "rosorns_collector",
     "triplegoldenshovelaxe_era", "tripleshovelaxe_era", "lilybush_era", "lileaves_era", "shield_l_log_era", "icire_rock_era", "shield_l_sand_era",
     "orchidbush_disguiser", "boltwingout_disguiser",
     "rosebush_marble", "rosorns_marble", "lilybush_marble", "lileaves_marble", "orchidbush_marble", "orchitwigs_marble",
