@@ -82,7 +82,6 @@ local function onequip(inst, owner)
     end
     inst.SoundEmitter:KillSound("sleep")
 end
-
 local function onunequip(inst, owner)
     if owner.prefab == "webber" then
         owner.AnimState:ClearOverrideSymbol("swap_body_tall")
@@ -110,13 +109,11 @@ local function onburnt(inst)
 
     inst:Remove()
 end
-
 local function onignite(inst)
     if inst.components.container ~= nil then
         inst.components.container.canbeopened = false
     end
 end
-
 local function onextinguish(inst)
     if inst.components.container ~= nil then
         inst.components.container.canbeopened = true
@@ -129,7 +126,10 @@ local function fn()
     inst.entity:AddTransform()
     inst.entity:AddAnimState()
     inst.entity:AddSoundEmitter()
+    inst.entity:AddMiniMapEntity()
     inst.entity:AddNetwork()
+
+    inst.MiniMapEntity:SetIcon("backcub.tex")
 
     MakeInventoryPhysics(inst)
     -- inst.Transform:SetScale(0.5, 0.5, 0.5)   --一旦这里改变动画大小，会导致火焰燃烧特效也跟着变化

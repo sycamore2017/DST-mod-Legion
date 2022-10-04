@@ -824,7 +824,9 @@ table.insert(prefs, Prefab(
     { "siving_turn_fruit" }
 ))
 
-table.insert(prefs, MakePlacer("siving_turn_placer", "siving_turn", "siving_turn", "idle"))
+table.insert(prefs, MakePlacer("siving_turn_placer", "siving_turn", "siving_turn", "idle",
+    nil, nil, nil, nil, nil, nil, Skined_SetBuildPlacer_legion)
+)
 
 --------------------------------------------------------------------------
 --[[ 子圭·育之果 ]]
@@ -949,8 +951,8 @@ MakeMask({
             HAT_OPENTOP_ONEQUIP_L(inst, owner, "siving_mask", GetSwapSymbol(owner))
 
             local notags = {
-                "NOCLICK", "shadow", "playerghost", "ghost",
-                "INLIMBO", "wall", "structure", "balloon", "siving", "glommer", "friendlyfruitfly", "boat"
+                "NOCLICK", "INLIMBO", "shadow", "playerghost", "ghost", "wall", "structure",
+                "balloon", "siving", "glommer", "friendlyfruitfly", "boat", "boatbumper"
             }
             if owner:HasTag("player") then --佩戴者是玩家时，不吸收其他玩家
                 table.insert(notags, "player")
@@ -1103,8 +1105,8 @@ MakeMask({
             owner:ListenForEvent("onattackother", OnAttackOther)
 
             local notags = {
-                "NOCLICK", "shadow", "playerghost", "ghost",
-                "INLIMBO", "wall", "structure", "balloon", "siving", "glommer", "friendlyfruitfly", "boat"
+                "NOCLICK", "INLIMBO", "shadow", "playerghost", "ghost", "wall", "structure",
+                "balloon", "siving", "glommer", "friendlyfruitfly", "boat", "boatbumper"
             }
             if owner:HasTag("player") then --佩戴者是玩家时，不吸收其他玩家
                 table.insert(notags, "player")

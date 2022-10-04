@@ -414,6 +414,8 @@ end
 --[[ other ]]--[[ 其他补充 ]]
 --------------------------------------------------------------------------
 
+_G.RegistMiniMapImage_legion("backcub")
+
 AddRecipe2(
     "shield_l_log", {
         Ingredient("boards", 2),

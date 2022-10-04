@@ -54,7 +54,7 @@ local COUNT_EYE = 8 --8
 local COUNT_EYE_GRIEF = 11 --11
 
 local TAGS_CANT = { "NOCLICK", "shadow", "playerghost", "ghost",
-                    "INLIMBO", "wall", "structure", "balloon", "siving", "boat" }
+                    "INLIMBO", "wall", "structure", "balloon", "siving", "boat", "boatbumper" }
 
 if CONFIGS_LEGION.PHOENIXBATTLEDIFFICULTY == 1 then
     DIST_FLAP = 7
@@ -1837,7 +1837,7 @@ table.insert(prefs, Prefab(
         inst.entity:AddAnimState()
         inst.entity:AddNetwork()
 
-        inst:AddTag("NOCLICK")
+        -- inst:AddTag("NOCLICK")
         inst:AddTag("FX")
 
         inst.AnimState:SetBank("siving_boss_eye")

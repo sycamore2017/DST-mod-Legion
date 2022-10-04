@@ -66,7 +66,7 @@ local function fn()
 
     inst.entity:AddTransform()
     inst.entity:AddAnimState()
-    inst.entity:AddMiniMapEntity()  --要在小地图上显示的话，记得加这句
+    inst.entity:AddMiniMapEntity() --要在小地图上显示的话，记得加这句
     inst.entity:AddNetwork()
 
     MakeInventoryPhysics(inst)
@@ -95,8 +95,7 @@ local function fn()
     -- })
 
     inst.entity:SetPristine()
-
-    if not TheWorld.ismastersim then 
+    if not TheWorld.ismastersim then
         return inst
     end
 

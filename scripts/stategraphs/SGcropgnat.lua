@@ -43,7 +43,18 @@ local events=
         end
     end),
     EventHandler("blocked", function(inst)
-        if not inst.components.health:IsDead() and (inst.components.freezable == nil or not inst.components.freezable:IsFrozen()) then
+        if
+            not inst.components.health:IsDead() and
+            (inst.components.freezable == nil or not inst.components.freezable:IsFrozen())
+        then
+            inst.sg:GoToState("hit")
+        end
+    end),
+    EventHandler("attacked", function(inst)
+        if
+            not inst.components.health:IsDead() and
+            (inst.components.freezable == nil or not inst.components.freezable:IsFrozen())
+        then
             inst.sg:GoToState("hit")
         end
     end),

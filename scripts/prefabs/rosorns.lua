@@ -19,7 +19,6 @@ local function OnEquip(inst, owner)
     --TIP: "onattackother"事件在 targ.components.combat:GetAttacked 之前，所以能提前改攻击配置
     owner:ListenForEvent("onattackother", UndefendedATK_legion)
 end
-
 local function OnUnequip(inst, owner)
     owner.AnimState:Hide("ARM_carry")
     owner.AnimState:Show("ARM_normal")

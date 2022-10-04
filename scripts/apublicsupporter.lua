@@ -208,8 +208,14 @@ _G.UndefendedATK_legion = function(inst, data)
                         self.inst.health_l_undefended ~= nil and
                         self.inst.components.health ~= nil --不要判断死亡(玩家)
                     then
-                        self.inst.components.health.absorb = self.inst.health_l_undefended.absorb or 0
-                        self.inst.components.health.playerabsorb = self.inst.health_l_undefended.playerabsorb or 0
+                        local healthcpt = self.inst.components.health
+                        local param = self.inst.health_l_undefended
+                        if param.absorb ~= nil and healthcpt.absorb == 0 then --说明被打后没变化，所以可以直接恢复
+                            healthcpt.absorb = param.absorb
+                        end
+                        if param.playerabsorb ~= nil and healthcpt.playerabsorb == 0 then
+                            healthcpt.playerabsorb = param.playerabsorb
+                        end
                     end
                     self.inst.health_l_undefended = nil
                     return notblocked
@@ -229,17 +235,31 @@ _G.UndefendedATK_legion = function(inst, data)
                 end
                 return mult2_Get(self, ...)
             end
+
+            if not target:HasTag("player") then --玩家无敌时，是不改的
+                local IsInvincible_old = health.IsInvincible
+                health.IsInvincible = function(self, ...)
+                    if self.inst.flag_l_undefended == 1 then
+                        return false
+                    end
+                    return IsInvincible_old(self, ...)
+                end
+            end
         end
     end
 
     target.flag_l_undefended = 1
     if health ~= nil then
-        target.health_l_undefended = {
-            absorb = health.absorb,
-            playerabsorb = health.playerabsorb
-        }
-        health.absorb = 0
-        health.playerabsorb = 0
+        local param = {}
+        if health.absorb ~= 0 then
+            param.absorb = health.absorb
+            health.absorb = 0
+        end
+        if health.playerabsorb ~= 0 then
+            param.playerabsorb = health.playerabsorb
+            health.playerabsorb = 0
+        end
+        target.health_l_undefended = param
     end
 end
 

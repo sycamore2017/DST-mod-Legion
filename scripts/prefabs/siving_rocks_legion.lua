@@ -558,7 +558,7 @@ local function TriggerLifeExtractTask(inst, doit)
                     ents = TheSim:FindEntities(x, y, z, DIST_HEALTH,
                         nil,
                         {"NOCLICK", "shadow", "playerghost", "ghost",
-                            "INLIMBO", "wall", "structure", "balloon", "siving", "boat"},
+                            "INLIMBO", "wall", "structure", "balloon", "siving", "boat", "boatbumper"},
                         {"siving_derivant", "_health"}
                     )
                 end

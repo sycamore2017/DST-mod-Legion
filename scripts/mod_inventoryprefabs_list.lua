@@ -142,7 +142,6 @@ local InventoryPrefabsList = {  --每个元素的下标值为每种物品栏图�
     foliageath_dish_tomahawksteak = { build = "images_minisign6", },
     siving_mask = { build = "images_minisign6", },
     siving_mask_gold = { build = "images_minisign6", },
-
     siving_ctlall_item = { build = "images_minisign6", },
     dug_monstrain = { build = "images_minisign6", },
     revolvedmoonlight_item = { build = "images_minisign6", },
@@ -192,7 +191,6 @@ local InventoryPrefabsList = {  --每个元素的下标值为每种物品栏图�
     rosorns_marble = { build = "images_minisign_skins1", },
     foliageath_rosorns_marble = { build = "images_minisign_skins1", },
     fimbul_axe_collector = { build = "images_minisign_skins1", },
-
     backcub_fans = { build = "images_minisign_skins1", },
     backcub_fans2 = { build = "images_minisign_skins1", },
     backcub_thanks = { build = "images_minisign_skins1", },

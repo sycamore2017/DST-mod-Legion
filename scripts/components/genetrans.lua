@@ -15,7 +15,7 @@ local GeneTrans = Class(function(self, inst)
 
 	self.fxdata = {
 		prefab = "siving_turn_fruit", symbol = "followed", x = 0, y = 0, z = 0,
-		skinname = "siving_turn"
+		skinname = "siving_turn", bloom = true
 	}
 	self.fx = nil
 end)
@@ -34,7 +34,9 @@ end
 local function SetLight(self, islight)
 	if islight then
 		self.inst.Light:Enable(true)
-		self.inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
+		if self.fxdata.bloom then
+			self.inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
+		end
 		-- if self.fx ~= nil then --太亮了，还是别弄这个
 		-- 	self.fx.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
 		-- end
