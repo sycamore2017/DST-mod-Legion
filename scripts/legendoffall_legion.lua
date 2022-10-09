@@ -1160,6 +1160,7 @@ _G.CROPS_DATA_LEGION.pineananas = {
     regrowstage = 4,
     bank = "crop_legion_pineananas",
     build = "crop_legion_pineananas",
+    image = { name = "pineananas.tex", atlas = "images/inventoryimages/pineananas.xml" },
     leveldata = {
         [1] = { anim = "level1", time = time_years * 0.05, deadanim = "dead1", witheredprefab = nil, },
         [2] = { anim = "level2", time = time_years * 0.15, deadanim = "dead1", witheredprefab = {"twigs"}, },
@@ -1198,6 +1199,7 @@ _G.CROPS_DATA_LEGION.onion = {
     regrowstage = 2,
     bank = "crop_legion_onion",
     build = "crop_legion_onion",
+    image = { name = "quagmire_onion.tex", atlas = nil },
     leveldata = {
         [1] = { anim = "level1", time = time_annual * 0.20, deadanim = "dead1", witheredprefab = nil, },
         [2] = { anim = "level2", time = time_annual * 0.15, deadanim = "dead1", witheredprefab = {"cutgrass"}, },
@@ -1314,6 +1316,7 @@ _G.CROPS_DATA_LEGION.tomato = {
     regrowstage = 3,
     bank = "crop_legion_tomato",
     build = "crop_legion_tomato",
+    image = { name = "quagmire_tomato.tex", atlas = nil },
     leveldata = {
         [1] = { anim = "level1", time = time_years * 0.15, deadanim = "dead1", witheredprefab = nil, },
         [2] = { anim = "level2", time = time_years * 0.20, deadanim = "dead1", witheredprefab = {"twigs"}, },
@@ -1410,6 +1413,7 @@ _G.CROPS_DATA_LEGION.gourd = {
     regrowstage = 4,
     bank = "crop_mythword_gourd",
     build = "crop_mythword_gourd",
+    image = { name = "gourd.tex", atlas = "images/inventoryimages/gourd.xml" },
     leveldata = {
         [1] = { anim = "level1", time = time_years * 0.05, deadanim = "dead1", witheredprefab = nil, },
         [2] = { anim = "level2", time = time_years * 0.15, deadanim = "dead1", witheredprefab = {"cutgrass"}, },

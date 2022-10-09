@@ -252,8 +252,6 @@ local function ReleaseFlowers(inst) --花寄语
     local x, y, z = inst.Transform:GetWorldPosition()
     local ents = TheSim:FindEntities(x, 0, z, DIST_REMOTE, { "_combat", "_health" }, TAGS_CANT)
 
-    --特效 undo
-
     for _, v in ipairs(ents) do
         if
             not v.hassivflower and --防止重复寄生

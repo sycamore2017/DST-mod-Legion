@@ -329,7 +329,7 @@ if CONFIGS_LEGION.LEGENDOFFALL then
         local cropprefab = "plant_"..k.."_l"
         plantables[seedsprefab] = {
             animstate = { bank = "seeds_crop_l", build = "seeds_crop_l", anim = "idle", anim_palcer = nil },
-            overrideimage = "seeds_crop_l",
+            overrideimage = "seeds_crop_l2",
             floater = {nil, "small", 0.2, 1.2},
             stacksize = TUNING.STACK_SIZE_SMALLITEM,
             fuelvalue = TUNING.SMALL_FUEL,
@@ -347,6 +347,18 @@ if CONFIGS_LEGION.LEGENDOFFALL then
                 inst:AddTag("deployedplant")
                 inst:AddTag("treeseed") --能使其放入种子袋
                 -- inst.overridedeployplacername = seedsprefab.."_placer" --这个可以让placer换成另一个
+
+                if v.image ~= nil then
+                    inst.inv_image_bg = { image = v.image.name, atlas = v.image.atlas }
+                else
+                    inst.inv_image_bg = {}
+                end
+                if inst.inv_image_bg.image == nil then
+                    inst.inv_image_bg.image = k..".tex"
+                end
+                if inst.inv_image_bg.atlas == nil then
+                    inst.inv_image_bg.atlas = GetInventoryItemAtlas(inst.inv_image_bg.image)
+                end
 
                 inst.displaynamefn = function(inst)
                     return STRINGS.NAMES[string.upper(cropprefab)]..STRINGS.PLANT_CROP_L["SEEDS"]
