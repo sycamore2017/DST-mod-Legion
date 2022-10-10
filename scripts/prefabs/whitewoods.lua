@@ -459,10 +459,97 @@ local function Fn_mat()
         inst.components.upgradeable.onstageadvancefn(inst)
     end
 
-    -- MakeSmallBurnable(inst, TUNING.SMALL_BURNTIME) --贴近地面，不会着火
-    -- MakeSmallPropagator(inst)
+    return inst
+end
 
-    MakeHauntableLaunch(inst)
+--------------------------------------------------------------------------
+--[[ 白木舞台 ]]
+--------------------------------------------------------------------------
+
+local assets_stage = {
+    Asset("ANIM", "anim/stage_whitewood.zip")
+}
+local prefabs_stage = {
+    "stage_lip_whitewood"
+}
+
+local function Fn_stage()
+    local inst = CreateEntity()
+
+    inst.entity:AddTransform()
+    -- inst.entity:AddSoundEmitter()
+    inst.entity:AddAnimState()
+    inst.entity:AddNetwork()
+
+    inst.AnimState:SetBank("stage_whitewood")
+    inst.AnimState:SetBuild("stage_whitewood")
+    inst.AnimState:PlayAnimation("idle")
+    inst.AnimState:SetOrientation(ANIM_ORIENTATION.OnGround)
+    inst.AnimState:SetLayer(LAYER_BACKGROUND)
+    inst.AnimState:SetFinalOffset(1)
+
+    inst:AddTag("DECOR")
+    inst:AddTag("NOCLICK")
+
+    inst.entity:SetPristine()
+    if not TheWorld.ismastersim then
+        return inst
+    end
+
+    inst.lip = nil
+
+    -- inst:AddComponent("inspectable")
+
+    inst:AddComponent("lootdropper")
+
+    inst:AddComponent("workable")
+    inst.components.workable:SetWorkAction(ACTIONS.HAMMER)
+    inst.components.workable:SetWorkLeft(1)
+    inst.components.workable:SetOnFinishCallback(function(inst)
+        inst.components.lootdropper:DropLoot()
+
+        local fx = SpawnPrefab("collapse_small")
+        fx.Transform:SetPosition(inst.Transform:GetWorldPosition())
+        fx:SetMaterial("wood")
+
+        inst:Remove()
+    end)
+
+    -- inst:DoTaskInTime(0, function(inst)
+    --     inst.lip = SpawnPrefab("stage_lip_whitewood")
+    --     if inst.lip then
+    --         inst:AddChild(inst.lip)
+    --     end
+    -- end)
+
+    return inst
+end
+local function Fn_stage_lip()
+    local inst = CreateEntity()
+
+    inst.entity:AddTransform()
+    inst.entity:AddAnimState()
+    inst.entity:AddNetwork()
+
+    inst.AnimState:SetBank("stage_whitewood")
+    inst.AnimState:SetBuild("stage_whitewood")
+    inst.AnimState:PlayAnimation("lip")
+    inst.AnimState:SetFinalOffset(0)
+    inst.AnimState:SetOrientation(ANIM_ORIENTATION.OnGroundFixed)
+    inst.AnimState:SetLayer(LAYER_BACKGROUND)
+
+    inst.Transform:SetRotation(90)
+    inst.Transform:SetScale(0.98,0.98,0.98)
+
+    inst:AddTag("DECOR")
+    inst:AddTag("NOCLICK")
+
+    inst.entity:SetPristine()
+    if not TheWorld.ismastersim then
+        return inst
+    end
+
+    inst.persists = false
 
     return inst
 end
@@ -473,4 +560,7 @@ end
 return Prefab("guitar_whitewood", Fn_guitar, assets_guitar, prefabs_guitar),
         Prefab("mat_whitewood_item", Fn_mat_item, assets_mat_item, prefabs_mat_item),
         MakePlacer("mat_whitewood_item_placer", "mat_whitewood", "mat_whitewood", "idle1", true),
-        Prefab("mat_whitewood", Fn_mat, assets_mat, prefabs_mat)
+        Prefab("mat_whitewood", Fn_mat, assets_mat, prefabs_mat),
+        Prefab("stage_whitewood", Fn_stage, assets_stage, prefabs_stage),
+        Prefab("stage_lip_whitewood", Fn_stage_lip, assets_stage, nil),
+        MakePlacer("stage_whitewood_placer", "stage_whitewood", "stage_whitewood", "idle", true)

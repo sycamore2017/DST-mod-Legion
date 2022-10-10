@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<spriter_data scml_version="1.0" generator="BrashMonkey Spriter" generator_version="r7">
+    <folder id="0" name="boat_parts">
+        <file id="0" name="boat_parts/boat_parts-0.png" width="1154" height="1158" pivot_x="0.5" pivot_y="0.48"/>
+    </folder>
+    <folder id="1" name="boat_lip">
+        <file id="0" name="boat_lip/boat_lip-0.png" width="1203" height="693" pivot_x="0.504" pivot_y="0.5"/>
+    </folder>
+    <entity id="0" name="stage_whitewood">
+        <animation id="0" name="idle" length="67" interval="100">
+            <mainline>
+                <key id="0">
+                    <object_ref id="0" timeline="0" key="0" z_index="0"/>
+                </key>
+            </mainline>
+            <timeline id="0" name="boat_parts">
+                <key id="0" spin="0">
+                    <object folder="0" file="0" angle="0"/>
+                </key>
+            </timeline>
+        </animation>
+        <animation id="1" name="lip" length="67" interval="100">
+            <mainline>
+                <key id="0">
+                    <object_ref id="0" timeline="0" key="0" z_index="0"/>
+                </key>
+            </mainline>
+            <timeline id="0" name="boat_lip">
+                <key id="0" spin="0">
+                    <object folder="1" file="0" y="-267" angle="0"/>
+                </key>
+            </timeline>
+        </animation>
+        <animation id="2" name="test" length="67" interval="100">
+            <mainline>
+                <key id="0">
+                    <object_ref id="0" timeline="1" key="0" z_index="0"/>
+                    <object_ref id="1" timeline="0" key="0" z_index="1"/>
+                </key>
+            </mainline>
+            <timeline id="0" name="boat_parts">
+                <key id="0" spin="0">
+                    <object folder="0" file="0" y="-8.05" angle="0" scale_y="0.633957"/>
+                </key>
+            </timeline>
+            <timeline id="1" name="boat_lip">
+                <key id="0" spin="0">
+                    <object folder="1" file="0" y="-200" angle="0" scale_y="0.633957"/>
+                </key>
+            </timeline>
+        </animation>
+    </entity>
+</spriter_data>

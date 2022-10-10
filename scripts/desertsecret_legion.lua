@@ -236,6 +236,14 @@ AddRecipe2(
         atlas = "images/inventoryimages/mat_whitewood_item.xml", image = "mat_whitewood_item.tex"
     }, { "DECOR" }
 )
+AddRecipe2(
+    "stage_whitewood", {
+        Ingredient("shyerrylog", 1, "images/inventoryimages/shyerrylog.xml"),
+    }, TECH.NONE, {
+        placer = "stage_whitewood_placer",
+        atlas = "images/inventoryimages/mat_whitewood_item.xml", image = "mat_whitewood_item.tex"
+    }, { "DECOR" }
+)
 
 if CONFIGS_LEGION.DRESSUP then
     AddRecipe2(
