@@ -1,19 +1,8 @@
+local prefs = {}
+
 --------------------------------------------------------------------------
 --[[ 白木吉他 ]]
 --------------------------------------------------------------------------
-
-local assets_guitar = {
-    Asset("ANIM", "anim/guitar_whitewood.zip"),
-    Asset("ANIM", "anim/swap_guitar_whitewood.zip"),
-    Asset("ATLAS", "images/inventoryimages/guitar_whitewood.xml"),
-    Asset("IMAGE", "images/inventoryimages/guitar_whitewood.tex"),
-}
-
-local prefabs_guitar = {
-    "battlesong_attach",
-    "battlesong_detach",
-    "guitar_whitewood_doing_fx",
-}
 
 local TIME_FOURHANDSPLAY = 1.5
 local RANGE_FOURHANDSPLAY = 10
@@ -56,7 +45,6 @@ local function PlayFail(inst, owner, talktype)
         inst.playtask = nil
     end
 end
-
 local function PlayStart(inst, owner)
     owner.AnimState:OverrideSymbol("swap_guitar", "swap_guitar_whitewood", "swap_guitar_whitewood")
 
@@ -117,7 +105,6 @@ local function PlayStart(inst, owner)
         end
     end
 end
-
 local function PlayDoing(inst, owner)
     owner.AnimState:PlayAnimation("soothingplay_loop", true) --之所以把动画改到这里而不是写进sg中，是为了兼容多种弹奏动画。建议写进PlayStart，并改造一下sg
 
@@ -213,7 +200,6 @@ local function PlayDoing(inst, owner)
         end
     end, 0.5)
 end
-
 local function PlayEnd(inst, owner)
     if owner.fourhands_status == 1 then
         owner.SoundEmitter:KillSound("song")
@@ -301,19 +287,25 @@ local function Fn_guitar()
     return inst
 end
 
+table.insert(prefs, Prefab(
+    "guitar_whitewood",
+    Fn_guitar,
+    {
+        Asset("ANIM", "anim/guitar_whitewood.zip"),
+        Asset("ANIM", "anim/swap_guitar_whitewood.zip"),
+        Asset("ATLAS", "images/inventoryimages/guitar_whitewood.xml"),
+        Asset("IMAGE", "images/inventoryimages/guitar_whitewood.tex"),
+    },
+    {
+        "battlesong_attach",
+        "battlesong_detach",
+        "guitar_whitewood_doing_fx",
+    }
+))
+
 --------------------------------------------------------------------------
 --[[ 白木地垫 ]]
 --------------------------------------------------------------------------
-
-local assets_mat_item = {
-    Asset("ANIM", "anim/mat_whitewood.zip"),
-    Asset("ATLAS", "images/inventoryimages/mat_whitewood_item.xml"),
-    Asset("IMAGE", "images/inventoryimages/mat_whitewood_item.tex"),
-}
-
-local prefabs_mat_item = {
-    "mat_whitewood"
-}
 
 local function Fn_mat_item()
     local inst = CreateEntity()
@@ -381,15 +373,22 @@ local function Fn_mat_item()
     return inst
 end
 
+table.insert(prefs, Prefab(
+    "mat_whitewood_item",
+    Fn_mat_item,
+    {
+        Asset("ANIM", "anim/mat_whitewood.zip"),
+        Asset("ATLAS", "images/inventoryimages/mat_whitewood_item.xml"),
+        Asset("IMAGE", "images/inventoryimages/mat_whitewood_item.tex"),
+    },
+    {
+        "mat_whitewood"
+    }
+))
+
+table.insert(prefs, MakePlacer("mat_whitewood_item_placer", "mat_whitewood", "mat_whitewood", "idle1", true))
+
 -----
-
-local assets_mat = {
-    Asset("ANIM", "anim/mat_whitewood.zip"),
-}
-
-local prefabs_mat = {
-    "mat_whitewood_item"
-}
 
 local function Fn_mat()
     local inst = CreateEntity()
@@ -462,105 +461,121 @@ local function Fn_mat()
     return inst
 end
 
+table.insert(prefs, Prefab(
+    "mat_whitewood",
+    Fn_mat,
+    {
+        Asset("ANIM", "anim/mat_whitewood.zip"),
+    },
+    {
+        "mat_whitewood_item"
+    }
+))
+
 --------------------------------------------------------------------------
---[[ 白木舞台 ]]
+--[[ 白木大地毯 ]]
 --------------------------------------------------------------------------
 
-local assets_stage = {
-    Asset("ANIM", "anim/stage_whitewood.zip")
-}
-local prefabs_stage = {
-    "stage_lip_whitewood"
-}
+table.insert(prefs, Prefab(
+    "carpet_large_ww",
+    function()
+        local inst = CreateEntity()
 
-local function Fn_stage()
-    local inst = CreateEntity()
+        inst.entity:AddTransform()
+        inst.entity:AddAnimState()
+        inst.entity:AddNetwork()
 
-    inst.entity:AddTransform()
-    -- inst.entity:AddSoundEmitter()
-    inst.entity:AddAnimState()
-    inst.entity:AddNetwork()
+        inst.AnimState:SetBank("carpet_large_ww")
+        inst.AnimState:SetBuild("carpet_large_ww")
+        inst.AnimState:PlayAnimation("idle")
+        inst.AnimState:SetOrientation(ANIM_ORIENTATION.OnGround)
+        inst.AnimState:SetLayer(LAYER_BACKGROUND)
+        inst.AnimState:SetFinalOffset(1)
 
-    inst.AnimState:SetBank("stage_whitewood")
-    inst.AnimState:SetBuild("stage_whitewood")
-    inst.AnimState:PlayAnimation("idle")
-    inst.AnimState:SetOrientation(ANIM_ORIENTATION.OnGround)
-    inst.AnimState:SetLayer(LAYER_BACKGROUND)
-    inst.AnimState:SetFinalOffset(1)
+        inst:AddTag("DECOR")
+        inst:AddTag("NOCLICK")
+        inst:AddTag("NOBLOCK")
 
-    inst:AddTag("DECOR")
-    inst:AddTag("NOCLICK")
+        inst.entity:SetPristine()
+        if not TheWorld.ismastersim then
+            return inst
+        end
 
-    inst.entity:SetPristine()
-    if not TheWorld.ismastersim then
+        inst._beacon = nil
+
+        -- inst:AddComponent("inspectable")
+
+        inst:AddComponent("lootdropper")
+
+        inst:AddComponent("savedrotation")
+
+        inst:DoTaskInTime(0, function(inst)
+            local bc = SpawnPrefab("beacon_work_l")
+            if bc then
+                inst:AddChild(bc)
+                inst._beacon = bc
+                bc.components.workable:SetWorkLeft(1)
+                bc.components.workable:SetOnWorkCallback(function(bc, worker, workleft, numworks)
+                    if worker == nil or not worker:HasTag("player") then --非玩家无法破坏这个地毯
+                        bc.components.workable:SetWorkLeft(1)
+                    end
+                end)
+                bc.components.workable:SetOnFinishCallback(function(bc, worker)
+                    inst.components.lootdropper:DropLoot()
+
+                    local fx = SpawnPrefab("collapse_small")
+                    fx.Transform:SetPosition(inst.Transform:GetWorldPosition())
+                    fx:SetMaterial("wood")
+
+                    bc:Remove()
+                    inst:Remove()
+                end)
+            end
+        end)
+
         return inst
-    end
+    end,
+    {
+        Asset("ANIM", "anim/carpet_large_ww.zip")
+    },
+    {
+        "beacon_work_l"
+    }
+))
 
-    inst.lip = nil
+table.insert(prefs, MakePlacer("carpet_large_ww_placer", "carpet_large_ww", "carpet_large_ww", "idle", true, nil, nil, nil, 90))
 
-    -- inst:AddComponent("inspectable")
+--------------------------------------------------------------------------
+--[[ 信标(用来让其绑定物被摧毁) ]]
+--------------------------------------------------------------------------
 
-    inst:AddComponent("lootdropper")
+table.insert(prefs, Prefab(
+    "beacon_work_l",
+    function()
+        local inst = CreateEntity()
 
-    inst:AddComponent("workable")
-    inst.components.workable:SetWorkAction(ACTIONS.HAMMER)
-    inst.components.workable:SetWorkLeft(1)
-    inst.components.workable:SetOnFinishCallback(function(inst)
-        inst.components.lootdropper:DropLoot()
+        inst.entity:AddTransform()
+        inst.entity:AddNetwork()
 
-        local fx = SpawnPrefab("collapse_small")
-        fx.Transform:SetPosition(inst.Transform:GetWorldPosition())
-        fx:SetMaterial("wood")
+        inst:AddTag("NOBLOCK")
 
-        inst:Remove()
-    end)
+        inst.entity:SetPristine()
+        if not TheWorld.ismastersim then
+            return inst
+        end
 
-    -- inst:DoTaskInTime(0, function(inst)
-    --     inst.lip = SpawnPrefab("stage_lip_whitewood")
-    --     if inst.lip then
-    --         inst:AddChild(inst.lip)
-    --     end
-    -- end)
+        inst.persists = false
 
-    return inst
-end
-local function Fn_stage_lip()
-    local inst = CreateEntity()
+        inst:AddComponent("workable")
+        inst.components.workable:SetWorkAction(ACTIONS.HAMMER)
 
-    inst.entity:AddTransform()
-    inst.entity:AddAnimState()
-    inst.entity:AddNetwork()
-
-    inst.AnimState:SetBank("stage_whitewood")
-    inst.AnimState:SetBuild("stage_whitewood")
-    inst.AnimState:PlayAnimation("lip")
-    inst.AnimState:SetFinalOffset(0)
-    inst.AnimState:SetOrientation(ANIM_ORIENTATION.OnGroundFixed)
-    inst.AnimState:SetLayer(LAYER_BACKGROUND)
-
-    inst.Transform:SetRotation(90)
-    inst.Transform:SetScale(0.98,0.98,0.98)
-
-    inst:AddTag("DECOR")
-    inst:AddTag("NOCLICK")
-
-    inst.entity:SetPristine()
-    if not TheWorld.ismastersim then
         return inst
-    end
-
-    inst.persists = false
-
-    return inst
-end
+    end,
+    nil,
+    nil
+))
 
 -----
 -----
 
-return Prefab("guitar_whitewood", Fn_guitar, assets_guitar, prefabs_guitar),
-        Prefab("mat_whitewood_item", Fn_mat_item, assets_mat_item, prefabs_mat_item),
-        MakePlacer("mat_whitewood_item_placer", "mat_whitewood", "mat_whitewood", "idle1", true),
-        Prefab("mat_whitewood", Fn_mat, assets_mat, prefabs_mat),
-        Prefab("stage_whitewood", Fn_stage, assets_stage, prefabs_stage),
-        Prefab("stage_lip_whitewood", Fn_stage_lip, assets_stage, nil),
-        MakePlacer("stage_whitewood_placer", "stage_whitewood", "stage_whitewood", "idle", true)
+return unpack(prefs)

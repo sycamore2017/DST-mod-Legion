@@ -237,10 +237,10 @@ AddRecipe2(
     }, { "DECOR" }
 )
 AddRecipe2(
-    "stage_whitewood", {
+    "carpet_large_ww", {
         Ingredient("shyerrylog", 1, "images/inventoryimages/shyerrylog.xml"),
     }, TECH.NONE, {
-        placer = "stage_whitewood_placer",
+        placer = "carpet_large_ww_placer", min_spacing = 0,
         atlas = "images/inventoryimages/mat_whitewood_item.xml", image = "mat_whitewood_item.tex"
     }, { "DECOR" }
 )
