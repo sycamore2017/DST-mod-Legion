@@ -34,6 +34,8 @@ local assets = {
     Asset("IMAGE", "images/inventoryimages/theemperorspendant.tex"),
     Asset("ATLAS", "images/inventoryimages/mat_whitewood_item.xml"),
     Asset("IMAGE", "images/inventoryimages/mat_whitewood_item.tex"),
+    Asset("ATLAS", "images/inventoryimages/carpet_large_ww.xml"),
+    Asset("IMAGE", "images/inventoryimages/carpet_large_ww.tex"),
 }
 
 for k,v in pairs(assets) do
@@ -238,10 +240,10 @@ AddRecipe2(
 )
 AddRecipe2(
     "carpet_large_ww", {
-        Ingredient("shyerrylog", 1, "images/inventoryimages/shyerrylog.xml"),
-    }, TECH.NONE, {
+        Ingredient("shyerrylog", 5, "images/inventoryimages/shyerrylog.xml"),
+    }, TECH.SCIENCE_ONE, {
         placer = "carpet_large_ww_placer", min_spacing = 0,
-        atlas = "images/inventoryimages/mat_whitewood_item.xml", image = "mat_whitewood_item.tex"
+        atlas = "images/inventoryimages/carpet_large_ww.xml", image = "carpet_large_ww.tex"
     }, { "DECOR" }
 )
 
