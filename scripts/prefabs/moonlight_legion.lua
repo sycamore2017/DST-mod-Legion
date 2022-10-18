@@ -238,7 +238,7 @@ table.insert(prefs, Prefab("hiddenmoonlight", function()
     inst:AddComponent("preserver")
 	inst.components.preserver:SetPerishRateMultiplier(function(inst, item)
         if item == nil then
-            return
+            return 0.3
         end
         if item:HasTag("frozen") then
             return 0
@@ -257,12 +257,15 @@ table.insert(prefs, Prefab("hiddenmoonlight", function()
     inst.components.workable:SetWorkLeft(5)
     inst.components.workable:SetOnWorkCallback(function(inst, worker, workleft, numworks)
         inst.AnimState:PlayAnimation("hit")
-        inst.components.container:DropEverything()
         inst.AnimState:PushAnimation("closed", true)
         inst.components.container:Close()
+        if worker == nil or not worker:HasTag("player") then
+            inst.components.workable:SetWorkLeft(5) --不能被非玩家破坏
+            return
+        end
+        inst.components.container:DropEverything()
     end)
     inst.components.workable:SetOnFinishCallback(function(inst, worker)
-        -- inst.components.lootdropper:DropLoot()
         inst.components.container:DropEverything()
 
         local x, y, z = inst.Transform:GetWorldPosition()
@@ -607,8 +610,12 @@ local function MakeRevolved(sets)
             inst.AnimState:PlayAnimation("hit")
             inst.AnimState:PushAnimation("closed")
             inst.SoundEmitter:PlaySound("grotto/common/turf_crafting_station/hit")
-            inst.components.container:DropEverything()
             inst.components.container:Close()
+            if worker == nil or not worker:HasTag("player") then
+                inst.components.workable:SetWorkLeft(5) --不能被非玩家破坏
+                return
+            end
+            inst.components.container:DropEverything()
         end)
         inst.components.workable:SetOnFinishCallback(function(inst, worker)
             inst.components.container:DropEverything()

@@ -935,7 +935,7 @@ if CONFIGS_LEGION.PRAYFORRAIN then
         test = function(cooker, names, tags)
             return names.monstrain_leaf and (tags.veggie and tags.veggie >= 2.5) and tags.egg and not tags.meat
         end,
-        priority = 20,
+        priority = 56, --和【永不妥协】里的 恶魔蛋(优先级52) 重了，这里调高优先级
         foodtype = FOODTYPE.VEGGIE,
         health = 3,
         hunger = 62.5,
