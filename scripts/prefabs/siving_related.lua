@@ -20,6 +20,7 @@ local ctlFuledItems = {
     lileaves = { moisture = nil, nutrients = { 12, 48, 12 } },
     orchitwigs = { moisture = nil, nutrients = { 48, 12, 12 } },
 }
+local PLACER_SCALE_CTL = 1.79 --这个大小就是20半径的
 
 local function MakeItem(data)
     local basename = "siving_ctl"..data.name
@@ -95,11 +96,73 @@ local function MakeItem(data)
         data.assets,
         data.prefabs
     ))
-    table.insert(prefs, MakePlacer(basename.."_item_placer", basename, basename, "idle"))
+    table.insert(prefs, MakePlacer(basename.."_item_placer", "firefighter_placement", "firefighter_placement", "idle",
+        true, nil, nil, PLACER_SCALE_CTL, nil, nil, function(inst)
+            local placer2 = CreateEntity()
+
+            --[[Non-networked entity]]
+            placer2.entity:SetCanSleep(false)
+            placer2.persists = false
+
+            placer2.entity:AddTransform()
+            placer2.entity:AddAnimState()
+
+            placer2:AddTag("CLASSIFIED")
+            placer2:AddTag("NOCLICK")
+            placer2:AddTag("placer")
+
+            local s = 1 / PLACER_SCALE_CTL
+            placer2.Transform:SetScale(s, s, s)
+
+            placer2.AnimState:SetBank(basename)
+            placer2.AnimState:SetBuild(basename)
+            placer2.AnimState:PlayAnimation("idle")
+            placer2.AnimState:SetLightOverride(1)
+
+            placer2.entity:SetParent(inst.entity)
+
+            inst.components.placer:LinkEntity(placer2)
+        end
+    ))
 end
 
 local function MakeConstruct(data)
     local basename = "siving_ctl"..data.name
+
+    local function OnEnableHelper_ctl(inst, enabled)
+        if enabled then
+            if inst.helper == nil then
+                inst.helper = CreateEntity()
+
+                --[[Non-networked entity]]
+                inst.helper.entity:SetCanSleep(false)
+                inst.helper.persists = false
+
+                inst.helper.entity:AddTransform()
+                inst.helper.entity:AddAnimState()
+
+                inst.helper:AddTag("CLASSIFIED")
+                inst.helper:AddTag("NOCLICK")
+                inst.helper:AddTag("placer")
+
+                inst.helper.Transform:SetScale(PLACER_SCALE_CTL, PLACER_SCALE_CTL, PLACER_SCALE_CTL)
+
+                inst.helper.AnimState:SetBank("firefighter_placement")
+                inst.helper.AnimState:SetBuild("firefighter_placement")
+                inst.helper.AnimState:PlayAnimation("idle")
+                inst.helper.AnimState:SetLightOverride(1)
+                inst.helper.AnimState:SetOrientation(ANIM_ORIENTATION.OnGround)
+                inst.helper.AnimState:SetLayer(LAYER_BACKGROUND)
+                inst.helper.AnimState:SetSortOrder(1)
+                inst.helper.AnimState:SetAddColour(0, .5, .5, 0)
+
+                inst.helper.entity:SetParent(inst.entity)
+            end
+        elseif inst.helper ~= nil then
+            inst.helper:Remove()
+            inst.helper = nil
+        end
+    end
 
     local function CanAcceptMoisture(botanyctl, test)
         if test ~= nil and (botanyctl.type == 1 or botanyctl.type == 3) then
@@ -299,6 +362,12 @@ local function MakeConstruct(data)
             inst:AddTag("structure")
             inst:AddTag("siving_ctl")
 
+            --Dedicated server does not need deployhelper
+            if not TheNet:IsDedicated() then
+                inst:AddComponent("deployhelper")
+                inst.components.deployhelper.onenablehelper = OnEnableHelper_ctl
+            end
+
             inst.entity:SetPristine()
             if not TheWorld.ismastersim then
                 return inst
@@ -493,6 +562,7 @@ MakeItem({
         Asset("ANIM", "anim/siving_ctlwater.zip"),
         Asset("ATLAS", "images/inventoryimages/siving_ctlwater_item.xml"),
         Asset("IMAGE", "images/inventoryimages/siving_ctlwater_item.tex"),
+        Asset("ANIM", "anim/firefighter_placement.zip"), --灭火器的placer圈
     },
     prefabs = { "siving_ctlwater" },
     sound = "dontstarve/common/rain_meter_craft",
@@ -501,6 +571,7 @@ MakeConstruct({
     name = "water",
     assets = {
         Asset("ANIM", "anim/siving_ctlwater.zip"),
+        Asset("ANIM", "anim/firefighter_placement.zip"), --灭火器的placer圈
     },
     prefabs = { "siving_ctlwater_item", "siving_ctl_bar" },
     ctltype = 1,
@@ -538,6 +609,7 @@ MakeItem({
         Asset("ANIM", "anim/siving_ctldirt.zip"),
         Asset("ATLAS", "images/inventoryimages/siving_ctldirt_item.xml"),
         Asset("IMAGE", "images/inventoryimages/siving_ctldirt_item.tex"),
+        Asset("ANIM", "anim/firefighter_placement.zip"), --灭火器的placer圈
     },
     prefabs = { "siving_ctldirt" },
     sound = "dontstarve/common/winter_meter_craft",
@@ -546,6 +618,7 @@ MakeConstruct({
     name = "dirt",
     assets = {
         Asset("ANIM", "anim/siving_ctldirt.zip"),
+        Asset("ANIM", "anim/firefighter_placement.zip"), --灭火器的placer圈
     },
     prefabs = { "siving_ctldirt_item", "siving_ctl_bar" },
     ctltype = 2,
@@ -591,6 +664,7 @@ MakeItem({
         Asset("ANIM", "anim/siving_ctlall.zip"),
         Asset("ATLAS", "images/inventoryimages/siving_ctlall_item.xml"),
         Asset("IMAGE", "images/inventoryimages/siving_ctlall_item.tex"),
+        Asset("ANIM", "anim/firefighter_placement.zip"), --灭火器的placer圈
     },
     prefabs = { "siving_ctlall" },
     sound = "dontstarve/halloween_2018/madscience_machine/place",
@@ -601,6 +675,7 @@ MakeConstruct({
         Asset("ANIM", "anim/siving_ctlall.zip"),
         Asset("ANIM", "anim/siving_ctlwater.zip"),
         Asset("ANIM", "anim/siving_ctldirt.zip"),
+        Asset("ANIM", "anim/firefighter_placement.zip"), --灭火器的placer圈
     },
     prefabs = { "siving_ctlall_item", "siving_ctl_bar" },
     ctltype = 3,

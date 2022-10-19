@@ -693,9 +693,9 @@ local function MakeRevolved(sets)
             inst._light:Remove()
         end
 
-        if TUNING.SMART_SIGN_DRAW_ENABLE then
-            SMART_SIGN_DRAW(inst)
-        end
+        -- if TUNING.SMART_SIGN_DRAW_ENABLE then --由于这个容器是便携的，不适合兼容【智能小木牌】
+        --     SMART_SIGN_DRAW(inst)
+        -- end
 
         -- if sets.fn_server ~= nil then
         --     sets.fn_server(inst)
