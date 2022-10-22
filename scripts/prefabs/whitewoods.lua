@@ -510,7 +510,7 @@ table.insert(prefs, Prefab(
         inst:AddComponent("savedrotation")
 
         inst:DoTaskInTime(0, function(inst)
-            local bc = SpawnPrefab("beacon_work_l")
+            local bc = SpawnPrefab("beacon_work_l") --由于当前组合下没法被破坏动作识别，所以得另外生成一对象来使其能被破坏
             if bc then
                 inst:AddChild(bc)
                 inst._beacon = bc

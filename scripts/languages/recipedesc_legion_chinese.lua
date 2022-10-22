@@ -182,7 +182,7 @@ return {
         },
         bananapop = {
             cook_need = "(烤)香蕉 冰度 树枝",
-            cook_cant = "肉度 鱼度 非食≤2",
+            cook_cant = "肉度 鱼度",
             recipe_count = 6,
         },
         ceviche = {
@@ -297,7 +297,7 @@ return {
         },
         frozenbananadaiquiri = {
             cook_need = "(烤)香蕉 冰度≥1",
-            cook_cant = nil,
+            cook_cant = "肉度 鱼度",
             recipe_count = 6,
         },
         bunnystew = {
@@ -307,7 +307,32 @@ return {
         },
         bananajuice = {
             cook_need = "(烤)香蕉≥2",
+            cook_cant = "肉度 鱼度 怪物度",
+            recipe_count = 6,
+        },
+        justeggs = {
+            cook_need = "蛋度≥3",
             cook_cant = nil,
+            recipe_count = 6,
+        },
+        veggieomlet = {
+            cook_need = "蛋度≥1 菜度≥1",
+            cook_cant = "肉度 乳度",
+            recipe_count = 6,
+        },
+        talleggs = {
+            cook_need = "高脚鸟蛋 菜度≥1",
+            cook_cant = nil,
+            recipe_count = 6,
+        },
+        beefalofeed = {
+            cook_need = "非食",
+            cook_cant = "怪物/肉/鱼/蛋/脂/乳/魔法度",
+            recipe_count = 6,
+        },
+        beefalotreat = {
+            cook_need = "非食 种子度 必忘我",
+            cook_cant = "怪物/肉/鱼/蛋/脂/乳/魔法度",
             recipe_count = 6,
         },
     },

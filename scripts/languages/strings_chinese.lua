@@ -3347,7 +3347,7 @@ S______GENERIC.DESCRIBE.THEEMPERORSPENDANT = "坚定的人才不会信这个。"
 -- S_______WALTER.DESCRIBE.THEEMPERORSPENDANT = ""
 
 S_NAMES.MAT_WHITEWOOD_ITEM = "白木地垫"
-S_RECIPE_DESC.MAT_WHITEWOOD_ITEM = "双脚体验木质感。"
+S_RECIPE_DESC.MAT_WHITEWOOD_ITEM = "让你双脚体验木质感。"
 S______GENERIC.DESCRIBE.MAT_WHITEWOOD_ITEM = "装饰地面的白色木片。"
 -- S_______WILLOW.DESCRIBE.MAT_WHITEWOOD_ITEM = ""
 -- S_____WOLFGANG.DESCRIBE.MAT_WHITEWOOD_ITEM = ""
@@ -3365,6 +3365,12 @@ S______WAXWELL.DESCRIBE.MAT_WHITEWOOD_ITEM = "地上垫了一层让我更有踏�
 -- S_________WURT.DESCRIBE.MAT_WHITEWOOD_ITEM = ""
 -- S_______WALTER.DESCRIBE.MAT_WHITEWOOD_ITEM = ""
 -- S________WANDA.DESCRIBE.MAT_WHITEWOOD_ITEM = ""
+
+S_NAMES.CARPET_WW = "白木地垫"
+S_RECIPE_DESC.CARPET_WW = "一张木肤质感的地垫。"
+
+S_NAMES.CARPET_LARGE_WW = "白木地毯"
+S_RECIPE_DESC.CARPET_LARGE_WW = "一张木肤质感的大号地毯。"
 
 --------------------------------------------------------------------------
 --[[ tips ]]--[[ 加载台词 ]]

@@ -791,6 +791,46 @@ local dressup_data = {
             return itemswap
         end
     },
+    antlionhat = {
+        buildfile = "hat_antlion",
+        buildsymbol = "swap_hat",
+    },
+    mask_dollhat = {
+        buildfile = "hat_mask_doll",
+        buildsymbol = "swap_hat",
+    },
+    mask_dollbrokenhat = {
+        buildfile = "hat_mask_dollbroken",
+        buildsymbol = "swap_hat",
+    },
+    mask_dollrepairedhat = {
+        buildfile = "hat_mask_dollrepaired",
+        buildsymbol = "swap_hat",
+    },
+    mask_blacksmithhat = {
+        buildfile = "hat_mask_blacksmith",
+        buildsymbol = "swap_hat",
+    },
+    mask_mirrorhat = {
+        buildfile = "hat_mask_mirror",
+        buildsymbol = "swap_hat",
+    },
+    mask_queenhat = {
+        buildfile = "hat_mask_queen",
+        buildsymbol = "swap_hat",
+    },
+    mask_kinghat = {
+        buildfile = "hat_mask_king",
+        buildsymbol = "swap_hat",
+    },
+    mask_treehat = {
+        buildfile = "hat_mask_tree",
+        buildsymbol = "swap_hat",
+    },
+    mask_foolhat = {
+        buildfile = "hat_mask_fool",
+        buildsymbol = "swap_hat",
+    },
 
     -------------------------------
     --身体-------------------------
@@ -953,8 +993,7 @@ local dressup_data = {
         buildfile = "torso_reflective",
         buildsymbol = "swap_body",
     },
-    hawaiianshirt =
-    {
+    hawaiianshirt = {
         buildfile = "torso_hawaiian",
         buildsymbol = "swap_body",
     },
@@ -1054,6 +1093,34 @@ local dressup_data = {
     },
     balloonvest = {
         buildfile = "balloonvest",
+        buildsymbol = "swap_body"
+    },
+    costume_doll_body = {
+        buildfile = "costume_doll_body",
+        buildsymbol = "swap_body"
+    },
+    costume_queen_body = {
+        buildfile = "costume_queen_body",
+        buildsymbol = "swap_body"
+    },
+    costume_king_body = {
+        buildfile = "costume_king_body",
+        buildsymbol = "swap_body"
+    },
+    costume_blacksmith_body = {
+        buildfile = "costume_blacksmith_body",
+        buildsymbol = "swap_body"
+    },
+    costume_mirror_body = {
+        buildfile = "costume_mirror_body",
+        buildsymbol = "swap_body"
+    },
+    costume_tree_body = {
+        buildfile = "costume_tree_body",
+        buildsymbol = "swap_body"
+    },
+    costume_fool_body = {
+        buildfile = "costume_fool_body",
         buildsymbol = "swap_body"
     },
     -- moon_altar --月科技系列的可搬动建筑，独一无二的，不能幻化

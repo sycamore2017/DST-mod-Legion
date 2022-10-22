@@ -3240,6 +3240,12 @@ S______WAXWELL.DESCRIBE.MAT_WHITEWOOD_ITEM = "A layer of cushion makes me feel m
 -- S_______WALTER.DESCRIBE.MAT_WHITEWOOD_ITEM = ""
 -- S________WANDA.DESCRIBE.MAT_WHITEWOOD_ITEM = ""
 
+S_NAMES.CARPET_WW = "White Wood Mat" --白木地垫
+S_RECIPE_DESC.CARPET_WW = "A simple wooden mat."
+
+S_NAMES.CARPET_LARGE_WW = "White Wood Carpet" --白木地毯
+S_RECIPE_DESC.CARPET_LARGE_WW = "A large wooden carpet."
+
 --------------------------------------------------------------------------
 --[[ other ]]--[[ 其他 ]]
 --------------------------------------------------------------------------
