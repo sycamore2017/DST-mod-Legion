@@ -6,9 +6,10 @@ local ProjectileLegion = Class(function(self, inst)
 	self.speed = 20 --抛射速度
 	self.stimuli = nil
 	self.hittargets = {} --把已经被攻击过的对象记下来，防止重复攻击
-	self.exclude_tags = { "INLIMBO", "NOCLICK", "wall", "structure", "boat" }
+	self.exclude_tags = { "INLIMBO", "NOCLICK", "wall", "structure" }
 	if not TheNet:GetPVPEnabled() then
 		table.insert(self.exclude_tags, "player")
+		table.insert(self.exclude_tags, "abigail")
 	end
 
 	self.onthrown = nil

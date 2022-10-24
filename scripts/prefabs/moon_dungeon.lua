@@ -775,10 +775,12 @@ local function SetState(inst)   --设置地下城的状态
         inst.dungeonState = true
         SetNewWorkAction(inst)
         inst.components.workable:SetWorkable(true)
+        inst.Physics:SetActive(true)
     else
         inst.AnimState:PlayAnimation("anim_sleep", false)
         inst.dungeonState = false
         inst.components.workable:SetWorkable(false)
+        inst.Physics:SetActive(false)
     end
 
     SetSwordSympol(inst, inst.hasSword)
@@ -789,7 +791,6 @@ local function OnEntitySleep(inst)
         SetState(inst)
     end
 end
-
 local function OnEntityWake(inst)
     SetState(inst)
 end
@@ -798,7 +799,6 @@ local function OnSave(inst, data)
     data.hasSword = inst.hasSword
     data.workTrigger = inst.workTrigger
 end
-
 local function OnLoad(inst, data)
     if data ~= nil then
         inst.hasSword = data.hasSword
@@ -818,7 +818,8 @@ local function create()
     inst.entity:AddNetwork()
 
     inst.Transform:SetScale(4, 4, 4)
-    MakeObstaclePhysics(inst, 4.7)
+    MakeObstaclePhysics(inst, 4.7, 8)
+    inst.Physics:SetActive(false)
 
     inst.AnimState:SetBank("moondungeon")
     inst.AnimState:SetBuild("moondungeon")

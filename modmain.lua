@@ -553,21 +553,7 @@ AddSimPostInit(function()
     _G.CONFIGS_LEGION.ENABLEDMODS.MythWords = TUNING.MYTH_WORDS_MOD_OPEN
     if TUNING.MYTH_WORDS_MOD_OPEN then
         if CONFIGS_LEGION.DRESSUP then
-            ------给神话的巨型葫芦添加幻化
             local DRESSUP_DATA = _G.DRESSUP_DATA_LEGION
-            DRESSUP_DATA["gourd_oversized"] = {
-                isnoskin = true,
-                istallbody = true,
-                buildfile = "farm_plant_gourd",
-                buildsymbol = "swap_body",
-            }
-            DRESSUP_DATA["gourd_oversized_waxed"] = DRESSUP_DATA["gourd_oversized"]
-            -- DRESSUP_DATA["gourd_oversized_rotten"] = { --神话还没改
-            --     isnoskin = true,
-            --     istallbody = true,
-            --     buildfile = "farm_plant_gourd",
-            --     buildsymbol = "swap_body_rotten",
-            -- }
 
             DRESSUP_DATA["xzhat_mk"] = { --行者帽
                 isnoskin = true,

@@ -140,8 +140,7 @@ local dressup_data = {
         buildfile = "swap_hammer",
         buildsymbol = "swap_hammer",
     },
-    pitchfork =
-    {
+    pitchfork = {
         buildfile = "swap_pitchfork",
         buildsymbol = "swap_pitchfork",
     },
@@ -459,6 +458,10 @@ local dressup_data = {
 
             return itemswap
         end,
+    },
+    goldenpitchfork = {
+        buildfile = "swap_goldenpitchfork",
+        buildsymbol = "swap_goldenpitchfork"
     },
     -- minifan = --有贴图之外的实体，不做幻化
     -- {
@@ -1261,8 +1264,7 @@ local dressup_data = {
             return itemswap
         end
     },
-    dualwrench =
-    {
+    dualwrench = {
         isnoskin = true,
         buildfile = "swap_dualwrench",
         buildsymbol = "swap_dualwrench",
@@ -1815,37 +1817,32 @@ local oversizecrops = {
     pepper = "farm_plant_pepper",
     durian = "farm_plant_durian_build",
     carrot = "farm_plant_carrot",
+    pineananas = "farm_plant_pineananas",
+    gourd = "farm_plant_gourd" --【神话书说】巨型葫芦(没有做腐烂状态的)
+}
+local function Build_crops(dressup, item, buildskin)
+    local itemswap = {}
+
+    if item.components.symbolswapdata ~= nil then
+        local swap = item.components.symbolswapdata
+        itemswap["swap_body_tall"] = dressup:GetDressData(
+            nil, swap.build, swap.symbol, item.GUID, "swap"
+        )
+    end
+
+    return itemswap
+end
+local cropdressdata = {
+    isnoskin = true,
+    istallbody = true,
+    buildfn = Build_crops
 }
 for k,v in pairs(oversizecrops) do
-    _G.DRESSUP_DATA_LEGION[k.."_oversized"] = {
-        isnoskin = true,
-        istallbody = true,
-        buildfile = v,
-        buildsymbol = "swap_body",
-    }
-    _G.DRESSUP_DATA_LEGION[k.."_oversized_waxed"] = _G.DRESSUP_DATA_LEGION[k.."_oversized"]
-    _G.DRESSUP_DATA_LEGION[k.."_oversized_rotten"] = {
-        isnoskin = true,
-        istallbody = true,
-        buildfile = "farm_plant_"..k.."_rotten_build",
-        buildsymbol = "swap_body",
-    }
+    _G.DRESSUP_DATA_LEGION[k.."_oversized"] = cropdressdata
+    _G.DRESSUP_DATA_LEGION[k.."_oversized_waxed"] = cropdressdata
+    _G.DRESSUP_DATA_LEGION[k.."_oversized_rotten"] = cropdressdata
 end
-if CONFIGS_LEGION.LEGENDOFFALL then
-    _G.DRESSUP_DATA_LEGION["pineananas_oversized"] = {
-        isnoskin = true,
-        istallbody = true,
-        buildfile = "farm_plant_pineananas",
-        buildsymbol = "swap_body",
-    }
-    _G.DRESSUP_DATA_LEGION["pineananas_oversized_waxed"] = _G.DRESSUP_DATA_LEGION["pineananas_oversized"]
-    _G.DRESSUP_DATA_LEGION["pineananas_oversized_rotten"] = {
-        isnoskin = true,
-        istallbody = true,
-        buildfile = "farm_plant_pineananas",
-        buildsymbol = "swap_body_rotten",
-    }
-end
+_G.DRESSUP_DATA_LEGION["immortal_fruit_oversized"] = cropdressdata --【能力勋章】巨型不朽果实(没有其他状态的)
 
 -------------------
 -------------------
