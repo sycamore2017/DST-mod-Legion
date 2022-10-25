@@ -28,7 +28,7 @@ end
 
 local class = {
 	--路径名
-	-- "widgets/skinlegiondialog",
+	"widgets/skinlegiondialog",
 	-- 'map/static_layouts/helpercemetery',
 	-- 'map/rooms/forest/rooms_desertsecret',
 	-- 'hotreload_legion',

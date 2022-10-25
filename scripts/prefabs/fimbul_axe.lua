@@ -56,7 +56,7 @@ local function OnUnequip(inst, owner)
 end
 
 local function OnThrown(inst, owner, target)
-    if target ~= owner then
+    if owner and owner.SoundEmitter ~= nil then
         owner.SoundEmitter:PlaySound("dontstarve/wilson/boomerang_throw")
     end
     inst.AnimState:PlayAnimation("spin_loop", true)
