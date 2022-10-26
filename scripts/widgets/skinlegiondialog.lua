@@ -512,55 +512,6 @@ function SkinLegionDialog:BuildSkinDesc(str)
     return scroll_area
 end
 
-function SkinLegionDialog:BuildSkinDesc__()
-    local function ScrollWidgetsCtor(context, index)
-        local w = Widget("skindesc-cell-".. index)
-
-        w.cell_root = w:AddChild(Text(CHATFONT, 21))
-        w.cell_root:SetColour(UICOLOURS.BROWN_DARK)
-        w.cell_root:SetHAlign(ANCHOR_LEFT)
-        w.cell_root:SetVAlign(ANCHOR_TOP)
-        w.cell_root:EnableWordWrap(true)
-        w.cell_root:SetRegionSize(220, 210)
-        w.cell_root:SetPosition(0, -0)
-
-		return w
-    end
-
-    local function ScrollWidgetSetData(context, widget, data, index)
-		widget.data = data
-		if data ~= nil then
-			widget.cell_root:Show()
-            -- widget.cell_root:SetMultilineTruncatedString(data.str, 10, 220)
-            widget.cell_root:SetString(data.str)
-			widget:Enable()
-		else
-			widget:Disable()
-			widget.cell_root:Hide()
-		end
-    end
-
-    local grid = TEMPLATES2.ScrollingGrid(
-        {},
-        {
-            context = {},
-            widget_width  = 220,
-            widget_height = 200,
-			force_peek    = true,
-            num_visible_rows = 1,
-            num_columns      = 1,
-            item_ctor_fn = ScrollWidgetsCtor,
-            apply_fn     = ScrollWidgetSetData,
-            scrollbar_offset = 20,
-            scrollbar_height_offset = -60
-        }
-    )
-
-	
-
-    return grid
-end
-
 function SkinLegionDialog:SetInteractionState(item)
     if item.context then
         item.context:SetInteractionState(item.isselected, item.isowned, item.isfocused, item.isunlockable, false)
