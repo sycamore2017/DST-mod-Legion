@@ -472,8 +472,6 @@ function SkinLegionDialog:BuildSkinDesc(str)
     w.cell_root:SetHAlign(ANCHOR_LEFT)
     w.cell_root:SetVAlign(ANCHOR_TOP)
     w.cell_root:EnableWordWrap(true)
-    -- w.cell_root:SetRegionSize(220, 210)
-    -- w.cell_root:SetString(str)
     w.cell_root:SetMultilineTruncatedString(str, 100, width)
 
     local x, y = w.cell_root:GetRegionSize()
@@ -481,33 +479,35 @@ function SkinLegionDialog:BuildSkinDesc(str)
     height = height - y
     height = math.abs(height)
 
-	local top = math.min(height, max_visible_height)/2 - padding
+	-- local top = math.min(height, max_visible_height)/2 - padding
+    local top = max_visible_height/2 - padding --固定一个高度，这样就能对齐 底部分割线
 
     local scissor_data = {x = 0, y = -max_visible_height/2, width = width, height = max_visible_height}
 	local context = {widget = w, offset = {x = 0, y = top}, size = {w = width, height = height + padding} }
-	local scrollbar = { scroll_per_click = 20*3 }
+	local scrollbar = { scroll_per_click = 20*3, h_offset = -13 }
 
     local scroll_area = TrueScrollArea(context, scissor_data, scrollbar)
 
     scroll_area.up_button:SetTextures("images/ui.xml", "arrow_scrollbar_up.tex")
-    scroll_area.up_button:SetScale(0.5)
-    scroll_area.up_button:SetPosition(-13, 96)
+    -- scroll_area.up_button:SetScale(0.5)
+    -- scroll_area.up_button:SetPosition(-13, 96)
 
 	scroll_area.down_button:SetTextures("images/ui.xml", "arrow_scrollbar_down.tex")
-    scroll_area.down_button:SetScale(0.5)
-    scroll_area.down_button:SetPosition(-13, -96)
+    -- scroll_area.down_button:SetScale(0.5)
+    -- scroll_area.down_button:SetPosition(-13, -96)
 
 	scroll_area.scroll_bar_line:SetTexture("images/ui.xml", "scrollbarline.tex")
-	scroll_area.scroll_bar_line:SetScale(.48)
-    scroll_area.scroll_bar_line:SetPosition(-13, 0)
+	scroll_area.scroll_bar_line:SetScale(.3)
+    -- scroll_area.scroll_bar_line:SetPosition(-13, 0)
 
-    scroll_area.scroll_bar:SetTexture("images/ui.xml", "scrollbarbox.tex")
-	scroll_area.scroll_bar:SetScale(.6)
-    scroll_area.scroll_bar:SetPosition(-13, 100)
+    -- scroll_area.scroll_bar:SetTextures("images/ui.xml", "scrollbarbox.tex", "scrollbarbox.tex", "scrollbarbox.tex")
+	-- scroll_area.scroll_bar:SetScale(.6)
+    -- scroll_area.scroll_bar:SetPosition(-13, 100)
 
-	scroll_area.position_marker:SetTextures("images/ui.xml", "scrollbarbox.tex")
-    scroll_area.position_marker:SetScale(.6)
-    scroll_area.position_marker:SetPosition(-13, 100)
+	scroll_area.position_marker:SetTextures("images/ui.xml", "scrollbarbox.tex", "scrollbarbox.tex", "scrollbarbox.tex")
+    scroll_area.position_marker:OnGainFocus() --获取焦点，以刷新图片
+    -- scroll_area.position_marker:SetScale(.6)
+    -- scroll_area.position_marker:SetPosition(-13, 100)
 
     return scroll_area
 end
@@ -580,6 +580,9 @@ function SkinLegionDialog:OnControl(control, down)
 end
 
 function SkinLegionDialog:Close()
+    if self.panel_iteminfo ~= nil then
+        self.panel_iteminfo:Kill()
+    end
 	self:Kill()
 end
 
