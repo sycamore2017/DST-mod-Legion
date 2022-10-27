@@ -12,17 +12,133 @@ local PopupDialogScreen = require "screens/redux/popupdialog"
 local TrueScrollArea = require "widgets/truescrollarea"
 local UIAnim = require "widgets/uianim"
 
+local function SetAnim_base(animstate, v)
+    if v.bank then
+        animstate:SetBank(v.bank)
+    end
+    if v.build then
+        animstate:SetBuild(v.build)
+    end
+    if v.anim2 == nil then
+        animstate:PlayAnimation(v.anim, v.isloop)
+    else
+        animstate:PlayAnimation(v.anim)
+        animstate:PushAnimation(v.anim2, v.isloop)
+    end
+end
+local function SetAnim_flowerbush(self, anim, data)
+    local animstate = anim:GetAnimState()
+    local tag = anim.tag_anim or 1
+    local tag_fruit = nil
+    if tag == 1 then --枯萎
+        animstate:PlayAnimation("idle_to_dead")
+        animstate:PushAnimation("dead", false)
+    elseif tag == 2 then --成长中
+        animstate:PlayAnimation("dead_to_idle")
+        animstate:PushAnimation("idle", true)
+        tag_fruit = 0
+    elseif tag == 3 then --成熟3
+        animstate:PlayAnimation("grow")
+        animstate:PushAnimation("idle", true)
+        tag_fruit = 3
+    elseif tag == 4 then --成熟2
+        animstate:PlayAnimation("grow")
+        animstate:PushAnimation("idle", true)
+        tag_fruit = 2
+    elseif tag == 5 then --成熟1
+        animstate:PlayAnimation("grow")
+        animstate:PushAnimation("idle", true)
+        tag_fruit = 1
+        tag = 0
+    end
+    if tag_fruit == 0 then
+        animstate:Hide("berries")
+        animstate:Hide("berriesmore")
+        animstate:Hide("berriesmost")
+    elseif tag_fruit == 1 then
+        animstate:Show("berries")
+        animstate:Hide("berriesmore")
+        animstate:Hide("berriesmost")
+    elseif tag_fruit == 2 then
+        animstate:Hide("berries")
+        animstate:Show("berriesmore")
+        animstate:Hide("berriesmost")
+    elseif tag_fruit == 3 then
+        animstate:Hide("berries")
+        animstate:Hide("berriesmore")
+        animstate:Show("berriesmost")
+    end
+    anim.tag_anim = tag + 1
+end
+local function SetAnim_flowerbush1(self, anim, data)
+    local animstate = anim:GetAnimState()
+    SetAnim_base(animstate, data)
+    animstate:Hide("berries")
+    animstate:Hide("berriesmore")
+    anim.tag_anim = 4
+end
+local function SetAnim_flowerbush2(self, anim, data)
+    local animstate = anim:GetAnimState()
+    SetAnim_base(animstate, data)
+    anim.tag_anim = 2
+end
+
 local width_skininfo = 260
 local SkinData = {
     rosebush_marble = {
-        height_anim = nil, --动画区域高度。默认150
+        height_anim = 160, --动画区域高度。默认150
         anims = {
             {
                 bank = "berrybush", build = "rosebush_marble",
-                anim = "idle", anim2 = nil, isloop = false,
-                fn_anim = nil, --fn(self, anim, data) 代替前面参数的自定义操作
-                x = -60, y = 20, scale = 0.32,
-                fn_click = nil, --fn(self, anim, data) 设置点击事件
+                anim = "shake", anim2 = "idle", isloop = true,
+                fn_anim = SetAnim_flowerbush1, --fn(self, anim, data) 代替前面参数的自定义操作
+                fn_click = SetAnim_flowerbush, --fn(self, anim, data) 设置点击事件
+                x = -52, y = 5, scale = 0.32
+            },
+            {
+                bank = "berrybush", build = "rosebush_marble",
+                anim = "dead", anim2 = nil, isloop = false,
+                fn_anim = SetAnim_flowerbush2,
+                fn_click = SetAnim_flowerbush,
+                x = 50, y = 5, scale = 0.32
+            }
+        }
+    },
+    lilybush_marble = {
+        height_anim = 110,
+        anims = {
+            {
+                bank = "berrybush", build = "lilybush_marble",
+                anim = "shake", anim2 = "idle", isloop = true,
+                fn_anim = SetAnim_flowerbush1,
+                fn_click = SetAnim_flowerbush,
+                x = -42, y = 5, scale = 0.32
+            },
+            {
+                bank = "berrybush", build = "lilybush_marble",
+                anim = "dead", anim2 = nil, isloop = false,
+                fn_anim = SetAnim_flowerbush2,
+                fn_click = SetAnim_flowerbush,
+                x = 40, y = 5, scale = 0.32
+            }
+        }
+    },
+    orchidbush_marble = {
+        height_anim = 180,
+        anims = {
+            {
+                bank = "berrybush", build = "orchidbush_marble",
+                anim = "shake", anim2 = "idle", isloop = true,
+                fn_anim = SetAnim_flowerbush1,
+                fn_click = SetAnim_flowerbush,
+                x = -47, y = 5, scale = 0.32
+            },
+            {
+                bank = "berrybush", build = "orchidbush_marble",
+                anim = "dead", anim2 = nil, isloop = false,
+                fn_anim = SetAnim_flowerbush2,
+                fn_click = SetAnim_flowerbush,
+                x = 45, y = 5, scale = 0.32
             }
         }
     }
@@ -542,20 +658,29 @@ function SkinLegionDialog:BuildSkinAnim(w, skindata)
     local ybase = -(skindata.height_anim or 150)
 
     for _,v in ipairs(skindata.anims) do
-        local anims = w:AddChild(UIAnim())
-        anims:SetScale(v.scale)
-        anims:SetPosition(xbase + v.x, ybase + v.y)
+        local anim = w:AddChild(UIAnim())
+        anim:SetScale(v.scale)
+        anim:SetPosition(xbase + v.x, ybase + v.y)
+        anim:SetFacing(FACING_DOWN)
 
         if v.fn_anim ~= nil then
-            v.fn_anim(self, anims, v)
+            v.fn_anim(self, anim, v)
         else
-            anims:GetAnimState():SetBank(v.bank)
-            anims:GetAnimState():SetBuild(v.build)
-            if v.anim2 == nil then
-                anims:GetAnimState():PlayAnimation(v.anim, v.isloop)
-            else
-                anims:GetAnimState():PlayAnimation(v.anim)
-                anims:GetAnimState():PushAnimation(v.anim2, v.isloop)
+            SetAnim_base(anim:GetAnimState(), v)
+        end
+
+        if v.fn_click ~= nil then
+            anim:SetClickable(true)
+            anim.OnControl = function(down, control) --down是uianim自己，不是字符串
+                if control == CONTROL_ACCEPT then --鼠标按下与弹回时
+                    if not self.anim_down then
+                        self.anim_down = true
+                        TheFrontEnd:GetSound():PlaySound("dontstarve/HUD/click_move")
+                    else
+                        self.anim_down = nil
+                        v.fn_click(self, anim, v)
+                    end
+                end
             end
         end
     end
