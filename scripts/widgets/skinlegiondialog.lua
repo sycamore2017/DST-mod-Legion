@@ -10,6 +10,23 @@ local ItemImage = require "widgets/redux/itemimage"
 local ScrollableList = require "widgets/scrollablelist"
 local PopupDialogScreen = require "screens/redux/popupdialog"
 local TrueScrollArea = require "widgets/truescrollarea"
+local UIAnim = require "widgets/uianim"
+
+local width_skininfo = 260
+local SkinData = {
+    rosebush_marble = {
+        height_anim = nil, --动画区域高度。默认150
+        anims = {
+            {
+                bank = "berrybush", build = "rosebush_marble",
+                anim = "idle", anim2 = nil, isloop = false,
+                fn_anim = nil, --fn(self, anim, data) 代替前面参数的自定义操作
+                x = -60, y = 20, scale = 0.32,
+                fn_click = nil, --fn(self, anim, data) 设置点击事件
+            }
+        }
+    }
+}
 
 local function GetCollection(skin)
     local data = SKINS_LEGION[skin]
@@ -228,7 +245,7 @@ function SkinLegionDialog:ResetItems()
                         context = nil, --存下的组件
                     }
                     table.insert(items, item)
-                    table.insert(items, item)
+                    -- table.insert(items, item)
 
                     if selected_item == nil and selected_skin ~= nil and selected_skin == skinname then
                         selected_item = item
@@ -317,12 +334,7 @@ function SkinLegionDialog:SetItemInfo(item)
             self.label_skinname = nil
             self.label_skinrarity = nil
             self.horizontal_line = nil
-            self.horizontal_line2 = nil
-            self.label_skinaccess = nil
-            self.label_skindescitem = nil
-            self.horizontal_line3 = nil
             self.scroll_skindesc = nil
-            -- self.button_access = nil --获取按钮(tip: 皮肤获取通道删除)
         end
     else
         if self.selected_item ~= nil then
@@ -336,11 +348,9 @@ function SkinLegionDialog:SetItemInfo(item)
         self:SetInteractionState(item)
         self.selected_item = item
 
-        local startpos_x = 168
-        local startpos_y = 224
         if self.panel_iteminfo == nil then
             self.panel_iteminfo = self.proot:AddChild(Widget("SkinItemInfo"))
-            self.panel_iteminfo:SetPosition(startpos_x, startpos_y)
+            self.panel_iteminfo:SetPosition(168, 224)
         end
 
         --皮肤名称
@@ -370,52 +380,12 @@ function SkinLegionDialog:SetItemInfo(item)
             self.horizontal_line:SetPosition(0, -38)
         end
 
-        --中部分割线
-        if self.horizontal_line2 == nil then
-            self.horizontal_line2 = self.panel_iteminfo:AddChild(Image("images/quagmire_recipebook.xml", "quagmire_recipe_line.tex"))
-            self.horizontal_line2:SetScale(.36, .25)
-            self.horizontal_line2:SetPosition(0, -180)
-        end
-
-        --皮肤获取方式描述
-        if self.label_skinaccess == nil then
-            self.label_skinaccess = self.panel_iteminfo:AddChild(Text(HEADERFONT, 21))
-            self.label_skinaccess:SetHAlign(ANCHOR_LEFT)
-            self.label_skinaccess:SetRegionSize(200, 20)
-            self.label_skinaccess:SetColour(UICOLOURS.BRONZE)
-            self.label_skinaccess:SetPosition(0, -190)
-        end
-        self.label_skinaccess:SetString(GetAccess(item.item_key))
-
-        --皮肤包含项描述
-        if self.label_skindescitem == nil then
-            self.label_skindescitem = self.panel_iteminfo:AddChild(Text(CHATFONT, 20))
-            self.label_skindescitem:SetPosition(0, -218)
-            self.label_skindescitem:SetColour(UICOLOURS.BROWN_DARK)
-            self.label_skindescitem:SetHAlign(ANCHOR_LEFT)
-            self.label_skindescitem:SetVAlign(ANCHOR_TOP)
-            self.label_skindescitem:EnableWordWrap(true)
-            self.label_skindescitem:SetRegionSize(200, 40)
-        end
-        self.label_skindescitem:SetString(GetDescItem(item.item_key))
-
-        --底部分割线
-        if self.horizontal_line3 == nil then
-            self.horizontal_line3 = self.panel_iteminfo:AddChild(Image("images/quagmire_recipebook.xml", "quagmire_recipe_line.tex"))
-            self.horizontal_line3:SetScale(.36, -.25)
-            self.horizontal_line3:SetPosition(0, -236)
-        end
-
-        --动画展示区域 undo
-
-        ------
-
-        --皮肤小故事
+        --滑动区域
         if self.scroll_skindesc ~= nil then
             self.scroll_skindesc:Kill()
         end
-        self.scroll_skindesc = self.panel_iteminfo:AddChild( self:BuildSkinDesc(GetDescription(item.item_key)) )
-        self.scroll_skindesc:SetPosition(-108, -340)
+        self.scroll_skindesc = self.panel_iteminfo:AddChild( self:BuildSkinDesc(item) )
+        self.scroll_skindesc:SetPosition(-128, -242)
 
         --获取按钮(tip: 皮肤获取通道删除)
         --[[
@@ -459,45 +429,96 @@ function SkinLegionDialog:SetItemInfo(item)
     end
 end
 
-function SkinLegionDialog:BuildSkinDesc(str)
-    local width = 220
+function SkinLegionDialog:BuildSkinDesc(item)
+    local width = width_skininfo
     local height = 0
-    local max_visible_height = 195
+    local max_visible_height = 390
 	local padding = 5
-    local left = 0
+    local left = 20
 
-    local w = Widget("skindesc_text")
-    w.cell_root = w:AddChild(Text(CHATFONT, 21))
-    w.cell_root:SetColour(UICOLOURS.BROWN_DARK)
-    w.cell_root:SetHAlign(ANCHOR_LEFT)
-    w.cell_root:SetVAlign(ANCHOR_TOP)
-    w.cell_root:EnableWordWrap(true)
-    w.cell_root:SetMultilineTruncatedString(str, 100, width)
+    local x, y
+    local height_anim = 150 --动画区域的高度
+    local height_line = 10 --分割线高度
+    local height_lag = 3 --项与项之间的间隔
 
-    local x, y = w.cell_root:GetRegionSize()
-    w.cell_root:SetPosition(left + 0.5 * x, height - 0.5 * y)
+    local w = Widget("scroll_skin_root")
+
+    --动画区域
+    local skindata = SkinData[item.item_key]
+    if skindata then
+        if skindata.height_anim then
+            height_anim = skindata.height_anim
+        end
+        self:BuildSkinAnim(w, skindata)
+    end
+    height = height - height_anim - height_lag
+
+    --动画分割线
+    local line1 = w:AddChild(Image("images/quagmire_recipebook.xml", "quagmire_recipe_line.tex"))
+    line1:SetScale(.36, .25)
+    line1:SetPosition(0.5*width, height - 0.5*height_line)
+    height = height - height_line - height_lag
+
+    --皮肤获取方式描述
+    local label_skinaccess = w:AddChild(Text(HEADERFONT, 21))
+    label_skinaccess:SetHAlign(ANCHOR_LEFT)
+    label_skinaccess:SetRegionSize(200, 20)
+    label_skinaccess:SetColour(UICOLOURS.BRONZE)
+    label_skinaccess:SetString(GetAccess(item.item_key))
+    x, y = label_skinaccess:GetRegionSize()
+    label_skinaccess:SetPosition(left + 0.5*x, height - 0.5*y)
     height = height - y
+
+    --皮肤包含项描述
+    local label_skindescitem = w:AddChild(Text(CHATFONT, 20))
+    label_skindescitem:SetColour(UICOLOURS.BROWN_DARK)
+    label_skindescitem:SetHAlign(ANCHOR_LEFT)
+    label_skindescitem:SetVAlign(ANCHOR_TOP)
+    label_skindescitem:EnableWordWrap(true)
+    label_skindescitem:SetRegionSize(200, 36)
+    label_skindescitem:SetString(GetDescItem(item.item_key))
+    x, y = label_skindescitem:GetRegionSize()
+    label_skindescitem:SetPosition(left + 0.5*x, height - 0.5*y)
+    height = height - y - height_lag
+
+    --故事分割线
+    local line2 = w:AddChild(Image("images/quagmire_recipebook.xml", "quagmire_recipe_line.tex"))
+    line2:SetScale(.36, -0.25)
+    line2:SetPosition(0.5*width, height - 0.5*height_line)
+    height = height - height_line - height_lag
+
+    --短篇故事
+    local text_story = w:AddChild(Text(CHATFONT, 21))
+    text_story:SetColour(UICOLOURS.BROWN_DARK)
+    text_story:SetHAlign(ANCHOR_LEFT)
+    text_story:SetVAlign(ANCHOR_TOP)
+    text_story:EnableWordWrap(true)
+    text_story:SetMultilineTruncatedString(GetDescription(item.item_key), 100, 220)
+    x, y = text_story:GetRegionSize()
+    text_story:SetPosition(left + 0.5*x, height - 0.5*y)
+    height = height - y - height_lag
+
     height = math.abs(height)
 
 	-- local top = math.min(height, max_visible_height)/2 - padding
-    local top = max_visible_height/2 - padding --固定一个高度，这样就能对齐 底部分割线
+    local top = max_visible_height/2 - padding --固定一个高度，这样就能对齐 标题分割线
 
     local scissor_data = {x = 0, y = -max_visible_height/2, width = width, height = max_visible_height}
 	local context = {widget = w, offset = {x = 0, y = top}, size = {w = width, height = height + padding} }
-	local scrollbar = { scroll_per_click = 20*3, h_offset = -13 }
+	local scrollbar = { scroll_per_click = 20*3, h_offset = -33 }
 
     local scroll_area = TrueScrollArea(context, scissor_data, scrollbar)
 
     scroll_area.up_button:SetTextures("images/ui.xml", "arrow_scrollbar_up.tex")
-    -- scroll_area.up_button:SetScale(0.5)
+    scroll_area.up_button:SetScale(0.4)
     -- scroll_area.up_button:SetPosition(-13, 96)
 
 	scroll_area.down_button:SetTextures("images/ui.xml", "arrow_scrollbar_down.tex")
-    -- scroll_area.down_button:SetScale(0.5)
+    scroll_area.down_button:SetScale(0.4)
     -- scroll_area.down_button:SetPosition(-13, -96)
 
 	scroll_area.scroll_bar_line:SetTexture("images/ui.xml", "scrollbarline.tex")
-	scroll_area.scroll_bar_line:SetScale(.3)
+	scroll_area.scroll_bar_line:SetScale(.9)
     -- scroll_area.scroll_bar_line:SetPosition(-13, 0)
 
     -- scroll_area.scroll_bar:SetTextures("images/ui.xml", "scrollbarbox.tex", "scrollbarbox.tex", "scrollbarbox.tex")
@@ -506,10 +527,38 @@ function SkinLegionDialog:BuildSkinDesc(str)
 
 	scroll_area.position_marker:SetTextures("images/ui.xml", "scrollbarbox.tex", "scrollbarbox.tex", "scrollbarbox.tex")
     scroll_area.position_marker:OnGainFocus() --获取焦点，以刷新图片
-    -- scroll_area.position_marker:SetScale(.6)
+    scroll_area.position_marker:SetScale(.45)
     -- scroll_area.position_marker:SetPosition(-13, 100)
 
     return scroll_area
+end
+
+function SkinLegionDialog:BuildSkinAnim(w, skindata)
+    if skindata.anims == nil then
+        return
+    end
+
+    local xbase = width_skininfo/2
+    local ybase = -(skindata.height_anim or 150)
+
+    for _,v in ipairs(skindata.anims) do
+        local anims = w:AddChild(UIAnim())
+        anims:SetScale(v.scale)
+        anims:SetPosition(xbase + v.x, ybase + v.y)
+
+        if v.fn_anim ~= nil then
+            v.fn_anim(self, anims, v)
+        else
+            anims:GetAnimState():SetBank(v.bank)
+            anims:GetAnimState():SetBuild(v.build)
+            if v.anim2 == nil then
+                anims:GetAnimState():PlayAnimation(v.anim, v.isloop)
+            else
+                anims:GetAnimState():PlayAnimation(v.anim)
+                anims:GetAnimState():PushAnimation(v.anim2, v.isloop)
+            end
+        end
+    end
 end
 
 function SkinLegionDialog:SetInteractionState(item)
