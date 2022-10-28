@@ -109,6 +109,21 @@ local function InitPlayerSymbol(animstate, data)
             animstate:Show("ARM_carry")
             animstate:Hide("ARM_normal")
         elseif v.type == 2 then --普通戴帽
+            animstate:Show("HAT")
+            animstate:Show("HAIR_HAT")
+            animstate:Hide("HAIR_NOHAT")
+            animstate:Hide("HAIR")
+
+            animstate:Hide("HEAD")
+            animstate:Show("HEAD_HAT")
+        elseif v.type == 3 then --开放戴帽
+            animstate:Show("HAT")
+            animstate:Hide("HAIR_HAT")
+            animstate:Show("HAIR_NOHAT")
+            animstate:Show("HAIR")
+
+            animstate:Show("HEAD")
+            animstate:Hide("HEAD_HAT")
         end
     end
 end
@@ -139,6 +154,43 @@ local function SetAnim_player2(self, anim, data)
         anim:SetFacing(FACING_LEFT)
         tag = 0
     else
+        tag = 0
+    end
+    anim.tag_anim = tag + 1
+end
+
+local function SetAnim_shuck(self, anim, data)
+    local animstate = anim:GetAnimState()
+    local tag = anim.tag_anim or 2
+    if tag == 1 then
+        animstate:PlayAnimation("cocoon_small_hit")
+        animstate:PushAnimation("cocoon_small", true)
+    elseif tag == 2 then
+        animstate:PlayAnimation("cocoon_dead", false)
+        tag = 0
+    else
+        tag = 0
+    end
+    anim.tag_anim = tag + 1
+end
+
+local function SetAnim_heatrock(self, anim, data)
+    local animstate = anim:GetAnimState()
+    SetAnim_base(animstate, data)
+    for _,v in ipairs(data.symbol) do
+        animstate:OverrideSymbol(v.symbol, v.build, v.file)
+    end
+end
+local function SetAnim_heatrock2(self, anim, data)
+    local animstate = anim:GetAnimState()
+    local tag
+    if anim.tag_anim == nil then
+        tag = data.tag_start or 1
+    else
+        tag = anim.tag_anim
+    end
+    animstate:PlayAnimation(tostring(tag), true)
+    if tag >= 5 then
         tag = 0
     end
     anim.tag_anim = tag + 1
@@ -176,7 +228,7 @@ local SkinData = {
             {
                 bank = "rosorns_marble", build = "rosorns_marble",
                 anim = "idle_cover", anim2 = nil, isloop = false,
-                x = -30, y = 0, scale = 0.38
+                x = -25, y = 0, scale = 0.38
             },
             {
                 symbol = {
@@ -184,7 +236,12 @@ local SkinData = {
                 },
                 fn_anim = SetAnim_player,
                 fn_click = SetAnim_player2,
-                x = 50, y = 0, scale = 0.38
+                x = 45, y = 0, scale = 0.38
+            },
+            {
+                bank = "boomerang", build = "rosorns_marble_fx",
+                anim = "used", anim2 = nil, isloop = false,
+                x = -50, y = -40, scale = 0.34
             }
         }
     },
@@ -213,12 +270,12 @@ local SkinData = {
             {
                 bank = "lileaves_marble", build = "lileaves_marble",
                 anim = "idle", anim2 = nil, isloop = false,
-                x = -80, y = 0, scale = 0.38
+                x = -75, y = 0, scale = 0.38
             },
             {
                 bank = "lileaves_marble", build = "lileaves_marble",
                 anim = "idle_cover", anim2 = nil, isloop = false,
-                x = -35, y = 0, scale = 0.38
+                x = -30, y = 0, scale = 0.38
             },
             {
                 symbol = {
@@ -226,7 +283,7 @@ local SkinData = {
                 },
                 fn_anim = SetAnim_player,
                 fn_click = SetAnim_player2,
-                x = 50, y = 0, scale = 0.38
+                x = 45, y = 0, scale = 0.38
             }
         }
     },
@@ -268,7 +325,12 @@ local SkinData = {
                 },
                 fn_anim = SetAnim_player,
                 fn_click = SetAnim_player2,
-                x = 50, y = 0, scale = 0.38
+                x = 45, y = 0, scale = 0.38
+            },
+            {
+                bank = "lavaarena_heal_projectile", build = "impact_orchid_fx_marble",
+                anim = "hit", anim2 = nil, isloop = false,
+                x = -50, y = 0, scale = 0.3
             }
         }
     },
@@ -310,7 +372,12 @@ local SkinData = {
                 },
                 fn_anim = SetAnim_player,
                 fn_click = SetAnim_player2,
-                x = 50, y = 0, scale = 0.38
+                x = 45, y = 0, scale = 0.38
+            },
+            {
+                bank = "lavaarena_heal_projectile", build = "impact_orchid_fx_disguiser",
+                anim = "hit", anim2 = nil, isloop = false,
+                x = -50, y = 0, scale = 0.32
             }
         }
     },
@@ -362,7 +429,352 @@ local SkinData = {
                 },
                 fn_anim = SetAnim_player,
                 fn_click = SetAnim_player2,
-                x = 50, y = 0, scale = 0.38
+                x = 45, y = 0, scale = 0.38
+            }
+        }
+    },
+    hat_lichen_emo_que = {
+        height_anim = 145,
+        anims = {
+            {
+                bank = "hat_lichen_emo_que", build = "hat_lichen_emo_que",
+                anim = "idle", anim2 = nil, isloop = false,
+                x = -45, y = 5, scale = 0.38
+            },
+            {
+                symbol = {
+                    { symbol = "swap_hat", build = "hat_lichen_emo_que", file = "swap_hat", type = 3 },
+                },
+                fn_anim = SetAnim_player,
+                fn_click = SetAnim_player2,
+                x = 45, y = 0, scale = 0.38
+            }
+        }
+    },
+    hat_lichen_disguiser = {
+        height_anim = 150,
+        anims = {
+            {
+                bank = "hat_lichen_disguiser", build = "hat_lichen_disguiser",
+                anim = "idle", anim2 = nil, isloop = false,
+                x = -45, y = 7, scale = 0.38
+            },
+            {
+                symbol = {
+                    { symbol = "swap_hat", build = "hat_lichen_disguiser", file = "swap_hat", type = 2 },
+                },
+                fn_anim = SetAnim_player,
+                fn_click = SetAnim_player2,
+                x = 45, y = 0, scale = 0.38
+            }
+        }
+    },
+    hat_cowboy_tvplay = {
+        height_anim = 150,
+        anims = {
+            {
+                bank = "hat_cowboy_tvplay", build = "hat_cowboy_tvplay",
+                anim = "idle", anim2 = nil, isloop = false,
+                x = -45, y = 10, scale = 0.38
+            },
+            {
+                symbol = {
+                    { symbol = "swap_hat", build = "hat_cowboy_tvplay", file = "swap_hat", type = 2 },
+                    { symbol = "swap_body", build = "hat_cowboy_tvplay", file = "swap_body", type = nil }
+                },
+                fn_anim = SetAnim_player,
+                fn_click = SetAnim_player2,
+                x = 45, y = 0, scale = 0.38
+            }
+        }
+    },
+    boltwingout_disguiser = {
+        height_anim = 140,
+        anims = {
+            {
+                bank = "spider_cocoon", build = "boltwingout_shuck_disguiser",
+                anim = "cocoon_small_hit", anim2 = "cocoon_small", isloop = true,
+                fn_click = SetAnim_shuck,
+                x = -10, y = 10, scale = 0.35
+            },
+            {
+                bank = "boltwingout_disguiser", build = "boltwingout_disguiser",
+                anim = "idle", anim2 = nil, isloop = false,
+                x = -70, y = 10, scale = 0.38
+            },
+            {
+                symbol = {
+                    { symbol = "swap_body", build = "boltwingout_disguiser", file = "swap_body", type = nil }
+                },
+                fn_anim = SetAnim_player,
+                fn_click = SetAnim_player2,
+                x = 70, y = 0, scale = 0.38
+            },
+            {
+                bank = "lavaarena_heal_projectile", build = "boltwingout_fx_disguiser",
+                anim = "hit", anim2 = nil, isloop = false,
+                x = -10, y = 0, scale = 0.3
+            },
+        }
+    },
+    fishhomingtool_awesome_thanks = {
+        height_anim = 280,
+        anims = {
+            {
+                bank = "fishhomingtool_normal_thanks", build = "fishhomingtool_normal_thanks",
+                anim = "idle", anim2 = nil, isloop = false,
+                x = -70, y = 210, scale = 0.38
+            },
+            {
+                bank = "fishhomingtool_awesome_thanks", build = "fishhomingtool_awesome_thanks",
+                anim = "idle", anim2 = nil, isloop = false,
+                x = -25, y = 150, scale = 0.38
+            },
+            {
+                symbol = {
+                    { symbol = "swap_object", build = "fishhomingtool_awesome_thanks", file = "swap", type = 1 }
+                },
+                fn_anim = SetAnim_player,
+                fn_click = SetAnim_player2,
+                x = 45, y = 140, scale = 0.38
+            },
+            {
+                bank = "fishhomingbait_thanks", build = "fishhomingbait_thanks",
+                anim = "idle2", anim2 = nil, isloop = false,
+                x = -80, y = 75, scale = 0.38
+            },
+            {
+                bank = "fishhomingbait_thanks", build = "fishhomingbait_thanks",
+                anim = "idle3", anim2 = nil, isloop = false,
+                x = -30, y = 55, scale = 0.38
+            },
+            {
+                bank = "fishhomingbait_thanks", build = "fishhomingbait_thanks",
+                anim = "idle1", anim2 = nil, isloop = false,
+                x = -65, y = 5, scale = 0.38
+            },
+            {
+                symbol = {
+                    { symbol = "swap_object", build = "fishhomingbait_thanks", file = "swap2", type = 1 }
+                },
+                fn_anim = SetAnim_player,
+                fn_click = SetAnim_player2,
+                x = 45, y = 0, scale = 0.38
+            }
+        }
+    },
+    shield_l_log_emo_pride = {
+        height_anim = 140,
+        anims = {
+            {
+                bank = "shield_l_log_emo_pride", build = "shield_l_log_emo_pride",
+                anim = "idle", anim2 = nil, isloop = false,
+                x = -45, y = 3, scale = 0.38
+            },
+            {
+                symbol = {
+                    { symbol = "lantern_overlay", build = "shield_l_log_emo_pride", file = "swap_shield", type = 1 }
+                },
+                fn_anim = SetAnim_player,
+                fn_click = SetAnim_player2,
+                x = 45, y = 0, scale = 0.38
+            },
+            {
+                bank = "lavaarena_beetletaur_fx", build = "lavaarena_beetletaur_fx",
+                anim = "defend_fx", anim2 = nil, isloop = false,
+                x = -50, y = 30, scale = 0.22
+            }
+        }
+    },
+    shield_l_log_emo_fist = {
+        height_anim = 140,
+        anims = {
+            {
+                bank = "shield_l_log_emo_fist", build = "shield_l_log_emo_fist",
+                anim = "idle", anim2 = nil, isloop = false,
+                x = -45, y = 3, scale = 0.38
+            },
+            {
+                symbol = {
+                    { symbol = "lantern_overlay", build = "shield_l_log_emo_fist", file = "swap_shield", type = 1 }
+                },
+                fn_anim = SetAnim_player,
+                fn_click = SetAnim_player2,
+                x = 45, y = 0, scale = 0.38
+            },
+            {
+                bank = "lavaarena_beetletaur_fx", build = "lavaarena_beetletaur_fx",
+                anim = "defend_fx", anim2 = nil, isloop = false,
+                x = -45, y = 27, scale = 0.22
+            }
+        }
+    },
+    shield_l_log_era = {
+        height_anim = 140,
+        anims = {
+            {
+                bank = "shield_l_log_era", build = "shield_l_log_era",
+                anim = "idle", anim2 = nil, isloop = false,
+                x = -45, y = 1, scale = 0.38
+            },
+            {
+                symbol = {
+                    { symbol = "lantern_overlay", build = "shield_l_log_era", file = "swap_shield", type = 1 }
+                },
+                fn_anim = SetAnim_player,
+                fn_click = SetAnim_player2,
+                x = 45, y = 0, scale = 0.38
+            },
+            {
+                bank = "lavaarena_beetletaur_fx", build = "lavaarena_beetletaur_fx",
+                anim = "defend_fx", anim2 = nil, isloop = false,
+                x = -45, y = 30, scale = 0.22
+            }
+        }
+    },
+    shield_l_sand_era = {
+        height_anim = 140,
+        anims = {
+            {
+                bank = "shield_l_sand_era", build = "shield_l_sand_era",
+                anim = "idle", anim2 = nil, isloop = false,
+                x = -45, y = 1, scale = 0.38
+            },
+            {
+                symbol = {
+                    { symbol = "lantern_overlay", build = "shield_l_sand_era", file = "swap_shield", type = 1 }
+                },
+                fn_anim = SetAnim_player,
+                fn_click = SetAnim_player2,
+                x = 45, y = 0, scale = 0.38
+            },
+            {
+                bank = "lavaarena_beetletaur_fx", build = "lavaarena_beetletaur_fx",
+                anim = "defend_fx", anim2 = nil, isloop = false,
+                x = -45, y = 30, scale = 0.22
+            }
+        }
+    },
+    shield_l_sand_op = {
+        height_anim = 140,
+        anims = {
+            {
+                bank = "shield_l_sand_op", build = "shield_l_sand_op",
+                anim = "idle", anim2 = nil, isloop = false,
+                x = -45, y = 3, scale = 0.38
+            },
+            {
+                symbol = {
+                    { symbol = "lantern_overlay", build = "shield_l_sand_op", file = "swap_shield", type = 1 }
+                },
+                fn_anim = SetAnim_player,
+                fn_click = SetAnim_player2,
+                x = 45, y = 0, scale = 0.38
+            },
+            {
+                bank = "lavaarena_beetletaur_fx", build = "lavaarena_beetletaur_fx",
+                anim = "defend_fx", anim2 = nil, isloop = false,
+                x = -40, y = 33, scale = 0.22
+            }
+        }
+    },
+    icire_rock_era = {
+        height_anim = 170,
+        anims = {
+            { --上
+                bank = "heat_rock", build = "heat_rock",
+                anim = "3", anim2 = nil, isloop = true,
+                tag_start = 4, symbol = {
+                    { symbol = "rock", build = "icire_rock_era", file = "rock" },
+                    { symbol = "shadow", build = "icire_rock_era", file = "shadow" }
+                },
+                fn_anim = SetAnim_heatrock,
+                fn_click = SetAnim_heatrock2,
+                x = 0, y = 13+90, scale = 0.38
+            },
+            { --右1
+                bank = "heat_rock", build = "heat_rock",
+                anim = "4", anim2 = nil, isloop = true,
+                tag_start = 5, symbol = {
+                    { symbol = "rock", build = "icire_rock_era", file = "rock" },
+                    { symbol = "shadow", build = "icire_rock_era", file = "shadow" }
+                },
+                fn_anim = SetAnim_heatrock,
+                fn_click = SetAnim_heatrock2,
+                x = 70, y = 13+65, scale = 0.38
+            },
+            { --右2
+                bank = "heat_rock", build = "heat_rock",
+                anim = "5", anim2 = nil, isloop = true,
+                tag_start = 1, symbol = {
+                    { symbol = "rock", build = "icire_rock_era", file = "rock" },
+                    { symbol = "shadow", build = "icire_rock_era", file = "shadow" }
+                },
+                fn_anim = SetAnim_heatrock,
+                fn_click = SetAnim_heatrock2,
+                x = 42, y = 13, scale = 0.38
+            },
+            { --左1
+                bank = "heat_rock", build = "heat_rock",
+                anim = "2", anim2 = nil, isloop = true,
+                tag_start = 3, symbol = {
+                    { symbol = "rock", build = "icire_rock_era", file = "rock" },
+                    { symbol = "shadow", build = "icire_rock_era", file = "shadow" }
+                },
+                fn_anim = SetAnim_heatrock,
+                fn_click = SetAnim_heatrock2,
+                x = -70, y = 13+65, scale = 0.38
+            },
+            { --左2
+                bank = "heat_rock", build = "heat_rock",
+                anim = "1", anim2 = nil, isloop = true,
+                tag_start = 2, symbol = {
+                    { symbol = "rock", build = "icire_rock_era", file = "rock" },
+                    { symbol = "shadow", build = "icire_rock_era", file = "shadow" }
+                },
+                fn_anim = SetAnim_heatrock,
+                fn_click = SetAnim_heatrock2,
+                x = -42, y = 13, scale = 0.38
+            }
+        }
+    },
+    icire_rock_collector = {
+        height_anim = 160,
+        anims = {
+            { --上
+                bank = "icire_rock_collector", build = "icire_rock_collector",
+                anim = "3", anim2 = nil, isloop = true,
+                tag_start = 4,
+                fn_click = SetAnim_heatrock2,
+                x = 0, y = 13+90, scale = 0.38
+            },
+            { --右1
+                bank = "icire_rock_collector", build = "icire_rock_collector",
+                anim = "4", anim2 = nil, isloop = true,
+                tag_start = 5,
+                fn_click = SetAnim_heatrock2,
+                x = 70, y = 13+65, scale = 0.38
+            },
+            { --右2
+                bank = "icire_rock_collector", build = "icire_rock_collector",
+                anim = "5", anim2 = nil, isloop = true,
+                tag_start = 1,
+                fn_click = SetAnim_heatrock2,
+                x = 42, y = 13, scale = 0.38
+            },
+            { --左1
+                bank = "icire_rock_collector", build = "icire_rock_collector",
+                anim = "2", anim2 = nil, isloop = true,
+                tag_start = 3,
+                fn_click = SetAnim_heatrock2,
+                x = -70, y = 13+65, scale = 0.38
+            },
+            { --左2
+                bank = "icire_rock_collector", build = "icire_rock_collector",
+                anim = "1", anim2 = nil, isloop = true,
+                tag_start = 2,
+                fn_click = SetAnim_heatrock2,
+                x = -42, y = 13, scale = 0.38
             }
         }
     },
