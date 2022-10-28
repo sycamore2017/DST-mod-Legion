@@ -778,6 +778,189 @@ local SkinData = {
             }
         }
     },
+    lilybush_era = {
+        height_anim = 280,
+        anims = {
+            {
+                bank = "berrybush2", build = "lilybush_era",
+                anim = "dead", anim2 = nil, isloop = false,
+                fn_anim = SetAnim_flowerbush2,
+                fn_click = SetAnim_flowerbush,
+                x = 65, y = 138, scale = 0.32
+            },
+            {
+                bank = "berrybush2", build = "lilybush_era",
+                anim = "shake", anim2 = "idle", isloop = true,
+                fn_anim = SetAnim_flowerbush1,
+                fn_click = SetAnim_flowerbush,
+                x = -27, y = 138, scale = 0.32
+            },
+            {
+                bank = "lileaves_era", build = "lileaves_era",
+                anim = "idle", anim2 = nil, isloop = false,
+                x = -83, y = 0, scale = 0.38
+            },
+            {
+                bank = "lileaves_era", build = "lileaves_era",
+                anim = "idle_cover", anim2 = nil, isloop = false,
+                x = -30, y = 0, scale = 0.38
+            },
+            {
+                symbol = {
+                    { symbol = "swap_object", build = "lileaves_era", file = "swap_object", type = 1 },
+                },
+                fn_anim = SetAnim_player,
+                fn_click = SetAnim_player2,
+                x = 45, y = 0, scale = 0.38
+            }
+        }
+    },
+    triplegoldenshovelaxe_era = {
+        height_anim = 265,
+        anims = {
+            {
+                bank = "tripleshovelaxe_era", build = "tripleshovelaxe_era",
+                anim = "idle", anim2 = nil, isloop = false,
+                x = -40, y = 130, scale = 0.38
+            },
+            {
+                symbol = {
+                    { symbol = "swap_object", build = "tripleshovelaxe_era", file = "swap", type = 1 },
+                },
+                fn_anim = SetAnim_player,
+                fn_click = SetAnim_player2,
+                x = 35, y = 130, scale = 0.38
+            },
+            {
+                bank = "triplegoldenshovelaxe_era", build = "triplegoldenshovelaxe_era",
+                anim = "idle", anim2 = nil, isloop = false,
+                x = -40, y = 0, scale = 0.38
+            },
+            {
+                symbol = {
+                    { symbol = "swap_object", build = "triplegoldenshovelaxe_era", file = "swap", type = 1 },
+                },
+                fn_anim = SetAnim_player,
+                fn_click = SetAnim_player2,
+                x = 35, y = 0, scale = 0.38
+            }
+        }
+    },
+    rosebush_collector = {
+        height_anim = 360,
+        anims = {
+            {
+                bank = "berrybush", build = "rosebush_collector",
+                anim = "dead", anim2 = nil, isloop = false,
+                fn_anim = SetAnim_flowerbush2,
+                fn_click = SetAnim_flowerbush,
+                x = 55, y = 143, scale = 0.28
+            },
+            {
+                bank = "berrybush", build = "rosebush_collector",
+                anim = "shake", anim2 = "idle", isloop = true,
+                fn_anim = SetAnim_flowerbush1,
+                fn_click = SetAnim_flowerbush,
+                x = -40, y = 143, scale = 0.28
+            },
+            {
+                bank = "rosorns_collector", build = "rosorns_collector",
+                anim = "idle", anim2 = nil, isloop = true,
+                x = -83, y = 0, scale = 0.38
+            },
+            {
+                bank = "rosorns_collector", build = "rosorns_collector",
+                anim = "idle_cover", anim2 = nil, isloop = true,
+                x = -30, y = 0, scale = 0.38
+            },
+            {
+                symbol = {
+                    { symbol = "swap_object", build = "rosorns_collector", file = "swap_object", type = 1 },
+                },
+                fn_anim = SetAnim_player,
+                fn_click = SetAnim_player2,
+                x = 45, y = 0, scale = 0.38
+            },
+            {
+                bank = "lavaarena_heal_projectile", build = "rosorns_collector_fx",
+                anim = "cast", anim2 = nil, isloop = false,
+                x = -30, y = 15, scale = 0.4
+            }
+        }
+    },
+    fimbul_axe_collector = {
+        height_anim = 265,
+        anims = {
+            {
+                bank = "fimbul_axe_collector", build = "fimbul_axe_collector",
+                anim = "idle", anim2 = nil, isloop = false,
+                x = -70, y = 130, scale = 0.38
+            },
+            {
+                symbol = {
+                    { symbol = "swap_object", build = "fimbul_axe_collector", file = "swap_base", type = 1 },
+                },
+                fn_anim = SetAnim_player,
+                fn_click = SetAnim_player2,
+                x = 25, y = 130, scale = 0.38
+            },
+            {
+                bank = "fimbul_axe_collector", build = "fimbul_axe_collector",
+                anim = "spin_loop", anim2 = nil, isloop = true,
+                x = -50, y = 0, scale = 0.38
+            },
+            {
+                symbol = {
+                    { symbol = "swap_object", build = "fimbul_axe_collector", file = "swap_throw", type = 1 },
+                },
+                fn_anim = SetAnim_player,
+                fn_click = SetAnim_player2,
+                x = 35, y = 0, scale = 0.38
+            },
+            {
+                bank = "fimbul_axe_collector3_fx", build = "fimbul_axe_collector3_fx",
+                anim = "idle", anim2 = "nil", isloop = false,
+                x = -50, y = 0, scale = 0.4
+            },
+            {
+                bank = "explode", build = "fimbul_axe_collector2_fx",
+                anim = "small_firecrackers", anim2 = nil, isloop = false,
+                x = -50, y = -15, scale = 0.4
+            },
+            {
+                bank = "fimbul_axe_collector", build = "fimbul_axe_collector",
+                anim = "star1", anim2 = "nil", isloop = false,
+                x = -20, y = 100, scale = 0.4
+            },
+            {
+                bank = "fimbul_axe_collector", build = "fimbul_axe_collector",
+                anim = "star3", anim2 = "nil", isloop = false,
+                x = -70, y = 80, scale = 0.4
+            },
+            {
+                bank = "fimbul_axe_collector", build = "fimbul_axe_collector",
+                anim = "star2", anim2 = "nil", isloop = false,
+                x = -55, y = 60, scale = 0.4
+            }
+        }
+    },
+    siving_turn_collector = {
+        height_anim = 200,
+        anims = {
+            {
+                bank = "siving_turn_collector", build = "siving_turn_collector",
+                anim = "on", anim2 = nil, isloop = true,
+                fn_anim = function(self, anim, data)
+                    local animstate = anim:GetAnimState()
+                    animstate:SetBank(data.bank)
+                    animstate:SetBuild(data.bank)
+                    animstate:PlayAnimation(data.anim, data.isloop)
+                end,
+                x = -60, y = 8, scale = 0.3
+            },
+            
+        }
+    },
 }
 
 local function GetCollection(skin)
