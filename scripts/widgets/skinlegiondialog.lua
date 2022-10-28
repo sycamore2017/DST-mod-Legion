@@ -12,6 +12,16 @@ local PopupDialogScreen = require "screens/redux/popupdialog"
 local TrueScrollArea = require "widgets/truescrollarea"
 local UIAnim = require "widgets/uianim"
 
+local AnimModels = {
+    "wilson", "willow", "wendy", "wolfgang", "wx78", "wickerbottom", "woodie", "waxwell", "wathgrithr",
+    "webber", "winona", "warly"
+}
+local AnimNames = {
+    "research", "emoteXL_sad", "emoteXL_annoyed", "emoteXL_happycheer", "emoteXL_waving4",
+    "emoteXL_waving1", "emoteXL_waving2", "emoteXL_waving3", "emoteXL_loop_dance0", "emoteXL_bonesaw",
+    "emoteXL_facepalm", "emoteXL_kiss", "emote_strikepose"
+}
+
 local function SetAnim_base(animstate, v)
     if v.bank then
         animstate:SetBank(v.bank)
@@ -50,6 +60,8 @@ local function SetAnim_flowerbush(self, anim, data)
         animstate:PushAnimation("idle", true)
         tag_fruit = 1
         tag = 0
+    else
+        tag = 0
     end
     if tag_fruit == 0 then
         animstate:Hide("berries")
@@ -83,6 +95,55 @@ local function SetAnim_flowerbush2(self, anim, data)
     anim.tag_anim = 2
 end
 
+local function InitPlayerSymbol(animstate, data)
+    animstate:Hide("ARM_carry")
+    animstate:Hide("HAT")
+    animstate:Hide("HAIR_HAT")
+    animstate:Show("HAIR_NOHAT")
+    animstate:Show("HAIR")
+    animstate:Show("HEAD")
+    animstate:Hide("HEAD_HAT")
+    for _,v in ipairs(data.symbol) do
+        animstate:OverrideSymbol(v.symbol, v.build, v.file)
+        if v.type == 1 then --普通手持
+            animstate:Show("ARM_carry")
+            animstate:Hide("ARM_normal")
+        elseif v.type == 2 then --普通戴帽
+        end
+    end
+end
+local function SetAnim_player(self, anim, data)
+    local animstate = anim:GetAnimState()
+    local model = AnimModels[math.random( #AnimModels )]
+    animstate:SetBank("wilson")
+    animstate:SetBuild(model)
+    local pushanim = AnimNames[math.random( #AnimNames )]
+    -- print(pushanim)
+    animstate:PlayAnimation(pushanim)
+    animstate:PushAnimation("idle_loop", true)
+
+    InitPlayerSymbol(animstate, data)
+
+    anim.tag_anim = 2
+end
+local function SetAnim_player2(self, anim, data)
+    -- local animstate = anim:GetAnimState()
+    local tag = anim.tag_anim or 1
+    if tag == 1 then
+        anim:SetFacing(FACING_DOWN)
+    elseif tag == 2 then
+        anim:SetFacing(FACING_RIGHT)
+    elseif tag == 3 then
+        anim:SetFacing(FACING_UP)
+    elseif tag == 4 then
+        anim:SetFacing(FACING_LEFT)
+        tag = 0
+    else
+        tag = 0
+    end
+    anim.tag_anim = tag + 1
+end
+
 local width_skininfo = 260
 local SkinData = {
     rosebush_marble = {
@@ -101,6 +162,29 @@ local SkinData = {
                 fn_anim = SetAnim_flowerbush2,
                 fn_click = SetAnim_flowerbush,
                 x = 50, y = 5, scale = 0.32
+            }
+        }
+    },
+    rosorns_marble = {
+        height_anim = 140, --带角色的高度最好是140起底
+        anims = {
+            {
+                bank = "rosorns_marble", build = "rosorns_marble",
+                anim = "idle", anim2 = nil, isloop = false,
+                x = -83, y = 0, scale = 0.38
+            },
+            {
+                bank = "rosorns_marble", build = "rosorns_marble",
+                anim = "idle_cover", anim2 = nil, isloop = false,
+                x = -30, y = 0, scale = 0.38
+            },
+            {
+                symbol = {
+                    { symbol = "swap_object", build = "rosorns_marble", file = "swap_object", type = 1 },
+                },
+                fn_anim = SetAnim_player,
+                fn_click = SetAnim_player2,
+                x = 50, y = 0, scale = 0.38
             }
         }
     },
@@ -123,25 +207,165 @@ local SkinData = {
             }
         }
     },
+    lileaves_marble = {
+        height_anim = 145,
+        anims = {
+            {
+                bank = "lileaves_marble", build = "lileaves_marble",
+                anim = "idle", anim2 = nil, isloop = false,
+                x = -80, y = 0, scale = 0.38
+            },
+            {
+                bank = "lileaves_marble", build = "lileaves_marble",
+                anim = "idle_cover", anim2 = nil, isloop = false,
+                x = -35, y = 0, scale = 0.38
+            },
+            {
+                symbol = {
+                    { symbol = "swap_object", build = "lileaves_marble", file = "swap_object", type = 1 },
+                },
+                fn_anim = SetAnim_player,
+                fn_click = SetAnim_player2,
+                x = 50, y = 0, scale = 0.38
+            }
+        }
+    },
     orchidbush_marble = {
-        height_anim = 180,
+        height_anim = 175,
         anims = {
             {
                 bank = "berrybush", build = "orchidbush_marble",
                 anim = "shake", anim2 = "idle", isloop = true,
                 fn_anim = SetAnim_flowerbush1,
                 fn_click = SetAnim_flowerbush,
-                x = -47, y = 5, scale = 0.32
+                x = -47, y = 0, scale = 0.32
             },
             {
                 bank = "berrybush", build = "orchidbush_marble",
                 anim = "dead", anim2 = nil, isloop = false,
                 fn_anim = SetAnim_flowerbush2,
                 fn_click = SetAnim_flowerbush,
-                x = 45, y = 5, scale = 0.32
+                x = 45, y = 0, scale = 0.32
             }
         }
-    }
+    },
+    orchitwigs_marble = {
+        height_anim = 145,
+        anims = {
+            {
+                bank = "orchitwigs_marble", build = "orchitwigs_marble",
+                anim = "idle", anim2 = nil, isloop = false,
+                x = -90, y = 0, scale = 0.38
+            },
+            {
+                bank = "orchitwigs_marble", build = "orchitwigs_marble",
+                anim = "idle_cover", anim2 = nil, isloop = false,
+                x = -30, y = 0, scale = 0.38
+            },
+            {
+                symbol = {
+                    { symbol = "swap_object", build = "orchitwigs_marble", file = "swap_object", type = 1 },
+                },
+                fn_anim = SetAnim_player,
+                fn_click = SetAnim_player2,
+                x = 50, y = 0, scale = 0.38
+            }
+        }
+    },
+    orchidbush_disguiser = {
+        height_anim = 105,
+        anims = {
+            {
+                bank = "berrybush2", build = "orchidbush_disguiser",
+                anim = "shake", anim2 = "idle", isloop = true,
+                fn_anim = SetAnim_flowerbush1,
+                fn_click = SetAnim_flowerbush,
+                x = -42, y = 0, scale = 0.32
+            },
+            {
+                bank = "berrybush2", build = "orchidbush_disguiser",
+                anim = "dead", anim2 = nil, isloop = false,
+                fn_anim = SetAnim_flowerbush2,
+                fn_click = SetAnim_flowerbush,
+                x = 40, y = 0, scale = 0.32
+            }
+        }
+    },
+    orchitwigs_disguiser = {
+        height_anim = 155,
+        anims = {
+            {
+                bank = "orchitwigs_disguiser", build = "orchitwigs_disguiser",
+                anim = "idle", anim2 = nil, isloop = false,
+                x = -83, y = 0, scale = 0.38
+            },
+            {
+                bank = "orchitwigs_disguiser", build = "orchitwigs_disguiser",
+                anim = "idle_cover", anim2 = nil, isloop = false,
+                x = -30, y = 0, scale = 0.38
+            },
+            {
+                symbol = {
+                    { symbol = "swap_object", build = "orchitwigs_disguiser", file = "swap_object", type = 1 },
+                },
+                fn_anim = SetAnim_player,
+                fn_click = SetAnim_player2,
+                x = 50, y = 0, scale = 0.38
+            }
+        }
+    },
+    neverfade_thanks = {
+        height_anim = 270,
+        anims = {
+            {
+                bank = "butterfly", build = "neverfade_butterfly_thanks",
+                anim = "take_off", anim2 = "flight_cycle", isloop = true,
+                x = -90, y = 145, scale = 0.32
+            },
+            {
+                bank = "neverfadebush_thanks", build = "neverfadebush_thanks",
+                anim = "shake", anim2 = "idle", isloop = true,
+                fn_anim = SetAnim_flowerbush1,
+                fn_click = SetAnim_flowerbush,
+                x = -42, y = 145, scale = 0.32
+            },
+            {
+                bank = "neverfadebush_thanks", build = "neverfadebush_thanks",
+                anim = "dead", anim2 = nil, isloop = false,
+                fn_anim = SetAnim_flowerbush2,
+                fn_click = SetAnim_flowerbush,
+                x = 40, y = 145, scale = 0.32
+            },
+            {
+                bank = "butterfly", build = "neverfade_butterfly_thanks",
+                anim = "land", anim2 = "idle", isloop = true,
+                x = 20, y = 145, scale = 0.32
+            },
+            {
+                bank = "butterfly", build = "neverfade_butterfly_thanks",
+                anim = "take_off", anim2 = "idle_flight_loop", isloop = true,
+                x = 70, y = 145, scale = 0.32
+            },
+            {
+                bank = "neverfade_thanks", build = "neverfade_thanks",
+                anim = "idle", anim2 = nil, isloop = false,
+                x = -90, y = 0, scale = 0.38
+            },
+            {
+                bank = "neverfade_thanks", build = "neverfade_thanks",
+                anim = "idle_cover", anim2 = nil, isloop = false,
+                x = -30, y = 0, scale = 0.38
+            },
+            {
+                symbol = {
+                    { symbol = "swap_object", build = "neverfade_thanks", file = "normal_swap", type = 1 },
+                },
+                fn_anim = SetAnim_player,
+                fn_click = SetAnim_player2,
+                x = 50, y = 0, scale = 0.38
+            }
+        }
+    },
 }
 
 local function GetCollection(skin)
