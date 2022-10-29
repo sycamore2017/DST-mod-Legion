@@ -196,6 +196,57 @@ local function SetAnim_heatrock2(self, anim, data)
     anim.tag_anim = tag + 1
 end
 
+local function SetAnim_sivturn(self, anim, data)
+    local animstate = anim:GetAnimState()
+    local tag
+    if anim.tag_anim == nil then
+        tag = data.tag_start or 1
+    else
+        tag = anim.tag_anim
+    end
+
+    if tag == 1 then
+        animstate:PlayAnimation("on_to_idle")
+        animstate:PushAnimation("idle", true)
+        animstate:OverrideSymbol("followed", data.build, "followed1")
+    elseif tag == 2 then
+        animstate:PlayAnimation("idle_to_on")
+        animstate:PushAnimation("on", true)
+        animstate:OverrideSymbol("followed", data.build, "followed2")
+        tag = 0
+    else
+        tag = 0
+    end
+    anim.tag_anim = tag + 1
+end
+
+local function SetAnim_sivderivant(self, anim, data)
+    local animstate = anim:GetAnimState()
+    local tag = anim.tag_anim or 2
+
+    if tag == 1 then
+        animstate:PlayAnimation("lvl3", true)
+    elseif tag == 2 then
+        animstate:PlayAnimation("lvl2", true)
+    elseif tag == 3 then
+        animstate:PlayAnimation("lvl1", true)
+    elseif tag == 4 then
+        animstate:PlayAnimation("lvl0", true)
+    elseif tag == 5 then
+        animstate:PlayAnimation("lvl3_live", true)
+    elseif tag == 6 then
+        animstate:PlayAnimation("lvl2_live", true)
+    elseif tag == 7 then
+        animstate:PlayAnimation("lvl1_live", true)
+    elseif tag == 8 then
+        animstate:PlayAnimation("lvl0_live", true)
+        tag = 0
+    else
+        tag = 0
+    end
+    anim.tag_anim = tag + 1
+end
+
 local width_skininfo = 260
 local SkinData = {
     rosebush_marble = {
@@ -847,21 +898,21 @@ local SkinData = {
         }
     },
     rosebush_collector = {
-        height_anim = 360,
+        height_anim = 320,
         anims = {
             {
                 bank = "berrybush", build = "rosebush_collector",
                 anim = "dead", anim2 = nil, isloop = false,
                 fn_anim = SetAnim_flowerbush2,
                 fn_click = SetAnim_flowerbush,
-                x = 55, y = 143, scale = 0.28
+                x = 45, y = 143, scale = 0.24
             },
             {
                 bank = "berrybush", build = "rosebush_collector",
                 anim = "shake", anim2 = "idle", isloop = true,
                 fn_anim = SetAnim_flowerbush1,
                 fn_click = SetAnim_flowerbush,
-                x = -40, y = 143, scale = 0.28
+                x = -45, y = 143, scale = 0.24
             },
             {
                 bank = "rosorns_collector", build = "rosorns_collector",
@@ -884,7 +935,7 @@ local SkinData = {
             {
                 bank = "lavaarena_heal_projectile", build = "rosorns_collector_fx",
                 anim = "cast", anim2 = nil, isloop = false,
-                x = -30, y = 15, scale = 0.4
+                x = -30, y = 10, scale = 0.4
             }
         }
     },
@@ -945,20 +996,88 @@ local SkinData = {
         }
     },
     siving_turn_collector = {
-        height_anim = 200,
+        height_anim = 190,
         anims = {
             {
                 bank = "siving_turn_collector", build = "siving_turn_collector",
-                anim = "on", anim2 = nil, isloop = true,
-                fn_anim = function(self, anim, data)
-                    local animstate = anim:GetAnimState()
-                    animstate:SetBank(data.bank)
-                    animstate:SetBuild(data.bank)
-                    animstate:PlayAnimation(data.anim, data.isloop)
-                end,
-                x = -60, y = 8, scale = 0.3
+                anim = "on_to_idle", anim2 = "idle", isloop = true,
+                tag_start = 2, symbol = {
+                    { symbol = "followed", build = "siving_turn_collector", file = "followed1" }
+                },
+                fn_anim = SetAnim_heatrock,
+                fn_click = SetAnim_sivturn,
+                x = 60, y = 8, scale = 0.3
             },
-            
+            {
+                bank = "siving_turn_collector", build = "siving_turn_collector",
+                anim = "idle_to_on", anim2 = "on", isloop = true,
+                tag_start = 1, symbol = {
+                    { symbol = "followed", build = "siving_turn_collector", file = "followed2" }
+                },
+                fn_anim = SetAnim_heatrock,
+                fn_click = SetAnim_sivturn,
+                x = -60, y = 8, scale = 0.3
+            }
+        }
+    },
+    siving_derivant_lvl0_thanks = {
+        height_anim = 255,
+        anims = {
+            {
+                bank = "siving_derivants_thanks", build = "siving_derivants_thanks",
+                anim = "lvl3", anim2 = nil, isloop = false,
+                fn_click = SetAnim_sivderivant,
+                x = -60, y = 100, scale = 0.22
+            },
+            {
+                bank = "siving_derivants_thanks2", build = "siving_derivants_thanks2",
+                anim = "lvl3", anim2 = nil, isloop = false,
+                fn_click = SetAnim_sivderivant,
+                x = 0, y = 1, scale = 0.22
+            }
+        }
+    },
+    backcub_fans = {
+        height_anim = 140,
+        anims = {
+            {
+                bank = "backcub_fans", build = "backcub_fans",
+                anim = "idle", anim2 = nil, isloop = false,
+                x = -45, y = 17, scale = 0.38
+            },
+            {
+                symbol = {
+                    { symbol = "swap_body", build = "backcub_fans", file = "swap_body", type = nil }
+                },
+                fn_anim = SetAnim_player,
+                fn_click = SetAnim_player2,
+                x = 45, y = 0, scale = 0.38
+            }
+        }
+    },
+    backcub_thanks = {
+        height_anim = 170,
+        anims = {
+            {
+                bank = "backcub_thanks", build = "backcub_thanks",
+                anim = "idle3_water", anim2 = nil, isloop = true,
+                touchanim = "idle5_water",
+                x = -25, y = 90, scale = 0.36
+            },
+            {
+                bank = "backcub_thanks", build = "backcub_thanks",
+                anim = "idle4", anim2 = "idle1", isloop = true,
+                touchanim = "idle4",
+                x = -55, y = 10, scale = 0.38
+            },
+            {
+                symbol = {
+                    { symbol = "swap_body", build = "backcub_thanks", file = "swap_body", type = nil }
+                },
+                fn_anim = SetAnim_player,
+                fn_click = SetAnim_player2,
+                x = 65, y = 0, scale = 0.38
+            }
         }
     },
 }
