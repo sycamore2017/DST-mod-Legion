@@ -642,15 +642,7 @@ _G.SKINS_LEGION = {
 			Asset("ANIM", "anim/skin/rosebush_marble.zip"),
 		},
 
-        string = ischinese and {
-            name = "理盛赤蔷", collection = "MARBLE", access = "DONATE",
-            descitem = "解锁\"蔷薇花丛\"的皮肤。",
-            description = "“什么事？”王后慵懒地挑选着名贵的珠宝首饰，眼皮都不愿抬起一下。一盆夺目的蔷薇被摆在梳妆台上，王后瞥了一眼，见蔷薇开得确实美，有心取一朵添妆。“嘶——”指尖一滴鲜血滑落，眼前突然浮现前日游行时，骑士长剑上滴落的鲜血。国王却对她说，贱民而已。她突然寒从胆边生，退后仔细端详。蔷薇无言，却绽放得猩红恣意。",
-        } or {
-            name = "Rose Marble Pot", collection = "MARBLE", access = "DONATE",
-            descitem = "Unlock \"Rose Bush\" skin.",
-            description = "The story was not translated.",
-        },
+        string = ischinese and { name = "理盛赤蔷" } or { name = "Rose Marble Pot" },
 
 		fn_start = function(inst)
             --官方代码写得挺好，直接改动画模板居然能继承已有的动画播放和symbol切换状态
@@ -677,15 +669,7 @@ _G.SKINS_LEGION = {
 		},
         image = { name = nil, atlas = nil, setable = true, },
 
-        string = ischinese and {
-            name = "落薇剪", collection = "MARBLE", access = "SPECIAL",
-            descitem = "解锁\"带刺蔷薇\"以及入鞘后的皮肤。",
-            description = "昔日王后的御剪如今竟然被用来剪去死刑犯的头发，据说这是为了防止刽子手砍头时，受到头发阻力拖泥带水，反而不美。究其原因，是王后修剪花丛时不慎被剪刀扎伤，这才特此给这把剪刀这样的“美差”。如今唯一能证明其身份的就是上面那精致的红蔷花纹，不过如今都被污迹遮住了大半。"
-        } or {
-            name = "Falling Petals Scissors", collection = "MARBLE", access = "SPECIAL",
-            descitem = "Unlock \"Rosorns\" skin.",
-            description = "The story was not translated.",
-        },
+        string = ischinese and { name = "落薇剪" } or { name = "Falling Petals Scissors" },
 
 		anim = {
             bank = nil, build = nil,
@@ -720,15 +704,7 @@ _G.SKINS_LEGION = {
 			Asset("ANIM", "anim/skin/lilybush_marble.zip"),
 		},
 
-        string = ischinese and {
-            name = "理盛截莲", collection = "MARBLE", access = "DONATE",
-            descitem = "解锁\"蹄莲花丛\"的皮肤。",
-            description = "少女坐在马车内，欢喜地看着怀中被精心打理过的蹄莲。阳光穿透层层阴云，照进这暗无天日的城镇，落在这一盆娇嫩的花上，露珠熠熠生辉，隐隐反射出彩虹的光芒，一如今晨那座新落成的哥特式大教堂中那复杂繁华的琉璃透射的光芒一样美丽。偌大的庄园，少女只将花摆在窗前，快乐地起舞，透过窗子依稀可见一街之隔的处刑场，囚犯被关在笼中已成枯骨，垂下的骨指刚好触及窗内蹄莲洁白的花瓣，仿佛拼死都要抚摸这份美好。"
-        } or {
-            name = "Lily Marble Pot", collection = "MARBLE", access = "DONATE",
-            descitem = "Unlock \"Lily Bush\" skin.",
-            description = "The story was not translated.",
-        },
+        string = ischinese and { name = "理盛截莲" } or { name = "Lily Marble Pot" },
 
 		fn_start = function(inst)
             inst.AnimState:SetBank("berrybush")
@@ -754,15 +730,7 @@ _G.SKINS_LEGION = {
 		},
         image = { name = nil, atlas = nil, setable = true, },
 
-        string = ischinese and {
-            name = "石莲长枪", collection = "MARBLE", access = "SPECIAL",
-            descitem = "解锁\"蹄莲翠叶\"以及入鞘后的皮肤。",
-            description = "他照着少女赠与的蹄莲的样子制了一把大理石长枪，本想建功立业，为国家开疆拓土，却没想到最后挥向的竟然是老鼠和饥肠辘辘苦求进城却不幸感染鼠疫的子民。昔日的铮光发亮的鞘如今已然锈迹斑斑，他虽如今已身获爵位，却也早已说不清那鞘上到底是铁锈还是血锈。"
-        } or {
-            name = "Marble Lilance", collection = "MARBLE", access = "SPECIAL",
-            descitem = "Unlock \"Lileaves\" skin.",
-            description = "The story was not translated.",
-        },
+        string = ischinese and { name = "石莲长枪" } or { name = "Marble Lilance" },
 
 		anim = {
             bank = nil, build = nil,
@@ -791,15 +759,7 @@ _G.SKINS_LEGION = {
 			Asset("ANIM", "anim/skin/orchidbush_marble.zip"),
 		},
 
-        string = ischinese and {
-            name = "理盛瀑兰", collection = "MARBLE", access = "DONATE",
-            descitem = "解锁\"兰草花丛\"的皮肤。",
-            description = "他将一束精心打理过的兰花放入这亲手打造的铁艺花架之中赠与她，一丝微笑渐渐攀上她的嘴角，正如这兰草瀑布般攀援在架子上灿烂动人。然而今日他却收到噩耗，奴隶主要求她在新婚之夜将这束兰花亲自送入奴隶主的庄园。在这个人贱于牲畜的时代，他无力反抗。好在隔壁庄园的奴隶主曾被他挽救于鼠疫之中，便答应买下两人收入自己庄园当差。"
-        } or {
-            name = "Orchid Marble Pot", collection = "MARBLE", access = "DONATE",
-            descitem = "Unlock \"Orchid Bush\" skin.",
-            description = "The story was not translated.",
-        },
+        string = ischinese and { name = "理盛瀑兰" } or { name = "Orchid Marble Pot" },
 
 		fn_start = function(inst)
             inst.AnimState:SetBank("berrybush")
@@ -825,15 +785,7 @@ _G.SKINS_LEGION = {
 		},
         image = { name = nil, atlas = nil, setable = true, },
 
-        string = ischinese and {
-            name = "铁艺兰珊", collection = "MARBLE", access = "SPECIAL",
-            descitem = "解锁\"兰草花穗\"以及入鞘后的皮肤。",
-            description = "婚礼虽不隆重却令人心安，如今他为新奴隶主看家护院，她为奴隶主的家眷莳花弄草，新铸的剑配上爱人所赠的兰花配饰，他紧握手中剑，誓死捍卫属于自己的一方安宁。听说隔壁庄园因奴隶暴动，看守松懈，庄园外墙已被涂满大大的“P”字母，（在黑死病时期，p代表不要靠近，有黑死病人）他一语不发，将擦拭好的剑推回剑鞘。"
-        } or {
-            name = "Ironchid", collection = "MARBLE", access = "SPECIAL",
-            descitem = "Unlock \"Orchitwigs\" skin.",
-            description = "The story was not translated.",
-        },
+        string = ischinese and { name = "铁艺兰珊" } or { name = "Ironchid" },
 
 		anim = {
             bank = nil, build = nil,
@@ -868,15 +820,7 @@ _G.SKINS_LEGION = {
 		},
         image = { name = nil, atlas = nil, setable = true, },
 
-        string = ischinese and {
-            name = "粉色追猎", collection = "DISGUISER", access = "FREE",
-            descitem = "解锁\"兰草花穗\"以及入鞘后的皮肤。",
-            description = "花色清浅，嫣粉各异，它隐匿其中，随着环境变化调整隐身衣的颜色，静候时机。若有猎物在此歇脚，它便踮起拟态为兰花瓣的步肢悄然靠近，只待猎物放松警惕，倏然伸出利爪，又消失在粉色的芬芳中。尽管有人批评它菩萨面蛇蝎心，但是待到下一次追猎时，它仍然会全力以赴。",
-        } or {
-            name = "Pink Orchitwigs", collection = "DISGUISER", access = "FREE",
-            descitem = "Unlock \"Orchitwigs\" skin.",
-            description = "The story was not translated.",
-        },
+        string = ischinese and { name = "粉色追猎" } or { name = "Pink Orchitwigs" },
 
 		anim = {
             bank = nil, build = nil,
@@ -907,15 +851,7 @@ _G.SKINS_LEGION = {
 			Asset("ANIM", "anim/skin/orchidbush_disguiser.zip"),
 		},
 
-        string = ischinese and {
-            name = "粉色猎园", collection = "DISGUISER", access = "SPECIAL",
-            descitem = "解锁\"兰草花丛\"的皮肤。",
-            description = "昨夜雨疏风骤，猎人不知所踪，仅留下这片茂盛的兰花丛纪念着曾经的点点滴滴。已不知是多少个春秋，花开花落，鸟去还回，它的等待始终落得一场空。恍惚间风吹过，摆动的兰花像极了猎人的身影，然而它也不知那潇洒果决的狩猎者是否还会归来……",
-        } or {
-            name = "Pink Orchid Bush", collection = "DISGUISER", access = "SPECIAL",
-            descitem = "Unlock \"Orchid Bush\" skin.",
-            description = "The story was not translated.",
-        },
+        string = ischinese and { name = "粉色猎园" } or { name = "Pink Orchid Bush" },
 
 		fn_start = function(inst)
             inst.AnimState:SetBank("berrybush2")
@@ -947,15 +883,7 @@ _G.SKINS_LEGION = {
 		},
         image = { name = nil, atlas = nil, setable = false, },
 
-        string = ischinese and {
-            name = "扶伤", collection = "THANKS", access = "SPECIAL",
-            descitem = "解锁\"永不凋零\"、\"永不凋零花丛\"、\"庇佑蝴蝶\"以及入鞘后的皮肤。",
-            description = "“话说，这夜京郊外小竹林中，那是充满了肃杀之气，本是人来人往的入城必经之路，此刻却连只鸟儿都没有。只见有一双身影在其中对峙，两人遮步相互打量了半晌，那女子方才立起剑来。这剑可大有名堂，唤作青玉扶伤，通体碧色，光洁如玉，敲之竟闻金铁之声，最厉害之处在于此剑有灵，能够护主。而这女子对面的敌人也是毫不示弱，双手缓缓拔出这雌雄双刀。江湖中人皆知，这习武之人大部分都是右利手，这刀疤脸男子却不同，他自小苦练，终成就双手皆能惯用，这一双雌雄狂刀，雌刀薄，攻在速，取敌不备；雄刀厚，攻在力，更可防守。这两人将武器亮出，霎时间那是天地变色，狂风大作，竹林之中落叶飞舞，竟在刀疤脸上留下一丝血痕，反观那女子衣服也多有破口，原是这两人在用内力较劲。刀疤脸冷笑一声，刀光一闪，就冲上前去，招招皆冲着柳氏的命门而去，这柳氏也不甘示弱，见招拆招，身边青蝶环绕护体，却又见缝插针地进攻刀疤脸的要害，两人正是势均力敌难解难分，然而只听得‘叮咛’一声，玉剑折断，一纤长身影艰难起身，逐渐隐没在渐起的夜雾之中。正是，十年冤案无处诉，玉剑傍身除恶徒！”",
-        } or {
-            name = "FuShang", collection = "THANKS", access = "SPECIAL",
-            descitem = "Unlock \"Neverfade\", \"Neverfade Bush\", and \"Neverfade Butterfly\" skin.",
-            description = "The story was not translated.",
-        },
+        string = ischinese and { name = "扶伤" } or { name = "FuShang" },
 
 		anim = {
             bank = nil, build = nil,
@@ -999,7 +927,7 @@ _G.SKINS_LEGION = {
 			Asset("ANIM", "anim/skin/neverfadebush_thanks.zip"),
 		},
         string = {
-            name = ischinese and "扶伤剑冢" or "FuShang Tomb", collection = "THANKS", access = "SPECIAL",
+            name = ischinese and "扶伤剑冢" or "FuShang Tomb"
         },
 
 		fn_start = function(inst)
@@ -1020,15 +948,7 @@ _G.SKINS_LEGION = {
 		},
 		image = { name = nil, atlas = nil, setable = true, },
 
-        string = ischinese and {
-            name = "\"困惑\"发卡", collection = "EMOTICON", access = "DONATE",
-            descitem = "解锁\"苔衣发卡\"的皮肤。",
-            description = "你知道哲学的基本问题吗？你认为意识和物质的关系是怎样的呢？你是唯心主义者还是唯物主义者？你支持意识能够正确认识物质的可知论，还是意识不能正确认识物质的不可知论呢？你对人类的存在是宇宙增墒这一判断有何看法？你认为人活着的意义是什么？什么？你什么都不知道？",
-        } or {
-            name = "Question Hairpin", collection = "EMOTICON", access = "DONATE",
-            descitem = "Unlock \"Lichen Hairpin\" skin.",
-            description = "The story was not translated.",
-        },
+        string = ischinese and { name = "\"困惑\"发卡" } or { name = "Question Hairpin" },
 
 		anim = {
             bank = nil, build = nil,
@@ -1051,15 +971,7 @@ _G.SKINS_LEGION = {
 		},
 		image = { name = nil, atlas = nil, setable = true, },
 
-        string = ischinese and {
-            name = "深渊的星", collection = "DISGUISER", access = "FREE",
-            descitem = "解锁\"苔衣发卡\"的皮肤。",
-            description = "洋流之下，是暗流涌动的深渊。终年阴暗，偶有一点光明便格外显眼。远处突然出现忽闪忽闪的淡蓝色光点，小小鱼虾们好奇前去追寻。越游越近，突现一张长满尖牙的恐怖大嘴一口咬了下来。",
-        } or {
-            name = "Abyss Star Hairpin", collection = "DISGUISER", access = "FREE",
-            descitem = "Unlock \"Lichen Hairpin\" skin.",
-            description = "The story was not translated.",
-        },
+        string = ischinese and { name = "深渊的星" } or { name = "Abyss Star Hairpin" },
 
 		anim = {
             bank = nil, build = nil,
@@ -1086,15 +998,7 @@ _G.SKINS_LEGION = {
 		},
 		image = { name = nil, atlas = nil, setable = true, },
 
-        string = ischinese and {
-            name = "卡尔的警帽，永远", collection = "TVPLAY", access = "FREE",
-            descitem = "解锁\"牛仔帽\"的皮肤。",
-            description = "卡尔与伙伴一同返回基地途中，因发生争论无心警惕周围，他们拐过树丛时被突然冲出的五个丧尸扑倒。两人慌乱中解决了麻烦。但卡尔突然感到肚子刺痛，掀起衬衣发现自己已被咬伤……年过三十的卡尔梦中惊醒，看了看还在熟睡的妻女，又望了望桌上警徽虽早已脱落但保养还算完好的警帽，感叹还好只是梦一场。",
-        } or {
-            name = "Carl's Forever Police Cap", collection = "TVPLAY", access = "FREE",
-            descitem = "Unlock \"Stetson\" skin.",
-            description = "The story was not translated.",
-        },
+        string = ischinese and { name = "卡尔的警帽，永远" } or { name = "Carl's Forever Police Cap" },
 
 		anim = {
             bank = nil, build = nil,
@@ -1119,15 +1023,7 @@ _G.SKINS_LEGION = {
 		},
 		image = { name = nil, atlas = nil, setable = true, },
 
-        string = ischinese and {
-            name = "枯叶飞舞", collection = "DISGUISER", access = "DONATE",
-            descitem = "解锁\"脱壳之翅\"、\"羽化后的壳\"的皮肤。",
-            description = "它进化出了一对枯叶般的翅膀。饿了，花丛中有黄叶辗转；恋了，风中有木下双双飞舞；累了，树干上有翠减停留。这不夺人耳目的一生，最终也会悄悄离场。",
-        } or {
-            name = "Fallen Dance", collection = "DISGUISER", access = "DONATE",
-            descitem = "Unlock \"Boltwing-out\", \"Post-eclosion Shuck\" skin.",
-            description = "The story was not translated.",
-        },
+        string = ischinese and { name = "枯叶飞舞" } or { name = "Fallen Dance" },
 
 		anim = {
             bank = nil, build = nil,
@@ -1153,15 +1049,7 @@ _G.SKINS_LEGION = {
 		},
         image = { name = nil, atlas = nil, setable = true, },
 
-        string = ischinese and {
-            name = "云烟", collection = "THANKS", access = "SPECIAL",
-            descitem = "解锁\"简易打窝饵制作器\"、\"专业打窝饵制作器\"和\"打窝饵\"的皮肤。",
-            description = "“书接上回，扶伤剑护主而断，这消息不知怎地不胫而走，而江湖上现今又流传着一个新的消息，说这食铁兽的遗孤已然认扶伤剑持剑者为主。而今扶伤剑再无护主能力，那这食铁兽是否会易主就成了众人茶余饭后最大的谈资。是夜，就看这京城一隅的一方小小茶楼，几人正悄声低语着最新消息，却是各不相同，几人各执一词。殊不知，这茶楼屋顶有一男子头戴斗笠手持一奇形烟斗吞云吐雾，只见他嘴角扯起一抹不屑的笑容，抬手招来黑鹰，将一卷密信放入信筒。至此，这食铁兽被捉进京都衙门内的消息便如同长了翅膀一样飞了出去。当夜丑时，衙门内除了个别看门打盹的官兵一片寂然，突然后院传来悉悉索索的异响。‘哼，上钩了’仔细瞧那墙角黑雾中，一名颓郁男子摘下斗笠，而他身周的云雾似乎有了感应，翻涌得愈发诡谲。这便是，江湖人心难餍足，云烟缭绕不肯渡！”",
-        } or {
-            name = "YunYan", collection = "THANKS", access = "SPECIAL",
-            descitem = "Unlock \"Fish-homing Bait Maker\", \"Fish-homing Bait Maker+\", and \"Fish-homing Bait\" skin.",
-            description = "The story was not translated.",
-        },
+        string = ischinese and { name = "云烟" } or { name = "YunYan" },
 
         anim = {
             bank = nil, build = nil,
@@ -1186,7 +1074,7 @@ _G.SKINS_LEGION = {
         image = { name = nil, atlas = nil, setable = true, },
 
         string = {
-            name = ischinese and "云烟草" or "YunYan Cigarette", collection = "THANKS", access = "SPECIAL",
+            name = ischinese and "云烟草" or "YunYan Cigarette"
         },
 
         anim = {
@@ -1218,7 +1106,7 @@ _G.SKINS_LEGION = {
         image = { name = nil, atlas = nil, setable = false }, --皮肤展示需要一个同prefab名的图片
 
         string = {
-            name = ischinese and "云烟瓶" or "YunYan Bottle", collection = "THANKS", access = "SPECIAL",
+            name = ischinese and "云烟瓶" or "YunYan Bottle"
         },
 
         fn_start = function(inst)
@@ -1256,15 +1144,7 @@ _G.SKINS_LEGION = {
 		},
 		image = { name = nil, atlas = nil, setable = true, },
 
-        string = ischinese and {
-            name = "爱上彩虹", collection = "EMOTICON", access = "FREE",
-            descitem = "解锁\"木盾\"的皮肤。",
-            description = "多一丝宽容，你就少一份疑惑；多一丝爱心，你就少一份怨恨；多一丝理解，你就少一份紧张。你我都是独一无二，为自己骄傲吧。"
-        } or {
-            name = "Love Rainbow", collection = "EMOTICON", access = "FREE",
-            descitem = "Unlock \"Log Shield\" skin.",
-            description = "More tolerance,less doubt.More love,less resentment.More understanding,less nervousness.You and I are unique.Be proud of yourself.",
-        },
+        string = ischinese and { name = "爱上彩虹" } or { name = "Love Rainbow" },
 
         anim = {
             bank = nil, build = nil,
@@ -1295,15 +1175,7 @@ _G.SKINS_LEGION = {
 		},
 		image = { name = nil, atlas = nil, setable = true, },
 
-        string = ischinese and {
-            name = "重拳出击", collection = "EMOTICON", access = "SPECIAL",
-            descitem = "解锁\"木盾\"的皮肤。",
-            description = "观点不一，骂Ta；羡慕嫉妒，恨Ta；没有黑点？监视Ta。不管发生什么，敲起键盘如同打拳，咬文嚼字断章取义也能搞得鸡飞狗跳。非我皆是恶，活在自己的世界，这就是拳的意义。打的就是你，陌生人。"
-        } or {
-            name = "Punch Quest", collection = "EMOTICON", access = "SPECIAL",
-            descitem = "Unlock \"Log Shield\" skin.",
-            description = "The story was not translated.",
-        },
+        string = ischinese and { name = "重拳出击" } or { name = "Punch Quest" },
 
         anim = {
             bank = nil, build = nil,
@@ -1329,15 +1201,7 @@ _G.SKINS_LEGION = {
 		},
 		image = { name = nil, atlas = nil, setable = true, },
 
-        string = ischinese and {
-            name = "洋流之下匍匐", collection = "ERA", access = "SPECIAL",
-            descitem = "解锁\"木盾\"的皮肤。",
-            description = "他们是生命的奇迹，在寒武纪那个物种大爆发的时代，他们不甘籍籍无名，最早进化出了眼睛，试图看清这洪流般的时代，还进化出了坚硬的外壳，保护自己的族群生生不息。可惜的是，他们引以为傲的甲胄最终在三亿年的进化中成为了积重难返的弊端，最终被自然淘汰。平凡的他们常常以背景或被猎杀的对象出现在纪录片中，如同英雄故事里籍籍无名的平民百姓，然而历经三亿年荣辱兴衰的他们却为研究不同时期的自然环境留下了无法估量的价值。"
-        } or {
-            name = "Under Current Crawl", collection = "ERA", access = "SPECIAL",
-            descitem = "Unlock \"Log Shield\" skin.",
-            description = "The story was not translated.",
-        },
+        string = ischinese and { name = "洋流之下匍匐" } or { name = "Under Current Crawl" },
 
         anim = {
             bank = nil, build = nil,
@@ -1364,15 +1228,7 @@ _G.SKINS_LEGION = {
 		},
 		image = { name = nil, atlas = nil, setable = true, },
 
-        string = ischinese and {
-            name = "坚硬头骨低鸣", collection = "ERA", access = "SPECIAL",
-            descitem = "解锁\"砂之抵御\"的皮肤。",
-            description = "在洞穴深处一个不起眼的角落，它孤独着。它的头骨暴露在外，与古旧的头部甲胄融为一体，身体早已腐朽，只留下部分残缺的脊椎。它骨头上道道触目惊心的伤疤诉说着生前如何无数次顽强地抵御捕食者，它的下颌张开，仿佛在拼命呼唤着族群与希望。在生命的尽头，大地之母听见了它最后的低鸣，拥抱并亲吻了它的遗骨。",
-        } or {
-            name = "Squealing Skull", collection = "ERA", access = "SPECIAL",
-            descitem = "Unlock \"Desert Defense\" skin.",
-            description = "The story was not translated.",
-        },
+        string = ischinese and { name = "坚硬头骨低鸣" } or { name = "Squealing Skull" },
 
         anim = {
             bank = nil, build = nil,
@@ -1394,15 +1250,7 @@ _G.SKINS_LEGION = {
 		},
 		image = { name = nil, atlas = nil, setable = true, },
 
-        string = ischinese and {
-            name = "旧稿", collection = "OLDPIC", access = "FREE",
-            descitem = "解锁\"砂之抵御\"的皮肤。",
-            description = "画完就觉得左右貌似不太整齐，但是都画好，不想再改。现在我绘画时会不时左右翻转来查看画面的问题，也算是一个进步吧。贴图上结合了沙之石的纹路以及大量向外突出的晶石，中间是金块，现在想想金块不足以被摆在中间好像很重要似的。",
-        } or {
-            name = "Squealing Skull", collection = "OLDPIC", access = "FREE",
-            descitem = "Unlock \"Desert Defense\" skin.",
-            description = "The story was not translated.",
-        },
+        string = ischinese and { name = "旧稿" } or { name = "Old Art" },
 
         anim = {
             bank = nil, build = nil,
@@ -1437,15 +1285,7 @@ _G.SKINS_LEGION = {
 		},
 		image = { name = nil, atlas = nil, setable = false, },
 
-        string = ischinese and {
-            name = "被封存的窸窣", collection = "ERA", access = "SPECIAL",
-            descitem = "解锁\"鸳鸯石\"的皮肤。",
-            description = "一颗苍天大树拔地而起，直冲云霄，然而在这地洞之内更显得蔚为壮观。更奇特的是，继续考察后，我们在树下的枯枝中发现一颗精美的琥珀。仔细清理之下，这才看到里面还有一只不知品类的有翅昆虫，琥珀将其包裹得如此完好，仿佛仍能听到窸窸窣窣的昆虫振翅声，而下一秒它就能活过来飞出琥珀似的。在火把的包围中，琥珀竟然渐渐变色，而其中的昆虫开始发出微弱的光芒，令人诧异的是，我突然感受到了它对生命瞬间凝滞的不甘……",
-        } or {
-            name = "Sealed Rustle", collection = "ERA", access = "SPECIAL",
-            descitem = "Unlock \"Icire Stone\" skin.",
-            description = "The story was not translated.",
-        },
+        string = ischinese and { name = "被封存的窸窣" } or { name = "Sealed Rustle" },
 
 		fn_start = function(inst)
             inst.AnimState:SetBank("heat_rock")
@@ -1483,15 +1323,7 @@ _G.SKINS_LEGION = {
 		},
 		image = { name = nil, atlas = nil, setable = false, },
 
-        string = ischinese and {
-            name = "占星石", collection = "COLLECTOR", access = "SPECIAL",
-            descitem = "解锁\"鸳鸯石\"的皮肤。",
-            description = "我族世代守护占星石，并流传着一个不可思议的秘密。占星石每三百年都会选中一位族人，只有他能读懂占星预言。到那时只要听从星的指导，就能让我族发扬兴盛，摆脱命运安排。然而，距离上一位族人逝去已过快四百年，占星石也只剩隐隐的光。"
-        } or {
-            name = "Astrological Stone", collection = "COLLECTOR", access = "SPECIAL",
-            descitem = "Unlock \"Icire Stone\" skin.",
-            description = "The story was not translated.",
-        },
+        string = ischinese and { name = "占星石" } or { name = "Astrological Stone" },
 
 		fn_start = function(inst)
             inst.AnimState:SetBank("icire_rock_collector")
@@ -1520,15 +1352,7 @@ _G.SKINS_LEGION = {
 			Asset("ANIM", "anim/skin/lilybush_era.zip"),
 		},
 
-        string = ischinese and {
-            name = "满布大地婆娑", collection = "ERA", access = "SPECIAL",
-            descitem = "解锁\"蹄莲花丛\"、\"蹄莲翠叶\"以及入鞘后的皮肤。",
-            description = "沿着地下河道一路向前，我们在巨大地洞的入口处发现一片蓝色荧光花海，这里的植被花萼巨大，花瓣柔软光滑，金、蓝、紫相隔相接，却不甚芬芳。不知是不是我们的到来惊动了它们，花海仿佛有了生命，从我们身周开始，缓缓催动起波涛，迷幻的色彩摄人心魄，细长的蕨叶互相摩擦，传来木叶婆娑之声，仿佛在轻声欢迎我们的到来。"
-        } or {
-            name = "Platycerium Bush", collection = "ERA", access = "SPECIAL",
-            descitem = "Unlock \"Lily Bush\", \"Lileaves\" skin.",
-            description = "The story was not translated.",
-        },
+        string = ischinese and { name = "满布大地婆娑" } or { name = "Platycerium Bush" },
 
 		fn_start = function(inst)
             inst.AnimState:SetBank("berrybush2")
@@ -1555,7 +1379,7 @@ _G.SKINS_LEGION = {
         image = { name = nil, atlas = nil, setable = true, },
 
         string = {
-            name = ischinese and "花叶婆娑" or "Platycerium Leaves", collection = "ERA", access = "SPECIAL",
+            name = ischinese and "花叶婆娑" or "Platycerium Leaves"
         },
 
 		anim = {
@@ -1587,15 +1411,7 @@ _G.SKINS_LEGION = {
 		},
         image = { name = nil, atlas = nil, setable = true, },
 
-        string = ischinese and {
-            name = "长河探索叮咚", collection = "ERA", access = "SPECIAL",
-            descitem = "解锁\"斧铲-三用型\"、\"斧铲-黄金三用型\"的皮肤。",
-            description = "在参加这一次的考古活动前，我们无论如何都想不到接下来我们将有怎样的奇遇。在深山中我们找到了一支新的古老河道，河道与山体相接，可惜被一块顽石堵住，老师和同学们齐心协力，终于在一片叮叮咚咚声中打开了新世界的入口，顺着河道进入山洞，不远处发现了奇怪的图腾，暗示我们顺流而下，越往前走地势便愈发低，而河流中也渐渐出现蓝色的荧光物，终于在河流尽头，我们发现了一片蓝色荧光瀑布和瀑布之下那个神秘的地洞入口。"
-        } or {
-            name = "Era River Explorer", collection = "ERA", access = "SPECIAL",
-            descitem = "Unlock \"Triple-shovelaxe\", \"Snazzy Triple-shovelaxe\" skin.",
-            description = "The story was not translated.",
-        },
+        string = ischinese and { name = "长河探索叮咚" } or { name = "Era River Explorer" },
 
 		anim = {
             bank = nil, build = nil,
@@ -1622,7 +1438,7 @@ _G.SKINS_LEGION = {
         image = { name = nil, atlas = nil, setable = true, },
 
         string = {
-            name = ischinese and "谷地发现叮咚" or "Era Valley Explorer", collection = "ERA", access = "SPECIAL",
+            name = ischinese and "谷地发现叮咚" or "Era Valley Explorer"
         },
 
 		anim = {
@@ -1650,15 +1466,7 @@ _G.SKINS_LEGION = {
 		},
 		image = { name = nil, atlas = nil, setable = true, },
 
-        string = ischinese and {
-            name = "饭仔", collection = "FANS", access = "FREE",
-            descitem = "解锁\"靠背熊\"的皮肤。",
-            description = "他叫饭仔，有着简单的几个爱好。吃饭饭，能吃就行；睡觉觉，要抱着他最爱的偶像抱枕才睡得着；不过，他最喜欢的还是给朋友们爱的抱抱。\n--感谢白饭的绘制",
-        } or {
-            name = "Kid Fan", collection = "FANS", access = "FREE",
-            descitem = "Unlock \"Backcub\" skin.",
-            description = "The story was not translated.",
-        },
+        string = ischinese and { name = "饭仔" } or { name = "Kid Fan" },
 
 		anim = {
             bank = nil, build = nil,
@@ -1682,15 +1490,7 @@ _G.SKINS_LEGION = {
 		},
 		image = { name = nil, atlas = nil, setable = true },
 
-        string = ischinese and {
-            name = "浮生儿", collection = "THANKS", access = "SPECIAL",
-            descitem = "解锁\"靠背熊\"的皮肤。",
-            description = "“这江湖中早有竹居食铁兽这种奇兽的传闻，言此兽贪食，因而肚量巨大，得之认主后可借兽腹容纳万物。正所谓匹夫无罪，怀璧其罪，很快便有人盯上了它们。当夜竹林中人头攒动，火把几乎照亮了半边天。要说这食铁兽一家也是自然之灵长，为了护幼舍命与猎人们周旋，长者们硬生生抗住漫天箭雨，幼兽方才安然逃出。眼见幼兽逃出天罗地网，老兽们自然更不会俯首称臣，由最年长者带头，只见它们齐齐祭出修炼多年的灵丹，以多年修为引动自爆。那爆炸声惊天动地，毁去了大半竹林，更带走了泰半猎人的性命，剩下的人也只是一息尚存苟延残喘。据说，后来当其他人在他们面前再提起食铁兽时，他们无一不浑身颤抖如临大敌。正所谓父母之爱子，则为之计深远，老兽们正是以壮烈之举彻底打消了后人想猎取它们的幼子的念头，真乃可叹可惜也！而今幼兽孑然一身，举目无亲，只得潜藏于农神山。这农神山因森林茂密，地形奇崛，罕有人迹。不过，这一天，兽子却在农神山山涧发现一名重伤昏迷的女子。这兽子本性纯良，虽经历灭族惨案，仍心怀善念，不欲见有生灵逝于前，便将这女子驮至其藏身的梨花洞，借梨花洞内天地灵气为女子愈合伤口，奇妙的是，这剑竟然也能自主吸取天地精华缓慢修复。女子醒来后出于感谢，用玉竹炼制背篓，容兽子隐息藏身，而在女子养伤过程中，一人一兽逐渐建立了对彼此的信任，遂为兽子起名为浮生儿，一起在洞中修行八年，直到这一日出山。这可谓，浮沉尘世见险恶，生死度外结善缘！”"
-        } or {
-            name = "Foosen", collection = "THANKS", access = "SPECIAL",
-            descitem = "Unlock \"Backcub\" skin.",
-            description = "The story was not translated."
-        },
+        string = ischinese and { name = "浮生儿" } or { name = "Foosen" },
 
 		fn_anim = function(inst)
             SetRandomSkinAnim(inst, {
@@ -1728,15 +1528,7 @@ _G.SKINS_LEGION = {
 		},
 		image = { name = nil, atlas = nil, setable = true },
 
-        string = ischinese and {
-            name = "饭豆子", collection = "FANS", access = "REWARD",
-            descitem = "解锁\"靠背熊\"的皮肤。",
-            description = "饭豆子睡着时思想喜欢飘向各处。暴雨来临，孩童们都被雷声吓得噩梦不断。饭豆子放下自己的美梦而去帮助他们改善梦境。一觉醒来，孩子们终记不得它的模样，只记得那沙子般细腻的柔软。\n--感谢白饭的绘制",
-        } or {
-            name = "Bean Fan", collection = "FANS", access = "REWARD",
-            descitem = "Unlock \"Backcub\" skin.",
-            description = "The story was not translated."
-        },
+        string = ischinese and { name = "饭豆子" } or { name = "Bean Fan" },
 
         fn_start = function(inst)
             inst.AnimState:SetBank("backcub_fans2")
@@ -1782,15 +1574,7 @@ _G.SKINS_LEGION = {
 			Asset("ANIM", "anim/skin/rosebush_collector.zip"),
 		},
 
-        string = ischinese and {
-            name = "朽星棘", collection = "COLLECTOR", access = "SPECIAL",
-            descitem = "解锁\"蔷薇花丛\"、\"带刺蔷薇\"以及入鞘后的皮肤。",
-            description = "作为银河系最大的军阀统领，从小便渴望权利与力量。他用尽半生精力，终于在极其遥远的星云残骸中找到传说中能贯穿星辰的神剑。他带着贯星剑回到了自己的星球，憧憬着一统宇宙成为唯一的神……他高傲自豪地在高台上举起贯星剑，正准备发起向其他银河统领的宣战时，剑体却突然碎裂开来，化作无数金色光束向地面射去。在众人诧异中，地面开始朽化龟裂，水晶般的荆棘开始迅速长出，不断往周围蔓延。整个星球失去了生机，他也在崩坏与腐朽中失踪。",
-        } or {
-            name = "Star Blighted Thorns", collection = "COLLECTOR", access = "SPECIAL",
-            descitem = "Unlock \"Rose Bush\", \"Rosorns\" skin.",
-            description = "The story was not translated.",
-        },
+        string = ischinese and { name = "朽星棘" } or { name = "Star Blighted Thorns" },
 
 		fn_start = function(inst)
             --官方代码写得挺好，直接改动画模板居然能继承已有的动画播放和symbol切换状态
@@ -1818,7 +1602,7 @@ _G.SKINS_LEGION = {
         image = { name = nil, atlas = nil, setable = true, },
 
         string = {
-            name = ischinese and "贯星剑" or "Star Pierced Sword", collection = "COLLECTOR", access = "SPECIAL",
+            name = ischinese and "贯星剑" or "Star Pierced Sword"
         },
 
 		anim = {
@@ -1856,15 +1640,7 @@ _G.SKINS_LEGION = {
 		},
         image = { name = nil, atlas = nil, setable = true },
 
-        string = ischinese and {
-            name = "跃星杖", collection = "COLLECTOR", access = "SPECIAL",
-            descitem = "解锁\"芬布尔斧\"的皮肤。",
-            description = "十七年前，盛夏流星群过后，一对夫妻在自己营地附近捡到一名戴着星星吊坠的女婴。现在，女婴已长大，每晚望着璀璨的星空着迷，但夫妻太爱这个孩子，不忍告诉她的来历，并藏起了属于她的吊坠。盛夏时节，女孩忽然有某种感应跑到楼顶，原来是流星群再次来临。女孩眼睛瞪得老大，欣赏着这场视觉的盛宴，留下了眼泪。夫妻觉得离别的时刻已经到来，把吊坠还给了女孩。吊坠交到女孩手里的那一刻，女孩理解了一切跃向天空，在耀眼的光芒过后，化作了流星群的一员飞出目光尽头，留下夫妻二人黯然神伤。\n两年后某个盛夏的夜晚，夫妻二人仍然依照往日习惯在楼顶看星星，此时一颗星星从天上划落，熟悉的少女身影闪现在夫妻眼前，三人默契相拥……"
-        } or {
-            name = "Star Leaping Staff", collection = "COLLECTOR", access = "SPECIAL",
-            descitem = "Unlock \"Fimbul's Axe\" skin.",
-            description = "The story was not translated.",
-        },
+        string = ischinese and { name = "跃星杖" } or { name = "Star Leaping Staff" },
 
 		anim = {
             bank = nil, build = nil,
@@ -1924,15 +1700,7 @@ _G.SKINS_LEGION = {
 		},
         image = { name = nil, atlas = nil, setable = false, },
 
-        string = ischinese and {
-            name = "转星移", collection = "COLLECTOR", access = "LUCK",
-            descitem = "解锁\"子圭·育\"的皮肤。",
-            description = "自从飞船失控，他被困在这片星漩中已过去3周。他无数次尝试与总部沟通，皆以失败告终。每每失落之际，他都会望着那颗最近的星球，星体一开始如黑洞般深邃，但又会逐渐闪耀起来，如同他的遭遇。“真好，你一直在我身边”，望着这颗美丽的星球他总能重燃信心，“你就是我的希望”。如今弹尽粮绝，飞船内的氧气也低到极限，他瘫倒在甲板，恍惚间，他好像发现很多生物的残骸漂浮在星环中，“为什么3周以来我都没看到过？”，他心生疑问。三周前，飞船突然收到求救讯号，然后他决定脱离航线前去救援，到达救援坐标后，飞船突然失控，那颗暗星也开始了光与暗的循环。在昏迷前，他终于理解这颗星球的秘密，“来吧，来吧，投入我的怀抱……”。昏迷的他，居然打开了舱门，向那颗星球跳去，很快便隐没在星环之中。",
-        } or {
-            name = "Revolving Star", collection = "COLLECTOR", access = "LUCK",
-            descitem = "Unlock \"Siving-Trans\" skin.",
-            description = "The story was not translated.",
-        },
+        string = ischinese and { name = "转星移" } or { name = "Revolving Star" },
 
 		fn_start = function(inst)
             fn_siving_turn(inst, "siving_turn_collector", false)
@@ -1958,15 +1726,7 @@ _G.SKINS_LEGION = {
             Asset("ANIM", "anim/skin/siving_derivant_lvl0_thanks.zip"), --为了swap-icon
 		},
 
-        string = ischinese and {
-            name = "梨花开", collection = "THANKS", access = "SPECIAL",
-            descitem = "解锁\"子圭(一/木/林/森)型岩\"的2套皮肤。",
-            description = "“上回说到，柳氏重伤，扶伤也已玉碎，她拖着残躯跌跌撞撞回到梨花洞，这洞外虽然是郁郁葱葱，却只是普通森林景致，不比里面别有洞天。洞中有几棵奇异的银叶树，散发着青绿色的微光，虽不甚亮堂却堪堪能够照亮整个洞穴。洞穴正中有一阵法，柳氏将断剑插入阵眼，只见银叶树上的微光竟然活泛起来，逐渐向阵眼汇集，刹那间，阵法其光大盛，从阵眼中渐渐生出嫩绿枝芽，攀在剑身，逐渐将整柄剑包裹起来，而那断剑似乎活了般一明一暗地发出白色微光，似在呼吸，剑身上的裂痕也肉眼可见地被修复消失。而柳氏盘腿席地而坐，青光一片中，她身上的伤口也在快速结痂愈合。原来这银叶树名曰青冥梨花树，有生死人肉白骨之效，又与这青玉扶伤剑同宗同源，故而能够医治扶伤剑痕和剑主肉躯。这可真是，玉人妙运天不绝，洞中八卦有乾坤！”"
-        } or {
-            name = "Snowflake Pine", collection = "THANKS", access = "SPECIAL",
-            descitem = "Unlock all \"Siving Derivant\" skin.",
-            description = "The story was not translated.",
-        },
+        string = ischinese and { name = "梨花开" } or { name = "Snowflake Pine" },
 
 		fn_start = function(inst)
             inst.AnimState:SetBank("siving_derivants_thanks")
@@ -1991,7 +1751,7 @@ _G.SKINS_LEGION = {
 		},
 
         string = {
-            name = ischinese and "梨花开" or "Snowflake Pine", collection = "THANKS", access = "SPECIAL",
+            name = ischinese and "梨花开" or "Snowflake Pine"
         },
 
 		fn_start = function(inst)
@@ -2013,7 +1773,7 @@ _G.SKINS_LEGION = {
 		},
 
         string = {
-            name = ischinese and "梨花开" or "Snowflake Pine", collection = "THANKS", access = "SPECIAL",
+            name = ischinese and "梨花开" or "Snowflake Pine"
         },
 
 		fn_start = function(inst)
@@ -2035,7 +1795,7 @@ _G.SKINS_LEGION = {
 		},
 
         string = {
-            name = ischinese and "梨花开" or "Snowflake Pine", collection = "THANKS", access = "SPECIAL",
+            name = ischinese and "梨花开" or "Snowflake Pine"
         },
 
 		fn_start = function(inst)
@@ -2057,7 +1817,7 @@ _G.SKINS_LEGION = {
 		},
 
         string = {
-            name = ischinese and "梨带雨" or "Snowflake Prayer Pine", collection = "THANKS", access = "SPECIAL",
+            name = ischinese and "梨带雨" or "Snowflake Prayer Pine"
         },
 
 		fn_start = function(inst)
@@ -2083,7 +1843,7 @@ _G.SKINS_LEGION = {
 		},
 
         string = {
-            name = ischinese and "梨带雨" or "Snowflake Prayer Pine", collection = "THANKS", access = "SPECIAL",
+            name = ischinese and "梨带雨" or "Snowflake Prayer Pine"
         },
 
 		fn_start = function(inst)
@@ -2105,7 +1865,7 @@ _G.SKINS_LEGION = {
 		},
 
         string = {
-            name = ischinese and "梨带雨" or "Snowflake Prayer Pine", collection = "THANKS", access = "SPECIAL",
+            name = ischinese and "梨带雨" or "Snowflake Prayer Pine"
         },
 
 		fn_start = function(inst)
@@ -2127,7 +1887,7 @@ _G.SKINS_LEGION = {
 		},
 
         string = {
-            name = ischinese and "梨带雨" or "Snowflake Prayer Pine", collection = "THANKS", access = "SPECIAL",
+            name = ischinese and "梨带雨" or "Snowflake Prayer Pine"
         },
 
 		fn_start = function(inst)
@@ -2188,64 +1948,6 @@ _G.SKIN_IDS_LEGION = {
 _G.SKIN_IDX_LEGION = {
     -- [1] = "rosorns_spell",
 }
-
-if ischinese then
-    STRINGS.SKIN_LEGION = {
-        UNKNOWN_STORY = "这个故事不值一提。",
-        COLLECTION = {
-            UNKNOWN = "陌生系列",
-            MAGICSPELL = "魔咒系列",
-            EMOTICON = "网上冲浪系列",
-            MARBLE = "大理石园丁系列",
-            THANKS = "江湖一枝花系列",
-            TVPLAY = "剧迷系列",
-            DISGUISER = "伪装学者系列",
-            ERA = "先古回响系列",
-            OLDPIC = "念旧系列",
-            FANS = "饭制系列",
-            COLLECTOR = "星河收藏家系列"
-        },
-        UI_ACCESS = "获取",
-        UI_INPUT_CDK = "请输入兑换码",
-        UI_LOAD_CDK = "兑换中...",
-        ACCESS = {
-            UNKNOWN = "无法获取",
-            DONATE = "通过回忆获取",
-            FREE = "自动获取",
-            SPECIAL = "通过特殊方式获取",
-            REWARD = "链锁奖励",
-            LUCK = "幸运眷顾"
-        },
-    }
-else
-    STRINGS.SKIN_LEGION = {
-        UNKNOWN_STORY = "The story is not worth mentioning.",
-        COLLECTION = {
-            UNKNOWN = "Strange Collection",
-            MAGICSPELL = "Magic Spell Collection",
-            EMOTICON = "Surf Net Collection",
-            MARBLE = "Marble Gardener Collection",
-            THANKS = "Heartfelt Thanks Collection",
-            TVPLAY = "TV Play Fans Collection",
-            DISGUISER = "Master of Disguise Collection",
-            ERA = "Era Echo Collection",
-            OLDPIC = "Nostalgia Collection",
-            FANS = "Fans Creation",
-            COLLECTOR = "Galaxy Collector Collection"
-        },
-        UI_ACCESS = "Get It",
-        UI_INPUT_CDK = "Please enter CDK",
-        UI_LOAD_CDK = "Redeeming...",
-        ACCESS = {
-            UNKNOWN = "Unable to get",
-            DONATE = "Get it by memory", --Get it by donation
-            FREE = "Free access",
-            SPECIAL = "Get it by special ways",
-            REWARD = "Chain reward",
-            LUCK = "Get it by luck"
-        },
-    }
-end
 
 ------
 
