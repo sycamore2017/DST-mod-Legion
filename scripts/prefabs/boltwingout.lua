@@ -60,18 +60,18 @@ local function onequip(inst, owner)
     end
 
     if owner.components.combat ~= nil and owner.set_l_bolt == nil then
-        owner.GetAttacked_old = owner.components.combat.GetAttacked
+        owner.GetAttacked_l_bolt = owner.components.combat.GetAttacked
         owner.components.combat.GetAttacked = function(self, attacker, damage, weapon, stimuli)
             if
                 not self.inst.set_l_bolt
                 or (self.inst.components.health == nil or self.inst.components.health:IsDead())
             then
-                return self.inst.GetAttacked_old(self, attacker, damage, weapon, stimuli)
+                return self.inst.GetAttacked_l_bolt(self, attacker, damage, weapon, stimuli)
             end
 
             local backpack = self.inst.components.inventory:GetEquippedItem(EQUIPSLOTS.BACK or EQUIPSLOTS.BODY) or nil
             if backpack == nil or backpack.components.container == nil then
-                return self.inst.GetAttacked_old(self, attacker, damage, weapon, stimuli)
+                return self.inst.GetAttacked_l_bolt(self, attacker, damage, weapon, stimuli)
             end
 
             local attackerinfact = weapon or attacker --武器写在前面是为了优先躲避远程武器
@@ -82,7 +82,7 @@ local function onequip(inst, owner)
                 or attackerinfact == nil --无实物的攻击
                 or damage <= 0
             then
-                return self.inst.GetAttacked_old(self, attacker, damage, weapon, stimuli)
+                return self.inst.GetAttacked_l_bolt(self, attacker, damage, weapon, stimuli)
             end
 
             --识别特定数量的材料来触发金蝉脱壳效果
@@ -123,7 +123,7 @@ local function onequip(inst, owner)
                 end
                 return false
             else
-                return self.inst.GetAttacked_old(self, attacker, damage, weapon, stimuli)
+                return self.inst.GetAttacked_l_bolt(self, attacker, damage, weapon, stimuli)
             end
         end
     end

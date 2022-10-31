@@ -847,22 +847,19 @@ end
 ]]--
 
 local function MakeWeapon(data)
-    table.insert(prefs, Prefab(
+    table.insert(prefs, Prefab( --手持物品
         data.name,
         function()
             local inst = CreateEntity()
 
             inst.entity:AddTransform()
             inst.entity:AddAnimState()
-            inst.entity:AddSoundEmitter()
             inst.entity:AddNetwork()
 
             MakeInventoryPhysics(inst)
-            RemovePhysicsColliders(inst)
 
             inst:AddTag("sharp")
             inst:AddTag("s_l_throw") --skill_legion_throw
-            inst:AddTag("siv_feather")
             inst:AddTag("allow_action_on_impassable")
 
             --weapon (from weapon component) added to pristine state for optimization
@@ -870,8 +867,8 @@ local function MakeWeapon(data)
 
             inst.AnimState:SetBank(data.name)
             inst.AnimState:SetBuild(data.name)
-            inst.AnimState:PlayAnimation("item", false)
-            -- inst.Transform:SetEightFaced()
+            inst.AnimState:PlayAnimation("idle", false)
+            inst.Transform:SetEightFaced()
 
             --Tip：官方的战斗辅助组件。加上后就能右键先瞄准再触发攻击。缺点是会导致其他对象的右键动作全部不起作用
             -- inst:AddComponent("aoetargeting")
@@ -886,17 +883,13 @@ local function MakeWeapon(data)
             -- inst.components.aoetargeting.reticule.ease = true
             -- inst.components.aoetargeting.reticule.mouseenabled = true
 
-            inst.projectiledelay = 2 * FRAMES
+            inst.projectiledelay = 2 * FRAMES --不能大于7帧
 
             MakeInventoryFloatable(inst, "small", 0.2, 0.5)
             local OnLandedClient_old = inst.components.floater.OnLandedClient
             inst.components.floater.OnLandedClient = function(self)
                 OnLandedClient_old(self)
                 self.inst.AnimState:SetFloatParams(0.04, 1, self.bob_percent)
-            end
-
-            if data.fn_common ~= nil then
-                data.fn_common(inst)
             end
 
             inst.entity:SetPristine()
@@ -912,7 +905,9 @@ local function MakeWeapon(data)
             inst:AddComponent("inventoryitem")
             inst.components.inventoryitem.imagename = data.name
             inst.components.inventoryitem.atlasname = "images/inventoryimages/"..data.name..".xml"
-            inst.components.inventoryitem:SetOnDroppedFn(OnDropped)
+            --被捡起时，修改自己的旋转角度 undo
+
+            inst:AddComponent("savedrotation") --保存旋转角度的组件
 
             inst:AddComponent("equippable")
             inst.components.equippable:SetOnEquip(OnEquip)
@@ -921,106 +916,119 @@ local function MakeWeapon(data)
 
             inst:AddComponent("weapon")
             inst.components.weapon:SetRange(-1, -1) --人物默认攻击距离为3、3
+            inst.components.weapon:SetDamage(data.damage)
 
-            inst:AddComponent("projectilelegion")
-            inst.components.projectilelegion.speed = 45
-            inst.components.projectilelegion.onthrown = OnThrown
-            inst.components.projectilelegion.onmiss = OnMiss
+            -- inst:AddComponent("projectilelegion")
+            -- inst.components.projectilelegion.speed = 45
+            -- inst.components.projectilelegion.shootrange = data.shootrange
+            -- inst.components.projectilelegion.onthrown = OnThrown
+            -- inst.components.projectilelegion.onmiss = OnMiss
 
             inst:AddComponent("skillspelllegion")
             inst.components.skillspelllegion.fn_spell = function(inst, caster, pos, options)
-                if caster.components.inventory then
-                    local doerpos = caster:GetPosition()
-                    local angles = {}
-                    local poss = {}
-                    local direction = (pos - doerpos):GetNormalized() --单位向量
-                    local angle = math.acos(direction:Dot(Vector3(1, 0, 0))) / DEGREES --这个角度是动画的，不能用来做物理的角度
-                    local ang_lag = 2.5
-
-                    --查询是否有能拉回的材料
-                    local lines = caster.components.inventory:FindItems(function(i)
-                        if i.line_l_value ~= nil or LineMap[i.prefab] then
-                            return true
-                        end
-                    end)
-
-                    local items = nil --需要丢出去的羽毛
-                    local num = inst.components.stackable:StackSize()
-                    if num <= 5 then
-                        items = caster.components.inventory:RemoveItem(inst, true)
-                    else
-                        items = inst.components.stackable:Get(5)
-                        items.components.inventoryitem:OnRemoved() --由于此时还处于物品栏状态，需要恢复为非物品栏状态
-                        num = 5
-                    end
-
-                    if num == 1 then
-                        angles = { 0 }
-                        poss[1] = pos
-                    else
-                        if num == 2 then
-                            angles = { -ang_lag, ang_lag }
-                        elseif num == 3 then
-                            angles = { -2*ang_lag, 0, 2*ang_lag }
-                        elseif num == 4 then
-                            angles = { -3*ang_lag, -ang_lag, ang_lag, 3*ang_lag }
-                        else --最多5个
-                            angles = { -4*ang_lag, -2*ang_lag, 0, 2*ang_lag, 4*ang_lag }
-                        end
-
-                        local ang = caster:GetAngleToPoint(pos.x, pos.y, pos.z) --原始角度，单位:度，比如33
-                        for i,v in ipairs(angles) do
-                            v = v + math.random()*2 - 1
-                            angles[i] = v
-                            local an = (ang+v)*DEGREES
-                            poss[i] = Vector3(doerpos.x+math.cos(an), 0, doerpos.z-math.sin(an))
-                        end
-                    end
-
-                    local feathers = {}
-                    for i,v in ipairs(angles) do
-                        local item = items.components.stackable:Get(1)
-                        item.Transform:SetPosition(doerpos:Get())
-                        feathers[i] = item
-                        item.components.projectilelegion:Throw(item, poss[i], caster, angle+v)
-                        item.components.projectilelegion:DelayVisibility(item.projectiledelay)
-                    end
-
-                    if caster.components.health ~= nil and not caster.components.health:IsDead() then
-                        local mask = caster.components.inventory:GetEquippedItem(EQUIPSLOTS.HEAD)
-                        if mask ~= nil and mask.feather_l_reducer ~= nil then
-                            mask = mask.feather_l_reducer
-                        else
-                            mask = 0
-                        end
-                        if caster.feather_l_reducer ~= nil then --简单地兼容其他东西
-                            mask = mask + caster.feather_l_reducer
-                        end
-                        caster.components.health:DoDelta(-(4 + mask)*num, true, data.name, false, nil, true)
-                        if not caster.components.health:IsDead() and #lines > 0 then
-                            local line = SpawnPrefab("siving_feather_line")
-                            caster.sivfeathers_l = feathers
-                            line.linedoer = caster
-                            if not caster.components.inventory:Equip(line) then
-                                line:Remove()
-                            end
-                        end
-                    end
-
-                    return true
+                if caster.components.inventory == nil then
+                    return false
                 end
+
+                local doerpos = caster:GetPosition()
+                local angles = {}
+                local poss = {}
+                local direction = (pos - doerpos):GetNormalized() --单位向量
+                local angle = math.acos(direction:Dot(Vector3(1, 0, 0))) / DEGREES --这个角度是动画的，不能用来做物理的角度
+                local ang_lag = 2.5
+
+                --查询是否有能拉回的材料
+                local lines = caster.components.inventory:FindItems(function(i)
+                    if i.line_l_value ~= nil or LineMap[i.prefab] then
+                        return true
+                    end
+                end)
+
+                local items = nil --需要丢出去的羽毛
+                local num = inst.components.stackable:StackSize()
+                if num <= 5 then
+                    items = caster.components.inventory:RemoveItem(inst, true)
+                else
+                    items = inst.components.stackable:Get(5)
+                    -- items.components.inventoryitem:OnRemoved() --由于此时还处于物品栏状态，需要恢复为非物品栏状态
+                    num = 5
+                end
+
+                if num == 1 then
+                    angles = { 0 }
+                    poss[1] = pos
+                else
+                    if num == 2 then
+                        angles = { -ang_lag, ang_lag }
+                    elseif num == 3 then
+                        angles = { -2*ang_lag, 0, 2*ang_lag }
+                    elseif num == 4 then
+                        angles = { -3*ang_lag, -ang_lag, ang_lag, 3*ang_lag }
+                    else --最多5个
+                        angles = { -4*ang_lag, -2*ang_lag, 0, 2*ang_lag, 4*ang_lag }
+                    end
+
+                    local ang = caster:GetAngleToPoint(pos.x, pos.y, pos.z) --原始角度，单位:度，比如33
+                    for i,v in ipairs(angles) do
+                        v = v + math.random()*2 - 1
+                        angles[i] = v
+                        local an = (ang+v)*DEGREES
+                        poss[i] = Vector3(doerpos.x+math.cos(an), 0, doerpos.z-math.sin(an))
+                    end
+                end
+
+                local feathers = {}
+                for i,v in ipairs(angles) do
+                    local fly = SpawnPrefab("siving_feather_fly")
+                    fly.AnimState:SetBank(data.name)
+                    fly.AnimState:SetBuild(data.name)
+                    fly.AnimState:PlayAnimation("shoot", false)
+
+                    fly.components.weapon:SetDamage(data.damage)
+                    fly.components.projectilelegion.shootrange = data.shootrange
+                    fly.feather_name = data.name
+                    fly.feather_skin = nil --undo 皮肤机制还没弄
+
+                    fly.Transform:SetPosition(doerpos:Get())
+                    table.insert(feathers, fly)
+
+                    fly.components.projectilelegion:Throw(fly, poss[i], caster, angle+v)
+                    fly.components.projectilelegion:DelayVisibility(inst.projectiledelay)
+                end
+
+                if caster.components.health ~= nil and not caster.components.health:IsDead() then
+                    local mask = caster.components.inventory:GetEquippedItem(EQUIPSLOTS.HEAD)
+                    if mask ~= nil and mask.feather_l_reducer ~= nil then
+                        mask = mask.feather_l_reducer
+                    else
+                        mask = 0
+                    end
+                    if caster.feather_l_reducer ~= nil then --简单地兼容其他东西
+                        mask = mask + caster.feather_l_reducer
+                    end
+                    caster.components.health:DoDelta(-(4 + mask)*num, true, data.name, false, nil, true)
+                    if not caster.components.health:IsDead() and #lines > 0 then
+                        local line = SpawnPrefab("siving_feather_line")
+                        caster.sivfeathers_l = feathers
+                        line.linedoer = caster
+                        if not caster.components.inventory:Equip(line) then
+                            line:Remove()
+                            caster.sivfeathers_l = nil
+                        end
+                    end
+                end
+
+                items:Remove() --全部删了吧，到时候重新生成，懒得保存以及恢复了
+
+                return true
             end
 
             MakeHauntableLaunch(inst)
 
-            if data.fn_server ~= nil then
-                data.fn_server(inst)
-            end
-
             return inst
         end,
-        data.assets,
-        data.prefabs
+        data.assets1,
+        data.prefabs1
     ))
 end
 
@@ -1083,7 +1091,7 @@ local function MakeBossWeapon(data)
                 end
                 inst:Remove()
             end
-            inst.components.projectilelegion.exclude_tags = { "INLIMBO", "NOCLICK", "siving", "boat" }
+            inst.components.projectilelegion.exclude_tags = { "INLIMBO", "NOCLICK", "siving" }
 
             if data.fn_server ~= nil then
                 data.fn_server(inst)
@@ -2140,22 +2148,23 @@ table.insert(prefs, Prefab(
 --玩家武器
 MakeWeapon({
     name = "siving_feather_real",
-    assets = {
+    assets1 = {
         Asset("ANIM", "anim/siving_feather_real.zip"),
         Asset("ATLAS", "images/inventoryimages/siving_feather_real.xml"),
         Asset("IMAGE", "images/inventoryimages/siving_feather_real.tex"),
     },
-    prefabs = {
+    prefabs1 = {
         -- "reticulelongmulti", --Tip：官方的战斗辅助组件
         -- "reticulelongmultiping",
+        "siving_feather_fly",
         "siving_feather_line"
     },
-    -- fn_common = function(inst) end,
-    fn_server = function(inst)
-        inst.components.weapon:SetDamage(61.2) --34*1.8
+    damage = 61.2, --34*1.8
+    shootrange = 13,
 
-        inst.components.projectilelegion.shootrange = 13
-    end
+    -- fn_common = function(inst) end,
+    -- fn_server = function(inst)
+    -- end
 })
 
 --BOSS产物：精致子圭翎羽
@@ -2260,32 +2269,33 @@ MakeBossWeapon({
 --玩家武器
 MakeWeapon({
     name = "siving_feather_fake",
-    assets = {
+    assets1 = {
         Asset("ANIM", "anim/siving_feather_fake.zip"),
         Asset("ATLAS", "images/inventoryimages/siving_feather_fake.xml"),
         Asset("IMAGE", "images/inventoryimages/siving_feather_fake.tex"),
     },
-    prefabs = {
+    prefabs1 = {
         -- "reticulelongmulti", --Tip：官方的战斗辅助组件
         -- "reticulelongmultiping",
+        "siving_feather_fly",
         "siving_feather_line"
     },
-    -- fn_common = function(inst) end,
-    fn_server = function(inst)
-        inst.components.weapon:SetDamage(40.8) --34*1.2
+    damage = 40.8, --34*1.2
+    shootrange = 10,
 
-        inst.components.projectilelegion.shootrange = 10
-        inst.components.projectilelegion.onhit = function(inst, targetpos, doer, target)
-            if not inst.isbroken and math.random() < 0.05 then
-                inst.isbroken = true
-                inst.Physics:Stop()
-                inst:StopUpdatingComponent(inst.components.projectilelegion)
-                inst:DoTaskInTime(0, function()
-                    inst:Remove()
-                end)
-            end
-        end
-    end
+    -- fn_common = function(inst) end,
+    -- fn_server = function(inst)
+    --     inst.components.projectilelegion.onhit = function(inst, targetpos, doer, target)
+    --         if not inst.isbroken and math.random() < 0.05 then
+    --             inst.isbroken = true
+    --             inst.Physics:Stop()
+    --             inst:StopUpdatingComponent(inst.components.projectilelegion)
+    --             inst:DoTaskInTime(0, function()
+    --                 inst:Remove()
+    --             end)
+    --         end
+    --     end
+    -- end
 })
 
 --BOSS产物：子圭翎羽
@@ -2334,8 +2344,63 @@ MakeBossWeapon({
 })
 
 --------------------------------------------------------------------------
---[[ 临时的羽刃拉扯器 ]]
+--[[ 临时的羽刃飞行器 临时的羽刃拉扯器 ]]
 --------------------------------------------------------------------------
+
+table.insert(prefs, Prefab(
+    "siving_feather_fly",
+    function()
+        local inst = CreateEntity()
+
+        inst.entity:AddTransform()
+        inst.entity:AddAnimState()
+        inst.entity:AddSoundEmitter()
+        inst.entity:AddNetwork()
+
+        MakeInventoryPhysics(inst)
+        RemovePhysicsColliders(inst)
+
+        inst.AnimState:SetOrientation(ANIM_ORIENTATION.OnGround)
+
+        inst:AddTag("sharp")
+
+        --weapon (from weapon component) added to pristine state for optimization
+        inst:AddTag("weapon")
+
+        inst.entity:SetPristine()
+        if not TheWorld.ismastersim then
+            return inst
+        end
+
+        inst:AddComponent("weapon")
+
+        inst:AddComponent("projectilelegion")
+        inst.components.projectilelegion.speed = 45
+        inst.components.projectilelegion.onthrown = function(inst, owner, targetpos, attacker)
+            inst.SoundEmitter:PlaySound("dontstarve/creatures/leif/swipe", nil, 0.2)
+        end
+        inst.components.projectilelegion.onmiss = function(inst, targetpos, attacker)
+            local x, y, z = inst.Transform:GetWorldPosition()
+            if TheWorld.Map:IsAboveGroundAtPoint(x, 0, z) or TheWorld.Map:IsOceanTileAtPoint(x, 0, z) then
+                local block = SpawnPrefab(data.name.."_block")
+                if block ~= nil then
+                    block.Transform:SetRotation(inst.Transform:GetRotation())
+                    block.Transform:SetPosition(x, y, z)
+                end
+            end
+            inst:Remove()
+        end
+        inst.components.projectilelegion.exclude_tags = { "INLIMBO", "NOCLICK", "siving" }
+
+        -- inst.task_remove = inst:DoTaskInTime(3.5, RemoveLine)
+
+        return inst
+    end,
+    nil,
+    nil
+))
+
+------
 
 local function RemoveFromOnwer(inst)
     if inst.components.inventoryitem ~= nil then
