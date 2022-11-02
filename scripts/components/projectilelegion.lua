@@ -104,21 +104,12 @@ function ProjectileLegion:Hit(target)
 	-- self:Stop()
 end
 
-local function DozeOff(inst, self)
-    self.dozeOffTask = nil
-    self:Miss() --官方这里用的Stop，那怎么实现的回复地面动画呢
-end
 function ProjectileLegion:OnEntitySleep()
-    if self.dozeOffTask == nil then
-   	    self.dozeOffTask = self.inst:DoTaskInTime(2, DozeOff, self)
-    end
+	if self.inst:IsValid() then
+		self:Miss()
+	end
 end
-function ProjectileLegion:OnEntityWake()
-    if self.dozeOffTask ~= nil then
-        self.dozeOffTask:Cancel()
-        self.dozeOffTask = nil
-    end
-end
+-- function ProjectileLegion:OnEntityWake()end
 
 function ProjectileLegion:OnUpdate(dt)
 	local current = self.inst:GetPosition()
@@ -143,11 +134,14 @@ function ProjectileLegion:OnUpdate(dt)
 			)
 		then
 			self:Hit(ent)
+			if self.inst.isbroken or not self.inst:IsValid() then
+				return
+			end
 			self.hittargets[ent] = true
 		end
 	end
 
-	if self.inst.isbroken then
+	if self.inst.isbroken or not self.inst:IsValid() then
 		return
 	end
 	if self.isgoback then

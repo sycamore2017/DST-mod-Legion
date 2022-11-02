@@ -1931,16 +1931,18 @@ if CONFIGS_LEGION.LEGENDOFFALL then
             if (inst.sg.statemem.projectiledelay or 0) > 0 then
                 inst.sg.statemem.projectiledelay = inst.sg.statemem.projectiledelay - dt
                 if inst.sg.statemem.projectiledelay <= 0 then
-                    inst.sg:RemoveStateTag("nointerrupt")
                     inst:PerformBufferedAction()
+                    inst.sg:RemoveStateTag("nointerrupt")
+                    inst.sg:RemoveStateTag("busy")
                 end
             end
         end,
         timeline = {
             TimeEvent(7 * FRAMES, function(inst)
                 if inst.sg.statemem.projectiledelay == nil then
-                    inst.sg:RemoveStateTag("nointerrupt")
                     inst:PerformBufferedAction()
+                    inst.sg:RemoveStateTag("nointerrupt")
+                    inst.sg:RemoveStateTag("busy")
                 end
             end),
             TimeEvent(18 * FRAMES, function(inst)
@@ -1994,6 +1996,8 @@ if CONFIGS_LEGION.LEGENDOFFALL then
         timeline = {
             TimeEvent(7 * FRAMES, function(inst)
                 inst:ClearBufferedAction()
+                inst.sg:RemoveStateTag("nointerrupt")
+                inst.sg:RemoveStateTag("busy")
             end)
         },
         ontimeout = function(inst)
@@ -2027,12 +2031,13 @@ if CONFIGS_LEGION.LEGENDOFFALL then
         end,
         timeline = {
             TimeEvent(3 * FRAMES, function(inst)
-                inst.sg:RemoveStateTag("nointerrupt")
                 inst:PerformBufferedAction()
-            end),
-            TimeEvent(6 * FRAMES, function(inst)
+                inst.sg:RemoveStateTag("nointerrupt")
                 inst.sg:RemoveStateTag("busy")
             end),
+            -- TimeEvent(6 * FRAMES, function(inst)
+            --     inst.sg:RemoveStateTag("busy")
+            -- end),
         },
         events = {
             EventHandler("animqueueover", function(inst)
@@ -2061,6 +2066,15 @@ if CONFIGS_LEGION.LEGENDOFFALL then
                 inst.sg:GoToState("idle")
             end
         end,
+        timeline = {
+            TimeEvent(3 * FRAMES, function(inst)
+                inst.sg:RemoveStateTag("nointerrupt")
+                inst.sg:RemoveStateTag("busy")
+            end),
+            -- TimeEvent(6 * FRAMES, function(inst)
+            --     inst.sg:RemoveStateTag("busy")
+            -- end),
+        },
         ontimeout = function(inst)
             inst:ClearBufferedAction()
             inst.sg:GoToState("idle")
