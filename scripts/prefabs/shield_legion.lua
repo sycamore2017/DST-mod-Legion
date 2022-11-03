@@ -522,7 +522,13 @@ end, {
 --------------------------------------------------------------------------
 
 if CONFIGS_LEGION.PRAYFORRAIN then
-    local function deathcallsforrain(owner)
+
+    -- local damage_shield = 30.6 --34*0.9
+    -- local damage_sword = 17 --34*0.5
+    local absorb_shield = 0.2
+    local absorb_sword = 0.75
+
+    local function DeathCallForRain(owner)
         TheWorld:PushEvent("ms_forceprecipitation", true)
     end
     local function drinkingblood(sword, owner)
@@ -531,7 +537,7 @@ if CONFIGS_LEGION.PRAYFORRAIN then
             sword.components.weapon:SetDamage(93.5-76.5*percent) --攻击力在17~93.5之间变化
         end
     end
-    local function radicalhealth(owner, data)
+    local function OnHealthDelta(owner, data)
         local sword = owner.components.inventory ~= nil and owner.components.inventory:GetEquippedItem(EQUIPSLOTS.HANDS) or nil
         if sword ~= nil and sword.prefab == "agronssword" then
             drinkingblood(sword, owner)
@@ -572,7 +578,7 @@ if CONFIGS_LEGION.PRAYFORRAIN then
             inst.components.weapon:SetDamage(55.25)
             inst.components.weapon:SetOnAttack(OnAttack_agron)
 
-            inst.components.armor:InitCondition(100, 0.2)
+            inst.components.armor:InitCondition(1000, absorb_shield)
             inst.components.armor.indestructible = true --无敌的护甲
 
             inst.components.equippable:SetOnEquip(function(inst, owner)
@@ -580,14 +586,14 @@ if CONFIGS_LEGION.PRAYFORRAIN then
 
                 -- owner.AnimState:OverrideSymbol("swap_object", "swap_agronssword", "swap_agronssword")
 
-                owner:ListenForEvent("death", deathcallsforrain)
-                owner:ListenForEvent("healthdelta", radicalhealth)
+                owner:ListenForEvent("death", DeathCallForRain)
+                owner:ListenForEvent("healthdelta", OnHealthDelta)
 
                 drinkingblood(inst, owner)
             end)
             inst.components.equippable:SetOnUnequip(function(inst, owner)
-                owner:RemoveEventCallback("death", deathcallsforrain)
-                owner:RemoveEventCallback("healthdelta", radicalhealth)
+                owner:RemoveEventCallback("death", DeathCallForRain)
+                owner:RemoveEventCallback("healthdelta", OnHealthDelta)
 
                 inst.components.weapon:SetDamage(55.25) --卸下时，恢复武器默认攻击力，为了让巨人之脚识别到
 

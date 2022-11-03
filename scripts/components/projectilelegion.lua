@@ -38,7 +38,7 @@ function ProjectileLegion:Throw(owner, targetpos, attacker, angle)
 
 	if self.isgoback then --StartUpdatingComponent会在下一帧执行，但是很可能在这一帧就飞远了
 		self.dest = PositionFix(targetpos)
-		if distsq(self.dest, self.start) <= self.bulletradius*self.bulletradius then
+		if distsq(self.dest, self.start) <= (self.bulletradius*self.bulletradius + 0.8) then
 			self:Miss()
 			return
 		end
