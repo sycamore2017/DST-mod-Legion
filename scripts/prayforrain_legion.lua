@@ -4,7 +4,6 @@ local prefabFiles = {
     "book_weather",             --气象之书
     "hat_mermbreathing",        --鱼之息
     "merm_scales",              --鱼鳞
-    "agronssword",              --艾力冈的剑
     "giantsfoot",               --巨脚背包
     "refractedmoonlight",       --月折宝剑
     "moonlight_legion",         --月之宝器

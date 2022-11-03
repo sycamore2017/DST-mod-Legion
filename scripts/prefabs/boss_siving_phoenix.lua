@@ -758,10 +758,12 @@ local function OnUnequip(inst, owner)
     owner:RemoveTag("s_l_throw") --skill_legion_throw
     owner:RemoveTag("siv_feather")
 end
-
-local function OnDropped(inst)
-    inst:PushEvent("on_landed")
+local function OnPickedUp_fea(inst, pickupguy, src_pos)
+    if pickupguy and pickupguy.Transform then
+        inst.Transform:SetRotation(pickupguy.Transform:GetRotation())
+    end
 end
+
 local function OnThrown_fly(inst, owner, targetpos, attacker)
     inst.SoundEmitter:PlaySound("dontstarve/creatures/leif/swipe", nil, 0.2)
 end
@@ -771,7 +773,7 @@ local function OnMiss_fly(basename, inst, targetpos, attacker)
         if attacker and attacker.sivfeathers_l ~= nil then
             local num = 0
             for _,v in ipairs(attacker.sivfeathers_l) do
-                if v and not v.isbroken then
+                if v and v:IsValid() then
                     num = num + 1
                 end
             end
@@ -783,35 +785,33 @@ local function OnMiss_fly(basename, inst, targetpos, attacker)
                 if num > 1 then
                     fea.components.stackable:SetStackSize(num)
                 end
-
                 if IsValid(attacker) then
                     if not attacker.components.inventory:Equip(fea) then
                         attacker.components.inventory:GiveItem(fea)
                     end
-                else
-                    OnDropped(fea)
                 end
             end
         end
         inst:Remove()
     else
-        local fea
         if --有线，那就先以滞留体形式存在
             inst.hasline and
             inst.caster ~= nil and IsValid(inst.caster) and
             inst.caster.sivfeathers_l ~= nil
         then
-            fea = SpawnPrefab(basename.."_blk")
+            local fea = SpawnPrefab(basename.."_blk")
             fea.feather_skin = inst.feather_skin --undo 皮肤机制还没弄
             fea.shootidx = inst.shootidx
             fea.caster = inst.caster
             inst.caster.sivfeathers_l[inst.shootidx] = fea
+            fea.Transform:SetRotation(inst.Transform:GetRotation())
+            fea.Transform:SetPosition(inst.Transform:GetWorldPosition())
+            fea:PushEvent("on_landed")
         else --没有线的话，立即变回正常的羽毛
-            fea = SpawnPrefab(basename, inst.feather_skin)
+            local fea = SpawnPrefab(basename, inst.feather_skin)
+            fea.Transform:SetRotation(inst.Transform:GetRotation())
+            fea.Transform:SetPosition(inst.Transform:GetWorldPosition())
         end
-        fea.Transform:SetRotation(inst.Transform:GetRotation())
-        fea.Transform:SetPosition(inst.Transform:GetWorldPosition())
-        OnDropped(fea)
         inst:Remove()
     end
 end
@@ -871,19 +871,18 @@ local function MakeWeapon(data)
         end
     end
     local function InitFeaFx(inst)
-        inst.OnSave = function(inst, data)
+        inst.OnSave = function(inst, dataa)
             if inst.feather_skin then
-                data.feather_skin = inst.feather_skin
+                dataa.feather_skin = inst.feather_skin
             end
         end
-        inst.OnLoad = function(inst, data)
-            if data ~= nil and data.feather_skin ~= nil then
-                inst.feather_skin = data.feather_skin
+        inst.OnLoad = function(inst, dataa)
+            if dataa ~= nil and dataa.feather_skin ~= nil then
+                inst.feather_skin = dataa.feather_skin
             end
             inst:DoTaskInTime(0.37, function(inst) --如果是加载时，应该恢复为正常的羽毛
                 local fea = SpawnPrefab(data.name, inst.feather_skin)
                 fea.Transform:SetPosition(inst.Transform:GetWorldPosition())
-                OnDropped(fea)
                 inst:Remove()
             end)
         end
@@ -899,7 +898,6 @@ local function MakeWeapon(data)
             local fea = SpawnPrefab(data.name, inst.feather_skin)
             fea.Transform:SetRotation(inst.Transform:GetRotation())
             fea.Transform:SetPosition(inst.Transform:GetWorldPosition())
-            OnDropped(fea)
             inst:Remove()
         end
     end
@@ -951,7 +949,8 @@ local function MakeWeapon(data)
             inst:AddComponent("inventoryitem")
             inst.components.inventoryitem.imagename = data.name
             inst.components.inventoryitem.atlasname = "images/inventoryimages/"..data.name..".xml"
-            --被捡起时，修改自己的旋转角度 undo
+            inst.components.inventoryitem.TryToSink = function(self, ...)end --防止在虚空里消失
+            inst.components.inventoryitem:SetOnPickupFn(OnPickedUp_fea) --被捡起时，修改自己的旋转角度
 
             inst:AddComponent("savedrotation") --保存旋转角度的组件
 
@@ -1047,6 +1046,7 @@ local function MakeWeapon(data)
                     if caster.feather_l_reducer ~= nil then --简单地兼容其他东西
                         mask = mask + caster.feather_l_reducer
                     end
+                    caster.sivfeathers_l = nil
                     caster.components.health:DoDelta(-(4 + mask)*num, true, data.name, false, nil, true)
                     if not caster.components.health:IsDead() and lines then
                         local line = SpawnPrefab("siving_feather_line")
@@ -1126,14 +1126,8 @@ local function MakeWeapon(data)
             end
             if not data.isreal then
                 inst.components.projectilelegion.onhit = function(inst, targetpos, doer, target)
-                    if not inst.isbroken and math.random() < 0.05 then
-                        inst.isbroken = true
+                    if math.random() < 0.05 then
                         inst:Remove()
-                        -- inst.Physics:Stop()
-                        -- inst:StopUpdatingComponent(inst.components.projectilelegion)
-                        -- inst:DoTaskInTime(0, function()
-                        --     inst:Remove()
-                        -- end)
                     end
                 end
             end
@@ -1230,6 +1224,7 @@ local function MakeBossWeapon(data)
             end
             inst.components.projectilelegion.onmiss = function(inst, targetpos, attacker)
                 local x, y, z = inst.Transform:GetWorldPosition()
+                -- if TheWorld.Map:IsVisualGroundAtPoint(x, 0, z) then --仅限陆地
                 if TheWorld.Map:IsAboveGroundAtPoint(x, 0, z) or TheWorld.Map:IsOceanTileAtPoint(x, 0, z) then
                     local block = SpawnPrefab(data.name.."_block")
                     if block ~= nil then
@@ -2473,7 +2468,7 @@ local function RemoveLine(inst)
     if inst.linedoer ~= nil then
         if inst.linedoer.sivfeathers_l ~= nil then --非法移除时，将飞行体或者滞留体都恢复为正常羽毛
             for _,v in ipairs(inst.linedoer.sivfeathers_l) do
-                if v and v:IsValid() and not v.isbroken then
+                if v and v:IsValid() then
                     if v.OnEntitySleep then
                         v:OnEntitySleep()
                     end
@@ -2588,7 +2583,7 @@ table.insert(prefs, Prefab(
                 local doerpos = doer:GetPosition()
                 local fea_name = nil
                 for _,v in ipairs(doer.sivfeathers_l) do
-                    if v and v:IsValid() and not v.isbroken then
+                    if v and v:IsValid() then
                         if fea_name == nil then
                             fea_name = string.sub(v.prefab, 1, -5)
                         end
@@ -2601,7 +2596,7 @@ table.insert(prefs, Prefab(
                 RemoveLine(inst)
                 if throwed then
                     for _,v in ipairs(doer.sivfeathers_l) do
-                        if v and v:IsValid() and not v.isbroken then
+                        if v and v:IsValid() then
                             local fly
                             if v.isblk then --是滞留体，需要重新生成飞行体
                                 fly = SpawnPrefab(fea_name.."_fly")
@@ -2623,24 +2618,6 @@ table.insert(prefs, Prefab(
                 else
                     doer.sivfeathers_l = nil
                 end
-
-                -- if not throwed then --如果没有能拉回来的羽毛，那就直接结算拉回的结果
-                --     if num > 0 and itemname then
-                --         local newitem = SpawnPrefab(itemname)
-                --         if newitem then
-                --             if num > 1 and newitem.components.stackable ~= nil then
-                --                 newitem.components.stackable:SetStackSize(num)
-                --             end
-                --             newitem.Transform:SetPosition(doerpos:Get())
-
-                --             if not doer.components.inventory:Equip(newitem) then
-                --                 doer.components.inventory:GiveItem(newitem)
-                --             end
-                --         end
-                --     else
-                --         RemoveLine(inst)
-                --     end
-                -- end
             end
         end
 

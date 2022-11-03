@@ -4,6 +4,23 @@ local prefs = {}
 --[[ 通用函数 ]]
 --------------------------------------------------------------------------
 
+local function Counterattack_base(inst, doer, attacker, data, range, atk)
+    local snap = SpawnPrefab("impact")
+    local x, y, z = doer.Transform:GetWorldPosition()
+    snap.Transform:SetScale(2, 2, 2)
+
+    if inst.components.shieldlegion:Counterattack(doer, attacker, data, range, atk) then
+        local x1, y1, z1 = attacker.Transform:GetWorldPosition()
+        local angle = -math.atan2(z1 - z, x1 - x)
+        snap.Transform:SetRotation(angle * RADIANS)
+        snap.Transform:SetPosition(x1, y1, z1)
+        return true
+    else
+        snap.Transform:SetPosition(x, y, z)
+        return false
+    end
+end
+
 local function OnEquipFn(inst, owner)
     if inst.components.skinedlegion ~= nil then
         local skindata = inst.components.skinedlegion:GetSkinedData()
@@ -333,20 +350,8 @@ if TUNING.LEGION_DESERTSECRET then
             inst.hurtsoundoverride = "dontstarve/creatures/together/antlion/sfx/break"
             inst.components.shieldlegion.armormult_success = mult_success_normal
             inst.components.shieldlegion.atkfn = function(inst, doer, attacker, data)
-                local snap = SpawnPrefab("impact")
-                local x, y, z = doer.Transform:GetWorldPosition()
-                snap.Transform:SetScale(2, 2, 2)
-
                 OnBlocked(doer, { attacker = attacker })
-
-                if inst.components.shieldlegion:Counterattack(doer, attacker, data, 8, 3) then --此时敌人近
-                    local x1, y1, z1 = attacker.Transform:GetWorldPosition()
-                    local angle = -math.atan2(z1 - z, x1 - x)
-                    snap.Transform:SetRotation(angle * RADIANS)
-                    snap.Transform:SetPosition(x1, y1, z1)
-                else
-                    snap.Transform:SetPosition(x, y, z)
-                end
+                Counterattack_base(inst, doer, attacker, data, 8, 3)
             end
             inst.components.shieldlegion.atkstayingfn = function(inst, doer, attacker, data)
                 inst.components.shieldlegion:Counterattack(doer, attacker, data, 8, 1.5)
@@ -391,9 +396,7 @@ MakeShield({
         Asset("ATLAS", "images/inventoryimages/shield_l_log.xml"),
         Asset("IMAGE", "images/inventoryimages/shield_l_log.tex"),
     },
-    prefabs = {
-        "shield_attack_l_fx",
-    },
+    prefabs = { "shield_attack_l_fx" },
     fn_common = function(inst)
         inst:AddComponent("skinedlegion")
         inst.components.skinedlegion:InitWithFloater("shield_l_log")
@@ -403,27 +406,14 @@ MakeShield({
         inst.components.equippable:SetOnUnequip(OnUnequipFn)
 
         inst.hurtsoundoverride = "dontstarve/wilson/hit_armour"
-        inst.components.shieldlegion.armormult_success = 0.5
+        inst.components.shieldlegion.armormult_success = 0.4
         inst.components.shieldlegion.atkfn = function(inst, doer, attacker, data)
-            local snap = SpawnPrefab("impact")
-            local x, y, z = doer.Transform:GetWorldPosition()
-            snap.Transform:SetScale(2, 2, 2)
-
-            if inst.components.shieldlegion:Counterattack(doer, attacker, data, 6, 2.5) then --此时敌人近
-                local x1, y1, z1 = attacker.Transform:GetWorldPosition()
-                local angle = -math.atan2(z1 - z, x1 - x)
-                snap.Transform:SetRotation(angle * RADIANS)
-                snap.Transform:SetPosition(x1, y1, z1)
-            else
-                snap.Transform:SetPosition(x, y, z)
-            end
+            Counterattack_base(inst, doer, attacker, data, 6, 2.5)
         end
         inst.components.shieldlegion.atkstayingfn = function(inst, doer, attacker, data)
             inst.components.shieldlegion:Counterattack(doer, attacker, data, 6, 0.8)
         end
-        -- inst.components.shieldlegion.atkfailfn = function(inst, doer, attacker, data)
-        --     inst.components.shieldlegion:Counterattack(doer, attacker, data, 4, 0.1) --即使盾反失败也要攻击一下
-        -- end
+        -- inst.components.shieldlegion.atkfailfn = function(inst, doer, attacker, data) end
 
         inst.components.weapon:SetDamage(27.2) --34*0.8
 
@@ -526,6 +516,98 @@ table.insert(prefs, Prefab("shieldterror_fire", function()
 end, {
     Asset("ANIM", "anim/coldfire_fire.zip")
 }, nil))
+
+--------------------------------------------------------------------------
+--[[ 艾力冈的剑 ]]
+--------------------------------------------------------------------------
+
+if CONFIGS_LEGION.PRAYFORRAIN then
+    local function deathcallsforrain(owner)
+        TheWorld:PushEvent("ms_forceprecipitation", true)
+    end
+    local function drinkingblood(sword, owner)
+        if owner.components.health ~= nil then
+            local percent = owner.components.health:GetPercent()
+            sword.components.weapon:SetDamage(93.5-76.5*percent) --攻击力在17~93.5之间变化
+        end
+    end
+    local function radicalhealth(owner, data)
+        local sword = owner.components.inventory ~= nil and owner.components.inventory:GetEquippedItem(EQUIPSLOTS.HANDS) or nil
+        if sword ~= nil and sword.prefab == "agronssword" then
+            drinkingblood(sword, owner)
+        end
+    end
+
+    local function OnAttack_agron(inst, owner, target)
+        if owner.components.health and owner.components.health:GetPercent() > 0.5 then
+            local fx = SpawnPrefab("agronssword_fx")    --燃血特效
+            fx.Transform:SetPosition(owner.Transform:GetWorldPosition())
+            owner.components.health:DoDelta(-1.5, false, "agronssword")
+        end
+    end
+
+    MakeShield({
+        name = "agronssword",
+        assets = {
+            Asset("ANIM", "anim/agronssword.zip"),    --这个是放在地上的动画文件
+            Asset("ANIM", "anim/swap_agronssword.zip"),   --手上的动画
+            Asset("ATLAS", "images/inventoryimages/agronssword.xml"),
+            Asset("IMAGE", "images/inventoryimages/agronssword.tex")
+        },
+        prefabs = { "agronssword_fx" },
+        fn_common = function(inst)
+            inst.entity:AddMiniMapEntity()
+            inst.MiniMapEntity:SetIcon("agronssword.tex")
+
+            inst:AddTag("sharp") --武器的标签跟攻击方式跟攻击音效有关 没有特殊的话就用这两个
+            inst:AddTag("pointy")
+            inst:AddTag("irreplaceable") --防止被猴子、食人花、坎普斯等拿走，防止被流星破坏，并使其下线时会自动掉落
+            inst:AddTag("nonpotatable") --这个貌似是？
+            inst:AddTag("hide_percentage")  --这个标签能让护甲耐久比例不显示出来
+            inst:AddTag("NORATCHECK") --mod兼容：永不妥协。该道具不算鼠潮分
+        end,
+        fn_server = function(inst)
+            inst.components.inventoryitem:SetSinks(true) --落水时会下沉，但是因为标签的关系会回到绚丽大门
+
+            inst.components.weapon:SetDamage(55.25)
+            inst.components.weapon:SetOnAttack(OnAttack_agron)
+
+            inst.components.armor:InitCondition(100, 0.2)
+            inst.components.armor.indestructible = true --无敌的护甲
+
+            inst.components.equippable:SetOnEquip(function(inst, owner)
+                OnEquipFn(inst, owner)
+
+                -- owner.AnimState:OverrideSymbol("swap_object", "swap_agronssword", "swap_agronssword")
+
+                owner:ListenForEvent("death", deathcallsforrain)
+                owner:ListenForEvent("healthdelta", radicalhealth)
+
+                drinkingblood(inst, owner)
+            end)
+            inst.components.equippable:SetOnUnequip(function(inst, owner)
+                owner:RemoveEventCallback("death", deathcallsforrain)
+                owner:RemoveEventCallback("healthdelta", radicalhealth)
+
+                inst.components.weapon:SetDamage(55.25) --卸下时，恢复武器默认攻击力，为了让巨人之脚识别到
+
+                OnUnequipFn(inst, owner)
+            end)
+
+            inst.hurtsoundoverride = "dontstarve/wilson/hit_armour"
+            inst.components.shieldlegion.armormult_success = 0
+            inst.components.shieldlegion.atkfn = function(inst, doer, attacker, data)
+                Counterattack_base(inst, doer, attacker, data, 8, 1.33)
+            end
+            inst.components.shieldlegion.atkstayingfn = function(inst, doer, attacker, data)
+                inst.components.shieldlegion:Counterattack(doer, attacker, data, 8, 1)
+            end
+            -- inst.components.shieldlegion.atkfailfn = function(inst, doer, attacker, data) end
+
+            -- inst.components.skinedlegion:SetOnPreLoad()
+        end,
+    })
+end
 
 --------------------
 --------------------

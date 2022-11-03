@@ -115,6 +115,13 @@ function ProjectileLegion:OnUpdate(dt)
 	local current = self.inst:GetPosition()
 
 	local x, y, z = current:Get()
+
+	--检测目前所在地皮，如果进入虚空领地，就直接停止
+	if not TheWorld.Map:IsAboveGroundAtPoint(x, 0, z) and not TheWorld.Map:IsOceanTileAtPoint(x, 0, z) then
+		self:Miss()
+		return
+	end
+
 	local ents = TheSim:FindEntities(x, y, z, 7, { "_combat" }, self.exclude_tags)
 	for _,ent in ipairs(ents) do
 		if
@@ -134,18 +141,18 @@ function ProjectileLegion:OnUpdate(dt)
 			)
 		then
 			self:Hit(ent)
-			if self.inst.isbroken or not self.inst:IsValid() then
+			if not self.inst:IsValid() then
 				return
 			end
 			self.hittargets[ent] = true
 		end
 	end
 
-	if self.inst.isbroken or not self.inst:IsValid() then
+	if not self.inst:IsValid() then
 		return
 	end
 	if self.isgoback then
-		if distsq(self.dest, current) <= self.bulletradius*self.bulletradius then
+		if distsq(self.dest, current) <= (self.bulletradius*self.bulletradius + 0.8) then
 			self:Miss()
 		end
 	elseif self.shootrange ~= nil and distsq(self.start, current) >= self.shootrange*self.shootrange then
