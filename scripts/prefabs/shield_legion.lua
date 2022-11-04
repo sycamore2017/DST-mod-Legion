@@ -44,6 +44,10 @@ local function OnEquipFn(inst, owner)
     owner.AnimState:Hide("ARM_normal") --隐藏普通的手
     owner.AnimState:Show("LANTERN_OVERLAY")
 
+    if owner:HasTag("equipmentmodel") then --假人！
+        return
+    end
+
     RebuildRedirectDamageFn(owner) --全局函数：重新构造combat的redirectdamagefn函数
     --登记远程保护的函数
     if owner.redirect_table[inst.prefab] == nil then
@@ -523,33 +527,30 @@ end, {
 
 if CONFIGS_LEGION.PRAYFORRAIN then
 
-    -- local damage_shield = 30.6 --34*0.9
-    -- local damage_sword = 17 --34*0.5
+    local damage_shield = 85 --34*2.5
+    local damage_sword = 136 --34*4
     local absorb_shield = 0.2
-    local absorb_sword = 0.75
+    local absorb_sword = 0.95
 
     local function DeathCallForRain(owner)
         TheWorld:PushEvent("ms_forceprecipitation", true)
     end
-    local function drinkingblood(sword, owner)
-        if owner.components.health ~= nil then
-            local percent = owner.components.health:GetPercent()
-            sword.components.weapon:SetDamage(93.5-76.5*percent) --攻击力在17~93.5之间变化
-        end
-    end
-    local function OnHealthDelta(owner, data)
-        local sword = owner.components.inventory ~= nil and owner.components.inventory:GetEquippedItem(EQUIPSLOTS.HANDS) or nil
-        if sword ~= nil and sword.prefab == "agronssword" then
-            drinkingblood(sword, owner)
-        end
-    end
-
     local function OnAttack_agron(inst, owner, target)
-        if owner.components.health and owner.components.health:GetPercent() > 0.5 then
-            local fx = SpawnPrefab("agronssword_fx")    --燃血特效
+        if owner.components.health ~= nil and owner.components.health:GetPercent() > 0.1 then
+            local fx = SpawnPrefab("agronssword_fx") --燃血特效
             fx.Transform:SetPosition(owner.Transform:GetWorldPosition())
             owner.components.health:DoDelta(-1.5, false, "agronssword")
         end
+    end
+    local function CalcDamage_agron(inst)
+        local owner = inst.components.inventoryitem:GetGrandOwner()
+        if owner and owner.components.health and owner.components.inventory then
+            if inst == owner.components.inventory:GetEquippedItem(EQUIPSLOTS.HANDS) then
+                inst.fn_onHealthDelta(owner, nil)
+                return
+            end
+        end
+        inst.components.weapon:SetDamage(inst._basedamage)
     end
 
     MakeShield({
@@ -573,29 +574,40 @@ if CONFIGS_LEGION.PRAYFORRAIN then
             inst:AddTag("NORATCHECK") --mod兼容：永不妥协。该道具不算鼠潮分
         end,
         fn_server = function(inst)
+            inst._task_revolt = nil
+            inst._basedamage = damage_shield
+            inst.fn_onHealthDelta = function(owner, data)
+                local percent = 1.0
+                if data and data.newpercent then
+                    percent = data.newpercent
+                else
+                    percent = owner.components.health:GetPercent()
+                end
+                inst.components.weapon:SetDamage(inst._basedamage*(1.2-percent))
+            end
+
             inst.components.inventoryitem:SetSinks(true) --落水时会下沉，但是因为标签的关系会回到绚丽大门
 
-            inst.components.weapon:SetDamage(55.25)
+            inst.components.weapon:SetDamage(damage_shield)
             inst.components.weapon:SetOnAttack(OnAttack_agron)
 
-            inst.components.armor:InitCondition(1000, absorb_shield)
+            inst.components.armor:InitCondition(100, absorb_shield)
             inst.components.armor.indestructible = true --无敌的护甲
 
             inst.components.equippable:SetOnEquip(function(inst, owner)
                 OnEquipFn(inst, owner)
 
                 -- owner.AnimState:OverrideSymbol("swap_object", "swap_agronssword", "swap_agronssword")
-
-                owner:ListenForEvent("death", DeathCallForRain)
-                owner:ListenForEvent("healthdelta", OnHealthDelta)
-
-                drinkingblood(inst, owner)
+                if owner.components.health ~= nil then
+                    owner:ListenForEvent("death", DeathCallForRain)
+                    owner:ListenForEvent("healthdelta", inst.fn_onHealthDelta)
+                    inst.fn_onHealthDelta(owner, nil)
+                end
             end)
             inst.components.equippable:SetOnUnequip(function(inst, owner)
                 owner:RemoveEventCallback("death", DeathCallForRain)
-                owner:RemoveEventCallback("healthdelta", OnHealthDelta)
-
-                inst.components.weapon:SetDamage(55.25) --卸下时，恢复武器默认攻击力，为了让巨人之脚识别到
+                owner:RemoveEventCallback("healthdelta", inst.fn_onHealthDelta)
+                inst.components.weapon:SetDamage(inst._basedamage) --卸下时，恢复攻击力，为了让巨人之脚识别到
 
                 OnUnequipFn(inst, owner)
             end)
@@ -603,7 +615,38 @@ if CONFIGS_LEGION.PRAYFORRAIN then
             inst.hurtsoundoverride = "dontstarve/wilson/hit_armour"
             inst.components.shieldlegion.armormult_success = 0
             inst.components.shieldlegion.atkfn = function(inst, doer, attacker, data)
-                Counterattack_base(inst, doer, attacker, data, 8, 1.33)
+                --先加攻击力，这样输出高一点
+                if inst._task_revolt ~= nil then
+                    inst._task_revolt:Cancel()
+                else
+                    inst._basedamage = damage_sword
+                    inst.fn_onHealthDelta(doer, nil)
+                    inst.components.armor:SetAbsorption(absorb_sword)
+                    inst._task_fx = inst:DoPeriodicTask(0.21, function(inst)
+                        local fx = SpawnPrefab("agronssword_fx")
+                        fx.Transform:SetPosition((inst.components.inventoryitem:GetGrandOwner() or inst).Transform:GetWorldPosition())
+                    end, 0)
+                    --改贴图 undo
+                end
+                inst._task_revolt = inst:DoTaskInTime(10, function(inst)
+                    inst._task_revolt = nil
+                    inst._basedamage = damage_shield
+                    CalcDamage_agron(inst) --因为此时有可能不再是装备状态，doer 发生了改变
+                    inst.components.armor:SetAbsorption(absorb_shield)
+                    if inst._task_fx ~= nil then
+                        inst._task_fx:Cancel()
+                        inst._task_fx = nil
+                    end
+                    --改贴图 undo
+                end)
+
+                Counterattack_base(inst, doer, attacker, data, 8, 1.3)
+
+                --后回血，这样输出高一点
+                local percent = doer.components.health:GetPercent()
+                if percent > 0 and percent <= 0.3 then
+                    doer.components.health:SetPercent(percent+0.1, false, "agronssword")
+                end
             end
             inst.components.shieldlegion.atkstayingfn = function(inst, doer, attacker, data)
                 inst.components.shieldlegion:Counterattack(doer, attacker, data, 8, 1)

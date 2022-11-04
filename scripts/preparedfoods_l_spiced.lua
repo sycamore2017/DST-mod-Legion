@@ -86,4 +86,6 @@ end
 
 GenerateSpicedFoods(require("preparedfoods_legion"))
 
+--undo 加入牛排战斧的配方
+
 return foods_spiced
