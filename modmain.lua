@@ -327,11 +327,15 @@ if TUNING.LEGION_SUPERBCUISINE then
     for k, recipe in pairs(foodrecipes_spice) do
         AddCookerRecipe("portablespicer", recipe)
     end
+    local itemrecipes_spice = require("prepareditems_l_spiced")
+    for k, recipe in pairs(itemrecipes_spice) do
+        AddCookerRecipe("portablespicer", recipe)
+    end
 
     --官方的便携香料站代码没改新机制，这里用另类方式手动改一下。等官方修复了我就删除。相关文件 prefabs\portablespicer.lua
     local IsModCookingProduct_old = IsModCookingProduct
     _G.IsModCookingProduct = function(cooker, name)
-        if foodrecipes_spice[name] ~= nil then
+        if foodrecipes_spice[name] ~= nil or itemrecipes_spice[name] ~= nil then
             return false
         end
         if IsModCookingProduct_old ~= nil then

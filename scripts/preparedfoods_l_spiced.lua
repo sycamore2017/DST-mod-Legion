@@ -12,8 +12,7 @@ local function oneaten_chili(inst, eater)
     eater:AddDebuff("buff_attack", "buff_attack")
 end
 
-local SPICES =
-{
+local SPICES = {
     SPICE_GARLIC = { oneatenfn = oneaten_garlic, prefabs = { "buff_playerabsorption" } },
     SPICE_SUGAR  = { oneatenfn = oneaten_sugar, prefabs = { "buff_workeffectiveness" } },
     SPICE_CHILI  = { oneatenfn = oneaten_chili, prefabs = { "buff_attack" } },
@@ -25,13 +24,13 @@ local function GenerateSpicedFoods(foods)
         for spicenameupper, spicedata in pairs(SPICES) do
             local newdata = shallowcopy(fooddata)
             local spicename = string.lower(spicenameupper)
-            if foodname == "wetgoop" then
-                newdata.test = function(cooker, names, tags) return names[spicename] end
-                newdata.priority = -10
-            else
+            -- if foodname == "wetgoop" then
+            --     newdata.test = function(cooker, names, tags) return names[spicename] end
+            --     newdata.priority = -10
+            -- else
                 newdata.test = function(cooker, names, tags) return names[foodname] and names[spicename] end
                 newdata.priority = 100
-            end
+            -- end
             newdata.cooktime = .12
             newdata.stacksize = nil
             newdata.spice = spicenameupper
@@ -47,7 +46,7 @@ local function GenerateSpicedFoods(foods)
             if newdata.float ~= nil then --原本就会沉的料理，即使加了调料一样会沉
                 newdata.float = {nil, "med", 0.05, {0.8, 0.7, 0.8}}
             end
-            foods_spiced[newdata.name] = newdata ------------------修改点！！！！
+            foods_spiced[newdata.name] = newdata
 
             ------------
 
@@ -85,7 +84,5 @@ local function GenerateSpicedFoods(foods)
 end
 
 GenerateSpicedFoods(require("preparedfoods_legion"))
-
---undo 加入牛排战斧的配方
 
 return foods_spiced

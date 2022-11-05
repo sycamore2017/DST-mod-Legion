@@ -171,6 +171,10 @@ end
 ------牛排战斧------
 
 local prefabs_steak = { "boneshard" }
+local foliageath_data_steak = {
+    image = "foliageath_dish_tomahawksteak", atlas = "images/inventoryimages/foliageath_dish_tomahawksteak.xml",
+    bank = "foliageath", build = "foliageath", anim = "dish_tomahawksteak", isloop = false
+}
 
 local function UpdateAxe(inst)
     local value
@@ -236,6 +240,7 @@ local function OnEquip_steak(inst, owner)
         return
     end
 
+    owner:PushEvent("learncookbookstats", inst.food_basename or inst.prefab) --解锁烹饪书数据
     owner:ListenForEvent("working", AfterWorking)
     owner.steak_l_chop = inst._chopchance
 end
@@ -290,6 +295,10 @@ local function MakeSteak(data)
 
                 inst:AddTag("spicedfood")
 
+                if data.spicename == "spice_garlic" then
+                    inst:AddTag("hide_percentage")
+                end
+
                 --设置作为背景的料理图
                 inst.inv_image_bg = { atlas = "images/inventoryimages/"..basename..".xml", image = basename..".tex" }
 
@@ -313,6 +322,7 @@ local function MakeSteak(data)
 
             inst:AddTag("show_spoilage")
             inst:AddTag("icebox_valid")
+            inst:AddTag("preparedfood") --这个标签能使其被放入香料站
 
             inst:AddTag("sharp")
 
@@ -329,6 +339,8 @@ local function MakeSteak(data)
 
             inst.food_symbol_build = basename
             inst.food_basename = data.spicename ~= nil and basename or nil
+
+            inst.foliageath_data = foliageath_data_steak
 
             inst._damage = nil --基础攻击力
             inst._chopvalue = nil --基础砍伐效率
@@ -347,7 +359,7 @@ local function MakeSteak(data)
 
             inst:AddComponent("perishable")
             inst.components.perishable.onperishreplacement = "boneshard"
-            inst.components.perishable:SetPerishTime(data.perishtime)
+            inst.components.perishable:SetPerishTime(data.perishtime or TUNING.PERISH_MED)
             inst.components.perishable:StartPerishing()
 
             inst:AddComponent("tool")
@@ -376,9 +388,9 @@ end
 
 ------
 
-MakeSteak({
+MakeSteak({ --普通
     spicename = nil,
-    perishtime = TUNING.PERISH_MED,
+    perishtime = nil,
     fn_server = function(inst)
         inst._damage = { 47.6, 61.2 } --34x1.8
         inst._chopvalue = { 1.2, 1.66 }
@@ -390,8 +402,63 @@ MakeSteak({
         inst.components.weapon:SetDamage(inst._damage[2])
     end
 })
+MakeSteak({ --大蒜香料：加护甲
+    spicename = "spice_garlic",
+    perishtime = nil,
+    fn_server = function(inst)
+        inst._damage = { 47.6, 61.2 } --34x1.8
+        inst._chopvalue = { 1.2, 1.66 }
+        inst._chopchance = 0.05
+        inst._UpdateAxe = UpdateAxe
 
+        inst.components.tool:SetAction(ACTIONS.CHOP, inst._chopvalue[2])
 
+        inst.components.weapon:SetDamage(inst._damage[2])
+
+        inst:AddComponent("armor")
+        inst.components.armor:InitCondition(100, 0.4)
+        inst.components.armor.indestructible = true --无敌的护甲
+    end
+})
+MakeSteak({ --蜂蜜香料：加工作效率
+    spicename = "spice_sugar",
+    perishtime = nil,
+    fn_server = function(inst)
+        inst._damage = { 47.6, 61.2 } --34x1.8
+        inst._chopvalue = { 1.8, 2.5 }
+        inst._chopchance = 0.15
+        inst._UpdateAxe = UpdateAxe
+
+        inst.components.tool:SetAction(ACTIONS.CHOP, inst._chopvalue[2])
+
+        inst.components.weapon:SetDamage(inst._damage[2])
+    end
+})
+MakeSteak({ --辣椒香料：加攻击
+    spicename = "spice_chili",
+    perishtime = nil,
+    fn_server = function(inst)
+        inst._damage = { 64.26, 82.62 } --34x1.8x1.35
+        inst._chopvalue = { 1.2, 1.66 }
+        inst._chopchance = 0.05
+        inst._UpdateAxe = UpdateAxe
+
+        inst.components.tool:SetAction(ACTIONS.CHOP, inst._chopvalue[2])
+
+        inst.components.weapon:SetDamage(inst._damage[2])
+    end
+})
+MakeSteak({ --盐香料：加新鲜度
+    spicename = "spice_salt",
+    perishtime = TUNING.TOTAL_DAY_TIME * 14.5,
+    fn_server = function(inst)
+        inst.components.tool:SetAction(ACTIONS.CHOP, 1.66)
+
+        inst.components.weapon:SetDamage(61.2)
+
+        inst.OnLoad = nil
+    end
+})
 
 ----------
 ----------

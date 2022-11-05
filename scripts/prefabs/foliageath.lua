@@ -18,7 +18,7 @@ local function ItemTradeTest(inst, item)
         hambat = true,
         bullkelp_root = true,
         foliageath = true,
-        dish_tomahawksteak = true,
+        -- dish_tomahawksteak = true,
     }
     if item == nil then
         return false

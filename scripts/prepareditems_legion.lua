@@ -23,7 +23,7 @@ local foods_legion = {
         recipe_count = 4,
 
         --这一截是不起效的代码
-        -- float = {nil, "small", 0.2, 1.05},
+        float = { nil, "small", 0.2, 0.75 },
         foodtype = FOODTYPE.MEAT,
         -- secondaryfoodtype = nil,
         health = 0,
