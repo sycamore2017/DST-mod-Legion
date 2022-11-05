@@ -6,7 +6,13 @@ local SPICES = {
     SPICE_GARLIC = true,
     SPICE_SUGAR  = true,
     SPICE_CHILI  = true,
-    SPICE_SALT   = true
+    SPICE_SALT   = true,
+
+    --兼容勋章的香料
+    SPICE_VOLTJELLY = true,
+    SPICE_PHOSPHOR = true,
+    SPICE_CACTUS_FLOWER = true,
+    SPICE_RAGE_BLOOD_SUGAR = true
 }
 
 local function GenerateSpicedFoods(foods)

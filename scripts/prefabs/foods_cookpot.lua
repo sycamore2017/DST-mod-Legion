@@ -227,7 +227,7 @@ local function SingleFight(inst, owner, target)
     end
 end
 
-local function OnEquip_steak(inst, owner)
+local function OnEquip_steak_pre(inst, owner)
     owner.AnimState:OverrideSymbol("swap_object", "dish_tomahawksteak", "swap")
     owner.AnimState:Show("ARM_carry")
     owner.AnimState:Hide("ARM_normal")
@@ -235,14 +235,18 @@ local function OnEquip_steak(inst, owner)
     if inst._UpdateAxe then
         inst._UpdateAxe(inst)
     end
-
-    if owner:HasTag("equipmentmodel") then --假人！
-        return
-    end
-
+end
+local function OnEquip_steak_pst(inst, owner)
     owner:PushEvent("learncookbookstats", inst.food_basename or inst.prefab) --解锁烹饪书数据
     owner:ListenForEvent("working", AfterWorking)
     owner.steak_l_chop = inst._chopchance
+end
+local function OnEquip_steak(inst, owner)
+    OnEquip_steak_pre(inst, owner)
+    if owner:HasTag("equipmentmodel") then --假人！
+        return
+    end
+    OnEquip_steak_pst(inst, owner)
 end
 local function OnUnequip_steak(inst, owner)
     owner.AnimState:Hide("ARM_carry")
@@ -261,6 +265,17 @@ local function OnAttack_steak(inst, owner, target)
     SingleFight(inst, owner, target)
 end
 
+local function InitSteak(inst)
+    inst._damage = { 47.6, 61.2 } --34x1.8
+    inst._chopvalue = { 1.2, 1.66 }
+    inst._chopchance = 0.05
+    inst._UpdateAxe = UpdateAxe
+
+    inst.components.tool:SetAction(ACTIONS.CHOP, inst._chopvalue[2])
+
+    inst.components.weapon:SetDamage(inst._damage[2])
+end
+
 local function MakeSteak(data)
     local assets = {
         Asset("ANIM", "anim/dish_tomahawksteak.zip"),
@@ -271,9 +286,17 @@ local function MakeSteak(data)
     local prefabname = "dish_tomahawksteak"
 
     if data.spicename ~= nil then
-        table.insert(assets, Asset("ANIM", "anim/spices.zip"))
+        if data.spicebuild ~= nil then
+            table.insert(assets, Asset("ANIM", "anim/"..data.spicebuild..".zip"))
+        else
+            table.insert(assets, Asset("ANIM", "anim/spices.zip"))
+        end
+        if data.spiceatlas ~= nil then
+            table.insert(assets, Asset("ATLAS", data.spiceatlas))
+        else
+            table.insert(assets, Asset("INV_IMAGE", data.spicename.."_over"))
+        end
         table.insert(assets, Asset("ANIM", "anim/plate_food.zip"))
-        table.insert(assets, Asset("INV_IMAGE", data.spicename.."_over"))
         prefabname = prefabname.."_"..data.spicename
     end
 
@@ -291,13 +314,9 @@ local function MakeSteak(data)
             if data.spicename ~= nil then
                 inst.AnimState:SetBuild("plate_food")
                 inst.AnimState:SetBank("plate_food")
-                inst.AnimState:OverrideSymbol("swap_garnish", "spices", data.spicename)
+                inst.AnimState:OverrideSymbol("swap_garnish", data.spicebuild or "spices", data.spicename)
 
                 inst:AddTag("spicedfood")
-
-                if data.spicename == "spice_garlic" then
-                    inst:AddTag("hide_percentage")
-                end
 
                 --设置作为背景的料理图
                 inst.inv_image_bg = { atlas = "images/inventoryimages/"..basename..".xml", image = basename..".tex" }
@@ -332,6 +351,10 @@ local function MakeSteak(data)
             --weapon (from weapon component) added to pristine state for optimization
             inst:AddTag("weapon")
 
+            if data.fn_common ~= nil then
+                data.fn_common(inst)
+            end
+
             inst.entity:SetPristine()
             if not TheWorld.ismastersim then
                 return inst
@@ -352,6 +375,9 @@ local function MakeSteak(data)
             inst:AddComponent("inventoryitem")
             inst.components.inventoryitem.imagename = basename
             if data.spicename ~= nil then
+                if data.spiceatlas ~= nil then
+                    inst.components.inventoryitem.atlasname = data.spiceatlas
+                end
                 inst.components.inventoryitem:ChangeImageName(data.spicename.."_over")
             else
                 inst.components.inventoryitem.atlasname = "images/inventoryimages/"..basename..".xml"
@@ -391,29 +417,16 @@ end
 MakeSteak({ --普通
     spicename = nil,
     perishtime = nil,
-    fn_server = function(inst)
-        inst._damage = { 47.6, 61.2 } --34x1.8
-        inst._chopvalue = { 1.2, 1.66 }
-        inst._chopchance = 0.05
-        inst._UpdateAxe = UpdateAxe
-
-        inst.components.tool:SetAction(ACTIONS.CHOP, inst._chopvalue[2])
-
-        inst.components.weapon:SetDamage(inst._damage[2])
-    end
+    fn_server = InitSteak
 })
 MakeSteak({ --大蒜香料：加护甲
     spicename = "spice_garlic",
     perishtime = nil,
+    fn_common = function(inst)
+        inst:AddTag("hide_percentage")
+    end,
     fn_server = function(inst)
-        inst._damage = { 47.6, 61.2 } --34x1.8
-        inst._chopvalue = { 1.2, 1.66 }
-        inst._chopchance = 0.05
-        inst._UpdateAxe = UpdateAxe
-
-        inst.components.tool:SetAction(ACTIONS.CHOP, inst._chopvalue[2])
-
-        inst.components.weapon:SetDamage(inst._damage[2])
+        InitSteak(inst)
 
         inst:AddComponent("armor")
         inst.components.armor:InitCondition(100, 0.4)
@@ -459,6 +472,99 @@ MakeSteak({ --盐香料：加新鲜度
         inst.OnLoad = nil
     end
 })
+
+if TUNING.FUNCTIONAL_MEDAL_IS_OPEN then --能力勋章兼容
+    local function OnAttack_steak_voltjelly(inst, owner, target)
+        OnAttack_steak(inst, owner, target)
+        if target ~= nil and target:IsValid() and owner ~= nil and owner:IsValid() then
+            SpawnPrefab("electrichitsparks"):AlignToTarget(target, owner, true)
+        end
+    end
+    MakeSteak({ --带电果冻粉：武器带电
+        spicename = "spice_voltjelly",
+        spicebuild = "medal_spices", spiceatlas = "images/spice_voltjelly_over.xml",
+        perishtime = nil,
+        fn_server = function(inst)
+            InitSteak(inst)
+            inst.components.weapon:SetElectric()
+            inst.components.weapon:SetOnAttack(OnAttack_steak_voltjelly)
+        end
+    })
+
+    local function onremovefire(fire)
+        fire.nightstick.fire = nil
+    end
+    local function OnEquip_steak_phosphor(inst, owner)
+        OnEquip_steak_pre(inst, owner)
+        if owner:HasTag("equipmentmodel") then --假人！
+            return
+        end
+        OnEquip_steak_pst(inst, owner)
+        if inst.fire == nil then
+            inst.fire = SpawnPrefab("nightstickfire")
+            inst.fire.nightstick = inst
+            inst:ListenForEvent("onremove", onremovefire, inst.fire)
+        end
+        inst.fire.entity:SetParent(owner.entity)
+    end
+    local function OnUnequip_steak_phosphor(inst, owner)
+        OnUnequip_steak(inst, owner)
+        if inst.fire ~= nil then
+            inst.fire:Remove()
+        end
+    end
+    MakeSteak({ --荧光粉：武器发光
+        spicename = "spice_phosphor",
+        spicebuild = "medal_spices", spiceatlas = "images/spice_phosphor_over.xml",
+        perishtime = nil,
+        fn_common = function(inst)
+            inst:AddTag("wildfireprotected")
+        end,
+        fn_server = function(inst)
+            InitSteak(inst)
+            inst.components.equippable:SetOnEquip(OnEquip_steak_phosphor)
+            inst.components.equippable:SetOnUnequip(OnUnequip_steak_phosphor)
+        end
+    })
+
+    MakeSteak({ --仙人掌花粉：加移速
+        spicename = "spice_cactus_flower",
+        spicebuild = "medal_spices", spiceatlas = "images/spice_cactus_flower_over.xml",
+        perishtime = nil,
+        fn_server = function(inst)
+            InitSteak(inst)
+            inst.components.equippable.walkspeedmult = TUNING.CANE_SPEED_MULT
+        end
+    })
+
+    local function BattleBornAttack(inst, data)
+        if not inst.components.health:IsDead() then
+            inst.components.health:DoDelta(0.6, false, inst.food_basename)
+        end
+    end
+    local function OnEquip_steak_rage_blood(inst, owner)
+        OnEquip_steak_pre(inst, owner)
+        if owner:HasTag("equipmentmodel") then --假人！
+            return
+        end
+        OnEquip_steak_pst(inst, owner)
+        owner:ListenForEvent("onattackother", BattleBornAttack)
+    end
+    local function OnUnequip_steak_rage_blood(inst, owner)
+        OnUnequip_steak(inst, owner)
+        owner:RemoveEventCallback("onattackother", BattleBornAttack)
+    end
+    MakeSteak({ --黑暗血糖：攻击回血
+        spicename = "spice_rage_blood_sugar",
+        spicebuild = "medal_spices", spiceatlas = "images/spice_rage_blood_sugar_over.xml",
+        perishtime = nil,
+        fn_server = function(inst)
+            InitSteak(inst)
+            inst.components.equippable:SetOnEquip(OnEquip_steak_rage_blood)
+            inst.components.equippable:SetOnUnequip(OnUnequip_steak_rage_blood)
+        end
+    })
+end
 
 ----------
 ----------

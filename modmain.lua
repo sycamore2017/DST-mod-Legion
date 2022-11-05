@@ -549,7 +549,8 @@ end)
 
 --AddSimPostInit()在所有mod加载完毕后才执行，这时能更准确判定是否启用某mod，不用考虑优先级
 AddSimPostInit(function()
-	-- table.insert(Assets, Asset("ANIM", "anim/player_actions_roll.zip")) --这个函数里没法再注册动画数据了
+	--table.insert(Assets, Asset("ANIM", "anim/player_actions_roll.zip")) --这个函数里没法再注册动画数据了
+    --注意：运行这里时，所有mod的prefab已经注册完成了
 
     ----------
     --神话书说
@@ -993,8 +994,6 @@ AddSimPostInit(function()
         end
     end
 
-    --本来想给某mod做幻化兼容的，要不是看在有粉丝想要，我才不会浪费时间做这个，结果代码加密+粉丝主动要来的代码也是假的(也可能是过期的)。总结，不搞了，拜拜
-
     ----------
     --工艺锅（Craft Pot）
     ----------
@@ -1078,4 +1077,9 @@ AddSimPostInit(function()
             --这里本来想把冰度、菜度等图标都改为自己的图标，但是原mod里的图标其实更简单直接，适合新手，所以就不弄啦
         end
     end
+
+    ----------
+    --能力勋章
+    ----------
+    -- _G.CONFIGS_LEGION.ENABLEDMODS.FunctionalMedal = TUNING.FUNCTIONAL_MEDAL_IS_OPEN
 end)

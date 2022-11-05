@@ -17,6 +17,7 @@ local foods_legion = {
         overridebuild = "dish_tomahawksteak", --替换料理build，这样所有料理都可以共享一个build了
         overridesymbolname = "base", --替换烹饪锅的料理贴图的symbol
         oneat_desc = STRINGS.UI.COOKBOOK.DISH_TOMAHAWKSTEAK,
+        notinitprefab = true, --兼容勋章的机制，此配方，不以通用方式生成预制物
 
         cook_need = "牛角 猫薄荷 (烤)大蒜 肉度≥1",
         cook_cant = nil,
