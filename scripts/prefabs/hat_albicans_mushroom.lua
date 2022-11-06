@@ -22,11 +22,14 @@ local function onequip(inst, owner)
 
     inst.components.periodicspawner:Start()
 
+    if owner:HasTag("equipmentmodel") then --假人！
+        return
+    end
+
     if owner.components.hunger ~= nil then
         owner.components.hunger.burnratemodifiers:SetModifier(inst, TUNING.ARMORSLURPER_SLOW_HUNGER) --0.6的饥饿速度
     end
 end
-
 local function onunequip(inst, owner)
     HAT_ONUNEQUIP_L(inst, owner)
 

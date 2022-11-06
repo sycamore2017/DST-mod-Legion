@@ -16,6 +16,10 @@ local function OnEquip(inst, owner)
     owner.AnimState:Show("ARM_carry")
     owner.AnimState:Hide("ARM_normal")
 
+    if owner:HasTag("equipmentmodel") then --假人！
+        return
+    end
+
     --TIP: "onattackother"事件在 targ.components.combat:GetAttacked 之前，所以能提前改攻击配置
     owner:ListenForEvent("onattackother", UndefendedATK_legion)
 end

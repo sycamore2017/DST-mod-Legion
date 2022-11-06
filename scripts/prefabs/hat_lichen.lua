@@ -136,5 +136,5 @@ local function lichenhatlightfn()   --设置苔衣发卡的光源
     return inst
 end
 
-return Prefab( "hat_lichen", fn, assets, prefabs),
+return Prefab("hat_lichen", fn, assets, prefabs),
         Prefab("lichenhatlight", lichenhatlightfn)

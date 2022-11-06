@@ -31,6 +31,10 @@ local function onequip(inst, owner) --装备武器时
     owner.AnimState:Show("ARM_carry") --显示持物手
     owner.AnimState:Hide("ARM_normal") --隐藏普通的手
 
+    if owner:HasTag("equipmentmodel") then --假人！
+        return
+    end
+
     owner:ListenForEvent("healthdelta", radicalhealth)
 
     --在这里直接调用radicalhealth()并不能识别到手中的武器，所以这里才这样写

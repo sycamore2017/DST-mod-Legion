@@ -78,6 +78,10 @@ local function onequip(inst, owner)
     owner.AnimState:OverrideSymbol("backpack", "giantsfoot", "backpack")
     owner.AnimState:OverrideSymbol("swap_body", "giantsfoot", "swap_body")
 
+    if owner:HasTag("equipmentmodel") then --假人！
+        return
+    end
+
     if inst.components.container ~= nil then
         inst.components.container:Open(owner)
     end

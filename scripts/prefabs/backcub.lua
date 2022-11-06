@@ -31,8 +31,17 @@ local function onequip(inst, owner)
         owner.AnimState:OverrideSymbol(symbol, "swap_backcub", "swap_body")
     end
 
+    if inst.soundtask ~= nil then
+        inst.soundtask:Cancel()
+        inst.soundtask = nil
+    end
+    inst.SoundEmitter:KillSound("sleep")
+
+    --假人兼容：不取消这个偷吃机制，这样就可以非玩家刷毛簇了
     if inst.components.container ~= nil then
-        inst.components.container:Open(owner)
+        if not owner:HasTag("equipmentmodel") then
+            inst.components.container:Open(owner)
+        end
 
         if inst.eattask == nil then
             inst.eattask = inst:DoPeriodicTask(60, function()
@@ -75,12 +84,6 @@ local function onequip(inst, owner)
             end, 30)
         end
     end
-
-    if inst.soundtask ~= nil then
-        inst.soundtask:Cancel()
-        inst.soundtask = nil
-    end
-    inst.SoundEmitter:KillSound("sleep")
 end
 local function onunequip(inst, owner)
     if owner.prefab == "webber" then

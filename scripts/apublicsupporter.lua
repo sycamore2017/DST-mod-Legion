@@ -1660,6 +1660,9 @@ AddPrefabPostInit("shieldofterror", function(inst)
         local onunequip_old = inst.components.equippable.onunequipfn
         inst.components.equippable.onequipfn = function(inst, owner, ...)
             onequip_old(inst, owner, ...)
+            if owner:HasTag("equipmentmodel") then --假人！
+                return
+            end
             RebuildRedirectDamageFn(owner) --全局函数：重新构造combat的redirectdamagefn函数
             --登记远程保护的函数
             if owner.redirect_table[inst.prefab] == nil then

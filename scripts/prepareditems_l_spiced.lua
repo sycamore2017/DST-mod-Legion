@@ -12,7 +12,8 @@ local SPICES = {
     SPICE_VOLTJELLY = true,
     SPICE_PHOSPHOR = true,
     SPICE_CACTUS_FLOWER = true,
-    SPICE_RAGE_BLOOD_SUGAR = true
+    SPICE_RAGE_BLOOD_SUGAR = true,
+    SPICE_POTATO_STARCH = true
 }
 
 local function GenerateSpicedFoods(foods)

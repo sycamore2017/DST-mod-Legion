@@ -332,17 +332,18 @@ if TUNING.LEGION_SUPERBCUISINE then
         AddCookerRecipe("portablespicer", recipe)
     end
 
+    --已经修复了，好耶！
     --官方的便携香料站代码没改新机制，这里用另类方式手动改一下。等官方修复了我就删除。相关文件 prefabs\portablespicer.lua
-    local IsModCookingProduct_old = IsModCookingProduct
-    _G.IsModCookingProduct = function(cooker, name)
-        if foodrecipes_spice[name] ~= nil or itemrecipes_spice[name] ~= nil then
-            return false
-        end
-        if IsModCookingProduct_old ~= nil then
-            return IsModCookingProduct_old(cooker, name)
-        end
-        return false
-    end
+    -- local IsModCookingProduct_old = IsModCookingProduct
+    -- _G.IsModCookingProduct = function(cooker, name)
+    --     if foodrecipes_spice[name] ~= nil or itemrecipes_spice[name] ~= nil then
+    --         return false
+    --     end
+    --     if IsModCookingProduct_old ~= nil then
+    --         return IsModCookingProduct_old(cooker, name)
+    --     end
+    --     return false
+    -- end
 
     --食谱中官方料理的修改
     if CONFIGS_LEGION.BETTERCOOKBOOK then
@@ -370,6 +371,37 @@ if TUNING.LEGION_SUPERBCUISINE then
         for k,v in pairs(require("preparednonfoods")) do
             SetNewCookBookUI(v, fooduidata_legion.nofood[k])
         end
+    end
+
+    --因为有的料理我只需要部分香料能调，兼容原因，其他香料制作时会崩溃，所以这里设置默认的返回值
+    local cooking = require("cooking")
+    local CalculateRecipe_old = cooking.CalculateRecipe
+    cooking.CalculateRecipe = function(cooker, names, ...)
+        local product, cooktime = CalculateRecipe_old(cooker, names, ...)
+        if product == nil then
+            local count_name = 0
+            local spice_name = nil
+            for _,name in pairs(names) do
+                if name then
+                    count_name = count_name + 1
+                    if spice_name == nil and string.sub(name, 1, 6) == "spice_" then
+                        spice_name = name
+                    end
+                end
+            end
+            if count_name == 2 then --香料站只有两格
+                if spice_name and PrefabExists("wetgoop_"..spice_name) then
+                    product = "wetgoop_"..spice_name
+                else
+                    product = "wetgoop_spice_chili" --实在不行，只能弄一个官方的了
+                end
+                cooktime = 0.12
+            else --这个情况按理来说是不可能的，不过这里也完善吧
+                product = "wetgoop"
+                cooktime = 0.25
+            end
+        end
+        return product, cooktime
     end
 end
 

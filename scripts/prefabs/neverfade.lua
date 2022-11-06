@@ -54,6 +54,14 @@ end
 
 local function onequip(inst, owner) --装备武器时
     ChangeSymbol(inst, owner, inst.components.skinedlegion:GetSkinedData())
+    owner.AnimState:Show("ARM_carry") --显示持物手
+    owner.AnimState:Hide("ARM_normal") --隐藏普通的手
+
+    inst.components.deployable:SetDeployMode(DEPLOYMODE.NONE) --装备时去除可栽种功能
+
+    if owner:HasTag("equipmentmodel") then --假人！
+        return
+    end
 
     if not inst.hasSetBroken then
         if owner.components.health ~= nil then
@@ -86,13 +94,7 @@ local function onequip(inst, owner) --装备武器时
             end
         end
     end
-
-    owner.AnimState:Show("ARM_carry") --显示持物手
-    owner.AnimState:Hide("ARM_normal") --隐藏普通的手
-
-    inst.components.deployable:SetDeployMode(DEPLOYMODE.NONE) --装备时去除可栽种功能
 end
-
 local function onunequip(inst, owner)   --放下武器时
     owner.AnimState:Hide("ARM_carry") --隐藏持物手
     owner.AnimState:Show("ARM_normal") --显示普通的手

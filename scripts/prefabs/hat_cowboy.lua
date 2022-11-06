@@ -53,6 +53,10 @@ local function onequip(inst, owner) --佩戴
         owner.scarf_skin_l = nil
     end
 
+    if owner:HasTag("equipmentmodel") then --假人！
+        return
+    end
+
     if owner:HasTag("player") then
         if owner.components.inventory ~= nil then
             local equippedArmor = owner.components.inventory:GetEquippedItem(EQUIPSLOTS.BODY) or nil --获取衣服

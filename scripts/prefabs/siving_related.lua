@@ -995,7 +995,8 @@ local function GetSwapSymbol(owner)
         pigman = true,
         pigguard = true,
         moonpig = true,
-        bunnyman = true
+        bunnyman = true,
+        sewing_mannequin = true
     }
     if owner.sivmask_swapsymbol or maps[owner.prefab] then
         return "swap_other"
@@ -1024,6 +1025,8 @@ MakeMask({
 
         inst.components.equippable:SetOnEquip(function(inst, owner)
             HAT_OPENTOP_ONEQUIP_L(inst, owner, "siving_mask", GetSwapSymbol(owner))
+
+            --假人兼容：这里不做截断，为了能开发一些新玩法
 
             local notags = {
                 "NOCLICK", "INLIMBO", "shadow", "playerghost", "ghost", "wall", "structure",
@@ -1176,6 +1179,8 @@ MakeMask({
 
         inst.components.equippable:SetOnEquip(function(inst, owner)
             HAT_OPENTOP_ONEQUIP_L(inst, owner, "siving_mask_gold", GetSwapSymbol(owner))
+
+            --假人兼容：这里不做截断，为了能开发一些新玩法
 
             owner:ListenForEvent("onattackother", OnAttackOther)
 

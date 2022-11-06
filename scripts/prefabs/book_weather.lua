@@ -22,6 +22,10 @@ local function OnEquip(inst, owner)
     owner.AnimState:OverrideSymbol("book_closed", "book_weather", "book_closed")
     -- owner.AnimState:OverrideSymbol("book_open_pages", "book_weather", "book_open_pages")
 
+    if owner:HasTag("equipmentmodel") then --假人！
+        return
+    end
+
     owner:AddTag("ignorewet")
     inst:ListenForEvent("newstate", FixSymbol, owner)
 end

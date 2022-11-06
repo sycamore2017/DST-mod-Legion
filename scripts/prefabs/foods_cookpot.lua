@@ -231,12 +231,11 @@ local function OnEquip_steak_pre(inst, owner)
     owner.AnimState:OverrideSymbol("swap_object", "dish_tomahawksteak", "swap")
     owner.AnimState:Show("ARM_carry")
     owner.AnimState:Hide("ARM_normal")
-
+end
+local function OnEquip_steak_pst(inst, owner)
     if inst._UpdateAxe then
         inst._UpdateAxe(inst)
     end
-end
-local function OnEquip_steak_pst(inst, owner)
     owner:PushEvent("learncookbookstats", inst.food_basename or inst.prefab) --解锁烹饪书数据
     owner:ListenForEvent("working", AfterWorking)
     owner.steak_l_chop = inst._chopchance
@@ -501,7 +500,7 @@ if TUNING.FUNCTIONAL_MEDAL_IS_OPEN then --能力勋章兼容
         end
         OnEquip_steak_pst(inst, owner)
         if inst.fire == nil then
-            inst.fire = SpawnPrefab("nightstickfire")
+            inst.fire = SpawnPrefab("lichenhatlight")
             inst.fire.nightstick = inst
             inst:ListenForEvent("onremove", onremovefire, inst.fire)
         end
@@ -562,6 +561,33 @@ if TUNING.FUNCTIONAL_MEDAL_IS_OPEN then --能力勋章兼容
             InitSteak(inst)
             inst.components.equippable:SetOnEquip(OnEquip_steak_rage_blood)
             inst.components.equippable:SetOnUnequip(OnUnequip_steak_rage_blood)
+        end
+    })
+
+    local function OnEquip_steak_potato_starch(inst, owner)
+        OnEquip_steak_pre(inst, owner)
+        if owner:HasTag("equipmentmodel") then --假人！
+            return
+        end
+        OnEquip_steak_pst(inst, owner)
+        if owner.components.hunger ~= nil then
+            owner.components.hunger.burnratemodifiers:SetModifier(inst, 0.8)
+        end
+    end
+    local function OnUnequip_steak_potato_starch(inst, owner)
+        OnUnequip_steak(inst, owner)
+        if owner.components.hunger ~= nil then
+            owner.components.hunger.burnratemodifiers:RemoveModifier(inst)
+        end
+    end
+    MakeSteak({ --土豆淀粉：耐饿
+        spicename = "spice_potato_starch",
+        spicebuild = "medal_spices", spiceatlas = "images/spice_potato_starch_over.xml",
+        perishtime = nil,
+        fn_server = function(inst)
+            InitSteak(inst)
+            inst.components.equippable:SetOnEquip(OnEquip_steak_potato_starch)
+            inst.components.equippable:SetOnUnequip(OnUnequip_steak_potato_starch)
         end
     })
 end

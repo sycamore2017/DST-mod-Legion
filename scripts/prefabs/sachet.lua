@@ -28,6 +28,10 @@ end
 local function onequip(inst, owner)
     owner.AnimState:OverrideSymbol("swap_body", "sachet", "swap_body")
 
+    if owner:HasTag("equipmentmodel") then --假人！
+        return
+    end
+
     if inst.components.fueled ~= nil then
         inst.components.fueled:StartConsuming()
     end

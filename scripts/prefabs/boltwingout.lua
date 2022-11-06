@@ -55,6 +55,10 @@ local function onequip(inst, owner)
         owner.bolt_skin_l = nil
     end
 
+    if owner:HasTag("equipmentmodel") then --假人！
+        return
+    end
+
     if inst.components.container ~= nil then
         inst.components.container:Open(owner)
     end
@@ -129,7 +133,6 @@ local function onequip(inst, owner)
     end
     owner.set_l_bolt = true
 end
-
 local function onunequip(inst, owner)
     owner.AnimState:ClearOverrideSymbol("swap_body")
     owner.bolt_skin_l = nil
@@ -149,13 +152,11 @@ local function onburnt(inst)
     SpawnPrefab("ash").Transform:SetPosition(inst.Transform:GetWorldPosition())
     inst:Remove()
 end
-
 local function onignite(inst)
     if inst.components.container ~= nil then
         inst.components.container.canbeopened = false
     end
 end
-
 local function onextinguish(inst)
     if inst.components.container ~= nil then
         inst.components.container.canbeopened = true
