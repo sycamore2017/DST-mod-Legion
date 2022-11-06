@@ -552,6 +552,20 @@ if CONFIGS_LEGION.PRAYFORRAIN then
         end
         inst.components.weapon:SetDamage(inst._basedamage)
     end
+    local function DoRevolt(inst, doer)
+        if inst._task_fx == nil then
+            inst._basedamage = damage_sword
+            if doer then
+                inst.fn_onHealthDelta(doer, nil)
+            end
+            inst.components.armor:SetAbsorption(absorb_sword)
+            inst._task_fx = inst:DoPeriodicTask(0.21, function(inst)
+                local fx = SpawnPrefab("agronssword_fx")
+                fx.Transform:SetPosition((inst.components.inventoryitem:GetGrandOwner() or inst).Transform:GetWorldPosition())
+            end, 0)
+            --改贴图 undo
+        end
+    end
 
     MakeShield({
         name = "agronssword",
@@ -574,7 +588,7 @@ if CONFIGS_LEGION.PRAYFORRAIN then
             inst:AddTag("NORATCHECK") --mod兼容：永不妥协。该道具不算鼠潮分
         end,
         fn_server = function(inst)
-            inst._task_revolt = nil
+            inst._task_fx = nil
             inst._basedamage = damage_shield
             inst.fn_onHealthDelta = function(owner, data)
                 local percent = 1.0
@@ -612,24 +626,9 @@ if CONFIGS_LEGION.PRAYFORRAIN then
                 OnUnequipFn(inst, owner)
             end)
 
-            inst.hurtsoundoverride = "dontstarve/wilson/hit_armour"
-            inst.components.shieldlegion.armormult_success = 0
-            inst.components.shieldlegion.atkfn = function(inst, doer, attacker, data)
-                --先加攻击力，这样输出高一点
-                if inst._task_revolt ~= nil then
-                    inst._task_revolt:Cancel()
-                else
-                    inst._basedamage = damage_sword
-                    inst.fn_onHealthDelta(doer, nil)
-                    inst.components.armor:SetAbsorption(absorb_sword)
-                    inst._task_fx = inst:DoPeriodicTask(0.21, function(inst)
-                        local fx = SpawnPrefab("agronssword_fx")
-                        fx.Transform:SetPosition((inst.components.inventoryitem:GetGrandOwner() or inst).Transform:GetWorldPosition())
-                    end, 0)
-                    --改贴图 undo
-                end
-                inst._task_revolt = inst:DoTaskInTime(10, function(inst)
-                    inst._task_revolt = nil
+            inst:AddComponent("timer")
+            inst:ListenForEvent("timerdone", function(inst, data)
+                if data.name == "revolt" then
                     inst._basedamage = damage_shield
                     CalcDamage_agron(inst) --因为此时有可能不再是装备状态，doer 发生了改变
                     inst.components.armor:SetAbsorption(absorb_shield)
@@ -638,7 +637,17 @@ if CONFIGS_LEGION.PRAYFORRAIN then
                         inst._task_fx = nil
                     end
                     --改贴图 undo
-                end)
+                end
+            end)
+
+            inst.hurtsoundoverride = "dontstarve/wilson/hit_armour"
+            inst.components.shieldlegion.armormult_success = 0
+            inst.components.shieldlegion.atkfn = function(inst, doer, attacker, data)
+                --先加攻击力，这样输出高一点
+                local timeleft = inst.components.timer:GetTimeLeft("revolt") or 0
+                inst.components.timer:StopTimer("revolt")
+                inst.components.timer:StartTimer("revolt", math.min(120, timeleft+10))
+                DoRevolt(inst, doer)
 
                 Counterattack_base(inst, doer, attacker, data, 8, 1.3)
 
@@ -652,6 +661,12 @@ if CONFIGS_LEGION.PRAYFORRAIN then
                 inst.components.shieldlegion:Counterattack(doer, attacker, data, 8, 1)
             end
             -- inst.components.shieldlegion.atkfailfn = function(inst, doer, attacker, data) end
+
+            inst.OnLoad = function(inst, data)
+                if inst.components.timer:TimerExists("revolt") then
+                    DoRevolt(inst, nil)
+                end
+            end
 
             -- inst.components.skinedlegion:SetOnPreLoad()
         end,

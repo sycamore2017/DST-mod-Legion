@@ -495,16 +495,16 @@ if TUNING.FUNCTIONAL_MEDAL_IS_OPEN then --能力勋章兼容
     end
     local function OnEquip_steak_phosphor(inst, owner)
         OnEquip_steak_pre(inst, owner)
-        if owner:HasTag("equipmentmodel") then --假人！
-            return
-        end
-        OnEquip_steak_pst(inst, owner)
         if inst.fire == nil then
             inst.fire = SpawnPrefab("lichenhatlight")
             inst.fire.nightstick = inst
             inst:ListenForEvent("onremove", onremovefire, inst.fire)
         end
         inst.fire.entity:SetParent(owner.entity)
+        if owner:HasTag("equipmentmodel") then --假人！
+            return
+        end
+        OnEquip_steak_pst(inst, owner)
     end
     local function OnUnequip_steak_phosphor(inst, owner)
         OnUnequip_steak(inst, owner)
