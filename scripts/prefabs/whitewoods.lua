@@ -304,7 +304,7 @@ table.insert(prefs, Prefab(
 ))
 
 --------------------------------------------------------------------------
---[[ 白木地垫 ]]
+--[[ 白木地片 ]]
 --------------------------------------------------------------------------
 
 local function Fn_mat_item()
@@ -473,107 +473,10 @@ table.insert(prefs, Prefab(
 ))
 
 --------------------------------------------------------------------------
---[[ 白木大地毯 ]]
+--[[ 白木地毯 ]]
 --------------------------------------------------------------------------
-
-table.insert(prefs, Prefab(
-    "carpet_large_ww",
-    function()
-        local inst = CreateEntity()
-
-        inst.entity:AddTransform()
-        inst.entity:AddAnimState()
-        inst.entity:AddNetwork()
-
-        inst.AnimState:SetBank("carpet_large_ww")
-        inst.AnimState:SetBuild("carpet_large_ww")
-        inst.AnimState:PlayAnimation("idle")
-        inst.AnimState:SetOrientation(ANIM_ORIENTATION.OnGround)
-        inst.AnimState:SetLayer(LAYER_BACKGROUND)
-        inst.AnimState:SetFinalOffset(1)
-
-        inst:AddTag("DECOR")
-        inst:AddTag("NOCLICK")
-        inst:AddTag("NOBLOCK")
-
-        inst.entity:SetPristine()
-        if not TheWorld.ismastersim then
-            return inst
-        end
-
-        inst._beacon = nil
-
-        -- inst:AddComponent("inspectable")
-
-        inst:AddComponent("lootdropper")
-
-        inst:AddComponent("savedrotation")
-
-        inst:DoTaskInTime(0, function(inst)
-            local bc = SpawnPrefab("beacon_work_l") --由于当前组合下没法被破坏动作识别，所以得另外生成一对象来使其能被破坏
-            if bc then
-                inst:AddChild(bc)
-                inst._beacon = bc
-                bc.components.workable:SetWorkLeft(1)
-                bc.components.workable:SetOnWorkCallback(function(bc, worker, workleft, numworks)
-                    if worker == nil or not worker:HasTag("player") then --非玩家无法破坏这个地毯
-                        bc.components.workable:SetWorkLeft(1)
-                    end
-                end)
-                bc.components.workable:SetOnFinishCallback(function(bc, worker)
-                    inst.components.lootdropper:DropLoot()
-
-                    local fx = SpawnPrefab("collapse_small")
-                    fx.Transform:SetPosition(inst.Transform:GetWorldPosition())
-                    fx:SetMaterial("wood")
-
-                    bc:Remove()
-                    inst:Remove()
-                end)
-            end
-        end)
-
-        return inst
-    end,
-    {
-        Asset("ANIM", "anim/carpet_large_ww.zip")
-    },
-    {
-        "beacon_work_l"
-    }
-))
 
 table.insert(prefs, MakePlacer("carpet_large_ww_placer", "carpet_large_ww", "carpet_large_ww", "idle", true, nil, nil, nil, 90))
-
---------------------------------------------------------------------------
---[[ 信标(用来让其绑定物被摧毁) ]]
---------------------------------------------------------------------------
-
-table.insert(prefs, Prefab(
-    "beacon_work_l",
-    function()
-        local inst = CreateEntity()
-
-        inst.entity:AddTransform()
-        inst.entity:AddNetwork()
-
-        inst:AddTag("NOBLOCK")
-
-        inst.entity:SetPristine()
-        if not TheWorld.ismastersim then
-            return inst
-        end
-
-        inst.persists = false
-
-        inst:AddComponent("workable")
-        inst.components.workable:SetWorkAction(ACTIONS.HAMMER)
-
-        return inst
-    end,
-    nil,
-    nil
-))
 
 -----
 -----

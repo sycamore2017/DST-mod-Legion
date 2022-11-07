@@ -3220,7 +3220,7 @@ S______GENERIC.DESCRIBE.THEEMPERORSPENDANT = "A determined man won't believe thi
 -- S_________WURT.DESCRIBE.THEEMPERORSPENDANT = ""
 -- S_______WALTER.DESCRIBE.THEEMPERORSPENDANT = ""
 
-S_NAMES.MAT_WHITEWOOD_ITEM = "White Wood Mat" --白木地垫
+S_NAMES.MAT_WHITEWOOD_ITEM = "White Wood Mat" --白木地片
 S_RECIPE_DESC.MAT_WHITEWOOD_ITEM = "Gives your feet a nice woody feel."
 S______GENERIC.DESCRIBE.MAT_WHITEWOOD_ITEM = "White wood chips for decorating the ground."
 -- S_______WILLOW.DESCRIBE.MAT_WHITEWOOD_ITEM = ""
