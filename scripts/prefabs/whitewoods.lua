@@ -472,12 +472,6 @@ table.insert(prefs, Prefab(
     }
 ))
 
---------------------------------------------------------------------------
---[[ 白木地毯 ]]
---------------------------------------------------------------------------
-
-table.insert(prefs, MakePlacer("carpet_large_ww_placer", "carpet_large_ww", "carpet_large_ww", "idle", true, nil, nil, nil, 90))
-
 -----
 -----
 

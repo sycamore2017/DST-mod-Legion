@@ -32,10 +32,12 @@ local assets = {
     Asset("IMAGE", "images/inventoryimages/theemperorsscepter.tex"),
     Asset("ATLAS", "images/inventoryimages/theemperorspendant.xml"),
     Asset("IMAGE", "images/inventoryimages/theemperorspendant.tex"),
-    Asset("ATLAS", "images/inventoryimages/mat_whitewood_item.xml"),
-    Asset("IMAGE", "images/inventoryimages/mat_whitewood_item.tex"),
-    Asset("ATLAS", "images/inventoryimages/carpet_large_ww.xml"),
-    Asset("IMAGE", "images/inventoryimages/carpet_large_ww.tex"),
+    -- Asset("ATLAS", "images/inventoryimages/mat_whitewood_item.xml"),
+    -- Asset("IMAGE", "images/inventoryimages/mat_whitewood_item.tex"),
+    Asset("ATLAS", "images/inventoryimages/carpet_whitewood_big.xml"),
+    Asset("IMAGE", "images/inventoryimages/carpet_whitewood_big.tex"),
+    Asset("ATLAS", "images/inventoryimages/carpet_whitewood.xml"),
+    Asset("IMAGE", "images/inventoryimages/carpet_whitewood.tex"),
 }
 
 for k,v in pairs(assets) do
@@ -213,6 +215,22 @@ AddIngredientValues({"shyerry"}, {fruit=4}, true, false) --AddIngredientValues(n
 --[[ 新制作物 ]]
 --------------------------------------------------------------------------
 
+local function PlacerTest_carpet(pt, rot, tests) --地毯涉及区域得全是地面，不能悬在海上
+    if tests == nil then tests = { -1.5, 1.5 } end
+
+    for _, k1 in ipairs(tests) do
+        for _, k2 in ipairs(tests) do
+            if not TheWorld.Map:IsAboveGroundAtPoint(pt.x+k1, 0, pt.z+k2) then
+                return false
+            end
+        end
+    end
+	return true
+end
+local function PlacerTest_carpet2(pt, rot)
+	return PlacerTest_carpet(pt, rot, { -3.1, 0, 3.1 })
+end
+
 AddRecipe2(
     "shield_l_sand", {
         Ingredient("townportaltalisman", 6),
@@ -230,20 +248,31 @@ AddRecipe2(
         atlas = "images/inventoryimages/guitar_whitewood.xml", image = "guitar_whitewood.tex"
     }, { "GARDENING", "TOOLS" }
 )
+-- AddRecipe2(
+--     "mat_whitewood_item", {
+--         Ingredient("shyerrylog", 1, "images/inventoryimages/shyerrylog.xml"),
+--     }, TECH.NONE, {
+--         numtogive = 6,
+--         atlas = "images/inventoryimages/mat_whitewood_item.xml", image = "mat_whitewood_item.tex"
+--     }, { "DECOR" }
+-- )
+
 AddRecipe2(
-    "mat_whitewood_item", {
-        Ingredient("shyerrylog", 1, "images/inventoryimages/shyerrylog.xml"),
+    "carpet_whitewood", {
+        Ingredient("shyerrylog", 1, "images/inventoryimages/shyerrylog.xml")
     }, TECH.NONE, {
-        numtogive = 6,
-        atlas = "images/inventoryimages/mat_whitewood_item.xml", image = "mat_whitewood_item.tex"
+        placer = "carpet_whitewood_placer", min_spacing = 0,
+        atlas = "images/inventoryimages/carpet_whitewood.xml", image = "carpet_whitewood.tex",
+        testfn = PlacerTest_carpet
     }, { "DECOR" }
 )
 AddRecipe2(
-    "carpet_large_ww", {
-        Ingredient("shyerrylog", 5, "images/inventoryimages/shyerrylog.xml"),
+    "carpet_whitewood_big", {
+        Ingredient("shyerrylog", 4, "images/inventoryimages/shyerrylog.xml")
     }, TECH.SCIENCE_ONE, {
-        placer = "carpet_large_ww_placer", min_spacing = 0,
-        atlas = "images/inventoryimages/carpet_large_ww.xml", image = "carpet_large_ww.tex"
+        placer = "carpet_whitewood_big_placer", min_spacing = 0,
+        atlas = "images/inventoryimages/carpet_whitewood_big.xml", image = "carpet_whitewood_big.tex",
+        testfn = PlacerTest_carpet2
     }, { "DECOR" }
 )
 

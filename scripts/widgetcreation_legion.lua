@@ -8,6 +8,15 @@ local containers = require("containers")
 local showmeneed = { "backcub" }
 local params = {}
 
+local function TestContainer_base(container, item, slot)
+    return not (item:HasTag("irreplaceable") or item:HasTag("nobundling"))
+        and (
+            item:HasTag("unwrappable") or not (
+                item:HasTag("_container") or item:HasTag("bundle")
+            )
+        )
+end
+
 params.backcub_fans2 = {
     widget = {
         slotpos = {},
@@ -43,13 +52,8 @@ if TUNING.LEGION_FLASHANDCRUSH then
         end
     end
 
-    if containers.params and containers.params.bundle_container then --还是希望和官方保持一致，免得官方修改我还得跟着改
-        params.beefalo.itemtestfn = containers.params.bundle_container.itemtestfn
-    else
-        params.beefalo.itemtestfn = function(container, item, slot)
-            return not (item:HasTag("irreplaceable") or item:HasTag("_container") or item:HasTag("bundle") or item:HasTag("nobundling"))
-        end
-    end
+    params.beefalo.itemtestfn = TestContainer_base
+
     table.insert(showmeneed, "beefalo")
 end
 
@@ -137,13 +141,7 @@ if CONFIGS_LEGION.PRAYFORRAIN then
         end
     end
 
-    if containers.params and containers.params.bundle_container then --还是希望和官方保持一致，免得官方修改我还得跟着改
-        params.revolvedmoonlight.itemtestfn = containers.params.bundle_container.itemtestfn
-    else
-        params.revolvedmoonlight.itemtestfn = function(container, item, slot)
-            return not (item:HasTag("irreplaceable") or item:HasTag("_container") or item:HasTag("bundle") or item:HasTag("nobundling"))
-        end
-    end
+    params.revolvedmoonlight.itemtestfn = TestContainer_base
 
     ------
 
@@ -164,7 +162,7 @@ if CONFIGS_LEGION.PRAYFORRAIN then
         table.insert(params.revolvedmoonlight_pro.widget.slotpos, Vector3(-122 + 225, (-77*y) + 80 - (y*2), 0))
     end
 
-    params.revolvedmoonlight_pro.itemtestfn = params.revolvedmoonlight.itemtestfn
+    params.revolvedmoonlight_pro.itemtestfn = TestContainer_base
 
     ------
 

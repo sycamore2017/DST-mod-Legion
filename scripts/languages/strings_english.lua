@@ -3220,7 +3220,7 @@ S______GENERIC.DESCRIBE.THEEMPERORSPENDANT = "A determined man won't believe thi
 -- S_________WURT.DESCRIBE.THEEMPERORSPENDANT = ""
 -- S_______WALTER.DESCRIBE.THEEMPERORSPENDANT = ""
 
-S_NAMES.MAT_WHITEWOOD_ITEM = "White Wood Mat" --白木地片
+S_NAMES.MAT_WHITEWOOD_ITEM = "White Wood Chip" --白木地片
 S_RECIPE_DESC.MAT_WHITEWOOD_ITEM = "Gives your feet a nice woody feel."
 S______GENERIC.DESCRIBE.MAT_WHITEWOOD_ITEM = "White wood chips for decorating the ground."
 -- S_______WILLOW.DESCRIBE.MAT_WHITEWOOD_ITEM = ""
@@ -3240,11 +3240,11 @@ S______WAXWELL.DESCRIBE.MAT_WHITEWOOD_ITEM = "A layer of cushion makes me feel m
 -- S_______WALTER.DESCRIBE.MAT_WHITEWOOD_ITEM = ""
 -- S________WANDA.DESCRIBE.MAT_WHITEWOOD_ITEM = ""
 
-S_NAMES.CARPET_WW = "White Wood Mat" --白木地垫
-S_RECIPE_DESC.CARPET_WW = "A simple wooden mat."
+S_NAMES.CARPET_WHITEWOOD = "White Wood Mat" --白木地垫
+S_RECIPE_DESC.CARPET_WHITEWOOD = "A simple wooden mat."
 
-S_NAMES.CARPET_LARGE_WW = "White Wood Carpet" --白木地毯
-S_RECIPE_DESC.CARPET_LARGE_WW = "A large wooden carpet."
+S_NAMES.CARPET_WHITEWOOD_BIG = "White Wood Carpet" --白木地毯
+S_RECIPE_DESC.CARPET_WHITEWOOD_BIG = "A large wooden carpet."
 
 --------------------------------------------------------------------------
 --[[ other ]]--[[ 其他 ]]

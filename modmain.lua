@@ -30,6 +30,7 @@ PrefabFiles = {
     "fx_legion",                --特效
     "buffs_legion",             --buff
     "shield_legion",            --盾类武器
+    "carpet_legion",            --地毯
 }
 
 Assets = {

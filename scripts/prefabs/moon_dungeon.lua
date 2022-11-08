@@ -449,7 +449,7 @@ local protector_stage = { --各种保护者的生成方式
     staycool = function(inst, worker, protector, protdata)
         --先冻住入侵者
         local x, y, z = inst.Transform:GetWorldPosition()
-        local ents = TheSim:FindEntities(x, y, z, 10, { "freezable" }, { "FX", "NOCLICK", "DECOR", "INLIMBO" })
+        local ents = TheSim:FindEntities(x, y, z, 10, { "freezable" }, { "FX", "NOCLICK", "INLIMBO" })
         for i, v in pairs(ents) do
             if v.components.freezable ~= nil then
                 v.components.freezable:AddColdness(10)
@@ -478,7 +478,7 @@ local protector_stage = { --各种保护者的生成方式
     --范围型冰控
     iceexplosion = function(inst, worker, protector, protdata)
         local x, y, z = inst.Transform:GetWorldPosition()
-        local ents = TheSim:FindEntities(x, y, z, 10, { "freezable" }, { "FX", "NOCLICK", "DECOR", "INLIMBO" })
+        local ents = TheSim:FindEntities(x, y, z, 10, { "freezable" }, { "FX", "NOCLICK", "INLIMBO" })
         for i, v in pairs(ents) do
             if v.components.freezable ~= nil then
                 v.components.freezable:AddColdness(10)
@@ -551,7 +551,7 @@ local protector_stage = { --各种保护者的生成方式
     --范围式催眠
     goodnight = function(inst, worker, protector, protdata)
         local x, y, z = inst.Transform:GetWorldPosition()
-        local ents = TheSim:FindEntities(x, y, z, 20, nil, { "playerghost", "FX", "DECOR", "INLIMBO" }, { "sleeper", "player" })
+        local ents = TheSim:FindEntities(x, y, z, 20, nil, { "playerghost", "FX", "INLIMBO" }, { "sleeper", "player" })
         for i, v in ipairs(ents) do
             if not (v.components.freezable ~= nil and v.components.freezable:IsFrozen()) and
                 not (v.components.pinnable ~= nil and v.components.pinnable:IsStuck()) and
@@ -574,7 +574,7 @@ local protector_stage = { --各种保护者的生成方式
     --先范围式催眠，后范围随机阵势产生
     baddream = function(inst, worker, protector, protdata)
         local x, y, z = inst.Transform:GetWorldPosition()
-        local ents = TheSim:FindEntities(x, y, z, 20, nil, { "playerghost", "FX", "DECOR", "INLIMBO" }, { "sleeper", "player" })
+        local ents = TheSim:FindEntities(x, y, z, 20, nil, { "playerghost", "FX", "INLIMBO" }, { "sleeper", "player" })
         for i, v in ipairs(ents) do
             if not (v.components.freezable ~= nil and v.components.freezable:IsFrozen()) and
                 not (v.components.pinnable ~= nil and v.components.pinnable:IsStuck()) and
