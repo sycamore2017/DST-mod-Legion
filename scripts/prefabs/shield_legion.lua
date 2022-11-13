@@ -21,6 +21,19 @@ local function Counterattack_base(inst, doer, attacker, data, range, atk)
     end
 end
 
+local function SetShieldEquip(inst, owner)
+    RebuildRedirectDamageFn(owner) --全局函数：重新构造combat的redirectdamagefn函数
+    --登记远程保护的函数
+    if owner.redirect_table[inst.prefab] == nil then
+        owner.redirect_table[inst.prefab] = function(victim, attacker, damage, weapon, stimuli)
+            --只要这里不为nil，就能吸收所有远程伤害，反正武器没有health组件，所以在伤害计算时会直接被判断给取消掉
+            if not inst._brokenshield then
+                return inst.components.shieldlegion:GetAttacked(victim, attacker, damage, weapon, stimuli)
+            end
+            return nil
+        end
+    end
+end
 local function OnEquipFn(inst, owner)
     if inst.components.skinedlegion ~= nil then
         local skindata = inst.components.skinedlegion:GetSkinedData()
@@ -48,17 +61,7 @@ local function OnEquipFn(inst, owner)
         return
     end
 
-    RebuildRedirectDamageFn(owner) --全局函数：重新构造combat的redirectdamagefn函数
-    --登记远程保护的函数
-    if owner.redirect_table[inst.prefab] == nil then
-        owner.redirect_table[inst.prefab] = function(victim, attacker, damage, weapon, stimuli)
-            --只要这里不为nil，就能吸收所有远程伤害，反正武器没有health组件，所以在伤害计算时会直接被判断给取消掉
-            if not inst._brokenshield then
-                return inst.components.shieldlegion:GetAttacked(victim, attacker, damage, weapon, stimuli)
-            end
-            return nil
-        end
-    end
+    SetShieldEquip(inst, owner)
 end
 local function OnUnequipFn(inst, owner)
     --owner.AnimState:ClearOverrideSymbol("book_closed")
@@ -570,10 +573,11 @@ if CONFIGS_LEGION.PRAYFORRAIN then
     MakeShield({
         name = "agronssword",
         assets = {
-            Asset("ANIM", "anim/agronssword.zip"),    --这个是放在地上的动画文件
-            Asset("ANIM", "anim/swap_agronssword.zip"),   --手上的动画
+            Asset("ANIM", "anim/agronssword.zip"),
             Asset("ATLAS", "images/inventoryimages/agronssword.xml"),
-            Asset("IMAGE", "images/inventoryimages/agronssword.tex")
+            Asset("IMAGE", "images/inventoryimages/agronssword.tex"),
+            Asset("ATLAS", "images/inventoryimages/agronssword2.xml"),
+            Asset("IMAGE", "images/inventoryimages/agronssword2.tex")
         },
         prefabs = { "agronssword_fx" },
         fn_common = function(inst)
@@ -609,9 +613,28 @@ if CONFIGS_LEGION.PRAYFORRAIN then
             inst.components.armor.indestructible = true --无敌的护甲
 
             inst.components.equippable:SetOnEquip(function(inst, owner)
-                OnEquipFn(inst, owner)
+                local filename = inst.components.timer:TimerExists("revolt") and "swap2" or "swap1"
+                if inst.components.skinedlegion ~= nil then
+                    local skindata = inst.components.skinedlegion:GetSkinedData()
+                    if skindata ~= nil and skindata.equip ~= nil then
+                        owner.AnimState:OverrideSymbol("lantern_overlay", skindata.equip.build, filename)
+                    else
+                        owner.AnimState:OverrideSymbol("lantern_overlay", "agronssword", filename)
+                    end
+                else
+                    owner.AnimState:OverrideSymbol("lantern_overlay", "agronssword", filename)
+                end
 
-                -- owner.AnimState:OverrideSymbol("swap_object", "swap_agronssword", "swap_agronssword")
+                owner.AnimState:HideSymbol("swap_object")
+                owner.AnimState:Show("ARM_carry") --显示持物手
+                owner.AnimState:Hide("ARM_normal") --隐藏普通的手
+                owner.AnimState:Show("LANTERN_OVERLAY")
+
+                if owner:HasTag("equipmentmodel") then --假人！
+                    return
+                end
+
+                SetShieldEquip(inst, owner)
                 if owner.components.health ~= nil then
                     owner:ListenForEvent("death", DeathCallForRain)
                     owner:ListenForEvent("healthdelta", inst.fn_onHealthDelta)
