@@ -1150,11 +1150,23 @@ local dressup_data = {
     --棱镜-------------------------
     -------------------------------
 
-    agronssword = --tip：通过幻化就可以把这把剑带到其他世界啦！
-    {
+    agronssword = { --tip：通过幻化就可以把这把剑带到其他世界啦！
         isnoskin = true,
-        buildfile = "swap_agronssword",
-        buildsymbol = "swap_agronssword",
+        -- isshield = true,
+        buildfn = function(dressup, item, buildskin)
+            local itemswap = {}
+
+            itemswap["lantern_overlay"] = dressup:GetDressData(
+                nil, item._dd.build,
+                item.components.timer:TimerExists("revolt") and "swap2" or "swap1",
+                item.GUID, "swap"
+            )
+            itemswap["LANTERN_OVERLAY"] = dressup:GetDressData(nil, nil, nil, nil, "show")
+            itemswap["swap_object"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
+            itemswap["whipline"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
+
+            return itemswap
+        end
     },
     backcub = {
         isnoskin = true,

@@ -21,6 +21,7 @@ local InventoryPrefabsList = {  --每个元素的下标值为每种物品栏图�
     desertdefense = { build = "images_minisign1", },
     hat_lichen = { build = "images_minisign1", },
     agronssword = { build = "images_minisign1", },
+    agronssword2 = { build = "images_minisign1", },
     --20
 
     dish_chilledrosejuice = { build = "images_minisign2", },

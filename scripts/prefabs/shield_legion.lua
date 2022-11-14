@@ -545,28 +545,44 @@ if CONFIGS_LEGION.PRAYFORRAIN then
             owner.components.health:DoDelta(-1.5, false, "agronssword")
         end
     end
-    local function CalcDamage_agron(inst)
-        local owner = inst.components.inventoryitem:GetGrandOwner()
-        if owner and owner.components.health and owner.components.inventory then
-            if inst == owner.components.inventory:GetEquippedItem(EQUIPSLOTS.HANDS) then
-                inst.fn_onHealthDelta(owner, nil)
-                return
+    local function TrySetOwnerSymbol(inst, doer, revolt)
+        if doer == nil then --因为此时有可能不再是装备状态，doer 发生了改变
+            doer = inst.components.inventoryitem:GetGrandOwner()
+        end
+        if doer then
+            if doer:HasTag("player") then
+                if doer.components.health and doer.components.inventory then
+                    if inst == doer.components.inventory:GetEquippedItem(EQUIPSLOTS.HANDS) then
+                        doer.AnimState:OverrideSymbol("lantern_overlay", inst._dd.build, revolt and "swap2" or "swap1")
+                        inst.fn_onHealthDelta(doer, nil)
+                    end
+                end
+            elseif doer:HasTag("equipmentmodel") then
+                doer.AnimState:OverrideSymbol("lantern_overlay", inst._dd.build, revolt and "swap2" or "swap1")
             end
         end
-        inst.components.weapon:SetDamage(inst._basedamage)
+        if revolt then
+            inst.components.inventoryitem.atlasname = inst._dd.img_atlas2
+            inst.components.inventoryitem:ChangeImageName(inst._dd.img_tex2)
+            inst.AnimState:PlayAnimation("idle2")
+        else
+            inst.components.inventoryitem.atlasname = inst._dd.img_atlas
+            inst.components.inventoryitem:ChangeImageName(inst._dd.img_tex)
+            inst.AnimState:PlayAnimation("idle")
+        end
     end
     local function DoRevolt(inst, doer)
         if inst._task_fx == nil then
             inst._basedamage = damage_sword
-            if doer then
-                inst.fn_onHealthDelta(doer, nil)
-            end
+            inst.components.weapon:SetDamage(damage_sword)
             inst.components.armor:SetAbsorption(absorb_sword)
+
+            TrySetOwnerSymbol(inst, doer, true)
+
             inst._task_fx = inst:DoPeriodicTask(0.21, function(inst)
-                local fx = SpawnPrefab("agronssword_fx")
+                local fx = SpawnPrefab(inst._dd.fx or "agronssword_fx")
                 fx.Transform:SetPosition((inst.components.inventoryitem:GetGrandOwner() or inst).Transform:GetWorldPosition())
             end, 0)
-            --改贴图 undo
         end
     end
 
@@ -592,6 +608,11 @@ if CONFIGS_LEGION.PRAYFORRAIN then
             inst:AddTag("NORATCHECK") --mod兼容：永不妥协。该道具不算鼠潮分
         end,
         fn_server = function(inst)
+            inst._dd = {
+                img_tex = "agronssword", img_atlas = "images/inventoryimages/agronssword.xml",
+                img_tex2 = "agronssword2", img_atlas2 = "images/inventoryimages/agronssword2.xml",
+                build = "agronssword", fx = "agronssword_fx"
+            }
             inst._task_fx = nil
             inst._basedamage = damage_shield
             inst.fn_onHealthDelta = function(owner, data)
@@ -604,7 +625,7 @@ if CONFIGS_LEGION.PRAYFORRAIN then
                 inst.components.weapon:SetDamage(inst._basedamage*(1.2-percent))
             end
 
-            inst.components.inventoryitem:SetSinks(true) --落水时会下沉，但是因为标签的关系会回到绚丽大门
+            inst.components.inventoryitem:SetSinks(true) --落水时会下沉，但是因为标签的关系会回到附近岸边
 
             inst.components.weapon:SetDamage(damage_shield)
             inst.components.weapon:SetOnAttack(OnAttack_agron)
@@ -613,18 +634,8 @@ if CONFIGS_LEGION.PRAYFORRAIN then
             inst.components.armor.indestructible = true --无敌的护甲
 
             inst.components.equippable:SetOnEquip(function(inst, owner)
-                local filename = inst.components.timer:TimerExists("revolt") and "swap2" or "swap1"
-                if inst.components.skinedlegion ~= nil then
-                    local skindata = inst.components.skinedlegion:GetSkinedData()
-                    if skindata ~= nil and skindata.equip ~= nil then
-                        owner.AnimState:OverrideSymbol("lantern_overlay", skindata.equip.build, filename)
-                    else
-                        owner.AnimState:OverrideSymbol("lantern_overlay", "agronssword", filename)
-                    end
-                else
-                    owner.AnimState:OverrideSymbol("lantern_overlay", "agronssword", filename)
-                end
-
+                owner.AnimState:OverrideSymbol("lantern_overlay", inst._dd.build,
+                    inst.components.timer:TimerExists("revolt") and "swap2" or "swap1")
                 owner.AnimState:HideSymbol("swap_object")
                 owner.AnimState:Show("ARM_carry") --显示持物手
                 owner.AnimState:Hide("ARM_normal") --隐藏普通的手
@@ -653,13 +664,15 @@ if CONFIGS_LEGION.PRAYFORRAIN then
             inst:ListenForEvent("timerdone", function(inst, data)
                 if data.name == "revolt" then
                     inst._basedamage = damage_shield
-                    CalcDamage_agron(inst) --因为此时有可能不再是装备状态，doer 发生了改变
+                    inst.components.weapon:SetDamage(damage_shield)
                     inst.components.armor:SetAbsorption(absorb_shield)
+
+                    TrySetOwnerSymbol(inst, nil, false)
+
                     if inst._task_fx ~= nil then
                         inst._task_fx:Cancel()
                         inst._task_fx = nil
                     end
-                    --改贴图 undo
                 end
             end)
 
