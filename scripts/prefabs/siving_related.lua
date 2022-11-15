@@ -1005,6 +1005,25 @@ local function GetSwapSymbol(owner)
     end
 end
 
+local function AddMaskHPCost(inst, owner, value)
+    if owner.feather_l_reducer == nil then
+        owner.feather_l_reducer = {}
+    end
+    owner.feather_l_reducer[inst.prefab] = value
+end
+local function DeleteMaskHPCost(inst, owner)
+    if owner.feather_l_reducer == nil then
+        return
+    end
+    owner.feather_l_reducer[inst.prefab] = nil
+    for _,v in pairs(owner.feather_l_reducer) do
+        if v then
+            return
+        end
+    end
+    owner.feather_l_reducer = nil
+end
+
 MakeMask({
     name = "siving_mask",
     assets = {
@@ -1020,13 +1039,14 @@ MakeMask({
         inst:AddTag("siv_mask")
     end,
     fn_server = function(inst)
-        inst.feather_l_reducer = -0.5
         inst.healthcounter_max = 80
 
         inst.components.equippable:SetOnEquip(function(inst, owner)
             HAT_OPENTOP_ONEQUIP_L(inst, owner, "siving_mask", GetSwapSymbol(owner))
 
             --假人兼容：这里不做截断，为了能开发一些新玩法
+
+            AddMaskHPCost(inst, owner, 0.5)
 
             local notags = {
                 "NOCLICK", "INLIMBO", "shadow", "playerghost", "ghost", "wall", "structure",
@@ -1100,6 +1120,7 @@ MakeMask({
         end)
         inst.components.equippable:SetOnUnequip(function(inst, owner)
             HAT_ONUNEQUIP_L(inst, owner)
+            DeleteMaskHPCost(inst, owner)
             CancelTask_life(inst, owner)
         end)
 
@@ -1174,13 +1195,14 @@ MakeMask({
         inst:AddTag("siv_mask2")
     end,
     fn_server = function(inst)
-        inst.feather_l_reducer = -1
         inst.healthcounter_max = 135
 
         inst.components.equippable:SetOnEquip(function(inst, owner)
             HAT_OPENTOP_ONEQUIP_L(inst, owner, "siving_mask_gold", GetSwapSymbol(owner))
 
             --假人兼容：这里不做截断，为了能开发一些新玩法
+
+            AddMaskHPCost(inst, owner, 1)
 
             owner:ListenForEvent("onattackother", OnAttackOther)
 
@@ -1255,6 +1277,7 @@ MakeMask({
         end)
         inst.components.equippable:SetOnUnequip(function(inst, owner)
             HAT_ONUNEQUIP_L(inst, owner)
+            DeleteMaskHPCost(inst, owner)
             CancelTask_life(inst, owner)
             owner:RemoveEventCallback("onattackother", OnAttackOther)
         end)

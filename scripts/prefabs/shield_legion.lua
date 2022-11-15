@@ -540,9 +540,9 @@ if CONFIGS_LEGION.PRAYFORRAIN then
     end
     local function OnAttack_agron(inst, owner, target)
         if owner.components.health ~= nil and owner.components.health:GetPercent() > 0.1 then
-            local fx = SpawnPrefab("agronssword_fx") --燃血特效
+            local fx = SpawnPrefab(inst._dd.fx or "agronssword_fx") --燃血特效
             fx.Transform:SetPosition(owner.Transform:GetWorldPosition())
-            owner.components.health:DoDelta(-1.5, false, "agronssword")
+            owner.components.health:DoDelta(-1.5, true, "agronssword")
         end
     end
     local function TrySetOwnerSymbol(inst, doer, revolt)

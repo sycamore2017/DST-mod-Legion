@@ -32,8 +32,8 @@ local assets = {
     Asset("IMAGE", "images/inventoryimages/theemperorsscepter.tex"),
     Asset("ATLAS", "images/inventoryimages/theemperorspendant.xml"),
     Asset("IMAGE", "images/inventoryimages/theemperorspendant.tex"),
-    -- Asset("ATLAS", "images/inventoryimages/mat_whitewood_item.xml"),
-    -- Asset("IMAGE", "images/inventoryimages/mat_whitewood_item.tex"),
+    Asset("ATLAS", "images/inventoryimages/mat_whitewood_item.xml"),
+    Asset("IMAGE", "images/inventoryimages/mat_whitewood_item.tex"),
     Asset("ATLAS", "images/inventoryimages/carpet_whitewood_big.xml"),
     Asset("IMAGE", "images/inventoryimages/carpet_whitewood_big.tex"),
     Asset("ATLAS", "images/inventoryimages/carpet_whitewood.xml"),
@@ -248,14 +248,14 @@ AddRecipe2(
         atlas = "images/inventoryimages/guitar_whitewood.xml", image = "guitar_whitewood.tex"
     }, { "GARDENING", "TOOLS" }
 )
--- AddRecipe2(
---     "mat_whitewood_item", {
---         Ingredient("shyerrylog", 1, "images/inventoryimages/shyerrylog.xml"),
---     }, TECH.NONE, {
---         numtogive = 6,
---         atlas = "images/inventoryimages/mat_whitewood_item.xml", image = "mat_whitewood_item.tex"
---     }, { "DECOR" }
--- )
+AddRecipe2(
+    "mat_whitewood_item", {
+        Ingredient("shyerrylog", 1, "images/inventoryimages/shyerrylog.xml"),
+    }, TECH.NONE, {
+        numtogive = 6,
+        atlas = "images/inventoryimages/mat_whitewood_item.xml", image = "mat_whitewood_item.tex"
+    }, { "DECOR" }
+)
 
 AddRecipe2(
     "carpet_whitewood", {

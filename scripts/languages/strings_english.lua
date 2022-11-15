@@ -2257,6 +2257,7 @@ S_____WORMWOOD.DESCRIBE.SIVING_TURN = {
 -- S________WANDA.DESCRIBE.SIVING_TURN = ""
 
 S_NAMES.SIVING_FEATHER_REAL = "True Siving Feather" --子圭玄鸟正羽
+S_RECIPE_DESC.SIVING_FEATHER_REAL = "Sharp feather after thoroughly tempered."
 S______GENERIC.DESCRIBE.SIVING_FEATHER_REAL = "I can't wait to pierce something with it."
 S_______WILLOW.DESCRIBE.SIVING_FEATHER_REAL = "Feather split!"
 S_____WOLFGANG.DESCRIBE.SIVING_FEATHER_REAL = "A sharp fly-cutter."

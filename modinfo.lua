@@ -42,8 +42,7 @@ icon = "modicon.tex"
 server_filter_tags = L and { "LEGION", } or { "棱镜", }
 
 --mod设置
-configuration_options =
-{
+configuration_options = {
     {name = "Title", label = L and "Language" or "语言", options = {{description = "", data = ""},}, default = "",},
     L and {
         name = "Language",
@@ -530,6 +529,35 @@ configuration_options =
             {description = "官方图", data = 2}
         },
         default = 1
+    },
+    L and {
+        name = "SivFeaStrength",
+        label = "Siving Feather Strength",
+        hover = "Set damage and HP loss of True Siving Feather.",
+        options = {
+            {description = "17/-0.5", data = 1}, --0.5
+            {description = "23.8/-1", data = 2}, --0.7
+            {description = "34/-2(default)", data = 3}, --1
+            {description = "42.5/-2.5", data = 4}, --1.25
+            {description = "51/-3", data = 5}, --1.5
+            {description = "61.2/-4", data = 6}, --1.8
+            {description = "68/-4.5", data = 7} --2
+        },
+        default = 3
+    } or {
+        name = "SivFeaStrength",
+        label = "子圭玄鸟正羽强度",
+        hover = "设置子圭玄鸟正羽的攻击力和耗血。变态，还是不变态，你自己界定！",
+        options = {
+            {description = "17/-0.5", data = 1}, --0.5
+            {description = "23.8/-1", data = 2}, --0.7
+            {description = "34/-2(默认)", data = 3}, --1
+            {description = "42.5/-2.5", data = 4}, --1.25
+            {description = "51/-3", data = 5}, --1.5
+            {description = "61.2/-4", data = 6}, --1.8
+            {description = "68/-4.5", data = 7} --2
+        },
+        default = 3
     },
 
     -----

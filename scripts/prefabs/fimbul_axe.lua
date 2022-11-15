@@ -108,14 +108,14 @@ local function GiveSomeShock(inst, owner, target)  --击中时的特殊效果
     local ents = TheSim:FindEntities(x, y, z, 3, nil, {"playerghost", "INLIMBO"}, {"shockable", "CHOP_workable"})
     for k, v in pairs(ents) do
         if v ~= owner then
-            if v.components.shockable ~= nil and math.random() < 0.3 then   --有几率对生物造成触电
+            if v.components.workable ~= nil and v.components.workable:CanBeWorked() then --直接破坏可以砍的物体
+                v.components.workable:Destroy(inst)
+            elseif v.components.shockable ~= nil and math.random() < 0.3 then --有几率对生物造成触电
                 givelightning = true
 
                 if isPVP or not v:HasTag("player") then --只要是pvp模式就直接生效，若不是则只让非玩家生物触电
                     v.components.shockable:Shock(6)
                 end
-            elseif v.components.workable ~= nil and v.components.workable:CanBeWorked() then --直接破坏可以砍的物体
-                v.components.workable:Destroy(inst)
             end
         end
     end

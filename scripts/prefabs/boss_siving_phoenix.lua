@@ -850,15 +850,43 @@ local function ReticuleUpdatePositionFn(inst, pos, reticule, ease, smoothing, dt
 end
 ]]--
 
+local sivfea_attack = 34
+local sivfea_hpcost = 2
+
+if CONFIGS_LEGION.SIVFEASTRENGTH == 3 then
+    --nothing
+elseif CONFIGS_LEGION.SIVFEASTRENGTH == 1 then
+    sivfea_attack = 17
+    sivfea_hpcost = 0.5
+elseif CONFIGS_LEGION.SIVFEASTRENGTH == 2 then
+    sivfea_attack = 23.8
+    sivfea_hpcost = 1
+elseif CONFIGS_LEGION.SIVFEASTRENGTH == 4 then
+    sivfea_attack = 42.5
+    sivfea_hpcost = 2.5
+elseif CONFIGS_LEGION.SIVFEASTRENGTH == 5 then
+    sivfea_attack = 51
+    sivfea_hpcost = 3
+elseif CONFIGS_LEGION.SIVFEASTRENGTH == 6 then
+    sivfea_attack = 61.2
+    sivfea_hpcost = 4
+elseif CONFIGS_LEGION.SIVFEASTRENGTH == 7 then
+    sivfea_attack = 68
+    sivfea_hpcost = 4.5
+end
+
 local function MakeWeapon(data)
     local fea_damage
     local fea_range
+    local fea_hpcost
     if data.isreal then
-        fea_damage = 61.2 --34*1.8
+        fea_damage = sivfea_attack
         fea_range = 13
+        fea_hpcost = sivfea_hpcost
     else
-        fea_damage = 40.8 --34*1.2
+        fea_damage = 30.6 --34*0.9
         fea_range = 10
+        fea_hpcost = 3
     end
 
     local function InitFea(inst)
@@ -1041,17 +1069,18 @@ local function MakeWeapon(data)
                 end
 
                 if caster.components.health ~= nil and not caster.components.health:IsDead() then
-                    local mask = caster.components.inventory:GetEquippedItem(EQUIPSLOTS.HEAD)
-                    if mask ~= nil and mask.feather_l_reducer ~= nil then
-                        mask = mask.feather_l_reducer
-                    else
-                        mask = 0
-                    end
-                    if caster.feather_l_reducer ~= nil then --简单地兼容其他东西
-                        mask = mask + caster.feather_l_reducer
+                    local costt = fea_hpcost
+                    if caster.feather_l_reducer ~= nil then
+                        for _,v in pairs(caster.feather_l_reducer) do
+                            if v then
+                                costt = costt - v
+                            end
+                        end
                     end
                     caster.sivfeathers_l = nil
-                    caster.components.health:DoDelta(-(4 + mask)*num, true, data.name, false, nil, true)
+                    if costt > 0 then
+                        caster.components.health:DoDelta(-costt*num, true, data.name, false, nil, true)
+                    end
                     if not caster.components.health:IsDead() and lines then
                         local line = SpawnPrefab("siving_feather_line")
                         caster.sivfeathers_l = feathers
@@ -1329,8 +1358,6 @@ SetSharedLootTable('siving_foenix', {
     {'siving_rocks',        0.50},
     {'siving_rocks',        0.50},
     {'siving_rocks',        0.50},
-    {'siving_feather_fake',     1.00},
-    {'siving_feather_fake',     0.50},
     {'siving_derivant_item',    1.00},
     {'siving_derivant_item',    1.00},
     {'siving_mask_blueprint',   1.00},
@@ -1358,10 +1385,12 @@ SetSharedLootTable('siving_moenix', {
     {'siving_feather_fake',     1.00},
     {'siving_feather_fake',     1.00},
     {'siving_feather_fake',     1.00},
+    {'siving_feather_fake',     1.00},
     {'siving_feather_fake',     0.50},
     {'siving_feather_fake',     0.50},
-    {'siving_feather_real',     1.00},
-    {'siving_mask_blueprint',   1.00},
+    {'siving_feather_fake',     0.50},
+    {'siving_feather_fake',     0.50},
+    {'siving_feather_real_blueprint',   1.00},
     -- {'chesspiece_moosegoose_sketch', 1.00},
 })
 
