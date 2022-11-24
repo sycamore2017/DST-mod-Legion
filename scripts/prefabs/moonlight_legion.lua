@@ -599,7 +599,7 @@ local function MakeRevolved(sets)
         inst.components.container.onclosefn = OnClose_revolved
         inst.components.container.skipclosesnd = true
         inst.components.container.skipopensnd = true
-        inst.components.container.droponopen = true
+        -- inst.components.container.droponopen = true --去掉这个就能打开不掉落了
 
         inst:AddComponent("lootdropper")
 

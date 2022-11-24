@@ -26,7 +26,8 @@ local SkinStrings = ischinese and {
         ERA = "先古回响系列",
         OLDPIC = "念旧系列",
         FANS = "饭制系列",
-        COLLECTOR = "星河收藏家系列"
+        COLLECTOR = "星河收藏家系列",
+        TASTE = "厨心百味系列"
     },
     UI_ACCESS = "获取",
     UI_INPUT_CDK = "请输入兑换码",
@@ -52,7 +53,8 @@ local SkinStrings = ischinese and {
         ERA = "Era Echo Collection",
         OLDPIC = "Nostalgia Collection",
         FANS = "Fans Creation",
-        COLLECTOR = "Galaxy Collector Collection"
+        COLLECTOR = "Galaxy Collector Collection",
+        TASTE = "Tastes Collection"
     },
     UI_ACCESS = "Get It",
     UI_INPUT_CDK = "Please enter CDK",
@@ -1439,6 +1441,18 @@ local SkinData = {
                 x = 65, y = 0, scale = 0.38
             }
         }
+    },
+    agronssword_taste = {
+        string = ischinese and {
+            collection = "TASTE", access = "SPECIAL",
+            descitem = "解锁\"艾力冈的剑\"的皮肤。",
+            description = "没有",
+        } or {
+            collection = "TASTE", access = "SPECIAL",
+            descitem = "Unlock \"Agron's Sword\" skin.",
+            description = "The story was not translated."
+        },
+        height_anim = 185,
     },
 }
 

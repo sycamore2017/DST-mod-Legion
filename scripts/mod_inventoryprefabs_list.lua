@@ -196,6 +196,9 @@ local InventoryPrefabsList = {  --每个元素的下标值为每种物品栏图�
     backcub_fans = { build = "images_minisign_skins1", },
     backcub_fans2 = { build = "images_minisign_skins1", },
     backcub_thanks = { build = "images_minisign_skins1", },
+
+    agronssword_taste = { build = "images_minisign_skins1", },
+    agronssword_taste2 = { build = "images_minisign_skins1", },
 }
 
 return InventoryPrefabsList

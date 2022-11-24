@@ -143,6 +143,20 @@ local function fn_siving_turn(inst, skinname, bloom)
     end
 end
 
+------
+
+local function fn_start_agronssword(inst)
+    inst.AnimState:SetBank(inst._dd.build)
+    inst.AnimState:SetBuild(inst._dd.build)
+    if inst.components.timer:TimerExists("revolt") then
+        inst.components.inventoryitem.atlasname = inst._dd.img_atlas2
+        inst.components.inventoryitem:ChangeImageName(inst._dd.img_tex2)
+    else
+        inst.components.inventoryitem.atlasname = inst._dd.img_atlas
+        inst.components.inventoryitem:ChangeImageName(inst._dd.img_tex)
+    end
+end
+
 --------------------------------------------------------------------------
 --[[ 全局皮肤总数据，以及修改 ]]
 --------------------------------------------------------------------------
@@ -438,7 +452,18 @@ _G.SKIN_PREFABS_LEGION = {
             setable = true,
         },
         equip = { symbol = nil, build = "shield_l_sand", file = "swap_shield" },
-        exchangefx = { prefab = nil, offset_y = nil, scale = nil },
+        exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
+    },
+    agronssword = {
+        fn_start = function(inst)
+            inst._dd = {
+                img_tex = "agronssword", img_atlas = "images/inventoryimages/agronssword.xml",
+                img_tex2 = "agronssword2", img_atlas2 = "images/inventoryimages/agronssword2.xml",
+                build = "agronssword", fx = "agronssword_fx"
+            }
+            fn_start_agronssword(inst)
+        end,
+        exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
     },
 
     tripleshovelaxe = {
@@ -556,6 +581,25 @@ _G.SKIN_PREFABS_LEGION = {
             fn_siving_turn_fruit(genetrans, "siving_turn")
         end,
         exchangefx = { prefab = nil, offset_y = nil, scale = 1.5 },
+    },
+
+    carpet_whitewood = {
+        assets = nil,
+        anim = {
+            bank = "carpet_whitewood", build = "carpet_whitewood",
+            anim = "idle", isloop_anim = nil, animpush = nil, isloop_animpush = nil,
+            setable = true
+        },
+        exchangefx = { prefab = nil, offset_y = nil, scale = nil }
+    },
+    carpet_whitewood_big = {
+        assets = nil,
+        anim = {
+            bank = "carpet_whitewood", build = "carpet_whitewood",
+            anim = "idle_big", isloop_anim = nil, animpush = nil, isloop_animpush = nil,
+            setable = true
+        },
+        exchangefx = { prefab = nil, offset_y = nil, scale = nil }
     },
 }
 
@@ -1263,6 +1307,33 @@ _G.SKINS_LEGION = {
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
     },
 
+    agronssword_taste = {
+        base_prefab = "agronssword",
+		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
+
+        skin_id = "637f66d88c2f781db2f7f2d0",
+        onlyownedshow = true,
+		assets = {
+			Asset("ANIM", "anim/skin/agronssword_taste.zip"),
+            Asset("ATLAS", "images/inventoryimages_skin/agronssword_taste.xml"),
+            Asset("IMAGE", "images/inventoryimages_skin/agronssword_taste.tex"),
+            Asset("ATLAS", "images/inventoryimages_skin/agronssword_taste2.xml"),
+            Asset("IMAGE", "images/inventoryimages_skin/agronssword_taste2.tex")
+		},
+
+        string = ischinese and { name = "糖霜法棍" } or { name = "Frosting Baguette" },
+
+        fn_start = function(inst)
+            inst._dd = {
+                img_tex = "agronssword_taste", img_atlas = "images/inventoryimages_skin/agronssword_taste.xml",
+                img_tex2 = "agronssword_taste2", img_atlas2 = "images/inventoryimages_skin/agronssword_taste2.xml",
+                build = "agronssword_taste", fx = "agronssword_fx_taste"
+            }
+            fn_start_agronssword(inst)
+        end,
+        exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
+    },
+
     icire_rock_era = {
         base_prefab = "icire_rock",
 		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
@@ -1898,6 +1969,87 @@ _G.SKINS_LEGION = {
         exchangefx = { prefab = nil, offset_y = nil, scale = 1.5 },
         linkedskins = { down = "siving_derivant_lvl2_thanks2", up = nil }
     },
+
+    carpet_whitewood_law = {
+        base_prefab = "carpet_whitewood",
+		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
+
+        skin_id = "",
+        onlyownedshow = true,
+		assets = {
+			Asset("ANIM", "anim/skin/carpet_whitewood_law.zip")
+		},
+        image = { name = nil, atlas = nil, setable = false },
+
+        string = ischinese and { name = "小西洋棋棋盘" } or { name = "Quarter Chessboard" },
+
+        anim = {
+            bank = "carpet_whitewood_law", build = "carpet_whitewood_law",
+            anim = "idle", isloop_anim = nil, animpush = nil, isloop_animpush = nil,
+            setable = true
+        },
+        exchangefx = { prefab = nil, offset_y = nil, scale = nil }
+    },
+    carpet_whitewood_big_law = {
+        base_prefab = "carpet_whitewood_big",
+		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
+
+        skin_id = "",
+        onlyownedshow = true,
+		assets = {
+			Asset("ANIM", "anim/skin/carpet_whitewood_law.zip")
+		},
+        image = { name = nil, atlas = nil, setable = false },
+
+        string = ischinese and { name = "西洋棋棋盘" } or { name = "Chessboard" },
+
+        anim = {
+            bank = "carpet_whitewood_law", build = "carpet_whitewood_law",
+            anim = "idle_big", isloop_anim = nil, animpush = nil, isloop_animpush = nil,
+            setable = true
+        },
+        exchangefx = { prefab = nil, offset_y = nil, scale = nil }
+    },
+    carpet_whitewood_law2 = {
+        base_prefab = "carpet_whitewood",
+		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
+
+        skin_id = "",
+        onlyownedshow = true,
+		assets = {
+			Asset("ANIM", "anim/skin/carpet_whitewood_law2.zip")
+		},
+        image = { name = nil, atlas = nil, setable = false },
+
+        string = ischinese and { name = "小西洋棋黑棋盘" } or { name = "Quarter Black Chessboard" },
+
+        anim = {
+            bank = "carpet_whitewood_law2", build = "carpet_whitewood_law2",
+            anim = "idle", isloop_anim = nil, animpush = nil, isloop_animpush = nil,
+            setable = true
+        },
+        exchangefx = { prefab = nil, offset_y = nil, scale = nil }
+    },
+    carpet_whitewood_big_law2 = {
+        base_prefab = "carpet_whitewood_big",
+		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
+
+        skin_id = "",
+        onlyownedshow = true,
+		assets = {
+			Asset("ANIM", "anim/skin/carpet_whitewood_law2.zip")
+		},
+        image = { name = nil, atlas = nil, setable = false },
+
+        string = ischinese and { name = "西洋棋黑棋盘" } or { name = "Black Chessboard" },
+
+        anim = {
+            bank = "carpet_whitewood_law2", build = "carpet_whitewood_law2",
+            anim = "idle_big", isloop_anim = nil, animpush = nil, isloop_animpush = nil,
+            setable = true
+        },
+        exchangefx = { prefab = nil, offset_y = nil, scale = nil }
+    },
 }
 
 _G.SKIN_IDS_LEGION = {
@@ -1932,10 +2084,11 @@ _G.SKIN_IDS_LEGION = {
         rosebush_marble = true, lilybush_marble = true, orchidbush_marble = true,
         hat_lichen_emo_que = true,
     },
-    ["6278c4acc340bf24ab311530"] = { --2度梅开(7)
+    ["6278c4acc340bf24ab311530"] = { --2度梅开(8)
         fishhomingtool_awesome_thanks = true, fishhomingtool_normal_thanks = true, fishhomingbait_thanks = true,
         triplegoldenshovelaxe_era = true, tripleshovelaxe_era = true, lilybush_era = true, lileaves_era = true, icire_rock_era = true, shield_l_log_era = true, shield_l_sand_era = true,
         shield_l_log_emo_fist = true,
+        carpet_whitewood_law = true, carpet_whitewood_big_law = true
     },
     ["6278c4eec340bf24ab311534"] = { --3尺垂涎(7)
         rosebush_collector = true, rosorns_collector = true, fimbul_axe_collector = true,
@@ -1943,6 +2096,10 @@ _G.SKIN_IDS_LEGION = {
         backcub_thanks = true,
         siving_derivant_lvl0_thanks = true, siving_derivant_lvl1_thanks = true, siving_derivant_lvl2_thanks = true, siving_derivant_lvl3_thanks = true,
         siving_derivant_lvl0_thanks2 = true, siving_derivant_lvl1_thanks2 = true, siving_derivant_lvl2_thanks2 = true, siving_derivant_lvl3_thanks2 = true,
+    },
+    ["637f07a28c2f781db2f7f1e8"] = { --4海名扬(8)
+        agronssword_taste = true,
+        carpet_whitewood_law2 = true, carpet_whitewood_big_law2 = true
     },
 }
 _G.SKIN_IDX_LEGION = {
@@ -1983,6 +2140,8 @@ local skinidxes = { --用以皮肤排序
     "backcub_thanks",
     "fishhomingtool_awesome_thanks", "fishhomingtool_normal_thanks", "fishhomingbait_thanks",
     "siving_turn_collector", "icire_rock_collector", "fimbul_axe_collector", "rosebush_collector", "rosorns_collector",
+    "carpet_whitewood_law", "carpet_whitewood_big_law", "carpet_whitewood_law2", "carpet_whitewood_big_law2",
+    "agronssword_taste",
     "triplegoldenshovelaxe_era", "tripleshovelaxe_era", "lilybush_era", "lileaves_era", "shield_l_log_era", "icire_rock_era", "shield_l_sand_era",
     "orchidbush_disguiser", "boltwingout_disguiser",
     "rosebush_marble", "rosorns_marble", "lilybush_marble", "lileaves_marble", "orchidbush_marble", "orchitwigs_marble",

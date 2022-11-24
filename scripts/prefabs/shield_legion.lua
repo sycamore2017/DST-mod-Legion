@@ -606,6 +606,9 @@ if CONFIGS_LEGION.PRAYFORRAIN then
             inst:AddTag("nonpotatable") --这个貌似是？
             inst:AddTag("hide_percentage")  --这个标签能让护甲耐久比例不显示出来
             inst:AddTag("NORATCHECK") --mod兼容：永不妥协。该道具不算鼠潮分
+
+            inst:AddComponent("skinedlegion")
+            inst.components.skinedlegion:Init("agronssword")
         end,
         fn_server = function(inst)
             inst._dd = {
@@ -704,7 +707,7 @@ if CONFIGS_LEGION.PRAYFORRAIN then
                 end
             end
 
-            -- inst.components.skinedlegion:SetOnPreLoad()
+            inst.components.skinedlegion:SetOnPreLoad()
         end,
     })
 end

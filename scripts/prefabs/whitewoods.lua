@@ -130,6 +130,10 @@ local function PlayDoing(inst, owner)
     inst.playtask = inst:DoPeriodicTask(1,
         owner.fourhands_status == 1 and
         function() --主弹逻辑：效果实施
+            if not owner:IsValid() then
+                return
+            end
+
             local x, y, z = owner.Transform:GetWorldPosition()
             for i, v in ipairs(AllPlayers) do
                 if
@@ -189,6 +193,9 @@ local function PlayDoing(inst, owner)
         inst.fxtask:Cancel()
     end
     inst.fxtask = inst:DoPeriodicTask(0.5, function()
+        if not owner:IsValid() then
+            return
+        end
         local x, y, z = owner.Transform:GetWorldPosition()
         local rad = math.random(0.5, 1.5)
         local angle = math.random() * 2 * PI

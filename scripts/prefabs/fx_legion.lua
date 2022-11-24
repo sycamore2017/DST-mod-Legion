@@ -270,6 +270,24 @@ if CONFIGS_LEGION.PRAYFORRAIN then
         end,
         fn_remove = nil,
     })
+    MakeFx({ --糖霜法棍：燃血
+        name = "agronssword_fx_taste",
+        assets = {
+            Asset("ANIM", "anim/lavaarena_boarrior_fx.zip"), --需要官方的动画模板
+            Asset("ANIM", "anim/skin/agronssword_fx_taste.zip")
+        },
+        prefabs = nil,
+        fn_common = nil,
+        fn_anim = function(inst)
+            inst.AnimState:SetBank("lavaarena_boarrior_fx")
+            inst.AnimState:SetBuild("agronssword_fx_taste")
+            inst.AnimState:PlayAnimation("ground_hit_1")
+            inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
+            inst.AnimState:SetFinalOffset(1)
+        end,
+        fn_remove = nil,
+    })
+
     MakeFx({ --月折宝剑：凝血
         name = "refractedmoonlight_fx",
         assets = {
