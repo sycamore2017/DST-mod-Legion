@@ -199,6 +199,12 @@ local InventoryPrefabsList = {  --每个元素的下标值为每种物品栏图�
 
     agronssword_taste = { build = "images_minisign_skins1", },
     agronssword_taste2 = { build = "images_minisign_skins1", },
+    soul_contracts_taste = { build = "images_minisign_skins1", },
+    icire_rock1_day = { build = "images_minisign_skins1", },
+    icire_rock2_day = { build = "images_minisign_skins1", },
+    icire_rock3_day = { build = "images_minisign_skins1", },
+    icire_rock4_day = { build = "images_minisign_skins1", },
+    icire_rock5_day = { build = "images_minisign_skins1", },
 }
 
 return InventoryPrefabsList

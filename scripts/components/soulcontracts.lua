@@ -61,6 +61,9 @@ end
 
 local function SetSoulFx(inst)
     local fx = SpawnPrefab("wortox_soul_in_fx")
+    if inst._fx_set then
+        inst._fx_set(inst, fx)
+    end
     fx.Transform:SetPosition(inst.Transform:GetWorldPosition())
     fx:Setup(inst)
 end

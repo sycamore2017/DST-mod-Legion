@@ -886,6 +886,9 @@ if IsServer then
                 if target:HasTag("soulcontracts") then --进入地面的契约书
                     --命中特效
                     local fx = SpawnPrefab("wortox_soul_in_fx")
+                    if target._fx_set then
+                        target._fx_set(target, fx)
+                    end
                     fx.Transform:SetPosition(inst.Transform:GetWorldPosition())
                     fx:Setup(target)
 
@@ -917,6 +920,9 @@ if IsServer then
                             end
 
                             local fx = SpawnPrefab("wortox_soul_in_fx")
+                            if book._fx_set then
+                                book._fx_set(book, fx)
+                            end
                             fx.Transform:SetPosition(inst.Transform:GetWorldPosition())
                             fx:Setup(target)
 

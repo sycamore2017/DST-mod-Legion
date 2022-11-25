@@ -601,6 +601,16 @@ _G.SKIN_PREFABS_LEGION = {
         },
         exchangefx = { prefab = nil, offset_y = nil, scale = nil }
     },
+
+    soul_contracts = {
+        assets = nil,
+        image = { name = nil, atlas = nil, setable = true },
+        fn_start = function(inst)
+            inst.AnimState:SetBank("book_maxwell")
+            inst.AnimState:SetBuild("soul_contracts")
+        end,
+        exchangefx = { prefab = nil, offset_y = nil, scale = nil }
+    },
 }
 
 _G.SKINS_LEGION = {
@@ -1411,6 +1421,44 @@ _G.SKINS_LEGION = {
         end,
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
     },
+    icire_rock_day = {
+        base_prefab = "icire_rock",
+		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
+
+        skin_id = "6380cbb88c2f781db2f7f400",
+        onlyownedshow = true,
+		assets = {
+			Asset("ANIM", "anim/skin/icire_rock_day.zip"),
+            Asset("ATLAS", "images/inventoryimages_skin/icire_rock1_day.xml"),
+            Asset("IMAGE", "images/inventoryimages_skin/icire_rock1_day.tex"),
+            Asset("ATLAS", "images/inventoryimages_skin/icire_rock2_day.xml"),
+            Asset("IMAGE", "images/inventoryimages_skin/icire_rock2_day.tex"),
+            Asset("ATLAS", "images/inventoryimages_skin/icire_rock3_day.xml"),
+            Asset("IMAGE", "images/inventoryimages_skin/icire_rock3_day.tex"),
+            Asset("ATLAS", "images/inventoryimages_skin/icire_rock4_day.xml"),
+            Asset("IMAGE", "images/inventoryimages_skin/icire_rock4_day.tex"),
+            Asset("ATLAS", "images/inventoryimages_skin/icire_rock5_day.xml"),
+            Asset("IMAGE", "images/inventoryimages_skin/icire_rock5_day.tex"),
+		},
+		image = { name = nil, atlas = nil, setable = false },
+
+        string = ischinese and { name = "风景球" } or { name = "Landscape Ball" },
+
+		fn_start = function(inst)
+            inst.AnimState:SetBank("icire_rock_day")
+            inst.AnimState:SetBuild("icire_rock_day")
+            inst.AnimState:ClearOverrideSymbol("rock")
+            inst.AnimState:ClearOverrideSymbol("shadow")
+
+            inst.changeimgfn = function(inst)
+                local newname = "icire_rock"..tostring(inst.currentTempRange).."_day"
+                inst.components.inventoryitem.atlasname = "images/inventoryimages_skin/"..newname..".xml"
+                inst.components.inventoryitem:ChangeImageName(newname)
+            end
+            inst.changeimgfn(inst)
+        end,
+        exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 }
+    },
 
     lilybush_era = {
         base_prefab = "lilybush",
@@ -1974,7 +2022,7 @@ _G.SKINS_LEGION = {
         base_prefab = "carpet_whitewood",
 		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
 
-        skin_id = "",
+        skin_id = "63805cf58c2f781db2f7f34b",
         onlyownedshow = true,
 		assets = {
 			Asset("ANIM", "anim/skin/carpet_whitewood_law.zip")
@@ -1988,14 +2036,18 @@ _G.SKINS_LEGION = {
             anim = "idle", isloop_anim = nil, animpush = nil, isloop_animpush = nil,
             setable = true
         },
-        exchangefx = { prefab = nil, offset_y = nil, scale = nil }
+        exchangefx = { prefab = nil, offset_y = nil, scale = nil },
+        fn_setBuildPlacer = function(inst)
+            inst.AnimState:SetBank("carpet_whitewood_law")
+            inst.AnimState:SetBuild("carpet_whitewood_law")
+        end
     },
     carpet_whitewood_big_law = {
         base_prefab = "carpet_whitewood_big",
 		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
 
-        skin_id = "",
-        onlyownedshow = true,
+        skin_id = "63805cf58c2f781db2f7f34b",
+        noshopshow = true,
 		assets = {
 			Asset("ANIM", "anim/skin/carpet_whitewood_law.zip")
 		},
@@ -2008,13 +2060,17 @@ _G.SKINS_LEGION = {
             anim = "idle_big", isloop_anim = nil, animpush = nil, isloop_animpush = nil,
             setable = true
         },
-        exchangefx = { prefab = nil, offset_y = nil, scale = nil }
+        exchangefx = { prefab = nil, offset_y = nil, scale = nil },
+        fn_setBuildPlacer = function(inst)
+            inst.AnimState:SetBank("carpet_whitewood_law")
+            inst.AnimState:SetBuild("carpet_whitewood_law")
+        end
     },
     carpet_whitewood_law2 = {
         base_prefab = "carpet_whitewood",
 		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
 
-        skin_id = "",
+        skin_id = "63805d098c2f781db2f7f34f",
         onlyownedshow = true,
 		assets = {
 			Asset("ANIM", "anim/skin/carpet_whitewood_law2.zip")
@@ -2028,14 +2084,18 @@ _G.SKINS_LEGION = {
             anim = "idle", isloop_anim = nil, animpush = nil, isloop_animpush = nil,
             setable = true
         },
-        exchangefx = { prefab = nil, offset_y = nil, scale = nil }
+        exchangefx = { prefab = nil, offset_y = nil, scale = nil },
+        fn_setBuildPlacer = function(inst)
+            inst.AnimState:SetBank("carpet_whitewood_law2")
+            inst.AnimState:SetBuild("carpet_whitewood_law2")
+        end
     },
     carpet_whitewood_big_law2 = {
         base_prefab = "carpet_whitewood_big",
 		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
 
-        skin_id = "",
-        onlyownedshow = true,
+        skin_id = "63805d098c2f781db2f7f34f",
+        noshopshow = true,
 		assets = {
 			Asset("ANIM", "anim/skin/carpet_whitewood_law2.zip")
 		},
@@ -2048,6 +2108,37 @@ _G.SKINS_LEGION = {
             anim = "idle_big", isloop_anim = nil, animpush = nil, isloop_animpush = nil,
             setable = true
         },
+        exchangefx = { prefab = nil, offset_y = nil, scale = nil },
+        fn_setBuildPlacer = function(inst)
+            inst.AnimState:SetBank("carpet_whitewood_law2")
+            inst.AnimState:SetBuild("carpet_whitewood_law2")
+        end
+    },
+
+    soul_contracts_taste = {
+        base_prefab = "soul_contracts",
+		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
+
+        skin_id = "638074368c2f781db2f7f374",
+        onlyownedshow = true,
+		assets = {
+            -- Asset("ANIM", "anim/book_maxwell.zip"), --官方暗影秘典动画模板
+			Asset("ANIM", "anim/skin/soul_contracts_taste.zip"),
+		},
+        image = { name = nil, atlas = nil, setable = true },
+
+        string = ischinese and { name = "芝士三明治" } or { name = "Cheese Sandwich" },
+
+		fn_start = function(inst)
+            inst.AnimState:SetBank("book_maxwell")
+            inst.AnimState:SetBuild("soul_contracts_taste")
+            inst._fx_set = function(inst, fx)
+                fx.AnimState:SetHighlightColour(246/255, 207/255, 75/255, 0)
+            end
+        end,
+        fn_end = function(inst)
+            inst._fx_set = nil
+        end,
         exchangefx = { prefab = nil, offset_y = nil, scale = nil }
     },
 }
@@ -2098,8 +2189,9 @@ _G.SKIN_IDS_LEGION = {
         siving_derivant_lvl0_thanks2 = true, siving_derivant_lvl1_thanks2 = true, siving_derivant_lvl2_thanks2 = true, siving_derivant_lvl3_thanks2 = true,
     },
     ["637f07a28c2f781db2f7f1e8"] = { --4海名扬(8)
-        agronssword_taste = true,
-        carpet_whitewood_law2 = true, carpet_whitewood_big_law2 = true
+        agronssword_taste = true, soul_contracts_taste = true,
+        carpet_whitewood_law2 = true, carpet_whitewood_big_law2 = true,
+        icire_rock_day = true,
     },
 }
 _G.SKIN_IDX_LEGION = {
@@ -2140,8 +2232,9 @@ local skinidxes = { --用以皮肤排序
     "backcub_thanks",
     "fishhomingtool_awesome_thanks", "fishhomingtool_normal_thanks", "fishhomingbait_thanks",
     "siving_turn_collector", "icire_rock_collector", "fimbul_axe_collector", "rosebush_collector", "rosorns_collector",
+    "icire_rock_day",
     "carpet_whitewood_law", "carpet_whitewood_big_law", "carpet_whitewood_law2", "carpet_whitewood_big_law2",
-    "agronssword_taste",
+    "agronssword_taste", "soul_contracts_taste",
     "triplegoldenshovelaxe_era", "tripleshovelaxe_era", "lilybush_era", "lileaves_era", "shield_l_log_era", "icire_rock_era", "shield_l_sand_era",
     "orchidbush_disguiser", "boltwingout_disguiser",
     "rosebush_marble", "rosorns_marble", "lilybush_marble", "lileaves_marble", "orchidbush_marble", "orchitwigs_marble",

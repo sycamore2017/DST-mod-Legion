@@ -226,9 +226,9 @@ end
 --------------------------------------------------------------------------
 
 local wortox_soul_common = require("prefabs/wortox_soul_common")
+local brain_contracts = require("brains/soul_contractsbrain")
 
-local assets_contracts =
-{
+local assets_contracts = {
     Asset("ANIM", "anim/book_maxwell.zip"), --官方暗影秘典动画模板
     Asset("ANIM", "anim/soul_contracts.zip"),
     Asset("ATLAS", "images/inventoryimages/soul_contracts.xml"),
@@ -236,17 +236,13 @@ local assets_contracts =
     Asset("SOUND", "sound/together.fsb"),   --官方音效包
     Asset("SCRIPT", "scripts/prefabs/wortox_soul_common.lua"), --官方灵魂通用功能函数文件
 }
-
-local prefabs_contracts =
-{
+local prefabs_contracts = {
     "wortox_soul_heal_fx",
     "wortox_soul",          --物品栏里的灵魂
     -- "wortox_soul_spawn",    --地面的灵魂
     -- "wortox_eat_soul_fx",
     "wortox_soul_in_fx",    --灵魂被吸收时的特效
 }
-
-local brain_contracts = require("brains/soul_contractsbrain")
 
 -----
 
@@ -448,8 +444,10 @@ local function fn_contracts()
     inst:AddTag("meteor_protection") --防止被流星破坏
     inst:AddTag("NORATCHECK") --mod兼容：永不妥协。该道具不算鼠潮分
 
-    inst.entity:SetPristine()
+    inst:AddComponent("skinedlegion")
+    inst.components.skinedlegion:Init("soul_contracts")
 
+    inst.entity:SetPristine()
     if not TheWorld.ismastersim then
         return inst
     end
@@ -499,6 +497,8 @@ local function fn_contracts()
     inst.components.locomotor.walkspeed = TUNING.WILSON_WALK_SPEED
     inst.components.locomotor.runspeed = TUNING.WILSON_RUN_SPEED
     inst:SetStateGraph("SGsoul_contracts")
+
+    inst.components.skinedlegion:SetOnPreLoad()
 
     return inst
 end

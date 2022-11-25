@@ -22,12 +22,14 @@ local SkinStrings = ischinese and {
         MARBLE = "大理石园丁系列",
         THANKS = "江湖一枝花系列",
         TVPLAY = "剧迷系列",
-        DISGUISER = "伪装学者系列",
+        DISGUISER = "奇妙物语系列",
         ERA = "先古回响系列",
         OLDPIC = "念旧系列",
         FANS = "饭制系列",
         COLLECTOR = "星河收藏家系列",
-        TASTE = "厨心百味系列"
+        TASTE = "厨心百味系列",
+        LAW = "律系列",
+        DAY = "节典系列"
     },
     UI_ACCESS = "获取",
     UI_INPUT_CDK = "请输入兑换码",
@@ -49,12 +51,14 @@ local SkinStrings = ischinese and {
         MARBLE = "Marble Gardener Collection",
         THANKS = "Heartfelt Thanks Collection",
         TVPLAY = "TV Play Fans Collection",
-        DISGUISER = "Master of Disguise Collection",
+        DISGUISER = "Wonderful Creatures Collection",
         ERA = "Era Echo Collection",
         OLDPIC = "Nostalgia Collection",
         FANS = "Fans Creation",
         COLLECTOR = "Galaxy Collector Collection",
-        TASTE = "Tastes Collection"
+        TASTE = "Tastes Collection",
+        LAW = "Rule Collection",
+        DAY = "Festival Collection"
     },
     UI_ACCESS = "Get It",
     UI_INPUT_CDK = "Please enter CDK",
@@ -1446,7 +1450,7 @@ local SkinData = {
         string = ischinese and {
             collection = "TASTE", access = "SPECIAL",
             descitem = "解锁\"艾力冈的剑\"的皮肤。",
-            description = "没有",
+            description = "没有"
         } or {
             collection = "TASTE", access = "SPECIAL",
             descitem = "Unlock \"Agron's Sword\" skin.",
@@ -1454,8 +1458,68 @@ local SkinData = {
         },
         height_anim = 185,
     },
+    carpet_whitewood_law = {
+        string = ischinese and {
+            name = "西洋棋棋盘",
+            collection = "LAW", access = "SPECIAL",
+            descitem = "解锁\"白木地垫\"、\"白木地毯\"的皮肤。",
+            description = "没有"
+        } or {
+            name = "Chessboard",
+            collection = "LAW", access = "SPECIAL",
+            descitem = "Unlock \"White Wood Mat\", \"White Wood Carpet\" skin.",
+            description = "The story was not translated."
+        },
+        height_anim = 185,
+    },
+    carpet_whitewood_law2 = {
+        string = ischinese and {
+            name = "西洋棋黑棋盘",
+            collection = "LAW", access = "SPECIAL",
+            descitem = "解锁\"白木地垫\"、\"白木地毯\"的皮肤。",
+            description = "没有"
+        } or {
+            name = "Black Chessboard",
+            collection = "LAW", access = "SPECIAL",
+            descitem = "Unlock \"White Wood Mat\", \"White Wood Carpet\" skin.",
+            description = "The story was not translated."
+        },
+        height_anim = 185,
+    },
+    soul_contracts_taste = {
+        string = ischinese and {
+            collection = "TASTE", access = "SPECIAL",
+            descitem = "解锁\"灵魂契约\"的皮肤。",
+            description = "没有"
+        } or {
+            collection = "TASTE", access = "SPECIAL",
+            descitem = "Unlock \"Soul Contracts\" skin.",
+            description = "The story was not translated."
+        },
+        height_anim = 185,
+    },
+    icire_rock_day = {
+        string = ischinese and {
+            collection = "DAY", access = "SPECIAL",
+            descitem = "解锁\"鸳鸯石\"的皮肤。",
+            description = "暂无"
+        } or {
+            collection = "DAY", access = "SPECIAL",
+            descitem = "Unlock \"Icire Stone\" skin.",
+            description = "The story was not translated."
+        },
+        height_anim = 170,
+    },
 }
 
+local function GetName(skin)
+    local data = SkinData[skin]
+    if data ~= nil and data.string ~= nil and data.string.name ~= nil then
+        return data.string.name
+    else
+        return GetSkinName(skin)
+    end
+end
 local function GetCollection(skin)
     local data = SkinData[skin]
     if data ~= nil and data.string ~= nil and data.string.collection ~= nil then
@@ -1784,7 +1848,7 @@ function SkinLegionDialog:SetItemInfo(item)
             -- self.label_skinname:SetRegionSize(180, 30)
             self.label_skinname:SetPosition(0, 0)
         end
-        self.label_skinname:SetString(GetSkinName(item.item_key))
+        self.label_skinname:SetString(GetName(item.item_key))
 
         --皮肤品质
         if self.label_skinrarity == nil then
