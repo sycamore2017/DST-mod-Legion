@@ -17,21 +17,26 @@ local function TestContainer_base(container, item, slot)
         )
 end
 
-params.backcub_fans2 = {
-    widget = {
-        slotpos = {},
-        animbank = "ui_piggyback_2x6",
-        animbuild = "ui_backcub_fans2_2x6",
-        pos = Vector3(-5, -50, 0)
-    },
-    issidewidget = true,
-    type = "pack",
-    openlimit = 1
-}
-for y = 0, 5 do
-    table.insert(params.backcub_fans2.widget.slotpos, Vector3(-162, -75 * y + 170, 0))
-    table.insert(params.backcub_fans2.widget.slotpos, Vector3(-162 + 75, -75 * y + 170, 0))
+local function MakeBackcub(name, animbuild)
+    params[name] = {
+        widget = {
+            slotpos = {},
+            animbank = "ui_piggyback_2x6",
+            animbuild = animbuild,
+            pos = Vector3(-5, -50, 0)
+        },
+        issidewidget = true,
+        type = "pack",
+        openlimit = 1
+    }
+    for y = 0, 5 do
+        table.insert(params[name].widget.slotpos, Vector3(-162, -75 * y + 170, 0))
+        table.insert(params[name].widget.slotpos, Vector3(-162 + 75, -75 * y + 170, 0))
+    end
 end
+
+MakeBackcub("backcub", "ui_piggyback_2x6")
+MakeBackcub("backcub_fans2", "ui_backcub_fans2_2x6")
 
 if TUNING.LEGION_FLASHANDCRUSH then
     params.beefalo = {

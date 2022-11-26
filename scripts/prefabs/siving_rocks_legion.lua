@@ -565,6 +565,7 @@ local function TriggerLifeExtractTask(inst, doit)
 
                 local cost = inst.treeState == 2 and 4 or 2
                 local costall = 0
+                local countfx = 0
 
                 for _,v in ipairs(ents) do
                     if v and v:IsValid() and v.entity:IsVisible() then
@@ -577,13 +578,17 @@ local function TriggerLifeExtractTask(inst, doit)
                             v:GetDistanceSqToPoint(x, y, z) <= DIST_HEALTH^2
                         then
                             ----特效生成
-                            if v.components.inventory == nil or not v.components.inventory:EquipHasTag("siv_BFF") then
-                                local life = SpawnPrefab("siving_lifesteal_fx")
-                                if life ~= nil then
-                                    life.movingTarget = inst
-                                    life.Transform:SetPosition(v.Transform:GetWorldPosition())
+                            if countfx < 8 then
+                                if v.components.inventory == nil or not v.components.inventory:EquipHasTag("siv_BFF") then
+                                    local life = SpawnPrefab("siving_lifesteal_fx")
+                                    if life ~= nil then
+                                        life.movingTarget = inst
+                                        life.Transform:SetPosition(v.Transform:GetWorldPosition())
+                                    end
+                                    countfx = countfx + 1
                                 end
                             end
+
                             ----吸血
                             if doit2 then
                                 local costnow = cost

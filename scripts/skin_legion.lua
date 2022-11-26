@@ -1677,13 +1677,13 @@ _G.SKINS_LEGION = {
         end,
         fn_end = function(inst)
             CancelRandomSkinAnim(inst)
-            inst.components.container:WidgetSetup("piggyback")
+            inst.components.container:WidgetSetup("backcub")
         end,
         fn_start_c = function(inst)
             inst.replica.container:WidgetSetup("backcub_fans2")
         end,
         fn_end_c = function(inst)
-            inst.replica.container:WidgetSetup("piggyback")
+            inst.replica.container:WidgetSetup("backcub")
         end,
 
         fn_anim = function(inst)
@@ -3111,7 +3111,7 @@ if not TheNet:IsDedicated() then
                         if right_root.skinshop_legion then
                             right_root.skinshop_legion:Kill()
                         end
-                        local SkinLegionDialog = _G.require("widgets/skinlegiondialog") --test：动态更新
+                        -- local SkinLegionDialog = _G.require("widgets/skinlegiondialog") --test：动态更新
                         right_root.skinshop_legion = right_root:AddChild(SkinLegionDialog(self.owner))
                         right_root.skinshop_legion:SetPosition(-380, 0)
                         self:Close()

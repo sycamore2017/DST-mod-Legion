@@ -256,6 +256,22 @@ local function SetAnim_heatrock2(self, anim, data)
     end
     anim.tag_anim = tag + 1
 end
+local function SetAnim_icire_rock_day(self, anim, data)
+    local animstate = anim:GetAnimState()
+    SetAnim_base(animstate, data)
+
+    local filename = ""
+    if data.tag == 1 then
+        filename = math.random() < 0.5 and "flake_crystal" or "flake_snow"
+    elseif data.tag == 2 then
+        filename = "flake_snow"
+    elseif data.tag == 4 then
+        filename = math.random() < 0.5 and "flake_leaf" or "flake_leaf2"
+    elseif data.tag == 5 then
+        filename = math.random() < 0.5 and "flake_dust" or "flake_ash"
+    end
+    animstate:OverrideSymbol("snowflake", "icire_rock_day", filename)
+end
 
 local function SetAnim_sivturn(self, anim, data)
     local animstate = anim:GetAnimState()
@@ -312,6 +328,33 @@ local function SetAnim_backcub(self, anim, data)
     local animstate = anim:GetAnimState()
     animstate:PlayAnimation(data.touchanim)
     animstate:PushAnimation(data.anim2 or data.anim, data.isloop)
+end
+
+local function SetAnim_soul_contracts(self, anim, data)
+    local animstate = anim:GetAnimState()
+    local tag
+    if anim.tag_anim == nil then
+        tag = 1
+    else
+        tag = anim.tag_anim
+    end
+
+    if tag == 1 then
+        animstate:PlayAnimation("proximity_pre")
+        animstate:PushAnimation("proximity_loop", true)
+    elseif tag == 2 then
+        animstate:PlayAnimation("proximity_pst")
+        animstate:PushAnimation("idle", false)
+        tag = 0
+    else
+        tag = 0
+    end
+    anim.tag_anim = tag + 1
+end
+local function SetAnim_soul_contracts2(self, anim, data)
+    local animstate = anim:GetAnimState()
+    animstate:PlayAnimation("use")
+    animstate:PushAnimation("proximity_loop", true)
 end
 
 local width_skininfo = 260
@@ -1552,13 +1595,27 @@ local SkinData = {
         string = ischinese and {
             collection = "TASTE", access = "SPECIAL",
             descitem = "解锁\"灵魂契约\"的皮肤。",
-            description = "急急急急急急...谁是急急国王？"
+            description = "他才二十岁出头，就成为了当地知名高级餐厅的主厨。都说每位成功的大厨都有自己的拿手好菜，他自然也不例外。一般人也许会猜是焗蜗牛、北极贝寿司这类奢华的菜品，而他的出名作却是普普通通的芝士三明治。他烤出来的三明治既酥脆又软绵，入口回甘。内陷里一边是新鲜的生菜搭配微熏火腿肉，爽脆喷香，另一边是牛肉边角料剁碎后煎出来的肉饼，然后用完全融化的芝士贯浇两边，将两部分完美融合为一体。无论是用料还是做法都和平常的一致，但只有他的芝士三明治，因为他特殊的细节把控，有着超出预料的口感使人难以忘怀。\n其他人都是想着探究料理的做法，而我好奇他的童年，是什么样的经历能磨炼并诞生出这样一位三明治烹饪大师。或许他已出卖了灵魂，为了治愈自己，为了填补曾经的遗憾！"
         } or {
             collection = "TASTE", access = "SPECIAL",
             descitem = "Unlock \"Soul Contracts\" skin.",
             description = "The story was not translated."
         },
-        height_anim = 185,
+        height_anim = 110,
+        anims = {
+            {
+                bank = "book_maxwell", build = "soul_contracts_taste",
+                anim = "use", anim2 = "proximity_loop", isloop = true,
+                fn_click = SetAnim_soul_contracts2,
+                x = -50, y = 15, scale = 0.32
+            },
+            {
+                bank = "book_maxwell", build = "soul_contracts_taste",
+                anim = "proximity_pst", anim2 = "idle", isloop = false,
+                fn_click = SetAnim_soul_contracts,
+                x = 50, y = 15, scale = 0.32
+            }
+        }
     },
     icire_rock_day = {
         string = ischinese and {
@@ -1571,7 +1628,58 @@ local SkinData = {
             description = "The story was not translated."
         },
         height_anim = 170,
-    },
+        anims = {
+            { --上
+                bank = "icire_rock_day", build = "icire_rock_day",
+                anim = "3", anim2 = nil, isloop = true,
+                x = 0, y = 13+90, scale = 0.38
+            },
+            {
+                bank = "wintersfeastfuel", build = "icire_rock_day",
+                anim = "idle_loop", anim2 = nil, isloop = true,
+                fn_anim = SetAnim_icire_rock_day, tag = 4,
+                x = 70, y = 13+65+13, scale = 0.46
+            },
+            { --右1
+                bank = "icire_rock_day", build = "icire_rock_day",
+                anim = "4", anim2 = nil, isloop = true,
+                x = 70, y = 13+65, scale = 0.38
+            },
+            {
+                bank = "wintersfeastfuel", build = "icire_rock_day",
+                anim = "idle_loop", anim2 = nil, isloop = true,
+                fn_anim = SetAnim_icire_rock_day, tag = 5,
+                x = 42, y = 13+13, scale = 0.46
+            },
+            { --右2
+                bank = "icire_rock_day", build = "icire_rock_day",
+                anim = "5", anim2 = nil, isloop = true,
+                x = 42, y = 13, scale = 0.38
+            },
+            {
+                bank = "wintersfeastfuel", build = "icire_rock_day",
+                anim = "idle_loop", anim2 = nil, isloop = true,
+                fn_anim = SetAnim_icire_rock_day, tag = 2,
+                x = -70, y = 13+65+13, scale = 0.46
+            },
+            { --左1
+                bank = "icire_rock_day", build = "icire_rock_day",
+                anim = "2", anim2 = nil, isloop = true,
+                x = -70, y = 13+65, scale = 0.38
+            },
+            {
+                bank = "wintersfeastfuel", build = "icire_rock_day",
+                anim = "idle_loop", anim2 = nil, isloop = true,
+                fn_anim = SetAnim_icire_rock_day, tag = 1,
+                x = -42, y = 13+13, scale = 0.46
+            },
+            { --左2
+                bank = "icire_rock_day", build = "icire_rock_day",
+                anim = "1", anim2 = nil, isloop = true,
+                x = -42, y = 13, scale = 0.38
+            }
+        }
+    }
 }
 
 local function GetName(skin)

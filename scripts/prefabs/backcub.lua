@@ -168,7 +168,7 @@ local function fn()
 
     inst.entity:SetPristine()
     if not TheWorld.ismastersim then
-        inst.OnEntityReplicated = function(inst) inst.replica.container:WidgetSetup("piggyback") end
+        inst.OnEntityReplicated = function(inst) inst.replica.container:WidgetSetup("backcub") end
         return inst
     end
 
@@ -188,7 +188,7 @@ local function fn()
     inst.components.insulator:SetInsulation(TUNING.INSULATION_MED_LARGE)    --介于冬帽与牛帽之间的数值
 
     inst:AddComponent("container")
-    inst.components.container:WidgetSetup("piggyback")
+    inst.components.container:WidgetSetup("backcub")
 
     MakeSmallBurnable(inst)
     MakeSmallPropagator(inst)
