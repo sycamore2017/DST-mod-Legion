@@ -69,20 +69,36 @@ local function UpdateImages(inst, range)
     inst.currentTempRange = range
     inst.AnimState:PlayAnimation(tostring(range), true)
 
-    inst.changeimgfn(inst)
+    local canbloom = true
+    local newname = "icire_rock"..tostring(range)
+    if inst._dd then
+        newname = newname..inst._dd.img_pst
+        inst.components.inventoryitem.atlasname = "images/inventoryimages_skin/"..newname..".xml"
+        inst.components.inventoryitem:ChangeImageName(newname)
+        canbloom = inst._dd.canbloom
+        if inst._dd.fn_temp then
+            inst._dd.fn_temp(inst, range)
+        end
+    else
+        inst.components.inventoryitem.atlasname = "images/inventoryimages/"..newname..".xml"
+        inst.components.inventoryitem:ChangeImageName(newname)
+    end
 
     --最冷与最热都会发光
     if range == 1 then
-        inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
         inst._light.Light:SetColour(64/255, 64/255, 208/255)
         inst._light.Light:Enable(true)
     elseif range == 5 then
-        inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
         inst._light.Light:SetColour(235/255, 165/255, 12/255)
         inst._light.Light:Enable(true)
     else
-        inst.AnimState:ClearBloomEffectHandle()
+        canbloom = false
         inst._light.Light:Enable(false)
+    end
+    if canbloom then
+        inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
+    else
+        inst.AnimState:ClearBloomEffectHandle()
     end
 end
 
@@ -207,12 +223,6 @@ local function fn()
     -- inst.components.fueled:InitializeFuelLevel(100)
     -- inst.components.fueled:SetDepletedFn(inst.Remove)
 
-    inst.changeimgfn = function(inst)
-        local newname = "icire_rock"..tostring(inst.currentTempRange)
-        inst.components.inventoryitem.atlasname = "images/inventoryimages/"..newname..".xml"
-        inst.components.inventoryitem:ChangeImageName(newname)
-    end
-
     inst:ListenForEvent("temperaturedelta", TemperatureChange)
     inst.currentTempRange = 0
 
@@ -221,6 +231,9 @@ local function fn()
     inst._owners = {}
     inst._onownerchange = function() OnOwnerChange(inst) end
 
+    inst.fn_temp = function(inst)
+        UpdateImages(inst, inst.currentTempRange or 3)
+    end
     UpdateImages(inst, 1)
     OnOwnerChange(inst)
 

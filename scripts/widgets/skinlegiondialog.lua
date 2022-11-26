@@ -1450,47 +1450,109 @@ local SkinData = {
         string = ischinese and {
             collection = "TASTE", access = "SPECIAL",
             descitem = "解锁\"艾力冈的剑\"的皮肤。",
-            description = "没有"
+            description = "急急急急急急...谁是急急国王？"
         } or {
             collection = "TASTE", access = "SPECIAL",
             descitem = "Unlock \"Agron's Sword\" skin.",
             description = "The story was not translated."
         },
-        height_anim = 185,
+        height_anim = 265,
+        anims = {
+            {
+                bank = "agronssword_taste", build = "agronssword_taste",
+                anim = "idle", anim2 = nil, isloop = false,
+                x = -55, y = 145, scale = 0.38
+            },
+            {
+                symbol = {
+                    { symbol = "lantern_overlay", build = "agronssword_taste", file = "swap1", type = 1 },
+                },
+                fn_anim = SetAnim_player,
+                fn_click = SetAnim_player2,
+                x = 35, y = 130, scale = 0.38
+            },
+            {
+                bank = "agronssword_taste", build = "agronssword_taste",
+                anim = "idle2", anim2 = nil, isloop = false,
+                x = -55, y = 12, scale = 0.38
+            },
+            {
+                symbol = {
+                    { symbol = "lantern_overlay", build = "agronssword_taste", file = "swap2", type = 1 },
+                },
+                fn_anim = SetAnim_player,
+                fn_click = SetAnim_player2,
+                x = 35, y = 0, scale = 0.38
+            },
+            {
+                bank = "lavaarena_beetletaur_fx", build = "lavaarena_beetletaur_fx",
+                anim = "defend_fx", anim2 = nil, isloop = false,
+                x = -55, y = 165, scale = 0.22
+            },
+            {
+                bank = "lavaarena_beetletaur_fx", build = "lavaarena_beetletaur_fx",
+                anim = "defend_fx", anim2 = nil, isloop = false,
+                x = -55, y = 50, scale = 0.22
+            }
+        }
     },
     carpet_whitewood_law = {
         string = ischinese and {
             name = "西洋棋棋盘",
             collection = "LAW", access = "SPECIAL",
             descitem = "解锁\"白木地垫\"、\"白木地毯\"的皮肤。",
-            description = "没有"
+            description = "急急急急急急...谁是急急国王？"
         } or {
             name = "Chessboard",
             collection = "LAW", access = "SPECIAL",
             descitem = "Unlock \"White Wood Mat\", \"White Wood Carpet\" skin.",
             description = "The story was not translated."
         },
-        height_anim = 185,
+        height_anim = 140,
+        anims = {
+            {
+                bank = "carpet_whitewood_law", build = "carpet_whitewood_law",
+                anim = "idle_big", anim2 = nil, isloop = false,
+                x = -45, y = 70, scale = 0.12
+            },
+            {
+                bank = "carpet_whitewood_law", build = "carpet_whitewood_law",
+                anim = "idle", anim2 = nil, isloop = false,
+                x = 65, y = 70, scale = 0.12
+            }
+        }
     },
     carpet_whitewood_law2 = {
         string = ischinese and {
             name = "西洋棋黑棋盘",
             collection = "LAW", access = "SPECIAL",
             descitem = "解锁\"白木地垫\"、\"白木地毯\"的皮肤。",
-            description = "没有"
+            description = "急急急急急急...谁是急急国王？"
         } or {
             name = "Black Chessboard",
             collection = "LAW", access = "SPECIAL",
             descitem = "Unlock \"White Wood Mat\", \"White Wood Carpet\" skin.",
             description = "The story was not translated."
         },
-        height_anim = 185,
+        height_anim = 140,
+        anims = {
+            {
+                bank = "carpet_whitewood_law2", build = "carpet_whitewood_law2",
+                anim = "idle_big", anim2 = nil, isloop = false,
+                x = -45, y = 70, scale = 0.12
+            },
+            {
+                bank = "carpet_whitewood_law2", build = "carpet_whitewood_law2",
+                anim = "idle", anim2 = nil, isloop = false,
+                x = 65, y = 70, scale = 0.12
+            }
+        }
     },
     soul_contracts_taste = {
         string = ischinese and {
             collection = "TASTE", access = "SPECIAL",
             descitem = "解锁\"灵魂契约\"的皮肤。",
-            description = "没有"
+            description = "急急急急急急...谁是急急国王？"
         } or {
             collection = "TASTE", access = "SPECIAL",
             descitem = "Unlock \"Soul Contracts\" skin.",
@@ -1502,7 +1564,7 @@ local SkinData = {
         string = ischinese and {
             collection = "DAY", access = "SPECIAL",
             descitem = "解锁\"鸳鸯石\"的皮肤。",
-            description = "暂无"
+            description = "急急急急急急...谁是急急国王？"
         } or {
             collection = "DAY", access = "SPECIAL",
             descitem = "Unlock \"Icire Stone\" skin.",

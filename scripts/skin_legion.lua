@@ -118,19 +118,19 @@ end
 
 ------
 
-local function fn_siving_turn_fruit(genetrans, skinname)
+local function Fn_siving_turn_fruit(genetrans, skinname)
     if genetrans.fx ~= nil then
         genetrans.fx.AnimState:SetBank(skinname)
         genetrans.fx.AnimState:SetBuild(skinname)
     end
     genetrans.fxdata.skinname = skinname
 end
-local function fn_siving_turn(inst, skinname, bloom)
+local function Fn_siving_turn(inst, skinname, bloom)
     inst.AnimState:SetBank(skinname)
     inst.AnimState:SetBuild(skinname)
     if inst.components.genetrans ~= nil then
         if inst.components.genetrans.fxdata.skinname ~= skinname then
-            fn_siving_turn_fruit(inst.components.genetrans, skinname)
+            Fn_siving_turn_fruit(inst.components.genetrans, skinname)
         end
         inst.components.genetrans.fxdata.bloom = bloom
     end
@@ -145,7 +145,7 @@ end
 
 ------
 
-local function fn_start_agronssword(inst)
+local function Fn_start_agronssword(inst)
     inst.AnimState:SetBank(inst._dd.build)
     inst.AnimState:SetBuild(inst._dd.build)
     if inst.components.timer:TimerExists("revolt") then
@@ -154,6 +154,35 @@ local function fn_start_agronssword(inst)
     else
         inst.components.inventoryitem.atlasname = inst._dd.img_atlas
         inst.components.inventoryitem:ChangeImageName(inst._dd.img_tex)
+    end
+end
+
+------
+
+local function Fn_icire_rock_day(inst, range)
+    local fx = inst._dd_fx
+    if fx == nil or not fx:IsValid() then
+        fx = SpawnPrefab("icire_rock_fx_day")
+    end
+    if fx ~= nil then
+        if range == 1 then
+            fx.AnimState:OverrideSymbol("snowflake", "icire_rock_day",
+                math.random() < 0.5 and "flake_crystal" or "flake_snow")
+        elseif range == 2 then
+            fx.AnimState:OverrideSymbol("snowflake", "icire_rock_day", "flake_snow")
+        elseif range == 4 then
+            fx.AnimState:OverrideSymbol("snowflake", "icire_rock_day",
+                math.random() < 0.5 and "flake_leaf" or "flake_leaf2")
+        elseif range == 5 then
+            fx.AnimState:OverrideSymbol("snowflake", "icire_rock_day",
+                math.random() < 0.5 and "flake_dust" or "flake_ash")
+        else
+            fx.AnimState:ClearOverrideSymbol("snowflake")
+        end
+
+        inst:AddChild(fx)
+        fx.Follower:FollowSymbol(inst.GUID, "base", 0, -30, 0)
+        inst._dd_fx = fx
     end
 end
 
@@ -419,12 +448,8 @@ _G.SKIN_PREFABS_LEGION = {
             inst.AnimState:OverrideSymbol("rock", "icire_rock", "rock")
             inst.AnimState:OverrideSymbol("shadow", "icire_rock", "shadow")
 
-            inst.changeimgfn = function(inst)
-                local newname = "icire_rock"..tostring(inst.currentTempRange)
-                inst.components.inventoryitem.atlasname = "images/inventoryimages/"..newname..".xml"
-                inst.components.inventoryitem:ChangeImageName(newname)
-            end
-            inst.changeimgfn(inst)
+            inst._dd = nil
+            inst.fn_temp(inst)
         end,
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
     },
@@ -461,7 +486,7 @@ _G.SKIN_PREFABS_LEGION = {
                 img_tex2 = "agronssword2", img_atlas2 = "images/inventoryimages/agronssword2.xml",
                 build = "agronssword", fx = "agronssword_fx"
             }
-            fn_start_agronssword(inst)
+            Fn_start_agronssword(inst)
         end,
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
     },
@@ -575,10 +600,10 @@ _G.SKIN_PREFABS_LEGION = {
     siving_turn = {
         assets = nil,
         fn_start = function(inst)
-            fn_siving_turn(inst, "siving_turn", true)
+            Fn_siving_turn(inst, "siving_turn", true)
         end,
         fn_fruit = function(genetrans)
-            fn_siving_turn_fruit(genetrans, "siving_turn")
+            Fn_siving_turn_fruit(genetrans, "siving_turn")
         end,
         exchangefx = { prefab = nil, offset_y = nil, scale = 1.5 },
     },
@@ -1339,7 +1364,7 @@ _G.SKINS_LEGION = {
                 img_tex2 = "agronssword_taste2", img_atlas2 = "images/inventoryimages_skin/agronssword_taste2.xml",
                 build = "agronssword_taste", fx = "agronssword_fx_taste"
             }
-            fn_start_agronssword(inst)
+            Fn_start_agronssword(inst)
         end,
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
     },
@@ -1374,12 +1399,8 @@ _G.SKINS_LEGION = {
             inst.AnimState:OverrideSymbol("rock", "icire_rock_era", "rock")
             inst.AnimState:OverrideSymbol("shadow", "icire_rock_era", "shadow")
 
-            inst.changeimgfn = function(inst)
-                local newname = "icire_rock"..tostring(inst.currentTempRange).."_era"
-                inst.components.inventoryitem.atlasname = "images/inventoryimages_skin/"..newname..".xml"
-                inst.components.inventoryitem:ChangeImageName(newname)
-            end
-            inst.changeimgfn(inst)
+            inst._dd = { img_pst = "_era", canbloom = true }
+            inst.fn_temp(inst)
         end,
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
     },
@@ -1412,12 +1433,8 @@ _G.SKINS_LEGION = {
             inst.AnimState:ClearOverrideSymbol("rock")
             inst.AnimState:ClearOverrideSymbol("shadow")
 
-            inst.changeimgfn = function(inst)
-                local newname = "icire_rock"..tostring(inst.currentTempRange).."_collector"
-                inst.components.inventoryitem.atlasname = "images/inventoryimages_skin/"..newname..".xml"
-                inst.components.inventoryitem:ChangeImageName(newname)
-            end
-            inst.changeimgfn(inst)
+            inst._dd = { img_pst = "_collector", canbloom = true }
+            inst.fn_temp(inst)
         end,
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
     },
@@ -1450,12 +1467,16 @@ _G.SKINS_LEGION = {
             inst.AnimState:ClearOverrideSymbol("rock")
             inst.AnimState:ClearOverrideSymbol("shadow")
 
-            inst.changeimgfn = function(inst)
-                local newname = "icire_rock"..tostring(inst.currentTempRange).."_day"
-                inst.components.inventoryitem.atlasname = "images/inventoryimages_skin/"..newname..".xml"
-                inst.components.inventoryitem:ChangeImageName(newname)
+            inst._dd = { img_pst = "_day", canbloom = false, fn_temp = Fn_icire_rock_day }
+            inst.fn_temp(inst)
+        end,
+        fn_end = function(inst)
+            if inst._dd_fx then
+                if inst._dd_fx:IsValid() then
+                    inst._dd_fx:Remove()
+                end
+                inst._dd_fx = nil
             end
-            inst.changeimgfn(inst)
         end,
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 }
     },
@@ -1822,10 +1843,10 @@ _G.SKINS_LEGION = {
         string = ischinese and { name = "转星移" } or { name = "Revolving Star" },
 
 		fn_start = function(inst)
-            fn_siving_turn(inst, "siving_turn_collector", false)
+            Fn_siving_turn(inst, "siving_turn_collector", false)
         end,
         fn_fruit = function(genetrans)
-            fn_siving_turn_fruit(genetrans, "siving_turn_collector")
+            Fn_siving_turn_fruit(genetrans, "siving_turn_collector")
         end,
         exchangefx = { prefab = nil, offset_y = nil, scale = 1.5 },
         fn_setBuildPlacer = function(inst)

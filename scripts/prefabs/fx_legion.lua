@@ -557,6 +557,41 @@ if TUNING.LEGION_FLASHANDCRUSH then
         end,
         fn_remove = nil,
     })
+
+    table.insert(prefs, Prefab(
+		"icire_rock_fx_day",
+		function()
+			local inst = CreateEntity()
+
+			inst.entity:AddTransform()
+            inst.entity:AddAnimState()
+            inst.entity:AddNetwork()
+            inst.entity:AddFollower()
+
+            inst.AnimState:SetBank("wintersfeastfuel")
+            inst.AnimState:SetBuild("icire_rock_day")
+            inst.AnimState:PlayAnimation("idle_loop", true)
+            inst.AnimState:SetFinalOffset(-1) --Tip: 1最上层，0中间层，-1最下层
+
+            local sc = 1.2
+            inst.AnimState:SetScale(sc, sc, sc)
+
+            inst:AddTag("FX")
+
+			inst.entity:SetPristine()
+			if not TheWorld.ismastersim then
+				return inst
+			end
+
+			inst.persists = false
+
+			return inst
+		end,
+		{
+            Asset("ANIM", "anim/wintersfeastfuel.zip") --官方节日欢愉动画
+        },
+		nil
+	))
 end
 
 if TUNING.LEGION_DESERTSECRET then

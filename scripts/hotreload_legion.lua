@@ -12,7 +12,7 @@ local hot = {
 	-- dish_tomahawksteak = 'foods_cookpot',
 	-- siving_mask = 'siving_related',
 	-- revolvedmoonlight = 'moonlight_legion',
-	-- revolvedmoonlight_pro = 'moonlight_legion',
+	-- icire_rock_fx_day = 'fx_legion',
 }
 local old_sp = GLOBAL.SpawnPrefab
 function GLOBAL.SpawnPrefab(prefab, ...)
