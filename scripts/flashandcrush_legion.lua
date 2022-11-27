@@ -8,6 +8,7 @@ local prefabFiles = {
     "tourmalinecore",           --电气石
     "icire_rock",               --鸳鸯石
     "guitar_miguel",            --米格尔的吉他
+    "legion_soul_fx",           --灵魂契约特效
     "the_gifted",               --重铸科技，针对每个角色的独有制作物
     "saddle_baggage",           --驮物牛鞍
     "tripleshovelaxes",          --铲斧-三用型
@@ -747,8 +748,6 @@ local release_spores = State{
 
 AddStategraphState("wilson", release_spores)
 
-AddIngredientValues({"albicans_cap"}, {veggie=2}, false, false)
-
 --------------------------------------------------------------------------
 --[[ 灵魂契约书瞬移、加血相关 ]]
 --------------------------------------------------------------------------
@@ -885,10 +884,7 @@ if IsServer then
             if target ~= nil then
                 if target:HasTag("soulcontracts") then --进入地面的契约书
                     --命中特效
-                    local fx = SpawnPrefab("wortox_soul_in_fx")
-                    if target._fx_set then
-                        target._fx_set(target, fx)
-                    end
+                    local fx = SpawnPrefab(target._dd and target._dd.fx or "wortox_soul_in_fx")
                     fx.Transform:SetPosition(inst.Transform:GetWorldPosition())
                     fx:Setup(target)
 
@@ -919,10 +915,7 @@ if IsServer then
                                 end
                             end
 
-                            local fx = SpawnPrefab("wortox_soul_in_fx")
-                            if book._fx_set then
-                                book._fx_set(book, fx)
-                            end
+                            local fx = SpawnPrefab(book._dd and book._dd.fx or "wortox_soul_in_fx")
                             fx.Transform:SetPosition(inst.Transform:GetWorldPosition())
                             fx:Setup(target)
 

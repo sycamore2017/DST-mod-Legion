@@ -1133,6 +1133,7 @@ local function MakeWeapon(data)
             inst.AnimState:SetOrientation(ANIM_ORIENTATION.OnGround)
 
             inst:AddTag("sharp")
+            inst:AddTag("nosteal")
 
             --weapon (from weapon component) added to pristine state for optimization
             inst:AddTag("weapon")
@@ -1146,6 +1147,11 @@ local function MakeWeapon(data)
             inst.hasline = false
             inst.shootidx = 1
             inst.caster = nil
+
+            --因为大力士攻击时会在不判空的情况下直接使用 inventoryitem，为了不崩溃，只能加个这个
+            inst:AddComponent("inventoryitem")
+            inst.components.inventoryitem.pushlandedevents = false
+            inst.components.inventoryitem.canbepickedup = false
 
             inst:AddComponent("weapon")
             inst.components.weapon:SetDamage(fea_damage)

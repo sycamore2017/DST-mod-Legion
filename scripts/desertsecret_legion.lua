@@ -55,8 +55,6 @@ local IsServer = TheNet:GetIsServer() or TheNet:IsDedicated()
 
 _G.RegistMiniMapImage_legion("shyerrytree")
 
-AddIngredientValues({"shyerry"}, {fruit=4}, true, false) --AddIngredientValues(names, tags, cancook, candry)
-
 --------------------------------------------------------------------------
 --[[ 新地皮相关 ]]
 --------------------------------------------------------------------------

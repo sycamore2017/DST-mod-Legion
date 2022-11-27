@@ -1,5 +1,4 @@
-local assets =
-{
+local assets = {
     Asset("ANIM", "anim/neverfade.zip"),--这个是放在地上的动画文件
 
      --正常的动画
@@ -15,11 +14,10 @@ local assets =
     Asset("ANIM", "anim/neverfadebush.zip"),--花丛的动画
 }
 
-local prefabs =
-{
+local prefabs = {
     "neverfadebush",
     "neverfade_shield",
-    "buff_butterflysblessing",
+    "buff_butterflysblessing"
 }
 
 local function ChangeSymbol(inst, owner, skindata)

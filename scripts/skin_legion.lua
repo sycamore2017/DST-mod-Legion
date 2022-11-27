@@ -331,7 +331,7 @@ _G.SKIN_PREFABS_LEGION = {
         exchangefx = { prefab = nil, offset_y = nil, scale = nil },
         floater = {
             cut = 0.12, size = "med", offset_y = 0.4, scale = 0.5, nofx = nil,
-        },
+        }
     },
     neverfadebush = {
         assets = nil,
@@ -339,7 +339,7 @@ _G.SKIN_PREFABS_LEGION = {
             inst.AnimState:SetBank("berrybush2")
             inst.AnimState:SetBuild("neverfadebush")
         end,
-        exchangefx = { prefab = nil, offset_y = 0.9, scale = nil },
+        exchangefx = { prefab = nil, offset_y = 0.9, scale = nil }
     },
 
     hat_lichen = {
@@ -633,6 +633,7 @@ _G.SKIN_PREFABS_LEGION = {
         fn_start = function(inst)
             inst.AnimState:SetBank("book_maxwell")
             inst.AnimState:SetBuild("soul_contracts")
+            inst._dd = { fx = "l_soul_fx" }
         end,
         exchangefx = { prefab = nil, offset_y = nil, scale = nil }
     },
@@ -885,6 +886,30 @@ _G.SKINS_LEGION = {
         },
     },
 
+    orchidbush_disguiser = {
+        base_prefab = "orchidbush",
+		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
+
+        skin_id = "626029b9c340bf24ab31057a",
+        onlyownedshow = true,
+		assets = {
+            Asset("ANIM", "anim/berrybush2.zip"), --官方浆果丛动画
+			Asset("ANIM", "anim/skin/orchidbush_disguiser.zip"),
+		},
+
+        string = ischinese and { name = "粉色猎园" } or { name = "Pink Orchid Bush" },
+
+		fn_start = function(inst)
+            inst.AnimState:SetBank("berrybush2")
+            inst.AnimState:SetBuild("orchidbush_disguiser")
+        end,
+        exchangefx = { prefab = nil, offset_y = 1.3, scale = nil },
+        linkedskins = { orchitwigs = "orchitwigs_disguiser" },
+        placer = {
+            name = nil, bank = "berrybush2", build = "orchidbush_disguiser", anim = "dead",
+            prefabs = { "dug_orchidbush", "cutted_orchidbush" },
+        },
+    },
     orchitwigs_disguiser = {
         base_prefab = "orchitwigs",
 		type = "item", skin_tags = {}, release_group = 555, rarity = rarityFree,
@@ -919,30 +944,6 @@ _G.SKINS_LEGION = {
             cut = 0.05, size = "small", offset_y = 0.15, scale = 0.5, nofx = nil,
         },
     },
-    orchidbush_disguiser = {
-        base_prefab = "orchidbush",
-		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
-
-        skin_id = "626029b9c340bf24ab31057a",
-        onlyownedshow = true,
-		assets = {
-            Asset("ANIM", "anim/berrybush2.zip"), --官方浆果丛动画
-			Asset("ANIM", "anim/skin/orchidbush_disguiser.zip"),
-		},
-
-        string = ischinese and { name = "粉色猎园" } or { name = "Pink Orchid Bush" },
-
-		fn_start = function(inst)
-            inst.AnimState:SetBank("berrybush2")
-            inst.AnimState:SetBuild("orchidbush_disguiser")
-        end,
-        exchangefx = { prefab = nil, offset_y = 1.3, scale = nil },
-        linkedskins = { orchitwigs = "orchitwigs_disguiser" },
-        placer = {
-            name = nil, bank = "berrybush2", build = "orchidbush_disguiser", anim = "dead",
-            prefabs = { "dug_orchidbush", "cutted_orchidbush" },
-        },
-    },
 
     neverfade_thanks = {
         base_prefab = "neverfade",
@@ -958,16 +959,15 @@ _G.SKINS_LEGION = {
             Asset("ATLAS", "images/inventoryimages_skin/neverfade_thanks_broken.xml"),
             Asset("IMAGE", "images/inventoryimages_skin/neverfade_thanks_broken.tex"),
             Asset("ATLAS", "images/inventoryimages_skin/foliageath_neverfade_thanks.xml"),
-            Asset("IMAGE", "images/inventoryimages_skin/foliageath_neverfade_thanks.tex"),
+            Asset("IMAGE", "images/inventoryimages_skin/foliageath_neverfade_thanks.tex")
 		},
-        image = { name = nil, atlas = nil, setable = false, },
 
         string = ischinese and { name = "扶伤" } or { name = "FuShang" },
 
 		anim = {
             bank = nil, build = nil,
             anim = nil, isloop_anim = nil, animpush = nil, isloop_animpush = nil,
-            setable = true,
+            setable = true
         },
         fn_start = function(inst)
             if inst.hasSetBroken then
@@ -993,8 +993,8 @@ _G.SKINS_LEGION = {
         },
         linkedskins = { bush = "neverfadebush_thanks" },
         placer = {
-            name = nil, bank = "neverfadebush_thanks", build = "neverfadebush_thanks", anim = "dead", prefabs = nil,
-        },
+            name = nil, bank = "neverfadebush_thanks", build = "neverfadebush_thanks", anim = "dead", prefabs = nil
+        }
     },
     neverfadebush_thanks = {
         base_prefab = "neverfadebush",
@@ -1014,7 +1014,99 @@ _G.SKINS_LEGION = {
             inst.AnimState:SetBuild("neverfadebush_thanks")
         end,
         exchangefx = { prefab = nil, offset_y = 1.2, scale = nil },
-        linkedskins = { sword = "neverfade_thanks", },
+        linkedskins = { sword = "neverfade_thanks" }
+    },
+    neverfade_paper = {
+        base_prefab = "neverfade",
+		type = "item", skin_tags = {}, release_group = 555, rarity = raritySpecial,
+
+        skin_id = "638362b68c2f781db2f7f524",
+        onlyownedshow = true,
+		assets = {
+			Asset("ANIM", "anim/skin/neverfade_paper.zip"),
+            Asset("ANIM", "anim/skin/neverfade_butterfly_paper.zip"),
+            Asset("ATLAS", "images/inventoryimages_skin/neverfade_paper.xml"),
+            Asset("IMAGE", "images/inventoryimages_skin/neverfade_paper.tex"),
+            Asset("ATLAS", "images/inventoryimages_skin/neverfade_paper_broken.xml"),
+            Asset("IMAGE", "images/inventoryimages_skin/neverfade_paper_broken.tex"),
+            Asset("ATLAS", "images/inventoryimages_skin/foliageath_neverfade_paper.xml"),
+            Asset("IMAGE", "images/inventoryimages_skin/foliageath_neverfade_paper.tex")
+		},
+
+        string = ischinese and { name = "青蝶纸剑" } or { name = "Paper-fly Sword" },
+
+		fn_anim = function(inst)
+            inst.AnimState:SetBank("neverfade_paper")
+            inst.AnimState:SetBuild("neverfade_paper")
+        end,
+        fn_start = function(inst)
+            if inst.hasSetBroken then
+                inst.components.inventoryitem.atlasname = "images/inventoryimages_skin/neverfade_paper_broken.xml"
+                inst.components.inventoryitem:ChangeImageName("neverfade_paper_broken")
+                inst.AnimState:PlayAnimation("idle_broken")
+            else
+                inst.components.inventoryitem.atlasname = "images/inventoryimages_skin/neverfade_paper.xml"
+                inst.components.inventoryitem:ChangeImageName("neverfade_paper")
+                inst.AnimState:PlayAnimation("idle")
+            end
+        end,
+        equip = {
+            symbol = "swap_object", build = "neverfade_paper", file = "normal_swap",
+            build_broken = "neverfade_paper", file_broken = "broken_swap"
+        },
+        scabbard = {
+            anim = "idle_cover", isloop = nil, bank = "neverfade_paper", build = "neverfade_paper",
+            image = "foliageath_neverfade_paper", atlas = "images/inventoryimages_skin/foliageath_neverfade_paper.xml",
+        },
+        butterfly = { bank = "butterfly", build = "neverfade_butterfly_paper" },
+        exchangefx = { prefab = nil, offset_y = nil, scale = nil },
+        floater = {
+            cut = 0.05, size = "small", offset_y = 0.15, scale = 0.5, nofx = nil,
+        },
+        linkedskins = { bush = "neverfadebush_paper" },
+        placer = {
+            name = nil, bank = "berrybush2", build = "neverfadebush_paper", anim = "dead", prefabs = nil
+        }
+    },
+    neverfadebush_paper = {
+        base_prefab = "neverfadebush",
+		type = "item", skin_tags = {}, release_group = 555, rarity = raritySpecial,
+
+        skin_id = "638362b68c2f781db2f7f524",
+        noshopshow = true,
+		assets = {
+			Asset("ANIM", "anim/skin/neverfadebush_paper.zip")
+		},
+        string = {
+            name = ischinese and "青蝶纸扇" or "Paper-fly Fan"
+        },
+
+		fn_start = function(inst)
+            inst.AnimState:SetBank("neverfadebush_paper")
+            inst.AnimState:SetBuild("neverfadebush_paper")
+        end,
+        exchangefx = { prefab = nil, offset_y = 1.2, scale = nil },
+        linkedskins = { sword = "neverfade_paper" }
+    },
+    neverfadebush_paper2 = {
+        base_prefab = "neverfadebush",
+		type = "item", skin_tags = {}, release_group = 555, rarity = raritySpecial,
+
+        skin_id = "638362b68c2f781db2f7f524",
+        noshopshow = true,
+		assets = {
+			Asset("ANIM", "anim/skin/neverfadebush_paper2.zip")
+		},
+        string = {
+            name = ischinese and "绀蝶纸扇" or "Violet Paper-fly Fan"
+        },
+
+		fn_start = function(inst)
+            inst.AnimState:SetBank("neverfadebush_paper2")
+            inst.AnimState:SetBuild("neverfadebush_paper2")
+        end,
+        exchangefx = { prefab = nil, offset_y = 1.2, scale = nil },
+        linkedskins = { sword = "neverfade_paper" }
     },
 
     hat_lichen_emo_que = {
@@ -2153,12 +2245,7 @@ _G.SKINS_LEGION = {
 		fn_start = function(inst)
             inst.AnimState:SetBank("book_maxwell")
             inst.AnimState:SetBuild("soul_contracts_taste")
-            inst._fx_set = function(inst, fx)
-                fx.AnimState:SetHighlightColour(246/255, 207/255, 75/255, 0)
-            end
-        end,
-        fn_end = function(inst)
-            inst._fx_set = nil
+            inst._dd = { fx = "l_soul_fx_taste" }
         end,
         exchangefx = { prefab = nil, offset_y = nil, scale = nil }
     },
@@ -2177,6 +2264,10 @@ _G.SKIN_IDS_LEGION = {
         shield_l_log_emo_fist = true, hat_lichen_emo_que = true,
         rosebush_collector = true, rosorns_collector = true, fimbul_axe_collector = true, siving_turn_collector = true,
         backcub_fans2 = true,
+        agronssword_taste = true, soul_contracts_taste = true,
+        carpet_whitewood_law = true, carpet_whitewood_big_law = true, carpet_whitewood_law2 = true, carpet_whitewood_big_law2 = true,
+        icire_rock_day = true,
+        neverfade_paper = true, neverfadebush_paper = true, neverfadebush_paper2 = true,
     },
     ["6278c450c340bf24ab311528"] = { --回忆(5)
         boltwingout_disguiser = true,
@@ -2213,6 +2304,7 @@ _G.SKIN_IDS_LEGION = {
         agronssword_taste = true, soul_contracts_taste = true,
         carpet_whitewood_law2 = true, carpet_whitewood_big_law2 = true,
         icire_rock_day = true,
+        neverfade_paper = true, neverfadebush_paper = true, neverfadebush_paper2 = true,
     },
 }
 _G.SKIN_IDX_LEGION = {
@@ -2253,6 +2345,7 @@ local skinidxes = { --用以皮肤排序
     "backcub_thanks",
     "fishhomingtool_awesome_thanks", "fishhomingtool_normal_thanks", "fishhomingbait_thanks",
     "siving_turn_collector", "icire_rock_collector", "fimbul_axe_collector", "rosebush_collector", "rosorns_collector",
+    "neverfade_paper", "neverfadebush_paper", "neverfadebush_paper2",
     "icire_rock_day",
     "carpet_whitewood_law", "carpet_whitewood_big_law", "carpet_whitewood_law2", "carpet_whitewood_big_law2",
     "agronssword_taste", "soul_contracts_taste",
@@ -3111,7 +3204,7 @@ if not TheNet:IsDedicated() then
                         if right_root.skinshop_legion then
                             right_root.skinshop_legion:Kill()
                         end
-                        -- local SkinLegionDialog = _G.require("widgets/skinlegiondialog") --test：动态更新
+                        local SkinLegionDialog = _G.require("widgets/skinlegiondialog") --test：动态更新
                         right_root.skinshop_legion = right_root:AddChild(SkinLegionDialog(self.owner))
                         right_root.skinshop_legion:SetPosition(-380, 0)
                         self:Close()

@@ -241,7 +241,7 @@ local prefabs_contracts = {
     "wortox_soul",          --物品栏里的灵魂
     -- "wortox_soul_spawn",    --地面的灵魂
     -- "wortox_eat_soul_fx",
-    "wortox_soul_in_fx",    --灵魂被吸收时的特效
+    "l_soul_fx",    --灵魂被吸收时的特效
 }
 
 -----
@@ -455,6 +455,7 @@ local function fn_contracts()
     inst._needheal = false
     inst._taskheal = nil
     StartUpadateHealTag(inst)
+    inst._dd = { fx = "l_soul_fx" }
 
     inst._SoulHealing = ContractsDoHeal
 

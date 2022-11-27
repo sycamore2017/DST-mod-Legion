@@ -42,8 +42,6 @@ local IsServer = TheNet:GetIsServer() or TheNet:IsDedicated()
 --[[ 基础 ]]
 --------------------------------------------------------------------------
 
-AddIngredientValues({"petals_rose", "petals_lily", "petals_orchid"}, {veggie=.5, petals_legion=1}, false, false)
-
 _G.RegistMiniMapImage_legion("rosebush")
 _G.RegistMiniMapImage_legion("lilybush")
 _G.RegistMiniMapImage_legion("orchidbush")

@@ -65,9 +65,6 @@ local IsServer = TheNet:GetIsServer() or TheNet:IsDedicated()
 --[[ 基础 ]]
 --------------------------------------------------------------------------
 
-AddIngredientValues({"pineananas"}, {veggie=1, fruit=1}, true, false)
-AddIngredientValues({"mint_l"}, {veggie=.5}, false, false)
-
 _G.RegistMiniMapImage_legion("siving_derivant")
 _G.RegistMiniMapImage_legion("siving_thetree")
 _G.RegistMiniMapImage_legion("siving_ctlwater")

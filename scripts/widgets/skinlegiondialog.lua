@@ -551,12 +551,12 @@ local SkinData = {
     },
     orchidbush_disguiser = {
         string = ischinese and {
-            collection = "DISGUISER", access = "FREE",
-            descitem = "解锁\"兰草花穗\"以及入鞘后的皮肤。",
-            description = "花色清浅，嫣粉各异，它隐匿其中，随着环境变化调整隐身衣的颜色，静候时机。若有猎物在此歇脚，它便踮起拟态为兰花瓣的步肢悄然靠近，只待猎物放松警惕，倏然伸出利爪，又消失在粉色的芬芳中。尽管有人批评它菩萨面蛇蝎心，但是待到下一次追猎时，它仍然会全力以赴。",
+            collection = "DISGUISER", access = "SPECIAL",
+            descitem = "解锁\"兰草花丛\"的皮肤。",
+            description = "昨夜雨疏风骤，猎人不知所踪，仅留下这片茂盛的兰花丛纪念着曾经的点点滴滴。已不知是多少个春秋，花开花落，鸟去还回，它的等待始终落得一场空。恍惚间风吹过，摆动的兰花像极了猎人的身影，然而它也不知那潇洒果决的狩猎者是否还会归来……",
         } or {
-            collection = "DISGUISER", access = "FREE",
-            descitem = "Unlock \"Orchitwigs\" skin.",
+            collection = "DISGUISER", access = "SPECIAL",
+            descitem = "Unlock \"Orchid Bush\" skin.",
             description = "The story was not translated.",
         },
         height_anim = 105,
@@ -579,12 +579,12 @@ local SkinData = {
     },
     orchitwigs_disguiser = {
         string = ischinese and {
-            collection = "DISGUISER", access = "SPECIAL",
-            descitem = "解锁\"兰草花丛\"的皮肤。",
-            description = "昨夜雨疏风骤，猎人不知所踪，仅留下这片茂盛的兰花丛纪念着曾经的点点滴滴。已不知是多少个春秋，花开花落，鸟去还回，它的等待始终落得一场空。恍惚间风吹过，摆动的兰花像极了猎人的身影，然而它也不知那潇洒果决的狩猎者是否还会归来……",
+            collection = "DISGUISER", access = "FREE",
+            descitem = "解锁\"兰草花穗\"以及入鞘后的皮肤。",
+            description = "花色清浅，嫣粉各异，它隐匿其中，随着环境变化调整隐身衣的颜色，静候时机。若有猎物在此歇脚，它便踮起拟态为兰花瓣的步肢悄然靠近，只待猎物放松警惕，倏然伸出利爪，又消失在粉色的芬芳中。尽管有人批评它菩萨面蛇蝎心，但是待到下一次追猎时，它仍然会全力以赴。",
         } or {
-            collection = "DISGUISER", access = "SPECIAL",
-            descitem = "Unlock \"Orchid Bush\" skin.",
+            collection = "DISGUISER", access = "FREE",
+            descitem = "Unlock \"Orchitwigs\" skin.",
             description = "The story was not translated.",
         },
         height_anim = 155,

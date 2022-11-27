@@ -215,14 +215,7 @@ local foods_legion = {
     dish_flowermooncake = {
         test = function(cooker, names, tags)
             return
-                (
-                    (tags.petals_legion or 0) --蔷薇花瓣、蹄莲花瓣、兰草花瓣、月树花瓣都属于这个
-                    + (names.cactus_flower or 0) --仙人掌花瓣
-                    + (names.forgetmelots or 0)  --必忘我
-                    + (names.myth_lotus_flower or 0)  --【神话书说】莲花
-                    + (names.aip_veggie_sunflower or 0) --【额外物品包】向日葵
-                    >= 3
-                )
+                (tags.petals_legion or 0) >= 3
                 and (tags.veggie and tags.veggie >= 2) and not tags.monster
                 and ( --秋季月圆那天才能做出来
                     tags.fallfullmoon or --一定要用or

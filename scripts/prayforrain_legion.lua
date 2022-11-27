@@ -50,8 +50,6 @@ local _G = GLOBAL
 --[[ 基础 ]]
 --------------------------------------------------------------------------
 
-AddIngredientValues({"monstrain_leaf"}, {monster=1, veggie=.5}, false, false)
-
 _G.RegistMiniMapImage_legion("monstrain")
 _G.RegistMiniMapImage_legion("agronssword")
 _G.RegistMiniMapImage_legion("giantsfoot")

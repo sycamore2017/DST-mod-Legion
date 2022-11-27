@@ -975,6 +975,7 @@ table.insert(prefs, Prefab(
                 return false
             end
             local treeitems = {
+                amulet = true,
                 reviver = true,
                 yellowamulet = true,
                 yellowstaff = true,
@@ -990,6 +991,9 @@ table.insert(prefs, Prefab(
             if item.prefab == "reviver" then
                 OnStealLife(inst, 40)
                 ComputTraded(inst, nil, 1)
+            elseif item.prefab == "amulet" then
+                OnStealLife(inst, 80)
+                ComputTraded(inst, nil, 2)
             else
                 OnStealLife(inst, 320)
                 ComputTraded(inst, 1, nil)

@@ -472,6 +472,7 @@ MakeSteak({ --盐香料：加新鲜度
     end
 })
 
+--[[--勋章兼容
 if TUNING.FUNCTIONAL_MEDAL_IS_OPEN then --能力勋章兼容
     local function OnAttack_steak_voltjelly(inst, owner, target)
         OnAttack_steak(inst, owner, target)
@@ -591,6 +592,7 @@ if TUNING.FUNCTIONAL_MEDAL_IS_OPEN then --能力勋章兼容
         end
     })
 end
+]]--
 
 ----------
 ----------

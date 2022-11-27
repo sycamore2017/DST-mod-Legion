@@ -173,10 +173,7 @@ local states =
                     inst.components.finiteuses:Use(1)
                     inst._needheal = false
 
-                    local fx = SpawnPrefab("wortox_soul_in_fx")
-                    if inst._fx_set then
-                        inst._fx_set(inst, fx)
-                    end
+                    local fx = SpawnPrefab(inst._dd and inst._dd.fx or "wortox_soul_in_fx")
                     fx.Transform:SetPosition(inst.Transform:GetWorldPosition())
                     fx:Setup(inst)
                 end

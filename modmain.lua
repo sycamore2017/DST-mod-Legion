@@ -292,19 +292,16 @@ if TUNING.LEGION_SUPERBCUISINE then
         table.insert(Assets, v)
     end
 
-    -- AddIngredientValues({"plantmeat"}, {meat=.5, veggie=.5}, true, false) --食人花肉块茎
-    -- AddIngredientValues({"batwing"}, {meat=.5}, true, false) --蝙蝠翅膀，虽然可以晾晒，但是得到的不是蝙蝠翅膀干，而是小肉干，所以candry不能填true
-    AddIngredientValues({"ash"}, {inedible=1}, false, false) --灰烬
-    AddIngredientValues({"slurtleslime"}, {gel=1}, false, false) --蜗牛黏液
-    AddIngredientValues({"glommerfuel"}, {gel=1}, false, false) --格罗姆黏液
-    AddIngredientValues({"phlegm"}, {gel=1}, false, false) --钢羊黏痰
-    -- AddIngredientValues({"wormlight_lesser"}, {veggie=.5}, false, false) --发光小浆果
-    -- AddIngredientValues({"wormlight"}, {veggie=1}, false, false) --发光浆果
-    AddIngredientValues({"furtuft"}, {inedible=1}, false, false) --熊毛屑(非熊皮)
-    AddIngredientValues({"twiggy_nut"}, {inedible=1}, false, false) --添加树枝树种作为新的料理原材料
-    AddIngredientValues({"moon_tree_blossom"}, {veggie=.5, petals_legion=1}, false, false) --月树花
-    AddIngredientValues({"foliage"}, {decoration=1}, false, false) --蕨叶
-    AddIngredientValues({"horn"}, {inedible=1, decoration=2}, false, false) --牛角
+    -- -- AddIngredientValues({"batwing"}, {meat=.5}, true, false) --蝙蝠翅膀，虽然可以晾晒，但是得到的不是蝙蝠翅膀干，而是小肉干，所以candry不能填true
+    -- AddIngredientValues({"ash"}, {inedible=1}, false, false) --灰烬
+    -- AddIngredientValues({"slurtleslime"}, {gel=1}, false, false) --蜗牛黏液
+    -- AddIngredientValues({"glommerfuel"}, {gel=1}, false, false) --格罗姆黏液
+    -- AddIngredientValues({"phlegm"}, {gel=1}, false, false) --钢羊黏痰
+    -- AddIngredientValues({"furtuft"}, {inedible=1}, false, false) --熊毛屑(非熊皮)
+    -- AddIngredientValues({"twiggy_nut"}, {inedible=1}, false, false) --添加树枝树种作为新的料理原材料
+    -- AddIngredientValues({"moon_tree_blossom"}, {veggie=.5, petals_legion=1}, false, false) --月树花
+    -- AddIngredientValues({"foliage"}, {decoration=1}, false, false) --蕨叶
+    -- AddIngredientValues({"horn"}, {inedible=1, decoration=2}, false, false) --牛角
 
     for k, recipe in pairs(require("preparedfoods_legion")) do
         table.insert(Assets, Asset("ATLAS", "images/cookbookimages/"..recipe.name..".xml"))
@@ -1116,4 +1113,63 @@ AddSimPostInit(function()
     --能力勋章
     ----------
     -- _G.CONFIGS_LEGION.ENABLEDMODS.FunctionalMedal = TUNING.FUNCTIONAL_MEDAL_IS_OPEN
+
+    ----------
+    --烹饪食材属性 兼容性修改(官方逻辑没有兼容性，只能自己写个有兼容性的啦)
+    ----------
+
+    local cooking2 = require("cooking")
+    local ingredients_base = cooking2.ingredients
+    if ingredients_base then
+        local ingredients_l = {
+            { {"ash"}, {inedible=1}, false, false }, --灰烬
+            { {"slurtleslime", "glommerfuel", "phlegm"}, {gel=1}, false, false }, --蜗牛黏液、格罗姆黏液、钢羊黏痰
+            { {"furtuft"}, {inedible=1}, false, false }, --熊毛屑(非熊皮)
+            { {"twiggy_nut"}, {inedible=1}, false, false }, --树枝树种
+            { {"moon_tree_blossom"}, {veggie=.5, petals_legion=1}, false, false }, --月树花
+            { {"foliage"}, {decoration=1}, false, false }, --蕨叶
+            { {"horn"}, {inedible=1, decoration=2}, false, false }, --牛角
+            { {"forgetmelots", "cactus_flower", "myth_lotus_flower", "aip_veggie_sunflower"}, {petals_legion=1}, false, false }, --必忘我、仙人掌花、【神话书说】莲花、【额外物品包】向日葵
+
+            { {"shyerry"}, {fruit=4}, true, false }, --颤栗果
+            { {"albicans_cap"}, {veggie=2}, false, false }, --素白菇
+            { {"petals_rose", "petals_lily", "petals_orchid"}, {veggie=.5, petals_legion=1}, false, false }, --三花
+            { {"pineananas"}, {veggie=1, fruit=1}, true, false }, --松萝
+            { {"mint_l"}, {veggie=.5}, false, false }, --猫薄荷
+            { {"monstrain_leaf"}, {monster=1, veggie=.5}, false, false }, --雨竹叶
+        }
+        for _,ing in ipairs(ingredients_l) do
+            for _,name in pairs(ing[1]) do
+                local cancook = ing[3]
+                local candry = ing[4]
+
+                if ingredients_base[name] == nil then
+                    ingredients_base[name] = { tags={} }
+                end
+                if cancook then
+                    if ingredients_base[name.."_cooked"] == nil then
+                        ingredients_base[name.."_cooked"] = { tags={} }
+                    end
+                end
+                if candry then
+                    if ingredients_base[name.."_dried"] == nil then
+                        ingredients_base[name.."_dried"] = { tags={} }
+                    end
+                end
+
+                for tagname,tagval in pairs(ing[2]) do
+                    ingredients_base[name].tags[tagname] = tagval
+                    if cancook then
+                        ingredients_base[name.."_cooked"].tags.precook = 1
+                        ingredients_base[name.."_cooked"].tags[tagname] = tagval
+                    end
+                    if candry then
+                        ingredients_base[name.."_dried"].tags.dried = 1
+                        ingredients_base[name.."_dried"].tags[tagname] = tagval
+                    end
+                end
+            end
+        end
+    end
+
 end)
