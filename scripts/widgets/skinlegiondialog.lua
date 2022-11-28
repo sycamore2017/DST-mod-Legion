@@ -158,6 +158,41 @@ local function SetAnim_flowerbush2(self, anim, data)
     anim.tag_anim = 2
 end
 
+local function SetAnim_neverfadebush(self, anim, data)
+    local animstate = anim:GetAnimState()
+    SetAnim_base(animstate, data)
+    animstate:Hide("berries")
+    animstate:Hide("berriesmore")
+    animstate:Hide("berriesmost")
+    anim.tag_anim = 3
+end
+local function SetClick_neverfadebush(self, anim, data)
+    local animstate = anim:GetAnimState()
+    local tag = anim.tag_anim or 3
+
+    animstate:PlayAnimation("grow")
+    animstate:PushAnimation("idle", true)
+    if tag == 3 then
+        animstate:Show("berriesmost")
+        anim.tag_anim = 4
+    else
+        animstate:Hide("berriesmost")
+        anim.tag_anim = 3
+    end
+end
+local function SetClick_neverfade(self, anim, data)
+    local animstate = anim:GetAnimState()
+    local tag = anim.tag_anim or 1
+
+    if tag == 1 then
+        animstate:PlayAnimation("idle_broken", false)
+        anim.tag_anim = 2
+    else
+        animstate:PlayAnimation("idle", false)
+        anim.tag_anim = 1
+    end
+end
+
 local function InitPlayerSymbol(animstate, data)
     animstate:Hide("ARM_carry")
     animstate:Hide("HAT")
@@ -637,14 +672,14 @@ local SkinData = {
                 bank = "neverfadebush_thanks", build = "neverfadebush_thanks",
                 anim = "shake", anim2 = "idle", isloop = true,
                 fn_anim = SetAnim_flowerbush1,
-                fn_click = SetAnim_flowerbush,
+                fn_click = SetClick_neverfadebush,
                 x = -42, y = 145, scale = 0.32
             },
             {
                 bank = "neverfadebush_thanks", build = "neverfadebush_thanks",
                 anim = "dead", anim2 = nil, isloop = false,
-                fn_anim = SetAnim_flowerbush2,
-                fn_click = SetAnim_flowerbush,
+                fn_anim = SetAnim_neverfadebush,
+                fn_click = SetClick_neverfadebush,
                 x = 40, y = 145, scale = 0.32
             },
             {
@@ -1685,11 +1720,11 @@ local SkinData = {
     neverfade_paper = {
         string = ischinese and {
             collection = "PAPER", access = "SPECIAL",
-            descitem = "解锁\"永不凋零\"、2个\"永不凋零花丛\"、\"庇佑蝴蝶\"以及入鞘后的皮肤。",
+            descitem = "解锁\"永不凋零\"、\"永不凋零花丛\"、\"庇佑蝴蝶\"以及入鞘后的皮肤。",
             description = "暂无",
         } or {
             collection = "PAPER", access = "SPECIAL",
-            descitem = "Unlock \"Neverfade\", two \"Neverfade Bush\", and \"Neverfade Butterfly\" skin.",
+            descitem = "Unlock \"Neverfade\", \"Neverfade Bush\", and \"Neverfade Butterfly\" skin.",
             description = "The story was not translated.",
         },
         height_anim = 300,
@@ -1698,14 +1733,14 @@ local SkinData = {
                 bank = "berrybush2", build = "neverfadebush_paper",
                 anim = "shake", anim2 = "idle", isloop = true,
                 fn_anim = SetAnim_flowerbush1,
-                fn_click = SetAnim_flowerbush,
+                fn_click = SetClick_neverfadebush,
                 x = -48, y = 200, scale = 0.25
             },
             {
-                bank = "berrybush2", build = "neverfadebush_paper2",
+                bank = "berrybush2", build = "neverfadebush_paper",
                 anim = "shake", anim2 = "idle", isloop = true,
-                fn_anim = SetAnim_flowerbush1,
-                fn_click = SetAnim_flowerbush,
+                fn_anim = SetAnim_neverfadebush,
+                fn_click = SetClick_neverfadebush,
                 x = 45, y = 145, scale = 0.25
             },
             {
@@ -1726,16 +1761,79 @@ local SkinData = {
             {
                 bank = "neverfade_paper", build = "neverfade_paper",
                 anim = "idle", anim2 = nil, isloop = false,
-                x = -90, y = 0, scale = 0.38
+                fn_click = SetClick_neverfade,
+                x = -85, y = 0, scale = 0.38
             },
             {
                 bank = "neverfade_paper", build = "neverfade_paper",
                 anim = "idle_cover", anim2 = nil, isloop = false,
-                x = -30, y = 0, scale = 0.38
+                x = -30, y = -2, scale = 0.38
             },
             {
                 symbol = {
                     { symbol = "swap_object", build = "neverfade_paper", file = "normal_swap", type = 1 },
+                },
+                fn_anim = SetAnim_player,
+                fn_click = SetAnim_player2,
+                x = 45, y = 0, scale = 0.38
+            }
+        }
+    },
+    neverfade_paper2 = {
+        string = ischinese and {
+            collection = "PAPER", access = "SPECIAL",
+            descitem = "解锁\"永不凋零\"、\"永不凋零花丛\"、\"庇佑蝴蝶\"以及入鞘后的皮肤。",
+            description = "暂无",
+        } or {
+            collection = "PAPER", access = "SPECIAL",
+            descitem = "Unlock \"Neverfade\", \"Neverfade Bush\", and \"Neverfade Butterfly\" skin.",
+            description = "The story was not translated.",
+        },
+        height_anim = 300,
+        anims = {
+            {
+                bank = "berrybush2", build = "neverfadebush_paper2",
+                anim = "shake", anim2 = "idle", isloop = true,
+                fn_anim = SetAnim_flowerbush1,
+                fn_click = SetClick_neverfadebush,
+                x = -48, y = 200, scale = 0.25
+            },
+            {
+                bank = "berrybush2", build = "neverfadebush_paper2",
+                anim = "shake", anim2 = "idle", isloop = true,
+                fn_anim = SetAnim_neverfadebush,
+                fn_click = SetClick_neverfadebush,
+                x = 45, y = 145, scale = 0.25
+            },
+            {
+                bank = "butterfly", build = "neverfade_butterfly_paper2",
+                anim = "land", anim2 = "idle", isloop = true,
+                x = 5, y = 145, scale = 0.25
+            },
+            {
+                bank = "butterfly", build = "neverfade_butterfly_paper2",
+                anim = "take_off", anim2 = "idle_flight_loop", isloop = true,
+                x = 70, y = 195, scale = 0.25
+            },
+            {
+                bank = "butterfly", build = "neverfade_butterfly_paper2",
+                anim = "take_off", anim2 = "flight_cycle", isloop = true,
+                x = -90, y = 90, scale = 0.25
+            },
+            {
+                bank = "neverfade_paper2", build = "neverfade_paper2",
+                anim = "idle", anim2 = nil, isloop = false,
+                fn_click = SetClick_neverfade,
+                x = -85, y = 0, scale = 0.38
+            },
+            {
+                bank = "neverfade_paper2", build = "neverfade_paper2",
+                anim = "idle_cover", anim2 = nil, isloop = false,
+                x = -30, y = -2, scale = 0.38
+            },
+            {
+                symbol = {
+                    { symbol = "swap_object", build = "neverfade_paper2", file = "normal_swap", type = 1 },
                 },
                 fn_anim = SetAnim_player,
                 fn_click = SetAnim_player2,

@@ -186,6 +186,15 @@ local function Fn_icire_rock_day(inst, range)
     end
 end
 
+------
+
+local function Fn_placer_neverfade(inst)
+    for _,v in ipairs({ "berries", "berriesmore", "berriesmost" }) do
+        inst.AnimState:Hide(v)
+    end
+    inst.AnimState:Pause()
+end
+
 --------------------------------------------------------------------------
 --[[ 全局皮肤总数据，以及修改 ]]
 --------------------------------------------------------------------------
@@ -1067,7 +1076,8 @@ _G.SKINS_LEGION = {
         },
         linkedskins = { bush = "neverfadebush_paper" },
         placer = {
-            name = nil, bank = "berrybush2", build = "neverfadebush_paper", anim = "dead", prefabs = nil
+            name = nil, bank = "berrybush2", build = "neverfadebush_paper", anim = "idle", prefabs = nil,
+            fn_init = Fn_placer_neverfade
         }
     },
     neverfadebush_paper = {
@@ -1090,6 +1100,60 @@ _G.SKINS_LEGION = {
         exchangefx = { prefab = nil, offset_y = 1.2, scale = nil },
         linkedskins = { sword = "neverfade_paper" }
     },
+    neverfade_paper2 = {
+        base_prefab = "neverfade",
+		type = "item", skin_tags = {}, release_group = 555, rarity = raritySpecial,
+
+        skin_id = "638362b68c2f781db2f7f524",
+        onlyownedshow = true,
+		assets = {
+			Asset("ANIM", "anim/skin/neverfade_paper2.zip"),
+            Asset("ANIM", "anim/skin/neverfade_butterfly_paper2.zip"),
+            -- Asset("ATLAS", "images/inventoryimages_skin/neverfade_paper2.xml"),
+            -- Asset("IMAGE", "images/inventoryimages_skin/neverfade_paper2.tex"),
+            Asset("ATLAS", "images/inventoryimages_skin/neverfade_paper2_broken.xml"),
+            Asset("IMAGE", "images/inventoryimages_skin/neverfade_paper2_broken.tex"),
+            Asset("ATLAS", "images/inventoryimages_skin/foliageath_neverfade_paper2.xml"),
+            Asset("IMAGE", "images/inventoryimages_skin/foliageath_neverfade_paper2.tex")
+		},
+        image = { name = nil, atlas = nil, setable = false },
+
+        string = ischinese and { name = "绀蝶纸剑" } or { name = "Violet Paper-fly Sword" },
+
+		fn_anim = function(inst)
+            inst.AnimState:SetBank("neverfade_paper2")
+            inst.AnimState:SetBuild("neverfade_paper2")
+        end,
+        fn_start = function(inst)
+            if inst.hasSetBroken then
+                inst.components.inventoryitem.atlasname = "images/inventoryimages_skin/neverfade_paper2_broken.xml"
+                inst.components.inventoryitem:ChangeImageName("neverfade_paper2_broken")
+                inst.AnimState:PlayAnimation("idle_broken")
+            else
+                inst.components.inventoryitem.atlasname = "images/inventoryimages_skin/neverfade_paper2.xml"
+                inst.components.inventoryitem:ChangeImageName("neverfade_paper2")
+                inst.AnimState:PlayAnimation("idle")
+            end
+        end,
+        equip = {
+            symbol = "swap_object", build = "neverfade_paper2", file = "normal_swap",
+            build_broken = "neverfade_paper2", file_broken = "broken_swap"
+        },
+        scabbard = {
+            anim = "idle_cover", isloop = nil, bank = "neverfade_paper2", build = "neverfade_paper2",
+            image = "foliageath_neverfade_paper2", atlas = "images/inventoryimages_skin/foliageath_neverfade_paper2.xml",
+        },
+        butterfly = { bank = "butterfly", build = "neverfade_butterfly_paper2" },
+        exchangefx = { prefab = nil, offset_y = nil, scale = nil },
+        floater = {
+            cut = 0.05, size = "small", offset_y = 0.15, scale = 0.5, nofx = nil,
+        },
+        linkedskins = { bush = "neverfadebush_paper2" },
+        placer = {
+            name = nil, bank = "berrybush2", build = "neverfadebush_paper2", anim = "idle", prefabs = nil,
+            fn_init = Fn_placer_neverfade
+        }
+    },
     neverfadebush_paper2 = {
         base_prefab = "neverfadebush",
 		type = "item", skin_tags = {}, release_group = 555, rarity = raritySpecial,
@@ -1108,7 +1172,7 @@ _G.SKINS_LEGION = {
             inst.AnimState:SetBuild("neverfadebush_paper2")
         end,
         exchangefx = { prefab = nil, offset_y = 1.2, scale = nil },
-        linkedskins = { sword = "neverfade_paper" }
+        linkedskins = { sword = "neverfade_paper2" }
     },
 
     hat_lichen_emo_que = {
@@ -2269,7 +2333,7 @@ _G.SKIN_IDS_LEGION = {
         agronssword_taste = true, soul_contracts_taste = true,
         carpet_whitewood_law = true, carpet_whitewood_big_law = true, carpet_whitewood_law2 = true, carpet_whitewood_big_law2 = true,
         icire_rock_day = true,
-        neverfade_paper = true, neverfadebush_paper = true, neverfadebush_paper2 = true,
+        neverfade_paper = true, neverfadebush_paper = true, neverfade_paper2 = true, neverfadebush_paper2 = true,
     },
     ["6278c450c340bf24ab311528"] = { --回忆(5)
         boltwingout_disguiser = true,
@@ -2306,7 +2370,7 @@ _G.SKIN_IDS_LEGION = {
         agronssword_taste = true, soul_contracts_taste = true,
         carpet_whitewood_law2 = true, carpet_whitewood_big_law2 = true,
         icire_rock_day = true,
-        neverfade_paper = true, neverfadebush_paper = true, neverfadebush_paper2 = true,
+        neverfade_paper = true, neverfadebush_paper = true, neverfade_paper2 = true, neverfadebush_paper2 = true,
     },
 }
 _G.SKIN_IDX_LEGION = {
@@ -2347,7 +2411,7 @@ local skinidxes = { --用以皮肤排序
     "backcub_thanks",
     "fishhomingtool_awesome_thanks", "fishhomingtool_normal_thanks", "fishhomingbait_thanks",
     "siving_turn_collector", "icire_rock_collector", "fimbul_axe_collector", "rosebush_collector", "rosorns_collector",
-    "neverfade_paper", "neverfadebush_paper", "neverfadebush_paper2",
+    "neverfade_paper", "neverfadebush_paper", "neverfade_paper2", "neverfadebush_paper2",
     "icire_rock_day",
     "carpet_whitewood_law", "carpet_whitewood_big_law", "carpet_whitewood_law2", "carpet_whitewood_big_law2",
     "agronssword_taste", "soul_contracts_taste",
@@ -3275,6 +3339,7 @@ _G.Skined_SetBuildPlacer_legion = function(inst)
         inst.components.placer.SetBuilder = function(self, ...)
             SetBuilder_old(self, ...)
             if self.builder and self.builder.components.playercontroller ~= nil then
+                --之所以把皮肤修改写到 SetBuilder 里，是因为 Skined_SetBuildPlacer_legion 执行时还没有皮肤数据
                 local skin = self.builder.components.playercontroller.placer_recipe_skin
                 if skin and SKINS_LEGION[skin] and SKINS_LEGION[skin].fn_setBuildPlacer then
                     SKINS_LEGION[skin].fn_setBuildPlacer(self.inst)
