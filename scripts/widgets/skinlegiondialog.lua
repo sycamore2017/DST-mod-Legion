@@ -29,7 +29,8 @@ local SkinStrings = ischinese and {
         COLLECTOR = "星河收藏家系列",
         TASTE = "厨心百味系列",
         LAW = "律系列",
-        DAY = "节典系列"
+        DAY = "节典系列",
+        PAPER = "纸忆系列"
     },
     UI_ACCESS = "获取",
     UI_INPUT_CDK = "请输入兑换码",
@@ -58,7 +59,8 @@ local SkinStrings = ischinese and {
         COLLECTOR = "Galaxy Collector Collection",
         TASTE = "Tastes Collection",
         LAW = "Rule Collection",
-        DAY = "Festival Collection"
+        DAY = "Festival Collection",
+        PAPER = "Paper Memoir Collection"
     },
     UI_ACCESS = "Get It",
     UI_INPUT_CDK = "Please enter CDK",
@@ -1679,7 +1681,68 @@ local SkinData = {
                 x = -42, y = 13, scale = 0.38
             }
         }
-    }
+    },
+    neverfade_paper = {
+        string = ischinese and {
+            collection = "PAPER", access = "SPECIAL",
+            descitem = "解锁\"永不凋零\"、2个\"永不凋零花丛\"、\"庇佑蝴蝶\"以及入鞘后的皮肤。",
+            description = "暂无",
+        } or {
+            collection = "PAPER", access = "SPECIAL",
+            descitem = "Unlock \"Neverfade\", two \"Neverfade Bush\", and \"Neverfade Butterfly\" skin.",
+            description = "The story was not translated.",
+        },
+        height_anim = 300,
+        anims = {
+            {
+                bank = "berrybush2", build = "neverfadebush_paper",
+                anim = "shake", anim2 = "idle", isloop = true,
+                fn_anim = SetAnim_flowerbush1,
+                fn_click = SetAnim_flowerbush,
+                x = -48, y = 200, scale = 0.25
+            },
+            {
+                bank = "berrybush2", build = "neverfadebush_paper2",
+                anim = "shake", anim2 = "idle", isloop = true,
+                fn_anim = SetAnim_flowerbush1,
+                fn_click = SetAnim_flowerbush,
+                x = 45, y = 145, scale = 0.25
+            },
+            {
+                bank = "butterfly", build = "neverfade_butterfly_paper",
+                anim = "land", anim2 = "idle", isloop = true,
+                x = 5, y = 145, scale = 0.25
+            },
+            {
+                bank = "butterfly", build = "neverfade_butterfly_paper",
+                anim = "take_off", anim2 = "idle_flight_loop", isloop = true,
+                x = 70, y = 195, scale = 0.25
+            },
+            {
+                bank = "butterfly", build = "neverfade_butterfly_paper",
+                anim = "take_off", anim2 = "flight_cycle", isloop = true,
+                x = -90, y = 90, scale = 0.25
+            },
+            {
+                bank = "neverfade_paper", build = "neverfade_paper",
+                anim = "idle", anim2 = nil, isloop = false,
+                x = -90, y = 0, scale = 0.38
+            },
+            {
+                bank = "neverfade_paper", build = "neverfade_paper",
+                anim = "idle_cover", anim2 = nil, isloop = false,
+                x = -30, y = 0, scale = 0.38
+            },
+            {
+                symbol = {
+                    { symbol = "swap_object", build = "neverfade_paper", file = "normal_swap", type = 1 },
+                },
+                fn_anim = SetAnim_player,
+                fn_click = SetAnim_player2,
+                x = 45, y = 0, scale = 0.38
+            }
+        }
+    },
 }
 
 local function GetName(skin)

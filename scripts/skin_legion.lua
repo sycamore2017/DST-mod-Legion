@@ -954,13 +954,14 @@ _G.SKINS_LEGION = {
 		assets = {
 			Asset("ANIM", "anim/skin/neverfade_thanks.zip"),
             Asset("ANIM", "anim/skin/neverfade_butterfly_thanks.zip"),
-            Asset("ATLAS", "images/inventoryimages_skin/neverfade_thanks.xml"),
-            Asset("IMAGE", "images/inventoryimages_skin/neverfade_thanks.tex"),
+            -- Asset("ATLAS", "images/inventoryimages_skin/neverfade_thanks.xml"),
+            -- Asset("IMAGE", "images/inventoryimages_skin/neverfade_thanks.tex"),
             Asset("ATLAS", "images/inventoryimages_skin/neverfade_thanks_broken.xml"),
             Asset("IMAGE", "images/inventoryimages_skin/neverfade_thanks_broken.tex"),
             Asset("ATLAS", "images/inventoryimages_skin/foliageath_neverfade_thanks.xml"),
             Asset("IMAGE", "images/inventoryimages_skin/foliageath_neverfade_thanks.tex")
 		},
+        image = { name = nil, atlas = nil, setable = false },
 
         string = ischinese and { name = "扶伤" } or { name = "FuShang" },
 
@@ -1025,13 +1026,14 @@ _G.SKINS_LEGION = {
 		assets = {
 			Asset("ANIM", "anim/skin/neverfade_paper.zip"),
             Asset("ANIM", "anim/skin/neverfade_butterfly_paper.zip"),
-            Asset("ATLAS", "images/inventoryimages_skin/neverfade_paper.xml"),
-            Asset("IMAGE", "images/inventoryimages_skin/neverfade_paper.tex"),
+            -- Asset("ATLAS", "images/inventoryimages_skin/neverfade_paper.xml"),
+            -- Asset("IMAGE", "images/inventoryimages_skin/neverfade_paper.tex"),
             Asset("ATLAS", "images/inventoryimages_skin/neverfade_paper_broken.xml"),
             Asset("IMAGE", "images/inventoryimages_skin/neverfade_paper_broken.tex"),
             Asset("ATLAS", "images/inventoryimages_skin/foliageath_neverfade_paper.xml"),
             Asset("IMAGE", "images/inventoryimages_skin/foliageath_neverfade_paper.tex")
 		},
+        image = { name = nil, atlas = nil, setable = false },
 
         string = ischinese and { name = "青蝶纸剑" } or { name = "Paper-fly Sword" },
 
@@ -1082,7 +1084,7 @@ _G.SKINS_LEGION = {
         },
 
 		fn_start = function(inst)
-            inst.AnimState:SetBank("neverfadebush_paper")
+            inst.AnimState:SetBank("berrybush2")
             inst.AnimState:SetBuild("neverfadebush_paper")
         end,
         exchangefx = { prefab = nil, offset_y = 1.2, scale = nil },
@@ -1102,7 +1104,7 @@ _G.SKINS_LEGION = {
         },
 
 		fn_start = function(inst)
-            inst.AnimState:SetBank("neverfadebush_paper2")
+            inst.AnimState:SetBank("berrybush2")
             inst.AnimState:SetBuild("neverfadebush_paper2")
         end,
         exchangefx = { prefab = nil, offset_y = 1.2, scale = nil },

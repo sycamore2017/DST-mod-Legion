@@ -205,6 +205,9 @@ local InventoryPrefabsList = {  --每个元素的下标值为每种物品栏图�
     icire_rock3_day = { build = "images_minisign_skins1", },
     icire_rock4_day = { build = "images_minisign_skins1", },
     icire_rock5_day = { build = "images_minisign_skins1", },
+    neverfade_paper = { build = "images_minisign_skins1", },
+    neverfade_paper_broken = { build = "images_minisign_skins1", },
+    foliageath_neverfade_paper = { build = "images_minisign_skins1", },
 }
 
 return InventoryPrefabsList
