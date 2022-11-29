@@ -318,7 +318,7 @@ _G.SKIN_PREFABS_LEGION = {
 
     neverfade = {
         assets = nil,
-        image = { name = nil, atlas = nil, setable = false, },
+        image = { name = nil, atlas = nil, setable = false },
         anim = {
             bank = nil, build = nil,
             anim = nil, isloop_anim = nil, animpush = nil, isloop_animpush = nil,
@@ -554,11 +554,11 @@ _G.SKIN_PREFABS_LEGION = {
 
     fimbul_axe = {
         assets = nil,
-        image = { name = nil, atlas = nil, setable = true, },
+        image = { name = nil, atlas = nil, setable = true },
         anim = {
             bank = "boomerang", build = nil,
             anim = nil, isloop_anim = nil, animpush = nil, isloop_animpush = nil,
-            setable = true,
+            setable = true
         },
         equip = {
             symbol = "swap_object", build = "fimbul_axe", file = "swap_base"
@@ -566,7 +566,7 @@ _G.SKIN_PREFABS_LEGION = {
         exchangefx = { prefab = nil, offset_y = nil, scale = nil },
         floater = {
             cut = 0.1, size = "med", offset_y = 0.3, scale = 0.5, nofx = nil
-        },
+        }
     },
 
     siving_derivant_lvl0 = {
@@ -645,6 +645,35 @@ _G.SKIN_PREFABS_LEGION = {
             inst._dd = { fx = "l_soul_fx" }
         end,
         exchangefx = { prefab = nil, offset_y = nil, scale = nil }
+    },
+
+    siving_feather_real = {
+        assets = nil,
+        image = { name = nil, atlas = nil, setable = true },
+        anim = {
+            bank = nil, build = nil,
+            anim = nil, isloop_anim = nil, animpush = nil, isloop_animpush = nil,
+            setable = true,
+        },
+        equip = {
+            symbol = "swap_object", build = "siving_feather_real", file = "swap"
+        },
+        exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
+        floater = { cut = 0.04, size = "small", offset_y = 0.2, scale = 0.5, nofx = nil }
+    },
+    siving_feather_fake = {
+        assets = nil,
+        image = { name = nil, atlas = nil, setable = true },
+        anim = {
+            bank = nil, build = nil,
+            anim = nil, isloop_anim = nil, animpush = nil, isloop_animpush = nil,
+            setable = true,
+        },
+        equip = {
+            symbol = "swap_object", build = "siving_feather_fake", file = "swap"
+        },
+        exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
+        floater = { cut = 0.04, size = "small", offset_y = 0.2, scale = 0.5, nofx = nil }
     },
 }
 

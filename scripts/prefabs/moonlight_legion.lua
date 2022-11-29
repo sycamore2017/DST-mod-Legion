@@ -72,56 +72,57 @@ local function SetTarget_hidden(inst, targetprefab)
 end
 
 local function DoBenefit(inst)
-    if not TheWorld.state.isfullmoon then
-        inst.canbenifit = true
-        return
+    local items = inst.components.container:GetAllItems()
+    local items_valid = {}
+    for _,v in pairs(items) do
+        if v ~= nil and v.components.perishable ~= nil then
+            table.insert(items_valid, v)
+        end
     end
 
-    if inst.components.container:IsOpen() then --打开时不进行
+    local benifitnum = #items_valid
+    if benifitnum == 0 then
         return
     end
-
-    if not inst.canbenifit then
-        return
-    end
-
-    inst:DoTaskInTime(math.random() + 0.4, function()
-        if inst.components.container:IsOpen() then --打开时不进行
-            return
-        end
-
-        local items = inst.components.container:GetAllItems()
-        local items_valid = {}
-        if #items == 0 then
-            return
-        end
-        for k,v in pairs(items) do
-            if v ~= nil and v.components.perishable ~= nil then
-                table.insert(items_valid, v)
-            end
-        end
-        if #items_valid == 0 then
-            return
-        end
-        inst.canbenifit = false
-
-        local benifitnum = #items_valid
-        benifitnum = benifitnum > 4 and 4 or benifitnum
-        for i = 1, benifitnum do
+    if benifitnum > 4 then
+        for i = 1, 4 do
             local benifititem = table.remove(items_valid, math.random(#items_valid))
             benifititem.components.perishable:SetPercent(1)
         end
+    else
+        for _,v in ipairs(items_valid) do
+            v.components.perishable:SetPercent(1)
+        end
+    end
 
-        local fx = SpawnPrefab("chesterlight")
+    if inst:IsAsleep() then --未加载状态就不产生特效了
+        return
+    end
+
+    local fx = SpawnPrefab("chesterlight")
+    if fx ~= nil then
         fx.Transform:SetPosition(inst.Transform:GetWorldPosition())
         fx:TurnOn()
         inst.SoundEmitter:PlaySound("dontstarve/creatures/chester/raise")
-        inst:DoTaskInTime(1, function()
-            if fx ~= nil then
+        fx:DoTaskInTime(2, function(fx)
+            if fx:IsAsleep() then
+                fx:Remove()
+            else
                 fx:TurnOff()
             end
         end)
-    end)
+    end
+end
+local function OnFullMoon_hidden(inst)
+    if not TheWorld.state.isfullmoon then --月圆时进行
+        return
+    end
+
+    if inst:IsAsleep() then
+        DoBenefit(inst)
+    else
+        inst:DoTaskInTime(math.random() + 0.4, DoBenefit)
+    end
 end
 
 local function OnUpgrade_hidden(item, doer, target, result)
@@ -141,7 +142,7 @@ local function OnUpgrade_hidden(item, doer, target, result)
     end
 
     item:Remove() --该道具是一次性的
-    DoBenefit(result)
+    OnFullMoon_hidden(result)
 end
 
 MakeItem({
@@ -224,7 +225,6 @@ table.insert(prefs, Prefab("hiddenmoonlight", function()
     end
 
     inst.upgradetarget = "icebox"
-    inst.canbenifit = true
 
     inst:AddComponent("inspectable")
 
@@ -284,8 +284,7 @@ table.insert(prefs, Prefab("hiddenmoonlight", function()
         inst:Remove()
     end)
 
-    inst:WatchWorldState("isfullmoon", DoBenefit)
-    inst:ListenForEvent("onclose", DoBenefit)
+    inst:WatchWorldState("isfullmoon", OnFullMoon_hidden)
 
     MakeHauntableLaunchAndDropFirstItem(inst)
 
@@ -294,11 +293,8 @@ table.insert(prefs, Prefab("hiddenmoonlight", function()
     end)
 
     inst.OnSave = function(inst, data)
-        if inst.upgradetarget ~= nil then
+        if inst.upgradetarget ~= "icebox" then
             data.upgradetarget = inst.upgradetarget
-        end
-        if not inst.canbenifit then
-            data.canbenifit = false
         end
     end
     inst.OnLoad = function(inst, data)
@@ -306,11 +302,7 @@ table.insert(prefs, Prefab("hiddenmoonlight", function()
             if data.upgradetarget ~= nil then
                 SetTarget_hidden(inst, data.upgradetarget)
             end
-            if not data.canbenifit then
-                inst.canbenifit = false
-            end
         end
-        DoBenefit(inst)
     end
 
     if TUNING.SMART_SIGN_DRAW_ENABLE then

@@ -82,13 +82,13 @@ local foods_legion = {
         cook_cant = "冬季盛宴专属",
         recipe_count = 4,
 
-        prefabs = { "sanity_lower", "gift",
-                    "flint", "moonrocknugget", "silk", "nitre", "gears", "ice", "twigs", "rocks", "goldnugget", "cutgrass", "cutreeds", "beefalowool",
-                    "redgem", "bluegem", "greengem", "orangegem", "yellowgem", "opalpreciousgem",
-                    "red_cap", "green_cap", "blue_cap", "spore_tall", "spore_medium", "spore_small",
-                    "mole", "rabbit", "bee", "butterfly", "robin", "robin_winter", "canary", "oceanfish_medium_4", "oceanfish_medium_6", "fireflies",
-                    "glommerfuel", "carrot_seeds", "corn_seeds", "twiggy_nut", "livinglog", "walrus_tusk", "honeycomb", "tentaclespots", "steelwool",
-        },
+        -- prefabs = { "sanity_lower", "gift",
+        --             "flint", "moonrocknugget", "silk", "nitre", "gears", "ice", "twigs", "rocks", "goldnugget", "cutgrass", "cutreeds", "beefalowool",
+        --             "redgem", "bluegem", "greengem", "orangegem", "yellowgem", "opalpreciousgem",
+        --             "red_cap", "green_cap", "blue_cap", "spore_tall", "spore_medium", "spore_small",
+        --             "mole", "rabbit", "bee", "butterfly", "robin", "robin_winter", "canary", "oceanfish_medium_4_inv", "oceanfish_medium_6_inv", "fireflies",
+        --             "glommerfuel", "carrot_seeds", "corn_seeds", "twiggy_nut", "livinglog", "walrus_tusk", "honeycomb", "tentaclespots", "steelwool",
+        -- },
         oneat_desc = STRINGS.UI.COOKBOOK.DISH_MERRYCHRISTMASSALAD,
         oneatenfn = function(inst, eater)   --食用时，有33%几率获得一个小礼物
             if math.random() < 0.33 then
@@ -103,7 +103,7 @@ local foods_legion = {
                     "red_cap", "green_cap", "blue_cap", "spore_tall", "spore_medium", "spore_small",
 
                     --小生物
-                    "mole", "rabbit", "bee", "butterfly", "robin", "robin_winter", "canary", "oceanfish_medium_4", "oceanfish_medium_6", "fireflies",
+                    "mole", "rabbit", "bee", "butterfly", "robin", "robin_winter", "canary", "oceanfish_medium_4_inv", "oceanfish_medium_6_inv", "fireflies",
 
                     --特殊材料
                     "glommerfuel", "carrot", "corn", "twiggy_nut", "livinglog", "walrus_tusk", "honeycomb", "tentaclespots", "steelwool",
@@ -123,14 +123,8 @@ local foods_legion = {
 
                 --选定食用者周围位置
                 local pos = eater:GetPosition()
-                local radius = eater:GetPhysicsRadius(0) + .7 + math.random() * .5
-                local angle = math.random() * 2 * PI
-                local x = pos.x + radius * math.cos(angle)
-                local z = pos.z - radius * math.sin(angle)
-
-                --生成特效与礼物
-                local fx = SpawnPrefab("sanity_lower")
-                fx.Transform:SetPosition(x, 0, z)
+                local x, y, z = GetCalculatedPos_legion(pos.x, 0, pos.z,
+                    eater:GetPhysicsRadius(0) + 0.7 + math.random()*0.5, math.random()*2*PI)
 
                 if eater.SoundEmitter ~= nil then
                     eater.SoundEmitter:PlaySound("dontstarve/creatures/together/deer/bell")
@@ -138,8 +132,15 @@ local foods_legion = {
                     eater.SoundEmitter:PlaySound("dontstarve/common/dropGeneric")
                 end
 
-                if TheWorld.Map:IsAboveGroundAtPoint(x, 0, z) then   --只在有效地面上生成
+                --生成特效与礼物
+                local fx = SpawnPrefab("sanity_lower")
+
+                if TheWorld.Map:IsAboveGroundAtPoint(x, 0, z) then --只在有效地面上生成
+                    fx.Transform:SetPosition(x, 0, z)
                     gift.Transform:SetPosition(x, 0, z)
+                else
+                    fx.Transform:SetPosition(pos:Get())
+                    gift.Transform:SetPosition(pos:Get())
                 end
             end
         end,

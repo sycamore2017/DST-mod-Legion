@@ -743,7 +743,12 @@ end
 ------
 
 local function OnEquip(inst, owner)
-    owner.AnimState:OverrideSymbol("swap_object", inst.prefab, "swap")
+    local skindata = inst.components.skinedlegion:GetSkinedData()
+    if skindata ~= nil and skindata.equip ~= nil then
+        owner.AnimState:OverrideSymbol(skindata.equip.symbol, skindata.equip.build, skindata.equip.file)
+    else
+        owner.AnimState:OverrideSymbol("swap_object", inst.prefab, "swap")
+    end
     owner.AnimState:Show("ARM_carry")
     owner.AnimState:Hide("ARM_normal")
 
@@ -755,7 +760,12 @@ local function OnEquip(inst, owner)
     owner:AddTag("siv_feather")
 end
 local function OnUnequip(inst, owner)
-    owner.AnimState:ClearOverrideSymbol("swap_object")
+    local skindata = inst.components.skinedlegion:GetSkinedData()
+    if skindata ~= nil and skindata.equip ~= nil then
+        owner.AnimState:ClearOverrideSymbol(skindata.equip.symbol)
+    else
+        owner.AnimState:ClearOverrideSymbol("swap_object")
+    end
     owner.AnimState:Hide("ARM_carry")
     owner.AnimState:Show("ARM_normal")
 
@@ -771,7 +781,7 @@ end
 local function OnThrown_fly(inst, owner, targetpos, attacker)
     inst.SoundEmitter:PlaySound("dontstarve/creatures/leif/swipe", nil, 0.2)
 end
-local function OnMiss_fly(basename, inst, targetpos, attacker)
+local function OnMiss_fly(inst, targetpos, attacker)
     if inst.components.projectilelegion.isgoback then
         inst.components.projectilelegion.isgoback = nil
         if attacker and attacker.sivfeathers_l ~= nil then
@@ -783,7 +793,7 @@ local function OnMiss_fly(basename, inst, targetpos, attacker)
             end
             attacker.sivfeathers_l = nil
             if num > 0 then
-                local fea = SpawnPrefab(basename, inst.feather_skin)
+                local fea = SpawnPrefab(inst.feather_name, inst.feather_skin)
                 fea.Transform:SetRotation(inst.Transform:GetRotation())
                 fea.Transform:SetPosition(inst.Transform:GetWorldPosition())
                 if num > 1 then
@@ -803,8 +813,7 @@ local function OnMiss_fly(basename, inst, targetpos, attacker)
             inst.caster ~= nil and IsValid(inst.caster) and
             inst.caster.sivfeathers_l ~= nil
         then
-            local fea = SpawnPrefab(basename.."_blk")
-            fea.feather_skin = inst.feather_skin --undo 皮肤机制还没弄
+            local fea = SpawnPrefab((inst.feather_skin or inst.feather_name).."_blk")
             fea.shootidx = inst.shootidx
             fea.caster = inst.caster
             inst.caster.sivfeathers_l[inst.shootidx] = fea
@@ -812,10 +821,15 @@ local function OnMiss_fly(basename, inst, targetpos, attacker)
             fea.Transform:SetPosition(inst.Transform:GetWorldPosition())
             fea:PushEvent("on_landed")
         else --没有线的话，立即变回正常的羽毛
-            local fea = SpawnPrefab(basename, inst.feather_skin)
+            local fea = SpawnPrefab(inst.feather_name, inst.feather_skin)
             fea.Transform:SetRotation(inst.Transform:GetRotation())
             fea.Transform:SetPosition(inst.Transform:GetWorldPosition())
         end
+        inst:Remove()
+    end
+end
+local function OnHit_fly_fake(inst, targetpos, doer, target)
+    if math.random() < 0.05 then
         inst:Remove()
     end
 end
@@ -875,6 +889,144 @@ elseif CONFIGS_LEGION.SIVFEASTRENGTH == 7 then
     sivfea_hpcost = 4.5
 end
 
+local function InitFeaFx(inst)
+    inst.OnLoad = function(inst, dataa)
+        inst:DoTaskInTime(0.37, function(inst) --如果是加载时，应该恢复为正常的羽毛
+            local fea = SpawnPrefab(inst.feather_name, inst.feather_skin)
+            fea.Transform:SetPosition(inst.Transform:GetWorldPosition())
+            inst:Remove()
+        end)
+    end
+    inst.OnEntitySleep = function(inst) --inst.OnEntitySleep() 比组件的 OnEntitySleep() 先执行
+        --玩家收回时若站得很近，会导致有两个会飞远，所以这里需要阻止其变回正常羽毛
+        if inst.components.projectilelegion ~= nil then
+            if inst.components.projectilelegion.isgoback then
+                inst:Remove()
+                return
+            end
+        end
+
+        local fea = SpawnPrefab(inst.feather_name, inst.feather_skin)
+        fea.Transform:SetRotation(inst.Transform:GetRotation())
+        fea.Transform:SetPosition(inst.Transform:GetWorldPosition())
+        inst:Remove()
+    end
+end
+local function InitFloatable(inst, data)
+    MakeInventoryFloatable(inst, data.size, data.offset_y, data.scale)
+    if data.cut ~= nil then
+        local OnLandedClient_old = inst.components.floater.OnLandedClient
+        inst.components.floater.OnLandedClient = function(self)
+            OnLandedClient_old(self)
+            self.inst.AnimState:SetFloatParams(data.cut, 1, self.bob_percent)
+        end
+    end
+end
+local function MakeWeapon_replace(data)
+    table.insert(prefs, Prefab( --飞行体
+        data.name.."_fly",
+        function()
+            local inst = CreateEntity()
+
+            inst.entity:AddTransform()
+            inst.entity:AddAnimState()
+            inst.entity:AddSoundEmitter()
+            inst.entity:AddNetwork()
+
+            MakeInventoryPhysics(inst)
+            RemovePhysicsColliders(inst)
+
+            inst.AnimState:SetBank(data.name)
+            inst.AnimState:SetBuild(data.name)
+
+            inst:AddTag("sharp")
+            inst:AddTag("nosteal")
+
+            --weapon (from weapon component) added to pristine state for optimization
+            inst:AddTag("weapon")
+
+            if data.fn_common_fly ~= nil then
+                data.fn_common_fly(inst)
+            end
+
+            inst.entity:SetPristine()
+            if not TheWorld.ismastersim then
+                return inst
+            end
+
+            inst.hasline = false
+            inst.shootidx = 1
+            inst.caster = nil
+
+            --因为大力士攻击时会在不判空的情况下直接使用 inventoryitem，为了不崩溃，只能加个这个
+            inst:AddComponent("inventoryitem")
+            inst.components.inventoryitem.pushlandedevents = false
+            inst.components.inventoryitem.canbepickedup = false
+
+            inst:AddComponent("weapon")
+
+            inst:AddComponent("projectilelegion")
+            inst.components.projectilelegion.speed = 45
+            inst.components.projectilelegion.onthrown = OnThrown_fly
+            inst.components.projectilelegion.onmiss = OnMiss_fly
+            if not data.isreal then
+                inst.components.projectilelegion.onhit = OnHit_fly_fake
+            end
+
+            InitFeaFx(inst)
+
+            if data.fn_server_fly ~= nil then
+                data.fn_server_fly(inst)
+            end
+
+            return inst
+        end,
+        nil,
+        nil
+    ))
+
+    table.insert(prefs, Prefab( --滞留体
+        data.name.."_blk",
+        function()
+            local inst = CreateEntity()
+
+            inst.entity:AddTransform()
+            inst.entity:AddAnimState()
+            inst.entity:AddNetwork()
+
+            MakeInventoryPhysics(inst)
+            RemovePhysicsColliders(inst)
+
+            inst.AnimState:SetBank(data.name)
+            inst.AnimState:SetBuild(data.name)
+            inst.Transform:SetEightFaced()
+
+            if data.fn_common_blk ~= nil then
+                data.fn_common_blk(inst)
+            end
+
+            inst.entity:SetPristine()
+            if not TheWorld.ismastersim then
+                return inst
+            end
+
+            inst.hasline = false
+            inst.shootidx = 1
+            inst.caster = nil
+            inst.isblk = true
+
+            InitFeaFx(inst)
+
+            if data.fn_server_blk ~= nil then
+                data.fn_server_blk(inst)
+            end
+
+            return inst
+        end,
+        nil,
+        nil
+    ))
+end
 local function MakeWeapon(data)
     local fea_damage
     local fea_range
@@ -887,51 +1039,6 @@ local function MakeWeapon(data)
         fea_damage = 30.6 --34*0.9
         fea_range = 10
         fea_hpcost = 3
-    end
-
-    local function InitFea(inst)
-        inst.AnimState:SetBank(data.name)
-        inst.AnimState:SetBuild(data.name)
-        inst.AnimState:PlayAnimation("idle", false)
-        inst.Transform:SetEightFaced()
-
-        MakeInventoryFloatable(inst, "small", 0.2, 0.5)
-        local OnLandedClient_old = inst.components.floater.OnLandedClient
-        inst.components.floater.OnLandedClient = function(self)
-            OnLandedClient_old(self)
-            self.inst.AnimState:SetFloatParams(0.04, 1, self.bob_percent)
-        end
-    end
-    local function InitFeaFx(inst)
-        inst.OnSave = function(inst, dataa)
-            if inst.feather_skin then
-                dataa.feather_skin = inst.feather_skin
-            end
-        end
-        inst.OnLoad = function(inst, dataa)
-            if dataa ~= nil and dataa.feather_skin ~= nil then
-                inst.feather_skin = dataa.feather_skin
-            end
-            inst:DoTaskInTime(0.37, function(inst) --如果是加载时，应该恢复为正常的羽毛
-                local fea = SpawnPrefab(data.name, inst.feather_skin)
-                fea.Transform:SetPosition(inst.Transform:GetWorldPosition())
-                inst:Remove()
-            end)
-        end
-        inst.OnEntitySleep = function(inst) --inst.OnEntitySleep() 比组件的 OnEntitySleep() 先执行
-            --玩家收回时若站得很近，会导致有两个会飞远，所以这里需要阻止其变回正常羽毛
-            if inst.components.projectilelegion ~= nil then
-                if inst.components.projectilelegion.isgoback then
-                    inst:Remove()
-                    return
-                end
-            end
-
-            local fea = SpawnPrefab(data.name, inst.feather_skin)
-            fea.Transform:SetRotation(inst.Transform:GetRotation())
-            fea.Transform:SetPosition(inst.Transform:GetWorldPosition())
-            inst:Remove()
-        end
     end
 
     table.insert(prefs, Prefab( --手持物品
@@ -952,7 +1059,14 @@ local function MakeWeapon(data)
             --weapon (from weapon component) added to pristine state for optimization
             inst:AddTag("weapon")
 
-            InitFea(inst)
+            inst.AnimState:SetBank(data.name)
+            inst.AnimState:SetBuild(data.name)
+            inst.AnimState:PlayAnimation("idle", false)
+            inst.Transform:SetEightFaced()
+
+            inst:AddComponent("skinedlegion")
+            inst.components.skinedlegion:InitWithFloater(data.name)
+
             inst.projectiledelay = 2 * FRAMES --不能大于7帧
 
             --Tip：官方的战斗辅助组件。加上后就能右键先瞄准再触发攻击。缺点是会导致其他对象的右键动作全部不起作用
@@ -1055,8 +1169,7 @@ local function MakeWeapon(data)
 
                 local feathers = {}
                 for i,v in ipairs(angles) do
-                    local fly = SpawnPrefab(data.name.."_fly")
-                    fly.feather_skin = nil --undo 皮肤机制还没弄
+                    local fly = SpawnPrefab((inst.skinname or data.name).."_fly")
                     fly.hasline = lines
                     fly.shootidx = i
                     fly.caster = caster
@@ -1099,6 +1212,8 @@ local function MakeWeapon(data)
 
             MakeHauntableLaunch(inst)
 
+            inst.components.skinedlegion:SetOnPreLoad()
+
             return inst
         end,
         {
@@ -1114,103 +1229,49 @@ local function MakeWeapon(data)
         }
     ))
 
-    table.insert(prefs, Prefab( --飞行体
-        data.name.."_fly",
-        function()
-            local inst = CreateEntity()
-
-            inst.entity:AddTransform()
-            inst.entity:AddAnimState()
-            inst.entity:AddSoundEmitter()
-            inst.entity:AddNetwork()
-
-            MakeInventoryPhysics(inst)
-            RemovePhysicsColliders(inst)
-
-            inst.AnimState:SetBank(data.name)
-            inst.AnimState:SetBuild(data.name)
+    MakeWeapon_replace({
+        name = data.name, isreal = data.isreal,
+        fn_common_fly = function(inst)
             inst.AnimState:PlayAnimation("shoot", false)
             inst.AnimState:SetOrientation(ANIM_ORIENTATION.OnGround)
-
-            inst:AddTag("sharp")
-            inst:AddTag("nosteal")
-
-            --weapon (from weapon component) added to pristine state for optimization
-            inst:AddTag("weapon")
-
-            inst.entity:SetPristine()
-            if not TheWorld.ismastersim then
-                return inst
-            end
-
+        end,
+        fn_server_fly = function(inst)
+            inst.feather_name = data.name
             inst.feather_skin = nil
-            inst.hasline = false
-            inst.shootidx = 1
-            inst.caster = nil
-
-            --因为大力士攻击时会在不判空的情况下直接使用 inventoryitem，为了不崩溃，只能加个这个
-            inst:AddComponent("inventoryitem")
-            inst.components.inventoryitem.pushlandedevents = false
-            inst.components.inventoryitem.canbepickedup = false
-
-            inst:AddComponent("weapon")
             inst.components.weapon:SetDamage(fea_damage)
-
-            inst:AddComponent("projectilelegion")
-            inst.components.projectilelegion.speed = 45
             inst.components.projectilelegion.shootrange = fea_range
-            inst.components.projectilelegion.onthrown = OnThrown_fly
-            inst.components.projectilelegion.onmiss = function(inst, targetpos, attacker)
-                OnMiss_fly(data.name, inst, targetpos, attacker)
-            end
-            if not data.isreal then
-                inst.components.projectilelegion.onhit = function(inst, targetpos, doer, target)
-                    if math.random() < 0.05 then
-                        inst:Remove()
-                    end
-                end
-            end
-
-            InitFeaFx(inst)
-
-            return inst
         end,
-        nil,
-        nil
-    ))
-
-    table.insert(prefs, Prefab( --滞留体
-        data.name.."_blk",
-        function()
-            local inst = CreateEntity()
-
-            inst.entity:AddTransform()
-            inst.entity:AddAnimState()
-            inst.entity:AddNetwork()
-
-            MakeInventoryPhysics(inst)
-            RemovePhysicsColliders(inst)
-
-            InitFea(inst)
-
-            inst.entity:SetPristine()
-            if not TheWorld.ismastersim then
-                return inst
-            end
-
+        fn_common_blk = function(inst)
+            inst.AnimState:PlayAnimation("idle", false)
+            InitFloatable(inst, { cut = 0.04, size = "small", offset_y = 0.2, scale = 0.5 })
+        end,
+        fn_server_blk = function(inst)
+            inst.feather_name = data.name
             inst.feather_skin = nil
-            inst.hasline = false
-            inst.shootidx = 1
-            inst.caster = nil
-            inst.isblk = true
+        end
+    })
 
-            InitFeaFx(inst)
-
-            return inst
+    local skinname = data.name.."_paper"
+    MakeWeapon_replace({
+        name = skinname, isreal = data.isreal,
+        fn_common_fly = function(inst)
+            inst.AnimState:PlayAnimation("shoot", true)
         end,
-        nil,
-        nil
-    ))
+        fn_server_fly = function(inst)
+            inst.feather_name = data.name
+            inst.feather_skin = skinname
+            inst.components.weapon:SetDamage(fea_damage)
+            inst.components.projectilelegion.shootrange = fea_range
+        end,
+        fn_common_blk = function(inst)
+            inst.AnimState:PlayAnimation("idle", false)
+            InitFloatable(inst, SKINS_LEGION[skinname].floater)
+        end,
+        fn_server_blk = function(inst)
+            inst.feather_name = data.name
+            inst.feather_skin = skinname
+        end
+    })
 end
 
 ------
@@ -2620,12 +2681,11 @@ table.insert(prefs, Prefab(
                 ----检查是否有能拉回的羽毛
                 local throwed = false
                 local doerpos = doer:GetPosition()
-                local fea_name = nil
                 for _,v in ipairs(doer.sivfeathers_l) do
                     if v and v:IsValid() then
-                        if fea_name == nil then
-                            fea_name = string.sub(v.prefab, 1, -5)
-                        end
+                        -- if fea_name == nil then
+                        --     fea_name = string.sub(v.prefab, 1, -5)
+                        -- end
                         throwed = true
                         break
                     end
@@ -2638,8 +2698,7 @@ table.insert(prefs, Prefab(
                         if v and v:IsValid() then
                             local fly
                             if v.isblk then --是滞留体，需要重新生成飞行体
-                                fly = SpawnPrefab(fea_name.."_fly")
-                                fly.feather_skin = v.feather_skin --undo 皮肤机制还没弄
+                                fly = SpawnPrefab((v.feather_skin or v.feather_name).."_fly")
                                 fly.shootidx = v.shootidx
                                 fly.caster = doer
                                 if doer.sivfeathers_l then --projectilelegion:Throw() 可能会清理 sivfeathers_l
