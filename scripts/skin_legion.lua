@@ -7,6 +7,7 @@ local ischinese = TUNING.LEGION_MOD_LANGUAGES == "chinese"
 table.insert(Assets, Asset("ATLAS", "images/icon_skinbar_shadow_l.xml"))
 table.insert(Assets, Asset("IMAGE", "images/icon_skinbar_shadow_l.tex"))
 table.insert(Assets, Asset("ANIM", "anim/images_minisign_skins1.zip"))
+table.insert(Assets, Asset("ANIM", "anim/images_minisign_skins2.zip"))
 table.insert(PrefabFiles, "fx_ranimbowspark")
 table.insert(PrefabFiles, "skinprefabs_legion")
 
@@ -2344,6 +2345,57 @@ _G.SKINS_LEGION = {
         end,
         exchangefx = { prefab = nil, offset_y = nil, scale = nil }
     },
+
+    siving_feather_real_paper = {
+        base_prefab = "siving_feather_real",
+		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
+
+        skin_id = "6387156a8c2f781db2f7f670",
+        onlyownedshow = true,
+		assets = {
+			Asset("ANIM", "anim/skin/siving_feather_real_paper.zip")
+		},
+        image = { name = nil, atlas = nil, setable = true },
+
+        string = ischinese and { name = "十字纸镖" } or { name = "Cross Paper Dart" },
+
+		anim = {
+            bank = nil, build = nil,
+            anim = nil, isloop_anim = nil, animpush = nil, isloop_animpush = nil,
+            setable = true
+        },
+        equip = {
+            symbol = "lantern_overlay", build = "siving_feather_real_paper", file = "swap",
+            isshield = true
+        },
+        exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
+        floater = { cut = 0.04, size = "small", offset_y = 0.2, scale = 0.5, nofx = nil }
+    },
+    siving_feather_fake_paper = {
+        base_prefab = "siving_feather_fake",
+		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
+
+        skin_id = "6387156a8c2f781db2f7f670",
+        noshopshow = true,
+		assets = {
+			Asset("ANIM", "anim/skin/siving_feather_fake_paper.zip")
+		},
+        image = { name = nil, atlas = nil, setable = true },
+
+        string = ischinese and { name = "四方纸镖" } or { name = "Square Paper Dart" },
+
+		anim = {
+            bank = nil, build = nil,
+            anim = nil, isloop_anim = nil, animpush = nil, isloop_animpush = nil,
+            setable = true
+        },
+        equip = {
+            symbol = "lantern_overlay", build = "siving_feather_fake_paper", file = "swap",
+            isshield = true
+        },
+        exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
+        floater = { cut = 0.04, size = "small", offset_y = 0.2, scale = 0.5, nofx = nil }
+    },
 }
 
 _G.SKIN_IDS_LEGION = {
@@ -2362,7 +2414,7 @@ _G.SKIN_IDS_LEGION = {
         agronssword_taste = true, soul_contracts_taste = true,
         carpet_whitewood_law = true, carpet_whitewood_big_law = true, carpet_whitewood_law2 = true, carpet_whitewood_big_law2 = true,
         icire_rock_day = true,
-        neverfade_paper = true, neverfadebush_paper = true, neverfade_paper2 = true, neverfadebush_paper2 = true,
+        neverfade_paper = true, neverfadebush_paper = true, neverfade_paper2 = true, neverfadebush_paper2 = true, siving_feather_real_paper = true, siving_feather_fake_paper = true,
     },
     ["6278c450c340bf24ab311528"] = { --回忆(5)
         boltwingout_disguiser = true,
@@ -2395,11 +2447,11 @@ _G.SKIN_IDS_LEGION = {
         siving_derivant_lvl0_thanks = true, siving_derivant_lvl1_thanks = true, siving_derivant_lvl2_thanks = true, siving_derivant_lvl3_thanks = true,
         siving_derivant_lvl0_thanks2 = true, siving_derivant_lvl1_thanks2 = true, siving_derivant_lvl2_thanks2 = true, siving_derivant_lvl3_thanks2 = true,
     },
-    ["637f07a28c2f781db2f7f1e8"] = { --4海名扬(8)
+    ["637f07a28c2f781db2f7f1e8"] = { --4海名扬(9)
         agronssword_taste = true, soul_contracts_taste = true,
         carpet_whitewood_law2 = true, carpet_whitewood_big_law2 = true,
         icire_rock_day = true,
-        neverfade_paper = true, neverfadebush_paper = true, neverfade_paper2 = true, neverfadebush_paper2 = true,
+        neverfade_paper = true, neverfadebush_paper = true, neverfade_paper2 = true, neverfadebush_paper2 = true, siving_feather_real_paper = true, siving_feather_fake_paper = true,
     },
 }
 _G.SKIN_IDX_LEGION = {
@@ -2440,7 +2492,7 @@ local skinidxes = { --用以皮肤排序
     "backcub_thanks",
     "fishhomingtool_awesome_thanks", "fishhomingtool_normal_thanks", "fishhomingbait_thanks",
     "siving_turn_collector", "icire_rock_collector", "fimbul_axe_collector", "rosebush_collector", "rosorns_collector",
-    "neverfade_paper", "neverfadebush_paper", "neverfade_paper2", "neverfadebush_paper2",
+    "neverfade_paper", "neverfadebush_paper", "neverfade_paper2", "neverfadebush_paper2", "siving_feather_real_paper", "siving_feather_fake_paper",
     "icire_rock_day",
     "carpet_whitewood_law", "carpet_whitewood_big_law", "carpet_whitewood_law2", "carpet_whitewood_big_law2",
     "agronssword_taste", "soul_contracts_taste",

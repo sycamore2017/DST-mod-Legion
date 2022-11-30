@@ -1841,6 +1841,48 @@ local SkinData = {
             }
         }
     },
+    siving_feather_real_paper = {
+        string = ischinese and {
+            name = "十字四方纸镖",
+            collection = "PAPER", access = "SPECIAL",
+            descitem = "解锁\"子圭玄鸟正羽\"、\"子圭玄鸟绒羽\"的皮肤。",
+            description = "急急急急急急...谁是急急国王？"
+        } or {
+            name = "Cross Square Paper Dart",
+            collection = "PAPER", access = "SPECIAL",
+            descitem = "Unlock \"True Siving Feather\", \"Siving Feather\" skin.",
+            description = "The story was not translated."
+        },
+        height_anim = 265,
+        anims = {
+            {
+                bank = "siving_feather_real_paper", build = "siving_feather_real_paper",
+                anim = "item", anim2 = nil, isloop = false,
+                x = -55, y = 130, scale = 0.38
+            },
+            {
+                symbol = {
+                    { symbol = "lantern_overlay", build = "siving_feather_real_paper", file = "swap", type = 1 },
+                },
+                fn_anim = SetAnim_player,
+                fn_click = SetAnim_player2,
+                x = 35, y = 130, scale = 0.38
+            },
+            {
+                bank = "siving_feather_fake_paper", build = "siving_feather_fake_paper",
+                anim = "item", anim2 = nil, isloop = false,
+                x = -55, y = 0, scale = 0.38
+            },
+            {
+                symbol = {
+                    { symbol = "lantern_overlay", build = "siving_feather_fake_paper", file = "swap", type = 1 },
+                },
+                fn_anim = SetAnim_player,
+                fn_click = SetAnim_player2,
+                x = 35, y = 0, scale = 0.38
+            }
+        }
+    },
 }
 
 local function GetName(skin)

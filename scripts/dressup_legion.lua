@@ -1867,7 +1867,7 @@ end
 --[[ 切换symbol时固定为幻化的装饰 ]]
 --------------------------------------------------------------------------
 
-local SymbolCommDealFn = function(inst, animstate, symbol)
+local function FileDeal_swap(inst, animstate, symbol)
     if inst.components.dressup ~= nil and inst.components.dressup.swaplist[symbol] ~= nil then
         local swapdata = inst.components.dressup.swaplist[symbol]
         if swapdata.type == "swap" then
@@ -1885,10 +1885,37 @@ local SymbolCommDealFn = function(inst, animstate, symbol)
             end
         elseif swapdata.type == "clear" then
             animstate:ClearOverrideSymbol(symbol)
-        elseif swapdata.type == "show" then
+        -- else --还剩 showsym hidesym 在这个情况下不处理
+        end
+        return true
+    else
+        return false
+    end
+end
+local function FileDeal_show(inst, animstate, symbol)
+    if inst.components.dressup ~= nil and inst.components.dressup.swaplist[symbol] ~= nil then
+        local swapdata = inst.components.dressup.swaplist[symbol]
+        if swapdata.type == "swap" or swapdata.type == "showsym" then --都 swap 了，肯定是要显示的
+            animstate:ShowSymbol(symbol)
+        elseif swapdata.type == "hidesym" then
+            animstate:HideSymbol(symbol)
+        else --还剩 clear
+            return false
+        end
+        return true
+    else
+        return false
+    end
+end
+local function SymbolDeal_show(inst, animstate, symbol)
+    if inst.components.dressup ~= nil and inst.components.dressup.swaplist[symbol] ~= nil then
+        local swapdata = inst.components.dressup.swaplist[symbol]
+        if swapdata.type == "show" then
             animstate:Show(symbol)
-        else
+        elseif swapdata.type == "hide" then
             animstate:Hide(symbol)
+        else
+            return false
         end
         return true
     else
@@ -1896,38 +1923,54 @@ local SymbolCommDealFn = function(inst, animstate, symbol)
     end
 end
 
+--显示、隐藏、修改动画文件的"动画通道"
 local hook_OverrideSymbol = UserDataHook.MakeHook("AnimState","OverrideSymbol",
     function(inst, symbol, build, file)
         -- print("----"..symbol.."-"..build.."-"..file)
-        return SymbolCommDealFn(inst, inst.userdatas.AnimState, symbol)
+        return FileDeal_swap(inst, inst.userdatas.AnimState, symbol)
     end
 )
 local hook_OverrideItemSkinSymbol = UserDataHook.MakeHook("AnimState","OverrideItemSkinSymbol",
     function(inst, symbol, ...)
-        return SymbolCommDealFn(inst, inst.userdatas.AnimState, symbol)
+        return FileDeal_swap(inst, inst.userdatas.AnimState, symbol)
     end
 )
 local hook_ClearOverrideSymbol = UserDataHook.MakeHook("AnimState","ClearOverrideSymbol",
     function(inst, symbol, ...)
-        return SymbolCommDealFn(inst, inst.userdatas.AnimState, symbol)
+        return FileDeal_swap(inst, inst.userdatas.AnimState, symbol)
     end
 )
+local hook_ShowSymbol = UserDataHook.MakeHook("AnimState","ShowSymbol",
+    function(inst, symbol, ...)
+        return FileDeal_show(inst, inst.userdatas.AnimState, symbol)
+    end
+)
+local hook_HideSymbol = UserDataHook.MakeHook("AnimState","HideSymbol",
+    function(inst, symbol, ...)
+        return FileDeal_show(inst, inst.userdatas.AnimState, symbol)
+    end
+)
+
+--显示或隐藏动画中的"图片名"
 local hook_Show = UserDataHook.MakeHook("AnimState","Show",
     function(inst, symbol, ...)
-        return SymbolCommDealFn(inst, inst.userdatas.AnimState, symbol)
+        return SymbolDeal_show(inst, inst.userdatas.AnimState, symbol)
     end
 )
 local hook_Hide = UserDataHook.MakeHook("AnimState","Hide",
     function(inst, symbol, ...)
-        return SymbolCommDealFn(inst, inst.userdatas.AnimState, symbol)
+        return SymbolDeal_show(inst, inst.userdatas.AnimState, symbol)
     end
 )
+
 AddPlayerPostInit(function(inst)
     UserDataHook.Hook(inst, hook_OverrideSymbol)
     UserDataHook.Hook(inst, hook_OverrideItemSkinSymbol)
     UserDataHook.Hook(inst, hook_ClearOverrideSymbol)
     UserDataHook.Hook(inst, hook_Show)
     UserDataHook.Hook(inst, hook_Hide)
+    UserDataHook.Hook(inst, hook_ShowSymbol)
+    UserDataHook.Hook(inst, hook_HideSymbol)
 
     inst.AnimState:Hide("LANTERN_OVERLAY") --人物默认清除提灯光效贴图，防止幻化的提灯显示出问题
     inst:AddComponent("dressup")

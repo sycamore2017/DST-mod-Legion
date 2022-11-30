@@ -746,6 +746,11 @@ local function OnEquip(inst, owner)
     local skindata = inst.components.skinedlegion:GetSkinedData()
     if skindata ~= nil and skindata.equip ~= nil then
         owner.AnimState:OverrideSymbol(skindata.equip.symbol, skindata.equip.build, skindata.equip.file)
+        if skindata.equip.isshield then
+            owner.AnimState:Show("LANTERN_OVERLAY")
+            owner.AnimState:HideSymbol("swap_object")
+            owner.AnimState:ClearOverrideSymbol("swap_object")
+        end
     else
         owner.AnimState:OverrideSymbol("swap_object", inst.prefab, "swap")
     end
@@ -763,6 +768,10 @@ local function OnUnequip(inst, owner)
     local skindata = inst.components.skinedlegion:GetSkinedData()
     if skindata ~= nil and skindata.equip ~= nil then
         owner.AnimState:ClearOverrideSymbol(skindata.equip.symbol)
+        if skindata.equip.isshield then
+            owner.AnimState:Hide("LANTERN_OVERLAY")
+            owner.AnimState:ShowSymbol("swap_object")
+        end
     else
         owner.AnimState:ClearOverrideSymbol("swap_object")
     end
@@ -1255,6 +1264,7 @@ local function MakeWeapon(data)
     MakeWeapon_replace({
         name = skinname, isreal = data.isreal,
         fn_common_fly = function(inst)
+            inst.Transform:SetFourFaced()
             inst.AnimState:PlayAnimation("shoot", true)
         end,
         fn_server_fly = function(inst)
