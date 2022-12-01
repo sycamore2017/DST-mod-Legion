@@ -2423,7 +2423,7 @@ _G.SKINS_LEGION = {
         base_prefab = "revolvedmoonlight_item",
 		type = "item", skin_tags = {}, release_group = 555, rarity = raritySpecial,
 
-        skin_id = "",
+        skin_id = "63889eaf8c2f781db2f7f763",
         noshopshow = true,
 		-- assets = {
 		-- 	Asset("ANIM", "anim/skin/revolvedmoonlight_taste.zip")
@@ -2444,7 +2444,7 @@ _G.SKINS_LEGION = {
         base_prefab = "revolvedmoonlight",
 		type = "item", skin_tags = {}, release_group = 555, rarity = raritySpecial,
 
-        skin_id = "",
+        skin_id = "63889eaf8c2f781db2f7f763",
         noshopshow = true,
 		assets = {
 			Asset("ANIM", "anim/skin/revolvedmoonlight_taste.zip"),
@@ -2475,7 +2475,7 @@ _G.SKINS_LEGION = {
         base_prefab = "revolvedmoonlight_pro",
 		type = "item", skin_tags = {}, release_group = 555, rarity = raritySpecial,
 
-        skin_id = "",
+        skin_id = "63889eaf8c2f781db2f7f763",
         onlyownedshow = true,
 		assets = {
 			Asset("ANIM", "anim/skin/revolvedmoonlight_pro_taste.zip")

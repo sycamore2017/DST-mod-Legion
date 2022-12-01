@@ -214,6 +214,18 @@ local InventoryPrefabsList = {  --每个元素的下标值为每种物品栏图�
     siving_feather_real_paper = { build = "images_minisign_skins2" },
     siving_feather_fake_paper = { build = "images_minisign_skins2" },
     soul_contracts_taste = { build = "images_minisign_skins2" },
+    revolvedmoonlight_item_taste = { build = "images_minisign_skins2" },
+    revolvedmoonlight_taste = { build = "images_minisign_skins2" },
+    revolvedmoonlight_pro_taste = { build = "images_minisign_skins2" },
+    revolvedmoonlight_item_taste2 = { build = "images_minisign_skins2" },
+    revolvedmoonlight_taste2 = { build = "images_minisign_skins2" },
+    revolvedmoonlight_pro_taste2 = { build = "images_minisign_skins2" },
+    revolvedmoonlight_item_taste3 = { build = "images_minisign_skins2" },
+    revolvedmoonlight_taste3 = { build = "images_minisign_skins2" },
+    revolvedmoonlight_pro_taste3 = { build = "images_minisign_skins2" },
+    revolvedmoonlight_item_taste4 = { build = "images_minisign_skins2" },
+    revolvedmoonlight_taste4 = { build = "images_minisign_skins2" },
+    revolvedmoonlight_pro_taste4 = { build = "images_minisign_skins2" },
 }
 
 return InventoryPrefabsList
