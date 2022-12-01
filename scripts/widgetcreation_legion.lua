@@ -145,7 +145,6 @@ if CONFIGS_LEGION.PRAYFORRAIN then
             table.insert(params.revolvedmoonlight.widget.slotpos, Vector3(80*x - 80*2 + 72, 80*y - 80*2 + 47, 0))
         end
     end
-
     params.revolvedmoonlight.itemtestfn = TestContainer_base
 
     ------
@@ -158,7 +157,7 @@ if CONFIGS_LEGION.PRAYFORRAIN then
             pos = Vector3(0, 150, 0),
             side_align_tip = 160,
         },
-        type = "chest",
+        type = "chest"
     }
     for y = 0, 2 do --                                                    x轴基础               y轴基础
         table.insert(params.revolvedmoonlight_pro.widget.slotpos, Vector3(-122      , (-77*y) + 80 - (y*2), 0))
@@ -166,8 +165,53 @@ if CONFIGS_LEGION.PRAYFORRAIN then
         table.insert(params.revolvedmoonlight_pro.widget.slotpos, Vector3(-122 + 150, (-77*y) + 80 - (y*2), 0))
         table.insert(params.revolvedmoonlight_pro.widget.slotpos, Vector3(-122 + 225, (-77*y) + 80 - (y*2), 0))
     end
-
     params.revolvedmoonlight_pro.itemtestfn = TestContainer_base
+
+    ------
+
+    local function MakeSkin_revolvedmoonlight(data)
+        local name = "revolvedmoonlight_"..data.skin
+        local animbuild = "ui_"..name.."_4x3"
+        params[name] = {
+            widget = {
+                slotpos = {},
+                animbank = "ui_chest_3x3",
+                animbuild = animbuild,
+                pos = Vector3(0, 150, 0),
+                side_align_tip = 160
+            },
+            type = "chest"
+        }
+        for y = 2, 1, -1 do
+            for x = 0, 2 do
+                table.insert(params[name].widget.slotpos, Vector3(80*x - 80*2 + 72, 80*y - 80*2 + 47, 0))
+            end
+        end
+        params[name].itemtestfn = TestContainer_base
+        table.insert(showmeneed, name)
+
+        name = "revolvedmoonlight_pro_"..data.skin
+        params[name] = {
+            widget = {
+                slotpos = {},
+                animbank = "ui_chest_3x3",
+                animbuild = animbuild,
+                pos = Vector3(0, 150, 0),
+                side_align_tip = 160
+            },
+            type = "chest"
+        }
+        for y = 0, 2 do --                                    x轴基础               y轴基础
+            table.insert(params[name].widget.slotpos, Vector3(-122      , (-77*y) + 80 - (y*2), 0))
+            table.insert(params[name].widget.slotpos, Vector3(-122 + 75 , (-77*y) + 80 - (y*2), 0))
+            table.insert(params[name].widget.slotpos, Vector3(-122 + 150, (-77*y) + 80 - (y*2), 0))
+            table.insert(params[name].widget.slotpos, Vector3(-122 + 225, (-77*y) + 80 - (y*2), 0))
+        end
+        params[name].itemtestfn = TestContainer_base
+        table.insert(showmeneed, name)
+    end
+
+    MakeSkin_revolvedmoonlight({ skin = "taste" })
 
     ------
 

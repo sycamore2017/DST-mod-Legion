@@ -44,9 +44,9 @@ local function MakeItem(sets)
         inst:AddComponent("inventoryitem")
         inst.components.inventoryitem.imagename = basename
         inst.components.inventoryitem.atlasname = "images/inventoryimages/"..basename..".xml"
-        if sets.floatable == nil then
-            inst.components.inventoryitem:SetSinks(true)
-        end
+        -- if sets.floatable == nil then
+        --     inst.components.inventoryitem:SetSinks(true)
+        -- end
 
         inst:AddComponent("upgradekit")
 
@@ -346,8 +346,11 @@ MakeItem({
         Asset("IMAGE", "images/inventoryimages/revolvedmoonlight_item.tex")
     },
     prefabs = { "revolvedmoonlight", "revolvedmoonlight_pro" },
-    floatable = { 0.18, "small", 0.4, 0.55 },
-    -- fn_common = function(inst)end,
+    -- floatable = { 0.18, "small", 0.4, 0.55 },
+    fn_common = function(inst)
+        inst:AddComponent("skinedlegion")
+        inst.components.skinedlegion:InitWithFloater("revolvedmoonlight_item")
+    end,
     fn_server = function(inst)
         inst.components.upgradekit:SetData({
             piggyback = {
@@ -359,6 +362,7 @@ MakeItem({
                 onupgradefn = OnUpgrade_revolved,
             }
         })
+        -- inst.components.skinedlegion:SetOnPreLoad() --它没有装备组件，不需要 OnPreLoad 吧
     end
 })
 
@@ -477,7 +481,6 @@ local function OnOwnerChange(inst)
 end
 
 local function MakeRevolved(sets)
-    local widgetname = sets.ispro and "revolvedmoonlight_pro" or "revolvedmoonlight"
     table.insert(prefs, Prefab(sets.name, function()
         local inst = CreateEntity()
 
@@ -501,16 +504,10 @@ local function MakeRevolved(sets)
         --因为有容器组件，所以不会被猴子、食人花、坎普斯等拿走
         inst:AddTag("NORATCHECK") --mod兼容：永不妥协。该道具不算鼠潮分
 
-        MakeInventoryFloatable(inst, sets.floatable[2], sets.floatable[3], sets.floatable[4])
-        if sets.floatable[1] ~= nil then
-            local OnLandedClient_old = inst.components.floater.OnLandedClient
-            inst.components.floater.OnLandedClient = function(self)
-                OnLandedClient_old(self)
-                self.inst.AnimState:SetFloatParams(sets.floatable[1], 1, self.bob_percent)
-            end
-        end
-
         inst.repair_revolved_l = true
+
+        inst:AddComponent("skinedlegion")
+        inst.components.skinedlegion:InitWithFloater(sets.name)
 
         -- if sets.fn_common ~= nil then
         --     sets.fn_common(inst)
@@ -518,7 +515,7 @@ local function MakeRevolved(sets)
 
         inst.entity:SetPristine()
         if not TheWorld.ismastersim then
-            inst.OnEntityReplicated = function(inst) inst.replica.container:WidgetSetup(widgetname) end
+            inst.OnEntityReplicated = function(inst) inst.replica.container:WidgetSetup(sets.name) end
             return inst
         end
 
@@ -586,7 +583,7 @@ local function MakeRevolved(sets)
         end)
 
         inst:AddComponent("container")
-        inst.components.container:WidgetSetup(widgetname)
+        inst.components.container:WidgetSetup(sets.name)
         inst.components.container.onopenfn = OnOpen_revolved
         inst.components.container.onclosefn = OnClose_revolved
         inst.components.container.skipclosesnd = true
@@ -689,6 +686,8 @@ local function MakeRevolved(sets)
         --     SMART_SIGN_DRAW(inst)
         -- end
 
+        -- inst.components.skinedlegion:SetOnPreLoad() --它没有装备组件，不需要 OnPreLoad 吧
+
         -- if sets.fn_server ~= nil then
         --     sets.fn_server(inst)
         -- end
@@ -711,14 +710,14 @@ end
 
 MakeRevolved({
     name = "revolvedmoonlight",
-    floatable = { 0.1, "med", 0.3, 0.3 },
+    -- floatable = { 0.1, "med", 0.3, 0.3 },
     ispro = nil,
     -- fn_common = function(inst)end,
     -- fn_server = function(inst)end
 })
 MakeRevolved({
     name = "revolvedmoonlight_pro",
-    floatable = { 0.1, "med", 0.3, 0.45 },
+    -- floatable = { 0.1, "med", 0.3, 0.45 },
     ispro = true,
     -- fn_common = function(inst)end,
     -- fn_server = function(inst)end

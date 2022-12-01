@@ -950,6 +950,7 @@ local function MakeWeapon_replace(data)
 
             inst:AddTag("sharp")
             inst:AddTag("nosteal")
+            inst:AddTag("NOCLICK")
 
             --weapon (from weapon component) added to pristine state for optimization
             inst:AddTag("weapon")
@@ -1009,6 +1010,8 @@ local function MakeWeapon_replace(data)
             inst.AnimState:SetBank(data.name)
             inst.AnimState:SetBuild(data.name)
             inst.Transform:SetEightFaced()
+
+            inst:AddTag("NOCLICK")
 
             if data.fn_common_blk ~= nil then
                 data.fn_common_blk(inst)
