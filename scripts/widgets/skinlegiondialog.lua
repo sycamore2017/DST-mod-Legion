@@ -1883,12 +1883,14 @@ local SkinData = {
             }
         }
     },
-    revolvedmoonlight_pro_taste = {
+    revolvedmoonlight_item_taste = {
         string = ischinese and {
+            name = "黄桃芒芒",
             collection = "TASTE", access = "SPECIAL",
             descitem = "解锁\"月轮宝盘套件\"、\"月轮宝盘\"的皮肤。",
             description = "暂无",
         } or {
+            name = "Mango Sundae",
             collection = "TASTE", access = "SPECIAL",
             descitem = "Unlock \"Revolved Moonlight Kit\", \"Revolved Moonlight\" skin.",
             description = "The story was not translated.",

@@ -2421,20 +2421,20 @@ _G.SKINS_LEGION = {
 
     revolvedmoonlight_item_taste = { --芒果
         base_prefab = "revolvedmoonlight_item",
-		type = "item", skin_tags = {}, release_group = 555, rarity = raritySpecial,
+		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
 
         skin_id = "63889eaf8c2f781db2f7f763",
-        noshopshow = true,
-		-- assets = {
-		-- 	Asset("ANIM", "anim/skin/revolvedmoonlight_taste.zip")
-		-- },
+        onlyownedshow = true,
+		assets = {
+			Asset("ANIM", "anim/skin/revolvedmoonlight_item_taste.zip")
+		},
         image = { name = nil, atlas = nil, setable = true },
 
         string = ischinese and { name = "芒果甜筒" } or { name = "Mango Cone" },
 
 		anim = {
-            bank = "revolvedmoonlight_taste", build = "revolvedmoonlight_taste",
-            anim = "idle_item", isloop_anim = nil, animpush = nil, isloop_animpush = nil,
+            bank = nil, build = nil,
+            anim = nil, isloop_anim = nil, animpush = nil, isloop_animpush = nil,
             setable = true
         },
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
@@ -2442,7 +2442,7 @@ _G.SKINS_LEGION = {
     },
     revolvedmoonlight_taste = {
         base_prefab = "revolvedmoonlight",
-		type = "item", skin_tags = {}, release_group = 555, rarity = raritySpecial,
+		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
 
         skin_id = "63889eaf8c2f781db2f7f763",
         noshopshow = true,
@@ -2473,10 +2473,10 @@ _G.SKINS_LEGION = {
     },
     revolvedmoonlight_pro_taste = {
         base_prefab = "revolvedmoonlight_pro",
-		type = "item", skin_tags = {}, release_group = 555, rarity = raritySpecial,
+		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
 
         skin_id = "63889eaf8c2f781db2f7f763",
-        onlyownedshow = true,
+        noshopshow = true,
 		assets = {
 			Asset("ANIM", "anim/skin/revolvedmoonlight_pro_taste.zip")
 		},
