@@ -212,6 +212,9 @@ if CONFIGS_LEGION.PRAYFORRAIN then
     end
 
     MakeSkin_revolvedmoonlight({ skin = "taste" })
+    MakeSkin_revolvedmoonlight({ skin = "taste2" })
+    MakeSkin_revolvedmoonlight({ skin = "taste3" })
+    MakeSkin_revolvedmoonlight({ skin = "taste4" })
 
     ------
 
