@@ -2455,11 +2455,13 @@ _G.SKINS_LEGION = {
         string = ischinese and { name = "芒果冰" } or { name = "Mango Ice Cream" },
 
 		fn_start = function(inst)
+            inst.AnimState:SetScale(0.8, 0.8, 0.8)
             inst.AnimState:SetBank("revolvedmoonlight_taste")
             inst.AnimState:SetBuild("revolvedmoonlight_taste")
             inst.components.container:WidgetSetup("revolvedmoonlight_taste")
         end,
         fn_end = function(inst)
+            inst.AnimState:SetScale(1, 1, 1)
             inst.components.container:WidgetSetup("revolvedmoonlight")
         end,
         fn_start_c = function(inst)
@@ -2485,11 +2487,13 @@ _G.SKINS_LEGION = {
         string = ischinese and { name = "黄桃芒芒" } or { name = "Mango Sundae" },
 
 		fn_start = function(inst)
+            inst.AnimState:SetScale(0.8, 0.8, 0.8)
             inst.AnimState:SetBank("revolvedmoonlight_pro_taste")
             inst.AnimState:SetBuild("revolvedmoonlight_taste")
             inst.components.container:WidgetSetup("revolvedmoonlight_pro_taste")
         end,
         fn_end = function(inst)
+            inst.AnimState:SetScale(1, 1, 1)
             inst.components.container:WidgetSetup("revolvedmoonlight_pro")
         end,
         fn_start_c = function(inst)
@@ -2538,11 +2542,13 @@ _G.SKINS_LEGION = {
         string = ischinese and { name = "草莓冰" } or { name = "Strawberry Ice Cream" },
 
 		fn_start = function(inst)
+            inst.AnimState:SetScale(0.8, 0.8, 0.8)
             inst.AnimState:SetBank("revolvedmoonlight_taste2")
             inst.AnimState:SetBuild("revolvedmoonlight_taste")
             inst.components.container:WidgetSetup("revolvedmoonlight_taste2")
         end,
         fn_end = function(inst)
+            inst.AnimState:SetScale(1, 1, 1)
             inst.components.container:WidgetSetup("revolvedmoonlight")
         end,
         fn_start_c = function(inst)
@@ -2568,15 +2574,191 @@ _G.SKINS_LEGION = {
         string = ischinese and { name = "巧遇莓莓" } or { name = "Strawberry Sundae" },
 
 		fn_start = function(inst)
+            inst.AnimState:SetScale(0.8, 0.8, 0.8)
             inst.AnimState:SetBank("revolvedmoonlight_pro_taste2")
             inst.AnimState:SetBuild("revolvedmoonlight_taste")
             inst.components.container:WidgetSetup("revolvedmoonlight_pro_taste2")
         end,
         fn_end = function(inst)
+            inst.AnimState:SetScale(1, 1, 1)
             inst.components.container:WidgetSetup("revolvedmoonlight_pro")
         end,
         fn_start_c = function(inst)
             inst.replica.container:WidgetSetup("revolvedmoonlight_pro_taste2")
+        end,
+        fn_end_c = function(inst)
+            inst.replica.container:WidgetSetup("revolvedmoonlight_pro")
+        end,
+        exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
+        floater = { cut = 0.1, size = "med", offset_y = 0.3, scale = 0.3, nofx = nil }
+    },
+
+    revolvedmoonlight_item_taste3 = { --柠檬
+        base_prefab = "revolvedmoonlight_item",
+		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
+
+        skin_id = "63889eef8c2f781db2f7f76c",
+        onlyownedshow = true,
+		assets = {
+			Asset("ANIM", "anim/skin/revolvedmoonlight_item_taste3.zip")
+		},
+        image = { name = nil, atlas = nil, setable = true },
+
+        string = ischinese and { name = "柠檬甜筒" } or { name = "Lemon Cone" },
+
+		anim = {
+            bank = nil, build = nil,
+            anim = nil, isloop_anim = nil, animpush = nil, isloop_animpush = nil,
+            setable = true
+        },
+        exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
+        floater = { cut = 0.18, size = "small", offset_y = 0.4, scale = 0.55, nofx = nil }
+    },
+    revolvedmoonlight_taste3 = {
+        base_prefab = "revolvedmoonlight",
+		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
+
+        skin_id = "63889eef8c2f781db2f7f76c",
+        noshopshow = true,
+		assets = {
+			Asset("ANIM", "anim/skin/revolvedmoonlight_taste3.zip"),
+            Asset("ANIM", "anim/skin/ui_revolvedmoonlight_taste3_4x3.zip")
+		},
+        image = { name = nil, atlas = nil, setable = true },
+
+        string = ischinese and { name = "柠檬冰" } or { name = "Lemon Ice Cream" },
+
+		fn_start = function(inst)
+            inst.AnimState:SetScale(0.8, 0.8, 0.8)
+            inst.AnimState:SetBank("revolvedmoonlight_taste3")
+            inst.AnimState:SetBuild("revolvedmoonlight_taste")
+            inst.components.container:WidgetSetup("revolvedmoonlight_taste3")
+        end,
+        fn_end = function(inst)
+            inst.AnimState:SetScale(1, 1, 1)
+            inst.components.container:WidgetSetup("revolvedmoonlight")
+        end,
+        fn_start_c = function(inst)
+            inst.replica.container:WidgetSetup("revolvedmoonlight_taste3")
+        end,
+        fn_end_c = function(inst)
+            inst.replica.container:WidgetSetup("revolvedmoonlight")
+        end,
+        exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
+        floater = { cut = 0.1, size = "med", offset_y = 0.3, scale = 0.3, nofx = nil }
+    },
+    revolvedmoonlight_pro_taste3 = {
+        base_prefab = "revolvedmoonlight_pro",
+		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
+
+        skin_id = "63889eef8c2f781db2f7f76c",
+        noshopshow = true,
+		assets = {
+			Asset("ANIM", "anim/skin/revolvedmoonlight_pro_taste3.zip")
+		},
+        image = { name = nil, atlas = nil, setable = true },
+
+        string = ischinese and { name = "奇异柠檬" } or { name = "Lemon Sundae" },
+
+		fn_start = function(inst)
+            inst.AnimState:SetScale(0.8, 0.8, 0.8)
+            inst.AnimState:SetBank("revolvedmoonlight_pro_taste3")
+            inst.AnimState:SetBuild("revolvedmoonlight_taste")
+            inst.components.container:WidgetSetup("revolvedmoonlight_pro_taste3")
+        end,
+        fn_end = function(inst)
+            inst.AnimState:SetScale(1, 1, 1)
+            inst.components.container:WidgetSetup("revolvedmoonlight_pro")
+        end,
+        fn_start_c = function(inst)
+            inst.replica.container:WidgetSetup("revolvedmoonlight_pro_taste3")
+        end,
+        fn_end_c = function(inst)
+            inst.replica.container:WidgetSetup("revolvedmoonlight_pro")
+        end,
+        exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
+        floater = { cut = 0.1, size = "med", offset_y = 0.3, scale = 0.3, nofx = nil }
+    },
+
+    revolvedmoonlight_item_taste4 = { --黑巧
+        base_prefab = "revolvedmoonlight_item",
+		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
+
+        skin_id = "63889f4b8c2f781db2f7f770",
+        onlyownedshow = true,
+		assets = {
+			Asset("ANIM", "anim/skin/revolvedmoonlight_item_taste4.zip")
+		},
+        image = { name = nil, atlas = nil, setable = true },
+
+        string = ischinese and { name = "黑巧甜筒" } or { name = "Choccy Cone" },
+
+		anim = {
+            bank = nil, build = nil,
+            anim = nil, isloop_anim = nil, animpush = nil, isloop_animpush = nil,
+            setable = true
+        },
+        exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
+        floater = { cut = 0.18, size = "small", offset_y = 0.4, scale = 0.55, nofx = nil }
+    },
+    revolvedmoonlight_taste4 = {
+        base_prefab = "revolvedmoonlight",
+		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
+
+        skin_id = "63889f4b8c2f781db2f7f770",
+        noshopshow = true,
+		assets = {
+			Asset("ANIM", "anim/skin/revolvedmoonlight_taste4.zip"),
+            Asset("ANIM", "anim/skin/ui_revolvedmoonlight_taste4_4x3.zip")
+		},
+        image = { name = nil, atlas = nil, setable = true },
+
+        string = ischinese and { name = "黑巧冰" } or { name = "Choccy Ice Cream" },
+
+		fn_start = function(inst)
+            inst.AnimState:SetScale(0.8, 0.8, 0.8)
+            inst.AnimState:SetBank("revolvedmoonlight_taste4")
+            inst.AnimState:SetBuild("revolvedmoonlight_taste")
+            inst.components.container:WidgetSetup("revolvedmoonlight_taste4")
+        end,
+        fn_end = function(inst)
+            inst.AnimState:SetScale(1, 1, 1)
+            inst.components.container:WidgetSetup("revolvedmoonlight")
+        end,
+        fn_start_c = function(inst)
+            inst.replica.container:WidgetSetup("revolvedmoonlight_taste4")
+        end,
+        fn_end_c = function(inst)
+            inst.replica.container:WidgetSetup("revolvedmoonlight")
+        end,
+        exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
+        floater = { cut = 0.1, size = "med", offset_y = 0.3, scale = 0.3, nofx = nil }
+    },
+    revolvedmoonlight_pro_taste4 = {
+        base_prefab = "revolvedmoonlight_pro",
+		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
+
+        skin_id = "63889f4b8c2f781db2f7f770",
+        noshopshow = true,
+		assets = {
+			Asset("ANIM", "anim/skin/revolvedmoonlight_pro_taste4.zip")
+		},
+        image = { name = nil, atlas = nil, setable = true },
+
+        string = ischinese and { name = "黑色旋涡" } or { name = "Choccy Sundae" },
+
+		fn_start = function(inst)
+            inst.AnimState:SetScale(0.8, 0.8, 0.8)
+            inst.AnimState:SetBank("revolvedmoonlight_pro_taste4")
+            inst.AnimState:SetBuild("revolvedmoonlight_taste")
+            inst.components.container:WidgetSetup("revolvedmoonlight_pro_taste4")
+        end,
+        fn_end = function(inst)
+            inst.AnimState:SetScale(1, 1, 1)
+            inst.components.container:WidgetSetup("revolvedmoonlight_pro")
+        end,
+        fn_start_c = function(inst)
+            inst.replica.container:WidgetSetup("revolvedmoonlight_pro_taste4")
         end,
         fn_end_c = function(inst)
             inst.replica.container:WidgetSetup("revolvedmoonlight_pro")
@@ -2602,6 +2784,8 @@ _G.SKIN_IDS_LEGION = {
         agronssword_taste = true, soul_contracts_taste = true,
         revolvedmoonlight_item_taste = true, revolvedmoonlight_taste = true, revolvedmoonlight_pro_taste = true,
         revolvedmoonlight_item_taste2 = true, revolvedmoonlight_taste2 = true, revolvedmoonlight_pro_taste2 = true,
+        revolvedmoonlight_item_taste3 = true, revolvedmoonlight_taste3 = true, revolvedmoonlight_pro_taste3 = true,
+        revolvedmoonlight_item_taste4 = true, revolvedmoonlight_taste4 = true, revolvedmoonlight_pro_taste4 = true,
         carpet_whitewood_law = true, carpet_whitewood_big_law = true, carpet_whitewood_law2 = true, carpet_whitewood_big_law2 = true,
         icire_rock_day = true,
         neverfade_paper = true, neverfadebush_paper = true, neverfade_paper2 = true, neverfadebush_paper2 = true, siving_feather_real_paper = true, siving_feather_fake_paper = true,
@@ -2641,6 +2825,8 @@ _G.SKIN_IDS_LEGION = {
     },
     ["637f07a28c2f781db2f7f1e8"] = { --4海名扬(9)
         agronssword_taste = true, soul_contracts_taste = true,
+        revolvedmoonlight_item_taste3 = true, revolvedmoonlight_taste3 = true, revolvedmoonlight_pro_taste3 = true,
+        revolvedmoonlight_item_taste4 = true, revolvedmoonlight_taste4 = true, revolvedmoonlight_pro_taste4 = true,
         carpet_whitewood_law2 = true, carpet_whitewood_big_law2 = true,
         icire_rock_day = true,
         neverfade_paper = true, neverfadebush_paper = true, neverfade_paper2 = true, neverfadebush_paper2 = true, siving_feather_real_paper = true, siving_feather_fake_paper = true,
@@ -2690,6 +2876,8 @@ local skinidxes = { --用以皮肤排序
     "agronssword_taste", "soul_contracts_taste",
     "revolvedmoonlight_item_taste", "revolvedmoonlight_taste", "revolvedmoonlight_pro_taste",
     "revolvedmoonlight_item_taste2", "revolvedmoonlight_taste2", "revolvedmoonlight_pro_taste2",
+    "revolvedmoonlight_item_taste3", "revolvedmoonlight_taste3", "revolvedmoonlight_pro_taste3",
+    "revolvedmoonlight_item_taste4", "revolvedmoonlight_taste4", "revolvedmoonlight_pro_taste4",
     "triplegoldenshovelaxe_era", "tripleshovelaxe_era", "lilybush_era", "lileaves_era", "shield_l_log_era", "icire_rock_era", "shield_l_sand_era",
     "orchidbush_disguiser", "boltwingout_disguiser",
     "rosebush_marble", "rosorns_marble", "lilybush_marble", "lileaves_marble", "orchidbush_marble", "orchitwigs_marble",

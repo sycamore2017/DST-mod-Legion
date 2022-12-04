@@ -1911,6 +1911,34 @@ local SkinData = {
         },
         height_anim = 300,
     },
+    revolvedmoonlight_item_taste3 = {
+        string = ischinese and {
+            name = "奇异柠檬",
+            collection = "TASTE", access = "SPECIAL",
+            descitem = "解锁\"月轮宝盘套件\"、\"月轮宝盘\"的皮肤。",
+            description = "暂无",
+        } or {
+            name = "Lemon Sundae",
+            collection = "TASTE", access = "SPECIAL",
+            descitem = "Unlock \"Revolved Moonlight Kit\", \"Revolved Moonlight\" skin.",
+            description = "The story was not translated.",
+        },
+        height_anim = 300,
+    },
+    revolvedmoonlight_item_taste4 = {
+        string = ischinese and {
+            name = "黑色旋涡",
+            collection = "TASTE", access = "SPECIAL",
+            descitem = "解锁\"月轮宝盘套件\"、\"月轮宝盘\"的皮肤。",
+            description = "暂无",
+        } or {
+            name = "Choccy Sundae",
+            collection = "TASTE", access = "SPECIAL",
+            descitem = "Unlock \"Revolved Moonlight Kit\", \"Revolved Moonlight\" skin.",
+            description = "The story was not translated.",
+        },
+        height_anim = 300,
+    },
 }
 
 local function GetName(skin)
