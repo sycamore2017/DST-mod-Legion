@@ -9,7 +9,7 @@ table.insert(Assets, Asset("ANIM", "anim/hat_straw_perd.zip"))
 --[[ 全局幻化数据 ]]
 --------------------------------------------------------------------------
 
-local function Build_symbolswap(dressup, item, buildskin)
+local function Fn_symbolSwap(dressup, item, buildskin)
     local itemswap = {}
 
     if item.components.symbolswapdata ~= nil then
@@ -1018,30 +1018,34 @@ local dressup_data = {
     },
     cavein_boulder = { --洞穴落石
         istallbody = true,
-        buildfn = Build_symbolswap
-        -- buildfn = function(dressup, item, buildskin) --这个没法使用 Build_symbolswap
-        --     local itemswap = {}
+        -- buildfn = Fn_symbolSwap
+        buildfn = function(dressup, item, buildskin) --找不到原因，这个没法使用 Fn_symbolSwap
+            local itemswap = {}
 
-        --     itemswap["swap_body_tall"] = dressup:GetDressData(
-        --         buildskin, "swap_cavein_boulder", "swap_body"..tostring(item.variation or ""), item.GUID, "swap"
-        --     )
+            if buildskin == nil then
+                itemswap["swap_body_tall"] = dressup:GetDressData(
+                    nil, "swap_cavein_boulder", "swap_body"..tostring(item.variation or ""), item.GUID, "swap"
+                )
+            else --Tip: 我怀疑官方贴图切换底层逻辑会强制一个皮肤贴图回归它的通道
+                itemswap["swap_body_tall"] = dressup:GetDressData(
+                    buildskin, "swap_cavein_boulder", "swap_boulder", item.GUID, "swap"
+                )
+            end
 
-        --     return itemswap
-        -- end
+            return itemswap
+        end
     },
-    sunkenchest = --上锁的贝壳宝箱
-    {
+    sunkenchest = { --上锁的贝壳宝箱
         isnoskin = true,
         istallbody = true,
         buildfile = "swap_sunken_treasurechest",
-        buildsymbol = "swap_body",
+        buildsymbol = "swap_body"
     },
-    shell_cluster = --贝壳垃圾堆
-    {
+    shell_cluster = { --贝壳垃圾堆
         isnoskin = true,
         istallbody = true,
         buildfile = "singingshell_cluster",
-        buildsymbol = "swap_body",
+        buildsymbol = "swap_body"
     },
     glassspike_short = { --小尖玻璃雕塑
         isnoskin = true,
@@ -1071,7 +1075,7 @@ local dressup_data = {
         isnoskin = true,
         istallbody = true,
         buildfile = "potato_sack",
-        buildsymbol = "swap_body",
+        buildsymbol = "swap_body"
     },
     armor_bramble = { --荆棘甲
         buildfile = "armor_bramble",
@@ -1136,23 +1140,23 @@ local dressup_data = {
         buildsymbol = "swap_body"
     },
     -- moon_altar --月科技系列的可搬动建筑，独一无二的，不能幻化
-    -- sculpture_knighthead = --骑士的大理石碎片。全图唯一性，不做幻化
-    -- {
+    -- sculpture_knighthead = { --骑士的大理石碎片。全图唯一性，不做幻化
     --     isnoskin = true,
+    --     istallbody = true,
     --     buildfile = "swap_sculpture_knighthead",
-    --     buildsymbol = "swap_body",
+    --     buildsymbol = "swap_body"
     -- },
-    -- sculpture_bishophead = --主教的大理石碎片。全图唯一性，不做幻化
-    -- {
+    -- sculpture_bishophead = { --主教的大理石碎片。全图唯一性，不做幻化
     --     isnoskin = true,
+    --     istallbody = true,
     --     buildfile = "swap_sculpture_bishophead",
-    --     buildsymbol = "swap_body",
+    --     buildsymbol = "swap_body"
     -- },
-    -- sculpture_rooknose = --战车的大理石碎片。全图唯一性，不做幻化
-    -- {
+    -- sculpture_rooknose = { --战车的大理石碎片。全图唯一性，不做幻化
     --     isnoskin = true,
+    --     istallbody = true,
     --     buildfile = "swap_sculpture_rooknose",
-    --     buildsymbol = "swap_body",
+    --     buildsymbol = "swap_body"
     -- },
 
     -------------------------------
@@ -1317,11 +1321,10 @@ local dressup_data = {
         buildfile = "giantsfoot",
         buildsymbol = "swap_body",
     },
-    hat_albicans_mushroom =
-    {
+    hat_albicans_mushroom = {
         isnoskin = true,
         buildfile = "hat_albicans_mushroom",
-        buildsymbol = "swap_hat",
+        buildsymbol = "swap_hat"
     },
     hat_cowboy = {
         isnoskin = true,
@@ -1809,7 +1812,7 @@ for _,v in pairs(pieces) do
     _G.DRESSUP_DATA_LEGION["chesspiece_"..v] = {
         isnoskin = true,
         istallbody = true,
-        buildfn = Build_symbolswap
+        buildfn = Fn_symbolSwap
     }
 end
 pieces = nil
@@ -1836,7 +1839,7 @@ local oversizecrops = {
 local cropdressdata = {
     isnoskin = true,
     istallbody = true,
-    buildfn = Build_symbolswap
+    buildfn = Fn_symbolSwap
 }
 for k,v in pairs(oversizecrops) do
     _G.DRESSUP_DATA_LEGION[k.."_oversized"] = cropdressdata
@@ -1872,6 +1875,7 @@ local function FileDeal_swap(inst, animstate, symbol)
             else
                 animstate:OverrideSymbol(symbol, swapdata.buildfile, swapdata.buildsymbol)
             end
+            -- print("----"..symbol.."-"..swapdata.buildfile.."-"..swapdata.buildsymbol.."-"..tostring(swapdata.buildskin))
         elseif swapdata.type == "clear" then
             animstate:ClearOverrideSymbol(symbol)
         -- else --还剩 showsym hidesym 在这个情况下不处理
@@ -1915,12 +1919,13 @@ end
 --显示、隐藏、修改动画文件的"动画通道"
 local hook_OverrideSymbol = UserDataHook.MakeHook("AnimState","OverrideSymbol",
     function(inst, symbol, build, file)
-        -- print("----"..symbol.."-"..build.."-"..file)
+        -- print("1----"..symbol.."-"..build.."-"..file)
         return FileDeal_swap(inst, inst.userdatas.AnimState, symbol)
     end
 )
 local hook_OverrideItemSkinSymbol = UserDataHook.MakeHook("AnimState","OverrideItemSkinSymbol",
     function(inst, symbol, ...)
+        -- print("2----"..symbol)
         return FileDeal_swap(inst, inst.userdatas.AnimState, symbol)
     end
 )

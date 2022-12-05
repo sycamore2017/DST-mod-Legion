@@ -749,7 +749,7 @@ AddSimPostInit(function()
                 end,
             }
             DRESSUP_DATA["bananafan_big"] = { --芭蕉宝扇
-                isnoskin = true, buildfile = "swap_bananafan_big", buildsymbol = "swap_fan",
+                isnoskin = true, buildfile = "swap_bananafan_big", buildsymbol = "swap_fan"
             }
             DRESSUP_DATA["myth_ruyi"] = { --莹月如意
                 isnoskin = true, buildfile = "myth_ruyi", buildsymbol = "swap_ruyi",
@@ -797,16 +797,22 @@ AddSimPostInit(function()
                 isnoskin = true, buildfile = "myth_weapon_syd", buildsymbol = "swap",
             }
             DRESSUP_DATA["myth_iron_helmet"] = { --铸铁头盔
-                isnoskin = true, buildfile = "myth_iron_helmet", buildsymbol = "swap_hat",
+                isnoskin = true, buildfile = "myth_iron_helmet", buildsymbol = "swap_hat"
             }
             DRESSUP_DATA["myth_iron_broadsword"] = { --铸铁大刀
-                isnoskin = true, buildfile = "myth_iron_broadsword", buildsymbol = "swap_object",
+                isnoskin = true, buildfile = "myth_iron_broadsword", buildsymbol = "swap_object"
             }
             DRESSUP_DATA["myth_iron_battlegear"] = { --铸铁战甲
-                isnoskin = true, buildfile = "myth_iron_battlegear", buildsymbol = "swap_body",
+                isnoskin = true, buildfile = "myth_iron_battlegear", buildsymbol = "swap_body"
             }
             DRESSUP_DATA["myth_food_tr"] = { --糖人
-                isnoskin = true, buildfile = "swap_myth_food_tr", buildsymbol = "image",
+                isnoskin = true, buildfile = "swap_myth_food_tr", buildsymbol = "image"
+            }
+            DRESSUP_DATA["cane_peach"] = { --桃木手杖
+                isnoskin = true, buildfile = "cane_peach", buildsymbol = "swap"
+            }
+            DRESSUP_DATA["myth_gold_staff"] = { --金击子
+                isnoskin = true, buildfile = "myth_gold_staff", buildsymbol = "swap_spear"
             }
         end
 
