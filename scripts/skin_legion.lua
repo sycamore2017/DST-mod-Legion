@@ -2438,6 +2438,7 @@ _G.SKINS_LEGION = {
             setable = true
         },
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
+        linkedskins = { item = "revolvedmoonlight_taste", item_pro = "revolvedmoonlight_pro_taste" },
         floater = { cut = 0.18, size = "small", offset_y = 0.4, scale = 0.55, nofx = nil }
     },
     revolvedmoonlight_taste = {
@@ -2471,6 +2472,7 @@ _G.SKINS_LEGION = {
             inst.replica.container:WidgetSetup("revolvedmoonlight")
         end,
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
+        linkedskins = { item = "revolvedmoonlight_item_taste" },
         floater = { cut = 0.1, size = "med", offset_y = 0.3, scale = 0.3, nofx = nil }
     },
     revolvedmoonlight_pro_taste = {
@@ -2503,6 +2505,7 @@ _G.SKINS_LEGION = {
             inst.replica.container:WidgetSetup("revolvedmoonlight_pro")
         end,
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
+        linkedskins = { item = "revolvedmoonlight_item_taste" },
         floater = { cut = 0.1, size = "med", offset_y = 0.3, scale = 0.3, nofx = nil }
     },
 
@@ -2525,6 +2528,7 @@ _G.SKINS_LEGION = {
             setable = true
         },
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
+        linkedskins = { item = "revolvedmoonlight_taste2", item_pro = "revolvedmoonlight_pro_taste2" },
         floater = { cut = 0.18, size = "small", offset_y = 0.4, scale = 0.55, nofx = nil }
     },
     revolvedmoonlight_taste2 = {
@@ -2558,6 +2562,7 @@ _G.SKINS_LEGION = {
             inst.replica.container:WidgetSetup("revolvedmoonlight")
         end,
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
+        linkedskins = { item = "revolvedmoonlight_item_taste2" },
         floater = { cut = 0.1, size = "med", offset_y = 0.3, scale = 0.3, nofx = nil }
     },
     revolvedmoonlight_pro_taste2 = {
@@ -2590,6 +2595,7 @@ _G.SKINS_LEGION = {
             inst.replica.container:WidgetSetup("revolvedmoonlight_pro")
         end,
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
+        linkedskins = { item = "revolvedmoonlight_item_taste2" },
         floater = { cut = 0.1, size = "med", offset_y = 0.3, scale = 0.3, nofx = nil }
     },
 
@@ -2612,6 +2618,7 @@ _G.SKINS_LEGION = {
             setable = true
         },
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
+        linkedskins = { item = "revolvedmoonlight_taste3", item_pro = "revolvedmoonlight_pro_taste3" },
         floater = { cut = 0.18, size = "small", offset_y = 0.4, scale = 0.55, nofx = nil }
     },
     revolvedmoonlight_taste3 = {
@@ -2645,6 +2652,7 @@ _G.SKINS_LEGION = {
             inst.replica.container:WidgetSetup("revolvedmoonlight")
         end,
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
+        linkedskins = { item = "revolvedmoonlight_item_taste3" },
         floater = { cut = 0.1, size = "med", offset_y = 0.3, scale = 0.3, nofx = nil }
     },
     revolvedmoonlight_pro_taste3 = {
@@ -2677,6 +2685,7 @@ _G.SKINS_LEGION = {
             inst.replica.container:WidgetSetup("revolvedmoonlight_pro")
         end,
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
+        linkedskins = { item = "revolvedmoonlight_item_taste3" },
         floater = { cut = 0.1, size = "med", offset_y = 0.3, scale = 0.3, nofx = nil }
     },
 
@@ -2699,6 +2708,7 @@ _G.SKINS_LEGION = {
             setable = true
         },
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
+        linkedskins = { item = "revolvedmoonlight_taste4", item_pro = "revolvedmoonlight_pro_taste4" },
         floater = { cut = 0.18, size = "small", offset_y = 0.4, scale = 0.55, nofx = nil }
     },
     revolvedmoonlight_taste4 = {
@@ -2732,6 +2742,7 @@ _G.SKINS_LEGION = {
             inst.replica.container:WidgetSetup("revolvedmoonlight")
         end,
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
+        linkedskins = { item = "revolvedmoonlight_item_taste4" },
         floater = { cut = 0.1, size = "med", offset_y = 0.3, scale = 0.3, nofx = nil }
     },
     revolvedmoonlight_pro_taste4 = {
@@ -2764,6 +2775,7 @@ _G.SKINS_LEGION = {
             inst.replica.container:WidgetSetup("revolvedmoonlight_pro")
         end,
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
+        linkedskins = { item = "revolvedmoonlight_item_taste4" },
         floater = { cut = 0.1, size = "med", offset_y = 0.3, scale = 0.3, nofx = nil }
     },
 }

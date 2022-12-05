@@ -335,6 +335,11 @@ local function OnUpgrade_revolved(item, doer, target, result)
         target.components.container:DropEverything()
     end
 
+    local linkdata = item.components.skinedlegion:GetLinkedSkins()
+    if linkdata ~= nil and result.components.skinedlegion ~= nil then
+        result.components.skinedlegion:SetSkin(target.prefab == "piggyback" and linkdata.item or linkdata.item_pro)
+    end
+
     item:Remove() --该道具是一次性的
 end
 
@@ -631,8 +636,13 @@ local function MakeRevolved(sets)
                     end
                 end
             end
+
             --归还套件
-            inst.components.lootdropper:SpawnLootPrefab("revolvedmoonlight_item")
+            local links = inst.components.skinedlegion:GetLinkedSkins()
+            if links ~= nil then
+                inst.components.lootdropper:SpawnLootPrefab("revolvedmoonlight_item", nil,
+                    links.item, nil, worker and worker.userid or nil)
+            end
 
             --特效
             local fx = SpawnPrefab("collapse_small")

@@ -9,7 +9,7 @@ local prefabs = {
     "foliageath_mylove",
 }
 
-local function ItemTradeTest(inst, item)
+local function ItemTradeTest(inst, item, giver)
     local tradeableSwords = {
         rosorns = true,
         lileaves = true,
@@ -21,7 +21,7 @@ local function ItemTradeTest(inst, item)
         -- dish_tomahawksteak = true,
     }
     if item == nil then
-        return false
+        return false, "WRONGSWORD"
     elseif item.foliageath_data ~= nil then --兼容其他mod
         return true
     elseif not tradeableSwords[item.prefab] then
@@ -84,6 +84,8 @@ local function fn()
     inst.components.trader.onaccept = OnSwordGiven
     inst.components.trader.deleteitemonaccept = false --交易时不自动删除
     inst.components.trader.acceptnontradable = true --可以交易无交易组件的物品
+
+    inst:AddComponent("emptyscabbard")
 
     inst:AddComponent("fuel")
     inst.components.fuel.fuelvalue = TUNING.LARGE_FUEL

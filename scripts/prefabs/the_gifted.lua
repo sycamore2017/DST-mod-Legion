@@ -495,8 +495,8 @@ local function fn_contracts()
     inst:AddComponent("locomotor") -- locomotor must be constructed before the stategraph
     inst.components.locomotor:EnableGroundSpeedMultiplier(false)
     inst.components.locomotor.pathcaps = { ignorewalls = true, allowocean = true } --能直接穿墙移动
-    inst.components.locomotor.walkspeed = TUNING.WILSON_WALK_SPEED
-    inst.components.locomotor.runspeed = TUNING.WILSON_RUN_SPEED
+    inst.components.locomotor.walkspeed = 8
+    inst.components.locomotor.runspeed = 8
     inst:SetStateGraph("SGsoul_contracts")
 
     inst.components.skinedlegion:SetOnPreLoad()

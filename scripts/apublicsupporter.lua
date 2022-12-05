@@ -428,10 +428,10 @@ if CONFIGS_LEGION.FLOWERSPOWER or CONFIGS_LEGION.LEGENDOFFALL then --4种花丛�
                 end
 
                 if flower ~= nil then
-                    flower.planted = true   --这里需要改成true，不然会被世界当成一个生成点
+                    flower.planted = true --这里需要改成true，不然会被世界当成一个生成点
                     flower.Transform:SetPosition(self.inst.Transform:GetWorldPosition())
-                    self.flowers = {}
                 end
+                self.flowers = {}
             end
         end
 

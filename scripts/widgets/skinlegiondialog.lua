@@ -394,6 +394,21 @@ local function SetAnim_soul_contracts2(self, anim, data)
     animstate:PushAnimation("proximity_loop", true)
 end
 
+local function SetClick_revolvedmoonlight(self, anim, data)
+    local animstate = anim:GetAnimState()
+    local tag = anim.tag_anim or 1
+
+    if tag == 1 then
+        animstate:PlayAnimation("open")
+        animstate:PushAnimation("opened", true)
+        anim.tag_anim = 2
+    else
+        animstate:PlayAnimation("close")
+        animstate:PushAnimation("closed", false)
+        anim.tag_anim = 1
+    end
+end
+
 local width_skininfo = 260
 local SkinData = {
     rosebush_marble = {
@@ -1895,7 +1910,31 @@ local SkinData = {
             descitem = "Unlock \"Revolved Moonlight Kit\", \"Revolved Moonlight\" skin.",
             description = "The story was not translated.",
         },
-        height_anim = 300,
+        height_anim = 180,
+        anims = {
+            {
+                bank = "ui_chest_3x3", build = "ui_revolvedmoonlight_taste_4x3",
+                anim = "open", anim2 = nil, isloop = false,
+                x = 0, y = 140, scale = 0.24
+            },
+            {
+                bank = "revolvedmoonlight_item_taste", build = "revolvedmoonlight_item_taste",
+                anim = "idle", anim2 = nil, isloop = false,
+                x = 0, y = 0, scale = 0.32
+            },
+            {
+                bank = "revolvedmoonlight_taste", build = "revolvedmoonlight_taste",
+                anim = "close", anim2 = "closed", isloop = false,
+                fn_click = SetClick_revolvedmoonlight,
+                x = -65, y = 0, scale = 0.32
+            },
+            {
+                bank = "revolvedmoonlight_pro_taste", build = "revolvedmoonlight_taste",
+                anim = "close", anim2 = "closed", isloop = false,
+                fn_click = SetClick_revolvedmoonlight,
+                x = 65, y = 0, scale = 0.32
+            }
+        }
     },
     revolvedmoonlight_item_taste2 = {
         string = ischinese and {
@@ -1909,7 +1948,31 @@ local SkinData = {
             descitem = "Unlock \"Revolved Moonlight Kit\", \"Revolved Moonlight\" skin.",
             description = "The story was not translated.",
         },
-        height_anim = 300,
+        height_anim = 180,
+        anims = {
+            {
+                bank = "ui_chest_3x3", build = "ui_revolvedmoonlight_taste2_4x3",
+                anim = "open", anim2 = nil, isloop = false,
+                x = 0, y = 140, scale = 0.24
+            },
+            {
+                bank = "revolvedmoonlight_item_taste2", build = "revolvedmoonlight_item_taste2",
+                anim = "idle", anim2 = nil, isloop = false,
+                x = 0, y = 0, scale = 0.32
+            },
+            {
+                bank = "revolvedmoonlight_taste2", build = "revolvedmoonlight_taste",
+                anim = "close", anim2 = "closed", isloop = false,
+                fn_click = SetClick_revolvedmoonlight,
+                x = -65, y = 0, scale = 0.32
+            },
+            {
+                bank = "revolvedmoonlight_pro_taste2", build = "revolvedmoonlight_taste",
+                anim = "close", anim2 = "closed", isloop = false,
+                fn_click = SetClick_revolvedmoonlight,
+                x = 65, y = 0, scale = 0.32
+            }
+        }
     },
     revolvedmoonlight_item_taste3 = {
         string = ischinese and {
@@ -1923,7 +1986,31 @@ local SkinData = {
             descitem = "Unlock \"Revolved Moonlight Kit\", \"Revolved Moonlight\" skin.",
             description = "The story was not translated.",
         },
-        height_anim = 300,
+        height_anim = 180,
+        anims = {
+            {
+                bank = "ui_chest_3x3", build = "ui_revolvedmoonlight_taste3_4x3",
+                anim = "open", anim2 = nil, isloop = false,
+                x = 0, y = 135, scale = 0.24
+            },
+            {
+                bank = "revolvedmoonlight_item_taste3", build = "revolvedmoonlight_item_taste3",
+                anim = "idle", anim2 = nil, isloop = false,
+                x = 0, y = 0, scale = 0.32
+            },
+            {
+                bank = "revolvedmoonlight_taste3", build = "revolvedmoonlight_taste",
+                anim = "close", anim2 = "closed", isloop = false,
+                fn_click = SetClick_revolvedmoonlight,
+                x = -65, y = 0, scale = 0.32
+            },
+            {
+                bank = "revolvedmoonlight_pro_taste3", build = "revolvedmoonlight_taste",
+                anim = "close", anim2 = "closed", isloop = false,
+                fn_click = SetClick_revolvedmoonlight,
+                x = 65, y = 0, scale = 0.32
+            }
+        }
     },
     revolvedmoonlight_item_taste4 = {
         string = ischinese and {
@@ -1937,7 +2024,31 @@ local SkinData = {
             descitem = "Unlock \"Revolved Moonlight Kit\", \"Revolved Moonlight\" skin.",
             description = "The story was not translated.",
         },
-        height_anim = 300,
+        height_anim = 180,
+        anims = {
+            {
+                bank = "ui_chest_3x3", build = "ui_revolvedmoonlight_taste4_4x3",
+                anim = "open", anim2 = nil, isloop = false,
+                x = 0, y = 140, scale = 0.24
+            },
+            {
+                bank = "revolvedmoonlight_item_taste4", build = "revolvedmoonlight_item_taste4",
+                anim = "idle", anim2 = nil, isloop = false,
+                x = 0, y = 0, scale = 0.32
+            },
+            {
+                bank = "revolvedmoonlight_taste4", build = "revolvedmoonlight_taste",
+                anim = "close", anim2 = "closed", isloop = false,
+                fn_click = SetClick_revolvedmoonlight,
+                x = -65, y = 0, scale = 0.32
+            },
+            {
+                bank = "revolvedmoonlight_pro_taste4", build = "revolvedmoonlight_taste",
+                anim = "close", anim2 = "closed", isloop = false,
+                fn_click = SetClick_revolvedmoonlight,
+                x = 65, y = 0, scale = 0.32
+            }
+        }
     },
 }
 

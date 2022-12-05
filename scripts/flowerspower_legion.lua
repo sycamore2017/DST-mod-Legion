@@ -141,7 +141,7 @@ end
 --[[ 青枝绿叶的修改 ]]
 --------------------------------------------------------------------------
 
---给给予动作加入短动画
+--------给给予动作加入短动画
 AddStategraphPostInit("wilson", function(sg)
     for k, v in pairs(sg.actionhandlers) do
         if v["action"]["id"] == "GIVE" then
@@ -160,7 +160,7 @@ AddStategraphPostInit("wilson", function(sg)
     end
 end)
 
---出鞘action
+--------出鞘action
 local PULLOUTSWORD = Action({ priority = 2, mount_valid = true })
 PULLOUTSWORD.id = "PULLOUTSWORD"
 PULLOUTSWORD.str = STRINGS.ACTIONS_LEGION.PULLOUTSWORD
@@ -176,9 +176,7 @@ AddAction(PULLOUTSWORD)
 
 --往具有某组件的物品添加动作的检测函数，如果满足条件，就向人物的动作可执行表中加入某个动作。right表示是否是右键动作
 AddComponentAction("INVENTORY", "swordscabbard", function(inst, doer, actions, right)
-    if doer.replica.inventory:GetActiveItem() ~= inst then
-        table.insert(actions, ACTIONS.PULLOUTSWORD)
-    end
+    table.insert(actions, ACTIONS.PULLOUTSWORD)
 end)
 AddComponentAction("SCENE", "swordscabbard", function(inst, doer, actions, right)
     if right then
@@ -190,6 +188,42 @@ end)
 AddStategraphActionHandler("wilson", ActionHandler(ACTIONS.PULLOUTSWORD, "doshortaction"))
 AddStategraphActionHandler("wilson_client", ActionHandler(ACTIONS.PULLOUTSWORD, "doshortaction"))
 
+--------右键剑鞘直接尝试入鞘
+local INTOSHEATH_L = Action({ priority = 2, mount_valid = true })
+INTOSHEATH_L.id = "INTOSHEATH_L"
+INTOSHEATH_L.str = STRINGS.ACTIONS.GIVE.SCABBARD
+INTOSHEATH_L.fn = function(act)
+    local obj = act.target or act.invobject
+    if
+        obj ~= nil and
+        obj.components.emptyscabbard ~= nil and obj.components.trader ~= nil and
+        act.doer.components.inventory ~= nil
+    then
+        local sword = act.doer.components.inventory:GetEquippedItem(EQUIPSLOTS.HANDS)
+        local able, reason = obj.components.trader:AbleToAccept(sword, act.doer)
+        if not able then
+            return false, reason
+        end
+
+        obj.components.trader:AcceptGift(act.doer, sword)
+        return true
+    end
+end
+AddAction(INTOSHEATH_L)
+
+AddComponentAction("INVENTORY", "emptyscabbard", function(inst, doer, actions, right)
+    table.insert(actions, ACTIONS.INTOSHEATH_L)
+end)
+AddComponentAction("SCENE", "emptyscabbard", function(inst, doer, actions, right)
+    if right then
+        table.insert(actions, ACTIONS.INTOSHEATH_L)
+    end
+end)
+
+AddStategraphActionHandler("wilson", ActionHandler(ACTIONS.INTOSHEATH_L, "doshortaction"))
+AddStategraphActionHandler("wilson_client", ActionHandler(ACTIONS.INTOSHEATH_L, "doshortaction"))
+
+--------掉落物设定
 if IsServer then
     if CONFIGS_LEGION.FOLIAGEATHCHANCE > 0 then
         --砍粗壮常青树有几率掉青枝绿叶

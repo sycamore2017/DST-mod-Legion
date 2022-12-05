@@ -54,12 +54,12 @@ function Soul_ContractsBrain:OnStart()
 		-- ),
 
 		--跟随契约拥有者
-		Follow(self.inst, function() return self.inst.components.follower.leader end, 0.2, 0.7, 1.2, true),
+		Follow(self.inst, function() return self.inst.components.follower.leader end, 0, 3, 6, true),
 
 		--失去契约拥有者后，原地不动
-		StandStill(self.inst),
+		StandStill(self.inst)
     }, 1)
-    
+
     self.bt = BT(self.inst, root)
 end
 
