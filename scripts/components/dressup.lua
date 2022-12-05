@@ -83,7 +83,6 @@ function DressUp:SetDressTop(itemswap)
     itemswap["HEAD"] = self:GetDressData(nil, nil, nil, nil, "hide")
     itemswap["HEAD_HAT"] = self:GetDressData(nil, nil, nil, nil, "show")
 end
-
 function DressUp:SetDressOpenTop(itemswap)
     itemswap["HAT"] = self:GetDressData(nil, nil, nil, nil, "show")
     itemswap["HAIR_HAT"] = self:GetDressData(nil, nil, nil, nil, "hide")
@@ -114,19 +113,27 @@ function DressUp:InitClear(symbol) --恢复实际展示的默认效果（清除�
     end
     self.inst.AnimState:ClearOverrideSymbol(symbol)
 end
-
 function DressUp:InitHide(symbol) --恢复实际展示的默认效果（隐藏）
     if self.swaplist[symbol] ~= nil then
         return
     end
     self.inst.AnimState:Hide(symbol)
 end
-
 function DressUp:InitShow(symbol) --恢复实际展示的默认效果（显示）
     if self.swaplist[symbol] ~= nil then
         return
     end
     self.inst.AnimState:Show(symbol)
+end
+function DressUp:InitGroupHead()
+    self:InitClear("swap_hat")
+    self:InitHide("HAT")
+    self:InitHide("HAIR_HAT")
+    self:InitShow("HAIR_NOHAT")
+    self:InitShow("HAIR")
+
+    self:InitShow("HEAD")
+    self:InitHide("HEAD_HAT")
 end
 
 -----
@@ -308,14 +315,7 @@ function DressUp:TakeOff(slot, itemdata)  --去幻某个装备栏的装备
                 self:InitClear("lantern_overlay")
                 self:InitHide("LANTERN_OVERLAY")
             elseif slot == EQUIPSLOTS.HEAD then
-                self:InitClear("swap_hat")
-                self:InitHide("HAT")
-                self:InitHide("HAIR_HAT")
-                self:InitShow("HAIR_NOHAT")
-                self:InitShow("HAIR")
-
-                self:InitShow("HEAD")
-                self:InitHide("HEAD_HAT")
+                self:InitGroupHead()
             elseif slot == EQUIPSLOTS.BODY or slot == EQUIPSLOTS.BACK or slot == EQUIPSLOTS.NECK then
                 self:InitClear("swap_body")
                 self:InitClear("backpack")

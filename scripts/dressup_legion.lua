@@ -9,6 +9,19 @@ table.insert(Assets, Asset("ANIM", "anim/hat_straw_perd.zip"))
 --[[ 全局幻化数据 ]]
 --------------------------------------------------------------------------
 
+local function Build_symbolswap(dressup, item, buildskin)
+    local itemswap = {}
+
+    if item.components.symbolswapdata ~= nil then
+        local swap = item.components.symbolswapdata
+        itemswap["swap_body_tall"] = dressup:GetDressData(
+            buildskin, swap.build, swap.symbol, item.GUID, "swap"
+        )
+    end
+
+    return itemswap
+end
+
 local dressup_data = {
     -------------------------------
     --手部-------------------------
@@ -991,8 +1004,7 @@ local dressup_data = {
         buildfile = "armor_trunkvest_winter",
         buildsymbol = "swap_body",
     },
-    reflectivevest =
-    {
+    reflectivevest = {
         buildfile = "torso_reflective",
         buildsymbol = "swap_body",
     },
@@ -1006,15 +1018,16 @@ local dressup_data = {
     },
     cavein_boulder = { --洞穴落石
         istallbody = true,
-        buildfn = function(dressup, item, buildskin)
-            local itemswap = {}
+        buildfn = Build_symbolswap
+        -- buildfn = function(dressup, item, buildskin) --这个没法使用 Build_symbolswap
+        --     local itemswap = {}
 
-            itemswap["swap_body_tall"] = dressup:GetDressData(
-                buildskin, "swap_cavein_boulder", "swap_body"..tostring(item.variation or ""), item.GUID, "swap"
-            )
+        --     itemswap["swap_body_tall"] = dressup:GetDressData(
+        --         buildskin, "swap_cavein_boulder", "swap_body"..tostring(item.variation or ""), item.GUID, "swap"
+        --     )
 
-            return itemswap
-        end,
+        --     return itemswap
+        -- end
     },
     sunkenchest = --上锁的贝壳宝箱
     {
@@ -1030,33 +1043,29 @@ local dressup_data = {
         buildfile = "singingshell_cluster",
         buildsymbol = "swap_body",
     },
-    glassspike_short = --小尖玻璃雕塑
-    {
+    glassspike_short = { --小尖玻璃雕塑
         isnoskin = true,
         istallbody = true,
         buildfile = "swap_glass_spike",
-        buildsymbol = "swap_body_short",
+        buildsymbol = "swap_body_short"
     },
-    glassspike_med = --中尖玻璃雕塑
-    {
+    glassspike_med = { --中尖玻璃雕塑
         isnoskin = true,
         istallbody = true,
         buildfile = "swap_glass_spike",
-        buildsymbol = "swap_body_med",
+        buildsymbol = "swap_body_med"
     },
-    glassspike_tall = --大尖玻璃雕塑
-    {
+    glassspike_tall = { --大尖玻璃雕塑
         isnoskin = true,
         istallbody = true,
         buildfile = "swap_glass_spike",
-        buildsymbol = "swap_body_tall",
+        buildsymbol = "swap_body_tall"
     },
-    glassblock = --钝玻璃雕塑
-    {
+    glassblock = { --钝玻璃雕塑
         isnoskin = true,
         istallbody = true,
         buildfile = "swap_glass_block",
-        buildsymbol = "swap_body",
+        buildsymbol = "swap_body"
     },
     potatosack = { --土豆袋
         isnoskin = true,
@@ -1080,7 +1089,7 @@ local dressup_data = {
         isnoskin = true,
         istallbody = true,
         buildfile = "oceantreenut",
-        buildsymbol = "swap_body",
+        buildsymbol = "swap_body"
     },
     carnival_vest_a = { --叽叽喳喳围巾
         isbackpack = true,
@@ -1340,17 +1349,8 @@ local dressup_data = {
             return itemswap
         end,
         unbuildfn = function(dressup, item)
-            dressup:InitClear("swap_hat")
-            dressup:InitHide("HAT")
-            dressup:InitHide("HAIR_HAT")
-            dressup:InitShow("HAIR_NOHAT")
-            dressup:InitShow("HAIR")
-
-            dressup:InitShow("HEAD")
-            dressup:InitHide("HEAD_HAT")
-
-            --还原牛仔围巾的效果
-            dressup:InitClear("swap_body")
+            dressup:InitGroupHead()
+            dressup:InitClear("swap_body") --还原牛仔围巾的效果
         end,
     },
     hat_lichen = {
@@ -1802,25 +1802,14 @@ local pieces = {
     "kitcoon",
     "catcoon"
 }
-local materials = {
-    "marble", "stone", "moonglass",
-}
+-- local materials = {
+--     "marble", "stone", "moonglass",
+-- }
 for _,v in pairs(pieces) do
-    _G.DRESSUP_DATA_LEGION["chesspiece_"..v] =
-    {
+    _G.DRESSUP_DATA_LEGION["chesspiece_"..v] = {
         isnoskin = true,
         istallbody = true,
-        buildfn = function(dressup, item, buildskin)
-            local itemswap = {}
-
-            if item.materialid ~= nil and materials[item.materialid] ~= nil then
-                itemswap["swap_body_tall"] = dressup:GetDressData(
-                    buildskin, "swap_chesspiece_"..v.."_"..materials[item.materialid], "swap_body", item.GUID, "swap"
-                )
-            end
-
-            return itemswap
-        end,
+        buildfn = Build_symbolswap
     }
 end
 pieces = nil
@@ -1844,22 +1833,10 @@ local oversizecrops = {
     pineananas = "farm_plant_pineananas",
     gourd = "farm_plant_gourd" --【神话书说】巨型葫芦(没有做腐烂状态的)
 }
-local function Build_crops(dressup, item, buildskin)
-    local itemswap = {}
-
-    if item.components.symbolswapdata ~= nil then
-        local swap = item.components.symbolswapdata
-        itemswap["swap_body_tall"] = dressup:GetDressData(
-            nil, swap.build, swap.symbol, item.GUID, "swap"
-        )
-    end
-
-    return itemswap
-end
 local cropdressdata = {
     isnoskin = true,
     istallbody = true,
-    buildfn = Build_crops
+    buildfn = Build_symbolswap
 }
 for k,v in pairs(oversizecrops) do
     _G.DRESSUP_DATA_LEGION[k.."_oversized"] = cropdressdata

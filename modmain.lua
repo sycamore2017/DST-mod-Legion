@@ -635,18 +635,10 @@ AddSimPostInit(function()
                     return itemswap
                 end,
                 unbuildfn = function(dressup, item)
-                    dressup:InitClear("swap_hat")
-                    dressup:InitHide("HAT")
-                    dressup:InitHide("HAIR_HAT")
-                    dressup:InitShow("HAIR_NOHAT")
-                    dressup:InitShow("HAIR")
-
-                    dressup:InitShow("HEAD")
-                    dressup:InitHide("HEAD_HAT")
-
+                    dressup:InitGroupHead()
                     dressup:InitClear("hair")
                     dressup:InitClear("swap_face")
-                end,
+                end
             }
             DRESSUP_DATA["cassock"] = { --袈裟
                 isnoskin = true, buildfile = "cassock", buildsymbol = "swap_body",
@@ -725,7 +717,7 @@ AddSimPostInit(function()
                     dressup:SetDressOpenTop(itemswap)
 
                     return itemswap
-                end,
+                end
             }
             DRESSUP_DATA["myth_bamboo_basket"] = { --竹药篓
                 isnoskin = true,
@@ -1115,9 +1107,94 @@ AddSimPostInit(function()
     -- _G.CONFIGS_LEGION.ENABLEDMODS.FunctionalMedal = TUNING.FUNCTIONAL_MEDAL_IS_OPEN
 
     ----------
+    --奇幻降临：永恒终焉
+    ----------
+    if TUNING.ABIGAIL_WILLIAMS_KEY_CALLMYWEAPON ~= nil or TUNING.AB_YZJXQ_SET ~= nil then
+        if CONFIGS_LEGION.DRESSUP then
+            local DRESSUP_DATA = _G.DRESSUP_DATA_LEGION
+
+            DRESSUP_DATA["abigail_williams_moon_hat"] = { --月之皇冠(仅限该mod角色才能穿戴)
+                isnoskin = true,
+                buildfn = function(dressup, item, buildskin)
+                    local itemswap = {}
+
+                    local owner = dressup.inst
+                    local skin_build = item:GetSkinBuild()
+                    local ownerskin  = owner.components.skinner ~= nil and owner.components.skinner.skin_name or ""
+
+                    if skin_build == "abigail_williams_moon_hat_summer" then --这个皮肤贴图性质只适合她自己
+                        if ownerskin == "abigail_williams_summer" then
+                            itemswap["headbase"] = dressup:GetDressData(
+                                nil, skin_build, "headbase", item.GUID, "swap"
+                            )
+                            itemswap["hair"] = dressup:GetDressData(
+                                nil, skin_build, "hair", item.GUID, "swap"
+                            )
+                        end
+                        dressup:SetDressOpenTop(itemswap)
+                    elseif skin_build == "abigail_williams_moon_hat_season" then
+                        itemswap["swap_hat"] = dressup:GetDressData(
+                            nil, skin_build, owner.prefab == "abigail_williams" and "swap_hat" or "swap_hat_other", item.GUID, "swap"
+                        )
+                        dressup:SetDressTop(itemswap)
+                    elseif skin_build ~= nil then
+                        itemswap["swap_hat"] = dressup:GetDressData(
+                            nil, skin_build, "swap_hat", item.GUID, "swap"
+                        )
+                        dressup:SetDressTop(itemswap)
+                    elseif skin_build == nil then
+                        itemswap["swap_hat"] = dressup:GetDressData(
+                            nil, item.prefab, "swap_hat", item.GUID, "swap"
+                        )
+                        dressup:SetDressOpenTop(itemswap)
+                    end
+
+                    return itemswap
+                end,
+                unbuildfn = function(dressup, item)
+                    local owner = dressup.inst
+                    local skin_build = item:GetSkinBuild()
+                    local ownerskin  = owner.components.skinner ~= nil and owner.components.skinner.skin_name or ""
+                    dressup:InitGroupHead()
+                    if skin_build == "abigail_williams_moon_hat_summer" and ownerskin == "abigail_williams_summer" then
+                        dressup:InitClear("headbase")
+                        dressup:InitClear("hair")
+                    end
+                end
+            }
+            DRESSUP_DATA["ab_tianming"] = { --扭结：天命(仅限该mod角色才能穿戴)
+                isnoskin = true,
+                buildfn = function(dressup, item, buildskin)
+                    local itemswap = {}
+
+                    -- local owner = dressup.inst
+                    local skin_build = item:GetSkinBuild()
+                    -- local ownerskin  = owner.components.skinner ~= nil and owner.components.skinner.skin_name or ""
+
+                    if skin_build == nil then --原皮没贴图
+                        itemswap["backpack"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
+                        itemswap["swap_body"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
+                    else
+                        itemswap["backpack"] = dressup:GetDressData(
+                            nil, skin_build, "backpack", item.GUID, "swap"
+                        )
+                        itemswap["swap_body"] = dressup:GetDressData(
+                            nil, skin_build, "swap_body", item.GUID, "swap"
+                        )
+                    end
+
+                    return itemswap
+                end
+            }
+            DRESSUP_DATA["ab_yzjxq"] = { --月之交响曲
+                isnoskin = true, buildfile = "abigail_williams_wand_full", buildsymbol = "swap_object"
+            }
+        end
+    end
+
+    ----------
     --烹饪食材属性 兼容性修改(官方逻辑没有兼容性，只能自己写个有兼容性的啦)
     ----------
-
     local cooking2 = require("cooking")
     local ingredients_base = cooking2.ingredients
     if ingredients_base then
