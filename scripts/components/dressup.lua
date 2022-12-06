@@ -92,6 +92,24 @@ function DressUp:SetDressOpenTop(itemswap)
     itemswap["HEAD"] = self:GetDressData(nil, nil, nil, nil, "show")
     itemswap["HEAD_HAT"] = self:GetDressData(nil, nil, nil, nil, "hide")
 end
+function DressUp:SetDressTopCover(itemswap) --头部完全不显示
+    itemswap["HAT"] = self:GetDressData(nil, nil, nil, nil, "show")
+    itemswap["HAIR_HAT"] = self:GetDressData(nil, nil, nil, nil, "hide")
+    itemswap["HAIR_NOHAT"] = self:GetDressData(nil, nil, nil, nil, "hide")
+    itemswap["HAIR"] = self:GetDressData(nil, nil, nil, nil, "hide")
+
+    itemswap["HEAD"] = self:GetDressData(nil, nil, nil, nil, "hide")
+    itemswap["HEAD_HAT"] = self:GetDressData(nil, nil, nil, nil, "hide")
+end
+function DressUp:SetDressHand(itemswap)
+    itemswap["whipline"] = self:GetDressData(nil, nil, nil, nil, "clear")
+    itemswap["lantern_overlay"] = self:GetDressData(nil, nil, nil, nil, "clear")
+end
+function DressUp:SetDressShield(itemswap)
+    itemswap["LANTERN_OVERLAY"] = self:GetDressData(nil, nil, nil, nil, "show")
+    itemswap["swap_object"] = self:GetDressData(nil, nil, nil, nil, "clear")
+    itemswap["whipline"] = self:GetDressData(nil, nil, nil, nil, "clear")
+end
 
 function DressUp:GetDressSlot(item, data)
     if data.dressslot ~= nil then

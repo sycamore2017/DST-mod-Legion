@@ -57,7 +57,7 @@ _G.RegistMiniMapImage_legion("refractedmoonlight")
 _G.RegistMiniMapImage_legion("moondungeon")
 _G.RegistMiniMapImage_legion("hiddenmoonlight")
 
-if TUNING.LEGION_BOOKRECIPETABS == "magic" then
+if _G.CONFIGS_LEGION.BOOKRECIPETABS == "magic" then
     AddRecipe2(
         "book_weather", {
             Ingredient("papyrus", 4),

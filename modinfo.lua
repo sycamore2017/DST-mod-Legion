@@ -312,13 +312,44 @@ configuration_options = {
     } or {
         name = "BookRecipetabs",
         label = "《多变的云》制作方式",
-        hover = "设置《多变的云》的制作栏。书中自有黄金屋，还是真理在人间？",
+        hover = "设置《多变的云》的制作栏。决定一本巨著的沉沦或现世。",
         options =
         {
             {description = "书籍栏(默认)", data = "bookbuilder"},
             {description = "魔法栏", data = "magic"},
         },
         default = "bookbuilder",
+    },
+    L and {
+        name = "RevolvedUpdateTimes",
+        label = "Max Upgrade Times of Revolved Moonlight",
+        hover = "Set the maximum upgrade times of Revolved Moonlight.",
+        options = {
+            { description = "4 times", data = 4 },
+            { description = "8 times", data = 8 },
+            { description = "12 times", data = 12 },
+            { description = "16 times", data = 16 },
+            { description = "20 times(default)", data = 20 },
+            { description = "24 times", data = 24 },
+            { description = "30 times", data = 30 },
+            { description = "40 times", data = 40 }
+        },
+        default = 20
+    } or {
+        name = "RevolvedUpdateTimes",
+        label = "月轮宝盘最大升级次数",
+        hover = "设置月轮宝盘的升级次数的最大值。",
+        options = {
+            { description = "4次", data = 4 },
+            { description = "8次", data = 8 },
+            { description = "12次", data = 12 },
+            { description = "16次", data = 16 },
+            { description = "20次(默认)", data = 20 },
+            { description = "24次", data = 24 },
+            { description = "30次", data = 30 },
+            { description = "40次", data = 40 }
+        },
+        default = 20
     },
 
     -----

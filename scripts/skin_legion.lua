@@ -1619,7 +1619,7 @@ _G.SKINS_LEGION = {
 		type = "item", skin_tags = {}, release_group = 555, rarity = raritySpecial,
 
         skin_id = "62df65b58c2f781db2f7998a",
-        onlyownedshow = true,
+        onlyownedshow = true, mustonwedshow = true,
 		assets = {
 			Asset("ANIM", "anim/skin/icire_rock_collector.zip"),
             Asset("ATLAS", "images/inventoryimages_skin/icire_rock1_collector.xml"),
@@ -1810,7 +1810,7 @@ _G.SKINS_LEGION = {
 		type = "item", skin_tags = {}, release_group = 555, rarity = rarityFree,
 
         skin_id = "629cca398c2f781db2f78092",
-        onlyownedshow = true,
+        onlyownedshow = true, mustonwedshow = true,
 		assets = {
 			Asset("ANIM", "anim/skin/backcub_fans.zip"),
 		},
@@ -1871,7 +1871,7 @@ _G.SKINS_LEGION = {
 		type = "item", skin_tags = {}, release_group = 555, rarity = rarityFree,
 
         skin_id = "6309c6e88c2f781db2f7ae20",
-        onlyownedshow = true,
+        onlyownedshow = true, mustonwedshow = true,
 		assets = {
 			Asset("ANIM", "anim/skin/backcub_fans2.zip"),
             Asset("ANIM", "anim/skin/ui_backcub_fans2_2x6.zip"),
@@ -3213,26 +3213,66 @@ if IsServer then
         if skins == nil then
             return
         end
-        if skins["backcub_fans2"] then
-            return
+
+        --2度梅开补偿
+        if not skins["carpet_whitewood_law"] then
+            if
+                ( (skins["lilybush_era"] and 0.5 or 0) +
+                (skins["icire_rock_era"] and 0.5 or 0) +
+                (skins["shield_l_sand_era"] and 0.5 or 0) ) >= 1
+            then
+                skins["carpet_whitewood_law"] = true
+                skins["carpet_whitewood_big_law"] = true
+            end
         end
 
-        for skinname,_ in pairs(SKIN_IDS_LEGION["6278c487c340bf24ab31152c"]) do
-            if not skins[skinname] then
-                return
+        --3尺垂涎补偿
+        if not skins["revolvedmoonlight_item_taste"] or not skins["revolvedmoonlight_item_taste2"] then
+            local countyy = (skins["rosebush_collector"] and 0.5 or 0) +
+                            (skins["lileaves_marble"] and 0.5 or 0) +
+                            (skins["orchitwigs_marble"] and 0.5 or 0) +
+                            (skins["fimbul_axe_collector"] and 1.5 or 0) +
+                            (skins["siving_derivant_lvl0_thanks"] and 0.5 or 0) +
+                            (skins["backcub_thanks"] and 2 or 0)
+            if countyy >= 3 then
+                skins["revolvedmoonlight_item_taste"] = true
+                skins["revolvedmoonlight_taste"] = true
+                skins["revolvedmoonlight_pro_taste"] = true
+                skins["revolvedmoonlight_item_taste2"] = true
+                skins["revolvedmoonlight_taste2"] = true
+                skins["revolvedmoonlight_pro_taste2"] = true
+            elseif countyy >= 1 then
+                if skins["revolvedmoonlight_item_taste"] then
+                    skins["revolvedmoonlight_item_taste2"] = true
+                    skins["revolvedmoonlight_taste2"] = true
+                    skins["revolvedmoonlight_pro_taste2"] = true
+                else
+                    skins["revolvedmoonlight_item_taste"] = true
+                    skins["revolvedmoonlight_taste"] = true
+                    skins["revolvedmoonlight_pro_taste"] = true
+                end
             end
         end
-        for skinname,_ in pairs(SKIN_IDS_LEGION["6278c4acc340bf24ab311530"]) do
-            if not skins[skinname] then
-                return
+
+        --全皮奖励
+        if not skins["backcub_fans2"] then
+            for skinname,_ in pairs(SKIN_IDS_LEGION["6278c487c340bf24ab31152c"]) do
+                if not skins[skinname] then
+                    return
+                end
             end
-        end
-        for skinname,_ in pairs(SKIN_IDS_LEGION["6278c4eec340bf24ab311534"]) do
-            if not skins[skinname] then
-                return
+            for skinname,_ in pairs(SKIN_IDS_LEGION["6278c4acc340bf24ab311530"]) do
+                if not skins[skinname] then
+                    return
+                end
             end
+            for skinname,_ in pairs(SKIN_IDS_LEGION["6278c4eec340bf24ab311534"]) do
+                if not skins[skinname] then
+                    return
+                end
+            end
+            skins["backcub_fans2"] = true
         end
-        skins["backcub_fans2"] = true
     end
 
     local function FnRpc_s2c(userid, handletype, data)

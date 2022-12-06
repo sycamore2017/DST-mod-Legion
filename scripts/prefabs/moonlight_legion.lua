@@ -374,6 +374,13 @@ MakeItem({
 ----------
 ----------
 
+local times_revolved_pro = CONFIGS_LEGION.REVOLVEDUPDATETIMES or 20
+local value_revolved = 5/times_revolved_pro
+local cool_revolved = TUNING.TOTAL_DAY_TIME/times_revolved_pro
+local temp_revolved = 35/times_revolved_pro
+local times_revolved = math.floor(times_revolved_pro/2) + 1
+times_revolved_pro = times_revolved_pro + 1
+
 local function OnOpen_revolved(inst)
     if inst.AnimState:IsCurrentAnimation("opened") or inst.AnimState:IsCurrentAnimation("open") then
         return
@@ -404,7 +411,10 @@ end
 local function ResetRadius(inst)
     local stagenow = inst.components.upgradeable:GetStage()
     if stagenow > 1 then
-        local rad = 0.25 + (stagenow-1)*0.25
+        if stagenow > times_revolved_pro then --在设置变换中，会出现当前等级大于最大等级的情况
+            stagenow = times_revolved_pro
+        end
+        local rad = 0.25 + (stagenow-1)*value_revolved
         if inst.components.inventoryitem.owner ~= nil then --被携带时，发光范围减半
             rad = rad / 2
             inst._light.Light:SetFalloff(0.65)
@@ -537,9 +547,13 @@ local function MakeRevolved(sets)
 
             local count = 1
             local stagenow = inst.components.upgradeable:GetStage()
-            inst.components.rechargeable:Discharge(3+TUNING.TOTAL_DAY_TIME*(21-stagenow)/20)
+            if stagenow > times_revolved_pro then --在设置变换中，会出现当前等级大于最大等级的情况
+                stagenow = times_revolved_pro
+            end
+
+            inst.components.rechargeable:Discharge(3 + cool_revolved*(times_revolved_pro-stagenow))
             CancelTask_heat(inst)
-            stagenow = 7+1.75*(stagenow-1) --7-42
+            stagenow = 7 + temp_revolved*(stagenow-1) --7-42
             inst.task_heat = inst:DoPeriodicTask(0.5, function(inst)
                 if
                     inst._owner_temp == nil or
@@ -563,7 +577,7 @@ local function MakeRevolved(sets)
                 end
 
                 local temper = inst._owner_temp.components.temperature
-                if (temper.current+3.5) < temper.overheattemp then --可不能让温度太高了
+                if (temper.current+8) < temper.overheattemp then --可不能让温度太高了
                     temper:SetTemperature(temper.current + 3.5)
                 else
                     CancelTask_heat(inst)
@@ -660,7 +674,7 @@ local function MakeRevolved(sets)
             ResetRadius(inst)
             inst.components.rechargeable:SetPercent(1) --每次升级，重置冷却时间
         end
-        inst.components.upgradeable.numstages = sets.ispro and 21 or 11
+        inst.components.upgradeable.numstages = sets.ispro and times_revolved_pro or times_revolved
         inst.components.upgradeable.upgradesperstage = 1
 
         inst:AddComponent("rechargeable")

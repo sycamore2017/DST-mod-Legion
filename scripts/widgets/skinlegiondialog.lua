@@ -1444,11 +1444,11 @@ local SkinData = {
     },
     backcub_fans = {
         string = ischinese and {
-            collection = "FANS", access = "FREE",
+            collection = "FANS", access = "SPECIAL",
             descitem = "解锁\"靠背熊\"的皮肤。",
             description = "他叫饭仔，有着简单的几个爱好。吃饭饭，能吃就行；睡觉觉，要抱着他最爱的偶像抱枕才睡得着；不过，他最喜欢的还是给朋友们爱的抱抱。\n--感谢白饭的绘制",
         } or {
-            collection = "FANS", access = "FREE",
+            collection = "FANS", access = "SPECIAL",
             descitem = "Unlock \"Backcub\" skin.",
             description = "The story was not translated.",
         },
@@ -2247,18 +2247,61 @@ function SkinLegionDialog:ResetItems()
 	local selected_skin = self.selected_item ~= nil and self.selected_item.item_key or nil
     local selected_item = nil
 
+    --确定展示配置
+    local myskins = SKINS_CACHE_L[self.owner.userid] or {}
+    -- local myskins = {
+    --     lileaves_marble = true,
+    --     icire_rock_era = true,
+    -- }
+    local expansionshow = false
+    local owned1 = 0
+    local owned2 = 0
+    local owned3 = 0
+    local owned4 = 0
+    for skinname, value in pairs(SKIN_IDS_LEGION["6278c487c340bf24ab31152c"]) do
+        if myskins[skinname] then
+            owned1 = 1
+            break
+        end
+    end
+    for skinname, value in pairs(SKIN_IDS_LEGION["6278c4acc340bf24ab311530"]) do
+        if myskins[skinname] then
+            owned2 = 1
+            break
+        end
+    end
+    for skinname, value in pairs(SKIN_IDS_LEGION["6278c4eec340bf24ab311534"]) do
+        if myskins[skinname] then
+            owned3 = 1
+            break
+        end
+    end
+    for skinname, value in pairs(SKIN_IDS_LEGION["637f07a28c2f781db2f7f1e8"]) do
+        if myskins[skinname] then
+            owned4 = 1
+            break
+        end
+    end
+    if (owned1 + owned2 + owned3 + owned4) >= 2 then
+        expansionshow = true
+    end
+
     --初始化皮肤项
     local items = {}
-    local myskins = SKINS_CACHE_L[self.owner.userid]
     for idx,skinname in pairs(SKIN_IDX_LEGION) do
         local v = SKINS_LEGION[skinname]
         if v ~= nil then
             if not v.noshopshow then
                 local isowned = false
-                if v.skin_id == "freeskins" or (myskins ~= nil and myskins[skinname]) then
+                if v.skin_id == "freeskins" or myskins[skinname] then
                     isowned = true
                 end
-                if not v.onlyownedshow or isowned then
+
+                if
+                    isowned or --自己拥有的
+                    (expansionshow and not v.mustonwedshow) or --拓展显示
+                    (not expansionshow and not v.onlyownedshow) --默认显示
+                then
                     local item = {
                         item_key = skinname,
                         item_id = skinname, --(不管)
@@ -2267,9 +2310,9 @@ function SkinLegionDialog:ResetItems()
                         isfocused = false, --是否处于被鼠标移入状态(不管)
                         isselected = false, --是否处于选中状态
                         isowned = isowned, --是否拥有该皮肤
-                        isunlockable = false, --是否可解锁
+                        isunlockable = not isowned, --是否可解锁
                         idx = nil,
-                        context = nil, --存下的组件
+                        context = nil --存下的组件
                     }
                     table.insert(items, item)
                     -- table.insert(items, item)

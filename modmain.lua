@@ -192,7 +192,8 @@ end
 if GetModConfigData("PrayForRain") then --祈雨祭 bool
     _G.CONFIGS_LEGION.PRAYFORRAIN = true
 
-    TUNING.LEGION_BOOKRECIPETABS = GetModConfigData("BookRecipetabs") --设置多变的云的制作栏 "bookbuilder" "magic"
+    _G.CONFIGS_LEGION.BOOKRECIPETABS = GetModConfigData("BookRecipetabs") --设置多变的云的制作栏 "bookbuilder" "magic"
+    _G.CONFIGS_LEGION.REVOLVEDUPDATETIMES = GetModConfigData("RevolvedUpdateTimes") --月轮宝盘最大升级次数
 end
 
 if GetModConfigData("LegendOfFall") then --丰饶传说 bool
@@ -960,8 +961,7 @@ AddSimPostInit(function()
                 itemswap["swap_hat"] = dressup:GetDressData(
                     buildskin, "aip_horse_head", "swap_hat", item.GUID, "swap"
                 )
-                dressup:SetDressTop(itemswap)
-                itemswap["HEAD_HAT"] = dressup:GetDressData(nil, nil, nil, nil, "hide")
+                dressup:SetDressTopCover(itemswap)
 
                 return itemswap
             end
@@ -974,8 +974,7 @@ AddSimPostInit(function()
                 itemswap["swap_hat"] = dressup:GetDressData(
                     buildskin, "aip_som", "swap_hat", item.GUID, "swap"
                 )
-                dressup:SetDressTop(itemswap)
-                itemswap["HEAD_HAT"] = dressup:GetDressData(nil, nil, nil, nil, "hide")
+                dressup:SetDressTopCover(itemswap)
 
                 return itemswap
             end
@@ -1111,6 +1110,173 @@ AddSimPostInit(function()
     --能力勋章
     ----------
     -- _G.CONFIGS_LEGION.ENABLEDMODS.FunctionalMedal = TUNING.FUNCTIONAL_MEDAL_IS_OPEN
+    if TUNING.FUNCTIONAL_MEDAL_IS_OPEN then
+        if CONFIGS_LEGION.DRESSUP then
+            local DRESSUP_DATA = _G.DRESSUP_DATA_LEGION
+            local function Fn_medal_staff(dressup, item, itemswap, name)
+                itemswap["swap_object"] = dressup:GetDressData(
+                    nil, GetMedalSkinData(item, name), "swap_"..name, item.GUID, "swap"
+                )
+                dressup:SetDressHand(itemswap)
+            end
+
+            DRESSUP_DATA["marbleaxe"] = { --大理石斧头
+                isnoskin = true, buildfile = "swap_marbleaxe", buildsymbol = "swap_marbleaxe"
+            }
+            DRESSUP_DATA["marblepickaxe"] = { --大理石镐
+                isnoskin = true, buildfile = "marblepickaxe", buildsymbol = "swap_marblepickaxe"
+            }
+            DRESSUP_DATA["medal_moonglass_shovel"] = { --月光玻璃铲
+                isnoskin = true, buildfile = "swap_medal_moonglass_shovel", buildsymbol = "swap_shovel"
+            }
+            DRESSUP_DATA["medal_moonglass_hammer"] = { --月光玻璃锤
+                isnoskin = true, buildfile = "swap_medal_moonglass_hammer", buildsymbol = "swap_hammer"
+            }
+            DRESSUP_DATA["medal_moonglass_bugnet"] = { --月光玻璃网
+                isnoskin = true, buildfile = "swap_medal_moonglass_bugnet", buildsymbol = "swap_bugnet"
+            }
+            DRESSUP_DATA["lureplant_rod"] = { --食人花手杖
+                isnoskin = true,
+                buildfn = function(dressup, item, buildskin)
+                    local itemswap = {}
+                    Fn_medal_staff(dressup, item, itemswap, "lureplant_rod")
+                    return itemswap
+                end
+            }
+            DRESSUP_DATA["immortal_staff"] = { --不朽法杖
+                isnoskin = true,
+                buildfn = function(dressup, item, buildskin)
+                    local itemswap = {}
+                    Fn_medal_staff(dressup, item, itemswap, "immortal_staff")
+                    return itemswap
+                end
+            }
+            DRESSUP_DATA["devour_staff"] = { --吞噬法杖
+                isnoskin = true,
+                buildfn = function(dressup, item, buildskin)
+                    local itemswap = {}
+                    Fn_medal_staff(dressup, item, itemswap, "devour_staff")
+                    return itemswap
+                end
+            }
+            DRESSUP_DATA["meteor_staff"] = { --流星法杖
+                isnoskin = true,
+                buildfn = function(dressup, item, buildskin)
+                    local itemswap = {}
+                    Fn_medal_staff(dressup, item, itemswap, "meteor_staff")
+                    return itemswap
+                end
+            }
+            DRESSUP_DATA["medal_skin_staff"] = { --风花雪月
+                isnoskin = true,
+                buildfn = function(dressup, item, buildskin)
+                    local itemswap = {}
+                    Fn_medal_staff(dressup, item, itemswap, "medal_skin_staff")
+                    return itemswap
+                end
+            }
+            DRESSUP_DATA["medal_space_staff"] = { --时空法杖
+                isnoskin = true,
+                buildfn = function(dressup, item, buildskin)
+                    local itemswap = {}
+                    Fn_medal_staff(dressup, item, itemswap, "medal_space_staff")
+                    return itemswap
+                end
+            }
+            DRESSUP_DATA["medal_goathat"] = { --羊角帽
+                isnoskin = true,
+                buildfn = function(dressup, item, buildskin)
+                    local itemswap = {}
+                    itemswap["swap_hat"] = dressup:GetDressData(
+                        nil, GetMedalSkinData(item, "medal_goathat"), "swap_hat", item.GUID, "swap"
+                    )
+                    dressup:SetDressTop(itemswap)
+                    return itemswap
+                end
+            }
+            DRESSUP_DATA["down_filled_coat"] = { --羽绒服
+                isnoskin = true,
+                buildfn = function(dressup, item, buildskin)
+                    local itemswap = {}
+                    itemswap["swap_body"] = dressup:GetDressData(
+                        nil, GetMedalSkinData(item, "down_filled_coat"), "swap_body", item.GUID, "swap"
+                    )
+                    itemswap["backpack"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
+                    return itemswap
+                end
+            }
+            DRESSUP_DATA["hat_blue_crystal"] = { --蓝晶帽
+                isnoskin = true,
+                buildfn = function(dressup, item, buildskin)
+                    local itemswap = {}
+                    itemswap["swap_hat"] = dressup:GetDressData(
+                        nil, "hat_blue_crystal", "swap_hat", item.GUID, "swap"
+                    )
+                    dressup:SetDressTopCover(itemswap)
+                    return itemswap
+                end
+            }
+            DRESSUP_DATA["medal_tentaclespike"] = { --活性触手尖刺
+                isnoskin = true,
+                buildfn = function(dressup, item, buildskin)
+                    local itemswap = {}
+                    itemswap["swap_object"] = dressup:GetDressData(
+                        nil, "medal_tentaclespike", "swap_medal_tentaclespike", item.GUID, "swap"
+                    )
+                    itemswap["whipline"] = dressup:GetDressData(
+                        nil, "swap_whip", "whipline", item.GUID, "swap"
+                    )
+                    return itemswap
+                end
+            }
+            DRESSUP_DATA["sanityrock_mace"] = { --方尖锏
+                isnoskin = true,
+                buildfn = function(dressup, item, buildskin)
+                    local itemswap = {}
+                    Fn_medal_staff(dressup, item, itemswap, "sanityrock_mace")
+                    return itemswap
+                end
+            }
+            DRESSUP_DATA["armor_medal_obsidian"] = { --红晶甲
+                isnoskin = true, buildfile = "armor_medal_obsidian", buildsymbol = "swap_body"
+            }
+            DRESSUP_DATA["armor_blue_crystal"] = { --蓝晶甲
+                isnoskin = true, buildfile = "armor_blue_crystal", buildsymbol = "swap_body"
+            }
+            DRESSUP_DATA["medal_fishingrod"] = { --玻璃钓竿
+                isnoskin = true,
+                buildfn = function(dressup, item, buildskin)
+                    local itemswap = {}
+
+                    local sbuild = GetMedalSkinData(item, "swap_medal_fishingrod")
+                    itemswap["swap_object"] = dressup:GetDressData(
+                        nil, sbuild, "swap_fishingrod", item.GUID, "swap"
+                    )
+                    itemswap["fishingline"] = dressup:GetDressData(
+                        nil, sbuild, "fishingline", item.GUID, "swap"
+                    )
+                    itemswap["FX_fishing"] = dressup:GetDressData(
+                        nil, sbuild, "FX_fishing", item.GUID, "swap"
+                    )
+                    dressup:SetDressHand(itemswap)
+
+                    return itemswap
+                end,
+                unbuildfn = function(dressup, item)
+                    dressup:InitClear("swap_object")
+                    dressup:InitClear("whipline")
+                    dressup:InitClear("lantern_overlay")
+                    dressup:InitHide("LANTERN_OVERLAY")
+
+                    dressup:InitClear("fishingline")
+                    dressup:InitClear("FX_fishing")
+                end
+            }
+            DRESSUP_DATA["medal_glassblock"] = { --不朽晶柱
+                isnoskin = true, istallbody = true, buildfile = "swap_medal_glass_block", buildsymbol = "swap_body"
+            }
+        end
+    end
 
     ----------
     --奇幻降临：永恒终焉

@@ -337,10 +337,7 @@ local dressup_data = {
             itemswap["FX_fishing"] = dressup:GetDressData(
                 buildskin, "swap_fishingrod_ocean", "FX_fishing", item.GUID, "swap"
             )
-
-            --切记，手持物品一定要清除不相关贴图
-            itemswap["lantern_overlay"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
-            itemswap["whipline"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
+            dressup:SetDressHand(itemswap)
 
             return itemswap
         end,
@@ -352,7 +349,7 @@ local dressup_data = {
 
             dressup:InitClear("fishingline")
             dressup:InitClear("FX_fishing")
-        end,
+        end
     },
     reskin_tool = --皮肤扫把
     {
@@ -464,10 +461,7 @@ local dressup_data = {
                     buildskin, "bernie_build", "swap_bernie_idle_willow", item.GUID, "swap"
                 )
             end
-
-            --切记，手持物品一定要清除不相关贴图
-            itemswap["lantern_overlay"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
-            itemswap["whipline"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
+            dressup:SetDressHand(itemswap)
 
             return itemswap
         end,
@@ -1174,9 +1168,7 @@ local dressup_data = {
                 item.components.timer:TimerExists("revolt") and "swap2" or "swap1",
                 item.GUID, "swap"
             )
-            itemswap["LANTERN_OVERLAY"] = dressup:GetDressData(nil, nil, nil, nil, "show")
-            itemswap["swap_object"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
-            itemswap["whipline"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
+            dressup:SetDressShield(itemswap)
 
             return itemswap
         end
@@ -1259,9 +1251,7 @@ local dressup_data = {
                     nil, "shield_l_sand", "swap_shield", item.GUID, "swap"
                 )
             end
-            itemswap["LANTERN_OVERLAY"] = dressup:GetDressData(nil, nil, nil, nil, "show")
-            itemswap["swap_object"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
-            itemswap["whipline"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
+            dressup:SetDressShield(itemswap)
 
             return itemswap
         end
@@ -1282,9 +1272,7 @@ local dressup_data = {
                     nil, "shield_l_log", "swap_shield", item.GUID, "swap"
                 )
             end
-            itemswap["LANTERN_OVERLAY"] = dressup:GetDressData(nil, nil, nil, nil, "show")
-            itemswap["swap_object"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
-            itemswap["whipline"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
+            dressup:SetDressShield(itemswap)
 
             return itemswap
         end
@@ -1309,8 +1297,7 @@ local dressup_data = {
                     nil, "fimbul_axe", "swap_base", item.GUID, "swap"
                 )
             end
-            itemswap["whipline"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
-            itemswap["lantern_overlay"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
+            dressup:SetDressHand(itemswap)
 
             return itemswap
         end
@@ -1402,8 +1389,7 @@ local dressup_data = {
                     nil, "swap_lileaves", "swap_lileaves", item.GUID, "swap"
                 )
             end
-            itemswap["whipline"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
-            itemswap["lantern_overlay"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
+            dressup:SetDressHand(itemswap)
 
             return itemswap
         end
@@ -1435,8 +1421,7 @@ local dressup_data = {
                     )
                 end
             end
-            itemswap["whipline"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
-            itemswap["lantern_overlay"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
+            dressup:SetDressHand(itemswap)
 
             return itemswap
         end,
@@ -1456,8 +1441,7 @@ local dressup_data = {
                     nil, "swap_orchitwigs", "swap_orchitwigs", item.GUID, "swap"
                 )
             end
-            itemswap["whipline"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
-            itemswap["lantern_overlay"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
+            dressup:SetDressHand(itemswap)
 
             return itemswap
         end
@@ -1487,8 +1471,7 @@ local dressup_data = {
                     nil, "swap_rosorns", "swap_rosorns", item.GUID, "swap"
                 )
             end
-            itemswap["whipline"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
-            itemswap["lantern_overlay"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
+            dressup:SetDressHand(itemswap)
 
             return itemswap
         end
@@ -1513,8 +1496,7 @@ local dressup_data = {
                     nil, "tripleshovelaxe", "swap", item.GUID, "swap"
                 )
             end
-            itemswap["whipline"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
-            itemswap["lantern_overlay"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
+            dressup:SetDressHand(itemswap)
 
             return itemswap
         end
@@ -1534,8 +1516,7 @@ local dressup_data = {
                     nil, "triplegoldenshovelaxe", "swap", item.GUID, "swap"
                 )
             end
-            itemswap["whipline"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
-            itemswap["lantern_overlay"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
+            dressup:SetDressHand(itemswap)
 
             return itemswap
         end
@@ -1578,15 +1559,13 @@ local dressup_data = {
         end,
         unbuildfn = function(dressup, item) end, --没啥好恢复的
     },
-    theemperorsscepter =
-    {
+    theemperorsscepter = {
         isnoskin = true,
         buildfn = function(dressup, item, buildskin)
             local itemswap = {}
 
             itemswap["swap_object"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
-            itemswap["whipline"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
-            itemswap["lantern_overlay"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
+            dressup:SetDressHand(itemswap)
 
             return itemswap
         end,
@@ -1608,8 +1587,7 @@ local dressup_data = {
                     nil, "fishhomingtool_awesome", "swap", item.GUID, "swap"
                 )
             end
-            itemswap["whipline"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
-            itemswap["lantern_overlay"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
+            dressup:SetDressHand(itemswap)
 
             return itemswap
         end,
@@ -1629,8 +1607,7 @@ local dressup_data = {
                     nil, "fishhomingbait", "swap1", item.GUID, "swap"
                 )
             end
-            itemswap["whipline"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
-            itemswap["lantern_overlay"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
+            dressup:SetDressHand(itemswap)
 
             return itemswap
         end,
@@ -1847,6 +1824,7 @@ for k,v in pairs(oversizecrops) do
     _G.DRESSUP_DATA_LEGION[k.."_oversized_rotten"] = cropdressdata
 end
 _G.DRESSUP_DATA_LEGION["immortal_fruit_oversized"] = cropdressdata --【能力勋章】巨型不朽果实(没有其他状态的)
+_G.DRESSUP_DATA_LEGION["medal_gift_fruit_oversized"] = cropdressdata --【能力勋章】巨型包果(没有其他状态的)
 
 -------------------
 -------------------
