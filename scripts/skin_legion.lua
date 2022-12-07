@@ -1883,16 +1883,20 @@ _G.SKINS_LEGION = {
         fn_start = function(inst)
             inst.AnimState:SetBank("backcub_fans2")
             inst.AnimState:SetBuild("backcub_fans2")
+            inst.components.container:Close()
             inst.components.container:WidgetSetup("backcub_fans2")
         end,
         fn_end = function(inst)
             CancelRandomSkinAnim(inst)
+            inst.components.container:Close()
             inst.components.container:WidgetSetup("backcub")
         end,
         fn_start_c = function(inst)
+            inst.replica.container:Close()
             inst.replica.container:WidgetSetup("backcub_fans2")
         end,
         fn_end_c = function(inst)
+            inst.replica.container:Close()
             inst.replica.container:WidgetSetup("backcub")
         end,
 
@@ -2456,19 +2460,23 @@ _G.SKINS_LEGION = {
         string = ischinese and { name = "芒果冰" } or { name = "Mango Ice Cream" },
 
 		fn_start = function(inst)
-            inst.AnimState:SetScale(0.8, 0.8, 0.8)
+            inst.AnimState:SetScale(0.85, 0.85, 0.85)
             inst.AnimState:SetBank("revolvedmoonlight_taste")
             inst.AnimState:SetBuild("revolvedmoonlight_taste")
+            inst.components.container:Close() --WidgetSetup 之前一定要先关闭，否则会崩溃
             inst.components.container:WidgetSetup("revolvedmoonlight_taste")
         end,
         fn_end = function(inst)
             inst.AnimState:SetScale(1, 1, 1)
+            inst.components.container:Close()
             inst.components.container:WidgetSetup("revolvedmoonlight")
         end,
         fn_start_c = function(inst)
+            inst.replica.container:Close()
             inst.replica.container:WidgetSetup("revolvedmoonlight_taste")
         end,
         fn_end_c = function(inst)
+            inst.replica.container:Close()
             inst.replica.container:WidgetSetup("revolvedmoonlight")
         end,
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
@@ -2489,19 +2497,23 @@ _G.SKINS_LEGION = {
         string = ischinese and { name = "黄桃芒芒" } or { name = "Mango Sundae" },
 
 		fn_start = function(inst)
-            inst.AnimState:SetScale(0.8, 0.8, 0.8)
+            inst.AnimState:SetScale(0.85, 0.85, 0.85)
             inst.AnimState:SetBank("revolvedmoonlight_pro_taste")
             inst.AnimState:SetBuild("revolvedmoonlight_taste")
+            inst.components.container:Close()
             inst.components.container:WidgetSetup("revolvedmoonlight_pro_taste")
         end,
         fn_end = function(inst)
             inst.AnimState:SetScale(1, 1, 1)
+            inst.components.container:Close()
             inst.components.container:WidgetSetup("revolvedmoonlight_pro")
         end,
         fn_start_c = function(inst)
+            inst.replica.container:Close()
             inst.replica.container:WidgetSetup("revolvedmoonlight_pro_taste")
         end,
         fn_end_c = function(inst)
+            inst.replica.container:Close()
             inst.replica.container:WidgetSetup("revolvedmoonlight_pro")
         end,
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
@@ -2546,19 +2558,23 @@ _G.SKINS_LEGION = {
         string = ischinese and { name = "草莓冰" } or { name = "Strawberry Ice Cream" },
 
 		fn_start = function(inst)
-            inst.AnimState:SetScale(0.8, 0.8, 0.8)
+            inst.AnimState:SetScale(0.85, 0.85, 0.85)
             inst.AnimState:SetBank("revolvedmoonlight_taste2")
             inst.AnimState:SetBuild("revolvedmoonlight_taste")
+            inst.components.container:Close()
             inst.components.container:WidgetSetup("revolvedmoonlight_taste2")
         end,
         fn_end = function(inst)
             inst.AnimState:SetScale(1, 1, 1)
+            inst.components.container:Close()
             inst.components.container:WidgetSetup("revolvedmoonlight")
         end,
         fn_start_c = function(inst)
+            inst.replica.container:Close()
             inst.replica.container:WidgetSetup("revolvedmoonlight_taste2")
         end,
         fn_end_c = function(inst)
+            inst.replica.container:Close()
             inst.replica.container:WidgetSetup("revolvedmoonlight")
         end,
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
@@ -2579,19 +2595,23 @@ _G.SKINS_LEGION = {
         string = ischinese and { name = "巧遇莓莓" } or { name = "Strawberry Sundae" },
 
 		fn_start = function(inst)
-            inst.AnimState:SetScale(0.8, 0.8, 0.8)
+            inst.AnimState:SetScale(0.85, 0.85, 0.85)
             inst.AnimState:SetBank("revolvedmoonlight_pro_taste2")
             inst.AnimState:SetBuild("revolvedmoonlight_taste")
+            inst.components.container:Close()
             inst.components.container:WidgetSetup("revolvedmoonlight_pro_taste2")
         end,
         fn_end = function(inst)
             inst.AnimState:SetScale(1, 1, 1)
+            inst.components.container:Close()
             inst.components.container:WidgetSetup("revolvedmoonlight_pro")
         end,
         fn_start_c = function(inst)
+            inst.replica.container:Close()
             inst.replica.container:WidgetSetup("revolvedmoonlight_pro_taste2")
         end,
         fn_end_c = function(inst)
+            inst.replica.container:Close()
             inst.replica.container:WidgetSetup("revolvedmoonlight_pro")
         end,
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
@@ -2636,19 +2656,23 @@ _G.SKINS_LEGION = {
         string = ischinese and { name = "柠檬冰" } or { name = "Lemon Ice Cream" },
 
 		fn_start = function(inst)
-            inst.AnimState:SetScale(0.8, 0.8, 0.8)
+            inst.AnimState:SetScale(0.85, 0.85, 0.85)
             inst.AnimState:SetBank("revolvedmoonlight_taste3")
             inst.AnimState:SetBuild("revolvedmoonlight_taste")
+            inst.components.container:Close()
             inst.components.container:WidgetSetup("revolvedmoonlight_taste3")
         end,
         fn_end = function(inst)
             inst.AnimState:SetScale(1, 1, 1)
+            inst.components.container:Close()
             inst.components.container:WidgetSetup("revolvedmoonlight")
         end,
         fn_start_c = function(inst)
+            inst.replica.container:Close()
             inst.replica.container:WidgetSetup("revolvedmoonlight_taste3")
         end,
         fn_end_c = function(inst)
+            inst.replica.container:Close()
             inst.replica.container:WidgetSetup("revolvedmoonlight")
         end,
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
@@ -2669,19 +2693,23 @@ _G.SKINS_LEGION = {
         string = ischinese and { name = "奇异柠檬" } or { name = "Lemon Sundae" },
 
 		fn_start = function(inst)
-            inst.AnimState:SetScale(0.8, 0.8, 0.8)
+            inst.AnimState:SetScale(0.85, 0.85, 0.85)
             inst.AnimState:SetBank("revolvedmoonlight_pro_taste3")
             inst.AnimState:SetBuild("revolvedmoonlight_taste")
+            inst.components.container:Close()
             inst.components.container:WidgetSetup("revolvedmoonlight_pro_taste3")
         end,
         fn_end = function(inst)
             inst.AnimState:SetScale(1, 1, 1)
+            inst.components.container:Close()
             inst.components.container:WidgetSetup("revolvedmoonlight_pro")
         end,
         fn_start_c = function(inst)
+            inst.replica.container:Close()
             inst.replica.container:WidgetSetup("revolvedmoonlight_pro_taste3")
         end,
         fn_end_c = function(inst)
+            inst.replica.container:Close()
             inst.replica.container:WidgetSetup("revolvedmoonlight_pro")
         end,
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
@@ -2726,19 +2754,23 @@ _G.SKINS_LEGION = {
         string = ischinese and { name = "黑巧冰" } or { name = "Choccy Ice Cream" },
 
 		fn_start = function(inst)
-            inst.AnimState:SetScale(0.8, 0.8, 0.8)
+            inst.AnimState:SetScale(0.85, 0.85, 0.85)
             inst.AnimState:SetBank("revolvedmoonlight_taste4")
             inst.AnimState:SetBuild("revolvedmoonlight_taste")
+            inst.components.container:Close()
             inst.components.container:WidgetSetup("revolvedmoonlight_taste4")
         end,
         fn_end = function(inst)
             inst.AnimState:SetScale(1, 1, 1)
+            inst.components.container:Close()
             inst.components.container:WidgetSetup("revolvedmoonlight")
         end,
         fn_start_c = function(inst)
+            inst.replica.container:Close()
             inst.replica.container:WidgetSetup("revolvedmoonlight_taste4")
         end,
         fn_end_c = function(inst)
+            inst.replica.container:Close()
             inst.replica.container:WidgetSetup("revolvedmoonlight")
         end,
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
@@ -2759,19 +2791,23 @@ _G.SKINS_LEGION = {
         string = ischinese and { name = "黑色旋涡" } or { name = "Choccy Sundae" },
 
 		fn_start = function(inst)
-            inst.AnimState:SetScale(0.8, 0.8, 0.8)
+            inst.AnimState:SetScale(0.85, 0.85, 0.85)
             inst.AnimState:SetBank("revolvedmoonlight_pro_taste4")
             inst.AnimState:SetBuild("revolvedmoonlight_taste")
+            inst.components.container:Close()
             inst.components.container:WidgetSetup("revolvedmoonlight_pro_taste4")
         end,
         fn_end = function(inst)
             inst.AnimState:SetScale(1, 1, 1)
+            inst.components.container:Close()
             inst.components.container:WidgetSetup("revolvedmoonlight_pro")
         end,
         fn_start_c = function(inst)
+            inst.replica.container:Close()
             inst.replica.container:WidgetSetup("revolvedmoonlight_pro_taste4")
         end,
         fn_end_c = function(inst)
+            inst.replica.container:Close()
             inst.replica.container:WidgetSetup("revolvedmoonlight_pro")
         end,
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
