@@ -1270,7 +1270,7 @@ local SkinData = {
         string = ischinese and {
             collection = "COLLECTOR", access = "SPECIAL",
             descitem = "解锁\"蔷薇花丛\"、\"带刺蔷薇\"以及入鞘后的皮肤。",
-            description = "作为银河系最大的军阀统领，从小便渴望权利与力量。他用尽半生精力，终于在极其遥远的星云残骸中找到传说中能贯穿星辰的神剑。他带着贯星剑回到了自己的星球，憧憬着一统宇宙成为唯一的神……他高傲自豪地在高台上举起贯星剑，正准备发起向其他银河统领的宣战时，剑体却突然碎裂开来，化作无数金色光束向地面射去。在众人诧异中，地面开始朽化龟裂，水晶般的荆棘开始迅速长出，不断往周围蔓延。整个星球失去了生机，他也在崩坏与腐朽中失踪。",
+            description = "作为银河系最大的军阀统领，从小便渴望权利与力量。他用尽半生精力，终于在极其遥远的星云残骸中找到传说中能贯穿星辰的神剑。他带着贯星剑回到了自己的星球，憧憬着一统宇宙成为唯一的神……\n他高傲自豪地在高台上举起贯星剑，正准备发起向其他银河统领的宣战时，剑体却突然碎裂开来，化作无数金色光束向地面射去。在众人诧异中，地面开始朽化龟裂，水晶般的荆棘开始迅速长出，不断往周围蔓延。整个星球失去了生机，他也在崩坏与腐朽中失踪。",
         } or {
             collection = "COLLECTOR", access = "SPECIAL",
             descitem = "Unlock \"Rose Bush\", \"Rosorns\" skin.",
@@ -1545,7 +1545,7 @@ local SkinData = {
         string = ischinese and {
             collection = "TASTE", access = "SPECIAL",
             descitem = "解锁\"艾力冈的剑\"的皮肤。",
-            description = "急急急急急急...谁是急急国王？"
+            description = "米歇尔凌晨就起床，在厨房和面、醒面、擀面，还用上了烤箱。很快来到早上，丈夫奥多穿着整洁的军装下楼，米歇尔赶紧端上来一大盘法棍，并往法棍上撒上一层糖霜，她知道奥多最喜欢加这个。两人的早餐是糖霜法棍，美味夹杂着别离，因为奥多马上要应征上战场，在如今非常动荡的时期。奥多怀揣家国情怀，觉得这是一份荣耀；米歇尔担心丈夫，期盼他一定要安全归来……"
         } or {
             collection = "TASTE", access = "SPECIAL",
             descitem = "Unlock \"Agron's Sword\" skin.",
@@ -1596,7 +1596,7 @@ local SkinData = {
             name = "西洋棋棋盘",
             collection = "LAW", access = "SPECIAL",
             descitem = "解锁\"白木地垫\"、\"白木地毯\"的皮肤。",
-            description = "急急急急急急...谁是急急国王？"
+            description = "不大不小的棋盘上，我方对方。每一颗棋子都是我的工具，让我在每一个方格上施展自己的权谋。不管是开局，结局，残局，败局，我都心思缜密，处变不惊。一横一竖的棋盘上，进攻防御，不到最后一刻都不要放弃！带领自己的棋子冲破封锁，进攻还是防御，都有我个人风格。"
         } or {
             name = "Chessboard",
             collection = "LAW", access = "SPECIAL",
@@ -1622,7 +1622,7 @@ local SkinData = {
             name = "西洋棋黑棋盘",
             collection = "LAW", access = "SPECIAL",
             descitem = "解锁\"白木地垫\"、\"白木地毯\"的皮肤。",
-            description = "急急急急急急...谁是急急国王？"
+            description = "一横一竖的棋盘上，我方对方。每一颗棋子都是我的工具，让我在每一个方格上施展自己的权谋。不管是开局，结局，残局，败局，我都心思缜密，处变不惊。一黑一白的棋盘上，进攻防御，不到最后一刻都不要放弃！带领自己的棋子冲破封锁，进攻还是防御，都有我独特个性。"
         } or {
             name = "Black Chessboard",
             collection = "LAW", access = "SPECIAL",
@@ -1673,7 +1673,7 @@ local SkinData = {
         string = ischinese and {
             collection = "DAY", access = "SPECIAL",
             descitem = "解锁\"鸳鸯石\"的皮肤。",
-            description = "急急急急急急...谁是急急国王？"
+            description = "圣诞节礼物？！我最想要的是一颗雪景球。轻拿起它，快速摇动，雪花飘落，透过玻璃，尽收美景。在那几秒内，我看尽欢愉，短暂脱离枯槁的现实。此刻你将得到一颗能变化球内景色的风景球，不同的画面有着不同欢乐氛围。在这重要时节，我希望你快乐……"
         } or {
             collection = "DAY", access = "SPECIAL",
             descitem = "Unlock \"Icire Stone\" skin.",
@@ -1736,7 +1736,7 @@ local SkinData = {
         string = ischinese and {
             collection = "PAPER", access = "SPECIAL",
             descitem = "解锁\"永不凋零\"、\"永不凋零花丛\"、\"庇佑蝴蝶\"以及入鞘后的皮肤。",
-            description = "暂无",
+            description = "先在纸的边缘画上浅蓝色花纹，然后折成纸扇，再把外端稍稍压平。按照这个方式多做一些不同大小的，把所有拼凑在一起粘起来。最后做三个纸蝴蝶插上去，一捧花丛扇就做好了。佩柏细细欣赏着自己新的作品。\n“你怎么又在做这些垃圾！？给我好好做功课去！”佩柏的父亲吼他，当着他的面把他的新作品捏成团丢进垃圾桶，“给我把作业写了。”随后扬长而去。\n当晚，佩柏偷偷在被窝里开着手电。“妈，我想你”，佩柏在白纸上写了这几个字，折成了一个纸蝴蝶，然后又折了一把纸剑，他将纸蝴蝶黏在纸剑上，不知不觉居然睡着了。“我说了你不听是不是！”睡梦中的佩柏突然被父亲从床上拽起，当着他的面把蝴蝶纸剑撕得粉碎，“以后我见一次撕一次！”父亲说完就出去了。佩柏小声啜泣起来。",
         } or {
             collection = "PAPER", access = "SPECIAL",
             descitem = "Unlock \"Neverfade\", \"Neverfade Bush\", and \"Neverfade Butterfly\" skin.",
@@ -1798,7 +1798,7 @@ local SkinData = {
         string = ischinese and {
             collection = "PAPER", access = "SPECIAL",
             descitem = "解锁\"永不凋零\"、\"永不凋零花丛\"、\"庇佑蝴蝶\"以及入鞘后的皮肤。",
-            description = "暂无",
+            description = "佩柏把自己的折纸作品都藏在了床下盒子里，他不敢让父亲知道。一天放学回家，发现父亲正在屋外烧自己的折纸。父亲见佩柏回来，拿起木棍准备打人。佩柏立即激动起来，压抑的情绪终于爆发，“要是妈还在，她才不会让你这样对我！”“呜…”佩柏哭起来，“都怪你这个酒鬼…对我最好的妈妈已经不在了！”佩柏放声大哭。父亲愣住了，放下手里的木棍，想抱住佩柏。佩柏躲开了，跑向屋里。父亲掩面哭泣，他知道他错了，但他不会改。佩柏是这样认为的。\n从那之后，佩柏不再尝试折纸，不再尝试倾注情感于他物，所有的折纸都藏进了心里！",
         } or {
             collection = "PAPER", access = "SPECIAL",
             descitem = "Unlock \"Neverfade\", \"Neverfade Bush\", and \"Neverfade Butterfly\" skin.",
@@ -1861,7 +1861,7 @@ local SkinData = {
             name = "十字四方纸镖",
             collection = "PAPER", access = "SPECIAL",
             descitem = "解锁\"子圭玄鸟正羽\"、\"子圭玄鸟绒羽\"的皮肤。",
-            description = "急急急急急急...谁是急急国王？"
+            description = "“啊，我的眼睛！”，一位同学的眼睛被纸飞镖戳伤，肇事者逃之夭夭。班主任知道后为这位同学主持公道，看到地上的纸飞镖，精致不一般，立马就觉得这是佩柏的“杰作”，把这件事告诉了佩柏的父亲。\n佩柏的纸飞镖本来放在自己的书包里，他课间休息时总喜欢偷偷拿出来把玩，被身后的同学瞄到。于是他趁着佩柏上厕所，擅自拿走了纸飞镖，跑到人头攒动的走廊玩耍，一不小心就戳到了一位同学的眼睛，知道闯祸的他迅速离开“案发现场”。\n当天佩柏放学回到家，父亲早就守在门口。父亲责怪他不知道努力学习，就搞些没用的纸玩意，佩柏很郁闷，但无力反驳。佩柏被罚不准吃晚饭，于是趁着父亲吃饭的时机，再次折起纸来。由于自己的纸飞镖被没收，他决定重新做一个。这次的纸飞镖，工序更复杂更繁美，每一折每一转都是他的心事流露。"
         } or {
             name = "Cross Square Paper Dart",
             collection = "PAPER", access = "SPECIAL",
@@ -1903,7 +1903,7 @@ local SkinData = {
             name = "黄桃芒芒",
             collection = "TASTE", access = "SPECIAL",
             descitem = "解锁\"月轮宝盘套件\"、\"月轮宝盘\"的皮肤。",
-            description = "暂无",
+            description = "橙主色调，绿色是点缀。芒果圣代，黄桃块为其新增一种平衡感。果香醇厚，如成熟的喜悦。",
         } or {
             name = "Mango Sundae",
             collection = "TASTE", access = "SPECIAL",
@@ -1941,7 +1941,7 @@ local SkinData = {
             name = "巧遇莓莓",
             collection = "TASTE", access = "SPECIAL",
             descitem = "解锁\"月轮宝盘套件\"、\"月轮宝盘\"的皮肤。",
-            description = "暂无",
+            description = "红主色调，黑色是点缀。草莓圣代，巧克力为其新增一种高级感。酸酸甜甜，如青春的可爱。",
         } or {
             name = "Strawberry Sundae",
             collection = "TASTE", access = "SPECIAL",
@@ -1979,7 +1979,7 @@ local SkinData = {
             name = "奇异柠檬",
             collection = "TASTE", access = "SPECIAL",
             descitem = "解锁\"月轮宝盘套件\"、\"月轮宝盘\"的皮肤。",
-            description = "暂无",
+            description = "绿主色调，黄色是点缀。柠檬圣代，奇异果为其新增一种搞怪感。清新酸拧，如跳脱的思维。",
         } or {
             name = "Lemon Sundae",
             collection = "TASTE", access = "SPECIAL",
@@ -2017,7 +2017,7 @@ local SkinData = {
             name = "黑色旋涡",
             collection = "TASTE", access = "SPECIAL",
             descitem = "解锁\"月轮宝盘套件\"、\"月轮宝盘\"的皮肤。",
-            description = "暂无",
+            description = "黑主色调，蓝色是点缀。黑巧圣代，蓝莓为其新增一种活跃感。丝滑香软，如随性的心态。",
         } or {
             name = "Choccy Sundae",
             collection = "TASTE", access = "SPECIAL",

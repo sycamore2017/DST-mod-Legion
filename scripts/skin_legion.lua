@@ -2044,7 +2044,7 @@ _G.SKINS_LEGION = {
 		type = "item", skin_tags = {}, release_group = 555, rarity = raritySpecial,
 
         skin_id = "62eb8b9e8c2f781db2f79d21",
-        onlyownedshow = true,
+        onlyownedshow = true, mustonwedshow = true,
 		assets = {
 			Asset("ANIM", "anim/skin/siving_turn_collector.zip"),
 		},
@@ -3785,7 +3785,7 @@ if not TheNet:IsDedicated() then
                         if right_root.skinshop_legion then
                             right_root.skinshop_legion:Kill()
                         end
-                        local SkinLegionDialog = _G.require("widgets/skinlegiondialog") --test：动态更新
+                        -- local SkinLegionDialog = _G.require("widgets/skinlegiondialog") --test：动态更新
                         right_root.skinshop_legion = right_root:AddChild(SkinLegionDialog(self.owner))
                         right_root.skinshop_legion:SetPosition(-380, 0)
                         self:Close()
