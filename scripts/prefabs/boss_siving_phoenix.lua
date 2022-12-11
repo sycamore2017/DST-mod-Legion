@@ -951,6 +951,7 @@ local function MakeWeapon_replace(data)
             inst:AddTag("sharp")
             inst:AddTag("nosteal")
             inst:AddTag("NOCLICK")
+            inst:AddTag("moistureimmunity") --禁止潮湿：EntityScript:GetIsWet()
 
             --weapon (from weapon component) added to pristine state for optimization
             inst:AddTag("weapon")
@@ -970,6 +971,7 @@ local function MakeWeapon_replace(data)
 
             --因为大力士攻击时会在不判空的情况下直接使用 inventoryitem，为了不崩溃，只能加个这个
             inst:AddComponent("inventoryitem")
+            inst.components.inventoryitem:EnableMoisture(false) --禁止潮湿：官方的代码有问题，会导致潮湿攻击滑落时叠加数变为1
             inst.components.inventoryitem.pushlandedevents = false
             inst.components.inventoryitem.canbepickedup = false
 
@@ -1067,6 +1069,7 @@ local function MakeWeapon(data)
             inst:AddTag("sharp")
             inst:AddTag("s_l_throw") --skill_legion_throw
             inst:AddTag("allow_action_on_impassable")
+            inst:AddTag("moistureimmunity") --禁止潮湿：EntityScript:GetIsWet()
 
             --weapon (from weapon component) added to pristine state for optimization
             inst:AddTag("weapon")
@@ -1108,6 +1111,7 @@ local function MakeWeapon(data)
             inst.components.inventoryitem.imagename = data.name
             inst.components.inventoryitem.atlasname = "images/inventoryimages/"..data.name..".xml"
             inst.components.inventoryitem.TryToSink = function(self, ...)end --防止在虚空里消失
+            inst.components.inventoryitem:EnableMoisture(false) --禁止潮湿：官方的代码有问题，会导致潮湿攻击滑落时叠加数变为1
             inst.components.inventoryitem:SetOnPickupFn(OnPickedUp_fea) --被捡起时，修改自己的旋转角度
 
             inst:AddComponent("savedrotation") --保存旋转角度的组件

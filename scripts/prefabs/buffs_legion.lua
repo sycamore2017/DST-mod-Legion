@@ -266,7 +266,6 @@ local function GetSkin(buff, player)
         return vv
     end
 end
-
 local function SpawnButterfly(buff, target)
     local butterfly = SpawnPrefab("neverfade_butterfly")
     if target.components.leader ~= nil then
@@ -287,13 +286,11 @@ local function SpawnButterfly(buff, target)
     end
     return nil
 end
-
 local function AddButterfly(buff, player)
     buff.countbutterflies = buff.countbutterflies + 1
     buff.blessingbutterflies[buff.countbutterflies] = SpawnButterfly(buff, player)
     player.countblessing = buff.countbutterflies --更新玩家的数据
 end
-
 local function DeleteButterfly(buff, player)
     if buff.blessingbutterflies[buff.countbutterflies] ~= nil then
         buff.blessingbutterflies[buff.countbutterflies].dead = true
@@ -307,19 +304,36 @@ local function DeleteButterfly(buff, player)
     end
 end
 
-local function RegisterRedirectDamageFn(buff, player) --登记自己的redirectdamagefn函数
-    RebuildRedirectDamageFn(player) --全局函数：重新构造combat的redirectdamagefn函数
-    if player.redirect_table[buff.prefab] == nil then
-        player.redirect_table[buff.prefab] = function(victim, attacker, damage, weapon, stimuli)
-            if buff.countbutterflies ~= nil and buff.countbutterflies > 0 then
-                if damage > 0 or stimuli == "electric" or stimuli == "darkness" then --骑牛也可以发动效果，爱屋及乌
-                    local redirect = buff.blessingbutterflies[buff.countbutterflies]
-                    DeleteButterfly(buff, victim)
-                    return redirect
-                end
+-- local function RegisterRedirectDamageFn(buff, player) --登记自己的redirectdamagefn函数
+--     RebuildRedirectDamageFn(player) --全局函数：重新构造combat的redirectdamagefn函数
+--     if player.redirect_table[buff.prefab] == nil then
+--         player.redirect_table[buff.prefab] = function(victim, attacker, damage, weapon, stimuli)
+--             if buff.countbutterflies ~= nil and buff.countbutterflies > 0 then
+--                 if damage > 0 or stimuli == "electric" or stimuli == "darkness" then --骑牛也可以发动效果，爱屋及乌
+--                     local redirect = buff.blessingbutterflies[buff.countbutterflies]
+--                     DeleteButterfly(buff, victim)
+--                     return redirect
+--                 end
+--             end
+--             return nil
+--         end
+--     end
+-- end
+local function SetBuff_butterflysblessing(buff, target)
+    if target.flag_l_bfbless ~= nil or target.components.inventory == nil or target.components.debuffable == nil then
+        return
+    end
+    target.flag_l_bfbless = true
+    local ApplyDamage_old = target.components.inventory.ApplyDamage
+    target.components.inventory.ApplyDamage = function(self, damage, ...)
+        if damage >= 0 and self.inst.countblessing ~= nil and self.inst.countblessing > 0 then
+            local mybuff = self.inst.components.debuffable:GetDebuff("buff_butterflysblessing")
+            if mybuff and mybuff.countbutterflies ~= nil and mybuff.countbutterflies > 0 then
+                DeleteButterfly(mybuff, self.inst)
+                return 0
             end
-            return nil
         end
+        return ApplyDamage_old(self, damage, ...)
     end
 end
 
@@ -339,16 +353,17 @@ MakeBuff({
         else
             AddButterfly(buff, target)
         end
-        RegisterRedirectDamageFn(buff, target)
+        -- RegisterRedirectDamageFn(buff, target)
+        SetBuff_butterflysblessing(buff, target)
     end,
     fn_again = function(buff, target)
         AddButterfly(buff, target) --在这里并不限制增加的数量，是否要增加数量只在生成方那边判断，不在这边的响应方进行
     end,
     fn_end = function(buff, target)
         --清除自己的redirectdamagefn函数
-        if target.redirect_table ~= nil then
-            target.redirect_table[buff.prefab] = nil
-        end
+        -- if target.redirect_table ~= nil then
+        --     target.redirect_table[buff.prefab] = nil
+        -- end
         --清除buff所有的数据
         for k, v in pairs(buff.blessingbutterflies) do
             v.dead = true

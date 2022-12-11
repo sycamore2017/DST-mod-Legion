@@ -439,7 +439,7 @@ local function TemperatureProtect(inst, owner)
         if inst._owner_temp == owner then --监听对象没有发生变化，就结束
             return
         end
-        inst:RemoveEventCallback("startfreezing", inst.fn_onTempDelta, inst._owner_temp) --把以前的监听去除
+        inst:RemoveEventCallback("temperaturedelta", inst.fn_onTempDelta, inst._owner_temp) --把以前的监听去除
         inst:RemoveEventCallback("death", inst.fn_onTempDelta, inst._owner_temp)
         CancelTask_heat(inst)
         inst._owner_temp = nil
@@ -452,12 +452,10 @@ local function TemperatureProtect(inst, owner)
         owner and IsValid(owner) and
         owner.components.temperature ~= nil
     then
-        inst:ListenForEvent("startfreezing", inst.fn_onTempDelta, owner)
+        inst:ListenForEvent("temperaturedelta", inst.fn_onTempDelta, owner)
         inst:ListenForEvent("death", inst.fn_onTempDelta, owner)
         inst._owner_temp = owner
-        if owner.components.temperature:IsFreezing() then
-            inst.fn_onTempDelta(owner)
-        end
+        inst.fn_onTempDelta(owner, { last = 0, new = owner.components.temperature:GetCurrent() })
     end
 end
 local function OnOwnerChange(inst)
@@ -493,6 +491,13 @@ local function OnOwnerChange(inst)
 
     inst._owners = newowners
     TemperatureProtect(inst, owner)
+
+    --暗影容器里，打开时会自动掉地上，防止崩溃
+    if owner and owner.prefab == "shadow_container" then
+        inst.components.container.droponopen = true
+    else
+        inst.components.container.droponopen = nil
+    end
 end
 
 local function MakeRevolved(sets)
@@ -536,12 +541,22 @@ local function MakeRevolved(sets)
 
         inst._owner_temp = nil
         inst.task_heat = nil
-        inst.fn_onTempDelta = function(owner)
-            if not IsValid(owner) or owner.components.temperature == nil then
-                TemperatureProtect(inst, nil)
+        inst.fn_onTempDelta = function(owner, eventdata)
+            if eventdata then
+                if inst.task_heat ~= nil then --防止一下子低温很多，导致不断刷新 task_heat
+                    return
+                end
+                if eventdata.new == nil or eventdata.new > 6.5 then --低温特效出现前就执行
+                    return
+                end
+            else
                 return
             end
             if not inst.components.rechargeable:IsCharged() then --冷却期内不触发
+                return
+            end
+            if not IsValid(owner) or owner.components.temperature == nil then
+                TemperatureProtect(inst, nil)
                 return
             end
 
@@ -552,7 +567,7 @@ local function MakeRevolved(sets)
             end
 
             inst.components.rechargeable:Discharge(3 + cool_revolved*(times_revolved_pro-stagenow))
-            CancelTask_heat(inst)
+            -- CancelTask_heat(inst)
             stagenow = 7 + temp_revolved*(stagenow-1) --7-42
             inst.task_heat = inst:DoPeriodicTask(0.5, function(inst)
                 if
@@ -577,7 +592,7 @@ local function MakeRevolved(sets)
                 end
 
                 local temper = inst._owner_temp.components.temperature
-                if (temper.current+8) < temper.overheattemp then --可不能让温度太高了
+                if (temper.current+8.5) < temper.overheattemp then --可不能让温度太高了
                     temper:SetTemperature(temper.current + 3.5)
                 else
                     CancelTask_heat(inst)
@@ -678,15 +693,14 @@ local function MakeRevolved(sets)
         inst.components.upgradeable.upgradesperstage = 1
 
         inst:AddComponent("rechargeable")
-        inst.components.rechargeable:SetOnChargedFn(function(inst)
-            if
-                inst._owner_temp ~= nil and
-                inst._owner_temp.components.temperature ~= nil and
-                inst._owner_temp.components.temperature:IsFreezing()
-            then
-                inst.fn_onTempDelta(inst._owner_temp)
-            end
-        end)
+        -- inst.components.rechargeable:SetOnChargedFn(function(inst) --因为温度变化已经是实时监听了，这里不再需要
+        --     if
+        --         inst._owner_temp ~= nil and
+        --         inst._owner_temp.components.temperature ~= nil
+        --     then
+        --         inst.fn_onTempDelta(inst._owner_temp, { last = 0, new = inst._owner_temp.components.temperature:GetCurrent() })
+        --     end
+        -- end)
 
         inst.OnLoad = function(inst, data) --由于 upgradeable 组件不会自己重新初始化，只能这里再初始化
             ResetRadius(inst)

@@ -135,10 +135,10 @@ if CONFIGS_LEGION.PRAYFORRAIN then
             slotpos = {},
             animbank = "ui_chest_3x3",
             animbuild = "ui_revolvedmoonlight_4x3",
-            pos = Vector3(0, 150, 0),
+            pos = Vector3(0, -150, 0),
             side_align_tip = 160,
         },
-        type = "chest",
+        type = "chest_l",
     }
     for y = 2, 1, -1 do
         for x = 0, 2 do
@@ -154,10 +154,10 @@ if CONFIGS_LEGION.PRAYFORRAIN then
             slotpos = {},
             animbank = "ui_chest_3x3",
             animbuild = "ui_revolvedmoonlight_4x3",
-            pos = Vector3(0, 150, 0),
+            pos = Vector3(0, -150, 0),
             side_align_tip = 160,
         },
-        type = "chest"
+        type = "chest_l"
     }
     for y = 0, 2 do --                                                    x轴基础               y轴基础
         table.insert(params.revolvedmoonlight_pro.widget.slotpos, Vector3(-122      , (-77*y) + 80 - (y*2), 0))
@@ -177,10 +177,10 @@ if CONFIGS_LEGION.PRAYFORRAIN then
                 slotpos = {},
                 animbank = "ui_chest_3x3",
                 animbuild = animbuild,
-                pos = Vector3(0, 150, 0),
+                pos = Vector3(0, -150, 0),
                 side_align_tip = 160
             },
-            type = "chest"
+            type = "chest_l"
         }
         for y = 2, 1, -1 do
             for x = 0, 2 do
@@ -196,10 +196,10 @@ if CONFIGS_LEGION.PRAYFORRAIN then
                 slotpos = {},
                 animbank = "ui_chest_3x3",
                 animbuild = animbuild,
-                pos = Vector3(0, 150, 0),
+                pos = Vector3(0, -150, 0),
                 side_align_tip = 160
             },
-            type = "chest"
+            type = "chest_l"
         }
         for y = 0, 2 do --                                    x轴基础               y轴基础
             table.insert(params[name].widget.slotpos, Vector3(-122      , (-77*y) + 80 - (y*2), 0))

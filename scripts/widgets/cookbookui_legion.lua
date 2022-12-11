@@ -169,7 +169,8 @@ local ui = Class(Widget, function(self,data,parent,top,left)
 	local str = strs.unkonwn
 	if recipes_count > 0 then --只有烹饪过才会显示烹饪时间
 		if data.recipe_def.cooktime ~= nil then
-			str = string.format("%.f"..strs.time_unit, data.recipe_def.cooktime * 20 * 0.8)
+			-- str = string.format("%.f"..strs.time_unit, data.recipe_def.cooktime * 20 * 0.8)
+			str = string.format("%.f"..strs.time_unit, data.recipe_def.cooktime * 20)
 		else
 			str = strs.empty
 		end
