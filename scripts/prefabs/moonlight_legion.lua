@@ -408,14 +408,70 @@ local function OnClose_revolved(inst)
     inst.SoundEmitter:PlaySound("dontstarve/cave/mushtree_tall_spore_land", nil, 0.6)
 end
 
-local function ResetRadius(inst)
+local function UpdateLight_revolved(owner)
+    if owner._revolves_light == nil or owner.prefab == "shadow_container" then
+        return
+    end
+
+    local chosen = nil
+    local range = 0
+    for k,_ in pairs(owner._revolves_light) do
+        if k:IsValid() then
+            local stagenow = k.components.upgradeable:GetStage()
+            if stagenow > range then
+                range = stagenow
+                chosen = k
+            end
+        end
+    end
+    if chosen ~= nil then
+        for k,_ in pairs(owner._revolves_light) do
+            if k:IsValid() then
+                k._light.Light:Enable(k == chosen)
+            end
+        end
+    end
+end
+local function RemoveLight_revolved(inst, owner)
+    if owner ~= nil and owner:IsValid() and owner._revolves_light ~= nil then
+        owner._revolves_light[inst] = nil
+        local newlights = nil
+        for k,_ in pairs(owner._revolves_light) do
+            if k:IsValid() then
+                if newlights == nil then
+                    newlights = {}
+                end
+                newlights[k] = true
+            end
+        end
+        owner._revolves_light = newlights
+        UpdateLight_revolved(owner)
+    end
+end
+local function ResetRadius(inst, grandowner)
+    --先获取最上层携带者
+    if grandowner == nil then
+        grandowner = inst
+        while grandowner.components.inventoryitem ~= nil do
+            local nextowner = grandowner.components.inventoryitem.owner
+            if nextowner == nil then
+                break
+            end
+            grandowner = nextowner
+        end
+    end
+    if grandowner == inst then
+        grandowner = nil
+    end
+
+    --更新光照范围
     local stagenow = inst.components.upgradeable:GetStage()
     if stagenow > 1 then
         if stagenow > times_revolved_pro then --在设置变换中，会出现当前等级大于最大等级的情况
             stagenow = times_revolved_pro
         end
         local rad = 0.25 + (stagenow-1)*value_revolved
-        if inst.components.inventoryitem.owner ~= nil then --被携带时，发光范围减半
+        if grandowner ~= nil then --被携带时，发光范围减半
             rad = rad / 2
             inst._light.Light:SetFalloff(0.65)
         else
@@ -423,39 +479,166 @@ local function ResetRadius(inst)
         end
         inst._light.Light:SetRadius(rad) --最大约2.75和5.25半径
     end
+
+    local owner_last = inst._owner_light
+    if grandowner == nil then --没有新主人，只取消原主人
+        RemoveLight_revolved(inst, owner_last)
+        inst._owner_light = nil
+        inst._light.Light:Enable(true)
+    else
+        if grandowner._revolves_light == nil then
+            grandowner._revolves_light = {}
+        end
+        if owner_last ~= grandowner then
+            RemoveLight_revolved(inst, owner_last)
+        end
+        inst._owner_light = grandowner
+        grandowner._revolves_light[inst] = true
+        if grandowner.prefab == "shadow_container" then
+            inst._light.Light:Enable(false)
+        else
+            UpdateLight_revolved(grandowner)
+        end
+    end
 end
 local function IsValid(one)
     return one:IsValid() and
         one.components.health ~= nil and not one.components.health:IsDead()
 end
 local function CancelTask_heat(inst)
-    if inst.task_heat ~= nil then
-        inst.task_heat:Cancel()
-        inst.task_heat = nil
+    if inst.task_l_heat ~= nil then
+        inst.task_l_heat:Cancel()
+        inst.task_l_heat = nil
+    end
+end
+local function OnTempDelta(owner, data)
+    if data == nil then
+        return
+    end
+    if owner._revolves == nil then
+        owner:RemoveEventCallback("temperaturedelta", OnTempDelta)
+        owner:RemoveEventCallback("death", OnTempDelta)
+        return
+    end
+    if owner.components.health == nil or owner.components.health:IsDead() or owner.components.temperature == nil then
+        CancelTask_heat(owner)
+        owner:RemoveEventCallback("temperaturedelta", OnTempDelta)
+        owner:RemoveEventCallback("death", OnTempDelta)
+        owner._revolves = nil
+        return
+    end
+
+    if data.new ~= nil then
+        if data.new >= 6 then --低温特效出现前就执行
+            return
+        end
+        if owner.task_l_heat ~= nil then --正在升温，就不继续
+            return
+        end
+
+        local chosen = nil
+        for k,_ in pairs(owner._revolves) do
+            if k:IsValid() then
+                if k.components.rechargeable:IsCharged() then --冷却完毕，可以用
+                    chosen = k
+                    break
+                end
+            end
+        end
+        if chosen == nil then
+            return
+        end
+
+        local count = 1
+        local stagenow = chosen.components.upgradeable:GetStage()
+        if stagenow > times_revolved_pro then --在设置变换中，会出现当前等级大于最大等级的情况
+            stagenow = times_revolved_pro
+        end
+
+        chosen.components.rechargeable:Discharge(3 + cool_revolved*(times_revolved_pro-stagenow))
+        stagenow = 7 + temp_revolved*(stagenow-1) --7-42
+
+        owner.task_l_heat = owner:DoPeriodicTask(0.5, function(owner)
+            if
+                owner.components.health == nil or owner.components.health:IsDead() or
+                owner.components.temperature == nil
+            then
+                CancelTask_heat(owner)
+                owner:RemoveEventCallback("temperaturedelta", OnTempDelta)
+                owner:RemoveEventCallback("death", OnTempDelta)
+                owner._revolves = nil
+                return
+            end
+
+            local fx = SpawnPrefab("revolvedmoonlight_fx")
+            if fx ~= nil then
+                fx.Transform:SetPosition(owner.Transform:GetWorldPosition())
+            end
+
+            if count < 1 then
+                count = 1
+                return
+            else
+                count = 0
+            end
+
+            local temper = owner.components.temperature
+            if (temper.current+8.5) < temper.overheattemp then --可不能让温度太高了
+                temper:SetTemperature(temper.current + 3.5)
+            else
+                CancelTask_heat(owner)
+                return
+            end
+
+            stagenow = stagenow - 3.5
+            if stagenow <= 0 then
+                CancelTask_heat(owner)
+            end
+        end, 0)
     end
 end
 local function TemperatureProtect(inst, owner)
+    --先取消监听以前的对象
     if inst._owner_temp ~= nil then
         if inst._owner_temp == owner then --监听对象没有发生变化，就结束
             return
         end
-        inst:RemoveEventCallback("temperaturedelta", inst.fn_onTempDelta, inst._owner_temp) --把以前的监听去除
-        inst:RemoveEventCallback("death", inst.fn_onTempDelta, inst._owner_temp)
-        CancelTask_heat(inst)
+        if inst._owner_temp._revolves ~= nil then
+            local newrevolves = nil
+            inst._owner_temp._revolves[inst] = nil
+            for k,_ in pairs(inst._owner_temp._revolves) do
+                if k:IsValid() then
+                    if newrevolves == nil then
+                        newrevolves = {}
+                    end
+                    newrevolves[k] = true
+                end
+            end
+            if newrevolves == nil then
+                inst._owner_temp:RemoveEventCallback("temperaturedelta", OnTempDelta)
+                inst._owner_temp:RemoveEventCallback("death", OnTempDelta)
+            end
+            inst._owner_temp._revolves = newrevolves
+        else
+            inst._owner_temp:RemoveEventCallback("temperaturedelta", OnTempDelta)
+            inst._owner_temp:RemoveEventCallback("death", OnTempDelta)
+        end
         inst._owner_temp = nil
-    else
-        CancelTask_heat(inst)
     end
 
-    --监听新的
+    --再尝试监听目前的对象
     if
-        owner and IsValid(owner) and
-        owner.components.temperature ~= nil
+        owner and owner.components.temperature ~= nil and IsValid(owner)
     then
-        inst:ListenForEvent("temperaturedelta", inst.fn_onTempDelta, owner)
-        inst:ListenForEvent("death", inst.fn_onTempDelta, owner)
+        if owner._revolves == nil then --第一次携带，把基础设定加上
+            owner._revolves = {}
+            owner:ListenForEvent("temperaturedelta", OnTempDelta)
+            owner:ListenForEvent("death", OnTempDelta)
+            --温度监听 触发非常频繁，所以应该不需要主动触发一次
+            -- OnTempDelta(owner, { last = 0, new = owner.components.temperature:GetCurrent() })
+        end
+        owner._revolves[inst] = true
         inst._owner_temp = owner
-        inst.fn_onTempDelta(owner, { last = 0, new = owner.components.temperature:GetCurrent() })
     end
 end
 local function OnOwnerChange(inst)
@@ -479,8 +662,9 @@ local function OnOwnerChange(inst)
         owner = nextowner
     end
 
-    ResetRadius(inst)
     inst._light.entity:SetParent(owner.entity)
+    ResetRadius(inst, owner)
+    TemperatureProtect(inst, owner)
 
     for k, v in pairs(inst._owners) do
         if k:IsValid() then
@@ -490,7 +674,6 @@ local function OnOwnerChange(inst)
     end
 
     inst._owners = newowners
-    TemperatureProtect(inst, owner)
 
     --暗影容器里，打开时会自动掉地上，防止崩溃
     if owner and owner.prefab == "shadow_container" then
@@ -540,71 +723,7 @@ local function MakeRevolved(sets)
         end
 
         inst._owner_temp = nil
-        inst.task_heat = nil
-        inst.fn_onTempDelta = function(owner, eventdata)
-            if eventdata then
-                if inst.task_heat ~= nil then --防止一下子低温很多，导致不断刷新 task_heat
-                    return
-                end
-                if eventdata.new == nil or eventdata.new > 6.5 then --低温特效出现前就执行
-                    return
-                end
-            else
-                return
-            end
-            if not inst.components.rechargeable:IsCharged() then --冷却期内不触发
-                return
-            end
-            if not IsValid(owner) or owner.components.temperature == nil then
-                TemperatureProtect(inst, nil)
-                return
-            end
-
-            local count = 1
-            local stagenow = inst.components.upgradeable:GetStage()
-            if stagenow > times_revolved_pro then --在设置变换中，会出现当前等级大于最大等级的情况
-                stagenow = times_revolved_pro
-            end
-
-            inst.components.rechargeable:Discharge(3 + cool_revolved*(times_revolved_pro-stagenow))
-            -- CancelTask_heat(inst)
-            stagenow = 7 + temp_revolved*(stagenow-1) --7-42
-            inst.task_heat = inst:DoPeriodicTask(0.5, function(inst)
-                if
-                    inst._owner_temp == nil or
-                    not IsValid(inst._owner_temp) or
-                    inst._owner_temp.components.temperature == nil
-                then
-                    TemperatureProtect(inst, nil)
-                    return
-                end
-
-                local fx = SpawnPrefab("revolvedmoonlight_fx")
-                if fx ~= nil then
-                    fx.Transform:SetPosition(inst._owner_temp.Transform:GetWorldPosition())
-                end
-
-                if count < 1 then
-                    count = 1
-                    return
-                else
-                    count = 0
-                end
-
-                local temper = inst._owner_temp.components.temperature
-                if (temper.current+8.5) < temper.overheattemp then --可不能让温度太高了
-                    temper:SetTemperature(temper.current + 3.5)
-                else
-                    CancelTask_heat(inst)
-                    return
-                end
-
-                stagenow = stagenow - 3.5
-                if stagenow <= 0 then
-                    CancelTask_heat(inst)
-                end
-            end, 0)
-        end
+        inst._owner_light = nil
 
         inst:AddComponent("inspectable")
 
@@ -668,9 +787,11 @@ local function MakeRevolved(sets)
 
             --归还套件
             local links = inst.components.skinedlegion:GetLinkedSkins()
-            if links ~= nil then
+            if links ~= nil and links.item ~= nil then
                 inst.components.lootdropper:SpawnLootPrefab("revolvedmoonlight_item", nil,
                     links.item, nil, worker and worker.userid or nil)
+            else
+                inst.components.lootdropper:SpawnLootPrefab("revolvedmoonlight_item")
             end
 
             --特效
@@ -686,24 +807,19 @@ local function MakeRevolved(sets)
             inst.SoundEmitter:PlaySound("dontstarve/common/telebase_gemplace")
         end
         inst.components.upgradeable.onstageadvancefn = function(inst)
-            ResetRadius(inst)
             inst.components.rechargeable:SetPercent(1) --每次升级，重置冷却时间
+            ResetRadius(inst, nil)
         end
         inst.components.upgradeable.numstages = sets.ispro and times_revolved_pro or times_revolved
         inst.components.upgradeable.upgradesperstage = 1
 
         inst:AddComponent("rechargeable")
-        -- inst.components.rechargeable:SetOnChargedFn(function(inst) --因为温度变化已经是实时监听了，这里不再需要
-        --     if
-        --         inst._owner_temp ~= nil and
-        --         inst._owner_temp.components.temperature ~= nil
-        --     then
-        --         inst.fn_onTempDelta(inst._owner_temp, { last = 0, new = inst._owner_temp.components.temperature:GetCurrent() })
-        --     end
-        -- end)
+        -- inst.components.rechargeable:SetOnChargedFn(function(inst)end)
 
         inst.OnLoad = function(inst, data) --由于 upgradeable 组件不会自己重新初始化，只能这里再初始化
-            ResetRadius(inst)
+            inst:DoTaskInTime(0.5, function(inst)
+                ResetRadius(inst, nil)
+            end)
         end
 
         --Create light
