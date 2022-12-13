@@ -1049,8 +1049,8 @@ MakeMask({
             AddMaskHPCost(inst, owner, 0.5)
 
             local notags = {
-                "NOCLICK", "INLIMBO", "shadow", "playerghost", "ghost", "wall", "structure",
-                "balloon", "siving", "glommer", "friendlyfruitfly", "boat", "boatbumper"
+                "NOCLICK", "INLIMBO", "shadow", "shadowminion", "playerghost", "ghost", "wall",
+                "balloon", "siving", "glommer", "friendlyfruitfly", "boat", "boatbumper", "structure"
             }
             if owner:HasTag("player") then --佩戴者是玩家时，不吸收其他玩家
                 table.insert(notags, "player")
@@ -1207,8 +1207,8 @@ MakeMask({
             owner:ListenForEvent("onattackother", OnAttackOther)
 
             local notags = {
-                "NOCLICK", "INLIMBO", "shadow", "playerghost", "ghost", "wall", "structure",
-                "balloon", "siving", "glommer", "friendlyfruitfly", "boat", "boatbumper"
+                "NOCLICK", "INLIMBO", "shadow", "shadowminion", "playerghost", "ghost", "wall",
+                "balloon", "siving", "glommer", "friendlyfruitfly", "boat", "boatbumper", "structure"
             }
             if owner:HasTag("player") then --佩戴者是玩家时，不吸收其他玩家
                 table.insert(notags, "player")

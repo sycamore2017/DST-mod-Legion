@@ -53,7 +53,7 @@ local TIME_EYE_DT_GRIEF = 0.6
 local COUNT_EYE = 8 --8
 local COUNT_EYE_GRIEF = 11 --11
 
-local TAGS_CANT = { "NOCLICK", "shadow", "playerghost", "ghost",
+local TAGS_CANT = { "NOCLICK", "shadow", "shadowminion", "playerghost", "ghost",
                     "INLIMBO", "wall", "structure", "balloon", "siving", "boat", "boatbumper" }
 
 if CONFIGS_LEGION.PHOENIXBATTLEDIFFICULTY == 1 then

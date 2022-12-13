@@ -472,126 +472,125 @@ MakeSteak({ --盐香料：加新鲜度
     end
 })
 
---勋章问题
--- if TUNING.FUNCTIONAL_MEDAL_IS_OPEN then --能力勋章兼容
---     local function OnAttack_steak_voltjelly(inst, owner, target)
---         OnAttack_steak(inst, owner, target)
---         if target ~= nil and target:IsValid() and owner ~= nil and owner:IsValid() then
---             SpawnPrefab("electrichitsparks"):AlignToTarget(target, owner, true)
---         end
---     end
---     MakeSteak({ --带电果冻粉：武器带电
---         spicename = "spice_voltjelly",
---         spicebuild = "medal_spices", spiceatlas = "images/spice_voltjelly_over.xml",
---         perishtime = nil,
---         fn_server = function(inst)
---             InitSteak(inst)
---             inst.components.weapon:SetElectric()
---             inst.components.weapon:SetOnAttack(OnAttack_steak_voltjelly)
---         end
---     })
+if TUNING.FUNCTIONAL_MEDAL_IS_OPEN then --能力勋章兼容
+    local function OnAttack_steak_voltjelly(inst, owner, target)
+        OnAttack_steak(inst, owner, target)
+        if target ~= nil and target:IsValid() and owner ~= nil and owner:IsValid() then
+            SpawnPrefab("electrichitsparks"):AlignToTarget(target, owner, true)
+        end
+    end
+    MakeSteak({ --带电果冻粉：武器带电
+        spicename = "spice_voltjelly",
+        spicebuild = "medal_spices", spiceatlas = "images/spice_voltjelly_over.xml",
+        perishtime = nil,
+        fn_server = function(inst)
+            InitSteak(inst)
+            inst.components.weapon:SetElectric()
+            inst.components.weapon:SetOnAttack(OnAttack_steak_voltjelly)
+        end
+    })
 
---     local function onremovefire(fire)
---         fire.nightstick.fire = nil
---     end
---     local function OnEquip_steak_phosphor(inst, owner)
---         OnEquip_steak_pre(inst, owner)
---         if inst.fire == nil then
---             inst.fire = SpawnPrefab("lichenhatlight")
---             inst.fire.nightstick = inst
---             inst:ListenForEvent("onremove", onremovefire, inst.fire)
---         end
---         inst.fire.entity:SetParent(owner.entity)
---         if owner:HasTag("equipmentmodel") then --假人！
---             return
---         end
---         OnEquip_steak_pst(inst, owner)
---     end
---     local function OnUnequip_steak_phosphor(inst, owner)
---         OnUnequip_steak(inst, owner)
---         if inst.fire ~= nil then
---             inst.fire:Remove()
---         end
---     end
---     MakeSteak({ --荧光粉：武器发光
---         spicename = "spice_phosphor",
---         spicebuild = "medal_spices", spiceatlas = "images/spice_phosphor_over.xml",
---         perishtime = nil,
---         fn_common = function(inst)
---             inst:AddTag("wildfireprotected")
---         end,
---         fn_server = function(inst)
---             InitSteak(inst)
---             inst.components.equippable:SetOnEquip(OnEquip_steak_phosphor)
---             inst.components.equippable:SetOnUnequip(OnUnequip_steak_phosphor)
---         end
---     })
+    local function onremovefire(fire)
+        fire.nightstick.fire = nil
+    end
+    local function OnEquip_steak_phosphor(inst, owner)
+        OnEquip_steak_pre(inst, owner)
+        if inst.fire == nil then
+            inst.fire = SpawnPrefab("lichenhatlight")
+            inst.fire.nightstick = inst
+            inst:ListenForEvent("onremove", onremovefire, inst.fire)
+        end
+        inst.fire.entity:SetParent(owner.entity)
+        if owner:HasTag("equipmentmodel") then --假人！
+            return
+        end
+        OnEquip_steak_pst(inst, owner)
+    end
+    local function OnUnequip_steak_phosphor(inst, owner)
+        OnUnequip_steak(inst, owner)
+        if inst.fire ~= nil then
+            inst.fire:Remove()
+        end
+    end
+    MakeSteak({ --荧光粉：武器发光
+        spicename = "spice_phosphor",
+        spicebuild = "medal_spices", spiceatlas = "images/spice_phosphor_over.xml",
+        perishtime = nil,
+        fn_common = function(inst)
+            inst:AddTag("wildfireprotected")
+        end,
+        fn_server = function(inst)
+            InitSteak(inst)
+            inst.components.equippable:SetOnEquip(OnEquip_steak_phosphor)
+            inst.components.equippable:SetOnUnequip(OnUnequip_steak_phosphor)
+        end
+    })
 
---     MakeSteak({ --仙人掌花粉：加移速
---         spicename = "spice_cactus_flower",
---         spicebuild = "medal_spices", spiceatlas = "images/spice_cactus_flower_over.xml",
---         perishtime = nil,
---         fn_server = function(inst)
---             InitSteak(inst)
---             inst.components.equippable.walkspeedmult = TUNING.CANE_SPEED_MULT
---         end
---     })
+    MakeSteak({ --仙人掌花粉：加移速
+        spicename = "spice_cactus_flower",
+        spicebuild = "medal_spices", spiceatlas = "images/spice_cactus_flower_over.xml",
+        perishtime = nil,
+        fn_server = function(inst)
+            InitSteak(inst)
+            inst.components.equippable.walkspeedmult = TUNING.CANE_SPEED_MULT
+        end
+    })
 
---     local function BattleBornAttack(inst, data)
---         if not inst.components.health:IsDead() then
---             inst.components.health:DoDelta(0.6, false, inst.food_basename)
---         end
---     end
---     local function OnEquip_steak_rage_blood(inst, owner)
---         OnEquip_steak_pre(inst, owner)
---         if owner:HasTag("equipmentmodel") then --假人！
---             return
---         end
---         OnEquip_steak_pst(inst, owner)
---         owner:ListenForEvent("onattackother", BattleBornAttack)
---     end
---     local function OnUnequip_steak_rage_blood(inst, owner)
---         OnUnequip_steak(inst, owner)
---         owner:RemoveEventCallback("onattackother", BattleBornAttack)
---     end
---     MakeSteak({ --黑暗血糖：攻击回血
---         spicename = "spice_rage_blood_sugar",
---         spicebuild = "medal_spices", spiceatlas = "images/spice_rage_blood_sugar_over.xml",
---         perishtime = nil,
---         fn_server = function(inst)
---             InitSteak(inst)
---             inst.components.equippable:SetOnEquip(OnEquip_steak_rage_blood)
---             inst.components.equippable:SetOnUnequip(OnUnequip_steak_rage_blood)
---         end
---     })
+    local function BattleBornAttack(inst, data)
+        if not inst.components.health:IsDead() then
+            inst.components.health:DoDelta(0.6, false, inst.food_basename)
+        end
+    end
+    local function OnEquip_steak_rage_blood(inst, owner)
+        OnEquip_steak_pre(inst, owner)
+        if owner:HasTag("equipmentmodel") then --假人！
+            return
+        end
+        OnEquip_steak_pst(inst, owner)
+        owner:ListenForEvent("onattackother", BattleBornAttack)
+    end
+    local function OnUnequip_steak_rage_blood(inst, owner)
+        OnUnequip_steak(inst, owner)
+        owner:RemoveEventCallback("onattackother", BattleBornAttack)
+    end
+    MakeSteak({ --黑暗血糖：攻击回血
+        spicename = "spice_rage_blood_sugar",
+        spicebuild = "medal_spices", spiceatlas = "images/spice_rage_blood_sugar_over.xml",
+        perishtime = nil,
+        fn_server = function(inst)
+            InitSteak(inst)
+            inst.components.equippable:SetOnEquip(OnEquip_steak_rage_blood)
+            inst.components.equippable:SetOnUnequip(OnUnequip_steak_rage_blood)
+        end
+    })
 
---     local function OnEquip_steak_potato_starch(inst, owner)
---         OnEquip_steak_pre(inst, owner)
---         if owner:HasTag("equipmentmodel") then --假人！
---             return
---         end
---         OnEquip_steak_pst(inst, owner)
---         if owner.components.hunger ~= nil then
---             owner.components.hunger.burnratemodifiers:SetModifier(inst, 0.8)
---         end
---     end
---     local function OnUnequip_steak_potato_starch(inst, owner)
---         OnUnequip_steak(inst, owner)
---         if owner.components.hunger ~= nil then
---             owner.components.hunger.burnratemodifiers:RemoveModifier(inst)
---         end
---     end
---     MakeSteak({ --土豆淀粉：耐饿
---         spicename = "spice_potato_starch",
---         spicebuild = "medal_spices", spiceatlas = "images/spice_potato_starch_over.xml",
---         perishtime = nil,
---         fn_server = function(inst)
---             InitSteak(inst)
---             inst.components.equippable:SetOnEquip(OnEquip_steak_potato_starch)
---             inst.components.equippable:SetOnUnequip(OnUnequip_steak_potato_starch)
---         end
---     })
--- end
+    local function OnEquip_steak_potato_starch(inst, owner)
+        OnEquip_steak_pre(inst, owner)
+        if owner:HasTag("equipmentmodel") then --假人！
+            return
+        end
+        OnEquip_steak_pst(inst, owner)
+        if owner.components.hunger ~= nil then
+            owner.components.hunger.burnratemodifiers:SetModifier(inst, 0.8)
+        end
+    end
+    local function OnUnequip_steak_potato_starch(inst, owner)
+        OnUnequip_steak(inst, owner)
+        if owner.components.hunger ~= nil then
+            owner.components.hunger.burnratemodifiers:RemoveModifier(inst)
+        end
+    end
+    MakeSteak({ --土豆淀粉：耐饿
+        spicename = "spice_potato_starch",
+        spicebuild = "medal_spices", spiceatlas = "images/spice_potato_starch_over.xml",
+        perishtime = nil,
+        fn_server = function(inst)
+            InitSteak(inst)
+            inst.components.equippable:SetOnEquip(OnEquip_steak_potato_starch)
+            inst.components.equippable:SetOnUnequip(OnUnequip_steak_potato_starch)
+        end
+    })
+end
 
 ----------
 ----------

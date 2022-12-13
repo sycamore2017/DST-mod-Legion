@@ -161,6 +161,7 @@ local function fn(Sim)
     inst:AddComponent("equippable") --装备组件
     inst.components.equippable.equipslot = EQUIPSLOTS.HEAD --装在头上
     inst.components.equippable.dapperness = TUNING.DAPPERNESS_MED  --和高礼帽一样的精神恢复
+    inst.components.equippable.insulated = true --防电
     inst.components.equippable:SetOnEquip(onequip)
     inst.components.equippable:SetOnUnequip(onunequip)
 
