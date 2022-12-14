@@ -195,6 +195,15 @@ for k,v in pairs(PLANT_DEFS) do
 				data.regrowStage = 1
 			end
 
+			--勋章的作物，目前都是不腐烂的设定
+			if k == "immortal_fruit" or k == "medal_gift_fruit" then
+				if data.eternalStage == nil then
+					data.eternalStage = countstage --默认就是最终阶段
+				end
+				data.stages_other.rot = nil
+				data.stages_other.huge_rot = nil
+			end
+
 			--确定资源
 			-- InitAssets(data, v.assets, {
 			-- 	Asset("ANIM", "anim/"..data.bank..".zip"),

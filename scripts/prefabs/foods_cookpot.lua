@@ -571,7 +571,7 @@ if TUNING.FUNCTIONAL_MEDAL_IS_OPEN then --能力勋章兼容
         end
         OnEquip_steak_pst(inst, owner)
         if owner.components.hunger ~= nil then
-            owner.components.hunger.burnratemodifiers:SetModifier(inst, 0.8)
+            owner.components.hunger.burnratemodifiers:SetModifier(inst, 0.2)
         end
     end
     local function OnUnequip_steak_potato_starch(inst, owner)

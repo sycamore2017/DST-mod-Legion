@@ -212,6 +212,7 @@ table.insert(prefs, Prefab("hiddenmoonlight", function()
 
     inst:AddTag("structure")
     inst:AddTag("fridge") --加了该标签，就能给热能石降温啦
+    inst:AddTag("meteor_protection") --防止被流星破坏
 
     inst.AnimState:SetBank("hiddenmoonlight")
     inst.AnimState:SetBuild("hiddenmoonlight")

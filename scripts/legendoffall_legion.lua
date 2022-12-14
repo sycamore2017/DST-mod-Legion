@@ -1733,7 +1733,8 @@ table.insert(_G.CA_S_INSPECTABLE_L, function(inst, doer, actions, right)
                 table.insert(actions, ACTIONS.LIFEBEND)
             elseif
                 inst:HasTag("withered") or inst:HasTag("barren") or --枯萎的植物
-                inst:HasTag("farm_plant") or --作物
+                inst:HasTag("weed") or --杂草
+                (inst:HasTag("farm_plant") and inst:HasTag("pickable_harvest_str")) or --作物
                 inst:HasTag("crop_legion") or --子圭垄植物
                 inst:HasTag("crop2_legion") --异种植物
             then

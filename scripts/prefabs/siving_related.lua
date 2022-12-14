@@ -1344,10 +1344,29 @@ MakeMask({
                 else
                     return false, "NOTHURT"
                 end
-            elseif target.components.farmplantstress ~= nil then --腐烂的作物
+            elseif target:HasTag("weed") then --杂草
+                if target.components.growable ~= nil then
+                    local growable = target.components.growable
+                    if
+                        growable.stages and growable.stages[growable.stage] ~= nil and
+                        growable.stages[growable.stage].name == "bolting"
+                    then
+                        if CalcuCost(mask, doer, 5) then
+                            growable:SetStage(growable:GetStage() - 1) --回到上一个阶段
+                            growable:StartGrowing()
+                        else
+                            return false, "NOLIFE"
+                        end
+                    else
+                        return false, "NOWITHERED"
+                    end
+                else
+                    return false, "NOWITHERED"
+                end
+            elseif target.components.farmplantstress ~= nil then --作物
                 if
                     target.components.growable ~= nil and
-                    target:HasTag("farm_plant_killjoy") --这个标签代表作物腐烂了
+                    target:HasTag("pickable_harvest_str") --这个标签代表作物腐烂了
                 then
                     if CalcuCost(mask, doer, 5) then
                         local growable = target.components.growable

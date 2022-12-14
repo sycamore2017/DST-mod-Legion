@@ -176,7 +176,6 @@ local function OnUpdateLight(inst)
     inst.Light:Enable(true)
     inst._lightradius = radius
 end
-
 local function OnLightDirty(inst, shouldon, maxradius)
     inst._islighton = shouldon
     inst._lightmaxradius = maxradius
@@ -189,7 +188,6 @@ local function OnLightDirty(inst, shouldon, maxradius)
         inst._lighttask = inst:DoPeriodicTask(FRAMES, OnUpdateLight)
     end
 end
-
 local function onturnon(inst)
     if inst._activetask == nil then
         if inst.activated > 0 then            
@@ -231,7 +229,6 @@ local function onturnon(inst)
         end
     end
 end
-
 local function onturnoff(inst)
     if inst._activetask == nil then 
         if inst.activated > 0 then                
@@ -264,7 +261,6 @@ local function doneact(inst)
         onturnoff(inst)
     end
 end
-
 local function doonact(inst)
     if inst._activecount > 1 then
         inst._activecount = inst._activecount - 1
@@ -276,9 +272,25 @@ local function doonact(inst)
     inst.SoundEmitter:PlaySound("dontstarve/common/together/celestial_orb/active")
 end
 
-local function onactivate(inst)
+local function onactivate(inst, doer, recipe)
     if inst.activated > 0 then
-        inst.activated = inst.activated - 1
+        if
+            recipe and recipe.level and recipe.level.ELECOURMALINE ~= nil and
+            recipe.level.ELECOURMALINE == 3 --高阶重铸科技才减少次数
+        then
+            inst.activated = inst.activated - 1
+            if inst.keystone ~= nil then
+                local usedkey = inst.activated + 1
+                for i, v in pairs(inst.keystone) do
+                    if i == usedkey then
+                        v.AnimState:PlayAnimation("kidle_use")
+                        v.AnimState:PushAnimation("kidle", false)
+                        v.Light:Enable(false)
+                        break
+                    end
+                end
+            end
+        end
 
         inst.AnimState:PlayAnimation("active_use")
         if inst.activated > 0 then
@@ -288,18 +300,6 @@ local function onactivate(inst)
             inst.AnimState:PushAnimation("loop", true)
             OnLightDirty(inst, true, LIGHT_RADIUS)
             inst.components.prototyper.trees = TUNING.PROTOTYPER_TREES.ELECOURMALINE_ONE or TUNING.PROTOTYPER_TREES.SCIENCEMACHINE
-        end
-
-        if inst.keystone ~= nil then
-            local usedkey = inst.activated + 1
-            for i, v in pairs(inst.keystone) do
-                if i == usedkey then
-                    v.AnimState:PlayAnimation("kidle_use")
-                    v.AnimState:PushAnimation("kidle", false)
-                    v.Light:Enable(false)
-                    break
-                end
-            end
         end
     else
         inst.AnimState:PlayAnimation("use")
