@@ -321,6 +321,35 @@ configuration_options = {
         default = "bookbuilder",
     },
     L and {
+        name = "HiddenUpdateTimes",
+        label = "Max Upgrade Times of Hidden Moonlight",
+        hover = "Set the maximum upgrade times of Hidden Moonlight.",
+        options = {
+            { description = "14 times", data = 14 },
+            { description = "28 times", data = 28 },
+            { description = "42 times", data = 42 },
+            { description = "56 times(default)", data = 56 },
+            { description = "70 times", data = 70 },
+            { description = "84 times", data = 84 },
+            { description = "98 times", data = 98 }
+        },
+        default = 56
+    } or {
+        name = "HiddenUpdateTimes",
+        label = "月藏宝匣最大升级次数",
+        hover = "设置月藏宝匣的升级次数的最大值。",
+        options = {
+            { description = "14次", data = 14 },
+            { description = "28次", data = 28 },
+            { description = "42次", data = 42 },
+            { description = "56次(默认)", data = 56 },
+            { description = "70次", data = 70 },
+            { description = "84次", data = 84 },
+            { description = "98次", data = 98 }
+        },
+        default = 56
+    },
+    L and {
         name = "RevolvedUpdateTimes",
         label = "Max Upgrade Times of Revolved Moonlight",
         hover = "Set the maximum upgrade times of Revolved Moonlight.",

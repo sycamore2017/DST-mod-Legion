@@ -744,6 +744,13 @@ then
         _G.REPAIRERS_L = {}
     end
 
+    local function Fn_sg_short(doer, action)
+        return "doshortaction"
+    end
+    local function Fn_sg_long(doer, action)
+        return "dolongaction"
+    end
+
     local function CommonDoerCheck(doer, target)
         if doer.replica.rider ~= nil and doer.replica.rider:IsRiding() then --骑牛时只能修复自己的携带物品
             if not (target.replica.inventoryitem ~= nil and target.replica.inventoryitem:IsGrandOwner(doer)) then
@@ -843,9 +850,7 @@ then
         for k,v in pairs(fungus_needchange) do
             _G.REPAIRERS_L[k] = {
                 fn_try = Fn_try_fungus,
-                fn_sg = function(doer, action)
-                    return "doshortaction"
-                end,
+                fn_sg = Fn_sg_short,
                 fn_do = function(act)
                     return Fn_do_fungus(act.doer, act.invobject, act.target, v)
                 end
@@ -895,18 +900,14 @@ then
 
         _G.REPAIRERS_L["silk"] = {
             fn_try = Fn_try_guitar, --【客户端】
-            fn_sg = function(doer, action) --【服务端、客户端】
-                return "dolongaction"
-            end,
+            fn_sg = Fn_sg_long, --【服务端、客户端】
             fn_do = function(act) --【服务端】
                 return Fn_do_guitar(act.doer, act.invobject, act.target, TUNING.TOTAL_DAY_TIME * 0.1)
             end
         }
         _G.REPAIRERS_L["steelwool"] = {
             fn_try = Fn_try_guitar,
-            fn_sg = function(doer, action)
-                return "dolongaction"
-            end,
+            fn_sg = Fn_sg_long,
             fn_do = function(act)
                 return Fn_do_guitar(act.doer, act.invobject, act.target, TUNING.TOTAL_DAY_TIME * 0.9)
             end
@@ -923,7 +924,7 @@ then
                 end
                 return false
             end,
-            fn_sg = function(doer, action) return "doshortaction" end,
+            fn_sg = Fn_sg_short,
             fn_do = function(act)
                 return DoUpgrade(act.doer, act.invobject, act.target, 1, false, "MAT")
             end
@@ -976,9 +977,7 @@ then
         for k,v in pairs(rock_needchange) do
             _G.REPAIRERS_L[k] = {
                 fn_try = Fn_try_sand,
-                fn_sg = function(doer, action)
-                    return "dolongaction"
-                end,
+                fn_sg = Fn_sg_long,
                 fn_do = function(act)
                     return Fn_do_sand(act.doer, act.invobject, act.target, v)
                 end
@@ -989,20 +988,33 @@ then
 
     if CONFIGS_LEGION.PRAYFORRAIN then
         _G.UPGRADETYPES.REVOLVED_L = "revolved_l"
+        _G.UPGRADETYPES.HIDDEN_L = "hidden_l"
+
+        local function Fn_try_gem(doer, target, tag)
+            if target:HasTag(tag) then
+                if CommonDoerCheck(doer, target) then
+                    return true
+                end
+            end
+            return false
+        end
+        local function Fn_do_gem(act)
+            return DoUpgrade(act.doer, act.invobject, act.target, 1, true, "YELLOWGEM")
+        end
 
         _G.REPAIRERS_L["yellowgem"] = {
             fn_try = function(inst, doer, target, actions, right)
-                if target:HasTag(UPGRADETYPES.REVOLVED_L.."_upgradeable") then
-                    if CommonDoerCheck(doer, target) then
-                        return true
-                    end
-                end
-                return false
+                return Fn_try_gem(doer, target, UPGRADETYPES.REVOLVED_L.."_upgradeable")
             end,
-            fn_sg = function(doer, action) return "doshortaction" end,
-            fn_do = function(act)
-                return DoUpgrade(act.doer, act.invobject, act.target, 1, true, "YELLOWGEM")
-            end
+            fn_sg = Fn_sg_short,
+            fn_do = Fn_do_gem
+        }
+        _G.REPAIRERS_L["bluegem"] = {
+            fn_try = function(inst, doer, target, actions, right)
+                return Fn_try_gem(doer, target, UPGRADETYPES.HIDDEN_L.."_upgradeable")
+            end,
+            fn_sg = Fn_sg_short,
+            fn_do = Fn_do_gem
         }
     end
 
@@ -1025,7 +1037,7 @@ then
         if act.invobject ~= nil then
             if act.invobject.prefab == "mat_whitewood_item" then
                 return "MERGE"
-            elseif act.invobject.prefab == "yellowgem" then
+            elseif act.invobject.prefab == "yellowgem" or act.invobject.prefab == "bluegem" then
                 return "EMBED"
             end
         end

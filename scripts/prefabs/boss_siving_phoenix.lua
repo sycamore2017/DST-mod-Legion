@@ -2604,7 +2604,11 @@ table.insert(prefs, Prefab(
     function()
         local inst = CreateEntity()
 
-        inst.entity:AddTransform()
+        inst.entity:AddTransform() --Tip：AddAnimState 组件 必需在该组件之后，否则会崩溃
+
+        --这个prefab我本来不准备加动画机制的，但是【Super Wall】mod 里会因此崩溃：它的机制默认装备物品是有这个组件的
+        inst.entity:AddAnimState()
+
         inst.entity:AddNetwork()
 
         MakeInventoryPhysics(inst)

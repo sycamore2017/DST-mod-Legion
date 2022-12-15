@@ -193,6 +193,7 @@ if GetModConfigData("PrayForRain") then --祈雨祭 bool
     _G.CONFIGS_LEGION.PRAYFORRAIN = true
 
     _G.CONFIGS_LEGION.BOOKRECIPETABS = GetModConfigData("BookRecipetabs") --设置多变的云的制作栏 "bookbuilder" "magic"
+    _G.CONFIGS_LEGION.HIDDENUPDATETIMES = GetModConfigData("HiddenUpdateTimes") --月藏宝匣最大升级次数
     _G.CONFIGS_LEGION.REVOLVEDUPDATETIMES = GetModConfigData("RevolvedUpdateTimes") --月轮宝盘最大升级次数
 end
 

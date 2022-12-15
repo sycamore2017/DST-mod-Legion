@@ -60,9 +60,45 @@ local function MakeItem(sets)
     end, sets.assets, sets.prefabs))
 end
 
+local function SpawnStackGem(gemname, num, x, y, z)
+    local gems = SpawnPrefab(gemname)
+    if gems ~= nil then
+        if num > 1 and gems.components.stackable ~= nil then
+            gems.components.stackable:SetStackSize(num)
+        end
+        gems.Transform:SetPosition(x, y, z)
+        if gems.components.inventoryitem ~= nil then
+            gems.components.inventoryitem:OnDropped(true)
+        end
+    end
+end
+local function DropGems(inst, gemname)
+    local numgems = inst.components.upgradeable:GetStage() - 1
+    if numgems > 0 then
+        local x, y, z = inst.Transform:GetWorldPosition()
+        local numgroup = math.floor(numgems / TUNING.STACK_SIZE_SMALLITEM)
+        local numsingle = numgems % TUNING.STACK_SIZE_SMALLITEM
+        if numgroup >= 1 then
+            for i = 1, numgroup, 1 do
+                SpawnStackGem(gemname, TUNING.STACK_SIZE_SMALLITEM, x, y, z)
+            end
+        end
+        if numsingle >= 1 then
+            SpawnStackGem(gemname, numsingle, x, y, z)
+        end
+    end
+end
+
+local function OnUpgradeFn(inst, doer, item)
+    inst.SoundEmitter:PlaySound("dontstarve/common/telebase_gemplace")
+end
+
 --------------------------------------------------------------------------
 --[[ 月藏宝匣 ]]
 --------------------------------------------------------------------------
+
+local times_hidden = CONFIGS_LEGION.HIDDENUPDATETIMES or 56
+local step_hidden = math.floor(times_hidden/14)
 
 local function SetTarget_hidden(inst, targetprefab)
     inst.upgradetarget = targetprefab
@@ -84,8 +120,15 @@ local function DoBenefit(inst)
     if benifitnum == 0 then
         return
     end
-    if benifitnum > 4 then
-        for i = 1, 4 do
+
+    local stagenow = inst.components.upgradeable:GetStage() - 1
+    if stagenow > times_hidden then --在设置变换中，会出现当前等级大于最大等级的情况
+        stagenow = times_hidden
+    end
+    stagenow = math.floor(stagenow/step_hidden) + 2 --默认2格
+
+    if benifitnum > stagenow then
+        for i = 1, stagenow do
             local benifititem = table.remove(items_valid, math.random(#items_valid))
             benifititem.components.perishable:SetPercent(1)
         end
@@ -277,6 +320,9 @@ table.insert(prefs, Prefab("hiddenmoonlight", function()
             end
         end
 
+        --归还宝石
+        DropGems(inst, "bluegem")
+
         inst.components.lootdropper:SpawnLootPrefab("hiddenmoonlight_item")
 
         local fx = SpawnPrefab("collapse_small")
@@ -284,6 +330,13 @@ table.insert(prefs, Prefab("hiddenmoonlight", function()
         fx:SetMaterial("stone")
         inst:Remove()
     end)
+
+    inst:AddComponent("upgradeable")
+    inst.components.upgradeable.upgradetype = UPGRADETYPES.HIDDEN_L
+    inst.components.upgradeable.onupgradefn = OnUpgradeFn
+    -- inst.components.upgradeable.onstageadvancefn = function(inst)end
+    inst.components.upgradeable.numstages = times_hidden + 1
+    inst.components.upgradeable.upgradesperstage = 1
 
     inst:WatchWorldState("isfullmoon", OnFullMoon_hidden)
 
@@ -708,8 +761,6 @@ local function MakeRevolved(sets)
         --因为有容器组件，所以不会被猴子、食人花、坎普斯等拿走
         inst:AddTag("NORATCHECK") --mod兼容：永不妥协。该道具不算鼠潮分
 
-        inst.repair_revolved_l = true
-
         inst:AddComponent("skinedlegion")
         inst.components.skinedlegion:InitWithFloater(sets.name)
 
@@ -768,23 +819,10 @@ local function MakeRevolved(sets)
             local back = SpawnPrefab(sets.ispro and "krampus_sack" or "piggyback")
             if back ~= nil then
                 back.Transform:SetPosition(x, y, z)
-                back = nil
             end
 
             --归还宝石
-            local numgems = inst.components.upgradeable:GetStage() - 1
-            if numgems > 0 then
-                back = SpawnPrefab("yellowgem")
-                if back ~= nil then
-                    if numgems > 1 and back.components.stackable ~= nil then
-                        back.components.stackable:SetStackSize(numgems)
-                    end
-                    back.Transform:SetPosition(x, y, z)
-                    if back.components.inventoryitem ~= nil then
-                        back.components.inventoryitem:OnDropped(true)
-                    end
-                end
-            end
+            DropGems(inst, "yellowgem")
 
             --归还套件
             local links = inst.components.skinedlegion:GetLinkedSkins()
@@ -804,9 +842,7 @@ local function MakeRevolved(sets)
 
         inst:AddComponent("upgradeable")
         inst.components.upgradeable.upgradetype = UPGRADETYPES.REVOLVED_L
-        inst.components.upgradeable.onupgradefn = function(inst, doer, item)
-            inst.SoundEmitter:PlaySound("dontstarve/common/telebase_gemplace")
-        end
+        inst.components.upgradeable.onupgradefn = OnUpgradeFn
         inst.components.upgradeable.onstageadvancefn = function(inst)
             inst.components.rechargeable:SetPercent(1) --每次升级，重置冷却时间
             ResetRadius(inst, nil)
