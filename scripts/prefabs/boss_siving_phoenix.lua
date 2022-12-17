@@ -798,6 +798,7 @@ local function OnMiss_fly(inst, targetpos, attacker)
             for _,v in ipairs(attacker.sivfeathers_l) do
                 if v and v:IsValid() then
                     num = num + 1
+                    v:Remove() --一旦有羽毛到达就把所有羽毛删了，防止残留
                 end
             end
             attacker.sivfeathers_l = nil
@@ -815,7 +816,9 @@ local function OnMiss_fly(inst, targetpos, attacker)
                 end
             end
         end
-        inst:Remove()
+        if inst:IsValid() then
+            inst:Remove()
+        end
     else
         if --有线，那就先以滞留体形式存在
             inst.hasline and

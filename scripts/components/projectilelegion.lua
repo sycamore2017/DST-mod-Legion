@@ -117,7 +117,11 @@ function ProjectileLegion:OnUpdate(dt)
 	local x, y, z = current:Get()
 
 	--检测目前所在地皮，如果进入虚空领地，就直接停止
-	if not TheWorld.Map:IsAboveGroundAtPoint(x, 0, z) and not TheWorld.Map:IsOceanTileAtPoint(x, 0, z) then
+	if
+		not self.isgoback and --防止飞回来时被卡住
+		not TheWorld.Map:IsAboveGroundAtPoint(x, 0, z) and
+		not TheWorld.Map:IsOceanTileAtPoint(x, 0, z)
+	then
 		self:Miss()
 		return
 	end

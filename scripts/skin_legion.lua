@@ -2295,10 +2295,17 @@ _G.SKINS_LEGION = {
             anim = "idle_big", isloop_anim = nil, animpush = nil, isloop_animpush = nil,
             setable = true
         },
+        fn_start = function(inst)
+            inst.AnimState:SetScale(1.08, 1.08, 1.08)
+        end,
+        fn_end = function(inst)
+            inst.AnimState:SetScale(1, 1, 1)
+        end,
         exchangefx = { prefab = nil, offset_y = nil, scale = nil },
         fn_setBuildPlacer = function(inst)
             inst.AnimState:SetBank("carpet_whitewood_law")
             inst.AnimState:SetBuild("carpet_whitewood_law")
+            inst.AnimState:SetScale(1.08, 1.08, 1.08)
         end
     },
     carpet_whitewood_law2 = {
@@ -2343,10 +2350,17 @@ _G.SKINS_LEGION = {
             anim = "idle_big", isloop_anim = nil, animpush = nil, isloop_animpush = nil,
             setable = true
         },
+        fn_start = function(inst)
+            inst.AnimState:SetScale(1.08, 1.08, 1.08)
+        end,
+        fn_end = function(inst)
+            inst.AnimState:SetScale(1, 1, 1)
+        end,
         exchangefx = { prefab = nil, offset_y = nil, scale = nil },
         fn_setBuildPlacer = function(inst)
             inst.AnimState:SetBank("carpet_whitewood_law2")
             inst.AnimState:SetBuild("carpet_whitewood_law2")
+            inst.AnimState:SetScale(1.08, 1.08, 1.08)
         end
     },
 
