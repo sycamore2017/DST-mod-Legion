@@ -26,6 +26,11 @@ local function onnutrient(self)
         self.inst:AddTag("fertableall")
     end
 end
+local function oncluster(self)
+    local now = self.cluster
+	now = Remap(now, 0, self.cluster_max, self.cluster_size[1], self.cluster_size[2])
+	self.inst.AnimState:SetScale(now, now, now)
+end
 
 local PerennialCrop2 = Class(function(self, inst)
 	self.inst = inst
@@ -54,6 +59,10 @@ local PerennialCrop2 = Class(function(self, inst)
 	self.pollinated = 0 --被授粉次数
 	self.infested = 0 --被骚扰次数
 
+	self.cluster = 0 --簇栽等级
+	self.cluster_max = 80 --最大簇栽等级
+	self.cluster_size = { 0.6, 3 } --体型变化范围
+
 	self.taskgrow = nil
 	self.timedata = {
 		start = nil, --开始进行生长的时间点
@@ -76,8 +85,27 @@ nil,
     isflower = onflower,
 	isrotten = onrotten,
 	donemoisture = onmoisture,
-	donenutrient = onnutrient
+	donenutrient = onnutrient,
+	cluster = oncluster
 })
+
+local function OnPicked(inst, doer, loot)
+	local crop = inst.components.perennialcrop2
+	crop:GenerateLoot(doer, 1)
+	local regrowstage = crop.isrotten and 1 or crop.regrowstage --枯萎之后，只能从第一阶段开始
+	if crop.fn_defend ~= nil then
+		crop.fn_defend(inst, doer)
+	end
+	crop.infested = 0
+	crop.pollinated = 0
+	crop.numfruit = nil
+	crop.donenutrient = false
+	crop.donetendable = false
+	crop.donemoisture = false
+	crop:CostNutrition()
+	crop:SetStage(regrowstage, false, false)
+	crop:StartGrowing()
+end
 
 function PerennialCrop2:DebugString()
 	local test = self.taskgrow == nil and "no_task,阶段" or "ye_task,阶段"
@@ -98,6 +126,13 @@ function PerennialCrop2:SetUp(cropprefab, data)
 	self.fn_overripe = data.fn_overripe
 	self.fn_loot = data.fn_loot
 	self.fn_stage = data.fn_stage
+
+	if data.cluster_max then
+		self.cluster_max = data.cluster_max
+	end
+	if data.cluster_size then
+		self.cluster_size = data.cluster_size
+	end
 
 	if data.getsickchance and self.getsickchance > 0 then
 		self.getsickchance = data.getsickchance
@@ -163,25 +198,11 @@ function PerennialCrop2:SetStage(stage, isrotten, skip)
 		if self.inst.components.pickable == nil then
             self.inst:AddComponent("pickable")
         end
-		self.inst.components.pickable.onpickedfn = function(inst, doer)
-			local crop = inst.components.perennialcrop2
-			local regrowstage = crop.isrotten and 1 or crop.regrowstage --枯萎之后，只能从第一阶段开始
-			if crop.fn_defend ~= nil then
-				crop.fn_defend(inst, doer)
-			end
-			crop.infested = 0
-			crop.pollinated = 0
-			crop.numfruit = nil
-			crop.donenutrient = false
-			crop.donetendable = false
-			crop.donemoisture = false
-			crop:CostNutrition()
-			crop:SetStage(regrowstage, false, false)
-			crop:StartGrowing()
-		end
+		self.inst.components.pickable.onpickedfn = OnPicked
 	    self.inst.components.pickable:SetUp(nil)
-		self.inst.components.pickable.use_lootdropper_for_product = true
-		self.inst.components.pickable.picksound = rotten and "dontstarve/wilson/harvest_berries" or "dontstarve/wilson/pickup_plants"
+		-- self.inst.components.pickable.use_lootdropper_for_product = true
+		self.inst.components.pickable.picksound = rotten and "dontstarve/wilson/harvest_berries"
+																or "dontstarve/wilson/pickup_plants"
 	else
 		self.inst:RemoveComponent("pickable")
 	end
@@ -683,6 +704,21 @@ end
 function PerennialCrop2:CanGrowInDark()
 	--枯萎、成熟时，在黑暗中也要计算时间了
 	return self.isrotten or self.stage == self.stage_max or self.cangrowindrak
+end
+
+function PerennialCrop2:GenerateLoot(doer, gettype) --生成收获物
+	local loot = {}
+	local pos = self.inst:GetPosition()
+
+	--先生成物品，然后直接开始丢弃
+
+	if gettype == 1 and doer and doer.components.inventory ~= nil then
+		for i, item in ipairs(loot) do
+			if item.components.inventoryitem ~= nil then
+				doer.components.inventoryitem:GiveItem(item, nil, pos)
+			end
+		end
+	end
 end
 
 function PerennialCrop2:Pollinate(doer, value) --授粉

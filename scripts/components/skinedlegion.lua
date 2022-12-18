@@ -138,6 +138,8 @@ function SkinedLegion:SetSkin(skinname)
 		return true
 	end
 
+	--undo：这里得判断无ID时，从在场所有玩家皮肤数据里判定是否有皮肤
+
 	local skin_data = self:GetSkinData(skinname)
 	if skin_data ~= nil then
 		self:OnSetSkinServer(skin_data, self._skindata)
