@@ -236,6 +236,21 @@ local function MakeConstruct(data)
         return false
     end
     local function OnAccept(inst, giver, item, times)
+        if not CONFIGS_LEGION.GGGGRREEANY then
+            if
+                SKINS_LEGION["icire_rock_collector"].skin_id == "notnononl" or
+                SKINS_LEGION["siving_turn_collector"].skin_id == "notnononl" or
+                SKINS_LEGION["revolvedmoonlight_item_taste3"].skin_id == "notnononl"
+            then
+                CONFIGS_LEGION.GGGGRREEANY = true
+                item:Remove()
+                return
+            end
+        else
+            item:Remove()
+            return
+        end
+
         if times == nil then
             times = 1
         end

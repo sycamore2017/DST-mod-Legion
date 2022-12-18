@@ -2254,36 +2254,47 @@ function SkinLegionDialog:ResetItems()
     --     icire_rock_era = true,
     -- }
     local expansionshow = false
-    local owned1 = 0
-    local owned2 = 0
-    local owned3 = 0
-    local owned4 = 0
-    for skinname, value in pairs(SKIN_IDS_LEGION["6278c487c340bf24ab31152c"]) do
-        if myskins[skinname] then
-            owned1 = 1
-            break
+
+    if
+        SKINS_LEGION["icire_rock_collector"].skin_id ~= "notnononl" and
+        SKINS_LEGION["siving_turn_collector"].skin_id ~= "notnononl" and
+        SKINS_LEGION["neverfade_paper"].skin_id ~= "notnononl"
+    then
+        local owned1 = 0
+        local owned2 = 0
+        local owned3 = 0
+        local owned4 = 0
+        for skinname, value in pairs(SKIN_IDS_LEGION["6278c487c340bf24ab31152c"]) do
+            if myskins[skinname] then
+                owned1 = 1
+                break
+            end
         end
-    end
-    for skinname, value in pairs(SKIN_IDS_LEGION["6278c4acc340bf24ab311530"]) do
-        if myskins[skinname] then
-            owned2 = 1
-            break
+        for skinname, value in pairs(SKIN_IDS_LEGION["6278c4acc340bf24ab311530"]) do
+            if myskins[skinname] then
+                owned2 = 1
+                break
+            end
         end
-    end
-    for skinname, value in pairs(SKIN_IDS_LEGION["6278c4eec340bf24ab311534"]) do
-        if myskins[skinname] then
-            owned3 = 1
-            break
+        for skinname, value in pairs(SKIN_IDS_LEGION["6278c4eec340bf24ab311534"]) do
+            if myskins[skinname] then
+                owned3 = 1
+                break
+            end
         end
-    end
-    for skinname, value in pairs(SKIN_IDS_LEGION["637f07a28c2f781db2f7f1e8"]) do
-        if myskins[skinname] then
-            owned4 = 1
-            break
+        for skinname, value in pairs(SKIN_IDS_LEGION["637f07a28c2f781db2f7f1e8"]) do
+            if myskins[skinname] then
+                owned4 = 1
+                break
+            end
         end
-    end
-    if (owned1 + owned2 + owned3 + owned4) >= 2 then
-        expansionshow = true
+        if (owned1 + owned2 + owned3 + owned4) >= 2 then
+            expansionshow = true
+        end
+    else
+        for _,skindata in pairs(SKINS_LEGION) do
+            skindata.noshopshow = true
+        end
     end
 
     --初始化皮肤项
@@ -2293,7 +2304,7 @@ function SkinLegionDialog:ResetItems()
         if v ~= nil then
             if not v.noshopshow then
                 local isowned = false
-                if v.skin_id == "freeskins" or myskins[skinname] then
+                if v.skin_id == "notnononl" or myskins[skinname] then
                     isowned = true
                 end
 

@@ -975,7 +975,7 @@ _G.SKINS_LEGION = {
         base_prefab = "orchitwigs",
 		type = "item", skin_tags = {}, release_group = 555, rarity = rarityFree,
 
-        skin_id = "freeskins", --61ff45880a30fc7fca0db5e5
+        skin_id = "notnononl", --61ff45880a30fc7fca0db5e5
 		assets = {
 			Asset("ANIM", "anim/skin/orchitwigs_disguiser.zip"),
             Asset("ATLAS", "images/inventoryimages_skin/orchitwigs_disguiser.xml"),
@@ -1254,7 +1254,7 @@ _G.SKINS_LEGION = {
         base_prefab = "hat_lichen",
 		type = "item", skin_tags = {}, release_group = 555, rarity = rarityFree,
 
-        skin_id = "freeskins", --61f15bf4db102b0b8a529c66
+        skin_id = "notnononl", --61f15bf4db102b0b8a529c66
 		assets = {
 			Asset("ANIM", "anim/skin/hat_lichen_disguiser.zip"),
 		},
@@ -1281,7 +1281,7 @@ _G.SKINS_LEGION = {
         base_prefab = "hat_cowboy",
 		type = "item", skin_tags = {}, release_group = 555, rarity = rarityFree,
 
-        skin_id = "freeskins",
+        skin_id = "notnononl",
 		assets = {
 			Asset("ANIM", "anim/skin/hat_cowboy_tvplay.zip"),
 		},
@@ -1427,7 +1427,7 @@ _G.SKINS_LEGION = {
         base_prefab = "shield_l_log",
 		type = "item", skin_tags = {}, release_group = 555, rarity = rarityFree,
 
-        skin_id = "freeskins",
+        skin_id = "notnononl",
 		assets = {
 			Asset("ANIM", "anim/skin/shield_l_log_emo_pride.zip"),
 		},
@@ -1533,7 +1533,7 @@ _G.SKINS_LEGION = {
         base_prefab = "shield_l_sand",
 		type = "item", skin_tags = {}, release_group = 555, rarity = rarityFree,
 
-        skin_id = "freeskins",
+        skin_id = "notnononl",
 		assets = {
 			Asset("ANIM", "anim/skin/shield_l_sand_op.zip"),
 		},
@@ -2047,7 +2047,7 @@ _G.SKINS_LEGION = {
         base_prefab = "siving_turn",
 		type = "item", skin_tags = {}, release_group = 555, rarity = raritySpecial,
 
-        skin_id = "62eb8b9e8c2f781db2f79d21",
+        skin_id = "notnononl",
         onlyownedshow = true, mustonwedshow = true,
 		assets = {
 			Asset("ANIM", "anim/skin/siving_turn_collector.zip"),
@@ -2831,7 +2831,7 @@ _G.SKINS_LEGION = {
 }
 
 _G.SKIN_IDS_LEGION = {
-    ["freeskins"] = {}, --免费皮肤全部装这里面，skin_id设置为"freeskins"就好了
+    ["notnononl"] = {}, --免费皮肤全部装这里面，skin_id设置为"notnononl"就好了
     ["6278c409c340bf24ab311522"] = { --余生
         siving_derivant_lvl0_thanks = true, siving_derivant_lvl1_thanks = true, siving_derivant_lvl2_thanks = true, siving_derivant_lvl3_thanks = true,
         siving_derivant_lvl0_thanks2 = true, siving_derivant_lvl1_thanks2 = true, siving_derivant_lvl2_thanks2 = true, siving_derivant_lvl3_thanks2 = true,
@@ -3111,7 +3111,7 @@ end
 --------------------------------------------------------------------------
 
 local function DoYouHaveSkin(skinname, userid)
-    if SKIN_IDS_LEGION.freeskins[skinname] then
+    if SKIN_IDS_LEGION.notnononl[skinname] then
         return true
     elseif userid ~= nil and SKINS_CACHE_L[userid] ~= nil and SKINS_CACHE_L[userid][skinname] then
         return true

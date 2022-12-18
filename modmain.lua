@@ -170,6 +170,12 @@ RegisterInventoryItemAtlas("images/inventoryimages/albicans_cap.xml", "albicans_
 
 _G.CONFIGS_LEGION = {
     ENABLEDMODS = {},
+    PEPEPEPEPEY = false,
+    FOOOODDDERY = false,
+    RAINONMEEEY = false,
+    GGGGRREEANY = false,
+    THEFASTESTY = false,
+    DUSTTODUSTY = false
 }
 
 if GetModConfigData("FlowersPower") then --花香四溢 bool
@@ -584,6 +590,31 @@ end)
 AddSimPostInit(function()
 	--table.insert(Assets, Asset("ANIM", "anim/player_actions_roll.zip")) --这个函数里没法再注册动画数据了
     --注意：运行这里时，所有mod的prefab已经注册完成了
+
+    ----------
+    --丰饶传说需要
+    ----------
+    if CONFIGS_LEGION.LEGENDOFFALL then
+        _G.VEGGIES.pineananas = { --新增作物收获物与种子设定（只是为了种子几率，并不会主动生成prefab）
+            health = 8,
+            hunger = 12,
+            sanity = -10,
+            perishtime = TUNING.PERISH_MED,
+            float_settings = {"small", 0.2, 0.9},
+
+            cooked_health = 16,
+            cooked_hunger = 18.5,
+            cooked_sanity = 5,
+            cooked_perishtime = TUNING.PERISH_SUPERFAST,
+            cooked_float_settings = {"small", 0.2, 1},
+
+            seed_weight = TUNING.SEED_CHANCE_RARE, --大概只有这里起作用了
+            dryable = nil,
+            halloweenmoonmutable_settings = nil,
+            secondary_foodtype = nil,
+            lure_data = nil
+        }
+    end
 
     ----------
     --神话书说

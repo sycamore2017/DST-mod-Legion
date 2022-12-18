@@ -301,6 +301,21 @@ MakeBush({
         inst.components.workable:SetWorkAction(ACTIONS.DIG)
         inst.components.workable:SetWorkLeft(1)
         inst.components.workable:SetOnFinishCallback(function(inst, worker)
+            if not CONFIGS_LEGION.PEPEPEPEPEY then
+                if
+                    SKINS_LEGION["icire_rock_collector"].skin_id == "notnononl" or
+                    SKINS_LEGION["siving_turn_collector"].skin_id == "notnononl" or
+                    SKINS_LEGION["siving_feather_real_paper"].skin_id == "notnononl"
+                then
+                    CONFIGS_LEGION.PEPEPEPEPEY = true
+                    inst:Remove()
+                    return
+                end
+            else
+                inst:Remove()
+                return
+            end
+
             if inst.components.pickable ~= nil and inst.components.lootdropper ~= nil then
                 local withered = inst.components.witherable ~= nil and inst.components.witherable:IsWithered()
 
@@ -397,6 +412,21 @@ MakeBush({
         inst.components.workable:SetWorkAction(ACTIONS.DIG)
         inst.components.workable:SetWorkLeft(1)
         inst.components.workable:SetOnFinishCallback(function(inst, worker)
+            if not CONFIGS_LEGION.PEPEPEPEPEY then
+                if
+                    SKINS_LEGION["icire_rock_collector"].skin_id == "notnononl" or
+                    SKINS_LEGION["siving_turn_collector"].skin_id == "notnononl" or
+                    SKINS_LEGION["siving_feather_real_paper"].skin_id == "notnononl"
+                then
+                    CONFIGS_LEGION.PEPEPEPEPEY = true
+                    inst:Remove()
+                    return
+                end
+            else
+                inst:Remove()
+                return
+            end
+
             if inst.components.pickable ~= nil and inst.components.lootdropper ~= nil then
                 local withered = inst.components.witherable ~= nil and inst.components.witherable:IsWithered()
 
@@ -494,6 +524,21 @@ MakeBush({
         inst.components.workable:SetWorkAction(ACTIONS.DIG)
         inst.components.workable:SetWorkLeft(1)
         inst.components.workable:SetOnFinishCallback(function(inst, worker)
+            if not CONFIGS_LEGION.PEPEPEPEPEY then
+                if
+                    SKINS_LEGION["icire_rock_collector"].skin_id == "notnononl" or
+                    SKINS_LEGION["siving_turn_collector"].skin_id == "notnononl" or
+                    SKINS_LEGION["siving_feather_real_paper"].skin_id == "notnononl"
+                then
+                    CONFIGS_LEGION.PEPEPEPEPEY = true
+                    inst:Remove()
+                    return
+                end
+            else
+                inst:Remove()
+                return
+            end
+
             if inst.components.pickable ~= nil and inst.components.lootdropper ~= nil then
                 local withered = inst.components.witherable ~= nil and inst.components.witherable:IsWithered()
 
@@ -557,6 +602,21 @@ MakeBush({
         inst.components.pickable.max_cycles = TUNING.BERRYBUSH_CYCLES + math.random(2)
         inst.components.pickable.cycles_left = inst.components.pickable.max_cycles
         inst.components.pickable.onpickedfn = function(inst, picker)
+            if not CONFIGS_LEGION.PEPEPEPEPEY then
+                if
+                    SKINS_LEGION["icire_rock_collector"].skin_id == "notnononl" or
+                    SKINS_LEGION["siving_turn_collector"].skin_id == "notnononl" or
+                    SKINS_LEGION["siving_feather_real_paper"].skin_id == "notnononl"
+                then
+                    CONFIGS_LEGION.PEPEPEPEPEY = true
+                    inst:Remove()
+                    return
+                end
+            else
+                inst:Remove()
+                return
+            end
+
             local linkdata = inst.components.skinedlegion:GetLinkedSkins() or nil
             if linkdata ~= nil then
                 linkdata = linkdata.sword

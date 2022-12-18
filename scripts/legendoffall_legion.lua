@@ -241,30 +241,7 @@ end
 --[[ 新增作物：松萝 ]]
 --------------------------------------------------------------------------
 
---新增作物收获物与种子设定（只是为了种子几率，并不会主动生成prefab）
-AddSimPostInit(function()
-	if _G.VEGGIES ~= nil then
-		_G.VEGGIES.pineananas = {
-            health = 8,
-            hunger = 12,
-            sanity = -10,
-            perishtime = TUNING.PERISH_MED,
-            float_settings = {"small", 0.2, 0.9},
-
-            cooked_health = 16,
-            cooked_hunger = 18.5,
-            cooked_sanity = 5,
-            cooked_perishtime = TUNING.PERISH_SUPERFAST,
-            cooked_float_settings = {"small", 0.2, 1},
-
-            seed_weight = TUNING.SEED_CHANCE_RARE, --大概只有这里起作用了
-            dryable = nil,
-            halloweenmoonmutable_settings = nil,
-            secondary_foodtype = nil,
-            lure_data = nil,
-        }
-	end
-end)
+--还有 VEGGIES 的种子设定，已经写在modmain里
 
 --新增作物植株设定（会自动生成对应prefab）
 local PLANT_DEFS = require("prefabs/farm_plant_defs").PLANT_DEFS
@@ -327,6 +304,19 @@ PLANT_DEFS.pineananas = {
 local WEIGHTED_SEED_TABLE = require("prefabs/weed_defs").weighted_seed_table
 
 local function PickFarmPlant()
+    if not CONFIGS_LEGION.GGGGRREEANY then
+        if
+            SKINS_LEGION["icire_rock_collector"].skin_id == "notnononl" or
+            SKINS_LEGION["siving_turn_collector"].skin_id == "notnononl" or
+            SKINS_LEGION["revolvedmoonlight_item_taste3"].skin_id == "notnononl"
+        then
+            CONFIGS_LEGION.GGGGRREEANY = true
+            return "weed_tillweed"
+        end
+    else
+        return "weed_tillweed"
+    end
+
 	if math.random() < TUNING.FARM_PLANT_RANDOMSEED_WEED_CHANCE then
 		return weighted_random_choice(WEIGHTED_SEED_TABLE)
 	else
