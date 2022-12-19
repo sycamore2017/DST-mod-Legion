@@ -62,6 +62,7 @@ local PerennialCrop2 = Class(function(self, inst)
 	self.cluster = 0 --簇栽等级
 	self.cluster_max = 80 --最大簇栽等级
 	self.cluster_size = { 0.6, 3 } --体型变化范围
+	self.lootothers = nil --{ log=0.02 } 副产物表
 
 	self.taskgrow = nil
 	self.timedata = {
@@ -76,7 +77,7 @@ local PerennialCrop2 = Class(function(self, inst)
 	self.onctlchange = nil
 
 	self.fn_overripe = nil --过熟时触发：fn(inst, numloot)
-	self.fn_loot = nil --获取收获物时触发：fn(inst, loot)
+	self.fn_loot = nil --获取收获物时触发：fn(self, loot)
 	self.fn_stage = nil --每次设定生长阶段时额外触发的函数：fn(inst, isfull)
 	self.fn_defend = nil --作物被采集/破坏时会寻求庇护的函数：fn(inst, target)
 end,
@@ -91,7 +92,7 @@ nil,
 
 local function OnPicked(inst, doer, loot)
 	local crop = inst.components.perennialcrop2
-	crop:GenerateLoot(doer, 1)
+	crop:GenerateLoot(doer, true)
 	local regrowstage = crop.isrotten and 1 or crop.regrowstage --枯萎之后，只能从第一阶段开始
 	if crop.fn_defend ~= nil then
 		crop.fn_defend(inst, doer)
@@ -133,6 +134,7 @@ function PerennialCrop2:SetUp(cropprefab, data)
 	if data.cluster_size then
 		self.cluster_size = data.cluster_size
 	end
+	self.lootothers = data.lootothers
 
 	if data.getsickchance and self.getsickchance > 0 then
 		self.getsickchance = data.getsickchance
@@ -365,11 +367,11 @@ function PerennialCrop2:DoGrowth(skip)
 
 	if data.justgrown then
 		if data.stage == self.stage_max then --如果成熟了，开始计算果子数量
-			local num = self.pollinated >= self.pollinated_max and 2 or 1
+			local num = 1
 			local rand = math.random()
-			if rand < 0.5 then --50%几率两个果实
+			if rand < 0.35 then --50%几率2果实
 				num = num + 1
-			elseif rand < 0.85 then --35%几率三个果实
+			elseif rand < 0.5 then --35%几率3果实
 				num = num + 2
 			end
 			self.numfruit = num
@@ -706,13 +708,105 @@ function PerennialCrop2:CanGrowInDark()
 	return self.isrotten or self.stage == self.stage_max or self.cangrowindrak
 end
 
-function PerennialCrop2:GenerateLoot(doer, gettype) --生成收获物
+local function SpawnStackDrop(loot, name, num, pos)
+	local item = SpawnPrefab(name)
+	if item ~= nil then
+		if num > 1 and item.components.stackable ~= nil then
+			local maxsize = item.components.stackable.maxsize
+			if num <= maxsize then
+				item.components.stackable:SetStackSize(num)
+				num = 0
+			else
+				item.components.stackable:SetStackSize(maxsize)
+				num = num - maxsize
+			end
+		else
+			num = num - 1
+        end
+
+        item.Transform:SetPosition(pos:Get())
+        if item.components.inventoryitem ~= nil then
+            item.components.inventoryitem:OnDropped(true)
+        end
+		table.insert(loot, item)
+
+		if num >= 1 then
+			SpawnStackDrop(loot, name, num, pos)
+		end
+	end
+end
+function PerennialCrop2:AddLoot(loot, name, number)
+	if loot[name] == nil then
+		loot[name] = number
+	else
+		loot[name] = loot[name] + number
+	end
+end
+function PerennialCrop2:GenerateLoot(doer, ispicked) --生成收获物
 	local loot = {}
+	local lootprefabs = {}
 	local pos = self.inst:GetPosition()
 
-	--先生成物品，然后直接开始丢弃
+	if self.fn_loot ~= nil then
+		self.fn_loot(self, lootprefabs)
+	elseif self.stage == self.stage_max then
+		if self.numfruit ~= nil and self.numfruit > 0 then
+			--先算主
+			local num = self.cluster - 1 + self.numfruit
+			if num <= 0 then
+				num = 1
+			end
+			if self.pollinated >= self.pollinated_max then --授粉成功
+				num = num + math.max( math.floor(self.cluster*0.1), 1 )
+			end
+			self:AddLoot(lootprefabs, self.isrotten and "spoiled_food" or self.cropprefab, num)
 
-	if gettype == 1 and doer and doer.components.inventory ~= nil then
+			--后算副
+			if self.lootothers ~= nil then
+				for name, factor in pairs(self.lootothers) do
+					num = math.floor(self.cluster*factor)
+					if num > 0 then
+						self:AddLoot(lootprefabs, self.isrotten and "spoiled_food" or name, num)
+					end
+				end
+			end
+		end
+	end
+
+	if not ispicked then --非采集时，多半是破坏
+		if self.level and self.level.witheredprefab then
+			for _,prefab in ipairs(self.level.witheredprefab) do
+				self:AddLoot(lootprefabs, prefab, 1)
+			end
+		end
+	end
+
+	if self.isflower and not self.isrotten then
+		self:AddLoot(lootprefabs, "petals", 3)
+	elseif self.stage > 1 then
+		local hasprefab = false
+		for _, num in pairs(lootprefabs) do
+			if num > 0 then
+				hasprefab = true
+				break
+			end
+		end
+		if not hasprefab then
+			if self.isrotten then
+				self:AddLoot(lootprefabs, "spoiled_food", 1)
+			else
+				self:AddLoot(lootprefabs, "cutgrass", 1)
+			end
+		end
+	end
+
+	for name, num in pairs(lootprefabs) do --生成实体并设置物理掉落
+		if num > 0 then
+			SpawnStackDrop(loot, name, num, pos)
+		end
+	end
+
+	if ispicked and doer and doer.components.inventory ~= nil then --给予采摘者
 		for i, item in ipairs(loot) do
 			if item.components.inventoryitem ~= nil then
 				doer.components.inventoryitem:GiveItem(item, nil, pos)

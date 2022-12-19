@@ -60,32 +60,36 @@ local function MakeItem(sets)
     end, sets.assets, sets.prefabs))
 end
 
-local function SpawnStackGem(gemname, num, x, y, z)
-    local gems = SpawnPrefab(gemname)
-    if gems ~= nil then
-        if num > 1 and gems.components.stackable ~= nil then
-            gems.components.stackable:SetStackSize(num)
+local function SpawnStackDrop(name, num, pos)
+	local item = SpawnPrefab(name)
+	if item ~= nil then
+		if num > 1 and item.components.stackable ~= nil then
+			local maxsize = item.components.stackable.maxsize
+			if num <= maxsize then
+				item.components.stackable:SetStackSize(num)
+				num = 0
+			else
+				item.components.stackable:SetStackSize(maxsize)
+				num = num - maxsize
+			end
+		else
+			num = num - 1
         end
-        gems.Transform:SetPosition(x, y, z)
-        if gems.components.inventoryitem ~= nil then
-            gems.components.inventoryitem:OnDropped(true)
+
+        item.Transform:SetPosition(pos:Get())
+        if item.components.inventoryitem ~= nil then
+            item.components.inventoryitem:OnDropped(true)
         end
-    end
+
+		if num >= 1 then
+			SpawnStackDrop(name, num, pos)
+		end
+	end
 end
 local function DropGems(inst, gemname)
     local numgems = inst.components.upgradeable:GetStage() - 1
     if numgems > 0 then
-        local x, y, z = inst.Transform:GetWorldPosition()
-        local numgroup = math.floor(numgems / TUNING.STACK_SIZE_SMALLITEM)
-        local numsingle = numgems % TUNING.STACK_SIZE_SMALLITEM
-        if numgroup >= 1 then
-            for i = 1, numgroup, 1 do
-                SpawnStackGem(gemname, TUNING.STACK_SIZE_SMALLITEM, x, y, z)
-            end
-        end
-        if numsingle >= 1 then
-            SpawnStackGem(gemname, numsingle, x, y, z)
-        end
+        SpawnStackDrop(gemname, numgems, inst:GetPosition())
     end
 end
 
