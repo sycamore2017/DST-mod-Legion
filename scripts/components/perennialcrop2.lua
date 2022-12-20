@@ -298,29 +298,30 @@ function PerennialCrop2:CostFromLand() --从耕地吸取所需养料、水分
 		local farmmgr = TheWorld.components.farming_manager
 		local tile_x, tile_z = TheWorld.Map:GetTileCoordsAtPoint(x, y, z)
     	local _n1, _n2, _n3 = farmmgr:GetTileNutrients(tile_x, tile_z)
+		local clusterplus = math.max( math.floor(self.cluster*0.5), 1 )
 
 		--加水
 		if not self.donemoisture then
 			if farmmgr:IsSoilMoistAtPoint(x, y, z) then
 				self.donemoisture = true
-				farmmgr:AddSoilMoistureAtPoint(x, y, z, -2.5)
+				farmmgr:AddSoilMoistureAtPoint(x, y, z, -2.5*clusterplus)
 			end
 		end
 
 		--施肥
 		if not self.donenutrient then
 			if _n3 > 0 then
-				_n3 = -3
+				_n3 = -3*clusterplus
 				_n2 = 0
 				_n1 = 0
 			elseif _n2 > 0 then
 				_n3 = 0
-				_n2 = -3
+				_n2 = -3*clusterplus
 				_n1 = 0
 			elseif _n1 > 0 then
 				_n3 = 0
 				_n2 = 0
-				_n1 = -3
+				_n1 = -3*clusterplus
 			end
 			if _n3 < 0 or _n2 < 0 or _n1 < 0 then
 				self.donenutrient = true
@@ -357,10 +358,13 @@ function PerennialCrop2:DoGrowth(skip)
 	local data = self:GetNextStage()
 
 	if data.justgrown or data.overripe then --生长和过熟时都会产生虫群
-		if self.getsickchance > 0 and math.random() < self.getsickchance then
-			local bugs = SpawnPrefab(math.random()<0.7 and "cropgnat" or "cropgnat_infester")
-			if bugs ~= nil then
-				bugs.Transform:SetPosition(self.inst.Transform:GetWorldPosition())
+		if self.getsickchance > 0 then
+			local clusterplus = math.max( math.floor(self.cluster*0.1), 1 )
+			if math.random() < self.getsickchance*clusterplus then
+				local bugs = SpawnPrefab(math.random()<0.7 and "cropgnat" or "cropgnat_infester")
+				if bugs ~= nil then
+					bugs.Transform:SetPosition(self.inst.Transform:GetWorldPosition())
+				end
 			end
 		end
 	end
@@ -379,27 +383,28 @@ function PerennialCrop2:DoGrowth(skip)
 	elseif data.stage == self.regrowstage or data.stage == 1 then --重新开始生长时，清空某些数据
 		--如果过熟了，掉落果子，给周围植物、土地和子圭管理者施肥
 		if data.overripe and self.numfruit ~= nil and self.numfruit > 0 then
-			local numloot = 0
-			local numpoop = 0
-			for i = 1, self.numfruit, 1 do
-				if math.random() < 0.6 then
-					numpoop = numpoop + 1
-				else
-					numloot = numloot + 1
-				end
-			end
+			local num = self.cluster + self.numfruit
+			local numpoop = math.ceil( num*(0.5 + math.random()*0.5) )
+			local numloot = num - numpoop
+			local pos = self.inst:GetPosition()
 
 			if numpoop > 0 then
+				local costplus = numpoop >= 10 and 10 or numpoop
+
 				for _,ctl in pairs(self.ctls) do
 					if ctl and ctl:IsValid() and ctl.components.botanycontroller ~= nil then
 						local botanyctl = ctl.components.botanycontroller
-						local nutrients = {42,42,42}
+						local nutrients = {8*costplus,8*costplus,8*costplus}
 						if CanAcceptNutrients(botanyctl, nutrients) then
-							for i = 1, numpoop, 1 do
+							for i = 1, 8, 1 do
 								botanyctl:SetValue(nil, nutrients, true)
-								numpoop = numpoop - 1
+								numpoop = numpoop - costplus
 								if numpoop <= 0 or not CanAcceptNutrients(botanyctl, nutrients) then
 									break
+								end
+								if costplus == 10 and numpoop < 10 then
+									costplus = numpoop
+									nutrients = {8*costplus,8*costplus,8*costplus}
 								end
 							end
 						end
@@ -410,9 +415,11 @@ function PerennialCrop2:DoGrowth(skip)
 					end
 				end
 
-				local x, y, z = self.inst.Transform:GetWorldPosition()
+				local x = pos.x
+				local y = pos.y
+				local z = pos.z
 				if numpoop > 0 then
-					for i = 1, numpoop, 1 do
+					for i = 1, 8, 1 do
 						local hastile = false
 						for k1 = -4, 4, 4 do --只影响周围半径一格的地皮，但感觉最多可涉及到3格地皮
 							for k2 = -4, 4, 4 do
@@ -420,14 +427,17 @@ function PerennialCrop2:DoGrowth(skip)
 								if tile == GROUND.FARMING_SOIL then
 									hastile = true
 									local tile_x, tile_z = TheWorld.Map:GetTileCoordsAtPoint(x+k1, 0, z+k2)
-									TheWorld.components.farming_manager:AddTileNutrients(tile_x, tile_z, 8, 8, 8)
+									TheWorld.components.farming_manager:AddTileNutrients(tile_x, tile_z, 2*costplus,2*costplus,2*costplus)
 								end
 							end
 						end
 						if hastile then
-							numpoop = numpoop - 1
+							numpoop = numpoop - costplus
 							if numpoop <= 0 then
 								break
+							end
+							if costplus == 10 and numpoop < 10 then
+								costplus = numpoop
 							end
 						else
 							break
@@ -436,64 +446,53 @@ function PerennialCrop2:DoGrowth(skip)
 				end
 
 				if numpoop > 0 then
-					for i = 1, numpoop, 1 do
-						local hasset = false
-						local ents = TheSim:FindEntities(x, y, z, 5,
-							nil,
-							{ "NOCLICK", "FX", "INLIMBO" },
-							{ "crop_legion", "crop2_legion", "withered", "barren" }
-						)
-						for _,v in pairs(ents) do
-							if v:IsValid() then
-								local cpt = nil
-								if v.components.pickable ~= nil then
-									if v.components.pickable:CanBeFertilized() then
-										cpt = v.components.pickable
-									end
-								elseif v.components.perennialcrop ~= nil then
-									cpt = v.components.perennialcrop
-								elseif v.components.perennialcrop2 ~= nil then
-									cpt = v.components.perennialcrop2
+					local hasset = false
+					local ents = TheSim:FindEntities(x, y, z, 5,
+						nil,
+						{ "NOCLICK", "FX", "INLIMBO" },
+						{ "crop_legion", "withered", "barren" }
+					)
+					for _,v in pairs(ents) do
+						if v:IsValid() then
+							local cpt = nil
+							if v.components.pickable ~= nil then
+								if v.components.pickable:CanBeFertilized() then
+									cpt = v.components.pickable
 								end
+							elseif v.components.perennialcrop ~= nil then
+								cpt = v.components.perennialcrop
+							elseif v.components.perennialcrop2 ~= nil then
+								cpt = v.components.perennialcrop2
+							end
 
-								if cpt ~= nil then
-									local poop = SpawnPrefab("glommerfuel")
-									if poop ~= nil then
-										if hasset then
-											cpt:Fertilize(poop, nil)
-										else
-											hasset = cpt:Fertilize(poop, nil)
-										end
-										poop:Remove()
+							if cpt ~= nil then
+								local poop = SpawnPrefab("glommerfuel")
+								if poop ~= nil then
+									if hasset then
+										cpt:Fertilize(poop, nil)
+									else
+										hasset = cpt:Fertilize(poop, nil)
 									end
+									poop:Remove()
 								end
 							end
 						end
+					end
 
-						if hasset then
-							numpoop = numpoop -1
-							if numpoop <= 0 then
-								break
-							end
-						else
-							break
-						end
+					if hasset then
+						numpoop = numpoop - costplus
 					end
 				end
 
 				if numpoop > 0 then
-					for i = 1, numpoop, 1 do
-						self.inst.components.lootdropper:SpawnLootPrefab("spoiled_food")
-					end
+					self:SpawnStackDrop(nil, "spoiled_food", numpoop, pos)
 				end
 			end
 
 			if self.fn_overripe ~= nil then
 				self.fn_overripe(self.inst, numloot)
 			elseif numloot > 0 then
-				for i = 1, numloot, 1 do
-					self.inst.components.lootdropper:SpawnLootPrefab(self.cropprefab)
-				end
+				self:SpawnStackDrop(nil, self.cropprefab, numloot, pos)
 			end
 		end
 
@@ -591,9 +590,6 @@ function PerennialCrop2:LongUpdate(dt, isloop, ismagic)
 	else
 		self:StartGrowing() --数据丢失的话，就只能重新开始了
 	end
-
-	-- print("longupdate---------------")
-	-- self:DebugString()
 end
 
 function PerennialCrop2:OnEntitySleep()
@@ -631,6 +627,7 @@ function PerennialCrop2:OnSave()
 		numfruit = self.numfruit ~= nil and self.numfruit or nil,
 		pollinated = self.pollinated > 0 and self.pollinated or nil,
 		infested = self.infested > 0 and self.infested or nil,
+		cluster = self.cluster > 0 and self.cluster or nil
     }
 
 	if self.timedata.paused then
@@ -660,6 +657,11 @@ function PerennialCrop2:OnLoad(data)
 	self.numfruit = data.numfruit
 	self.pollinated = data.pollinated or 0
 	self.infested = data.infested or 0
+
+	if data.cluster ~= nil then
+		self.cluster = data.cluster
+		--undo: 更新簇栽数据
+	end
 
 	self:SetStage(self.stage, self.isrotten, false)
 	self:OnEntitySleep() --把task取消，根据情况继续
@@ -708,7 +710,7 @@ function PerennialCrop2:CanGrowInDark()
 	return self.isrotten or self.stage == self.stage_max or self.cangrowindrak
 end
 
-local function SpawnStackDrop(loot, name, num, pos)
+function PerennialCrop2:SpawnStackDrop(loot, name, num, pos)
 	local item = SpawnPrefab(name)
 	if item ~= nil then
 		if num > 1 and item.components.stackable ~= nil then
@@ -728,10 +730,12 @@ local function SpawnStackDrop(loot, name, num, pos)
         if item.components.inventoryitem ~= nil then
             item.components.inventoryitem:OnDropped(true)
         end
-		table.insert(loot, item)
+		if loot ~= nil then
+			table.insert(loot, item)
+		end
 
 		if num >= 1 then
-			SpawnStackDrop(loot, name, num, pos)
+			self:SpawnStackDrop(loot, name, num, pos)
 		end
 	end
 end
@@ -752,10 +756,7 @@ function PerennialCrop2:GenerateLoot(doer, ispicked) --生成收获物
 	elseif self.stage == self.stage_max then
 		if self.numfruit ~= nil and self.numfruit > 0 then
 			--先算主
-			local num = self.cluster - 1 + self.numfruit
-			if num <= 0 then
-				num = 1
-			end
+			local num = self.cluster + self.numfruit
 			if self.pollinated >= self.pollinated_max then --授粉成功
 				num = num + math.max( math.floor(self.cluster*0.1), 1 )
 			end
@@ -779,6 +780,8 @@ function PerennialCrop2:GenerateLoot(doer, ispicked) --生成收获物
 				self:AddLoot(lootprefabs, prefab, 1)
 			end
 		end
+		--异种也要完全返还
+		self:AddLoot(lootprefabs, "seeds_"..self.cropprefab.."_l", 1+self.cluster)
 	end
 
 	if self.isflower and not self.isrotten then
@@ -802,7 +805,7 @@ function PerennialCrop2:GenerateLoot(doer, ispicked) --生成收获物
 
 	for name, num in pairs(lootprefabs) do --生成实体并设置物理掉落
 		if num > 0 then
-			SpawnStackDrop(loot, name, num, pos)
+			self:SpawnStackDrop(loot, name, num, pos)
 		end
 	end
 
@@ -946,27 +949,28 @@ function PerennialCrop2:CostController()
 		return
 	end
 
+	local clusterplus = math.max( math.floor(self.cluster*0.5), 1 )
 	for _,ctl in pairs(self.ctls) do
 		if ctl and ctl:IsValid() and ctl.components.botanycontroller ~= nil then
 			local botanyctl = ctl.components.botanycontroller
 			local change = false
 			if not self.donemoisture and (botanyctl.type == 1 or botanyctl.type == 3) and botanyctl.moisture > 0 then
-				botanyctl.moisture = math.max(botanyctl.moisture - 2.5, 0)
+				botanyctl.moisture = math.max(botanyctl.moisture - 2.5*clusterplus, 0)
 				self.donemoisture = true
 				change = true
 			end
 
 			if not self.donenutrient and (botanyctl.type == 2 or botanyctl.type == 3) then
 				if botanyctl.nutrients[3] > 0 then
-					botanyctl.nutrients[3] = math.max(botanyctl.nutrients[3] - 3, 0)
+					botanyctl.nutrients[3] = math.max(botanyctl.nutrients[3] - 3*clusterplus, 0)
 					self.donenutrient = true
 					change = true
 				elseif botanyctl.nutrients[2] > 0 then
-					botanyctl.nutrients[2] = math.max(botanyctl.nutrients[2] - 3, 0)
+					botanyctl.nutrients[2] = math.max(botanyctl.nutrients[2] - 3*clusterplus, 0)
 					self.donenutrient = true
 					change = true
 				elseif botanyctl.nutrients[1] > 0 then
-					botanyctl.nutrients[1] = math.max(botanyctl.nutrients[1] - 3, 0)
+					botanyctl.nutrients[1] = math.max(botanyctl.nutrients[1] - 3*clusterplus, 0)
 					self.donenutrient = true
 					change = true
 				end
@@ -1033,9 +1037,7 @@ function PerennialCrop2:DisplayCrop(oldcrop, doer) --替换作物：把它的养
 		self.donenutrient = true
 	end
 
-	oldcrop.components.lootdropper:SpawnLootPrefab("seeds_"..oldcpt.cropprefab.."_l")
-	oldcrop.components.lootdropper:DropLoot()
-
+	oldcpt:GenerateLoot(doer, false) --返还之前异种的掉落物
 	if oldcpt.fn_defend ~= nil and doer then
 		oldcpt.fn_defend(oldcrop, doer)
 	end

@@ -793,46 +793,7 @@ local function MakePlant2(cropprefab, sets)
 					or "GROWING"
 			end
 
-			inst:AddComponent("lootdropper")
-			inst.components.lootdropper:SetLootSetupFn(function(lootdropper)
-				local crop = lootdropper.inst.components.perennialcrop2
-				local loots = {}
-
-				if crop.fn_loot ~= nil then
-					crop.fn_loot(crop.inst, loots)
-				elseif crop.stage == crop.stage_max then
-					if crop.numfruit ~= nil and crop.numfruit > 0 then
-						if crop.isrotten then
-							for i = 1, crop.numfruit, 1 do
-								table.insert(loots, "spoiled_food")
-							end
-						else
-							for i = 1, crop.numfruit, 1 do
-								table.insert(loots, crop.cropprefab)
-							end
-						end
-					end
-				end
-
-				if lootdropper.inst.worked_l then --说明是被破坏的
-					lootdropper.inst.worked_l = nil
-					if crop.level and crop.level.witheredprefab then
-						for _,prefab in ipairs(crop.level.witheredprefab) do
-							table.insert(loots, prefab)
-						end
-					end
-				end
-
-				if crop.isflower and not crop.isrotten then
-					for i = 1, 3, 1 do
-						table.insert(loots, "petals")
-					end
-				elseif crop.stage > 1 and #loots <= 0 then
-					table.insert(loots, crop.isrotten and "spoiled_food" or "cutgrass")
-				end
-
-				lootdropper:SetLoot(loots)
-			end)
+			-- inst:AddComponent("lootdropper")
 
 			inst:AddComponent("hauntable")
 			inst.components.hauntable:SetHauntValue(TUNING.HAUNT_TINY)
