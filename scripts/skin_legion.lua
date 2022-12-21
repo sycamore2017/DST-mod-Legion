@@ -2047,7 +2047,7 @@ _G.SKINS_LEGION = {
         base_prefab = "siving_turn",
 		type = "item", skin_tags = {}, release_group = 555, rarity = raritySpecial,
 
-        skin_id = "notnononl",
+        skin_id = "62eb8b9e8c2f781db2f79d21",
         onlyownedshow = true, mustonwedshow = true,
 		assets = {
 			Asset("ANIM", "anim/skin/siving_turn_collector.zip"),

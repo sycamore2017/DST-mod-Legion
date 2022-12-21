@@ -59,10 +59,10 @@ local PerennialCrop2 = Class(function(self, inst)
 	self.pollinated = 0 --被授粉次数
 	self.infested = 0 --被骚扰次数
 
-	self.cluster = 0 --簇栽等级
+	self.cluster_size = { 0.9, 1.5 } --体型变化范围
 	self.cluster_max = 80 --最大簇栽等级
-	self.cluster_size = { 0.6, 3 } --体型变化范围
-	self.lootothers = nil --{ log=0.02 } 副产物表
+	-- self.cluster = 0 --簇栽等级
+	self.lootothers = nil --{ { israndom=false, factor=0.02, name="log", name_rot="xxx" } } 副产物表
 
 	self.taskgrow = nil
 	self.timedata = {
@@ -76,7 +76,7 @@ local PerennialCrop2 = Class(function(self, inst)
 	self.ctls = {}
 	self.onctlchange = nil
 
-	self.fn_overripe = nil --过熟时触发：fn(inst, numloot)
+	self.fn_overripe = nil --过熟时触发：fn(self, numloot)
 	self.fn_loot = nil --获取收获物时触发：fn(self, loot)
 	self.fn_stage = nil --每次设定生长阶段时额外触发的函数：fn(inst, isfull)
 	self.fn_defend = nil --作物被采集/破坏时会寻求庇护的函数：fn(inst, target)
@@ -92,7 +92,7 @@ nil,
 
 local function OnPicked(inst, doer, loot)
 	local crop = inst.components.perennialcrop2
-	crop:GenerateLoot(doer, true)
+	crop:GenerateLoot(doer, true, false)
 	local regrowstage = crop.isrotten and 1 or crop.regrowstage --枯萎之后，只能从第一阶段开始
 	if crop.fn_defend ~= nil then
 		crop.fn_defend(inst, doer)
@@ -134,6 +134,7 @@ function PerennialCrop2:SetUp(cropprefab, data)
 	if data.cluster_size then
 		self.cluster_size = data.cluster_size
 	end
+	self.cluster = 0 --现在才写是为了动态更新大小
 	self.lootothers = data.lootothers
 
 	if data.getsickchance and self.getsickchance > 0 then
@@ -490,7 +491,7 @@ function PerennialCrop2:DoGrowth(skip)
 			end
 
 			if self.fn_overripe ~= nil then
-				self.fn_overripe(self.inst, numloot)
+				self.fn_overripe(self, numloot)
 			elseif numloot > 0 then
 				self:SpawnStackDrop(nil, self.cropprefab, numloot, pos)
 			end
@@ -660,7 +661,7 @@ function PerennialCrop2:OnLoad(data)
 
 	if data.cluster ~= nil then
 		self.cluster = data.cluster
-		--undo: 更新簇栽数据
+		self.inst._cluster_l:set(self.cluster)
 	end
 
 	self:SetStage(self.stage, self.isrotten, false)
@@ -746,7 +747,7 @@ function PerennialCrop2:AddLoot(loot, name, number)
 		loot[name] = loot[name] + number
 	end
 end
-function PerennialCrop2:GenerateLoot(doer, ispicked) --生成收获物
+function PerennialCrop2:GenerateLoot(doer, ispicked, isburnt) --生成收获物
 	local loot = {}
 	local lootprefabs = {}
 	local pos = self.inst:GetPosition()
@@ -764,10 +765,20 @@ function PerennialCrop2:GenerateLoot(doer, ispicked) --生成收获物
 
 			--后算副
 			if self.lootothers ~= nil then
-				for name, factor in pairs(self.lootothers) do
-					num = math.floor(self.cluster*factor)
+				for _, data in pairs(self.lootothers) do
+					if data.israndom then
+						num = math.random() < data.factor and 1 or 0
+					else
+						num = math.floor(self.cluster*data.factor)
+					end
 					if num > 0 then
-						self:AddLoot(lootprefabs, self.isrotten and "spoiled_food" or name, num)
+						local name
+						if self.isrotten then
+							name = data.name_rot or "spoiled_food"
+						else
+							name = data.name
+						end
+						self:AddLoot(lootprefabs, name, num)
 					end
 				end
 			end
@@ -803,6 +814,22 @@ function PerennialCrop2:GenerateLoot(doer, ispicked) --生成收获物
 		end
 	end
 
+	if isburnt then
+		local lootprefabs2 = {}
+		for name, num in pairs(lootprefabs) do
+			if TUNING.BURNED_LOOT_OVERRIDES[name] ~= nil then
+				self:AddLoot(lootprefabs2, TUNING.BURNED_LOOT_OVERRIDES[name], num)
+			elseif PrefabExists(name.."_cooked") then
+				self:AddLoot(lootprefabs2, name.."_cooked", num)
+			elseif PrefabExists("cooked"..name) then
+				self:AddLoot(lootprefabs2, "cooked"..name, num)
+			else
+				self:AddLoot(lootprefabs2, "ash", num)
+			end
+		end
+		lootprefabs = lootprefabs2
+	end
+
 	for name, num in pairs(lootprefabs) do --生成实体并设置物理掉落
 		if num > 0 then
 			self:SpawnStackDrop(loot, name, num, pos)
@@ -812,7 +839,7 @@ function PerennialCrop2:GenerateLoot(doer, ispicked) --生成收获物
 	if ispicked and doer and doer.components.inventory ~= nil then --给予采摘者
 		for i, item in ipairs(loot) do
 			if item.components.inventoryitem ~= nil then
-				doer.components.inventoryitem:GiveItem(item, nil, pos)
+				doer.components.inventory:GiveItem(item, nil, pos)
 			end
 		end
 	end
@@ -1027,22 +1054,36 @@ function PerennialCrop2:TriggerController(ctl, isadd, noupdate)
 	end
 end
 
-function PerennialCrop2:DisplayCrop(oldcrop, doer) --替换作物：把它的养料占为己有
-	local oldcpt = oldcrop.components.perennialcrop2
+function PerennialCrop2:ClusteredPlant(seeds, doer) --簇栽
+	if seeds.components.plantablelegion == nil then
+		return false
+	end
+	if seeds.components.plantablelegion.plant ~= self.inst.prefab then
+		return false, "NOTMATCH_C"
+	end
+	if self.cluster >= self.cluster_max then
+		return false, "ISMAXED_C"
+	end
 
-	if oldcpt.donemoisture then
-		self.donemoisture = true
+	if seeds.components.stackable ~= nil then
+		local need = self.cluster_max - self.cluster
+		local num = seeds.components.stackable:StackSize()
+		if need > num then
+			self.cluster = self.cluster + num
+		else
+			self.cluster = self.cluster_max
+			seeds = seeds.components.stackable:Get(need)
+		end
+	else
+		self.cluster = self.cluster + 1
 	end
-	if oldcpt.donenutrient then
-		self.donenutrient = true
-	end
+	self.inst._cluster_l:set(self.cluster)
+	seeds:Remove()
 
-	oldcpt:GenerateLoot(doer, false) --返还之前异种的掉落物
-	if oldcpt.fn_defend ~= nil and doer then
-		oldcpt.fn_defend(oldcrop, doer)
+	if self.inst.SoundEmitter ~= nil then
+		self.inst.SoundEmitter:PlaySound("dontstarve/common/plant")
 	end
-	local x, y, z = oldcrop.Transform:GetWorldPosition()
-	SpawnPrefab("dirt_puff").Transform:SetPosition(x, y, z)
+	return true
 end
 
 return PerennialCrop2

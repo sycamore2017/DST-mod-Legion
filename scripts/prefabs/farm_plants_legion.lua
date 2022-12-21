@@ -399,7 +399,6 @@ local function IsTooDarkToGrow(inst)
 	end
 	return IsTooDarkToGrow_legion(inst)
 end
-
 local function UpdateGrowing(inst)
 	if (inst.components.burnable == nil or not inst.components.burnable.burning) and not IsTooDarkToGrow(inst) then
 		if inst.components.perennialcrop then
@@ -415,7 +414,6 @@ local function UpdateGrowing(inst)
 		end
 	end
 end
-
 local function OnIsDark(inst)
 	UpdateGrowing(inst)
 	if TheWorld.state.isnight then
@@ -436,6 +434,21 @@ local function OnIsRaining(inst)
 		inst.components.perennialcrop:PourWater(nil, nil, inst.components.perennialcrop.moisture_max/2)
 	elseif inst.components.perennialcrop2 then
 		inst.components.perennialcrop2:PourWater(nil, nil, 1)
+	end
+end
+
+local function CallDefender(inst, target)
+	if target ~= nil then
+		inst:RemoveTag("farm_plant_defender")
+
+		local x, y, z = inst.Transform:GetWorldPosition()
+		local defenders = TheSim:FindEntities(x, y, z, TUNING.FARM_PLANT_DEFENDER_SEARCH_DIST, {"farm_plant_defender"})
+		for _, defender in ipairs(defenders) do
+			if defender.components.burnable == nil or not defender.components.burnable.burning then
+				defender:PushEvent("defend_farm_plant", {source = inst, target = target})
+				break
+			end
+		end
 	end
 end
 
@@ -618,20 +631,7 @@ local function MakePlant(data)
 
 			inst:AddComponent("perennialcrop")
 			inst.components.perennialcrop:SetUp(data)
-			inst.components.perennialcrop.fn_defend = function(inst, target)
-				if target ~= nil then
-					inst:RemoveTag("farm_plant_defender")
-
-					local x, y, z = inst.Transform:GetWorldPosition()
-					local defenders = TheSim:FindEntities(x, y, z, TUNING.FARM_PLANT_DEFENDER_SEARCH_DIST, {"farm_plant_defender"})
-					for _, defender in ipairs(defenders) do
-						if defender.components.burnable == nil or not defender.components.burnable.burning then
-							defender:PushEvent("defend_farm_plant", {source = inst, target = target})
-							break
-						end
-					end
-				end
-			end
+			inst.components.perennialcrop.fn_defend = CallDefender
 			inst.components.perennialcrop:SetStage(1, false, false, true, false)
 			inst.components.perennialcrop:StartGrowing()
 			inst.components.perennialcrop.onctlchange = function(inst, ctls)
@@ -711,8 +711,62 @@ local function MakePlant(data)
 end
 
 --------------------------------------------------------------------------
---[[ 旧版的多年生植物 ]]
+--[[ 异种植物 ]]
 --------------------------------------------------------------------------
+
+local function GetStatus_p2(inst)
+	local crop = inst.components.perennialcrop2
+	return (crop == nil and "GROWING")
+		or (crop.isrotten and "WITHERED")
+		or (crop.stage == crop.stage_max and "READY")
+		or (crop.isflower and "FLORESCENCE")
+		or (crop.stage <= 2 and "SPROUT")
+		or "GROWING"
+end
+local function OnHaunt_p2(inst, haunter)
+	if inst:HasTag("fertableall") and math.random() <= TUNING.HAUNT_CHANCE_OFTEN then
+		local fert = SpawnPrefab("spoiled_food")
+		inst.components.perennialcrop2:Fertilize(fert, haunter)
+		fert:Remove()
+		return true
+	end
+	return false
+end
+local function OnPlant_p2(inst, pt)
+	local cpt = inst.components.perennialcrop2
+	local ents = TheSim:FindEntities(pt.x, pt.y, pt.z, 20, --寻找周围的管理器
+		{ "siving_ctl" },
+		{ "NOCLICK", "INLIMBO" },
+		nil
+	)
+	for _,v in pairs(ents) do
+		if v:IsValid() and v.components.botanycontroller ~= nil then
+			cpt:TriggerController(v, true, true)
+		end
+	end
+	cpt:CostNutrition()
+	if cpt.donemoisture or cpt.donenutrient or cpt.donetendable then
+		--由于走的不是正常流程，这里得补上对照料的纠正
+		inst.components.farmplanttendable:SetTendable(not cpt.donetendable)
+		cpt:StartGrowing() --由于 CostNutrition() 不会主动更新生长时间，这里手动更新
+	end
+end
+
+local function OnWorkedFinish_p2(inst, worker)
+	local crop = inst.components.perennialcrop2
+	crop:GenerateLoot(worker, false, false)
+	if crop.fn_defend ~= nil then
+		crop.fn_defend(inst, worker)
+	end
+	local x, y, z = inst.Transform:GetWorldPosition()
+	SpawnPrefab("dirt_puff").Transform:SetPosition(x, y, z)
+	inst:Remove()
+end
+local function OnBurnt_p2(inst)
+	local crop = inst.components.perennialcrop2
+	crop:GenerateLoot(nil, false, true)
+	inst:Remove()
+end
 
 local function MakePlant2(cropprefab, sets)
 	local assets = sets.assets or {}
@@ -748,6 +802,8 @@ local function MakePlant2(cropprefab, sets)
 			inst:AddTag("crop2_legion")
 			inst:AddTag("tendable_farmplant") -- for farmplanttendable component
 
+			inst._cluster_l = net_byte(inst.GUID, "plant_crop_l._cluster_l", "cluster_l_dirty")
+
 			inst.displaynamefn = function(inst) --名字，主要是特殊的阶段加点前缀
 				local namepre = ""
 				if inst:HasTag("nognatinfest") then
@@ -769,7 +825,15 @@ local function MakePlant2(cropprefab, sets)
 						namepre = namepre..STRINGS.PLANT_CROP_L["FLORESCENCE"]
 					end
 				end
-				return namepre..STRINGS.NAMES[string.upper("plant_"..cropprefab.."_l")]
+
+				namepre = namepre..STRINGS.NAMES[string.upper("plant_"..cropprefab.."_l")]
+
+				local cluster = inst._cluster_l:value()
+				if cluster ~= nil and cluster > 0 then
+					namepre = namepre.."(Lv."..tostring(cluster)..")"
+				end
+
+				return namepre
 			end
 
 			if sets.fn_common ~= nil then
@@ -783,29 +847,13 @@ local function MakePlant2(cropprefab, sets)
 
 			inst:AddComponent("inspectable")
 			inst.components.inspectable.nameoverride = "PLANT_CROP_L" --用来统一描述，懒得每种作物都搞个描述了
-    		inst.components.inspectable.getstatus = function(inst)
-				local crop = inst.components.perennialcrop2
-				return (crop == nil and "GROWING")
-					or (crop.isrotten and "WITHERED")
-					or (crop.stage == crop.stage_max and "READY")
-					or (crop.isflower and "FLORESCENCE")
-					or (crop.stage <= 2 and "SPROUT")
-					or "GROWING"
-			end
+    		inst.components.inspectable.getstatus = GetStatus_p2
 
 			-- inst:AddComponent("lootdropper")
 
 			inst:AddComponent("hauntable")
 			inst.components.hauntable:SetHauntValue(TUNING.HAUNT_TINY)
-			inst.components.hauntable:SetOnHauntFn(function(inst, haunter)
-				if inst.components.perennialcrop2 ~= nil and math.random() <= TUNING.HAUNT_CHANCE_OFTEN then
-					local fert = SpawnPrefab("spoiled_food")
-					inst.components.perennialcrop2:Fertilize(fert, haunter)
-					fert:Remove()
-					return true
-				end
-				return false
-			end)
+			inst.components.hauntable:SetOnHauntFn(OnHaunt_p2)
 
 			inst:AddComponent("growable")
 			inst.components.growable.stages = {}
@@ -838,22 +886,12 @@ local function MakePlant2(cropprefab, sets)
 			inst:AddComponent("workable")
 			inst.components.workable:SetWorkAction(ACTIONS.DIG)
 			inst.components.workable:SetWorkLeft(1)
-			inst.components.workable:SetOnFinishCallback(function(inst, worker)
-				local crop = inst.components.perennialcrop2
-				if crop.fn_defend ~= nil then
-					crop.fn_defend(inst, worker)
-				end
-				inst.worked_l = true
-				RemovePlant(inst, "dirt_puff", "seeds_"..crop.cropprefab.."_l")
-			end)
+			inst.components.workable:SetOnFinishCallback(OnWorkedFinish_p2)
 
 			if not sets.fireproof then
 				MakeSmallBurnable(inst)
 				MakeSmallPropagator(inst)
-				inst.components.burnable:SetOnBurntFn(function(inst)
-					inst.worked_l = true
-					RemovePlant(inst, nil, "seeds_"..inst.components.perennialcrop2.cropprefab.."_l")
-				end)
+				inst.components.burnable:SetOnBurntFn(OnBurnt_p2)
 				inst.components.burnable:SetOnIgniteFn(function(inst, source, doer)
 					UpdateGrowing(inst)
 				end)
@@ -865,19 +903,7 @@ local function MakePlant2(cropprefab, sets)
 			inst:AddComponent("perennialcrop2")
 			inst.components.perennialcrop2:SetUp(cropprefab, sets)
 			inst.components.perennialcrop2.fn_defend = function(inst, target)
-				if target ~= nil then
-					inst:RemoveTag("farm_plant_defender")
-
-					local x, y, z = inst.Transform:GetWorldPosition()
-					local defenders = TheSim:FindEntities(x, y, z, TUNING.FARM_PLANT_DEFENDER_SEARCH_DIST, {"farm_plant_defender"})
-					for _, defender in ipairs(defenders) do
-						if defender.components.burnable == nil or not defender.components.burnable.burning then
-							defender:PushEvent("defend_farm_plant", {source = inst, target = target})
-							break
-						end
-					end
-				end
-
+				CallDefender(inst, target)
 				if sets.fn_defend ~= nil then
 					sets.fn_defend(inst, target)
 				end
@@ -894,25 +920,7 @@ local function MakePlant2(cropprefab, sets)
 			--季节变换时更新生长速度，我觉得没必要了，因为OnEntityWake就已经更新得很勤了
 			-- inst:WatchWorldState("iswinter", TogglePickable)
 
-			inst.fn_planted = function(inst, pt)
-				local cpt = inst.components.perennialcrop2
-				local ents = TheSim:FindEntities(pt.x, pt.y, pt.z, 20, --寻找周围的管理器
-					{ "siving_ctl" },
-					{ "NOCLICK", "INLIMBO" },
-					nil
-				)
-				for _,v in pairs(ents) do
-					if v:IsValid() and v.components.botanycontroller ~= nil then
-						cpt:TriggerController(v, true, true)
-					end
-				end
-				cpt:CostNutrition()
-				if cpt.donemoisture or cpt.donenutrient or cpt.donetendable then
-					--由于走的不是正常流程，这里得补上对照料的纠正
-					inst.components.farmplanttendable:SetTendable(not cpt.donetendable)
-					cpt:StartGrowing() --由于 CostNutrition() 不会主动更新生长时间，这里手动更新
-				end
-			end
+			inst.fn_planted = OnPlant_p2
 
 			if sets.fn_server ~= nil then
 				sets.fn_server(inst)

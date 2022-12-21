@@ -366,41 +366,16 @@ local function OnPlant(seed, doer, soilorcrop)
     end
     return false
 end
-local function OnPlant2(seed, doer, crop)
-    if seed.components.plantablelegion ~= nil and seed.components.plantablelegion.plant ~= nil then
-        local plant = SpawnPrefab(seed.components.plantablelegion.plant)
-        if plant ~= nil then
-            local pt = crop:GetPosition()
-            plant.Transform:SetPosition(pt:Get())
-            -- plant:PushEvent("on_planted", { doer = doer, seed = seed, in_soil = true })
-            if plant.SoundEmitter ~= nil then
-				plant.SoundEmitter:PlaySound("dontstarve/common/plant")
-			end
-            TheWorld:PushEvent("itemplanted", { doer = doer, pos = pt })
-
-            --替换原本的作物
-            plant.components.perennialcrop2:DisplayCrop(crop, doer)
-
-            crop:Remove()
-            seed:Remove()
-
-            if plant.fn_planted then
-                plant.fn_planted(plant, pt)
-            end
-
-            return true
-        end
-    end
-    return false
-end
 
 local PLANTSOIL_LEGION = Action({ theme_music = "farming" })
 PLANTSOIL_LEGION.id = "PLANTSOIL_LEGION"
 PLANTSOIL_LEGION.str = STRINGS.ACTIONS.PLANTSOIL_LEGION
 PLANTSOIL_LEGION.strfn = function(act)
     if act.target ~= nil then
-        if act.target:HasTag("crop_legion") or act.target:HasTag("crop2_legion") then
+        if act.target:HasTag("crop_legion") then
             return "DISPLAY"
+        elseif act.target:HasTag("crop2_legion") then
+            return "CLUSTERED"
         end
     end
     return "GENERIC"
@@ -409,25 +384,18 @@ PLANTSOIL_LEGION.fn = function(act)
     if
         act.invobject ~= nil and
         act.doer.components.inventory ~= nil and
-        act.target ~= nil and act.target:IsValid() and
-        (
-            act.target:HasTag("soil_legion") or
-            act.target.components.perennialcrop ~= nil or act.target.components.perennialcrop2 ~= nil
-        )
+        act.target ~= nil and act.target:IsValid()
     then
-        local seed = act.doer.components.inventory:RemoveItem(act.invobject)
-        if seed ~= nil then
-            if act.target.components.perennialcrop2 ~= nil then
-                if OnPlant2(seed, act.doer, act.target) then
-                    return true
-                end
-            else
+        if act.target:HasTag("soil_legion") or act.target.components.perennialcrop ~= nil then
+            local seed = act.doer.components.inventory:RemoveItem(act.invobject)
+            if seed ~= nil then
                 if OnPlant(seed, act.doer, act.target) then
                     return true
                 end
+                act.doer.components.inventory:GiveItem(seed)
             end
-
-            act.doer.components.inventory:GiveItem(seed)
+        elseif act.target.components.perennialcrop2 ~= nil then
+            return act.target.components.perennialcrop2:ClusteredPlant(act.invobject, act.doer)
         end
     end
 end
@@ -980,6 +948,7 @@ _G.CROPS_DATA_LEGION.carrot = {
         [2] = "level6_carrot_2",
         [3] = "level6_carrot_3",
     },
+    cluster_size = { 0.9, 1.5 }
 }
 _G.CROPS_DATA_LEGION.corn = {
     growthmults = { [1] = 0.8, [2] = 0.8, [3] = 0.8, [4] = 0 }, --秋春夏
@@ -999,6 +968,7 @@ _G.CROPS_DATA_LEGION.corn = {
         [2] = "level6_corn_2",
         [3] = "level6_corn_3",
     },
+    cluster_size = { 1.4, 1.5 }
 }
 _G.CROPS_DATA_LEGION.pumpkin = {
     growthmults = { [1] = 1.2, [2] = 1.2, [3] = 0.8, [4] = 1.5 }, --秋冬
@@ -1037,28 +1007,10 @@ _G.CROPS_DATA_LEGION.eggplant = {
         [2] = "level6_2",
         [3] = "level6_3",
     },
-    fn_loot = function(inst, loots)
-        local crop = inst.components.perennialcrop2
-        if crop.stage == crop.stage_max then
-            if crop.numfruit ~= nil and crop.numfruit > 0 then
-                if crop.isrotten then
-                    for i = 1, crop.numfruit, 1 do
-                        table.insert(loots, "spoiled_food")
-                    end
-                    if math.random() < 0.4 then
-                        table.insert(loots, "rottenegg")
-                    end
-                else
-                    for i = 1, crop.numfruit, 1 do
-                        table.insert(loots, crop.cropprefab)
-                    end
-                    if math.random() < 0.4 then
-                        table.insert(loots, "bird_egg")
-                    end
-                end
-            end
-        end
-    end
+    lootothers = {
+        { israndom=true, factor=0.4, name="bird_egg", name_rot="rottenegg" },
+        { israndom=false, factor=0.2, name="bird_egg", name_rot="rottenegg" } --16
+    }
 }
 _G.CROPS_DATA_LEGION.durian = {
     growthmults = { [1] = 0.8, [2] = 1.2, [3] = 1.2, [4] = 0 }, --春
@@ -1078,25 +1030,10 @@ _G.CROPS_DATA_LEGION.durian = {
         [2] = "level6_durian_2",
         [3] = "level6_durian_3",
     },
-    fn_loot = function(inst, loots)
-        local crop = inst.components.perennialcrop2
-        if crop.stage == crop.stage_max then
-            if crop.numfruit ~= nil and crop.numfruit > 0 then
-                if crop.isrotten then
-                    for i = 1, crop.numfruit, 1 do
-                        table.insert(loots, "spoiled_food")
-                    end
-                else
-                    for i = 1, crop.numfruit, 1 do
-                        table.insert(loots, crop.cropprefab)
-                    end
-                end
-                if math.random() < 0.05 then
-                    table.insert(loots, "livinglog")
-                end
-            end
-        end
-    end
+    lootothers = {
+        { israndom=true, factor=0.05, name="livinglog", name_rot="livinglog" },
+        { israndom=false, factor=0.0625, name="livinglog", name_rot="livinglog" } --5
+    }
 }
 _G.CROPS_DATA_LEGION.pomegranate = {
     growthmults = { [1] = 0.8, [2] = 0.8, [3] = 1.2, [4] = 0 }, --春夏
@@ -1174,25 +1111,10 @@ _G.CROPS_DATA_LEGION.pineananas = {
         [2] = "level6_2",
         [3] = "level6_3",
     },
-    fn_loot = function(inst, loots)
-        local crop = inst.components.perennialcrop2
-        if crop.stage == crop.stage_max then
-            if crop.numfruit ~= nil and crop.numfruit > 0 then
-                if crop.isrotten then
-                    for i = 1, crop.numfruit, 1 do
-                        table.insert(loots, "spoiled_food")
-                    end
-                else
-                    for i = 1, crop.numfruit, 1 do
-                        table.insert(loots, crop.cropprefab)
-                    end
-                end
-                if math.random() < 0.05 then
-                    table.insert(loots, "pinecone")
-                end
-            end
-        end
-    end
+    lootothers = {
+        { israndom=true, factor=0.05, name="pinecone", name_rot="pinecone" },
+        { israndom=false, factor=0.0625, name="pinecone", name_rot="pinecone" } --5
+    }
 }
 _G.CROPS_DATA_LEGION.onion = {
     growthmults = { [1] = 0.8, [2] = 0.8, [3] = 0.8, [4] = 0 }, --春秋夏
@@ -1230,28 +1152,10 @@ _G.CROPS_DATA_LEGION.pepper = {
         [2] = "level5_2",
         [3] = "level5_3",
     },
-    fn_loot = function(inst, loots)
-        local crop = inst.components.perennialcrop2
-        if crop.stage == crop.stage_max then
-            if crop.numfruit ~= nil and crop.numfruit > 0 then
-                if crop.isrotten then
-                    for i = 1, crop.numfruit, 1 do
-                        table.insert(loots, "spoiled_food")
-                    end
-                    if math.random() < 0.4 then
-                        table.insert(loots, "spoiled_food")
-                    end
-                else
-                    for i = 1, crop.numfruit, 1 do
-                        table.insert(loots, crop.cropprefab)
-                    end
-                    if math.random() < 0.4 then
-                        table.insert(loots, "mint_l")
-                    end
-                end
-            end
-        end
-    end
+    lootothers = {
+        { israndom=true, factor=0.4, name="mint_l", name_rot=nil },
+        { israndom=false, factor=0.2, name="mint_l", name_rot=nil } --16
+    }
 }
 _G.CROPS_DATA_LEGION.potato = {
     growthmults = { [1] = 0.8, [2] = 1.2, [3] = 0.8, [4] = 1.5 }, --春秋冬
@@ -1288,28 +1192,12 @@ _G.CROPS_DATA_LEGION.garlic = {
         [2] = "level5_2",
         [3] = "level5_3",
     },
-    fn_loot = function(inst, loots)
-        local crop = inst.components.perennialcrop2
-        if crop.stage == crop.stage_max then
-            if crop.numfruit ~= nil and crop.numfruit > 0 then
-                if crop.isrotten then
-                    for i = 1, crop.numfruit, 1 do
-                        table.insert(loots, "spoiled_food")
-                    end
-                else
-                    for i = 1, crop.numfruit, 1 do
-                        table.insert(loots, crop.cropprefab)
-                    end
-                end
-                local rand = math.random()
-                if rand < 0.03 then
-                    table.insert(loots, "feather_crow")
-                elseif rand < 0.05 then
-                    table.insert(loots, "feather_robin")
-                end
-            end
-        end
-    end
+    lootothers = {
+        { israndom=true, factor=0.03, name="feather_crow", name_rot="feather_crow" },
+        { israndom=false, factor=0.0375, name="feather_crow", name_rot="feather_crow" }, --3
+        { israndom=true, factor=0.02, name="feather_robin", name_rot="feather_robin" },
+        { israndom=false, factor=0.025, name="feather_robin", name_rot="feather_robin" } --2
+    }
 }
 _G.CROPS_DATA_LEGION.tomato = {
     growthmults = { [1] = 0.8, [2] = 0.8, [3] = 0.8, [4] = 0 }, --春夏秋
@@ -1361,15 +1249,21 @@ _G.CROPS_DATA_LEGION.mandrake = {
         [4] = { anim = "level4", time = time_years * 0.24, deadanim = "dead1", witheredprefab = {"cutgrass"}, },
         [5] = { anim = "level5", time = nil,               deadanim = "dead1", witheredprefab = {"cutgrass"}, },
     },
-    fn_loot = function(inst, loots)
-        local crop = inst.components.perennialcrop2
-        if crop.isrotten then
-            table.insert(loots, "livinglog")
-            table.insert(loots, "livinglog")
-        elseif crop.stage == crop.stage_max then
-            table.insert(loots, "mandrake")
+    fn_loot = function(self, loots)
+        if self.stage == self.stage_max then
+            if self.numfruit ~= nil and self.numfruit > 0 then
+                local num = self.cluster + 1 --曼德拉产量固定1
+                if self.isrotten then
+                    self:AddLoot(loots, "livinglog", num*2)
+                else
+                    self:AddLoot(loots, "mandrake", num)
+                end
+            end
         end
     end,
+    -- fn_overripe = function(self, numloot) --应该不会过熟才对
+    --     --不做任何操作，因为不希望曼德拉草会落果
+    -- end,
     fn_defend = function(inst, target)
         local doer = target or inst
         if doer.SoundEmitter then

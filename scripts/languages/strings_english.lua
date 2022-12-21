@@ -3436,8 +3436,39 @@ S________WANDA.ACTIONFAIL.PICKUP_CONTRACTS = S________WANDA.ACTIONFAIL.EXSTAY_CO
 
 STRINGS.ACTIONS.PLANTSOIL_LEGION = {
     GENERIC = "Plant",
-    DISPLAY = "Replant"
+    DISPLAY = "Replant",
+    CLUSTERED = "Clustered Plant"
 }
+
+S______GENERIC.ACTIONFAIL.PLANTSOIL_LEGION = {
+    NOTMATCH_C = "Different varieties can't be planted together.",
+    ISMAXED_C = "It has reached its maximum planting density."
+}
+-- S_______WILLOW.ACTIONFAIL.PLANTSOIL_LEGION = ""
+S_____WOLFGANG.ACTIONFAIL.PLANTSOIL_LEGION = {
+    NOTMATCH_C = "Not a family, not a door.",
+    ISMAXED_C = "There is no place to continue planting."
+}
+-- S________WENDY.ACTIONFAIL.PLANTSOIL_LEGION = ""
+-- S_________WX78.ACTIONFAIL.PLANTSOIL_LEGION = ""
+S_WICKERBOTTOM.ACTIONFAIL.PLANTSOIL_LEGION = {
+    NOTMATCH_C = "They need the same genes to grow together!",
+    ISMAXED_C = "I'm curious whether it can grow in such a dense environment?"
+}
+-- S_______WOODIE.ACTIONFAIL.PLANTSOIL_LEGION = ""
+-- S______WAXWELL.ACTIONFAIL.PLANTSOIL_LEGION = ""
+-- S___WATHGRITHR.ACTIONFAIL.PLANTSOIL_LEGION = ""
+-- S_______WEBBER.ACTIONFAIL.PLANTSOIL_LEGION = ""
+-- S_______WINONA.ACTIONFAIL.PLANTSOIL_LEGION = ""
+-- S________WARLY.ACTIONFAIL.PLANTSOIL_LEGION = ""
+-- S_______WORTOX.ACTIONFAIL.PLANTSOIL_LEGION = ""
+S_____WORMWOOD.ACTIONFAIL.PLANTSOIL_LEGION = {
+    NOTMATCH_C = "Only the same kind is welcome.",
+    ISMAXED_C = "Full!"
+}
+-- S_________WURT.ACTIONFAIL.PLANTSOIL_LEGION = ""
+-- S_______WALTER.ACTIONFAIL.PLANTSOIL_LEGION = ""
+-- S________WANDA.ACTIONFAIL.PLANTSOIL_LEGION = ""
 
 STRINGS.ACTIONS.GENETRANS = {
     GENERIC = "Put On",
