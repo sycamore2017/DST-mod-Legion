@@ -947,8 +947,7 @@ _G.CROPS_DATA_LEGION.carrot = {
         [1] = "level6_carrot_1",
         [2] = "level6_carrot_2",
         [3] = "level6_carrot_3",
-    },
-    cluster_size = { 0.9, 1.5 }
+    }
 }
 _G.CROPS_DATA_LEGION.corn = {
     growthmults = { [1] = 0.8, [2] = 0.8, [3] = 0.8, [4] = 0 }, --秋春夏
@@ -967,8 +966,7 @@ _G.CROPS_DATA_LEGION.corn = {
         [1] = "level6_corn_1",
         [2] = "level6_corn_2",
         [3] = "level6_corn_3",
-    },
-    cluster_size = { 1.4, 1.5 }
+    }
 }
 _G.CROPS_DATA_LEGION.pumpkin = {
     growthmults = { [1] = 1.2, [2] = 1.2, [3] = 0.8, [4] = 1.5 }, --秋冬
@@ -988,6 +986,7 @@ _G.CROPS_DATA_LEGION.pumpkin = {
         [2] = "level6_pumpkin_2",
         [3] = "level6_pumpkin_3",
     },
+    cluster_size = { 1, 1.35 }
 }
 _G.CROPS_DATA_LEGION.eggplant = {
     growthmults = { [1] = 0.8, [2] = 1.2, [3] = 0.8, [4] = 0 }, --春秋
@@ -1007,6 +1006,7 @@ _G.CROPS_DATA_LEGION.eggplant = {
         [2] = "level6_2",
         [3] = "level6_3",
     },
+    cluster_size = { 1, 1.6 },
     lootothers = {
         { israndom=true, factor=0.4, name="bird_egg", name_rot="rottenegg" },
         { israndom=false, factor=0.2, name="bird_egg", name_rot="rottenegg" } --16
@@ -1111,6 +1111,7 @@ _G.CROPS_DATA_LEGION.pineananas = {
         [2] = "level6_2",
         [3] = "level6_3",
     },
+    cluster_size = { 1, 1.35 },
     lootothers = {
         { israndom=true, factor=0.05, name="pinecone", name_rot="pinecone" },
         { israndom=false, factor=0.0625, name="pinecone", name_rot="pinecone" } --5
@@ -1134,6 +1135,7 @@ _G.CROPS_DATA_LEGION.onion = {
         [2] = "level5_2",
         [3] = "level5_3",
     },
+    cluster_size = { 1, 1.35 }
 }
 _G.CROPS_DATA_LEGION.pepper = {
     growthmults = { [1] = 1.2, [2] = 0.8, [3] = 0.8, [4] = 0 }, --秋夏
@@ -1152,6 +1154,7 @@ _G.CROPS_DATA_LEGION.pepper = {
         [2] = "level5_2",
         [3] = "level5_3",
     },
+    cluster_size = { 1, 1.6 },
     lootothers = {
         { israndom=true, factor=0.4, name="mint_l", name_rot=nil },
         { israndom=false, factor=0.2, name="mint_l", name_rot=nil } --16
@@ -1174,6 +1177,7 @@ _G.CROPS_DATA_LEGION.potato = {
         [2] = "level5_2",
         [3] = "level5_3",
     },
+    cluster_size = { 1, 1.6 }
 }
 _G.CROPS_DATA_LEGION.garlic = {
     growthmults = { [1] = 0.8, [2] = 0.8, [3] = 0.8, [4] = 1.5 }, --春夏秋冬
@@ -1192,6 +1196,7 @@ _G.CROPS_DATA_LEGION.garlic = {
         [2] = "level5_2",
         [3] = "level5_3",
     },
+    cluster_size = { 1, 1.6 },
     lootothers = {
         { israndom=true, factor=0.03, name="feather_crow", name_rot="feather_crow" },
         { israndom=false, factor=0.0375, name="feather_crow", name_rot="feather_crow" }, --3
@@ -1216,7 +1221,8 @@ _G.CROPS_DATA_LEGION.tomato = {
         [1] = "level5_1",
         [2] = "level5_2",
         [3] = "level5_3",
-    }
+    },
+    cluster_size = { 1, 1.5 }
 }
 _G.CROPS_DATA_LEGION.asparagus = {
     growthmults = { [1] = 0.8, [2] = 1.2, [3] = 1.2, [4] = 1.5 }, --春冬
@@ -1235,6 +1241,7 @@ _G.CROPS_DATA_LEGION.asparagus = {
         [2] = "level5_2",
         [3] = "level5_3",
     },
+    cluster_size = { 1, 1.5 }
 }
 _G.CROPS_DATA_LEGION.mandrake = {
     growthmults = { [1] = 1, [2] = 1, [3] = 1, [4] = 1.5 }, --冬

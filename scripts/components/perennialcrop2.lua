@@ -59,7 +59,7 @@ local PerennialCrop2 = Class(function(self, inst)
 	self.pollinated = 0 --被授粉次数
 	self.infested = 0 --被骚扰次数
 
-	self.cluster_size = { 0.9, 1.5 } --体型变化范围
+	self.cluster_size = { 1, 1.4 } --体型变化范围
 	self.cluster_max = 80 --最大簇栽等级
 	-- self.cluster = 0 --簇栽等级
 	self.lootothers = nil --{ { israndom=false, factor=0.02, name="log", name_rot="xxx" } } 副产物表
