@@ -791,8 +791,6 @@ function PerennialCrop2:GenerateLoot(doer, ispicked, isburnt) --生成收获物
 				self:AddLoot(lootprefabs, prefab, 1)
 			end
 		end
-		--异种也要完全返还
-		self:AddLoot(lootprefabs, "seeds_"..self.cropprefab.."_l", 1+self.cluster)
 	end
 
 	if self.isflower and not self.isrotten then
@@ -828,6 +826,9 @@ function PerennialCrop2:GenerateLoot(doer, ispicked, isburnt) --生成收获物
 			end
 		end
 		lootprefabs = lootprefabs2
+	end
+	if not ispicked then --异种也要完全返还，写在后面，防止变成灰烬
+		self:AddLoot(lootprefabs, "seeds_"..self.cropprefab.."_l", 1+self.cluster)
 	end
 
 	for name, num in pairs(lootprefabs) do --生成实体并设置物理掉落
@@ -1064,6 +1065,11 @@ function PerennialCrop2:ClusteredPlant(seeds, doer) --簇栽
 	if self.cluster >= self.cluster_max then
 		return false, "ISMAXED_C"
 	end
+
+	--升级前，先采摘了，防止玩家骚操作
+	if doer ~= nil and self.inst.components.pickable ~= nil then
+        self.inst.components.pickable:Pick(doer)
+    end
 
 	if seeds.components.stackable ~= nil then
 		local need = self.cluster_max - self.cluster
