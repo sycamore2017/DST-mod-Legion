@@ -990,6 +990,7 @@ end
 local function HealArmor(mask)
     if
         mask.components.armor:GetPercent() < 1
+        and mask.components.armor.Repair ~= nil --可能有些老mod改了 Repair 这个函数，导致出问题，这里预防一下
     then
         mask.components.armor:Repair(40)
         mask.healthcounter = mask.healthcounter - 20

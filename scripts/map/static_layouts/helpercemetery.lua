@@ -118,34 +118,34 @@ return {
         --     ["scenario"] = "graveyard_ghosts"
         --   }
         -- },
-        -- {
-        --   name = "Alex",
-        --   type = "gravestone", --1/2
-        --   shape = "rectangle",
-        --   x = 160,
-        --   y = 160,
-        --   width = 0,
-        --   height = 0,
-        --   visible = true,
-        --   properties = {
-        --     ["data.setepitaph"] = "Alex",
-        --     ["scenario"] = "graveyard_ghosts"
-        --   }
-        -- },
-        -- {
-        --   name = "Brook",
-        --   type = "gravestone", --3/5
-        --   shape = "rectangle",
-        --   x = 352,
-        --   y = 288,
-        --   width = 0,
-        --   height = 0,
-        --   visible = true,
-        --   properties = {
-        --     ["data.setepitaph"] = "Brook",
-        --     ["scenario"] = "graveyard_ghosts"
-        --   }
-        -- },
+        {
+          name = "白饭",
+          type = "gravestone", --1/2
+          shape = "rectangle",
+          x = 160,
+          y = 160,
+          width = 0,
+          height = 0,
+          visible = true,
+          properties = {
+            ["data.setepitaph"] = "白饭不能酿成酒。\n            --白饭",
+            ["scenario"] = "graveyard_ghosts"
+          }
+        },
+        {
+          name = "孟尝鬼鬼",
+          type = "gravestone", --3/5
+          shape = "rectangle",
+          x = 352,
+          y = 288,
+          width = 0,
+          height = 0,
+          visible = true,
+          properties = {
+            ["data.setepitaph"] = "梧大…我的文件…删……\n            --孟尝鬼鬼",
+            ["scenario"] = "graveyard_ghosts"
+          }
+        },
         {
           name = "秦文铦",
           type = "gravestone", --3/4

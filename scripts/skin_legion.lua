@@ -3076,6 +3076,10 @@ for baseprefab,v in pairs(_G.SKIN_PREFABS_LEGION) do
 end
 ischinese = nil
 
+------资源补充
+RegisterInventoryItemAtlas("images/inventoryimages_skin/agronssword_taste.xml", "agronssword_taste.tex")
+RegisterInventoryItemAtlas("images/inventoryimages_skin/agronssword_taste2.xml", "agronssword_taste2.tex")
+
 ------重新生成一遍PREFAB_SKINS_IDS(在prefabskins.lua中被定义)
 _G.PREFAB_SKINS_IDS = {}
 for prefab,skins in pairs(_G.PREFAB_SKINS) do

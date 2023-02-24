@@ -355,9 +355,16 @@ local foods_legion = {
         recipe_count = 6,
 
         oneat_desc = STRINGS.UI.COOKBOOK.DISH_FAREWELLCUPCAKE,
-        oneatenfn = function(inst, eater)   --食用者受到1000点的攻击伤害
+        oneatenfn = function(inst, eater) --食用者受到1000点的攻击伤害
             if eater.components.combat ~= nil then
-                eater.components.combat:GetAttacked(inst, 1000)
+                local damage = 1000
+
+                --如果是一次性吃完类型的对象，伤害应该是整组算的
+                if eater.components.eater and eater.components.eater.eatwholestack then
+                    damage = damage * inst.components.stackable:StackSize()
+                end
+
+                eater.components.combat:GetAttacked(inst, damage)
             end
         end,
     },
@@ -367,7 +374,7 @@ local foods_legion = {
             return (names.foliage and names.foliage >= 2) and (tags.meat and tags.meat >= 1)
                 and not tags.inedible and not tags.sweetener
         end,
-        priority = 20,
+        priority = 56, --和【永不妥协】里的 simpsalad(优先级20、权重20) 冲突，这里调高优先级
         foodtype = FOODTYPE.MEAT,
         health = 10,
         hunger = 62.5,
@@ -929,7 +936,7 @@ if CONFIGS_LEGION.PRAYFORRAIN then
         test = function(cooker, names, tags)
             return names.monstrain_leaf and (tags.veggie and tags.veggie >= 2.5) and tags.egg and not tags.meat
         end,
-        priority = 56, --和【永不妥协】里的 恶魔蛋(优先级52) 重了，这里调高优先级
+        priority = 56, --和【永不妥协】里的 um_deviled_eggs(优先级52) 冲突，这里调高优先级
         foodtype = FOODTYPE.VEGGIE,
         health = 3,
         hunger = 62.5,

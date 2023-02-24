@@ -83,10 +83,9 @@ local dressup_data = {
             end
         end,
     },
-    bugnet =
-    {
+    bugnet = {
         buildfile = "swap_bugnet",
-        buildsymbol = "swap_bugnet",
+        buildsymbol = "swap_bugnet"
     },
     fishingrod =
     {
@@ -143,10 +142,9 @@ local dressup_data = {
         buildfile = "swap_goldenshovel",
         buildsymbol = "swap_goldenshovel",
     },
-    multitool_axe_pickaxe =
-    {
+    multitool_axe_pickaxe = {
         buildfile = "swap_multitool_axe_pickaxe",
-        buildsymbol = "swap_object",
+        buildsymbol = "swap_object"
     },
     hammer =
     {
@@ -351,8 +349,7 @@ local dressup_data = {
             dressup:InitClear("FX_fishing")
         end
     },
-    reskin_tool = --皮肤扫把
-    {
+    reskin_tool = { --扫把
         buildfile = "swap_reskin_tool",
         buildsymbol = "swap_reskin_tool",
     },
@@ -835,21 +832,24 @@ local dressup_data = {
     },
     mask_treehat = {
         buildfile = "hat_mask_tree",
-        buildsymbol = "swap_hat",
+        buildsymbol = "swap_hat"
     },
     mask_foolhat = {
         buildfile = "hat_mask_fool",
-        buildsymbol = "swap_hat",
+        buildsymbol = "swap_hat"
+    },
+    nightcaphat = { --睡帽
+        buildfile = "hat_nightcap",
+        buildsymbol = "swap_hat"
     },
 
     -------------------------------
     --身体-------------------------
     -------------------------------
 
-    armorwood =
-    {
+    armorwood = {
         buildfile = "armor_wood",
-        buildsymbol = "swap_body",
+        buildsymbol = "swap_body"
     },
     armorgrass =
     {
@@ -1546,8 +1546,7 @@ local dressup_data = {
         end,
         unbuildfn = function(dressup, item) end, --没啥好恢复的
     },
-    theemperorspendant =
-    {
+    theemperorspendant = {
         isnoskin = true,
         buildfn = function(dressup, item, buildskin)
             local itemswap = {}
@@ -1823,8 +1822,21 @@ for k,v in pairs(oversizecrops) do
     _G.DRESSUP_DATA_LEGION[k.."_oversized_waxed"] = cropdressdata
     _G.DRESSUP_DATA_LEGION[k.."_oversized_rotten"] = cropdressdata
 end
+oversizecrops = nil
 _G.DRESSUP_DATA_LEGION["immortal_fruit_oversized"] = cropdressdata --【能力勋章】巨型不朽果实(没有其他状态的)
 _G.DRESSUP_DATA_LEGION["medal_gift_fruit_oversized"] = cropdressdata --【能力勋章】巨型包果(没有其他状态的)
+
+--统一添加枕头幻化数据
+for material, _ in pairs(require("prefabs/pillow_defs")) do
+    _G.DRESSUP_DATA_LEGION["handpillow_"..material] = {
+        buildfile = "swap_pillows_"..material,
+        buildsymbol = "swap_object"
+    }
+    _G.DRESSUP_DATA_LEGION["bodypillow_"..material] = {
+        buildfile = "swap_pillows_"..material,
+        buildsymbol = "swap_body"
+    }
+end
 
 -------------------
 -------------------

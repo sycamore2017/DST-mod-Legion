@@ -1,25 +1,21 @@
-local assets =
-{
+local assets = {
     Asset("ANIM", "anim/explodingfruitcake.zip"),
     Asset("ATLAS", "images/inventoryimages/explodingfruitcake.xml"),
-    Asset("IMAGE", "images/inventoryimages/explodingfruitcake.tex"),
+    Asset("IMAGE", "images/inventoryimages/explodingfruitcake.tex")
 }
 
-local prefabs =
-{
-    "explode_fruitcake",
+local prefabs = {
+    "explode_fruitcake"
 }
 
 local function OnIgniteFn(inst)
     inst.SoundEmitter:PlaySound("dontstarve/common/blackpowder_fuse_LP", "hiss")
     DefaultBurnFn(inst)
 end
-
 local function OnExtinguishFn(inst)
     inst.SoundEmitter:KillSound("hiss")
     DefaultExtinguishFn(inst)
 end
-
 local function OnExplodeFn(inst)
     inst.SoundEmitter:KillSound("hiss")
     local fx = SpawnPrefab("explode_fruitcake")
@@ -32,6 +28,23 @@ local function OnPutInInv(inst, owner)
     if owner.prefab == "mole" then
         inst.components.explosive:OnBurnt()
     end
+end
+
+local function OnEaten(inst, eater) --注意：该函数执行后，才会执行食物的删除操作
+    --如果是一次性吃完类型的对象，直接爆炸吧，反正都要整体删除了
+    if eater.components.eater and eater.components.eater.eatwholestack then
+        inst.components.explosive:OnBurnt()
+        return
+    end
+
+    --由于食用时会主动消耗一个，而爆炸会消耗全部，为了达到一次吃只炸一个的效果，新生成一个完成爆炸效果
+    eater:DoTaskInTime(1.5+math.random(), function()
+        if eater:IsValid() and not eater:IsInLimbo() then
+            local cake = SpawnPrefab("explodingfruitcake")
+            cake.Transform:SetPosition(eater.Transform:GetWorldPosition())
+            cake.components.explosive:OnBurnt()
+        end
+    end)
 end
 
 local function fn()
@@ -88,22 +101,7 @@ local function fn()
     inst.components.edible.sanityvalue = 5
     inst.components.edible.foodtype = FOODTYPE.GOODIES
     inst.components.edible.secondaryfoodtype = FOODTYPE.VEGGIE
-    inst.components.edible:SetOnEatenFn(function(inst, eater)
-        --如果是一次性吃完类型的对象，直接爆炸吧，反正都要整体删除了
-        if eater.components.eater and eater.components.eater.eatwholestack then
-            inst.components.explosive:OnBurnt()
-            return
-        end
-
-        --由于食用时会主动消耗一个，而爆炸会消耗全部，为了达到一次吃只炸一个的效果，新生成一个完成爆炸效果
-        eater:DoTaskInTime(1.5+math.random(), function()
-            if eater:IsValid() and not eater:IsInLimbo() then
-                local cake = SpawnPrefab("explodingfruitcake")
-                cake.Transform:SetPosition(eater.Transform:GetWorldPosition())
-                cake.components.explosive:OnBurnt()
-            end
-        end)
-    end)
+    inst.components.edible:SetOnEatenFn(OnEaten)
 
     inst:AddComponent("bait")
 

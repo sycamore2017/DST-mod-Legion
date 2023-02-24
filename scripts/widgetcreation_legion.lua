@@ -7,6 +7,13 @@ local containers = require("containers")
 
 local showmeneed = { "backcub" }
 local params = {}
+local cook_ingredients = { --能放入月藏宝匣的特殊食材
+    ash = true,
+    slurtleslime = true, glommerfuel = true, phlegm = true,
+    furtuft = true, pigskin = true,
+    twiggy_nut = true,
+    horn = true,
+}
 
 local function TestContainer_base(container, item, slot)
     return not (item:HasTag("irreplaceable") or item:HasTag("nobundling"))
@@ -107,18 +114,17 @@ if CONFIGS_LEGION.PRAYFORRAIN then
             return true
         end
 
-        if cooking.IsCookingIngredient(item.prefab) then --只要是烹饪食材，就能放入
+        --只要是烹饪食材，就能放入
+        if cook_ingredients[item.prefab] or cooking.IsCookingIngredient(item.prefab) then
             return true
         end
 
         if item:HasTag("smallcreature") then
             return true
         end
-
         if not (item:HasTag("fresh") or item:HasTag("stale") or item:HasTag("spoiled")) then
             return false
         end
-
         for k, v in pairs(FOODTYPE) do
             if item:HasTag("edible_"..v) then
                 return true
@@ -338,7 +344,7 @@ for k, v in pairs(params) do
 end
 params = nil
 
---加入mod的容器
+--加入mod的容器（已经过时了，不要用这里的逻辑）
 -- local widgetsetup_old = containers.widgetsetup
 -- function containers.widgetsetup(container, prefab, data)
 --     local t = params[prefab or container.inst.prefab]

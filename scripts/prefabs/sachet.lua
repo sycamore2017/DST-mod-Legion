@@ -51,7 +51,7 @@ local function onequip(inst, owner)
             end
             local x,y,z = owner.Transform:GetWorldPosition()
             local ents = TheSim:FindEntities(x,y,z, 6, {"flower"})
-            for k,v in pairs(ents) do
+            for _,v in ipairs(ents) do
                 if math.random() < 0.1 then
                     local fly = SpawnPrefab("butterfly")
 
@@ -124,7 +124,7 @@ local function fn()
     inst.components.inventoryitem.atlasname = "images/inventoryimages/sachet.xml"
 
     inst:AddComponent("equippable")
-    inst.components.equippable.equipslot = EQUIPSLOTS.NECK or EQUIPSLOTS.BODY
+    inst.components.equippable.equipslot = EQUIPSLOTS.BODY --EQUIPSLOTS.NECK
     inst.components.equippable.dapperness = TUNING.DAPPERNESS_HUGE /2 *1.5  -- +15精神/分钟
     inst.components.equippable:SetOnEquip(onequip)
     inst.components.equippable:SetOnUnequip(onunequip)

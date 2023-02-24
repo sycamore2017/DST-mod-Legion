@@ -395,7 +395,7 @@ function PerennialCrop2:DoGrowth(skip)
 				for _,ctl in pairs(self.ctls) do
 					if ctl and ctl:IsValid() and ctl.components.botanycontroller ~= nil then
 						local botanyctl = ctl.components.botanycontroller
-						local nutrients = {8*costplus,8*costplus,8*costplus}
+						local nutrients = {16*costplus,16*costplus,16*costplus}
 						if CanAcceptNutrients(botanyctl, nutrients) then
 							for i = 1, 8, 1 do
 								botanyctl:SetValue(nil, nutrients, true)
@@ -405,7 +405,7 @@ function PerennialCrop2:DoGrowth(skip)
 								end
 								if costplus == 10 and numpoop < 10 then
 									costplus = numpoop
-									nutrients = {8*costplus,8*costplus,8*costplus}
+									nutrients = {16*costplus,16*costplus,16*costplus}
 								end
 							end
 						end
@@ -428,7 +428,7 @@ function PerennialCrop2:DoGrowth(skip)
 								if tile == GROUND.FARMING_SOIL then
 									hastile = true
 									local tile_x, tile_z = TheWorld.Map:GetTileCoordsAtPoint(x+k1, 0, z+k2)
-									TheWorld.components.farming_manager:AddTileNutrients(tile_x, tile_z, 2*costplus,2*costplus,2*costplus)
+									TheWorld.components.farming_manager:AddTileNutrients(tile_x, tile_z, 4*costplus,4*costplus,4*costplus)
 								end
 							end
 						end

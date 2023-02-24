@@ -335,9 +335,20 @@ local function OnPlant(seed, doer, soilorcrop)
     if seed.components.farmplantable ~= nil and seed.components.farmplantable.plant ~= nil then
         local pt = soilorcrop:GetPosition()
 
-        local plant_prefab = FunctionOrValue(seed.components.farmplantable.plant, seed)
-        if plant_prefab == "farm_plant_randomseed" then
-            plant_prefab = PickFarmPlant()
+        local plant_prefab = nil
+        if seed.prefab == "medal_weed_seeds" then --【能力勋章】杂草种子
+            local weedtable = { --勋章里的权重和官方设置不一样，不然我就直接用 weighted_seed_table 了
+                weed_forgetmelots = 2, --必忘我
+                weed_tillweed = 1, --犁地草
+                weed_firenettle = 1, --火荨麻
+                weed_ivy = 1 --刺针旋花
+            }
+            plant_prefab = weighted_random_choice(weedtable)
+        else
+            plant_prefab = FunctionOrValue(seed.components.farmplantable.plant, seed)
+            if plant_prefab == "farm_plant_randomseed" then
+                plant_prefab = PickFarmPlant()
+            end
         end
 
         local plant = SpawnPrefab(plant_prefab.."_legion")

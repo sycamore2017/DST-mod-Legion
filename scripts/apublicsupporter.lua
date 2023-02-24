@@ -1770,7 +1770,7 @@ end)
 --------------------------------------------------------------------------
 
 if CONFIGS_LEGION.LEGENDOFFALL then
-    local RC_SKILL_L = Action({ priority=1.5, rmb=true, mount_valid=true, distance=36 })
+    local RC_SKILL_L = Action({ priority=11, rmb=true, mount_valid=true, distance=36 }) --原本优先级是1.5
     RC_SKILL_L.id = "RC_SKILL_L" --rightclick_skillspell_legion
     RC_SKILL_L.str = STRINGS.ACTIONS.RC_SKILL_L
     RC_SKILL_L.strfn = function(act)

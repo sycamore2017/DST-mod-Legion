@@ -1402,6 +1402,7 @@ AddSimPostInit(function()
     local cooking2 = require("cooking")
     local ingredients_base = cooking2.ingredients
     if ingredients_base then
+        --注意：每次设定这里时，记得判断是否要在月藏宝匣容器栏那边设置新参数(因为这里的执行慢于容器的执行)
         local ingredients_l = {
             { {"ash"}, {inedible=1}, false, false }, --灰烬
             { {"slurtleslime", "glommerfuel", "phlegm"}, {gel=1}, false, false }, --蜗牛黏液、格罗姆黏液、钢羊黏痰
