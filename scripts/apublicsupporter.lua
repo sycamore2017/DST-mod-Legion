@@ -2147,3 +2147,25 @@ if CONFIGS_LEGION.LEGENDOFFALL or CONFIGS_LEGION.PRAYFORRAIN then
     end))
     AddStategraphActionHandler("wilson_client", ActionHandler(ACTIONS.POUR_WATER_LEGION, "pour"))
 end
+
+--------------------------------------------------------------------------
+--[[ 让草叉能叉起地毯 ]]
+--------------------------------------------------------------------------
+
+if IsServer then
+    local function FnSet_pitchfork(inst)
+        inst:AddComponent("carpetpullerlegion")
+    end
+    AddPrefabPostInit("pitchfork", FnSet_pitchfork)
+    AddPrefabPostInit("goldenpitchfork", FnSet_pitchfork)
+
+    local REMOVE_CARPET_L = Action({ priority=3, tile_placer="gridplacer" })
+    REMOVE_CARPET_L.id = "REMOVE_CARPET_L"
+    -- REMOVE_CARPET_L.str = STRINGS.ACTIONS.REMOVE_CARPET_L
+    REMOVE_CARPET_L.fn = function(act)
+        if act.invobject ~= nil and act.invobject.components.carpetpullerlegion ~= nil then
+            return act.invobject.components.carpetpullerlegion:DoIt(act:GetActionPoint(), act.doer)
+        end
+    end
+    AddAction(REMOVE_CARPET_L)
+end
