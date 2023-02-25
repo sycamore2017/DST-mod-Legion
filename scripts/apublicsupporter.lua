@@ -2158,14 +2158,26 @@ if IsServer then
     end
     AddPrefabPostInit("pitchfork", FnSet_pitchfork)
     AddPrefabPostInit("goldenpitchfork", FnSet_pitchfork)
+end
 
-    local REMOVE_CARPET_L = Action({ priority=3, tile_placer="gridplacer" })
-    REMOVE_CARPET_L.id = "REMOVE_CARPET_L"
-    -- REMOVE_CARPET_L.str = STRINGS.ACTIONS.REMOVE_CARPET_L
-    REMOVE_CARPET_L.fn = function(act)
-        if act.invobject ~= nil and act.invobject.components.carpetpullerlegion ~= nil then
-            return act.invobject.components.carpetpullerlegion:DoIt(act:GetActionPoint(), act.doer)
+local REMOVE_CARPET_L = Action({ priority=3 })
+REMOVE_CARPET_L.id = "REMOVE_CARPET_L"
+REMOVE_CARPET_L.str = STRINGS.ACTIONS_LEGION.REMOVE_CARPET_L
+REMOVE_CARPET_L.fn = function(act)
+    if act.invobject ~= nil and act.invobject.components.carpetpullerlegion ~= nil then
+        return act.invobject.components.carpetpullerlegion:DoIt(act:GetActionPoint(), act.doer)
+    end
+end
+AddAction(REMOVE_CARPET_L)
+
+AddComponentAction("POINT", "carpetpullerlegion", function(inst, doer, pos, actions, right, target)
+    if right then
+        local x, y, z = pos:Get()
+        if #TheSim:FindEntities(x, y, z, 2, {"carpet_l"}, nil, nil) > 0 then
+            table.insert(actions, ACTIONS.REMOVE_CARPET_L)
         end
     end
-    AddAction(REMOVE_CARPET_L)
-end
+end)
+
+AddStategraphActionHandler("wilson", ActionHandler(ACTIONS.REMOVE_CARPET_L, "terraform"))
+AddStategraphActionHandler("wilson_client", ActionHandler(ACTIONS.REMOVE_CARPET_L, "terraform"))

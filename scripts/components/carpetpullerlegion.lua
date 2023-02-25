@@ -1,24 +1,21 @@
 local CarpetPullerLegion = Class(function(self, inst)
     self.inst = inst
-	-- self.fn_spell = nil
 end)
 
--- function CarpetPullerLegion:CanCast(caster, pos)
--- 	--Tip：官方的战斗辅助组件。与官方一样的判定方式
--- 	-- return self.inst.components.aoetargeting ~= nil and self.inst.components.aoetargeting.alwaysvalid or
--- 	-- 	(
--- 	-- 		TheWorld.Map:IsPassableAtPoint(pos:Get()) and
--- 	-- 		not TheWorld.Map:IsGroundTargetBlocked(pos) and
--- 	-- 		TheWorld.Map:IsAboveGroundAtPoint(pos:Get())
--- 	-- 	)
--- 	return true
--- end
-
--- function CarpetPullerLegion:CastSpell(caster, pos, options)
--- 	if self.fn_spell ~= nil then
--- 		self.fn_spell(self.inst, caster, pos, options)
--- 	end
--- 	-- self.inst:PushEvent("skillspelled", {caster = caster, pos = pos, options})
--- end
+function CarpetPullerLegion:DoIt(pos, doer)
+    local res = false
+    local x, y, z = pos:Get()
+	local ents = TheSim:FindEntities(x, y, z, 2, {"carpet_l"}, nil, nil)
+    for _, v in ipairs(ents) do
+        if v:IsValid() then
+            if v.OnCarpetRemove ~= nil then
+                v.OnCarpetRemove(v, doer)
+            end
+            v:Remove()
+            res = true
+        end
+    end
+    return res
+end
 
 return CarpetPullerLegion

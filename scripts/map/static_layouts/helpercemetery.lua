@@ -132,20 +132,20 @@ return {
             ["scenario"] = "graveyard_ghosts"
           }
         },
-        {
-          name = "孟尝鬼鬼",
-          type = "gravestone", --3/5
-          shape = "rectangle",
-          x = 352,
-          y = 288,
-          width = 0,
-          height = 0,
-          visible = true,
-          properties = {
-            ["data.setepitaph"] = "梧大…我的文件…删……\n            --孟尝鬼鬼",
-            ["scenario"] = "graveyard_ghosts"
-          }
-        },
+        -- {
+        --   name = "孟尝鬼鬼",
+        --   type = "gravestone", --3/5
+        --   shape = "rectangle",
+        --   x = 352,
+        --   y = 288,
+        --   width = 0,
+        --   height = 0,
+        --   visible = true,
+        --   properties = {
+        --     ["data.setepitaph"] = "梧大…我的文件…删……\n            --孟尝鬼鬼",
+        --     ["scenario"] = "graveyard_ghosts"
+        --   }
+        -- },
         {
           name = "秦文铦",
           type = "gravestone", --3/4

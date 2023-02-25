@@ -1,9 +1,8 @@
-local assets =
-{
+local assets = {
     Asset("ANIM", "anim/dualwrench.zip"),
     Asset("ANIM", "anim/swap_dualwrench.zip"),
     Asset("ATLAS", "images/inventoryimages/dualwrench.xml"),
-    Asset("IMAGE", "images/inventoryimages/dualwrench.tex"),
+    Asset("IMAGE", "images/inventoryimages/dualwrench.tex")
 }
 
 local function onequip(inst, owner)
@@ -11,7 +10,6 @@ local function onequip(inst, owner)
     owner.AnimState:Show("ARM_carry")
     owner.AnimState:Hide("ARM_normal")
 end
-
 local function onunequip(inst, owner)
     owner.AnimState:Hide("ARM_carry")
     owner.AnimState:Show("ARM_normal")
@@ -47,7 +45,6 @@ local function fn()
     })
 
     inst.entity:SetPristine()
-
     if not TheWorld.ismastersim then
         return inst
     end
@@ -65,6 +62,8 @@ local function fn()
     --添加草叉功能
     inst:AddInherentAction(ACTIONS.TERRAFORM)
     inst:AddComponent("terraformer")
+
+    inst:AddComponent("carpetpullerlegion")
 
     inst:AddComponent("finiteuses")
     inst.components.finiteuses:SetMaxUses(TUNING.HAMMER_USES)   --总共75次，可攻击75次
