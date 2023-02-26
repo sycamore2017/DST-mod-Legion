@@ -73,28 +73,26 @@ end
 --[[ 猫线球 ]]
 --------------------------------------------------------------------------
 
-if CONFIGS_LEGION.LEGENDOFFALL then
-    MakeToy({
-        name = "cattenball",
-        assets = {
-            Asset("ANIM", "anim/toy_legion.zip"),
-            Asset("ATLAS", "images/inventoryimages/cattenball.xml"),
-            Asset("IMAGE", "images/inventoryimages/cattenball.tex"),
-        },
-        prefabs = nil,
-        floatable = { 0.08, "med", 0.25, 0.5 },
-        stackable = TUNING.STACK_SIZE_MEDITEM,
-        tradable = 9,
-        fuel = TUNING.SMALL_FUEL,
-        fn_common = function(inst)
-            inst:AddTag("cattoy") --能给浣猫
-        end,
-        fn_server = function(inst)
-            MakeSmallBurnable(inst, TUNING.SMALL_BURNTIME)
-            MakeSmallPropagator(inst)
-        end
-    })
-end
+MakeToy({
+    name = "cattenball",
+    assets = {
+        Asset("ANIM", "anim/toy_legion.zip"),
+        Asset("ATLAS", "images/inventoryimages/cattenball.xml"),
+        Asset("IMAGE", "images/inventoryimages/cattenball.tex"),
+    },
+    prefabs = nil,
+    floatable = { 0.08, "med", 0.25, 0.5 },
+    stackable = TUNING.STACK_SIZE_MEDITEM,
+    tradable = 9,
+    fuel = TUNING.SMALL_FUEL,
+    fn_common = function(inst)
+        inst:AddTag("cattoy") --能给浣猫
+    end,
+    fn_server = function(inst)
+        MakeSmallBurnable(inst, TUNING.SMALL_BURNTIME)
+        MakeSmallPropagator(inst)
+    end
+})
 
 --------------------------------------------------------------------------
 --[[ 玩具小海绵与玩具小海星 ]]
@@ -162,10 +160,8 @@ end
 --     return Prefab(name, Fn_toywe, assets_toywe)
 -- end
 
--- if TUNING.LEGION_DESERTSECRET then
---     table.insert(prefabs, MakeToyWe("toy_spongebob"))
---     table.insert(prefabs, MakeToyWe("toy_patrickstar"))
--- end
+-- table.insert(prefabs, MakeToyWe("toy_spongebob"))
+-- table.insert(prefabs, MakeToyWe("toy_patrickstar"))
 
 --------------------
 --------------------

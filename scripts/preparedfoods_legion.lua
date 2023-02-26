@@ -59,13 +59,12 @@ local foods_legion = {
             end
         end,
     },
-
     dish_merrychristmassalad = {
         test = function(cooker, names, tags)
             return names.twiggy_nut and names.corn and names.carrot and (tags.veggie and tags.veggie >= 3)
                     and (
                         tags.winterfeast or --一定要用or
-                        TUNING.LEGION_FESTIVALRECIPES or IsSpecialEventActive(SPECIAL_EVENTS.WINTERS_FEAST) --冬季盛宴专属
+                        CONFIGS_LEGION.FESTIVALRECIPES or IsSpecialEventActive(SPECIAL_EVENTS.WINTERS_FEAST) --冬季盛宴专属
                     )
         end,
         priority = 20,
@@ -145,13 +144,12 @@ local foods_legion = {
             end
         end,
     },
-
     dish_sugarlesstrickmakercupcakes = {
         test = function(cooker, names, tags)
             return names.pumpkin and tags.egg and tags.magic and tags.monster and not tags.meat
                     and (
                         tags.hallowednights or --一定要用or
-                        TUNING.LEGION_FESTIVALRECIPES or IsSpecialEventActive(SPECIAL_EVENTS.HALLOWED_NIGHTS) --万圣节专属
+                        CONFIGS_LEGION.FESTIVALRECIPES or IsSpecialEventActive(SPECIAL_EVENTS.HALLOWED_NIGHTS) --万圣节专属
                     )
         end,
         priority = 20,
@@ -212,7 +210,6 @@ local foods_legion = {
             end
         end,
     },
-
     dish_flowermooncake = {
         test = function(cooker, names, tags)
             return
@@ -330,7 +327,6 @@ local foods_legion = {
             end
         end,
     },
-
     dish_farewellcupcake = {
         test = function(cooker, names, tags)
             return (names.red_cap or names.red_cap_cooked) and tags.monster and tags.decoration
@@ -368,7 +364,6 @@ local foods_legion = {
             end
         end,
     },
-
     dish_braisedmeatwithfoliages = {
         test = function(cooker, names, tags)
             return (names.foliage and names.foliage >= 2) and (tags.meat and tags.meat >= 1)
@@ -388,7 +383,6 @@ local foods_legion = {
         cook_cant = "非食 甜度",
         recipe_count = 6,
     },
-
     dish_fleshnapoleon = {
         test = function(cooker, names, tags)
             return ((names.wormlight_lesser and names.wormlight_lesser > 1) or names.wormlight)
@@ -436,7 +430,6 @@ local foods_legion = {
             end
         end,
     },
-
     dish_beggingmeat = {
         test = function(cooker, names, tags)
             return names.ash and tags.meat and (not tags.monster or tags.monster <= 1) and not tags.sweetener and not tags.frozen
@@ -476,7 +469,6 @@ local foods_legion = {
             end
         end,
     },
-
     dish_frenchsnailsbaked = {
         test = function(cooker, names, tags)
             return names.slurtleslime and names.cutlichen and tags.meat and (not tags.monster or tags.monster <= 1)
@@ -515,7 +507,6 @@ local foods_legion = {
             inst.components.explosive.lightonexplode = false
         end
     },
-
     dish_neworleanswings = {
         test = function(cooker, names, tags)
             return (names.batwing or names.batwing_cooked) and (tags.meat and tags.meat >= 2) and (not tags.monster or tags.monster <= 2)
@@ -540,7 +531,6 @@ local foods_legion = {
             eater:AddDebuff("buff_batdisguise", "buff_batdisguise")
         end,
     },
-
     dish_fishjoyramen = {
         test = function(cooker, names, tags)
             return (names.plantmeat or names.plantmeat_cooked) and tags.fish and (not tags.monster or tags.monster <= 1)
@@ -595,7 +585,6 @@ local foods_legion = {
             end
         end,
     },
-
     dish_roastedmarshmallows = {
         test = function(cooker, names, tags)
             return names.glommerfuel and tags.sweetener and names.twigs and not tags.meat and not tags.frozen and not tags.egg
@@ -615,7 +604,6 @@ local foods_legion = {
         cook_cant = "肉度 冰度 蛋度",
         recipe_count = 6,
     },
-
     dish_pomegranatejelly = {
         test = function(cooker, names, tags)
             return (names.pomegranate or names.pomegranate_cooked) and
@@ -636,7 +624,6 @@ local foods_legion = {
         cook_cant = "菜度 肉度 蛋度",
         recipe_count = 6,
     },
-
     dish_medicinalliquor = {
         test = function(cooker, names, tags)
             return names.furtuft and tags.frozen and not tags.meat and not tags.sweetener
@@ -715,7 +702,6 @@ local foods_legion = {
             end
         end,
     },
-
     dish_bananamousse = {
         test = function(cooker, names, tags)
             return (names.cave_banana or names.cave_banana_cooked) and (tags.fruit and tags.fruit > 1) and tags.egg
@@ -745,7 +731,6 @@ local foods_legion = {
             end
         end,
     },
-
     dish_friedfishwithpuree = {
         test = function(cooker, names, tags)
             return names.fig and (names.oceanfish_small_3_inv or names.oceanfish_medium_9_inv)
@@ -774,47 +759,10 @@ local foods_legion = {
             end
         end,
     },
-
-	--[[
-        CALORIES_TINY = calories_per_day/8, -- berries --9.375
-        CALORIES_SMALL = calories_per_day/6, -- veggies --12.5
-        CALORIES_MEDSMALL = calories_per_day/4, --18.75
-        CALORIES_MED = calories_per_day/3, -- meat --25
-        CALORIES_LARGE = calories_per_day/2, -- cooked meat --37.5
-        CALORIES_HUGE = calories_per_day, -- crockpot foods? --75
-        CALORIES_SUPERHUGE = calories_per_day*2, -- crockpot foods? --150
-
-        HEALING_TINY = 1,
-        HEALING_SMALL = 3,
-        HEALING_MEDSMALL = 8,
-        HEALING_MED = 20,
-        HEALING_MEDLARGE = 30,
-        HEALING_LARGE = 40,
-        HEALING_HUGE = 60,
-        HEALING_SUPERHUGE = 100,
-
-        SANITY_SUPERTINY = 1,
-        SANITY_TINY = 5,
-        SANITY_SMALL = 10,
-        SANITY_MED = 15,
-        SANITY_MEDLARGE = 20,
-        SANITY_LARGE = 33,
-        SANITY_HUGE = 50,
-
-        PERISH_ONE_DAY = 1*total_day_time*perish_warp, --1天
-        PERISH_TWO_DAY = 2*total_day_time*perish_warp, --2天
-        PERISH_SUPERFAST = 3*total_day_time*perish_warp,
-        PERISH_FAST = 6*total_day_time*perish_warp,
-        PERISH_FASTISH = 8*total_day_time*perish_warp,
-        PERISH_MED = 10*total_day_time*perish_warp,
-        PERISH_SLOW = 15*total_day_time*perish_warp,
-        PERISH_PRESERVED = 20*total_day_time*perish_warp,
-        PERISH_SUPERSLOW = 40*total_day_time*perish_warp, --40天
-	]]--
-}
-
-if CONFIGS_LEGION.FLOWERSPOWER then
-    foods_legion.dish_chilledrosejuice = {
+    ------
+    --花香四溢
+    ------
+    dish_chilledrosejuice = {
         test = function(cooker, names, tags)
             return (names.petals_rose and names.petals_rose > 1) and tags.frozen and (tags.fruit and tags.fruit >= 1)
                 and not tags.meat and not tags.monster
@@ -854,9 +802,8 @@ if CONFIGS_LEGION.FLOWERSPOWER then
                 flower.planted = true
             end
         end,
-    }
-
-    foods_legion.dish_twistedrolllily = {
+    },
+    dish_twistedrolllily = {
         test = function(cooker, names, tags)
             return (names.petals_lily and names.petals_lily > 1) and (tags.meat and tags.meat >= 1) and (tags.veggie and tags.veggie >= 2)
         end,
@@ -892,9 +839,8 @@ if CONFIGS_LEGION.FLOWERSPOWER then
                 fly.sg:GoToState("idle")
             end
         end,
-    }
-
-    foods_legion.dish_orchidcake = {
+    },
+    dish_orchidcake = {
         test = function(cooker, names, tags)
             return (names.petals_orchid and names.petals_orchid > 1) and (tags.veggie and tags.veggie >= 1.5) and tags.fruit
                 and not tags.meat and not tags.monster
@@ -928,11 +874,11 @@ if CONFIGS_LEGION.FLOWERSPOWER then
                 end
             end
         end,
-    }
-end
-
-if CONFIGS_LEGION.PRAYFORRAIN then
-    foods_legion.dish_ricedumpling = {
+    },
+    ------
+    --祈雨祭
+    ------
+    dish_ricedumpling = {
         test = function(cooker, names, tags)
             return names.monstrain_leaf and (tags.veggie and tags.veggie >= 2.5) and tags.egg and not tags.meat
         end,
@@ -958,11 +904,11 @@ if CONFIGS_LEGION.PRAYFORRAIN then
                 eater:AddDebuff("buff_hungerretarder", "buff_hungerretarder")
             end
         end,
-    }
-end
-
-if CONFIGS_LEGION.LEGENDOFFALL then
-    foods_legion.dish_murmurananas = {
+    },
+    ------
+    --丰饶传说
+    ------
+    dish_murmurananas = {
         test = function(cooker, names, tags)
             return (names.pineananas or names.pineananas_cooked) and (tags.meat and tags.meat >= 2)
                 and (not tags.monster or tags.monster <= 1)
@@ -980,8 +926,8 @@ if CONFIGS_LEGION.LEGENDOFFALL then
         cook_need = "(烤)松萝 肉度≥2",
         cook_cant = "怪物度≤1",
         recipe_count = 6,
-    }
-    foods_legion.dish_sosweetjarkfruit = {
+    },
+    dish_sosweetjarkfruit = {
         test = function(cooker, names, tags)
             return names.pineananas and tags.frozen and (tags.sweetener and tags.sweetener >= 2)
                 and not tags.monster and not tags.meat
@@ -1000,11 +946,11 @@ if CONFIGS_LEGION.LEGENDOFFALL then
         cook_need = "松萝 冰度 甜度≥2",
         cook_cant = "怪物度 肉度",
         recipe_count = 2,
-    }
-end
-
-if TUNING.LEGION_FLASHANDCRUSH then
-    foods_legion.dish_wrappedshrimppaste = {
+    },
+    ------
+    --电闪雷鸣
+    ------
+    dish_wrappedshrimppaste = {
         test = function(cooker, names, tags)
             return names.wobster_sheller_land and names.albicans_cap and (tags.decoration and tags.decoration >= 1)
                 and not tags.fruit and not tags.monster
@@ -1030,11 +976,11 @@ if TUNING.LEGION_FLASHANDCRUSH then
             eater.time_l_sporeresistance = { add = TUNING.SEG_TIME*24, max = TUNING.SEG_TIME*30 }
             eater:AddDebuff("buff_sporeresistance", "buff_sporeresistance")
         end,
-    }
-end
-
-if TUNING.LEGION_DESERTSECRET then
-    foods_legion.dish_shyerryjam = {
+    },
+    ------
+    --尘世蜃楼
+    ------
+    dish_shyerryjam = {
         test = function(cooker, names, tags)
             return names.shyerry and not tags.veggie and not tags.monster
                 and not tags.egg and not tags.meat and not tags.inedible and not tags.frozen
@@ -1061,7 +1007,44 @@ if TUNING.LEGION_DESERTSECRET then
             eater:AddDebuff("buff_healthstorage", "buff_healthstorage")
         end,
     }
-end
+
+	--[[
+        CALORIES_TINY = calories_per_day/8, -- berries --9.375
+        CALORIES_SMALL = calories_per_day/6, -- veggies --12.5
+        CALORIES_MEDSMALL = calories_per_day/4, --18.75
+        CALORIES_MED = calories_per_day/3, -- meat --25
+        CALORIES_LARGE = calories_per_day/2, -- cooked meat --37.5
+        CALORIES_HUGE = calories_per_day, -- crockpot foods? --75
+        CALORIES_SUPERHUGE = calories_per_day*2, -- crockpot foods? --150
+
+        HEALING_TINY = 1,
+        HEALING_SMALL = 3,
+        HEALING_MEDSMALL = 8,
+        HEALING_MED = 20,
+        HEALING_MEDLARGE = 30,
+        HEALING_LARGE = 40,
+        HEALING_HUGE = 60,
+        HEALING_SUPERHUGE = 100,
+
+        SANITY_SUPERTINY = 1,
+        SANITY_TINY = 5,
+        SANITY_SMALL = 10,
+        SANITY_MED = 15,
+        SANITY_MEDLARGE = 20,
+        SANITY_LARGE = 33,
+        SANITY_HUGE = 50,
+
+        PERISH_ONE_DAY = 1*total_day_time*perish_warp, --1天
+        PERISH_TWO_DAY = 2*total_day_time*perish_warp, --2天
+        PERISH_SUPERFAST = 3*total_day_time*perish_warp,
+        PERISH_FAST = 6*total_day_time*perish_warp,
+        PERISH_FASTISH = 8*total_day_time*perish_warp,
+        PERISH_MED = 10*total_day_time*perish_warp,
+        PERISH_SLOW = 15*total_day_time*perish_warp,
+        PERISH_PRESERVED = 20*total_day_time*perish_warp,
+        PERISH_SUPERSLOW = 40*total_day_time*perish_warp, --40天
+	]]--
+}
 
 ------
 ------

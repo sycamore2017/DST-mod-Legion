@@ -12,7 +12,7 @@ local PopupDialogScreen = require "screens/redux/popupdialog"
 local TrueScrollArea = require "widgets/truescrollarea"
 local UIAnim = require "widgets/uianim"
 
-local ischinese = TUNING.LEGION_MOD_LANGUAGES == "chinese"
+local ischinese = CONFIGS_LEGION.LANGUAGES == "chinese"
 local SkinStrings = ischinese and {
     UNKNOWN_STORY = "这个故事不值一提。",
     COLLECTION = {

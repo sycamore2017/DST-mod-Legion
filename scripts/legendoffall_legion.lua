@@ -166,12 +166,10 @@ AddDeconstructRecipe("siving_ctldirt", {
 
 if IsServer then
     local newproducts = {
-        cutlichen = { product = "cutlichen", produce = 4, },
-        foliage = { product = "foliage", produce = 6, },
+        cutlichen = { product = "cutlichen", produce = 4 },
+        foliage = { product = "foliage", produce = 6 },
+        albicans_cap = { product = "albicans_cap", produce = 4 }
     }
-    if TUNING.LEGION_FLASHANDCRUSH then
-        newproducts["albicans_cap"] = { product = "albicans_cap", produce = 4, }
-    end
 
     AddPrefabPostInit("mushroom_farm", function(inst)
         local AbleToAcceptTest_old = inst.components.trader.abletoaccepttest
@@ -1548,22 +1546,7 @@ AddComponentAction("SCENE", "genetrans", function(inst, doer, actions, right)
     end
 end)
 
-if not _G.rawget(_G, "CA_U_INVENTORYITEM_L") then --ComponentAction_USEITEM_inventoryitem_legion
-    _G.CA_U_INVENTORYITEM_L = {}
-end
-table.insert(_G.CA_U_INVENTORYITEM_L, function(inst, doer, target, actions, right)
-    if
-        right and
-        (inst.prefab == "siving_rocks" or TRANS_DATA_LEGION[inst.prefab] ~= nil) and
-        target:HasTag("genetrans") and
-        not (doer.replica.inventory ~= nil and doer.replica.inventory:IsHeavyLifting()) and
-        not (doer.replica.rider ~= nil and doer.replica.rider:IsRiding())
-    then
-        table.insert(actions, ACTIONS.GENETRANS)
-        return true
-    end
-    return false
-end)
+-- GENETRANS 组件动作响应已移到 CA_U_INVENTORYITEM_L 中
 
 local function FnSgGeneTrans(inst, action)
     if inst.replica.inventory ~= nil and inst.replica.inventory:IsHeavyLifting() then
@@ -1615,40 +1598,7 @@ AddAction(LIFEBEND)
 
 --Tip："EQUIPPED"类型只识别手持道具，其他装备栏位置的不识别
 -- AddComponentAction("EQUIPPED", "lifebender", function(inst, doer, target, actions, right) end)
-table.insert(_G.CA_S_INSPECTABLE_L, function(inst, doer, actions, right)
-    if right and doer ~= inst and (doer.replica.inventory ~= nil and not doer.replica.inventory:IsHeavyLifting()) then
-        local item = doer.replica.inventory:GetEquippedItem(EQUIPSLOTS.HEAD)
-        if item ~= nil and item:HasTag("siv_mask2") then
-            if inst.prefab == "flower_withered" or inst.prefab == "mandrake" then --枯萎花、死掉的曼德拉草
-                table.insert(actions, ACTIONS.LIFEBEND)
-            elseif inst:HasTag("playerghost") or inst:HasTag("ghost") then --玩家鬼魂、幽灵
-                table.insert(actions, ACTIONS.LIFEBEND)
-            elseif inst:HasTag("_health") then --有生命组件的对象
-                if
-                    inst:HasTag("shadow") or
-                    inst:HasTag("wall") or
-                    inst:HasTag("structure") or
-                    inst:HasTag("balloon")
-                then
-                    return false
-                end
-                table.insert(actions, ACTIONS.LIFEBEND)
-            elseif
-                inst:HasTag("withered") or inst:HasTag("barren") or --枯萎的植物
-                inst:HasTag("weed") or --杂草
-                (inst:HasTag("farm_plant") and inst:HasTag("pickable_harvest_str")) or --作物
-                inst:HasTag("crop_legion") or --子圭垄植物
-                inst:HasTag("crop2_legion") --异种植物
-            then
-                table.insert(actions, ACTIONS.LIFEBEND)
-            else
-                return false
-            end
-            return true
-        end
-    end
-    return false
-end)
+-- LIFEBEND 组件动作响应已移到 CA_S_INSPECTABLE_L 中
 
 AddStategraphActionHandler("wilson", ActionHandler(ACTIONS.LIFEBEND, "give"))
 AddStategraphActionHandler("wilson_client", ActionHandler(ACTIONS.LIFEBEND, "give"))

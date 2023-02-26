@@ -19,11 +19,8 @@ local GROUND_FLOORING = _G.GROUND_FLOORING
 --------------------------------------------------------------------------
 
 --地皮种类，用以生成代号
-local tiles_legion = {}
-
-if TUNING.LEGION_DESERTSECRET then
-    tiles_legion["LILYPOND_DEEP"] = 
-    {
+local tiles_legion = {
+	LILYPOND_DEEP = {
     	added = false, floor = true, ground_name = "Lilypond_deep",
 
     	name = "water_medium",	--这个代表levels/tile/下的文件名字的关键部分
@@ -39,10 +36,8 @@ if TUNING.LEGION_DESERTSECRET then
 
     	name_minimap = "map_edge",
     	noise_texture_minimap = "levels/textures/mini_lilypond_noise.tex",
-    }
-
-    tiles_legion["PAINTEDBOG"] = 
-    {
+    },
+	PAINTEDBOG = {
     	added = false, floor = true, ground_name = "Paintedbog",
 
     	name = "swamp",
@@ -58,10 +53,8 @@ if TUNING.LEGION_DESERTSECRET then
 
     	name_minimap = "map_edge",
     	noise_texture_minimap = "levels/textures/mini_bog_noise.tex",
-    }
-
-    tiles_legion["SOMERUINS"] = 
-    {
+    },
+	SOMERUINS = {
     	added = false, floor = true, ground_name = "Someruins",
 
     	name = "blocky",
@@ -77,10 +70,8 @@ if TUNING.LEGION_DESERTSECRET then
 
     	name_minimap = "map_edge",
     	noise_texture_minimap = "levels/textures/mini_ruins_slab.tex",
-    }
-
-    tiles_legion["SOMERUINS_BLUE"] = 
-    {
+    },
+	SOMERUINS_BLUE = {
     	added = false, floor = true, ground_name = "Someruins_blue",
 
     	name = "blocky",
@@ -97,7 +88,7 @@ if TUNING.LEGION_DESERTSECRET then
     	name_minimap = "map_edge",
     	noise_texture_minimap = "levels/textures/mini_ruins_slab.tex",
     }
-end
+}
 
 --将地皮代号变成下标
 local tiles_index = {}

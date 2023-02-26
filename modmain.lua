@@ -31,6 +31,7 @@ PrefabFiles = {
     "buffs_legion",             --buff
     "shield_legion",            --盾类武器
     "carpet_legion",            --地毯
+    "foods_cookpot",            --料理
 }
 
 Assets = {
@@ -48,6 +49,20 @@ Assets = {
     --预加载，给科技栏用的
     Asset("ATLAS", "images/inventoryimages/hat_lichen.xml"),
     Asset("IMAGE", "images/inventoryimages/hat_lichen.tex"),
+
+    --为工艺锅mod加的（此时并不明确是否启用了该mod）
+    Asset("ATLAS", "images/foodtags/foodtag_gel.xml"),
+    Asset("IMAGE", "images/foodtags/foodtag_gel.tex"),
+    Asset("ATLAS", "images/foodtags/foodtag_petals.xml"),
+    Asset("IMAGE", "images/foodtags/foodtag_petals.tex"),
+    Asset("ATLAS", "images/foodtags/foodtag_fallfullmoon.xml"),
+    Asset("IMAGE", "images/foodtags/foodtag_fallfullmoon.tex"),
+    Asset("ATLAS", "images/foodtags/foodtag_winterfeast.xml"),
+    Asset("IMAGE", "images/foodtags/foodtag_winterfeast.tex"),
+    Asset("ATLAS", "images/foodtags/foodtag_hallowednights.xml"),
+    Asset("IMAGE", "images/foodtags/foodtag_hallowednights.tex"),
+    Asset("ATLAS", "images/foodtags/foodtag_newmoon.xml"),
+    Asset("IMAGE", "images/foodtags/foodtag_newmoon.tex"),
 
     --为了在菜谱和农谱里显示材料的图片，所以不管玩家设置，还是要注册一遍
     Asset("ATLAS", "images/inventoryimages/monstrain_leaf.xml"),
@@ -95,71 +110,6 @@ RegisterInventoryItemAtlas("images/inventoryimages/albicans_cap.xml", "albicans_
 --[[ Test ]]--[[ test ]]
 --------------------------------------------------------------------------
 
--- local function ResumeHands(inst)
---     --需要恢复贴图显示状态
---     local hands = inst.components.inventory:GetEquippedItem(EQUIPSLOTS.HANDS)
---     if hands ~= nil and not hands:HasTag("book") then
---         inst.AnimState:Show("ARM_carry")
---         inst.AnimState:Hide("ARM_normal")
---     else
---         inst.AnimState:Hide("ARM_carry")
---         inst.AnimState:Show("ARM_normal")
---         inst.AnimState:ClearOverrideSymbol("swap_object")
---     end
--- end
-
--- local gosg = State {
---     name = "gosg",
---     tags = { "gosg" },
-
---     onenter = function(inst)
---         --需注意，拿在手上的药杵和做捣药动作时用的贴图不一样
---         inst.AnimState:OverrideSymbol("swap_object","medicine_pestle_myth","objectpestle")
---         inst.AnimState:OverrideSymbol("mortar_myth","medicine_pestle_myth","mortar")
-
---         --这两个贴图都要显示，因为都用到了
---         inst.AnimState:Show("ARM_carry")
---         inst.AnimState:Show("ARM_normal")
-
---         inst.AnimState:PlayAnimation("pound_medicine_myth_pre")
---         inst.AnimState:PushAnimation("pound_medicine_myth_loop", true)
-
---         inst.sg:SetTimeout(120 * FRAMES)
---     end,
-
---     ontimeout = function(inst)
---         inst:DoTaskInTime(inst.AnimState:GetCurrentAnimationLength() - inst.AnimState:GetCurrentAnimationTime()%inst.AnimState:GetCurrentAnimationLength(), function()
---             ResumeHands(inst)
---             --需注意，拿在手上的药杵和做捣药动作时用的贴图不一样
---             inst.AnimState:OverrideSymbol("swap_object","swap_medicine_pestle_myth","swap_medicine_pestle_myth")
---             inst.AnimState:PlayAnimation("pound_medicine_myth_pst", false)
---             inst:DoTaskInTime(inst.AnimState:GetCurrentAnimationLength(), function()
---                 inst.sg:GoToState("idle")
---             end)
---         end)
---     end,
-
---     events =
---     {
---         EventHandler("equip", function(inst)    --防止装备时改变手的显示状态
---             inst.AnimState:OverrideSymbol("swap_object","pound_medicine_myth","swap_object")
---             inst.AnimState:Show("ARM_carry")
---             inst.AnimState:Show("ARM_normal")
---         end),
-
---         EventHandler("unequip", function(inst)  --防止卸下时改变手的显示状态
---             inst.AnimState:OverrideSymbol("swap_object","pound_medicine_myth","swap_object")
---             inst.AnimState:Show("ARM_carry")
---             inst.AnimState:Show("ARM_normal")
---         end),
---     },
-
---     onexit = function(inst)
---         ResumeHands(inst)
---     end,
--- }
--- AddStategraphState("wilson", gosg)
-
 -- TheInput:AddKeyUpHandler(KEY_V, function()
 --     ThePlayer.sg:GoToState("gosg")
 -- end)
@@ -178,64 +128,34 @@ _G.CONFIGS_LEGION = {
     DUSTTODUSTY = false
 }
 
-if GetModConfigData("FlowersPower") then --花香四溢 bool
-    _G.CONFIGS_LEGION.FLOWERSPOWER = true
-    _G.CONFIGS_LEGION.FLOWERWEAPONSCHANCE = GetModConfigData("FlowerWeaponsChance")
-    _G.CONFIGS_LEGION.FOLIAGEATHCHANCE = GetModConfigData("FoliageathChance")
-else
-    _G.CONFIGS_LEGION.FLOWERSPOWER = false
-end
+_G.CONFIGS_LEGION.FLOWERWEAPONSCHANCE = GetModConfigData("FlowerWeaponsChance")
+_G.CONFIGS_LEGION.FOLIAGEATHCHANCE = GetModConfigData("FoliageathChance")
 
 _G.CONFIGS_LEGION.BETTERCOOKBOOK = false
-if GetModConfigData("SuperbCuisine") then --美味佳肴 bool
-    TUNING.LEGION_SUPERBCUISINE = true
+_G.CONFIGS_LEGION.FESTIVALRECIPES = GetModConfigData("FestivalRecipes")
 
-    if GetModConfigData("FestivalRecipes") then --开放节日食谱 bool
-        TUNING.LEGION_FESTIVALRECIPES = true
-    end
+_G.CONFIGS_LEGION.BOOKRECIPETABS = GetModConfigData("BookRecipetabs") --设置多变的云的制作栏 "bookbuilder" "magic"
+_G.CONFIGS_LEGION.HIDDENUPDATETIMES = GetModConfigData("HiddenUpdateTimes") --月藏宝匣最大升级次数
+_G.CONFIGS_LEGION.REVOLVEDUPDATETIMES = GetModConfigData("RevolvedUpdateTimes") --月轮宝盘最大升级次数
+
+-- TUNING.LEGION_GROWTHRATE = GetModConfigData("GrowthRate") --设置生长速度 int 0.7 1 1.5 2
+-- TUNING.LEGION_CROPYIELDS = GetModConfigData("CropYields") --设置果实数量 int 0 1 2 3
+_G.CONFIGS_LEGION.X_OVERRIPETIME = GetModConfigData("OverripeTime") --设置过熟的时间倍数 int 1 2 0
+_G.CONFIGS_LEGION.X_PESTRISK = GetModConfigData("PestRisk") --设置虫害几率 double 0.007 0.012
+_G.CONFIGS_LEGION.PHOENIXREBIRTHCYCLE = GetModConfigData("PhoenixRebirthCycle") --设置玄鸟重生时间
+_G.CONFIGS_LEGION.SIVINGROOTTEX = GetModConfigData("SivingRootTex") --设置子圭突触贴图
+_G.CONFIGS_LEGION.PHOENIXBATTLEDIFFICULTY = GetModConfigData("PhoenixBattleDifficulty") --设置玄鸟战斗难度
+_G.CONFIGS_LEGION.SIVFEASTRENGTH = GetModConfigData("SivFeaStrength") --设置子圭玄鸟正羽强度
+
+_G.CONFIGS_LEGION.TECHUNLOCK = GetModConfigData("TechUnlock") --设置新道具的科技解锁方式 "lootdropper" "prototyper"
+
+if GetModConfigData("DressUp") then --启用幻化机制 bool
+    _G.CONFIGS_LEGION.DRESSUP = true
+else
+    _G.CONFIGS_LEGION.DRESSUP = false
 end
 
-if GetModConfigData("PrayForRain") then --祈雨祭 bool
-    _G.CONFIGS_LEGION.PRAYFORRAIN = true
-
-    _G.CONFIGS_LEGION.BOOKRECIPETABS = GetModConfigData("BookRecipetabs") --设置多变的云的制作栏 "bookbuilder" "magic"
-    _G.CONFIGS_LEGION.HIDDENUPDATETIMES = GetModConfigData("HiddenUpdateTimes") --月藏宝匣最大升级次数
-    _G.CONFIGS_LEGION.REVOLVEDUPDATETIMES = GetModConfigData("RevolvedUpdateTimes") --月轮宝盘最大升级次数
-end
-
-if GetModConfigData("LegendOfFall") then --丰饶传说 bool
-    _G.CONFIGS_LEGION.LEGENDOFFALL = true
-
-    -- TUNING.LEGION_GROWTHRATE = GetModConfigData("GrowthRate") --设置生长速度 int 0.7 1 1.5 2
-    -- TUNING.LEGION_CROPYIELDS = GetModConfigData("CropYields") --设置果实数量 int 0 1 2 3
-    _G.CONFIGS_LEGION.X_OVERRIPETIME = GetModConfigData("OverripeTime") --设置过熟的时间倍数 int 1 2 0
-    _G.CONFIGS_LEGION.X_PESTRISK = GetModConfigData("PestRisk") --设置虫害几率 double 0.007 0.012
-
-    _G.CONFIGS_LEGION.PHOENIXREBIRTHCYCLE = GetModConfigData("PhoenixRebirthCycle") --设置玄鸟重生时间
-    _G.CONFIGS_LEGION.SIVINGROOTTEX = GetModConfigData("SivingRootTex") --设置子圭突触贴图
-    _G.CONFIGS_LEGION.PHOENIXBATTLEDIFFICULTY = GetModConfigData("PhoenixBattleDifficulty") --设置玄鸟战斗难度
-    _G.CONFIGS_LEGION.SIVFEASTRENGTH = GetModConfigData("SivFeaStrength") --设置子圭玄鸟正羽强度
-end
-
-if GetModConfigData("FlashAndCrush") then --电闪雷鸣 bool
-    TUNING.LEGION_FLASHANDCRUSH = true
-
-    TUNING.LEGION_TECHUNLOCK = GetModConfigData("TechUnlock") --设置新道具的科技解锁方式 "lootdropper" "prototyper"
-end
-
-if GetModConfigData("DesertSecret") then --尘市蜃楼 bool
-    TUNING.LEGION_DESERTSECRET = true
-
-    if GetModConfigData("DressUp") then --启用幻化机制 bool
-        _G.CONFIGS_LEGION.DRESSUP = true
-    else
-        _G.CONFIGS_LEGION.DRESSUP = false
-    end
-end
-
-if GetModConfigData("CleaningUpStench") then --自动清除地上的臭臭 bool
-    TUNING.LEGION_CLEANINGUPSTENCH = true
-end
+_G.CONFIGS_LEGION.CLEANINGUPSTENCH = GetModConfigData("CleaningUpStench") --自动清除地上的臭臭 bool
 
 ----------
 --语言设置
@@ -270,188 +190,153 @@ modimport("scripts/widgetcreation_legion.lua")
 --[[ the power of flowers ]]--[[ 花香四溢 ]]
 --------------------------------------------------------------------------
 
-if CONFIGS_LEGION.FLOWERSPOWER then
-    modimport("scripts/flowerspower_legion.lua")
-end
+modimport("scripts/flowerspower_legion.lua")
 
 --------------------------------------------------------------------------
 --[[ superb cuisine ]]--[[ 美味佳肴 ]]
 --------------------------------------------------------------------------
 
-if TUNING.LEGION_SUPERBCUISINE then
-    table.insert(PrefabFiles, "foods_cookpot")
+-- -- AddIngredientValues({"batwing"}, {meat=.5}, true, false) --蝙蝠翅膀，虽然可以晾晒，但是得到的不是蝙蝠翅膀干，而是小肉干，所以candry不能填true
+-- AddIngredientValues({"ash"}, {inedible=1}, false, false) --灰烬
+-- AddIngredientValues({"slurtleslime"}, {gel=1}, false, false) --蜗牛黏液
+-- AddIngredientValues({"glommerfuel"}, {gel=1}, false, false) --格罗姆黏液
+-- AddIngredientValues({"phlegm"}, {gel=1}, false, false) --钢羊黏痰
+-- AddIngredientValues({"furtuft"}, {inedible=1}, false, false) --熊毛屑(非熊皮)
+-- AddIngredientValues({"twiggy_nut"}, {inedible=1}, false, false) --添加树枝树种作为新的料理原材料
+-- AddIngredientValues({"moon_tree_blossom"}, {veggie=.5, petals_legion=1}, false, false) --月树花
+-- AddIngredientValues({"foliage"}, {decoration=1}, false, false) --蕨叶
+-- AddIngredientValues({"horn"}, {inedible=1, decoration=2}, false, false) --牛角
 
-    ------为工艺锅mod加的（此时并不明确是否启用了该mod）
-    local assets_craftpot = {
-        Asset("ATLAS", "images/foodtags/foodtag_gel.xml"),
-        Asset("IMAGE", "images/foodtags/foodtag_gel.tex"),
-        Asset("ATLAS", "images/foodtags/foodtag_petals.xml"),
-        Asset("IMAGE", "images/foodtags/foodtag_petals.tex"),
-        Asset("ATLAS", "images/foodtags/foodtag_fallfullmoon.xml"),
-        Asset("IMAGE", "images/foodtags/foodtag_fallfullmoon.tex"),
-        Asset("ATLAS", "images/foodtags/foodtag_winterfeast.xml"),
-        Asset("IMAGE", "images/foodtags/foodtag_winterfeast.tex"),
-        Asset("ATLAS", "images/foodtags/foodtag_hallowednights.xml"),
-        Asset("IMAGE", "images/foodtags/foodtag_hallowednights.tex"),
-        Asset("ATLAS", "images/foodtags/foodtag_newmoon.xml"),
-        Asset("IMAGE", "images/foodtags/foodtag_newmoon.tex"),
-    }
-    for k,v in pairs(assets_craftpot) do
-        table.insert(Assets, v)
+for k, recipe in pairs(require("preparedfoods_legion")) do
+    table.insert(Assets, Asset("ATLAS", "images/cookbookimages/"..recipe.name..".xml"))
+    table.insert(Assets, Asset("IMAGE", "images/cookbookimages/"..recipe.name..".tex"))
+
+    AddCookerRecipe("cookpot", recipe)
+    AddCookerRecipe("portablecookpot", recipe)
+    AddCookerRecipe("archive_cookpot", recipe)
+    RegisterInventoryItemAtlas("images/cookbookimages/"..recipe.name..".xml", recipe.name..".tex")
+end
+for k, recipe in pairs(require("prepareditems_legion")) do
+    table.insert(Assets, Asset("ATLAS", "images/cookbookimages/"..recipe.name..".xml"))
+    table.insert(Assets, Asset("IMAGE", "images/cookbookimages/"..recipe.name..".tex"))
+
+    AddCookerRecipe("cookpot", recipe)
+    AddCookerRecipe("portablecookpot", recipe)
+    AddCookerRecipe("archive_cookpot", recipe)
+    RegisterInventoryItemAtlas("images/cookbookimages/"..recipe.name..".xml", recipe.name..".tex")
+end
+
+local foodrecipes_spice = require("preparedfoods_l_spiced")
+for k, recipe in pairs(foodrecipes_spice) do
+    AddCookerRecipe("portablespicer", recipe)
+end
+local itemrecipes_spice = require("prepareditems_l_spiced")
+for k, recipe in pairs(itemrecipes_spice) do
+    AddCookerRecipe("portablespicer", recipe)
+end
+
+--已经修复了，好耶！
+--官方的便携香料站代码没改新机制，这里用另类方式手动改一下。等官方修复了我就删除。相关文件 prefabs\portablespicer.lua
+-- local IsModCookingProduct_old = IsModCookingProduct
+-- _G.IsModCookingProduct = function(cooker, name)
+--     if foodrecipes_spice[name] ~= nil or itemrecipes_spice[name] ~= nil then
+--         return false
+--     end
+--     if IsModCookingProduct_old ~= nil then
+--         return IsModCookingProduct_old(cooker, name)
+--     end
+--     return false
+-- end
+
+--食谱中官方料理的修改
+if CONFIGS_LEGION.BETTERCOOKBOOK then
+    local cookbookui_legion = require("widgets/cookbookui_legion")
+    local fooduidata_legion = require("languages/recipedesc_legion_chinese")
+
+    local function SetNewCookBookUI(recipe, uidata)
+        if uidata ~= nil then
+            recipe.cook_need = uidata.cook_need
+            recipe.cook_cant = uidata.cook_cant
+            recipe.recipe_count = uidata.recipe_count or 1
+            recipe.custom_cookbook_details_fn = function(data, self, top, left)
+                local root = cookbookui_legion(data, self, top, left)
+                return root
+            end
+        end
     end
 
-    -- -- AddIngredientValues({"batwing"}, {meat=.5}, true, false) --蝙蝠翅膀，虽然可以晾晒，但是得到的不是蝙蝠翅膀干，而是小肉干，所以candry不能填true
-    -- AddIngredientValues({"ash"}, {inedible=1}, false, false) --灰烬
-    -- AddIngredientValues({"slurtleslime"}, {gel=1}, false, false) --蜗牛黏液
-    -- AddIngredientValues({"glommerfuel"}, {gel=1}, false, false) --格罗姆黏液
-    -- AddIngredientValues({"phlegm"}, {gel=1}, false, false) --钢羊黏痰
-    -- AddIngredientValues({"furtuft"}, {inedible=1}, false, false) --熊毛屑(非熊皮)
-    -- AddIngredientValues({"twiggy_nut"}, {inedible=1}, false, false) --添加树枝树种作为新的料理原材料
-    -- AddIngredientValues({"moon_tree_blossom"}, {veggie=.5, petals_legion=1}, false, false) --月树花
-    -- AddIngredientValues({"foliage"}, {decoration=1}, false, false) --蕨叶
-    -- AddIngredientValues({"horn"}, {inedible=1, decoration=2}, false, false) --牛角
-
-    for k, recipe in pairs(require("preparedfoods_legion")) do
-        table.insert(Assets, Asset("ATLAS", "images/cookbookimages/"..recipe.name..".xml"))
-        table.insert(Assets, Asset("IMAGE", "images/cookbookimages/"..recipe.name..".tex"))
-
-        AddCookerRecipe("cookpot", recipe)
-        AddCookerRecipe("portablecookpot", recipe)
-        AddCookerRecipe("archive_cookpot", recipe)
-        RegisterInventoryItemAtlas("images/cookbookimages/"..recipe.name..".xml", recipe.name..".tex")
+    for k,v in pairs(require("preparedfoods")) do
+        SetNewCookBookUI(v, fooduidata_legion.klei[k])
     end
-    for k, recipe in pairs(require("prepareditems_legion")) do
-        table.insert(Assets, Asset("ATLAS", "images/cookbookimages/"..recipe.name..".xml"))
-        table.insert(Assets, Asset("IMAGE", "images/cookbookimages/"..recipe.name..".tex"))
-
-        AddCookerRecipe("cookpot", recipe)
-        AddCookerRecipe("portablecookpot", recipe)
-        AddCookerRecipe("archive_cookpot", recipe)
-        RegisterInventoryItemAtlas("images/cookbookimages/"..recipe.name..".xml", recipe.name..".tex")
+    for k,v in pairs(require("preparedfoods_warly")) do
+        SetNewCookBookUI(v, fooduidata_legion.warly[k])
     end
-
-    local foodrecipes_spice = require("preparedfoods_l_spiced")
-    for k, recipe in pairs(foodrecipes_spice) do
-        AddCookerRecipe("portablespicer", recipe)
+    for k,v in pairs(require("preparednonfoods")) do
+        SetNewCookBookUI(v, fooduidata_legion.nofood[k])
     end
-    local itemrecipes_spice = require("prepareditems_l_spiced")
-    for k, recipe in pairs(itemrecipes_spice) do
-        AddCookerRecipe("portablespicer", recipe)
-    end
+end
 
-    --已经修复了，好耶！
-    --官方的便携香料站代码没改新机制，这里用另类方式手动改一下。等官方修复了我就删除。相关文件 prefabs\portablespicer.lua
-    -- local IsModCookingProduct_old = IsModCookingProduct
-    -- _G.IsModCookingProduct = function(cooker, name)
-    --     if foodrecipes_spice[name] ~= nil or itemrecipes_spice[name] ~= nil then
-    --         return false
-    --     end
-    --     if IsModCookingProduct_old ~= nil then
-    --         return IsModCookingProduct_old(cooker, name)
-    --     end
-    --     return false
-    -- end
-
-    --食谱中官方料理的修改
-    if CONFIGS_LEGION.BETTERCOOKBOOK then
-        local cookbookui_legion = require("widgets/cookbookui_legion")
-        local fooduidata_legion = require("languages/recipedesc_legion_chinese")
-
-        local function SetNewCookBookUI(recipe, uidata)
-            if uidata ~= nil then
-                recipe.cook_need = uidata.cook_need
-                recipe.cook_cant = uidata.cook_cant
-                recipe.recipe_count = uidata.recipe_count or 1
-                recipe.custom_cookbook_details_fn = function(data, self, top, left)
-                    local root = cookbookui_legion(data, self, top, left)
-                    return root
+--因为有的料理我只需要部分香料能调，兼容原因，其他香料制作时会崩溃，所以这里设置默认的返回值
+local cooking = require("cooking")
+local CalculateRecipe_old = cooking.CalculateRecipe
+cooking.CalculateRecipe = function(cooker, names, ...)
+    local product, cooktime = CalculateRecipe_old(cooker, names, ...)
+    if product == nil then
+        local count_name = 0
+        local spice_name = nil
+        for _,name in pairs(names) do
+            if name then
+                count_name = count_name + 1
+                if spice_name == nil and string.sub(name, 1, 6) == "spice_" then
+                    spice_name = name
                 end
             end
         end
-
-        for k,v in pairs(require("preparedfoods")) do
-            SetNewCookBookUI(v, fooduidata_legion.klei[k])
-        end
-        for k,v in pairs(require("preparedfoods_warly")) do
-            SetNewCookBookUI(v, fooduidata_legion.warly[k])
-        end
-        for k,v in pairs(require("preparednonfoods")) do
-            SetNewCookBookUI(v, fooduidata_legion.nofood[k])
+        if count_name == 2 then --香料站只有两格
+            if spice_name and PrefabExists("wetgoop_"..spice_name) then
+                product = "wetgoop_"..spice_name
+            else
+                product = "wetgoop_spice_chili" --实在不行，只能弄一个官方的了
+            end
+            cooktime = 0.12
+        else --这个情况按理来说是不可能的，不过这里也完善吧
+            product = "wetgoop"
+            cooktime = 0.25
         end
     end
-
-    --因为有的料理我只需要部分香料能调，兼容原因，其他香料制作时会崩溃，所以这里设置默认的返回值
-    local cooking = require("cooking")
-    local CalculateRecipe_old = cooking.CalculateRecipe
-    cooking.CalculateRecipe = function(cooker, names, ...)
-        local product, cooktime = CalculateRecipe_old(cooker, names, ...)
-        if product == nil then
-            local count_name = 0
-            local spice_name = nil
-            for _,name in pairs(names) do
-                if name then
-                    count_name = count_name + 1
-                    if spice_name == nil and string.sub(name, 1, 6) == "spice_" then
-                        spice_name = name
-                    end
-                end
-            end
-            if count_name == 2 then --香料站只有两格
-                if spice_name and PrefabExists("wetgoop_"..spice_name) then
-                    product = "wetgoop_"..spice_name
-                else
-                    product = "wetgoop_spice_chili" --实在不行，只能弄一个官方的了
-                end
-                cooktime = 0.12
-            else --这个情况按理来说是不可能的，不过这里也完善吧
-                product = "wetgoop"
-                cooktime = 0.25
-            end
-        end
-        return product, cooktime
-    end
+    return product, cooktime
 end
 
 --------------------------------------------------------------------------
 --[[ desert secret ]]--[[ 尘市蜃楼 ]]
 --------------------------------------------------------------------------
 
-if TUNING.LEGION_DESERTSECRET then
-    if CONFIGS_LEGION.DRESSUP then
-        modimport("scripts/fengl_userdatahook.lua")
-        modimport("scripts/dressup_legion.lua")
-    end
-    modimport("scripts/desertsecret_legion.lua")
+if CONFIGS_LEGION.DRESSUP then
+    modimport("scripts/fengl_userdatahook.lua")
+    modimport("scripts/dressup_legion.lua")
 end
+modimport("scripts/desertsecret_legion.lua")
 
 --------------------------------------------------------------------------
 --[[ the sacrifice of rain ]]--[[ 祈雨祭 ]]
 --------------------------------------------------------------------------
 
-if CONFIGS_LEGION.PRAYFORRAIN then
-    modimport("scripts/prayforrain_legion.lua")
-end
+modimport("scripts/prayforrain_legion.lua")
 
 --------------------------------------------------------------------------
 --[[ legends of the fall ]]--[[ 丰饶传说 ]]
 --------------------------------------------------------------------------
 
-if CONFIGS_LEGION.LEGENDOFFALL then
-    -- modimport("scripts/new_farm_legion.lua")    --关于农场新机制的部分全在这里
-    modimport("scripts/legendoffall_legion.lua")
-end
+modimport("scripts/legendoffall_legion.lua")
 
 --------------------------------------------------------------------------
 --[[ flash and crush ]]--[[ 电闪雷鸣 ]]
 --------------------------------------------------------------------------
 
-if TUNING.LEGION_FLASHANDCRUSH then
-    if TUNING.LEGION_TECHUNLOCK == "prototyper" then
-        modimport("scripts/new_techtree_legion.lua")    --新增制作栏的所需代码
-    end
-
-    modimport("scripts/flashandcrush_legion.lua")
+if _G.CONFIGS_LEGION.TECHUNLOCK == "prototyper" then
+    modimport("scripts/new_techtree_legion.lua")    --新增制作栏的所需代码
 end
+modimport("scripts/flashandcrush_legion.lua")
 
 --------------------------------------------------------------------------
 --[[ other ]]--[[ 其他补充 ]]
@@ -592,29 +477,27 @@ AddSimPostInit(function()
     --注意：运行这里时，所有mod的prefab已经注册完成了
 
     ----------
-    --丰饶传说需要
+    --丰饶传说
     ----------
-    if CONFIGS_LEGION.LEGENDOFFALL then
-        _G.VEGGIES.pineananas = { --新增作物收获物与种子设定（只是为了种子几率，并不会主动生成prefab）
-            health = 8,
-            hunger = 12,
-            sanity = -10,
-            perishtime = TUNING.PERISH_MED,
-            float_settings = {"small", 0.2, 0.9},
+    _G.VEGGIES.pineananas = { --新增作物收获物与种子设定（只是为了种子几率，并不会主动生成prefab）
+        health = 8,
+        hunger = 12,
+        sanity = -10,
+        perishtime = TUNING.PERISH_MED,
+        float_settings = {"small", 0.2, 0.9},
 
-            cooked_health = 16,
-            cooked_hunger = 18.5,
-            cooked_sanity = 5,
-            cooked_perishtime = TUNING.PERISH_SUPERFAST,
-            cooked_float_settings = {"small", 0.2, 1},
+        cooked_health = 16,
+        cooked_hunger = 18.5,
+        cooked_sanity = 5,
+        cooked_perishtime = TUNING.PERISH_SUPERFAST,
+        cooked_float_settings = {"small", 0.2, 1},
 
-            seed_weight = TUNING.SEED_CHANCE_RARE, --大概只有这里起作用了
-            dryable = nil,
-            halloweenmoonmutable_settings = nil,
-            secondary_foodtype = nil,
-            lure_data = nil
-        }
-    end
+        seed_weight = TUNING.SEED_CHANCE_RARE, --大概只有这里起作用了
+        dryable = nil,
+        halloweenmoonmutable_settings = nil,
+        secondary_foodtype = nil,
+        lure_data = nil
+    }
 
     ----------
     --神话书说
@@ -1059,83 +942,81 @@ AddSimPostInit(function()
     ----------
     _G.CONFIGS_LEGION.ENABLEDMODS.CraftPot = AddFoodTag ~= nil --AddFoodTag()是该mod里的全局函数
     if CONFIGS_LEGION.ENABLEDMODS.CraftPot then
-        if TUNING.LEGION_SUPERBCUISINE then
-            --写这个是为了注册特殊烹饪条件(craft pot的机制)
-            AddIngredientValues({"craftpot"}, {
-                fallfullmoon = 1,
-                winterfeast = 1,
-                hallowednights = 1,
-                newmoon = 1,
-            }, false, false)
+        --写这个是为了注册特殊烹饪条件(craft pot的机制)
+        AddIngredientValues({"craftpot"}, {
+            fallfullmoon = 1,
+            winterfeast = 1,
+            hallowednights = 1,
+            newmoon = 1,
+        }, false, false)
 
-            if TUNING.LEGION_MOD_LANGUAGES == "chinese" then
-                STRINGS.NAMES_LEGION = {
-                    GEL = "黏液度",
-                    PETALS_LEGION = "花度",
-                    FALLFULLMOON = "秋季月圆天专属",
-                    WINTERSFEAST = "冬季盛宴专属",
-                    HALLOWEDNIGHTS = "疯狂万圣专属",
-                    NEWMOON = "新月天专属",
-                }
+        if _G.CONFIGS_LEGION.LANGUAGES == "chinese" then
+            STRINGS.NAMES_LEGION = {
+                GEL = "黏液度",
+                PETALS_LEGION = "花度",
+                FALLFULLMOON = "秋季月圆天专属",
+                WINTERSFEAST = "冬季盛宴专属",
+                HALLOWEDNIGHTS = "疯狂万圣专属",
+                NEWMOON = "新月天专属",
+            }
 
-                --帮craft pot翻译下吧
-                STRINGS.NAMES.FROZEN = "冰度"
-                STRINGS.NAMES.VEGGIE = "菜度"
-                STRINGS.NAMES.SWEETENER = "甜度"
-                -- STRINGS.NAMES.MEAT = "肉度" --和大肉重名了，不能这样改
-                -- STRINGS.NAMES.FISH = "鱼度" --和鱼重名了，不能这样改
-                STRINGS.NAMES.MONSTER = "怪物度"
-                STRINGS.NAMES.FRUIT = "果度"
-                STRINGS.NAMES.EGG = "蛋度"
-                STRINGS.NAMES.INEDIBLE = "非食"
-                STRINGS.NAMES.MAGIC = "魔法度"
-                STRINGS.NAMES.DECORATION = "装饰度"
-                STRINGS.NAMES.SEED = "种子度"
-                STRINGS.NAMES.DAIRY = "乳度"
-                STRINGS.NAMES.FAT = "脂度"
-            else
-                STRINGS.NAMES_LEGION = {
-                    GEL = "Gel",
-                    PETALS_LEGION = "Petals",
-                    FALLFULLMOON = "specific to Fall FullMoon Day",
-                    WINTERSFEAST = "specific to Winter Feast",
-                    HALLOWEDNIGHTS = "specific to Hallowed Nights",
-                    NEWMOON = "specific to NewMoon Day",
-                }
-            end
-
-            AddFoodTag('gel', {
-                name = STRINGS.NAMES_LEGION.GEL,
-                tex = "foodtag_gel.tex",
-                atlas = "images/foodtags/foodtag_gel.xml"
-            })
-            AddFoodTag('petals_legion', {
-                name = STRINGS.NAMES_LEGION.PETALS_LEGION,
-                tex = "foodtag_petals.tex",
-                atlas = "images/foodtags/foodtag_petals.xml"
-            })
-            AddFoodTag('fallfullmoon', {
-                name = STRINGS.NAMES_LEGION.FALLFULLMOON,
-                tex = "foodtag_fallfullmoon.tex",
-                atlas = "images/foodtags/foodtag_fallfullmoon.xml"
-            })
-            AddFoodTag('winterfeast', {
-                name = STRINGS.NAMES_LEGION.WINTERSFEAST,
-                tex = "foodtag_winterfeast.tex",
-                atlas = "images/foodtags/foodtag_winterfeast.xml"
-            })
-            AddFoodTag('hallowednights', {
-                name = STRINGS.NAMES_LEGION.HALLOWEDNIGHTS,
-                tex = "foodtag_hallowednights.tex",
-                atlas = "images/foodtags/foodtag_hallowednights.xml"
-            })
-            AddFoodTag('newmoon', {
-                name = STRINGS.NAMES_LEGION.NEWMOON,
-                tex = "foodtag_newmoon.tex",
-                atlas = "images/foodtags/foodtag_newmoon.xml"
-            })
-            --这里本来想把冰度、菜度等图标都改为自己的图标，但是原mod里的图标其实更简单直接，适合新手，所以就不弄啦
+            --帮craft pot翻译下吧
+            STRINGS.NAMES.FROZEN = "冰度"
+            STRINGS.NAMES.VEGGIE = "菜度"
+            STRINGS.NAMES.SWEETENER = "甜度"
+            -- STRINGS.NAMES.MEAT = "肉度" --和大肉重名了，不能这样改
+            -- STRINGS.NAMES.FISH = "鱼度" --和鱼重名了，不能这样改
+            STRINGS.NAMES.MONSTER = "怪物度"
+            STRINGS.NAMES.FRUIT = "果度"
+            STRINGS.NAMES.EGG = "蛋度"
+            STRINGS.NAMES.INEDIBLE = "非食"
+            STRINGS.NAMES.MAGIC = "魔法度"
+            STRINGS.NAMES.DECORATION = "装饰度"
+            STRINGS.NAMES.SEED = "种子度"
+            STRINGS.NAMES.DAIRY = "乳度"
+            STRINGS.NAMES.FAT = "脂度"
+        else
+            STRINGS.NAMES_LEGION = {
+                GEL = "Gel",
+                PETALS_LEGION = "Petals",
+                FALLFULLMOON = "specific to Fall FullMoon Day",
+                WINTERSFEAST = "specific to Winter Feast",
+                HALLOWEDNIGHTS = "specific to Hallowed Nights",
+                NEWMOON = "specific to NewMoon Day",
+            }
         end
+
+        AddFoodTag('gel', {
+            name = STRINGS.NAMES_LEGION.GEL,
+            tex = "foodtag_gel.tex",
+            atlas = "images/foodtags/foodtag_gel.xml"
+        })
+        AddFoodTag('petals_legion', {
+            name = STRINGS.NAMES_LEGION.PETALS_LEGION,
+            tex = "foodtag_petals.tex",
+            atlas = "images/foodtags/foodtag_petals.xml"
+        })
+        AddFoodTag('fallfullmoon', {
+            name = STRINGS.NAMES_LEGION.FALLFULLMOON,
+            tex = "foodtag_fallfullmoon.tex",
+            atlas = "images/foodtags/foodtag_fallfullmoon.xml"
+        })
+        AddFoodTag('winterfeast', {
+            name = STRINGS.NAMES_LEGION.WINTERSFEAST,
+            tex = "foodtag_winterfeast.tex",
+            atlas = "images/foodtags/foodtag_winterfeast.xml"
+        })
+        AddFoodTag('hallowednights', {
+            name = STRINGS.NAMES_LEGION.HALLOWEDNIGHTS,
+            tex = "foodtag_hallowednights.tex",
+            atlas = "images/foodtags/foodtag_hallowednights.xml"
+        })
+        AddFoodTag('newmoon', {
+            name = STRINGS.NAMES_LEGION.NEWMOON,
+            tex = "foodtag_newmoon.tex",
+            atlas = "images/foodtags/foodtag_newmoon.xml"
+        })
+        --这里本来想把冰度、菜度等图标都改为自己的图标，但是原mod里的图标其实更简单直接，适合新手，所以就不弄啦
     end
 
     ----------

@@ -56,7 +56,7 @@ SetSharedLootTable( 'elecarmet',
 local function AddSpecialLoot(inst)
     inst.components.lootdropper:SetChanceLootTable('elecarmet')
 
-    if TUNING.LEGION_TECHUNLOCK ~= "lootdropper" then
+    if CONFIGS_LEGION.TECHUNLOCK ~= "lootdropper" then
         return
     end
 
@@ -71,14 +71,12 @@ local function AddSpecialLoot(inst)
         "saddle_baggage_blueprint",
         "hat_albicans_mushroom_blueprint",
         "soul_contracts_blueprint",
-        "explodingfruitcake_blueprint"
+        "explodingfruitcake_blueprint",
+        "fishhomingtool_awesome_blueprint",
+        "siving_mask_gold_blueprint",
+        "siving_ctlall_item_blueprint"
     }
-    if CONFIGS_LEGION.LEGENDOFFALL then
-        table.insert(drops, "fishhomingtool_awesome_blueprint")
-        table.insert(drops, "siving_mask_gold_blueprint")
-        table.insert(drops, "siving_ctlall_item_blueprint")
-        inst.components.lootdropper:AddChanceLoot(table.remove(drops, math.random(#drops)), 1)
-    end
+    inst.components.lootdropper:AddChanceLoot(table.remove(drops, math.random(#drops)), 1)
     inst.components.lootdropper:AddChanceLoot(table.remove(drops, math.random(#drops)), 1)
     inst.components.lootdropper:AddChanceLoot(table.remove(drops, math.random(#drops)), 1)
     inst.components.lootdropper:AddChanceLoot(table.remove(drops, math.random(#drops)), 1)

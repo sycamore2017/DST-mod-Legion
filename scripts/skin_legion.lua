@@ -2,7 +2,7 @@
 
 local _G = GLOBAL
 local IsServer = TheNet:GetIsServer() or TheNet:IsDedicated()
-local ischinese = TUNING.LEGION_MOD_LANGUAGES == "chinese"
+local ischinese = _G.CONFIGS_LEGION.LANGUAGES == "chinese"
 
 table.insert(Assets, Asset("ATLAS", "images/icon_skinbar_shadow_l.xml"))
 table.insert(Assets, Asset("IMAGE", "images/icon_skinbar_shadow_l.tex"))
@@ -3804,7 +3804,7 @@ end)
 
 if not TheNet:IsDedicated() then
      --离线模式不能有皮肤界面功能(因为离线模式下的klei账户ID与联网模式下的不一样)
-    if TheNet:IsOnlineMode() and TUNING.LEGION_MOD_LANGUAGES == "chinese" then
+    if TheNet:IsOnlineMode() and _G.CONFIGS_LEGION.LANGUAGES == "chinese" then
         -- local ImageButton = require "widgets/imagebutton"
         local PlayerAvatarPopup = require "widgets/playeravatarpopup"
         local TEMPLATES = require "widgets/templates"

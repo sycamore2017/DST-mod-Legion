@@ -134,11 +134,9 @@ local function OnSet_wood(inst)
     inst.OnCarpetRemove = OnRemove_wood
 end
 
-if TUNING.LEGION_DESERTSECRET then
-    MakeCarpets({
-        name = "whitewood", fn_server1 = OnSet_wood, fn_server2 = OnSet_wood
-    })
-end
+MakeCarpets({
+    name = "whitewood", fn_server1 = OnSet_wood, fn_server2 = OnSet_wood
+})
 
 --------------------
 --------------------

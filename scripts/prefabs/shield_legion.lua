@@ -173,224 +173,222 @@ end
 --[[ 砂之抵御 ]]
 --------------------------------------------------------------------------
 
-if TUNING.LEGION_DESERTSECRET then
-    local damage_sandstorms = 42.5  --34*1.25
-    local damage_normal = 30.6      --34*0.9
-    local damage_raining = 17       --34*0.5
-    local damage_broken = 3.4       --34*0.1
+local damage_sandstorms = 42.5  --34*1.25
+local damage_normal = 30.6      --34*0.9
+local damage_raining = 17       --34*0.5
+local damage_broken = 3.4       --34*0.1
 
-    local absorb_sandstorms = 0.9
-    local absorb_normal = 0.75
-    local absorb_raining = 0.4
-    local absorb_broken = 0.1
+local absorb_sandstorms = 0.9
+local absorb_normal = 0.75
+local absorb_raining = 0.4
+local absorb_broken = 0.1
 
-    local mult_success_sandstorms = 0.1
-    local mult_success_normal = 0.3
-    local mult_success_raining = 0.6
+local mult_success_sandstorms = 0.1
+local mult_success_normal = 0.3
+local mult_success_raining = 0.6
 
-    local function OnBlocked(owner, data)
-        -- owner.SoundEmitter:PlaySound("dontstarve/common/together/teleport_sand/out")    --被攻击时播放像沙的声音
-        owner.SoundEmitter:PlaySound("dontstarve/wilson/hit_scalemail")
+local function OnBlocked(owner, data)
+    -- owner.SoundEmitter:PlaySound("dontstarve/common/together/teleport_sand/out")    --被攻击时播放像沙的声音
+    owner.SoundEmitter:PlaySound("dontstarve/wilson/hit_scalemail")
 
-        if not TheWorld.state.israining then    --没下雨时被攻击就释放法术
-            if
-                data.attacker ~= nil and
-                data.attacker.components.combat ~= nil and --攻击者有战斗组件
-                data.attacker.components.health ~= nil and --攻击者有生命组件
-                not data.attacker.components.health:IsDead() and --攻击者没死亡
-                (data.weapon == nil or ((data.weapon.components.weapon == nil or data.weapon.components.weapon.projectile == nil) and data.weapon.components.projectile == nil)) and --不是远程武器
-                not data.redirected
+    if not TheWorld.state.israining then    --没下雨时被攻击就释放法术
+        if
+            data.attacker ~= nil and
+            data.attacker.components.combat ~= nil and --攻击者有战斗组件
+            data.attacker.components.health ~= nil and --攻击者有生命组件
+            not data.attacker.components.health:IsDead() and --攻击者没死亡
+            (data.weapon == nil or ((data.weapon.components.weapon == nil or data.weapon.components.weapon.projectile == nil) and data.weapon.components.projectile == nil)) and --不是远程武器
+            not data.redirected
+        then
+            local map = TheWorld.Map
+            local x, y, z = data.attacker.Transform:GetWorldPosition()
+            if not map:IsVisualGroundAtPoint(x, 0, z) then --攻击者在水中，被动无效
+                return
+            end
+
+            local num = 1
+            local plus = 1.2
+            if (owner.components.areaaware ~= nil and owner.components.areaaware:CurrentlyInTag("sandstorm"))
+                and (not TheWorld:HasTag("cave") and TheWorld.state.issummer)
             then
-                local map = TheWorld.Map
-                local x, y, z = data.attacker.Transform:GetWorldPosition()
-                if not map:IsVisualGroundAtPoint(x, 0, z) then --攻击者在水中，被动无效
-                    return
-                end
+                plus = 2.4
+                num = math.random(3, 6)
+            else
+                num = math.random(1, 2)
+            end
 
-                local num = 1
-                local plus = 1.2
-                if (owner.components.areaaware ~= nil and owner.components.areaaware:CurrentlyInTag("sandstorm"))
-                    and (not TheWorld:HasTag("cave") and TheWorld.state.issummer)
-                then
-                    plus = 2.4
-                    num = math.random(3, 6)
-                else
-                    num = math.random(1, 2)
-                end
+            for i = 1, num do
+                local rad = math.random() * plus
+                local angle = math.random() * 2 * PI
+                local xxx = x + rad * math.cos(angle)
+                local zzz = z - rad * math.sin(angle)
 
-                for i = 1, num do
-                    local rad = math.random() * plus
-                    local angle = math.random() * 2 * PI
-                    local xxx = x + rad * math.cos(angle)
-                    local zzz = z - rad * math.sin(angle)
-
-                    if map:IsVisualGroundAtPoint(xxx, 0, zzz) then --不在水中
-                        local sspike = SpawnPrefab("sandspike_legion")
-                        if sspike ~= nil then
-                            sspike.iscounterattack = true
-                            sspike.Transform:SetPosition(xxx, 0, zzz)
-                        end
+                if map:IsVisualGroundAtPoint(xxx, 0, zzz) then --不在水中
+                    local sspike = SpawnPrefab("sandspike_legion")
+                    if sspike ~= nil then
+                        sspike.iscounterattack = true
+                        sspike.Transform:SetPosition(xxx, 0, zzz)
                     end
                 end
             end
         end
     end
-    local function onsandstorm(owner, area, weapon) --沙尘暴中属性上升
-        local shield = nil
-        if weapon ~= nil and weapon.prefab == "shield_l_sand" then
-            shield = weapon
-        else
-            shield = owner ~= nil and owner.components.inventory:GetEquippedItem(EQUIPSLOTS.HANDS) or nil
-            if shield == nil or shield.prefab ~= "shield_l_sand" then
-                return
-            end
-        end
-
-        if shield._brokenshield then
-            shield.components.weapon:SetDamage(damage_broken)
-            shield.components.armor:SetAbsorption(absorb_broken)
+end
+local function onsandstorm(owner, area, weapon) --沙尘暴中属性上升
+    local shield = nil
+    if weapon ~= nil and weapon.prefab == "shield_l_sand" then
+        shield = weapon
+    else
+        shield = owner ~= nil and owner.components.inventory:GetEquippedItem(EQUIPSLOTS.HANDS) or nil
+        if shield == nil or shield.prefab ~= "shield_l_sand" then
             return
         end
-
-        --if TheWorld.components.sandstorms ~= nil and TheWorld.components.sandstorms:IsSandstormActive() then
-        if not TheWorld:HasTag("cave") and TheWorld.state.issummer then
-            --处于沙暴之中时
-            if owner ~= nil and owner.components.areaaware ~= nil and owner.components.areaaware:CurrentlyInTag("sandstorm") then
-                shield.components.weapon:SetDamage(damage_sandstorms)
-                shield.components.armor:SetAbsorption(absorb_sandstorms)
-                shield.components.shieldlegion.armormult_success = mult_success_sandstorms
-                return
-            end
-        end
-        shield.components.weapon:SetDamage(damage_normal)
-        shield.components.armor:SetAbsorption(absorb_normal)
-        shield.components.shieldlegion.armormult_success = mult_success_normal
-    end
-    local function onisraining(inst) --下雨时属性降低
-        local owner = inst.components.inventoryitem.owner
-
-        if TheWorld.state.israining then
-            if owner ~= nil then owner:RemoveEventCallback("changearea", onsandstorm) end
-            if inst._brokenshield then
-                inst.components.weapon:SetDamage(damage_broken)
-                inst.components.armor:SetAbsorption(absorb_broken)
-            else
-                inst.components.weapon:SetDamage(damage_raining)
-                inst.components.armor:SetAbsorption(absorb_raining)
-                inst.components.shieldlegion.armormult_success = mult_success_raining
-            end
-        else
-            if inst._brokenshield then
-                inst.components.weapon:SetDamage(damage_broken)
-                inst.components.armor:SetAbsorption(absorb_broken)
-            else
-                onsandstorm(owner, nil, inst)   --不下雨时就刷新一次
-            end
-            if not TheWorld:HasTag("cave") and TheWorld.state.issummer then --不是在洞穴里，并且夏天时才会开始沙尘暴的监听
-                if owner ~= nil then
-                    owner:ListenForEvent("changearea", onsandstorm) --因为这个消息由玩家发出，所以只好由玩家来监听了
-                end
-            end
-        end
     end
 
-    MakeShield({
-        name = "shield_l_sand",
-        assets = {
-            Asset("ANIM", "anim/shield_l_sand.zip"),
-            Asset("ATLAS", "images/inventoryimages/shield_l_sand.xml"),
-            Asset("IMAGE", "images/inventoryimages/shield_l_sand.tex"),
-        },
-        prefabs = {
-            "sandspike_legion",    --对玩家友好的沙之咬
-            "shield_attack_l_fx",
-        },
-        fn_common = function(inst)
-            inst:AddComponent("skinedlegion")
-            inst.components.skinedlegion:Init("shield_l_sand")
-        end,
-        fn_server = function(inst)
-            inst.components.inventoryitem:SetSinks(true) --它是石头做的，不可漂浮
+    if shield._brokenshield then
+        shield.components.weapon:SetDamage(damage_broken)
+        shield.components.armor:SetAbsorption(absorb_broken)
+        return
+    end
 
-            inst.components.equippable:SetOnEquip(function(inst, owner)
-                OnEquipFn(inst, owner)
-                onisraining(inst)   --装备时先更新一次
-
-                inst:ListenForEvent("blocked", OnBlocked, owner)
-                inst:ListenForEvent("attacked", OnBlocked, owner)
-
-                inst:WatchWorldState("israining", onisraining)
-                inst:WatchWorldState("issummer", onisraining)
-
-                --能在沙暴中不减速行走
-                if owner.components.locomotor ~= nil then
-                    if owner._runinsandstorm == nil then
-                        local oldfn = owner.components.locomotor.SetExternalSpeedMultiplier
-                        owner.components.locomotor.SetExternalSpeedMultiplier = function(self, source, key, m)
-                            if self.inst._runinsandstorm and key == "sandstorm" then
-                                self:RemoveExternalSpeedMultiplier(self.inst, "sandstorm")
-                                return
-                            end
-                            oldfn(self, source, key, m)
-                        end
-                    end
-                    -- owner.components.locomotor:RemoveExternalSpeedMultiplier(owner, "sandstorm") --切换装备时，下一帧会自动更新移速
-                    owner._runinsandstorm = true
-                end
-            end)
-            inst.components.equippable:SetOnUnequip(function(inst, owner)
-                inst:RemoveEventCallback("blocked", OnBlocked, owner)
-                inst:RemoveEventCallback("attacked", OnBlocked, owner)
-
-                owner:RemoveEventCallback("changearea", onsandstorm)
-                inst:StopWatchingWorldState("israining", onisraining)
-                inst:StopWatchingWorldState("issummer", onisraining)
-
-                if owner.components.locomotor ~= nil then
-                    owner._runinsandstorm = false
-                end
-
-                OnUnequipFn(inst, owner)
-            end)
-            inst.components.equippable.insulated = true --设为true，就能防电
-
-            inst.hurtsoundoverride = "dontstarve/creatures/together/antlion/sfx/break"
-            inst.components.shieldlegion.armormult_success = mult_success_normal
-            inst.components.shieldlegion.atkfn = function(inst, doer, attacker, data)
-                OnBlocked(doer, { attacker = attacker })
-                Counterattack_base(inst, doer, attacker, data, 8, 3)
-            end
-            inst.components.shieldlegion.atkstayingfn = function(inst, doer, attacker, data)
-                inst.components.shieldlegion:Counterattack(doer, attacker, data, 8, 1.5)
-            end
-            -- inst.components.shieldlegion.atkfailfn = function(inst, doer, attacker, data) end
-
-            inst.components.weapon:SetDamage(damage_normal)
-
-            inst.components.armor:InitCondition(1050, absorb_normal) --150*10*0.7= 1050防具耐久
-            SetNoBrokenArmor(inst, function(armorcpt, isbrokenbefore)
-                if armorcpt.condition <= 0 then
-                    inst:AddTag("repair_sand")
-                    inst.components.equippable.insulated = false
-                    inst.components.weapon:SetDamage(damage_broken)
-                    inst.components.armor:SetAbsorption(absorb_broken)
-                else
-                    if armorcpt.condition >= armorcpt.maxcondition then
-                        inst:RemoveTag("repair_sand")
-                    else
-                        inst:AddTag("repair_sand")
-                    end
-                    if isbrokenbefore then --说明是刚从损坏状态变成修复状态
-                        inst.components.equippable.insulated = true
-                        onisraining(inst)
-                    end
-                end
-            end)
-
-            inst.components.skinedlegion:SetOnPreLoad()
-        end,
-    })
+    --if TheWorld.components.sandstorms ~= nil and TheWorld.components.sandstorms:IsSandstormActive() then
+    if not TheWorld:HasTag("cave") and TheWorld.state.issummer then
+        --处于沙暴之中时
+        if owner ~= nil and owner.components.areaaware ~= nil and owner.components.areaaware:CurrentlyInTag("sandstorm") then
+            shield.components.weapon:SetDamage(damage_sandstorms)
+            shield.components.armor:SetAbsorption(absorb_sandstorms)
+            shield.components.shieldlegion.armormult_success = mult_success_sandstorms
+            return
+        end
+    end
+    shield.components.weapon:SetDamage(damage_normal)
+    shield.components.armor:SetAbsorption(absorb_normal)
+    shield.components.shieldlegion.armormult_success = mult_success_normal
 end
+local function onisraining(inst) --下雨时属性降低
+    local owner = inst.components.inventoryitem.owner
+
+    if TheWorld.state.israining then
+        if owner ~= nil then owner:RemoveEventCallback("changearea", onsandstorm) end
+        if inst._brokenshield then
+            inst.components.weapon:SetDamage(damage_broken)
+            inst.components.armor:SetAbsorption(absorb_broken)
+        else
+            inst.components.weapon:SetDamage(damage_raining)
+            inst.components.armor:SetAbsorption(absorb_raining)
+            inst.components.shieldlegion.armormult_success = mult_success_raining
+        end
+    else
+        if inst._brokenshield then
+            inst.components.weapon:SetDamage(damage_broken)
+            inst.components.armor:SetAbsorption(absorb_broken)
+        else
+            onsandstorm(owner, nil, inst)   --不下雨时就刷新一次
+        end
+        if not TheWorld:HasTag("cave") and TheWorld.state.issummer then --不是在洞穴里，并且夏天时才会开始沙尘暴的监听
+            if owner ~= nil then
+                owner:ListenForEvent("changearea", onsandstorm) --因为这个消息由玩家发出，所以只好由玩家来监听了
+            end
+        end
+    end
+end
+
+MakeShield({
+    name = "shield_l_sand",
+    assets = {
+        Asset("ANIM", "anim/shield_l_sand.zip"),
+        Asset("ATLAS", "images/inventoryimages/shield_l_sand.xml"),
+        Asset("IMAGE", "images/inventoryimages/shield_l_sand.tex"),
+    },
+    prefabs = {
+        "sandspike_legion",    --对玩家友好的沙之咬
+        "shield_attack_l_fx",
+    },
+    fn_common = function(inst)
+        inst:AddComponent("skinedlegion")
+        inst.components.skinedlegion:Init("shield_l_sand")
+    end,
+    fn_server = function(inst)
+        inst.components.inventoryitem:SetSinks(true) --它是石头做的，不可漂浮
+
+        inst.components.equippable:SetOnEquip(function(inst, owner)
+            OnEquipFn(inst, owner)
+            onisraining(inst)   --装备时先更新一次
+
+            inst:ListenForEvent("blocked", OnBlocked, owner)
+            inst:ListenForEvent("attacked", OnBlocked, owner)
+
+            inst:WatchWorldState("israining", onisraining)
+            inst:WatchWorldState("issummer", onisraining)
+
+            --能在沙暴中不减速行走
+            if owner.components.locomotor ~= nil then
+                if owner._runinsandstorm == nil then
+                    local oldfn = owner.components.locomotor.SetExternalSpeedMultiplier
+                    owner.components.locomotor.SetExternalSpeedMultiplier = function(self, source, key, m)
+                        if self.inst._runinsandstorm and key == "sandstorm" then
+                            self:RemoveExternalSpeedMultiplier(self.inst, "sandstorm")
+                            return
+                        end
+                        oldfn(self, source, key, m)
+                    end
+                end
+                -- owner.components.locomotor:RemoveExternalSpeedMultiplier(owner, "sandstorm") --切换装备时，下一帧会自动更新移速
+                owner._runinsandstorm = true
+            end
+        end)
+        inst.components.equippable:SetOnUnequip(function(inst, owner)
+            inst:RemoveEventCallback("blocked", OnBlocked, owner)
+            inst:RemoveEventCallback("attacked", OnBlocked, owner)
+
+            owner:RemoveEventCallback("changearea", onsandstorm)
+            inst:StopWatchingWorldState("israining", onisraining)
+            inst:StopWatchingWorldState("issummer", onisraining)
+
+            if owner.components.locomotor ~= nil then
+                owner._runinsandstorm = false
+            end
+
+            OnUnequipFn(inst, owner)
+        end)
+        inst.components.equippable.insulated = true --设为true，就能防电
+
+        inst.hurtsoundoverride = "dontstarve/creatures/together/antlion/sfx/break"
+        inst.components.shieldlegion.armormult_success = mult_success_normal
+        inst.components.shieldlegion.atkfn = function(inst, doer, attacker, data)
+            OnBlocked(doer, { attacker = attacker })
+            Counterattack_base(inst, doer, attacker, data, 8, 3)
+        end
+        inst.components.shieldlegion.atkstayingfn = function(inst, doer, attacker, data)
+            inst.components.shieldlegion:Counterattack(doer, attacker, data, 8, 1.5)
+        end
+        -- inst.components.shieldlegion.atkfailfn = function(inst, doer, attacker, data) end
+
+        inst.components.weapon:SetDamage(damage_normal)
+
+        inst.components.armor:InitCondition(1050, absorb_normal) --150*10*0.7= 1050防具耐久
+        SetNoBrokenArmor(inst, function(armorcpt, isbrokenbefore)
+            if armorcpt.condition <= 0 then
+                inst:AddTag("repair_sand")
+                inst.components.equippable.insulated = false
+                inst.components.weapon:SetDamage(damage_broken)
+                inst.components.armor:SetAbsorption(absorb_broken)
+            else
+                if armorcpt.condition >= armorcpt.maxcondition then
+                    inst:RemoveTag("repair_sand")
+                else
+                    inst:AddTag("repair_sand")
+                end
+                if isbrokenbefore then --说明是刚从损坏状态变成修复状态
+                    inst.components.equippable.insulated = true
+                    onisraining(inst)
+                end
+            end
+        end)
+
+        inst.components.skinedlegion:SetOnPreLoad()
+    end,
+})
 
 --------------------------------------------------------------------------
 --[[ 木盾 ]]
@@ -528,189 +526,186 @@ end, {
 --[[ 艾力冈的剑 ]]
 --------------------------------------------------------------------------
 
-if CONFIGS_LEGION.PRAYFORRAIN then
+local damage_shield = 85 --34*2.5
+local damage_sword = 136 --34*4
+local absorb_shield = 0.2
+local absorb_sword = 0.95
 
-    local damage_shield = 85 --34*2.5
-    local damage_sword = 136 --34*4
-    local absorb_shield = 0.2
-    local absorb_sword = 0.95
-
-    local function DeathCallForRain(owner)
-        TheWorld:PushEvent("ms_forceprecipitation", true)
-    end
-    local function OnAttack_agron(inst, owner, target)
-        if owner.components.health ~= nil and owner.components.health:GetPercent() > 0.1 then
-            local fx = SpawnPrefab(inst._dd.fx or "agronssword_fx") --燃血特效
-            fx.Transform:SetPosition(owner.Transform:GetWorldPosition())
-            owner.components.health:DoDelta(-1.5, true, "agronssword")
-        end
-    end
-    local function TrySetOwnerSymbol(inst, doer, revolt)
-        if doer == nil then --因为此时有可能不再是装备状态，doer 发生了改变
-            doer = inst.components.inventoryitem:GetGrandOwner()
-        end
-        if doer then
-            if doer:HasTag("player") then
-                if doer.components.health and doer.components.inventory then
-                    if inst == doer.components.inventory:GetEquippedItem(EQUIPSLOTS.HANDS) then
-                        doer.AnimState:OverrideSymbol("lantern_overlay", inst._dd.build, revolt and "swap2" or "swap1")
-                        inst.fn_onHealthDelta(doer, nil)
-                    end
-                end
-            elseif doer:HasTag("equipmentmodel") then
-                doer.AnimState:OverrideSymbol("lantern_overlay", inst._dd.build, revolt and "swap2" or "swap1")
-            end
-        end
-        if revolt then
-            inst.components.inventoryitem.atlasname = inst._dd.img_atlas2
-            inst.components.inventoryitem:ChangeImageName(inst._dd.img_tex2)
-            inst.AnimState:PlayAnimation("idle2")
-        else
-            inst.components.inventoryitem.atlasname = inst._dd.img_atlas
-            inst.components.inventoryitem:ChangeImageName(inst._dd.img_tex)
-            inst.AnimState:PlayAnimation("idle")
-        end
-    end
-    local function DoRevolt(inst, doer)
-        if inst._task_fx == nil then
-            inst._basedamage = damage_sword
-            inst.components.weapon:SetDamage(damage_sword)
-            inst.components.armor:SetAbsorption(absorb_sword)
-
-            TrySetOwnerSymbol(inst, doer, true)
-
-            inst._task_fx = inst:DoPeriodicTask(0.21, function(inst)
-                local fx = SpawnPrefab(inst._dd.fx or "agronssword_fx")
-                fx.Transform:SetPosition((inst.components.inventoryitem:GetGrandOwner() or inst).Transform:GetWorldPosition())
-            end, 0)
-        end
-    end
-
-    MakeShield({
-        name = "agronssword",
-        assets = {
-            Asset("ANIM", "anim/agronssword.zip"),
-            Asset("ATLAS", "images/inventoryimages/agronssword.xml"),
-            Asset("IMAGE", "images/inventoryimages/agronssword.tex"),
-            Asset("ATLAS", "images/inventoryimages/agronssword2.xml"),
-            Asset("IMAGE", "images/inventoryimages/agronssword2.tex")
-        },
-        prefabs = { "agronssword_fx" },
-        fn_common = function(inst)
-            inst.entity:AddMiniMapEntity()
-            inst.MiniMapEntity:SetIcon("agronssword.tex")
-
-            inst:AddTag("sharp") --武器的标签跟攻击方式跟攻击音效有关 没有特殊的话就用这两个
-            inst:AddTag("pointy")
-            inst:AddTag("irreplaceable") --防止被猴子、食人花、坎普斯等拿走，防止被流星破坏，并使其下线时会自动掉落
-            inst:AddTag("nonpotatable") --这个貌似是？
-            inst:AddTag("hide_percentage")  --这个标签能让护甲耐久比例不显示出来
-            inst:AddTag("NORATCHECK") --mod兼容：永不妥协。该道具不算鼠潮分
-
-            inst:AddComponent("skinedlegion")
-            inst.components.skinedlegion:Init("agronssword")
-        end,
-        fn_server = function(inst)
-            inst._dd = {
-                img_tex = "agronssword", img_atlas = "images/inventoryimages/agronssword.xml",
-                img_tex2 = "agronssword2", img_atlas2 = "images/inventoryimages/agronssword2.xml",
-                build = "agronssword", fx = "agronssword_fx"
-            }
-            inst._task_fx = nil
-            inst._basedamage = damage_shield
-            inst.fn_onHealthDelta = function(owner, data)
-                local percent = 1.0
-                if data and data.newpercent then
-                    percent = data.newpercent
-                else
-                    percent = owner.components.health:GetPercent()
-                end
-                inst.components.weapon:SetDamage(inst._basedamage*(1.2-percent))
-            end
-
-            inst.components.inventoryitem:SetSinks(true) --落水时会下沉，但是因为标签的关系会回到附近岸边
-
-            inst.components.weapon:SetDamage(damage_shield)
-            inst.components.weapon:SetOnAttack(OnAttack_agron)
-
-            inst.components.armor:InitCondition(100, absorb_shield)
-            inst.components.armor.indestructible = true --无敌的护甲
-
-            inst.components.equippable:SetOnEquip(function(inst, owner)
-                owner.AnimState:OverrideSymbol("lantern_overlay", inst._dd.build,
-                    inst.components.timer:TimerExists("revolt") and "swap2" or "swap1")
-                owner.AnimState:HideSymbol("swap_object")
-                owner.AnimState:Show("ARM_carry") --显示持物手
-                owner.AnimState:Hide("ARM_normal") --隐藏普通的手
-                owner.AnimState:Show("LANTERN_OVERLAY")
-
-                if owner:HasTag("equipmentmodel") then --假人！
-                    return
-                end
-
-                SetShieldEquip(inst, owner)
-                if owner.components.health ~= nil then
-                    owner:ListenForEvent("death", DeathCallForRain)
-                    owner:ListenForEvent("healthdelta", inst.fn_onHealthDelta)
-                    inst.fn_onHealthDelta(owner, nil)
-                end
-            end)
-            inst.components.equippable:SetOnUnequip(function(inst, owner)
-                owner:RemoveEventCallback("death", DeathCallForRain)
-                owner:RemoveEventCallback("healthdelta", inst.fn_onHealthDelta)
-                inst.components.weapon:SetDamage(inst._basedamage) --卸下时，恢复攻击力，为了让巨人之脚识别到
-
-                OnUnequipFn(inst, owner)
-            end)
-
-            inst:AddComponent("timer")
-            inst:ListenForEvent("timerdone", function(inst, data)
-                if data.name == "revolt" then
-                    inst._basedamage = damage_shield
-                    inst.components.weapon:SetDamage(damage_shield)
-                    inst.components.armor:SetAbsorption(absorb_shield)
-
-                    TrySetOwnerSymbol(inst, nil, false)
-
-                    if inst._task_fx ~= nil then
-                        inst._task_fx:Cancel()
-                        inst._task_fx = nil
-                    end
-                end
-            end)
-
-            inst.hurtsoundoverride = "dontstarve/wilson/hit_armour"
-            inst.components.shieldlegion.armormult_success = 0
-            inst.components.shieldlegion.atkfn = function(inst, doer, attacker, data)
-                --先加攻击力，这样输出高一点
-                local timeleft = inst.components.timer:GetTimeLeft("revolt") or 0
-                inst.components.timer:StopTimer("revolt")
-                inst.components.timer:StartTimer("revolt", math.min(120, timeleft+10))
-                DoRevolt(inst, doer)
-
-                Counterattack_base(inst, doer, attacker, data, 8, 1.3)
-
-                --后回血，这样输出高一点
-                local percent = doer.components.health:GetPercent()
-                if percent > 0 and percent <= 0.3 then
-                    doer.components.health:SetPercent(percent+0.1, false, "agronssword")
-                end
-            end
-            inst.components.shieldlegion.atkstayingfn = function(inst, doer, attacker, data)
-                inst.components.shieldlegion:Counterattack(doer, attacker, data, 8, 1)
-            end
-            -- inst.components.shieldlegion.atkfailfn = function(inst, doer, attacker, data) end
-
-            inst.OnLoad = function(inst, data)
-                if inst.components.timer:TimerExists("revolt") then
-                    DoRevolt(inst, nil)
-                end
-            end
-
-            inst.components.skinedlegion:SetOnPreLoad()
-        end,
-    })
+local function DeathCallForRain(owner)
+    TheWorld:PushEvent("ms_forceprecipitation", true)
 end
+local function OnAttack_agron(inst, owner, target)
+    if owner.components.health ~= nil and owner.components.health:GetPercent() > 0.1 then
+        local fx = SpawnPrefab(inst._dd.fx or "agronssword_fx") --燃血特效
+        fx.Transform:SetPosition(owner.Transform:GetWorldPosition())
+        owner.components.health:DoDelta(-1.5, true, "agronssword")
+    end
+end
+local function TrySetOwnerSymbol(inst, doer, revolt)
+    if doer == nil then --因为此时有可能不再是装备状态，doer 发生了改变
+        doer = inst.components.inventoryitem:GetGrandOwner()
+    end
+    if doer then
+        if doer:HasTag("player") then
+            if doer.components.health and doer.components.inventory then
+                if inst == doer.components.inventory:GetEquippedItem(EQUIPSLOTS.HANDS) then
+                    doer.AnimState:OverrideSymbol("lantern_overlay", inst._dd.build, revolt and "swap2" or "swap1")
+                    inst.fn_onHealthDelta(doer, nil)
+                end
+            end
+        elseif doer:HasTag("equipmentmodel") then
+            doer.AnimState:OverrideSymbol("lantern_overlay", inst._dd.build, revolt and "swap2" or "swap1")
+        end
+    end
+    if revolt then
+        inst.components.inventoryitem.atlasname = inst._dd.img_atlas2
+        inst.components.inventoryitem:ChangeImageName(inst._dd.img_tex2)
+        inst.AnimState:PlayAnimation("idle2")
+    else
+        inst.components.inventoryitem.atlasname = inst._dd.img_atlas
+        inst.components.inventoryitem:ChangeImageName(inst._dd.img_tex)
+        inst.AnimState:PlayAnimation("idle")
+    end
+end
+local function DoRevolt(inst, doer)
+    if inst._task_fx == nil then
+        inst._basedamage = damage_sword
+        inst.components.weapon:SetDamage(damage_sword)
+        inst.components.armor:SetAbsorption(absorb_sword)
+
+        TrySetOwnerSymbol(inst, doer, true)
+
+        inst._task_fx = inst:DoPeriodicTask(0.21, function(inst)
+            local fx = SpawnPrefab(inst._dd.fx or "agronssword_fx")
+            fx.Transform:SetPosition((inst.components.inventoryitem:GetGrandOwner() or inst).Transform:GetWorldPosition())
+        end, 0)
+    end
+end
+
+MakeShield({
+    name = "agronssword",
+    assets = {
+        Asset("ANIM", "anim/agronssword.zip"),
+        Asset("ATLAS", "images/inventoryimages/agronssword.xml"),
+        Asset("IMAGE", "images/inventoryimages/agronssword.tex"),
+        Asset("ATLAS", "images/inventoryimages/agronssword2.xml"),
+        Asset("IMAGE", "images/inventoryimages/agronssword2.tex")
+    },
+    prefabs = { "agronssword_fx" },
+    fn_common = function(inst)
+        inst.entity:AddMiniMapEntity()
+        inst.MiniMapEntity:SetIcon("agronssword.tex")
+
+        inst:AddTag("sharp") --武器的标签跟攻击方式跟攻击音效有关 没有特殊的话就用这两个
+        inst:AddTag("pointy")
+        inst:AddTag("irreplaceable") --防止被猴子、食人花、坎普斯等拿走，防止被流星破坏，并使其下线时会自动掉落
+        inst:AddTag("nonpotatable") --这个貌似是？
+        inst:AddTag("hide_percentage")  --这个标签能让护甲耐久比例不显示出来
+        inst:AddTag("NORATCHECK") --mod兼容：永不妥协。该道具不算鼠潮分
+
+        inst:AddComponent("skinedlegion")
+        inst.components.skinedlegion:Init("agronssword")
+    end,
+    fn_server = function(inst)
+        inst._dd = {
+            img_tex = "agronssword", img_atlas = "images/inventoryimages/agronssword.xml",
+            img_tex2 = "agronssword2", img_atlas2 = "images/inventoryimages/agronssword2.xml",
+            build = "agronssword", fx = "agronssword_fx"
+        }
+        inst._task_fx = nil
+        inst._basedamage = damage_shield
+        inst.fn_onHealthDelta = function(owner, data)
+            local percent = 1.0
+            if data and data.newpercent then
+                percent = data.newpercent
+            else
+                percent = owner.components.health:GetPercent()
+            end
+            inst.components.weapon:SetDamage(inst._basedamage*(1.2-percent))
+        end
+
+        inst.components.inventoryitem:SetSinks(true) --落水时会下沉，但是因为标签的关系会回到附近岸边
+
+        inst.components.weapon:SetDamage(damage_shield)
+        inst.components.weapon:SetOnAttack(OnAttack_agron)
+
+        inst.components.armor:InitCondition(100, absorb_shield)
+        inst.components.armor.indestructible = true --无敌的护甲
+
+        inst.components.equippable:SetOnEquip(function(inst, owner)
+            owner.AnimState:OverrideSymbol("lantern_overlay", inst._dd.build,
+                inst.components.timer:TimerExists("revolt") and "swap2" or "swap1")
+            owner.AnimState:HideSymbol("swap_object")
+            owner.AnimState:Show("ARM_carry") --显示持物手
+            owner.AnimState:Hide("ARM_normal") --隐藏普通的手
+            owner.AnimState:Show("LANTERN_OVERLAY")
+
+            if owner:HasTag("equipmentmodel") then --假人！
+                return
+            end
+
+            SetShieldEquip(inst, owner)
+            if owner.components.health ~= nil then
+                owner:ListenForEvent("death", DeathCallForRain)
+                owner:ListenForEvent("healthdelta", inst.fn_onHealthDelta)
+                inst.fn_onHealthDelta(owner, nil)
+            end
+        end)
+        inst.components.equippable:SetOnUnequip(function(inst, owner)
+            owner:RemoveEventCallback("death", DeathCallForRain)
+            owner:RemoveEventCallback("healthdelta", inst.fn_onHealthDelta)
+            inst.components.weapon:SetDamage(inst._basedamage) --卸下时，恢复攻击力，为了让巨人之脚识别到
+
+            OnUnequipFn(inst, owner)
+        end)
+
+        inst:AddComponent("timer")
+        inst:ListenForEvent("timerdone", function(inst, data)
+            if data.name == "revolt" then
+                inst._basedamage = damage_shield
+                inst.components.weapon:SetDamage(damage_shield)
+                inst.components.armor:SetAbsorption(absorb_shield)
+
+                TrySetOwnerSymbol(inst, nil, false)
+
+                if inst._task_fx ~= nil then
+                    inst._task_fx:Cancel()
+                    inst._task_fx = nil
+                end
+            end
+        end)
+
+        inst.hurtsoundoverride = "dontstarve/wilson/hit_armour"
+        inst.components.shieldlegion.armormult_success = 0
+        inst.components.shieldlegion.atkfn = function(inst, doer, attacker, data)
+            --先加攻击力，这样输出高一点
+            local timeleft = inst.components.timer:GetTimeLeft("revolt") or 0
+            inst.components.timer:StopTimer("revolt")
+            inst.components.timer:StartTimer("revolt", math.min(120, timeleft+10))
+            DoRevolt(inst, doer)
+
+            Counterattack_base(inst, doer, attacker, data, 8, 1.3)
+
+            --后回血，这样输出高一点
+            local percent = doer.components.health:GetPercent()
+            if percent > 0 and percent <= 0.3 then
+                doer.components.health:SetPercent(percent+0.1, false, "agronssword")
+            end
+        end
+        inst.components.shieldlegion.atkstayingfn = function(inst, doer, attacker, data)
+            inst.components.shieldlegion:Counterattack(doer, attacker, data, 8, 1)
+        end
+        -- inst.components.shieldlegion.atkfailfn = function(inst, doer, attacker, data) end
+
+        inst.OnLoad = function(inst, data)
+            if inst.components.timer:TimerExists("revolt") then
+                DoRevolt(inst, nil)
+            end
+        end
+
+        inst.components.skinedlegion:SetOnPreLoad()
+    end,
+})
 
 --------------------
 --------------------

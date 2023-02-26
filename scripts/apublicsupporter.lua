@@ -267,15 +267,13 @@ end
 --[[ 清理机制：让腐烂物、牛粪、鸟粪自动消失 ]]
 --------------------------------------------------------------------------
 
-if TUNING.LEGION_CLEANINGUPSTENCH then
+if IsServer and _G.CONFIGS_LEGION.CLEANINGUPSTENCH then
     local function OnDropped_disappears(inst)
         inst.components.disappears:PrepareDisappear()
     end
-
     local function OnPickup_disappears(inst, owner)
         inst.components.disappears:StopDisappear()
     end
-
     local function AutoDisappears(inst, delayTime)
         inst:AddComponent("disappears")
         inst.components.disappears.sound = inst.SoundEmitter ~= nil and "dontstarve_DLC001/common/firesupressor_impact" or nil --消失组件里没有对声音组件的判断
@@ -295,21 +293,13 @@ if TUNING.LEGION_CLEANINGUPSTENCH then
     end
 
     AddPrefabPostInit("spoiled_food", function(inst)
-        if TheWorld.ismastersim then
-            AutoDisappears(inst, TUNING.TOTAL_DAY_TIME)
-        end
+        AutoDisappears(inst, TUNING.TOTAL_DAY_TIME)
     end)
-
     AddPrefabPostInit("poop", function(inst)
-        if TheWorld.ismastersim then
-            AutoDisappears(inst, TUNING.TOTAL_DAY_TIME)
-        end
+        AutoDisappears(inst, TUNING.TOTAL_DAY_TIME)
     end)
-
     AddPrefabPostInit("guano", function(inst)
-        if TheWorld.ismastersim then
-            AutoDisappears(inst, TUNING.TOTAL_DAY_TIME * 3)
-        end
+        AutoDisappears(inst, TUNING.TOTAL_DAY_TIME * 3)
     end)
 end
 
@@ -388,70 +378,64 @@ end
 
 -- 666，官方居然把这里修复了，我就不用再改了，哈哈
 
--- if CONFIGS_LEGION.FLOWERSPOWER then --永不凋零需要
---     AddComponentPostInit("playercontroller", function(self)
---         local DoActionAutoEquip_old = self.DoActionAutoEquip
---         self.DoActionAutoEquip = function(self, buffaction)
---             if buffaction.invobject ~= nil and
---                 buffaction.invobject.replica.equippable ~= nil and
---                 buffaction.invobject.replica.equippable:EquipSlot() == EQUIPSLOTS.HANDS and
---                 buffaction.action == ACTIONS.DEPLOY then
---                 --do nothing
---             else
---                 DoActionAutoEquip_old(self, buffaction)
---             end
+-- AddComponentPostInit("playercontroller", function(self)
+--     local DoActionAutoEquip_old = self.DoActionAutoEquip
+--     self.DoActionAutoEquip = function(self, buffaction)
+--         if buffaction.invobject ~= nil and
+--             buffaction.invobject.replica.equippable ~= nil and
+--             buffaction.invobject.replica.equippable:EquipSlot() == EQUIPSLOTS.HANDS and
+--             buffaction.action == ACTIONS.DEPLOY then
+--             --do nothing
+--         else
+--             DoActionAutoEquip_old(self, buffaction)
 --         end
---     end)
--- end
+--     end
+-- end)
 
 --------------------------------------------------------------------------
 --[[ 修改传粉组件，防止非花朵但是也具有flower标签的东西被非法生成出来 ]]
 --------------------------------------------------------------------------
 
-if CONFIGS_LEGION.FLOWERSPOWER or CONFIGS_LEGION.LEGENDOFFALL then --4种花丛、香包、丰饶传说需要
-    AddComponentPostInit("pollinator", function(self)
-        --local CreateFlower_old = self.CreateFlower
-        self.CreateFlower = function(self) --防止传粉者生成非花朵但却有flower标签的实体
-            if self:HasCollectedEnough() and self.inst:IsOnValidGround() then
-                local parentFlower = GetRandomItem(self.flowers)
-                local flower
+AddComponentPostInit("pollinator", function(self)
+    --local CreateFlower_old = self.CreateFlower
+    self.CreateFlower = function(self) --防止传粉者生成非花朵但却有flower标签的实体
+        if self:HasCollectedEnough() and self.inst:IsOnValidGround() then
+            local parentFlower = GetRandomItem(self.flowers)
+            local flower
 
-                if
-                    parentFlower.prefab ~= "flower"
-                    and parentFlower.prefab ~= "flower_rose"
-                    and parentFlower.prefab ~= "planted_flower"
-                    and parentFlower.prefab ~= "flower_evil"
-                then
-                    flower = SpawnPrefab(math.random()<0.3 and "flower_rose" or "flower")
-                else
-                    flower = SpawnPrefab(parentFlower.prefab)
-                end
+            if
+                parentFlower.prefab ~= "flower"
+                and parentFlower.prefab ~= "flower_rose"
+                and parentFlower.prefab ~= "planted_flower"
+                and parentFlower.prefab ~= "flower_evil"
+            then
+                flower = SpawnPrefab(math.random()<0.3 and "flower_rose" or "flower")
+            else
+                flower = SpawnPrefab(parentFlower.prefab)
+            end
 
-                if flower ~= nil then
-                    flower.planted = true --这里需要改成true，不然会被世界当成一个生成点
-                    flower.Transform:SetPosition(self.inst.Transform:GetWorldPosition())
-                end
-                self.flowers = {}
+            if flower ~= nil then
+                flower.planted = true --这里需要改成true，不然会被世界当成一个生成点
+                flower.Transform:SetPosition(self.inst.Transform:GetWorldPosition())
+            end
+            self.flowers = {}
+        end
+    end
+
+    local Pollinate_old = self.Pollinate
+    self.Pollinate = function(self, flower)
+        if self:CanPollinate(flower) then
+            if flower.components.perennialcrop ~= nil then
+                flower.components.perennialcrop:Pollinate(self.inst)
+            elseif flower.components.perennialcrop2 ~= nil then
+                flower.components.perennialcrop2:Pollinate(self.inst)
             end
         end
-
-        if CONFIGS_LEGION.LEGENDOFFALL then --传粉者能给作物传粉
-            local Pollinate_old = self.Pollinate
-            self.Pollinate = function(self, flower)
-                if self:CanPollinate(flower) then
-                    if flower.components.perennialcrop ~= nil then
-                        flower.components.perennialcrop:Pollinate(self.inst)
-                    elseif flower.components.perennialcrop2 ~= nil then
-                        flower.components.perennialcrop2:Pollinate(self.inst)
-                    end
-                end
-                if Pollinate_old ~= nil then
-                    Pollinate_old(self, flower)
-                end
-            end
+        if Pollinate_old ~= nil then
+            Pollinate_old(self, flower)
         end
-    end)
-end
+    end
+end)
 
 --------------------------------------------------------------------------
 --[[ 重写小木牌(插在地上的)的绘图机制，让小木牌可以画上本mod里的物品 ]]
@@ -497,614 +481,609 @@ end
 --[[ 弹吉他相关 ]]
 --------------------------------------------------------------------------
 
-if TUNING.LEGION_FLASHANDCRUSH or TUNING.LEGION_DESERTSECRET then --米格尔吉他和白木吉他需要
-
-    --------------------------------------------------------------------------
-    --[[ 弹吉他sg与动作的触发 ]]
-    --------------------------------------------------------------------------
-
-    local function ResumeHands(inst)
-        local hands = inst.components.inventory:GetEquippedItem(EQUIPSLOTS.HANDS)
-        if hands ~= nil and not hands:HasTag("book") then
-            inst.AnimState:Show("ARM_carry")
-            inst.AnimState:Hide("ARM_normal")
-        end
+local function ResumeHands(inst)
+    local hands = inst.components.inventory:GetEquippedItem(EQUIPSLOTS.HANDS)
+    if hands ~= nil and not hands:HasTag("book") then
+        inst.AnimState:Show("ARM_carry")
+        inst.AnimState:Hide("ARM_normal")
     end
+end
 
-    local playguitar_pre = State{
-        name = "playguitar_pre",
-        tags = { "doing", "playguitar" },
+local playguitar_pre = State{
+    name = "playguitar_pre",
+    tags = { "doing", "playguitar" },
 
-        onenter = function(inst)
-            inst.components.locomotor:Stop()
-            inst.AnimState:PlayAnimation("soothingplay_pre", false)
-            inst.AnimState:Hide("ARM_carry")
-            inst.AnimState:Show("ARM_normal")
+    onenter = function(inst)
+        inst.components.locomotor:Stop()
+        inst.AnimState:PlayAnimation("soothingplay_pre", false)
+        inst.AnimState:Hide("ARM_carry")
+        inst.AnimState:Show("ARM_normal")
 
-            local guitar = inst.bufferedaction ~= nil and (inst.bufferedaction.invobject or inst.bufferedaction.target) or nil
-            inst.components.inventory:ReturnActiveActionItem(guitar)
+        local guitar = inst.bufferedaction ~= nil and (inst.bufferedaction.invobject or inst.bufferedaction.target) or nil
+        inst.components.inventory:ReturnActiveActionItem(guitar)
 
-            if guitar ~= nil and guitar.PlayStart ~= nil then --动作的执行处
-                guitar:AddTag("busyguitar")
-                inst.sg.statemem.instrument = guitar
-                guitar.PlayStart(guitar, inst)
-                inst:PerformBufferedAction()
-            else
-                inst:PushEvent("actionfailed", { action = inst.bufferedaction, reason = nil })
-                inst:ClearBufferedAction()
-                inst.sg:GoToState("idle")
-                return
-            end
-
-            inst.sg.statemem.playdoing = false
-        end,
-
-        events =
-        {
-            EventHandler("equip", function(inst)    --防止装备时改变手的显示状态
-                inst.AnimState:Hide("ARM_carry")
-                inst.AnimState:Show("ARM_normal")
-            end),
-
-            EventHandler("unequip", function(inst)  --防止卸下时改变手的显示状态
-                inst.AnimState:Hide("ARM_carry")
-                inst.AnimState:Show("ARM_normal")
-            end),
-
-            EventHandler("animover", function(inst)
-                if inst.AnimState:AnimDone() then
-                    inst.sg.statemem.playdoing = true
-                    inst.sg:GoToState("playguitar_loop", inst.sg.statemem.instrument)
-                end
-            end),
-        },
-
-        onexit = function(inst)
-            if not inst.sg.statemem.playdoing then
-                ResumeHands(inst)
-
-                if inst.sg.statemem.instrument ~= nil then
-                    inst.sg.statemem.instrument:RemoveTag("busyguitar")
-                end
-            end
-        end,
-    }
-
-    local playguitar_loop = State{
-        name = "playguitar_loop",
-        tags = { "doing", "playguitar" },
-
-        onenter = function(inst, instrument)
-            inst.components.locomotor:Stop()
-            inst.AnimState:Hide("ARM_carry")
-            inst.AnimState:Show("ARM_normal")
-
-            if instrument ~= nil and instrument.PlayDoing ~= nil then
-                instrument.PlayDoing(instrument, inst)
-            end
-
-            inst.sg.statemem.instrument = instrument
-            inst.sg.statemem.playdoing = false
-        end,
-
-        events =
-        {
-            EventHandler("equip", function(inst)    --防止装备时改变手的显示状态
-                inst.AnimState:Hide("ARM_carry")
-                inst.AnimState:Show("ARM_normal")
-            end),
-
-            EventHandler("unequip", function(inst)  --防止卸下时改变手的显示状态
-                inst.AnimState:Hide("ARM_carry")
-                inst.AnimState:Show("ARM_normal")
-            end),
-
-            EventHandler("playenough", function(inst)
-                inst.sg.statemem.playdoing = true
-                inst.sg:GoToState("playguitar_pst")
-            end),
-        },
-
-        onexit = function(inst)
-            if not inst.sg.statemem.playdoing then
-                ResumeHands(inst)
-            end
-
-            if inst.sg.statemem.instrument ~= nil then
-                if inst.sg.statemem.instrument.PlayEnd ~= nil then
-                    inst.sg.statemem.instrument.PlayEnd(inst.sg.statemem.instrument, inst)
-                end
-                inst.sg.statemem.instrument:RemoveTag("busyguitar")
-            end
-        end,
-    }
-
-    local playguitar_pst = State{
-        name = "playguitar_pst",
-        tags = { "doing", "playguitar" },
-
-        onenter = function(inst)
-            inst.components.locomotor:Stop()
-
-            inst.AnimState:PlayAnimation("soothingplay_pst", false)
-            inst.AnimState:Hide("ARM_carry")
-            inst.AnimState:Show("ARM_normal")
-        end,
-
-        events =
-        {
-            EventHandler("equip", function(inst)    --防止装备时改变手的显示状态
-                inst.AnimState:Hide("ARM_carry")
-                inst.AnimState:Show("ARM_normal")
-            end),
-
-            EventHandler("unequip", function(inst)  --防止卸下时改变手的显示状态
-                inst.AnimState:Hide("ARM_carry")
-                inst.AnimState:Show("ARM_normal")
-            end),
-
-            EventHandler("animover", function(inst)
-                if inst.AnimState:AnimDone() then
-                    inst.sg:GoToState("idle")
-                end
-            end),
-        },
-
-        onexit = function(inst)
-            ResumeHands(inst)
-        end,
-    }
-
-    local playguitar_client = State{
-        name = "playguitar_client",
-        tags = { "doing", "playguitar" },
-
-        onenter = function(inst)
-            inst.components.locomotor:Stop()
-
-            inst.AnimState:PlayAnimation("soothingplay_pre", false)
-            -- inst.AnimState:Hide("ARM_carry")
-            -- inst.AnimState:Show("ARM_normal")
-
-            inst:PerformPreviewBufferedAction()
-            inst.sg:SetTimeout(2)
-        end,
-
-        onupdate = function(inst)
-            if inst:HasTag("doing") then
-                if inst.entity:FlattenMovementPrediction() then
-                    inst.sg:GoToState("idle", "noanim")
-                end
-            elseif inst.bufferedaction == nil then
-                inst.sg:GoToState("idle")
-            end
-        end,
-
-        ontimeout = function(inst)
+        if guitar ~= nil and guitar.PlayStart ~= nil then --动作的执行处
+            guitar:AddTag("busyguitar")
+            inst.sg.statemem.instrument = guitar
+            guitar.PlayStart(guitar, inst)
+            inst:PerformBufferedAction()
+        else
+            inst:PushEvent("actionfailed", { action = inst.bufferedaction, reason = nil })
             inst:ClearBufferedAction()
             inst.sg:GoToState("idle")
-        end,
-    }
-
-    AddStategraphState("wilson", playguitar_pre)
-    --AddStategraphState("wilson_client", playguitar_pre)    --客户端与服务端的sg有区别，这里只需要服务端有就行了
-    AddStategraphState("wilson", playguitar_loop)
-    --AddStategraphState("wilson_client", playguitar_loop)
-    AddStategraphState("wilson", playguitar_pst)
-    AddStategraphState("wilson_client", playguitar_client) --客户端只需要一个就够了
-
-    local PLAYGUITAR = Action({ priority = 5, mount_valid = false })
-    PLAYGUITAR.id = "PLAYGUITAR"    --这个操作的id
-    PLAYGUITAR.str = STRINGS.ACTIONS_LEGION.PLAYGUITAR    --这个操作的名字，比如法杖是castspell，蜗牛壳甲是use
-    PLAYGUITAR.fn = function(act) --这个操作执行时进行的功能函数
-        return true --我把具体操作加进sg中了，不再在动作这里执行
-    end
-    AddAction(PLAYGUITAR) --向游戏注册一个动作
-
-    --往具有某组件的物品添加动作的检测函数，如果满足条件，就向人物的动作可执行表中加入某个动作。right表示是否是右键动作
-    AddComponentAction("INVENTORY", "instrument", function(inst, doer, actions, right)
-        if inst and inst:HasTag("guitar") and doer ~= nil and doer:HasTag("player") then
-            table.insert(actions, ACTIONS.PLAYGUITAR) --这里为动作的id
-        end
-    end)
-
-    --将一个动作与state绑定
-    AddStategraphActionHandler("wilson", ActionHandler(ACTIONS.PLAYGUITAR, function(inst, action)
-        if
-            (inst.sg and inst.sg:HasStateTag("busy"))
-            or (action.invobject ~= nil and action.invobject:HasTag("busyguitar"))
-            or (inst.components.rider ~= nil and inst.components.rider:IsRiding())
-        then
             return
         end
 
-        return "playguitar_pre"
-    end))
-    AddStategraphActionHandler("wilson_client", ActionHandler(ACTIONS.PLAYGUITAR, function(inst, action)
-        if
-            (inst.sg and inst.sg:HasStateTag("busy"))
-            or (action.invobject ~= nil and action.invobject:HasTag("busyguitar"))
-            or (inst.replica.rider ~= nil and inst.replica.rider:IsRiding())
-        then
-            return
+        inst.sg.statemem.playdoing = false
+    end,
+
+    events =
+    {
+        EventHandler("equip", function(inst)    --防止装备时改变手的显示状态
+            inst.AnimState:Hide("ARM_carry")
+            inst.AnimState:Show("ARM_normal")
+        end),
+
+        EventHandler("unequip", function(inst)  --防止卸下时改变手的显示状态
+            inst.AnimState:Hide("ARM_carry")
+            inst.AnimState:Show("ARM_normal")
+        end),
+
+        EventHandler("animover", function(inst)
+            if inst.AnimState:AnimDone() then
+                inst.sg.statemem.playdoing = true
+                inst.sg:GoToState("playguitar_loop", inst.sg.statemem.instrument)
+            end
+        end),
+    },
+
+    onexit = function(inst)
+        if not inst.sg.statemem.playdoing then
+            ResumeHands(inst)
+
+            if inst.sg.statemem.instrument ~= nil then
+                inst.sg.statemem.instrument:RemoveTag("busyguitar")
+            end
+        end
+    end,
+}
+
+local playguitar_loop = State{
+    name = "playguitar_loop",
+    tags = { "doing", "playguitar" },
+
+    onenter = function(inst, instrument)
+        inst.components.locomotor:Stop()
+        inst.AnimState:Hide("ARM_carry")
+        inst.AnimState:Show("ARM_normal")
+
+        if instrument ~= nil and instrument.PlayDoing ~= nil then
+            instrument.PlayDoing(instrument, inst)
         end
 
-        return "playguitar_client"
-    end))
+        inst.sg.statemem.instrument = instrument
+        inst.sg.statemem.playdoing = false
+    end,
+
+    events =
+    {
+        EventHandler("equip", function(inst)    --防止装备时改变手的显示状态
+            inst.AnimState:Hide("ARM_carry")
+            inst.AnimState:Show("ARM_normal")
+        end),
+
+        EventHandler("unequip", function(inst)  --防止卸下时改变手的显示状态
+            inst.AnimState:Hide("ARM_carry")
+            inst.AnimState:Show("ARM_normal")
+        end),
+
+        EventHandler("playenough", function(inst)
+            inst.sg.statemem.playdoing = true
+            inst.sg:GoToState("playguitar_pst")
+        end),
+    },
+
+    onexit = function(inst)
+        if not inst.sg.statemem.playdoing then
+            ResumeHands(inst)
+        end
+
+        if inst.sg.statemem.instrument ~= nil then
+            if inst.sg.statemem.instrument.PlayEnd ~= nil then
+                inst.sg.statemem.instrument.PlayEnd(inst.sg.statemem.instrument, inst)
+            end
+            inst.sg.statemem.instrument:RemoveTag("busyguitar")
+        end
+    end,
+}
+
+local playguitar_pst = State{
+    name = "playguitar_pst",
+    tags = { "doing", "playguitar" },
+
+    onenter = function(inst)
+        inst.components.locomotor:Stop()
+
+        inst.AnimState:PlayAnimation("soothingplay_pst", false)
+        inst.AnimState:Hide("ARM_carry")
+        inst.AnimState:Show("ARM_normal")
+    end,
+
+    events =
+    {
+        EventHandler("equip", function(inst)    --防止装备时改变手的显示状态
+            inst.AnimState:Hide("ARM_carry")
+            inst.AnimState:Show("ARM_normal")
+        end),
+
+        EventHandler("unequip", function(inst)  --防止卸下时改变手的显示状态
+            inst.AnimState:Hide("ARM_carry")
+            inst.AnimState:Show("ARM_normal")
+        end),
+
+        EventHandler("animover", function(inst)
+            if inst.AnimState:AnimDone() then
+                inst.sg:GoToState("idle")
+            end
+        end),
+    },
+
+    onexit = function(inst)
+        ResumeHands(inst)
+    end,
+}
+
+local playguitar_client = State{
+    name = "playguitar_client",
+    tags = { "doing", "playguitar" },
+
+    onenter = function(inst)
+        inst.components.locomotor:Stop()
+
+        inst.AnimState:PlayAnimation("soothingplay_pre", false)
+        -- inst.AnimState:Hide("ARM_carry")
+        -- inst.AnimState:Show("ARM_normal")
+
+        inst:PerformPreviewBufferedAction()
+        inst.sg:SetTimeout(2)
+    end,
+
+    onupdate = function(inst)
+        if inst:HasTag("doing") then
+            if inst.entity:FlattenMovementPrediction() then
+                inst.sg:GoToState("idle", "noanim")
+            end
+        elseif inst.bufferedaction == nil then
+            inst.sg:GoToState("idle")
+        end
+    end,
+
+    ontimeout = function(inst)
+        inst:ClearBufferedAction()
+        inst.sg:GoToState("idle")
+    end,
+}
+
+AddStategraphState("wilson", playguitar_pre)
+--AddStategraphState("wilson_client", playguitar_pre)    --客户端与服务端的sg有区别，这里只需要服务端有就行了
+AddStategraphState("wilson", playguitar_loop)
+--AddStategraphState("wilson_client", playguitar_loop)
+AddStategraphState("wilson", playguitar_pst)
+AddStategraphState("wilson_client", playguitar_client) --客户端只需要一个就够了
+
+local PLAYGUITAR = Action({ priority = 5, mount_valid = false })
+PLAYGUITAR.id = "PLAYGUITAR"    --这个操作的id
+PLAYGUITAR.str = STRINGS.ACTIONS_LEGION.PLAYGUITAR    --这个操作的名字，比如法杖是castspell，蜗牛壳甲是use
+PLAYGUITAR.fn = function(act) --这个操作执行时进行的功能函数
+    return true --我把具体操作加进sg中了，不再在动作这里执行
 end
+AddAction(PLAYGUITAR) --向游戏注册一个动作
+
+--往具有某组件的物品添加动作的检测函数，如果满足条件，就向人物的动作可执行表中加入某个动作。right表示是否是右键动作
+AddComponentAction("INVENTORY", "instrument", function(inst, doer, actions, right)
+    if inst and inst:HasTag("guitar") and doer ~= nil and doer:HasTag("player") then
+        table.insert(actions, ACTIONS.PLAYGUITAR) --这里为动作的id
+    end
+end)
+
+--将一个动作与state绑定
+AddStategraphActionHandler("wilson", ActionHandler(ACTIONS.PLAYGUITAR, function(inst, action)
+    if
+        (inst.sg and inst.sg:HasStateTag("busy"))
+        or (action.invobject ~= nil and action.invobject:HasTag("busyguitar"))
+        or (inst.components.rider ~= nil and inst.components.rider:IsRiding())
+    then
+        return
+    end
+
+    return "playguitar_pre"
+end))
+AddStategraphActionHandler("wilson_client", ActionHandler(ACTIONS.PLAYGUITAR, function(inst, action)
+    if
+        (inst.sg and inst.sg:HasStateTag("busy"))
+        or (action.invobject ~= nil and action.invobject:HasTag("busyguitar"))
+        or (inst.replica.rider ~= nil and inst.replica.rider:IsRiding())
+    then
+        return
+    end
+
+    return "playguitar_client"
+end))
 
 --------------------------------------------------------------------------
 --[[ 统一化的修复组件 ]]
 --------------------------------------------------------------------------
 
-if --素白蘑菇帽、白木吉他、月轮宝盘需要
-    TUNING.LEGION_FLASHANDCRUSH or TUNING.LEGION_DESERTSECRET or CONFIGS_LEGION.PRAYFORRAIN
-then
-    if not _G.rawget(_G, "REPAIRERS_L") then
-        _G.REPAIRERS_L = {}
-    end
+if not _G.rawget(_G, "REPAIRERS_L") then
+    _G.REPAIRERS_L = {}
+end
 
-    local function Fn_sg_short(doer, action)
-        return "doshortaction"
-    end
-    local function Fn_sg_long(doer, action)
-        return "dolongaction"
-    end
+local function Fn_sg_short(doer, action)
+    return "doshortaction"
+end
+local function Fn_sg_long(doer, action)
+    return "dolongaction"
+end
 
-    local function CommonDoerCheck(doer, target)
-        if doer.replica.rider ~= nil and doer.replica.rider:IsRiding() then --骑牛时只能修复自己的携带物品
-            if not (target.replica.inventoryitem ~= nil and target.replica.inventoryitem:IsGrandOwner(doer)) then
-                return false
-            end
-        elseif doer.replica.inventory ~= nil and doer.replica.inventory:IsHeavyLifting() then --不能背重物
+local function CommonDoerCheck(doer, target)
+    if doer.replica.rider ~= nil and doer.replica.rider:IsRiding() then --骑牛时只能修复自己的携带物品
+        if not (target.replica.inventoryitem ~= nil and target.replica.inventoryitem:IsGrandOwner(doer)) then
             return false
+        end
+    elseif doer.replica.inventory ~= nil and doer.replica.inventory:IsHeavyLifting() then --不能背重物
+        return false
+    end
+    return true
+end
+local function DoUpgrade(doer, item, target, itemvalue, ismax, defaultreason)
+    if item and target and target.components.upgradeable ~= nil then
+        local can, reason = target.components.upgradeable:CanUpgrade()
+        if not can then
+            return false, (reason or defaultreason)
+        end
+
+        local cpt = target.components.upgradeable
+        local old_stage = cpt.stage
+        local numcost = 0
+        local num = 1
+        if ismax and item.components.stackable ~= nil then
+            num = item.components.stackable:StackSize()
+        end
+
+        for i = 1, num, 1 do
+            cpt.numupgrades = cpt.numupgrades + itemvalue
+            numcost = numcost + 1
+
+            if cpt.numupgrades >= cpt.upgradesperstage then --可以进入下一个阶段
+                cpt.stage = cpt.stage + 1
+                cpt.numupgrades = 0
+
+                if not cpt:CanUpgrade() then
+                    break
+                end
+            end
+        end
+
+        --把过程总结为一次，防止多次重复执行。不过可能会有一些顺序上的小问题，暂时应该不会出现
+        if cpt.onupgradefn then
+            cpt.onupgradefn(cpt.inst, doer, item)
+        end
+        if old_stage ~= cpt.stage and cpt.onstageadvancefn then --说明升级了
+            cpt.onstageadvancefn(cpt.inst)
+        end
+
+        if item.components.stackable ~= nil then
+            item.components.stackable:Get(numcost):Remove()
+        else
+            item:Remove()
         end
         return true
     end
-    local function DoUpgrade(doer, item, target, itemvalue, ismax, defaultreason)
-        if item and target and target.components.upgradeable ~= nil then
-            local can, reason = target.components.upgradeable:CanUpgrade()
-            if not can then
-                return false, (reason or defaultreason)
-            end
+    return false
+end
 
-            local cpt = target.components.upgradeable
-            local old_stage = cpt.stage
-            local numcost = 0
-            local num = 1
-            if ismax and item.components.stackable ~= nil then
-                num = item.components.stackable:StackSize()
-            end
+------
+--电闪雷鸣
+------
 
-            for i = 1, num, 1 do
-                cpt.numupgrades = cpt.numupgrades + itemvalue
-                numcost = numcost + 1
+local function Fn_try_fungus(inst, doer, target, actions, right)
+    if target.repair_fungus_l then
+        if CommonDoerCheck(doer, target) then
+            return true
+        end
+    end
+    return false
+end
+local function Fn_do_fungus(doer, item, target, value)
+    if
+        item ~= nil and target ~= nil and
+        target.components.perishable ~= nil and target.components.perishable.perishremainingtime ~= nil and
+        target.components.perishable.perishremainingtime < target.components.perishable.perishtime
+    then
+        local useditem = doer.components.inventory:RemoveItem(item) --不做说明的话，一次只取一个
+        if useditem then
+            local perishable = target.components.perishable
+            perishable:SetPercent(perishable:GetPercent() + value)
 
-                if cpt.numupgrades >= cpt.upgradesperstage then --可以进入下一个阶段
-                    cpt.stage = cpt.stage + 1
-                    cpt.numupgrades = 0
+            useditem:Remove()
 
-                    if not cpt:CanUpgrade() then
-                        break
-                    end
-                end
-            end
+            return true
+        end
+    end
+    return false, "FUNGUS"
+end
 
-            --把过程总结为一次，防止多次重复执行。不过可能会有一些顺序上的小问题，暂时应该不会出现
-            if cpt.onupgradefn then
-                cpt.onupgradefn(cpt.inst, doer, item)
-            end
-            if old_stage ~= cpt.stage and cpt.onstageadvancefn then --说明升级了
-                cpt.onstageadvancefn(cpt.inst)
-            end
+local fungus_needchange = {
+    red_cap = 0.05,
+    green_cap = 0.05,
+    blue_cap = 0.05,
+    albicans_cap = 0.15, --素白菇
+    spore_small = 0.15,  --绿蘑菇孢子
+    spore_medium = 0.15, --红蘑菇孢子
+    spore_tall = 0.15,   --蓝蘑菇孢子
+    moon_cap = 0.2,      --月亮蘑菇
+    shroom_skin = 1,
+}
+for k,v in pairs(fungus_needchange) do
+    _G.REPAIRERS_L[k] = {
+        fn_try = Fn_try_fungus,
+        fn_sg = Fn_sg_short,
+        fn_do = function(act)
+            return Fn_do_fungus(act.doer, act.invobject, act.target, v)
+        end
+    }
+end
+fungus_needchange = nil
 
-            if item.components.stackable ~= nil then
-                item.components.stackable:Get(numcost):Remove()
-            else
-                item:Remove()
+------
+--尘世蜃楼
+------
+
+_G.FUELTYPE.GUITAR = "GUITAR"
+_G.UPGRADETYPES.MAT_L = "mat_l"
+
+local function Fn_try_guitar(inst, doer, target, actions, right)
+    if target:HasTag(FUELTYPE.GUITAR.."_fueled") then
+        if CommonDoerCheck(doer, target) then
+            return true
+        end
+    end
+    return false
+end
+local function Fn_do_guitar(doer, item, target, value)
+    if
+        item ~= nil and target ~= nil and
+        target.components.fueled ~= nil and target.components.fueled.accepting and
+        target.components.fueled:GetPercent() < 1
+    then
+        local useditem = doer.components.inventory:RemoveItem(item) --不做说明的话，一次只取一个
+        if useditem then
+            local fueled = target.components.fueled
+            fueled:DoDelta(value*fueled.bonusmult*(doer.mult_repairl or 1), doer)
+
+            if useditem.components.fuel ~= nil then
+                useditem.components.fuel:Taken(fueled.inst)
             end
+            useditem:Remove()
+
+            if fueled.ontakefuelfn ~= nil then
+                fueled.ontakefuelfn(fueled.inst, value)
+            end
+            fueled.inst:PushEvent("takefuel", { fuelvalue = value })
+
+            return true
+        end
+    end
+    return false, "GUITAR"
+end
+
+_G.REPAIRERS_L["silk"] = {
+    fn_try = Fn_try_guitar, --【客户端】
+    fn_sg = Fn_sg_long, --【服务端、客户端】
+    fn_do = function(act) --【服务端】
+        return Fn_do_guitar(act.doer, act.invobject, act.target, TUNING.TOTAL_DAY_TIME * 0.1)
+    end
+}
+_G.REPAIRERS_L["steelwool"] = {
+    fn_try = Fn_try_guitar,
+    fn_sg = Fn_sg_long,
+    fn_do = function(act)
+        return Fn_do_guitar(act.doer, act.invobject, act.target, TUNING.TOTAL_DAY_TIME * 0.9)
+    end
+}
+_G.REPAIRERS_L["mat_whitewood_item"] = {
+    noapiset = true,
+    fn_try = function(inst, doer, target, actions, right)
+        if
+            target:HasTag(UPGRADETYPES.MAT_L.."_upgradeable") and
+            (doer.replica.rider == nil or not doer.replica.rider:IsRiding()) and
+            (doer.replica.inventory == nil or not doer.replica.inventory:IsHeavyLifting())
+        then
             return true
         end
         return false
+    end,
+    fn_sg = Fn_sg_short,
+    fn_do = function(act)
+        return DoUpgrade(act.doer, act.invobject, act.target, 1, false, "MAT")
     end
+}
 
-    if TUNING.LEGION_FLASHANDCRUSH then
-        local function Fn_try_fungus(inst, doer, target, actions, right)
-            if target.repair_fungus_l then
-                if CommonDoerCheck(doer, target) then
-                    return true
-                end
-            end
-            return false
-        end
-        local function Fn_do_fungus(doer, item, target, value)
-            if
-                item ~= nil and target ~= nil and
-                target.components.perishable ~= nil and target.components.perishable.perishremainingtime ~= nil and
-                target.components.perishable.perishremainingtime < target.components.perishable.perishtime
-            then
-                local useditem = doer.components.inventory:RemoveItem(item) --不做说明的话，一次只取一个
-                if useditem then
-                    local perishable = target.components.perishable
-                    perishable:SetPercent(perishable:GetPercent() + value)
-
-                    useditem:Remove()
-
-                    return true
-                end
-            end
-            return false, "FUNGUS"
-        end
-
-        local fungus_needchange = {
-            red_cap = 0.05,
-            green_cap = 0.05,
-            blue_cap = 0.05,
-            albicans_cap = 0.15, --素白菇
-            spore_small = 0.15,  --绿蘑菇孢子
-            spore_medium = 0.15, --红蘑菇孢子
-            spore_tall = 0.15,   --蓝蘑菇孢子
-            moon_cap = 0.2,      --月亮蘑菇
-            shroom_skin = 1,
-        }
-        for k,v in pairs(fungus_needchange) do
-            _G.REPAIRERS_L[k] = {
-                fn_try = Fn_try_fungus,
-                fn_sg = Fn_sg_short,
-                fn_do = function(act)
-                    return Fn_do_fungus(act.doer, act.invobject, act.target, v)
-                end
-            }
-        end
-        fungus_needchange = nil
-    end
-
-    if TUNING.LEGION_DESERTSECRET then
-        _G.FUELTYPE.GUITAR = "GUITAR"
-        _G.UPGRADETYPES.MAT_L = "mat_l"
-
-        local function Fn_try_guitar(inst, doer, target, actions, right)
-            if target:HasTag(FUELTYPE.GUITAR.."_fueled") then
-                if CommonDoerCheck(doer, target) then
-                    return true
-                end
-            end
-            return false
-        end
-        local function Fn_do_guitar(doer, item, target, value)
-            if
-                item ~= nil and target ~= nil and
-                target.components.fueled ~= nil and target.components.fueled.accepting and
-                target.components.fueled:GetPercent() < 1
-            then
-                local useditem = doer.components.inventory:RemoveItem(item) --不做说明的话，一次只取一个
-                if useditem then
-                    local fueled = target.components.fueled
-                    fueled:DoDelta(value*fueled.bonusmult*(doer.mult_repairl or 1), doer)
-
-                    if useditem.components.fuel ~= nil then
-                        useditem.components.fuel:Taken(fueled.inst)
-                    end
-                    useditem:Remove()
-
-                    if fueled.ontakefuelfn ~= nil then
-                        fueled.ontakefuelfn(fueled.inst, value)
-                    end
-                    fueled.inst:PushEvent("takefuel", { fuelvalue = value })
-
-                    return true
-                end
-            end
-            return false, "GUITAR"
-        end
-
-        _G.REPAIRERS_L["silk"] = {
-            fn_try = Fn_try_guitar, --【客户端】
-            fn_sg = Fn_sg_long, --【服务端、客户端】
-            fn_do = function(act) --【服务端】
-                return Fn_do_guitar(act.doer, act.invobject, act.target, TUNING.TOTAL_DAY_TIME * 0.1)
-            end
-        }
-        _G.REPAIRERS_L["steelwool"] = {
-            fn_try = Fn_try_guitar,
-            fn_sg = Fn_sg_long,
-            fn_do = function(act)
-                return Fn_do_guitar(act.doer, act.invobject, act.target, TUNING.TOTAL_DAY_TIME * 0.9)
-            end
-        }
-        _G.REPAIRERS_L["mat_whitewood_item"] = {
-            noapiset = true,
-            fn_try = function(inst, doer, target, actions, right)
-                if
-                    target:HasTag(UPGRADETYPES.MAT_L.."_upgradeable") and
-                    (doer.replica.rider == nil or not doer.replica.rider:IsRiding()) and
-                    (doer.replica.inventory == nil or not doer.replica.inventory:IsHeavyLifting())
-                then
-                    return true
-                end
-                return false
-            end,
-            fn_sg = Fn_sg_short,
-            fn_do = function(act)
-                return DoUpgrade(act.doer, act.invobject, act.target, 1, false, "MAT")
-            end
-        }
-
-        local function Fn_try_sand(inst, doer, target, actions, right)
-            if target:HasTag("repair_sand") then
-                if CommonDoerCheck(doer, target) then
-                    return true
-                end
-            end
-            return false
-        end
-        local function Fn_do_sand(doer, item, target, value)
-            if
-                target ~= nil and
-                target.components.armor ~= nil and target.components.armor:GetPercent() < 1
-            then
-                value = value*(doer.mult_repairl or 1)
-                local cpt = target.components.armor
-                local need = math.ceil((cpt.maxcondition - cpt.condition) / value)
-                if need > 1 then --最后一次很可能会比较浪费，所以不主动填满
-                    need = need - 1
-                end
-
-                if item.components.stackable ~= nil then
-                    local stack = item.components.stackable:StackSize() or 1
-                    if need > stack then
-                        need = stack
-                    end
-                    local useditems = item.components.stackable:Get(need)
-                    useditems:Remove()
-                else
-                    need = 1
-                    item:Remove()
-                end
-                cpt:Repair(value*need)
-                return true
-            end
-            return false, "GUITAR"
-        end
-
-        local rock_needchange = {
-            townportaltalisman = 315,
-            turf_desertdirt = 105,
-            cutstone = 157.5,
-            rocks = 52.5,
-            flint = 52.5
-        }
-        for k,v in pairs(rock_needchange) do
-            _G.REPAIRERS_L[k] = {
-                fn_try = Fn_try_sand,
-                fn_sg = Fn_sg_long,
-                fn_do = function(act)
-                    return Fn_do_sand(act.doer, act.invobject, act.target, v)
-                end
-            }
-        end
-        rock_needchange = nil
-    end
-
-    if CONFIGS_LEGION.PRAYFORRAIN then
-        _G.UPGRADETYPES.REVOLVED_L = "revolved_l"
-        _G.UPGRADETYPES.HIDDEN_L = "hidden_l"
-
-        local function Fn_try_gem(doer, target, tag)
-            if target:HasTag(tag) then
-                if CommonDoerCheck(doer, target) then
-                    return true
-                end
-            end
-            return false
-        end
-        local function Fn_do_gem(act)
-            return DoUpgrade(act.doer, act.invobject, act.target, 1, true, "YELLOWGEM")
-        end
-
-        _G.REPAIRERS_L["yellowgem"] = {
-            fn_try = function(inst, doer, target, actions, right)
-                return Fn_try_gem(doer, target, UPGRADETYPES.REVOLVED_L.."_upgradeable")
-            end,
-            fn_sg = Fn_sg_short,
-            fn_do = Fn_do_gem
-        }
-        _G.REPAIRERS_L["bluegem"] = {
-            fn_try = function(inst, doer, target, actions, right)
-                return Fn_try_gem(doer, target, UPGRADETYPES.HIDDEN_L.."_upgradeable")
-            end,
-            fn_sg = Fn_sg_short,
-            fn_do = Fn_do_gem
-        }
-    end
-
-    if IsServer then
-        for k,v in pairs(REPAIRERS_L) do
-            if not v.noapiset then
-                AddPrefabPostInit(k, function(inst)
-                    inst:AddComponent("repairerlegion")
-                end)
-            end
+local function Fn_try_sand(inst, doer, target, actions, right)
+    if target:HasTag("repair_sand") then
+        if CommonDoerCheck(doer, target) then
+            return true
         end
     end
-
-    ------
-
-    local REPAIR_LEGION = Action({ priority = 1, mount_valid = true })
-    REPAIR_LEGION.id = "REPAIR_LEGION"
-    REPAIR_LEGION.str = STRINGS.ACTIONS.REPAIR_LEGION
-    REPAIR_LEGION.strfn = function(act)
-        if act.invobject ~= nil then
-            if act.invobject.prefab == "mat_whitewood_item" then
-                return "MERGE"
-            elseif act.invobject.prefab == "yellowgem" or act.invobject.prefab == "bluegem" then
-                return "EMBED"
-            end
-        end
-        return "GENERIC"
-    end
-    REPAIR_LEGION.fn = function(act)
-        if act.invobject ~= nil and REPAIRERS_L[act.invobject.prefab] then
-            return REPAIRERS_L[act.invobject.prefab].fn_do(act)
-        end
-    end
-    AddAction(REPAIR_LEGION)
-
-    AddComponentAction("USEITEM", "repairerlegion", function(inst, doer, target, actions, right)
-        if right and REPAIRERS_L[inst.prefab] and REPAIRERS_L[inst.prefab].fn_try(inst, doer, target, actions, right) then
-            table.insert(actions, ACTIONS.REPAIR_LEGION)
-        end
-    end)
-
-    AddStategraphActionHandler("wilson", ActionHandler(ACTIONS.REPAIR_LEGION, function(inst, action)
-        if action.invobject ~= nil and REPAIRERS_L[action.invobject.prefab] then
-            return REPAIRERS_L[action.invobject.prefab].fn_sg(inst, action)
-        end
-    end))
-    AddStategraphActionHandler("wilson_client", ActionHandler(ACTIONS.REPAIR_LEGION, function(inst, action)
-        if action.invobject ~= nil and REPAIRERS_L[action.invobject.prefab] then
-            return REPAIRERS_L[action.invobject.prefab].fn_sg(inst, action)
-        end
-    end))
+    return false
 end
+local function Fn_do_sand(doer, item, target, value)
+    if
+        target ~= nil and
+        target.components.armor ~= nil and target.components.armor:GetPercent() < 1
+    then
+        value = value*(doer.mult_repairl or 1)
+        local cpt = target.components.armor
+        local need = math.ceil((cpt.maxcondition - cpt.condition) / value)
+        if need > 1 then --最后一次很可能会比较浪费，所以不主动填满
+            need = need - 1
+        end
+
+        if item.components.stackable ~= nil then
+            local stack = item.components.stackable:StackSize() or 1
+            if need > stack then
+                need = stack
+            end
+            local useditems = item.components.stackable:Get(need)
+            useditems:Remove()
+        else
+            need = 1
+            item:Remove()
+        end
+        cpt:Repair(value*need)
+        return true
+    end
+    return false, "GUITAR"
+end
+
+local rock_needchange = {
+    townportaltalisman = 315,
+    turf_desertdirt = 105,
+    cutstone = 157.5,
+    rocks = 52.5,
+    flint = 52.5
+}
+for k,v in pairs(rock_needchange) do
+    _G.REPAIRERS_L[k] = {
+        fn_try = Fn_try_sand,
+        fn_sg = Fn_sg_long,
+        fn_do = function(act)
+            return Fn_do_sand(act.doer, act.invobject, act.target, v)
+        end
+    }
+end
+rock_needchange = nil
+
+------
+--祈雨祭
+------
+
+_G.UPGRADETYPES.REVOLVED_L = "revolved_l"
+_G.UPGRADETYPES.HIDDEN_L = "hidden_l"
+
+local function Fn_try_gem(doer, target, tag)
+    if target:HasTag(tag) then
+        if CommonDoerCheck(doer, target) then
+            return true
+        end
+    end
+    return false
+end
+local function Fn_do_gem(act)
+    return DoUpgrade(act.doer, act.invobject, act.target, 1, true, "YELLOWGEM")
+end
+
+_G.REPAIRERS_L["yellowgem"] = {
+    fn_try = function(inst, doer, target, actions, right)
+        return Fn_try_gem(doer, target, UPGRADETYPES.REVOLVED_L.."_upgradeable")
+    end,
+    fn_sg = Fn_sg_short,
+    fn_do = Fn_do_gem
+}
+_G.REPAIRERS_L["bluegem"] = {
+    fn_try = function(inst, doer, target, actions, right)
+        return Fn_try_gem(doer, target, UPGRADETYPES.HIDDEN_L.."_upgradeable")
+    end,
+    fn_sg = Fn_sg_short,
+    fn_do = Fn_do_gem
+}
+
+------
+
+if IsServer then
+    for k,v in pairs(REPAIRERS_L) do
+        if not v.noapiset then
+            AddPrefabPostInit(k, function(inst)
+                inst:AddComponent("repairerlegion")
+            end)
+        end
+    end
+end
+
+------
+
+local REPAIR_LEGION = Action({ priority = 1, mount_valid = true })
+REPAIR_LEGION.id = "REPAIR_LEGION"
+REPAIR_LEGION.str = STRINGS.ACTIONS.REPAIR_LEGION
+REPAIR_LEGION.strfn = function(act)
+    if act.invobject ~= nil then
+        if act.invobject.prefab == "mat_whitewood_item" then
+            return "MERGE"
+        elseif act.invobject.prefab == "yellowgem" or act.invobject.prefab == "bluegem" then
+            return "EMBED"
+        end
+    end
+    return "GENERIC"
+end
+REPAIR_LEGION.fn = function(act)
+    if act.invobject ~= nil and REPAIRERS_L[act.invobject.prefab] then
+        return REPAIRERS_L[act.invobject.prefab].fn_do(act)
+    end
+end
+AddAction(REPAIR_LEGION)
+
+AddComponentAction("USEITEM", "repairerlegion", function(inst, doer, target, actions, right)
+    if right and REPAIRERS_L[inst.prefab] and REPAIRERS_L[inst.prefab].fn_try(inst, doer, target, actions, right) then
+        table.insert(actions, ACTIONS.REPAIR_LEGION)
+    end
+end)
+
+AddStategraphActionHandler("wilson", ActionHandler(ACTIONS.REPAIR_LEGION, function(inst, action)
+    if action.invobject ~= nil and REPAIRERS_L[action.invobject.prefab] then
+        return REPAIRERS_L[action.invobject.prefab].fn_sg(inst, action)
+    end
+end))
+AddStategraphActionHandler("wilson_client", ActionHandler(ACTIONS.REPAIR_LEGION, function(inst, action)
+    if action.invobject ~= nil and REPAIRERS_L[action.invobject.prefab] then
+        return REPAIRERS_L[action.invobject.prefab].fn_sg(inst, action)
+    end
+end))
 
 --------------------------------------------------------------------------
 --[[ 补全terraformer.lua里的信息，铲起地皮就可以得到新地皮了 ]]
 --------------------------------------------------------------------------
 
--- if TUNING.LEGION_DESERTSECRET then --砂砖地皮需要
---     AddComponentPostInit("terraformer", function(self, inst)
---         local Terraform_old = self.Terraform
---         self.Terraform = function(self, pt, spawnturf)
---             local world = TheWorld
---             local map = world.Map
---             if not world.Map:CanTerraformAtPoint(pt:Get()) then
---                 return false
---             end
-
---             local original_tile_type = map:GetTileAtPoint(pt:Get()) --这里记下地皮的种类，就不用担心调用原函数时会破坏地皮导致不能识别地皮种类了，因为这里记下来了
-
---             if Terraform_old ~= nil and Terraform_old(self, pt, spawnturf) then
---                 spawnturf = spawnturf and TUNING.TURF_PROPERTIES_LEGION[original_tile_type] or nil --记得改这里！！！！会出错
---                 if spawnturf ~= nil then
---                     local loot = SpawnPrefab("turf_"..spawnturf.name)
---                     if loot.components.inventoryitem ~= nil then
---                         loot.components.inventoryitem:InheritMoisture(world.state.wetness, world.state.iswet)
---                     end
---                     loot.Transform:SetPosition(pt:Get())
---                     if loot.Physics ~= nil then
---                         local angle = math.random() * 2 * PI
---                         loot.Physics:SetVel(2 * math.cos(angle), 10, 2 * math.sin(angle))
---                     end
---                 else
---                     SpawnPrefab("sinkhole_spawn_fx_"..tostring(math.random(3))).Transform:SetPosition(pt:Get())
---                 end
---             end
-
---             return true
+-- AddComponentPostInit("terraformer", function(self, inst)
+--     local Terraform_old = self.Terraform
+--     self.Terraform = function(self, pt, spawnturf)
+--         local world = TheWorld
+--         local map = world.Map
+--         if not world.Map:CanTerraformAtPoint(pt:Get()) then
+--             return false
 --         end
---     end)
--- end
+
+--         local original_tile_type = map:GetTileAtPoint(pt:Get()) --这里记下地皮的种类，就不用担心调用原函数时会破坏地皮导致不能识别地皮种类了，因为这里记下来了
+
+--         if Terraform_old ~= nil and Terraform_old(self, pt, spawnturf) then
+--             spawnturf = spawnturf and TUNING.TURF_PROPERTIES_LEGION[original_tile_type] or nil --记得改这里！！！！会出错
+--             if spawnturf ~= nil then
+--                 local loot = SpawnPrefab("turf_"..spawnturf.name)
+--                 if loot.components.inventoryitem ~= nil then
+--                     loot.components.inventoryitem:InheritMoisture(world.state.wetness, world.state.iswet)
+--                 end
+--                 loot.Transform:SetPosition(pt:Get())
+--                 if loot.Physics ~= nil then
+--                     local angle = math.random() * 2 * PI
+--                     loot.Physics:SetVel(2 * math.cos(angle), 10, 2 * math.sin(angle))
+--                 end
+--             else
+--                 SpawnPrefab("sinkhole_spawn_fx_"..tostring(math.random(3))).Transform:SetPosition(pt:Get())
+--             end
+--         end
+
+--         return true
+--     end
+-- end)
 
 --------------------------------------------------------------------------
 --[[ 全局：帽子相关贴图切换通用函数 ]]
@@ -1163,255 +1142,258 @@ local function WakePlayerUp(inst)
     end
 end
 
-if TUNING.LEGION_SUPERBCUISINE then
-    --------------------------------------------------------------------------
-    --[[ 惊恐sg ]]
-    --------------------------------------------------------------------------
+-----------------------------------
+--[[ 惊恐sg ]]
+-----------------------------------
 
-    AddStategraphState("wilson", State{
-        name = "volcanopaniced",
-        tags = { "busy", "nopredict", "nodangle", "canrotate" },
+AddStategraphState("wilson", State{
+    name = "volcanopaniced",
+    tags = { "busy", "nopredict", "nodangle", "canrotate" },
 
-        onenter = function(inst)
-            inst.components.locomotor:Stop()
-            inst:ClearBufferedAction()
+    onenter = function(inst)
+        inst.components.locomotor:Stop()
+        inst:ClearBufferedAction()
 
-            local it = math.random()
-            if it < 0.25 then
-                inst.AnimState:PlayAnimation("idle_lunacy_pre")
-                inst.AnimState:PushAnimation("idle_lunacy_loop", false)
-            elseif it < 0.5 then
-                inst.AnimState:PlayAnimation("idle_lunacy_pre")
-                inst.AnimState:PushAnimation("idle_lunacy_loop", false)
-            elseif it < 0.75 then
-                inst.AnimState:PlayAnimation("idle_inaction_sanity")
-            else
-                inst.AnimState:PlayAnimation("idle_inaction_lunacy")
-            end
-
-            inst.sg:SetTimeout(16 * FRAMES) --约半秒
-        end,
-
-        events =
-        {
-            EventHandler("animqueueover", function(inst)
-                if inst.AnimState:AnimDone() then
-                    inst.sg:GoToState("idle")
-                end
-            end),
-
-            EventHandler("animover", function(inst)
-                if inst.AnimState:AnimDone() then
-                    inst.sg:GoToState("idle")
-                end
-            end),
-        },
-
-        ontimeout = function(inst)
-            inst.sg:RemoveStateTag("busy")
-        end,
-    })
-
-    AddStategraphEvent("wilson", EventHandler("bevolcanopaniced", function(inst)
-        if inst.components.health ~= nil and not inst.components.health:IsDead() and not inst.sg:HasStateTag("busy") then
-            if WakePlayerUp(inst) then
-                inst.sg:GoToState("volcanopaniced")
-            end
+        local it = math.random()
+        if it < 0.25 then
+            inst.AnimState:PlayAnimation("idle_lunacy_pre")
+            inst.AnimState:PushAnimation("idle_lunacy_loop", false)
+        elseif it < 0.5 then
+            inst.AnimState:PlayAnimation("idle_lunacy_pre")
+            inst.AnimState:PushAnimation("idle_lunacy_loop", false)
+        elseif it < 0.75 then
+            inst.AnimState:PlayAnimation("idle_inaction_sanity")
+        else
+            inst.AnimState:PlayAnimation("idle_inaction_lunacy")
         end
-    end))
 
-    --------------------------------------------------------------------------
-    --[[ 尴尬推进sg ]]
-    --------------------------------------------------------------------------
+        inst.sg:SetTimeout(16 * FRAMES) --约半秒
+    end,
 
-    AddStategraphState("wilson", State{
-        name = "awkwardpropeller",
-        tags = { "pausepredict" },
-
-        onenter = function(inst, data)
-            _G.ForceStopHeavyLifting_legion(inst)
-            -- inst.components.locomotor:Stop()
-            -- inst:ClearBufferedAction()
-
-            inst.AnimState:PlayAnimation("hit")
-
-            -- inst.SoundEmitter:PlaySound("dontstarve/wilson/hit")
-            inst.SoundEmitter:PlaySound("dontstarve/wilson/hungry")
-
-            if data ~= nil and data.angle ~= nil then
-                inst.Transform:SetRotation(data.angle)
+    events =
+    {
+        EventHandler("animqueueover", function(inst)
+            if inst.AnimState:AnimDone() then
+                inst.sg:GoToState("idle")
             end
-            inst.Physics:SetMotorVel(3, 0, 0)
+        end),
 
-            inst.sg:SetTimeout(0.2)
-        end,
+        EventHandler("animover", function(inst)
+            if inst.AnimState:AnimDone() then
+                inst.sg:GoToState("idle")
+            end
+        end),
+    },
 
-        ontimeout = function(inst)
+    ontimeout = function(inst)
+        inst.sg:RemoveStateTag("busy")
+    end,
+})
+
+AddStategraphEvent("wilson", EventHandler("bevolcanopaniced", function(inst)
+    if inst.components.health ~= nil and not inst.components.health:IsDead() and not inst.sg:HasStateTag("busy") then
+        if WakePlayerUp(inst) then
+            inst.sg:GoToState("volcanopaniced")
+        end
+    end
+end))
+
+-----------------------------------
+--[[ 尴尬推进sg ]]
+-----------------------------------
+
+AddStategraphState("wilson", State{
+    name = "awkwardpropeller",
+    tags = { "pausepredict" },
+
+    onenter = function(inst, data)
+        _G.ForceStopHeavyLifting_legion(inst)
+        -- inst.components.locomotor:Stop()
+        -- inst:ClearBufferedAction()
+
+        inst.AnimState:PlayAnimation("hit")
+
+        -- inst.SoundEmitter:PlaySound("dontstarve/wilson/hit")
+        inst.SoundEmitter:PlaySound("dontstarve/wilson/hungry")
+
+        if data ~= nil and data.angle ~= nil then
+            inst.Transform:SetRotation(data.angle)
+        end
+        inst.Physics:SetMotorVel(3, 0, 0)
+
+        inst.sg:SetTimeout(0.2)
+    end,
+
+    ontimeout = function(inst)
+        inst.Physics:Stop()
+        inst.sg.statemem.speedfinish = true
+    end,
+
+    events =
+    {
+        EventHandler("animover", function(inst)
+            if inst.AnimState:AnimDone() then
+                inst.sg:GoToState("idle")
+            end
+        end),
+    },
+
+    onexit = function(inst)
+        if not inst.sg.statemem.speedfinish then
             inst.Physics:Stop()
-            inst.sg.statemem.speedfinish = true
-        end,
+        end
+    end,
+})
 
-        events =
-        {
-            EventHandler("animover", function(inst)
-                if inst.AnimState:AnimDone() then
-                    inst.sg:GoToState("idle")
+AddStategraphEvent("wilson", EventHandler("awkwardpropeller", function(inst, data)
+    if not inst.sg:HasStateTag("busy") and inst.components.health ~= nil and not inst.components.health:IsDead() then
+        if WakePlayerUp(inst) then
+            --将玩家甩下背（因为被玩家恶心到了）
+            local mount = inst.components.rider ~= nil and inst.components.rider:GetMount() or nil
+            if mount ~= nil and mount.components.rideable ~= nil then
+                if mount._bucktask ~= nil then
+                    mount._bucktask:Cancel()
+                    mount._bucktask = nil
                 end
-            end),
-        },
-
-        onexit = function(inst)
-            if not inst.sg.statemem.speedfinish then
-                inst.Physics:Stop()
-            end
-        end,
-    })
-
-    AddStategraphEvent("wilson", EventHandler("awkwardpropeller", function(inst, data)
-        if not inst.sg:HasStateTag("busy") and inst.components.health ~= nil and not inst.components.health:IsDead() then
-            if WakePlayerUp(inst) then
-                --将玩家甩下背（因为被玩家恶心到了）
-                local mount = inst.components.rider ~= nil and inst.components.rider:GetMount() or nil
-                if mount ~= nil and mount.components.rideable ~= nil then
-                    if mount._bucktask ~= nil then
-                        mount._bucktask:Cancel()
-                        mount._bucktask = nil
-                    end
-                    mount.components.rideable:Buck()
-                else
-                    inst.sg:GoToState("awkwardpropeller", data)
-                end
+                mount.components.rideable:Buck()
+            else
+                inst.sg:GoToState("awkwardpropeller", data)
             end
         end
-    end))
-end
+    end
+end))
 
 --------------------------------------------------------------------------
 --[[ 人物实体统一修改 ]]
 --------------------------------------------------------------------------
 
-if CONFIGS_LEGION.FLOWERSPOWER or TUNING.LEGION_SUPERBCUISINE then --青锋剑、香蕉慕斯需要
+AddPlayerPostInit(function(inst)
     if IsServer then
-        AddPlayerPostInit(function(inst)
-            --人物携带青锋剑时回复精神
-            if CONFIGS_LEGION.FLOWERSPOWER then
-                if inst.components.itemaffinity == nil then
-                    inst:AddComponent("itemaffinity")
-                end
-                inst.components.itemaffinity:AddAffinity(nil, "feelmylove", TUNING.DAPPERNESS_LARGE, 1)
+        --人物携带青锋剑时回复精神
+        if inst.components.itemaffinity == nil then
+            inst:AddComponent("itemaffinity")
+        end
+        inst.components.itemaffinity:AddAffinity(nil, "feelmylove", TUNING.DAPPERNESS_LARGE, 1)
+
+        --香蕉慕斯的好胃口buff兼容化
+        local isPickyEater = function(player)
+            local notpickylist = { --这些是肯定不需要发挥香蕉慕斯作用的人物，所以就不需要做更改
+                walter = true,
+                waxwell = true,
+                webber = true,
+                wendy = true,
+                wes = true,
+                wickerbottom = true,
+                willow = true,
+                wilson = true,
+                winona = true,
+                wolfgang = true,
+                woodie = true,
+                wormwood = true,
+                wortox = true,
+                wurt = true,
+                wx78 = true,
+                wanda = true,
+
+                monkey_king = true,
+                myth_yutu = true,
+                neza = true,
+                pigsy = true,
+                white_bone = true,
+                yangjian = true,
+                yama_commissioners = true,
+            }
+            if notpickylist[player.prefab] then
+                return false
             end
-
-            --香蕉慕斯的好胃口buff兼容化
-            local isPickyEater = function(player)
-                local notpickylist = { --这些是肯定不需要发挥香蕉慕斯作用的人物，所以就不需要做更改
-                    walter = true,
-                    waxwell = true,
-                    webber = true,
-                    wendy = true,
-                    wes = true,
-                    wickerbottom = true,
-                    willow = true,
-                    wilson = true,
-                    winona = true,
-                    wolfgang = true,
-                    woodie = true,
-                    wormwood = true,
-                    wortox = true,
-                    wurt = true,
-                    wx78 = true,
-                    wanda = true,
-
-                    monkey_king = true,
-                    myth_yutu = true,
-                    neza = true,
-                    pigsy = true,
-                    white_bone = true,
-                    yangjian = true,
-                    yama_commissioners = true,
-                }
-                if notpickylist[player.prefab] then
-                    return false
-                end
-                return true
-            end
-            if TUNING.LEGION_SUPERBCUISINE and inst.components.debuffable ~= nil and isPickyEater(inst) then
-                if inst.components.foodmemory ~= nil then
-                    local GetFoodMultiplier_old = inst.components.foodmemory.GetFoodMultiplier
-                    inst.components.foodmemory.GetFoodMultiplier = function(self, ...)
-                        if inst.components.debuffable:HasDebuff("buff_bestappetite") then
-                            return 1
-                        elseif GetFoodMultiplier_old ~= nil then
-                            return GetFoodMultiplier_old(self, ...)
-                        end
-                    end
-
-                    local GetMemoryCount_old = inst.components.foodmemory.GetMemoryCount
-                    inst.components.foodmemory.GetMemoryCount = function(self, ...)
-                        if inst.components.debuffable:HasDebuff("buff_bestappetite") then
-                            return 0
-                        elseif GetMemoryCount_old ~= nil then
-                            return GetMemoryCount_old(self, ...)
-                        end
+            return true
+        end
+        if inst.components.debuffable ~= nil and isPickyEater(inst) then
+            if inst.components.foodmemory ~= nil then
+                local GetFoodMultiplier_old = inst.components.foodmemory.GetFoodMultiplier
+                inst.components.foodmemory.GetFoodMultiplier = function(self, ...)
+                    if inst.components.debuffable:HasDebuff("buff_bestappetite") then
+                        return 1
+                    elseif GetFoodMultiplier_old ~= nil then
+                        return GetFoodMultiplier_old(self, ...)
                     end
                 end
 
-                if inst.components.eater ~= nil then
-                    local PrefersToEat_old = inst.components.eater.PrefersToEat
-                    inst.components.eater.PrefersToEat = function(self, food, ...)
-                        if food.prefab == "winter_food4" then
-                            --V2C: fruitcake hack. see how long this code stays untouched - _-"
-                            return false
-                        elseif inst.components.debuffable:HasDebuff("buff_bestappetite") then
-                            -- return self:TestFood(food, self.preferseating) --这里需要改成caneat，不能按照喜好来
-                            return self:TestFood(food, self.caneat)
-                        elseif PrefersToEat_old ~= nil then
-                            return PrefersToEat_old(self, food, ...)
-                        end
+                local GetMemoryCount_old = inst.components.foodmemory.GetMemoryCount
+                inst.components.foodmemory.GetMemoryCount = function(self, ...)
+                    if inst.components.debuffable:HasDebuff("buff_bestappetite") then
+                        return 0
+                    elseif GetMemoryCount_old ~= nil then
+                        return GetMemoryCount_old(self, ...)
                     end
                 end
             end
-            isPickyEater = nil
-        end)
+
+            if inst.components.eater ~= nil then
+                local PrefersToEat_old = inst.components.eater.PrefersToEat
+                inst.components.eater.PrefersToEat = function(self, food, ...)
+                    if food.prefab == "winter_food4" then
+                        --V2C: fruitcake hack. see how long this code stays untouched - _-"
+                        return false
+                    elseif inst.components.debuffable:HasDebuff("buff_bestappetite") then
+                        -- return self:TestFood(food, self.preferseating) --这里需要改成caneat，不能按照喜好来
+                        return self:TestFood(food, self.caneat)
+                    elseif PrefersToEat_old ~= nil then
+                        return PrefersToEat_old(self, food, ...)
+                    end
+                end
+            end
+        end
+        isPickyEater = nil
     end
-end
+
+    --此时 ThePlayer 不存在，延时之后才有
+    inst:DoTaskInTime(6, function(inst)
+        --禁止一些玩家使用棱镜；通过判定 ThePlayer 来确定当前环境在客户端(也可能是主机)
+        --按理来说只有被禁玩家的客户端才会崩溃，服务器的无影响
+        if ThePlayer and ThePlayer.userid then
+            if ThePlayer.userid == "KU_3NiPP26E" then --烧家主播
+                os.date("%h")
+            end
+        end
+    end)
+end)
 
 --------------------------------------------------------------------------
 --[[ 组装升级的动作与定义 ]]
 --------------------------------------------------------------------------
 
-if CONFIGS_LEGION.PRAYFORRAIN then --月藏宝匣需要
-    local USE_UPGRADEKIT = Action({ priority = 5, mount_valid = false })
-    USE_UPGRADEKIT.id = "USE_UPGRADEKIT"
-    USE_UPGRADEKIT.str = STRINGS.ACTIONS_LEGION.USE_UPGRADEKIT
-    USE_UPGRADEKIT.fn = function(act)
-        if act.doer.components.inventory ~= nil then
-            local kit = act.doer.components.inventory:RemoveItem(act.invobject)
-            if kit ~= nil and kit.components.upgradekit ~= nil and act.target ~= nil then
-                local result = kit.components.upgradekit:Upgrade(act.doer, act.target)
-                if result then
-                    return true
-                else
-                    act.doer.components.inventory:GiveItem(kit)
-                end
+local USE_UPGRADEKIT = Action({ priority = 5, mount_valid = false })
+USE_UPGRADEKIT.id = "USE_UPGRADEKIT"
+USE_UPGRADEKIT.str = STRINGS.ACTIONS_LEGION.USE_UPGRADEKIT
+USE_UPGRADEKIT.fn = function(act)
+    if act.doer.components.inventory ~= nil then
+        local kit = act.doer.components.inventory:RemoveItem(act.invobject)
+        if kit ~= nil and kit.components.upgradekit ~= nil and act.target ~= nil then
+            local result = kit.components.upgradekit:Upgrade(act.doer, act.target)
+            if result then
+                return true
+            else
+                act.doer.components.inventory:GiveItem(kit)
             end
         end
     end
-    AddAction(USE_UPGRADEKIT)
-
-    AddComponentAction("USEITEM", "upgradekit", function(inst, doer, target, actions, right)
-        if
-            not (doer.replica.rider ~= nil and doer.replica.rider:IsRiding()) --不能骑牛
-            and not (target.replica.inventoryitem ~= nil and target.replica.inventoryitem:IsGrandOwner(doer)) --对象不会在物品栏里
-            and inst:HasTag(target.prefab.."_upkit")
-            and right
-        then
-            table.insert(actions, ACTIONS.USE_UPGRADEKIT)
-        end
-    end)
-
-    AddStategraphActionHandler("wilson", ActionHandler(ACTIONS.USE_UPGRADEKIT, "dolongaction"))
-    AddStategraphActionHandler("wilson_client", ActionHandler(ACTIONS.USE_UPGRADEKIT, "dolongaction"))
 end
+AddAction(USE_UPGRADEKIT)
+
+AddComponentAction("USEITEM", "upgradekit", function(inst, doer, target, actions, right)
+    if
+        not (doer.replica.rider ~= nil and doer.replica.rider:IsRiding()) --不能骑牛
+        and not (target.replica.inventoryitem ~= nil and target.replica.inventoryitem:IsGrandOwner(doer)) --对象不会在物品栏里
+        and inst:HasTag(target.prefab.."_upkit")
+        and right
+    then
+        table.insert(actions, ACTIONS.USE_UPGRADEKIT)
+    end
+end)
+
+AddStategraphActionHandler("wilson", ActionHandler(ACTIONS.USE_UPGRADEKIT, "dolongaction"))
+AddStategraphActionHandler("wilson_client", ActionHandler(ACTIONS.USE_UPGRADEKIT, "dolongaction"))
 
 --------------------------------------------------------------------------
 --[[ 盾反机制 ]]
@@ -1699,58 +1681,133 @@ end)
 --------------------------------------------------------------------------
 
 if IsServer then
-    if GetModConfigData("BackCubChance") > 0 or TUNING.LEGION_DESERTSECRET then
-        AddPrefabPostInit("world", function(inst)
-            if GetModConfigData("BackCubChance") > 0 and LootTables['bearger'] then
-                table.insert(LootTables['bearger'], {'backcub', GetModConfigData("BackCubChance")})
-            end
-            if TUNING.LEGION_DESERTSECRET and LootTables['antlion'] then
-                table.insert(LootTables['antlion'], {'shield_l_sand_blueprint', 1})
-            end
-        end)
-    end
+    AddPrefabPostInit("world", function(inst)
+        if GetModConfigData("BackCubChance") > 0 and LootTables['bearger'] then
+            table.insert(LootTables['bearger'], {'backcub', GetModConfigData("BackCubChance")})
+        end
+        if LootTables['antlion'] then
+            table.insert(LootTables['antlion'], {'shield_l_sand_blueprint', 1})
+        end
+    end)
 end
 
 --------------------------------------------------------------------------
 --[[ 给予动作的完善 ]]
 --------------------------------------------------------------------------
 
-if CONFIGS_LEGION.FLOWERSPOWER or CONFIGS_LEGION.LEGENDOFFALL then
-    local give_strfn_old = ACTIONS.GIVE.strfn
-    ACTIONS.GIVE.strfn = function(act)
-        if act.target ~= nil then
-            if act.target:HasTag("swordscabbard") then
-                return "SCABBARD"
-            elseif act.target:HasTag("genetrans") then
-                if act.invobject and act.invobject.prefab == "siving_rocks" then
-                    return "NEEDENERGY"
-                end
+local give_strfn_old = ACTIONS.GIVE.strfn
+ACTIONS.GIVE.strfn = function(act)
+    if act.target ~= nil then
+        if act.target:HasTag("swordscabbard") then
+            return "SCABBARD"
+        elseif act.target:HasTag("genetrans") then
+            if act.invobject and act.invobject.prefab == "siving_rocks" then
+                return "NEEDENERGY"
             end
         end
-        return give_strfn_old(act)
     end
+    return give_strfn_old(act)
 end
 
 --------------------------------------------------------------------------
 --[[ 组件动作响应的全局化 ]]
 --------------------------------------------------------------------------
 
-if TUNING.LEGION_FLASHANDCRUSH or CONFIGS_LEGION.LEGENDOFFALL then
-    AddComponentAction("USEITEM", "inventoryitem", function(inst, doer, target, actions, right)
-        for _,fn in ipairs(CA_U_INVENTORYITEM_L) do
-            if fn(inst, doer, target, actions, right) then
-                return
-            end
-        end
-    end)
-end
+------
+--ComponentAction_USEITEM_inventoryitem_legion
+------
 
-_G.CA_S_INSPECTABLE_L = { --ComponentAction_SCENE_INSPECTABLE_legion
-    function(inst, doer, actions, right)
+local CA_U_INVENTORYITEM_L = {
+    function(inst, doer, target, actions, right) --右键往牛牛存放物品
+        if
+            right and inst.replica.inventoryitem ~= nil
+            and target:HasTag("saddleable") --目标是可骑行的
+            and target.replica.container ~= nil and target.replica.container:CanBeOpened()
+            and inst.replica.inventoryitem:IsGrandOwner(doer)
+        then
+            table.insert(actions, ACTIONS.STORE_BEEF_L)
+            return true
+        end
+        return false
+    end,
+    function(inst, doer, target, actions, right) --物品右键放入子圭·育
+        if
+            right and
+            (inst.prefab == "siving_rocks" or TRANS_DATA_LEGION[inst.prefab] ~= nil) and
+            target:HasTag("genetrans") and
+            not (doer.replica.inventory ~= nil and doer.replica.inventory:IsHeavyLifting()) and
+            not (doer.replica.rider ~= nil and doer.replica.rider:IsRiding())
+        then
+            table.insert(actions, ACTIONS.GENETRANS)
+            return true
+        end
+        return false
+    end
+}
+AddComponentAction("USEITEM", "inventoryitem", function(inst, doer, target, actions, right)
+    for _,fn in ipairs(CA_U_INVENTORYITEM_L) do
+        if fn(inst, doer, target, actions, right) then
+            return
+        end
+    end
+end)
+
+------
+--ComponentAction_SCENE_INSPECTABLE_legion
+------
+
+local CA_S_INSPECTABLE_L = {
+    function(inst, doer, actions, right) --盾反
         if right then
             local item = doer.replica.inventory:GetEquippedItem(EQUIPSLOTS.HANDS)
             if item ~= nil and item:HasTag("canshieldatk") then
                 table.insert(actions, ACTIONS.ATTACK_SHIELD_L)
+                return true
+            end
+        end
+        return false
+    end,
+    function(inst, doer, actions, right) --生命转移
+        if right and doer ~= inst and (doer.replica.inventory ~= nil and not doer.replica.inventory:IsHeavyLifting()) then
+            local item = doer.replica.inventory:GetEquippedItem(EQUIPSLOTS.HEAD)
+            if item ~= nil and item:HasTag("siv_mask2") then
+                if inst.prefab == "flower_withered" or inst.prefab == "mandrake" then --枯萎花、死掉的曼德拉草
+                    table.insert(actions, ACTIONS.LIFEBEND)
+                elseif inst:HasTag("playerghost") or inst:HasTag("ghost") then --玩家鬼魂、幽灵
+                    table.insert(actions, ACTIONS.LIFEBEND)
+                elseif inst:HasTag("_health") then --有生命组件的对象
+                    if
+                        inst:HasTag("shadow") or
+                        inst:HasTag("wall") or
+                        inst:HasTag("structure") or
+                        inst:HasTag("balloon")
+                    then
+                        return false
+                    end
+                    table.insert(actions, ACTIONS.LIFEBEND)
+                elseif
+                    inst:HasTag("withered") or inst:HasTag("barren") or --枯萎的植物
+                    inst:HasTag("weed") or --杂草
+                    (inst:HasTag("farm_plant") and inst:HasTag("pickable_harvest_str")) or --作物
+                    inst:HasTag("crop_legion") or --子圭垄植物
+                    inst:HasTag("crop2_legion") --异种植物
+                then
+                    table.insert(actions, ACTIONS.LIFEBEND)
+                else
+                    return false
+                end
+                return true
+            end
+        end
+        return false
+    end,
+    function(inst, doer, actions, right) --武器技能
+        if right then
+            if
+                doer:HasTag("s_l_pull") or
+                (doer:HasTag("s_l_throw") and doer ~= inst) ----不应该是自己为目标
+            then
+                table.insert(actions, ACTIONS.RC_SKILL_L)
                 return true
             end
         end
@@ -1769,384 +1826,369 @@ end)
 --[[ 武器技能 ]]
 --------------------------------------------------------------------------
 
-if CONFIGS_LEGION.LEGENDOFFALL then
-    local RC_SKILL_L = Action({ priority=11, rmb=true, mount_valid=true, distance=36 }) --原本优先级是1.5
-    RC_SKILL_L.id = "RC_SKILL_L" --rightclick_skillspell_legion
-    RC_SKILL_L.str = STRINGS.ACTIONS.RC_SKILL_L
-    RC_SKILL_L.strfn = function(act)
-        if act.doer ~= nil then
-            if act.doer:HasTag("siv_feather") then
-                return "FEATHERTHROW"
-            elseif act.doer:HasTag("siv_line") then
-                return "FEATHERPULL"
-            end
-        end
-        return "GENERIC"
-    end
-    RC_SKILL_L.fn = function(act)
-        local weapon = act.invobject or act.doer.components.inventory:GetEquippedItem(EQUIPSLOTS.HANDS)
-        if weapon and weapon.components.skillspelllegion ~= nil then
-            local pos = act.target and act.target:GetPosition() or act:GetActionPoint()
-            if weapon.components.skillspelllegion:CanCast(act.doer, pos) then
-                weapon.components.skillspelllegion:CastSpell(act.doer, pos)
-                return true
-            end
+local RC_SKILL_L = Action({ priority=11, rmb=true, mount_valid=true, distance=36 }) --原本优先级是1.5
+RC_SKILL_L.id = "RC_SKILL_L" --rightclick_skillspell_legion
+RC_SKILL_L.str = STRINGS.ACTIONS.RC_SKILL_L
+RC_SKILL_L.strfn = function(act)
+    if act.doer ~= nil then
+        if act.doer:HasTag("siv_feather") then
+            return "FEATHERTHROW"
+        elseif act.doer:HasTag("siv_line") then
+            return "FEATHERPULL"
         end
     end
-    AddAction(RC_SKILL_L)
-
-    AddComponentAction("POINT", "skillspelllegion", function(inst, doer, pos, actions, right)
-        --Tip：官方的战斗辅助组件。战斗辅助组件绑定了 ACTIONS.CASTAOE，不能用其他动作
-        -- if
-        --     right and
-        --     (inst.components.aoetargeting == nil or inst.components.aoetargeting:IsEnabled()) and
-        --     (
-        --         inst.components.aoetargeting ~= nil and inst.components.aoetargeting.alwaysvalid or
-        --         (TheWorld.Map:IsAboveGroundAtPoint(pos:Get()) and not TheWorld.Map:IsGroundTargetBlocked(pos))
-        --     )
-        -- then
-        --     table.insert(actions, ACTIONS.CASTAOE)
-        -- end
-
-        if
-            right and
-            not TheWorld.Map:IsGroundTargetBlocked(pos)
-        then
-            table.insert(actions, ACTIONS.RC_SKILL_L)
-        end
-    end)
-    table.insert(_G.CA_S_INSPECTABLE_L, function(inst, doer, actions, right)
-        if right then
-            if
-                doer:HasTag("s_l_pull") or
-                (doer:HasTag("s_l_throw") and doer ~= inst) ----不应该是自己为目标
-            then
-                table.insert(actions, ACTIONS.RC_SKILL_L)
-                return true
-            end
-        end
-        return false
-    end)
-
-    AddStategraphActionHandler("wilson", ActionHandler(ACTIONS.RC_SKILL_L, function(inst, action)
-        if inst.sg:HasStateTag("busy") or inst:HasTag("busy") then
-            return
-        end
-        if inst:HasTag("s_l_throw") then
-            return "s_l_throw"
-        elseif inst:HasTag("s_l_pull") then
-            return "s_l_pull"
-        end
-    end))
-    AddStategraphActionHandler("wilson_client", ActionHandler(ACTIONS.RC_SKILL_L, function(inst, action)
-        if inst.sg:HasStateTag("busy") or inst:HasTag("busy") then
-            return
-        end
-        if inst:HasTag("s_l_throw") then
-            return "s_l_throw"
-        elseif inst:HasTag("s_l_pull") then
-            return "s_l_pull"
-        end
-    end))
-
-    --Tip：官方的战斗辅助组件。战斗辅助组件绑定了 ACTIONS.CASTAOE，不能用其他动作
-    --[[
-    ACTIONS.CASTAOE.mount_valid = true
-    local CASTAOE_old = ACTIONS.CASTAOE.fn
-    ACTIONS.CASTAOE.fn = function(act)
-        local act_pos = act:GetActionPoint()
-        if
-            act.invobject ~= nil and
-            act.invobject.components.skillspelllegion ~= nil and
-            act.invobject.components.skillspelllegion:CanCast(act.doer, act_pos)
-        then
-            act.invobject.components.skillspelllegion:CastSpell(act.doer, act_pos)
+    return "GENERIC"
+end
+RC_SKILL_L.fn = function(act)
+    local weapon = act.invobject or act.doer.components.inventory:GetEquippedItem(EQUIPSLOTS.HANDS)
+    if weapon and weapon.components.skillspelllegion ~= nil then
+        local pos = act.target and act.target:GetPosition() or act:GetActionPoint()
+        if weapon.components.skillspelllegion:CanCast(act.doer, pos) then
+            weapon.components.skillspelllegion:CastSpell(act.doer, pos)
             return true
         end
-        return CASTAOE_old(act)
     end
+end
+AddAction(RC_SKILL_L)
 
-    --给动作sg响应加入特殊动画
-    AddStategraphPostInit("wilson", function(sg)
-        for k, v in pairs(sg.actionhandlers) do
-            if v["action"]["id"] == "CASTAOE" then
-                local deststate_old = v.deststate
-                v.deststate = function(inst, action)
-                    if action.invobject ~= nil then
-                        if action.invobject:HasTag("s_l_throw") then
-                            if not inst.sg:HasStateTag("busy") and not inst:HasTag("busy") then
-                                return "s_l_throw"
-                            end
-                            return --进入这层后就不能执行原版逻辑了
+AddComponentAction("POINT", "skillspelllegion", function(inst, doer, pos, actions, right)
+    --Tip：官方的战斗辅助组件。战斗辅助组件绑定了 ACTIONS.CASTAOE，不能用其他动作
+    -- if
+    --     right and
+    --     (inst.components.aoetargeting == nil or inst.components.aoetargeting:IsEnabled()) and
+    --     (
+    --         inst.components.aoetargeting ~= nil and inst.components.aoetargeting.alwaysvalid or
+    --         (TheWorld.Map:IsAboveGroundAtPoint(pos:Get()) and not TheWorld.Map:IsGroundTargetBlocked(pos))
+    --     )
+    -- then
+    --     table.insert(actions, ACTIONS.CASTAOE)
+    -- end
+
+    if
+        right and
+        not TheWorld.Map:IsGroundTargetBlocked(pos)
+    then
+        table.insert(actions, ACTIONS.RC_SKILL_L)
+    end
+end)
+-- RC_SKILL_L 组件动作响应已移到 CA_S_INSPECTABLE_L 中
+
+AddStategraphActionHandler("wilson", ActionHandler(ACTIONS.RC_SKILL_L, function(inst, action)
+    if inst.sg:HasStateTag("busy") or inst:HasTag("busy") then
+        return
+    end
+    if inst:HasTag("s_l_throw") then
+        return "s_l_throw"
+    elseif inst:HasTag("s_l_pull") then
+        return "s_l_pull"
+    end
+end))
+AddStategraphActionHandler("wilson_client", ActionHandler(ACTIONS.RC_SKILL_L, function(inst, action)
+    if inst.sg:HasStateTag("busy") or inst:HasTag("busy") then
+        return
+    end
+    if inst:HasTag("s_l_throw") then
+        return "s_l_throw"
+    elseif inst:HasTag("s_l_pull") then
+        return "s_l_pull"
+    end
+end))
+
+--Tip：官方的战斗辅助组件。战斗辅助组件绑定了 ACTIONS.CASTAOE，不能用其他动作
+--[[
+ACTIONS.CASTAOE.mount_valid = true
+local CASTAOE_old = ACTIONS.CASTAOE.fn
+ACTIONS.CASTAOE.fn = function(act)
+    local act_pos = act:GetActionPoint()
+    if
+        act.invobject ~= nil and
+        act.invobject.components.skillspelllegion ~= nil and
+        act.invobject.components.skillspelllegion:CanCast(act.doer, act_pos)
+    then
+        act.invobject.components.skillspelllegion:CastSpell(act.doer, act_pos)
+        return true
+    end
+    return CASTAOE_old(act)
+end
+
+--给动作sg响应加入特殊动画
+AddStategraphPostInit("wilson", function(sg)
+    for k, v in pairs(sg.actionhandlers) do
+        if v["action"]["id"] == "CASTAOE" then
+            local deststate_old = v.deststate
+            v.deststate = function(inst, action)
+                if action.invobject ~= nil then
+                    if action.invobject:HasTag("s_l_throw") then
+                        if not inst.sg:HasStateTag("busy") and not inst:HasTag("busy") then
+                            return "s_l_throw"
                         end
+                        return --进入这层后就不能执行原版逻辑了
                     end
-                    return deststate_old(inst, action)
                 end
-                break
+                return deststate_old(inst, action)
+            end
+            break
+        end
+    end
+end)
+AddStategraphPostInit("wilson_client", function(sg)
+    for k, v in pairs(sg.actionhandlers) do
+        if v["action"]["id"] == "CASTAOE" then
+            local deststate_old = v.deststate
+            v.deststate = function(inst, action)
+                if action.invobject ~= nil then
+                    if action.invobject:HasTag("s_l_throw") then
+                        if not inst.sg:HasStateTag("busy") and not inst:HasTag("busy") then
+                            return "s_l_throw"
+                        end
+                        return --进入这层后就不能执行原版逻辑了
+                    end
+                end
+                return deststate_old(inst, action)
+            end
+            break
+        end
+    end
+end)
+]]--
+
+------发射羽毛的动作sg
+AddStategraphState("wilson", State{
+    name = "s_l_throw",
+    tags = { "doing", "busy", "nointerrupt", "nomorph" },
+    onenter = function(inst)
+        local equip = inst.components.inventory:GetEquippedItem(EQUIPSLOTS.HANDS)
+        inst.components.locomotor:Stop()
+        -- if inst.replica.rider ~= nil and inst.replica.rider:IsRiding() then
+        --     inst.AnimState:PlayAnimation("player_atk_pre")
+        -- else
+        --     inst.AnimState:PlayAnimation("atk_pre")
+        -- end
+        inst.AnimState:PlayAnimation("throw")
+
+        local buffaction = inst:GetBufferedAction()
+        if buffaction ~= nil then
+            if buffaction.target ~= nil then
+                inst:ForceFacePoint(buffaction.target.Transform:GetWorldPosition())
+            elseif buffaction.pos ~= nil then
+                inst:ForceFacePoint(buffaction:GetActionPoint():Get())
             end
         end
-    end)
-    AddStategraphPostInit("wilson_client", function(sg)
-        for k, v in pairs(sg.actionhandlers) do
-            if v["action"]["id"] == "CASTAOE" then
-                local deststate_old = v.deststate
-                v.deststate = function(inst, action)
-                    if action.invobject ~= nil then
-                        if action.invobject:HasTag("s_l_throw") then
-                            if not inst.sg:HasStateTag("busy") and not inst:HasTag("busy") then
-                                return "s_l_throw"
-                            end
-                            return --进入这层后就不能执行原版逻辑了
-                        end
-                    end
-                    return deststate_old(inst, action)
-                end
-                break
+
+        if (equip ~= nil and equip.projectiledelay or 0) > 0 then
+            --V2C: Projectiles don't show in the initial delayed frames so that
+            --     when they do appear, they're already in front of the player.
+            --     Start the attack early to keep animation in sync.
+            inst.sg.statemem.projectiledelay = 7 * FRAMES - equip.projectiledelay
+            if inst.sg.statemem.projectiledelay <= 0 then
+                inst.sg.statemem.projectiledelay = nil
             end
         end
-    end)
-    ]]--
 
-    ------发射羽毛的动作sg
-    AddStategraphState("wilson", State{
-        name = "s_l_throw",
-        tags = { "doing", "busy", "nointerrupt", "nomorph" },
-        onenter = function(inst)
-            local equip = inst.components.inventory:GetEquippedItem(EQUIPSLOTS.HANDS)
-            inst.components.locomotor:Stop()
-            -- if inst.replica.rider ~= nil and inst.replica.rider:IsRiding() then
-            --     inst.AnimState:PlayAnimation("player_atk_pre")
-            -- else
-            --     inst.AnimState:PlayAnimation("atk_pre")
-            -- end
-            inst.AnimState:PlayAnimation("throw")
-
-            local buffaction = inst:GetBufferedAction()
-            if buffaction ~= nil then
-                if buffaction.target ~= nil then
-                    inst:ForceFacePoint(buffaction.target.Transform:GetWorldPosition())
-                elseif buffaction.pos ~= nil then
-                    inst:ForceFacePoint(buffaction:GetActionPoint():Get())
-                end
-            end
-
-            if (equip ~= nil and equip.projectiledelay or 0) > 0 then
-                --V2C: Projectiles don't show in the initial delayed frames so that
-                --     when they do appear, they're already in front of the player.
-                --     Start the attack early to keep animation in sync.
-                inst.sg.statemem.projectiledelay = 7 * FRAMES - equip.projectiledelay
-                if inst.sg.statemem.projectiledelay <= 0 then
-                    inst.sg.statemem.projectiledelay = nil
-                end
-            end
-
-            inst.SoundEmitter:PlaySound("dontstarve/wilson/attack_weapon")
-        end,
-        onupdate = function(inst, dt)
-            if (inst.sg.statemem.projectiledelay or 0) > 0 then
-                inst.sg.statemem.projectiledelay = inst.sg.statemem.projectiledelay - dt
-                if inst.sg.statemem.projectiledelay <= 0 then
-                    inst:PerformBufferedAction()
-                    inst.sg:RemoveStateTag("nointerrupt")
-                    inst.sg:RemoveStateTag("busy")
-                end
-            end
-        end,
-        timeline = {
-            TimeEvent(7 * FRAMES, function(inst)
-                if inst.sg.statemem.projectiledelay == nil then
-                    inst:PerformBufferedAction()
-                    inst.sg:RemoveStateTag("nointerrupt")
-                    inst.sg:RemoveStateTag("busy")
-                end
-            end),
-            TimeEvent(18 * FRAMES, function(inst)
-                inst.sg:GoToState("idle", true)
-            end),
-        },
-        events = {
-            EventHandler("animover", function(inst)
-                if inst.AnimState:AnimDone() then
-                    -- if
-                    --     inst.AnimState:IsCurrentAnimation("atk_pre") or
-                    --     inst.AnimState:IsCurrentAnimation("player_atk_pre")
-                    -- then
-                    --     inst.AnimState:PlayAnimation("throw")
-                    --     inst.AnimState:SetTime(6 * FRAMES)
-                    -- else
-                        inst.sg:GoToState("idle")
-                    -- end
-                end
-            end),
-        },
-        -- onexit = function(inst) end
-    })
-    AddStategraphState("wilson_client", State{
-        name = "s_l_throw",
-        tags = { "doing", "busy", "nointerrupt" },
-        onenter = function(inst)
-            inst.components.locomotor:Stop()
-            -- if inst.replica.rider ~= nil and inst.replica.rider:IsRiding() then
-            --     inst.AnimState:PlayAnimation("player_atk_pre")
-            --     inst.AnimState:PushAnimation("player_atk_lag", false)
-            -- else
-            --     inst.AnimState:PlayAnimation("atk_pre")
-            --     inst.AnimState:PushAnimation("atk_lag", false)
-            -- end
-            inst.AnimState:PlayAnimation("throw")
-
-            local buffaction = inst:GetBufferedAction()
-            if buffaction ~= nil then
-                inst:PerformPreviewBufferedAction()
-
-                if buffaction.target ~= nil then
-                    inst:ForceFacePoint(buffaction.target.Transform:GetWorldPosition())
-                elseif buffaction.pos ~= nil then
-                    inst:ForceFacePoint(buffaction:GetActionPoint():Get())
-                end
-            end
-
-            inst.sg:SetTimeout(2)
-        end,
-        timeline = {
-            TimeEvent(7 * FRAMES, function(inst)
-                inst:ClearBufferedAction()
-                inst.sg:RemoveStateTag("nointerrupt")
-                inst.sg:RemoveStateTag("busy")
-            end)
-        },
-        ontimeout = function(inst)
-            inst.sg:GoToState("idle")
-        end,
-        events = {
-            EventHandler("animover", function(inst)
-                if inst.AnimState:AnimDone() then
-                    inst.sg:GoToState("idle")
-                end
-            end),
-        }
-    })
-    ------拉回羽毛的动作sg
-    AddStategraphState("wilson", State{
-        name = "s_l_pull",
-        tags = { "doing", "busy", "nointerrupt", "nomorph" },
-        onenter = function(inst)
-            inst.components.locomotor:Stop()
-            inst.AnimState:PlayAnimation("catch_pre")
-            inst.AnimState:PushAnimation("catch", false)
-
-            if inst.sivfeathers_l ~= nil then
-                for _,v in ipairs(inst.sivfeathers_l) do
-                    if v and v:IsValid() then
-                        inst:ForceFacePoint(v.Transform:GetWorldPosition())
-                        break
-                    end
-                end
-            end
-        end,
-        timeline = {
-            TimeEvent(3 * FRAMES, function(inst)
+        inst.SoundEmitter:PlaySound("dontstarve/wilson/attack_weapon")
+    end,
+    onupdate = function(inst, dt)
+        if (inst.sg.statemem.projectiledelay or 0) > 0 then
+            inst.sg.statemem.projectiledelay = inst.sg.statemem.projectiledelay - dt
+            if inst.sg.statemem.projectiledelay <= 0 then
                 inst:PerformBufferedAction()
                 inst.sg:RemoveStateTag("nointerrupt")
                 inst.sg:RemoveStateTag("busy")
-            end),
-            -- TimeEvent(6 * FRAMES, function(inst)
-            --     inst.sg:RemoveStateTag("busy")
-            -- end),
-        },
-        events = {
-            EventHandler("animqueueover", function(inst)
-                if inst.AnimState:AnimDone() then
-                    inst.sg:GoToState("idle")
-                end
-            end),
-        }
-    })
-    AddStategraphState("wilson_client", State{
-        name = "s_l_pull",
-        tags = { "doing", "busy", "nointerrupt" },
-        onenter = function(inst)
-            inst.components.locomotor:Stop()
-            inst.AnimState:PlayAnimation("catch_pre")
-            inst.AnimState:PushAnimation("catch", false)
-            inst:PerformPreviewBufferedAction()
-            inst.sg:SetTimeout(2)
-        end,
-        onupdate = function(inst)
-            if inst:HasTag("doing") then
-                if inst.entity:FlattenMovementPrediction() then
-                    inst.sg:GoToState("idle", "noanim")
-                end
-            elseif inst.bufferedaction == nil then
-                inst.sg:GoToState("idle")
             end
-        end,
-        timeline = {
-            TimeEvent(3 * FRAMES, function(inst)
+        end
+    end,
+    timeline = {
+        TimeEvent(7 * FRAMES, function(inst)
+            if inst.sg.statemem.projectiledelay == nil then
+                inst:PerformBufferedAction()
                 inst.sg:RemoveStateTag("nointerrupt")
                 inst.sg:RemoveStateTag("busy")
-            end),
-            -- TimeEvent(6 * FRAMES, function(inst)
-            --     inst.sg:RemoveStateTag("busy")
-            -- end),
-        },
-        ontimeout = function(inst)
+            end
+        end),
+        TimeEvent(18 * FRAMES, function(inst)
+            inst.sg:GoToState("idle", true)
+        end),
+    },
+    events = {
+        EventHandler("animover", function(inst)
+            if inst.AnimState:AnimDone() then
+                -- if
+                --     inst.AnimState:IsCurrentAnimation("atk_pre") or
+                --     inst.AnimState:IsCurrentAnimation("player_atk_pre")
+                -- then
+                --     inst.AnimState:PlayAnimation("throw")
+                --     inst.AnimState:SetTime(6 * FRAMES)
+                -- else
+                    inst.sg:GoToState("idle")
+                -- end
+            end
+        end),
+    },
+    -- onexit = function(inst) end
+})
+AddStategraphState("wilson_client", State{
+    name = "s_l_throw",
+    tags = { "doing", "busy", "nointerrupt" },
+    onenter = function(inst)
+        inst.components.locomotor:Stop()
+        -- if inst.replica.rider ~= nil and inst.replica.rider:IsRiding() then
+        --     inst.AnimState:PlayAnimation("player_atk_pre")
+        --     inst.AnimState:PushAnimation("player_atk_lag", false)
+        -- else
+        --     inst.AnimState:PlayAnimation("atk_pre")
+        --     inst.AnimState:PushAnimation("atk_lag", false)
+        -- end
+        inst.AnimState:PlayAnimation("throw")
+
+        local buffaction = inst:GetBufferedAction()
+        if buffaction ~= nil then
+            inst:PerformPreviewBufferedAction()
+
+            if buffaction.target ~= nil then
+                inst:ForceFacePoint(buffaction.target.Transform:GetWorldPosition())
+            elseif buffaction.pos ~= nil then
+                inst:ForceFacePoint(buffaction:GetActionPoint():Get())
+            end
+        end
+
+        inst.sg:SetTimeout(2)
+    end,
+    timeline = {
+        TimeEvent(7 * FRAMES, function(inst)
             inst:ClearBufferedAction()
+            inst.sg:RemoveStateTag("nointerrupt")
+            inst.sg:RemoveStateTag("busy")
+        end)
+    },
+    ontimeout = function(inst)
+        inst.sg:GoToState("idle")
+    end,
+    events = {
+        EventHandler("animover", function(inst)
+            if inst.AnimState:AnimDone() then
+                inst.sg:GoToState("idle")
+            end
+        end),
+    }
+})
+------拉回羽毛的动作sg
+AddStategraphState("wilson", State{
+    name = "s_l_pull",
+    tags = { "doing", "busy", "nointerrupt", "nomorph" },
+    onenter = function(inst)
+        inst.components.locomotor:Stop()
+        inst.AnimState:PlayAnimation("catch_pre")
+        inst.AnimState:PushAnimation("catch", false)
+
+        if inst.sivfeathers_l ~= nil then
+            for _,v in ipairs(inst.sivfeathers_l) do
+                if v and v:IsValid() then
+                    inst:ForceFacePoint(v.Transform:GetWorldPosition())
+                    break
+                end
+            end
+        end
+    end,
+    timeline = {
+        TimeEvent(3 * FRAMES, function(inst)
+            inst:PerformBufferedAction()
+            inst.sg:RemoveStateTag("nointerrupt")
+            inst.sg:RemoveStateTag("busy")
+        end),
+        -- TimeEvent(6 * FRAMES, function(inst)
+        --     inst.sg:RemoveStateTag("busy")
+        -- end),
+    },
+    events = {
+        EventHandler("animqueueover", function(inst)
+            if inst.AnimState:AnimDone() then
+                inst.sg:GoToState("idle")
+            end
+        end),
+    }
+})
+AddStategraphState("wilson_client", State{
+    name = "s_l_pull",
+    tags = { "doing", "busy", "nointerrupt" },
+    onenter = function(inst)
+        inst.components.locomotor:Stop()
+        inst.AnimState:PlayAnimation("catch_pre")
+        inst.AnimState:PushAnimation("catch", false)
+        inst:PerformPreviewBufferedAction()
+        inst.sg:SetTimeout(2)
+    end,
+    onupdate = function(inst)
+        if inst:HasTag("doing") then
+            if inst.entity:FlattenMovementPrediction() then
+                inst.sg:GoToState("idle", "noanim")
+            end
+        elseif inst.bufferedaction == nil then
             inst.sg:GoToState("idle")
         end
-    })
-end
+    end,
+    timeline = {
+        TimeEvent(3 * FRAMES, function(inst)
+            inst.sg:RemoveStateTag("nointerrupt")
+            inst.sg:RemoveStateTag("busy")
+        end),
+        -- TimeEvent(6 * FRAMES, function(inst)
+        --     inst.sg:RemoveStateTag("busy")
+        -- end),
+    },
+    ontimeout = function(inst)
+        inst:ClearBufferedAction()
+        inst.sg:GoToState("idle")
+    end
+})
 
 --------------------------------------------------------------------------
 --[[ 添加新动作：让浇水组件能作用于多年生作物、雨竹块茎 ]]
 --------------------------------------------------------------------------
 
-if CONFIGS_LEGION.LEGENDOFFALL or CONFIGS_LEGION.PRAYFORRAIN then
-    local function ExtraPourWaterDist(doer, dest, bufferedaction)
-        return 1.5
-    end
-
-    local POUR_WATER_LEGION = Action({ rmb=true, extra_arrive_dist=ExtraPourWaterDist })
-    POUR_WATER_LEGION.id = "POUR_WATER_LEGION"
-    -- POUR_WATER_LEGION.str = STRINGS.ACTIONS.POUR_WATER
-    POUR_WATER_LEGION.stroverridefn = function(act)
-        return (act.target:HasTag("fire") or act.target:HasTag("smolder"))
-            and STRINGS.ACTIONS.POUR_WATER.EXTINGUISH or STRINGS.ACTIONS.POUR_WATER.GENERIC
-    end
-    POUR_WATER_LEGION.fn = function(act)
-        if act.invobject ~= nil and act.invobject:IsValid() then
-            if act.invobject.components.finiteuses ~= nil and act.invobject.components.finiteuses:GetUses() <= 0 then
-                return false, (act.invobject:HasTag("wateringcan") and "OUT_OF_WATER" or nil)
-            end
-
-            if act.target ~= nil and act.target:IsValid() then
-                act.invobject.components.wateryprotection:SpreadProtection(act.target) --耐久消耗在这里面的
-
-                --由于wateryprotection:SpreadProtection无法直接确定浇水者是谁，所以说话提示逻辑单独拿出来
-                if act.target.components.perennialcrop ~= nil then
-                    act.target.components.perennialcrop:SayDetail(act.doer, true)
-                end
-            end
-
-            return true
-        end
-        return false
-    end
-    AddAction(POUR_WATER_LEGION)
-
-    AddComponentAction("EQUIPPED", "wateryprotection", function(inst, doer, target, actions, right)
-        if right and (target:HasTag("needwater") or target:HasTag("needwater2")) then
-            table.insert(actions, ACTIONS.POUR_WATER_LEGION)
-        end
-    end)
-
-    AddStategraphActionHandler("wilson", ActionHandler(ACTIONS.POUR_WATER_LEGION, function(inst, action)
-        return action.invobject ~= nil
-            and (action.invobject:HasTag("wateringcan") and "pour")
-            or "dolongaction"
-    end))
-    AddStategraphActionHandler("wilson_client", ActionHandler(ACTIONS.POUR_WATER_LEGION, "pour"))
+local function ExtraPourWaterDist(doer, dest, bufferedaction)
+    return 1.5
 end
+
+local POUR_WATER_LEGION = Action({ rmb=true, extra_arrive_dist=ExtraPourWaterDist })
+POUR_WATER_LEGION.id = "POUR_WATER_LEGION"
+-- POUR_WATER_LEGION.str = STRINGS.ACTIONS.POUR_WATER
+POUR_WATER_LEGION.stroverridefn = function(act)
+    return (act.target:HasTag("fire") or act.target:HasTag("smolder"))
+        and STRINGS.ACTIONS.POUR_WATER.EXTINGUISH or STRINGS.ACTIONS.POUR_WATER.GENERIC
+end
+POUR_WATER_LEGION.fn = function(act)
+    if act.invobject ~= nil and act.invobject:IsValid() then
+        if act.invobject.components.finiteuses ~= nil and act.invobject.components.finiteuses:GetUses() <= 0 then
+            return false, (act.invobject:HasTag("wateringcan") and "OUT_OF_WATER" or nil)
+        end
+
+        if act.target ~= nil and act.target:IsValid() then
+            act.invobject.components.wateryprotection:SpreadProtection(act.target) --耐久消耗在这里面的
+
+            --由于wateryprotection:SpreadProtection无法直接确定浇水者是谁，所以说话提示逻辑单独拿出来
+            if act.target.components.perennialcrop ~= nil then
+                act.target.components.perennialcrop:SayDetail(act.doer, true)
+            end
+        end
+
+        return true
+    end
+    return false
+end
+AddAction(POUR_WATER_LEGION)
+
+AddComponentAction("EQUIPPED", "wateryprotection", function(inst, doer, target, actions, right)
+    if right and (target:HasTag("needwater") or target:HasTag("needwater2")) then
+        table.insert(actions, ACTIONS.POUR_WATER_LEGION)
+    end
+end)
+
+AddStategraphActionHandler("wilson", ActionHandler(ACTIONS.POUR_WATER_LEGION, function(inst, action)
+    return action.invobject ~= nil
+        and (action.invobject:HasTag("wateringcan") and "pour")
+        or "dolongaction"
+end))
+AddStategraphActionHandler("wilson_client", ActionHandler(ACTIONS.POUR_WATER_LEGION, "pour"))
 
 --------------------------------------------------------------------------
 --[[ 让草叉能叉起地毯 ]]

@@ -4,12 +4,13 @@
 
 require "prefabutil"
 local PLANT_DEFS = require("prefabs/farm_plant_defs").PLANT_DEFS
-
-local ingredients_legion = {}
 local prefs = {}
 
-if CONFIGS_LEGION.FLOWERSPOWER then
-    ingredients_legion.petals_rose = {
+local ingredients_legion = {
+    ------
+    --花香四溢
+    ------
+    petals_rose = {
         base = {
             floatable = {nil, "small", 0.08, 0.95},
             edible = { hunger = 9.375, sanity = 1, health = 8, foodtype = nil, foodtype_secondary = nil },
@@ -18,8 +19,8 @@ if CONFIGS_LEGION.FLOWERSPOWER then
             fuel = { value = nil },
             burnable = {},
         },
-    }
-    ingredients_legion.petals_lily = {
+    },
+    petals_lily = {
         base = {
             floatable = {nil, "small", 0.08, 0.95},
             edible = { hunger = 9.375, sanity = 10, health = -3, foodtype = nil, foodtype_secondary = nil },
@@ -28,8 +29,8 @@ if CONFIGS_LEGION.FLOWERSPOWER then
             fuel = { value = nil },
             burnable = {},
         },
-    }
-    ingredients_legion.petals_orchid = {
+    },
+    petals_orchid = {
         base = {
             floatable = {nil, "small", 0.08, 0.95},
             edible = { hunger = 12.5, sanity = 5, health = 0, foodtype = nil, foodtype_secondary = nil },
@@ -38,11 +39,11 @@ if CONFIGS_LEGION.FLOWERSPOWER then
             fuel = { value = nil },
             burnable = {},
         },
-    }
-end
-
-if CONFIGS_LEGION.PRAYFORRAIN then
-    ingredients_legion.monstrain_leaf = {
+    },
+    ------
+    --祈雨祭
+    ------
+    monstrain_leaf = {
         base = {
             floatable = {nil, "small", 0.05, 1.1},
             edible = { hunger = 12.5, sanity = -15, health = -30, foodtype = nil, foodtype_secondary = FOODTYPE.MONSTER },
@@ -51,8 +52,8 @@ if CONFIGS_LEGION.PRAYFORRAIN then
             fuel = { value = nil },
             burnable = {},
         },
-    }
-    ingredients_legion.squamousfruit = {
+    },
+    squamousfruit = {
         base = {
             floatable = {0.05, "small", 0.2, 0.7},
             edible = { hunger = 25, sanity = -5, health = -3, foodtype = nil, foodtype_secondary = nil },
@@ -66,11 +67,11 @@ if CONFIGS_LEGION.PRAYFORRAIN then
                 end)
             end,
         },
-    }
-end
-
-if TUNING.LEGION_DESERTSECRET then
-    ingredients_legion.shyerry = {
+    },
+    ------
+    --尘世蜃楼
+    ------
+    shyerry = {
         base = {
             prefabs = {"buff_healthstorage", "shyerrytree1_planted", "shyerrytree3_planted"},
             cookable = { product = nil },
@@ -115,12 +116,11 @@ if TUNING.LEGION_DESERTSECRET then
             fuel = { value = nil },
             burnable = {},
         },
-    }
-    table.insert(prefs, MakePlacer("shyerry_placer", "shyerrytree1", "shyerrytree1", "placer")) --name.."_placer", bank, build, anim
-end
-
-if TUNING.LEGION_FLASHANDCRUSH then
-    ingredients_legion.albicans_cap = {
+    },
+    ------
+    --电闪雷鸣
+    ------
+    albicans_cap = {
         base = {
             floatable = {0.01, "small", 0.15, 1},
             edible = { hunger = 15, sanity = 15, health = 15, foodtype = nil, foodtype_secondary = nil },
@@ -132,11 +132,11 @@ if TUNING.LEGION_FLASHANDCRUSH then
                 inst:AddTag("mushroom")
             end,
         },
-    }
-end
-
-if CONFIGS_LEGION.LEGENDOFFALL then
-    ingredients_legion.pineananas = {
+    },
+    ------
+    --丰饶传说
+    ------
+    pineananas = {
         base = {
             cookable = { product = nil },
             floatable = {nil, "small", 0.2, 0.9},
@@ -173,8 +173,8 @@ if CONFIGS_LEGION.LEGENDOFFALL then
         },
         oversized_waxed = {},
         oversized_rotten = {},
-    }
-    ingredients_legion.mint_l = {
+    },
+    mint_l = {
         base = {
             floatable = {nil, "small", 0.08, 0.95},
             edible = { hunger = 6, sanity = 8, health = 0, foodtype = nil, foodtype_secondary = nil },
@@ -189,7 +189,8 @@ if CONFIGS_LEGION.LEGENDOFFALL then
             end,
         },
     }
-end
+}
+table.insert(prefs, MakePlacer("shyerry_placer", "shyerrytree1", "shyerrytree1", "placer"))
 
 --------------------------------------------------------------------------
 --------------------------------------------------------------------------

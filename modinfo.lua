@@ -99,27 +99,6 @@ configuration_options = {
         default = "",
     },
     L and {
-        name = "FlowersPower",
-        label = "Flowers\' Power",
-        hover = "Allow \'the power of flowers\' to be added.",
-        options = 
-        {
-            {description = "Yes", data = true},
-            {description = "No", data = false},
-        },
-        default = true,
-    } or {
-        name = "FlowersPower",
-        label = "开启\"花香四溢\"",
-        hover = "允许添加\"花香四溢\"的内容。最好的报复是美丽，最美的盛开是反击！",
-        options = 
-        {
-            {description = "是", data = true},
-            {description = "否", data = false},
-        },
-        default = true,
-    },
-    L and {
         name = "FlowerWeaponsChance",
         label = "Flower Weapons Chance",
         hover = "Set the chance to get flower weapons.",
@@ -206,27 +185,6 @@ configuration_options = {
         default = "",
     },
     L and {
-        name = "SuperbCuisine",
-        label = "Superb Cuisine",
-        hover = "Allow \'superb cuisine\' to be added.",
-        options =
-        {
-            {description = "Yes", data = true},
-            {description = "No", data = false},
-        },
-        default = true,
-    } or {
-        name = "SuperbCuisine",
-        label = "开启\"美味佳肴\"",
-        hover = "允许添加\"美味佳肴\"的内容。给孤独的味蕾增添新的色彩。",
-        options =
-        {
-            {description = "是", data = true},
-            {description = "否", data = false},
-        },
-        default = true,
-    },
-    L and {
         name = "FestivalRecipes",
         label = "Festival Recipes",
         hover = "Open Festival recipes.",
@@ -277,27 +235,6 @@ configuration_options = {
         label = L and "TheSacrificeOfRain" or "祈雨祭",
         options = {{description = "", data = ""},},
         default = "",
-    },
-    L and {
-        name = "PrayForRain",
-        label = "Pray For Rain",
-        hover = "Allow \'the sacrifice of rain\' to be added.",
-        options =
-        {
-            {description = "Yes", data = true},
-            {description = "No", data = false},
-        },
-        default = true,
-    } or {
-        name = "PrayForRain",
-        label = "开启\"祈雨祭\"",
-        hover = "允许添加\"祈雨祭\"的内容。不管是阴还是晴，都是祈求自然而受的恩惠。",
-        options =
-        {
-            {description = "是", data = true},
-            {description = "否", data = false},
-        },
-        default = true,
     },
     L and {
         name = "BookRecipetabs",
@@ -389,27 +326,6 @@ configuration_options = {
         label = L and "LegendOfFall" or "丰饶传说",
         options = {{description = "", data = ""},},
         default = "",
-    },
-    L and {
-        name = "LegendOfFall",
-        label = "Legend Of Fall",
-        hover = "Allow \'legend of fall\' to be added.",
-        options =
-        {
-            {description = "Yes", data = true},
-            {description = "No", data = false},
-        },
-        default = true,
-    } or {
-        name = "LegendOfFall",
-        label = "开启\"丰饶传说\"",
-        hover = "允许添加\"丰饶传说\"的内容。如果有一天我能够拥有一个大果园，我愿放下所有追求做个农夫去种田。",
-        options =
-        {
-            {description = "是", data = true},
-            {description = "否", data = false},
-        },
-        default = true,
     },
     -- L and {
     --     name = "GrowthRate",
@@ -630,27 +546,6 @@ configuration_options = {
         default = "",
     },
     L and {
-        name = "FlashAndCrush",
-        label = "Flash And Crush",
-        hover = "Allow \'flash and crush\' to be added.",
-        options =
-        {
-            {description = "Yes", data = true},
-            {description = "No", data = false},
-        },
-        default = true,
-    } or {
-        name = "FlashAndCrush",
-        label = "开启\"电闪雷鸣\"",
-        hover = "允许添加\"电闪雷鸣\"的内容。电气的力量带来了科技的发展。",
-        options =
-        {
-            {description = "是", data = true},
-            {description = "否", data = false},
-        },
-        default = true,
-    },
-    L and {
         name = "TechUnlock",
         label = "Tech Unlock",
         hover = "Set up ways to unlock new techs.",
@@ -680,27 +575,6 @@ configuration_options = {
         label = L and "DesertSecret" or "尘市蜃楼",
         options = {{description = "", data = ""},},
         default = "",
-    },
-    L and {
-        name = "DesertSecret",
-        label = "The Desert Secret",
-        hover = "Allow \'desert secret\' to be added.",
-        options =
-        {
-            {description = "Yes", data = true},
-            {description = "No", data = false},
-        },
-        default = true,
-    } or {
-        name = "DesertSecret",
-        label = "开启\"尘市蜃楼\"",
-        hover = "允许添加\"尘市蜃楼\"的内容。黄沙之中，有座幻影般的古城和悲惨的命运。",
-        options =
-        {
-            {description = "是", data = true},
-            {description = "否", data = false},
-        },
-        default = true,
     },
     L and {
         name = "DressUp",

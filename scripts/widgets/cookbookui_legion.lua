@@ -6,7 +6,7 @@ local Text = require "widgets/text"
 -- local Grid = require "widgets/grid"
 -- local Spinner = require "widgets/spinner"
 
-local strs = TUNING.LEGION_MOD_LANGUAGES == "chinese" and {
+local strs = CONFIGS_LEGION.LANGUAGES == "chinese" and {
 	effect = "特殊作用",
 	perish_unit = "天",
 	perish_no = "不会腐烂",

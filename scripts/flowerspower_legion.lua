@@ -233,23 +233,25 @@ if IsServer then
             "evergreen_sparse_tall",
             "evergreen_sparse_short"
         }
-        for _,v in pairs(trees) do
-            AddPrefabPostInit(v, function(inst)
-                if inst.components.workable ~= nil then
-                    local onfinish_old = inst.components.workable.onfinish
-                    inst.components.workable:SetOnFinishCallback(function(inst, chopper)
-                        if inst.components.lootdropper ~= nil then
-                            if math.random() < CONFIGS_LEGION.FOLIAGEATHCHANCE then
-                                inst.components.lootdropper:SpawnLootPrefab("foliageath")
-                            end
+        local function FnSet_evergreen(inst)
+            if inst.components.workable ~= nil then
+                local onfinish_old = inst.components.workable.onfinish
+                inst.components.workable:SetOnFinishCallback(function(inst, chopper)
+                    if inst.components.lootdropper ~= nil then
+                        if math.random() < CONFIGS_LEGION.FOLIAGEATHCHANCE then
+                            inst.components.lootdropper:SpawnLootPrefab("foliageath")
                         end
-                        if onfinish_old ~= nil then
-                            onfinish_old(inst, chopper)
-                        end
-                    end)
-                end
-            end)
+                    end
+                    if onfinish_old ~= nil then
+                        onfinish_old(inst, chopper)
+                    end
+                end)
+            end
         end
+        for _,v in pairs(trees) do
+            AddPrefabPostInit(v, FnSet_evergreen)
+        end
+        trees = nil
 
         --粗壮常青树的树精有几率掉青枝绿叶
         AddPrefabPostInit("leif_sparse", function(inst)

@@ -21,7 +21,7 @@ local S_________WURT = STRINGS.CHARACTERS.WURT         --沃特的台词
 local S_______WALTER = STRINGS.CHARACTERS.WALTER       --沃尔特的台词
 local S________WANDA = STRINGS.CHARACTERS.WANDA        --旺达的台词
 
-TUNING.LEGION_MOD_LANGUAGES = "english"
+_G.CONFIGS_LEGION.LANGUAGES = "english"
 
 --------------------------------------------------------------------------
 --[[ the little star in the cave ]]--[[ 洞穴里的星光点点 ]]

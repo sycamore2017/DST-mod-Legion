@@ -142,10 +142,11 @@ end
 --------------------
 --------------------
 
-local plantables = {}
-
-if CONFIGS_LEGION.FLOWERSPOWER then
-    plantables.dug_rosebush = {
+local plantables = {
+    ------
+    --花香四溢
+    ------
+    dug_rosebush = {
         animstate = { bank = "berrybush2", build = "rosebush", anim = "dropped", anim_palcer = "dead", },
         floater = {0.03, "large", 0.2, {0.65, 0.5, 0.65}},  --漂浮参数（底部切割比例, 波纹动画, 波纹所处位置比例, 波纹大小）
         stacksize = TUNING.STACK_SIZE_LARGEITEM,            --最大堆叠数
@@ -164,8 +165,8 @@ if CONFIGS_LEGION.FLOWERSPOWER then
             inst:AddTag("deployedplant") --植株种植标签，植物人种下时能恢复精神等
         end,
         fn_server = nil,
-    }
-    plantables.dug_lilybush = {
+    },
+    dug_lilybush = {
         animstate = { bank = "berrybush2", build = "lilybush", anim = "dropped", anim_palcer = "dead", },
         floater = {0.03, "large", 0.2, {0.65, 0.5, 0.65}},
         stacksize = TUNING.STACK_SIZE_LARGEITEM,
@@ -184,8 +185,8 @@ if CONFIGS_LEGION.FLOWERSPOWER then
             inst:AddTag("deployedplant")
         end,
         fn_server = nil,
-    }
-    plantables.dug_orchidbush = {
+    },
+    dug_orchidbush = {
         animstate = { bank = "berrybush2", build = "orchidbush", anim = "dropped", anim_palcer = "dead", },
         floater = {nil, "large", 0.1, {0.65, 0.5, 0.65}},
         stacksize = TUNING.STACK_SIZE_LARGEITEM,
@@ -204,8 +205,8 @@ if CONFIGS_LEGION.FLOWERSPOWER then
             inst:AddTag("deployedplant")
         end,
         fn_server = nil,
-    }
-    plantables.cutted_rosebush = {
+    },
+    cutted_rosebush = {
         animstate = { bank = "rosebush", build = "rosebush", anim = "cutted", anim_palcer = "dead", },
         floater = {nil, "large", 0.1, 0.55},
         stacksize = TUNING.STACK_SIZE_SMALLITEM,
@@ -225,8 +226,8 @@ if CONFIGS_LEGION.FLOWERSPOWER then
             inst:AddTag("treeseed") --能使其放入种子袋
         end,
         fn_server = nil,
-    }
-    plantables.cutted_lilybush = {
+    },
+    cutted_lilybush = {
         animstate = { bank = "lilybush", build = "lilybush", anim = "cutted", anim_palcer = "dead", },
         floater = {nil, "large", 0.1, 0.55},
         stacksize = TUNING.STACK_SIZE_SMALLITEM,
@@ -246,8 +247,8 @@ if CONFIGS_LEGION.FLOWERSPOWER then
             inst:AddTag("treeseed") --能使其放入种子袋
         end,
         fn_server = nil,
-    }
-    plantables.cutted_orchidbush = {
+    },
+    cutted_orchidbush = {
         animstate = { bank = "orchidbush", build = "orchidbush", anim = "cutted", anim_palcer = "dead", },
         floater = {nil, "large", 0.1, 0.55},
         stacksize = TUNING.STACK_SIZE_SMALLITEM,
@@ -266,11 +267,11 @@ if CONFIGS_LEGION.FLOWERSPOWER then
             inst:AddTag("treeseed") --能使其放入种子袋
         end,
         fn_server = nil
-    }
-end
-
-if CONFIGS_LEGION.LEGENDOFFALL then
-    plantables.siving_derivant_item = { --[[ 子圭一型岩(物品) ]]
+    },
+    ------
+    --丰饶传说
+    ------
+    siving_derivant_item = { --子圭一型岩(物品)
         animstate = { bank = "siving_derivants", build = "siving_derivants", anim = "item", anim_palcer = "lvl0", },
         floater = nil,
         stacksize = TUNING.STACK_SIZE_LARGEITEM,
@@ -322,69 +323,11 @@ if CONFIGS_LEGION.LEGENDOFFALL then
 				inst.OnTreeLive(inst, nil)
 			end)
         end,
-    }
-
-    for k,v in pairs(CROPS_DATA_LEGION) do
-        local seedsprefab = "seeds_"..k.."_l"
-        local cropprefab = "plant_"..k.."_l"
-        plantables[seedsprefab] = {
-            animstate = { bank = "seeds_crop_l", build = "seeds_crop_l", anim = "idle", anim_palcer = nil },
-            overrideimage = "seeds_crop_l2",
-            floater = {nil, "small", 0.2, 1.2},
-            stacksize = TUNING.STACK_SIZE_SMALLITEM,
-            fuelvalue = TUNING.SMALL_FUEL,
-            burnable = {
-                time = TUNING.SMALL_BURNTIME,
-                fxsize = "small",
-                lightedsize = "small",
-            },
-            deployable = {
-                prefab = cropprefab,
-                mode = DEPLOYMODE.PLANT, spacing = DEPLOYSPACING.MEDIUM,
-                sound = "dontstarve/wilson/plant_seeds"
-            },
-            fn_common = function(inst)
-                inst:AddTag("deployedplant")
-                inst:AddTag("treeseed") --能使其放入种子袋
-                -- inst.overridedeployplacername = seedsprefab.."_placer" --这个可以让placer换成另一个
-
-                if v.image ~= nil then
-                    inst.inv_image_bg = { image = v.image.name, atlas = v.image.atlas }
-                else
-                    inst.inv_image_bg = {}
-                end
-                if inst.inv_image_bg.image == nil then
-                    inst.inv_image_bg.image = k..".tex"
-                end
-                if inst.inv_image_bg.atlas == nil then
-                    inst.inv_image_bg.atlas = GetInventoryItemAtlas(inst.inv_image_bg.image)
-                end
-
-                inst.displaynamefn = function(inst)
-                    return STRINGS.NAMES[string.upper(cropprefab)]..STRINGS.PLANT_CROP_L["SEEDS"]
-                end
-            end,
-            fn_server = function(inst)
-                inst.sivbird_l_food = 0.5 --能给予玄鸟换取子圭石
-
-                inst.components.inspectable.nameoverride = "SEEDS_CROP_L"
-
-                inst:AddComponent("plantablelegion")
-                inst.components.plantablelegion.plant = cropprefab
-            end
-        }
-        table.insert(prefabs, MakePlacer(
-            seedsprefab.."_placer", v.bank, v.build, v.leveldata[1].anim,
-            nil, nil, nil, nil, nil, nil, function(inst)
-                inst.AnimState:Pause() --不想让placer动起来
-                inst.AnimState:OverrideSymbol("soil", "crop_soil_legion", "soil")
-            end
-        ))
-    end
-end
-
-if CONFIGS_LEGION.PRAYFORRAIN then
-    plantables.dug_monstrain = {
+    },
+    ------
+    --祈雨祭
+    ------
+    dug_monstrain = {
         animstate = { bank = "monstrain", build = "monstrain", anim = "dropped", anim_palcer = nil, },
         floater = {nil, "small", 0.2, 1.2},
         stacksize = TUNING.STACK_SIZE_LARGEITEM,
@@ -404,14 +347,75 @@ if CONFIGS_LEGION.PRAYFORRAIN then
         end,
         fn_server = nil,
     }
+}
+
+--异种
+for k,v in pairs(CROPS_DATA_LEGION) do
+    local seedsprefab = "seeds_"..k.."_l"
+    local cropprefab = "plant_"..k.."_l"
+    plantables[seedsprefab] = {
+        animstate = { bank = "seeds_crop_l", build = "seeds_crop_l", anim = "idle", anim_palcer = nil },
+        overrideimage = "seeds_crop_l2",
+        floater = {nil, "small", 0.2, 1.2},
+        stacksize = TUNING.STACK_SIZE_SMALLITEM,
+        fuelvalue = TUNING.SMALL_FUEL,
+        burnable = {
+            time = TUNING.SMALL_BURNTIME,
+            fxsize = "small",
+            lightedsize = "small",
+        },
+        deployable = {
+            prefab = cropprefab,
+            mode = DEPLOYMODE.PLANT, spacing = DEPLOYSPACING.MEDIUM,
+            sound = "dontstarve/wilson/plant_seeds"
+        },
+        fn_common = function(inst)
+            inst:AddTag("deployedplant")
+            inst:AddTag("treeseed") --能使其放入种子袋
+            -- inst.overridedeployplacername = seedsprefab.."_placer" --这个可以让placer换成另一个
+
+            if v.image ~= nil then
+                inst.inv_image_bg = { image = v.image.name, atlas = v.image.atlas }
+            else
+                inst.inv_image_bg = {}
+            end
+            if inst.inv_image_bg.image == nil then
+                inst.inv_image_bg.image = k..".tex"
+            end
+            if inst.inv_image_bg.atlas == nil then
+                inst.inv_image_bg.atlas = GetInventoryItemAtlas(inst.inv_image_bg.image)
+            end
+
+            inst.displaynamefn = function(inst)
+                return STRINGS.NAMES[string.upper(cropprefab)]..STRINGS.PLANT_CROP_L["SEEDS"]
+            end
+        end,
+        fn_server = function(inst)
+            inst.sivbird_l_food = 0.5 --能给予玄鸟换取子圭石
+
+            inst.components.inspectable.nameoverride = "SEEDS_CROP_L"
+
+            inst:AddComponent("plantablelegion")
+            inst.components.plantablelegion.plant = cropprefab
+        end
+    }
     table.insert(prefabs, MakePlacer(
-        "dug_monstrain_placer", "monstrain", "monstrain", "idle_summer",
+        seedsprefab.."_placer", v.bank, v.build, v.leveldata[1].anim,
         nil, nil, nil, nil, nil, nil, function(inst)
-            inst.AnimState:Pause()
-            inst.Transform:SetScale(1.4, 1.4, 1.4)
+            inst.AnimState:Pause() --不想让placer动起来
+            inst.AnimState:OverrideSymbol("soil", "crop_soil_legion", "soil")
         end
     ))
 end
+
+--雨竹块茎placer
+table.insert(prefabs, MakePlacer(
+    "dug_monstrain_placer", "monstrain", "monstrain", "idle_summer",
+    nil, nil, nil, nil, nil, nil, function(inst)
+        inst.AnimState:Pause()
+        inst.Transform:SetScale(1.4, 1.4, 1.4)
+    end
+))
 
 --------------------
 --------------------

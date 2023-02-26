@@ -116,7 +116,7 @@ local function TriggerMoisture(self)
 	end
 end
 local function GetDetailString(self, doer, type)
-	local titles = TUNING.LEGION_MOD_LANGUAGES == "chinese" and {
+	local titles = CONFIGS_LEGION.LANGUAGES == "chinese" and {
 		nutrients = "肥力",
 		moisture = "水分",
 		sickness = "疾病",

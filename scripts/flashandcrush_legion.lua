@@ -72,7 +72,7 @@ local upvaluehelper = require "hua_upvaluehelper"
 
 _G.RegistMiniMapImage_legion("elecourmaline")
 
-if TUNING.LEGION_TECHUNLOCK == "lootdropper" then
+if _G.CONFIGS_LEGION.TECHUNLOCK == "lootdropper" then
     AddRecipe2(
         "tripleshovelaxe", {
             Ingredient("axe", 1),
@@ -108,37 +108,34 @@ if TUNING.LEGION_TECHUNLOCK == "lootdropper" then
             atlas = "images/inventoryimages/explodingfruitcake.xml", image = "explodingfruitcake.tex"
         }, { "RECAST", "WEAPONS" }
     )
-    if CONFIGS_LEGION.LEGENDOFFALL then
-        AddRecipe2(
-            "fishhomingtool_awesome", {
-                Ingredient("fishhomingtool_normal", 5, "images/inventoryimages/fishhomingtool_normal.xml"),
-                Ingredient("chum", 2),
-            }, TECH.LOST, {
-                atlas = "images/inventoryimages/fishhomingtool_awesome.xml", image = "fishhomingtool_awesome.tex"
-            }, { "RECAST", "FISHING" }
-        )
-        AddRecipe2(
-            "siving_mask_gold", {
-                Ingredient("goggleshat", 1),
-                Ingredient("siving_mask", 1, "images/inventoryimages/siving_mask.xml"),
-                Ingredient("siving_derivant_item", 1, "images/inventoryimages/siving_derivant_item.xml"),
-                Ingredient("dish_shyerryjam", 1, "images/inventoryimages/dish_shyerryjam.xml"),
-            }, TECH.LOST, {
-                atlas = "images/inventoryimages/siving_mask_gold.xml", image = "siving_mask_gold.tex"
-            }, { "RECAST", "ARMOUR", "MAGIC", "RESTORATION" }
-        )
-        AddRecipe2(
-            "siving_ctlall_item", {
-                Ingredient("siving_ctlwater_item", 1, "images/inventoryimages/siving_ctlwater_item.xml"),
-                Ingredient("siving_ctldirt_item", 1, "images/inventoryimages/siving_ctldirt_item.xml"),
-                Ingredient("siving_derivant_item", 1, "images/inventoryimages/siving_derivant_item.xml"),
-                Ingredient("singingshell_octave4", 1, nil, nil, "singingshell_octave4_1.tex")
-            }, TECH.LOST, {
-                atlas = "images/inventoryimages/siving_ctlall_item.xml", image = "siving_ctlall_item.tex"
-            }, { "RECAST", "MAGIC", "GARDENING", "STRUCTURES" }
-        )
-    end
-
+    AddRecipe2(
+        "fishhomingtool_awesome", {
+            Ingredient("fishhomingtool_normal", 5, "images/inventoryimages/fishhomingtool_normal.xml"),
+            Ingredient("chum", 2),
+        }, TECH.LOST, {
+            atlas = "images/inventoryimages/fishhomingtool_awesome.xml", image = "fishhomingtool_awesome.tex"
+        }, { "RECAST", "FISHING" }
+    )
+    AddRecipe2(
+        "siving_mask_gold", {
+            Ingredient("goggleshat", 1),
+            Ingredient("siving_mask", 1, "images/inventoryimages/siving_mask.xml"),
+            Ingredient("siving_derivant_item", 1, "images/inventoryimages/siving_derivant_item.xml"),
+            Ingredient("dish_shyerryjam", 1, "images/inventoryimages/dish_shyerryjam.xml"),
+        }, TECH.LOST, {
+            atlas = "images/inventoryimages/siving_mask_gold.xml", image = "siving_mask_gold.tex"
+        }, { "RECAST", "ARMOUR", "MAGIC", "RESTORATION" }
+    )
+    AddRecipe2(
+        "siving_ctlall_item", {
+            Ingredient("siving_ctlwater_item", 1, "images/inventoryimages/siving_ctlwater_item.xml"),
+            Ingredient("siving_ctldirt_item", 1, "images/inventoryimages/siving_ctldirt_item.xml"),
+            Ingredient("siving_derivant_item", 1, "images/inventoryimages/siving_derivant_item.xml"),
+            Ingredient("singingshell_octave4", 1, nil, nil, "singingshell_octave4_1.tex")
+        }, TECH.LOST, {
+            atlas = "images/inventoryimages/siving_ctlall_item.xml", image = "siving_ctlall_item.tex"
+        }, { "RECAST", "MAGIC", "GARDENING", "STRUCTURES" }
+    )
     AddRecipe2(
         "triplegoldenshovelaxe", {
             Ingredient("goldenaxe", 2),
@@ -241,40 +238,37 @@ else
             atlas = "images/inventoryimages/explodingfruitcake.xml", image = "explodingfruitcake.tex"
         }, { "RECAST", "WEAPONS" }
     )
-    if CONFIGS_LEGION.LEGENDOFFALL then
-        AddRecipe2(
-            "fishhomingtool_awesome", {
-                Ingredient("fishhomingtool_normal", 5, "images/inventoryimages/fishhomingtool_normal.xml"),
-                Ingredient("chum", 2),
-            }, TECH.ELECOURMALINE_ONE, {
-                nounlock = true,
-                atlas = "images/inventoryimages/fishhomingtool_awesome.xml", image = "fishhomingtool_awesome.tex"
-            }, { "RECAST", "FISHING" }
-        )
-        AddRecipe2(
-            "siving_mask_gold", {
-                Ingredient("goggleshat", 1),
-                Ingredient("siving_mask", 1, "images/inventoryimages/siving_mask.xml"),
-                Ingredient("siving_derivant_item", 1, "images/inventoryimages/siving_derivant_item.xml"),
-                Ingredient("dish_shyerryjam", 1, "images/inventoryimages/dish_shyerryjam.xml"),
-            }, TECH.ELECOURMALINE_THREE, {
-                nounlock = true,
-                atlas = "images/inventoryimages/siving_mask_gold.xml", image = "siving_mask_gold.tex"
-            }, { "RECAST", "ARMOUR", "MAGIC", "RESTORATION" }
-        )
-        AddRecipe2(
-            "siving_ctlall_item", {
-                Ingredient("siving_ctlwater_item", 1, "images/inventoryimages/siving_ctlwater_item.xml"),
-                Ingredient("siving_ctldirt_item", 1, "images/inventoryimages/siving_ctldirt_item.xml"),
-                Ingredient("siving_derivant_item", 1, "images/inventoryimages/siving_derivant_item.xml"),
-                Ingredient("singingshell_octave4", 1, nil, nil, "singingshell_octave4_1.tex")
-            }, TECH.ELECOURMALINE_THREE, {
-                nounlock = true,
-                atlas = "images/inventoryimages/siving_ctlall_item.xml", image = "siving_ctlall_item.tex"
-            }, { "RECAST", "MAGIC", "GARDENING", "STRUCTURES" }
-        )
-    end
-
+    AddRecipe2(
+        "fishhomingtool_awesome", {
+            Ingredient("fishhomingtool_normal", 5, "images/inventoryimages/fishhomingtool_normal.xml"),
+            Ingredient("chum", 2),
+        }, TECH.ELECOURMALINE_ONE, {
+            nounlock = true,
+            atlas = "images/inventoryimages/fishhomingtool_awesome.xml", image = "fishhomingtool_awesome.tex"
+        }, { "RECAST", "FISHING" }
+    )
+    AddRecipe2(
+        "siving_mask_gold", {
+            Ingredient("goggleshat", 1),
+            Ingredient("siving_mask", 1, "images/inventoryimages/siving_mask.xml"),
+            Ingredient("siving_derivant_item", 1, "images/inventoryimages/siving_derivant_item.xml"),
+            Ingredient("dish_shyerryjam", 1, "images/inventoryimages/dish_shyerryjam.xml"),
+        }, TECH.ELECOURMALINE_THREE, {
+            nounlock = true,
+            atlas = "images/inventoryimages/siving_mask_gold.xml", image = "siving_mask_gold.tex"
+        }, { "RECAST", "ARMOUR", "MAGIC", "RESTORATION" }
+    )
+    AddRecipe2(
+        "siving_ctlall_item", {
+            Ingredient("siving_ctlwater_item", 1, "images/inventoryimages/siving_ctlwater_item.xml"),
+            Ingredient("siving_ctldirt_item", 1, "images/inventoryimages/siving_ctldirt_item.xml"),
+            Ingredient("siving_derivant_item", 1, "images/inventoryimages/siving_derivant_item.xml"),
+            Ingredient("singingshell_octave4", 1, nil, nil, "singingshell_octave4_1.tex")
+        }, TECH.ELECOURMALINE_THREE, {
+            nounlock = true,
+            atlas = "images/inventoryimages/siving_ctlall_item.xml", image = "siving_ctlall_item.tex"
+        }, { "RECAST", "MAGIC", "GARDENING", "STRUCTURES" }
+    )
     AddRecipe2(
         "triplegoldenshovelaxe", {
             Ingredient("goldenaxe", 2),
@@ -620,21 +614,7 @@ STORE_BEEF_L.str = STRINGS.ACTIONS_LEGION.STORE_BEEF_L --这个操作的名字�
 STORE_BEEF_L.fn = ACTIONS.STORE.fn --这个操作执行时进行的功能函数
 AddAction(STORE_BEEF_L) --向游戏注册一个动作
 
-if not _G.rawget(_G, "CA_U_INVENTORYITEM_L") then --ComponentAction_USEITEM_inventoryitem_legion
-    _G.CA_U_INVENTORYITEM_L = {}
-end
-table.insert(_G.CA_U_INVENTORYITEM_L, function(inst, doer, target, actions, right)
-    if
-        right and inst.replica.inventoryitem ~= nil
-        and target:HasTag("saddleable") --目标是可骑行的
-        and target.replica.container ~= nil and target.replica.container:CanBeOpened()
-        and inst.replica.inventoryitem:IsGrandOwner(doer)
-    then
-        table.insert(actions, ACTIONS.STORE_BEEF_L)
-        return true
-    end
-    return false
-end)
+-- STORE_BEEF_L 组件动作响应已移到 CA_U_INVENTORYITEM_L 中
 
 --将一个动作与state绑定
 AddStategraphActionHandler("wilson", ActionHandler(ACTIONS.STORE_BEEF_L, "give"))
