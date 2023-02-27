@@ -104,7 +104,7 @@ RegisterInventoryItemAtlas("images/inventoryimages/pineananas_seeds.xml", "pinea
 RegisterInventoryItemAtlas("images/inventoryimages/mint_l.xml", "mint_l.tex")
 RegisterInventoryItemAtlas("images/inventoryimages/albicans_cap.xml", "albicans_cap.tex")
 
--- local IsServer = TheNet:GetIsServer() or TheNet:IsDedicated()
+local IsServer = TheNet:GetIsServer() or TheNet:IsDedicated()
 
 --------------------------------------------------------------------------
 --[[ Test ]]--[[ test ]]
@@ -145,7 +145,7 @@ _G.CONFIGS_LEGION.X_PESTRISK = GetModConfigData("PestRisk") --设置虫害几率
 _G.CONFIGS_LEGION.PHOENIXREBIRTHCYCLE = GetModConfigData("PhoenixRebirthCycle") --设置玄鸟重生时间
 _G.CONFIGS_LEGION.SIVINGROOTTEX = GetModConfigData("SivingRootTex") --设置子圭突触贴图
 _G.CONFIGS_LEGION.PHOENIXBATTLEDIFFICULTY = GetModConfigData("PhoenixBattleDifficulty") --设置玄鸟战斗难度
-_G.CONFIGS_LEGION.SIVFEASTRENGTH = GetModConfigData("SivFeaStrength") --设置子圭玄鸟正羽强度
+_G.CONFIGS_LEGION.SIVFEASTRENGTH = GetModConfigData("SivFeaStrength") --设置子圭·翰强度
 
 _G.CONFIGS_LEGION.TECHUNLOCK = GetModConfigData("TechUnlock") --设置新道具的科技解锁方式 "lootdropper" "prototyper"
 
@@ -276,8 +276,32 @@ if CONFIGS_LEGION.BETTERCOOKBOOK then
     end
 end
 
---因为有的料理我只需要部分香料能调，兼容原因，其他香料制作时会崩溃，所以这里设置默认的返回值
 local cooking = require("cooking")
+local ingredients_l = {
+    { {"ash"}, {inedible=1}, false, false }, --灰烬
+    { {"slurtleslime", "glommerfuel", "phlegm"}, {gel=1}, false, false }, --蜗牛黏液、格罗姆黏液、钢羊黏痰
+    { {"furtuft"}, {inedible=1}, false, false }, --熊毛屑(非熊皮)
+    { {"twiggy_nut"}, {inedible=1}, false, false }, --树枝树种
+    { {"moon_tree_blossom"}, {veggie=.5, petals_legion=1}, false, false }, --月树花
+    { {"foliage"}, {decoration=1}, false, false }, --蕨叶
+    { {"horn"}, {inedible=1, decoration=2}, false, false }, --牛角
+    { {"forgetmelots", "cactus_flower", "myth_lotus_flower", "aip_veggie_sunflower"}, {petals_legion=1}, false, false }, --必忘我、仙人掌花、【神话书说】莲花、【额外物品包】向日葵
+
+    { {"shyerry"}, {fruit=4}, true, false }, --颤栗果
+    { {"albicans_cap"}, {veggie=2}, false, false }, --素白菇
+    { {"petals_rose", "petals_lily", "petals_orchid"}, {veggie=.5, petals_legion=1}, false, false }, --三花
+    { {"pineananas"}, {veggie=1, fruit=1}, true, false }, --松萝
+    { {"mint_l"}, {veggie=.5}, false, false }, --猫薄荷
+    { {"monstrain_leaf"}, {monster=1, veggie=.5}, false, false }, --雨竹叶
+}
+local ingredients_map = {}
+for _,ing in ipairs(ingredients_l) do
+    for _,name in pairs(ing[1]) do
+        ingredients_map[name] = true
+    end
+end
+
+--因为有的料理我只需要部分香料能调，兼容原因，其他香料制作时会崩溃，所以这里设置默认的返回值
 local CalculateRecipe_old = cooking.CalculateRecipe
 cooking.CalculateRecipe = function(cooker, names, ...)
     local product, cooktime = CalculateRecipe_old(cooker, names, ...)
@@ -305,6 +329,15 @@ cooking.CalculateRecipe = function(cooker, names, ...)
         end
     end
     return product, cooktime
+end
+
+--因为食材配置在 AddSimPostInit 时才会加入，所以得优化这个函数
+local IsCookingIngredient_old = cooking.IsCookingIngredient
+cooking.IsCookingIngredient = function(prefabname, ...)
+    if ingredients_map[prefabname] then
+        return true
+    end
+    return IsCookingIngredient_old(prefabname, ...)
 end
 
 --------------------------------------------------------------------------
@@ -366,8 +399,8 @@ AddRecipe2(
     }, { "CLOTHING", "LIGHT" }
 )
 
-AddPrefabPostInit("bunnyman", function(inst)    --通过api重写兔人的识别敌人函数
-    if TheWorld.ismastersim then
+if IsServer then
+    AddPrefabPostInit("bunnyman", function(inst)    --通过api重写兔人的识别敌人函数
         local targetfn_old = inst.components.combat.targetfn
         inst.components.combat:SetRetargetFunction(3, function(inst)
             local target = targetfn_old(inst)
@@ -386,24 +419,8 @@ AddPrefabPostInit("bunnyman", function(inst)    --通过api重写兔人的识别
                 return target
             end
         end)
-
-        local GetBattleCryString_old = inst.components.combat.GetBattleCryString
-        inst.components.combat.GetBattleCryString = function(combatcmp, target)
-            local cry, strid = GetBattleCryString_old(combatcmp, target)
-            if
-                cry ~= nil and cry ~= "RABBIT_BATTLECRY" and
-                (
-                    (target.components.inventory ~= nil and target.components.inventory:EquipHasTag("ignoreMeat")) or
-                    target:HasTag("ignoreMeat")
-                )
-            then
-                return "RABBIT_BATTLECRY", math.random(#STRINGS["RABBIT_BATTLECRY"])
-            else
-                return cry, strid
-            end
-        end
-    end
-end)
+    end)
+end
 
 ----------
 --增加新的周期性怪物
@@ -1280,27 +1297,9 @@ AddSimPostInit(function()
     ----------
     --烹饪食材属性 兼容性修改(官方逻辑没有兼容性，只能自己写个有兼容性的啦)
     ----------
-    local cooking2 = require("cooking")
-    local ingredients_base = cooking2.ingredients
+    cooking = require("cooking")
+    local ingredients_base = cooking.ingredients
     if ingredients_base then
-        --注意：每次设定这里时，记得判断是否要在月藏宝匣容器栏那边设置新参数(因为这里的执行慢于容器的执行)
-        local ingredients_l = {
-            { {"ash"}, {inedible=1}, false, false }, --灰烬
-            { {"slurtleslime", "glommerfuel", "phlegm"}, {gel=1}, false, false }, --蜗牛黏液、格罗姆黏液、钢羊黏痰
-            { {"furtuft"}, {inedible=1}, false, false }, --熊毛屑(非熊皮)
-            { {"twiggy_nut"}, {inedible=1}, false, false }, --树枝树种
-            { {"moon_tree_blossom"}, {veggie=.5, petals_legion=1}, false, false }, --月树花
-            { {"foliage"}, {decoration=1}, false, false }, --蕨叶
-            { {"horn"}, {inedible=1, decoration=2}, false, false }, --牛角
-            { {"forgetmelots", "cactus_flower", "myth_lotus_flower", "aip_veggie_sunflower"}, {petals_legion=1}, false, false }, --必忘我、仙人掌花、【神话书说】莲花、【额外物品包】向日葵
-
-            { {"shyerry"}, {fruit=4}, true, false }, --颤栗果
-            { {"albicans_cap"}, {veggie=2}, false, false }, --素白菇
-            { {"petals_rose", "petals_lily", "petals_orchid"}, {veggie=.5, petals_legion=1}, false, false }, --三花
-            { {"pineananas"}, {veggie=1, fruit=1}, true, false }, --松萝
-            { {"mint_l"}, {veggie=.5}, false, false }, --猫薄荷
-            { {"monstrain_leaf"}, {monster=1, veggie=.5}, false, false }, --雨竹叶
-        }
         for _,ing in ipairs(ingredients_l) do
             for _,name in pairs(ing[1]) do
                 local cancook = ing[3]
@@ -1334,5 +1333,6 @@ AddSimPostInit(function()
             end
         end
     end
+    ingredients_l = nil
 
 end)

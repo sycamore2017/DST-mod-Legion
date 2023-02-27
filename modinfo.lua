@@ -508,8 +508,8 @@ configuration_options = {
     },
     L and {
         name = "SivFeaStrength",
-        label = "Siving Feather Strength",
-        hover = "Set damage and HP loss of True Siving Feather.",
+        label = "Siving-Plume Strength",
+        hover = "Set damage and HP loss of Siving-Plume.",
         options = {
             {description = "17/-0.5", data = 1}, --0.5
             {description = "23.8/-1", data = 2}, --0.7
@@ -522,8 +522,8 @@ configuration_options = {
         default = 3
     } or {
         name = "SivFeaStrength",
-        label = "子圭玄鸟正羽强度",
-        hover = "设置子圭玄鸟正羽的攻击力和耗血。变态，还是不变态，你自己界定！",
+        label = "子圭·翰强度",
+        hover = "设置子圭·翰的攻击力和耗血。变态，还是不变态，你自己界定！",
         options = {
             {description = "17/-0.5", data = 1}, --0.5
             {description = "23.8/-1", data = 2}, --0.7

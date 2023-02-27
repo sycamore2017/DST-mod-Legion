@@ -307,6 +307,7 @@ end
 --[[ 修改rider组件，重新构造combat的redirectdamagefn函数以适应更多元的机制 ]]
 --------------------------------------------------------------------------
 
+--[[
 if IsServer then
     function GLOBAL.RebuildRedirectDamageFn(player) --重新构造combat的redirectdamagefn函数
         --初始化
@@ -371,6 +372,7 @@ if IsServer then
         end
     end)
 end
+]]--
 
 --------------------------------------------------------------------------
 --[[ 修改playercontroller组件，防止既有手持装备组件和栽种组件的物品在栽种时会先自动装备在身上的问题 ]]
@@ -1268,85 +1270,6 @@ end))
 --------------------------------------------------------------------------
 
 AddPlayerPostInit(function(inst)
-    if IsServer then
-        --人物携带青锋剑时回复精神
-        if inst.components.itemaffinity == nil then
-            inst:AddComponent("itemaffinity")
-        end
-        inst.components.itemaffinity:AddAffinity(nil, "feelmylove", TUNING.DAPPERNESS_LARGE, 1)
-
-        --香蕉慕斯的好胃口buff兼容化
-        local isPickyEater = function(player)
-            local notpickylist = { --这些是肯定不需要发挥香蕉慕斯作用的人物，所以就不需要做更改
-                walter = true,
-                waxwell = true,
-                webber = true,
-                wendy = true,
-                wes = true,
-                wickerbottom = true,
-                willow = true,
-                wilson = true,
-                winona = true,
-                wolfgang = true,
-                woodie = true,
-                wormwood = true,
-                wortox = true,
-                wurt = true,
-                wx78 = true,
-                wanda = true,
-
-                monkey_king = true,
-                myth_yutu = true,
-                neza = true,
-                pigsy = true,
-                white_bone = true,
-                yangjian = true,
-                yama_commissioners = true,
-            }
-            if notpickylist[player.prefab] then
-                return false
-            end
-            return true
-        end
-        if inst.components.debuffable ~= nil and isPickyEater(inst) then
-            if inst.components.foodmemory ~= nil then
-                local GetFoodMultiplier_old = inst.components.foodmemory.GetFoodMultiplier
-                inst.components.foodmemory.GetFoodMultiplier = function(self, ...)
-                    if inst.components.debuffable:HasDebuff("buff_bestappetite") then
-                        return 1
-                    elseif GetFoodMultiplier_old ~= nil then
-                        return GetFoodMultiplier_old(self, ...)
-                    end
-                end
-
-                local GetMemoryCount_old = inst.components.foodmemory.GetMemoryCount
-                inst.components.foodmemory.GetMemoryCount = function(self, ...)
-                    if inst.components.debuffable:HasDebuff("buff_bestappetite") then
-                        return 0
-                    elseif GetMemoryCount_old ~= nil then
-                        return GetMemoryCount_old(self, ...)
-                    end
-                end
-            end
-
-            if inst.components.eater ~= nil then
-                local PrefersToEat_old = inst.components.eater.PrefersToEat
-                inst.components.eater.PrefersToEat = function(self, food, ...)
-                    if food.prefab == "winter_food4" then
-                        --V2C: fruitcake hack. see how long this code stays untouched - _-"
-                        return false
-                    elseif inst.components.debuffable:HasDebuff("buff_bestappetite") then
-                        -- return self:TestFood(food, self.preferseating) --这里需要改成caneat，不能按照喜好来
-                        return self:TestFood(food, self.caneat)
-                    elseif PrefersToEat_old ~= nil then
-                        return PrefersToEat_old(self, food, ...)
-                    end
-                end
-            end
-        end
-        isPickyEater = nil
-    end
-
     --此时 ThePlayer 不存在，延时之后才有
     inst:DoTaskInTime(6, function(inst)
         --禁止一些玩家使用棱镜；通过判定 ThePlayer 来确定当前环境在客户端(也可能是主机)
@@ -1357,6 +1280,87 @@ AddPlayerPostInit(function(inst)
             end
         end
     end)
+
+    if not IsServer then
+        return
+    end
+
+    --人物携带青锋剑时回复精神
+    if inst.components.itemaffinity == nil then
+        inst:AddComponent("itemaffinity")
+    end
+    inst.components.itemaffinity:AddAffinity(nil, "feelmylove", TUNING.DAPPERNESS_LARGE, 1)
+
+    --香蕉慕斯的好胃口buff兼容化
+    local pickyeaters = {
+        wathgrithr = true,
+        warly = true
+    }
+    if inst.components.debuffable ~= nil and pickyeaters[inst.prefab] then
+        if inst.components.foodmemory ~= nil then
+            local GetFoodMultiplier_old = inst.components.foodmemory.GetFoodMultiplier
+            inst.components.foodmemory.GetFoodMultiplier = function(self, ...)
+                if inst.components.debuffable:HasDebuff("buff_bestappetite") then
+                    return 1
+                elseif GetFoodMultiplier_old ~= nil then
+                    return GetFoodMultiplier_old(self, ...)
+                end
+            end
+
+            local GetMemoryCount_old = inst.components.foodmemory.GetMemoryCount
+            inst.components.foodmemory.GetMemoryCount = function(self, ...)
+                if inst.components.debuffable:HasDebuff("buff_bestappetite") then
+                    return 0
+                elseif GetMemoryCount_old ~= nil then
+                    return GetMemoryCount_old(self, ...)
+                end
+            end
+        end
+
+        if inst.components.eater ~= nil then
+            local PrefersToEat_old = inst.components.eater.PrefersToEat
+            inst.components.eater.PrefersToEat = function(self, food, ...)
+                if food.prefab == "winter_food4" then
+                    --V2C: fruitcake hack. see how long this code stays untouched - _-"
+                    return false
+                elseif inst.components.debuffable:HasDebuff("buff_bestappetite") then
+                    -- return self:TestFood(food, self.preferseating) --这里需要改成caneat，不能按照喜好来
+                    return self:TestFood(food, self.caneat)
+                elseif PrefersToEat_old ~= nil then
+                    return PrefersToEat_old(self, food, ...)
+                end
+            end
+        end
+    end
+    pickyeaters = nil
+
+    --受击修改
+    if inst.components.inventory ~= nil then
+        local ApplyDamage_old = inst.components.inventory.ApplyDamage
+        inst.components.inventory.ApplyDamage = function(self, damage, attacker, weapon, ...)
+            if damage >= 0 then
+                local player = self.inst
+                --盾反
+                local hand = player.components.inventory:GetEquippedItem(EQUIPSLOTS.HANDS)
+                if
+                    hand ~= nil and
+                    hand.components.shieldlegion ~= nil and
+                    hand.components.shieldlegion:GetAttacked(player, attacker, damage, weapon)
+                then
+                    return 0
+                end
+                --蝴蝶庇佑
+                if player.countblessing ~= nil and player.countblessing > 0 then
+                    local mybuff = player.components.debuffable:GetDebuff("buff_butterflysblessing")
+                    if mybuff and mybuff.countbutterflies ~= nil and mybuff.countbutterflies > 0 then
+                        mybuff.DeleteButterfly(mybuff, player)
+                        return 0
+                    end
+                end
+            end
+            return ApplyDamage_old(self, damage, attacker, weapon, ...)
+        end
+    end
 end)
 
 --------------------------------------------------------------------------
@@ -1450,7 +1454,7 @@ AddStategraphState("wilson", State{
     },
 
     ontimeout = function(inst)
-        inst.sg:RemoveStateTag("atk_shield")
+        -- inst.sg:RemoveStateTag("atk_shield")
         inst.sg:RemoveStateTag("busy")
         inst.sg:AddStateTag("idle")
     end,
@@ -1524,7 +1528,7 @@ AddStategraphState("wilson_client", State{
     },
 
     ontimeout = function(inst)
-        inst.sg:RemoveStateTag("atk_shield")
+        -- inst.sg:RemoveStateTag("atk_shield")
         inst.sg:AddStateTag("idle")
     end,
 
@@ -1609,7 +1613,6 @@ local function FlingItem_terror(dropper, loot, pt, flingtargetpos, flingtargetva
     end
 end
 AddPrefabPostInit("shieldofterror", function(inst)
-    inst:AddTag("combatredirect")   --代表这个武器会给予伤害对象重定义函数
     inst:AddTag("allow_action_on_impassable")
     inst:AddTag("shield_l")
     inst:RemoveTag("toolpunch")
@@ -1649,30 +1652,6 @@ AddPrefabPostInit("shieldofterror", function(inst)
             inst.components.shieldlegion:Counterattack(doer, attacker, data, 8, 0.5)
         end
         -- inst.components.shieldlegion.atkfailfn = function(inst, doer, attacker, data) end
-
-        local onequip_old = inst.components.equippable.onequipfn
-        local onunequip_old = inst.components.equippable.onunequipfn
-        inst.components.equippable.onequipfn = function(inst, owner, ...)
-            onequip_old(inst, owner, ...)
-            if owner:HasTag("equipmentmodel") then --假人！
-                return
-            end
-            RebuildRedirectDamageFn(owner) --全局函数：重新构造combat的redirectdamagefn函数
-            --登记远程保护的函数
-            if owner.redirect_table[inst.prefab] == nil then
-                owner.redirect_table[inst.prefab] = function(victim, attacker, damage, weapon, stimuli)
-                    --只要这里不为nil，就能吸收所有远程伤害，反正武器没有health组件，所以在伤害计算时会直接被判断给取消掉
-                    return inst.components.shieldlegion:GetAttacked(victim, attacker, damage, weapon, stimuli)
-                end
-            end
-        end
-        inst.components.equippable.onunequipfn = function(inst, owner, ...)
-            onunequip_old(inst, owner, ...)
-            --清除自己的redirectdamagefn函数
-            if owner.redirect_table ~= nil then
-                owner.redirect_table[inst.prefab] = nil
-            end
-        end
     end
 end)
 

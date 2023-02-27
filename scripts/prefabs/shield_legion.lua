@@ -21,19 +21,6 @@ local function Counterattack_base(inst, doer, attacker, data, range, atk)
     end
 end
 
-local function SetShieldEquip(inst, owner)
-    RebuildRedirectDamageFn(owner) --全局函数：重新构造combat的redirectdamagefn函数
-    --登记远程保护的函数
-    if owner.redirect_table[inst.prefab] == nil then
-        owner.redirect_table[inst.prefab] = function(victim, attacker, damage, weapon, stimuli)
-            --只要这里不为nil，就能吸收所有远程伤害，反正武器没有health组件，所以在伤害计算时会直接被判断给取消掉
-            if not inst._brokenshield then
-                return inst.components.shieldlegion:GetAttacked(victim, attacker, damage, weapon, stimuli)
-            end
-            return nil
-        end
-    end
-end
 local function OnEquipFn(inst, owner)
     if inst.components.skinedlegion ~= nil then
         local skindata = inst.components.skinedlegion:GetSkinedData()
@@ -57,11 +44,9 @@ local function OnEquipFn(inst, owner)
     owner.AnimState:Hide("ARM_normal") --隐藏普通的手
     owner.AnimState:Show("LANTERN_OVERLAY")
 
-    if owner:HasTag("equipmentmodel") then --假人！
-        return
-    end
-
-    SetShieldEquip(inst, owner)
+    -- if owner:HasTag("equipmentmodel") then --假人！
+    --     return
+    -- end
 end
 local function OnUnequipFn(inst, owner)
     --owner.AnimState:ClearOverrideSymbol("book_closed")
@@ -125,7 +110,6 @@ local function MakeShield(data)
             inst.AnimState:SetBuild(data.name)
             inst.AnimState:PlayAnimation("idle")
 
-            inst:AddTag("combatredirect")   --代表这个武器会给予伤害对象重定义函数
             inst:AddTag("allow_action_on_impassable")
             inst:AddTag("shield_l")
 
@@ -644,7 +628,6 @@ MakeShield({
                 return
             end
 
-            SetShieldEquip(inst, owner)
             if owner.components.health ~= nil then
                 owner:ListenForEvent("death", DeathCallForRain)
                 owner:ListenForEvent("healthdelta", inst.fn_onHealthDelta)

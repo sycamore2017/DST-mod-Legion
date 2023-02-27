@@ -114,20 +114,12 @@ for y = 3, 0, -1 do
 end
 
 local cooking = require("cooking")
-local cook_ingredients = { --能放入月藏宝匣的特殊食材
-    ash = true,
-    slurtleslime = true, glommerfuel = true, phlegm = true,
-    furtuft = true, pigskin = true,
-    twiggy_nut = true,
-    horn = true,
-}
 function params.hiddenmoonlight.itemtestfn(container, item, slot)
     if item:HasTag("icebox_valid") then
         return true
     end
 
-    --只要是烹饪食材，就能放入
-    if cook_ingredients[item.prefab] or cooking.IsCookingIngredient(item.prefab) then
+    if cooking.IsCookingIngredient(item.prefab) then --只要是烹饪食材，就能放入
         return true
     end
 
