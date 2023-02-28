@@ -3663,7 +3663,7 @@ STRINGS.ACTIONS.GENETRANS = {
     CHARGE = "充能",
 }
 S______GENERIC.ACTIONFAIL.GENETRANS = {
-    DONE = "先把转化好的取下来吧。",
+    NOGENE = "它需要先获取活性组织做样本才能尝试转化。",
     GROWING = "已经有东西在转化了。",
     ENERGYOUT = "它需要充能后才能启动。",
     WRONGITEM = "这不是它能转化的。",
@@ -3682,7 +3682,7 @@ S______GENERIC.ACTIONFAIL.GENETRANS = {
 -- S_______WORTOX.ACTIONFAIL.GENETRANS =
 -- S_____WORMWOOD.ACTIONFAIL.GENETRANS =
 S________WARLY.ACTIONFAIL.GENETRANS = {
-    DONE = "一个盘子只能摆一道菜！",
+    NOGENE = "看来它需要一个配方才知道怎么做。",
     GROWING = "一口锅一次只能做一种菜！",
     NOENERGY = "这炉子没火了。",
     WRONGITEM = "错误的食材。",

@@ -3476,7 +3476,7 @@ STRINGS.ACTIONS.GENETRANS = {
     CHARGE = "Charge",
 }
 S______GENERIC.ACTIONFAIL.GENETRANS = {
-    DONE = "Take down the transformed one first.",
+    NOGENE = "It needs to obtain samples before transforming this.",
     GROWING = "Something is already here.",
     ENERGYOUT = "Needs to be charged before it can start.",
     WRONGITEM = "This isn't what it can transform.",
@@ -3495,7 +3495,7 @@ S______GENERIC.ACTIONFAIL.GENETRANS = {
 -- S_______WORTOX.ACTIONFAIL.GENETRANS =
 -- S_____WORMWOOD.ACTIONFAIL.GENETRANS =
 S________WARLY.ACTIONFAIL.GENETRANS = {
-    DONE = "You can only put one dish on this plate at same time!",
+    NOGENE = "It needs a recipe to know how to do it.",
     GROWING = "A pot can only cook one dish at same time!",
     NOENERGY = "This stove is out of fuel.",
     WRONGITEM = "Wrong ingredients.",
