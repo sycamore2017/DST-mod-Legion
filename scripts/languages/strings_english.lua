@@ -3480,7 +3480,9 @@ S______GENERIC.ACTIONFAIL.GENETRANS = {
     GROWING = "Something is already here.",
     ENERGYOUT = "Needs to be charged before it can start.",
     WRONGITEM = "This isn't what it can transform.",
-    ENERGYMAX = "Already full of life energy."
+    ENERGYMAX = "Already full of life energy.",
+    WRONGKEY = "This can't be used as a sample.",
+    HASKEY = "It already has this sample."
 }
 -- S_______WILLOW.ACTIONFAIL.GENETRANS =
 -- S_____WOLFGANG.ACTIONFAIL.GENETRANS =
@@ -3499,7 +3501,9 @@ S________WARLY.ACTIONFAIL.GENETRANS = {
     GROWING = "A pot can only cook one dish at same time!",
     NOENERGY = "This stove is out of fuel.",
     WRONGITEM = "Wrong ingredients.",
-    ENERGYMAX = "Maximum power has been reached."
+    ENERGYMAX = "Maximum power has been reached.",
+    WRONGKEY = "This is not the recipe it needs.",
+    HASKEY = "It already has this recipe."
 }
 -- S_________WURT.ACTIONFAIL.GENETRANS =
 -- S_______WALTER.ACTIONFAIL.GENETRANS =

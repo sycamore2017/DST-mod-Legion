@@ -771,19 +771,26 @@ table.insert(prefs, Prefab(
 --[[ 子圭·育 ]]
 --------------------------------------------------------------------------
 
-local function OnDeconstruct(inst, worker)
+local function GetStatus_turn(inst)
     local cpt = inst.components.genetrans
-    if cpt.seed then
-        inst:RemoveChild(cpt.seed)
-        cpt.seed:ReturnToScene()
-        cpt.seed.Transform:SetPosition(inst.Transform:GetWorldPosition())
-        if cpt.seed.components.perishable ~= nil then
-            cpt.seed.components.perishable:StartPerishing()
-        end
-        cpt.seed = nil
+    return (cpt == nil and "GENERIC")
+        or (cpt.fruit and "DONE")
+        or (cpt.energytime <= 0 and "NOENERGY")
+        or (cpt.seed and "DOING")
+        or "GENERIC"
+end
+local function OnWork_turn(inst, worker, workleft, numworks)
+    local cpt = inst.components.genetrans
+    if cpt.energytime > 0 and cpt.seed ~= nil then
+        inst.AnimState:PlayAnimation("hit_on")
+        inst.AnimState:PushAnimation("on", true)
+    else
+        inst.AnimState:PlayAnimation("hit")
+        inst.AnimState:PushAnimation("idle", false)
     end
-
-    inst.components.lootdropper:DropLoot()
+end
+local function OnDeconstruct_turn(inst, worker)
+    inst.components.genetrans:DropLoot()
     local fx = SpawnPrefab("collapse_big")
     fx.Transform:SetPosition(inst.Transform:GetWorldPosition())
     fx:SetMaterial("rock")
@@ -828,83 +835,22 @@ table.insert(prefs, Prefab(
         end
 
         inst:AddComponent("inspectable")
-        inst.components.inspectable.getstatus = function(inst)
-            local cpt = inst.components.genetrans
-            return (cpt == nil and "GENERIC")
-                or (cpt.fruit and "DONE")
-                or (cpt.energytime <= 0 and "NOENERGY")
-                or (cpt.seed and "DOING")
-                or "GENERIC"
-        end
-
-        inst:AddComponent("lootdropper")
-        inst.components.lootdropper:SetLootSetupFn(function(lootdropper)
-            local cpt = lootdropper.inst.components.genetrans
-            if cpt.fruit then
-                local loots = {}
-                local number
-                if cpt.fruit == "seeds_mandrake_l" or cpt.fruit == "dug_monstrain" then
-                    number = 1
-                else
-                    number = math.random(2,3)
-                end
-                for i = 1, number, 1 do
-                    table.insert(loots, cpt.fruit)
-                end
-                lootdropper:SetLoot(loots)
-            else
-                lootdropper:SetLoot(nil)
-            end
-        end)
-        inst.components.lootdropper.GenerateLoot = function(self)
-            local loots = {}
-
-            if self.lootsetupfn then
-                self.lootsetupfn(self)
-            end
-            if self.loot then
-                for k,v in ipairs(self.loot) do
-                    table.insert(loots, v)
-                end
-            end
-
-            if self.inst.worked_l then
-                self.inst.worked_l = nil
-                local recipe = AllRecipes[self.inst.prefab]
-                if recipe then
-                    local recipeloot = self:GetRecipeLoot(recipe)
-                    for k,v in ipairs(recipeloot) do
-                        table.insert(loots, v)
-                    end
-                end
-            end
-            return loots
-        end
+        inst.components.inspectable.getstatus = GetStatus_turn
 
         inst:AddComponent("hauntable")
         inst.components.hauntable:SetHauntValue(TUNING.HAUNT_TINY)
 
-        inst:AddComponent("genetrans") --实在不想做无谓的代码优化了，所以该组件与该实体的耦合性特别特别强
+        inst:AddComponent("lootdropper")
+
+        inst:AddComponent("genetrans") --实在不想做无谓的代码优化了，所以该组件与该实体的耦合性特别特别高
 
         inst:AddComponent("workable")
         inst.components.workable:SetWorkAction(ACTIONS.HAMMER)
         inst.components.workable:SetWorkLeft(5)
-        inst.components.workable:SetOnWorkCallback(function(inst, worker)
-            local cpt = inst.components.genetrans
-            if cpt.energytime > 0 and (cpt.fruit or cpt.seed) then
-                inst.AnimState:PlayAnimation("hit_on")
-                inst.AnimState:PushAnimation("on", true)
-            else
-                inst.AnimState:PlayAnimation("hit")
-                inst.AnimState:PushAnimation("idle", false)
-            end
-        end)
-        inst.components.workable:SetOnFinishCallback(function(inst, worker)
-            inst.worked_l = true
-            OnDeconstruct(inst, worker)
-        end)
+        inst.components.workable:SetOnWorkCallback(OnWork_turn)
+        inst.components.workable:SetOnFinishCallback(OnDeconstruct_turn)
 
-        inst:ListenForEvent("ondeconstructstructure", OnDeconstruct)
+        inst:ListenForEvent("ondeconstructstructure", OnDeconstruct_turn)
 
         inst.components.skinedlegion:SetOnPreLoad()
 

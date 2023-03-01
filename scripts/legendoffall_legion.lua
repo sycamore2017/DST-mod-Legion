@@ -1481,7 +1481,8 @@ local mapseeds = {
     },
     mandrake = {
         swap = { build = "siving_turn", file = "swap_mandrake", symboltype = "1" },
-        fruit = "seeds_mandrake_l", time = 10*TUNING.TOTAL_DAY_TIME
+        fruit = "seeds_mandrake_l", time = 20*TUNING.TOTAL_DAY_TIME,
+        fruitnum_min = 1, fruitnum_max = 1
     },
     gourd_oversized = {
         swap = { build = "farm_plant_gourd", file = "swap_body", symboltype = "3" },
@@ -1489,7 +1490,8 @@ local mapseeds = {
     },
     squamousfruit = {
         swap = { build = "squamousfruit", file = "swap_turn", symboltype = "1" },
-        fruit = "dug_monstrain", time = 2*TUNING.TOTAL_DAY_TIME
+        fruit = "dug_monstrain", time = 2*TUNING.TOTAL_DAY_TIME,
+        fruitnum_min = 1, fruitnum_max = 1, genekey = "raindonate"
     }
 }
 for k,v in pairs(mapseeds) do
@@ -1503,7 +1505,7 @@ GENETRANS.id = "GENETRANS"
 GENETRANS.str = STRINGS.ACTIONS.GENETRANS
 GENETRANS.strfn = function(act)
     if act.invobject ~= nil then
-        if act.invobject.prefab == "siving_rocks" then
+        if act.invobject.prefab == "siving_rocks" or act.invobject.sivturnenergy ~= nil then
             return "CHARGE"
         end
     end
@@ -1521,10 +1523,19 @@ GENETRANS.fn = function(act)
             material = act.invobject
         end
         if material ~= nil then
-            if material.prefab == "siving_rocks" then
+            if material.prefab == "siving_rocks" or material.sivturnenergy ~= nil then
                 return act.target.components.genetrans:Charge(material, act.doer)
             else
-                return act.target.components.genetrans:SetUp(material, act.doer, false)
+                local res, reason = act.target.components.genetrans:UnlockGene(material, act.doer)
+                if not res then --说明基因池解锁失败了
+                    if reason == "HASKEY" then --说明这是种活性组织
+                        return false, reason
+                    else
+                        return act.target.components.genetrans:SetUp(material, act.doer)
+                    end
+                else
+                    return true
+                end
             end
         end
     end

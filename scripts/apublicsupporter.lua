@@ -1712,7 +1712,7 @@ local CA_U_INVENTORYITEM_L = {
     function(inst, doer, target, actions, right) --物品右键放入子圭·育
         if
             right and
-            (inst.prefab == "siving_rocks" or TRANS_DATA_LEGION[inst.prefab] ~= nil) and
+            -- (inst.prefab == "siving_rocks" or TRANS_DATA_LEGION[inst.prefab] ~= nil) and
             target:HasTag("genetrans") and
             not (doer.replica.inventory ~= nil and doer.replica.inventory:IsHeavyLifting()) and
             not (doer.replica.rider ~= nil and doer.replica.rider:IsRiding())

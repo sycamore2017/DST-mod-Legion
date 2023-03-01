@@ -3684,7 +3684,7 @@ if IsServer then
         end
 
         --实体生成后，开始调取接口获取皮肤数据
-        inst.task_skin_l = inst:DoTaskInTime(0.1, function()
+        inst.task_skin_l = inst:DoTaskInTime(1.1, function()
             inst.task_skin_l = nil
             GetLegionSkins(inst, inst.userid, 0.5, false)
 

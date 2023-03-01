@@ -3667,7 +3667,9 @@ S______GENERIC.ACTIONFAIL.GENETRANS = {
     GROWING = "已经有东西在转化了。",
     ENERGYOUT = "它需要充能后才能启动。",
     WRONGITEM = "这不是它能转化的。",
-    ENERGYMAX = "它已经充满了生命的能量。"
+    ENERGYMAX = "它已经充满了生命的能量。",
+    WRONGKEY = "这东西没法让它做样本。",
+    HASKEY = "它已经有这个样本了。"
 }
 -- S_______WILLOW.ACTIONFAIL.GENETRANS =
 -- S_____WOLFGANG.ACTIONFAIL.GENETRANS =
@@ -3686,7 +3688,9 @@ S________WARLY.ACTIONFAIL.GENETRANS = {
     GROWING = "一口锅一次只能做一种菜！",
     NOENERGY = "这炉子没火了。",
     WRONGITEM = "错误的食材。",
-    ENERGYMAX = "已经到达了最大火力。"
+    ENERGYMAX = "已经到达了最大火力。",
+    WRONGKEY = "这东西不是它要的配方。",
+    HASKEY = "它已经有这个配方了。"
 }
 -- S_________WURT.ACTIONFAIL.GENETRANS =
 -- S_______WALTER.ACTIONFAIL.GENETRANS =
