@@ -264,46 +264,6 @@ _G.UndefendedATK_legion = function(inst, data)
 end
 
 --------------------------------------------------------------------------
---[[ 清理机制：让腐烂物、牛粪、鸟粪自动消失 ]]
---------------------------------------------------------------------------
-
-if IsServer and _G.CONFIGS_LEGION.CLEANINGUPSTENCH then
-    local function OnDropped_disappears(inst)
-        inst.components.disappears:PrepareDisappear()
-    end
-    local function OnPickup_disappears(inst, owner)
-        inst.components.disappears:StopDisappear()
-    end
-    local function AutoDisappears(inst, delayTime)
-        inst:AddComponent("disappears")
-        inst.components.disappears.sound = inst.SoundEmitter ~= nil and "dontstarve_DLC001/common/firesupressor_impact" or nil --消失组件里没有对声音组件的判断
-        inst.components.disappears.anim = "disappear"
-        inst.components.disappears.delay = delayTime --设置消失延迟时间
-
-        local onputininventoryfn_old = inst.components.inventoryitem.onputininventoryfn
-        inst.components.inventoryitem:SetOnPutInInventoryFn(function(item, owner)
-            if onputininventoryfn_old ~= nil then
-                onputininventoryfn_old(item, owner)
-            end
-            OnPickup_disappears(item, owner)
-        end)
-
-        inst:ListenForEvent("ondropped", OnDropped_disappears)
-        inst.components.disappears:PrepareDisappear()
-    end
-
-    AddPrefabPostInit("spoiled_food", function(inst)
-        AutoDisappears(inst, TUNING.TOTAL_DAY_TIME)
-    end)
-    AddPrefabPostInit("poop", function(inst)
-        AutoDisappears(inst, TUNING.TOTAL_DAY_TIME)
-    end)
-    AddPrefabPostInit("guano", function(inst)
-        AutoDisappears(inst, TUNING.TOTAL_DAY_TIME * 3)
-    end)
-end
-
---------------------------------------------------------------------------
 --[[ 修改rider组件，重新构造combat的redirectdamagefn函数以适应更多元的机制 ]]
 --------------------------------------------------------------------------
 
@@ -393,91 +353,6 @@ end
 --         end
 --     end
 -- end)
-
---------------------------------------------------------------------------
---[[ 修改传粉组件，防止非花朵但是也具有flower标签的东西被非法生成出来 ]]
---------------------------------------------------------------------------
-
-AddComponentPostInit("pollinator", function(self)
-    --local CreateFlower_old = self.CreateFlower
-    self.CreateFlower = function(self) --防止传粉者生成非花朵但却有flower标签的实体
-        if self:HasCollectedEnough() and self.inst:IsOnValidGround() then
-            local parentFlower = GetRandomItem(self.flowers)
-            local flower
-
-            if
-                parentFlower.prefab ~= "flower"
-                and parentFlower.prefab ~= "flower_rose"
-                and parentFlower.prefab ~= "planted_flower"
-                and parentFlower.prefab ~= "flower_evil"
-            then
-                flower = SpawnPrefab(math.random()<0.3 and "flower_rose" or "flower")
-            else
-                flower = SpawnPrefab(parentFlower.prefab)
-            end
-
-            if flower ~= nil then
-                flower.planted = true --这里需要改成true，不然会被世界当成一个生成点
-                flower.Transform:SetPosition(self.inst.Transform:GetWorldPosition())
-            end
-            self.flowers = {}
-        end
-    end
-
-    local Pollinate_old = self.Pollinate
-    self.Pollinate = function(self, flower)
-        if self:CanPollinate(flower) then
-            if flower.components.perennialcrop ~= nil then
-                flower.components.perennialcrop:Pollinate(self.inst)
-            elseif flower.components.perennialcrop2 ~= nil then
-                flower.components.perennialcrop2:Pollinate(self.inst)
-            end
-        end
-        if Pollinate_old ~= nil then
-            Pollinate_old(self, flower)
-        end
-    end
-end)
-
---------------------------------------------------------------------------
---[[ 重写小木牌(插在地上的)的绘图机制，让小木牌可以画上本mod里的物品 ]]
---------------------------------------------------------------------------
-
-if IsServer then
-    local InventoryPrefabsList = require("mod_inventoryprefabs_list")  --mod中有物品栏图片的prefabs的表
-
-    local function minisign_init(inst)
-        local OnDrawnFn_old = inst.components.drawable.ondrawnfn
-        inst.components.drawable:SetOnDrawnFn(function(inst, image, src, atlas, bgimage, bgatlas) --这里image是所用图片的名字，而非prefab的名字
-            if OnDrawnFn_old ~= nil then
-                OnDrawnFn_old(inst, image, src, atlas, bgimage, bgatlas)
-            end
-            --src在重载后就没了，所以没法让信息存在src里
-            if inst.use_high_symbol then
-                if image ~= nil and InventoryPrefabsList[image] ~= nil then
-                    inst.AnimState:OverrideSymbol("SWAP_SIGN_HIGH", InventoryPrefabsList[image].build, image)
-                end
-                if bgimage ~= nil and InventoryPrefabsList[bgimage] ~= nil then
-                    inst.AnimState:OverrideSymbol("SWAP_SIGN_BG_HIGH", InventoryPrefabsList[bgimage].build, bgimage)
-                end
-            else
-                if image ~= nil and InventoryPrefabsList[image] ~= nil then
-                    inst.AnimState:OverrideSymbol("SWAP_SIGN", InventoryPrefabsList[image].build, image)
-                end
-                if bgimage ~= nil and InventoryPrefabsList[bgimage] ~= nil then
-                    inst.AnimState:OverrideSymbol("SWAP_SIGN_BG", InventoryPrefabsList[bgimage].build, bgimage)
-                end
-            end
-        end)
-    end
-
-    AddPrefabPostInit("minisign", function(inst)
-        minisign_init(inst)
-    end)
-    AddPrefabPostInit("minisign_drawn", function(inst)
-        minisign_init(inst)
-    end)
-end
 
 --------------------------------------------------------------------------
 --[[ 弹吉他相关 ]]
@@ -1656,21 +1531,6 @@ AddPrefabPostInit("shieldofterror", function(inst)
 end)
 
 --------------------------------------------------------------------------
---[[ 世界修改 ]]
---------------------------------------------------------------------------
-
-if IsServer then
-    AddPrefabPostInit("world", function(inst)
-        if GetModConfigData("BackCubChance") > 0 and LootTables['bearger'] then
-            table.insert(LootTables['bearger'], {'backcub', GetModConfigData("BackCubChance")})
-        end
-        if LootTables['antlion'] then
-            table.insert(LootTables['antlion'], {'shield_l_sand_blueprint', 1})
-        end
-    end)
-end
-
---------------------------------------------------------------------------
 --[[ 给予动作的完善 ]]
 --------------------------------------------------------------------------
 
@@ -2202,3 +2062,217 @@ end)
 
 AddStategraphActionHandler("wilson", ActionHandler(ACTIONS.REMOVE_CARPET_L, "terraform"))
 AddStategraphActionHandler("wilson_client", ActionHandler(ACTIONS.REMOVE_CARPET_L, "terraform"))
+
+--------------------------------------------------------------------------
+--[[ 服务器专属修改 ]]
+--------------------------------------------------------------------------
+
+if IsServer then
+    --------------------------------------------------------------------------
+    --[[ 修改传粉组件，防止非花朵但是也具有flower标签的东西被非法生成出来 ]]
+    --------------------------------------------------------------------------
+
+    AddComponentPostInit("pollinator", function(self)
+        --local CreateFlower_old = self.CreateFlower
+        self.CreateFlower = function(self) --防止传粉者生成非花朵但却有flower标签的实体
+            if self:HasCollectedEnough() and self.inst:IsOnValidGround() then
+                local parentFlower = GetRandomItem(self.flowers)
+                local flower
+
+                if
+                    parentFlower.prefab ~= "flower"
+                    and parentFlower.prefab ~= "flower_rose"
+                    and parentFlower.prefab ~= "planted_flower"
+                    and parentFlower.prefab ~= "flower_evil"
+                then
+                    flower = SpawnPrefab(math.random()<0.3 and "flower_rose" or "flower")
+                else
+                    flower = SpawnPrefab(parentFlower.prefab)
+                end
+
+                if flower ~= nil then
+                    flower.planted = true --这里需要改成true，不然会被世界当成一个生成点
+                    flower.Transform:SetPosition(self.inst.Transform:GetWorldPosition())
+                end
+                self.flowers = {}
+            end
+        end
+
+        local Pollinate_old = self.Pollinate
+        self.Pollinate = function(self, flower)
+            if self:CanPollinate(flower) then
+                if flower.components.perennialcrop ~= nil then
+                    flower.components.perennialcrop:Pollinate(self.inst)
+                elseif flower.components.perennialcrop2 ~= nil then
+                    flower.components.perennialcrop2:Pollinate(self.inst)
+                end
+            end
+            if Pollinate_old ~= nil then
+                Pollinate_old(self, flower)
+            end
+        end
+    end)
+
+    --------------------------------------------------------------------------
+    --[[ 重写小木牌(插在地上的)的绘图机制，让小木牌可以画上本mod里的物品 ]]
+    --------------------------------------------------------------------------
+
+    local InventoryPrefabsList = require("mod_inventoryprefabs_list")  --mod中有物品栏图片的prefabs的表
+
+    local function minisign_init(inst)
+        local OnDrawnFn_old = inst.components.drawable.ondrawnfn
+        inst.components.drawable:SetOnDrawnFn(function(inst, image, src, atlas, bgimage, bgatlas) --这里image是所用图片的名字，而非prefab的名字
+            if OnDrawnFn_old ~= nil then
+                OnDrawnFn_old(inst, image, src, atlas, bgimage, bgatlas)
+            end
+            --src在重载后就没了，所以没法让信息存在src里
+            if inst.use_high_symbol then
+                if image ~= nil and InventoryPrefabsList[image] ~= nil then
+                    inst.AnimState:OverrideSymbol("SWAP_SIGN_HIGH", InventoryPrefabsList[image].build, image)
+                end
+                if bgimage ~= nil and InventoryPrefabsList[bgimage] ~= nil then
+                    inst.AnimState:OverrideSymbol("SWAP_SIGN_BG_HIGH", InventoryPrefabsList[bgimage].build, bgimage)
+                end
+            else
+                if image ~= nil and InventoryPrefabsList[image] ~= nil then
+                    inst.AnimState:OverrideSymbol("SWAP_SIGN", InventoryPrefabsList[image].build, image)
+                end
+                if bgimage ~= nil and InventoryPrefabsList[bgimage] ~= nil then
+                    inst.AnimState:OverrideSymbol("SWAP_SIGN_BG", InventoryPrefabsList[bgimage].build, bgimage)
+                end
+            end
+        end)
+    end
+    AddPrefabPostInit("minisign", minisign_init)
+    AddPrefabPostInit("minisign_drawn", minisign_init)
+
+    --------------------------------------------------------------------------
+    --[[ 清理机制：让腐烂物、牛粪、鸟粪自动消失 ]]
+    --------------------------------------------------------------------------
+
+    if _G.CONFIGS_LEGION.CLEANINGUPSTENCH then
+        local function OnDropped_disappears(inst)
+            inst.components.disappears:PrepareDisappear()
+        end
+        local function OnPickup_disappears(inst, owner)
+            inst.components.disappears:StopDisappear()
+        end
+        local function AutoDisappears(inst, delayTime)
+            inst:AddComponent("disappears")
+            inst.components.disappears.sound = inst.SoundEmitter ~= nil and "dontstarve_DLC001/common/firesupressor_impact" or nil --消失组件里没有对声音组件的判断
+            inst.components.disappears.anim = "disappear"
+            inst.components.disappears.delay = delayTime --设置消失延迟时间
+
+            local onputininventoryfn_old = inst.components.inventoryitem.onputininventoryfn
+            inst.components.inventoryitem:SetOnPutInInventoryFn(function(item, owner)
+                if onputininventoryfn_old ~= nil then
+                    onputininventoryfn_old(item, owner)
+                end
+                OnPickup_disappears(item, owner)
+            end)
+
+            inst:ListenForEvent("ondropped", OnDropped_disappears)
+            inst.components.disappears:PrepareDisappear()
+        end
+
+        AddPrefabPostInit("spoiled_food", function(inst)
+            AutoDisappears(inst, TUNING.TOTAL_DAY_TIME)
+        end)
+        AddPrefabPostInit("poop", function(inst)
+            AutoDisappears(inst, TUNING.TOTAL_DAY_TIME)
+        end)
+        AddPrefabPostInit("guano", function(inst)
+            AutoDisappears(inst, TUNING.TOTAL_DAY_TIME * 3)
+        end)
+    end
+
+    --------------------------------------------------------------------------
+    --[[ 世界修改 ]]
+    --------------------------------------------------------------------------
+
+    AddPrefabPostInit("world", function(inst)
+        if CONFIGS_LEGION.BACKCUBCHANCE > 0 and LootTables['bearger'] then
+            table.insert(LootTables['bearger'], {'backcub', CONFIGS_LEGION.BACKCUBCHANCE})
+        end
+        if LootTables['antlion'] then
+            table.insert(LootTables['antlion'], {'shield_l_sand_blueprint', 1})
+        end
+    end)
+
+    --------------------------------------------------------------------------
+    --[[ 倾心玫瑰酥：爱的城堡 ]]
+    --------------------------------------------------------------------------
+
+    local function OnEat_eater(inst, data)
+        if
+            data ~= nil and
+            data.food ~= nil and data.food.lovepoint_l ~= nil and --爱的料理
+            data.feeder ~= nil and data.feeder ~= inst and --喂食者不能是自己
+            data.feeder.userid ~= nil and data.feeder.userid ~= "" --喂食者只能是玩家
+        then
+            if data.feeder.components.sanity ~= nil then
+                data.feeder.components.sanity:DoDelta(15)
+            end
+            if inst.components.health == nil then
+                return
+            end
+
+            local cpt = inst.components.eater
+            local point = 0
+            if cpt.lovemap_l == nil then
+                cpt.lovemap_l = {}
+            else
+                point = cpt.lovemap_l[data.feeder.userid] or 0
+            end
+            point = point + data.food.lovepoint_l
+            print("加了："..tostring(point))
+            if point > 0 then
+                cpt.lovemap_l[data.feeder.userid] = point
+                inst.components.health:DoDelta(2*point, nil, data.food.prefab)
+            else
+                cpt.lovemap_l[data.feeder.userid] = nil
+            end
+            --特效 undo
+
+            local lovers = {
+                KU_d2kn608B = "KU_GNdCpQBk",
+                KU_GNdCpQBk = "KU_d2kn608B"
+            }
+            if
+                data.feeder.userid == "KU_baaCbyKC" or (
+                    inst.userid ~= nil and inst.userid ~= "" and
+                    lovers[inst.userid] == data.feeder.userid
+                )
+            then
+                local fx = SpawnPrefab("reskin_tool_bouquet_explode_fx")
+                fx.Transform:SetPosition(inst.Transform:GetWorldPosition())
+            end
+        end
+    end
+    AddComponentPostInit("eater", function(self)
+        self.inst:ListenForEvent("oneat", OnEat_eater)
+
+        local OnSave_old = self.OnSave
+        self.OnSave = function(self, ...)
+            if OnSave_old ~= nil then
+                local data, refs = OnSave_old(self, ...)
+                if type(data) == "table" then
+                    data.lovemap_l = self.lovemap_l
+                    return data, refs
+                end
+            end
+            if self.lovemap_l ~= nil then
+                return { lovemap_l = self.lovemap_l }
+            end
+        end
+
+        local OnLoad_old = self.OnLoad
+        self.OnLoad = function(self, data, ...)
+            self.lovemap_l = data.lovemap_l
+            if OnLoad_old ~= nil then
+                OnLoad_old(self, data, ...)
+            end
+        end
+    end)
+
+end

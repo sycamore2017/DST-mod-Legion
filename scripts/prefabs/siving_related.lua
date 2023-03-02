@@ -774,7 +774,7 @@ table.insert(prefs, Prefab(
 local function GetStatus_turn(inst)
     local cpt = inst.components.genetrans
     return (cpt == nil and "GENERIC")
-        or (cpt.fruit and "DONE")
+        or (cpt.fruitnum > 0 and "DONE")
         or (cpt.energytime <= 0 and "NOENERGY")
         or (cpt.seed and "DOING")
         or "GENERIC"

@@ -1213,6 +1213,26 @@ S________WARLY.DESCRIBE.DISH_TOMAHAWKSTEAK = {
 -- S_______WALTER.DESCRIBE.DISH_TOMAHAWKSTEAK = ""
 -- S________WANDA.DESCRIBE.DISH_TOMAHAWKSTEAK = ""
 
+S_NAMES.DISH_LOVINGROSECAKE = "倾心玫瑰酥"
+STRINGS.UI.COOKBOOK.DISH_LOVINGROSECAKE = "筑就爱的城堡"
+S______GENERIC.DESCRIBE.DISH_LOVINGROSECAKE = "一定要让我喜欢的人当面尝尝！"
+S_______WILLOW.DESCRIBE.DISH_LOVINGROSECAKE = "火不是唯一能让我心动的，还有一个人。"
+-- S_____WOLFGANG.DESCRIBE.DISH_LOVINGROSECAKE = ""
+S________WENDY.DESCRIBE.DISH_LOVINGROSECAKE = "莫名的情愫啊，请问，谁来将它带走呢？"
+-- S_________WX78.DESCRIBE.DISH_LOVINGROSECAKE = ""
+S_WICKERBOTTOM.DESCRIBE.DISH_LOVINGROSECAKE = "有所为，有所爱，有所期待。"
+S_______WOODIE.DESCRIBE.DISH_LOVINGROSECAKE = "我会送给露西，可惜她只吃木头。"
+S______WAXWELL.DESCRIBE.DISH_LOVINGROSECAKE = "小孩才用的恋爱把戏。"
+S___WATHGRITHR.DESCRIBE.DISH_LOVINGROSECAKE = "期待两人默契并肩作战。"
+S_______WEBBER.DESCRIBE.DISH_LOVINGROSECAKE = "能有人和我一起玩就太好啦。"
+-- S_______WINONA.DESCRIBE.DISH_LOVINGROSECAKE = ""
+S_______WORTOX.DESCRIBE.DISH_LOVINGROSECAKE = "衣带渐宽终不悔，为伊消得人憔悴。"
+S_____WORMWOOD.DESCRIBE.DISH_LOVINGROSECAKE = "不理解，但好吃！"
+S________WARLY.DESCRIBE.DISH_LOVINGROSECAKE = "最好分享给爱人而不是自己吃掉，懂了吗。"
+-- S_________WURT.DESCRIBE.DISH_LOVINGROSECAKE = ""
+-- S_______WALTER.DESCRIBE.DISH_LOVINGROSECAKE = ""
+S________WANDA.DESCRIBE.DISH_LOVINGROSECAKE = "我终将随时间离开，只能自己享用了。"
+
 --------------------------------------------------------------------------
 --[[ the sacrifice of rain ]]--[[ 祈雨祭 ]]
 --------------------------------------------------------------------------

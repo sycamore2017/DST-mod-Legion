@@ -1128,6 +1128,26 @@ S________WARLY.DESCRIBE.DISH_TOMAHAWKSTEAK = {
 -- S_______WALTER.DESCRIBE.DISH_TOMAHAWKSTEAK = ""
 -- S________WANDA.DESCRIBE.DISH_TOMAHAWKSTEAK = ""
 
+S_NAMES.DISH_LOVINGROSECAKE = "Loving Rose Shortcake" --倾心玫瑰酥
+STRINGS.UI.COOKBOOK.DISH_LOVINGROSECAKE = "Build a castle of love"
+S______GENERIC.DESCRIBE.DISH_LOVINGROSECAKE = "Be sure to let someone I love taste it in person!"
+S_______WILLOW.DESCRIBE.DISH_LOVINGROSECAKE = "Fire is not the only thing that gets me."
+-- S_____WOLFGANG.DESCRIBE.DISH_LOVINGROSECAKE = ""
+S________WENDY.DESCRIBE.DISH_LOVINGROSECAKE = "Inexplicable feelings, who will take it away?"
+-- S_________WX78.DESCRIBE.DISH_LOVINGROSECAKE = ""
+S_WICKERBOTTOM.DESCRIBE.DISH_LOVINGROSECAKE = "There is something to do, to love, to expect."
+S_______WOODIE.DESCRIBE.DISH_LOVINGROSECAKE = "I will give it to Lucy, but she only eats wood."
+S______WAXWELL.DESCRIBE.DISH_LOVINGROSECAKE = "A love trick for children."
+S___WATHGRITHR.DESCRIBE.DISH_LOVINGROSECAKE = "Looking forward to the two of us fighting side-by-side."
+S_______WEBBER.DESCRIBE.DISH_LOVINGROSECAKE = "It would be great to have someone play with me."
+-- S_______WINONA.DESCRIBE.DISH_LOVINGROSECAKE = ""
+S_______WORTOX.DESCRIBE.DISH_LOVINGROSECAKE = "Where there is love, there are always wishes."
+S_____WORMWOOD.DESCRIBE.DISH_LOVINGROSECAKE = "I don't understand, but delicious!"
+S________WARLY.DESCRIBE.DISH_LOVINGROSECAKE = "It's better to share it with your lover rather than eat it yourself."
+-- S_________WURT.DESCRIBE.DISH_LOVINGROSECAKE = ""
+-- S_______WALTER.DESCRIBE.DISH_LOVINGROSECAKE = ""
+S________WANDA.DESCRIBE.DISH_LOVINGROSECAKE = "I will leave with time and can only enjoy myself."
+
 --------------------------------------------------------------------------
 --[[ the sacrifice of rain ]]--[[ 祈雨祭 ]]
 --------------------------------------------------------------------------

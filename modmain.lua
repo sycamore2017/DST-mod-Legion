@@ -156,6 +156,7 @@ else
 end
 
 _G.CONFIGS_LEGION.CLEANINGUPSTENCH = GetModConfigData("CleaningUpStench") --自动清除地上的臭臭 bool
+_G.CONFIGS_LEGION.BACKCUBCHANCE = GetModConfigData("BackCubChance") --靠背熊掉落几率
 
 ----------
 --语言设置
@@ -278,14 +279,13 @@ end
 
 local cooking = require("cooking")
 local ingredients_l = {
-    { {"ash"}, {inedible=1}, false, false }, --灰烬
+    { {"ash", "furtuft", "twiggy_nut"}, {inedible=1}, false, false }, --灰烬、熊毛屑(非熊皮)、树枝树种
     { {"slurtleslime", "glommerfuel", "phlegm"}, {gel=1}, false, false }, --蜗牛黏液、格罗姆黏液、钢羊黏痰
-    { {"furtuft"}, {inedible=1}, false, false }, --熊毛屑(非熊皮)
-    { {"twiggy_nut"}, {inedible=1}, false, false }, --树枝树种
     { {"moon_tree_blossom"}, {veggie=.5, petals_legion=1}, false, false }, --月树花
     { {"foliage"}, {decoration=1}, false, false }, --蕨叶
     { {"horn"}, {inedible=1, decoration=2}, false, false }, --牛角
     { {"forgetmelots", "cactus_flower", "myth_lotus_flower", "aip_veggie_sunflower"}, {petals_legion=1}, false, false }, --必忘我、仙人掌花、【神话书说】莲花、【额外物品包】向日葵
+    { {"reviver"}, {meat=1.5, magic=1}, false, false }, --告密的心
 
     { {"shyerry"}, {fruit=4}, true, false }, --颤栗果
     { {"albicans_cap"}, {veggie=2}, false, false }, --素白菇

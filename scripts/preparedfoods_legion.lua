@@ -759,6 +759,32 @@ local foods_legion = {
             end
         end,
     },
+    dish_lovingrosecake = {
+        test = function(cooker, names, tags)
+            return names.petals_rose and names.reviver
+                and not tags.monster
+        end,
+        priority = 56,
+        foodtype = FOODTYPE.GOODIES,
+        secondaryfoodtype = FOODTYPE.ROUGHAGE,
+        health = 20,
+        hunger = 13,
+        sanity = 14,
+        perishtime = 10000*TUNING.TOTAL_DAY_TIME,
+        cooktime = 1,
+        potlevel = nil,
+        float = {nil, "small", 0.12, 1},
+
+        cook_need = "蔷薇花瓣 告密的心",
+        cook_cant = "怪物度",
+        recipe_count = 6,
+
+        oneat_desc = STRINGS.UI.COOKBOOK.DISH_LOVINGROSECAKE,
+
+        fn_common = function(inst)
+            inst.lovepoint_l = 1
+        end
+    },
     ------
     --花香四溢
     ------
