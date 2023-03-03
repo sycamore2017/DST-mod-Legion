@@ -608,6 +608,7 @@ _G.SKIN_PREFABS_LEGION = {
     siving_turn = {
         fn_start = function(inst)
             Fn_siving_turn(inst, "siving_turn", true)
+            inst.components.genetrans.fxdata.unlockfx = "siving_turn_unlock_fx"
         end,
         fn_fruit = function(genetrans)
             Fn_siving_turn_fruit(genetrans, "siving_turn")
@@ -2058,6 +2059,7 @@ _G.SKINS_LEGION = {
 
 		fn_start = function(inst)
             Fn_siving_turn(inst, "siving_turn_collector", false)
+            inst.components.genetrans.fxdata.unlockfx = "siving_turn_collector_unlock_fx"
         end,
         fn_fruit = function(genetrans)
             Fn_siving_turn_fruit(genetrans, "siving_turn_collector")

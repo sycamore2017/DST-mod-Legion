@@ -22,7 +22,7 @@ local GeneTrans = Class(function(self, inst)
 
 	self.fxdata = {
 		prefab = "siving_turn_fruit", symbol = "followed", x = 0, y = 0, z = 0,
-		skinname = "siving_turn", bloom = true
+		skinname = "siving_turn", bloom = true, unlockfx = "siving_turn_unlock_fx"
 	}
 	self.fx = nil
 end)
@@ -627,7 +627,12 @@ function GeneTrans:UnlockGene(items, doer)
 		else
 			items:Remove()
 		end
-		--blinkblink的特效 undo
+
+		local fx = SpawnPrefab(self.fxdata.unlockfx)
+		if fx ~= nil then
+			fx.Transform:SetPosition(self.inst.Transform:GetWorldPosition())
+		end
+		self.inst.SoundEmitter:PlaySound("wintersfeast2019/winters_feast/table/fx")
 	end
 
 	return true

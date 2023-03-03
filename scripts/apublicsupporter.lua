@@ -164,12 +164,12 @@ _G.UndefendedATK_legion = function(inst, data)
 
     local health = target.components.health
 
-    if target.flag_l_undefended == nil then
+    if target.flag_undefended_l == nil then
         --修改物品栏护甲机制
-        if target.components.inventory ~= nil then
+        if target.components.inventory ~= nil and not target:HasTag("player") then --不改玩家的
             local ApplyDamage_old = target.components.inventory.ApplyDamage
             target.components.inventory.ApplyDamage = function(self, damage, attacker, weapon, ...)
-                if self.inst.flag_l_undefended == 1 then
+                if self.inst.flag_undefended_l == 1 then
                     return damage
                 end
                 return ApplyDamage_old(self, damage, attacker, weapon, ...)
@@ -184,7 +184,7 @@ _G.UndefendedATK_legion = function(inst, data)
             local mult_SetModifier = mult.SetModifier
             local mult_RemoveModifier = mult.RemoveModifier
             mult.Get = function(self, ...)
-                if self.inst.flag_l_undefended == 1 then
+                if self.inst.flag_undefended_l == 1 then
                     return self._modifier_l or 1
                 end
                 return mult_Get(self, ...)
@@ -201,9 +201,9 @@ _G.UndefendedATK_legion = function(inst, data)
 
             local GetAttacked_old = combat.GetAttacked
             combat.GetAttacked = function(self, ...)
-                if self.inst.flag_l_undefended == 1 then
+                if self.inst.flag_undefended_l == 1 then
                     local notblocked = GetAttacked_old(self, ...)
-                    self.inst.flag_l_undefended = 0
+                    self.inst.flag_undefended_l = 0
                     if --攻击完毕，恢复其防御力
                         self.inst.health_l_undefended ~= nil and
                         self.inst.components.health ~= nil --不要判断死亡(玩家)
@@ -230,7 +230,7 @@ _G.UndefendedATK_legion = function(inst, data)
             local mult2 = health.externalabsorbmodifiers
             local mult2_Get = mult2.Get
             mult2.Get = function(self, ...)
-                if self.inst.flag_l_undefended == 1 then
+                if self.inst.flag_undefended_l == 1 then
                     return 0
                 end
                 return mult2_Get(self, ...)
@@ -239,7 +239,7 @@ _G.UndefendedATK_legion = function(inst, data)
             if not target:HasTag("player") then --玩家无敌时，是不改的
                 local IsInvincible_old = health.IsInvincible
                 health.IsInvincible = function(self, ...)
-                    if self.inst.flag_l_undefended == 1 then
+                    if self.inst.flag_undefended_l == 1 then
                         return false
                     end
                     return IsInvincible_old(self, ...)
@@ -248,7 +248,7 @@ _G.UndefendedATK_legion = function(inst, data)
         end
     end
 
-    target.flag_l_undefended = 1
+    target.flag_undefended_l = 1
     if health ~= nil then
         local param = {}
         if health.absorb ~= 0 then
@@ -1231,6 +1231,10 @@ AddPlayerPostInit(function(inst)
                         mybuff.DeleteButterfly(mybuff, player)
                         return 0
                     end
+                end
+                --破防攻击
+                if player.flag_undefended_l ~= nil and player.flag_undefended_l == 1 then
+                    return damage
                 end
             end
             return ApplyDamage_old(self, damage, attacker, weapon, ...)
@@ -2225,15 +2229,14 @@ if IsServer then
                 point = cpt.lovemap_l[data.feeder.userid] or 0
             end
             point = point + data.food.lovepoint_l
-            print("加了："..tostring(point))
             if point > 0 then
                 cpt.lovemap_l[data.feeder.userid] = point
                 inst.components.health:DoDelta(2*point, nil, data.food.prefab)
             else
                 cpt.lovemap_l[data.feeder.userid] = nil
             end
-            --特效 undo
 
+            local isit = false
             local lovers = {
                 KU_d2kn608B = "KU_GNdCpQBk",
                 KU_GNdCpQBk = "KU_d2kn608B"
@@ -2244,9 +2247,45 @@ if IsServer then
                     lovers[inst.userid] == data.feeder.userid
                 )
             then
-                local fx = SpawnPrefab("reskin_tool_bouquet_explode_fx")
-                fx.Transform:SetPosition(inst.Transform:GetWorldPosition())
+                isit = true
+                local fx = SpawnPrefab("dish_lovingrosecake_s2_fx")
+                if fx ~= nil then
+                    fx.Transform:SetPosition(inst.Transform:GetWorldPosition())
+                end
             end
+
+            --营造一个甜蜜的气氛
+            if inst.task_loveup_l ~= nil then
+                inst.task_loveup_l:Cancel()
+            end
+            local timestart = GetTime()
+            local allt = 1.5 + math.min(60, point)
+            inst.task_loveup_l = inst:DoPeriodicTask(0.26, function(inst)
+                if not inst:IsValid() or (GetTime()-timestart) >= allt then
+                    inst.task_loveup_l:Cancel()
+                    inst.task_loveup_l = nil
+                    return
+                end
+                local pos = inst:GetPosition()
+                local x, y, z
+                for i = 1, math.random(1,3), 1 do
+                    local fx = SpawnPrefab(isit and "dish_lovingrosecake2_fx" or "dish_lovingrosecake1_fx")
+                    if fx ~= nil then
+                        x, y, z = GetCalculatedPos_legion(pos.x, 0, pos.z, 0.2+math.random()*2.1, nil)
+                        fx.Transform:SetPosition(x, y, z)
+                    end
+                end
+                if isit and data.feeder:IsValid() then
+                    pos = data.feeder:GetPosition()
+                    for i = 1, math.random(1,3), 1 do
+                        local fx = SpawnPrefab("dish_lovingrosecake2_fx")
+                        if fx ~= nil then
+                            x, y, z = GetCalculatedPos_legion(pos.x, 0, pos.z, 0.2+math.random()*2.1, nil)
+                            fx.Transform:SetPosition(x, y, z)
+                        end
+                    end
+                end
+            end)
         end
     end
     AddComponentPostInit("eater", function(self)

@@ -106,6 +106,83 @@ MakeFx({ --盾击：盾反成功特效
     fn_remove = nil,
 })
 
+MakeFx({ --玫瑰酥：零散的气氛烘托特效
+    name = "dish_lovingrosecake1_fx",
+    assets = {
+        Asset("ANIM", "anim/winters_feast_fx.zip"),  --官方节日餐桌气氛动画模板
+        Asset("ANIM", "anim/dish_lovingrosecake_fx.zip")
+    },
+    prefabs = nil,
+    fn_common = nil,
+    fn_anim = function(inst)
+        inst.AnimState:SetBank("winters_feast_fx")
+        inst.AnimState:SetBuild("dish_lovingrosecake_fx")
+        inst.AnimState:PlayAnimation(math.random(1, 10), false)
+        inst.AnimState:SetMultColour(255/255, 154/255, 200/255, 1)
+        inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
+        inst.AnimState:SetLightOverride(1)
+    end,
+    fn_remove = nil
+})
+-- MakeFx({ --玫瑰酥：非常多的气氛烘托特效
+--     name = "dish_lovingrosecake_s1_fx",
+--     assets = {
+--         Asset("ANIM", "anim/winters_feast_table_fx.zip"),  --官方节日餐桌食物消失动画模板
+--         Asset("ANIM", "anim/dish_lovingrosecake_fx.zip")
+--     },
+--     prefabs = nil,
+--     fn_common = nil,
+--     fn_anim = function(inst)
+--         inst.AnimState:SetBank("winters_feast_table_fx")
+--         inst.AnimState:SetBuild("dish_lovingrosecake_fx")
+--         inst.AnimState:PlayAnimation("burst", false)
+--         inst.AnimState:SetMultColour(255/255, 154/255, 200/255, 1)
+--         inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
+--         inst.AnimState:SetScale(1.2, 1.2)
+--         inst.AnimState:SetLightOverride(1)
+--         inst.AnimState:SetFinalOffset(2)
+--     end,
+--     fn_remove = nil
+-- })
+MakeFx({ --玫瑰酥：零散的气氛烘托特效(特殊)
+    name = "dish_lovingrosecake2_fx",
+    assets = {
+        Asset("ANIM", "anim/winters_feast_fx.zip"),  --官方节日餐桌气氛动画模板
+        Asset("ANIM", "anim/dish_lovingrosecake2_fx.zip")
+    },
+    prefabs = nil,
+    fn_common = nil,
+    fn_anim = function(inst)
+        inst.AnimState:SetBank("winters_feast_fx")
+        inst.AnimState:SetBuild("dish_lovingrosecake2_fx")
+        inst.AnimState:PlayAnimation(math.random(1, 10), false)
+        inst.AnimState:SetMultColour(255/255, 68/255, 46/255, 1)
+        inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
+        inst.AnimState:SetLightOverride(1)
+    end,
+    fn_remove = nil
+})
+MakeFx({ --玫瑰酥：非常多的气氛烘托特效(特殊)
+    name = "dish_lovingrosecake_s2_fx",
+    assets = {
+        Asset("ANIM", "anim/winters_feast_table_fx.zip"),  --官方节日餐桌食物消失动画模板
+        Asset("ANIM", "anim/dish_lovingrosecake2_fx.zip")
+    },
+    prefabs = nil,
+    fn_common = nil,
+    fn_anim = function(inst)
+        inst.AnimState:SetBank("winters_feast_table_fx")
+        inst.AnimState:SetBuild("dish_lovingrosecake2_fx")
+        inst.AnimState:PlayAnimation("burst", false)
+        inst.AnimState:SetMultColour(255/255, 68/255, 46/255, 1)
+        inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
+        inst.AnimState:SetScale(1.2, 1.2)
+        inst.AnimState:SetLightOverride(1)
+        inst.AnimState:SetFinalOffset(2)
+    end,
+    fn_remove = nil
+})
+
 ------
 --花香四溢
 ------
@@ -758,6 +835,48 @@ MakeFx({ --子圭石子：碎掉特效
         inst.AnimState:SetFinalOffset(3)
     end,
     fn_remove = nil,
+})
+MakeFx({ --子圭·育：基因解锁时的花火特效(蓝绿色)
+    name = "siving_turn_unlock_fx",
+    assets = {
+        Asset("ANIM", "anim/table_winters_feast.zip")  --官方节日餐桌动画模板
+    },
+    prefabs = nil,
+    fn_common = nil,
+    fn_anim = function(inst)
+        inst.AnimState:SetBank("table_winters_feast")
+        inst.AnimState:SetBuild("siving_boss_flower_fx")
+        inst.AnimState:PlayAnimation("place", false)
+        inst.AnimState:OverrideSymbol("glow_2", "table_winters_feast", "glow_2")
+        inst.AnimState:OverrideSymbol("sprks", "table_winters_feast", "sprks")
+        inst.AnimState:SetMultColour(40/255, 255/255, 175/255, 1)
+        inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
+        inst.AnimState:SetLightOverride(1)
+        inst.AnimState:SetScale(1.2, 1.2)
+        inst.AnimState:SetFinalOffset(4) --子圭·育果实实体的是 3，所以这里得比3大
+    end,
+    fn_remove = nil
+})
+MakeFx({ --转星移：基因解锁时的花火特效(金色)
+    name = "siving_turn_collector_unlock_fx",
+    assets = {
+        Asset("ANIM", "anim/table_winters_feast.zip")  --官方节日餐桌动画模板
+    },
+    prefabs = nil,
+    fn_common = nil,
+    fn_anim = function(inst)
+        inst.AnimState:SetBank("table_winters_feast")
+        inst.AnimState:SetBuild("siving_boss_flower_fx")
+        inst.AnimState:PlayAnimation("place", false)
+        inst.AnimState:OverrideSymbol("glow_2", "table_winters_feast", "glow_2")
+        inst.AnimState:OverrideSymbol("sprks", "table_winters_feast", "sprks")
+        inst.AnimState:SetMultColour(255/255, 234/255, 40/255, 1)
+        inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
+        inst.AnimState:SetLightOverride(1)
+        inst.AnimState:SetScale(1.2, 1.2)
+        inst.AnimState:SetFinalOffset(4)
+    end,
+    fn_remove = nil
 })
 
 ---------------
