@@ -658,10 +658,36 @@ local function DoUpgrade(doer, item, target, itemvalue, ismax, defaultreason)
     end
     return false
 end
+local function DoArmorRepair(doer, item, target, value)
+    if
+        target ~= nil and
+        target.components.armor ~= nil and target.components.armor:GetPercent() < 1
+    then
+        value = value*(doer.mult_repair_l or 1)
+        local cpt = target.components.armor
+        local need = math.ceil((cpt.maxcondition - cpt.condition) / value)
+        if need > 1 then --最后一次很可能会比较浪费，所以不主动填满
+            need = need - 1
+        end
 
-------
---电闪雷鸣
-------
+        if item.components.stackable ~= nil then
+            local stack = item.components.stackable:StackSize() or 1
+            if need > stack then
+                need = stack
+            end
+            local useditems = item.components.stackable:Get(need)
+            useditems:Remove()
+        else
+            need = 1
+            item:Remove()
+        end
+        cpt:Repair(value*need)
+        return true
+    end
+    return false, "GUITAR"
+end
+
+--素白蘑菇帽
 
 local function Fn_try_fungus(inst, doer, target, actions, right)
     if target.repair_fungus_l then
@@ -712,9 +738,7 @@ for k,v in pairs(fungus_needchange) do
 end
 fungus_needchange = nil
 
-------
---尘世蜃楼
-------
+--白木吉他、白木地片
 
 _G.FUELTYPE.GUITAR = "GUITAR"
 _G.UPGRADETYPES.MAT_L = "mat_l"
@@ -786,6 +810,8 @@ _G.REPAIRERS_L["mat_whitewood_item"] = {
     end
 }
 
+--砂之抵御
+
 local function Fn_try_sand(inst, doer, target, actions, right)
     if target:HasTag("repair_sand") then
         if CommonDoerCheck(doer, target) then
@@ -793,34 +819,6 @@ local function Fn_try_sand(inst, doer, target, actions, right)
         end
     end
     return false
-end
-local function Fn_do_sand(doer, item, target, value)
-    if
-        target ~= nil and
-        target.components.armor ~= nil and target.components.armor:GetPercent() < 1
-    then
-        value = value*(doer.mult_repair_l or 1)
-        local cpt = target.components.armor
-        local need = math.ceil((cpt.maxcondition - cpt.condition) / value)
-        if need > 1 then --最后一次很可能会比较浪费，所以不主动填满
-            need = need - 1
-        end
-
-        if item.components.stackable ~= nil then
-            local stack = item.components.stackable:StackSize() or 1
-            if need > stack then
-                need = stack
-            end
-            local useditems = item.components.stackable:Get(need)
-            useditems:Remove()
-        else
-            need = 1
-            item:Remove()
-        end
-        cpt:Repair(value*need)
-        return true
-    end
-    return false, "GUITAR"
 end
 
 local rock_needchange = {
@@ -835,15 +833,32 @@ for k,v in pairs(rock_needchange) do
         fn_try = Fn_try_sand,
         fn_sg = Fn_sg_long,
         fn_do = function(act)
-            return Fn_do_sand(act.doer, act.invobject, act.target, v)
+            return DoArmorRepair(act.doer, act.invobject, act.target, v)
         end
     }
 end
 rock_needchange = nil
 
-------
---祈雨祭
-------
+--犀金胄甲、犀金护甲
+
+local function Fn_try_bugshell(inst, doer, target, actions, right)
+    if target.repair_bugshell_l then
+        if CommonDoerCheck(doer, target) then
+            return true
+        end
+    end
+    return false
+end
+_G.REPAIRERS_L["insectshell_l"] = {
+    noapiset = true,
+    fn_try = Fn_try_bugshell,
+    fn_sg = Fn_sg_long,
+    fn_do = function(act)
+        return DoArmorRepair(act.doer, act.invobject, act.target, 180)
+    end
+}
+
+--月藏宝匣、月轮宝盘
 
 _G.UPGRADETYPES.REVOLVED_L = "revolved_l"
 _G.UPGRADETYPES.HIDDEN_L = "hidden_l"

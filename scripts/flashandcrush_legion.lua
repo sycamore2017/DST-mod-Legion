@@ -198,6 +198,26 @@ if _G.CONFIGS_LEGION.TECHUNLOCK == "lootdropper" then
             atlas = "images/inventoryimages/soul_contracts.xml", image = "soul_contracts.tex"
         }, { "RECAST", "RESTORATION", "MAGIC" }
     )
+    AddRecipe2(
+        "hat_elepheetle", {
+            Ingredient("dumbbell_marble", 1),
+            Ingredient("insectshell_l", 40, "images/inventoryimages/insectshell_l.xml"),
+            Ingredient("goldnugget", 10),
+            Ingredient("slurtlehat", 1),
+        }, TECH.LOST, {
+            atlas = "images/inventoryimages/hat_elepheetle.xml", image = "hat_elepheetle.tex"
+        }, { "RECAST", "ARMOUR" }
+    )
+    AddRecipe2(
+        "armor_elepheetle", {
+            Ingredient("armormarble", 1),
+            Ingredient("insectshell_l", 40, "images/inventoryimages/insectshell_l.xml"),
+            Ingredient("goldnugget", 10),
+            Ingredient("armorsnurtleshell", 1),
+        }, TECH.LOST, {
+            atlas = "images/inventoryimages/armor_elepheetle.xml", image = "armor_elepheetle.tex"
+        }, { "RECAST", "ARMOUR" }
+    )
 else
     AddRecipe2(
         "tripleshovelaxe", {
@@ -337,6 +357,28 @@ else
             nounlock = true, builder_tag = "soulstealer",
             atlas = "images/inventoryimages/soul_contracts.xml", image = "soul_contracts.tex"
         }, { "RECAST", "RESTORATION", "MAGIC", "CHARACTER" }
+    )
+    AddRecipe2(
+        "hat_elepheetle", {
+            Ingredient("dumbbell_marble", 1),
+            Ingredient("insectshell_l", 40, "images/inventoryimages/insectshell_l.xml"),
+            Ingredient("goldnugget", 10),
+            Ingredient("slurtlehat", 1),
+        }, TECH.ELECOURMALINE_THREE, {
+            nounlock = true,
+            atlas = "images/inventoryimages/hat_elepheetle.xml", image = "hat_elepheetle.tex"
+        }, { "RECAST", "ARMOUR" }
+    )
+    AddRecipe2(
+        "armor_elepheetle", {
+            Ingredient("armormarble", 1),
+            Ingredient("insectshell_l", 40, "images/inventoryimages/insectshell_l.xml"),
+            Ingredient("goldnugget", 10),
+            Ingredient("armorsnurtleshell", 1),
+        }, TECH.ELECOURMALINE_THREE, {
+            nounlock = true,
+            atlas = "images/inventoryimages/armor_elepheetle.xml", image = "armor_elepheetle.tex"
+        }, { "RECAST", "ARMOUR" }
     )
 end
 

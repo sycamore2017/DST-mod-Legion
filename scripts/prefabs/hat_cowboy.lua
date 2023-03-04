@@ -147,7 +147,6 @@ local function fn(Sim)
     inst.components.skinedlegion:InitWithFloater("hat_cowboy")
 
     inst.entity:SetPristine()
-
     if not TheWorld.ismastersim then
         return inst
     end
@@ -186,4 +185,4 @@ local function fn(Sim)
     return inst
 end
 
-return Prefab( "hat_cowboy", fn, assets)
+return Prefab("hat_cowboy", fn, assets)

@@ -3,7 +3,6 @@ local prefabFiles = {
     "farm_plants_legion",
     "cropgnat",
     "insectthings_l",
-    "boltwingout",
     "siving_related",
     "fishhomingtools",
     "boss_siving_phoenix"
@@ -52,6 +51,10 @@ local assets = {
     Asset("IMAGE", "images/inventoryimages/siving_feather_real.tex"),
     Asset("ATLAS", "images/inventoryimages/siving_feather_fake.xml"),
     Asset("IMAGE", "images/inventoryimages/siving_feather_fake.tex"),
+    Asset("ATLAS", "images/inventoryimages/hat_elepheetle.xml"),
+    Asset("IMAGE", "images/inventoryimages/hat_elepheetle.tex"),
+    Asset("ATLAS", "images/inventoryimages/armor_elepheetle.xml"),
+    Asset("IMAGE", "images/inventoryimages/armor_elepheetle.tex"),
 }
 
 for k,v in pairs(assets) do
