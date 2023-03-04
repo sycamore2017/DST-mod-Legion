@@ -264,7 +264,8 @@ params.boltwingout = {
             moonbutterflywings = 1, --月蛾翅膀
             moonbutterfly = 0.3,    --月蛾
 
-            ahandfulofwings = 0.25, --一捧翅膀
+            ahandfulofwings = 0.25, --虫翅碎片
+            insectshell_l = 0.25,   --虫甲碎片
             raindonate = 0.45,      --雨蝇
             fireflies = 0.45,       --萤火虫
 

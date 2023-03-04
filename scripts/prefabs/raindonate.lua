@@ -1,20 +1,14 @@
-local assets =
-{
+local assets = {
     Asset("ANIM", "anim/raindonate.zip"),
     Asset("ATLAS", "images/inventoryimages/raindonate.xml"),
     Asset("IMAGE", "images/inventoryimages/raindonate.tex"),
-    Asset("ANIM", "anim/mosquito.zip"), --官方蚊子动画模板
+    Asset("ANIM", "anim/mosquito.zip") --官方蚊子动画模板
 }
-
-local prefabs =
-{
-    --nothing
+local prefabs = {
+    "ahandfulofwings"
 }
-
 local brain = require("brains/raindonatebrain")
-
-local sounds =
-{
+local sounds = {
     takeoff = "dontstarve_DLC001/creatures/dragonfly/fly",
     --attack = "dontstarve_DLC001/creatures/dragonfly/fly",
     buzz = "dontstarve_DLC001/creatures/dragonfly/fly", --飞行时的配音，龙蝇扇翅膀的声音
@@ -23,12 +17,9 @@ local sounds =
     --explode = "dontstarve/creatures/mosquito/mosquito_explo",
 }
 
---[[
-SetSharedLootTable('raindonate',
-{
-    {'mosquitosack', .5},
+SetSharedLootTable('raindonate', {
+    {'ahandfulofwings', 0.33},
 })
---]]
 
 local function OnWorked(inst, worker)
     local owner = inst.components.homeseeker ~= nil and inst.components.homeseeker.home or nil
@@ -185,8 +176,8 @@ local function raindonate()
     inst.components.inventoryitem.imagename = "raindonate"
     inst.components.inventoryitem.atlasname = "images/inventoryimages/raindonate.xml"
 
-    --inst:AddComponent("lootdropper")
-    --inst.components.lootdropper:SetChanceLootTable('raindonate')
+    inst:AddComponent("lootdropper")
+    inst.components.lootdropper:SetChanceLootTable('raindonate')
 
     -- inst:AddComponent("stackable")
 
@@ -226,6 +217,7 @@ local function raindonate()
 
     -- inst:ListenForEvent("attacked", OnAttacked)
     inst:ListenForEvent("death", OnDeath)
+    inst.fn_murdered_l = OnDeath
 
     MakeFeedableSmallLivestock(inst, TUNING.TOTAL_DAY_TIME * 2, OnPickedUp, OnDropped)
 

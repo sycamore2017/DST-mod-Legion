@@ -78,11 +78,12 @@ local InventoryPrefabsList = {  --每个元素的下标值为每种物品栏图�
     dish_murmurananas = { build = "images_minisign4" },
     dish_shyerryjam = { build = "images_minisign4" },
     ahandfulofwings = { build = "images_minisign4" },
+    insectshell_l = { build = "images_minisign4" },
     boltwingout = { build = "images_minisign4" },
     tripleshovelaxe = { build = "images_minisign4" },
     catmint = { build = "images_minisign4" },
     cattenball = { build = "images_minisign4" },
-    --70
+    --71
 
     dish_sugarlesstrickmakercupcakes = { build = "images_minisign4" },
     hat_albicans_mushroom = { build = "images_minisign4" },
@@ -149,7 +150,6 @@ local InventoryPrefabsList = {  --每个元素的下标值为每种物品栏图�
     revolvedmoonlight_item = { build = "images_minisign6" },
     revolvedmoonlight = { build = "images_minisign6" },
     revolvedmoonlight_pro = { build = "images_minisign6" },
-
     dish_lovingrosecake = { build = "images_minisign6" },
 
     --skins1

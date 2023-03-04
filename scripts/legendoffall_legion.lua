@@ -2,7 +2,7 @@ local prefabFiles = {
     "siving_rocks_legion",
     "farm_plants_legion",
     "cropgnat",
-    "ahandfulofwings",
+    "insectthings_l",
     "boltwingout",
     "siving_related",
     "fishhomingtools",
@@ -26,6 +26,8 @@ local assets = {
     Asset("IMAGE", "images/inventoryimages/siving_soil_item.tex"),
     Asset("ATLAS", "images/inventoryimages/ahandfulofwings.xml"),
     Asset("IMAGE", "images/inventoryimages/ahandfulofwings.tex"),
+    Asset("ATLAS", "images/inventoryimages/insectshell_l.xml"),
+    Asset("IMAGE", "images/inventoryimages/insectshell_l.tex"),
     Asset("ATLAS", "images/inventoryimages/boltwingout.xml"),
     Asset("IMAGE", "images/inventoryimages/boltwingout.tex"),
     Asset("ATLAS", "images/inventoryimages/siving_rocks.xml"), --mod之间注册相同的文件是有效的
@@ -809,6 +811,7 @@ local fishhoming_ingredients = {
     mosquito =          { pasty = 1, frizzy = 1, shaking = 1 },
     raindonate =        { pasty = 1, shaking = 1 },
     ahandfulofwings =   { pasty = 1, dusty = 1, shaking = 1 },
+    insectshell_l =     { hardy = 1, dusty = 1, shaking = 1 },
     wormlight =         { pasty = 1, veggie = 2, frizzy = 1 }, --海鹦鹉
     wormlight_lesser =  { pasty = 1, veggie = 1, frizzy = 1 },
     minotaurhorn =      { pasty = 1, dusty = 1, hardy = 1, evil = 10, meat = 1 }, --邪天翁

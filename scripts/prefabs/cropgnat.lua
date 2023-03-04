@@ -1,19 +1,16 @@
-local assets =
-{
+local assets = {
     Asset("ANIM", "anim/gnat.zip"), --官方单机哈姆雷特虫群动画模板
-    Asset("ANIM", "anim/swap_cropgnat_fly.zip"),
+    Asset("ANIM", "anim/swap_cropgnat_fly.zip")
 }
 
-local prefabs =
-{
-    "ahandfulofwings",
+local prefabs = {
+    "ahandfulofwings"
 }
 
 local brain = require("brains/cropgnatbrain")
 local brain_infester = require("brains/cropgnat_infesterbrain")
 
-local sounds =
-{
+local sounds = {
     attack = "legion/gnat/attack",
     buzz = "legion/gnat/loop",
     hit = "legion/gnat/hit",

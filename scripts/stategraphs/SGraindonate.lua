@@ -59,9 +59,7 @@ local states=
 
 			inst.Physics:Stop()
 			RemovePhysicsColliders(inst)
-			if inst.components.lootdropper then
-				inst.components.lootdropper:DropLoot(Vector3(inst.Transform:GetWorldPosition()))
-			end
+			inst.components.lootdropper:DropLoot(inst:GetPosition())
         end,
 
 		events=

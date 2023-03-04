@@ -736,7 +736,7 @@ local function Fn_do_guitar(doer, item, target, value)
         local useditem = doer.components.inventory:RemoveItem(item) --不做说明的话，一次只取一个
         if useditem then
             local fueled = target.components.fueled
-            fueled:DoDelta(value*fueled.bonusmult*(doer.mult_repairl or 1), doer)
+            fueled:DoDelta(value*fueled.bonusmult*(doer.mult_repair_l or 1), doer)
 
             if useditem.components.fuel ~= nil then
                 useditem.components.fuel:Taken(fueled.inst)
@@ -799,7 +799,7 @@ local function Fn_do_sand(doer, item, target, value)
         target ~= nil and
         target.components.armor ~= nil and target.components.armor:GetPercent() < 1
     then
-        value = value*(doer.mult_repairl or 1)
+        value = value*(doer.mult_repair_l or 1)
         local cpt = target.components.armor
         local need = math.ceil((cpt.maxcondition - cpt.condition) / value)
         if need > 1 then --最后一次很可能会比较浪费，所以不主动填满
@@ -1240,6 +1240,17 @@ AddPlayerPostInit(function(inst)
             return ApplyDamage_old(self, damage, attacker, weapon, ...)
         end
     end
+
+    --谋杀生物时(一般是指物品栏里的)
+    local function OnMurdered_player(inst, data)
+        if
+            data.victim ~= nil and data.victim.prefab == "raindonate" and
+            not data.negligent --不能是疏忽大意导致的，必须是有意的
+        then
+            data.victim:fn_murdered_l()
+        end
+    end
+    inst:ListenForEvent("murdered", OnMurdered_player)
 end)
 
 --------------------------------------------------------------------------
