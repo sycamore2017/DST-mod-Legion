@@ -485,12 +485,23 @@ local function OnEquip_beetlehat(inst, owner)
         return
     end
 
+    --工作效率
     if owner.components.workmultiplier == nil then
         owner:AddComponent("workmultiplier")
     end
     owner.components.workmultiplier:AddMultiplier(ACTIONS.CHOP,   1.5, inst)
     owner.components.workmultiplier:AddMultiplier(ACTIONS.MINE,   1.5, inst)
     owner.components.workmultiplier:AddMultiplier(ACTIONS.HAMMER, 1.5, inst)
+    --攻击力
+    if owner.components.combat ~= nil then
+        owner.components.combat.externaldamagemultipliers:SetModifier(inst, 1.1)
+    end
+    --健身值
+    if owner.components.mightiness ~= nil then
+        owner.components.mightiness.ratemodifiers:SetModifier(inst, 0.3)
+    end
+
+    owner:AddTag("burden_ignor_l")
 end
 local function OnUnequip_beetlehat(inst, owner)
     HAT_ONUNEQUIP_L(inst, owner)
@@ -500,6 +511,14 @@ local function OnUnequip_beetlehat(inst, owner)
         owner.components.workmultiplier:RemoveMultiplier(ACTIONS.MINE,   inst)
         owner.components.workmultiplier:RemoveMultiplier(ACTIONS.HAMMER, inst)
     end
+    if owner.components.combat ~= nil then
+        owner.components.combat.externaldamagemultipliers:RemoveModifier(inst)
+    end
+    if owner.components.mightiness ~= nil then
+        owner.components.mightiness.ratemodifiers:RemoveModifier(inst)
+    end
+
+    owner:RemoveTag("burden_ignor_l")
 end
 
 local function Fn_beetlehat()
@@ -517,6 +536,7 @@ local function Fn_beetlehat()
 
     inst:AddTag("hat")
     inst:AddTag("waterproofer")
+    inst:AddTag("burden_l")
     inst.repair_bugshell_l = true
 
     -- inst:AddComponent("skinedlegion")
@@ -576,6 +596,8 @@ local function Fn_beetlearmor()
     inst.AnimState:SetBuild("armor_elepheetle")
     inst.AnimState:PlayAnimation("idle")
 
+    inst:AddTag("stablearmor_l") --无硬直 棱镜tag
+    inst:AddTag("heavyarmor") --减轻击退效果 官方tag
     inst.repair_bugshell_l = true
 
     -- inst:AddComponent("skinedlegion")

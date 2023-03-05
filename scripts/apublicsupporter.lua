@@ -2094,6 +2094,52 @@ AddStategraphActionHandler("wilson", ActionHandler(ACTIONS.REMOVE_CARPET_L, "ter
 AddStategraphActionHandler("wilson_client", ActionHandler(ACTIONS.REMOVE_CARPET_L, "terraform"))
 
 --------------------------------------------------------------------------
+--[[ 人物StateGraph修改 ]]
+--------------------------------------------------------------------------
+
+local function DoHurtSound(inst)
+    if inst.hurtsoundoverride ~= nil then
+        inst.SoundEmitter:PlaySound(inst.hurtsoundoverride, nil, inst.hurtsoundvolume)
+    elseif not inst:HasTag("mime") then
+        inst.SoundEmitter:PlaySound((inst.talker_path_override or "dontstarve/characters/")..(inst.soundsname or inst.prefab).."/hurt", nil, inst.hurtsoundvolume)
+    end
+end
+
+AddStategraphPostInit("wilson", function(sg)
+    --受击无硬直
+    local eve = sg.events["attacked"]
+    local attacked_event_fn = eve.fn
+    eve.fn = function(inst, data, ...)
+        if not inst.components.health:IsDead() and not inst.sg:HasStateTag("drowning") then
+            if not inst.sg:HasStateTag("sleeping") then --睡袋貌似有自己的特殊机制
+                if inst.components.inventory ~= nil and inst.components.inventory:EquipHasTag("stablearmor_l") then
+                    inst.SoundEmitter:PlaySound("dontstarve/wilson/hit")
+                    DoHurtSound(inst)
+                    return
+                end
+            end
+        end
+        return attacked_event_fn(inst, data, ...)
+    end
+
+    --给予动作加入短动画
+    for k, v in pairs(sg.actionhandlers) do
+        if v["action"]["id"] == "GIVE" then
+            local give_handler_fn = v.deststate
+            v.deststate = function(inst, action)
+                --入鞘使用短动作
+                if action.invobject ~= nil and action.target ~= nil and action.target:HasTag("swordscabbard") then
+                    return "doshortaction"
+                end
+                return give_handler_fn(inst, action)
+            end
+
+            break
+        end
+    end
+end)
+
+--------------------------------------------------------------------------
 --[[ 服务器专属修改 ]]
 --------------------------------------------------------------------------
 

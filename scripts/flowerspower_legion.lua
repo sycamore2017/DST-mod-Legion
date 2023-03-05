@@ -141,25 +141,6 @@ end
 --[[ 青枝绿叶的修改 ]]
 --------------------------------------------------------------------------
 
---------给给予动作加入短动画
-AddStategraphPostInit("wilson", function(sg)
-    for k, v in pairs(sg.actionhandlers) do
-        if v["action"]["id"] == "GIVE" then
-            local SGWilson_give_handler_fn = v.deststate
-
-            v.deststate = function(inst, action)
-                --入鞘使用短动作
-                if action.invobject ~= nil and action.target ~= nil and action.target:HasTag("swordscabbard") then
-                    return "doshortaction"
-                end
-                return SGWilson_give_handler_fn(inst, action)
-            end
-
-            break
-        end
-    end
-end)
-
 --------出鞘action
 local PULLOUTSWORD = Action({ priority = 2, mount_valid = true })
 PULLOUTSWORD.id = "PULLOUTSWORD"

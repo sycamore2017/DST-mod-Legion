@@ -1619,3 +1619,41 @@ AddAction(LIFEBEND)
 
 AddStategraphActionHandler("wilson", ActionHandler(ACTIONS.LIFEBEND, "give"))
 AddStategraphActionHandler("wilson_client", ActionHandler(ACTIONS.LIFEBEND, "give"))
+
+--------------------------------------------------------------------------
+--[[ 犀金甲的相关 ]]
+--------------------------------------------------------------------------
+
+------不受装备的减速效果影响
+
+local inventoryitem_replica = require("components/inventoryitem_replica")
+
+local GetWalkSpeedMult_old = inventoryitem_replica.GetWalkSpeedMult
+inventoryitem_replica.GetWalkSpeedMult = function(self, ...)
+    local res = GetWalkSpeedMult_old(self, ...)
+    if self.inst.components.equippable == nil and self.classified ~= nil then --客户端环境
+        if
+            res < 1.0 and not self.inst:HasTag("burden_l") and
+            ThePlayer ~= nil and ThePlayer:HasTag("burden_ignor_l")
+        then
+            return 1.0
+        end
+    end
+    return res
+end
+
+if IsServer then
+    AddComponentPostInit("equippable", function(self)
+        local GetWalkSpeedMult_old = self.GetWalkSpeedMult
+        self.GetWalkSpeedMult = function(self, ...)
+            local res = GetWalkSpeedMult_old(self, ...)
+            if res < 1.0 and not self.inst:HasTag("burden_l") then
+                local owner = self.inst.components.inventoryitem and self.inst.components.inventoryitem:GetGrandOwner() or nil
+                if owner ~= nil and owner:HasTag("burden_ignor_l") then
+                    return 1.0
+                end
+            end
+            return res
+        end
+    end)
+end
