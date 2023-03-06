@@ -583,6 +583,18 @@ local assets_beetlearmor = {
     Asset("IMAGE", "images/inventoryimages/armor_elepheetle.tex")
 }
 
+local function OnEquip_beetlearmor(inst, owner)
+    -- local skindata = inst.components.skinedlegion:GetSkinedData()
+    -- if skindata ~= nil and skindata.equip ~= nil then
+    --     owner.AnimState:OverrideSymbol("swap_body", skindata.equip.build, skindata.equip.file)
+    -- else
+        owner.AnimState:OverrideSymbol("swap_body", "armor_elepheetle", "swap_body")
+    -- end
+end
+local function OnUnequip_beetlearmor(inst, owner)
+    owner.AnimState:ClearOverrideSymbol("swap_body")
+end
+
 local function Fn_beetlearmor()
     local inst = CreateEntity()
 
@@ -597,6 +609,7 @@ local function Fn_beetlearmor()
     inst.AnimState:PlayAnimation("idle")
 
     inst:AddTag("stablearmor_l") --无硬直 棱镜tag
+    inst:AddTag("insulatedarmor_l") --免疫麻痹 棱镜tag
     inst:AddTag("heavyarmor") --减轻击退效果 官方tag
     inst.repair_bugshell_l = true
 
@@ -616,7 +629,8 @@ local function Fn_beetlearmor()
     inst.components.inventoryitem.atlasname = "images/inventoryimages/armor_elepheetle.xml"
 
     inst:AddComponent("equippable")
-    inst.components.equippable.equipslot = EQUIPSLOTS.BACK or EQUIPSLOTS.BODY
+    -- inst.components.equippable.equipslot = EQUIPSLOTS.BACK or EQUIPSLOTS.BODY
+    inst.components.equippable.equipslot = EQUIPSLOTS.BODY
     inst.components.equippable:SetOnEquip(OnEquip_beetlearmor)
     inst.components.equippable:SetOnUnequip(OnUnequip_beetlearmor)
     inst.components.equippable.insulated = true --防电

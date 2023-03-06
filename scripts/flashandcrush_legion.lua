@@ -405,79 +405,101 @@ local function CanShockable(inst)
            and not inst:HasTag("electrified")       --电气生物不会被触电
            and not inst:HasTag("lightninggoat")     --电羊不会被触电
 end
-
-local function AddShockableComponent_fire(inst, sym, offset, level)
-    if inst.canshockable or CanShockable(inst) then  --防止非生物物品加入这个组件
-        inst.canshockable = true
-
-        if inst.components.shockable == nil then
-            inst:AddComponent("shockable")
-        else
-            inst.canshockable = nil
-        end
-        inst.components.shockable:InitStaticFx(sym, offset or Vector3(0, 0, 1), level)    --这里的设置是为了让着火的symbol被设定的优先级高一些，覆盖的冰冻的symbol
+local function AddShockable(inst, level)
+    if not CanShockable(inst) then
+        return
     end
-end
-
-local function AddShockableComponent_ice(inst, sym, offset, level)
-    if inst.canshockable or CanShockable(inst) then  --防止非生物物品加入这个组件
-        inst.canshockable = true
-
-        if inst.components.shockable == nil then
-            inst:AddComponent("shockable")
-            inst.components.shockable:InitStaticFx(sym, offset or Vector3(0, 0, 0), level)
-        else
-            inst.canshockable = nil
+    local symbol = nil
+    local x, y, z = 0, 0, 0
+    local cpt = inst.components.burnable
+    if cpt ~= nil then
+        for _, v in pairs(cpt.fxdata) do
+            if v.follow ~= nil then
+                symbol = v.follow
+                -- level = cpt.fxlevel
+                x = v.x
+                y = v.y
+                z = v.z
+                break
+            end
         end
     end
+    if symbol == nil or symbol == "" then
+        cpt = inst.components.freezable
+        if cpt ~= nil then
+            for _, v in pairs(cpt.fxdata) do
+                if v.follow ~= nil then
+                    symbol = v.follow
+                    -- level = cpt.fxlevel
+                    x = v.x
+                    y = v.y
+                    z = v.z
+                    break
+                end
+            end
+        end
+        if symbol == nil or symbol == "" then
+            cpt = inst.components.combat
+            if cpt ~= nil then
+                symbol = cpt.hiteffectsymbol
+            end
+        end
+    end
+    if inst.components.shockable == nil then
+        inst:AddComponent("shockable")
+    end
+    if z == 0 then
+        z = 1
+    end
+    inst.components.shockable:InitStaticFx(symbol, Vector3(x or 0, y or 0, z), level or 1)
 end
 
 local MakeSmallBurnableCharacter_old = MakeSmallBurnableCharacter
 _G.MakeSmallBurnableCharacter = function(inst, sym, offset)
     MakeSmallBurnableCharacter_old(inst, sym, offset)
-    AddShockableComponent_fire(inst, sym, offset, 1)
+    AddShockable(inst, 1)
 end
 
 local MakeMediumBurnableCharacter_old = MakeMediumBurnableCharacter
 _G.MakeMediumBurnableCharacter = function(inst, sym, offset)
     MakeMediumBurnableCharacter_old(inst, sym, offset)
-    AddShockableComponent_fire(inst, sym, offset, 2)
+    AddShockable(inst, 2)
 end
 
 local MakeLargeBurnableCharacter_old = MakeLargeBurnableCharacter
 _G.MakeLargeBurnableCharacter = function(inst, sym, offset)
     MakeLargeBurnableCharacter_old(inst, sym, offset)
-    AddShockableComponent_fire(inst, sym, offset, 3)
+    AddShockable(inst, 3)
 end
 
 local MakeTinyFreezableCharacter_old = MakeTinyFreezableCharacter
 _G.MakeTinyFreezableCharacter = function(inst, sym, offset)
     MakeTinyFreezableCharacter_old(inst, sym, offset)
-    AddShockableComponent_ice(inst, sym, offset, 1)
+    AddShockable(inst, 1)
 end
 
 local MakeSmallFreezableCharacter_old = MakeSmallFreezableCharacter
 _G.MakeSmallFreezableCharacter = function(inst, sym, offset)
     MakeSmallFreezableCharacter_old(inst, sym, offset)
-    AddShockableComponent_ice(inst, sym, offset, 1)
+    AddShockable(inst, 1)
 end
 
 local MakeMediumFreezableCharacter_old = MakeMediumFreezableCharacter
 _G.MakeMediumFreezableCharacter = function(inst, sym, offset)
     MakeMediumFreezableCharacter_old(inst, sym, offset)
-    AddShockableComponent_ice(inst, sym, offset, 2)
+    AddShockable(inst, 2)
 end
 
 local MakeLargeFreezableCharacter_old = MakeLargeFreezableCharacter
 _G.MakeLargeFreezableCharacter = function(inst, sym, offset)
     MakeLargeFreezableCharacter_old(inst, sym, offset)
-    AddShockableComponent_ice(inst, sym, offset, 2)
+    AddShockable(inst, 2)
 end
 
 local MakeHugeFreezableCharacter_old = MakeHugeFreezableCharacter
 _G.MakeHugeFreezableCharacter = function(inst, sym, offset)
     MakeHugeFreezableCharacter_old(inst, sym, offset)
-    AddShockableComponent_ice(inst, sym, offset, 3)
+    AddShockable(inst, 3)
 end
 
 --------------------------------------------------------------------------
@@ -497,7 +519,7 @@ end
 
 local shocked_enter = State{
     name = "shocked_enter",
-    tags = { "busy", "nopredict", "nodangle", "shocked" },
+    tags = { "busy", "nopredict", "nodangle", "shocked_l" },
 
     onenter = function(inst)
         ClearStatusAilments(inst)
@@ -516,11 +538,13 @@ local shocked_enter = State{
         inst.AnimState:PlayAnimation("shock", true)
     end,
 
-    events =
-    {
+    events = {
         EventHandler("unshocked", function(inst)
             inst.sg:GoToState("shocked_exit")
         end),
+        EventHandler("attacked", function(inst)
+            inst.sg:GoToState("shocked_exit")
+        end)
     },
 
     onexit = function(inst)
@@ -533,12 +557,11 @@ local shocked_enter = State{
         if inst.components.shockable ~= nil then
             inst.components.shockable:Unshock()
         end
-    end,
+    end
 }
-
 local shocked_exit = State{
     name = "shocked_exit",
-    tags = { "busy", "nopredict", "nodangle" },
+    tags = { "idle", "canrotate", "nodangle" },
 
     onenter = function(inst)
         inst.components.locomotor:Stop()
@@ -551,17 +574,19 @@ local shocked_exit = State{
 
     ontimeout = function(inst)
         inst.sg:GoToState("idle", true)
-    end,
+    end
 }
 
 AddStategraphState("wilson", shocked_enter)
---AddStategraphState("wilson_client", sanddefense_enter)    --客户端与服务端的sg有区别，这里只需要服务端有就行了
+--AddStategraphState("wilson_client", sanddefense_enter) --客户端与服务端的sg有区别，这里只需要服务端有就行了
 AddStategraphState("wilson", shocked_exit)
 
 --通过api添加触电响应函数
 AddStategraphEvent("wilson", EventHandler("beshocked", function(inst)
     if inst.components.health ~= nil and not inst.components.health:IsDead() then
-        inst.sg:GoToState("shocked_enter")
+        if not inst.sg:HasStateTag("shocked_l") then --防止重复进入sg导致触发 onexit 中的 Unshock() 而导致连续麻痹时会失效
+            inst.sg:GoToState("shocked_enter")
+        end
     end
 end))
 
@@ -583,7 +608,6 @@ local function onopen(inst)
         end
     end
 end
-
 local function onclose(inst)
     inst.SoundEmitter:PlaySound("dontstarve/wilson/pickup_reeds")
     inst.SoundEmitter:PlaySound("dontstarve/common/together/packaged")
@@ -604,20 +628,17 @@ local function OnMySaddleChanged(inst, data)
         end
     end
 end
-
 local function OnMyDeath(inst, data)
     if inst.components.container ~= nil then
         inst.components.container:Close()
         inst.components.container.canbeopened = false
     end
 end
-
 local function OnMyAttacked(inst, data)
     if inst.components.container ~= nil then
         inst.components.container:Close()
     end
 end
-
 local function OnMyRiderChanged(inst, data)
     if inst.components.container ~= nil then
         inst.components.container:Close()
@@ -628,7 +649,7 @@ AddPrefabPostInit("beefalo", function(inst)
     inst:AddTag("fridge") --给予容器0.5保鲜效果
     inst:AddTag("nocool") --没有冷冻的效果
 
-    if TheWorld.ismastersim then
+    if IsServer then
         if inst.components.container == nil then --由于官方的动作检测函数的问题，导致不能中途加入容器组件，所以只能默认每个牛都加个容器组件
             inst:AddComponent("container")
             inst.components.container:WidgetSetup("beefalo")

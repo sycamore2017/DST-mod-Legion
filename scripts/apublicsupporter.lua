@@ -2340,14 +2340,16 @@ if IsServer then
                 end
                 local pos = inst:GetPosition()
                 local x, y, z
-                for i = 1, math.random(1,3), 1 do
-                    local fx = SpawnPrefab(isit and "dish_lovingrosecake2_fx" or "dish_lovingrosecake1_fx")
-                    if fx ~= nil then
-                        x, y, z = GetCalculatedPos_legion(pos.x, 0, pos.z, 0.2+math.random()*2.1, nil)
-                        fx.Transform:SetPosition(x, y, z)
+                if not inst:IsAsleep() then
+                    for i = 1, math.random(1,3), 1 do
+                        local fx = SpawnPrefab(isit and "dish_lovingrosecake2_fx" or "dish_lovingrosecake1_fx")
+                        if fx ~= nil then
+                            x, y, z = GetCalculatedPos_legion(pos.x, 0, pos.z, 0.2+math.random()*2.1, nil)
+                            fx.Transform:SetPosition(x, y, z)
+                        end
                     end
                 end
-                if isit and data.feeder:IsValid() then
+                if isit and data.feeder:IsValid() and not data.feeder:IsAsleep() then
                     pos = data.feeder:GetPosition()
                     for i = 1, math.random(1,3), 1 do
                         local fx = SpawnPrefab("dish_lovingrosecake2_fx")

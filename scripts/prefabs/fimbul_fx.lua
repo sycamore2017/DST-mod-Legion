@@ -2,8 +2,7 @@
 --[[ 蓝色闪电特效：和官方的区别就是颜色不同而已 ]]
 --------------------------------------------------------------------------
 
-local assets_lightning =
-{
+local assets_lightning = {
     Asset("ANIM", "anim/lightning.zip"), --官方闪电动画模板
 }
 
@@ -104,15 +103,18 @@ end
 --[[ 静电陷阱特效 ]]
 --------------------------------------------------------------------------
 
-local assets_static =
-{
+local assets_static = {
     Asset("ANIM", "anim/fimbul_static_fx.zip"),
-    Asset("ANIM", "anim/lavaarena_hammer_attack_fx.zip"), --官方熔炉锤子大招特效动画模板
+    Asset("ANIM", "anim/lavaarena_hammer_attack_fx.zip") --官方熔炉锤子大招特效动画模板
 }
 
 local function OnStaticRemove(inst)
-    inst.AnimState:PlayAnimation("crackle_pst", false)
-    inst:ListenForEvent("animover", inst.Remove)
+    if inst:IsAsleep() then
+        inst:Remove()
+    else
+        inst.AnimState:PlayAnimation("crackle_pst", false)
+        inst:ListenForEvent("animover", inst.Remove)
+    end
 end
 
 local function fn_static()
@@ -134,7 +136,6 @@ local function fn_static()
     inst:AddTag("NOCLICK")
 
     inst.entity:SetPristine()
-
     if not TheWorld.ismastersim then
       return inst
     end

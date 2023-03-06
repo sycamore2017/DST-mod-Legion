@@ -136,7 +136,6 @@ local function GetDamage(inst, damage)
     end
     return damage
 end
-
 local function GetSpawnPoint(pos, radius)
     -- local x, y, z = inst.Transform:GetWorldPosition()
     local rad = radius or math.random(1, 20)
@@ -246,36 +245,32 @@ local function SpawnLightning(x, y, z)
     SpawnPrefab(prefab_type).Transform:SetPosition(strike_position:Get())
 end
 
-local mine_test_fn = function(dude, inst)
+local function mine_test_fn(dude, inst)
     return dude.components.health ~= nil and not dude.components.health:IsDead()
         and dude.components.combat ~= nil and dude.components.combat:CanBeAttacked(inst)
 end
-
 local function SpawnStatic(x, y, z)
 	local static = SpawnPrefab("fimbul_static_fx")
 	static.AnimState:PlayAnimation("crackle_pst", true)
 	static.Transform:SetPosition(x, y, z)
-
-	static.findtask = static:DoPeriodicTask(0.5, function()
-        local target = FindEntity(static, 2, mine_test_fn, {"shockable"}, {"ghost", "playerghost", "INLIMBO"}, nil)
-
+	static.findtask = static:DoPeriodicTask(0.5, function(inst)
+        local target = FindEntity(inst, 1.6, mine_test_fn, {"shockable"}, {"ghost", "playerghost", "INLIMBO"}, nil)
         if target ~= nil then
         	target.components.shockable:Shock(8)
 
-        	if static.findtask ~= nil then
-        	    static.findtask:Cancel()
-        	    static.findtask = nil
+        	if inst.findtask ~= nil then
+        	    inst.findtask:Cancel()
+        	    inst.findtask = nil
         	end
-        	static:DoRemove()
+        	inst:DoRemove()
         end
     end)
-
-    static.quittask = static:DoTaskInTime(180, function()
-        if static.findtask ~= nil then
-            static.findtask:Cancel()
-            static.findtask = nil
+    static.quittask = static:DoTaskInTime(60+math.random()*120, function(inst)
+        if inst.findtask ~= nil then
+            inst.findtask:Cancel()
+            inst.findtask = nil
         end
-        static:Remove()
+        inst:DoRemove()
     end)
 end
 
@@ -304,23 +299,21 @@ local flashwhirl_knockback_radius = 8 	--旋风击退半径
 local function Knockback(inst, target, k_damage, k_radius)
     if target.components.workable ~= nil then
         target.components.workable:Destroy(inst)
-    elseif target.components.combat ~= nil and (target.components.health ~= nil and not target.components.health:IsDead()) then
-        if target:HasTag("player") then
-            --先受伤害，再进行击退
-            target.components.combat:GetAttacked(inst.attackowner or inst, GetDamage(inst, k_damage))
-            target:PushEvent("knockback", {knocker = inst, radius = k_radius})
-        else --其他生物没有击退sg，不会被击飞
-            target.components.combat:GetAttacked(inst.attackowner or inst, GetDamage(inst, k_damage * 3))
-        end
+    elseif target.components.combat ~= nil and target.components.health ~= nil and not target.components.health:IsDead() then
+        --先受伤害，再进行击退
+        target.components.combat:GetAttacked(inst.attackowner or inst,
+            GetDamage(inst, target:HasTag("player") and k_damage or k_damage*3))
+        target:PushEvent("knockback", {knocker = inst, radius = k_radius}) --其实只有少部分生物有击退sg
     end
 end
 
 local function FlashWhirl(inst)
 	local x1, y1, z1 = inst.Transform:GetWorldPosition()
-	local ents = TheSim:FindEntities(x1, y1, z1, flashwhirl_radius, nil, { "DECOR", "NOCLICK", "FX", "shadow", "playerghost", "INLIMBO" })
+	local ents = TheSim:FindEntities(x1, y1, z1, flashwhirl_radius,
+        nil, { "DECOR", "NOCLICK", "FX", "shadow", "playerghost", "INLIMBO" })
 
 	for i, ent in pairs(ents) do
-		if ent ~= inst and ent:IsValid() and ent.entity:IsVisible() and ent.Physics ~= nil then
+		if ent ~= inst and ent.entity:IsVisible() and ent.Physics ~= nil then
 			local x2, y2, z2 = ent.Transform:GetWorldPosition()
 
 			if ent.components.inventoryitem ~= nil and ent.components.locomotor == nil then	--物品栏物品，非生物
@@ -329,7 +322,10 @@ local function FlashWhirl(inst)
 
 				ent.Physics:Teleport(x2, 0.5, z2)
 				ent.Physics:SetVel(vec.x * speed, speed, vec.z * speed)
-			elseif ent.components.locomotor ~= nil or (ent.components.workable ~= nil and not ent:HasTag("DIG_workable")) then	--击飞生物，或摧毁可以锤、砍、凿的物体
+			elseif --击飞生物，或摧毁可以锤、砍、凿的物体
+                ent.components.locomotor ~= nil or
+                (ent.components.workable ~= nil and not ent:HasTag("DIG_workable"))
+            then
 				Knockback(inst, ent, flashwhirl_damage, flashwhirl_knockback_radius)
 			end
 		end
@@ -344,7 +340,7 @@ end
 --技能--战吼自爆：以自己为中心爆炸
 ----------------------------------------------------
 
-local battlecry_radius = 9 		--战吼爆炸生效半径
+local battlecry_radius = 7 		--战吼爆炸生效半径
 local battlecry_damage = 100 	--战吼爆炸伤害
 local battlecry_knockback_radius = 6 	--战吼爆炸击退半径
 
@@ -359,7 +355,7 @@ local function BattleCry(inst)
 
 	local ents = TheSim:FindEntities(pos.x, pos.y, pos.z, battlecry_radius, nil, { "DECOR", "NOCLICK", "FX", "shadow", "playerghost", "INLIMBO" })
 	for k, v in pairs(ents) do
-        if v ~= inst and v:IsValid() then
+        if v ~= inst then
             Knockback(inst, v, battlecry_damage, battlecry_knockback_radius)
         end
 	end
@@ -378,7 +374,6 @@ local function RangeSplash(inst, target)
     local splash = SpawnPrefab("fimbul_teleport_fx")
     splash.attackowner = inst
 	splash.Transform:SetPosition(GetSpawnPoint(target:GetPosition(), 1))
-
 	Knockback(splash, target, rangesplash_damage, rangesplash_knockback_radius)
 end
 
@@ -400,7 +395,7 @@ local axewave_period = 3 --攻击间隔时间
 ----------------------------------------------------
 
 local axeuppercut_damage = 30 	--上挥伤害
-local axeuppercut_knockback_radius = 15 	--上挥击退半径
+local axeuppercut_knockback_radius = 15 --上挥击退半径
 
 local function AxeUppercut(inst, target)
 	Knockback(inst, target, axeuppercut_damage, axeuppercut_knockback_radius)
@@ -414,27 +409,6 @@ local heavyhack_radius = 6 		--重锤伤害的判断距离
 local heavyhack_damage = 20 	--重锤伤害
 local heavyhack_shocktime = 8 	--重锤麻痹时间
 
--- local function HeavyHack(inst, pos, shocking)
--- 	SpawnPrefab("fimbul_attack_fx").Transform:SetPosition(pos:Get())
---  SpawnPrefab("fimbul_cracklebase_fx").Transform:SetPosition(pos:Get())
-
--- 	local ents = TheSim:FindEntities(pos.x, pos.y, pos.z, heavyhack_radius, nil, { "NOCLICK", "FX", "shadow", "playerghost", "INLIMBO" })
--- 	for k, v in pairs(ents) do
--- 	    if v ~= inst and v:IsValid() then
---             if v.components.workable ~= nil and not v:HasTag("DIG_workable") then    --摧毁对象
---                 v.components.workable:Destroy(inst)
---             elseif v.components.health ~= nil and not v.components.health:IsDead() then   --攻击并麻痹
---                 if v.components.combat ~= nil then
---                     v.components.combat:GetAttacked(inst, heavyhack_damage)
---                 end
---                 if shocking and v.components.shockable ~= nil then
---                     v.components.shockable:Shock(heavyhack_shocktime)
---                 end            
---             end
--- 	    end
--- 	end
--- end
-
 local function juzhen(angle, cd, kd, s1, vp)    --这个函数来自于熔炉mod，感谢！
     local s3 = Vector3(s1.x + math.cos(0) * cd, 0, s1.z + math.sin(0) * cd)
     local minx = s1.x + 0
@@ -447,24 +421,22 @@ local function juzhen(angle, cd, kd, s1, vp)    --这个函数来自于熔炉mod
     local xvp = Vector3(s1.x + math.cos(math.rad(xdjd + Xangle)) * ysjl, 0, s1.z + math.sin(math.rad(xdjd + Xangle)) * ysjl)
     return minx <= xvp.x and xvp.x <= maxx and minz <= xvp.z and xvp.z <= maxz
 end
-
 local function HeavyHack(inst, angle)
     local pos = inst:GetPosition()
     local ents = TheSim:FindEntities(pos.x, 0, pos.z, 10, nil, {"DECOR", "NOCLICK", "FX", "shadow", "playerghost", "INLIMBO"})
-    if next(ents) ~= nil then   --next函数用于判断是否为空表
-        for k, v in pairs(ents) do
-            if v ~= inst and v:IsValid() then
-                local vp = v:GetPosition() 
-                if juzhen(angle, 10, 4, Vector3(pos.x, pos.y, pos.z), vp) then
-                    if v.components.workable ~= nil and not v:HasTag("DIG_workable") then    --摧毁对象
-                        v.components.workable:Destroy(inst)
-                    elseif v.components.health ~= nil and not v.components.health:IsDead() then   --攻击并麻痹
-                        if v.components.combat ~= nil then
-                            v.components.combat:GetAttacked(inst, GetDamage(inst, heavyhack_damage))
-                        end
-                        if v.components.shockable ~= nil and not v.components.shockable:IsShocked() then
-                            v.components.shockable:Shock(heavyhack_shocktime)
-                        end            
+    for k, v in ipairs(ents) do
+        if v ~= inst then
+            local vp = v:GetPosition()
+            if juzhen(angle, 10, 4, Vector3(pos.x, pos.y, pos.z), vp) then
+                if v.components.workable ~= nil and not v:HasTag("DIG_workable") then    --摧毁对象
+                    v.components.workable:Destroy(inst)
+                elseif v.components.health ~= nil and not v.components.health:IsDead() then   --攻击并麻痹
+                    if v.components.combat ~= nil then
+                        v.components.combat:GetAttacked(inst,
+                            GetDamage(inst, v:HasTag("player") and heavyhack_damage or heavyhack_damage*3))
+                    end
+                    if v.components.shockable ~= nil and not v.components.shockable:IsShocked() then
+                        v.components.shockable:Shock(heavyhack_shocktime)
                     end
                 end
             end
@@ -548,7 +520,6 @@ local function KeepTargetFn(inst, target)
     and inst:GetPosition():Dist(target:GetPosition()) <= 25
     and target:GetPosition():Dist(landing) <= 35
 end
-
 local function RetargetFn(inst)
     return FindEntity(
         inst,
@@ -586,7 +557,6 @@ local function ShouldSleep(inst)
     -- return not inst.irritated
     return false
 end
-
 local function ShouldWake(inst)
     return true
 end
@@ -599,25 +569,20 @@ local function OnSave(inst, data)
         end
     end
 end
-
 local function OnLoad(inst, data)
     if data ~= nil then
         if data.deathcounter ~= nil then
             inst.deathcounter = data.deathcounter
-        else
-            inst.deathcounter = 0
         end
         if data.healthPercent ~= nil then
             inst.healthPercent = data.healthPercent
-        else
-            inst.healthPercent = nil
         end
     end
-
-    BeIrritated(inst)
-    OverrideSymbols(inst, inst.irritated)
-
     UpdateDeathCounter(inst)
+    inst:DoTaskInTime(0.2, function(inst)
+        BeIrritated(inst)
+        OverrideSymbols(inst, inst.irritated)
+    end)
 end
 
 local function OnDeath(inst)
@@ -674,7 +639,6 @@ local function fn()
     inst:AddTag("electrified")
 
     inst.entity:SetPristine()
-
     if not TheWorld.ismastersim then
         return inst
     end
