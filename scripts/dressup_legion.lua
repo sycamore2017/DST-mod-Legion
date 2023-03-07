@@ -680,10 +680,9 @@ local dressup_data = {
         buildfile = "hat_goggles",
         buildsymbol = "swap_hat",
     },
-    deserthat =
-    {
+    deserthat = {
         buildfile = "hat_desert",
-        buildsymbol = "swap_hat",
+        buildsymbol = "swap_hat"
     },
     skeletonhat =
     {
@@ -1735,6 +1734,14 @@ local dressup_data = {
 
             return itemswap
         end
+    },
+    hat_elepheetle = {
+        buildfile = "hat_elepheetle",
+        buildsymbol = "swap_hat"
+    },
+    armor_elepheetle = {
+        buildfile = "armor_elepheetle",
+        buildsymbol = "swap_body"
     },
 }
 

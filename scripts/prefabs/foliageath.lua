@@ -65,7 +65,7 @@ local function fn()
     local OnLandedClient_old = inst.components.floater.OnLandedClient
     inst.components.floater.OnLandedClient = function(self)
         OnLandedClient_old(self)
-        self.inst.AnimState:SetFloatParams(0.15, 1, 0.1)
+        self.inst.AnimState:SetFloatParams(0.15, 1, self.bob_percent)
     end
 
     inst.entity:SetPristine()

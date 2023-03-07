@@ -542,6 +542,13 @@ local function Fn_beetlehat()
     -- inst:AddComponent("skinedlegion")
     -- inst.components.skinedlegion:InitWithFloater("hat_elepheetle")
 
+    MakeInventoryFloatable(inst, "small", 0.2, 1.35)
+    -- local OnLandedClient_old = inst.components.floater.OnLandedClient
+    -- inst.components.floater.OnLandedClient = function(self)
+    --     OnLandedClient_old(self)
+    --     self.inst.AnimState:SetFloatParams(0.15, 1, self.bob_percent)
+    -- end
+
     inst.entity:SetPristine()
     if not TheWorld.ismastersim then
         return inst
@@ -615,6 +622,13 @@ local function Fn_beetlearmor()
 
     -- inst:AddComponent("skinedlegion")
     -- inst.components.skinedlegion:InitWithFloater("armor_elepheetle")
+
+    MakeInventoryFloatable(inst, "small", 0.4, 0.95)
+    local OnLandedClient_old = inst.components.floater.OnLandedClient
+    inst.components.floater.OnLandedClient = function(self)
+        OnLandedClient_old(self)
+        self.inst.AnimState:SetFloatParams(0.15, 1, self.bob_percent)
+    end
 
     inst.entity:SetPristine()
     if not TheWorld.ismastersim then

@@ -11,8 +11,8 @@ local hot = {
 	-- siving_feather_real = 'boss_siving_phoenix',
 	-- dish_tomahawksteak = 'foods_cookpot',
 	-- siving_mask = 'siving_related',
-	-- revolvedmoonlight = 'moonlight_legion',
-	-- icire_rock_fx_day = 'fx_legion',
+	hat_elepheetle = 'insectthings_l',
+	armor_elepheetle = 'insectthings_l',
 }
 local old_sp = GLOBAL.SpawnPrefab
 function GLOBAL.SpawnPrefab(prefab, ...)
