@@ -300,10 +300,10 @@ params.fishhomingtool = {
         side_align_tip = 120,
         buttoninfo = {
             text = STRINGS.ACTIONS_LEGION.MAKE,
-            position = Vector3(0, -100, 0),
+            position = Vector3(0, -100, 0)
         }
     },
-    type = "cooker",
+    type = "cooker"
 }
 function params.fishhomingtool.itemtestfn(container, item, slot)
     if
@@ -324,6 +324,32 @@ function params.fishhomingtool.widget.buttoninfo.fn(inst, doer)
 end
 function params.fishhomingtool.widget.buttoninfo.validfn(inst)
     return inst.replica.container ~= nil and not inst.replica.container:IsEmpty()
+end
+
+------
+--胡萝卜长枪
+------
+
+local function IsCarrot(container, item, slot)
+    return item.prefab == "carrot" or item.prefab == "carrot_cooked"
+end
+
+params.lance_carrot_l = {
+    widget = {
+        slotpos = {
+            Vector3(0,   32 + 4,  0),
+            Vector3(0, -(32 + 4), 0)
+        },
+        animbank = "ui_cookpot_1x2",
+        animbuild = "ui_cookpot_1x2",
+        pos = Vector3(0, 60, 0)
+    },
+    type = "hand_inv",
+    excludefromcrafting = true,
+    priorityfn = IsCarrot
+}
+function params.lance_carrot_l.itemtestfn(container, item, slot)
+    return IsCarrot(container, item, slot) or item.prefab == "spoiled_food"
 end
 
 --------------------------------------------------------------------------

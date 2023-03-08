@@ -82,10 +82,7 @@ function Shockable:Shock(shocktime) --触电时的处理
     if self.inst.components.health ~= nil and self.inst.components.health:IsDead() then
         return
     end
-    if self.inst:HasTag("insulatedbody_l") then
-        return
-    end
-    if self.inst.components.inventory ~= nil and self.inst.components.inventory:EquipHasTag("insulatedarmor_l") then
+    if self.inst:HasTag("sedate_l") then
         return
     end
 

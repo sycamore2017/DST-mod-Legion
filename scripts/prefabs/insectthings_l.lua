@@ -501,10 +501,14 @@ local function OnEquip_beetlehat(inst, owner)
         owner.components.mightiness.ratemodifiers:SetModifier(inst, 0.3)
     end
 
-    owner:AddTag("burden_ignor_l")
+    AddTag_legion(owner, "burden_ignor_l", inst.prefab) --免疫装备减速 棱镜tag
 end
 local function OnUnequip_beetlehat(inst, owner)
     HAT_ONUNEQUIP_L(inst, owner)
+
+    if owner:HasTag("equipmentmodel") then --假人！
+        return
+    end
 
     if owner.components.workmultiplier ~= nil then
         owner.components.workmultiplier:RemoveMultiplier(ACTIONS.CHOP,   inst)
@@ -517,8 +521,7 @@ local function OnUnequip_beetlehat(inst, owner)
     if owner.components.mightiness ~= nil then
         owner.components.mightiness.ratemodifiers:RemoveModifier(inst)
     end
-
-    owner:RemoveTag("burden_ignor_l")
+    RemoveTag_legion(owner, "burden_ignor_l", inst.prefab)
 end
 
 local function Fn_beetlehat()
@@ -568,7 +571,7 @@ local function Fn_beetlehat()
     inst.components.equippable.walkspeedmult = 0.85
 
     inst:AddComponent("armor")
-    inst.components.armor:InitCondition(945, 0.85)
+    inst.components.armor:InitCondition(945, 0.8)
 
     inst:AddComponent("waterproofer")
     inst.components.waterproofer:SetEffectiveness(TUNING.WATERPROOFNESS_SMALL)
@@ -597,9 +600,23 @@ local function OnEquip_beetlearmor(inst, owner)
     -- else
         owner.AnimState:OverrideSymbol("swap_body", "armor_elepheetle", "swap_body")
     -- end
+
+    if owner:HasTag("equipmentmodel") then --假人！
+        return
+    end
+
+    AddTag_legion(owner, "stable_l", inst.prefab) --无硬直 棱镜tag
+    AddTag_legion(owner, "sedate_l", inst.prefab) --免疫麻痹 棱镜tag
 end
 local function OnUnequip_beetlearmor(inst, owner)
     owner.AnimState:ClearOverrideSymbol("swap_body")
+
+    if owner:HasTag("equipmentmodel") then --假人！
+        return
+    end
+
+    RemoveTag_legion(owner, "stable_l", inst.prefab)
+    RemoveTag_legion(owner, "sedate_l", inst.prefab)
 end
 
 local function Fn_beetlearmor()
@@ -615,8 +632,6 @@ local function Fn_beetlearmor()
     inst.AnimState:SetBuild("armor_elepheetle")
     inst.AnimState:PlayAnimation("idle")
 
-    inst:AddTag("stablearmor_l") --无硬直 棱镜tag
-    inst:AddTag("insulatedarmor_l") --免疫麻痹 棱镜tag
     inst:AddTag("heavyarmor") --减轻击退效果 官方tag
     inst.repair_bugshell_l = true
 
@@ -651,7 +666,7 @@ local function Fn_beetlearmor()
     inst.components.equippable.walkspeedmult = 0.15
 
     inst:AddComponent("armor")
-    inst.components.armor:InitCondition(1050, 0.95)
+    inst.components.armor:InitCondition(1050, 0.9)
 
     inst:AddComponent("waterproofer")
     inst.components.waterproofer:SetEffectiveness(TUNING.WATERPROOFNESS_SMALL)

@@ -2709,6 +2709,25 @@ S________WARLY.DESCRIBE.ARMOR_ELEPHEETLE = "比起顶级防御，我仍然选择
 S_______WALTER.DESCRIBE.ARMOR_ELEPHEETLE = "今年的万圣节装扮就决定是它了！"
 S________WANDA.DESCRIBE.ARMOR_ELEPHEETLE = "虫子，和时间诅咒，这根本不搭好吗！"
 
+S_NAMES.LANCE_CARROT_L = "胡萝卜长枪"
+S______GENERIC.DESCRIBE.LANCE_CARROT_L = "用食物当武器，这不是第一次发生了。"
+-- S_______WILLOW.DESCRIBE.LANCE_CARROT_L = ""
+-- S_____WOLFGANG.DESCRIBE.LANCE_CARROT_L = ""
+S________WENDY.DESCRIBE.LANCE_CARROT_L = "兔子的武器。"
+-- S_________WX78.DESCRIBE.LANCE_CARROT_L = ""
+S_WICKERBOTTOM.DESCRIBE.LANCE_CARROT_L = "我还是第一次见到像竹子一样硬化的胡萝卜。"
+S_______WOODIE.DESCRIBE.LANCE_CARROT_L = "我就想问它能不能吃。"
+-- S______WAXWELL.DESCRIBE.LANCE_CARROT_L = ""
+S___WATHGRITHR.DESCRIBE.LANCE_CARROT_L = "当你足够犀利，连食物也能当武器。"
+S_______WEBBER.DESCRIBE.LANCE_CARROT_L = "好吃又好玩的长长胡萝卜！"
+-- S_______WINONA.DESCRIBE.LANCE_CARROT_L = ""
+-- S_______WORTOX.DESCRIBE.LANCE_CARROT_L = ""
+S_____WORMWOOD.DESCRIBE.LANCE_CARROT_L = "好长。"
+S________WARLY.DESCRIBE.LANCE_CARROT_L = "可惜已经硬化，没法食用了。"
+S_________WURT.DESCRIBE.LANCE_CARROT_L = "哈，我觉得它很适合我。"
+-- S_______WALTER.DESCRIBE.LANCE_CARROT_L = ""
+S________WANDA.DESCRIBE.LANCE_CARROT_L = "没啥好稀奇的。"
+
 --------------------------------------------------------------------------
 --[[ flash and crush ]]--[[ 电闪雷鸣 ]]
 --------------------------------------------------------------------------

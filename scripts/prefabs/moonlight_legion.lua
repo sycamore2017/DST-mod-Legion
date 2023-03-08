@@ -245,6 +245,19 @@ local function OnClose(inst)
     inst.SoundEmitter:KillSound("idlesound2")
     inst.SoundEmitter:PlaySound("dontstarve/cave/mushtree_tall_spore_land", nil, 0.6)
 end
+local function SetPerishRate_hidden(inst, item)
+    if item == nil then
+        return 0.3
+    end
+    if item:HasTag("frozen") then
+        return 0
+    elseif inst.upgradetarget ~= nil then --盐箱是0.25，冰箱0.5。给盐盒就是0.15，给冰箱就是0.3
+        if inst.upgradetarget == "saltbox" then
+            return 0.15
+        end
+    end
+    return 0.3
+end
 
 table.insert(prefs, Prefab("hiddenmoonlight", function()
     local inst = CreateEntity()
@@ -284,19 +297,7 @@ table.insert(prefs, Prefab("hiddenmoonlight", function()
     inst.components.container.skipopensnd = true
 
     inst:AddComponent("preserver")
-	inst.components.preserver:SetPerishRateMultiplier(function(inst, item)
-        if item == nil then
-            return 0.3
-        end
-        if item:HasTag("frozen") then
-            return 0
-        elseif inst.upgradetarget ~= nil then --盐箱是0.25，冰箱0.5。给盐盒就是0.15，给冰箱就是0.3
-            if inst.upgradetarget == "saltbox" then
-                return 0.15
-            end
-        end
-        return 0.3
-    end)
+	inst.components.preserver:SetPerishRateMultiplier(SetPerishRate_hidden)
 
     inst:AddComponent("lootdropper")
 

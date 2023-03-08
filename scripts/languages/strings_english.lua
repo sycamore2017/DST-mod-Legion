@@ -2616,6 +2616,25 @@ S________WARLY.DESCRIBE.ARMOR_ELEPHEETLE = "I still prefer cooking to top defens
 S_______WALTER.DESCRIBE.ARMOR_ELEPHEETLE = "This year's Halloween costume is decided!"
 S________WANDA.DESCRIBE.ARMOR_ELEPHEETLE = "Bug, and the time curse, these two don't match at all!"
 
+S_NAMES.LANCE_CARROT_L = "Carrot Lance" --胡萝卜长枪
+S______GENERIC.DESCRIBE.LANCE_CARROT_L = "Using food as a weapon is not new."
+-- S_______WILLOW.DESCRIBE.LANCE_CARROT_L = ""
+-- S_____WOLFGANG.DESCRIBE.LANCE_CARROT_L = ""
+S________WENDY.DESCRIBE.LANCE_CARROT_L = "A rabbit's weapon."
+-- S_________WX78.DESCRIBE.LANCE_CARROT_L = ""
+S_WICKERBOTTOM.DESCRIBE.LANCE_CARROT_L = "Carrot stick that harden like bamboo."
+S_______WOODIE.DESCRIBE.LANCE_CARROT_L = "I just want to ask if this can be eaten."
+-- S______WAXWELL.DESCRIBE.LANCE_CARROT_L = ""
+S___WATHGRITHR.DESCRIBE.LANCE_CARROT_L = "When you are incisive enough, even food can be a weapon."
+S_______WEBBER.DESCRIBE.LANCE_CARROT_L = "Tasty and funny long carrot!"
+-- S_______WINONA.DESCRIBE.LANCE_CARROT_L = ""
+-- S_______WORTOX.DESCRIBE.LANCE_CARROT_L = ""
+S_____WORMWOOD.DESCRIBE.LANCE_CARROT_L = "Very long."
+S________WARLY.DESCRIBE.LANCE_CARROT_L = "Unfortunately, it has hardened and cannot be eaten."
+S_________WURT.DESCRIBE.LANCE_CARROT_L = "Ha, I think it suits me very well."
+-- S_______WALTER.DESCRIBE.LANCE_CARROT_L = ""
+S________WANDA.DESCRIBE.LANCE_CARROT_L = "Nothing new."
+
 --------------------------------------------------------------------------
 --[[ flash and crush ]]--[[ 电闪雷鸣 ]]
 --------------------------------------------------------------------------

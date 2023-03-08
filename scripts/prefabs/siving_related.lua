@@ -19,6 +19,11 @@ local ctlFuledItems = {
     rosorns = { moisture = nil, nutrients = { 12, 12, 48 } },
     lileaves = { moisture = nil, nutrients = { 12, 48, 12 } },
     orchitwigs = { moisture = nil, nutrients = { 48, 12, 12 } },
+
+    --【猥琐联盟】
+    weisuo_coppery_kela = { moisture = nil, nutrients = { 2, 2, 2 } },
+    weisuo_silvery_kela = { moisture = nil, nutrients = { 20, 20, 20 } },
+    weisuo_golden_kela = { moisture = nil, nutrients = { 80, 80, 80 } },
 }
 local PLACER_SCALE_CTL = 1.79 --这个大小就是20半径的
 

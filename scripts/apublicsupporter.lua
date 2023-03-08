@@ -263,6 +263,32 @@ _G.UndefendedATK_legion = function(inst, data)
     end
 end
 
+--[ 兼容性标签管理 ]--
+_G.AddTag_legion = function(inst, tagname, key)
+    if inst.tags_l == nil then
+        inst.tags_l = {}
+    end
+    if inst.tags_l[tagname] == nil then
+        inst.tags_l[tagname] = {}
+    end
+    inst.tags_l[tagname][key] = true
+    inst:AddTag(tagname)
+end
+_G.RemoveTag_legion = function(inst, tagname, key)
+    if inst.tags_l ~= nil then
+        if inst.tags_l[tagname] ~= nil then
+            inst.tags_l[tagname][key] = nil
+            for k, v in pairs(inst.tags_l[tagname]) do
+                if v == true then --如果还有 key 为true，那就不能删除这个标签
+                    return
+                end
+            end
+            inst.tags_l[tagname] = nil --没有 key 是true了，直接做空
+        end
+    end
+    inst:RemoveTag(tagname)
+end
+
 --------------------------------------------------------------------------
 --[[ 修改rider组件，重新构造combat的redirectdamagefn函数以适应更多元的机制 ]]
 --------------------------------------------------------------------------
@@ -854,7 +880,7 @@ _G.REPAIRERS_L["insectshell_l"] = {
     fn_try = Fn_try_bugshell,
     fn_sg = Fn_sg_long,
     fn_do = function(act)
-        return DoArmorRepair(act.doer, act.invobject, act.target, 180)
+        return DoArmorRepair(act.doer, act.invobject, act.target, 100)
     end
 }
 
@@ -2112,7 +2138,7 @@ AddStategraphPostInit("wilson", function(sg)
     eve.fn = function(inst, data, ...)
         if not inst.components.health:IsDead() and not inst.sg:HasStateTag("drowning") then
             if not inst.sg:HasStateTag("sleeping") then --睡袋貌似有自己的特殊机制
-                if inst.components.inventory ~= nil and inst.components.inventory:EquipHasTag("stablearmor_l") then
+                if inst:HasTag("stable_l") then
                     inst.SoundEmitter:PlaySound("dontstarve/wilson/hit")
                     DoHurtSound(inst)
                     return

@@ -12,7 +12,7 @@ local hot = {
 	-- dish_tomahawksteak = 'foods_cookpot',
 	-- siving_mask = 'siving_related',
 	hat_elepheetle = 'insectthings_l',
-	armor_elepheetle = 'insectthings_l',
+	lance_carrot_l = 'farm_plants_legion',
 }
 local old_sp = GLOBAL.SpawnPrefab
 function GLOBAL.SpawnPrefab(prefab, ...)

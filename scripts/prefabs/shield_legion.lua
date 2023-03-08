@@ -56,11 +56,6 @@ local function OnUnequipFn(inst, owner)
     owner.AnimState:ClearOverrideSymbol("lantern_overlay")
     owner.AnimState:Hide("LANTERN_OVERLAY")
     owner.AnimState:ShowSymbol("swap_object")
-
-    --清除自己的redirectdamagefn函数
-    if owner.redirect_table ~= nil then
-        owner.redirect_table[inst.prefab] = nil
-    end
 end
 
 local function SetNoBrokenArmor(inst, exfn)

@@ -201,7 +201,7 @@ if _G.CONFIGS_LEGION.TECHUNLOCK == "lootdropper" then
     AddRecipe2(
         "hat_elepheetle", {
             Ingredient("dumbbell_marble", 1),
-            Ingredient("insectshell_l", 40, "images/inventoryimages/insectshell_l.xml"),
+            Ingredient("insectshell_l", 30, "images/inventoryimages/insectshell_l.xml"),
             Ingredient("goldnugget", 10),
             Ingredient("slurtlehat", 1),
         }, TECH.LOST, {
@@ -211,7 +211,7 @@ if _G.CONFIGS_LEGION.TECHUNLOCK == "lootdropper" then
     AddRecipe2(
         "armor_elepheetle", {
             Ingredient("armormarble", 1),
-            Ingredient("insectshell_l", 40, "images/inventoryimages/insectshell_l.xml"),
+            Ingredient("insectshell_l", 30, "images/inventoryimages/insectshell_l.xml"),
             Ingredient("goldnugget", 10),
             Ingredient("armorsnurtleshell", 1),
         }, TECH.LOST, {
@@ -361,7 +361,7 @@ else
     AddRecipe2(
         "hat_elepheetle", {
             Ingredient("dumbbell_marble", 1),
-            Ingredient("insectshell_l", 40, "images/inventoryimages/insectshell_l.xml"),
+            Ingredient("insectshell_l", 30, "images/inventoryimages/insectshell_l.xml"),
             Ingredient("goldnugget", 10),
             Ingredient("slurtlehat", 1),
         }, TECH.ELECOURMALINE_THREE, {
@@ -372,7 +372,7 @@ else
     AddRecipe2(
         "armor_elepheetle", {
             Ingredient("armormarble", 1),
-            Ingredient("insectshell_l", 40, "images/inventoryimages/insectshell_l.xml"),
+            Ingredient("insectshell_l", 30, "images/inventoryimages/insectshell_l.xml"),
             Ingredient("goldnugget", 10),
             Ingredient("armorsnurtleshell", 1),
         }, TECH.ELECOURMALINE_THREE, {

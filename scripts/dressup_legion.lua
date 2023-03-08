@@ -1736,12 +1736,19 @@ local dressup_data = {
         end
     },
     hat_elepheetle = {
+        isnoskin = true,
         buildfile = "hat_elepheetle",
         buildsymbol = "swap_hat"
     },
     armor_elepheetle = {
+        isnoskin = true,
         buildfile = "armor_elepheetle",
         buildsymbol = "swap_body"
+    },
+    lance_carrot_l = {
+        isnoskin = true,
+        buildfile = "lance_carrot_l",
+        buildsymbol = "swap_object"
     },
 }
 

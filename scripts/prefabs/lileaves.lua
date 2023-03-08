@@ -69,8 +69,8 @@ local function fn()
     inst:AddComponent("inspectable") --可检查组件
 
     inst:AddComponent("equippable")--添加可装备组件，有了这个组件，你才能装备物品  
-    inst.components.equippable:SetOnEquip( OnEquip )
-    inst.components.equippable:SetOnUnequip( OnUnequip )
+    inst.components.equippable:SetOnEquip(OnEquip)
+    inst.components.equippable:SetOnUnequip(OnUnequip)
 
     inst:AddComponent("weapon") --增加武器组件 有了这个才可以打人
     inst.components.weapon:SetDamage(51) --设置伤害，如果为0会吸引不了仇恨、不触发被攻击动画

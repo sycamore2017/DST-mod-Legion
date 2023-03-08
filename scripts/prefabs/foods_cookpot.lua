@@ -179,13 +179,13 @@ local foliageath_data_steak = {
 local function UpdateAxe(inst)
     local value
     if inst._damage then
-        value = inst._damage[2] * inst.components.perishable:GetPercent()
-        value = Remap(value, 0, inst._damage[2], inst._damage[1], inst._damage[2])
+        value = inst.components.perishable:GetPercent()
+        value = Remap(value, 0, 1, inst._damage[1], inst._damage[2])
         inst.components.weapon:SetDamage(value)
     end
     if inst._chopvalue then
-        value = inst._chopvalue[2] * inst.components.perishable:GetPercent()
-        value = Remap(value, 0, inst._chopvalue[2], inst._chopvalue[1], inst._chopvalue[2])
+        value = inst.components.perishable:GetPercent()
+        value = Remap(value, 0, 1, inst._chopvalue[1], inst._chopvalue[2])
         inst.components.tool.actions[ACTIONS.CHOP] = value
     end
 end
