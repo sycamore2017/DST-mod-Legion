@@ -507,14 +507,17 @@ end, {
 
 local damage_shield = 85 --34*2.5
 local damage_sword = 136 --34*4
-local absorb_shield = 0.2
-local absorb_sword = 0.95
+local absorb_shield = 0.1
+local absorb_sword = 0.3
 
 local function DeathCallForRain(owner)
     TheWorld:PushEvent("ms_forceprecipitation", true)
 end
 local function OnAttack_agron(inst, owner, target)
-    if owner.components.health ~= nil and owner.components.health:GetPercent() > 0.1 then
+    if
+        not inst.components.timer:TimerExists("revolt") and
+        owner.components.health ~= nil and owner.components.health:GetPercent() > 0.1
+    then
         local fx = SpawnPrefab(inst._dd.fx or "agronssword_fx") --燃血特效
         fx.Transform:SetPosition(owner.Transform:GetWorldPosition())
         owner.components.health:DoDelta(-1.5, true, "agronssword")
@@ -560,6 +563,70 @@ local function DoRevolt(inst, doer)
         end, 0)
     end
 end
+local function OnLoad_agron(inst, data)
+    if inst.components.timer:TimerExists("revolt") then
+        DoRevolt(inst, nil)
+    end
+end
+local function TimerDone_agron(inst, data)
+    if data.name == "revolt" then
+        inst._basedamage = damage_shield
+        inst.components.weapon:SetDamage(damage_shield)
+        inst.components.armor:SetAbsorption(absorb_shield)
+
+        TrySetOwnerSymbol(inst, nil, false)
+
+        if inst._task_fx ~= nil then
+            inst._task_fx:Cancel()
+            inst._task_fx = nil
+        end
+    end
+end
+
+local function OnEquip_agron(inst, owner)
+    owner.AnimState:OverrideSymbol("lantern_overlay", inst._dd.build,
+        inst.components.timer:TimerExists("revolt") and "swap2" or "swap1")
+    owner.AnimState:HideSymbol("swap_object")
+    owner.AnimState:Show("ARM_carry") --显示持物手
+    owner.AnimState:Hide("ARM_normal") --隐藏普通的手
+    owner.AnimState:Show("LANTERN_OVERLAY")
+
+    if owner:HasTag("equipmentmodel") then --假人！
+        return
+    end
+
+    if owner.components.health ~= nil then
+        owner:ListenForEvent("death", DeathCallForRain)
+        owner:ListenForEvent("healthdelta", inst.fn_onHealthDelta)
+        inst.fn_onHealthDelta(owner, nil)
+    end
+end
+local function OnUnequip_agron(inst, owner)
+    owner:RemoveEventCallback("death", DeathCallForRain)
+    owner:RemoveEventCallback("healthdelta", inst.fn_onHealthDelta)
+    inst.components.weapon:SetDamage(inst._basedamage) --卸下时，恢复攻击力，为了让巨人之脚识别到
+
+    OnUnequipFn(inst, owner)
+end
+local function ShieldAtk_agron(inst, doer, attacker, data)
+    --先加攻击力，这样输出高一点
+    local timeleft = inst.components.timer:GetTimeLeft("revolt") or 0
+    inst.components.timer:StopTimer("revolt")
+    inst.components.timer:StartTimer("revolt", math.min(120, timeleft+10))
+    DoRevolt(inst, doer)
+
+    Counterattack_base(inst, doer, attacker, data, 8, 1.3)
+
+    --后回血，这样输出高一点
+    local percent = doer.components.health:GetPercent()
+    if percent > 0 and percent <= 0.3 then
+        percent = data.damage and data.damage*0.08 or 0.8
+        doer.components.health:DoDelta(percent, true, "debug_key", true, nil, true) --对旺达的回血只有特定原因才能成功
+    end
+end
+local function ShieldAtkStay_agron(inst, doer, attacker, data)
+    inst.components.shieldlegion:Counterattack(doer, attacker, data, 8, 1)
+end
 
 MakeShield({
     name = "agronssword",
@@ -600,7 +667,7 @@ MakeShield({
             else
                 percent = owner.components.health:GetPercent()
             end
-            inst.components.weapon:SetDamage(inst._basedamage*(1.2-percent))
+            inst.components.weapon:SetDamage(math.floor( inst._basedamage*(1.2-percent) ))
         end
 
         inst.components.inventoryitem:SetSinks(true) --落水时会下沉，但是因为标签的关系会回到附近岸边
@@ -611,75 +678,19 @@ MakeShield({
         inst.components.armor:InitCondition(100, absorb_shield)
         inst.components.armor.indestructible = true --无敌的护甲
 
-        inst.components.equippable:SetOnEquip(function(inst, owner)
-            owner.AnimState:OverrideSymbol("lantern_overlay", inst._dd.build,
-                inst.components.timer:TimerExists("revolt") and "swap2" or "swap1")
-            owner.AnimState:HideSymbol("swap_object")
-            owner.AnimState:Show("ARM_carry") --显示持物手
-            owner.AnimState:Hide("ARM_normal") --隐藏普通的手
-            owner.AnimState:Show("LANTERN_OVERLAY")
-
-            if owner:HasTag("equipmentmodel") then --假人！
-                return
-            end
-
-            if owner.components.health ~= nil then
-                owner:ListenForEvent("death", DeathCallForRain)
-                owner:ListenForEvent("healthdelta", inst.fn_onHealthDelta)
-                inst.fn_onHealthDelta(owner, nil)
-            end
-        end)
-        inst.components.equippable:SetOnUnequip(function(inst, owner)
-            owner:RemoveEventCallback("death", DeathCallForRain)
-            owner:RemoveEventCallback("healthdelta", inst.fn_onHealthDelta)
-            inst.components.weapon:SetDamage(inst._basedamage) --卸下时，恢复攻击力，为了让巨人之脚识别到
-
-            OnUnequipFn(inst, owner)
-        end)
+        inst.components.equippable:SetOnEquip(OnEquip_agron)
+        inst.components.equippable:SetOnUnequip(OnUnequip_agron)
 
         inst:AddComponent("timer")
-        inst:ListenForEvent("timerdone", function(inst, data)
-            if data.name == "revolt" then
-                inst._basedamage = damage_shield
-                inst.components.weapon:SetDamage(damage_shield)
-                inst.components.armor:SetAbsorption(absorb_shield)
-
-                TrySetOwnerSymbol(inst, nil, false)
-
-                if inst._task_fx ~= nil then
-                    inst._task_fx:Cancel()
-                    inst._task_fx = nil
-                end
-            end
-        end)
+        inst:ListenForEvent("timerdone", TimerDone_agron)
 
         inst.hurtsoundoverride = "dontstarve/wilson/hit_armour"
         inst.components.shieldlegion.armormult_success = 0
-        inst.components.shieldlegion.atkfn = function(inst, doer, attacker, data)
-            --先加攻击力，这样输出高一点
-            local timeleft = inst.components.timer:GetTimeLeft("revolt") or 0
-            inst.components.timer:StopTimer("revolt")
-            inst.components.timer:StartTimer("revolt", math.min(120, timeleft+10))
-            DoRevolt(inst, doer)
-
-            Counterattack_base(inst, doer, attacker, data, 8, 1.3)
-
-            --后回血，这样输出高一点
-            local percent = doer.components.health:GetPercent()
-            if percent > 0 and percent <= 0.3 then
-                doer.components.health:SetPercent(percent+0.1, false, "agronssword")
-            end
-        end
-        inst.components.shieldlegion.atkstayingfn = function(inst, doer, attacker, data)
-            inst.components.shieldlegion:Counterattack(doer, attacker, data, 8, 1)
-        end
+        inst.components.shieldlegion.atkfn = ShieldAtk_agron
+        inst.components.shieldlegion.atkstayingfn = ShieldAtkStay_agron
         -- inst.components.shieldlegion.atkfailfn = function(inst, doer, attacker, data) end
 
-        inst.OnLoad = function(inst, data)
-            if inst.components.timer:TimerExists("revolt") then
-                DoRevolt(inst, nil)
-            end
-        end
+        inst.OnLoad = OnLoad_agron
 
         inst.components.skinedlegion:SetOnPreLoad()
     end,

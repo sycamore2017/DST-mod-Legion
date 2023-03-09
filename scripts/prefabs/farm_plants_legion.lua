@@ -1002,6 +1002,7 @@ local function OnEquip_carl(inst, owner)
         inst.components.container:Open(owner)
 
 		inst:ListenForEvent("gotnewitem", OnOwnerItemChange_carl, owner)
+		inst:ListenForEvent("itemget", OnOwnerItemChange_carl, owner)
 		inst:ListenForEvent("itemlose", OnOwnerItemChange_carl, owner)
 		UpdateCarrot(inst, true)
     end
@@ -1018,6 +1019,7 @@ local function OnUnequip_carl(inst, owner)
         inst.components.container:Close()
     end
 	inst:RemoveEventCallback("gotnewitem", OnOwnerItemChange_carl, owner)
+	inst:RemoveEventCallback("itemget", OnOwnerItemChange_carl, owner)
 	inst:RemoveEventCallback("itemlose", OnOwnerItemChange_carl, owner)
 end
 local function OnAttack_carl(inst, attacker, target)
@@ -1058,6 +1060,7 @@ table.insert(prefs, Prefab(
         inst.AnimState:PlayAnimation("idle")
 
 		inst:AddTag("jab") --使用捅击的动作进行攻击
+		inst.repair_carrot_l = true
 
         --weapon (from weapon component) added to pristine state for optimization
     	inst:AddTag("weapon")
@@ -1093,7 +1096,7 @@ table.insert(prefs, Prefab(
 		inst:AddComponent("weapon")
 		inst.components.weapon:SetDamage(atk_min_carl)
 		-- inst.components.weapon:SetRange(-1, -1) --人物默认攻击距离为3、3
-		inst.components.weapon:SetOnAttack(OnAttack_carl)
+		-- inst.components.weapon:SetOnAttack(OnAttack_carl)
 
 		inst:AddComponent("finiteuses")
 		inst.components.finiteuses:SetMaxUses(200)

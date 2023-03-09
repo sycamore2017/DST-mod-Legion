@@ -712,6 +712,34 @@ local function DoArmorRepair(doer, item, target, value)
     end
     return false, "GUITAR"
 end
+local function DoFiniteusesRepair(doer, item, target, value)
+    if
+        target ~= nil and
+        target.components.finiteuses ~= nil and target.components.finiteuses:GetPercent() < 1
+    then
+        value = value*(doer.mult_repair_l or 1)
+        local cpt = target.components.finiteuses
+        local need = math.ceil((cpt.total - cpt.current) / value)
+        if need > 1 then --最后一次很可能会比较浪费，所以不主动填满
+            need = need - 1
+        end
+
+        if item.components.stackable ~= nil then
+            local stack = item.components.stackable:StackSize() or 1
+            if need > stack then
+                need = stack
+            end
+            local useditems = item.components.stackable:Get(need)
+            useditems:Remove()
+        else
+            need = 1
+            item:Remove()
+        end
+        cpt:Repair(value*need)
+        return true
+    end
+    return false, "GUITAR"
+end
 
 --素白蘑菇帽
 
@@ -914,6 +942,31 @@ _G.REPAIRERS_L["bluegem"] = {
     end,
     fn_sg = Fn_sg_short,
     fn_do = Fn_do_gem
+}
+
+--胡萝卜长枪
+
+local function Fn_try_carrot(inst, doer, target, actions, right)
+    if target.repair_carrot_l then
+        if CommonDoerCheck(doer, target) then
+            return true
+        end
+    end
+    return false
+end
+_G.REPAIRERS_L["carrot"] = {
+    fn_try = Fn_try_carrot,
+    fn_sg = Fn_sg_long,
+    fn_do = function(act)
+        return DoFiniteusesRepair(act.doer, act.invobject, act.target, 25)
+    end
+}
+_G.REPAIRERS_L["carrot_cooked"] = {
+    fn_try = Fn_try_carrot,
+    fn_sg = Fn_sg_long,
+    fn_do = function(act)
+        return DoFiniteusesRepair(act.doer, act.invobject, act.target, 15)
+    end
 }
 
 ------
