@@ -744,7 +744,7 @@ end
 --素白蘑菇帽
 
 local function Fn_try_fungus(inst, doer, target, actions, right)
-    if target.repair_fungus_l then
+    if target:HasTag("rp_fungus_l") then
         if CommonDoerCheck(doer, target) then
             return true
         end
@@ -867,7 +867,7 @@ _G.REPAIRERS_L["mat_whitewood_item"] = {
 --砂之抵御
 
 local function Fn_try_sand(inst, doer, target, actions, right)
-    if target:HasTag("repair_sand") then
+    if target:HasTag("rp_sand_l") then
         if CommonDoerCheck(doer, target) then
             return true
         end
@@ -896,7 +896,7 @@ rock_needchange = nil
 --犀金胄甲、犀金护甲
 
 local function Fn_try_bugshell(inst, doer, target, actions, right)
-    if target.repair_bugshell_l then
+    if target:HasTag("rp_bugshell_l") then
         if CommonDoerCheck(doer, target) then
             return true
         end
@@ -947,7 +947,7 @@ _G.REPAIRERS_L["bluegem"] = {
 --胡萝卜长枪
 
 local function Fn_try_carrot(inst, doer, target, actions, right)
-    if target.repair_carrot_l then
+    if target:HasTag("rp_carrot_l") then
         if CommonDoerCheck(doer, target) then
             return true
         end

@@ -1,5 +1,4 @@
-local assets =
-{
+local assets = {
     Asset("ANIM", "anim/sand_spike.zip"),
     Asset("ANIM", "anim/sand_splash_fx.zip"),
 }
@@ -10,15 +9,13 @@ local assets =
 --     Asset("ANIM", "anim/sand_splash_fx.zip"),
 -- }
 
-local SPIKE_SIZES =
-{
+local SPIKE_SIZES = {
     "short",
     "med",
     "tall",
 }
 
-local RADIUS =
-{
+local RADIUS = {
     ["short"] = .2,
     ["med"] = .4,
     ["tall"] = .6,
@@ -274,7 +271,7 @@ local function MakeSpikeFn(shape, size)
         inst.Physics:SetCollisionGroup(COLLISION.OBSTACLES)
         inst.Physics:ClearCollisionMask()
         inst.Physics:CollidesWith(COLLISION.ITEMS)
-        inst.Physics:CollidesWith(COLLISION.CHARACTERS)
+        -- inst.Physics:CollidesWith(COLLISION.CHARACTERS) --不与部分生物发生碰撞
         inst.Physics:CollidesWith(COLLISION.GIANTS)
         inst.Physics:CollidesWith(COLLISION.WORLD)
         inst.Physics:SetActive(false)

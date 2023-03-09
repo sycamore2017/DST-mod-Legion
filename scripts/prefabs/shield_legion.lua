@@ -163,8 +163,8 @@ local absorb_raining = 0.4
 local absorb_broken = 0.1
 
 local mult_success_sandstorms = 0.1
-local mult_success_normal = 0.3
-local mult_success_raining = 0.6
+local mult_success_normal = 0.2
+local mult_success_raining = 0.5
 
 local function OnBlocked(owner, data)
     -- owner.SoundEmitter:PlaySound("dontstarve/common/together/teleport_sand/out")    --被攻击时播放像沙的声音
@@ -272,6 +272,61 @@ local function onisraining(inst) --下雨时属性降低
     end
 end
 
+local function OnEquip_sand(inst, owner)
+    OnEquipFn(inst, owner)
+    if owner:HasTag("equipmentmodel") then --假人！
+        return
+    end
+
+    onisraining(inst)   --装备时先更新一次
+
+    inst:ListenForEvent("blocked", OnBlocked, owner)
+    inst:ListenForEvent("attacked", OnBlocked, owner)
+
+    inst:WatchWorldState("israining", onisraining)
+    inst:WatchWorldState("issummer", onisraining)
+
+    --能在沙暴中不减速行走
+    if owner.components.locomotor ~= nil then
+        if owner._runinsandstorm == nil then
+            local oldfn = owner.components.locomotor.SetExternalSpeedMultiplier
+            owner.components.locomotor.SetExternalSpeedMultiplier = function(self, source, key, m)
+                if self.inst._runinsandstorm and key == "sandstorm" then
+                    self:RemoveExternalSpeedMultiplier(self.inst, "sandstorm")
+                    return
+                end
+                oldfn(self, source, key, m)
+            end
+        end
+        -- owner.components.locomotor:RemoveExternalSpeedMultiplier(owner, "sandstorm") --切换装备时，下一帧会自动更新移速
+        owner._runinsandstorm = true
+    end
+end
+local function OnUnequip_sand(inst, owner)
+    OnUnequipFn(inst, owner)
+    if owner:HasTag("equipmentmodel") then --假人！
+        return
+    end
+
+    inst:RemoveEventCallback("blocked", OnBlocked, owner)
+    inst:RemoveEventCallback("attacked", OnBlocked, owner)
+
+    owner:RemoveEventCallback("changearea", onsandstorm)
+    inst:StopWatchingWorldState("israining", onisraining)
+    inst:StopWatchingWorldState("issummer", onisraining)
+
+    if owner.components.locomotor ~= nil then
+        owner._runinsandstorm = false
+    end
+end
+local function ShieldAtk_sand(inst, doer, attacker, data)
+    OnBlocked(doer, { attacker = attacker })
+    Counterattack_base(inst, doer, attacker, data, 8, 3)
+end
+local function ShieldAtkStay_sand(inst, doer, attacker, data)
+    inst.components.shieldlegion:Counterattack(doer, attacker, data, 8, 1.5)
+end
+
 MakeShield({
     name = "shield_l_sand",
     assets = {
@@ -290,57 +345,14 @@ MakeShield({
     fn_server = function(inst)
         inst.components.inventoryitem:SetSinks(true) --它是石头做的，不可漂浮
 
-        inst.components.equippable:SetOnEquip(function(inst, owner)
-            OnEquipFn(inst, owner)
-            onisraining(inst)   --装备时先更新一次
-
-            inst:ListenForEvent("blocked", OnBlocked, owner)
-            inst:ListenForEvent("attacked", OnBlocked, owner)
-
-            inst:WatchWorldState("israining", onisraining)
-            inst:WatchWorldState("issummer", onisraining)
-
-            --能在沙暴中不减速行走
-            if owner.components.locomotor ~= nil then
-                if owner._runinsandstorm == nil then
-                    local oldfn = owner.components.locomotor.SetExternalSpeedMultiplier
-                    owner.components.locomotor.SetExternalSpeedMultiplier = function(self, source, key, m)
-                        if self.inst._runinsandstorm and key == "sandstorm" then
-                            self:RemoveExternalSpeedMultiplier(self.inst, "sandstorm")
-                            return
-                        end
-                        oldfn(self, source, key, m)
-                    end
-                end
-                -- owner.components.locomotor:RemoveExternalSpeedMultiplier(owner, "sandstorm") --切换装备时，下一帧会自动更新移速
-                owner._runinsandstorm = true
-            end
-        end)
-        inst.components.equippable:SetOnUnequip(function(inst, owner)
-            inst:RemoveEventCallback("blocked", OnBlocked, owner)
-            inst:RemoveEventCallback("attacked", OnBlocked, owner)
-
-            owner:RemoveEventCallback("changearea", onsandstorm)
-            inst:StopWatchingWorldState("israining", onisraining)
-            inst:StopWatchingWorldState("issummer", onisraining)
-
-            if owner.components.locomotor ~= nil then
-                owner._runinsandstorm = false
-            end
-
-            OnUnequipFn(inst, owner)
-        end)
+        inst.components.equippable:SetOnEquip(OnEquip_sand)
+        inst.components.equippable:SetOnUnequip(OnUnequip_sand)
         inst.components.equippable.insulated = true --设为true，就能防电
 
         inst.hurtsoundoverride = "dontstarve/creatures/together/antlion/sfx/break"
         inst.components.shieldlegion.armormult_success = mult_success_normal
-        inst.components.shieldlegion.atkfn = function(inst, doer, attacker, data)
-            OnBlocked(doer, { attacker = attacker })
-            Counterattack_base(inst, doer, attacker, data, 8, 3)
-        end
-        inst.components.shieldlegion.atkstayingfn = function(inst, doer, attacker, data)
-            inst.components.shieldlegion:Counterattack(doer, attacker, data, 8, 1.5)
-        end
+        inst.components.shieldlegion.atkfn = ShieldAtk_sand
+        inst.components.shieldlegion.atkstayingfn = ShieldAtkStay_sand
         -- inst.components.shieldlegion.atkfailfn = function(inst, doer, attacker, data) end
 
         inst.components.weapon:SetDamage(damage_normal)
@@ -348,15 +360,15 @@ MakeShield({
         inst.components.armor:InitCondition(1050, absorb_normal) --150*10*0.7= 1050防具耐久
         SetNoBrokenArmor(inst, function(armorcpt, isbrokenbefore)
             if armorcpt.condition <= 0 then
-                inst:AddTag("repair_sand")
+                inst:AddTag("rp_sand_l")
                 inst.components.equippable.insulated = false
                 inst.components.weapon:SetDamage(damage_broken)
                 inst.components.armor:SetAbsorption(absorb_broken)
             else
                 if armorcpt.condition >= armorcpt.maxcondition then
-                    inst:RemoveTag("repair_sand")
+                    inst:RemoveTag("rp_sand_l")
                 else
-                    inst:AddTag("repair_sand")
+                    inst:AddTag("rp_sand_l")
                 end
                 if isbrokenbefore then --说明是刚从损坏状态变成修复状态
                     inst.components.equippable.insulated = true
@@ -515,8 +527,7 @@ local function DeathCallForRain(owner)
 end
 local function OnAttack_agron(inst, owner, target)
     if
-        not inst.components.timer:TimerExists("revolt") and
-        owner.components.health ~= nil and owner.components.health:GetPercent() > 0.1
+        owner.components.health ~= nil and owner.components.health:GetPercent() > 0.3
     then
         local fx = SpawnPrefab(inst._dd.fx or "agronssword_fx") --燃血特效
         fx.Transform:SetPosition(owner.Transform:GetWorldPosition())

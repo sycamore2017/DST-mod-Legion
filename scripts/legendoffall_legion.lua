@@ -946,22 +946,18 @@ local time_years = 25 * TUNING.TOTAL_DAY_TIME
 local time_day = TUNING.TOTAL_DAY_TIME*(_G.CONFIGS_LEGION.X_OVERRIPETIME or 1)
 
 _G.CROPS_DATA_LEGION.carrot = {
-    growthmults = { [1] = 0.8, [2] = 1.2, [3] = 0.8, [4] = 1.5 }, --秋冬春。小于1为加速生长，大于1为延缓生长，为0停止生长
+    growthmults = { 0.8, 1.2, 0.8, 1.5 }, --秋冬春。小于1为加速生长，大于1为延缓生长，为0停止生长
     regrowstage = 3, --重新生长的阶段
-    bank = "plant_normal_legion",
-    build = "plant_normal_legion",
+    -- cangrowindrak = true, --能否在黑暗中生长(默认不能)
+    -- getsickchance = 0.007, --害虫产生率
+    bank = "plant_normal_legion", build = "plant_normal_legion",
     leveldata = {
         [1] = { anim = "level1_carrot", time = time_annual * 0.05, deadanim = "dead123_carrot", witheredprefab = nil, },
-        [2] = { anim = "level2_carrot", time = time_annual * 0.15, deadanim = "dead123_carrot", witheredprefab = {"cutgrass"}, },
-        [3] = { anim = "level3_carrot", time = time_annual * 0.20, deadanim = "dead123_carrot", witheredprefab = {"cutgrass"}, },
+        [2] = { anim = "level2_carrot", time = time_annual * 0.15, deadanim = "dead123_carrot", witheredprefab = {"cutgrass"} },
+        [3] = { anim = "level3_carrot", time = time_annual * 0.20, deadanim = "dead123_carrot", witheredprefab = {"cutgrass"} },
         [4] = { anim = "level4_carrot", time = time_annual * 0.20, deadanim = "dead456_carrot", witheredprefab = {"cutgrass"} },
-        [5] = { anim = "level5_carrot", time = time_annual * 0.40, deadanim = "dead456_carrot", witheredprefab = {"cutgrass"}, bloom = true, },
-        [6] = { anim = "level6_carrot", time = time_day    * 6.00, deadanim = "dead456_carrot", witheredprefab = {"cutgrass"}, },
-    },
-    maturedanim = {
-        [1] = "level6_carrot_1",
-        [2] = "level6_carrot_2",
-        [3] = "level6_carrot_3",
+        [5] = { anim = "level5_carrot", time = time_annual * 0.40, deadanim = "dead456_carrot", witheredprefab = {"cutgrass"}, bloom = true },
+        [6] = { anim = { "level6_carrot_1", "level6_carrot_2", "level6_carrot_3" }, time = time_day * 6.00, deadanim = "dead456_carrot", witheredprefab = {"cutgrass"} }
     }
 }
 _G.CROPS_DATA_LEGION.corn = {

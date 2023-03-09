@@ -1060,7 +1060,7 @@ table.insert(prefs, Prefab(
         inst.AnimState:PlayAnimation("idle")
 
 		inst:AddTag("jab") --使用捅击的动作进行攻击
-		inst.repair_carrot_l = true
+		inst:AddTag("rp_carrot_l")
 
         --weapon (from weapon component) added to pristine state for optimization
     	inst:AddTag("weapon")

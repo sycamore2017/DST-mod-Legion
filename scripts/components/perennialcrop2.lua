@@ -38,7 +38,7 @@ local PerennialCrop2 = Class(function(self, inst)
 	self.cropprefab = "corn"
 	self.stage_max = 2 --最大生长阶段
 	self.growthmults = nil --四个季节的生长速度
-	self.leveldata = nil --该植物生长有几个阶段，每个阶段的动画,以及是否处在花期
+	self.leveldata = nil --该植物生长有几个阶段，每个阶段的动画，以及是否处在花期、是否能采集
 	self.maturedanim = nil --成熟后的几个动画，根据果子数量决定下标
 	self.regrowstage = 1 --采摘后重新开始生长的阶段（枯萎后采摘毕竟从第一阶段开始）
 

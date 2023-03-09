@@ -540,7 +540,7 @@ local function Fn_beetlehat()
     inst:AddTag("hat")
     inst:AddTag("waterproofer")
     inst:AddTag("burden_l")
-    inst.repair_bugshell_l = true
+    inst:AddTag("rp_bugshell_l")
 
     -- inst:AddComponent("skinedlegion")
     -- inst.components.skinedlegion:InitWithFloater("hat_elepheetle")
@@ -633,7 +633,7 @@ local function Fn_beetlearmor()
     inst.AnimState:PlayAnimation("idle")
 
     inst:AddTag("heavyarmor") --减轻击退效果 官方tag
-    inst.repair_bugshell_l = true
+    inst:AddTag("rp_bugshell_l")
 
     -- inst:AddComponent("skinedlegion")
     -- inst.components.skinedlegion:InitWithFloater("armor_elepheetle")

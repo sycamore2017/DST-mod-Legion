@@ -143,7 +143,7 @@ local function fn(Sim)
     inst:AddTag("hat")
     inst:AddTag("show_spoilage")
     inst:AddTag("icebox_valid")
-    inst.repair_fungus_l = true
+    inst:AddTag("rp_fungus_l")
 
     --waterproofer (from waterproofer component) added to pristine state for optimization
     inst:AddTag("waterproofer")
