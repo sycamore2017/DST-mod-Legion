@@ -289,6 +289,46 @@ _G.RemoveTag_legion = function(inst, tagname, key)
     inst:RemoveTag(tagname)
 end
 
+--[ 吉他曲管理(mod兼容用的，如果其他mod想要增加自己的曲子就用以下代码) ]--
+--[[
+if not _G.rawget(_G, "GUITARSONGSPOOL_LEGION") then
+    _G.GUITARSONGSPOOL_LEGION = {}
+end
+_G.GUITARSONGSPOOL_LEGION["weisuo"] = function(guitar, doer, team, songs, guitartype) --吉他实体、主弹演奏者、演奏团队、已有的曲子、演奏类型
+    if guitar.prefab == "guitar_whitewood" then --以后还会出新的吉他，所以这里要有限制
+        local songmap = {
+            shiye = "歌曲路径",
+            faye = "歌曲路径2",
+            noobmaster = "歌曲路径3",
+            chenyu = "歌曲路径4"
+        }
+        local song = songmap[doer.prefab] or nil
+        local num_weisuo = song ~= nil and 1 or 0
+
+        if team ~= nil then --team里只有其他人，没有主弹
+            for _, player in pairs(team) do
+                if player and songmap[player.prefab] ~= nil then
+                    num_weisuo = num_weisuo + 1
+                end
+            end
+            if num_weisuo >= 4 then
+                song = "四人歌曲路径"
+            elseif num_weisuo >= 3 then
+                song = "三人歌曲路径"
+            elseif num_weisuo >= 2 then
+                song = "双人歌曲路径"
+            end
+        end
+
+        if song ~= nil then
+            doer.SoundEmitter:PlaySound(song, "guitarsong_l")
+            doer.SoundEmitter:SetVolume("guitarsong_l", 0.5)
+            return "override" --返回"override"代表只用这里的歌曲；否则就得往 songs 里加新的歌曲路径
+        end
+    end
+end
+]]--
+
 --------------------------------------------------------------------------
 --[[ 修改rider组件，重新构造combat的redirectdamagefn函数以适应更多元的机制 ]]
 --------------------------------------------------------------------------

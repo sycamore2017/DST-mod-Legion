@@ -956,7 +956,7 @@ _G.CROPS_DATA_LEGION.carrot = {
         [2] = { anim = "level2_carrot", time = time_annual * 0.15, deadanim = "dead123_carrot", witheredprefab = {"cutgrass"} },
         [3] = { anim = "level3_carrot", time = time_annual * 0.20, deadanim = "dead123_carrot", witheredprefab = {"cutgrass"} },
         [4] = { anim = "level4_carrot", time = time_annual * 0.20, deadanim = "dead456_carrot", witheredprefab = {"cutgrass"} },
-        [5] = { anim = "level5_carrot", time = time_annual * 0.40, deadanim = "dead456_carrot", witheredprefab = {"cutgrass"}, bloom = true },
+        [5] = { anim = "level5_carrot", time = time_annual * 0.40, deadanim = "dead456_carrot", witheredprefab = {"cutgrass"}, bloom = true, pickable = nil },
         [6] = { anim = { "level6_carrot_1", "level6_carrot_2", "level6_carrot_3" }, time = time_day * 6.00, deadanim = "dead456_carrot", witheredprefab = {"cutgrass"} }
     }
 }

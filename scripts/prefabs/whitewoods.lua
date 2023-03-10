@@ -53,7 +53,7 @@ local function PlayStart(inst, owner)
         owner.fourhands_task:Cancel()
     end
     owner.fourhands_playtype = TYPE_PLAY
-    owner.fourhands_valid = false
+    owner.fourhands_valid = nil
     owner.fourhands_myleader = nil
     owner.fourhands_status = 1
     owner.fourhands_task = inst:DoTaskInTime(TIME_FOURHANDSPLAY, function()
@@ -62,13 +62,24 @@ local function PlayStart(inst, owner)
         if owner.fourhands_status == 1 then
             local songs = owner.fourhands_valid and {
                 "legion/guitar_songs/never_end_love",
-                "legion/guitar_songs/let_her_go",
+                "legion/guitar_songs/let_her_go"
             } or {
                 "legion/guitar_songs/town",
-                "legion/guitar_songs/viva_la_vida",
+                "legion/guitar_songs/viva_la_vida"
             }
-            owner.SoundEmitter:PlaySound(songs[math.random(#songs)], "song")
-            owner.SoundEmitter:SetVolume("song",0.5)
+
+            if GUITARSONGSPOOL_LEGION ~= nil then
+                for _, fn in pairs(GUITARSONGSPOOL_LEGION) do
+                    if fn then
+                        local res = fn(inst, owner, owner.fourhands_valid, songs, TYPE_PLAY)
+                        if res and res == "override" then
+                            return
+                        end
+                    end
+                end
+            end
+            owner.SoundEmitter:PlaySound(songs[math.random(#songs)], "guitarsong_l")
+            owner.SoundEmitter:SetVolume("guitarsong_l", 0.5)
         end
     end)
 
@@ -87,7 +98,11 @@ local function PlayStart(inst, owner)
             if v.fourhands_task == nil or v:GetDistanceSqToPoint(x, y, z) > RANGE_FOURHANDSPLAY * RANGE_FOURHANDSPLAY then
                 owner.fourhands_status = -1 --弹奏失败
             else
-                v.fourhands_valid = true --告知主弹这次是联弹
+                if v.fourhands_valid == nil then --告知主弹这次是联弹
+                    v.fourhands_valid = {}
+                end
+                table.insert(v.fourhands_valid, owner)
+
                 owner.fourhands_myleader = v --记下本次联弹的主弹对象
                 owner.fourhands_status = 0  --确定自己副弹的位置
 
@@ -209,7 +224,7 @@ local function PlayDoing(inst, owner)
 end
 local function PlayEnd(inst, owner)
     if owner.fourhands_status == 1 then
-        owner.SoundEmitter:KillSound("song")
+        owner.SoundEmitter:KillSound("guitarsong_l")
     end
 
     if inst.playtask ~= nil then

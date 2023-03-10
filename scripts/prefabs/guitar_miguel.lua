@@ -1,5 +1,4 @@
-local assets =
-{
+local assets = {
     Asset("ANIM", "anim/guitar_miguel.zip"),
     Asset("ANIM", "anim/swap_guitar_miguel.zip"),
     Asset("ATLAS", "images/inventoryimages/guitar_miguel.xml"),
@@ -9,15 +8,13 @@ local assets =
     Asset("ANIM", "anim/ghost_pirate_build.zip"),
 }
 
-local prefabs =
-{
+local prefabs = {
     "ghost",
     "guitar_miguel_ground_fx",
     "guitar_miguel_float_fx",
 }
 
-local ghost_builds =
-{
+local ghost_builds = {
     "ghost_pig_build",
     "ghost_pirate_build",
     "ghost_wes_build",
