@@ -1279,9 +1279,6 @@ _G.CROPS_DATA_LEGION.mandrake = {
             end
         end
     end,
-    -- fn_overripe = function(self, numloot) --应该不会过熟才对
-    --     --不做任何操作，因为不希望曼德拉草会落果
-    -- end,
     fn_defend = function(inst, target)
         local doer = target or inst
         if doer.SoundEmitter then
