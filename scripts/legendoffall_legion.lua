@@ -1267,7 +1267,7 @@ _G.CROPS_DATA_LEGION.mandrake = {
         [4] = { anim = "level4", time = time_years * 0.24, deadanim = "dead1", witheredprefab = {"cutgrass"}, },
         [5] = { anim = "level5", time = nil,               deadanim = "dead1", witheredprefab = {"cutgrass"}, },
     },
-    fn_loot = function(self, loots)
+    fn_loot = function(self, doer, ispicked, isburnt, loots)
         if self.stage == self.stage_max then
             if self.numfruit ~= nil and self.numfruit > 0 then
                 local num = self.cluster + 1 --曼德拉产量固定1
