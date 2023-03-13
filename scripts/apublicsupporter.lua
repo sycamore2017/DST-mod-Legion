@@ -2294,7 +2294,7 @@ if IsServer then
         end
 
         local Pollinate_old = self.Pollinate
-        self.Pollinate = function(self, flower)
+        self.Pollinate = function(self, flower, ...)
             if self:CanPollinate(flower) then
                 if flower.components.perennialcrop ~= nil then
                     flower.components.perennialcrop:Pollinate(self.inst)
@@ -2303,7 +2303,7 @@ if IsServer then
                 end
             end
             if Pollinate_old ~= nil then
-                Pollinate_old(self, flower)
+                Pollinate_old(self, flower, ...)
             end
         end
     end)

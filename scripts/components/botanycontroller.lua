@@ -125,7 +125,7 @@ local function WitherComputMoisture(self, v)
             return true
         end
     elseif v.components.perennialcrop2 ~= nil then
-        if v.components.perennialcrop2:PourWater(nil, nil, 1) then
+        if v.components.perennialcrop2:PourWater(nil, self.inst, 1) then
             self.moisture = math.max(0, self.moisture-2.5)
             return true
         end
@@ -167,7 +167,7 @@ local function WitherComputNutrients(self, v)
 
         local poop = SpawnPrefab("poop")
         if poop ~= nil then
-            cpt:Fertilize(poop, nil)
+            cpt:Fertilize(poop, self.inst)
             poop:Remove()
             self.nutrients[idx] = math.max(0, self.nutrients[idx] - 3)
             return true

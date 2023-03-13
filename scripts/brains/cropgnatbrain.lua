@@ -45,15 +45,16 @@ local function GetInfestTarget(inst)
         end
 
         inst.infesttarget = FindEntity(inst, 16, function(guy)
-            if GetValid(guy.infester) == nil then --还未被虫群认领
-                return guy.components.perennialcrop ~= nil --多年生作物
-                        or guy.components.perennialcrop2 ~= nil --旧版作物
-                        or guy.components.pickable ~= nil --可采摘植物
-            end
-            return false
-        end,
-        nil, { "FX", "INLIMBO", "nognatinfest", "withered", "barren" },
-        { "crop_legion", "crop2_legion", "witherable" })
+                if GetValid(guy.infester) == nil then --还未被虫群认领
+                    return guy.components.perennialcrop ~= nil --多年生作物
+                            or guy.components.perennialcrop2 ~= nil --异种植物
+                            or guy.components.pickable ~= nil --可采摘植物
+                end
+                return false
+            end,
+            nil, { "FX", "INLIMBO", "nognatinfest", "withered", "barren" },
+            { "crop_legion", "crop2_legion", "witherable" }
+        )
 
         if inst.infesttarget ~= nil then
             inst.infesttarget.infester = inst --做个标记，一个虫群只能认领一个侵扰对象
@@ -159,7 +160,7 @@ function CropGnatBrain:OnStart()
                 Wander(self.inst, function() return self.inst.components.knownlocations:GetLocation("home") end, 20)
             )
         }, 1)
-    
+
     self.bt = BT(self.inst, root)
 end
 

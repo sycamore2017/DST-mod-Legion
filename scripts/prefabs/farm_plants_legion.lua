@@ -719,9 +719,41 @@ local function GetStatus_p2(inst)
 	return (crop == nil and "GROWING")
 		or (crop.isrotten and "WITHERED")
 		or (crop.stage == crop.stage_max and "READY")
+		or (crop.level.pickable == 1 and "READY")
 		or (crop.isflower and "FLORESCENCE")
-		or (crop.stage <= 2 and "SPROUT")
+		-- or (crop.stage <= 2 and "SPROUT")
 		or "GROWING"
+end
+local function DisplayName_p2(inst) --特殊的阶段加点前缀
+	local namepre = ""
+	if inst:HasTag("nognatinfest") then
+		namepre = STRINGS.PLANT_CROP_L["WITHERED"]
+	else
+		if inst:HasTag("tendable_farmplant") then --可以照顾
+			namepre = namepre..STRINGS.PLANT_CROP_L["BLUE"]
+		end
+		if inst:HasTag("needwater") then --可以浇水
+			namepre = namepre..STRINGS.PLANT_CROP_L["DRY"]
+		end
+		if inst:HasTag("fertableall") then --可以施肥
+			namepre = namepre..STRINGS.PLANT_CROP_L["FEEBLE"]
+		end
+		if namepre ~= "" then
+			namepre = namepre..STRINGS.PLANT_CROP_L["PREPOSITION"]
+		end
+		if inst:HasTag("flower") then --花期
+			namepre = namepre..STRINGS.PLANT_CROP_L["FLORESCENCE"]
+		end
+	end
+
+	namepre = namepre..STRINGS.NAMES[string.upper(inst.prefab or "plant_carrot_l")]
+
+	local cluster = inst._cluster_l:value()
+	if cluster ~= nil and cluster > 0 then
+		namepre = namepre.."(Lv."..tostring(cluster)..")"
+	end
+
+	return namepre
 end
 local function OnHaunt_p2(inst, haunter)
 	if inst:HasTag("fertableall") and math.random() <= TUNING.HAUNT_CHANCE_OFTEN then
@@ -754,10 +786,11 @@ end
 
 local function OnWorkedFinish_p2(inst, worker)
 	local crop = inst.components.perennialcrop2
-	crop:GenerateLoot(worker, false, false)
 	if crop.fn_defend ~= nil then
 		crop.fn_defend(inst, worker)
 	end
+	crop:GenerateLoot(worker, false, false)
+
 	local x, y, z = inst.Transform:GetWorldPosition()
 	SpawnPrefab("dirt_puff").Transform:SetPosition(x, y, z)
 	inst:Remove()
@@ -804,37 +837,7 @@ local function MakePlant2(cropprefab, sets)
 
 			inst._cluster_l = net_byte(inst.GUID, "plant_crop_l._cluster_l", "cluster_l_dirty")
 
-			inst.displaynamefn = function(inst) --名字，主要是特殊的阶段加点前缀
-				local namepre = ""
-				if inst:HasTag("nognatinfest") then
-					namepre = STRINGS.PLANT_CROP_L["WITHERED"]
-				else
-					if inst:HasTag("tendable_farmplant") then --可以照顾
-						namepre = namepre..STRINGS.PLANT_CROP_L["BLUE"]
-					end
-					if inst:HasTag("needwater") then --可以浇水
-						namepre = namepre..STRINGS.PLANT_CROP_L["DRY"]
-					end
-					if inst:HasTag("fertableall") then --可以施肥
-						namepre = namepre..STRINGS.PLANT_CROP_L["FEEBLE"]
-					end
-					if namepre ~= "" then
-						namepre = namepre..STRINGS.PLANT_CROP_L["PREPOSITION"]
-					end
-					if inst:HasTag("flower") then --花期
-						namepre = namepre..STRINGS.PLANT_CROP_L["FLORESCENCE"]
-					end
-				end
-
-				namepre = namepre..STRINGS.NAMES[string.upper("plant_"..cropprefab.."_l")]
-
-				local cluster = inst._cluster_l:value()
-				if cluster ~= nil and cluster > 0 then
-					namepre = namepre.."(Lv."..tostring(cluster)..")"
-				end
-
-				return namepre
-			end
+			inst.displaynamefn = DisplayName_p2
 
 			if sets.fn_common ~= nil then
 				sets.fn_common(inst)

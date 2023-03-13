@@ -301,7 +301,7 @@ PLANT_DEFS.pineananas = {
 }
 
 --------------------------------------------------------------------------
---[[ 添加新动作：让种子能种在 子圭·垄 和 旧版作物 里 ]]
+--[[ 添加新动作：让种子能种在 子圭·垄 和 异种植物 里 ]]
 --------------------------------------------------------------------------
 
 local WEIGHTED_SEED_TABLE = require("prefabs/weed_defs").weighted_seed_table
@@ -933,7 +933,7 @@ if IsServer then
 end
 
 --------------------------------------------------------------------------
---[[ 旧版多年生作物 ]]
+--[[ 异种植物 ]]
 --------------------------------------------------------------------------
 
 --[[ hey, Tosh! See here! ]]--
@@ -941,105 +941,101 @@ if not _G.rawget(_G, "CROPS_DATA_LEGION") then --对于global来说，不能直�
     _G.CROPS_DATA_LEGION = {}
 end
 
-local time_annual = 20*TUNING.TOTAL_DAY_TIME
-local time_years = 25 * TUNING.TOTAL_DAY_TIME
+-- local time_annual = 20*TUNING.TOTAL_DAY_TIME
+-- local time_years = 25 * TUNING.TOTAL_DAY_TIME
+local time_grow = TUNING.TOTAL_DAY_TIME
+local time_crop = 12*TUNING.TOTAL_DAY_TIME --普通作物一般是5天生长期
 local time_day = TUNING.TOTAL_DAY_TIME*(_G.CONFIGS_LEGION.X_OVERRIPETIME or 1)
 
 _G.CROPS_DATA_LEGION.carrot = {
-    growthmults = { 0.8, 1.2, 0.8, 1.5 }, --秋冬春。小于1为加速生长，大于1为延缓生长，为0停止生长
-    regrowstage = 3, --重新生长的阶段
+    growthmults = { 0.8, 1.2, 0.8, 1.5 }, --春x秋冬。小于1为加速生长，大于1为延缓生长，为0停止生长
+    regrowstage = 1, --重新生长的阶段
     -- cangrowindrak = true, --能否在黑暗中生长(默认不能)
     -- getsickchance = 0.007, --害虫产生率
     bank = "plant_normal_legion", build = "plant_normal_legion",
     leveldata = {
-        [1] = { anim = "level1_carrot", time = time_annual * 0.05, deadanim = "dead123_carrot", witheredprefab = nil, },
-        [2] = { anim = "level2_carrot", time = time_annual * 0.15, deadanim = "dead123_carrot", witheredprefab = {"cutgrass"} },
-        [3] = { anim = "level3_carrot", time = time_annual * 0.20, deadanim = "dead123_carrot", witheredprefab = {"cutgrass"} },
-        [4] = { anim = "level4_carrot", time = time_annual * 0.20, deadanim = "dead456_carrot", witheredprefab = {"cutgrass"} },
-        [5] = { anim = "level5_carrot", time = time_annual * 0.40, deadanim = "dead456_carrot", witheredprefab = {"cutgrass"}, bloom = true, pickable = nil },
-        [6] = { anim = { "level6_carrot_1", "level6_carrot_2", "level6_carrot_3" }, time = time_day * 6.00, deadanim = "dead456_carrot", witheredprefab = {"cutgrass"} }
+        { anim = "level4_carrot", time = time_crop*0.45, deadanim = "dead123_carrot", witheredprefab = nil },
+        { anim = "level5_carrot", time = time_crop*0.55, deadanim = "dead123_carrot", witheredprefab = {"cutgrass"} },
+        { anim = { "level6_carrot_1", "level6_carrot_2", "level6_carrot_3" }, time = time_day*6, deadanim = "dead456_carrot", witheredprefab = {"cutgrass"} }
+        -- [1] = { anim = "level1_carrot", time = time_annual * 0.05, deadanim = "dead123_carrot", witheredprefab = nil },
+        -- [2] = { anim = "level2_carrot", time = time_annual * 0.15, deadanim = "dead123_carrot", witheredprefab = {"cutgrass"} },
+        -- [3] = { anim = "level3_carrot", time = time_annual * 0.20, deadanim = "dead123_carrot", witheredprefab = {"cutgrass"} },
+        -- [4] = { anim = "level4_carrot", time = time_annual * 0.20, deadanim = "dead456_carrot", witheredprefab = {"cutgrass"} },
+        -- [5] = { anim = "level5_carrot", time = time_annual * 0.40, deadanim = "dead456_carrot", witheredprefab = {"cutgrass"}, bloom = true, pickable = nil },
+        -- [6] = { anim = { "level6_carrot_1", "level6_carrot_2", "level6_carrot_3" }, time = time_day * 6.00, deadanim = "dead456_carrot", witheredprefab = {"cutgrass"} }
     }
 }
 _G.CROPS_DATA_LEGION.corn = {
-    growthmults = { [1] = 0.8, [2] = 0.8, [3] = 0.8, [4] = 0 }, --秋春夏
-    regrowstage = 3,
-    bank = "plant_normal_legion",
-    build = "plant_normal_legion",
+    growthmults = { 0.8, 0.8, 0.8, 0 }, --春夏秋x
+    regrowstage = 2,
+    bank = "plant_normal_legion", build = "plant_normal_legion",
     leveldata = {
-        [1] = { anim = "level1_corn", time = time_annual * 0.05, deadanim = "dead123_corn", witheredprefab = nil, },
-        [2] = { anim = "level2_corn", time = time_annual * 0.15, deadanim = "dead123_corn", witheredprefab = {"twigs"}, },
-        [3] = { anim = "level3_corn", time = time_annual * 0.20, deadanim = "dead123_corn", witheredprefab = {"twigs"}, },
-        [4] = { anim = "level4_corn", time = time_annual * 0.20, deadanim = "dead456_corn", witheredprefab = {"twigs"}, },
-        [5] = { anim = "level5_corn", time = time_annual * 0.40, deadanim = "dead456_corn", witheredprefab = {"twigs"}, bloom = true, },
-        [6] = { anim = "level6_corn", time = time_day    * 6.00, deadanim = "dead456_corn", witheredprefab = {"twigs", "twigs"}, },
-    },
-    maturedanim = {
-        [1] = "level6_corn_1",
-        [2] = "level6_corn_2",
-        [3] = "level6_corn_3",
+        { anim = "level3_corn", time = time_grow,      deadanim = "dead123_corn", witheredprefab = nil },
+        { anim = "level4_corn", time = time_crop*0.45, deadanim = "dead456_corn", witheredprefab = {"twigs"} },
+        { anim = "level5_corn", time = time_crop*0.55, deadanim = "dead456_corn", witheredprefab = {"twigs"}, bloom = true },
+        { anim = { "level6_corn_1", "level6_corn_2", "level6_corn_3" }, time = time_day*6, deadanim = "dead456_corn", witheredprefab = {"twigs", "twigs"} }
+        -- [1] = { anim = "level1_corn", time = time_annual * 0.05, deadanim = "dead123_corn", witheredprefab = nil, },
+        -- [2] = { anim = "level2_corn", time = time_annual * 0.15, deadanim = "dead123_corn", witheredprefab = {"twigs"}, },
+        -- [3] = { anim = "level3_corn", time = time_annual * 0.20, deadanim = "dead123_corn", witheredprefab = {"twigs"}, },
+        -- [4] = { anim = "level4_corn", time = time_annual * 0.20, deadanim = "dead456_corn", witheredprefab = {"twigs"}, },
+        -- [5] = { anim = "level5_corn", time = time_annual * 0.40, deadanim = "dead456_corn", witheredprefab = {"twigs"}, bloom = true, },
+        -- [6] = { anim = "level6_corn", time = time_day    * 6.00, deadanim = "dead456_corn", witheredprefab = {"twigs", "twigs"}, },
     }
 }
 _G.CROPS_DATA_LEGION.pumpkin = {
-    growthmults = { [1] = 1.2, [2] = 1.2, [3] = 0.8, [4] = 1.5 }, --秋冬
-    regrowstage = 4,
-    bank = "plant_normal_legion",
-    build = "plant_normal_legion",
+    growthmults = { 1.2, 1.2, 0.8, 1.5 }, --xx秋冬
+    regrowstage = 2,
+    bank = "plant_normal_legion", build = "plant_normal_legion",
     leveldata = {
-        [1] = { anim = "level1_pumpkin", time = time_years * 0.05, deadanim = "dead123_pumpkin", witheredprefab = nil, },
-        [2] = { anim = "level2_pumpkin", time = time_years * 0.15, deadanim = "dead123_pumpkin", witheredprefab = {"cutgrass"}, },
-        [3] = { anim = "level3_pumpkin", time = time_years * 0.20, deadanim = "dead123_pumpkin", witheredprefab = {"cutgrass"}, },
-        [4] = { anim = "level4_pumpkin", time = time_years * 0.20, deadanim = "dead456_pumpkin", witheredprefab = {"cutgrass"}, },
-        [5] = { anim = "level5_pumpkin", time = time_years * 0.40, deadanim = "dead456_pumpkin", witheredprefab = {"cutgrass", "cutgrass"}, bloom = true, },
-        [6] = { anim = "level6_pumpkin", time = time_day   * 6.00, deadanim = "dead456_pumpkin", witheredprefab = {"cutgrass", "rope"}, },
+        { anim = "level3_pumpkin", time = time_grow,      deadanim = "dead123_pumpkin", witheredprefab = nil },
+        { anim = "level4_pumpkin", time = time_crop*0.45, deadanim = "dead456_pumpkin", witheredprefab = {"cutgrass"} },
+        { anim = "level5_pumpkin", time = time_crop*0.55, deadanim = "dead456_pumpkin", witheredprefab = {"cutgrass", "cutgrass"}, bloom = true },
+        { anim = { "level6_pumpkin_1", "level6_pumpkin_2", "level6_pumpkin_3" }, time = time_day*6, deadanim = "dead456_pumpkin", witheredprefab = {"cutgrass", "rope"} }
+        -- [1] = { anim = "level1_pumpkin", time = time_years * 0.05, deadanim = "dead123_pumpkin", witheredprefab = nil, },
+        -- [2] = { anim = "level2_pumpkin", time = time_years * 0.15, deadanim = "dead123_pumpkin", witheredprefab = {"cutgrass"}, },
+        -- [3] = { anim = "level3_pumpkin", time = time_years * 0.20, deadanim = "dead123_pumpkin", witheredprefab = {"cutgrass"}, },
+        -- [4] = { anim = "level4_pumpkin", time = time_years * 0.20, deadanim = "dead456_pumpkin", witheredprefab = {"cutgrass"}, },
+        -- [5] = { anim = "level5_pumpkin", time = time_years * 0.40, deadanim = "dead456_pumpkin", witheredprefab = {"cutgrass", "cutgrass"}, bloom = true, },
+        -- [6] = { anim = "level6_pumpkin", time = time_day   * 6.00, deadanim = "dead456_pumpkin", witheredprefab = {"cutgrass", "rope"}, },
     },
-    maturedanim = {
-        [1] = "level6_pumpkin_1",
-        [2] = "level6_pumpkin_2",
-        [3] = "level6_pumpkin_3",
-    },
-    cluster_size = { 1, 1.35 }
+    cluster_size = { 1, 1.5 }
 }
 _G.CROPS_DATA_LEGION.eggplant = {
-    growthmults = { [1] = 0.8, [2] = 1.2, [3] = 0.8, [4] = 0 }, --春秋
-    regrowstage = 4,
-    bank = "crop_legion_eggplant",
-    build = "crop_legion_eggplant",
+    growthmults = { 0.8, 1.2, 0.8, 0 }, --春x秋x
+    regrowstage = 2,
+    bank = "crop_legion_eggplant", build = "crop_legion_eggplant",
     leveldata = {
-        [1] = { anim = "level1", time = time_years * 0.05, deadanim = "dead1", witheredprefab = nil, },
-        [2] = { anim = "level2", time = time_years * 0.15, deadanim = "dead1", witheredprefab = {"cutgrass"}, },
-        [3] = { anim = "level3", time = time_years * 0.20, deadanim = "dead1", witheredprefab = {"cutgrass"}, },
-        [4] = { anim = "level4", time = time_years * 0.20, deadanim = "dead2", witheredprefab = {"cutgrass"}, },
-        [5] = { anim = "level5", time = time_years * 0.40, deadanim = "dead2", witheredprefab = {"rope"}, bloom = true, },
-        [6] = { anim = "level6", time = time_day   * 6.00, deadanim = "dead2", witheredprefab = {"rope", "bird_egg"}, },
+        { anim = "level3", time = time_grow,      deadanim = "dead1", witheredprefab = nil },
+        { anim = "level4", time = time_crop*0.45, deadanim = "dead2", witheredprefab = {"cutgrass"} },
+        { anim = "level5", time = time_crop*0.55, deadanim = "dead2", witheredprefab = {"rope"}, bloom = true },
+        { anim = { "level6_1", "level6_2", "level6_3" }, time = time_day*6, deadanim = "dead2", witheredprefab = {"rope", "bird_egg"} }
+        -- [1] = { anim = "level1", time = time_years * 0.05, deadanim = "dead1", witheredprefab = nil, },
+        -- [2] = { anim = "level2", time = time_years * 0.15, deadanim = "dead1", witheredprefab = {"cutgrass"}, },
+        -- [3] = { anim = "level3", time = time_years * 0.20, deadanim = "dead1", witheredprefab = {"cutgrass"}, },
+        -- [4] = { anim = "level4", time = time_years * 0.20, deadanim = "dead2", witheredprefab = {"cutgrass"}, },
+        -- [5] = { anim = "level5", time = time_years * 0.40, deadanim = "dead2", witheredprefab = {"rope"}, bloom = true, },
+        -- [6] = { anim = "level6", time = time_day   * 6.00, deadanim = "dead2", witheredprefab = {"rope", "bird_egg"}, },
     },
-    maturedanim = {
-        [1] = "level6_1",
-        [2] = "level6_2",
-        [3] = "level6_3",
-    },
-    cluster_size = { 1, 1.6 },
     lootothers = {
         { israndom=true, factor=0.4, name="bird_egg", name_rot="rottenegg" },
         { israndom=false, factor=0.2, name="bird_egg", name_rot="rottenegg" } --16
     }
 }
 _G.CROPS_DATA_LEGION.durian = {
-    growthmults = { [1] = 0.8, [2] = 1.2, [3] = 1.2, [4] = 0 }, --春
-    regrowstage = 4,
-    bank = "plant_normal_legion",
-    build = "plant_normal_legion",
+    growthmults = { 0.8, 1.2, 1.2, 0 }, --春xxx
+    regrowstage = 2,
+    bank = "plant_normal_legion", build = "plant_normal_legion",
     leveldata = {
-        [1] = { anim = "level1_durian", time = time_years * 0.05, deadanim = "dead123_durian", witheredprefab = nil, },
-        [2] = { anim = "level2_durian", time = time_years * 0.15, deadanim = "dead123_durian", witheredprefab = {"twigs"}, },
-        [3] = { anim = "level3_durian", time = time_years * 0.20, deadanim = "dead123_durian", witheredprefab = {"twigs"}, },
-        [4] = { anim = "level4_durian", time = time_years * 0.20, deadanim = "dead456_durian", witheredprefab = {"log"}, },
-        [5] = { anim = "level5_durian", time = time_years * 0.40, deadanim = "dead456_durian", witheredprefab = {"livinglog"}, bloom = true, },
-        [6] = { anim = "level6_durian", time = time_day   * 6.00, deadanim = "dead456_durian", witheredprefab = {"livinglog", "log"}, },
-    },
-    maturedanim = {
-        [1] = "level6_durian_1",
-        [2] = "level6_durian_2",
-        [3] = "level6_durian_3",
+        { anim = "level3_durian", time = time_grow,      deadanim = "dead123_durian", witheredprefab = nil },
+        { anim = "level4_durian", time = time_crop*0.45, deadanim = "dead456_durian", witheredprefab = {"log"} },
+        { anim = "level5_durian", time = time_crop*0.55, deadanim = "dead456_durian", witheredprefab = {"livinglog"}, bloom = true },
+        { anim = { "level6_durian_1", "level6_durian_2", "level6_durian_3" }, time = time_day*6, deadanim = "dead456_durian", witheredprefab = {"livinglog", "log"} }
+        -- [1] = { anim = "level1_durian", time = time_years * 0.05, deadanim = "dead123_durian", witheredprefab = nil, },
+        -- [2] = { anim = "level2_durian", time = time_years * 0.15, deadanim = "dead123_durian", witheredprefab = {"twigs"}, },
+        -- [3] = { anim = "level3_durian", time = time_years * 0.20, deadanim = "dead123_durian", witheredprefab = {"twigs"}, },
+        -- [4] = { anim = "level4_durian", time = time_years * 0.20, deadanim = "dead456_durian", witheredprefab = {"log"}, },
+        -- [5] = { anim = "level5_durian", time = time_years * 0.40, deadanim = "dead456_durian", witheredprefab = {"livinglog"}, bloom = true, },
+        -- [6] = { anim = "level6_durian", time = time_day   * 6.00, deadanim = "dead456_durian", witheredprefab = {"livinglog", "log"}, },
     },
     lootothers = {
         { israndom=true, factor=0.05, name="livinglog", name_rot="livinglog" },
@@ -1047,167 +1043,148 @@ _G.CROPS_DATA_LEGION.durian = {
     }
 }
 _G.CROPS_DATA_LEGION.pomegranate = {
-    growthmults = { [1] = 0.8, [2] = 0.8, [3] = 1.2, [4] = 0 }, --春夏
-    regrowstage = 4,
-    bank = "plant_normal_legion",
-    build = "plant_normal_legion",
+    growthmults = { 0.8, 0.8, 1.2, 0 }, --春夏xx
+    regrowstage = 2,
+    bank = "plant_normal_legion", build = "plant_normal_legion",
     leveldata = {
-        [1] = { anim = "level1_pomegranate", time = time_years * 0.05, deadanim = "dead123_pomegranate", witheredprefab = nil, },
-        [2] = { anim = "level2_pomegranate", time = time_years * 0.15, deadanim = "dead123_pomegranate", witheredprefab = {"twigs"}, },
-        [3] = { anim = "level3_pomegranate", time = time_years * 0.20, deadanim = "dead123_pomegranate", witheredprefab = {"twigs"}, },
-        [4] = { anim = "level4_pomegranate", time = time_years * 0.20, deadanim = "dead456_pomegranate", witheredprefab = {"log"}, },
-        [5] = { anim = "level5_pomegranate", time = time_years * 0.40, deadanim = "dead456_pomegranate", witheredprefab = {"log"}, bloom = true, },
-        [6] = { anim = "level6_pomegranate", time = time_day   * 6.00, deadanim = "dead456_pomegranate", witheredprefab = {"log", "log"}, },
-    },
-    maturedanim = {
-        [1] = "level6_pomegranate_1",
-        [2] = "level6_pomegranate_2",
-        [3] = "level6_pomegranate_3",
-    },
+        { anim = "level3_pomegranate", time = time_grow,      deadanim = "dead123_pomegranate", witheredprefab = nil },
+        { anim = "level4_pomegranate", time = time_crop*0.45, deadanim = "dead456_pomegranate", witheredprefab = {"log"} },
+        { anim = "level5_pomegranate", time = time_crop*0.55, deadanim = "dead456_pomegranate", witheredprefab = {"log"}, bloom = true },
+        { anim = { "level6_pomegranate_1", "level6_pomegranate_2", "level6_pomegranate_3" }, time = time_day*6, deadanim = "dead456_pomegranate", witheredprefab = {"log", "log"} }
+        -- [1] = { anim = "level1_pomegranate", time = time_years * 0.05, deadanim = "dead123_pomegranate", witheredprefab = nil, },
+        -- [2] = { anim = "level2_pomegranate", time = time_years * 0.15, deadanim = "dead123_pomegranate", witheredprefab = {"twigs"}, },
+        -- [3] = { anim = "level3_pomegranate", time = time_years * 0.20, deadanim = "dead123_pomegranate", witheredprefab = {"twigs"}, },
+        -- [4] = { anim = "level4_pomegranate", time = time_years * 0.20, deadanim = "dead456_pomegranate", witheredprefab = {"log"}, },
+        -- [5] = { anim = "level5_pomegranate", time = time_years * 0.40, deadanim = "dead456_pomegranate", witheredprefab = {"log"}, bloom = true, },
+        -- [6] = { anim = "level6_pomegranate", time = time_day   * 6.00, deadanim = "dead456_pomegranate", witheredprefab = {"log", "log"}, },
+    }
 }
 _G.CROPS_DATA_LEGION.dragonfruit = {
-    growthmults = { [1] = 0.8, [2] = 0.8, [3] = 1.2, [4] = 0 }, --春夏
-    regrowstage = 4,
-    bank = "plant_normal_legion",
-    build = "plant_normal_legion",
+    growthmults = { 0.8, 0.8, 1.2, 0 }, --春夏xx
+    regrowstage = 2,
+    bank = "plant_normal_legion", build = "plant_normal_legion",
     leveldata = {
-        [1] = { anim = "level1_dragonfruit", time = time_years * 0.05, deadanim = "dead123_dragonfruit", witheredprefab = nil, },
-        [2] = { anim = "level2_dragonfruit", time = time_years * 0.15, deadanim = "dead123_dragonfruit", witheredprefab = {"twigs"}, },
-        [3] = { anim = "level3_dragonfruit", time = time_years * 0.20, deadanim = "dead123_dragonfruit", witheredprefab = {"twigs"}, },
-        [4] = { anim = "level4_dragonfruit", time = time_years * 0.20, deadanim = "dead456_dragonfruit", witheredprefab = {"log"}, },
-        [5] = { anim = "level5_dragonfruit", time = time_years * 0.40, deadanim = "dead456_dragonfruit", witheredprefab = {"log", "twigs"}, bloom = true, },
-        [6] = { anim = "level6_dragonfruit", time = time_day   * 6.00, deadanim = "dead456_dragonfruit", witheredprefab = {"log", "twigs"}, },
-    },
-    maturedanim = {
-        [1] = "level6_dragonfruit_1",
-        [2] = "level6_dragonfruit_2",
-        [3] = "level6_dragonfruit_3",
-    },
+        { anim = "level3_dragonfruit", time = time_grow,      deadanim = "dead123_dragonfruit", witheredprefab = nil },
+        { anim = "level4_dragonfruit", time = time_crop*0.45, deadanim = "dead456_dragonfruit", witheredprefab = {"log"} },
+        { anim = "level5_dragonfruit", time = time_crop*0.55, deadanim = "dead456_dragonfruit", witheredprefab = {"log", "twigs"}, bloom = true },
+        { anim = { "level6_dragonfruit_1", "level6_dragonfruit_2", "level6_dragonfruit_3" }, time = time_day*6, deadanim = "dead456_dragonfruit", witheredprefab = {"log", "twigs"} }
+        -- [1] = { anim = "level1_dragonfruit", time = time_years * 0.05, deadanim = "dead123_dragonfruit", witheredprefab = nil, },
+        -- [2] = { anim = "level2_dragonfruit", time = time_years * 0.15, deadanim = "dead123_dragonfruit", witheredprefab = {"twigs"}, },
+        -- [3] = { anim = "level3_dragonfruit", time = time_years * 0.20, deadanim = "dead123_dragonfruit", witheredprefab = {"twigs"}, },
+        -- [4] = { anim = "level4_dragonfruit", time = time_years * 0.20, deadanim = "dead456_dragonfruit", witheredprefab = {"log"}, },
+        -- [5] = { anim = "level5_dragonfruit", time = time_years * 0.40, deadanim = "dead456_dragonfruit", witheredprefab = {"log", "twigs"}, bloom = true, },
+        -- [6] = { anim = "level6_dragonfruit", time = time_day   * 6.00, deadanim = "dead456_dragonfruit", witheredprefab = {"log", "twigs"}, },
+    }
 }
 _G.CROPS_DATA_LEGION.watermelon = {
-    growthmults = { [1] = 0.8, [2] = 0.8, [3] = 1.2, [4] = 0 }, --春夏
-    regrowstage = 3,
-    bank = "plant_normal_legion",
-    build = "plant_normal_legion",
+    growthmults = { 0.8, 0.8, 1.2, 0 }, --春夏xx
+    regrowstage = 1,
+    bank = "plant_normal_legion", build = "plant_normal_legion",
     leveldata = {
-        [1] = { anim = "level1_watermelon", time = time_annual * 0.05, deadanim = "dead123_watermelon", witheredprefab = nil, },
-        [2] = { anim = "level2_watermelon", time = time_annual * 0.15, deadanim = "dead123_watermelon", witheredprefab = {"cutgrass"}, },
-        [3] = { anim = "level3_watermelon", time = time_annual * 0.20, deadanim = "dead123_watermelon", witheredprefab = {"cutgrass"}, },
-        [4] = { anim = "level4_watermelon", time = time_annual * 0.20, deadanim = "dead456_watermelon", witheredprefab = {"cutgrass"}, },
-        [5] = { anim = "level5_watermelon", time = time_annual * 0.40, deadanim = "dead456_watermelon", witheredprefab = {"cutgrass"}, bloom = true, },
-        [6] = { anim = "level6_watermelon", time = time_day    * 6.00, deadanim = "dead456_watermelon", witheredprefab = {"cutgrass", "cutgrass"}, },
-    },
-    maturedanim = {
-        [1] = "level6_watermelon_1",
-        [2] = "level6_watermelon_2",
-        [3] = "level6_watermelon_3",
-    },
+        { anim = "level3_watermelon", time = time_crop*0.25, deadanim = "dead123_watermelon", witheredprefab = nil },
+        { anim = "level4_watermelon", time = time_crop*0.35, deadanim = "dead456_watermelon", witheredprefab = {"cutgrass"} },
+        { anim = "level5_watermelon", time = time_crop*0.40, deadanim = "dead456_watermelon", witheredprefab = {"cutgrass"}, bloom = true },
+        { anim = { "level6_watermelon_1", "level6_watermelon_2", "level6_watermelon_3" }, time = time_day*6, deadanim = "dead456_watermelon", witheredprefab = {"cutgrass", "cutgrass"} }
+        -- [1] = { anim = "level1_watermelon", time = time_annual * 0.05, deadanim = "dead123_watermelon", witheredprefab = nil, },
+        -- [2] = { anim = "level2_watermelon", time = time_annual * 0.15, deadanim = "dead123_watermelon", witheredprefab = {"cutgrass"}, },
+        -- [3] = { anim = "level3_watermelon", time = time_annual * 0.20, deadanim = "dead123_watermelon", witheredprefab = {"cutgrass"}, },
+        -- [4] = { anim = "level4_watermelon", time = time_annual * 0.20, deadanim = "dead456_watermelon", witheredprefab = {"cutgrass"}, },
+        -- [5] = { anim = "level5_watermelon", time = time_annual * 0.40, deadanim = "dead456_watermelon", witheredprefab = {"cutgrass"}, bloom = true, },
+        -- [6] = { anim = "level6_watermelon", time = time_day    * 6.00, deadanim = "dead456_watermelon", witheredprefab = {"cutgrass", "cutgrass"}, },
+    }
 }
 _G.CROPS_DATA_LEGION.pineananas = {
-    growthmults = { [1] = 1.2, [2] = 0.8, [3] = 0.8, [4] = 0 }, --秋夏
-    regrowstage = 4,
-    bank = "crop_legion_pineananas",
-    build = "crop_legion_pineananas",
+    growthmults = { 1.2, 0.8, 0.8, 0 }, --x夏秋x
+    regrowstage = 2,
+    bank = "crop_legion_pineananas", build = "crop_legion_pineananas",
     image = { name = "pineananas.tex", atlas = "images/inventoryimages/pineananas.xml" },
     leveldata = {
-        [1] = { anim = "level1", time = time_years * 0.05, deadanim = "dead1", witheredprefab = nil, },
-        [2] = { anim = "level2", time = time_years * 0.15, deadanim = "dead1", witheredprefab = {"twigs"}, },
-        [3] = { anim = "level3", time = time_years * 0.20, deadanim = "dead1", witheredprefab = {"log"}, },
-        [4] = { anim = "level4", time = time_years * 0.20, deadanim = "dead2", witheredprefab = {"log"}, },
-        [5] = { anim = "level5", time = time_years * 0.40, deadanim = "dead2", witheredprefab = {"log", "cutgrass"}, bloom = true, },
-        [6] = { anim = "level6", time = time_day   * 6.00, deadanim = "dead2", witheredprefab = {"log", "cutgrass", "pinecone"}, },
+        { anim = "level3", time = time_grow,      deadanim = "dead1", witheredprefab = nil },
+        { anim = "level4", time = time_crop*0.45, deadanim = "dead2", witheredprefab = {"log"} },
+        { anim = "level5", time = time_crop*0.55, deadanim = "dead2", witheredprefab = {"log", "cutgrass"}, bloom = true },
+        { anim = { "level6_1", "level6_2", "level6_3" }, time = time_day*6, deadanim = "dead2", witheredprefab = {"log", "cutgrass"} }
+        -- [1] = { anim = "level1", time = time_years * 0.05, deadanim = "dead1", witheredprefab = nil, },
+        -- [2] = { anim = "level2", time = time_years * 0.15, deadanim = "dead1", witheredprefab = {"twigs"}, },
+        -- [3] = { anim = "level3", time = time_years * 0.20, deadanim = "dead1", witheredprefab = {"log"}, },
+        -- [4] = { anim = "level4", time = time_years * 0.20, deadanim = "dead2", witheredprefab = {"log"}, },
+        -- [5] = { anim = "level5", time = time_years * 0.40, deadanim = "dead2", witheredprefab = {"log", "cutgrass"}, bloom = true, },
+        -- [6] = { anim = "level6", time = time_day   * 6.00, deadanim = "dead2", witheredprefab = {"log", "cutgrass", "pinecone"}, },
     },
-    maturedanim = {
-        [1] = "level6_1",
-        [2] = "level6_2",
-        [3] = "level6_3",
-    },
-    cluster_size = { 1, 1.35 },
+    cluster_size = { 1, 1.5 },
     lootothers = {
         { israndom=true, factor=0.05, name="pinecone", name_rot="pinecone" },
         { israndom=false, factor=0.0625, name="pinecone", name_rot="pinecone" } --5
     }
 }
 _G.CROPS_DATA_LEGION.onion = {
-    growthmults = { [1] = 0.8, [2] = 0.8, [3] = 0.8, [4] = 0 }, --春秋夏
-    regrowstage = 2,
-    bank = "crop_legion_onion",
-    build = "crop_legion_onion",
+    growthmults = { 0.8, 0.8, 0.8, 0 }, --春夏秋x
+    regrowstage = 1,
+    bank = "crop_legion_onion", build = "crop_legion_onion",
     image = { name = "quagmire_onion.tex", atlas = nil },
     leveldata = {
-        [1] = { anim = "level1", time = time_annual * 0.20, deadanim = "dead1", witheredprefab = nil, },
-        [2] = { anim = "level2", time = time_annual * 0.15, deadanim = "dead1", witheredprefab = {"cutgrass"}, },
-        [3] = { anim = "level3", time = time_annual * 0.20, deadanim = "dead2", witheredprefab = {"cutgrass"}, },
-        [4] = { anim = "level4", time = time_annual * 0.45, deadanim = "dead2", witheredprefab = {"cutgrass"}, bloom = true, },
-        [5] = { anim = "level5", time = time_day    * 6.00, deadanim = "dead2", witheredprefab = {"cutgrass", "cutgrass"}, },
+        { anim = "level2", time = time_crop*0.25, deadanim = "dead1", witheredprefab = nil },
+        { anim = "level3", time = time_crop*0.35, deadanim = "dead2", witheredprefab = {"cutgrass"} },
+        { anim = "level4", time = time_crop*0.40, deadanim = "dead2", witheredprefab = {"cutgrass"}, bloom = true },
+        { anim = { "level5_1", "level5_2", "level5_3" }, time = time_day*6, deadanim = "dead2", witheredprefab = {"cutgrass", "cutgrass"} }
+        -- [1] = { anim = "level1", time = time_annual * 0.20, deadanim = "dead1", witheredprefab = nil, },
+        -- [2] = { anim = "level2", time = time_annual * 0.15, deadanim = "dead1", witheredprefab = {"cutgrass"}, },
+        -- [3] = { anim = "level3", time = time_annual * 0.20, deadanim = "dead2", witheredprefab = {"cutgrass"}, },
+        -- [4] = { anim = "level4", time = time_annual * 0.45, deadanim = "dead2", witheredprefab = {"cutgrass"}, bloom = true, },
+        -- [5] = { anim = "level5", time = time_day    * 6.00, deadanim = "dead2", witheredprefab = {"cutgrass", "cutgrass"}, },
     },
-    maturedanim = {
-        [1] = "level5_1",
-        [2] = "level5_2",
-        [3] = "level5_3",
-    },
-    cluster_size = { 1, 1.35 }
+    cluster_size = { 1, 1.5 }
 }
 _G.CROPS_DATA_LEGION.pepper = {
-    growthmults = { [1] = 1.2, [2] = 0.8, [3] = 0.8, [4] = 0 }, --秋夏
-    regrowstage = 3,
-    bank = "crop_legion_pepper",
-    build = "crop_legion_pepper",
+    growthmults = { 1.2, 0.8, 0.8, 0 }, --x夏秋x
+    regrowstage = 2,
+    bank = "crop_legion_pepper", build = "crop_legion_pepper",
     leveldata = {
-        [1] = { anim = "level1", time = time_years * 0.15, deadanim = "dead1", witheredprefab = nil, },
-        [2] = { anim = "level2", time = time_years * 0.20, deadanim = "dead1", witheredprefab = {"cutgrass"}, },
-        [3] = { anim = "level3", time = time_years * 0.25, deadanim = "dead2", witheredprefab = {"cutgrass"}, },
-        [4] = { anim = "level4", time = time_years * 0.40, deadanim = "dead2", witheredprefab = {"cutgrass"}, bloom = true, },
-        [5] = { anim = "level5", time = time_day   * 6.00, deadanim = "dead2", witheredprefab = {"cutgrass", "cutgrass"}, },
+        { anim = "level2", time = time_grow,      deadanim = "dead1", witheredprefab = nil },
+        { anim = "level3", time = time_crop*0.45, deadanim = "dead2", witheredprefab = {"cutgrass"} },
+        { anim = "level4", time = time_crop*0.55, deadanim = "dead2", witheredprefab = {"cutgrass"}, bloom = true },
+        { anim = { "level5_1", "level5_2", "level5_3" }, time = time_day*6, deadanim = "dead2", witheredprefab = {"cutgrass", "cutgrass"} }
+        -- [1] = { anim = "level1", time = time_years * 0.15, deadanim = "dead1", witheredprefab = nil, },
+        -- [2] = { anim = "level2", time = time_years * 0.20, deadanim = "dead1", witheredprefab = {"cutgrass"}, },
+        -- [3] = { anim = "level3", time = time_years * 0.25, deadanim = "dead2", witheredprefab = {"cutgrass"}, },
+        -- [4] = { anim = "level4", time = time_years * 0.40, deadanim = "dead2", witheredprefab = {"cutgrass"}, bloom = true, },
+        -- [5] = { anim = "level5", time = time_day   * 6.00, deadanim = "dead2", witheredprefab = {"cutgrass", "cutgrass"}, },
     },
-    maturedanim = {
-        [1] = "level5_1",
-        [2] = "level5_2",
-        [3] = "level5_3",
-    },
-    cluster_size = { 1, 1.6 },
     lootothers = {
         { israndom=true, factor=0.4, name="mint_l", name_rot=nil },
         { israndom=false, factor=0.2, name="mint_l", name_rot=nil } --16
     }
 }
 _G.CROPS_DATA_LEGION.potato = {
-    growthmults = { [1] = 0.8, [2] = 1.2, [3] = 0.8, [4] = 1.5 }, --春秋冬
-    regrowstage = 2,
-    bank = "crop_legion_potato",
-    build = "crop_legion_potato",
+    growthmults = { 0.8, 1.2, 0.8, 1.5 }, --春x秋冬
+    regrowstage = 1,
+    bank = "crop_legion_potato", build = "crop_legion_potato",
     leveldata = {
-        [1] = { anim = "level1", time = time_annual * 0.20, deadanim = "dead1", witheredprefab = nil, },
-        [2] = { anim = "level2", time = time_annual * 0.15, deadanim = "dead1", witheredprefab = {"cutgrass"}, },
-        [3] = { anim = "level3", time = time_annual * 0.20, deadanim = "dead2", witheredprefab = {"cutgrass", "potato"}, },
-        [4] = { anim = "level4", time = time_annual * 0.45, deadanim = "dead2", witheredprefab = {"cutgrass", "potato"}, bloom = true, },
-        [5] = { anim = "level5", time = time_day    * 6.00, deadanim = "dead2", witheredprefab = {"cutgrass", "potato"}, },
-    },
-    maturedanim = {
-        [1] = "level5_1",
-        [2] = "level5_2",
-        [3] = "level5_3",
-    },
-    cluster_size = { 1, 1.6 }
+        { anim = "level2", time = time_crop*0.25, deadanim = "dead1", witheredprefab = nil },
+        { anim = "level3", time = time_crop*0.35, deadanim = "dead2", witheredprefab = {"cutgrass"} },
+        { anim = "level4", time = time_crop*0.40, deadanim = "dead2", witheredprefab = {"cutgrass", "potato"}, bloom = true },
+        { anim = { "level5_1", "level5_2", "level5_3" }, time = time_day*6, deadanim = "dead2", witheredprefab = {"cutgrass", "potato"} }
+        -- [1] = { anim = "level1", time = time_annual * 0.20, deadanim = "dead1", witheredprefab = nil, },
+        -- [2] = { anim = "level2", time = time_annual * 0.15, deadanim = "dead1", witheredprefab = {"cutgrass"}, },
+        -- [3] = { anim = "level3", time = time_annual * 0.20, deadanim = "dead2", witheredprefab = {"cutgrass", "potato"}, },
+        -- [4] = { anim = "level4", time = time_annual * 0.45, deadanim = "dead2", witheredprefab = {"cutgrass", "potato"}, bloom = true, },
+        -- [5] = { anim = "level5", time = time_day    * 6.00, deadanim = "dead2", witheredprefab = {"cutgrass", "potato"}, },
+    }
 }
 _G.CROPS_DATA_LEGION.garlic = {
-    growthmults = { [1] = 0.8, [2] = 0.8, [3] = 0.8, [4] = 1.5 }, --春夏秋冬
-    regrowstage = 2,
-    bank = "crop_legion_garlic",
-    build = "crop_legion_garlic",
+    growthmults = { 0.8, 0.8, 0.8, 1.5 }, --春夏秋冬
+    regrowstage = 1,
+    bank = "crop_legion_garlic", build = "crop_legion_garlic",
     leveldata = {
-        [1] = { anim = "level1", time = time_annual * 0.20, deadanim = "dead1", witheredprefab = nil, },
-        [2] = { anim = "level2", time = time_annual * 0.15, deadanim = "dead1", witheredprefab = {"cutgrass"}, },
-        [3] = { anim = "level3", time = time_annual * 0.20, deadanim = "dead2", witheredprefab = {"cutgrass"}, },
-        [4] = { anim = "level4", time = time_annual * 0.45, deadanim = "dead2", witheredprefab = {"cutgrass"}, bloom = true, },
-        [5] = { anim = "level5", time = time_day    * 6.00, deadanim = "dead2", witheredprefab = {"feather_crow", "feather_robin"}, },
+        { anim = "level2", time = time_crop*0.25, deadanim = "dead1", witheredprefab = nil },
+        { anim = "level3", time = time_crop*0.35, deadanim = "dead2", witheredprefab = {"cutgrass"} },
+        { anim = "level4", time = time_crop*0.40, deadanim = "dead2", witheredprefab = {"cutgrass"}, bloom = true },
+        { anim = { "level5_1", "level5_2", "level5_3" }, time = time_day*6, deadanim = "dead2", witheredprefab = {"feather_crow", "feather_robin"} }
+        -- [1] = { anim = "level1", time = time_annual * 0.20, deadanim = "dead1", witheredprefab = nil, },
+        -- [2] = { anim = "level2", time = time_annual * 0.15, deadanim = "dead1", witheredprefab = {"cutgrass"}, },
+        -- [3] = { anim = "level3", time = time_annual * 0.20, deadanim = "dead2", witheredprefab = {"cutgrass"}, },
+        -- [4] = { anim = "level4", time = time_annual * 0.45, deadanim = "dead2", witheredprefab = {"cutgrass"}, bloom = true, },
+        -- [5] = { anim = "level5", time = time_day    * 6.00, deadanim = "dead2", witheredprefab = {"feather_crow", "feather_robin"}, }
     },
-    maturedanim = {
-        [1] = "level5_1",
-        [2] = "level5_2",
-        [3] = "level5_3",
-    },
-    cluster_size = { 1, 1.6 },
     lootothers = {
         { israndom=true, factor=0.03, name="feather_crow", name_rot="feather_crow" },
         { israndom=false, factor=0.0375, name="feather_crow", name_rot="feather_crow" }, --3
@@ -1216,66 +1193,63 @@ _G.CROPS_DATA_LEGION.garlic = {
     }
 }
 _G.CROPS_DATA_LEGION.tomato = {
-    growthmults = { [1] = 0.8, [2] = 0.8, [3] = 0.8, [4] = 0 }, --春夏秋
-    regrowstage = 3,
-    bank = "crop_legion_tomato",
-    build = "crop_legion_tomato",
+    growthmults = { 0.8, 0.8, 0.8, 0 }, --春夏秋x
+    regrowstage = 2,
+    bank = "crop_legion_tomato", build = "crop_legion_tomato",
     image = { name = "quagmire_tomato.tex", atlas = nil },
     leveldata = {
-        [1] = { anim = "level1", time = time_years * 0.15, deadanim = "dead1", witheredprefab = nil, },
-        [2] = { anim = "level2", time = time_years * 0.20, deadanim = "dead1", witheredprefab = {"twigs"}, },
-        [3] = { anim = "level3", time = time_years * 0.25, deadanim = "dead2", witheredprefab = {"twigs"}, },
-        [4] = { anim = "level4", time = time_years * 0.40, deadanim = "dead2", witheredprefab = {"twigs"}, bloom = true, },
-        [5] = { anim = "level5", time = time_day   * 6.00, deadanim = "dead2", witheredprefab = {"twigs", "twigs"}, },
+        { anim = "level2", time = time_grow,      deadanim = "dead1", witheredprefab = nil },
+        { anim = "level3", time = time_crop*0.45, deadanim = "dead2", witheredprefab = {"twigs"} },
+        { anim = "level4", time = time_crop*0.55, deadanim = "dead2", witheredprefab = {"twigs"}, bloom = true },
+        { anim = { "level5_1", "level5_2", "level5_3" }, time = time_day*6, deadanim = "dead2", witheredprefab = {"twigs", "twigs"} }
+        -- [1] = { anim = "level1", time = time_years * 0.15, deadanim = "dead1", witheredprefab = nil, },
+        -- [2] = { anim = "level2", time = time_years * 0.20, deadanim = "dead1", witheredprefab = {"twigs"}, },
+        -- [3] = { anim = "level3", time = time_years * 0.25, deadanim = "dead2", witheredprefab = {"twigs"}, },
+        -- [4] = { anim = "level4", time = time_years * 0.40, deadanim = "dead2", witheredprefab = {"twigs"}, bloom = true, },
+        -- [5] = { anim = "level5", time = time_day   * 6.00, deadanim = "dead2", witheredprefab = {"twigs", "twigs"}, },
     },
-    maturedanim = {
-        [1] = "level5_1",
-        [2] = "level5_2",
-        [3] = "level5_3",
-    },
-    cluster_size = { 1, 1.5 }
+    cluster_size = { 1, 1.7 }
 }
 _G.CROPS_DATA_LEGION.asparagus = {
-    growthmults = { [1] = 0.8, [2] = 1.2, [3] = 1.2, [4] = 1.5 }, --春冬
-    regrowstage = 3,
-    bank = "crop_legion_asparagus",
-    build = "crop_legion_asparagus",
+    growthmults = { 0.8, 1.2, 1.2, 1.5 }, --春xx冬
+    regrowstage = 2,
+    bank = "crop_legion_asparagus", build = "crop_legion_asparagus",
     leveldata = {
-        [1] = { anim = "level1", time = time_years * 0.15, deadanim = "dead1", witheredprefab = nil, },
-        [2] = { anim = "level2", time = time_years * 0.20, deadanim = "dead1", witheredprefab = {"cutgrass"}, },
-        [3] = { anim = "level3", time = time_years * 0.25, deadanim = "dead2", witheredprefab = {"cutgrass", "cutgrass"}, },
-        [4] = { anim = "level4", time = time_years * 0.40, deadanim = "dead2", witheredprefab = {"cutgrass", "cutgrass"}, },
-        [5] = { anim = "level5", time = time_day   * 6.00, deadanim = "dead2", witheredprefab = {"cutgrass", "cutgrass", "cutgrass"}, },
+        { anim = "level2", time = time_grow,      deadanim = "dead1", witheredprefab = nil },
+        { anim = "level3", time = time_crop*0.45, deadanim = "dead2", witheredprefab = {"cutgrass"} },
+        { anim = "level4", time = time_crop*0.55, deadanim = "dead2", witheredprefab = {"cutgrass", "cutgrass"}, bloom = true },
+        { anim = { "level5_1", "level5_2", "level5_3" }, time = time_day*6, deadanim = "dead2", witheredprefab = {"cutgrass", "cutgrass", "cutgrass"} }
+        -- [1] = { anim = "level1", time = time_years * 0.15, deadanim = "dead1", witheredprefab = nil, },
+        -- [2] = { anim = "level2", time = time_years * 0.20, deadanim = "dead1", witheredprefab = {"cutgrass"}, },
+        -- [3] = { anim = "level3", time = time_years * 0.25, deadanim = "dead2", witheredprefab = {"cutgrass", "cutgrass"}, },
+        -- [4] = { anim = "level4", time = time_years * 0.40, deadanim = "dead2", witheredprefab = {"cutgrass", "cutgrass"}, },
+        -- [5] = { anim = "level5", time = time_day   * 6.00, deadanim = "dead2", witheredprefab = {"cutgrass", "cutgrass", "cutgrass"}, }
     },
-    maturedanim = {
-        [1] = "level5_1",
-        [2] = "level5_2",
-        [3] = "level5_3",
-    },
-    cluster_size = { 1, 1.5 }
+    cluster_size = { 1, 1.7 }
 }
 _G.CROPS_DATA_LEGION.mandrake = {
-    growthmults = { [1] = 1, [2] = 1, [3] = 1, [4] = 1.5 }, --冬
+    growthmults = { 1, 1, 1, 1.5 }, --xxx冬
     regrowstage = 1,
-    bank = "crop_legion_mandrake",
-    build = "crop_legion_mandrake",
+    bank = "crop_legion_mandrake", build = "crop_legion_mandrake",
     getsickchance = 0,
     leveldata = {
-        [1] = { anim = "level1", time = time_years * 0.16, deadanim = "dead1", witheredprefab = nil, },
-        [2] = { anim = "level2", time = time_years * 0.24, deadanim = "dead1", witheredprefab = {"cutgrass"}, },
-        [3] = { anim = "level3", time = time_years * 0.36, deadanim = "dead1", witheredprefab = {"cutgrass"}, },
-        [4] = { anim = "level4", time = time_years * 0.24, deadanim = "dead1", witheredprefab = {"cutgrass"}, },
-        [5] = { anim = "level5", time = nil,               deadanim = "dead1", witheredprefab = {"cutgrass"}, },
+        { anim = "level2", time = time_crop*0.5, deadanim = "dead1", witheredprefab = nil },
+        { anim = "level3", time = time_crop*0.7, deadanim = "dead1", witheredprefab = {"cutgrass"} },
+        { anim = "level4", time = time_crop*0.8, deadanim = "dead1", witheredprefab = {"cutgrass"} },
+        { anim = "level5", time = nil,           deadanim = "dead1", witheredprefab = {"cutgrass"} }
+        -- [1] = { anim = "level1", time = time_years * 0.16, deadanim = "dead1", witheredprefab = nil, },
+        -- [2] = { anim = "level2", time = time_years * 0.24, deadanim = "dead1", witheredprefab = {"cutgrass"}, },
+        -- [3] = { anim = "level3", time = time_years * 0.36, deadanim = "dead1", witheredprefab = {"cutgrass"}, },
+        -- [4] = { anim = "level4", time = time_years * 0.24, deadanim = "dead1", witheredprefab = {"cutgrass"}, },
+        -- [5] = { anim = "level5", time = nil,               deadanim = "dead1", witheredprefab = {"cutgrass"}, }
     },
     fn_loot = function(self, doer, ispicked, isburnt, loots)
         if self.stage == self.stage_max then
-            if self.numfruit ~= nil and self.numfruit > 0 then
-                local num = self.cluster + 1 --曼德拉产量固定1
-                if self.isrotten then
-                    self:AddLoot(loots, "livinglog", num*2)
-                else
-                    self:AddLoot(loots, "mandrake", num)
-                end
+            local num = self.cluster + 1 --曼德拉产量固定1
+            if self.isrotten then
+                self:AddLoot(loots, "livinglog", num*2)
+            else
+                self:AddLoot(loots, "mandrake", num)
             end
         end
     end,
@@ -1287,8 +1261,12 @@ _G.CROPS_DATA_LEGION.mandrake = {
             inst.SoundEmitter:PlaySound("dontstarve/creatures/mandrake/death")
         end
         local x, y, z = doer.Transform:GetWorldPosition()
+        local timemult = inst.components.perennialcrop2.cluster*0.03 --99级大概会增加3倍时间
         doer:DoTaskInTime(0.4+0.2*math.random(), function()
             local time = TUNING.MANDRAKE_SLEEP_TIME
+            if timemult > 0 then
+                time = time + time*timemult
+            end
             local ents = TheSim:FindEntities(x, y, z, TUNING.MANDRAKE_SLEEP_RANGE_COOKED, nil,
                 { "playerghost", "FX", "DECOR", "INLIMBO" }, { "sleeper", "player" })
             for i, v in ipairs(ents) do
@@ -1318,23 +1296,21 @@ _G.CROPS_DATA_LEGION.mandrake = {
     end
 }
 _G.CROPS_DATA_LEGION.gourd = {
-    growthmults = { [1] = 1.2, [2] = 1.2, [3] = 0.8, [4] = 0 }, --秋
-    regrowstage = 4,
-    bank = "crop_mythword_gourd",
-    build = "crop_mythword_gourd",
+    growthmults = { 1.2, 1.2, 0.8, 0 }, --xx秋x
+    regrowstage = 2,
+    bank = "crop_mythword_gourd", build = "crop_mythword_gourd",
     image = { name = "gourd.tex", atlas = "images/inventoryimages/gourd.xml" },
     leveldata = {
-        [1] = { anim = "level1", time = time_years * 0.05, deadanim = "dead1", witheredprefab = nil, },
-        [2] = { anim = "level2", time = time_years * 0.15, deadanim = "dead1", witheredprefab = {"cutgrass"}, },
-        [3] = { anim = "level3", time = time_years * 0.20, deadanim = "dead2", witheredprefab = {"cutgrass"}, },
-        [4] = { anim = "level4", time = time_years * 0.20, deadanim = "dead2", witheredprefab = {"cutgrass"}, },
-        [5] = { anim = "level5", time = time_years * 0.40, deadanim = "dead2", witheredprefab = {"cutgrass", "cutgrass"}, bloom = true, },
-        [6] = { anim = "level6", time = time_day   * 6.00, deadanim = "dead2", witheredprefab = {"cutgrass", "rope"}, },
-    },
-    maturedanim = {
-        [1] = "level6_1",
-        [2] = "level6_2",
-        [3] = "level6_3",
+        { anim = "level3", time = time_grow,      deadanim = "dead1", witheredprefab = nil },
+        { anim = "level4", time = time_crop*0.45, deadanim = "dead2", witheredprefab = {"cutgrass"} },
+        { anim = "level5", time = time_crop*0.55, deadanim = "dead2", witheredprefab = {"cutgrass", "cutgrass"}, bloom = true },
+        { anim = { "level6_1", "level6_2", "level6_3" }, time = time_day*6, deadanim = "dead2", witheredprefab = {"cutgrass", "rope"} }
+        -- [1] = { anim = "level1", time = time_years * 0.05, deadanim = "dead1", witheredprefab = nil, },
+        -- [2] = { anim = "level2", time = time_years * 0.15, deadanim = "dead1", witheredprefab = {"cutgrass"}, },
+        -- [3] = { anim = "level3", time = time_years * 0.20, deadanim = "dead2", witheredprefab = {"cutgrass"}, },
+        -- [4] = { anim = "level4", time = time_years * 0.20, deadanim = "dead2", witheredprefab = {"cutgrass"}, },
+        -- [5] = { anim = "level5", time = time_years * 0.40, deadanim = "dead2", witheredprefab = {"cutgrass", "cutgrass"}, bloom = true, },
+        -- [6] = { anim = "level6", time = time_day   * 6.00, deadanim = "dead2", witheredprefab = {"cutgrass", "rope"}, }
     }
 }
 
