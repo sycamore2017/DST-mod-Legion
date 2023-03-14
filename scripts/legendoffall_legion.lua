@@ -936,6 +936,14 @@ end
 --[[ 异种植物 ]]
 --------------------------------------------------------------------------
 
+local function OnSummer_cactus(inst, isit)
+    if TheWorld.state.issummer then
+        inst.AnimState:OverrideSymbol("flowerplus", "crop_legion_cactus", "flomax")
+    else
+        inst.AnimState:ClearOverrideSymbol("flowerplus")
+    end
+end
+
 --[[ hey, Tosh! See here! ]]--
 if not _G.rawget(_G, "CROPS_DATA_LEGION") then --对于global来说，不能直接检测是否有某个元素，需要用rawget才行
     _G.CROPS_DATA_LEGION = {}
@@ -952,6 +960,7 @@ _G.CROPS_DATA_LEGION.carrot = {
     regrowstage = 1, --重新生长的阶段
     -- cangrowindrak = true, --能否在黑暗中生长(默认不能)
     -- getsickchance = 0.007, --害虫产生率
+    -- fireproof = false, --是否防火
     bank = "plant_normal_legion", build = "plant_normal_legion",
     leveldata = {
         { anim = "level4_carrot", time = time_crop*0.45, deadanim = "dead123_carrot", witheredprefab = nil },
@@ -963,7 +972,19 @@ _G.CROPS_DATA_LEGION.carrot = {
         -- [4] = { anim = "level4_carrot", time = time_annual * 0.20, deadanim = "dead456_carrot", witheredprefab = {"cutgrass"} },
         -- [5] = { anim = "level5_carrot", time = time_annual * 0.40, deadanim = "dead456_carrot", witheredprefab = {"cutgrass"}, bloom = true, pickable = nil },
         -- [6] = { anim = { "level6_carrot_1", "level6_carrot_2", "level6_carrot_3" }, time = time_day * 6.00, deadanim = "dead456_carrot", witheredprefab = {"cutgrass"} }
-    }
+    },
+    fn_loot = function(self, doer, ispicked, isburnt, loots)
+        if self.stage == self.stage_max then
+            self:GetBaseLoot(loots, {
+                doer = doer, ispicked = ispicked, isburnt = isburnt,
+                crop = self.cropprefab, crop_rot = "spoiled_food",
+                lootothers = nil
+            })
+            if self.cluster >= 35 then
+                self:AddLoot(loots, "lance_carrot_l", self.cluster >= 70 and 2 or 1)
+            end
+        end
+    end
 }
 _G.CROPS_DATA_LEGION.corn = {
     growthmults = { 0.8, 0.8, 0.8, 0 }, --春夏秋x
@@ -1313,6 +1334,55 @@ _G.CROPS_DATA_LEGION.gourd = {
         -- [6] = { anim = "level6", time = time_day   * 6.00, deadanim = "dead2", witheredprefab = {"cutgrass", "rope"}, }
     }
 }
+_G.CROPS_DATA_LEGION.cactus_meat = {
+    growthmults = { 1.2, 0.8, 1.2, 0 }, --x夏xx
+    regrowstage = 1,
+    bank = "crop_legion_cactus", build = "crop_legion_cactus",
+    leveldata = {
+        { anim = "level1", time = time_crop*0.45, deadanim = "dead1", witheredprefab = nil },
+        { anim = "level2", time = time_crop*0.55, deadanim = "dead1", witheredprefab = {"cutgrass"} },
+        { anim = { "level3_1", "level3_2", "level3_3" }, time = time_grow, deadanim = "dead1", witheredprefab = {"cutgrass"}, pickable = 1 },
+        { anim = { "level4_1", "level4_2", "level4_3" }, time = time_day*6, deadanim = "dead1", witheredprefab = {"cutgrass"}, bloom = true }
+    },
+    fn_loot = function(self, doer, ispicked, isburnt, loots)
+        if self.stage == self.stage_max or self.level.pickable == 1 then
+            local lootother = nil
+            if self.stage == self.stage_max then --最终阶段才有仙人掌花
+                lootother = {
+                    { israndom=true, factor=0.4, name="cactus_flower", name_rot=nil },
+                    { israndom=false, factor= TheWorld.state.issummer and 0.7 or 0.2, name="cactus_flower", name_rot=nil } --16、56
+                }
+            end
+            self:GetBaseLoot(loots, {
+                doer = doer, ispicked = ispicked, isburnt = isburnt,
+                crop = self.cropprefab, crop_rot = "spoiled_food",
+                lootothers = lootother
+            })
+        end
+    end,
+    fn_pick = function(self, doer, loot) --采集时被刺伤
+        if
+            doer ~= nil and doer.components.combat ~= nil and
+            not (
+                doer.components.inventory ~= nil and
+                (
+                    doer.components.inventory:EquipHasTag("bramble_resistant") or
+                    (CONFIGS_LEGION.ENABLEDMODS.MythWords and doer.components.inventory:Has("thorns_pill", 1))
+                )
+            )
+        then
+            doer.components.combat:GetAttacked(self.inst, 6 + 0.2*self.cluster)
+            doer:PushEvent("thorns")
+        end
+    end,
+    fn_common = function(inst)
+        inst:AddTag("thorny")
+    end,
+    fn_server = function(inst) --夏季时切换花朵贴图
+        inst:WatchWorldState("issummer", OnSummer_cactus)
+        inst:DoTaskInTime(0.1, OnSummer_cactus)
+    end
+}
 
 --------------------------------------------------------------------------
 --[[ 修改浣猫，让猫薄荷对其产生特殊作用 ]]
@@ -1467,6 +1537,11 @@ local mapseeds = {
         swap = { build = "squamousfruit", file = "swap_turn", symboltype = "1" },
         fruit = "dug_monstrain", time = 2*TUNING.TOTAL_DAY_TIME,
         fruitnum_min = 1, fruitnum_max = 1, genekey = "raindonate"
+    },
+    cactus_flower = {
+        swap = { build = "crop_legion_cactus", file = "swap_turn", symboltype = "1" },
+        fruit = "seeds_cactus_meat_l", time = 2*TUNING.TOTAL_DAY_TIME,
+        fruitnum_min = 1, fruitnum_max = 1, genekey = nil --undo 还没设置key捏
     }
 }
 for k,v in pairs(mapseeds) do

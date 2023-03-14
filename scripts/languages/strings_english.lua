@@ -2234,7 +2234,7 @@ STRINGS.PLANT_CROP_L = {
     FLORESCENCE = "Blooming ",
     SEEDS = " Xeeds",
 }
-S_NAMES.PLANT_CARROT_L = "Carrot Plant"
+S_NAMES.PLANT_CARROT_L = "Carrot Cluster"
 S_NAMES.PLANT_CORN_L = "Corn Straw"
 S_NAMES.PLANT_PUMPKIN_L = "Pumpkin Rack"
 S_NAMES.PLANT_EGGPLANT_L = "Eggplant Nest"
@@ -2251,6 +2251,7 @@ S_NAMES.PLANT_TOMATO_L = "Thormato"
 S_NAMES.PLANT_ASPARAGUS_L = "Asparagus Clump"
 S_NAMES.PLANT_MANDRAKE_L = "Planted Mandrake"
 S_NAMES.PLANT_GOURD_L = "Gourd Vine"
+S_NAMES.PLANT_CACTUS_MEAT_L = "Cactaceae"
 
 S______GENERIC.DESCRIBE.PLANT_CROP_L = {
     WITHERED = "It will be born again when spring breeze blows...",

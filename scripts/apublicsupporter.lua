@@ -290,10 +290,10 @@ _G.RemoveTag_legion = function(inst, tagname, key)
 end
 
 --[ 吉他曲管理(mod兼容用的，如果其他mod想要增加自己的曲子就用以下代码) ]--
---[[
 if not _G.rawget(_G, "GUITARSONGSPOOL_LEGION") then
     _G.GUITARSONGSPOOL_LEGION = {}
 end
+--[[
 _G.GUITARSONGSPOOL_LEGION["weisuo"] = function(guitar, doer, team, songs, guitartype) --吉他实体、主弹演奏者、演奏团队、已有的曲子、演奏类型
     if guitar.prefab == "guitar_whitewood" then --以后还会出新的吉他，所以这里要有限制
         local songmap = {

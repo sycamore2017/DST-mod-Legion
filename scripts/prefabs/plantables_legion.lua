@@ -362,7 +362,7 @@ for k,v in pairs(CROPS_DATA_LEGION) do
         burnable = {
             time = TUNING.SMALL_BURNTIME,
             fxsize = "small",
-            lightedsize = "small",
+            lightedsize = "small"
         },
         deployable = {
             prefab = cropprefab,
@@ -397,6 +397,7 @@ for k,v in pairs(CROPS_DATA_LEGION) do
 
             inst:AddComponent("plantablelegion")
             inst.components.plantablelegion.plant = cropprefab
+            inst.components.plantablelegion.plant2 = v.plant2 --同一个异种种子可能能升级第二种对象
         end
     }
     table.insert(prefabs, MakePlacer(

@@ -68,13 +68,11 @@ local function PlayStart(inst, owner)
                 "legion/guitar_songs/viva_la_vida"
             }
 
-            if GUITARSONGSPOOL_LEGION ~= nil then
-                for _, fn in pairs(GUITARSONGSPOOL_LEGION) do
-                    if fn then
-                        local res = fn(inst, owner, owner.fourhands_valid, songs, TYPE_PLAY)
-                        if res and res == "override" then
-                            return
-                        end
+            for _, fn in pairs(GUITARSONGSPOOL_LEGION) do
+                if fn then
+                    local res = fn(inst, owner, owner.fourhands_valid, songs, TYPE_PLAY)
+                    if res and res == "override" then
+                        return
                     end
                 end
             end

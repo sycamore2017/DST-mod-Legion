@@ -210,10 +210,10 @@ function PerennialCrop2:SetStage(stage, isrotten, skip) --设置为某阶段
 	--设置动画
 	if rotten then
 		self.inst.AnimState:PlayAnimation(level.deadanim, false)
-	elseif stage == self.stage_max then
+	elseif stage == self.stage_max or level.pickable == 1 then
 		if type(level.anim) == 'table' then
 			local minnum = #level.anim
-			minnum = math.min(minnum, self.numfruit or 3)
+			minnum = math.min(minnum, self.numfruit or 1)
 			self.inst.AnimState:PlayAnimation(level.anim[minnum], true)
 		else
 			self.inst.AnimState:PlayAnimation(level.anim, true)
@@ -229,11 +229,10 @@ function PerennialCrop2:SetStage(stage, isrotten, skip) --设置为某阶段
 	end
 
 	--设置是否可采摘
-	local pick = level.pickable or 0
 	if
 		rotten or --枯萎了，必定能采集
-		pick == 1 or -- 1 代表必定能采集
-		(pick ~= -1 and stage == self.stage_max) -- -1 代表不能采集
+		level.pickable == 1 or -- 1 代表必定能采集
+		(level.pickable ~= -1 and stage == self.stage_max) -- -1 代表不能采集
 	then
 		if self.inst.components.pickable == nil then
 			self.inst:AddComponent("pickable")
@@ -477,20 +476,22 @@ function PerennialCrop2:DoGrowth(skip) --生长到下一阶段
 	end
 
 	if data.justgrown then
-		if data.stage == self.stage_max then --如果成熟了，开始计算果子数量
-			local num = 1
-			local rand = math.random()
-			if rand < 0.35 then --50%几率2果实
-				num = num + 1
-			elseif rand < 0.5 then --35%几率3果实
-				num = num + 2
+		if data.stage == self.stage_max or data.level.pickable == 1 then --如果能采集了，开始计算果子数量
+			if self.numfruit == nil or self.numfruit <= 1 then --如果只有1个，有机会继续变多
+				local num = 1
+				local rand = math.random()
+				if rand < 0.35 then --50%几率2果实
+					num = num + 1
+				elseif rand < 0.5 then --35%几率3果实
+					num = num + 2
+				end
+				self.numfruit = num
 			end
-			self.numfruit = num
 		end
 	elseif data.stage == self.regrowstage or data.stage == 1 then --重新开始生长时，清空某些数据
 		--如果过熟了，掉落果子，给周围植物、土地和子圭管理者施肥
 		if data.overripe then
-			local num = self.cluster + (self.numfruit or 0)
+			local num = self.cluster + (self.numfruit or 1)
 			local numpoop = math.ceil( num*(0.5 + math.random()*0.5) )
 			local numloot = num - numpoop
 			local pos = self.inst:GetPosition()
@@ -633,26 +634,20 @@ function PerennialCrop2:StartGrowing(lefttime, skip) --尝试生长计时
 
 	local data = self:GetGrowTime()
 	if data.time == nil or data.time <= 0 then --永恒阶段
-		-- self.timedata.all = nil
 		self.timedata.mult = nil
 		self.timedata.start = nil
-		-- self.timedata.paused = false
 		self.timedata.left = nil
 		return
 	else
 		if data.mult <= 0 then --生长暂停
 			self.timedata.mult = nil
 			self.timedata.start = nil
-			-- self.timedata.all = nil
 			self.timedata.left = lefttime or data.time
-			-- self.timedata.paused = true
 			return
 		else
 			self.timedata.mult = data.mult
 			self.timedata.start = GetTime()
-			-- self.timedata.all = lefttime or data.time
 			self.timedata.left = lefttime or data.time
-			-- self.timedata.paused = false
 		end
 	end
 
@@ -740,9 +735,9 @@ function PerennialCrop2:Pause() --中止生长
 end
 
 function PerennialCrop2:Resume() --继续生长
-    -- if self.timedata.left == nil then --没有暂停，或没有暂停后的必要数据
-	-- 	return
-	-- end
+	if self.timedata.start ~= nil then --start 不为空，代表已经在生长了，就不要继续重新刷新了
+		return
+	end
 
 	self:StartGrowing(self.timedata.left)
 end
@@ -847,7 +842,7 @@ function PerennialCrop2:AddLoot(loot, name, number)
 end
 function PerennialCrop2:GetBaseLoot(lootprefabs, sets) --判定基础收获物
 	--先算主
-	local num = self.cluster + (self.numfruit or 0)
+	local num = self.cluster + (self.numfruit or 1)
 	local ispollinated = self.pollinated >= self.pollinated_max --授粉成功，提高产量
 	if ispollinated then
 		num = num + math.max( math.floor(self.cluster*0.1), 1 ) --保证肯定多1个
@@ -1143,3 +1138,5 @@ function PerennialCrop2:ClusteredPlant(seeds, doer) --簇栽
 
 	return true
 end
+
+return PerennialCrop2

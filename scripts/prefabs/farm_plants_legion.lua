@@ -375,6 +375,10 @@ end
 --[[ 子圭·垄的多年生植物 ]]
 --------------------------------------------------------------------------
 
+local function EmptyCptFn(self, ...)
+	--nothing
+end
+
 local function RemovePlant(inst, lastprefab, lootprefab)
 	local x, y, z = inst.Transform:GetWorldPosition()
 	if lastprefab ~= nil then
@@ -388,30 +392,16 @@ local function RemovePlant(inst, lastprefab, lootprefab)
 end
 
 local function IsTooDarkToGrow(inst)
-	if inst.components.perennialcrop then
-		if inst.components.perennialcrop:CanGrowInDark() then
-			return false
-		end
-	elseif inst.components.perennialcrop2 then
-		if inst.components.perennialcrop2:CanGrowInDark() then
-			return false
-		end
+	if inst.components.perennialcrop:CanGrowInDark() then
+		return false
 	end
 	return IsTooDarkToGrow_legion(inst)
 end
 local function UpdateGrowing(inst)
 	if (inst.components.burnable == nil or not inst.components.burnable.burning) and not IsTooDarkToGrow(inst) then
-		if inst.components.perennialcrop then
-			inst.components.perennialcrop:Resume()
-		elseif inst.components.perennialcrop2 then
-			inst.components.perennialcrop2:Resume()
-		end
+		inst.components.perennialcrop:Resume()
 	else
-		if inst.components.perennialcrop then
-			inst.components.perennialcrop:Pause()
-		elseif inst.components.perennialcrop2 then
-			inst.components.perennialcrop2:Pause()
-		end
+		inst.components.perennialcrop:Pause()
 	end
 end
 local function OnIsDark(inst)
@@ -432,8 +422,6 @@ local function OnIsRaining(inst)
 	if inst.components.perennialcrop then
 		--不管雨始还是雨停，增加一半的蓄水量(反正一场雨结束，总共只加最大蓄水量的数值)
 		inst.components.perennialcrop:PourWater(nil, nil, inst.components.perennialcrop.moisture_max/2)
-	elseif inst.components.perennialcrop2 then
-		inst.components.perennialcrop2:PourWater(nil, nil, 1)
 	end
 end
 
@@ -628,6 +616,8 @@ local function MakePlant(data)
 				inst.components.perennialcrop:TendTo(doer, true)
 				return true
 			end
+			inst.components.farmplanttendable.OnSave = EmptyCptFn --照顾组件的数据不能保存下来，否则会影响 perennialcrop
+			inst.components.farmplanttendable.OnLoad = EmptyCptFn
 
 			inst:AddComponent("perennialcrop")
 			inst.components.perennialcrop:SetUp(data)
@@ -667,9 +657,9 @@ local function MakePlant(data)
 			end
 
 			inst:AddComponent("moisture") --浇水机制由潮湿度组件控制（能让水球、神话的玉净瓶等起作用）
-			inst.components.moisture.OnUpdate = function(self, ...) end --取消下雨时的潮湿度增加
-			inst.components.moisture.OnSave = function(self, ...) end
-			inst.components.moisture.OnLoad = function(self, ...) end
+			inst.components.moisture.OnUpdate = EmptyCptFn --取消下雨时的潮湿度增加
+			inst.components.moisture.OnSave = EmptyCptFn
+			inst.components.moisture.OnLoad = EmptyCptFn
 			inst.components.moisture.DoDelta = function(self, num, ...)
 				if num > 0 then
 					self.inst.components.perennialcrop:PourWater(nil, nil, num)
@@ -678,6 +668,7 @@ local function MakePlant(data)
 
 			inst:WatchWorldState("israining", OnIsRaining) --下雨时补充水分
 			inst:WatchWorldState("isnight", OnIsDark) --黑暗中无法继续生长
+			-- inst:ListenForEvent("seasontick", OnSeasonTick) --季节变换时更新生长速度（不用了，本来每天就会更新生长）
 			inst:DoTaskInTime(0, function()
 				OnIsDark(inst)
 			end)
@@ -783,21 +774,72 @@ local function OnPlant_p2(inst, pt)
 		cpt:StartGrowing() --由于 CostNutrition() 不会主动更新生长时间，这里手动更新
 	end
 end
-
+local function DoMagicGrowth_p2(inst, doer)
+	if inst:IsValid() then
+		return inst.components.perennialcrop2:DoMagicGrowth(doer, 6*TUNING.TOTAL_DAY_TIME)
+	end
+	return false
+end
+local function OnTendTo_p2(inst, doer)
+	inst.components.perennialcrop2:TendTo(doer, true)
+	return true
+end
+local function OnMoiWater_p2(self, num, ...)
+	if num > 0 then
+		self.inst.components.perennialcrop2:PourWater(nil, nil, num)
+	end
+end
 local function OnWorkedFinish_p2(inst, worker)
 	local crop = inst.components.perennialcrop2
+
+	local x, y, z = inst.Transform:GetWorldPosition()
+	SpawnPrefab("dirt_puff").Transform:SetPosition(x, y, z)
+
 	if crop.fn_defend ~= nil then
 		crop.fn_defend(inst, worker)
 	end
 	crop:GenerateLoot(worker, false, false)
-
-	local x, y, z = inst.Transform:GetWorldPosition()
-	SpawnPrefab("dirt_puff").Transform:SetPosition(x, y, z)
 	inst:Remove()
 end
+
+local function OnIsRaining_p2(inst)
+	inst.components.perennialcrop2:PourWater(nil, nil, 1)
+end
+local function IsTooDarkToGrow_p2(inst)
+	if inst.components.perennialcrop2:CanGrowInDark() then
+		return false
+	end
+	return IsTooDarkToGrow_legion(inst)
+end
+local function UpdateGrowing_p2(inst)
+	if (inst.components.burnable == nil or not inst.components.burnable.burning) and not IsTooDarkToGrow_p2(inst) then
+		inst.components.perennialcrop2:Resume()
+	else
+		inst.components.perennialcrop2:Pause()
+	end
+end
+local function OnIsDark_p2(inst)
+	UpdateGrowing_p2(inst)
+	if TheWorld.state.isnight then
+		if inst.nighttask == nil then
+			inst.nighttask = inst:DoPeriodicTask(5, UpdateGrowing_p2, math.random() * 5)
+		end
+	else
+		if inst.nighttask ~= nil then
+			inst.nighttask:Cancel()
+			inst.nighttask = nil
+		end
+	end
+end
+
+local function OnIgnite_p2(inst, source, doer)
+	UpdateGrowing_p2(inst)
+end
+local function OnExtinguish_p2(inst)
+	UpdateGrowing_p2(inst)
+end
 local function OnBurnt_p2(inst)
-	local crop = inst.components.perennialcrop2
-	crop:GenerateLoot(nil, false, true)
+	inst.components.perennialcrop2:GenerateLoot(nil, false, true)
 	inst:Remove()
 end
 
@@ -862,29 +904,19 @@ local function MakePlant2(cropprefab, sets)
 			inst.components.growable.stages = {}
 			inst.components.growable:StopGrowing()
 			inst.components.growable.magicgrowable = true --非常规造林学生效标志（其他会由组件来施行）
-			inst.components.growable.domagicgrowthfn = function(inst, doer)
-				if inst:IsValid() then
-					return inst.components.perennialcrop2:DoMagicGrowth(doer, 8*TUNING.TOTAL_DAY_TIME)
-				end
-				return false
-			end
+			inst.components.growable.domagicgrowthfn = DoMagicGrowth_p2
 			inst.components.growable.GetCurrentStageData = function(self) return { tendable = false } end
 
 			inst:AddComponent("farmplanttendable")
-			inst.components.farmplanttendable.ontendtofn = function(inst, doer)
-				inst.components.perennialcrop2:TendTo(doer, true)
-				return true
-			end
+			inst.components.farmplanttendable.ontendtofn = OnTendTo_p2
+			inst.components.farmplanttendable.OnSave = EmptyCptFn --照顾组件的数据不能保存下来，否则会影响 perennialcrop2
+			inst.components.farmplanttendable.OnLoad = EmptyCptFn
 
 			inst:AddComponent("moisture") --浇水机制由潮湿度组件控制（能让水球、神话的玉净瓶等起作用）
-			inst.components.moisture.OnUpdate = function(self, ...) end --取消下雨时的潮湿度增加
-			inst.components.moisture.OnSave = function(self, ...) end
-			inst.components.moisture.OnLoad = function(self, ...) end
-			inst.components.moisture.DoDelta = function(self, num, ...)
-				if num > 0 then
-					self.inst.components.perennialcrop2:PourWater(nil, nil, num)
-				end
-			end
+			inst.components.moisture.OnUpdate = EmptyCptFn --取消下雨时的潮湿度增加
+			inst.components.moisture.OnSave = EmptyCptFn
+			inst.components.moisture.OnLoad = EmptyCptFn
+			inst.components.moisture.DoDelta = OnMoiWater_p2
 
 			inst:AddComponent("workable")
 			inst.components.workable:SetWorkAction(ACTIONS.DIG)
@@ -894,13 +926,9 @@ local function MakePlant2(cropprefab, sets)
 			if not sets.fireproof then
 				MakeSmallBurnable(inst)
 				MakeSmallPropagator(inst)
+				inst.components.burnable:SetOnIgniteFn(OnIgnite_p2)
+				inst.components.burnable:SetOnExtinguishFn(OnExtinguish_p2)
 				inst.components.burnable:SetOnBurntFn(OnBurnt_p2)
-				inst.components.burnable:SetOnIgniteFn(function(inst, source, doer)
-					UpdateGrowing(inst)
-				end)
-				inst.components.burnable:SetOnExtinguishFn(function(inst)
-					UpdateGrowing(inst)
-				end)
 			end
 
 			inst:AddComponent("perennialcrop2")
@@ -914,14 +942,12 @@ local function MakePlant2(cropprefab, sets)
 			inst.components.perennialcrop2:SetStage(1, false, false)
 			inst.components.perennialcrop2:StartGrowing()
 
-			inst:WatchWorldState("israining", OnIsRaining) --下雨时补充水分
-			inst:WatchWorldState("isnight", OnIsDark) --黑暗中无法继续生长
+			inst:WatchWorldState("israining", OnIsRaining_p2) --下雨时补充水分
+			inst:WatchWorldState("isnight", OnIsDark_p2) --黑暗中无法继续生长
+			-- inst:ListenForEvent("seasontick", OnSeasonTick_p2) --季节变换时更新生长速度（不用了，本来每天就会更新生长）
 			inst:DoTaskInTime(0, function()
-				OnIsDark(inst)
+				OnIsDark_p2(inst)
 			end)
-
-			--季节变换时更新生长速度，我觉得没必要了，因为OnEntityWake就已经更新得很勤了
-			-- inst:WatchWorldState("iswinter", TogglePickable)
 
 			inst.fn_planted = OnPlant_p2
 
