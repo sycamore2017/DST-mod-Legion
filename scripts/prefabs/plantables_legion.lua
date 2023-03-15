@@ -1,5 +1,13 @@
 local prefabs = {}
 
+local function GetPlacerAnim(anims)
+    if type(anims) == 'table' then
+        return anims[ #anims ]
+    else
+        return anims
+    end
+end
+
 local function MakePlantable(name, data)
     local imgname = data.overrideimage or name
     local assets = {
@@ -401,7 +409,7 @@ for k,v in pairs(CROPS_DATA_LEGION) do
         end
     }
     table.insert(prefabs, MakePlacer(
-        seedsprefab.."_placer", v.bank, v.build, v.leveldata[1].anim,
+        seedsprefab.."_placer", v.bank, v.build, GetPlacerAnim(v.leveldata[1].anim),
         nil, nil, nil, nil, nil, nil, function(inst)
             inst.AnimState:Pause() --不想让placer动起来
             inst.AnimState:OverrideSymbol("soil", "crop_soil_legion", "soil")

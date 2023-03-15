@@ -864,7 +864,8 @@ local function MakePlant2(cropprefab, sets)
 
 			inst.AnimState:SetBank(sets.bank)
 			inst.AnimState:SetBuild(sets.build)
-			inst.AnimState:PlayAnimation(sets.leveldata[1].anim)
+			-- inst.AnimState:PlayAnimation(sets.leveldata[1].anim, true) --组件里会设置动画的
+
 			if sets.bank == "plant_normal_legion" then
 				-- inst.AnimState:OverrideSymbol("dirt", "crop_soil_legion", "dirt")
 			else

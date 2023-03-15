@@ -1339,11 +1339,12 @@ _G.CROPS_DATA_LEGION.cactus_meat = {
     regrowstage = 1,
     bank = "crop_legion_cactus", build = "crop_legion_cactus",
     leveldata = {
-        { anim = "level1", time = time_crop*0.45, deadanim = "dead1", witheredprefab = nil },
-        { anim = "level2", time = time_crop*0.55, deadanim = "dead1", witheredprefab = {"cutgrass"} },
+        { anim = { "level1_1", "level1_2", "level1_3" }, time = time_crop*0.45, deadanim = "dead1", witheredprefab = nil },
+        { anim = { "level2_1", "level2_2", "level2_3" }, time = time_crop*0.55, deadanim = "dead1", witheredprefab = {"cutgrass"} },
         { anim = { "level3_1", "level3_2", "level3_3" }, time = time_grow, deadanim = "dead1", witheredprefab = {"cutgrass"}, pickable = 1 },
         { anim = { "level4_1", "level4_2", "level4_3" }, time = time_day*6, deadanim = "dead1", witheredprefab = {"cutgrass"}, bloom = true }
     },
+    cluster_size = { 1, 1.4 },
     fn_loot = function(self, doer, ispicked, isburnt, loots)
         if self.stage == self.stage_max or self.level.pickable == 1 then
             local lootother = nil
