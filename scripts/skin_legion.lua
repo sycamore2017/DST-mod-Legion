@@ -3844,7 +3844,7 @@ if not TheNet:IsDedicated() then
                         -- local SkinLegionDialog = _G.require("widgets/skinlegiondialog") --test：动态更新
                         right_root.skinshop_legion = right_root:AddChild(SkinLegionDialog(self.owner))
                         right_root.skinshop_legion:SetPosition(-380, 0)
-                        self:Close()
+                        -- self:Close() --为啥
                     end,
                     nil, "self_inspect_mod.tex"
                 ))

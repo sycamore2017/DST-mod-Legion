@@ -961,11 +961,11 @@ _G.CROPS_DATA_LEGION.carrot = {
     -- cangrowindrak = true, --能否在黑暗中生长(默认不能)
     -- getsickchance = 0.007, --害虫产生率
     -- fireproof = false, --是否防火
-    bank = "plant_normal_legion", build = "plant_normal_legion",
+    bank = "crop_legion_carrot", build = "crop_legion_carrot",
     leveldata = {
-        { anim = "level4_carrot", time = time_crop*0.45, deadanim = "dead123_carrot", witheredprefab = nil },
-        { anim = "level5_carrot", time = time_crop*0.55, deadanim = "dead123_carrot", witheredprefab = {"cutgrass"} },
-        { anim = { "level6_carrot_1", "level6_carrot_2", "level6_carrot_3" }, time = time_day*6, deadanim = "dead456_carrot", witheredprefab = {"cutgrass"} }
+        { anim = "level1", time = time_crop*0.45, deadanim = "dead1", witheredprefab = nil },
+        { anim = "level2", time = time_crop*0.55, deadanim = "dead1", witheredprefab = {"cutgrass"} },
+        { anim = { "level3_1", "level3_2", "level3_3" }, time = time_day*6, deadanim = "dead1", witheredprefab = {"cutgrass"} }
         -- [1] = { anim = "level1_carrot", time = time_annual * 0.05, deadanim = "dead123_carrot", witheredprefab = nil },
         -- [2] = { anim = "level2_carrot", time = time_annual * 0.15, deadanim = "dead123_carrot", witheredprefab = {"cutgrass"} },
         -- [3] = { anim = "level3_carrot", time = time_annual * 0.20, deadanim = "dead123_carrot", witheredprefab = {"cutgrass"} },
@@ -973,6 +973,7 @@ _G.CROPS_DATA_LEGION.carrot = {
         -- [5] = { anim = "level5_carrot", time = time_annual * 0.40, deadanim = "dead456_carrot", witheredprefab = {"cutgrass"}, bloom = true, pickable = nil },
         -- [6] = { anim = { "level6_carrot_1", "level6_carrot_2", "level6_carrot_3" }, time = time_day * 6.00, deadanim = "dead456_carrot", witheredprefab = {"cutgrass"} }
     },
+    cluster_size = { 1, 1.5 },
     fn_loot = function(self, doer, ispicked, isburnt, loots)
         if self.stage == self.stage_max then
             self:GetBaseLoot(loots, {
