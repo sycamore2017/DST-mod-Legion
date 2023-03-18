@@ -1385,6 +1385,11 @@ _G.CROPS_DATA_LEGION.cactus_meat = {
         inst:DoTaskInTime(0.1, OnSummer_cactus)
     end
 }
+-- _G.CROPS_DATA_LEGION.plantmeat = {
+--     growthmults = { 0.8, 1.2, 1.2, 0 }, --春xxx
+--     regrowstage = 1,
+--     bank = "crop_legion_lureplant", build = "crop_legion_lureplant",
+-- }
 
 --------------------------------------------------------------------------
 --[[ 修改浣猫，让猫薄荷对其产生特殊作用 ]]

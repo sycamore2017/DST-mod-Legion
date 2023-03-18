@@ -2669,11 +2669,22 @@ function SkinLegionDialog:OnControl(control, down)
     -- end
 end
 
+local function GetRightRoot()
+    if ThePlayer and ThePlayer.HUD and ThePlayer.HUD.controls then
+        return ThePlayer.HUD.controls.right_root
+    end
+    return nil
+end
 function SkinLegionDialog:Close()
     if self.panel_iteminfo ~= nil then
         self.panel_iteminfo:Kill()
     end
 	self:Kill()
+
+    local right_root = GetRightRoot()
+    if right_root ~= nil then
+        right_root.skinshop_l = nil
+    end
 end
 
 return SkinLegionDialog

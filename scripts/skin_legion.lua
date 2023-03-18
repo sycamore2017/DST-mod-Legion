@@ -3740,8 +3740,8 @@ AddClientModRPCHandler("LegionSkined", "SkinHandle", function(handletype, data, 
 
                     --获取数据后，主动更新皮肤铺界面
                     local right_root = GetRightRoot()
-                    if right_root ~= nil and right_root.skinshop_legion then
-                        right_root.skinshop_legion:ResetItems()
+                    if right_root ~= nil and right_root.skinshop_l then
+                        right_root.skinshop_l:ResetItems()
                     end
                 end
             end
@@ -3752,8 +3752,8 @@ AddClientModRPCHandler("LegionSkined", "SkinHandle", function(handletype, data, 
                 if result then
                     --获取数据后，主动更新cdk输入框
                     local right_root = GetRightRoot()
-                    if right_root ~= nil and right_root.skinshop_legion then
-                        right_root.skinshop_legion:SetCdkState(result.state, result.pop)
+                    if right_root ~= nil and right_root.skinshop_l then
+                        right_root.skinshop_l:SetCdkState(result.state, result.pop)
                     end
                 end
             end
@@ -3805,10 +3805,11 @@ end)
 --------------------------------------------------------------------------
 
 if not TheNet:IsDedicated() then
-     --离线模式不能有皮肤界面功能(因为离线模式下的klei账户ID与联网模式下的不一样)
+    --离线模式不能有皮肤界面功能(因为离线模式下的klei账户ID与联网模式下的不一样)
     if TheNet:IsOnlineMode() and _G.CONFIGS_LEGION.LANGUAGES == "chinese" then
         -- local ImageButton = require "widgets/imagebutton"
-        local PlayerAvatarPopup = require "widgets/playeravatarpopup"
+        -- local PlayerAvatarPopup = require "widgets/playeravatarpopup"
+        local PlayerInfoPopup = require "screens/playerinfopopupscreen"
         local TEMPLATES = require "widgets/templates"
         local SkinLegionDialog = require "widgets/skinlegiondialog"
 
@@ -3817,61 +3818,38 @@ if not TheNet:IsDedicated() then
         --     right_root = self.right_root
         -- end)
 
-        local Layout_old = PlayerAvatarPopup.Layout
-        PlayerAvatarPopup.Layout = function(self, ...)
-            Layout_old(self, ...)
-            if not TheInput:ControllerAttached() then
-                -- if self.close_button then
-                --     self.close_button:SetPosition(90, -269)
-                -- end
+        local MakeBG_old = PlayerInfoPopup.MakeBG
+        PlayerInfoPopup.MakeBG = function(self, ...)
+            MakeBG_old(self, ...)
 
-                local right_root = GetRightRoot()
-                if right_root == nil then
-                    return
-                end
-
-                if right_root.skinshop_legion then --再次打开人物自检面板时，需要关闭已有的铺子页面
-                    right_root.skinshop_legion:Kill()
-                    right_root.skinshop_legion = nil
-                end
-
-                self.skinshop_l_button = self.proot:AddChild(TEMPLATES.IconButton(
-                    "images/icon_skinbar_shadow_l.xml", "icon_skinbar_shadow_l.tex", "棱镜鸡毛铺", false, false,
-                    function()
-                        if right_root.skinshop_legion then
-                            right_root.skinshop_legion:Kill()
-                        end
-                        -- local SkinLegionDialog = _G.require("widgets/skinlegiondialog") --test：动态更新
-                        right_root.skinshop_legion = right_root:AddChild(SkinLegionDialog(self.owner))
-                        right_root.skinshop_legion:SetPosition(-380, 0)
-                        -- self:Close() --为啥
-                    end,
-                    nil, "self_inspect_mod.tex"
-                ))
-                self.skinshop_l_button.icon:SetScale(.6)
-                self.skinshop_l_button.icon:SetPosition(-4, 6)
-                self.skinshop_l_button:SetScale(0.65)
-                self.skinshop_l_button:SetPosition(-100, -273)
-
-                -- self.skinshop_l_button = self.proot:AddChild(
-                --     ImageButton("images/global_redux.xml", "button_carny_long_normal.tex",
-                --         "button_carny_long_hover.tex", "button_carny_long_disabled.tex", "button_carny_long_down.tex")
-                -- )
-                -- self.skinshop_l_button.image:SetScale(0.2, 0.5)
-                -- self.skinshop_l_button:SetFont(CHATFONT)
-                -- self.skinshop_l_button:SetPosition(-80, -271)
-                -- self.skinshop_l_button.text:SetColour(0,0,0,1)
-                -- self.skinshop_l_button:SetTextSize(26)
-                -- self.skinshop_l_button:SetText("*")
-                -- self.skinshop_l_button:SetOnClick(function()
-                --     if right_root.skinshop_legion then
-                --         right_root.skinshop_legion:Kill()
-                --     end
-                --     right_root.skinshop_legion = right_root:AddChild(SkinLegionDialog(self.owner))
-                --     right_root.skinshop_legion:SetPosition(-380, 0)
-                --     self:Close()
-                -- end)
+            local right_root = GetRightRoot()
+            if right_root == nil then
+                return
             end
+            if right_root.skinshop_l then --再次打开人物自检面板时，需要关闭已有的铺子页面
+                right_root.skinshop_l:Kill()
+                right_root.skinshop_l = nil
+            end
+
+            self.skinshop_l_button = self.root:AddChild(TEMPLATES.IconButton(
+                "images/icon_skinbar_shadow_l.xml", "icon_skinbar_shadow_l.tex", "棱镜鸡毛铺", false, false,
+                function()
+                    if right_root.skinshop_l then
+                        right_root.skinshop_l:Kill()
+                    end
+                    -- local SkinLegionDialog = _G.require("widgets/skinlegiondialog") --test：动态更新
+                    right_root.skinshop_l = right_root:AddChild(SkinLegionDialog(self.owner))
+                    right_root.skinshop_l:SetPosition(-380, 0)
+                    -- self:Kill() --直接删除并不能去除暂停状态
+                    --去除当前的全局弹窗。必须去除暂停，否则会导致刷新皮肤的响应也暂停
+                    TheFrontEnd:PopScreen()
+                end,
+                nil, "self_inspect_mod.tex"
+            ))
+            self.skinshop_l_button.icon:SetScale(.6)
+            self.skinshop_l_button.icon:SetPosition(-4, 6)
+            self.skinshop_l_button:SetScale(0.65)
+            self.skinshop_l_button:SetPosition(246, -260)
         end
     end
 end
