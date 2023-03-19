@@ -1534,7 +1534,7 @@ local mapseeds = {
     mandrake = {
         swap = { build = "siving_turn", file = "swap_mandrake", symboltype = "1" },
         fruit = "seeds_mandrake_l", time = 20*TUNING.TOTAL_DAY_TIME,
-        fruitnum_min = 1, fruitnum_max = 1
+        fruitnum_min = 1, fruitnum_max = 1, genekey = "mandrakesoup"
     },
     gourd_oversized = {
         swap = { build = "farm_plant_gourd", file = "swap_body", symboltype = "3" },

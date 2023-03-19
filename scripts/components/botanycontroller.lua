@@ -210,8 +210,8 @@ local function ComputSoils(self, fn_tile, fn_wither, fn_check, fn_tend, tags)
         fn_tend(self, x, y, z)
     end
 
-    for k1 = -28,28,4 do
-        for k2 = -28,28,4 do
+    for k1 = -20,20,4 do
+        for k2 = -20,20,4 do
             local tile = TheWorld.Map:GetTileAtPoint(x+k1, 0, z+k2)
             if tile == GROUND.FARMING_SOIL then
                 if fn_tile(self, x+k1, 0, z+k2) and fn_check(self) then

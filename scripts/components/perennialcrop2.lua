@@ -96,6 +96,13 @@ local function CancelTaskGrow(self)
 		self.taskgrow = nil
 	end
 end
+local function GetFruitNum(self)
+	if self.pollinated >= self.pollinated_max then
+		return (self.numfruit or 1) + 1
+	else
+		return self.numfruit or 1
+	end
+end
 
 function PerennialCrop2:SetUp(cropprefab, data)
 	self.cropprefab = cropprefab
@@ -213,7 +220,7 @@ function PerennialCrop2:SetStage(stage, isrotten, skip) --设置为某阶段
 	elseif stage == self.stage_max or level.pickable == 1 then
 		if type(level.anim) == 'table' then
 			local minnum = #level.anim
-			minnum = math.min(minnum, self.numfruit or 1)
+			minnum = math.min(minnum, GetFruitNum(self))
 			self.inst.AnimState:PlayAnimation(level.anim[minnum], true)
 		else
 			self.inst.AnimState:PlayAnimation(level.anim, true)
@@ -491,7 +498,7 @@ function PerennialCrop2:DoGrowth(skip) --生长到下一阶段
 	elseif data.stage == self.regrowstage or data.stage == 1 then --重新开始生长时，清空某些数据
 		--如果过熟了，掉落果子，给周围植物、土地和子圭管理者施肥
 		if data.overripe then
-			local num = self.cluster + (self.numfruit or 1)
+			local num = self.cluster + GetFruitNum(self)
 			local numpoop = math.ceil( num*(0.5 + math.random()*0.5) )
 			local numloot = num - numpoop
 			local pos = self.inst:GetPosition()

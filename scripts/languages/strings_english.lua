@@ -2636,6 +2636,25 @@ S_________WURT.DESCRIBE.LANCE_CARROT_L = "Ha, I think it suits me very well."
 -- S_______WALTER.DESCRIBE.LANCE_CARROT_L = ""
 S________WANDA.DESCRIBE.LANCE_CARROT_L = "Nothing new."
 
+S_NAMES.PLANT_NEPENTHES_L = "Vase Herb" --巨食草
+S______GENERIC.DESCRIBE.PLANT_NEPENTHES_L = "What a big insect eating plant!"
+-- S_______WILLOW.DESCRIBE.PLANT_NEPENTHES_L = ""
+S_____WOLFGANG.DESCRIBE.PLANT_NEPENTHES_L = "谢天谢地，沃尔夫冈的菜园有救了。"
+-- S________WENDY.DESCRIBE.PLANT_NEPENTHES_L = ""
+S_________WX78.DESCRIBE.PLANT_NEPENTHES_L = "向害虫进军吧！"
+S_WICKERBOTTOM.DESCRIBE.PLANT_NEPENTHES_L = "它的消化液能分解绝大多数材料。"
+S_______WOODIE.DESCRIBE.PLANT_NEPENTHES_L = "没见过，不熟。"
+-- S______WAXWELL.DESCRIBE.PLANT_NEPENTHES_L = ""
+-- S___WATHGRITHR.DESCRIBE.PLANT_NEPENTHES_L = ""
+S_______WEBBER.DESCRIBE.PLANT_NEPENTHES_L = "里面一定是捉迷藏的绝佳地点！"
+S_______WINONA.DESCRIBE.PLANT_NEPENTHES_L = "神奇植物在这里！"
+S_______WORTOX.DESCRIBE.PLANT_NEPENTHES_L = "它不吃我，我也不吃它。"
+S_____WORMWOOD.DESCRIBE.PLANT_NEPENTHES_L = "非常可靠的朋友！"
+-- S________WARLY.DESCRIBE.PLANT_NEPENTHES_L = ""
+-- S_________WURT.DESCRIBE.PLANT_NEPENTHES_L = ""
+-- S_______WALTER.DESCRIBE.PLANT_NEPENTHES_L = ""
+S________WANDA.DESCRIBE.PLANT_NEPENTHES_L = "我以前见过的可没这么大。"
+
 --------------------------------------------------------------------------
 --[[ flash and crush ]]--[[ 电闪雷鸣 ]]
 --------------------------------------------------------------------------
@@ -3363,6 +3382,18 @@ S_RECIPE_DESC.CARPET_WHITEWOOD = "A simple wooden mat."
 
 S_NAMES.CARPET_WHITEWOOD_BIG = "White Wood Carpet" --白木地毯
 S_RECIPE_DESC.CARPET_WHITEWOOD_BIG = "A large wooden carpet."
+
+S_NAMES.CARPET_PLUSH = "Plush Mat" --线绒地垫
+S_RECIPE_DESC.CARPET_PLUSH = "A simple fluffy mat."
+
+S_NAMES.CARPET_PLUSH_BIG = "Plush Carpet" --线绒地毯
+S_RECIPE_DESC.CARPET_PLUSH_BIG = "A large fluffy carpet."
+
+S_NAMES.CARPET_SIVING = "Hard Rock Mat" --棱石地垫
+S_RECIPE_DESC.CARPET_SIVING = "A simple rocky mat."
+
+S_NAMES.CARPET_SIVING_BIG = "Hard Rock Carpet" --棱石地毯
+S_RECIPE_DESC.CARPET_SIVING_BIG = "A large rocky carpet."
 
 --------------------------------------------------------------------------
 --[[ other ]]--[[ 其他 ]]

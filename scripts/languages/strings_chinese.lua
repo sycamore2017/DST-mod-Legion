@@ -2729,6 +2729,25 @@ S_________WURT.DESCRIBE.LANCE_CARROT_L = "哈，我觉得它很适合我。"
 -- S_______WALTER.DESCRIBE.LANCE_CARROT_L = ""
 S________WANDA.DESCRIBE.LANCE_CARROT_L = "没啥好稀奇的。"
 
+S_NAMES.PLANT_NEPENTHES_L = "巨食草"
+S______GENERIC.DESCRIBE.PLANT_NEPENTHES_L = "好大一棵食虫植物！"
+-- S_______WILLOW.DESCRIBE.PLANT_NEPENTHES_L = ""
+S_____WOLFGANG.DESCRIBE.PLANT_NEPENTHES_L = "谢天谢地，沃尔夫冈的菜园有救了。"
+-- S________WENDY.DESCRIBE.PLANT_NEPENTHES_L = ""
+S_________WX78.DESCRIBE.PLANT_NEPENTHES_L = "向害虫进军吧！"
+S_WICKERBOTTOM.DESCRIBE.PLANT_NEPENTHES_L = "它的消化液能分解绝大多数材料。"
+S_______WOODIE.DESCRIBE.PLANT_NEPENTHES_L = "没见过，不熟。"
+-- S______WAXWELL.DESCRIBE.PLANT_NEPENTHES_L = ""
+-- S___WATHGRITHR.DESCRIBE.PLANT_NEPENTHES_L = ""
+S_______WEBBER.DESCRIBE.PLANT_NEPENTHES_L = "里面一定是捉迷藏的绝佳地点！"
+S_______WINONA.DESCRIBE.PLANT_NEPENTHES_L = "神奇植物在这里！"
+S_______WORTOX.DESCRIBE.PLANT_NEPENTHES_L = "它不吃我，我也不吃它。"
+S_____WORMWOOD.DESCRIBE.PLANT_NEPENTHES_L = "非常可靠的朋友！"
+-- S________WARLY.DESCRIBE.PLANT_NEPENTHES_L = ""
+-- S_________WURT.DESCRIBE.PLANT_NEPENTHES_L = ""
+-- S_______WALTER.DESCRIBE.PLANT_NEPENTHES_L = ""
+S________WANDA.DESCRIBE.PLANT_NEPENTHES_L = "我以前见过的可没这么大。"
+
 --------------------------------------------------------------------------
 --[[ flash and crush ]]--[[ 电闪雷鸣 ]]
 --------------------------------------------------------------------------
@@ -3489,6 +3508,18 @@ S_RECIPE_DESC.CARPET_WHITEWOOD = "一张木肤质感的地垫。"
 
 S_NAMES.CARPET_WHITEWOOD_BIG = "白木地毯"
 S_RECIPE_DESC.CARPET_WHITEWOOD_BIG = "一张木肤质感的大号地毯。"
+
+S_NAMES.CARPET_PLUSH = "线绒地垫"
+S_RECIPE_DESC.CARPET_PLUSH = "一张毛茸茸质感的地垫。"
+
+S_NAMES.CARPET_PLUSH_BIG = "线绒地毯"
+S_RECIPE_DESC.CARPET_PLUSH_BIG = "一张毛茸茸质感的大号地毯。"
+
+S_NAMES.CARPET_SIVING = "棱石地垫"
+S_RECIPE_DESC.CARPET_SIVING = "一张坚石质感的地垫。"
+
+S_NAMES.CARPET_SIVING_BIG = "棱石地毯"
+S_RECIPE_DESC.CARPET_SIVING_BIG = "一张坚石质感的大号地毯。"
 
 --------------------------------------------------------------------------
 --[[ tips ]]--[[ 加载台词 ]]
