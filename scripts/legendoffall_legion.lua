@@ -20,6 +20,8 @@ local assets = {
     Asset("ANIM", "anim/mushroom_farm_foliage2_build.zip"), --蕨叶(洞穴)的蘑菇农场贴图
     Asset("ANIM", "anim/farm_plant_pineananas.zip"),
     Asset("ANIM", "anim/player_actions_roll.zip"), --脱壳之翅所需动作（来自单机版）
+    Asset("ANIM", "anim/crop_legion_cactus.zip"), --异种动画，让子圭育提前用的
+    Asset("ANIM", "anim/crop_legion_lureplant.zip"),
 
     Asset("ATLAS", "images/inventoryimages/siving_soil_item.xml"), --预加载，给科技栏用的
     Asset("IMAGE", "images/inventoryimages/siving_soil_item.tex"),
@@ -1385,11 +1387,40 @@ _G.CROPS_DATA_LEGION.cactus_meat = {
         inst:DoTaskInTime(0.1, OnSummer_cactus)
     end
 }
--- _G.CROPS_DATA_LEGION.plantmeat = {
---     growthmults = { 0.8, 1.2, 1.2, 0 }, --春xxx
---     regrowstage = 1,
---     bank = "crop_legion_lureplant", build = "crop_legion_lureplant",
--- }
+_G.CROPS_DATA_LEGION.plantmeat = {
+    growthmults = { 0.8, 1.2, 0.8, 0 }, --春x秋x
+    regrowstage = 1, cangrowindrak = true, getsickchance = 0,
+    plant2 = "plant_nepenthes_l", --这个的三阶段是单独的实体，也需要升级
+    bank = "crop_legion_lureplant", build = "crop_legion_lureplant",
+    leveldata = {
+        { anim = "level1", time = time_crop*0.45, deadanim = "dead1", witheredprefab = nil },
+        { anim = "level2", time = time_crop*0.55, deadanim = "dead1", witheredprefab = {"cutgrass" ,"cutgrass"} },
+        { anim = "idle", time = nil, deadanim = "dead1", witheredprefab = {"cutgrass" ,"cutgrass", "cutgrass"}, pickable = -1 }
+    },
+    cluster_size = { 0.9, 1.5 },
+    fn_growth = function(self, data) --成熟阶段得换成生物实体
+        if data.stage < self.stage_max then
+            return
+        end
+        local plant = SpawnPrefab("plant_nepenthes_l")
+        if plant ~= nil then
+            plant.components.perennialcrop2.cluster = self.cluster --继承状态
+            plant.Transform:SetPosition(self.inst.Transform:GetWorldPosition())
+        end
+        self.inst:Remove()
+    end,
+    fn_stage = function(self) --成熟阶段枯萎，变回1阶段的植物实体
+        if self.stage < self.stage_max or not self.isrotten then
+            return
+        end
+        -- local plant = SpawnPrefab("plant_plantmeat_l")
+        -- if plant ~= nil then
+        --     plant.components.perennialcrop2.cluster = self.cluster --继承状态
+        --     plant.Transform:SetPosition(self.inst.Transform:GetWorldPosition())
+        -- end
+        -- self.inst:Remove()
+    end
+}
 
 --------------------------------------------------------------------------
 --[[ 修改浣猫，让猫薄荷对其产生特殊作用 ]]
@@ -1548,7 +1579,12 @@ local mapseeds = {
     cactus_flower = {
         swap = { build = "crop_legion_cactus", file = "swap_turn", symboltype = "1" },
         fruit = "seeds_cactus_meat_l", time = 2*TUNING.TOTAL_DAY_TIME,
-        fruitnum_min = 1, fruitnum_max = 1, genekey = nil --undo 还没设置key捏
+        fruitnum_min = 1, fruitnum_max = 1, genekey = "tissue_l_cactus"
+    },
+    lureplantbulb = {
+        swap = { build = "crop_legion_lureplant", file = "swap_turn", symboltype = "1" },
+        fruit = "seeds_plantmeat_l", time = 2*TUNING.TOTAL_DAY_TIME,
+        fruitnum_min = 1, fruitnum_max = 1, genekey = "tissue_l_lureplant"
     }
 }
 for k,v in pairs(mapseeds) do

@@ -20,6 +20,8 @@ local ctlFuledItems = {
     lileaves = { moisture = nil, nutrients = { 12, 48, 12 } },
     orchitwigs = { moisture = nil, nutrients = { 48, 12, 12 } },
     lance_carrot_l = { moisture = nil, nutrients = { 24, 24, 24 } },
+    tissue_l_cactus = { moisture = nil, nutrients = { 8, nil, 8 } },
+    tissue_l_lureplant = { moisture = nil, nutrients = { 8, nil, 8 } },
 
     --【猥琐联盟】
     weisuo_coppery_kela = { moisture = nil, nutrients = { 2, 2, 2 } },
