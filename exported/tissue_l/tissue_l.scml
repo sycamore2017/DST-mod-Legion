@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<spriter_data scml_version="1.0" generator="BrashMonkey Spriter" generator_version="r7">
+    <folder id="0" name="base">
+        <file id="0" name="base/base-0.png" width="176" height="80" pivot_x="0.5" pivot_y="0.54"/>
+    </folder>
+    <folder id="1" name="cactus">
+        <file id="0" name="cactus/cactus-0.png" width="126" height="111" pivot_x="0.5" pivot_y="0.25"/>
+    </folder>
+    <folder id="2" name="lureplant">
+        <file id="0" name="lureplant/lureplant-0.png" width="126" height="117" pivot_x="0.5" pivot_y="0.3"/>
+    </folder>
+    <entity id="0" name="tissue_l">
+        <animation id="0" name="idle" length="1000" interval="100">
+            <mainline>
+                <key id="0">
+                    <object_ref id="0" timeline="0" key="0" z_index="0"/>
+                </key>
+            </mainline>
+            <timeline id="0" name="base-0">
+                <key id="0" spin="0">
+                    <object folder="0" file="0" x="-2" y="-3"/>
+                </key>
+            </timeline>
+        </animation>
+        <animation id="1" name="idle_cactus" length="1000" interval="100">
+            <mainline>
+                <key id="0">
+                    <object_ref id="0" timeline="0" key="0" z_index="0"/>
+                    <object_ref id="1" timeline="1" key="0" z_index="1"/>
+                </key>
+            </mainline>
+            <timeline id="0" name="base-0">
+                <key id="0" spin="0">
+                    <object folder="0" file="0" x="-2" y="-3"/>
+                </key>
+            </timeline>
+            <timeline id="1" name="cactus-0">
+                <key id="0" spin="0">
+                    <object folder="1" file="0" x="2.798913" y="11.070652"/>
+                </key>
+            </timeline>
+        </animation>
+        <animation id="2" name="idle_lureplant" length="1000" interval="100">
+            <mainline>
+                <key id="0">
+                    <object_ref id="0" timeline="0" key="0" z_index="0"/>
+                    <object_ref id="1" timeline="1" key="0" z_index="1"/>
+                </key>
+            </mainline>
+            <timeline id="0" name="base-0">
+                <key id="0" spin="0">
+                    <object folder="0" file="0" x="-2" y="-3"/>
+                </key>
+            </timeline>
+            <timeline id="1" name="lureplant-0">
+                <key id="0" spin="0">
+                    <object folder="2" file="0" x="1.686902" y="10.750905"/>
+                </key>
+            </timeline>
+        </animation>
+    </entity>
+</spriter_data>

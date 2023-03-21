@@ -138,6 +138,14 @@ MakeCarpets({
     name = "whitewood", fn_server1 = OnSet_wood, fn_server2 = OnSet_wood
 })
 
+--------------------------------------------------------------------------
+--[[ 线绒地垫、地毯 ]]
+--------------------------------------------------------------------------
+
+MakeCarpets({
+    name = "plush", fn_server1 = OnSet_wood, fn_server2 = OnSet_wood
+})
+
 --------------------
 --------------------
 

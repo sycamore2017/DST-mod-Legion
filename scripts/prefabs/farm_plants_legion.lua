@@ -964,6 +964,50 @@ local function MakePlant2(cropprefab, sets)
 end
 
 --------------------------------------------------------------------------
+--[[ 活性组织 ]]
+--------------------------------------------------------------------------
+
+local function MakeTissue(name)
+	local myname = "tissue_l_"..name
+	local assets = {
+		Asset("ANIM", "anim/tissue_l.zip"),
+		Asset("ATLAS", "images/inventoryimages/"..myname..".xml"),
+    	Asset("IMAGE", "images/inventoryimages/"..myname..".tex")
+	}
+
+	return Prefab(
+		myname,
+		function()
+			local inst = CreateEntity()
+
+			inst.entity:AddTransform()
+			inst.entity:AddAnimState()
+			inst.entity:AddNetwork()
+
+			inst.AnimState:SetBank("tissue_l")
+			inst.AnimState:SetBuild("tissue_l")
+			inst.AnimState:PlayAnimation("idle_"..name, false)
+
+			-- inst:AddTag("plant")
+
+			inst.entity:SetPristine()
+			if not TheWorld.ismastersim then
+				return inst
+			end
+
+			inst:AddComponent("inspectable")
+			inst.components.inspectable.nameoverride = "TISSUE_L" --用来统一描述
+
+			return inst
+		end,
+		assets, nil
+	)
+end
+
+-- MakeTissue("cactus")
+-- MakeTissue("lureplant")
+
+--------------------------------------------------------------------------
 --[[ 胡萝卜长枪 ]]
 --------------------------------------------------------------------------
 

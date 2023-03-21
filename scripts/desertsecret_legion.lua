@@ -273,6 +273,24 @@ AddRecipe2(
         testfn = PlacerTest_carpet2
     }, { "DECOR" }
 )
+AddRecipe2(
+    "carpet_plush", {
+        Ingredient("shyerrylog", 1, "images/inventoryimages/shyerrylog.xml")
+    }, TECH.NONE, {
+        placer = "carpet_plush_placer", min_spacing = 0,
+        atlas = "images/inventoryimages/carpet_plush.xml", image = "carpet_plush.tex",
+        testfn = PlacerTest_carpet
+    }, { "DECOR" }
+)
+AddRecipe2(
+    "carpet_plush_big", {
+        Ingredient("shyerrylog", 4, "images/inventoryimages/shyerrylog.xml")
+    }, TECH.SCIENCE_ONE, {
+        placer = "carpet_plush_big_placer", min_spacing = 0,
+        atlas = "images/inventoryimages/carpet_plush_big.xml", image = "carpet_plush_big.tex",
+        testfn = PlacerTest_carpet2
+    }, { "DECOR" }
+)
 
 if CONFIGS_LEGION.DRESSUP then
     AddRecipe2(

@@ -57,6 +57,10 @@ local assets = {
     Asset("IMAGE", "images/inventoryimages/hat_elepheetle.tex"),
     Asset("ATLAS", "images/inventoryimages/armor_elepheetle.xml"),
     Asset("IMAGE", "images/inventoryimages/armor_elepheetle.tex"),
+    Asset("ATLAS", "images/inventoryimages/carpet_plush_big.xml"),
+    Asset("IMAGE", "images/inventoryimages/carpet_plush_big.tex"),
+    Asset("ATLAS", "images/inventoryimages/carpet_plush.xml"),
+    Asset("IMAGE", "images/inventoryimages/carpet_plush.tex"),
 }
 
 for k,v in pairs(assets) do
@@ -1387,40 +1391,40 @@ _G.CROPS_DATA_LEGION.cactus_meat = {
         inst:DoTaskInTime(0.1, OnSummer_cactus)
     end
 }
-_G.CROPS_DATA_LEGION.plantmeat = {
-    growthmults = { 0.8, 1.2, 0.8, 0 }, --春x秋x
-    regrowstage = 1, cangrowindrak = true, getsickchance = 0,
-    plant2 = "plant_nepenthes_l", --这个的三阶段是单独的实体，也需要升级
-    bank = "crop_legion_lureplant", build = "crop_legion_lureplant",
-    leveldata = {
-        { anim = "level1", time = time_crop*0.45, deadanim = "dead1", witheredprefab = nil },
-        { anim = "level2", time = time_crop*0.55, deadanim = "dead1", witheredprefab = {"cutgrass" ,"cutgrass"} },
-        { anim = "idle", time = nil, deadanim = "dead1", witheredprefab = {"cutgrass" ,"cutgrass", "cutgrass"}, pickable = -1 }
-    },
-    cluster_size = { 0.9, 1.5 },
-    fn_growth = function(self, data) --成熟阶段得换成生物实体
-        if data.stage < self.stage_max then
-            return
-        end
-        local plant = SpawnPrefab("plant_nepenthes_l")
-        if plant ~= nil then
-            plant.components.perennialcrop2.cluster = self.cluster --继承状态
-            plant.Transform:SetPosition(self.inst.Transform:GetWorldPosition())
-        end
-        self.inst:Remove()
-    end,
-    fn_stage = function(self) --成熟阶段枯萎，变回1阶段的植物实体
-        if self.stage < self.stage_max or not self.isrotten then
-            return
-        end
-        -- local plant = SpawnPrefab("plant_plantmeat_l")
-        -- if plant ~= nil then
-        --     plant.components.perennialcrop2.cluster = self.cluster --继承状态
-        --     plant.Transform:SetPosition(self.inst.Transform:GetWorldPosition())
-        -- end
-        -- self.inst:Remove()
-    end
-}
+-- _G.CROPS_DATA_LEGION.plantmeat = {
+--     growthmults = { 0.8, 1.2, 0.8, 0 }, --春x秋x
+--     regrowstage = 1, cangrowindrak = true, getsickchance = 0,
+--     plant2 = "plant_nepenthes_l", --这个的三阶段是单独的实体，也需要升级
+--     bank = "crop_legion_lureplant", build = "crop_legion_lureplant",
+--     leveldata = {
+--         { anim = "level1", time = time_crop*0.45, deadanim = "dead1", witheredprefab = nil },
+--         { anim = "level2", time = time_crop*0.55, deadanim = "dead1", witheredprefab = {"cutgrass" ,"cutgrass"} },
+--         { anim = "idle", time = nil, deadanim = "dead1", witheredprefab = {"cutgrass" ,"cutgrass", "cutgrass"}, pickable = -1 }
+--     },
+--     cluster_size = { 0.9, 1.5 },
+--     fn_growth = function(self, data) --成熟阶段得换成生物实体
+--         if data.stage < self.stage_max then
+--             return
+--         end
+--         local plant = SpawnPrefab("plant_nepenthes_l")
+--         if plant ~= nil then
+--             plant.components.perennialcrop2.cluster = self.cluster --继承状态
+--             plant.Transform:SetPosition(self.inst.Transform:GetWorldPosition())
+--         end
+--         self.inst:Remove()
+--     end,
+--     fn_stage = function(self) --成熟阶段枯萎，变回1阶段的植物实体
+--         if self.stage < self.stage_max or not self.isrotten then
+--             return
+--         end
+--         -- local plant = SpawnPrefab("plant_plantmeat_l")
+--         -- if plant ~= nil then
+--         --     plant.components.perennialcrop2.cluster = self.cluster --继承状态
+--         --     plant.Transform:SetPosition(self.inst.Transform:GetWorldPosition())
+--         -- end
+--         -- self.inst:Remove()
+--     end
+-- }
 
 --------------------------------------------------------------------------
 --[[ 修改浣猫，让猫薄荷对其产生特殊作用 ]]
