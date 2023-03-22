@@ -2185,6 +2185,9 @@ AddStategraphActionHandler("wilson_client", ActionHandler(ACTIONS.POUR_WATER_LEG
 if IsServer then
     local function FnSet_pitchfork(inst)
         inst:AddComponent("carpetpullerlegion")
+
+        inst.components.finiteuses:SetConsumption(ACTIONS.REMOVE_CARPET_L, --叉起地毯的消耗和叉起地皮一样
+            inst.components.finiteuses.consumption[ACTIONS.TERRAFORM] or 1)
     end
     AddPrefabPostInit("pitchfork", FnSet_pitchfork)
     AddPrefabPostInit("goldenpitchfork", FnSet_pitchfork)

@@ -975,7 +975,7 @@ local function MakeTissue(name)
     	Asset("IMAGE", "images/inventoryimages/"..myname..".tex")
 	}
 
-	return Prefab(
+	table.insert(prefs, Prefab(
 		myname,
 		function()
 			local inst = CreateEntity()
@@ -984,11 +984,20 @@ local function MakeTissue(name)
 			inst.entity:AddAnimState()
 			inst.entity:AddNetwork()
 
+			MakeInventoryPhysics(inst)
+
 			inst.AnimState:SetBank("tissue_l")
 			inst.AnimState:SetBuild("tissue_l")
 			inst.AnimState:PlayAnimation("idle_"..name, false)
 
-			-- inst:AddTag("plant")
+			inst:AddTag("tissue_l") --这个标签没啥用，就想加上而已
+
+			MakeInventoryFloatable(inst, "small", 0.1, 1)
+			-- local OnLandedClient_old = inst.components.floater.OnLandedClient
+			-- inst.components.floater.OnLandedClient = function(self)
+			-- 	OnLandedClient_old(self)
+			-- 	self.inst.AnimState:SetFloatParams(0.02, 1, self.bob_percent)
+			-- end
 
 			inst.entity:SetPristine()
 			if not TheWorld.ismastersim then
@@ -998,14 +1007,31 @@ local function MakeTissue(name)
 			inst:AddComponent("inspectable")
 			inst.components.inspectable.nameoverride = "TISSUE_L" --用来统一描述
 
+			inst:AddComponent("inventoryitem")
+			inst.components.inventoryitem.imagename = myname
+			inst.components.inventoryitem.atlasname = "images/inventoryimages/"..myname..".xml"
+
+			inst:AddComponent("stackable")
+            inst.components.stackable.maxsize = TUNING.STACK_SIZE_SMALLITEM
+
+			inst:AddComponent("tradable")
+
+			inst:AddComponent("fuel")
+            inst.components.fuel.fuelvalue = TUNING.TINY_FUEL
+
+			MakeSmallBurnable(inst)
+            MakeSmallPropagator(inst)
+
+			MakeHauntableLaunchAndIgnite(inst)
+
 			return inst
 		end,
 		assets, nil
-	)
+	))
 end
 
--- MakeTissue("cactus")
--- MakeTissue("lureplant")
+MakeTissue("cactus")
+MakeTissue("lureplant")
 
 --------------------------------------------------------------------------
 --[[ 胡萝卜长枪 ]]

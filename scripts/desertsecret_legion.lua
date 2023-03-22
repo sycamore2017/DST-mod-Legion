@@ -230,6 +230,49 @@ local function PlacerTest_carpet2(pt, rot)
 end
 
 AddRecipe2(
+    "carpet_whitewood", {
+        Ingredient("shyerrylog", 1, "images/inventoryimages/shyerrylog.xml")
+    }, TECH.NONE, {
+        placer = "carpet_whitewood_placer", min_spacing = 0,
+        atlas = "images/inventoryimages/carpet_whitewood.xml", image = "carpet_whitewood.tex",
+        testfn = PlacerTest_carpet
+    }, { "DECOR" }
+)
+AddRecipe2(
+    "carpet_whitewood_big", {
+        Ingredient("shyerrylog", 4, "images/inventoryimages/shyerrylog.xml")
+    }, TECH.SCIENCE_ONE, {
+        placer = "carpet_whitewood_big_placer", min_spacing = 0,
+        atlas = "images/inventoryimages/carpet_whitewood_big.xml", image = "carpet_whitewood_big.tex",
+        testfn = PlacerTest_carpet2
+    }, { "DECOR" }
+)
+AddRecipe2(
+    "carpet_plush", {
+        Ingredient("cattenball", 1, "images/inventoryimages/cattenball.xml"),
+        Ingredient("beefalowool", 1),
+        Ingredient("beardhair", 1)
+    }, TECH.NONE, {
+        placer = "carpet_plush_placer", min_spacing = 0,
+        atlas = "images/inventoryimages/carpet_plush.xml", image = "carpet_plush.tex",
+        testfn = PlacerTest_carpet
+    }, { "DECOR" }
+)
+AddRecipe2(
+    "carpet_plush_big", {
+        Ingredient("cattenball", 2, "images/inventoryimages/cattenball.xml"),
+        Ingredient("beefalowool", 4),
+        Ingredient("beardhair", 2)
+    }, TECH.SCIENCE_ONE, {
+        placer = "carpet_plush_big_placer", min_spacing = 0,
+        atlas = "images/inventoryimages/carpet_plush_big.xml", image = "carpet_plush_big.tex",
+        testfn = PlacerTest_carpet2
+    }, { "DECOR" }
+)
+
+------
+
+AddRecipe2(
     "shield_l_sand", {
         Ingredient("townportaltalisman", 6),
         Ingredient("shield_l_log", 1, "images/inventoryimages/shield_l_log.xml"),
@@ -252,43 +295,6 @@ AddRecipe2(
     }, TECH.NONE, {
         numtogive = 6,
         atlas = "images/inventoryimages/mat_whitewood_item.xml", image = "mat_whitewood_item.tex"
-    }, { "DECOR" }
-)
-
-AddRecipe2(
-    "carpet_whitewood", {
-        Ingredient("shyerrylog", 1, "images/inventoryimages/shyerrylog.xml")
-    }, TECH.NONE, {
-        placer = "carpet_whitewood_placer", min_spacing = 0,
-        atlas = "images/inventoryimages/carpet_whitewood.xml", image = "carpet_whitewood.tex",
-        testfn = PlacerTest_carpet
-    }, { "DECOR" }
-)
-AddRecipe2(
-    "carpet_whitewood_big", {
-        Ingredient("shyerrylog", 4, "images/inventoryimages/shyerrylog.xml")
-    }, TECH.SCIENCE_ONE, {
-        placer = "carpet_whitewood_big_placer", min_spacing = 0,
-        atlas = "images/inventoryimages/carpet_whitewood_big.xml", image = "carpet_whitewood_big.tex",
-        testfn = PlacerTest_carpet2
-    }, { "DECOR" }
-)
-AddRecipe2(
-    "carpet_plush", {
-        Ingredient("shyerrylog", 1, "images/inventoryimages/shyerrylog.xml")
-    }, TECH.NONE, {
-        placer = "carpet_plush_placer", min_spacing = 0,
-        atlas = "images/inventoryimages/carpet_plush.xml", image = "carpet_plush.tex",
-        testfn = PlacerTest_carpet
-    }, { "DECOR" }
-)
-AddRecipe2(
-    "carpet_plush_big", {
-        Ingredient("shyerrylog", 4, "images/inventoryimages/shyerrylog.xml")
-    }, TECH.SCIENCE_ONE, {
-        placer = "carpet_plush_big_placer", min_spacing = 0,
-        atlas = "images/inventoryimages/carpet_plush_big.xml", image = "carpet_plush_big.tex",
-        testfn = PlacerTest_carpet2
     }, { "DECOR" }
 )
 
