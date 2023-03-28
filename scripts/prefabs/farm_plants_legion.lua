@@ -1226,6 +1226,204 @@ table.insert(prefs, Prefab(
     nil
 ))
 
+--------------------------------------------------------------------------
+--[[ 巨食草 三阶段 ]]
+--------------------------------------------------------------------------
+
+local sounds_nep = {
+    pant = "dontstarve/creatures/chester/pant",
+    pop = "dontstarve/creatures/chester/pop",
+    boing = "dontstarve/creatures/chester/boing",
+    lick = "dontstarve/creatures/chester/lick",
+
+	hurt = "dontstarve/creatures/chester/hurt",
+	death = "dontstarve/creatures/chester/death",
+    open = "dontstarve/creatures/chester/open",
+    close = "dontstarve/creatures/chester/close",
+	leaf = "dontstarve/wilson/pickup_reeds"
+}
+
+local function DisplayName_nep(inst)
+	local namepre = STRINGS.NAMES[string.upper(inst.prefab or "plant_carrot_l")]
+	local cluster = inst._cluster_l:value()
+	if cluster ~= nil and cluster > 0 then
+		namepre = namepre.."(Lv."..tostring(cluster)..")"
+	end
+
+	return namepre
+end
+
+local function DoDigest(inst)
+	inst.task_digest = nil
+	inst.AnimState:PushAnimation("idle", true)
+	-- inst.AnimState:PlayAnimation("idle", true)
+
+	--开始消化
+end
+local function StopDigest(inst)
+	if inst.task_digest ~= nil then
+		inst.task_digest:Cancel()
+		inst.task_digest = nil
+	end
+end
+local function TryDigest(inst, isclose)
+	StopDigest(inst)
+
+	local cpt = inst.components.container
+	for k,v in pairs(cpt.slots) do
+        if
+			v.prefab ~= "insectshell_l" and v.prefab ~= "boneshard" and
+			not v:HasTag("irreplaceable") and not v:HasTag("nodigest_l")
+		then
+			if isclose then
+				inst.AnimState:PlayAnimation("close")
+    			inst.AnimState:PushAnimation("eat", true)
+			else
+				inst.AnimState:PlayAnimation("eat", true)
+			end
+			inst.task_digest = inst:DoTaskInTime(5, DoDigest)
+			return
+		end
+    end
+end
+
+local function OnOpen_nep(inst)
+    inst.AnimState:PlayAnimation("open", false)
+    -- inst.AnimState:PushAnimation("opened", true)
+
+    inst.SoundEmitter:PlaySound(sounds_nep.leaf, nil, 0.6)
+	inst.SoundEmitter:PlaySound(sounds_nep.open, nil, 0.3)
+
+	StopDigest(inst)
+end
+local function OnClose_nep(inst)
+    inst.AnimState:PlayAnimation("close")
+    inst.AnimState:PushAnimation("idle", true)
+
+    inst.SoundEmitter:PlaySound(sounds_nep.leaf, nil, 0.6)
+	inst.SoundEmitter:PlaySound(sounds_nep.close, nil, 0.3)
+
+	TryDigest(inst, true)
+end
+
+local function Attacked_nep(inst, data)
+	if inst.components.health:IsDead() then
+		return
+	end
+
+	if data.attacker and data.attacker:HasTag("player") then
+		inst.components.health:DoDelta(-200)
+		if inst.components.health:IsDead() then
+			return
+		end
+	end
+
+	inst.components.container:Close()
+
+	inst.SoundEmitter:PlaySound(sounds_nep.leaf, nil, 0.6)
+	inst.SoundEmitter:PlaySound(sounds_nep.hurt, nil, 0.3)
+
+	inst.AnimState:PlayAnimation("hit")
+	inst.AnimState:PushAnimation("idle", true)
+end
+local function OnDeath_nep(inst)
+	inst.components.container:Close()
+	inst.components.container.canbeopened = false
+	inst.components.container:DropEverything()
+
+	inst.components.perennialcrop2:GenerateLoot(nil, true, false)
+
+	inst.SoundEmitter:PlaySound(sounds_nep.leaf, nil, 0.6)
+	inst.SoundEmitter:PlaySound(sounds_nep.death, nil, 0.3)
+
+	inst.AnimState:PlayAnimation("hit")
+	RemovePhysicsColliders(inst)
+
+	--转化到1阶段 undo
+end
+
+table.insert(prefs, Prefab(
+    "plant_nepenthes_l",
+    function()
+        local inst = CreateEntity()
+
+        inst.entity:AddTransform()
+		inst.entity:AddAnimState()
+		inst.entity:AddSoundEmitter()
+		inst.entity:AddMiniMapEntity()
+		inst.entity:AddNetwork()
+
+		inst:SetPhysicsRadiusOverride(.8)
+    	MakeObstaclePhysics(inst, inst.physicsradiusoverride)
+
+        inst.AnimState:SetBank("crop_legion_lureplant")
+        inst.AnimState:SetBuild("crop_legion_lureplant")
+        -- inst.AnimState:PlayAnimation("idle") --组件里会设置动画的
+
+		inst.MiniMapEntity:SetIcon("plant_crop_l.tex")
+
+		inst:AddTag("crop2_legion")
+		inst:AddTag("veggie")
+		inst:AddTag("notraptrigger")
+    	inst:AddTag("noauradamage")
+		inst:AddTag("companion")
+
+		inst._cluster_l = net_byte(inst.GUID, "plant_crop_l._cluster_l", "cluster_l_dirty")
+
+		inst.displaynamefn = DisplayName_nep
+
+        inst.entity:SetPristine()
+        if not TheWorld.ismastersim then
+			inst.OnEntityReplicated = function(inst) inst.replica.container:WidgetSetup("plant_nepenthes_l") end
+            return inst
+        end
+
+		inst:AddComponent("inspectable")
+
+		inst:AddComponent("health")
+    	inst.components.health:SetMaxHealth(1200)
+		inst.components.health.destroytime = 0.7
+
+		inst:AddComponent("combat")
+		inst.components.combat.hiteffectsymbol = "base"
+
+		inst:AddComponent("container")
+		inst.components.container:WidgetSetup("plant_nepenthes_l")
+        inst.components.container.onopenfn = OnOpen_nep
+        inst.components.container.onclosefn = OnClose_nep
+        inst.components.container.skipclosesnd = true
+        inst.components.container.skipopensnd = true
+
+		inst:AddComponent("perennialcrop2")
+		inst.components.perennialcrop2.StartGrowing = EmptyCptFn
+		inst.components.perennialcrop2.LongUpdate = EmptyCptFn
+		inst.components.perennialcrop2.OnEntityWake = EmptyCptFn
+		inst.components.perennialcrop2.OnEntitySleep = EmptyCptFn
+		inst.components.perennialcrop2:SetUp("plantmeat", CROPS_DATA_LEGION["plantmeat"])
+		inst.components.perennialcrop2.fn_defend = CallDefender
+		inst.components.perennialcrop2:SetStage(3, false, false)
+
+		inst:ListenForEvent("attacked", Attacked_nep)
+		inst:ListenForEvent("death", OnDeath_nep)
+
+		-- inst:DoTaskInTime(0, function()
+		-- 	OnIsDark_p2(inst)
+		-- end)
+
+		MakeHauntableDropFirstItem(inst)
+
+		if TUNING.SMART_SIGN_DRAW_ENABLE then
+			SMART_SIGN_DRAW(inst)
+		end
+
+        return inst
+    end,
+    {
+        Asset("ANIM", "anim/crop_legion_lureplant.zip"),
+    },
+    nil
+))
+
 --------------------
 --------------------
 

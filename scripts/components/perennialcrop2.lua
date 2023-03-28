@@ -983,6 +983,9 @@ function PerennialCrop2:Infest(doer, value) --侵害
 	if self.infested >= self.infested_max then
 		self.infested = 0
 		self:SetStage(self.stage, true, false)
+		if not self.inst:IsValid() then --巨食草需要的，枯萎时会移除自己
+			return true
+		end
 		self:StartGrowing() --开始枯萎计时
 	end
 
