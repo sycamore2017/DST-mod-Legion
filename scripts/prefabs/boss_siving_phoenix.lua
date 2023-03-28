@@ -7,6 +7,7 @@ local birdbrain = require("brains/siving_phoenixbrain")
 
 local LineMap = {
     silk = 2,
+    beardhair = 4,
     steelwool = 20,
     cattenball = 15
 }

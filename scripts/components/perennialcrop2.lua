@@ -1073,7 +1073,7 @@ function PerennialCrop2:PourWater(item, doer, value) --浇水
 	return true
 end
 
-function PerennialCrop2:DoMagicGrowth(doer, dt) --催熟
+function PerennialCrop2:DoMagicGrowth(doer, dt, ignorelvl) --催熟
 	--着火时无法被催熟
 	if self.inst.components.burnable ~= nil and self.inst.components.burnable:IsBurning() then
 		return false
@@ -1094,7 +1094,12 @@ function PerennialCrop2:DoMagicGrowth(doer, dt) --催熟
 	else
 		self:OnEntityWake() --更新已经经过的时间
 		if not self.inst:IsValid() then --生长时可能会移除实体
-			return
+			return false
+		end
+
+		--催熟时间会受到簇栽等级影响
+		if not ignorelvl then
+			dt = dt*Remap(self.cluster, 0, self.cluster_max, 1, 1/6)
 		end
 		self:LongUpdate(dt, false, true)
 	end

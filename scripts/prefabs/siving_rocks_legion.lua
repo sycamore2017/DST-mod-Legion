@@ -1461,11 +1461,11 @@ table.insert(prefs, Prefab(
         inst.entity:AddAnimState()
         inst.entity:AddNetwork()
 
-        MakeInventoryPhysics(inst)
-
         inst.AnimState:SetBank("farm_soil")
         inst.AnimState:SetBuild("siving_soil")
         -- inst.AnimState:PlayAnimation("till_idle")
+
+        inst:SetPhysicsRadiusOverride(TUNING.FARM_PLANT_PHYSICS_RADIUS)
 
         inst:AddTag("soil_legion")
 

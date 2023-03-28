@@ -967,6 +967,7 @@ _G.CROPS_DATA_LEGION.carrot = {
     -- cangrowindrak = true, --能否在黑暗中生长(默认不能)
     -- getsickchance = 0.007, --害虫产生率
     -- fireproof = false, --是否防火
+    -- nomagicgrow = true, --是否禁止被魔法催熟
     bank = "crop_legion_carrot", build = "crop_legion_carrot",
     leveldata = {
         { anim = "level1", time = time_crop*0.45, deadanim = "dead1", witheredprefab = nil },
@@ -1257,9 +1258,8 @@ _G.CROPS_DATA_LEGION.asparagus = {
 }
 _G.CROPS_DATA_LEGION.mandrake = {
     growthmults = { 1, 1, 1, 1.5 }, --xxx冬
-    regrowstage = 1,
+    regrowstage = 1, nomagicgrow = true, getsickchance = 0,
     bank = "crop_legion_mandrake", build = "crop_legion_mandrake",
-    getsickchance = 0,
     leveldata = {
         { anim = "level2", time = time_crop*0.5, deadanim = "dead1", witheredprefab = nil },
         { anim = "level3", time = time_crop*0.7, deadanim = "dead1", witheredprefab = {"cutgrass"} },
@@ -1351,7 +1351,7 @@ _G.CROPS_DATA_LEGION.cactus_meat = {
         { anim = { "level3_1", "level3_2", "level3_3" }, time = time_grow, deadanim = "dead1", witheredprefab = {"cutgrass"}, pickable = 1 },
         { anim = { "level4_1", "level4_2", "level4_3" }, time = time_day*6, deadanim = "dead1", witheredprefab = {"cutgrass"}, bloom = true }
     },
-    cluster_size = { 1, 1.4 },
+    cluster_size = { 0.9, 1.3 },
     fn_loot = function(self, doer, ispicked, isburnt, loots)
         if self.stage == self.stage_max or self.level.pickable == 1 then
             local lootother = nil
@@ -1745,6 +1745,84 @@ if IsServer then
                 end
             end
             return res
+        end
+    end)
+end
+
+--------------------------------------------------------------------------
+--[[ 活性组织获取方式 ]]
+--------------------------------------------------------------------------
+
+if IsServer then
+    ------仙人掌的
+    local function FnSet_cactus(inst)
+        local onpickedfn_old = inst.components.pickable.onpickedfn
+        inst.components.pickable.onpickedfn = function(inst, picker, ...)
+            if onpickedfn_old then
+                onpickedfn_old(inst, picker, ...)
+            end
+
+            if
+                not TheWorld.state.israining or
+                TheWorld.state.temperature < 20 or
+                math.random() >= 0.05
+            then
+                return
+            end
+
+            local loot = SpawnPrefab("tissue_l_cactus")
+            if loot then
+                loot.components.inventoryitem:InheritMoisture(TheWorld.state.wetness, TheWorld.state.iswet)
+                if picker ~= nil and picker.components.inventory ~= nil then
+                    picker.components.inventory:GiveItem(loot, nil, inst:GetPosition())
+                else
+                    local x, y, z = inst.Transform:GetWorldPosition()
+                    loot.components.inventoryitem:DoDropPhysics(x, y, z, true)
+                end
+            end
+        end
+    end
+    AddPrefabPostInit("cactus", FnSet_cactus)
+    AddPrefabPostInit("oasis_cactus", FnSet_cactus)
+
+    ------食人花的
+    local function OnDeath_lure(inst)
+        if inst.num_sivrock_l ~= nil and inst.num_sivrock_l >= 10 and math.random() < 0.33 then
+            inst.components.lootdropper:SpawnLootPrefab("tissue_l_lureplant")
+        end
+    end
+    AddPrefabPostInit("lureplant", function(inst)
+        local itemstodigestfn_old = inst.components.digester.itemstodigestfn
+        inst.components.digester.itemstodigestfn = function(owner, item, ...)
+            if item and item.prefab == "siving_rocks" then
+                owner.num_sivrock_l = (owner.num_sivrock_l or 0) + item.components.stackable.stacksize
+                owner.components.inventory:RemoveItem(item, true):Remove()
+                return false
+            end
+            if itemstodigestfn_old then
+                return itemstodigestfn_old(owner, item, ...)
+            end
+        end
+
+        inst:ListenForEvent("death", OnDeath_lure)
+
+        local OnLoad_old = inst.OnLoad
+        inst.OnLoad = function(inst, data)
+            if data ~= nil and data.num_sivrock_l ~= nil then
+                inst.num_sivrock_l = data.num_sivrock_l
+            end
+            if OnLoad_old then
+                OnLoad_old(inst, data)
+            end
+        end
+        local OnSave_old = inst.OnSave
+        inst.OnSave = function(inst, data)
+            if inst.num_sivrock_l ~= nil then
+                data.num_sivrock_l = inst.num_sivrock_l
+            end
+            if OnSave_old then
+                OnSave_old(inst, data)
+            end
         end
     end)
 end

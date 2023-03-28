@@ -451,8 +451,6 @@ local function MakePlant(data)
 			inst.entity:AddSoundEmitter()
 			inst.entity:AddNetwork()
 
-			MakeInventoryPhysics(inst)
-
 			inst.AnimState:SetBank(data.bank)
 			inst.AnimState:SetBuild(data.build)
 			inst.AnimState:OverrideSymbol("soil01", "siving_soil", "soil01")
@@ -776,7 +774,7 @@ local function OnPlant_p2(inst, pt)
 end
 local function DoMagicGrowth_p2(inst, doer)
 	if inst:IsValid() then
-		return inst.components.perennialcrop2:DoMagicGrowth(doer, 6*TUNING.TOTAL_DAY_TIME)
+		return inst.components.perennialcrop2:DoMagicGrowth(doer, 6*TUNING.TOTAL_DAY_TIME, false)
 	end
 	return false
 end
@@ -866,6 +864,8 @@ local function MakePlant2(cropprefab, sets)
 			inst.AnimState:SetBuild(sets.build)
 			-- inst.AnimState:PlayAnimation(sets.leveldata[1].anim, true) --组件里会设置动画的
 
+			inst:SetPhysicsRadiusOverride(TUNING.FARM_PLANT_PHYSICS_RADIUS)
+
 			if sets.bank == "plant_normal_legion" then
 				-- inst.AnimState:OverrideSymbol("dirt", "crop_soil_legion", "dirt")
 			else
@@ -901,12 +901,14 @@ local function MakePlant2(cropprefab, sets)
 			inst.components.hauntable:SetHauntValue(TUNING.HAUNT_TINY)
 			inst.components.hauntable:SetOnHauntFn(OnHaunt_p2)
 
-			inst:AddComponent("growable")
-			inst.components.growable.stages = {}
-			inst.components.growable:StopGrowing()
-			inst.components.growable.magicgrowable = true --非常规造林学生效标志（其他会由组件来施行）
-			inst.components.growable.domagicgrowthfn = DoMagicGrowth_p2
-			inst.components.growable.GetCurrentStageData = function(self) return { tendable = false } end
+			if not sets.nomagicgrow then --无法被魔法催熟，就不需要这个组件
+				inst:AddComponent("growable")
+				inst.components.growable.stages = {}
+				inst.components.growable:StopGrowing()
+				inst.components.growable.magicgrowable = true --非常规造林学生效标志（其他会由组件来施行）
+				inst.components.growable.domagicgrowthfn = DoMagicGrowth_p2
+				inst.components.growable.GetCurrentStageData = function(self) return { tendable = false } end
+			end
 
 			inst:AddComponent("farmplanttendable")
 			inst.components.farmplanttendable.ontendtofn = OnTendTo_p2

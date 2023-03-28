@@ -764,6 +764,7 @@ local function MakeRevolved(sets)
 
         inst:AddTag("meteor_protection") --防止被流星破坏
         --因为有容器组件，所以不会被猴子、食人花、坎普斯等拿走
+        inst:AddTag("nosteal") --防止被火药猴偷走
         inst:AddTag("NORATCHECK") --mod兼容：永不妥协。该道具不算鼠潮分
 
         inst:AddComponent("skinedlegion")

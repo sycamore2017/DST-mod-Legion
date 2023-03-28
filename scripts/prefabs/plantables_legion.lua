@@ -413,6 +413,9 @@ for k,v in pairs(CROPS_DATA_LEGION) do
         nil, nil, nil, nil, nil, nil, function(inst)
             inst.AnimState:Pause() --不想让placer动起来
             inst.AnimState:OverrideSymbol("soil", "crop_soil_legion", "soil")
+            if v.cluster_size ~= nil then
+                inst.AnimState:SetScale(v.cluster_size[1], v.cluster_size[1], v.cluster_size[1])
+            end
         end
     ))
 end
