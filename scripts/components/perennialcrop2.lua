@@ -1153,5 +1153,23 @@ function PerennialCrop2:ClusteredPlant(seeds, doer) --簇栽
 
 	return true
 end
+function PerennialCrop2:DoCluster(num) --单纯的簇栽升级，也可以降级
+	if self.cluster >= self.cluster_max then
+		return false
+	end
+
+	local newvalue = self.cluster + (num or 1)
+	if newvalue > self.cluster_max then
+		newvalue = self.cluster_max
+	elseif newvalue < 0 then
+		newvalue = 0
+	else
+		newvalue = math.floor(newvalue) --保证是整数
+	end
+	self.cluster = newvalue
+	self.inst._cluster_l:set(newvalue)
+
+	return newvalue < self.cluster_max
+end
 
 return PerennialCrop2

@@ -1242,6 +1242,7 @@ local sounds_nep = {
     close = "dontstarve/creatures/chester/close",
 	leaf = "dontstarve/wilson/pickup_reeds"
 }
+local 
 
 local function DisplayName_nep(inst)
 	local namepre = STRINGS.NAMES[string.upper(inst.prefab or "plant_carrot_l")]
@@ -1253,12 +1254,183 @@ local function DisplayName_nep(inst)
 	return namepre
 end
 
-local function DoDigest(inst)
+local function IsDigestible(item)
+	return item.prefab ~= "insectshell_l" and item.prefab ~= "boneshard" and
+		not item:HasTag("irreplaceable") and not item:HasTag("nodigest_l")
+end
+local function GetItemDesc(item, namemap, txt)
+	local name = item.nameoverride or
+		(item.components.inspectable ~= nil and item.components.inspectable.nameoverride) or
+		item.prefab or nil
+	if name ~= nil then
+		name = STRINGS.NAMES[string.upper(name)] or "MISSING NAME"
+	else
+		name = "MISSING NAME"
+	end
+	txt = txt..", "..tostring(namemap[item.prefab]).." "..name
+	namemap[item.prefab] = nil
+	return txt
+end
+local function IsValid(inst)
+	return inst ~= nil and inst:IsValid()
+end
+local function ScreeningItems(eater, item, items_digest, items_free, namemap)
+	local owner = item.components.inventoryitem and item.components.inventoryitem.owner or nil
+	if IsDigestible(item) then --可以消化的：需要从各自容器里拿出来，再统一删除
+		if owner ~= nil then
+			local cpt = owner.components.container or owner.components.inventory
+			if cpt ~= nil then
+				item = cpt:RemoveItem(item, true)
+			end
+		end
+		if item ~= nil then
+			table.insert(items_digest, item)
+			namemap[item.prefab] = (namemap[item.prefab] or 0) +
+									(item.components.stackable and item.components.stackable.stacksize or 1)
+			--递归判定容器物品中的物品
+			local cpt = item.components.container or item.components.inventory
+			if cpt ~= nil then
+				local cptitems = cpt:FindItems(IsValid)
+				for _, v in pairs(cptitems) do
+					ScreeningItems(eater, v, items_digest, items_free, namemap)
+				end
+			end
+		end
+	else --无法消化的：需要从非巨食草的容器里拿出来，再统一放进巨食草
+		if owner ~= nil then
+			if eater == owner then --如果本来就在巨食草里，就不用做什么操作啦
+				return
+			end
+			local cpt = owner.components.container or owner.components.inventory
+			if cpt ~= nil then
+				item = cpt:RemoveItem(item, true)
+			end
+		end
+		if item ~= nil then
+			table.insert(items_free, item)
+		end
+	end
+end
+local function SpawnDigestedItems(loot, name, num, pos)
+	local item = SpawnPrefab(name)
+	if item ~= nil then
+		if num > 1 and item.components.stackable ~= nil then
+			local maxsize = item.components.stackable.maxsize
+			if num <= maxsize then
+				item.components.stackable:SetStackSize(num)
+				num = 0
+			else
+				item.components.stackable:SetStackSize(maxsize)
+				num = num - maxsize
+			end
+		else
+			num = num - 1
+        end
+
+        item.Transform:SetPosition(pos:Get())
+        -- if item.components.inventoryitem ~= nil then
+        --     item.components.inventoryitem:OnDropped(true)
+        -- end
+		if loot ~= nil then
+			table.insert(loot, item)
+		end
+
+		if num >= 1 then
+			SpawnDigestedItems(loot, name, num, pos)
+		end
+	end
+end
+local function DoDigest(inst, doer)
 	inst.task_digest = nil
+
+	if inst.components.health:IsDead() then
+		return
+	end
+	inst.components.health:SetPercent(1)
+
 	inst.AnimState:PushAnimation("idle", true)
 	-- inst.AnimState:PlayAnimation("idle", true)
 
-	--开始消化
+	------先登记所有的物品
+	local items_digest = {}
+	local items_free = {}
+	local namemap = {}
+	local cpt = inst.components.container
+	local cptitems = cpt:FindItems(IsValid)
+	for _, v in pairs(cptitems) do
+		ScreeningItems(inst, v, items_digest, items_free, namemap)
+	end
+
+	------生成消化后产物，结算
+	local numprefab = {}
+	local numall = inst.count_digest
+	for name, number in pairs(namemap) do
+		numall = numall + number
+		if DIGEST_DATA_LEGION[name] ~= nil then
+			for k, v in pairs(DIGEST_DATA_LEGION[name]) do
+				numprefab[k] = (numprefab[k] or 0) + number*v
+			end
+		end
+	end
+	for name, number in pairs(numprefab) do
+		number = number*0.25
+		local number2 = math.floor(number) --整数部分
+		number = number - number2 --小数部分
+		if number > 0 then --小数部分也有几率产出
+			if math.random() < number/2 then
+				number2 = number2 + 1
+			end
+		end
+		number = number2
+		if number >= 1 then
+			SpawnDigestedItems(items_free, name, number, inst:GetPosition())
+		end
+	end
+
+	------簇栽升级
+	local cpt2 = inst.components.perennialcrop2
+	if cpt2.cluster < cpt2.cluster_max then
+		if numall >= 80 then
+			local timelevelup = math.floor(numall/80)
+			if cpt2:DoCluster(timelevelup) then
+				inst.count_digest = numall - timelevelup*80
+			else --返回false就代表不再能升级了，就没必要记录了
+				inst.count_digest = 0
+			end
+		else
+			inst.count_digest = numall
+		end
+	else
+		inst.count_digest = 0
+	end
+
+	------发送全服通告
+	if true then
+		local itemtxt = ""
+		for _, item in pairs(items_digest) do
+			if namemap[item.prefab] ~= nil then --不为空说明还没被记录进去
+				itemtxt = GetItemDesc(item, namemap, itemtxt)
+			end
+		end
+		if doer ~= nil then
+			itemtxt = subfmt(STRINGS.PLANT_CROP_L.DIGEST,
+				{ doer = tostring(doer.name), eater = STRINGS.NAMES[string.upper(inst.prefab)], items = itemtxt })
+		else
+			itemtxt = subfmt(STRINGS.PLANT_CROP_L.DIGESTSELF,
+				{ eater = STRINGS.NAMES[string.upper(inst.prefab)], items = itemtxt })
+		end
+		TheNet:Announce(itemtxt)
+	end
+
+	------整理物品
+	for _, item in pairs(items_digest) do --现在才删除，是因为全服通告需要实体来判定名字
+		item:Remove()
+	end
+	for _, item in pairs(items_free) do --将无法消化的放回巨食草里
+		if item:IsValid() then
+			cpt:GiveItem(item)
+		end
+	end
 end
 local function StopDigest(inst)
 	if inst.task_digest ~= nil then
@@ -1266,28 +1438,25 @@ local function StopDigest(inst)
 		inst.task_digest = nil
 	end
 end
-local function TryDigest(inst, isclose)
+local function TryDigest(inst, isclose, doer)
 	StopDigest(inst)
-
-	local cpt = inst.components.container
-	for k,v in pairs(cpt.slots) do
-        if
-			v.prefab ~= "insectshell_l" and v.prefab ~= "boneshard" and
-			not v:HasTag("irreplaceable") and not v:HasTag("nodigest_l")
-		then
+	for k,v in pairs(inst.components.container.slots) do
+        if IsDigestible(v) then
 			if isclose then
 				inst.AnimState:PlayAnimation("close")
     			inst.AnimState:PushAnimation("eat", true)
 			else
 				inst.AnimState:PlayAnimation("eat", true)
 			end
-			inst.task_digest = inst:DoTaskInTime(5, DoDigest)
+			inst.task_digest = inst:DoTaskInTime(5, function(inst)
+				DoDigest(inst, doer)
+			end)
 			return
 		end
     end
 end
 
-local function OnOpen_nep(inst)
+local function OnOpen_nep(inst, data)
     inst.AnimState:PlayAnimation("open", false)
     -- inst.AnimState:PushAnimation("opened", true)
 
@@ -1296,14 +1465,14 @@ local function OnOpen_nep(inst)
 
 	StopDigest(inst)
 end
-local function OnClose_nep(inst)
+local function OnClose_nep(inst, doer)
     inst.AnimState:PlayAnimation("close")
     inst.AnimState:PushAnimation("idle", true)
 
     inst.SoundEmitter:PlaySound(sounds_nep.leaf, nil, 0.6)
 	inst.SoundEmitter:PlaySound(sounds_nep.close, nil, 0.3)
 
-	TryDigest(inst, true)
+	TryDigest(inst, true, doer)
 end
 
 local function Attacked_nep(inst, data)
@@ -1377,6 +1546,8 @@ table.insert(prefs, Prefab(
 			inst.OnEntityReplicated = function(inst) inst.replica.container:WidgetSetup("plant_nepenthes_l") end
             return inst
         end
+
+		inst.count_digest = 0 --已消化物品的数量
 
 		inst:AddComponent("inspectable")
 

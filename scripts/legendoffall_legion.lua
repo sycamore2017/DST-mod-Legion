@@ -1426,6 +1426,28 @@ _G.CROPS_DATA_LEGION.plantmeat = {
     end
 }
 
+------巨食草消化结算清单
+if not _G.rawget(_G, "DIGEST_DATA_LEGION") then
+    _G.DIGEST_DATA_LEGION = {}
+end
+local digest_data_l = {
+    rabbit = { boneshard = 1, insectshell_l = nil }, --key value 对应 产物prefab 数量比例
+    -- carrat = { boneshard = 1 }, --胡萝卜鼠
+    -- fruitdragon = { boneshard = 1 }, --沙拉蝾螈
+    -- grassgekko = { boneshard = 1 }, --草蜥蜴
+    frog = { boneshard = 1 }, --青蛙
+    mole = { boneshard = 1 }, --鼹鼠
+    monkey = { boneshard = 1.2 }, --洞穴猴
+    mutated_penguin = { boneshard = 1 }, --变异企鹅
+    penguin = { boneshard = 1, feather_crow = 0.1 }, --企鹅
+    mossling = { boneshard = 1, goose_feather = 0.5 }, --小鹿鹅
+    lightcrab = { slurtle_shellpieces = 1 }, --发光蟹
+}
+for k,v in pairs(digest_data_l) do
+    _G.DIGEST_DATA_LEGION[k] = v
+end
+digest_data_l = nil
+
 --------------------------------------------------------------------------
 --[[ 修改浣猫，让猫薄荷对其产生特殊作用 ]]
 --------------------------------------------------------------------------

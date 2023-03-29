@@ -2321,6 +2321,8 @@ STRINGS.PLANT_CROP_L = {
     PREPOSITION = "的",
     FLORESCENCE = "花期",
     SEEDS = "异种",
+    DIGEST = "【{doer}】向{eater}投喂了{items}。",
+    DIGESTSELF = "{eater}消化了{items}。"
 }
 S_NAMES.PLANT_CARROT_L = "芾萝卜"
 S_NAMES.PLANT_CORN_L = "玉米杆"
