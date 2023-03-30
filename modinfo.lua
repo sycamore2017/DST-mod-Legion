@@ -535,6 +535,25 @@ configuration_options = {
         },
         default = 3
     },
+    L and {
+        name = "DigestedItemMsg",
+        label = "Digested-message of Vase Herb",
+        hover = "Send a server message when Vase Herb digest items.",
+        options = {
+            {description = "On(default)", data = true},
+            {description = "Off", data = false}
+        },
+        default = true
+    } or {
+        name = "DigestedItemMsg",
+        label = "巨食草消化提醒",
+        hover = "在巨食草消化物品时发送全服消息。毕竟它什么都吃，安全起见。",
+        options = {
+            {description = "开启(默认)", data = true},
+            {description = "关闭", data = false}
+        },
+        default = true
+    },
 
     -----
 

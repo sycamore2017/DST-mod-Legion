@@ -146,6 +146,7 @@ _G.CONFIGS_LEGION.PHOENIXREBIRTHCYCLE = GetModConfigData("PhoenixRebirthCycle") 
 _G.CONFIGS_LEGION.SIVINGROOTTEX = GetModConfigData("SivingRootTex") --设置子圭突触贴图
 _G.CONFIGS_LEGION.PHOENIXBATTLEDIFFICULTY = GetModConfigData("PhoenixBattleDifficulty") --设置玄鸟战斗难度
 _G.CONFIGS_LEGION.SIVFEASTRENGTH = GetModConfigData("SivFeaStrength") --设置子圭·翰强度
+_G.CONFIGS_LEGION.DIGESTEDITEMMSG = GetModConfigData("DigestedItemMsg") --巨食草消化提醒
 
 _G.CONFIGS_LEGION.TECHUNLOCK = GetModConfigData("TechUnlock") --设置新道具的科技解锁方式 "lootdropper" "prototyper"
 

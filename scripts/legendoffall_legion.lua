@@ -1430,18 +1430,132 @@ _G.CROPS_DATA_LEGION.plantmeat = {
 if not _G.rawget(_G, "DIGEST_DATA_LEGION") then
     _G.DIGEST_DATA_LEGION = {}
 end
+local lvls = { 0, 5, 10, 20, 30, 40, 60, 80, 99 }
 local digest_data_l = {
-    rabbit = { boneshard = 1, insectshell_l = nil }, --key value 对应 产物prefab 数量比例
-    -- carrat = { boneshard = 1 }, --胡萝卜鼠
-    -- fruitdragon = { boneshard = 1 }, --沙拉蝾螈
-    -- grassgekko = { boneshard = 1 }, --草蜥蜴
-    frog = { boneshard = 1 }, --青蛙
-    mole = { boneshard = 1 }, --鼹鼠
-    monkey = { boneshard = 1.2 }, --洞穴猴
-    mutated_penguin = { boneshard = 1 }, --变异企鹅
-    penguin = { boneshard = 1, feather_crow = 0.1 }, --企鹅
-    mossling = { boneshard = 1, goose_feather = 0.5 }, --小鹿鹅
-    lightcrab = { slurtle_shellpieces = 1 }, --发光蟹
+    bee = {
+        lvl = nil, --巨食草要达到这个簇栽等级后才能主动吞下该对象，如果为 nil 则代表无法主动吞下
+        attract = nil, --为true的话，可以被巨食草主动吸引(是靠战斗组件来吸引)
+        loot = { ahandfulofwings = 0.1, insectshell_l = 1 } --key value 对应 产物prefab 数量比例
+    },
+    butterfly = { lvl = nil, attract = nil, loot = { ahandfulofwings = 0.1, insectshell_l = 1 } }, --蝴蝶
+    moonbutterfly = { lvl = nil, attract = nil, loot = { ahandfulofwings = 0.3, insectshell_l = 1 } }, --月蛾
+    carrat = { lvl = nil, attract = nil, loot = { carrot_seeds = 1 } }, --胡萝卜鼠
+    lightcrab = { lvl = nil, attract = nil, loot = { slurtle_shellpieces = 1 } }, --发光蟹
+    oceanfish_small_1_inv = { lvl = nil, attract = nil, loot = { boneshard = 1 } }, --小孔雀鱼
+    oceanfish_small_2_inv = { lvl = nil, attract = nil, loot = { boneshard = 1 } }, --针鼻喷墨鱼
+    oceanfish_small_3_inv = { lvl = nil, attract = nil, loot = { boneshard = 1 } }, --小饵鱼
+    oceanfish_small_4_inv = { lvl = nil, attract = nil, loot = { boneshard = 1 } }, --三文鱼苗
+    oceanfish_small_5_inv = { lvl = nil, attract = nil, loot = { corn_seeds = 1 } }, --爆米花鱼
+    oceanfish_small_6_inv = { lvl = nil, attract = nil, loot = { boneshard = 1 } }, --落叶比目鱼
+    oceanfish_small_7_inv = { lvl = nil, attract = nil, loot = { boneshard = 1 } }, --花朵金枪鱼
+    oceanfish_small_8_inv = { lvl = nil, attract = nil, loot = { boneshard = 1 } }, --炽热太阳鱼
+    oceanfish_small_9_inv = { lvl = nil, attract = nil, loot = { boneshard = 1 } }, --口水鱼
+    oceanfish_medium_1_inv = { lvl = nil, attract = nil, loot = { boneshard = 1.2 } }, --泥鱼
+    oceanfish_medium_2_inv = { lvl = nil, attract = nil, loot = { boneshard = 1.2 } }, --斑鱼
+    oceanfish_medium_3_inv = { lvl = nil, attract = nil, loot = { boneshard = 1.2 } }, --浮夸狮子鱼
+    oceanfish_medium_4_inv = { lvl = nil, attract = nil, loot = { boneshard = 1.2 } }, --黑鲶鱼
+    oceanfish_medium_5_inv = { lvl = nil, attract = nil, loot = { corn_seeds = 1.2 } }, --玉米鳕鱼
+    oceanfish_medium_6_inv = { lvl = nil, attract = nil, loot = { boneshard = 1.2 } }, --花锦鲤
+    oceanfish_medium_7_inv = { lvl = nil, attract = nil, loot = { boneshard = 1.2 } }, --金锦鲤
+    oceanfish_medium_8_inv = { lvl = nil, attract = nil, loot = { boneshard = 1.2 } }, --冰鲷鱼
+    oceanfish_medium_9_inv = { lvl = nil, attract = nil, loot = { boneshard = 1.2 } }, --甜味鱼
+    pondfish = { lvl = nil, attract = nil, loot = { boneshard = 1 } }, --池塘鱼
+    pondeel = { lvl = nil, attract = nil, loot = { boneshard = 1.2 } }, --鳗鱼
+    lightflier = { lvl = nil, attract = nil, loot = { ahandfulofwings = 0.3, insectshell_l = 1 } }, --荧光果飞虫
+    dragon_scales = { lvl = nil, attract = nil, loot = { insectshell_l = 28 } }, --龙鳞
+    lavae_egg = { lvl = nil, attract = nil, loot = { insectshell_l = 20 } }, --岩浆虫卵
+    lavae_egg_cracked = { lvl = nil, attract = nil, loot = { insectshell_l = 20 } }, --岩浆虫卵(孵化中)
+    lavae_cocoon = { lvl = nil, attract = nil, loot = { insectshell_l = 28 } }, --冷冻虫卵
+    butter = { lvl = nil, attract = nil, loot = { insectshell_l = 16 } }, --黄油
+    royal_jelly = { lvl = nil, attract = nil, loot = { insectshell_l = 16 } }, --蜂王浆
+    glommerwings = { lvl = nil, attract = nil, loot = { insectshell_l = 16 } }, --格罗姆翅膀
+    glommerfuel = { lvl = nil, attract = nil, loot = { insectshell_l = 8 } }, --格罗姆黏液
+    honeycomb = { lvl = nil, attract = nil, loot = { insectshell_l = 16 } }, --蜂巢
+    beeswax = { lvl = nil, attract = nil, loot = { insectshell_l = 18 } }, --蜂蜡
+    wormlight = { lvl = nil, attract = nil, loot = { insectshell_l = 4 } }, --神秘浆果
+    wormlight_lesser = { lvl = nil, attract = nil, loot = { insectshell_l = 1 } }, --神秘小浆果
+    fruitflyfruit = { lvl = nil, attract = nil, loot = { insectshell_l = 20 } }, --友好果蝇果
+    fireflies = { lvl = nil, attract = nil, loot = { ahandfulofwings = 0.3, insectshell_l = 1 } }, --萤火虫
+    raindonate = { lvl = lvls[1], attract = true, loot = { ahandfulofwings = 1, insectshell_l = 1 } }, --雨蝇
+    cropgnat = { lvl = lvls[1], attract = true, loot = { ahandfulofwings = 1, insectshell_l = 1 } }, --植害虫群
+    cropgnat_infester = { lvl = lvls[1], attract = true, loot = { ahandfulofwings = 1, insectshell_l = 1 } }, --叮咬虫群
+    killerbee = { lvl = lvls[1], attract = true, loot = { ahandfulofwings = 0.3, insectshell_l = 1 } }, --杀人蜂
+    mosquito = { lvl = lvls[1], attract = true, loot = { ahandfulofwings = 0.3, insectshell_l = 1 } }, --蚊子
+    fruitfly = { lvl = lvls[2], attract = true, loot = { ahandfulofwings = 0.3, insectshell_l = 1 } }, --坏果蝇
+    crow = { lvl = lvls[2], attract = nil, loot = { boneshard = 1, feather_crow = 0.1 } }, --乌鸦
+    canary = { lvl = lvls[2], attract = nil, loot = { boneshard = 1, feather_canary = 0.1 } }, --金丝雀
+    canary_poisoned = { lvl = lvls[2], attract = nil, loot = { boneshard = 1, feather_canary = 1 } }, --生病金丝雀
+    robin = { lvl = lvls[2], attract = nil, loot = { boneshard = 1, feather_robin = 0.1 } }, --红雀
+    robin_winter = { lvl = lvls[2], attract = nil, loot = { boneshard = 1, feather_robin_winter = 0.1 } }, --雪雀
+    puffin = { lvl = lvls[2], attract = nil, loot = { boneshard = 1, feather_crow = 0.1 } }, --海鹦鹉
+    rabbit = { lvl = lvls[2], attract = nil, loot = { boneshard = 1 } }, --兔子
+    mole = { lvl = lvls[2], attract = nil, loot = { boneshard = 1 } }, --鼹鼠
+    gingerbreadpig = { lvl = lvls[2], attract = nil, loot = { wintersfeastfuel = 1 } }, --姜饼猪
+    eyeplant = { lvl = lvls[2], attract = nil, loot = nil }, --眼球草
+    wobster_sheller_land = { lvl = lvls[2], attract = nil, loot = nil }, --地上的龙虾
+    wobster_moonglass_land = { lvl = lvls[3], attract = nil, loot = { moonglass = 1 } }, --地上的月光龙虾
+    lavae = { lvl = lvls[3], attract = true, loot = { insectshell_l = 1 } }, --熔岩虫
+    fruitdragon = { lvl = lvls[3], attract = nil, loot = { dragonfruit_seeds = 1 } }, --沙拉蝾螈
+    grassgekko = { lvl = lvls[3], attract = nil, loot = { boneshard = 1 } }, --草蜥蜴
+    frog = { lvl = lvls[3], attract = nil, loot = { boneshard = 1 } }, --青蛙
+    cookiecutter = { lvl = lvls[3], attract = nil, loot = { cookiecuttershell = 1 } }, --饼干切割机
+    bat = { lvl = lvls[3], attract = nil, loot = { boneshard = 1 } }, --蝙蝠
+    birchnutdrake = { lvl = lvls[3], attract = nil, loot = { acorn = 1 } }, --桦树果精
+    spider = { lvl = lvls[3], attract = nil, loot = { boneshard = 1 } }, --蜘蛛
+    spider_warrior = { lvl = lvls[4], attract = nil, loot = { boneshard = 1 } }, --蜘蛛战士
+    spider_hider = { lvl = lvls[4], attract = nil, loot = { boneshard = 1 } }, --洞穴蜘蛛
+    spider_spitter = { lvl = lvls[4], attract = nil, loot = { boneshard = 1 } }, --喷吐蜘蛛
+    spider_dropper = { lvl = lvls[4], attract = nil, loot = { boneshard = 1 } }, --白蜘蛛
+    monkey = { lvl = lvls[4], attract = nil, loot = { boneshard = 1 } }, --洞穴猴
+    bird_mutant = { lvl = lvls[4], attract = nil, loot = { boneshard = 1 } }, --月鸦
+    bird_mutant_spitter = { lvl = lvls[4], attract = nil, loot = { boneshard = 1 } }, --喷吐月鸦
+    stalker_minion = { lvl = lvls[4], attract = nil, loot = { nightmarefuel = 1 } }, --影织者血包
+    stalker_minion1 = { lvl = lvls[4], attract = nil, loot = { nightmarefuel = 1 } }, --影织者血包1
+    stalker_minion2 = { lvl = lvls[4], attract = nil, loot = { nightmarefuel = 1 } }, --影织者血包2
+    buzzard = { lvl = lvls[5], attract = nil, loot = { boneshard = 1, feather_crow = 0.1 } }, --秃鹫
+    spider_moon = { lvl = lvls[5], attract = nil, loot = { boneshard = 1 } }, --月岛蜘蛛
+    spider_healer = { lvl = lvls[5], attract = nil, loot = { boneshard = 1 } }, --护士蜘蛛
+    spider_water = { lvl = lvls[5], attract = nil, loot = { boneshard = 1 } }, --海黾
+    beeguard = { lvl = lvls[5], attract = true, loot = { ahandfulofwings = 1, insectshell_l = 1 } }, --蜜蜂守卫
+    eyeofterror_mini_grounded = { lvl = lvls[5], attract = nil, loot = { boneshard = 1 } }, --小克眼球(孵化中)
+    eyeofterror_mini = { lvl = lvls[5], attract = nil, loot = { boneshard = 1 } }, --小克眼球
+    molebat = { lvl = lvls[5], attract = nil, loot = { boneshard = 1, guano = 0.2 } }, --猪鼻蝙蝠
+    squid = { lvl = lvls[5], attract = nil, loot = { boneshard = 1 } }, --鱿鱼
+    worm = { lvl = lvls[6], attract = true, loot = { boneshard = 1, insectshell_l = 2 } }, --深渊蠕虫
+    perd = { lvl = lvls[6], attract = nil, loot = { boneshard = 1 } }, --火鸡
+    penguin = { lvl = lvls[6], attract = nil, loot = { boneshard = 1, feather_crow = 0.2 } }, --企鹅
+    catcoon = { lvl = lvls[6], attract = nil, loot = { boneshard = 1, coontail = 0.2 } }, --浣猫
+    snurtle = { lvl = lvls[6], attract = nil, loot = { slurtle_shellpieces = 1.2, armorsnurtleshell = 0.1 } }, --圆壳蜗牛
+    slurtle = { lvl = lvls[7], attract = true, loot = { slurtle_shellpieces = 1.5, slurtlehat = 0.1 } }, --尖壳蜗牛
+    mutated_penguin = { lvl = lvls[7], attract = nil, loot = { boneshard = 1.5 } }, --变异企鹅
+    smallbird = { lvl = lvls[7], attract = nil, loot = { boneshard = 1 } }, --小高脚鸟
+    slurper = { lvl = lvls[7], attract = false, loot = { boneshard = 1, slurper_pelt = 0.2 } }, --啜食者
+    hound = { lvl = lvls[7], attract = nil, loot = { boneshard = 1, houndstooth = 0.2 } }, --猎狗
+    firehound = { lvl = lvls[8], attract = nil, loot = { boneshard = 1, houndstooth = 0.5, redgem = 0.1 } }, --火猎狗
+    icehound = { lvl = lvls[8], attract = nil, loot = { boneshard = 1, houndstooth = 0.5, bluegem = 0.1 } }, --冰猎狗
+    moonhound = { lvl = lvls[8], attract = nil, loot = { boneshard = 1, houndstooth = 0.5 } }, --月岛猎狗
+    mutatedhound = { lvl = lvls[8], attract = nil, loot = { boneshard = 1, houndstooth = 0.5 } }, --变异猎狗
+    teenbird = { lvl = lvls[8], attract = nil, loot = { boneshard = 1.2 } }, --青年高脚鸟
+    mossling = { lvl = lvls[8], attract = nil, loot = { boneshard = 1, goose_feather = 0.5 } }, --小鹿鹅
+    babybeefalo = { lvl = lvls[8], attract = nil, loot = { boneshard = 1.2, beefalowool = 0.2 } }, --小牛
+    lightninggoat = { lvl = lvls[8], attract = nil, loot = { boneshard = 1, lightninggoathorn = 0.5 } }, --电羊
+    merm = { lvl = lvls[8], attract = nil, loot = { boneshard = 1, merm_scales = 0.2 } }, --鱼人
+    pigman = { lvl = lvls[8], attract = nil, loot = { boneshard = 1, pigskin = 0.2 } }, --猪人
+    powder_monkey = { lvl = lvls[8], attract = nil, loot = { boneshard = 1 } }, --火药猴
+    mushgnome = { lvl = lvls[8], attract = nil, loot = { spore_moon = 4, livinglog = 4 } }, --月蘑菇精灵
+    little_walrus = { lvl = lvls[8], attract = nil, loot = { boneshard = 1, walrus_tusk = 0.1 } }, --小海象
+    deer = { lvl = lvls[8], attract = nil, loot = { boneshard = 2, deer_antler1 = 0.1, deer_antler2 = 0.1, deer_antler3 = 0.1 } }, --无眼鹿
+    deer_red = { lvl = lvls[9], attract = nil, loot = { boneshard = 3, deer_antler1 = 0.1, deer_antler2 = 0.1, deer_antler3 = 0.1, redgem = 0.1 } }, --无眼鹿(红)
+    deer_blue = { lvl = lvls[9], attract = nil, loot = { boneshard = 3, deer_antler1 = 0.1, deer_antler2 = 0.1, deer_antler3 = 0.1, bluegem = 0.1 } }, --无眼鹿(蓝)
+    bunnyman = { lvl = lvls[9], attract = nil, loot = { boneshard = 1, manrabbit_tail = 0.5, beardhair = 0.1 } }, --兔人
+    mermguard = { lvl = lvls[9], attract = nil, loot = { boneshard = 1, merm_scales = 0.5 } }, --鱼人战士
+    pigguard = { lvl = lvls[9], attract = nil, loot = { boneshard = 1, pigskin = 0.5 } }, --猪人战士
+    moonpig = { lvl = lvls[9], attract = nil, loot = { boneshard = 1, pigskin = 0.5 } }, --月杖转化仪式的疯猪
+    prime_mate = { lvl = lvls[9], attract = nil, loot = { boneshard = 1.2 } }, --火药猴船长
+    walrus = { lvl = lvls[9], attract = nil, loot = { boneshard = 1, walrus_tusk = 4 } }, --海象
+    clayhound = { lvl = lvls[9], attract = nil, loot = { houndstooth = 1, redpouch = 4 } }, --陶土猎狗
+    hedgehound = { lvl = lvls[9], attract = nil, loot = { boneshard = 1, houndstooth = 0.5, cutted_rosebush = 4 } }, --蔷薇猎狗
+    lordfruitfly = { lvl = lvls[9], attract = nil, loot = { ahandfulofwings = 8, insectshell_l = 12 } }, --果蝇王
 }
 for k,v in pairs(digest_data_l) do
     _G.DIGEST_DATA_LEGION[k] = v

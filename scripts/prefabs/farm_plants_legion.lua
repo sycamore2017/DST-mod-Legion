@@ -1242,7 +1242,6 @@ local sounds_nep = {
     close = "dontstarve/creatures/chester/close",
 	leaf = "dontstarve/wilson/pickup_reeds"
 }
-local 
 
 local function DisplayName_nep(inst)
 	local namepre = STRINGS.NAMES[string.upper(inst.prefab or "plant_carrot_l")]
@@ -1256,6 +1255,8 @@ end
 
 local function IsDigestible(item)
 	return item.prefab ~= "insectshell_l" and item.prefab ~= "boneshard" and
+		item.prefab ~= "seeds_plantmeat_l" and --不吃自己的异种
+		item.prefab ~= "plantmeat" and item.prefab ~= "plantmeat_cooked" and --这是巨食草主产物，不能吃掉
 		not item:HasTag("irreplaceable") and not item:HasTag("nodigest_l")
 end
 local function GetItemDesc(item, namemap, txt)
@@ -1367,8 +1368,11 @@ local function DoDigest(inst, doer)
 	for name, number in pairs(namemap) do
 		numall = numall + number
 		if DIGEST_DATA_LEGION[name] ~= nil then
-			for k, v in pairs(DIGEST_DATA_LEGION[name]) do
-				numprefab[k] = (numprefab[k] or 0) + number*v
+			local dd = DIGEST_DATA_LEGION[name]
+			if dd.loot ~= nil then
+				for k, v in pairs(dd.loot) do
+					numprefab[k] = (numprefab[k] or 0) + number*v
+				end
 			end
 		end
 	end
@@ -1405,7 +1409,7 @@ local function DoDigest(inst, doer)
 	end
 
 	------发送全服通告
-	if true then
+	if CONFIGS_LEGION.DIGESTEDITEMMSG then
 		local itemtxt = ""
 		for _, item in pairs(items_digest) do
 			if namemap[item.prefab] ~= nil then --不为空说明还没被记录进去
@@ -1426,7 +1430,7 @@ local function DoDigest(inst, doer)
 	for _, item in pairs(items_digest) do --现在才删除，是因为全服通告需要实体来判定名字
 		item:Remove()
 	end
-	for _, item in pairs(items_free) do --将无法消化的放回巨食草里
+	for _, item in pairs(items_free) do --将无法消化物品和消化产物都放回巨食草里
 		if item:IsValid() then
 			cpt:GiveItem(item)
 		end
