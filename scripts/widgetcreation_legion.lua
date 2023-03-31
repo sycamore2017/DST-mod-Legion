@@ -8,7 +8,7 @@ local containers = require("containers")
 local showmeneed = {
     "backcub", "beefalo", "giantsfoot",
     "hiddenmoonlight", "revolvedmoonlight", "revolvedmoonlight_pro",
-    "boltwingout"
+    "boltwingout", "plant_nepenthes_l"
 }
 local params = {}
 
@@ -350,6 +350,31 @@ params.lance_carrot_l = {
 }
 function params.lance_carrot_l.itemtestfn(container, item, slot)
     return IsCarrot(container, item, slot) or item.prefab == "spoiled_food"
+end
+
+------
+--巨食草
+------
+
+params.plant_nepenthes_l = {
+    widget = {
+        slotpos = {},
+        slotbg = {},
+        animbank = "ui_chest_3x3",
+        animbuild = "ui_nepenthes_l_4x4",
+        pos = Vector3(0, 200, 0),
+        side_align_tip = 160,
+    },
+    type = "chest"
+}
+for y = 3, 0, -1 do
+    for x = 0, 3 do
+        table.insert(params.plant_nepenthes_l.widget.slotpos, Vector3(80 * (x - 2) + 40, 80 * (y - 2) + 40, 0))
+        table.insert(params.plant_nepenthes_l.widget.slotbg, { image = "slot_juice_l.tex", atlas = "images/slot_juice_l.xml" })
+    end
+end
+function params.plant_nepenthes_l.itemtestfn(container, item, slot)
+    return not (item:HasTag("irreplaceable") or item:HasTag("nobundling") or item:HasTag("nodigest_l"))
 end
 
 --------------------------------------------------------------------------

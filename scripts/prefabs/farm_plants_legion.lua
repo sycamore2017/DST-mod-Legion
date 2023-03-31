@@ -1230,6 +1230,12 @@ table.insert(prefs, Prefab(
 --[[ 巨食草 三阶段 ]]
 --------------------------------------------------------------------------
 
+local TIME_TRYSWALLOW = 4.5 --吞食检查周期
+local TIME_DOLURE = 10 --引诱周期
+local DIST_SWALLOW = { 2, 6 } --吞食半径 极限值
+local NUM_SWALLOW = { 1, 10 } --吞食对象数量 极限值
+local TIME_SWALLOW = { 35, 5 } --吞食消化时间 极限值
+local DIST_LURE = { 6, 24 } --引诱半径 极限值
 local sounds_nep = {
     pant = "dontstarve/creatures/chester/pant",
     pop = "dontstarve/creatures/chester/pop",
@@ -1252,12 +1258,16 @@ local function DisplayName_nep(inst)
 
 	return namepre
 end
-
+local function StartTimer(inst, name, time)
+	inst.components.timer:StopTimer(name)
+	inst.components.timer:StartTimer(name, time)
+end
 local function IsDigestible(item)
 	return item.prefab ~= "insectshell_l" and item.prefab ~= "boneshard" and
 		item.prefab ~= "seeds_plantmeat_l" and --不吃自己的异种
 		item.prefab ~= "plantmeat" and item.prefab ~= "plantmeat_cooked" and --这是巨食草主产物，不能吃掉
-		not item:HasTag("irreplaceable") and not item:HasTag("nodigest_l")
+		not item:HasTag("irreplaceable") and not item:HasTag("nobundling") and
+		not item:HasTag("nodigest_l")
 end
 local function GetItemDesc(item, namemap, txt)
 	local name = item.nameoverride or
@@ -1329,9 +1339,9 @@ local function SpawnDigestedItems(loot, name, num, pos)
         end
 
         item.Transform:SetPosition(pos:Get())
-        -- if item.components.inventoryitem ~= nil then
-        --     item.components.inventoryitem:OnDropped(true)
-        -- end
+        if item.components.inventoryitem ~= nil then
+            item.components.inventoryitem:OnDropped(true)
+        end
 		if loot ~= nil then
 			table.insert(loot, item)
 		end
@@ -1341,28 +1351,7 @@ local function SpawnDigestedItems(loot, name, num, pos)
 		end
 	end
 end
-local function DoDigest(inst, doer)
-	inst.task_digest = nil
-
-	if inst.components.health:IsDead() then
-		return
-	end
-	inst.components.health:SetPercent(1)
-
-	inst.AnimState:PushAnimation("idle", true)
-	-- inst.AnimState:PlayAnimation("idle", true)
-
-	------先登记所有的物品
-	local items_digest = {}
-	local items_free = {}
-	local namemap = {}
-	local cpt = inst.components.container
-	local cptitems = cpt:FindItems(IsValid)
-	for _, v in pairs(cptitems) do
-		ScreeningItems(inst, v, items_digest, items_free, namemap)
-	end
-
-	------生成消化后产物，结算
+local function ComputDigest(inst, namemap, items_free)
 	local numprefab = {}
 	local numall = inst.count_digest
 	for name, number in pairs(namemap) do
@@ -1407,6 +1396,27 @@ local function DoDigest(inst, doer)
 	else
 		inst.count_digest = 0
 	end
+end
+local function DoDigest(inst, doer)
+	inst.task_digest = nil
+
+	if inst.components.health:IsDead() then
+		return
+	end
+	inst.components.health:SetPercent(1)
+
+	------先登记所有的物品
+	local items_digest = {}
+	local items_free = {}
+	local namemap = {}
+	local cpt = inst.components.container
+	local cptitems = cpt:FindItems(IsValid)
+	for _, v in pairs(cptitems) do
+		ScreeningItems(inst, v, items_digest, items_free, namemap)
+	end
+
+	------生成消化后产物，结算，簇栽升级
+	ComputDigest(inst, namemap, items_free)
 
 	------发送全服通告
 	if CONFIGS_LEGION.DIGESTEDITEMMSG then
@@ -1442,16 +1452,10 @@ local function StopDigest(inst)
 		inst.task_digest = nil
 	end
 end
-local function TryDigest(inst, isclose, doer)
+local function TryDigest(inst, doer)
 	StopDigest(inst)
 	for k,v in pairs(inst.components.container.slots) do
         if IsDigestible(v) then
-			if isclose then
-				inst.AnimState:PlayAnimation("close")
-    			inst.AnimState:PushAnimation("eat", true)
-			else
-				inst.AnimState:PlayAnimation("eat", true)
-			end
 			inst.task_digest = inst:DoTaskInTime(5, function(inst)
 				DoDigest(inst, doer)
 			end)
@@ -1460,59 +1464,165 @@ local function TryDigest(inst, isclose, doer)
     end
 end
 
-local function OnOpen_nep(inst, data)
-    inst.AnimState:PlayAnimation("open", false)
-    -- inst.AnimState:PushAnimation("opened", true)
+local function TrySwallow(inst)
+	inst.sg.mem.to_swallow = nil
+	StartTimer(inst, "swallow", TIME_TRYSWALLOW)
 
-    inst.SoundEmitter:PlaySound(sounds_nep.leaf, nil, 0.6)
-	inst.SoundEmitter:PlaySound(sounds_nep.open, nil, 0.3)
-
-	StopDigest(inst)
-end
-local function OnClose_nep(inst, doer)
-    inst.AnimState:PlayAnimation("close")
-    inst.AnimState:PushAnimation("idle", true)
-
-    inst.SoundEmitter:PlaySound(sounds_nep.leaf, nil, 0.6)
-	inst.SoundEmitter:PlaySound(sounds_nep.close, nil, 0.3)
-
-	TryDigest(inst, true, doer)
-end
-
-local function Attacked_nep(inst, data)
-	if inst.components.health:IsDead() then
-		return
+	local x, y, z = inst.Transform:GetWorldPosition()
+	local cluster = inst.components.perennialcrop2.cluster
+	local ents = TheSim:FindEntities(x, y, z, inst.dist_swallow, nil,
+					{ "INLIMBO", "NOCLICK", "player", "vaseherb" }, { "_combat", "_health", "_inventoryitem" })
+	for _, v in ipairs(ents) do
+		if DIGEST_DATA_LEGION[v.prefab] ~= nil and not v:HasTag("nodigest_l") then
+			local dd = DIGEST_DATA_LEGION[v.prefab]
+			if dd.lvl ~= nil and dd.lvl <= cluster then
+				inst.sg:GoToState("swallow")
+				return true
+			end
+		end
 	end
-
-	if data.attacker and data.attacker:HasTag("player") then
-		inst.components.health:DoDelta(-200)
-		if inst.components.health:IsDead() then
-			return
+	return false
+end
+local function DoSwallow(inst)
+	local x, y, z = inst.Transform:GetWorldPosition()
+	local count = 0
+	local namemap = {}
+	local newitems = {}
+	local cluster = inst.components.perennialcrop2.cluster
+	local ents = TheSim:FindEntities(x, y, z, inst.dist_swallow, nil,
+					{ "INLIMBO", "NOCLICK", "player", "vaseherb" }, { "_combat", "_health", "_inventoryitem" })
+	for _, v in ipairs(ents) do
+		if DIGEST_DATA_LEGION[v.prefab] ~= nil and not v:HasTag("nodigest_l") then
+			local dd = DIGEST_DATA_LEGION[v.prefab]
+			if dd.lvl ~= nil and dd.lvl <= cluster then
+				count = count + 1
+				namemap[v.prefab] = (namemap[v.prefab] or 0) +
+									(v.components.stackable and v.components.stackable.stacksize or 1)
+				v:Remove()
+				if count >= inst.num_swallow then
+					break
+				end
+			end
 		end
 	end
 
-	inst.components.container:Close()
+	if count <= 0 then
+		return
+	end
 
-	inst.SoundEmitter:PlaySound(sounds_nep.leaf, nil, 0.6)
-	inst.SoundEmitter:PlaySound(sounds_nep.hurt, nil, 0.3)
-
-	inst.AnimState:PlayAnimation("hit")
-	inst.AnimState:PushAnimation("idle", true)
+	inst.components.health:SetPercent(1)
+	ComputDigest(inst, namemap, newitems)
+	for _, item in pairs(newitems) do --将消化产物放到巨食草里
+		if item:IsValid() then
+			inst.components.container:GiveItem(item)
+		end
+	end
+	StartTimer(inst, "digested", inst.time_swallow) --开始冷却计时
 end
-local function OnDeath_nep(inst)
-	inst.components.container:Close()
-	inst.components.container.canbeopened = false
-	inst.components.container:DropEverything()
+local function DoLure(inst)
+	inst.sg.mem.to_lure = nil
+	StartTimer(inst, "lure", TIME_DOLURE)
 
+	local x, y, z = inst.Transform:GetWorldPosition()
+	local cluster = inst.components.perennialcrop2.cluster
+	local ents = TheSim:FindEntities(x, y, z, inst.dist_lure, nil,
+					{ "INLIMBO", "NOCLICK", "player", "vaseherb" }, { "_combat" })
+	for _, v in ipairs(ents) do
+		if
+			v.components.combat ~= nil and v.components.combat:CanTarget(inst) and
+			DIGEST_DATA_LEGION[v.prefab] ~= nil and not v:HasTag("nodigest_l")
+		then
+			local dd = DIGEST_DATA_LEGION[v.prefab]
+			if dd.lvl ~= nil and dd.lvl <= cluster then
+				v.components.combat:SetTarget(inst)
+				if v:HasTag("gnat_l") then --虫群有独特的吸引方式
+					v.infesttarget = inst
+				end
+			end
+		end
+	end
+end
+
+local function OnOpen_nep(inst, data)
+	if not inst.components.health:IsDead() then
+		StopDigest(inst)
+        inst.sg:GoToState("openmouth", data)
+    end
+end
+local function OnClose_nep(inst, doer)
+    if not inst.components.health:IsDead() then
+		inst.fn_tryDigest(inst, doer)
+		if inst.sg:HasStateTag("open") then --从打开容器sg才会继续关闭容器的sg
+			inst.sg:GoToState("closemouth", doer)
+		end
+    end
+end
+local function OnTimerDone_nep(inst, data)
+	if data.name == "swallow" then
+		inst:PushEvent("doswallow")
+	elseif data.name == "lure" then
+		inst:PushEvent("dolure")
+	elseif data.name == "digested" then
+		inst:PushEvent("digested")
+	end
+end
+local function DecimalPointTruncation(value, plus) --截取小数点
+	value = math.floor(value*plus)
+	return value/plus
+end
+local function OnCluster_nep(cpt, now)
+	local value = Remap(now, 0, cpt.cluster_max, DIST_SWALLOW[1], DIST_SWALLOW[2])
+	cpt.inst.dist_swallow = DecimalPointTruncation(value, 10)
+
+	value = Remap(now, 0, cpt.cluster_max, NUM_SWALLOW[1], NUM_SWALLOW[2])
+	cpt.inst.num_swallow = math.floor(value)
+
+	value = Remap(now, 0, cpt.cluster_max, TIME_SWALLOW[1], TIME_SWALLOW[2])
+	cpt.inst.time_swallow = DecimalPointTruncation(value, 10)
+
+	value = Remap(now, 0, cpt.cluster_max, DIST_LURE[1], DIST_LURE[2])
+	cpt.inst.dist_lure = DecimalPointTruncation(value, 10)
+end
+local function SwitchPlant(inst, plant)
+	local cpt = inst.components.perennialcrop2
+	if plant ~= nil then --说明是植物到生物
+		cpt.cluster = plant.components.perennialcrop2.cluster
+		inst.Transform:SetPosition(plant.Transform:GetWorldPosition())
+	else --生物到植物
+		inst.components.container:Close()
+		inst.components.container.canbeopened = false
+		inst.components.container:DropEverything()
+
+		local plant = SpawnPrefab("plant_plantmeat_l")
+        if plant ~= nil then
+            plant.components.perennialcrop2.cluster = cpt.cluster
+            plant.Transform:SetPosition(inst.Transform:GetWorldPosition())
+			return plant
+        end
+        -- inst:Remove() --现在删除还太早，生命组件会出手
+	end
+end
+local function OnDeath_nep(inst, data)
 	inst.components.perennialcrop2:GenerateLoot(nil, true, false)
+	StopDigest(inst)
+	inst.components.timer:StopTimer("swallow")
+	inst.components.timer:StopTimer("lure")
+	inst.components.timer:StopTimer("digested")
 
-	inst.SoundEmitter:PlaySound(sounds_nep.leaf, nil, 0.6)
-	inst.SoundEmitter:PlaySound(sounds_nep.death, nil, 0.3)
+	inst.fn_switch(inst)
+end
 
-	inst.AnimState:PlayAnimation("hit")
-	RemovePhysicsColliders(inst)
-
-	--转化到1阶段 undo
+local function OnSave_nep(inst, data)
+	if inst.count_digest > 0 then
+		data.count_digest = inst.count_digest
+	end
+end
+local function OnLoad_nep(inst, data)
+	if data ~= nil then
+		if data.count_digest ~= nil then
+			inst.count_digest = data.count_digest
+		end
+	end
 end
 
 table.insert(prefs, Prefab(
@@ -1540,6 +1650,7 @@ table.insert(prefs, Prefab(
 		inst:AddTag("notraptrigger")
     	inst:AddTag("noauradamage")
 		inst:AddTag("companion")
+		inst:AddTag("vaseherb")
 
 		inst._cluster_l = net_byte(inst.GUID, "plant_crop_l._cluster_l", "cluster_l_dirty")
 
@@ -1552,6 +1663,19 @@ table.insert(prefs, Prefab(
         end
 
 		inst.count_digest = 0 --已消化物品的数量
+		inst.dist_swallow = DIST_SWALLOW[1] --吞食半径
+		inst.num_swallow = NUM_SWALLOW[1] --一次能吞下对象的最大数量
+		inst.time_swallow = TIME_SWALLOW[1] --主动吞食后的消化时间
+		inst.dist_lure = DIST_LURE[1] --引诱半径
+		inst.sounds = sounds_nep
+		inst.task_digest = nil
+
+		inst.fn_tryDigest = TryDigest
+		inst.fn_trySwallow = TrySwallow
+		inst.fn_doSwallow = DoSwallow
+		inst.fn_doLure = DoLure
+		inst.fn_death = OnDeath_nep
+		inst.fn_switch = SwitchPlant
 
 		inst:AddComponent("inspectable")
 
@@ -1569,6 +1693,8 @@ table.insert(prefs, Prefab(
         inst.components.container.skipclosesnd = true
         inst.components.container.skipopensnd = true
 
+		inst:AddComponent("timer")
+
 		inst:AddComponent("perennialcrop2")
 		inst.components.perennialcrop2.StartGrowing = EmptyCptFn
 		inst.components.perennialcrop2.LongUpdate = EmptyCptFn
@@ -1576,14 +1702,16 @@ table.insert(prefs, Prefab(
 		inst.components.perennialcrop2.OnEntitySleep = EmptyCptFn
 		inst.components.perennialcrop2:SetUp("plantmeat", CROPS_DATA_LEGION["plantmeat"])
 		inst.components.perennialcrop2.fn_defend = CallDefender
+		inst.components.perennialcrop2.fn_cluster = OnCluster_nep
+		inst.components.perennialcrop2.infested_max = 50 --我可不想它直接被害虫干掉了
 		inst.components.perennialcrop2:SetStage(3, false, false)
 
-		inst:ListenForEvent("attacked", Attacked_nep)
-		inst:ListenForEvent("death", OnDeath_nep)
+		inst:SetStateGraph("SGplant_nepenthes_l")
 
-		-- inst:DoTaskInTime(0, function()
-		-- 	OnIsDark_p2(inst)
-		-- end)
+		inst:ListenForEvent("timerdone", OnTimerDone_nep)
+
+		inst.OnSave = OnSave_nep
+		inst.OnLoad = OnLoad_nep
 
 		MakeHauntableDropFirstItem(inst)
 
@@ -1594,7 +1722,8 @@ table.insert(prefs, Prefab(
         return inst
     end,
     {
-        Asset("ANIM", "anim/crop_legion_lureplant.zip"),
+        Asset("ANIM", "anim/ui_nepenthes_l_4x4.zip"),
+		Asset("ANIM", "anim/crop_legion_lureplant.zip")
     },
     nil
 ))

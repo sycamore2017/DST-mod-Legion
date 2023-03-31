@@ -30,6 +30,11 @@ local function oncluster(self)
     local now = self.cluster or 0
 	now = Remap(now, 0, self.cluster_max, self.cluster_size[1], self.cluster_size[2])
 	self.inst.AnimState:SetScale(now, now, now)
+
+	self.inst._cluster_l:set(now)
+	if self.fn_cluster ~= nil then
+		self.fn_cluster(self, now)
+	end
 end
 
 local PerennialCrop2 = Class(function(self, inst)
@@ -80,6 +85,7 @@ local PerennialCrop2 = Class(function(self, inst)
 	self.fn_stage = nil --每次设定生长阶段时额外触发的函数：fn(self)
 
 	self.fn_defend = nil --作物被采集/破坏时会寻求庇护的函数：fn(inst, target)
+	self.fn_cluster = nil --簇栽等级变化时触发：fn(self, nowvalue)
 end,
 nil,
 {
@@ -790,7 +796,6 @@ function PerennialCrop2:OnLoad(data)
 
 	if data.cluster ~= nil then
 		self.cluster = math.min(data.cluster, self.cluster_max)
-		self.inst._cluster_l:set(self.cluster)
 	end
 
 	self:SetStage(self.stage, self.isrotten, false)
@@ -1144,7 +1149,6 @@ function PerennialCrop2:ClusteredPlant(seeds, doer) --簇栽
 	else
 		self.cluster = self.cluster + 1
 	end
-	self.inst._cluster_l:set(self.cluster)
 	seeds:Remove()
 
 	if self.inst.SoundEmitter ~= nil then
@@ -1167,7 +1171,6 @@ function PerennialCrop2:DoCluster(num) --单纯的簇栽升级，也可以降级
 		newvalue = math.floor(newvalue) --保证是整数
 	end
 	self.cluster = newvalue
-	self.inst._cluster_l:set(newvalue)
 
 	return newvalue < self.cluster_max
 end

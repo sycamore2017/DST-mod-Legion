@@ -22,6 +22,8 @@ local assets = {
     Asset("ANIM", "anim/player_actions_roll.zip"), --脱壳之翅所需动作（来自单机版）
     Asset("ANIM", "anim/crop_legion_cactus.zip"), --异种动画，让子圭育提前用的
     Asset("ANIM", "anim/crop_legion_lureplant.zip"),
+    Asset("ATLAS", "images/slot_juice_l.xml"), --巨食草的格子背景
+    Asset("IMAGE", "images/slot_juice_l.tex"),
 
     Asset("ATLAS", "images/inventoryimages/siving_soil_item.xml"), --预加载，给科技栏用的
     Asset("IMAGE", "images/inventoryimages/siving_soil_item.tex"),
@@ -1406,10 +1408,9 @@ _G.CROPS_DATA_LEGION.plantmeat = {
         if data.stage < self.stage_max then
             return
         end
-        local plant = SpawnPrefab("plant_nepenthes_l")
-        if plant ~= nil then
-            plant.components.perennialcrop2.cluster = self.cluster --继承状态
-            plant.Transform:SetPosition(self.inst.Transform:GetWorldPosition())
+        local bios = SpawnPrefab("plant_nepenthes_l")
+        if bios ~= nil then
+            bios.fn_switch(bios, self.inst)
         end
         self.inst:Remove()
     end,
@@ -1417,12 +1418,11 @@ _G.CROPS_DATA_LEGION.plantmeat = {
         if self.stage < self.stage_max or not self.isrotten then
             return
         end
-        -- local plant = SpawnPrefab("plant_plantmeat_l")
-        -- if plant ~= nil then
-        --     plant.components.perennialcrop2.cluster = self.cluster --继承状态
-        --     plant.Transform:SetPosition(self.inst.Transform:GetWorldPosition())
-        -- end
-        -- self.inst:Remove()
+        local plant = self.inst.fn_switch(self.inst)
+        if plant ~= nil then
+            plant.components.perennialcrop2:SetStage(1, true, false) --弄成枯萎的
+        end
+        self.inst:Remove()
     end
 }
 
@@ -1529,7 +1529,7 @@ local digest_data_l = {
     slurtle = { lvl = lvls[7], attract = true, loot = { slurtle_shellpieces = 1.5, slurtlehat = 0.1 } }, --尖壳蜗牛
     mutated_penguin = { lvl = lvls[7], attract = nil, loot = { boneshard = 1.5 } }, --变异企鹅
     smallbird = { lvl = lvls[7], attract = nil, loot = { boneshard = 1 } }, --小高脚鸟
-    slurper = { lvl = lvls[7], attract = false, loot = { boneshard = 1, slurper_pelt = 0.2 } }, --啜食者
+    slurper = { lvl = lvls[7], attract = nil, loot = { boneshard = 1, slurper_pelt = 0.2 } }, --啜食者
     hound = { lvl = lvls[7], attract = nil, loot = { boneshard = 1, houndstooth = 0.2 } }, --猎狗
     firehound = { lvl = lvls[8], attract = nil, loot = { boneshard = 1, houndstooth = 0.5, redgem = 0.1 } }, --火猎狗
     icehound = { lvl = lvls[8], attract = nil, loot = { boneshard = 1, houndstooth = 0.5, bluegem = 0.1 } }, --冰猎狗

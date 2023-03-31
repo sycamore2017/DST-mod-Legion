@@ -45,7 +45,7 @@ local function GetInfestTarget(inst)
 
         inst.infesttarget = FindEntity(inst, 16, function(guy)
             return GetValid(guy.infester) == nil and inst.components.combat:CanTarget(guy)
-        end, {"character", "_combat", "_health"}, {"FX", "NOCLICK", "INLIMBO", "playerghost", "largecreature", "nognatinfest"}, nil)
+        end, {"character", "_combat", "_health"}, {"NOCLICK", "INLIMBO", "playerghost", "largecreature", "nognatinfest"}, nil)
 
         if inst.infesttarget ~= nil then
             inst.infesttarget.infester = inst --做个标记，一个虫群只能认领一个侵扰对象

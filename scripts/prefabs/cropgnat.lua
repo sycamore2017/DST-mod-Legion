@@ -63,6 +63,7 @@ local function MakeGnat(name, isinfester)
         inst:AddTag("hostile")
         -- inst:AddTag("no_durability_loss_on_hit") --单机版才有的标签，被打之后不会减少武器耐久
         inst:AddTag("ignorewalkableplatformdrowning")
+        inst:AddTag("gnat_l")
 
         inst.AnimState:SetBank("gnat")
         inst.AnimState:SetBuild("gnat")

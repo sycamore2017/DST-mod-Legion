@@ -203,13 +203,13 @@ local function MagicWarble(inst) --魔音绕梁
             local inv = v.components.inventory
             local hasprotect = false
             for slot, item in pairs(inv.equipslots) do
-                -- if slot ~= EQUIPSLOTS.BEARD then --可不能把威尔逊的“胡子”给吼下来了
+                if slot ~= EQUIPSLOTS.BEARD then --可不能把威尔逊的“胡子”给吼下来了
                     if item.prefab == "earmuffshat" or item.protect_l_magicwarble then
                         hasprotect = true
                     else
                         inv:DropItem(item, true, true)
                     end
-                -- end
+                end
             end
 
             --装备了兔耳罩就能避免后续的debuff
