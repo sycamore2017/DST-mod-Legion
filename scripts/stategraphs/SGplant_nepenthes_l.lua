@@ -77,18 +77,18 @@ local states= {
                 if type(pushanim) == "string" then
                     inst.AnimState:PlayAnimation(pushanim)
                 end
-                inst.AnimState:PushAnimation("idle", true)
+                inst.AnimState:PushAnimation("idle", false)
             else
-                inst.AnimState:PlayAnimation("idle", true)
+                inst.AnimState:PlayAnimation("idle")
             end
         end,
-        -- events = {
-        --     EventHandler("animover", function(inst)
-        --         if inst.AnimState:AnimDone() then
-        --             inst.sg:GoToState("idle")
-        --         end
-        --     end)
-        -- }
+        events = {
+            EventHandler("animover", function(inst)
+                if inst.AnimState:AnimDone() then
+                    inst.sg:GoToState("idle")
+                end
+            end)
+        }
     },
     State{ --死亡
         name = "death",
@@ -144,14 +144,21 @@ local states= {
         name = "digest",
         tags = { "busy" },
         onenter = function(inst, data)
-            inst.AnimState:PlayAnimation("eat", true)
+            inst.AnimState:PlayAnimation("eat")
             -- inst.SoundEmitter:PlaySound(inst.sounds.leaf, nil, 0.6)
 	        -- inst.SoundEmitter:PlaySound(inst.sounds.close, nil, 0.3)
         end,
         events = {
+            --[[ Tip:
+                "animover" 事件会在每一个动画结束触发，如果是循环动画则只会触发一次；
+                "animqueueover" 事件只会在不循环的最后一个动画结束时触发；
+                inst.AnimState:AnimDone() 用于判断 双动画连续播放是否完全结束
+            ]]--
             EventHandler("animover", function(inst) --动画结束才判定是否要离开当前sg，保证动画连贯性
                 if inst.task_digest == nil and not inst.components.timer:TimerExists("digested") then
                     inst.sg:GoToState("idle")
+                else
+                    inst.sg:GoToState("digest")
                 end
             end)
         }
@@ -161,7 +168,7 @@ local states= {
         tags = { "busy", "doing" },
         onenter = function(inst, data)
             inst.AnimState:PlayAnimation("open")
-            inst.AnimState:PushAnimation("close")
+            inst.AnimState:PushAnimation("close", false) --Tip: PushAnimation 的第二个参数如果没有就默认为 true
             inst.SoundEmitter:PlaySound(inst.sounds.leaf, nil, 0.6)
 	        inst.SoundEmitter:PlaySound(inst.sounds.open, nil, 0.3)
         end,

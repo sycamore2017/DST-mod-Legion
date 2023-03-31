@@ -1271,12 +1271,12 @@ local function IsDigestible(item)
 end
 local function GetItemDesc(item, namemap, txt)
 	local name = item.nameoverride or
-		(item.components.inspectable ~= nil and item.components.inspectable.nameoverride) or
-		item.prefab or nil
+		(item.components.inspectable ~= nil and item.components.inspectable.nameoverride) or nil
 	if name ~= nil then
-		name = STRINGS.NAMES[string.upper(name)] or "MISSING NAME"
-	else
-		name = "MISSING NAME"
+		name = STRINGS.NAMES[string.upper(name)]
+	end
+	if name == nil then
+		name = STRINGS.NAMES[string.upper(item.prefab)] or "MISSING NAME"
 	end
 	txt = txt..", "..tostring(namemap[item.prefab]).." "..name
 	namemap[item.prefab] = nil
