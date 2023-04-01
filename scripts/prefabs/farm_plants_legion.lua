@@ -1267,14 +1267,21 @@ local function IsDigestible(item)
 		not item:HasTag("nodigest_l")
 end
 local function GetItemDesc(item, namemap, txt)
-	local name = item.nameoverride or
-		(item.components.inspectable ~= nil and item.components.inspectable.nameoverride) or nil
-	if name ~= nil then
-		name = STRINGS.NAMES[string.upper(name)]
+	local name = nil
+	if item.displaynamefn ~= nil then
+		name = item.displaynamefn(item)
 	end
 	if name == nil then
-		name = STRINGS.NAMES[string.upper(item.prefab)] or "MISSING NAME"
+		name = item.nameoverride or
+			(item.components.inspectable ~= nil and item.components.inspectable.nameoverride) or nil
+		if name ~= nil then
+			name = STRINGS.NAMES[string.upper(name)]
+		end
+		if name == nil then
+			name = STRINGS.NAMES[string.upper(item.prefab)] or "MISSING NAME"
+		end
 	end
+
 	txt = txt..", "..tostring(namemap[item.prefab]).." "..name
 	namemap[item.prefab] = nil
 	return txt
@@ -1573,6 +1580,8 @@ local function DecimalPointTruncation(value, plus) --截取小数点
 	return value/plus
 end
 local function OnCluster_nep(cpt, now)
+	now = math.min(now*1.25, cpt.cluster_max) --提前让数值达到最大
+
 	local value = Remap(now, 0, cpt.cluster_max, DIST_SWALLOW[1], DIST_SWALLOW[2])
 	cpt.inst.dist_swallow = DecimalPointTruncation(value, 10)
 

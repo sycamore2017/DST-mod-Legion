@@ -1793,7 +1793,8 @@ local pieces = {
     "eyeofterror",
     "twinsofterror",
     "kitcoon",
-    "catcoon"
+    "catcoon",
+    "manrabbit"
 }
 -- local materials = {
 --     "marble", "stone", "moonglass",
