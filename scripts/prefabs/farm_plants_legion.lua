@@ -1728,9 +1728,9 @@ table.insert(prefs, Prefab(
 
 		MakeHauntableDropFirstItem(inst)
 
-		if TUNING.SMART_SIGN_DRAW_ENABLE then
-			SMART_SIGN_DRAW(inst)
-		end
+		-- if TUNING.SMART_SIGN_DRAW_ENABLE then
+		-- 	SMART_SIGN_DRAW(inst)
+		-- end
 
         return inst
     end,

@@ -1900,7 +1900,7 @@ if IsServer then
 
             if
                 not TheWorld.state.israining or
-                TheWorld.state.temperature < 20 or
+                TheWorld.state.temperature < 15 or
                 math.random() >= 0.05
             then
                 return
