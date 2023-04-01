@@ -18,12 +18,12 @@ local SkinStrings = ischinese and {
     COLLECTION = {
         UNKNOWN = "陌生系列",
         MAGICSPELL = "魔咒系列",
-        EMOTICON = "网上冲浪系列",
+        EMOTICON = "印象系列",
         MARBLE = "大理石园丁系列",
         THANKS = "江湖一枝花系列",
-        TVPLAY = "剧迷系列",
+        TVPLAY = "N次元系列",
         DISGUISER = "奇妙物语系列",
-        ERA = "先古回响系列",
+        ERA = "古早系列",
         OLDPIC = "念旧系列",
         FANS = "饭制系列",
         COLLECTOR = "星河收藏家系列",
@@ -48,12 +48,12 @@ local SkinStrings = ischinese and {
     COLLECTION = {
         UNKNOWN = "Strange Collection",
         MAGICSPELL = "Magic Spell Collection",
-        EMOTICON = "Surf Net Collection",
+        EMOTICON = "Notion Collection",
         MARBLE = "Marble Gardener Collection",
         THANKS = "Heartfelt Thanks Collection",
-        TVPLAY = "TV Play Fans Collection",
+        TVPLAY = "N-dimension Collection",
         DISGUISER = "Wonderful Creatures Collection",
-        ERA = "Era Echo Collection",
+        ERA = "Ancient Era Collection",
         OLDPIC = "Nostalgia Collection",
         FANS = "Fans Creation",
         COLLECTOR = "Galaxy Collector Collection",
@@ -1321,7 +1321,7 @@ local SkinData = {
         string = ischinese and {
             collection = "COLLECTOR", access = "SPECIAL",
             descitem = "解锁\"芬布尔斧\"的皮肤。",
-            description = "十七年前，盛夏流星群过后，一对夫妻在自己营地附近捡到一名戴着星星吊坠的女婴。现在，女婴已长大，每晚望着璀璨的星空着迷，但夫妻太爱这个孩子，不忍告诉她的来历，并藏起了属于她的吊坠。盛夏时节，女孩忽然有某种感应跑到楼顶，原来是流星群再次来临。女孩眼睛瞪得老大，欣赏着这场视觉的盛宴，留下了眼泪。夫妻觉得离别的时刻已经到来，把吊坠还给了女孩。吊坠交到女孩手里的那一刻，女孩理解了一切跃向天空，在耀眼的光芒过后，化作了流星群的一员飞出目光尽头，留下夫妻二人黯然神伤。\n两年后某个盛夏的夜晚，夫妻二人仍然依照往日习惯在楼顶看星星，此时一颗星星从天上划落，熟悉的少女身影闪现在夫妻眼前，三人默契相拥……"
+            description = "十七年前，盛夏流星群过后，一对夫妻在自己营地附近捡到一名戴着星星吊坠的女婴。现在，女婴已长大，每晚望着璀璨的星空着迷，但夫妻太爱这个孩子，不忍告诉她的来历，并藏起了属于她的吊坠。\n盛夏时节，女孩忽然有某种感应跑到楼顶，原来是流星群再次来临。女孩眼睛瞪得老大，欣赏着这场视觉的盛宴，留下了眼泪。\n夫妻觉得离别的时刻已经到来，把吊坠还给了女孩。吊坠交到女孩手里的那一刻，女孩理解了一切。她跃向天空，在耀眼的光芒过后，化作了流星群的一员飞出目光尽头，留下夫妻二人黯然神伤。\n两年后某个盛夏的夜晚，夫妻二人仍然依照往日习惯在楼顶看星星，此时一颗星星从天上划落，熟悉的少女身影闪现在夫妻眼前，三人默契相拥……"
         } or {
             collection = "COLLECTOR", access = "SPECIAL",
             descitem = "Unlock \"Fimbul's Axe\" skin.",
@@ -1903,7 +1903,7 @@ local SkinData = {
             name = "黄桃芒芒",
             collection = "TASTE", access = "SPECIAL",
             descitem = "解锁\"月轮宝盘套件\"、\"月轮宝盘\"的皮肤。",
-            description = "橙主色调，绿色是点缀。芒果圣代，黄桃块为其新增一种平衡感。果香醇厚，如成熟的喜悦。",
+            description = "近几月冰之国总是遭到蘑怪的侵扰。冰灵损失惨重，因为被蘑怪抓伤后会逐渐长满菌丝绒毛而死。冰王不得已加快了冰灵的创造，用料和做工也不再那么细心。小芒就是冰王用低廉的冰激凌底料，普通黄桃以及滥大街的芒果而创造出来的冰灵，然后马上就被派到了边哨站岗。\n芒队长每天都认真教授小芒等队员如何与蘑怪对抗。芒队长已经见证了太多队友的离别，所以格外强调，最重要的是如何活下来！\n没过几天，夜里警报响起！小芒虽然知道自己是粗制滥造出来的劣质冰灵，浑身发抖，但为了王国，坚定了信念，还是冲了出去……",
         } or {
             name = "Mango Sundae",
             collection = "TASTE", access = "SPECIAL",

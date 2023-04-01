@@ -389,7 +389,7 @@ local function OnPlant(seed, doer, soilorcrop)
     return false
 end
 
-local PLANTSOIL_LEGION = Action({ theme_music = "farming" })
+local PLANTSOIL_LEGION = Action({ theme_music = "farming", priority = 3 })
 PLANTSOIL_LEGION.id = "PLANTSOIL_LEGION"
 PLANTSOIL_LEGION.str = STRINGS.ACTIONS.PLANTSOIL_LEGION
 PLANTSOIL_LEGION.strfn = function(act)
@@ -429,7 +429,7 @@ AddComponentAction("USEITEM", "farmplantable", function(inst, doer, target, acti
     end
 end)
 AddComponentAction("USEITEM", "plantablelegion", function(inst, doer, target, actions, right)
-    if target:HasTag("crop2_legion") and not target:HasTag("NOCLICK") then
+    if right and target:HasTag("crop2_legion") and not target:HasTag("NOCLICK") then
         table.insert(actions, ACTIONS.PLANTSOIL_LEGION)
     end
 end)

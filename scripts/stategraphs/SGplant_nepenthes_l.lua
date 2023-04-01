@@ -97,7 +97,7 @@ local states= {
             inst.AnimState:PlayAnimation("hit")
             RemovePhysicsColliders(inst)
             inst.SoundEmitter:PlaySound(inst.sounds.leaf, nil, 0.6)
-	        inst.SoundEmitter:PlaySound(inst.sounds.death, nil, 0.3)
+	        inst.SoundEmitter:PlaySound(inst.sounds.death, nil, 0.2)
             inst.fn_death(inst, data)
         end
     },
@@ -107,7 +107,7 @@ local states= {
         onenter = function(inst)
             inst.AnimState:PlayAnimation("hit")
             inst.SoundEmitter:PlaySound(inst.sounds.leaf, nil, 0.6)
-	        inst.SoundEmitter:PlaySound(inst.sounds.hurt, nil, 0.3)
+	        inst.SoundEmitter:PlaySound(inst.sounds.hurt, nil, 0.2)
 
             inst.components.container:Close()
         end,
@@ -123,7 +123,7 @@ local states= {
         onenter = function(inst, data)
             inst.AnimState:PlayAnimation("open")
             inst.SoundEmitter:PlaySound(inst.sounds.leaf, nil, 0.6)
-	        inst.SoundEmitter:PlaySound(inst.sounds.open, nil, 0.3)
+	        inst.SoundEmitter:PlaySound(inst.sounds.open, nil, 0.2)
         end
     },
     State{ --容器关闭
@@ -132,7 +132,7 @@ local states= {
         onenter = function(inst, data)
             inst.AnimState:PlayAnimation("close")
             inst.SoundEmitter:PlaySound(inst.sounds.leaf, nil, 0.6)
-	        inst.SoundEmitter:PlaySound(inst.sounds.close, nil, 0.3)
+	        inst.SoundEmitter:PlaySound(inst.sounds.close, nil, 0.2)
         end,
         events = {
             EventHandler("animover", function(inst)
@@ -145,8 +145,8 @@ local states= {
         tags = { "busy" },
         onenter = function(inst, data)
             inst.AnimState:PlayAnimation("eat")
-            -- inst.SoundEmitter:PlaySound(inst.sounds.leaf, nil, 0.6)
-	        -- inst.SoundEmitter:PlaySound(inst.sounds.close, nil, 0.3)
+            inst.SoundEmitter:PlaySound(inst.sounds.leaf, nil, 0.3)
+	        inst.SoundEmitter:PlaySound(inst.sounds.lick, nil, 0.2)
         end,
         events = {
             --[[ Tip:
@@ -156,6 +156,7 @@ local states= {
             ]]--
             EventHandler("animover", function(inst) --动画结束才判定是否要离开当前sg，保证动画连贯性
                 if inst.task_digest == nil and not inst.components.timer:TimerExists("digested") then
+                    inst.SoundEmitter:PlaySound(inst.sounds.rumble, nil, 0.5)
                     inst.sg:GoToState("idle")
                 else
                     inst.sg:GoToState("digest")
@@ -170,7 +171,7 @@ local states= {
             inst.AnimState:PlayAnimation("open")
             inst.AnimState:PushAnimation("close", false) --Tip: PushAnimation 的第二个参数如果没有就默认为 true
             inst.SoundEmitter:PlaySound(inst.sounds.leaf, nil, 0.6)
-	        inst.SoundEmitter:PlaySound(inst.sounds.open, nil, 0.3)
+	        inst.SoundEmitter:PlaySound(inst.sounds.open, nil, 0.2)
         end,
         timeline = {
             TimeEvent(11 * FRAMES, function(inst)
@@ -183,7 +184,7 @@ local states= {
                     inst.sg:GoToState("idle")
                 else
                     inst.SoundEmitter:PlaySound(inst.sounds.leaf, nil, 0.6)
-                    inst.SoundEmitter:PlaySound(inst.sounds.close, nil, 0.3)
+                    inst.SoundEmitter:PlaySound(inst.sounds.close, nil, 0.2)
                 end
             end)
         }

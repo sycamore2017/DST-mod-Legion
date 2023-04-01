@@ -26,16 +26,6 @@ local function onnutrient(self)
         self.inst:AddTag("fertableall")
     end
 end
-local function oncluster(self)
-    local now = self.cluster or 0
-	now = Remap(now, 0, self.cluster_max, self.cluster_size[1], self.cluster_size[2])
-	self.inst.AnimState:SetScale(now, now, now)
-
-	self.inst._cluster_l:set(now)
-	if self.fn_cluster ~= nil then
-		self.fn_cluster(self, now)
-	end
-end
 
 local PerennialCrop2 = Class(function(self, inst)
 	self.inst = inst
@@ -72,7 +62,7 @@ local PerennialCrop2 = Class(function(self, inst)
 
 	self.cluster_size = { 1, 1.8 } --体型变化范围
 	self.cluster_max = 99 --最大簇栽等级
-	-- self.cluster = 0 --簇栽等级
+	self.cluster = 0 --簇栽等级
 	self.lootothers = nil --{ { israndom=false, factor=0.02, name="log", name_rot="xxx" } } 副产物表
 
 	self.ctls = {} --管理者
@@ -92,8 +82,7 @@ nil,
     isflower = onflower,
 	isrotten = onrotten,
 	donemoisture = onmoisture,
-	donenutrient = onnutrient,
-	cluster = oncluster
+	donenutrient = onnutrient
 })
 
 local function CancelTaskGrow(self)
@@ -135,7 +124,7 @@ function PerennialCrop2:SetUp(cropprefab, data)
 	if data.cluster_size then
 		self.cluster_size = data.cluster_size
 	end
-	self.cluster = 0 --现在才写是为了动态更新大小
+	self:OnClusterChange() --这里写是为了动态更新大小
 	self.lootothers = data.lootothers
 
 	if data.getsickchance and self.getsickchance > 0 then
@@ -796,6 +785,7 @@ function PerennialCrop2:OnLoad(data)
 
 	if data.cluster ~= nil then
 		self.cluster = math.min(data.cluster, self.cluster_max)
+		self:OnClusterChange()
 	end
 
 	self:SetStage(self.stage, self.isrotten, false)
@@ -1114,6 +1104,15 @@ function PerennialCrop2:DoMagicGrowth(doer, dt, ignorelvl) --催熟
 	return true
 end
 
+function PerennialCrop2:OnClusterChange() --簇栽等级变化时
+	local now = self.cluster or 0
+	self.inst._cluster_l:set(now)
+	if self.fn_cluster ~= nil then
+		self.fn_cluster(self, now)
+	end
+	now = Remap(now, 0, self.cluster_max, self.cluster_size[1], self.cluster_size[2])
+	self.inst.AnimState:SetScale(now, now, now)
+end
 function PerennialCrop2:ClusteredPlant(seeds, doer) --簇栽
 	local plantable = seeds.components.plantablelegion
 	if plantable == nil then
@@ -1149,6 +1148,7 @@ function PerennialCrop2:ClusteredPlant(seeds, doer) --簇栽
 	else
 		self.cluster = self.cluster + 1
 	end
+	self:OnClusterChange()
 	seeds:Remove()
 
 	if self.inst.SoundEmitter ~= nil then
@@ -1171,6 +1171,7 @@ function PerennialCrop2:DoCluster(num) --单纯的簇栽升级，也可以降级
 		newvalue = math.floor(newvalue) --保证是整数
 	end
 	self.cluster = newvalue
+	self:OnClusterChange()
 
 	return newvalue < self.cluster_max
 end

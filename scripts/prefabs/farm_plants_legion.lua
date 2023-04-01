@@ -1237,16 +1237,13 @@ local NUM_SWALLOW = { 1, 10 } --吞食对象数量 极限值
 local TIME_SWALLOW = { 35, 5 } --吞食消化时间 极限值
 local DIST_LURE = { 6, 24 } --引诱半径 极限值
 local sounds_nep = {
-    pant = "dontstarve/creatures/chester/pant",
-    pop = "dontstarve/creatures/chester/pop",
-    boing = "dontstarve/creatures/chester/boing",
     lick = "dontstarve/creatures/chester/lick",
-
 	hurt = "dontstarve/creatures/chester/hurt",
 	death = "dontstarve/creatures/chester/death",
     open = "dontstarve/creatures/chester/open",
     close = "dontstarve/creatures/chester/close",
-	leaf = "dontstarve/wilson/pickup_reeds"
+	leaf = "dontstarve/wilson/pickup_reeds",
+	rumble = "dontstarve/creatures/slurper/rumble"
 }
 
 local function DisplayName_nep(inst)
@@ -1404,6 +1401,7 @@ local function DoDigest(inst, doer)
 		return
 	end
 	inst.components.health:SetPercent(1)
+	inst.components.perennialcrop2:Cure()
 
 	------先登记所有的物品
 	local items_digest = {}
@@ -1511,6 +1509,7 @@ local function DoSwallow(inst)
 	end
 
 	inst.components.health:SetPercent(1)
+	inst.components.perennialcrop2:Cure()
 	ComputDigest(inst, namemap, newitems)
 	for _, item in pairs(newitems) do --将消化产物放到巨食草里
 		if item:IsValid() then
@@ -1536,6 +1535,9 @@ local function DoLure(inst)
 			if dd.lvl ~= nil and dd.lvl <= cluster then
 				v.components.combat:SetTarget(inst)
 				if v:HasTag("gnat_l") then --虫群有独特的吸引方式
+					if v.infesttarget ~= nil then
+						v.infesttarget.infester = nil --清除以前的标记
+					end
 					v.infesttarget = inst
 				end
 			end
@@ -1587,6 +1589,7 @@ local function SwitchPlant(inst, plant)
 	local cpt = inst.components.perennialcrop2
 	if plant ~= nil then --说明是植物到生物
 		cpt.cluster = plant.components.perennialcrop2.cluster
+		cpt:OnClusterChange()
 		inst.Transform:SetPosition(plant.Transform:GetWorldPosition())
 	else --生物到植物
 		inst.components.container:Close()
@@ -1596,6 +1599,7 @@ local function SwitchPlant(inst, plant)
 		local plant = SpawnPrefab("plant_plantmeat_l")
         if plant ~= nil then
             plant.components.perennialcrop2.cluster = cpt.cluster
+			plant.components.perennialcrop2:OnClusterChange()
             plant.Transform:SetPosition(inst.Transform:GetWorldPosition())
 			return plant
         end
@@ -1636,7 +1640,7 @@ table.insert(prefs, Prefab(
 		inst.entity:AddMiniMapEntity()
 		inst.entity:AddNetwork()
 
-		inst:SetPhysicsRadiusOverride(.8)
+		inst:SetPhysicsRadiusOverride(.5)
     	MakeObstaclePhysics(inst, inst.physicsradiusoverride)
 
         inst.AnimState:SetBank("crop_legion_lureplant")
