@@ -1430,7 +1430,7 @@ _G.CROPS_DATA_LEGION.plantmeat = {
 if not _G.rawget(_G, "DIGEST_DATA_LEGION") then
     _G.DIGEST_DATA_LEGION = {}
 end
-local lvls = { 0, 5, 10, 20, 30, 40, 60, 80, 99 }
+local lvls = { 0, 5, 10, 20, 30, 40, 50, 65, 80 }
 local digest_data_l = {
     bee = {
         lvl = nil, --巨食草要达到这个簇栽等级后才能主动吞下该对象，如果为 nil 则代表无法主动吞下
@@ -1556,6 +1556,14 @@ local digest_data_l = {
     clayhound = { lvl = lvls[9], attract = nil, loot = { redpouch = 4 } }, --陶土猎狗
     hedgehound = { lvl = lvls[9], attract = nil, loot = { boneshard = 1, cutted_rosebush = 4 } }, --蔷薇猎狗
     lordfruitfly = { lvl = lvls[9], attract = nil, loot = { ahandfulofwings = 8, insectshell_l = 12 } }, --果蝇王
+
+    --mod兼容：永不妥协
+    aphid = { lvl = lvls[2], attract = true, loot = { ahandfulofwings = 0.2, insectshell_l = 1 } }, --蚜虫
+    uncompromising_caverat = { lvl = lvls[4], attract = true, loot = { boneshard = 1 } }, --老鼠(洞穴)
+    uncompromising_rat = { lvl = lvls[4], attract = true, loot = { boneshard = 1 } }, --老鼠
+    uncompromising_junkrat = { lvl = lvls[4], attract = true, loot = { boneshard = 1 } }, --老鼠(垃圾)
+    uncompromising_packrat = { lvl = lvls[4], attract = true, loot = { boneshard = 1 } }, --老鼠(背包)
+    pied_rat = { lvl = lvls[7], attract = true, loot = { boneshard = 1 } }, --吹笛魔鼠
 }
 for k,v in pairs(digest_data_l) do
     _G.DIGEST_DATA_LEGION[k] = v
@@ -1898,11 +1906,7 @@ if IsServer then
                 onpickedfn_old(inst, picker, ...)
             end
 
-            if
-                not TheWorld.state.israining or
-                TheWorld.state.temperature < 15 or
-                math.random() >= 0.05
-            then
+            if not TheWorld.state.israining or math.random() >= 0.05 then
                 return
             end
 
@@ -1923,7 +1927,8 @@ if IsServer then
 
     ------食人花的
     local function OnDeath_lure(inst)
-        if inst.num_sivrock_l ~= nil and inst.num_sivrock_l >= 10 and math.random() < 0.33 then
+        if inst.num_sivrock_l ~= nil and inst.num_sivrock_l >= 20 then
+            inst.num_sivrock_l = nil
             inst.components.lootdropper:SpawnLootPrefab("tissue_l_lureplant")
         end
     end
