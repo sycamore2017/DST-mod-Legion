@@ -1259,6 +1259,9 @@ local function StartTimer(inst, name, time)
 	inst.components.timer:StopTimer(name)
 	inst.components.timer:StartTimer(name, time)
 end
+local function ComputStackNum(value, item)
+	return (value or 0) + (item.components.stackable and item.components.stackable.stacksize or 1)
+end
 local function IsDigestible(item)
 	return item.prefab ~= "insectshell_l" and item.prefab ~= "boneshard" and
 		item.prefab ~= "seeds_plantmeat_l" and --不吃自己的异种
@@ -1300,8 +1303,7 @@ local function ScreeningItems(eater, item, items_digest, items_free, namemap)
 		end
 		if item ~= nil then
 			table.insert(items_digest, item)
-			namemap[item.prefab] = (namemap[item.prefab] or 0) +
-									(item.components.stackable and item.components.stackable.stacksize or 1)
+			namemap[item.prefab] = ComputStackNum(namemap[item.prefab], item)
 			--递归判定容器物品中的物品
 			local cpt = item.components.container or item.components.inventory
 			if cpt ~= nil then
@@ -1373,14 +1375,13 @@ local function ComputDigest(inst, namemap, items_free)
 		number = number*0.25
 		local number2 = math.floor(number) --整数部分
 		number = number - number2 --小数部分
-		if number > 0 then --小数部分也有几率产出
-			if math.random() < number/2 then
+		if number > 0 then --小数部分则随机
+			if math.random() < number then
 				number2 = number2 + 1
 			end
 		end
-		number = number2
-		if number >= 1 then
-			SpawnDigestedItems(items_free, name, number, inst:GetPosition())
+		if number2 >= 1 then
+			SpawnDigestedItems(items_free, name, number2, inst:GetPosition())
 		end
 	end
 
@@ -1399,6 +1400,14 @@ local function ComputDigest(inst, namemap, items_free)
 		end
 	else
 		inst.count_digest = 0
+	end
+end
+local function GetItemLoots(item, lootmap)
+	if item.components.lootdropper ~= nil and math.random() >= 0.75 then --25%几率，能获取完整掉落物
+		local loots = item.components.lootdropper:GenerateLoot()
+		for _,lootname in pairs(loots) do --这个表里的数据都是单个的
+			lootmap[lootname] = ComputStackNum(lootmap[lootname], item)
+		end
 	end
 end
 local function DoDigest(inst, doer)
@@ -1442,11 +1451,16 @@ local function DoDigest(inst, doer)
 	end
 
 	------整理物品
+	local lootmap = {}
 	for _, item in pairs(items_digest) do --现在才删除，是因为全服通告需要实体来判定名字
+		GetItemLoots(item, lootmap) --有几率进行一次死亡掉落物判定
 		item:Remove()
 	end
+	for name, number in pairs(lootmap) do --生成被吞生物的掉落物
+		SpawnDigestedItems(items_free, name, number, inst:GetPosition())
+	end
 	for _, item in pairs(items_free) do --将无法消化物品和消化产物都放回巨食草里
-		if item:IsValid() then
+		if item:IsValid() and item.components.inventoryitem ~= nil then
 			cpt:GiveItem(item)
 		end
 	end
@@ -1492,6 +1506,7 @@ local function DoSwallow(inst)
 	local x, y, z = inst.Transform:GetWorldPosition()
 	local count = 0
 	local namemap = {}
+	local lootmap = {}
 	local newitems = {}
 	local cluster = inst.components.perennialcrop2.cluster
 	local ents = TheSim:FindEntities(x, y, z, inst.dist_swallow, nil,
@@ -1501,8 +1516,8 @@ local function DoSwallow(inst)
 			local dd = DIGEST_DATA_LEGION[v.prefab]
 			if dd.lvl ~= nil and dd.lvl <= cluster then
 				count = count + 1
-				namemap[v.prefab] = (namemap[v.prefab] or 0) +
-									(v.components.stackable and v.components.stackable.stacksize or 1)
+				namemap[v.prefab] = ComputStackNum(namemap[v.prefab], v)
+				GetItemLoots(v, lootmap)
 				v:Remove()
 				if count >= inst.num_swallow then
 					break
@@ -1515,11 +1530,15 @@ local function DoSwallow(inst)
 		return
 	end
 
+	for name, number in pairs(lootmap) do --生成被吞生物的掉落物
+		SpawnDigestedItems(newitems, name, number, inst:GetPosition())
+	end
+
 	inst.components.health:SetPercent(1)
 	inst.components.perennialcrop2:Cure()
 	ComputDigest(inst, namemap, newitems)
 	for _, item in pairs(newitems) do --将消化产物放到巨食草里
-		if item:IsValid() then
+		if item:IsValid() and item.components.inventoryitem ~= nil then
 			inst.components.container:GiveItem(item)
 		end
 	end
