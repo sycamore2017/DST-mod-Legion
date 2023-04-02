@@ -181,7 +181,7 @@ function GeneTrans:SpawnStackDrop(name, num, pos, doer, items)
 	end
 end
 
-function GeneTrans:DropLoot()
+function GeneTrans:DropLoot(needrecipe)
 	local lootmap = {}
 	local pos = self.inst:GetPosition()
 	--原始物品
@@ -191,11 +191,13 @@ function GeneTrans:DropLoot()
 	--转化产物
 	GetLootFruit(self, nil, nil)
 	--建筑材料
-	local recipe = AllRecipes[self.inst.prefab]
-	if recipe then
-		local recipeloot = self.inst.components.lootdropper:GetRecipeLoot(recipe)
-		for _,v in ipairs(recipeloot) do
-			lootmap[v] = (lootmap[v] or 0) + 1
+	if needrecipe then
+		local recipe = AllRecipes[self.inst.prefab]
+		if recipe then
+			local recipeloot = self.inst.components.lootdropper:GetRecipeLoot(recipe)
+			for _,v in ipairs(recipeloot) do
+				lootmap[v] = (lootmap[v] or 0) + 1
+			end
 		end
 	end
 	--基因池物品
@@ -249,7 +251,15 @@ function GeneTrans:SetUp(seeds, doer)
 	if self.seed ~= nil then --已有种子
 		if self.seednum > 0 then --还有在转化的
 			if self.seed ~= seeds.prefab then --正在转化的和要放入的不一样
-				return false, "GROWING"
+				--拿下已有的种子，准备放入新种子了
+				self:SpawnStackDrop(self.seed, self.seednum, self.inst:GetPosition(), doer, nil)
+				self.seed = nil
+				self.seeddata = nil
+				self.seednum = 0
+				self.timedata.start = nil
+				self.timedata.all = nil
+				self.timedata.pass = nil
+				-- return false, "GROWING"
 			end
 		end
 	end

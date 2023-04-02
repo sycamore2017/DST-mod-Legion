@@ -74,7 +74,9 @@ local function AddSpecialLoot(inst)
         "explodingfruitcake_blueprint",
         "fishhomingtool_awesome_blueprint",
         "siving_mask_gold_blueprint",
-        "siving_ctlall_item_blueprint"
+        "siving_ctlall_item_blueprint",
+        "hat_elepheetle_blueprint",
+        "armor_elepheetle_blueprint"
     }
     inst.components.lootdropper:AddChanceLoot(table.remove(drops, math.random(#drops)), 1)
     inst.components.lootdropper:AddChanceLoot(table.remove(drops, math.random(#drops)), 1)

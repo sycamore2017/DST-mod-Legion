@@ -797,12 +797,18 @@ local function OnWork_turn(inst, worker, workleft, numworks)
         inst.AnimState:PushAnimation("idle", false)
     end
 end
-local function OnDeconstruct_turn(inst, worker)
-    inst.components.genetrans:DropLoot()
+local function OnBroken_turn(inst, needrecipe)
+    inst.components.genetrans:DropLoot(needrecipe)
     local fx = SpawnPrefab("collapse_big")
     fx.Transform:SetPosition(inst.Transform:GetWorldPosition())
     fx:SetMaterial("rock")
     inst:Remove()
+end
+local function OnFinished_turn(inst)
+    OnBroken_turn(inst, true)
+end
+local function OnDeconstruct_turn(inst, worker)
+    OnBroken_turn(inst, false) --拆解机制自带建造材料的还原，所以这里不再还原材料
 end
 
 table.insert(prefs, Prefab(
@@ -856,7 +862,7 @@ table.insert(prefs, Prefab(
         inst.components.workable:SetWorkAction(ACTIONS.HAMMER)
         inst.components.workable:SetWorkLeft(5)
         inst.components.workable:SetOnWorkCallback(OnWork_turn)
-        inst.components.workable:SetOnFinishCallback(OnDeconstruct_turn)
+        inst.components.workable:SetOnFinishCallback(OnFinished_turn)
 
         inst:ListenForEvent("ondeconstructstructure", OnDeconstruct_turn)
 

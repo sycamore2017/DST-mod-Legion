@@ -447,13 +447,18 @@ local function OnOpen_revolved(inst)
     inst.AnimState:PlayAnimation("open")
     inst.AnimState:PushAnimation("opened", true)
 
+    inst.SoundEmitter:PlaySound("dontstarve/cave/mushtree_tall_spore_land", nil, 0.6)
+
+    local gowner = inst.components.inventoryitem:GetGrandOwner()
+    if gowner ~= nil then --说明自己在容器里，就不要发出循环声音
+        return
+    end
     if not inst.SoundEmitter:PlayingSound("idlesound1") then
         inst.SoundEmitter:PlaySound("dontstarve/creatures/together/toad_stool/spore_cloud_LP", "idlesound1", 0.7)
     end
     if not inst.SoundEmitter:PlayingSound("idlesound2") then
         inst.SoundEmitter:PlaySound("dontstarve/bee/bee_hive_LP", "idlesound2", 0.7)
     end
-    inst.SoundEmitter:PlaySound("dontstarve/cave/mushtree_tall_spore_land", nil, 0.6)
 end
 local function OnClose_revolved(inst)
     if inst.AnimState:IsCurrentAnimation("close") or inst.AnimState:IsCurrentAnimation("closed") then

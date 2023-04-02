@@ -1537,7 +1537,7 @@ local digest_data_l = {
     mutatedhound = { lvl = lvls[8], attract = nil, loot = { boneshard = 2 } }, --变异猎狗
     teenbird = { lvl = lvls[8], attract = nil, loot = { boneshard = 2 } }, --青年高脚鸟
     mossling = { lvl = lvls[8], attract = nil, loot = { boneshard = 1 } }, --小鹿鹅
-    babybeefalo = { lvl = lvls[8], attract = nil, loot = { boneshard = 1.2 } }, --小牛
+    babybeefalo = { lvl = lvls[8], attract = nil, loot = { boneshard = 1 } }, --小牛
     lightninggoat = { lvl = lvls[8], attract = nil, loot = { boneshard = 1, goatmilk = 0.2 } }, --电羊
     merm = { lvl = lvls[8], attract = nil, loot = { boneshard = 1, merm_scales = 0.2 } }, --鱼人
     pigman = { lvl = lvls[8], attract = nil, loot = { boneshard = 1 } }, --猪人
