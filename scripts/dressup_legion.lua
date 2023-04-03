@@ -1447,8 +1447,23 @@ local dressup_data = {
     },
     pinkstaff = {
         isnoskin = true,
-        buildfile = "swap_pinkstaff",
-        buildsymbol = "swap_pinkstaff",
+        buildfn = function(dressup, item, buildskin)
+            local itemswap = {}
+
+            local skindata = item.components.skinedlegion:GetSkinedData()
+            if skindata ~= nil and skindata.equip ~= nil then
+                itemswap["swap_object"] = dressup:GetDressData(
+                    nil, skindata.equip.build, skindata.equip.file, item.GUID, "swap"
+                )
+            else
+                itemswap["swap_object"] = dressup:GetDressData(
+                    nil, "swap_pinkstaff", "swap_pinkstaff", item.GUID, "swap"
+                )
+            end
+            dressup:SetDressHand(itemswap)
+
+            return itemswap
+        end
     },
     refractedmoonlight = { --tip：通过幻化就可以把这把剑带到其他世界啦！
         isnoskin = true,

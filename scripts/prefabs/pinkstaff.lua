@@ -12,11 +12,29 @@ local function OnFinished(inst)
 end
 
 local function OnEquip(inst, owner)
-    owner.AnimState:OverrideSymbol("swap_object", "swap_pinkstaff", "swap_pinkstaff")
+    local skindata = inst.components.skinedlegion:GetSkinedData()
+    if skindata ~= nil then
+        if skindata.equip ~= nil then
+            owner.AnimState:OverrideSymbol("swap_object", skindata.equip.build, skindata.equip.file)
+        else
+            owner.AnimState:OverrideSymbol("swap_object", "swap_pinkstaff", "swap_pinkstaff")
+        end
+        if skindata.equipfx ~= nil then
+            skindata.equipfx.start(inst, owner)
+        end
+    else
+        owner.AnimState:OverrideSymbol("swap_object", "swap_pinkstaff", "swap_pinkstaff")
+    end
+
     owner.AnimState:Show("ARM_carry")
     owner.AnimState:Hide("ARM_normal")
 end
 local function OnUnequip(inst, owner)
+    local skindata = inst.components.skinedlegion:GetSkinedData()
+    if skindata ~= nil and skindata.equipfx ~= nil then
+        skindata.equipfx.stop(inst, owner)
+    end
+
     owner.AnimState:Hide("ARM_carry")
     owner.AnimState:Show("ARM_normal")
 end
@@ -86,15 +104,10 @@ local function Fn()
 
     inst:AddTag("nopunch")  --这个标签的作用应该是让本身没有武器组件的道具用武器攻击的动作，而不是用拳头攻击的动作
 
-    MakeInventoryFloatable(inst, "small", 0.35, 0.5)
-    local OnLandedClient_old = inst.components.floater.OnLandedClient
-    inst.components.floater.OnLandedClient = function(self)
-        OnLandedClient_old(self)
-        self.inst.AnimState:SetFloatParams(0.15, 1, self.bob_percent)
-    end
+    inst:AddComponent("skinedlegion")
+    inst.components.skinedlegion:InitWithFloater("pinkstaff")
 
     inst.entity:SetPristine()
-
     if not TheWorld.ismastersim then
         return inst
     end
@@ -126,6 +139,8 @@ local function Fn()
     inst.components.spellcaster:SetCanCastFn(DressUpTest)
 
     MakeHauntableLaunch(inst)
+
+    inst.components.skinedlegion:SetOnPreLoad()
 
     return inst
 end

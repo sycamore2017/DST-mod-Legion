@@ -196,6 +196,24 @@ local function Fn_placer_neverfade(inst)
     inst.AnimState:Pause()
 end
 
+------
+
+local function SetFollowedFx(inst, owner, fxname, sym, x, y)
+    local fx = SpawnPrefab(fxname)
+    if fx ~= nil then
+        fx.entity:SetParent(owner.entity)
+        fx.entity:AddFollower()
+        fx.Follower:FollowSymbol(owner.GUID, sym or "swap_object", x or 0, y or 0, 0)
+        inst.fx_s_l = fx
+    end
+end
+local function EndFollowedFx(inst, owner)
+    if inst.fx_s_l ~= nil then
+        inst.fx_s_l:Remove()
+        inst.fx_s_l = nil
+    end
+end
+
 --------------------------------------------------------------------------
 --[[ 全局皮肤总数据，以及修改 ]]
 --------------------------------------------------------------------------
@@ -208,7 +226,7 @@ _G.SKIN_PREFABS_LEGION = {
     --[[
     rosorns = {
         assets = nil, --仅仅是用于初始化注册
-        image = { name = nil, atlas = nil, setable = true, }, --提前注册，或者皮肤初始化使用
+        image = { name = nil, atlas = nil, setable = true }, --提前注册，或者皮肤初始化使用
 
         anim = { --皮肤初始化使用
             bank = nil, build = nil,
@@ -269,7 +287,7 @@ _G.SKIN_PREFABS_LEGION = {
 
     rosorns = {
         assets = nil,
-        image = { name = nil, atlas = nil, setable = true, },
+        image = { name = nil, atlas = nil, setable = true },
         anim = {
             bank = nil, build = nil,
             anim = nil, isloop_anim = nil, animpush = nil, isloop_animpush = nil,
@@ -285,7 +303,7 @@ _G.SKIN_PREFABS_LEGION = {
     },
     lileaves = {
         assets = nil,
-        image = { name = nil, atlas = nil, setable = true, },
+        image = { name = nil, atlas = nil, setable = true },
         anim = {
             bank = nil, build = nil,
             anim = nil, isloop_anim = nil, animpush = nil, isloop_animpush = nil,
@@ -301,7 +319,7 @@ _G.SKIN_PREFABS_LEGION = {
     },
     orchitwigs = {
         assets = nil,
-        image = { name = nil, atlas = nil, setable = true, },
+        image = { name = nil, atlas = nil, setable = true },
         anim = {
             bank = nil, build = nil,
             anim = nil, isloop_anim = nil, animpush = nil, isloop_animpush = nil,
@@ -352,11 +370,11 @@ _G.SKIN_PREFABS_LEGION = {
 
     hat_lichen = {
         assets = nil,
-        image = { name = nil, atlas = nil, setable = true, },
+        image = { name = nil, atlas = nil, setable = true },
         anim = {
             bank = nil, build = nil,
             anim = "anim", isloop_anim = nil, animpush = nil, isloop_animpush = nil,
-            setable = true,
+            setable = true
         },
         equip = { symbol = "swap_hat", build = "hat_lichen", file = "swap_hat", isopenhat = true },
         exchangefx = { prefab = nil, offset_y = nil, scale = nil },
@@ -367,7 +385,7 @@ _G.SKIN_PREFABS_LEGION = {
 
     hat_cowboy = {
         assets = nil,
-        image = { name = nil, atlas = nil, setable = true, },
+        image = { name = nil, atlas = nil, setable = true },
         anim = {
             bank = nil, build = nil,
             anim = "anim", isloop_anim = nil, animpush = nil, isloop_animpush = nil,
@@ -380,9 +398,27 @@ _G.SKIN_PREFABS_LEGION = {
         },
     },
 
+    pinkstaff = {
+        assets = nil,
+        image = { name = nil, atlas = nil, setable = true },
+        anim = {
+            bank = nil, build = nil,
+            anim = "anim", isloop_anim = nil, animpush = nil, isloop_animpush = nil,
+            setable = true
+        },
+        fn_start = function(inst)
+            inst.fxcolour = {255/255, 80/255, 173/255}
+        end,
+        equip = {
+            symbol = "swap_object", build = "swap_pinkstaff", file = "swap_pinkstaff"
+        },
+        exchangefx = { prefab = nil, offset_y = nil, scale = nil },
+        floater = { cut = 0.15, size = "small", offset_y = 0.35, scale = 0.5, nofx = nil }
+    },
+
     boltwingout = {
         assets = nil,
-        image = { name = nil, atlas = nil, setable = true, },
+        image = { name = nil, atlas = nil, setable = true },
         anim = {
             bank = "swap_boltwingout", build = "swap_boltwingout",
             anim = "idle", isloop_anim = nil, animpush = nil, isloop_animpush = nil,
@@ -398,7 +434,7 @@ _G.SKIN_PREFABS_LEGION = {
 
     fishhomingtool_awesome = {
         assets = nil,
-        image = { name = nil, atlas = nil, setable = true, },
+        image = { name = nil, atlas = nil, setable = true },
         anim = {
             bank = nil, build = nil,
             anim = nil, isloop_anim = nil, animpush = nil, isloop_animpush = nil,
@@ -412,7 +448,7 @@ _G.SKIN_PREFABS_LEGION = {
     },
     fishhomingtool_normal = {
         assets = nil,
-        image = { name = nil, atlas = nil, setable = true, },
+        image = { name = nil, atlas = nil, setable = true },
         anim = {
             bank = nil, build = nil,
             anim = nil, isloop_anim = nil, animpush = nil, isloop_animpush = nil,
@@ -464,7 +500,7 @@ _G.SKIN_PREFABS_LEGION = {
 
     shield_l_log = {
         assets = nil,
-        image = { name = nil, atlas = nil, setable = true, },
+        image = { name = nil, atlas = nil, setable = true },
         anim = {
             bank = "shield_l_log", build = "shield_l_log",
             anim = "idle", isloop_anim = nil, animpush = nil, isloop_animpush = nil,
@@ -478,7 +514,7 @@ _G.SKIN_PREFABS_LEGION = {
     },
     shield_l_sand = {
         assets = nil,
-        image = { name = nil, atlas = nil, setable = true, },
+        image = { name = nil, atlas = nil, setable = true },
         anim = {
             bank = "shield_l_sand", build = "shield_l_sand",
             anim = "idle", isloop_anim = nil, animpush = nil, isloop_animpush = nil,
@@ -501,7 +537,7 @@ _G.SKIN_PREFABS_LEGION = {
 
     tripleshovelaxe = {
         assets = nil,
-        image = { name = nil, atlas = nil, setable = true, },
+        image = { name = nil, atlas = nil, setable = true },
         anim = {
             bank = nil, build = nil,
             anim = nil, isloop_anim = nil, animpush = nil, isloop_animpush = nil,
@@ -517,7 +553,7 @@ _G.SKIN_PREFABS_LEGION = {
     },
     triplegoldenshovelaxe = {
         assets = nil,
-        image = { name = nil, atlas = nil, setable = true, },
+        image = { name = nil, atlas = nil, setable = true },
         anim = {
             bank = nil, build = nil,
             anim = nil, isloop_anim = nil, animpush = nil, isloop_animpush = nil,
@@ -534,7 +570,7 @@ _G.SKIN_PREFABS_LEGION = {
 
     backcub = {
         assets = nil,
-        image = { name = nil, atlas = nil, setable = true, },
+        image = { name = nil, atlas = nil, setable = true },
         anim = {
             bank = "backcub", build = "backcub",
             anim = "anim", isloop_anim = true, animpush = nil, isloop_animpush = nil,
@@ -720,7 +756,7 @@ _G.SKINS_LEGION = {
 			Asset("ANIM", "anim/skin/spear_mirrorrose.zip"),
             Asset("ANIM", "anim/skin/rosorns_spell.zip"),
 		},
-		image = { name = nil, atlas = nil, setable = true, }, --提前注册，或者皮肤初始化使用
+		image = { name = nil, atlas = nil, setable = true }, --提前注册，或者皮肤初始化使用
 
         string = ischinese and { --皮肤字符
             name = "施咒蔷薇", collection = "MAGICSPELL", access = "DONATE",
@@ -809,7 +845,7 @@ _G.SKINS_LEGION = {
             Asset("ATLAS", "images/inventoryimages_skin/foliageath_rosorns_marble.xml"),
             Asset("IMAGE", "images/inventoryimages_skin/foliageath_rosorns_marble.tex"),
 		},
-        image = { name = nil, atlas = nil, setable = true, },
+        image = { name = nil, atlas = nil, setable = true },
 
         string = ischinese and { name = "落薇剪" } or { name = "Falling Petals Scissors" },
 
@@ -870,7 +906,7 @@ _G.SKINS_LEGION = {
             Asset("ATLAS", "images/inventoryimages_skin/foliageath_lileaves_marble.xml"),
             Asset("IMAGE", "images/inventoryimages_skin/foliageath_lileaves_marble.tex"),
 		},
-        image = { name = nil, atlas = nil, setable = true, },
+        image = { name = nil, atlas = nil, setable = true },
 
         string = ischinese and { name = "石莲长枪" } or { name = "Marble Lilance" },
 
@@ -925,7 +961,7 @@ _G.SKINS_LEGION = {
             Asset("ATLAS", "images/inventoryimages_skin/foliageath_orchitwigs_marble.xml"),
             Asset("IMAGE", "images/inventoryimages_skin/foliageath_orchitwigs_marble.tex"),
 		},
-        image = { name = nil, atlas = nil, setable = true, },
+        image = { name = nil, atlas = nil, setable = true },
 
         string = ischinese and { name = "铁艺兰珊" } or { name = "Ironchid" },
 
@@ -979,12 +1015,10 @@ _G.SKINS_LEGION = {
         skin_id = "notnononl", --61ff45880a30fc7fca0db5e5
 		assets = {
 			Asset("ANIM", "anim/skin/orchitwigs_disguiser.zip"),
-            Asset("ATLAS", "images/inventoryimages_skin/orchitwigs_disguiser.xml"),
-            Asset("IMAGE", "images/inventoryimages_skin/orchitwigs_disguiser.tex"),
             Asset("ATLAS", "images/inventoryimages_skin/foliageath_orchitwigs_disguiser.xml"),
             Asset("IMAGE", "images/inventoryimages_skin/foliageath_orchitwigs_disguiser.tex"),
 		},
-        image = { name = nil, atlas = nil, setable = true, },
+        image = { name = nil, atlas = nil, setable = true },
 
         string = ischinese and { name = "粉色追猎" } or { name = "Pink Orchitwigs" },
 
@@ -1016,8 +1050,6 @@ _G.SKINS_LEGION = {
 		assets = {
 			Asset("ANIM", "anim/skin/neverfade_thanks.zip"),
             Asset("ANIM", "anim/skin/neverfade_butterfly_thanks.zip"),
-            -- Asset("ATLAS", "images/inventoryimages_skin/neverfade_thanks.xml"),
-            -- Asset("IMAGE", "images/inventoryimages_skin/neverfade_thanks.tex"),
             Asset("ATLAS", "images/inventoryimages_skin/neverfade_thanks_broken.xml"),
             Asset("IMAGE", "images/inventoryimages_skin/neverfade_thanks_broken.tex"),
             Asset("ATLAS", "images/inventoryimages_skin/foliageath_neverfade_thanks.xml"),
@@ -1088,8 +1120,6 @@ _G.SKINS_LEGION = {
 		assets = {
 			Asset("ANIM", "anim/skin/neverfade_paper.zip"),
             Asset("ANIM", "anim/skin/neverfade_butterfly_paper.zip"),
-            -- Asset("ATLAS", "images/inventoryimages_skin/neverfade_paper.xml"),
-            -- Asset("IMAGE", "images/inventoryimages_skin/neverfade_paper.tex"),
             Asset("ATLAS", "images/inventoryimages_skin/neverfade_paper_broken.xml"),
             Asset("IMAGE", "images/inventoryimages_skin/neverfade_paper_broken.tex"),
             Asset("ATLAS", "images/inventoryimages_skin/foliageath_neverfade_paper.xml"),
@@ -1162,8 +1192,6 @@ _G.SKINS_LEGION = {
 		assets = {
 			Asset("ANIM", "anim/skin/neverfade_paper2.zip"),
             Asset("ANIM", "anim/skin/neverfade_butterfly_paper2.zip"),
-            -- Asset("ATLAS", "images/inventoryimages_skin/neverfade_paper2.xml"),
-            -- Asset("IMAGE", "images/inventoryimages_skin/neverfade_paper2.tex"),
             Asset("ATLAS", "images/inventoryimages_skin/neverfade_paper2_broken.xml"),
             Asset("IMAGE", "images/inventoryimages_skin/neverfade_paper2_broken.tex"),
             Asset("ATLAS", "images/inventoryimages_skin/foliageath_neverfade_paper2.xml"),
@@ -1236,7 +1264,7 @@ _G.SKINS_LEGION = {
 		assets = {
 			Asset("ANIM", "anim/skin/hat_lichen_emo_que.zip"),
 		},
-		image = { name = nil, atlas = nil, setable = true, },
+		image = { name = nil, atlas = nil, setable = true },
 
         string = ischinese and { name = "\"困惑\"发卡" } or { name = "Question Hairpin" },
 
@@ -1259,7 +1287,7 @@ _G.SKINS_LEGION = {
 		assets = {
 			Asset("ANIM", "anim/skin/hat_lichen_disguiser.zip"),
 		},
-		image = { name = nil, atlas = nil, setable = true, },
+		image = { name = nil, atlas = nil, setable = true },
 
         string = ischinese and { name = "深渊的星" } or { name = "Abyss Star Hairpin" },
 
@@ -1286,7 +1314,7 @@ _G.SKINS_LEGION = {
 		assets = {
 			Asset("ANIM", "anim/skin/hat_cowboy_tvplay.zip"),
 		},
-		image = { name = nil, atlas = nil, setable = true, },
+		image = { name = nil, atlas = nil, setable = true },
 
         string = ischinese and { name = "卡尔的警帽，永远" } or { name = "Carl's Forever Police Cap" },
 
@@ -1301,6 +1329,38 @@ _G.SKINS_LEGION = {
             cut = 0.03, size = "med", offset_y = 0.2, scale = 0.8, nofx = nil,
         },
     },
+    pinkstaff_tvplay = {
+        base_prefab = "pinkstaff",
+		type = "item", skin_tags = {}, release_group = 555, rarity = rarityFree,
+
+        skin_id = "notnononl",
+		assets = {
+			Asset("ANIM", "anim/skin/pinkstaff_tvplay.zip")
+		},
+        image = { name = nil, atlas = nil, setable = true },
+
+        string = ischinese and { name = "音速起子12" } or { name = "Sonic Screwdriver 12" },
+
+		anim = {
+            bank = nil, build = nil,
+            anim = nil, isloop_anim = nil, animpush = nil, isloop_animpush = nil,
+            setable = true
+        },
+        fn_start = function(inst)
+            inst.fxcolour = {115/255, 217/255, 255/255}
+        end,
+        equip = {
+            symbol = "swap_object", build = "pinkstaff_tvplay", file = "swap_object"
+        },
+        -- equipfx = {
+        --     start = function(inst, owner)
+        --         SetFollowedFx(inst, owner, "pinkstaff_tvplay_fx", "swap_object", 0, 0)
+        --     end,
+        --     stop = EndFollowedFx
+        -- },
+        exchangefx = { prefab = nil, offset_y = nil, scale = nil },
+        floater = { cut = 0.15, size = "small", offset_y = 0.35, scale = 0.5, nofx = nil }
+    },
 
     boltwingout_disguiser = {
         base_prefab = "boltwingout",
@@ -1311,7 +1371,7 @@ _G.SKINS_LEGION = {
 			Asset("ANIM", "anim/skin/boltwingout_disguiser.zip"),
             Asset("ANIM", "anim/skin/boltwingout_shuck_disguiser.zip"),
 		},
-		image = { name = nil, atlas = nil, setable = true, },
+		image = { name = nil, atlas = nil, setable = true },
 
         string = ischinese and { name = "枯叶飞舞" } or { name = "Fallen Dance" },
 
@@ -1337,7 +1397,7 @@ _G.SKINS_LEGION = {
 		assets = {
 			Asset("ANIM", "anim/skin/fishhomingtool_awesome_thanks.zip")
 		},
-        image = { name = nil, atlas = nil, setable = true, },
+        image = { name = nil, atlas = nil, setable = true },
 
         string = ischinese and { name = "云烟" } or { name = "YunYan" },
 
@@ -1361,7 +1421,7 @@ _G.SKINS_LEGION = {
 		assets = {
 			Asset("ANIM", "anim/skin/fishhomingtool_normal_thanks.zip")
 		},
-        image = { name = nil, atlas = nil, setable = true, },
+        image = { name = nil, atlas = nil, setable = true },
 
         string = {
             name = ischinese and "云烟草" or "YunYan Cigarette"
@@ -1432,7 +1492,7 @@ _G.SKINS_LEGION = {
 		assets = {
 			Asset("ANIM", "anim/skin/shield_l_log_emo_pride.zip"),
 		},
-		image = { name = nil, atlas = nil, setable = true, },
+		image = { name = nil, atlas = nil, setable = true },
 
         string = ischinese and { name = "爱上彩虹" } or { name = "Love Rainbow" },
 
@@ -1463,7 +1523,7 @@ _G.SKINS_LEGION = {
 		assets = {
 			Asset("ANIM", "anim/skin/shield_l_log_emo_fist.zip"),
 		},
-		image = { name = nil, atlas = nil, setable = true, },
+		image = { name = nil, atlas = nil, setable = true },
 
         string = ischinese and { name = "重拳出击" } or { name = "Punch Quest" },
 
@@ -1489,7 +1549,7 @@ _G.SKINS_LEGION = {
 		assets = {
 			Asset("ANIM", "anim/skin/shield_l_log_era.zip"),
 		},
-		image = { name = nil, atlas = nil, setable = true, },
+		image = { name = nil, atlas = nil, setable = true },
 
         string = ischinese and { name = "洋流之下匍匐" } or { name = "Under Current Crawl" },
 
@@ -1516,7 +1576,7 @@ _G.SKINS_LEGION = {
 		assets = {
 			Asset("ANIM", "anim/skin/shield_l_sand_era.zip"),
 		},
-		image = { name = nil, atlas = nil, setable = true, },
+		image = { name = nil, atlas = nil, setable = true },
 
         string = ischinese and { name = "坚硬头骨低鸣" } or { name = "Squealing Skull" },
 
@@ -1538,7 +1598,7 @@ _G.SKINS_LEGION = {
 		assets = {
 			Asset("ANIM", "anim/skin/shield_l_sand_op.zip"),
 		},
-		image = { name = nil, atlas = nil, setable = true, },
+		image = { name = nil, atlas = nil, setable = true },
 
         string = ischinese and { name = "旧稿" } or { name = "Old Art" },
 
@@ -1727,7 +1787,7 @@ _G.SKINS_LEGION = {
             Asset("ATLAS", "images/inventoryimages_skin/foliageath_lileaves_era.xml"),
             Asset("IMAGE", "images/inventoryimages_skin/foliageath_lileaves_era.tex"),
 		},
-        image = { name = nil, atlas = nil, setable = true, },
+        image = { name = nil, atlas = nil, setable = true },
 
         string = {
             name = ischinese and "花叶婆娑" or "Platycerium Leaves"
@@ -1760,7 +1820,7 @@ _G.SKINS_LEGION = {
 		assets = {
 			Asset("ANIM", "anim/skin/triplegoldenshovelaxe_era.zip"),
 		},
-        image = { name = nil, atlas = nil, setable = true, },
+        image = { name = nil, atlas = nil, setable = true },
 
         string = ischinese and { name = "长河探索叮咚" } or { name = "Era River Explorer" },
 
@@ -1786,7 +1846,7 @@ _G.SKINS_LEGION = {
 		assets = {
 			Asset("ANIM", "anim/skin/tripleshovelaxe_era.zip"),
 		},
-        image = { name = nil, atlas = nil, setable = true, },
+        image = { name = nil, atlas = nil, setable = true },
 
         string = {
             name = ischinese and "谷地发现叮咚" or "Era Valley Explorer"
@@ -1815,7 +1875,7 @@ _G.SKINS_LEGION = {
 		assets = {
 			Asset("ANIM", "anim/skin/backcub_fans.zip"),
 		},
-		image = { name = nil, atlas = nil, setable = true, },
+		image = { name = nil, atlas = nil, setable = true },
 
         string = ischinese and { name = "饭仔" } or { name = "Kid Fan" },
 
@@ -1954,7 +2014,7 @@ _G.SKINS_LEGION = {
             Asset("ATLAS", "images/inventoryimages_skin/foliageath_rosorns_collector.xml"),
             Asset("IMAGE", "images/inventoryimages_skin/foliageath_rosorns_collector.tex"),
 		},
-        image = { name = nil, atlas = nil, setable = true, },
+        image = { name = nil, atlas = nil, setable = true },
 
         string = {
             name = ischinese and "贯星剑" or "Star Pierced Sword"
@@ -2948,7 +3008,7 @@ local skinidxes = { --用以皮肤排序
     "shield_l_log_emo_fist", "hat_lichen_emo_que",
 
     "backcub_fans2", "backcub_fans",
-    "shield_l_log_emo_pride", "shield_l_sand_op", "hat_cowboy_tvplay", "hat_lichen_disguiser", "orchitwigs_disguiser"
+    "shield_l_log_emo_pride", "shield_l_sand_op", "pinkstaff_tvplay",  "hat_cowboy_tvplay", "hat_lichen_disguiser", "orchitwigs_disguiser"
 }
 for i,skinname in pairs(skinidxes) do
     _G.SKIN_IDX_LEGION[i] = skinname

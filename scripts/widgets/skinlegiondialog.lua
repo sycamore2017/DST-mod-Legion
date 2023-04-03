@@ -2050,6 +2050,38 @@ local SkinData = {
             }
         }
     },
+    pinkstaff_tvplay = {
+        string = ischinese and {
+            collection = "TVPLAY", access = "FREE",
+            descitem = "解锁\"幻象法杖\"的皮肤。",
+            description = ""
+        } or {
+            collection = "TVPLAY", access = "FREE",
+            descitem = "Unlock \"Illusion Staff\" skin.",
+            description = "The story was not translated."
+        },
+        height_anim = 145,
+        anims = {
+            {
+                bank = "pinkstaff_tvplay", build = "pinkstaff_tvplay",
+                anim = "idle", anim2 = nil, isloop = false,
+                x = -45, y = 0, scale = 0.38
+            },
+            -- {
+            --     bank = "pinkstaff_tvplay_fx", build = "pinkstaff_tvplay_fx",
+            --     anim = "idle", anim2 = nil, isloop = true,
+            --     x = -45, y = 40, scale = 0.38
+            -- },
+            {
+                symbol = {
+                    { symbol = "swap_object", build = "pinkstaff_tvplay", file = "swap_object", type = 1 },
+                },
+                fn_anim = SetAnim_player,
+                fn_click = SetAnim_player2,
+                x = 45, y = 0, scale = 0.38
+            }
+        }
+    },
 }
 
 local function GetName(skin)

@@ -233,6 +233,7 @@ local InventoryPrefabsList = {  --每个元素的下标值为每种物品栏图�
     revolvedmoonlight_item_taste4 = { build = "images_minisign_skins2" },
     revolvedmoonlight_taste4 = { build = "images_minisign_skins2" },
     revolvedmoonlight_pro_taste4 = { build = "images_minisign_skins2" },
+    pinkstaff_tvplay = { build = "images_minisign_skins2" },
 }
 
 return InventoryPrefabsList
