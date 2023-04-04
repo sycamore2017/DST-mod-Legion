@@ -1754,15 +1754,16 @@ GENETRANS.strfn = function(act)
 end
 GENETRANS.fn = function(act)
     if act.target ~= nil and act.target.components.genetrans ~= nil and act.doer ~= nil then
-        local material
+        local material = act.invobject
         if
-            act.doer.components.inventory ~= nil and act.doer.components.inventory:IsHeavyLifting() and
+            material == nil and
+            -- act.doer.components.inventory ~= nil and act.doer.components.inventory:IsHeavyLifting() and
+            act.doer.components.inventory ~= nil and --inventory:IsHeavyLifting() 不能判定，因为神话书说里改了
             not (act.doer.components.rider ~= nil and act.doer.components.rider:IsRiding())
         then
             material = act.doer.components.inventory:GetEquippedItem(EQUIPSLOTS.BODY)
-        else
-            material = act.invobject
         end
+
         if material ~= nil then
             if material.prefab == "siving_rocks" or material.sivturnenergy ~= nil then
                 return act.target.components.genetrans:Charge(material, act.doer)
@@ -1786,7 +1787,8 @@ AddAction(GENETRANS)
 AddComponentAction("SCENE", "genetrans", function(inst, doer, actions, right)
     if
         right and
-        (doer.replica.inventory ~= nil and doer.replica.inventory:IsHeavyLifting()) and
+        -- (doer.replica.inventory ~= nil and doer.replica.inventory:IsHeavyLifting()) and
+        doer.replica.inventory ~= nil and --inventory:IsHeavyLifting() 不能判定，因为神话书说里改了
         not (doer.replica.rider ~= nil and doer.replica.rider:IsRiding())
     then
         local item = doer.replica.inventory:GetEquippedItem(EQUIPSLOTS.BODY)

@@ -2955,6 +2955,8 @@ _G.SKIN_IDS_LEGION = {
         icire_rock_day = true,
         neverfade_paper = true, neverfadebush_paper = true, neverfade_paper2 = true, neverfadebush_paper2 = true, siving_feather_real_paper = true, siving_feather_fake_paper = true,
     },
+    ["642c14d9f2b67d287a35d439"] = { --5谷丰登
+    }
 }
 _G.SKIN_IDX_LEGION = {
     -- [1] = "rosorns_spell",
