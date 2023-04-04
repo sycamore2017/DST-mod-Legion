@@ -704,6 +704,38 @@ MakeFx({ --白木吉他：弹奏时的飘动音符
     end,
     fn_remove = nil,
 })
+table.insert(prefs, Prefab( --幻象法杖：电光(音速起子12)
+    "pinkstaff_fx_tvplay",
+    function()
+        local inst = CreateEntity()
+
+        inst.entity:AddTransform()
+        inst.entity:AddAnimState()
+        inst.entity:AddNetwork()
+
+        inst.AnimState:SetBank("pinkstaff_fx_tvplay")
+        inst.AnimState:SetBuild("pinkstaff_fx_tvplay")
+        inst.AnimState:PlayAnimation("idle", true)
+        inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
+        inst.AnimState:SetMultColour(115/255, 217/255, 255/255, 0.6)
+        inst.AnimState:SetFinalOffset(1)
+
+        inst:AddTag("FX")
+
+        inst.entity:SetPristine()
+        if not TheWorld.ismastersim then
+            return inst
+        end
+
+        inst.persists = false
+
+        return inst
+    end,
+    {
+        Asset("ANIM", "anim/skin/pinkstaff_fx_tvplay.zip")
+    },
+    nil
+))
 
 ------
 --丰饶传说
@@ -725,7 +757,7 @@ MakeFx({ --脱壳之翅：逃脱时的茸毛特效
     end,
     fn_remove = nil,
 })
-MakeFx({ --脱壳之翅：逃脱时的茸毛特效（枯叶飞舞皮肤）
+MakeFx({ --脱壳之翅：逃脱时的茸毛特效（枯叶飞舞）
     name = "boltwingout_fx_disguiser",
     assets = {
         Asset("ANIM", "anim/lavaarena_heal_projectile.zip"), --官方的熔炉奶杖击中特效动画

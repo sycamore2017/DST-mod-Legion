@@ -1352,12 +1352,12 @@ _G.SKINS_LEGION = {
         equip = {
             symbol = "swap_object", build = "pinkstaff_tvplay", file = "swap_object"
         },
-        -- equipfx = {
-        --     start = function(inst, owner)
-        --         SetFollowedFx(inst, owner, "pinkstaff_tvplay_fx", "swap_object", 0, 0)
-        --     end,
-        --     stop = EndFollowedFx
-        -- },
+        equipfx = {
+            start = function(inst, owner)
+                SetFollowedFx(inst, owner, "pinkstaff_fx_tvplay", "swap_object", 0, -140)
+            end,
+            stop = EndFollowedFx
+        },
         exchangefx = { prefab = nil, offset_y = nil, scale = nil },
         floater = { cut = 0.15, size = "small", offset_y = 0.35, scale = 0.5, nofx = nil }
     },
