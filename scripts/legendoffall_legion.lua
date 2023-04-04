@@ -1373,6 +1373,7 @@ _G.CROPS_DATA_LEGION.cactus_meat = {
     fn_pick = function(self, doer, loot) --采集时被刺伤
         if
             doer ~= nil and doer.components.combat ~= nil and
+            not doer:HasTag("shadowminion") and
             not (
                 doer.components.inventory ~= nil and
                 (

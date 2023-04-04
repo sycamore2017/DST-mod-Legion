@@ -80,6 +80,7 @@ local function MakeBush(data)
             setberries(inst, 1)
 
             inst:AddTag("bush")
+            inst:AddTag("bush_l") --棱镜标签：表示能被暗影仆从采摘(默认是带 flwoer 标签的东西无法被采摘)
             inst:AddTag("plant")
 
             if data.fn_common ~= nil then
@@ -264,6 +265,7 @@ MakeBush({
             --采集时被刺伤
             if
                 picker.components.combat ~= nil and
+                not picker:HasTag("shadowminion") and
                 not (
                     picker.components.inventory ~= nil and
                     (

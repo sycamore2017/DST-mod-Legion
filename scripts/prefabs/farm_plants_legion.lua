@@ -1263,6 +1263,9 @@ local function ComputStackNum(value, item)
 	return (value or 0) + (item.components.stackable and item.components.stackable.stacksize or 1)
 end
 local function IsDigestible(item)
+	if item.prefab == "fruitflyfruit" then
+        return not item:HasTag("fruitflyfruit") --没有 fruitflyfruit 就代表是枯萎了
+    end
 	return item.prefab ~= "insectshell_l" and item.prefab ~= "boneshard" and
 		item.prefab ~= "seeds_plantmeat_l" and --不吃自己的异种
 		item.prefab ~= "plantmeat" and item.prefab ~= "plantmeat_cooked" and --这是巨食草主产物，不能吃掉

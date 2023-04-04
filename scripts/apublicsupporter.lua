@@ -2262,6 +2262,58 @@ AddStategraphPostInit("wilson", function(sg)
 end)
 
 --------------------------------------------------------------------------
+--[[ 让暗影仆从能采摘三花 ]]
+--------------------------------------------------------------------------
+
+local function FindPickupableItem_filter(v, ba, owner, radius, furthestfirst, positionoverride, ignorethese, onlytheseprefabs, allowpickables, ispickable, worker)
+    if v.components.burnable ~= nil and (v.components.burnable:IsBurning() or v.components.burnable:IsSmoldering()) then
+        return false
+    end
+    if ispickable then
+        if not allowpickables then
+            return false
+        end
+    end
+    if ignorethese ~= nil and ignorethese[v] ~= nil and ignorethese[v].worker ~= worker then
+        return false
+    end
+    if onlytheseprefabs ~= nil and onlytheseprefabs[ispickable and v.components.pickable.product or v.prefab] == nil then
+        return false
+    end
+    if ba ~= nil and ba.target == v and (ba.action == ACTIONS.PICKUP or ba.action == ACTIONS.PICK) then
+        return false
+    end
+    return v, ispickable
+end
+
+local FindPickupableItem_old = _G.FindPickupableItem
+_G.FindPickupableItem = function(owner, radius, furthestfirst, positionoverride, ignorethese, onlytheseprefabs, allowpickables, worker)
+    if owner == nil or owner.components.inventory == nil then
+        return nil
+    end
+    local ba = owner:GetBufferedAction()
+    local x, y, z
+    if positionoverride then
+        x, y, z = positionoverride:Get()
+    else
+        x, y, z = owner.Transform:GetWorldPosition()
+    end
+    local ents = TheSim:FindEntities(x, y, z, radius, { "bush_l" }, { "INLIMBO", "NOCLICK" }, { "pickable" }) --修改点
+    local istart, iend, idiff = 1, #ents, 1
+    if furthestfirst then
+        istart, iend, idiff = iend, istart, -1
+    end
+    for i = istart, iend, idiff do
+        local v = ents[i]
+        local ispickable = v:HasTag("pickable")
+        if FindPickupableItem_filter(v, ba, owner, radius, furthestfirst, positionoverride, ignorethese, onlytheseprefabs, allowpickables, ispickable, worker) then
+            return v, ispickable
+        end
+    end
+    return FindPickupableItem_old(owner, radius, furthestfirst, positionoverride, ignorethese, onlytheseprefabs, allowpickables, worker)
+end
+
+--------------------------------------------------------------------------
 --[[ 服务器专属修改 ]]
 --------------------------------------------------------------------------
 

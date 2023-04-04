@@ -374,6 +374,9 @@ for y = 3, 0, -1 do
     end
 end
 function params.plant_nepenthes_l.itemtestfn(container, item, slot)
+    if item.prefab == "fruitflyfruit" then
+        return not item:HasTag("fruitflyfruit") --没有 fruitflyfruit 就代表是枯萎了
+    end
     return not (item:HasTag("irreplaceable") or item:HasTag("nobundling") or item:HasTag("nodigest_l"))
 end
 
