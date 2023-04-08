@@ -77,7 +77,7 @@ local SkinStrings = ischinese and {
 
 local AnimModels = {
     "wilson", "willow", "wendy", "wolfgang", "wx78", "wickerbottom", "woodie", "waxwell", "wathgrithr",
-    "webber", "winona", "warly"
+    "webber", "winona", "warly", "wes"
 }
 local AnimNames = {
     "research", "emoteXL_sad", "emoteXL_annoyed", "emoteXL_happycheer", "emoteXL_waving4",
