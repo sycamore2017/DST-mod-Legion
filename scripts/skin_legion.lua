@@ -1266,7 +1266,7 @@ _G.SKINS_LEGION = {
 		},
 		image = { name = nil, atlas = nil, setable = true },
 
-        string = ischinese and { name = "\"困惑\"发卡" } or { name = "Question Hairpin" },
+        string = ischinese and { name = "困惑发卡" } or { name = "Question Hairpin" },
 
 		anim = {
             bank = nil, build = nil,
@@ -1551,7 +1551,7 @@ _G.SKINS_LEGION = {
 		},
 		image = { name = nil, atlas = nil, setable = true },
 
-        string = ischinese and { name = "洋流之下匍匐" } or { name = "Under Current Crawl" },
+        string = ischinese and { name = "三叶虫化石" } or { name = "Trilobite Fossil" },
 
         anim = {
             bank = nil, build = nil,
@@ -1578,7 +1578,7 @@ _G.SKINS_LEGION = {
 		},
 		image = { name = nil, atlas = nil, setable = true },
 
-        string = ischinese and { name = "坚硬头骨低鸣" } or { name = "Squealing Skull" },
+        string = ischinese and { name = "三角龙头骨" } or { name = "The Skull of Triceratops" },
 
         anim = {
             bank = nil, build = nil,
@@ -1662,7 +1662,7 @@ _G.SKINS_LEGION = {
 		},
 		image = { name = nil, atlas = nil, setable = false, },
 
-        string = ischinese and { name = "被封存的窸窣" } or { name = "Sealed Rustle" },
+        string = ischinese and { name = "琥珀石中蝇" } or { name = "In Amber" },
 
 		fn_start = function(inst)
             inst.AnimState:SetBank("heat_rock")
@@ -1763,7 +1763,7 @@ _G.SKINS_LEGION = {
 			Asset("ANIM", "anim/skin/lilybush_era.zip"),
 		},
 
-        string = ischinese and { name = "满布大地婆娑" } or { name = "Platycerium Bush" },
+        string = ischinese and { name = "婆娑角蕨" } or { name = "Platycerium Bush" },
 
 		fn_start = function(inst)
             inst.AnimState:SetBank("berrybush2")
@@ -1790,7 +1790,7 @@ _G.SKINS_LEGION = {
         image = { name = nil, atlas = nil, setable = true },
 
         string = {
-            name = ischinese and "花叶婆娑" or "Platycerium Leaves"
+            name = ischinese and "婆娑花叶" or "Platycerium Leaves"
         },
 
 		anim = {
@@ -1822,7 +1822,7 @@ _G.SKINS_LEGION = {
 		},
         image = { name = nil, atlas = nil, setable = true },
 
-        string = ischinese and { name = "长河探索叮咚" } or { name = "Era River Explorer" },
+        string = ischinese and { name = "铛铛考古镐" } or { name = "Era River Explorer" },
 
 		anim = {
             bank = nil, build = nil,
@@ -1849,7 +1849,7 @@ _G.SKINS_LEGION = {
         image = { name = nil, atlas = nil, setable = true },
 
         string = {
-            name = ischinese and "谷地发现叮咚" or "Era Valley Explorer"
+            name = ischinese and "叮叮考古镐" or "Era Valley Explorer"
         },
 
 		anim = {
@@ -2864,7 +2864,7 @@ _G.SKINS_LEGION = {
 		},
         image = { name = nil, atlas = nil, setable = true },
 
-        string = ischinese and { name = "黑色旋涡" } or { name = "Choccy Sundae" },
+        string = ischinese and { name = "黑巧旋涡" } or { name = "Choccy Sundae" },
 
 		fn_start = function(inst)
             inst.AnimState:SetScale(0.85, 0.85, 0.85)

@@ -1265,6 +1265,8 @@ end
 local function IsDigestible(item)
 	if item.prefab == "fruitflyfruit" then
         return not item:HasTag("fruitflyfruit") --没有 fruitflyfruit 就代表是枯萎了
+	elseif item.prefab == "glommerflower" then
+		return not item:HasTag("glommerflower") --没有 glommerflower 就代表是枯萎了
     end
 	return item.prefab ~= "insectshell_l" and item.prefab ~= "boneshard" and
 		item.prefab ~= "seeds_plantmeat_l" and --不吃自己的异种

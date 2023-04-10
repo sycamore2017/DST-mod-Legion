@@ -61,6 +61,15 @@ end
 --[[ 子圭x型岩 ]]
 --------------------------------------------------------------------------
 
+local function SetRotation(inst, delta)
+    local angle = inst.Transform:GetRotation()
+    if inst.SetOrientation ~= nil then
+        inst.SetOrientation(inst, angle + delta)
+    else
+        inst.Transform:SetRotation(angle + delta)
+    end
+end
+
 local function MakeDerivant(data)
     local function UpdateGrowing(inst)
         if IsTooDarkToGrow_legion(inst) then
@@ -104,6 +113,8 @@ local function MakeDerivant(data)
             inst.AnimState:SetScale(1.3, 1.3)
             MakeSnowCovered_comm_legion(inst)
 
+            inst.Transform:SetTwoFaced()
+
             inst.MiniMapEntity:SetIcon("siving_derivant.tex")
 
             inst.Light:Enable(false)
@@ -114,6 +125,7 @@ local function MakeDerivant(data)
 
             inst:AddTag("siving_derivant")
             inst:AddTag("silviculture") --这个标签能让《造林学》发挥作用
+            inst:AddTag("rotatableobject") --能让栅栏击剑起作用
 
             inst:AddComponent("skinedlegion")
             inst.components.skinedlegion:Init("siving_derivant_"..data.name)
@@ -128,6 +140,8 @@ local function MakeDerivant(data)
             inst:AddComponent("inspectable")
 
             inst:AddComponent("lootdropper")
+
+            inst:AddComponent("savedrotation")
 
             inst:AddComponent("workable")
 
@@ -208,6 +222,7 @@ local function SetTimer_derivant(inst, time, nextname)
                 if inst.treeState ~= 0 then
                     tree.OnTreeLive(tree, inst.treeState)
                 end
+                SetRotation(tree, inst.Transform:GetRotation())
                 tree.Transform:SetPosition(inst.Transform:GetWorldPosition())
             end
             inst:Remove()
@@ -230,6 +245,7 @@ local function SpawnSkinedPrefab(inst, itemname)
         if inst.treeState ~= 0 then
             tree.OnTreeLive(tree, inst.treeState)
         end
+        SetRotation(tree, inst.Transform:GetRotation())
         tree.Transform:SetPosition(x, y, z)
     end
 end

@@ -1348,8 +1348,8 @@ _G.CROPS_DATA_LEGION.cactus_meat = {
     regrowstage = 1,
     bank = "crop_legion_cactus", build = "crop_legion_cactus",
     leveldata = {
-        { anim = { "level1_1", "level1_2", "level1_3" }, time = time_crop*0.45, deadanim = "dead1", witheredprefab = nil },
-        { anim = { "level2_1", "level2_2", "level2_3" }, time = time_crop*0.55, deadanim = "dead1", witheredprefab = {"cutgrass"} },
+        { anim = { "level1_1", "level1_2", "level1_3" }, time = TUNING.TOTAL_DAY_TIME*10*0.45, deadanim = "dead1", witheredprefab = nil },
+        { anim = { "level2_1", "level2_2", "level2_3" }, time = TUNING.TOTAL_DAY_TIME*10*0.55, deadanim = "dead1", witheredprefab = {"cutgrass"} },
         { anim = { "level3_1", "level3_2", "level3_3" }, time = time_grow, deadanim = "dead1", witheredprefab = {"cutgrass"}, pickable = 1 },
         { anim = { "level4_1", "level4_2", "level4_3" }, time = time_day*6, deadanim = "dead1", witheredprefab = {"cutgrass"}, bloom = true }
     },
@@ -1469,6 +1469,7 @@ local digest_data_l = {
     lavae_cocoon = { lvl = nil, attract = nil, loot = { insectshell_l = 28 } }, --冷冻虫卵
     butter = { lvl = nil, attract = nil, loot = { insectshell_l = 16 } }, --黄油
     royal_jelly = { lvl = nil, attract = nil, loot = { insectshell_l = 16 } }, --蜂王浆
+    glommerflower = { lvl = nil, attract = nil, loot = { insectshell_l = 16 } }, --格罗姆花
     glommerwings = { lvl = nil, attract = nil, loot = { insectshell_l = 16 } }, --格罗姆翅膀
     glommerfuel = { lvl = nil, attract = nil, loot = { insectshell_l = 8 } }, --格罗姆黏液
     honeycomb = { lvl = nil, attract = nil, loot = { insectshell_l = 16 } }, --蜂巢

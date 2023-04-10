@@ -1228,10 +1228,12 @@ local SkinData = {
     },
     triplegoldenshovelaxe_era = {
         string = ischinese and {
+            name = "叮叮铛铛考古镐",
             collection = "ERA", access = "SPECIAL",
             descitem = "解锁\"斧铲-三用型\"、\"斧铲-黄金三用型\"的皮肤。",
             description = "在参加这一次的考古活动前，我们无论如何都想不到接下来我们将有怎样的奇遇。在深山中我们找到了一支新的古老河道，河道与山体相接，可惜被一块顽石堵住，老师和同学们齐心协力，终于在一片叮叮咚咚声中打开了新世界的入口，顺着河道进入山洞，不远处发现了奇怪的图腾，暗示我们顺流而下，越往前走地势便愈发低，而河流中也渐渐出现蓝色的荧光物，终于在河流尽头，我们发现了一片蓝色荧光瀑布和瀑布之下那个神秘的地洞入口。"
         } or {
+            name = "Era Explorers",
             collection = "ERA", access = "SPECIAL",
             descitem = "Unlock \"Triple-shovelaxe\", \"Snazzy Triple-shovelaxe\" skin.",
             description = "The story was not translated.",
@@ -2014,7 +2016,7 @@ local SkinData = {
     },
     revolvedmoonlight_item_taste4 = {
         string = ischinese and {
-            name = "黑色旋涡",
+            name = "黑巧旋涡",
             collection = "TASTE", access = "SPECIAL",
             descitem = "解锁\"月轮宝盘套件\"、\"月轮宝盘\"的皮肤。",
             description = "黑主色调，蓝色是点缀。黑巧圣代，蓝莓为其新增一种活跃感。丝滑香软，如随性的心态。",

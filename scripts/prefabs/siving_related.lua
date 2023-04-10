@@ -1311,7 +1311,7 @@ MakeMask({
             elseif target:HasTag("ghost") then --幽灵
                 return false, "GHOST"
             elseif target.components.health ~= nil then --有生命组件的对象
-                if target.components.health:IsHurt() then
+                if not target.components.health:IsDead() and target.components.health:IsHurt() then
                     if CalcuCost(mask, doer, 20) then
                         target.components.health:DoDelta(15, true, mask.prefab, true, nil, true)
                     else
