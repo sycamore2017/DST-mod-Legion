@@ -101,7 +101,7 @@ end
 local function ComputMoisture(self, x, y, z)
     if self.moisture > 0 then
         TheWorld.components.farming_manager:AddSoilMoistureAtPoint(x, y, z, 100)
-        self.moisture = math.max(0, self.moisture-25)
+        self.moisture = math.max(0, self.moisture-2.5) --由于没法知道耕地里的具体水分，只能这样直接加水了
         return true
     end
 end

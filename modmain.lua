@@ -19,6 +19,7 @@ local _G = GLOBAL
 --------------------------------------------------------------------------
 
 PrefabFiles = {
+    "bush_legion",              --棱镜灌木丛
     "hat_lichen",               --苔衣发卡
     "backcub",                  --靠背熊
     "ingredients_legion",       --食材

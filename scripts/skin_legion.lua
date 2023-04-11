@@ -828,7 +828,7 @@ _G.SKINS_LEGION = {
             inst.AnimState:SetBuild("rosebush_marble")
         end,
         exchangefx = { prefab = nil, offset_y = nil, scale = 1.5 },
-        linkedskins = { rosorns = "rosorns_marble" },
+        linkedskins = { sword = "rosorns_marble" },
         placer = {
             name = nil, bank = "berrybush", build = "rosebush_marble", anim = "dead",
             prefabs = { "dug_rosebush", "cutted_rosebush" },
@@ -889,7 +889,7 @@ _G.SKINS_LEGION = {
             inst.AnimState:SetBuild("lilybush_marble")
         end,
         exchangefx = { prefab = nil, offset_y = nil, scale = nil },
-        linkedskins = { lileaves = "lileaves_marble" },
+        linkedskins = { sword = "lileaves_marble" },
         placer = {
             name = nil, bank = "berrybush", build = "lilybush_marble", anim = "dead",
             prefabs = { "dug_lilybush", "cutted_lilybush" },
@@ -944,7 +944,7 @@ _G.SKINS_LEGION = {
             inst.AnimState:SetBuild("orchidbush_marble")
         end,
         exchangefx = { prefab = nil, offset_y = 1.3, scale = nil },
-        linkedskins = { orchitwigs = "orchitwigs_marble" },
+        linkedskins = { sword = "orchitwigs_marble" },
         placer = {
             name = nil, bank = "berrybush", build = "orchidbush_marble", anim = "dead",
             prefabs = { "dug_orchidbush", "cutted_orchidbush" },
@@ -1002,7 +1002,7 @@ _G.SKINS_LEGION = {
             inst.AnimState:SetBuild("orchidbush_disguiser")
         end,
         exchangefx = { prefab = nil, offset_y = 1.3, scale = nil },
-        linkedskins = { orchitwigs = "orchitwigs_disguiser" },
+        linkedskins = { sword = "orchitwigs_disguiser" },
         placer = {
             name = nil, bank = "berrybush2", build = "orchidbush_disguiser", anim = "dead",
             prefabs = { "dug_orchidbush", "cutted_orchidbush" },
@@ -1770,7 +1770,7 @@ _G.SKINS_LEGION = {
             inst.AnimState:SetBuild("lilybush_era")
         end,
         exchangefx = { prefab = nil, offset_y = nil, scale = 1.5 },
-        linkedskins = { lileaves = "lileaves_era" },
+        linkedskins = { sword = "lileaves_era" },
         placer = {
             name = nil, bank = "berrybush2", build = "lilybush_era", anim = "dead",
             prefabs = { "dug_lilybush", "cutted_lilybush" },
@@ -1997,7 +1997,7 @@ _G.SKINS_LEGION = {
             inst.AnimState:SetBuild("rosebush_collector")
         end,
         exchangefx = { prefab = nil, offset_y = nil, scale = 1.5 },
-        linkedskins = { rosorns = "rosorns_collector" },
+        linkedskins = { sword = "rosorns_collector" },
         placer = {
             name = nil, bank = "berrybush", build = "rosebush_collector", anim = "dead",
             prefabs = { "dug_rosebush", "cutted_rosebush" },

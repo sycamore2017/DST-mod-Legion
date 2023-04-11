@@ -126,6 +126,7 @@ local function MakeDerivant(data)
             inst:AddTag("siving_derivant")
             inst:AddTag("silviculture") --这个标签能让《造林学》发挥作用
             inst:AddTag("rotatableobject") --能让栅栏击剑起作用
+            inst:AddTag("flatrotated_l") --棱镜标签：旋转时旋转180度
 
             inst:AddComponent("skinedlegion")
             inst.components.skinedlegion:Init("siving_derivant_"..data.name)

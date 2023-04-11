@@ -223,7 +223,7 @@ S______GENERIC.DESCRIBE.DUG_ORCHIDBUSH = "我从山中来，带着兰花草。"
 --S_______WEBBER.DESCRIBE.DUG_ORCHIDBUSH = "Yaaay! Popsicle, popsicle!"
 --S_______WINONA.DESCRIBE.DUG_ORCHIDBUSH = "Great to cool off after some hard physical labor."
 
-S_NAMES.CUTTED_ORCHIDBUSH = "兰草种耔"
+S_NAMES.CUTTED_ORCHIDBUSH = "兰草种籽"
 S______GENERIC.DESCRIBE.CUTTED_ORCHIDBUSH = "这是植物很常见的繁殖方式。"
 --S_______WILLOW.DESCRIBE.CUTTED_ORCHIDBUSH = "This is the opposite of burning."
 --S_____WOLFGANG.DESCRIBE.CUTTED_ORCHIDBUSH = "Wolfgang can eat in one bite!"

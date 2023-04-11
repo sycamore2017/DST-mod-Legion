@@ -2298,7 +2298,7 @@ _G.FindPickupableItem = function(owner, radius, furthestfirst, positionoverride,
     else
         x, y, z = owner.Transform:GetWorldPosition()
     end
-    local ents = TheSim:FindEntities(x, y, z, radius, { "bush_l" }, { "INLIMBO", "NOCLICK" }, { "pickable" }) --修改点
+    local ents = TheSim:FindEntities(x, y, z, radius, { "bush_l_f" }, { "INLIMBO", "NOCLICK" }, { "pickable" }) --修改点
     local istart, iend, idiff = 1, #ents, 1
     if furthestfirst then
         istart, iend, idiff = iend, istart, -1
@@ -2311,6 +2311,26 @@ _G.FindPickupableItem = function(owner, radius, furthestfirst, positionoverride,
         end
     end
     return FindPickupableItem_old(owner, radius, furthestfirst, positionoverride, ignorethese, onlytheseprefabs, allowpickables, worker)
+end
+
+--------------------------------------------------------------------------
+--[[ 栅栏击剑旋转一些对象时，旋转180度而不是45度 ]]
+--------------------------------------------------------------------------
+
+local ROTATE_FENCE_fn_old = ACTIONS.ROTATE_FENCE.fn
+ACTIONS.ROTATE_FENCE.fn = function(act)
+    if
+        act.invobject ~= nil and
+        act.target ~= nil and act.target:HasTag("flatrotated_l")
+    then
+        local fencerotator = act.invobject.components.fencerotator
+        if fencerotator then
+            fencerotator:Rotate(act.target, 180)
+            return true
+        end
+    end
+
+    return ROTATE_FENCE_fn_old(act)
 end
 
 --------------------------------------------------------------------------

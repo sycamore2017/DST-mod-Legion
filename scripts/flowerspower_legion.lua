@@ -1,5 +1,4 @@
 local prefabFiles = {
-    "bush_flowers",             --花的灌木丛
     "rosorns",                  --玫瑰刺
     "lileaves",                 --蹄莲叶
     "orchitwigs",               --兰花絮

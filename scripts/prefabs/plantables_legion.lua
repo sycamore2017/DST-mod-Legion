@@ -118,7 +118,11 @@ local function MakePlantable(name, data)
                 end
 
                 if tree.components.pickable ~= nil then
-                    tree.components.pickable:OnTransplant()
+                    if data.deployable.isoriginal then --直接进入生长状态
+                        tree.components.pickable:MakeEmpty()
+                    else
+                        tree.components.pickable:OnTransplant()
+                    end
                 end
 
                 if deployer ~= nil and deployer.SoundEmitter ~= nil then
@@ -165,9 +169,9 @@ local plantables = {
             lightedsize = "small",          --引燃范围大小
         },
         deployable = {
-            prefab = "rosebush",        --种植出的prefab名
-            mode = DEPLOYMODE.PLANT,    --种植类型
-            spacing = nil,              --种植间隔
+            prefab = "rosebush", --种植出的prefab名
+            mode = DEPLOYMODE.PLANT, --种植类型
+            spacing = DEPLOYSPACING.MEDIUM --种植间隔
         },
         fn_common = function(inst)
             inst:AddTag("deployedplant") --植株种植标签，植物人种下时能恢复精神等
@@ -186,8 +190,7 @@ local plantables = {
         },
         deployable = {
             prefab = "lilybush",
-            mode = DEPLOYMODE.PLANT,
-            spacing = nil,
+            mode = DEPLOYMODE.PLANT, spacing = DEPLOYSPACING.MEDIUM
         },
         fn_common = function(inst)
             inst:AddTag("deployedplant")
@@ -206,8 +209,7 @@ local plantables = {
         },
         deployable = {
             prefab = "orchidbush",
-            mode = DEPLOYMODE.PLANT,
-            spacing = DEPLOYSPACING.MEDIUM,
+            mode = DEPLOYMODE.PLANT, spacing = DEPLOYSPACING.LESS
         },
         fn_common = function(inst)
             inst:AddTag("deployedplant")
@@ -215,7 +217,7 @@ local plantables = {
         fn_server = nil,
     },
     cutted_rosebush = {
-        animstate = { bank = "rosebush", build = "rosebush", anim = "cutted", anim_palcer = "dead", },
+        animstate = { bank = "rosebush", build = "rosebush", anim = "cutted", anim_palcer = nil },
         floater = {nil, "large", 0.1, 0.55},
         stacksize = TUNING.STACK_SIZE_SMALLITEM,
         fuelvalue = TUNING.SMALL_FUEL,
@@ -226,8 +228,8 @@ local plantables = {
         },
         deployable = {
             prefab = "rosebush",
-            mode = DEPLOYMODE.PLANT,
-            spacing = nil,
+            isoriginal = true,
+            mode = DEPLOYMODE.PLANT, spacing = DEPLOYSPACING.MEDIUM
         },
         fn_common = function(inst)
             inst:AddTag("deployedplant")
@@ -236,7 +238,7 @@ local plantables = {
         fn_server = nil,
     },
     cutted_lilybush = {
-        animstate = { bank = "lilybush", build = "lilybush", anim = "cutted", anim_palcer = "dead", },
+        animstate = { bank = "lilybush", build = "lilybush", anim = "cutted", anim_palcer = nil },
         floater = {nil, "large", 0.1, 0.55},
         stacksize = TUNING.STACK_SIZE_SMALLITEM,
         fuelvalue = TUNING.SMALL_FUEL,
@@ -247,8 +249,8 @@ local plantables = {
         },
         deployable = {
             prefab = "lilybush",
-            mode = DEPLOYMODE.PLANT,
-            spacing = nil,
+            isoriginal = true,
+            mode = DEPLOYMODE.PLANT, spacing = DEPLOYSPACING.MEDIUM
         },
         fn_common = function(inst)
             inst:AddTag("deployedplant")
@@ -257,7 +259,7 @@ local plantables = {
         fn_server = nil,
     },
     cutted_orchidbush = {
-        animstate = { bank = "orchidbush", build = "orchidbush", anim = "cutted", anim_palcer = "dead", },
+        animstate = { bank = "orchidbush", build = "orchidbush", anim = "cutted", anim_palcer = nil },
         floater = {nil, "large", 0.1, 0.55},
         stacksize = TUNING.STACK_SIZE_SMALLITEM,
         fuelvalue = TUNING.SMALL_FUEL,
@@ -268,7 +270,8 @@ local plantables = {
         },
         deployable = {
             prefab = "orchidbush",
-            mode = DEPLOYMODE.PLANT, spacing = DEPLOYSPACING.MEDIUM
+            isoriginal = true,
+            mode = DEPLOYMODE.PLANT, spacing = DEPLOYSPACING.LESS
         },
         fn_common = function(inst)
             inst:AddTag("deployedplant")
@@ -427,6 +430,26 @@ table.insert(prefabs, MakePlacer(
         inst.AnimState:Pause()
         inst.Transform:SetScale(1.4, 1.4, 1.4)
     end
+))
+
+--花丛-原始placer
+local function SetPlacer_bush(inst)
+    inst.AnimState:Hide("berriesmost")
+    inst.AnimState:Hide("berriesmore")
+    inst.AnimState:Hide("berries")
+    inst.AnimState:Pause()
+end
+table.insert(prefabs, MakePlacer(
+    "cutted_rosebush_placer", "berrybush2", "rosebush", "idle",
+    nil, nil, nil, nil, nil, nil, SetPlacer_bush
+))
+table.insert(prefabs, MakePlacer(
+    "cutted_lilybush_placer", "berrybush2", "lilybush", "idle",
+    nil, nil, nil, nil, nil, nil, SetPlacer_bush
+))
+table.insert(prefabs, MakePlacer(
+    "cutted_orchidbush_placer", "berrybush2", "orchidbush", "idle",
+    nil, nil, nil, nil, nil, nil, SetPlacer_bush
 ))
 
 --------------------
