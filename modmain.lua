@@ -33,6 +33,7 @@ PrefabFiles = {
     "shield_legion",            --盾类武器
     "carpet_legion",            --地毯
     "foods_cookpot",            --料理
+    "placer_legion",            --大多数的placer
 }
 
 Assets = {

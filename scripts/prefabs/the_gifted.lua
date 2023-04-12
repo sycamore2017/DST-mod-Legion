@@ -14,7 +14,7 @@ local prefabs_creep_item =
     "web_hump",
 }
 
-local function OnDeploy_creep_item(inst, pt, deployer)
+local function OnDeploy_creep_item(inst, pt, deployer, rot)
     local tree = SpawnPrefab("web_hump")
     if tree ~= nil then
         tree.Transform:SetPosition(pt:Get())
@@ -594,7 +594,6 @@ end
 -----
 
 return Prefab("web_hump_item", fn_creep_item, assets_creep_item, prefabs_creep_item),
-        MakePlacer("web_hump_item_placer", "web_hump", "web_hump", "anim"),
         Prefab("web_hump", fn_creep, assets_creep, prefabs_creep),
         Prefab("soul_contracts", fn_contracts, assets_contracts, prefabs_contracts)
         -- Prefab("elecrazor", fn_elecrazor, assets_elecrazor, nil)

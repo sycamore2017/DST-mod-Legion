@@ -11,6 +11,10 @@ table.insert(Assets, Asset("ANIM", "anim/images_minisign_skins2.zip"))
 table.insert(PrefabFiles, "fx_ranimbowspark")
 table.insert(PrefabFiles, "skinprefabs_legion")
 
+------资源补充
+RegisterInventoryItemAtlas("images/inventoryimages_skin/agronssword_taste.xml", "agronssword_taste.tex")
+RegisterInventoryItemAtlas("images/inventoryimages_skin/agronssword_taste2.xml", "agronssword_taste2.tex")
+
 --------------------------------------------------------------------------
 --[[ 皮肤函数 ]]
 --------------------------------------------------------------------------
@@ -185,15 +189,6 @@ local function Fn_icire_rock_day(inst, range)
         fx.Follower:FollowSymbol(inst.GUID, "base", 0, -30, 0)
         inst._dd_fx = fx
     end
-end
-
-------
-
-local function Fn_placer_neverfade(inst)
-    for _,v in ipairs({ "berries", "berriesmore", "berriesmost" }) do
-        inst.AnimState:Hide(v)
-    end
-    inst.AnimState:Pause()
 end
 
 ------
@@ -803,10 +798,7 @@ _G.SKINS_LEGION = {
             -- },
             -- fn_anim = function(inst)end, --处于水中时的动画设置，替换anim的默认方式
         },
-        placer = { --自定义的placer
-            name = nil, bank = nil, build = nil, anim = "dead",
-            prefabs = { "prefab1", "prefab2" }, --哪些物品的placer，可对应多个。若为空则表示只用overridedeployplacername机制
-        },
+        fn_placer = function(inst)end
     },
     ]]--
 
@@ -829,10 +821,10 @@ _G.SKINS_LEGION = {
         end,
         exchangefx = { prefab = nil, offset_y = nil, scale = 1.5 },
         linkedskins = { sword = "rosorns_marble" },
-        placer = {
-            name = nil, bank = "berrybush", build = "rosebush_marble", anim = "dead",
-            prefabs = { "dug_rosebush", "cutted_rosebush" },
-        },
+        fn_placer = function(inst)
+            inst.AnimState:SetBank("berrybush")
+            inst.AnimState:SetBuild("rosebush_marble")
+        end
     },
     rosorns_marble = {
         base_prefab = "rosorns",
@@ -890,10 +882,10 @@ _G.SKINS_LEGION = {
         end,
         exchangefx = { prefab = nil, offset_y = nil, scale = nil },
         linkedskins = { sword = "lileaves_marble" },
-        placer = {
-            name = nil, bank = "berrybush", build = "lilybush_marble", anim = "dead",
-            prefabs = { "dug_lilybush", "cutted_lilybush" },
-        },
+        fn_placer = function(inst)
+            inst.AnimState:SetBank("berrybush")
+            inst.AnimState:SetBuild("lilybush_marble")
+        end
     },
     lileaves_marble = {
         base_prefab = "lileaves",
@@ -945,10 +937,10 @@ _G.SKINS_LEGION = {
         end,
         exchangefx = { prefab = nil, offset_y = 1.3, scale = nil },
         linkedskins = { sword = "orchitwigs_marble" },
-        placer = {
-            name = nil, bank = "berrybush", build = "orchidbush_marble", anim = "dead",
-            prefabs = { "dug_orchidbush", "cutted_orchidbush" },
-        },
+        fn_placer = function(inst)
+            inst.AnimState:SetBank("berrybush")
+            inst.AnimState:SetBuild("orchidbush_marble")
+        end
     },
     orchitwigs_marble = {
         base_prefab = "orchitwigs",
@@ -1003,10 +995,10 @@ _G.SKINS_LEGION = {
         end,
         exchangefx = { prefab = nil, offset_y = 1.3, scale = nil },
         linkedskins = { sword = "orchitwigs_disguiser" },
-        placer = {
-            name = nil, bank = "berrybush2", build = "orchidbush_disguiser", anim = "dead",
-            prefabs = { "dug_orchidbush", "cutted_orchidbush" },
-        },
+        fn_placer = function(inst)
+            inst.AnimState:SetBank("berrybush2")
+            inst.AnimState:SetBuild("orchidbush_disguiser")
+        end
     },
     orchitwigs_disguiser = {
         base_prefab = "orchitwigs",
@@ -1087,9 +1079,10 @@ _G.SKINS_LEGION = {
             cut = 0.05, size = "small", offset_y = 0.15, scale = 0.5, nofx = nil,
         },
         linkedskins = { bush = "neverfadebush_thanks" },
-        placer = {
-            name = nil, bank = "neverfadebush_thanks", build = "neverfadebush_thanks", anim = "dead", prefabs = nil
-        }
+        fn_placer = function(inst)
+            inst.AnimState:SetBank("neverfadebush_thanks")
+            inst.AnimState:SetBuild("neverfadebush_thanks")
+        end
     },
     neverfadebush_thanks = {
         base_prefab = "neverfadebush",
@@ -1158,10 +1151,10 @@ _G.SKINS_LEGION = {
             cut = 0.05, size = "small", offset_y = 0.15, scale = 0.5, nofx = nil,
         },
         linkedskins = { bush = "neverfadebush_paper" },
-        placer = {
-            name = nil, bank = "berrybush2", build = "neverfadebush_paper", anim = "idle", prefabs = nil,
-            fn_init = Fn_placer_neverfade
-        }
+        fn_placer = function(inst)
+            inst.AnimState:SetBank("berrybush2")
+            inst.AnimState:SetBuild("neverfadebush_paper")
+        end
     },
     neverfadebush_paper = {
         base_prefab = "neverfadebush",
@@ -1230,10 +1223,10 @@ _G.SKINS_LEGION = {
             cut = 0.05, size = "small", offset_y = 0.15, scale = 0.5, nofx = nil,
         },
         linkedskins = { bush = "neverfadebush_paper2" },
-        placer = {
-            name = nil, bank = "berrybush2", build = "neverfadebush_paper2", anim = "idle", prefabs = nil,
-            fn_init = Fn_placer_neverfade
-        }
+        fn_placer = function(inst)
+            inst.AnimState:SetBank("berrybush2")
+            inst.AnimState:SetBuild("neverfadebush_paper2")
+        end
     },
     neverfadebush_paper2 = {
         base_prefab = "neverfadebush",
@@ -1771,10 +1764,10 @@ _G.SKINS_LEGION = {
         end,
         exchangefx = { prefab = nil, offset_y = nil, scale = 1.5 },
         linkedskins = { sword = "lileaves_era" },
-        placer = {
-            name = nil, bank = "berrybush2", build = "lilybush_era", anim = "dead",
-            prefabs = { "dug_lilybush", "cutted_lilybush" },
-        }
+        fn_placer = function(inst)
+            inst.AnimState:SetBank("berrybush2")
+            inst.AnimState:SetBuild("lilybush_era")
+        end
     },
     lileaves_era = {
         base_prefab = "lileaves",
@@ -1998,10 +1991,10 @@ _G.SKINS_LEGION = {
         end,
         exchangefx = { prefab = nil, offset_y = nil, scale = 1.5 },
         linkedskins = { sword = "rosorns_collector" },
-        placer = {
-            name = nil, bank = "berrybush", build = "rosebush_collector", anim = "dead",
-            prefabs = { "dug_rosebush", "cutted_rosebush" },
-        },
+        fn_placer = function(inst)
+            inst.AnimState:SetBank("berrybush")
+            inst.AnimState:SetBuild("rosebush_collector")
+        end
     },
     rosorns_collector = {
         base_prefab = "rosorns",
@@ -2125,7 +2118,7 @@ _G.SKINS_LEGION = {
             Fn_siving_turn_fruit(genetrans, "siving_turn_collector")
         end,
         exchangefx = { prefab = nil, offset_y = nil, scale = 1.5 },
-        fn_setBuildPlacer = function(inst)
+        fn_placer = function(inst)
             inst.AnimState:SetBank("siving_turn_collector")
             inst.AnimState:SetBuild("siving_turn_collector")
         end
@@ -2151,10 +2144,11 @@ _G.SKINS_LEGION = {
         end,
         exchangefx = { prefab = nil, offset_y = nil, scale = 1.5 },
         linkedskins = { down = nil, up = "siving_derivant_lvl1_thanks" },
-        placer = {
-            name = nil, bank = "siving_derivants_thanks", build = "siving_derivants_thanks", anim = "lvl0",
-            prefabs = { "siving_derivant_item" },
-        },
+        fn_placer = function(inst)
+            inst.AnimState:SetBank("siving_derivants_thanks")
+            inst.AnimState:SetBuild("siving_derivants_thanks")
+            inst.AnimState:SetScale(1.3, 1.3)
+        end
     },
     siving_derivant_lvl1_thanks = {
         base_prefab = "siving_derivant_lvl1",
@@ -2243,10 +2237,11 @@ _G.SKINS_LEGION = {
         end,
         exchangefx = { prefab = nil, offset_y = nil, scale = 1.5 },
         linkedskins = { down = nil, up = "siving_derivant_lvl1_thanks2" },
-        placer = {
-            name = nil, bank = "siving_derivants_thanks2", build = "siving_derivants_thanks2", anim = "lvl0",
-            prefabs = { "siving_derivant_item" },
-        },
+        fn_placer = function(inst)
+            inst.AnimState:SetBank("siving_derivants_thanks2")
+            inst.AnimState:SetBuild("siving_derivants_thanks2")
+            inst.AnimState:SetScale(1.3, 1.3)
+        end
     },
     siving_derivant_lvl1_thanks2 = {
         base_prefab = "siving_derivant_lvl1",
@@ -2334,7 +2329,7 @@ _G.SKINS_LEGION = {
             setable = true
         },
         exchangefx = { prefab = nil, offset_y = nil, scale = nil },
-        fn_setBuildPlacer = function(inst)
+        fn_placer = function(inst)
             inst.AnimState:SetBank("carpet_whitewood_law")
             inst.AnimState:SetBuild("carpet_whitewood_law")
         end
@@ -2364,7 +2359,7 @@ _G.SKINS_LEGION = {
             inst.AnimState:SetScale(1, 1, 1)
         end,
         exchangefx = { prefab = nil, offset_y = nil, scale = nil },
-        fn_setBuildPlacer = function(inst)
+        fn_placer = function(inst)
             inst.AnimState:SetBank("carpet_whitewood_law")
             inst.AnimState:SetBuild("carpet_whitewood_law")
             inst.AnimState:SetScale(1.08, 1.08, 1.08)
@@ -2389,7 +2384,7 @@ _G.SKINS_LEGION = {
             setable = true
         },
         exchangefx = { prefab = nil, offset_y = nil, scale = nil },
-        fn_setBuildPlacer = function(inst)
+        fn_placer = function(inst)
             inst.AnimState:SetBank("carpet_whitewood_law2")
             inst.AnimState:SetBuild("carpet_whitewood_law2")
         end
@@ -2419,7 +2414,7 @@ _G.SKINS_LEGION = {
             inst.AnimState:SetScale(1, 1, 1)
         end,
         exchangefx = { prefab = nil, offset_y = nil, scale = nil },
-        fn_setBuildPlacer = function(inst)
+        fn_placer = function(inst)
             inst.AnimState:SetBank("carpet_whitewood_law2")
             inst.AnimState:SetBuild("carpet_whitewood_law2")
             inst.AnimState:SetScale(1.08, 1.08, 1.08)
@@ -3060,32 +3055,6 @@ for skinname,v in pairs(_G.SKINS_LEGION) do
     --         v.exchangefx.prefab = "explode_reskin"
     --     end
     -- end
-    if v.placer ~= nil then
-        if v.placer.name == nil then
-            v.placer.name = skinname.."_placer"
-        end
-        if v.anim ~= nil then
-            if v.placer.bank == nil then
-                v.placer.bank = v.anim.bank
-            end
-            if v.placer.build == nil then
-                v.placer.build = v.anim.build
-            end
-            if v.placer.anim == nil then
-                v.placer.anim = v.anim.anim
-            end
-        else
-            if v.placer.bank == nil then
-                v.placer.bank = skinname
-            end
-            if v.placer.build == nil then
-                v.placer.build = skinname
-            end
-            if v.placer.anim == nil then
-                v.placer.anim = "idle"
-            end
-        end
-    end
 
     table.insert(v.skin_tags, string.upper(skinname))
     table.insert(v.skin_tags, "CRAFTABLE")
@@ -3139,10 +3108,6 @@ for baseprefab,v in pairs(_G.SKIN_PREFABS_LEGION) do
     _G[baseprefab.."_clear_fn"] = function(inst) end --【服务端】给CreatePrefabSkin()用的
 end
 ischinese = nil
-
-------资源补充
-RegisterInventoryItemAtlas("images/inventoryimages_skin/agronssword_taste.xml", "agronssword_taste.tex")
-RegisterInventoryItemAtlas("images/inventoryimages_skin/agronssword_taste2.xml", "agronssword_taste2.tex")
 
 ------重新生成一遍PREFAB_SKINS_IDS(在prefabskins.lua中被定义)
 _G.PREFAB_SKINS_IDS = {}
@@ -3278,44 +3243,29 @@ _G.SKINS_CACHE_L = { --已有皮肤缓存
     --     skinname2 = true,
     -- },
 }
-_G.SKINS_CACHE_EX_L = { --皮肤切换缓存
+_G.SKINS_CACHE_CG_L = { --皮肤切换缓存
     -- Kxx_xxxx = { --用户ID
-    --     prefab1 = { name = skinname1, placer = placername1 },
-    --     prefab2 = { name = skinname2, placer = placername2 },
-    -- },
+    --     prefab1 = "skinname1" --上次切换的皮肤名
+    -- }
 }
 
-local function SaveExSkin(userid, skin_name, skin_data, skin_data_old)
+local function SaveCGSkin(userid, skin_name, skin_data, skin_data_old)
     if userid == nil then
         return
     end
 
-    local caches = SKINS_CACHE_EX_L[userid]
+    local caches = SKINS_CACHE_CG_L[userid]
     if caches == nil then
-        SKINS_CACHE_EX_L[userid] = {}
-        caches = SKINS_CACHE_EX_L[userid]
-    else
-        --先把以前的清除了
-        if
-            skin_data_old ~= nil and skin_data_old.placer ~= nil and skin_data_old.placer.prefabs ~= nil
-        then
-            for _,v in pairs(skin_data_old.placer.prefabs) do
-                caches[v] = nil
-            end
-        end
+        caches = {}
+        SKINS_CACHE_CG_L[userid] = caches
     end
 
-    --再更新目前的
-    if
-        skin_name ~= nil and
-        skin_data ~= nil and skin_data.placer ~= nil and skin_data.placer.prefabs ~= nil
-    then
-        for _,v in pairs(skin_data.placer.prefabs) do
-            caches[v] = {
-                name = skin_name,
-                placer = skin_data.placer.name
-            }
-        end
+    local prefabname = skin_data and skin_data.base_prefab or nil
+    if prefabname == nil then
+        prefabname = skin_data_old and skin_data_old.base_prefab or nil
+    end
+    if prefabname ~= nil then
+        caches[prefabname] = skin_name
     end
 end
 
@@ -3637,39 +3587,53 @@ if IsServer then
                 if target ~= nil and target.components.skinedlegion ~= nil then
                     tool:DoTaskInTime(0, function()
                         local doer = tool.components.inventoryitem.owner
-                        local skins = PREFAB_SKINS[target.prefab]
-                        local skin_data_old = target.components.skinedlegion:GetSkinedData()
-
-                        local skinname_new = nil
-                        local skinweight = nil
-                        local skinname_old = target.components.skinedlegion:GetSkin()
-                        local skinweight_old = 0
-                        if skinname_old ~= nil and SKINS_LEGION[skinname_old] ~= nil then
-                            skinweight_old = SKINS_LEGION[skinname_old].skin_idx
+                        if not target:IsValid() or doer == nil or doer.userid == nil then
+                            return
                         end
 
-                        if skins ~= nil then
-                            for _,skinname in pairs(skins) do
-                                if DoYouHaveSkin(skinname, doer.userid) then
-                                    if SKINS_LEGION[skinname] ~= nil then
-                                        local weight = SKINS_LEGION[skinname].skin_idx
-                                        if weight > skinweight_old then
-                                            if skinweight == nil or skinweight > weight then
-                                                skinweight = weight
-                                                skinname_new = skinname
-                                            end
-                                        end
+                        local skins = PREFAB_SKINS[target.prefab]
+                        if skins == nil then
+                            return
+                        end
+
+                        local skinname_new = nil
+                        local skinname_old = target.components.skinedlegion:GetSkin()
+                        local skinname_cac = SKINS_CACHE_CG_L[doer.userid] and SKINS_CACHE_CG_L[doer.userid][target.prefab] or nil
+
+                        if skinname_old == nil then --原皮，尝试切换成其他皮肤，优先为缓存皮肤
+                            if skinname_cac ~= nil and DoYouHaveSkin(skinname_cac, doer.userid) then
+                                skinname_new = skinname_cac
+                            else
+                                for _, skinname in pairs(skins) do --寻找第一个拥有的皮肤
+                                    if DoYouHaveSkin(skinname, doer.userid) then
+                                        skinname_new = skinname
+                                        break
+                                    end
+                                end
+                            end
+                        else --非原皮，切换到下一个皮肤
+                            local findit = false
+                            for _, skinname in pairs(skins) do --寻找下一个拥有的皮肤
+                                if skinname_old == skinname then
+                                    findit = true
+                                elseif findit then --只判断当前皮肤之后的皮肤
+                                    if DoYouHaveSkin(skinname, doer.userid) then
+                                        skinname_new = skinname
+                                        break
                                     end
                                 end
                             end
                         end
                         if skinname_new ~= skinname_old then
+                            local skin_data_old = target.components.skinedlegion:GetSkinedData()
                             target.components.skinedlegion:SetSkin(skinname_new)
 
                             --交换记录
                             local skin_name = target.components.skinedlegion:GetSkin()
-                            SaveExSkin(doer.userid, skin_name, target.components.skinedlegion:GetSkinedData(), skin_data_old)
-                            FnRpc_s2c(doer.userid, 4, { new = skin_name, old = skinname_old })
+                            if skinname_cac ~= skin_name then
+                                SaveCGSkin(doer.userid, skin_name, target.components.skinedlegion:GetSkinedData(), skin_data_old)
+                                FnRpc_s2c(doer.userid, 4, { new = skin_name, old = skinname_old })
+                            end
                         end
                         target.components.skinedlegion:SpawnSkinExchangeFx(nil, tool) --不管有没有交换成功，都释放特效
                     end)
@@ -3695,6 +3659,9 @@ if IsServer then
                 OnSave_old(inst, data)
             end
 
+            if inst.userid == nil then
+                return
+            end
             if SKINS_CACHE_L[inst.userid] ~= nil then
                 local skins = nil
                 for skinname,v in pairs(SKINS_CACHE_L[inst.userid]) do
@@ -3707,21 +3674,16 @@ if IsServer then
                     data.skins_legion = skins
                 end
             end
-            if SKINS_CACHE_EX_L[inst.userid] ~= nil then
+            if SKINS_CACHE_CG_L[inst.userid] ~= nil then
                 local skins = nil
-                for prefabname,v in pairs(SKINS_CACHE_EX_L[inst.userid]) do
-                    if v.name ~= nil and v.placer ~= nil then --目前只需要这几个数据
-                        if skins == nil then
-                            skins = {}
-                        end
-                        skins[prefabname] = {
-                            name = v.name,
-                            placer = v.placer
-                        }
+                for prefabname,v in pairs(SKINS_CACHE_CG_L[inst.userid]) do
+                    if skins == nil then
+                        skins = {}
                     end
+                    skins[prefabname] = v
                 end
                 if skins ~= nil then
-                    data.skins_ex_legion = skins
+                    data.skins_cg_legion = skins
                 end
             end
         end
@@ -3730,25 +3692,25 @@ if IsServer then
                 OnLoad_old(inst, data)
             end
 
-            --先存下来，等服务器皮肤数据确认后才传给客户端
-            if data ~= nil then
+            if inst.userid == nil then
+                return
+            end
+            if data ~= nil then --先存下来，等服务器皮肤数据确认后才传给客户端
                 if data.skins_legion ~= nil then
                     SKINS_CACHE_L[inst.userid] = data.skins_legion
                 end
-                if data.skins_ex_legion ~= nil then
+                if data.skins_cg_legion ~= nil then
                     local newdata = {}
-                    for prefabname,v in pairs(data.skins_ex_legion) do
-                        if v.name ~= nil and SKINS_LEGION[v.name] ~= nil then --检查皮肤完整性
-                            newdata[prefabname] = v
-                        end
+                    for prefabname,v in pairs(data.skins_cg_legion) do
+                        newdata[prefabname] = v
                     end
-                    SKINS_CACHE_EX_L[inst.userid] = newdata
+                    SKINS_CACHE_CG_L[inst.userid] = newdata
                 end
             end
         end
 
         --实体生成后，开始调取接口获取皮肤数据
-        inst.task_skin_l = inst:DoTaskInTime(1.1, function()
+        inst.task_skin_l = inst:DoTaskInTime(1.2, function()
             inst.task_skin_l = nil
             GetLegionSkins(inst, inst.userid, 0.5, false)
 
@@ -3756,8 +3718,8 @@ if IsServer then
                 if SKINS_CACHE_L[inst.userid] ~= nil then
                     FnRpc_s2c(inst.userid, 1, SKINS_CACHE_L[inst.userid])
                 end
-                if SKINS_CACHE_EX_L[inst.userid] ~= nil then
-                    FnRpc_s2c(inst.userid, 3, SKINS_CACHE_EX_L[inst.userid])
+                if SKINS_CACHE_CG_L[inst.userid] ~= nil then
+                    FnRpc_s2c(inst.userid, 3, SKINS_CACHE_CG_L[inst.userid])
                 end
             end
         end)
@@ -3824,7 +3786,7 @@ AddClientModRPCHandler("LegionSkined", "SkinHandle", function(handletype, data, 
             if data and type(data) == "string" then
                 local success, result = pcall(json.decode, data)
                 if result and ThePlayer and ThePlayer.userid then
-                    SKINS_CACHE_EX_L[ThePlayer.userid] = result
+                    SKINS_CACHE_CG_L[ThePlayer.userid] = result
                 end
             end
 
@@ -3835,7 +3797,7 @@ AddClientModRPCHandler("LegionSkined", "SkinHandle", function(handletype, data, 
                     if result.new ~= nil or result.old ~= nil then
                         local skin_data = result.new ~= nil and SKINS_LEGION[result.new] or nil
                         local skin_data_old = result.old ~= nil and SKINS_LEGION[result.old] or nil
-                        SaveExSkin(ThePlayer.userid, result.new, skin_data, skin_data_old)
+                        SaveCGSkin(ThePlayer.userid, result.new, skin_data, skin_data_old)
                     end
                 end
             end
@@ -3920,42 +3882,21 @@ end
 --[[ placer应用兼容皮肤的切换缓存 ]]
 --------------------------------------------------------------------------
 
-local inventoryitem_replica = require("components/inventoryitem_replica")
+-- local inventoryitem_replica = require("components/inventoryitem_replica")
 
-local GetDeployPlacerName_old = inventoryitem_replica.GetDeployPlacerName
-inventoryitem_replica.GetDeployPlacerName = function(self, ...)
-    local placerold = GetDeployPlacerName_old(self, ...)
-    if placerold == "gridplacer" then
-        return placerold
-    end
+-- local GetDeployPlacerName_old = inventoryitem_replica.GetDeployPlacerName
+-- inventoryitem_replica.GetDeployPlacerName = function(self, ...)
+--     local placerold = GetDeployPlacerName_old(self, ...)
+--     if placerold == "gridplacer" then
+--         return placerold
+--     end
 
-    if ThePlayer and ThePlayer.userid and SKINS_CACHE_EX_L[ThePlayer.userid] ~= nil then
-        local data = SKINS_CACHE_EX_L[ThePlayer.userid]
-        if data[self.inst.prefab] ~= nil then
-            return data[self.inst.prefab].placer or placerold
-        end
-    end
+--     if ThePlayer and ThePlayer.userid and SKINS_CACHE_EX_L[ThePlayer.userid] ~= nil then
+--         local data = SKINS_CACHE_EX_L[ThePlayer.userid]
+--         if data[self.inst.prefab] ~= nil then
+--             return data[self.inst.prefab].placer or placerold
+--         end
+--     end
 
-    return placerold
-end
-
---------------------------------------------------------------------------
---[[ 建筑物placer兼容 ]]
---------------------------------------------------------------------------
-
---建筑的皮肤placer请看playercontroller.StartBuildPlacementMode
-_G.Skined_SetBuildPlacer_legion = function(inst)
-    if inst.components.placer ~= nil then
-        local SetBuilder_old = inst.components.placer.SetBuilder
-        inst.components.placer.SetBuilder = function(self, ...)
-            SetBuilder_old(self, ...)
-            if self.builder and self.builder.components.playercontroller ~= nil then
-                --之所以把皮肤修改写到 SetBuilder 里，是因为 Skined_SetBuildPlacer_legion 执行时还没有皮肤数据
-                local skin = self.builder.components.playercontroller.placer_recipe_skin
-                if skin and SKINS_LEGION[skin] and SKINS_LEGION[skin].fn_setBuildPlacer then
-                    SKINS_LEGION[skin].fn_setBuildPlacer(self.inst)
-                end
-            end
-        end
-    end
-end
+--     return placerold
+-- end

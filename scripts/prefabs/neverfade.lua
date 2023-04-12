@@ -189,7 +189,7 @@ local function OnRecovered(inst, dt, player) --每次被剑鞘恢复时执行的
     end
 end
 
-local function ondeploy(inst, pt, deployer) --这里是右键种植时的函数
+local function ondeploy(inst, pt, deployer, rot) --这里是右键种植时的函数
     local tree = SpawnPrefab("neverfadebush")
     if tree ~= nil then
         local linkdata = inst.components.skinedlegion:GetLinkedSkins() or nil
@@ -279,5 +279,4 @@ local function fn()
     return inst
 end
 
-return Prefab("neverfade", fn, assets, prefabs),
-        MakePlacer("neverfade_placer", "berrybush2", "neverfadebush", "dead")
+return Prefab("neverfade", fn, assets, prefabs)

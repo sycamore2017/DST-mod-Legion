@@ -1436,7 +1436,7 @@ table.insert(prefs, Prefab(
         inst.components.inventoryitem:SetSinks(true)
 
         inst:AddComponent("deployable")
-        inst.components.deployable.ondeploy = function(inst, pt, deployer)
+        inst.components.deployable.ondeploy = function(inst, pt, deployer, rot)
             local tree = SpawnPrefab("siving_soil")
             if tree ~= nil then
                 tree.Transform:SetPosition(pt:Get())
@@ -1461,9 +1461,6 @@ table.insert(prefs, Prefab(
     },
     { "siving_soil" }
 ))
-
---子圭·垄(placer)
-table.insert(prefs, MakePlacer("siving_soil_item_placer", "farm_soil", "siving_soil", "till_idle"))
 
 --------------------------------------------------------------------------
 --[[ 子圭·垄 ]]

@@ -66,7 +66,7 @@ local function MakeItem(data)
 
             inst:AddComponent("deployable")
             inst.components.deployable:SetDeploySpacing(DEPLOYSPACING.MEDIUM)
-            inst.components.deployable.ondeploy = function(inst, pt, deployer)
+            inst.components.deployable.ondeploy = function(inst, pt, deployer, rot)
                 local tree = SpawnPrefab(basename)
                 if tree ~= nil then
                     tree.components.botanycontroller:SetValue(inst.siv_moisture, inst.siv_nutrients, false)
@@ -103,34 +103,6 @@ local function MakeItem(data)
         end,
         data.assets,
         data.prefabs
-    ))
-    table.insert(prefs, MakePlacer(basename.."_item_placer", "firefighter_placement", "firefighter_placement", "idle",
-        true, nil, nil, PLACER_SCALE_CTL, nil, nil, function(inst)
-            local placer2 = CreateEntity()
-
-            --[[Non-networked entity]]
-            placer2.entity:SetCanSleep(false)
-            placer2.persists = false
-
-            placer2.entity:AddTransform()
-            placer2.entity:AddAnimState()
-
-            placer2:AddTag("CLASSIFIED")
-            placer2:AddTag("NOCLICK")
-            placer2:AddTag("placer")
-
-            local s = 1 / PLACER_SCALE_CTL
-            placer2.Transform:SetScale(s, s, s)
-
-            placer2.AnimState:SetBank(basename)
-            placer2.AnimState:SetBuild(basename)
-            placer2.AnimState:PlayAnimation("idle")
-            placer2.AnimState:SetLightOverride(1)
-
-            placer2.entity:SetParent(inst.entity)
-
-            inst.components.placer:LinkEntity(placer2)
-        end
     ))
 end
 
@@ -873,10 +845,6 @@ table.insert(prefs, Prefab(
     { Asset("ANIM", "anim/siving_turn.zip") },
     { "siving_turn_fruit" }
 ))
-
-table.insert(prefs, MakePlacer("siving_turn_placer", "siving_turn", "siving_turn", "idle",
-    nil, nil, nil, nil, nil, nil, Skined_SetBuildPlacer_legion)
-)
 
 --------------------------------------------------------------------------
 --[[ 子圭·育之果 ]]
