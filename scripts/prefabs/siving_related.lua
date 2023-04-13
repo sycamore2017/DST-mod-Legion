@@ -751,6 +751,9 @@ table.insert(prefs, Prefab(
 --[[ 子圭·育 ]]
 --------------------------------------------------------------------------
 
+local function GetDesc_turn(inst, doer) --提示自身的转化数据
+    return inst.components.genetrans:SayDetail(doer, false)
+end
 local function GetStatus_turn(inst)
     local cpt = inst.components.genetrans
     return (cpt == nil and "GENERIC")
@@ -761,6 +764,19 @@ local function GetStatus_turn(inst)
 end
 local function OnWork_turn(inst, worker, workleft, numworks)
     local cpt = inst.components.genetrans
+
+    if cpt.seed ~= nil then --还有东西在上面
+        inst.components.workable:SetWorkLeft(5)
+        if inst.worked_l then --说明已经敲过一次，这一次该掉落了
+            inst.worked_l = nil
+            cpt:ClearAll(worker, true, false)
+        else
+            inst.worked_l = true
+        end
+    else
+        inst.worked_l = nil
+    end
+
     if cpt.energytime > 0 and cpt.seed ~= nil then
         inst.AnimState:PlayAnimation("hit_on")
         inst.AnimState:PushAnimation("on", true)
@@ -795,7 +811,7 @@ table.insert(prefs, Prefab(
         inst.entity:AddLight()
         inst.entity:AddNetwork()
 
-        MakeObstaclePhysics(inst, .35)
+        MakeObstaclePhysics(inst, .15)
 
         inst.MiniMapEntity:SetIcon("siving_turn.tex")
 
@@ -820,7 +836,10 @@ table.insert(prefs, Prefab(
             return inst
         end
 
+        inst.worked_l = nil
+
         inst:AddComponent("inspectable")
+        inst.components.inspectable.descriptionfn = GetDesc_turn
         inst.components.inspectable.getstatus = GetStatus_turn
 
         inst:AddComponent("hauntable")

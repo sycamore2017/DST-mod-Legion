@@ -169,8 +169,14 @@ function GeneTrans:SpawnStackDrop(name, num, pos, doer, items)
 			if doer ~= nil and doer.components.inventory ~= nil then
 				doer.components.inventory:GiveItem(item, nil, pos)
 			else
-				if not item:HasTag("heavy") then --巨大作物不知道为啥不能弹射
+				if not item:HasTag("heavy") then --巨大作物会因为当前位置的 ObstaclePhysics 物体所阻挡，导致掉落效果失败
 					item.components.inventoryitem:OnDropped(true)
+				end
+				if item:HasTag("heavy") then
+					item:DoTaskInTime(0.2, function()
+						item.Transform:SetPosition(doer.Transform:GetWorldPosition())
+						item.components.inventoryitem:OnDropped(true)
+					end)
 				end
 			end
         end
@@ -251,15 +257,7 @@ function GeneTrans:SetUp(seeds, doer)
 	if self.seed ~= nil then --已有种子
 		if self.seednum > 0 then --还有在转化的
 			if self.seed ~= seeds.prefab then --正在转化的和要放入的不一样
-				--拿下已有的种子，准备放入新种子了
-				self:SpawnStackDrop(self.seed, self.seednum, self.inst:GetPosition(), doer, nil)
-				self.seed = nil
-				self.seeddata = nil
-				self.seednum = 0
-				self.timedata.start = nil
-				self.timedata.all = nil
-				self.timedata.pass = nil
-				-- return false, "GROWING"
+				return false, "GROWING"
 			end
 		end
 	end
@@ -297,6 +295,47 @@ function GeneTrans:SetUp(seeds, doer)
 	end
 
     return true
+end
+
+function GeneTrans:ClearAll(doer, mustdrop, initanim) --恢复原始状态
+	if mustdrop then
+		doer = nil
+	end
+
+	--原始物品
+	if self.seednum > 0 then
+		self:SpawnStackDrop(self.seed, self.seednum, self.inst:GetPosition(), doer, nil)
+	end
+	--转化产物
+	GetLootFruit(self, doer, nil)
+
+	--数据初始化
+	if self.taskgrow ~= nil then
+		self.taskgrow:Cancel()
+		self.taskgrow = nil
+	end
+	self.timedata.start = nil
+	self.timedata.all = nil
+	self.timedata.pass = nil
+	self.seed = nil
+	self.seeddata = nil
+	self.seednum = 0
+	self.fruitnum = 0
+	SetLight(self, false)
+	self:TriggerPickable(false)
+
+	if initanim then
+		if self.energytime <= 0 or self.fx == nil then
+			self.AnimState:PlayAnimation("idle", false)
+		else
+			self.AnimState:PlayAnimation("on_to_idle")
+			self.AnimState:PushAnimation("idle", false)
+		end
+	end
+	if self.fx ~= nil then
+		self.fx:Remove()
+		self.fx = nil
+	end
 end
 
 function GeneTrans:CostEnergy(cost)
@@ -646,6 +685,67 @@ function GeneTrans:UnlockGene(items, doer)
 	end
 
 	return true
+end
+
+local function DecimalPointTruncation(value, plus) --截取小数点
+	value = math.floor(value*plus)
+	return value/plus
+end
+local function GetDetailString(self, doer, type)
+	if self.seed == nil then
+		return
+	end
+
+	local data = {
+		name = STRINGS.NAMES[string.upper(self.seed)] or self.seed,
+		seednum = tostring(self.seednum),
+		fruitnum = tostring(self.fruitnum),
+		timepass = 0,
+		timeall = 0
+	}
+
+	if type == 2 then
+		if self.timedata.pass ~= nil then
+			data.timepass = DecimalPointTruncation(self.timedata.pass/TUNING.TOTAL_DAY_TIME, 10)
+		end
+		if self.timedata.all ~= nil then
+			data.timeall = DecimalPointTruncation(self.timedata.all/TUNING.TOTAL_DAY_TIME, 10)
+		end
+		data.timepass = tostring(data.timepass)
+		data.timeall = tostring(data.timeall)
+		return subfmt(STRINGS.PLANT_CROP_L.TURN_D2, data)
+	else
+		return subfmt(STRINGS.PLANT_CROP_L.TURN_D1, data)
+	end
+end
+function GeneTrans:SayDetail(doer, dotalk) --介绍细节
+	if doer == nil or doer:HasTag("mime") then
+		return
+	end
+
+	local str = nil
+
+	if doer:HasTag("sharpeye") then
+		str = GetDetailString(self, doer, 2)
+	else
+		local hat = doer.components.inventory and doer.components.inventory:GetEquippedItem(EQUIPSLOTS.HEAD) or nil
+		if hat == nil then
+			-- if doer:HasTag("plantkin") then
+			-- 	str = GetDetailString(self, doer, 1)
+			-- end
+			return str
+		elseif hat:HasTag("detailedplanthappiness") then
+			str = GetDetailString(self, doer, 2)
+		elseif hat:HasTag("plantinspector") then
+			str = GetDetailString(self, doer, 1)
+		end
+	end
+
+	if dotalk and str ~= nil and doer.components.talker ~= nil then
+		doer.components.talker:Say(str)
+	end
+
+	return str
 end
 
 return GeneTrans

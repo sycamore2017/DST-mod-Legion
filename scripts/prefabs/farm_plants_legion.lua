@@ -873,10 +873,13 @@ local function MakePlant2(cropprefab, sets)
 			end
 
 			inst.MiniMapEntity:SetIcon("plant_crop_l.tex")
+			inst.Transform:SetTwoFaced() --两个面，这样就可以左右不同（再多貌似有问题）
 
 			inst:AddTag("plant")
 			inst:AddTag("crop2_legion")
-			inst:AddTag("tendable_farmplant") -- for farmplanttendable component
+			inst:AddTag("tendable_farmplant") --for farmplanttendable component
+			inst:AddTag("rotatableobject") --能让栅栏击剑起作用
+            inst:AddTag("flatrotated_l") --棱镜标签：旋转时旋转180度
 
 			inst._cluster_l = net_byte(inst.GUID, "plant_crop_l._cluster_l", "cluster_l_dirty")
 
@@ -890,6 +893,8 @@ local function MakePlant2(cropprefab, sets)
 			if not TheWorld.ismastersim then
 				return inst
 			end
+
+			inst:AddComponent("savedrotation")
 
 			inst:AddComponent("inspectable")
 			inst.components.inspectable.nameoverride = "PLANT_CROP_L" --用来统一描述，懒得每种作物都搞个描述了
@@ -1624,6 +1629,7 @@ local function SwitchPlant(inst, plant)
 		cpt.cluster = plant.components.perennialcrop2.cluster
 		cpt:OnClusterChange()
 		inst.Transform:SetPosition(plant.Transform:GetWorldPosition())
+		inst.Transform:SetRotation(plant.Transform:GetRotation())
 	else --生物到植物
 		inst.components.container:Close()
 		inst.components.container.canbeopened = false
@@ -1634,6 +1640,7 @@ local function SwitchPlant(inst, plant)
             plant.components.perennialcrop2.cluster = cpt.cluster
 			plant.components.perennialcrop2:OnClusterChange()
             plant.Transform:SetPosition(inst.Transform:GetWorldPosition())
+			plant.Transform:SetRotation(inst.Transform:GetRotation())
 			return plant
         end
         -- inst:Remove() --现在删除还太早，生命组件会出手
@@ -1681,6 +1688,7 @@ table.insert(prefs, Prefab(
         -- inst.AnimState:PlayAnimation("idle") --组件里会设置动画的
 
 		inst.MiniMapEntity:SetIcon("plant_crop_l.tex")
+		inst.Transform:SetTwoFaced() --两个面，这样就可以左右不同（再多貌似有问题）
 
 		inst:AddTag("crop2_legion")
 		inst:AddTag("veggie")
@@ -1688,6 +1696,8 @@ table.insert(prefs, Prefab(
     	inst:AddTag("noauradamage")
 		inst:AddTag("companion")
 		inst:AddTag("vaseherb")
+		inst:AddTag("rotatableobject") --能让栅栏击剑起作用
+		inst:AddTag("flatrotated_l") --棱镜标签：旋转时旋转180度
 
 		inst._cluster_l = net_byte(inst.GUID, "plant_crop_l._cluster_l", "cluster_l_dirty")
 
@@ -1715,6 +1725,8 @@ table.insert(prefs, Prefab(
 		inst.fn_switch = SwitchPlant
 
 		inst:AddComponent("inspectable")
+
+		inst:AddComponent("savedrotation")
 
 		inst:AddComponent("health")
     	inst.components.health:SetMaxHealth(1200)
