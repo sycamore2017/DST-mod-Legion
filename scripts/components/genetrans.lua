@@ -169,14 +169,11 @@ function GeneTrans:SpawnStackDrop(name, num, pos, doer, items)
 			if doer ~= nil and doer.components.inventory ~= nil then
 				doer.components.inventory:GiveItem(item, nil, pos)
 			else
-				if not item:HasTag("heavy") then --巨大作物会因为当前位置的 ObstaclePhysics 物体所阻挡，导致掉落效果失败
+				if item:HasTag("heavy") then --巨大作物不知道为啥不能弹射
+					local x, y, z = GetCalculatedPos_legion(pos.x, pos.y, pos.z, 0.5+1.8*math.random())
+					item.Transform:SetPosition(x, y, z)
+				else
 					item.components.inventoryitem:OnDropped(true)
-				end
-				if item:HasTag("heavy") then
-					item:DoTaskInTime(0.2, function()
-						item.Transform:SetPosition(doer.Transform:GetWorldPosition())
-						item.components.inventoryitem:OnDropped(true)
-					end)
 				end
 			end
         end
@@ -278,13 +275,21 @@ function GeneTrans:SetUp(seeds, doer)
 	-- inst.SoundEmitter:PlaySound("dontstarve/halloween_2018/madscience_machine/idle_LP", "loop")
 
 	--删除种子实体
-	-- if doer ~= nil and doer.components.inventory ~= nil then
-	-- 	local item = doer.components.inventory:RemoveItem(seeds, true, false)
-	-- 	item:Remove()
-	-- else
-	-- 	seeds:Remove()
-	-- end
 	seeds:Remove()
+
+	--寻找周围的相同实体，一并放上去
+	local x, y, z = self.inst.Transform:GetWorldPosition()
+	local ents = TheSim:FindEntities(x, y, z, 4, { "_inventoryitem" }, { "NOCLICK", "INLIMBO" })
+	for _, ent in ipairs(ents) do
+		if ent.prefab == self.seed then
+			if ent.components.stackable ~= nil then
+				self.seednum = self.seednum + ent.components.stackable:StackSize()
+			else
+				self.seednum = self.seednum + 1
+			end
+			ent:Remove()
+		end
+	end
 
 	--开始基因转化
 	self.timedata.all = self.seeddata.time or TUNING.TOTAL_DAY_TIME

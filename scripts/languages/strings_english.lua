@@ -2235,8 +2235,8 @@ STRINGS.PLANT_CROP_L = {
     SEEDS = " Xeeds",
     DIGEST = "[{doer}] fed {items} to the {eater}.",
     DIGESTSELF = "{eater} digested {items}.",
-    TURN_D1 = "[{name}] {seednum} doing / {fruitnum} done.",
-    TURN_D2 = "[{name}] {seednum} doing / {fruitnum} done; Now {timepass} / {timeall} days."
+    TURN_D1 = "[{name}] {seednum} doing, {fruitnum} done.",
+    TURN_D2 = "[{name}] {seednum} doing, {fruitnum} done; Now {timepass}/{timeall} days."
 }
 S_NAMES.PLANT_CARROT_L = "Carrot Cluster"
 S_NAMES.PLANT_CORN_L = "Corn Straw"

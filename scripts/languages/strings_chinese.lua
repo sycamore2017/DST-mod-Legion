@@ -2323,8 +2323,8 @@ STRINGS.PLANT_CROP_L = {
     SEEDS = "异种",
     DIGEST = "【{doer}】向{eater}投喂了{items}。",
     DIGESTSELF = "{eater}消化了{items}。",
-    TURN_D1 = "【{name}】{seednum}转化中/{fruitnum}已完成。",
-    TURN_D2 = "【{name}】{seednum}转化中/{fruitnum}已完成；当前{timepass}/{timeall}天。"
+    TURN_D1 = "【{name}】{seednum}转化中，{fruitnum}已完成。",
+    TURN_D2 = "【{name}】{seednum}转化中，{fruitnum}已完成；当前{timepass}/{timeall}天。"
 }
 S_NAMES.PLANT_CARROT_L = "芾萝卜"
 S_NAMES.PLANT_CORN_L = "玉米杆"
