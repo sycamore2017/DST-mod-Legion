@@ -396,7 +396,10 @@ local function OnUpgrade_revolved(item, doer, target, result)
 
     local linkdata = item.components.skinedlegion:GetLinkedSkins()
     if linkdata ~= nil and result.components.skinedlegion ~= nil then
-        result.components.skinedlegion:SetSkin(target.prefab == "piggyback" and linkdata.item or linkdata.item_pro)
+        result.components.skinedlegion:SetSkin(
+            target.prefab == "piggyback" and linkdata.item or linkdata.item_pro,
+            doer ~= nil and doer.userid or nil
+        )
     end
 
     item:Remove() --该道具是一次性的

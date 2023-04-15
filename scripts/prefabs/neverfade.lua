@@ -194,7 +194,7 @@ local function ondeploy(inst, pt, deployer, rot) --这里是右键种植时的�
     if tree ~= nil then
         local linkdata = inst.components.skinedlegion:GetLinkedSkins() or nil
         if linkdata ~= nil and tree.components.skinedlegion ~= nil then
-            tree.components.skinedlegion:SetSkin(linkdata.bush)
+            tree.components.skinedlegion:SetSkin(linkdata.bush, deployer ~= nil and deployer.userid or nil)
         end
         tree.Transform:SetPosition(pt:Get())
 

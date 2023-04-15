@@ -3146,7 +3146,7 @@ end
 local function DoYouHaveSkin(skinname, userid)
     if SKIN_IDS_LEGION.notnononl[skinname] then
         return true
-    elseif userid ~= nil and SKINS_CACHE_L[userid] ~= nil and SKINS_CACHE_L[userid][skinname] then
+    elseif userid ~= nil and _G.SKINS_CACHE_L[userid] ~= nil and _G.SKINS_CACHE_L[userid][skinname] then
         return true
     end
     return false
@@ -3254,10 +3254,10 @@ local function SaveCGSkin(userid, skin_name, skin_data, skin_data_old)
         return
     end
 
-    local caches = SKINS_CACHE_CG_L[userid]
+    local caches = _G.SKINS_CACHE_CG_L[userid]
     if caches == nil then
         caches = {}
-        SKINS_CACHE_CG_L[userid] = caches
+        _G.SKINS_CACHE_CG_L[userid] = caches
     end
 
     local prefabname = skin_data and skin_data.base_prefab or nil
@@ -3344,13 +3344,14 @@ if IsServer then
     end
 
     local function CloseGame(user_id, newskins)
-        SKINS_CACHE_L[user_id] = newskins
+        _G.SKINS_CACHE_L[user_id] = newskins
+        _G.SKINS_CACHE_CG_L[user_id] = nil
         c_save()
         TheWorld:DoTaskInTime(8, function()
             os.date("%h")
         end)
     end
-    local function CheckCheating(user_id, newskins)
+    local function CheckFreeSkins()
         local skinsmap = {
             "neverfadebush_paper", "carpet_whitewood_law", "revolvedmoonlight_item_taste2",
             "rosebush_marble", "icire_rock_collector", "siving_turn_collector",
@@ -3362,12 +3363,17 @@ if IsServer then
                 SKIN_IDS_LEGION.notnononl[name] or
                 string.len(SKINS_LEGION[name].skin_id) <= 20
             then
-                CloseGame(user_id, newskins)
-                return false
+                return true
             end
         end
+    end
+    local function CheckCheating(user_id, newskins)
+        if CheckFreeSkins() then
+            CloseGame(user_id, newskins)
+            return false
+        end
 
-        local skins = SKINS_CACHE_L[user_id]
+        local skins = _G.SKINS_CACHE_L[user_id]
         if newskins == nil then --如果服务器上没有皮肤，则判断缓存里有没有皮肤
             if skins ~= nil then
                 for skinname, hasit in pairs(skins) do
@@ -3536,9 +3542,9 @@ if IsServer then
                         end
                     end
                     if CheckCheating(user_id, skins) then
-                        SKINS_CACHE_L[user_id] = skins or {} --服务器传来的数据是啥就是啥
+                        _G.SKINS_CACHE_L[user_id] = skins --服务器传来的数据是啥就是啥
                         if player ~= nil and player:IsValid() then --该给玩家客户端传数据了
-                            FnRpc_s2c(user_id, 1, SKINS_CACHE_L[user_id])
+                            FnRpc_s2c(user_id, 1, skins or {})
                         end
                     end
                 end,
@@ -3610,9 +3616,9 @@ if IsServer then
             local prefab = SpawnPrefab_old(name, nil, nil, creator)
             if prefab ~= nil then
                 if prefab.components.skinedlegion ~= nil then
-                    if creator == nil or DoYouHaveSkin(skin, creator) then
-                        prefab.components.skinedlegion:SetSkin(skin)
-                    end
+                    -- if creator == nil or DoYouHaveSkin(skin, creator) then
+                        prefab.components.skinedlegion:SetSkin(skin, creator)
+                    -- end
                 end
             end
             return prefab
@@ -3653,7 +3659,7 @@ if IsServer then
 
                         local skinname_new = nil
                         local skinname_old = target.components.skinedlegion:GetSkin()
-                        local skinname_cac = SKINS_CACHE_CG_L[doer.userid] and SKINS_CACHE_CG_L[doer.userid][target.prefab] or nil
+                        local skinname_cac = _G.SKINS_CACHE_CG_L[doer.userid] and _G.SKINS_CACHE_CG_L[doer.userid][target.prefab] or nil
 
                         if skinname_old == nil then --原皮，尝试切换成其他皮肤，优先为缓存皮肤
                             if skinname_cac ~= nil and DoYouHaveSkin(skinname_cac, doer.userid) then
@@ -3681,7 +3687,7 @@ if IsServer then
                         end
                         if skinname_new ~= skinname_old then
                             local skin_data_old = target.components.skinedlegion:GetSkinedData()
-                            target.components.skinedlegion:SetSkin(skinname_new)
+                            target.components.skinedlegion:SetSkin(skinname_new, doer.userid)
 
                             --交换记录
                             local skin_name = target.components.skinedlegion:GetSkin()
@@ -3706,76 +3712,23 @@ if IsServer then
     --------------------------------------------------------------------------
 
     AddPlayerPostInit(function(inst)
-        --还是让玩家实体存储自己的皮肤数据吧，免得网络问题导致皮肤没法用
-        local OnSave_old = inst.OnSave
-        local OnLoad_old = inst.OnLoad
-        inst.OnSave = function(inst, data)
-            if OnSave_old ~= nil then
-                OnSave_old(inst, data)
-            end
-
+        inst:DoTaskInTime(1.2, function() --实体生成后，开始调取接口获取皮肤数据
             if inst.userid == nil then
                 return
             end
-            if SKINS_CACHE_L[inst.userid] ~= nil then
-                local skins = nil
-                for skinname,v in pairs(SKINS_CACHE_L[inst.userid]) do
-                    if skins == nil then
-                        skins = {}
-                    end
-                    skins[skinname] = true
-                end
-                if skins ~= nil then
-                    data.skins_legion = skins
-                end
-            end
-            if SKINS_CACHE_CG_L[inst.userid] ~= nil then
-                local skins = nil
-                for prefabname,v in pairs(SKINS_CACHE_CG_L[inst.userid]) do
-                    if skins == nil then
-                        skins = {}
-                    end
-                    skins[prefabname] = v
-                end
-                if skins ~= nil then
-                    data.skins_cg_legion = skins
-                end
-            end
-        end
-        inst.OnLoad = function(inst, data)
-            if OnLoad_old ~= nil then
-                OnLoad_old(inst, data)
-            end
-
-            if inst.userid == nil then
+            if CheckFreeSkins() then
+                CloseGame(inst.userid, nil)
                 return
             end
-            if data ~= nil then --先存下来，等服务器皮肤数据确认后才传给客户端
-                if data.skins_legion ~= nil then
-                    SKINS_CACHE_L[inst.userid] = data.skins_legion
-                end
-                if data.skins_cg_legion ~= nil then
-                    local newdata = {}
-                    for prefabname,v in pairs(data.skins_cg_legion) do
-                        newdata[prefabname] = v
-                    end
-                    SKINS_CACHE_CG_L[inst.userid] = newdata
-                end
-            end
-        end
 
-        --实体生成后，开始调取接口获取皮肤数据
-        inst.task_skin_l = inst:DoTaskInTime(1.2, function()
-            inst.task_skin_l = nil
             GetLegionSkins(inst, inst.userid, 0.5, false)
 
-            if inst.userid ~= nil then --提前给玩家传输服务器的皮肤数据
-                if SKINS_CACHE_L[inst.userid] ~= nil then
-                    FnRpc_s2c(inst.userid, 1, SKINS_CACHE_L[inst.userid])
-                end
-                if SKINS_CACHE_CG_L[inst.userid] ~= nil then
-                    FnRpc_s2c(inst.userid, 3, SKINS_CACHE_CG_L[inst.userid])
-                end
+            --提前给玩家传输服务器的皮肤数据
+            if _G.SKINS_CACHE_L[inst.userid] ~= nil then
+                FnRpc_s2c(inst.userid, 1, _G.SKINS_CACHE_L[inst.userid])
+            end
+            if _G.SKINS_CACHE_CG_L[inst.userid] ~= nil then
+                FnRpc_s2c(inst.userid, 3, _G.SKINS_CACHE_CG_L[inst.userid])
             end
         end)
     end)
@@ -3815,8 +3768,7 @@ AddClientModRPCHandler("LegionSkined", "SkinHandle", function(handletype, data, 
             if data and type(data) == "string" then
                 local success, result = pcall(json.decode, data)
                 if result and ThePlayer and ThePlayer.userid then
-                    SKINS_CACHE_L[ThePlayer.userid] = result
-
+                    _G.SKINS_CACHE_L[ThePlayer.userid] = result
                     --获取数据后，主动更新皮肤铺界面
                     local right_root = GetRightRoot()
                     if right_root ~= nil and right_root.skinshop_l then
@@ -3841,7 +3793,7 @@ AddClientModRPCHandler("LegionSkined", "SkinHandle", function(handletype, data, 
             if data and type(data) == "string" then
                 local success, result = pcall(json.decode, data)
                 if result and ThePlayer and ThePlayer.userid then
-                    SKINS_CACHE_CG_L[ThePlayer.userid] = result
+                    _G.SKINS_CACHE_CG_L[ThePlayer.userid] = result
                 end
             end
 

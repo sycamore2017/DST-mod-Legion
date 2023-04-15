@@ -133,12 +133,52 @@ end
 
 ------以下均为【服务端】环境
 
-function SkinedLegion:SetSkin(skinname)
+function SkinedLegion:SetSkin(skinname, userid)
 	if not self.isServe or self.skin == skinname then
 		return true
 	end
-
-	--undo：这里得判断无ID时，从在场所有玩家皮肤数据里判定是否有皮肤
+	--undo: 从贴图切换角度判定是否作弊
+	--这里的判断无ID时，从在场所有玩家皮肤数据里判定是否有皮肤
+	if skinname ~= nil then
+		local needwait = false
+		if userid == nil then
+			for id, value in pairs(SKINS_CACHE_L) do
+				if value[skinname] then
+					userid = id
+					break
+				end
+			end
+			if userid == nil then
+				needwait = true
+			end
+		else
+			if SKINS_CACHE_L[userid] == nil then
+				needwait = true
+			elseif not SKINS_CACHE_L[userid][skinname] then
+				return false
+			end
+		end
+		if needwait then
+			self.inst:DoTaskInTime(20+8*math.random(), function(inst)
+				if self.skin == nil then
+					return
+				end
+				if self.userid == nil then
+					for id, value in pairs(SKINS_CACHE_L) do
+						if value[skinname] then
+							self.userid = id
+							return
+						end
+					end
+				else
+					if SKINS_CACHE_L[self.userid] ~= nil and SKINS_CACHE_L[self.userid][skinname] then
+						return
+					end
+				end
+				self:SetSkin(nil)
+			end)
+		end
+	end
 
 	local skin_data = self:GetSkinData(skinname)
 	if skin_data ~= nil then
@@ -147,10 +187,12 @@ function SkinedLegion:SetSkin(skinname)
 		if skinname == nil then --代表恢复原皮肤
 			self._skin_idx:set(0)
 			self.skin = nil
+			self.userid = nil
 			self.inst.skinname = nil
 		else
 			self._skin_idx:set(skin_data.skin_idx)
 			self.skin = skinname
+			self.userid = userid
 			self.inst.skinname = skinname
 		end
 		self._skindata = skin_data
@@ -163,7 +205,7 @@ end
 
 function SkinedLegion:OnSave()
 	if self.skin ~= nil then
-		return { skin = self.skin }
+		return { skin = self.skin, userid = self.userid }
 	else
 		return nil
 	end
@@ -177,8 +219,9 @@ function SkinedLegion:OnLoad(data)
 	if data.skin ~= nil then
 		self.skin = nil --先还原为原皮肤，才能应用新皮肤
 		self.inst.skinname = nil
+		self.userid = data.userid
 		self._skindata = self:GetSkinData()
-		self:SetSkin(data.skin)
+		self:SetSkin(data.skin, self.userid)
 	end
 end
 
@@ -187,6 +230,7 @@ function SkinedLegion:SetOnPreLoad(onpreloadfn) --提前加载皮肤数据，好
 		if data ~= nil then
 			if data.skin ~= nil then
 				self.skin = data.skin
+				self.userid = data.userid
 				self.inst.skinname = data.skin
 				self._skindata = self:GetSkinData(data.skin)
 			end

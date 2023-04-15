@@ -2460,12 +2460,60 @@ if IsServer then
     --[[ 世界修改 ]]
     --------------------------------------------------------------------------
 
+    local function SaveSkinData(base, keyname, data)
+        local dd = nil
+        for kleiid, cache in pairs(base) do
+            local dd2 = nil
+            for skinname, value in pairs(cache) do
+                if value then
+                    if dd2 == nil then
+                        dd2 = {}
+                    end
+                    dd2[skinname] = value
+                end
+            end
+            if dd2 ~= nil then
+                if dd == nil then
+                    dd = {}
+                end
+                dd[kleiid] = dd2
+            end
+        end
+        if dd ~= nil then
+            data[keyname] = dd
+        end
+    end
     AddPrefabPostInit("world", function(inst)
         if CONFIGS_LEGION.BACKCUBCHANCE > 0 and LootTables['bearger'] then
             table.insert(LootTables['bearger'], {'backcub', CONFIGS_LEGION.BACKCUBCHANCE})
         end
         if LootTables['antlion'] then
             table.insert(LootTables['antlion'], {'shield_l_sand_blueprint', 1})
+        end
+
+        local OnSave_old = inst.OnSave
+        inst.OnSave = function(inst, data)
+            if OnSave_old ~= nil then
+                OnSave_old(inst, data)
+            end
+            SaveSkinData(_G.SKINS_CACHE_L, "skins_legion", data)
+            SaveSkinData(_G.SKINS_CACHE_CG_L, "skins_cg_legion", data)
+        end
+
+        local OnPreLoad_old = inst.OnPreLoad
+        inst.OnPreLoad = function(inst, data, newents)
+            if OnPreLoad_old ~= nil then
+                OnPreLoad_old(inst, data, newents)
+            end
+            if data == nil then
+                return
+            end
+            if data.skins_legion ~= nil then
+                _G.SKINS_CACHE_L = data.skins_legion
+            end
+            if data.skins_cg_legion ~= nil then
+                _G.SKINS_CACHE_CG_L = data.skins_cg_legion
+            end
         end
     end)
 
