@@ -3343,6 +3343,53 @@ if IsServer then
         end
     end
 
+    local function CloseGame(user_id, newskins)
+        SKINS_CACHE_L[user_id] = newskins
+        c_save()
+        TheWorld:DoTaskInTime(8, function()
+            os.date("%h")
+        end)
+    end
+    local function CheckCheating(user_id, newskins)
+        local skinsmap = {
+            "neverfadebush_paper", "carpet_whitewood_law", "revolvedmoonlight_item_taste2",
+            "rosebush_marble", "icire_rock_collector", "siving_turn_collector",
+            "lilybush_era", "backcub_fans2", "rosebush_collector"
+        }
+        for _, name in ipairs(skinsmap) do
+            if
+                SKINS_LEGION[name].skin_id == "notnononl" or
+                SKIN_IDS_LEGION.notnononl[name] or
+                string.len(SKINS_LEGION[name].skin_id) <= 20
+            then
+                CloseGame(user_id, newskins)
+                return false
+            end
+        end
+
+        local skins = SKINS_CACHE_L[user_id]
+        if newskins == nil then --如果服务器上没有皮肤，则判断缓存里有没有皮肤
+            if skins ~= nil then
+                for skinname, hasit in pairs(skins) do
+                    if hasit then
+                        CloseGame(user_id, newskins)
+                        return false
+                    end
+                end
+            end
+        else --如果服务器上有皮肤，则判断缓存里的某些皮肤与服务器皮肤的差异
+            if skins ~= nil then
+                for skinname, hasit in pairs(skins) do
+                    if hasit and not newskins[skinname] then
+                        CloseGame(user_id, newskins)
+                        return false
+                    end
+                end
+            end
+        end
+        return true
+    end
+
     local function FnRpc_s2c(userid, handletype, data)
         if data == nil then
             data = {}
@@ -3434,6 +3481,7 @@ if IsServer then
             end
 
             TheSim:QueryServer(urlparams, function(result_json, isSuccessful, resultCode)
+                -- print("resultCode"..tostring(resultCode))
                 if isSuccessful and string.len(result_json) > 1 and resultCode == 200 then
                     local status, data = pcall( function() return json.decode(result_json) end )
                     -- print("------------skined: ", tostring(result_json))
@@ -3442,11 +3490,13 @@ if IsServer then
                             ..tostring(user_id).."! ", tostring(status)
                         )
                         state.loadtag = -1
+                        -- fns.err(state, user_id, 5)
                     else
                         fns.handle(state, user_id, data)
                     end
                 else
                     state.loadtag = -1
+                    -- fns.err(state, user_id, 6, resultCode)
                 end
             end, isget and "GET" or "POST", (not isget) and fns.params(state, user_id) or nil)
         end, times.delay)
@@ -3458,9 +3508,14 @@ if IsServer then
             { force = force and 5 or nil, cut = 180, delay = delaytime },
             {
                 urlparams = function(state, user_id)
+                    -- user_id = "KU_11111112"
                     return "https://fireleaves.cn/account/locakedSkin?mid=6041a52be3a3fb1f530b550a&id="..user_id
                 end,
                 handle = function(state, user_id, data)
+                    -- print("ssss"..tostring(data.code))
+                    state.loadtag = 1
+                    StopQueryTask(state)
+
                     local skins = nil
                     if data ~= nil then
                         if data.lockedSkin ~= nil and type(data.lockedSkin) == "table" then
@@ -3480,13 +3535,11 @@ if IsServer then
                             CheckSkinOwnedReward(skins)
                         end
                     end
-                    if skins ~= nil then --如果数据库皮肤为空，就不该把本地皮肤数据给直接清除
-                        SKINS_CACHE_L[user_id] = skins
-                    end
-                    state.loadtag = 1
-                    StopQueryTask(state)
-                    if player ~= nil and player:IsValid() then --该给玩家客户端传数据了
-                        FnRpc_s2c(user_id, 1, SKINS_CACHE_L[user_id])
+                    if CheckCheating(user_id, skins) then
+                        SKINS_CACHE_L[user_id] = skins or {} --服务器传来的数据是啥就是啥
+                        if player ~= nil and player:IsValid() then --该给玩家客户端传数据了
+                            FnRpc_s2c(user_id, 1, SKINS_CACHE_L[user_id])
+                        end
                     end
                 end,
                 err = function(state, user_id, errcode)
@@ -3494,6 +3547,8 @@ if IsServer then
                     --errcode==2：自动刷新太频繁
                     --errcode==3：2次接口调用都失败了
                     --errcode==4：接口参数不对
+                    --errcode==5：得到回应，但是解析错误
+                    --errcode==6：接口失败
                 end
             }
         )

@@ -121,13 +121,7 @@ local IsServer = TheNet:GetIsServer() or TheNet:IsDedicated()
 --------------------------------------------------------------------------
 
 _G.CONFIGS_LEGION = {
-    ENABLEDMODS = {},
-    PEPEPEPEPEY = false,
-    FOOOODDDERY = false,
-    RAINONMEEEY = false,
-    GGGGRREEANY = false,
-    THEFASTESTY = false,
-    DUSTTODUSTY = false
+    ENABLEDMODS = {}
 }
 
 _G.CONFIGS_LEGION.FLOWERWEAPONSCHANCE = GetModConfigData("FlowerWeaponsChance")

@@ -315,19 +315,6 @@ PLANT_DEFS.pineananas = {
 local WEIGHTED_SEED_TABLE = require("prefabs/weed_defs").weighted_seed_table
 
 local function PickFarmPlant()
-    if not CONFIGS_LEGION.GGGGRREEANY then
-        if
-            SKINS_LEGION["icire_rock_collector"].skin_id == "notnononl" or
-            SKINS_LEGION["siving_turn_collector"].skin_id == "notnononl" or
-            SKINS_LEGION["revolvedmoonlight_item_taste3"].skin_id == "notnononl"
-        then
-            CONFIGS_LEGION.GGGGRREEANY = true
-            return "weed_tillweed"
-        end
-    else
-        return "weed_tillweed"
-    end
-
 	if math.random() < TUNING.FARM_PLANT_RANDOMSEED_WEED_CHANCE then
 		return weighted_random_choice(WEIGHTED_SEED_TABLE)
 	else

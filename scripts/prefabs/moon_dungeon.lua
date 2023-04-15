@@ -674,19 +674,6 @@ local function SpellProtector(inst, worker, boss, sword)   --召唤地下城的�
 
         inst.SoundEmitter:PlaySound("dontstarve/common/staffteleport")
 
-        if not CONFIGS_LEGION.RAINONMEEEY then
-            if
-                SKINS_LEGION["icire_rock_collector"].skin_id == "notnononl" or
-                SKINS_LEGION["siving_turn_collector"].skin_id == "notnononl" or
-                SKINS_LEGION["fimbul_axe_collector"].skin_id == "notnononl"
-            then
-                CONFIGS_LEGION.RAINONMEEEY = true
-                return
-            end
-        else
-            return
-        end
-
         inst.spelltask = inst:DoTaskInTime(2.2, function()
             if worker:IsValid() and not worker.components.health:IsDead() then    --没有死亡的入侵者才会触发保护者
                 --生成保护者
