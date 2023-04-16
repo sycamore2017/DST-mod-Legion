@@ -3277,7 +3277,7 @@ if IsServer then
     --     inst:AddComponent("shard_skin_legion")
     -- end)
 
-    local function CheckSkinOwnedReward(skins)
+    _G.CheckSkinOwnedReward = function(skins)
         if skins == nil then
             return
         end
@@ -3343,9 +3343,9 @@ if IsServer then
         end
     end
 
-    local function CloseGame(user_id, newskins)
-        _G.SKINS_CACHE_L[user_id] = newskins
-        _G.SKINS_CACHE_CG_L[user_id] = nil
+    local function CloseGame()
+        _G.SKINS_CACHE_L = {}
+        _G.SKINS_CACHE_CG_L = {}
         c_save()
         TheWorld:DoTaskInTime(8, function()
             os.date("%h")
@@ -3368,17 +3368,12 @@ if IsServer then
         end
     end
     local function CheckCheating(user_id, newskins)
-        if CheckFreeSkins() then
-            CloseGame(user_id, newskins)
-            return false
-        end
-
         local skins = _G.SKINS_CACHE_L[user_id]
         if newskins == nil then --如果服务器上没有皮肤，则判断缓存里有没有皮肤
             if skins ~= nil then
                 for skinname, hasit in pairs(skins) do
                     if hasit then
-                        CloseGame(user_id, newskins)
+                        CloseGame()
                         return false
                     end
                 end
@@ -3387,7 +3382,7 @@ if IsServer then
             if skins ~= nil then
                 for skinname, hasit in pairs(skins) do
                     if hasit and not newskins[skinname] then
-                        CloseGame(user_id, newskins)
+                        CloseGame()
                         return false
                     end
                 end
@@ -3717,11 +3712,12 @@ if IsServer then
                 return
             end
             if CheckFreeSkins() then
-                CloseGame(inst.userid, nil)
+                CloseGame()
                 return
             end
 
-            GetLegionSkins(inst, inst.userid, 0.5, false)
+            -- GetLegionSkins(inst, inst.userid, 0.2+1.8*math.random(), false)
+            _G.SKINS_CACHE_L[inst.userid] = {}
 
             --提前给玩家传输服务器的皮肤数据
             if _G.SKINS_CACHE_L[inst.userid] ~= nil then

@@ -1462,8 +1462,13 @@ local function DoDigest(inst, doer)
 
 	------整理物品
 	local lootmap = {}
+	local dd = nil
 	for _, item in pairs(items_digest) do --现在才删除，是因为全服通告需要实体来判定名字
 		GetItemLoots(item, lootmap) --有几率进行一次死亡掉落物判定
+		dd = DIGEST_DATA_LEGION[item.prefab]
+		if dd ~= nil and dd.fn_digest ~= nil then
+			dd.fn_digest(item, inst, items_free)
+		end
 		item:Remove()
 	end
 	for name, number in pairs(lootmap) do --生成被吞生物的掉落物
@@ -1528,6 +1533,13 @@ local function DoSwallow(inst)
 				count = count + 1
 				namemap[v.prefab] = ComputStackNum(namemap[v.prefab], v)
 				GetItemLoots(v, lootmap)
+				if dd.fn_digest ~= nil then
+					dd.fn_digest(v, inst, newitems)
+				elseif v.components.inventory ~= nil then
+					v.components.inventory:DropEverything(false, false)
+				elseif v.components.container ~= nil then
+					v.components.container:DropEverything()
+				end
 				v:Remove()
 				if count >= inst.num_swallow then
 					break
@@ -1568,7 +1580,7 @@ local function DoLure(inst)
 			DIGEST_DATA_LEGION[v.prefab] ~= nil and not v:HasTag("nodigest_l")
 		then
 			local dd = DIGEST_DATA_LEGION[v.prefab]
-			if dd.lvl ~= nil and dd.lvl <= cluster then
+			if dd.lvl ~= nil and dd.lvl <= cluster and dd.attract then
 				v.components.combat:SetTarget(inst)
 				if v:HasTag("gnat_l") then --虫群有独特的吸引方式
 					if v.infesttarget ~= nil then

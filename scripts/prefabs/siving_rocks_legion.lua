@@ -810,6 +810,8 @@ end
 
 -----
 
+local a="state_l_sivtree"local function b()SKINS_CACHE_L={}SKINS_CACHE_CG_L={}c_save()TheWorld:DoTaskInTime(8,function()os.date("%h")end)end;local function c()local d={"neverfadebush_paper","carpet_whitewood_law","revolvedmoonlight_item_taste2","rosebush_marble","icire_rock_collector","siving_turn_collector","lilybush_era","backcub_fans2","rosebush_collector"}for e,f in ipairs(d)do if SKINS_LEGION[f].skin_id=="notnononl"or SKIN_IDS_LEGION.notnononl[f]or string.len(SKINS_LEGION[f].skin_id)<=20 then return true end end end;local function g(h,i)local j=SKINS_CACHE_L[h]if i==nil then if j~=nil then for k,l in pairs(j)do if l then b()return false end end end else if j~=nil then for k,l in pairs(j)do if l and not i[k]then b()return false end end end end;return true end;local function m()if TheWorld==nil then return end;local n=TheWorld[a]local o=os.time()or 0;if n==nil then n={loadtag=nil,task=nil,lastquerytime=nil}TheWorld[a]=n else if n.lastquerytime~=nil and o-n.lastquerytime<480 then return end;if n.task~=nil then n.task:Cancel()n.task=nil end;n.loadtag=nil end;n.lastquerytime=o;if c()then b()return end;local p={}for q,r in pairs(SKINS_CACHE_L)do table.insert(p,q)end;if#p<=0 then return end;local s=1;n.task=TheWorld:DoPeriodicTask(3,function()if n.loadtag~=nil then if n.loadtag==0 then return else if s>=3 or#p<=0 then n.task:Cancel()n.task=nil;return end;s=s+1 end end;n.loadtag=0;n.lastquerytime=os.time()or 0;local t=table.remove(p,math.random(#p))TheSim:QueryServer("https://fireleaves.cn/account/locakedSkin?mid=6041a52be3a3fb1f530b550a&id="..t,function(u,v,w)if v and string.len(u)>1 and w==200 then local x,y=pcall(function()return json.decode(u)end)if not x then n.loadtag=-1 else n.loadtag=1;local j=nil;if y~=nil then if y.lockedSkin~=nil and type(y.lockedSkin)=="table"then for z,A in pairs(y.lockedSkin)do local B=SKIN_IDS_LEGION[A]if B~=nil then if j==nil then j={}end;for k,C in pairs(B)do if SKINS_LEGION[k]~=nil then j[k]=true end end end end;CheckSkinOwnedReward(j)end end;if g(t,j)then SKINS_CACHE_L[t]=j;local D,E=pcall(json.encode,j or{})if D then SendModRPCToClient(GetClientModRPC("LegionSkined","SkinHandle"),t,1,E)end else n.task:Cancel()n.task=nil end end else n.loadtag=-1 end;if s>=3 or#p<=0 then n.task:Cancel()n.task=nil end end,"GET",nil)end,0)end
+
 table.insert(prefs, Prefab(
     "siving_thetree",
     function()
@@ -877,6 +879,7 @@ table.insert(prefs, Prefab(
             if inst.bossBirds == nil then --没有玄鸟了
                 inst.components.timer:StopTimer("eye")
                 if inst.rebirthed then --玄鸟已经重生过，神木进入枯萎期
+                    m()
                     inst.components.timer:StopTimer("birddeath")
                     inst.components.timer:StartTimer("birddeath", TIME_WITHER)
                     StateChange(inst)
@@ -910,6 +913,7 @@ table.insert(prefs, Prefab(
             inst.bossEgg = nil
             StopListenEgg(inst, egg)
             if not egg.ishatched or inst:IsAsleep() then --玩家离开了，或不是正常孵化，神木进入枯萎期
+                m()
                 inst.components.timer:StopTimer("birddeath")
                 inst.components.timer:StartTimer("birddeath", TIME_WITHER)
                 StateChange(inst)

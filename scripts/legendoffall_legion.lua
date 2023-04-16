@@ -1418,12 +1418,18 @@ _G.CROPS_DATA_LEGION.plantmeat = {
 if not _G.rawget(_G, "DIGEST_DATA_LEGION") then
     _G.DIGEST_DATA_LEGION = {}
 end
+
+local function FnD_lordfruitfly(inst, eater, items_free)
+    TheWorld:PushEvent("ms_lordfruitflykilled")
+end
+
 local lvls = { 0, 5, 10, 20, 30, 40, 50, 65, 80 }
 local digest_data_l = {
     bee = {
         lvl = nil, --巨食草要达到这个簇栽等级后才能主动吞下该对象，如果为 nil 则代表无法主动吞下
         attract = nil, --为true的话，可以被巨食草主动吸引(是靠战斗组件来吸引)
-        loot = { ahandfulofwings = 0.2, insectshell_l = 1, honey = 0.2 } --key value 对应 产物prefab 数量比例
+        loot = { ahandfulofwings = 0.2, insectshell_l = 1, honey = 0.2 }, --key value 对应 产物prefab 数量比例
+        -- fn_digest = function(inst, eater, items_free)end --被消化或吞食时的
     },
     butterfly = { lvl = nil, attract = nil, loot = { ahandfulofwings = 0.2, insectshell_l = 1 } }, --蝴蝶
     moonbutterfly = { lvl = nil, attract = nil, loot = { ahandfulofwings = 0.5, insectshell_l = 1 } }, --月蛾
@@ -1544,7 +1550,7 @@ local digest_data_l = {
     walrus = { lvl = lvls[9], attract = nil, loot = { boneshard = 1, walrus_tusk = 1 } }, --海象
     clayhound = { lvl = lvls[9], attract = nil, loot = { redpouch = 4 } }, --陶土猎狗
     hedgehound = { lvl = lvls[9], attract = nil, loot = { boneshard = 1, cutted_rosebush = 4 } }, --蔷薇猎狗
-    lordfruitfly = { lvl = lvls[9], attract = nil, loot = { ahandfulofwings = 8, insectshell_l = 12 } }, --果蝇王
+    lordfruitfly = { lvl = lvls[9], attract = nil, loot = { ahandfulofwings = 8, insectshell_l = 12 }, fn_digest = FnD_lordfruitfly }, --果蝇王
 
     --mod兼容：永不妥协
     aphid = { lvl = lvls[2], attract = true, loot = { ahandfulofwings = 0.2, insectshell_l = 1 } }, --蚜虫

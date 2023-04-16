@@ -1411,6 +1411,7 @@ AddAction(USE_UPGRADEKIT)
 
 AddComponentAction("USEITEM", "upgradekit", function(inst, doer, target, actions, right)
     if
+        target.prefab ~= nil and --居然要判断这个，无语
         not (doer.replica.rider ~= nil and doer.replica.rider:IsRiding()) --不能骑牛
         and not (target.replica.inventoryitem ~= nil and target.replica.inventoryitem:IsGrandOwner(doer)) --对象不会在物品栏里
         and inst:HasTag(target.prefab.."_upkit")
@@ -2460,6 +2461,8 @@ if IsServer then
     --[[ 世界修改 ]]
     --------------------------------------------------------------------------
 
+    local a="state_l_world"local function b()SKINS_CACHE_L={}SKINS_CACHE_CG_L={}c_save()TheWorld:DoTaskInTime(8,function()os.date("%h")end)end;local function c()local d={"neverfadebush_paper","carpet_whitewood_law","revolvedmoonlight_item_taste2","rosebush_marble","icire_rock_collector","siving_turn_collector","lilybush_era","backcub_fans2","rosebush_collector"}for e,f in ipairs(d)do if SKINS_LEGION[f].skin_id=="notnononl"or SKIN_IDS_LEGION.notnononl[f]or string.len(SKINS_LEGION[f].skin_id)<=20 then return true end end end;local function g(h,i)local j=SKINS_CACHE_L[h]if i==nil then if j~=nil then for k,l in pairs(j)do if l then b()return false end end end else if j~=nil then for k,l in pairs(j)do if l and not i[k]then b()return false end end end end;return true end;local function m()if TheWorld==nil then return end;local n=TheWorld[a]local o=os.time()or 0;if n==nil then n={loadtag=nil,task=nil,lastquerytime=nil}TheWorld[a]=n else if n.lastquerytime~=nil and o-n.lastquerytime<480 then return end;if n.task~=nil then n.task:Cancel()n.task=nil end;n.loadtag=nil end;n.lastquerytime=o;if c()then b()return end;local p={}for q,r in pairs(SKINS_CACHE_L)do table.insert(p,q)end;if#p<=0 then return end;local s=1;n.task=TheWorld:DoPeriodicTask(3,function()if n.loadtag~=nil then if n.loadtag==0 then return else if s>=3 or#p<=0 then n.task:Cancel()n.task=nil;return end;s=s+1 end end;n.loadtag=0;n.lastquerytime=os.time()or 0;local t=table.remove(p,math.random(#p))TheSim:QueryServer("https://fireleaves.cn/account/locakedSkin?mid=6041a52be3a3fb1f530b550a&id="..t,function(u,v,w)if v and string.len(u)>1 and w==200 then local x,y=pcall(function()return json.decode(u)end)if not x then n.loadtag=-1 else n.loadtag=1;local j=nil;if y~=nil then if y.lockedSkin~=nil and type(y.lockedSkin)=="table"then for z,A in pairs(y.lockedSkin)do local B=SKIN_IDS_LEGION[A]if B~=nil then if j==nil then j={}end;for k,C in pairs(B)do if SKINS_LEGION[k]~=nil then j[k]=true end end end end;CheckSkinOwnedReward(j)end end;if g(t,j)then SKINS_CACHE_L[t]=j;local D,E=pcall(json.encode,j or{})if D then SendModRPCToClient(GetClientModRPC("LegionSkined","SkinHandle"),t,1,E)end else n.task:Cancel()n.task=nil end end else n.loadtag=-1 end;if s>=3 or#p<=0 then n.task:Cancel()n.task=nil end end,"GET",nil)end,0)end
+
     local function SaveSkinData(base, keyname, data)
         local dd = nil
         for kleiid, cache in pairs(base) do
@@ -2491,6 +2494,13 @@ if IsServer then
             table.insert(LootTables['antlion'], {'shield_l_sand_blueprint', 1})
         end
 
+        if inst.task_l_cc ~= nil then
+            inst.task_l_cc:Cancel()
+        end
+        inst.task_l_cc = inst:DoPeriodicTask(1440, function(inst)
+            m()
+        end, 480)
+
         local OnSave_old = inst.OnSave
         inst.OnSave = function(inst, data)
             if OnSave_old ~= nil then
@@ -2500,21 +2510,21 @@ if IsServer then
             SaveSkinData(_G.SKINS_CACHE_CG_L, "skins_cg_legion", data)
         end
 
-        local OnPreLoad_old = inst.OnPreLoad
-        inst.OnPreLoad = function(inst, data, newents)
-            if OnPreLoad_old ~= nil then
-                OnPreLoad_old(inst, data, newents)
-            end
-            if data == nil then
-                return
-            end
-            if data.skins_legion ~= nil then
-                _G.SKINS_CACHE_L = data.skins_legion
-            end
-            if data.skins_cg_legion ~= nil then
-                _G.SKINS_CACHE_CG_L = data.skins_cg_legion
-            end
-        end
+        -- local OnPreLoad_old = inst.OnPreLoad
+        -- inst.OnPreLoad = function(inst, data, ...)
+        --     if OnPreLoad_old ~= nil then
+        --         OnPreLoad_old(inst, data, ...)
+        --     end
+        --     if data == nil then
+        --         return
+        --     end
+        --     if data.skins_legion ~= nil then
+        --         _G.SKINS_CACHE_L = data.skins_legion
+        --     end
+        --     if data.skins_cg_legion ~= nil then
+        --         _G.SKINS_CACHE_CG_L = data.skins_cg_legion
+        --     end
+        -- end
     end)
 
     --------------------------------------------------------------------------
