@@ -1589,6 +1589,7 @@ table.insert(prefs, Prefab(
 
         inst:AddComponent("health")
         inst.components.health:SetMaxHealth(300)
+        inst.components.health:SetInvincible(true)
 
         inst:AddComponent("combat")
 
@@ -1624,6 +1625,10 @@ table.insert(prefs, Prefab(
                 SetEggState(inst, 4)
             end
         end
+
+        inst:DoTaskInTime(2, function(inst) --防止产生瞬间暴毙
+            inst.components.health:SetInvincible(false)
+        end)
 
         return inst
     end,

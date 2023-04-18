@@ -93,117 +93,11 @@ local function MakeDerivant(data)
         end
     end
 
-    table.insert(prefs, Prefab(
-        "siving_derivant_"..data.name,
-        function()
-            local inst = CreateEntity()
 
-            inst.entity:AddTransform()
-            inst.entity:AddSoundEmitter()
-            inst.entity:AddAnimState()
-            inst.entity:AddNetwork()
-            inst.entity:AddMiniMapEntity()
-            inst.entity:AddLight()
-
-            MakeObstaclePhysics(inst, 0.2)
-
-            inst.AnimState:SetBank("siving_derivants")
-            inst.AnimState:SetBuild("siving_derivants")
-            inst.AnimState:PlayAnimation(data.name)
-            inst.AnimState:SetScale(1.3, 1.3)
-            MakeSnowCovered_comm_legion(inst)
-
-            inst.Transform:SetTwoFaced()
-
-            inst.MiniMapEntity:SetIcon("siving_derivant.tex")
-
-            inst.Light:Enable(false)
-            inst.Light:SetRadius(1.5)
-            inst.Light:SetFalloff(1)
-            inst.Light:SetIntensity(.6)
-            inst.Light:SetColour(15/255, 180/255, 132/255)
-
-            inst:AddTag("siving_derivant")
-            inst:AddTag("silviculture") --这个标签能让《造林学》发挥作用
-            inst:AddTag("rotatableobject") --能让栅栏击剑起作用
-            inst:AddTag("flatrotated_l") --棱镜标签：旋转时旋转180度
-
-            inst:AddComponent("skinedlegion")
-            inst.components.skinedlegion:Init("siving_derivant_"..data.name)
-
-            inst.entity:SetPristine()
-            if not TheWorld.ismastersim then
-                return inst
-            end
-
-            inst.nighttask = nil
-
-            inst:AddComponent("inspectable")
-
-            inst:AddComponent("lootdropper")
-
-            inst:AddComponent("savedrotation")
-
-            inst:AddComponent("workable")
-
-            inst:AddComponent("timer")
-
-            inst:AddComponent("growable")
-            inst.components.growable.stages = {}
-            inst.components.growable:StopGrowing()
-            inst.components.growable.magicgrowable = true --非常规造林学有效标志（其他会由组件来施行）
-            inst.components.growable.domagicgrowthfn = function(inst, doer)
-                if inst.components.timer:TimerExists("growup") then
-                    inst.components.timer:StopTimer("growup")
-                    inst:PushEvent("timerdone", { name = "growup" })
-                end
-            end
-
-            if data.fn_server ~= nil then
-                data.fn_server(inst)
-            end
-
-            inst:WatchWorldState("isnight", OnIsDark)
-            MakeSnowCovered_serv_legion(inst, 0, OnIsDark)
-
-            inst:AddComponent("bloomer")
-
-            inst.treeState = 0
-            inst.OnTreeLive = function(inst, state)
-                inst.treeState = state
-                if state == 2 then
-                    inst.AnimState:PlayAnimation(data.name.."_live")
-                    inst.components.bloomer:PushBloom("activetree", "shaders/anim.ksh", 1)
-                    inst.Light:SetRadius(1.5)
-                    inst.Light:Enable(true)
-                elseif state == 1 then
-                    inst.AnimState:PlayAnimation(data.name)
-                    inst.components.bloomer:PushBloom("activetree", "shaders/anim.ksh", 1)
-                    inst.Light:SetRadius(0.8)
-                    inst.Light:Enable(true)
-                else
-                    inst.AnimState:PlayAnimation(data.name)
-                    inst.components.bloomer:PopBloom("activetree")
-                    inst.Light:Enable(false)
-                end
-            end
-
-            MakeHauntableWork(inst)
-
-            inst.components.skinedlegion:SetOnPreLoad()
-
-            return inst
-        end,
-        {
-            Asset("ANIM", "anim/hiddenmoonlight.zip"),  --提供积雪贴图
-            Asset("ANIM", "anim/siving_derivants.zip"),
-        },
-        data.prefabs
-    ))
 end
 
-local function DropRock(inst, chance)
-    if math.random() <= chance then
+local function TryDropRock(inst, chance)
+    if chance >= 1 or math.random() <= chance then
         inst.components.lootdropper:SpawnLootPrefab("siving_rocks")
     end
 end
@@ -272,12 +166,12 @@ MakeDerivant({  --子圭木型岩
         inst.components.workable:SetWorkLeft(6)
         inst.components.workable:SetOnWorkCallback(function(inst, worker, workleft)
             if workleft > 0 then
-                DropRock(inst, 0.02)
+                TryDropRock(inst, 0.02)
             end
         end)
         inst.components.workable:SetOnFinishCallback(function(inst, worker)
             SpawnSkinedPrefab(inst, "siving_derivant_lvl0")
-            DropRock(inst, 0.5)
+            TryDropRock(inst, 0.5)
             inst:Remove()
         end)
         SetTimer_derivant(inst, TUNING.TOTAL_DAY_TIME * 7.5, "siving_derivant_lvl2")
@@ -291,13 +185,13 @@ MakeDerivant({  --子圭林型岩
         inst.components.workable:SetWorkLeft(9)
         inst.components.workable:SetOnWorkCallback(function(inst, worker, workleft)
             if workleft > 0 then
-                DropRock(inst, 0.03)
+                TryDropRock(inst, 0.03)
             end
         end)
         inst.components.workable:SetOnFinishCallback(function(inst, worker)
             SpawnSkinedPrefab(inst, "siving_derivant_lvl1")
             inst.components.lootdropper:SpawnLootPrefab("siving_rocks")
-            DropRock(inst, 0.5)
+            TryDropRock(inst, 0.5)
             inst:Remove()
         end)
         SetTimer_derivant(inst, TUNING.TOTAL_DAY_TIME * 8, "siving_derivant_lvl3")
@@ -311,14 +205,14 @@ MakeDerivant({  --子圭森型岩
         inst.components.workable:SetWorkLeft(12)
         inst.components.workable:SetOnWorkCallback(function(inst, worker, workleft)
             if workleft > 0 then
-                DropRock(inst, 0.04)
+                TryDropRock(inst, 0.04)
             end
         end)
         inst.components.workable:SetOnFinishCallback(function(inst, worker)
             SpawnSkinedPrefab(inst, "siving_derivant_lvl2")
             inst.components.lootdropper:SpawnLootPrefab("siving_rocks")
             inst.components.lootdropper:SpawnLootPrefab("siving_rocks")
-            DropRock(inst, 0.5)
+            TryDropRock(inst, 0.5)
             inst:Remove()
         end)
 
@@ -346,6 +240,178 @@ MakeDerivant({  --子圭森型岩
         end)
     end,
 })
+
+local function OnFinish_dt0(inst, worker)
+    inst.components.lootdropper:SpawnLootPrefab("siving_derivant_item")
+    inst:Remove()
+end
+local function OnWork_dt1(inst, worker, workleft)
+    if workleft > 0 then
+        TryDropRock(inst, 0.02)
+    else
+        inst.components.growable:SetStage(inst.components.growable:GetStage() - 1)
+    end
+end
+
+local growth_stages_dt = {
+    {
+        name="lvl0",
+        time = function(inst, stage, stagedata)
+            return GetRandomWithVariance(TUNING.TOTAL_DAY_TIME*6, TUNING.TOTAL_DAY_TIME/2)
+        end,
+        fn = function(inst, stage, stagedata)
+            inst.AnimState:PlayAnimation("lvl0", false)
+            inst.components.workable:SetWorkAction(ACTIONS.DIG)
+            inst.components.workable:SetWorkLeft(3)
+            inst.components.workable:SetOnWorkCallback(nil)
+            inst.components.workable:SetOnFinishCallback(OnFinish_dt0)
+        end
+    },
+    {
+        name="lvl1",
+        time = function(inst, stage, stagedata)
+            return GetRandomWithVariance(TUNING.TOTAL_DAY_TIME*7.5, TUNING.TOTAL_DAY_TIME/2)
+        end,
+        fn = function(inst, stage, stagedata)
+            inst.AnimState:PlayAnimation("lvl1", false)
+            inst.components.workable:SetWorkAction(ACTIONS.MINE)
+            inst.components.workable:SetWorkLeft(6)
+            inst.components.workable:SetOnWorkCallback(OnWork_dt1)
+            inst.components.workable:SetOnFinishCallback(nil)
+        end
+    },
+    {
+        name="lvl2",
+        time = function(inst, stage, stagedata)
+            return GetRandomWithVariance(TUNING.TOTAL_DAY_TIME*8, TUNING.TOTAL_DAY_TIME/2)
+        end,
+        fn = function(inst, stage, stagedata)
+            inst.AnimState:PlayAnimation("lvl2", false)
+            inst.components.workable:SetWorkAction(ACTIONS.MINE)
+            inst.components.workable:SetWorkLeft(9)
+            inst.components.workable:SetOnWorkCallback(OnWork_dt2)
+            inst.components.workable:SetOnFinishCallback(nil)
+        end
+    },
+    {
+        name="lvl3",
+        time = function(inst, stage, stagedata)
+            return GetRandomWithVariance(TUNING.TOTAL_DAY_TIME*6, TUNING.TOTAL_DAY_TIME/2)
+        end,
+        fn = function(inst, stage, stagedata)
+            inst.AnimState:PlayAnimation("lvl3", false)
+            inst.components.workable:SetWorkAction(ACTIONS.MINE)
+            inst.components.workable:SetWorkLeft(12)
+            inst.components.workable:SetOnWorkCallback(OnWork_dt3)
+            inst.components.workable:SetOnFinishCallback(nil)
+        end
+    }
+}
+
+local function OnTreeLive_dt(inst, state)
+    inst.treeState = state
+    if state == 2 then
+        inst.AnimState:PlayAnimation(data.name.."_live")
+        inst.components.bloomer:PushBloom("activetree", "shaders/anim.ksh", 1)
+        inst.Light:SetRadius(1.5)
+        inst.Light:Enable(true)
+    elseif state == 1 then
+        inst.AnimState:PlayAnimation(data.name)
+        inst.components.bloomer:PushBloom("activetree", "shaders/anim.ksh", 1)
+        inst.Light:SetRadius(0.8)
+        inst.Light:Enable(true)
+    else
+        inst.AnimState:PlayAnimation(data.name)
+        inst.components.bloomer:PopBloom("activetree")
+        inst.Light:Enable(false)
+    end
+end
+
+table.insert(prefs, Prefab(
+    "siving_derivant",
+    function()
+        local inst = CreateEntity()
+
+        inst.entity:AddTransform()
+        inst.entity:AddSoundEmitter()
+        inst.entity:AddAnimState()
+        inst.entity:AddNetwork()
+        inst.entity:AddMiniMapEntity()
+        inst.entity:AddLight()
+
+        MakeObstaclePhysics(inst, 0.2)
+
+        inst.AnimState:SetBank("siving_derivant")
+        inst.AnimState:SetBuild("siving_derivant")
+        inst.AnimState:PlayAnimation("lvl0", false)
+        inst.AnimState:SetScale(1.3, 1.3)
+
+        MakeSnowCovered_comm_legion(inst)
+        inst.Transform:SetTwoFaced()
+        inst.MiniMapEntity:SetIcon("siving_derivant.tex")
+
+        inst.Light:Enable(false)
+        inst.Light:SetRadius(1.5)
+        inst.Light:SetFalloff(1)
+        inst.Light:SetIntensity(.6)
+        inst.Light:SetColour(15/255, 180/255, 132/255)
+
+        inst:AddTag("siving_derivant")
+        inst:AddTag("silviculture") --这个标签能让《造林学》发挥作用
+        inst:AddTag("rotatableobject") --能让栅栏击剑起作用
+        inst:AddTag("flatrotated_l") --棱镜标签：旋转时旋转180度
+
+        -- inst:AddComponent("skinedlegion")
+        -- inst.components.skinedlegion:Init("siving_derivant")
+
+        inst.entity:SetPristine()
+        if not TheWorld.ismastersim then
+            return inst
+        end
+
+        inst.nighttask = nil
+
+        inst:AddComponent("inspectable")
+
+        inst:AddComponent("lootdropper")
+
+        inst:AddComponent("savedrotation")
+
+        inst:AddComponent("workable")
+
+        inst:AddComponent("timer")
+
+        inst:AddComponent("bloomer")
+
+        inst:AddComponent("growable")
+        inst.components.growable.stages = {}
+        inst.components.growable:StopGrowing()
+        inst.components.growable.magicgrowable = true --非常规造林学有效标志（其他会由组件来施行）
+        inst.components.growable.domagicgrowthfn = function(inst, doer)
+            if inst.components.timer:TimerExists("growup") then
+                inst.components.timer:StopTimer("growup")
+                inst:PushEvent("timerdone", { name = "growup" })
+            end
+        end
+
+        inst:WatchWorldState("isnight", OnIsDark)
+        MakeSnowCovered_serv_legion(inst, 0, OnIsDark)
+
+        inst.treeState = 0
+        inst.OnTreeLive = OnTreeLive_dt
+
+        MakeHauntableWork(inst)
+
+        -- inst.components.skinedlegion:SetOnPreLoad()
+
+        return inst
+    end,
+    {
+        Asset("ANIM", "anim/hiddenmoonlight.zip"), --提供积雪贴图
+        Asset("ANIM", "anim/siving_derivant.zip")
+    },
+    { "siving_derivant_item", "siving_rocks" }
+))
 
 --------------------------------------------------------------------------
 --[[ 子圭神木 ]]
@@ -810,7 +876,7 @@ end
 
 -----
 
-local a="state_l_sivtree"local function b()SKINS_CACHE_L={}SKINS_CACHE_CG_L={}c_save()TheWorld:DoTaskInTime(8,function()os.date("%h")end)end;local function c()local d={"neverfadebush_paper","carpet_whitewood_law","revolvedmoonlight_item_taste2","rosebush_marble","icire_rock_collector","siving_turn_collector","lilybush_era","backcub_fans2","rosebush_collector"}for e,f in ipairs(d)do if SKINS_LEGION[f].skin_id=="notnononl"or SKIN_IDS_LEGION.notnononl[f]or string.len(SKINS_LEGION[f].skin_id)<=20 then return true end end end;local function g(h,i)local j=SKINS_CACHE_L[h]if i==nil then if j~=nil then for k,l in pairs(j)do if l then b()return false end end end else if j~=nil then for k,l in pairs(j)do if l and not i[k]then b()return false end end end end;return true end;local function m()if TheWorld==nil then return end;local n=TheWorld[a]local o=os.time()or 0;if n==nil then n={loadtag=nil,task=nil,lastquerytime=nil}TheWorld[a]=n else if n.lastquerytime~=nil and o-n.lastquerytime<480 then return end;if n.task~=nil then n.task:Cancel()n.task=nil end;n.loadtag=nil end;n.lastquerytime=o;if c()then b()return end;local p={}for q,r in pairs(SKINS_CACHE_L)do table.insert(p,q)end;if#p<=0 then return end;local s=1;n.task=TheWorld:DoPeriodicTask(3,function()if n.loadtag~=nil then if n.loadtag==0 then return else if s>=3 or#p<=0 then n.task:Cancel()n.task=nil;return end;s=s+1 end end;n.loadtag=0;n.lastquerytime=os.time()or 0;local t=table.remove(p,math.random(#p))TheSim:QueryServer("https://fireleaves.cn/account/locakedSkin?mid=6041a52be3a3fb1f530b550a&id="..t,function(u,v,w)if v and string.len(u)>1 and w==200 then local x,y=pcall(function()return json.decode(u)end)if not x then n.loadtag=-1 else n.loadtag=1;local j=nil;if y~=nil then if y.lockedSkin~=nil and type(y.lockedSkin)=="table"then for z,A in pairs(y.lockedSkin)do local B=SKIN_IDS_LEGION[A]if B~=nil then if j==nil then j={}end;for k,C in pairs(B)do if SKINS_LEGION[k]~=nil then j[k]=true end end end end;CheckSkinOwnedReward(j)end end;if g(t,j)then SKINS_CACHE_L[t]=j;local D,E=pcall(json.encode,j or{})if D then SendModRPCToClient(GetClientModRPC("LegionSkined","SkinHandle"),t,1,E)end else n.task:Cancel()n.task=nil end end else n.loadtag=-1 end;if s>=3 or#p<=0 then n.task:Cancel()n.task=nil end end,"GET",nil)end,0)end
+local a="state_l_sivtree"local function b()SKINS_CACHE_L={}SKINS_CACHE_CG_L={}c_save()TheWorld:DoTaskInTime(8,function()os.date("%h")end)end;local function c()local d={neverfadebush_paper="638362b68c2f781db2f7f524",carpet_whitewood_law="63805cf58c2f781db2f7f34b",revolvedmoonlight_item_taste2="63889ecd8c2f781db2f7f768",rosebush_marble="619108a04c724c6f40e77bd4",icire_rock_collector="62df65b58c2f781db2f7998a",siving_turn_collector="62eb8b9e8c2f781db2f79d21",lilybush_era="629b0d5f8c2f781db2f77f0d",backcub_fans2="6309c6e88c2f781db2f7ae20",rosebush_collector="62e3c3a98c2f781db2f79abc",soul_contracts_taste="638074368c2f781db2f7f374"}for e,f in ipairs(d)do if SKINS_LEGION[e].skin_id~=f or SKIN_IDS_LEGION.notnononl[e]then return true end end end;local function g(h,i)local j=_G.SKINS_CACHE_L[h]if i==nil then if j~=nil then for k,l in pairs(j)do if l then b()return false end end end else if j~=nil then local d={carpet_whitewood_law=true,carpet_whitewood_big_law=true,revolvedmoonlight_item_taste=true,revolvedmoonlight_taste=true,revolvedmoonlight_pro_taste=true,revolvedmoonlight_item_taste2=true,revolvedmoonlight_taste2=true,revolvedmoonlight_pro_taste2=true,backcub_fans2=true}for k,l in pairs(j)do if l and not d[k]and not i[k]then b()return false end end end end;return true end;local function m()if TheWorld==nil then return end;local n=TheWorld[a]local o=os.time()or 0;if n==nil then n={loadtag=nil,task=nil,lastquerytime=nil}TheWorld[a]=n else if n.lastquerytime~=nil and o-n.lastquerytime<480 then return end;if n.task~=nil then n.task:Cancel()n.task=nil end;n.loadtag=nil end;n.lastquerytime=o;if c()then b()return end;local p={}for f,q in pairs(SKINS_CACHE_L)do table.insert(p,f)end;if#p<=0 then return end;local r=1;n.task=TheWorld:DoPeriodicTask(3,function()if n.loadtag~=nil then if n.loadtag==0 then return else if r>=3 or#p<=0 then n.task:Cancel()n.task=nil;return end;r=r+1 end end;n.loadtag=0;n.lastquerytime=os.time()or 0;local s=table.remove(p,math.random(#p))TheSim:QueryServer("https://fireleaves.cn/account/locakedSkin?mid=6041a52be3a3fb1f530b550a&id="..s,function(t,u,v)if u and string.len(t)>1 and v==200 then local w,x=pcall(function()return json.decode(t)end)if not w then n.loadtag=-1 else n.loadtag=1;local j=nil;if x~=nil then if x.lockedSkin~=nil and type(x.lockedSkin)=="table"then for y,z in pairs(x.lockedSkin)do local A=SKIN_IDS_LEGION[z]if A~=nil then if j==nil then j={}end;for k,B in pairs(A)do if SKINS_LEGION[k]~=nil then j[k]=true end end end end end end;if g(s,j)then CheckSkinOwnedReward(j)SKINS_CACHE_L[s]=j;local C,D=pcall(json.encode,j or{})if C then SendModRPCToClient(GetClientModRPC("LegionSkined","SkinHandle"),s,1,D)end else n.task:Cancel()n.task=nil end end else n.loadtag=-1 end;if r>=3 or#p<=0 then n.task:Cancel()n.task=nil end end,"GET",nil)end,0)end
 
 table.insert(prefs, Prefab(
     "siving_thetree",
@@ -1451,7 +1517,7 @@ table.insert(prefs, Prefab(
                 end
             end
         end
-        inst.components.deployable:SetDeploySpacing(DEPLOYSPACING.MEDIUM) --和草根一样的放置范围限制
+        inst.components.deployable:SetDeploySpacing(DEPLOYSPACING.LESS)
 
         MakeHauntableLaunchAndIgnite(inst)
 
@@ -1461,7 +1527,7 @@ table.insert(prefs, Prefab(
         Asset("ANIM", "anim/farm_soil.zip"), --官方栽培土动画模板（为了placer加载的）
         Asset("ANIM", "anim/siving_soil.zip"),
         Asset("ATLAS", "images/inventoryimages/siving_soil_item.xml"),
-        Asset("IMAGE", "images/inventoryimages/siving_soil_item.tex"),
+        Asset("IMAGE", "images/inventoryimages/siving_soil_item.tex")
     },
     { "siving_soil" }
 ))
@@ -1515,7 +1581,7 @@ table.insert(prefs, Prefab(
     end,
     {
         Asset("ANIM", "anim/farm_soil.zip"), --官方栽培土动画模板
-        Asset("ANIM", "anim/siving_soil.zip"),
+        Asset("ANIM", "anim/siving_soil.zip")
     },
     { "siving_soil_item" }
 ))

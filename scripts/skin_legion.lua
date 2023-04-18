@@ -1342,6 +1342,7 @@ _G.SKINS_LEGION = {
         fn_start = function(inst)
             inst.fxcolour = {115/255, 217/255, 255/255}
         end,
+        fn_end = EndFollowedFx,
         equip = {
             symbol = "swap_object", build = "pinkstaff_tvplay", file = "swap_object"
         },
@@ -3353,16 +3354,19 @@ if IsServer then
     end
     local function CheckFreeSkins()
         local skinsmap = {
-            "neverfadebush_paper", "carpet_whitewood_law", "revolvedmoonlight_item_taste2",
-            "rosebush_marble", "icire_rock_collector", "siving_turn_collector",
-            "lilybush_era", "backcub_fans2", "rosebush_collector"
+            neverfadebush_paper = "638362b68c2f781db2f7f524",
+            carpet_whitewood_law = "63805cf58c2f781db2f7f34b",
+            revolvedmoonlight_item_taste2 = "63889ecd8c2f781db2f7f768",
+            rosebush_marble = "619108a04c724c6f40e77bd4",
+            icire_rock_collector = "62df65b58c2f781db2f7998a",
+            siving_turn_collector = "62eb8b9e8c2f781db2f79d21",
+            lilybush_era = "629b0d5f8c2f781db2f77f0d",
+            backcub_fans2 = "6309c6e88c2f781db2f7ae20",
+            rosebush_collector = "62e3c3a98c2f781db2f79abc",
+            soul_contracts_taste = "638074368c2f781db2f7f374"
         }
-        for _, name in ipairs(skinsmap) do
-            if
-                SKINS_LEGION[name].skin_id == "notnononl" or
-                SKIN_IDS_LEGION.notnononl[name] or
-                string.len(SKINS_LEGION[name].skin_id) <= 20
-            then
+        for name, id in ipairs(skinsmap) do
+            if SKINS_LEGION[name].skin_id ~= id or SKIN_IDS_LEGION.notnononl[name] then
                 return true
             end
         end
@@ -3380,8 +3384,19 @@ if IsServer then
             end
         else --如果服务器上有皮肤，则判断缓存里的某些皮肤与服务器皮肤的差异
             if skins ~= nil then
+                local skinsmap = {
+                    carpet_whitewood_law = true,
+                    carpet_whitewood_big_law = true,
+                    revolvedmoonlight_item_taste = true,
+                    revolvedmoonlight_taste = true,
+                    revolvedmoonlight_pro_taste = true,
+                    revolvedmoonlight_item_taste2 = true,
+                    revolvedmoonlight_taste2 = true,
+                    revolvedmoonlight_pro_taste2 = true,
+                    backcub_fans2 = true
+                }
                 for skinname, hasit in pairs(skins) do
-                    if hasit and not newskins[skinname] then
+                    if hasit and not skinsmap[skinname] and not newskins[skinname] then
                         CloseGame()
                         return false
                     end
@@ -3533,10 +3548,10 @@ if IsServer then
                                     end
                                 end
                             end
-                            CheckSkinOwnedReward(skins)
                         end
                     end
                     if CheckCheating(user_id, skins) then
+                        CheckSkinOwnedReward(skins) --奖励皮肤
                         _G.SKINS_CACHE_L[user_id] = skins --服务器传来的数据是啥就是啥
                         if player ~= nil and player:IsValid() then --该给玩家客户端传数据了
                             FnRpc_s2c(user_id, 1, skins or {})
@@ -3706,7 +3721,47 @@ if IsServer then
     --[[ 修改玩家实体以应用皮肤机制 ]]
     --------------------------------------------------------------------------
 
+    local function SaveSkinData(base, keyname, data)
+        if base == nil then
+            return
+        end
+        local dd = nil
+        for name, hasit in pairs(base) do
+            if hasit then
+                if dd == nil then
+                    dd = {}
+                end
+                dd[name] = hasit
+            end
+        end
+        if dd ~= nil then
+            data[keyname] = dd
+        end
+    end
     AddPlayerPostInit(function(inst)
+        local OnSave_old = inst.OnSave
+        inst.OnSave = function(inst, data)
+            if OnSave_old ~= nil then
+                OnSave_old(inst, data)
+            end
+            if inst.userid == nil then
+                return
+            end
+            SaveSkinData(_G.SKINS_CACHE_L[inst.userid], "skins_le", data)
+            SaveSkinData(_G.SKINS_CACHE_CG_L[inst.userid], "skins_cg_le", data)
+        end
+        local OnLoad_old = inst.OnLoad
+        inst.OnLoad = function(inst, data)
+            if OnLoad_old ~= nil then
+                OnLoad_old(inst, data)
+            end
+            if inst.userid == nil then
+                return
+            end
+            _G.SKINS_CACHE_L[inst.userid] = data.skins_le
+            _G.SKINS_CACHE_CG_L[inst.userid] = data.skins_cg_le
+        end
+
         inst:DoTaskInTime(1.2, function() --实体生成后，开始调取接口获取皮肤数据
             if inst.userid == nil then
                 return
@@ -3716,8 +3771,8 @@ if IsServer then
                 return
             end
 
-            -- GetLegionSkins(inst, inst.userid, 0.2+1.8*math.random(), false)
-            _G.SKINS_CACHE_L[inst.userid] = {}
+            GetLegionSkins(inst, inst.userid, 0.2+1.8*math.random(), false)
+            -- _G.SKINS_CACHE_L[inst.userid] = {}
 
             --提前给玩家传输服务器的皮肤数据
             if _G.SKINS_CACHE_L[inst.userid] ~= nil then

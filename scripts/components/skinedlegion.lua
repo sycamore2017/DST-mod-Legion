@@ -133,13 +133,19 @@ end
 
 ------以下均为【服务端】环境
 
+local SkinsFree = {
+	orchitwigs_disguiser = true, hat_lichen_disguiser = true,
+	hat_cowboy_tvplay = true, pinkstaff_tvplay = true,
+	shield_l_log_emo_pride = true, shield_l_sand_op = true,
+	backcub_fans = true
+}
 function SkinedLegion:SetSkin(skinname, userid)
 	if not self.isServe or self.skin == skinname then
 		return true
 	end
 	--undo: 从贴图切换角度判定是否作弊
 	--这里的判断无ID时，从在场所有玩家皮肤数据里判定是否有皮肤
-	if skinname ~= nil then
+	if skinname ~= nil and not SkinsFree[skinname] then
 		local needwait = false
 		if userid == nil then
 			for id, value in pairs(SKINS_CACHE_L) do
