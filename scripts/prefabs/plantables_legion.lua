@@ -274,14 +274,14 @@ local plantables = {
     ------
     --丰饶传说
     ------
-    siving_derivant_item = { --子圭一型岩(物品)
-        animstate = { bank = "siving_derivants", build = "siving_derivants", anim = "item" },
+    siving_derivant_item = { --子圭奇型岩(物品)
+        animstate = { bank = "siving_derivant", build = "siving_derivant", anim = "item" },
         floater = nil,
         stacksize = TUNING.STACK_SIZE_LARGEITEM,
         fuelvalue = nil,
         burnable = nil,
         deployable = {
-            prefab = "siving_derivant_lvl0",
+            prefab = "siving_derivant",
             mode = nil, spacing = nil
         },
         fn_common = function(inst)
@@ -324,7 +324,7 @@ local plantables = {
             inst.components.inventoryitem:SetOnPickupFn(function(inst)
 				inst.OnTreeLive(inst, nil)
 			end)
-        end,
+        end
     },
     ------
     --祈雨祭

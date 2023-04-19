@@ -15,7 +15,7 @@ local S___WATHGRITHR = STRINGS.CHARACTERS.WATHGRITHR   --瓦丝格蕾的台词
 local S_______WEBBER = STRINGS.CHARACTERS.WEBBER       --韦伯的台词
 local S_______WINONA = STRINGS.CHARACTERS.WINONA       --薇诺娜的台词
 local S________WARLY = STRINGS.CHARACTERS.WARLY        --沃利的台词
-local S_______WORTOX = STRINGS.CHARACTERS.WORTOX       --沃托克斯的台词
+local S_______WORTOX = STRINGS.CHARACTERS.WORTOX       --沃拓克斯的台词
 local S_____WORMWOOD = STRINGS.CHARACTERS.WORMWOOD     --沃姆伍德的台词
 local S_________WURT = STRINGS.CHARACTERS.WURT         --沃特的台词
 local S_______WALTER = STRINGS.CHARACTERS.WALTER       --沃尔特的台词
@@ -1734,7 +1734,7 @@ S_________WURT.DESCRIBE.SIVING_ROCKS = "I've seen this in my hometown."
 S_______WALTER.DESCRIBE.SIVING_ROCKS = "Aha, species discovery!"
 S________WANDA.DESCRIBE.SIVING_ROCKS = "It's dazzling in the sun."
 
-S_NAMES.SIVING_DERIVANT_ITEM = "Siving Derivant"  --未种下的子圭一型岩
+S_NAMES.SIVING_DERIVANT_ITEM = "Siving Derivant"  --子圭奇型岩
 S______GENERIC.DESCRIBE.SIVING_DERIVANT_ITEM = "I'd like to see what it'll look like."
 -- S_______WILLOW.DESCRIBE.SIVING_DERIVANT_ITEM = ""
 -- S_____WOLFGANG.DESCRIBE.SIVING_DERIVANT_ITEM = ""
@@ -1746,88 +1746,80 @@ S______WAXWELL.DESCRIBE.SIVING_DERIVANT_ITEM = "It's rare. Don't let me down."
 S___WATHGRITHR.DESCRIBE.SIVING_DERIVANT_ITEM = "Is it a derivant of the world tree?!"
 -- S_______WEBBER.DESCRIBE.SIVING_DERIVANT_ITEM = ""
 -- S_______WINONA.DESCRIBE.SIVING_DERIVANT_ITEM = ""
--- S_______WORTOX.DESCRIBE.SIVING_DERIVANT_ITEM = ""
+S_______WORTOX.DESCRIBE.SIVING_DERIVANT_ITEM = "Bad memories flooded into my mind."
 S_____WORMWOOD.DESCRIBE.SIVING_DERIVANT_ITEM = "Stone friend's child is still sleeping."
 -- S________WARLY.DESCRIBE.SIVING_DERIVANT_ITEM = ""
 S_________WURT.DESCRIBE.SIVING_DERIVANT_ITEM = "This is it's seed, which needs to be planted in the soil."
 -- S_______WALTER.DESCRIBE.SIVING_DERIVANT_ITEM = ""
 -- S________WANDA.DESCRIBE.SIVING_DERIVANT_ITEM = ""
 
-S_NAMES.SIVING_DERIVANT_LVL0 = "Siving Derivant"    --子圭一型岩
-S________WANDA.DESCRIBE.SIVING_DERIVANT_LVL0 = "It's going to take some time."
--- S_______WILLOW.DESCRIBE.SIVING_DERIVANT_LVL0 = ""
--- S_____WOLFGANG.DESCRIBE.SIVING_DERIVANT_LVL0 = ""
--- S________WENDY.DESCRIBE.SIVING_DERIVANT_LVL0 = ""
--- S_________WX78.DESCRIBE.SIVING_DERIVANT_LVL0 = ""
-S_WICKERBOTTOM.DESCRIBE.SIVING_DERIVANT_LVL0 = "It's worth studying."
--- S_______WOODIE.DESCRIBE.SIVING_DERIVANT_LVL0 = ""
--- S______WAXWELL.DESCRIBE.SIVING_DERIVANT_LVL0 = ""
-S___WATHGRITHR.DESCRIBE.SIVING_DERIVANT_LVL0 = "I hope it can grow into a world tree."
--- S_______WEBBER.DESCRIBE.SIVING_DERIVANT_LVL0 = ""
--- S_______WINONA.DESCRIBE.SIVING_DERIVANT_LVL0 = ""
--- S_______WORTOX.DESCRIBE.SIVING_DERIVANT_LVL0 = ""
-S_____WORMWOOD.DESCRIBE.SIVING_DERIVANT_LVL0 = "Stone friend's child wakes up."
--- S________WARLY.DESCRIBE.SIVING_DERIVANT_LVL0 = ""
-S_________WURT.DESCRIBE.SIVING_DERIVANT_LVL0 = "Just wait for it, glorp."
--- S_______WALTER.DESCRIBE.SIVING_DERIVANT_LVL0 = ""
-S________WANDA.DESCRIBE.SIVING_DERIVANT_LVL0 = "It takes more than a little time."
-
-S_NAMES.SIVING_DERIVANT_LVL1 = "Siving Derivant"    --子圭木型岩
-S______GENERIC.DESCRIBE.SIVING_DERIVANT_LVL1 = "Great, it's finally grown up a little."
--- S_______WILLOW.DESCRIBE.SIVING_DERIVANT_LVL1 = ""
--- S_____WOLFGANG.DESCRIBE.SIVING_DERIVANT_LVL1 = ""
-S________WENDY.DESCRIBE.SIVING_DERIVANT_LVL1 = "Full of hope."
--- S_________WX78.DESCRIBE.SIVING_DERIVANT_LVL1 = ""
-S_WICKERBOTTOM.DESCRIBE.SIVING_DERIVANT_LVL1 = "Worth watching for sure."
--- S_______WOODIE.DESCRIBE.SIVING_DERIVANT_LVL1 = ""
--- S______WAXWELL.DESCRIBE.SIVING_DERIVANT_LVL1 = ""
--- S___WATHGRITHR.DESCRIBE.SIVING_DERIVANT_LVL1 = ""
--- S_______WEBBER.DESCRIBE.SIVING_DERIVANT_LVL1 = ""
--- S_______WINONA.DESCRIBE.SIVING_DERIVANT_LVL1 = ""
--- S_______WORTOX.DESCRIBE.SIVING_DERIVANT_LVL1 = ""
-S_____WORMWOOD.DESCRIBE.SIVING_DERIVANT_LVL1 = "Growing steadily."
--- S________WARLY.DESCRIBE.SIVING_DERIVANT_LVL1 = ""
--- S_________WURT.DESCRIBE.SIVING_DERIVANT_LVL1 = ""
--- S_______WALTER.DESCRIBE.SIVING_DERIVANT_LVL1 = ""
-S________WANDA.DESCRIBE.SIVING_DERIVANT_LVL1 = "It needs more than just a little more time to grow."
-
-S_NAMES.SIVING_DERIVANT_LVL2 = "Siving Derivant"    --子圭林型岩
-S______GENERIC.DESCRIBE.SIVING_DERIVANT_LVL2 = "That's great, it looks good."
--- S_______WILLOW.DESCRIBE.SIVING_DERIVANT_LVL2 = ""
--- S_____WOLFGANG.DESCRIBE.SIVING_DERIVANT_LVL2 = ""
--- S________WENDY.DESCRIBE.SIVING_DERIVANT_LVL2 = ""
--- S_________WX78.DESCRIBE.SIVING_DERIVANT_LVL2 = ""
-S_WICKERBOTTOM.DESCRIBE.SIVING_DERIVANT_LVL2 = "I will continue to study it."
--- S_______WOODIE.DESCRIBE.SIVING_DERIVANT_LVL2 = ""
--- S______WAXWELL.DESCRIBE.SIVING_DERIVANT_LVL2 = ""
--- S___WATHGRITHR.DESCRIBE.SIVING_DERIVANT_LVL2 = ""
--- S_______WEBBER.DESCRIBE.SIVING_DERIVANT_LVL2 = ""
--- S_______WINONA.DESCRIBE.SIVING_DERIVANT_LVL2 = ""
--- S_______WORTOX.DESCRIBE.SIVING_DERIVANT_LVL2 = ""
-S_____WORMWOOD.DESCRIBE.SIVING_DERIVANT_LVL2 = "It's taller than me!"
--- S________WARLY.DESCRIBE.SIVING_DERIVANT_LVL2 = ""
-S_________WURT.DESCRIBE.SIVING_DERIVANT_LVL2 = "I've never planted it alive, florpt!"
--- S_______WALTER.DESCRIBE.SIVING_DERIVANT_LVL2 = ""
-S________WANDA.DESCRIBE.SIVING_DERIVANT_LVL2 = "Almost time no time at all for me."
-
-S_NAMES.SIVING_DERIVANT_LVL3 = "Siving Derivant"  --子圭森型岩
-S______GENERIC.DESCRIBE.SIVING_DERIVANT_LVL3 = "The stone grows luxuriantly."
-S_______WILLOW.DESCRIBE.SIVING_DERIVANT_LVL3 = "Doesn't burn. I don't like it."
--- S_____WOLFGANG.DESCRIBE.SIVING_DERIVANT_LVL3 = ""
--- S________WENDY.DESCRIBE.SIVING_DERIVANT_LVL3 = ""
--- S_________WX78.DESCRIBE.SIVING_DERIVANT_LVL3 = ""
-S_WICKERBOTTOM.DESCRIBE.SIVING_DERIVANT_LVL3 = "Should be its final form."
-S_______WOODIE.DESCRIBE.SIVING_DERIVANT_LVL3 = "Axes don't seem to do anything to it."
--- S______WAXWELL.DESCRIBE.SIVING_DERIVANT_LVL3 = ""
--- S___WATHGRITHR.DESCRIBE.SIVING_DERIVANT_LVL3 = ""
--- S_______WEBBER.DESCRIBE.SIVING_DERIVANT_LVL3 = ""
--- S_______WINONA.DESCRIBE.SIVING_DERIVANT_LVL3 = ""
-S_______WORTOX.DESCRIBE.SIVING_DERIVANT_LVL3 = "No matter how good it looks, it has no soul."
-S_____WORMWOOD.DESCRIBE.SIVING_DERIVANT_LVL3 = "Mature stone friends."
-S________WARLY.DESCRIBE.SIVING_DERIVANT_LVL3 = "Strange."
-S_________WURT.DESCRIBE.SIVING_DERIVANT_LVL3 = "Deep in the forest of my hometown there's lots of these."
--- S_______WALTER.DESCRIBE.SIVING_DERIVANT_LVL3 = ""
-S________WANDA.DESCRIBE.SIVING_DERIVANT_LVL3 = "It's amazing, but I'm also not surprised."
+S_NAMES.SIVING_DERIVANT = "Siving Derivant" --子圭奇型岩
+S______GENERIC.DESCRIBE.SIVING_DERIVANT = {
+    GENERIC = "It's going to take some time.",
+    LV1 = "Great, it's finally grown up a little.",
+    LV2 = "That's great, it looks good.",
+    LV3 = "The stone grows luxuriantly."
+}
+S_______WILLOW.DESCRIBE.SIVING_DERIVANT = {
+    GENERIC = "Doesn't burn. I don't like it.",
+    LV1 = "Doesn't burn. I don't like it.",
+    LV2 = "Doesn't burn. I don't like it.",
+    LV3 = "Doesn't burn. I don't like it."
+}
+S________WENDY.DESCRIBE.SIVING_DERIVANT = {
+    GENERIC = "Full of hope.",
+    LV1 = "Full of hope.",
+    LV2 = "Full of hope.",
+    LV3 = "Full of hope."
+}
+S_WICKERBOTTOM.DESCRIBE.SIVING_DERIVANT = {
+    GENERIC = "It's worth studying.",
+    LV1 = "Worth watching for sure.",
+    LV2 = "I will continue to study it.",
+    LV3 = "Should be its final form."
+}
+S_______WOODIE.DESCRIBE.SIVING_DERIVANT = {
+    GENERIC = "It's a bit like a tree stump.",
+    LV1 = "Axes don't seem to do anything to it.",
+    LV2 = "Axes don't seem to do anything to it.",
+    LV3 = "Lucy naively thought it was a tree."
+}
+S___WATHGRITHR.DESCRIBE.SIVING_DERIVANT = {
+    GENERIC = "I hope it can grow into a world tree.",
+    LV1 = "I hope it can grow into a world tree.",
+    LV2 = "I hope it can grow into a world tree.",
+    LV3 = "It seems that it won't grow as big as a world tree."
+}
+S_______WORTOX.DESCRIBE.SIVING_DERIVANT = {
+    GENERIC = "There is a tragic and mysterious history about it.",
+    LV1 = "That happened thousands of years ago, I heard it from an old lady.",
+    LV2 = "The green fire meteor swept across the sky, accompanied by a huge earthquake, and it came.",
+    LV3 = "This thing thrives on life, so the Crab Man decides to destroy it."
+}
+S_____WORMWOOD.DESCRIBE.SIVING_DERIVANT = {
+    GENERIC = "Stone friend's child wakes up.",
+    LV1 = "Growing steadily.",
+    LV2 = "It's taller than me!",
+    LV3 = "Its heart has changed."
+}
+S________WARLY.DESCRIBE.SIVING_DERIVANT = {
+    GENERIC = "Strange.",
+    LV1 = "Strange.",
+    LV2 = "Strange.",
+    LV3 = "Strange."
+}
+S_________WURT.DESCRIBE.SIVING_DERIVANT = {
+    GENERIC = "Just wait for it, glorp.",
+    LV1 = "I've never planted it alive, florpt!",
+    LV2 = "I've never planted it alive, florpt!",
+    LV3 = "Deep in the forest of my hometown there's lots of these."
+}
+S________WANDA.DESCRIBE.SIVING_DERIVANT = {
+    GENERIC = "It takes more than a little time.",
+    LV1 = "It needs more than just a little more time to grow.",
+    LV2 = "Almost time no time at all for me.",
+    LV3 = "It's amazing, but I'm also not surprised."
+}
 
 S_NAMES.SIVING_THETREE = "Siving Alpha" --子圭神木岩
 S______GENERIC.DESCRIBE.SIVING_THETREE = {

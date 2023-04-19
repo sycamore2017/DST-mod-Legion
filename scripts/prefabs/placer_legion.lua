@@ -103,12 +103,13 @@ CreatePlacer("neverfade", "berrybush2", "neverfadebush", "idle", nil, nil, nil, 
 --------------------------------------------------------------------------
 
 local function Fn_derivant(inst)
-    Skined_deploy(inst, "siving_derivant_lvl0")
+    Skined_deploy(inst, "siving_derivant")
+    inst.AnimState:SetScale(1.3, 1.3)
     inst.AnimState:SetPercent("lvl0", 0)
 end
 
-----子圭一型岩
-CreatePlacer("siving_derivant_item", "siving_derivants", "siving_derivants", "lvl0", nil, nil, nil, nil, nil, "two", Fn_derivant)
+----子圭奇型岩
+CreatePlacer("siving_derivant_item", "siving_derivant", "siving_derivant", "lvl0", nil, nil, nil, nil, nil, "two", Fn_derivant)
 
 ----子圭·垄
 CreatePlacer("siving_soil_item", "farm_soil", "siving_soil", "till_idle")

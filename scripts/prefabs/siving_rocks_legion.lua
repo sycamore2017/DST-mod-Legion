@@ -58,189 +58,20 @@ if not CONFIGS_LEGION.ENABLEDMODS.MythWords then --未开启神话书说时才�
 end
 
 --------------------------------------------------------------------------
---[[ 子圭x型岩 ]]
+--[[ 子圭奇型岩 ]]
 --------------------------------------------------------------------------
-
-local function SetRotation(inst, delta)
-    local angle = inst.Transform:GetRotation()
-    if inst.SetOrientation ~= nil then
-        inst.SetOrientation(inst, angle + delta)
-    else
-        inst.Transform:SetRotation(angle + delta)
-    end
-end
-
-local function MakeDerivant(data)
-    local function UpdateGrowing(inst)
-        if IsTooDarkToGrow_legion(inst) then
-            inst.components.timer:PauseTimer("growup")
-        else
-            inst.components.timer:ResumeTimer("growup")
-        end
-    end
-
-    local function OnIsDark(inst)
-        UpdateGrowing(inst)
-        if TheWorld.state.isnight then
-            if inst.nighttask == nil then
-                inst.nighttask = inst:DoPeriodicTask(5, UpdateGrowing, math.random() * 5)
-            end
-        else
-            if inst.nighttask ~= nil then
-                inst.nighttask:Cancel()
-                inst.nighttask = nil
-            end
-        end
-    end
-
-
-end
 
 local function TryDropRock(inst, chance)
     if chance >= 1 or math.random() <= chance then
         inst.components.lootdropper:SpawnLootPrefab("siving_rocks")
     end
 end
-local function SetTimer_derivant(inst, time, nextname)
-    inst.components.timer:StartTimer("growup", time)
-    inst:ListenForEvent("timerdone", function(inst, data)
-        if data.name == "growup" then
-            inst.SoundEmitter:PlaySound("dontstarve/common/together/marble_shrub/grow")
-            local tree = nil
-            local skindata = inst.components.skinedlegion:GetSkinedData()
-            if skindata and skindata.linkedskins and skindata.linkedskins.up then
-                tree = SpawnPrefab(nextname, skindata.linkedskins.up)
-            else
-                tree = SpawnPrefab(nextname)
-            end
-            if tree ~= nil then
-                if inst.treeState ~= 0 then
-                    tree.OnTreeLive(tree, inst.treeState)
-                end
-                SetRotation(tree, inst.Transform:GetRotation())
-                tree.Transform:SetPosition(inst.Transform:GetWorldPosition())
-            end
-            inst:Remove()
-        end
-    end)
-end
-local function SpawnSkinedPrefab(inst, itemname)
-    local x, y, z = inst.Transform:GetWorldPosition()
-    SpawnPrefab("rock_break_fx").Transform:SetPosition(x, y, z)
-    SpawnPrefab("collapse_small").Transform:SetPosition(x, y, z)
-
-    local tree = nil
-    local skindata = inst.components.skinedlegion:GetSkinedData()
-    if skindata and skindata.linkedskins and skindata.linkedskins.down then
-        tree = SpawnPrefab(itemname, skindata.linkedskins.down)
-    else
-        tree = SpawnPrefab(itemname)
+local function SetAnim_dt(inst, name)
+    if inst.treeState == 2 then
+        name = name.."_live"
     end
-    if tree ~= nil then
-        if inst.treeState ~= 0 then
-            tree.OnTreeLive(tree, inst.treeState)
-        end
-        SetRotation(tree, inst.Transform:GetRotation())
-        tree.Transform:SetPosition(x, y, z)
-    end
+    inst.AnimState:PlayAnimation(name, false)
 end
-
-MakeDerivant({  --子圭一型岩
-    name = "lvl0",
-    prefabs = { "siving_derivant_item", "siving_derivant_lvl1" },
-    fn_server = function(inst)
-        inst.components.workable:SetWorkAction(ACTIONS.DIG)
-        inst.components.workable:SetWorkLeft(3)
-        inst.components.workable:SetOnFinishCallback(function(inst, worker)
-            inst.components.lootdropper:SpawnLootPrefab("siving_derivant_item")
-            inst:Remove()
-        end)
-        SetTimer_derivant(inst, TUNING.TOTAL_DAY_TIME * 6, "siving_derivant_lvl1")
-    end,
-})
-MakeDerivant({  --子圭木型岩
-    name = "lvl1",
-    prefabs = { "siving_rocks", "siving_derivant_lvl0", "siving_derivant_lvl2" },
-    fn_server = function(inst)
-        inst.components.workable:SetWorkAction(ACTIONS.MINE)
-        inst.components.workable:SetWorkLeft(6)
-        inst.components.workable:SetOnWorkCallback(function(inst, worker, workleft)
-            if workleft > 0 then
-                TryDropRock(inst, 0.02)
-            end
-        end)
-        inst.components.workable:SetOnFinishCallback(function(inst, worker)
-            SpawnSkinedPrefab(inst, "siving_derivant_lvl0")
-            TryDropRock(inst, 0.5)
-            inst:Remove()
-        end)
-        SetTimer_derivant(inst, TUNING.TOTAL_DAY_TIME * 7.5, "siving_derivant_lvl2")
-    end,
-})
-MakeDerivant({  --子圭林型岩
-    name = "lvl2",
-    prefabs = { "siving_rocks", "siving_derivant_lvl1", "siving_derivant_lvl3" },
-    fn_server = function(inst)
-        inst.components.workable:SetWorkAction(ACTIONS.MINE)
-        inst.components.workable:SetWorkLeft(9)
-        inst.components.workable:SetOnWorkCallback(function(inst, worker, workleft)
-            if workleft > 0 then
-                TryDropRock(inst, 0.03)
-            end
-        end)
-        inst.components.workable:SetOnFinishCallback(function(inst, worker)
-            SpawnSkinedPrefab(inst, "siving_derivant_lvl1")
-            inst.components.lootdropper:SpawnLootPrefab("siving_rocks")
-            TryDropRock(inst, 0.5)
-            inst:Remove()
-        end)
-        SetTimer_derivant(inst, TUNING.TOTAL_DAY_TIME * 8, "siving_derivant_lvl3")
-    end,
-})
-MakeDerivant({  --子圭森型岩
-    name = "lvl3",
-    prefabs = { "siving_rocks", "siving_derivant_lvl2" },
-    fn_server = function(inst)
-        inst.components.workable:SetWorkAction(ACTIONS.MINE)
-        inst.components.workable:SetWorkLeft(12)
-        inst.components.workable:SetOnWorkCallback(function(inst, worker, workleft)
-            if workleft > 0 then
-                TryDropRock(inst, 0.04)
-            end
-        end)
-        inst.components.workable:SetOnFinishCallback(function(inst, worker)
-            SpawnSkinedPrefab(inst, "siving_derivant_lvl2")
-            inst.components.lootdropper:SpawnLootPrefab("siving_rocks")
-            inst.components.lootdropper:SpawnLootPrefab("siving_rocks")
-            TryDropRock(inst, 0.5)
-            inst:Remove()
-        end)
-
-        inst.components.timer:StartTimer("growup", TUNING.TOTAL_DAY_TIME * 6)
-        inst:ListenForEvent("timerdone", function(inst, data)
-            if data.name == "growup" then
-                inst.components.timer:StartTimer("growup", TUNING.TOTAL_DAY_TIME * 6)
-                local x,y,z = inst.Transform:GetWorldPosition()
-                local ents = TheSim:FindEntities(x,y,z, 6,
-                    nil,
-                    {"NOCLICK", "FX", "INLIMBO"},
-                    nil
-                )
-                local numloot = 0
-                for i,ent in ipairs(ents) do
-                    if ent.prefab == "siving_rocks" then
-                        numloot = numloot + 1
-                        if numloot >= 2 then
-                            return
-                        end
-                    end
-                end
-                inst.components.lootdropper:SpawnLootPrefab("siving_rocks")
-            end
-        end)
-    end,
-})
-
 local function OnFinish_dt0(inst, worker)
     inst.components.lootdropper:SpawnLootPrefab("siving_derivant_item")
     inst:Remove()
@@ -249,79 +80,188 @@ local function OnWork_dt1(inst, worker, workleft)
     if workleft > 0 then
         TryDropRock(inst, 0.02)
     else
+        TryDropRock(inst, 1)
         inst.components.growable:SetStage(inst.components.growable:GetStage() - 1)
+        inst.components.growable:StartGrowing()
     end
+end
+local function OnWork_dt2(inst, worker, workleft)
+    if workleft > 0 then
+        TryDropRock(inst, 0.03)
+    else
+        TryDropRock(inst, 1)
+        TryDropRock(inst, 1)
+        inst.components.growable:SetStage(inst.components.growable:GetStage() - 1)
+        inst.components.growable:StartGrowing()
+    end
+end
+local function OnWork_dt3(inst, worker, workleft)
+    if workleft > 0 then
+        TryDropRock(inst, 0.04)
+    else
+        TryDropRock(inst, 1)
+        TryDropRock(inst, 1)
+        TryDropRock(inst, 1)
+        inst.components.timer:StopTimer("fallenleaf")
+        inst.components.growable:SetStage(inst.components.growable:GetStage() - 1)
+        inst.components.growable:StartGrowing()
+    end
+end
+local function MagicGrow_dt3(inst, doer)
+    inst:PushEvent("timerdone", { name = "fallenleaf" })
 end
 
 local growth_stages_dt = {
     {
-        name="lvl0",
+        name = "lvl0",
         time = function(inst, stage, stagedata)
             return GetRandomWithVariance(TUNING.TOTAL_DAY_TIME*6, TUNING.TOTAL_DAY_TIME/2)
         end,
         fn = function(inst, stage, stagedata)
-            inst.AnimState:PlayAnimation("lvl0", false)
+            SetAnim_dt(inst, "lvl0")
             inst.components.workable:SetWorkAction(ACTIONS.DIG)
             inst.components.workable:SetWorkLeft(3)
             inst.components.workable:SetOnWorkCallback(nil)
             inst.components.workable:SetOnFinishCallback(OnFinish_dt0)
+            inst.components.growable.domagicgrowthfn = nil
         end
     },
     {
-        name="lvl1",
+        name = "lvl1",
         time = function(inst, stage, stagedata)
             return GetRandomWithVariance(TUNING.TOTAL_DAY_TIME*7.5, TUNING.TOTAL_DAY_TIME/2)
         end,
         fn = function(inst, stage, stagedata)
-            inst.AnimState:PlayAnimation("lvl1", false)
+            SetAnim_dt(inst, "lvl1")
             inst.components.workable:SetWorkAction(ACTIONS.MINE)
             inst.components.workable:SetWorkLeft(6)
             inst.components.workable:SetOnWorkCallback(OnWork_dt1)
             inst.components.workable:SetOnFinishCallback(nil)
+            inst.components.growable.domagicgrowthfn = nil
         end
     },
     {
-        name="lvl2",
+        name = "lvl2",
         time = function(inst, stage, stagedata)
             return GetRandomWithVariance(TUNING.TOTAL_DAY_TIME*8, TUNING.TOTAL_DAY_TIME/2)
         end,
         fn = function(inst, stage, stagedata)
-            inst.AnimState:PlayAnimation("lvl2", false)
+            SetAnim_dt(inst, "lvl2")
             inst.components.workable:SetWorkAction(ACTIONS.MINE)
             inst.components.workable:SetWorkLeft(9)
             inst.components.workable:SetOnWorkCallback(OnWork_dt2)
             inst.components.workable:SetOnFinishCallback(nil)
+            inst.components.growable.domagicgrowthfn = nil
         end
     },
     {
-        name="lvl3",
+        name = "lvl3",
         time = function(inst, stage, stagedata)
             return GetRandomWithVariance(TUNING.TOTAL_DAY_TIME*6, TUNING.TOTAL_DAY_TIME/2)
         end,
         fn = function(inst, stage, stagedata)
-            inst.AnimState:PlayAnimation("lvl3", false)
+            SetAnim_dt(inst, "lvl3")
             inst.components.workable:SetWorkAction(ACTIONS.MINE)
             inst.components.workable:SetWorkLeft(12)
             inst.components.workable:SetOnWorkCallback(OnWork_dt3)
             inst.components.workable:SetOnFinishCallback(nil)
+            inst.components.growable.domagicgrowthfn = MagicGrow_dt3
+            inst.components.growable:StopGrowing()
+            if not inst.components.timer:TimerExists("fallenleaf") then
+                inst.components.timer:StartTimer("fallenleaf", stagedata.time(inst, stage, stagedata))
+            end
         end
     }
 }
 
+local function UpdateGrowing_dt(inst)
+    if IsTooDarkToGrow_legion(inst) then
+        inst.components.timer:PauseTimer("fallenleaf")
+        inst.components.growable:Pause()
+    else
+        inst.components.timer:ResumeTimer("fallenleaf")
+        inst.components.growable:Resume()
+    end
+end
+local function OnIsDark_dt(inst)
+    UpdateGrowing_dt(inst)
+    if TheWorld.state.isnight then
+        if inst.nighttask == nil then
+            inst.nighttask = inst:DoPeriodicTask(5, UpdateGrowing_dt, math.random()*5)
+        end
+    else
+        if inst.nighttask ~= nil then
+            inst.nighttask:Cancel()
+            inst.nighttask = nil
+        end
+    end
+end
+local function GetStatus_dt(inst)
+	local cpt = inst.components.growable
+	return (cpt == nil and "GENERIC")
+		or (cpt.stage == 1 and "GENERIC")
+        or (cpt.stage == 2 and "LV1")
+        or (cpt.stage == 3 and "LV2")
+        or (cpt.stage == 4 and "LV3")
+		or "GENERIC"
+end
+local function TimerDone_dt(inst, data)
+    if data.name == "fallenleaf" then
+        local cpt = inst.components.growable
+        if cpt.stage ~= 4 then
+            return
+        end
+        inst.components.workable:SetWorkLeft(12) --恢复破坏度
+        inst.components.timer:StopTimer("fallenleaf")
+        inst.components.timer:StartTimer("fallenleaf", cpt.stages[4].time(inst, 4, cpt.stages[4]))
+
+        local x, y, z = inst.Transform:GetWorldPosition()
+        local ents = TheSim:FindEntities(x,y,z, 6,
+            nil,
+            {"NOCLICK", "FX", "INLIMBO"},
+            nil
+        )
+        local numloot = 0
+        local stackitem = nil
+        for _, ent in ipairs(ents) do
+            if ent.prefab == "siving_rocks" then
+                numloot = numloot + 1
+                if stackitem == nil and not ent.components.stackable:IsFull() then
+                    stackitem = ent
+                end
+                if numloot >= 2 then
+                    if stackitem ~= nil then
+                        break
+                    else --周围的子圭石最多只能两组
+                        return
+                    end
+                end
+            end
+        end
+        if stackitem == nil then
+            TryDropRock(inst, 1)
+        else
+            stackitem.components.stackable:SetStackSize(stackitem.components.stackable:StackSize()+1)
+        end
+    end
+end
 local function OnTreeLive_dt(inst, state)
+    local cpt = inst.components.growable
+    local name = cpt.stages[cpt.stage].name or "lvl0"
+
     inst.treeState = state
     if state == 2 then
-        inst.AnimState:PlayAnimation(data.name.."_live")
+        inst.AnimState:PlayAnimation(name.."_live")
         inst.components.bloomer:PushBloom("activetree", "shaders/anim.ksh", 1)
         inst.Light:SetRadius(1.5)
         inst.Light:Enable(true)
     elseif state == 1 then
-        inst.AnimState:PlayAnimation(data.name)
+        inst.AnimState:PlayAnimation(name)
         inst.components.bloomer:PushBloom("activetree", "shaders/anim.ksh", 1)
         inst.Light:SetRadius(0.8)
         inst.Light:Enable(true)
     else
-        inst.AnimState:PlayAnimation(data.name)
+        inst.AnimState:PlayAnimation(name)
         inst.components.bloomer:PopBloom("activetree")
         inst.Light:Enable(false)
     end
@@ -361,8 +301,8 @@ table.insert(prefs, Prefab(
         inst:AddTag("rotatableobject") --能让栅栏击剑起作用
         inst:AddTag("flatrotated_l") --棱镜标签：旋转时旋转180度
 
-        -- inst:AddComponent("skinedlegion")
-        -- inst.components.skinedlegion:Init("siving_derivant")
+        inst:AddComponent("skinedlegion")
+        inst.components.skinedlegion:Init("siving_derivant")
 
         inst.entity:SetPristine()
         if not TheWorld.ismastersim then
@@ -370,8 +310,10 @@ table.insert(prefs, Prefab(
         end
 
         inst.nighttask = nil
+        inst.treeState = 0
 
         inst:AddComponent("inspectable")
+        inst.components.inspectable.getstatus = GetStatus_dt
 
         inst:AddComponent("lootdropper")
 
@@ -384,20 +326,15 @@ table.insert(prefs, Prefab(
         inst:AddComponent("bloomer")
 
         inst:AddComponent("growable")
-        inst.components.growable.stages = {}
-        inst.components.growable:StopGrowing()
-        inst.components.growable.magicgrowable = true --非常规造林学有效标志（其他会由组件来施行）
-        inst.components.growable.domagicgrowthfn = function(inst, doer)
-            if inst.components.timer:TimerExists("growup") then
-                inst.components.timer:StopTimer("growup")
-                inst:PushEvent("timerdone", { name = "growup" })
-            end
-        end
+        inst.components.growable.stages = growth_stages_dt
+        inst.components.growable.magicgrowable = true --能被魔法催熟
+        inst.components.growable:SetStage(1)
+        inst.components.growable:StartGrowing()
 
-        inst:WatchWorldState("isnight", OnIsDark)
-        MakeSnowCovered_serv_legion(inst, 0, OnIsDark)
+        inst:WatchWorldState("isnight", OnIsDark_dt)
+        inst:ListenForEvent("timerdone", TimerDone_dt)
+        MakeSnowCovered_serv_legion(inst, 0.1 + 0.3*math.random(), OnIsDark_dt)
 
-        inst.treeState = 0
         inst.OnTreeLive = OnTreeLive_dt
 
         MakeHauntableWork(inst)
@@ -412,6 +349,45 @@ table.insert(prefs, Prefab(
     },
     { "siving_derivant_item", "siving_rocks" }
 ))
+
+----兼容以前的代码
+
+local function MakeDerivant(name, state)
+    table.insert(prefs, Prefab(
+        "siving_derivant_"..name,
+        function()
+            local inst = CreateEntity()
+
+            inst.entity:AddTransform()
+            inst.entity:AddNetwork()
+
+            inst.entity:SetPristine()
+            if not TheWorld.ismastersim then
+                return inst
+            end
+
+            inst:DoTaskInTime(1+math.random(), function(inst)
+                local tree = SpawnPrefab("siving_derivant")
+                if tree ~= nil then
+                    if state ~= 1 then
+                        tree.components.growable:SetStage(state)
+                        if state ~= 4 then
+                            tree.components.growable:StartGrowing()
+                        end
+                    end
+                    tree.Transform:SetPosition(inst.Transform:GetWorldPosition())
+                end
+                inst:Remove()
+            end)
+
+            return inst
+        end, nil, nil
+    ))
+end
+MakeDerivant("lvl0", 1)
+MakeDerivant("lvl1", 2)
+MakeDerivant("lvl2", 3)
+MakeDerivant("lvl3", 4)
 
 --------------------------------------------------------------------------
 --[[ 子圭神木 ]]

@@ -347,7 +347,7 @@ table.insert(prefs, Prefab("hiddenmoonlight", function()
 
     MakeHauntableLaunchAndDropFirstItem(inst)
 
-    MakeSnowCovered_serv_legion(inst, 0.1 + 0.3 * math.random(), function(inst)
+    MakeSnowCovered_serv_legion(inst, 0.1 + 0.3*math.random(), function(inst)
         inst.AnimState:SetTime(math.random() * inst.AnimState:GetCurrentAnimationLength())
     end)
 

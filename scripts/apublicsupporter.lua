@@ -22,6 +22,13 @@ _G.RegistMiniMapImage_legion = function(filename, fileaddresspre)
 end
 
 --[ 积雪监听(仅prefab定义时使用) ]--
+local function OnSnowCoveredChagned(inst, covered)
+    if TheWorld.state.issnowcovered then
+        inst.AnimState:OverrideSymbol("snow", "hiddenmoonlight", "snow")
+    else
+        inst.AnimState:OverrideSymbol("snow", "hiddenmoonlight", "emptysnow")
+    end
+end
 _G.MakeSnowCovered_comm_legion = function(inst)
     inst.AnimState:OverrideSymbol("snow", "hiddenmoonlight", "emptysnow")
 
@@ -30,16 +37,8 @@ _G.MakeSnowCovered_comm_legion = function(inst)
     --  2、同时，动画制作中，需要添加“snow”的通道
 end
 _G.MakeSnowCovered_serv_legion = function(inst, delaytime, delayfn)
-    local function OnSnowCoveredChagned(inst, covered)
-        if TheWorld.state.issnowcovered then
-            inst.AnimState:OverrideSymbol("snow", "hiddenmoonlight", "snow")
-        else
-            inst.AnimState:OverrideSymbol("snow", "hiddenmoonlight", "emptysnow")
-        end
-    end
-
     inst:WatchWorldState("issnowcovered", OnSnowCoveredChagned)
-    inst:DoTaskInTime(delaytime, function()
+    inst:DoTaskInTime(delaytime, function(inst)
 		OnSnowCoveredChagned(inst)
         if delayfn ~= nil then delayfn(inst) end
 	end)
@@ -1756,6 +1755,18 @@ local CA_S_INSPECTABLE_L = {
         end
         return false
     end,
+    function(inst, doer, actions, right) --武器技能
+        if right then
+            if
+                doer:HasTag("s_l_pull") or
+                (doer:HasTag("s_l_throw") and doer ~= inst) ----不应该是自己为目标
+            then
+                table.insert(actions, ACTIONS.RC_SKILL_L)
+                return true
+            end
+        end
+        return false
+    end,
     function(inst, doer, actions, right) --生命转移
         if right and doer ~= inst and (doer.replica.inventory ~= nil and not doer.replica.inventory:IsHeavyLifting()) then
             local item = doer.replica.inventory:GetEquippedItem(EQUIPSLOTS.HEAD)
@@ -1785,18 +1796,6 @@ local CA_S_INSPECTABLE_L = {
                 else
                     return false
                 end
-                return true
-            end
-        end
-        return false
-    end,
-    function(inst, doer, actions, right) --武器技能
-        if right then
-            if
-                doer:HasTag("s_l_pull") or
-                (doer:HasTag("s_l_throw") and doer ~= inst) ----不应该是自己为目标
-            then
-                table.insert(actions, ACTIONS.RC_SKILL_L)
                 return true
             end
         end
