@@ -332,4 +332,54 @@ function BotanyController:OnLoad(data)
     end
 end
 
+local function DecimalPointTruncation(value, plus) --截取小数点
+	value = math.floor(value*plus)
+	return value/plus
+end
+local function GetDetailString(self, doer, type)
+	local data = {
+		n1 = tostring(DecimalPointTruncation(self.nutrients[1], 10)),
+        n2 = tostring(DecimalPointTruncation(self.nutrients[2], 10)),
+        n3 = tostring(DecimalPointTruncation(self.nutrients[3], 10)),
+        mo = tostring(DecimalPointTruncation(self.moisture, 10))
+	}
+
+	if type == 2 then
+		data.nu_max = tostring(self.nutrient_max)
+		data.mo_max = tostring(self.moisture_max)
+		return subfmt(STRINGS.PLANT_CROP_L["CTL2_"..tostring(self.type)], data)
+	else
+		return subfmt(STRINGS.PLANT_CROP_L["CTL1_"..tostring(self.type)], data)
+	end
+end
+function BotanyController:SayDetail(doer, dotalk) --介绍细节
+	if doer == nil or doer:HasTag("mime") then
+		return
+	end
+
+	local str = nil
+
+	if doer:HasTag("sharpeye") then
+		str = GetDetailString(self, doer, 2)
+	else
+		local hat = doer.components.inventory and doer.components.inventory:GetEquippedItem(EQUIPSLOTS.HEAD) or nil
+		if hat == nil then
+			-- if doer:HasTag("plantkin") then
+			-- 	str = GetDetailString(self, doer, 1)
+			-- end
+			return str
+		elseif hat:HasTag("detailedplanthappiness") then
+			str = GetDetailString(self, doer, 2)
+		elseif hat:HasTag("plantinspector") then
+			str = GetDetailString(self, doer, 1)
+		end
+	end
+
+	if dotalk and str ~= nil and doer.components.talker ~= nil then
+		doer.components.talker:Say(str)
+	end
+
+	return str
+end
+
 return BotanyController

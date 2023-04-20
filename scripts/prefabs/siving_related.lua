@@ -30,6 +30,225 @@ local ctlFuledItems = {
 }
 local PLACER_SCALE_CTL = 1.79 --这个大小就是20半径的
 
+local function GetDesc_ctl(inst, doer)
+    return inst.components.botanycontroller:SayDetail(doer, false)
+end
+local function OnEnableHelper_ctl(inst, enabled)
+    if enabled then
+        if inst.helper == nil then
+            inst.helper = CreateEntity()
+
+            --[[Non-networked entity]]
+            inst.helper.entity:SetCanSleep(false)
+            inst.helper.persists = false
+
+            inst.helper.entity:AddTransform()
+            inst.helper.entity:AddAnimState()
+
+            inst.helper:AddTag("CLASSIFIED")
+            inst.helper:AddTag("NOCLICK")
+            inst.helper:AddTag("placer")
+
+            inst.helper.Transform:SetScale(PLACER_SCALE_CTL, PLACER_SCALE_CTL, PLACER_SCALE_CTL)
+
+            inst.helper.AnimState:SetBank("firefighter_placement")
+            inst.helper.AnimState:SetBuild("firefighter_placement")
+            inst.helper.AnimState:PlayAnimation("idle")
+            inst.helper.AnimState:SetLightOverride(1)
+            inst.helper.AnimState:SetOrientation(ANIM_ORIENTATION.OnGround)
+            inst.helper.AnimState:SetLayer(LAYER_BACKGROUND)
+            inst.helper.AnimState:SetSortOrder(1)
+            inst.helper.AnimState:SetAddColour(0, .5, .5, 0)
+
+            inst.helper.entity:SetParent(inst.entity)
+        end
+    elseif inst.helper ~= nil then
+        inst.helper:Remove()
+        inst.helper = nil
+    end
+end
+local function CanAcceptMoisture(botanyctl, test)
+    if test ~= nil and (botanyctl.type == 1 or botanyctl.type == 3) then
+        return botanyctl.moisture < botanyctl.moisture_max
+    end
+    return nil
+end
+local function CanAcceptNutrients(botanyctl, test)
+    if test ~= nil and (botanyctl.type == 2 or botanyctl.type == 3) then
+        if test[1] ~= nil and test[1] ~= 0 and botanyctl.nutrients[1] < botanyctl.nutrient_max then
+            return true
+        elseif test[2] ~= nil and test[2] ~= 0 and botanyctl.nutrients[2] < botanyctl.nutrient_max then
+            return true
+        elseif test[3] ~= nil and test[3] ~= 0 and botanyctl.nutrients[3] < botanyctl.nutrient_max then
+            return true
+        else
+            return false
+        end
+    end
+    return nil
+end
+local function GiveItemBack(inst, giver, item)
+    if giver and giver.components.inventory ~= nil then
+        -- item.prevslot = nil
+        -- item.prevcontainer = nil
+        giver.components.inventory:GiveItem(item, nil, giver:GetPosition() or nil)
+    else
+        item.Transform:SetPosition(inst.Transform:GetWorldPosition())
+    end
+end
+local function GetAllActiveItems(giver, item, times)
+    --需要限制获取时机，不可能每次循环都来合并一次
+    if times == 1 and item.components.stackable ~= nil then --有叠加组件，说明鼠标上可能有物品
+        if giver.components.inventory ~= nil then
+            local activeitem = giver.components.inventory:GetActiveItem()
+            if activeitem ~= nil and activeitem.prefab == item.prefab then
+                activeitem.components.inventoryitem:RemoveFromOwner(true)
+                item.components.stackable:Put(activeitem)
+            end
+        end
+    end
+end
+local function AcceptTest_ctl(inst, item, giver)
+    local botanyctl = inst.components.botanycontroller
+    local acpt_m = nil --true接受、false已经满了、nil无法接受
+    local acpt_n = nil
+    if ctlFuledItems[item.prefab] ~= nil then
+        acpt_m = CanAcceptMoisture(botanyctl, ctlFuledItems[item.prefab].moisture)
+        acpt_n = CanAcceptNutrients(botanyctl, ctlFuledItems[item.prefab].nutrients)
+    elseif item.siv_ctl_fueled ~= nil then --兼容其他mod
+        acpt_m = CanAcceptMoisture(botanyctl, item.siv_ctl_fueled.moisture)
+        acpt_n = CanAcceptNutrients(botanyctl, item.siv_ctl_fueled.nutrients)
+    else
+        acpt_m = CanAcceptMoisture(botanyctl, item.components.wateryprotection)
+        if item.components.fertilizer ~= nil then
+            acpt_n = CanAcceptNutrients(botanyctl, item.components.fertilizer.nutrients)
+        end
+    end
+
+    if acpt_m or acpt_n then
+        return true
+    elseif giver ~= nil then
+        if acpt_m == false or acpt_n == false then
+            giver.siv_ctl_traded = "ISFULL"
+        else
+            giver.siv_ctl_traded = "REFUSE"
+        end
+    end
+
+    return false
+end
+local function OnAccept_ctl(inst, giver, item, times)
+    if times == nil then
+        times = 1
+    end
+
+    local botanyctl = inst.components.botanycontroller
+    if ctlFuledItems[item.prefab] ~= nil then
+        GetAllActiveItems(giver, item, times)
+        botanyctl:SetValue(ctlFuledItems[item.prefab].moisture, ctlFuledItems[item.prefab].nutrients, true)
+    elseif item.siv_ctl_fueled ~= nil then
+        botanyctl:SetValue(item.siv_ctl_fueled.moisture, item.siv_ctl_fueled.nutrients, true)
+        if item.siv_ctl_fueled.fn_accept ~= nil then
+            item.siv_ctl_fueled.fn_accept(inst, giver, item)
+            return
+        end
+        GetAllActiveItems(giver, item, times)
+    else
+        GetAllActiveItems(giver, item, times)
+        local waterypro = item.components.wateryprotection
+        local value_m = nil
+        if waterypro ~= nil then
+            if waterypro.addwetness == nil or waterypro.addwetness == 0 then
+                value_m = 20
+            else
+                value_m = waterypro.addwetness
+            end
+            if item.components.finiteuses ~= nil then
+                value_m = value_m * item.components.finiteuses:GetUses() --普通水壶是+1000
+            else
+                value_m = value_m * 10
+            end
+        end
+
+        botanyctl:SetValue(value_m,
+            item.components.fertilizer ~= nil and item.components.fertilizer.nutrients or nil,
+            true
+        )
+
+        if item.components.fertilizer ~= nil then
+            item.components.fertilizer:OnApplied(giver, inst) --删除以及特殊机制就在其中
+            if item:IsValid() then
+                if
+                    (
+                        (item.components.finiteuses ~= nil and item.components.finiteuses:GetUses() > 0)
+                        or (item.components.stackable ~= nil and item.components.stackable:StackSize() >= 1)
+                    )
+                    and AcceptTest_ctl(inst, item, giver)
+                then
+                    OnAccept_ctl(inst, giver, item, times+1)
+                else
+                    GiveItemBack(inst, giver, item)
+                end
+                giver.siv_ctl_traded = nil
+            end
+            return
+        elseif item.components.finiteuses ~= nil then
+            if item.prefab == "wateringcan" or item.prefab == "premiumwateringcan" then
+                item.components.finiteuses:Use(1000)
+            else
+                item.components.finiteuses:Use(1)
+            end
+            if item:IsValid() then
+                if item.components.finiteuses:GetUses() > 0 and AcceptTest_ctl(inst, item, giver) then
+                    OnAccept_ctl(inst, giver, item, times+1)
+                else
+                    GiveItemBack(inst, giver, item)
+                end
+                giver.siv_ctl_traded = nil
+            end
+            return
+        end
+    end
+
+    if item.components.stackable ~= nil then
+        if item.components.stackable:StackSize() > times and AcceptTest_ctl(inst, item, giver) then
+            OnAccept_ctl(inst, giver, item, times+1)
+        else
+            item.components.stackable:Get(times):Remove()
+            if item:IsValid() then
+                GiveItemBack(inst, giver, item)
+            end
+        end
+    else
+        item:Remove()
+    end
+end
+local function OnRefuse_ctl(inst, giver, item)
+    if giver ~= nil and giver.siv_ctl_traded ~= nil then
+        if giver.components.talker ~= nil then
+            giver.components.talker:Say(GetString(giver, "DESCRIBE", { string.upper(inst.prefab), giver.siv_ctl_traded }))
+        end
+        giver.siv_ctl_traded = nil
+    end
+end
+local function DoFunction_ctl(inst, doit)
+    if inst.task_function ~= nil then
+        inst.task_function:Cancel()
+        inst.task_function = nil
+    end
+    if not doit then
+        return
+    end
+
+    local time = 210 + math.random()*10
+    inst.task_function = inst:DoPeriodicTask(time, function()
+        if TheWorld.state.israining or TheWorld.state.issnowing then --下雨时补充水分
+            inst.components.botanycontroller:SetValue(800, nil, true)
+        end
+        inst.components.botanycontroller:DoAreaFunction()
+    end, math.random()*2)
+end
+
 local function MakeItem(data)
     local basename = "siving_ctl"..data.name
     table.insert(prefs, Prefab(
@@ -105,221 +324,8 @@ local function MakeItem(data)
         data.prefabs
     ))
 end
-
 local function MakeConstruct(data)
     local basename = "siving_ctl"..data.name
-
-    local function OnEnableHelper_ctl(inst, enabled)
-        if enabled then
-            if inst.helper == nil then
-                inst.helper = CreateEntity()
-
-                --[[Non-networked entity]]
-                inst.helper.entity:SetCanSleep(false)
-                inst.helper.persists = false
-
-                inst.helper.entity:AddTransform()
-                inst.helper.entity:AddAnimState()
-
-                inst.helper:AddTag("CLASSIFIED")
-                inst.helper:AddTag("NOCLICK")
-                inst.helper:AddTag("placer")
-
-                inst.helper.Transform:SetScale(PLACER_SCALE_CTL, PLACER_SCALE_CTL, PLACER_SCALE_CTL)
-
-                inst.helper.AnimState:SetBank("firefighter_placement")
-                inst.helper.AnimState:SetBuild("firefighter_placement")
-                inst.helper.AnimState:PlayAnimation("idle")
-                inst.helper.AnimState:SetLightOverride(1)
-                inst.helper.AnimState:SetOrientation(ANIM_ORIENTATION.OnGround)
-                inst.helper.AnimState:SetLayer(LAYER_BACKGROUND)
-                inst.helper.AnimState:SetSortOrder(1)
-                inst.helper.AnimState:SetAddColour(0, .5, .5, 0)
-
-                inst.helper.entity:SetParent(inst.entity)
-            end
-        elseif inst.helper ~= nil then
-            inst.helper:Remove()
-            inst.helper = nil
-        end
-    end
-
-    local function CanAcceptMoisture(botanyctl, test)
-        if test ~= nil and (botanyctl.type == 1 or botanyctl.type == 3) then
-            return botanyctl.moisture < botanyctl.moisture_max
-        end
-        return nil
-    end
-    local function CanAcceptNutrients(botanyctl, test)
-        if test ~= nil and (botanyctl.type == 2 or botanyctl.type == 3) then
-            if test[1] ~= nil and test[1] ~= 0 and botanyctl.nutrients[1] < botanyctl.nutrient_max then
-                return true
-            elseif test[2] ~= nil and test[2] ~= 0 and botanyctl.nutrients[2] < botanyctl.nutrient_max then
-                return true
-            elseif test[3] ~= nil and test[3] ~= 0 and botanyctl.nutrients[3] < botanyctl.nutrient_max then
-                return true
-            else
-                return false
-            end
-        end
-        return nil
-    end
-    local function GiveItemBack(inst, giver, item)
-        if giver and giver.components.inventory ~= nil then
-            -- item.prevslot = nil
-            -- item.prevcontainer = nil
-            giver.components.inventory:GiveItem(item, nil, giver:GetPosition() or nil)
-        else
-            item.Transform:SetPosition(inst.Transform:GetWorldPosition())
-        end
-    end
-    local function GetAllActiveItems(giver, item, times)
-        --需要限制获取时机，不可能每次循环都来合并一次
-        if times == 1 and item.components.stackable ~= nil then --有叠加组件，说明鼠标上可能有物品
-            if giver.components.inventory ~= nil then
-                local activeitem = giver.components.inventory:GetActiveItem()
-                if activeitem ~= nil and activeitem.prefab == item.prefab then
-                    activeitem.components.inventoryitem:RemoveFromOwner(true)
-                    item.components.stackable:Put(activeitem)
-                end
-            end
-        end
-    end
-
-    local function AcceptTest(inst, item, giver)
-        local botanyctl = inst.components.botanycontroller
-        local acpt_m = nil --true接受、false已经满了、nil无法接受
-        local acpt_n = nil
-        if ctlFuledItems[item.prefab] ~= nil then
-            acpt_m = CanAcceptMoisture(botanyctl, ctlFuledItems[item.prefab].moisture)
-            acpt_n = CanAcceptNutrients(botanyctl, ctlFuledItems[item.prefab].nutrients)
-        elseif item.siv_ctl_fueled ~= nil then --兼容其他mod
-            acpt_m = CanAcceptMoisture(botanyctl, item.siv_ctl_fueled.moisture)
-            acpt_n = CanAcceptNutrients(botanyctl, item.siv_ctl_fueled.nutrients)
-        else
-            acpt_m = CanAcceptMoisture(botanyctl, item.components.wateryprotection)
-            if item.components.fertilizer ~= nil then
-                acpt_n = CanAcceptNutrients(botanyctl, item.components.fertilizer.nutrients)
-            end
-        end
-
-        if acpt_m or acpt_n then
-            return true
-        elseif giver ~= nil then
-            if acpt_m == false or acpt_n == false then
-                giver.siv_ctl_traded = "ISFULL"
-            else
-                giver.siv_ctl_traded = "REFUSE"
-            end
-        end
-
-        return false
-    end
-    local function OnAccept(inst, giver, item, times)
-        if times == nil then
-            times = 1
-        end
-
-        local botanyctl = inst.components.botanycontroller
-        if ctlFuledItems[item.prefab] ~= nil then
-            GetAllActiveItems(giver, item, times)
-            botanyctl:SetValue(ctlFuledItems[item.prefab].moisture, ctlFuledItems[item.prefab].nutrients, true)
-        elseif item.siv_ctl_fueled ~= nil then
-            botanyctl:SetValue(item.siv_ctl_fueled.moisture, item.siv_ctl_fueled.nutrients, true)
-            if item.siv_ctl_fueled.fn_accept ~= nil then
-                item.siv_ctl_fueled.fn_accept(inst, giver, item)
-                return
-            end
-            GetAllActiveItems(giver, item, times)
-        else
-            GetAllActiveItems(giver, item, times)
-            local waterypro = item.components.wateryprotection
-            local value_m = nil
-            if waterypro ~= nil then
-                if waterypro.addwetness == nil or waterypro.addwetness == 0 then
-                    value_m = 20
-                else
-                    value_m = waterypro.addwetness
-                end
-                if item.components.finiteuses ~= nil then
-                    value_m = value_m * item.components.finiteuses:GetUses() --普通水壶是+1000
-                else
-                    value_m = value_m * 10
-                end
-            end
-
-            botanyctl:SetValue(value_m,
-                item.components.fertilizer ~= nil and item.components.fertilizer.nutrients or nil,
-                true
-            )
-
-            if item.components.fertilizer ~= nil then
-                item.components.fertilizer:OnApplied(giver, inst) --删除以及特殊机制就在其中
-                if item:IsValid() then
-                    if
-                        (
-                            (item.components.finiteuses ~= nil and item.components.finiteuses:GetUses() > 0)
-                            or (item.components.stackable ~= nil and item.components.stackable:StackSize() >= 1)
-                        )
-                        and AcceptTest(inst, item, giver)
-                    then
-                        OnAccept(inst, giver, item, times+1)
-                    else
-                        GiveItemBack(inst, giver, item)
-                    end
-                    giver.siv_ctl_traded = nil
-                end
-                return
-            elseif item.components.finiteuses ~= nil then
-                if item.prefab == "wateringcan" or item.prefab == "premiumwateringcan" then
-                    item.components.finiteuses:Use(1000)
-                else
-                    item.components.finiteuses:Use(1)
-                end
-                if item:IsValid() then
-                    if item.components.finiteuses:GetUses() > 0 and AcceptTest(inst, item, giver) then
-                        OnAccept(inst, giver, item, times+1)
-                    else
-                        GiveItemBack(inst, giver, item)
-                    end
-                    giver.siv_ctl_traded = nil
-                end
-                return
-            end
-        end
-
-        if item.components.stackable ~= nil then
-            if item.components.stackable:StackSize() > times and AcceptTest(inst, item, giver) then
-                OnAccept(inst, giver, item, times+1)
-            else
-                item.components.stackable:Get(times):Remove()
-                if item:IsValid() then
-                    GiveItemBack(inst, giver, item)
-                end
-            end
-        else
-            item:Remove()
-        end
-    end
-
-    local function DoFunction(inst, doit)
-        if inst.task_function ~= nil then
-            inst.task_function:Cancel()
-            inst.task_function = nil
-        end
-        if not doit then
-            return
-        end
-
-        local time = 210 + math.random()*10
-        inst.task_function = inst:DoPeriodicTask(time, function()
-            if TheWorld.state.israining or TheWorld.state.issnowing then --下雨时补充水分
-                inst.components.botanycontroller:SetValue(800, nil, true)
-            end
-            inst.components.botanycontroller:DoAreaFunction()
-        end, math.random()*2)
-    end
-
     table.insert(prefs, Prefab(
         basename,
         function()
@@ -354,6 +360,7 @@ local function MakeConstruct(data)
             end
 
             inst:AddComponent("inspectable")
+            inst.components.inspectable.descriptionfn = GetDesc_ctl
 
             inst:AddComponent("portablestructure")
             inst.components.portablestructure:SetOnDismantleFn(function(inst, doer)
@@ -370,7 +377,7 @@ local function MakeConstruct(data)
                         item.Transform:SetPosition(inst.Transform:GetWorldPosition())
                     end
                     inst.components.botanycontroller:TriggerPlant(false)
-                    DoFunction(inst, false)
+                    DoFunction_ctl(inst, false)
                     inst:Remove()
                 end
             end)
@@ -390,7 +397,7 @@ local function MakeConstruct(data)
                 fx.Transform:SetPosition(x, y, z)
                 fx:SetMaterial("rock")
                 inst.components.botanycontroller:TriggerPlant(false)
-                DoFunction(inst, false)
+                DoFunction_ctl(inst, false)
                 inst:Remove()
             end)
 
@@ -398,16 +405,9 @@ local function MakeConstruct(data)
             inst.components.hauntable:SetHauntValue(TUNING.HAUNT_SMALL)
 
             inst:AddComponent("trader")
-            inst.components.trader:SetAcceptTest(AcceptTest)
-            inst.components.trader.onaccept = OnAccept
-            inst.components.trader.onrefuse = function(inst, giver, item)
-                if giver ~= nil and giver.siv_ctl_traded ~= nil then
-                    if giver.components.talker ~= nil then
-                        giver.components.talker:Say(GetString(giver, "DESCRIBE", { string.upper(basename), giver.siv_ctl_traded }))
-                    end
-                    giver.siv_ctl_traded = nil
-                end
-            end
+            inst.components.trader:SetAcceptTest(AcceptTest_ctl)
+            inst.components.trader.onaccept = OnAccept_ctl
+            inst.components.trader.onrefuse = OnRefuse_ctl
             inst.components.trader.deleteitemonaccept = false --收到物品不马上移除，根据具体物品决定
             inst.components.trader.acceptnontradable = true
 
@@ -416,7 +416,7 @@ local function MakeConstruct(data)
             inst.task_function = nil
             inst:DoTaskInTime(0.1+math.random()*0.4, function()
                 inst.components.botanycontroller:TriggerPlant(true)
-                DoFunction(inst, true)
+                DoFunction_ctl(inst, true)
             end)
 
             if data.fn_server ~= nil then

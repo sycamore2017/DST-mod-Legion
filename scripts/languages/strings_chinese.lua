@@ -2315,8 +2315,14 @@ STRINGS.PLANT_CROP_L = {
     SEEDS = "异种",
     DIGEST = "【{doer}】向{eater}投喂了{items}。",
     DIGESTSELF = "{eater}消化了{items}。",
-    TURN_D1 = "【{name}】{seednum}转化中，{fruitnum}已完成。",
-    TURN_D2 = "【{name}】{seednum}转化中，{fruitnum}已完成；当前{timepass}/{timeall}天。"
+    TURN_D1 = "【{name}】{seednum}转化中；能量{power}天。",
+    TURN_D2 = "【{name}】{seednum}转化中，{fruitnum}已完成；当前{timepass}/{timeall}天；能量{power}天。",
+    CTL1_1 = "含水量{mo}。",
+    CTL2_1 = "含水量{mo}/{mo_max}。",
+    CTL1_2 = "1号肥{n1}，2号肥{n2}，3号肥{n3}。",
+    CTL2_2 = "1号肥{n1}/{nu_max}，2号肥{n2}/{nu_max}，3号肥{n3}/{nu_max}。",
+    CTL1_3 = "含水量{mo}；1号肥{n1}，2号肥{n2}，3号肥{n3}。",
+    CTL2_3 = "含水量{mo}/{mo_max}；1号肥{n1}/{nu_max}，2号肥{n2}/{nu_max}，3号肥{n3}/{nu_max}。"
 }
 S_NAMES.PLANT_CARROT_L = "芾萝卜"
 S_NAMES.PLANT_CORN_L = "玉米杆"
@@ -3563,7 +3569,7 @@ local SURVIVAL_TIPS = { --介绍探险技巧
     "靠背熊真是太可爱了，恨不得天天撸它的毛，而且它还特别喜欢趴我背上。虽然在背上时我看不到它在干嘛，但是非常温暖。诶？我的曼德拉草汤和冰激凌去哪了……",
 }
 local LORE_TIPS = { --介绍故事背景
-    "传言沙漠里藏着一位女巫，也许有天我能找到她，听她娓娓道来那悲惨的故事。",
+    "传言一位女巫在沙漠里隐居，也许有天我能找到她，听她娓娓道来那悲惨的故事。",
     "天外飞仙，噬命以滋养玄鸟。蟹类倾族所有，移至洞坑，炸其入地脉，遂不见天日。",
     "莱克阿米特每次被打败都会反思，精进技巧提升力量，至今没人知道它的上限到底在哪。",
     "灵魂契约和众多无辜灵魂签下了不平等契约，唯独与其主人不会签订协议，大概是他还有利用价值吧……",
@@ -3575,13 +3581,13 @@ local CONTROL_TIPS_NOT_CONSOLE = { --介绍键鼠控制
 }
 
 for i,str in ipairs(SURVIVAL_TIPS) do
-    AddLoadingTip(STRINGS.UI.LOADING_SCREEN_OTHER_TIPS, "TIP_L"..tostring(i), "【棱镜】“"..str.."”-W")
+    AddLoadingTip(STRINGS.UI.LOADING_SCREEN_OTHER_TIPS, "TIP_L"..tostring(i), "【棱镜·笔记】“"..str.."”-W")
 end
 for i,str in ipairs(LORE_TIPS) do
-    AddLoadingTip(STRINGS.UI.LOADING_SCREEN_OTHER_TIPS, "TIP_L"..tostring(i), "【棱镜】"..str)
+    AddLoadingTip(STRINGS.UI.LOADING_SCREEN_OTHER_TIPS, "TIP_L"..tostring(i), "【棱镜·背景】"..str)
 end
 for i,str in ipairs(CONTROL_TIPS_NOT_CONSOLE) do
-    AddLoadingTip(STRINGS.UI.LOADING_SCREEN_OTHER_TIPS, "TIP_L"..tostring(i), "【棱镜】"..str)
+    AddLoadingTip(STRINGS.UI.LOADING_SCREEN_OTHER_TIPS, "TIP_L"..tostring(i), "【棱镜·技巧】"..str)
 end
 
 SURVIVAL_TIPS = nil

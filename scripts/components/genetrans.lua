@@ -706,7 +706,8 @@ local function GetDetailString(self, doer, type)
 		seednum = tostring(self.seednum),
 		fruitnum = tostring(self.fruitnum),
 		timepass = 0,
-		timeall = 0
+		timeall = 0,
+		power = tostring(DecimalPointTruncation(self.energytime/TUNING.TOTAL_DAY_TIME, 10))
 	}
 
 	if type == 2 then

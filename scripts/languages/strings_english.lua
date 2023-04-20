@@ -2227,8 +2227,14 @@ STRINGS.PLANT_CROP_L = {
     SEEDS = " Xeeds",
     DIGEST = "[{doer}] fed {items} to the {eater}.",
     DIGESTSELF = "{eater} digested {items}.",
-    TURN_D1 = "[{name}] {seednum} doing, {fruitnum} done.",
-    TURN_D2 = "[{name}] {seednum} doing, {fruitnum} done; Now {timepass}/{timeall} days."
+    TURN_D1 = "[{name}] {seednum} doing; Energy {power} days.",
+    TURN_D2 = "[{name}] {seednum} doing, {fruitnum} done; Now {timepass}/{timeall} days; Energy {power} days.",
+    CTL1_1 = "Moisture {mo}.",
+    CTL2_1 = "Moisture {mo}/{mo_max}.",
+    CTL1_2 = "Nutrient1 {n1}, Nutrient2 {n2}, Nutrient3 {n3}.",
+    CTL2_2 = "Nutrient1 {n1}/{nu_max}, Nutrient2 {n2}/{nu_max}, Nutrient3 {n3}/{nu_max}.",
+    CTL1_3 = "Moisture {mo}; Nutrient1 {n1}, Nutrient2 {n2}, Nutrient3 {n3}.",
+    CTL2_3 = "Moisture {mo}/{mo_max}; Nutrient1 {n1}/{nu_max}, Nutrient2 {n2}/{nu_max}, Nutrient3 {n3}/{nu_max}."
 }
 S_NAMES.PLANT_CARROT_L = "Carrot Cluster"
 S_NAMES.PLANT_CORN_L = "Corn Straw"
