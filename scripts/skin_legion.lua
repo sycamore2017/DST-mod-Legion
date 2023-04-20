@@ -3184,20 +3184,121 @@ if IsServer then
     end
     local function CheckFreeSkins()
         local skinsmap = {
-            neverfadebush_paper = "638362b68c2f781db2f7f524",
-            carpet_whitewood_law = "63805cf58c2f781db2f7f34b",
-            revolvedmoonlight_item_taste2 = "63889ecd8c2f781db2f7f768",
-            rosebush_marble = "619108a04c724c6f40e77bd4",
-            icire_rock_collector = "62df65b58c2f781db2f7998a",
-            siving_turn_collector = "62eb8b9e8c2f781db2f79d21",
-            lilybush_era = "629b0d5f8c2f781db2f77f0d",
-            backcub_fans2 = "6309c6e88c2f781db2f7ae20",
-            rosebush_collector = "62e3c3a98c2f781db2f79abc",
-            soul_contracts_taste = "638074368c2f781db2f7f374"
+            neverfadebush_paper = {
+                id = "638362b68c2f781db2f7f524",
+                linkids = {
+                    ["637f07a28c2f781db2f7f1e8"] = true, --4
+                    ["6278c409c340bf24ab311522"] = true
+                }
+            },
+            carpet_whitewood_law = {
+                id = "63805cf58c2f781db2f7f34b",
+                linkids = {
+                    ["6278c4acc340bf24ab311530"] = true, --2
+                    ["6278c409c340bf24ab311522"] = true
+                }
+            },
+            revolvedmoonlight_item_taste2 = {
+                id = "63889ecd8c2f781db2f7f768",
+                linkids = {
+                    ["6278c4eec340bf24ab311534"] = true, --3
+                    ["6278c409c340bf24ab311522"] = true
+                }
+            },
+            rosebush_marble = {
+                id = "619108a04c724c6f40e77bd4",
+                linkids = {
+                    ["6278c487c340bf24ab31152c"] = true, --1
+                    ["62eb7b148c2f781db2f79cf8"] = true, --花
+                    ["6278c450c340bf24ab311528"] = true, --忆
+                    ["6278c409c340bf24ab311522"] = true
+                }
+            },
+            icire_rock_collector = {
+                id = "62df65b58c2f781db2f7998a",
+                linkids = {}
+            },
+            siving_turn_collector = {
+                id = "62eb8b9e8c2f781db2f79d21",
+                linkids = {
+                    ["6278c409c340bf24ab311522"] = true
+                }
+            },
+            lilybush_era = {
+                id = "629b0d5f8c2f781db2f77f0d",
+                linkids = {
+                    ["6278c4acc340bf24ab311530"] = true, --2
+                    ["62eb7b148c2f781db2f79cf8"] = true, --花
+                    ["6278c409c340bf24ab311522"] = true
+                }
+            },
+            backcub_fans2 = {
+                id = "6309c6e88c2f781db2f7ae20",
+                linkids = {
+                    ["6278c409c340bf24ab311522"] = true
+                }
+            },
+            rosebush_collector = {
+                id = "62e3c3a98c2f781db2f79abc",
+                linkids = {
+                    ["6278c4eec340bf24ab311534"] = true, --3
+                    ["62eb7b148c2f781db2f79cf8"] = true, --花
+                    ["6278c409c340bf24ab311522"] = true
+                }
+            },
+            soul_contracts_taste = {
+                id = "638074368c2f781db2f7f374",
+                linkids = {
+                    ["637f07a28c2f781db2f7f1e8"] = true, --4
+                    ["6278c409c340bf24ab311522"] = true
+                }
+            }
         }
-        for name, id in ipairs(skinsmap) do
-            if SKINS_LEGION[name].skin_id ~= id or SKIN_IDS_LEGION.notnononl[name] then
+        for name, v in pairs(skinsmap) do --不准篡改皮肤数据
+            if SKINS_LEGION[name].skin_id ~= v.id then
                 return true
+            end
+            for idd, value in pairs(SKIN_IDS_LEGION) do
+                if idd ~= v.id and value[name] and not v.linkids[idd] then
+                    -- print("----2"..tostring(name).."--"..tostring(idd))
+                    return true
+                end
+            end
+        end
+        skinsmap = {
+            rosebush = {
+                rosebush_marble = true,
+                rosebush_collector = true
+            },
+            lilybush = {
+                lilybush_marble = true,
+                lilybush_era = true
+            },
+            orchidbush = {
+                orchidbush_marble = true,
+                orchidbush_disguiser = true
+            },
+            neverfadebush = {
+                neverfadebush_thanks = true,
+                neverfadebush_paper = true,
+                neverfadebush_paper2 = true
+            },
+            icire_rock = {
+                icire_rock_era = true,
+                icire_rock_collector = true,
+                icire_rock_day = true
+            },
+            siving_derivant = {
+                siving_derivant_thanks = true,
+                siving_derivant_thanks2 = true
+            }
+        }
+        for name, v in pairs(skinsmap) do --不准私自给皮肤改名
+            for sname, sv in pairs(SKINS_LEGION) do
+                if sv.base_prefab == name and not v[sname] then
+                    -- print("----"..tostring(name).."--"..tostring(sname))
+                    return true
+                end
             end
         end
     end
@@ -3592,7 +3693,7 @@ if IsServer then
             _G.SKINS_CACHE_CG_L[inst.userid] = data.skins_cg_le
         end
 
-        inst:DoTaskInTime(1.2, function() --实体生成后，开始调取接口获取皮肤数据
+        inst:DoTaskInTime(1.2, function(inst) --实体生成后，开始调取接口获取皮肤数据
             if inst.userid == nil then
                 return
             end
