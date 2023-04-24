@@ -1832,6 +1832,8 @@ LIFEBEND.strfn = function(act)
         return "REVIVE"
     elseif target:HasTag("_health") then --有生命组件的对象
         return "CURE"
+    elseif target:HasTag("lifebox_l") then --生命容器
+        return "GIVE"
     end
     return "GENERIC"
 end

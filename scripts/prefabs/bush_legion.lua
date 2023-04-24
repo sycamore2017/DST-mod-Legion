@@ -275,14 +275,14 @@ end
 
 local function SpawnSpecialLoot_rose(inst, picker, mustdrop)
     local loot = math.random()
-    if loot <= 0.3 then --30%几率掉落花瓣，60%几率掉落树枝，10%几率掉落蔷薇折枝
+    if loot < 0.3 then --30%几率掉落花瓣，65%几率掉落树枝，5%几率掉落蔷薇折枝
         SpawnStackDrop("petals", 1, inst, picker, mustdrop, false)
-    elseif loot <= 0.9 then
+    elseif loot < 0.95 then
         SpawnStackDrop("twigs", 1, inst, picker, mustdrop, false)
     else
         SpawnStackDrop("cutted_rosebush", 1, inst, picker, true, false)
     end
-    if math.random() <= CONFIGS_LEGION.FLOWERWEAPONSCHANCE then --3%几率掉落剑
+    if math.random() < CONFIGS_LEGION.FLOWERWEAPONSCHANCE then --3%几率掉落剑
         SpawnStackDrop("rosorns", 1, inst, picker, true, true)
     end
 end
@@ -304,7 +304,7 @@ local function OnPicked_rose(inst, picker)
     then
         picker.components.combat:GetAttacked(inst, TUNING.MARSHBUSH_DAMAGE) --荆棘的伤害值
 
-        if math.random() <= 0.01 and picker.task_pick_rosebush == nil and picker.components.talker ~= nil then
+        if math.random() < 0.01 and picker.task_pick_rosebush == nil and picker.components.talker ~= nil then
             picker.task_pick_rosebush = picker:DoTaskInTime(0, function()
                 picker.components.talker:Say(GetString(picker, "ANNOUNCE_PICK_ROSEBUSH"))
                 picker.task_pick_rosebush = nil
@@ -377,14 +377,14 @@ MakeBush({
 
 local function SpawnSpecialLoot_lily(inst, picker, mustdrop)
     local loot = math.random()
-    if loot <= 0.3 then --30%几率掉落1花瓣，60%几率掉落2花瓣，10%几率掉落蹄莲芽束
+    if loot < 0.3 then --30%几率掉落1花瓣，60%几率掉落2花瓣，10%几率掉落蹄莲芽束
         SpawnStackDrop("petals", 1, inst, picker, mustdrop, false)
-    elseif loot <= 0.9 then
+    elseif loot < 0.9 then
         SpawnStackDrop("petals", 2, inst, picker, mustdrop, false)
     else
         SpawnStackDrop("cutted_lilybush", 1, inst, picker, true, false)
     end
-    if math.random() <= CONFIGS_LEGION.FLOWERWEAPONSCHANCE then --3%几率掉落剑
+    if math.random() < CONFIGS_LEGION.FLOWERWEAPONSCHANCE then --3%几率掉落剑
         SpawnStackDrop("lileaves", 1, inst, picker, true, true)
     end
 end
@@ -454,14 +454,14 @@ MakeBush({
 
 local function SpawnSpecialLoot_orchid(inst, picker, mustdrop)
     local loot = math.random()
-    if loot <= 0.3 then --30%几率掉落花瓣，60%几率掉落干草，10%几率掉落兰草种籽
+    if loot < 0.3 then --30%几率掉落花瓣，60%几率掉落干草，10%几率掉落兰草种籽
         SpawnStackDrop("petals", 1, inst, picker, mustdrop, false)
-    elseif loot <= 0.9 then
+    elseif loot < 0.9 then
         SpawnStackDrop("cutgrass", 1, inst, picker, mustdrop, false)
     else
         SpawnStackDrop("cutted_orchidbush", 1, inst, picker, true, false)
     end
-    if math.random() <= CONFIGS_LEGION.FLOWERWEAPONSCHANCE then --3%几率掉落剑
+    if math.random() < CONFIGS_LEGION.FLOWERWEAPONSCHANCE then --3%几率掉落剑
         SpawnStackDrop("orchitwigs", 1, inst, picker, true, true)
     end
 end

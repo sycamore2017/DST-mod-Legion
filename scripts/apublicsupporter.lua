@@ -1652,9 +1652,8 @@ AddPrefabPostInit("shieldofterror", function(inst)
                         attacker.components.combat.externaldamagetakenmultipliers:SetModifier("shieldterror_fire", 1.1)
                     else
                         attacker.task_fire_l:Cancel()
-                        attacker.task_fire_l = nil
                     end
-                    attacker.task_fire_l = inst:DoTaskInTime(8, function(inst)
+                    attacker.task_fire_l = attacker:DoTaskInTime(8, function(attacker)
                         attacker.task_fire_l = nil
                         attacker.components.combat.externaldamagetakenmultipliers:RemoveModifier("shieldterror_fire")
                     end)
@@ -1790,7 +1789,8 @@ local CA_S_INSPECTABLE_L = {
                     inst:HasTag("weed") or --杂草
                     (inst:HasTag("farm_plant") and inst:HasTag("pickable_harvest_str")) or --作物
                     inst:HasTag("crop_legion") or --子圭垄植物
-                    inst:HasTag("crop2_legion") --异种植物
+                    inst:HasTag("crop2_legion") or --异种植物
+                    inst:HasTag("lifebox_l") --生命容器
                 then
                     table.insert(actions, ACTIONS.LIFEBEND)
                 else

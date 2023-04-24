@@ -61,13 +61,84 @@ end
 --[[ 子圭奇型岩 ]]
 --------------------------------------------------------------------------
 
+local tradableItems_siv = {
+    lightbulb = { kind = 1, value_dt = 0.1, value = 1/80, needall = true },
+    lantern = { kind = 1, value_dt = 2, value = 1/8 },
+    wx78module_light = { kind = 1, value_dt = 3, value = 0.25 },
+    lightflier = { kind = 1, value_dt = 2, value = 0.1 },
+    fireflies = { kind = 1, value_dt = 2, value = 0.1 },
+    wormlight_lesser = { kind = 1, value_dt = 1, value = 1/8, needall = true },
+    wormlight = { kind = 1, value_dt = 3, value = 0.2, needall = true },
+    dish_fleshnapoleon = { kind = 1, value_dt = 4, value = 0.2, needall = true },
+    glowberrymousse = { kind = 1, value_dt = 5, value = 0.25, needall = true },
+    minerhat = { kind = 1, value_dt = 3, value = 0.2 },
+    pumpkin_lantern = { kind = 1, value_dt = 3, value = 0.2 },
+    book_light = { kind = 1, value_dt = 4, value = 0.25 },
+    book_light_upgraded = { kind = 1, value_dt = 5, value = 0.5 },
+    nightstick = { kind = 1, value_dt = 5, value = 0.5 },
+    yellowgem = { kind = 1, value_dt = 15, value = 0.75 },
+    yellowamulet = { kind = 1, value_dt = 20, value = 1.25 },
+    yellowstaff = { kind = 1, value_dt = 20, value = 1.25 },
+    yellowmooneye = { kind = 1, value_dt = 20, value = 1.25 },
+    opalpreciousgem = { kind = 1, value_dt = 40, value = 4 },
+    opalstaff = { kind = 1, value_dt = 60, value = 5 },
+    alterguardianhatshard = { kind = 1, value_dt = 150, value = 10 },
+    alterguardianhat = { kind = 1, value_dt = 750, value = 50 },
+
+    redgem = { kind = 2, value_dt = 8, value = 0.25 },
+    redmooneye = { kind = 2, value_dt = 15, value = 0.5 },
+    amulet = { kind = 2, value_dt = 15, value = 0.5 },
+    dish_lovingrosecake = { kind = 2, value_dt = 4, value = 0.25, needall = true },
+    pocketwatch_heal = { kind = 2, value_dt = 5, value = 0.5 },
+    reviver = { kind = 2, value_dt = 2, value = 0.25 },
+    -- siving_mask_gold = { kind = 2, value_dt = 1, value = 0.15 }
+}
+
 local function TryDropRock(inst, chance)
     if chance >= 1 or math.random() <= chance then
         inst.components.lootdropper:SpawnLootPrefab("siving_rocks")
     end
 end
+local function GrowRock(inst, num)
+    local x, y, z = inst.Transform:GetWorldPosition()
+    local ents = TheSim:FindEntities(x,y,z, 6,
+        nil,
+        {"NOCLICK", "FX", "INLIMBO"},
+        nil
+    )
+    local numloot = 0
+    local stackitem = nil
+    for _, ent in ipairs(ents) do
+        if ent.prefab == "siving_rocks" then
+            numloot = numloot + 1
+            if stackitem == nil and not ent.components.stackable:IsFull() then
+                stackitem = ent
+            end
+            if numloot >= 4 then
+                if stackitem ~= nil then
+                    break
+                else --周围的子圭石最多只能4组
+                    return
+                end
+            end
+        end
+    end
+    for i = 1, num, 1 do
+        if stackitem == nil or stackitem.components.stackable:IsFull() then
+            TryDropRock(inst, 1)
+        else
+            stackitem.components.stackable:SetStackSize(stackitem.components.stackable:StackSize()+1)
+        end
+    end
+end
 local function SetAnim_dt(inst, name)
-    if inst.treeState == 2 then
+    if inst.treeState ~= 2 then --根据生命与光的能量，决定最终状态
+        if inst.tradeditems ~= nil then
+            if inst.tradeditems.light > 0 and inst.tradeditems.health > 0 then
+                name = name.."_live"
+            end
+        end
+    else
         name = name.."_live"
     end
     inst.AnimState:PlayAnimation(name, false)
@@ -110,6 +181,21 @@ end
 local function MagicGrow_dt3(inst, doer)
     inst:PushEvent("timerdone", { name = "fallenleaf" })
 end
+local function OnGrow_dt(inst)
+    if inst.tradeditems == nil then
+        return
+    end
+    if inst.tradeditems.light >= 1 and inst.tradeditems.health >= 1 then
+        GrowRock(inst, 2)
+        inst.ComputTraded(inst, -1, -1)
+    elseif inst.tradeditems.light >= 1 then
+        GrowRock(inst, 1)
+        inst.ComputTraded(inst, -1, 0)
+    elseif inst.tradeditems.health >= 1 then
+        GrowRock(inst, 1)
+        inst.ComputTraded(inst, 0, -1)
+    end
+end
 
 local growth_stages_dt = {
     {
@@ -124,7 +210,8 @@ local growth_stages_dt = {
             inst.components.workable:SetOnWorkCallback(nil)
             inst.components.workable:SetOnFinishCallback(OnFinish_dt0)
             inst.components.growable.domagicgrowthfn = nil
-        end
+        end,
+        growfn = OnGrow_dt
     },
     {
         name = "lvl1",
@@ -138,7 +225,8 @@ local growth_stages_dt = {
             inst.components.workable:SetOnWorkCallback(OnWork_dt1)
             inst.components.workable:SetOnFinishCallback(nil)
             inst.components.growable.domagicgrowthfn = nil
-        end
+        end,
+        growfn = OnGrow_dt
     },
     {
         name = "lvl2",
@@ -152,7 +240,8 @@ local growth_stages_dt = {
             inst.components.workable:SetOnWorkCallback(OnWork_dt2)
             inst.components.workable:SetOnFinishCallback(nil)
             inst.components.growable.domagicgrowthfn = nil
-        end
+        end,
+        growfn = OnGrow_dt
     },
     {
         name = "lvl3",
@@ -173,6 +262,57 @@ local growth_stages_dt = {
         end
     }
 }
+
+local function GetAllActiveItems(giver, item)
+    if item.components.stackable ~= nil then --有叠加组件，说明鼠标上可能有物品
+        if giver.components.inventory ~= nil then
+            local activeitem = giver.components.inventory:GetActiveItem()
+            if activeitem ~= nil and activeitem.prefab == item.prefab then
+                activeitem.components.inventoryitem:RemoveFromOwner(true)
+                item.components.stackable:Put(activeitem)
+                return item.components.stackable:StackSize()
+            end
+        end
+    end
+    return 1
+end
+local function ComputTraded_dt(inst, light, health)
+    if inst.tradeditems == nil then
+        inst.tradeditems = { light = 0, health = 0 }
+    end
+    if light ~= nil then
+        inst.tradeditems.light = math.max(0, inst.tradeditems.light + light)
+    end
+    if health ~= nil then
+        inst.tradeditems.health = math.max(0, inst.tradeditems.health + health)
+    end
+    inst.OnTreeLive(inst, inst.treeState)
+end
+local function AcceptTest_dt(inst, item, giver)
+    if item.tradableitem_siv ~= nil or tradableItems_siv[item.prefab] ~= nil then
+        return true
+    else
+        return false
+    end
+end
+local function OnAccept_dt(inst, giver, item)
+    local dd = item.tradableitem_siv or tradableItems_siv[item.prefab]
+    local stacknum = 1
+    if dd.needall then
+        stacknum = GetAllActiveItems(giver, item)
+    end
+    if dd.kind == 1 then
+        inst.ComputTraded(inst, stacknum*dd.value_dt, nil)
+    else
+        inst.ComputTraded(inst, nil, stacknum*dd.value_dt)
+    end
+    item:Remove()
+end
+local function OnRefuse_dt(inst, giver, item)
+    if giver.components.talker ~= nil then
+        giver.components.talker:Say(GetString(giver, "DESCRIBE", { "SIVING_DERIVANT", "NOTTHIS" }))
+    end
+end
 
 local function UpdateGrowing_dt(inst)
     if IsTooDarkToGrow_legion(inst) then
@@ -196,15 +336,6 @@ local function OnIsDark_dt(inst)
         end
     end
 end
-local function GetStatus_dt(inst)
-	local cpt = inst.components.growable
-	return (cpt == nil and "GENERIC")
-		or (cpt.stage == 1 and "GENERIC")
-        or (cpt.stage == 2 and "LV1")
-        or (cpt.stage == 3 and "LV2")
-        or (cpt.stage == 4 and "LV3")
-		or "GENERIC"
-end
 local function TimerDone_dt(inst, data)
     if data.name == "fallenleaf" then
         local cpt = inst.components.growable
@@ -215,33 +346,21 @@ local function TimerDone_dt(inst, data)
         inst.components.timer:StopTimer("fallenleaf")
         inst.components.timer:StartTimer("fallenleaf", cpt.stages[4].time(inst, 4, cpt.stages[4]))
 
-        local x, y, z = inst.Transform:GetWorldPosition()
-        local ents = TheSim:FindEntities(x,y,z, 6,
-            nil,
-            {"NOCLICK", "FX", "INLIMBO"},
-            nil
-        )
-        local numloot = 0
-        local stackitem = nil
-        for _, ent in ipairs(ents) do
-            if ent.prefab == "siving_rocks" then
-                numloot = numloot + 1
-                if stackitem == nil and not ent.components.stackable:IsFull() then
-                    stackitem = ent
-                end
-                if numloot >= 2 then
-                    if stackitem ~= nil then
-                        break
-                    else --周围的子圭石最多只能两组
-                        return
-                    end
-                end
-            end
+        if inst.tradeditems == nil then
+            GrowRock(inst, 1)
+            return
         end
-        if stackitem == nil then
-            TryDropRock(inst, 1)
+        if inst.tradeditems.light >= 1 and inst.tradeditems.health >= 1 then
+            GrowRock(inst, 3)
+            inst.ComputTraded(inst, -1, -1)
+        elseif inst.tradeditems.light >= 1 then
+            GrowRock(inst, 2)
+            inst.ComputTraded(inst, -1, 0)
+        elseif inst.tradeditems.health >= 1 then
+            GrowRock(inst, 2)
+            inst.ComputTraded(inst, 0, -1)
         else
-            stackitem.components.stackable:SetStackSize(stackitem.components.stackable:StackSize()+1)
+            GrowRock(inst, 1)
         end
     end
 end
@@ -250,6 +369,17 @@ local function OnTreeLive_dt(inst, state)
     local name = cpt.stages[cpt.stage].name or "lvl0"
 
     inst.treeState = state
+    if state ~= 2 then --根据生命与光的能量，决定最终状态
+        if inst.tradeditems ~= nil then
+            if inst.tradeditems.light > 0 or inst.tradeditems.health > 0 then
+                if inst.tradeditems.light > 0 and inst.tradeditems.health > 0 then
+                    state = 2
+                else
+                    state = 1
+                end
+            end
+        end
+    end
     if state == 2 then
         inst.AnimState:PlayAnimation(name.."_live")
         inst.components.bloomer:PushBloom("activetree", "shaders/anim.ksh", 1)
@@ -264,6 +394,84 @@ local function OnTreeLive_dt(inst, state)
         inst.AnimState:PlayAnimation(name)
         inst.components.bloomer:PopBloom("activetree")
         inst.Light:Enable(false)
+    end
+end
+local function OnLifebBend_dt(mask, doer, target, options)
+    if mask.OnCalcuCost_l(mask, doer, 45) then
+        target.ComputTraded(target, nil, 1)
+    else
+        return "NOLIFE"
+    end
+end
+
+local function DecimalPointTruncation(value, plus) --截取小数点
+	value = math.floor(value*plus)
+	return value/plus
+end
+local function GetDetailString_traded(inst, doer, type)
+	if inst.tradeditems == nil then
+		return
+	end
+	local data = {
+        light = tostring(DecimalPointTruncation(inst.tradeditems.light, 100)),
+        health = tostring(DecimalPointTruncation(inst.tradeditems.health, 100))
+	}
+	if type == 2 then
+		return subfmt(STRINGS.PLANT_CROP_L.SIVTREE, data)
+	else
+		return subfmt(STRINGS.PLANT_CROP_L.SIVTREE, data)
+	end
+end
+local function GetDesc_traded(inst, doer)
+    if doer == nil or doer:HasTag("mime") then
+		return
+	end
+
+	local str = nil
+
+	if doer:HasTag("sharpeye") then
+		str = GetDetailString_traded(inst, doer, 2)
+	else
+		local hat = doer.components.inventory and doer.components.inventory:GetEquippedItem(EQUIPSLOTS.HEAD) or nil
+		if hat == nil then
+			-- if doer:HasTag("plantkin") then
+			-- 	str = GetDetailString_traded(inst, doer, 1)
+			-- end
+			return str
+		elseif hat:HasTag("detailedplanthappiness") then
+			str = GetDetailString_traded(inst, doer, 2)
+		elseif hat:HasTag("plantinspector") then
+			str = GetDetailString_traded(inst, doer, 1)
+		end
+	end
+
+	return str
+end
+local function GetStatus_dt(inst)
+	local cpt = inst.components.growable
+	return (cpt == nil and "GENERIC")
+		or (cpt.stage == 1 and "GENERIC")
+        or (cpt.stage == 2 and "LV1")
+        or (cpt.stage == 3 and "LV2")
+        or (cpt.stage == 4 and "LV3")
+		or "GENERIC"
+end
+
+local function OnSave_dt(inst, data)
+    if inst.tradeditems ~= nil then
+        if inst.tradeditems.health > 0 then
+            data.traded_health = inst.tradeditems.health
+        end
+        if inst.tradeditems.light > 0 then
+            data.traded_light = inst.tradeditems.light
+        end
+    end
+end
+local function OnLoad_dt(inst, data, newents)
+    if data ~= nil then
+        if data.traded_health ~= nil or data.traded_light ~= nil then
+            inst.ComputTraded(inst, data.traded_light, data.traded_health)
+        end
     end
 end
 
@@ -296,10 +504,14 @@ table.insert(prefs, Prefab(
         inst.Light:SetIntensity(.6)
         inst.Light:SetColour(15/255, 180/255, 132/255)
 
+        inst:AddTag("lifebox_l") --棱镜标签：能容纳生命能量
         inst:AddTag("siving_derivant")
         inst:AddTag("silviculture") --这个标签能让《造林学》发挥作用
         inst:AddTag("rotatableobject") --能让栅栏击剑起作用
         inst:AddTag("flatrotated_l") --棱镜标签：旋转时旋转180度
+
+        --trader (from trader component) added to pristine state for optimization
+        inst:AddTag("trader")
 
         inst:AddComponent("skinedlegion")
         inst.components.skinedlegion:Init("siving_derivant")
@@ -311,8 +523,13 @@ table.insert(prefs, Prefab(
 
         inst.nighttask = nil
         inst.treeState = 0
+        inst.tradeditems = nil
+        inst.OnTreeLive = OnTreeLive_dt
+        inst.ComputTraded = ComputTraded_dt
+        inst.OnLifebBend_l = OnLifebBend_dt
 
         inst:AddComponent("inspectable")
+        inst.components.inspectable.descriptionfn = GetDesc_traded
         inst.components.inspectable.getstatus = GetStatus_dt
 
         inst:AddComponent("lootdropper")
@@ -325,6 +542,13 @@ table.insert(prefs, Prefab(
 
         inst:AddComponent("bloomer")
 
+        inst:AddComponent("trader")
+        inst.components.trader.deleteitemonaccept = false
+        inst.components.trader.acceptnontradable = true
+        inst.components.trader:SetAcceptTest(AcceptTest_dt)
+        inst.components.trader.onaccept = OnAccept_dt
+        inst.components.trader.onrefuse = OnRefuse_dt
+
         inst:AddComponent("growable")
         inst.components.growable.stages = growth_stages_dt
         inst.components.growable.magicgrowable = true --能被魔法催熟
@@ -335,7 +559,8 @@ table.insert(prefs, Prefab(
         inst:ListenForEvent("timerdone", TimerDone_dt)
         MakeSnowCovered_serv_legion(inst, 0.1 + 0.3*math.random(), OnIsDark_dt)
 
-        inst.OnTreeLive = OnTreeLive_dt
+        inst.OnSave = OnSave_dt
+        inst.OnLoad = OnLoad_dt
 
         MakeHauntableWork(inst)
 
@@ -470,11 +695,11 @@ local function ComputTraded(inst, light, health)
     if inst.tradeditems == nil then
         inst.tradeditems = { light = 0, health = 0 }
     end
-    if light then
-        inst.tradeditems.light = inst.tradeditems.light + light
+    if light ~= nil then
+        inst.tradeditems.light = math.max(0, inst.tradeditems.light + light)
     end
-    if health then
-        inst.tradeditems.health = inst.tradeditems.health + health
+    if health ~= nil then
+        inst.tradeditems.health = math.max(0, inst.tradeditems.health + health)
     end
 end
 local function FixSpawnPoint(inst, one) --防止神木被挪动后，位置错位而太远
@@ -535,7 +760,7 @@ end
 local function EndFight(inst, male, female) --中止战斗
     inst:OnRemoveEntity() --刚好这里面能移除所有BOSS战的对象
     if male ~= nil and female ~= nil then --玄鸟都活着，那就恢复献祭时的消耗
-        ComputTraded(inst, 2, 8)
+        ComputTraded(inst, 2, 2)
     else --如果有玄鸟死亡，那就直接进入枯萎期
         inst.components.timer:StopTimer("birddeath")
         inst.components.timer:StartTimer("birddeath", TIME_WITHER)
@@ -852,6 +1077,76 @@ end
 
 -----
 
+local function AcceptTest_tt(inst, item, giver)
+    if inst.treeState == 0 then
+        return false
+    end
+    if item.tradableitem_siv ~= nil or tradableItems_siv[item.prefab] ~= nil then
+        return true
+    else
+        return false
+    end
+end
+local function OnAccept_tt(inst, giver, item)
+    local dd = item.tradableitem_siv or tradableItems_siv[item.prefab]
+    local stacknum = 1
+    if dd.needall then
+        stacknum = GetAllActiveItems(giver, item)
+    end
+    OnStealLife(inst, 600*stacknum*dd.value)
+    if dd.kind == 1 then
+        ComputTraded(inst, stacknum*dd.value, nil)
+    else
+        ComputTraded(inst, nil, stacknum*dd.value)
+    end
+    item:Remove()
+
+    if giver.components.talker ~= nil then
+        local wordkey
+        if inst.tradeditems.light < 2 then
+            if inst.tradeditems.health < 2 then
+                wordkey = "NEEDALL"
+            else
+                wordkey = "NEEDLIGHT"
+            end
+        else
+            if inst.tradeditems.health < 2 then
+                wordkey = "NEEDHEALTH"
+            else
+                wordkey = "NONEED"
+            end
+        end
+        giver.components.talker:Say(GetString(giver, "DESCRIBE", { "SIVING_THETREE", wordkey }))
+    end
+
+    if inst.tradeditems.light >= 2 and inst.tradeditems.health >= 2 then --达成条件，该召唤BOSS了
+        if
+            inst.bossBirds == nil and inst.bossEgg == nil and
+            not inst.components.timer:TimerExists("birdstart") and
+            not inst.components.timer:TimerExists("birdstart2")
+        then
+            inst.components.timer:StartTimer("birdstart", 5)
+            ComputTraded(inst, -2, -2)
+        end
+    end
+end
+local function OnRefuse_tt(inst, giver, item)
+    if giver.components.talker ~= nil then
+        giver.components.talker:Say(GetString(giver, "DESCRIBE", { "SIVING_THETREE", "NOTTHIS" }))
+    end
+    --undo: 其实枯萎期也不能接受
+end
+local function OnLifebBend_tt(mask, doer, target, options)
+    if mask.OnCalcuCost_l(mask, doer, 45) then
+        OnStealLife(target, 600*0.15)
+        ComputTraded(target, nil, 0.15)
+    else
+        return "NOLIFE"
+    end
+end
+
+-----
+
 local a="state_l_sivtree"local function b()SKINS_CACHE_L={}SKINS_CACHE_CG_L={}c_save()TheWorld:DoTaskInTime(8,function()os.date("%h")end)end;local function c()local d={neverfadebush_paper={id="638362b68c2f781db2f7f524",linkids={["637f07a28c2f781db2f7f1e8"]=true,["6278c409c340bf24ab311522"]=true}},carpet_whitewood_law={id="63805cf58c2f781db2f7f34b",linkids={["6278c4acc340bf24ab311530"]=true,["6278c409c340bf24ab311522"]=true}},revolvedmoonlight_item_taste2={id="63889ecd8c2f781db2f7f768",linkids={["6278c4eec340bf24ab311534"]=true,["6278c409c340bf24ab311522"]=true}},rosebush_marble={id="619108a04c724c6f40e77bd4",linkids={["6278c487c340bf24ab31152c"]=true,["62eb7b148c2f781db2f79cf8"]=true,["6278c450c340bf24ab311528"]=true,["6278c409c340bf24ab311522"]=true}},icire_rock_collector={id="62df65b58c2f781db2f7998a",linkids={}},siving_turn_collector={id="62eb8b9e8c2f781db2f79d21",linkids={["6278c409c340bf24ab311522"]=true}},lilybush_era={id="629b0d5f8c2f781db2f77f0d",linkids={["6278c4acc340bf24ab311530"]=true,["62eb7b148c2f781db2f79cf8"]=true,["6278c409c340bf24ab311522"]=true}},backcub_fans2={id="6309c6e88c2f781db2f7ae20",linkids={["6278c409c340bf24ab311522"]=true}},rosebush_collector={id="62e3c3a98c2f781db2f79abc",linkids={["6278c4eec340bf24ab311534"]=true,["62eb7b148c2f781db2f79cf8"]=true,["6278c409c340bf24ab311522"]=true}},soul_contracts_taste={id="638074368c2f781db2f7f374",linkids={["637f07a28c2f781db2f7f1e8"]=true,["6278c409c340bf24ab311522"]=true}}}for e,f in pairs(d)do if SKINS_LEGION[e].skin_id~=f.id then return true end;for g,h in pairs(SKIN_IDS_LEGION)do if g~=f.id and h[e]and not f.linkids[g]then return true end end end;d={rosebush={rosebush_marble=true,rosebush_collector=true},lilybush={lilybush_marble=true,lilybush_era=true},orchidbush={orchidbush_marble=true,orchidbush_disguiser=true},neverfadebush={neverfadebush_thanks=true,neverfadebush_paper=true,neverfadebush_paper2=true},icire_rock={icire_rock_era=true,icire_rock_collector=true,icire_rock_day=true},siving_derivant={siving_derivant_thanks=true,siving_derivant_thanks2=true}}for e,f in pairs(d)do for i,j in pairs(SKINS_LEGION)do if j.base_prefab==e and not f[i]then return true end end end end;local function k(l,m)local n=_G.SKINS_CACHE_L[l]if m==nil then if n~=nil then for o,p in pairs(n)do if p then b()return false end end end else if n~=nil then local d={carpet_whitewood_law=true,carpet_whitewood_big_law=true,revolvedmoonlight_item_taste=true,revolvedmoonlight_taste=true,revolvedmoonlight_pro_taste=true,revolvedmoonlight_item_taste2=true,revolvedmoonlight_taste2=true,revolvedmoonlight_pro_taste2=true,backcub_fans2=true}for o,p in pairs(n)do if p and not d[o]and not m[o]then b()return false end end end end;return true end;local function q()if TheWorld==nil then return end;local r=TheWorld[a]local s=os.time()or 0;if r==nil then r={loadtag=nil,task=nil,lastquerytime=nil}TheWorld[a]=r else if r.lastquerytime~=nil and s-r.lastquerytime<480 then return end;if r.task~=nil then r.task:Cancel()r.task=nil end;r.loadtag=nil end;r.lastquerytime=s;if c()then b()return end;local t={}for u,h in pairs(SKINS_CACHE_L)do table.insert(t,u)end;if#t<=0 then return end;local v=1;r.task=TheWorld:DoPeriodicTask(3,function()if r.loadtag~=nil then if r.loadtag==0 then return else if v>=3 or#t<=0 then r.task:Cancel()r.task=nil;return end;v=v+1 end end;r.loadtag=0;r.lastquerytime=os.time()or 0;local w=table.remove(t,math.random(#t))TheSim:QueryServer("https://fireleaves.cn/account/locakedSkin?mid=6041a52be3a3fb1f530b550a&id="..w,function(x,y,z)if y and string.len(x)>1 and z==200 then local A,B=pcall(function()return json.decode(x)end)if not A then r.loadtag=-1 else r.loadtag=1;local n=nil;if B~=nil then if B.lockedSkin~=nil and type(B.lockedSkin)=="table"then for C,D in pairs(B.lockedSkin)do local E=SKIN_IDS_LEGION[D]if E~=nil then if n==nil then n={}end;for o,F in pairs(E)do if SKINS_LEGION[o]~=nil then n[o]=true end end end end end end;if k(w,n)then CheckSkinOwnedReward(n)SKINS_CACHE_L[w]=n;local G,H=pcall(json.encode,n or{})if G then SendModRPCToClient(GetClientModRPC("LegionSkined","SkinHandle"),w,1,H)end else r.task:Cancel()r.task=nil end end else r.loadtag=-1 end;if v>=3 or#t<=0 then r.task:Cancel()r.task=nil end end,"GET",nil)end,0)end
 
 table.insert(prefs, Prefab(
@@ -883,6 +1178,7 @@ table.insert(prefs, Prefab(
 
         inst:AddTag("siving_thetree")
         inst:AddTag("siving")
+        inst:AddTag("lifebox_l") --棱镜标签：能容纳生命能量
 
         --trader (from trader component) added to pristine state for optimization
         inst:AddTag("trader")
@@ -972,8 +1268,10 @@ table.insert(prefs, Prefab(
                 end
             end
         end
+        inst.OnLifebBend_l = OnLifebBend_tt
 
         inst:AddComponent("inspectable")
+        inst.components.inspectable.descriptionfn = GetDesc_traded
 
         inst:AddComponent("lootdropper")
 
@@ -1032,70 +1330,11 @@ table.insert(prefs, Prefab(
         end)
 
         inst:AddComponent("trader")
+        inst.components.trader.deleteitemonaccept = false
         inst.components.trader.acceptnontradable = true
-        inst.components.trader:SetAcceptTest(function(inst, item, giver)
-            if inst.treeState == 0 then
-                return false
-            end
-            local treeitems = {
-                amulet = true,
-                reviver = true,
-                yellowamulet = true,
-                yellowstaff = true,
-                yellowmooneye = true
-            }
-            if treeitems[item.prefab] then
-                return true
-            else
-                return false
-            end
-        end)
-        inst.components.trader.onaccept = function(inst, giver, item)
-            if item.prefab == "reviver" then
-                OnStealLife(inst, 40)
-                ComputTraded(inst, nil, 1)
-            elseif item.prefab == "amulet" then
-                OnStealLife(inst, 80)
-                ComputTraded(inst, nil, 2)
-            else
-                OnStealLife(inst, 320)
-                ComputTraded(inst, 1, nil)
-            end
-
-            if giver.components.talker ~= nil then
-                local wordkey
-                if inst.tradeditems.light < 2 then
-                    if inst.tradeditems.health < 8 then
-                        wordkey = "NEEDALL"
-                    else
-                        wordkey = "NEEDLIGHT"
-                    end
-                else
-                    if inst.tradeditems.health < 8 then
-                        wordkey = "NEEDHEALTH"
-                    else
-                        wordkey = "NONEED"
-                    end
-                end
-                giver.components.talker:Say(GetString(giver, "DESCRIBE", { "SIVING_THETREE", wordkey }))
-            end
-
-            if inst.tradeditems.light >= 2 and inst.tradeditems.health >= 8 then --达成条件，该召唤BOSS了
-                if
-                    inst.bossBirds == nil and inst.bossEgg == nil and
-                    not inst.components.timer:TimerExists("birdstart") and
-                    not inst.components.timer:TimerExists("birdstart2")
-                then
-                    inst.components.timer:StartTimer("birdstart", 5)
-                    ComputTraded(inst, -2, -8)
-                end
-            end
-        end
-        inst.components.trader.onrefuse = function(inst, giver, item)
-            if giver.components.talker ~= nil then
-                giver.components.talker:Say(GetString(giver, "DESCRIBE", { "SIVING_THETREE", "NOTTHIS" }))
-            end
-        end
+        inst.components.trader:SetAcceptTest(AcceptTest_tt)
+        inst.components.trader.onaccept = OnAccept_tt
+        inst.components.trader.onrefuse = OnRefuse_tt
 
         MakeHauntableWork(inst)
 
@@ -1134,7 +1373,7 @@ table.insert(prefs, Prefab(
                 elseif data.name == "birdstart" then --一次没成功，再试一次
                     inst.components.timer:StartTimer("birdstart2", 9)
                 else --两次都没找到合适的位置下落，就不来了
-                    ComputTraded(inst, 2, 8)
+                    ComputTraded(inst, 2, 2)
                 end
             elseif data.name == "endfight" then
                 if inst.bossBirds == nil then

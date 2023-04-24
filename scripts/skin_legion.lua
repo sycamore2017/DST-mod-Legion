@@ -3850,7 +3850,7 @@ if not TheNet:IsDedicated() then
                     if right_root.skinshop_l then
                         right_root.skinshop_l:Kill()
                     end
-                    local SkinLegionDialog = _G.require("widgets/skinlegiondialog") --test：动态更新
+                    -- local SkinLegionDialog = _G.require("widgets/skinlegiondialog") --test：动态更新
                     right_root.skinshop_l = right_root:AddChild(SkinLegionDialog(self.owner))
                     right_root.skinshop_l:SetPosition(-380, 0)
                     -- self:Kill() --直接删除并不能去除暂停状态

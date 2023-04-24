@@ -1099,7 +1099,6 @@ local function OnAttackOther(owner, data)
         end
     end
 end
-
 local function CalcuCost(mask, doer, cost)
     if mask.healthcounter == nil then
         mask.healthcounter = 0
@@ -1126,6 +1125,175 @@ local function CalcuCost(mask, doer, cost)
 
     return false
 end
+local function SetBendFx(target, doer)
+    local fx = SpawnPrefab("life_trans_fx")
+    if fx ~= nil then
+        fx.Transform:SetPosition(target.Transform:GetWorldPosition())
+    end
+    if doer.SoundEmitter ~= nil then
+        doer.SoundEmitter:PlaySound("monkeyisland/wonkycurse/curse_fx")
+    end
+end
+local function FnBend_mask(mask, doer, target, options)
+    if target == nil or not target:IsValid() then
+        return false
+    end
+
+    if target.OnLifebBend_l ~= nil then --生命容器
+        local reason = target.OnLifebBend_l(mask, doer, target, options)
+        if reason ~= nil then
+            return false, reason
+        end
+    elseif target.prefab == "flower_withered" then --枯萎花
+        if CalcuCost(mask, doer, 5) then
+            local flower = SpawnPrefab("planted_flower")
+            if flower ~= nil then
+                flower.Transform:SetPosition(target.Transform:GetWorldPosition())
+                target:Remove()
+                target = flower
+            end
+        else
+            return false, "NOLIFE"
+        end
+    elseif target.prefab == "mandrake" then --死掉的曼德拉草
+        if CalcuCost(mask, doer, 20) then
+            local flower = SpawnPrefab("mandrake_planted")
+            if flower ~= nil then
+                flower.Transform:SetPosition(target.Transform:GetWorldPosition())
+                flower:replant()
+                if target.components.stackable ~= nil then
+                    target.components.stackable:Get():Remove()
+                else
+                    target:Remove()
+                end
+                target = flower
+            end
+        else
+            return false, "NOLIFE"
+        end
+    elseif target:HasTag("playerghost") then --玩家鬼魂
+        if CalcuCost(mask, doer, 120) then
+            target:PushEvent("respawnfromghost", { source = mask, user = doer })
+            target.components.health:DeltaPenalty(TUNING.REVIVE_HEALTH_PENALTY)
+            target:DoTaskInTime(1, function()
+                local healthcpt = target.components.health
+                if healthcpt ~= nil and not healthcpt:IsDead() then
+                    --旺达一样恢复10岁吧，因为她回血困难
+                    healthcpt:SetVal(target.components.oldager == nil and 10 or 10/TUNING.OLDAGE_HEALTH_SCALE)
+                    healthcpt:DoDelta(0, true, nil, true, nil, true)
+                end
+            end)
+        else
+            return false, "NOLIFE"
+        end
+    elseif target:HasTag("ghost") then --幽灵
+        return false, "GHOST"
+    elseif target.components.health ~= nil then --有生命组件的对象
+        if not target.components.health:IsDead() and target.components.health:IsHurt() then
+            if CalcuCost(mask, doer, 20) then
+                target.components.health:DoDelta(15, true, mask.prefab, true, nil, true)
+            else
+                return false, "NOLIFE"
+            end
+        else
+            return false, "NOTHURT"
+        end
+    elseif target:HasTag("weed") then --杂草
+        if target.components.growable ~= nil then
+            local growable = target.components.growable
+            if
+                growable.stages and growable.stages[growable.stage] ~= nil and
+                growable.stages[growable.stage].name == "bolting"
+            then
+                if CalcuCost(mask, doer, 5) then
+                    growable:SetStage(growable:GetStage() - 1) --回到上一个阶段
+                    growable:StartGrowing()
+                else
+                    return false, "NOLIFE"
+                end
+            else
+                return false, "NOWITHERED"
+            end
+        else
+            return false, "NOWITHERED"
+        end
+    elseif target.components.farmplantstress ~= nil then --作物
+        if
+            target.components.growable ~= nil and
+            target:HasTag("pickable_harvest_str") --这个标签代表作物腐烂了
+        then
+            if CalcuCost(mask, doer, 5) then
+                local growable = target.components.growable
+                growable:SetStage(growable:GetStage() - 1) --回到上一个阶段
+                growable:StartGrowing()
+            else
+                return false, "NOLIFE"
+            end
+        else
+            return false, "NOWITHERED"
+        end
+    elseif target.components.perennialcrop ~= nil then --子圭垄植物
+        local cpt = target.components.perennialcrop
+        if cpt.isrotten then
+            if CalcuCost(mask, doer, 5) then
+                cpt:SetStage(cpt.stage, cpt.ishuge, false, true, false)
+                if cpt.timedata.paused then
+                    cpt.timedata.left = nil --不用管，StartGrowing()时会自动设置的
+                    cpt.timedata.start = nil
+                    cpt.timedata.all = nil
+                else
+                    cpt:StartGrowing()
+                end
+            else
+                return false, "NOLIFE"
+            end
+        else
+            return false, "NOWITHERED"
+        end
+    elseif target.components.perennialcrop2 ~= nil then --异种植物
+        local cpt = target.components.perennialcrop2
+        if cpt.isrotten then
+            if CalcuCost(mask, doer, 5) then
+                cpt:SetStage(cpt.stage, false, false)
+                cpt:StartGrowing()
+            else
+                return false, "NOLIFE"
+            end
+        else
+            return false, "NOWITHERED"
+        end
+    elseif target.components.witherable ~= nil or target.components.pickable ~= nil then --普通植物
+        if target.components.pickable ~= nil then
+            if target.components.pickable:CanBeFertilized() then --贫瘠或缺水枯萎
+                if CalcuCost(mask, doer, 5) then
+                    local poop = SpawnPrefab("poop")
+                    if poop ~= nil then
+                        target.components.pickable:Fertilize(poop, nil)
+                        poop:Remove()
+                    end
+                else
+                    return false, "NOLIFE"
+                end
+            else
+                return false, "NOWITHERED"
+            end
+        else
+            if target.components.witherable:CanRejuvenate() then --缺水枯萎
+                if CalcuCost(mask, doer, 5) then
+                    target.components.witherable:Protect(TUNING.FIRESUPPRESSOR_PROTECTION_TIME)
+                else
+                    return false, "NOLIFE"
+                end
+            else
+                return false, "NOWITHERED"
+            end
+        end
+    end
+
+    SetBendFx(target, doer)
+
+    return true
+end
 
 MakeMask({
     name = "siving_mask_gold",
@@ -1144,6 +1312,7 @@ MakeMask({
     end,
     fn_server = function(inst)
         inst.healthcounter_max = 135
+        inst.OnCalcuCost_l = CalcuCost
 
         inst.components.equippable:SetOnEquip(function(inst, owner)
             HAT_OPENTOP_ONEQUIP_L(inst, owner, "siving_mask_gold", GetSwapSymbol(owner))
@@ -1233,167 +1402,7 @@ MakeMask({
         inst.components.armor:InitCondition(735, 0.75)
 
         inst:AddComponent("lifebender") --御血神通！然而并不
-        inst.components.lifebender.fn_bend = function(mask, doer, target, options)
-            if target == nil or not target:IsValid() then
-                return false
-            end
-
-            if target.prefab == "flower_withered" then --枯萎花
-                if CalcuCost(mask, doer, 5) then
-                    local flower = SpawnPrefab("planted_flower")
-                    if flower ~= nil then
-                        flower.Transform:SetPosition(target.Transform:GetWorldPosition())
-                        target:Remove()
-                        target = flower
-                    end
-                else
-                    return false, "NOLIFE"
-                end
-            elseif target.prefab == "mandrake" then --死掉的曼德拉草
-                if CalcuCost(mask, doer, 20) then
-                    local flower = SpawnPrefab("mandrake_planted")
-                    if flower ~= nil then
-                        flower.Transform:SetPosition(target.Transform:GetWorldPosition())
-                        flower:replant()
-                        if target.components.stackable ~= nil then
-                            target.components.stackable:Get():Remove()
-                        else
-                            target:Remove()
-                        end
-                        target = flower
-                    end
-                else
-                    return false, "NOLIFE"
-                end
-            elseif target:HasTag("playerghost") then --玩家鬼魂
-                if CalcuCost(mask, doer, 120) then
-                    target:PushEvent("respawnfromghost", { source = mask, user = doer })
-                    target.components.health:DeltaPenalty(TUNING.REVIVE_HEALTH_PENALTY)
-                    target:DoTaskInTime(1, function()
-                        local healthcpt = target.components.health
-                        if healthcpt ~= nil and not healthcpt:IsDead() then
-                            --旺达一样恢复10岁吧，因为她回血困难
-                            healthcpt:SetVal(target.components.oldager == nil and 10 or 10/TUNING.OLDAGE_HEALTH_SCALE)
-                            healthcpt:DoDelta(0, true, nil, true, nil, true)
-                        end
-                    end)
-                else
-                    return false, "NOLIFE"
-                end
-            elseif target:HasTag("ghost") then --幽灵
-                return false, "GHOST"
-            elseif target.components.health ~= nil then --有生命组件的对象
-                if not target.components.health:IsDead() and target.components.health:IsHurt() then
-                    if CalcuCost(mask, doer, 20) then
-                        target.components.health:DoDelta(15, true, mask.prefab, true, nil, true)
-                    else
-                        return false, "NOLIFE"
-                    end
-                else
-                    return false, "NOTHURT"
-                end
-            elseif target:HasTag("weed") then --杂草
-                if target.components.growable ~= nil then
-                    local growable = target.components.growable
-                    if
-                        growable.stages and growable.stages[growable.stage] ~= nil and
-                        growable.stages[growable.stage].name == "bolting"
-                    then
-                        if CalcuCost(mask, doer, 5) then
-                            growable:SetStage(growable:GetStage() - 1) --回到上一个阶段
-                            growable:StartGrowing()
-                        else
-                            return false, "NOLIFE"
-                        end
-                    else
-                        return false, "NOWITHERED"
-                    end
-                else
-                    return false, "NOWITHERED"
-                end
-            elseif target.components.farmplantstress ~= nil then --作物
-                if
-                    target.components.growable ~= nil and
-                    target:HasTag("pickable_harvest_str") --这个标签代表作物腐烂了
-                then
-                    if CalcuCost(mask, doer, 5) then
-                        local growable = target.components.growable
-                        growable:SetStage(growable:GetStage() - 1) --回到上一个阶段
-                        growable:StartGrowing()
-                    else
-                        return false, "NOLIFE"
-                    end
-                else
-                    return false, "NOWITHERED"
-                end
-            elseif target.components.perennialcrop ~= nil then --子圭垄植物
-                local cpt = target.components.perennialcrop
-                if cpt.isrotten then
-                    if CalcuCost(mask, doer, 5) then
-                        cpt:SetStage(cpt.stage, cpt.ishuge, false, true, false)
-                        if cpt.timedata.paused then
-                            cpt.timedata.left = nil --不用管，StartGrowing()时会自动设置的
-                            cpt.timedata.start = nil
-                            cpt.timedata.all = nil
-                        else
-                            cpt:StartGrowing()
-                        end
-                    else
-                        return false, "NOLIFE"
-                    end
-                else
-                    return false, "NOWITHERED"
-                end
-            elseif target.components.perennialcrop2 ~= nil then --异种植物
-                local cpt = target.components.perennialcrop2
-                if cpt.isrotten then
-                    if CalcuCost(mask, doer, 5) then
-                        cpt:SetStage(cpt.stage, false, false)
-                        cpt:StartGrowing()
-                    else
-                        return false, "NOLIFE"
-                    end
-                else
-                    return false, "NOWITHERED"
-                end
-            elseif target.components.witherable ~= nil or target.components.pickable ~= nil then --普通植物
-                if target.components.pickable ~= nil then
-                    if target.components.pickable:CanBeFertilized() then --贫瘠或缺水枯萎
-                        if CalcuCost(mask, doer, 5) then
-                            local poop = SpawnPrefab("poop")
-                            if poop ~= nil then
-                                target.components.pickable:Fertilize(poop, nil)
-                                poop:Remove()
-                            end
-                        else
-                            return false, "NOLIFE"
-                        end
-                    else
-                        return false, "NOWITHERED"
-                    end
-                else
-                    if target.components.witherable:CanRejuvenate() then --缺水枯萎
-                        if CalcuCost(mask, doer, 5) then
-                            target.components.witherable:Protect(TUNING.FIRESUPPRESSOR_PROTECTION_TIME)
-                        else
-                            return false, "NOLIFE"
-                        end
-                    else
-                        return false, "NOWITHERED"
-                    end
-                end
-            end
-
-            local fx = SpawnPrefab("life_trans_fx")
-            if fx ~= nil then
-                fx.Transform:SetPosition(target.Transform:GetWorldPosition())
-            end
-            if doer.SoundEmitter ~= nil then
-                doer.SoundEmitter:PlaySound("monkeyisland/wonkycurse/curse_fx")
-            end
-
-            return true
-        end
+        inst.components.lifebender.fn_bend = FnBend_mask
     end
 })
 
