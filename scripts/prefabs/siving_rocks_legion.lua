@@ -259,7 +259,8 @@ local growth_stages_dt = {
             if not inst.components.timer:TimerExists("fallenleaf") then
                 inst.components.timer:StartTimer("fallenleaf", stagedata.time(inst, stage, stagedata))
             end
-        end
+        end,
+        growfn = OnGrow_dt
     }
 }
 
@@ -1077,30 +1078,7 @@ end
 
 -----
 
-local function AcceptTest_tt(inst, item, giver)
-    if inst.treeState == 0 then
-        return false
-    end
-    if item.tradableitem_siv ~= nil or tradableItems_siv[item.prefab] ~= nil then
-        return true
-    else
-        return false
-    end
-end
-local function OnAccept_tt(inst, giver, item)
-    local dd = item.tradableitem_siv or tradableItems_siv[item.prefab]
-    local stacknum = 1
-    if dd.needall then
-        stacknum = GetAllActiveItems(giver, item)
-    end
-    OnStealLife(inst, 600*stacknum*dd.value)
-    if dd.kind == 1 then
-        ComputTraded(inst, stacknum*dd.value, nil)
-    else
-        ComputTraded(inst, nil, stacknum*dd.value)
-    end
-    item:Remove()
-
+local function TrySummonBoss(inst, giver)
     if giver.components.talker ~= nil then
         local wordkey
         if inst.tradeditems.light < 2 then
@@ -1130,6 +1108,31 @@ local function OnAccept_tt(inst, giver, item)
         end
     end
 end
+local function AcceptTest_tt(inst, item, giver)
+    if inst.treeState == 0 then
+        return false
+    end
+    if item.tradableitem_siv ~= nil or tradableItems_siv[item.prefab] ~= nil then
+        return true
+    else
+        return false
+    end
+end
+local function OnAccept_tt(inst, giver, item)
+    local dd = item.tradableitem_siv or tradableItems_siv[item.prefab]
+    local stacknum = 1
+    if dd.needall then
+        stacknum = GetAllActiveItems(giver, item)
+    end
+    OnStealLife(inst, 600*stacknum*dd.value)
+    if dd.kind == 1 then
+        ComputTraded(inst, stacknum*dd.value, nil)
+    else
+        ComputTraded(inst, nil, stacknum*dd.value)
+    end
+    item:Remove()
+    TrySummonBoss(inst, giver)
+end
 local function OnRefuse_tt(inst, giver, item)
     if giver.components.talker ~= nil then
         giver.components.talker:Say(GetString(giver, "DESCRIBE", { "SIVING_THETREE", "NOTTHIS" }))
@@ -1140,6 +1143,7 @@ local function OnLifebBend_tt(mask, doer, target, options)
     if mask.OnCalcuCost_l(mask, doer, 45) then
         OnStealLife(target, 600*0.15)
         ComputTraded(target, nil, 0.15)
+        TrySummonBoss(target, doer)
     else
         return "NOLIFE"
     end
