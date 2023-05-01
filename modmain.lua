@@ -1,10 +1,34 @@
 --------------------------------------------------------------------------
---[[ Update Logs ]]--[[ 更新说明 ]]
+--[[ Encoding Tips ]]--[[ 编码小贴士 ]]
 --------------------------------------------------------------------------
 
---[[
+--[[ Follower组件讲解 Tip:
+    ▷ inst.entity:AddFollower() 使用这个添加该组件
+    ▷ inst.Follower:FollowSymbol(owner.GUID, "swap_object", nil, nil, nil, true, nil, 0, 3)
+        1、参数分别为 实体ID，跟随通道名，偏移量x，偏移量y，偏移量z，是否替换贴图位置，未知，默认贴图下标，连续替换的贴图下标
+        2、例子中的意思就是 inst 这个实体跟随 owner 的 swap_object 通道，并替换位置 0到3 的通道内贴图
+    ▷ inst.Follower:FollowSymbol(owner.GUID, "swap_body", nil, nil, nil, true, nil, 5)
+        1、例子中的意思就是 inst 这个实体跟随 owner 的 swap_body 通道，并替换位置为 5 的通道内贴图
+        2、如果最后两个参数都不填写，就代表把所有位置的贴图都替换掉
+    ▷ inst.Follower:StopFollowing() 让 inst 停止跟随通道
+]]--
 
-]]
+--[[ RPC使用讲解 Tip:
+    !!!所有参数建议弄成数字类型或者字符类型
+
+    【客户端发送请求给服务器】SendModRPCToServer(GetModRPC("LegionMsg", "operate"), 参数2, 参数3, ...)
+    【服务器监听与响应请求】
+        AddModRPCHandler("LegionMsg", "operate", function(player, 参数2, ...) --第一个参数固定为发起请求的玩家
+            --做你想做的
+        end)
+
+    【服务端发送请求给客户端】SendModRPCToClient(GetClientModRPC("LegionMsg", "operate"), 玩家ID, 参数2, 参数3, ...)
+    --若 玩家ID 为table，则服务端会向table里的全部玩家ID都发送请求
+    【客户端监听与响应请求】
+        AddClientModRPCHandler("LegionMsg", "operate", function(参数2, ...) --通过 ThePlayer 确定客户端玩家
+            --做你想做的
+        end)
+]]--
 
 --------------------------------------------------------------------------
 --[[ Globals ]]--[[ 全局 ]]

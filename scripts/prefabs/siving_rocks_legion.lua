@@ -966,7 +966,7 @@ local function OnRestoreSoul(victim)
     victim.nosoultask = nil
 end
 local function IsValidVictim(victim)
-    return wortox_soul_common.HasSoul(victim) and victim.components.health:IsDead()
+    return wortox_soul_common.HasSoul(victim) and (victim.components.health == nil or victim.components.health:IsDead())
 end
 local function LetLifeWalkToTree(inst, victim, healthvalue)
     local x, y, z = victim.Transform:GetWorldPosition()

@@ -3716,26 +3716,6 @@ if IsServer then
     end)
 end
 
---------------------------------------------------------------------------
---[[ RPC使用讲解
-    Tip:
-        !!!所有参数建议弄成数字类型或者字符类型
-
-        【客户端发送请求给服务器】SendModRPCToServer(GetModRPC("LegionSkined", "RefreshSkinData"), 参数2, 参数3, ...)
-        【服务器监听与响应请求】
-            AddModRPCHandler("LegionSkined", "RefreshSkinData", function(player, 参数2, ...) --第一个参数固定为发起请求的玩家
-                --做你想做的
-            end)
-
-        【服务端发送请求给客户端】SendModRPCToClient(GetClientModRPC("LegionSkined", "RefreshSkinData"), 玩家ID, 参数2, 参数3, ...)
-        --若 玩家ID 为table，则服务端会向table里的全部玩家ID都发送请求
-        【客户端监听与响应请求】
-            AddClientModRPCHandler("LegionSkined", "RefreshSkinData", function(参数2, ...) --通过 ThePlayer 确定客户端玩家
-                --做你想做的
-            end)
-]]--
---------------------------------------------------------------------------
-
 local function GetRightRoot()
     if ThePlayer and ThePlayer.HUD and ThePlayer.HUD.controls then
         return ThePlayer.HUD.controls.right_root

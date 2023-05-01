@@ -22,6 +22,42 @@ local function Fn_symbolSwap(dressup, item, buildskin)
     return itemswap
 end
 
+local function Fn_removeFollowSymbolFx(inst, fxkey)
+    if inst[fxkey] ~= nil then
+        for i, v in ipairs(inst[fxkey]) do
+            v:Remove()
+        end
+        inst[fxkey] = nil
+    end
+end
+local function Fn_setFollowSymbolFx(owner, fxkey, fxdata, randomanim)
+    if owner[fxkey] == nil then
+        owner[fxkey] = {}
+        for i, v in ipairs(fxdata) do
+            local fx = SpawnPrefab(v.name)
+            if v.anim ~= nil then
+                fx.AnimState:PlayAnimation(v.anim, true)
+            end
+            table.insert(owner[fxkey], fx)
+        end
+    end
+    local frame = nil
+    if randomanim then
+        frame = math.random(owner[fxkey][1].AnimState:GetCurrentAnimationNumFrames()) - 1
+    end
+    for i, v in ipairs(owner[fxkey]) do
+        local fxdd = fxdata[i]
+        v.entity:SetParent(owner.entity)
+        v.Follower:FollowSymbol(owner.GUID, fxdd.symbol, fxdd.x, fxdd.y, fxdd.z, true, nil, fxdd.idx, fxdd.idx2)
+        if frame ~= nil then
+            v.AnimState:SetFrame(frame)
+        end
+        if v.components.highlightchild ~= nil then
+            v.components.highlightchild:SetOwner(owner)
+        end
+    end
+end
+
 local dressup_data = {
     -------------------------------
     --手部-------------------------
@@ -467,6 +503,66 @@ local dressup_data = {
         buildfile = "swap_goldenpitchfork",
         buildsymbol = "swap_goldenpitchfork"
     },
+    featherfan = {
+        dressslot = EQUIPSLOTS.HANDS,
+        buildfile = "fan",
+        buildsymbol = "swap_fan"
+    },
+    perdfan = {
+        dressslot = EQUIPSLOTS.HANDS,
+        buildfile = "fan",
+        buildsymbol = "swap_fan_perd"
+    },
+    sword_lunarplant = {
+        buildfile = "sword_lunarplant",
+        buildsymbol = "swap_sword_lunarplant",
+        equipfn = function(owner, item)
+            Fn_setFollowSymbolFx(owner, "fx_l_sword_lunarplant", {
+                { name = "sword_lunarplant_blade_fx", anim = nil, symbol = "swap_object", idx = 0, idx2 = 3 },
+                { name = "sword_lunarplant_blade_fx", anim = "swap_loop2", symbol = "swap_object", idx = 5, idx2 = 8 }
+            }, true)
+        end,
+        unequipfn = function(owner, item)
+            Fn_removeFollowSymbolFx(owner, "fx_l_sword_lunarplant")
+        end,
+        onequipfn = function(owner, item)
+            item.blade1.entity:SetParent(item.entity)
+            item.blade2.entity:SetParent(item.entity)
+            item.blade1.Follower:FollowSymbol(item.GUID, "swap_spear", nil, nil, nil, true, nil, 0, 3)
+            item.blade2.Follower:FollowSymbol(item.GUID, "swap_spear", nil, nil, nil, true, nil, 5, 8)
+            item.blade1.components.highlightchild:SetOwner(item)
+            item.blade2.components.highlightchild:SetOwner(item)
+        end
+    },
+    staff_lunarplant = {
+        buildfile = "staff_lunarplant",
+        buildsymbol = "swap_staff_lunarplant",
+        equipfn = function(owner, item)
+            Fn_setFollowSymbolFx(owner, "fx_l_staff_lunarplant", {
+                { name = "staff_lunarplant_fx", anim = nil, symbol = "swap_object" }
+            }, true)
+        end,
+        unequipfn = function(owner, item)
+            Fn_removeFollowSymbolFx(owner, "fx_l_staff_lunarplant")
+        end,
+        onequipfn = function(owner, item)
+            item.fx.entity:SetParent(item.entity)
+            item.fx.Follower:FollowSymbol(item.GUID, "swap_spear", nil, nil, nil, true)
+            item.fx.components.highlightchild:SetOwner(item)
+        end
+    },
+    bomb_lunarplant = {
+        buildfile = "bomb_lunarplant",
+        buildsymbol = "swap_bomb_lunarplant"
+    },
+    pickaxe_lunarplant = {
+        buildfile = "pickaxe_lunarplant",
+        buildsymbol = "swap_pickaxe_lunarplant"
+    },
+    shovel_lunarplant = {
+        buildfile = "shovel_lunarplant",
+        buildsymbol = "swap_shovel_lunarplant"
+    },
     -- minifan = --有贴图之外的实体，不做幻化
     -- {
     --     buildfile = "swap_minifan",
@@ -841,6 +937,68 @@ local dressup_data = {
         buildfile = "hat_nightcap",
         buildsymbol = "swap_hat"
     },
+    lunarplanthat = {
+        buildfile = "hat_lunarplant",
+        buildsymbol = "swap_hat",
+        equipfn = function(owner, item)
+            Fn_setFollowSymbolFx(owner, "fx_l_lunarplanthat", {
+                { name = "lunarplanthat_fx", anim = nil, symbol = "swap_hat", idx = 0 },
+                { name = "lunarplanthat_fx", anim = "idle2", symbol = "swap_hat", idx = 1 },
+                { name = "lunarplanthat_fx", anim = "idle3", symbol = "swap_hat", idx = 2 }
+            }, true)
+            owner.AnimState:SetSymbolLightOverride("swap_hat", .1)
+        end,
+        unequipfn = function(owner, item)
+            Fn_removeFollowSymbolFx(owner, "fx_l_lunarplanthat")
+            owner.AnimState:SetSymbolLightOverride("swap_hat", 0)
+        end,
+        onequipfn = function(owner, item)
+            Fn_removeFollowSymbolFx(item, "fx")
+            owner.AnimState:SetSymbolLightOverride("swap_hat", 0)
+        end
+    },
+    alterguardianhat = {
+        dressslot = "head_t",
+        buildfn = function(dressup, item, buildskin)
+            local itemswap = {}
+
+            local owner = dressup.inst
+            local sanity = owner.components.sanity ~= nil and owner.components.sanity:GetPercent() or 0
+            if sanity > TUNING.SANITY_BECOME_ENLIGHTENED_THRESH then
+                if owner.fx_l_alterfront == nil then
+                    owner.fx_l_alterfront = SpawnPrefab("alterguardian_hat_equipped")
+                    owner.fx_l_alterfront:OnActivated(owner, true)
+                end
+                if owner.fx_l_alterback == nil then
+                    owner.fx_l_alterback = SpawnPrefab("alterguardian_hat_equipped")
+                    owner.fx_l_alterback:OnActivated(owner, false)
+                end
+                if buildskin then
+                    owner.fx_l_alterfront:SetSkin(buildskin, item.GUID)
+                    owner.fx_l_alterback:SetSkin(buildskin, item.GUID)
+                end
+            else
+                itemswap["swap_hat"] = dressup:GetDressData(
+                    buildskin, "hat_alterguardian", "swap_hat", item.GUID, "swap"
+                )
+                dressup:SetDressOpenTop(itemswap)
+            end
+
+            return itemswap
+        end,
+        unbuildfn = function(dressup, item)
+            local owner = dressup.inst
+            if owner.fx_l_alterfront ~= nil then
+                owner.fx_l_alterfront:OnDeactivated()
+                owner.fx_l_alterfront = nil
+            end
+            if owner.fx_l_alterback ~= nil then
+                owner.fx_l_alterback:OnDeactivated()
+                owner.fx_l_alterback = nil
+            end
+            dressup:InitGroupHead()
+        end
+    },
 
     -------------------------------
     --身体-------------------------
@@ -1131,6 +1289,29 @@ local dressup_data = {
     costume_fool_body = {
         buildfile = "costume_fool_body",
         buildsymbol = "swap_body"
+    },
+    armor_lunarplant = {
+        buildfile = "armor_lunarplant",
+        buildsymbol = "swap_body",
+        equipfn = function(owner, item)
+            Fn_setFollowSymbolFx(owner, "fx_l_armor_lunarplant", {
+                { name = "armor_lunarplant_glow_fx", anim = nil, symbol = "swap_body", idx = 0 },
+                { name = "armor_lunarplant_glow_fx", anim = "idle2", symbol = "swap_body", idx = 1 },
+                { name = "armor_lunarplant_glow_fx", anim = "idle3", symbol = "swap_body", idx = 2 },
+                { name = "armor_lunarplant_glow_fx", anim = "idle4", symbol = "swap_body", idx = 3 },
+                { name = "armor_lunarplant_glow_fx", anim = "idle5", symbol = "swap_body", idx = 4 },
+                { name = "armor_lunarplant_glow_fx", anim = "idle6", symbol = "swap_body", idx = 5 }
+            }, true)
+            owner.AnimState:SetSymbolLightOverride("swap_body", .1)
+        end,
+        unequipfn = function(owner, item)
+            Fn_removeFollowSymbolFx(owner, "fx_l_armor_lunarplant")
+            owner.AnimState:SetSymbolLightOverride("swap_body", 0)
+        end,
+        onequipfn = function(owner, item)
+            Fn_removeFollowSymbolFx(item, "fx")
+            owner.AnimState:SetSymbolLightOverride("swap_body", 0)
+        end
     },
     -- moon_altar --月科技系列的可搬动建筑，独一无二的，不能幻化
     -- sculpture_knighthead = { --骑士的大理石碎片。全图唯一性，不做幻化
@@ -1880,7 +2061,7 @@ end
 --------------------------------------------------------------------------
 
 local function FileDeal_swap(inst, animstate, symbol)
-    if inst.components.dressup ~= nil and inst.components.dressup.swaplist[symbol] ~= nil then
+    if inst.components.dressup and inst.components.dressup.swaplist[symbol] ~= nil then
         local swapdata = inst.components.dressup.swaplist[symbol]
         if swapdata.type == "swap" then
             if swapdata.buildskin ~= nil then
@@ -1906,7 +2087,7 @@ local function FileDeal_swap(inst, animstate, symbol)
     end
 end
 local function FileDeal_show(inst, animstate, symbol)
-    if inst.components.dressup ~= nil and inst.components.dressup.swaplist[symbol] ~= nil then
+    if inst.components.dressup and inst.components.dressup.swaplist[symbol] ~= nil then
         local swapdata = inst.components.dressup.swaplist[symbol]
         if swapdata.type == "swap" or swapdata.type == "showsym" then --都 swap 了，肯定是要显示的
             animstate:ShowSymbol(symbol)
@@ -1921,7 +2102,7 @@ local function FileDeal_show(inst, animstate, symbol)
     end
 end
 local function SymbolDeal_show(inst, animstate, symbol)
-    if inst.components.dressup ~= nil and inst.components.dressup.swaplist[symbol] ~= nil then
+    if inst.components.dressup and inst.components.dressup.swaplist[symbol] ~= nil then
         local swapdata = inst.components.dressup.swaplist[symbol]
         if swapdata.type == "show" then
             animstate:Show(symbol)
@@ -1977,6 +2158,39 @@ local hook_Hide = UserDataHook.MakeHook("AnimState","Hide",
     end
 )
 
+local function EquipSet_dress(inst, item)
+    if _G.DRESSUP_DATA_LEGION[item.prefab] then
+        local dd = _G.DRESSUP_DATA_LEGION[item.prefab]
+        if dd.onequipfn ~= nil then
+            local slot = inst.components.dressup:GetDressSlot(item, dd)
+            if slot and inst.components.dressup.itemlist[slot] ~= nil then
+                dd.onequipfn(inst, item)
+            end
+        end
+	end
+end
+local function OnEquip_dress(inst, data)
+    if data == nil or data.item == nil then
+        return
+    end
+	EquipSet_dress(inst, data.item)
+end
+local function OnFix_dress(inst, data)
+    if inst.components.inventory == nil then
+        return
+    end
+    for k, v in pairs(inst.components.inventory.equipslots) do
+        if v ~= nil then
+            EquipSet_dress(inst, v)
+        end
+    end
+end
+-- local function OnUnequip_dress(inst, data)
+--     if data == nil then
+--         return
+--     end
+-- end
+
 AddPlayerPostInit(function(inst)
     UserDataHook.Hook(inst, hook_OverrideSymbol)
     UserDataHook.Hook(inst, hook_OverrideItemSkinSymbol)
@@ -1988,6 +2202,9 @@ AddPlayerPostInit(function(inst)
 
     inst.AnimState:Hide("LANTERN_OVERLAY") --人物默认清除提灯光效贴图，防止幻化的提灯显示出问题
     inst:AddComponent("dressup")
+    inst:ListenForEvent("equip", OnEquip_dress)
+    inst:ListenForEvent("dress_l_fix", OnFix_dress)
+	-- inst:ListenForEvent("unequip", OnUnequip_dress)
 end)
 
 --知识点，就不删除了

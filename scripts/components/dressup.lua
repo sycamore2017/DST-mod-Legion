@@ -226,6 +226,8 @@ function DressUp:PutOn(item, loaddata) --幻化一个物品
         end
     end
 
+    self:TakeOff(slot, itemdataold)
+
     --增加幻化数据
     local itemswap = {}
     local buildskin = (not data.isnoskin) and item:GetSkinBuild() or nil
@@ -303,7 +305,6 @@ function DressUp:PutOn(item, loaddata) --幻化一个物品
     end
 
     self:UpdateSwapList()
-    self:TakeOff(slot, itemdataold)
     self:UpdateReal()
 
     item:RemoveFromScene()
