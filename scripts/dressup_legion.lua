@@ -946,15 +946,15 @@ local dressup_data = {
                 { name = "lunarplanthat_fx", anim = "idle2", symbol = "swap_hat", idx = 1 },
                 { name = "lunarplanthat_fx", anim = "idle3", symbol = "swap_hat", idx = 2 }
             }, true)
-            owner.AnimState:SetSymbolLightOverride("swap_hat", .1)
+            -- owner.AnimState:SetSymbolLightOverride("swap_hat", .1)
         end,
         unequipfn = function(owner, item)
             Fn_removeFollowSymbolFx(owner, "fx_l_lunarplanthat")
-            owner.AnimState:SetSymbolLightOverride("swap_hat", 0)
+            -- owner.AnimState:SetSymbolLightOverride("swap_hat", 0)
         end,
         onequipfn = function(owner, item)
             Fn_removeFollowSymbolFx(item, "fx")
-            owner.AnimState:SetSymbolLightOverride("swap_hat", 0)
+            -- owner.AnimState:SetSymbolLightOverride("swap_hat", 0)
         end
     },
     alterguardianhat = {
@@ -1302,15 +1302,15 @@ local dressup_data = {
                 { name = "armor_lunarplant_glow_fx", anim = "idle5", symbol = "swap_body", idx = 4 },
                 { name = "armor_lunarplant_glow_fx", anim = "idle6", symbol = "swap_body", idx = 5 }
             }, true)
-            owner.AnimState:SetSymbolLightOverride("swap_body", .1)
+            -- owner.AnimState:SetSymbolLightOverride("swap_body", .1)
         end,
         unequipfn = function(owner, item)
             Fn_removeFollowSymbolFx(owner, "fx_l_armor_lunarplant")
-            owner.AnimState:SetSymbolLightOverride("swap_body", 0)
+            -- owner.AnimState:SetSymbolLightOverride("swap_body", 0)
         end,
         onequipfn = function(owner, item)
             Fn_removeFollowSymbolFx(item, "fx")
-            owner.AnimState:SetSymbolLightOverride("swap_body", 0)
+            -- owner.AnimState:SetSymbolLightOverride("swap_body", 0)
         end
     },
     -- moon_altar --月科技系列的可搬动建筑，独一无二的，不能幻化
@@ -2158,39 +2158,6 @@ local hook_Hide = UserDataHook.MakeHook("AnimState","Hide",
     end
 )
 
-local function EquipSet_dress(inst, item)
-    if _G.DRESSUP_DATA_LEGION[item.prefab] then
-        local dd = _G.DRESSUP_DATA_LEGION[item.prefab]
-        if dd.onequipfn ~= nil then
-            local slot = inst.components.dressup:GetDressSlot(item, dd)
-            if slot and inst.components.dressup.itemlist[slot] ~= nil then
-                dd.onequipfn(inst, item)
-            end
-        end
-	end
-end
-local function OnEquip_dress(inst, data)
-    if data == nil or data.item == nil then
-        return
-    end
-	EquipSet_dress(inst, data.item)
-end
-local function OnFix_dress(inst, data)
-    if inst.components.inventory == nil then
-        return
-    end
-    for k, v in pairs(inst.components.inventory.equipslots) do
-        if v ~= nil then
-            EquipSet_dress(inst, v)
-        end
-    end
-end
--- local function OnUnequip_dress(inst, data)
---     if data == nil then
---         return
---     end
--- end
-
 AddPlayerPostInit(function(inst)
     UserDataHook.Hook(inst, hook_OverrideSymbol)
     UserDataHook.Hook(inst, hook_OverrideItemSkinSymbol)
@@ -2202,9 +2169,6 @@ AddPlayerPostInit(function(inst)
 
     inst.AnimState:Hide("LANTERN_OVERLAY") --人物默认清除提灯光效贴图，防止幻化的提灯显示出问题
     inst:AddComponent("dressup")
-    inst:ListenForEvent("equip", OnEquip_dress)
-    inst:ListenForEvent("dress_l_fix", OnFix_dress)
-	-- inst:ListenForEvent("unequip", OnUnequip_dress)
 end)
 
 --知识点，就不删除了

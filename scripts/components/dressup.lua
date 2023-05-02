@@ -40,6 +40,38 @@ local function OnReroll(inst)
     end
     self.itemlist = {}
 end
+local function EquipSet_dress(inst, item)
+    if DRESSUP_DATA_LEGION[item.prefab] then
+        local dd = DRESSUP_DATA_LEGION[item.prefab]
+        if dd.onequipfn ~= nil then
+            local slot = inst.components.dressup:GetDressSlot(item, dd)
+            if slot and inst.components.dressup.itemlist[slot] ~= nil then
+                dd.onequipfn(inst, item)
+            end
+        end
+	end
+end
+local function OnEquip_dress(inst, data)
+    if data == nil or data.item == nil then
+        return
+    end
+	EquipSet_dress(inst, data.item)
+end
+local function OnFix_dress(inst, data)
+    if inst.components.inventory == nil then
+        return
+    end
+    for k, v in pairs(inst.components.inventory.equipslots) do
+        if v ~= nil then
+            EquipSet_dress(inst, v)
+        end
+    end
+end
+-- local function OnUnequip_dress(inst, data)
+--     if data == nil then
+--         return
+--     end
+-- end
 
 local BODYTALL = "body_t"
 
@@ -61,6 +93,9 @@ local DressUp = Class(function(self, inst)
     }
 
     inst:ListenForEvent("ms_playerreroll", OnReroll) --重选人物时
+    inst:ListenForEvent("equip", OnEquip_dress)
+    inst:ListenForEvent("dressup_l", OnFix_dress)
+	-- inst:ListenForEvent("unequip", OnUnequip_dress)
 end)
 
 function DressUp:GetDressData(buildskin, buildfile, buildsymbol, guid, type)
@@ -198,7 +233,7 @@ function DressUp:UpdateSwapList() --更新幻化表
     end
 end
 
-function DressUp:PutOn(item, loaddata) --幻化一个物品
+function DressUp:PutOn(item, loaddata, noevent) --幻化一个物品
     local data = DRESSUP_DATA_LEGION[item.prefab]
     if data == nil then
         return false
@@ -307,6 +342,10 @@ function DressUp:PutOn(item, loaddata) --幻化一个物品
     self:UpdateSwapList()
     self:UpdateReal()
 
+    if not noevent then
+        self.inst:PushEvent("dressup_l", { item = item, olditemdata = itemdataold })
+    end
+
     item:RemoveFromScene()
     item:DoTaskInTime(0.2, function() --必需滞后删除！
         item:Remove()
@@ -399,9 +438,12 @@ function DressUp:OnLoad(data, newents)
         for _, v in pairs(data.items) do
             local item = CreateItem(self, v, true)
             if item ~= nil then
-                self:PutOn(item, v)
+                self:PutOn(item, v, true)
             end
         end
+        self.inst:DoTaskInTime(0.25 + 0.6*math.random(), function(inst)
+            inst:PushEvent("dressup_l")
+        end)
     end
 end
 
