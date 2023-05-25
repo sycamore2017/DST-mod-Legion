@@ -2330,6 +2330,41 @@ _G.SKINS_LEGION = {
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
         floater = { cut = 0.04, size = "small", offset_y = 0.2, scale = 0.5, nofx = nil }
     },
+    siving_feather_real_collector = {
+        base_prefab = "siving_feather_real",
+		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
+
+        skin_id = "646f760769b4f368be4526b4",
+        onlyownedshow = true,
+		assets = {
+			Asset("ANIM", "anim/skin/siving_feather_real_collector.zip")
+		},
+        image = { name = nil, atlas = nil, setable = true },
+
+        string = ischinese and { name = "旅星猫" } or { name = "Traverse Star Cat" },
+
+		-- fn_anim = function(inst)
+        --     SetRandomSkinAnim(inst, {
+        --         "idle1", "idle1", "idle1", "idle2", "idle3", "idle3", "idle4", "idle5"
+        --     })
+        -- end,
+        -- fn_start = function(inst)
+        --     inst.AnimState:SetBank("backcub_thanks")
+        --     inst.AnimState:SetBuild("backcub_thanks")
+        -- end,
+        -- fn_end = function(inst)
+        --     CancelRandomSkinAnim(inst)
+        -- end,
+        equip = {
+            symbol = "lantern_overlay", build = "siving_feather_real_collector", file = "swap_cushion",
+            isshield = true, fn = function(inst, owner)
+                
+            end
+        },
+        exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
+        floater = { cut = nil, size = "med", offset_y = 0.1, scale = 0.9, nofx = nil }
+    },
+    -- siving_feather_fake_collector
 
     revolvedmoonlight_item_taste = { --芒果
         base_prefab = "revolvedmoonlight_item",
@@ -2733,7 +2768,7 @@ _G.SKIN_IDS_LEGION = {
         orchidbush_disguiser = true, boltwingout_disguiser = true,
         rosebush_marble = true, lilybush_marble = true, orchidbush_marble = true, rosorns_marble = true, lileaves_marble = true, orchitwigs_marble = true,
         shield_l_log_emo_fist = true, hat_lichen_emo_que = true,
-        rosebush_collector = true, rosorns_collector = true, fimbul_axe_collector = true, siving_turn_collector = true,
+        rosebush_collector = true, rosorns_collector = true, fimbul_axe_collector = true, siving_turn_collector = true, siving_feather_real_collector = true, siving_feather_fake_collector = true,
         backcub_fans2 = true,
         agronssword_taste = true, soul_contracts_taste = true,
         revolvedmoonlight_item_taste = true, revolvedmoonlight_taste = true, revolvedmoonlight_pro_taste = true,
@@ -2784,6 +2819,7 @@ _G.SKIN_IDS_LEGION = {
         neverfade_paper = true, neverfadebush_paper = true, neverfade_paper2 = true, neverfadebush_paper2 = true, siving_feather_real_paper = true, siving_feather_fake_paper = true,
     },
     ["642c14d9f2b67d287a35d439"] = { --5谷丰登
+        siving_feather_real_collector = true, siving_feather_fake_collector = true,
     }
 }
 _G.SKIN_IDX_LEGION = {
@@ -2821,6 +2857,7 @@ local skinidxes = { --用以皮肤排序
     "neverfade_thanks", "neverfadebush_thanks", "siving_derivant_thanks", "siving_derivant_thanks2",
     "backcub_thanks",
     "fishhomingtool_awesome_thanks", "fishhomingtool_normal_thanks", "fishhomingbait_thanks",
+    "siving_feather_real_collector", "siving_feather_fake_collector",
     "siving_turn_collector", "icire_rock_collector", "fimbul_axe_collector", "rosebush_collector", "rosorns_collector",
     "neverfade_paper", "neverfadebush_paper", "neverfade_paper2", "neverfadebush_paper2", "siving_feather_real_paper", "siving_feather_fake_paper",
     "icire_rock_day",

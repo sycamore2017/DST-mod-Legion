@@ -940,11 +940,18 @@ local dressup_data = {
     lunarplanthat = {
         buildfile = "hat_lunarplant",
         buildsymbol = "swap_hat",
+        -- buildfn = function(dressup, item, buildskin)
+        --     local itemswap = {}
+        --     itemswap["HEAD"] = dressup:GetDressData(nil, nil, nil, nil, "show")
+        --     itemswap["HEAD_HAT"] = dressup:GetDressData(nil, nil, nil, nil, "show")
+        --     return itemswap
+        -- end,
         equipfn = function(owner, item)
             Fn_setFollowSymbolFx(owner, "fx_l_lunarplanthat", {
                 { name = "lunarplanthat_fx", anim = nil, symbol = "swap_hat", idx = 0 },
                 { name = "lunarplanthat_fx", anim = "idle2", symbol = "swap_hat", idx = 1 },
                 { name = "lunarplanthat_fx", anim = "idle3", symbol = "swap_hat", idx = 2 }
+                -- { name = "lunarplanthat_fx", anim = "idle3", symbol = "headbase", idx = 2, idx2 = 3 }
             }, true)
             -- owner.AnimState:SetSymbolLightOverride("swap_hat", .1)
         end,
