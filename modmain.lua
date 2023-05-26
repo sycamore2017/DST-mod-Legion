@@ -199,7 +199,7 @@ end
 --[[ hot reload ]]--[[ 热更新机制 ]]
 --------------------------------------------------------------------------
 
--- modimport("scripts/hotreload_legion.lua")
+modimport("scripts/hotreload_legion.lua")
 
 --------------------------------------------------------------------------
 --[[ compatibility enhancement ]]--[[ 兼容性修改 ]]

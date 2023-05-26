@@ -1900,6 +1900,46 @@ local SkinData = {
             }
         }
     },
+    siving_feather_real_collector = {
+        string = ischinese and {
+            collection = "COLLECTOR", access = "SPECIAL",
+            descitem = "解锁\"子圭·翰\"、\"子圭玄鸟绒羽\"的皮肤。",
+            description = ""
+        } or {
+            collection = "COLLECTOR", access = "SPECIAL",
+            descitem = "Unlock \"True Siving Feather\", \"Siving Feather\" skin.",
+            description = "The story was not translated."
+        },
+        height_anim = 265,
+        anims = {
+            {
+                bank = "kitcoon", build = "siving_feather_real_collector", face = FACING_DOWNRIGHT,
+                anim = "jump_out", anim2 = "idle_loop", isloop = true,
+                x = -55, y = 135, scale = 0.38
+            },
+            {
+                symbol = {
+                    { symbol = "lantern_overlay", build = "siving_feather_real_collector", file = "swap_show", type = 1 },
+                },
+                fn_anim = SetAnim_player,
+                fn_click = SetAnim_player2,
+                x = 35, y = 130, scale = 0.38
+            },
+            {
+                bank = "kitcoon", build = "siving_feather_fake_collector", face = FACING_DOWNRIGHT,
+                anim = "sleep_pre", anim2 = "sleep_loop", isloop = true,
+                x = -55, y = 5, scale = 0.38
+            },
+            {
+                symbol = {
+                    { symbol = "lantern_overlay", build = "siving_feather_fake_collector", file = "swap_show", type = 1 },
+                },
+                fn_anim = SetAnim_player,
+                fn_click = SetAnim_player2,
+                x = 35, y = 0, scale = 0.38
+            }
+        }
+    },
     revolvedmoonlight_item_taste = {
         string = ischinese and {
             name = "黄桃芒芒",
@@ -2655,7 +2695,7 @@ function SkinLegionDialog:BuildSkinAnim(w, skindata)
         local anim = w:AddChild(UIAnim())
         anim:SetScale(v.scale)
         anim:SetPosition(xbase + v.x, ybase + v.y)
-        anim:SetFacing(FACING_DOWN)
+        anim:SetFacing(v.face or FACING_DOWN)
 
         if v.fn_anim ~= nil then
             v.fn_anim(self, anim, v)

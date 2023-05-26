@@ -757,7 +757,7 @@ MakeFx({ --脱壳之翅：逃脱时的茸毛特效
     end,
     fn_remove = nil,
 })
-MakeFx({ --脱壳之翅：逃脱时的茸毛特效（枯叶飞舞）
+MakeFx({ --枯叶飞舞：逃脱时的茸毛特效
     name = "boltwingout_fx_disguiser",
     assets = {
         Asset("ANIM", "anim/lavaarena_heal_projectile.zip"), --官方的熔炉奶杖击中特效动画
@@ -910,6 +910,140 @@ MakeFx({ --转星移：基因解锁时的花火特效(金色)
     end,
     fn_remove = nil
 })
+
+------
+
+local anims_sivfeather_collector = {
+    "idle_loop", "idle_loop", "idle_loop", "idle_loop", "idle_loop",
+    "idle_loop", "idle_loop", "idle_loop", "idle_loop", "idle_loop",
+    "idle_loop", "idle_loop", "idle_loop", "idle_loop", "idle_loop",
+    "idle_loop", "idle_loop", "idle_loop", "idle_loop", "idle_loop",
+    { "sleep_pre", "sleep_loop", "sleep_loop", "sleep_loop", "sleep_loop", "sleep_loop", "sleep_loop", "sleep_pst" },
+    { "sleep_pre", "sleep_loop", "sleep_loop", "sleep_loop", "sleep_loop",  "sleep_pst" },
+    { "sleep_pre", "sleep_loop", "sleep_loop", "sleep_pst" },
+    "emote_lick", "emote_lick", "emote_lick", "distress", "emote_stretch", "emote_stretch", "emote_stretch",
+    { "walk_pre", "walk_pst" },
+    { "jump_pre", "jump_loop", "jump_pst" },
+    { "jump_pre", "jump_loop", "jump_loop", "jump_pst" }
+}
+
+------随机仿sg的动画
+
+local function DoSgAnim(inst)
+    if inst.skin_l_anims then
+        local anim = nil
+        local keys = inst.skin_l_keys or {}
+
+        if keys.x == nil then
+            keys.x = math.random(#inst.skin_l_anims)
+        end
+        anim = inst.skin_l_anims[keys.x]
+        if type(anim) == "table" then
+            if keys.y == nil then
+                keys.y = 1
+            else
+                keys.y = keys.y + 1
+            end
+            anim = anim[keys.y]
+            if anim == nil then
+                inst.skin_l_keys = {}
+                DoSgAnim(inst)
+                return
+            end
+        else
+            keys = {}
+        end
+        inst.skin_l_keys = keys
+        inst.AnimState:PlayAnimation(anim, false)
+    end
+end
+local function SetSgSkinAnim(inst, anims)
+    if inst.skin_l_anims == nil then
+        inst:ListenForEvent("animover", DoSgAnim) --看起来被装备后，动画会自动暂停。所以我也不用主动关闭监听了
+    end
+    inst.skin_l_anims = anims
+    DoSgAnim(inst)
+end
+-- local function CancelSgSkinAnim(inst)
+--     inst.skin_l_anims = nil
+--     inst.skin_l_keys = nil
+--     inst:RemoveEventCallback("animover", DoSgAnim)
+-- end
+
+table.insert(prefs, Prefab( --旅星猫：蓝色猫猫
+    "sivfeather_real_collector_fx",
+    function()
+        local inst = CreateEntity()
+
+        inst.entity:AddTransform()
+        inst.entity:AddAnimState()
+        inst.entity:AddFollower()
+        inst.entity:AddNetwork()
+
+        inst.Transform:SetSixFaced()
+
+        inst.AnimState:SetBank("kitcoon")
+        inst.AnimState:SetBuild("siving_feather_real_collector")
+        inst.AnimState:PlayAnimation("idle_loop")
+
+        inst:AddTag("FX")
+
+        inst.entity:SetPristine()
+        if not TheWorld.ismastersim then
+            return inst
+        end
+
+        inst.persists = false
+
+        SetSgSkinAnim(inst, anims_sivfeather_collector)
+
+        return inst
+    end,
+    {
+        Asset("ANIM", "anim/skin/siving_feather_real_collector.zip"),
+        Asset("ANIM", "anim/kitcoon_basic.zip"),  --官方猫咪动画模板
+	    Asset("ANIM", "anim/kitcoon_emotes.zip"),
+	    Asset("ANIM", "anim/kitcoon_jump.zip")
+    },
+    nil
+))
+table.insert(prefs, Prefab( --流星猫：棕色猫猫
+    "sivfeather_fake_collector_fx",
+    function()
+        local inst = CreateEntity()
+
+        inst.entity:AddTransform()
+        inst.entity:AddAnimState()
+        inst.entity:AddFollower()
+        inst.entity:AddNetwork()
+
+        inst.Transform:SetSixFaced()
+
+        inst.AnimState:SetBank("kitcoon")
+        inst.AnimState:SetBuild("siving_feather_fake_collector")
+        inst.AnimState:PlayAnimation("idle_loop")
+
+        inst:AddTag("FX")
+
+        inst.entity:SetPristine()
+        if not TheWorld.ismastersim then
+            return inst
+        end
+
+        inst.persists = false
+
+        SetSgSkinAnim(inst, anims_sivfeather_collector)
+
+        return inst
+    end,
+    {
+        Asset("ANIM", "anim/skin/siving_feather_fake_collector.zip"),
+        Asset("ANIM", "anim/kitcoon_basic.zip"),  --官方猫咪动画模板
+	    Asset("ANIM", "anim/kitcoon_emotes.zip"),
+	    Asset("ANIM", "anim/kitcoon_jump.zip")
+    },
+    nil
+))
 
 ---------------
 ---------------

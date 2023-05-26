@@ -754,6 +754,9 @@ local function OnEquip(inst, owner)
             owner.AnimState:HideSymbol("swap_object")
             owner.AnimState:ClearOverrideSymbol("swap_object")
         end
+        if skindata.equip.startfn then
+            skindata.equip.startfn(inst, owner)
+        end
     else
         owner.AnimState:OverrideSymbol("swap_object", inst.prefab, "swap")
     end
@@ -774,6 +777,9 @@ local function OnUnequip(inst, owner)
         if skindata.equip.isshield then
             owner.AnimState:Hide("LANTERN_OVERLAY")
             owner.AnimState:ShowSymbol("swap_object")
+        end
+        if skindata.equip.endfn then
+            skindata.equip.endfn(inst, owner)
         end
     else
         owner.AnimState:ClearOverrideSymbol("swap_object")
@@ -848,6 +854,16 @@ local function OnHit_fly_fake(inst, targetpos, doer, target)
         inst:Remove()
     end
 end
+local function OnThrown_fly_collector(inst, owner, targetpos, attacker)
+    local rand = math.random()
+    if rand < 0.33 then
+        inst.SoundEmitter:PlaySound("dontstarve_DLC001/creatures/catcoon/hiss_pre", nil, 0.5)
+    elseif rand < 0.66 then
+        inst.SoundEmitter:PlaySound("dontstarve_DLC001/creatures/catcoon/attack", nil, 0.5)
+    else
+        inst.SoundEmitter:PlaySound("dontstarve_DLC001/creatures/catcoon/pounce", nil, 0.5)
+    end
+end
 
 --[[
 local function ReticuleTargetFn()
@@ -902,6 +918,28 @@ elseif CONFIGS_LEGION.SIVFEASTRENGTH == 6 then
 elseif CONFIGS_LEGION.SIVFEASTRENGTH == 7 then
     sivfea_attack = 68
     sivfea_hpcost = 4.5
+end
+
+local function SetAnim_fly_collector(inst)
+    if math.random() < 0.4 then
+        inst.AnimState:PlayAnimation("jump_loop")
+        inst.AnimState:PushAnimation("jump_pst", false)
+    else
+        inst.AnimState:PlayAnimation("jump_out")
+        inst.AnimState:PushAnimation("idle_loop", true)
+    end
+end
+local function SetAnim_blk_collector(inst)
+    local ran = math.random()
+    if ran < 0.25 then
+        inst.AnimState:PlayAnimation("emote_lick")
+        inst.AnimState:PushAnimation("idle_loop", true)
+    elseif ran < 0.5 then
+        inst.AnimState:PlayAnimation("emote_stretch")
+        inst.AnimState:PushAnimation("idle_loop", true)
+    else
+        inst.AnimState:PlayAnimation("idle_loop", true)
+    end
 end
 
 local function InitFeaFx(inst)
@@ -1293,6 +1331,33 @@ local function MakeWeapon(data)
         fn_server_blk = function(inst)
             inst.feather_name = data.name
             inst.feather_skin = skinname
+        end
+    })
+
+    local skinname2 = data.name.."_collector"
+    MakeWeapon_replace({
+        name = skinname2, isreal = data.isreal,
+        fn_common_fly = function(inst)
+            inst.AnimState:SetBank("kitcoon")
+            inst.Transform:SetSixFaced()
+            SetAnim_fly_collector(inst)
+        end,
+        fn_server_fly = function(inst)
+            inst.feather_name = data.name
+            inst.feather_skin = skinname2
+            inst.components.weapon:SetDamage(fea_damage)
+            inst.components.projectilelegion.shootrange = fea_range
+            inst.components.projectilelegion.onthrown = OnThrown_fly_collector
+        end,
+        fn_common_blk = function(inst)
+            inst.AnimState:SetBank("kitcoon")
+            inst.Transform:SetSixFaced()
+            SetAnim_blk_collector(inst)
+            InitFloatable(inst, SKINS_LEGION[skinname2].floater)
+        end,
+        fn_server_blk = function(inst)
+            inst.feather_name = data.name
+            inst.feather_skin = skinname2
         end
     })
 end

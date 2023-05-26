@@ -209,6 +209,105 @@ local function EndFollowedFx(inst, owner)
     end
 end
 
+------官方新的动画格式
+
+local function RemoveFollowSymbolFx(inst, fxkey)
+    if inst[fxkey] ~= nil then
+        for i, v in ipairs(inst[fxkey]) do
+            v:Remove()
+        end
+        inst[fxkey] = nil
+    end
+end
+local function SetFollowSymbolFx(owner, fxkey, fxdata, randomanim)
+    if owner[fxkey] == nil then
+        owner[fxkey] = {}
+        for i, v in ipairs(fxdata) do
+            local fx = SpawnPrefab(v.name)
+            if v.anim ~= nil then
+                fx.AnimState:PlayAnimation(v.anim, true)
+            end
+            table.insert(owner[fxkey], fx)
+        end
+    end
+    local frame = nil
+    if randomanim then
+        frame = math.random(owner[fxkey][1].AnimState:GetCurrentAnimationNumFrames()) - 1
+    end
+    for i, v in ipairs(owner[fxkey]) do
+        local fxdd = fxdata[i]
+        v.entity:SetParent(owner.entity)
+        v.Follower:FollowSymbol(owner.GUID, fxdd.symbol, fxdd.x, fxdd.y, fxdd.z, true, nil, fxdd.idx, fxdd.idx2)
+        if frame ~= nil then
+            v.AnimState:SetFrame(frame)
+        end
+        if v.components.highlightchild ~= nil then
+            v.components.highlightchild:SetOwner(owner)
+        end
+    end
+end
+
+------随机仿sg的动画
+
+local function DoSgAnim(inst)
+    if inst.skin_l_anims then
+        local anim = nil
+        local keys = inst.skin_l_keys or {}
+
+        if keys.x == nil then
+            keys.x = math.random(#inst.skin_l_anims)
+        end
+        anim = inst.skin_l_anims[keys.x]
+        if type(anim) == "table" then
+            if keys.y == nil then
+                keys.y = 1
+            else
+                keys.y = keys.y + 1
+            end
+            anim = anim[keys.y]
+            if anim == nil then
+                inst.skin_l_keys = {}
+                DoSgAnim(inst)
+                return
+            end
+        else
+            keys = {}
+        end
+        inst.skin_l_keys = keys
+        inst.AnimState:PlayAnimation(anim, false)
+    end
+end
+local function SetSgSkinAnim(inst, anims)
+    if inst.skin_l_anims == nil then
+        inst:ListenForEvent("animover", DoSgAnim) --看起来被装备后，动画会自动暂停。所以我也不用主动关闭监听了
+    end
+    inst.skin_l_anims = anims
+    DoSgAnim(inst)
+end
+local function CancelSgSkinAnim(inst)
+    inst.skin_l_anims = nil
+    inst.skin_l_keys = nil
+    inst:RemoveEventCallback("animover", DoSgAnim)
+end
+
+------
+
+local function Fn_anim_sivfeather_collector(inst)
+    SetSgSkinAnim(inst, {
+        "idle_loop", "idle_loop", "idle_loop", "idle_loop", "idle_loop",
+        "idle_loop", "idle_loop", "idle_loop", "idle_loop", "idle_loop",
+        "idle_loop", "idle_loop", "idle_loop", "idle_loop", "idle_loop",
+        "idle_loop", "idle_loop", "idle_loop", "idle_loop", "idle_loop",
+        { "sleep_pre", "sleep_loop", "sleep_loop", "sleep_loop", "sleep_loop", "sleep_loop", "sleep_loop", "sleep_pst" },
+        { "sleep_pre", "sleep_loop", "sleep_loop", "sleep_loop", "sleep_loop",  "sleep_pst" },
+        { "sleep_pre", "sleep_loop", "sleep_loop", "sleep_pst" },
+        "emote_lick", "emote_lick", "emote_lick", "distress", "emote_stretch", "emote_stretch", "emote_stretch",
+        { "walk_pre", "walk_pst" },
+        { "jump_pre", "jump_loop", "jump_pst" },
+        { "jump_pre", "jump_loop", "jump_loop", "jump_pst" }
+    })
+end
+
 --------------------------------------------------------------------------
 --[[ 全局皮肤总数据，以及修改 ]]
 --------------------------------------------------------------------------
@@ -2332,39 +2431,86 @@ _G.SKINS_LEGION = {
     },
     siving_feather_real_collector = {
         base_prefab = "siving_feather_real",
-		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
+		type = "item", skin_tags = {}, release_group = 555, rarity = raritySpecial,
 
         skin_id = "646f760769b4f368be4526b4",
         onlyownedshow = true,
 		assets = {
-			Asset("ANIM", "anim/skin/siving_feather_real_collector.zip")
+			Asset("ANIM", "anim/skin/siving_feather_real_collector.zip"),
+            Asset("ANIM", "anim/kitcoon_basic.zip"),  --官方猫咪动画模板
+            Asset("ANIM", "anim/kitcoon_emotes.zip"),
+            Asset("ANIM", "anim/kitcoon_jump.zip")
 		},
         image = { name = nil, atlas = nil, setable = true },
 
         string = ischinese and { name = "旅星猫" } or { name = "Traverse Star Cat" },
 
-		-- fn_anim = function(inst)
-        --     SetRandomSkinAnim(inst, {
-        --         "idle1", "idle1", "idle1", "idle2", "idle3", "idle3", "idle4", "idle5"
-        --     })
-        -- end,
-        -- fn_start = function(inst)
-        --     inst.AnimState:SetBank("backcub_thanks")
-        --     inst.AnimState:SetBuild("backcub_thanks")
-        -- end,
-        -- fn_end = function(inst)
-        --     CancelRandomSkinAnim(inst)
-        -- end,
+		fn_anim = Fn_anim_sivfeather_collector,
+        fn_start = function(inst)
+            inst.AnimState:SetBank("kitcoon")
+            inst.AnimState:SetBuild("siving_feather_real_collector")
+            inst.Transform:SetSixFaced()
+        end,
+        fn_end = function(inst)
+            CancelSgSkinAnim(inst)
+            inst.Transform:SetEightFaced()
+        end,
         equip = {
             symbol = "lantern_overlay", build = "siving_feather_real_collector", file = "swap_cushion",
-            isshield = true, fn = function(inst, owner)
-                
+            isshield = true,
+            startfn = function(inst, owner)
+                SetFollowSymbolFx(owner, "fx_l_sivfeather_real", {
+                    { name = "sivfeather_real_collector_fx", anim = nil, symbol = "lantern_overlay", x = 18, y = -12, z = 0 }
+                }, true)
+            end,
+            endfn = function(inst, owner)
+                RemoveFollowSymbolFx(owner, "fx_l_sivfeather_real")
             end
         },
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
         floater = { cut = nil, size = "med", offset_y = 0.1, scale = 0.9, nofx = nil }
     },
-    -- siving_feather_fake_collector
+    siving_feather_fake_collector = {
+        base_prefab = "siving_feather_fake",
+		type = "item", skin_tags = {}, release_group = 555, rarity = raritySpecial,
+
+        skin_id = "646f760769b4f368be4526b4",
+        noshopshow = true,
+		assets = {
+			Asset("ANIM", "anim/skin/siving_feather_fake_collector.zip"),
+            Asset("ANIM", "anim/kitcoon_basic.zip"),  --官方猫咪动画模板
+            Asset("ANIM", "anim/kitcoon_emotes.zip"),
+            Asset("ANIM", "anim/kitcoon_jump.zip")
+		},
+        image = { name = nil, atlas = nil, setable = true },
+
+        string = ischinese and { name = "流星猫" } or { name = "Meteor Cat" },
+
+		fn_anim = Fn_anim_sivfeather_collector,
+        fn_start = function(inst)
+            inst.AnimState:SetBank("kitcoon")
+            inst.AnimState:SetBuild("siving_feather_fake_collector")
+            inst.Transform:SetSixFaced()
+        end,
+        fn_end = function(inst)
+            CancelSgSkinAnim(inst)
+            inst.Transform:SetEightFaced()
+        end,
+        equip = {
+            symbol = "lantern_overlay", build = "siving_feather_fake_collector", file = "swap_cushion",
+            isshield = true,
+            startfn = function(inst, owner)
+                SetFollowSymbolFx(owner, "fx_l_sivfeather_fake", {
+                    { name = "sivfeather_fake_collector_fx", anim = nil, symbol = "lantern_overlay", x = 18, y = -12, z = 0 }
+                }, true)
+            end,
+            endfn = function(inst, owner)
+                RemoveFollowSymbolFx(owner, "fx_l_sivfeather_fake")
+            end
+        },
+        exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
+        floater = { cut = nil, size = "med", offset_y = 0.1, scale = 0.9, nofx = nil }
+    },
 
     revolvedmoonlight_item_taste = { --芒果
         base_prefab = "revolvedmoonlight_item",
@@ -3867,7 +4013,7 @@ if not TheNet:IsDedicated() then
                     if right_root.skinshop_l then
                         right_root.skinshop_l:Kill()
                     end
-                    -- local SkinLegionDialog = _G.require("widgets/skinlegiondialog") --test：动态更新
+                    local SkinLegionDialog = _G.require("widgets/skinlegiondialog") --test：动态更新
                     right_root.skinshop_l = right_root:AddChild(SkinLegionDialog(self.owner))
                     right_root.skinshop_l:SetPosition(-380, 0)
                     -- self:Kill() --直接删除并不能去除暂停状态
