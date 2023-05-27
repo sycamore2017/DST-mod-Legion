@@ -864,6 +864,19 @@ local function OnThrown_fly_collector(inst, owner, targetpos, attacker)
         inst.SoundEmitter:PlaySound("dontstarve_DLC001/creatures/catcoon/pounce", nil, 0.5)
     end
 end
+local function OnComput_collector(cpt, pos)
+    local count = cpt.count_update or 1
+    if count >= 5 then
+        count = 0
+        local fx = SpawnPrefab(cpt.inst.feather_skin.."_flyfx")
+        if fx ~= nil then
+            fx.Transform:SetPosition(pos:Get())
+        end
+    else
+        count = count + 1
+    end
+    cpt.count_update = count
+end
 
 --[[
 local function ReticuleTargetFn()
@@ -1340,6 +1353,7 @@ local function MakeWeapon(data)
         fn_common_fly = function(inst)
             inst.AnimState:SetBank("kitcoon")
             inst.Transform:SetSixFaced()
+            inst.AnimState:SetScale(0.9, 0.9)
             SetAnim_fly_collector(inst)
         end,
         fn_server_fly = function(inst)
@@ -1348,10 +1362,12 @@ local function MakeWeapon(data)
             inst.components.weapon:SetDamage(fea_damage)
             inst.components.projectilelegion.shootrange = fea_range
             inst.components.projectilelegion.onthrown = OnThrown_fly_collector
+            inst.components.projectilelegion.oncomput = OnComput_collector
         end,
         fn_common_blk = function(inst)
             inst.AnimState:SetBank("kitcoon")
             inst.Transform:SetSixFaced()
+            inst.AnimState:SetScale(0.9, 0.9)
             SetAnim_blk_collector(inst)
             InitFloatable(inst, SKINS_LEGION[skinname2].floater)
         end,

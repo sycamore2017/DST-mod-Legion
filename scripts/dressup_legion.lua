@@ -1834,6 +1834,11 @@ local dressup_data = {
                 else
                     itemswap["lantern_overlay"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
                 end
+                if skindata.equip.build == "siving_feather_fake_collector" then
+                    Fn_setFollowSymbolFx(dressup.inst, "fx_d_sivfeather_fake", {
+                        { name = "sivfeather_fake_collector_fx", anim = nil, symbol = "lantern_overlay", x = 18, y = -12, z = 0 }
+                    }, false)
+                end
             else
                 itemswap["swap_object"] = dressup:GetDressData(
                     nil, "siving_feather_fake", "swap", item.GUID, "swap"
@@ -1843,6 +1848,12 @@ local dressup_data = {
             itemswap["whipline"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
 
             return itemswap
+        end,
+        unequipfn = function(owner, item)
+            Fn_removeFollowSymbolFx(owner, "fx_d_sivfeather_fake")
+        end,
+        onequipfn = function(owner, item)
+            Fn_removeFollowSymbolFx(owner, "fx_l_sivfeather_fake")
         end
     },
     siving_feather_real = {
@@ -1861,6 +1872,11 @@ local dressup_data = {
                 else
                     itemswap["lantern_overlay"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
                 end
+                if skindata.equip.build == "siving_feather_real_collector" then
+                    Fn_setFollowSymbolFx(dressup.inst, "fx_d_sivfeather_real", {
+                        { name = "sivfeather_real_collector_fx", anim = nil, symbol = "lantern_overlay", x = 18, y = -12, z = 0 }
+                    }, false)
+                end
             else
                 itemswap["swap_object"] = dressup:GetDressData(
                     nil, "siving_feather_real", "swap", item.GUID, "swap"
@@ -1870,6 +1886,12 @@ local dressup_data = {
             itemswap["whipline"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
 
             return itemswap
+        end,
+        unequipfn = function(owner, item)
+            Fn_removeFollowSymbolFx(owner, "fx_d_sivfeather_real")
+        end,
+        onequipfn = function(owner, item)
+            Fn_removeFollowSymbolFx(owner, "fx_l_sivfeather_real")
         end
     },
     siving_mask = {

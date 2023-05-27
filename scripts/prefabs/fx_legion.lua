@@ -910,10 +910,56 @@ MakeFx({ --转星移：基因解锁时的花火特效(金色)
     end,
     fn_remove = nil
 })
+MakeFx({ --旅星猫：投射路径特效
+    name = "siving_feather_real_collector_flyfx",
+    assets = {
+        Asset("ANIM", "anim/skin/siving_feather_collector_fx.zip")
+    },
+    prefabs = nil,
+    fn_common = nil,
+    fn_anim = function(inst)
+        inst.AnimState:SetBank("siving_feather_collector_fx")
+        inst.AnimState:SetBuild("siving_feather_collector_fx")
+        inst.AnimState:PlayAnimation("idle"..tostring(math.random(3)))
+        inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
+        inst.AnimState:SetFinalOffset(1)
+
+        local rand = math.random()
+        if rand < 0.2 then
+            inst.AnimState:SetMultColour(237/255, 170/255, 165/255, 1)
+        elseif rand < 0.4 then
+            inst.AnimState:SetMultColour(172/255, 237/255, 165/255, 1)
+        end
+    end,
+    fn_remove = nil
+})
+MakeFx({ --流星猫：投射路径特效
+    name = "siving_feather_fake_collector_flyfx",
+    assets = {
+        Asset("ANIM", "anim/skin/siving_feather_collector_fx.zip")
+    },
+    prefabs = nil,
+    fn_common = nil,
+    fn_anim = function(inst)
+        inst.AnimState:SetBank("siving_feather_collector_fx")
+        inst.AnimState:SetBuild("siving_feather_collector_fx")
+        inst.AnimState:PlayAnimation("idle"..tostring(math.random(3)))
+        inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
+        inst.AnimState:SetFinalOffset(1)
+
+        local rand = math.random()
+        if rand < 0.2 then
+            inst.AnimState:SetMultColour(237/255, 170/255, 165/255, 1)
+        elseif rand < 0.4 then
+            inst.AnimState:SetMultColour(172/255, 237/255, 165/255, 1)
+        end
+    end,
+    fn_remove = nil
+})
 
 ------
 
-local anims_sivfeather_collector = {
+local anims_kitcoon = {
     "idle_loop", "idle_loop", "idle_loop", "idle_loop", "idle_loop",
     "idle_loop", "idle_loop", "idle_loop", "idle_loop", "idle_loop",
     "idle_loop", "idle_loop", "idle_loop", "idle_loop", "idle_loop",
@@ -970,80 +1016,61 @@ end
 --     inst:RemoveEventCallback("animover", DoSgAnim)
 -- end
 
-table.insert(prefs, Prefab( --旅星猫：蓝色猫猫
-    "sivfeather_real_collector_fx",
-    function()
-        local inst = CreateEntity()
+local function MakeFx_kitcoon(data)
+    table.insert(prefs, Prefab(
+        data.name,
+        function()
+            local inst = CreateEntity()
 
-        inst.entity:AddTransform()
-        inst.entity:AddAnimState()
-        inst.entity:AddFollower()
-        inst.entity:AddNetwork()
+            inst.entity:AddTransform()
+            inst.entity:AddAnimState()
+            inst.entity:AddFollower()
+            inst.entity:AddNetwork()
 
-        inst.Transform:SetSixFaced()
+            inst.Transform:SetSixFaced()
 
-        inst.AnimState:SetBank("kitcoon")
-        inst.AnimState:SetBuild("siving_feather_real_collector")
-        inst.AnimState:PlayAnimation("idle_loop")
+            inst.AnimState:SetBank("kitcoon")
+            inst.AnimState:SetBuild(data.build)
+            inst.AnimState:PlayAnimation("idle_loop")
 
-        inst:AddTag("FX")
+            inst:AddTag("FX")
 
-        inst.entity:SetPristine()
-        if not TheWorld.ismastersim then
+            inst.entity:SetPristine()
+            if not TheWorld.ismastersim then
+                return inst
+            end
+
+            inst.persists = false
+
+            SetSgSkinAnim(inst, anims_kitcoon)
+
             return inst
-        end
+        end,
+        data.assets,
+        nil
+    ))
+end
 
-        inst.persists = false
-
-        SetSgSkinAnim(inst, anims_sivfeather_collector)
-
-        return inst
-    end,
-    {
+MakeFx_kitcoon({ --旅星猫：蓝色猫猫
+    name = "sivfeather_real_collector_fx",
+    build = "siving_feather_real_collector",
+    assets = {
         Asset("ANIM", "anim/skin/siving_feather_real_collector.zip"),
         Asset("ANIM", "anim/kitcoon_basic.zip"),  --官方猫咪动画模板
-	    Asset("ANIM", "anim/kitcoon_emotes.zip"),
-	    Asset("ANIM", "anim/kitcoon_jump.zip")
-    },
-    nil
-))
-table.insert(prefs, Prefab( --流星猫：棕色猫猫
-    "sivfeather_fake_collector_fx",
-    function()
-        local inst = CreateEntity()
-
-        inst.entity:AddTransform()
-        inst.entity:AddAnimState()
-        inst.entity:AddFollower()
-        inst.entity:AddNetwork()
-
-        inst.Transform:SetSixFaced()
-
-        inst.AnimState:SetBank("kitcoon")
-        inst.AnimState:SetBuild("siving_feather_fake_collector")
-        inst.AnimState:PlayAnimation("idle_loop")
-
-        inst:AddTag("FX")
-
-        inst.entity:SetPristine()
-        if not TheWorld.ismastersim then
-            return inst
-        end
-
-        inst.persists = false
-
-        SetSgSkinAnim(inst, anims_sivfeather_collector)
-
-        return inst
-    end,
-    {
+        Asset("ANIM", "anim/kitcoon_emotes.zip"),
+        Asset("ANIM", "anim/kitcoon_jump.zip")
+    }
+})
+MakeFx_kitcoon({ --流星猫：棕色猫猫
+    name = "sivfeather_fake_collector_fx",
+    build = "siving_feather_fake_collector",
+    assets = {
         Asset("ANIM", "anim/skin/siving_feather_fake_collector.zip"),
         Asset("ANIM", "anim/kitcoon_basic.zip"),  --官方猫咪动画模板
-	    Asset("ANIM", "anim/kitcoon_emotes.zip"),
-	    Asset("ANIM", "anim/kitcoon_jump.zip")
-    },
-    nil
-))
+        Asset("ANIM", "anim/kitcoon_emotes.zip"),
+        Asset("ANIM", "anim/kitcoon_jump.zip")
+    }
+})
 
 ---------------
 ---------------

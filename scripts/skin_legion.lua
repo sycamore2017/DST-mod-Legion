@@ -2450,10 +2450,12 @@ _G.SKINS_LEGION = {
             inst.AnimState:SetBank("kitcoon")
             inst.AnimState:SetBuild("siving_feather_real_collector")
             inst.Transform:SetSixFaced()
+            inst.AnimState:SetScale(0.9, 0.9)
         end,
         fn_end = function(inst)
             CancelSgSkinAnim(inst)
             inst.Transform:SetEightFaced()
+            inst.AnimState:SetScale(1, 1)
         end,
         equip = {
             symbol = "lantern_overlay", build = "siving_feather_real_collector", file = "swap_cushion",
@@ -2461,14 +2463,14 @@ _G.SKINS_LEGION = {
             startfn = function(inst, owner)
                 SetFollowSymbolFx(owner, "fx_l_sivfeather_real", {
                     { name = "sivfeather_real_collector_fx", anim = nil, symbol = "lantern_overlay", x = 18, y = -12, z = 0 }
-                }, true)
+                }, false)
             end,
             endfn = function(inst, owner)
                 RemoveFollowSymbolFx(owner, "fx_l_sivfeather_real")
             end
         },
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
-        floater = { cut = nil, size = "med", offset_y = 0.1, scale = 0.9, nofx = nil }
+        floater = { cut = nil, size = "med", offset_y = 0.1, scale = 0.5, nofx = nil }
     },
     siving_feather_fake_collector = {
         base_prefab = "siving_feather_fake",
@@ -2491,10 +2493,12 @@ _G.SKINS_LEGION = {
             inst.AnimState:SetBank("kitcoon")
             inst.AnimState:SetBuild("siving_feather_fake_collector")
             inst.Transform:SetSixFaced()
+            inst.AnimState:SetScale(0.9, 0.9)
         end,
         fn_end = function(inst)
             CancelSgSkinAnim(inst)
             inst.Transform:SetEightFaced()
+            inst.AnimState:SetScale(1, 1)
         end,
         equip = {
             symbol = "lantern_overlay", build = "siving_feather_fake_collector", file = "swap_cushion",
@@ -2502,14 +2506,14 @@ _G.SKINS_LEGION = {
             startfn = function(inst, owner)
                 SetFollowSymbolFx(owner, "fx_l_sivfeather_fake", {
                     { name = "sivfeather_fake_collector_fx", anim = nil, symbol = "lantern_overlay", x = 18, y = -12, z = 0 }
-                }, true)
+                }, false)
             end,
             endfn = function(inst, owner)
                 RemoveFollowSymbolFx(owner, "fx_l_sivfeather_fake")
             end
         },
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
-        floater = { cut = nil, size = "med", offset_y = 0.1, scale = 0.9, nofx = nil }
+        floater = { cut = nil, size = "med", offset_y = 0.1, scale = 0.5, nofx = nil }
     },
 
     revolvedmoonlight_item_taste = { --芒果

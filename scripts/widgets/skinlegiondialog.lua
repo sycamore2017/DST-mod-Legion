@@ -409,6 +409,25 @@ local function SetClick_revolvedmoonlight(self, anim, data)
     end
 end
 
+local function SetAnim_sivfeather(self, anim, data)
+    local animstate = anim:GetAnimState()
+    local tag = anim.tag_anim or 1
+
+    if tag == 1 then
+        animstate:PlayAnimation("sleep_pst")
+        animstate:PushAnimation("idle_loop", true)
+        anim.tag_anim = 2
+    elseif tag == 2 then
+        animstate:PlayAnimation("emote_stretch")
+        animstate:PushAnimation("idle_loop", true)
+        anim.tag_anim = 3
+    elseif tag == 3 then
+        animstate:PlayAnimation("sleep_pre")
+        animstate:PushAnimation("sleep_loop", true)
+        anim.tag_anim = 1
+    end
+end
+
 local width_skininfo = 260
 local SkinData = {
     rosebush_marble = {
@@ -1915,7 +1934,9 @@ local SkinData = {
             {
                 bank = "kitcoon", build = "siving_feather_real_collector", face = FACING_DOWNRIGHT,
                 anim = "jump_out", anim2 = "idle_loop", isloop = true,
-                x = -55, y = 135, scale = 0.38
+                touchanim = "emote_lick",
+                fn_click = SetAnim_backcub,
+                x = -55, y = 135, scale = 0.34
             },
             {
                 symbol = {
@@ -1928,7 +1949,8 @@ local SkinData = {
             {
                 bank = "kitcoon", build = "siving_feather_fake_collector", face = FACING_DOWNRIGHT,
                 anim = "sleep_pre", anim2 = "sleep_loop", isloop = true,
-                x = -55, y = 5, scale = 0.38
+                fn_click = SetAnim_sivfeather,
+                x = -55, y = 5, scale = 0.34
             },
             {
                 symbol = {
