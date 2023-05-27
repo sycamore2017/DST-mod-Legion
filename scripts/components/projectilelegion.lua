@@ -16,7 +16,6 @@ local ProjectileLegion = Class(function(self, inst)
 	self.onprehit = nil
     self.onhit = nil
     self.onmiss = nil
-	self.oncomput = nil
 end)
 
 function ProjectileLegion:RotateToTarget(dest, angle)
@@ -151,10 +150,6 @@ function ProjectileLegion:OnUpdate(dt)
 			end
 			self.hittargets[ent] = true
 		end
-	end
-
-	if self.oncomput ~= nil then
-		self.oncomput(self, current)
 	end
 
 	if not self.inst:IsValid() then
