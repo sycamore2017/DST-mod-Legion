@@ -933,7 +933,8 @@ end
 
 local function OnSummer_cactus(inst, isit)
     if TheWorld.state.issummer then
-        inst.AnimState:OverrideSymbol("flowerplus", "crop_legion_cactus", "flomax")
+        local skin = inst.components.skinedlegion:GetSkin()
+        inst.AnimState:OverrideSymbol("flowerplus", skin or "crop_legion_cactus", "flomax")
     else
         inst.AnimState:ClearOverrideSymbol("flowerplus")
     end
