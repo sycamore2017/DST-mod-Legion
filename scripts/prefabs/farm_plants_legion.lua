@@ -841,6 +841,10 @@ local function OnBurnt_p2(inst)
 	inst:Remove()
 end
 
+local skinedplant = {
+	cactus_meat = true
+}
+
 local function MakePlant2(cropprefab, sets)
 	local assets = sets.assets or {}
 	table.insert(assets, Asset("ANIM", "anim/"..sets.bank..".zip"))
@@ -884,6 +888,11 @@ local function MakePlant2(cropprefab, sets)
 			inst._cluster_l = net_byte(inst.GUID, "plant_crop_l._cluster_l", "cluster_l_dirty")
 
 			inst.displaynamefn = DisplayName_p2
+
+			if skinedplant[cropprefab] then
+				inst:AddComponent("skinedlegion")
+        		inst.components.skinedlegion:Init("plant_"..cropprefab.."_l")
+			end
 
 			if sets.fn_common ~= nil then
 				sets.fn_common(inst)
@@ -958,6 +967,10 @@ local function MakePlant2(cropprefab, sets)
 			end)
 
 			inst.fn_planted = OnPlant_p2
+
+			-- if inst.components.skinedlegion ~= nil then
+			-- 	inst.components.skinedlegion:SetOnPreLoad()
+			-- end
 
 			if sets.fn_server ~= nil then
 				sets.fn_server(inst)

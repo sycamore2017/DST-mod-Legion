@@ -802,6 +802,16 @@ _G.SKIN_PREFABS_LEGION = {
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
         floater = { cut = 0.1, size = "med", offset_y = 0.3, scale = 0.45, nofx = nil }
     },
+
+    plant_cactus_meat_l = {
+        assets = nil,
+        fn_start = function(inst)
+            local sets = _G.CROPS_DATA_LEGION["cactus_meat"]
+            inst.AnimState:SetBank(sets.bank)
+            inst.AnimState:SetBuild(sets.build)
+        end,
+        exchangefx = { prefab = nil, offset_y = nil, scale = 1.5 }
+    },
 }
 
 _G.SKINS_LEGION = {
@@ -2907,6 +2917,28 @@ _G.SKINS_LEGION = {
         linkedskins = { item = "revolvedmoonlight_item_taste4" },
         floater = { cut = 0.1, size = "med", offset_y = 0.3, scale = 0.3, nofx = nil }
     },
+
+    plant_cactus_meat_l_world = {
+        base_prefab = "plant_cactus_meat_l",
+		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
+
+        skin_id = "6473057469b4f368be45295a",
+		assets = {
+			Asset("ANIM", "anim/skin/plant_cactus_meat_l_world.zip")
+		},
+
+        string = ischinese and { name = "波蒂球" } or { name = "Dots Cactus" },
+
+		fn_start = function(inst)
+            inst.AnimState:SetBank("plant_cactus_meat_l_world")
+            inst.AnimState:SetBuild("plant_cactus_meat_l_world")
+        end,
+        exchangefx = { prefab = nil, offset_y = nil, scale = 1.5 },
+        fn_placer = function(inst)
+            inst.AnimState:SetBank("plant_cactus_meat_l_world")
+            inst.AnimState:SetBuild("plant_cactus_meat_l_world")
+        end
+    },
 }
 
 _G.SKIN_IDS_LEGION = {
@@ -2915,7 +2947,7 @@ _G.SKIN_IDS_LEGION = {
         siving_derivant_thanks = true, siving_derivant_thanks2 = true, neverfade_thanks = true, neverfadebush_thanks = true, backcub_thanks = true,
         fishhomingtool_awesome_thanks = true, fishhomingtool_normal_thanks = true, fishhomingbait_thanks = true,
         triplegoldenshovelaxe_era = true, tripleshovelaxe_era = true, lilybush_era = true, lileaves_era = true, icire_rock_era = true, shield_l_log_era = true, shield_l_sand_era = true,
-        orchidbush_disguiser = true, boltwingout_disguiser = true,
+        orchidbush_disguiser = true, boltwingout_disguiser = true, plant_cactus_meat_l_world = true,
         rosebush_marble = true, lilybush_marble = true, orchidbush_marble = true, rosorns_marble = true, lileaves_marble = true, orchitwigs_marble = true,
         shield_l_log_emo_fist = true, hat_lichen_emo_que = true,
         rosebush_collector = true, rosorns_collector = true, fimbul_axe_collector = true, siving_turn_collector = true, siving_feather_real_collector = true, siving_feather_fake_collector = true,
@@ -2970,6 +3002,7 @@ _G.SKIN_IDS_LEGION = {
     },
     ["642c14d9f2b67d287a35d439"] = { --5谷丰登
         siving_feather_real_collector = true, siving_feather_fake_collector = true,
+        plant_cactus_meat_l_world = true,
     }
 }
 _G.SKIN_IDX_LEGION = {
@@ -3018,7 +3051,7 @@ local skinidxes = { --用以皮肤排序
     "revolvedmoonlight_item_taste3", "revolvedmoonlight_taste3", "revolvedmoonlight_pro_taste3",
     "revolvedmoonlight_item_taste4", "revolvedmoonlight_taste4", "revolvedmoonlight_pro_taste4",
     "triplegoldenshovelaxe_era", "tripleshovelaxe_era", "lilybush_era", "lileaves_era", "shield_l_log_era", "icire_rock_era", "shield_l_sand_era",
-    "orchidbush_disguiser", "boltwingout_disguiser",
+    "plant_cactus_meat_l_world", "orchidbush_disguiser", "boltwingout_disguiser",
     "rosebush_marble", "rosorns_marble", "lilybush_marble", "lileaves_marble", "orchidbush_marble", "orchitwigs_marble",
     "shield_l_log_emo_fist", "hat_lichen_emo_que",
 

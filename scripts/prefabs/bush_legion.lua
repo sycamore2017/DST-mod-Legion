@@ -367,7 +367,7 @@ MakeBush({
         MakeLargeBurnable(inst)
         MakeMediumPropagator(inst)
 
-        inst.components.skinedlegion:SetOnPreLoad()
+        -- inst.components.skinedlegion:SetOnPreLoad()
     end
 })
 
@@ -444,7 +444,7 @@ MakeBush({
         MakeLargeBurnable(inst)
         MakeMediumPropagator(inst)
 
-        inst.components.skinedlegion:SetOnPreLoad()
+        -- inst.components.skinedlegion:SetOnPreLoad()
     end,
 })
 
@@ -521,7 +521,7 @@ MakeBush({
         MakeMediumBurnable(inst)
         MakeSmallPropagator(inst)
 
-        inst.components.skinedlegion:SetOnPreLoad()
+        -- inst.components.skinedlegion:SetOnPreLoad()
     end,
 })
 
@@ -565,7 +565,7 @@ MakeBush({
         inst.components.pickable.cycles_left = inst.components.pickable.max_cycles
         inst.components.pickable.onpickedfn = OnPicked_never
 
-        inst.components.skinedlegion:SetOnPreLoad()
+        -- inst.components.skinedlegion:SetOnPreLoad()
     end,
 })
 

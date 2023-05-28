@@ -118,6 +118,9 @@ CreatePlacer("siving_soil_item", "farm_soil", "siving_soil", "till_idle")
 CreatePlacer("siving_turn", "siving_turn", "siving_turn", "idle", nil, nil, nil, nil, nil, nil, Skined_build)
 
 ----异种
+local skinedplant = {
+	cactus_meat = true
+}
 local function GetPlacerAnim(anims)
     if type(anims) == 'table' then
         return anims[ #anims ]
@@ -136,6 +139,9 @@ for k,v in pairs(CROPS_DATA_LEGION) do
     CreatePlacer(
         "seeds_"..k.."_l", v.bank, v.build, GetPlacerAnim(v.leveldata[1].anim),
         nil, nil, nil, nil, nil, "two", function(inst)
+            if skinedplant[k] then
+                Skined_deploy(inst, "plant_"..k.."_l")
+            end
             Fn_xeeds(inst, v)
         end
     )
