@@ -1959,6 +1959,41 @@ local SkinData = {
                 fn_anim = SetAnim_player,
                 fn_click = SetAnim_player2,
                 x = 35, y = 0, scale = 0.38
+            },
+            {
+                bank = "goldnugget", build = "siving_feather_collector_fx",
+                anim = "sparkle", anim2 = nil, isloop = false,
+                x = -50, y = 180, scale = 0.38
+            },
+            {
+                bank = "goldnugget", build = "siving_feather_collector_fx",
+                anim = "sparkle", anim2 = nil, isloop = false,
+                x = -40, y = 190, scale = 0.38
+            },
+            {
+                bank = "goldnugget", build = "siving_feather_collector_fx",
+                anim = "sparkle", anim2 = nil, isloop = false,
+                x = -70, y = 150, scale = 0.38
+            },
+            {
+                bank = "goldnugget", build = "siving_feather_collector_fx",
+                anim = "sparkle", anim2 = nil, isloop = false,
+                x = -90, y = 220, scale = 0.38
+            },
+            {
+                bank = "goldnugget", build = "siving_feather_collector_fx",
+                anim = "sparkle", anim2 = nil, isloop = false,
+                x = -65, y = 40, scale = 0.38
+            },
+            {
+                bank = "goldnugget", build = "siving_feather_collector_fx",
+                anim = "sparkle", anim2 = nil, isloop = false,
+                x = -100, y = 55, scale = 0.38
+            },
+            {
+                bank = "goldnugget", build = "siving_feather_collector_fx",
+                anim = "sparkle", anim2 = nil, isloop = false,
+                x = -30, y = -5, scale = 0.38
             }
         }
     },

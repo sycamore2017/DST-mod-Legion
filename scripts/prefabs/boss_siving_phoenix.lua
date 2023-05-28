@@ -864,6 +864,16 @@ local function OnThrown_fly_collector(inst, owner, targetpos, attacker)
         inst.SoundEmitter:PlaySound("dontstarve_DLC001/creatures/catcoon/pounce", nil, 0.5)
     end
 end
+local function SpawnFx_collector(inst)
+    local x, y, z = inst.Transform:GetWorldPosition()
+    for i = 1, math.random(2), 1 do
+        local fx = SpawnPrefab(inst.feather_skin.."_flyfx")
+        if fx ~= nil then
+            local x1, y1, z1 = GetCalculatedPos_legion(x, y, z, math.random()*2, nil)
+            fx.Transform:SetPosition(x1, y1, z1)
+        end
+    end
+end
 
 --[[
 local function ReticuleTargetFn()
@@ -1349,6 +1359,7 @@ local function MakeWeapon(data)
             inst.components.weapon:SetDamage(fea_damage)
             inst.components.projectilelegion.shootrange = fea_range
             inst.components.projectilelegion.onthrown = OnThrown_fly_collector
+            inst.task_skinfx = inst:DoPeriodicTask(0.1, SpawnFx_collector, 0)
         end,
         fn_common_blk = function(inst)
             inst.AnimState:SetBank("kitcoon")

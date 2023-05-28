@@ -910,56 +910,64 @@ MakeFx({ --转星移：基因解锁时的花火特效(金色)
     end,
     fn_remove = nil
 })
--- MakeFx({ --旅星猫：投射路径特效
---     name = "siving_feather_real_collector_flyfx",
---     assets = {
---         Asset("ANIM", "anim/skin/siving_feather_collector_fx.zip")
---     },
---     prefabs = nil,
---     fn_common = nil,
---     fn_anim = function(inst)
---         inst.AnimState:SetBank("siving_feather_collector_fx")
---         inst.AnimState:SetBuild("siving_feather_collector_fx")
---         inst.AnimState:PlayAnimation("idle"..tostring(math.random(3)))
---         inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
---         inst.AnimState:SetFinalOffset(1)
+MakeFx({ --旅星猫：投射路径特效
+    name = "siving_feather_real_collector_flyfx",
+    assets = {
+        Asset("ANIM", "anim/gold_nugget.zip"), --官方金块动画
+        Asset("ANIM", "anim/skin/siving_feather_collector_fx.zip")
+    },
+    prefabs = nil,
+    fn_common = nil,
+    fn_anim = function(inst)
+        inst.AnimState:SetBank("goldnugget")
+        inst.AnimState:SetBuild("siving_feather_collector_fx")
+        inst.AnimState:PlayAnimation("sparkle")
+        inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
+        inst.AnimState:SetFinalOffset(1)
+        inst.AnimState:SetFrame(math.random( math.floor(inst.AnimState:GetCurrentAnimationNumFrames()/2) ) - 1)
 
---         local rand = math.random()
---         if rand < 0.2 then
---             inst.AnimState:SetMultColour(237/255, 170/255, 165/255, math.random())
---         elseif rand < 0.4 then
---             inst.AnimState:SetMultColour(172/255, 237/255, 165/255, math.random())
---         else
---             inst.AnimState:SetMultColour(1, 1, 1, 0.1)
---         end
---     end,
---     fn_remove = nil
--- })
--- MakeFx({ --流星猫：投射路径特效
---     name = "siving_feather_fake_collector_flyfx",
---     assets = {
---         Asset("ANIM", "anim/skin/siving_feather_collector_fx.zip")
---     },
---     prefabs = nil,
---     fn_common = nil,
---     fn_anim = function(inst)
---         inst.AnimState:SetBank("siving_feather_collector_fx")
---         inst.AnimState:SetBuild("siving_feather_collector_fx")
---         inst.AnimState:PlayAnimation("idle"..tostring(math.random(3)))
---         inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
---         inst.AnimState:SetFinalOffset(1)
+        if math.random() < 0.4 then
+            inst.AnimState:OverrideSymbol("sparkle", "siving_feather_collector_fx", "star2")
+        end
 
---         local rand = math.random()
---         if rand < 0.2 then
---             inst.AnimState:SetMultColour(237/255, 170/255, 165/255, math.random())
---         elseif rand < 0.4 then
---             inst.AnimState:SetMultColour(172/255, 237/255, 165/255, math.random())
---         else
---             inst.AnimState:SetMultColour(1, 1, 1, 0.1)
---         end
---     end,
---     fn_remove = nil
--- })
+        local rand = math.random()
+        if rand < 0.2 then
+            inst.AnimState:SetMultColour(82/255, 243/255, 255/255, 1)
+        elseif rand < 0.4 then
+            inst.AnimState:SetMultColour(81/255, 105/255, 165/255, 1)
+        end
+    end,
+    fn_remove = nil
+})
+MakeFx({ --流星猫：投射路径特效
+    name = "siving_feather_fake_collector_flyfx",
+    assets = {
+        Asset("ANIM", "anim/gold_nugget.zip"), --官方金块动画
+        Asset("ANIM", "anim/skin/siving_feather_collector_fx.zip")
+    },
+    prefabs = nil,
+    fn_common = nil,
+    fn_anim = function(inst)
+        inst.AnimState:SetBank("goldnugget")
+        inst.AnimState:SetBuild("siving_feather_collector_fx")
+        inst.AnimState:PlayAnimation("sparkle")
+        inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
+        inst.AnimState:SetFinalOffset(1)
+        inst.AnimState:SetFrame(math.random( math.floor(inst.AnimState:GetCurrentAnimationNumFrames()/2) ) - 1)
+
+        if math.random() < 0.6 then
+            inst.AnimState:OverrideSymbol("sparkle", "siving_feather_collector_fx", "star2")
+        end
+
+        local rand = math.random()
+        if rand < 0.2 then
+            inst.AnimState:SetMultColour(255/255, 213/255, 85/255, 1)
+        elseif rand < 0.4 then
+            inst.AnimState:SetMultColour(141/255, 125/255, 66/255, 1)
+        end
+    end,
+    fn_remove = nil
+})
 
 ------
 
