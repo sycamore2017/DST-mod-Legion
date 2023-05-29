@@ -324,8 +324,8 @@ _G.SKIN_PREFABS_LEGION = {
 
         anim = { --皮肤初始化使用
             bank = nil, build = nil,
-            anim = nil, isloop_anim = nil, animpush = nil, isloop_animpush = nil,
-            setable = true,
+            anim = nil, animpush = nil, isloop = nil,
+            setable = true
         },
         -- fn_anim = function(inst)end, --处于地面时的动画设置，替换anim的默认方式
 
@@ -347,10 +347,10 @@ _G.SKIN_PREFABS_LEGION = {
             cut = 0.15, size = "small", offset_y = 0.4, scale = 0.5, nofx = nil,
             -- anim = {
             --     bank = nil, build = nil,
-            --     anim = nil, isloop_anim = nil, animpush = nil, isloop_animpush = nil,
+            --     anim = nil, animpush = nil, isloop = nil
             -- },
             -- fn_anim = function(inst)end, --处于水中时的动画设置，替换anim的默认方式
-        },
+        }
     },
     ]]--
 
@@ -384,8 +384,8 @@ _G.SKIN_PREFABS_LEGION = {
         image = { name = nil, atlas = nil, setable = true },
         anim = {
             bank = nil, build = nil,
-            anim = nil, isloop_anim = nil, animpush = nil, isloop_animpush = nil,
-            setable = true,
+            anim = nil, animpush = nil, isloop = nil,
+            setable = true
         },
         equip = {
             symbol = "swap_object", build = "swap_rosorns", file = "swap_rosorns"
@@ -400,8 +400,8 @@ _G.SKIN_PREFABS_LEGION = {
         image = { name = nil, atlas = nil, setable = true },
         anim = {
             bank = nil, build = nil,
-            anim = nil, isloop_anim = nil, animpush = nil, isloop_animpush = nil,
-            setable = true,
+            anim = nil, animpush = nil, isloop = nil,
+            setable = true
         },
         equip = {
             symbol = "swap_object", build = "swap_lileaves", file = "swap_lileaves"
@@ -416,8 +416,8 @@ _G.SKIN_PREFABS_LEGION = {
         image = { name = nil, atlas = nil, setable = true },
         anim = {
             bank = nil, build = nil,
-            anim = nil, isloop_anim = nil, animpush = nil, isloop_animpush = nil,
-            setable = true,
+            anim = nil, animpush = nil, isloop = nil,
+            setable = true
         },
         equip = {
             symbol = "swap_object", build = "swap_orchitwigs", file = "swap_orchitwigs",
@@ -433,8 +433,8 @@ _G.SKIN_PREFABS_LEGION = {
         image = { name = nil, atlas = nil, setable = false },
         anim = {
             bank = nil, build = nil,
-            anim = nil, isloop_anim = nil, animpush = nil, isloop_animpush = nil,
-            setable = true,
+            anim = nil, animpush = nil, isloop = nil,
+            setable = true
         },
         fn_start = function(inst)
             if inst.hasSetBroken then
@@ -467,7 +467,7 @@ _G.SKIN_PREFABS_LEGION = {
         image = { name = nil, atlas = nil, setable = true },
         anim = {
             bank = nil, build = nil,
-            anim = "anim", isloop_anim = nil, animpush = nil, isloop_animpush = nil,
+            anim = "anim", animpush = nil, isloop = nil,
             setable = true
         },
         equip = { symbol = "swap_hat", build = "hat_lichen", file = "swap_hat", isopenhat = true },
@@ -482,8 +482,8 @@ _G.SKIN_PREFABS_LEGION = {
         image = { name = nil, atlas = nil, setable = true },
         anim = {
             bank = nil, build = nil,
-            anim = "anim", isloop_anim = nil, animpush = nil, isloop_animpush = nil,
-            setable = true,
+            anim = "anim", animpush = nil, isloop = nil,
+            setable = true
         },
         equip = { symbol = "swap_hat", build = "hat_cowboy", file = "swap_hat" },
         exchangefx = { prefab = nil, offset_y = nil, scale = nil },
@@ -497,7 +497,7 @@ _G.SKIN_PREFABS_LEGION = {
         image = { name = nil, atlas = nil, setable = true },
         anim = {
             bank = nil, build = nil,
-            anim = "anim", isloop_anim = nil, animpush = nil, isloop_animpush = nil,
+            anim = "anim", animpush = nil, isloop = nil,
             setable = true
         },
         fn_start = function(inst)
@@ -515,8 +515,8 @@ _G.SKIN_PREFABS_LEGION = {
         image = { name = nil, atlas = nil, setable = true },
         anim = {
             bank = "swap_boltwingout", build = "swap_boltwingout",
-            anim = "idle", isloop_anim = nil, animpush = nil, isloop_animpush = nil,
-            setable = true,
+            anim = nil, animpush = nil, isloop = nil,
+            setable = true
         },
         equip = { symbol = "swap_body", build = "swap_boltwingout", file = "swap_body" },
         boltdata = { fx = "boltwingout_fx", build = nil },
@@ -531,8 +531,8 @@ _G.SKIN_PREFABS_LEGION = {
         image = { name = nil, atlas = nil, setable = true },
         anim = {
             bank = nil, build = nil,
-            anim = nil, isloop_anim = nil, animpush = nil, isloop_animpush = nil,
-            setable = true,
+            anim = nil, animpush = nil, isloop = nil,
+            setable = true
         },
         fn_start = function(inst)
             inst.components.bundlemaker:SetSkinData()
@@ -545,8 +545,8 @@ _G.SKIN_PREFABS_LEGION = {
         image = { name = nil, atlas = nil, setable = true },
         anim = {
             bank = nil, build = nil,
-            anim = nil, isloop_anim = nil, animpush = nil, isloop_animpush = nil,
-            setable = true,
+            anim = nil, animpush = nil, isloop = nil,
+            setable = true
         },
         fn_start = function(inst)
             inst.components.bundlemaker:SetSkinData()
@@ -597,8 +597,8 @@ _G.SKIN_PREFABS_LEGION = {
         image = { name = nil, atlas = nil, setable = true },
         anim = {
             bank = "shield_l_log", build = "shield_l_log",
-            anim = "idle", isloop_anim = nil, animpush = nil, isloop_animpush = nil,
-            setable = true,
+            anim = nil, animpush = nil, isloop = nil,
+            setable = true
         },
         equip = { symbol = nil, build = "shield_l_log", file = "swap_shield" },
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.7 },
@@ -611,8 +611,8 @@ _G.SKIN_PREFABS_LEGION = {
         image = { name = nil, atlas = nil, setable = true },
         anim = {
             bank = "shield_l_sand", build = "shield_l_sand",
-            anim = "idle", isloop_anim = nil, animpush = nil, isloop_animpush = nil,
-            setable = true,
+            anim = nil, animpush = nil, isloop = nil,
+            setable = true
         },
         equip = { symbol = nil, build = "shield_l_sand", file = "swap_shield" },
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
@@ -634,8 +634,8 @@ _G.SKIN_PREFABS_LEGION = {
         image = { name = nil, atlas = nil, setable = true },
         anim = {
             bank = nil, build = nil,
-            anim = nil, isloop_anim = nil, animpush = nil, isloop_animpush = nil,
-            setable = true,
+            anim = nil, animpush = nil, isloop = nil,
+            setable = true
         },
         equip = {
             symbol = "swap_object", build = "tripleshovelaxe", file = "swap"
@@ -643,23 +643,21 @@ _G.SKIN_PREFABS_LEGION = {
         exchangefx = { prefab = nil, offset_y = nil, scale = nil },
         floater = {
             cut = nil, size = "med", offset_y = 0.15, scale = 0.4, nofx = nil,
-        },
+        }
     },
     triplegoldenshovelaxe = {
         assets = nil,
         image = { name = nil, atlas = nil, setable = true },
         anim = {
             bank = nil, build = nil,
-            anim = nil, isloop_anim = nil, animpush = nil, isloop_animpush = nil,
-            setable = true,
+            anim = nil, animpush = nil, isloop = nil,
+            setable = true
         },
         equip = {
             symbol = "swap_object", build = "triplegoldenshovelaxe", file = "swap"
         },
         exchangefx = { prefab = nil, offset_y = nil, scale = nil },
-        floater = {
-            cut = nil, size = "med", offset_y = 0.15, scale = 0.4, nofx = nil,
-        },
+        floater = { cut = nil, size = "med", offset_y = 0.15, scale = 0.4, nofx = nil }
     },
 
     backcub = {
@@ -667,8 +665,8 @@ _G.SKIN_PREFABS_LEGION = {
         image = { name = nil, atlas = nil, setable = true },
         anim = {
             bank = "backcub", build = "backcub",
-            anim = "anim", isloop_anim = true, animpush = nil, isloop_animpush = nil,
-            setable = true,
+            anim = "anim", animpush = nil, isloop = true,
+            setable = true
         },
         equip = { symbol = "swap_body", build = "swap_backcub", file = "swap_body" },
         exchangefx = { prefab = nil, offset_y = nil, scale = nil },
@@ -676,7 +674,7 @@ _G.SKIN_PREFABS_LEGION = {
             cut = nil, size = nil, offset_y = nil, scale = nil, nofx = true,
             anim = {
                 bank = "backcub", build = "backcub",
-                anim = "anim_water", isloop_anim = true, animpush = nil, isloop_animpush = nil,
+                anim = "anim_water", animpush = nil, isloop = true
             }
         }
     },
@@ -686,16 +684,14 @@ _G.SKIN_PREFABS_LEGION = {
         image = { name = nil, atlas = nil, setable = true },
         anim = {
             bank = "boomerang", build = nil,
-            anim = nil, isloop_anim = nil, animpush = nil, isloop_animpush = nil,
+            anim = nil, animpush = nil, isloop = nil,
             setable = true
         },
         equip = {
             symbol = "swap_object", build = "fimbul_axe", file = "swap_base"
         },
         exchangefx = { prefab = nil, offset_y = nil, scale = nil },
-        floater = {
-            cut = 0.1, size = "med", offset_y = 0.3, scale = 0.5, nofx = nil
-        }
+        floater = { cut = 0.1, size = "med", offset_y = 0.3, scale = 0.5, nofx = nil }
     },
 
     siving_derivant = {
@@ -722,7 +718,7 @@ _G.SKIN_PREFABS_LEGION = {
     carpet_whitewood = {
         anim = {
             bank = "carpet_whitewood", build = "carpet_whitewood",
-            anim = "idle", isloop_anim = nil, animpush = nil, isloop_animpush = nil,
+            anim = nil, animpush = nil, isloop = nil,
             setable = true
         },
         exchangefx = { prefab = nil, offset_y = nil, scale = nil }
@@ -730,7 +726,7 @@ _G.SKIN_PREFABS_LEGION = {
     carpet_whitewood_big = {
         anim = {
             bank = "carpet_whitewood", build = "carpet_whitewood",
-            anim = "idle_big", isloop_anim = nil, animpush = nil, isloop_animpush = nil,
+            anim = "idle_big", animpush = nil, isloop = nil,
             setable = true
         },
         exchangefx = { prefab = nil, offset_y = nil, scale = nil }
@@ -750,7 +746,7 @@ _G.SKIN_PREFABS_LEGION = {
         image = { name = nil, atlas = nil, setable = true },
         anim = {
             bank = nil, build = nil,
-            anim = nil, isloop_anim = nil, animpush = nil, isloop_animpush = nil,
+            anim = nil, animpush = nil, isloop = nil,
             setable = true
         },
         equip = {
@@ -763,7 +759,7 @@ _G.SKIN_PREFABS_LEGION = {
         image = { name = nil, atlas = nil, setable = true },
         anim = {
             bank = nil, build = nil,
-            anim = nil, isloop_anim = nil, animpush = nil, isloop_animpush = nil,
+            anim = nil, animpush = nil, isloop = nil,
             setable = true
         },
         equip = {
@@ -777,7 +773,7 @@ _G.SKIN_PREFABS_LEGION = {
         image = { name = nil, atlas = nil, setable = true },
         anim = {
             bank = "revolvedmoonlight", build = "revolvedmoonlight",
-            anim = "idle_item", isloop_anim = nil, animpush = nil, isloop_animpush = nil,
+            anim = "idle_item", animpush = nil, isloop = nil,
             setable = true
         },
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
@@ -812,6 +808,99 @@ _G.SKIN_PREFABS_LEGION = {
         end,
         exchangefx = { prefab = nil, offset_y = nil, scale = 1.5 }
     },
+
+    siving_ctlwater_item = {
+        assets = nil,
+        image = { name = nil, atlas = nil, setable = true },
+        anim = {
+            bank = "siving_ctlwater", build = "siving_ctlwater",
+            anim = "item", animpush = nil, isloop = nil, setable = true
+        },
+        exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 }
+    },
+    siving_ctlwater = {
+        assets = nil,
+        fn_start = function(inst)
+            inst.AnimState:SetBank("siving_ctlwater")
+            inst.AnimState:SetBuild("siving_ctlwater")
+            inst.barsets_l = {
+                siv_bar = {
+                    x = 0, y = -180, z = 0, scale = nil,
+                    bank = "siving_ctlwater", build = "siving_ctlwater", anim = "bar"
+                }
+            }
+            inst:UpdateBars_l()
+        end,
+        exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 }
+    },
+    siving_ctldirt_item = {
+        assets = nil,
+        image = { name = nil, atlas = nil, setable = true },
+        anim = {
+            bank = "siving_ctldirt", build = "siving_ctldirt",
+            anim = "item", animpush = nil, isloop = nil, setable = true
+        },
+        exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 }
+    },
+    siving_ctldirt = {
+        assets = nil,
+        fn_start = function(inst)
+            inst.AnimState:SetBank("siving_ctldirt")
+            inst.AnimState:SetBuild("siving_ctldirt")
+            inst.barsets_l = {
+                siv_bar1 = {
+                    x = -48, y = -140, z = 0, scale = nil,
+                    bank = "siving_ctldirt", build = "siving_ctldirt", anim = "bar1"
+                },
+                siv_bar2 = {
+                    x = -5, y = -140, z = 0, scale = nil,
+                    bank = "siving_ctldirt", build = "siving_ctldirt", anim = "bar2"
+                },
+                siv_bar3 = {
+                    x = 39, y = -140, z = 0, scale = nil,
+                    bank = "siving_ctldirt", build = "siving_ctldirt", anim = "bar3"
+                }
+            }
+            inst:UpdateBars_l()
+        end,
+        exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 }
+    },
+    siving_ctlall_item = {
+        assets = nil,
+        image = { name = nil, atlas = nil, setable = true },
+        anim = {
+            bank = "siving_ctlall", build = "siving_ctlall",
+            anim = "item", animpush = nil, isloop = nil, setable = true
+        },
+        exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 }
+    },
+    siving_ctlall = {
+        assets = nil,
+        fn_start = function(inst)
+            inst.AnimState:SetBank("siving_ctlall")
+            inst.AnimState:SetBuild("siving_ctlall")
+            inst.barsets_l = {
+                siv_bar1 = {
+                    x = -53, y = -335, z = 0, scale = nil,
+                    bank = "siving_ctldirt", build = "siving_ctldirt", anim = "bar1"
+                },
+                siv_bar2 = {
+                    x = -10, y = -360, z = 0, scale = nil,
+                    bank = "siving_ctldirt", build = "siving_ctldirt", anim = "bar2"
+                },
+                siv_bar3 = {
+                    x = 34, y = -335, z = 0, scale = nil,
+                    bank = "siving_ctldirt", build = "siving_ctldirt", anim = "bar3"
+                },
+                siv_bar4 = {
+                    x = -10, y = -297, z = 0, scale = nil,
+                    bank = "siving_ctlwater", build = "siving_ctlwater", anim = "bar"
+                }
+            }
+            inst:UpdateBars_l()
+        end,
+        exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 }
+    },
 }
 
 _G.SKINS_LEGION = {
@@ -831,7 +920,7 @@ _G.SKINS_LEGION = {
 		assets = { --仅仅是用于初始化注册
 			Asset("ANIM", "anim/skin/swap_spear_mirrorrose.zip"),
 			Asset("ANIM", "anim/skin/spear_mirrorrose.zip"),
-            Asset("ANIM", "anim/skin/rosorns_spell.zip"),
+            Asset("ANIM", "anim/skin/rosorns_spell.zip")
 		},
 		image = { name = nil, atlas = nil, setable = true }, --提前注册，或者皮肤初始化使用
 
@@ -847,8 +936,8 @@ _G.SKINS_LEGION = {
 
 		anim = { --皮肤初始化使用
             bank = "spear_mirrorrose", build = "spear_mirrorrose",
-            anim = nil, isloop_anim = nil, animpush = nil, isloop_animpush = nil,
-            setable = true,
+            anim = nil, animpush = nil, isloop = nil,
+            setable = true
         },
         -- fn_anim = function(inst)end, --处于地面时的动画设置，替换anim的默认方式
 
@@ -876,7 +965,7 @@ _G.SKINS_LEGION = {
             cut = 0.15, size = "small", offset_y = 0.4, scale = 0.5, nofx = nil,
             -- anim = {
             --     bank = nil, build = nil,
-            --     anim = nil, isloop_anim = nil, animpush = nil, isloop_animpush = nil,
+            --     anim = nil, animpush = nil, isloop = nil
             -- },
             -- fn_anim = function(inst)end, --处于水中时的动画设置，替换anim的默认方式
         },
@@ -917,7 +1006,7 @@ _G.SKINS_LEGION = {
 		assets = {
 			Asset("ANIM", "anim/skin/rosorns_marble.zip"),
             Asset("ATLAS", "images/inventoryimages_skin/foliageath_rosorns_marble.xml"),
-            Asset("IMAGE", "images/inventoryimages_skin/foliageath_rosorns_marble.tex"),
+            Asset("IMAGE", "images/inventoryimages_skin/foliageath_rosorns_marble.tex")
 		},
         image = { name = nil, atlas = nil, setable = true },
 
@@ -925,12 +1014,10 @@ _G.SKINS_LEGION = {
 
 		anim = {
             bank = nil, build = nil,
-            anim = nil, isloop_anim = true, animpush = nil, isloop_animpush = nil,
-            setable = true,
+            anim = nil, animpush = nil, isloop = true,
+            setable = true
         },
-        equip = {
-            symbol = "swap_object", build = "rosorns_marble", file = "swap_object"
-        },
+        equip = { symbol = "swap_object", build = "rosorns_marble", file = "swap_object" },
         fn_onAttack = function(inst, owner, target)
             local fx = SpawnPrefab("rosorns_marble_fx")
             if fx ~= nil then
@@ -939,12 +1026,10 @@ _G.SKINS_LEGION = {
         end,
         scabbard = {
             anim = "idle_cover", isloop = true, bank = "rosorns_marble", build = "rosorns_marble",
-            image = "foliageath_rosorns_marble", atlas = "images/inventoryimages_skin/foliageath_rosorns_marble.xml",
+            image = "foliageath_rosorns_marble", atlas = "images/inventoryimages_skin/foliageath_rosorns_marble.xml"
         },
         exchangefx = { prefab = nil, offset_y = nil, scale = nil },
-        floater = {
-            cut = 0.15, size = "small", offset_y = 0.4, scale = 0.5, nofx = nil,
-        },
+        floater = { cut = 0.15, size = "small", offset_y = 0.4, scale = 0.5, nofx = nil }
     },
     lilybush_marble = {
         base_prefab = "lilybush",
@@ -978,7 +1063,7 @@ _G.SKINS_LEGION = {
 		assets = {
 			Asset("ANIM", "anim/skin/lileaves_marble.zip"),
             Asset("ATLAS", "images/inventoryimages_skin/foliageath_lileaves_marble.xml"),
-            Asset("IMAGE", "images/inventoryimages_skin/foliageath_lileaves_marble.tex"),
+            Asset("IMAGE", "images/inventoryimages_skin/foliageath_lileaves_marble.tex")
 		},
         image = { name = nil, atlas = nil, setable = true },
 
@@ -986,20 +1071,16 @@ _G.SKINS_LEGION = {
 
 		anim = {
             bank = nil, build = nil,
-            anim = nil, isloop_anim = nil, animpush = nil, isloop_animpush = nil,
-            setable = true,
+            anim = nil, animpush = nil, isloop = nil,
+            setable = true
         },
-        equip = {
-            symbol = "swap_object", build = "lileaves_marble", file = "swap_object"
-        },
+        equip = { symbol = "swap_object", build = "lileaves_marble", file = "swap_object" },
         scabbard = {
             anim = "idle_cover", isloop = nil, bank = "lileaves_marble", build = "lileaves_marble",
-            image = "foliageath_lileaves_marble", atlas = "images/inventoryimages_skin/foliageath_lileaves_marble.xml",
+            image = "foliageath_lileaves_marble", atlas = "images/inventoryimages_skin/foliageath_lileaves_marble.xml"
         },
         exchangefx = { prefab = nil, offset_y = nil, scale = nil },
-        floater = {
-            cut = 0.15, size = "small", offset_y = 0.4, scale = 0.6, nofx = nil,
-        },
+        floater = { cut = 0.15, size = "small", offset_y = 0.4, scale = 0.6, nofx = nil }
     },
     orchidbush_marble = {
         base_prefab = "orchidbush",
@@ -1033,7 +1114,7 @@ _G.SKINS_LEGION = {
 		assets = {
 			Asset("ANIM", "anim/skin/orchitwigs_marble.zip"),
             Asset("ATLAS", "images/inventoryimages_skin/foliageath_orchitwigs_marble.xml"),
-            Asset("IMAGE", "images/inventoryimages_skin/foliageath_orchitwigs_marble.tex"),
+            Asset("IMAGE", "images/inventoryimages_skin/foliageath_orchitwigs_marble.tex")
 		},
         image = { name = nil, atlas = nil, setable = true },
 
@@ -1041,8 +1122,8 @@ _G.SKINS_LEGION = {
 
 		anim = {
             bank = nil, build = nil,
-            anim = nil, isloop_anim = nil, animpush = nil, isloop_animpush = nil,
-            setable = true,
+            anim = nil, animpush = nil, isloop = nil,
+            setable = true
         },
         equip = {
             symbol = "swap_object", build = "orchitwigs_marble", file = "swap_object",
@@ -1053,9 +1134,7 @@ _G.SKINS_LEGION = {
             image = "foliageath_orchitwigs_marble", atlas = "images/inventoryimages_skin/foliageath_orchitwigs_marble.xml",
         },
         exchangefx = { prefab = nil, offset_y = nil, scale = nil },
-        floater = {
-            cut = 0.05, size = "small", offset_y = 0.15, scale = 0.5, nofx = nil,
-        },
+        floater = { cut = 0.05, size = "small", offset_y = 0.15, scale = 0.5, nofx = nil }
     },
 
     orchidbush_disguiser = {
@@ -1090,7 +1169,7 @@ _G.SKINS_LEGION = {
 		assets = {
 			Asset("ANIM", "anim/skin/orchitwigs_disguiser.zip"),
             Asset("ATLAS", "images/inventoryimages_skin/foliageath_orchitwigs_disguiser.xml"),
-            Asset("IMAGE", "images/inventoryimages_skin/foliageath_orchitwigs_disguiser.tex"),
+            Asset("IMAGE", "images/inventoryimages_skin/foliageath_orchitwigs_disguiser.tex")
 		},
         image = { name = nil, atlas = nil, setable = true },
 
@@ -1098,21 +1177,19 @@ _G.SKINS_LEGION = {
 
 		anim = {
             bank = nil, build = nil,
-            anim = nil, isloop_anim = nil, animpush = nil, isloop_animpush = nil,
-            setable = true,
+            anim = nil, animpush = nil, isloop = nil,
+            setable = true
         },
         equip = {
             symbol = "swap_object", build = "orchitwigs_disguiser", file = "swap_object",
-            atkfx = "impact_orchid_fx_disguiser",
+            atkfx = "impact_orchid_fx_disguiser"
         },
         scabbard = {
             anim = "idle_cover", isloop = nil, bank = "orchitwigs_disguiser", build = "orchitwigs_disguiser",
-            image = "foliageath_orchitwigs_disguiser", atlas = "images/inventoryimages_skin/foliageath_orchitwigs_disguiser.xml",
+            image = "foliageath_orchitwigs_disguiser", atlas = "images/inventoryimages_skin/foliageath_orchitwigs_disguiser.xml"
         },
         exchangefx = { prefab = nil, offset_y = nil, scale = nil },
-        floater = {
-            cut = 0.05, size = "small", offset_y = 0.15, scale = 0.5, nofx = nil,
-        },
+        floater = { cut = 0.05, size = "small", offset_y = 0.15, scale = 0.5, nofx = nil }
     },
 
     neverfade_thanks = {
@@ -1135,7 +1212,7 @@ _G.SKINS_LEGION = {
 
 		anim = {
             bank = nil, build = nil,
-            anim = nil, isloop_anim = nil, animpush = nil, isloop_animpush = nil,
+            anim = nil, animpush = nil, isloop = nil,
             setable = true
         },
         fn_start = function(inst)
@@ -1153,13 +1230,11 @@ _G.SKINS_LEGION = {
         },
         scabbard = {
             anim = "idle_cover", isloop = nil, bank = "neverfade_thanks", build = "neverfade_thanks",
-            image = "foliageath_neverfade_thanks", atlas = "images/inventoryimages_skin/foliageath_neverfade_thanks.xml",
+            image = "foliageath_neverfade_thanks", atlas = "images/inventoryimages_skin/foliageath_neverfade_thanks.xml"
         },
         butterfly = { bank = "butterfly", build = "neverfade_butterfly_thanks" },
         exchangefx = { prefab = nil, offset_y = nil, scale = nil },
-        floater = {
-            cut = 0.05, size = "small", offset_y = 0.15, scale = 0.5, nofx = nil,
-        },
+        floater = { cut = 0.05, size = "small", offset_y = 0.15, scale = 0.5, nofx = nil },
         linkedskins = { bush = "neverfadebush_thanks" },
         fn_placer = function(inst)
             inst.AnimState:SetBank("neverfadebush_thanks")
@@ -1337,7 +1412,7 @@ _G.SKINS_LEGION = {
 
         skin_id = "61909c584c724c6f40e779fa",
 		assets = {
-			Asset("ANIM", "anim/skin/hat_lichen_emo_que.zip"),
+			Asset("ANIM", "anim/skin/hat_lichen_emo_que.zip")
 		},
 		image = { name = nil, atlas = nil, setable = true },
 
@@ -1345,14 +1420,12 @@ _G.SKINS_LEGION = {
 
 		anim = {
             bank = nil, build = nil,
-            anim = nil, isloop_anim = nil, animpush = nil, isloop_animpush = nil,
-            setable = true,
+            anim = nil, animpush = nil, isloop = nil,
+            setable = true
         },
         equip = { symbol = "swap_hat", build = "hat_lichen_emo_que", file = "swap_hat", isopenhat = true },
         exchangefx = { prefab = nil, offset_y = nil, scale = nil },
-        floater = {
-            cut = 0.03, size = "small", offset_y = 0.15, scale = 0.5, nofx = nil,
-        },
+        floater = { cut = 0.03, size = "small", offset_y = 0.15, scale = 0.5, nofx = nil }
     },
     hat_lichen_disguiser = {
         base_prefab = "hat_lichen",
@@ -1360,7 +1433,7 @@ _G.SKINS_LEGION = {
 
         skin_id = "notnononl", --61f15bf4db102b0b8a529c66
 		assets = {
-			Asset("ANIM", "anim/skin/hat_lichen_disguiser.zip"),
+			Asset("ANIM", "anim/skin/hat_lichen_disguiser.zip")
 		},
 		image = { name = nil, atlas = nil, setable = true },
 
@@ -1368,17 +1441,15 @@ _G.SKINS_LEGION = {
 
 		anim = {
             bank = nil, build = nil,
-            anim = nil, isloop_anim = nil, animpush = nil, isloop_animpush = nil,
-            setable = true,
+            anim = nil, animpush = nil, isloop = nil,
+            setable = true
         },
         equip = {
             symbol = "swap_hat", build = "hat_lichen_disguiser", file = "swap_hat",
             isopenhat = false, lightcolor = { r = 0, g = 1, b = 1 }
         },
         exchangefx = { prefab = nil, offset_y = nil, scale = nil },
-        floater = {
-            cut = 0.03, size = "med", offset_y = 0.2, scale = 0.7, nofx = nil,
-        },
+        floater = { cut = 0.03, size = "med", offset_y = 0.2, scale = 0.7, nofx = nil }
     },
 
     hat_cowboy_tvplay = {
@@ -1395,14 +1466,12 @@ _G.SKINS_LEGION = {
 
 		anim = {
             bank = nil, build = nil,
-            anim = nil, isloop_anim = nil, animpush = nil, isloop_animpush = nil,
-            setable = true,
+            anim = nil, animpush = nil, isloop = nil,
+            setable = true
         },
         equip = { symbol = "swap_hat", build = "hat_cowboy_tvplay", file = "swap_hat" },
         exchangefx = { prefab = nil, offset_y = nil, scale = nil },
-        floater = {
-            cut = 0.03, size = "med", offset_y = 0.2, scale = 0.8, nofx = nil,
-        },
+        floater = { cut = 0.03, size = "med", offset_y = 0.2, scale = 0.8, nofx = nil }
     },
     pinkstaff_tvplay = {
         base_prefab = "pinkstaff",
@@ -1418,16 +1487,14 @@ _G.SKINS_LEGION = {
 
 		anim = {
             bank = nil, build = nil,
-            anim = nil, isloop_anim = nil, animpush = nil, isloop_animpush = nil,
+            anim = nil, animpush = nil, isloop = nil,
             setable = true
         },
         fn_start = function(inst)
             inst.fxcolour = {115/255, 217/255, 255/255}
         end,
         fn_end = EndFollowedFx,
-        equip = {
-            symbol = "swap_object", build = "pinkstaff_tvplay", file = "swap_object"
-        },
+        equip = { symbol = "swap_object", build = "pinkstaff_tvplay", file = "swap_object" },
         equipfx = {
             start = function(inst, owner)
                 SetFollowedFx(inst, owner, "pinkstaff_fx_tvplay", "swap_object", 0, -140)
@@ -1445,7 +1512,7 @@ _G.SKINS_LEGION = {
         skin_id = "61c57daadb102b0b8a50ae95",
 		assets = {
 			Asset("ANIM", "anim/skin/boltwingout_disguiser.zip"),
-            Asset("ANIM", "anim/skin/boltwingout_shuck_disguiser.zip"),
+            Asset("ANIM", "anim/skin/boltwingout_shuck_disguiser.zip")
 		},
 		image = { name = nil, atlas = nil, setable = true },
 
@@ -1453,15 +1520,13 @@ _G.SKINS_LEGION = {
 
 		anim = {
             bank = nil, build = nil,
-            anim = nil, isloop_anim = nil, animpush = nil, isloop_animpush = nil,
-            setable = true,
+            anim = nil, animpush = nil, isloop = nil,
+            setable = true
         },
         equip = { symbol = "swap_body", build = "boltwingout_disguiser", file = "swap_body" },
         boltdata = { fx = "boltwingout_fx_disguiser", build = "boltwingout_shuck_disguiser" },
         exchangefx = { prefab = nil, offset_y = nil, scale = nil },
-        floater = {
-            cut = nil, size = "med", offset_y = 0.1, scale = 0.8, nofx = nil,
-        },
+        floater = { cut = nil, size = "med", offset_y = 0.1, scale = 0.8, nofx = nil }
     },
 
     fishhomingtool_awesome_thanks = {
@@ -1479,14 +1544,14 @@ _G.SKINS_LEGION = {
 
         anim = {
             bank = nil, build = nil,
-            anim = nil, isloop_anim = nil, animpush = nil, isloop_animpush = nil,
-            setable = true,
+            anim = nil, animpush = nil, isloop = nil,
+            setable = true
         },
         fn_start = function(inst)
             inst.components.bundlemaker:SetSkinData("fishhomingbait_thanks", nil)
         end,
         equip = { symbol = "swap_object", build = "fishhomingtool_awesome_thanks", file = "swap" },
-        exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
+        exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 }
     },
     fishhomingtool_normal_thanks = {
         base_prefab = "fishhomingtool_normal",
@@ -1505,13 +1570,13 @@ _G.SKINS_LEGION = {
 
         anim = {
             bank = nil, build = nil,
-            anim = nil, isloop_anim = nil, animpush = nil, isloop_animpush = nil,
-            setable = true,
+            anim = nil, animpush = nil, isloop = nil,
+            setable = true
         },
         fn_start = function(inst)
             inst.components.bundlemaker:SetSkinData("fishhomingbait_thanks", nil)
         end,
-        exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
+        exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 }
     },
     fishhomingbait_thanks = {
         base_prefab = "fishhomingbait",
@@ -1574,16 +1639,12 @@ _G.SKINS_LEGION = {
 
         anim = {
             bank = nil, build = nil,
-            anim = nil, isloop_anim = nil, animpush = nil, isloop_animpush = nil,
-            setable = true,
+            anim = nil, animpush = nil, isloop = nil,
+            setable = true
         },
-        equip = {
-            symbol = "lantern_overlay", build = "shield_l_log_emo_pride", file = "swap_shield"
-        },
+        equip = { symbol = "lantern_overlay", build = "shield_l_log_emo_pride", file = "swap_shield" },
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.7 },
-        floater = {
-            cut = nil, size = "small", offset_y = 0.2, scale = 0.9, nofx = nil,
-        },
+        floater = { cut = nil, size = "small", offset_y = 0.2, scale = 0.9, nofx = nil },
 
         fn_start = function(inst)
             FxInit(inst, {"fx_ranimbowspark"}, -10)
@@ -1597,7 +1658,7 @@ _G.SKINS_LEGION = {
         skin_id = "629b0d278c2f781db2f77ef8",
         onlyownedshow = true,
 		assets = {
-			Asset("ANIM", "anim/skin/shield_l_log_emo_fist.zip"),
+			Asset("ANIM", "anim/skin/shield_l_log_emo_fist.zip")
 		},
 		image = { name = nil, atlas = nil, setable = true },
 
@@ -1605,16 +1666,14 @@ _G.SKINS_LEGION = {
 
         anim = {
             bank = nil, build = nil,
-            anim = nil, isloop_anim = nil, animpush = nil, isloop_animpush = nil,
-            setable = true,
+            anim = nil, animpush = nil, isloop = nil,
+            setable = true
         },
         equip = {
             symbol = "lantern_overlay", build = "shield_l_log_emo_fist", file = "swap_shield"
         },
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.6 },
-        floater = {
-            cut = nil, size = "small", offset_y = 0.2, scale = 0.8, nofx = nil,
-        },
+        floater = { cut = nil, size = "small", offset_y = 0.2, scale = 0.8, nofx = nil }
     },
     shield_l_log_era = {
         base_prefab = "shield_l_log",
@@ -1623,7 +1682,7 @@ _G.SKINS_LEGION = {
         skin_id = "629b0d088c2f781db2f77ef4",
         onlyownedshow = true,
 		assets = {
-			Asset("ANIM", "anim/skin/shield_l_log_era.zip"),
+			Asset("ANIM", "anim/skin/shield_l_log_era.zip")
 		},
 		image = { name = nil, atlas = nil, setable = true },
 
@@ -1631,16 +1690,12 @@ _G.SKINS_LEGION = {
 
         anim = {
             bank = nil, build = nil,
-            anim = nil, isloop_anim = nil, animpush = nil, isloop_animpush = nil,
-            setable = true,
+            anim = nil, animpush = nil, isloop = nil,
+            setable = true
         },
-        equip = {
-            symbol = "lantern_overlay", build = "shield_l_log_era", file = "swap_shield"
-        },
+        equip = { symbol = "lantern_overlay", build = "shield_l_log_era", file = "swap_shield" },
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.7 },
-        floater = {
-            cut = nil, size = "small", offset_y = 0.2, scale = 0.8, nofx = nil,
-        },
+        floater = { cut = nil, size = "small", offset_y = 0.2, scale = 0.8, nofx = nil }
     },
 
     shield_l_sand_era = {
@@ -1650,7 +1705,7 @@ _G.SKINS_LEGION = {
         skin_id = "62845917c340bf24ab311969",
         onlyownedshow = true,
 		assets = {
-			Asset("ANIM", "anim/skin/shield_l_sand_era.zip"),
+			Asset("ANIM", "anim/skin/shield_l_sand_era.zip")
 		},
 		image = { name = nil, atlas = nil, setable = true },
 
@@ -1658,13 +1713,11 @@ _G.SKINS_LEGION = {
 
         anim = {
             bank = nil, build = nil,
-            anim = nil, isloop_anim = nil, animpush = nil, isloop_animpush = nil,
-            setable = true,
+            anim = nil, animpush = nil, isloop = nil,
+            setable = true
         },
-        equip = {
-            symbol = "lantern_overlay", build = "shield_l_sand_era", file = "swap_shield"
-        },
-        exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
+        equip = { symbol = "lantern_overlay", build = "shield_l_sand_era", file = "swap_shield" },
+        exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 }
     },
     shield_l_sand_op = {
         base_prefab = "shield_l_sand",
@@ -1672,7 +1725,7 @@ _G.SKINS_LEGION = {
 
         skin_id = "notnononl",
 		assets = {
-			Asset("ANIM", "anim/skin/shield_l_sand_op.zip"),
+			Asset("ANIM", "anim/skin/shield_l_sand_op.zip")
 		},
 		image = { name = nil, atlas = nil, setable = true },
 
@@ -1680,13 +1733,11 @@ _G.SKINS_LEGION = {
 
         anim = {
             bank = nil, build = nil,
-            anim = nil, isloop_anim = nil, animpush = nil, isloop_animpush = nil,
-            setable = true,
+            anim = nil, animpush = nil, isloop = nil,
+            setable = true
         },
-        equip = {
-            symbol = "lantern_overlay", build = "shield_l_sand_op", file = "swap_shield"
-        },
-        exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
+        equip = { symbol = "lantern_overlay", build = "shield_l_sand_op", file = "swap_shield" },
+        exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 }
     },
 
     agronssword_taste = {
@@ -1861,7 +1912,7 @@ _G.SKINS_LEGION = {
 		assets = {
 			Asset("ANIM", "anim/skin/lileaves_era.zip"),
             Asset("ATLAS", "images/inventoryimages_skin/foliageath_lileaves_era.xml"),
-            Asset("IMAGE", "images/inventoryimages_skin/foliageath_lileaves_era.tex"),
+            Asset("IMAGE", "images/inventoryimages_skin/foliageath_lileaves_era.tex")
 		},
         image = { name = nil, atlas = nil, setable = true },
 
@@ -1871,20 +1922,16 @@ _G.SKINS_LEGION = {
 
 		anim = {
             bank = nil, build = nil,
-            anim = nil, isloop_anim = nil, animpush = nil, isloop_animpush = nil,
-            setable = true,
+            anim = nil, animpush = nil, isloop = nil,
+            setable = true
         },
-        equip = {
-            symbol = "swap_object", build = "lileaves_era", file = "swap_object"
-        },
+        equip = { symbol = "swap_object", build = "lileaves_era", file = "swap_object" },
         scabbard = {
             anim = "idle_cover", isloop = nil, bank = "lileaves_era", build = "lileaves_era",
-            image = "foliageath_lileaves_era", atlas = "images/inventoryimages_skin/foliageath_lileaves_era.xml",
+            image = "foliageath_lileaves_era", atlas = "images/inventoryimages_skin/foliageath_lileaves_era.xml"
         },
         exchangefx = { prefab = nil, offset_y = nil, scale = nil },
-        floater = {
-            cut = 0.05, size = "small", offset_y = 0.15, scale = 0.5, nofx = nil,
-        },
+        floater = { cut = 0.05, size = "small", offset_y = 0.15, scale = 0.5, nofx = nil }
     },
 
     triplegoldenshovelaxe_era = {
@@ -1894,7 +1941,7 @@ _G.SKINS_LEGION = {
         skin_id = "629b0d848c2f781db2f77f11",
         onlyownedshow = true,
 		assets = {
-			Asset("ANIM", "anim/skin/triplegoldenshovelaxe_era.zip"),
+			Asset("ANIM", "anim/skin/triplegoldenshovelaxe_era.zip")
 		},
         image = { name = nil, atlas = nil, setable = true },
 
@@ -1902,16 +1949,12 @@ _G.SKINS_LEGION = {
 
 		anim = {
             bank = nil, build = nil,
-            anim = nil, isloop_anim = nil, animpush = nil, isloop_animpush = nil,
-            setable = true,
+            anim = nil, animpush = nil, isloop = nil,
+            setable = true
         },
-        equip = {
-            symbol = "swap_object", build = "triplegoldenshovelaxe_era", file = "swap"
-        },
+        equip = { symbol = "swap_object", build = "triplegoldenshovelaxe_era", file = "swap" },
         exchangefx = { prefab = nil, offset_y = nil, scale = nil },
-        floater = {
-            cut = nil, size = "med", offset_y = 0.15, scale = 0.4, nofx = nil
-        },
+        floater = { cut = nil, size = "med", offset_y = 0.15, scale = 0.4, nofx = nil }
     },
     tripleshovelaxe_era = {
         base_prefab = "tripleshovelaxe",
@@ -1920,7 +1963,7 @@ _G.SKINS_LEGION = {
         skin_id = "629b0d848c2f781db2f77f11",
         noshopshow = true,
 		assets = {
-			Asset("ANIM", "anim/skin/tripleshovelaxe_era.zip"),
+			Asset("ANIM", "anim/skin/tripleshovelaxe_era.zip")
 		},
         image = { name = nil, atlas = nil, setable = true },
 
@@ -1930,16 +1973,12 @@ _G.SKINS_LEGION = {
 
 		anim = {
             bank = nil, build = nil,
-            anim = nil, isloop_anim = nil, animpush = nil, isloop_animpush = nil,
-            setable = true,
+            anim = nil, animpush = nil, isloop = nil,
+            setable = true
         },
-        equip = {
-            symbol = "swap_object", build = "tripleshovelaxe_era", file = "swap"
-        },
+        equip = { symbol = "swap_object", build = "tripleshovelaxe_era", file = "swap" },
         exchangefx = { prefab = nil, offset_y = nil, scale = nil },
-        floater = {
-            cut = nil, size = "med", offset_y = 0.15, scale = 0.4, nofx = nil
-        },
+        floater = { cut = nil, size = "med", offset_y = 0.15, scale = 0.4, nofx = nil }
     },
 
     backcub_fans = {
@@ -1949,7 +1988,7 @@ _G.SKINS_LEGION = {
         skin_id = "629cca398c2f781db2f78092",
         onlyownedshow = true, mustonwedshow = true,
 		assets = {
-			Asset("ANIM", "anim/skin/backcub_fans.zip"),
+			Asset("ANIM", "anim/skin/backcub_fans.zip")
 		},
 		image = { name = nil, atlas = nil, setable = true },
 
@@ -1957,14 +1996,12 @@ _G.SKINS_LEGION = {
 
 		anim = {
             bank = nil, build = nil,
-            anim = nil, isloop_anim = nil, animpush = nil, isloop_animpush = nil,
-            setable = true,
+            anim = nil, animpush = nil, isloop = nil,
+            setable = true
         },
         equip = { symbol = "swap_body", build = "backcub_fans", file = "swap_body" },
         exchangefx = { prefab = nil, offset_y = nil, scale = nil },
-        floater = {
-            cut = nil, size = "med", offset_y = 0.1, scale = 1.1, nofx = nil,
-        },
+        floater = { cut = nil, size = "med", offset_y = 0.1, scale = 1.1, nofx = nil }
     },
     backcub_thanks = {
         base_prefab = "backcub",
@@ -2088,7 +2125,7 @@ _G.SKINS_LEGION = {
 		assets = {
 			Asset("ANIM", "anim/skin/rosorns_collector.zip"),
             Asset("ATLAS", "images/inventoryimages_skin/foliageath_rosorns_collector.xml"),
-            Asset("IMAGE", "images/inventoryimages_skin/foliageath_rosorns_collector.tex"),
+            Asset("IMAGE", "images/inventoryimages_skin/foliageath_rosorns_collector.tex")
 		},
         image = { name = nil, atlas = nil, setable = true },
 
@@ -2098,12 +2135,10 @@ _G.SKINS_LEGION = {
 
 		anim = {
             bank = nil, build = nil,
-            anim = nil, isloop_anim = true, animpush = nil, isloop_animpush = nil,
-            setable = true,
+            anim = nil, animpush = nil, isloop = true,
+            setable = true
         },
-        equip = {
-            symbol = "swap_object", build = "rosorns_collector", file = "swap_object"
-        },
+        equip = { symbol = "swap_object", build = "rosorns_collector", file = "swap_object" },
         fn_onAttack = function(inst, owner, target)
             local fx = SpawnPrefab("rosorns_collector_fx")
             if fx ~= nil then
@@ -2112,12 +2147,10 @@ _G.SKINS_LEGION = {
         end,
         scabbard = {
             anim = "idle_cover", isloop = true, bank = "rosorns_collector", build = "rosorns_collector",
-            image = "foliageath_rosorns_collector", atlas = "images/inventoryimages_skin/foliageath_rosorns_collector.xml",
+            image = "foliageath_rosorns_collector", atlas = "images/inventoryimages_skin/foliageath_rosorns_collector.xml"
         },
         exchangefx = { prefab = nil, offset_y = nil, scale = nil },
-        floater = {
-            nofx = true
-        }
+        floater = { nofx = true }
     },
 
     fimbul_axe_collector = {
@@ -2135,12 +2168,10 @@ _G.SKINS_LEGION = {
 
 		anim = {
             bank = nil, build = nil,
-            anim = nil, isloop_anim = true, animpush = nil, isloop_animpush = nil,
-            setable = true,
+            anim = nil, animpush = nil, isloop = true, --为啥要为true?
+            setable = true
         },
-        equip = {
-            symbol = "swap_object", build = "fimbul_axe_collector", file = "swap_base"
-        },
+        equip = { symbol = "swap_object", build = "fimbul_axe_collector", file = "swap_base" },
         fn_onThrown = function(inst, owner, target)
             if owner:HasTag("player") then
                 owner.AnimState:OverrideSymbol("swap_object", "fimbul_axe_collector", "swap_throw")
@@ -2175,9 +2206,7 @@ _G.SKINS_LEGION = {
             end
         end,
         exchangefx = { prefab = nil, offset_y = nil, scale = nil },
-        floater = {
-            cut = 0.1, size = "med", offset_y = 0.3, scale = 0.4, nofx = nil
-        },
+        floater = { cut = 0.1, size = "med", offset_y = 0.3, scale = 0.4, nofx = nil }
     },
 
     siving_turn_collector = {
@@ -2271,7 +2300,7 @@ _G.SKINS_LEGION = {
 
         anim = {
             bank = "carpet_whitewood_law", build = "carpet_whitewood_law",
-            anim = "idle", isloop_anim = nil, animpush = nil, isloop_animpush = nil,
+            anim = nil, animpush = nil, isloop = nil,
             setable = true
         },
         exchangefx = { prefab = nil, offset_y = nil, scale = nil },
@@ -2295,7 +2324,7 @@ _G.SKINS_LEGION = {
 
         anim = {
             bank = "carpet_whitewood_law", build = "carpet_whitewood_law",
-            anim = "idle_big", isloop_anim = nil, animpush = nil, isloop_animpush = nil,
+            anim = "idle_big", animpush = nil, isloop = nil,
             setable = true
         },
         fn_start = function(inst)
@@ -2326,7 +2355,7 @@ _G.SKINS_LEGION = {
 
         anim = {
             bank = "carpet_whitewood_law2", build = "carpet_whitewood_law2",
-            anim = "idle", isloop_anim = nil, animpush = nil, isloop_animpush = nil,
+            anim = nil, animpush = nil, isloop = nil,
             setable = true
         },
         exchangefx = { prefab = nil, offset_y = nil, scale = nil },
@@ -2350,7 +2379,7 @@ _G.SKINS_LEGION = {
 
         anim = {
             bank = "carpet_whitewood_law2", build = "carpet_whitewood_law2",
-            anim = "idle_big", isloop_anim = nil, animpush = nil, isloop_animpush = nil,
+            anim = "idle_big", animpush = nil, isloop = nil,
             setable = true
         },
         fn_start = function(inst)
@@ -2404,7 +2433,7 @@ _G.SKINS_LEGION = {
 
 		anim = {
             bank = nil, build = nil,
-            anim = nil, isloop_anim = nil, animpush = nil, isloop_animpush = nil,
+            anim = nil, animpush = nil, isloop = nil,
             setable = true
         },
         equip = {
@@ -2429,7 +2458,7 @@ _G.SKINS_LEGION = {
 
 		anim = {
             bank = nil, build = nil,
-            anim = nil, isloop_anim = nil, animpush = nil, isloop_animpush = nil,
+            anim = nil, animpush = nil, isloop = nil,
             setable = true
         },
         equip = {
@@ -2541,7 +2570,7 @@ _G.SKINS_LEGION = {
 
 		anim = {
             bank = nil, build = nil,
-            anim = nil, isloop_anim = nil, animpush = nil, isloop_animpush = nil,
+            anim = nil, animpush = nil, isloop = nil,
             setable = true
         },
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
@@ -2639,7 +2668,7 @@ _G.SKINS_LEGION = {
 
 		anim = {
             bank = nil, build = nil,
-            anim = nil, isloop_anim = nil, animpush = nil, isloop_animpush = nil,
+            anim = nil, animpush = nil, isloop = nil,
             setable = true
         },
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
@@ -2737,7 +2766,7 @@ _G.SKINS_LEGION = {
 
 		anim = {
             bank = nil, build = nil,
-            anim = nil, isloop_anim = nil, animpush = nil, isloop_animpush = nil,
+            anim = nil, animpush = nil, isloop = nil,
             setable = true
         },
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
@@ -2835,7 +2864,7 @@ _G.SKINS_LEGION = {
 
 		anim = {
             bank = nil, build = nil,
-            anim = nil, isloop_anim = nil, animpush = nil, isloop_animpush = nil,
+            anim = nil, animpush = nil, isloop = nil,
             setable = true
         },
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
@@ -2923,6 +2952,7 @@ _G.SKINS_LEGION = {
 		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
 
         skin_id = "6473057469b4f368be45295a",
+        onlyownedshow = true,
 		assets = {
 			Asset("ANIM", "anim/skin/plant_cactus_meat_l_world.zip")
 		},
@@ -2932,12 +2962,166 @@ _G.SKINS_LEGION = {
 		fn_start = function(inst)
             inst.AnimState:SetBank("plant_cactus_meat_l_world")
             inst.AnimState:SetBuild("plant_cactus_meat_l_world")
+            --undo 检查夏天贴图
         end,
         exchangefx = { prefab = nil, offset_y = nil, scale = 1.5 },
         fn_placer = function(inst)
             inst.AnimState:SetBank("plant_cactus_meat_l_world")
             inst.AnimState:SetBuild("plant_cactus_meat_l_world")
         end
+    },
+
+    siving_ctlwater_item_era = {
+        base_prefab = "siving_ctlwater_item",
+		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
+
+        -- skin_id = "629b0d848c2f781db2f77f11",
+        noshopshow = true,
+		assets = {
+			Asset("ANIM", "anim/skin/siving_ctlwater_era.zip")
+		},
+        image = { name = nil, atlas = nil, setable = true },
+
+        string = ischinese and { name = "翻海图腾柱" } or { name = "Surging Sea Totem Pole" },
+
+		anim = {
+            bank = "siving_ctlwater_era", build = "siving_ctlwater_era",
+            anim = "item", animpush = nil, isloop = nil, setable = true
+        },
+        exchangefx = { prefab = nil, offset_y = nil, scale = 1.5 }
+    },
+    siving_ctlwater_era = {
+        base_prefab = "siving_ctlwater",
+		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
+
+        -- skin_id = "646f760769b4f368be4526b4",
+        noshopshow = true,
+		assets = {
+			Asset("ANIM", "anim/skin/siving_ctlwater_era.zip")
+		},
+
+        string = ischinese and { name = "翻海图腾柱" } or { name = "Surging Sea Totem Pole" },
+
+        fn_start = function(inst)
+            inst.AnimState:SetBank("siving_ctlwater_era")
+            inst.AnimState:SetBuild("siving_ctlwater_era")
+            inst.barsets_l = {
+                siv_bar = {
+                    x = 0, y = 0, z = 0, scale = nil, followedsymbol = "tag1",
+                    bank = "siving_ctlwater_era", build = "siving_ctlwater_era", anim = "bar"
+                }
+            }
+            inst:UpdateBars_l()
+        end,
+        exchangefx = { prefab = nil, offset_y = nil, scale = 1.5 }
+    },
+    siving_ctldirt_item_era = {
+        base_prefab = "siving_ctldirt_item",
+		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
+
+        -- skin_id = "629b0d848c2f781db2f77f11",
+        noshopshow = true,
+		assets = {
+			Asset("ANIM", "anim/skin/siving_ctldirt_era.zip")
+		},
+        image = { name = nil, atlas = nil, setable = true },
+
+        string = ischinese and { name = "寻森图腾柱" } or { name = "Seeking Silva Totem Pole" },
+
+		anim = {
+            bank = "siving_ctldirt_era", build = "siving_ctldirt_era",
+            anim = "item", animpush = nil, isloop = nil, setable = true
+        },
+        exchangefx = { prefab = nil, offset_y = nil, scale = 1.5 }
+    },
+    siving_ctldirt_era = {
+        base_prefab = "siving_ctldirt",
+		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
+
+        -- skin_id = "646f760769b4f368be4526b4",
+        noshopshow = true,
+		assets = {
+			Asset("ANIM", "anim/skin/siving_ctldirt_era.zip")
+		},
+
+        string = ischinese and { name = "寻森图腾柱" } or { name = "Seeking Silva Totem Pole" },
+
+        fn_start = function(inst)
+            inst.AnimState:SetBank("siving_ctldirt_era")
+            inst.AnimState:SetBuild("siving_ctldirt_era")
+            inst.barsets_l = {
+                siv_bar1 = {
+                    x = 0, y = 0, z = 0, scale = nil, followedsymbol = "tag1",
+                    bank = "siving_ctldirt_era", build = "siving_ctldirt_era", anim = "bar1"
+                },
+                siv_bar2 = {
+                    x = 0, y = 0, z = 0, scale = nil, followedsymbol = "tag2",
+                    bank = "siving_ctldirt_era", build = "siving_ctldirt_era", anim = "bar2"
+                },
+                siv_bar3 = {
+                    x = 0, y = 0, z = 0, scale = nil, followedsymbol = "tag3",
+                    bank = "siving_ctldirt_era", build = "siving_ctldirt_era", anim = "bar3"
+                }
+            }
+            inst:UpdateBars_l()
+        end,
+        exchangefx = { prefab = nil, offset_y = nil, scale = 1.5 }
+    },
+    siving_ctlall_item_era = {
+        base_prefab = "siving_ctlall_item",
+		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
+
+        -- skin_id = "629b0d848c2f781db2f77f11",
+        noshopshow = true,
+		assets = {
+			Asset("ANIM", "anim/skin/siving_ctlall_era.zip")
+		},
+        image = { name = nil, atlas = nil, setable = true },
+
+        string = ischinese and { name = "耘天图腾柱" } or { name = "Singing Sky Totem Pole" },
+
+		anim = {
+            bank = "siving_ctlall_era", build = "siving_ctlall_era",
+            anim = "item", animpush = nil, isloop = nil, setable = true
+        },
+        exchangefx = { prefab = nil, offset_y = nil, scale = 1.5 }
+    },
+    siving_ctlall_era = {
+        base_prefab = "siving_ctlall",
+		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
+
+        -- skin_id = "646f760769b4f368be4526b4",
+        onlyownedshow = true,
+		assets = {
+			Asset("ANIM", "anim/skin/siving_ctlall_era.zip")
+		},
+
+        string = ischinese and { name = "耘天图腾柱" } or { name = "Singing Sky Totem Pole" },
+
+        fn_start = function(inst)
+            inst.AnimState:SetBank("siving_ctlall_era")
+            inst.AnimState:SetBuild("siving_ctlall_era")
+            inst.barsets_l = {
+                siv_bar1 = {
+                    x = 0, y = 0, z = 0, scale = nil, followedsymbol = "tag1",
+                    bank = "siving_ctlall_era", build = "siving_ctlall_era", anim = "bar1"
+                },
+                siv_bar2 = {
+                    x = 0, y = 0, z = 0, scale = nil, followedsymbol = "tag2",
+                    bank = "siving_ctlall_era", build = "siving_ctlall_era", anim = "bar2"
+                },
+                siv_bar3 = {
+                    x = 0, y = 0, z = 0, scale = nil, followedsymbol = "tag3",
+                    bank = "siving_ctlall_era", build = "siving_ctlall_era", anim = "bar3"
+                },
+                siv_bar4 = {
+                    x = 0, y = 0, z = 0, scale = nil, followedsymbol = "tag4",
+                    bank = "siving_ctlall_era", build = "siving_ctlall_era", anim = "bar4"
+                }
+            }
+            inst:UpdateBars_l()
+        end,
+        exchangefx = { prefab = nil, offset_y = nil, scale = 1.5 }
     },
 }
 
@@ -2947,6 +3131,7 @@ _G.SKIN_IDS_LEGION = {
         siving_derivant_thanks = true, siving_derivant_thanks2 = true, neverfade_thanks = true, neverfadebush_thanks = true, backcub_thanks = true,
         fishhomingtool_awesome_thanks = true, fishhomingtool_normal_thanks = true, fishhomingbait_thanks = true,
         triplegoldenshovelaxe_era = true, tripleshovelaxe_era = true, lilybush_era = true, lileaves_era = true, icire_rock_era = true, shield_l_log_era = true, shield_l_sand_era = true,
+        siving_ctlwater_item_era = true, siving_ctlwater_era = true, siving_ctldirt_item_era = true, siving_ctldirt_era = true, siving_ctlall_item_era = true, siving_ctlall_era = true,
         orchidbush_disguiser = true, boltwingout_disguiser = true, plant_cactus_meat_l_world = true,
         rosebush_marble = true, lilybush_marble = true, orchidbush_marble = true, rosorns_marble = true, lileaves_marble = true, orchitwigs_marble = true,
         shield_l_log_emo_fist = true, hat_lichen_emo_que = true,
@@ -3003,6 +3188,9 @@ _G.SKIN_IDS_LEGION = {
     ["642c14d9f2b67d287a35d439"] = { --5谷丰登
         siving_feather_real_collector = true, siving_feather_fake_collector = true,
         plant_cactus_meat_l_world = true,
+        siving_ctlwater_item_era = true, siving_ctlwater_era = true,
+        siving_ctldirt_item_era = true, siving_ctldirt_era = true,
+        siving_ctlall_item_era = true, siving_ctlall_era = true,
     }
 }
 _G.SKIN_IDX_LEGION = {
@@ -3021,17 +3209,9 @@ local function InitData_anim(anim, bank, build)
     if anim.anim == nil then
         anim.anim = "idle"
     end
-    if anim.animpush ~= nil then
-        anim.isloop_anim = nil
-        if anim.isloop_animpush ~= true then
-            anim.isloop_animpush = false
-        end
-    else
-        anim.isloop_animpush = nil
-        if anim.isloop_anim ~= true then
-            anim.isloop_anim = false
-        end
-    end
+    -- if anim.isloop ~= true then
+    --     anim.isloop = false
+    -- end
 end
 
 ------
@@ -3050,6 +3230,7 @@ local skinidxes = { --用以皮肤排序
     "revolvedmoonlight_item_taste2", "revolvedmoonlight_taste2", "revolvedmoonlight_pro_taste2",
     "revolvedmoonlight_item_taste3", "revolvedmoonlight_taste3", "revolvedmoonlight_pro_taste3",
     "revolvedmoonlight_item_taste4", "revolvedmoonlight_taste4", "revolvedmoonlight_pro_taste4",
+    "siving_ctlwater_item_era", "siving_ctlwater_era", "siving_ctldirt_item_era", "siving_ctldirt_era", "siving_ctlall_item_era", "siving_ctlall_era",
     "triplegoldenshovelaxe_era", "tripleshovelaxe_era", "lilybush_era", "lileaves_era", "shield_l_log_era", "icire_rock_era", "shield_l_sand_era",
     "plant_cactus_meat_l_world", "orchidbush_disguiser", "boltwingout_disguiser",
     "rosebush_marble", "rosorns_marble", "lilybush_marble", "lileaves_marble", "orchidbush_marble", "orchitwigs_marble",

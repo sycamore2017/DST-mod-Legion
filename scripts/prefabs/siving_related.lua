@@ -249,6 +249,60 @@ local function DoFunction_ctl(inst, doit)
     end, math.random()*2)
 end
 
+local function TryAddBar(inst)
+    for barkey, data in pairs(inst.barsets_l) do
+        local fx = inst[barkey]
+        if fx == nil then
+            fx = SpawnPrefab("siving_ctl_bar")
+            inst:AddChild(fx)
+            inst[barkey] = fx
+        end
+        -- fx.Transform:SetNoFaced()
+        fx.AnimState:SetBank(data.bank)
+        fx.AnimState:SetBuild(data.build)
+        -- fx.AnimState:PlayAnimation(data.anim)
+        fx.AnimState:SetPercent(data.anim, 0)
+        fx.Follower:FollowSymbol(inst.GUID, data.followedsymbol or "base", data.x, data.y, data.z)
+        if data.scale ~= nil then
+            fx.Transform:SetScale(data.scale, data.scale, data.scale)
+        end
+    end
+end
+local function SetBar(inst, barkey, value, valuemax)
+    if inst[barkey] ~= nil then
+        if value <= 0 then
+            inst[barkey].AnimState:SetPercent(inst.barsets_l[barkey].anim, 0)
+        elseif value < valuemax then
+            inst[barkey].AnimState:SetPercent(inst.barsets_l[barkey].anim, value/valuemax)
+        else
+            inst[barkey].AnimState:SetPercent(inst.barsets_l[barkey].anim, 1)
+        end
+    end
+end
+local function UpdateBars(inst)
+    TryAddBar(inst)
+    inst.components.botanycontroller:onbarchange()
+end
+
+local function OnSave_ctlitem(inst, data)
+    if inst.siv_moisture ~= nil then
+        data.siv_moisture = inst.siv_moisture
+    end
+    if inst.siv_nutrients ~= nil then
+        data.siv_nutrients = inst.siv_nutrients
+    end
+end
+local function OnLoad_ctlitem(inst, data)
+    if data ~= nil then
+        if data.siv_moisture ~= nil then
+            inst.siv_moisture = data.siv_moisture
+        end
+        if data.siv_nutrients ~= nil then
+            inst.siv_nutrients = data.siv_nutrients
+        end
+    end
+end
+
 local function MakeItem(data)
     local basename = "siving_ctl"..data.name
     table.insert(prefs, Prefab(
@@ -267,6 +321,9 @@ local function MakeItem(data)
             inst.AnimState:PlayAnimation("item")
 
             inst:AddTag("eyeturret") --眼球塔的专属标签，但为了deployable组件的摆放名字而使用（显示为“放置”）
+
+            inst:AddComponent("skinedlegion")
+            inst.components.skinedlegion:Init(basename.."_item")
 
             inst.entity:SetPristine()
             if not TheWorld.ismastersim then
@@ -299,24 +356,10 @@ local function MakeItem(data)
 
             MakeHauntableLaunchAndIgnite(inst)
 
-            inst.OnSave = function(inst, data)
-                if inst.siv_moisture ~= nil then
-                    data.siv_moisture = inst.siv_moisture
-                end
-                if inst.siv_nutrients ~= nil then
-                    data.siv_nutrients = inst.siv_nutrients
-                end
-            end
-            inst.OnLoad = function(inst, data)
-                if data ~= nil then
-                    if data.siv_moisture ~= nil then
-                        inst.siv_moisture = data.siv_moisture
-                    end
-                    if data.siv_nutrients ~= nil then
-                        inst.siv_nutrients = data.siv_nutrients
-                    end
-                end
-            end
+            inst.OnSave = OnSave_ctlitem
+            inst.OnLoad = OnLoad_ctlitem
+
+            -- inst.components.skinedlegion:SetOnPreLoad()
 
             return inst
         end,
@@ -354,10 +397,15 @@ local function MakeConstruct(data)
                 inst.components.deployhelper.onenablehelper = OnEnableHelper_ctl
             end
 
+            inst:AddComponent("skinedlegion")
+            inst.components.skinedlegion:Init(basename)
+
             inst.entity:SetPristine()
             if not TheWorld.ismastersim then
                 return inst
             end
+
+            inst.UpdateBars_l = UpdateBars
 
             inst:AddComponent("inspectable")
             inst.components.inspectable.descriptionfn = GetDesc_ctl
@@ -418,6 +466,8 @@ local function MakeConstruct(data)
                 inst.components.botanycontroller:TriggerPlant(true)
                 DoFunction_ctl(inst, true)
             end)
+
+            -- inst.components.skinedlegion:SetOnPreLoad()
 
             if data.fn_server ~= nil then
                 data.fn_server(inst)
@@ -505,35 +555,11 @@ end
 --[[ 子圭·利川 ]]
 --------------------------------------------------------------------------
 
-local function AddBar(inst, data)
-    local fx = SpawnPrefab("siving_ctl_bar")
-    if fx ~= nil then
-        -- fx.Transform:SetNoFaced()
-
-        fx.AnimState:SetBank(data.bank)
-        fx.AnimState:SetBuild(data.build)
-        -- fx.AnimState:PlayAnimation(data.anim)
-        fx.AnimState:SetPercent(data.anim, 0)
-
-        inst:AddChild(fx)
-        fx.Follower:FollowSymbol(inst.GUID, "base", data.x, data.y, data.z)
-        if data.scale ~= nil then
-            fx.Transform:SetScale(data.scale, data.scale, data.scale)
-        end
-
-        inst[data.barkey] = fx
-    end
+local function OnRain_ctlwater(inst)
+    inst.components.botanycontroller:SetValue(200, nil, true) --下雨/雪开始与结束时，直接恢复一定水分
 end
-local function SetBar(inst, barkey, anim, value, valuemax)
-    if inst[barkey] ~= nil then
-        if value <= 0 then
-            inst[barkey].AnimState:SetPercent(anim, 0)
-        elseif value < valuemax then
-            inst[barkey].AnimState:SetPercent(anim, value/valuemax)
-        else
-            inst[barkey].AnimState:SetPercent(anim, 1)
-        end
-    end
+local function OnBarChange_ctlwater(ctl)
+    SetBar(ctl.inst, "siv_bar", ctl.moisture, ctl.moisture_max)
 end
 
 MakeItem({
@@ -542,46 +568,45 @@ MakeItem({
         Asset("ANIM", "anim/siving_ctlwater.zip"),
         Asset("ATLAS", "images/inventoryimages/siving_ctlwater_item.xml"),
         Asset("IMAGE", "images/inventoryimages/siving_ctlwater_item.tex"),
-        Asset("ANIM", "anim/firefighter_placement.zip"), --灭火器的placer圈
+        Asset("ANIM", "anim/firefighter_placement.zip") --灭火器的placer圈
     },
     prefabs = { "siving_ctlwater" },
-    sound = "dontstarve/common/rain_meter_craft",
+    sound = "dontstarve/common/rain_meter_craft"
 })
 MakeConstruct({
     name = "water",
     assets = {
         Asset("ANIM", "anim/siving_ctlwater.zip"),
-        Asset("ANIM", "anim/firefighter_placement.zip"), --灭火器的placer圈
+        Asset("ANIM", "anim/firefighter_placement.zip") --灭火器的placer圈
     },
     prefabs = { "siving_ctlwater_item", "siving_ctl_bar" },
     ctltype = 1,
     fn_server = function(inst)
         inst.components.botanycontroller.type = 1
+        inst.barsets_l = {
+            siv_bar = {
+                x = 0, y = -180, z = 0, scale = nil,
+                bank = "siving_ctlwater", build = "siving_ctlwater", anim = "bar"
+            }
+        }
 
-        inst:WatchWorldState("israining", function(inst)
-            inst.components.botanycontroller:SetValue(200, nil, true) --下雨/雪开始与结束时，直接恢复一定水分
+        inst:WatchWorldState("israining", OnRain_ctlwater)
+        inst:DoTaskInTime(0.4, function(inst)
+            inst.components.botanycontroller.onbarchange = OnBarChange_ctlwater
+            UpdateBars(inst)
         end)
-
-        inst:DoTaskInTime(0, function()
-            AddBar(inst, {
-                barkey = "siv_bar",
-                bank = "siving_ctlwater", build = "siving_ctlwater", anim = "bar",
-                x = 0, y = -180, z = 0, scale = nil
-            })
-            inst.components.botanycontroller.onbarchange = function(botanyctl)
-                SetBar(botanyctl.inst, "siv_bar", "bar", botanyctl.moisture, botanyctl.moisture_max)
-            end
-
-            inst:DoTaskInTime(0.5, function()
-                inst.components.botanycontroller:onbarchange()
-            end)
-        end)
-    end,
+    end
 })
 
 --------------------------------------------------------------------------
 --[[ 子圭·益矩 ]]
 --------------------------------------------------------------------------
+
+local function OnBarChange_ctldirt(ctl)
+    SetBar(ctl.inst, "siv_bar1", ctl.nutrients[1], ctl.nutrient_max)
+    SetBar(ctl.inst, "siv_bar2", ctl.nutrients[2], ctl.nutrient_max)
+    SetBar(ctl.inst, "siv_bar3", ctl.nutrients[3], ctl.nutrient_max)
+end
 
 MakeItem({
     name = "dirt",
@@ -589,54 +614,53 @@ MakeItem({
         Asset("ANIM", "anim/siving_ctldirt.zip"),
         Asset("ATLAS", "images/inventoryimages/siving_ctldirt_item.xml"),
         Asset("IMAGE", "images/inventoryimages/siving_ctldirt_item.tex"),
-        Asset("ANIM", "anim/firefighter_placement.zip"), --灭火器的placer圈
+        Asset("ANIM", "anim/firefighter_placement.zip") --灭火器的placer圈
     },
     prefabs = { "siving_ctldirt" },
-    sound = "dontstarve/common/winter_meter_craft",
+    sound = "dontstarve/common/winter_meter_craft"
 })
 MakeConstruct({
     name = "dirt",
     assets = {
         Asset("ANIM", "anim/siving_ctldirt.zip"),
-        Asset("ANIM", "anim/firefighter_placement.zip"), --灭火器的placer圈
+        Asset("ANIM", "anim/firefighter_placement.zip") --灭火器的placer圈
     },
     prefabs = { "siving_ctldirt_item", "siving_ctl_bar" },
     ctltype = 2,
     fn_server = function(inst)
         inst.components.botanycontroller.type = 2
+        inst.barsets_l = {
+            siv_bar1 = {
+                x = -48, y = -140, z = 0, scale = nil,
+                bank = "siving_ctldirt", build = "siving_ctldirt", anim = "bar1"
+            },
+            siv_bar2 = {
+                x = -5, y = -140, z = 0, scale = nil,
+                bank = "siving_ctldirt", build = "siving_ctldirt", anim = "bar2"
+            },
+            siv_bar3 = {
+                x = 39, y = -140, z = 0, scale = nil,
+                bank = "siving_ctldirt", build = "siving_ctldirt", anim = "bar3"
+            }
+        }
 
-        inst:DoTaskInTime(0, function()
-            AddBar(inst, {
-                barkey = "siv_bar1",
-                bank = "siving_ctldirt", build = "siving_ctldirt", anim = "bar1",
-                x = -48, y = -140, z = 0, scale = nil
-            })
-            AddBar(inst, {
-                barkey = "siv_bar2",
-                bank = "siving_ctldirt", build = "siving_ctldirt", anim = "bar2",
-                x = -5, y = -140, z = 0, scale = nil
-            })
-            AddBar(inst, {
-                barkey = "siv_bar3",
-                bank = "siving_ctldirt", build = "siving_ctldirt", anim = "bar3",
-                x = 39, y = -140, z = 0, scale = nil
-            })
-            inst.components.botanycontroller.onbarchange = function(botanyctl)
-                SetBar(botanyctl.inst, "siv_bar1", "bar1", botanyctl.nutrients[1], botanyctl.nutrient_max)
-                SetBar(botanyctl.inst, "siv_bar2", "bar2", botanyctl.nutrients[2], botanyctl.nutrient_max)
-                SetBar(botanyctl.inst, "siv_bar3", "bar3", botanyctl.nutrients[3], botanyctl.nutrient_max)
-            end
-
-            inst:DoTaskInTime(0.5, function()
-                inst.components.botanycontroller:onbarchange()
-            end)
+        inst:DoTaskInTime(0.4, function(inst)
+            inst.components.botanycontroller.onbarchange = OnBarChange_ctldirt
+            UpdateBars(inst)
         end)
-    end,
+    end
 })
 
 --------------------------------------------------------------------------
 --[[ 子圭·崇溟 ]]
 --------------------------------------------------------------------------
+
+local function OnBarChange_ctlall(ctl)
+    SetBar(ctl.inst, "siv_bar1", ctl.nutrients[1], ctl.nutrient_max)
+    SetBar(ctl.inst, "siv_bar2", ctl.nutrients[2], ctl.nutrient_max)
+    SetBar(ctl.inst, "siv_bar3", ctl.nutrients[3], ctl.nutrient_max)
+    SetBar(ctl.inst, "siv_bar4", ctl.moisture, ctl.moisture_max)
+end
 
 MakeItem({
     name = "all",
@@ -644,10 +668,10 @@ MakeItem({
         Asset("ANIM", "anim/siving_ctlall.zip"),
         Asset("ATLAS", "images/inventoryimages/siving_ctlall_item.xml"),
         Asset("IMAGE", "images/inventoryimages/siving_ctlall_item.tex"),
-        Asset("ANIM", "anim/firefighter_placement.zip"), --灭火器的placer圈
+        Asset("ANIM", "anim/firefighter_placement.zip") --灭火器的placer圈
     },
     prefabs = { "siving_ctlall" },
-    sound = "dontstarve/halloween_2018/madscience_machine/place",
+    sound = "dontstarve/halloween_2018/madscience_machine/place"
 })
 MakeConstruct({
     name = "all",
@@ -655,7 +679,7 @@ MakeConstruct({
         Asset("ANIM", "anim/siving_ctlall.zip"),
         Asset("ANIM", "anim/siving_ctlwater.zip"),
         Asset("ANIM", "anim/siving_ctldirt.zip"),
-        Asset("ANIM", "anim/firefighter_placement.zip"), --灭火器的placer圈
+        Asset("ANIM", "anim/firefighter_placement.zip") --灭火器的placer圈
     },
     prefabs = { "siving_ctlall_item", "siving_ctl_bar" },
     ctltype = 3,
@@ -663,40 +687,30 @@ MakeConstruct({
         inst.components.botanycontroller.type = 3
         inst.components.botanycontroller.moisture_max = 6000
         inst.components.botanycontroller.nutrient_max = 2400
+        inst.barsets_l = {
+            siv_bar1 = {
+                x = -53, y = -335, z = 0, scale = nil,
+                bank = "siving_ctldirt", build = "siving_ctldirt", anim = "bar1"
+            },
+            siv_bar2 = {
+                x = -10, y = -360, z = 0, scale = nil,
+                bank = "siving_ctldirt", build = "siving_ctldirt", anim = "bar2"
+            },
+            siv_bar3 = {
+                x = 34, y = -335, z = 0, scale = nil,
+                bank = "siving_ctldirt", build = "siving_ctldirt", anim = "bar3"
+            },
+            siv_bar4 = {
+                x = -10, y = -297, z = 0, scale = nil,
+                bank = "siving_ctlwater", build = "siving_ctlwater", anim = "bar"
+            }
+        }
 
-        inst:DoTaskInTime(0, function()
-            AddBar(inst, {
-                barkey = "siv_bar1",
-                bank = "siving_ctldirt", build = "siving_ctldirt", anim = "bar1",
-                x = -53, y = -335, z = 0, scale = nil
-            })
-            AddBar(inst, {
-                barkey = "siv_bar2",
-                bank = "siving_ctldirt", build = "siving_ctldirt", anim = "bar2",
-                x = -10, y = -360, z = 0, scale = nil
-            })
-            AddBar(inst, {
-                barkey = "siv_bar3",
-                bank = "siving_ctldirt", build = "siving_ctldirt", anim = "bar3",
-                x = 34, y = -335, z = 0, scale = nil
-            })
-            AddBar(inst, {
-                barkey = "siv_bar4",
-                bank = "siving_ctlwater", build = "siving_ctlwater", anim = "bar",
-                x = -10, y = -297, z = 0, scale = nil
-            })
-            inst.components.botanycontroller.onbarchange = function(botanyctl)
-                SetBar(botanyctl.inst, "siv_bar1", "bar1", botanyctl.nutrients[1], botanyctl.nutrient_max)
-                SetBar(botanyctl.inst, "siv_bar2", "bar2", botanyctl.nutrients[2], botanyctl.nutrient_max)
-                SetBar(botanyctl.inst, "siv_bar3", "bar3", botanyctl.nutrients[3], botanyctl.nutrient_max)
-                SetBar(botanyctl.inst, "siv_bar4", "bar", botanyctl.moisture, botanyctl.moisture_max)
-            end
-
-            inst:DoTaskInTime(0.5, function()
-                inst.components.botanycontroller:onbarchange()
-            end)
+        inst:DoTaskInTime(0.4, function(inst)
+            inst.components.botanycontroller.onbarchange = OnBarChange_ctlall
+            UpdateBars(inst)
         end)
-    end,
+    end
 })
 
 --------------------------------------------------------------------------

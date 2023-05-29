@@ -3,9 +3,9 @@ local function SetAnim(inst, data)
 	inst.AnimState:SetBuild(data.build)
 	if data.animpush then
 		inst.AnimState:PlayAnimation(data.anim)
-		inst.AnimState:PushAnimation(data.animpush, data.isloop_animpush)
+		inst.AnimState:PushAnimation(data.animpush, data.isloop)
 	else
-		inst.AnimState:PlayAnimation(data.anim, data.isloop_anim)
+		inst.AnimState:PlayAnimation(data.anim, data.isloop)
 	end
 end
 
@@ -139,6 +139,21 @@ local SkinsFree = {
 	shield_l_log_emo_pride = true, shield_l_sand_op = true,
 	backcub_fans = true
 }
+function SkinedLegion:SetLinkedSkin(newinst, linkedkey, doer)
+	local linkdata = self:GetLinkedSkins() or nil
+	if linkdata ~= nil and linkdata[linkedkey] ~= nil then
+		newinst.components.skinedlegion:SetSkin(linkdata[linkedkey], self.userid or (doer and doer.userid or nil))
+	end
+end
+function SkinedLegion:SpawnLinkedSkinLoot(prefabname, dropper, linkedkey, doer)
+	local linkdata = self:GetLinkedSkins() or nil
+	if linkdata ~= nil and linkdata[linkedkey] ~= nil then
+		dropper.components.lootdropper:SpawnLootPrefab(prefabname, nil,
+			linkdata[linkedkey], nil, self.userid or (doer and doer.userid or nil))
+	else
+		dropper.components.lootdropper:SpawnLootPrefab(prefabname)
+	end
+end
 function SkinedLegion:SetSkin(skinname, userid)
 	if not self.isServe or self.skin == skinname then
 		return true

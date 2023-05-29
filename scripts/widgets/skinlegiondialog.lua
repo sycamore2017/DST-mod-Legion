@@ -428,6 +428,35 @@ local function SetAnim_sivfeather(self, anim, data)
     end
 end
 
+local function SetAnim_plant_cactus(self, anim, data)
+    local animstate = anim:GetAnimState()
+    SetAnim_base(animstate, data)
+    for _,v in ipairs(data.symbol) do
+        animstate:OverrideSymbol(v.symbol, v.build, v.file)
+    end
+end
+local function SetClick_plant_cactus(self, anim, data)
+    local animstate = anim:GetAnimState()
+    local tag = anim.tag_anim or data.tag_start
+
+    if tag == nil or tag == 5 then
+        animstate:PlayAnimation("dead1")
+        anim.tag_anim = 1
+    elseif tag == 1 then
+        animstate:PlayAnimation("level1_3")
+        anim.tag_anim = 2
+    elseif tag == 2 then
+        animstate:PlayAnimation("level2_3")
+        anim.tag_anim = 3
+    elseif tag == 3 then
+        animstate:PlayAnimation("level3_3")
+        anim.tag_anim = 4
+    else
+        animstate:PlayAnimation("level4_3")
+        anim.tag_anim = 5
+    end
+end
+
 local width_skininfo = 260
 local SkinData = {
     rosebush_marble = {
@@ -2184,6 +2213,37 @@ local SkinData = {
                 fn_anim = SetAnim_player,
                 fn_click = SetAnim_player2,
                 x = 45, y = 0, scale = 0.38
+            }
+        }
+    },
+    plant_cactus_meat_l_world = {
+        string = ischinese and {
+            collection = "DISGUISER", access = "SPECIAL",
+            descitem = "解锁\"仙人柱\"的皮肤。",
+            description = ""
+        } or {
+            collection = "DISGUISER", access = "SPECIAL",
+            descitem = "Unlock \"Cactaceae\" skin.",
+            description = "The story was not translated."
+        },
+        height_anim = 134,
+        anims = {
+            {
+                bank = "plant_cactus_meat_l_world", build = "plant_cactus_meat_l_world",
+                anim = "level4_3", anim2 = nil, isloop = false,
+                symbol = {
+                    { symbol = "flowerplus", build = "plant_cactus_meat_l_world", file = "flomax" }
+                },
+                fn_anim = SetAnim_plant_cactus,
+                fn_click = SetClick_plant_cactus,
+                x = -52, y = 5, scale = 0.32
+            },
+            {
+                bank = "plant_cactus_meat_l_world", build = "plant_cactus_meat_l_world",
+                anim = "level1_3", anim2 = nil, isloop = false,
+                tag_start = 2,
+                fn_click = SetClick_plant_cactus,
+                x = 50, y = 5, scale = 0.32
             }
         }
     },

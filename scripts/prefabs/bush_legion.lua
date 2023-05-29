@@ -227,18 +227,12 @@ local function GetRegenTime_base(inst)
     return GetRegenTime(inst, TUNING.TOTAL_DAY_TIME * 6)
 end
 local function SpawnStackDrop(name, num, bush, doer, mustdrop, checkskin, items)
-    local item = nil
-    if checkskin and doer ~= nil and doer.userid ~= nil then --还是得检查用户ID，因为不是所有花丛都跟花剑绑定一起的
-        local linkdata = bush.components.skinedlegion:GetLinkedSkins()
-        if linkdata ~= nil and linkdata.sword ~= nil then
-            item = SpawnPrefab(name, linkdata.sword, nil, doer.userid)
-        else
-            item = SpawnPrefab(name)
-        end
-    else
-        item = SpawnPrefab(name)
-    end
+    local item = SpawnPrefab(name)
 	if item ~= nil then
+        if checkskin and doer ~= nil and doer.userid ~= nil then --还是得检查用户ID，因为不是所有花丛都跟花剑绑定一起的
+            bush.components.skinedlegion:SetLinkedSkin(item, "sword", doer)
+        end
+
 		if num > 1 and item.components.stackable ~= nil then
 			local maxsize = item.components.stackable.maxsize
 			if num <= maxsize then
@@ -268,7 +262,7 @@ local function SpawnStackDrop(name, num, bush, doer, mustdrop, checkskin, items)
         end
 
 		if num >= 1 then
-			SpawnStackDrop(name, num, pos, doer)
+			SpawnStackDrop(name, num, bush, doer, mustdrop, checkskin, items)
 		end
 	end
 end

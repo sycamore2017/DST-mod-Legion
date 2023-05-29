@@ -195,10 +195,7 @@ local function ondeploy(inst, pt, deployer, rot) --这里是右键种植时的�
     q()
     local tree = SpawnPrefab("neverfadebush")
     if tree ~= nil then
-        local linkdata = inst.components.skinedlegion:GetLinkedSkins() or nil
-        if linkdata ~= nil and tree.components.skinedlegion ~= nil then
-            tree.components.skinedlegion:SetSkin(linkdata.bush, deployer ~= nil and deployer.userid or nil)
-        end
+        inst.components.skinedlegion:SetLinkedSkin(tree, "bush", deployer)
         tree.Transform:SetPosition(pt:Get())
 
         local percent = inst.components.finiteuses:GetPercent()
