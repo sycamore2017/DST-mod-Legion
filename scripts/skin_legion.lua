@@ -2975,7 +2975,7 @@ _G.SKINS_LEGION = {
         base_prefab = "siving_ctlwater_item",
 		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
 
-        -- skin_id = "629b0d848c2f781db2f77f11",
+        skin_id = "64759cc569b4f368be452b14",
         noshopshow = true,
 		assets = {
 			Asset("ANIM", "anim/skin/siving_ctlwater_era.zip")
@@ -2988,13 +2988,14 @@ _G.SKINS_LEGION = {
             bank = "siving_ctlwater_era", build = "siving_ctlwater_era",
             anim = "item", animpush = nil, isloop = nil, setable = true
         },
+        linkedskins = { link = "siving_ctlwater_era" },
         exchangefx = { prefab = nil, offset_y = nil, scale = 1.5 }
     },
     siving_ctlwater_era = {
         base_prefab = "siving_ctlwater",
 		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
 
-        -- skin_id = "646f760769b4f368be4526b4",
+        skin_id = "64759cc569b4f368be452b14",
         noshopshow = true,
 		assets = {
 			Asset("ANIM", "anim/skin/siving_ctlwater_era.zip")
@@ -3013,13 +3014,14 @@ _G.SKINS_LEGION = {
             }
             inst:UpdateBars_l()
         end,
+        linkedskins = { link = "siving_ctlwater_item_era" },
         exchangefx = { prefab = nil, offset_y = nil, scale = 1.5 }
     },
     siving_ctldirt_item_era = {
         base_prefab = "siving_ctldirt_item",
 		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
 
-        -- skin_id = "629b0d848c2f781db2f77f11",
+        skin_id = "64759cc569b4f368be452b14",
         noshopshow = true,
 		assets = {
 			Asset("ANIM", "anim/skin/siving_ctldirt_era.zip")
@@ -3032,13 +3034,14 @@ _G.SKINS_LEGION = {
             bank = "siving_ctldirt_era", build = "siving_ctldirt_era",
             anim = "item", animpush = nil, isloop = nil, setable = true
         },
+        linkedskins = { link = "siving_ctldirt_era" },
         exchangefx = { prefab = nil, offset_y = nil, scale = 1.5 }
     },
     siving_ctldirt_era = {
         base_prefab = "siving_ctldirt",
 		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
 
-        -- skin_id = "646f760769b4f368be4526b4",
+        skin_id = "64759cc569b4f368be452b14",
         noshopshow = true,
 		assets = {
 			Asset("ANIM", "anim/skin/siving_ctldirt_era.zip")
@@ -3065,13 +3068,14 @@ _G.SKINS_LEGION = {
             }
             inst:UpdateBars_l()
         end,
+        linkedskins = { link = "siving_ctldirt_item_era" },
         exchangefx = { prefab = nil, offset_y = nil, scale = 1.5 }
     },
     siving_ctlall_item_era = {
         base_prefab = "siving_ctlall_item",
 		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
 
-        -- skin_id = "629b0d848c2f781db2f77f11",
+        skin_id = "64759cc569b4f368be452b14",
         noshopshow = true,
 		assets = {
 			Asset("ANIM", "anim/skin/siving_ctlall_era.zip")
@@ -3084,19 +3088,20 @@ _G.SKINS_LEGION = {
             bank = "siving_ctlall_era", build = "siving_ctlall_era",
             anim = "item", animpush = nil, isloop = nil, setable = true
         },
+        linkedskins = { link = "siving_ctlall_era" },
         exchangefx = { prefab = nil, offset_y = nil, scale = 1.5 }
     },
     siving_ctlall_era = {
         base_prefab = "siving_ctlall",
 		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
 
-        -- skin_id = "646f760769b4f368be4526b4",
+        skin_id = "64759cc569b4f368be452b14",
         onlyownedshow = true,
 		assets = {
 			Asset("ANIM", "anim/skin/siving_ctlall_era.zip")
 		},
 
-        string = ischinese and { name = "耘天图腾柱" } or { name = "Singing Sky Totem Pole" },
+        string = ischinese and { name = "耘天图腾柱" } or { name = "Sowing Sky Totem Pole" },
 
         fn_start = function(inst)
             inst.AnimState:SetBank("siving_ctlall_era")
@@ -3121,6 +3126,7 @@ _G.SKINS_LEGION = {
             }
             inst:UpdateBars_l()
         end,
+        linkedskins = { link = "siving_ctlall_item_era" },
         exchangefx = { prefab = nil, offset_y = nil, scale = 1.5 }
     },
 }

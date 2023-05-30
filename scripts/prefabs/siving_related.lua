@@ -280,8 +280,25 @@ local function SetBar(inst, barkey, value, valuemax)
     end
 end
 local function UpdateBars(inst)
-    TryAddBar(inst)
-    inst.components.botanycontroller:onbarchange()
+    if inst.components.botanycontroller.onbarchange ~= nil then
+        TryAddBar(inst)
+        inst.components.botanycontroller:onbarchange()
+    end
+end
+
+local function OnBarChange_ctlwater(ctl)
+    SetBar(ctl.inst, "siv_bar", ctl.moisture, ctl.moisture_max)
+end
+local function OnBarChange_ctldirt(ctl)
+    SetBar(ctl.inst, "siv_bar1", ctl.nutrients[1], ctl.nutrient_max)
+    SetBar(ctl.inst, "siv_bar2", ctl.nutrients[2], ctl.nutrient_max)
+    SetBar(ctl.inst, "siv_bar3", ctl.nutrients[3], ctl.nutrient_max)
+end
+local function OnBarChange_ctlall(ctl)
+    SetBar(ctl.inst, "siv_bar1", ctl.nutrients[1], ctl.nutrient_max)
+    SetBar(ctl.inst, "siv_bar2", ctl.nutrients[2], ctl.nutrient_max)
+    SetBar(ctl.inst, "siv_bar3", ctl.nutrients[3], ctl.nutrient_max)
+    SetBar(ctl.inst, "siv_bar4", ctl.moisture, ctl.moisture_max)
 end
 
 local function OnSave_ctlitem(inst, data)
@@ -345,6 +362,7 @@ local function MakeItem(data)
             inst.components.deployable.ondeploy = function(inst, pt, deployer, rot)
                 local tree = SpawnPrefab(basename)
                 if tree ~= nil then
+                    inst.components.skinedlegion:SetLinkedSkin(tree, "link", deployer)
                     tree.components.botanycontroller:SetValue(inst.siv_moisture, inst.siv_nutrients, false)
                     tree.Transform:SetPosition(pt:Get())
                     if deployer ~= nil and deployer.SoundEmitter ~= nil then
@@ -414,6 +432,7 @@ local function MakeConstruct(data)
             inst.components.portablestructure:SetOnDismantleFn(function(inst, doer)
                 local item = SpawnPrefab(basename.."_item")
                 if item ~= nil then
+                    inst.components.skinedlegion:SetLinkedSkin(item, "link", doer)
                     item.siv_moisture = inst.components.botanycontroller.moisture
                     item.siv_nutrients = inst.components.botanycontroller.nutrients
                     if doer ~= nil and doer.components.inventory ~= nil then
@@ -437,6 +456,7 @@ local function MakeConstruct(data)
                 local x, y, z = inst.Transform:GetWorldPosition()
                 local item = SpawnPrefab(basename.."_item")
                 if item ~= nil then
+                    inst.components.skinedlegion:SetLinkedSkin(item, "link", worker)
                     item.siv_moisture = inst.components.botanycontroller.moisture
                     item.siv_nutrients = inst.components.botanycontroller.nutrients
                     item.Transform:SetPosition(x, y, z)
@@ -462,7 +482,15 @@ local function MakeConstruct(data)
             inst:AddComponent("botanycontroller")
 
             inst.task_function = nil
-            inst:DoTaskInTime(0.1+math.random()*0.4, function()
+            inst:DoTaskInTime(0.2+math.random()*0.4, function(inst)
+                if inst.components.botanycontroller.type == 3 then
+                    inst.components.botanycontroller.onbarchange = OnBarChange_ctlall
+                elseif inst.components.botanycontroller.type == 2 then
+                    inst.components.botanycontroller.onbarchange = OnBarChange_ctldirt
+                else
+                    inst.components.botanycontroller.onbarchange = OnBarChange_ctlwater
+                end
+                UpdateBars(inst)
                 inst.components.botanycontroller:TriggerPlant(true)
                 DoFunction_ctl(inst, true)
             end)
@@ -558,9 +586,6 @@ end
 local function OnRain_ctlwater(inst)
     inst.components.botanycontroller:SetValue(200, nil, true) --下雨/雪开始与结束时，直接恢复一定水分
 end
-local function OnBarChange_ctlwater(ctl)
-    SetBar(ctl.inst, "siv_bar", ctl.moisture, ctl.moisture_max)
-end
 
 MakeItem({
     name = "water",
@@ -591,22 +616,12 @@ MakeConstruct({
         }
 
         inst:WatchWorldState("israining", OnRain_ctlwater)
-        inst:DoTaskInTime(0.4, function(inst)
-            inst.components.botanycontroller.onbarchange = OnBarChange_ctlwater
-            UpdateBars(inst)
-        end)
     end
 })
 
 --------------------------------------------------------------------------
 --[[ 子圭·益矩 ]]
 --------------------------------------------------------------------------
-
-local function OnBarChange_ctldirt(ctl)
-    SetBar(ctl.inst, "siv_bar1", ctl.nutrients[1], ctl.nutrient_max)
-    SetBar(ctl.inst, "siv_bar2", ctl.nutrients[2], ctl.nutrient_max)
-    SetBar(ctl.inst, "siv_bar3", ctl.nutrients[3], ctl.nutrient_max)
-end
 
 MakeItem({
     name = "dirt",
@@ -643,24 +658,12 @@ MakeConstruct({
                 bank = "siving_ctldirt", build = "siving_ctldirt", anim = "bar3"
             }
         }
-
-        inst:DoTaskInTime(0.4, function(inst)
-            inst.components.botanycontroller.onbarchange = OnBarChange_ctldirt
-            UpdateBars(inst)
-        end)
     end
 })
 
 --------------------------------------------------------------------------
 --[[ 子圭·崇溟 ]]
 --------------------------------------------------------------------------
-
-local function OnBarChange_ctlall(ctl)
-    SetBar(ctl.inst, "siv_bar1", ctl.nutrients[1], ctl.nutrient_max)
-    SetBar(ctl.inst, "siv_bar2", ctl.nutrients[2], ctl.nutrient_max)
-    SetBar(ctl.inst, "siv_bar3", ctl.nutrients[3], ctl.nutrient_max)
-    SetBar(ctl.inst, "siv_bar4", ctl.moisture, ctl.moisture_max)
-end
 
 MakeItem({
     name = "all",
@@ -705,11 +708,6 @@ MakeConstruct({
                 bank = "siving_ctlwater", build = "siving_ctlwater", anim = "bar"
             }
         }
-
-        inst:DoTaskInTime(0.4, function(inst)
-            inst.components.botanycontroller.onbarchange = OnBarChange_ctlall
-            UpdateBars(inst)
-        end)
     end
 })
 

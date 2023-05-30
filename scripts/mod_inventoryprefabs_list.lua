@@ -237,6 +237,9 @@ local InventoryPrefabsList = {  --每个元素的下标值为每种物品栏图�
 
     siving_feather_real_collector = { build = "images_minisign_skins2" },
     siving_feather_fake_collector = { build = "images_minisign_skins2" },
+    siving_ctlwater_item_era = { build = "images_minisign_skins2" },
+    siving_ctldirt_item_era = { build = "images_minisign_skins2" },
+    siving_ctlall_item_era = { build = "images_minisign_skins2" },
 }
 
 return InventoryPrefabsList
