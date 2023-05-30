@@ -308,6 +308,16 @@ local function Fn_anim_sivfeather_collector(inst)
     })
 end
 
+------
+
+local function OnSummer_cactus(inst, build)
+    if TheWorld.state.issummer then
+        inst.AnimState:OverrideSymbol("flowerplus", build or "crop_legion_cactus", "flomax")
+    else
+        inst.AnimState:ClearOverrideSymbol("flowerplus")
+    end
+end
+
 --------------------------------------------------------------------------
 --[[ 全局皮肤总数据，以及修改 ]]
 --------------------------------------------------------------------------
@@ -805,6 +815,7 @@ _G.SKIN_PREFABS_LEGION = {
             local sets = _G.CROPS_DATA_LEGION["cactus_meat"]
             inst.AnimState:SetBank(sets.bank)
             inst.AnimState:SetBuild(sets.build)
+            OnSummer_cactus(inst, nil)
         end,
         exchangefx = { prefab = nil, offset_y = nil, scale = 1.5 }
     },
@@ -2962,7 +2973,7 @@ _G.SKINS_LEGION = {
 		fn_start = function(inst)
             inst.AnimState:SetBank("plant_cactus_meat_l_world")
             inst.AnimState:SetBuild("plant_cactus_meat_l_world")
-            --undo 检查夏天贴图
+            OnSummer_cactus(inst, "plant_cactus_meat_l_world")
         end,
         exchangefx = { prefab = nil, offset_y = nil, scale = 1.5 },
         fn_placer = function(inst)
@@ -2989,6 +3000,12 @@ _G.SKINS_LEGION = {
             anim = "item", animpush = nil, isloop = nil, setable = true
         },
         linkedskins = { link = "siving_ctlwater_era" },
+        fn_placer = function(inst)
+            if inst.placerbase_l ~= nil then
+                inst.placerbase_l.AnimState:SetBank("siving_ctlwater_era")
+                inst.placerbase_l.AnimState:SetBuild("siving_ctlwater_era")
+            end
+        end,
         exchangefx = { prefab = nil, offset_y = nil, scale = 1.5 }
     },
     siving_ctlwater_era = {
@@ -3035,6 +3052,12 @@ _G.SKINS_LEGION = {
             anim = "item", animpush = nil, isloop = nil, setable = true
         },
         linkedskins = { link = "siving_ctldirt_era" },
+        fn_placer = function(inst)
+            if inst.placerbase_l ~= nil then
+                inst.placerbase_l.AnimState:SetBank("siving_ctldirt_era")
+                inst.placerbase_l.AnimState:SetBuild("siving_ctldirt_era")
+            end
+        end,
         exchangefx = { prefab = nil, offset_y = nil, scale = 1.5 }
     },
     siving_ctldirt_era = {
@@ -3089,6 +3112,12 @@ _G.SKINS_LEGION = {
             anim = "item", animpush = nil, isloop = nil, setable = true
         },
         linkedskins = { link = "siving_ctlall_era" },
+        fn_placer = function(inst)
+            if inst.placerbase_l ~= nil then
+                inst.placerbase_l.AnimState:SetBank("siving_ctlall_era")
+                inst.placerbase_l.AnimState:SetBuild("siving_ctlall_era")
+            end
+        end,
         exchangefx = { prefab = nil, offset_y = nil, scale = 1.5 }
     },
     siving_ctlall_era = {

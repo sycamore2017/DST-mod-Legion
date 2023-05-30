@@ -728,6 +728,7 @@ table.insert(prefs, Prefab(
         -- inst.AnimState:SetBank("siving_ctldirt")
         -- inst.AnimState:SetBuild("siving_ctldirt")
         -- inst.AnimState:PlayAnimation("bar2")
+        inst.AnimState:SetFinalOffset(3)
 
         inst:AddTag("FX")
 

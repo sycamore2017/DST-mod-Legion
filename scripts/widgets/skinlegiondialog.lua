@@ -457,6 +457,19 @@ local function SetClick_plant_cactus(self, anim, data)
     end
 end
 
+local function SetClick_siving_ctl(self, anim, data)
+    local animstate = anim:GetAnimState()
+    local tag = anim.tag_anim or 2
+
+    if tag == 2 then
+        animstate:PlayAnimation("item")
+        anim.tag_anim = 1
+    else
+        animstate:PlayAnimation("idle")
+        anim.tag_anim = 2
+    end
+end
+
 local width_skininfo = 260
 local SkinData = {
     rosebush_marble = {
@@ -2244,6 +2257,53 @@ local SkinData = {
                 tag_start = 2,
                 fn_click = SetClick_plant_cactus,
                 x = 50, y = 5, scale = 0.32
+            }
+        }
+    },
+    siving_ctlall_era = {
+        string = ischinese and {
+            collection = "ERA", access = "SPECIAL",
+            descitem = "解锁\"子圭·利川\"、\"子圭·益矩\"、\"子圭·崇溟\"的皮肤。",
+            description = ""
+        } or {
+            collection = "ERA", access = "SPECIAL",
+            descitem = "Unlock \"Siving-Eau\", \"Siving-Alim\", \"Siving-Ridge\" skin.",
+            description = "The story was not translated."
+        },
+        height_anim = 213,
+        anims = {
+            {
+                bank = "siving_ctlall_era", build = "siving_ctlall_era",
+                anim = "idle", anim2 = nil, isloop = false,
+                fn_click = SetClick_siving_ctl,
+                x = 0, y = 5, scale = 0.26
+            },
+            {
+                bank = "siving_ctlwater_era", build = "siving_ctlwater_era",
+                anim = "idle", anim2 = nil, isloop = false,
+                fn_click = SetClick_siving_ctl,
+                x = -66, y = 5, scale = 0.26
+            },
+            {
+                bank = "siving_ctldirt_era", build = "siving_ctldirt_era",
+                anim = "idle", anim2 = nil, isloop = false,
+                fn_click = SetClick_siving_ctl,
+                x = 66, y = 5, scale = 0.26
+            },
+            {
+                bank = "farm_plant_happiness", build = "farm_plant_happiness",
+                anim = "happy", anim2 = nil, isloop = false,
+                x = 0, y = 5, scale = 0.26
+            },
+            {
+                bank = "farm_plant_happiness", build = "farm_plant_happiness",
+                anim = "happy", anim2 = nil, isloop = false,
+                x = -66, y = 5, scale = 0.26
+            },
+            {
+                bank = "farm_plant_happiness", build = "farm_plant_happiness",
+                anim = "happy", anim2 = nil, isloop = false,
+                x = 66, y = 5, scale = 0.26
             }
         }
     },

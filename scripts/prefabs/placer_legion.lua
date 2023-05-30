@@ -174,6 +174,7 @@ local function Fn_ctl(inst, basename)
 
     placer2.entity:SetParent(inst.entity)
 
+    inst.placerbase_l = placer2
     inst.components.placer:LinkEntity(placer2)
 end
 for _, pst in ipairs(ctls) do
@@ -182,6 +183,7 @@ for _, pst in ipairs(ctls) do
         basename.."_item", "firefighter_placement", "firefighter_placement", "idle",
         true, nil, nil, PLACER_SCALE_CTL, nil, nil, function(inst)
             Fn_ctl(inst, basename)
+            Skined_deploy(inst, nil, GetSkin_base)
         end
     )
 end
