@@ -527,6 +527,9 @@ local function MakeMask(data)
             inst.AnimState:SetBuild(data.name)
             inst.AnimState:PlayAnimation("idle")
 
+            inst:AddComponent("skinedlegion")
+            inst.components.skinedlegion:Init(data.name)
+
             if data.fn_common ~= nil then
                 data.fn_common(inst)
             end
@@ -567,6 +570,8 @@ local function MakeMask(data)
                     end
                 end
             end
+
+            inst.components.skinedlegion:SetOnPreLoad()
 
             if data.fn_server ~= nil then
                 data.fn_server(inst)
@@ -944,6 +949,24 @@ local function HealArmor(mask)
     return false
 end
 
+local function AddMaskHPCost(inst, owner, value)
+    if owner.feather_l_reducer == nil then
+        owner.feather_l_reducer = {}
+    end
+    owner.feather_l_reducer[inst.prefab] = value
+end
+local function DeleteMaskHPCost(inst, owner)
+    if owner.feather_l_reducer == nil then
+        return
+    end
+    owner.feather_l_reducer[inst.prefab] = nil
+    for _,v in pairs(owner.feather_l_reducer) do
+        if v then
+            return
+        end
+    end
+    owner.feather_l_reducer = nil
+end
 local function GetSwapSymbol(owner)
     local maps = {
         wolfgang = true,
@@ -965,24 +988,113 @@ local function GetSwapSymbol(owner)
         return "swap_hat"
     end
 end
-
-local function AddMaskHPCost(inst, owner, value)
-    if owner.feather_l_reducer == nil then
-        owner.feather_l_reducer = {}
-    end
-    owner.feather_l_reducer[inst.prefab] = value
-end
-local function DeleteMaskHPCost(inst, owner)
-    if owner.feather_l_reducer == nil then
-        return
-    end
-    owner.feather_l_reducer[inst.prefab] = nil
-    for _,v in pairs(owner.feather_l_reducer) do
-        if v then
+local function SetSymbols_mask(inst, owner)
+    local skindata = inst.components.skinedlegion:GetSkinedData()
+    if skindata ~= nil and skindata.equip ~= nil then
+        if skindata.equip.startfn ~= nil then
+            skindata.equip.startfn(inst, owner)
             return
         end
+        print("sss")
+        if skindata.equip.isopenhat then
+            HAT_OPENTOP_ONEQUIP_L(inst, owner, skindata.equip.build, skindata.equip.file or GetSwapSymbol(owner))
+        else
+            HAT_ONEQUIP_L(inst, owner, skindata.equip.build, skindata.equip.file or GetSwapSymbol(owner))
+        end
+    else
+        HAT_OPENTOP_ONEQUIP_L(inst, owner, inst.prefab, GetSwapSymbol(owner))
     end
-    owner.feather_l_reducer = nil
+end
+local function ClearSymbols_mask(inst, owner)
+    local skindata = inst.components.skinedlegion:GetSkinedData()
+    if skindata ~= nil and skindata.equip ~= nil then
+        if skindata.equip.endfn ~= nil then
+            skindata.equip.endfn(inst, owner)
+        end
+    end
+    HAT_ONUNEQUIP_L(inst, owner)
+end
+local function OnEquip_mask(inst, owner)
+    SetSymbols_mask(inst, owner)
+
+    --假人兼容：这里不做截断，为了能开发一些新玩法
+
+    AddMaskHPCost(inst, owner, 0.5)
+
+    local notags = {
+        "NOCLICK", "INLIMBO", "shadow", "shadowminion", "playerghost", "ghost", "wall",
+        "balloon", "siving", "glommer", "friendlyfruitfly", "boat", "boatbumper", "structure"
+    }
+    if owner:HasTag("player") then --佩戴者是玩家时，不吸收其他玩家
+        table.insert(notags, "player")
+    end
+    local _taskcounter = 0
+    inst.task_life = inst:DoPeriodicTask(0.5, function(inst)
+        if not owner:IsValid() then
+            CancelTask_life(inst, owner)
+            return
+        end
+
+        ----计数器管理
+        _taskcounter = _taskcounter + 1
+        local doit = false
+        if _taskcounter % 4 == 0 then --每过两秒
+            doit = true
+            _taskcounter = 0
+        end
+
+        ----吸取对象的管理
+        local x, y, z = owner.Transform:GetWorldPosition()
+        local target = inst.lifetarget
+        if --吸血对象失效了，重新找新对象
+            target == nil or not target:IsValid() or
+            target.components.health == nil or target.components.health:IsDead() or
+            target:GetDistanceSqToPoint(x, y, z) > 324 --18*18
+        then
+            target = FindEntity(owner, 18, function(ent, finder)
+                    if
+                        ent.prefab ~= finder.prefab and --不吸收同类
+                        ent.components.health ~= nil and not ent.components.health:IsDead()
+                    then
+                        return true
+                    end
+                end,
+                {"_health"}, notags, nil
+            )
+            inst.lifetarget = target
+        end
+
+        ----积累的管理
+        if target ~= nil then --有可吸收对象时
+            SpawnLifeFx(target, owner)
+            if doit then
+                DrinkLife(inst, target, 2)
+                if inst.healthcounter >= 4 then
+                    if not HealOwner(inst, owner) then --优先为玩家恢复生命
+                        if inst.healthcounter >= 20 then --其次才是恢复自己的耐久
+                            HealArmor(inst)
+                        end
+                    end
+                end
+            end
+        else --不存在可吸收对象时
+            if doit then
+                if inst.components.armor:GetPercent() < 1 then --自己损坏了
+                    if owner.components.health ~= nil and not owner.components.health:IsDead() then
+                        DrinkLife(inst, owner, 2)
+                    end
+                    if inst.healthcounter >= 20 then
+                        HealArmor(inst)
+                    end
+                end
+            end
+        end
+    end, 1)
+end
+local function OnUnequip_mask(inst, owner)
+    ClearSymbols_mask(inst, owner)
+    DeleteMaskHPCost(inst, owner)
+    CancelTask_life(inst, owner)
 end
 
 MakeMask({
@@ -990,11 +1102,9 @@ MakeMask({
     assets = {
         Asset("ANIM", "anim/siving_mask.zip"),
         Asset("ATLAS", "images/inventoryimages/siving_mask.xml"),
-        Asset("IMAGE", "images/inventoryimages/siving_mask.tex"),
+        Asset("IMAGE", "images/inventoryimages/siving_mask.tex")
     },
-    prefabs = {
-        "siving_lifesteal_fx"
-    },
+    prefabs = { "siving_lifesteal_fx" },
     fn_common = function(inst)
         inst:AddTag("siv_BF")
         inst:AddTag("siv_mask")
@@ -1002,88 +1112,8 @@ MakeMask({
     fn_server = function(inst)
         inst.healthcounter_max = 80
 
-        inst.components.equippable:SetOnEquip(function(inst, owner)
-            HAT_OPENTOP_ONEQUIP_L(inst, owner, "siving_mask", GetSwapSymbol(owner))
-
-            --假人兼容：这里不做截断，为了能开发一些新玩法
-
-            AddMaskHPCost(inst, owner, 0.5)
-
-            local notags = {
-                "NOCLICK", "INLIMBO", "shadow", "shadowminion", "playerghost", "ghost", "wall",
-                "balloon", "siving", "glommer", "friendlyfruitfly", "boat", "boatbumper", "structure"
-            }
-            if owner:HasTag("player") then --佩戴者是玩家时，不吸收其他玩家
-                table.insert(notags, "player")
-            end
-            local _taskcounter = 0
-            inst.task_life = inst:DoPeriodicTask(0.5, function(inst)
-                if not owner:IsValid() then
-                    CancelTask_life(inst, owner)
-                    return
-                end
-
-                ----计数器管理
-                _taskcounter = _taskcounter + 1
-                local doit = false
-                if _taskcounter % 4 == 0 then --每过两秒
-                    doit = true
-                    _taskcounter = 0
-                end
-
-                ----吸取对象的管理
-                local x, y, z = owner.Transform:GetWorldPosition()
-                local target = inst.lifetarget
-                if --吸血对象失效了，重新找新对象
-                    target == nil or not target:IsValid() or
-                    target.components.health == nil or target.components.health:IsDead() or
-                    target:GetDistanceSqToPoint(x, y, z) > 324 --18*18
-                then
-                    target = FindEntity(owner, 18, function(ent, finder)
-                            if
-                                ent.prefab ~= finder.prefab and --不吸收同类
-                                ent.components.health ~= nil and not ent.components.health:IsDead()
-                            then
-                                return true
-                            end
-                        end,
-                        {"_health"}, notags, nil
-                    )
-                    inst.lifetarget = target
-                end
-
-                ----积累的管理
-                if target ~= nil then --有可吸收对象时
-                    SpawnLifeFx(target, owner)
-                    if doit then
-                        DrinkLife(inst, target, 2)
-                        if inst.healthcounter >= 4 then
-                            if not HealOwner(inst, owner) then --优先为玩家恢复生命
-                                if inst.healthcounter >= 20 then --其次才是恢复自己的耐久
-                                    HealArmor(inst)
-                                end
-                            end
-                        end
-                    end
-                else --不存在可吸收对象时
-                    if doit then
-                        if inst.components.armor:GetPercent() < 1 then --自己损坏了
-                            if owner.components.health ~= nil and not owner.components.health:IsDead() then
-                                DrinkLife(inst, owner, 2)
-                            end
-                            if inst.healthcounter >= 20 then
-                                HealArmor(inst)
-                            end
-                        end
-                    end
-                end
-            end, 1)
-        end)
-        inst.components.equippable:SetOnUnequip(function(inst, owner)
-            HAT_ONUNEQUIP_L(inst, owner)
-            DeleteMaskHPCost(inst, owner)
-            CancelTask_life(inst, owner)
-        end)
+        inst.components.equippable:SetOnEquip(OnEquip_mask)
+        inst.components.equippable:SetOnUnequip(OnUnequip_mask)
 
         inst.components.armor:InitCondition(315, 0.7)
     end
@@ -1147,7 +1177,7 @@ local function SetBendFx(target, doer)
         doer.SoundEmitter:PlaySound("monkeyisland/wonkycurse/curse_fx")
     end
 end
-local function FnBend_mask(mask, doer, target, options)
+local function FnBend_mask2(mask, doer, target, options)
     if target == nil or not target:IsValid() then
         return false
     end
@@ -1307,13 +1337,97 @@ local function FnBend_mask(mask, doer, target, options)
 
     return true
 end
+local function OnEquip_mask2(inst, owner)
+    SetSymbols_mask(inst, owner)
+
+    --假人兼容：这里不做截断，为了能开发一些新玩法
+
+    AddMaskHPCost(inst, owner, 1)
+
+    owner:ListenForEvent("onattackother", OnAttackOther)
+
+    local notags = {
+        "NOCLICK", "INLIMBO", "shadow", "shadowminion", "playerghost", "ghost", "wall",
+        "balloon", "siving", "glommer", "friendlyfruitfly", "boat", "boatbumper", "structure"
+    }
+    if owner:HasTag("player") then --佩戴者是玩家时，不吸收其他玩家
+        table.insert(notags, "player")
+    end
+    local _taskcounter = 0
+    inst.task_life = inst:DoPeriodicTask(0.5, function(inst)
+        if not owner:IsValid() then
+            CancelTask_life(inst, owner)
+            return
+        end
+
+        ----计数器管理
+        _taskcounter = _taskcounter + 1
+        local doit = false
+        if _taskcounter % 4 == 0 then --每过两秒
+            doit = true
+            _taskcounter = 0
+        end
+
+        ----吸取对象的管理
+        local x, y, z = owner.Transform:GetWorldPosition()
+        local target = inst.lifetarget
+        if --吸血对象失效了，重新找新对象
+            target == nil or not target:IsValid() or
+            target.components.health == nil or target.components.health:IsDead() or
+            target:GetDistanceSqToPoint(x, y, z) > 400 --20*20
+        then
+            target = FindEntity(owner, 20, function(ent, finder)
+                    if
+                        ent.prefab ~= finder.prefab and --不吸收同类
+                        ent.components.health ~= nil and not ent.components.health:IsDead() and (
+                            (ent.components.combat ~= nil and ent.components.combat.target == finder) or
+                            ( --不攻击驯化的对象、自己的跟随者
+                                (ent.components.domesticatable == nil or not ent.components.domesticatable:IsDomesticated()) and
+                                (finder.components.leader == nil or not finder.components.leader:IsFollower(ent))
+                            )
+                        )
+                    then
+                        return true
+                    end
+                end,
+                {"_health"}, notags, nil
+            )
+            inst.lifetarget = target
+        end
+
+        ----特效
+        if target ~= nil then
+            SpawnLifeFx(target, owner)
+        end
+
+        ----积累的管理
+        if doit then
+            if target ~= nil then
+                DrinkLife(inst, target, 4)
+            end
+            if inst.healthcounter >= 4 then
+                if not HealOwner(inst, owner) then --优先为玩家恢复生命
+                    if inst.healthcounter >= 20 then --其次才是恢复自己的耐久
+                        HealArmor(inst)
+                    end
+                end
+            end
+        end
+    end, 1)
+end
+local function OnUnequip_mask2(inst, owner)
+    ClearSymbols_mask(inst, owner)
+    DeleteMaskHPCost(inst, owner)
+    CancelTask_life(inst, owner)
+    owner:RemoveEventCallback("onattackother", OnAttackOther)
+end
 
 MakeMask({
     name = "siving_mask_gold",
     assets = {
         Asset("ANIM", "anim/siving_mask_gold.zip"),
         Asset("ATLAS", "images/inventoryimages/siving_mask_gold.xml"),
-        Asset("IMAGE", "images/inventoryimages/siving_mask_gold.tex"),
+        Asset("IMAGE", "images/inventoryimages/siving_mask_gold.tex")
     },
     prefabs = {
         "siving_lifesteal_fx",
@@ -1327,95 +1441,13 @@ MakeMask({
         inst.healthcounter_max = 135
         inst.OnCalcuCost_l = CalcuCost
 
-        inst.components.equippable:SetOnEquip(function(inst, owner)
-            HAT_OPENTOP_ONEQUIP_L(inst, owner, "siving_mask_gold", GetSwapSymbol(owner))
-
-            --假人兼容：这里不做截断，为了能开发一些新玩法
-
-            AddMaskHPCost(inst, owner, 1)
-
-            owner:ListenForEvent("onattackother", OnAttackOther)
-
-            local notags = {
-                "NOCLICK", "INLIMBO", "shadow", "shadowminion", "playerghost", "ghost", "wall",
-                "balloon", "siving", "glommer", "friendlyfruitfly", "boat", "boatbumper", "structure"
-            }
-            if owner:HasTag("player") then --佩戴者是玩家时，不吸收其他玩家
-                table.insert(notags, "player")
-            end
-            local _taskcounter = 0
-            inst.task_life = inst:DoPeriodicTask(0.5, function(inst)
-                if not owner:IsValid() then
-                    CancelTask_life(inst, owner)
-                    return
-                end
-
-                ----计数器管理
-                _taskcounter = _taskcounter + 1
-                local doit = false
-                if _taskcounter % 4 == 0 then --每过两秒
-                    doit = true
-                    _taskcounter = 0
-                end
-
-                ----吸取对象的管理
-                local x, y, z = owner.Transform:GetWorldPosition()
-                local target = inst.lifetarget
-                if --吸血对象失效了，重新找新对象
-                    target == nil or not target:IsValid() or
-                    target.components.health == nil or target.components.health:IsDead() or
-                    target:GetDistanceSqToPoint(x, y, z) > 400 --20*20
-                then
-                    target = FindEntity(owner, 20, function(ent, finder)
-                            if
-                                ent.prefab ~= finder.prefab and --不吸收同类
-                                ent.components.health ~= nil and not ent.components.health:IsDead() and (
-                                    (ent.components.combat ~= nil and ent.components.combat.target == finder) or
-                                    ( --不攻击驯化的对象、自己的跟随者
-                                        (ent.components.domesticatable == nil or not ent.components.domesticatable:IsDomesticated()) and
-                                        (finder.components.leader == nil or not finder.components.leader:IsFollower(ent))
-                                    )
-                                )
-                            then
-                                return true
-                            end
-                        end,
-                        {"_health"}, notags, nil
-                    )
-                    inst.lifetarget = target
-                end
-
-                ----特效
-                if target ~= nil then
-                    SpawnLifeFx(target, owner)
-                end
-
-                ----积累的管理
-                if doit then
-                    if target ~= nil then
-                        DrinkLife(inst, target, 4)
-                    end
-                    if inst.healthcounter >= 4 then
-                        if not HealOwner(inst, owner) then --优先为玩家恢复生命
-                            if inst.healthcounter >= 20 then --其次才是恢复自己的耐久
-                                HealArmor(inst)
-                            end
-                        end
-                    end
-                end
-            end, 1)
-        end)
-        inst.components.equippable:SetOnUnequip(function(inst, owner)
-            HAT_ONUNEQUIP_L(inst, owner)
-            DeleteMaskHPCost(inst, owner)
-            CancelTask_life(inst, owner)
-            owner:RemoveEventCallback("onattackother", OnAttackOther)
-        end)
+        inst.components.equippable:SetOnEquip(OnEquip_mask2)
+        inst.components.equippable:SetOnUnequip(OnUnequip_mask2)
 
         inst.components.armor:InitCondition(735, 0.75)
 
         inst:AddComponent("lifebender") --御血神通！然而并不
-        inst.components.lifebender.fn_bend = FnBend_mask
+        inst.components.lifebender.fn_bend = FnBend_mask2
     end
 })
 

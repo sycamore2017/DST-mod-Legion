@@ -64,8 +64,41 @@ local function MakeFx(data)
 			return inst
 		end,
 		data.assets,
-		data.prefabs
+		nil
 	))
+end
+local function MakeFx2(data)
+    table.insert(prefs, Prefab(
+        data.name,
+        function()
+            local inst = CreateEntity()
+
+            inst.entity:AddTransform()
+            inst.entity:AddAnimState()
+            inst.entity:AddNetwork()
+
+            inst:AddTag("FX")
+
+            if data.fn_common ~= nil then
+				data.fn_common(inst)
+			end
+
+            inst.entity:SetPristine()
+            if not TheWorld.ismastersim then
+                return inst
+            end
+
+            inst.persists = false
+
+            if data.fn_server ~= nil then
+				data.fn_server(inst)
+			end
+
+            return inst
+        end,
+        data.assets,
+        nil
+    ))
 end
 
 ---------------
@@ -76,7 +109,6 @@ end
 --     assets = {
 --         Asset("ANIM", "anim/lavaarena_sunder_armor.zip"), --官方的熔炉破甲buff特效动画
 --     },
---     prefabs = nil,
 --     fn_common = nil,
 --     fn_anim = function(inst)
 --         inst.AnimState:SetBank("lavaarena_sunder_armor")
@@ -93,7 +125,6 @@ MakeFx({ --盾击：盾反成功特效
     assets = {
         Asset("ANIM", "anim/lavaarena_beetletaur_fx.zip"), --官方的熔炉甲虫猪防御特效动画
     },
-    prefabs = nil,
     fn_common = nil,
     fn_anim = function(inst)
         inst.AnimState:SetBank("lavaarena_beetletaur_fx")
@@ -112,7 +143,6 @@ MakeFx({ --玫瑰酥：零散的气氛烘托特效
         Asset("ANIM", "anim/winters_feast_fx.zip"),  --官方节日餐桌气氛动画模板
         Asset("ANIM", "anim/dish_lovingrosecake_fx.zip")
     },
-    prefabs = nil,
     fn_common = nil,
     fn_anim = function(inst)
         inst.AnimState:SetBank("winters_feast_fx")
@@ -130,7 +160,6 @@ MakeFx({ --玫瑰酥：零散的气氛烘托特效
 --         Asset("ANIM", "anim/winters_feast_table_fx.zip"),  --官方节日餐桌食物消失动画模板
 --         Asset("ANIM", "anim/dish_lovingrosecake_fx.zip")
 --     },
---     prefabs = nil,
 --     fn_common = nil,
 --     fn_anim = function(inst)
 --         inst.AnimState:SetBank("winters_feast_table_fx")
@@ -150,7 +179,6 @@ MakeFx({ --玫瑰酥：零散的气氛烘托特效(特殊)
         Asset("ANIM", "anim/winters_feast_fx.zip"),  --官方节日餐桌气氛动画模板
         Asset("ANIM", "anim/dish_lovingrosecake2_fx.zip")
     },
-    prefabs = nil,
     fn_common = nil,
     fn_anim = function(inst)
         inst.AnimState:SetBank("winters_feast_fx")
@@ -168,7 +196,6 @@ MakeFx({ --玫瑰酥：非常多的气氛烘托特效(特殊)
         Asset("ANIM", "anim/winters_feast_table_fx.zip"),  --官方节日餐桌食物消失动画模板
         Asset("ANIM", "anim/dish_lovingrosecake2_fx.zip")
     },
-    prefabs = nil,
     fn_common = nil,
     fn_anim = function(inst)
         inst.AnimState:SetBank("winters_feast_table_fx")
@@ -193,7 +220,6 @@ MakeFx({ --兰草花剑：飞溅花瓣
         Asset("ANIM", "anim/impact_orchid.zip"),
         Asset("ANIM", "anim/impact.zip"), --官方击中特效动画模板
     },
-    prefabs = nil,
     fn_common = nil,
     fn_anim = function(inst)
         inst.AnimState:SetBank("impact")
@@ -209,7 +235,6 @@ MakeFx({ --粉色追猎：飞溅花瓣
         Asset("ANIM", "anim/lavaarena_heal_projectile.zip"), --官方的熔炉奶杖击中特效动画
         Asset("ANIM", "anim/skin/impact_orchid_fx_disguiser.zip"),
     },
-    prefabs = nil,
     fn_common = nil,
     fn_anim = function(inst)
         inst.AnimState:SetBank("lavaarena_heal_projectile")
@@ -225,7 +250,6 @@ MakeFx({ --铁艺兰珊：飞溅花瓣
         Asset("ANIM", "anim/lavaarena_heal_projectile.zip"), --官方的熔炉奶杖击中特效动画
         Asset("ANIM", "anim/skin/impact_orchid_fx_marble.zip"),
     },
-    prefabs = nil,
     fn_common = nil,
     fn_anim = function(inst)
         inst.AnimState:SetBank("lavaarena_heal_projectile")
@@ -241,7 +265,6 @@ MakeFx({ --永不凋零：损坏自己庇佑玩家的特效
         Asset("ANIM", "anim/stalker_shield.zip"), --官方影织者护盾动画模板
         Asset("ANIM", "anim/neverfade_shield.zip"),
     },
-    prefabs = nil,
     fn_common = nil,
     fn_anim = function(inst)
         inst.entity:AddSoundEmitter()
@@ -267,7 +290,6 @@ MakeFx({ --永不凋零：损坏自己庇佑玩家的特效
 --     assets = {
 --         Asset("ANIM", "anim/lavaarena_firebomb.zip"), --官方熔炉燃烧瓶特效动画模板
 --     },
---     prefabs = nil,
 --     fn_common = nil,
 --     fn_anim = function(inst)
 --         inst.AnimState:SetBank("lavaarena_firebomb")
@@ -284,7 +306,6 @@ MakeFx({ --永不凋零：损坏自己庇佑玩家的特效
 --     assets = {
 --         Asset("ANIM", "anim/lavaarena_heal_projectile.zip"), --官方的熔炉奶杖击中特效动画
 --     },
---     prefabs = nil,
 --     fn_common = nil,
 --     fn_anim = function(inst)
 --         inst.AnimState:SetBank("lavaarena_heal_projectile")
@@ -302,7 +323,6 @@ MakeFx({ --贯星剑：闪光炸裂
         Asset("ANIM", "anim/lavaarena_heal_projectile.zip"), --官方的熔炉奶杖击中特效动画
         Asset("ANIM", "anim/skin/rosorns_collector_fx.zip"),
     },
-    prefabs = nil,
     fn_common = nil,
     fn_anim = function(inst)
         inst.AnimState:SetBank("lavaarena_heal_projectile")
@@ -319,7 +339,6 @@ MakeFx({ --落薇剪：一剪没
         Asset("ANIM", "anim/boomerang.zip"), --官方的回旋镖动画
         Asset("ANIM", "anim/skin/rosorns_marble_fx.zip"),
     },
-    prefabs = nil,
     fn_common = nil,
     fn_anim = function(inst)
         inst.AnimState:SetBank("boomerang")
@@ -340,7 +359,6 @@ MakeFx({ --艾力冈的剑：燃血
         Asset("ANIM", "anim/lavaarena_boarrior_fx.zip"), --需要官方的动画模板
         Asset("ANIM", "anim/agronssword_fx.zip"),
     },
-    prefabs = nil,
     fn_common = nil,
     fn_anim = function(inst)
         inst.AnimState:SetBank("lavaarena_boarrior_fx")
@@ -357,7 +375,6 @@ MakeFx({ --糖霜法棍：燃血
         Asset("ANIM", "anim/lavaarena_boarrior_fx.zip"), --需要官方的动画模板
         Asset("ANIM", "anim/skin/agronssword_fx_taste.zip")
     },
-    prefabs = nil,
     fn_common = nil,
     fn_anim = function(inst)
         inst.AnimState:SetBank("lavaarena_boarrior_fx")
@@ -375,7 +392,6 @@ MakeFx({ --月折宝剑：凝血
         Asset("ANIM", "anim/lavaarena_boarrior_fx.zip"),    --需要官方的动画模板
         Asset("ANIM", "anim/refractedmoonlight_fx.zip"),
     },
-    prefabs = nil,
     fn_common = nil,
     fn_anim = function(inst)
         inst.AnimState:SetBank("lavaarena_boarrior_fx")
@@ -392,7 +408,6 @@ MakeFx({ --月轮宝盘：光韵特效
         Asset("ANIM", "anim/terrariumchest_fx.zip"), --官方盒中泰拉箱子的特效
         Asset("ANIM", "anim/revolvedmoonlight_fx.zip")
     },
-    prefabs = nil,
     fn_common = nil,
     fn_anim = function(inst)
         inst.AnimState:SetBank("terrariumchest_fx")
@@ -420,7 +435,6 @@ MakeFx({ --素白蘑菇帽：作物疾病的治愈时，消散的细菌
         Asset("ANIM", "anim/lavaarena_boarrior_fx.zip"),    --需要官方的动画模板
         Asset("ANIM", "anim/agronssword_fx.zip"),           --套用已有的贴图
     },
-    prefabs = nil,
     fn_common = nil,
     fn_anim = function(inst)
         inst.AnimState:SetBank("lavaarena_boarrior_fx")
@@ -437,7 +451,6 @@ MakeFx({ --素白蘑菇帽：玩家身上不断冒出的孢子
         Asset("ANIM", "anim/wormwood_pollen_fx.zip"),    --需要官方的动画模板
         Asset("ANIM", "anim/residualspores_fx.zip"),
     },
-    prefabs = nil,
     fn_common = nil,
     fn_anim = function(inst)
         inst.AnimState:SetBank("wormwood_pollen_fx")
@@ -463,7 +476,6 @@ MakeFx({ --芬布尔斧：击中时贴地扩散的闪电
         Asset("ANIM", "anim/fimbul_static_fx.zip"),
         Asset("ANIM", "anim/lavaarena_hammer_attack_fx.zip"), --官方熔炉锤子大招特效动画模板
     },
-    prefabs = nil,
     fn_common = nil,
     fn_anim = function(inst)
         inst.AnimState:SetBank("lavaarena_hammer_attack_fx")
@@ -483,7 +495,6 @@ MakeFx({ --跃星杖：飘散的星星
     assets = {
         Asset("ANIM", "anim/skin/fimbul_axe_collector.zip"),
     },
-    prefabs = nil,
     fn_common = nil,
     fn_anim = function(inst)
         inst.AnimState:SetBank("fimbul_axe_collector")
@@ -500,7 +511,6 @@ MakeFx({ --跃星杖：炸落的星星
         Asset("ANIM", "anim/explode.zip"), --官方爆炸特效动画模板
         Asset("ANIM", "anim/skin/fimbul_axe_collector2_fx.zip"),
     },
-    prefabs = nil,
     fn_common = function(inst)
         inst.Transform:SetFourFaced()
     end,
@@ -519,7 +529,6 @@ MakeFx({ --跃星杖：扩大的星星
     assets = {
         Asset("ANIM", "anim/skin/fimbul_axe_collector3_fx.zip"),
     },
-    prefabs = nil,
     fn_common = nil,
     fn_anim = function(inst)
         inst.AnimState:SetBank("fimbul_axe_collector3_fx")
@@ -540,7 +549,6 @@ MakeFx({ --跃星杖：扩大的星星
 --         Asset("ANIM", "anim/fimbul_attack_fx.zip"),
 --         Asset("ANIM", "anim/lavaarena_hammer_attack_fx.zip"), --官方熔炉锤子大招特效动画模板
 --     },
---     prefabs = nil,
 --     fn_common = nil,
 --     fn_anim = function(inst)
 --         inst.AnimState:SetBank("lavaarena_hammer_attack_fx")
@@ -558,7 +566,6 @@ MakeFx({ --重铸boss：远程飞溅攻击特效
         Asset("ANIM", "anim/fimbul_teleport_fx.zip"),
         Asset("ANIM", "anim/lavaarena_creature_teleport.zip"), --官方熔炉敌人出场特效动画模板
     },
-    prefabs = nil,
     fn_common = nil,
     fn_anim = function(inst)
         inst.AnimState:SetBank("lavaarena_creature_teleport")
@@ -579,7 +586,6 @@ MakeFx({ --重铸boss：战吼时的爆炸
         Asset("ANIM", "anim/fimbul_explode_fx.zip"),
         Asset("ANIM", "anim/explode.zip"), --官方爆炸特效动画模板
     },
-    prefabs = nil,
     fn_common = function(inst)
         inst.Transform:SetFourFaced()
     end,
@@ -603,7 +609,6 @@ MakeFx({ --米格尔吉他：飘散的万寿菊花瓣
         Asset("ANIM", "anim/pine_needles.zip"), --官方砍树掉落松针特效
         Asset("ANIM", "anim/guitar_miguel_fx.zip"),
     },
-    prefabs = nil,
     fn_common = nil,
     fn_anim = function(inst)
         inst.AnimState:SetBank("pine_needles")
@@ -616,13 +621,11 @@ MakeFx({ --米格尔吉他：飘散的万寿菊花瓣
     end,
     fn_remove = nil,
 })
-
 MakeFx({ --爆炸水果蛋糕：爆炸特效
     name = "explode_fruitcake",
     assets = {
-        Asset("ANIM", "anim/explode.zip"), --官方爆炸特效动画模板
+        Asset("ANIM", "anim/explode.zip") --官方爆炸特效动画模板
     },
-    prefabs = nil,
     fn_common = function(inst)
         inst.Transform:SetFourFaced()
     end,
@@ -640,15 +643,12 @@ MakeFx({ --爆炸水果蛋糕：爆炸特效
     end,
     fn_remove = nil,
 })
-
-table.insert(prefs, Prefab(
-    "icire_rock_fx_day",
-    function()
-        local inst = CreateEntity()
-
-        inst.entity:AddTransform()
-        inst.entity:AddAnimState()
-        inst.entity:AddNetwork()
+MakeFx2({ --风景球：落雪
+    name = "icire_rock_fx_day",
+    assets = {
+        Asset("ANIM", "anim/wintersfeastfuel.zip") --官方节日欢愉动画
+    },
+    fn_common = function(inst)
         inst.entity:AddFollower()
 
         inst.AnimState:SetBank("wintersfeastfuel")
@@ -658,23 +658,9 @@ table.insert(prefs, Prefab(
 
         local sc = 1.2
         inst.AnimState:SetScale(sc, sc, sc)
-
-        inst:AddTag("FX")
-
-        inst.entity:SetPristine()
-        if not TheWorld.ismastersim then
-            return inst
-        end
-
-        inst.persists = false
-
-        return inst
     end,
-    {
-        Asset("ANIM", "anim/wintersfeastfuel.zip") --官方节日欢愉动画
-    },
-    nil
-))
+    -- fn_server = function(inst)end
+})
 
 ------
 --尘世蜃楼
@@ -686,7 +672,6 @@ MakeFx({ --白木吉他：弹奏时的飘动音符
         Asset("ANIM", "anim/guitar_whitewood_doing_fx.zip"),
         Asset("ANIM", "anim/fx_wathgrithr_buff.zip"), --官方战歌特效动画模板
     },
-    prefabs = nil,
     fn_common = nil,
     fn_anim = function(inst)
         local anims =
@@ -704,38 +689,21 @@ MakeFx({ --白木吉他：弹奏时的飘动音符
     end,
     fn_remove = nil,
 })
-table.insert(prefs, Prefab( --幻象法杖：电光(音速起子12)
-    "pinkstaff_fx_tvplay",
-    function()
-        local inst = CreateEntity()
-
-        inst.entity:AddTransform()
-        inst.entity:AddAnimState()
-        inst.entity:AddNetwork()
-
+MakeFx2({ --幻象法杖：电光(音速起子12)
+    name = "pinkstaff_fx_tvplay",
+    assets = {
+        Asset("ANIM", "anim/skin/pinkstaff_fx_tvplay.zip")
+    },
+    fn_common = function(inst)
         inst.AnimState:SetBank("pinkstaff_fx_tvplay")
         inst.AnimState:SetBuild("pinkstaff_fx_tvplay")
         inst.AnimState:PlayAnimation("idle", true)
         inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
         inst.AnimState:SetMultColour(115/255, 217/255, 255/255, 0.6)
         inst.AnimState:SetFinalOffset(1)
-
-        inst:AddTag("FX")
-
-        inst.entity:SetPristine()
-        if not TheWorld.ismastersim then
-            return inst
-        end
-
-        inst.persists = false
-
-        return inst
     end,
-    {
-        Asset("ANIM", "anim/skin/pinkstaff_fx_tvplay.zip")
-    },
-    nil
-))
+    -- fn_server = function(inst)end
+})
 
 ------
 --丰饶传说
@@ -747,7 +715,6 @@ MakeFx({ --脱壳之翅：逃脱时的茸毛特效
         Asset("ANIM", "anim/lavaarena_heal_projectile.zip"), --官方的熔炉奶杖击中特效动画
         Asset("ANIM", "anim/boltwingout_fx.zip"),
     },
-    prefabs = nil,
     fn_common = nil,
     fn_anim = function(inst)
         inst.AnimState:SetBank("lavaarena_heal_projectile")
@@ -763,7 +730,6 @@ MakeFx({ --枯叶飞舞：逃脱时的茸毛特效
         Asset("ANIM", "anim/lavaarena_heal_projectile.zip"), --官方的熔炉奶杖击中特效动画
         Asset("ANIM", "anim/skin/boltwingout_fx_disguiser.zip"),
     },
-    prefabs = nil,
     fn_common = nil,
     fn_anim = function(inst)
         inst.AnimState:SetBank("lavaarena_heal_projectile")
@@ -779,7 +745,6 @@ MakeFx({ --子圭·歃：生命转移特效
         Asset("ANIM", "anim/life_trans_fx.zip"),
         Asset("ANIM", "anim/cursed_fx.zip"), --官方猴子诅咒特效动画模板
     },
-    prefabs = nil,
     fn_common = nil,
     fn_anim = function(inst)
         inst.AnimState:SetBank("cursed_fx")
@@ -797,7 +762,6 @@ MakeFx({ --子圭寄生花：消失特效
         Asset("ANIM", "anim/lavaarena_boarrior_fx.zip"), --官方的动画
         Asset("ANIM", "anim/siving_boss_flower_fx.zip"),
     },
-    prefabs = nil,
     fn_common = nil,
     fn_anim = function(inst)
         inst.AnimState:SetBank("lavaarena_boarrior_fx")
@@ -814,7 +778,6 @@ MakeFx({ --魔音绕梁：音波特效
     assets = {
         Asset("ANIM", "anim/bearger_ring_fx.zip"), --官方的动画
     },
-    prefabs = nil,
     fn_common = nil,
     fn_anim = function(inst)
         inst.AnimState:SetBank("bearger_ring_fx")
@@ -834,7 +797,6 @@ MakeFx({ --花寄语：音波特效
         Asset("ANIM", "anim/alterguardian_meteor.zip"), --官方的动画
         Asset("ANIM", "anim/siving_boss_caw_fx.zip")
     },
-    prefabs = nil,
     fn_common = nil,
     fn_anim = function(inst)
         inst.AnimState:SetBank("alterguardian_meteor")
@@ -857,7 +819,6 @@ MakeFx({ --子圭石子：碎掉特效
     assets = {
         Asset("ANIM", "anim/siving_egg.zip"),
     },
-    prefabs = nil,
     fn_common = nil,
     fn_anim = function(inst)
         inst.AnimState:SetBank("siving_egg")
@@ -873,7 +834,6 @@ MakeFx({ --子圭·育：基因解锁时的花火特效(蓝绿色)
     assets = {
         Asset("ANIM", "anim/table_winters_feast.zip")  --官方节日餐桌动画模板
     },
-    prefabs = nil,
     fn_common = nil,
     fn_anim = function(inst)
         inst.AnimState:SetBank("table_winters_feast")
@@ -894,7 +854,6 @@ MakeFx({ --转星移：基因解锁时的花火特效(金色)
     assets = {
         Asset("ANIM", "anim/table_winters_feast.zip")  --官方节日餐桌动画模板
     },
-    prefabs = nil,
     fn_common = nil,
     fn_anim = function(inst)
         inst.AnimState:SetBank("table_winters_feast")
@@ -916,7 +875,6 @@ MakeFx({ --旅星猫：投射路径特效
         Asset("ANIM", "anim/gold_nugget.zip"), --官方金块动画
         Asset("ANIM", "anim/skin/siving_feather_collector_fx.zip")
     },
-    prefabs = nil,
     fn_common = nil,
     fn_anim = function(inst)
         inst.AnimState:SetBank("goldnugget")
@@ -945,7 +903,6 @@ MakeFx({ --流星猫：投射路径特效
         Asset("ANIM", "anim/gold_nugget.zip"), --官方金块动画
         Asset("ANIM", "anim/skin/siving_feather_collector_fx.zip")
     },
-    prefabs = nil,
     fn_common = nil,
     fn_anim = function(inst)
         inst.AnimState:SetBank("goldnugget")
@@ -986,7 +943,6 @@ local anims_kitcoon = {
 }
 
 ------随机仿sg的动画
-
 local function DoSgAnim(inst)
     if inst.skin_l_anims then
         local anim = nil
@@ -1028,60 +984,61 @@ end
 --     inst:RemoveEventCallback("animover", DoSgAnim)
 -- end
 
-local function MakeFx_kitcoon(data)
-    table.insert(prefs, Prefab(
-        data.name,
-        function()
-            local inst = CreateEntity()
-
-            inst.entity:AddTransform()
-            inst.entity:AddAnimState()
-            inst.entity:AddFollower()
-            inst.entity:AddNetwork()
-
-            inst.Transform:SetSixFaced()
-
-            inst.AnimState:SetBank("kitcoon")
-            inst.AnimState:SetBuild(data.build)
-            inst.AnimState:PlayAnimation("idle_loop")
-
-            inst:AddTag("FX")
-
-            inst.entity:SetPristine()
-            if not TheWorld.ismastersim then
-                return inst
-            end
-
-            inst.persists = false
-
-            SetSgSkinAnim(inst, anims_kitcoon)
-
-            return inst
-        end,
-        data.assets,
-        nil
-    ))
-end
-
-MakeFx_kitcoon({ --旅星猫：蓝色猫猫
+MakeFx2({ --旅星猫：蓝色猫猫
     name = "sivfeather_real_collector_fx",
-    build = "siving_feather_real_collector",
     assets = {
         Asset("ANIM", "anim/skin/siving_feather_real_collector.zip"),
         Asset("ANIM", "anim/kitcoon_basic.zip"),  --官方猫咪动画模板
         Asset("ANIM", "anim/kitcoon_emotes.zip"),
         Asset("ANIM", "anim/kitcoon_jump.zip")
-    }
+    },
+    fn_common = function(inst)
+        inst.entity:AddFollower()
+        inst.Transform:SetSixFaced()
+
+        inst.AnimState:SetBank("kitcoon")
+        inst.AnimState:SetBuild("siving_feather_real_collector")
+        inst.AnimState:PlayAnimation("idle_loop")
+    end,
+    fn_server = function(inst)
+        SetSgSkinAnim(inst, anims_kitcoon)
+    end
 })
-MakeFx_kitcoon({ --流星猫：棕色猫猫
+MakeFx2({ --流星猫：棕色猫猫
     name = "sivfeather_fake_collector_fx",
-    build = "siving_feather_fake_collector",
     assets = {
         Asset("ANIM", "anim/skin/siving_feather_fake_collector.zip"),
         Asset("ANIM", "anim/kitcoon_basic.zip"),  --官方猫咪动画模板
         Asset("ANIM", "anim/kitcoon_emotes.zip"),
         Asset("ANIM", "anim/kitcoon_jump.zip")
-    }
+    },
+    fn_common = function(inst)
+        inst.entity:AddFollower()
+        inst.Transform:SetSixFaced()
+
+        inst.AnimState:SetBank("kitcoon")
+        inst.AnimState:SetBuild("siving_feather_fake_collector")
+        inst.AnimState:PlayAnimation("idle_loop")
+    end,
+    fn_server = function(inst)
+        SetSgSkinAnim(inst, anims_kitcoon)
+    end
+})
+
+------
+
+MakeFx2({ --巫仆骨面：红
+    name = "sivmask_era_fx",
+    assets = {
+        Asset("ANIM", "anim/skin/siving_mask_era.zip")
+    },
+    fn_common = function(inst)
+        inst.entity:AddFollower()
+        inst.AnimState:SetBank("siving_mask_era")
+        inst.AnimState:SetBuild("siving_mask_era")
+        inst.AnimState:PlayAnimation("idle1", true)
+    end,
+    -- fn_server = function(inst)end
 })
 
 ---------------

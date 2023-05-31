@@ -912,6 +912,29 @@ _G.SKIN_PREFABS_LEGION = {
         end,
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 }
     },
+
+    siving_mask = {
+        assets = nil,
+        image = { name = nil, atlas = nil, setable = true },
+        anim = {
+            bank = nil, build = nil,
+            anim = nil, animpush = nil, isloop = nil,
+            setable = true
+        },
+        equip = { symbol = nil, build = "siving_mask", file = nil, isopenhat = true },
+        exchangefx = { prefab = nil, offset_y = nil, scale = nil }
+    },
+    siving_mask_gold = {
+        assets = nil,
+        image = { name = nil, atlas = nil, setable = true },
+        anim = {
+            bank = nil, build = nil,
+            anim = nil, animpush = nil, isloop = nil,
+            setable = true
+        },
+        equip = { symbol = nil, build = "siving_mask_gold", file = nil, isopenhat = true },
+        exchangefx = { prefab = nil, offset_y = nil, scale = nil }
+    },
 }
 
 _G.SKINS_LEGION = {
@@ -2984,7 +3007,7 @@ _G.SKINS_LEGION = {
 
     siving_ctlwater_item_era = {
         base_prefab = "siving_ctlwater_item",
-		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
+		type = "item", skin_tags = {}, release_group = 555, rarity = raritySpecial,
 
         skin_id = "64759cc569b4f368be452b14",
         noshopshow = true,
@@ -3010,7 +3033,7 @@ _G.SKINS_LEGION = {
     },
     siving_ctlwater_era = {
         base_prefab = "siving_ctlwater",
-		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
+		type = "item", skin_tags = {}, release_group = 555, rarity = raritySpecial,
 
         skin_id = "64759cc569b4f368be452b14",
         noshopshow = true,
@@ -3036,7 +3059,7 @@ _G.SKINS_LEGION = {
     },
     siving_ctldirt_item_era = {
         base_prefab = "siving_ctldirt_item",
-		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
+		type = "item", skin_tags = {}, release_group = 555, rarity = raritySpecial,
 
         skin_id = "64759cc569b4f368be452b14",
         noshopshow = true,
@@ -3062,7 +3085,7 @@ _G.SKINS_LEGION = {
     },
     siving_ctldirt_era = {
         base_prefab = "siving_ctldirt",
-		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
+		type = "item", skin_tags = {}, release_group = 555, rarity = raritySpecial,
 
         skin_id = "64759cc569b4f368be452b14",
         noshopshow = true,
@@ -3096,7 +3119,7 @@ _G.SKINS_LEGION = {
     },
     siving_ctlall_item_era = {
         base_prefab = "siving_ctlall_item",
-		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
+		type = "item", skin_tags = {}, release_group = 555, rarity = raritySpecial,
 
         skin_id = "64759cc569b4f368be452b14",
         noshopshow = true,
@@ -3122,7 +3145,7 @@ _G.SKINS_LEGION = {
     },
     siving_ctlall_era = {
         base_prefab = "siving_ctlall",
-		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
+		type = "item", skin_tags = {}, release_group = 555, rarity = raritySpecial,
 
         skin_id = "64759cc569b4f368be452b14",
         onlyownedshow = true,
@@ -3158,6 +3181,48 @@ _G.SKINS_LEGION = {
         linkedskins = { link = "siving_ctlall_item_era" },
         exchangefx = { prefab = nil, offset_y = nil, scale = 1.5 }
     },
+
+    siving_mask_era = {
+        base_prefab = "siving_mask",
+		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
+
+        skin_id = "64759cc569b4f368be452b14",
+        noshopshow = true,
+		assets = {
+			Asset("ANIM", "anim/skin/siving_mask_era.zip")
+		},
+		image = { name = nil, atlas = nil, setable = true },
+
+        string = ischinese and { name = "巫仆骨面" } or { name = "Witch Servant Bone Mask" },
+
+		anim = {
+            bank = nil, build = nil,
+            anim = nil, animpush = nil, isloop = nil,
+            setable = true
+        },
+        equip = {
+            startfn = function(inst, owner)
+                owner.AnimState:ClearOverrideSymbol("swap_hat")
+                owner.AnimState:Show("HAT")
+                owner.AnimState:Hide("HAIR_HAT")
+                owner.AnimState:Show("HAIR_NOHAT")
+                owner.AnimState:Show("HAIR")
+
+                owner.AnimState:Show("HEAD")
+                owner.AnimState:Show("HEAD_HAT")
+
+                SetFollowSymbolFx(owner, "fx_l_sivmask", {
+                    { name = "sivmask_era_fx", anim = nil, symbol = "swap_hat", idx = 0 },
+                    { name = "sivmask_era_fx", anim = "idle2", symbol = "swap_hat", idx = 1 },
+                    { name = "sivmask_era_fx", anim = "idle3", symbol = "headbase", idx = 2 }
+                }, false)
+            end,
+            endfn = function(inst, owner)
+                RemoveFollowSymbolFx(owner, "fx_l_sivmask")
+            end
+        },
+        exchangefx = { prefab = nil, offset_y = nil, scale = nil }
+    },
 }
 
 _G.SKIN_IDS_LEGION = {
@@ -3167,6 +3232,7 @@ _G.SKIN_IDS_LEGION = {
         fishhomingtool_awesome_thanks = true, fishhomingtool_normal_thanks = true, fishhomingbait_thanks = true,
         triplegoldenshovelaxe_era = true, tripleshovelaxe_era = true, lilybush_era = true, lileaves_era = true, icire_rock_era = true, shield_l_log_era = true, shield_l_sand_era = true,
         siving_ctlwater_item_era = true, siving_ctlwater_era = true, siving_ctldirt_item_era = true, siving_ctldirt_era = true, siving_ctlall_item_era = true, siving_ctlall_era = true,
+        siving_mask_era = true,
         orchidbush_disguiser = true, boltwingout_disguiser = true, plant_cactus_meat_l_world = true,
         rosebush_marble = true, lilybush_marble = true, orchidbush_marble = true, rosorns_marble = true, lileaves_marble = true, orchitwigs_marble = true,
         shield_l_log_emo_fist = true, hat_lichen_emo_que = true,
@@ -3226,6 +3292,7 @@ _G.SKIN_IDS_LEGION = {
         siving_ctlwater_item_era = true, siving_ctlwater_era = true,
         siving_ctldirt_item_era = true, siving_ctldirt_era = true,
         siving_ctlall_item_era = true, siving_ctlall_era = true,
+        siving_mask_era = true,
     }
 }
 _G.SKIN_IDX_LEGION = {
@@ -3252,6 +3319,7 @@ end
 ------
 
 local skinidxes = { --用以皮肤排序
+    "siving_ctlwater_item_era", "siving_ctlwater_era", "siving_ctldirt_item_era", "siving_ctldirt_era", "siving_ctlall_item_era", "siving_ctlall_era",
     "neverfade_thanks", "neverfadebush_thanks", "siving_derivant_thanks", "siving_derivant_thanks2",
     "backcub_thanks",
     "fishhomingtool_awesome_thanks", "fishhomingtool_normal_thanks", "fishhomingbait_thanks",
@@ -3265,7 +3333,7 @@ local skinidxes = { --用以皮肤排序
     "revolvedmoonlight_item_taste2", "revolvedmoonlight_taste2", "revolvedmoonlight_pro_taste2",
     "revolvedmoonlight_item_taste3", "revolvedmoonlight_taste3", "revolvedmoonlight_pro_taste3",
     "revolvedmoonlight_item_taste4", "revolvedmoonlight_taste4", "revolvedmoonlight_pro_taste4",
-    "siving_ctlwater_item_era", "siving_ctlwater_era", "siving_ctldirt_item_era", "siving_ctldirt_era", "siving_ctlall_item_era", "siving_ctlall_era",
+    "siving_mask_era",
     "triplegoldenshovelaxe_era", "tripleshovelaxe_era", "lilybush_era", "lileaves_era", "shield_l_log_era", "icire_rock_era", "shield_l_sand_era",
     "plant_cactus_meat_l_world", "orchidbush_disguiser", "boltwingout_disguiser",
     "rosebush_marble", "rosorns_marble", "lilybush_marble", "lileaves_marble", "orchidbush_marble", "orchitwigs_marble",
