@@ -995,7 +995,6 @@ local function SetSymbols_mask(inst, owner)
             skindata.equip.startfn(inst, owner)
             return
         end
-        print("sss")
         if skindata.equip.isopenhat then
             HAT_OPENTOP_ONEQUIP_L(inst, owner, skindata.equip.build, skindata.equip.file or GetSwapSymbol(owner))
         else

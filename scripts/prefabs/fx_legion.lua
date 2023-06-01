@@ -695,6 +695,7 @@ MakeFx2({ --幻象法杖：电光(音速起子12)
         Asset("ANIM", "anim/skin/pinkstaff_fx_tvplay.zip")
     },
     fn_common = function(inst)
+        inst.entity:AddFollower()
         inst.AnimState:SetBank("pinkstaff_fx_tvplay")
         inst.AnimState:SetBuild("pinkstaff_fx_tvplay")
         inst.AnimState:PlayAnimation("idle", true)
@@ -1034,9 +1035,11 @@ MakeFx2({ --巫仆骨面：红
     },
     fn_common = function(inst)
         inst.entity:AddFollower()
+        inst.Transform:SetFourFaced()
         inst.AnimState:SetBank("siving_mask_era")
         inst.AnimState:SetBuild("siving_mask_era")
-        inst.AnimState:PlayAnimation("idle1", true)
+        inst.AnimState:PlayAnimation("maskbtm", false)
+        inst.AnimState:SetFinalOffset(-1)
     end,
     -- fn_server = function(inst)end
 })

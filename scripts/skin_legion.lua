@@ -193,19 +193,19 @@ end
 
 ------
 
-local function SetFollowedFx(inst, owner, fxname, sym, x, y)
+local function SetFollowedFx(inst, owner, fxname, sym, x, y, fxkey)
     local fx = SpawnPrefab(fxname)
     if fx ~= nil then
         fx.entity:SetParent(owner.entity)
-        fx.entity:AddFollower()
+        -- fx.entity:AddFollower()
         fx.Follower:FollowSymbol(owner.GUID, sym or "swap_object", x or 0, y or 0, 0)
-        inst.fx_s_l = fx
+        inst[fxkey] = fx
     end
 end
-local function EndFollowedFx(inst, owner)
-    if inst.fx_s_l ~= nil then
-        inst.fx_s_l:Remove()
-        inst.fx_s_l = nil
+local function EndFollowedFx(inst, owner, fxkey)
+    if inst[fxkey] ~= nil then
+        inst[fxkey]:Remove()
+        inst[fxkey] = nil
     end
 end
 
@@ -1527,13 +1527,17 @@ _G.SKINS_LEGION = {
         fn_start = function(inst)
             inst.fxcolour = {115/255, 217/255, 255/255}
         end,
-        fn_end = EndFollowedFx,
+        fn_end = function(inst)
+            EndFollowedFx(inst, nil, "fx_l_pinkstaff_tv")
+        end,
         equip = { symbol = "swap_object", build = "pinkstaff_tvplay", file = "swap_object" },
         equipfx = {
             start = function(inst, owner)
-                SetFollowedFx(inst, owner, "pinkstaff_fx_tvplay", "swap_object", 0, -140)
+                SetFollowedFx(inst, owner, "pinkstaff_fx_tvplay", "swap_object", 0, -140, "fx_l_pinkstaff_tv")
             end,
-            stop = EndFollowedFx
+            stop = function(inst, owner)
+                EndFollowedFx(inst, nil, "fx_l_pinkstaff_tv")
+            end
         },
         exchangefx = { prefab = nil, offset_y = nil, scale = nil },
         floater = { cut = 0.15, size = "small", offset_y = 0.35, scale = 0.5, nofx = nil }
@@ -3189,7 +3193,8 @@ _G.SKINS_LEGION = {
         skin_id = "64759cc569b4f368be452b14",
         noshopshow = true,
 		assets = {
-			Asset("ANIM", "anim/skin/siving_mask_era.zip")
+			Asset("ANIM", "anim/skin/siving_mask_era.zip"),
+            Asset("ANIM", "anim/siving_mask_era_fx.zip")
 		},
 		image = { name = nil, atlas = nil, setable = true },
 
@@ -3200,27 +3205,16 @@ _G.SKINS_LEGION = {
             anim = nil, animpush = nil, isloop = nil,
             setable = true
         },
-        equip = {
-            startfn = function(inst, owner)
-                owner.AnimState:ClearOverrideSymbol("swap_hat")
-                owner.AnimState:Show("HAT")
-                owner.AnimState:Hide("HAIR_HAT")
-                owner.AnimState:Show("HAIR_NOHAT")
-                owner.AnimState:Show("HAIR")
-
-                owner.AnimState:Show("HEAD")
-                owner.AnimState:Show("HEAD_HAT")
-
-                SetFollowSymbolFx(owner, "fx_l_sivmask", {
-                    { name = "sivmask_era_fx", anim = nil, symbol = "swap_hat", idx = 0 },
-                    { name = "sivmask_era_fx", anim = "idle2", symbol = "swap_hat", idx = 1 },
-                    { name = "sivmask_era_fx", anim = "idle3", symbol = "headbase", idx = 2 }
-                }, false)
-            end,
-            endfn = function(inst, owner)
-                RemoveFollowSymbolFx(owner, "fx_l_sivmask")
+        fn_start = function(inst)
+            inst.fn_l_maskfx = function(fx)
+                -- fx.AnimState:SetBank("lifeplant_fx")
+                fx.AnimState:SetBuild("siving_mask_era_fx")
             end
-        },
+        end,
+        fn_end = function(inst)
+            inst.fn_l_maskfx = nil
+        end,
+        equip = { symbol = nil, build = "siving_mask_era", file = "swap_hat", isopenhat = true },
         exchangefx = { prefab = nil, offset_y = nil, scale = nil }
     },
 }
