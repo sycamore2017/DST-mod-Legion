@@ -225,7 +225,11 @@ local function SetFollowSymbolFx(owner, fxkey, fxdata, randomanim)
         for i, v in ipairs(fxdata) do
             local fx = SpawnPrefab(v.name)
             if v.anim ~= nil then
-                fx.AnimState:PlayAnimation(v.anim, true)
+                if v.noloop then
+                    fx.AnimState:PlayAnimation(v.anim, false)
+                else
+                    fx.AnimState:PlayAnimation(v.anim, true)
+                end
             end
             table.insert(owner[fxkey], fx)
         end
@@ -3193,12 +3197,11 @@ _G.SKINS_LEGION = {
         skin_id = "64759cc569b4f368be452b14",
         noshopshow = true,
 		assets = {
-			Asset("ANIM", "anim/skin/siving_mask_era.zip"),
-            Asset("ANIM", "anim/siving_mask_era_fx.zip")
+			Asset("ANIM", "anim/skin/siving_mask_era.zip")
 		},
 		image = { name = nil, atlas = nil, setable = true },
 
-        string = ischinese and { name = "巫仆骨面" } or { name = "Witch Servant Bone Mask" },
+        string = ischinese and { name = "巫仆血骨面" } or { name = "Blood Servant Bone Mask" },
 
 		anim = {
             bank = nil, build = nil,
@@ -3206,15 +3209,84 @@ _G.SKINS_LEGION = {
             setable = true
         },
         fn_start = function(inst)
-            inst.fn_l_maskfx = function(fx)
-                -- fx.AnimState:SetBank("lifeplant_fx")
-                fx.AnimState:SetBuild("siving_mask_era_fx")
-            end
+            inst.maskfxoverride_l = "siving_lifesteal_fx_era1"
         end,
         fn_end = function(inst)
-            inst.fn_l_maskfx = nil
+            inst.maskfxoverride_l = nil
         end,
         equip = { symbol = nil, build = "siving_mask_era", file = "swap_hat", isopenhat = true },
+        exchangefx = { prefab = nil, offset_y = nil, scale = nil }
+    },
+    siving_mask_era2 = {
+        base_prefab = "siving_mask",
+		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
+
+        skin_id = "64759cc569b4f368be452b14",
+        noshopshow = true,
+		assets = {
+			Asset("ANIM", "anim/skin/siving_mask_era2.zip")
+		},
+		image = { name = nil, atlas = nil, setable = true },
+
+        string = ischinese and { name = "巫仆毒骨面" } or { name = "Toxin Servant Bone Mask" },
+
+		anim = {
+            bank = nil, build = nil,
+            anim = nil, animpush = nil, isloop = nil,
+            setable = true
+        },
+        fn_start = function(inst)
+            inst.maskfxoverride_l = "siving_lifesteal_fx_era2"
+        end,
+        fn_end = function(inst)
+            inst.maskfxoverride_l = nil
+        end,
+        equip = { symbol = nil, build = "siving_mask_era2", file = "swap_hat", isopenhat = true },
+        exchangefx = { prefab = nil, offset_y = nil, scale = nil }
+    },
+    siving_mask_gold_era = {
+        base_prefab = "siving_mask_gold",
+		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
+
+        skin_id = "64759cc569b4f368be452b14",
+        noshopshow = true,
+		assets = {
+			Asset("ANIM", "anim/skin/siving_mask_gold_era.zip")
+		},
+		image = { name = nil, atlas = nil, setable = true },
+
+        string = ischinese and { name = "巫酋血骨面" } or { name = "Blood Chief Bone Mask" },
+
+		anim = {
+            bank = nil, build = nil,
+            anim = nil, animpush = nil, isloop = nil,
+            setable = true
+        },
+        fn_start = function(inst)
+            inst.maskfxoverride_l = "siving_lifesteal_fx_era3"
+        end,
+        fn_end = function(inst)
+            inst.maskfxoverride_l = nil
+        end,
+        equip = {
+            startfn = function(inst, owner)
+                owner.AnimState:ClearOverrideSymbol("swap_hat")
+                owner.AnimState:Show("HAT")
+                owner.AnimState:Hide("HAIR_HAT")
+                owner.AnimState:Show("HAIR_NOHAT")
+                owner.AnimState:Show("HAIR")
+                owner.AnimState:Show("HEAD")
+                owner.AnimState:Hide("HEAD_HAT")
+                SetFollowSymbolFx(owner, "fx_l_sivmask", {
+                    { name = "sivmask_era_fx", anim = nil, symbol = "swap_hat", idx = 0 },
+                    { name = "sivmask_era_fx", anim = "idle2", symbol = "swap_hat", idx = 1 },
+                    { name = "sivmask_era_fx", anim = "idle3", symbol = "swap_hat", idx = 2 }
+                }, false)
+            end,
+            endfn = function(inst, owner)
+                RemoveFollowSymbolFx(owner, "fx_l_sivmask")
+            end
+        },
         exchangefx = { prefab = nil, offset_y = nil, scale = nil }
     },
 }
@@ -3226,7 +3298,7 @@ _G.SKIN_IDS_LEGION = {
         fishhomingtool_awesome_thanks = true, fishhomingtool_normal_thanks = true, fishhomingbait_thanks = true,
         triplegoldenshovelaxe_era = true, tripleshovelaxe_era = true, lilybush_era = true, lileaves_era = true, icire_rock_era = true, shield_l_log_era = true, shield_l_sand_era = true,
         siving_ctlwater_item_era = true, siving_ctlwater_era = true, siving_ctldirt_item_era = true, siving_ctldirt_era = true, siving_ctlall_item_era = true, siving_ctlall_era = true,
-        siving_mask_era = true,
+        siving_mask_era = true, siving_mask_era2 = true, siving_mask_gold_era = true,
         orchidbush_disguiser = true, boltwingout_disguiser = true, plant_cactus_meat_l_world = true,
         rosebush_marble = true, lilybush_marble = true, orchidbush_marble = true, rosorns_marble = true, lileaves_marble = true, orchitwigs_marble = true,
         shield_l_log_emo_fist = true, hat_lichen_emo_que = true,
@@ -3286,7 +3358,7 @@ _G.SKIN_IDS_LEGION = {
         siving_ctlwater_item_era = true, siving_ctlwater_era = true,
         siving_ctldirt_item_era = true, siving_ctldirt_era = true,
         siving_ctlall_item_era = true, siving_ctlall_era = true,
-        siving_mask_era = true,
+        siving_mask_era = true, siving_mask_era2 = true, siving_mask_gold_era = true,
     }
 }
 _G.SKIN_IDX_LEGION = {
@@ -3327,7 +3399,7 @@ local skinidxes = { --用以皮肤排序
     "revolvedmoonlight_item_taste2", "revolvedmoonlight_taste2", "revolvedmoonlight_pro_taste2",
     "revolvedmoonlight_item_taste3", "revolvedmoonlight_taste3", "revolvedmoonlight_pro_taste3",
     "revolvedmoonlight_item_taste4", "revolvedmoonlight_taste4", "revolvedmoonlight_pro_taste4",
-    "siving_mask_era",
+    "siving_mask_era", "siving_mask_era2", "siving_mask_gold_era",
     "triplegoldenshovelaxe_era", "tripleshovelaxe_era", "lilybush_era", "lileaves_era", "shield_l_log_era", "icire_rock_era", "shield_l_sand_era",
     "plant_cactus_meat_l_world", "orchidbush_disguiser", "boltwingout_disguiser",
     "rosebush_marble", "rosorns_marble", "lilybush_marble", "lileaves_marble", "orchidbush_marble", "orchitwigs_marble",

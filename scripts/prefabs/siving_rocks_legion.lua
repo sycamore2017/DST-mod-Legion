@@ -1588,98 +1588,189 @@ table.insert(prefs, Prefab(
 --[[ 生命吸收的特效 ]]
 --------------------------------------------------------------------------
 
-table.insert(prefs, Prefab(
-    "siving_lifesteal_fx",
-    function()
-        local inst = CreateEntity()
+local function OnEntitySleep_life(inst)
+    if inst.OnReachTarget ~= nil then
+        inst.OnReachTarget()
+    end
+    if inst.taskMove ~= nil then
+        inst.taskMove:Cancel()
+        inst.taskMove = nil
+    end
+    inst:Remove()
+end
+local function RunTo_life(inst)
+    if inst.movingTarget == nil or not inst.movingTarget:IsValid() then
+        if inst.taskMove ~= nil then
+            inst.taskMove:Cancel()
+            inst.taskMove = nil
+        end
+        inst:Remove()
+    elseif inst._count >= 129 or inst:GetDistanceSqToInst(inst.movingTarget) <= inst.minDistanceSq then
+        if inst.OnReachTarget ~= nil then
+            inst.OnReachTarget()
+        end
+        if inst.taskMove ~= nil then
+            inst.taskMove:Cancel()
+            inst.taskMove = nil
+        end
+        inst:Remove()
+    else --更新目标地点
+        inst:ForceFacePoint(inst.movingTarget.Transform:GetWorldPosition())
+        inst._count = inst._count + 1
+        if inst.fn_l_run ~= nil then
+            inst.fn_l_run(inst)
+        end
+    end
+end
+local function MakeFx_life(data)
+    table.insert(prefs, Prefab(
+        data.name,
+        function()
+            local inst = CreateEntity()
 
-        inst.entity:AddTransform()
-        inst.entity:AddAnimState()
-        inst.entity:AddNetwork()
+            inst.entity:AddTransform()
+            inst.entity:AddAnimState()
+            inst.entity:AddNetwork()
 
-        MakeGhostPhysics(inst, 1, 0.15)
-        RemovePhysicsColliders(inst)
+            MakeGhostPhysics(inst, 1, 0.15)
+            RemovePhysicsColliders(inst)
 
+            inst:AddTag("flying")
+            inst:AddTag("NOCLICK")
+            inst:AddTag("FX")
+            inst:AddTag("NOBLOCK")
+
+            if data.fn_common ~= nil then
+                data.fn_common(inst)
+            end
+
+            inst.entity:SetPristine()
+            if not TheWorld.ismastersim then
+                return inst
+            end
+
+            inst.persists = false
+            inst.taskMove = nil
+            inst.movingTarget = nil
+            inst.OnReachTarget = nil
+            inst.minDistanceSq = 3.3 --1.8*1.8+0.06
+            inst._count = 0
+
+            inst:AddComponent("locomotor")
+            inst.components.locomotor.walkspeed = 2
+            inst.components.locomotor.runspeed = 2
+            inst.components.locomotor:SetTriggersCreep(false)
+            inst.components.locomotor:EnableGroundSpeedMultiplier(false)
+            inst.components.locomotor.pathcaps = { ignorewalls = true, allowocean = true }
+
+            inst:AddComponent("bloomer")
+            inst.components.bloomer:PushBloom("lifesteal", "shaders/anim.ksh", 1)
+
+            inst:DoTaskInTime(0, function(inst)
+                if inst.movingTarget == nil or not inst.movingTarget:IsValid() then
+                    inst:Remove()
+                else
+                    inst:ForceFacePoint(inst.movingTarget.Transform:GetWorldPosition())
+                    inst.components.locomotor:WalkForward()
+                    inst.taskMove = inst:DoPeriodicTask(0.1, RunTo_life, 0)
+                end
+            end)
+            inst.OnEntitySleep = OnEntitySleep_life
+
+            return inst
+        end,
+        data.assets,
+        nil
+    ))
+end
+
+MakeFx_life({
+    name = "siving_lifesteal_fx",
+    assets = {
+        Asset("ANIM", "anim/lifeplant_fx.zip")
+    },
+    fn_common = function(inst)
         inst.AnimState:SetBank("lifeplant_fx")
         inst.AnimState:SetBuild("lifeplant_fx")
         inst.AnimState:PlayAnimation("single"..math.random(1,3), true)
         inst.AnimState:SetMultColour(15/255, 180/255, 132/255, 1)
         inst.AnimState:SetScale(0.6, 0.6)
+    end
+})
 
-        inst:AddTag("flying")
-        inst:AddTag("NOCLICK")
-        inst:AddTag("FX")
-        inst:AddTag("NOBLOCK")
+local assets_fx_era = {
+    Asset("ANIM", "anim/lifeplant_fx.zip"),
+    Asset("ANIM", "anim/skin/siving_mask_era_fx.zip")
+}
+local rbg_era1 = { 237/255, 67/255, 65/255 }
+local rbg_era2 = { 65/255, 237/255, 157/255 }
+local function FnRun_era1(inst)
+    if inst._count < 35 then
+        inst.AnimState:SetMultColour(rbg_era1[1], rbg_era1[2], rbg_era1[3], inst._count/35)
+    else
+        inst.AnimState:SetMultColour(rbg_era1[1], rbg_era1[2], rbg_era1[3], 1)
+    end
+end
+local function FnRun_era2(inst)
+    if inst._count < 35 then
+        inst.AnimState:SetMultColour(rbg_era2[1], rbg_era2[2], rbg_era2[3], inst._count/35)
+    else
+        inst.AnimState:SetMultColour(rbg_era2[1], rbg_era2[2], rbg_era2[3], 1)
+    end
+end
 
-        inst.entity:SetPristine()
-        if not TheWorld.ismastersim then
-            return inst
-        end
-
-        inst.persists = false
-        inst.taskMove = nil
-        inst.movingTarget = nil
-        inst.OnReachTarget = nil
-        inst.minDistanceSq = 3.3 --1.8*1.8+0.06
-        inst._count = 0
-
-        inst:AddComponent("locomotor")
-        inst.components.locomotor.walkspeed = 2
-        inst.components.locomotor.runspeed = 2
-        inst.components.locomotor:SetTriggersCreep(false)
-        inst.components.locomotor:EnableGroundSpeedMultiplier(false)
-        inst.components.locomotor.pathcaps = { ignorewalls = true, allowocean = true }
-
-        inst:AddComponent("bloomer")
-        inst.components.bloomer:PushBloom("lifesteal", "shaders/anim.ksh", 1)
-
-        inst:DoTaskInTime(0, function()
-            if inst.movingTarget == nil or not inst.movingTarget:IsValid() then
-                inst:Remove()
-            else
-                inst:ForceFacePoint(inst.movingTarget.Transform:GetWorldPosition())
-                inst.components.locomotor:WalkForward()
-                inst.taskMove = inst:DoPeriodicTask(0.1, function()
-                    if inst.movingTarget == nil or not inst.movingTarget:IsValid() then
-                        if inst.taskMove ~= nil then
-                            inst.taskMove:Cancel()
-                            inst.taskMove = nil
-                        end
-                        inst:Remove()
-                    elseif inst._count >= 129 or inst:GetDistanceSqToInst(inst.movingTarget) <= inst.minDistanceSq then
-                        if inst.OnReachTarget ~= nil then
-                            inst.OnReachTarget()
-                        end
-                        if inst.taskMove ~= nil then
-                            inst.taskMove:Cancel()
-                            inst.taskMove = nil
-                        end
-                        inst:Remove()
-                    else --更新目标地点
-                        inst:ForceFacePoint(inst.movingTarget.Transform:GetWorldPosition())
-                        inst._count = inst._count + 1
-                    end
-                end, 0)
-            end
-        end)
-        inst.OnEntitySleep = function(inst)
-            if inst.OnReachTarget ~= nil then
-                inst.OnReachTarget()
-            end
-            if inst.taskMove ~= nil then
-                inst.taskMove:Cancel()
-                inst.taskMove = nil
-            end
-            inst:Remove()
-        end
-
-        return inst
-    end,
-    {
-        Asset("ANIM", "anim/lifeplant_fx.zip"),
-    },
-    nil
-))
+MakeFx_life({
+    name = "siving_lifesteal_fx_era1",
+    assets = assets_fx_era,
+    fn_common = function(inst)
+        inst.AnimState:SetBank("lifeplant_fx")
+        inst.AnimState:SetBuild("lifeplant_fx")
+        inst.AnimState:OverrideSymbol("lunar_mote", "siving_mask_era_fx", "lunar_mote"..tostring(5-math.random(2)))
+        inst.AnimState:PlayAnimation("single"..math.random(1,3), true)
+        inst.AnimState:SetMultColour(rbg_era1[1], rbg_era1[2], rbg_era1[3], 0)
+        inst.AnimState:SetScale(0.6, 0.6)
+        inst.fn_l_run = FnRun_era1
+    end
+})
+MakeFx_life({
+    name = "siving_lifesteal_fx_era2",
+    assets = assets_fx_era,
+    fn_common = function(inst)
+        inst.AnimState:SetBank("lifeplant_fx")
+        inst.AnimState:SetBuild("lifeplant_fx")
+        inst.AnimState:OverrideSymbol("lunar_mote", "siving_mask_era_fx", "lunar_mote"..tostring(5-math.random(2)))
+        inst.AnimState:PlayAnimation("single"..math.random(1,3), true)
+        inst.AnimState:SetMultColour(rbg_era2[1], rbg_era2[2], rbg_era2[3], 0)
+        inst.AnimState:SetScale(0.6, 0.6)
+        inst.fn_l_run = FnRun_era2
+    end
+})
+MakeFx_life({
+    name = "siving_lifesteal_fx_era3",
+    assets = assets_fx_era,
+    fn_common = function(inst)
+        inst.AnimState:SetBank("lifeplant_fx")
+        inst.AnimState:SetBuild("lifeplant_fx")
+        inst.AnimState:OverrideSymbol("lunar_mote", "siving_mask_era_fx", "lunar_mote"..tostring(math.random(4)))
+        inst.AnimState:PlayAnimation("single"..math.random(1,3), true)
+        inst.AnimState:SetMultColour(rbg_era1[1], rbg_era1[2], rbg_era1[3], 0)
+        inst.AnimState:SetScale(0.6, 0.6)
+        inst.fn_l_run = FnRun_era1
+    end
+})
+MakeFx_life({
+    name = "siving_lifesteal_fx_era4",
+    assets = assets_fx_era,
+    fn_common = function(inst)
+        inst.AnimState:SetBank("lifeplant_fx")
+        inst.AnimState:SetBuild("lifeplant_fx")
+        inst.AnimState:OverrideSymbol("lunar_mote", "siving_mask_era_fx", "lunar_mote"..tostring(math.random(4)))
+        inst.AnimState:PlayAnimation("single"..math.random(1,3), true)
+        inst.AnimState:SetMultColour(rbg_era2[1], rbg_era2[2], rbg_era2[3], 0)
+        inst.AnimState:SetScale(0.6, 0.6)
+        inst.fn_l_run = FnRun_era2
+    end
+})
 
 --------------------------------------------------------------------------
 --[[ 子圭·垄(物品) ]]

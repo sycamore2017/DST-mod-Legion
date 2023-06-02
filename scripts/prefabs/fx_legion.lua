@@ -1028,18 +1028,16 @@ MakeFx2({ --流星猫：棕色猫猫
 
 ------
 
-MakeFx2({ --巫仆骨面：红
+MakeFx2({ --巫酋血骨面
     name = "sivmask_era_fx",
     assets = {
-        Asset("ANIM", "anim/skin/siving_mask_era.zip")
+        Asset("ANIM", "anim/skin/siving_mask_gold_era.zip")
     },
     fn_common = function(inst)
         inst.entity:AddFollower()
-        inst.Transform:SetFourFaced()
-        inst.AnimState:SetBank("siving_mask_era")
-        inst.AnimState:SetBuild("siving_mask_era")
-        inst.AnimState:PlayAnimation("maskbtm", false)
-        inst.AnimState:SetFinalOffset(-1)
+        inst.AnimState:SetBank("siving_mask_gold_era")
+        inst.AnimState:SetBuild("siving_mask_gold_era")
+        inst.AnimState:PlayAnimation("idle1", true)
     end,
     -- fn_server = function(inst)end
 })

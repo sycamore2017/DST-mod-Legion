@@ -913,8 +913,8 @@ local function CancelTask_life(inst, owner)
     end
     inst.lifetarget = nil
 end
-local function SpawnLifeFx(target, owner)
-    local life = SpawnPrefab("siving_lifesteal_fx")
+local function SpawnLifeFx(target, owner, inst)
+    local life = SpawnPrefab(inst.maskfxoverride_l or "siving_lifesteal_fx")
     if life ~= nil then
         life.movingTarget = owner
         life.minDistanceSq = 1.02
@@ -1065,7 +1065,7 @@ local function OnEquip_mask(inst, owner)
 
         ----积累的管理
         if target ~= nil then --有可吸收对象时
-            SpawnLifeFx(target, owner)
+            SpawnLifeFx(target, owner, inst)
             if doit then
                 DrinkLife(inst, target, 2)
                 if inst.healthcounter >= 4 then
@@ -1396,7 +1396,7 @@ local function OnEquip_mask2(inst, owner)
 
         ----特效
         if target ~= nil then
-            SpawnLifeFx(target, owner)
+            SpawnLifeFx(target, owner, inst)
         end
 
         ----积累的管理

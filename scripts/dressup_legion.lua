@@ -36,7 +36,11 @@ local function Fn_setFollowSymbolFx(owner, fxkey, fxdata, randomanim)
         for i, v in ipairs(fxdata) do
             local fx = SpawnPrefab(v.name)
             if v.anim ~= nil then
-                fx.AnimState:PlayAnimation(v.anim, true)
+                if v.noloop then
+                    fx.AnimState:PlayAnimation(v.anim, false)
+                else
+                    fx.AnimState:PlayAnimation(v.anim, true)
+                end
             end
             table.insert(owner[fxkey], fx)
         end
@@ -55,6 +59,27 @@ local function Fn_setFollowSymbolFx(owner, fxkey, fxdata, randomanim)
         if v.components.highlightchild ~= nil then
             v.components.highlightchild:SetOwner(owner)
         end
+    end
+end
+
+local function GetSymbol_sivmask(dressup)
+    local maps = {
+        wolfgang = true,
+        waxwell = true,
+        wathgrithr = true,
+        winona = true,
+        wortox = true,
+        wormwood = true,
+        wurt = true,
+        pigman = true,
+        pigguard = true,
+        moonpig = true,
+        bunnyman = true
+    }
+    if dressup.inst.sivmask_swapsymbol or maps[dressup.inst.prefab] then
+        return "swap_other"
+    else
+        return "swap_hat"
     end
 end
 
@@ -1892,30 +1917,22 @@ local dressup_data = {
         buildfn = function(dressup, item, buildskin)
             local itemswap = {}
 
-            local maps = {
-                wolfgang = true,
-                waxwell = true,
-                wathgrithr = true,
-                winona = true,
-                wortox = true,
-                wormwood = true,
-                wurt = true,
-                pigman = true,
-                pigguard = true,
-                moonpig = true,
-                bunnyman = true
-            }
-            local symbolname = nil
-            if dressup.inst.sivmask_swapsymbol or maps[dressup.inst.prefab] then
-                symbolname = "swap_other"
+            local skindata = item.components.skinedlegion:GetSkinedData()
+            if skindata ~= nil and skindata.equip ~= nil then
+                itemswap["swap_hat"] = dressup:GetDressData(
+                    nil, skindata.equip.build, skindata.equip.file or GetSymbol_sivmask(dressup), item.GUID, "swap"
+                )
+                if skindata.equip.isopenhat then
+                    dressup:SetDressOpenTop(itemswap)
+                else
+                    dressup:SetDressTop(itemswap)
+                end
             else
-                symbolname = "swap_hat"
+                itemswap["swap_hat"] = dressup:GetDressData(
+                    nil, "siving_mask", GetSymbol_sivmask(dressup), item.GUID, "swap"
+                )
+                dressup:SetDressOpenTop(itemswap)
             end
-
-            itemswap["swap_hat"] = dressup:GetDressData(
-                nil, "siving_mask", symbolname, item.GUID, "swap"
-            )
-            dressup:SetDressOpenTop(itemswap)
 
             return itemswap
         end
@@ -1925,28 +1942,8 @@ local dressup_data = {
         buildfn = function(dressup, item, buildskin)
             local itemswap = {}
 
-            local maps = {
-                wolfgang = true,
-                waxwell = true,
-                wathgrithr = true,
-                winona = true,
-                wortox = true,
-                wormwood = true,
-                wurt = true,
-                pigman = true,
-                pigguard = true,
-                moonpig = true,
-                bunnyman = true
-            }
-            local symbolname = nil
-            if dressup.inst.sivmask_swapsymbol or maps[dressup.inst.prefab] then
-                symbolname = "swap_other"
-            else
-                symbolname = "swap_hat"
-            end
-
             itemswap["swap_hat"] = dressup:GetDressData(
-                nil, "siving_mask_gold", symbolname, item.GUID, "swap"
+                nil, "siving_mask_gold", GetSymbol_sivmask(dressup), item.GUID, "swap"
             )
             dressup:SetDressOpenTop(itemswap)
 

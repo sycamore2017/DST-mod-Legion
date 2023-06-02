@@ -240,6 +240,10 @@ local InventoryPrefabsList = {  --每个元素的下标值为每种物品栏图�
     siving_ctlwater_item_era = { build = "images_minisign_skins2" },
     siving_ctldirt_item_era = { build = "images_minisign_skins2" },
     siving_ctlall_item_era = { build = "images_minisign_skins2" },
+    siving_mask_era = { build = "images_minisign_skins2" },
+    siving_mask_era2 = { build = "images_minisign_skins2" },
+    siving_mask_gold_era = { build = "images_minisign_skins2" },
+    siving_mask_gold_era2 = { build = "images_minisign_skins2" }
 }
 
 return InventoryPrefabsList
