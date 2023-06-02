@@ -3249,7 +3249,7 @@ _G.SKINS_LEGION = {
 		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
 
         skin_id = "64759cc569b4f368be452b14",
-        noshopshow = true,
+        onlyownedshow = true,
 		assets = {
 			Asset("ANIM", "anim/skin/siving_mask_gold_era.zip")
 		},
