@@ -1041,6 +1041,19 @@ MakeFx2({ --巫酋血骨面
     end,
     -- fn_server = function(inst)end
 })
+MakeFx2({ --巫酋毒骨面
+    name = "sivmask_era2_fx",
+    assets = {
+        Asset("ANIM", "anim/skin/siving_mask_gold_era2.zip")
+    },
+    fn_common = function(inst)
+        inst.entity:AddFollower()
+        inst.AnimState:SetBank("siving_mask_gold_era2")
+        inst.AnimState:SetBuild("siving_mask_gold_era2")
+        inst.AnimState:PlayAnimation("idle1", true)
+    end,
+    -- fn_server = function(inst)end
+})
 
 ---------------
 ---------------

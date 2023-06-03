@@ -1942,12 +1942,49 @@ local dressup_data = {
         buildfn = function(dressup, item, buildskin)
             local itemswap = {}
 
-            itemswap["swap_hat"] = dressup:GetDressData(
-                nil, "siving_mask_gold", GetSymbol_sivmask(dressup), item.GUID, "swap"
-            )
-            dressup:SetDressOpenTop(itemswap)
+            local skindata = item.components.skinedlegion:GetSkinedData()
+            if skindata ~= nil and skindata.equip ~= nil then
+                if skindata.equip.build == "siving_mask_gold_era" then
+                    Fn_setFollowSymbolFx(dressup.inst, "fx_d_sivmask", {
+                        { name = "sivmask_era_fx", anim = nil, symbol = "swap_hat", idx = 0 },
+                        { name = "sivmask_era_fx", anim = "idle2", symbol = "swap_hat", idx = 1 },
+                        { name = "sivmask_era_fx", anim = "idle3", symbol = "swap_hat", idx = 2 }
+                    }, false)
+                    itemswap["swap_hat"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
+                    dressup:SetDressOpenTop(itemswap)
+                elseif skindata.equip.build == "siving_mask_gold_era2" then
+                    Fn_setFollowSymbolFx(dressup.inst, "fx_d_sivmask", {
+                        { name = "sivmask_era2_fx", anim = nil, symbol = "swap_hat", idx = 0 },
+                        { name = "sivmask_era2_fx", anim = "idle2", symbol = "swap_hat", idx = 1 },
+                        { name = "sivmask_era2_fx", anim = "idle3", symbol = "swap_hat", idx = 2 }
+                    }, false)
+                    itemswap["swap_hat"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
+                    dressup:SetDressOpenTop(itemswap)
+                else
+                    itemswap["swap_hat"] = dressup:GetDressData(
+                        nil, skindata.equip.build, skindata.equip.file or GetSymbol_sivmask(dressup), item.GUID, "swap"
+                    )
+                    if skindata.equip.isopenhat then
+                        dressup:SetDressOpenTop(itemswap)
+                    else
+                        dressup:SetDressTop(itemswap)
+                    end
+                end
+            else
+                itemswap["swap_hat"] = dressup:GetDressData(
+                    nil, "siving_mask_gold", GetSymbol_sivmask(dressup), item.GUID, "swap"
+                )
+                dressup:SetDressOpenTop(itemswap)
+            end
 
             return itemswap
+        end,
+        unequipfn = function(owner, item)
+            Fn_removeFollowSymbolFx(owner, "fx_d_sivmask")
+        end,
+        onequipfn = function(owner, item)
+            Fn_removeFollowSymbolFx(owner, "fx_l_sivmask")
+            Fn_removeFollowSymbolFx(owner, "fx_l_sivmask2")
         end
     },
     hat_elepheetle = {

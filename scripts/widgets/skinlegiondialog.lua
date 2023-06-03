@@ -807,7 +807,7 @@ local SkinData = {
             },
             {
                 symbol = {
-                    { symbol = "swap_hat", build = "hat_lichen_emo_que", file = "swap_hat", type = 3 },
+                    { symbol = "swap_hat", build = "hat_lichen_emo_que", file = "swap_hat", type = 3 }
                 },
                 fn_anim = SetAnim_player,
                 fn_click = SetAnim_player2,
@@ -834,7 +834,7 @@ local SkinData = {
             },
             {
                 symbol = {
-                    { symbol = "swap_hat", build = "hat_lichen_disguiser", file = "swap_hat", type = 2 },
+                    { symbol = "swap_hat", build = "hat_lichen_disguiser", file = "swap_hat", type = 2 }
                 },
                 fn_anim = SetAnim_player,
                 fn_click = SetAnim_player2,
@@ -1928,7 +1928,7 @@ local SkinData = {
         } or {
             name = "Cross Square Paper Dart",
             collection = "PAPER", access = "SPECIAL",
-            descitem = "Unlock \"True Siving Feather\", \"Siving Feather\" skin.",
+            descitem = "Unlock \"Siving-Plume\", \"Siving Feather\" skin.",
             description = "The story was not translated."
         },
         height_anim = 265,
@@ -1968,7 +1968,7 @@ local SkinData = {
             description = ""
         } or {
             collection = "COLLECTOR", access = "SPECIAL",
-            descitem = "Unlock \"True Siving Feather\", \"Siving Feather\" skin.",
+            descitem = "Unlock \"Siving-Plume\", \"Siving Feather\" skin.",
             description = "The story was not translated."
         },
         height_anim = 265,
@@ -2304,6 +2304,74 @@ local SkinData = {
                 bank = "farm_plant_happiness", build = "farm_plant_happiness",
                 anim = "happy", anim2 = nil, isloop = false,
                 x = 66, y = 5, scale = 0.26
+            }
+        }
+    },
+    siving_mask_gold_era = {
+        string = ischinese and {
+            name = "巫族骨面",
+            collection = "ERA", access = "SPECIAL",
+            descitem = "解锁\"子圭·汲\"、\"子圭·歃\"的2套皮肤。",
+            description = ""
+        } or {
+            name = "Witch Bone Mask",
+            collection = "ERA", access = "SPECIAL",
+            descitem = "Unlock \"Siving-Absor\", \"Siving-Movili\" skin.",
+            description = "The story was not translated."
+        },
+        height_anim = 265,
+        anims = {
+            {
+                bank = "siving_mask_era", build = "siving_mask_era",
+                anim = "idle", anim2 = nil, isloop = false,
+                x = -34, y = 135, scale = 0.28
+            },
+            {
+                bank = "siving_mask_gold_era", build = "siving_mask_gold_era", face = FACING_LEFT,
+                anim = "idle", anim2 = nil, isloop = false,
+                x = 26, y = 140, scale = 0.28
+            },
+            {
+                symbol = {
+                    { symbol = "swap_hat", build = "siving_mask_era", file = "swap_hat", type = 3 }
+                },
+                fn_anim = SetAnim_player,
+                fn_click = SetAnim_player2,
+                x = -68, y = 130, scale = 0.35
+            },
+            {
+                symbol = {
+                    { symbol = "swap_hat", build = "siving_mask_gold_era", file = "swap_show", type = 3 },
+                },
+                fn_anim = SetAnim_player,
+                fn_click = SetAnim_player2,
+                x = 56, y = 130, scale = 0.35
+            },
+            {
+                bank = "siving_mask_era2", build = "siving_mask_era2",
+                anim = "idle", anim2 = nil, isloop = false,
+                x = -34, y = 5, scale = 0.28
+            },
+            {
+                bank = "siving_mask_gold_era2", build = "siving_mask_gold_era2", face = FACING_LEFT,
+                anim = "idle", anim2 = nil, isloop = false,
+                x = 26, y = 10, scale = 0.28
+            },
+            {
+                symbol = {
+                    { symbol = "swap_hat", build = "siving_mask_era2", file = "swap_hat", type = 3 }
+                },
+                fn_anim = SetAnim_player,
+                fn_click = SetAnim_player2,
+                x = -68, y = 0, scale = 0.35
+            },
+            {
+                symbol = {
+                    { symbol = "swap_hat", build = "siving_mask_gold_era2", file = "swap_show", type = 3 },
+                },
+                fn_anim = SetAnim_player,
+                fn_click = SetAnim_player2,
+                x = 56, y = 0, scale = 0.35
             }
         }
     },

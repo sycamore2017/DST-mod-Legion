@@ -1704,6 +1704,7 @@ local assets_fx_era = {
 }
 local rbg_era1 = { 237/255, 67/255, 65/255 }
 local rbg_era2 = { 65/255, 237/255, 157/255 }
+local rbg_era3 = { 206/255, 65/255, 236/255 }
 local function FnRun_era1(inst)
     if inst._count < 35 then
         inst.AnimState:SetMultColour(rbg_era1[1], rbg_era1[2], rbg_era1[3], inst._count/35)
@@ -1716,6 +1717,13 @@ local function FnRun_era2(inst)
         inst.AnimState:SetMultColour(rbg_era2[1], rbg_era2[2], rbg_era2[3], inst._count/35)
     else
         inst.AnimState:SetMultColour(rbg_era2[1], rbg_era2[2], rbg_era2[3], 1)
+    end
+end
+local function FnRun_era3(inst)
+    if inst._count < 35 then
+        inst.AnimState:SetMultColour(rbg_era3[1], rbg_era3[2], rbg_era3[3], inst._count/35)
+    else
+        inst.AnimState:SetMultColour(rbg_era3[1], rbg_era3[2], rbg_era3[3], 1)
     end
 end
 
@@ -1766,9 +1774,9 @@ MakeFx_life({
         inst.AnimState:SetBuild("lifeplant_fx")
         inst.AnimState:OverrideSymbol("lunar_mote", "siving_mask_era_fx", "lunar_mote"..tostring(math.random(4)))
         inst.AnimState:PlayAnimation("single"..math.random(1,3), true)
-        inst.AnimState:SetMultColour(rbg_era2[1], rbg_era2[2], rbg_era2[3], 0)
+        inst.AnimState:SetMultColour(rbg_era3[1], rbg_era3[2], rbg_era3[3], 0)
         inst.AnimState:SetScale(0.6, 0.6)
-        inst.fn_l_run = FnRun_era2
+        inst.fn_l_run = FnRun_era3
     end
 })
 
