@@ -25,6 +25,7 @@ local GeneTrans = Class(function(self, inst)
 		skinname = "siving_turn", bloom = true, unlockfx = "siving_turn_unlock_fx"
 	}
 	self.fx = nil
+	self.fn_setanim = nil
 end)
 
 local function SetLight(self, islight)
@@ -46,12 +47,10 @@ local function SetLight(self, islight)
 end
 local function SpawnFx(self)
 	self.fx = SpawnPrefab(self.fxdata.prefab)
-
 	local skindata = self.inst.components.skinedlegion:GetSkinedData()
 	if skindata ~= nil and skindata.fn_fruit ~= nil then
 		skindata.fn_fruit(self)
 	end
-
 	self.fx.entity:SetParent(self.inst.entity)
 	-- self.fx.entity:AddFollower()
 	self.fx.Follower:FollowSymbol(
@@ -75,6 +74,9 @@ local function SetAnims(self) --有果子时设置各种动画
 	--设置果实的动画
 	if self.fx == nil or not self.fx:IsValid() then
 		SpawnFx(self)
+	end
+	if self.fn_setanim ~= nil then
+		self.fn_setanim(self, true)
 	end
 	self.fx.AnimState:OverrideSymbol("swap", self.seeddata.swap.build, self.seeddata.swap.file)
 	if self.seeddata.swap.symboltype == "3" then
@@ -128,6 +130,9 @@ local function OnPickedFn(inst, doer)
 		if cpt.fx ~= nil then
 			cpt.fx:Remove()
 			cpt.fx = nil
+		end
+		if cpt.fn_setanim ~= nil then
+			cpt.fn_setanim(cpt, false)
 		end
 		if cpt.energytime <= 0 then
 			inst.AnimState:PlayAnimation("idle", false)
@@ -340,6 +345,9 @@ function GeneTrans:ClearAll(doer, mustdrop, initanim) --恢复原始状态
 	if self.fx ~= nil then
 		self.fx:Remove()
 		self.fx = nil
+	end
+	if self.fn_setanim ~= nil then
+		self.fn_setanim(self, false)
 	end
 end
 

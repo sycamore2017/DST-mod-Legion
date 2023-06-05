@@ -30,7 +30,8 @@ local SkinStrings = ischinese and {
         TASTE = "厨心百味系列",
         LAW = "律系列",
         DAY = "节典系列",
-        PAPER = "纸忆系列"
+        PAPER = "纸忆系列",
+        FUTURE = "关于未来系列"
     },
     UI_ACCESS = "获取",
     UI_INPUT_CDK = "请输入兑换码",
@@ -60,7 +61,8 @@ local SkinStrings = ischinese and {
         TASTE = "Tastes Collection",
         LAW = "Rule Collection",
         DAY = "Festival Collection",
-        PAPER = "Paper Memoir Collection"
+        PAPER = "Paper Memoir Collection",
+        FUTURE = "About Future Collection"
     },
     UI_ACCESS = "Get It",
     UI_INPUT_CDK = "Please enter CDK",
@@ -276,7 +278,11 @@ local function SetAnim_heatrock(self, anim, data)
     local animstate = anim:GetAnimState()
     SetAnim_base(animstate, data)
     for _,v in ipairs(data.symbol) do
-        animstate:OverrideSymbol(v.symbol, v.build, v.file)
+        if v.ishide then
+            animstate:HideSymbol(v.symbol)
+        else
+            animstate:OverrideSymbol(v.symbol, v.build, v.file)
+        end
     end
 end
 local function SetAnim_heatrock2(self, anim, data)
@@ -327,6 +333,31 @@ local function SetAnim_sivturn(self, anim, data)
         animstate:PlayAnimation("idle_to_on")
         animstate:PushAnimation("on", true)
         animstate:OverrideSymbol("followed", data.build, "followed2")
+        tag = 0
+    else
+        tag = 0
+    end
+    anim.tag_anim = tag + 1
+end
+local function SetAnim_sivturn2(self, anim, data)
+    local animstate = anim:GetAnimState()
+    local tag
+    if anim.tag_anim == nil then
+        tag = data.tag_start or 1
+    else
+        tag = anim.tag_anim
+    end
+
+    if tag == 1 then
+        animstate:PlayAnimation("on_to_idle")
+        animstate:PushAnimation("idle", true)
+        animstate:OverrideSymbol("followed", data.build, "followed1")
+        animstate:HideSymbol("seat")
+    elseif tag == 2 then
+        animstate:PlayAnimation("idle_to_on")
+        animstate:PushAnimation("on", true)
+        animstate:OverrideSymbol("followed", data.build, "followed2")
+        animstate:ShowSymbol("seat")
         tag = 0
     else
         tag = 0
@@ -1476,6 +1507,76 @@ local SkinData = {
                 fn_anim = SetAnim_heatrock,
                 fn_click = SetAnim_sivturn,
                 x = -60, y = 8, scale = 0.3
+            }
+        }
+    },
+    siving_turn_future = {
+        string = ischinese and {
+            collection = "FUTURE", access = "SPECIAL",
+            descitem = "解锁\"子圭·育\"的皮肤。",
+            description = ""
+        } or {
+            collection = "FUTURE", access = "SPECIAL",
+            descitem = "Unlock \"Siving-Trans\" skin.",
+            description = "The story was not translated."
+        },
+        height_anim = 155,
+        anims = {
+            {
+                bank = "siving_turn_future", build = "siving_turn_future",
+                anim = "on_to_idle", anim2 = "idle", isloop = true,
+                tag_start = 2, symbol = {
+                    { symbol = "followed", build = "siving_turn_future", file = "followed1" },
+                    { symbol = "seat", ishide = true }
+                },
+                fn_anim = SetAnim_heatrock,
+                fn_click = SetAnim_sivturn2,
+                x = 50, y = 14, scale = 0.25
+            },
+            {
+                bank = "siving_turn_future", build = "siving_turn_future",
+                anim = "idle_to_on", anim2 = "on", isloop = true,
+                tag_start = 1, symbol = {
+                    { symbol = "followed", build = "siving_turn_future", file = "followed2" }
+                },
+                fn_anim = SetAnim_heatrock,
+                fn_click = SetAnim_sivturn2,
+                x = -65, y = 14, scale = 0.25
+            }
+        }
+    },
+    siving_turn_future2 = {
+        string = ischinese and {
+            collection = "FUTURE", access = "SPECIAL",
+            descitem = "解锁\"子圭·育\"的皮肤。",
+            description = ""
+        } or {
+            collection = "FUTURE", access = "SPECIAL",
+            descitem = "Unlock \"Siving-Trans\" skin.",
+            description = "The story was not translated."
+        },
+        height_anim = 155,
+        anims = {
+            {
+                bank = "siving_turn_future2", build = "siving_turn_future2",
+                anim = "on_to_idle", anim2 = "idle", isloop = true,
+                tag_start = 2, symbol = {
+                    { symbol = "followed", build = "siving_turn_future2", file = "followed1" },
+                    { symbol = "seat", ishide = true }
+                },
+                fn_anim = SetAnim_heatrock,
+                fn_click = SetAnim_sivturn2,
+                x = 50, y = 14, scale = 0.25
+            },
+            {
+                bank = "siving_turn_future2", build = "siving_turn_future2",
+                anim = "idle_to_on", anim2 = "on", isloop = true,
+                tag_start = 1, symbol = {
+                    { symbol = "followed", build = "siving_turn_future2", file = "followed2" }
+                },
+                fn_anim = SetAnim_heatrock,
+                fn_click = SetAnim_sivturn2,
+                x = -65, y = 14, scale = 0.25
             }
         }
     },

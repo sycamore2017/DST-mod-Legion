@@ -870,6 +870,46 @@ MakeFx({ --转星移：基因解锁时的花火特效(金色)
     end,
     fn_remove = nil
 })
+MakeFx({ --爱汪基因诱变舱：基因解锁时的花火特效(橘色)
+    name = "siving_turn_future_unlock_fx",
+    assets = {
+        Asset("ANIM", "anim/table_winters_feast.zip")  --官方节日餐桌动画模板
+    },
+    fn_common = nil,
+    fn_anim = function(inst)
+        inst.AnimState:SetBank("table_winters_feast")
+        inst.AnimState:SetBuild("siving_boss_flower_fx")
+        inst.AnimState:PlayAnimation("place", false)
+        inst.AnimState:OverrideSymbol("glow_2", "table_winters_feast", "glow_2")
+        inst.AnimState:OverrideSymbol("sprks", "table_winters_feast", "sprks")
+        inst.AnimState:SetMultColour(255/255, 179/255, 109/255, 1)
+        inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
+        inst.AnimState:SetLightOverride(1)
+        inst.AnimState:SetScale(1.2, 1.2)
+        inst.AnimState:SetFinalOffset(4)
+    end,
+    fn_remove = nil
+})
+MakeFx({ --爱喵基因诱变舱：基因解锁时的花火特效(淡粉色)
+    name = "siving_turn_future2_unlock_fx",
+    assets = {
+        Asset("ANIM", "anim/table_winters_feast.zip")  --官方节日餐桌动画模板
+    },
+    fn_common = nil,
+    fn_anim = function(inst)
+        inst.AnimState:SetBank("table_winters_feast")
+        inst.AnimState:SetBuild("siving_boss_flower_fx")
+        inst.AnimState:PlayAnimation("place", false)
+        inst.AnimState:OverrideSymbol("glow_2", "table_winters_feast", "glow_2")
+        inst.AnimState:OverrideSymbol("sprks", "table_winters_feast", "sprks")
+        inst.AnimState:SetMultColour(255/255, 160/255, 221/255, 1)
+        inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
+        inst.AnimState:SetLightOverride(1)
+        inst.AnimState:SetScale(1.2, 1.2)
+        inst.AnimState:SetFinalOffset(4)
+    end,
+    fn_remove = nil
+})
 MakeFx({ --旅星猫：投射路径特效
     name = "siving_feather_real_collector_flyfx",
     assets = {

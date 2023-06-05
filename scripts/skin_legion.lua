@@ -14,6 +14,9 @@ table.insert(PrefabFiles, "skinprefabs_legion")
 ------资源补充
 RegisterInventoryItemAtlas("images/inventoryimages_skin/agronssword_taste.xml", "agronssword_taste.tex")
 RegisterInventoryItemAtlas("images/inventoryimages_skin/agronssword_taste2.xml", "agronssword_taste2.tex")
+RegisterInventoryItemAtlas("images/inventoryimages_skin/siving_turn_collector.xml", "siving_turn_collector.tex")
+RegisterInventoryItemAtlas("images/inventoryimages_skin/siving_turn_future.xml", "siving_turn_future.tex")
+RegisterInventoryItemAtlas("images/inventoryimages_skin/siving_turn_future2.xml", "siving_turn_future2.tex")
 
 --------------------------------------------------------------------------
 --[[ 皮肤函数 ]]
@@ -123,28 +126,70 @@ end
 
 ------
 
-local function Fn_siving_turn_fruit(genetrans, skinname)
+local function Fn_sivturn_fruit(genetrans, skinname)
     if genetrans.fx ~= nil then
         genetrans.fx.AnimState:SetBank(skinname)
         genetrans.fx.AnimState:SetBuild(skinname)
     end
     genetrans.fxdata.skinname = skinname
 end
-local function Fn_siving_turn(inst, skinname, bloom)
+local function Fn_sivturn(inst, skinname, bloom)
     inst.AnimState:SetBank(skinname)
     inst.AnimState:SetBuild(skinname)
-    if inst.components.genetrans ~= nil then
-        if inst.components.genetrans.fxdata.skinname ~= skinname then
-            Fn_siving_turn_fruit(inst.components.genetrans, skinname)
-        end
-        inst.components.genetrans.fxdata.bloom = bloom
+
+    local cpt = inst.components.genetrans
+    if cpt.fxdata.skinname ~= skinname then
+        Fn_sivturn_fruit(cpt, skinname)
     end
+    cpt.fxdata.bloom = bloom
+    if cpt.fn_setanim ~= nil then
+        cpt.fn_setanim(cpt, cpt.seeddata ~= nil)
+    end
+
     if bloom then
         if inst.Light:IsEnabled() then
             inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
         end
     else
         inst.AnimState:ClearBloomEffectHandle()
+    end
+end
+
+local function SetAnim_sivturn(inst, swap)
+    if swap == nil then
+        inst.AnimState:ClearOverrideSymbol("swap")
+        inst.AnimState:Hide("SWAPFRUIT-3")
+        inst.AnimState:Hide("SWAPFRUIT-2")
+        inst.AnimState:Hide("SWAPFRUIT-1")
+        return
+    end
+
+    inst.AnimState:OverrideSymbol("swap", swap.build, swap.file)
+    if swap.symboltype == "3" then
+        inst.AnimState:Show("SWAPFRUIT-3")
+        inst.AnimState:Hide("SWAPFRUIT-2")
+        inst.AnimState:Hide("SWAPFRUIT-1")
+    elseif swap.symboltype == "2" then
+        inst.AnimState:Hide("SWAPFRUIT-3")
+        inst.AnimState:Show("SWAPFRUIT-2")
+        inst.AnimState:Hide("SWAPFRUIT-1")
+    else
+        inst.AnimState:Hide("SWAPFRUIT-3")
+        inst.AnimState:Hide("SWAPFRUIT-2")
+        inst.AnimState:Show("SWAPFRUIT-1")
+    end
+end
+local function Fn_sivturn_anim_futrue(genetrans, isset)
+    if isset then
+        SetAnim_sivturn(genetrans.inst, genetrans.seeddata.swap)
+        genetrans.inst.AnimState:ShowSymbol("seat")
+        genetrans.inst.AnimState:ClearOverrideSymbol("followed")
+    else
+        SetAnim_sivturn(genetrans.inst, nil)
+        genetrans.inst.AnimState:HideSymbol("seat")
+        if genetrans.fxdata.skinname ~= nil then
+            genetrans.inst.AnimState:OverrideSymbol("followed", genetrans.fxdata.skinname, "followed3")
+        end
     end
 end
 
@@ -720,11 +765,11 @@ _G.SKIN_PREFABS_LEGION = {
 
     siving_turn = {
         fn_start = function(inst)
-            Fn_siving_turn(inst, "siving_turn", true)
+            Fn_sivturn(inst, "siving_turn", true)
             inst.components.genetrans.fxdata.unlockfx = "siving_turn_unlock_fx"
         end,
         fn_fruit = function(genetrans)
-            Fn_siving_turn_fruit(genetrans, "siving_turn")
+            Fn_sivturn_fruit(genetrans, "siving_turn")
         end,
         exchangefx = { prefab = nil, offset_y = nil, scale = 1.5 },
     },
@@ -2259,22 +2304,87 @@ _G.SKINS_LEGION = {
         onlyownedshow = true, mustonwedshow = true,
 		assets = {
 			Asset("ANIM", "anim/skin/siving_turn_collector.zip"),
+            Asset("ATLAS", "images/inventoryimages_skin/siving_turn_collector.xml"),
+            Asset("IMAGE", "images/inventoryimages_skin/siving_turn_collector.tex")
 		},
-        image = { name = nil, atlas = nil, setable = false, },
 
         string = ischinese and { name = "转星移" } or { name = "Revolving Star" },
 
 		fn_start = function(inst)
-            Fn_siving_turn(inst, "siving_turn_collector", false)
+            Fn_sivturn(inst, "siving_turn_collector", false)
             inst.components.genetrans.fxdata.unlockfx = "siving_turn_collector_unlock_fx"
         end,
         fn_fruit = function(genetrans)
-            Fn_siving_turn_fruit(genetrans, "siving_turn_collector")
+            Fn_sivturn_fruit(genetrans, "siving_turn_collector")
         end,
         exchangefx = { prefab = nil, offset_y = nil, scale = 1.5 },
         fn_placer = function(inst)
             inst.AnimState:SetBank("siving_turn_collector")
             inst.AnimState:SetBuild("siving_turn_collector")
+        end
+    },
+    siving_turn_future = {
+        base_prefab = "siving_turn",
+		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
+
+        skin_id = "647d83c269b4f368be4533e9",
+        onlyownedshow = true,
+		assets = {
+			Asset("ANIM", "anim/skin/siving_turn_future.zip"),
+            Asset("ATLAS", "images/inventoryimages_skin/siving_turn_future.xml"),
+            Asset("IMAGE", "images/inventoryimages_skin/siving_turn_future.tex")
+		},
+
+        string = ischinese and { name = "爱汪基因诱变舱" } or { name = "Bark Gene Mutation Cabin" },
+
+		fn_start = function(inst)
+            inst.components.genetrans.fn_setanim = Fn_sivturn_anim_futrue
+            inst.components.genetrans.fxdata.unlockfx = "siving_turn_future_unlock_fx"
+            Fn_sivturn(inst, "siving_turn_future", false)
+        end,
+        fn_end = function(inst)
+            inst.components.genetrans.fn_setanim = nil
+            inst.AnimState:ClearOverrideSymbol("followed")
+        end,
+        fn_fruit = function(genetrans)
+            Fn_sivturn_fruit(genetrans, "siving_turn_future")
+        end,
+        exchangefx = { prefab = nil, offset_y = nil, scale = 1.5 },
+        fn_placer = function(inst)
+            inst.AnimState:SetBank("siving_turn_future")
+            inst.AnimState:SetBuild("siving_turn_future")
+        end
+    },
+    siving_turn_future2 = {
+        base_prefab = "siving_turn",
+		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
+
+        skin_id = "647d972169b4f368be45343a",
+        onlyownedshow = true,
+		assets = {
+			Asset("ANIM", "anim/skin/siving_turn_future2.zip"),
+            Asset("ATLAS", "images/inventoryimages_skin/siving_turn_future2.xml"),
+            Asset("IMAGE", "images/inventoryimages_skin/siving_turn_future2.tex")
+		},
+
+        string = ischinese and { name = "爱喵基因诱变舱" } or { name = "Mew Gene Mutation Cabin" },
+
+		fn_start = function(inst)
+            inst.components.genetrans.fn_setanim = Fn_sivturn_anim_futrue
+            inst.components.genetrans.fxdata.unlockfx = "siving_turn_future2_unlock_fx"
+            Fn_sivturn(inst, "siving_turn_future2", false)
+        end,
+        fn_end = function(inst)
+            inst.components.genetrans.fn_setanim = nil
+            inst.AnimState:ClearOverrideSymbol("followed")
+        end,
+        fn_fruit = function(genetrans)
+            Fn_sivturn_fruit(genetrans, "siving_turn_future2")
+        end,
+        exchangefx = { prefab = nil, offset_y = nil, scale = 1.5 },
+        fn_placer = function(inst)
+            inst.AnimState:SetBank("siving_turn_future2")
+            inst.AnimState:SetBuild("siving_turn_future2")
         end
     },
 
@@ -3269,7 +3379,7 @@ _G.SKINS_LEGION = {
             inst.maskfxoverride_l = nil
         end,
         equip = {
-            build = "siving_mask_gold_era",
+            build = "siving_mask_gold_era", --幻化识别
             startfn = function(inst, owner)
                 owner.AnimState:ClearOverrideSymbol("swap_hat")
                 owner.AnimState:Show("HAT")
@@ -3315,7 +3425,7 @@ _G.SKINS_LEGION = {
             inst.maskfxoverride_l = nil
         end,
         equip = {
-            build = "siving_mask_gold_era2",
+            build = "siving_mask_gold_era2", --幻化识别
             startfn = function(inst, owner)
                 owner.AnimState:ClearOverrideSymbol("swap_hat")
                 owner.AnimState:Show("HAT")
@@ -3359,6 +3469,7 @@ _G.SKIN_IDS_LEGION = {
         carpet_whitewood_law = true, carpet_whitewood_big_law = true, carpet_whitewood_law2 = true, carpet_whitewood_big_law2 = true,
         icire_rock_day = true,
         neverfade_paper = true, neverfadebush_paper = true, neverfade_paper2 = true, neverfadebush_paper2 = true, siving_feather_real_paper = true, siving_feather_fake_paper = true,
+        siving_turn_future = true, siving_turn_future2 = true
     },
     ["6278c450c340bf24ab311528"] = { --回忆(5)
         boltwingout_disguiser = true,
@@ -3372,26 +3483,26 @@ _G.SKIN_IDS_LEGION = {
         orchidbush_disguiser = true,
         shield_l_log_era = true, --这一个是多给的(当做花泥)
     },
-    ["6278c487c340bf24ab31152c"] = { --1鸣惊人(7)
+    ["6278c487c340bf24ab31152c"] = { --1鸣惊人
         neverfade_thanks = true, neverfadebush_thanks = true,
         orchidbush_disguiser = true, boltwingout_disguiser = true,
         rosebush_marble = true, lilybush_marble = true, orchidbush_marble = true,
         hat_lichen_emo_que = true,
     },
-    ["6278c4acc340bf24ab311530"] = { --2度梅开(8)
+    ["6278c4acc340bf24ab311530"] = { --2度梅开
         fishhomingtool_awesome_thanks = true, fishhomingtool_normal_thanks = true, fishhomingbait_thanks = true,
         triplegoldenshovelaxe_era = true, tripleshovelaxe_era = true, lilybush_era = true, lileaves_era = true, icire_rock_era = true, shield_l_log_era = true, shield_l_sand_era = true,
         shield_l_log_emo_fist = true,
         carpet_whitewood_law = true, carpet_whitewood_big_law = true
     },
-    ["6278c4eec340bf24ab311534"] = { --3尺垂涎(9)
+    ["6278c4eec340bf24ab311534"] = { --3尺垂涎
         rosebush_collector = true, rosorns_collector = true, fimbul_axe_collector = true,
         rosorns_marble = true, lileaves_marble = true, orchitwigs_marble = true,
         backcub_thanks = true, siving_derivant_thanks = true, siving_derivant_thanks2 = true,
         revolvedmoonlight_item_taste = true, revolvedmoonlight_taste = true, revolvedmoonlight_pro_taste = true,
         revolvedmoonlight_item_taste2 = true, revolvedmoonlight_taste2 = true, revolvedmoonlight_pro_taste2 = true
     },
-    ["637f07a28c2f781db2f7f1e8"] = { --4海名扬(9)
+    ["637f07a28c2f781db2f7f1e8"] = { --4海名扬
         agronssword_taste = true, soul_contracts_taste = true,
         revolvedmoonlight_item_taste3 = true, revolvedmoonlight_taste3 = true, revolvedmoonlight_pro_taste3 = true,
         revolvedmoonlight_item_taste4 = true, revolvedmoonlight_taste4 = true, revolvedmoonlight_pro_taste4 = true,
@@ -3406,6 +3517,7 @@ _G.SKIN_IDS_LEGION = {
         siving_ctldirt_item_era = true, siving_ctldirt_era = true,
         siving_ctlall_item_era = true, siving_ctlall_era = true,
         siving_mask_era = true, siving_mask_era2 = true, siving_mask_gold_era = true, siving_mask_gold_era2 = true,
+        siving_turn_future = true, siving_turn_future2 = true
     }
 }
 _G.SKIN_IDX_LEGION = {
@@ -3438,7 +3550,9 @@ local skinidxes = { --用以皮肤排序
     "fishhomingtool_awesome_thanks", "fishhomingtool_normal_thanks", "fishhomingbait_thanks",
     "siving_feather_real_collector", "siving_feather_fake_collector",
     "siving_turn_collector", "icire_rock_collector", "fimbul_axe_collector", "rosebush_collector", "rosorns_collector",
-    "neverfade_paper", "neverfadebush_paper", "neverfade_paper2", "neverfadebush_paper2", "siving_feather_real_paper", "siving_feather_fake_paper",
+    "neverfade_paper", "neverfadebush_paper", "neverfade_paper2", "neverfadebush_paper2",
+    "siving_turn_future", "siving_turn_future2",
+    "siving_feather_real_paper", "siving_feather_fake_paper",
     "icire_rock_day",
     "carpet_whitewood_law", "carpet_whitewood_big_law", "carpet_whitewood_law2", "carpet_whitewood_big_law2",
     "agronssword_taste", "soul_contracts_taste",
