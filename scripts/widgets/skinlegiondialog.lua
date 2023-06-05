@@ -12,6 +12,8 @@ local PopupDialogScreen = require "screens/redux/popupdialog"
 local TrueScrollArea = require "widgets/truescrollarea"
 local UIAnim = require "widgets/uianim"
 
+local TEST = false
+
 local ischinese = CONFIGS_LEGION.LANGUAGES == "chinese"
 local SkinStrings = ischinese and {
     UNKNOWN_STORY = "这个故事不值一提。",
@@ -77,7 +79,7 @@ local SkinStrings = ischinese and {
     }
 }
 
-local AnimModels = {
+local AnimModels = TEST and { "wx78" } or {
     "wilson", "willow", "wendy", "wolfgang", "wx78", "wickerbottom", "woodie", "waxwell", "wathgrithr",
     "webber", "winona", "warly", "wes"
 }
@@ -2684,6 +2686,7 @@ function SkinLegionDialog:ResetItems()
     local owned2 = 0
     local owned3 = 0
     local owned4 = 0
+    local owned5 = 0
     for skinname, value in pairs(SKIN_IDS_LEGION["6278c487c340bf24ab31152c"]) do
         if myskins[skinname] then
             owned1 = 1
@@ -2708,7 +2711,13 @@ function SkinLegionDialog:ResetItems()
             break
         end
     end
-    if (owned1 + owned2 + owned3 + owned4) >= 2 then
+    for skinname, value in pairs(SKIN_IDS_LEGION["642c14d9f2b67d287a35d439"]) do
+        if myskins[skinname] then
+            owned5 = 1
+            break
+        end
+    end
+    if (owned1 + owned2 + owned3 + owned4 + owned5) >= 2 then
         expansionshow = true
     end
 
@@ -2870,10 +2879,12 @@ function SkinLegionDialog:SetItemInfo(item)
         self.label_skinrarity:SetColour(GetColorForItem(item.item_key))
 
         --标题分割线
-        if self.horizontal_line == nil then
-            self.horizontal_line = self.panel_iteminfo:AddChild(Image("images/quagmire_recipebook.xml", "quagmire_recipe_line_break.tex"))
-            self.horizontal_line:SetScale(.6, .3)
-            self.horizontal_line:SetPosition(0, -38)
+        if not TEST then
+            if self.horizontal_line == nil then
+                self.horizontal_line = self.panel_iteminfo:AddChild(Image("images/quagmire_recipebook.xml", "quagmire_recipe_line_break.tex"))
+                self.horizontal_line:SetScale(.6, .3)
+                self.horizontal_line:SetPosition(0, -38)
+            end
         end
 
         --滑动区域
@@ -2950,20 +2961,26 @@ function SkinLegionDialog:BuildSkinDesc(item)
     height = height - height_anim - height_lag
 
     --动画分割线
-    local line1 = w:AddChild(Image("images/quagmire_recipebook.xml", "quagmire_recipe_line.tex"))
-    line1:SetScale(.36, .25)
-    line1:SetPosition(0.5*width, height - 0.5*height_line)
+    if not TEST then
+        local line1 = w:AddChild(Image("images/quagmire_recipebook.xml", "quagmire_recipe_line.tex"))
+        line1:SetScale(.36, .25)
+        line1:SetPosition(0.5*width, height - 0.5*height_line)
+    end
     height = height - height_line - height_lag
 
     --皮肤获取方式描述
-    local label_skinaccess = w:AddChild(Text(HEADERFONT, 21))
-    label_skinaccess:SetHAlign(ANCHOR_LEFT)
-    label_skinaccess:SetRegionSize(200, 20)
-    label_skinaccess:SetColour(UICOLOURS.BRONZE)
-    label_skinaccess:SetString(GetAccess(skindata))
-    x, y = label_skinaccess:GetRegionSize()
-    label_skinaccess:SetPosition(left + 0.5*x, height - 0.5*y)
-    height = height - y
+    if not TEST then
+        local label_skinaccess = w:AddChild(Text(HEADERFONT, 21))
+        label_skinaccess:SetHAlign(ANCHOR_LEFT)
+        label_skinaccess:SetRegionSize(200, 20)
+        label_skinaccess:SetColour(UICOLOURS.BRONZE)
+        label_skinaccess:SetString(GetAccess(skindata))
+        x, y = label_skinaccess:GetRegionSize()
+        label_skinaccess:SetPosition(left + 0.5*x, height - 0.5*y)
+        height = height - y
+    else
+        height = height - 20
+    end
 
     --皮肤包含项描述
     local label_skindescitem = w:AddChild(Text(CHATFONT, 20))

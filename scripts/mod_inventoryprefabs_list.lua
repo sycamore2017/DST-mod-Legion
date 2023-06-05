@@ -234,7 +234,6 @@ local InventoryPrefabsList = {  --每个元素的下标值为每种物品栏图�
     revolvedmoonlight_taste4 = { build = "images_minisign_skins2" },
     revolvedmoonlight_pro_taste4 = { build = "images_minisign_skins2" },
     pinkstaff_tvplay = { build = "images_minisign_skins2" },
-
     siving_feather_real_collector = { build = "images_minisign_skins2" },
     siving_feather_fake_collector = { build = "images_minisign_skins2" },
     siving_ctlwater_item_era = { build = "images_minisign_skins2" },
