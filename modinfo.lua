@@ -554,6 +554,76 @@ configuration_options = {
         },
         default = true
     },
+    L and {
+        name = "TransTimeCrop",
+        label = "Mutation Time of Crops",
+        hover = "Set the time for ordinary crops mutation with Siving-Trans.",
+        options = {
+            {description = "30 sec", data = 0.0625},
+            {description = "1 min", data = 0.125},
+            {description = "2 min", data = 0.25},
+            {description = "4 min", data = 0.5},
+            {description = "6 min", data = 0.75},
+            {description = "8 min(default)", data = 1},
+            {description = "12 min", data = 1.5},
+            {description = "16 min", data = 2},
+            {description = "24 min", data = 3},
+            {description = "32 min", data = 4}
+        },
+        default = 1
+    } or {
+        name = "TransTimeCrop",
+        label = "普通作物转成异种的时间",
+        hover = "设置子圭·育转化普通作物所需的时间。你也是时间管理大师吗？",
+        options = {
+            {description = "30秒", data = 0.0625},
+            {description = "1分钟", data = 0.125},
+            {description = "2分钟", data = 0.25},
+            {description = "4分钟", data = 0.5},
+            {description = "6分钟", data = 0.75},
+            {description = "8分钟(默认)", data = 1},
+            {description = "12分钟", data = 1.5},
+            {description = "16分钟", data = 2},
+            {description = "24分钟", data = 3},
+            {description = "32分钟", data = 4}
+        },
+        default = 1
+    },
+    L and {
+        name = "TransTimeSpec",
+        label = "Mutation Time Mult of Plants",
+        hover = "Set the Time Multiplier for special plants mutation with Siving-Trans.",
+        options = {
+            {description = "0.0625x", data = 0.0625},
+            {description = "0.125x", data = 0.125},
+            {description = "0.25x", data = 0.25},
+            {description = "0.5x", data = 0.5},
+            {description = "0.75x", data = 0.75},
+            {description = "1x(default)", data = 1},
+            {description = "1.5x", data = 1.5},
+            {description = "2x", data = 2},
+            {description = "3x", data = 3},
+            {description = "4x", data = 4}
+        },
+        default = 1
+    } or {
+        name = "TransTimeSpec",
+        label = "特殊植物转成异种的时间倍率",
+        hover = "设置子圭·育转化特殊植物的时间倍率。你肯定是时间管理大师！",
+        options = {
+            {description = "0.0625倍", data = 0.0625},
+            {description = "0.125倍", data = 0.125},
+            {description = "0.25倍", data = 0.25},
+            {description = "0.5倍", data = 0.5},
+            {description = "0.75倍", data = 0.75},
+            {description = "1倍(默认)", data = 1},
+            {description = "1.5倍", data = 1.5},
+            {description = "2倍", data = 2},
+            {description = "3倍", data = 3},
+            {description = "4倍", data = 4}
+        },
+        default = 1
+    },
 
     -----
 

@@ -2325,6 +2325,7 @@ table.insert(prefs, Prefab(
 
         inst:AddTag("siv_boss_block") --用来被清场
         inst:AddTag("siving_derivant")
+        inst:AddTag("trapdamage") --让骨甲能生效
 
         inst.AnimState:SetBank("atrium_fence")
         if CONFIGS_LEGION.SIVINGROOTTEX == 1 then

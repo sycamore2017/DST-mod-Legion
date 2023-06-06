@@ -147,6 +147,15 @@ local function OnPickedFn(inst, doer)
 	cpt:TriggerPickable(false)
 end
 
+function GeneTrans:SetTransTime()
+	self.timedata.all = self.seeddata.time or TUNING.TOTAL_DAY_TIME
+	if self.seeddata.genekey ~= nil then --特殊植物
+		self.timedata.all = self.timedata.all * (CONFIGS_LEGION.TRANSTIMESPEC or 1)
+	else --普通作物
+		self.timedata.all = self.timedata.all * (CONFIGS_LEGION.TRANSTIMECROP or 1)
+	end
+end
+
 function GeneTrans:SpawnStackDrop(name, num, pos, doer, items)
 	local item = SpawnPrefab(name)
 	if item == nil then
@@ -297,7 +306,7 @@ function GeneTrans:SetUp(seeds, doer)
 	end
 
 	--开始基因转化
-	self.timedata.all = self.seeddata.time or TUNING.TOTAL_DAY_TIME
+	self:SetTransTime()
 	self:StartTransing()
 	self:UpdateFxProgress()
 	if self.energytime > 0 then
@@ -620,7 +629,7 @@ function GeneTrans:OnLoad(data, newents)
 
 		if self.seednum > 0 then --还有需要转化的，所以继续判定时间
 			local dt = data.time_dt or 0
-			self.timedata.all = self.seeddata.time or TUNING.TOTAL_DAY_TIME
+			self:SetTransTime()
 			self.timedata.pass = data.time_pass or 0
 			if dt > 0 or self.timedata.pass > 0 then --有多余的时间：循环更新
 				self:LongUpdate(dt, 0)

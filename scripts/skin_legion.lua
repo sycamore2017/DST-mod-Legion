@@ -3983,6 +3983,20 @@ if IsServer then
                     ["637f07a28c2f781db2f7f1e8"] = true, --4
                     ["6278c409c340bf24ab311522"] = true
                 }
+            },
+            siving_turn_future2 = {
+                id = "647d972169b4f368be45343a",
+                linkids = {
+                    ["642c14d9f2b67d287a35d439"] = true, --5
+                    ["6278c409c340bf24ab311522"] = true
+                }
+            },
+            siving_ctlall_era = {
+                id = "64759cc569b4f368be452b14",
+                linkids = {
+                    ["642c14d9f2b67d287a35d439"] = true, --5
+                    ["6278c409c340bf24ab311522"] = true
+                }
             }
         }
         for name, v in pairs(skinsmap) do --不准篡改皮肤数据
@@ -4022,6 +4036,11 @@ if IsServer then
             siving_derivant = {
                 siving_derivant_thanks = true,
                 siving_derivant_thanks2 = true
+            },
+            siving_turn = {
+                siving_turn_collector = true,
+                siving_turn_future = true,
+                siving_turn_future2 = true
             }
         }
         for name, v in pairs(skinsmap) do --不准私自给皮肤改名

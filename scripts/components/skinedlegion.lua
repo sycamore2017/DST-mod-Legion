@@ -159,9 +159,12 @@ function SkinedLegion:SetSkin(skinname, userid)
 		return true
 	end
 	--undo: 从贴图切换角度判定是否作弊
-	--这里的判断无ID时，从在场所有玩家皮肤数据里判定是否有皮肤
 	if skinname ~= nil and not SkinsFree[skinname] then
-		local needwait = false
+		if userid ~= nil then
+			if SKINS_CACHE_L[userid] == nil or not SKINS_CACHE_L[userid][skinname] then
+				userid = nil
+			end
+		end
 		if userid == nil then
 			for id, value in pairs(SKINS_CACHE_L) do
 				if value[skinname] then
@@ -169,31 +172,25 @@ function SkinedLegion:SetSkin(skinname, userid)
 					break
 				end
 			end
-			if userid == nil then
-				needwait = true
-			end
-		else
-			if SKINS_CACHE_L[userid] == nil then
-				needwait = true
-			elseif not SKINS_CACHE_L[userid][skinname] then
-				return false
-			end
 		end
-		if needwait then
+		if userid == nil then
 			self.inst:DoTaskInTime(20+8*math.random(), function(inst)
 				if self.skin == nil then
 					return
 				end
+				if self.userid ~= nil then
+					if SKINS_CACHE_L[self.userid] == nil or not SKINS_CACHE_L[self.userid][self.skin] then
+						self.userid = nil
+					else
+						return
+					end
+				end
 				if self.userid == nil then
 					for id, value in pairs(SKINS_CACHE_L) do
-						if value[skinname] then
+						if value[self.skin] then
 							self.userid = id
 							return
 						end
-					end
-				else
-					if SKINS_CACHE_L[self.userid] ~= nil and SKINS_CACHE_L[self.userid][skinname] then
-						return
 					end
 				end
 				self:SetSkin(nil)
