@@ -711,10 +711,24 @@ local dressup_data = {
         buildfile = "hat_ruins",
         buildsymbol = "swap_hat",
     },
-    molehat =
-    {
-        buildfile = "hat_mole",
-        buildsymbol = "swap_hat",
+    molehat = {
+        buildfn = function(dressup, item, buildskin)
+            local itemswap = {}
+
+            if buildskin == "molehat_goggles" then
+                itemswap["swap_hat"] = dressup:GetDressData(
+                    buildskin, "hat_mole", "swap_hat", item.GUID, "swap"
+                )
+                dressup:SetDressOpenTop(itemswap)
+            else
+                itemswap["swap_hat"] = dressup:GetDressData(
+                    buildskin, "hat_mole", "swap_hat", item.GUID, "swap"
+                )
+                dressup:SetDressTop(itemswap)
+            end
+
+            return itemswap
+        end
     },
     wathgrithrhat = {
         buildfn = function(dressup, item, buildskin)
@@ -966,7 +980,7 @@ local dressup_data = {
         buildfile = "hat_lunarplant",
         buildsymbol = "swap_hat",
         equipfn = function(owner, item)
-            Fn_setFollowSymbolFx(owner, "fx_l_lunarplanthat", {
+            Fn_setFollowSymbolFx(owner, "fx_d_lunarplanthat", {
                 { name = "lunarplanthat_fx", anim = nil, symbol = "swap_hat", idx = 0 },
                 { name = "lunarplanthat_fx", anim = "idle2", symbol = "swap_hat", idx = 1 },
                 { name = "lunarplanthat_fx", anim = "idle3", symbol = "swap_hat", idx = 2 }
@@ -974,7 +988,7 @@ local dressup_data = {
             -- owner.AnimState:SetSymbolLightOverride("swap_hat", .1)
         end,
         unequipfn = function(owner, item)
-            Fn_removeFollowSymbolFx(owner, "fx_l_lunarplanthat")
+            Fn_removeFollowSymbolFx(owner, "fx_d_lunarplanthat")
             -- owner.AnimState:SetSymbolLightOverride("swap_hat", 0)
         end,
         onequipfn = function(owner, item)
@@ -1022,6 +1036,129 @@ local dressup_data = {
                 owner.fx_l_alterback = nil
             end
             dressup:InitGroupHead()
+        end
+    },
+    poop = {
+        isnoskin = true,
+        dressslot = "head_t2",
+        buildfn = function(dressup, item, buildskin)
+            local itemswap = {}
+
+            itemswap["HAT"] = dressup:GetDressData(nil, nil, nil, nil, "show")
+            Fn_setFollowSymbolFx(dressup.inst, "fx_d_poop", {
+                { name = "poop_l_fx", symbol = "swap_hat", idx = 0, x = -10, y = -130, z = 0 },
+                { name = "poop_l_fx", symbol = "swap_hat", idx = 1, x = -20, y = -130, z = 0 },
+                { name = "poop_l_fx", symbol = "swap_hat", idx = 2, x = -15, y = -130, z = 0 },
+                { name = "flies_l_fx", symbol = "swap_hat", x = -10, y = -60, z = 0 }
+            }, false)
+
+            return itemswap
+        end,
+        unbuildfn = function(dressup, item)
+            Fn_removeFollowSymbolFx(dressup.inst, "fx_d_poop")
+            dressup:InitHide("HAT")
+        end
+    },
+    guano = {
+        isnoskin = true,
+        dressslot = "head_t2",
+        buildfn = function(dressup, item, buildskin)
+            local itemswap = {}
+
+            itemswap["HAT"] = dressup:GetDressData(nil, nil, nil, nil, "show")
+            Fn_setFollowSymbolFx(dressup.inst, "fx_d_guano", {
+                { name = "guano_l_fx", symbol = "swap_hat", idx = 0, x = -10, y = -130, z = 0 },
+                { name = "guano_l_fx", symbol = "swap_hat", idx = 1, x = -20, y = -130, z = 0 },
+                { name = "guano_l_fx", symbol = "swap_hat", idx = 2, x = -15, y = -130, z = 0 },
+                { name = "flies_l_fx", symbol = "swap_hat", x = -10, y = -60, z = 0 }
+            }, false)
+
+            return itemswap
+        end,
+        unbuildfn = function(dressup, item)
+            Fn_removeFollowSymbolFx(dressup.inst, "fx_d_guano")
+            dressup:InitHide("HAT")
+        end
+    },
+    spoiled_food = {
+        isnoskin = true,
+        dressslot = "head_t2",
+        buildfn = function(dressup, item, buildskin)
+            local itemswap = {}
+
+            itemswap["HAT"] = dressup:GetDressData(nil, nil, nil, nil, "show")
+            Fn_setFollowSymbolFx(dressup.inst, "fx_d_spoiled_food", {
+                { name = "spoiled_food_l_fx", symbol = "swap_hat", idx = 0, x = 0, y = -140, z = 0 },
+                { name = "spoiled_food_l_fx", symbol = "swap_hat", idx = 1, x = -10, y = -140, z = 0 },
+                { name = "spoiled_food_l_fx", symbol = "swap_hat", idx = 2, x = -10, y = -140, z = 0 }
+            }, false)
+
+            return itemswap
+        end,
+        unbuildfn = function(dressup, item)
+            Fn_removeFollowSymbolFx(dressup.inst, "fx_d_spoiled_food")
+            dressup:InitHide("HAT")
+        end
+    },
+    tallbirdegg = {
+        isnoskin = true,
+        dressslot = "head_t2",
+        buildfn = function(dressup, item, buildskin)
+            local itemswap = {}
+            itemswap["HAT"] = dressup:GetDressData(nil, nil, nil, nil, "show")
+
+            local animname = math.random()
+            if animname < 0.33 then
+                animname = "idle_happy"
+            elseif animname < 0.66 then
+                animname = "idle_hot"
+            else
+                animname = "idle_cold"
+            end
+            Fn_setFollowSymbolFx(dressup.inst, "fx_d_tallbirdegg", {
+                { name = "tallbirdegg_l_fx", anim = animname, symbol = "swap_hat", idx = 0, x = -10, y = -145, z = 0 },
+                { name = "tallbirdegg_l_fx", anim = animname, symbol = "swap_hat", idx = 1, x = -20, y = -145, z = 0 },
+                { name = "tallbirdegg_l_fx", anim = animname, symbol = "swap_hat", idx = 2, x = -20, y = -145, z = 0 }
+            }, false)
+
+            return itemswap
+        end,
+        unbuildfn = function(dressup, item)
+            Fn_removeFollowSymbolFx(dressup.inst, "fx_d_tallbirdegg")
+            dressup:InitHide("HAT")
+        end
+    },
+    tallbirdegg_cracked = {
+        isnoskin = true,
+        dressslot = "head_t2",
+        buildfn = function(dressup, item, buildskin)
+            local itemswap = {}
+            itemswap["HAT"] = dressup:GetDressData(nil, nil, nil, nil, "show")
+
+            local animname = "idle_happy"
+            if item.AnimState:IsCurrentAnimation("idle_hot") then
+                animname = "idle_hot"
+            elseif item.AnimState:IsCurrentAnimation("idle_cold") then
+                animname = "idle_cold"
+            end
+            -- if item.components.hatchable ~= nil then
+            --     if item.components.hatchable.toohot then
+            --         anim = "idle_hot"
+            --     elseif item.components.hatchable.toocold then
+            --         anim = "idle_cold"
+            --     end
+            -- end
+            Fn_setFollowSymbolFx(dressup.inst, "fx_d_tallbirdegg2", {
+                { name = "tallbirdegg_l_fx", anim = animname, symbol = "swap_hat", idx = 0, x = -10, y = -145, z = 0 },
+                { name = "tallbirdegg_l_fx", anim = animname, symbol = "swap_hat", idx = 1, x = -20, y = -145, z = 0 },
+                { name = "tallbirdegg_l_fx", anim = animname, symbol = "swap_hat", idx = 2, x = -20, y = -145, z = 0 }
+            }, false)
+
+            return itemswap
+        end,
+        unbuildfn = function(dressup, item)
+            Fn_removeFollowSymbolFx(dressup.inst, "fx_d_tallbirdegg2")
+            dressup:InitHide("HAT")
         end
     },
 
@@ -1753,8 +1890,7 @@ local dressup_data = {
         end,
         unbuildfn = function(dressup, item) end, --没啥好恢复的
     },
-    theemperorsmantle =
-    {
+    theemperorsmantle = {
         isnoskin = true,
         istallbody = true,
         buildfn = function(dressup, item, buildskin)
@@ -2058,7 +2194,7 @@ for _,v in pairs(pieces) do
         buildfn = Fn_symbolSwap
     }
 end
-pieces = nil
+
 
 --统一添加各种巨型作物的幻化数据
 local oversizecrops = {
@@ -2104,6 +2240,64 @@ for material, _ in pairs(require("prefabs/pillow_defs")) do
         buildsymbol = "swap_body"
     }
 end
+
+--统一添加猫咪幻化数据
+pieces = {
+    "kitcoon_forest", "kitcoon_savanna", "kitcoon_deciduous",
+    "kitcoon_marsh", "kitcoon_grass", "kitcoon_rocky",
+    "kitcoon_desert", "kitcoon_moon", "kitcoon_yot"
+}
+local function buildfn_cat(dressup, item, buildskin)
+    local itemswap = {}
+
+    itemswap["HAT"] = dressup:GetDressData(nil, nil, nil, nil, "show")
+    Fn_setFollowSymbolFx(dressup.inst, "fx_d_"..item.prefab, {
+        { name = item.prefab.."_l_fx", symbol = "swap_hat", x = -10, y = -148, z = 0 }
+    }, false)
+
+    return itemswap
+end
+local function unbuildfn_animal(dressup, item)
+    Fn_removeFollowSymbolFx(dressup.inst, "fx_d_"..item.prefab)
+    dressup:InitHide("HAT")
+end
+local dressbasedata = {
+    isnoskin = true,
+    dressslot = "head_t2",
+    buildfn = buildfn_cat,
+    unbuildfn = unbuildfn_animal
+}
+for _,v in pairs(pieces) do
+    _G.DRESSUP_DATA_LEGION[v] = dressbasedata
+end
+
+--统一添加鸟类幻化数据
+pieces = {
+    "crow", "robin", "robin_winter", "canary", "puffin", "quagmire_pigeon",
+    "bird_mutant", "bird_mutant_spitter", "buzzard"
+}
+local function buildfn_bird(dressup, item, buildskin)
+    local itemswap = {}
+
+    itemswap["HAT"] = dressup:GetDressData(nil, nil, nil, nil, "show")
+    Fn_setFollowSymbolFx(dressup.inst, "fx_d_"..item.prefab, {
+        { name = item.prefab.."_l_fx", symbol = "swap_hat", x = -20, y = -148, z = 0 }
+    }, false)
+
+    return itemswap
+end
+dressbasedata = {
+    isnoskin = true,
+    dressslot = "head_t2",
+    buildfn = buildfn_bird,
+    unbuildfn = unbuildfn_animal
+}
+for _,v in pairs(pieces) do
+    _G.DRESSUP_DATA_LEGION[v] = dressbasedata
+end
+
+dressbasedata = nil
+pieces = nil
 
 -------------------
 -------------------

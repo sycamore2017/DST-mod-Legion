@@ -624,6 +624,25 @@ configuration_options = {
         },
         default = 1
     },
+    L and {
+        name = "SivSolToMedal",
+        label = "Siving-Sols Bans Crops in Medals",
+        hover = "Set whether the crops in the Functional Medal mod can be planted in Siving-Sols.",
+        options = {
+            {description = "Not Plantable", data = false},
+            {description = "Plantable(default)", data = true}
+        },
+        default = true
+    } or {
+        name = "SivSolToMedal",
+        label = "子圭·垄兼容能力勋章的作物",
+        hover = "是否允许能力勋章mod里的作物被种在子圭·垄里。我有我自己的见解和想法，真的。",
+        options = {
+            {description = "禁止种植", data = false},
+            {description = "允许种植(默认)", data = true}
+        },
+        default = true
+    },
 
     -----
 
@@ -700,22 +719,20 @@ configuration_options = {
         name = "CleaningUpStench",
         label = "Cleaning Up Stench",
         hover = "Auto-cleaning-up smelly things on the ground.",
-        options =
-        {
+        options = {
             {description = "Yes", data = true},
-            {description = "No(default)", data = false},
+            {description = "No(default)", data = false}
         },
-        default = false,
+        default = false
     } or {
         name = "CleaningUpStench",
         label = "臭臭自动清理",
         hover = "自动清除掉在地上的臭东西(大便、鸟粪、腐烂物)。化作春泥更护花。",
-        options =
-        {
+        options = {
             {description = "是", data = true},
-            {description = "否(默认)", data = false},
+            {description = "否(默认)", data = false}
         },
-        default = false,
+        default = false
     },
     L and {
         name = "BackCubChance",

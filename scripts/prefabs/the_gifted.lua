@@ -249,8 +249,12 @@ local prefabs_contracts = {
 local function ContractsDoHeal(inst)
     wortox_soul_common.DoHeal(inst)
 end
-
 local function UpadateHealTag(inst)
+    if inst.components.finiteuses:GetUses() <= 1 then --耐久很低时就不加血了，防止无法跟随玩家
+        inst._needheal = false
+        return
+    end
+
     local shouldheal = false
     local x, y, z = inst.Transform:GetWorldPosition()
     for _,v in ipairs(AllPlayers) do
@@ -271,14 +275,12 @@ local function UpadateHealTag(inst)
         inst._needheal = false
     end
 end
-
 local function StartUpadateHealTag(inst)
     if inst._taskheal == nil then
         inst._needheal = false
         inst._taskheal = inst:DoPeriodicTask(0.6, UpadateHealTag, 1)
     end
 end
-
 local function StopUpadateHealTag(inst)
     if inst._taskheal ~= nil then
         inst._taskheal:Cancel()
@@ -428,7 +430,10 @@ local function fn_contracts()
     inst.entity:AddTransform()
     inst.entity:AddAnimState()
     inst.entity:AddSoundEmitter()
+    inst.entity:AddMiniMapEntity()
     inst.entity:AddNetwork()
+
+    inst.MiniMapEntity:SetIcon("soul_contracts.tex")
 
     MakeFlyingCharacterPhysics(inst, 1, .5)
 

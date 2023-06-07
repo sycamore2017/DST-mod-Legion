@@ -349,6 +349,17 @@ local function OnPlant(seed, doer, soilorcrop)
             end
         end
 
+        if --【能力勋章】能否种植其中作物
+            not _G.CONFIGS_LEGION.SIVSOLTOMEDAL and (
+                seed.prefab == "immortal_fruit_seed" or
+                seed.prefab == "medal_gift_fruit_seed" or
+                plant_prefab == "farm_plant_immortal_fruit" or
+                plant_prefab == "farm_plant_medal_gift_fruit"
+            )
+        then
+            return false
+        end
+
         local plant = SpawnPrefab(plant_prefab.."_legion")
         if plant ~= nil then
             plant.Transform:SetPosition(pt:Get())

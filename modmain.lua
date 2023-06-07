@@ -169,6 +169,7 @@ _G.CONFIGS_LEGION.SIVFEASTRENGTH = GetModConfigData("SivFeaStrength") --设置�
 _G.CONFIGS_LEGION.DIGESTEDITEMMSG = GetModConfigData("DigestedItemMsg") --巨食草消化提醒
 _G.CONFIGS_LEGION.TRANSTIMECROP = GetModConfigData("TransTimeCrop") --普通作物转成异种的时间
 _G.CONFIGS_LEGION.TRANSTIMESPEC = GetModConfigData("TransTimeSpec") --特殊植物转成异种的时间倍率
+_G.CONFIGS_LEGION.SIVSOLTOMEDAL = GetModConfigData("SivSolToMedal") --子圭·垄兼容能力勋章的作物
 
 _G.CONFIGS_LEGION.TECHUNLOCK = GetModConfigData("TechUnlock") --设置新道具的科技解锁方式 "lootdropper" "prototyper"
 

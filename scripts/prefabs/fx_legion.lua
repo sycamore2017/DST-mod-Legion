@@ -980,7 +980,9 @@ local anims_kitcoon = {
     "emote_lick", "emote_lick", "emote_lick", "distress", "emote_stretch", "emote_stretch", "emote_stretch",
     { "walk_pre", "walk_pst" },
     { "jump_pre", "jump_loop", "jump_pst" },
-    { "jump_pre", "jump_loop", "jump_loop", "jump_pst" }
+    { "jump_pre", "jump_loop", "jump_loop", "jump_pst" },
+    "idle_loop", "idle_loop", "idle_loop", "idle_loop", "idle_loop",
+    "idle_loop", "idle_loop", "idle_loop", "idle_loop", "idle_loop"
 }
 
 ------随机仿sg的动画
@@ -1016,7 +1018,7 @@ local function SetSgSkinAnim(inst, anims)
     if inst.skin_l_anims == nil then
         inst:ListenForEvent("animover", DoSgAnim) --看起来被装备后，动画会自动暂停。所以我也不用主动关闭监听了
     end
-    inst.skin_l_anims = anims
+    inst.skin_l_anims = anims or anims_kitcoon
     DoSgAnim(inst)
 end
 -- local function CancelSgSkinAnim(inst)
@@ -1024,6 +1026,14 @@ end
 --     inst.skin_l_keys = nil
 --     inst:RemoveEventCallback("animover", DoSgAnim)
 -- end
+local function SetAnim_cat(inst, build)
+    inst.entity:AddFollower()
+    inst.Transform:SetSixFaced()
+
+    inst.AnimState:SetBank("kitcoon")
+    inst.AnimState:SetBuild(build)
+    inst.AnimState:PlayAnimation("idle_loop")
+end
 
 MakeFx2({ --旅星猫：蓝色猫猫
     name = "sivfeather_real_collector_fx",
@@ -1034,16 +1044,9 @@ MakeFx2({ --旅星猫：蓝色猫猫
         Asset("ANIM", "anim/kitcoon_jump.zip")
     },
     fn_common = function(inst)
-        inst.entity:AddFollower()
-        inst.Transform:SetSixFaced()
-
-        inst.AnimState:SetBank("kitcoon")
-        inst.AnimState:SetBuild("siving_feather_real_collector")
-        inst.AnimState:PlayAnimation("idle_loop")
+        SetAnim_cat(inst, "siving_feather_real_collector")
     end,
-    fn_server = function(inst)
-        SetSgSkinAnim(inst, anims_kitcoon)
-    end
+    fn_server = SetSgSkinAnim
 })
 MakeFx2({ --流星猫：棕色猫猫
     name = "sivfeather_fake_collector_fx",
@@ -1054,15 +1057,190 @@ MakeFx2({ --流星猫：棕色猫猫
         Asset("ANIM", "anim/kitcoon_jump.zip")
     },
     fn_common = function(inst)
-        inst.entity:AddFollower()
-        inst.Transform:SetSixFaced()
+        SetAnim_cat(inst, "siving_feather_fake_collector")
+    end,
+    fn_server = SetSgSkinAnim
+})
 
-        inst.AnimState:SetBank("kitcoon")
-        inst.AnimState:SetBuild("siving_feather_fake_collector")
-        inst.AnimState:PlayAnimation("idle_loop")
+--各种普通猫咪
+local cats = {
+    "kitcoon_forest", "kitcoon_savanna", "kitcoon_deciduous",
+    "kitcoon_marsh", "kitcoon_grass", "kitcoon_rocky",
+    "kitcoon_desert", "kitcoon_moon", "kitcoon_yot"
+}
+for _,v in pairs(cats) do
+    MakeFx2({
+        name = v.."_l_fx",
+        assets = {
+            Asset("ANIM", "anim/"..v.."_build.zip"),
+            Asset("ANIM", "anim/kitcoon_basic.zip"),  --官方猫咪动画模板
+            Asset("ANIM", "anim/kitcoon_emotes.zip"),
+            Asset("ANIM", "anim/kitcoon_jump.zip")
+        },
+        fn_common = function(inst)
+            SetAnim_cat(inst, v.."_build")
+        end,
+        fn_server = SetSgSkinAnim
+    })
+end
+cats = nil
+
+local anims_bird = {
+    "idle", "idle", "idle", "idle", "idle", "idle", "idle",
+    "caw", { "caw", "caw" }, { "caw", "caw", "caw" },
+    "peck", { "peck", "peck" }, { "peck", "peck", "peck" },
+    { "flap_pre", "flap_loop", "flap_post" },
+    { "flap_pre", "flap_loop", "flap_loop", "flap_post" },
+    { "flap_pre", "flap_loop", "flap_loop", "flap_loop", "flap_loop", "flap_post" },
+    "hop", "hop", "hop", "hop", "hop", "switch", "switch", "switch", "switch",
+    { "sleep_pre", "sleep_loop", "sleep_loop", "sleep_loop", "sleep_loop", "sleep_loop", "sleep_loop", "sleep_pst" },
+    { "sleep_pre", "sleep_loop", "sleep_loop", "sleep_loop", "sleep_loop",  "sleep_pst" },
+    { "sleep_pre", "sleep_loop", "sleep_loop", "sleep_pst" },
+    "idle", "idle", "idle", "idle", "idle", "idle", "idle"
+}
+local anims_bird2 = {
+    "idle", "idle", "idle", "idle", "idle", "idle", "idle",
+    "caw", { "caw", "caw" }, { "caw", "caw", "caw" },
+    { "flap_pre", "flap_loop", "flap_post" },
+    { "flap_pre", "flap_loop", "flap_loop", "flap_post" },
+    { "flap_pre", "flap_loop", "flap_loop", "flap_loop", "flap_loop", "flap_post" },
+    "hop", "hop", "hop", "hop", "hop", "switch", "switch", "switch", "switch",
+    "hit", "hit", "hit", "attack", "attack", "attack", "attack", "attack",
+    { "sleep_pre", "sleep_loop", "sleep_loop", "sleep_loop", "sleep_loop", "sleep_loop", "sleep_loop", "sleep_pst" },
+    { "sleep_pre", "sleep_loop", "sleep_loop", "sleep_loop", "sleep_loop",  "sleep_pst" },
+    { "sleep_pre", "sleep_loop", "sleep_loop", "sleep_pst" },
+    "idle", "idle", "idle", "idle", "idle", "idle", "idle"
+}
+local anims_bird3 = {
+    "idle", "idle", "idle", "idle", "idle", "idle", "idle",
+    "caw", { "caw", "caw" }, { "caw", "caw", "caw" },
+    "peck", { "peck", "peck" }, { "peck", "peck", "peck" },
+    { "flap_pre", "flap_loop", "flap_pst" },
+    { "flap_pre", "flap_loop", "flap_loop", "flap_pst" },
+    { "flap_pre", "flap_loop", "flap_loop", "flap_loop", "flap_loop", "flap_pst" },
+    "hop", "hop", "hop", "hop", "hop", "taunt", "taunt", "taunt", "taunt", "taunt",
+    "hit", "hit", "hit", "atk", "atk", "atk", "atk", "atk",
+    { "sleep_pre", "sleep_loop", "sleep_loop", "sleep_loop", "sleep_loop", "sleep_loop", "sleep_loop", "sleep_pst" },
+    { "sleep_pre", "sleep_loop", "sleep_loop", "sleep_loop", "sleep_loop",  "sleep_pst" },
+    { "sleep_pre", "sleep_loop", "sleep_loop", "sleep_pst" },
+    "idle", "idle", "idle", "idle", "idle", "idle", "idle"
+}
+local function SetSgSkinAnim_bird(inst)
+    SetSgSkinAnim(inst, anims_bird)
+end
+local function SetSgSkinAnim_bird2(inst)
+    SetSgSkinAnim(inst, anims_bird2)
+end
+local function SetAnim_bird(inst, bank, build, face)
+    inst.entity:AddFollower()
+    if face == 4 then
+        inst.Transform:SetFourFaced()
+    else
+        inst.Transform:SetTwoFaced()
+    end
+    inst.AnimState:SetBank(bank or "crow")
+    inst.AnimState:SetBuild(build)
+    inst.AnimState:PlayAnimation("land")
+end
+MakeFx2({ --乌鸦
+    name = "crow_l_fx",
+    assets = {
+        Asset("ANIM", "anim/crow.zip"),
+        Asset("ANIM", "anim/crow_build.zip")
+    },
+    fn_common = function(inst)
+        SetAnim_bird(inst, nil, "crow_build")
+    end,
+    fn_server = SetSgSkinAnim_bird
+})
+MakeFx2({ --红雀
+    name = "robin_l_fx",
+    assets = {
+        Asset("ANIM", "anim/crow.zip"),
+        Asset("ANIM", "anim/robin_build.zip")
+    },
+    fn_common = function(inst)
+        SetAnim_bird(inst, nil, "robin_build")
+    end,
+    fn_server = SetSgSkinAnim_bird
+})
+MakeFx2({ --雪雀
+    name = "robin_winter_l_fx",
+    assets = {
+        Asset("ANIM", "anim/crow.zip"),
+        Asset("ANIM", "anim/robin_winter_build.zip")
+    },
+    fn_common = function(inst)
+        SetAnim_bird(inst, nil, "robin_winter_build")
+    end,
+    fn_server = SetSgSkinAnim_bird
+})
+MakeFx2({ --金丝雀
+    name = "canary_l_fx",
+    assets = {
+        Asset("ANIM", "anim/crow.zip"),
+        Asset("ANIM", "anim/canary_build.zip")
+    },
+    fn_common = function(inst)
+        SetAnim_bird(inst, nil, "canary_build")
+    end,
+    fn_server = SetSgSkinAnim_bird
+})
+MakeFx2({ --鸽子
+    name = "quagmire_pigeon_l_fx",
+    assets = {
+        Asset("ANIM", "anim/crow.zip"),
+        Asset("ANIM", "anim/quagmire_pigeon_build.zip")
+    },
+    fn_common = function(inst)
+        SetAnim_bird(inst, nil, "quagmire_pigeon_build")
+    end,
+    fn_server = SetSgSkinAnim_bird
+})
+MakeFx2({ --海鹦鹉
+    name = "puffin_l_fx",
+    assets = {
+        Asset("ANIM", "anim/crow.zip"),
+        Asset("ANIM", "anim/puffin_build.zip")
+    },
+    fn_common = function(inst)
+        SetAnim_bird(inst, "puffin", "puffin_build")
+    end,
+    fn_server = SetSgSkinAnim_bird
+})
+MakeFx2({ --月盲乌鸦
+    name = "bird_mutant_l_fx",
+    assets = {
+        Asset("ANIM", "anim/mutated_crow.zip"),
+        Asset("ANIM", "anim/bird_mutant_build.zip")
+    },
+    fn_common = function(inst)
+        SetAnim_bird(inst, "mutated_crow", "bird_mutant_build", 4)
+    end,
+    fn_server = SetSgSkinAnim_bird2
+})
+MakeFx2({ --奇形鸟
+    name = "bird_mutant_spitter_l_fx",
+    assets = {
+        Asset("ANIM", "anim/mutated_robin.zip"),
+        Asset("ANIM", "anim/bird_mutant_spitter_build.zip")
+    },
+    fn_common = function(inst)
+        SetAnim_bird(inst, "mutated_robin", "bird_mutant_spitter_build", 4)
+    end,
+    fn_server = SetSgSkinAnim_bird2
+})
+MakeFx2({ --秃鹫
+    name = "buzzard_l_fx",
+    assets = {
+        Asset("ANIM", "anim/buzzard_build.zip"),
+        Asset("ANIM", "anim/buzzard_basic.zip")
+    },
+    fn_common = function(inst)
+        SetAnim_bird(inst, "buzzard", "buzzard_build", 4)
     end,
     fn_server = function(inst)
-        SetSgSkinAnim(inst, anims_kitcoon)
+        SetSgSkinAnim(inst, anims_bird3)
     end
 })
 
@@ -1091,6 +1269,78 @@ MakeFx2({ --巫酋毒骨面
         inst.AnimState:SetBank("siving_mask_gold_era2")
         inst.AnimState:SetBuild("siving_mask_gold_era2")
         inst.AnimState:PlayAnimation("idle1", true)
+    end,
+    -- fn_server = function(inst)end
+})
+MakeFx2({ --便便
+    name = "poop_l_fx",
+    assets = {
+        Asset("ANIM", "anim/poop.zip")
+    },
+    fn_common = function(inst)
+        inst.entity:AddFollower()
+        inst.AnimState:SetBank("poop")
+        inst.AnimState:SetBuild("poop")
+        inst.AnimState:PlayAnimation("dump")
+    end,
+    fn_server = function(inst)
+        inst.AnimState:PushAnimation("idle", false)
+    end
+})
+MakeFx2({ --鸟粪
+    name = "guano_l_fx",
+    assets = {
+        Asset("ANIM", "anim/guano.zip")
+    },
+    fn_common = function(inst)
+        inst.entity:AddFollower()
+        inst.AnimState:SetBank("guano")
+        inst.AnimState:SetBuild("guano")
+        inst.AnimState:PlayAnimation("dump")
+    end,
+    fn_server = function(inst)
+        inst.AnimState:PushAnimation("idle", false)
+    end
+})
+MakeFx2({ --苍蝇特效
+    name = "flies_l_fx",
+    assets = {
+        Asset("ANIM", "anim/flies.zip")
+    },
+    fn_common = function(inst)
+        inst.entity:AddFollower()
+        inst.AnimState:SetBank("flies")
+        inst.AnimState:SetBuild("flies")
+        inst.AnimState:PlayAnimation("swarm_pre")
+    end,
+    fn_server = function(inst)
+        inst.AnimState:PushAnimation("swarm_loop", true)
+    end
+})
+MakeFx2({ --腐烂物
+    name = "spoiled_food_l_fx",
+    assets = {
+        Asset("ANIM", "anim/spoiled_food.zip")
+    },
+    fn_common = function(inst)
+        inst.entity:AddFollower()
+        inst.AnimState:SetBank("spoiled")
+        inst.AnimState:SetBuild("spoiled_food")
+        inst.AnimState:PlayAnimation("idle")
+    end,
+    -- fn_server = function(inst)end
+})
+MakeFx2({ --高脚鸟蛋
+    name = "tallbirdegg_l_fx",
+    assets = {
+        Asset("ANIM", "anim/tallbird_egg.zip")
+    },
+    fn_common = function(inst)
+        inst.entity:AddFollower()
+        inst.AnimState:SetBank("egg")
+        inst.AnimState:SetBuild("tallbird_egg")
+        inst.AnimState:PlayAnimation("egg")
+        inst.AnimState:HideSymbol("shdw")
     end,
     -- fn_server = function(inst)end
 })
