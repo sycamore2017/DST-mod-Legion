@@ -910,30 +910,10 @@ AddSimPostInit(function()
             isnoskin = true, buildfile = "aip_wizard_hat", buildsymbol = "swap_hat"
         }
         DRESSUP_DATA["aip_horse_head"] = { --马头
-            isnoskin = true,
-            buildfn = function(dressup, item, buildskin)
-                local itemswap = {}
-
-                itemswap["swap_hat"] = dressup:GetDressData(
-                    buildskin, "aip_horse_head", "swap_hat", item.GUID, "swap"
-                )
-                dressup:SetDressTopCover(itemswap)
-
-                return itemswap
-            end
+            isnoskin = true, isfullhead = true, buildfile = "aip_horse_head", buildsymbol = "swap_hat"
         }
         DRESSUP_DATA["aip_som"] = { --谜之声
-            isnoskin = true,
-            buildfn = function(dressup, item, buildskin)
-                local itemswap = {}
-
-                itemswap["swap_hat"] = dressup:GetDressData(
-                    buildskin, "aip_som", "swap_hat", item.GUID, "swap"
-                )
-                dressup:SetDressTopCover(itemswap)
-
-                return itemswap
-            end
+            isnoskin = true, isfullhead = true, buildfile = "aip_som", buildsymbol = "swap_hat"
         }
         DRESSUP_DATA["aip_blue_glasses"] = { --岚色眼镜
             isnoskin = true, isopentop = true,
@@ -1160,15 +1140,7 @@ AddSimPostInit(function()
                 end
             }
             DRESSUP_DATA["hat_blue_crystal"] = { --蓝晶帽
-                isnoskin = true,
-                buildfn = function(dressup, item, buildskin)
-                    local itemswap = {}
-                    itemswap["swap_hat"] = dressup:GetDressData(
-                        nil, "hat_blue_crystal", "swap_hat", item.GUID, "swap"
-                    )
-                    dressup:SetDressTopCover(itemswap)
-                    return itemswap
-                end
+                isnoskin = true, isfullhead = true, buildfile = "hat_blue_crystal", buildsymbol = "swap_hat"
             }
             DRESSUP_DATA["medal_tentaclespike"] = { --活性触手尖刺
                 isnoskin = true,

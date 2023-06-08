@@ -266,6 +266,7 @@ local function TryAddBar(inst)
         if data.scale ~= nil then
             fx.Transform:SetScale(data.scale, data.scale, data.scale)
         end
+        fx.components.highlightchild:SetOwner(inst)
     end
 end
 local function SetBar(inst, barkey, value, valuemax)
@@ -735,6 +736,8 @@ table.insert(prefs, Prefab(
         -- inst.AnimState:PlayAnimation("bar2")
         inst.AnimState:SetFinalOffset(3)
 
+        inst:AddComponent("highlightchild")
+
         inst:AddTag("FX")
 
         inst.entity:SetPristine()
@@ -887,6 +890,8 @@ table.insert(prefs, Prefab(
         inst.AnimState:SetPercent("fruit", 0)
         inst.AnimState:SetFinalOffset(3)
 
+        inst:AddComponent("highlightchild")
+
         inst:AddTag("FX")
 
         inst.entity:SetPristine()
@@ -996,12 +1001,12 @@ local function SetSymbols_mask(inst, owner)
             return
         end
         if skindata.equip.isopenhat then
-            HAT_OPENTOP_ONEQUIP_L(inst, owner, skindata.equip.build, skindata.equip.file or GetSwapSymbol(owner))
+            HAT_L_ON_OPENTOP(inst, owner, skindata.equip.build, skindata.equip.file or GetSwapSymbol(owner))
         else
-            HAT_ONEQUIP_L(inst, owner, skindata.equip.build, skindata.equip.file or GetSwapSymbol(owner))
+            HAT_L_ON(inst, owner, skindata.equip.build, skindata.equip.file or GetSwapSymbol(owner))
         end
     else
-        HAT_OPENTOP_ONEQUIP_L(inst, owner, inst.prefab, GetSwapSymbol(owner))
+        HAT_L_ON_OPENTOP(inst, owner, inst.prefab, GetSwapSymbol(owner))
     end
 end
 local function ClearSymbols_mask(inst, owner)
@@ -1011,7 +1016,7 @@ local function ClearSymbols_mask(inst, owner)
             skindata.equip.endfn(inst, owner)
         end
     end
-    HAT_ONUNEQUIP_L(inst, owner)
+    HAT_L_OFF(inst, owner)
 end
 local function OnEquip_mask(inst, owner)
     SetSymbols_mask(inst, owner)

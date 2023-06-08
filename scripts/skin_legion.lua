@@ -256,43 +256,19 @@ end
 
 ------官方新的动画格式
 
-local function RemoveFollowSymbolFx(inst, fxkey)
-    if inst[fxkey] ~= nil then
-        for i, v in ipairs(inst[fxkey]) do
-            v:Remove()
-        end
-        inst[fxkey] = nil
+local function Fn_setFollowFx(owner, fxkey, fxname)
+    if owner[fxkey] ~= nil then
+        owner[fxkey]:Remove()
+    end
+    owner[fxkey] = SpawnPrefab(fxname)
+    if owner[fxkey] then
+        owner[fxkey]:AttachToOwner(owner)
     end
 end
-local function SetFollowSymbolFx(owner, fxkey, fxdata, randomanim)
-    if owner[fxkey] == nil then
-        owner[fxkey] = {}
-        for i, v in ipairs(fxdata) do
-            local fx = SpawnPrefab(v.name)
-            if v.anim ~= nil then
-                if v.noloop then
-                    fx.AnimState:PlayAnimation(v.anim, false)
-                else
-                    fx.AnimState:PlayAnimation(v.anim, true)
-                end
-            end
-            table.insert(owner[fxkey], fx)
-        end
-    end
-    local frame = nil
-    if randomanim then
-        frame = math.random(owner[fxkey][1].AnimState:GetCurrentAnimationNumFrames()) - 1
-    end
-    for i, v in ipairs(owner[fxkey]) do
-        local fxdd = fxdata[i]
-        v.entity:SetParent(owner.entity)
-        v.Follower:FollowSymbol(owner.GUID, fxdd.symbol, fxdd.x, fxdd.y, fxdd.z, true, nil, fxdd.idx, fxdd.idx2)
-        if frame ~= nil then
-            v.AnimState:SetFrame(frame)
-        end
-        if v.components.highlightchild ~= nil then
-            v.components.highlightchild:SetOwner(owner)
-        end
+local function Fn_removeFollowFx(owner, fxkey)
+    if owner[fxkey] ~= nil then
+        owner[fxkey]:Remove()
+        owner[fxkey] = nil
     end
 end
 
@@ -2652,12 +2628,10 @@ _G.SKINS_LEGION = {
             symbol = "lantern_overlay", build = "siving_feather_real_collector", file = "swap_cushion",
             isshield = true,
             startfn = function(inst, owner)
-                SetFollowSymbolFx(owner, "fx_l_sivfeather_real", {
-                    { name = "sivfeather_real_collector_fx", anim = nil, symbol = "lantern_overlay", x = 18, y = -12, z = 0 }
-                }, false)
+                Fn_setFollowFx(owner, "fx_l_sivfea_real", "sivfea_real_collector_fofx")
             end,
             endfn = function(inst, owner)
-                RemoveFollowSymbolFx(owner, "fx_l_sivfeather_real")
+                Fn_removeFollowFx(owner, "fx_l_sivfea_real")
             end
         },
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
@@ -2695,12 +2669,10 @@ _G.SKINS_LEGION = {
             symbol = "lantern_overlay", build = "siving_feather_fake_collector", file = "swap_cushion",
             isshield = true,
             startfn = function(inst, owner)
-                SetFollowSymbolFx(owner, "fx_l_sivfeather_fake", {
-                    { name = "sivfeather_fake_collector_fx", anim = nil, symbol = "lantern_overlay", x = 18, y = -12, z = 0 }
-                }, false)
+                Fn_setFollowFx(owner, "fx_l_sivfea_fake", "sivfea_fake_collector_fofx")
             end,
             endfn = function(inst, owner)
-                RemoveFollowSymbolFx(owner, "fx_l_sivfeather_fake")
+                Fn_removeFollowFx(owner, "fx_l_sivfea_fake")
             end
         },
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
@@ -3388,14 +3360,10 @@ _G.SKINS_LEGION = {
                 owner.AnimState:Show("HAIR")
                 owner.AnimState:Show("HEAD")
                 owner.AnimState:Hide("HEAD_HAT")
-                SetFollowSymbolFx(owner, "fx_l_sivmask", {
-                    { name = "sivmask_era_fx", anim = nil, symbol = "swap_hat", idx = 0 },
-                    { name = "sivmask_era_fx", anim = "idle2", symbol = "swap_hat", idx = 1 },
-                    { name = "sivmask_era_fx", anim = "idle3", symbol = "swap_hat", idx = 2 }
-                }, false)
+                Fn_setFollowFx(owner, "fx_l_sivmask", "sivmask_era_fofx")
             end,
             endfn = function(inst, owner)
-                RemoveFollowSymbolFx(owner, "fx_l_sivmask")
+                Fn_removeFollowFx(owner, "fx_l_sivmask")
             end
         },
         exchangefx = { prefab = nil, offset_y = nil, scale = nil }
@@ -3434,14 +3402,10 @@ _G.SKINS_LEGION = {
                 owner.AnimState:Show("HAIR")
                 owner.AnimState:Show("HEAD")
                 owner.AnimState:Hide("HEAD_HAT")
-                SetFollowSymbolFx(owner, "fx_l_sivmask2", {
-                    { name = "sivmask_era2_fx", anim = nil, symbol = "swap_hat", idx = 0 },
-                    { name = "sivmask_era2_fx", anim = "idle2", symbol = "swap_hat", idx = 1 },
-                    { name = "sivmask_era2_fx", anim = "idle3", symbol = "swap_hat", idx = 2 }
-                }, false)
+                Fn_setFollowFx(owner, "fx_l_sivmask", "sivmask_era2_fofx")
             end,
             endfn = function(inst, owner)
-                RemoveFollowSymbolFx(owner, "fx_l_sivmask2")
+                Fn_removeFollowFx(owner, "fx_l_sivmask")
             end
         },
         exchangefx = { prefab = nil, offset_y = nil, scale = nil }

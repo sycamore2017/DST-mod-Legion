@@ -57,6 +57,7 @@ local function SpawnFx(self)
 		self.inst.GUID, self.fxdata.symbol, --TIP: 跟随通道时，默认跟随通道文件夹里ID=0的
 		self.fxdata.x, self.fxdata.y, self.fxdata.z
 	)
+	self.fx.components.highlightchild:SetOwner(self.inst)
 end
 local function SetAnims(self) --有果子时设置各种动画
 	--设置本体的动画
