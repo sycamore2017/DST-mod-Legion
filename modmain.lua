@@ -30,6 +30,27 @@
         end)
 ]]--
 
+--[[ 给玩家实体增加已有皮肤获取与管理机制 Tip：
+    TheNet:GetIsMasterSimulation()  --是否为服务器世界(主机+云服)
+    TheNet:GetIsServer()            --是否为主机世界(玩家本地电脑开的，既跑进程，也要运行ui)
+    TheNet:IsDedicated()            --是否为云服世界(只跑进程，不运行ui)
+    TheShard:IsSecondary()          --是否为副世界(所以，not TheShard:IsSecondary() 就能确定是主世界了)
+    TheShard:GetShardId()           --获取当前世界的ID
+
+    世界分为3种
+        1、主世界(运行主服务器代码，与客户端通信)、
+        2、副世界(运行副服务器代码，与客户端通信)、
+        3、客户端世界(运行客户端代码，与当前所处的服务器世界通信)
+    例如，1个玩家用本地电脑开无洞穴存档，则世界有主世界(与房主客户端世界是同一个)、客户端(其他玩家的各有一个)。
+        开了含洞穴的本地存档或云服存档，则世界有主世界(主机或云服)、洞穴世界(副世界)、客户端(所有玩家各有一个)
+    modmain会在每个世界都加载一次
+
+    TheWorld.ismastersim        --是否为服务器世界(主机+云服。本质上就是 TheNet:GetIsMasterSimulation())
+    TheWorld.ismastershard      --是否为主世界(本质上就是 TheWorld.ismastersim and not TheShard:IsSecondary())
+    TheNet:GetIsServer() or TheNet:IsDedicated() --是否为非客户端世界，这个是最精确的判定方式
+    not TheNet:IsDedicated()    --这个方式也能判定客户端，但是无法排除客户端和服务端为一体的世界的情况
+]]--
+
 --------------------------------------------------------------------------
 --[[ Globals ]]--[[ 全局 ]]
 --------------------------------------------------------------------------

@@ -1516,7 +1516,7 @@ local SkinData = {
         string = ischinese and {
             collection = "FUTURE", access = "SPECIAL",
             descitem = "解锁\"子圭·育\"的皮肤。",
-            description = ""
+            description = "以后的以后会发生什么，我们总是充满遐想，今天给大家讲个故事，关于未来。\n那时候，人们都依赖高科技已达到近乎长生不老的地步，也没有了更高尚的追求。而且你要知道很多动植物都在人类科技发展过程中灭绝了，甚至包括人类的爱犬，那是一段黑暗的时期，这里就不讲啦，继续讲今天的主题，幸好人类有喜欢存档的习惯，各种或消失或灭绝的动植物基因都被保留了下来。\n一个无聊的民间科学家无意间翻到一张自己祖先抱着一只非常可爱的生物的照片，于是去基因档案所窃取了这个生物的基因，并违规制造了生化打印器。很快，几只可爱的汪汪叫狗狗重现人间，科学家和狗狗玩的很开心呢。不过未来世界很难有不透风的纳米墙，科学家很快就被举报，他的所有成果都被没收，他自己也被关了起来……"
         } or {
             collection = "FUTURE", access = "SPECIAL",
             descitem = "Unlock \"Siving-Trans\" skin.",
@@ -1551,7 +1551,7 @@ local SkinData = {
         string = ischinese and {
             collection = "FUTURE", access = "SPECIAL",
             descitem = "解锁\"子圭·育\"的皮肤。",
-            description = ""
+            description = "关于未来的故事还有下文。\n近百年来突然掀起一场宠物选美潮流，不时有各种宠物选美大赛冲入人们视野。可能那时人类无聊至极，开始培养新的兴趣。在赛场上，可以看到各种名流展示着自己的爱宠，越是有权有威望人士的爱宠会更加“美丽动人”，但说实话，这些人并不爱他们的爱宠，只是把它当做炫耀的工具。所有宠物都由一家神秘机构负责创造，可根据卖家的想法来培育宠物。机构里有一台改装过的仪器，叫做基因诱变舱。机构人员其实并不是它的建造者，但会用就够了。他们会往里面注入各种动植物的基因，然后链接在一起，短短8小时，便能打印出新的生物。\n有一天一位外星流浪客，带着古老星系的生物基因找到这个神秘机构，机构由于只接受宠物创造，所以不得以将猫的基因也加了进来……于是，在这个洁白的舱体里，第一只全身布满金色星纹，闪着金光的，星猫，诞生了！毫无疑问，外星流浪客带着它赢了很多次选美比赛，他和星猫引起了多次全球轰动，可真是让人羡慕得不行……"
         } or {
             collection = "FUTURE", access = "SPECIAL",
             descitem = "Unlock \"Siving-Trans\" skin.",
@@ -2068,7 +2068,7 @@ local SkinData = {
         string = ischinese and {
             collection = "COLLECTOR", access = "SPECIAL",
             descitem = "解锁\"子圭·翰\"、\"子圭玄鸟绒羽\"的皮肤。",
-            description = ""
+            description = "传说宇宙里有种强大的四维生物，能穿梭于时间位面，只在一些古老星系里偶尔出没。一个幸运至极的人类，在从飞船中投身古星环后濒死之际，意外撞上了它。青光一闪，这个人突然回到了自己飞船迷路之前，手里还多了一片青光闪耀的鳞片。几年间，他靠着鳞片，带着自己的族人发展壮大，寿终正寝前将鳞片做成了占星石，希望占星石能继续引导族人。几百年后，族内有人叛变，窃取了占星石中的基因，逃往他星……\n此时此刻，到处地面塌陷，并不断长出暗红色的水晶荆棘。一个被基因改造过的星猫和其主人逃走途中，星猫掉进地缝，主人自顾不暇选择直接逃走，而星猫却意外接触到了荆棘的核心，核心里的能量居然被星猫吸收。顿时，它身体迸发出一股能量波，星猫从金色变成了青色，毛发也更加突出和光耀。它进化了，觉醒的古老基因让它通晓了一切。\n星猫飘向空中，俯瞰崩溃中的星球，为了报答诞生之恩，果断选择回到过去，拯救面前的未来……"
         } or {
             collection = "COLLECTOR", access = "SPECIAL",
             descitem = "Unlock \"Siving-Plume\", \"Siving Feather\" skin.",
@@ -2336,7 +2336,7 @@ local SkinData = {
         string = ischinese and {
             collection = "DISGUISER", access = "SPECIAL",
             descitem = "解锁\"仙人柱\"的皮肤。",
-            description = ""
+            description = "如果要我选什么花最美，我觉得，不是春日里的繁花似锦，也不是夏日里的娇艳欲滴，而是滚滚黄沙里，干旱沙漠中，险恶环境下开出的花儿！\n在每个清晨，它布满纤毛的球刺会从晨风中借来一缕缕露水；\n在每个正午，厚实的皮质会牢牢锁住水分，不给烈日抢走的机会；\n在偶尔午夜，小小的身体迸开巨大花蕾，不与争艳，在第一束阳光拜访前默默收起所有美丽痕迹。"
         } or {
             collection = "DISGUISER", access = "SPECIAL",
             descitem = "Unlock \"Cactaceae\" skin.",
@@ -2367,19 +2367,19 @@ local SkinData = {
         string = ischinese and {
             collection = "ERA", access = "SPECIAL",
             descitem = "解锁\"子圭·利川\"、\"子圭·益矩\"、\"子圭·崇溟\"的皮肤。",
-            description = ""
+            description = "在遥远古代，人类还处在部落阶段。在海滨旁，在密林里，在高原上，以大大小小的部落分而居之。\n海滨部落敬畏无垠大海。他们渴望探索翻涌的海洋，但总有一个极限，无情的洋流总能将他们拍落。于是他们树起图腾，关于海，关于他们在海里见过的庞大造物。\n密林部落崇敬广袤山川。他们勇于在一山又一山中寻觅并建立新的栖息地，但总有一个极限，连绵山川阻碍了他们的联系与团结。于是他们树起图腾，关于山，关于他们想要团结，想要走遍大地。\n高原部落向往自由蓝天。恶劣的生存环境让他们信仰魂魄能翱翔天空。于是他们树起图腾，关于天，关于美好生活和每天都能望见的自由飞鸟。"
         } or {
             collection = "ERA", access = "SPECIAL",
             descitem = "Unlock \"Siving-Eau\", \"Siving-Alim\", \"Siving-Ridge\" skin.",
             description = "The story was not translated."
         },
-        height_anim = 213,
+        height_anim = 226,
         anims = {
             {
                 bank = "siving_ctlall_era", build = "siving_ctlall_era",
                 anim = "idle", anim2 = nil, isloop = false,
                 fn_click = SetClick_siving_ctl,
-                x = 0, y = 5, scale = 0.26
+                x = 0, y = 20, scale = 0.26
             },
             {
                 bank = "siving_ctlwater_era", build = "siving_ctlwater_era",
@@ -2396,7 +2396,7 @@ local SkinData = {
             {
                 bank = "farm_plant_happiness", build = "farm_plant_happiness",
                 anim = "happy", anim2 = nil, isloop = false,
-                x = 0, y = 5, scale = 0.26
+                x = 0, y = 30, scale = 0.26
             },
             {
                 bank = "farm_plant_happiness", build = "farm_plant_happiness",
@@ -2415,7 +2415,7 @@ local SkinData = {
             name = "巫族骨面",
             collection = "ERA", access = "SPECIAL",
             descitem = "解锁\"子圭·汲\"、\"子圭·歃\"的2套皮肤。",
-            description = ""
+            description = "在密林深处，最靠近大地中心的地方，出生了一个被诅咒的婴儿，他面目狰狞丑陋，皮肤枯干发绿，族人们都想处死这不祥之兆，只有他生母舍命抵抗，死前他被藏进枯木中，顺着河流漂向无人处。\n一只野猪冲向了被搁浅在河边的他，因为他啼哭声让野猪狂躁。然而野猪肉眼可见逐渐消瘦，半途就没了气息。婴儿爬了出来，皮肤已不那么枯瘦。很快，周围的飞禽走兽都纷纷倒地，奇异的符号从这些动物身上慢慢散出，流向这个刚出生的婴儿，他的容貌已和正常婴儿无异。\n不知何时，一位头戴绳坠兽骨身批叶袍的女巫出现在他面前，对他耳语几句，婴儿周围奇怪的现象停了下来。她将婴儿的手掌划破，又窃窃私语，血液飘进她的骨面具中，绿纹被染成血色。女巫疯笑着，抱走了婴儿，消失在森林中……"
         } or {
             name = "Witch Bone Mask",
             collection = "ERA", access = "SPECIAL",
@@ -2477,7 +2477,7 @@ local SkinData = {
                 x = 56, y = 0, scale = 0.35
             }
         }
-    },
+    }
 }
 
 local function GetName(skin)

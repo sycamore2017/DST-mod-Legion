@@ -100,6 +100,26 @@ local function GetSymbol_sivmask(dressup)
     end
 end
 
+-- local function ToggleLantern(owner, data)
+--     if
+--         owner.sg == nil or (owner.sg:HasStateTag("nodangle")
+--         or (owner.components.rider ~= nil and owner.components.rider:IsRiding()
+--         and not owner.sg:HasStateTag("forcedangle")))
+--     then
+--         owner.AnimState:OverrideSymbol("swap_object", data.build, data.file)
+--         if data.showlantern then
+--             owner.AnimState:Show("LANTERN_OVERLAY")
+--         end
+--         owner._lantern_l:Hide()
+--     else
+--         owner.AnimState:OverrideSymbol("swap_object", data.build, data.file_stick)
+--         if data.showlantern then
+--             owner.AnimState:Hide("LANTERN_OVERLAY")
+--         end
+--         owner._lantern_l:Show()
+--     end
+-- end
+
 local dressup_data = {
     -------------------------------
     --手部-------------------------
