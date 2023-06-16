@@ -1430,7 +1430,7 @@ MakeFxFollow({ --秃鹫
     },
     fx = { {
         bank = "buzzard", build = "buzzard_build", face = 4, sg = anims_buzzard,
-        x = -20, y = -148, z = 0, fn_anim = SetAnim_bird, symbol = "swap_hat"
+        x = -10, y = -143, z = 0, fn_anim = SetAnim_bird, symbol = "swap_hat"
     } }
 })
 MakeFxFollow({ --小高脚鸟
@@ -1440,7 +1440,7 @@ MakeFxFollow({ --小高脚鸟
     },
     fx = { {
         bank = "smallbird", build = "smallbird_basic", face = 4, sg = anims_smallbird, anim = "hatch",
-        x = -20, y = -148, z = 0, fn_anim = SetAnim_bird, symbol = "swap_hat"
+        x = -10, y = -138, z = 0, fn_anim = SetAnim_bird, symbol = "swap_hat"
     } }
 })
 MakeFxFollow({ --便便

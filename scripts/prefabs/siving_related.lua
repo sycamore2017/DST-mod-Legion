@@ -714,6 +714,8 @@ MakeConstruct({
                 bank = "siving_ctlwater", build = "siving_ctlwater", anim = "bar"
             }
         }
+
+        inst:WatchWorldState("israining", OnRain_ctlwater)
     end
 })
 

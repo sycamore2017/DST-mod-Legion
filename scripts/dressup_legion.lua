@@ -22,23 +22,6 @@ local function Fn_symbolSwap(dressup, item, buildskin)
     return itemswap
 end
 
-local function Fn_setFollowFx(owner, fxkey, fxname)
-    --不能把数据存在item上，因为幻化后item会被删除
-    if owner[fxkey] ~= nil then
-        owner[fxkey]:Remove()
-    end
-    owner[fxkey] = SpawnPrefab(fxname)
-    if owner[fxkey] then
-        owner[fxkey]:AttachToOwner(owner)
-    end
-end
-local function Fn_removeFollowFx(owner, fxkey)
-    if owner[fxkey] ~= nil then
-        owner[fxkey]:Remove()
-        owner[fxkey] = nil
-    end
-end
-
 local function Fn_removeFollowSymbolFx(inst, fxkey)
     if inst[fxkey] ~= nil then
         for i, v in ipairs(inst[fxkey]) do
@@ -76,6 +59,27 @@ local function Fn_setFollowSymbolFx(owner, fxkey, fxdata, randomanim)
         if v.components.highlightchild ~= nil then
             v.components.highlightchild:SetOwner(owner)
         end
+    end
+end
+
+local function Fn_setFollowFx(owner, fxkey, fxname)
+    --不能把数据存在item上，因为幻化后item会被删除
+    if owner[fxkey] ~= nil then
+        owner[fxkey]:Remove()
+    end
+    owner[fxkey] = SpawnPrefab(fxname)
+    if owner[fxkey] then
+        owner[fxkey]:AttachToOwner(owner)
+    end
+end
+local function Fn_removeFollowFx(owner, fxkey)
+    if owner[fxkey] ~= nil then
+        if owner[fxkey].Remove ~= nil then
+            owner[fxkey]:Remove()
+        else --兼容测试版和正式版
+            Fn_removeFollowSymbolFx(owner, fxkey)
+        end
+        owner[fxkey] = nil
     end
 end
 
