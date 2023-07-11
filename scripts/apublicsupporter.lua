@@ -1284,7 +1284,11 @@ AddStategraphState("wilson", State{
 })
 
 AddStategraphEvent("wilson", EventHandler("awkwardpropeller", function(inst, data)
-    if not inst.sg:HasStateTag("busy") and inst.components.health ~= nil and not inst.components.health:IsDead() then
+    if
+        not inst.sg:HasStateTag("busy") and
+        not inst.sg:HasStateTag("overridelocomote") and
+        inst.components.health ~= nil and not inst.components.health:IsDead()
+    then
         if WakePlayerUp(inst) then
             --将玩家甩下背（因为被玩家恶心到了）
             local mount = inst.components.rider ~= nil and inst.components.rider:GetMount() or nil
@@ -2293,6 +2297,7 @@ end)
 --[[ 让暗影仆从能采摘三花 ]]
 --------------------------------------------------------------------------
 
+--整个函数都改了，删掉了没用的逻辑
 local function FindPickupableItem_filter(v, ba, owner, radius, furthestfirst, positionoverride, ignorethese, onlytheseprefabs, allowpickables, ispickable, worker)
     if v.components.burnable ~= nil and (v.components.burnable:IsBurning() or v.components.burnable:IsSmoldering()) then
         return false
@@ -2326,7 +2331,8 @@ _G.FindPickupableItem = function(owner, radius, furthestfirst, positionoverride,
     else
         x, y, z = owner.Transform:GetWorldPosition()
     end
-    local ents = TheSim:FindEntities(x, y, z, radius, { "bush_l_f" }, { "INLIMBO", "NOCLICK" }, { "pickable" }) --修改点
+    local ents = TheSim:FindEntities(x, y, z, radius,
+        { "pickable" }, { "INLIMBO", "NOCLICK" }, { "bush_l_f", "crop_legion", "crop2_legion" }) --修改点
     local istart, iend, idiff = 1, #ents, 1
     if furthestfirst then
         istart, iend, idiff = iend, istart, -1

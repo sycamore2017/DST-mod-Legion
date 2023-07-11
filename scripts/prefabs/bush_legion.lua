@@ -229,7 +229,10 @@ end
 local function SpawnStackDrop(name, num, bush, doer, mustdrop, checkskin, items)
     local item = SpawnPrefab(name)
 	if item ~= nil then
-        if checkskin and doer ~= nil and doer.userid ~= nil then --还是得检查用户ID，因为不是所有花丛都跟花剑绑定一起的
+        if
+            checkskin and doer ~= nil and --检查采集者，用暗影收割者时采集者是世界自己
+            (TheWorld == doer or doer.userid ~= nil) --还是得检查用户ID，因为不是所有花丛都跟花剑绑定一起的
+        then
             bush.components.skinedlegion:SetLinkedSkin(item, "sword", doer)
         end
 

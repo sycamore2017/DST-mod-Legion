@@ -396,11 +396,8 @@ local dressup_data = {
         buildfile = "swap_glasscutter",
         buildsymbol = "swap_glasscutter",
     },
-    gnarwail_horn = --多角鲸的角
-    {
-        isnoskin = true,
-        buildfile = "swap_gnarwailhorn",
-        buildsymbol = "swap_gnarwailhorn",
+    gnarwail_horn = { --一角鲸的角
+        isnoskin = true, buildfile = "gnarwail_horn", buildsymbol = "swap_gnarwailhorn"
     },
     messagebottle = --有信的漂流瓶
     {
@@ -791,7 +788,10 @@ local dressup_data = {
         buildfn = function(dressup, item, buildskin)
             local itemswap = {}
 
-            if buildskin == "wathgrithrhat_valkyrie" then
+            if
+                buildskin == "wathgrithrhat_valkyrie" or
+                buildskin == "wathgrithrhat_lunar"
+            then
                 itemswap["swap_hat"] = dressup:GetDressData(
                     buildskin, "hat_wathgrithr", "swap_hat", item.GUID, "swap"
                 )
@@ -1352,22 +1352,16 @@ local dressup_data = {
     spicepack = { isbackpack = true, buildfile = "swap_chefpack" },
     seedpouch = { isbackpack = true, buildfile = "seedpouch" },
     oceantreenut = { --疙瘩树果
-        isnoskin = true,
-        istallbody = true,
-        buildfile = "oceantreenut",
-        buildsymbol = "swap_body"
+        isnoskin = true, istallbody = true, buildfile = "oceantreenut", buildsymbol = "swap_body"
     },
     carnival_vest_a = { --叽叽喳喳围巾
-        isbackpack = true,
-        buildfile = "carnival_vest_a",
+        isbackpack = true, buildfile = "carnival_vest_a"
     },
     carnival_vest_b = { --叽叽喳喳斗篷
-        isbackpack = true,
-        buildfile = "carnival_vest_b",
+        isbackpack = true, buildfile = "carnival_vest_b"
     },
     carnival_vest_c = { --叽叽喳喳小披肩
-        isbackpack = true,
-        buildfile = "carnival_vest_c",
+        isbackpack = true, buildfile = "carnival_vest_c"
     },
     balloonvest = { buildfile = "balloonvest", buildsymbol = "swap_body" },
     costume_doll_body = { buildfile = "costume_doll_body", buildsymbol = "swap_body" },
@@ -2066,40 +2060,14 @@ end
 
 --统一添加各种雕像的幻化数据
 local pieces = {
-    "pawn",
-    "rook",
-    "knight",
-    "bishop",
-    "muse",
-    "formal",
-    "hornucopia",
-    "pipe",
-
-    "deerclops",
-    "bearger",
-    "moosegoose",
-    "dragonfly",
-    "clayhound",
-    "claywarg",
-    "butterfly",
-    "anchor",
-    "moon",
-    "carrat",
-    "beefalo",
-    "crabking",
-    "malbatross",
-    "toadstool",
-    "stalker",
-    "klaus",
-    "beequeen",
-    "antlion",
-    "minotaur",
-    "guardianphase3",
-    "eyeofterror",
-    "twinsofterror",
-    "kitcoon",
-    "catcoon",
-    "manrabbit"
+    "pawn", "rook", "knight", "bishop", "muse", "formal", "hornucopia", "pipe",
+    "deerclops", "bearger", "moosegoose", "dragonfly", "minotaur", "guardianphase3",
+    "clayhound", "claywarg",
+    "butterfly", "anchor", "moon", "carrat", "beefalo",
+    "crabking", "malbatross", "toadstool", "stalker", "klaus", "beequeen", "antlion",
+    "eyeofterror", "twinsofterror",
+    "kitcoon", "catcoon", "manrabbit",
+    "daywalker"
 }
 -- local materials = {
 --     "marble", "stone", "moonglass",

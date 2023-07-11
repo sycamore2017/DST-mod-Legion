@@ -175,6 +175,9 @@ local function fn(Sim)
     inst.components.equippable:SetOnEquip(onequip)
     inst.components.equippable:SetOnUnequip(onunequip)
 
+    inst:AddComponent("waterproofer")
+    inst.components.waterproofer:SetEffectiveness(TUNING.WATERPROOFNESS_MED) --0.5防潮
+
     inst:AddComponent("tradable")
 
     inst:AddComponent("insulator")
