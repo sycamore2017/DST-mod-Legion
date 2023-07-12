@@ -1011,6 +1011,7 @@ local function MakeTissue(name)
 			inst.AnimState:PlayAnimation("idle_"..name, false)
 
 			inst:AddTag("tissue_l") --这个标签没啥用，就想加上而已
+			inst.pickupsound = "vegetation_grassy"
 
 			MakeInventoryFloatable(inst, "small", 0.1, 1)
 			-- local OnLandedClient_old = inst.components.floater.OnLandedClient

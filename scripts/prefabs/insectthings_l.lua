@@ -46,6 +46,8 @@ local function Fn_wing()
 
     MakeInventoryFloatable(inst, "small", 0.1, 1.2)
 
+    inst.pickupsound = "vegetation_grassy"
+
     inst.entity:SetPristine()
     if not TheWorld.ismastersim then
         return inst
@@ -72,6 +74,8 @@ local function Fn_shell()
     inst.AnimState:PlayAnimation("shell", false)
 
     MakeInventoryFloatable(inst, "small", 0.1, 1.1)
+
+    inst.pickupsound = "vegetation_grassy"
 
     inst.entity:SetPristine()
     if not TheWorld.ismastersim then

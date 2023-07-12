@@ -87,6 +87,7 @@ MakeToy({
     fuel = TUNING.SMALL_FUEL,
     fn_common = function(inst)
         inst:AddTag("cattoy") --能给浣猫
+        inst.pickupsound = "cloth"
     end,
     fn_server = function(inst)
         MakeSmallBurnable(inst, TUNING.SMALL_BURNTIME)

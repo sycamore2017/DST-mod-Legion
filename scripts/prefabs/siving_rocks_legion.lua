@@ -21,6 +21,7 @@ if not CONFIGS_LEGION.ENABLEDMODS.MythWords then --未开启神话书说时才�
             inst.AnimState:SetBuild("myth_siving")
             inst.AnimState:PlayAnimation("siving_rocks")
 
+            inst.pickupsound = "rock"
             inst:AddTag("molebait")
 
             inst.entity:SetPristine()

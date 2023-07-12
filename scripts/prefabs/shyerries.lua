@@ -513,10 +513,11 @@ local function fn_log()
     inst.AnimState:SetBuild("shyerrylog")
     inst.AnimState:PlayAnimation("idle")
 
+    inst.pickupsound = "wood"
+
     MakeInventoryFloatable(inst, "med", 0.2, 0.8)
 
     inst.entity:SetPristine()
-
     if not TheWorld.ismastersim then
         return inst
     end

@@ -135,10 +135,10 @@ local function Fn_gold()
     inst.components.inventoryitem.atlasname = "images/inventoryimages/triplegoldenshovelaxe.xml"
 
     inst:AddComponent("tool")
-    inst.components.tool:SetAction(ACTIONS.CHOP, 1.1)
-    inst.components.tool:SetAction(ACTIONS.MINE, 1.1)
-    inst.components.tool:SetAction(ACTIONS.DIG,  1.1)
-    inst.components.tool:EnableToughWork(true) --可以挖掘更坚硬的对象
+    inst.components.tool:SetAction(ACTIONS.CHOP, 1.25)
+    inst.components.tool:SetAction(ACTIONS.MINE, 1.25)
+    inst.components.tool:SetAction(ACTIONS.DIG,  1.25)
+    inst.components.tool:EnableToughWork(true) --可以开凿更坚硬的对象
 
     inst:AddComponent("finiteuses")
     inst.components.finiteuses:SetMaxUses(180)

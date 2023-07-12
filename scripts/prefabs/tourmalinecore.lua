@@ -69,8 +69,9 @@ local function fn(Sim)
     inst.AnimState:SetBuild("tourmalinecore")
     inst.AnimState:PlayAnimation("idle")
 
-    inst.entity:SetPristine()
+    inst.pickupsound = "gem"
 
+    inst.entity:SetPristine()
     if not TheWorld.ismastersim then
         return inst
     end

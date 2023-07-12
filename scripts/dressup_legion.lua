@@ -759,12 +759,7 @@ local dressup_data = {
         buildfile = "hat_slurtle",
         buildsymbol = "swap_hat",
     },
-    ruinshat =
-    {
-        isopentop = true,
-        buildfile = "hat_ruins",
-        buildsymbol = "swap_hat",
-    },
+    ruinshat = { isopentop = true, buildfile = "hat_ruins", buildsymbol = "swap_hat" },
     molehat = {
         buildfn = function(dressup, item, buildskin)
             local itemswap = {}
@@ -806,31 +801,11 @@ local dressup_data = {
             return itemswap
         end
     },
-    icehat =
-    {
-        buildfile = "hat_ice",
-        buildsymbol = "swap_hat",
-    },
-    rainhat =
-    {
-        buildfile = "hat_rain",
-        buildsymbol = "swap_hat",
-    },
-    catcoonhat =
-    {
-        buildfile = "hat_catcoon",
-        buildsymbol = "swap_hat",
-    },
-    watermelonhat =
-    {
-        buildfile = "hat_watermelon",
-        buildsymbol = "swap_hat",
-    },
-    eyebrellahat =
-    {
-        buildfile = "hat_eyebrella",
-        buildsymbol = "swap_hat",
-    },
+    icehat = { buildfile = "hat_ice", buildsymbol = "swap_hat" },
+    rainhat = { buildfile = "hat_rain", buildsymbol = "swap_hat" },
+    catcoonhat = { buildfile = "hat_catcoon", buildsymbol = "swap_hat" },
+    watermelonhat = { buildfile = "hat_watermelon", buildsymbol = "swap_hat" },
+    eyebrellahat = { isopentop = true, buildfile = "hat_eyebrella", buildsymbol = "swap_hat" },
     red_mushroomhat =
     {
         buildfile = "hat_red_mushroom",
@@ -866,12 +841,7 @@ local dressup_data = {
         buildfile = "hat_dragontail",
         buildsymbol = "swap_hat",
     },
-    goggleshat =
-    {
-        isopentop = true,
-        buildfile = "hat_goggles",
-        buildsymbol = "swap_hat",
-    },
+    goggleshat = { isopentop = true, buildfile = "hat_goggles", buildsymbol = "swap_hat" },
     deserthat = {
         buildfile = "hat_desert",
         buildsymbol = "swap_hat"
@@ -904,22 +874,9 @@ local dressup_data = {
         buildfile = "hat_kelp",
         buildsymbol = "swap_hat",
     },
-    mermhat =
-    {
-        isopentop = true,
-        buildfile = "hat_merm",
-        buildsymbol = "swap_hat",
-    },
-    cookiecutterhat =
-    {
-        buildfile = "hat_cookiecutter",
-        buildsymbol = "swap_hat",
-    },
-    batnosehat = {
-        isnoskin = true,
-        buildfile = "hat_batnose",
-        buildsymbol = "swap_hat",
-    },
+    mermhat = { isopentop = true, buildfile = "hat_merm", buildsymbol = "swap_hat" },
+    cookiecutterhat = { buildfile = "hat_cookiecutter", buildsymbol = "swap_hat" },
+    batnosehat = { isnoskin = true, buildfile = "hat_batnose", buildsymbol = "swap_hat" },
     slurper = --啜食者
     {
         isnoskin = true,

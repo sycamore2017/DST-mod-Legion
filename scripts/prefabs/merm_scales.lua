@@ -20,8 +20,9 @@ local function fn()
 
     MakeInventoryFloatable(inst, "med", 0.1, 0.77)
 
-    inst.entity:SetPristine()
+    inst.pickupsound = "cloth"
 
+    inst.entity:SetPristine()
     if not TheWorld.ismastersim then
         return inst
     end

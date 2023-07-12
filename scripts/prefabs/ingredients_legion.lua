@@ -252,6 +252,7 @@ local function MakePrefab(name, info)
         inst.AnimState:PlayAnimation(info.animstate.anim)
 
         -- inst:AddTag("meat")
+        inst.pickupsound = "vegetation_firm"
 
         if info.cookable ~= nil then
             inst:AddTag("cookable")
@@ -397,12 +398,10 @@ end
 local function OnUnequip_oversized(inst, owner)
     owner.AnimState:ClearOverrideSymbol("swap_body")
 end
-
 local function OnFinishWork_oversized(inst, chopper)
     inst.components.lootdropper:DropLoot()
     inst:Remove()
 end
-
 local function CalcWeightCoefficient_oversized(weight_data)
     if weight_data[3] ~= nil and math.random() < weight_data[3] then
         return (math.random() + math.random()) / 2
@@ -410,29 +409,24 @@ local function CalcWeightCoefficient_oversized(weight_data)
         return math.random()
     end
 end
-
 local function MakeLoots_oversized(inst, name)
 	local seeds = name.."_seeds"
     return {name, name, seeds, seeds, math.random() < 0.75 and name or seeds}
 end
-
 local function OnBurnt_oversized(inst)
     inst.components.lootdropper:DropLoot()
     inst:Remove()
 end
-
 local PlayWaxAnimation = function(inst)
     inst.AnimState:PlayAnimation("wax_oversized", false)
     inst.AnimState:PushAnimation("idle_oversized")
 end
-
 local function CancelWaxTask(inst)
 	if inst._waxtask ~= nil then
 		inst._waxtask:Cancel()
 		inst._waxtask = nil
 	end
 end
-
 local function StartWaxTask(inst)
 	if not inst.inlimbo and inst._waxtask == nil then
 		inst._waxtask = inst:DoTaskInTime(GetRandomMinMax(20, 40), PlayWaxAnimation)

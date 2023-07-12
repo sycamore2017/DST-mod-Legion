@@ -35,6 +35,8 @@ local function MakePlantable(name, data)
             end
         end
 
+        inst.pickupsound = "vegetation_firm"
+
         if data.fn_common ~= nil then
             data.fn_common(inst)
         end
@@ -294,6 +296,7 @@ local plantables = {
             inst.Light:SetColour(15/255, 180/255, 132/255)
 
             inst:AddTag("siving_derivant")
+            inst.pickupsound = "metal"
         end,
         fn_server = function(inst)
             inst:AddComponent("bloomer")
