@@ -5,7 +5,7 @@
 local assets = {
     Asset("ANIM", "anim/tripleshovelaxe.zip"),
     Asset("ATLAS", "images/inventoryimages/tripleshovelaxe.xml"),
-    Asset("IMAGE", "images/inventoryimages/tripleshovelaxe.tex"),
+    Asset("IMAGE", "images/inventoryimages/tripleshovelaxe.tex")
 }
 
 local function OnUnequip(inst, owner)
@@ -94,7 +94,7 @@ end
 local assets_gold = {
     Asset("ANIM", "anim/triplegoldenshovelaxe.zip"),
     Asset("ATLAS", "images/inventoryimages/triplegoldenshovelaxe.xml"),
-    Asset("IMAGE", "images/inventoryimages/triplegoldenshovelaxe.tex"),
+    Asset("IMAGE", "images/inventoryimages/triplegoldenshovelaxe.tex")
 }
 
 local function Fn_gold()
@@ -138,6 +138,7 @@ local function Fn_gold()
     inst.components.tool:SetAction(ACTIONS.CHOP, 1.1)
     inst.components.tool:SetAction(ACTIONS.MINE, 1.1)
     inst.components.tool:SetAction(ACTIONS.DIG,  1.1)
+    inst.components.tool:EnableToughWork(true) --可以挖掘更坚硬的对象
 
     inst:AddComponent("finiteuses")
     inst.components.finiteuses:SetMaxUses(180)

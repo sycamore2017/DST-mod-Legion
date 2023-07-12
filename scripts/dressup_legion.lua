@@ -1022,25 +1022,17 @@ local dressup_data = {
             local itemswap = {}
 
             local owner = dressup.inst
-            local sanity = owner.components.sanity ~= nil and owner.components.sanity:GetPercent() or 0
-            if sanity > TUNING.SANITY_BECOME_ENLIGHTENED_THRESH then
-                if owner.fx_l_alterfront == nil then
-                    owner.fx_l_alterfront = SpawnPrefab("alterguardian_hat_equipped")
-                    owner.fx_l_alterfront:OnActivated(owner, true)
-                end
-                if owner.fx_l_alterback == nil then
-                    owner.fx_l_alterback = SpawnPrefab("alterguardian_hat_equipped")
-                    owner.fx_l_alterback:OnActivated(owner, false)
-                end
-                if buildskin then
-                    owner.fx_l_alterfront:SetSkin(buildskin, item.GUID)
-                    owner.fx_l_alterback:SetSkin(buildskin, item.GUID)
-                end
-            else
-                itemswap["swap_hat"] = dressup:GetDressData(
-                    buildskin, "hat_alterguardian", "swap_hat", item.GUID, "swap"
-                )
-                dressup:SetDressOpenTop(itemswap)
+            if owner.fx_l_alterfront == nil then
+                owner.fx_l_alterfront = SpawnPrefab("alterguardian_hat_equipped")
+                owner.fx_l_alterfront:OnActivated(owner, true)
+            end
+            if owner.fx_l_alterback == nil then
+                owner.fx_l_alterback = SpawnPrefab("alterguardian_hat_equipped")
+                owner.fx_l_alterback:OnActivated(owner, false)
+            end
+            if buildskin then
+                owner.fx_l_alterfront:SetSkin(buildskin, item.GUID)
+                owner.fx_l_alterback:SetSkin(buildskin, item.GUID)
             end
 
             return itemswap
@@ -2223,6 +2215,21 @@ local function SymbolDeal_show(inst, animstate, symbol)
         return false
     end
 end
+local function HelmDeal_show(inst, animstate, value)
+    if inst.components.dressup and inst.components.dressup.swaplist["helmex"] ~= nil then
+        local swapdata = inst.components.dressup.swaplist["helmex"]
+        if swapdata.type == "yes" then
+            animstate:UseHeadHatExchange(true)
+        elseif swapdata.type == "no" then
+            animstate:UseHeadHatExchange(false)
+        else
+            return false
+        end
+        return true
+    else
+        return false
+    end
+end
 
 --显示、隐藏、修改动画文件的"动画通道"
 local hook_OverrideSymbol = UserDataHook.MakeHook("AnimState","OverrideSymbol",
@@ -2265,6 +2272,13 @@ local hook_Hide = UserDataHook.MakeHook("AnimState","Hide",
     end
 )
 
+--完全遮盖头部
+local hook_UseHeadHatExchange = UserDataHook.MakeHook("AnimState","UseHeadHatExchange",
+    function(inst, enable, ...)
+        return HelmDeal_show(inst, inst.userdatas.AnimState, enable)
+    end
+)
+
 AddPlayerPostInit(function(inst)
     UserDataHook.Hook(inst, hook_OverrideSymbol)
     UserDataHook.Hook(inst, hook_OverrideItemSkinSymbol)
@@ -2273,6 +2287,7 @@ AddPlayerPostInit(function(inst)
     UserDataHook.Hook(inst, hook_Hide)
     UserDataHook.Hook(inst, hook_ShowSymbol)
     UserDataHook.Hook(inst, hook_HideSymbol)
+    UserDataHook.Hook(inst, hook_UseHeadHatExchange)
 
     inst.AnimState:Hide("LANTERN_OVERLAY") --人物默认清除提灯光效贴图，防止幻化的提灯显示出问题
     inst:AddComponent("dressup")

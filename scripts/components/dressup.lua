@@ -110,6 +110,8 @@ function DressUp:GetDressData(buildskin, buildfile, buildsymbol, guid, type)
 end
 
 function DressUp:SetDressTop(itemswap)
+    itemswap["headbase_hat"] = self:GetDressData(nil, nil, nil, nil, "clear")
+
     itemswap["HAT"] = self:GetDressData(nil, nil, nil, nil, "show")
     itemswap["HAIR_HAT"] = self:GetDressData(nil, nil, nil, nil, "show")
     itemswap["HAIR_NOHAT"] = self:GetDressData(nil, nil, nil, nil, "hide")
@@ -117,11 +119,19 @@ function DressUp:SetDressTop(itemswap)
 
     itemswap["HEAD"] = self:GetDressData(nil, nil, nil, nil, "hide")
     itemswap["HEAD_HAT"] = self:GetDressData(nil, nil, nil, nil, "show")
+    itemswap["HEAD_HAT_NOHELM"] = self:GetDressData(nil, nil, nil, nil, "show")
+    itemswap["HEAD_HAT_HELM"] = self:GetDressData(nil, nil, nil, nil, "hide")
+
     itemswap["face"] = self:GetDressData(nil, nil, nil, nil, "showsym")
     itemswap["swap_face"] = self:GetDressData(nil, nil, nil, nil, "showsym")
     itemswap["beard"] = self:GetDressData(nil, nil, nil, nil, "showsym")
+    itemswap["cheeks"] = self:GetDressData(nil, nil, nil, nil, "showsym")
+
+    itemswap["helmex"] = self:GetDressData(nil, nil, nil, nil, "no")
 end
 function DressUp:SetDressOpenTop(itemswap)
+    itemswap["headbase_hat"] = self:GetDressData(nil, nil, nil, nil, "clear")
+
     itemswap["HAT"] = self:GetDressData(nil, nil, nil, nil, "show")
     itemswap["HAIR_HAT"] = self:GetDressData(nil, nil, nil, nil, "hide")
     itemswap["HAIR_NOHAT"] = self:GetDressData(nil, nil, nil, nil, "show")
@@ -129,21 +139,35 @@ function DressUp:SetDressOpenTop(itemswap)
 
     itemswap["HEAD"] = self:GetDressData(nil, nil, nil, nil, "show")
     itemswap["HEAD_HAT"] = self:GetDressData(nil, nil, nil, nil, "hide")
+    itemswap["HEAD_HAT_NOHELM"] = self:GetDressData(nil, nil, nil, nil, "hide")
+    itemswap["HEAD_HAT_HELM"] = self:GetDressData(nil, nil, nil, nil, "hide")
+
     itemswap["face"] = self:GetDressData(nil, nil, nil, nil, "showsym")
     itemswap["swap_face"] = self:GetDressData(nil, nil, nil, nil, "showsym")
     itemswap["beard"] = self:GetDressData(nil, nil, nil, nil, "showsym")
+    itemswap["cheeks"] = self:GetDressData(nil, nil, nil, nil, "showsym")
+
+    itemswap["helmex"] = self:GetDressData(nil, nil, nil, nil, "no")
 end
 function DressUp:SetDressFullHead(itemswap) --头部完全不显示
-    itemswap["HAT"] = self:GetDressData(nil, nil, nil, nil, "show")
+    itemswap["swap_hat"] = self:GetDressData(nil, nil, nil, nil, "clear")
+
+    itemswap["HAT"] = self:GetDressData(nil, nil, nil, nil, "hide")
     itemswap["HAIR_HAT"] = self:GetDressData(nil, nil, nil, nil, "hide")
     itemswap["HAIR_NOHAT"] = self:GetDressData(nil, nil, nil, nil, "hide")
     itemswap["HAIR"] = self:GetDressData(nil, nil, nil, nil, "hide")
 
     itemswap["HEAD"] = self:GetDressData(nil, nil, nil, nil, "hide")
-    itemswap["HEAD_HAT"] = self:GetDressData(nil, nil, nil, nil, "hide")
+    itemswap["HEAD_HAT"] = self:GetDressData(nil, nil, nil, nil, "show")
+    itemswap["HEAD_HAT_NOHELM"] = self:GetDressData(nil, nil, nil, nil, "hide")
+    itemswap["HEAD_HAT_HELM"] = self:GetDressData(nil, nil, nil, nil, "show")
+
     itemswap["face"] = self:GetDressData(nil, nil, nil, nil, "hidesym")
     itemswap["swap_face"] = self:GetDressData(nil, nil, nil, nil, "hidesym")
     itemswap["beard"] = self:GetDressData(nil, nil, nil, nil, "hidesym")
+    itemswap["cheeks"] = self:GetDressData(nil, nil, nil, nil, "hidesym")
+
+    itemswap["helmex"] = self:GetDressData(nil, nil, nil, nil, "yes")
 end
 function DressUp:SetDressHand(itemswap)
     itemswap["whipline"] = self:GetDressData(nil, nil, nil, nil, "clear")
@@ -199,7 +223,14 @@ function DressUp:InitShow(symbol) --恢复实际展示的默认效果（显示�
     end
     self.inst.AnimState:Show(symbol)
 end
+function DressUp:InitHelmEx(value) --恢复遮盖头部开关
+    if self.swaplist["helmex"] ~= nil then
+        return
+    end
+    self.inst.AnimState:UseHeadHatExchange(value)
+end
 function DressUp:InitGroupHead()
+    self:InitClear("headbase_hat")
     self:InitClear("swap_hat")
     self:InitHide("HAT")
     self:InitHide("HAIR_HAT")
@@ -208,9 +239,15 @@ function DressUp:InitGroupHead()
 
     self:InitShow("HEAD")
     self:InitHide("HEAD_HAT")
+    self:InitHide("HEAD_HAT_NOHELM")
+    self:InitHide("HEAD_HAT_HELM")
+
     self:InitShowSym("face")
     self:InitShowSym("swap_face")
     self:InitShowSym("beard")
+    self:InitShowSym("cheeks")
+
+    self:InitHelmEx(false)
 end
 
 -----
@@ -235,6 +272,8 @@ function DressUp:UpdateReal() --更新实际展示效果
                 self.inst.AnimState:ShowSymbol(k)
             elseif v.type == "hidesym" then
                 self.inst.AnimState:HideSymbol(k)
+            elseif k == "helmex" then
+                self.inst.AnimState:UseHeadHatExchange(v.type == "yes")
             end
         end
     end
@@ -260,17 +299,9 @@ function DressUp:UpdateSwapList() --更新幻化表
     end
 end
 
-local nodressitems = {
-    lunarplanthat = true,
-    armor_lunarplant = true
-}
 function DressUp:PutOn(item, loaddata, noevent) --幻化一个物品
     local data = DRESSUP_DATA_LEGION[item.prefab]
     if data == nil then
-        return false
-    end
-
-    if not PrefabExists("voidcloth_scythe") and nodressitems[item.prefab] then --新版本到来之前，不能幻化这些，代码不兼容
         return false
     end
 
@@ -322,14 +353,16 @@ function DressUp:PutOn(item, loaddata, noevent) --幻化一个物品
             end
             --手臂的隐藏与显示不需要操作，因为需要跟随实际装备状态
         elseif slot == EQUIPSLOTS.HEAD then
-            itemswap["swap_hat"] = self:GetDressData(buildskin, data.buildfile, data.buildsymbol, item.GUID, "swap")
+            local symres = "swap_hat"
             if data.isopentop then
                 self:SetDressOpenTop(itemswap)
             elseif data.isfullhead then
                 self:SetDressFullHead(itemswap)
+                symres = "headbase_hat"
             else
                 self:SetDressTop(itemswap)
             end
+            itemswap[symres] = self:GetDressData(buildskin, data.buildfile, data.buildsymbol, item.GUID, "swap")
         elseif slot == EQUIPSLOTS.BODY or slot == EQUIPSLOTS.BACK or slot == EQUIPSLOTS.NECK then
             if data.isbackpack then
                 itemswap["backpack"] = self:GetDressData(buildskin, data.buildfile, "backpack", item.GUID, "swap")

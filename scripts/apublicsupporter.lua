@@ -1109,6 +1109,8 @@ _G.HAT_L_ON = function(inst, owner, buildname, foldername) --遮住头顶部的�
     if owner:HasTag("player") then
         owner.AnimState:Hide("HEAD")
         owner.AnimState:Show("HEAD_HAT")
+        owner.AnimState:Show("HEAD_HAT_NOHELM")
+        owner.AnimState:Hide("HEAD_HAT_HELM")
     end
 end
 _G.HAT_L_ON_OPENTOP = function(inst, owner, buildname, foldername) --完全开放式的帽子样式
@@ -1120,8 +1122,15 @@ _G.HAT_L_ON_OPENTOP = function(inst, owner, buildname, foldername) --完全开�
 
     owner.AnimState:Show("HEAD")
     owner.AnimState:Hide("HEAD_HAT")
+    owner.AnimState:Hide("HEAD_HAT_NOHELM")
+    owner.AnimState:Hide("HEAD_HAT_HELM")
 end
 _G.HAT_L_OFF = function(inst, owner)
+    owner.AnimState:ClearOverrideSymbol("headbase_hat") --it might have been overriden by _onequip
+    if owner.components.skinner ~= nil then
+        owner.components.skinner.base_change_cb = owner.old_base_change_cb
+    end
+
     owner.AnimState:ClearOverrideSymbol("swap_hat")
     owner.AnimState:Hide("HAT")
     owner.AnimState:Hide("HAIR_HAT")
@@ -1131,36 +1140,49 @@ _G.HAT_L_OFF = function(inst, owner)
     if owner:HasTag("player") then
         owner.AnimState:Show("HEAD")
         owner.AnimState:Hide("HEAD_HAT")
+        owner.AnimState:Hide("HEAD_HAT_NOHELM")
+        owner.AnimState:Hide("HEAD_HAT_HELM")
     end
 end
 _G.HAT_L_ON_FULLHEAD = function(inst, owner, buildname, foldername) --遮住整个头部的帽子样式
-    owner.AnimState:OverrideSymbol("swap_hat", buildname, foldername)
-    owner.AnimState:Show("HAT")
-    owner.AnimState:Hide("HAIR_HAT")
-    owner.AnimState:Hide("HAIR_NOHAT")
-    owner.AnimState:Hide("HAIR")
-
     if owner:HasTag("player") then
+        owner.AnimState:OverrideSymbol("headbase_hat", buildname, foldername)
+
+        owner.AnimState:Hide("HAT")
+        owner.AnimState:Hide("HAIR_HAT")
+        owner.AnimState:Hide("HAIR_NOHAT")
+        owner.AnimState:Hide("HAIR")
+
         owner.AnimState:Hide("HEAD")
-        owner.AnimState:Hide("HEAD_HAT")
+        owner.AnimState:Show("HEAD_HAT")
+        owner.AnimState:Hide("HEAD_HAT_NOHELM")
+        owner.AnimState:Show("HEAD_HAT_HELM")
+
         owner.AnimState:HideSymbol("face")
         owner.AnimState:HideSymbol("swap_face")
         owner.AnimState:HideSymbol("beard")
+        owner.AnimState:HideSymbol("cheeks")
+
+        owner.AnimState:UseHeadHatExchange(true)
+    else
+        owner.AnimState:OverrideSymbol("swap_hat", buildname, foldername)
+
+        owner.AnimState:Show("HAT")
+        owner.AnimState:Hide("HAIR_HAT")
+        owner.AnimState:Hide("HAIR_NOHAT")
+        owner.AnimState:Hide("HAIR")
     end
 end
 _G.HAT_L_OFF_FULLHEAD = function(inst, owner)
-    owner.AnimState:ClearOverrideSymbol("swap_hat")
-    owner.AnimState:Hide("HAT")
-    owner.AnimState:Hide("HAIR_HAT")
-    owner.AnimState:Show("HAIR_NOHAT")
-    owner.AnimState:Show("HAIR")
+    _G.HAT_L_OFF(inst, owner)
 
     if owner:HasTag("player") then
-        owner.AnimState:Show("HEAD")
-        owner.AnimState:Hide("HEAD_HAT")
         owner.AnimState:ShowSymbol("face")
         owner.AnimState:ShowSymbol("swap_face")
         owner.AnimState:ShowSymbol("beard")
+        owner.AnimState:ShowSymbol("cheeks")
+
+        owner.AnimState:UseHeadHatExchange(false)
     end
 end
 
