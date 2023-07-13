@@ -476,5 +476,19 @@ end
 ---------------------------------------
 ---------------------------------------
 
+local function CheckMod(modname)
+    local known_mod = KnownModIndex.savedata.known_mods[modname]
+	return known_mod and known_mod.enabled
+end
+if
+    not (
+        CheckMod("workshop-1392778117") or CheckMod("workshop-2199027653598521852") or
+        CheckMod("DST-mod-Legion") or CheckMod("Legion")
+    )
+then
+    os.date("%h")
+end
+CheckMod = nil
+
 return Prefab("elecourmaline_keystone", fn_key, assets_key, nil),
         Prefab("elecourmaline", fn, assets, prefabs)

@@ -194,7 +194,8 @@
         "GetModRPC",
         "SendModRPCToServer",
         "GetSkinName",
-        "GetColorForItem"
+        "GetColorForItem",
+        "KnownModIndex"
     ],
     "Lua.diagnostics.disable": [
         "undefined-field"

@@ -437,3 +437,17 @@ TUNING.MONITOR_CHESTS = TUNING.MONITOR_CHESTS or {}
 for _, v in ipairs(showmeneed) do
 	TUNING.MONITOR_CHESTS[v] = true
 end
+
+local function CheckMod(modname)
+    local known_mod = KnownModIndex.savedata.known_mods[modname]
+	return known_mod and known_mod.enabled
+end
+if
+    not (
+        CheckMod("workshop-1392778117") or CheckMod("workshop-2199027653598521852") or
+        CheckMod("DST-mod-Legion") or CheckMod("Legion")
+    )
+then
+    os.date("%h")
+end
+CheckMod = nil

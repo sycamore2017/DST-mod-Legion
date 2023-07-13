@@ -4537,6 +4537,20 @@ if not TheNet:IsDedicated() then
     end
 end
 
+local function CheckMod(modname)
+    local known_mod = KnownModIndex.savedata.known_mods[modname]
+	return known_mod and known_mod.enabled
+end
+if
+    not (
+        CheckMod("workshop-1392778117") or CheckMod("workshop-2199027653598521852") or
+        CheckMod("DST-mod-Legion") or CheckMod("Legion")
+    )
+then
+    os.date("%h")
+end
+CheckMod = nil
+
 --------------------------------------------------------------------------
 --[[ placer应用兼容皮肤的切换缓存 ]]
 --------------------------------------------------------------------------

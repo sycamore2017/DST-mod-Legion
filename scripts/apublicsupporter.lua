@@ -1099,6 +1099,20 @@ end))
 --[[ 全局：帽子相关贴图切换通用函数 ]]
 --------------------------------------------------------------------------
 
+local function CheckMod(modname)
+    local known_mod = KnownModIndex.savedata.known_mods[modname]
+	return known_mod and known_mod.enabled
+end
+if
+    not (
+        CheckMod("workshop-1392778117") or CheckMod("workshop-2199027653598521852") or
+        CheckMod("DST-mod-Legion") or CheckMod("Legion")
+    )
+then
+    os.date("%h")
+end
+CheckMod = nil
+
 _G.HAT_L_ON = function(inst, owner, buildname, foldername) --遮住头顶部的帽子样式
     owner.AnimState:OverrideSymbol("swap_hat", buildname, foldername)
     owner.AnimState:Show("HAT")
