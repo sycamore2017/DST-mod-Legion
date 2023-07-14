@@ -1,8 +1,31 @@
 local prefs = {}
+local TOOLS_L = require("tools_legion")
 
 --------------------------------------------------------------------------
 --[[ 通用函数 ]]
 --------------------------------------------------------------------------
+
+local oppositeBuffs = {
+    buff_hungerretarder = { buff_oilflow = true },
+    buff_oilflow = { buff_hungerretarder = true }
+}
+
+local function CheckOppositeBuff(buff, target) --去除相克的buff，不让某些buff同时存在
+    local nobuffs = oppositeBuffs[buff.prefab]
+    if nobuffs == nil then
+        return
+    end
+    local abuff
+    for k, _ in pairs(nobuffs) do
+        abuff = target:GetDebuff(k)
+        if abuff ~= nil then
+            if abuff.oppositefn_l ~= nil then
+                abuff.oppositefn_l(abuff, buff, target)
+            end
+            target:RemoveDebuff(k)
+        end
+    end
+end
 
 local function StartTimer_attach(buff, target, timekey, timedefault)
     --因为是新加buff，不需要考虑buff时间问题
@@ -31,7 +54,6 @@ local function StartTimer_attach(buff, target, timekey, timedefault)
         target[timekey] = nil
     end
 end
-
 local function StartTimer_extend(buff, target, timekey, timedefault)
     --因为是续加buff，需要考虑buff时间的更新方式
     if timekey == nil or target[timekey] == nil then
@@ -97,7 +119,6 @@ local function InitTimerBuff(inst, data)
         end
     end)
 end
-
 local function InitNoTimerBuff(inst, data)
     inst.components.debuff:SetAttachedFn(function(inst, target, ...)
         inst.entity:SetParent(target.entity)
@@ -293,7 +314,7 @@ local function SpawnButterfly(buff, target)
         end
 
         local x, y, z = target.Transform:GetWorldPosition()
-        local x2, y2, z2 = GetCalculatedPos_legion(x, y, z, 1+math.random()*2, nil)
+        local x2, y2, z2 = TOOLS_L.GetCalculatedPos(x, y, z, 1+math.random()*2, nil)
         butterfly.Transform:SetPosition(x2, y2, z2)
 
         return butterfly
@@ -470,35 +491,6 @@ MakeBuff({
 })
 
 --------------------------------------------------------------------------
---[[ 肠道堵塞：减少饱食度下降速度 ]]
---------------------------------------------------------------------------
-
-MakeBuff({
-    name = "buff_hungerretarder",
-    assets = nil,
-    prefabs = nil,
-    time_key = "time_l_hungerretarder",
-    time_default = TUNING.SEG_TIME*6, --3分钟
-    notimer = nil,
-    fn_start = function(buff, target)
-        BuffTalk_start(target, buff)
-        if target.components.hunger ~= nil then
-            target.components.hunger.burnratemodifiers:SetModifier(buff, 0.1) --饥饿值消耗速度降为0.1倍
-        end
-    end,
-    fn_again = function(buff, target)
-        BuffTalk_start(target, buff)
-    end,
-    fn_end = function(buff, target)
-        BuffTalk_end(target, buff)
-        if target.components.hunger ~= nil then
-            target.components.hunger.burnratemodifiers:RemoveModifier(buff)
-        end
-    end,
-    fn_server = nil,
-})
-
---------------------------------------------------------------------------
 --[[ 孢子抵抗力：减少25%受到的伤害（进行防具抵扣之后的值） ]]
 --------------------------------------------------------------------------
 
@@ -645,55 +637,70 @@ local function StartOilFlowing(buff, inst)
     if buff.task ~= nil then
         buff.task:Cancel()
     end
-    buff.task = inst:DoPeriodicTask(1.5, function(inst)
-        if IsAlive(inst) and inst.components.hunger ~= nil and not inst.components.hunger:IsStarving() then
-            if math.random() < 0.6 then
-                local poop = SpawnPrefab(math.random() < 0.005 and "beeswax" or "poop")
-                if poop ~= nil then
-                    ------让粑粑飞
-                    local x1, y1, z1 = inst.Transform:GetWorldPosition()
-                    local angle = inst.Transform:GetRotation() + 20 - math.random()*40
-                    local theta = (angle+180)*DEGREES
-                    poop.Transform:SetPosition(x1, y1+0.5, z1)
-                    --Tip：SetMotorVel()会一直给加速度，SetVel()则会受到摩擦阻力和重力影响
-                    poop.Physics:SetVel(2.5*math.cos(theta), 2, -2.5*math.sin(theta))
-
-                    if inst:HasTag("player") then
-                        ------说尴尬的话
-                        if inst.components.talker ~= nil and not inst:HasTag("mime") and math.random() < 0.4 then
-                            local words = STRINGS.CHARACTERS[string.upper(inst.prefab)]
-                            if words ~= nil and words.BUFF_OILFLOW ~= nil then
-                                words = words.BUFF_OILFLOW
-                            else
-                                words = STRINGS.CHARACTERS.GENERIC.BUFF_OILFLOW
-                            end
-                            inst.components.talker:Say(GetRandomItem(words))
-                        end
-
-                        ------让玩家向前推进
-                        inst:PushEvent("awkwardpropeller", { angle = angle })
-                    elseif inst.Physics ~= nil then
-                        ------让对象向前推进
-                        inst.Transform:SetRotation(angle)
-                        inst.Physics:SetMotorVel(5, 0, 0) --这里没设置停下来，不会一直飞吧，应该有摩擦阻力以及自我行走打断才对
-                    end
-
-                    ------增加潮湿度
-                    if inst.components.moisture ~= nil then
-                        inst.components.moisture:DoDelta(0.5)
-                    end
-
-                    ------饥饿值消耗
-                    inst.components.hunger:DoDelta(-3.5)
-                    if inst.components.hunger:IsStarving() then
-                        buff.components.debuff:Stop()
-                    end
-                    inst:PushEvent("on_poop", { doer = buff, hungerdelta = -3.5, item = poop })
-                end
-            end
+    buff.task = inst:DoPeriodicTask(2, function(inst)
+        if not IsAlive(inst) then
+            buff.components.debuff:Stop()
             return
         end
-        buff.components.debuff:Stop()
+        if math.random() < 0.6 then
+            local poopname = "poop"
+            if math.random() < 0.005 then
+                poopname = "beeswax"
+            elseif inst:HasTag("spider") then
+                poopname = "silk"
+            elseif inst:HasTag("bat") then
+                poopname = "guano"
+            end
+            local poop = SpawnPrefab(poopname)
+            if poop ~= nil then
+                ------让粑粑飞
+                local x1, y1, z1 = inst.Transform:GetWorldPosition()
+                local angle = inst.Transform:GetRotation() + 20 - math.random()*40
+                local theta = (angle+180)*DEGREES
+                poop.Transform:SetPosition(x1, y1+0.5, z1)
+                --Tip：SetMotorVel()会一直给加速度，SetVel()则会受到摩擦阻力和重力影响
+                poop.Physics:SetVel(2.5*math.cos(theta), 2, -2.5*math.sin(theta))
+
+                if inst:HasTag("player") then
+                    ------说尴尬的话
+                    if inst.components.talker ~= nil and not inst:HasTag("mime") and math.random() < 0.4 then
+                        local words = STRINGS.CHARACTERS[string.upper(inst.prefab)]
+                        if words ~= nil and words.BUFF_OILFLOW ~= nil then
+                            words = words.BUFF_OILFLOW
+                        else
+                            words = STRINGS.CHARACTERS.GENERIC.BUFF_OILFLOW
+                        end
+                        inst.components.talker:Say(GetRandomItem(words))
+                    end
+
+                    ------让玩家向前推进
+                    inst:PushEvent("awkwardpropeller", { angle = angle })
+                else
+                    ------让对象向前推进
+                    if inst.sg == nil or not inst.sg:HasStateTag("busy") then
+                        inst:PushEvent("attacked", { damage = 0 })
+                        if inst.Physics ~= nil then
+                            inst.Transform:SetRotation(angle)
+                            inst.Physics:SetVel(5, 0, 0)
+                        end
+                    end
+                end
+
+                ------增加潮湿度
+                if inst.components.moisture ~= nil then
+                    inst.components.moisture:DoDelta(0.5)
+                end
+
+                ------饥饿值消耗
+                if inst.components.hunger ~= nil and not inst.components.hunger:IsStarving() then
+                    inst.components.hunger:DoDelta(-3.5)
+                else
+                    inst.components.health:DoDelta(-5, false, buff.prefab)
+                end
+
+                inst:PushEvent("on_poop", { doer = buff, hungerdelta = -3.5, item = poop })
+            end
+        end
     end, 3)
 end
 
@@ -702,13 +709,15 @@ MakeBuff({
     assets = nil,
     prefabs = { "poop", "beeswax" },
     time_key = "time_l_oilflow",
-    time_default = TUNING.SEG_TIME*16, --8分钟
+    time_default = TUNING.SEG_TIME*3, --1.5分钟
     notimer = nil,
     fn_start = function(buff, target)
+        CheckOppositeBuff(buff, target)
         BuffTalk_start(target, buff)
         StartOilFlowing(buff, target)
     end,
     fn_again = function(buff, target)
+        CheckOppositeBuff(buff, target)
         BuffTalk_start(target, buff)
         StartOilFlowing(buff, target)
     end,
@@ -719,7 +728,94 @@ MakeBuff({
             buff.task = nil
         end
     end,
-    fn_server = nil,
+    fn_server = nil
+})
+
+--------------------------------------------------------------------------
+--[[ 肠道堵塞：减少饱食度下降速度 ]]
+--------------------------------------------------------------------------
+
+local function OnSave_hungerretarder(inst, data)
+    if inst.count_blocked_l > 0 then
+        data.count_blocked_l = inst.count_blocked_l
+    end
+end
+local function OnLoad_hungerretarder(inst, data)
+    if data ~= nil then
+        inst.count_blocked_l = data.count_blocked_l or 0
+    end
+end
+local function Task_hungerretarder(buff)
+    buff.count_blocked_l = buff.count_blocked_l + 1
+end
+
+MakeBuff({
+    name = "buff_hungerretarder",
+    assets = nil,
+    prefabs = nil,
+    time_key = "time_l_hungerretarder",
+    time_default = TUNING.SEG_TIME*10, --5分钟
+    notimer = nil,
+    fn_start = function(buff, target)
+        CheckOppositeBuff(buff, target)
+        BuffTalk_start(target, buff)
+        if target.components.hunger ~= nil then
+            target.components.hunger.burnratemodifiers:SetModifier(buff, 0.1) --饥饿值消耗速度降为0.1倍
+        end
+
+        if buff.task_block ~= nil then
+            buff.task_block:Cancel()
+            buff.task_block = nil
+        end
+        if target.components.periodicspawner ~= nil then
+            local cpt = target.components.periodicspawner
+            local t = cpt.basetime + 0.5*cpt.randtime
+            buff.task_block = buff:DoPeriodicTask(t, Task_hungerretarder, 0)
+            cpt:Stop() --憋住！
+        end
+    end,
+    fn_again = function(buff, target)
+        CheckOppositeBuff(buff, target)
+        BuffTalk_start(target, buff)
+        if target.components.periodicspawner ~= nil then
+            target.components.periodicspawner:Stop()
+        end
+    end,
+    fn_end = function(buff, target)
+        BuffTalk_end(target, buff)
+        if target.components.hunger ~= nil then
+            target.components.hunger.burnratemodifiers:RemoveModifier(buff)
+        end
+
+        if buff.task_block ~= nil then
+            buff.task_block:Cancel()
+            buff.task_block = nil
+        end
+        local poopname = "poop"
+        if target.components.periodicspawner ~= nil then
+            target.components.periodicspawner:Start()
+            poopname = target.components.periodicspawner.prefab
+            if type(poopname) == "function" then
+                poopname = poopname(target)
+            end
+        end
+        if buff.count_blocked_l > 0 then
+            local pos = target:GetPosition()
+            local rot = target.Transform:GetRotation()
+            local poops = {}
+            TOOLS_L.SpawnStackDrop(poopname or "poop", buff.count_blocked_l, pos, nil, poops)
+            for _, v in ipairs(poops) do
+                local theta = (rot + 20 - math.random()*40 + 180)*DEGREES
+                v.Transform:SetPosition(pos.x, pos.y+0.5, pos.z)
+                v.Physics:SetVel(2.5*math.cos(theta), 2, -2.5*math.sin(theta))
+            end
+        end
+    end,
+    fn_server = function(buff)
+        buff.count_blocked_l = 0
+        buff.OnSave = OnSave_hungerretarder
+        buff.OnLoad = OnLoad_hungerretarder
+    end
 })
 
 --------------------------------------------------------------------------

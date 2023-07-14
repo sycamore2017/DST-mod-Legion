@@ -1,4 +1,5 @@
 local prefs = {}
+local TOOLS_L = require("tools_legion")
 
 --------------------------------------------------------------------------
 --[[ 通用函数 ]]
@@ -60,36 +61,10 @@ local function MakeItem(sets)
     end, sets.assets, sets.prefabs))
 end
 
-local function SpawnStackDrop(name, num, pos)
-	local item = SpawnPrefab(name)
-	if item ~= nil then
-		if num > 1 and item.components.stackable ~= nil then
-			local maxsize = item.components.stackable.maxsize
-			if num <= maxsize then
-				item.components.stackable:SetStackSize(num)
-				num = 0
-			else
-				item.components.stackable:SetStackSize(maxsize)
-				num = num - maxsize
-			end
-		else
-			num = num - 1
-        end
-
-        item.Transform:SetPosition(pos:Get())
-        if item.components.inventoryitem ~= nil then
-            item.components.inventoryitem:OnDropped(true)
-        end
-
-		if num >= 1 then
-			SpawnStackDrop(name, num, pos)
-		end
-	end
-end
 local function DropGems(inst, gemname)
     local numgems = inst.components.upgradeable:GetStage() - 1
     if numgems > 0 then
-        SpawnStackDrop(gemname, numgems, inst:GetPosition())
+        TOOLS_L.SpawnStackDrop(gemname, numgems, inst:GetPosition())
     end
 end
 
@@ -277,7 +252,7 @@ table.insert(prefs, Prefab("hiddenmoonlight", function()
     inst.AnimState:SetBank("hiddenmoonlight")
     inst.AnimState:SetBuild("hiddenmoonlight")
     inst.AnimState:PlayAnimation("closed", true)
-    MakeSnowCovered_comm_legion(inst)
+    TOOLS_L.MakeSnowCovered_comm(inst)
 
     inst.entity:SetPristine()
     if not TheWorld.ismastersim then
@@ -347,7 +322,7 @@ table.insert(prefs, Prefab("hiddenmoonlight", function()
 
     MakeHauntableLaunchAndDropFirstItem(inst)
 
-    MakeSnowCovered_serv_legion(inst, 0.1 + 0.3*math.random(), function(inst)
+    TOOLS_L.MakeSnowCovered_serv(inst, 0.1 + 0.3*math.random(), function(inst)
         inst.AnimState:SetTime(math.random() * inst.AnimState:GetCurrentAnimationLength())
     end)
 

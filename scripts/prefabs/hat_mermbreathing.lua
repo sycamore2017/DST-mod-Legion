@@ -1,14 +1,11 @@
-local assets =
-{
+local TOOLS_L = require("tools_legion")
+
+local assets = {
     Asset("ANIM", "anim/hat_mermbreathing.zip"),
 	Asset("ATLAS", "images/inventoryimages/hat_mermbreathing.xml"),   --物品栏图片
     Asset("IMAGE", "images/inventoryimages/hat_mermbreathing.tex"),
 }
-
 -- local prefabs =
--- {
---     --nothing
--- }
 
 local function CheckMod(modname)
     local known_mod = KnownModIndex.savedata.known_mods[modname]
@@ -43,7 +40,7 @@ local function onPretendingMerm(owner, data)
 end
 
 local function onequip(inst, owner) --佩戴
-    HAT_L_ON_OPENTOP(inst, owner, "hat_mermbreathing", "swap_hat")
+    TOOLS_L.hat_on_opentop(inst, owner, "hat_mermbreathing", "swap_hat")
 
     if owner:HasTag("equipmentmodel") then --假人！
         return
@@ -60,7 +57,7 @@ local function onequip(inst, owner) --佩戴
 end
 
 local function onunequip(inst, owner)   --卸下
-    HAT_L_OFF(inst, owner)
+    TOOLS_L.hat_off(inst, owner)
 
     if owner.components.moisture then
         owner:RemoveEventCallback("moisturedelta", onPretendingMerm)

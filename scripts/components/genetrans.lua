@@ -1,3 +1,5 @@
+local TOOLS_L = require("tools_legion")
+
 local GeneTrans = Class(function(self, inst)
 	self.inst = inst
 
@@ -110,7 +112,7 @@ local function GetLootFruit(self, doer, loot)
 				num = num + math.random(1, 2)
 			end
 		end
-		self:SpawnStackDrop(self.seeddata.fruit, num, self.inst:GetPosition(), doer, loot)
+		TOOLS_L.SpawnStackDrop(self.seeddata.fruit, num, self.inst:GetPosition(), doer, loot)
 	end
 end
 local function OnPickedFn(inst, doer)
@@ -157,48 +159,6 @@ function GeneTrans:SetTransTime()
 	end
 end
 
-function GeneTrans:SpawnStackDrop(name, num, pos, doer, items)
-	local item = SpawnPrefab(name)
-	if item == nil then
-		item = SpawnPrefab("siving_rocks")
-	end
-	if item ~= nil then
-		if num > 1 and item.components.stackable ~= nil then
-			local maxsize = item.components.stackable.maxsize
-			if num <= maxsize then
-				item.components.stackable:SetStackSize(num)
-				num = 0
-			else
-				item.components.stackable:SetStackSize(maxsize)
-				num = num - maxsize
-			end
-		else
-			num = num - 1
-        end
-
-		if items ~= nil then
-			table.insert(items, item)
-		end
-        item.Transform:SetPosition(pos:Get())
-        if item.components.inventoryitem ~= nil then
-			if doer ~= nil and doer.components.inventory ~= nil then
-				doer.components.inventory:GiveItem(item, nil, pos)
-			else
-				if item:HasTag("heavy") then --巨大作物不知道为啥不能弹射
-					local x, y, z = GetCalculatedPos_legion(pos.x, pos.y, pos.z, 0.5+1.8*math.random())
-					item.Transform:SetPosition(x, y, z)
-				else
-					item.components.inventoryitem:OnDropped(true)
-				end
-			end
-        end
-
-		if num >= 1 then
-			self:SpawnStackDrop(name, num, pos, doer)
-		end
-	end
-end
-
 function GeneTrans:DropLoot(needrecipe)
 	local lootmap = {}
 	local pos = self.inst:GetPosition()
@@ -229,7 +189,7 @@ function GeneTrans:DropLoot(needrecipe)
 	end
 	--最终产生
 	for name, num in pairs(lootmap) do
-		self:SpawnStackDrop(name, num, pos, nil, nil)
+		TOOLS_L.SpawnStackDrop(name, num, pos, nil, nil)
 	end
 end
 
@@ -324,7 +284,7 @@ function GeneTrans:ClearAll(doer, mustdrop, initanim) --恢复原始状态
 
 	--原始物品
 	if self.seednum > 0 then
-		self:SpawnStackDrop(self.seed, self.seednum, self.inst:GetPosition(), doer, nil)
+		TOOLS_L.SpawnStackDrop(self.seed, self.seednum, self.inst:GetPosition(), doer, nil)
 	end
 	--转化产物
 	GetLootFruit(self, doer, nil)

@@ -1,3 +1,5 @@
+local TOOLS_L = require("tools_legion")
+
 local assets = {
     Asset("ANIM", "anim/rosorns.zip"),
     Asset("ANIM", "anim/swap_rosorns.zip"),
@@ -35,13 +37,13 @@ local function OnEquip(inst, owner)
     end
 
     --TIP: "onattackother"事件在 targ.components.combat:GetAttacked 之前，所以能提前改攻击配置
-    owner:ListenForEvent("onattackother", UndefendedATK_legion)
+    owner:ListenForEvent("onattackother", TOOLS_L.UndefendedATK)
 end
 local function OnUnequip(inst, owner)
     owner.AnimState:Hide("ARM_carry")
     owner.AnimState:Show("ARM_normal")
 
-    owner:RemoveEventCallback("onattackother", UndefendedATK_legion)
+    owner:RemoveEventCallback("onattackother", TOOLS_L.UndefendedATK)
 end
 
 local function onattack(inst, owner, target)

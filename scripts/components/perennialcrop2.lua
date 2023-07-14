@@ -1,3 +1,5 @@
+local TOOLS_L = require("tools_legion")
+
 local function onflower(self)
     if self.isflower then
         self.inst:AddTag("flower")
@@ -594,14 +596,14 @@ function PerennialCrop2:DoGrowth(skip) --生长到下一阶段
 				end
 
 				if numpoop > 0 then
-					self:SpawnStackDrop(nil, "spoiled_food", numpoop, pos)
+					TOOLS_L.SpawnStackDrop("spoiled_food", numpoop, pos)
 				end
 			end
 
 			if self.fn_overripe ~= nil then
 				self.fn_overripe(self, numloot)
 			elseif numloot > 0 then
-				self:SpawnStackDrop(nil, self.cropprefab, numloot, pos)
+				TOOLS_L.SpawnStackDrop(self.cropprefab, numloot, pos)
 			end
 		end
 
@@ -806,35 +808,6 @@ function PerennialCrop2:CanGrowInDark() --是否能在黑暗中生长
 	return self.isrotten or self.stage == self.stage_max or self.cangrowindrak
 end
 
-function PerennialCrop2:SpawnStackDrop(loot, name, num, pos) --生成整组的物品，并丢下
-	local item = SpawnPrefab(name)
-	if item ~= nil then
-		if num > 1 and item.components.stackable ~= nil then
-			local maxsize = item.components.stackable.maxsize
-			if num <= maxsize then
-				item.components.stackable:SetStackSize(num)
-				num = 0
-			else
-				item.components.stackable:SetStackSize(maxsize)
-				num = num - maxsize
-			end
-		else
-			num = num - 1
-        end
-
-        item.Transform:SetPosition(pos:Get())
-        if item.components.inventoryitem ~= nil then
-            item.components.inventoryitem:OnDropped(true)
-        end
-		if loot ~= nil then
-			table.insert(loot, item)
-		end
-
-		if num >= 1 then
-			self:SpawnStackDrop(loot, name, num, pos)
-		end
-	end
-end
 function PerennialCrop2:AddLoot(loot, name, number)
 	if loot[name] == nil then
 		loot[name] = number
@@ -941,7 +914,7 @@ function PerennialCrop2:GenerateLoot(doer, ispicked, isburnt) --生成收获物
 
 	for name, num in pairs(lootprefabs) do --生成实体并设置物理掉落
 		if num > 0 then
-			self:SpawnStackDrop(loot, name, num, pos)
+			TOOLS_L.SpawnStackDrop(name, num, pos, nil, loot)
 		end
 	end
 

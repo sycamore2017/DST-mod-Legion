@@ -1,3 +1,5 @@
+local TOOLS_L = require("tools_legion")
+
 --------------------------------------------------------------------------
 --[[ 基础材料 ]]
 --------------------------------------------------------------------------
@@ -480,9 +482,9 @@ local assets_beetlehat = {
 local function OnEquip_beetlehat(inst, owner)
     -- local skindata = inst.components.skinedlegion:GetSkinedData()
     -- if skindata ~= nil and skindata.equip ~= nil then
-    --     HAT_L_ON(inst, owner, skindata.equip.build, skindata.equip.file)
+    --     TOOLS_L.hat_on(inst, owner, skindata.equip.build, skindata.equip.file)
     -- else
-        HAT_L_ON(inst, owner, "hat_elepheetle", "swap_hat")
+        TOOLS_L.hat_on(inst, owner, "hat_elepheetle", "swap_hat")
     -- end
 
     if owner:HasTag("equipmentmodel") then --假人！
@@ -505,10 +507,10 @@ local function OnEquip_beetlehat(inst, owner)
         owner.components.mightiness.ratemodifiers:SetModifier(inst, 0.3)
     end
 
-    AddTag_legion(owner, "burden_ignor_l", inst.prefab) --免疫装备减速 棱镜tag
+    TOOLS_L.AddTag(owner, "burden_ignor_l", inst.prefab) --免疫装备减速 棱镜tag
 end
 local function OnUnequip_beetlehat(inst, owner)
-    HAT_L_OFF(inst, owner)
+    TOOLS_L.hat_off(inst, owner)
 
     if owner:HasTag("equipmentmodel") then --假人！
         return
@@ -525,7 +527,7 @@ local function OnUnequip_beetlehat(inst, owner)
     if owner.components.mightiness ~= nil then
         owner.components.mightiness.ratemodifiers:RemoveModifier(inst)
     end
-    RemoveTag_legion(owner, "burden_ignor_l", inst.prefab)
+    TOOLS_L.RemoveTag(owner, "burden_ignor_l", inst.prefab)
 end
 
 local function Fn_beetlehat()
@@ -609,8 +611,8 @@ local function OnEquip_beetlearmor(inst, owner)
         return
     end
 
-    AddTag_legion(owner, "stable_l", inst.prefab) --无硬直 棱镜tag
-    AddTag_legion(owner, "sedate_l", inst.prefab) --免疫麻痹 棱镜tag
+    TOOLS_L.AddTag(owner, "stable_l", inst.prefab) --无硬直 棱镜tag
+    TOOLS_L.AddTag(owner, "sedate_l", inst.prefab) --免疫麻痹 棱镜tag
 end
 local function OnUnequip_beetlearmor(inst, owner)
     owner.AnimState:ClearOverrideSymbol("swap_body")
@@ -619,8 +621,8 @@ local function OnUnequip_beetlearmor(inst, owner)
         return
     end
 
-    RemoveTag_legion(owner, "stable_l", inst.prefab)
-    RemoveTag_legion(owner, "sedate_l", inst.prefab)
+    TOOLS_L.RemoveTag(owner, "stable_l", inst.prefab)
+    TOOLS_L.RemoveTag(owner, "sedate_l", inst.prefab)
 end
 
 local function Fn_beetlearmor()

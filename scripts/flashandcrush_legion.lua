@@ -62,6 +62,7 @@ end
 
 local _G = GLOBAL
 local IsServer = TheNet:GetIsServer() or TheNet:IsDedicated()
+local TOOLS_L = require("tools_legion")
 
 --监听函数修改工具，超强der大佬写滴！
 local upvaluehelper = require "hua_upvaluehelper"
@@ -524,7 +525,7 @@ local shocked_enter = State{
 
     onenter = function(inst)
         ClearStatusAilments(inst)
-        _G.ForceStopHeavyLifting_legion(inst)
+        TOOLS_L.ForceStopHeavyLifting(inst)
         inst.components.locomotor:Stop()
         inst:ClearBufferedAction()
 

@@ -1,12 +1,11 @@
-local assets =
-{
+local TOOLS_L = require("tools_legion")
+
+local assets = {
     Asset("ANIM", "anim/hat_lichen.zip"),
 	Asset("ATLAS", "images/inventoryimages/hat_lichen.xml"),
-    Asset("IMAGE", "images/inventoryimages/hat_lichen.tex"),
+    Asset("IMAGE", "images/inventoryimages/hat_lichen.tex")
 }
-
-local prefabs =
-{
+local prefabs = {
     "lichenhatlight"
 }
 
@@ -19,16 +18,16 @@ local function lichen_equip(inst, owner)    --装备时
     local skindata = inst.components.skinedlegion:GetSkinedData()
     if skindata ~= nil and skindata.equip ~= nil then
         if skindata.equip.isopenhat then
-            HAT_L_ON_OPENTOP(inst, owner, skindata.equip.build, skindata.equip.file)
+            TOOLS_L.hat_on_opentop(inst, owner, skindata.equip.build, skindata.equip.file)
         else
-            HAT_L_ON(inst, owner, skindata.equip.build, skindata.equip.file)
+            TOOLS_L.hat_on(inst, owner, skindata.equip.build, skindata.equip.file)
         end
         if skindata.equip.lightcolor ~= nil then
             local rgb = skindata.equip.lightcolor
             inst._light.Light:SetColour(rgb.r, rgb.g, rgb.b)
         end
     else
-        HAT_L_ON_OPENTOP(inst, owner, "hat_lichen", "swap_hat")
+        TOOLS_L.hat_on_opentop(inst, owner, "hat_lichen", "swap_hat")
     end
 
     -- owner:AddTag("ignoreMeat")  --添加忽略带着肉的标签
@@ -38,7 +37,7 @@ local function lichen_equip(inst, owner)    --装备时
 end
 
 local function lichen_unequip(inst, owner)  --卸下时
-    HAT_L_OFF(inst, owner)
+    TOOLS_L.hat_off(inst, owner)
 
     -- owner:RemoveTag("ignoreMeat")    --移除忽略带肉的标签
 

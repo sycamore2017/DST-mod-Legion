@@ -73,6 +73,7 @@ end
 
 local _G = GLOBAL
 local IsServer = TheNet:GetIsServer() or TheNet:IsDedicated()
+local TOOLS_L = require("tools_legion")
 
 --------------------------------------------------------------------------
 --[[ 基础 ]]
@@ -637,7 +638,7 @@ AddStategraphState("wilson", State{
             return
         end
 
-        _G.ForceStopHeavyLifting_legion(inst) --虽然目前的触发条件并不可能有背着重物的情况，因为本身就是背包的功能，但是为了兼容性...
+        TOOLS_L.ForceStopHeavyLifting(inst) --虽然目前的触发条件并不可能有背着重物的情况，因为本身就是背包的功能，但是为了兼容性...
         inst.components.locomotor:Stop()
         inst:ClearBufferedAction()
 

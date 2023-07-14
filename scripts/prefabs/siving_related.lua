@@ -1,4 +1,5 @@
 local prefs = {}
+local TOOLS_L = require("tools_legion")
 
 local function CheckMod(modname)
     local known_mod = KnownModIndex.savedata.known_mods[modname]
@@ -1017,12 +1018,12 @@ local function SetSymbols_mask(inst, owner)
             return
         end
         if skindata.equip.isopenhat then
-            HAT_L_ON_OPENTOP(inst, owner, skindata.equip.build, skindata.equip.file or GetSwapSymbol(owner))
+            TOOLS_L.hat_on_opentop(inst, owner, skindata.equip.build, skindata.equip.file or GetSwapSymbol(owner))
         else
-            HAT_L_ON(inst, owner, skindata.equip.build, skindata.equip.file or GetSwapSymbol(owner))
+            TOOLS_L.hat_on(inst, owner, skindata.equip.build, skindata.equip.file or GetSwapSymbol(owner))
         end
     else
-        HAT_L_ON_OPENTOP(inst, owner, inst.prefab, GetSwapSymbol(owner))
+        TOOLS_L.hat_on_opentop(inst, owner, inst.prefab, GetSwapSymbol(owner))
     end
 end
 local function ClearSymbols_mask(inst, owner)
@@ -1032,7 +1033,7 @@ local function ClearSymbols_mask(inst, owner)
             skindata.equip.endfn(inst, owner)
         end
     end
-    HAT_L_OFF(inst, owner)
+    TOOLS_L.hat_off(inst, owner)
 end
 local function OnEquip_mask(inst, owner)
     SetSymbols_mask(inst, owner)

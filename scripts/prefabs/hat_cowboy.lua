@@ -1,5 +1,6 @@
-local assets =
-{
+local TOOLS_L = require("tools_legion")
+
+local assets = {
     Asset("ANIM", "anim/hat_cowboy.zip"),
 	Asset("ATLAS", "images/inventoryimages/hat_cowboy.xml"),   --物品栏图片
     Asset("IMAGE", "images/inventoryimages/hat_cowboy.tex"),
@@ -46,10 +47,10 @@ end
 local function onequip(inst, owner) --佩戴
     local skindata = inst.components.skinedlegion:GetSkinedData()
     if skindata ~= nil and skindata.equip ~= nil then
-        HAT_L_ON(inst, owner, skindata.equip.build, skindata.equip.file)
+        TOOLS_L.hat_on(inst, owner, skindata.equip.build, skindata.equip.file)
         owner.scarf_skin_l = skindata.equip.build
     else
-        HAT_L_ON(inst, owner, "hat_cowboy", "swap_hat")
+        TOOLS_L.hat_on(inst, owner, "hat_cowboy", "swap_hat")
         owner.scarf_skin_l = nil
     end
 
@@ -95,7 +96,7 @@ local function onequip(inst, owner) --佩戴
 end
 
 local function onunequip(inst, owner)   --卸下
-    HAT_L_OFF(inst, owner)
+    TOOLS_L.hat_off(inst, owner)
     owner.scarf_skin_l = nil
 
     if owner:HasTag("player") then

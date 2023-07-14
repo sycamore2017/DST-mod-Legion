@@ -1,5 +1,6 @@
 local PLANT_DEFS = require("prefabs/farm_plant_defs").PLANT_DEFS
 local WEED_DEFS = require("prefabs/weed_defs").WEED_DEFS
+local TOOLS_L = require("tools_legion")
 local prefs = {}
 local defs = {}
 
@@ -395,7 +396,7 @@ local function IsTooDarkToGrow(inst)
 	if inst.components.perennialcrop:CanGrowInDark() then
 		return false
 	end
-	return IsTooDarkToGrow_legion(inst)
+	return TOOLS_L.IsTooDarkToGrow(inst)
 end
 local function UpdateGrowing(inst)
 	if (inst.components.burnable == nil or not inst.components.burnable.burning) and not IsTooDarkToGrow(inst) then
@@ -807,7 +808,7 @@ local function IsTooDarkToGrow_p2(inst)
 	if inst.components.perennialcrop2:CanGrowInDark() then
 		return false
 	end
-	return IsTooDarkToGrow_legion(inst)
+	return TOOLS_L.IsTooDarkToGrow(inst)
 end
 local function UpdateGrowing_p2(inst)
 	if (inst.components.burnable == nil or not inst.components.burnable.burning) and not IsTooDarkToGrow_p2(inst) then
@@ -1352,35 +1353,6 @@ local function ScreeningItems(eater, item, items_digest, items_free, namemap)
 		end
 	end
 end
-local function SpawnDigestedItems(loot, name, num, pos)
-	local item = SpawnPrefab(name)
-	if item ~= nil then
-		if num > 1 and item.components.stackable ~= nil then
-			local maxsize = item.components.stackable.maxsize
-			if num <= maxsize then
-				item.components.stackable:SetStackSize(num)
-				num = 0
-			else
-				item.components.stackable:SetStackSize(maxsize)
-				num = num - maxsize
-			end
-		else
-			num = num - 1
-        end
-
-        item.Transform:SetPosition(pos:Get())
-        if item.components.inventoryitem ~= nil then
-            item.components.inventoryitem:OnDropped(true)
-        end
-		if loot ~= nil then
-			table.insert(loot, item)
-		end
-
-		if num >= 1 then
-			SpawnDigestedItems(loot, name, num, pos)
-		end
-	end
-end
 local function ComputDigest(inst, namemap, items_free)
 	local numprefab = {}
 	local numall = inst.count_digest
@@ -1405,7 +1377,7 @@ local function ComputDigest(inst, namemap, items_free)
 			end
 		end
 		if number2 >= 1 then
-			SpawnDigestedItems(items_free, name, number2, inst:GetPosition())
+			TOOLS_L.SpawnStackDrop(name, number2, inst:GetPosition(), nil, items_free)
 		end
 	end
 
@@ -1486,7 +1458,7 @@ local function DoDigest(inst, doer)
 		item:Remove()
 	end
 	for name, number in pairs(lootmap) do --生成被吞生物的掉落物
-		SpawnDigestedItems(items_free, name, number, inst:GetPosition())
+		TOOLS_L.SpawnStackDrop(name, number, inst:GetPosition(), nil, items_free)
 	end
 	for _, item in pairs(items_free) do --将无法消化物品和消化产物都放回巨食草里
 		if item:IsValid() and item.components.inventoryitem ~= nil then
@@ -1567,7 +1539,7 @@ local function DoSwallow(inst)
 	end
 
 	for name, number in pairs(lootmap) do --生成被吞生物的掉落物
-		SpawnDigestedItems(newitems, name, number, inst:GetPosition())
+		TOOLS_L.SpawnStackDrop(name, number, inst:GetPosition(), nil, newitems)
 	end
 
 	inst.components.health:SetPercent(1)

@@ -1,5 +1,6 @@
 local prefs = {}
 local wortox_soul_common = require("prefabs/wortox_soul_common")
+local TOOLS_L = require("tools_legion")
 
 local function CheckMod(modname)
     local known_mod = KnownModIndex.savedata.known_mods[modname]
@@ -331,7 +332,7 @@ local function OnRefuse_dt(inst, giver, item)
 end
 
 local function UpdateGrowing_dt(inst)
-    if IsTooDarkToGrow_legion(inst) then
+    if TOOLS_L.IsTooDarkToGrow(inst) then
         inst.components.timer:PauseTimer("fallenleaf")
         inst.components.growable:Pause()
     else
@@ -510,7 +511,7 @@ table.insert(prefs, Prefab(
         inst.AnimState:PlayAnimation("lvl0", false)
         inst.AnimState:SetScale(1.3, 1.3)
 
-        MakeSnowCovered_comm_legion(inst)
+        TOOLS_L.MakeSnowCovered_comm(inst)
         inst.Transform:SetTwoFaced()
         inst.MiniMapEntity:SetIcon("siving_derivant.tex")
 
@@ -573,7 +574,7 @@ table.insert(prefs, Prefab(
 
         inst:WatchWorldState("isnight", OnIsDark_dt)
         inst:ListenForEvent("timerdone", TimerDone_dt)
-        MakeSnowCovered_serv_legion(inst, 0.1 + 0.3*math.random(), OnIsDark_dt)
+        TOOLS_L.MakeSnowCovered_serv(inst, 0.1 + 0.3*math.random(), OnIsDark_dt)
 
         inst.OnSave = OnSave_dt
         inst.OnLoad = OnLoad_dt
@@ -788,8 +789,8 @@ end
 
 local function DropRock(inst)
     local xx, yy, zz = inst.Transform:GetWorldPosition()
-    local x, y, z = GetCalculatedPos_legion(xx, yy, zz, 2.6+math.random()*3, nil)
-    DropItem_legion("siving_rocks", x, y+13, z, 1.5, 18, 15*FRAMES, nil, nil, nil)
+    local x, y, z = TOOLS_L.GetCalculatedPos(xx, yy, zz, 2.6+math.random()*3, nil)
+    TOOLS_L.FallingItem("siving_rocks", x, y+13, z, 1.5, 18, 15*FRAMES, nil, nil, nil)
 end
 local function CallBirdFarAway(bird, x, z)
     if

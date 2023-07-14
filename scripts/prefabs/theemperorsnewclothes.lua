@@ -1,5 +1,7 @@
+local TOOLS_L = require("tools_legion")
+
 local function OnUnequip_crown(inst, owner)
-    HAT_L_OFF(inst, owner)
+    TOOLS_L.hat_off(inst, owner)
 end
 
 ------------

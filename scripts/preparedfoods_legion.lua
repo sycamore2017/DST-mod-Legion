@@ -1,5 +1,6 @@
 require("constants")
 local cookbookui_legion = require "widgets/cookbookui_legion"
+local TOOLS_L = require("tools_legion")
 
 ------
 
@@ -122,7 +123,7 @@ local foods_legion = {
 
                 --选定食用者周围位置
                 local pos = eater:GetPosition()
-                local x, y, z = GetCalculatedPos_legion(pos.x, 0, pos.z,
+                local x, y, z = TOOLS_L.GetCalculatedPos(pos.x, 0, pos.z,
                     eater:GetPhysicsRadius(0) + 0.7 + math.random()*0.5, math.random()*2*PI)
 
                 if eater.SoundEmitter ~= nil then
@@ -738,6 +739,7 @@ local foods_legion = {
         end,
         priority = 666,
         foodtype = FOODTYPE.MEAT,
+        secondaryfoodtype = FOODTYPE.ROUGHAGE,
         health = 6,
         hunger = 66,
         sanity = 6,
@@ -753,11 +755,9 @@ local foods_legion = {
         prefabs = { "buff_oilflow" },
         oneat_desc = STRINGS.UI.COOKBOOK.DISH_FRIEDFISHWITHPUREE,
         oneatenfn = function(inst, eater)
-            if eater.components.hunger ~= nil then
-                eater.time_l_oilflow = { replace_min = TUNING.SEG_TIME*16 }
-                eater:AddDebuff("buff_oilflow", "buff_oilflow")
-            end
-        end,
+            eater.time_l_oilflow = { add = TUNING.SEG_TIME*3, max = TUNING.SEG_TIME*30 }
+            eater:AddDebuff("buff_oilflow", "buff_oilflow")
+        end
     },
     dish_lovingrosecake = {
         test = function(cooker, names, tags)
@@ -924,12 +924,16 @@ local foods_legion = {
 
         prefabs = { "buff_hungerretarder" },
         oneat_desc = STRINGS.UI.COOKBOOK.DISH_RICEDUMPLING,
-        oneatenfn = function(inst, eater)   --食用后3分钟内饥饿下降大大减慢
-            if eater.components.hunger ~= nil then --这个buff需要有饥饿值组件
-                eater.time_l_hungerretarder = { replace_min = TUNING.SEG_TIME*6 }
+        oneatenfn = function(inst, eater)
+            if eater.components.hunger ~= nil or eater.components.periodicspawner ~= nil then
+                if not eater:HasTag("player") and eater.components.periodicspawner ~= nil then
+                    eater.time_l_hungerretarder = { add = TUNING.TOTAL_DAY_TIME*5, max = TUNING.TOTAL_DAY_TIME*50 }
+                else
+                    eater.time_l_hungerretarder = { add = TUNING.SEG_TIME*10, max = TUNING.SEG_TIME*50 }
+                end
                 eater:AddDebuff("buff_hungerretarder", "buff_hungerretarder")
             end
-        end,
+        end
     },
     ------
     --丰饶传说

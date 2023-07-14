@@ -1,5 +1,6 @@
 local prefs = {}
 local birdbrain = require("brains/siving_phoenixbrain")
+local TOOLS_L = require("tools_legion")
 
 --------------------------------------------------------------------------
 --[[ 通用 ]]
@@ -243,7 +244,7 @@ local function DiscerningPeck(inst, target) --啄击
     if target ~= nil then
         if inst.components.combat:CanHitTarget(target, nil) then
             --能命中时，才会开始破防改造
-            UndefendedATK_legion(inst, { target = target })
+            TOOLS_L.UndefendedATK(inst, { target = target })
         end
         inst.components.combat:DoAttack(target)
     end
@@ -282,7 +283,7 @@ local function FeathersFlap(inst) --羽乱舞
         local fea = SpawnPrefab(math.random() < 0.2 and "siving_bossfea_real" or "siving_bossfea_fake")
         if fea ~= nil then
             fea.Transform:SetPosition(x, 0, z)
-            fea.components.projectilelegion:Throw(fea, Vector3(GetCalculatedPos_legion(x, 0, z, 2)), inst, nil)
+            fea.components.projectilelegion:Throw(fea, Vector3(TOOLS_L.GetCalculatedPos(x, 0, z, 2)), inst, nil)
             fea.components.projectilelegion:DelayVisibility(fea.projectiledelay)
         end
     end
@@ -869,7 +870,7 @@ local function SpawnFx_collector(inst)
     for i = 1, math.random(2), 1 do
         local fx = SpawnPrefab(inst.feather_skin.."_flyfx")
         if fx ~= nil then
-            local x1, y1, z1 = GetCalculatedPos_legion(x, y, z, math.random()*2, nil)
+            local x1, y1, z1 = TOOLS_L.GetCalculatedPos(x, y, z, math.random()*2, nil)
             fx.Transform:SetPosition(x1, y1, z1)
         end
     end
@@ -2058,7 +2059,7 @@ local function EyeATK1(inst)
         local x2, y2, z2
         for i = 1, numpot, 1 do
             if emptykey ~= i then
-                x2, y2, z2 = GetCalculatedPos_legion(xx, 0, zz, 3.5, the+the_dt*(i-1))
+                x2, y2, z2 = TOOLS_L.GetCalculatedPos(xx, 0, zz, 3.5, the+the_dt*(i-1))
                 SpawnRoot(inst.bird, x2, z2, 0.4)
             end
         end
@@ -2162,7 +2163,7 @@ local function EyeAttack(inst, dt, countnow, countmax, x, z, counthalo)
                         the = theta - 2*DEGREES
                     end
                 end
-                xx, yy, zz = GetCalculatedPos_legion(x, 0, z, 3+num*1.2, the)
+                xx, yy, zz = TOOLS_L.GetCalculatedPos(x, 0, z, 3+num*1.2, the)
                 SpawnRoot(inst.bird, xx, zz, 0.3)
             end
             if num >= nummax then

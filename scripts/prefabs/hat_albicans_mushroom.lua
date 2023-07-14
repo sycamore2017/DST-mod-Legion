@@ -1,12 +1,11 @@
-local assets =
-{
+local TOOLS_L = require("tools_legion")
+
+local assets = {
     Asset("ANIM", "anim/hat_albicans_mushroom.zip"),
 	Asset("ATLAS", "images/inventoryimages/hat_albicans_mushroom.xml"),   --物品栏图片
     Asset("IMAGE", "images/inventoryimages/hat_albicans_mushroom.tex"),
 }
-
-local prefabs =
-{
+local prefabs = {
     "escapinggerms_fx",
     "residualspores_fx",
     "buff_sporeresistance",
@@ -32,7 +31,7 @@ end
 CheckMod = nil
 
 local function onequip(inst, owner)
-    HAT_L_ON(inst, owner, "hat_albicans_mushroom", "swap_hat")
+    TOOLS_L.hat_on(inst, owner, "hat_albicans_mushroom", "swap_hat")
 
     inst.components.periodicspawner:Start()
 
@@ -45,7 +44,7 @@ local function onequip(inst, owner)
     end
 end
 local function onunequip(inst, owner)
-    HAT_L_OFF(inst, owner)
+    TOOLS_L.hat_off(inst, owner)
 
     inst.components.periodicspawner:Stop()
 
