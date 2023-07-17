@@ -2,6 +2,7 @@
 
 local _G = GLOBAL
 local TOOLS_L = require("tools_legion")
+local SpDamageUtil = require("components/spdamageutil")
 local IsServer = TheNet:GetIsServer() or TheNet:IsDedicated()
 
 --------------------------------------------------------------------------
@@ -1051,17 +1052,25 @@ AddPlayerPostInit(function(inst)
     --受击修改
     if inst.components.inventory ~= nil then
         local ApplyDamage_old = inst.components.inventory.ApplyDamage
-        inst.components.inventory.ApplyDamage = function(self, damage, attacker, weapon, ...)
-            if damage >= 0 then
+        inst.components.inventory.ApplyDamage = function(self, damage, attacker, weapon, spdamage, ...)
+            if damage >= 0 or spdamage ~= nil then
                 local player = self.inst
                 --盾反
                 local hand = player.components.inventory:GetEquippedItem(EQUIPSLOTS.HANDS)
                 if
                     hand ~= nil and
                     hand.components.shieldlegion ~= nil and
-                    hand.components.shieldlegion:GetAttacked(player, attacker, damage, weapon)
+                    hand.components.shieldlegion:GetAttacked(player, attacker, damage, weapon, spdamage)
                 then
-                    return 0
+                    if spdamage ~= nil then
+                        if next(spdamage) == nil then
+                            return 0
+                        else --说明还有其他特殊伤害，就继续官方逻辑了
+                            damage = 0
+                        end
+                    else
+                        return 0
+                    end
                 end
                 --蝴蝶庇佑
                 if player.countblessing ~= nil and player.countblessing > 0 then
@@ -1073,10 +1082,10 @@ AddPlayerPostInit(function(inst)
                 end
                 --破防攻击
                 if player.flag_undefended_l ~= nil and player.flag_undefended_l == 1 then
-                    return damage
+                    return damage, spdamage
                 end
             end
-            return ApplyDamage_old(self, damage, attacker, weapon, ...)
+            return ApplyDamage_old(self, damage, attacker, weapon, spdamage, ...)
         end
     end
 

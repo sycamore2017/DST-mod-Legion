@@ -339,24 +339,6 @@ local function DeleteButterfly(buff, player)
     end
 end
 
--- local function SetBuff_butterflysblessing(buff, target)
---     if target.flag_l_bfbless ~= nil or target.components.inventory == nil or target.components.debuffable == nil then
---         return
---     end
---     target.flag_l_bfbless = true
---     local ApplyDamage_old = target.components.inventory.ApplyDamage
---     target.components.inventory.ApplyDamage = function(self, damage, ...)
---         if damage >= 0 and self.inst.countblessing ~= nil and self.inst.countblessing > 0 then
---             local mybuff = self.inst.components.debuffable:GetDebuff("buff_butterflysblessing")
---             if mybuff and mybuff.countbutterflies ~= nil and mybuff.countbutterflies > 0 then
---                 DeleteButterfly(mybuff, self.inst)
---                 return 0
---             end
---         end
---         return ApplyDamage_old(self, damage, ...)
---     end
--- end
-
 MakeBuff({
     name = "buff_butterflysblessing",
     assets = nil,

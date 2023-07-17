@@ -158,11 +158,11 @@ local function UndefendedATK(inst, data)
         --修改物品栏护甲机制
         if target.components.inventory ~= nil and not target:HasTag("player") then --不改玩家的
             local ApplyDamage_old = target.components.inventory.ApplyDamage
-            target.components.inventory.ApplyDamage = function(self, damage, attacker, weapon, ...)
+            target.components.inventory.ApplyDamage = function(self, damage, attacker, weapon, spdamage, ...)
                 if self.inst.flag_undefended_l == 1 then
-                    return damage
+                    return damage, spdamage
                 end
-                return ApplyDamage_old(self, damage, attacker, weapon, ...)
+                return ApplyDamage_old(self, damage, attacker, weapon, spdamage, ...)
             end
         end
 

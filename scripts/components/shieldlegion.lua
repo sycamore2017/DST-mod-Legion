@@ -1,3 +1,5 @@
+local SpDamageUtil = require("components/spdamageutil")
+
 local function oncanatk(self)
     if self.canatk then
         self.inst:AddTag("canshieldatk")
@@ -9,6 +11,17 @@ local function DoShieldSound(doer, sound)
     if sound then
         doer.SoundEmitter:PlaySound(sound, nil, doer.hurtsoundvolume)
     end
+end
+local function ComputSpDamage(self, spdamage)
+    local resdamage = 0
+    for sptype, dmg in pairs(spdamage) do
+        local def = SpDamageUtil.GetSpDefenseForType(self.inst, sptype)
+        if def > 0 then --如果该盾有对应的防御能力，就完全防住
+            resdamage = resdamage + dmg
+            spdamage[sptype] = nil --挡下时，清除这个伤害
+        end
+    end
+    return resdamage
 end
 
 local ShieldLegion = Class(function(self, inst)
@@ -31,7 +44,6 @@ local ShieldLegion = Class(function(self, inst)
     -- self.atkstayingfn = nil
     -- self.atkfailfn = nil
     -- self.armortakedmgfn = nil
-    -- self.resultfn = nil
 end,
 nil,
 {
@@ -72,7 +84,10 @@ function ShieldLegion:Counterattack(doer, attacker, data, radius, dmgmult)
 
     local weapon = self.inst.components.weapon
     local stimuli = nil
-    if doer.components.electricattacks ~= nil then
+    if weapon ~= nil and weapon.overridestimulifn ~= nil then
+        stimuli = weapon.overridestimulifn(self.inst, doer, attacker)
+    end
+    if stimuli == nil and doer.components.electricattacks ~= nil then
         stimuli = "electric"
     end
 
@@ -91,9 +106,9 @@ function ShieldLegion:Counterattack(doer, attacker, data, radius, dmgmult)
                 (attacker:GetIsWet() and 1 or 0)
             )
         or 1
-    local dmg = doer.components.combat:CalcDamage(attacker, self.inst, mult) * (dmgmult or 1)
-                + ( (data.damage or 0) * 0.1 )
-    attacker.components.combat:GetAttacked(doer, dmg, self.inst, stimuli)
+    local dmg, spdmg = doer.components.combat:CalcDamage(attacker, self.inst, mult)
+    dmg = dmg * (dmgmult or 1) + ((data.damage + data.otherdamage) * 0.1)
+    attacker.components.combat:GetAttacked(doer, dmg, self.inst, stimuli, spdmg)
 
     return true
 end
@@ -101,37 +116,46 @@ function ShieldLegion:ArmorTakeDamage(doer, attacker, data)
     if self.armortakedmgfn ~= nil then
         self.armortakedmgfn(self.inst, doer, attacker, data)
     end
-    if data.armordamage > 0 and self.inst.components.armor ~= nil then
-        self.inst.components.armor:TakeDamage(data.armordamage)
+    if self.inst.components.armor ~= nil then
+        local value = data.damage + data.otherdamage
+        if value > 0 then
+            if data.issuccess then
+                value = value*self.armormult_success
+            end
+            self.inst.components.armor:TakeDamage(value)
+        end
     end
 end
-function ShieldLegion:GetAttacked(doer, attacker, damage, weapon, stimuli)
+function ShieldLegion:GetAttacked(doer, attacker, damage, weapon, stimuli, spdamage)
     if self.inst._brokenshield or not self.canatk then
         return false
     end
 
     local data = {
-        damage = damage, --实际伤害
-        armordamage = damage, --盾会承受的伤害
+        damage = damage, --最终伤害
+        otherdamage = 0, --挡下的特殊伤害总和
+        spdamage = spdamage,
         weapon = weapon,
         stimuli = stimuli,
-        israngedweapon = false
+        israngedweapon = false,
+        issuccess = false, --本次盾反是否成功
+        isstay = false --是否为后续盾反
     }
 
     if self.issuccess then --一次sg的时间，盾反成功后完全无敌
         if doer.sg:HasStateTag("atk_shield") then --重新检查是否有效
-            if self.atkstayingfn ~= nil and doer ~= attacker then --不能自己盾反自己
-                self.atkstayingfn(self.inst, doer, attacker, data)
-            end
-            self:SetFollowedFx(doer, self.fxdata) --盾保特效
-            DoShieldSound(doer, self.inst.hurtsoundoverride)
-            return true
+            data.issuccess = true
+            data.isstay = true
         else --如果因为数据问题进入这里，就校正数据
             self:FinishAttack(doer)
         end
+    elseif self.time ~= nil then
+        if GetTime()-self.time < self.delta then --达成盾反条件
+            data.issuccess = true
+        else
+            self:FinishAttack(doer)
+        end
     end
-
-    local restarget = false
 
     if --远程武器分为两类，一类是有projectile组件、一类是weapon组件中有projectile属性
         weapon ~= nil and (
@@ -141,45 +165,52 @@ function ShieldLegion:GetAttacked(doer, attacker, damage, weapon, stimuli)
         )
     then
         data.israngedweapon = true
-        restarget = true
     end
 
-    if self.time ~= nil then
-        if GetTime()-self.time < self.delta then --达成盾反条件
+    if data.issuccess then
+        if spdamage ~= nil then
+            data.otherdamage = ComputSpDamage(self, spdamage)
+        end
+        if data.isstay then
+            if self.atkstayingfn ~= nil and doer ~= attacker then --不能自己盾反自己
+                self.atkstayingfn(self.inst, doer, attacker, data)
+            end
+        else
             if doer.sg:HasStateTag("atk_shield") then --加入防打断标签，这样本次sg后续被攻击不会进入被攻击sg
                 doer.sg:AddStateTag("nointerrupt")
             end
             if self.atkfn ~= nil and doer ~= attacker then --不能自己盾反自己
                 self.atkfn(self.inst, doer, attacker, data)
             end
-
-            restarget = true
-            data.armordamage = data.armordamage*self.armormult_success
             self.issuccess = true
             doer.shield_l_success = true --让玩家实体也能直接识别是否处于盾反成功中
-            self:SetFollowedFx(doer, self.fxdata) --盾保特效
-            DoShieldSound(doer, self.inst.hurtsoundoverride)
-        else
-            if self.atkfailfn ~= nil then
-                self.atkfailfn(self.inst, doer, attacker, data)
-            end
-            self:FinishAttack(doer)
         end
-    end
 
-    if restarget then
+        self:SetFollowedFx(doer, self.fxdata) --盾保特效
+        DoShieldSound(doer, self.inst.hurtsoundoverride)
         self:ArmorTakeDamage(doer, attacker, data)
+        return true
+    elseif data.israngedweapon then --完全抵御远程攻击
+        if spdamage ~= nil then
+            data.otherdamage = ComputSpDamage(self, spdamage)
+        end
+        DoShieldSound(doer, self.inst.hurtsoundoverride)
+        self:ArmorTakeDamage(doer, attacker, data)
+        return true
+    else
+        if self.atkfailfn ~= nil then
+            self.atkfailfn(self.inst, doer, attacker, data)
+        end
+        return false
     end
-
-    return restarget
 end
 
 function ShieldLegion:FinishAttack(doer, issgend)
     if self.time ~= nil then
         self.time = nil
-        if self.resultfn ~= nil then
-            self.resultfn(self.inst, doer)
-        end
+        -- if self.resultfn ~= nil then
+        --     self.resultfn(self.inst, doer)
+        -- end
     end
     self.issuccess = false
     doer.shield_l_success = nil
