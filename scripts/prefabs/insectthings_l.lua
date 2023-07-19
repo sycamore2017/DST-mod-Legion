@@ -108,41 +108,6 @@ local prefabs_boltout = {
     "boltwingout_fx",
     "boltwingout_shuck"
 }
-local BOLTCOST = {
-    stinger = 3,            --蜂刺
-    honey = 5,              --蜂蜜
-    royal_jelly = 0.1,      --蜂王浆
-    honeycomb = 0.25,       --蜂巢
-    beeswax = 0.2,          --蜂蜡
-    bee = 0.5,              --蜜蜂
-    killerbee = 0.45,       --杀人蜂
-
-    mosquitosack = 1,       --蚊子血袋
-    mosquito = 0.45,        --蚊子
-
-    glommerwings = 0.25,    --格罗姆翅膀
-    glommerfuel = 0.5,      --格罗姆黏液
-
-    butterflywings = 3,     --蝴蝶翅膀
-    butter = 0.1,           --黄油
-    butterfly = 0.6,        --蝴蝶
-
-    wormlight = 0.25,       --神秘浆果
-    wormlight_lesser = 1,   --神秘小浆果
-
-    moonbutterflywings = 1, --月蛾翅膀
-    moonbutterfly = 0.3,    --月蛾
-
-    ahandfulofwings = 0.25, --虫翅碎片
-    insectshell_l = 0.25,   --虫甲碎片
-    raindonate = 0.45,      --雨蝇
-    fireflies = 0.45,       --萤火虫
-
-    dragon_scales = 0.1,    --龙鳞
-    lavae_egg = 0.06,       --岩浆虫卵
-    lavae_egg_cracked = 0.06,--岩浆虫卵(孵化中)
-    lavae_cocoon = 0.03,    --冷冻虫卵
-}
 
 local function OnEquip_boltout(inst, owner)
     local skindata = inst.components.skinedlegion:GetSkinedData()
@@ -161,76 +126,7 @@ local function OnEquip_boltout(inst, owner)
     if inst.components.container ~= nil then
         inst.components.container:Open(owner)
     end
-
-    if owner.components.combat ~= nil and owner.set_l_bolt == nil then
-        owner.GetAttacked_l_bolt = owner.components.combat.GetAttacked
-        owner.components.combat.GetAttacked = function(self, attacker, damage, weapon, stimuli)
-            if
-                not self.inst.set_l_bolt
-                or (self.inst.components.health == nil or self.inst.components.health:IsDead())
-            then
-                return self.inst.GetAttacked_l_bolt(self, attacker, damage, weapon, stimuli)
-            end
-
-            local backpack = self.inst.components.inventory:GetEquippedItem(EQUIPSLOTS.BACK or EQUIPSLOTS.BODY) or nil
-            if backpack == nil or backpack.components.container == nil then
-                return self.inst.GetAttacked_l_bolt(self, attacker, damage, weapon, stimuli)
-            end
-
-            local attackerinfact = weapon or attacker --武器写在前面是为了优先躲避远程武器
-            if
-                (self.inst.components.rider ~= nil and self.inst.components.rider:IsRiding()) --在骑牛
-                or self.inst.sg:HasStateTag("busy") --在做特殊动作，攻击sg不会带这个标签
-                or stimuli == "darkness" --黑暗攻击
-                or attackerinfact == nil --无实物的攻击
-                or damage <= 0
-            then
-                return self.inst.GetAttacked_l_bolt(self, attacker, damage, weapon, stimuli)
-            end
-
-            --识别特定数量的材料来触发金蝉脱壳效果
-            local finalitem = backpack.components.container:FindItem(function(item)
-                local value = item.bolt_l_value or BOLTCOST[item.prefab]
-                if
-                    value ~= nil and
-                    value <= (item.components.stackable ~= nil and item.components.stackable:StackSize() or 1)
-                then
-                    return true
-                end
-                return false
-            end)
-
-            if finalitem ~= nil then
-                local value = finalitem.bolt_l_value or BOLTCOST[finalitem.prefab]
-                if value ~= nil then --删除对应数量的材料
-                    if value >= 1 then
-                        if finalitem.components.stackable ~= nil then
-                            finalitem.components.stackable:Get(value):Remove()
-                        else
-                            finalitem:Remove()
-                        end
-                    elseif math.random() < value then
-                        if finalitem.components.stackable ~= nil then
-                            finalitem.components.stackable:Get():Remove()
-                        else
-                            finalitem:Remove()
-                        end
-                    end
-                end
-
-                --金蝉脱壳
-                self.inst:PushEvent("boltout", { escapepos = attackerinfact:GetPosition() })
-                --若是远程攻击的敌人，“壳”可能因为距离太远吸引不到敌人，所以这里主动先让敌人丢失仇恨
-                if attacker ~= nil and attacker.components.combat ~= nil then
-                    attacker.components.combat:SetTarget(nil)
-                end
-                return false
-            else
-                return self.inst.GetAttacked_l_bolt(self, attacker, damage, weapon, stimuli)
-            end
-        end
-    end
-    owner.set_l_bolt = true
+    owner.bolt_l = inst
 end
 local function OnUnequip_boltout(inst, owner)
     owner.AnimState:ClearOverrideSymbol("swap_body")
@@ -239,8 +135,7 @@ local function OnUnequip_boltout(inst, owner)
     if inst.components.container ~= nil then
         inst.components.container:Close(owner)
     end
-
-    owner.set_l_bolt = false
+    owner.bolt_l = nil
 end
 
 local function OnBurnt_boltout(inst)

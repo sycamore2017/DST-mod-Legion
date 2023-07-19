@@ -531,10 +531,18 @@ end, {
 --[[ 艾力冈的剑 ]]
 --------------------------------------------------------------------------
 
-local damage_shield = 85 --34*2.5
-local damage_sword = 136 --34*4
+local damage_shield = 76.5 --34*2.25
+local damage_sword = 119 --34*3.5
 local absorb_shield = 0.1
 local absorb_sword = 0.3
+local resist_shield = 0.9
+local resist_sword = 0.7/0.9
+local planardefense_shield = 5
+local planardefense_sword = 20
+local bonus_shield = 1
+local bonus_sword = 1.2
+local planardamage_shield = 0
+local planardamage_sword = 15
 
 local function DeathCallForRain(owner)
     TheWorld:PushEvent("ms_forceprecipitation", true)
@@ -579,6 +587,10 @@ local function DoRevolt(inst, doer)
         inst._basedamage = damage_sword
         inst.components.weapon:SetDamage(damage_sword)
         inst.components.armor:SetAbsorption(absorb_sword)
+        inst.components.planardamage:SetBaseDamage(planardamage_sword)
+        inst.components.planardefense:SetBaseDefense(planardefense_sword)
+        inst.components.damagetypebonus:AddBonus("lunar_aligned", inst, bonus_sword, "revolt")
+        inst.components.damagetyperesist:AddResist("shadow_aligned", inst, resist_sword, "revolt")
 
         TrySetOwnerSymbol(inst, doer, true)
 
@@ -598,6 +610,10 @@ local function TimerDone_agron(inst, data)
         inst._basedamage = damage_shield
         inst.components.weapon:SetDamage(damage_shield)
         inst.components.armor:SetAbsorption(absorb_shield)
+        inst.components.planardamage:SetBaseDamage(planardamage_shield)
+        inst.components.planardefense:SetBaseDefense(planardefense_shield)
+        inst.components.damagetypebonus:RemoveBonus("lunar_aligned", inst, "revolt")
+        inst.components.damagetyperesist:RemoveResist("shadow_aligned", inst, "revolt")
 
         TrySetOwnerSymbol(inst, nil, false)
 
@@ -705,6 +721,18 @@ MakeShield({
 
         inst.components.equippable:SetOnEquip(OnEquip_agron)
         inst.components.equippable:SetOnUnequip(OnUnequip_agron)
+
+        inst:AddComponent("planardamage")
+        inst.components.planardamage:SetBaseDamage(planardamage_shield)
+
+        inst:AddComponent("planardefense")
+	    inst.components.planardefense:SetBaseDefense(planardefense_shield)
+
+        inst:AddComponent("damagetypebonus")
+        inst.components.damagetypebonus:AddBonus("lunar_aligned", inst, bonus_shield)
+
+        inst:AddComponent("damagetyperesist")
+	    inst.components.damagetyperesist:AddResist("shadow_aligned", inst, resist_shield)
 
         inst:AddComponent("timer")
         inst:ListenForEvent("timerdone", TimerDone_agron)

@@ -104,7 +104,7 @@ local function FallingItem(itemname, x, y, z, hitrange, hitdamage, fallingtime, 
                             {"_combat", "_health"}, {"NOCLICK", "shadow", "playerghost", "INLIMBO"}, nil
                         )
                         if someone ~= nil and someone.components.combat:CanBeAttacked() then
-                            someone.components.combat:GetAttacked(inst, hitdamage, nil)
+                            someone.components.combat:GetAttacked(inst, hitdamage)
                         end
                     end
 

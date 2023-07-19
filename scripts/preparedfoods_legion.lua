@@ -363,7 +363,7 @@ local foods_legion = {
 
                 eater.components.combat:GetAttacked(inst, damage)
             end
-        end,
+        end
     },
     dish_braisedmeatwithfoliages = {
         test = function(cooker, names, tags)

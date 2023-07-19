@@ -984,6 +984,129 @@ end))
 --[[ 人物实体统一修改 ]]
 --------------------------------------------------------------------------
 
+local BOLTCOST = {
+    stinger = 3,            --蜂刺
+    honey = 5,              --蜂蜜
+    royal_jelly = 0.1,      --蜂王浆
+    honeycomb = 0.25,       --蜂巢
+    beeswax = 0.2,          --蜂蜡
+    bee = 0.5,              --蜜蜂
+    killerbee = 0.45,       --杀人蜂
+
+    mosquitosack = 1,       --蚊子血袋
+    mosquito = 0.45,        --蚊子
+
+    glommerwings = 0.25,    --格罗姆翅膀
+    glommerfuel = 0.5,      --格罗姆黏液
+
+    butterflywings = 3,     --蝴蝶翅膀
+    butter = 0.1,           --黄油
+    butterfly = 0.6,        --蝴蝶
+
+    wormlight = 0.25,       --神秘浆果
+    wormlight_lesser = 1,   --神秘小浆果
+
+    moonbutterflywings = 1, --月蛾翅膀
+    moonbutterfly = 0.3,    --月蛾
+
+    ahandfulofwings = 0.25, --虫翅碎片
+    insectshell_l = 0.25,   --虫甲碎片
+    raindonate = 0.45,      --雨蝇
+    fireflies = 0.45,       --萤火虫
+
+    dragon_scales = 0.1,    --龙鳞
+    lavae_egg = 0.06,       --岩浆虫卵
+    lavae_egg_cracked = 0.06,--岩浆虫卵(孵化中)
+    lavae_cocoon = 0.03,    --冷冻虫卵
+}
+
+local function OnMurdered_player(inst, data)
+    if
+        data.victim ~= nil and data.victim.prefab == "raindonate" and
+        not data.negligent --不能是疏忽大意导致的，必须是有意的
+    then
+        data.victim:fn_murdered_l()
+    end
+end
+local function inv_ApplyDamage(self, damage, attacker, weapon, spdamage, ...)
+    if damage >= 0 or spdamage ~= nil then
+        local player = self.inst
+        --盾反
+        local hand = player.components.inventory:GetEquippedItem(EQUIPSLOTS.HANDS)
+        if
+            hand ~= nil and
+            hand.components.shieldlegion ~= nil and
+            hand.components.shieldlegion:GetAttacked(player, attacker, damage, weapon, spdamage)
+        then
+            if spdamage ~= nil then
+                if next(spdamage) == nil then
+                    return 0
+                else --说明还有其他特殊伤害，就继续官方逻辑了
+                    damage = 0
+                end
+            else
+                return 0
+            end
+        end
+        --蝴蝶庇佑
+        if player.countblessing ~= nil and player.countblessing > 0 then
+            local mybuff = player.components.debuffable:GetDebuff("buff_butterflysblessing")
+            if mybuff and mybuff.countbutterflies ~= nil and mybuff.countbutterflies > 0 then
+                mybuff.DeleteButterfly(mybuff, player)
+                return 0
+            end
+        end
+        --金蝉脱壳
+        if
+            player.bolt_l ~= nil
+            and (player.components.rider == nil or not player.components.rider:IsRiding()) --不能骑牛
+            and not player.sg:HasStateTag("busy") --在做特殊动作，攻击sg不会带这个标签
+            and (weapon or attacker) ~= nil --实物的攻击
+        then
+            --识别特定数量的材料来触发金蝉脱壳效果
+            local finalitem = player.bolt_l.components.container:FindItem(function(item)
+                local value = item.bolt_l_value or BOLTCOST[item.prefab]
+                if
+                    value ~= nil and
+                    value <= (item.components.stackable ~= nil and item.components.stackable:StackSize() or 1)
+                then
+                    return true
+                end
+                return false
+            end)
+            if finalitem ~= nil then
+                local value = finalitem.bolt_l_value or BOLTCOST[finalitem.prefab]
+                if value >= 1 then
+                    if finalitem.components.stackable ~= nil then
+                        finalitem.components.stackable:Get(value):Remove()
+                    else
+                        finalitem:Remove()
+                    end
+                elseif math.random() < value then
+                    if finalitem.components.stackable ~= nil then
+                        finalitem.components.stackable:Get():Remove()
+                    else
+                        finalitem:Remove()
+                    end
+                end
+
+                --金蝉脱壳
+                player:PushEvent("boltout", { escapepos = (weapon or attacker):GetPosition() })
+                --若是远程攻击的敌人，“壳”可能因为距离太远吸引不到敌人，所以这里主动先让敌人丢失仇恨
+                if attacker ~= nil and attacker.components.combat ~= nil then
+                    attacker.components.combat:SetTarget(nil)
+                end
+                return 0
+            end
+        end
+        --破防攻击
+        if player.flag_undefended_l ~= nil and player.flag_undefended_l == 1 then
+            return damage, spdamage
+        end
+    end
+    return self.inst.inv_ApplyDamage_old_l(self, damage, attacker, weapon, spdamage, ...)
+end
+
 AddPlayerPostInit(function(inst)
     --此时 ThePlayer 不存在，延时之后才有
     inst:DoTaskInTime(6, function(inst)
@@ -1051,53 +1174,11 @@ AddPlayerPostInit(function(inst)
 
     --受击修改
     if inst.components.inventory ~= nil then
-        local ApplyDamage_old = inst.components.inventory.ApplyDamage
-        inst.components.inventory.ApplyDamage = function(self, damage, attacker, weapon, spdamage, ...)
-            if damage >= 0 or spdamage ~= nil then
-                local player = self.inst
-                --盾反
-                local hand = player.components.inventory:GetEquippedItem(EQUIPSLOTS.HANDS)
-                if
-                    hand ~= nil and
-                    hand.components.shieldlegion ~= nil and
-                    hand.components.shieldlegion:GetAttacked(player, attacker, damage, weapon, spdamage)
-                then
-                    if spdamage ~= nil then
-                        if next(spdamage) == nil then
-                            return 0
-                        else --说明还有其他特殊伤害，就继续官方逻辑了
-                            damage = 0
-                        end
-                    else
-                        return 0
-                    end
-                end
-                --蝴蝶庇佑
-                if player.countblessing ~= nil and player.countblessing > 0 then
-                    local mybuff = player.components.debuffable:GetDebuff("buff_butterflysblessing")
-                    if mybuff and mybuff.countbutterflies ~= nil and mybuff.countbutterflies > 0 then
-                        mybuff.DeleteButterfly(mybuff, player)
-                        return 0
-                    end
-                end
-                --破防攻击
-                if player.flag_undefended_l ~= nil and player.flag_undefended_l == 1 then
-                    return damage, spdamage
-                end
-            end
-            return ApplyDamage_old(self, damage, attacker, weapon, spdamage, ...)
-        end
+        inst.inv_ApplyDamage_old_l = inst.components.inventory.ApplyDamage
+        inst.components.inventory.ApplyDamage = inv_ApplyDamage
     end
 
     --谋杀生物时(一般是指物品栏里的)
-    local function OnMurdered_player(inst, data)
-        if
-            data.victim ~= nil and data.victim.prefab == "raindonate" and
-            not data.negligent --不能是疏忽大意导致的，必须是有意的
-        then
-            data.victim:fn_murdered_l()
-        end
-    end
     inst:ListenForEvent("murdered", OnMurdered_player)
 end)
 
@@ -1390,6 +1471,11 @@ AddPrefabPostInit("shieldofterror", function(inst)
             inst.components.shieldlegion:Counterattack(doer, attacker, data, 8, 0.5)
         end
         -- inst.components.shieldlegion.atkfailfn = function(inst, doer, attacker, data) end
+
+        if inst.components.planardefense == nil then
+            inst:AddComponent("planardefense")
+	        inst.components.planardefense:SetBaseDefense(10)
+        end
     end
 end)
 
