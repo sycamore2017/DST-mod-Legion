@@ -149,7 +149,7 @@ local function OnMiss(inst, owner, target)
     end
 end
 
-local function OnLightning(inst)    --因为拿在手上会有"INLIMBO"标签，所以装备时并不会吸引闪电，只有放在地上时才会
+local function OnLightning(inst) --因为拿在手上会有"INLIMBO"标签，所以装备时并不会吸引闪电，只有放在地上时才会
     GiveSomeShock(inst, nil, inst)
 
     if inst.components.finiteuses ~= nil and inst.components.finiteuses:GetUses() < 250 then

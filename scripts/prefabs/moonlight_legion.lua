@@ -69,7 +69,11 @@ local function DropGems(inst, gemname)
 end
 
 local function OnUpgradeFn(inst, doer, item)
-    inst.SoundEmitter:PlaySound("dontstarve/common/telebase_gemplace")
+    (inst.SoundEmitter or doer.SoundEmitter):PlaySound("dontstarve/common/telebase_gemplace")
+end
+
+local function OnRemove_light(inst)
+    inst._light:Remove()
 end
 
 --------------------------------------------------------------------------
@@ -858,9 +862,7 @@ local function MakeRevolved(sets)
         inst._owners = {}
         inst._onownerchange = function() OnOwnerChange(inst) end
         OnOwnerChange(inst)
-        inst.OnRemoveEntity = function(inst)
-            inst._light:Remove()
-        end
+        inst.OnRemoveEntity = OnRemove_light
 
         -- if TUNING.SMART_SIGN_DRAW_ENABLE then --由于这个容器是便携的，不适合兼容【智能小木牌】
         --     SMART_SIGN_DRAW(inst)
@@ -902,6 +904,392 @@ MakeRevolved({
     -- fn_common = function(inst)end,
     -- fn_server = function(inst)end
 })
+
+--------------------------------------------------------------------------
+--[[ 月折宝剑 ]]
+--------------------------------------------------------------------------
+
+local atk_rf_buff = 40
+local atk_rf = 10
+local atk2_rf_buff = 20
+local atk2_rf = 5
+local atkmult_rf_hurt = 0.1
+local atkmult_rf = 1
+local bonus_rf = 1
+local bonus_rf_buff = 1.2
+local count_rf_max = 4
+
+local function SetCount_refracted(inst, value)
+    inst._count = math.clamp(value, 0, count_rf_max)
+    if inst._count >= count_rf_max then
+        if inst.components.perishable == nil then
+            inst:AddComponent("perishable")
+            inst.components.perishable:SetPerishTime(TUNING.PERISH_FAST)
+            inst:AddTag("show_spoilage")
+        end
+    else
+        if inst.components.perishable ~= nil then
+            inst:RemoveComponent("perishable")
+            inst:RemoveTag("show_spoilage")
+        end
+    end
+end
+local function SetAtk_refracted(inst)
+    inst.components.weapon:SetDamage(math.floor( (inst._atk+inst._atk_lvl)*inst._atkmult ))
+    inst.components.planardamage:SetBaseDamage(math.floor( (inst._atk_sp+inst._atk_sp_lvl)*inst._atkmult ))
+end
+local function SetLight_refracted(inst)
+    if inst._lvl >= 4 then
+        inst._light.Light:SetRadius(inst._task_fx == nil and 1 or 3)
+        inst._light.Light:Enable(true)
+    else
+        inst._light.Light:Enable(false)
+    end
+end
+local function TrySetOwnerSymbol(inst, doer, revolt)
+    if doer == nil then --因为此时有可能不再是装备状态，doer 发生了改变
+        doer = inst.components.inventoryitem:GetGrandOwner()
+    end
+    if doer then
+        if doer:HasTag("player") then
+            if doer.components.health and doer.components.inventory then
+                if inst == doer.components.inventory:GetEquippedItem(EQUIPSLOTS.HANDS) then
+                    doer.AnimState:OverrideSymbol("swap_object", inst._dd.build, revolt and "swap_refractedmoonlight" or "swap_refractedmoonlight")
+                end
+            end
+        elseif doer:HasTag("equipmentmodel") then
+            doer.AnimState:OverrideSymbol("swap_object", inst._dd.build, revolt and "swap_refractedmoonlight" or "swap_refractedmoonlight")
+        end
+    end
+    if revolt then
+        inst.components.inventoryitem.atlasname = inst._dd.img_atlas2
+        inst.components.inventoryitem:ChangeImageName(inst._dd.img_tex2)
+        inst.AnimState:PlayAnimation("idle_loop")
+    else
+        inst.components.inventoryitem.atlasname = inst._dd.img_atlas
+        inst.components.inventoryitem:ChangeImageName(inst._dd.img_tex)
+        inst.AnimState:PlayAnimation("idle_loop")
+    end
+end
+local function TriggerRevolt(inst, doer, doit)
+    if doit then
+        if inst._task_fx == nil then
+            inst._task_fx = inst:DoPeriodicTask(0.21, function(inst)
+                local fx = SpawnPrefab(inst._dd.fx or "refractedmoonlight_fx")
+                fx.Transform:SetPosition((inst.components.inventoryitem:GetGrandOwner() or inst).Transform:GetWorldPosition())
+            end, 0)
+        end
+
+        inst._atk = atk_rf_buff
+        inst._atk_sp = atk2_rf_buff
+        inst.components.damagetypebonus:AddBonus("shadow_aligned", inst, bonus_rf_buff, "revolt")
+
+        if inst._lvl >= 8 then
+            inst.components.weapon:SetRange(1.5)
+        end
+
+        TrySetOwnerSymbol(inst, doer, true)
+    else
+        if inst._task_fx ~= nil then
+            inst._task_fx:Cancel()
+            inst._task_fx = nil
+        end
+
+        inst._atk = atk_rf
+        inst._atk_sp = atk2_rf
+        inst.components.damagetypebonus:RemoveBonus("shadow_aligned", inst, "revolt")
+
+        inst.components.weapon:SetRange(0)
+
+        TrySetOwnerSymbol(inst, nil, false)
+    end
+    SetAtk_refracted(inst)
+    SetLight_refracted(inst)
+end
+local function TryRevolt(inst, doer)
+    if doer == nil then
+        doer = inst.components.inventoryitem:GetGrandOwner()
+    end
+    if inst._count <= 0 then
+        return
+    elseif inst._count < 1 then
+        if doer and doer.components.health and doer.components.health:GetPercent() < 1 then
+            doer.components.health:DoDelta(20*inst._count, true, "debug_key", true, nil, true) --对旺达回血要特定原因才行
+            SetCount_refracted(inst, 0)
+        end
+        return
+    else
+        SetCount_refracted(inst, inst._count - 1)
+    end
+
+    local time = 60
+    if inst._lvl >= 14 then
+        local timeleft = inst.components.timer:GetTimeLeft("revolt") or 0
+        if timeleft > 0 then
+            time = math.min(time + timeleft, 360)
+        end
+    else
+        if inst._lvl < 2 then
+            time = 30
+        end
+    end
+    inst.components.timer:StopTimer("revolt")
+    inst.components.timer:StartTimer("revolt", time)
+    TriggerRevolt(inst, doer, true)
+end
+
+local function OnEquip_refracted(inst, owner) --装备武器时
+    owner.AnimState:OverrideSymbol("swap_object", inst._dd.build,
+        inst.components.timer:TimerExists("revolt") and "swap_refractedmoonlight" or "swap_refractedmoonlight")
+    owner.AnimState:Show("ARM_carry") --显示持物手
+    owner.AnimState:Hide("ARM_normal") --隐藏普通的手
+
+    if owner:HasTag("equipmentmodel") then --假人！
+        return
+    end
+
+    owner:ListenForEvent("healthdelta", inst.fn_onHealthDelta)
+    inst.fn_onHealthDelta(owner, nil)
+end
+local function OnUnequip_refracted(inst, owner) --卸下武器时
+    owner.AnimState:Hide("ARM_carry") --隐藏持物手
+    owner.AnimState:Show("ARM_normal") --显示普通的手
+
+    owner:RemoveEventCallback("healthdelta", inst.fn_onHealthDelta)
+    if inst._atkmult == atkmult_rf_hurt then
+        inst.fn_onHealthDelta(owner, { newpercent = 1 }) --卸下时，恢复武器默认攻击力，为了让巨人之脚识别到
+    end
+end
+local function OnAttack_refracted(inst, owner, target)
+    if inst._task_fx == nil or inst._lvl >= 10 then
+        SetCount_refracted(inst, inst._count + (inst._lvl >= 12 and 0.1 or 0.05))
+    end
+    if inst._lvl >= 6 and inst._task_fx ~= nil then
+        if owner.components.health and owner.components.health:GetPercent() < 1 then
+            owner.components.health:DoDelta(1.5, true, "debug_key", true, nil, true) --对旺达回血要特定原因才行
+            return
+        end
+    end
+    if inst._atkmult == atkmult_rf_hurt then
+        inst.fn_onHealthDelta(owner, nil)
+    end
+end
+
+local function OnStageUp_refracted(inst)
+    local lvl = inst.components.upgradeable:GetStage() - 1
+    inst._lvl = lvl
+    if lvl >= 13 then
+        inst._atk_lvl = 40
+        inst._atk_sp_lvl = 30
+    elseif lvl >= 11 then
+        inst._atk_lvl = 30
+        inst._atk_sp_lvl = 30
+    elseif lvl >= 9 then
+        inst._atk_lvl = 30
+        inst._atk_sp_lvl = 20
+    elseif lvl >= 7 then
+        inst._atk_lvl = 20
+        inst._atk_sp_lvl = 20
+    elseif lvl >= 5 then
+        inst._atk_lvl = 20
+        inst._atk_sp_lvl = 10
+    elseif lvl >= 3 then
+        inst._atk_lvl = 10
+        inst._atk_sp_lvl = 10
+    elseif lvl >= 1 then
+        inst._atk_lvl = 10
+        inst._atk_sp_lvl = 0
+    else
+        inst._atk_lvl = 0
+        inst._atk_sp_lvl = 0
+    end
+    TriggerRevolt(inst, nil, inst._task_fx ~= nil or inst.components.timer:TimerExists("revolt"))
+end
+local function TimerDone_refracted(inst, data)
+    if data.name == "revolt" then
+        TriggerRevolt(inst, nil, false)
+    end
+end
+local function OnOwnerChange_refracted(inst)
+    local newowners = {}
+    local owner = inst
+    while owner.components.inventoryitem ~= nil do
+        newowners[owner] = true
+
+        if inst._owners[owner] then
+            inst._owners[owner] = nil
+        else
+            inst:ListenForEvent("onputininventory", inst._onownerchange, owner)
+            inst:ListenForEvent("ondropped", inst._onownerchange, owner)
+        end
+
+        local nextowner = owner.components.inventoryitem.owner
+        if nextowner == nil then
+            break
+        end
+
+        owner = nextowner
+    end
+
+    inst._light.entity:SetParent(owner.entity)
+
+    for k, v in pairs(inst._owners) do
+        if k:IsValid() then
+            inst:RemoveEventCallback("onputininventory", inst._onownerchange, k)
+            inst:RemoveEventCallback("ondropped", inst._onownerchange, k)
+        end
+    end
+
+    inst._owners = newowners
+end
+
+local function OnSave_refracted(inst, data)
+	if inst._count > 0 then
+		data.count = inst._count
+	end
+end
+local function OnLoad_refracted(inst, data)
+	if data ~= nil then
+		if data.count ~= nil then
+			inst._count = data.count
+		end
+	end
+    inst:DoTaskInTime(0.45, function(inst)
+        SetCount_refracted(inst, inst._count)
+        OnStageUp_refracted(inst)
+    end)
+end
+
+table.insert(prefs, Prefab(
+    "refractedmoonlight",
+    function()
+        local inst = CreateEntity()
+
+        inst.entity:AddTransform()
+        inst.entity:AddAnimState()
+        inst.entity:AddMiniMapEntity() --要在小地图上显示的话，记得加这句
+        inst.entity:AddNetwork()
+
+        MakeInventoryPhysics(inst)
+
+        inst.AnimState:SetBank("refractedmoonlight")
+        inst.AnimState:SetBuild("refractedmoonlight")
+        inst.AnimState:PlayAnimation("idle_loop", true)
+
+        inst:AddTag("sharp") --武器的标签跟攻击方式跟攻击音效有关 没有特殊的话就用这两个
+        inst:AddTag("pointy")
+        inst:AddTag("irreplaceable") --防止被猴子、食人花、坎普斯等拿走，防止被流星破坏，并使其下线时会自动掉落
+        inst:AddTag("nonpotatable") --这个貌似是？
+        inst:AddTag("NORATCHECK") --mod兼容：永不妥协。该道具不算鼠潮分
+
+        --weapon (from weapon component) added to pristine state for optimization
+        inst:AddTag("weapon")
+
+        inst.MiniMapEntity:SetIcon("refractedmoonlight.tex")
+
+        -- inst:AddComponent("skinedlegion")
+        -- inst.components.skinedlegion:Init("refractedmoonlight")
+
+        inst.entity:SetPristine()
+        if not TheWorld.ismastersim then
+            return inst
+        end
+
+        inst._dd = {
+            img_tex = "refractedmoonlight", img_atlas = "images/inventoryimages/refractedmoonlight.xml",
+            img_tex2 = "refractedmoonlight", img_atlas2 = "images/inventoryimages/refractedmoonlight.xml",
+            build = "swap_refractedmoonlight", fx = "refractedmoonlight_fx"
+        }
+        inst._task_fx = nil
+        inst._atk = atk_rf
+        inst._atk_sp = atk2_rf
+        inst._atk_lvl = 0
+        inst._atk_sp_lvl = 0
+        inst._atkmult = atkmult_rf
+        inst._count = 0
+        inst._lvl = 0
+        inst.fn_onHealthDelta = function(owner, data)
+            local percent = 0
+            if data and data.newpercent then
+                percent = 1 - data.newpercent
+            else
+                if owner.components.health ~= nil then
+                    percent = 1 - owner.components.health:GetPercent()
+                end
+            end
+            if percent <= inst._count then
+                inst._atkmult = atkmult_rf
+            else
+                inst._atkmult = atkmult_rf_hurt
+            end
+            SetAtk_refracted(inst)
+        end
+
+        inst:AddComponent("inspectable")
+
+        inst:AddComponent("refractedmoonlight") --进入buff状态的必要组件
+
+        inst:AddComponent("inventoryitem")
+        inst.components.inventoryitem.imagename = "refractedmoonlight"
+        inst.components.inventoryitem.atlasname = "images/inventoryimages/refractedmoonlight.xml"
+        inst.components.inventoryitem:SetSinks(true) --落水时会下沉，但是因为标签的关系会回到绚丽大门
+
+        inst:AddComponent("weapon")
+        inst.components.weapon:SetDamage(atk_rf)
+        inst.components.weapon:SetOnAttack(OnAttack_refracted)
+
+        inst:AddComponent("planardamage")
+        inst.components.planardamage:SetBaseDamage(atk2_rf)
+
+        inst:AddComponent("damagetypebonus")
+	    inst.components.damagetypebonus:AddBonus("shadow_aligned", inst, bonus_rf)
+
+        inst:AddComponent("equippable")
+        inst.components.equippable:SetOnEquip(OnEquip_refracted)
+        inst.components.equippable:SetOnUnequip(OnUnequip_refracted)
+
+        inst:AddComponent("upgradeable")
+        inst.components.upgradeable.upgradetype = UPGRADETYPES.REFRACTED_L
+        inst.components.upgradeable.onupgradefn = OnUpgradeFn
+        inst.components.upgradeable.onstageadvancefn = OnStageUp_refracted
+        inst.components.upgradeable.numstages = 15 --因为初始等级为1，所以升级14次的话就填写15
+        inst.components.upgradeable.upgradesperstage = 1
+
+        inst:AddComponent("timer")
+        inst:ListenForEvent("timerdone", TimerDone_refracted)
+
+        -- inst:AddComponent("rechargeable") --这个组件不够完善，没法手动暂停
+        -- inst.components.rechargeable.OnUpdate = function(self, dt)end
+
+        inst._light = SpawnPrefab("alterguardianhatlight")
+        -- inst._light.Light:SetRadius(0.25)
+        -- inst._light.Light:SetFalloff(0.7)
+        inst._light.Light:SetColour(180/255, 195/255, 150/255)
+        -- inst._light.Light:SetIntensity(0.75)
+        inst._light.Light:Enable(false)
+        inst._owners = {}
+        inst._onownerchange = function() OnOwnerChange_refracted(inst) end
+        OnOwnerChange_refracted(inst)
+        inst.OnRemoveEntity = OnRemove_light
+
+        MakeHauntableLaunch(inst)
+
+        inst.OnSave = OnSave_refracted
+        inst.OnLoad = OnLoad_refracted
+
+        -- inst.components.skinedlegion:SetOnPreLoad()
+
+        return inst
+    end, {
+        Asset("ANIM", "anim/refractedmoonlight.zip"),    --地面的动画
+        Asset("ANIM", "anim/swap_refractedmoonlight.zip"),   --手上的动画
+        Asset("ATLAS", "images/inventoryimages/refractedmoonlight.xml"),
+        Asset("IMAGE", "images/inventoryimages/refractedmoonlight.tex")
+    }, {
+        "refractedmoonlight_fx",
+        "alterguardianhatlight"
+    }
+))
 
 --------------------
 --------------------

@@ -5,8 +5,7 @@ local prefabFiles = {
     "hat_mermbreathing",        --鱼之息
     "merm_scales",              --鱼鳞
     "giantsfoot",               --巨脚背包
-    "refractedmoonlight",       --月折宝剑
-    "moonlight_legion",         --月之宝器
+    "moonlight_legion",         --月之宝具
     "moon_dungeon",             --月的地下城
 }
 

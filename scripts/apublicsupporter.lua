@@ -690,6 +690,7 @@ _G.REPAIRERS_L["insectshell_l"] = {
 
 _G.UPGRADETYPES.REVOLVED_L = "revolved_l"
 _G.UPGRADETYPES.HIDDEN_L = "hidden_l"
+_G.UPGRADETYPES.REFRACTED_L = "refracted_l"
 
 local function Fn_try_gem(doer, target, tag)
     if target:HasTag(tag) then
@@ -713,6 +714,13 @@ _G.REPAIRERS_L["yellowgem"] = {
 _G.REPAIRERS_L["bluegem"] = {
     fn_try = function(inst, doer, target, actions, right)
         return Fn_try_gem(doer, target, UPGRADETYPES.HIDDEN_L.."_upgradeable")
+    end,
+    fn_sg = Fn_sg_short,
+    fn_do = Fn_do_gem
+}
+_G.REPAIRERS_L["opalpreciousgem"] = {
+    fn_try = function(inst, doer, target, actions, right)
+        return Fn_try_gem(doer, target, UPGRADETYPES.REFRACTED_L.."_upgradeable")
     end,
     fn_sg = Fn_sg_short,
     fn_do = Fn_do_gem

@@ -1440,6 +1440,27 @@ _G.CROPS_DATA_LEGION.plantmeat = {
         self.inst:Remove()
     end
 }
+-- _G.CROPS_DATA_LEGION.berries = {
+--     growthmults = { 0.8, 1.2, 0.8, 0 }, --春x秋x
+--     regrowstage = 1,
+--     bank = "crop_legion_berries", build = "crop_legion_berries",
+--     leveldata = {
+--         { anim = "level1", time = TUNING.TOTAL_DAY_TIME*8*0.45, deadanim = "dead1", witheredprefab = nil },
+--         { anim = "level2", time = TUNING.TOTAL_DAY_TIME*8*0.55, deadanim = "dead1", witheredprefab = {"log"}, bloom = true },
+--         { anim = { "level3_1", "level3_2", "level3_3" }, time = time_grow, deadanim = "dead1", witheredprefab = {"log", "twigs"}, pickable = 1 },
+--         { anim = { "level4_1", "level4_2", "level4_3" }, time = time_day*6, deadanim = "dead1", witheredprefab = {"log", "twigs"} }
+--     },
+--     cluster_size = { 1, 1.5 },
+--     fn_loot = function(self, doer, ispicked, isburnt, loots)
+--         if self.stage == self.stage_max or self.level.pickable == 1 then
+--             self:GetBaseLoot(loots, {
+--                 doer = doer, ispicked = ispicked, isburnt = isburnt,
+--                 crop = self.stage == self.stage_max and self.cropprefab or "berries_juicy", crop_rot = "spoiled_food",
+--                 lootothers = nil
+--             })
+--         end
+--     end
+-- }
 
 ------巨食草消化结算清单
 if not _G.rawget(_G, "DIGEST_DATA_LEGION") then
