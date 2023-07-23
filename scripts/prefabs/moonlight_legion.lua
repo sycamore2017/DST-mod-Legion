@@ -1320,7 +1320,8 @@ table.insert(prefs, Prefab(
         Asset("ATLAS", "images/inventoryimages/refractedmoonlight.xml"),
         Asset("IMAGE", "images/inventoryimages/refractedmoonlight.tex")
     }, {
-        "refracted_l_spark_fx",
+        "refracted_l_spark_fx", "refracted_l_wave_fx",
+        "refracted_l_skylight_fx", "refracted_l_light_fx",
         "alterguardianhatlight"
     }
 ))

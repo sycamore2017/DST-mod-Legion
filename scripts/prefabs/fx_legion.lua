@@ -529,7 +529,7 @@ MakeFx({ --月折宝剑：月耀注入
     end,
     fn_remove = nil
 })
-MakeFx({ --月折宝剑：回血
+MakeFx({ --月折宝剑：月耀
     name = "refracted_l_light_fx",
     assets = {
         Asset("ANIM", "anim/siving_boss_caw_fx.zip"),

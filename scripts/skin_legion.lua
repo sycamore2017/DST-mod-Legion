@@ -6,6 +6,8 @@ local ischinese = _G.CONFIGS_LEGION.LANGUAGES == "chinese"
 
 table.insert(Assets, Asset("ATLAS", "images/icon_skinbar_shadow_l.xml"))
 table.insert(Assets, Asset("IMAGE", "images/icon_skinbar_shadow_l.tex"))
+table.insert(Assets, Asset("ATLAS", "images/icon_wikibar_shadow_l.xml"))
+table.insert(Assets, Asset("IMAGE", "images/icon_wikibar_shadow_l.tex"))
 table.insert(Assets, Asset("ANIM", "anim/images_minisign_skins1.zip"))
 table.insert(Assets, Asset("ANIM", "anim/images_minisign_skins2.zip"))
 table.insert(PrefabFiles, "fx_ranimbowspark")
@@ -4487,24 +4489,24 @@ end)
 --[[ 修改审视自我按钮的弹出界面，增加皮肤界面触发按钮 ]]
 --------------------------------------------------------------------------
 
-if not TheNet:IsDedicated() then
-    --离线模式不能有皮肤界面功能(因为离线模式下的klei账户ID与联网模式下的不一样)
-    if TheNet:IsOnlineMode() and _G.CONFIGS_LEGION.LANGUAGES == "chinese" then
-        -- local ImageButton = require "widgets/imagebutton"
-        -- local PlayerAvatarPopup = require "widgets/playeravatarpopup"
-        local PlayerInfoPopup = require "screens/playerinfopopupscreen"
-        local TEMPLATES = require "widgets/templates"
-        local SkinLegionDialog = require "widgets/skinlegiondialog"
+if not TheNet:IsDedicated() and _G.CONFIGS_LEGION.LANGUAGES == "chinese" then
+    -- local ImageButton = require "widgets/imagebutton"
+    -- local PlayerAvatarPopup = require "widgets/playeravatarpopup"
+    local PlayerInfoPopup = require "screens/playerinfopopupscreen"
+    local TEMPLATES = require "widgets/templates"
+    local SkinLegionDialog = require "widgets/skinlegiondialog"
 
-        -- local right_root = nil
-        -- AddClassPostConstruct("widgets/controls", function(self)
-        --     right_root = self.right_root
-        -- end)
+    -- local right_root = nil
+    -- AddClassPostConstruct("widgets/controls", function(self)
+    --     right_root = self.right_root
+    -- end)
 
-        local MakeBG_old = PlayerInfoPopup.MakeBG
-        PlayerInfoPopup.MakeBG = function(self, ...)
-            MakeBG_old(self, ...)
+    local MakeBG_old = PlayerInfoPopup.MakeBG
+    PlayerInfoPopup.MakeBG = function(self, ...)
+        MakeBG_old(self, ...)
 
+        --离线模式不能有皮肤界面功能(因为离线模式下的klei账户ID与联网模式下的不一样)
+        if TheNet:IsOnlineMode() then
             local right_root = GetRightRoot()
             if right_root == nil then
                 return
@@ -4532,8 +4534,20 @@ if not TheNet:IsDedicated() then
             self.skinshop_l_button.icon:SetScale(.6)
             self.skinshop_l_button.icon:SetPosition(-4, 6)
             self.skinshop_l_button:SetScale(0.65)
-            self.skinshop_l_button:SetPosition(246, -260)
+            self.skinshop_l_button:SetPosition(204, -260)
         end
+
+        self.wiki_l_button = self.root:AddChild(TEMPLATES.IconButton(
+            "images/icon_wikibar_shadow_l.xml", "icon_wikibar_shadow_l.tex", "棱镜百科", false, false,
+            function()
+                VisitURL("http://wap.modwikis.com/mod/mainPage?_id=645b7b5e5e00ca45b8018bc9")
+            end,
+            nil, "self_inspect_mod.tex"
+        ))
+        self.wiki_l_button.icon:SetScale(.6)
+        self.wiki_l_button.icon:SetPosition(-4, 6)
+        self.wiki_l_button:SetScale(0.65)
+        self.wiki_l_button:SetPosition(246, -260)
     end
 end
 

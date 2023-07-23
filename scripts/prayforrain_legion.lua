@@ -317,7 +317,7 @@ AddStategraphState("wilson", State{
             if fx ~= nil then
                 fx.Transform:SetPosition(inst.Transform:GetWorldPosition())
             end
-        end),
+        end)
     },
     events = {
         EventHandler("equip", function(inst) inst.sg:GoToState("idle") end),
@@ -332,73 +332,42 @@ AddStategraphState("wilson", State{
         inst.SoundEmitter:KillSound("lightstart")
     end
 })
--- AddStategraphState("wilson_client", State{
---     name = "moonsurge_l",
---     tags = { "doing", "busy", "canrotate" },
+AddStategraphState("wilson_client", State{
+    name = "moonsurge_l",
+    tags = { "doing", "busy", "canrotate" },
+    server_states = { "moonsurge_l" },
+    onenter = function(inst)
+        inst.components.locomotor:Stop()
+        -- inst.AnimState:PlayAnimation("staff_pre")
+        -- inst.AnimState:PushAnimation("staff_lag", false)
+        inst.AnimState:PlayAnimation("staff") --太拖沓了，直接不要staff_pre那部分的
 
---     onenter = function(inst)
---         -- if inst.replica.combat ~= nil then
---         --     if inst.replica.combat:InCooldown() then
---         --         inst.sg:RemoveStateTag("abouttoattack")
---         --         inst:ClearBufferedAction()
---         --         inst.sg:GoToState("idle", true)
---         --         return
---         --     end
---         -- end
-
---         local equip = inst.replica.inventory:GetEquippedItem(EQUIPSLOTS.HANDS)
---         if equip == nil or not equip:HasTag("canshieldatk") then
---             inst.sg:RemoveStateTag("abouttoattack")
---             inst:ClearBufferedAction()
---             inst.sg:GoToState("idle", true)
---             return
---         end
-
---         inst.components.locomotor:Stop()
---         local rider = inst.replica.rider
---         if rider ~= nil and rider:IsRiding() then
---             inst.AnimState:PlayAnimation("player_atk_pre")
---             inst.AnimState:PushAnimation("player_atk", false)
---         else
---             inst.AnimState:PlayAnimation("toolpunch")
---         end
---         inst.SoundEmitter:PlaySound("dontstarve/wilson/attack_weapon", nil, nil, true)
---         inst.sg:SetTimeout(13 * FRAMES)
-
---         local buffaction = inst:GetBufferedAction()
---         if buffaction ~= nil then
---             inst:PerformPreviewBufferedAction()
-
---             if buffaction.target ~= nil then
---                 inst:ForceFacePoint(buffaction.target.Transform:GetWorldPosition())
---             elseif buffaction.pos ~= nil then
---                 inst:ForceFacePoint(buffaction:GetActionPoint():Get())
---             end
---         end
---     end,
-
---     timeline ={
---         TimeEvent(8 * FRAMES, function(inst)
---             inst:ClearBufferedAction()
---             inst.sg:RemoveStateTag("abouttoattack")
---         end)
---     },
-
---     ontimeout = function(inst)
---         -- inst.sg:RemoveStateTag("atk_shield")
---         inst.sg:AddStateTag("idle")
---     end,
-
---     events = {
---         EventHandler("animqueueover", function(inst)
---             if inst.AnimState:AnimDone() then
---                 inst.sg:GoToState("idle")
---             end
---         end),
---     },
-
---     -- onexit = nil
--- })
+        inst:PerformPreviewBufferedAction()
+        inst.sg:SetTimeout(2)
+    end,
+    onupdate = function(inst)
+        if inst.sg:ServerStateMatches() then
+            if inst.entity:FlattenMovementPrediction() then
+                inst.sg:GoToState("idle", "noanim")
+            end
+        elseif inst.bufferedaction == nil then
+            inst.sg:GoToState("idle")
+        end
+    end,
+    ontimeout = function(inst)
+        inst:ClearBufferedAction()
+        inst.sg:GoToState("idle")
+    end,
+    timeline = {
+        TimeEvent(21 * FRAMES, function(inst)
+            inst.AnimState:SetFrame(47) --施法动画太长了，直接跳过拖沓的部分
+        end),
+        TimeEvent(29 * FRAMES, function(inst)
+            inst.sg:RemoveStateTag("busy")
+            inst.sg:AddStateTag("idle")
+        end)
+    }
+})
 
 local MOONSURGE_L = Action({ priority = 5, mount_valid = true })
 MOONSURGE_L.id = "MOONSURGE_L"
@@ -428,4 +397,4 @@ AddComponentAction("EQUIPPED", "z_refractedmoonlight", function(inst, doer, targ
 end)
 
 AddStategraphActionHandler("wilson", ActionHandler(ACTIONS.MOONSURGE_L, "moonsurge_l"))
--- AddStategraphActionHandler("wilson_client", ActionHandler(ACTIONS.MOONSURGE_L, "moonsurge_l"))
+AddStategraphActionHandler("wilson_client", ActionHandler(ACTIONS.MOONSURGE_L, "moonsurge_l"))
