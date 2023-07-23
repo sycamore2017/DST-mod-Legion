@@ -207,7 +207,7 @@ INTOSHEATH_L.fn = function(act)
     local obj = act.target or act.invobject
     if
         obj ~= nil and
-        obj.components.emptyscabbard ~= nil and obj.components.trader ~= nil and
+        obj.components.z_emptyscabbard ~= nil and obj.components.trader ~= nil and
         act.doer.components.inventory ~= nil
     then
         local sword = act.doer.components.inventory:GetEquippedItem(EQUIPSLOTS.HANDS)
@@ -222,10 +222,10 @@ INTOSHEATH_L.fn = function(act)
 end
 AddAction(INTOSHEATH_L)
 
-AddComponentAction("INVENTORY", "emptyscabbard", function(inst, doer, actions, right)
+AddComponentAction("INVENTORY", "z_emptyscabbard", function(inst, doer, actions, right)
     table.insert(actions, ACTIONS.INTOSHEATH_L)
 end)
-AddComponentAction("SCENE", "emptyscabbard", function(inst, doer, actions, right)
+AddComponentAction("SCENE", "z_emptyscabbard", function(inst, doer, actions, right)
     if right then
         table.insert(actions, ACTIONS.INTOSHEATH_L)
     end

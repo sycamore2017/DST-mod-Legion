@@ -757,7 +757,7 @@ if IsServer then
     for k,v in pairs(REPAIRERS_L) do
         if not v.noapiset then
             AddPrefabPostInit(k, function(inst)
-                inst:AddComponent("repairerlegion")
+                inst:AddComponent("z_repairerlegion")
             end)
         end
     end
@@ -785,7 +785,7 @@ REPAIR_LEGION.fn = function(act)
 end
 AddAction(REPAIR_LEGION)
 
-AddComponentAction("USEITEM", "repairerlegion", function(inst, doer, target, actions, right)
+AddComponentAction("USEITEM", "z_repairerlegion", function(inst, doer, target, actions, right)
     if right and REPAIRERS_L[inst.prefab] and REPAIRERS_L[inst.prefab].fn_try(inst, doer, target, actions, right) then
         table.insert(actions, ACTIONS.REPAIR_LEGION)
     end

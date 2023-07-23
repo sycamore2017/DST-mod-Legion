@@ -89,7 +89,7 @@ local function Fn_shell()
     inst.components.inventoryitem.imagename = "insectshell_l"
     inst.components.inventoryitem.atlasname = "images/inventoryimages/insectshell_l.xml"
 
-    inst:AddComponent("repairerlegion")
+    inst:AddComponent("z_repairerlegion")
 
     return inst
 end

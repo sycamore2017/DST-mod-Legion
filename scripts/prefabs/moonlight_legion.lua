@@ -920,18 +920,18 @@ local bonus_rf_buff = 1.2
 local count_rf_max = 4
 
 local function SetCount_refracted(inst, value)
-    inst._count = math.clamp(value, 0, count_rf_max)
-    if inst._count >= count_rf_max then
-        if inst.components.perishable == nil then
-            inst:AddComponent("perishable")
-            inst.components.perishable:SetPerishTime(TUNING.PERISH_FAST)
-            inst:AddTag("show_spoilage")
-        end
+    value = math.clamp(value, 0, count_rf_max)
+    inst._count = value
+    inst:PushEvent("percentusedchange", { percent = value/count_rf_max }) --界面需要一个百分比
+    if value >= 1 then
+        inst:AddTag("canmoonsurge_l")
+        inst:RemoveTag("cansurge_l")
+    elseif value > 0 then
+        inst:RemoveTag("canmoonsurge_l")
+        inst:AddTag("cansurge_l")
     else
-        if inst.components.perishable ~= nil then
-            inst:RemoveComponent("perishable")
-            inst:RemoveTag("show_spoilage")
-        end
+        inst:RemoveTag("canmoonsurge_l")
+        inst:RemoveTag("cansurge_l")
     end
 end
 local function SetAtk_refracted(inst)
@@ -940,7 +940,7 @@ local function SetAtk_refracted(inst)
 end
 local function SetLight_refracted(inst)
     if inst._lvl >= 4 then
-        inst._light.Light:SetRadius(inst._task_fx == nil and 1 or 3)
+        inst._light.Light:SetRadius(inst._task_fx == nil and 1 or 4)
         inst._light.Light:Enable(true)
     else
         inst._light.Light:Enable(false)
@@ -974,15 +974,35 @@ end
 local function TriggerRevolt(inst, doer, doit)
     if doit then
         if inst._task_fx == nil then
-            inst._task_fx = inst:DoPeriodicTask(0.21, function(inst)
-                local fx = SpawnPrefab(inst._dd.fx or "refractedmoonlight_fx")
-                fx.Transform:SetPosition((inst.components.inventoryitem:GetGrandOwner() or inst).Transform:GetWorldPosition())
+            inst._task_fx = inst:DoPeriodicTask(0.7, function(inst)
+                local owner = inst.components.inventoryitem:GetGrandOwner() or inst
+                if owner:IsAsleep() then
+                    return
+                end
+
+                local fx = SpawnPrefab(inst._dd.fx or "refracted_l_spark_fx")
+                if fx ~= nil then
+                    if not owner:HasTag("player") then
+                        local xx, yy, zz = owner.Transform:GetWorldPosition()
+                        fx.Transform:SetPosition(xx, yy+1.4, zz)
+                        -- local x, y, z = TOOLS_L.GetCalculatedPos(xx, yy, zz, 0.1+math.random()*0.9, nil)
+                        -- fx.Transform:SetPosition(x, y+math.random()*2, z)
+                        return
+                    end
+                    fx.entity:SetParent(owner.entity)
+                    if inst._equip_l then
+                        fx.entity:AddFollower()
+                        fx.Follower:FollowSymbol(owner.GUID, "swap_object", 10, -80, 0)
+                    else
+                        fx.Transform:SetPosition(0, 1.4, 0)
+                    end
+                end
             end, 0)
         end
 
         inst._atk = atk_rf_buff
         inst._atk_sp = atk2_rf_buff
-        inst.components.damagetypebonus:AddBonus("shadow_aligned", inst, bonus_rf_buff, "revolt")
+        inst.components.damagetypebonus:AddBonus("shadow_aligned", inst, bonus_rf_buff, "moonsurge")
 
         if inst._lvl >= 8 then
             inst.components.weapon:SetRange(1.5)
@@ -997,7 +1017,7 @@ local function TriggerRevolt(inst, doer, doit)
 
         inst._atk = atk_rf
         inst._atk_sp = atk2_rf
-        inst.components.damagetypebonus:RemoveBonus("shadow_aligned", inst, "revolt")
+        inst.components.damagetypebonus:RemoveBonus("shadow_aligned", inst, "moonsurge")
 
         inst.components.weapon:SetRange(0)
 
@@ -1006,25 +1026,25 @@ local function TriggerRevolt(inst, doer, doit)
     SetAtk_refracted(inst)
     SetLight_refracted(inst)
 end
-local function TryRevolt(inst, doer)
+local function TryRevolt_refracted(inst, doer)
     if doer == nil then
         doer = inst.components.inventoryitem:GetGrandOwner()
     end
     if inst._count <= 0 then
-        return
+        return 0
     elseif inst._count < 1 then
         if doer and doer.components.health and doer.components.health:GetPercent() < 1 then
             doer.components.health:DoDelta(20*inst._count, true, "debug_key", true, nil, true) --对旺达回血要特定原因才行
             SetCount_refracted(inst, 0)
         end
-        return
+        return 1
     else
         SetCount_refracted(inst, inst._count - 1)
     end
 
     local time = 60
     if inst._lvl >= 14 then
-        local timeleft = inst.components.timer:GetTimeLeft("revolt") or 0
+        local timeleft = inst.components.timer:GetTimeLeft("moonsurge") or 0
         if timeleft > 0 then
             time = math.min(time + timeleft, 360)
         end
@@ -1033,29 +1053,37 @@ local function TryRevolt(inst, doer)
             time = 30
         end
     end
-    inst.components.timer:StopTimer("revolt")
-    inst.components.timer:StartTimer("revolt", time)
+    inst.components.timer:StopTimer("moonsurge")
+    inst.components.timer:StartTimer("moonsurge", time)
     TriggerRevolt(inst, doer, true)
+
+    return 2
 end
 
 local function OnEquip_refracted(inst, owner) --装备武器时
     owner.AnimState:OverrideSymbol("swap_object", inst._dd.build,
-        inst.components.timer:TimerExists("revolt") and "swap_refractedmoonlight" or "swap_refractedmoonlight")
+        inst.components.timer:TimerExists("moonsurge") and "swap_refractedmoonlight" or "swap_refractedmoonlight")
     owner.AnimState:Show("ARM_carry") --显示持物手
     owner.AnimState:Hide("ARM_normal") --隐藏普通的手
+    inst._equip_l = true
 
     if owner:HasTag("equipmentmodel") then --假人！
         return
     end
 
     owner:ListenForEvent("healthdelta", inst.fn_onHealthDelta)
+    inst:ListenForEvent("attacked", inst.fn_onAttacked, owner)
     inst.fn_onHealthDelta(owner, nil)
+    inst:DoTaskInTime(0, function() --需要主动更新一下，不然没反应
+        inst:PushEvent("percentusedchange", { percent = inst._count/count_rf_max })
+    end)
 end
 local function OnUnequip_refracted(inst, owner) --卸下武器时
     owner.AnimState:Hide("ARM_carry") --隐藏持物手
     owner.AnimState:Show("ARM_normal") --显示普通的手
-
+    inst._equip_l = nil
     owner:RemoveEventCallback("healthdelta", inst.fn_onHealthDelta)
+    inst:RemoveEventCallback("attacked", inst.fn_onAttacked, owner)
     if inst._atkmult == atkmult_rf_hurt then
         inst.fn_onHealthDelta(owner, { newpercent = 1 }) --卸下时，恢复武器默认攻击力，为了让巨人之脚识别到
     end
@@ -1103,10 +1131,10 @@ local function OnStageUp_refracted(inst)
         inst._atk_lvl = 0
         inst._atk_sp_lvl = 0
     end
-    TriggerRevolt(inst, nil, inst._task_fx ~= nil or inst.components.timer:TimerExists("revolt"))
+    TriggerRevolt(inst, nil, inst._task_fx ~= nil or inst.components.timer:TimerExists("moonsurge"))
 end
 local function TimerDone_refracted(inst, data)
-    if data.name == "revolt" then
+    if data.name == "moonsurge" then
         TriggerRevolt(inst, nil, false)
     end
 end
@@ -1198,8 +1226,9 @@ table.insert(prefs, Prefab(
         inst._dd = {
             img_tex = "refractedmoonlight", img_atlas = "images/inventoryimages/refractedmoonlight.xml",
             img_tex2 = "refractedmoonlight", img_atlas2 = "images/inventoryimages/refractedmoonlight.xml",
-            build = "swap_refractedmoonlight", fx = "refractedmoonlight_fx"
+            build = "swap_refractedmoonlight", fx = "refracted_l_spark_fx"
         }
+        inst._equip_l = nil
         inst._task_fx = nil
         inst._atk = atk_rf
         inst._atk_sp = atk2_rf
@@ -1224,10 +1253,16 @@ table.insert(prefs, Prefab(
             end
             SetAtk_refracted(inst)
         end
+        inst.fn_onAttacked = function(owner, data)
+            if inst._count > 0 then
+                SetCount_refracted(inst, inst._count - 0.5)
+            end
+        end
+        inst.fn_tryRevolt = TryRevolt_refracted
 
         inst:AddComponent("inspectable")
 
-        inst:AddComponent("refractedmoonlight") --进入buff状态的必要组件
+        inst:AddComponent("z_refractedmoonlight")
 
         inst:AddComponent("inventoryitem")
         inst.components.inventoryitem.imagename = "refractedmoonlight"
@@ -1258,8 +1293,7 @@ table.insert(prefs, Prefab(
         inst:AddComponent("timer")
         inst:ListenForEvent("timerdone", TimerDone_refracted)
 
-        -- inst:AddComponent("rechargeable") --这个组件不够完善，没法手动暂停
-        -- inst.components.rechargeable.OnUpdate = function(self, dt)end
+        inst:PushEvent("percentusedchange", { percent = 0 })
 
         inst._light = SpawnPrefab("alterguardianhatlight")
         -- inst._light.Light:SetRadius(0.25)
@@ -1286,7 +1320,7 @@ table.insert(prefs, Prefab(
         Asset("ATLAS", "images/inventoryimages/refractedmoonlight.xml"),
         Asset("IMAGE", "images/inventoryimages/refractedmoonlight.tex")
     }, {
-        "refractedmoonlight_fx",
+        "refracted_l_spark_fx",
         "alterguardianhatlight"
     }
 ))

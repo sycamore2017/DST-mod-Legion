@@ -274,3 +274,158 @@ end)
 --         end
 --     end)
 -- )
+
+--------------------------------------------------------------------------
+--[[ 月折宝剑的动作 ]]
+--------------------------------------------------------------------------
+
+AddStategraphState("wilson", State{
+    name = "moonsurge_l",
+    tags = { "doing", "busy", "canrotate" },
+    onenter = function(inst)
+        local equip = inst.components.inventory:GetEquippedItem(EQUIPSLOTS.HANDS)
+        if equip == nil or not (equip:HasTag("canmoonsurge_l") or equip:HasTag("cansurge_l")) then
+            inst:ClearBufferedAction()
+            inst.sg:GoToState("idle", true)
+            return
+        end
+
+        -- inst.AnimState:PlayAnimation("staff_pre")
+        -- inst.AnimState:PushAnimation("staff", false)
+        inst.AnimState:PlayAnimation("staff") --太拖沓了，直接不要staff_pre那部分的
+        inst.components.locomotor:Stop()
+        inst.SoundEmitter:PlaySound("moonstorm/creatures/boss/alterguardian3/atk_beam", "lightstart", 0.3)
+
+        local fx_skylight = SpawnPrefab(equip:HasTag("canmoonsurge_l") and "refracted_l_skylight_fx" or "refracted_l_light_fx")
+        if fx_skylight ~= nil then
+            fx_skylight.Transform:SetPosition(inst.Transform:GetWorldPosition())
+        end
+    end,
+    timeline = {
+        TimeEvent(21 * FRAMES, function(inst)
+            inst.AnimState:SetFrame(47) --施法动画太长了，直接跳过拖沓的部分
+        end),
+        TimeEvent(25 * FRAMES, function(inst)
+            inst.SoundEmitter:PlaySound("dontstarve/common/together/moonbase/beam_stop", nil, 0.4)
+            inst.SoundEmitter:KillSound("lightstart")
+        end),
+        TimeEvent(29 * FRAMES, function(inst)
+            inst:PerformBufferedAction()
+            inst.sg:RemoveStateTag("busy")
+            inst.sg:AddStateTag("idle")
+            local fx = SpawnPrefab("refracted_l_wave_fx")
+            if fx ~= nil then
+                fx.Transform:SetPosition(inst.Transform:GetWorldPosition())
+            end
+        end),
+    },
+    events = {
+        EventHandler("equip", function(inst) inst.sg:GoToState("idle") end),
+        EventHandler("unequip", function(inst) inst.sg:GoToState("idle") end),
+        EventHandler("animqueueover", function(inst)
+            if inst.AnimState:AnimDone() then
+                inst.sg:GoToState("idle")
+            end
+        end)
+    },
+    onexit = function(inst)
+        inst.SoundEmitter:KillSound("lightstart")
+    end
+})
+-- AddStategraphState("wilson_client", State{
+--     name = "moonsurge_l",
+--     tags = { "doing", "busy", "canrotate" },
+
+--     onenter = function(inst)
+--         -- if inst.replica.combat ~= nil then
+--         --     if inst.replica.combat:InCooldown() then
+--         --         inst.sg:RemoveStateTag("abouttoattack")
+--         --         inst:ClearBufferedAction()
+--         --         inst.sg:GoToState("idle", true)
+--         --         return
+--         --     end
+--         -- end
+
+--         local equip = inst.replica.inventory:GetEquippedItem(EQUIPSLOTS.HANDS)
+--         if equip == nil or not equip:HasTag("canshieldatk") then
+--             inst.sg:RemoveStateTag("abouttoattack")
+--             inst:ClearBufferedAction()
+--             inst.sg:GoToState("idle", true)
+--             return
+--         end
+
+--         inst.components.locomotor:Stop()
+--         local rider = inst.replica.rider
+--         if rider ~= nil and rider:IsRiding() then
+--             inst.AnimState:PlayAnimation("player_atk_pre")
+--             inst.AnimState:PushAnimation("player_atk", false)
+--         else
+--             inst.AnimState:PlayAnimation("toolpunch")
+--         end
+--         inst.SoundEmitter:PlaySound("dontstarve/wilson/attack_weapon", nil, nil, true)
+--         inst.sg:SetTimeout(13 * FRAMES)
+
+--         local buffaction = inst:GetBufferedAction()
+--         if buffaction ~= nil then
+--             inst:PerformPreviewBufferedAction()
+
+--             if buffaction.target ~= nil then
+--                 inst:ForceFacePoint(buffaction.target.Transform:GetWorldPosition())
+--             elseif buffaction.pos ~= nil then
+--                 inst:ForceFacePoint(buffaction:GetActionPoint():Get())
+--             end
+--         end
+--     end,
+
+--     timeline ={
+--         TimeEvent(8 * FRAMES, function(inst)
+--             inst:ClearBufferedAction()
+--             inst.sg:RemoveStateTag("abouttoattack")
+--         end)
+--     },
+
+--     ontimeout = function(inst)
+--         -- inst.sg:RemoveStateTag("atk_shield")
+--         inst.sg:AddStateTag("idle")
+--     end,
+
+--     events = {
+--         EventHandler("animqueueover", function(inst)
+--             if inst.AnimState:AnimDone() then
+--                 inst.sg:GoToState("idle")
+--             end
+--         end),
+--     },
+
+--     -- onexit = nil
+-- })
+
+local MOONSURGE_L = Action({ priority = 5, mount_valid = true })
+MOONSURGE_L.id = "MOONSURGE_L"
+MOONSURGE_L.str = STRINGS.ACTIONS.MOONSURGE_L
+MOONSURGE_L.strfn = function(act)
+    if act.invobject ~= nil and act.invobject:HasTag("canmoonsurge_l") then
+        return "GENERIC"
+    end
+    return "LACK"
+end
+MOONSURGE_L.fn = function(act)
+    if act.invobject ~= nil and act.invobject.fn_tryRevolt ~= nil then
+        act.invobject.fn_tryRevolt(act.invobject, act.doer)
+    end
+    return true
+end
+AddAction(MOONSURGE_L)
+
+AddComponentAction("EQUIPPED", "z_refractedmoonlight", function(inst, doer, target, actions, right)
+    if
+        right and
+        doer == target and --对自己使用
+        (inst:HasTag("canmoonsurge_l") or inst:HasTag("cansurge_l"))
+    then
+        table.insert(actions, ACTIONS.MOONSURGE_L)
+    end
+end)
+
+AddStategraphActionHandler("wilson", ActionHandler(ACTIONS.MOONSURGE_L, "moonsurge_l"))
+-- AddStategraphActionHandler("wilson_client", ActionHandler(ACTIONS.MOONSURGE_L, "moonsurge_l"))

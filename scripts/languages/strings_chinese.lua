@@ -3579,6 +3579,7 @@ local SURVIVAL_TIPS = { --介绍探险技巧
     "小时候奶奶经常跟我说，雨蝇是益虫，逝去时会导致下雨。至今，我都记着她这句话。",
     "作物总是产生烦人的害虫，整天跟着我嗡嗡嗡嗡，还咬我。我受不了了，我一定要找到消灭它们的办法。今天我就把话撂在这儿了……",
     "靠背熊真是太可爱了，恨不得天天撸它的毛，而且它还特别喜欢趴我背上。虽然在背上时我看不到它在干嘛，但是非常温暖。诶？我的曼德拉草汤和冰激凌去哪了……",
+    "巨食草胃口特大，还什么都吃，而且不知道是我的错觉还是哪样，在我的投喂下，它体型越来越大了。"
 }
 local LORE_TIPS = { --介绍故事背景
     "传言一位女巫在沙漠里隐居，也许有天我能找到她，听她娓娓道来那悲惨的故事。",
@@ -3967,3 +3968,8 @@ S______GENERIC.ACTIONFAIL.REMOVE_CARPET_L = {
 -- S_________WURT.ACTIONFAIL.REMOVE_CARPET_L = ""
 -- S_______WALTER.ACTIONFAIL.REMOVE_CARPET_L = ""
 -- S________WANDA.ACTIONFAIL.REMOVE_CARPET_L = ""
+
+STRINGS.ACTIONS.MOONSURGE_L = {
+    GENERIC = "月耀涌动",
+    LACK = "涌动"
+}

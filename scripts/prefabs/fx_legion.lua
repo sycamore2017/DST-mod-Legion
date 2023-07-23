@@ -492,11 +492,11 @@ MakeFx({ --糖霜法棍：燃血
     fn_remove = nil,
 })
 
-MakeFx({ --月折宝剑：凝血
-    name = "refractedmoonlight_fx",
+MakeFx({ --月折宝剑：涌动
+    name = "refracted_l_wave_fx",
     assets = {
         Asset("ANIM", "anim/lavaarena_boarrior_fx.zip"),    --需要官方的动画模板
-        Asset("ANIM", "anim/refractedmoonlight_fx.zip"),
+        Asset("ANIM", "anim/refractedmoonlight_fx.zip")
     },
     fn_common = nil,
     fn_anim = function(inst)
@@ -504,9 +504,69 @@ MakeFx({ --月折宝剑：凝血
         inst.AnimState:SetBuild("refractedmoonlight_fx")
         inst.AnimState:PlayAnimation("ground_hit_1")
         inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
+        inst.AnimState:SetScale(1.5, 1.5)
         inst.AnimState:SetFinalOffset(1)
     end,
     fn_remove = nil,
+})
+MakeFx({ --月折宝剑：月耀注入
+    name = "refracted_l_skylight_fx",
+    assets = {
+        Asset("ANIM", "anim/siving_boss_caw_fx.zip"),
+        Asset("ANIM", "anim/alterguardian_meteor.zip") --官方月晶石陷阱动画模板
+    },
+    fn_common = nil,
+    fn_anim = function(inst)
+        inst.AnimState:SetBank("alterguardian_meteor")
+        inst.AnimState:SetBuild("siving_boss_caw_fx")
+        inst.AnimState:PlayAnimation("meteor_pre")
+        inst.AnimState:OverrideSymbol("fx_skybeam", "alterguardian_meteor", "fx_skybeam")
+        inst.AnimState:OverrideSymbol("fx_beam", "alterguardian_meteor", "fx_beam")
+        inst.AnimState:OverrideSymbol("blue_splode", "alterguardian_meteor", "blue_splode")
+        inst.AnimState:SetScale(0.8, 0.8)
+        inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
+        inst.AnimState:SetFinalOffset(2)
+    end,
+    fn_remove = nil
+})
+MakeFx({ --月折宝剑：回血
+    name = "refracted_l_light_fx",
+    assets = {
+        Asset("ANIM", "anim/siving_boss_caw_fx.zip"),
+        Asset("ANIM", "anim/alterguardian_meteor.zip") --官方月晶石陷阱动画模板
+    },
+    fn_common = nil,
+    fn_anim = function(inst)
+        inst.AnimState:SetBank("alterguardian_meteor")
+        inst.AnimState:SetBuild("siving_boss_caw_fx")
+        inst.AnimState:PlayAnimation("meteor_pre")
+        -- inst.AnimState:OverrideSymbol("fx_skybeam", "alterguardian_meteor", "fx_skybeam")
+        inst.AnimState:OverrideSymbol("fx_beam", "alterguardian_meteor", "fx_beam")
+        -- inst.AnimState:OverrideSymbol("blue_splode", "alterguardian_meteor", "blue_splode")
+        inst.AnimState:SetScale(0.8, 0.8)
+        inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
+        inst.AnimState:SetFinalOffset(2)
+    end,
+    fn_remove = nil
+})
+MakeFx({ --月折宝剑：闪闪月耀
+    name = "refracted_l_spark_fx",
+    assets = {
+        Asset("ANIM", "anim/siving_boss_caw_fx.zip"),
+        Asset("ANIM", "anim/alterguardian_meteor.zip") --官方月晶石陷阱动画模板
+    },
+    fn_common = nil,
+    fn_anim = function(inst)
+        inst.AnimState:SetBank("alterguardian_meteor")
+        inst.AnimState:SetBuild("siving_boss_caw_fx")
+        inst.AnimState:PlayAnimation("meteorground_pre")
+        inst.AnimState:PushAnimation("meteorground_loop", false)
+        inst.AnimState:SetScale(0.4, 0.4)
+        inst.AnimState:SetMultColour(131/255, 250/255, 230/255, 0.7)
+        inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
+        inst.AnimState:SetFinalOffset(2)
+    end,
+    fn_remove = nil
 })
 MakeFx({ --月轮宝盘：光韵特效
     name = "revolvedmoonlight_fx",

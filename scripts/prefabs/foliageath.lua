@@ -85,7 +85,7 @@ local function fn()
     inst.components.trader.deleteitemonaccept = false --交易时不自动删除
     inst.components.trader.acceptnontradable = true --可以交易无交易组件的物品
 
-    inst:AddComponent("emptyscabbard")
+    inst:AddComponent("z_emptyscabbard")
 
     inst:AddComponent("fuel")
     inst.components.fuel.fuelvalue = TUNING.LARGE_FUEL

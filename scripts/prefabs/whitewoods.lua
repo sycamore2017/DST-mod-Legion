@@ -377,7 +377,7 @@ local function Fn_mat_item()
     inst.components.inventoryitem.imagename = "mat_whitewood_item"
     inst.components.inventoryitem.atlasname = "images/inventoryimages/mat_whitewood_item.xml"
 
-    inst:AddComponent("repairerlegion")
+    inst:AddComponent("z_repairerlegion")
 
     inst:AddComponent("edible")
     inst.components.edible.foodtype = FOODTYPE.WOOD
