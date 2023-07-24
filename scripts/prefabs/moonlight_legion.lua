@@ -60,20 +60,29 @@ local function MakeItem(sets)
         return inst
     end, sets.assets, sets.prefabs))
 end
-
 local function DropGems(inst, gemname)
     local numgems = inst.components.upgradeable:GetStage() - 1
     if numgems > 0 then
         TOOLS_L.SpawnStackDrop(gemname, numgems, inst:GetPosition())
     end
 end
-
 local function OnUpgradeFn(inst, doer, item)
     (inst.SoundEmitter or doer.SoundEmitter):PlaySound("dontstarve/common/telebase_gemplace")
 end
-
 local function OnRemove_light(inst)
     inst._light:Remove()
+end
+local function DisplayName(inst)
+    local namepre = inst.nameoverride or inst.prefab
+	namepre = STRINGS.NAMES[string.upper(namepre or "hiddenmoonlight")] or "Something"
+	local lvl = inst._lvl_l:value()
+	if lvl ~= nil and lvl > 0 then
+		namepre = namepre.."(Lv."..tostring(lvl)..")"
+	end
+	return namepre
+end
+local function SetLevel(inst)
+    inst._lvl_l:set(inst.components.upgradeable:GetStage() - 1)
 end
 
 --------------------------------------------------------------------------
@@ -237,6 +246,21 @@ local function SetPerishRate_hidden(inst, item)
     end
     return 0.3
 end
+local function OnSave_hidden(inst, data)
+	if inst.upgradetarget ~= "icebox" then
+        data.upgradetarget = inst.upgradetarget
+    end
+end
+local function OnLoad_hidden(inst, data)
+	if data ~= nil then
+        if data.upgradetarget ~= nil then
+            SetTarget_hidden(inst, data.upgradetarget)
+        end
+    end
+    inst:DoTaskInTime(0.4, function(inst)
+        SetLevel(inst)
+    end)
+end
 
 table.insert(prefs, Prefab("hiddenmoonlight", function()
     local inst = CreateEntity()
@@ -252,11 +276,15 @@ table.insert(prefs, Prefab("hiddenmoonlight", function()
     inst:AddTag("structure")
     inst:AddTag("fridge") --加了该标签，就能给热能石降温啦
     inst:AddTag("meteor_protection") --防止被流星破坏
+    inst:AddTag("moontreasure_l")
 
     inst.AnimState:SetBank("hiddenmoonlight")
     inst.AnimState:SetBuild("hiddenmoonlight")
     inst.AnimState:PlayAnimation("closed", true)
     TOOLS_L.MakeSnowCovered_comm(inst)
+
+    inst._lvl_l = net_byte(inst.GUID, "moonlight_l._lvl_l", "lvl_l_dirty")
+    inst.displaynamefn = DisplayName
 
     inst.entity:SetPristine()
     if not TheWorld.ismastersim then
@@ -318,7 +346,7 @@ table.insert(prefs, Prefab("hiddenmoonlight", function()
     inst:AddComponent("upgradeable")
     inst.components.upgradeable.upgradetype = UPGRADETYPES.HIDDEN_L
     inst.components.upgradeable.onupgradefn = OnUpgradeFn
-    -- inst.components.upgradeable.onstageadvancefn = function(inst)end
+    inst.components.upgradeable.onstageadvancefn = SetLevel
     inst.components.upgradeable.numstages = times_hidden + 1
     inst.components.upgradeable.upgradesperstage = 1
 
@@ -330,18 +358,8 @@ table.insert(prefs, Prefab("hiddenmoonlight", function()
         inst.AnimState:SetTime(math.random() * inst.AnimState:GetCurrentAnimationLength())
     end)
 
-    inst.OnSave = function(inst, data)
-        if inst.upgradetarget ~= "icebox" then
-            data.upgradetarget = inst.upgradetarget
-        end
-    end
-    inst.OnLoad = function(inst, data)
-        if data ~= nil then
-            if data.upgradetarget ~= nil then
-                SetTarget_hidden(inst, data.upgradetarget)
-            end
-        end
-    end
+    inst.OnSave = OnSave_hidden
+    inst.OnLoad = OnLoad_hidden
 
     if TUNING.SMART_SIGN_DRAW_ENABLE then
 		SMART_SIGN_DRAW(inst)
@@ -735,6 +753,18 @@ local function OnOwnerChange(inst)
     end
 end
 
+local function OnStageUp_revolved(inst)
+    inst.components.rechargeable:SetPercent(1) --每次升级，重置冷却时间
+    ResetRadius(inst, nil)
+    SetLevel(inst)
+end
+local function OnLoad_revolved(inst, data) --由于 upgradeable 组件不会自己重新初始化，只能这里再初始化
+	inst:DoTaskInTime(0.5, function(inst)
+        ResetRadius(inst, nil)
+        SetLevel(inst)
+    end)
+end
+
 local function MakeRevolved(sets)
     table.insert(prefs, Prefab(sets.name, function()
         local inst = CreateEntity()
@@ -759,6 +789,10 @@ local function MakeRevolved(sets)
         --因为有容器组件，所以不会被猴子、食人花、坎普斯等拿走
         inst:AddTag("nosteal") --防止被火药猴偷走
         inst:AddTag("NORATCHECK") --mod兼容：永不妥协。该道具不算鼠潮分
+        inst:AddTag("moontreasure_l")
+
+        inst._lvl_l = net_byte(inst.GUID, "moonlight_l._lvl_l", "lvl_l_dirty")
+		inst.displaynamefn = DisplayName
 
         inst:AddComponent("skinedlegion")
         inst.components.skinedlegion:InitWithFloater(sets.name)
@@ -836,21 +870,14 @@ local function MakeRevolved(sets)
         inst:AddComponent("upgradeable")
         inst.components.upgradeable.upgradetype = UPGRADETYPES.REVOLVED_L
         inst.components.upgradeable.onupgradefn = OnUpgradeFn
-        inst.components.upgradeable.onstageadvancefn = function(inst)
-            inst.components.rechargeable:SetPercent(1) --每次升级，重置冷却时间
-            ResetRadius(inst, nil)
-        end
+        inst.components.upgradeable.onstageadvancefn = OnStageUp_revolved
         inst.components.upgradeable.numstages = sets.ispro and times_revolved_pro or times_revolved
         inst.components.upgradeable.upgradesperstage = 1
 
         inst:AddComponent("rechargeable")
         -- inst.components.rechargeable:SetOnChargedFn(function(inst)end)
 
-        inst.OnLoad = function(inst, data) --由于 upgradeable 组件不会自己重新初始化，只能这里再初始化
-            inst:DoTaskInTime(0.5, function(inst)
-                ResetRadius(inst, nil)
-            end)
-        end
+        inst.OnLoad = OnLoad_revolved
 
         --Create light
         inst._light = SpawnPrefab("heatrocklight")
@@ -1106,6 +1133,7 @@ end
 local function OnStageUp_refracted(inst)
     local lvl = inst.components.upgradeable:GetStage() - 1
     inst._lvl = lvl
+    inst._lvl_l:set(lvl)
     if lvl >= 13 then
         inst._atk_lvl = 40
         inst._atk_sp_lvl = 30
@@ -1188,143 +1216,144 @@ local function OnLoad_refracted(inst, data)
     end)
 end
 
-table.insert(prefs, Prefab(
-    "refractedmoonlight",
-    function()
-        local inst = CreateEntity()
+table.insert(prefs, Prefab("refractedmoonlight", function()
+    local inst = CreateEntity()
 
-        inst.entity:AddTransform()
-        inst.entity:AddAnimState()
-        inst.entity:AddMiniMapEntity() --要在小地图上显示的话，记得加这句
-        inst.entity:AddNetwork()
+    inst.entity:AddTransform()
+    inst.entity:AddAnimState()
+    inst.entity:AddMiniMapEntity() --要在小地图上显示的话，记得加这句
+    inst.entity:AddNetwork()
 
-        MakeInventoryPhysics(inst)
+    MakeInventoryPhysics(inst)
 
-        inst.AnimState:SetBank("refractedmoonlight")
-        inst.AnimState:SetBuild("refractedmoonlight")
-        inst.AnimState:PlayAnimation("idle_loop", true)
+    inst.AnimState:SetBank("refractedmoonlight")
+    inst.AnimState:SetBuild("refractedmoonlight")
+    inst.AnimState:PlayAnimation("idle_loop", true)
 
-        inst:AddTag("sharp") --武器的标签跟攻击方式跟攻击音效有关 没有特殊的话就用这两个
-        inst:AddTag("pointy")
-        inst:AddTag("irreplaceable") --防止被猴子、食人花、坎普斯等拿走，防止被流星破坏，并使其下线时会自动掉落
-        inst:AddTag("nonpotatable") --这个貌似是？
-        inst:AddTag("NORATCHECK") --mod兼容：永不妥协。该道具不算鼠潮分
+    inst:AddTag("sharp") --武器的标签跟攻击方式跟攻击音效有关 没有特殊的话就用这两个
+    inst:AddTag("pointy")
+    inst:AddTag("irreplaceable") --防止被猴子、食人花、坎普斯等拿走，防止被流星破坏，并使其下线时会自动掉落
+    inst:AddTag("nonpotatable") --这个貌似是？
+    inst:AddTag("NORATCHECK") --mod兼容：永不妥协。该道具不算鼠潮分
+    inst:AddTag("moontreasure_l")
 
-        --weapon (from weapon component) added to pristine state for optimization
-        inst:AddTag("weapon")
+    --weapon (from weapon component) added to pristine state for optimization
+    inst:AddTag("weapon")
 
-        inst.MiniMapEntity:SetIcon("refractedmoonlight.tex")
+    inst.MiniMapEntity:SetIcon("refractedmoonlight.tex")
 
-        -- inst:AddComponent("skinedlegion")
-        -- inst.components.skinedlegion:Init("refractedmoonlight")
+    inst._lvl_l = net_byte(inst.GUID, "moonlight_l._lvl_l", "lvl_l_dirty")
+    inst.displaynamefn = DisplayName
 
-        inst.entity:SetPristine()
-        if not TheWorld.ismastersim then
-            return inst
-        end
+    -- inst:AddComponent("skinedlegion")
+    -- inst.components.skinedlegion:Init("refractedmoonlight")
 
-        inst._dd = {
-            img_tex = "refractedmoonlight", img_atlas = "images/inventoryimages/refractedmoonlight.xml",
-            img_tex2 = "refractedmoonlight", img_atlas2 = "images/inventoryimages/refractedmoonlight.xml",
-            build = "swap_refractedmoonlight", fx = "refracted_l_spark_fx"
-        }
-        inst._equip_l = nil
-        inst._task_fx = nil
-        inst._atk = atk_rf
-        inst._atk_sp = atk2_rf
-        inst._atk_lvl = 0
-        inst._atk_sp_lvl = 0
-        inst._atkmult = atkmult_rf
-        inst._count = 0
-        inst._lvl = 0
-        inst.fn_onHealthDelta = function(owner, data)
-            local percent = 0
-            if data and data.newpercent then
-                percent = 1 - data.newpercent
-            else
-                if owner.components.health ~= nil then
-                    percent = 1 - owner.components.health:GetPercent()
-                end
-            end
-            if percent <= inst._count then
-                inst._atkmult = atkmult_rf
-            else
-                inst._atkmult = atkmult_rf_hurt
-            end
-            SetAtk_refracted(inst)
-        end
-        inst.fn_onAttacked = function(owner, data)
-            if inst._count > 0 then
-                SetCount_refracted(inst, inst._count - 0.5)
-            end
-        end
-        inst.fn_tryRevolt = TryRevolt_refracted
-
-        inst:AddComponent("inspectable")
-
-        inst:AddComponent("z_refractedmoonlight")
-
-        inst:AddComponent("inventoryitem")
-        inst.components.inventoryitem.imagename = "refractedmoonlight"
-        inst.components.inventoryitem.atlasname = "images/inventoryimages/refractedmoonlight.xml"
-        inst.components.inventoryitem:SetSinks(true) --落水时会下沉，但是因为标签的关系会回到绚丽大门
-
-        inst:AddComponent("weapon")
-        inst.components.weapon:SetDamage(atk_rf)
-        inst.components.weapon:SetOnAttack(OnAttack_refracted)
-
-        inst:AddComponent("planardamage")
-        inst.components.planardamage:SetBaseDamage(atk2_rf)
-
-        inst:AddComponent("damagetypebonus")
-	    inst.components.damagetypebonus:AddBonus("shadow_aligned", inst, bonus_rf)
-
-        inst:AddComponent("equippable")
-        inst.components.equippable:SetOnEquip(OnEquip_refracted)
-        inst.components.equippable:SetOnUnequip(OnUnequip_refracted)
-
-        inst:AddComponent("upgradeable")
-        inst.components.upgradeable.upgradetype = UPGRADETYPES.REFRACTED_L
-        inst.components.upgradeable.onupgradefn = OnUpgradeFn
-        inst.components.upgradeable.onstageadvancefn = OnStageUp_refracted
-        inst.components.upgradeable.numstages = 15 --因为初始等级为1，所以升级14次的话就填写15
-        inst.components.upgradeable.upgradesperstage = 1
-
-        inst:AddComponent("timer")
-        inst:ListenForEvent("timerdone", TimerDone_refracted)
-
-        inst:PushEvent("percentusedchange", { percent = 0 })
-
-        inst._light = SpawnPrefab("alterguardianhatlight")
-        -- inst._light.Light:SetRadius(0.25)
-        -- inst._light.Light:SetFalloff(0.7)
-        inst._light.Light:SetColour(180/255, 195/255, 150/255)
-        -- inst._light.Light:SetIntensity(0.75)
-        inst._light.Light:Enable(false)
-        inst._owners = {}
-        inst._onownerchange = function() OnOwnerChange_refracted(inst) end
-        OnOwnerChange_refracted(inst)
-        inst.OnRemoveEntity = OnRemove_light
-
-        MakeHauntableLaunch(inst)
-
-        inst.OnSave = OnSave_refracted
-        inst.OnLoad = OnLoad_refracted
-
-        -- inst.components.skinedlegion:SetOnPreLoad()
-
+    inst.entity:SetPristine()
+    if not TheWorld.ismastersim then
         return inst
-    end, {
-        Asset("ANIM", "anim/refractedmoonlight.zip"),    --地面的动画
-        Asset("ANIM", "anim/swap_refractedmoonlight.zip"),   --手上的动画
-        Asset("ATLAS", "images/inventoryimages/refractedmoonlight.xml"),
-        Asset("IMAGE", "images/inventoryimages/refractedmoonlight.tex")
-    }, {
-        "refracted_l_spark_fx", "refracted_l_wave_fx",
-        "refracted_l_skylight_fx", "refracted_l_light_fx",
-        "alterguardianhatlight"
+    end
+
+    inst._dd = {
+        img_tex = "refractedmoonlight", img_atlas = "images/inventoryimages/refractedmoonlight.xml",
+        img_tex2 = "refractedmoonlight", img_atlas2 = "images/inventoryimages/refractedmoonlight.xml",
+        build = "swap_refractedmoonlight", fx = "refracted_l_spark_fx"
     }
-))
+    inst._equip_l = nil
+    inst._task_fx = nil
+    inst._atk = atk_rf
+    inst._atk_sp = atk2_rf
+    inst._atk_lvl = 0
+    inst._atk_sp_lvl = 0
+    inst._atkmult = atkmult_rf
+    inst._count = 0
+    inst._lvl = 0
+    inst.fn_onHealthDelta = function(owner, data)
+        local percent = 0
+        if data and data.newpercent then
+            percent = 1 - data.newpercent
+        else
+            if owner.components.health ~= nil then
+                percent = 1 - owner.components.health:GetPercent()
+            end
+        end
+        if percent <= inst._count then
+            inst._atkmult = atkmult_rf
+        else
+            inst._atkmult = atkmult_rf_hurt
+        end
+        SetAtk_refracted(inst)
+    end
+    inst.fn_onAttacked = function(owner, data)
+        if inst._count > 0 then
+            SetCount_refracted(inst, inst._count - 0.5)
+        end
+    end
+    inst.fn_tryRevolt = TryRevolt_refracted
+
+    inst:AddComponent("inspectable")
+
+    inst:AddComponent("z_refractedmoonlight")
+
+    inst:AddComponent("inventoryitem")
+    inst.components.inventoryitem.imagename = "refractedmoonlight"
+    inst.components.inventoryitem.atlasname = "images/inventoryimages/refractedmoonlight.xml"
+    inst.components.inventoryitem:SetSinks(true) --落水时会下沉，但是因为标签的关系会回到绚丽大门
+
+    inst:AddComponent("weapon")
+    inst.components.weapon:SetDamage(atk_rf)
+    inst.components.weapon:SetOnAttack(OnAttack_refracted)
+
+    inst:AddComponent("planardamage")
+    inst.components.planardamage:SetBaseDamage(atk2_rf)
+
+    inst:AddComponent("damagetypebonus")
+    inst.components.damagetypebonus:AddBonus("shadow_aligned", inst, bonus_rf)
+
+    inst:AddComponent("equippable")
+    inst.components.equippable:SetOnEquip(OnEquip_refracted)
+    inst.components.equippable:SetOnUnequip(OnUnequip_refracted)
+
+    inst:AddComponent("upgradeable")
+    inst.components.upgradeable.upgradetype = UPGRADETYPES.REFRACTED_L
+    inst.components.upgradeable.onupgradefn = OnUpgradeFn
+    inst.components.upgradeable.onstageadvancefn = OnStageUp_refracted
+    inst.components.upgradeable.numstages = 15 --因为初始等级为1，所以升级14次的话就填写15
+    inst.components.upgradeable.upgradesperstage = 1
+
+    inst:AddComponent("timer")
+    inst:ListenForEvent("timerdone", TimerDone_refracted)
+
+    inst:PushEvent("percentusedchange", { percent = 0 })
+
+    inst._light = SpawnPrefab("alterguardianhatlight")
+    -- inst._light.Light:SetRadius(0.25)
+    -- inst._light.Light:SetFalloff(0.7)
+    inst._light.Light:SetColour(180/255, 195/255, 150/255)
+    -- inst._light.Light:SetIntensity(0.75)
+    inst._light.Light:Enable(false)
+    inst._owners = {}
+    inst._onownerchange = function() OnOwnerChange_refracted(inst) end
+    OnOwnerChange_refracted(inst)
+    inst.OnRemoveEntity = OnRemove_light
+
+    MakeHauntableLaunch(inst)
+
+    inst.OnSave = OnSave_refracted
+    inst.OnLoad = OnLoad_refracted
+
+    -- inst.components.skinedlegion:SetOnPreLoad()
+
+    return inst
+end, {
+    Asset("ANIM", "anim/refractedmoonlight.zip"),    --地面的动画
+    Asset("ANIM", "anim/swap_refractedmoonlight.zip"),   --手上的动画
+    Asset("ATLAS", "images/inventoryimages/refractedmoonlight.xml"),
+    Asset("IMAGE", "images/inventoryimages/refractedmoonlight.tex")
+}, {
+    "refracted_l_spark_fx", "refracted_l_wave_fx",
+    "refracted_l_skylight_fx", "refracted_l_light_fx",
+    "alterguardianhatlight"
+}))
 
 --------------------
 --------------------

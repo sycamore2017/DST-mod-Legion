@@ -401,7 +401,31 @@ end
 local function Fn_sg_long(doer, action)
     return "dolongaction"
 end
+local function Fn_sg_handy_long2short(doer, action)
+    if doer:HasTag("fastbuilder") or doer:HasTag("fastrepairer") or doer:HasTag("handyperson") then
+        return "doshortaction"
+    end
+    return "dolongaction"
+end
 
+local function ComputCost(valuenow, valuemax, value, item)
+    local need = math.ceil((valuemax - valuenow) / value)
+    if need > 1 then --最后一次很可能会比较浪费，所以不主动填满
+        need = need - 1
+    end
+    if item.components.stackable ~= nil then
+        local stack = item.components.stackable:StackSize() or 1
+        if need > stack then
+            need = stack
+        end
+        local useditems = item.components.stackable:Get(need)
+        useditems:Remove()
+    else
+        need = 1
+        item:Remove()
+    end
+    return need
+end
 local function CommonDoerCheck(doer, target)
     if doer.replica.rider ~= nil and doer.replica.rider:IsRiding() then --骑牛时只能修复自己的携带物品
         if not (target.replica.inventoryitem ~= nil and target.replica.inventoryitem:IsGrandOwner(doer)) then
@@ -465,22 +489,7 @@ local function DoArmorRepair(doer, item, target, value)
     then
         value = value*(doer.mult_repair_l or 1)
         local cpt = target.components.armor
-        local need = math.ceil((cpt.maxcondition - cpt.condition) / value)
-        if need > 1 then --最后一次很可能会比较浪费，所以不主动填满
-            need = need - 1
-        end
-
-        if item.components.stackable ~= nil then
-            local stack = item.components.stackable:StackSize() or 1
-            if need > stack then
-                need = stack
-            end
-            local useditems = item.components.stackable:Get(need)
-            useditems:Remove()
-        else
-            need = 1
-            item:Remove()
-        end
+        local need = ComputCost(cpt.condition, cpt.maxcondition, value, item)
         cpt:Repair(value*need)
         return true
     end
@@ -493,26 +502,29 @@ local function DoFiniteusesRepair(doer, item, target, value)
     then
         value = value*(doer.mult_repair_l or 1)
         local cpt = target.components.finiteuses
-        local need = math.ceil((cpt.total - cpt.current) / value)
-        if need > 1 then --最后一次很可能会比较浪费，所以不主动填满
-            need = need - 1
-        end
-
-        if item.components.stackable ~= nil then
-            local stack = item.components.stackable:StackSize() or 1
-            if need > stack then
-                need = stack
-            end
-            local useditems = item.components.stackable:Get(need)
-            useditems:Remove()
-        else
-            need = 1
-            item:Remove()
-        end
+        local need = ComputCost(cpt.current, cpt.total, value, item)
         cpt:Repair(value*need)
         return true
     end
     return false, "GUITAR"
+end
+local function DoFueledRepair(doer, item, target, value, reason)
+    if
+        target ~= nil and
+        target.components.fueled ~= nil and target.components.fueled.accepting and
+        target.components.fueled:GetPercent() < 1
+    then
+        local cpt = target.components.fueled
+        local need = ComputCost(cpt.currentfuel, cpt.maxfuel, value, item)
+        cpt:DoDelta(value*need, doer)
+        if cpt.ontakefuelfn ~= nil then
+            cpt.ontakefuelfn(target, value)
+        end
+        target:PushEvent("takefuel", { fuelvalue = value })
+
+        return true
+    end
+    return false, reason
 end
 
 --素白蘑菇帽
@@ -579,45 +591,21 @@ local function Fn_try_guitar(inst, doer, target, actions, right)
     end
     return false
 end
-local function Fn_do_guitar(doer, item, target, value)
-    if
-        item ~= nil and target ~= nil and
-        target.components.fueled ~= nil and target.components.fueled.accepting and
-        target.components.fueled:GetPercent() < 1
-    then
-        local useditem = doer.components.inventory:RemoveItem(item) --不做说明的话，一次只取一个
-        if useditem then
-            local fueled = target.components.fueled
-            fueled:DoDelta(value*fueled.bonusmult*(doer.mult_repair_l or 1), doer)
-
-            if useditem.components.fuel ~= nil then
-                useditem.components.fuel:Taken(fueled.inst)
-            end
-            useditem:Remove()
-
-            if fueled.ontakefuelfn ~= nil then
-                fueled.ontakefuelfn(fueled.inst, value)
-            end
-            fueled.inst:PushEvent("takefuel", { fuelvalue = value })
-
-            return true
-        end
-    end
-    return false, "GUITAR"
-end
 
 _G.REPAIRERS_L["silk"] = {
     fn_try = Fn_try_guitar, --【客户端】
-    fn_sg = Fn_sg_long, --【服务端、客户端】
+    fn_sg = Fn_sg_handy_long2short, --【服务端、客户端】
     fn_do = function(act) --【服务端】
-        return Fn_do_guitar(act.doer, act.invobject, act.target, TUNING.TOTAL_DAY_TIME * 0.1)
+        local value = TUNING.TOTAL_DAY_TIME*0.1*(act.doer.mult_repair_l or 1)
+        return DoFueledRepair(act.doer, act.invobject, act.target, value, "GUITAR")
     end
 }
 _G.REPAIRERS_L["steelwool"] = {
     fn_try = Fn_try_guitar,
-    fn_sg = Fn_sg_long,
+    fn_sg = Fn_sg_handy_long2short,
     fn_do = function(act)
-        return Fn_do_guitar(act.doer, act.invobject, act.target, TUNING.TOTAL_DAY_TIME * 0.9)
+        local value = TUNING.TOTAL_DAY_TIME*0.9*(act.doer.mult_repair_l or 1)
+        return DoFueledRepair(act.doer, act.invobject, act.target, value, "GUITAR")
     end
 }
 _G.REPAIRERS_L["mat_whitewood_item"] = {
@@ -659,7 +647,7 @@ local rock_needchange = {
 for k,v in pairs(rock_needchange) do
     _G.REPAIRERS_L[k] = {
         fn_try = Fn_try_sand,
-        fn_sg = Fn_sg_long,
+        fn_sg = Fn_sg_handy_long2short,
         fn_do = function(act)
             return DoArmorRepair(act.doer, act.invobject, act.target, v)
         end
@@ -680,7 +668,7 @@ end
 _G.REPAIRERS_L["insectshell_l"] = {
     noapiset = true,
     fn_try = Fn_try_bugshell,
-    fn_sg = Fn_sg_long,
+    fn_sg = Fn_sg_handy_long2short,
     fn_do = function(act)
         return DoArmorRepair(act.doer, act.invobject, act.target, 100)
     end
@@ -738,23 +726,56 @@ local function Fn_try_carrot(inst, doer, target, actions, right)
 end
 _G.REPAIRERS_L["carrot"] = {
     fn_try = Fn_try_carrot,
-    fn_sg = Fn_sg_long,
+    fn_sg = Fn_sg_handy_long2short,
     fn_do = function(act)
         return DoFiniteusesRepair(act.doer, act.invobject, act.target, 25)
     end
 }
 _G.REPAIRERS_L["carrot_cooked"] = {
     fn_try = Fn_try_carrot,
-    fn_sg = Fn_sg_long,
+    fn_sg = Fn_sg_handy_long2short,
     fn_do = function(act)
         return DoFiniteusesRepair(act.doer, act.invobject, act.target, 15)
     end
 }
 
+--电气石
+
+_G.FUELTYPE.ELEC_L = "ELEC_L"
+
+local function Fn_try_elec(inst, doer, target, actions, right)
+    if target:HasTag(FUELTYPE.ELEC_L.."_fueled") then
+        if CommonDoerCheck(doer, target) then
+            return true
+        end
+    end
+    return false
+end
+
+local elec_needchange = {
+    redgem = 70,
+    tourmalineshard = 150,
+    moonstorm_spark = 70,
+    lightninggoathorn = 70,
+    voltgoatjelly = 50,
+    purplegem = 60
+}
+for k,v in pairs(elec_needchange) do
+    _G.REPAIRERS_L[k] = {
+        noapiset = k == "tourmalineshard",
+        fn_try = Fn_try_elec,
+        fn_sg = Fn_sg_handy_long2short,
+        fn_do = function(act)
+            return DoFueledRepair(act.doer, act.invobject, act.target, v, "ELEC")
+        end
+    }
+end
+elec_needchange = nil
+
 ------
 
 if IsServer then
-    for k,v in pairs(REPAIRERS_L) do
+    for k,v in pairs(_G.REPAIRERS_L) do
         if not v.noapiset then
             AddPrefabPostInit(k, function(inst)
                 inst:AddComponent("z_repairerlegion")
@@ -769,11 +790,13 @@ local REPAIR_LEGION = Action({ priority = 1, mount_valid = true })
 REPAIR_LEGION.id = "REPAIR_LEGION"
 REPAIR_LEGION.str = STRINGS.ACTIONS.REPAIR_LEGION
 REPAIR_LEGION.strfn = function(act)
-    if act.invobject ~= nil then
-        if act.invobject.prefab == "mat_whitewood_item" then
-            return "MERGE"
-        elseif act.invobject.prefab == "yellowgem" or act.invobject.prefab == "bluegem" then
+    if act.target ~= nil then
+        if act.target:HasTag("moontreasure_l") then
             return "EMBED"
+        elseif act.target:HasTag("eleccore_l") then
+            return "CHARGE"
+        elseif act.target.prefab == "mat_whitewood" then
+            return "MERGE"
         end
     end
     return "GENERIC"

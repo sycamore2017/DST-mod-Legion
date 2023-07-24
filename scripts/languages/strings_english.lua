@@ -3498,25 +3498,29 @@ STRINGS.UI.CRAFTING.NEEDSELECOURMALINE_THREE = "Find an activated Elecourmaline 
 STRINGS.ACTIONS.REPAIR_LEGION = {
     GENERIC = "Repair",
     MERGE = "Merge",
-    EMBED = "Embed"
+    EMBED = "Embed",
+    CHARGE = "Charge"
 }
 S______GENERIC.ACTIONFAIL.REPAIR_LEGION = {
     GUITAR = "There's nothing to fix.",
     FUNGUS = "It's fresh and doesn't need to be repaired.",
     MAT = "Already the biggest it can be.",
-    YELLOWGEM = "It's already full of gems."
+    YELLOWGEM = "It's already full of gems.",
+    ELEC = "It is already full of energy!"
 }
 S_______WEBBER.ACTIONFAIL.REPAIR_LEGION = {
     GUITAR = "It's none of our business.",
     FUNGUS = "We can't see what's wrong even with our several eyes.",
     MAT = "OK, that's good.",
-    YELLOWGEM = "It seems that not everything can be infinite."
+    YELLOWGEM = "It seems that not everything can be infinite.",
+    ELEC = "Enough for us to use for a long time."
 }
 S_______WINONA.ACTIONFAIL.REPAIR_LEGION = {
     GUITAR = "Perfect as ever.",
     FUNGUS = "It's perfect.",
     MAT = "I think that's as big as it's going to get.",
-    YELLOWGEM = "Enough."
+    YELLOWGEM = "Enough.",
+    ELEC = "I think it's fully charged."
 }
 
 STRINGS.CROP_LEGION = {

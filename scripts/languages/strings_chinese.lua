@@ -3682,25 +3682,29 @@ STRINGS.UI.CRAFTING.NEEDSELECOURMALINE_THREE = "寻找激活的电气重铸台�
 STRINGS.ACTIONS.REPAIR_LEGION = {
     GENERIC = "修理",
     MERGE = "合并",
-    EMBED = "嵌入"
+    EMBED = "嵌入",
+    CHARGE = "充能"
 }
 S______GENERIC.ACTIONFAIL.REPAIR_LEGION = {
     GUITAR = "很新，没啥好修的。",
     FUNGUS = "很新鲜，不用修了。",
     MAT = "已经是最大的样子了。",
-    YELLOWGEM = "已经嵌满了。"
+    YELLOWGEM = "已经嵌满了。",
+    ELEC = "它已经充满了能量！"
 }
 S_______WEBBER.ACTIONFAIL.REPAIR_LEGION = {
     GUITAR = "没我们事啦。",
     FUNGUS = "我们好几只眼睛都看不出哪里坏了。",
     MAT = "好，够啦。",
-    YELLOWGEM = "看来并不是什么都能无限大？"
+    YELLOWGEM = "看来并不是什么都能无限大？",
+    ELEC = "够我们用很久了。"
 }
 S_______WINONA.ACTIONFAIL.REPAIR_LEGION = {
     GUITAR = "完美如初。",
     FUNGUS = "很完整了。",
     MAT = "我想这是它能保持坚固的最大极限了。",
-    YELLOWGEM = "够多了。"
+    YELLOWGEM = "够多了。",
+    ELEC = "我想它已经充满了。"
 }
 
 STRINGS.CROP_LEGION = {
