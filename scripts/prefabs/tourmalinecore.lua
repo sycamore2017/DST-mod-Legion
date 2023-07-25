@@ -8,7 +8,7 @@ local function OnFuelChange(inst, data)
     
 end
 
-local function fn(Sim)
+local function Fn()
     local inst = CreateEntity()
 
     inst.entity:AddTransform()
@@ -43,6 +43,7 @@ local function fn(Sim)
     inst.components.fueled.accepting = true
 
     inst:AddComponent("batterylegion")
+    -- inst.components.batterylegion:StartCharge() --会监听能量自动开始的
 
     MakeHauntableLaunch(inst)
 
@@ -63,4 +64,4 @@ then
 end
 CheckMod = nil
 
-return Prefab("tourmalinecore", fn, assets, nil)
+return Prefab("tourmalinecore", Fn, assets, nil)

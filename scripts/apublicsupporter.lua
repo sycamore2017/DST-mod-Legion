@@ -401,11 +401,17 @@ end
 local function Fn_sg_long(doer, action)
     return "dolongaction"
 end
-local function Fn_sg_handy_long2short(doer, action)
+local function Fn_sg_handy(doer, action)
     if doer:HasTag("fastbuilder") or doer:HasTag("fastrepairer") or doer:HasTag("handyperson") then
         return "doshortaction"
     end
     return "dolongaction"
+end
+local function Fn_sg_robot_handy(doer, action) --机器人对电能、电子更加了解
+    if doer:HasTag("upgrademoduleowner") then
+        return "doshortaction"
+    end
+    return Fn_sg_handy(doer, action)
 end
 
 local function ComputCost(valuenow, valuemax, value, item)
@@ -594,7 +600,7 @@ end
 
 _G.REPAIRERS_L["silk"] = {
     fn_try = Fn_try_guitar, --【客户端】
-    fn_sg = Fn_sg_handy_long2short, --【服务端、客户端】
+    fn_sg = Fn_sg_handy, --【服务端、客户端】
     fn_do = function(act) --【服务端】
         local value = TUNING.TOTAL_DAY_TIME*0.1*(act.doer.mult_repair_l or 1)
         return DoFueledRepair(act.doer, act.invobject, act.target, value, "GUITAR")
@@ -602,7 +608,7 @@ _G.REPAIRERS_L["silk"] = {
 }
 _G.REPAIRERS_L["steelwool"] = {
     fn_try = Fn_try_guitar,
-    fn_sg = Fn_sg_handy_long2short,
+    fn_sg = Fn_sg_handy,
     fn_do = function(act)
         local value = TUNING.TOTAL_DAY_TIME*0.9*(act.doer.mult_repair_l or 1)
         return DoFueledRepair(act.doer, act.invobject, act.target, value, "GUITAR")
@@ -647,7 +653,7 @@ local rock_needchange = {
 for k,v in pairs(rock_needchange) do
     _G.REPAIRERS_L[k] = {
         fn_try = Fn_try_sand,
-        fn_sg = Fn_sg_handy_long2short,
+        fn_sg = Fn_sg_handy,
         fn_do = function(act)
             return DoArmorRepair(act.doer, act.invobject, act.target, v)
         end
@@ -668,7 +674,7 @@ end
 _G.REPAIRERS_L["insectshell_l"] = {
     noapiset = true,
     fn_try = Fn_try_bugshell,
-    fn_sg = Fn_sg_handy_long2short,
+    fn_sg = Fn_sg_handy,
     fn_do = function(act)
         return DoArmorRepair(act.doer, act.invobject, act.target, 100)
     end
@@ -726,14 +732,14 @@ local function Fn_try_carrot(inst, doer, target, actions, right)
 end
 _G.REPAIRERS_L["carrot"] = {
     fn_try = Fn_try_carrot,
-    fn_sg = Fn_sg_handy_long2short,
+    fn_sg = Fn_sg_handy,
     fn_do = function(act)
         return DoFiniteusesRepair(act.doer, act.invobject, act.target, 25)
     end
 }
 _G.REPAIRERS_L["carrot_cooked"] = {
     fn_try = Fn_try_carrot,
-    fn_sg = Fn_sg_handy_long2short,
+    fn_sg = Fn_sg_handy,
     fn_do = function(act)
         return DoFiniteusesRepair(act.doer, act.invobject, act.target, 15)
     end
@@ -757,6 +763,7 @@ local elec_needchange = {
     tourmalineshard = 150,
     moonstorm_spark = 70,
     lightninggoathorn = 70,
+    goatmilk = 20,
     voltgoatjelly = 50,
     purplegem = 60
 }
@@ -764,7 +771,7 @@ for k,v in pairs(elec_needchange) do
     _G.REPAIRERS_L[k] = {
         noapiset = k == "tourmalineshard",
         fn_try = Fn_try_elec,
-        fn_sg = Fn_sg_handy_long2short,
+        fn_sg = Fn_sg_robot_handy,
         fn_do = function(act)
             return DoFueledRepair(act.doer, act.invobject, act.target, v, "ELEC")
         end
