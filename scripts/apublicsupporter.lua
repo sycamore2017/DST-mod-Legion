@@ -2175,6 +2175,52 @@ ACTIONS.ROTATE_FENCE.fn = function(act)
 end
 
 --------------------------------------------------------------------------
+--[[ 电气石的动作 ]]
+--------------------------------------------------------------------------
+
+local RUB_L = Action({ priority = 1, mount_valid = true })
+RUB_L.id = "MOONSURGE_L"
+RUB_L.str = STRINGS.ACTIONS.MOONSURGE_L
+RUB_L.strfn = function(act)
+    if act.invobject ~= nil and act.invobject:HasTag("canmoonsurge_l") then
+        return "GENERIC"
+    end
+    return "LACK"
+end
+RUB_L.fn = function(act)
+    if act.invobject == nil then --说明是摩擦电气石自身
+        if
+            act.target ~= nil and act.target.components.batterylegion ~= nil and
+            act.doer ~= nil
+        then
+            
+        end
+    else
+
+    end
+    
+
+    if act.invobject ~= nil and act.invobject.fn_tryRevolt ~= nil then
+        act.invobject.fn_tryRevolt(act.invobject, act.doer)
+    end
+    return true
+end
+AddAction(RUB_L)
+
+AddComponentAction("EQUIPPED", "z_refractedmoonlight", function(inst, doer, target, actions, right)
+    if
+        right and
+        doer == target and --对自己使用
+        (inst:HasTag("canmoonsurge_l") or inst:HasTag("cansurge_l"))
+    then
+        table.insert(actions, ACTIONS.RUB_L)
+    end
+end)
+
+AddStategraphActionHandler("wilson", ActionHandler(ACTIONS.RUB_L, "moonsurge_l"))
+AddStategraphActionHandler("wilson_client", ActionHandler(ACTIONS.RUB_L, "moonsurge_l"))
+
+--------------------------------------------------------------------------
 --[[ 服务器专属修改 ]]
 --------------------------------------------------------------------------
 

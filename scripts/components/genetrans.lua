@@ -21,6 +21,7 @@ local GeneTrans = Class(function(self, inst)
 		pass = nil, --单个的已经生长的时间
 		all = nil --单个的总体生长时间
 	}
+	self.timedata_fast = { start = nil, now = nil, max = TUNING.TOTAL_DAY_TIME*100 }
 
 	self.fxdata = {
 		prefab = "siving_turn_fruit", symbol = "followed", x = 0, y = 0, z = 0,
@@ -412,7 +413,20 @@ function GeneTrans:StartTransing()
 	end
 end
 
-function GeneTrans:LongUpdate(dt, costtime)
+function GeneTrans:AddFastTime(time)
+	if self.timedata_fast.start == nil then
+		self.timedata_fast.start = GetTime()
+	end
+	self.timedata_fast.now = math.min(self.timedata_fast.max, (self.timedata_fast.now or 0) + time)
+end
+function GeneTrans:GetFastTimePercent()
+	if self.timedata_fast.now == nil then
+		return 0
+	end
+	return self.timedata_fast.now/self.timedata_fast.max
+end
+
+function GeneTrans:ComputTime(dt, costtime)
 	if self.timedata.all == nil or self.energytime <= 0 then
 		return
 	end
@@ -439,7 +453,7 @@ function GeneTrans:LongUpdate(dt, costtime)
 		else
 			self.timedata.pass = self.timedata.pass - self.timedata.all
 			if self.timedata.pass >= self.timedata.all then
-				self:LongUpdate(dt, costtime)
+				self:ComputTime(dt, costtime)
 				return
 			end
 		end
@@ -474,12 +488,26 @@ function GeneTrans:LongUpdate(dt, costtime)
 	end
 
 	if dt > 0 then --还有时间可以经过
-		self:LongUpdate(dt, costtime)
+		self:ComputTime(dt, costtime)
 	else
 		self:CostEnergy(costtime)
 		self:StartTransing()
 		self:UpdateFxProgress()
 	end
+end
+function GeneTrans:LongUpdate(dt)
+	if self.timedata_fast.now ~= nil then
+		if self.timedata_fast.now > dt then
+			self.timedata_fast.now = self.timedata_fast.now - dt
+			self.timedata_fast.start = GetTime()
+			dt = dt*2
+		else
+			dt = dt + self.timedata_fast.now
+			self.timedata_fast.now = nil
+			self.timedata_fast.start = nil
+		end
+	end
+	self:ComputTime(dt, nil)
 end
 
 function GeneTrans:OnEntitySleep()
@@ -488,12 +516,21 @@ function GeneTrans:OnEntitySleep()
 		self.taskgrow = nil
 	end
 end
-
 function GeneTrans:OnEntityWake()
 	if self.timedata.start == nil or self.energytime <= 0 then
+		if self.timedata_fast.now ~= nil and self.timedata_fast.start ~= nil then
+			local timenow = GetTime()
+			local past = timenow - self.timedata_fast.start
+			if past >= self.timedata_fast.now then
+				self.timedata_fast.now = nil
+				self.timedata_fast.start = nil
+			else
+				self.timedata_fast.now = self.timedata_fast.now - past
+				self.timedata_fast.start = timenow
+			end
+		end
 		return
 	end
-
 	self:LongUpdate(GetTime()-self.timedata.start)
 end
 
@@ -520,6 +557,9 @@ function GeneTrans:OnSave()
 	if self.energytime < self.energytime_max then
 		data.energytime = self.energytime
 	end
+	if self.timedata_fast.now ~= nil then --先不计算经过的时间，因为转化时间还没判断
+		data.time_fast = self.timedata_fast.now
+	end
 
 	local genepool = nil
 	for seedname, isfull in pairs(self.genepool) do
@@ -536,7 +576,6 @@ function GeneTrans:OnSave()
 
     return data
 end
-
 function GeneTrans:OnLoad(data, newents)
 	if data.energytime ~= nil then
 		self.energytime = math.min(data.energytime, self.energytime_max)
@@ -547,6 +586,9 @@ function GeneTrans:OnLoad(data, newents)
 				self.genepool[value] = true
 			end
 		end
+	end
+	if data.time_fast ~= nil then
+		self:AddFastTime(data.time_fast)
 	end
 
 	local seedname = nil
@@ -593,7 +635,7 @@ function GeneTrans:OnLoad(data, newents)
 			self:SetTransTime()
 			self.timedata.pass = data.time_pass or 0
 			if dt > 0 or self.timedata.pass > 0 then --有多余的时间：循环更新
-				self:LongUpdate(dt, 0)
+				self:LongUpdate(dt)
 			else --无多余时间：更新能量状态、继续转化、更新进度
 				self:CostEnergy(0)
 				self:StartTransing()
@@ -685,15 +727,20 @@ local function GetDetailString(self, doer, type)
 		fruitnum = tostring(self.fruitnum),
 		timepass = 0,
 		timeall = 0,
-		power = tostring(DecimalPointTruncation(self.energytime/TUNING.TOTAL_DAY_TIME, 10))
+		power = tostring(DecimalPointTruncation(self.energytime/TUNING.TOTAL_DAY_TIME, 100)),
+		timefast = 0
 	}
+	if self.timedata_fast.now ~= nil then
+		data.timefast = DecimalPointTruncation(self.timedata_fast.now/TUNING.TOTAL_DAY_TIME, 100)
+	end
+	data.timefast = tostring(data.timefast)
 
 	if type == 2 then
 		if self.timedata.pass ~= nil then
-			data.timepass = DecimalPointTruncation(self.timedata.pass/TUNING.TOTAL_DAY_TIME, 10)
+			data.timepass = DecimalPointTruncation(self.timedata.pass/TUNING.TOTAL_DAY_TIME, 100)
 		end
 		if self.timedata.all ~= nil then
-			data.timeall = DecimalPointTruncation(self.timedata.all/TUNING.TOTAL_DAY_TIME, 10)
+			data.timeall = DecimalPointTruncation(self.timedata.all/TUNING.TOTAL_DAY_TIME, 100)
 		end
 		data.timepass = tostring(data.timepass)
 		data.timeall = tostring(data.timeall)

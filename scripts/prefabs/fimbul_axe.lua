@@ -151,12 +151,8 @@ end
 
 local function OnLightning(inst) --因为拿在手上会有"INLIMBO"标签，所以装备时并不会吸引闪电，只有放在地上时才会
     GiveSomeShock(inst, nil, inst)
-
-    if inst.components.finiteuses ~= nil and inst.components.finiteuses:GetUses() < 250 then
-        local uses = inst.components.finiteuses:GetUses() + 10
-
-        if uses > 250 then uses = 250 end
-        inst.components.finiteuses:SetUses(uses)
+    if inst.components.finiteuses:GetPercent() < 1 then
+        inst.components.finiteuses:Repair(10)
     end
 end
 

@@ -4,8 +4,12 @@ local assets = {
     Asset("IMAGE", "images/inventoryimages/tourmalinecore.tex")
 }
 
-local function OnFuelChange(inst, data)
-    
+local function OnLightning(inst) --因为拿在手上会有"INLIMBO"标签，所以携带时并不会吸引闪电，只有放在地上时才会
+    if inst.components.fueled:GetPercent() < 1 then
+        if math.random() < 0.5 then
+            inst.components.fueled:DoDelta(5, nil)
+        end
+    end
 end
 
 local function Fn()
@@ -22,6 +26,7 @@ local function Fn()
     inst.AnimState:PlayAnimation("idle")
 
     inst:AddTag("eleccore_l")
+    inst:AddTag("lightningrod")
 
     inst.pickupsound = "gem"
 
@@ -44,6 +49,8 @@ local function Fn()
 
     inst:AddComponent("batterylegion")
     -- inst.components.batterylegion:StartCharge() --会监听能量自动开始的
+
+    inst:ListenForEvent("lightningstrike", OnLightning)
 
     MakeHauntableLaunch(inst)
 

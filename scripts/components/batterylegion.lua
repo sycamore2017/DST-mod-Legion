@@ -63,8 +63,20 @@ end
 function BatteryLegion:Do(doer, target)
 	local cost = 0
     local cpt = self.inst.components.fueled
-	if cpt ~= nil and cpt.currentfuel <= 0 then
-		return false, "NOENERGY"
+
+	if cpt ~= nil then
+		if target:HasTag("lightningrod") and target.components.battery ~= nil then
+			if target.chargeleft ~= nil then
+				cpt:DoDelta(target.chargeleft*10, doer)
+				target.components.battery:OnUsed(self.inst)
+				return true
+			else
+				return false, "NOUSE"
+			end
+		end
+		if cpt.currentfuel <= 0 then
+			return false, "NOENERGY"
+		end
 	end
 
 	if target.prefab == "fimbul_axe" then --芬布尔斧
@@ -78,17 +90,31 @@ function BatteryLegion:Do(doer, target)
 			return false, "NONEED"
 		end
 	elseif target.components.genetrans ~= nil then --子圭·育
-		cost = 50
-		if not TryCostEnergy(cpt, cost, doer) then
-			return false, "NOENERGY"
+		if target.components.genetrans:GetFastTimePercent() <= 0.99 then
+			cost = 50
+			if not TryCostEnergy(cpt, cost, doer) then
+				return false, "NOENERGY"
+			end
+			target.components.genetrans:AddFastTime(TUNING.TOTAL_DAY_TIME*10)
+		else
+			return false, "NONEED"
 		end
-		--undo
-	elseif target.prefab == "firesuppressor" or target.prefab == "winona_battery_low" then --雪球发射器、薇诺娜的发电机
+	elseif
+		target.prefab == "firesuppressor" or --雪球发射器
+		target.prefab == "winona_battery_low" or --薇诺娜的发电机
+		target.prefab == "nightstick" --晨星锤
+	then
 		if target.components.fueled ~= nil and target.components.fueled:GetPercent() < 0.99 then
-			if not target.components.fueled.accepting then
+			if target.prefab ~= "nightstick" and not target.components.fueled.accepting then
 				return false, "REFUSE"
 			end
-			cost = target.prefab == "firesuppressor" and 20 or 10
+			if target.prefab == "firesuppressor" then
+				cost = 20
+			elseif target.prefab == "winona_battery_low" then
+				cost = 10
+			else
+				cost = 15
+			end
 			if not TryCostEnergy(cpt, cost, doer) then
 				return false, "NOENERGY"
 			end
@@ -130,6 +156,17 @@ function BatteryLegion:Do(doer, target)
 			end
 		else
 			return false, "NONEED"
+		end
+	elseif target:HasTag("lightninggoat") then --伏特羊
+		if target:HasTag("charged") then
+			return false, "NONEED"
+		elseif target.components.health ~= nil and not target.components.health:IsDead() then
+			cost = 5
+			if not TryCostEnergy(cpt, cost, doer) then
+				return false, "NOENERGY"
+			end
+			target:PushEvent("attacked", { attacker = doer or self.inst, damage = 0,
+				damageresolved = 0, original_damage = 0, stimuli = "electric" })
 		end
 	elseif --有移动能力的生物、玩家
 		target.components.combat ~= nil and
