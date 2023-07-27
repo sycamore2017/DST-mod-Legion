@@ -73,7 +73,7 @@ local function fn_lightning()
     inst.AnimState:SetBank("lightning")
     inst.AnimState:SetBuild("lightning")
     inst.AnimState:PlayAnimation("anim")
-    inst.AnimState:SetMultColour(0/255, 159/255, 234/255, 1)    --前三个是颜色值，第四个是透明度
+    inst.AnimState:SetMultColour(0/255, 159/255, 234/255, 1) --前三个是颜色值，第四个是透明度
 
     inst.SoundEmitter:PlaySound("dontstarve/rain/thunder_close", nil, nil, true)
 

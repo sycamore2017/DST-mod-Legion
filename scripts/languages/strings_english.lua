@@ -3482,6 +3482,7 @@ STRINGS.ACTIONS_LEGION = {
     MAKE = "Make", --打窝器容器的按钮名字
     ATTACK_SHIELD_L = "Protective attack", --盾牌类道具通用动作的名字
     REMOVE_CARPET_L = "Fork away", --移除地毯动作的名字
+    RUB_L = "Rub", --电气石摩擦的名字
 }
 STRINGS.ACTIONS.GIVE.SCABBARD = "Put into"  --青枝绿叶放入武器的名字
 STRINGS.ACTIONS.PICK.GENETRANS = "Take down"  --收获子圭·育的名字
@@ -3789,3 +3790,41 @@ STRINGS.ACTIONS.MOONSURGE_L = {
     GENERIC = "Moonlight Surge",
     LACK = "Surge"
 }
+
+S______GENERIC.ACTIONFAIL.RUB_L = {
+    NOUSE = "No response...",
+    NOENERGY = "The battery is low.",
+    NONEED = "It doesn't need it at the moment.",
+    REFUSE = "It is currently unable to charge."
+}
+-- S_______WILLOW.ACTIONFAIL.RUB_L = ""
+-- S_____WOLFGANG.ACTIONFAIL.RUB_L = ""
+-- S________WENDY.ACTIONFAIL.RUB_L = ""
+S_________WX78.ACTIONFAIL.RUB_L = {
+    NOUSE = "NOT APPLICABLE! ONLY FOOLISH HUMANS CANNOT SEE IT.",
+    NOENERGY = "ENERGY WILL ALSO BE DEPLETED.",
+    NONEED = "DON'T WASTE ENERGY!",
+    REFUSE = "THE CHARGING INTERFACE IS NOT RESPONDING."
+}
+-- S_WICKERBOTTOM.ACTIONFAIL.RUB_L = ""
+-- S_______WOODIE.ACTIONFAIL.RUB_L = ""
+-- S______WAXWELL.ACTIONFAIL.RUB_L = ""
+-- S___WATHGRITHR.ACTIONFAIL.RUB_L = ""
+-- S_______WEBBER.ACTIONFAIL.RUB_L = ""
+S_______WINONA.ACTIONFAIL.RUB_L = {
+    NOUSE = "That's not how it's used!",
+    NOENERGY = "The battery is low, I will try charging it.",
+    NONEED = "I don't need to do anything else.",
+    REFUSE = "It is in a state where it cannot conduct electricity."
+}
+-- S________WARLY.ACTIONFAIL.RUB_L = ""
+-- S_______WORTOX.ACTIONFAIL.RUB_L = ""
+S_____WORMWOOD.ACTIONFAIL.RUB_L = {
+    NOUSE = "It's useless.",
+    NOENERGY = "There is no power.",
+    NONEED = "Not now.",
+    REFUSE = "Can't do it, what's the problem?"
+}
+-- S_________WURT.ACTIONFAIL.RUB_L = ""
+-- S_______WALTER.ACTIONFAIL.RUB_L = ""
+-- S________WANDA.ACTIONFAIL.RUB_L = ""

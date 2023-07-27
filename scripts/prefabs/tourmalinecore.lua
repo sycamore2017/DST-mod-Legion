@@ -48,7 +48,7 @@ local function Fn()
     inst.components.fueled.accepting = true
 
     inst:AddComponent("batterylegion")
-    -- inst.components.batterylegion:StartCharge() --会监听能量自动开始的
+    inst.components.batterylegion:StartCharge()
 
     inst:ListenForEvent("lightningstrike", OnLightning)
 

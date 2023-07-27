@@ -2178,47 +2178,47 @@ end
 --[[ 电气石的动作 ]]
 --------------------------------------------------------------------------
 
-local RUB_L = Action({ priority = 1, mount_valid = true })
-RUB_L.id = "MOONSURGE_L"
-RUB_L.str = STRINGS.ACTIONS.MOONSURGE_L
-RUB_L.strfn = function(act)
-    if act.invobject ~= nil and act.invobject:HasTag("canmoonsurge_l") then
-        return "GENERIC"
-    end
-    return "LACK"
-end
+local RUB_L = Action({ priority = 5, mount_valid = true })
+RUB_L.id = "RUB_L"
+RUB_L.str = STRINGS.ACTIONS_LEGION.RUB_L
 RUB_L.fn = function(act)
-    if act.invobject == nil then --说明是摩擦电气石自身
-        if
-            act.target ~= nil and act.target.components.batterylegion ~= nil and
-            act.doer ~= nil
-        then
-            
-        end
+    local battery = nil
+    local target = nil
+    --先要找到主体和客体
+    if act.invobject ~= nil and act.invobject.components.batterylegion ~= nil then
+        battery = act.invobject
+        target = act.target or act.doer
+    elseif act.target ~= nil and act.target.components.batterylegion ~= nil then
+        battery = act.target
+        target = act.invobject or act.doer
     else
-
+        return false, "NOUSE"
     end
-    
-
-    if act.invobject ~= nil and act.invobject.fn_tryRevolt ~= nil then
-        act.invobject.fn_tryRevolt(act.invobject, act.doer)
-    end
-    return true
+    return battery.components.batterylegion:Do(act.doer, target)
 end
 AddAction(RUB_L)
 
-AddComponentAction("EQUIPPED", "z_refractedmoonlight", function(inst, doer, target, actions, right)
-    if
-        right and
-        doer == target and --对自己使用
-        (inst:HasTag("canmoonsurge_l") or inst:HasTag("cansurge_l"))
-    then
+--对地上的物品进行操作
+AddComponentAction("SCENE", "batterylegion", function(inst, doer, actions, right)
+    if right then
+        table.insert(actions, ACTIONS.RUB_L)
+    end
+end)
+--对物品栏的物品进行操作
+AddComponentAction("INVENTORY", "batterylegion", function(inst, doer, actions, right)
+    -- if right then --INVENTORY 模式，不能用right
+        table.insert(actions, ACTIONS.RUB_L)
+    -- end
+end)
+--用物品对其他对象进行操作
+AddComponentAction("USEITEM", "batterylegion", function(inst, doer, target, actions, right)
+    if right then
         table.insert(actions, ACTIONS.RUB_L)
     end
 end)
 
-AddStategraphActionHandler("wilson", ActionHandler(ACTIONS.RUB_L, "moonsurge_l"))
-AddStategraphActionHandler("wilson_client", ActionHandler(ACTIONS.RUB_L, "moonsurge_l"))
+AddStategraphActionHandler("wilson", ActionHandler(ACTIONS.RUB_L, Fn_sg_robot_handy))
+AddStategraphActionHandler("wilson_client", ActionHandler(ACTIONS.RUB_L, Fn_sg_robot_handy))
 
 --------------------------------------------------------------------------
 --[[ 服务器专属修改 ]]

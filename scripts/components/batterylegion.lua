@@ -9,7 +9,7 @@ local function OnFuelChange(inst, data)
 		end
 	end
 end
-local function DoCharge_task(self)
+local function DoCharge_task(inst, self)
 	self.time_start = GetTime()
 	self:Charge(self.charge_value, nil)
 end
@@ -49,6 +49,17 @@ function BatteryLegion:StopCharge() --结束自动充能
 	self.time_start = nil
 end
 
+local function SpawnFx(doer, target)
+	local owner = target
+	if target.components.inventoryitem ~= nil then
+		local owner2 = target.components.inventoryitem:GetGrandOwner()
+		if owner2 ~= nil then
+			owner = owner2
+		end
+	end
+	local x, y, z = owner.Transform:GetWorldPosition()
+    SpawnPrefab("eleccore_spark_fx").Transform:SetPosition(x, y+0.7 + math.random()*1.3, z)
+end
 local function TryCostEnergy(cpt, cost, doer)
 	if cpt == nil then
 		return true
@@ -69,6 +80,7 @@ function BatteryLegion:Do(doer, target)
 			if target.chargeleft ~= nil then
 				cpt:DoDelta(target.chargeleft*10, doer)
 				target.components.battery:OnUsed(self.inst)
+				SpawnFx(doer, target)
 				return true
 			else
 				return false, "NOUSE"
@@ -133,14 +145,14 @@ function BatteryLegion:Do(doer, target)
 			target.components.fueled ~= nil and
 			target.components.trader ~= nil and target.components.trader.enabled
 		then
-			if not target.components.fueled.accepting then
-				return false, "REFUSE"
-			end
+			-- if not target.components.fueled.accepting then
+			-- 	return false, "REFUSE"
+			-- end
 			cost = 20
 			if not TryCostEnergy(cpt, cost, doer) then
 				return false, "NOENERGY"
 			end
-			local gem = SpawnPrefab("bluegem")
+			local gem = SpawnPrefab("redgem")
 			if gem ~= nil then
 				local abletoaccept, reason = target.components.trader:AbleToAccept(gem, doer)
 				if abletoaccept then
@@ -223,8 +235,7 @@ function BatteryLegion:Do(doer, target)
 	end
 
 	if cost > 0 then
-		--特效undo
-
+		SpawnFx(doer, target)
 		if self.inst.components.fueled == nil then
 			if self.inst.components.stackable ~= nil then
 				self.inst.components.stackable:Get():Remove()

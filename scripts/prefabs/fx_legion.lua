@@ -828,6 +828,64 @@ MakeFx2({ --风景球：落雪
     -- fn_server = function(inst)end
 })
 
+local function OnUpdate_eleccore(inst, dt)
+    if inst.sound then
+        inst.SoundEmitter:PlaySound("dontstarve/characters/wx78/spark")
+        inst.sound = nil
+    end
+    inst.Light:SetIntensity(inst.i)
+    inst.i = inst.i - dt * 2
+    if inst.i <= 0 then
+        if inst.killfx then
+            inst:Remove()
+        else
+            inst.task:Cancel()
+            inst.task = nil
+        end
+    end
+end
+local function OnAnimOver_eleccore(inst)
+    if inst.task == nil then
+        inst:Remove()
+    else
+        inst:RemoveEventCallback("animover", OnAnimOver_eleccore)
+        inst.killfx = true
+    end
+end
+MakeFx({ --电气石：摩擦电
+    name = "eleccore_spark_fx",
+    assets = {
+        Asset("ANIM", "anim/sparks.zip") --官方漏电火花动画
+    },
+    fn_common = nil,
+    fn_anim = function(inst)
+        inst.entity:AddSoundEmitter()
+        inst.entity:AddLight()
+
+        inst.AnimState:SetBank("sparks")
+        inst.AnimState:SetBuild("sparks")
+        inst.AnimState:PlayAnimation("sparks_"..tostring(math.random(3)))
+        inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
+        inst.AnimState:SetMultColour(66/255, 207/255, 255/255, 1)
+        inst.Transform:SetScale(2, 2, 2)
+        inst.AnimState:SetFinalOffset(3)
+
+        inst.Light:Enable(true)
+        inst.Light:SetRadius(2)
+        inst.Light:SetFalloff(1)
+        inst.Light:SetIntensity(.9)
+        inst.Light:SetColour(66/255, 207/255, 255/255)
+
+        local dt = 1 / 20
+        inst.i = .9
+        inst.sound = inst.SoundEmitter ~= nil
+        inst.task = inst:DoPeriodicTask(dt, OnUpdate_eleccore, nil, dt)
+    end,
+    fn_remove = function(inst)
+        inst:ListenForEvent("animover", OnAnimOver_eleccore)
+    end
+})
+
 ------
 --尘世蜃楼
 ------
@@ -853,7 +911,7 @@ MakeFx({ --白木吉他：弹奏时的飘动音符
         inst.AnimState:OverrideSymbol("fx_icon", "guitar_whitewood_doing_fx", "fx_icon")
         inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
     end,
-    fn_remove = nil,
+    fn_remove = nil
 })
 MakeFx2({ --幻象法杖：电光(音速起子12)
     name = "pinkstaff_fx_tvplay",
