@@ -1452,11 +1452,23 @@ _G.CROPS_DATA_LEGION.plantmeat = {
 --     },
 --     cluster_size = { 1, 1.5 },
 --     fn_loot = function(self, doer, ispicked, isburnt, loots)
---         if self.stage == self.stage_max or self.level.pickable == 1 then
+--         if self.stage == self.stage_max then
 --             self:GetBaseLoot(loots, {
 --                 doer = doer, ispicked = ispicked, isburnt = isburnt,
---                 crop = self.stage == self.stage_max and self.cropprefab or "berries_juicy", crop_rot = "spoiled_food",
---                 lootothers = nil
+--                 crop = self.cropprefab, crop_rot = "spoiled_food",
+--                 lootothers = {
+--                     { israndom=true, factor=0.4, name="berries_juicy", name_rot=nil },
+--                     { israndom=false, factor=0.2, name="berries_juicy", name_rot=nil }
+--                 }
+--             })
+--         elseif self.level.pickable == 1 then
+--             self:GetBaseLoot(loots, {
+--                 doer = doer, ispicked = ispicked, isburnt = isburnt,
+--                 crop = "berries_juicy", crop_rot = "spoiled_food",
+--                 lootothers = {
+--                     { israndom=true, factor=0.4, name=self.cropprefab, name_rot=nil },
+--                     { israndom=false, factor=0.2, name=self.cropprefab, name_rot=nil }
+--                 }
 --             })
 --         end
 --     end
@@ -1776,6 +1788,21 @@ local mapseeds = {
         swap = { build = "crop_legion_lureplant", file = "swap_turn", symboltype = "1" },
         fruit = "seeds_plantmeat_l", time = 2*TUNING.TOTAL_DAY_TIME,
         fruitnum_min = 1, fruitnum_max = 1, genekey = "tissue_l_lureplant"
+    },
+    berrybush = {
+        swap = { build = "crop_legion_berries", file = "swap_turn1", symboltype = "1" },
+        fruit = "seeds_berries_l", time = 2*TUNING.TOTAL_DAY_TIME,
+        fruitnum_min = 1, fruitnum_max = 1, genekey = "tissue_l_berries"
+    },
+    berrybush2 = {
+        swap = { build = "crop_legion_berries", file = "swap_turn2", symboltype = "1" },
+        fruit = "seeds_berries_l", time = 2*TUNING.TOTAL_DAY_TIME,
+        fruitnum_min = 1, fruitnum_max = 1, genekey = "tissue_l_berries"
+    },
+    berrybush_juicy = {
+        swap = { build = "crop_legion_berries", file = "swap_turn3", symboltype = "1" },
+        fruit = "seeds_berries_l", time = 5*TUNING.TOTAL_DAY_TIME,
+        fruitnum_min = 2, fruitnum_max = 3, genekey = "tissue_l_berries"
     }
 }
 for k,v in pairs(mapseeds) do

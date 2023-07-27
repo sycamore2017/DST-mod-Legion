@@ -2267,6 +2267,7 @@ S_NAMES.PLANT_MANDRAKE_L = "Planted Mandrake"
 S_NAMES.PLANT_GOURD_L = "Gourd Vine"
 S_NAMES.PLANT_CACTUS_MEAT_L = "Cactaceae"
 S_NAMES.PLANT_PLANTMEAT_L = "Vase Herb"
+S_NAMES.PLANT_BERRIES_L = "Jabuticaba"
 
 S______GENERIC.DESCRIBE.PLANT_CROP_L = {
     WITHERED = "It will be born again when spring breeze blows...",
