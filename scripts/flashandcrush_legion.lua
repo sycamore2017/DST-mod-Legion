@@ -52,6 +52,8 @@ local assets = {
     Asset("IMAGE", "images/inventoryimages/soul_contracts.tex"),
     Asset("ATLAS", "images/inventoryimages/explodingfruitcake.xml"),
     Asset("IMAGE", "images/inventoryimages/explodingfruitcake.tex"),
+    Asset("ATLAS", "images/inventoryimages/tourmalinecore.xml"),
+    Asset("IMAGE", "images/inventoryimages/tourmalinecore.tex")
 }
 
 for k,v in pairs(assets) do

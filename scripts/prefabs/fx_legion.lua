@@ -866,7 +866,7 @@ MakeFx({ --电气石：摩擦电
         inst.AnimState:SetBuild("sparks")
         inst.AnimState:PlayAnimation("sparks_"..tostring(math.random(3)))
         inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
-        inst.AnimState:SetMultColour(66/255, 207/255, 255/255, 1)
+        inst.AnimState:SetMultColour(50/255, 176/255, 255/255, 0.8)
         inst.Transform:SetScale(2, 2, 2)
         inst.AnimState:SetFinalOffset(3)
 
@@ -874,7 +874,7 @@ MakeFx({ --电气石：摩擦电
         inst.Light:SetRadius(2)
         inst.Light:SetFalloff(1)
         inst.Light:SetIntensity(.9)
-        inst.Light:SetColour(66/255, 207/255, 255/255)
+        inst.Light:SetColour(50/255, 176/255, 255/255)
 
         local dt = 1 / 20
         inst.i = .9

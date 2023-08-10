@@ -1255,7 +1255,7 @@ table.insert(prefs, Prefab("refractedmoonlight", function()
 
     inst._dd = {
         img_tex = "refractedmoonlight", img_atlas = "images/inventoryimages/refractedmoonlight.xml",
-        img_tex2 = "refractedmoonlight", img_atlas2 = "images/inventoryimages/refractedmoonlight.xml",
+        img_tex2 = "refractedmoonlight2", img_atlas2 = "images/inventoryimages/refractedmoonlight2.xml",
         build = "swap_refractedmoonlight", fx = "refracted_l_spark_fx"
     }
     inst._equip_l = nil
@@ -1348,7 +1348,9 @@ end, {
     Asset("ANIM", "anim/refractedmoonlight.zip"),    --地面的动画
     Asset("ANIM", "anim/swap_refractedmoonlight.zip"),   --手上的动画
     Asset("ATLAS", "images/inventoryimages/refractedmoonlight.xml"),
-    Asset("IMAGE", "images/inventoryimages/refractedmoonlight.tex")
+    Asset("IMAGE", "images/inventoryimages/refractedmoonlight.tex"),
+    Asset("ATLAS", "images/inventoryimages/refractedmoonlight2.xml"),
+    Asset("IMAGE", "images/inventoryimages/refractedmoonlight2.tex")
 }, {
     "refracted_l_spark_fx", "refracted_l_wave_fx",
     "refracted_l_skylight_fx", "refracted_l_light_fx",
