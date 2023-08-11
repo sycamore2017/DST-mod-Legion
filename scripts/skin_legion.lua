@@ -345,6 +345,15 @@ local function OnSummer_cactus(inst, build)
     end
 end
 
+------
+
+local function SetWidget(inst, name)
+    if inst.replica.container ~= nil then
+        inst.replica.container:Close()
+        inst.replica.container:WidgetSetup(name)
+    end
+end
+
 --------------------------------------------------------------------------
 --[[ 全局皮肤总数据，以及修改 ]]
 --------------------------------------------------------------------------
@@ -2131,12 +2140,10 @@ _G.SKINS_LEGION = {
             inst.components.container:WidgetSetup("backcub")
         end,
         fn_start_c = function(inst)
-            inst.replica.container:Close()
-            inst.replica.container:WidgetSetup("backcub_fans2")
+            SetWidget(inst, "backcub_fans2")
         end,
         fn_end_c = function(inst)
-            inst.replica.container:Close()
-            inst.replica.container:WidgetSetup("backcub")
+            SetWidget(inst, "backcub")
         end,
 
         fn_anim = function(inst)
@@ -2730,12 +2737,10 @@ _G.SKINS_LEGION = {
             inst.components.container:WidgetSetup("revolvedmoonlight")
         end,
         fn_start_c = function(inst)
-            inst.replica.container:Close()
-            inst.replica.container:WidgetSetup("revolvedmoonlight_taste")
+            SetWidget(inst, "revolvedmoonlight_taste")
         end,
         fn_end_c = function(inst)
-            inst.replica.container:Close()
-            inst.replica.container:WidgetSetup("revolvedmoonlight")
+            SetWidget(inst, "revolvedmoonlight")
         end,
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
         linkedskins = { item = "revolvedmoonlight_item_taste" },
@@ -2767,12 +2772,10 @@ _G.SKINS_LEGION = {
             inst.components.container:WidgetSetup("revolvedmoonlight_pro")
         end,
         fn_start_c = function(inst)
-            inst.replica.container:Close()
-            inst.replica.container:WidgetSetup("revolvedmoonlight_pro_taste")
+            SetWidget(inst, "revolvedmoonlight_pro_taste")
         end,
         fn_end_c = function(inst)
-            inst.replica.container:Close()
-            inst.replica.container:WidgetSetup("revolvedmoonlight_pro")
+            SetWidget(inst, "revolvedmoonlight_pro")
         end,
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
         linkedskins = { item = "revolvedmoonlight_item_taste" },
@@ -2828,12 +2831,10 @@ _G.SKINS_LEGION = {
             inst.components.container:WidgetSetup("revolvedmoonlight")
         end,
         fn_start_c = function(inst)
-            inst.replica.container:Close()
-            inst.replica.container:WidgetSetup("revolvedmoonlight_taste2")
+            SetWidget(inst, "revolvedmoonlight_taste2")
         end,
         fn_end_c = function(inst)
-            inst.replica.container:Close()
-            inst.replica.container:WidgetSetup("revolvedmoonlight")
+            SetWidget(inst, "revolvedmoonlight")
         end,
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
         linkedskins = { item = "revolvedmoonlight_item_taste2" },
@@ -2865,12 +2866,10 @@ _G.SKINS_LEGION = {
             inst.components.container:WidgetSetup("revolvedmoonlight_pro")
         end,
         fn_start_c = function(inst)
-            inst.replica.container:Close()
-            inst.replica.container:WidgetSetup("revolvedmoonlight_pro_taste2")
+            SetWidget(inst, "revolvedmoonlight_pro_taste2")
         end,
         fn_end_c = function(inst)
-            inst.replica.container:Close()
-            inst.replica.container:WidgetSetup("revolvedmoonlight_pro")
+            SetWidget(inst, "revolvedmoonlight_pro")
         end,
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
         linkedskins = { item = "revolvedmoonlight_item_taste2" },
@@ -2926,12 +2925,10 @@ _G.SKINS_LEGION = {
             inst.components.container:WidgetSetup("revolvedmoonlight")
         end,
         fn_start_c = function(inst)
-            inst.replica.container:Close()
-            inst.replica.container:WidgetSetup("revolvedmoonlight_taste3")
+            SetWidget(inst, "revolvedmoonlight_taste3")
         end,
         fn_end_c = function(inst)
-            inst.replica.container:Close()
-            inst.replica.container:WidgetSetup("revolvedmoonlight")
+            SetWidget(inst, "revolvedmoonlight")
         end,
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
         linkedskins = { item = "revolvedmoonlight_item_taste3" },
@@ -2963,12 +2960,10 @@ _G.SKINS_LEGION = {
             inst.components.container:WidgetSetup("revolvedmoonlight_pro")
         end,
         fn_start_c = function(inst)
-            inst.replica.container:Close()
-            inst.replica.container:WidgetSetup("revolvedmoonlight_pro_taste3")
+            SetWidget(inst, "revolvedmoonlight_pro_taste3")
         end,
         fn_end_c = function(inst)
-            inst.replica.container:Close()
-            inst.replica.container:WidgetSetup("revolvedmoonlight_pro")
+            SetWidget(inst, "revolvedmoonlight_pro")
         end,
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
         linkedskins = { item = "revolvedmoonlight_item_taste3" },
@@ -3024,12 +3019,10 @@ _G.SKINS_LEGION = {
             inst.components.container:WidgetSetup("revolvedmoonlight")
         end,
         fn_start_c = function(inst)
-            inst.replica.container:Close()
-            inst.replica.container:WidgetSetup("revolvedmoonlight_taste4")
+            SetWidget(inst, "revolvedmoonlight_taste4")
         end,
         fn_end_c = function(inst)
-            inst.replica.container:Close()
-            inst.replica.container:WidgetSetup("revolvedmoonlight")
+            SetWidget(inst, "revolvedmoonlight")
         end,
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
         linkedskins = { item = "revolvedmoonlight_item_taste4" },
@@ -3061,12 +3054,10 @@ _G.SKINS_LEGION = {
             inst.components.container:WidgetSetup("revolvedmoonlight_pro")
         end,
         fn_start_c = function(inst)
-            inst.replica.container:Close()
-            inst.replica.container:WidgetSetup("revolvedmoonlight_pro_taste4")
+            SetWidget(inst, "revolvedmoonlight_pro_taste4")
         end,
         fn_end_c = function(inst)
-            inst.replica.container:Close()
-            inst.replica.container:WidgetSetup("revolvedmoonlight_pro")
+            SetWidget(inst, "revolvedmoonlight_pro")
         end,
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
         linkedskins = { item = "revolvedmoonlight_item_taste4" },

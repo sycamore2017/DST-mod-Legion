@@ -946,6 +946,11 @@ local bonus_rf = 1
 local bonus_rf_buff = 1.2
 local count_rf_max = 4
 
+local lvls_refracted = {}
+for i = 1, 14, 1 do
+    lvls_refracted[i] = i*CONFIGS_LEGION.REFRACTEDUPDATETIMES/14
+end
+
 local function SetCount_refracted(inst, value)
     value = math.clamp(value, 0, count_rf_max)
     inst._count = value
@@ -966,7 +971,7 @@ local function SetAtk_refracted(inst)
     inst.components.planardamage:SetBaseDamage(math.floor( (inst._atk_sp+inst._atk_sp_lvl)*inst._atkmult ))
 end
 local function SetLight_refracted(inst)
-    if inst._lvl >= 4 then
+    if inst._lvl >= lvls_refracted[4] then
         inst._light.Light:SetRadius(inst._task_fx == nil and 1 or 4)
         inst._light.Light:Enable(true)
     else
@@ -981,21 +986,21 @@ local function TrySetOwnerSymbol(inst, doer, revolt)
         if doer:HasTag("player") then
             if doer.components.health and doer.components.inventory then
                 if inst == doer.components.inventory:GetEquippedItem(EQUIPSLOTS.HANDS) then
-                    doer.AnimState:OverrideSymbol("swap_object", inst._dd.build, revolt and "swap_refractedmoonlight" or "swap_refractedmoonlight")
+                    doer.AnimState:OverrideSymbol("swap_object", inst._dd.build, revolt and "swap2" or "swap1")
                 end
             end
         elseif doer:HasTag("equipmentmodel") then
-            doer.AnimState:OverrideSymbol("swap_object", inst._dd.build, revolt and "swap_refractedmoonlight" or "swap_refractedmoonlight")
+            doer.AnimState:OverrideSymbol("swap_object", inst._dd.build, revolt and "swap2" or "swap1")
         end
     end
     if revolt then
         inst.components.inventoryitem.atlasname = inst._dd.img_atlas2
         inst.components.inventoryitem:ChangeImageName(inst._dd.img_tex2)
-        inst.AnimState:PlayAnimation("idle_loop")
+        inst.AnimState:PlayAnimation("idle2", true)
     else
         inst.components.inventoryitem.atlasname = inst._dd.img_atlas
         inst.components.inventoryitem:ChangeImageName(inst._dd.img_tex)
-        inst.AnimState:PlayAnimation("idle_loop")
+        inst.AnimState:PlayAnimation("idle", true)
     end
 end
 local function TriggerRevolt(inst, doer, doit)
@@ -1012,8 +1017,6 @@ local function TriggerRevolt(inst, doer, doit)
                     if not owner:HasTag("player") then
                         local xx, yy, zz = owner.Transform:GetWorldPosition()
                         fx.Transform:SetPosition(xx, yy+1.4, zz)
-                        -- local x, y, z = TOOLS_L.GetCalculatedPos(xx, yy, zz, 0.1+math.random()*0.9, nil)
-                        -- fx.Transform:SetPosition(x, y+math.random()*2, z)
                         return
                     end
                     fx.entity:SetParent(owner.entity)
@@ -1031,7 +1034,7 @@ local function TriggerRevolt(inst, doer, doit)
         inst._atk_sp = atk2_rf_buff
         inst.components.damagetypebonus:AddBonus("shadow_aligned", inst, bonus_rf_buff, "moonsurge")
 
-        if inst._lvl >= 8 then
+        if inst._lvl >= lvls_refracted[8] then
             inst.components.weapon:SetRange(1.5)
         end
 
@@ -1070,13 +1073,13 @@ local function TryRevolt_refracted(inst, doer)
     end
 
     local time = 60
-    if inst._lvl >= 14 then
+    if inst._lvl >= lvls_refracted[14] then
         local timeleft = inst.components.timer:GetTimeLeft("moonsurge") or 0
         if timeleft > 0 then
             time = math.min(time + timeleft, 360)
         end
     else
-        if inst._lvl < 2 then
+        if inst._lvl < lvls_refracted[2] then
             time = 30
         end
     end
@@ -1089,7 +1092,7 @@ end
 
 local function OnEquip_refracted(inst, owner) --装备武器时
     owner.AnimState:OverrideSymbol("swap_object", inst._dd.build,
-        inst.components.timer:TimerExists("moonsurge") and "swap_refractedmoonlight" or "swap_refractedmoonlight")
+        inst.components.timer:TimerExists("moonsurge") and "swap2" or "swap1")
     owner.AnimState:Show("ARM_carry") --显示持物手
     owner.AnimState:Hide("ARM_normal") --隐藏普通的手
     inst._equip_l = true
@@ -1116,10 +1119,18 @@ local function OnUnequip_refracted(inst, owner) --卸下武器时
     end
 end
 local function OnAttack_refracted(inst, owner, target)
-    if inst._task_fx == nil or inst._lvl >= 10 then
-        SetCount_refracted(inst, inst._count + (inst._lvl >= 12 and 0.1 or 0.05))
+    if inst._task_fx == nil or inst._lvl >= lvls_refracted[10] then
+        SetCount_refracted(inst, inst._count + (inst._lvl >= lvls_refracted[12] and 0.1 or 0.05))
     end
-    if inst._lvl >= 6 and inst._task_fx ~= nil then
+    if inst._lvl >= lvls_refracted[6] and inst._task_fx ~= nil then
+        if target ~= nil and target:IsValid() then
+            local fx = SpawnPrefab(inst._dd.fx or "refracted_l_spark_fx")
+            if fx ~= nil then
+                local xx, yy, zz = target.Transform:GetWorldPosition()
+                local x, y, z = TOOLS_L.GetCalculatedPos(xx, yy, zz, 0.1+math.random()*0.9, nil)
+                fx.Transform:SetPosition(x, y+math.random()*2, z)
+            end
+        end
         if owner.components.health and owner.components.health:GetPercent() < 1 then
             owner.components.health:DoDelta(1.5, true, "debug_key", true, nil, true) --对旺达回血要特定原因才行
             return
@@ -1134,25 +1145,25 @@ local function OnStageUp_refracted(inst)
     local lvl = inst.components.upgradeable:GetStage() - 1
     inst._lvl = lvl
     inst._lvl_l:set(lvl)
-    if lvl >= 13 then
+    if lvl >= lvls_refracted[13] then
         inst._atk_lvl = 40
         inst._atk_sp_lvl = 30
-    elseif lvl >= 11 then
+    elseif lvl >= lvls_refracted[11] then
         inst._atk_lvl = 30
         inst._atk_sp_lvl = 30
-    elseif lvl >= 9 then
+    elseif lvl >= lvls_refracted[9] then
         inst._atk_lvl = 30
         inst._atk_sp_lvl = 20
-    elseif lvl >= 7 then
+    elseif lvl >= lvls_refracted[7] then
         inst._atk_lvl = 20
         inst._atk_sp_lvl = 20
-    elseif lvl >= 5 then
+    elseif lvl >= lvls_refracted[5] then
         inst._atk_lvl = 20
         inst._atk_sp_lvl = 10
-    elseif lvl >= 3 then
+    elseif lvl >= lvls_refracted[3] then
         inst._atk_lvl = 10
         inst._atk_sp_lvl = 10
-    elseif lvl >= 1 then
+    elseif lvl >= lvls_refracted[1] then
         inst._atk_lvl = 10
         inst._atk_sp_lvl = 0
     else
@@ -1228,7 +1239,7 @@ table.insert(prefs, Prefab("refractedmoonlight", function()
 
     inst.AnimState:SetBank("refractedmoonlight")
     inst.AnimState:SetBuild("refractedmoonlight")
-    inst.AnimState:PlayAnimation("idle_loop", true)
+    inst.AnimState:PlayAnimation("idle", true)
 
     inst:AddTag("sharp") --武器的标签跟攻击方式跟攻击音效有关 没有特殊的话就用这两个
     inst:AddTag("pointy")
@@ -1256,7 +1267,7 @@ table.insert(prefs, Prefab("refractedmoonlight", function()
     inst._dd = {
         img_tex = "refractedmoonlight", img_atlas = "images/inventoryimages/refractedmoonlight.xml",
         img_tex2 = "refractedmoonlight2", img_atlas2 = "images/inventoryimages/refractedmoonlight2.xml",
-        build = "swap_refractedmoonlight", fx = "refracted_l_spark_fx"
+        build = "refractedmoonlight", fx = "refracted_l_spark_fx"
     }
     inst._equip_l = nil
     inst._task_fx = nil
@@ -1317,7 +1328,7 @@ table.insert(prefs, Prefab("refractedmoonlight", function()
     inst.components.upgradeable.upgradetype = UPGRADETYPES.REFRACTED_L
     inst.components.upgradeable.onupgradefn = OnUpgradeFn
     inst.components.upgradeable.onstageadvancefn = OnStageUp_refracted
-    inst.components.upgradeable.numstages = 15 --因为初始等级为1，所以升级14次的话就填写15
+    inst.components.upgradeable.numstages = CONFIGS_LEGION.REFRACTEDUPDATETIMES + 1 --因为初始等级为1
     inst.components.upgradeable.upgradesperstage = 1
 
     inst:AddComponent("timer")
@@ -1345,8 +1356,7 @@ table.insert(prefs, Prefab("refractedmoonlight", function()
 
     return inst
 end, {
-    Asset("ANIM", "anim/refractedmoonlight.zip"),    --地面的动画
-    Asset("ANIM", "anim/swap_refractedmoonlight.zip"),   --手上的动画
+    Asset("ANIM", "anim/refractedmoonlight.zip"),
     Asset("ATLAS", "images/inventoryimages/refractedmoonlight.xml"),
     Asset("IMAGE", "images/inventoryimages/refractedmoonlight.tex"),
     Asset("ATLAS", "images/inventoryimages/refractedmoonlight2.xml"),

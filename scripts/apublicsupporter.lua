@@ -680,7 +680,7 @@ _G.REPAIRERS_L["insectshell_l"] = {
     end
 }
 
---月藏宝匣、月轮宝盘
+--月藏宝匣、月轮宝盘、月折宝剑
 
 _G.UPGRADETYPES.REVOLVED_L = "revolved_l"
 _G.UPGRADETYPES.HIDDEN_L = "hidden_l"
