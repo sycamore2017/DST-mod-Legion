@@ -156,8 +156,10 @@ local InventoryPrefabsList = {  --每个元素的下标值为每种物品栏图�
     lance_carrot_l = { build = "images_minisign6" },
     tissue_l_cactus = { build = "images_minisign6" },
     tissue_l_lureplant = { build = "images_minisign6" },
+    
+    tissue_l_berries = { build = "images_minisign6" },
 
-    --skins1
+    --skins1：56个
     hat_lichen_emo_que = { build = "images_minisign_skins1" },
     neverfade_thanks = { build = "images_minisign_skins1" },
     neverfade_thanks_broken = { build = "images_minisign_skins1" },

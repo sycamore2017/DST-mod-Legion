@@ -1054,6 +1054,7 @@ end
 
 MakeTissue("cactus")
 MakeTissue("lureplant")
+MakeTissue("berries")
 
 --------------------------------------------------------------------------
 --[[ 胡萝卜长枪 ]]

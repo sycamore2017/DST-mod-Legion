@@ -2691,6 +2691,7 @@ S_____WORMWOOD.DESCRIBE.TISSUE_L = "A part of a friend."
 
 S_NAMES.TISSUE_L_CACTUS = "Living Tissue of Cactus" --仙人掌活性组织
 S_NAMES.TISSUE_L_LUREPLANT = "Living Tissue of Lureplant" --食人花活性组织
+S_NAMES.TISSUE_L_BERRIES = "Living Tissue of Berry Bush" --浆果丛活性组织
 
 --------------------------------------------------------------------------
 --[[ flash and crush ]]--[[ 电闪雷鸣 ]]

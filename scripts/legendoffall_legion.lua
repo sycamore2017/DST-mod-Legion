@@ -1448,7 +1448,7 @@ _G.CROPS_DATA_LEGION.plantmeat = {
 --         { anim = "level1", time = TUNING.TOTAL_DAY_TIME*8*0.45, deadanim = "dead1", witheredprefab = nil },
 --         { anim = "level2", time = TUNING.TOTAL_DAY_TIME*8*0.55, deadanim = "dead1", witheredprefab = {"log"}, bloom = true },
 --         { anim = { "level3_1", "level3_2", "level3_3" }, time = time_grow, deadanim = "dead1", witheredprefab = {"log", "twigs"}, pickable = 1 },
---         { anim = { "level4_1", "level4_2", "level4_3" }, time = time_day*6, deadanim = "dead1", witheredprefab = {"log", "twigs"} }
+--         { anim = { "level3_1", "level3_2", "level3_3" }, time = time_day*6, deadanim = "dead1", witheredprefab = {"log", "twigs"} }
 --     },
 --     cluster_size = { 1, 1.5 },
 --     fn_loot = function(self, doer, ispicked, isburnt, loots)
@@ -1972,32 +1972,51 @@ end
 --------------------------------------------------------------------------
 
 if IsServer then
+    local function GiveTissue(inst, picker, name)
+        local loot = SpawnPrefab(name)
+        if loot ~= nil then
+            loot.components.inventoryitem:InheritMoisture(TheWorld.state.wetness, TheWorld.state.iswet)
+            if picker ~= nil and picker.components.inventory ~= nil then
+                picker.components.inventory:GiveItem(loot, nil, inst:GetPosition())
+            else
+                local x, y, z = inst.Transform:GetWorldPosition()
+                loot.components.inventoryitem:DoDropPhysics(x, y, z, true)
+            end
+        end
+    end
+
     ------仙人掌的
     local function FnSet_cactus(inst)
         local onpickedfn_old = inst.components.pickable.onpickedfn
         inst.components.pickable.onpickedfn = function(inst, picker, ...)
-            if onpickedfn_old then
+            if onpickedfn_old ~= nil then
                 onpickedfn_old(inst, picker, ...)
             end
-
             if not TheWorld.state.israining or math.random() >= 0.05 then
                 return
             end
-
-            local loot = SpawnPrefab("tissue_l_cactus")
-            if loot then
-                loot.components.inventoryitem:InheritMoisture(TheWorld.state.wetness, TheWorld.state.iswet)
-                if picker ~= nil and picker.components.inventory ~= nil then
-                    picker.components.inventory:GiveItem(loot, nil, inst:GetPosition())
-                else
-                    local x, y, z = inst.Transform:GetWorldPosition()
-                    loot.components.inventoryitem:DoDropPhysics(x, y, z, true)
-                end
-            end
+            GiveTissue(inst, picker, "tissue_l_cactus")
         end
     end
     AddPrefabPostInit("cactus", FnSet_cactus)
     AddPrefabPostInit("oasis_cactus", FnSet_cactus)
+
+    ------浆果丛的
+    local function FnSet_berry(inst)
+        local onpickedfn_old = inst.components.pickable.onpickedfn
+        inst.components.pickable.onpickedfn = function(inst, picker, ...)
+            if onpickedfn_old ~= nil then
+                onpickedfn_old(inst, picker, ...)
+            end
+            if not TheWorld.state.isdusk or math.random() >= 0.01 then
+                return
+            end
+            GiveTissue(inst, picker, "tissue_l_berries")
+        end
+    end
+    AddPrefabPostInit("berrybush", FnSet_berry)
+    AddPrefabPostInit("berrybush2", FnSet_berry)
+    AddPrefabPostInit("berrybush_juicy", FnSet_berry)
 
     ------食人花的
     local function OnDeath_lure(inst)
