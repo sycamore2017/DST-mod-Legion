@@ -2212,7 +2212,7 @@ AddComponentAction("INVENTORY", "batterylegion", function(inst, doer, actions, r
 end)
 --用物品对其他对象进行操作
 AddComponentAction("USEITEM", "batterylegion", function(inst, doer, target, actions, right)
-    if right then
+    if right and not target:HasTag("battery_l") then
         table.insert(actions, ACTIONS.RUB_L)
     end
 end)

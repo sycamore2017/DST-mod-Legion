@@ -2872,22 +2872,44 @@ S___WATHGRITHR.DESCRIBE.ELECARMET = "我最伟大的敌人，也称作芬布尔�
 S_______WORTOX.DESCRIBE.ELECARMET = "一个迷失的灵魂。"
 
 S_NAMES.TOURMALINECORE = "电气石"
+S_RECIPE_DESC.BLOCK_L_TOURMALINECORE = "用以存储电气时代的主要能源。"
 S______GENERIC.DESCRIBE.TOURMALINECORE = "天啦，我能摸摸看吗？"
---S_______WILLOW.DESCRIBE.TOURMALINECORE = ""
+S_______WILLOW.DESCRIBE.TOURMALINECORE = "我更喜欢红宝石。"
 --S_____WOLFGANG.DESCRIBE.TOURMALINECORE = ""
---S________WENDY.DESCRIBE.TOURMALINECORE = ""
+-- S________WENDY.DESCRIBE.TOURMALINECORE = ""
 S_________WX78.DESCRIBE.TOURMALINECORE = "这可以作为我的能源核心！"
-S_WICKERBOTTOM.DESCRIBE.TOURMALINECORE = "它聚集了大量的正电荷。"
+S_WICKERBOTTOM.DESCRIBE.TOURMALINECORE = "能聚集电荷的晶体。"
 -- S_______WOODIE.DESCRIBE.TOURMALINECORE = ""
 S______WAXWELL.DESCRIBE.TOURMALINECORE = "青色带来雷电。"
 -- S___WATHGRITHR.DESCRIBE.TOURMALINECORE = ""
--- S_______WEBBER.DESCRIBE.TOURMALINECORE = ""
--- S_______WINONA.DESCRIBE.TOURMALINECORE = ""
--- S________WARLY.DESCRIBE.TOURMALINECORE = ""
+S_______WEBBER.DESCRIBE.TOURMALINECORE = "摩擦摩擦。"
+S_______WINONA.DESCRIBE.TOURMALINECORE = "对我来说太有用了！"
+S________WARLY.DESCRIBE.TOURMALINECORE = "这石头稍微有一点意思了。"
 -- S_______WORTOX.DESCRIBE.TOURMALINECORE = ""
--- S_____WORMWOOD.DESCRIBE.TOURMALINECORE = ""
+S_____WORMWOOD.DESCRIBE.TOURMALINECORE = "劈里啪啦。"
 -- S_________WURT.DESCRIBE.TOURMALINECORE = ""
+S_______WALTER.DESCRIBE.TOURMALINECORE = "我能收藏吗，可以吗！可以吗？"
+-- S________WANDA.DESCRIBE.TOURMALINECORE = ""
 -- STRINGS.CHARACTERS.WAGSTAFF.DESCRIBE.TOURMALINECORE = "这可以用作我机器人的能源核心！"
+
+S_NAMES.TOURMALINESHARD = "带电的晶石"
+S______GENERIC.DESCRIBE.TOURMALINESHARD = "我敢打赌这石头包裹着一块晶体。"
+-- S_______WILLOW.DESCRIBE.TOURMALINESHARD = ""
+-- S_____WOLFGANG.DESCRIBE.TOURMALINESHARD = ""
+-- S________WENDY.DESCRIBE.TOURMALINESHARD = ""
+-- S_________WX78.DESCRIBE.TOURMALINESHARD = ""
+S_WICKERBOTTOM.DESCRIBE.TOURMALINESHARD = "一种特殊的石头，带有微弱电流。"
+-- S_______WOODIE.DESCRIBE.TOURMALINESHARD = ""
+-- S______WAXWELL.DESCRIBE.TOURMALINESHARD = ""
+-- S___WATHGRITHR.DESCRIBE.TOURMALINESHARD = ""
+-- S_______WEBBER.DESCRIBE.TOURMALINESHARD = ""
+S_______WINONA.DESCRIBE.TOURMALINESHARD = "需要打磨掉外面那层没用的石头。"
+S_______WORTOX.DESCRIBE.TOURMALINESHARD = "玉不琢，不成器。"
+-- S_____WORMWOOD.DESCRIBE.TOURMALINESHARD = ""
+S________WARLY.DESCRIBE.TOURMALINESHARD = "我对研究石头完全不感兴趣。"
+-- S_________WURT.DESCRIBE.TOURMALINESHARD = ""
+S_______WALTER.DESCRIBE.TOURMALINESHARD = "好看的石头，先留着吧。"
+-- S________WANDA.DESCRIBE.TOURMALINESHARD = ""
 
 S_NAMES.ICIRE_ROCK = "鸳鸯石"
 S_RECIPE_DESC.ICIRE_ROCK = "炙热与严寒的交融。"
@@ -3570,7 +3592,7 @@ local SURVIVAL_TIPS = { --介绍探险技巧
     "在我进行基地大装修时，偶然发现人造地皮居然能阻止颤栗树的再生……",
     "《多变的云》里的知识水分非常重，字面意思。",
     "今晚没有月亮，他不知道在冰箱捣鼓什么，我昏沉睡去。醒来发现每个烹饪锅都盛满了诡异笑脸的黑色蛋糕……",
-    "沃拓克斯煎了一条甜味鱼，说是送我。香气扑鼻，我大口吃下，还在诧异平日自私的他怎么会请我吃如此美味……",
+    "沃拓克斯煎了一条甜味鱼，说是让我吃。香气扑鼻，我大口吃下后，他却一溜烟跑了……",
     "当你看见水果蛋糕里有条引线，请不要抱有吃它的想法。就算真的吃了，也不会送你水果的。",
     "白色的蘑菇帽产生的孢子有很强的的药用价值。生理上，能增强抵抗力，物理上，沾满皮肤也能减少我受到的伤害。",
     "靠近某块奇异的巨石后我突发奇想做出来了几种多功能工具，它们用起来实在是太方便了……",

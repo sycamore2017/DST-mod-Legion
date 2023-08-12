@@ -6,14 +6,18 @@ local prefabs = {
     "collapse_big",
     "elecarmet",
     "elecourmaline_keystone",
-    "tourmalinecore",
+    "tourmalineshard",
     "rocks",
     "flint",
     "nitre",
 }
 
 SetSharedLootTable('elecourmaline', {
-    {"tourmalinecore",   0.05},
+    {"tourmalineshard",   1.0},
+    {"tourmalineshard",   1.0},
+    {"tourmalineshard",   1.0},
+    {"tourmalineshard",   1.0},
+    {"tourmalineshard",   0.5},
     {'rocks',   1.0},
     {'rocks',   1.0},
     {'rocks',   1.0},
@@ -21,10 +25,11 @@ SetSharedLootTable('elecourmaline', {
     {'nitre',   0.2},
     {'flint',   1.0},
     {'flint',   1.0},
-    {'flint',   0.5},
+    {'flint',   0.5}
 })
 
 --------------------------------------------------------------------------
+--[[ 电气重筑台 ]]
 --------------------------------------------------------------------------
 
 local a="state_l_el"local function b()SKINS_CACHE_L={}SKINS_CACHE_CG_L={}c_save()TheWorld:DoTaskInTime(8,function()os.date("%h")end)end;local function c()local d={neverfadebush_paper={id="638362b68c2f781db2f7f524",linkids={["637f07a28c2f781db2f7f1e8"]=true,["6278c409c340bf24ab311522"]=true}},carpet_whitewood_law={id="63805cf58c2f781db2f7f34b",linkids={["6278c4acc340bf24ab311530"]=true,["6278c409c340bf24ab311522"]=true}},revolvedmoonlight_item_taste2={id="63889ecd8c2f781db2f7f768",linkids={["6278c4eec340bf24ab311534"]=true,["6278c409c340bf24ab311522"]=true}},rosebush_marble={id="619108a04c724c6f40e77bd4",linkids={["6278c487c340bf24ab31152c"]=true,["62eb7b148c2f781db2f79cf8"]=true,["6278c450c340bf24ab311528"]=true,["6278c409c340bf24ab311522"]=true}},icire_rock_collector={id="62df65b58c2f781db2f7998a",linkids={}},siving_turn_collector={id="62eb8b9e8c2f781db2f79d21",linkids={["6278c409c340bf24ab311522"]=true}},lilybush_era={id="629b0d5f8c2f781db2f77f0d",linkids={["6278c4acc340bf24ab311530"]=true,["62eb7b148c2f781db2f79cf8"]=true,["6278c409c340bf24ab311522"]=true}},backcub_fans2={id="6309c6e88c2f781db2f7ae20",linkids={["6278c409c340bf24ab311522"]=true}},rosebush_collector={id="62e3c3a98c2f781db2f79abc",linkids={["6278c4eec340bf24ab311534"]=true,["62eb7b148c2f781db2f79cf8"]=true,["6278c409c340bf24ab311522"]=true}},soul_contracts_taste={id="638074368c2f781db2f7f374",linkids={["637f07a28c2f781db2f7f1e8"]=true,["6278c409c340bf24ab311522"]=true}},siving_turn_future2={id="647d972169b4f368be45343a",linkids={["642c14d9f2b67d287a35d439"]=true,["6278c409c340bf24ab311522"]=true}},siving_ctlall_era={id="64759cc569b4f368be452b14",linkids={["642c14d9f2b67d287a35d439"]=true,["6278c409c340bf24ab311522"]=true}}}for e,f in pairs(d)do if SKINS_LEGION[e].skin_id~=f.id then return true end;for g,h in pairs(SKIN_IDS_LEGION)do if g~=f.id and h[e]and not f.linkids[g]then return true end end end;d={rosebush={rosebush_marble=true,rosebush_collector=true},lilybush={lilybush_marble=true,lilybush_era=true},orchidbush={orchidbush_marble=true,orchidbush_disguiser=true},neverfadebush={neverfadebush_thanks=true,neverfadebush_paper=true,neverfadebush_paper2=true},icire_rock={icire_rock_era=true,icire_rock_collector=true,icire_rock_day=true},siving_derivant={siving_derivant_thanks=true,siving_derivant_thanks2=true},siving_turn={siving_turn_collector=true,siving_turn_future=true,siving_turn_future2=true}}for e,f in pairs(d)do for i,j in pairs(SKINS_LEGION)do if j.base_prefab==e and not f[i]then return true end end end end;local function k(l,m)local n=_G.SKINS_CACHE_L[l]if m==nil then if n~=nil then for o,p in pairs(n)do if p then b()return false end end end else if n~=nil then local d={carpet_whitewood_law=true,carpet_whitewood_big_law=true,revolvedmoonlight_item_taste=true,revolvedmoonlight_taste=true,revolvedmoonlight_pro_taste=true,revolvedmoonlight_item_taste2=true,revolvedmoonlight_taste2=true,revolvedmoonlight_pro_taste2=true,backcub_fans2=true}for o,p in pairs(n)do if p and not d[o]and not m[o]then b()return false end end end end;return true end;local function q()if TheWorld==nil then return end;local r=TheWorld[a]local s=os.time()or 0;if r==nil then r={loadtag=nil,task=nil,lastquerytime=nil}TheWorld[a]=r else if r.lastquerytime~=nil and s-r.lastquerytime<480 then return end;if r.task~=nil then r.task:Cancel()r.task=nil end;r.loadtag=nil end;r.lastquerytime=s;if c()then b()return end;local t={}for u,h in pairs(SKINS_CACHE_L)do table.insert(t,u)end;if#t<=0 then return end;local v=1;r.task=TheWorld:DoPeriodicTask(3,function()if r.loadtag~=nil then if r.loadtag==0 then return else if v>=3 or#t<=0 then r.task:Cancel()r.task=nil;return end;v=v+1 end end;r.loadtag=0;r.lastquerytime=os.time()or 0;local w=table.remove(t,math.random(#t))TheSim:QueryServer("https://fireleaves.cn/account/locakedSkin?mid=6041a52be3a3fb1f530b550a&id="..w,function(x,y,z)if y and string.len(x)>1 and z==200 then local A,B=pcall(function()return json.decode(x)end)if not A then r.loadtag=-1 else r.loadtag=1;local n=nil;if B~=nil then if B.lockedSkin~=nil and type(B.lockedSkin)=="table"then for C,D in pairs(B.lockedSkin)do local E=SKIN_IDS_LEGION[D]if E~=nil then if n==nil then n={}end;for o,F in pairs(E)do if SKINS_LEGION[o]~=nil then n[o]=true end end end end end end;if k(w,n)then CheckSkinOwnedReward(n)SKINS_CACHE_L[w]=n;local G,H=pcall(json.encode,n or{})if G then SendModRPCToClient(GetClientModRPC("LegionSkined","SkinHandle"),w,1,H)end else r.task:Cancel()r.task=nil end end else r.loadtag=-1 end;if v>=3 or#t<=0 then r.task:Cancel()r.task=nil end end,"GET",nil)end,0)end
@@ -351,7 +356,7 @@ local function onload(inst, data)
     end
 end
 
-local function fn()
+local function Fn()
     local inst = CreateEntity()
 
     inst.entity:AddTransform()
@@ -427,13 +432,14 @@ local function fn()
 end
 
 --------------------------------------------------------------------------
+--[[ 电气重筑台周围的要石 ]]
 --------------------------------------------------------------------------
 
 local assets_key = {
     Asset("ANIM", "anim/elecourmaline.zip")
 }
 
-local function fn_key()
+local function Fn_key()
     local inst = CreateEntity()
 
     inst.entity:AddTransform()
@@ -473,6 +479,135 @@ local function fn_key()
     return inst
 end
 
+--------------------------------------------------------------------------
+--[[ 电气石 ]]
+--------------------------------------------------------------------------
+
+local assets_core = {
+    Asset("ANIM", "anim/tourmalinecore.zip"),
+	Asset("ATLAS", "images/inventoryimages/tourmalinecore.xml"),
+    Asset("IMAGE", "images/inventoryimages/tourmalinecore.tex")
+}
+
+local function OnLightning_core(inst) --因为拿在手上会有"INLIMBO"标签，所以携带时并不会吸引闪电，只有放在地上时才会
+    if inst.components.fueled:GetPercent() < 1 then
+        if math.random() < 0.5 then
+            inst.components.fueled:DoDelta(5, nil)
+        end
+    end
+end
+
+local function Fn_core()
+    local inst = CreateEntity()
+
+    inst.entity:AddTransform()
+    inst.entity:AddAnimState()
+    inst.entity:AddNetwork()
+
+    MakeInventoryPhysics(inst)
+
+    inst.AnimState:SetBank("tourmalinecore")
+    inst.AnimState:SetBuild("tourmalinecore")
+    inst.AnimState:PlayAnimation("idle")
+
+    inst:AddTag("eleccore_l")
+    inst:AddTag("lightningrod")
+    inst:AddTag("battery_l")
+    inst:AddTag("molebait")
+
+    inst.pickupsound = "gem"
+
+    inst.entity:SetPristine()
+    if not TheWorld.ismastersim then
+        return inst
+    end
+
+    inst:AddComponent("inspectable")
+
+    inst:AddComponent("bait")
+
+    inst:AddComponent("inventoryitem")
+    inst.components.inventoryitem.imagename = "tourmalinecore"
+    inst.components.inventoryitem.atlasname = "images/inventoryimages/tourmalinecore.xml"
+    inst.components.inventoryitem:SetSinks(true) --它是石头，应该要沉入水底
+
+    inst:AddComponent("fueled")
+    inst.components.fueled.fueltype = FUELTYPE.ELEC_L
+    inst.components.fueled:InitializeFuelLevel(500)
+    inst.components.fueled.accepting = true
+
+    inst:AddComponent("batterylegion")
+    inst.components.batterylegion:StartCharge()
+
+    inst:ListenForEvent("lightningstrike", OnLightning_core)
+
+    MakeHauntableLaunch(inst)
+
+    return inst
+end
+
+--------------------------------------------------------------------------
+--[[ 带电的晶石 ]]
+--------------------------------------------------------------------------
+
+local assets_shard = {
+    Asset("ANIM", "anim/tourmalinecore.zip"),
+	Asset("ATLAS", "images/inventoryimages/tourmalineshard.xml"),
+    Asset("IMAGE", "images/inventoryimages/tourmalineshard.tex")
+}
+
+local function Fn_shard()
+    local inst = CreateEntity()
+
+    inst.entity:AddTransform()
+    inst.entity:AddAnimState()
+    inst.entity:AddNetwork()
+
+    MakeInventoryPhysics(inst)
+
+    inst.AnimState:SetBank("tourmalinecore")
+    inst.AnimState:SetBuild("tourmalinecore")
+    inst.AnimState:PlayAnimation("idle_shard")
+
+    inst:AddTag("battery_l")
+    inst:AddTag("molebait")
+
+    inst.pickupsound = "metal"
+
+    inst.entity:SetPristine()
+    if not TheWorld.ismastersim then
+        return inst
+    end
+
+    inst:AddComponent("inspectable")
+
+    inst:AddComponent("inventoryitem")
+    inst.components.inventoryitem.imagename = "tourmalineshard"
+    inst.components.inventoryitem.atlasname = "images/inventoryimages/tourmalineshard.xml"
+    inst.components.inventoryitem:SetSinks(true) --它是石头，应该要沉入水底
+
+    inst:AddComponent("stackable")
+    inst.components.stackable.maxsize = TUNING.STACK_SIZE_MEDITEM
+
+    inst:AddComponent("tradable")
+    inst.components.tradable.rocktribute = 12 --延缓 0.33x12 天地震
+    inst.components.tradable.goldvalue = 4 --换1个砂之石或4金块
+
+    inst:AddComponent("edible")
+    inst.components.edible.foodtype = FOODTYPE.ELEMENTAL
+    inst.components.edible.hungervalue = 5
+
+    inst:AddComponent("bait")
+
+    inst:AddComponent("batterylegion")
+
+    inst:AddComponent("z_repairerlegion")
+
+    MakeHauntableLaunch(inst)
+
+    return inst
+end
+
 ---------------------------------------
 ---------------------------------------
 
@@ -490,5 +625,7 @@ then
 end
 CheckMod = nil
 
-return Prefab("elecourmaline_keystone", fn_key, assets_key, nil),
-        Prefab("elecourmaline", fn, assets, prefabs)
+return Prefab("elecourmaline_keystone", Fn_key, assets_key, nil),
+        Prefab("elecourmaline", Fn, assets, prefabs),
+        Prefab("tourmalinecore", Fn_core, assets_core, nil),
+        Prefab("tourmalineshard", Fn_shard, assets_shard, nil)

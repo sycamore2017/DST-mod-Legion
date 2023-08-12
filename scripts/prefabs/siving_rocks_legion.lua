@@ -55,6 +55,10 @@ if not CONFIGS_LEGION.ENABLEDMODS.MythWords then --未开启神话书说时才�
 
             inst:AddComponent("bait")
 
+            inst:AddComponent("edible")
+            inst.components.edible.foodtype = FOODTYPE.ELEMENTAL
+            inst.components.edible.hungervalue = 5
+
             inst:AddComponent("inventoryitem")
             inst.components.inventoryitem.imagename = "siving_rocks"
             inst.components.inventoryitem.atlasname = "images/inventoryimages/siving_rocks.xml"

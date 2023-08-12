@@ -16,7 +16,7 @@ local assets = {
 local prefabs = {
 	"fimbul_axe",
     "elecourmaline",
-    "tourmalinecore",
+    "tourmalineshard",
     "rocks",
     "flint",
 
@@ -39,14 +39,21 @@ local brain = require "brains/elecarmetbrain"
 SetSharedLootTable('elecarmet', {
 	{"fimbul_axe",       1.00},
     {"fimbul_axe",       0.33},
-    {"tourmalinecore",   0.10},
+    {"tourmalineshard",   1.0},
+    {"tourmalineshard",   1.0},
+    {"tourmalineshard",   1.0},
+    {"tourmalineshard",   1.0},
+    {"tourmalineshard",   1.0},
+    {"tourmalineshard",   1.0},
+    {"tourmalineshard",   0.5},
+    {"tourmalineshard",   0.5},
     {'rocks',   1.0},
     {'rocks',   1.0},
     {'rocks',   1.0},
     {'rocks',   0.5},
     {'flint',   1.0},
     {'flint',   1.0},
-    {'flint',   0.5},
+    {'flint',   0.5}
 })
 
 local function AddSpecialLoot(inst)
@@ -72,7 +79,8 @@ local function AddSpecialLoot(inst)
         "siving_mask_gold_blueprint",
         "siving_ctlall_item_blueprint",
         "hat_elepheetle_blueprint",
-        "armor_elepheetle_blueprint"
+        "armor_elepheetle_blueprint",
+        "block_l_tourmalinecore_blueprint"
     }
     inst.components.lootdropper:AddChanceLoot(table.remove(drops, math.random(#drops)), 1)
     inst.components.lootdropper:AddChanceLoot(table.remove(drops, math.random(#drops)), 1)

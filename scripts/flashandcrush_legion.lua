@@ -5,7 +5,6 @@ local prefabFiles = {
     "elecourmaline",            --电气重铸台
     "hat_cowboy",               --牛仔套装
     "dualwrench",               --扳手-双用型
-    "tourmalinecore",           --电气石
     "icire_rock",               --鸳鸯石
     "guitar_miguel",            --米格尔的吉他
     "legion_soul_fx",           --灵魂契约特效
@@ -53,7 +52,9 @@ local assets = {
     Asset("ATLAS", "images/inventoryimages/explodingfruitcake.xml"),
     Asset("IMAGE", "images/inventoryimages/explodingfruitcake.tex"),
     Asset("ATLAS", "images/inventoryimages/tourmalinecore.xml"),
-    Asset("IMAGE", "images/inventoryimages/tourmalinecore.tex")
+    Asset("IMAGE", "images/inventoryimages/tourmalinecore.tex"),
+    Asset("ATLAS", "images/inventoryimages/tourmalineshard.xml"),
+    Asset("IMAGE", "images/inventoryimages/tourmalineshard.tex")
 }
 
 for k,v in pairs(assets) do
@@ -76,315 +77,188 @@ _G.RegistMiniMapImage_legion("soul_contracts")
 --[[ 电气石重铸台相关 ]]
 --------------------------------------------------------------------------
 
+local tech_recast
+local lock_recast
 if _G.CONFIGS_LEGION.TECHUNLOCK == "lootdropper" then
-    AddRecipe2(
-        "tripleshovelaxe", {
-            Ingredient("axe", 1),
-            Ingredient("pickaxe", 1),
-            Ingredient("shovel", 1),
-        }, TECH.LOST, {
-            atlas = "images/inventoryimages/tripleshovelaxe.xml", image = "tripleshovelaxe.tex"
-        }, { "RECAST", "TOOLS" }
-    )
-    AddRecipe2(
-        "dualwrench", {
-            Ingredient("hammer", 1),
-            Ingredient("goldnugget", 1),
-            Ingredient("pitchfork", 1),
-        }, TECH.LOST, {
-            atlas = "images/inventoryimages/dualwrench.xml", image = "dualwrench.tex"
-        }, { "RECAST", "TOOLS" }
-    )
-    AddRecipe2(
-        "icire_rock", {
-            Ingredient("amulet", 1),
-            Ingredient("heatrock", 2),
-            Ingredient("blueamulet", 1),
-        }, TECH.LOST, {
-            atlas = "images/inventoryimages/icire_rock.xml", image = "icire_rock.tex"
-        }, { "RECAST", "WINTER", "SUMMER" }
-    )
-    AddRecipe2(
-        "explodingfruitcake", {
-            Ingredient("winter_food4", 1),
-            Ingredient("gunpowder", 2),
-        }, TECH.LOST, {
-            atlas = "images/inventoryimages/explodingfruitcake.xml", image = "explodingfruitcake.tex"
-        }, { "RECAST", "WEAPONS" }
-    )
-    AddRecipe2(
-        "fishhomingtool_awesome", {
-            Ingredient("fishhomingtool_normal", 5, "images/inventoryimages/fishhomingtool_normal.xml"),
-            Ingredient("chum", 2),
-        }, TECH.LOST, {
-            atlas = "images/inventoryimages/fishhomingtool_awesome.xml", image = "fishhomingtool_awesome.tex"
-        }, { "RECAST", "FISHING" }
-    )
-    AddRecipe2(
-        "siving_mask_gold", {
-            Ingredient("goggleshat", 1),
-            Ingredient("siving_mask", 1, "images/inventoryimages/siving_mask.xml"),
-            Ingredient("siving_derivant_item", 1, "images/inventoryimages/siving_derivant_item.xml"),
-            Ingredient("dish_shyerryjam", 1, "images/inventoryimages/dish_shyerryjam.xml"),
-        }, TECH.LOST, {
-            atlas = "images/inventoryimages/siving_mask_gold.xml", image = "siving_mask_gold.tex"
-        }, { "RECAST", "ARMOUR", "MAGIC", "RESTORATION" }
-    )
-    AddRecipe2(
-        "siving_ctlall_item", {
-            Ingredient("siving_ctlwater_item", 1, "images/inventoryimages/siving_ctlwater_item.xml"),
-            Ingredient("siving_ctldirt_item", 1, "images/inventoryimages/siving_ctldirt_item.xml"),
-            Ingredient("siving_derivant_item", 1, "images/inventoryimages/siving_derivant_item.xml"),
-            Ingredient("singingshell_octave4", 1, nil, nil, "singingshell_octave4_1.tex")
-        }, TECH.LOST, {
-            atlas = "images/inventoryimages/siving_ctlall_item.xml", image = "siving_ctlall_item.tex"
-        }, { "RECAST", "MAGIC", "GARDENING", "STRUCTURES" }
-    )
-    AddRecipe2(
-        "triplegoldenshovelaxe", {
-            Ingredient("goldenaxe", 2),
-            Ingredient("goldenpickaxe", 2),
-            Ingredient("goldenshovel", 2),
-        }, TECH.LOST, {
-            atlas = "images/inventoryimages/triplegoldenshovelaxe.xml", image = "triplegoldenshovelaxe.tex"
-        }, { "RECAST", "TOOLS" }
-    )
-    AddRecipe2(
-        "hat_cowboy", {
-            Ingredient("beefalohat", 1),
-            Ingredient("rainhat", 1),
-            Ingredient("tophat", 1),
-        }, TECH.LOST, {
-            atlas = "images/inventoryimages/hat_cowboy.xml", image = "hat_cowboy.tex"
-        }, { "RECAST", "RAIN", "SUMMER", "RIDING", "CLOTHING" }
-    )
-    AddRecipe2(
-        "guitar_miguel", {
-            Ingredient("panflute", 1),
-            Ingredient("onemanband", 1),
-        }, TECH.LOST, {
-            atlas = "images/inventoryimages/guitar_miguel.xml", image = "guitar_miguel.tex"
-        }, { "RECAST", "GARDENING", "MAGIC" }
-    )
-    AddRecipe2(
-        "web_hump_item", {
-            Ingredient("monstermeat_dried", 12),
-            Ingredient("minisign_item", 2),
-            Ingredient("silk", 12),
-        }, TECH.LOST, {
-            atlas = "images/inventoryimages/web_hump_item.xml", image = "web_hump_item.tex"
-        }, { "RECAST", "STRUCTURES", "DECOR" }
-    )
-    AddRecipe2(
-        "saddle_baggage", {
-            Ingredient("bedroll_straw", 1),
-            Ingredient("saddle_basic", 1),
-            Ingredient("bundlewrap", 2),
-        }, TECH.LOST, {
-            atlas = "images/inventoryimages/saddle_baggage.xml", image = "saddle_baggage.tex"
-        }, { "RECAST", "RIDING", "COOKING", "CONTAINERS" }
-    )
-    AddRecipe2(
-        "hat_albicans_mushroom", {
-            Ingredient("red_mushroomhat", 1),
-            Ingredient("green_mushroomhat", 1),
-            Ingredient("blue_mushroomhat", 1),
-        }, TECH.LOST, {
-            atlas = "images/inventoryimages/hat_albicans_mushroom.xml", image = "hat_albicans_mushroom.tex"
-        }, { "RECAST", "CLOTHING", "SUMMER", "GARDENING", "RAIN" }
-    )
-    AddRecipe2(
-        "soul_contracts", {
-            Ingredient("wortox_soul", 20),
-            Ingredient("waxwelljournal", 1),
-            Ingredient("nightmarefuel", 20),
-        }, TECH.LOST, {
-            atlas = "images/inventoryimages/soul_contracts.xml", image = "soul_contracts.tex"
-        }, { "RECAST", "RESTORATION", "MAGIC" }
-    )
-    AddRecipe2(
-        "hat_elepheetle", {
-            Ingredient("dumbbell_marble", 1),
-            Ingredient("insectshell_l", 30, "images/inventoryimages/insectshell_l.xml"),
-            Ingredient("goldnugget", 10),
-            Ingredient("slurtlehat", 1),
-        }, TECH.LOST, {
-            atlas = "images/inventoryimages/hat_elepheetle.xml", image = "hat_elepheetle.tex"
-        }, { "RECAST", "ARMOUR" }
-    )
-    AddRecipe2(
-        "armor_elepheetle", {
-            Ingredient("armormarble", 1),
-            Ingredient("insectshell_l", 30, "images/inventoryimages/insectshell_l.xml"),
-            Ingredient("goldnugget", 10),
-            Ingredient("armorsnurtleshell", 1),
-        }, TECH.LOST, {
-            atlas = "images/inventoryimages/armor_elepheetle.xml", image = "armor_elepheetle.tex"
-        }, { "RECAST", "ARMOUR" }
-    )
+    tech_recast = { TECH.LOST, TECH.LOST }
+    lock_recast = nil
 else
-    AddRecipe2(
-        "tripleshovelaxe", {
-            Ingredient("axe", 1),
-            Ingredient("pickaxe", 1),
-            Ingredient("shovel", 1),
-        }, TECH.ELECOURMALINE_ONE, {
-            nounlock = true,
-            atlas = "images/inventoryimages/tripleshovelaxe.xml", image = "tripleshovelaxe.tex"
-        }, { "RECAST", "TOOLS" }
-    )
-    AddRecipe2(
-        "dualwrench", {
-            Ingredient("hammer", 1),
-            Ingredient("goldnugget", 1),
-            Ingredient("pitchfork", 1),
-        }, TECH.ELECOURMALINE_ONE, {
-            nounlock = true,
-            atlas = "images/inventoryimages/dualwrench.xml", image = "dualwrench.tex"
-        }, { "RECAST", "TOOLS" }
-    )
-    AddRecipe2(
-        "icire_rock", {
-            Ingredient("amulet", 1),
-            Ingredient("heatrock", 2),
-            Ingredient("blueamulet", 1),
-        }, TECH.ELECOURMALINE_ONE, {
-            nounlock = true,
-            atlas = "images/inventoryimages/icire_rock.xml", image = "icire_rock.tex"
-        }, { "RECAST", "WINTER", "SUMMER" }
-    )
-    AddRecipe2(
-        "explodingfruitcake", {
-            Ingredient("winter_food4", 1),
-            Ingredient("gunpowder", 2),
-        }, TECH.ELECOURMALINE_ONE, {
-            nounlock = true,
-            atlas = "images/inventoryimages/explodingfruitcake.xml", image = "explodingfruitcake.tex"
-        }, { "RECAST", "WEAPONS" }
-    )
-    AddRecipe2(
-        "fishhomingtool_awesome", {
-            Ingredient("fishhomingtool_normal", 5, "images/inventoryimages/fishhomingtool_normal.xml"),
-            Ingredient("chum", 2),
-        }, TECH.ELECOURMALINE_ONE, {
-            nounlock = true,
-            atlas = "images/inventoryimages/fishhomingtool_awesome.xml", image = "fishhomingtool_awesome.tex"
-        }, { "RECAST", "FISHING" }
-    )
-    AddRecipe2(
-        "siving_mask_gold", {
-            Ingredient("goggleshat", 1),
-            Ingredient("siving_mask", 1, "images/inventoryimages/siving_mask.xml"),
-            Ingredient("siving_derivant_item", 1, "images/inventoryimages/siving_derivant_item.xml"),
-            Ingredient("dish_shyerryjam", 1, "images/inventoryimages/dish_shyerryjam.xml"),
-        }, TECH.ELECOURMALINE_THREE, {
-            nounlock = true,
-            atlas = "images/inventoryimages/siving_mask_gold.xml", image = "siving_mask_gold.tex"
-        }, { "RECAST", "ARMOUR", "MAGIC", "RESTORATION" }
-    )
-    AddRecipe2(
-        "siving_ctlall_item", {
-            Ingredient("siving_ctlwater_item", 1, "images/inventoryimages/siving_ctlwater_item.xml"),
-            Ingredient("siving_ctldirt_item", 1, "images/inventoryimages/siving_ctldirt_item.xml"),
-            Ingredient("siving_derivant_item", 1, "images/inventoryimages/siving_derivant_item.xml"),
-            Ingredient("singingshell_octave4", 1, nil, nil, "singingshell_octave4_1.tex")
-        }, TECH.ELECOURMALINE_THREE, {
-            nounlock = true,
-            atlas = "images/inventoryimages/siving_ctlall_item.xml", image = "siving_ctlall_item.tex"
-        }, { "RECAST", "MAGIC", "GARDENING", "STRUCTURES" }
-    )
-    AddRecipe2(
-        "triplegoldenshovelaxe", {
-            Ingredient("goldenaxe", 2),
-            Ingredient("goldenpickaxe", 2),
-            Ingredient("goldenshovel", 2),
-        }, TECH.ELECOURMALINE_THREE, {
-            nounlock = true,
-            atlas = "images/inventoryimages/triplegoldenshovelaxe.xml", image = "triplegoldenshovelaxe.tex"
-        }, { "RECAST", "TOOLS" }
-    )
-    AddRecipe2(
-        "hat_cowboy", {
-            Ingredient("beefalohat", 1),
-            Ingredient("rainhat", 1),
-            Ingredient("tophat", 1),
-        }, TECH.ELECOURMALINE_THREE, {
-            nounlock = true,
-            atlas = "images/inventoryimages/hat_cowboy.xml", image = "hat_cowboy.tex"
-        }, { "RECAST", "RAIN", "SUMMER", "RIDING", "CLOTHING" }
-    )
-    AddRecipe2(
-        "guitar_miguel", {
-            Ingredient("panflute", 1),
-            Ingredient("onemanband", 1),
-        }, TECH.ELECOURMALINE_THREE, {
-            nounlock = true,
-            atlas = "images/inventoryimages/guitar_miguel.xml", image = "guitar_miguel.tex"
-        }, { "RECAST", "GARDENING", "MAGIC" }
-    )
-    AddRecipe2(
-        "web_hump_item", {
-            Ingredient("monstermeat_dried", 12),
-            Ingredient("minisign_item", 2),
-            Ingredient("silk", 12),
-        }, TECH.ELECOURMALINE_THREE, {
-            nounlock = true, builder_tag = "spiderwhisperer",
-            atlas = "images/inventoryimages/web_hump_item.xml", image = "web_hump_item.tex"
-        }, { "RECAST", "STRUCTURES", "DECOR", "CHARACTER" }
-    )
-    AddRecipe2(
-        "saddle_baggage", {
-            Ingredient("bedroll_straw", 1),
-            Ingredient("saddle_basic", 1),
-            Ingredient("bundlewrap", 2),
-        }, TECH.ELECOURMALINE_THREE, {
-            nounlock = true,
-            atlas = "images/inventoryimages/saddle_baggage.xml", image = "saddle_baggage.tex"
-        }, { "RECAST", "RIDING", "COOKING", "CONTAINERS" }
-    )
-    AddRecipe2(
-        "hat_albicans_mushroom", {
-            Ingredient("red_mushroomhat", 1),
-            Ingredient("green_mushroomhat", 1),
-            Ingredient("blue_mushroomhat", 1),
-        }, TECH.ELECOURMALINE_THREE, {
-            nounlock = true,
-            atlas = "images/inventoryimages/hat_albicans_mushroom.xml", image = "hat_albicans_mushroom.tex"
-        }, { "RECAST", "CLOTHING", "SUMMER", "GARDENING", "RAIN" }
-    )
-    AddRecipe2(
-        "soul_contracts", {
-            Ingredient("wortox_soul", 20),
-            Ingredient("waxwelljournal", 1),
-            Ingredient("nightmarefuel", 20),
-        }, TECH.ELECOURMALINE_THREE, {
-            nounlock = true, builder_tag = "soulstealer",
-            atlas = "images/inventoryimages/soul_contracts.xml", image = "soul_contracts.tex"
-        }, { "RECAST", "RESTORATION", "MAGIC", "CHARACTER" }
-    )
-    AddRecipe2(
-        "hat_elepheetle", {
-            Ingredient("dumbbell_marble", 1),
-            Ingredient("insectshell_l", 30, "images/inventoryimages/insectshell_l.xml"),
-            Ingredient("goldnugget", 10),
-            Ingredient("slurtlehat", 1),
-        }, TECH.ELECOURMALINE_THREE, {
-            nounlock = true,
-            atlas = "images/inventoryimages/hat_elepheetle.xml", image = "hat_elepheetle.tex"
-        }, { "RECAST", "ARMOUR" }
-    )
-    AddRecipe2(
-        "armor_elepheetle", {
-            Ingredient("armormarble", 1),
-            Ingredient("insectshell_l", 30, "images/inventoryimages/insectshell_l.xml"),
-            Ingredient("goldnugget", 10),
-            Ingredient("armorsnurtleshell", 1),
-        }, TECH.ELECOURMALINE_THREE, {
-            nounlock = true,
-            atlas = "images/inventoryimages/armor_elepheetle.xml", image = "armor_elepheetle.tex"
-        }, { "RECAST", "ARMOUR" }
-    )
+    tech_recast = { TECH.ELECOURMALINE_ONE, TECH.ELECOURMALINE_THREE }
+    lock_recast = true
 end
+
+AddRecipe2(
+    "tripleshovelaxe", {
+        Ingredient("axe", 1),
+        Ingredient("pickaxe", 1),
+        Ingredient("shovel", 1)
+    }, tech_recast[1], {
+        nounlock = lock_recast,
+        atlas = "images/inventoryimages/tripleshovelaxe.xml", image = "tripleshovelaxe.tex"
+    }, { "RECAST", "TOOLS" }
+)
+AddRecipe2(
+    "dualwrench", {
+        Ingredient("hammer", 1),
+        Ingredient("goldnugget", 1),
+        Ingredient("pitchfork", 1)
+    }, tech_recast[1], {
+        nounlock = lock_recast,
+        atlas = "images/inventoryimages/dualwrench.xml", image = "dualwrench.tex"
+    }, { "RECAST", "TOOLS" }
+)
+AddRecipe2(
+    "icire_rock", {
+        Ingredient("amulet", 1),
+        Ingredient("heatrock", 2),
+        Ingredient("blueamulet", 1)
+    }, tech_recast[1], {
+        nounlock = lock_recast,
+        atlas = "images/inventoryimages/icire_rock.xml", image = "icire_rock.tex"
+    }, { "RECAST", "WINTER", "SUMMER" }
+)
+AddRecipe2(
+    "explodingfruitcake", {
+        Ingredient("winter_food4", 1),
+        Ingredient("gunpowder", 2)
+    }, tech_recast[1], {
+        nounlock = lock_recast,
+        atlas = "images/inventoryimages/explodingfruitcake.xml", image = "explodingfruitcake.tex"
+    }, { "RECAST", "WEAPONS" }
+)
+AddRecipe2(
+    "fishhomingtool_awesome", {
+        Ingredient("fishhomingtool_normal", 5, "images/inventoryimages/fishhomingtool_normal.xml"),
+        Ingredient("chum", 2)
+    }, tech_recast[1], {
+        nounlock = lock_recast,
+        atlas = "images/inventoryimages/fishhomingtool_awesome.xml", image = "fishhomingtool_awesome.tex"
+    }, { "RECAST", "FISHING" }
+)
+AddRecipe2(
+    "block_l_tourmalinecore", {
+        Ingredient("redgem", 10),
+        Ingredient("tourmalineshard", 10, "images/inventoryimages/tourmalineshard.xml"),
+        Ingredient("moonstorm_spark", 10)
+    }, tech_recast[2], {
+        nounlock = lock_recast,
+        product = "tourmalinecore", description = "block_l_tourmalinecore",
+        atlas = "images/inventoryimages/tourmalinecore.xml", image = "tourmalinecore.tex"
+    }, { "RECAST", "REFINE" }
+)
+AddRecipe2(
+    "triplegoldenshovelaxe", {
+        Ingredient("goldenaxe", 2),
+        Ingredient("goldenpickaxe", 2),
+        Ingredient("goldenshovel", 2)
+    }, tech_recast[2], {
+        nounlock = lock_recast,
+        atlas = "images/inventoryimages/triplegoldenshovelaxe.xml", image = "triplegoldenshovelaxe.tex"
+    }, { "RECAST", "TOOLS" }
+)
+AddRecipe2(
+    "hat_cowboy", {
+        Ingredient("beefalohat", 1),
+        Ingredient("rainhat", 1),
+        Ingredient("tophat", 1)
+    }, tech_recast[2], {
+        nounlock = lock_recast,
+        atlas = "images/inventoryimages/hat_cowboy.xml", image = "hat_cowboy.tex"
+    }, { "RECAST", "RAIN", "SUMMER", "RIDING", "CLOTHING" }
+)
+AddRecipe2(
+    "saddle_baggage", {
+        Ingredient("bedroll_straw", 1),
+        Ingredient("saddle_basic", 1),
+        Ingredient("bundlewrap", 2)
+    }, tech_recast[2], {
+        nounlock = lock_recast,
+        atlas = "images/inventoryimages/saddle_baggage.xml", image = "saddle_baggage.tex"
+    }, { "RECAST", "RIDING", "COOKING", "CONTAINERS" }
+)
+AddRecipe2(
+    "hat_albicans_mushroom", {
+        Ingredient("red_mushroomhat", 1),
+        Ingredient("green_mushroomhat", 1),
+        Ingredient("blue_mushroomhat", 1)
+    }, tech_recast[2], {
+        nounlock = lock_recast,
+        atlas = "images/inventoryimages/hat_albicans_mushroom.xml", image = "hat_albicans_mushroom.tex"
+    }, { "RECAST", "CLOTHING", "SUMMER", "GARDENING", "RAIN" }
+)
+AddRecipe2(
+    "siving_mask_gold", {
+        Ingredient("goggleshat", 1),
+        Ingredient("siving_mask", 1, "images/inventoryimages/siving_mask.xml"),
+        Ingredient("siving_derivant_item", 1, "images/inventoryimages/siving_derivant_item.xml"),
+        Ingredient("dish_shyerryjam", 1, "images/inventoryimages/dish_shyerryjam.xml")
+    }, tech_recast[2], {
+        nounlock = lock_recast,
+        atlas = "images/inventoryimages/siving_mask_gold.xml", image = "siving_mask_gold.tex"
+    }, { "RECAST", "ARMOUR", "MAGIC", "RESTORATION" }
+)
+AddRecipe2(
+    "siving_ctlall_item", {
+        Ingredient("siving_ctlwater_item", 1, "images/inventoryimages/siving_ctlwater_item.xml"),
+        Ingredient("siving_ctldirt_item", 1, "images/inventoryimages/siving_ctldirt_item.xml"),
+        Ingredient("siving_derivant_item", 1, "images/inventoryimages/siving_derivant_item.xml"),
+        Ingredient("singingshell_octave4", 1, nil, nil, "singingshell_octave4_1.tex")
+    }, tech_recast[2], {
+        nounlock = lock_recast,
+        atlas = "images/inventoryimages/siving_ctlall_item.xml", image = "siving_ctlall_item.tex"
+    }, { "RECAST", "MAGIC", "GARDENING", "STRUCTURES" }
+)
+AddRecipe2(
+    "hat_elepheetle", {
+        Ingredient("dumbbell_marble", 1),
+        Ingredient("insectshell_l", 30, "images/inventoryimages/insectshell_l.xml"),
+        Ingredient("goldnugget", 10),
+        Ingredient("slurtlehat", 1)
+    }, tech_recast[2], {
+        nounlock = lock_recast,
+        atlas = "images/inventoryimages/hat_elepheetle.xml", image = "hat_elepheetle.tex"
+    }, { "RECAST", "ARMOUR" }
+)
+AddRecipe2(
+    "armor_elepheetle", {
+        Ingredient("armormarble", 1),
+        Ingredient("insectshell_l", 30, "images/inventoryimages/insectshell_l.xml"),
+        Ingredient("goldnugget", 10),
+        Ingredient("armorsnurtleshell", 1)
+    }, tech_recast[2], {
+        nounlock = lock_recast,
+        atlas = "images/inventoryimages/armor_elepheetle.xml", image = "armor_elepheetle.tex"
+    }, { "RECAST", "ARMOUR" }
+)
+AddRecipe2(
+    "guitar_miguel", {
+        Ingredient("panflute", 1),
+        Ingredient("onemanband", 1)
+    }, tech_recast[2], {
+        nounlock = lock_recast,
+        atlas = "images/inventoryimages/guitar_miguel.xml", image = "guitar_miguel.tex"
+    }, { "RECAST", "GARDENING", "MAGIC" }
+)
+AddRecipe2(
+    "web_hump_item", {
+        Ingredient("monstermeat_dried", 12),
+        Ingredient("minisign_item", 2),
+        Ingredient("silk", 12)
+    }, tech_recast[2], {
+        nounlock = lock_recast, builder_tag = "spiderwhisperer",
+        atlas = "images/inventoryimages/web_hump_item.xml", image = "web_hump_item.tex"
+    }, { "RECAST", "STRUCTURES", "DECOR", "CHARACTER" }
+)
+AddRecipe2(
+    "soul_contracts", {
+        Ingredient("wortox_soul", 20),
+        Ingredient("waxwelljournal", 1),
+        Ingredient("nightmarefuel", 20)
+    }, tech_recast[2], {
+        nounlock = lock_recast, builder_tag = "soulstealer",
+        atlas = "images/inventoryimages/soul_contracts.xml", image = "soul_contracts.tex"
+    }, { "RECAST", "RESTORATION", "MAGIC", "CHARACTER" }
+)
 
 --这个配方用来便于绿宝石法杖分解
 AddDeconstructRecipe("web_hump", {
@@ -392,6 +266,9 @@ AddDeconstructRecipe("web_hump", {
     Ingredient("minisign_item", 2),
     Ingredient("silk", 12)
 })
+
+tech_recast = nil
+lock_recast = nil
 
 --------------------------------------------------------------------------
 --[[ 修改基础函数以给生物添加触电组件 ]]

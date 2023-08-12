@@ -1697,8 +1697,18 @@ local dressup_data = {
     },
     refractedmoonlight = { --tip：通过幻化就可以把这把剑带到其他世界啦！
         isnoskin = true,
-        buildfile = "swap_refractedmoonlight",
-        buildsymbol = "swap_refractedmoonlight",
+        buildfn = function(dressup, item, buildskin)
+            local itemswap = {}
+
+            itemswap["swap_object"] = dressup:GetDressData(
+                nil, item._dd.build,
+                item.components.timer:TimerExists("moonsurge") and "swap2" or "swap1",
+                item.GUID, "swap"
+            )
+            dressup:SetDressHand(itemswap)
+
+            return itemswap
+        end
     },
     rosorns = {
         isnoskin = true,

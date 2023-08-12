@@ -855,7 +855,8 @@ end
 MakeFx({ --电气石：摩擦电
     name = "eleccore_spark_fx",
     assets = {
-        Asset("ANIM", "anim/sparks.zip") --官方漏电火花动画
+        Asset("ANIM", "anim/sparks.zip"), --官方漏电火花动画
+        Asset("ANIM", "anim/sparks_l_fx.zip")
     },
     fn_common = nil,
     fn_anim = function(inst)
@@ -863,10 +864,10 @@ MakeFx({ --电气石：摩擦电
         inst.entity:AddLight()
 
         inst.AnimState:SetBank("sparks")
-        inst.AnimState:SetBuild("sparks")
+        inst.AnimState:SetBuild("sparks_l_fx")
         inst.AnimState:PlayAnimation("sparks_"..tostring(math.random(3)))
         inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
-        inst.AnimState:SetMultColour(50/255, 176/255, 255/255, 0.8)
+        inst.AnimState:SetMultColour(140/255, 239/255, 255/255, 1)
         inst.Transform:SetScale(2, 2, 2)
         inst.AnimState:SetFinalOffset(3)
 
