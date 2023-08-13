@@ -22,6 +22,7 @@ local assets = {
     Asset("ANIM", "anim/player_actions_roll.zip"), --脱壳之翅所需动作（来自单机版）
     Asset("ANIM", "anim/crop_legion_cactus.zip"), --异种动画，让子圭育提前用的
     Asset("ANIM", "anim/crop_legion_lureplant.zip"),
+    Asset("ANIM", "anim/crop_legion_berries.zip"),
     Asset("ATLAS", "images/slot_juice_l.xml"), --巨食草的格子背景
     Asset("IMAGE", "images/slot_juice_l.tex"),
 
@@ -1440,39 +1441,48 @@ _G.CROPS_DATA_LEGION.plantmeat = {
         self.inst:Remove()
     end
 }
--- _G.CROPS_DATA_LEGION.berries = {
---     growthmults = { 0.8, 1.2, 0.8, 0 }, --春x秋x
---     regrowstage = 1,
---     bank = "crop_legion_berries", build = "crop_legion_berries",
---     leveldata = {
---         { anim = "level1", time = TUNING.TOTAL_DAY_TIME*8*0.45, deadanim = "dead1", witheredprefab = nil },
---         { anim = "level2", time = TUNING.TOTAL_DAY_TIME*8*0.55, deadanim = "dead1", witheredprefab = {"log"}, bloom = true },
---         { anim = { "level3_1", "level3_2", "level3_3" }, time = time_grow, deadanim = "dead1", witheredprefab = {"log", "twigs"}, pickable = 1 },
---         { anim = { "level3_1", "level3_2", "level3_3" }, time = time_day*6, deadanim = "dead1", witheredprefab = {"log", "twigs"} }
---     },
---     cluster_size = { 1, 1.5 },
---     fn_loot = function(self, doer, ispicked, isburnt, loots)
---         if self.stage == self.stage_max then
---             self:GetBaseLoot(loots, {
---                 doer = doer, ispicked = ispicked, isburnt = isburnt,
---                 crop = self.cropprefab, crop_rot = "spoiled_food",
---                 lootothers = {
---                     { israndom=true, factor=0.4, name="berries_juicy", name_rot=nil },
---                     { israndom=false, factor=0.2, name="berries_juicy", name_rot=nil }
---                 }
---             })
---         elseif self.level.pickable == 1 then
---             self:GetBaseLoot(loots, {
---                 doer = doer, ispicked = ispicked, isburnt = isburnt,
---                 crop = "berries_juicy", crop_rot = "spoiled_food",
---                 lootothers = {
---                     { israndom=true, factor=0.4, name=self.cropprefab, name_rot=nil },
---                     { israndom=false, factor=0.2, name=self.cropprefab, name_rot=nil }
---                 }
---             })
---         end
---     end
--- }
+_G.CROPS_DATA_LEGION.berries = {
+    growthmults = { 0.8, 1.2, 0.8, 0 }, --春x秋x
+    regrowstage = 1,
+    bank = "crop_legion_berries", build = "crop_legion_berries",
+    leveldata = {
+        { anim = "level1", time = TUNING.TOTAL_DAY_TIME*8*0.45, deadanim = "dead1", witheredprefab = nil },
+        { anim = "level2", time = TUNING.TOTAL_DAY_TIME*8*0.55, deadanim = "dead1", witheredprefab = {"log"}, bloom = true },
+        { anim = { "level3_1", "level3_2", "level3_3" }, time = time_grow, deadanim = "dead1", witheredprefab = {"log", "twigs"}, pickable = 1 },
+        { anim = { "level3_1", "level3_2", "level3_3" }, time = time_day*6, deadanim = "dead1", witheredprefab = {"log", "twigs"} }
+    },
+    cluster_size = { 0.9, 1.3 },
+    fn_loot = function(self, doer, ispicked, isburnt, loots)
+        if self.stage == self.stage_max then
+            self:GetBaseLoot(loots, {
+                doer = doer, ispicked = ispicked, isburnt = isburnt,
+                crop = self.cropprefab, crop_rot = "spoiled_food",
+                lootothers = {
+                    { israndom=true, factor=0.4, name="berries_juicy", name_rot=nil },
+                    { israndom=false, factor=0.2, name="berries_juicy", name_rot=nil }
+                }
+            })
+        elseif self.level.pickable == 1 then
+            self:GetBaseLoot(loots, {
+                doer = doer, ispicked = ispicked, isburnt = isburnt,
+                crop = "berries_juicy", crop_rot = "spoiled_food",
+                lootothers = {
+                    { israndom=true, factor=0.4, name=self.cropprefab, name_rot=nil },
+                    { israndom=false, factor=0.2, name=self.cropprefab, name_rot=nil }
+                }
+            })
+        end
+    end,
+    fn_stage = function(self)
+        if self.stage >= self.stage_max then
+            -- local skin = self.inst.components.skinedlegion:GetSkin()
+            -- self.inst.AnimState:OverrideSymbol("fruit1", skin or "crop_legion_berries", "fruit2")
+            self.inst.AnimState:OverrideSymbol("fruit1", "crop_legion_berries", "fruit2")
+        else
+            self.inst.AnimState:ClearOverrideSymbol("fruit1")
+        end
+    end
+}
 
 ------巨食草消化结算清单
 if not _G.rawget(_G, "DIGEST_DATA_LEGION") then
@@ -1789,17 +1799,17 @@ local mapseeds = {
         fruit = "seeds_plantmeat_l", time = 2*TUNING.TOTAL_DAY_TIME,
         fruitnum_min = 1, fruitnum_max = 1, genekey = "tissue_l_lureplant"
     },
-    berrybush = {
+    dug_berrybush = {
         swap = { build = "crop_legion_berries", file = "swap_turn1", symboltype = "1" },
         fruit = "seeds_berries_l", time = 2*TUNING.TOTAL_DAY_TIME,
         fruitnum_min = 1, fruitnum_max = 1, genekey = "tissue_l_berries"
     },
-    berrybush2 = {
+    dug_berrybush2 = {
         swap = { build = "crop_legion_berries", file = "swap_turn2", symboltype = "1" },
         fruit = "seeds_berries_l", time = 2*TUNING.TOTAL_DAY_TIME,
-        fruitnum_min = 1, fruitnum_max = 1, genekey = "tissue_l_berries"
+        fruitnum_min = 1, fruitnum_max = 2, genekey = "tissue_l_berries"
     },
-    berrybush_juicy = {
+    dug_berrybush_juicy = {
         swap = { build = "crop_legion_berries", file = "swap_turn3", symboltype = "1" },
         fruit = "seeds_berries_l", time = 5*TUNING.TOTAL_DAY_TIME,
         fruitnum_min = 2, fruitnum_max = 3, genekey = "tissue_l_berries"

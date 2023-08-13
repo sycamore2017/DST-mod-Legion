@@ -8,7 +8,7 @@ local L = locale ~= "zh" and locale ~= "zhr" --true-英文; false-中文
 
 name = L and "[DST] Legion" or "[DST] 棱镜"
 author = "ti_Tout"
-version = "7.2.7" --每次更新时为了上传必须更改
+version = "7.2.8" --每次更新时为了上传必须更改
 description =
     L and "Thanks for using this mod!\n                                           [version]"..version.."  [file]1392778117\n\n*As you can see, this mod includes much of the imagination of the mod makers. I really want to make this mod like a DLC, can we wait until it happens?\n\nSpecial thanks：半夏微暖半夏凉(Code consultant)、羽中就是他(Guest artist)、风铃草(Functional supporter)、白饭(Wiki editor)"
     or "感谢订阅本mod！                                    [版本]"..version.."  [文件]1392778117\n\n*如你所见，本mod包括了作者的很多的脑洞，我也很想把这个mod做成像DLC一样的规模，敬请期待吧。\n*本mod为个人爱好所做，禁止任何个人或组织转载、除自用外的修改、发布或其他形式的侵犯本mod权益的行为！\n\n特别感谢：半夏微暖半夏凉(代码指导)、羽中就是他(客串画佬)、风铃草(特功支持)、白饭(百科编辑)"
@@ -210,6 +210,75 @@ configuration_options = L and {
             {description = "68/-4.5", data = 7} --2
         },
         default = 3
+    },
+    {   name = "SivFeaDamage",
+        label = "Siving-Plume Damage",
+        hover = "Set damage of Siving-Plume.",
+        options = {
+            {description = "1", data = 1},
+            {description = "3", data = 3},
+            {description = "5", data = 5},
+            {description = "8", data = 8},
+            {description = "10", data = 10},
+            {description = "12", data = 12},
+            {description = "15", data = 15},
+            {description = "17", data = 17},
+            {description = "20", data = 20},
+            {description = "23", data = 23},
+            {description = "26(default)", data = 26},
+            {description = "30", data = 30},
+            {description = "34", data = 34},
+            {description = "38", data = 38},
+            {description = "42", data = 42},
+            {description = "48", data = 48},
+            {description = "51", data = 51},
+            {description = "55", data = 55},
+            {description = "60", data = 60},
+            {description = "68", data = 68},
+            {description = "75", data = 75}
+        },
+        default = 26
+    },
+    {   name = "SivFeaHealthCost",
+        label = "Siving-Plume Health Cost",
+        hover = "Set health consumption of Siving-Plume when using its skill.",
+        options = {
+            {description = "0", data = 0},
+            {description = "0.2", data = 0.2},
+            {description = "0.5", data = 0.5},
+            {description = "0.8", data = 0.8},
+            {description = "1", data = 1},
+            {description = "1.2", data = 1.2},
+            {description = "1.5(default)", data = 1.5},
+            {description = "1.8", data = 1.8},
+            {description = "2", data = 2},
+            {description = "2.5", data = 2.5},
+            {description = "3", data = 3},
+            {description = "3.5", data = 3.5},
+            {description = "4", data = 4},
+            {description = "5", data = 5},
+            {description = "7", data = 7},
+            {description = "10", data = 10},
+            {description = "15", data = 15}
+        },
+        default = 1.5
+    },
+    {   name = "SivFeaThrowedNum",
+        label = "Max number of throws for Feather Split",
+        hover = "Set the maximum number of throws for Feather Split.",
+        options = {
+            {description = "1", data = 1},
+            {description = "2", data = 2},
+            {description = "3", data = 3},
+            {description = "4", data = 4},
+            {description = "5(default)", data = 5},
+            {description = "6", data = 6},
+            {description = "7", data = 7},
+            {description = "8", data = 8},
+            {description = "9", data = 9},
+            {description = "10", data = 10}
+        },
+        default = 5
     },
     {   name = "DigestedItemMsg",
         label = "Digested-message of Vase Herb",
@@ -508,19 +577,74 @@ configuration_options = L and {
         },
         default = 1
     },
-    {   name = "SivFeaStrength",
-        label = "子圭·翰强度",
-        hover = "设置子圭·翰的攻击力和耗血。变态，还是不变态，你自己界定！",
+    {   name = "SivFeaDamage",
+        label = "子圭·翰的攻击力",
+        hover = "设置子圭·翰的攻击力。变态，还是不变态，你自己界定！",
         options = {
-            {description = "17/-0.5", data = 1}, --0.5
-            {description = "23.8/-1", data = 2}, --0.7
-            {description = "34/-2(默认)", data = 3}, --1
-            {description = "42.5/-2.5", data = 4}, --1.25
-            {description = "51/-3", data = 5}, --1.5
-            {description = "61.2/-4", data = 6}, --1.8
-            {description = "68/-4.5", data = 7} --2
+            {description = "1", data = 1},
+            {description = "3", data = 3},
+            {description = "5", data = 5},
+            {description = "8", data = 8},
+            {description = "10", data = 10},
+            {description = "12", data = 12},
+            {description = "15", data = 15},
+            {description = "17", data = 17},
+            {description = "20", data = 20},
+            {description = "23", data = 23},
+            {description = "26(默认)", data = 26},
+            {description = "30", data = 30},
+            {description = "34", data = 34},
+            {description = "38", data = 38},
+            {description = "42", data = 42},
+            {description = "48", data = 48},
+            {description = "51", data = 51},
+            {description = "55", data = 55},
+            {description = "60", data = 60},
+            {description = "68", data = 68},
+            {description = "75", data = 75}
         },
-        default = 3
+        default = 26
+    },
+    {   name = "SivFeaHealthCost",
+        label = "子圭·翰的技能耗血量",
+        hover = "设置子圭·翰使用羽刃分掷时的耗血量。这一定得有个代价，对吗？",
+        options = {
+            {description = "0", data = 0},
+            {description = "0.2", data = 0.2},
+            {description = "0.5", data = 0.5},
+            {description = "0.8", data = 0.8},
+            {description = "1", data = 1},
+            {description = "1.2", data = 1.2},
+            {description = "1.5(默认)", data = 1.5},
+            {description = "1.8", data = 1.8},
+            {description = "2", data = 2},
+            {description = "2.5", data = 2.5},
+            {description = "3", data = 3},
+            {description = "3.5", data = 3.5},
+            {description = "4", data = 4},
+            {description = "5", data = 5},
+            {description = "7", data = 7},
+            {description = "10", data = 10},
+            {description = "15", data = 15}
+        },
+        default = 1.5
+    },
+    {   name = "SivFeaThrowedNum",
+        label = "羽刃分掷的最大投掷数",
+        hover = "设置子圭羽毛在羽刃分掷时的最大投掷数。飞吧！",
+        options = {
+            {description = "1", data = 1},
+            {description = "2", data = 2},
+            {description = "3", data = 3},
+            {description = "4", data = 4},
+            {description = "5(默认)", data = 5},
+            {description = "6", data = 6},
+            {description = "7", data = 7},
+            {description = "8", data = 8},
+            {description = "9", data = 9},
+            {description = "10", data = 10}
+        },
+        default = 5
     },
     {   name = "DigestedItemMsg",
         label = "巨食草消化提醒",

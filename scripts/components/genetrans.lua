@@ -184,7 +184,7 @@ function GeneTrans:DropLoot(needrecipe)
 		if isfull then
 			local keyname = TRANS_DATA_LEGION[seedname].genekey
 			if keyname ~= nil then
-				lootmap[keyname] = (lootmap[keyname] or 0) + 1
+				lootmap[keyname] = 1 --由于一个key可能对应多个转化材料，所以只能掉落一个
 			end
 		end
 	end
@@ -695,7 +695,12 @@ function GeneTrans:UnlockGene(items, doer)
 	elseif self.genepool[seed] then
 		return false, "HASKEY"
 	else
-		self.genepool[seed] = true
+		for seedname, data in pairs(TRANS_DATA_LEGION) do --由于一个key可能对应多个转化材料，所以这里要全循环
+			if items.prefab == data.genekey then
+				self.genepool[seedname] = true
+			end
+		end
+
 		if items.components.stackable ~= nil then
 			items.components.stackable:Get(1):Remove()
 		else
