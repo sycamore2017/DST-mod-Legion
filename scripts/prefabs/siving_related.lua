@@ -1041,7 +1041,7 @@ local function OnEquip_mask(inst, owner)
 
     --假人兼容：这里不做截断，为了能开发一些新玩法
 
-    AddMaskHPCost(inst, owner, 0.5)
+    AddMaskHPCost(inst, owner, 0.75)
 
     local notags = {
         "NOCLICK", "INLIMBO", "shadow", "shadowminion", "playerghost", "ghost", "wall",
@@ -1145,6 +1145,23 @@ MakeMask({
 --[[ 子圭·歃 ]]
 --------------------------------------------------------------------------
 
+local function OnRepaired_mask2(inst, amount)
+    if amount > 0 and inst:HasTag("broken") then
+        inst:RemoveTag("broken")
+        inst:AddTag("siv_BFF")
+        inst:AddTag("siv_mask2")
+        inst.components.inspectable.nameoverride = nil
+        inst.components.armor:SetAbsorption(0.75)
+    end
+end
+local function OnBroken_mask2(inst)
+    inst:AddTag("broken") --这个标签会让名称显示加入“损坏”前缀
+    inst:RemoveTag("siv_BFF")
+    inst:RemoveTag("siv_mask2")
+    inst.components.inspectable.nameoverride = "BROKEN_FORGEDITEM" --改为统一的损坏描述
+    inst.components.armor:SetAbsorption(0)
+    inst:PushEvent("percentusedchange", { percent = 0 }) --界面需要一个百分比
+end
 local function OnAttackOther(owner, data)
     if
         owner.components.inventory ~= nil and
@@ -1364,7 +1381,7 @@ local function OnEquip_mask2(inst, owner)
 
     --假人兼容：这里不做截断，为了能开发一些新玩法
 
-    AddMaskHPCost(inst, owner, 1)
+    AddMaskHPCost(inst, owner, 0.5)
 
     owner:ListenForEvent("onattackother", OnAttackOther)
 
@@ -1458,6 +1475,7 @@ MakeMask({
     fn_common = function(inst)
         inst:AddTag("siv_BFF")
         inst:AddTag("siv_mask2")
+        inst:AddTag("show_broken_ui") --装备损坏后展示特殊物品栏ui
     end,
     fn_server = function(inst)
         inst.healthcounter_max = 135
@@ -1467,6 +1485,9 @@ MakeMask({
         inst.components.equippable:SetOnUnequip(OnUnequip_mask2)
 
         inst.components.armor:InitCondition(735, 0.75)
+        inst.components.armor:SetKeepOnFinished(true) --耐久为0不消失
+		inst.components.armor:SetOnFinished(OnBroken_mask2)
+        inst.components.armor.onrepair = OnRepaired_mask2
 
         inst:AddComponent("lifebender") --御血神通！然而并不
         inst.components.lifebender.fn_bend = FnBend_mask2

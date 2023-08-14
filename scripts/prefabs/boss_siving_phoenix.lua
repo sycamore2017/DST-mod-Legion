@@ -906,30 +906,7 @@ local function ReticuleUpdatePositionFn(inst, pos, reticule, ease, smoothing, dt
 end
 ]]--
 
-local sivfea_attack = 34
-local sivfea_hpcost = 2
-
-if CONFIGS_LEGION.SIVFEASTRENGTH == 3 then
-    --nothing
-elseif CONFIGS_LEGION.SIVFEASTRENGTH == 1 then
-    sivfea_attack = 17
-    sivfea_hpcost = 0.5
-elseif CONFIGS_LEGION.SIVFEASTRENGTH == 2 then
-    sivfea_attack = 23.8
-    sivfea_hpcost = 1
-elseif CONFIGS_LEGION.SIVFEASTRENGTH == 4 then
-    sivfea_attack = 42.5
-    sivfea_hpcost = 2.5
-elseif CONFIGS_LEGION.SIVFEASTRENGTH == 5 then
-    sivfea_attack = 51
-    sivfea_hpcost = 3
-elseif CONFIGS_LEGION.SIVFEASTRENGTH == 6 then
-    sivfea_attack = 61.2
-    sivfea_hpcost = 4
-elseif CONFIGS_LEGION.SIVFEASTRENGTH == 7 then
-    sivfea_attack = 68
-    sivfea_hpcost = 4.5
-end
+local throwednum = CONFIGS_LEGION.SIVFEATHROWEDNUM or 5
 
 local function SetAnim_fly_collector(inst)
     if math.random() < 0.4 then
@@ -1101,9 +1078,9 @@ local function MakeWeapon(data)
     local fea_range
     local fea_hpcost
     if data.isreal then
-        fea_damage = sivfea_attack
+        fea_damage = CONFIGS_LEGION.SIVFEADAMAGE or 26
         fea_range = 13
-        fea_hpcost = sivfea_hpcost
+        fea_hpcost = CONFIGS_LEGION.SIVFEAHEALTHCOST or 1.5
     else
         fea_damage = 30.6 --34*0.9
         fea_range = 10
@@ -1191,7 +1168,6 @@ local function MakeWeapon(data)
                 local poss = {}
                 local direction = (pos - doerpos):GetNormalized() --单位向量
                 local angle = math.acos(direction:Dot(Vector3(1, 0, 0))) / DEGREES --这个角度是动画的，不能用来做物理的角度
-                local ang_lag = 2.5
 
                 --查询是否有能拉回的材料
                 local lines = caster.components.inventory:FindItems(function(i)
@@ -1207,26 +1183,37 @@ local function MakeWeapon(data)
 
                 local items = nil --需要丢出去的羽毛
                 local num = inst.components.stackable:StackSize()
-                if num <= 5 then
+                if num <= throwednum then
                     items = caster.components.inventory:RemoveItem(inst, true)
                 else
-                    items = inst.components.stackable:Get(5)
+                    items = inst.components.stackable:Get(throwednum)
                     -- items.components.inventoryitem:OnRemoved() --由于此时还处于物品栏状态，需要恢复为非物品栏状态
-                    num = 5
+                    num = throwednum
                 end
 
                 if num == 1 then
                     angles = { 0 }
                     poss[1] = pos
                 else
+                    local ang_lag = 2.5
                     if num == 2 then
                         angles = { -ang_lag, ang_lag }
                     elseif num == 3 then
                         angles = { -2*ang_lag, 0, 2*ang_lag }
                     elseif num == 4 then
                         angles = { -3*ang_lag, -ang_lag, ang_lag, 3*ang_lag }
-                    else --最多5个
+                    elseif num == 5 then
                         angles = { -4*ang_lag, -2*ang_lag, 0, 2*ang_lag, 4*ang_lag }
+                    elseif num == 6 then
+                        angles = { -5*ang_lag, -3*ang_lag, -ang_lag, ang_lag, 3*ang_lag, 5*ang_lag }
+                    elseif num == 7 then
+                        angles = { -6*ang_lag, -4*ang_lag, -2*ang_lag, 0, 2*ang_lag, 4*ang_lag, 6*ang_lag }
+                    elseif num == 8 then
+                        angles = { -7*ang_lag, -5*ang_lag, -3*ang_lag, -ang_lag, ang_lag, 3*ang_lag, 5*ang_lag, 7*ang_lag }
+                    elseif num == 9 then
+                        angles = { -8*ang_lag, -6*ang_lag, -4*ang_lag, -2*ang_lag, 0, 2*ang_lag, 4*ang_lag, 6*ang_lag, 8*ang_lag }
+                    else
+                        angles = { -9*ang_lag, -7*ang_lag, -5*ang_lag, -3*ang_lag, -ang_lag, ang_lag, 3*ang_lag, 5*ang_lag, 7*ang_lag, 9*ang_lag }
                     end
 
                     local ang = caster:GetAngleToPoint(pos.x, pos.y, pos.z) --原始角度，单位:度，比如33
@@ -1254,10 +1241,10 @@ local function MakeWeapon(data)
 
                 if caster.components.health ~= nil and not caster.components.health:IsDead() then
                     local costt = fea_hpcost
-                    if caster.feather_l_reducer ~= nil then
+                    if costt > 0 and caster.feather_l_reducer ~= nil then
                         for _,v in pairs(caster.feather_l_reducer) do
                             if v then
-                                costt = costt - v
+                                costt = costt * v
                             end
                         end
                     end

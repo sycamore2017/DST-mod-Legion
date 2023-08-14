@@ -197,20 +197,6 @@ configuration_options = L and {
         },
         default = 1
     },
-    {   name = "SivFeaStrength",
-        label = "Siving-Plume Strength",
-        hover = "Set damage and HP loss of Siving-Plume.",
-        options = {
-            {description = "17/-0.5", data = 1}, --0.5
-            {description = "23.8/-1", data = 2}, --0.7
-            {description = "34/-2(default)", data = 3}, --1
-            {description = "42.5/-2.5", data = 4}, --1.25
-            {description = "51/-3", data = 5}, --1.5
-            {description = "61.2/-4", data = 6}, --1.8
-            {description = "68/-4.5", data = 7} --2
-        },
-        default = 3
-    },
     {   name = "SivFeaDamage",
         label = "Siving-Plume Damage",
         hover = "Set damage of Siving-Plume.",

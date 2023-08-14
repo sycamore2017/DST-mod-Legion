@@ -180,14 +180,14 @@ _G.CONFIGS_LEGION.HIDDENUPDATETIMES = GetModConfigData("HiddenUpdateTimes") --�
 _G.CONFIGS_LEGION.REVOLVEDUPDATETIMES = GetModConfigData("RevolvedUpdateTimes") --月轮宝盘最大升级次数
 _G.CONFIGS_LEGION.REFRACTEDUPDATETIMES = GetModConfigData("RefractedUpdateTimes") --月折宝剑最大升级次数
 
--- TUNING.LEGION_GROWTHRATE = GetModConfigData("GrowthRate") --设置生长速度 int 0.7 1 1.5 2
--- TUNING.LEGION_CROPYIELDS = GetModConfigData("CropYields") --设置果实数量 int 0 1 2 3
 _G.CONFIGS_LEGION.X_OVERRIPETIME = GetModConfigData("OverripeTime") --设置过熟的时间倍数 int 1 2 0
 _G.CONFIGS_LEGION.X_PESTRISK = GetModConfigData("PestRisk") --设置虫害几率 double 0.007 0.012
 _G.CONFIGS_LEGION.PHOENIXREBIRTHCYCLE = GetModConfigData("PhoenixRebirthCycle") --设置玄鸟重生时间
 _G.CONFIGS_LEGION.SIVINGROOTTEX = GetModConfigData("SivingRootTex") --设置子圭突触贴图
 _G.CONFIGS_LEGION.PHOENIXBATTLEDIFFICULTY = GetModConfigData("PhoenixBattleDifficulty") --设置玄鸟战斗难度
-_G.CONFIGS_LEGION.SIVFEASTRENGTH = GetModConfigData("SivFeaStrength") --设置子圭·翰强度
+_G.CONFIGS_LEGION.SIVFEADAMAGE = GetModConfigData("SivFeaDamage") --设置子圭·翰的攻击力
+_G.CONFIGS_LEGION.SIVFEAHEALTHCOST = GetModConfigData("SivFeaHealthCost") --设置子圭·翰的技能耗血量
+_G.CONFIGS_LEGION.SIVFEATHROWEDNUM = GetModConfigData("SivFeaThrowedNum") --设置羽刃分掷的最大投掷数
 _G.CONFIGS_LEGION.DIGESTEDITEMMSG = GetModConfigData("DigestedItemMsg") --巨食草消化提醒
 _G.CONFIGS_LEGION.TRANSTIMECROP = GetModConfigData("TransTimeCrop") --普通作物转成异种的时间
 _G.CONFIGS_LEGION.TRANSTIMESPEC = GetModConfigData("TransTimeSpec") --特殊植物转成异种的时间倍率

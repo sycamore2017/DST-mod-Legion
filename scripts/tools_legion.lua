@@ -411,6 +411,59 @@ local function hat_off_fullhead(inst, owner)
     end
 end
 
+--[ 耐久为0不会消失的可修复装备 ]--
+local function OnRepaired(inst, item, doer, now)
+	if inst.components.equippable == nil then
+        if inst.foreverequip_l.fn_setEquippable ~= nil then
+            inst.foreverequip_l.fn_setEquippable(inst)
+        end
+        if inst.foreverequip_l.anim ~= nil then
+            inst.AnimState:PlayAnimation(inst.foreverequip_l.anim, inst.foreverequip_l.isloop)
+        end
+		-- inst.components.floater:SetSwapData(SWAP_DATA)
+		inst:RemoveTag("broken")
+		inst.components.inspectable.nameoverride = nil
+	end
+end
+local function OnBroken(inst) --损坏后会把装备卸下并丢进玩家物品栏
+    if inst.components.equippable ~= nil and inst.components.equippable:IsEquipped() then
+        local owner = inst.components.inventoryitem.owner
+        if owner ~= nil and owner.components.inventory ~= nil then
+            local item = owner.components.inventory:Unequip(inst.components.equippable.equipslot)
+            if item ~= nil then
+                owner.components.inventory:GiveItem(item, nil, owner:GetPosition())
+            end
+        end
+    end
+    if inst.foreverequip_l.fn_broken ~= nil then
+        inst.foreverequip_l.fn_broken(inst)
+    else
+        if inst.components.equippable ~= nil then
+            inst:RemoveComponent("equippable")
+            if inst.foreverequip_l.anim_broken ~= nil then
+                inst.AnimState:PlayAnimation(inst.foreverequip_l.anim_broken, inst.foreverequip_l.isloop_broken)
+            end
+            -- inst.components.floater:SetSwapData(SWAP_DATA_BROKEN)
+            inst:AddTag("broken") --这个标签会让名称显示加入“损坏”前缀
+            inst.components.inspectable.nameoverride = "BROKEN_FORGEDITEM" --改为统一的损坏描述
+        end
+    end
+end
+local function MakeNoLossRepairableEquipment(inst, data)
+    inst.foreverequip_l = data
+    if inst.foreverequip_l.fn_repaired == nil then
+        inst.foreverequip_l.fn_repaired = OnRepaired
+    end
+	if inst.components.armor ~= nil then
+		inst.components.armor:SetKeepOnFinished(true)
+		inst.components.armor:SetOnFinished(OnBroken)
+	elseif inst.components.finiteuses ~= nil then
+		inst.components.finiteuses:SetOnFinished(OnBroken)
+	elseif inst.components.fueled ~= nil then
+		inst.components.fueled:SetDepletedFn(OnBroken)
+	end
+end
+
 -- local TOOLS_L = require("tools_legion")
 return {
 	MakeSnowCovered_comm = MakeSnowCovered_comm,
@@ -427,5 +480,6 @@ return {
 	hat_on_opentop = hat_on_opentop,
 	hat_off = hat_off,
 	hat_on_fullhead = hat_on_fullhead,
-	hat_off_fullhead = hat_off_fullhead
+	hat_off_fullhead = hat_off_fullhead,
+    MakeNoLossRepairableEquipment = MakeNoLossRepairableEquipment
 }

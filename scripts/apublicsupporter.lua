@@ -414,6 +414,11 @@ local function Fn_sg_robot_handy(doer, action) --机器人对电能、电子更�
     return Fn_sg_handy(doer, action)
 end
 
+local function CheckForeverEquip(inst, item, doer, now)
+    if now > 0 and inst.foreverequip_l ~= nil and inst.foreverequip_l.fn_repaired ~= nil then
+        inst.foreverequip_l.fn_repaired(inst, item, doer, now)
+    end
+end
 local function ComputCost(valuenow, valuemax, value, item)
     local need = math.ceil((valuemax - valuenow) / value)
     if need > 1 then --最后一次很可能会比较浪费，所以不主动填满
@@ -497,6 +502,7 @@ local function DoArmorRepair(doer, item, target, value)
         local cpt = target.components.armor
         local need = ComputCost(cpt.condition, cpt.maxcondition, value, item)
         cpt:Repair(value*need)
+        CheckForeverEquip(target, item, doer, cpt.condition)
         return true
     end
     return false, "GUITAR"
@@ -510,6 +516,7 @@ local function DoFiniteusesRepair(doer, item, target, value)
         local cpt = target.components.finiteuses
         local need = ComputCost(cpt.current, cpt.total, value, item)
         cpt:Repair(value*need)
+        CheckForeverEquip(target, item, doer, cpt.current)
         return true
     end
     return false, "GUITAR"
@@ -527,7 +534,7 @@ local function DoFueledRepair(doer, item, target, value, reason)
             cpt.ontakefuelfn(target, value)
         end
         target:PushEvent("takefuel", { fuelvalue = value })
-
+        CheckForeverEquip(target, item, doer, cpt.currentfuel)
         return true
     end
     return false, reason
@@ -571,7 +578,7 @@ local fungus_needchange = {
     spore_medium = 0.15, --红蘑菇孢子
     spore_tall = 0.15,   --蓝蘑菇孢子
     moon_cap = 0.2,      --月亮蘑菇
-    shroom_skin = 1,
+    shroom_skin = 1
 }
 for k,v in pairs(fungus_needchange) do
     _G.REPAIRERS_L[k] = {

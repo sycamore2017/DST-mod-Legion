@@ -1,4 +1,5 @@
 local prefs = {}
+local TOOLS_L = require("tools_legion")
 
 --------------------------------------------------------------------------
 --[[ 通用函数 ]]
@@ -72,38 +73,6 @@ local function OnUnequipFn(inst, owner)
     owner.AnimState:ShowSymbol("swap_object")
 end
 
-local function SetNoBrokenArmor(inst, exfn)
-    inst.components.armor.SetCondition = function(self, amount)
-        if self.indestructible then
-            return
-        end
-
-        local amountold = self.condition
-        self.condition = math.min(amount, self.maxcondition)
-        local _brokenshield = inst._brokenshield
-
-        if self.condition <= 0 then
-            self.condition = 0
-            -- ProfileStatsSet("armor_broke_"..self.inst.prefab, true)
-            -- ProfileStatsSet("armor", self.inst.prefab)
-            -- if self.onfinished ~= nil then
-            --     self.onfinished()
-            -- end
-            -- self.inst:Remove()
-            inst._brokenshield = true
-            inst.components.shieldlegion.canatk = false
-        else
-            inst._brokenshield = false
-            inst.components.shieldlegion.canatk = true
-        end
-
-        if amountold ~= self.condition then
-            self.inst:PushEvent("percentusedchange", { percent = self:GetPercent() })
-            exfn(self, _brokenshield)
-        end
-    end
-end
-
 local function MakeShield(data)
 	table.insert(prefs, Prefab(
 		data.name,
@@ -169,12 +138,10 @@ end
 local damage_sandstorms = 42.5  --34*1.25
 local damage_normal = 30.6      --34*0.9
 local damage_raining = 17       --34*0.5
-local damage_broken = 3.4       --34*0.1
 
 local absorb_sandstorms = 0.9
 local absorb_normal = 0.75
 local absorb_raining = 0.4
-local absorb_broken = 0.1
 
 local mult_success_sandstorms = 0.1
 local mult_success_normal = 0.2
@@ -238,12 +205,6 @@ local function onsandstorm(owner, area, weapon) --沙尘暴中属性上升
         end
     end
 
-    if shield._brokenshield then
-        shield.components.weapon:SetDamage(damage_broken)
-        shield.components.armor:SetAbsorption(absorb_broken)
-        return
-    end
-
     --if TheWorld.components.sandstorms ~= nil and TheWorld.components.sandstorms:IsSandstormActive() then
     if not TheWorld:HasTag("cave") and TheWorld.state.issummer then
         --处于沙暴之中时
@@ -263,21 +224,11 @@ local function onisraining(inst) --下雨时属性降低
 
     if TheWorld.state.israining then
         if owner ~= nil then owner:RemoveEventCallback("changearea", onsandstorm) end
-        if inst._brokenshield then
-            inst.components.weapon:SetDamage(damage_broken)
-            inst.components.armor:SetAbsorption(absorb_broken)
-        else
-            inst.components.weapon:SetDamage(damage_raining)
-            inst.components.armor:SetAbsorption(absorb_raining)
-            inst.components.shieldlegion.armormult_success = mult_success_raining
-        end
+        inst.components.weapon:SetDamage(damage_raining)
+        inst.components.armor:SetAbsorption(absorb_raining)
+        inst.components.shieldlegion.armormult_success = mult_success_raining
     else
-        if inst._brokenshield then
-            inst.components.weapon:SetDamage(damage_broken)
-            inst.components.armor:SetAbsorption(absorb_broken)
-        else
-            onsandstorm(owner, nil, inst)   --不下雨时就刷新一次
-        end
+        onsandstorm(owner, nil, inst) --不下雨时就刷新一次
         if not TheWorld:HasTag("cave") and TheWorld.state.issummer then --不是在洞穴里，并且夏天时才会开始沙尘暴的监听
             if owner ~= nil then
                 owner:ListenForEvent("changearea", onsandstorm) --因为这个消息由玩家发出，所以只好由玩家来监听了
@@ -341,6 +292,19 @@ local function ShieldAtkStay_sand(inst, doer, attacker, data)
     inst.components.shieldlegion:Counterattack(doer, attacker, data, 8, 1.5)
 end
 
+local function SetupEquippable_sand(inst)
+    inst.components.equippable:SetOnEquip(OnEquip_sand)
+    inst.components.equippable:SetOnUnequip(OnUnequip_sand)
+    inst.components.equippable.insulated = true --设为true，就能防电
+end
+local foreverequip_sand= {
+    -- anim = nil, anim_broken = "broken", fn_broken = nil, fn_repaired = nil,
+    fn_setEquippable = function(inst)
+        inst:AddComponent("equippable")
+        SetupEquippable_sand(inst)
+    end
+}
+
 MakeShield({
     name = "shield_l_sand",
     assets = {
@@ -353,15 +317,16 @@ MakeShield({
         "shield_attack_l_fx",
     },
     fn_common = function(inst)
+        inst:AddTag("rp_sand_l")
+        inst:AddTag("show_broken_ui") --装备损坏后展示特殊物品栏ui
+
         inst:AddComponent("skinedlegion")
         inst.components.skinedlegion:Init("shield_l_sand")
     end,
     fn_server = function(inst)
         inst.components.inventoryitem:SetSinks(true) --它是石头做的，不可漂浮
 
-        inst.components.equippable:SetOnEquip(OnEquip_sand)
-        inst.components.equippable:SetOnUnequip(OnUnequip_sand)
-        inst.components.equippable.insulated = true --设为true，就能防电
+        SetupEquippable_sand(inst)
 
         inst.hurtsoundoverride = "dontstarve/creatures/together/antlion/sfx/break"
         inst.components.shieldlegion.armormult_success = mult_success_normal
@@ -372,24 +337,8 @@ MakeShield({
         inst.components.weapon:SetDamage(damage_normal)
 
         inst.components.armor:InitCondition(1050, absorb_normal) --150*10*0.7= 1050防具耐久
-        SetNoBrokenArmor(inst, function(armorcpt, isbrokenbefore)
-            if armorcpt.condition <= 0 then
-                inst:AddTag("rp_sand_l")
-                inst.components.equippable.insulated = false
-                inst.components.weapon:SetDamage(damage_broken)
-                inst.components.armor:SetAbsorption(absorb_broken)
-            else
-                if armorcpt.condition >= armorcpt.maxcondition then
-                    inst:RemoveTag("rp_sand_l")
-                else
-                    inst:AddTag("rp_sand_l")
-                end
-                if isbrokenbefore then --说明是刚从损坏状态变成修复状态
-                    inst.components.equippable.insulated = true
-                    onisraining(inst)
-                end
-            end
-        end)
+
+        TOOLS_L.MakeNoLossRepairableEquipment(inst, foreverequip_sand)
 
         inst.components.skinedlegion:SetOnPreLoad()
     end,
@@ -718,6 +667,7 @@ MakeShield({
 
         inst.components.armor:InitCondition(100, absorb_shield)
         inst.components.armor.indestructible = true --无敌的护甲
+        inst.components.armor:SetKeepOnFinished(true) --防止因为别的mod导致耐久为0
 
         inst.components.equippable:SetOnEquip(OnEquip_agron)
         inst.components.equippable:SetOnUnequip(OnUnequip_agron)

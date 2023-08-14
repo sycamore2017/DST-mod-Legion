@@ -51,7 +51,7 @@ nil,
 })
 
 function ShieldLegion:CanAttack(doer) --只能在sg里用，不也能用于平常的判断
-    return self.canatk and self.time == nil and not self.inst._brokenshield
+    return self.canatk and self.time == nil and not self.inst:HasTag("broken")
 end
 
 function ShieldLegion:StartAttack(doer)
@@ -127,7 +127,7 @@ function ShieldLegion:ArmorTakeDamage(doer, attacker, data)
     end
 end
 function ShieldLegion:GetAttacked(doer, attacker, damage, weapon, stimuli, spdamage)
-    if self.inst._brokenshield or not self.canatk then
+    if self.inst:HasTag("broken") or not self.canatk then
         return false
     end
 

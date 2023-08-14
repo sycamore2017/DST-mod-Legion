@@ -424,6 +424,17 @@ local function OnUnequip_beetlehat(inst, owner)
     end
     TOOLS_L.RemoveTag(owner, "burden_ignor_l", inst.prefab)
 end
+local function SetupEquippable_beetlehat(inst)
+	inst:AddComponent("equippable")
+    inst.components.equippable.equipslot = EQUIPSLOTS.HEAD
+    inst.components.equippable:SetOnEquip(OnEquip_beetlehat)
+    inst.components.equippable:SetOnUnequip(OnUnequip_beetlehat)
+    inst.components.equippable.walkspeedmult = 0.85
+end
+local foreverequip_beetlehat = {
+    -- anim = nil, anim_broken = "broken", fn_broken = nil, fn_repaired = nil,
+    fn_setEquippable = SetupEquippable_beetlehat
+}
 
 local function Fn_beetlehat()
     local inst = CreateEntity()
@@ -442,6 +453,7 @@ local function Fn_beetlehat()
     inst:AddTag("waterproofer")
     inst:AddTag("burden_l")
     inst:AddTag("rp_bugshell_l")
+    inst:AddTag("show_broken_ui") --装备损坏后展示特殊物品栏ui
 
     -- inst:AddComponent("skinedlegion")
     -- inst.components.skinedlegion:InitWithFloater("hat_elepheetle")
@@ -465,11 +477,7 @@ local function Fn_beetlehat()
     inst.components.inventoryitem.imagename = "hat_elepheetle"
     inst.components.inventoryitem.atlasname = "images/inventoryimages/hat_elepheetle.xml"
 
-    inst:AddComponent("equippable")
-    inst.components.equippable.equipslot = EQUIPSLOTS.HEAD
-    inst.components.equippable:SetOnEquip(OnEquip_beetlehat)
-    inst.components.equippable:SetOnUnequip(OnUnequip_beetlehat)
-    inst.components.equippable.walkspeedmult = 0.85
+    SetupEquippable_beetlehat(inst)
 
     inst:AddComponent("armor")
     inst.components.armor:InitCondition(945, 0.8)
@@ -478,6 +486,8 @@ local function Fn_beetlehat()
     inst.components.waterproofer:SetEffectiveness(TUNING.WATERPROOFNESS_SMALL)
 
     MakeHauntableLaunch(inst)
+
+    TOOLS_L.MakeNoLossRepairableEquipment(inst, foreverequip_beetlehat)
 
     -- inst.components.skinedlegion:SetOnPreLoad()
 
@@ -519,6 +529,18 @@ local function OnUnequip_beetlearmor(inst, owner)
     TOOLS_L.RemoveTag(owner, "stable_l", inst.prefab)
     TOOLS_L.RemoveTag(owner, "sedate_l", inst.prefab)
 end
+local function SetupEquippable_beetlearmor(inst)
+	inst:AddComponent("equippable")
+    inst.components.equippable.equipslot = EQUIPSLOTS.BODY
+    inst.components.equippable:SetOnEquip(OnEquip_beetlearmor)
+    inst.components.equippable:SetOnUnequip(OnUnequip_beetlearmor)
+    inst.components.equippable.insulated = true --防电
+    inst.components.equippable.walkspeedmult = 0.15
+end
+local foreverequip_beetlearmor = {
+    -- anim = nil, anim_broken = "broken", fn_broken = nil, fn_repaired = nil,
+    fn_setEquippable = SetupEquippable_beetlearmor
+}
 
 local function Fn_beetlearmor()
     local inst = CreateEntity()
@@ -535,6 +557,7 @@ local function Fn_beetlearmor()
 
     inst:AddTag("heavyarmor") --减轻击退效果 官方tag
     inst:AddTag("rp_bugshell_l")
+    inst:AddTag("show_broken_ui") --装备损坏后展示特殊物品栏ui
 
     -- inst:AddComponent("skinedlegion")
     -- inst.components.skinedlegion:InitWithFloater("armor_elepheetle")
@@ -558,13 +581,7 @@ local function Fn_beetlearmor()
     inst.components.inventoryitem.imagename = "armor_elepheetle"
     inst.components.inventoryitem.atlasname = "images/inventoryimages/armor_elepheetle.xml"
 
-    inst:AddComponent("equippable")
-    -- inst.components.equippable.equipslot = EQUIPSLOTS.BACK or EQUIPSLOTS.BODY
-    inst.components.equippable.equipslot = EQUIPSLOTS.BODY
-    inst.components.equippable:SetOnEquip(OnEquip_beetlearmor)
-    inst.components.equippable:SetOnUnequip(OnUnequip_beetlearmor)
-    inst.components.equippable.insulated = true --防电
-    inst.components.equippable.walkspeedmult = 0.15
+    SetupEquippable_beetlearmor(inst)
 
     inst:AddComponent("armor")
     inst.components.armor:InitCondition(1050, 0.9)
@@ -573,6 +590,8 @@ local function Fn_beetlearmor()
     inst.components.waterproofer:SetEffectiveness(TUNING.WATERPROOFNESS_SMALL)
 
     MakeHauntableLaunch(inst)
+
+    TOOLS_L.MakeNoLossRepairableEquipment(inst, foreverequip_beetlearmor)
 
     -- inst.components.skinedlegion:SetOnPreLoad()
 
