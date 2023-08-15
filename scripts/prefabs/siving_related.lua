@@ -1160,7 +1160,7 @@ local function OnBroken_mask2(inst)
     inst:RemoveTag("siv_mask2")
     inst.components.inspectable.nameoverride = "BROKEN_FORGEDITEM" --改为统一的损坏描述
     inst.components.armor:SetAbsorption(0)
-    inst:PushEvent("percentusedchange", { percent = 0 }) --界面需要一个百分比
+    inst:PushEvent("percentusedchange", { percent = 0 }) --界面需要更新百分比
 end
 local function OnAttackOther(owner, data)
     if

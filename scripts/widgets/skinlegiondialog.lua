@@ -996,6 +996,63 @@ local SkinData = {
             }
         }
     },
+    fishhomingtool_awesome_taste = {
+        string = ischinese and {
+            name = "茶之恋",
+            collection = "TASTE", access = "REWARD",
+            descitem = "解锁\"简易打窝饵制作器\"、\"专业打窝饵制作器\"和\"打窝饵\"的皮肤。",
+            description = ""
+        } or {
+            name = "Tea Heart",
+            collection = "TASTE", access = "REWARD",
+            descitem = "Unlock \"Fish-homing Bait Maker\", \"Fish-homing Bait Maker+\", and \"Fish-homing Bait\" skin.",
+            description = "The story was not translated."
+        },
+        height_anim = 280,
+        anims = {
+            {
+                bank = "fishhomingtool_normal_taste", build = "fishhomingtool_normal_taste",
+                anim = "idle", anim2 = nil, isloop = false,
+                x = -80, y = 190, scale = 0.38
+            },
+            {
+                bank = "fishhomingtool_awesome_taste", build = "fishhomingtool_awesome_taste",
+                anim = "idle", anim2 = nil, isloop = false,
+                x = -35, y = 150, scale = 0.38
+            },
+            {
+                symbol = {
+                    { symbol = "swap_object", build = "fishhomingtool_awesome_taste", file = "swap", type = 1 }
+                },
+                fn_anim = SetAnim_player,
+                fn_click = SetAnim_player2,
+                x = 35, y = 140, scale = 0.38
+            },
+            {
+                bank = "fishhomingbait_taste", build = "fishhomingbait_taste",
+                anim = "idle2", anim2 = nil, isloop = false,
+                x = -80, y = 75, scale = 0.38
+            },
+            {
+                bank = "fishhomingbait_taste", build = "fishhomingbait_taste",
+                anim = "idle3", anim2 = nil, isloop = false,
+                x = -30, y = 55, scale = 0.38
+            },
+            {
+                bank = "fishhomingbait_taste", build = "fishhomingbait_taste",
+                anim = "idle1", anim2 = nil, isloop = false,
+                x = -65, y = 5, scale = 0.38
+            },
+            {
+                symbol = {
+                    { symbol = "lantern_overlay", build = "fishhomingbait_taste", file = "swap1", type = 1 }
+                },
+                fn_anim = SetAnim_player,
+                fn_click = SetAnim_player2,
+                x = 35, y = 0, scale = 0.38
+            }
+        }
+    },
     shield_l_log_emo_pride = {
         string = ischinese and {
             collection = "EMOTICON", access = "FREE",
@@ -2728,7 +2785,7 @@ function SkinLegionDialog:ResetItems()
         if v ~= nil then
             if not v.noshopshow then
                 local isowned = false
-                if v.skin_id == "notnononl" or myskins[skinname] then
+                if v.skin_id == "ooooonononon" or myskins[skinname] then
                     isowned = true
                 end
 

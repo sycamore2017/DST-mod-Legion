@@ -1842,7 +1842,7 @@ local dressup_data = {
             dressup:SetDressHand(itemswap)
 
             return itemswap
-        end,
+        end
     },
     fishhomingbait = {
         isnoskin = true,
@@ -1851,18 +1851,22 @@ local dressup_data = {
 
             local data = item.baitimgs_l[item.components.fishhomingbait.type_shape]
             if data ~= nil then
-                itemswap["swap_object"] = dressup:GetDressData(
-                    nil, data.build, data.swap, item.GUID, "swap"
-                )
+                if data.isshield then
+                    itemswap["lantern_overlay"] = dressup:GetDressData(nil, data.build, data.swap, item.GUID, "swap")
+                    itemswap["LANTERN_OVERLAY"] = dressup:GetDressData(nil, nil, nil, nil, "show")
+                    itemswap["swap_object"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
+                else
+                    itemswap["swap_object"] = dressup:GetDressData(nil, data.build, data.swap, item.GUID, "swap")
+                    itemswap["lantern_overlay"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
+                end
             else
-                itemswap["swap_object"] = dressup:GetDressData(
-                    nil, "fishhomingbait", "swap1", item.GUID, "swap"
-                )
+                itemswap["swap_object"] = dressup:GetDressData(nil, "fishhomingbait", "swap1", item.GUID, "swap")
+                itemswap["lantern_overlay"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
             end
-            dressup:SetDressHand(itemswap)
+            itemswap["whipline"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
 
             return itemswap
-        end,
+        end
     },
     dish_tomahawksteak = {
         isnoskin = true,

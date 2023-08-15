@@ -162,7 +162,7 @@ local assets_bag = {
     Asset("ATLAS", "images/inventoryimages/fishhomingbait2.xml"),
     Asset("IMAGE", "images/inventoryimages/fishhomingbait2.tex"),
     Asset("ATLAS", "images/inventoryimages/fishhomingbait3.xml"),
-    Asset("IMAGE", "images/inventoryimages/fishhomingbait3.tex"),
+    Asset("IMAGE", "images/inventoryimages/fishhomingbait3.tex")
 }
 
 local prefabs_bag = {
@@ -223,15 +223,33 @@ end
 local function OnEquip(inst, owner)
     local data = inst.baitimgs_l[inst.components.fishhomingbait.type_shape]
     if data ~= nil then
-        owner.AnimState:OverrideSymbol("swap_object", data.build, data.swap)
+        if data.isshield then
+            owner.AnimState:Show("LANTERN_OVERLAY")
+            owner.AnimState:HideSymbol("swap_object")
+            owner.AnimState:ClearOverrideSymbol("swap_object")
+            owner.AnimState:OverrideSymbol("lantern_overlay", data.build, data.swap)
+        else
+            owner.AnimState:OverrideSymbol("swap_object", data.build, data.swap)
+        end
     else
         owner.AnimState:OverrideSymbol("swap_object", "fishhomingbait", "swap1")
     end
-
     owner.AnimState:Show("ARM_carry")
     owner.AnimState:Hide("ARM_normal")
 end
 local function OnUnequip(inst, owner)
+    local data = inst.baitimgs_l[inst.components.fishhomingbait.type_shape]
+    if data ~= nil then
+        if data.isshield then
+            owner.AnimState:Hide("LANTERN_OVERLAY")
+            owner.AnimState:ShowSymbol("swap_object")
+            owner.AnimState:ClearOverrideSymbol("lantern_overlay")
+        else
+            owner.AnimState:ClearOverrideSymbol("swap_object")
+        end
+    else
+        owner.AnimState:ClearOverrideSymbol("swap_object")
+    end
     owner.AnimState:Hide("ARM_carry")
     owner.AnimState:Show("ARM_normal")
 end

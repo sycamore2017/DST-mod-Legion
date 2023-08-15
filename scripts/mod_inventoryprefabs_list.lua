@@ -244,7 +244,13 @@ local InventoryPrefabsList = {  --每个元素的下标值为每种物品栏图�
     siving_mask_era = { build = "images_minisign_skins2" },
     siving_mask_era2 = { build = "images_minisign_skins2" },
     siving_mask_gold_era = { build = "images_minisign_skins2" },
-    siving_mask_gold_era2 = { build = "images_minisign_skins2" }
+    siving_mask_gold_era2 = { build = "images_minisign_skins2" },
+
+    fishhomingtool_normal_taste = { build = "images_minisign_skins1" },
+    fishhomingtool_awesome_taste = { build = "images_minisign_skins1" },
+    fishhomingbait1_taste = { build = "images_minisign_skins1" },
+    fishhomingbait2_taste = { build = "images_minisign_skins1" },
+    fishhomingbait3_taste = { build = "images_minisign_skins1" },
 }
 
 local function CheckMod(modname)

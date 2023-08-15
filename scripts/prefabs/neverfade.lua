@@ -160,6 +160,7 @@ local function onfinished(inst)
                 end
             end
         end
+        inst:PushEvent("percentusedchange", { percent = 0 }) --界面需要更新百分比
     end
 end
 
@@ -229,6 +230,7 @@ local function fn()
     inst:AddTag("pointy")
     -- inst:AddTag("hide_percentage")  --这个标签能让耐久比例不显示出来
     inst:AddTag("deployedplant")
+    inst:AddTag("show_broken_ui") --装备损坏后展示特殊物品栏ui
 
     --weapon (from weapon component) added to pristine state for optimization
     inst:AddTag("weapon")
@@ -237,7 +239,6 @@ local function fn()
     inst.components.skinedlegion:InitWithFloater("neverfade") --客户端才初始化时居然获取不了inst.prefab
 
     inst.entity:SetPristine()
-
     if not TheWorld.ismastersim then
         return inst
     end
@@ -256,7 +257,7 @@ local function fn()
     inst:AddComponent("equippable")
     inst.components.equippable:SetOnEquip(onequip)
     inst.components.equippable:SetOnUnequip(onunequip)
-    -- inst.components.equippable.dapperness = TUNING.DAPPERNESS_MED   --高礼帽般的回复精神效果
+    -- inst.components.equippable.dapperness = TUNING.DAPPERNESS_MED --高礼帽般的回复精神效果
 
     inst:AddComponent("weapon")
     inst.components.weapon:SetDamage(55)
@@ -270,7 +271,7 @@ local function fn()
     inst:AddComponent("deployable")
     inst.components.deployable.ondeploy = ondeploy
     inst.components.deployable:SetDeployMode(DEPLOYMODE.PLANT)
-    inst.components.deployable:SetDeploySpacing(DEPLOYSPACING.MEDIUM)   --草根一样的种植所需范围
+    inst.components.deployable:SetDeploySpacing(DEPLOYSPACING.MEDIUM) --草根一样的种植所需范围
 
     MakeHauntableLaunch(inst)  --作祟相关函数
 

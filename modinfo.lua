@@ -101,6 +101,45 @@ configuration_options = L and {
         },
         default = 0.005
     },
+    {   name = "RoseBushSpacing",
+        label = "Planting limit radius of Rose Bush",
+        hover = "Set the planting limit radius of Rose Bush.",
+        options = {
+            {description = "0", data = 3},
+            {description = "0.75", data = 2},
+            {description = "1(default)", data = 1},
+            {description = "2(pre-setup)", data = 0},
+            {description = "3.2", data = 4},
+            {description = "4", data = 5}
+        },
+        default = 1
+    },
+    {   name = "LilyBushSpacing",
+        label = "Planting limit radius of Lily Bush",
+        hover = "Set the planting limit radius of Lily Bush.",
+        options = {
+            {description = "0", data = 3},
+            {description = "0.75", data = 2},
+            {description = "1(default)", data = 1},
+            {description = "2(pre-setup)", data = 0},
+            {description = "3.2", data = 4},
+            {description = "4", data = 5}
+        },
+        default = 1
+    },
+    {   name = "OrchidBushSpacing",
+        label = "Planting limit radius of Orchid Bush",
+        hover = "Set the planting limit radius of Orchid Bush.",
+        options = {
+            {description = "0", data = 3},
+            {description = "0.75(default)", data = 2},
+            {description = "1(pre-setup)", data = 1},
+            {description = "2", data = 0},
+            {description = "3.2", data = 4},
+            {description = "4", data = 5}
+        },
+        default = 2
+    },
 
     {name = "Title", label = "", options = {{description = "", data = ""}}, default = ""},
     {name = "Title", label = "Superb Cuisine", options = {{description = "", data = ""}}, default = ""},
@@ -466,6 +505,45 @@ configuration_options = L and {
             {description = "100%", data = 1.0}
         },
         default = 0.005
+    },
+    {   name = "RoseBushSpacing",
+        label = "蔷薇花丛种植间隔",
+        hover = "设置蔷薇花丛种植时的间隔半径限制。选择便捷还是美观？",
+        options = {
+            {description = "0", data = 3},
+            {description = "0.75", data = 2},
+            {description = "1(默认)", data = 1},
+            {description = "2(旧设)", data = 0},
+            {description = "3.2", data = 4},
+            {description = "4", data = 5}
+        },
+        default = 1
+    },
+    {   name = "LilyBushSpacing",
+        label = "蹄莲花丛种植间隔",
+        hover = "设置蹄莲花丛种植时的间隔半径限制。选择便捷还是美观？",
+        options = {
+            {description = "0", data = 3},
+            {description = "0.75", data = 2},
+            {description = "1(默认)", data = 1},
+            {description = "2(旧设)", data = 0},
+            {description = "3.2", data = 4},
+            {description = "4", data = 5}
+        },
+        default = 1
+    },
+    {   name = "OrchidBushSpacing",
+        label = "兰草花丛种植间隔",
+        hover = "设置兰草花丛种植时的间隔半径限制。选择便捷还是美观？",
+        options = {
+            {description = "0", data = 3},
+            {description = "0.75(默认)", data = 2},
+            {description = "1(旧设)", data = 1},
+            {description = "2", data = 0},
+            {description = "3.2", data = 4},
+            {description = "4", data = 5}
+        },
+        default = 2
     },
 
     {name = "Title", label = "", options = {{description = "", data = ""}}, default = ""},

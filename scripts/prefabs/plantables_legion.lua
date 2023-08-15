@@ -165,7 +165,7 @@ local plantables = {
         deployable = {
             prefab = "rosebush", --种植出的prefab名
             mode = DEPLOYMODE.PLANT, --种植类型
-            spacing = DEPLOYSPACING.MEDIUM --种植间隔
+            spacing = CONFIGS_LEGION.ROSEBUSHSPACING or DEPLOYSPACING.MEDIUM --种植间隔
         },
         fn_common = function(inst)
             inst:AddTag("deployedplant") --植株种植标签，植物人种下时能恢复精神等
@@ -184,7 +184,7 @@ local plantables = {
         },
         deployable = {
             prefab = "lilybush",
-            mode = DEPLOYMODE.PLANT, spacing = DEPLOYSPACING.MEDIUM
+            mode = DEPLOYMODE.PLANT, spacing = CONFIGS_LEGION.LILYBUSHSPACING or DEPLOYSPACING.MEDIUM
         },
         fn_common = function(inst)
             inst:AddTag("deployedplant")
@@ -203,7 +203,7 @@ local plantables = {
         },
         deployable = {
             prefab = "orchidbush",
-            mode = DEPLOYMODE.PLANT, spacing = DEPLOYSPACING.LESS
+            mode = DEPLOYMODE.PLANT, spacing = CONFIGS_LEGION.ORCHIDBUSHSPACING or DEPLOYSPACING.LESS
         },
         fn_common = function(inst)
             inst:AddTag("deployedplant")
@@ -223,7 +223,7 @@ local plantables = {
         deployable = {
             prefab = "rosebush",
             isoriginal = true,
-            mode = DEPLOYMODE.PLANT, spacing = DEPLOYSPACING.MEDIUM
+            mode = DEPLOYMODE.PLANT, spacing = CONFIGS_LEGION.ROSEBUSHSPACING or DEPLOYSPACING.MEDIUM
         },
         fn_common = function(inst)
             inst:AddTag("deployedplant")
@@ -244,7 +244,7 @@ local plantables = {
         deployable = {
             prefab = "lilybush",
             isoriginal = true,
-            mode = DEPLOYMODE.PLANT, spacing = DEPLOYSPACING.MEDIUM
+            mode = DEPLOYMODE.PLANT, spacing = CONFIGS_LEGION.LILYBUSHSPACING or DEPLOYSPACING.MEDIUM
         },
         fn_common = function(inst)
             inst:AddTag("deployedplant")
@@ -265,7 +265,7 @@ local plantables = {
         deployable = {
             prefab = "orchidbush",
             isoriginal = true,
-            mode = DEPLOYMODE.PLANT, spacing = DEPLOYSPACING.LESS
+            mode = DEPLOYMODE.PLANT, spacing = CONFIGS_LEGION.ORCHIDBUSHSPACING or DEPLOYSPACING.LESS
         },
         fn_common = function(inst)
             inst:AddTag("deployedplant")

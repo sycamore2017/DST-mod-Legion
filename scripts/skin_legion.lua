@@ -584,7 +584,7 @@ _G.SKIN_PREFABS_LEGION = {
             inst.components.bundlemaker:SetSkinData()
         end,
         equip = { symbol = "swap_object", build = "fishhomingtool_awesome", file = "swap" },
-        exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
+        exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 }
     },
     fishhomingtool_normal = {
         assets = nil,
@@ -597,7 +597,7 @@ _G.SKIN_PREFABS_LEGION = {
         fn_start = function(inst)
             inst.components.bundlemaker:SetSkinData()
         end,
-        exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
+        exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 }
     },
     fishhomingbait = {
         fn_start = function(inst)
@@ -622,7 +622,7 @@ _G.SKIN_PREFABS_LEGION = {
             end
         end,
         -- baiting = nil,
-        exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
+        exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 }
     },
 
     icire_rock = {
@@ -984,7 +984,7 @@ _G.SKINS_LEGION = {
 		build_name_override = nil, --皮肤名称(居然是小写)
 
         skin_idx = 1, --[key]形式的下标不能按代码顺序，后面会统一排序的
-        skin_id = "61627d927bbb727be174c4a0",
+        skin_id = "",
         noshopshow = nil, --为true的话，就不在鸡毛铺里展示
         onlyownedshow = true, --为true的话，只有玩家拥有该皮肤才在鸡毛铺里展示
 		assets = { --仅仅是用于初始化注册
@@ -1235,7 +1235,7 @@ _G.SKINS_LEGION = {
         base_prefab = "orchitwigs",
 		type = "item", skin_tags = {}, release_group = 555, rarity = rarityFree,
 
-        skin_id = "notnononl", --61ff45880a30fc7fca0db5e5
+        skin_id = "ooooonononon",
 		assets = {
 			Asset("ANIM", "anim/skin/orchitwigs_disguiser.zip"),
             Asset("ATLAS", "images/inventoryimages_skin/foliageath_orchitwigs_disguiser.xml"),
@@ -1501,7 +1501,7 @@ _G.SKINS_LEGION = {
         base_prefab = "hat_lichen",
 		type = "item", skin_tags = {}, release_group = 555, rarity = rarityFree,
 
-        skin_id = "notnononl", --61f15bf4db102b0b8a529c66
+        skin_id = "ooooonononon",
 		assets = {
 			Asset("ANIM", "anim/skin/hat_lichen_disguiser.zip")
 		},
@@ -1526,7 +1526,7 @@ _G.SKINS_LEGION = {
         base_prefab = "hat_cowboy",
 		type = "item", skin_tags = {}, release_group = 555, rarity = rarityFree,
 
-        skin_id = "notnononl",
+        skin_id = "ooooonononon",
 		assets = {
 			Asset("ANIM", "anim/skin/hat_cowboy_tvplay.zip"),
 		},
@@ -1547,7 +1547,7 @@ _G.SKINS_LEGION = {
         base_prefab = "pinkstaff",
 		type = "item", skin_tags = {}, release_group = 555, rarity = rarityFree,
 
-        skin_id = "notnononl",
+        skin_id = "ooooonononon",
 		assets = {
 			Asset("ANIM", "anim/skin/pinkstaff_tvplay.zip")
 		},
@@ -1627,6 +1627,30 @@ _G.SKINS_LEGION = {
         equip = { symbol = "swap_object", build = "fishhomingtool_awesome_thanks", file = "swap" },
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 }
     },
+    fishhomingtool_awesome_taste = {
+        base_prefab = "fishhomingtool_awesome",
+		type = "item", skin_tags = {}, release_group = 555, rarity = rarityFree,
+
+        skin_id = "61ff45880a30fc7fca0db5e5",
+        onlyownedshow = true, mustonwedshow = true,
+		assets = {
+			Asset("ANIM", "anim/skin/fishhomingtool_awesome_taste.zip")
+		},
+        image = { name = nil, atlas = nil, setable = true },
+
+        string = ischinese and { name = "茶之恋榨汁机" } or { name = "Tea Heart Juicer" },
+
+        anim = {
+            bank = nil, build = nil,
+            anim = nil, animpush = nil, isloop = nil,
+            setable = true
+        },
+        fn_start = function(inst)
+            inst.components.bundlemaker:SetSkinData("fishhomingbait_taste", nil)
+        end,
+        equip = { symbol = "swap_object", build = "fishhomingtool_awesome_taste", file = "swap" },
+        exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 }
+    },
     fishhomingtool_normal_thanks = {
         base_prefab = "fishhomingtool_normal",
 		type = "item", skin_tags = {}, release_group = 555, rarity = raritySpecial,
@@ -1638,9 +1662,7 @@ _G.SKINS_LEGION = {
 		},
         image = { name = nil, atlas = nil, setable = true },
 
-        string = {
-            name = ischinese and "云烟草" or "YunYan Cigarette"
-        },
+        string = { name = ischinese and "云烟草" or "YunYan Cigarette" },
 
         anim = {
             bank = nil, build = nil,
@@ -1649,6 +1671,29 @@ _G.SKINS_LEGION = {
         },
         fn_start = function(inst)
             inst.components.bundlemaker:SetSkinData("fishhomingbait_thanks", nil)
+        end,
+        exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 }
+    },
+    fishhomingtool_normal_taste = {
+        base_prefab = "fishhomingtool_normal",
+		type = "item", skin_tags = {}, release_group = 555, rarity = rarityFree,
+
+        skin_id = "61ff45880a30fc7fca0db5e5",
+        noshopshow = true,
+		assets = {
+			Asset("ANIM", "anim/skin/fishhomingtool_normal_taste.zip")
+		},
+        image = { name = nil, atlas = nil, setable = true },
+
+        string = ischinese and { name = "一袋茶之恋" } or { name = "A Bag of Tea Heart" },
+
+        anim = {
+            bank = nil, build = nil,
+            anim = nil, animpush = nil, isloop = nil,
+            setable = true
+        },
+        fn_start = function(inst)
+            inst.components.bundlemaker:SetSkinData("fishhomingbait_taste", nil)
         end,
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 }
     },
@@ -1666,13 +1711,11 @@ _G.SKINS_LEGION = {
             Asset("ATLAS", "images/inventoryimages_skin/fishhomingbait2_thanks.xml"),
             Asset("IMAGE", "images/inventoryimages_skin/fishhomingbait2_thanks.tex"),
             Asset("ATLAS", "images/inventoryimages_skin/fishhomingbait3_thanks.xml"),
-            Asset("IMAGE", "images/inventoryimages_skin/fishhomingbait3_thanks.tex"),
+            Asset("IMAGE", "images/inventoryimages_skin/fishhomingbait3_thanks.tex")
 		},
         image = { name = nil, atlas = nil, setable = false }, --皮肤展示需要一个同prefab名的图片
 
-        string = {
-            name = ischinese and "云烟瓶" or "YunYan Bottle"
-        },
+        string = { name = ischinese and "云烟瓶" or "YunYan Bottle" },
 
         fn_start = function(inst)
             inst.baitimgs_l = {
@@ -1696,14 +1739,58 @@ _G.SKINS_LEGION = {
             end
         end,
         baiting = { bank = "pollen_chum", build = "pollen_chum" },
-        exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
+        exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 }
+    },
+    fishhomingbait_taste = {
+        base_prefab = "fishhomingbait",
+		type = "item", skin_tags = {}, release_group = 555, rarity = rarityFree,
+
+        skin_id = "61ff45880a30fc7fca0db5e5",
+        noshopshow = true,
+		assets = {
+            Asset("ANIM", "anim/pollen_chum.zip"), --官方藤壶花粉动画
+			Asset("ANIM", "anim/skin/fishhomingbait_taste.zip"),
+            Asset("ATLAS", "images/inventoryimages_skin/fishhomingbait1_taste.xml"),
+            Asset("IMAGE", "images/inventoryimages_skin/fishhomingbait1_taste.tex"),
+            Asset("ATLAS", "images/inventoryimages_skin/fishhomingbait2_taste.xml"),
+            Asset("IMAGE", "images/inventoryimages_skin/fishhomingbait2_taste.tex"),
+            Asset("ATLAS", "images/inventoryimages_skin/fishhomingbait3_taste.xml"),
+            Asset("IMAGE", "images/inventoryimages_skin/fishhomingbait3_taste.tex")
+		},
+        image = { name = nil, atlas = nil, setable = false }, --皮肤展示需要一个同prefab名的图片
+
+        string = ischinese and { name = "茶之恋" } or { name = "Tea Heart" },
+
+        fn_start = function(inst)
+            inst.baitimgs_l = {
+                dusty = {
+                    img = "fishhomingbait1_taste", atlas = "images/inventoryimages_skin/fishhomingbait1_taste.xml",
+                    anim = "idle1", swap = "swap1", symbol = "base1", build = "fishhomingbait_taste", isshield = true
+                },
+                pasty = {
+                    img = "fishhomingbait2_taste", atlas = "images/inventoryimages_skin/fishhomingbait2_taste.xml",
+                    anim = "idle2", swap = "swap2", symbol = "base2", build = "fishhomingbait_taste", isshield = true
+                },
+                hardy = {
+                    img = "fishhomingbait3_taste", atlas = "images/inventoryimages_skin/fishhomingbait3_taste.xml",
+                    anim = "idle3", swap = "swap3", symbol = "base3", build = "fishhomingbait_taste", isshield = true
+                }
+            }
+            inst.AnimState:SetBank("fishhomingbait_taste")
+            inst.AnimState:SetBuild("fishhomingbait_taste")
+            if inst.components.fishhomingbait and inst.components.fishhomingbait.oninitfn then
+                inst.components.fishhomingbait.oninitfn(inst)
+            end
+        end,
+        baiting = { bank = "pollen_chum", build = "pollen_chum" },
+        exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 }
     },
 
     shield_l_log_emo_pride = {
         base_prefab = "shield_l_log",
 		type = "item", skin_tags = {}, release_group = 555, rarity = rarityFree,
 
-        skin_id = "notnononl",
+        skin_id = "ooooonononon",
 		assets = {
 			Asset("ANIM", "anim/skin/shield_l_log_emo_pride.zip"),
 		},
@@ -1797,7 +1884,7 @@ _G.SKINS_LEGION = {
         base_prefab = "shield_l_sand",
 		type = "item", skin_tags = {}, release_group = 555, rarity = rarityFree,
 
-        skin_id = "notnononl",
+        skin_id = "ooooonononon",
 		assets = {
 			Asset("ANIM", "anim/skin/shield_l_sand_op.zip")
 		},
@@ -3406,7 +3493,7 @@ _G.SKINS_LEGION = {
 }
 
 _G.SKIN_IDS_LEGION = {
-    ["notnononl"] = {}, --免费皮肤全部装这里面，skin_id设置为"notnononl"就好了
+    ["ooooonononon"] = {}, --免费皮肤全部装这里面，skin_id设置为"ooooonononon"就好了
     ["6278c409c340bf24ab311522"] = { --余生
         siving_derivant_thanks = true, siving_derivant_thanks2 = true, neverfade_thanks = true, neverfadebush_thanks = true, backcub_thanks = true,
         fishhomingtool_awesome_thanks = true, fishhomingtool_normal_thanks = true, fishhomingbait_thanks = true,
@@ -3475,7 +3562,11 @@ _G.SKIN_IDS_LEGION = {
         siving_ctlall_item_era = true, siving_ctlall_era = true,
         siving_mask_era = true, siving_mask_era2 = true, siving_mask_gold_era = true, siving_mask_gold_era2 = true,
         siving_turn_future = true, siving_turn_future2 = true
-    }
+    },
+    -- ["61f15bf4db102b0b8a529c66"] = { --柳绿花红
+    -- },
+    -- ["61627d927bbb727be174c4a0"] = { --棋举不定
+    -- }
 }
 _G.SKIN_IDX_LEGION = {
     -- [1] = "rosorns_spell",
@@ -3523,6 +3614,7 @@ local skinidxes = { --用以皮肤排序
     "rosebush_marble", "rosorns_marble", "lilybush_marble", "lileaves_marble", "orchidbush_marble", "orchitwigs_marble",
     "shield_l_log_emo_fist", "hat_lichen_emo_que",
 
+    "fishhomingtool_awesome_taste", "fishhomingtool_normal_taste", "fishhomingbait_taste",
     "backcub_fans2", "backcub_fans",
     "shield_l_log_emo_pride", "shield_l_sand_op", "pinkstaff_tvplay",  "hat_cowboy_tvplay", "hat_lichen_disguiser", "orchitwigs_disguiser"
 }
@@ -3663,7 +3755,7 @@ end
 --------------------------------------------------------------------------
 
 local function DoYouHaveSkin(skinname, userid)
-    if SKIN_IDS_LEGION.notnononl[skinname] then
+    if SKIN_IDS_LEGION.ooooonononon[skinname] then
         return true
     elseif userid ~= nil and _G.SKINS_CACHE_L[userid] ~= nil and _G.SKINS_CACHE_L[userid][skinname] then
         return true
@@ -4007,7 +4099,8 @@ if IsServer then
                     revolvedmoonlight_item_taste2 = true,
                     revolvedmoonlight_taste2 = true,
                     revolvedmoonlight_pro_taste2 = true,
-                    backcub_fans2 = true
+                    backcub_fans2 = true,
+                    --undo
                 }
                 for skinname, hasit in pairs(skins) do
                     if hasit and not skinsmap[skinname] and not newskins[skinname] then
