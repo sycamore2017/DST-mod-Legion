@@ -136,13 +136,12 @@ AddRecipe2(
     }, { "RECAST", "FISHING" }
 )
 AddRecipe2(
-    "block_l_tourmalinecore", {
+    "tourmalinecore", {
         Ingredient("redgem", 10),
         Ingredient("tourmalineshard", 10, "images/inventoryimages/tourmalineshard.xml"),
         Ingredient("moonstorm_spark", 10)
     }, tech_recast[2], {
-        nounlock = lock_recast,
-        product = "tourmalinecore", description = "block_l_tourmalinecore",
+        nounlock = lock_recast, no_deconstruction = true,
         atlas = "images/inventoryimages/tourmalinecore.xml", image = "tourmalinecore.tex"
     }, { "RECAST", "REFINE" }
 )

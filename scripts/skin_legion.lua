@@ -4100,7 +4100,9 @@ if IsServer then
                     revolvedmoonlight_taste2 = true,
                     revolvedmoonlight_pro_taste2 = true,
                     backcub_fans2 = true,
-                    --undo
+                    fishhomingtool_normal_taste = true,
+                    fishhomingtool_awesome_taste = true,
+                    fishhomingbait_taste = true
                 }
                 for skinname, hasit in pairs(skins) do
                     if hasit and not skinsmap[skinname] and not newskins[skinname] then

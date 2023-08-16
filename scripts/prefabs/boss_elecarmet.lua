@@ -80,7 +80,7 @@ local function AddSpecialLoot(inst)
         "siving_ctlall_item_blueprint",
         "hat_elepheetle_blueprint",
         "armor_elepheetle_blueprint",
-        "block_l_tourmalinecore_blueprint"
+        "tourmalinecore_blueprint"
     }
     inst.components.lootdropper:AddChanceLoot(table.remove(drops, math.random(#drops)), 1)
     inst.components.lootdropper:AddChanceLoot(table.remove(drops, math.random(#drops)), 1)

@@ -206,6 +206,20 @@ if IsServer then
             if farm.remainingharvests ~= 0 and newproducts[item.prefab] ~= nil then
                 if farm.components.harvestable ~= nil then
                     local data = newproducts[item.prefab]
+                    local max_produce = data.produce
+                    local grow_time = TUNING.MUSHROOMFARM_FULL_GROW_TIME
+                    local grower_skilltreeupdater = giver.components.skilltreeupdater
+                    if grower_skilltreeupdater ~= nil then
+                        if grower_skilltreeupdater:IsActivated("wormwood_mushroomplanter_upgrade") then
+                            max_produce = 6
+                        end
+                        if grower_skilltreeupdater:IsActivated("wormwood_mushroomplanter_ratebonus2") then
+                            grow_time = grow_time * TUNING.WORMWOOD_MUSHROOMPLANTER_RATEBONUS_2
+                        elseif grower_skilltreeupdater:IsActivated("wormwood_mushroomplanter_ratebonus1") then
+                            grow_time = grow_time * TUNING.WORMWOOD_MUSHROOMPLANTER_RATEBONUS_1
+                        end
+                    end
+
                     if item.prefab == "foliage" then
                         farm.AnimState:OverrideSymbol(
                             "swap_mushroom",
@@ -215,8 +229,8 @@ if IsServer then
                     else
                         farm.AnimState:OverrideSymbol("swap_mushroom", "mushroom_farm_"..data.product.."_build", "swap_mushroom")
                     end
-                    farm.components.harvestable:SetProduct(data.product, data.produce)
-                    farm.components.harvestable:SetGrowTime(TUNING.MUSHROOMFARM_FULL_GROW_TIME / data.produce)
+                    farm.components.harvestable:SetProduct(data.product, max_produce)
+                    farm.components.harvestable:SetGrowTime(grow_time/max_produce)
                     farm.components.harvestable:Grow()
 
                     TheWorld:PushEvent("itemplanted", { doer = giver, pos = farm:GetPosition() }) --this event is pushed in other places too

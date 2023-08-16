@@ -2779,7 +2779,7 @@ S___WATHGRITHR.DESCRIBE.ELECARMET = "My greatest enemy, a Fimbul."
 --S_______WINONA.DESCRIBE.ELECARMET = "Great to cool off after some hard physical labor."
 
 S_NAMES.TOURMALINECORE = "Tourmaline" --电气石
-S_RECIPE_DESC.BLOCK_L_TOURMALINECORE = "Used to store the main energy of the electrical age."
+S_RECIPE_DESC.TOURMALINECORE = "Used to store the main energy of the electrical age."
 S______GENERIC.DESCRIBE.TOURMALINECORE = "Oh my, can I touch it?"
 S_______WILLOW.DESCRIBE.TOURMALINECORE = "I prefer Red Gems."
 --S_____WOLFGANG.DESCRIBE.TOURMALINECORE = ""
