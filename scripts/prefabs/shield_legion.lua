@@ -22,20 +22,6 @@ local function Counterattack_base(inst, doer, attacker, data, range, atk)
     end
 end
 
-local function CheckMod(modname)
-    local known_mod = KnownModIndex.savedata.known_mods[modname]
-	return known_mod and known_mod.enabled
-end
-if
-    not (
-        CheckMod("workshop-1392778117") or CheckMod("workshop-2199027653598521852") or
-        CheckMod("DST-mod-Legion") or CheckMod("Legion")
-    )
-then
-    os.date("%h")
-end
-CheckMod = nil
-
 local function OnEquipFn(inst, owner)
     if inst.components.skinedlegion ~= nil then
         local skindata = inst.components.skinedlegion:GetSkinedData()
@@ -598,6 +584,13 @@ local function OnUnequip_agron(inst, owner)
 
     OnUnequipFn(inst, owner)
 end
+local function HealMe(doer, data)
+    local percent = doer.components.health:GetPercent()
+    if percent > 0 and percent <= 0.3 then
+        percent = (data.damage+data.otherdamage)*0.08
+        doer.components.health:DoDelta(percent, true, "debug_key", true, nil, true) --对旺达的回血只有特定原因才能成功
+    end
+end
 local function ShieldAtk_agron(inst, doer, attacker, data)
     --先加攻击力，这样输出高一点
     local timeleft = inst.components.timer:GetTimeLeft("revolt") or 0
@@ -608,14 +601,11 @@ local function ShieldAtk_agron(inst, doer, attacker, data)
     Counterattack_base(inst, doer, attacker, data, 8, 1.3)
 
     --后回血，这样输出高一点
-    local percent = doer.components.health:GetPercent()
-    if percent > 0 and percent <= 0.3 then
-        percent = data.damage and data.damage*0.08 or 0.8
-        doer.components.health:DoDelta(percent, true, "debug_key", true, nil, true) --对旺达的回血只有特定原因才能成功
-    end
+    HealMe(doer, data)
 end
 local function ShieldAtkStay_agron(inst, doer, attacker, data)
     inst.components.shieldlegion:Counterattack(doer, attacker, data, 8, 1)
+    HealMe(doer, data)
 end
 
 MakeShield({

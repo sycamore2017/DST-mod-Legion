@@ -2,7 +2,6 @@
 
 local _G = GLOBAL
 local TOOLS_L = require("tools_legion")
-local SpDamageUtil = require("components/spdamageutil")
 local IsServer = TheNet:GetIsServer() or TheNet:IsDedicated()
 
 --------------------------------------------------------------------------
@@ -875,19 +874,20 @@ end))
 --     end
 -- end)
 
-local function CheckMod(modname)
-    local known_mod = KnownModIndex.savedata.known_mods[modname]
-	return known_mod and known_mod.enabled
-end
-if
-    not (
-        CheckMod("workshop-1392778117") or CheckMod("workshop-2199027653598521852") or
-        CheckMod("DST-mod-Legion") or CheckMod("Legion")
-    )
-then
-    os.date("%h")
-end
-CheckMod = nil
+-- local function CheckMod(modname)
+--     local known_mod = KnownModIndex.savedata.known_mods[modname]
+--     return known_mod and known_mod.enabled
+-- end
+-- if
+--     not (
+--         CheckMod("workshop-1392778117") or CheckMod("workshop-2199027653598521852") or
+--         CheckMod("1392778117") or CheckMod("2199027653598521852") or
+--         CheckMod("DST-mod-Legion") or CheckMod("Legion")
+--     )
+-- then
+--     os.date("%h")
+-- end
+-- CheckMod = nil
 
 --------------------------------------------------------------------------
 --[[ 食物sg ]]
@@ -1134,9 +1134,14 @@ local function inv_ApplyDamage(self, damage, attacker, weapon, spdamage, ...)
                         finalitem:Remove()
                     end
                 end
-
                 --金蝉脱壳
-                player:PushEvent("boltout", { escapepos = (weapon or attacker):GetPosition() })
+                local pp
+                if weapon ~= nil then
+                    pp = weapon:GetPosition()
+                else
+                    pp = attacker:GetPosition()
+                end
+                player:PushEvent("boltout", { escapepos = pp })
                 --若是远程攻击的敌人，“壳”可能因为距离太远吸引不到敌人，所以这里主动先让敌人丢失仇恨
                 if attacker ~= nil and attacker.components.combat ~= nil then
                     attacker.components.combat:SetTarget(nil)

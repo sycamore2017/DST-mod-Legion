@@ -629,24 +629,9 @@ end
 --[[ 脱壳之翅的sg ]]
 --------------------------------------------------------------------------
 
-local function CheckMod(modname)
-    local known_mod = KnownModIndex.savedata.known_mods[modname]
-	return known_mod and known_mod.enabled
-end
-if
-    not (
-        CheckMod("workshop-1392778117") or CheckMod("workshop-2199027653598521852") or
-        CheckMod("DST-mod-Legion") or CheckMod("Legion")
-    )
-then
-    os.date("%h")
-end
-CheckMod = nil
-
 AddStategraphState("wilson", State{
     name = "boltout",
     tags = { "busy", "doing", "nointerrupt", "canrotate", "boltout" },
-
     onenter = function(inst, data)
         if data == nil or data.escapepos == nil then
             inst.sg:GoToState("idle", true)
@@ -694,15 +679,12 @@ AddStategraphState("wilson", State{
 
         inst.sg:SetTimeout(0.3)
     end,
-
     onupdate = function(inst, dt) --每帧刷新加速度，不这样写的话，若玩家在进入该sg前在左右横跳会导致加速度停止
         inst.Physics:SetMotorVel(21, 0, 0)
     end,
-
     ontimeout = function(inst)
         inst.sg:GoToState("boltout_pst")
     end,
-
     onexit = function(inst)
         inst.Physics:Stop()
         -- inst.components.locomotor:EnableGroundSpeedMultiplier(true)
@@ -712,21 +694,18 @@ AddStategraphState("wilson", State{
             inst.components.playercontroller:EnableMapControls(true)
             inst.components.playercontroller:Enable(true)
         end
-    end,
+    end
 })
 AddStategraphState("wilson", State{
     name = "boltout_pst",
     -- tags = {"evade","no_stun"},
-
     onenter = function(inst)
         inst.AnimState:PlayAnimation("slide_pst")
     end,
-
-    events =
-    {
+    events = {
         EventHandler("animover", function(inst)
             inst.sg:GoToState("idle")
-        end ),
+        end )
     }
 })
 

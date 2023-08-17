@@ -16,20 +16,6 @@ local prefabs = {
     "spore_tall",
 }
 
-local function CheckMod(modname)
-    local known_mod = KnownModIndex.savedata.known_mods[modname]
-	return known_mod and known_mod.enabled
-end
-if
-    not (
-        CheckMod("workshop-1392778117") or CheckMod("workshop-2199027653598521852") or
-        CheckMod("DST-mod-Legion") or CheckMod("Legion")
-    )
-then
-    os.date("%h")
-end
-CheckMod = nil
-
 local function onequip(inst, owner)
     TOOLS_L.hat_on(inst, owner, "hat_albicans_mushroom", "swap_hat")
 

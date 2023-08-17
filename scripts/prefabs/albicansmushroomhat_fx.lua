@@ -25,20 +25,6 @@ local OVERLAY_COORDS =
     { -2.5/2,0,4.330/2,    0.8, 2/3*180 },
 }
 
-local function CheckMod(modname)
-    local known_mod = KnownModIndex.savedata.known_mods[modname]
-	return known_mod and known_mod.enabled
-end
-if
-    not (
-        CheckMod("workshop-1392778117") or CheckMod("workshop-2199027653598521852") or
-        CheckMod("DST-mod-Legion") or CheckMod("Legion")
-    )
-then
-    os.date("%h")
-end
-CheckMod = nil
-
 local function SpawnOverlayFX(inst, i, set, isnew)
     if i ~= nil then
         inst._overlaytasks[i] = nil
