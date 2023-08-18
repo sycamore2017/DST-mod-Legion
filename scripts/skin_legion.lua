@@ -4626,7 +4626,7 @@ if not TheNet:IsDedicated() and _G.CONFIGS_LEGION.LANGUAGES == "chinese" then
         self.wiki_l_button = self.root:AddChild(TEMPLATES.IconButton(
             "images/icon_wikibar_shadow_l.xml", "icon_wikibar_shadow_l.tex", "棱镜百科", false, false,
             function()
-                VisitURL("http://wap.modwikis.com/mod/mainPage?_id=645b7b5e5e00ca45b8018bc9")
+                VisitURL("http://wap.modwikis.com/mod/mainPage?_id=645b7b5e5e00ca45b8018bc9", false)
             end,
             nil, "self_inspect_mod.tex"
         ))

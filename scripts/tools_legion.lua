@@ -442,7 +442,11 @@ local function MakeNoLossRepairableEquipment(inst, data)
         inst.foreverequip_l.fn_repaired = OnRepaired
     end
 	if inst.components.armor ~= nil then
-		inst.components.armor:SetKeepOnFinished(true)
+        if inst.components.armor.SetKeepOnFinished == nil then --有的mod替换了这个组件，导致没兼容官方的新函数
+            inst.components.armor.keeponfinished = true
+        else
+            inst.components.armor:SetKeepOnFinished(true)
+        end
 		inst.components.armor:SetOnFinished(OnBroken)
 	elseif inst.components.finiteuses ~= nil then
 		inst.components.finiteuses:SetOnFinished(OnBroken)

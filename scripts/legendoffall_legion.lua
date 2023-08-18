@@ -1995,7 +1995,7 @@ if IsServer then
             if onpickedfn_old ~= nil then
                 onpickedfn_old(inst, picker, ...)
             end
-            if not TheWorld.state.israining or math.random() >= 0.05 then
+            if not TheWorld.state.israining or math.random() >= (CONFIGS_LEGION.TISSUECACTUSCHANCE or 0.05) then
                 return
             end
             GiveTissue(inst, picker, "tissue_l_cactus")
@@ -2011,7 +2011,7 @@ if IsServer then
             if onpickedfn_old ~= nil then
                 onpickedfn_old(inst, picker, ...)
             end
-            if not TheWorld.state.isdusk or math.random() >= 0.01 then
+            if not TheWorld.state.isdusk or math.random() >= (CONFIGS_LEGION.TISSUEBERRIESCHANCE or 0.01) then
                 return
             end
             GiveTissue(inst, picker, "tissue_l_berries")

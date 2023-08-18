@@ -178,7 +178,7 @@ configuration_options = L and {
     {name = "Title", label = "Legend of Fall", options = {{description = "", data = ""}}, default = ""},
     {   name = "OverripeTime",
         label = "Overripe Time",
-        hover = "Set overripe time of X-crops.",
+        hover = "Set overripe time of X-plants.",
         options = {
             {description = "1x(default)", data = 1},
             {description = "2x", data = 2},
@@ -189,7 +189,7 @@ configuration_options = L and {
     },
     {   name = "PestRisk",
         label = "Pest Risk",
-        hover = "Set the chance of pest infestation about X-crops.",
+        hover = "Set the chance of pest infestation about X-plants.",
         options = {
             {description = "Never", data = 0},
             {description = "0.07%", data = 0.0007},
@@ -356,6 +356,46 @@ configuration_options = L and {
             {description = "Plantable(default)", data = true}
         },
         default = true
+    },
+    {   name = "TissueCactusChance",
+        label = "Tissue of Cactus Chance",
+        hover = "Set the chance to get Living Tissue of Cactus.",
+        options = {
+            {description = "0.5%", data = 0.005},
+            {description = "1%", data = 0.01},
+            {description = "2%", data = 0.02},
+            {description = "3.5%", data = 0.035},
+            {description = "5%(default)", data = 0.05},
+            {description = "7%", data = 0.07},
+            {description = "10%", data = 0.1},
+            {description = "15%", data = 0.15},
+            {description = "20%", data = 0.2},
+            {description = "30%", data = 0.3},
+            {description = "50%", data = 0.5},
+            {description = "80%", data = 0.8},
+            {description = "100%", data = 1.0}
+        },
+        default = 0.05
+    },
+    {   name = "TissueBerriesChance",
+        label = "Tissue of Berry Bush Chance",
+        hover = "Set the chance to get Living Tissue of Berry Bush.",
+        options = {
+            {description = "0.5%", data = 0.005},
+            {description = "1%(default)", data = 0.01},
+            {description = "2%", data = 0.02},
+            {description = "3.5%", data = 0.035},
+            {description = "5%", data = 0.05},
+            {description = "7%", data = 0.07},
+            {description = "10%", data = 0.1},
+            {description = "15%", data = 0.15},
+            {description = "20%", data = 0.2},
+            {description = "30%", data = 0.3},
+            {description = "50%", data = 0.5},
+            {description = "80%", data = 0.8},
+            {description = "100%", data = 1.0}
+        },
+        default = 0.01
     },
 
     {name = "Title", label = "", options = {{description = "", data = ""}}, default = ""},
@@ -593,8 +633,8 @@ configuration_options = L and {
         default = 1
     },
     {   name = "PestRisk",
-        label = "异种作物虫害率",
-        hover = "设置异种作物害虫产生几率。种好你的田，管好你的地！",
+        label = "异种植物虫害率",
+        hover = "设置异种植物的害虫产生几率。种好你的田，管好你的地！",
         options = {
             {description = "不产生", data = 0},
             {description = "0.07%", data = 0.0007},
@@ -761,6 +801,46 @@ configuration_options = L and {
             {description = "允许种植(默认)", data = true}
         },
         default = true
+    },
+    {   name = "TissueCactusChance",
+        label = "仙人掌活性组织掉落几率",
+        hover = "设置仙人掌活性组织的掉落几率。嘶~",
+        options = {
+            {description = "0.5%", data = 0.005},
+            {description = "1%", data = 0.01},
+            {description = "2%", data = 0.02},
+            {description = "3.5%", data = 0.035},
+            {description = "5%(默认)", data = 0.05},
+            {description = "7%", data = 0.07},
+            {description = "10%", data = 0.1},
+            {description = "15%", data = 0.15},
+            {description = "20%", data = 0.2},
+            {description = "30%", data = 0.3},
+            {description = "50%", data = 0.5},
+            {description = "80%", data = 0.8},
+            {description = "100%", data = 1.0}
+        },
+        default = 0.05
+    },
+    {   name = "TissueBerriesChance",
+        label = "浆果丛活性组织掉落几率",
+        hover = "设置浆果丛活性组织的掉落几率。咯噜咯噜噜~",
+        options = {
+            {description = "0.5%", data = 0.005},
+            {description = "1%(默认)", data = 0.01},
+            {description = "2%", data = 0.02},
+            {description = "3.5%", data = 0.035},
+            {description = "5%", data = 0.05},
+            {description = "7%", data = 0.07},
+            {description = "10%", data = 0.1},
+            {description = "15%", data = 0.15},
+            {description = "20%", data = 0.2},
+            {description = "30%", data = 0.3},
+            {description = "50%", data = 0.5},
+            {description = "80%", data = 0.8},
+            {description = "100%", data = 1.0}
+        },
+        default = 0.01
     },
 
     {name = "Title", label = "", options = {{description = "", data = ""}}, default = ""},

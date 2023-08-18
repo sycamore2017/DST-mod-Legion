@@ -1471,7 +1471,11 @@ MakeMask({
         inst.components.equippable:SetOnUnequip(OnUnequip_mask2)
 
         inst.components.armor:InitCondition(735, 0.75)
-        inst.components.armor:SetKeepOnFinished(true) --耐久为0不消失
+        if inst.components.armor.SetKeepOnFinished == nil then --有的mod替换了这个组件，导致没兼容官方的新函数
+            inst.components.armor.keeponfinished = true
+        else
+            inst.components.armor:SetKeepOnFinished(true) --耐久为0不消失
+        end
 		inst.components.armor:SetOnFinished(OnBroken_mask2)
         inst.components.armor.onrepair = OnRepaired_mask2
 

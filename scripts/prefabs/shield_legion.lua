@@ -657,7 +657,11 @@ MakeShield({
 
         inst.components.armor:InitCondition(100, absorb_shield)
         inst.components.armor.indestructible = true --无敌的护甲
-        inst.components.armor:SetKeepOnFinished(true) --防止因为别的mod导致耐久为0
+        if inst.components.armor.SetKeepOnFinished == nil then --有的mod替换了这个组件，导致没兼容官方的新函数
+            inst.components.armor.keeponfinished = true
+        else
+            inst.components.armor:SetKeepOnFinished(true) --防止因为别的mod导致耐久为0
+        end
 
         inst.components.equippable:SetOnEquip(OnEquip_agron)
         inst.components.equippable:SetOnUnequip(OnUnequip_agron)

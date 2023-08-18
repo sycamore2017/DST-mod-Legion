@@ -771,7 +771,10 @@ local elec_needchange = {
     lightninggoathorn = 70,
     goatmilk = 20,
     voltgoatjelly = 50,
-    purplegem = 60
+    purplegem = 60,
+    feather_canary = 15,
+    blowdart_yellow = 10,
+    oceanfishingbobber_canary = 10
 }
 for k,v in pairs(elec_needchange) do
     _G.REPAIRERS_L[k] = {

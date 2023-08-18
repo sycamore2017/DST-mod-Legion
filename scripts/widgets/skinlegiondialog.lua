@@ -2975,7 +2975,7 @@ function SkinLegionDialog:SetItemInfo(item)
                         local skin = SKINS_LEGION[item.item_key]
                         if skin ~= nil then
                             VisitURL("https://wap.fireleaves.cn/#/qrcode?userId="..self.owner.userid
-                                .."&skinId="..skin.skin_id)
+                                .."&skinId="..skin.skin_id, false)
                             PushPopupDialog(self, "感谢支持！", "打赏成功了吗？请点击按钮刷新皮肤数据。", "弄好了吧？", function()
                                 DoRpc(1, nil)
                             end)
