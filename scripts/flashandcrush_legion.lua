@@ -244,7 +244,7 @@ AddRecipe2(
         Ingredient("minisign_item", 2),
         Ingredient("silk", 12)
     }, tech_recast[2], {
-        nounlock = lock_recast, builder_tag = "spiderwhisperer",
+        nounlock = lock_recast, builder_tag = lock_recast and "spiderwhisperer" or nil,
         atlas = "images/inventoryimages/web_hump_item.xml", image = "web_hump_item.tex"
     }, { "RECAST", "STRUCTURES", "DECOR", "CHARACTER" }
 )
@@ -254,7 +254,7 @@ AddRecipe2(
         Ingredient("waxwelljournal", 1),
         Ingredient("nightmarefuel", 20)
     }, tech_recast[2], {
-        nounlock = lock_recast, builder_tag = "soulstealer",
+        nounlock = lock_recast, builder_tag = lock_recast and "soulstealer" or nil,
         atlas = "images/inventoryimages/soul_contracts.xml", image = "soul_contracts.tex"
     }, { "RECAST", "RESTORATION", "MAGIC", "CHARACTER" }
 )

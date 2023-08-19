@@ -310,10 +310,16 @@ params.fishhomingtool = {
     type = "cooker"
 }
 function params.fishhomingtool.itemtestfn(container, item, slot)
+    if item.prefab == "fruitflyfruit" then
+        return not item:HasTag("fruitflyfruit") --没有 fruitflyfruit 就代表是枯萎了
+    elseif item.prefab == "glommerflower" then
+		return not item:HasTag("glommerflower") --没有 glommerflower 就代表是枯萎了
+    end
     if
         FISHHOMING_INGREDIENTS_L[item.prefab] ~= nil or
-        item:HasTag("edible_MEAT") or item:HasTag("edible_VEGGIE") or item:HasTag("edible_MONSTER") or
-        item:HasTag("edible_SEEDS") or item:HasTag("winter_ornament")
+        not (item:HasTag("irreplaceable") or item:HasTag("nobundling") or item:HasTag("nodigest_l"))
+        -- item:HasTag("edible_MEAT") or item:HasTag("edible_VEGGIE") or item:HasTag("edible_MONSTER") or
+        -- item:HasTag("edible_SEEDS") or item:HasTag("winter_ornament")
     then
         return true
     end

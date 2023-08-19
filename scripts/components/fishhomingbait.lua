@@ -1,7 +1,6 @@
 local FishHomingBait = Class(function(self, inst)
 	self.inst = inst
 	self.times = 1
-	self.prefabs = nil
 	self.type_eat = "veggie"
 	self.type_shape = "dusty"
 	self.type_special = nil
@@ -155,52 +154,108 @@ local function FindOtherKeys(other)
 	-- print("zehshi:"..tostring(key_max[1]).."-"..tostring(key_max2[1]))
 	return res
 end
-function FishHomingBait:Make(container, doer)
+local function PutFactor(details, details_other, num, base)
+	for k, n in pairs(base) do
+		if details[k] == nil then --说明是特殊前缀
+			details_other[k] = (details_other[k] or 0) + num*n
+		else
+			details[k] = details[k] + num*n
+		end
+	end
+end
+local function PutFactor_base(details, num, item)
+	local needremove = nil
+	if type(item) == "string" then
+		item = SpawnPrefab(item)
+		needremove = true
+	end
+	if item == nil then
+		return
+	end
+	if item.components.edible ~= nil then
+		local cpt = item.components.edible
+		if cpt.foodtype == FOODTYPE.MONSTER or cpt.secondaryfoodtype == FOODTYPE.MONSTER then
+			details.monster = details.monster + num
+		end
+		if cpt.foodtype == FOODTYPE.MEAT or cpt.secondaryfoodtype == FOODTYPE.MEAT then
+			details.meat = details.meat + num
+		else
+			details.veggie = details.veggie + num
+		end
+	end
+	if needremove then
+		item:Remove()
+	end
+end
+function FishHomingBait:GetFactors(items, doer)
 	local details = {
 		hardy = 0, pasty = 0, dusty = 0,
 		meat = 0, veggie = 0, monster = 0
 	}
 	local details_other = {}
-	self.times = 0
-	self.prefabs = {}
+	local times = 0
 
-	for i = 1, container:GetNumSlots() do
-		local item = container:GetItemInSlot(i)
-		if item ~= nil then
-			local mult = item.components.stackable ~= nil and item.components.stackable:StackSize() or 5
-
-			if FISHHOMING_INGREDIENTS_L[item.prefab] ~= nil then
-				local idata = FISHHOMING_INGREDIENTS_L[item.prefab]
-				for k,num in pairs(idata) do
-					if num then
-						if details[k] == nil then
-							if details_other[k] == nil then
-								details_other[k] = num*mult
-							else
-								details_other[k] = details_other[k] + num*mult
-							end
+	for _, v in pairs(items) do
+		local factors = FISHHOMING_INGREDIENTS_L[v.prefab]
+		local mult = v.components.stackable ~= nil and v.components.stackable:StackSize() or 1
+		if factors ~= nil then
+			PutFactor(details, details_other, mult, factors)
+			times = times + mult
+		else
+			local recipe = AllRecipes[v.prefab]
+			if recipe == nil then
+				PutFactor_base(details, mult, v)
+				times = times + mult
+			else
+				for i, ind in ipairs(recipe.ingredients) do
+					if ind.amount ~= nil and ind.amount > 0 then
+						local factors_ind = FISHHOMING_INGREDIENTS_L[ind.type]
+						local mult_ind = mult*ind.amount/recipe.numtogive
+						if factors_ind ~= nil then
+							PutFactor(details, details_other, mult_ind, factors_ind)
+							times = times + mult_ind
 						else
-							details[k] = details[k] + num*mult
+							local recipe_ind = AllRecipes[ind.type]
+							if recipe_ind == nil then
+								PutFactor_base(details, mult_ind, ind.type)
+								times = times + mult_ind
+							else
+								for i2, ind2 in ipairs(recipe_ind.ingredients) do
+									if ind2.amount ~= nil and ind2.amount > 0 then
+										local factors_ind2 = FISHHOMING_INGREDIENTS_L[ind2.type]
+										local mult_ind2 = mult_ind*ind2.amount/recipe_ind.numtogive
+										if factors_ind2 ~= nil then
+											PutFactor(details, details_other, mult_ind2, factors_ind2)
+										else
+											PutFactor_base(details, mult_ind2, ind2.type)
+										end
+										times = times + mult_ind2
+									end
+								end
+							end
 						end
 					end
 				end
-			elseif item.components.edible ~= nil then
-				if item.components.edible.foodtype == FOODTYPE.MEAT then
-					details.meat = details.meat + mult
-				elseif item.components.edible.foodtype == FOODTYPE.VEGGIE or item.components.edible.foodtype == FOODTYPE.SEEDS then
-					details.veggie = details.veggie + mult
-				elseif item.components.edible.foodtype == FOODTYPE.MONSTER then
-					details.monster = details.monster + mult
-				end
 			end
-
-			self.times = self.times + mult
-			self.prefabs[item.prefab] = true
-
-			item:Remove()
 		end
 	end
 
+	return details, details_other, times
+end
+function FishHomingBait:Make(container, doer)
+	local items = {}
+	for i = 1, container:GetNumSlots() do
+		local item = container:GetItemInSlot(i)
+		if item ~= nil then
+			table.insert(items, item)
+		end
+	end
+	local details, details_other, times = self:GetFactors(items, doer)
+	for _, v in pairs(items) do
+		v:Remove()
+	end
+
+	self.times = times
 	if self.onmakefn ~= nil then
 		self.onmakefn(self, container, doer, details, details_other)
 	end
@@ -208,8 +263,7 @@ function FishHomingBait:Make(container, doer)
 	self.type_eat = FindMaxKey(details, "veggie", "meat", "monster")
 	self.type_shape = FindMaxKey(details, "dusty", "pasty", "hardy")
 	self.type_special = FindOtherKeys(details_other)
-
-	self.times = math.ceil(self.times/2) --根据总数量确定释放功能的次数(最多 4格*40叠加/2=80次)
+	self.times = math.ceil(self.times/2) --根据总数量确定释放功能的次数
 
 	self:InitSelf()
 end
@@ -237,22 +291,12 @@ function FishHomingBait:OnSave()
 		data.type_shape = self.type_shape
 	end
 
-    if self.prefabs ~= nil then
-		data.prefabs = {}
-		for name,bo in pairs(self.prefabs) do
-			if bo then
-				table.insert(data.prefabs, name)
-			end
-		end
-	end
-
 	if self.eviled then
 		data.eviled = true
 	end
 
     return data
 end
-
 function FishHomingBait:OnLoad(data)
     if data ~= nil then
         if data.times ~= nil then
@@ -273,13 +317,6 @@ function FishHomingBait:OnLoad(data)
 			self.type_shape = data.type_shape
 		end
 
-		if data.prefabs ~= nil then
-			self.prefabs = {}
-			for _,name in pairs(data.prefabs) do
-				self.prefabs[name] = true
-			end
-		end
-
 		if data.eviled then
 			self.eviled = true
 		end
@@ -291,7 +328,6 @@ end
 function FishHomingBait:Handover(baiting)
     local baitcpt = baiting.components.fishhomingbait
 	baitcpt.times = self.times
-	baitcpt.prefabs = self.prefabs
 	baitcpt.type_eat = self.type_eat
 	baitcpt.type_shape = self.type_shape
 	baitcpt.type_special = self.type_special
@@ -306,8 +342,8 @@ function FishHomingBait:GetPreys()
 	local chance_high = 8
 	local list = {
 		oceanfish_small_1 = { --小孔雀鱼
-			hardy = nil, pasty = nil, dusty = chance_high,
-			meat = chance_med, veggie = chance_med, monster = chance_low
+			hardy = nil, pasty = nil, dusty = chance_high, --按水深来确定形状权重
+			meat = chance_med, veggie = chance_med, monster = chance_low --按食性来确定食用权重
 		},
 		oceanfish_small_2 = { --针鼻喷墨鱼
 			hardy = nil, pasty = chance_med, dusty = chance_high,
@@ -458,47 +494,44 @@ function FishHomingBait:GetPreys()
 	local specialchance = 0
 	local specialmult = 1
 	for prefab,data in pairs(list) do
-		if data ~= nil then
-			if self.type_special ~= nil then
-				for k,bo in pairs(self.type_special) do
-					if bo and data[k] ~= nil then
-						specialchance = specialchance + data[k]
-					end
+		if self.type_special ~= nil then
+			for k,bo in pairs(self.type_special) do
+				if bo and data[k] ~= nil then
+					specialchance = specialchance + data[k]
 				end
 			end
-
-			if specialchance > 0 then --说明是特殊对象
-				if data[self.type_eat] ~= nil then
-					specialmult = specialmult + 0.25
-				end
-				if data[self.type_shape] ~= nil then
-					specialmult = specialmult + 0.25
-				end
-
-				if preys.special == nil then
-					preys.special = {}
-				end
-				preys.special[prefab] = specialchance*specialmult
-			else
-				if data[self.type_eat] ~= nil then
-					weight = weight + data[self.type_eat]
-				end
-				if data[self.type_shape] ~= nil then
-					weight = weight + data[self.type_shape]
-				end
-				if weight > 0 then
-					if preys.normal == nil then
-						preys.normal = {}
-					end
-					preys.normal[prefab] = { min = allweight, max = allweight+weight }
-					allweight = allweight+weight
-				end
-			end
-
-			weight = 0
-			specialchance = 0
-			specialmult = 1
 		end
+
+		if specialchance > 0 then --说明是特殊对象
+			if data[self.type_eat] ~= nil then
+				specialmult = specialmult + 0.25
+			end
+			if data[self.type_shape] ~= nil then
+				specialmult = specialmult + 0.25
+			end
+			if preys.special == nil then
+				preys.special = {}
+			end
+			preys.special[prefab] = specialchance*specialmult
+		else
+			if data[self.type_eat] ~= nil then
+				weight = weight + data[self.type_eat]
+			end
+			if data[self.type_shape] ~= nil then
+				weight = weight + data[self.type_shape]
+			end
+			if weight > 0 then
+				if preys.normal == nil then
+					preys.normal = {}
+				end
+				preys.normal[prefab] = { min = allweight, max = allweight+weight }
+				allweight = allweight+weight
+			end
+		end
+
+		weight = 0
+		specialchance = 0
+		specialmult = 1
 	end
 
 	if preys.normal ~= nil or preys.special ~= nil then
@@ -603,7 +636,7 @@ function FishHomingBait:SpawnBaited(prefab, x,y,z)
 		return
 	end
 
-	---------------龙虾、月光龙虾、海黾、草鳄鱼
+	---------------龙虾、月光龙虾、海黾、草鳄鱼、饼干切割机
 
 	if
 		prefab == "wobster_sheller" or prefab == "wobster_moonglass" or
@@ -761,7 +794,6 @@ function FishHomingBait:Baiting(periodtime)
 		self:RemoveSelf()
 		return
 	end
-
 	if periodtime == nil then
 		if self.type_shape == "hardy" then
 			periodtime = 16
@@ -772,7 +804,6 @@ function FishHomingBait:Baiting(periodtime)
 		end
 		self:GetPreys()
 	end
-
 	if self.preys == nil then
 		self:RemoveSelf()
 		return
@@ -786,21 +817,16 @@ function FishHomingBait:Baiting(periodtime)
 		end
 
 		local x, y, z = inst.Transform:GetWorldPosition()
-		local numbaited = #TheSim:FindEntities(x, y, z, 20,
-						{ "baited" }, { "INLIMBO" }, nil)
+		local numbaited = #TheSim:FindEntities(x, y, z, 20, { "baited" }, { "INLIMBO" }, nil)
 		if numbaited < 20 then
 			if self.preys.special ~= nil then
-				local rand = nil
 				local hasspecial = false
 				for prefab,chance in pairs(self.preys.special) do
-					if chance ~= nil then
-						rand = math.random()
-						if rand < chance then
-							if self:SpawnBaited(prefab, x,y,z) then --吸引到才减少次数
-								self.times = self.times - 1
-							end
-							hasspecial = true
+					if math.random() < chance then
+						if self:SpawnBaited(prefab, x,y,z) then --吸引到才减少次数
+							self.times = self.times - 1
 						end
+						hasspecial = true
 					end
 				end
 				if hasspecial then
@@ -811,7 +837,7 @@ function FishHomingBait:Baiting(periodtime)
 			if self.preys.normal ~= nil then
 				local rand = math.random()*self.preys.allweight
 				for prefab,data in pairs(self.preys.normal) do
-					if data and rand >= data.min and rand < data.max then
+					if rand >= data.min and rand < data.max then
 						if self:SpawnBaited(prefab, x,y,z) then --吸引到才减少次数
 							self.times = self.times - 1
 						end

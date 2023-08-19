@@ -2206,7 +2206,7 @@ STRINGS.FISHHOMING3_LEGION = {
     GRASSY = "Grassy ", --草鳄鱼
     EVIL = "Evil ", --邪天翁
     FRIZZY = "Frizzy ", --海鹦鹉
-    SALTY = "Briny ", --饼干切割机
+    SALTY = "Briny " --饼干切割机
 }
 
 S_NAMES.FISHHOMINGBAIT = "Fish-Homing Bait" --打窝饵
