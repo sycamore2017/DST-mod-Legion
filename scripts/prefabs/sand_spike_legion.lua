@@ -137,7 +137,7 @@ local function DoDamage(inst, OnIgnite)
             -- else
             if v.components.combat ~= nil then
                 if v.components.health ~= nil and not v.components.health:IsDead() then
-                    if v.components.locomotor == nil then --就这里，导致可以秒杀触手等没有移动组件但有战斗组件的实体
+                    if v.components.locomotor == nil and not v:HasTag("epic") then --可秒杀触手等没有移动组件但有战斗组件的实体
                         v.components.health:Kill()
                     elseif not isblock and inst.components.combat:IsValidTarget(v) then
                         inst.components.combat:DoAttack(v)

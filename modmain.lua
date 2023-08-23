@@ -248,7 +248,7 @@ modimport("scripts/flowerspower_legion.lua")
 --[[ superb cuisine ]]--[[ 美味佳肴 ]]
 --------------------------------------------------------------------------
 
--- -- AddIngredientValues({"batwing"}, {meat=.5}, true, false) --蝙蝠翅膀，虽然可以晾晒，但是得到的不是蝙蝠翅膀干，而是小肉干，所以candry不能填true
+-- AddIngredientValues({"batwing"}, {meat=.5}, true, false) --蝙蝠翅膀，虽然可以晾晒，但是得到的不是蝙蝠翅膀干，而是小肉干，所以candry不能填true
 -- AddIngredientValues({"ash"}, {inedible=1}, false, false) --灰烬
 -- AddIngredientValues({"slurtleslime"}, {gel=1}, false, false) --蜗牛黏液
 -- AddIngredientValues({"glommerfuel"}, {gel=1}, false, false) --格罗姆黏液
@@ -266,7 +266,7 @@ for k, recipe in pairs(require("preparedfoods_legion")) do
     AddCookerRecipe("cookpot", recipe)
     AddCookerRecipe("portablecookpot", recipe)
     AddCookerRecipe("archive_cookpot", recipe)
-    RegisterInventoryItemAtlas("images/cookbookimages/"..recipe.name..".xml", recipe.name..".tex")
+    RegisterInventoryItemAtlas("images/inventoryimages/"..recipe.name..".xml", recipe.name..".tex") --应该注册物品栏贴图
 end
 for k, recipe in pairs(require("prepareditems_legion")) do
     table.insert(Assets, Asset("ATLAS", "images/cookbookimages/"..recipe.name..".xml"))
@@ -275,7 +275,7 @@ for k, recipe in pairs(require("prepareditems_legion")) do
     AddCookerRecipe("cookpot", recipe)
     AddCookerRecipe("portablecookpot", recipe)
     AddCookerRecipe("archive_cookpot", recipe)
-    RegisterInventoryItemAtlas("images/cookbookimages/"..recipe.name..".xml", recipe.name..".tex")
+    RegisterInventoryItemAtlas("images/inventoryimages/"..recipe.name..".xml", recipe.name..".tex")
 end
 
 local foodrecipes_spice = require("preparedfoods_l_spiced")

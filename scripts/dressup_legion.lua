@@ -399,7 +399,7 @@ local dressup_data = {
     gnarwail_horn = { --一角鲸的角
         isnoskin = true, buildfile = "gnarwail_horn", buildsymbol = "swap_gnarwailhorn"
     },
-    messagebottle = --有信的漂流瓶
+    messagebottle = --瓶中信
     {
         isnoskin = true,
         dressslot = EQUIPSLOTS.HANDS,

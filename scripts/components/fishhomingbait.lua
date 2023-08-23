@@ -182,6 +182,13 @@ local function PutFactor_base(details, num, item)
 		else
 			details.veggie = details.veggie + num
 		end
+	else
+		if item.components.health ~= nil then
+			details.meat = details.meat + num
+		end
+		if item:HasTag("monster") then
+			details.monster = details.monster + num
+		end
 	end
 	if needremove then
 		item:Remove()

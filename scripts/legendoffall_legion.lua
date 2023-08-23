@@ -724,12 +724,22 @@ if not _G.rawget(_G, "FISHHOMING_INGREDIENTS_L") then
 end
 
 local fishhoming_ingredients = {
-    cutgrass =              { dusty=1, pasty=1, veggie=1 }, --采下的草
-    cutreeds =              { dusty=1, pasty=1, hardy=1, veggie=1 }, --采下的芦苇
+    cutgrass =              { dusty=1, pasty=1, veggie=0.5 }, --采下的草
     twigs =                 { pasty=1, hardy=1, veggie=0.5 }, --树枝
-    log =                   { dusty=1, hardy=1, veggie=0.5 }, --木头
+    log =                   { hardy=1, veggie=0.5 }, --木头
+    rocks =                 { hardy=1 }, --石头
+    flint =                 { dusty=1, hardy=1 }, --燧石
+    ice =                   { pasty=1, hardy=1 }, --冰
+    ash =                   { dusty=1 }, --灰烬
+    silk =                  { pasty=1 }, --蜘蛛丝
+    beefalowool =           { dusty=1 }, --牛毛
+    spoiled_food =          { pasty=1, rotten=0.5 }, --腐烂物(龙虾)
+    poop =                  { pasty=1, rotten=1 }, --粪肥(龙虾)
+    stinger =               { dusty=1, frizzy=0.5 }, --蜂刺(海鹦鹉)
     goldnugget =            { hardy=1, lucky=1, shiny=0.5 }, --金块(金锦鲤、花锦鲤、鱿鱼)
     lucky_goldnugget =      { hardy=1, lucky=1, shiny=0.5 }, --幸运黄金(金锦鲤、花锦鲤、鱿鱼)
+    livinglog =             { pasty=1, hardy=1, veggie=1 }, --活木头
+    cutreeds =              { pasty=1, hardy=1, veggie=0.5 }, --采下的芦苇
     redgem =                { hardy=1, hot=1 }, --红宝石(炽热太阳鱼)
     bluegem =               { hardy=1, frozen=1 }, --蓝宝石(冰鲷鱼)
     purplegem =             { hardy=1, hot=0.5, frozen=0.5 }, --紫宝石(炽热太阳鱼、冰鲷鱼)
@@ -737,145 +747,192 @@ local fishhoming_ingredients = {
     yellowgem =             { hardy=1, shiny=1 }, --黄宝石(鱿鱼)
     greengem =              { hardy=1 }, --绿宝石
     opalpreciousgem =       { hardy=1, shiny=1, rusty=1 }, --彩虹宝石(鱿鱼、月光龙虾)
-    scandata =              { pasty=1, hardy=1 }, --生物数据
-    fireflies =             { dusty=1, pasty=1, meat=0.5, shaking=1, shiny=0.5 }, --萤火虫(海黾、鱿鱼)
-    lightbulb =             { dusty=1, pasty=1, shiny=1 }, --荧光果(鱿鱼)
-    lightflier =            { dusty=1, pasty=1, meat=0.5, shiny=1, shaking=1 }, --球状光虫(鱿鱼、海黾)
-    dragon_scales =         { dusty=5, hardy=5, hot=5, evil=5 }, --鳞片(炽热太阳鱼、邪天翁)
-    lavae_egg =             { pasty=4, hardy=4, meat=4, hot=4, evil=4, frizzy=2 }, --岩浆虫卵(炽热太阳鱼、邪天翁、海鹦鹉)
-    lavae_egg_cracked =     { pasty=4, hardy=4, meat=4, hot=5, evil=5, frizzy=2 }, --岩浆虫卵(炽热太阳鱼、邪天翁、海鹦鹉)
-    lavae_cocoon =          { dusty=4, pasty=4, hardy=4, meat=2, evil=2, frizzy=2 }, --岩浆虫卵(邪天翁、海鹦鹉)
-    livinglog =             { dusty=1, pasty=1, hardy=1, veggie=1 }, --活木头
-    honey =                 { pasty=1, sticky=1 }, --蜂蜜(甜味鱼)
-    royal_jelly =           { pasty=1, sticky=5 }, --蜂王浆(甜味鱼)
-    honeycomb =             { dusty=1, pasty=1, sticky=5 }, --蜂巢(甜味鱼)
-    beeswax =               { dusty=1, pasty=1, hardy=1, sticky=5, wrinkled=0.5 }, --蜂蜡(甜味鱼、落叶比目鱼)
-    butter =                { pasty=1, sticky=1 }, --黄油(甜味鱼)
+    moonglass =             { dusty=1, hardy=1, rusty=1 }, --月亮碎片(月光龙虾)
+    moonglass_charged =     { hardy=1, rusty=1, shiny=0.5 }, --注能月亮碎片(月光龙虾、鱿鱼)
+    moonrocknugget =        { hardy=1, rusty=1 }, --月岩(月光龙虾)
+    moonstorm_spark =       { shiny=1, rusty=1 }, --月熠(鱿鱼、月光龙虾)
+    marble =                { hardy=1 }, --大理石
+    houndstooth =           { hardy=1, bloody=0.5 }, --犬牙
+    nitre =                 { dusty=1, hardy=1, salty=0.5 }, --硝石(饼干切割机)
+    saltrock =              { dusty=1, salty=1 }, --盐晶(饼干切割机)
+    spidergland =           { pasty=1, monster=1 }, --蜘蛛腺
+    siving_rocks =          { pasty=1, hardy=1 }, --子圭石
+    feather_crow =          { dusty=1 }, --黑色羽毛
+    feather_robin =         { dusty=1, hot=0.5 }, --红色羽毛(炽热太阳鱼)
+    feather_robin_winter =  { pasty=1, frozen=0.5 }, --蓝色羽毛(冰鲷鱼)
+    feather_canary =        { hardy=1, shiny=0.5 }, --黄色羽毛(鱿鱼)
+    beardhair =             { dusty=1 }, --胡须
+    charcoal =              { dusty=1, hardy=1, hot=0.5 }, --木炭(炽热太阳鱼)
+    phlegm =                { pasty=1, slippery=1 }, --脓鼻涕(口水鱼)
+    slurtleslime =          { pasty=1, slippery=1 }, --蛞蝓龟黏液(口水鱼)
+    nightmarefuel =         { whispering=0.5 }, --噩梦燃料(一角鲸)
+    horn =                  { hardy=1, whispering=1, lucky=0.5 }, --牛角(一角鲸、金锦鲤、花锦鲤)
+    gnarwail_horn =         { hardy=1, whispering=1 }, --一角鲸的角(一角鲸)
+    lightninggoathorn =     { hardy=1 }, --伏特羊角
+    coontail =              { dusty=1, pasty=1, meat=0.5 }, --猫尾
+    tentaclespots =         { pasty=1, meat=0.5, monster=1 }, --触手皮
+    tentaclespike =         { pasty=2, hardy=2, meat=1, monster=2 }, --触手尖刺
+    pigskin =               { pasty=1, meat=0.5 }, --猪皮
+    manrabbit_tail =        { dusty=1, pasty=1, meat=0.5 }, --兔绒
+    gears =                 { hardy=1 }, --齿轮
+    purebrilliance =        { hardy=1, shiny=0.5, rusty=0.5 }, --纯粹辉煌(鱿鱼、月光龙虾)
+    lunarplant_husk =       { pasty=1, hardy=1, veggie=0.5 }, --亮茄外壳
+    voidcloth =             { dusty=1, pasty=1 }, --暗影碎布
+    dreadstone =            { dusty=1, hardy=1, monster=1, whispering=0.5 }, --绝望石(一角鲸)
+    horrorfuel =            { monster=1, whispering=1 }, --纯粹恐惧(一角鲸)
+    cookiecuttershell =     { dusty=1, hardy=1, salty=1 }, --饼干切割机壳(饼干切割机)
+    slurtle_shellpieces =   { hardy=1 }, --外壳碎片
+    slurper_pelt =          { pasty=1, meat=0.5 }, --啜食者皮
+    townportaltalisman =    { dusty=1, pasty=1, hardy=1 }, --沙之石
+    driftwood_log =         { pasty=1, hardy=1, veggie=0.5 }, --浮木桩
+    blackflag =             { hardy=1 }, --黑旗
+    thulecite_pieces =      { hardy=1 }, --铥矿碎片
+    messagebottleempty =    { dusty=1, hardy=1 }, --空瓶子
+    messagebottle =         { dusty=1, pasty=1, hardy=1 }, --瓶中信
+    carnival_prizeticket =  { dusty=1, pasty=1 }, --奖票
+    wintersfeastfuel =      { rotten=0.5 }, --节日欢愉(龙虾)
+    boneshard =             { hardy=1 }, --骨头碎片
+    walrus_tusk =           { hardy=1 }, --海象牙
+    walrushat =             { dusty=1, pasty=1 }, --贝雷帽
+    waterplant_bomb =       { hardy=1, veggie=0.5 }, --种壳
+    tourmalinecore =        { hardy=1, shiny=0.5 }, --电气石(鱿鱼)
+    tourmalineshard =       { dusty=1, hardy=1 }, --带电的晶石
+    fimbul_axe =            { hardy=1 }, --芬布尔斧
+    scandata =              { pasty=1 }, --生物数据
+    firepen =               { hardy=1, hot=1 }, --火焰笔(炽热太阳鱼)
+    canary_poisoned =       { pasty=1, hardy=1, meat=1, shiny=0.5 }, --中毒金丝雀(鱿鱼)
+    crow =                  { pasty=1, meat=1 }, --乌鸦
+    puffin =                { pasty=1, meat=1 }, --海鹦鹉
+    robin =                 { dusty=1, meat=1, hot=0.5 }, --红雀(炽热太阳鱼)
+    robin_winter =          { pasty=1, meat=1, frozen=0.5 }, --雪雀(冰鲷鱼)
+    canary =                { hardy=1, meat=1, shiny=1 }, --金丝雀(鱿鱼)
+    bird_mutant =           { dusty=1, meat=1, rusty=0.5, rotten=0.5 }, --月盲乌鸦(月光龙虾、龙虾)
+    bird_mutant_spitter =   { pasty=1, meat=1, rusty=0.5, rotten=0.5 }, --奇形鸟(月光龙虾、龙虾)
+    rabbit =                { pasty=1, hardy=1, meat=1 }, --兔子
+    lightbulb =             { dusty=1, pasty=1, veggie=0.5, shiny=1 }, --荧光果(鱿鱼)
+    lightcrab =             { pasty=1, hardy=1, meat=1, shiny=1 }, --发光蟹(鱿鱼)
     fig =                   { pasty=1, veggie=1, sticky=1, grassy=0.5 }, --无花果(甜味鱼、草鳄鱼)
     fig_cooked =            { pasty=1, veggie=1, sticky=1 }, --烤无花果(甜味鱼)
-    glommerfuel =           { pasty=1, whispering=1, frizzy=0.5 }, --格罗姆的黏液(一角鲸、海鹦鹉)
-    glommerwings =          { dusty=1, whispering=1, shaking=1 }, --格罗姆翅膀(一角鲸、海黾)
-    glommerflower =         { pasty=5, whispering=5 }, --格罗姆花(一角鲸)
-    fruitflyfruit =         { pasty=5, shaking=5 }, --友好果蝇果(海黾)
-    nightmarefuel =         { whispering=0.5 }, --噩梦燃料(一角鲸)
-    horn =                  { dusty=1, hardy=1, whispering=1, lucky=0.5 }, --牛角(一角鲸、金锦鲤、花锦鲤)
+    kelp =                  { pasty=1, veggie=1 }, --海带叶
+    kelp_cooked =           { pasty=1, veggie=1 }, --熟海带叶
+    kelp_dried =            { dusty=1, pasty=1, veggie=1, wrinkled=1 }, --干海带叶(落叶比目鱼)
     rock_avocado_fruit =    { hardy=1, veggie=1 }, --石果
     rock_avocado_fruit_ripe={ pasty=1, hardy=1, veggie=1, grassy=1 }, --成熟石果(草鳄鱼)
     rock_avocado_fruit_ripe_cooked={ pasty=1, veggie=1 }, --熟石果
     rock_avocado_fruit_sprout={ pasty=1, hardy=1, veggie=1, grassy=1 }, --发芽的石果(草鳄鱼)
     cactus_meat =           { pasty=1, veggie=1, grassy=1 }, --仙人掌肉(草鳄鱼)
     cactus_meat_cooked =    { pasty=1, veggie=1 }, --熟仙人掌肉
+    petals_rose =           { pasty=1, veggie=1, fragrant=1 }, --蔷薇花瓣(花朵金枪鱼)
+    petals_lily =           { pasty=1, veggie=1, fragrant=1 }, --蹄莲花瓣(花朵金枪鱼)
+    petals_orchid =         { pasty=1, veggie=1, fragrant=1 }, --兰草花瓣(花朵金枪鱼)
+    forgetmelots =          { veggie=0.5, fragrant=1 }, --必忘我(花朵金枪鱼)
+    myth_lotus_flower =     { pasty=1, veggie=1, fragrant=1 }, --莲花(花朵金枪鱼)
+    moon_tree_blossom =     { pasty=1, veggie=0.5, fragrant=1 }, --月树花(花朵金枪鱼)
+    petals_evil =           { veggie=0.5, monster=1, evil=0.5 }, --深色花瓣(邪天翁)
+    cutted_rosebush =       { pasty=1, hardy=1, veggie=0.5, grassy=0.5 }, --蔷薇折枝(草鳄鱼)
+    cutted_lilybush =       { pasty=1, veggie=0.5, grassy=0.5 }, --蹄莲芽束(草鳄鱼)
+    cutted_orchidbush =     { dusty=1, pasty=1, veggie=0.5, wrinkled=0.5, grassy=0.5 }, --兰草种籽(落叶比目鱼、草鳄鱼)
+    dug_monstrain =         { pasty=1, hardy=1, veggie=0.5, monster=1 }, --雨竹块茎
+    squamousfruit =         { pasty=1, hardy=1, veggie=0.5, monster=1 }, --鳞果
+    monstrain_leaf =        { pasty=1, veggie=1, monster=2 }, --雨竹叶
+    dragonfruit =           { pasty=1, veggie=1, hot=0.5 }, --火龙果(炽热太阳鱼)
+    dragonfruit_cooked =    { pasty=1, veggie=1, hot=0.5 }, --熟火龙果(炽热太阳鱼)
+    pepper =                { pasty=1, veggie=1, hot=0.5 }, --辣椒(炽热太阳鱼)
+    pepper_cooked =         { dusty=1, pasty=1, veggie=1, hot=0.5 }, --烤辣椒(炽热太阳鱼)
+    durian =                { pasty=1, hardy=1, veggie=1, monster=2, rotten=0.5 }, --榴莲(龙虾)
+    durian_cooked =         { pasty=1, hardy=1, veggie=1, monster=2, rotten=0.5 }, --超臭榴莲(龙虾)
+    pomegranate =           { pasty=1, hardy=1, veggie=1, bloody=0.5 }, --石榴(岩石大白鲨)
+    pomegranate_cooked =    { pasty=1, hardy=1, veggie=1, bloody=0.5 }, --切片熟石榴(岩石大白鲨)
+    watermelon =            { pasty=1, veggie=1, grassy=0.5 }, --西瓜(草鳄鱼)
+    watermelon_cooked =     { pasty=1, veggie=1 }, --烤西瓜
+    corn =                  { pasty=1, hardy=1, veggie=1 }, --玉米
+    corn_cooked =           { pasty=1, hardy=1, veggie=1, comical=1 }, --爆米花(爆米花鱼、玉米鳕鱼)
+    twiggy_nut =            { hardy=1, veggie=0.5 }, --多枝树种
+    acorn =                 { hardy=1, veggie=0.5, grassy=0.5 }, --桦栗果(草鳄鱼)
+    acorn_cooked =          { pasty=1, veggie=0.5 }, --烤桦栗果
+    pinecone =              { dusty=1, hardy=1, veggie=0.5 }, --松果
+    palmcone_seed =         { dusty=1, veggie=0.5 }, --棕榈松果树芽
+    palmcone_scale =        { dusty=1, pasty=1, veggie=0.5 }, --棕榈松果树鳞片
+    dug_rosebush =          { pasty=1, hardy=1, veggie=0.5 }, --蔷薇花丛
+    dug_lilybush =          { pasty=1, veggie=0.5 }, --蹄莲花丛
+    dug_orchidbush =        { dusty=1, pasty=1, veggie=0.5 }, --兰草花丛
+    dug_berrybush =         { pasty=1, hardy=1, veggie=0.5 }, --浆果丛
+    dug_berrybush2 =        { pasty=1, veggie=0.5 }, --特殊浆果丛
+    dug_berrybush_juicy =   { pasty=1, veggie=0.5 }, --多汁浆果丛
+    dug_grass =             { dusty=1, pasty=1, veggie=0.5 }, --草丛
+    dug_marsh_bush =        { pasty=1, hardy=1, veggie=0.5 }, --尖刺灌木
+    dug_monkeytail =        { pasty=1, hardy=1, veggie=0.5 }, --猴尾草
+    dug_bananabush =        { pasty=1, veggie=0.5 }, --香蕉丛
+    dug_rock_avocado_bush = { pasty=1, hardy=1, veggie=0.5 }, --石果灌木丛
+    dug_sapling =           { pasty=1, hardy=1, veggie=0.5 }, --树苗
+    dug_sapling_moon =      { pasty=1, hardy=1, veggie=0.5, rusty=0.5 }, --月岛树苗(月光龙虾)
+    dug_trap_starfish =     { pasty=1, hardy=1, meat=0.5 }, --海星陷阱
+    spore_small =           { shiny=1 }, --绿色孢子(鱿鱼)
+    spore_medium =          { shiny=1 }, --红色孢子(鱿鱼)
+    spore_tall =            { shiny=1 }, --蓝色孢子(鱿鱼)
+    spore_moon =            { shiny=1, rusty=0.5 }, --月亮孢子(鱿鱼、月光龙虾)
     bird_egg =              { dusty=1, pasty=1, meat=0.5, slippery=1 }, --鸟蛋(口水鱼)
     bird_egg_cooked =       { dusty=1, pasty=1, meat=0.5 }, --熟鸟蛋
     egg =                   { dusty=1, pasty=1, meat=0.5, slippery=1 }, --蛋(口水鱼)
     egg_cooked =            { dusty=1, pasty=1, meat=0.5 }, --熟蛋
-    tallbirdegg =           { dusty=1, pasty=1, meat=1, slippery=5 }, --高脚鸟蛋(口水鱼)
-    tallbirdegg_cracked =   { dusty=1, pasty=1, meat=1, slippery=5 }, --孵化中的高脚鸟蛋(口水鱼)
+    tallbirdegg =           { pasty=1, hardy=1, meat=1, slippery=5 }, --高脚鸟蛋(口水鱼)
+    tallbirdegg_cracked =   { pasty=1, hardy=1, meat=1, slippery=5 }, --孵化中的高脚鸟蛋(口水鱼)
     tallbirdegg_cooked =    { dusty=1, pasty=1, meat=1 }, --煎高脚鸟蛋
-    petals_rose =           { pasty=1, veggie=0.5, fragrant=1 }, --蔷薇花瓣(花朵金枪鱼)
-    petals_lily =           { pasty=1, veggie=0.5, fragrant=1 }, --蹄莲花瓣(花朵金枪鱼)
-    petals_orchid =         { pasty=1, veggie=0.5, fragrant=1 }, --兰草花瓣(花朵金枪鱼)
-    forgetmelots =          { pasty=1, fragrant=1 }, --必忘我(花朵金枪鱼)
-    myth_lotus_flower =     { pasty=1, veggie=1, fragrant=1 }, --莲花(花朵金枪鱼)
-    moon_tree_blossom =     { pasty=1, veggie=0.5, fragrant=1 }, --月树花(花朵金枪鱼)
-    meat_dried =            { hardy=1, meat=1, wrinkled=1 }, --肉干(落叶比目鱼)
-    smallmeat_dried =       { hardy=1, meat=1, wrinkled=1 }, --小风干肉(落叶比目鱼)
-    monstermeat_dried =     { hardy=1, meat=1, monster=2, wrinkled=1 }, --怪物肉干(落叶比目鱼)
-    cutted_rosebush =       { pasty=1, hardy=1, veggie=0.5, wrinkled=0.5, grassy=0.5 }, --(落叶比目鱼、草鳄鱼)
-    cutted_lilybush =       { pasty=1, hardy=1, veggie=0.5, wrinkled=0.5, grassy=0.5 }, --(落叶比目鱼、草鳄鱼)
-    cutted_orchidbush =     { pasty=1, hardy=1, veggie=0.5, wrinkled=0.5, grassy=0.5 }, --(落叶比目鱼、草鳄鱼)
-    dug_monstrain =         { pasty=1, hardy=1, veggie=0.5, monster=1 }, --雨竹块茎
-    squamousfruit =         { pasty=1, hardy=1, veggie=0.5, monster=1 }, --鳞果
-    monstrain_leaf =        { pasty=1, veggie=1, monster=2 }, --雨竹叶
-    spore_small =           { dusty=1, shiny=1 }, --绿色孢子(鱿鱼)
-    spore_medium =          { dusty=1, shiny=1 }, --红色孢子(鱿鱼)
-    spore_tall =            { dusty=1, shiny=1 }, --蓝色孢子(鱿鱼)
-    spore_moon =            { dusty=1, shiny=1, rusty=0.5 }, --月亮孢子(鱿鱼、月光龙虾)
+    batwing =               { pasty=1, meat=1, monster=1, whispering=0.5 }, --洞穴蝙蝠翅膀(一角鲸)
+    batwing_cooked =        { pasty=1, meat=1, monster=1 }, --熟蝙蝠翅膀
     meat =                  { pasty=1, meat=1, bloody=1 }, --肉(岩石大白鲨)
-    monstermeat =           { pasty=1, meat=1, monster=2, bloody=1 }, --怪物肉(岩石大白鲨)
-    dish_duriantartare =    { pasty=1, meat=2, monster=4, bloody=2 }, --怪味鞑靼(岩石大白鲨)
-    monstertartare =        { pasty=1, meat=2, monster=4, bloody=2 }, --怪物鞑靼(岩石大白鲨)
-    houndstooth =           { dusty=1, hardy=1, bloody=0.5 }, --犬牙
+    cookedmeat =            { pasty=1, meat=1 }, --熟肉
+    meat_dried =            { hardy=1, meat=1, wrinkled=1 }, --肉干(落叶比目鱼)
+    monstermeat =           { pasty=1, hardy=1, meat=1, monster=2, bloody=1 }, --怪物肉(岩石大白鲨)
+    cookedmonstermeat =     { pasty=1, hardy=1, meat=1, monster=2 }, --熟怪物肉
+    monstermeat_dried =     { hardy=1, meat=1, monster=2, wrinkled=1 }, --怪物肉干(落叶比目鱼)
+    smallmeat =             { pasty=1, meat=1 }, --小肉
+    cookedsmallmeat =       { pasty=1, meat=1 }, --熟小肉
+    smallmeat_dried =       { hardy=1, meat=1, wrinkled=1 }, --小风干肉(落叶比目鱼)
+    dish_duriantartare =    { pasty=2, meat=2, monster=4, bloody=2 }, --怪味鞑靼(岩石大白鲨)
+    monstertartare =        { pasty=2, meat=2, monster=4, bloody=2 }, --怪物鞑靼(岩石大白鲨)
+    shroom_skin =           { pasty=5, meat=2, monster=5, rotten=4, evil=5 }, --蘑菇皮(龙虾、邪天翁)
     compost =               { pasty=1, veggie=0.5, rotten=1 }, --堆肥(龙虾)
-    spoiled_fish =          { pasty=1, hardy=1, rotten=1 }, --变质的鱼(龙虾)
-    spoiled_fish_small =    { pasty=1, hardy=1, rotten=1 }, --坏掉的小鱼(龙虾)
-    poop =                  { dusty=1, pasty=1, veggie=0.5, rotten=1 }, --粪肥(龙虾)
-    guano =                 { dusty=1, pasty=1, rotten=1, salty=0.5 }, --鸟粪(龙虾、饼干切割机)
+    spoiled_fish =          { pasty=1, hardy=1, meat=0.5, rotten=1 }, --变质的鱼(龙虾)
+    spoiled_fish_small =    { pasty=1, hardy=1, meat=0.5, rotten=1 }, --坏掉的小鱼(龙虾)
+    guano =                 { dusty=1, rotten=1, salty=0.5 }, --鸟粪(龙虾、饼干切割机)
     rottenegg =             { pasty=1, hardy=1, rotten=1, slippery=1 }, --腐烂鸟蛋(龙虾、口水鱼)
-    moonglass =             { dusty=1, hardy=1, rusty=1 }, --月亮碎片(月光龙虾)
-    moonglass_charged =     { dusty=1, hardy=1, rusty=1, shiny=0.5 }, --注能月亮碎片(月光龙虾、鱿鱼)
-    moonrocknugget =        { dusty=1, hardy=1, rusty=1 }, --月岩(月光龙虾)
-    bee =                   { dusty=1, pasty=1, meat=0.5, shaking=1, frizzy=0.5 }, --蜜蜂(海黾、海鹦鹉)
+    lightflier =            { dusty=1, pasty=1, meat=0.5, shiny=1, shaking=1 }, --球状光虫(鱿鱼、海黾)
+    dragon_scales =         { hardy=5, hot=5, evil=5 }, --鳞片(炽热太阳鱼、邪天翁)
+    lavae_egg =             { hardy=4, meat=4, hot=4, evil=4, frizzy=2 }, --岩浆虫卵(炽热太阳鱼、邪天翁、海鹦鹉)
+    lavae_egg_cracked =     { hardy=4, meat=4, hot=5, evil=5, frizzy=2 }, --岩浆虫卵(炽热太阳鱼、邪天翁、海鹦鹉)
+    lavae_cocoon =          { dusty=4, hardy=4, meat=2, evil=2, frizzy=2 }, --冷冻虫卵(邪天翁、海鹦鹉)
+    honey =                 { pasty=1, sticky=1 }, --蜂蜜(甜味鱼)
+    royal_jelly =           { pasty=1, sticky=5 }, --蜂王浆(甜味鱼)
+    honeycomb =             { dusty=1, pasty=1, sticky=5 }, --蜂巢(甜味鱼)
+    beeswax =               { dusty=1, hardy=1, sticky=5, wrinkled=0.5 }, --蜂蜡(甜味鱼、落叶比目鱼)
+    butter =                { pasty=1, sticky=1 }, --黄油(甜味鱼)
+    butterfly =             { dusty=1, meat=0.5, shaking=1 }, --蝴蝶(海黾)
+    butterflywings =        { dusty=1, shaking=0.5 }, --蝴蝶翅膀(海黾)
+    moonbutterfly =         { pasty=1, meat=0.5, shaking=1, frizzy=0.5, rusty=0.5 }, --月蛾(海黾、海鹦鹉、月光龙虾)
+    moonbutterflywings =    { dusty=1, pasty=1, shaking=0.5, rusty=0.5 }, --月蛾翅膀(海黾、月光龙虾)
+    wormlight =             { pasty=1, veggie=1, shiny=1, frizzy=0.5 }, --发光浆果(鱿鱼、海鹦鹉)
+    wormlight_lesser =      { pasty=1, veggie=1, shiny=0.5, frizzy=0.5 }, --小发光浆果(鱿鱼、海鹦鹉)
+    fireflies =             { dusty=1, meat=0.5, shaking=1, shiny=0.5 }, --萤火虫(海黾、鱿鱼)
+    bee =                   { dusty=1, meat=0.5, shaking=1, frizzy=0.5 }, --蜜蜂(海黾、海鹦鹉)
     killerbee =             { dusty=1, pasty=1, meat=0.5, shaking=1 }, --杀人蜂(海黾)
-    stinger =               { dusty=1, frizzy=0.5 }, --蜂刺(海鹦鹉)
     mosquitosack =          { pasty=1, bloody=1, frizzy=0.5 }, --蚊子血囊(岩石大白鲨、海鹦鹉)
-    mosquito =              { dusty=1, pasty=1, meat=0.5, shaking=1, bloody=0.5 }, --蚊子(海黾、岩石大白鲨)
+    mosquito =              { pasty=1, meat=0.5, shaking=1, bloody=0.5 }, --蚊子(海黾、岩石大白鲨)
     raindonate =            { pasty=1, meat=0.5, shaking=1 }, --雨蝇(海黾)
     ahandfulofwings =       { dusty=1, pasty=1, shaking=0.5 }, --虫翅碎片(海黾)
     insectshell_l =         { dusty=1, hardy=1, frizzy=0.5 }, --虫甲碎片(海鹦鹉)
-    wormlight =             { pasty=1, veggie=1, shiny=1, frizzy=0.5 }, --发光浆果(鱿鱼、海鹦鹉)
-    wormlight_lesser =      { pasty=1, veggie=1, shiny=0.5, frizzy=0.5 }, --小发光浆果(鱿鱼、海鹦鹉)
-    minotaurhorn =          { dusty=5, pasty=5, hardy=5, meat=2, evil=5 }, --守护者之角(邪天翁)
+    glommerfuel =           { pasty=1, whispering=1, frizzy=0.5 }, --格罗姆的黏液(一角鲸、海鹦鹉)
+    glommerwings =          { dusty=1, whispering=1, shaking=1 }, --格罗姆翅膀(一角鲸、海黾)
+    glommerflower =         { pasty=5, whispering=5 }, --格罗姆花(一角鲸)
+    fruitflyfruit =         { pasty=5, shaking=5, wrinkled=2 }, --友好果蝇果(海黾、落叶比目鱼)
+    minotaurhorn =          { hardy=5, meat=2, evil=5 }, --守护者之角(邪天翁)
     malbatross_feather =    { pasty=2, hardy=2, evil=2 }, --邪天翁羽毛(邪天翁)
-    malbatross_beak =       { dusty=2, hardy=2, evil=5 }, --邪天翁喙(邪天翁)
-    deerclops_eyeball =     { pasty=5, meat=5, monster=6, evil=5, frozen=2 }, --独眼巨鹿眼球
-    nitre =                 { dusty=1, hardy=1, salty=0.5 }, --硝石(饼干切割机)
-    saltrock =              { dusty=1, salty=1 }, --盐晶(饼干切割机)
-    ice =                   { pasty=1 }, --冰
-    ash =                   { dusty=1 }, --灰烬
-    spoiled_food =          { dusty=1, pasty=1, hardy=1, rotten=0.5 }, --腐烂物(龙虾)
-    silk =                  { dusty=1, pasty=1 }, --蜘蛛丝
-    spidergland =           { pasty=1, monster=1 }, --蜘蛛腺
-    beefalowool =           { dusty=1, pasty=1 }, --牛毛
-    flint =                 { dusty=1, hardy=1 }, --燧石
-    feather_crow =          { dusty=1, pasty=1, hardy=1 }, --黑色羽毛
-    feather_robin =         { dusty=1, hardy=1, hot=0.5 }, --红色羽毛(炽热太阳鱼)
-    feather_robin_winter =  { pasty=1, hardy=1, frozen=0.5 }, --蓝色羽毛(冰鲷鱼)
-    feather_canary =        { dusty=1, pasty=1, hardy=1, shiny=0.5 }, --黄色羽毛(鱿鱼)
-    furtuft =               { dusty=1, pasty=1, evil=0.5 }, --毛丛(邪天翁)
-    phlegm =                { pasty=1, slippery=1 }, --脓鼻涕(口水鱼)
-    slurtleslime =          { pasty=1, slippery=1 }, --蛞蝓龟黏液(口水鱼)
-    twiggy_nut =            { hardy=1, veggie=0.5 }, --多枝树种
-    acorn =                 { pasty=1, hardy=1, veggie=0.5, grassy=0.5 }, --桦栗果(草鳄鱼)
-    pinecone =              { dusty=1, hardy=1, veggie=0.5 }, --松果
-    petals_evil =           { pasty=1, veggie=0.5, monster=1, evil=0.5 }, --深色花瓣(邪天翁)
-    siving_rocks =          { pasty=1, hardy=1 }, --子圭石
-    goose_feather =         { dusty=2, pasty=2, evil=2 }, --麋鹿鹅羽毛(邪天翁)
-    moonstorm_spark =       { shiny=1, rusty=1 }, --月熠(鱿鱼、月光龙虾)
-    rocks =                 { dusty=1, hardy=1 }, --石头
-    marble =                { hardy=1 }, --大理石
-    canary_poisoned =       { pasty=1, hardy=1, meat=1, shiny=0.5 }, --中毒金丝雀(鱿鱼)
-    batwing =               { pasty=1, meat=1, monster=1 }, --洞穴蝙蝠翅膀
-    batwing_cooked =        { dusty=1, pasty=1, meat=1, monster=1 }, --熟蝙蝠翅膀
-    beardhair =             { dusty=1, pasty=1 }, --胡须
+    malbatross_beak =       { hardy=5, evil=5 }, --邪天翁喙(邪天翁)
+    deerclops_eyeball =     { pasty=5, meat=5, monster=6, evil=5, frozen=2 }, --独眼巨鹿眼球(邪天翁、冰鲷鱼)
     bearger_fur =           { pasty=5, monster=5, evil=5 }, --熊皮(邪天翁)
-    charcoal =              { dusty=1, hardy=1, hot=0.5 }, --木炭(炽热太阳鱼)
-    -- coontail =              { dusty=1, pasty=1, hardy=1 }, --猫尾
-    -- tentaclespots =         { dusty=1, pasty=1, hardy=1 }, --触手皮
-    -- tentaclespike =         { dusty=1, pasty=1, hardy=1 }, --触手尖刺
-    -- pigskin
-    -- lightninggoathorn
-    -- shroom_skin
-    -- gears
-    -- dreadstone
-    -- horrorfuel
-    -- cookiecuttershell
-    -- slurtle_shellpieces
-    -- slurper_pelt
-    -- rabbit
-    -- purebrilliance
-    -- manrabbit_tail
-    -- townportaltalisman
-    -- driftwood_log
-    -- blackflag
-    -- thulecite_pieces
-    -- milkywhites
-    -- lunarplant_husk
-    -- voidcloth
-    -- messagebottleempty
-    -- carnival_prizeticket
-    -- wintersfeastfuel
-    -- boneshard
+    furtuft =               { dusty=1, evil=0.5 }, --毛丛(邪天翁)
+    goose_feather =         { dusty=2, evil=2 }, --麋鹿鹅羽毛(邪天翁)
+    milkywhites =           { pasty=2, monster=2, evil=2, sticky=1 }, --乳白物(邪天翁、甜味鱼)
     -- xx =             { dusty=1, pasty=1, hardy=1 }, --
 }
 for name,data in pairs(fishhoming_ingredients) do
@@ -995,12 +1052,6 @@ _G.CROPS_DATA_LEGION.carrot = {
         { anim = "level1", time = time_crop*0.45, deadanim = "dead1", witheredprefab = nil },
         { anim = "level2", time = time_crop*0.55, deadanim = "dead1", witheredprefab = {"cutgrass"} },
         { anim = { "level3_1", "level3_2", "level3_3" }, time = time_day*6, deadanim = "dead1", witheredprefab = {"cutgrass"} }
-        -- [1] = { anim = "level1_carrot", time = time_annual * 0.05, deadanim = "dead123_carrot", witheredprefab = nil },
-        -- [2] = { anim = "level2_carrot", time = time_annual * 0.15, deadanim = "dead123_carrot", witheredprefab = {"cutgrass"} },
-        -- [3] = { anim = "level3_carrot", time = time_annual * 0.20, deadanim = "dead123_carrot", witheredprefab = {"cutgrass"} },
-        -- [4] = { anim = "level4_carrot", time = time_annual * 0.20, deadanim = "dead456_carrot", witheredprefab = {"cutgrass"} },
-        -- [5] = { anim = "level5_carrot", time = time_annual * 0.40, deadanim = "dead456_carrot", witheredprefab = {"cutgrass"}, bloom = true, pickable = nil },
-        -- [6] = { anim = { "level6_carrot_1", "level6_carrot_2", "level6_carrot_3" }, time = time_day * 6.00, deadanim = "dead456_carrot", witheredprefab = {"cutgrass"} }
     },
     cluster_size = { 1, 1.5 },
     fn_loot = function(self, doer, ispicked, isburnt, loots)
