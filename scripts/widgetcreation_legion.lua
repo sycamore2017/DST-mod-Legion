@@ -31,7 +31,7 @@ local function MakeBackcub(name, animbuild)
             slotpos = {},
             animbank = "ui_piggyback_2x6",
             animbuild = animbuild,
-            pos = Vector3(-5, -50, 0)
+            pos = Vector3(-5, -90, 0)
         },
         issidewidget = true,
         type = "pack",
@@ -50,16 +50,15 @@ MakeBackcub("backcub_fans2", "ui_backcub_fans2_2x6")
 ------
 
 params.beefalo = {
-    widget =
-    {
+    widget = {
         slotpos = {},
         animbank = "ui_chester_shadow_3x4",
         animbuild = "ui_chester_shadow_3x4",
         pos = Vector3(0, 220, 0),
-        side_align_tip = 160,
+        side_align_tip = 160
     },
     type = "chest",
-    openlimit = 1,
+    openlimit = 1
 }
 for y = 2.5, -0.5, -1 do
     for x = 0, 2 do
@@ -74,12 +73,11 @@ params.beefalo.itemtestfn = TestContainer_base
 ------
 
 params.giantsfoot = {
-    widget =
-    {
+    widget = {
         slotpos = {},
         animbank = "ui_backpack_2x4",
         animbuild = "ui_backpack_2x4",
-        pos = Vector3(-5, -70, 0),
+        pos = Vector3(-5, -80, 0)
     },
     issidewidget = true,
     type = "pack",
@@ -103,9 +101,9 @@ params.hiddenmoonlight = {
         animbank = "ui_chest_3x3",
         animbuild = "ui_hiddenmoonlight_4x4",
         pos = Vector3(0, 200, 0),
-        side_align_tip = 160,
+        side_align_tip = 160
     },
-    type = "chest",
+    type = "chest"
 }
 for y = 3, 0, -1 do
     for x = 0, 3 do
@@ -237,7 +235,7 @@ params.boltwingout = {
         slotpos = {},
         animbank = "ui_piggyback_2x6",
         animbuild = "ui_piggyback_2x6",
-        pos = Vector3(-5, -50, 0)
+        pos = Vector3(-5, -90, 0)
     },
     issidewidget = true,
     type = "pack",
@@ -403,20 +401,6 @@ for k, v in pairs(params) do
     containers.MAXITEMSLOTS = math.max(containers.MAXITEMSLOTS, v.widget.slotpos ~= nil and #v.widget.slotpos or 0)
 end
 params = nil
-
---加入mod的容器（已经过时了，不要用这里的逻辑）
--- local widgetsetup_old = containers.widgetsetup
--- function containers.widgetsetup(container, prefab, data)
---     local t = params[prefab or container.inst.prefab]
---     if t ~= nil then   --是mod里用到的格子就注册，否则就返回官方的格子注册函数
---         for k, v in pairs(t) do
---             container[k] = v
---         end
---         container:SetNumSlots(container.widget.slotpos ~= nil and #container.widget.slotpos or 0)
---     else
---         return widgetsetup_old(container, prefab, data)
---     end
--- end
 
 --------------------------------------------------------------------------
 --mod兼容：Show Me (中文)

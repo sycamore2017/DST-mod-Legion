@@ -194,11 +194,11 @@ MakeItem({
         inst.components.upgradekit:SetData({
             icebox = {
                 prefabresult = "hiddenmoonlight",
-                onupgradefn = OnUpgrade_hidden,
+                onupgradefn = OnUpgrade_hidden
             },
             saltbox = {
                 prefabresult = "hiddenmoonlight",
-                onupgradefn = OnUpgrade_hidden,
+                onupgradefn = OnUpgrade_hidden
             }
         })
     end
@@ -246,6 +246,10 @@ local function SetPerishRate_hidden(inst, item)
     end
     return 0.3
 end
+local function SetLevel_hidden(inst)
+    SetLevel(inst)
+end
+
 local function OnSave_hidden(inst, data)
 	if inst.upgradetarget ~= "icebox" then
         data.upgradetarget = inst.upgradetarget
@@ -258,8 +262,40 @@ local function OnLoad_hidden(inst, data)
         end
     end
     inst:DoTaskInTime(0.4, function(inst)
-        SetLevel(inst)
+        SetLevel_hidden(inst)
     end)
+end
+
+local function OnWork_hidden(inst, worker, workleft, numworks)
+    inst.AnimState:PlayAnimation("hit")
+    inst.AnimState:PushAnimation("closed", true)
+    inst.components.container:Close()
+    if worker == nil or not worker:HasTag("player") then
+        inst.components.workable:SetWorkLeft(5) --不能被非玩家破坏
+        return
+    end
+    inst.components.container:DropEverything()
+end
+local function OnFinished_hidden(inst, worker)
+    inst.components.container:DropEverything()
+
+    local x, y, z = inst.Transform:GetWorldPosition()
+    if inst.upgradetarget ~= nil then
+        local box = SpawnPrefab(inst.upgradetarget)
+        if box ~= nil then
+            box.Transform:SetPosition(x, y, z)
+        end
+    end
+
+    --归还宝石
+    DropGems(inst, "bluegem")
+
+    inst.components.lootdropper:SpawnLootPrefab("hiddenmoonlight_item")
+
+    local fx = SpawnPrefab("collapse_small")
+    fx.Transform:SetPosition(x, y, z)
+    fx:SetMaterial("stone")
+    inst:Remove()
 end
 
 table.insert(prefs, Prefab("hiddenmoonlight", function()
@@ -293,6 +329,7 @@ table.insert(prefs, Prefab("hiddenmoonlight", function()
     end
 
     inst.upgradetarget = "icebox"
+    inst.perishrate_l = 0.5
 
     inst:AddComponent("inspectable")
 
@@ -311,42 +348,13 @@ table.insert(prefs, Prefab("hiddenmoonlight", function()
     inst:AddComponent("workable")
     inst.components.workable:SetWorkAction(ACTIONS.HAMMER)
     inst.components.workable:SetWorkLeft(5)
-    inst.components.workable:SetOnWorkCallback(function(inst, worker, workleft, numworks)
-        inst.AnimState:PlayAnimation("hit")
-        inst.AnimState:PushAnimation("closed", true)
-        inst.components.container:Close()
-        if worker == nil or not worker:HasTag("player") then
-            inst.components.workable:SetWorkLeft(5) --不能被非玩家破坏
-            return
-        end
-        inst.components.container:DropEverything()
-    end)
-    inst.components.workable:SetOnFinishCallback(function(inst, worker)
-        inst.components.container:DropEverything()
-
-        local x, y, z = inst.Transform:GetWorldPosition()
-        if inst.upgradetarget ~= nil then
-            local box = SpawnPrefab(inst.upgradetarget)
-            if box ~= nil then
-                box.Transform:SetPosition(x, y, z)
-            end
-        end
-
-        --归还宝石
-        DropGems(inst, "bluegem")
-
-        inst.components.lootdropper:SpawnLootPrefab("hiddenmoonlight_item")
-
-        local fx = SpawnPrefab("collapse_small")
-        fx.Transform:SetPosition(x, y, z)
-        fx:SetMaterial("stone")
-        inst:Remove()
-    end)
+    inst.components.workable:SetOnWorkCallback(OnWork_hidden)
+    inst.components.workable:SetOnFinishCallback(OnFinished_hidden)
 
     inst:AddComponent("upgradeable")
     inst.components.upgradeable.upgradetype = UPGRADETYPES.HIDDEN_L
-    inst.components.upgradeable.onupgradefn = OnUpgradeFn
-    inst.components.upgradeable.onstageadvancefn = SetLevel
+    inst.components.upgradeable.onupgradefn = OnUpgradeFn --升级前
+    inst.components.upgradeable.onstageadvancefn = SetLevel_hidden --升级时
     inst.components.upgradeable.numstages = times_hidden + 1
     inst.components.upgradeable.upgradesperstage = 1
 
@@ -751,6 +759,40 @@ local function OnLoad_revolved(inst, data) --由于 upgradeable 组件不会自�
     end)
 end
 
+local function OnWork_revolved(inst, worker, workleft, numworks)
+    inst.AnimState:PlayAnimation("hit")
+    inst.AnimState:PushAnimation("closed")
+    inst.SoundEmitter:PlaySound("grotto/common/turf_crafting_station/hit")
+    inst.components.container:Close()
+    if worker == nil or not worker:HasTag("player") then
+        inst.components.workable:SetWorkLeft(5) --不能被非玩家破坏
+        return
+    end
+    inst.components.container:DropEverything()
+end
+local function OnFinished_revolved(inst, worker)
+    inst.components.container:DropEverything()
+
+    --归还背包
+    local x, y, z = inst.Transform:GetWorldPosition()
+    local back = SpawnPrefab(inst.prefab == "revolvedmoonlight" and "piggyback" or "krampus_sack")
+    if back ~= nil then
+        back.Transform:SetPosition(x, y, z)
+    end
+
+    --归还宝石
+    DropGems(inst, "yellowgem")
+
+    --归还套件
+    inst.components.skinedlegion:SpawnLinkedSkinLoot("revolvedmoonlight_item", inst, "item", worker)
+
+    --特效
+    local fx = SpawnPrefab("collapse_small")
+    fx.Transform:SetPosition(x, y, z)
+    fx:SetMaterial("stone")
+    inst:Remove()
+end
+
 local function MakeRevolved(sets)
     table.insert(prefs, Prefab(sets.name, function()
         local inst = CreateEntity()
@@ -819,39 +861,8 @@ local function MakeRevolved(sets)
         inst:AddComponent("workable")
         inst.components.workable:SetWorkAction(ACTIONS.HAMMER)
         inst.components.workable:SetWorkLeft(5)
-        inst.components.workable:SetOnWorkCallback(function(inst, worker, workleft, numworks)
-            inst.AnimState:PlayAnimation("hit")
-            inst.AnimState:PushAnimation("closed")
-            inst.SoundEmitter:PlaySound("grotto/common/turf_crafting_station/hit")
-            inst.components.container:Close()
-            if worker == nil or not worker:HasTag("player") then
-                inst.components.workable:SetWorkLeft(5) --不能被非玩家破坏
-                return
-            end
-            inst.components.container:DropEverything()
-        end)
-        inst.components.workable:SetOnFinishCallback(function(inst, worker)
-            inst.components.container:DropEverything()
-
-            --归还背包
-            local x, y, z = inst.Transform:GetWorldPosition()
-            local back = SpawnPrefab(sets.ispro and "krampus_sack" or "piggyback")
-            if back ~= nil then
-                back.Transform:SetPosition(x, y, z)
-            end
-
-            --归还宝石
-            DropGems(inst, "yellowgem")
-
-            --归还套件
-            inst.components.skinedlegion:SpawnLinkedSkinLoot("revolvedmoonlight_item", inst, "item", worker)
-
-            --特效
-            local fx = SpawnPrefab("collapse_small")
-            fx.Transform:SetPosition(x, y, z)
-            fx:SetMaterial("stone")
-            inst:Remove()
-        end)
+        inst.components.workable:SetOnWorkCallback(OnWork_revolved)
+        inst.components.workable:SetOnFinishCallback(OnFinished_revolved)
 
         inst:AddComponent("upgradeable")
         inst.components.upgradeable.upgradetype = UPGRADETYPES.REVOLVED_L

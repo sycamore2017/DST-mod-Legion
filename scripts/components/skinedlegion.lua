@@ -154,7 +154,7 @@ function SkinedLegion:SpawnLinkedSkinLoot(prefabname, dropper, linkedkey, doer)
 		dropper.components.lootdropper:SpawnLootPrefab(prefabname)
 	end
 end
-function SkinedLegion:SetSkin(skinname, userid)
+function SkinedLegion:SetSkin(skinname, userid, isload)
 	if not self.isServe or self.skin == skinname then
 		return true
 	end
@@ -174,27 +174,31 @@ function SkinedLegion:SetSkin(skinname, userid)
 			end
 		end
 		if userid == nil then
-			self.inst:DoTaskInTime(20+8*math.random(), function(inst)
-				if self.skin == nil then
-					return
-				end
-				if self.userid ~= nil then
-					if SKINS_CACHE_L[self.userid] == nil or not SKINS_CACHE_L[self.userid][self.skin] then
-						self.userid = nil
-					else
+			if isload then --主要是用于上下洞穴时，防止皮肤因还没有缓存而失效
+				self.inst:DoTaskInTime(20+8*math.random(), function(inst)
+					if self.skin == nil then
 						return
 					end
-				end
-				if self.userid == nil then
-					for id, value in pairs(SKINS_CACHE_L) do
-						if value[self.skin] then
-							self.userid = id
+					if self.userid ~= nil then
+						if SKINS_CACHE_L[self.userid] == nil or not SKINS_CACHE_L[self.userid][self.skin] then
+							self.userid = nil
+						else
 							return
 						end
 					end
-				end
-				self:SetSkin(nil)
-			end)
+					if self.userid == nil then
+						for id, value in pairs(SKINS_CACHE_L) do
+							if value[self.skin] then
+								self.userid = id
+								return
+							end
+						end
+					end
+					self:SetSkin(nil)
+				end)
+			else
+				return true
+			end
 		end
 	end
 
@@ -239,7 +243,7 @@ function SkinedLegion:OnLoad(data)
 		self.inst.skinname = nil
 		self.userid = data.userid
 		self._skindata = self:GetSkinData()
-		self:SetSkin(data.skin, self.userid)
+		self:SetSkin(data.skin, self.userid, true)
 	end
 end
 

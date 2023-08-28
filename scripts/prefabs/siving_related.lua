@@ -938,7 +938,7 @@ end
 local function HealOwner(mask, owner)
     if
         owner.components.health ~= nil and
-        not owner.components.health:IsDead() and owner.components.health:IsHurt()
+        not owner.components.health:IsDead() and owner.components.health:GetPercentWithPenalty() < 0.98
     then
         owner.components.health:DoDelta(2, true, "debug_key", true, nil, true) --对旺达的回血只有特定原因才能成功
         mask.healthcounter = mask.healthcounter - 4
@@ -1322,8 +1322,7 @@ local function FnBend_mask2(mask, doer, target, options)
         local cpt = target.components.perennialcrop2
         if cpt.isrotten then
             if CalcuCost(mask, doer, 5) then
-                cpt:SetStage(cpt.stage, false, false)
-                cpt:StartGrowing()
+                cpt:SetStage(cpt.stage, false)
             else
                 return false, "NOLIFE"
             end

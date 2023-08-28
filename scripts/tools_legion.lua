@@ -37,6 +37,21 @@ local function IsTooDarkToGrow(inst)
 	return false
 end
 
+--[ 植株寻求保护 ]--
+local function CallPlantDefender(inst, target, noone)
+	if target ~= nil and (noone or not target:HasTag("plantkin")) then
+        inst:RemoveTag("farm_plant_defender") --其实是杂草才需要去除这个标签
+        local x, y, z = inst.Transform:GetWorldPosition()
+        local defenders = TheSim:FindEntities(x, y, z, TUNING.FARM_PLANT_DEFENDER_SEARCH_DIST, {"farm_plant_defender"})
+        for _, defender in ipairs(defenders) do
+            if defender.components.burnable == nil or not defender.components.burnable.burning then
+                defender:PushEvent("defend_farm_plant", {source = inst, target = target})
+                break
+            end
+        end
+    end
+end
+
 --[ 计算最终位置 ]--
 local function GetCalculatedPos(x, y, z, radius, theta)
     local rad = radius or math.random() * 3
@@ -460,6 +475,7 @@ return {
 	MakeSnowCovered_comm = MakeSnowCovered_comm,
 	MakeSnowCovered_serv = MakeSnowCovered_serv,
 	IsTooDarkToGrow = IsTooDarkToGrow,
+    CallPlantDefender = CallPlantDefender,
 	GetCalculatedPos = GetCalculatedPos,
 	FallingItem = FallingItem,
 	ForceStopHeavyLifting = ForceStopHeavyLifting,
