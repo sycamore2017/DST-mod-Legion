@@ -305,7 +305,7 @@ PLANT_DEFS.pineananas = {
 	product_oversized = "pineananas_oversized",
 	--种子 代码名称
 	seed = "pineananas_seeds",
-	--标签
+	--家族标签
 	plant_type_tag = "farm_plant_pineananas",
     --巨型产物腐烂后的收获物
     loot_oversized_rot = {"spoiled_food", "spoiled_food", "spoiled_food", "pineananas_seeds", "fruitfly", "fruitfly", "pinecone"},

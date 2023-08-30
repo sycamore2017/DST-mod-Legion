@@ -89,12 +89,24 @@ end
 --[[ 月藏宝匣 ]]
 --------------------------------------------------------------------------
 
-local times_hidden = CONFIGS_LEGION.HIDDENUPDATETIMES or 56
-local step_hidden = math.floor(times_hidden/14)
+local times_hidden = CONFIGS_LEGION.HIDDENUPDATETIMES or 25
 
+local function UpdatePerishRate_hidden(inst)
+    local lvl = inst.components.upgradeable:GetStage() - 1
+    if lvl > times_hidden then --在设置变换中，会出现当前等级大于最大等级的情况
+        lvl = times_hidden
+    elseif lvl < 0 then
+        lvl = 0
+    end
+    if inst.upgradetarget == "icebox" then
+        inst.perishrate_l = Remap(lvl, 0, times_hidden, 0.5, 0.1)
+    else
+        inst.perishrate_l = Remap(lvl, 0, times_hidden, 0.4, 0.0)
+    end
+end
 local function SetTarget_hidden(inst, targetprefab)
     inst.upgradetarget = targetprefab
-    if targetprefab == "saltbox" then
+    if targetprefab ~= "icebox" then
         inst.AnimState:OverrideSymbol("base", "hiddenmoonlight", "saltbase")
     end
 end
@@ -113,12 +125,7 @@ local function DoBenefit(inst)
         return
     end
 
-    local stagenow = inst.components.upgradeable:GetStage() - 1
-    if stagenow > times_hidden then --在设置变换中，会出现当前等级大于最大等级的情况
-        stagenow = times_hidden
-    end
-    stagenow = math.floor(stagenow/step_hidden) + 2 --默认2格
-
+    local stagenow = 4
     if benifitnum > stagenow then
         for i = 1, stagenow do
             local benifititem = table.remove(items_valid, math.random(#items_valid))
@@ -165,6 +172,7 @@ local function OnUpgrade_hidden(item, doer, target, result)
         result.SoundEmitter:PlaySound("dontstarve/common/place_structure_straw")
     end
     SetTarget_hidden(result, target.prefab)
+    UpdatePerishRate_hidden(result)
 
     --将原箱子中的物品转移到新箱子中
     if target.components.container ~= nil and result.components.container ~= nil then
@@ -235,19 +243,16 @@ local function OnClose(inst)
 end
 local function SetPerishRate_hidden(inst, item)
     if item == nil then
-        return 0.3
+        return inst.perishrate_l
     end
     if item:HasTag("frozen") then
         return 0
-    elseif inst.upgradetarget ~= nil then --盐箱是0.25，冰箱0.5。给盐盒就是0.15，给冰箱就是0.3
-        if inst.upgradetarget == "saltbox" then
-            return 0.15
-        end
     end
-    return 0.3
+    return inst.perishrate_l
 end
 local function SetLevel_hidden(inst)
     SetLevel(inst)
+    UpdatePerishRate_hidden(inst)
 end
 
 local function OnSave_hidden(inst, data)
@@ -261,9 +266,7 @@ local function OnLoad_hidden(inst, data)
             SetTarget_hidden(inst, data.upgradetarget)
         end
     end
-    inst:DoTaskInTime(0.4, function(inst)
-        SetLevel_hidden(inst)
-    end)
+    SetLevel_hidden(inst)
 end
 
 local function OnWork_hidden(inst, worker, workleft, numworks)

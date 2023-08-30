@@ -26,7 +26,7 @@ local flowerMaps = {
 	weed_tillweed = 	{ 			 small = true, medium = true, grown = true 					 },
 
 	pineananas = 	{ 							   medium = true 			   					 },
-	gourd =			{ 							   medium = true 			   					 },
+	gourd =			{ 							   medium = true 			   					 }
 }
 local regrowMaps = {
 	asparagus = 2,
@@ -50,7 +50,7 @@ local regrowMaps = {
 	weed_ivy = 1,
 
 	pineananas = 3,
-	gourd = 3,
+	gourd = 3
 }
 
 --mod里再次加载农场作物的动画会导致官方的作物动画不显示。因为官方作物动画有加载顺序限制，一旦mod里引用会导致顺序变化
@@ -68,37 +68,12 @@ local regrowMaps = {
 -- 	data.assets = assetsbase
 -- end
 
---官方的prefabs注册不清楚有啥用，然后还会导致问题，那么，不写了
--- local function InitPrefabs(data, prefabspre, prefabsbase)
--- 	if prefabspre ~= nil then
--- 		for k, v in pairs(prefabspre) do
--- 			table.insert(prefabsbase, v)
--- 		end
--- 	end
-
--- 	if data.product ~= nil then
--- 		table.insert(prefabsbase, data.product)
--- 	end
--- 	if data.product_huge ~= nil then
--- 		table.insert(prefabsbase, data.product_huge)
--- 	end
--- 	if data.seed ~= nil then
--- 		table.insert(prefabsbase, data.seed)
--- 	end
-
--- 	data.prefabs = prefabsbase
--- end
-
-for k,v in pairs(PLANT_DEFS) do
+for k, v in pairs(PLANT_DEFS) do
 	if k ~= "randomseed" then
 		local data = {
-			assets = nil,
-			prefabs = nil,
 			tags = v.tags,
-			build = v.build,	--贴图
-			bank = v.bank,		--动画模板
-			fireproof = v.fireproof == true, --是否防火
-			weights	= v.weight_data, --重量范围
+			build = v.build, bank = v.bank,
+			fireproof = v.fireproof, --是否防火
 			sounds = v.sounds, --音效
 			prefab = v.prefab.."_legion", --作物 代码名称
 			prefab_old = v.prefab, --作物 原代码名称（目前是展示名字时使用）
@@ -106,34 +81,31 @@ for k,v in pairs(PLANT_DEFS) do
 			product_huge = v.product_oversized, --巨型产物 代码名称
 			seed = v.seed, --种子 代码名称
 			loot_huge_rot = v.loot_oversized_rot, --巨型产物腐烂后的收获物
-			costMoisture = 1, --需水量
-			costNutrient = 2, --需肥类型(这里只需要一个量即可，不需要关注肥料类型)
-			canGetSick = v.canGetSick ~= false, --是否能产生病虫害（原创）
-			stages = {}, --该植物生长有几个阶段，每个阶段的动画,以及是否处在花期（原创）
-			stages_other = { huge = nil, huge_rot = nil, rot = nil }, --巨大化阶段、巨大化枯萎、枯萎等阶段的数据
-			regrowStage = 1, --枯萎或者采摘后重新开始生长的阶段（原创）
-			eternalStage = v.eternalStage, --长到这个阶段后，就不再往下生长（原创）
-			goodSeasons = v.good_seasons, --喜好季节：{autumn = true, winter = true, spring = true, summer = true}
-			killjoysTolerance = v.max_killjoys_tolerance, --扫兴容忍度：一般都为0
-
+			cost_moisture = 1, --需水量
+			cost_nutrient = 2, --需肥量(这里只需要一个量即可，不需要关注肥料类型)
+			can_getsick = v.can_getsick ~= false, --是否能产生病虫害（原创）
+			stages = {}, --该植物生长有几个阶段，每个阶段的动画，以及是否处在花期（原创）
+			stages_other = { huge = nil, huge_rot = nil, rot = nil }, --巨大化阶段、巨大化枯萎、枯萎等阶段的数据（原创）
+			regrowstage = 1, --枯萎或者采摘后重新开始生长的阶段（原创）
+			goodseasons = v.good_seasons, --喜好季节：{autumn = true, winter = true, spring = true, summer = true}
+			killjoystolerance = v.max_killjoys_tolerance, --扫兴容忍度：一般都为0
 			fn_common = v.fn_common, --额外设定函数（通用）：fn(inst)
 			fn_server = v.fn_server, --额外设定函数（主机）：fn(inst)
-			fn_stage = v.fn_stage, --每次设定生长阶段时额外触发的函数：fn(inst, isfull)
+			fn_stage = v.fn_stage --每次设定生长阶段时额外触发的函数：fn(inst, isfull)
 		}
 
 		--确定花期map（其他mod想要增加花期，可仿造目前格式写在PLANT_DEFS中即可）
-		local flowermap = v.flowerMap or flowerMaps[k]
+		local flowermap = v.flowermap or flowerMaps[k]
 
 		--重新改生长阶段数据
-		for k2,v2 in pairs(v.plantregistryinfo) do
+		for _, v2 in pairs(v.plantregistryinfo) do
 			local stage = {
 				name = v2.text, --该阶段的名字
 				anim = v2.anim,
 				anim_grow = v2.grow_anim,
-				isflower = (flowermap ~= nil and flowermap[v2.text]) or false,
+				isflower = (flowermap ~= nil and flowermap[v2.text]) or nil,
 				time = nil --生长时间、或枯萎时间、或重生时间
 			}
-
 			if v2.text == "oversized" then
 				stage.name = "huge"
 				stage.time = 6 * TUNING.TOTAL_DAY_TIME --巨型作物，6天后枯萎
@@ -157,118 +129,106 @@ for k,v in pairs(PLANT_DEFS) do
 			local averagetime = 7*TUNING.TOTAL_DAY_TIME / (countstage-2) --不算发芽时间，总共7天成熟
 			data.stages[1].time = 14 * TUNING.SEG_TIME --14/16天发芽
 			data.stages[countstage].time = 4 * TUNING.TOTAL_DAY_TIME --成熟作物，4天后枯萎
-			for k3,v3 in pairs(data.stages) do
+			for _, v3 in pairs(data.stages) do
 				if v3.time == nil then
 					v3.time = averagetime
 				end
 			end
 
 			--重新改需水量
-			if v.costMoisture ~= nil then --获取自定义的需水量
-				data.costMoisture = v.costMoisture
-			elseif v.moisture == TUNING.FARM_PLANT_DRINK_LOW then
-				data.costMoisture = 1
-			elseif v.moisture == TUNING.FARM_PLANT_DRINK_MED then
-				data.costMoisture = 2
-			elseif v.moisture == TUNING.FARM_PLANT_DRINK_HIGH then
-				data.costMoisture = 4
+			if v.cost_moisture ~= nil then --获取自定义的需水量
+				data.cost_moisture = v.cost_moisture
+			elseif v.moisture.drink_rate == TUNING.FARM_PLANT_DRINK_LOW then
+				data.cost_moisture = 1
+			elseif v.moisture.drink_rate == TUNING.FARM_PLANT_DRINK_MED then
+				data.cost_moisture = 2
+			elseif v.moisture.drink_rate == TUNING.FARM_PLANT_DRINK_HIGH then
+				data.cost_moisture = 4
 			end
 
 			--重新改需肥量
-			for k3,v3 in pairs(v.nutrient_consumption) do
-				if v3 ~= nil and data.costNutrient < v3 then
-					data.costNutrient = v3
+			for _,v3 in pairs(v.nutrient_consumption) do
+				if v3 ~= nil and data.cost_nutrient < v3 then
+					data.cost_nutrient = v3
 				end
 			end
-			if data.costNutrient > 2 and data.costNutrient <= 4 then
-				data.costNutrient = 3
-			elseif data.costNutrient > 4 then
-				data.costNutrient = 4
+			if data.cost_nutrient > 2 and data.cost_nutrient <= 4 then
+				data.cost_nutrient = 3
+			elseif data.cost_nutrient > 4 then
+				data.cost_nutrient = 4
 			end
 
 			--确定再生的阶段
-			if v.regrowStage ~= nil then
-				data.regrowStage = v.regrowStage
+			if v.regrowstage ~= nil then
+				data.regrowstage = v.regrowstage
 			elseif regrowMaps[k] ~= nil then
-				data.regrowStage = regrowMaps[k]
+				data.regrowstage = regrowMaps[k]
 			end
-			if data.regrowStage >= countstage then
-				data.regrowStage = 1
+			if data.regrowstage >= countstage then
+				data.regrowstage = 1
 			end
-
-			--勋章的作物，目前都是不腐烂的设定
-			if k == "immortal_fruit" or k == "medal_gift_fruit" then
-				if data.eternalStage == nil then
-					data.eternalStage = countstage --默认就是最终阶段
-				end
-				data.stages_other.rot = nil
-				data.stages_other.huge_rot = nil
-			end
-
-			--确定资源
-			-- InitAssets(data, v.assets, {
-			-- 	Asset("ANIM", "anim/"..data.bank..".zip"),
-			-- 	Asset("ANIM", "anim/siving_soil.zip"),
-			-- 	-- Asset("SCRIPT", "scripts/prefabs/farm_plant_defs.lua"),
-			-- })
-			-- InitPrefabs(data, v.prefabs, {
-			-- 	"spoiled_food",
-			-- 	"farm_plant_happy", "farm_plant_unhappy",
-			-- 	"siving_soil",
-			-- 	"dirt_puff",
-			-- 	"cropgnat", "cropgnat_infester"
-			-- })
 
 			defs[k] = data
 		end
 	end
 end
 
-for k,v in pairs(WEED_DEFS) do
+--勋章的作物，目前都是不腐烂的设定
+local dd = defs["immortal_fruit"]
+if dd ~= nil then
+	dd.stages[#dd.stages].time = nil
+	dd.stages_other.huge.time = nil
+	dd.stages_other.rot = nil
+	dd.stages_other.huge_rot = nil
+	dd = nil
+end
+dd = defs["medal_gift_fruit"]
+if dd ~= nil then
+	dd.stages[#dd.stages].time = nil
+	dd.stages_other.huge.time = nil
+	dd.stages_other.rot = nil
+	dd.stages_other.huge_rot = nil
+	dd = nil
+end
+
+for k, v in pairs(WEED_DEFS) do
 	local data = {
-		assets = nil,
-		prefabs = nil,
 		tags = v.tags or v.extra_tags,
-		build = v.build,	--贴图
-		bank = v.bank,		--动画模板
-		fireproof = v.fireproof == true, --是否防火
-		-- weights	= nil, --重量范围
+		build = v.build, bank = v.bank,
+		fireproof = v.fireproof, --是否防火
 		sounds = v.sounds, --音效
 		prefab = v.prefab.."_legion", --作物 代码名称
 		prefab_old = v.prefab, --作物 原代码名称（目前是展示名字时使用）
 		product = v.product, --产物 代码名称（对于杂草，是可能为空的）
-		-- product_huge = nil, --巨型产物 代码名称
-		-- seed = nil, --种子 代码名称
-		-- loot_huge_rot = nil, --巨型产物腐烂后的收获物
-		costMoisture = 1, --需水量
-		costNutrient = 2, --需肥类型(这里只需要一个量即可，不需要关注肥料类型)
-		canGetSick = v.canGetSick ~= false, --是否能产生病虫害（原创）
-		stages = {}, --该植物生长有几个阶段，每个阶段的动画,以及是否处在花期（原创）
-		stages_other = { rot = nil }, --枯萎等阶段的数据
-		regrowStage = 1, --枯萎或者采摘后重新开始生长的阶段（原创）
-		eternalStage = v.eternalStage, --长到这个阶段后，就不再往下生长（原创）
-		goodSeasons = v.good_seasons or {}, --喜好季节：{autumn = true, winter = true, spring = true, summer = true}
-		killjoysTolerance = v.killjoysTolerance or 1, --扫兴容忍度：杂草为1，容忍度比作物高
-
+		product_huge = v.product_oversized, --巨型产物 代码名称
+		seed = v.seed, --种子 代码名称
+		loot_huge_rot = v.loot_oversized_rot, --巨型产物腐烂后的收获物
+		cost_moisture = 1, --需水量
+		cost_nutrient = 2, --需肥量(这里只需要一个量即可，不需要关注肥料类型)
+		can_getsick = v.can_getsick ~= false, --是否能产生病虫害（原创）
+		stages = {}, --该植物生长有几个阶段，每个阶段的动画，以及是否处在花期（原创）
+		stages_other = { rot = nil }, --枯萎等阶段的数据（原创）
+		regrowstage = 1, --枯萎或者采摘后重新开始生长的阶段（原创）
+		goodseasons = v.good_seasons or {}, --喜好季节：{autumn = true, winter = true, spring = true, summer = true}
+		killjoystolerance = v.killjoystolerance or 1, --扫兴容忍度：杂草为1，容忍度比作物高
 		fn_common = v.fn_common, --额外设定函数（通用）：fn(inst)
 		fn_server = v.fn_server or v.masterpostinit, --额外设定函数（主机）：fn(inst)
 		-- fn_stage = v.fn_stage or v.OnMakeFullFn, --每次设定生长阶段时额外触发的函数：fn(inst, isfull)
 	}
 
 	--确定花期map（其他mod想要增加花期，可仿造目前格式写在PLANT_DEFS中即可）
-	local flowermap = v.flowerMap or flowerMaps[k]
+	local flowermap = v.flowermap or flowerMaps[k]
 
 	--重新改生长阶段数据
-	for k2,v2 in pairs(v.plantregistryinfo) do
+	for _, v2 in pairs(v.plantregistryinfo) do
 		if v2.text ~= "bolting" then --bolting相当于是杂草的枯萎，但我觉得用picked来当枯萎更好
 			local stage = {
 				name = v2.text, --该阶段的名字
 				anim = v2.anim,
 				anim_grow = v2.grow_anim,
-				isflower = (flowermap ~= nil and flowermap[v2.text]) or false,
+				isflower = (flowermap ~= nil and flowermap[v2.text]) or nil,
 				time = nil --生长时间、或枯萎时间、或重生时间
 			}
-
 			if v2.text == "picked" then
 				stage.name = "rot"
 				stage.time = 4 * TUNING.TOTAL_DAY_TIME --枯萎作物，4天后重新开始生长
@@ -282,69 +242,51 @@ for k,v in pairs(WEED_DEFS) do
 	local countstage = #data.stages
 	if countstage >= 2 then
 		--确定生长时间
-		local averagetime = 4*TUNING.TOTAL_DAY_TIME / (countstage-1) --不算发芽时间，总共4天成熟
+		local averagetime = 4*TUNING.TOTAL_DAY_TIME / (countstage-1) --总共4天成熟
 		data.stages[countstage].time = 2 * TUNING.TOTAL_DAY_TIME --成熟作物，2天后枯萎
-		for k3,v3 in pairs(data.stages) do
+		for _, v3 in pairs(data.stages) do
 			if v3.time == nil then
 				v3.time = averagetime
 			end
 		end
 
 		--重新改需水量
-		if v.costMoisture ~= nil then --获取自定义的需水量
-			data.costMoisture = v.costMoisture
-		elseif v.moisture == TUNING.FARM_PLANT_DRINK_LOW then
-			data.costMoisture = 1
-		elseif v.moisture == TUNING.FARM_PLANT_DRINK_MED then
-			data.costMoisture = 2
-		elseif v.moisture == TUNING.FARM_PLANT_DRINK_HIGH then
-			data.costMoisture = 4
+		if v.cost_moisture ~= nil then --获取自定义的需水量
+			data.cost_moisture = v.cost_moisture
+		elseif v.moisture.drink_rate == TUNING.FARM_PLANT_DRINK_LOW then
+			data.cost_moisture = 1
+		elseif v.moisture.drink_rate == TUNING.FARM_PLANT_DRINK_MED then
+			data.cost_moisture = 2
+		elseif v.moisture.drink_rate == TUNING.FARM_PLANT_DRINK_HIGH then
+			data.cost_moisture = 4
 		end
 
 		--重新改需肥量
-		for k3,v3 in pairs(v.nutrient_consumption) do
-			if v3 ~= nil and data.costNutrient < v3 then
-				data.costNutrient = v3
+		for _,v3 in pairs(v.nutrient_consumption) do
+			if v3 ~= nil and data.cost_nutrient < v3 then
+				data.cost_nutrient = v3
 			end
 		end
-		if data.costNutrient > 2 and data.costNutrient <= 4 then
-			data.costNutrient = 3
-		elseif data.costNutrient > 4 then
-			data.costNutrient = 4
+		if data.cost_nutrient > 2 and data.cost_nutrient <= 4 then
+			data.cost_nutrient = 3
+		elseif data.cost_nutrient > 4 then
+			data.cost_nutrient = 4
 		end
 
 		--确定再生的阶段
-		if v.regrowStage ~= nil then
-			data.regrowStage = v.regrowStage
+		if v.regrowstage ~= nil then
+			data.regrowstage = v.regrowstage
 		elseif regrowMaps[k] ~= nil then
-			data.regrowStage = regrowMaps[k]
+			data.regrowstage = regrowMaps[k]
 		end
-		if data.regrowStage >= countstage then
-			data.regrowStage = 1
+		if data.regrowstage >= countstage then
+			data.regrowstage = 1
 		end
-
-		--确定永恒生长阶段
-		if data.eternalStage == nil then
-			data.eternalStage = countstage --默认就是最终阶段
-		end
-
-		--确定资源
-		-- InitAssets(data, v.assets, {
-		-- 	Asset("ANIM", "anim/"..data.bank..".zip"),
-		-- 	Asset("ANIM", "anim/siving_soil.zip"),
-		-- 	Asset("SCRIPT", "scripts/prefabs/weed_defs.lua"),
-		-- })
-		-- InitPrefabs(data, v.prefabs or v.prefab_deps, {
-		-- 	"spoiled_food",
-		-- 	"farm_plant_happy", "farm_plant_unhappy",
-		-- 	"siving_soil",
-		-- 	"dirt_puff",
-		-- 	"cropgnat", "cropgnat_infester"
-		-- })
 
 		if data.sounds == nil then
 			data.sounds = {
-				grow_rot = "farming/common/farm/rot",
+				grow_full = "farming/common/farm/grow_full",
+				grow_rot = "farming/common/farm/rot"
 			}
 		end
 
@@ -441,7 +383,54 @@ local function CallDefender(inst, target)
 	end
 end
 
+
+
+
+local function DescriptionFn(inst, doer)
+	return inst.components.perennialcrop:SayDetail(doer, false)
+end
+local function GetStatusFn(inst)
+	if inst.components.burnable ~= nil and inst.components.burnable:IsBurning() then
+		return "BURNING"
+	end
+	local crop = inst.components.perennialcrop
+	if crop.stagedata.name == "seed" then
+		return "SEED"
+	elseif crop.isrotten then
+		return crop.ishuge and "ROTTEN_OVERSIZED" or "ROTTEN"
+	elseif crop.stage == crop.stage_max then
+		return crop.ishuge and "FULL_OVERSIZED" or "FULL"
+	else
+		return "GROWING"
+	end
+end
+
 local function MakePlant(data)
+	local function GetDisplayName(inst)
+		local stagename = nil
+		for k, v in pairs(data.stages) do
+			if inst.AnimState:IsCurrentAnimation(v.anim) or inst.AnimState:IsCurrentAnimation(v.anim_grow) then
+				stagename = v.name
+				break
+			end
+		end
+		for k, v in pairs(data.stages_other) do
+			if inst.AnimState:IsCurrentAnimation(v.anim) or inst.AnimState:IsCurrentAnimation(v.anim_grow) then
+				stagename = v.name
+				break
+			end
+		end
+
+		local basename = STRINGS.NAMES[string.upper(data.prefab_old)]
+		if stagename == nil then
+			return basename
+		elseif STRINGS.CROP_LEGION[string.upper(stagename)] ~= nil then
+			return subfmt(STRINGS.CROP_LEGION[string.upper(stagename)], {crop = basename})
+		else
+			return subfmt(STRINGS.CROP_LEGION.GROWING, {crop = basename})
+		end
+	end
+
 	return Prefab(
 		data.prefab,
 		function()
@@ -467,34 +456,7 @@ local function MakePlant(data)
 				end
 			end
 
-			inst.displaynamefn = function(inst)
-				local stagename = nil
-				for k, v in pairs(data.stages) do
-					if v ~= nil then
-						if inst.AnimState:IsCurrentAnimation(v.anim) or inst.AnimState:IsCurrentAnimation(v.anim_grow) then
-							stagename = v.name
-							break
-						end
-					end
-				end
-				for k, v in pairs(data.stages_other) do
-					if v ~= nil then
-						if inst.AnimState:IsCurrentAnimation(v.anim) or inst.AnimState:IsCurrentAnimation(v.anim_grow) then
-							stagename = v.name
-							break
-						end
-					end
-				end
-
-				local basename = STRINGS.NAMES[string.upper(data.prefab_old)]
-				if stagename == nil then
-					return basename
-				elseif STRINGS.CROP_LEGION[string.upper(stagename)] ~= nil then
-					return subfmt(STRINGS.CROP_LEGION[string.upper(stagename)], {crop = basename})
-				else
-					return subfmt(STRINGS.CROP_LEGION.GROWING, {crop = basename})
-				end
-			end
+			inst.displaynamefn = GetDisplayName
 
 			if data.fn_common ~= nil then
 				data.fn_common(inst)
@@ -507,26 +469,8 @@ local function MakePlant(data)
 
 			inst:AddComponent("inspectable")
 			inst.components.inspectable.nameoverride = "FARM_PLANT"
-			inst.components.inspectable.descriptionfn = function(inst, doer) --提示自身的生长数据
-				return inst.components.perennialcrop:SayDetail(doer, false)
-			end
-			inst.components.inspectable.getstatus = function(inst)
-				if inst.components.burnable ~= nil and inst.components.burnable:IsBurning() then
-					return "BURNING"
-				end
-
-				local crop = inst.components.perennialcrop
-
-				if crop.stagedata.name == "seed" then
-					return "SEED"
-				elseif crop.isrotten then
-					return crop.ishuge and "ROTTEN_OVERSIZED" or "ROTTEN"
-				elseif crop.stage == crop.stage_max then
-					return crop.ishuge and "FULL_OVERSIZED" or "FULL"
-				else
-					return "GROWING"
-				end
-			end
+			inst.components.inspectable.descriptionfn = DescriptionFn --提示自身的生长数据
+			inst.components.inspectable.getstatus = GetStatusFn
 
 			inst:AddComponent("hauntable")
 			inst.components.hauntable:SetHauntValue(TUNING.HAUNT_TINY)

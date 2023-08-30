@@ -401,7 +401,23 @@ function PerennialCrop2:GetGrowTime() --获取当前阶段的总生长时间
 end
 function PerennialCrop2:UpdateTimeMult() --更新生长速度
 	local multnew = 1
-	if self.isrotten or self.stage == self.stage_max then --枯萎恢复与过熟时间不受影响
+	if self.isrotten or self.stage == self.stage_max then --枯萎恢复与过熟时间
+		if self.isrotten then
+			if TheWorld.state.season == "winter" then
+				multnew = self.growthmults[4]
+			elseif TheWorld.state.season == "summer" then
+				multnew = self.growthmults[2]
+			elseif TheWorld.state.season == "spring" then
+				multnew = self.growthmults[1]
+			else --默认为秋，其他mod的特殊季节默认都为秋季
+				multnew = self.growthmults[3]
+			end
+			if multnew > 1 and multnew < 2 then --枯萎恢复的话，在喜好季节是直接时间减半
+				multnew = 2
+			else --不喜好季节还是默认速度
+				multnew = 1
+			end
+		end
 		if self.fn_timemult ~= nil then
 			multnew = self.fn_timemult(self, multnew)
 			if multnew ~= nil and multnew <= 0 then
