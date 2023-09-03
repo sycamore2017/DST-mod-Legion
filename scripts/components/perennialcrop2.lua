@@ -339,7 +339,6 @@ function PerennialCrop2:TriggerGrowInDark(isadd) --控制是否能在黑暗中�
 		self.cangrowindrak = nil
 
 		inst:WatchWorldState("isnight", OnIsDark)
-		-- inst:ListenForEvent("seasontick", OnSeasonTick_p2) --季节变换时更新生长速度（不用了，本来每天就会更新生长）
 		inst:DoTaskInTime(math.random(), function(inst)
 			OnIsDark(inst)
 		end)
@@ -401,30 +400,7 @@ function PerennialCrop2:GetGrowTime() --获取当前阶段的总生长时间
 end
 function PerennialCrop2:UpdateTimeMult() --更新生长速度
 	local multnew = 1
-	if self.isrotten or self.stage == self.stage_max then --枯萎恢复与过熟时间
-		if self.isrotten then
-			if TheWorld.state.season == "winter" then
-				multnew = self.growthmults[4]
-			elseif TheWorld.state.season == "summer" then
-				multnew = self.growthmults[2]
-			elseif TheWorld.state.season == "spring" then
-				multnew = self.growthmults[1]
-			else --默认为秋，其他mod的特殊季节默认都为秋季
-				multnew = self.growthmults[3]
-			end
-			if multnew > 1 and multnew < 2 then --枯萎恢复的话，在喜好季节是直接时间减半
-				multnew = 2
-			else --不喜好季节还是默认速度
-				multnew = 1
-			end
-		end
-		if self.fn_timemult ~= nil then
-			multnew = self.fn_timemult(self, multnew)
-			if multnew ~= nil and multnew <= 0 then
-				multnew = nil
-			end
-		end
-	else
+	if self.isrotten then
 		if TheWorld.state.season == "winter" then
 			multnew = self.growthmults[4]
 		elseif TheWorld.state.season == "summer" then
@@ -434,25 +410,39 @@ function PerennialCrop2:UpdateTimeMult() --更新生长速度
 		else --默认为秋，其他mod的特殊季节默认都为秋季
 			multnew = self.growthmults[3]
 		end
-		if self.fn_timemult ~= nil then
-			multnew = self.fn_timemult(self, multnew)
+		if multnew > 1 and multnew < 2 then --枯萎恢复的话，在喜好季节是直接时间减半
+			multnew = 2
+		else --不喜好季节还是默认速度
+			multnew = 1
 		end
-		if multnew ~= nil and multnew <= 0 then
-			multnew = nil
-		else
-			--浇水、施肥、照顾，能加快生长
-			local mulmul = 1.0
-			if not self.notmoisture and self.donemoisture then
-				mulmul = mulmul + 0.15
-			end
-			if not self.notnutrient and self.donenutrient then
-				mulmul = mulmul + 0.2
-			end
-			if not self.nottendable and self.donetendable then
-				mulmul = mulmul + 0.15
-			end
-			multnew = multnew * mulmul
+	elseif self.stage ~= self.stage_max then
+		if TheWorld.state.season == "winter" then
+			multnew = self.growthmults[4]
+		elseif TheWorld.state.season == "summer" then
+			multnew = self.growthmults[2]
+		elseif TheWorld.state.season == "spring" then
+			multnew = self.growthmults[1]
+		else --默认为秋，其他mod的特殊季节默认都为秋季
+			multnew = self.growthmults[3]
 		end
+		--浇水、施肥、照顾，能加快生长
+		local mulmul = 1.0
+		if not self.notmoisture and self.donemoisture then
+			mulmul = mulmul + 0.15
+		end
+		if not self.notnutrient and self.donenutrient then
+			mulmul = mulmul + 0.2
+		end
+		if not self.nottendable and self.donetendable then
+			mulmul = mulmul + 0.15
+		end
+		multnew = multnew * mulmul
+	end
+	if self.fn_timemult ~= nil then
+		multnew = self.fn_timemult(self, multnew)
+	end
+	if multnew ~= nil and multnew <= 0 then
+		multnew = nil
 	end
 	if multnew ~= self.time_mult then
 		local dt = GetTime()
@@ -782,7 +772,6 @@ function PerennialCrop2:DoGrowth() --生长到下一阶段
 	end
 	self:SetStage(data.stage)
 end
-
 local function OnPicked(inst, doer, loot)
 	local crop = inst.components.perennialcrop2
 	local regrowstage = crop.isrotten and 1 or crop.regrowstage
@@ -864,8 +853,8 @@ function PerennialCrop2:SetStage(stage, isrotten) --设置为某阶段
 		self.inst.components.pickable:SetUp(nil)
 		-- self.inst.components.pickable.use_lootdropper_for_product = true
 		self.inst.components.pickable.picksound = rotten and "dontstarve/wilson/harvest_berries"
-																or "dontstarve/wilson/pickup_plants"
-	else
+													or "dontstarve/wilson/pickup_plants"
+	elseif self.inst.components.pickable ~= nil then
 		self.inst:RemoveComponent("pickable")
 	end
 
@@ -1005,7 +994,7 @@ function PerennialCrop2:GenerateLoot(doer, ispicked, isburnt) --生成收获物
 		if self.fn_pick ~= nil then
 			self.fn_pick(self, doer, loot)
 		end
-		if doer then
+		if doer ~= nil then
 			doer:PushEvent("picksomething", { object = self.inst, loot = loot })
 			if doer.components.inventory ~= nil then --给予采摘者
 				for _, item in pairs(loot) do
@@ -1061,8 +1050,8 @@ function PerennialCrop2:CostController() --从管理器拿取养料、水分、�
 	end
 
 	local clusterplus = math.max( math.floor(self.cluster*0.5), 1 )
-	for _,ctl in pairs(self.ctls) do
-		if ctl and ctl:IsValid() and ctl.components.botanycontroller ~= nil then
+	for _, ctl in pairs(self.ctls) do
+		if ctl:IsValid() and ctl.components.botanycontroller ~= nil then
 			local botanyctl = ctl.components.botanycontroller
 			local change = false
 			if not self.donemoisture and (botanyctl.type == 1 or botanyctl.type == 3) and botanyctl.moisture > 0 then

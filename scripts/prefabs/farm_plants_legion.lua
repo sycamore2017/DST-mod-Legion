@@ -74,6 +74,9 @@ for k, v in pairs(PLANT_DEFS) do
 			tags = v.tags,
 			build = v.build, bank = v.bank,
 			fireproof = v.fireproof, --是否防火
+			nomagicgrow = v.nomagicgrow, --是否不能催熟（原创）
+			nosick = v.nosick, --是否不产生病虫害（原创）
+			cangrowindrak = v.cangrowindrak, --是否能在黑暗中生长（原创）
 			sounds = v.sounds, --音效
 			prefab = v.prefab.."_legion", --作物 代码名称
 			prefab_old = v.prefab, --作物 原代码名称（目前是展示名字时使用）
@@ -83,7 +86,6 @@ for k, v in pairs(PLANT_DEFS) do
 			loot_huge_rot = v.loot_oversized_rot, --巨型产物腐烂后的收获物
 			cost_moisture = 1, --需水量
 			cost_nutrient = 2, --需肥量(这里只需要一个量即可，不需要关注肥料类型)
-			can_getsick = v.can_getsick ~= false, --是否能产生病虫害（原创）
 			stages = {}, --该植物生长有几个阶段，每个阶段的动画，以及是否处在花期（原创）
 			stages_other = { huge = nil, huge_rot = nil, rot = nil }, --巨大化阶段、巨大化枯萎、枯萎等阶段的数据（原创）
 			regrowstage = 1, --枯萎或者采摘后重新开始生长的阶段（原创）
@@ -91,6 +93,7 @@ for k, v in pairs(PLANT_DEFS) do
 			killjoystolerance = v.max_killjoys_tolerance, --扫兴容忍度：一般都为0
 			fn_common = v.fn_common, --额外设定函数（通用）：fn(inst)
 			fn_server = v.fn_server, --额外设定函数（主机）：fn(inst)
+			fn_defend = v.fn_defend, --作物被采集/破坏时会寻求庇护的函数：fn(inst, target)
 			fn_stage = v.fn_stage --每次设定生长阶段时额外触发的函数：fn(inst, isfull)
 		}
 
@@ -173,29 +176,14 @@ for k, v in pairs(PLANT_DEFS) do
 	end
 end
 
---勋章的作物，目前都是不腐烂的设定
-local dd = defs["immortal_fruit"]
-if dd ~= nil then
-	dd.stages[#dd.stages].time = nil
-	dd.stages_other.huge.time = nil
-	dd.stages_other.rot = nil
-	dd.stages_other.huge_rot = nil
-	dd = nil
-end
-dd = defs["medal_gift_fruit"]
-if dd ~= nil then
-	dd.stages[#dd.stages].time = nil
-	dd.stages_other.huge.time = nil
-	dd.stages_other.rot = nil
-	dd.stages_other.huge_rot = nil
-	dd = nil
-end
-
 for k, v in pairs(WEED_DEFS) do
 	local data = {
 		tags = v.tags or v.extra_tags,
 		build = v.build, bank = v.bank,
 		fireproof = v.fireproof, --是否防火
+		nomagicgrow = v.nomagicgrow, --是否不能催熟（原创）
+		nosick = v.nosick, --是否不产生病虫害（原创）
+		cangrowindrak = v.cangrowindrak, --是否能在黑暗中生长（原创）
 		sounds = v.sounds, --音效
 		prefab = v.prefab.."_legion", --作物 代码名称
 		prefab_old = v.prefab, --作物 原代码名称（目前是展示名字时使用）
@@ -205,7 +193,6 @@ for k, v in pairs(WEED_DEFS) do
 		loot_huge_rot = v.loot_oversized_rot, --巨型产物腐烂后的收获物
 		cost_moisture = 1, --需水量
 		cost_nutrient = 2, --需肥量(这里只需要一个量即可，不需要关注肥料类型)
-		can_getsick = v.can_getsick ~= false, --是否能产生病虫害（原创）
 		stages = {}, --该植物生长有几个阶段，每个阶段的动画，以及是否处在花期（原创）
 		stages_other = { rot = nil }, --枯萎等阶段的数据（原创）
 		regrowstage = 1, --枯萎或者采摘后重新开始生长的阶段（原创）
@@ -213,6 +200,7 @@ for k, v in pairs(WEED_DEFS) do
 		killjoystolerance = v.killjoystolerance or 1, --扫兴容忍度：杂草为1，容忍度比作物高
 		fn_common = v.fn_common, --额外设定函数（通用）：fn(inst)
 		fn_server = v.fn_server or v.masterpostinit, --额外设定函数（主机）：fn(inst)
+		fn_defend = v.fn_defend, --作物被采集/破坏时会寻求庇护的函数：fn(inst, target)
 		-- fn_stage = v.fn_stage or v.OnMakeFullFn, --每次设定生长阶段时额外触发的函数：fn(inst, isfull)
 	}
 
@@ -283,13 +271,6 @@ for k, v in pairs(WEED_DEFS) do
 			data.regrowstage = 1
 		end
 
-		if data.sounds == nil then
-			data.sounds = {
-				grow_full = "farming/common/farm/grow_full",
-				grow_rot = "farming/common/farm/rot"
-			}
-		end
-
 		--设置其他
 		if k == "weed_tillweed" then --不能设置犁地草的犁地效果
 			data.fn_stage = v.fn_stage
@@ -314,82 +295,32 @@ for k, v in pairs(WEED_DEFS) do
 	end
 end
 
+--勋章的作物，目前都是不腐烂的设定
+local dd = defs["immortal_fruit"]
+if dd ~= nil then
+	dd.stages[#dd.stages].time = nil
+	dd.stages_other.huge.time = nil
+	dd.stages_other.rot = nil
+	dd.stages_other.huge_rot = nil
+	dd = nil
+end
+dd = defs["medal_gift_fruit"]
+if dd ~= nil then
+	dd.stages[#dd.stages].time = nil
+	dd.stages_other.huge.time = nil
+	dd.stages_other.rot = nil
+	dd.stages_other.huge_rot = nil
+	dd = nil
+end
+
 --------------------------------------------------------------------------
 --[[ 子圭·垄的多年生植物 ]]
 --------------------------------------------------------------------------
 
-local function EmptyCptFn(self, ...)
-	--nothing
-end
-
-local function RemovePlant(inst, lastprefab, lootprefab)
-	local x, y, z = inst.Transform:GetWorldPosition()
-	if lastprefab ~= nil then
-		SpawnPrefab(lastprefab).Transform:SetPosition(x, y, z)
-	end
-	if lootprefab ~= nil then
-		inst.components.lootdropper:SpawnLootPrefab(lootprefab)
-	end
-	inst.components.lootdropper:DropLoot()
-	inst:Remove()
-end
-
-local function IsTooDarkToGrow(inst)
-	if inst.components.perennialcrop:CanGrowInDark() then
-		return false
-	end
-	return TOOLS_L.IsTooDarkToGrow(inst)
-end
-local function UpdateGrowing(inst)
-	if (inst.components.burnable == nil or not inst.components.burnable.burning) and not IsTooDarkToGrow(inst) then
-		inst.components.perennialcrop:Resume()
-	else
-		inst.components.perennialcrop:Pause()
-	end
-end
-local function OnIsDark(inst)
-	UpdateGrowing(inst)
-	if TheWorld.state.isnight then
-		if inst.nighttask == nil then
-			inst.nighttask = inst:DoPeriodicTask(5, UpdateGrowing, math.random() * 5)
-		end
-	else
-		if inst.nighttask ~= nil then
-			inst.nighttask:Cancel()
-			inst.nighttask = nil
-		end
-	end
-end
-
-local function OnIsRaining(inst)
-	if inst.components.perennialcrop then
-		--不管雨始还是雨停，增加一半的蓄水量(反正一场雨结束，总共只加最大蓄水量的数值)
-		inst.components.perennialcrop:PourWater(nil, nil, inst.components.perennialcrop.moisture_max/2)
-	end
-end
-
-local function CallDefender(inst, target)
-	if target ~= nil then
-		inst:RemoveTag("farm_plant_defender")
-
-		local x, y, z = inst.Transform:GetWorldPosition()
-		local defenders = TheSim:FindEntities(x, y, z, TUNING.FARM_PLANT_DEFENDER_SEARCH_DIST, {"farm_plant_defender"})
-		for _, defender in ipairs(defenders) do
-			if defender.components.burnable == nil or not defender.components.burnable.burning then
-				defender:PushEvent("defend_farm_plant", {source = inst, target = target})
-				break
-			end
-		end
-	end
-end
-
-
-
-
-local function DescriptionFn(inst, doer)
+local function DescriptionFn_p(inst, doer)
 	return inst.components.perennialcrop:SayDetail(doer, false)
 end
-local function GetStatusFn(inst)
+local function GetStatusFn_p(inst)
 	if inst.components.burnable ~= nil and inst.components.burnable:IsBurning() then
 		return "BURNING"
 	end
@@ -469,104 +400,15 @@ local function MakePlant(data)
 
 			inst:AddComponent("inspectable")
 			inst.components.inspectable.nameoverride = "FARM_PLANT"
-			inst.components.inspectable.descriptionfn = DescriptionFn --提示自身的生长数据
-			inst.components.inspectable.getstatus = GetStatusFn
+			inst.components.inspectable.descriptionfn = DescriptionFn_p --提示自身的生长数据
+			inst.components.inspectable.getstatus = GetStatusFn_p
 
 			inst:AddComponent("hauntable")
 			inst.components.hauntable:SetHauntValue(TUNING.HAUNT_TINY)
 
-			inst:AddComponent("lootdropper")
-			inst.components.lootdropper:SetLootSetupFn(function(lootdropper)
-				local crop = lootdropper.inst.components.perennialcrop
-				local numfruitplus = crop.pollinated >= crop.pollinated_max
-
-				if crop.ishuge then
-					if crop.isrotten then
-						lootdropper:SetLoot(data.loot_huge_rot)
-					else
-						lootdropper:SetLoot(numfruitplus and {data.product_huge, data.product} or {data.product_huge})
-					end
-				elseif crop.stage < crop.stage_max then
-					if crop.isrotten then
-						lootdropper:SetLoot({"spoiled_food"})
-					else
-						local loot = math.random() < 0.5 and {"cutgrass"} or {"twigs"}
-						if crop.isflower then
-							table.insert(loot, "petals")
-						end
-						lootdropper:SetLoot(loot)
-					end
-				else
-					local numfruit = 1
-					if crop.num_perfect ~= nil then
-						if crop.num_perfect >= 5 then
-							numfruit = 3
-						elseif crop.num_perfect > 2 then
-							numfruit = 2
-						end
-					end
-					if numfruitplus then
-						numfruit = numfruit + 1
-					end
-
-					local loot = {}
-					local product = crop.isrotten and "spoiled_food" or (data.product or "cutgrass")
-					for i = 1, numfruit, 1 do
-						table.insert(loot, product)
-					end
-					lootdropper:SetLoot(loot)
-				end
-			end)
-
-			inst:AddComponent("workable")
-			inst.components.workable:SetWorkAction(ACTIONS.DIG)
-			inst.components.workable:SetWorkLeft(1)
-			inst.components.workable:SetOnFinishCallback(function(inst, worker)
-				if inst.components.perennialcrop.fn_defend ~= nil then
-					inst.components.perennialcrop.fn_defend(inst, worker)
-				end
-				RemovePlant(inst, "dirt_puff", "siving_soil_item") --被破坏，生成未放置的栽培土
-			end)
-
-			if not data.fireproof then
-				MakeSmallBurnable(inst)
-				MakeSmallPropagator(inst)
-				inst.components.burnable:SetOnBurntFn(function(inst)
-					RemovePlant(inst, "siving_soil", "ash") --被烧掉，生成被放置的栽培土
-				end)
-				inst.components.burnable:SetOnIgniteFn(function(inst, source, doer)
-					UpdateGrowing(inst)
-				end)
-				inst.components.burnable:SetOnExtinguishFn(function(inst)
-					UpdateGrowing(inst)
-				end)
-			end
-
-			inst:AddComponent("growable")
-			inst.components.growable.stages = {}
-			inst.components.growable:StopGrowing()
-			inst.components.growable.magicgrowable = true --非常规造林学生效标志（其他会由组件来施行）
-			inst.components.growable.domagicgrowthfn = function(inst, doer)
-				if inst:IsValid() then
-					return inst.components.perennialcrop:DoMagicGrowth(doer, 2*TUNING.TOTAL_DAY_TIME)
-				end
-				return false
-			end
-			inst.components.growable.GetCurrentStageData = function(self) return { tendable = false } end
-
-			inst:AddComponent("farmplanttendable")
-			inst.components.farmplanttendable.ontendtofn = function(inst, doer)
-				inst.components.perennialcrop:TendTo(doer, true)
-				return true
-			end
-			inst.components.farmplanttendable.OnSave = EmptyCptFn --照顾组件的数据不能保存下来，否则会影响 perennialcrop
-			inst.components.farmplanttendable.OnLoad = EmptyCptFn
-
 			inst:AddComponent("perennialcrop")
 			inst.components.perennialcrop:SetUp(data)
-			inst.components.perennialcrop.fn_defend = CallDefender
-			inst.components.perennialcrop:SetStage(1, false, false, true, false)
-			inst.components.perennialcrop:StartGrowing()
+			inst.components.perennialcrop:SetStage(1, false, false)
 			inst.components.perennialcrop.onctlchange = function(inst, ctls)
 				local types = {}
 				for guid,ctl in pairs(ctls) do
@@ -599,22 +441,6 @@ local function MakePlant(data)
 				end
 			end
 
-			inst:AddComponent("moisture") --浇水机制由潮湿度组件控制（能让水球、神话的玉净瓶等起作用）
-			inst.components.moisture.OnUpdate = EmptyCptFn --取消下雨时的潮湿度增加
-			inst.components.moisture.OnSave = EmptyCptFn
-			inst.components.moisture.OnLoad = EmptyCptFn
-			inst.components.moisture.DoDelta = function(self, num, ...)
-				if num > 0 then
-					self.inst.components.perennialcrop:PourWater(nil, nil, num)
-				end
-			end
-
-			inst:WatchWorldState("israining", OnIsRaining) --下雨时补充水分
-			inst:WatchWorldState("isnight", OnIsDark) --黑暗中无法继续生长
-			inst:DoTaskInTime(0, function()
-				OnIsDark(inst)
-			end)
-
 			inst.fn_planted = function(inst, pt)
 				--寻找周围的管理器
 				local ents = TheSim:FindEntities(pt.x, pt.y, pt.z, 20,
@@ -638,8 +464,8 @@ local function MakePlant(data)
 
 			return inst
 		end,
-		data.assets,
-		data.prefabs
+		nil,
+		nil
 	)
 end
 
