@@ -692,7 +692,7 @@ function PerennialCrop2:DoOverripe() --过熟（掉落果子，给周围植物�
 				{ "NOCLICK", "FX", "INLIMBO" },
 				{ "crop_legion", "withered", "barren" }
 			)
-			for _,v in pairs(ents) do
+			for _, v in pairs(ents) do
 				local cpt = nil
 				if v.components.pickable ~= nil then
 					if v.components.pickable:CanBeFertilized() then
@@ -1332,7 +1332,7 @@ function PerennialCrop2:TendTo(doer, wish) --照顾
 	end
 	if not self.inst:IsAsleep() then
 		-- local tended = self.donetendable --记下此时状态，因为0.5秒后状态可能已经发生改变
-		self.inst:DoTaskInTime(0.5 + math.random() * 0.5, function()
+		self.inst:DoTaskInTime(0.5 + math.random()*0.5, function()
 			local fx = SpawnPrefab(tended and "farm_plant_happy" or "farm_plant_unhappy")
 			if fx ~= nil then
 				fx.Transform:SetPosition(self.inst.Transform:GetWorldPosition())

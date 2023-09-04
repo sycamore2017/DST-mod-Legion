@@ -390,10 +390,15 @@ local function OnPlant(seed, doer, soilorcrop)
                 plant.components.perennialcrop:DisplayCrop(soilorcrop, doer)
             end
 
+            plant.soilskin_l = soilorcrop.soilskin_l
+            if plant.fn_soiltype ~= nil then
+                plant.fn_soiltype(plant, soilorcrop.soiltype_l)
+            end
+
             soilorcrop:Remove()
             seed:Remove()
 
-            if plant.fn_planted then
+            if plant.fn_planted ~= nil then
                 plant.fn_planted(plant, pt)
             end
 
@@ -605,7 +610,6 @@ if FindFarmPlant then
                 local cropcpt = plant.components.perennialcrop or plant.components.perennialcrop2
                 if
                     not plant or not plant:IsValid() or not IsNearFollowPos(self, plant) or
-                    (plant.components.perennialcrop ~= nil and not cropcpt.tendable) or
                     not (self.validplantfn == nil or self.validplantfn(self.inst, plant))
                 then
                     self.inst.planttarget = nil

@@ -55,7 +55,7 @@ function BotanyController:TriggerPlant(isadd)
         { "NOCLICK", "FX", "INLIMBO" },
         { "crop_legion", "crop2_legion" }
     )
-    for _,v in pairs(ents) do
+    for _, v in pairs(ents) do
         if v.components.perennialcrop ~= nil then
             v.components.perennialcrop:TriggerController(self.inst, isadd)
         elseif v.components.perennialcrop2 ~= nil then

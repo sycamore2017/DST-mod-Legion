@@ -302,7 +302,13 @@ if dd ~= nil then
 	dd.stages_other.huge.time = nil
 	dd.stages_other.rot = nil
 	dd.stages_other.huge_rot = nil
-	dd = nil
+
+	if CONFIGS_LEGION.SIVSOLTOMEDAL then
+		dd = defs["weed_ivy"]
+		if dd ~= nil and dd.product == nil then
+			dd.product = "medal_ivy" --旋花藤：勋章的针刺旋花特殊产物
+		end
+	end
 end
 dd = defs["medal_gift_fruit"]
 if dd ~= nil then
@@ -333,6 +339,87 @@ local function GetStatusFn_p(inst)
 		return crop.ishuge and "FULL_OVERSIZED" or "FULL"
 	else
 		return "GROWING"
+	end
+end
+local function OnWorkedFinish_p(inst, worker)
+	local crop = inst.components.perennialcrop
+
+	local x, y, z = inst.Transform:GetWorldPosition()
+	SpawnPrefab("dirt_puff").Transform:SetPosition(x, y, z)
+
+	if crop.fn_defend ~= nil then
+		crop.fn_defend(inst, worker)
+	end
+	crop:GenerateLoot(worker, false, false)
+	inst:Remove()
+end
+local function UpdateSoilType_p(inst, soiltype)
+	if soiltype ~= nil then
+		inst.soiltype_l = soiltype
+	end
+	local soilbuild = "siving_soil"
+	if inst.soilskin_l ~= nil then
+		soilbuild = soilbuild..inst.soilskin_l
+	end
+	inst.AnimState:OverrideSymbol("soil01", soilbuild, "soil0"..inst.soiltype_l)
+end
+local function OnCtlChange_p(inst, ctls)
+	local types = {}
+	for guid, ctl in pairs(ctls) do
+		if ctl:IsValid() and ctl.components.botanycontroller ~= nil then
+			local type = ctl.components.botanycontroller.type
+			if type == 3 then
+				types[3] = true
+				break
+			elseif type == 2 then
+				types[2] = true
+			elseif type == 1 then
+				types[1] = true
+			end
+
+			if types[2] and types[1] then
+				types[3] = true
+				break
+			end
+		end
+	end
+	if types[3] or (types[2] and types[1]) then
+		inst.fn_soiltype(inst, "4")
+	elseif types[2] then
+		inst.fn_soiltype(inst, "3")
+	elseif types[1] then
+		inst.fn_soiltype(inst, "2")
+	else
+		inst.fn_soiltype(inst, "1")
+	end
+end
+local function OnPlant_p(inst, pt)
+	local cpt = inst.components.perennialcrop
+	local ents = TheSim:FindEntities(pt.x, pt.y, pt.z, 20, --寻找周围的管理器
+		{ "siving_ctl" },
+		{ "NOCLICK", "INLIMBO" },
+		nil
+	)
+	for _,v in ipairs(ents) do
+		if v.components.botanycontroller ~= nil then
+			cpt:TriggerController(v, true, true)
+		end
+	end
+	cpt:CostNutrition(true)
+	cpt:UpdateTimeMult() --更新生长速度
+end
+
+local function OnSave_p(inst, data)
+	if inst.soilskin_l ~= nil then
+		data.soilskin_l = inst.soilskin_l
+	end
+end
+local function OnLoad_p(inst, data)
+	if data ~= nil then
+		if data.soilskin_l ~= nil then
+			inst.soilskin_l = data.soilskin_l
+			inst.fn_soiltype(inst, nil)
+		end
 	end
 end
 
@@ -398,6 +485,9 @@ local function MakePlant(data)
 				return inst
 			end
 
+			inst.soiltype_l = "1"
+			inst.soilskin_l = nil
+
 			inst:AddComponent("inspectable")
 			inst.components.inspectable.nameoverride = "FARM_PLANT"
 			inst.components.inspectable.descriptionfn = DescriptionFn_p --提示自身的生长数据
@@ -406,57 +496,21 @@ local function MakePlant(data)
 			inst:AddComponent("hauntable")
 			inst.components.hauntable:SetHauntValue(TUNING.HAUNT_TINY)
 
+			inst:AddComponent("workable")
+			inst.components.workable:SetWorkAction(ACTIONS.DIG)
+			inst.components.workable:SetWorkLeft(1)
+			inst.components.workable:SetOnFinishCallback(OnWorkedFinish_p)
+
 			inst:AddComponent("perennialcrop")
+			inst.components.perennialcrop.onctlchange = OnCtlChange_p
 			inst.components.perennialcrop:SetUp(data)
 			inst.components.perennialcrop:SetStage(1, false, false)
-			inst.components.perennialcrop.onctlchange = function(inst, ctls)
-				local types = {}
-				for guid,ctl in pairs(ctls) do
-					if ctl:IsValid() and ctl.components.botanycontroller ~= nil then
-						local type = ctl.components.botanycontroller.type
-						if type == 3 then
-							types[3] = true
-							break
-						elseif type == 2 then
-							types[2] = true
-						elseif type == 1 then
-							types[1] = true
-						end
 
-						if types[2] and types[1] then
-							types[3] = true
-							break
-						end
-					end
-				end
+			inst.fn_planted = OnPlant_p
+			inst.fn_soiltype = UpdateSoilType_p
 
-				if types[3] or (types[2] and types[1]) then
-					inst.AnimState:OverrideSymbol("soil01", "siving_soil", "soil04")
-				elseif types[2] then
-					inst.AnimState:OverrideSymbol("soil01", "siving_soil", "soil03")
-				elseif types[1] then
-					inst.AnimState:OverrideSymbol("soil01", "siving_soil", "soil02")
-				else
-					inst.AnimState:OverrideSymbol("soil01", "siving_soil", "soil01")
-				end
-			end
-
-			inst.fn_planted = function(inst, pt)
-				--寻找周围的管理器
-				local ents = TheSim:FindEntities(pt.x, pt.y, pt.z, 20,
-					{ "siving_ctl" },
-					{ "NOCLICK", "INLIMBO" },
-					nil
-				)
-				for _,v in pairs(ents) do
-					if v:IsValid() and v.components.botanycontroller ~= nil then
-						inst.components.perennialcrop:TriggerController(v, true, true)
-					end
-				end
-				if TheWorld.state.israining or TheWorld.state.issnowing then
-					inst.components.perennialcrop:PourWater(nil, nil, inst.components.perennialcrop.moisture_max/2)
-				end
-			end
+			inst.OnSave = OnSave_p
+			inst.OnLoad = OnLoad_p
 
 			if data.fn_server ~= nil then
 				data.fn_server(inst)
@@ -530,8 +584,8 @@ local function OnPlant_p2(inst, pt)
 		{ "NOCLICK", "INLIMBO" },
 		nil
 	)
-	for _,v in pairs(ents) do
-		if v:IsValid() and v.components.botanycontroller ~= nil then
+	for _,v in ipairs(ents) do
+		if v.components.botanycontroller ~= nil then
 			cpt:TriggerController(v, true, true)
 		end
 	end

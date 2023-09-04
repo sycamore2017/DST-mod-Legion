@@ -1304,14 +1304,7 @@ local function FnBend_mask2(mask, doer, target, options)
         local cpt = target.components.perennialcrop
         if cpt.isrotten then
             if CalcuCost(mask, doer, 5) then
-                cpt:SetStage(cpt.stage, cpt.ishuge, false, true, false)
-                if cpt.timedata.paused then
-                    cpt.timedata.left = nil --不用管，StartGrowing()时会自动设置的
-                    cpt.timedata.start = nil
-                    cpt.timedata.all = nil
-                else
-                    cpt:StartGrowing()
-                end
+                cpt:SetStage(cpt.stage, cpt.ishuge, false)
             else
                 return false, "NOLIFE"
             end
