@@ -1,4 +1,5 @@
 local prefs = {}
+local TOOLS_L = require("tools_legion")
 
 --------------------------------------------------------------------------
 --[[ 白木吉他 ]]
@@ -489,6 +490,242 @@ table.insert(prefs, Prefab(
         "mat_whitewood_item"
     }
 ))
+
+--------------------------------------------------------------------------
+--[[ 白木展示台、白木展示柜 ]]
+--------------------------------------------------------------------------
+
+local invPrefabList = require("mod_inventoryprefabs_list")  --mod中有物品栏图片的prefabs的表
+local invBuildMaps = {
+    "images_minisign1", "images_minisign2", "images_minisign3",
+    "images_minisign4", "images_minisign5", "images_minisign6",
+    "images_minisign_skins1", "images_minisign_skins2" --7、8
+}
+
+local function SetShowSlot(inst, slot)
+    local item = inst.components.container.slots[slot]
+    if item == nil then
+        inst.AnimState:ClearOverrideSymbol("slot"..tostring(slot))
+        inst.AnimState:ClearOverrideSymbol("slotbg"..tostring(slot))
+    else
+        local atlas, bgimage, bgatlas
+        local image = FunctionOrValue(item.drawimageoverride, item, inst) or (#(item.components.inventoryitem.imagename or "") > 0 and item.components.inventoryitem.imagename) or item.prefab or nil
+        if image ~= nil then
+            atlas = FunctionOrValue(item.drawatlasoverride, item, inst) or (#(item.components.inventoryitem.atlasname or "") > 0 and item.components.inventoryitem.atlasname) or nil
+            if item.inv_image_bg ~= nil and item.inv_image_bg.image ~= nil and item.inv_image_bg.image:len() > 4 and item.inv_image_bg.image:sub(-4):lower() == ".tex" then
+                bgimage = item.inv_image_bg.image:sub(1, -5)
+                bgatlas = item.inv_image_bg.atlas ~= GetInventoryItemAtlas(item.inv_image_bg.image) and item.inv_image_bg.atlas or nil
+            end
+
+            if invPrefabList[image] ~= nil then
+                inst.AnimState:OverrideSymbol("slot"..tostring(slot), invBuildMaps[invPrefabList[image]] or invBuildMaps[1], image)
+            else
+                inst.AnimState:OverrideSymbol("slot"..tostring(slot), atlas or GetInventoryItemAtlas(image..".tex"), image..".tex")
+            end
+            if bgimage ~= nil then
+                if invPrefabList[bgimage] ~= nil then
+                    inst.AnimState:OverrideSymbol("slotbg"..tostring(slot), invBuildMaps[invPrefabList[bgimage]] or invBuildMaps[1], bgimage)
+                else
+                    inst.AnimState:OverrideSymbol("slotbg"..tostring(slot), bgatlas or GetInventoryItemAtlas(bgimage..".tex"), bgimage..".tex")
+                end
+            else
+                inst.AnimState:ClearOverrideSymbol("slotbg"..tostring(slot))
+            end
+        else
+            inst.AnimState:ClearOverrideSymbol("slot"..tostring(slot))
+            inst.AnimState:ClearOverrideSymbol("slotbg"..tostring(slot))
+        end
+    end
+end
+local function ItemGet_chest(inst, data)
+    if data and data.slot and data.slot <= inst.shownum_l then
+        SetShowSlot(inst, data.slot)
+    end
+end
+local function ItemLose_chest(inst, data)
+    if data and data.slot and data.slot <= inst.shownum_l then
+        SetShowSlot(inst, data.slot)
+    end
+end
+
+local function OnOpen_chest(inst)
+    if not inst:HasTag("burnt") then
+        inst.AnimState:PlayAnimation("open")
+        if inst.skin_open_sound then
+            inst.SoundEmitter:PlaySound(inst.skin_open_sound)
+        else
+            inst.SoundEmitter:PlaySound("dontstarve/wilson/chest_open")
+        end
+    end
+end
+local function OnClose_chest(inst)
+    if not inst:HasTag("burnt") then
+        inst.AnimState:PlayAnimation("close")
+        inst.AnimState:PushAnimation("closed", false)
+        if inst.skin_close_sound then
+            inst.SoundEmitter:PlaySound(inst.skin_close_sound)
+        else
+            inst.SoundEmitter:PlaySound("dontstarve/wilson/chest_close")
+        end
+        for i = 1, inst.shownum_l, 1 do
+            SetShowSlot(inst, i)
+        end
+    end
+end
+local function OnHit_chest(inst, worker)
+    if not inst:HasTag("burnt") then
+        if inst.components.container ~= nil then
+            inst.components.container:DropEverything()
+            inst.components.container:Close()
+        end
+        inst.AnimState:PlayAnimation("hit")
+        inst.AnimState:PushAnimation("closed", false)
+    end
+end
+local function OnHammered_chest(inst, worker)
+    if inst.components.burnable ~= nil and inst.components.burnable:IsBurning() then
+        inst.components.burnable:Extinguish()
+    end
+    inst.components.lootdropper:DropLoot()
+    if inst.components.container ~= nil then
+        inst.components.container:DropEverything()
+    end
+    local fx = SpawnPrefab("collapse_small")
+    fx.Transform:SetPosition(inst.Transform:GetWorldPosition())
+    fx:SetMaterial("wood")
+    inst:Remove()
+end
+
+local function OnSave_chest(inst, data)
+    if inst.components.burnable ~= nil and inst.components.burnable:IsBurning() or inst:HasTag("burnt") then
+        data.burnt = true
+    end
+end
+local function OnLoad_chest(inst, data)
+    if data ~= nil and data.burnt and inst.components.burnable ~= nil then
+        inst.components.burnable.onburnt(inst)
+    end
+end
+
+local function MakeChest(data)
+    table.insert(prefs, Prefab(
+        data.name,
+        function()
+            local inst = CreateEntity()
+
+            inst.entity:AddTransform()
+            inst.entity:AddAnimState()
+            inst.entity:AddSoundEmitter()
+            inst.entity:AddMiniMapEntity()
+            inst.entity:AddNetwork()
+
+            inst.MiniMapEntity:SetIcon("chest_whitewood.tex")
+
+            inst:AddTag("structure")
+            inst:AddTag("chest")
+
+            inst.AnimState:SetBank(data.name)
+            inst.AnimState:SetBuild(data.name)
+            inst.AnimState:PlayAnimation("closed")
+
+            TOOLS_L.MakeSnowCovered_comm(inst)
+
+            -- inst:AddComponent("skinedlegion")
+            -- inst.components.skinedlegion:Init(data.name)
+
+            -- if data.fn_common ~= nil then
+            --     data.fn_common(inst)
+            -- end
+
+            inst.entity:SetPristine()
+            if not TheWorld.ismastersim then
+                inst.OnEntityReplicated = function(inst) inst.replica.container:WidgetSetup(name) end
+                return inst
+            end
+
+            inst.shownum_l = 3
+
+            inst:AddComponent("inspectable")
+
+            inst:AddComponent("container")
+            inst.components.container:WidgetSetup(name)
+            inst.components.container.onopenfn = OnOpen_chest
+            inst.components.container.onclosefn = OnClose_chest
+            inst.components.container.skipclosesnd = true
+            inst.components.container.skipopensnd = true
+
+            inst:AddComponent("lootdropper")
+
+            inst:AddComponent("workable")
+            inst.components.workable:SetWorkAction(ACTIONS.HAMMER)
+            -- inst.components.workable:SetWorkLeft(2)
+            inst.components.workable:SetOnWorkCallback(OnHit_chest)
+            inst.components.workable:SetOnFinishCallback(OnHammered_chest)
+
+            inst:AddComponent("hauntable")
+            inst.components.hauntable:SetHauntValue(TUNING.HAUNT_TINY)
+
+            TOOLS_L.MakeSnowCovered_serv(inst, 0.1 + 0.3*math.random(), nil)
+
+            inst.OnSave = OnSave_chest
+            inst.OnLoad = OnLoad_chest
+
+            -- inst:ListenForEvent("onbuilt", onbuilt)
+            inst:ListenForEvent("itemget", ItemGet_chest)
+            inst:ListenForEvent("itemlose", ItemLose_chest)
+
+            -- inst.components.skinedlegion:SetOnPreLoad()
+
+            if data.fn_server ~= nil then
+                data.fn_server(inst)
+            end
+
+            return inst
+        end,
+        data.assets,
+        data.prefabs
+    ))
+end
+
+MakeChest({
+    name = "chest_whitewood",
+    assets = {
+        Asset("ANIM", "anim/chest_whitewood.zip"),
+        Asset("ANIM", "anim/hiddenmoonlight.zip"),
+        Asset("ANIM", "anim/ui_chester_shadow_3x4.zip"),
+        Asset("ANIM", "anim/ui_chest_whitewood_3x4.zip")
+    },
+    -- prefabs = {},
+    -- fn_common = function(inst)end,
+    fn_server = function(inst)
+        inst.shownum_l = 3
+
+        inst.components.workable:SetWorkLeft(2)
+
+        MakeMediumBurnable(inst, nil, nil, true)
+        MakeMediumPropagator(inst)
+    end
+})
+
+-- MakeChest({
+--     name = "chest_whitewood_big",
+--     assets = {
+--         Asset("ANIM", "anim/chest_whitewood_big.zip"),
+--         Asset("ANIM", "anim/hiddenmoonlight.zip"),
+--         Asset("ANIM", "anim/ui_bookstation_4x5.zip"),
+--         Asset("ANIM", "anim/ui_chest_whitewood_4x6.zip")
+--     },
+--     -- prefabs = {},
+--     -- fn_common = function(inst)end,
+--     fn_server = function(inst)
+--         inst.shownum_l = 8
+
+--         inst.components.workable:SetWorkLeft(4)
+
+--         MakeLargeBurnable(inst, nil, nil, true)
+--         MakeLargePropagator(inst)
+--     end
+-- })
 
 -----
 -----

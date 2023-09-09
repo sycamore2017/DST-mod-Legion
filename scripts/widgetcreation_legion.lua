@@ -8,7 +8,8 @@ local containers = require("containers")
 local showmeneed = {
     "backcub", "beefalo", "giantsfoot",
     "hiddenmoonlight", "revolvedmoonlight", "revolvedmoonlight_pro",
-    "boltwingout", "plant_nepenthes_l"
+    "boltwingout", "plant_nepenthes_l",
+    "chest_whitewood", "chest_whitewood_big"
 }
 local params = {}
 
@@ -388,6 +389,47 @@ function params.plant_nepenthes_l.itemtestfn(container, item, slot)
 		return not item:HasTag("glommerflower") --没有 glommerflower 就代表是枯萎了
     end
     return not (item:HasTag("irreplaceable") or item:HasTag("nobundling") or item:HasTag("nodigest_l"))
+end
+
+------
+--白木展示台
+------
+
+params.chest_whitewood = {
+    widget = {
+        slotpos = {},
+        animbank = "ui_chester_shadow_3x4",
+        animbuild = "ui_chest_whitewood_3x4",
+        pos = Vector3(0, 220, 0),
+        side_align_tip = 160
+    },
+    type = "chest"
+}
+for y = 2.5, -0.5, -1 do
+    for x = 0, 2 do
+        table.insert(params.chest_whitewood.widget.slotpos, Vector3(75*x - 75*2 + 75, 75*y - 75*2 + 75, 0))
+    end
+end
+
+------
+--白木展示柜
+------
+
+params.chest_whitewood_big = {
+    widget = {
+        slotpos = {},
+        animbank = "ui_bookstation_4x5",
+        animbuild = "ui_chest_whitewood_4x6",
+        pos = Vector3(0, 280, 0),
+        side_align_tip = 160
+    },
+    type = "chest"
+}
+for y = 0, 5 do
+    table.insert(params.chest_whitewood_big.widget.slotpos, Vector3(-114      , (-77 * y) + 37 - (y * 2), 0))
+    table.insert(params.chest_whitewood_big.widget.slotpos, Vector3(-114 + 75 , (-77 * y) + 37 - (y * 2), 0))
+    table.insert(params.chest_whitewood_big.widget.slotpos, Vector3(-114 + 150, (-77 * y) + 37 - (y * 2), 0))
+    table.insert(params.chest_whitewood_big.widget.slotpos, Vector3(-114 + 225, (-77 * y) + 37 - (y * 2), 0))
 end
 
 --------------------------------------------------------------------------

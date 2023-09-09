@@ -2307,7 +2307,7 @@ if IsServer then
                 inst.AnimState:OverrideSymbol("SWAP_SIGN", invBuildMaps[invPrefabList[image]] or invBuildMaps[1], image)
             end
             if bgimage ~= nil and invPrefabList[bgimage] ~= nil then
-                inst.AnimState:OverrideSymbol("SWAP_SIGN_BG", invBuildMaps[invPrefabList[image]] or invBuildMaps[1], bgimage)
+                inst.AnimState:OverrideSymbol("SWAP_SIGN_BG", invBuildMaps[invPrefabList[bgimage]] or invBuildMaps[1], bgimage)
             end
         end)
     end
