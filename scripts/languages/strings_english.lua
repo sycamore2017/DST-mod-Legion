@@ -3460,6 +3460,82 @@ S_RECIPE_DESC.CARPET_SIVING = "A rocky mat."
 S_NAMES.CARPET_SIVING_BIG = "Hard Rock Carpet" --棱石地毯
 S_RECIPE_DESC.CARPET_SIVING_BIG = "A large rocky carpet."
 
+S_NAMES.CHEST_WHITEWOOD = "White Wood Cabinet" --白木展示台
+S_RECIPE_DESC.CHEST_WHITEWOOD = "A container that can display its belongings."
+S______GENERIC.DESCRIBE.CHEST_WHITEWOOD = {
+    GENERIC = "A simple and elegant white cabinet.",
+    BURNT = "Unfortunately."
+}
+S_______WILLOW.DESCRIBE.CHEST_WHITEWOOD = {
+    GENERIC = "The more beautiful wooden products burn, the more I am pleased.",
+    BURNT = "A perfect charcoal product."
+}
+-- S_____WOLFGANG.DESCRIBE.CHEST_WHITEWOOD = ""
+-- S________WENDY.DESCRIBE.CHEST_WHITEWOOD = ""
+-- S_________WX78.DESCRIBE.CHEST_WHITEWOOD = ""
+-- S_WICKERBOTTOM.DESCRIBE.CHEST_WHITEWOOD = ""
+S_______WOODIE.DESCRIBE.CHEST_WHITEWOOD = {
+    GENERIC = "This work is very easy for Lucy and me.",
+    BURNT = "A tragic fate."
+}
+-- S______WAXWELL.DESCRIBE.CHEST_WHITEWOOD = ""
+-- S___WATHGRITHR.DESCRIBE.CHEST_WHITEWOOD = ""
+-- S_______WEBBER.DESCRIBE.CHEST_WHITEWOOD = ""
+-- S_______WINONA.DESCRIBE.CHEST_WHITEWOOD = ""
+S_______WORTOX.DESCRIBE.CHEST_WHITEWOOD = {
+    GENERIC = "Aren't you afraid of being stolen for a box that's too flashy?",
+    BURNT = "The box is destroyed, and the contents inside are also gone."
+}
+S_____WORMWOOD.DESCRIBE.CHEST_WHITEWOOD = {
+    GENERIC = "A beautiful friend product.",
+    BURNT = "Cannot accept!"
+}
+S________WARLY.DESCRIBE.CHEST_WHITEWOOD = {
+    GENERIC = "Sometimes it is also used to display exquisite cuisine.",
+    BURNT = "Flame can bring delicious food, but it can also take everything away."
+}
+-- S_________WURT.DESCRIBE.CHEST_WHITEWOOD = ""
+-- S_______WALTER.DESCRIBE.CHEST_WHITEWOOD = ""
+-- S________WANDA.DESCRIBE.CHEST_WHITEWOOD = ""
+
+S_NAMES.CHEST_WHITEWOOD_BIG = "White Wood Showcase" --白木展示柜
+S_RECIPE_DESC.CHEST_WHITEWOOD_BIG = "A large container that can display its belongings."
+S______GENERIC.DESCRIBE.CHEST_WHITEWOOD_BIG = {
+    GENERIC = "A simple and elegant white showcase.",
+    BURNT = "What a pity."
+}
+S_______WILLOW.DESCRIBE.CHEST_WHITEWOOD_BIG = {
+    GENERIC = "The more beautiful wooden products burn, the more they make me happy.",
+    BURNT = "A perfect charcoal product."
+}
+-- S_____WOLFGANG.DESCRIBE.CHEST_WHITEWOOD_BIG = ""
+-- S________WENDY.DESCRIBE.CHEST_WHITEWOOD_BIG = ""
+-- S_________WX78.DESCRIBE.CHEST_WHITEWOOD_BIG = ""
+-- S_WICKERBOTTOM.DESCRIBE.CHEST_WHITEWOOD_BIG = ""
+S_______WOODIE.DESCRIBE.CHEST_WHITEWOOD_BIG = {
+    GENERIC = "Just spend a little more time, this is very easy for Lucy and me.",
+    BURNT = "A tragic fate."
+}
+-- S______WAXWELL.DESCRIBE.CHEST_WHITEWOOD_BIG = ""
+-- S___WATHGRITHR.DESCRIBE.CHEST_WHITEWOOD_BIG = ""
+-- S_______WEBBER.DESCRIBE.CHEST_WHITEWOOD_BIG = ""
+-- S_______WINONA.DESCRIBE.CHEST_WHITEWOOD_BIG = ""
+S_______WORTOX.DESCRIBE.CHEST_WHITEWOOD_BIG = {
+    GENERIC = "Aren't you afraid of being targeted by bad guys for such a flamboyant showcase?",
+    BURNT = "I will feel sorry for it for a second."
+}
+S_____WORMWOOD.DESCRIBE.CHEST_WHITEWOOD_BIG = {
+    GENERIC = "A huge and beautiful friend product.",
+    BURNT = "Noooo! Cannot accept!"
+}
+S________WARLY.DESCRIBE.CHEST_WHITEWOOD_BIG = {
+    GENERIC = "Put the dishes I cooked inside, and it will look like a restaurant.",
+    BURNT = "The flame brought delicious food and also took away my little dream."
+}
+-- S_________WURT.DESCRIBE.CHEST_WHITEWOOD_BIG = ""
+-- S_______WALTER.DESCRIBE.CHEST_WHITEWOOD_BIG = ""
+-- S________WANDA.DESCRIBE.CHEST_WHITEWOOD_BIG = ""
+
 --------------------------------------------------------------------------
 --[[ other ]]--[[ 其他 ]]
 --------------------------------------------------------------------------

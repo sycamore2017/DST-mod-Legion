@@ -639,7 +639,7 @@ local function MakeChest(data)
 
             inst.entity:SetPristine()
             if not TheWorld.ismastersim then
-                inst.OnEntityReplicated = function(inst) inst.replica.container:WidgetSetup(name) end
+                inst.OnEntityReplicated = function(inst) inst.replica.container:WidgetSetup(data.name) end
                 return inst
             end
 
@@ -648,7 +648,7 @@ local function MakeChest(data)
             inst:AddComponent("inspectable")
 
             inst:AddComponent("container")
-            inst.components.container:WidgetSetup(name)
+            inst.components.container:WidgetSetup(data.name)
             inst.components.container.onopenfn = OnOpen_chest
             inst.components.container.onclosefn = OnClose_chest
             inst.components.container.skipclosesnd = true

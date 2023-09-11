@@ -407,7 +407,7 @@ params.chest_whitewood = {
 }
 for y = 2.5, -0.5, -1 do
     for x = 0, 2 do
-        table.insert(params.chest_whitewood.widget.slotpos, Vector3(75*x - 75*2 + 75, 75*y - 75*2 + 75, 0))
+        table.insert(params.chest_whitewood.widget.slotpos, Vector3(75*x - 75*2 + 75, 75*y - 75*2 + 67, 0))
     end
 end
 

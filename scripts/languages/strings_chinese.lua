@@ -3581,6 +3581,82 @@ S_RECIPE_DESC.CARPET_SIVING = "一张坚石质感的地垫。"
 S_NAMES.CARPET_SIVING_BIG = "棱石地毯"
 S_RECIPE_DESC.CARPET_SIVING_BIG = "一张坚石质感的大号地毯。"
 
+S_NAMES.CHEST_WHITEWOOD = "白木展示台"
+S_RECIPE_DESC.CHEST_WHITEWOOD = "能展示所有物的容器。"
+S______GENERIC.DESCRIBE.CHEST_WHITEWOOD = {
+    GENERIC = "简单大方的白色展台。",
+    BURNT = "可惜了。"
+}
+S_______WILLOW.DESCRIBE.CHEST_WHITEWOOD = {
+    GENERIC = "越漂亮的木制品烧起来越让我欣慰。",
+    BURNT = "完美的木炭制品。"
+}
+-- S_____WOLFGANG.DESCRIBE.CHEST_WHITEWOOD = ""
+-- S________WENDY.DESCRIBE.CHEST_WHITEWOOD = ""
+-- S_________WX78.DESCRIBE.CHEST_WHITEWOOD = ""
+-- S_WICKERBOTTOM.DESCRIBE.CHEST_WHITEWOOD = ""
+S_______WOODIE.DESCRIBE.CHEST_WHITEWOOD = {
+    GENERIC = "这个做工，对露西和我来说很简单。",
+    BURNT = "惨烈的命运。"
+}
+-- S______WAXWELL.DESCRIBE.CHEST_WHITEWOOD = ""
+-- S___WATHGRITHR.DESCRIBE.CHEST_WHITEWOOD = ""
+-- S_______WEBBER.DESCRIBE.CHEST_WHITEWOOD = ""
+-- S_______WINONA.DESCRIBE.CHEST_WHITEWOOD = ""
+S_______WORTOX.DESCRIBE.CHEST_WHITEWOOD = {
+    GENERIC = "太张扬的箱子，不怕被偷吗？",
+    BURNT = "箱毁物亡。"
+}
+S_____WORMWOOD.DESCRIBE.CHEST_WHITEWOOD = {
+    GENERIC = "漂亮的朋友工艺。",
+    BURNT = "不能接受！"
+}
+S________WARLY.DESCRIBE.CHEST_WHITEWOOD = {
+    GENERIC = "有时候也用来摆放精致小巧的料理。",
+    BURNT = "火焰能带来美味，也能带走一切。"
+}
+-- S_________WURT.DESCRIBE.CHEST_WHITEWOOD = ""
+-- S_______WALTER.DESCRIBE.CHEST_WHITEWOOD = ""
+-- S________WANDA.DESCRIBE.CHEST_WHITEWOOD = ""
+
+S_NAMES.CHEST_WHITEWOOD_BIG = "白木展示柜"
+S_RECIPE_DESC.CHEST_WHITEWOOD_BIG = "能展示所有物的超大容器。"
+S______GENERIC.DESCRIBE.CHEST_WHITEWOOD_BIG = {
+    GENERIC = "简单大方的白色展柜。",
+    BURNT = "太可惜了。"
+}
+S_______WILLOW.DESCRIBE.CHEST_WHITEWOOD_BIG = {
+    GENERIC = "越漂亮的木制品烧起来越让我欢喜。",
+    BURNT = "非常完美的木炭制品。"
+}
+-- S_____WOLFGANG.DESCRIBE.CHEST_WHITEWOOD_BIG = ""
+-- S________WENDY.DESCRIBE.CHEST_WHITEWOOD_BIG = ""
+-- S_________WX78.DESCRIBE.CHEST_WHITEWOOD_BIG = ""
+-- S_WICKERBOTTOM.DESCRIBE.CHEST_WHITEWOOD_BIG = ""
+S_______WOODIE.DESCRIBE.CHEST_WHITEWOOD_BIG = {
+    GENERIC = "多花一点时间，这个对露西和我来说很简单。",
+    BURNT = "惨烈的命运。"
+}
+-- S______WAXWELL.DESCRIBE.CHEST_WHITEWOOD_BIG = ""
+-- S___WATHGRITHR.DESCRIBE.CHEST_WHITEWOOD_BIG = ""
+-- S_______WEBBER.DESCRIBE.CHEST_WHITEWOOD_BIG = ""
+-- S_______WINONA.DESCRIBE.CHEST_WHITEWOOD_BIG = ""
+S_______WORTOX.DESCRIBE.CHEST_WHITEWOOD_BIG = {
+    GENERIC = "这么张扬的柜子，不怕被坏人盯上吗？",
+    BURNT = "箱毁物亡，心疼一秒。"
+}
+S_____WORMWOOD.DESCRIBE.CHEST_WHITEWOOD_BIG = {
+    GENERIC = "巨大的漂亮朋友工艺。",
+    BURNT = "不能接受！不能接受！"
+}
+S________WARLY.DESCRIBE.CHEST_WHITEWOOD_BIG = {
+    GENERIC = "摆上我烹饪的佳肴，都能开一家店了。",
+    BURNT = "火焰带来了美味，也带走了我的小梦想。"
+}
+-- S_________WURT.DESCRIBE.CHEST_WHITEWOOD_BIG = ""
+-- S_______WALTER.DESCRIBE.CHEST_WHITEWOOD_BIG = ""
+-- S________WANDA.DESCRIBE.CHEST_WHITEWOOD_BIG = ""
+
 --------------------------------------------------------------------------
 --[[ tips ]]--[[ 加载台词 ]]
 --------------------------------------------------------------------------

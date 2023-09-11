@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<spriter_data scml_version="1.0" generator="BrashMonkey Spriter" generator_version="r7">
+    <folder id="0" name="base">
+        <file id="0" name="base/base-0.png" width="428" height="275" pivot_x="0.5" pivot_y="0.12"/>
+        <file id="1" name="base/base-1.png" width="451" height="293" pivot_x="0.5" pivot_y="0.2"/>
+        <file id="2" name="base/base-2.png" width="414" height="234" pivot_x="0.5" pivot_y="0.2"/>
+        <file id="3" name="base/base-3.png" width="429" height="80" pivot_x="0.5" pivot_y="0.4"/>
+    </folder>
+    <folder id="1" name="shadow">
+        <file id="0" name="shadow/shadow-0.png" width="457" height="96" pivot_x="0.5" pivot_y="0.4"/>
+    </folder>
+    <folder id="2" name="burnt">
+        <file id="0" name="burnt/burnt-0.png" width="449" height="441" pivot_x="0.5" pivot_y="0.1"/>
+    </folder>
+    <folder id="3" name="snow">
+        <file id="0" name="snow/snow-0.png" width="68" height="124" pivot_x="0.632353" pivot_y="0.491935"/>
+        <file id="1" name="snow/snow-1.png" width="112" height="120" pivot_x="0.464286" pivot_y="0.408333"/>
+        <file id="2" name="snow/snow-2.png" width="120" height="104" pivot_x="0.475" pivot_y="0.346154"/>
+        <file id="3" name="snow/snow-3.png" width="73" height="74" pivot_x="0.561644" pivot_y="0.486486"/>
+    </folder>
+    <folder id="4" name="slot1">
+        <file id="0" name="slot1/slot1-0.png" width="256" height="256" pivot_x="0.5" pivot_y="0.5"/>
+    </folder>
+    <folder id="5" name="slot2">
+        <file id="0" name="slot2/slot2-0.png" width="256" height="256" pivot_x="0.5" pivot_y="0.5"/>
+    </folder>
+    <folder id="6" name="slot3">
+        <file id="0" name="slot3/slot3-0.png" width="256" height="256" pivot_x="0.5" pivot_y="0.5"/>
+    </folder>
+    <folder id="7" name="slotbg1">
+        <file id="0" name="slotbg1/slotbg1-0.png" width="256" height="256" pivot_x="0.5" pivot_y="0.5"/>
+    </folder>
+    <folder id="8" name="slotbg2">
+        <file id="0" name="slotbg2/slotbg2-0.png" width="256" height="256" pivot_x="0.5" pivot_y="0.5"/>
+    </folder>
+    <folder id="9" name="slotbg3">
+        <file id="0" name="slotbg3/slotbg3-0.png" width="256" height="256" pivot_x="0.5" pivot_y="0.5"/>
+    </folder>
+    <folder id="10" name="slot4">
+        <file id="0" name="slot4/slot4-0.png" width="256" height="256" pivot_x="0.5" pivot_y="0.5"/>
+    </folder>
+    <folder id="11" name="slot5">
+        <file id="0" name="slot5/slot5-0.png" width="256" height="256" pivot_x="0.5" pivot_y="0.5"/>
+    </folder>
+    <folder id="12" name="slot6">
+        <file id="0" name="slot6/slot6-0.png" width="256" height="256" pivot_x="0.5" pivot_y="0.5"/>
+    </folder>
+    <folder id="13" name="slot7">
+        <file id="0" name="slot7/slot7-0.png" width="256" height="256" pivot_x="0.5" pivot_y="0.5"/>
+    </folder>
+    <folder id="14" name="slot8">
+        <file id="0" name="slot8/slot8-0.png" width="256" height="256" pivot_x="0.5" pivot_y="0.5"/>
+    </folder>
+    <folder id="15" name="slotbg4">
+        <file id="0" name="slotbg4/slotbg4-0.png" width="256" height="256" pivot_x="0.5" pivot_y="0.5"/>
+    </folder>
+    <folder id="16" name="slotbg5">
+        <file id="0" name="slotbg5/slotbg5-0.png" width="256" height="256" pivot_x="0.5" pivot_y="0.5"/>
+    </folder>
+    <folder id="17" name="slotbg6">
+        <file id="0" name="slotbg6/slotbg6-0.png" width="256" height="256" pivot_x="0.5" pivot_y="0.5"/>
+    </folder>
+    <folder id="18" name="slotbg7">
+        <file id="0" name="slotbg7/slotbg7-0.png" width="256" height="256" pivot_x="0.5" pivot_y="0.5"/>
+    </folder>
+    <folder id="19" name="slotbg8">
+        <file id="0" name="slotbg8/slotbg8-0.png" width="256" height="256" pivot_x="0.5" pivot_y="0.5"/>
+    </folder>
+    <entity id="0" name="chest_whitewood_big">
+        <animation id="0" name="NewAnimation" length="1000" interval="100">
+            <mainline>
+                <key id="0"/>
+            </mainline>
+        </animation>
+    </entity>
+</spriter_data>

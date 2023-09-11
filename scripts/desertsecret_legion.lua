@@ -38,6 +38,10 @@ local assets = {
     Asset("IMAGE", "images/inventoryimages/carpet_whitewood_big.tex"),
     Asset("ATLAS", "images/inventoryimages/carpet_whitewood.xml"),
     Asset("IMAGE", "images/inventoryimages/carpet_whitewood.tex"),
+    Asset("ATLAS", "images/inventoryimages/chest_whitewood_big.xml"),
+    Asset("IMAGE", "images/inventoryimages/chest_whitewood_big.tex"),
+    Asset("ATLAS", "images/inventoryimages/chest_whitewood.xml"),
+    Asset("IMAGE", "images/inventoryimages/chest_whitewood.tex"),
 }
 
 for k,v in pairs(assets) do
@@ -54,6 +58,7 @@ local IsServer = TheNet:GetIsServer() or TheNet:IsDedicated()
 --------------------------------------------------------------------------
 
 _G.RegistMiniMapImage_legion("shyerrytree")
+_G.RegistMiniMapImage_legion("chest_whitewood")
 
 --------------------------------------------------------------------------
 --[[ 新地皮相关 ]]
@@ -276,7 +281,7 @@ AddRecipe2(
     "shield_l_sand", {
         Ingredient("townportaltalisman", 6),
         Ingredient("shield_l_log", 1, "images/inventoryimages/shield_l_log.xml"),
-        Ingredient("turf_desertdirt", 3),
+        Ingredient("turf_desertdirt", 3)
     }, TECH.LOST, {
         atlas = "images/inventoryimages/shield_l_sand.xml", image = "shield_l_sand.tex"
     }, { "WEAPONS", "ARMOUR" }
@@ -284,26 +289,46 @@ AddRecipe2(
 AddRecipe2(
     "guitar_whitewood", {
         Ingredient("shyerrylog", 1, "images/inventoryimages/shyerrylog.xml"),
-        Ingredient("steelwool", 1),
+        Ingredient("steelwool", 1)
     }, TECH.SCIENCE_ONE, {
         atlas = "images/inventoryimages/guitar_whitewood.xml", image = "guitar_whitewood.tex"
     }, { "GARDENING", "TOOLS" }
 )
 AddRecipe2(
     "mat_whitewood_item", {
-        Ingredient("shyerrylog", 1, "images/inventoryimages/shyerrylog.xml"),
+        Ingredient("shyerrylog", 1, "images/inventoryimages/shyerrylog.xml")
     }, TECH.NONE, {
         numtogive = 6,
         atlas = "images/inventoryimages/mat_whitewood_item.xml", image = "mat_whitewood_item.tex"
     }, { "DECOR" }
 )
+AddRecipe2(
+    "chest_whitewood", {
+        Ingredient("shyerrylog", 2, "images/inventoryimages/shyerrylog.xml"),
+        Ingredient("messagebottleempty", 1),
+        Ingredient("charcoal", 2)
+    }, TECH.SCIENCE_ONE, {
+        atlas = "images/inventoryimages/chest_whitewood.xml", image = "chest_whitewood.tex",
+        placer = "chest_whitewood_placer", min_spacing = 1
+    }, { "CONTAINERS", "STRUCTURES" }
+)
+-- AddRecipe2(
+--     "chest_whitewood_big", {
+--         Ingredient("shyerrylog", 6, "images/inventoryimages/shyerrylog.xml"),
+--         Ingredient("messagebottleempty", 4),
+--         Ingredient("charcoal", 4)
+--     }, TECH.SCIENCE_TWO, {
+--         atlas = "images/inventoryimages/chest_whitewood_big.xml", image = "chest_whitewood_big.tex",
+--         placer = "chest_whitewood_big_placer", min_spacing = 1
+--     }, { "CONTAINERS", "STRUCTURES" }
+-- )
 
 if CONFIGS_LEGION.DRESSUP then
     AddRecipe2(
         "pinkstaff", {
             Ingredient("glommerwings", 1),
             Ingredient("livinglog", 1),
-            Ingredient("glommerfuel", 1),
+            Ingredient("glommerfuel", 1)
         }, TECH.MAGIC_TWO, {
             atlas = "images/inventoryimages/pinkstaff.xml", image = "pinkstaff.tex"
         }, { "MAGIC", "DECOR" }
@@ -311,7 +336,7 @@ if CONFIGS_LEGION.DRESSUP then
     AddRecipe2(
         "theemperorscrown", {
             Ingredient("nightmarefuel", 1),
-            Ingredient("rocks", 1),
+            Ingredient("rocks", 1)
         }, TECH.NONE, {
             atlas = "images/inventoryimages/theemperorscrown.xml", image = "theemperorscrown.tex"
         }, { "CLOTHING", "DECOR" }
@@ -319,7 +344,7 @@ if CONFIGS_LEGION.DRESSUP then
     AddRecipe2(
         "theemperorsmantle", {
             Ingredient("nightmarefuel", 1),
-            Ingredient("cutgrass", 1),
+            Ingredient("cutgrass", 1)
         }, TECH.NONE, {
             atlas = "images/inventoryimages/theemperorsmantle.xml", image = "theemperorsmantle.tex"
         }, { "CLOTHING", "DECOR" }
@@ -327,7 +352,7 @@ if CONFIGS_LEGION.DRESSUP then
     AddRecipe2(
         "theemperorsscepter", {
             Ingredient("nightmarefuel", 1),
-            Ingredient("twigs", 1),
+            Ingredient("twigs", 1)
         }, TECH.NONE, {
             atlas = "images/inventoryimages/theemperorsscepter.xml", image = "theemperorsscepter.tex"
         }, { "CLOTHING", "DECOR" }
@@ -335,7 +360,7 @@ if CONFIGS_LEGION.DRESSUP then
     AddRecipe2(
         "theemperorspendant", {
             Ingredient("nightmarefuel", 1),
-            Ingredient("flint", 1),
+            Ingredient("flint", 1)
         }, TECH.NONE, {
             atlas = "images/inventoryimages/theemperorspendant.xml", image = "theemperorspendant.tex"
         }, { "CLOTHING", "DECOR" }
