@@ -227,7 +227,7 @@ CreatePlacer("mat_whitewood_item", "mat_whitewood", "mat_whitewood", "idle1", tr
 CreatePlacer("chest_whitewood", "chest_whitewood", "chest_whitewood", "placer")
 
 ----白木展示柜
--- CreatePlacer("chest_whitewood_big", "chest_whitewood_big", "chest_whitewood_big", "placer")
+CreatePlacer("chest_whitewood_big", "chest_whitewood_big", "chest_whitewood_big", "placer")
 
 --------------------
 --------------------

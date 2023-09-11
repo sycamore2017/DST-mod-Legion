@@ -707,25 +707,25 @@ MakeChest({
     end
 })
 
--- MakeChest({
---     name = "chest_whitewood_big",
---     assets = {
---         Asset("ANIM", "anim/chest_whitewood_big.zip"),
---         Asset("ANIM", "anim/hiddenmoonlight.zip"),
---         Asset("ANIM", "anim/ui_bookstation_4x5.zip"),
---         Asset("ANIM", "anim/ui_chest_whitewood_4x6.zip")
---     },
---     -- prefabs = {},
---     -- fn_common = function(inst)end,
---     fn_server = function(inst)
---         inst.shownum_l = 8
+MakeChest({
+    name = "chest_whitewood_big",
+    assets = {
+        Asset("ANIM", "anim/chest_whitewood_big.zip"),
+        Asset("ANIM", "anim/hiddenmoonlight.zip"),
+        Asset("ANIM", "anim/ui_bookstation_4x5.zip"),
+        Asset("ANIM", "anim/ui_chest_whitewood_4x6.zip")
+    },
+    -- prefabs = {},
+    -- fn_common = function(inst)end,
+    fn_server = function(inst)
+        inst.shownum_l = 8
 
---         inst.components.workable:SetWorkLeft(4)
+        inst.components.workable:SetWorkLeft(4)
 
---         MakeLargeBurnable(inst, nil, nil, true)
---         MakeLargePropagator(inst)
---     end
--- })
+        MakeLargeBurnable(inst, nil, nil, true)
+        MakeLargePropagator(inst)
+    end
+})
 
 -----
 -----

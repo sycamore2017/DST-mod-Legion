@@ -426,10 +426,10 @@ params.chest_whitewood_big = {
     type = "chest"
 }
 for y = 0, 5 do
-    table.insert(params.chest_whitewood_big.widget.slotpos, Vector3(-114      , (-77 * y) + 37 - (y * 2), 0))
-    table.insert(params.chest_whitewood_big.widget.slotpos, Vector3(-114 + 75 , (-77 * y) + 37 - (y * 2), 0))
-    table.insert(params.chest_whitewood_big.widget.slotpos, Vector3(-114 + 150, (-77 * y) + 37 - (y * 2), 0))
-    table.insert(params.chest_whitewood_big.widget.slotpos, Vector3(-114 + 225, (-77 * y) + 37 - (y * 2), 0))
+    table.insert(params.chest_whitewood_big.widget.slotpos, Vector3(-114      , (-77 * y) + 114 - (y * 2), 0))
+    table.insert(params.chest_whitewood_big.widget.slotpos, Vector3(-114 + 75 , (-77 * y) + 114 - (y * 2), 0))
+    table.insert(params.chest_whitewood_big.widget.slotpos, Vector3(-114 + 150, (-77 * y) + 114 - (y * 2), 0))
+    table.insert(params.chest_whitewood_big.widget.slotpos, Vector3(-114 + 225, (-77 * y) + 114 - (y * 2), 0))
 end
 
 --------------------------------------------------------------------------

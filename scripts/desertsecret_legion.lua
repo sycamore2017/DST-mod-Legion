@@ -312,16 +312,16 @@ AddRecipe2(
         placer = "chest_whitewood_placer", min_spacing = 1
     }, { "CONTAINERS", "STRUCTURES" }
 )
--- AddRecipe2(
---     "chest_whitewood_big", {
---         Ingredient("shyerrylog", 6, "images/inventoryimages/shyerrylog.xml"),
---         Ingredient("messagebottleempty", 4),
---         Ingredient("charcoal", 4)
---     }, TECH.SCIENCE_TWO, {
---         atlas = "images/inventoryimages/chest_whitewood_big.xml", image = "chest_whitewood_big.tex",
---         placer = "chest_whitewood_big_placer", min_spacing = 1
---     }, { "CONTAINERS", "STRUCTURES" }
--- )
+AddRecipe2(
+    "chest_whitewood_big", {
+        Ingredient("shyerrylog", 6, "images/inventoryimages/shyerrylog.xml"),
+        Ingredient("messagebottleempty", 4),
+        Ingredient("charcoal", 4)
+    }, TECH.SCIENCE_TWO, {
+        atlas = "images/inventoryimages/chest_whitewood_big.xml", image = "chest_whitewood_big.tex",
+        placer = "chest_whitewood_big_placer", min_spacing = 1
+    }, { "CONTAINERS", "STRUCTURES" }
+)
 
 if CONFIGS_LEGION.DRESSUP then
     AddRecipe2(
