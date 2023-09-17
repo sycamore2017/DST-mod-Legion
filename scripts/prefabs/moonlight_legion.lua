@@ -89,7 +89,7 @@ end
 --[[ 月藏宝匣 ]]
 --------------------------------------------------------------------------
 
-local times_hidden = CONFIGS_LEGION.HIDDENUPDATETIMES or 25
+local times_hidden = CONFIGS_LEGION.HIDDENUPDATETIMES or 20
 
 local function UpdatePerishRate_hidden(inst)
     local lvl = inst.components.upgradeable:GetStage() - 1
@@ -99,9 +99,9 @@ local function UpdatePerishRate_hidden(inst)
         lvl = 0
     end
     if inst.upgradetarget == "icebox" then
-        inst.perishrate_l = Remap(lvl, 0, times_hidden, 0.5, 0.1)
+        inst.perishrate_l = Remap(lvl, 0, times_hidden, 0.4, 0.1)
     else
-        inst.perishrate_l = Remap(lvl, 0, times_hidden, 0.4, 0.0)
+        inst.perishrate_l = Remap(lvl, 0, times_hidden, 0.3, 0.0)
     end
 end
 local function SetTarget_hidden(inst, targetprefab)

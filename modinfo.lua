@@ -430,8 +430,8 @@ configuration_options = L and {
             { description = "8 times", data = 8 },
             { description = "10 times", data = 10 },
             { description = "15 times", data = 15 },
-            { description = "20 times", data = 20 },
-            { description = "25 times(default)", data = 25 },
+            { description = "20 times(default)", data = 20 },
+            { description = "25 times", data = 25 },
             { description = "30 times", data = 30 },
             { description = "35 times", data = 35 },
             { description = "40 times", data = 40 },
@@ -440,7 +440,7 @@ configuration_options = L and {
             { description = "55 times", data = 55 },
             { description = "60 times", data = 60 }
         },
-        default = 25
+        default = 20
     },
     {   name = "RevolvedUpdateTimes",
         label = "Max Upgrade Times of Revolved Moonlight",
@@ -882,8 +882,8 @@ configuration_options = L and {
             { description = "8次", data = 8 },
             { description = "10次", data = 10 },
             { description = "15次", data = 15 },
-            { description = "20次", data = 20 },
-            { description = "25次(默认)", data = 25 },
+            { description = "20次(默认)", data = 20 },
+            { description = "25次", data = 25 },
             { description = "30次", data = 30 },
             { description = "35次", data = 35 },
             { description = "40次", data = 40 },
@@ -892,7 +892,7 @@ configuration_options = L and {
             { description = "55次", data = 55 },
             { description = "60次", data = 60 }
         },
-        default = 25
+        default = 20
     },
     {   name = "RevolvedUpdateTimes",
         label = "月轮宝盘最大升级次数",

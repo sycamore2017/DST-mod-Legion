@@ -73,9 +73,9 @@ local function KillerRetarget(inst) --主动寻找生物来攻击
         function(guy)
             return inst.components.combat:CanTarget(guy)
         end,
-        { "_combat", "_health", "smallcreature" },   --必须有的标签
-        { "INLIMBO", "raindonate" },    --不能有的标签
-        { "insect" })   --必须有至少其中一个的标签
+        { "_combat", "_health", "insect" }, --必须有的标签
+        { "INLIMBO", "raindonate", "friendlyfruitfly" }, --不能有的标签
+        { "smallcreature", "small" }) --必须有至少其中一个的标签
 end
 
 local function SwapBelly(inst, size)    --换身体部分的贴图
@@ -88,12 +88,15 @@ local function SwapBelly(inst, size)    --换身体部分的贴图
     end
 end
 
-local function HuntingBug(inst, data) --攻击时,直接杀死小型昆虫
-    if data.target:HasTag("smallcreature") and data.target:HasTag("insect") then
+local function HuntingBug(inst, data) --攻击时，直接杀死小型昆虫
+    if
+        data.target:HasTag("insect") and (
+            data.target:HasTag("smallcreature") or data.target:HasTag("small")
+        )
+    then
         if data.target.components.health ~= nil and not data.target.components.health:IsDead() then
             data.target.components.health:DoDelta(-data.target.components.health.currenthealth, nil, inst.prefab, true, nil, true)
         end
-
         if inst.components.health ~= nil and inst.components.health:GetPercent() < 1 then
             inst.components.health:DoDelta(150, false, "hunting")
         end

@@ -108,7 +108,7 @@ params.hiddenmoonlight = {
 }
 for y = 3, 0, -1 do
     for x = 0, 3 do
-        table.insert(params.hiddenmoonlight.widget.slotpos, Vector3(80 * (x - 2) + 40, 80 * (y - 2) + 40, 0))
+        table.insert(params.hiddenmoonlight.widget.slotpos, Vector3(80 * (x - 2) + 37, 80 * (y - 2) + 43, 0))
     end
 end
 

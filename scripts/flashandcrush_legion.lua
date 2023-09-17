@@ -209,7 +209,7 @@ AddRecipe2(
 )
 AddRecipe2(
     "hat_elepheetle", {
-        Ingredient("dumbbell_marble", 1),
+        Ingredient("cookiecutterhat", 1),
         Ingredient("insectshell_l", 30, "images/inventoryimages/insectshell_l.xml"),
         Ingredient("goldnugget", 10),
         Ingredient("slurtlehat", 1)
@@ -251,7 +251,7 @@ AddRecipe2(
 AddRecipe2(
     "soul_contracts", {
         Ingredient("wortox_soul", 20),
-        Ingredient("waxwelljournal", 1),
+        Ingredient("mapscroll", 5),
         Ingredient("nightmarefuel", 20)
     }, tech_recast[2], {
         nounlock = lock_recast, builder_tag = lock_recast and "soulstealer" or nil,
