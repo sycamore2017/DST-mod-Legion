@@ -158,7 +158,7 @@ end
 --------------------------------------------------------------------------
 
 --------出鞘action
-local PULLOUTSWORD = Action({ priority = 2, mount_valid = true })
+local PULLOUTSWORD = Action({ priority = 2, mount_valid = true, encumbered_valid = true, canforce = true })
 PULLOUTSWORD.id = "PULLOUTSWORD"
 PULLOUTSWORD.str = STRINGS.ACTIONS_LEGION.PULLOUTSWORD
 PULLOUTSWORD.fn = function(act)
@@ -182,11 +182,10 @@ AddComponentAction("SCENE", "swordscabbard", function(inst, doer, actions, right
 end)
 
 --将一个动作与state绑定
-AddStategraphActionHandler("wilson", ActionHandler(ACTIONS.PULLOUTSWORD, "doshortaction"))
-AddStategraphActionHandler("wilson_client", ActionHandler(ACTIONS.PULLOUTSWORD, "doshortaction"))
+AddStategraphActionHandler("wilson", ActionHandler(ACTIONS.PULLOUTSWORD, "doskipaction_l"))
 
 --------右键剑鞘直接尝试入鞘
-local INTOSHEATH_L = Action({ priority = 2, mount_valid = true })
+local INTOSHEATH_L = Action({ priority = 2, mount_valid = true, canforce = true })
 INTOSHEATH_L.id = "INTOSHEATH_L"
 INTOSHEATH_L.str = STRINGS.ACTIONS.GIVE.SCABBARD
 INTOSHEATH_L.fn = function(act)
@@ -217,8 +216,7 @@ AddComponentAction("SCENE", "z_emptyscabbard", function(inst, doer, actions, rig
     end
 end)
 
-AddStategraphActionHandler("wilson", ActionHandler(ACTIONS.INTOSHEATH_L, "doshortaction"))
-AddStategraphActionHandler("wilson_client", ActionHandler(ACTIONS.INTOSHEATH_L, "doshortaction"))
+AddStategraphActionHandler("wilson", ActionHandler(ACTIONS.INTOSHEATH_L, "doskipaction_l"))
 
 --------掉落物设定
 if IsServer then

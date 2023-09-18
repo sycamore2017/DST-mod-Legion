@@ -2081,6 +2081,29 @@ local function DoHurtSound(inst)
     end
 end
 
+AddStategraphState("wilson", State{ --一个没有前置时间需求的action的sg
+    name = "doskipaction_l",
+    tags = { "idle", "nodangle" },
+    onenter = function(inst)
+        inst.components.locomotor:StopMoving()
+        if inst:HasTag("beaver") then
+            inst.AnimState:PlayAnimation("atk_pre")
+            inst.AnimState:PushAnimation("atk", false)
+        else
+            inst.AnimState:PlayAnimation("pickup")
+            inst.AnimState:PushAnimation("pickup_pst", false)
+        end
+        inst:PerformBufferedAction()
+    end,
+    events = {
+        EventHandler("animover", function(inst)
+            if inst.AnimState:AnimDone() then
+                inst.sg:GoToState("idle")
+            end
+        end)
+    }
+})
+
 AddStategraphPostInit("wilson", function(sg)
     --受击无硬直
     local eve = sg.events["attacked"]
@@ -2105,7 +2128,7 @@ AddStategraphPostInit("wilson", function(sg)
             v.deststate = function(inst, action)
                 --入鞘使用短动作
                 if action.invobject ~= nil and action.target ~= nil and action.target:HasTag("swordscabbard") then
-                    return "doshortaction"
+                    return "doskipaction_l"
                 end
                 return give_handler_fn(inst, action)
             end

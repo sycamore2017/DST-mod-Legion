@@ -117,7 +117,6 @@ local assets_together = {
     Asset("ATLAS", "images/inventoryimages/foliageath_dish_tomahawksteak.xml"),
     Asset("IMAGE", "images/inventoryimages/foliageath_dish_tomahawksteak.tex"),
 }
-
 local prefabs_together = {
     "foliageath",
 }
