@@ -305,7 +305,7 @@ AddRecipe2(
 AddRecipe2(
     "chest_whitewood", {
         Ingredient("shyerrylog", 2, "images/inventoryimages/shyerrylog.xml"),
-        Ingredient("moonglass", 2),
+        Ingredient("flint", 2),
         Ingredient("charcoal", 2)
     }, TECH.SCIENCE_ONE, {
         atlas = "images/inventoryimages/chest_whitewood.xml", image = "chest_whitewood.tex",
@@ -315,8 +315,8 @@ AddRecipe2(
 AddRecipe2(
     "chest_whitewood_big", {
         Ingredient("shyerrylog", 6, "images/inventoryimages/shyerrylog.xml"),
-        Ingredient("moonglass", 4),
-        Ingredient("charcoal", 4)
+        Ingredient("flint", 6),
+        Ingredient("charcoal", 6)
     }, TECH.SCIENCE_TWO, {
         atlas = "images/inventoryimages/chest_whitewood_big.xml", image = "chest_whitewood_big.tex",
         placer = "chest_whitewood_big_placer", min_spacing = 1

@@ -252,6 +252,7 @@ AddRecipe2(
     "soul_contracts", {
         Ingredient("wortox_soul", 20),
         Ingredient("mapscroll", 5),
+        Ingredient("reviver", 2),
         Ingredient("nightmarefuel", 20)
     }, tech_recast[2], {
         nounlock = lock_recast, builder_tag = lock_recast and "soulstealer" or nil,

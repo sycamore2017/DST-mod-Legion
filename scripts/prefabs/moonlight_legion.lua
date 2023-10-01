@@ -115,7 +115,10 @@ local function DoBenefit(inst)
     local items = inst.components.container:GetAllItems()
     local items_valid = {}
     for _,v in pairs(items) do
-        if v ~= nil and v.components.perishable ~= nil then
+        if
+            v ~= nil and
+            v.components.perishable ~= nil and v.components.perishable:GetPercent() < 0.995
+        then
             table.insert(items_valid, v)
         end
     end
@@ -125,17 +128,32 @@ local function DoBenefit(inst)
         return
     end
 
-    local stagenow = 4
-    if benifitnum > stagenow then
-        for i = 1, stagenow do
-            local benifititem = table.remove(items_valid, math.random(#items_valid))
+    local value = 2.5
+    local needs = 0.0
+    while value > 0 and benifitnum > 0 do
+        local benifititem = table.remove(items_valid, math.random(#items_valid))
+        benifitnum = benifitnum - 1
+        needs = 1 - benifititem.components.perishable:GetPercent()
+        if value >= needs then
             benifititem.components.perishable:SetPercent(1)
-        end
-    else
-        for _,v in ipairs(items_valid) do
-            v.components.perishable:SetPercent(1)
+            value = value - needs
+        else
+            benifititem.components.perishable:ReducePercent(-value)
+            value = 0
         end
     end
+
+    -- local stagenow = 4
+    -- if benifitnum > stagenow then
+    --     for i = 1, stagenow do
+    --         local benifititem = table.remove(items_valid, math.random(#items_valid))
+    --         benifititem.components.perishable:SetPercent(1)
+    --     end
+    -- else
+    --     for _,v in ipairs(items_valid) do
+    --         v.components.perishable:SetPercent(1)
+    --     end
+    -- end
 
     if inst:IsAsleep() then --未加载状态就不产生特效了
         return
@@ -436,7 +454,7 @@ MakeItem({
 ----------
 ----------
 
-local times_revolved_pro = CONFIGS_LEGION.REVOLVEDUPDATETIMES or 20
+local times_revolved_pro = CONFIGS_LEGION.REVOLVEDUPDATETIMES or 10
 local value_revolved = 5/times_revolved_pro
 local cool_revolved = TUNING.TOTAL_DAY_TIME/times_revolved_pro
 local temp_revolved = 35/times_revolved_pro

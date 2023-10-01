@@ -204,33 +204,36 @@ local function MagicWarble(inst) --魔音绕梁
             local inv = v.components.inventory
             local hasprotect = false
             for slot, item in pairs(inv.equipslots) do
-                if slot ~= EQUIPSLOTS.BEARD then --可不能把威尔逊的“胡子”给吼下来了
-                    if item.prefab == "earmuffshat" or item.protect_l_magicwarble then
-                        hasprotect = true
-                    else
+                if item.prefab == "earmuffshat" or item.protect_l_magicwarble then
+                    hasprotect = true
+                    break
+                end
+            end
+            if not hasprotect then
+                for slot, item in pairs(inv.equipslots) do
+                    if slot ~= EQUIPSLOTS.BEARD then --可不能把威尔逊的“胡子”给吼下来了
                         inv:DropItem(item, true, true)
                     end
                 end
-            end
+                --装备了兔耳罩就能避免后续的debuff
+                if TIME_BUFF_WARBLE > 0 then
+                    v.time_l_magicwarble = { replace_min = TIME_BUFF_WARBLE }
+                    v:AddDebuff("debuff_magicwarble", "debuff_magicwarble")
 
-            --装备了兔耳罩就能避免后续的debuff
-            if not hasprotect and TIME_BUFF_WARBLE > 0 then
-                v.time_l_magicwarble = { replace_min = TIME_BUFF_WARBLE }
-                v:AddDebuff("debuff_magicwarble", "debuff_magicwarble")
-
-                if inst.isgrief then --悲愤状态：附加睡醒的移速缓慢状态
-                    if v.task_groggy_warble ~= nil then
-                        v.task_groggy_warble:Cancel()
-                    end
-                    v:AddTag("groggy") --添加标签，走路会摇摇晃晃
-                    v.components.locomotor:SetExternalSpeedMultiplier(v, "magicwarble", 0.4)
-                    v.task_groggy_warble = v:DoTaskInTime(TIME_BUFF_WARBLE, function(v)
-                        if v.components.locomotor ~= nil then
-                            v.components.locomotor:RemoveExternalSpeedMultiplier(v, "magicwarble")
+                    if inst.isgrief then --悲愤状态：附加睡醒的移速缓慢状态
+                        if v.task_groggy_warble ~= nil then
+                            v.task_groggy_warble:Cancel()
                         end
-                        v:RemoveTag("groggy")
-                        v.task_groggy_warble = nil
-                    end)
+                        v:AddTag("groggy") --添加标签，走路会摇摇晃晃
+                        v.components.locomotor:SetExternalSpeedMultiplier(v, "magicwarble", 0.4)
+                        v.task_groggy_warble = v:DoTaskInTime(TIME_BUFF_WARBLE, function(v)
+                            if v.components.locomotor ~= nil then
+                                v.components.locomotor:RemoveExternalSpeedMultiplier(v, "magicwarble")
+                            end
+                            v:RemoveTag("groggy")
+                            v.task_groggy_warble = nil
+                        end)
+                    end
                 end
             end
         end

@@ -107,7 +107,7 @@ AddRecipe2(
 AddRecipe2(
     "revolvedmoonlight_item", {
         Ingredient("yellowmooneye", 2),
-        Ingredient("turf_meteor", 2),
+        Ingredient("turf_meteor", 2)
     }, TECH.LOST, {
         atlas = "images/inventoryimages/revolvedmoonlight_item.xml", image = "revolvedmoonlight_item.tex"
     }, { "LIGHT", "CONTAINERS" }
