@@ -192,6 +192,15 @@ local function SetBehaviorTree(inst, done)
     end
 end
 
+local SOUNDBLOCKINGHATS = {
+    earmuffshat = true, --兔耳罩
+    slurtlehat = true, --背壳头盔
+    slurper = true, --啜食者
+    eyemaskhat = true, --眼面具
+    nightcaphat = true, --睡帽
+    lunarplanthat = true, --亮茄头盔
+    voidclothhat = true --虚空风帽
+}
 local function MagicWarble(inst) --魔音绕梁
     local x, y, z = inst.Transform:GetWorldPosition()
     local ents = TheSim:FindEntities(x, 0, z, DIST_REMOTE, { "_combat", "_inventory" }, { "INLIMBO", "siving", "l_noears" })
@@ -204,7 +213,7 @@ local function MagicWarble(inst) --魔音绕梁
             local inv = v.components.inventory
             local hasprotect = false
             for slot, item in pairs(inv.equipslots) do
-                if item.prefab == "earmuffshat" or item.protect_l_magicwarble then
+                if SOUNDBLOCKINGHATS[item.prefab] or item.protect_l_magicwarble then
                     hasprotect = true
                     break
                 end
@@ -215,7 +224,7 @@ local function MagicWarble(inst) --魔音绕梁
                         inv:DropItem(item, true, true)
                     end
                 end
-                --装备了兔耳罩就能避免后续的debuff
+                --后续的debuff
                 if TIME_BUFF_WARBLE > 0 then
                     v.time_l_magicwarble = { replace_min = TIME_BUFF_WARBLE }
                     v:AddDebuff("debuff_magicwarble", "debuff_magicwarble")

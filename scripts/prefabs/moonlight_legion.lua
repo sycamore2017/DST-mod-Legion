@@ -1090,11 +1090,11 @@ local function TryRevolt_refracted(inst, doer)
         SetCount_refracted(inst, inst._count - 1)
     end
 
-    local time = 60
+    local time = 90
     if inst._lvl >= lvls_refracted[14] then
         local timeleft = inst.components.timer:GetTimeLeft("moonsurge") or 0
         if timeleft > 0 then
-            time = math.min(time + timeleft, 360)
+            time = math.min(time + timeleft, 480)
         end
     else
         if inst._lvl < lvls_refracted[2] then
@@ -1164,25 +1164,25 @@ local function OnStageUp_refracted(inst)
     inst._lvl = lvl
     inst._lvl_l:set(lvl)
     if lvl >= lvls_refracted[13] then
-        inst._atk_lvl = 40
-        inst._atk_sp_lvl = 30
+        inst._atk_lvl = 80
+        inst._atk_sp_lvl = 60
     elseif lvl >= lvls_refracted[11] then
-        inst._atk_lvl = 30
-        inst._atk_sp_lvl = 30
+        inst._atk_lvl = 60
+        inst._atk_sp_lvl = 60
     elseif lvl >= lvls_refracted[9] then
-        inst._atk_lvl = 30
-        inst._atk_sp_lvl = 20
+        inst._atk_lvl = 60
+        inst._atk_sp_lvl = 40
     elseif lvl >= lvls_refracted[7] then
+        inst._atk_lvl = 40
+        inst._atk_sp_lvl = 40
+    elseif lvl >= lvls_refracted[5] then
+        inst._atk_lvl = 40
+        inst._atk_sp_lvl = 20
+    elseif lvl >= lvls_refracted[3] then
         inst._atk_lvl = 20
         inst._atk_sp_lvl = 20
-    elseif lvl >= lvls_refracted[5] then
-        inst._atk_lvl = 20
-        inst._atk_sp_lvl = 10
-    elseif lvl >= lvls_refracted[3] then
-        inst._atk_lvl = 10
-        inst._atk_sp_lvl = 10
     elseif lvl >= lvls_refracted[1] then
-        inst._atk_lvl = 10
+        inst._atk_lvl = 20
         inst._atk_sp_lvl = 0
     else
         inst._atk_lvl = 0
