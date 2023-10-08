@@ -3,14 +3,10 @@ local prefabFiles = {
     "lileaves",                 --蹄莲叶
     "orchitwigs",               --兰花絮
     "neverfade",                --永不凋零
+    "foliageath",               --青枝绿叶
     "sachet",                   --香包
     "neverfade_butterfly",      --永不凋零的蝴蝶
 }
-
-if GLOBAL.CONFIGS_LEGION.FOLIAGEATHCHANCE > 0 then
-    table.insert(PrefabFiles, "foliageath")  --青枝绿叶相关
-end
-
 for k,v in pairs(prefabFiles) do
     table.insert(PrefabFiles, v)
 end
@@ -27,7 +23,6 @@ local assets = {
     Asset("ATLAS", "images/inventoryimages/sachet.xml"), --预加载，给科技栏用的
     Asset("IMAGE", "images/inventoryimages/sachet.tex"),
 }
-
 for k,v in pairs(assets) do
     table.insert(Assets, v)
 end

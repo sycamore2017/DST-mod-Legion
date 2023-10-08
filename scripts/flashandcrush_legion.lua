@@ -678,7 +678,6 @@ AddStategraphState("wilson", release_spores)
 
 local function FindItemWithoutContainer(inst, fn)
     local inventory = inst.components.inventory
-
     for k,v in pairs(inventory.itemslots) do
         if v and fn(v) then
             return v
@@ -774,26 +773,31 @@ if IsServer then
 
     local seeksoulstealer_f = false
     AddPrefabPostInit("wortox_soul_spawn", function(inst)
-        --灵魂优先寻找契约
+        --灵魂优先寻找契约，或者契约的主人
         if not seeksoulstealer_f then
             seeksoulstealer_f = true
             local SeekSoulStealer_old = upvaluehelper.Get(_G.Prefabs["wortox_soul_spawn"].fn, "SeekSoulStealer")
             if SeekSoulStealer_old ~= nil then
                 local function SeekSoulStealer_new(inst)
-                    local thebook = FindEntity(
+                    local toer = FindEntity(
                         inst,
                         TUNING.WORTOX_SOULSTEALER_RANGE,
-                        function(item)
-                            --寻找未装满的契约书
-                            return item:IsValid() and item.entity:IsVisible() and
-                                (item.components.finiteuses ~= nil and item.components.finiteuses:GetPercent() < 1)
-                        end,
+                        nil,
                         { "soulcontracts" },
                         { "NOCLICK", "FX", "INLIMBO" },
                         nil
                     )
-                    if thebook ~= nil then
-                        inst.components.projectile:Throw(inst, thebook, inst)
+                    if toer ~= nil then
+                        --如果耐久满了，则寻找其主人
+                        if toer.components.finiteuses ~= nil and toer.components.finiteuses:GetPercent() >= 1 then
+                            if toer.components.follower ~= nil and toer.components.follower:GetLeader() ~= nil then
+                                toer = toer.components.follower:GetLeader()
+                            else
+                                SeekSoulStealer_old(inst)
+                                return
+                            end
+                        end
+                        inst.components.projectile:Throw(inst, toer, inst)
                     else
                         SeekSoulStealer_old(inst)
                     end
@@ -835,7 +839,7 @@ if IsServer then
                                 if book.components.finiteuses:GetPercent() >= 1 then
                                     book._SoulHealing(book)
                                 else
-                                    book.components.finiteuses:SetUses(book.components.finiteuses:GetUses() + 1)
+                                    book.components.finiteuses:Repair(1)
                                 end
                             end
 
@@ -849,7 +853,6 @@ if IsServer then
                     end
                 end
             end
-
             if OnHit_old ~= nil then
                 OnHit_old(inst, attacker, target)
             end

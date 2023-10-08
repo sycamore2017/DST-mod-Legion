@@ -269,11 +269,7 @@ local function UpadateHealTag(inst)
             break
         end
     end
-    if shouldheal then
-        inst._needheal = true
-    else
-        inst._needheal = false
-    end
+    inst._needheal = shouldheal
 end
 local function StartUpadateHealTag(inst)
     if inst._taskheal == nil then

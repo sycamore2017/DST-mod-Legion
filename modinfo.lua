@@ -90,8 +90,9 @@ configuration_options = L and {
         options = {
             {description = "0%", data = 0},
             {description = "0.1%", data = 0.001},
-            {description = "0.5%(default)", data = 0.005},
-            {description = "1%", data = 0.01},
+            {description = "0.5%", data = 0.005},
+            {description = "1%(default)", data = 0.01},
+            {description = "2%", data = 0.02},
             {description = "3%", data = 0.03},
             {description = "5%", data = 0.05},
             {description = "10%", data = 0.1},
@@ -99,7 +100,7 @@ configuration_options = L and {
             {description = "50%", data = 0.5},
             {description = "100%", data = 1.0}
         },
-        default = 0.005
+        default = 0.01
     },
     {   name = "RoseBushSpacing",
         label = "Planting limit radius of Rose Bush",
@@ -412,15 +413,6 @@ configuration_options = L and {
 
     {name = "Title", label = "", options = {{description = "", data = ""}}, default = ""},
     {name = "Title", label = "The Sacrifice of Rain", options = {{description = "", data = ""}}, default = ""},
-    {   name = "BookRecipetabs",
-        label = "Book Recipetabs",
-        hover = "Set recipetabs of Changing Clouds.",
-        options = {
-            {description = "Book(default)", data = "bookbuilder"},
-            {description = "Magic", data = "magic"}
-        },
-        default = "bookbuilder"
-    },
     {   name = "HiddenUpdateTimes",
         label = "Max Upgrade Times of Hidden Moonlight",
         hover = "Set the maximum upgrade times of Hidden Moonlight (the smaller, the easier).",
@@ -543,8 +535,9 @@ configuration_options = L and {
         options = {
             {description = "0%", data = 0},
             {description = "0.1%", data = 0.001},
-            {description = "0.5%(默认)", data = 0.005},
-            {description = "1%", data = 0.01},
+            {description = "0.5%", data = 0.005},
+            {description = "1%(默认)", data = 0.01},
+            {description = "2%", data = 0.02},
             {description = "3%", data = 0.03},
             {description = "5%", data = 0.05},
             {description = "10%", data = 0.1},
@@ -552,7 +545,7 @@ configuration_options = L and {
             {description = "50%", data = 0.5},
             {description = "100%", data = 1.0}
         },
-        default = 0.005
+        default = 0.01
     },
     {   name = "RoseBushSpacing",
         label = "蔷薇花丛种植间隔",
@@ -865,15 +858,6 @@ configuration_options = L and {
 
     {name = "Title", label = "", options = {{description = "", data = ""}}, default = ""},
     {name = "Title", label = "祈雨祭", options = {{description = "", data = ""}}, default = ""},
-    {   name = "BookRecipetabs",
-        label = "《多变的云》制作方式",
-        hover = "设置《多变的云》的制作栏。决定一本巨著的沉沦或现世。",
-        options = {
-            {description = "书籍栏(默认)", data = "bookbuilder"},
-            {description = "魔法栏", data = "magic"}
-        },
-        default = "bookbuilder"
-    },
     {   name = "HiddenUpdateTimes",
         label = "月藏宝匣最大升级次数",
         hover = "设置月藏宝匣的升级次数的最大值（越小越简单）。",

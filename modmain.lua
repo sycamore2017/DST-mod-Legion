@@ -178,7 +178,6 @@ _G.CONFIGS_LEGION.ORCHIDBUSHSPACING = GetModConfigData("OrchidBushSpacing")
 _G.CONFIGS_LEGION.BETTERCOOKBOOK = false
 _G.CONFIGS_LEGION.FESTIVALRECIPES = GetModConfigData("FestivalRecipes")
 
-_G.CONFIGS_LEGION.BOOKRECIPETABS = GetModConfigData("BookRecipetabs") --设置多变的云的制作栏 "bookbuilder" "magic"
 _G.CONFIGS_LEGION.HIDDENUPDATETIMES = GetModConfigData("HiddenUpdateTimes") --月藏宝匣最大升级次数
 _G.CONFIGS_LEGION.REVOLVEDUPDATETIMES = GetModConfigData("RevolvedUpdateTimes") --月轮宝盘最大升级次数
 _G.CONFIGS_LEGION.REFRACTEDUPDATETIMES = GetModConfigData("RefractedUpdateTimes") --月折宝剑最大升级次数

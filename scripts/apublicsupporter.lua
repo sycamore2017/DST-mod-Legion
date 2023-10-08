@@ -428,8 +428,7 @@ local function ComputCost(valuenow, valuemax, value, item)
         if need > stack then
             need = stack
         end
-        local useditems = item.components.stackable:Get(need)
-        useditems:Remove()
+        item.components.stackable:Get(need):Remove()
     else
         need = 1
         item:Remove()

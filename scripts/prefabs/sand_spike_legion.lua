@@ -107,34 +107,6 @@ local function DoDamage(inst, OnIgnite)
     local ents = TheSim:FindEntities(x, 0, z, inst.spikeradius + DAMAGE_RADIUS_PADDING, nil, NON_COLLAPSIBLE_TAGS, COLLAPSIBLE_TAGS)
     for _, v in ipairs(ents) do
         if v:IsValid() then
-            -- local isworkable = false
-            -- if v.components.workable ~= nil then
-            --     local work_action = v.components.workable:GetWorkAction()
-            --     --V2C: nil action for campfires
-            --     --     allow digging spawners (e.g. rabbithole)
-            --     isworkable = (
-            --         (work_action == nil and v:HasTag("NPC_workable")) or
-            --         (v.components.workable:CanBeWorked() and COLLAPSIBLE_WORK_ACTIONS[work_action.id])
-            --     )
-            -- end
-            -- if isworkable then
-            --     v.components.workable:Destroy(inst)
-            --     if v:IsValid() and v:HasTag("stump") then
-            --         v:Remove()
-            --     end
-            -- elseif v.components.pickable ~= nil
-            --     and v.components.pickable:CanBePicked()
-            --     and not v:HasTag("intense") then
-            --     local num = v.components.pickable.numtoharvest or 1
-            --     local product = v.components.pickable.product
-            --     local x1, y1, z1 = v.Transform:GetWorldPosition()
-            --     v.components.pickable:Pick(inst) -- only calling this to trigger callbacks on the object
-            --     if product ~= nil and num > 0 then
-            --         for i = 1, num do
-            --             SpawnPrefab(product).Transform:SetPosition(x1, 0, z1)
-            --         end
-            --     end
-            -- else
             if v.components.combat ~= nil then
                 if v.components.health ~= nil and not v.components.health:IsDead() then
                     -- if v.components.locomotor == nil and not v:HasTag("epic") then --可秒杀触手等没有移动组件但有战斗组件的实体

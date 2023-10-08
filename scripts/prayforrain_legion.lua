@@ -57,29 +57,15 @@ _G.RegistMiniMapImage_legion("refractedmoonlight")
 _G.RegistMiniMapImage_legion("moondungeon")
 _G.RegistMiniMapImage_legion("hiddenmoonlight")
 
-if _G.CONFIGS_LEGION.BOOKRECIPETABS == "magic" then
-    AddRecipe2(
-        "book_weather", {
-            Ingredient("papyrus", 4),
-            Ingredient("squamousfruit", 3, "images/inventoryimages/squamousfruit.xml"),
-            Ingredient("raindonate", 3, "images/inventoryimages/raindonate.xml"),
-        }, TECH.MAGIC_THREE, {
-            atlas = "images/inventoryimages/book_weather.xml", image = "book_weather.tex"
-        }, { "MAGIC", "WEAPONS", "RAIN" }
-    )
-else
-    AddRecipe2(
-        "book_weather", {
-            Ingredient("book_rain", 1),
-            Ingredient("squamousfruit", 2, "images/inventoryimages/squamousfruit.xml"),
-            Ingredient("raindonate", 2, "images/inventoryimages/raindonate.xml"),
-        }, TECH.MAGIC_THREE, {
-            builder_tag = "bookbuilder",
-            atlas = "images/inventoryimages/book_weather.xml", image = "book_weather.tex"
-        }, { "MAGIC", "WEAPONS", "RAIN", "CHARACTER" }
-    )
-end
-
+AddRecipe2(
+    "book_weather", {
+        Ingredient("papyrus", 8),
+        Ingredient("squamousfruit", 3, "images/inventoryimages/squamousfruit.xml"),
+        Ingredient("raindonate", 3, "images/inventoryimages/raindonate.xml")
+    }, TECH.MAGIC_THREE, {
+        atlas = "images/inventoryimages/book_weather.xml", image = "book_weather.tex"
+    }, { "MAGIC", "WEAPONS", "RAIN" }
+)
 AddRecipe2(
     "hat_mermbreathing", {
         Ingredient("merm_scales", 3, "images/inventoryimages/merm_scales.xml"),
@@ -98,16 +84,18 @@ AddRecipe2(
 )
 AddRecipe2(
     "hiddenmoonlight_item", {
-        Ingredient("bluemooneye", 2),
-        Ingredient("turf_shellbeach", 2),
+        Ingredient("bluemooneye", 1),
+        Ingredient("moonrocknugget", 2),
+        Ingredient("slurtle_shellpieces", 1)
     }, TECH.LOST, {
         atlas = "images/inventoryimages/hiddenmoonlight_item.xml", image = "hiddenmoonlight_item.tex"
     }, { "STRUCTURES", "CONTAINERS", "COOKING" }
 )
 AddRecipe2(
     "revolvedmoonlight_item", {
-        Ingredient("yellowmooneye", 2),
-        Ingredient("turf_meteor", 2)
+        Ingredient("yellowmooneye", 1),
+        Ingredient("moonrocknugget", 2),
+        Ingredient("houndstooth", 1)
     }, TECH.LOST, {
         atlas = "images/inventoryimages/revolvedmoonlight_item.xml", image = "revolvedmoonlight_item.tex"
     }, { "LIGHT", "CONTAINERS" }

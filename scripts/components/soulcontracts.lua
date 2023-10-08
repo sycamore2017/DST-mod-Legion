@@ -50,8 +50,8 @@ function SoulContracts:ReturnSouls(doer)
                 if soulscount > 1 and soul.components.stackable ~= nil then
                     soul.components.stackable:SetStackSize(soulscount)
                 end
+                doer.components.inventory:GiveItem(soul, nil, doer:GetPosition())
             end
-            doer.components.inventory:GiveItem(soul, nil, doer:GetPosition())
             self.inst.components.finiteuses:Use(soulscount)
         end
     end
@@ -153,21 +153,32 @@ end
 
 function SoulContracts:GiveSoul(doer, soul)
     if self.inst.components.finiteuses ~= nil then
-        if self.inst.components.finiteuses:GetPercent() >= 1 then --已经满了，直接释放一个灵魂
+        local finiteuses = self.inst.components.finiteuses
+        if finiteuses.current >= finiteuses.total then --已经满了，直接释放一个灵魂
             if self.inst._SoulHealing ~= nil then
                 self.inst._SoulHealing(doer or self.inst)
             end
-        else --没有满，灵魂+1
-            self.inst.components.finiteuses:SetUses(self.inst.components.finiteuses:GetUses() + 1)
+            if soul.components.stackable ~= nil then
+                soul.components.stackable:Get(1):Remove()
+            else
+                soul:Remove()
+            end
+        else --没有满，尝试将耐久都补满
+            local needs = math.ceil(finiteuses.total - finiteuses.current)
+            if soul.components.stackable ~= nil then
+                local stack = soul.components.stackable:StackSize() or 1
+                if needs > stack then
+                    needs = stack
+                end
+                soul.components.stackable:Get(needs):Remove()
+            else
+                needs = 1
+                soul:Remove()
+            end
+            finiteuses:Repair(needs)
         end
     end
     SetSoulFx(self.inst)
-
-    if soul.components.stackable ~= nil then
-        soul.components.stackable:Get(1):Remove()
-    else
-        soul:Remove()
-    end
 
     return true
 end

@@ -212,19 +212,34 @@ local function MagicWarble(inst) --魔音绕梁
         then
             local inv = v.components.inventory
             local hasprotect = false
-            for slot, item in pairs(inv.equipslots) do
-                if SOUNDBLOCKINGHATS[item.prefab] or item.protect_l_magicwarble then
-                    hasprotect = true
-                    break
-                end
-            end
-            if not hasprotect then
+            if inst.isgrief then --悲愤状态：必定脱装备
                 for slot, item in pairs(inv.equipslots) do
                     if slot ~= EQUIPSLOTS.BEARD then --可不能把威尔逊的“胡子”给吼下来了
-                        inv:DropItem(item, true, true)
+                        if SOUNDBLOCKINGHATS[item.prefab] or item.protect_l_magicwarble then
+                            hasprotect = true
+                        else
+                            inv:DropItem(item, true, true)
+                        end
                     end
                 end
-                --后续的debuff
+            else
+                for slot, item in pairs(inv.equipslots) do
+                    if slot ~= EQUIPSLOTS.BEARD then
+                        if SOUNDBLOCKINGHATS[item.prefab] or item.protect_l_magicwarble then
+                            hasprotect = true
+                            break
+                        end
+                    end
+                end
+                if not hasprotect then
+                    for slot, item in pairs(inv.equipslots) do
+                        if slot ~= EQUIPSLOTS.BEARD then --可不能把威尔逊的“胡子”给吼下来了
+                            inv:DropItem(item, true, true)
+                        end
+                    end
+                end
+            end
+            if not hasprotect then --后续的debuff
                 if TIME_BUFF_WARBLE > 0 then
                     v.time_l_magicwarble = { replace_min = TIME_BUFF_WARBLE }
                     v:AddDebuff("debuff_magicwarble", "debuff_magicwarble")
