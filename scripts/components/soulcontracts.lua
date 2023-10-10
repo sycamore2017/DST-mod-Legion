@@ -10,18 +10,36 @@ local SoulContracts = Class(function(self, inst)
     self.inst = inst
     self.staying = true
 
-    self.inst.components.follower.OnChangedLeader = function(inst, new_leader, prev_leader)
-        if new_leader == nil then
-            self.staying = true
-        else
-            self.staying = false
-        end
-    end
+    -- self.inst.components.follower.OnChangedLeader = function(inst, new_leader, prev_leader)
+    --     if new_leader == nil then
+    --         self.staying = true
+    --     else
+    --         self.staying = false
+    --     end
+    -- end
 end,
 nil,
 {
     staying = onstaying
 })
+
+local function SetSoulFx(book, doer)
+    local fx = SpawnPrefab(book._dd and book._dd.fx or "wortox_soul_in_fx")
+    fx.Transform:SetPosition(doer.Transform:GetWorldPosition())
+    fx:Setup(doer)
+end
+-- local function FindItemWithoutContainer(inst, fn)
+--     local inventory = inst.components.inventory
+
+--     for k,v in pairs(inventory.itemslots) do
+--         if v and fn(v) then
+--             return v
+--         end
+--     end
+--     if inventory.activeitem and fn(inventory.activeitem) then
+--         return inventory.activeitem
+--     end
+-- end
 
 function SoulContracts:ReturnSouls(doer)
     if
@@ -42,6 +60,7 @@ function SoulContracts:ReturnSouls(doer)
                 self.inst._SoulHealing(doer)
                 self.inst.components.finiteuses:Use(1)
             end
+            SetSoulFx(self.inst, doer)
         else
             soulscount = TUNING.WORTOX_MAX_SOULS - soulscount
             soulscount = math.ceil( math.min(soulscount, self.inst.components.finiteuses:GetUses()) )
@@ -59,93 +78,74 @@ function SoulContracts:ReturnSouls(doer)
     return true
 end
 
-local function SetSoulFx(inst)
-    local fx = SpawnPrefab(inst._dd and inst._dd.fx or "wortox_soul_in_fx")
-    fx.Transform:SetPosition(inst.Transform:GetWorldPosition())
-    fx:Setup(inst)
-end
-local function FindItemWithoutContainer(inst, fn)
-    local inventory = inst.components.inventory
-
-    for k,v in pairs(inventory.itemslots) do
-        if v and fn(v) then
-            return v
+function SoulContracts:TriggerOwner(dolink, doer)
+    if doer == nil or not doer:HasTag("player") then
+        return false, "NORIGHT"
+    end
+    if
+        self.inst._contractsowner ~= nil and
+        self.inst._contractsowner ~= doer and self.inst._contractsowner:IsValid()
+    then
+        return false, "NORIGHT"
+    end
+    if
+        doer._contracts_l ~= nil and
+        doer._contracts_l ~= self.inst and doer._contracts_l:IsValid()
+    then
+        return false, "ONLYONE"
+    end
+    if dolink == nil then --自动模式
+        if self.inst._contractsowner ~= nil then
+            dolink = false
+        else
+            dolink = true
         end
     end
-    if inventory.activeitem and fn(inventory.activeitem) then
-        return inventory.activeitem
-    end
-end
-function SoulContracts:TriggerStaying(trystay, doer)
-    if trystay then
-        if --只有它的跟随对象才有权让它停止跟随
-            doer ~= nil and
-            self.inst.components.follower:GetLeader() ~= nil and
-            self.inst.components.follower:GetLeader() ~= doer
-        then
-            return false, "NORIGHT"
+    if dolink then --绑定
+        if self.inst._contractsowner == doer then --防止重复触发
+            return true
         end
-
-        self.staying = true
-        self.inst.components.follower:StopFollowing()
-        self.inst.components.locomotor:StopMoving()
-    elseif doer ~= nil then --要跟随，肯定得有一个跟随对象
-        if --它有跟随对象时，无法切换跟随
-            self.inst.components.follower:GetLeader() ~= nil and
-            self.inst.components.follower:GetLeader() ~= doer
-        then
-            return false, "NORIGHT"
-        end
-
-        if doer.components.inventory ~= nil then
-            --寻找包里的其他契约书
-            local otherbook = FindItemWithoutContainer(doer, function(item)
-                if item:HasTag("soulcontracts") and item ~= self.inst then
-                    return true
-                end
-                return false
-            end)
-            --每个玩家最多拥有1本契约书
-            if otherbook ~= nil then
-                return false, "ONLYONE"
-            end
-        end
-
+        doer._contracts_l = self.inst
+        self.inst._contractsowner = doer
         self.staying = false
+        self.inst.persists = false
+        self.inst:ListenForEvent("onremove", self.inst._OnOwnerRemoved, doer)
         if doer.components.leader ~= nil then
             doer.components.leader:RemoveFollowersByTag("soulcontracts") --清除其他所有契约的跟随
             doer.components.leader:AddFollower(self.inst)
         else
             self.inst.components.follower:SetLeader(doer)
         end
+    else --解绑
+        doer._contracts_l = nil
+        self.inst._contractsowner = nil
+        self.staying = true
+        self.inst.persists = true
+        self.inst:RemoveEventCallback("onremove", self.inst._OnOwnerRemoved, doer)
+        self.inst.components.follower:StopFollowing()
+        self.inst.components.locomotor:StopMoving()
     end
-
-    SetSoulFx(self.inst)
+    SetSoulFx(self.inst, self.inst)
 
     return true
 end
 
 function SoulContracts:PickUp(doer)
-    if --只有当前跟随对象才有权捡起它
-        self.inst.components.follower:GetLeader() ~= nil and
-        self.inst.components.follower:GetLeader() ~= doer
+    if doer == nil or not doer:HasTag("player") then
+        return false, "NORIGHT"
+    end
+    if
+        self.inst._contractsowner ~= nil and
+        self.inst._contractsowner ~= doer and self.inst._contractsowner:IsValid()
     then
         return false, "NORIGHT"
     end
-
-    --反正进入物品栏时就要检查一遍，这里虽然提前检查更好，但是物品栏里的检查更通用
-    -- --寻找包里的其他契约书
-    -- local otherbook = FindItemWithoutContainer(doer, function(item)
-    --     if item:HasTag("soulcontracts") and item ~= self.inst then
-    --         return true
-    --     end
-    --     return false
-    -- end)
-    -- --每个玩家最多拥有1本契约书
-    -- if otherbook ~= nil then
-    --     return false, "ONLYONE"
-    -- end
-
+    if
+        doer._contracts_l ~= nil and
+        doer._contracts_l ~= self.inst and doer._contracts_l:IsValid()
+    then
+        return false, "ONLYONE"
+    end
     doer:PushEvent("onpickupitem", { item = self.inst })
     doer.components.inventory:GiveItem(self.inst, nil, self.inst:GetPosition())
     return true
@@ -178,7 +178,7 @@ function SoulContracts:GiveSoul(doer, soul)
             finiteuses:Repair(needs)
         end
     end
-    SetSoulFx(self.inst)
+    SetSoulFx(self.inst, doer or self.inst)
 
     return true
 end

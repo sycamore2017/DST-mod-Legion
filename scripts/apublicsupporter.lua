@@ -1158,6 +1158,8 @@ local function inv_ApplyDamage(self, damage, attacker, weapon, spdamage, ...)
     end
     return self.inst.inv_ApplyDamage_old_l(self, damage, attacker, weapon, spdamage, ...)
 end
+-- local function OnRemove_player(inst)
+-- end
 
 AddPlayerPostInit(function(inst)
     --此时 ThePlayer 不存在，延时之后才有
@@ -1232,6 +1234,46 @@ AddPlayerPostInit(function(inst)
 
     --谋杀生物时(一般是指物品栏里的)
     inst:ListenForEvent("murdered", OnMurdered_player)
+
+    --下线时记录灵魂契约数据
+    -- inst:ListenForEvent("onremove", OnRemove_player)
+    local OnSave_old = inst.OnSave
+    inst.OnSave = function(inst, data)
+        if OnSave_old ~= nil then
+            OnSave_old(inst, data)
+        end
+        if inst._contracts_l ~= nil and inst._contracts_l:IsValid() then
+            local book = inst._contracts_l
+            if book.components.inventoryitem ~= nil then
+                if book.components.inventoryitem.owner ~= nil then --带在身上的(不管是谁)，给个标志
+                    data.contracts_slot_l = true
+                end
+            end
+            data.contracts_l = book:GetSaveRecord()
+        end
+    end
+    local OnLoad_old = inst.OnLoad
+    inst.OnLoad = function(inst, data, ...)
+        if OnLoad_old ~= nil then
+            OnLoad_old(inst, data, ...)
+        end
+        if data == nil then
+            return
+        end
+        if data.contracts_l ~= nil then
+            local book = SpawnSaveRecord(data.contracts_l)
+            if book ~= nil then
+                book.Transform:SetPosition(inst.Transform:GetWorldPosition())
+                if data.contracts_slot_l then
+                    if inst.components.inventory ~= nil then
+                        inst.components.inventory:GiveItem(book)
+                    end
+                elseif book.components.soulcontracts ~= nil then
+                    book.components.soulcontracts:TriggerOwner(true, inst)
+                end
+            end
+        end
+    end
 end)
 
 --------------------------------------------------------------------------

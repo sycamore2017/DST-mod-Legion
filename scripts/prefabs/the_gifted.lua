@@ -285,99 +285,48 @@ local function StopUpadateHealTag(inst)
     inst._needheal = false
 end
 
------
-
-local function FindItemWithoutContainer(inst, fn)
-    local inventory = inst.components.inventory
-
-    for k,v in pairs(inventory.itemslots) do
-        if v and fn(v) then
-            return v
-        end
-    end
-    if inventory.activeitem and fn(inventory.activeitem) then
-        return inventory.activeitem
-    end
-end
-local function OnWortoxGetContracts(inst, owner)
-    --寻找包里的其他契约书
-    local otherbook = FindItemWithoutContainer(owner, function(item)
-        if item:HasTag("soulcontracts") and item ~= inst then
-            return true
-        end
-        return false
-    end)
-
-    --每个玩家最多拥有1本契约书
-    if otherbook ~= nil then
-        owner:DoTaskInTime(0.2, function()
-            owner.components.inventory:DropItem(inst)
-            if owner.components.talker ~= nil then
-                owner.components.talker:Say(GetString(owner, "DESCRIBE", { "SOUL_CONTRACTS", "ONLYONE" }))
-            end
-        end)
-
-        return
-    end
-
-    --实现契约丢地上时自动跟随玩家
-    if owner.components.leader ~= nil then
-        owner.components.leader:RemoveFollowersByTag("soulcontracts") --清除已有跟随的契约书
-        owner.components.leader:AddFollower(inst) --提前设定跟随者，因为丢弃时已经获取不到owner了
-    else
-        inst.components.follower:SetLeader(owner)
-    end
-end
-
 local function OnPutInInventory_contracts(inst) --放进物品栏时(在鼠标和格子相互切换时也会触发)
     StopUpadateHealTag(inst)
-
     --因为契约书只能放进物品栏，不存在多级owner情况(物品->包裹->背包->玩家)，所以这里可以直接获取玩家
     local owner = inst.components.inventoryitem.owner
-    if owner ~= nil and owner:HasTag("player") then
-        OnWortoxGetContracts(inst, owner)
+    if owner ~= nil then
+        local res, reason = inst.components.soulcontracts:TriggerOwner(true, owner)
+        if not res then
+            owner:DoTaskInTime(0, function()
+                owner.components.inventory:DropItem(inst)
+                if owner.components.talker ~= nil then
+                    owner.components.talker:Say(GetString(owner, "DESCRIBE", { "SOUL_CONTRACTS", reason or "NORIGHT" }))
+                end
+            end)
+        end
     end
 end
-
--- local function setDropPostion(inst, time)
---     inst:DoTaskInTime(time, function ()
---         if inst.components.follower:GetLeader() ~= nil and inst.Physics ~= nil then
---             -- inst.Transform:SetPosition(inst.components.follower:GetLeader().Transform:GetWorldPosition())
---             inst.Physics:Teleport(inst.components.follower:GetLeader().Transform:GetWorldPosition())
---         end
---     end)
--- end
-
 local function OnDropped_contracts(inst) --丢在地上时
     if inst.sg ~= nil then
         inst.sg:GoToState("powerdown")
     end
-
     if inst.components.finiteuses:GetUses() > 0 then
         StartUpadateHealTag(inst)
     else
         StopUpadateHealTag(inst)
     end
-
-    -- if inst.components.follower:GetLeader() ~= nil then --当初为啥要重新设定一遍位置呢，难道是跟随组件的问题？
-    --     setDropPostion(inst, FRAMES * 6)
-    -- end
+    if inst._contractsowner ~= nil then
+        if inst._contractsowner:IsValid() then
+            inst.components.follower:SetLeader(inst._contractsowner)
+        else
+            inst._contractsowner = nil
+        end
+    end
 end
-
------
-
 local function OnHaunt_contracts(inst, haunter) --被作祟时
     if math.random() <= 0.2 and inst.components.finiteuses:GetPercent() < 1 then
-        inst.components.finiteuses:SetUses(inst.components.finiteuses:GetUses() + 1)
+        inst.components.finiteuses:Repair(1)
     elseif inst.components.finiteuses:GetUses() > 0 then
         inst._needheal = true
     end
     inst.components.hauntable.hauntvalue = TUNING.HAUNT_TINY
     return true
 end
-
------
-
 local function SoulLeaking(inst, posInst) --释放全部灵魂
     if inst.components.finiteuses:GetUses() <= 0 then
         return
@@ -392,35 +341,32 @@ local function SoulLeaking(inst, posInst) --释放全部灵魂
         end
     end
 end
-
 local function FuelTaken_contracts(inst, taker) --被当作燃料消耗时
     SoulLeaking(inst, taker)
     StopUpadateHealTag(inst)
 end
-
------
-
 local function PercentChanged_contracts(inst, data) --耐久变化时
     if data ~= nil and data.percent ~= nil then
         if data.percent <= 0 then --耐久用光
             if not inst:HasTag("nosoulleft") then
                 inst:AddTag("nosoulleft")
             end
-
             StopUpadateHealTag(inst)
         else --还有耐久
             if inst:HasTag("nosoulleft") then
                 inst:RemoveTag("nosoulleft")
             end
-
             if inst.components.inventoryitem.owner == nil then --不在背包里时
                 StartUpadateHealTag(inst)
             end
         end
     end
 end
+local function OnOwnerRemoved_contracts(inst, owner) --主人实体消失时，自己也消失
+    inst:Remove()
+end
 
-local function fn_contracts()
+local function Fn_contracts()
     local inst = CreateEntity()
 
     inst.entity:AddTransform()
@@ -455,6 +401,10 @@ local function fn_contracts()
 
     inst._needheal = false
     inst._taskheal = nil
+    inst._contractsowner = nil
+    inst._OnOwnerRemoved = function(owner)
+        OnOwnerRemoved_contracts(inst, owner)
+    end
     StartUpadateHealTag(inst)
     inst._dd = { fx = "l_soul_fx" }
 
@@ -477,7 +427,6 @@ local function fn_contracts()
     inst:AddComponent("finiteuses")
     inst.components.finiteuses:SetMaxUses(40)
     inst.components.finiteuses:SetUses(40)
-    inst:ListenForEvent("percentusedchange", PercentChanged_contracts)
 
     inst:AddComponent("fuel")
     inst.components.fuel.fuelvalue = TUNING.MED_FUEL
@@ -489,8 +438,11 @@ local function fn_contracts()
 
     inst:AddComponent("soulcontracts")
 
+    inst:ListenForEvent("percentusedchange", PercentChanged_contracts)
     inst:ListenForEvent("onputininventory", OnPutInInventory_contracts)
     inst:ListenForEvent("ondropped", OnDropped_contracts)
+    -- inst:ListenForEvent("stopfollowing", OnStopFollowing_contracts)
+    -- inst:ListenForEvent("startfollowing", OnStartFollowing_contracts)
 
     inst:SetBrain(brain_contracts)
     inst:AddComponent("locomotor") -- locomotor must be constructed before the stategraph
@@ -596,5 +548,5 @@ end
 
 return Prefab("web_hump_item", fn_creep_item, assets_creep_item, prefabs_creep_item),
         Prefab("web_hump", fn_creep, assets_creep, prefabs_creep),
-        Prefab("soul_contracts", fn_contracts, assets_contracts, prefabs_contracts)
+        Prefab("soul_contracts", Fn_contracts, assets_contracts, prefabs_contracts)
         -- Prefab("elecrazor", fn_elecrazor, assets_elecrazor, nil)

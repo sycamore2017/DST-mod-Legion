@@ -770,6 +770,19 @@ if IsServer then
         end
         return souls, soulscount
     end
+    local function SetSoulFx(book, doer)
+        local fx = SpawnPrefab(book._dd and book._dd.fx or "wortox_soul_in_fx")
+        fx.Transform:SetPosition(doer.Transform:GetWorldPosition())
+        fx:Setup(doer)
+    end
+    local function ValidSoulTarget(v)
+        if
+            v.components.health ~= nil and not v.components.health:IsDead() and
+            not v:HasTag("playerghost")
+        then
+            return true
+        end
+    end
 
     local seeksoulstealer_f = false
     AddPrefabPostInit("wortox_soul_spawn", function(inst)
@@ -781,20 +794,31 @@ if IsServer then
                 local function SeekSoulStealer_new(inst)
                     local toer = FindEntity(
                         inst,
-                        TUNING.WORTOX_SOULSTEALER_RANGE,
+                        TUNING.WORTOX_SOULSTEALER_RANGE+4,
+                        function(one, inst)
+                            if one.components.finiteuses ~= nil then
+                                if one.components.finiteuses:GetPercent() >= 1 then
+                                    if
+                                        one._contractsowner ~= nil and one._contractsowner:IsValid() and
+                                        ValidSoulTarget(one._contractsowner)
+                                    then
+                                        return true
+                                    end
+                                else
+                                    return true
+                                end
+                            elseif one._contracts_l ~= nil and ValidSoulTarget(one) then
+                                return true
+                            end
+                        end,
                         nil,
-                        { "soulcontracts" },
                         { "NOCLICK", "FX", "INLIMBO" },
-                        nil
+                        { "soulcontracts", "player" }
                     )
                     if toer ~= nil then
-                        --如果耐久满了，则寻找其主人
                         if toer.components.finiteuses ~= nil and toer.components.finiteuses:GetPercent() >= 1 then
-                            if toer.components.follower ~= nil and toer.components.follower:GetLeader() ~= nil then
-                                toer = toer.components.follower:GetLeader()
-                            else
-                                SeekSoulStealer_old(inst)
-                                return
+                            if toer._contractsowner ~= nil then
+                                toer = toer._contractsowner --如果耐久满了，则寻找其主人
                             end
                         end
                         inst.components.projectile:Throw(inst, toer, inst)
@@ -810,47 +834,42 @@ if IsServer then
         local OnHit_old = inst.components.projectile.onhit
         inst.components.projectile:SetOnHitFn(function(inst, attacker, target)
             if target ~= nil then
-                if target:HasTag("soulcontracts") then --进入地面的契约书
-                    --命中特效
-                    local fx = SpawnPrefab(target._dd and target._dd.fx or "wortox_soul_in_fx")
-                    fx.Transform:SetPosition(inst.Transform:GetWorldPosition())
-                    fx:Setup(target)
-
-                    if target.components.finiteuses ~= nil and target._SoulHealing ~= nil then
-                        if target.components.finiteuses:GetPercent() >= 1 then
-                            target._SoulHealing(target)
+                local owner = nil
+                local book = nil
+                if target:HasTag("soulcontracts") then
+                    book = target
+                    if book._contractsowner ~= nil and book._contractsowner:IsValid() then
+                        owner = book._contractsowner
+                    end
+                elseif target.components.inventory ~= nil then
+                    owner = target
+                    if owner._contracts_l ~= nil and owner._contracts_l:IsValid() then
+                        book = owner._contracts_l
+                    end
+                end
+                if book ~= nil and book.components.finiteuses ~= nil then
+                    if book.components.finiteuses:GetPercent() < 1 then
+                        book.components.finiteuses:Repair(1)
+                        SetSoulFx(book, book)
+                    elseif
+                        owner ~= nil and owner.components.inventory ~= nil and
+                        owner.components.inventory.isopen --这里应该可以规避死亡状态的玩家，所以就不多判断了
+                    then
+                        local souls, count = GetSouls(owner)
+                        if count >= TUNING.WORTOX_MAX_SOULS then --灵魂达到上限，自动释放
+                            if book._SoulHealing ~= nil  then
+                                book._SoulHealing(owner)
+                            end
                         else
-                            target.components.finiteuses:SetUses(target.components.finiteuses:GetUses() + 1)
+                            owner.components.inventory:GiveItem(SpawnPrefab("wortox_soul"), nil, owner:GetPosition())
                         end
+                        SetSoulFx(book, owner)
+                    elseif book._SoulHealing ~= nil then
+                        book._SoulHealing(book)
+                        SetSoulFx(book, book)
                     end
                     inst:Remove()
                     return
-                elseif target.components.inventory ~= nil then --击中玩家时，有携带契约书的话
-                    local book = FindItemWithoutContainer(target, function(item)
-                        if item:HasTag("soulcontracts") then
-                            return true
-                        end
-                        return false
-                    end)
-                    if book ~= nil then
-                        local souls, count = GetSouls(target)
-                        if count >= TUNING.WORTOX_MAX_SOULS then --灵魂达到上限，由契约来吸收
-                            if book.components.finiteuses ~= nil and book._SoulHealing ~= nil then
-                                if book.components.finiteuses:GetPercent() >= 1 then
-                                    book._SoulHealing(book)
-                                else
-                                    book.components.finiteuses:Repair(1)
-                                end
-                            end
-
-                            local fx = SpawnPrefab(book._dd and book._dd.fx or "wortox_soul_in_fx")
-                            fx.Transform:SetPosition(inst.Transform:GetWorldPosition())
-                            fx:Setup(target)
-
-                            inst:Remove()
-                            return
-                        end
-                    end
                 end
             end
             if OnHit_old ~= nil then
@@ -858,34 +877,6 @@ if IsServer then
             end
         end)
     end)
-
-    --瞬移动作响应时能消耗契约书中的灵魂
-    -- local BLINK_fn_old = ACTIONS.BLINK.fn
-    -- ACTIONS.BLINK.fn = function(act)
-    --     local act_pos = act:GetActionPoint()
-    --     if act.invobject == nil
-    --         and act.doer ~= nil
-    --         and act.doer:HasTag("soulstealer")
-    --         and act.doer.sg ~= nil
-    --         and act.doer.sg.currentstate.name == "portal_jumpin_pre"
-    --         and act_pos ~= nil
-    --         and act.doer.components.inventory ~= nil
-    --     then
-    --         local contracts = FindItemWithoutContainer(act.doer, function(item)
-    --             return item:HasTag("soulcontracts") and
-    --                 item.components.finiteuses ~= nil and
-    --                 item.components.finiteuses:GetUses() > 0
-    --         end)
-
-    --         if contracts ~= nil then
-    --             contracts.components.finiteuses:Use(1)
-    --             act.doer.sg:GoToState("portal_jumpin", act_pos)
-    --             return true
-    --         end
-    --     end
-
-    --     return BLINK_fn_old(act)
-    -- end
 end
 
 --------------------------------------------------------------------------
@@ -961,10 +952,8 @@ EXSTAY_CONTRACTS.fn = function(act)
         act.target ~= nil and not act.target:IsInLimbo() and
         act.target.components.soulcontracts ~= nil
     then
-        return act.target.components.soulcontracts:TriggerStaying(
-            not act.target.components.soulcontracts.staying, act.doer)
+        return act.target.components.soulcontracts:TriggerOwner(nil, act.doer)
     end
-
     return false, "NORIGHT"
 end
 AddAction(EXSTAY_CONTRACTS)
