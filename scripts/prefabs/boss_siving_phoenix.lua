@@ -316,6 +316,18 @@ local function FeathersFlap(inst) --羽乱舞
     end
     SetBehaviorTree(inst, "flap")
 end
+local function IsTreeHaloCrusher(attacker, weapon)
+    if attacker ~= nil and attacker.prefab == "tornado" or attacker.treehalo_crusher_l then
+        return true
+    elseif weapon ~= nil then
+        if weapon.treehalo_crusher_l then
+            return true
+        elseif weapon.components.tool ~= nil and weapon.components.tool:CanDoAction(ACTIONS.MINE) then
+            return true
+        end
+    end
+    return false
+end
 
 local function MakeBoss(data)
     table.insert(prefs, Prefab(
@@ -631,19 +643,6 @@ local function MakeBoss(data)
                         return
                     end
 
-                    if
-                        inst.sign_l_treehalo > 0 and
-                        data.weapon ~= nil and
-                        data.weapon.components.tool ~= nil and
-                        data.weapon.components.tool:CanDoAction(ACTIONS.MINE)
-                    then
-                        inst.count_toolatk = inst.count_toolatk + 1
-                        if inst.count_toolatk >= 4 then --达到4次就减少一层buff
-                            SetTreeBuff(inst, -1)
-                            inst.count_toolatk = 0
-                        end
-                    end
-
                     --现在是雌雄双打
                     local lasttarget = inst.components.combat.target
                     --谁离得近打谁
@@ -661,56 +660,13 @@ local function MakeBoss(data)
                     if lasttarget and inst.mate ~= nil and inst.mate.components.combat.target == nil then
                         inst.mate.components.combat:SetTarget(lasttarget)
                     end
-
-                    --[[
-                    local lasttarget = inst.components.combat.target
-
-                    --保持伴侣和自己同时仇恨不同的对象
-                    if inst.mate == nil then
-                        if data.attacker == lasttarget then
-                            return
-                        end
-
-                        --谁离得近打谁
-                        if lasttarget ~= nil and IsValid(lasttarget) then
-                            if
-                                inst:GetDistanceSqToPoint(lasttarget:GetPosition())
-                                > inst:GetDistanceSqToPoint(data.attacker:GetPosition())
-                            then
-                                inst.components.combat:SetTarget(data.attacker)
-                            end
-                        else
-                            inst.components.combat:SetTarget(data.attacker)
-                        end
-                    else
-                        local matetarget = inst.mate.components.combat.target
-
-                        if data.attacker == lasttarget then
-                            if lasttarget == matetarget then
-                                inst.mate.components.combat:SetTarget(nil)
-                            end
-                            return
-                        end
-
-                        --谁离得近打谁
-                        if lasttarget ~= nil and IsValid(lasttarget) then
-                            if
-                                inst:GetDistanceSqToPoint(lasttarget:GetPosition())
-                                > inst:GetDistanceSqToPoint(data.attacker:GetPosition())
-                            then
-                                inst.components.combat:SetTarget(data.attacker)
-                                if data.attacker == matetarget then
-                                    inst.mate.components.combat:SetTarget(nil)
-                                end
-                            end
-                        else
-                            inst.components.combat:SetTarget(data.attacker)
-                            if data.attacker == matetarget then
-                                inst.mate.components.combat:SetTarget(nil)
-                            end
-                        end
+                end
+                if inst.sign_l_treehalo > 0 and IsTreeHaloCrusher(data.attacker, data.weapon) then
+                    inst.count_toolatk = inst.count_toolatk + 1
+                    if inst.count_toolatk >= 4 then --达到4次就减少一层buff
+                        SetTreeBuff(inst, -1)
+                        inst.count_toolatk = 0
                     end
-                    ]]--
                 end
             end)
             inst:ListenForEvent("timerdone", function(inst, data)

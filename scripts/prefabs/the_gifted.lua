@@ -234,7 +234,7 @@ local assets_contracts = {
     Asset("ATLAS", "images/inventoryimages/soul_contracts.xml"),
     Asset("IMAGE", "images/inventoryimages/soul_contracts.tex"),
     Asset("SOUND", "sound/together.fsb"),   --官方音效包
-    Asset("SCRIPT", "scripts/prefabs/wortox_soul_common.lua"), --官方灵魂通用功能函数文件
+    Asset("SCRIPT", "scripts/prefabs/wortox_soul_common.lua") --官方灵魂通用功能函数文件
 }
 local prefabs_contracts = {
     "wortox_soul_heal_fx",
@@ -243,8 +243,6 @@ local prefabs_contracts = {
     -- "wortox_eat_soul_fx",
     "l_soul_fx",    --灵魂被吸收时的特效
 }
-
------
 
 local function ContractsDoHeal(inst)
     wortox_soul_common.DoHeal(inst)
@@ -331,9 +329,9 @@ local function SoulLeaking(inst, posInst) --释放全部灵魂
     if inst.components.finiteuses:GetUses() <= 0 then
         return
     end
-
     local x, y, z = posInst.Transform:GetWorldPosition()
-    for k = 1, inst.components.finiteuses:GetUses() do
+    local count = math.min(20, inst.components.finiteuses:GetUses()) --怕卡顿
+    for k = 1, count do
         local soul = SpawnPrefab("wortox_soul")
         soul.Transform:SetPosition(x, y, z)
         if soul.components.inventoryitem ~= nil then
@@ -362,8 +360,39 @@ local function PercentChanged_contracts(inst, data) --耐久变化时
         end
     end
 end
-local function OnOwnerRemoved_contracts(inst, owner) --主人实体消失时，自己也消失
-    inst:Remove()
+
+local function EmptyCptFn(self, ...)end
+local function DisplayName(inst)
+    local namepre = inst.nameoverride or inst.prefab
+	namepre = STRINGS.NAMES[string.upper(namepre or "hiddenmoonlight")] or "Something"
+	local lvl = inst._lvl_l:value()
+	if lvl ~= nil and lvl > 0 then
+		namepre = namepre.."(Lv."..tostring(lvl)..")"
+	end
+	return namepre
+end
+local function OnUpgradeFn_contracts(inst, doer, item)
+    (inst.SoundEmitter or doer.SoundEmitter):PlaySound("dontstarve/characters/wortox/soul/spawn", nil, .5)
+end
+local function SetLevel(inst)
+    inst._lvl_l:set(inst.components.upgradeable:GetStage() - 1)
+end
+local function UpdateUses_contracts(inst, uses)
+    local lvl = inst.components.upgradeable:GetStage() - 1
+    if lvl > 0 then
+        inst.components.finiteuses:SetMaxUses(40 + lvl*4)
+        inst.components.finiteuses:SetUses(uses or inst.components.finiteuses:GetUses()) --主要是更新一下ui
+    end
+end
+local function SetLevel_contracts(inst, uses)
+    SetLevel(inst)
+    UpdateUses_contracts(inst, uses)
+end
+local function OnSave_contracts(inst, data)
+	data.uses_l = inst.components.finiteuses:GetUses() --主要是怕 finiteuses 以后会限制大小
+end
+local function OnLoad_contracts(inst, data)
+    SetLevel_contracts(inst, data and data.uses_l or nil)
 end
 
 local function Fn_contracts()
@@ -391,6 +420,9 @@ local function Fn_contracts()
     inst:AddTag("meteor_protection") --防止被流星破坏
     inst:AddTag("NORATCHECK") --mod兼容：永不妥协。该道具不算鼠潮分
 
+    inst._lvl_l = net_byte(inst.GUID, "contracts_l._lvl_l", "lvl_l_dirty")
+    inst.displaynamefn = DisplayName
+
     inst:AddComponent("skinedlegion")
     inst.components.skinedlegion:Init("soul_contracts")
 
@@ -402,17 +434,14 @@ local function Fn_contracts()
     inst._needheal = false
     inst._taskheal = nil
     inst._contractsowner = nil
-    inst._OnOwnerRemoved = function(owner)
-        OnOwnerRemoved_contracts(inst, owner)
-    end
-    StartUpadateHealTag(inst)
     inst._dd = { fx = "l_soul_fx" }
-
     inst._SoulHealing = ContractsDoHeal
+    StartUpadateHealTag(inst)
 
     inst:AddComponent("inspectable")
 
     inst:AddComponent("follower")
+    inst.components.follower.CachePlayerLeader = EmptyCptFn --不想它在重进世界时出错了还跟着玩家
     inst.components.follower.keepdeadleader = true
     inst.components.follower.keepleaderduringminigame = true
 
@@ -422,7 +451,7 @@ local function Fn_contracts()
     inst.components.inventoryitem.atlasname = "images/inventoryimages/soul_contracts.xml"
     inst.components.inventoryitem.pushlandedevents = false
     inst.components.inventoryitem.nobounce = true
-    inst.components.inventoryitem.canbepickedup = false
+    inst.components.inventoryitem.canbepickedup = false --无法被直接捡起来
 
     inst:AddComponent("finiteuses")
     inst.components.finiteuses:SetMaxUses(40)
@@ -435,6 +464,13 @@ local function Fn_contracts()
     inst:AddComponent("hauntable")
     inst.components.hauntable.cooldown = TUNING.HAUNT_COOLDOWN_SMALL
     inst.components.hauntable:SetOnHauntFn(OnHaunt_contracts)
+
+    inst:AddComponent("upgradeable")
+    inst.components.upgradeable.upgradetype = UPGRADETYPES.CONTRACTS_L
+    inst.components.upgradeable.onupgradefn = OnUpgradeFn_contracts --升级前
+    inst.components.upgradeable.onstageadvancefn = SetLevel_contracts --升级时
+    inst.components.upgradeable.numstages = 100
+    inst.components.upgradeable.upgradesperstage = 1
 
     inst:AddComponent("soulcontracts")
 
@@ -451,6 +487,9 @@ local function Fn_contracts()
     inst.components.locomotor.walkspeed = 8
     inst.components.locomotor.runspeed = 8
     inst:SetStateGraph("SGsoul_contracts")
+
+    inst.OnSave = OnSave_contracts
+    inst.OnLoad = OnLoad_contracts
 
     inst.components.skinedlegion:SetOnPreLoad()
 

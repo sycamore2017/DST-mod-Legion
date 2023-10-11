@@ -3605,7 +3605,8 @@ STRINGS.ACTIONS.REPAIR_LEGION = {
     GENERIC = "Repair",
     MERGE = "Merge",
     EMBED = "Embed",
-    CHARGE = "Charge"
+    CHARGE = "Charge",
+    CONTRACTS = "Expand"
 }
 S______GENERIC.ACTIONFAIL.REPAIR_LEGION = {
     GUITAR = "There's nothing to fix.",

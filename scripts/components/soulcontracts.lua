@@ -10,6 +10,13 @@ local SoulContracts = Class(function(self, inst)
     self.inst = inst
     self.staying = true
 
+    self._OnOwnerReroll = function(owner) --主人重选人物时，解除联系
+        self:TriggerOwner(false, owner)
+    end
+    self._OnOwnerRemoved = function(owner) --主人实体消失时，自己也消失
+        self.inst:Remove()
+    end
+
     -- self.inst.components.follower.OnChangedLeader = function(inst, new_leader, prev_leader)
     --     if new_leader == nil then
     --         self.staying = true
@@ -109,7 +116,8 @@ function SoulContracts:TriggerOwner(dolink, doer)
         self.inst._contractsowner = doer
         self.staying = false
         self.inst.persists = false
-        self.inst:ListenForEvent("onremove", self.inst._OnOwnerRemoved, doer)
+        self.inst:ListenForEvent("ms_playerreroll", self._OnOwnerReroll, doer)
+        self.inst:ListenForEvent("onremove", self._OnOwnerRemoved, doer)
         if doer.components.leader ~= nil then
             doer.components.leader:RemoveFollowersByTag("soulcontracts") --清除其他所有契约的跟随
             doer.components.leader:AddFollower(self.inst)
@@ -121,7 +129,8 @@ function SoulContracts:TriggerOwner(dolink, doer)
         self.inst._contractsowner = nil
         self.staying = true
         self.inst.persists = true
-        self.inst:RemoveEventCallback("onremove", self.inst._OnOwnerRemoved, doer)
+        self.inst:RemoveEventCallback("ms_playerreroll", self._OnOwnerReroll, doer)
+        self.inst:RemoveEventCallback("onremove", self._OnOwnerRemoved, doer)
         self.inst.components.follower:StopFollowing()
         self.inst.components.locomotor:StopMoving()
     end

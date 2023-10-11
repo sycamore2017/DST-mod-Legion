@@ -787,6 +787,34 @@ for k,v in pairs(elec_needchange) do
 end
 elec_needchange = nil
 
+--灵魂契约
+
+_G.UPGRADETYPES.CONTRACTS_L = "CONTRACTS_L"
+
+local function Fn_try_soul(inst, doer, target, actions, right)
+    if target:HasTag(UPGRADETYPES.CONTRACTS_L.."_upgradeable") then
+        if CommonDoerCheck(doer, target) then
+            return true
+        end
+    end
+    return false
+end
+
+local soul_needchange = {
+    ghostflower = 1, horrorfuel = 1
+}
+for k,v in pairs(soul_needchange) do
+    _G.REPAIRERS_L[k] = {
+        noapiset = nil,
+        fn_try = Fn_try_soul,
+        fn_sg = Fn_sg_long,
+        fn_do = function(act)
+            return DoUpgrade(act.doer, act.invobject, act.target, 1, true, "YELLOWGEM")
+        end
+    }
+end
+soul_needchange = nil
+
 ------
 
 if IsServer then
@@ -812,6 +840,8 @@ REPAIR_LEGION.strfn = function(act)
             return "CHARGE"
         elseif act.target.prefab == "mat_whitewood" then
             return "MERGE"
+        elseif act.target.prefab == "soul_contracts" then
+            return "CONTRACTS"
         end
     end
     return "GENERIC"
@@ -1250,6 +1280,8 @@ AddPlayerPostInit(function(inst)
                 end
             end
             data.contracts_l = book:GetSaveRecord()
+        elseif inst.contracts_record_l ~= nil then
+            data.contracts_l = inst.contracts_record_l
         end
     end
     local OnLoad_old = inst.OnLoad
@@ -1261,17 +1293,26 @@ AddPlayerPostInit(function(inst)
             return
         end
         if data.contracts_l ~= nil then
-            local book = SpawnSaveRecord(data.contracts_l)
-            if book ~= nil then
-                book.Transform:SetPosition(inst.Transform:GetWorldPosition())
-                if data.contracts_slot_l then
-                    if inst.components.inventory ~= nil then
-                        inst.components.inventory:GiveItem(book)
+            local contracts_slot_l = data.contracts_slot_l --提前缓存下来，因为等会就会清除了
+            local contracts_l = data.contracts_l
+            inst.contracts_record_l = contracts_l
+            inst.task_contracts_l = inst:DoTaskInTime(0.3, function(inst)
+                local book = SpawnSaveRecord(contracts_l)
+                if book ~= nil then
+                    book.Transform:SetPosition(inst.Transform:GetWorldPosition())
+                    if contracts_slot_l then
+                        if inst.components.inventory ~= nil then
+                            inst.components.inventory:GiveItem(book)
+                        end
+                    elseif book.components.soulcontracts ~= nil then
+                        book.components.soulcontracts:TriggerOwner(true, inst)
+                        -- local res, reason = book.components.soulcontracts:TriggerOwner(true, inst)
+                        -- print("结果是:"..tostring(res)..","..tostring(reason))
                     end
-                elseif book.components.soulcontracts ~= nil then
-                    book.components.soulcontracts:TriggerOwner(true, inst)
                 end
-            end
+                inst.contracts_record_l = nil --主要是怕缓冲期间，服务器再次保存并退出，导致契约数据直接消失
+                inst.task_contracts_l = nil
+            end)
         end
     end
 end)

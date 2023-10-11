@@ -3788,7 +3788,8 @@ STRINGS.ACTIONS.REPAIR_LEGION = {
     GENERIC = "修理",
     MERGE = "合并",
     EMBED = "嵌入",
-    CHARGE = "充能"
+    CHARGE = "充能",
+    CONTRACTS = "拓"
 }
 S______GENERIC.ACTIONFAIL.REPAIR_LEGION = {
     GUITAR = "很新，没啥好修的。",
