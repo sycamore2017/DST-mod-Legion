@@ -1,8 +1,34 @@
+local wortox_soul_common = require("prefabs/wortox_soul_common")
+
 local function onstaying(self)
     if self.staying then
         self.inst:AddTag("bookstaying")
     else
         self.inst:RemoveTag("bookstaying")
+    end
+end
+local function OnRestoreSoul(inst)
+    inst.nosoultask_l = nil
+end
+local function OnTargetDeath(inst, data)
+    if
+        inst.nosoultask == nil and --沃托克斯的灵魂机制应该比 death 事件还要早执行
+        inst.nosoultask_l == nil and --契约的机制
+        inst:IsValid() and
+        not inst:IsInLimbo() and not inst:IsAsleep() and --在奇怪状态就算了，产生了灵魂也接收不到
+        wortox_soul_common.HasSoul(inst)
+    then
+        inst.nosoultask_l = inst:DoTaskInTime(5, OnRestoreSoul)
+
+        local numsoul = (wortox_soul_common.GetNumSouls(inst)) / 2
+        local soulchance = numsoul - math.floor(numsoul)
+        numsoul = math.floor(numsoul)
+        if soulchance > 0 and math.random() < soulchance then
+            numsoul = numsoul + 1
+        end
+        if numsoul > 0 then
+            wortox_soul_common.SpawnSoulsAt(inst, numsoul)
+        end
     end
 end
 
@@ -15,6 +41,22 @@ local SoulContracts = Class(function(self, inst)
     end
     self._OnOwnerRemoved = function(owner) --主人实体消失时，自己也消失
         self.inst:Remove()
+    end
+    self._OnOwnerHitOther = function(owner, data) --主人攻击时，让敌人死后能产生灵魂
+        if self.inst._lvl_l:value() ~= nil and self.inst._lvl_l:value() >= 20 then
+            if
+                data and data.target and not data.target.mark_contract_l and
+                data.target:IsValid() and
+                data.target.components.health ~= nil
+            then
+                data.target.mark_contract_l = true
+                if data.target.components.health:IsDead() then --攻击时就已经死了，就不需要监听了
+                    OnTargetDeath(data.target)
+                else
+                    data.target:ListenForEvent("death", OnTargetDeath)
+                end
+            end
+        end
     end
 
     -- self.inst.components.follower.OnChangedLeader = function(inst, new_leader, prev_leader)
@@ -35,18 +77,6 @@ local function SetSoulFx(book, doer)
     fx.Transform:SetPosition(doer.Transform:GetWorldPosition())
     fx:Setup(doer)
 end
--- local function FindItemWithoutContainer(inst, fn)
---     local inventory = inst.components.inventory
-
---     for k,v in pairs(inventory.itemslots) do
---         if v and fn(v) then
---             return v
---         end
---     end
---     if inventory.activeitem and fn(inventory.activeitem) then
---         return inventory.activeitem
---     end
--- end
 
 function SoulContracts:ReturnSouls(doer)
     if
@@ -85,6 +115,12 @@ function SoulContracts:ReturnSouls(doer)
     return true
 end
 
+local function UnlinkOwner(self, doer)
+    doer._contracts_l = nil
+    self.inst:RemoveEventCallback("ms_playerreroll", self._OnOwnerReroll, doer)
+    self.inst:RemoveEventCallback("onremove", self._OnOwnerRemoved, doer)
+    self.inst:RemoveEventCallback("onhitother", self._OnOwnerHitOther, doer)
+end
 function SoulContracts:TriggerOwner(dolink, doer)
     if doer == nil or not doer:HasTag("player") then
         return false, "NORIGHT"
@@ -112,12 +148,16 @@ function SoulContracts:TriggerOwner(dolink, doer)
         if self.inst._contractsowner == doer then --防止重复触发
             return true
         end
+        if self.inst._contractsowner ~= nil then --清理之前的监听
+            UnlinkOwner(self, self.inst._contractsowner)
+        end
         doer._contracts_l = self.inst
         self.inst._contractsowner = doer
         self.staying = false
         self.inst.persists = false
         self.inst:ListenForEvent("ms_playerreroll", self._OnOwnerReroll, doer)
         self.inst:ListenForEvent("onremove", self._OnOwnerRemoved, doer)
+        self.inst:ListenForEvent("onhitother", self._OnOwnerHitOther, doer)
         if doer.components.leader ~= nil then
             doer.components.leader:RemoveFollowersByTag("soulcontracts") --清除其他所有契约的跟随
             doer.components.leader:AddFollower(self.inst)
@@ -125,12 +165,10 @@ function SoulContracts:TriggerOwner(dolink, doer)
             self.inst.components.follower:SetLeader(doer)
         end
     else --解绑
-        doer._contracts_l = nil
         self.inst._contractsowner = nil
         self.staying = true
         self.inst.persists = true
-        self.inst:RemoveEventCallback("ms_playerreroll", self._OnOwnerReroll, doer)
-        self.inst:RemoveEventCallback("onremove", self._OnOwnerRemoved, doer)
+        UnlinkOwner(self, doer)
         self.inst.components.follower:StopFollowing()
         self.inst.components.locomotor:StopMoving()
     end

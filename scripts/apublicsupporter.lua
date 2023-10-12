@@ -1188,8 +1188,6 @@ local function inv_ApplyDamage(self, damage, attacker, weapon, spdamage, ...)
     end
     return self.inst.inv_ApplyDamage_old_l(self, damage, attacker, weapon, spdamage, ...)
 end
--- local function OnRemove_player(inst)
--- end
 
 AddPlayerPostInit(function(inst)
     --此时 ThePlayer 不存在，延时之后才有
@@ -1266,7 +1264,6 @@ AddPlayerPostInit(function(inst)
     inst:ListenForEvent("murdered", OnMurdered_player)
 
     --下线时记录灵魂契约数据
-    -- inst:ListenForEvent("onremove", OnRemove_player)
     local OnSave_old = inst.OnSave
     inst.OnSave = function(inst, data)
         if OnSave_old ~= nil then
@@ -1306,8 +1303,6 @@ AddPlayerPostInit(function(inst)
                         end
                     elseif book.components.soulcontracts ~= nil then
                         book.components.soulcontracts:TriggerOwner(true, inst)
-                        -- local res, reason = book.components.soulcontracts:TriggerOwner(true, inst)
-                        -- print("结果是:"..tostring(res)..","..tostring(reason))
                     end
                 end
                 inst.contracts_record_l = nil --主要是怕缓冲期间，服务器再次保存并退出，导致契约数据直接消失

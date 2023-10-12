@@ -244,7 +244,13 @@ local states = {
             inst.AnimState:ClearBloomEffectHandle()
             inst:AddTag("NOCLICK")
             inst.Light:Enable(false)
-            inst.components.lootdropper:DropLoot(inst:GetPosition())
+            if inst:IsInLimbo() and inst.tree and inst.tree:IsValid() then --在隐藏状态死亡的话，就让掉落物产生在神木岩附近
+                local pos = inst.tree:GetPosition()
+                local offset = FindWalkableOffset(pos, 2*PI*math.random(), 3+math.random()*3, 8, false, true)
+                inst.components.lootdropper:DropLoot(Point(pos.x + offset.x, 0, pos.z + offset.z))
+            else
+                inst.components.lootdropper:DropLoot(inst:GetPosition())
+            end
             PlaySound(inst, "death", nil, nil)
         end,
         onexit = function(inst)

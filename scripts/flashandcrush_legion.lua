@@ -676,17 +676,17 @@ AddStategraphState("wilson", release_spores)
 --[[ 灵魂契约书瞬移、加血相关 ]]
 --------------------------------------------------------------------------
 
-local function FindItemWithoutContainer(inst, fn)
-    local inventory = inst.components.inventory
-    for k,v in pairs(inventory.itemslots) do
-        if v and fn(v) then
-            return v
-        end
-    end
-    if inventory.activeitem and fn(inventory.activeitem) then
-        return inventory.activeitem
-    end
-end
+-- local function FindItemWithoutContainer(inst, fn)
+--     local inventory = inst.components.inventory
+--     for k,v in pairs(inventory.itemslots) do
+--         if v and fn(v) then
+--             return v
+--         end
+--     end
+--     if inventory.activeitem and fn(inventory.activeitem) then
+--         return inventory.activeitem
+--     end
+-- end
 
 --[[
 -- 辅助沃托克斯管理灵魂

@@ -380,8 +380,12 @@ end
 local function UpdateUses_contracts(inst, uses)
     local lvl = inst.components.upgradeable:GetStage() - 1
     if lvl > 0 then
-        inst.components.finiteuses:SetMaxUses(40 + lvl*4)
-        inst.components.finiteuses:SetUses(uses or inst.components.finiteuses:GetUses()) --主要是更新一下ui
+        local maxuse = 40 + lvl*2
+        if uses == nil then
+            uses = inst.components.finiteuses:GetUses()
+        end
+        inst.components.finiteuses:SetMaxUses(maxuse)
+        inst.components.finiteuses:SetUses(math.min(maxuse, uses))
     end
 end
 local function SetLevel_contracts(inst, uses)
