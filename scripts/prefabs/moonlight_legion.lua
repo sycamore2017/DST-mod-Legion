@@ -1053,7 +1053,7 @@ local function TriggerRevolt(inst, doer, doit)
         inst.components.damagetypebonus:AddBonus("shadow_aligned", inst, bonus_rf_buff, "moonsurge")
 
         if inst._lvl >= lvls_refracted[8] then
-            inst.components.weapon:SetRange(1.5)
+            inst.components.weapon:SetRange(2)
         end
 
         TrySetOwnerSymbol(inst, doer, true)

@@ -30,7 +30,7 @@
         end)
 ]]--
 
---[[ 给玩家实体增加已有皮肤获取与管理机制 Tip：
+--[[ 关于世界 Tip：
     TheNet:GetIsMasterSimulation()  --是否为服务器世界(主机+云服)
     TheNet:GetIsServer()            --是否为主机世界(玩家本地电脑开的，既跑进程，也要运行ui)
     TheNet:IsDedicated()            --是否为云服世界(只跑进程，不运行ui)
@@ -49,6 +49,70 @@
     TheWorld.ismastershard      --是否为主世界(本质上就是 TheWorld.ismastersim and not TheShard:IsSecondary())
     TheNet:GetIsServer() or TheNet:IsDedicated() --是否为非客户端世界，这个是最精确的判定方式
     not TheNet:IsDedicated()    --这个方式也能判定客户端，但是无法排除客户端和服务端为一体的世界的情况
+]]--
+
+--[[ combat机制 Tip:
+1、Combat:DoAttack(targ, weapon, projectile, stimuli, instancemult, instrangeoverride, instpos)
+    ▷stimuli：可以 weapon.overridestimulifn 自定义，如果有攻击者自己有 buff_electricattack，则为 electric
+    ▷攻击距离：敌人物理半径+攻击者攻击距离+武器攻击距离。玩家的 hitrange 默认为3，武器的 hitrange 默认为0
+    ▷攻击带电：攻击本身是带电的(stimuli == "electric")，或者武器带电(weapon.stimuli == "electric")
+    ▷攻击反伤：判定在攻击前，执行在攻击后。反伤给攻击者，由敌人以及敌人所戴装备自定义逻辑
+    ▷标签系数：damagetypebonus组件 通过敌人的标签，来给攻击与特殊攻击提供额外 乘法系数
+    ▷暂时系数：instancemult(默认1)，表示是这次攻击的暂时性的系数，会与 最终攻击力(普攻) 相乘
+    ▷最终攻击力(普攻)：
+        basedamage --(1)如果骑行，为骑行对象的 基础攻击+鞍具的额外攻击：combat.defaultdamage+saddler:GetBonusDamage()
+                   --(2)如果空手，为攻击者的 基础攻击：combat.defaultdamage
+                   --(3)如果有武器，为武器的 基础攻击x标签系数(默认1)：weapon:damage*damagetypebonus:GetBonus(敌人)
+        * basemultiplier --(1)如果骑行，为骑行对象的 基础攻击系数(默认1)：combat.damagemultiplier
+                         --(2)其他，为攻击者的 基础攻击系数(默认1)：combat.damagemultiplier
+        * externaldamagemultipliers:Get() --额外攻击系数(默认1)，内部是乘法计算。多数mod都是改的这里
+        * damagetypemult --(1)如果骑行，为骑行对象的 标签系数(默认1)x鞍具提供的标签系数(默认1)：damagetypebonus:GetBonus(敌人)*damagetypebonus:GetBonus(敌人)
+                         --(2)其他，为攻击者的 标签系数(默认1)：damagetypebonus:GetBonus(敌人)
+        * multiplier --电系加成系数(默认1)：若攻击带电，敌人无电系防御，就为1.5，若敌人潮湿了，根据潮湿程度，最终为1.5-2.5
+        * playermultiplier --若空手或骑行，敌人为玩家，则为攻击者的 对玩家系数(默认1)：self.playerdamagepercent
+        * pvpmultiplier --若敌我双方都是玩家，则为攻击者的 pvp系数(默认1)：self.pvp_damagemod
+        * self.customdamagemultfn() --角色系数：攻击者根据一定逻辑，提供该系数(默认1)，比如旺达和温蒂就有该逻辑
+        + bonus --(1)如果骑行，为骑行对象的 叠加攻击(默认0)：combat.damagebonus
+                --(2)其他，为攻击者的 叠加攻击(默认0)：combat.damagebonus
+    ▷最终攻击力(特攻，比如位面攻击)：
+        spdamage(是个表，非数字) --(1)如果骑行，为骑行对象的 特殊攻击+鞍具的特殊攻击：CollectSpDamage()
+                                --(2)如果空手，为攻击者的 特殊攻击：CollectSpDamage()
+                                --(3)如果有武器，为武器的 特殊攻击x标签系数(默认1)：CollectSpDamage()*damagetypebonus:GetBonus(敌人)
+        * damagetypemult --与普攻的逻辑相同
+        * playermultiplier --与普攻的逻辑相同
+        * pvpmultiplier --与普攻的逻辑相同
+
+2、Combat:GetAttacked(attacker, damage, weapon, stimuli, spdamage)
+    ▷闪避：根据 attackdodger组件，一旦闪避成功，两种最终攻击力(普攻与特攻)都会被设置为0：attackdodger:Dodge()
+    ▷替身：根据被攻击者的 self.redirectdamagefn() 得到替身，由替身进行伤害计算与结算，但自己依然会触发受击事件之类的逻辑。比如骑牛时，牛替玩家挡伤害
+    ▷装备防御：如果被攻击者有物品栏组件，则进行以下逻辑
+        --标签抵挡：若装备有 resistance组件，则在攻击者或武器有组件里的对应标签时，两种最终攻击力设为0，逻辑结束
+        --护甲系数：若装备有 armor组件，则最终护甲系数为所有护甲系数中的最大值
+        --标签系数：若装备有 damagetyperesist组件，则在攻击者或武器有组件里的对应标签时，提供一个系数值(所有装备系数累乘)
+    ▷装备普攻损耗：根据所有具有 armor组件的装备，各自的损耗=伤害*标签系数*最大护甲系数*该装备的护甲系数/所有装备的护甲系数之和
+    ▷装备普攻额外损耗：装备通过一定逻辑，可能会受到额外的损耗：armor:GetBonusDamage(attacker, weapon)。比如海狸的攻击会对木甲有额外损耗
+    ▷装备特攻损耗：循环每种特殊攻击值
+        1、特殊攻击力 = 特殊攻击力*所有装备的标签系数累乘
+        2、特殊防御装备：获取装备栏中所有具备对应特殊防御力的装备
+        3、由所有 特殊防御装备 尽可能平均地吸收 特殊攻击力，吸收多少特殊攻击力就会消耗多少耐久
+    ▷鞍具标签系数：若骑行的鞍具具有 damagetyperesist组件，则在攻击者或武器有组件里的对应标签时，提供一个系数值
+    ▷自身标签系数：若被攻击者具有 damagetyperesist组件，则在攻击者或武器有组件里的对应标签时，提供一个系数值
+    ▷额外受击系数：被攻击者自身的伤害系数：self.externaldamagetakenmultipliers:Get()，内部是乘法计算。多数mod都是改的这里
+    ▷额外攻击值：combat.bonusdamagefn()，攻击者根据一定逻辑，提供该数值，比如蜂后和蜜蜂就有该逻辑
+    ▷最终普攻伤害值1：
+        damage --传参。可能是由 Combat:DoAttack() 而来，也可能是 Combat:GetAttacked() 直接设置的数值
+        * 所有装备的标签系数累乘 * (1 - 所有护甲系数中的最大值)
+        * 鞍具标签系数 * 自身标签系数 * 额外受击系数
+        + 额外受击系数 * 额外攻击值
+    ▷最终特攻伤害值：如果最终结果不大于0，则不参与计算，代表完全防御住了
+        (
+            spdamage(是个表，非数字) --传参。可能是由 Combat:DoAttack() 而来，也可能是 Combat:GetAttacked() 直接设置的数值
+            * 所有装备的标签系数累乘
+        )
+        - 所有具有对应特殊防御的装备的特殊防御值之和 - 被攻击者自身对应的的特殊防御值
+    ▷位面生物抵抗：若被攻击者有 planarentity组件，则减免普攻伤害
+        --最终普攻伤害值2 = (√(最终普攻伤害值1 * 4 + 64) - 8) *4 --公式含义：伤害越高，减免越多，比如10->8.8、100->54
+    ▷最终伤害 = 最终普攻伤害值2 + 最终特攻伤害值 --有的对象还有生命损失减免，比如女武神，但这里只考虑战斗伤害
 ]]--
 
 --------------------------------------------------------------------------

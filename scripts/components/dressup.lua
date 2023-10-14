@@ -480,6 +480,8 @@ function DressUp:TakeOffAll()   --清除所有幻化效果
                 UnequipItem(self.inst, EQUIPSLOTS.BACK)
                 UnequipItem(self.inst, EQUIPSLOTS.NECK)
                 UnequipItem(self.inst, EQUIPSLOTS.BODY)
+            elseif k == "head_t" or k == "head_t2" then
+                UnequipItem(self.inst, EQUIPSLOTS.HEAD)
             else
                 UnequipItem(self.inst, k)
             end

@@ -881,16 +881,15 @@ MakeFx({ --白木吉他：弹奏时的飘动音符
     name = "guitar_whitewood_doing_fx",
     assets = {
         Asset("ANIM", "anim/guitar_whitewood_doing_fx.zip"),
-        Asset("ANIM", "anim/fx_wathgrithr_buff.zip"), --官方战歌特效动画模板
+        Asset("ANIM", "anim/fx_wathgrithr_buff.zip") --官方战歌特效动画模板
     },
     fn_common = nil,
     fn_anim = function(inst)
-        local anims =
-        {
+        local anims = {
             "fx_durability",
             "fx_fireresistance",
             "fx_healthgain",
-            "fx_sanitygain",
+            "fx_sanitygain"
         }
         inst.AnimState:SetBank("fx_wathgrithr_buff")
         inst.AnimState:SetBuild("fx_wathgrithr_buff")

@@ -161,7 +161,7 @@ local function UndefendedATK(inst, data)
         if target.components.inventory ~= nil and not target:HasTag("player") then --不改玩家的
             local ApplyDamage_old = target.components.inventory.ApplyDamage
             target.components.inventory.ApplyDamage = function(self, damage, attacker, weapon, spdamage, ...)
-                if self.inst.flag_undefended_l == 1 then
+                if self.inst.flag_undefended_l == 1 then --虽然其中可能会有增伤机制，但太复杂了，不好改，直接原样返回吧
                     return damage, spdamage
                 end
                 return ApplyDamage_old(self, damage, attacker, weapon, spdamage, ...)
@@ -236,6 +236,22 @@ local function UndefendedATK(inst, data)
                     end
                     return IsInvincible_old(self, ...)
                 end
+            end
+        end
+
+        --修改位面实体机制
+        if target.components.planarentity ~= nil then
+            local AbsorbDamage_old = target.components.planarentity.AbsorbDamage
+            target.components.planarentity.AbsorbDamage = function(self, damage, attacker, weapon, spdmg, ...)
+                if self.inst.flag_undefended_l == 1 then
+                    local damage2, spdamage2 = AbsorbDamage_old(self, damage, attacker, weapon, spdmg, ...)
+                    if damage2 < damage then --如果最终值小于之前的值，说明有减免，那就不准减免
+                        return damage, spdamage2
+                    else --兼容别的mod的逻辑
+                        return damage2, spdamage2
+                    end
+                end
+                return AbsorbDamage_old(self, damage, attacker, weapon, spdmg, ...)
             end
         end
     end

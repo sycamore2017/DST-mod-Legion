@@ -204,25 +204,45 @@ local function AfterWorking(inst, data)
         end
     end
 end
-local function SingleFight(inst, owner, target)
-    if target ~= nil then
-        local hasenemy = false
-        local x, y, z = owner.Transform:GetWorldPosition()
-        local ents = TheSim:FindEntities(x, y, z, 16, { "_combat" }, {"NOCLICK", "INLIMBO", "player"})
-        for _,v in ipairs(ents) do
-            if
-                v ~= target and v:IsValid()
-                and v.components.health ~= nil and not v.components.health:IsDead()
-                and v.components.combat ~= nil and v.components.combat.target == owner
-            then
-                v.components.combat:DropTarget(false)
-                hasenemy = true
-            end
+local function SingleFight(owner)
+    -- if owner.singlefight_target == nil then
+    --     return
+    -- end
+    local hasenemy = false
+    local x, y, z = owner.Transform:GetWorldPosition()
+    local ents = TheSim:FindEntities(x, y, z, 24, { "_combat" }, {"NOCLICK", "INLIMBO", "player"})
+    for _,v in ipairs(ents) do
+        if
+            v ~= owner.singlefight_target
+            and v.components.health ~= nil and not v.components.health:IsDead()
+            and v.components.combat ~= nil and v.components.combat.target == owner
+        then
+            v.components.combat:DropTarget(false)
+            hasenemy = true
         end
-        if hasenemy and math.random() < 0.1 then
-            if owner.components.talker ~= nil then
-                owner.components.talker:Say(GetString(owner, "DESCRIBE", { "DISH_TOMAHAWKSTEAK", "ATK" }))
-            end
+    end
+    if owner.singlefight_count == nil or owner.singlefight_count <= 1 then
+        owner.singlefight_count = nil
+        owner.singlefight_target = nil
+        if owner.singlefight_task ~= nil then
+            owner.singlefight_task:Cancel()
+            owner.singlefight_task = nil
+        end
+    else
+        owner.singlefight_count = owner.singlefight_count - 1
+        if hasenemy and owner.components.talker ~= nil and math.random() < 0.1 then
+            owner.components.talker:Say(GetString(owner, "DESCRIBE", { "DISH_TOMAHAWKSTEAK", "ATK" }))
+        end
+    end
+end
+local function TrySingleFight(inst, owner, target)
+    if target ~= nil and owner ~= nil and owner:IsValid() then
+        owner.singlefight_target = target
+        owner.singlefight_count = 7
+        if owner.singlefight_task == nil then
+            owner.singlefight_task = owner:DoPeriodicTask(0.5, SingleFight, 0)
+        else
+            SingleFight(owner) --每次攻击立即触发一下，免得 task 的效果跟不上
         end
     end
 end
@@ -261,7 +281,7 @@ local function OnAttack_steak(inst, owner, target)
     if inst._UpdateAxe then
         inst._UpdateAxe(inst)
     end
-    SingleFight(inst, owner, target)
+    TrySingleFight(inst, owner, target)
 end
 
 local function InitSteak(inst)
