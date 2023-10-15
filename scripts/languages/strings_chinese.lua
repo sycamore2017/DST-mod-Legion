@@ -3694,7 +3694,7 @@ local LORE_TIPS = { --介绍故事背景
     "有位从嗷嗷大陆来的探险家在月亮上修建了一座城堡，里面聚集了各种怪物守卫者，都是为了保护一把传说中的宝剑。这把剑能折射月光为其所用，只有健康无恙的持有者能发挥它最大的力量……",
 }
 local CONTROL_TIPS_NOT_CONSOLE = { --介绍键鼠控制
-    "盾击动作的前8帧内被攻击，就能成功触发盾反。",
+    "举盾动作的前8帧内被攻击，就能成功触发盾反。",
 }
 
 for i,str in ipairs(SURVIVAL_TIPS) do
@@ -3768,7 +3768,7 @@ STRINGS.ACTIONS_LEGION = {
     PULLOUTSWORD = "出鞘", --拔剑出鞘动作的名字
     USE_UPGRADEKIT = "组装升级", --升级套件的升级动作的名字
     MAKE = "制作", --打窝器容器的按钮名字
-    ATTACK_SHIELD_L = "盾击", --盾牌类道具通用动作的名字
+    ATTACK_SHIELD_L = "举盾", --盾牌类道具通用动作的名字
     REMOVE_CARPET_L = "叉起", --移除地毯动作的名字
     RUB_L = "摩擦", --电气石摩擦的名字
 }

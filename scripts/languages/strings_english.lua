@@ -3585,7 +3585,7 @@ STRINGS.ACTIONS_LEGION = {
     PULLOUTSWORD = "Pull out", --拔剑出鞘动作的名字
     USE_UPGRADEKIT = "Assemble upgrade", --升级套件的升级动作的名字
     MAKE = "Make", --打窝器容器的按钮名字
-    ATTACK_SHIELD_L = "Protective attack", --盾牌类道具通用动作的名字
+    ATTACK_SHIELD_L = "Shield up", --盾牌类道具通用动作的名字
     REMOVE_CARPET_L = "Fork away", --移除地毯动作的名字
     RUB_L = "Rub", --电气石摩擦的名字
 }

@@ -196,7 +196,7 @@ end
 ---------------
 ---------------
 
--- MakeFx({ --盾击：护盾图标
+-- MakeFx({ --举盾：护盾图标
 --     name = "shield_protect_l_fx",
 --     assets = {
 --         Asset("ANIM", "anim/lavaarena_sunder_armor.zip"), --官方的熔炉破甲buff特效动画
@@ -212,7 +212,7 @@ end
 --     end,
 --     fn_remove = nil,
 -- })
-MakeFx({ --盾击：盾反成功特效
+MakeFx({ --举盾：盾反成功特效
     name = "shield_attack_l_fx",
     assets = {
         Asset("ANIM", "anim/lavaarena_beetletaur_fx.zip"), --官方的熔炉甲虫猪防御特效动画

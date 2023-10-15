@@ -1,12 +1,12 @@
 local assets = {
     Asset("ANIM", "anim/foliageath.zip"),
     Asset("ATLAS", "images/inventoryimages/foliageath.xml"),
-    Asset("IMAGE", "images/inventoryimages/foliageath.tex"),
+    Asset("IMAGE", "images/inventoryimages/foliageath.tex")
 }
 
 local prefabs = {
     "foliageath_together",
-    "foliageath_mylove",
+    "foliageath_mylove"
 }
 
 local function ItemTradeTest(inst, item, giver)
@@ -29,13 +29,11 @@ local function ItemTradeTest(inst, item, giver)
     end
     return true
 end
-
 local function OnSwordGiven(inst, giver, item)
     if item ~= nil then
-        if item.prefab == "foliageath" and giver ~= nil and giver.components.talker ~= nil then
-            giver.components.talker:Say(GetString(giver, "ANNOUNCE_HIS_LOVE_WISH"))
-        end
-
+        -- if item.prefab == "foliageath" and giver ~= nil and giver.components.talker ~= nil then
+        --     giver.components.talker:Say(GetString(giver, "ANNOUNCE_HIS_LOVE_WISH"))
+        -- end
         local togethered = SpawnPrefab(item.prefab == "foliageath" and "foliageath_mylove" or "foliageath_together")
         togethered.components.swordscabbard:BeTogether(inst, item)
     end
@@ -115,11 +113,15 @@ local assets_together = {
     Asset("ATLAS", "images/inventoryimages/foliageath_foliageath.xml"),
     Asset("IMAGE", "images/inventoryimages/foliageath_foliageath.tex"),
     Asset("ATLAS", "images/inventoryimages/foliageath_dish_tomahawksteak.xml"),
-    Asset("IMAGE", "images/inventoryimages/foliageath_dish_tomahawksteak.tex"),
+    Asset("IMAGE", "images/inventoryimages/foliageath_dish_tomahawksteak.tex")
 }
 local prefabs_together = {
-    "foliageath",
+    "foliageath"
 }
+
+local function GetStatus_together(inst)
+    return "MERGED"
+end
 
 local function MakeIt(name, ismylove)
     local function fn_together()
@@ -134,11 +136,12 @@ local function MakeIt(name, ismylove)
 
         inst.AnimState:SetBank("foliageath")
         inst.AnimState:SetBuild("foliageath")
-        inst.AnimState:PlayAnimation("hambat")
 
         if ismylove then
+            inst.AnimState:PlayAnimation("foliageath")
             inst:AddTag("feelmylove")
         else
+            inst.AnimState:PlayAnimation("hambat")
             inst:SetPrefabNameOverride("foliageath")
         end
         inst:AddTag("NORATCHECK") --mod兼容：永不妥协。该道具不算鼠潮分
@@ -158,13 +161,14 @@ local function MakeIt(name, ismylove)
         inst:AddComponent("inspectable")
 
         inst:AddComponent("inventoryitem")
-        inst.components.inventoryitem.imagename = "foliageath_hambat" --默认是火腿棒入鞘后的贴图
-        inst.components.inventoryitem.atlasname = "images/inventoryimages/foliageath_hambat.xml"
 
-        if not ismylove then
-            inst.components.inspectable.getstatus = function(inst)
-                return "MERGED"
-            end
+        if ismylove then
+            inst.components.inventoryitem.imagename = "foliageath_foliageath"
+            inst.components.inventoryitem.atlasname = "images/inventoryimages/foliageath_foliageath.xml"
+        else
+            inst.components.inventoryitem.imagename = "foliageath_hambat" --默认是火腿棒入鞘后的贴图
+            inst.components.inventoryitem.atlasname = "images/inventoryimages/foliageath_hambat.xml"
+            inst.components.inspectable.getstatus = GetStatus_together
         end
 
         inst:AddComponent("swordscabbard")

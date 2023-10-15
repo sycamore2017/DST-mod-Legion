@@ -69,7 +69,7 @@ function SwordScabbard:BreakUp(player)
     ------生成剑
     local sword = nil
     if self.sworddata == nil then
-        sword = SpawnPrefab("hambat")
+        sword = SpawnPrefab(self.inst:HasTag("feelmylove") and "foliageath" or "hambat")
         if sword ~= nil then
             sword.Transform:SetPosition(player.Transform:GetWorldPosition())
         end

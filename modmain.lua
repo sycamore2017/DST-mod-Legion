@@ -111,7 +111,7 @@
         )
         - 所有具有对应特殊防御的装备的特殊防御值之和 - 被攻击者自身对应的的特殊防御值
     ▷位面生物抵抗：若被攻击者有 planarentity组件，则减免普攻伤害
-        --最终普攻伤害值2 = (√(最终普攻伤害值1 * 4 + 64) - 8) *4 --公式含义：伤害越高，减免越多，比如10->8.8、100->54
+        --最终普攻伤害值2 = (√(最终普攻伤害值1 * 4 + 64) - 8) *4 --公式含义：伤害越高，减免比例越高，比如10->8.8、100->54
     ▷最终伤害 = 最终普攻伤害值2 + 最终特攻伤害值 --有的对象还有生命损失减免，比如女武神，但这里只考虑战斗伤害
 ]]--
 
@@ -246,8 +246,9 @@ _G.CONFIGS_LEGION.HIDDENUPDATETIMES = GetModConfigData("HiddenUpdateTimes") --�
 _G.CONFIGS_LEGION.REVOLVEDUPDATETIMES = GetModConfigData("RevolvedUpdateTimes") --月轮宝盘最大升级次数
 _G.CONFIGS_LEGION.REFRACTEDUPDATETIMES = GetModConfigData("RefractedUpdateTimes") --月折宝剑最大升级次数
 
-_G.CONFIGS_LEGION.X_OVERRIPETIME = GetModConfigData("OverripeTime") --设置过熟的时间倍数 int 1 2 0
-_G.CONFIGS_LEGION.X_PESTRISK = GetModConfigData("PestRisk") --设置虫害几率 double 0.007 0.012
+_G.CONFIGS_LEGION.X_GROWTHTIME = GetModConfigData("X_growthTime") --设置异种生长的时间倍数
+_G.CONFIGS_LEGION.X_OVERRIPETIME = GetModConfigData("X_overripeTime") --设置异种过熟的时间倍数
+_G.CONFIGS_LEGION.X_PESTRISK = GetModConfigData("X_pestRisk") --设置异种虫害几率
 _G.CONFIGS_LEGION.PHOENIXREBIRTHCYCLE = GetModConfigData("PhoenixRebirthCycle") --设置玄鸟重生时间
 _G.CONFIGS_LEGION.SIVINGROOTTEX = GetModConfigData("SivingRootTex") --设置子圭突触贴图
 _G.CONFIGS_LEGION.PHOENIXBATTLEDIFFICULTY = GetModConfigData("PhoenixBattleDifficulty") --设置玄鸟战斗难度

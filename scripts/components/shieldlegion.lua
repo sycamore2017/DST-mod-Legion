@@ -36,7 +36,7 @@ local ShieldLegion = Class(function(self, inst)
     }
 
     self.time = nil
-    self.delta = 8 * FRAMES --FRAMES为0.033秒。并且盾击sg动画总时长为 13*FRAMES，最好小于这个值
+    self.delta = 8 * FRAMES --FRAMES为0.033秒。并且举盾sg动画总时长为 13*FRAMES，最好小于这个值
     self.armormult_success = 1 --盾反成功时的损害系数
 
     -- self.startfn = nil
