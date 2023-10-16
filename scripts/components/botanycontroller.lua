@@ -64,6 +64,20 @@ function BotanyController:TriggerPlant(isadd)
     end
 end
 
+function BotanyController:CostNutrientsAny(cost) --消耗任意一种肥料，优先3号肥
+    local idx = nil
+    if self.nutrients[3] > 0 then
+        idx = 3
+    elseif self.nutrients[2] > 0 then
+        idx = 2
+    elseif self.nutrients[1] > 0 then
+        idx = 1
+    else
+        return false
+    end
+    self.nutrients[idx] = math.max(0, self.nutrients[idx] - cost) --不循环判断所有肥料了，就这样吧
+    return true
+end
 local function SetReleaseFx(x, y, z)
     local fx = SpawnPrefab("farm_plant_happy")
     if fx ~= nil then
@@ -153,49 +167,40 @@ local function WitherComputNutrients(self, v)
         if cpt.isrotten or cpt.donenutrient or cpt.stage == cpt.stage_max then
             return false
         end
-
-        local idx = nil
-        if self.nutrients[3] > 0 then
-            idx = 3
-        elseif self.nutrients[2] > 0 then
-            idx = 2
-        elseif self.nutrients[1] > 0 then
-            idx = 1
-        else
-            return false --按理来说不应该能运行到这里
-        end
-
         local poop = SpawnPrefab("poop")
         if poop ~= nil then
             cpt:Fertilize(poop, self.inst)
             poop:Remove()
-            self.nutrients[idx] = math.max(0, self.nutrients[idx] - 3)
+            self:CostNutrientsAny(3)
             return true
         end
     elseif
         v.components.pickable ~= nil and
         v.components.pickable:CanBeFertilized() --贫瘠或缺水枯萎
     then
-        local idx = nil
-        if self.nutrients[3] > 0 then
-            idx = 3
-        elseif self.nutrients[2] > 0 then
-            idx = 2
-        elseif self.nutrients[1] > 0 then
-            idx = 1
-        else
-            return false --按理来说不应该能运行到这里
-        end
-
         local poop = SpawnPrefab("poop")
         if poop ~= nil then
             v.components.pickable:Fertilize(poop, nil)
             poop:Remove()
-            self.nutrients[idx] = math.max(0, self.nutrients[idx] - 3)
+            self:CostNutrientsAny(3)
             return true
         end
     elseif v.fn_l_neednutrient ~= nil then --兼容其他mod
         return v.fn_l_neednutrient(v, self)
+    end
+end
+local function ComputVase(self, v)
+    if not v.components.vase.enabled or v.flowerid == nil then --没有插花
+        return false
+    end
+    if v.OnLoad ~= nil then --没错，要恢复就这么简单
+        v.OnLoad(v, { flowerid = v.flowerid, wilttime = TUNING.ENDTABLE_FLOWER_WILTTIME }) --时间不能乱改，不然会导致不发光
+        if self.moisture > 0 then
+            self.moisture = math.max(0, self.moisture-0.2)
+        else
+            self:CostNutrientsAny(0.5)
+        end
+        return true
     end
 end
 local function ComputSoils(self, fn_tile, fn_wither, fn_check, fn_tend, tags)
@@ -225,22 +230,25 @@ local function ComputSoils(self, fn_tile, fn_wither, fn_check, fn_tend, tags)
         end
     end
 
-    --特效
-    SetReleaseFx(x, y, z)
-
     if isasleep then --睡眠状态就不查找枯萎作物
         self:SetBars()
         return
+    else
+        SetReleaseFx(x, y, z) --特效
     end
 
     --不需要考虑子圭作物，因为机制已经有了
     local ents = TheSim:FindEntities(x, y, z, 20, nil, { "NOCLICK", "INLIMBO" }, tags)
     for _,v in pairs(ents) do
-        if v:IsValid() then
-            if fn_wither(self, v) and fn_check(self) then
-                self:SetBars()
-                return
-            end
+        local res
+        if v.components.vase ~= nil then
+            res = ComputVase(self, v)
+        else
+            res = fn_wither(self, v)
+        end
+        if res and fn_check(self) then
+            self:SetBars()
+            return
         end
     end
     self:SetBars()
@@ -254,7 +262,7 @@ function BotanyController:DoAreaFunction()
                 return self.moisture <= 0
             end,
             nil,
-            { "witherable", "barren", "crop2_legion", "needwater2" }
+            { "witherable", "barren", "crop2_legion", "needwater2", "vase" }
         )
     elseif self.type == 2 then
         ComputSoils(self,
@@ -262,7 +270,7 @@ function BotanyController:DoAreaFunction()
             WitherComputNutrients,
             isEmptyNutrients,
             nil,
-            { "witherable", "barren", "crop2_legion", "neednutrient2" }
+            { "witherable", "barren", "crop2_legion", "neednutrient2", "vase" }
         )
     else
         ComputSoils(self,
@@ -287,7 +295,7 @@ function BotanyController:DoAreaFunction()
                     end
                 end
             end,
-            { "witherable", "barren", "crop2_legion", "needwater2", "neednutrient2" }
+            { "witherable", "barren", "crop2_legion", "needwater2", "neednutrient2", "vase" }
         )
     end
 end

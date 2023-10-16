@@ -1266,9 +1266,6 @@ AddPlayerPostInit(function(inst)
     --下线时记录灵魂契约数据
     local OnSave_old = inst.OnSave
     inst.OnSave = function(inst, data)
-        if OnSave_old ~= nil then
-            OnSave_old(inst, data)
-        end
         if inst._contracts_l ~= nil and inst._contracts_l:IsValid() then
             local book = inst._contracts_l
             if book.components.inventoryitem ~= nil then
@@ -1279,6 +1276,9 @@ AddPlayerPostInit(function(inst)
             data.contracts_l = book:GetSaveRecord()
         elseif inst.contracts_record_l ~= nil then
             data.contracts_l = inst.contracts_record_l
+        end
+        if OnSave_old ~= nil then --OnSave是可能有返回的
+            return OnSave_old(inst, data)
         end
     end
     local OnLoad_old = inst.OnLoad
