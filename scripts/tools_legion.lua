@@ -297,6 +297,62 @@ local function RemoveTag(inst, tagname, key)
     inst:RemoveTag(tagname)
 end
 
+--[ 兼容性数值管理 ]--
+local function AddEntValue(ent, key, key2, valuedeal, value)
+    if ent[key] == nil then
+        ent[key] = {}
+    end
+    ent[key][key2] = value
+    if valuedeal ~= nil then
+        local res = 0
+        if valuedeal == 1 then --加法
+            for _, v in pairs(ent[key]) do
+                res = res + v
+            end
+        else --乘法
+            for _, v in pairs(ent[key]) do
+                res = res * v
+            end
+        end
+        ent[key.."_v"] = res ~= 0 and res or nil
+    end
+end
+local function RemoveEntValue(ent, key, key2, valuedeal)
+    if ent[key] == nil then
+        ent[key.."_v"] = nil
+        return
+    end
+    ent[key][key2] = nil
+    if valuedeal == nil then
+        for _, v in pairs(ent[key]) do
+            if v then
+                return
+            end
+        end
+        ent[key] = nil
+    else
+        local res = 0
+        local hasit = false
+        if valuedeal == 1 then --加法
+            for _, v in pairs(ent[key]) do
+                res = res + v
+                hasit = true
+            end
+        else --乘法
+            for _, v in pairs(ent[key]) do
+                res = res * v
+                hasit = true
+            end
+        end
+        if hasit then
+            ent[key.."_v"] = res ~= 0 and res or nil
+        else
+            ent[key.."_v"] = nil
+            ent[key] = nil
+        end
+    end
+end
+
 --[ 生成堆叠的物品 ]--
 local function SpawnStackDrop(name, num, pos, doer, items, overname)
     local item = SpawnPrefab(name)
@@ -498,6 +554,8 @@ return {
 	UndefendedATK = UndefendedATK,
 	AddTag = AddTag,
 	RemoveTag = RemoveTag,
+    AddEntValue = AddEntValue,
+    RemoveEntValue = RemoveEntValue,
 	SpawnStackDrop = SpawnStackDrop,
 	hat_on = hat_on,
 	hat_on_opentop = hat_on_opentop,

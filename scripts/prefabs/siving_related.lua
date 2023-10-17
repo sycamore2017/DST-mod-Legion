@@ -958,24 +958,6 @@ local function HealArmor(mask)
     return false
 end
 
-local function AddMaskHPCost(inst, owner, value)
-    if owner.feather_l_reducer == nil then
-        owner.feather_l_reducer = {}
-    end
-    owner.feather_l_reducer[inst.prefab] = value
-end
-local function DeleteMaskHPCost(inst, owner)
-    if owner.feather_l_reducer == nil then
-        return
-    end
-    owner.feather_l_reducer[inst.prefab] = nil
-    for _,v in pairs(owner.feather_l_reducer) do
-        if v then
-            return
-        end
-    end
-    owner.feather_l_reducer = nil
-end
 local function GetSwapSymbol(owner)
     local maps = {
         wolfgang = true,
@@ -1025,15 +1007,11 @@ end
 local function OnEquip_mask(inst, owner)
     SetSymbols_mask(inst, owner)
 
-    --假人兼容：这里不做截断，为了能开发一些新玩法
-
-    AddMaskHPCost(inst, owner, 0.75)
-
     local notags = {
         "NOCLICK", "INLIMBO", "shadow", "shadowminion", "playerghost", "ghost", "wall",
         "balloon", "siving", "glommer", "friendlyfruitfly", "boat", "boatbumper", "structure"
     }
-    if owner:HasTag("player") then --佩戴者是玩家时，不吸收其他玩家
+    if owner:HasTag("player") or owner:HasTag("equipmentmodel") then --佩戴者是玩家、假人时，不吸收其他玩家
         table.insert(notags, "player")
     end
     local _taskcounter = 0
@@ -1098,10 +1076,16 @@ local function OnEquip_mask(inst, owner)
             end
         end
     end, 1)
+
+    if owner:HasTag("equipmentmodel") then --假人！
+        return
+    end
+
+    TOOLS_L.AddEntValue(owner, "siv_blood_l_reducer", inst.prefab, 1, 0.25)
 end
 local function OnUnequip_mask(inst, owner)
     ClearSymbols_mask(inst, owner)
-    DeleteMaskHPCost(inst, owner)
+    TOOLS_L.RemoveEntValue(owner, "siv_blood_l_reducer", inst.prefab, 1)
     CancelTask_life(inst, owner)
 end
 
@@ -1114,8 +1098,7 @@ MakeMask({
     },
     prefabs = { "siving_lifesteal_fx" },
     fn_common = function(inst)
-        inst:AddTag("siv_BF")
-        inst:AddTag("siv_mask")
+        inst:AddTag("siv_mask") --没啥用
     end,
     fn_server = function(inst)
         inst.healthcounter_max = 80
@@ -1134,7 +1117,6 @@ MakeMask({
 local function OnRepaired_mask2(inst, amount)
     if amount > 0 and inst:HasTag("broken") then
         inst:RemoveTag("broken")
-        inst:AddTag("siv_BFF")
         inst:AddTag("siv_mask2")
         inst.components.inspectable.nameoverride = nil
         inst.components.armor:SetAbsorption(0.75)
@@ -1142,7 +1124,6 @@ local function OnRepaired_mask2(inst, amount)
 end
 local function OnBroken_mask2(inst)
     inst:AddTag("broken") --这个标签会让名称显示加入“损坏”前缀
-    inst:RemoveTag("siv_BFF")
     inst:RemoveTag("siv_mask2")
     inst.components.inspectable.nameoverride = "BROKEN_FORGEDITEM" --改为统一的损坏描述
     inst.components.armor:SetAbsorption(0)
@@ -1357,17 +1338,11 @@ end
 local function OnEquip_mask2(inst, owner)
     SetSymbols_mask(inst, owner)
 
-    --假人兼容：这里不做截断，为了能开发一些新玩法
-
-    AddMaskHPCost(inst, owner, 0.5)
-
-    owner:ListenForEvent("onattackother", OnAttackOther)
-
     local notags = {
         "NOCLICK", "INLIMBO", "shadow", "shadowminion", "playerghost", "ghost", "wall",
         "balloon", "siving", "glommer", "friendlyfruitfly", "boat", "boatbumper", "structure"
     }
-    if owner:HasTag("player") then --佩戴者是玩家时，不吸收其他玩家
+    if owner:HasTag("player") or owner:HasTag("equipmentmodel") then --佩戴者是玩家、假人时，不吸收其他玩家
         table.insert(notags, "player")
     end
     local _taskcounter = 0
@@ -1431,12 +1406,21 @@ local function OnEquip_mask2(inst, owner)
             end
         end
     end, 1)
+
+    if owner:HasTag("equipmentmodel") then --假人！
+        return
+    end
+
+    owner:ListenForEvent("onattackother", OnAttackOther)
+    TOOLS_L.AddEntValue(owner, "siv_blood_l_reducer", inst.prefab, 1, 0.5)
+    TOOLS_L.AddTag(owner, "PreventSivFlower", inst.prefab)
 end
 local function OnUnequip_mask2(inst, owner)
     ClearSymbols_mask(inst, owner)
-    DeleteMaskHPCost(inst, owner)
-    CancelTask_life(inst, owner)
     owner:RemoveEventCallback("onattackother", OnAttackOther)
+    TOOLS_L.RemoveEntValue(owner, "siv_blood_l_reducer", inst.prefab, 1)
+    TOOLS_L.RemoveTag(owner, "PreventSivFlower", inst.prefab)
+    CancelTask_life(inst, owner)
 end
 
 MakeMask({
@@ -1451,8 +1435,7 @@ MakeMask({
         "life_trans_fx"
     },
     fn_common = function(inst)
-        inst:AddTag("siv_BFF")
-        inst:AddTag("siv_mask2")
+        inst:AddTag("siv_mask2") --给特殊动作用
         inst:AddTag("show_broken_ui") --装备损坏后展示特殊物品栏ui
     end,
     fn_server = function(inst)

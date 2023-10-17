@@ -285,7 +285,7 @@ local function ReleaseFlowers(inst) --花寄语
         if
             not v.hassivflower and --防止重复寄生
             v.components.health ~= nil and not v.components.health:IsDead() and
-            (v.components.inventory == nil or not v.components.inventory:EquipHasTag("siv_BFF")) and
+            not v:HasTag("PreventSivFlower") and
             (inst.isgrief or math.random() < 0.33)
         then
             SpawnFlower(inst, v)
@@ -1224,17 +1224,17 @@ local function MakeWeapon(data)
 
                 if caster.components.health ~= nil and not caster.components.health:IsDead() then
                     local costt = fea_hpcost
-                    if costt > 0 and caster.feather_l_reducer ~= nil then
-                        for _,v in pairs(caster.feather_l_reducer) do
-                            if v then
-                                costt = costt * v
-                            end
+                    if costt > 0 and caster.siv_blood_l_reducer_v ~= nil then
+                        if caster.siv_blood_l_reducer_v >= 1 then
+                            costt = 0
+                        else
+                            costt = costt * (1-caster.siv_blood_l_reducer_v)
                         end
                     end
-                    caster.sivfeathers_l = nil
                     if costt > 0 then
                         caster.components.health:DoDelta(-costt*num, true, data.name, false, nil, true)
                     end
+                    caster.sivfeathers_l = nil
                     if not caster.components.health:IsDead() and lines then
                         local line = SpawnPrefab("siving_feather_line")
                         caster.sivfeathers_l = feathers

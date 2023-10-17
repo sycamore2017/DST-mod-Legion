@@ -859,6 +859,7 @@ local function TriggerLifeExtractTask(inst, doit)
                 end
 
                 local cost = inst.treeState == 2 and 4 or 2
+                local costnow = 0
                 local costall = 0
                 local countfx = 0
 
@@ -872,9 +873,16 @@ local function TriggerLifeExtractTask(inst, doit)
                             v.components.health ~= nil and not v.components.health:IsDead() and
                             v:GetDistanceSqToPoint(x, y, z) <= DIST_HEALTH^2
                         then
-                            ----特效生成
-                            if countfx < 8 then
-                                if v.components.inventory == nil or not v.components.inventory:EquipHasTag("siv_BFF") then
+                            costnow = cost
+                            if v.siv_blood_l_reducer_v ~= nil then
+                                if v.siv_blood_l_reducer_v >= 1 then
+                                    costnow = 0
+                                else
+                                    costnow = costnow * (1-v.siv_blood_l_reducer_v)
+                                end
+                            end
+                            if costnow > 0 then
+                                if countfx < 8 then --特效生成
                                     local life = SpawnPrefab("siving_lifesteal_fx")
                                     if life ~= nil then
                                         life.movingTarget = inst
@@ -882,19 +890,7 @@ local function TriggerLifeExtractTask(inst, doit)
                                     end
                                     countfx = countfx + 1
                                 end
-                            end
-
-                            ----吸血
-                            if doit2 then
-                                local costnow = cost
-                                if v.components.inventory ~= nil then
-                                    if v.components.inventory:EquipHasTag("siv_BFF") then
-                                        costnow = 0
-                                    elseif v.components.inventory:EquipHasTag("siv_BF") then
-                                        costnow = costnow / 2
-                                    end
-                                end
-                                if costnow > 0 then
+                                if doit2 then --吸血
                                     v.components.health:DoDelta(-costnow, true, inst.prefab, false, inst, true)
                                     costall = costall + costnow
                                 end
