@@ -381,7 +381,7 @@ local function SpawnStackDrop(name, num, pos, doer, items, overname)
 			if doer ~= nil and doer.components.inventory ~= nil then
 				doer.components.inventory:GiveItem(item, nil, pos)
 			else
-				if item:HasTag("heavy") then --巨大作物不知道为啥不能弹射
+				if item:HasTag("heavy") then --巨大作物不知道为啥不能弹射，可能是和别的物体碰撞了，就失效了
 					local x, y, z = GetCalculatedPos(pos.x, pos.y, pos.z, 0.5+1.8*math.random())
 					item.Transform:SetPosition(x, y, z)
 				else

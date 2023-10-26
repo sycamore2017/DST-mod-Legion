@@ -837,12 +837,17 @@ local function TriggerLifeExtractTask(inst, doit)
             local ents = nil
             local _taskcounter = 0
             local _freecounter = 0
+            local doit2 = false
+            local cost = 2
+            local costnow = 0
+            local costall = 0
+            local countfx = 0
 
             ----每2秒吸取所有生物生命；每0.5秒产生吸取特效
             inst.taskLifeExtract = inst:DoPeriodicTask(0.5, function(inst)
                 ----计数器管理
                 _taskcounter = _taskcounter + 1
-                local doit2 = false
+                doit2 = false
                 if _taskcounter % 4 == 0 then --每过两秒
                     doit2 = true
                     _taskcounter = 0
@@ -852,19 +857,18 @@ local function TriggerLifeExtractTask(inst, doit)
                 if doit2 or ents == nil then
                     ents = TheSim:FindEntities(x, y, z, DIST_HEALTH,
                         nil,
-                        {"NOCLICK", "shadow", "shadowminion", "playerghost", "ghost",
-                            "INLIMBO", "wall", "structure", "balloon", "siving", "boat", "boatbumper"},
-                        {"siving_derivant", "_health"}
+                        { "NOCLICK", "shadow", "shadowminion", "playerghost", "ghost",
+                            "INLIMBO", "wall", "structure", "balloon", "siving" },
+                        { "siving_derivant", "_combat" }
                     )
                 end
 
-                local cost = inst.treeState == 2 and 4 or 2
-                local costnow = 0
-                local costall = 0
-                local countfx = 0
+                cost = inst.treeState == 2 and 4 or 2
+                costall = 0
+                countfx = 0
 
                 for _,v in ipairs(ents) do
-                    if v and v:IsValid() and v.entity:IsVisible() then
+                    if v:IsValid() and v.entity:IsVisible() then
                         if v:HasTag("siving_derivant") then
                             if v.treeState ~= nil and inst.treeState ~= v.treeState then
                                 v.OnTreeLive(v, inst.treeState)

@@ -462,7 +462,9 @@ configuration_options = L and {
         label = "Max Upgrade Times of Revolved Moonlight",
         hover = "Set the maximum upgrade times of Revolved Moonlight (the smaller, the easier).",
         options = {
+            { description = "2 times", data = 2 },
             { description = "4 times", data = 4 },
+            { description = "6 times", data = 6 },
             { description = "8 times", data = 8 },
             { description = "10 times(default)", data = 10 },
             { description = "12 times", data = 12 },
@@ -931,7 +933,9 @@ configuration_options = L and {
         label = "月轮宝盘最大升级次数",
         hover = "设置月轮宝盘的升级次数的最大值（越小越简单）。",
         options = {
+            { description = "2次", data = 2 },
             { description = "4次", data = 4 },
+            { description = "6次", data = 6 },
             { description = "8次", data = 8 },
             { description = "10次(默认)", data = 10 },
             { description = "12次", data = 12 },

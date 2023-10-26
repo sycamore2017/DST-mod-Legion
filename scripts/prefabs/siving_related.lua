@@ -957,6 +957,106 @@ local function HealArmor(mask)
     end
     return false
 end
+local function IsValidVictim(ent, owner)
+    if
+        ent.components.health ~= nil and not ent.components.health:IsDead() and
+        (ent.siv_blood_l_reducer_v == nil or ent.siv_blood_l_reducer_v < 1) and
+        (
+            (ent.components.combat ~= nil and ent.components.combat.target == owner) or
+            ( --不窃取驯化的对象、自己的跟随者
+                (ent.components.domesticatable == nil or not ent.components.domesticatable:IsDomesticated()) and
+                (owner.components.leader == nil or not owner.components.leader:IsFollower(ent))
+            )
+        )
+    then
+        return true
+    end
+    return false
+end
+local function StealHealth(inst, owner, ismask2)
+    local notags = {
+        "NOCLICK", "INLIMBO", "shadow", "shadowminion", "playerghost", "ghost", "wall",
+        "balloon", "siving", "glommer", "friendlyfruitfly", "structure"
+    }
+    if owner:HasTag("player") or owner:HasTag("equipmentmodel") then --佩戴者是玩家、假人时，不吸收其他玩家
+        table.insert(notags, "player")
+    end
+    local _taskcounter = 0
+    local doit = false
+    local x, y, z
+    local target
+    local costnow = 0
+    inst.task_life = inst:DoPeriodicTask(0.5, function(inst)
+        if not owner:IsValid() then
+            CancelTask_life(inst, owner)
+            return
+        end
+
+        ----计数器管理
+        _taskcounter = _taskcounter + 1
+        doit = false
+        if _taskcounter % 4 == 0 then --每过两秒
+            doit = true
+            _taskcounter = 0
+        end
+
+        ----吸取对象的管理
+        x, y, z = owner.Transform:GetWorldPosition()
+        target = inst.lifetarget
+        if --吸血对象失效了，重新找新对象
+            target == nil or not target:IsValid() or
+            not IsValidVictim(target, owner) or
+            target:GetDistanceSqToPoint(x, y, z) > 400 --20*20
+        then
+            target = FindEntity(owner, 20, function(ent, finder)
+                return IsValidVictim(ent, finder)
+            end, { "_health", "_combat" }, notags, nil)
+            inst.lifetarget = target
+        end
+
+        ----窃血抵抗
+        if target ~= nil then
+            costnow = ismask2 and 4 or 2
+            if target.siv_blood_l_reducer_v ~= nil then
+                if target.siv_blood_l_reducer_v >= 1 then --经过了前面的判定，这里应该不会再触发了
+                    costnow = 0
+                else
+                    costnow = costnow * (1-target.siv_blood_l_reducer_v)
+                end
+            end
+            if costnow > 0 then --特效
+                SpawnLifeFx(target, owner, inst)
+            end
+        else
+            costnow = 0
+        end
+
+        ----积累的管理
+        if doit then
+            if costnow > 0 then
+                DrinkLife(inst, target, costnow)
+            end
+            if ismask2 or target ~= nil then
+                if inst.healthcounter >= 4 then
+                    if not HealOwner(inst, owner) then --优先为玩家恢复生命
+                        if inst.healthcounter >= 20 then --其次才是恢复自己的耐久
+                            HealArmor(inst)
+                        end
+                    end
+                end
+            else
+                if inst.components.armor:GetPercent() < 1 then --自己损坏了
+                    if owner.components.health ~= nil and not owner.components.health:IsDead() then
+                        DrinkLife(inst, owner, 2)
+                    end
+                    if inst.healthcounter >= 20 then
+                        HealArmor(inst)
+                    end
+                end
+            end
+        end
+    end, 1)
+end
 
 local function GetSwapSymbol(owner)
     local maps = {
@@ -1006,76 +1106,7 @@ local function ClearSymbols_mask(inst, owner)
 end
 local function OnEquip_mask(inst, owner)
     SetSymbols_mask(inst, owner)
-
-    local notags = {
-        "NOCLICK", "INLIMBO", "shadow", "shadowminion", "playerghost", "ghost", "wall",
-        "balloon", "siving", "glommer", "friendlyfruitfly", "boat", "boatbumper", "structure"
-    }
-    if owner:HasTag("player") or owner:HasTag("equipmentmodel") then --佩戴者是玩家、假人时，不吸收其他玩家
-        table.insert(notags, "player")
-    end
-    local _taskcounter = 0
-    inst.task_life = inst:DoPeriodicTask(0.5, function(inst)
-        if not owner:IsValid() then
-            CancelTask_life(inst, owner)
-            return
-        end
-
-        ----计数器管理
-        _taskcounter = _taskcounter + 1
-        local doit = false
-        if _taskcounter % 4 == 0 then --每过两秒
-            doit = true
-            _taskcounter = 0
-        end
-
-        ----吸取对象的管理
-        local x, y, z = owner.Transform:GetWorldPosition()
-        local target = inst.lifetarget
-        if --吸血对象失效了，重新找新对象
-            target == nil or not target:IsValid() or
-            target.components.health == nil or target.components.health:IsDead() or
-            target:GetDistanceSqToPoint(x, y, z) > 324 --18*18
-        then
-            target = FindEntity(owner, 18, function(ent, finder)
-                    if
-                        ent.prefab ~= finder.prefab and --不吸收同类
-                        ent.components.health ~= nil and not ent.components.health:IsDead()
-                    then
-                        return true
-                    end
-                end,
-                {"_health"}, notags, nil
-            )
-            inst.lifetarget = target
-        end
-
-        ----积累的管理
-        if target ~= nil then --有可吸收对象时
-            SpawnLifeFx(target, owner, inst)
-            if doit then
-                DrinkLife(inst, target, 2)
-                if inst.healthcounter >= 4 then
-                    if not HealOwner(inst, owner) then --优先为玩家恢复生命
-                        if inst.healthcounter >= 20 then --其次才是恢复自己的耐久
-                            HealArmor(inst)
-                        end
-                    end
-                end
-            end
-        else --不存在可吸收对象时
-            if doit then
-                if inst.components.armor:GetPercent() < 1 then --自己损坏了
-                    if owner.components.health ~= nil and not owner.components.health:IsDead() then
-                        DrinkLife(inst, owner, 2)
-                    end
-                    if inst.healthcounter >= 20 then
-                        HealArmor(inst)
-                    end
-                end
-            end
-        end
-    end, 1)
+    StealHealth(inst, owner, false)
 
     if owner:HasTag("equipmentmodel") then --假人！
         return
@@ -1134,6 +1165,7 @@ local function OnAttackOther(owner, data)
         owner.components.inventory ~= nil and
         data.target ~= nil and data.target:IsValid() and
         data.target.components.health ~= nil and not data.target.components.health:IsDead() and
+        (data.target.siv_blood_l_reducer_v == nil or data.target.siv_blood_l_reducer_v < 1) and
         not (
             data.target:HasTag("shadow") or
             data.target:HasTag("ghost") or
@@ -1337,75 +1369,7 @@ local function FnBend_mask2(mask, doer, target, options)
 end
 local function OnEquip_mask2(inst, owner)
     SetSymbols_mask(inst, owner)
-
-    local notags = {
-        "NOCLICK", "INLIMBO", "shadow", "shadowminion", "playerghost", "ghost", "wall",
-        "balloon", "siving", "glommer", "friendlyfruitfly", "boat", "boatbumper", "structure"
-    }
-    if owner:HasTag("player") or owner:HasTag("equipmentmodel") then --佩戴者是玩家、假人时，不吸收其他玩家
-        table.insert(notags, "player")
-    end
-    local _taskcounter = 0
-    inst.task_life = inst:DoPeriodicTask(0.5, function(inst)
-        if not owner:IsValid() then
-            CancelTask_life(inst, owner)
-            return
-        end
-
-        ----计数器管理
-        _taskcounter = _taskcounter + 1
-        local doit = false
-        if _taskcounter % 4 == 0 then --每过两秒
-            doit = true
-            _taskcounter = 0
-        end
-
-        ----吸取对象的管理
-        local x, y, z = owner.Transform:GetWorldPosition()
-        local target = inst.lifetarget
-        if --吸血对象失效了，重新找新对象
-            target == nil or not target:IsValid() or
-            target.components.health == nil or target.components.health:IsDead() or
-            target:GetDistanceSqToPoint(x, y, z) > 400 --20*20
-        then
-            target = FindEntity(owner, 20, function(ent, finder)
-                    if
-                        ent.prefab ~= finder.prefab and --不吸收同类
-                        ent.components.health ~= nil and not ent.components.health:IsDead() and (
-                            (ent.components.combat ~= nil and ent.components.combat.target == finder) or
-                            ( --不攻击驯化的对象、自己的跟随者
-                                (ent.components.domesticatable == nil or not ent.components.domesticatable:IsDomesticated()) and
-                                (finder.components.leader == nil or not finder.components.leader:IsFollower(ent))
-                            )
-                        )
-                    then
-                        return true
-                    end
-                end,
-                {"_health"}, notags, nil
-            )
-            inst.lifetarget = target
-        end
-
-        ----特效
-        if target ~= nil then
-            SpawnLifeFx(target, owner, inst)
-        end
-
-        ----积累的管理
-        if doit then
-            if target ~= nil then
-                DrinkLife(inst, target, 4)
-            end
-            if inst.healthcounter >= 4 then
-                if not HealOwner(inst, owner) then --优先为玩家恢复生命
-                    if inst.healthcounter >= 20 then --其次才是恢复自己的耐久
-                        HealArmor(inst)
-                    end
-                end
-            end
-        end
-    end, 1)
+    StealHealth(inst, owner, true)
 
     if owner:HasTag("equipmentmodel") then --假人！
         return

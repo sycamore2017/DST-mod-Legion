@@ -190,11 +190,19 @@ local function WitherComputNutrients(self, v)
     end
 end
 local function ComputVase(self, v)
-    if not v.components.vase.enabled or v.flowerid == nil then --没有插花
+    if
+        not v.components.vase.enabled or
+        (v.flowerid == nil and v._flower_id == nil) or --没有插花
+        v._hack_do_not_wilt ~= nil --本身是不枯萎的，那就不需要改什么了
+    then
         return false
     end
     if v.OnLoad ~= nil then --没错，要恢复就这么简单
-        v.OnLoad(v, { flowerid = v.flowerid, wilttime = TUNING.ENDTABLE_FLOWER_WILTTIME }) --时间不能乱改，不然会导致不发光
+        if v.flowerid ~= nil then --茶几的数据格式
+            v.OnLoad(v, { flowerid = v.flowerid, wilttime = TUNING.ENDTABLE_FLOWER_WILTTIME })
+        else --花瓶的数据格式
+            v.OnLoad(v, { flower_id = v._flower_id, wilt_time = TUNING.ENDTABLE_FLOWER_WILTTIME })
+        end
         if self.moisture > 0 then
             self.moisture = math.max(0, self.moisture-0.2)
         else

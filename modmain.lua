@@ -59,6 +59,10 @@
     ▷攻击反伤：判定在攻击前，执行在攻击后。反伤给攻击者，由敌人以及敌人所戴装备自定义逻辑
     ▷标签系数：damagetypebonus组件 通过敌人的标签，来给攻击与特殊攻击提供额外 乘法系数
     ▷暂时系数：instancemult(默认1)，表示是这次攻击的暂时性的系数，会与 最终攻击力(普攻) 相乘
+    ▷基础的特攻计算(比如位面攻击)：
+        basedamage --某个对象的基础特殊攻击
+        * self.externalmultipliers:Get() --兼容性乘法系数
+        + self.externalbonuses:Get() --兼容性加法数值
     ▷最终攻击力(普攻)：
         basedamage --(1)如果骑行，为骑行对象的 基础攻击+鞍具的额外攻击：combat.defaultdamage+saddler:GetBonusDamage()
                    --(2)如果空手，为攻击者的 基础攻击：combat.defaultdamage
@@ -79,7 +83,7 @@
                                 --(2)如果空手，为攻击者的 特殊攻击：CollectSpDamage()
                                 --(3)如果有武器，为武器的 特殊攻击x标签系数(默认1)：CollectSpDamage()*damagetypebonus:GetBonus(敌人)
         * damagetypemult --与普攻的逻辑相同
-        * playermultiplier --与普攻的逻辑相同
+        -- * playermultiplier --与普攻的逻辑相同(已被注释)
         * pvpmultiplier --与普攻的逻辑相同
 
 2、Combat:GetAttacked(attacker, damage, weapon, stimuli, spdamage)
@@ -95,6 +99,10 @@
         1、特殊攻击力 = 特殊攻击力*所有装备的标签系数累乘
         2、特殊防御装备：获取装备栏中所有具备对应特殊防御力的装备
         3、由所有 特殊防御装备 尽可能平均地吸收 特殊攻击力，吸收多少特殊攻击力就会消耗多少耐久
+    ▷基础的特防计算(比如位面防御)：
+        basedefense --某个对象的基础特殊防御
+        * self.externalmultipliers:Get() --兼容性乘法系数
+        + self.externalbonuses:Get() --兼容性加法数值
     ▷鞍具标签系数：若骑行的鞍具具有 damagetyperesist组件，则在攻击者或武器有组件里的对应标签时，提供一个系数值
     ▷自身标签系数：若被攻击者具有 damagetyperesist组件，则在攻击者或武器有组件里的对应标签时，提供一个系数值
     ▷额外受击系数：被攻击者自身的伤害系数：self.externaldamagetakenmultipliers:Get()，内部是乘法计算。多数mod都是改的这里
