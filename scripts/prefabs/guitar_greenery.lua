@@ -277,7 +277,7 @@ local function MakeGreeneryFx(name, build)
                  inst:Remove()
             else
                 --查找周围的玩家，如果有则一直不消失，如果没有，则随机会消失
-                if FindEntity(inst, 1, nil, { "player" }, { "notarget", "INLIMBO", "playerghost" }, nil) == nil and math.random() < 0.2 then
+                if FindEntity(inst, 1, nil, { "player" }, { "notarget", "INLIMBO" }, nil) == nil and math.random() < 0.2 then
                     inst.ending = true
                     inst.AnimState:PlayAnimation("ungrow_"..inst.animname)
                 else

@@ -121,8 +121,8 @@ local function FindSpiderdens(inst)
     inst.spiderdens = {}
     inst.lasttesttime = GetTime()
     local x, y, z = inst.Transform:GetWorldPosition()
-    local ents = TheSim:FindEntities(x, y, z, 25, nil, { "DECOR", "NOCLICK", "FX", "INLIMBO" })
-    for i, ent in pairs(ents) do
+    local ents = TheSim:FindEntities(x, y, z, 25, nil, { "NOCLICK", "INLIMBO" })
+    for _, ent in ipairs(ents) do
         if ent ~= inst then
             if ent:HasTag("spiderden") or ent.prefab == "spiderhole" then
                 table.insert(inst.spiderdens, ent)

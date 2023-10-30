@@ -52,7 +52,7 @@ function BotanyController:TriggerPlant(isadd)
     local x, y, z = self.inst.Transform:GetWorldPosition()
     local ents = TheSim:FindEntities(x, y, z, 20,
         nil,
-        { "NOCLICK", "FX", "INLIMBO" },
+        { "NOCLICK", "INLIMBO" },
         { "crop_legion", "crop2_legion" }
     )
     for _, v in pairs(ents) do

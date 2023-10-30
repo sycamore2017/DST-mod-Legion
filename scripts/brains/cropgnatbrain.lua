@@ -52,7 +52,7 @@ local function GetInfestTarget(inst)
                 end
                 return false
             end,
-            nil, { "FX", "INLIMBO", "nognatinfest", "withered", "barren" },
+            nil, { "INLIMBO", "nognatinfest", "withered", "barren" },
             { "crop_legion", "crop2_legion", "witherable" }
         )
 

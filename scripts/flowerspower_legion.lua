@@ -1,8 +1,4 @@
 local prefabFiles = {
-    "rosorns",                  --玫瑰刺
-    "lileaves",                 --蹄莲叶
-    "orchitwigs",               --兰花絮
-    "neverfade",                --永不凋零
     "foliageath",               --青枝绿叶
     "sachet",                   --香包
     "neverfade_butterfly",      --永不凋零的蝴蝶
@@ -72,8 +68,7 @@ if IsServer then
             local flower = nil
             local x, y, z = inst.Transform:GetWorldPosition()
             local ents = TheSim:FindEntities(x, y, z, 8, nil, { "NOCLICK", "FX", "INLIMBO" }) --检测周围物体
-
-            for i, ent in ipairs(ents) do
+            for _, ent in ipairs(ents) do
                 if ent.prefab == inst.bushCreater.name then
                     hasBush = true
                     break
@@ -81,7 +76,6 @@ if IsServer then
                     flower = ent   --获取花的实体
                 end
             end
-
             if not hasBush and flower ~= nil then --周围没有花丛+有花，有几率把花变成花丛
                 if math.random() < inst.bushCreater.chance then
                     local pos = flower:GetPosition()
@@ -98,22 +92,12 @@ if IsServer then
     end
 
     AddPrefabPostInit("gravestone", function(inst)    --通过api重写墓碑的功能
-        inst.bushCreater =
-        {
-            name = "orchidbush",
-            chance = 0.01,
-        }
-
+        inst.bushCreater = { name = "orchidbush", chance = 0.01 }
         inst:WatchWorldState("israining", onisraining)
         onisraining(inst, TheWorld.state.israining)
     end)
     AddPrefabPostInit("pond", function(inst)    --通过api重写青蛙池塘的功能
-        inst.bushCreater =
-        {
-            name = "lilybush",
-            chance = 0.03,
-        }
-
+        inst.bushCreater = { name = "lilybush", chance = 0.03 }
         inst:WatchWorldState("israining", onisraining)
         onisraining(inst, TheWorld.state.israining)
     end)

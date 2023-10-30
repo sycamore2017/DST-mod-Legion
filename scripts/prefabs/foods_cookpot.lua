@@ -210,7 +210,7 @@ local function SingleFight(owner)
     -- end
     local hasenemy = false
     local x, y, z = owner.Transform:GetWorldPosition()
-    local ents = TheSim:FindEntities(x, y, z, 24, { "_combat" }, {"NOCLICK", "INLIMBO", "player"})
+    local ents = TheSim:FindEntities(x, y, z, 24, { "_combat" }, { "NOCLICK", "INLIMBO", "player" })
     for _,v in ipairs(ents) do
         if
             v ~= owner.singlefight_target

@@ -220,11 +220,12 @@ local assets_shuck = {
   Asset("ANIM", "anim/spider_cocoon.zip"), --官方蜘蛛巢动画
   Asset("ANIM", "anim/boltwingout_shuck.zip")
 }
+local tags_cant_shuck = TOOLS_L.TagsCombat3()
 
 local function AttractEnemies_shuck(inst)
     local pos = inst:GetPosition()
-    local ents = TheSim:FindEntities(pos.x, pos.y, pos.z, 8, { "_combat" }, { "NOCLICK", "INLIMBO" })
-    for k, v in pairs(ents) do
+    local ents = TheSim:FindEntities(pos.x, pos.y, pos.z, 8, { "_combat" }, tags_cant_shuck)
+    for _, v in ipairs(ents) do
         if v ~= inst and v.components.combat ~= nil and v.components.combat:CanTarget(inst) then
             v.components.combat:SetTarget(inst)
         end

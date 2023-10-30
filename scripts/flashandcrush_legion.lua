@@ -812,7 +812,7 @@ if IsServer then
                             end
                         end,
                         nil,
-                        { "NOCLICK", "FX", "INLIMBO" },
+                        { "NOCLICK", "INLIMBO", "playerghost", "notarget" },
                         { "soulcontracts", "player" }
                     )
                     if toer ~= nil then

@@ -2,8 +2,8 @@ local TOOLS_L = require("tools_legion")
 
 local assets = {
     Asset("ANIM", "anim/hat_albicans_mushroom.zip"),
-	Asset("ATLAS", "images/inventoryimages/hat_albicans_mushroom.xml"),   --物品栏图片
-    Asset("IMAGE", "images/inventoryimages/hat_albicans_mushroom.tex"),
+	Asset("ATLAS", "images/inventoryimages/hat_albicans_mushroom.xml"),
+    Asset("IMAGE", "images/inventoryimages/hat_albicans_mushroom.tex")
 }
 local prefabs = {
     "escapinggerms_fx",
@@ -13,7 +13,7 @@ local prefabs = {
     "albicans_cap",
     "spore_small",
     "spore_medium",
-    "spore_tall",
+    "spore_tall"
 }
 
 local function onequip(inst, owner)
@@ -38,7 +38,6 @@ local function onunequip(inst, owner)
         owner.components.hunger.burnratemodifiers:RemoveModifier(inst)
     end
 end
-
 local function onuse(inst)
     local owner = inst.components.inventoryitem.owner
     if owner ~= nil then
@@ -53,17 +52,14 @@ local function onuse(inst)
         owner.sg:GoToState("release_spores", inst)
     end
 end
-
 local function ReleaseSporesEffect(inst, owner)
     local x, y, z = owner.Transform:GetWorldPosition()
+    local tags_cant = TOOLS_L.TagsCombat1()
     local ents = TheSim:FindEntities(x, y, z, 3.5,
-        nil,
-        { "DECOR", "NOCLICK", "FX", "shadow", "playerghost", "INLIMBO" },
-        { "player", "lamp", "mushroom_farm", "crop_legion", "crop2_legion" }
+        nil, tags_cant, { "player", "lamp", "mushroom_farm", "crop_legion", "crop2_legion" }
     )
-
-    for i, ent in pairs(ents) do
-        if ent ~= nil and ent:IsValid() and ent.entity:IsVisible() then
+    for _, ent in pairs(ents) do
+        if ent.entity:IsVisible() then
             if ent:HasTag("player") then
                 ent.time_l_sporeresistance = { add = TUNING.SEG_TIME*6, max = TUNING.SEG_TIME*30 }
                 ent:AddDebuff("buff_sporeresistance", "buff_sporeresistance")
@@ -111,7 +107,6 @@ local function ReleaseSporesEffect(inst, owner)
     if owner.components.hunger ~= nil then
         owner.components.hunger:DoDelta(-30)
     end
-
     if owner.components.lootdropper ~= nil then
         local num = math.random(2, 5)
         for i = 1, num do
@@ -123,8 +118,6 @@ local function ReleaseSporesEffect(inst, owner)
         end
     end
 end
-
------------------------------------
 
 local function fn(Sim)
     local inst = CreateEntity()

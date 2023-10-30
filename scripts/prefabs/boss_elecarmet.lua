@@ -35,6 +35,9 @@ local prefabs = {
 }
 
 local brain = require "brains/elecarmetbrain"
+local TOOLS_L = require("tools_legion")
+local tags_cant_static = TOOLS_L.TagsCombat2({ "ghost" })
+local tags_cant_target = TOOLS_L.TagsCombat2({ "smallcreature", "animal" })
 
 SetSharedLootTable('elecarmet', {
 	{"fimbul_axe",       1.00},
@@ -260,7 +263,7 @@ local function SpawnStatic(x, y, z)
 	static.AnimState:PlayAnimation("crackle_pst", true)
 	static.Transform:SetPosition(x, y, z)
 	static.findtask = static:DoPeriodicTask(0.5, function(inst)
-        local target = FindEntity(inst, 1.6, mine_test_fn, {"shockable"}, {"ghost", "playerghost", "INLIMBO"}, nil)
+        local target = FindEntity(inst, 1.6, mine_test_fn, { "shockable" }, tags_cant_static, nil)
         if target ~= nil then
         	target.components.shockable:Shock(8)
 
@@ -527,15 +530,13 @@ local function KeepTargetFn(inst, target)
     and target:GetPosition():Dist(landing) <= 35
 end
 local function RetargetFn(inst)
-    return FindEntity(
-        inst,
-        25,
+    return FindEntity(inst, 25,
         function(guy)
             -- return guy.components.combat.target == inst and inst.components.combat:CanTarget(guy)
             return inst.components.combat:CanTarget(guy)
         end,
         { "_combat" },
-        { "playerghost", "smallcreature", "animal", "largecreature", "INLIMBO" }
+        tags_cant_target
     )
 end
 

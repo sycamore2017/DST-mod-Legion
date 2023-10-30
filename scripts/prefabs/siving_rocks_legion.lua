@@ -111,11 +111,7 @@ local function TryDropRock(inst, chance)
 end
 local function GrowRock(inst, num)
     local x, y, z = inst.Transform:GetWorldPosition()
-    local ents = TheSim:FindEntities(x,y,z, 6,
-        nil,
-        {"NOCLICK", "FX", "INLIMBO"},
-        nil
-    )
+    local ents = TheSim:FindEntities(x,y,z, 6, nil, { "INLIMBO" }, nil)
     local numloot = 0
     local stackitem = nil
     for _, ent in ipairs(ents) do
@@ -761,7 +757,7 @@ local function InitEgg(inst, egg, ismale)
 end
 local function ClearBattlefield(inst) --打扫战场
     local x, y, z = inst.Transform:GetWorldPosition()
-    local ents = TheSim:FindEntities(x, 0, z, DIST_HEALTH+10, { "siv_boss_block" }, { "INLIMBO" })
+    local ents = TheSim:FindEntities(x, 0, z, DIST_HEALTH+15, { "siv_boss_block" }, { "INLIMBO" })
     for _, v in ipairs(ents) do
         if v.fn_onClear ~= nil then
             v:fn_onClear()
@@ -842,6 +838,7 @@ local function TriggerLifeExtractTask(inst, doit)
             local costnow = 0
             local costall = 0
             local countfx = 0
+            local canttags = TOOLS_L.TagsSiving({ "siving" })
 
             ----每2秒吸取所有生物生命；每0.5秒产生吸取特效
             inst.taskLifeExtract = inst:DoPeriodicTask(0.5, function(inst)
@@ -855,12 +852,7 @@ local function TriggerLifeExtractTask(inst, doit)
 
                 ----吸收对象的更新
                 if doit2 or ents == nil then
-                    ents = TheSim:FindEntities(x, y, z, DIST_HEALTH,
-                        nil,
-                        { "NOCLICK", "shadow", "shadowminion", "playerghost", "ghost",
-                            "INLIMBO", "wall", "structure", "balloon", "siving" },
-                        { "siving_derivant", "_combat" }
-                    )
+                    ents = TheSim:FindEntities(x, y, z, DIST_HEALTH, nil, canttags, { "siving_derivant", "_combat" })
                 end
 
                 cost = inst.treeState == 2 and 4 or 2

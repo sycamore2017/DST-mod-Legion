@@ -396,9 +396,7 @@ end
 local function OnPlant_p(inst, pt)
 	local cpt = inst.components.perennialcrop
 	local ents = TheSim:FindEntities(pt.x, pt.y, pt.z, 20, --寻找周围的管理器
-		{ "siving_ctl" },
-		{ "NOCLICK", "INLIMBO" },
-		nil
+		{ "siving_ctl" }, { "NOCLICK", "INLIMBO" }, nil
 	)
 	for _,v in ipairs(ents) do
 		if v.components.botanycontroller ~= nil then
@@ -580,9 +578,7 @@ end
 local function OnPlant_p2(inst, pt)
 	local cpt = inst.components.perennialcrop2
 	local ents = TheSim:FindEntities(pt.x, pt.y, pt.z, 20, --寻找周围的管理器
-		{ "siving_ctl" },
-		{ "NOCLICK", "INLIMBO" },
-		nil
+		{ "siving_ctl" }, { "NOCLICK", "INLIMBO" }, nil
 	)
 	for _,v in ipairs(ents) do
 		if v.components.botanycontroller ~= nil then
@@ -992,6 +988,12 @@ local sounds_nep = {
 	leaf = "dontstarve/wilson/pickup_reeds",
 	rumble = "dontstarve/creatures/slurper/rumble"
 }
+local TAGS_CANT_NEP = TOOLS_L.TagsCombat3({ "player", "vaseherb", "nodigest_l" })
+local ITEMS_NODIGEST = {
+	insectshell_l = true, boneshard = true, ahandfulofwings = true,
+	seeds_plantmeat_l = true, --不吃自己的异种
+	plantmeat = true, plantmeat_cooked = true --这是巨食草主产物，不能吃掉
+}
 
 local function DisplayName_nep(inst)
 	local namepre = STRINGS.NAMES[string.upper(inst.prefab or "plant_carrot_l")]
@@ -1015,9 +1017,7 @@ local function IsDigestible(item)
 	elseif item.prefab == "glommerflower" then
 		return not item:HasTag("glommerflower") --没有 glommerflower 就代表是枯萎了
     end
-	return item.prefab ~= "insectshell_l" and item.prefab ~= "boneshard" and
-		item.prefab ~= "seeds_plantmeat_l" and --不吃自己的异种
-		item.prefab ~= "plantmeat" and item.prefab ~= "plantmeat_cooked" and --这是巨食草主产物，不能吃掉
+	return not ITEMS_NODIGEST(item.prefab) and
 		not item:HasTag("irreplaceable") and not item:HasTag("nobundling") and
 		not item:HasTag("nodigest_l")
 end
@@ -1217,10 +1217,11 @@ local function TrySwallow(inst)
 
 	local x, y, z = inst.Transform:GetWorldPosition()
 	local cluster = inst.components.perennialcrop2.cluster
-	local ents = TheSim:FindEntities(x, y, z, inst.dist_swallow, nil,
-					{ "INLIMBO", "NOCLICK", "player", "vaseherb" }, { "_combat", "_health", "_inventoryitem" })
+	local ents = TheSim:FindEntities(x, y, z, inst.dist_swallow,
+		nil, TAGS_CANT_NEP, { "_combat", "_health", "_inventoryitem" }
+	)
 	for _, v in ipairs(ents) do
-		if DIGEST_DATA_LEGION[v.prefab] ~= nil and not v:HasTag("nodigest_l") then
+		if DIGEST_DATA_LEGION[v.prefab] ~= nil then
 			local dd = DIGEST_DATA_LEGION[v.prefab]
 			if dd.lvl ~= nil and dd.lvl <= cluster then
 				inst.sg:GoToState("swallow")
@@ -1237,10 +1238,11 @@ local function DoSwallow(inst)
 	local lootmap = {}
 	local newitems = {}
 	local cluster = inst.components.perennialcrop2.cluster
-	local ents = TheSim:FindEntities(x, y, z, inst.dist_swallow, nil,
-					{ "INLIMBO", "NOCLICK", "player", "vaseherb" }, { "_combat", "_health", "_inventoryitem" })
+	local ents = TheSim:FindEntities(x, y, z, inst.dist_swallow,
+		nil, TAGS_CANT_NEP, { "_combat", "_health", "_inventoryitem" }
+	)
 	for _, v in ipairs(ents) do
-		if DIGEST_DATA_LEGION[v.prefab] ~= nil and not v:HasTag("nodigest_l") then
+		if DIGEST_DATA_LEGION[v.prefab] ~= nil then
 			local dd = DIGEST_DATA_LEGION[v.prefab]
 			if dd.lvl ~= nil and dd.lvl <= cluster then
 				count = count + 1
@@ -1285,12 +1287,11 @@ local function DoLure(inst)
 
 	local x, y, z = inst.Transform:GetWorldPosition()
 	local cluster = inst.components.perennialcrop2.cluster
-	local ents = TheSim:FindEntities(x, y, z, inst.dist_lure, nil,
-					{ "INLIMBO", "NOCLICK", "player", "vaseherb" }, { "_combat" })
+	local ents = TheSim:FindEntities(x, y, z, inst.dist_lure, nil, TAGS_CANT_NEP, { "_combat" })
 	for _, v in ipairs(ents) do
 		if
 			v.components.combat ~= nil and v.components.combat:CanTarget(inst) and
-			DIGEST_DATA_LEGION[v.prefab] ~= nil and not v:HasTag("nodigest_l")
+			DIGEST_DATA_LEGION[v.prefab] ~= nil
 		then
 			local dd = DIGEST_DATA_LEGION[v.prefab]
 			if dd.lvl ~= nil and dd.lvl <= cluster and dd.attract then

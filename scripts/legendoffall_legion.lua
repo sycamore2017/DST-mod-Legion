@@ -1284,7 +1284,7 @@ _G.CROPS_DATA_LEGION.mandrake = {
                 time = time + time*timemult
             end
             local ents = TheSim:FindEntities(x, y, z, TUNING.MANDRAKE_SLEEP_RANGE_COOKED, nil,
-                { "playerghost", "FX", "DECOR", "INLIMBO" }, { "sleeper", "player" })
+                { "playerghost", "INLIMBO" }, { "sleeper", "player" })
             for i, v in ipairs(ents) do
                 if
                     not (v.components.freezable ~= nil and v.components.freezable:IsFrozen()) and

@@ -56,24 +56,6 @@ local function CheckSkills(inst, isidle)
             inst.sg:GoToState("flap_pre")
             return true
         end
-        --[[
-        if not inst.components.combat:InCooldown() then --啄击冷却时间到了就自动尝试攻击最近的敌人
-            local x, y, z = inst.Transform:GetWorldPosition()
-            local ents = TheSim:FindEntities(x, 0, z, inst.DIST_ATK+1, { "_combat" }, { "INLIMBO", "siving" })
-            for _, v in ipairs(ents) do
-                if
-                    v:HasTag("player") or ( --对玩家无条件攻击
-                        v.components.combat ~= nil and
-                        v.components.combat.target ~= nil and
-                        v.components.combat.target:HasTag("siving") --只攻击对玄鸟有仇恨的对象
-                    )
-                then
-                    inst.sg:GoToState("attack", {target = v})
-                    return true
-                end
-            end
-        end
-        ]]--
     elseif isidle then
         local rand = math.random()
         if rand < 0.05 then

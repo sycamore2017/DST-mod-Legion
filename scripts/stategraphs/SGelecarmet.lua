@@ -1,4 +1,6 @@
 require("stategraphs/commonstates")
+local TOOLS_L = require("tools_legion")
+local tags_cant = TOOLS_L.TagsCombat1()
 
 local function ValidTarget(target)
     if target and target:IsValid() then
@@ -17,7 +19,7 @@ local function GetDistance(inst, target)    --得到的是距离的平方
 end
 
 local function FindTarget(inst, radius)
-    return FindEntity(inst, radius, function(item) return ValidTarget(item) end, nil, {"NOCLICK", "FX", "shadow", "playerghost", "INLIMBO"}, nil)
+    return FindEntity(inst, radius, function(item) return ValidTarget(item) end, nil, tags_cant, nil)
 end
 
 local function TestRange(inst, target, radius_min, radius_max)  --最大范围与最小范围的数值都是平方值

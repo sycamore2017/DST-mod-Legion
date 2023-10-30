@@ -530,6 +530,34 @@ MakeBuff({
 })
 
 --------------------------------------------------------------------------
+--[[ 怜悯：降低攻击力 ]]
+--------------------------------------------------------------------------
+
+MakeBuff({
+    name = "buff_attackreduce",
+    assets = nil,
+    prefabs = nil,
+    time_key = "time_l_attackreduce",
+    time_default = TUNING.SEG_TIME*2, --1分钟
+    notimer = nil,
+    fn_start = function(buff, target)
+        if target.components.damagetypebonus == nil then --通过这个组件能使得弱化效果能同时应用给普攻和特攻
+            target:AddComponent("damagetypebonus")
+        end
+        target.components.damagetypebonus:AddBonus("_health", target, 0.7, "buff_attackreduce")
+        target.AnimState:SetMultColour(165/255, 188/255, 47/255, 1)
+    end,
+    fn_again = nil,
+    fn_end = function(buff, target)
+        if target.components.damagetypebonus ~= nil then
+            target.components.damagetypebonus:RemoveBonus("_health", target, "buff_attackreduce")
+        end
+        target.AnimState:SetMultColour(1, 1, 1, 1)
+    end,
+    fn_server = nil
+})
+
+--------------------------------------------------------------------------
 --[[ 惊吓：进入被惊吓sg ]]
 --------------------------------------------------------------------------
 

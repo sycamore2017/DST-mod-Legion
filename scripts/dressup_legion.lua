@@ -143,21 +143,9 @@ local dressup_data = {
         -- equipfn = nil,              --幻化时函数。data.equipfn(player, item)
         -- unequipfn = nil,            --去幻时函数。data.unequipfn(player, item)
     },
-    hambat =
-    {
-        buildfile = "swap_ham_bat",
-        buildsymbol = "swap_ham_bat",
-    },
-    spear_wathgrithr =
-    {
-        buildfile = "swap_spear_wathgrithr",
-        buildsymbol = "swap_spear_wathgrithr",
-    },
-    nightsword =
-    {
-        buildfile = "swap_nightmaresword",
-        buildsymbol = "swap_nightmaresword",
-    },
+    hambat = { buildfile = "swap_ham_bat", buildsymbol = "swap_ham_bat" },
+    spear_wathgrithr = { buildfile = "swap_spear_wathgrithr", buildsymbol = "swap_spear_wathgrithr" },
+    nightsword = { buildfile = "swap_nightmaresword", buildsymbol = "swap_nightmaresword" },
     lantern = {
         buildfn = function(dressup, item, buildskin)
             local itemswap = {}
@@ -183,246 +171,60 @@ local dressup_data = {
             if item.components.machine ~= nil and item.components.machine:IsOn() then
                 item.components.machine:TurnOff()
             end
-        end,
+        end
     },
-    bugnet = {
-        buildfile = "swap_bugnet",
-        buildsymbol = "swap_bugnet"
+    bugnet = { buildfile = "swap_bugnet", buildsymbol = "swap_bugnet" },
+    fishingrod = { buildfile = "swap_fishingrod", buildsymbol = "swap_fishingrod" },
+    grass_umbrella = { buildfile = "swap_parasol", buildsymbol = "swap_parasol" },
+    umbrella = { buildfile = "swap_umbrella", buildsymbol = "swap_umbrella" },
+    waterballoon = { buildfile = "swap_waterballoon", buildsymbol = "swap_waterballoon" },
+    compass = { buildfile = "swap_compass", buildsymbol = "swap_compass" },
+    axe = { buildfile = "swap_axe", buildsymbol = "swap_axe" },
+    goldenaxe = { buildfile = "swap_goldenaxe", buildsymbol = "swap_goldenaxe" },
+    pickaxe = { buildfile = "swap_pickaxe", buildsymbol = "swap_pickaxe" },
+    goldenpickaxe = { buildfile = "swap_goldenpickaxe", buildsymbol = "swap_goldenpickaxe" },
+    shovel = { buildfile = "swap_shovel", buildsymbol = "swap_shovel" },
+    goldenshovel = { buildfile = "swap_goldenshovel", buildsymbol = "swap_goldenshovel" },
+    multitool_axe_pickaxe = { buildfile = "swap_multitool_axe_pickaxe", buildsymbol = "swap_object" },
+    hammer = { buildfile = "swap_hammer", buildsymbol = "swap_hammer" },
+    pitchfork = { buildfile = "swap_pitchfork", buildsymbol = "swap_pitchfork" },
+    saddlehorn = { buildfile = "swap_saddlehorn", buildsymbol = "swap_saddlehorn" },
+    brush = { buildfile = "swap_beefalobrush", buildsymbol = "swap_beefalobrush" },
+    batbat = { buildfile = "swap_batbat", buildsymbol = "swap_batbat" },
+    firestaff = { buildfile = "swap_staffs", buildsymbol = "swap_redstaff" },
+    icestaff = { buildfile = "swap_staffs", buildsymbol = "swap_bluestaff" },
+    telestaff = { buildfile = "swap_staffs", buildsymbol = "swap_purplestaff" },
+    yellowstaff = { buildfile = "swap_staffs", buildsymbol = "swap_yellowstaff" },
+    greenstaff = { buildfile = "swap_staffs", buildsymbol = "swap_greenstaff" },
+    orangestaff = { buildfile = "swap_staffs", buildsymbol = "swap_orangestaff" },
+    opalstaff = { buildfile = "swap_staffs", buildsymbol = "swap_opalstaff" },
+    nightstick = { buildfile = "swap_nightstick", buildsymbol = "swap_nightstick" },
+    whip = { iswhip = true, buildfile = "swap_whip", buildsymbol = "swap_whip" },
+    sleepbomb = { buildfile = "swap_sleepbomb", buildsymbol = "swap_sleepbomb" },
+    blowdart_sleep = { buildfile = "swap_blowdart", buildsymbol = "swap_blowdart" },
+    blowdart_fire = { buildfile = "swap_blowdart", buildsymbol = "swap_blowdart" },
+    blowdart_yellow = { buildfile = "swap_blowdart", buildsymbol = "swap_blowdart" },
+    blowdart_pipe = { buildfile = "swap_blowdart_pipe", buildsymbol = "swap_blowdart_pipe" },
+    boomerang = { buildfile = "swap_boomerang", buildsymbol = "swap_boomerang" },
+    staff_tornado = { buildfile = "swap_tornado_stick", buildsymbol = "swap_tornado_stick" },
+    cane = { buildfile = "swap_cane", buildsymbol = "swap_cane" },
+    ruins_bat = { buildfile = "swap_ruins_bat", buildsymbol = "swap_ruins_bat" },
+    tentaclespike = { isnoskin = true, buildfile = "swap_spike", buildsymbol = "swap_spike" },
+    bullkelp_root = { isnoskin = true, iswhip = true, buildfile = "swap_bullkelproot", buildsymbol = "swap_whip" },
+    chum = { buildfile = "swap_chum_pouch", buildsymbol = "swap_chum_pouch" }, --鱼食
+    diviningrod = { isnoskin = true, buildfile = "swap_diviningrod", buildsymbol = "swap_diviningrod" }, --零件探测器
+    fishingnet = { buildfile = "swap_boat_net", buildsymbol = "swap_boat_net" }, --渔网
+    glasscutter = { buildfile = "swap_glasscutter", buildsymbol = "swap_glasscutter" }, --月玻璃刀
+    gnarwail_horn = { isnoskin = true, buildfile = "gnarwail_horn", buildsymbol = "swap_gnarwailhorn" }, --一角鲸的角
+    messagebottle = { --瓶中信
+        isnoskin = true, dressslot = EQUIPSLOTS.HANDS,
+        buildfile = "swap_bottle", buildsymbol = "swap_bottle"
     },
-    fishingrod =
-    {
-        buildfile = "swap_fishingrod",
-        buildsymbol = "swap_fishingrod",
-    },
-    grass_umbrella =
-    {
-        buildfile = "swap_parasol",
-        buildsymbol = "swap_parasol",
-    },
-    umbrella =
-    {
-        buildfile = "swap_umbrella",
-        buildsymbol = "swap_umbrella",
-    },
-    waterballoon =
-    {
-        buildfile = "swap_waterballoon",
-        buildsymbol = "swap_waterballoon",
-    },
-    compass =
-    {
-        buildfile = "swap_compass",
-        buildsymbol = "swap_compass",
-    },
-    axe =
-    {
-        buildfile = "swap_axe",
-        buildsymbol = "swap_axe",
-    },
-    goldenaxe =
-    {
-        buildfile = "swap_goldenaxe",
-        buildsymbol = "swap_goldenaxe",
-    },
-    pickaxe =
-    {
-        buildfile = "swap_pickaxe",
-        buildsymbol = "swap_pickaxe",
-    },
-    goldenpickaxe =
-    {
-        buildfile = "swap_goldenpickaxe",
-        buildsymbol = "swap_goldenpickaxe",
-    },
-    shovel =
-    {
-        buildfile = "swap_shovel",
-        buildsymbol = "swap_shovel",
-    },
-    goldenshovel =
-    {
-        buildfile = "swap_goldenshovel",
-        buildsymbol = "swap_goldenshovel",
-    },
-    multitool_axe_pickaxe = {
-        buildfile = "swap_multitool_axe_pickaxe",
-        buildsymbol = "swap_object"
-    },
-    hammer =
-    {
-        buildfile = "swap_hammer",
-        buildsymbol = "swap_hammer",
-    },
-    pitchfork = {
-        buildfile = "swap_pitchfork",
-        buildsymbol = "swap_pitchfork",
-    },
-    saddlehorn =
-    {
-        buildfile = "swap_saddlehorn",
-        buildsymbol = "swap_saddlehorn",
-    },
-    brush =
-    {
-        buildfile = "swap_beefalobrush",
-        buildsymbol = "swap_beefalobrush",
-    },
-    batbat =
-    {
-        buildfile = "swap_batbat",
-        buildsymbol = "swap_batbat",
-    },
-    firestaff =
-    {
-        buildfile = "swap_staffs",
-        buildsymbol = "swap_redstaff",
-    },
-    icestaff =
-    {
-        buildfile = "swap_staffs",
-        buildsymbol = "swap_bluestaff",
-    },
-    telestaff =
-    {
-        buildfile = "swap_staffs",
-        buildsymbol = "swap_purplestaff",
-    },
-    yellowstaff =
-    {
-        buildfile = "swap_staffs",
-        buildsymbol = "swap_yellowstaff",
-    },
-    greenstaff =
-    {
-        buildfile = "swap_staffs",
-        buildsymbol = "swap_greenstaff",
-    },
-    orangestaff =
-    {
-        buildfile = "swap_staffs",
-        buildsymbol = "swap_orangestaff",
-    },
-    opalstaff =
-    {
-        buildfile = "swap_staffs",
-        buildsymbol = "swap_opalstaff",
-    },
-    nightstick =
-    {
-        buildfile = "swap_nightstick",
-        buildsymbol = "swap_nightstick",
-    },
-    whip = {
-        iswhip = true,
-        buildfile = "swap_whip",
-        buildsymbol = "swap_whip",
-    },
-    sleepbomb =
-    {
-        buildfile = "swap_sleepbomb",
-        buildsymbol = "swap_sleepbomb",
-    },
-    blowdart_sleep =
-    {
-        buildfile = "swap_blowdart",
-        buildsymbol = "swap_blowdart",
-    },
-    blowdart_fire =
-    {
-        buildfile = "swap_blowdart",
-        buildsymbol = "swap_blowdart",
-    },
-    blowdart_yellow =
-    {
-        buildfile = "swap_blowdart",
-        buildsymbol = "swap_blowdart",
-    },
-    blowdart_pipe =
-    {
-        buildfile = "swap_blowdart_pipe",
-        buildsymbol = "swap_blowdart_pipe",
-    },
-    boomerang =
-    {
-        buildfile = "swap_boomerang",
-        buildsymbol = "swap_boomerang",
-    },
-    staff_tornado =
-    {
-        buildfile = "swap_tornado_stick",
-        buildsymbol = "swap_tornado_stick",
-    },
-    cane =
-    {
-        buildfile = "swap_cane",
-        buildsymbol = "swap_cane",
-    },
-    ruins_bat =
-    {
-        buildfile = "swap_ruins_bat",
-        buildsymbol = "swap_ruins_bat",
-    },
-    tentaclespike =
-    {
-        isnoskin = true,
-        buildfile = "swap_spike",
-        buildsymbol = "swap_spike",
-    },
-    bullkelp_root =
-    {
-        isnoskin = true,
-        iswhip = true,
-        buildfile = "swap_bullkelproot",
-        buildsymbol = "swap_whip",
-    },
-    chum = --鱼食
-    {
-        buildfile = "swap_chum_pouch",
-        buildsymbol = "swap_chum_pouch",
-    },
-    diviningrod = --零件探测器
-    {
-        isnoskin = true,
-        buildfile = "swap_diviningrod",
-        buildsymbol = "swap_diviningrod",
-    },
-    fishingnet = --渔网
-    {
-        buildfile = "swap_boat_net",
-        buildsymbol = "swap_boat_net",
-    },
-    glasscutter = --月玻璃刀
-    {
-        buildfile = "swap_glasscutter",
-        buildsymbol = "swap_glasscutter",
-    },
-    gnarwail_horn = { --一角鲸的角
-        isnoskin = true, buildfile = "gnarwail_horn", buildsymbol = "swap_gnarwailhorn"
-    },
-    messagebottle = --瓶中信
-    {
-        isnoskin = true,
-        dressslot = EQUIPSLOTS.HANDS,
-        buildfile = "swap_bottle",
-        buildsymbol = "swap_bottle",
-    },
-    oar = { --木桨
-        buildfile = "swap_oar",
-        buildsymbol = "swap_oar"
-    },
-    oar_driftwood = { --浮木桨
-        buildfile = "swap_oar_driftwood",
-        buildsymbol = "swap_oar_driftwood"
-    },
-    oar_monkey = { --战桨
-        buildfile = "swap_oar_monkey",
-        buildsymbol = "swap_oar_monkey"
-    },
-    malbatross_beak = { --邪天翁喙
-        buildfile = "swap_malbatross_beak",
-        buildsymbol = "swap_malbatross_beak"
-    },
-    oceanfishingrod = { --海洋钓竿
+    oar = { buildfile = "swap_oar", buildsymbol = "swap_oar" }, --木桨
+    oar_driftwood = { buildfile = "swap_oar_driftwood", buildsymbol = "swap_oar_driftwood" }, --浮木桨
+    oar_monkey = { buildfile = "swap_oar_monkey", buildsymbol = "swap_oar_monkey" }, --战桨
+    malbatross_beak = { buildfile = "swap_malbatross_beak", buildsymbol = "swap_malbatross_beak" }, --邪天翁喙
+    oceanfishingrod = { --海钓竿
         buildfn = function(dressup, item, buildskin)
             local itemswap = {}
             itemswap["swap_object"] = dressup:GetDressData(
@@ -448,31 +250,11 @@ local dressup_data = {
             dressup:InitClear("FX_fishing")
         end
     },
-    reskin_tool = { --扫把
-        buildfile = "swap_reskin_tool",
-        buildsymbol = "swap_reskin_tool",
-    },
-    slingshot = --弹弓
-    {
-        buildfile = "swap_slingshot",
-        buildsymbol = "swap_slingshot",
-    },
-    trident = --破音三叉戟
-    {
-        buildfile = "swap_trident",
-        buildsymbol = "swap_trident",
-    },
-    waterplant_bomb = --藤壶花的飞弹
-    {
-        isnoskin = true,
-        buildfile = "swap_barnacle_burr",
-        buildsymbol = "swap_barnacle_burr",
-    },
-    moonglassaxe =
-    {
-        buildfile = "swap_glassaxe",
-        buildsymbol = "swap_glassaxe",
-    },
+    reskin_tool = { buildfile = "swap_reskin_tool", buildsymbol = "swap_reskin_tool" }, --扫把
+    slingshot = { buildfile = "swap_slingshot", buildsymbol = "swap_slingshot" }, --弹弓
+    trident = { buildfile = "swap_trident", buildsymbol = "swap_trident" }, --刺耳三叉戟
+    waterplant_bomb = { isnoskin = true, buildfile = "swap_barnacle_burr", buildsymbol = "swap_barnacle_burr" }, --种壳
+    moonglassaxe = { buildfile = "swap_glassaxe", buildsymbol = "swap_glassaxe" },
     lighter = { buildfile = "swap_lighter", buildsymbol = "swap_lighter" },
     torch = { buildfile = "swap_torch", buildsymbol = "swap_torch" },
     farm_hoe = { buildfile = "quagmire_hoe", buildsymbol = "swap_quagmire_hoe" },
@@ -601,31 +383,12 @@ local dressup_data = {
         end
     },
     walking_stick = { buildfile = "walking_stick", buildsymbol = "swap_walking_stick" },
-    -- minifan = --有贴图之外的实体，不做幻化
-    -- {
-    --     buildfile = "swap_minifan",
-    --     buildsymbol = "swap_minifan",
-    -- },
-    -- redlantern = --有贴图之外的实体，不做幻化
-    -- {
-    --     buildfile = "swap_redlantern",
-    --     buildsymbol = "swap_redlantern",
-    -- },
-    -- thurible = --暗影香炉。有贴图之外的实体，不做幻化
-    -- {
-    --     buildfile = "swap_thurible",
-    --     buildsymbol = "swap_thurible",
-    -- },
-    -- lucy = --露西斧，伍迪只有一把，不做幻化
-    -- {
-    --     buildfile = "swap_lucy_axe",lucy
-    --     buildsymbol = "swap_lucy_axe",
-    -- },
-    -- propsign = { --猪王比赛的木牌：会在重启后自动消失，所以不能被幻化
-    --     isnoskin = true,
-    --     buildfile = "swap_sign_elite",
-    --     buildsymbol = "swap_sign_elite",
-    -- },
+    houndstooth_blowpipe = { buildfile = "swap_houndstooth_blowpipe", buildsymbol = "swap_blowdart_pipe" }, --嚎弹炮
+    -- minifan = { buildfile = "swap_minifan", buildsymbol = "swap_minifan" }, --有贴图之外的实体，不做幻化
+    -- redlantern = { buildfile = "swap_redlantern", buildsymbol = "swap_redlantern" }, --有贴图之外的实体，不做幻化
+    -- thurible = { buildfile = "swap_thurible", buildsymbol = "swap_thurible" }, --暗影香炉。有贴图之外的实体，不做幻化
+    -- lucy = { buildfile = "swap_lucy_axe", buildsymbol = "swap_lucy_axe" }, --露西斧，伍迪只有一把，不做幻化
+    -- propsign = { isnoskin = true, buildfile = "swap_sign_elite", buildsymbol = "swap_sign_elite" }, --猪王比赛的木牌：会在重启后自动消失，所以不幻化
 
     -------------------------------
     --头部-------------------------
@@ -907,86 +670,41 @@ local dressup_data = {
         end
     },
     woodcarvedhat = { buildfile = "hat_woodcarved", buildsymbol = "swap_hat" },
+    wagpunkhat = {
+        buildfile = "hat_wagpunk", buildsymbol = "swap_hat",
+        equipfn = function(owner, item)
+            Fn_setFollowFx(owner, "fx_d_wagpunkhat", "wagpunkhat_fx")
+            if owner.fx_d_wagpunkhat ~= nil then
+                owner.fx_d_wagpunkhat.level:set(5)
+            end
+        end,
+        unequipfn = function(owner, item)
+            Fn_removeFollowFx(owner, "fx_d_wagpunkhat")
+        end,
+        onequipfn = function(owner, item)
+            Fn_removeFollowFx(item, "fx")
+        end
+    },
 
     -------------------------------
     --身体-------------------------
     -------------------------------
 
-    armorwood = {
-        buildfile = "armor_wood",
-        buildsymbol = "swap_body"
-    },
-    armorgrass =
-    {
-        buildfile = "armor_grass",
-        buildsymbol = "swap_body",
-    },
-    armordragonfly =
-    {
-        buildfile = "torso_dragonfly",
-        buildsymbol = "swap_body",
-    },
-    armorslurper =
-    {
-        buildfile = "armor_slurper",
-        buildsymbol = "swap_body",
-    },
-    armorskeleton =
-    {
-        buildfile = "armor_skeleton",
-        buildsymbol = "swap_body",
-    },
-    armor_sanity =
-    {
-        buildfile = "armor_sanity",
-        buildsymbol = "swap_body",
-    },
-    armorruins =
-    {
-        buildfile = "armor_ruins",
-        buildsymbol = "swap_body",
-    },
-    armormarble =
-    {
-        buildfile = "armor_marble",
-        buildsymbol = "swap_body",
-    },
-    armorsnurtleshell =
-    {
-        istallbody = true,
-        buildfile = "armor_slurtleshell",
-        buildsymbol = "swap_body_tall",
-    },
-    backpack =
-    {
-        isbackpack = true,
-        buildfile = "swap_backpack",
-    },
-    krampus_sack =
-    {
-        isbackpack = true,
-        buildfile = "swap_krampus_sack",
-    },
-    candybag =
-    {
-        isbackpack = true,
-        buildfile = "candybag",
-    },
-    piggyback = {
-        isbackpack = true,
-        buildfile = "swap_piggyback",
-    },
-    icepack =
-    {
-        isbackpack = true,
-        buildfile = "swap_icepack",
-    },
-    onemanband =
-    {
-        istallbody = true,
-        buildfile = "swap_one_man_band",
-        buildsymbol = "swap_body_tall",
-    },
+    armorwood = { buildfile = "armor_wood", buildsymbol = "swap_body" },
+    armorgrass = { buildfile = "armor_grass", buildsymbol = "swap_body" },
+    armordragonfly = { buildfile = "torso_dragonfly", buildsymbol = "swap_body" },
+    armorslurper = { buildfile = "armor_slurper", buildsymbol = "swap_body" },
+    armorskeleton = { buildfile = "armor_skeleton", buildsymbol = "swap_body" },
+    armor_sanity = { buildfile = "armor_sanity", buildsymbol = "swap_body" },
+    armorruins = { buildfile = "armor_ruins", buildsymbol = "swap_body" },
+    armormarble = { buildfile = "armor_marble", buildsymbol = "swap_body" },
+    armorsnurtleshell = { istallbody = true, buildfile = "armor_slurtleshell", buildsymbol = "swap_body_tall" },
+    backpack = { isbackpack = true, buildfile = "swap_backpack" },
+    krampus_sack = { isbackpack = true, buildfile = "swap_krampus_sack" },
+    candybag = { isbackpack = true, buildfile = "candybag" },
+    piggyback = { isbackpack = true, buildfile = "swap_piggyback" },
+    icepack = { isbackpack = true, buildfile = "swap_icepack" },
+    onemanband = { istallbody = true, buildfile = "swap_one_man_band", buildsymbol = "swap_body_tall" },
     amulet = {
         buildfn = function(dressup, item, buildskin)
             local itemswap = {}
@@ -1005,25 +723,21 @@ local dressup_data = {
             return itemswap
         end
     },
-    blueamulet =
-    {
+    blueamulet = {
         buildfile = "torso_amulets",
-        buildsymbol = "blueamulet",
+        buildsymbol = "blueamulet"
     },
-    purpleamulet =
-    {
+    purpleamulet = {
         buildfile = "torso_amulets",
-        buildsymbol = "purpleamulet",
+        buildsymbol = "purpleamulet"
     },
-    greenamulet =
-    {
+    greenamulet = {
         buildfile = "torso_amulets",
-        buildsymbol = "greenamulet",
+        buildsymbol = "greenamulet"
     },
-    orangeamulet =
-    {
+    orangeamulet = {
         buildfile = "torso_amulets",
-        buildsymbol = "orangeamulet",
+        buildsymbol = "orangeamulet"
     },
     yellowamulet = {
         buildfn = function(dressup, item, buildskin)
@@ -1043,38 +757,13 @@ local dressup_data = {
             return itemswap
         end
     },
-    raincoat =
-    {
-        buildfile = "torso_rain",
-        buildsymbol = "swap_body",
-    },
-    sweatervest =
-    {
-        buildfile = "armor_sweatervest",
-        buildsymbol = "swap_body",
-    },
-    trunkvest_summer =
-    {
-        buildfile = "armor_trunkvest_summer",
-        buildsymbol = "swap_body",
-    },
-    trunkvest_winter =
-    {
-        buildfile = "armor_trunkvest_winter",
-        buildsymbol = "swap_body",
-    },
-    reflectivevest = {
-        buildfile = "torso_reflective",
-        buildsymbol = "swap_body",
-    },
-    hawaiianshirt = {
-        buildfile = "torso_hawaiian",
-        buildsymbol = "swap_body",
-    },
-    beargervest = {
-        buildfile = "torso_bearger",
-        buildsymbol = "swap_body",
-    },
+    raincoat = { buildfile = "torso_rain", buildsymbol = "swap_body" },
+    sweatervest = { buildfile = "armor_sweatervest", buildsymbol = "swap_body" },
+    trunkvest_summer = { buildfile = "armor_trunkvest_summer", buildsymbol = "swap_body" },
+    trunkvest_winter = { buildfile = "armor_trunkvest_winter", buildsymbol = "swap_body" },
+    reflectivevest = { buildfile = "torso_reflective", buildsymbol = "swap_body" },
+    hawaiianshirt = { buildfile = "torso_hawaiian", buildsymbol = "swap_body" },
+    beargervest = { buildfile = "torso_bearger", buildsymbol = "swap_body" },
     cavein_boulder = { --洞穴落石
         istallbody = true,
         -- buildfn = Fn_symbolSwap
@@ -1094,42 +783,12 @@ local dressup_data = {
             return itemswap
         end
     },
-    sunkenchest = { --上锁的贝壳宝箱
-        isnoskin = true,
-        istallbody = true,
-        buildfile = "swap_sunken_treasurechest",
-        buildsymbol = "swap_body"
-    },
-    shell_cluster = { --贝壳垃圾堆
-        isnoskin = true,
-        istallbody = true,
-        buildfile = "singingshell_cluster",
-        buildsymbol = "swap_body"
-    },
-    glassspike_short = { --小尖玻璃雕塑
-        isnoskin = true,
-        istallbody = true,
-        buildfile = "swap_glass_spike",
-        buildsymbol = "swap_body_short"
-    },
-    glassspike_med = { --中尖玻璃雕塑
-        isnoskin = true,
-        istallbody = true,
-        buildfile = "swap_glass_spike",
-        buildsymbol = "swap_body_med"
-    },
-    glassspike_tall = { --大尖玻璃雕塑
-        isnoskin = true,
-        istallbody = true,
-        buildfile = "swap_glass_spike",
-        buildsymbol = "swap_body_tall"
-    },
-    glassblock = { --钝玻璃雕塑
-        isnoskin = true,
-        istallbody = true,
-        buildfile = "swap_glass_block",
-        buildsymbol = "swap_body"
-    },
+    sunkenchest = { isnoskin = true, istallbody = true, buildfile = "swap_sunken_treasurechest", buildsymbol = "swap_body" }, --沉底宝箱
+    shell_cluster = { isnoskin = true, istallbody = true, buildfile = "singingshell_cluster", buildsymbol = "swap_body" }, --贝壳堆
+    glassspike_short = { isnoskin = true, istallbody = true, buildfile = "swap_glass_spike", buildsymbol = "swap_body_short" }, --小玻璃尖刺
+    glassspike_med = { isnoskin = true, istallbody = true, buildfile = "swap_glass_spike", buildsymbol = "swap_body_med" }, --中玻璃尖刺
+    glassspike_tall = { isnoskin = true, istallbody = true, buildfile = "swap_glass_spike", buildsymbol = "swap_body_tall" }, --大玻璃尖刺
+    glassblock = { isnoskin = true, istallbody = true, buildfile = "swap_glass_block", buildsymbol = "swap_body" }, --玻璃城堡
     potatosack = { isnoskin = true, istallbody = true, buildfile = "potato_sack", buildsymbol = "swap_body" }, --土豆袋
     armor_bramble = { buildfile = "armor_bramble", buildsymbol = "swap_body" }, --荆棘甲
     spicepack = { isbackpack = true, buildfile = "swap_chefpack" },
@@ -1169,6 +828,21 @@ local dressup_data = {
         end,
         unequipfn = function(owner, item)
             Fn_removeFollowFx(owner, "fx_d_armor_voidcloth")
+        end,
+        onequipfn = function(owner, item)
+            Fn_removeFollowFx(item, "fx")
+        end
+    },
+    armorwagpunk = {
+        buildfile = "armor_wagpunk_01", buildsymbol = "swap_body",
+        equipfn = function(owner, item)
+            Fn_setFollowFx(owner, "fx_d_armorwagpunk", "armorwagpunk_fx")
+            if owner.fx_d_armorwagpunk ~= nil then
+                owner.fx_d_armorwagpunk.level:set(5)
+            end
+        end,
+        unequipfn = function(owner, item)
+            Fn_removeFollowFx(owner, "fx_d_armorwagpunk")
         end,
         onequipfn = function(owner, item)
             Fn_removeFollowFx(item, "fx")
@@ -1253,7 +927,7 @@ local dressup_data = {
                 dressup:InitClear("swap_body")
                 dressup:InitClear("backpack")
             end
-        end,
+        end
     },
     boltwingout = {
         isnoskin = true,
@@ -1273,7 +947,7 @@ local dressup_data = {
             itemswap["backpack"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
 
             return itemswap
-        end,
+        end
     },
     -- book_weather --该道具贴图切换比较特殊，不做幻化
     shield_l_sand = {
@@ -1321,7 +995,7 @@ local dressup_data = {
     dualwrench = {
         isnoskin = true,
         buildfile = "swap_dualwrench",
-        buildsymbol = "swap_dualwrench",
+        buildsymbol = "swap_dualwrench"
     },
     fimbul_axe = {
         isnoskin = true,
@@ -1347,7 +1021,7 @@ local dressup_data = {
         isnoskin = true,
         isbackpack = true,
         buildfile = "giantsfoot",
-        buildsymbol = "swap_body",
+        buildsymbol = "swap_body"
     },
     hat_albicans_mushroom = {
         isnoskin = true,
@@ -1382,7 +1056,7 @@ local dressup_data = {
         unbuildfn = function(dressup, item)
             dressup:InitGroupHead()
             dressup:InitClear("swap_body") --还原牛仔围巾的效果
-        end,
+        end
     },
     hat_lichen = {
         isnoskin = true,
@@ -1407,13 +1081,13 @@ local dressup_data = {
             end
 
             return itemswap
-        end,
+        end
     },
     hat_mermbreathing = {
         isnoskin = true,
         isopentop = true,
         buildfile = "hat_mermbreathing",
-        buildsymbol = "swap_hat",
+        buildsymbol = "swap_hat"
     },
     lileaves = {
         isnoskin = true,
@@ -1465,7 +1139,7 @@ local dressup_data = {
             dressup:SetDressHand(itemswap)
 
             return itemswap
-        end,
+        end
     },
     orchitwigs = {
         isnoskin = true,
@@ -1545,7 +1219,7 @@ local dressup_data = {
     sachet = {
         isnoskin = true,
         buildfile = "sachet",
-        buildsymbol = "swap_body",
+        buildsymbol = "swap_body"
     },
     tripleshovelaxe = {
         isnoskin = true,
@@ -1597,7 +1271,7 @@ local dressup_data = {
 
             return itemswap
         end,
-        unbuildfn = function(dressup, item) end, --没啥好恢复的
+        unbuildfn = function(dressup, item) end --没啥好恢复的
     },
     theemperorsmantle = {
         isnoskin = true,
@@ -1609,7 +1283,7 @@ local dressup_data = {
 
             return itemswap
         end,
-        unbuildfn = function(dressup, item) end, --没啥好恢复的
+        unbuildfn = function(dressup, item) end --没啥好恢复的
     },
     theemperorspendant = {
         isnoskin = true,
@@ -1621,7 +1295,7 @@ local dressup_data = {
 
             return itemswap
         end,
-        unbuildfn = function(dressup, item) end, --没啥好恢复的
+        unbuildfn = function(dressup, item) end --没啥好恢复的
     },
     theemperorsscepter = {
         isnoskin = true,
@@ -1633,7 +1307,7 @@ local dressup_data = {
 
             return itemswap
         end,
-        unbuildfn = function(dressup, item) end, --没啥好恢复的
+        unbuildfn = function(dressup, item) end --没啥好恢复的
     },
     fishhomingtool_awesome = {
         isnoskin = true,
@@ -1683,7 +1357,7 @@ local dressup_data = {
     dish_tomahawksteak = {
         isnoskin = true,
         buildfile = "dish_tomahawksteak",
-        buildsymbol = "swap",
+        buildsymbol = "swap"
     },
     siving_feather_fake = {
         isnoskin = true,
@@ -1856,7 +1530,7 @@ local pieces = {
     "crabking", "malbatross", "toadstool", "stalker", "klaus", "beequeen", "antlion",
     "eyeofterror", "twinsofterror",
     "kitcoon", "catcoon", "manrabbit",
-    "daywalker"
+    "daywalker", "deerclops_mutated", "warg_mutated", "bearger_mutated"
 }
 -- local materials = {
 --     "marble", "stone", "moonglass",

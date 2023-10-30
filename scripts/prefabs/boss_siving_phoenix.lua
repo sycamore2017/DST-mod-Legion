@@ -55,10 +55,15 @@ local TIME_EYE_DT_GRIEF = 0.6
 local COUNT_EYE = 8 --8
 local COUNT_EYE_GRIEF = 11 --11
 
-local TAGS_CANT = {
-    "NOCLICK", "shadow", "shadowminion", "playerghost", "ghost",
-    "INLIMBO", "wall", "structure", "balloon", "siving"
-}
+local TAGS_CANT = TOOLS_L.TagsSiving({ "siving" })
+local tagsfornow = { "wall", "structure", "companion", "glommer", "friendlyfruitfly", "shadowminion" }
+if not TheNet:GetPVPEnabled() then
+    table.insert(tagsfornow, "player")
+    table.insert(tagsfornow, "abigail")
+end
+local TAGS_CANT_FEA = TOOLS_L.TagsCombat1(tagsfornow)
+local TAGS_CANT_BOSSFEA = TOOLS_L.TagsCombat1({ "siving" })
+tagsfornow = nil
 
 if CONFIGS_LEGION.PHOENIXBATTLEDIFFICULTY == 1 then
     DIST_FLAP = 7
@@ -506,7 +511,7 @@ local function MakeBoss(data)
                                 and inst.mate.components.combat.target ~= guy
                         end,
                         { "_combat" },
-                        { "INLIMBO", "siving" }
+                        TAGS_CANT_BOSSFEA
                     )
             end)
             inst.components.combat:SetKeepTargetFunction(function(inst, target)
@@ -998,6 +1003,7 @@ local function MakeWeapon_replace(data)
             inst.components.projectilelegion.speed = 45
             inst.components.projectilelegion.onthrown = OnThrown_fly
             inst.components.projectilelegion.onmiss = OnMiss_fly
+            inst.components.projectilelegion.exclude_tags = TAGS_CANT_FEA
             if not data.isreal then
                 inst.components.projectilelegion.onhit = OnHit_fly_fake
             end
@@ -1351,6 +1357,16 @@ end
 ------
 ------
 
+local function OnThrown_bossfea(inst, owner, targetpos, attacker)
+    inst.AnimState:PlayAnimation("shoot3", false)
+    inst.SoundEmitter:PlaySound("dontstarve/creatures/leif/swipe", nil, 0.2)
+end
+local function OnCollide_bossfea(inst, data)
+    local boat_physics = data.other.components.boatphysics
+    if boat_physics ~= nil then
+        inst.components.workable:WorkedBy(data.other, 1)
+    end
+end
 local function MakeBossWeapon(data)
     local scale = 1.2
     table.insert(prefs, Prefab(
@@ -1392,10 +1408,8 @@ local function MakeBossWeapon(data)
             inst:AddComponent("projectilelegion")
             inst.components.projectilelegion.speed = 45
             inst.components.projectilelegion.shootrange = DIST_FLAP
-            inst.components.projectilelegion.onthrown = function(inst, owner, targetpos, attacker)
-                inst.AnimState:PlayAnimation("shoot3", false)
-                inst.SoundEmitter:PlaySound("dontstarve/creatures/leif/swipe", nil, 0.2)
-            end
+            inst.components.projectilelegion.exclude_tags = TAGS_CANT_BOSSFEA
+            inst.components.projectilelegion.onthrown = OnThrown_bossfea
             inst.components.projectilelegion.onmiss = function(inst, targetpos, attacker)
                 local x, y, z = inst.Transform:GetWorldPosition()
                 -- if TheWorld.Map:IsVisualGroundAtPoint(x, 0, z) then --仅限陆地
@@ -1408,7 +1422,6 @@ local function MakeBossWeapon(data)
                 end
                 inst:Remove()
             end
-            inst.components.projectilelegion.exclude_tags = { "INLIMBO", "NOCLICK", "siving" }
 
             if data.fn_server ~= nil then
                 data.fn_server(inst)
@@ -1473,12 +1486,7 @@ local function MakeBossWeapon(data)
 
             MakeHauntableWork(inst)
 
-            inst:ListenForEvent("on_collide", function(inst, data) --被船撞时
-                local boat_physics = data.other.components.boatphysics
-                if boat_physics ~= nil then
-                    inst.components.workable:WorkedBy(data.other, 1)
-                end
-            end)
+            inst:ListenForEvent("on_collide", OnCollide_bossfea) --被船撞时
 
             if data.fn_server2 ~= nil then
                 data.fn_server2(inst)
@@ -1604,6 +1612,29 @@ local function OnTimerDone_egg(inst, data)
         inst:Remove()
     end
 end
+local function OnAttacked_egg(inst, data)
+    if not inst.components.health:IsDead() then
+        inst.AnimState:PlayAnimation("hit")
+        SetEggState(inst, inst.state)
+    end
+end
+local function OnDeath_egg(inst, data)
+    inst:RemoveEventCallback("timerdone", OnTimerDone_egg)
+    inst.components.lootdropper:DropLoot()
+    inst.AnimState:PlayAnimation("break", false)
+end
+local function OnLoad_egg(inst, data)
+    if inst.components.timer:TimerExists("state2") then
+        inst.components.timer:StopTimer("state1")
+        SetEggState(inst, 2)
+    elseif inst.components.timer:TimerExists("state3") then
+        inst.components.timer:StopTimer("state1")
+        SetEggState(inst, 3)
+    elseif inst.components.timer:TimerExists("birth") then
+        inst.components.timer:StopTimer("state1")
+        SetEggState(inst, 4)
+    end
+end
 
 table.insert(prefs, Prefab(
     "siving_egg",
@@ -1652,30 +1683,10 @@ table.insert(prefs, Prefab(
         inst.components.timer:StartTimer("state1", TIME_EGG*0.3)
 
         inst:ListenForEvent("timerdone", OnTimerDone_egg)
-        inst:ListenForEvent("attacked", function(inst, data)
-            if not inst.components.health:IsDead() then
-                inst.AnimState:PlayAnimation("hit")
-                SetEggState(inst, inst.state)
-            end
-        end)
-        inst:ListenForEvent("death", function(inst, data)
-            inst:RemoveEventCallback("timerdone", OnTimerDone_egg)
-            inst.components.lootdropper:DropLoot()
-            inst.AnimState:PlayAnimation("break", false)
-        end)
+        inst:ListenForEvent("attacked", OnAttacked_egg)
+        inst:ListenForEvent("death", OnDeath_egg)
 
-        inst.OnLoad = function(inst, data)
-            if inst.components.timer:TimerExists("state2") then
-                inst.components.timer:StopTimer("state1")
-                SetEggState(inst, 2)
-            elseif inst.components.timer:TimerExists("state3") then
-                inst.components.timer:StopTimer("state1")
-                SetEggState(inst, 3)
-            elseif inst.components.timer:TimerExists("birth") then
-                inst.components.timer:StopTimer("state1")
-                SetEggState(inst, 4)
-            end
-        end
+        inst.OnLoad = OnLoad_egg
 
         inst:DoTaskInTime(2, function(inst) --防止产生瞬间暴毙
             inst.components.health:SetInvincible(false)
@@ -1742,6 +1753,137 @@ local function GiveLife(target, value)
     end
     return value
 end
+local function Fn_onBind_flower(inst, bird, target)
+    inst.tree = bird.tree
+    inst.bird = bird
+    inst.target = target
+    target.hassivflower = true
+    inst.entity:SetParent(target.entity)
+
+    --获取能跟随的symbol
+    local symbol = target.components.debuffable and target.components.debuffable.followsymbol or nil
+    if symbol == nil or symbol == "" then
+        if target.components.combat ~= nil then
+            symbol = target.components.combat.hiteffectsymbol
+        end
+    end
+    if symbol == nil or symbol == "" then
+        if target.components.freezable ~= nil then
+            for _, v in pairs(target.components.freezable.fxdata) do
+                if v.follow ~= nil then
+                    symbol = v.follow
+                    break
+                end
+            end
+        end
+        if symbol == nil or symbol == "" then
+            if target.components.burnable ~= nil then
+                for _, v in pairs(target.components.burnable.fxdata) do
+                    if v.follow ~= nil then
+                        symbol = v.follow
+                        break
+                    end
+                end
+            end
+        end
+    end
+    if symbol ~= nil then
+        local ox, oy, oz = 0, 0, 0
+        if target.components.debuffable ~= nil then
+            local debuffable = target.components.debuffable
+            ox = debuffable.followoffset.x
+            oy = debuffable.followoffset.y
+            oz = debuffable.followoffset.z
+        end
+        if oy == 0 then
+            oy = -140
+        end
+        inst.Follower:FollowSymbol(target.GUID, symbol, ox, oy, oz)
+    end
+
+    inst:ListenForEvent("death", inst.fn_onUnbind, target)
+    inst:ListenForEvent("onremove", inst.fn_onUnbind, target)
+
+    if inst._task_re ~= nil then
+        inst._task_re:Cancel()
+        inst._task_re = nil
+    end
+
+    inst.task_bind = inst:DoPeriodicTask(2, function(inst)
+        if IsValid(inst.target) then
+            inst.target.components.health:DoDelta(-4, true, "siving_boss_flower", false, inst, true)
+            inst.countHealth = inst.countHealth + 40
+
+            --宿主还没死，并且也没有达到吸血上限，就更新自己的动画
+            if not inst.target.components.health:IsDead() and inst.countHealth < HEALTH_FLOWER then
+                SetFlowerState(inst, inst.countHealth, true)
+                return
+            end
+        end
+        inst.fn_onUnbind(inst.target)
+    end, 2)
+end
+local function OnAttacked_flower(inst, data)
+    if not inst.components.health:IsDead() then
+        inst.AnimState:PlayAnimation("hit"..tostring(inst.state))
+        inst.AnimState:PushAnimation("idle"..tostring(inst.state), true)
+    end
+end
+local function OnDeath_flower(inst, data)
+    if inst._task_health ~= nil then
+        inst._task_health:Cancel()
+        inst._task_health = nil
+    end
+    inst.Light:Enable(false)
+    inst.AnimState:ClearBloomEffectHandle()
+    inst.AnimState:PlayAnimation("dead"..tostring(inst.state), false)
+end
+local function Init_flower(inst)
+    if inst.tree ~= nil and inst.tree:IsValid() then
+        local value = inst.components.health.currenthealth
+        local valuelast = 0
+        if inst.tree.bossBirds ~= nil then --优先直接给玄鸟加血(我嫌给神木再转给玄鸟的话太慢了)
+            local female = inst.tree.bossBirds.female
+            local male = inst.tree.bossBirds.male
+            if female ~= nil and not IsValid(female) then
+                female = nil
+            end
+            if male ~= nil and not IsValid(male) then
+                male = nil
+            end
+            if female ~= nil or male ~= nil then
+                if female ~= nil and male ~= nil then
+                    value = value/2
+                end
+                if female ~= nil then
+                    valuelast = valuelast + GiveLife(female, value)
+                end
+                if male ~= nil then
+                    valuelast = valuelast + GiveLife(male, value)
+                end
+            else
+                valuelast = value
+            end
+        else
+            valuelast = value
+        end
+
+        if valuelast > 0 then --然后才是给神木增加生命计数器
+            inst.tree.countHealth = inst.tree.countHealth + valuelast
+        end
+    elseif inst.bird ~= nil and IsValid(inst.bird) then
+        GiveLife(inst.bird, inst.components.health.currenthealth)
+    end
+
+    local fx = SpawnPrefab("siving_boss_flower_fx")
+    if fx ~= nil then
+        local x, y, z = inst.Transform:GetWorldPosition()
+        fx.Transform:SetPosition(x, 0, z)
+    end
+
+    inst._task_health = nil
+    inst:Remove()
+end
 
 table.insert(prefs, Prefab( --特效
     "siving_boss_flowerfx",
@@ -1800,77 +1942,7 @@ table.insert(prefs, Prefab( --特效
             end
             inst:Remove()
         end
-        inst.fn_onBind = function(inst, bird, target) --寄生
-            inst.tree = bird.tree
-            inst.bird = bird
-            inst.target = target
-            target.hassivflower = true
-            inst.entity:SetParent(target.entity)
-
-            --获取能跟随的symbol
-            local symbol = target.components.debuffable and target.components.debuffable.followsymbol or nil
-            if symbol == nil or symbol == "" then
-                if target.components.combat ~= nil then
-                    symbol = target.components.combat.hiteffectsymbol
-                end
-            end
-            if symbol == nil or symbol == "" then
-                if target.components.freezable ~= nil then
-                    for _, v in pairs(target.components.freezable.fxdata) do
-                        if v.follow ~= nil then
-                            symbol = v.follow
-                            break
-                        end
-                    end
-                end
-                if symbol == nil or symbol == "" then
-                    if target.components.burnable ~= nil then
-                        for _, v in pairs(target.components.burnable.fxdata) do
-                            if v.follow ~= nil then
-                                symbol = v.follow
-                                break
-                            end
-                        end
-                    end
-                end
-            end
-            if symbol ~= nil then
-                local ox, oy, oz = 0, 0, 0
-                if target.components.debuffable ~= nil then
-                    local debuffable = target.components.debuffable
-                    ox = debuffable.followoffset.x
-                    oy = debuffable.followoffset.y
-                    oz = debuffable.followoffset.z
-                end
-                if oy == 0 then
-                    oy = -140
-                end
-                inst.Follower:FollowSymbol(target.GUID, symbol, ox, oy, oz)
-            end
-
-            inst:ListenForEvent("death", inst.fn_onUnbind, target)
-            inst:ListenForEvent("onremove", inst.fn_onUnbind, target)
-
-            if inst._task_re ~= nil then
-                inst._task_re:Cancel()
-                inst._task_re = nil
-            end
-
-            inst.task_bind = inst:DoPeriodicTask(2, function(inst)
-                if IsValid(inst.target) then
-                    inst.target.components.health:DoDelta(-4, true, inst.prefab, false, inst, true)
-                    inst.countHealth = inst.countHealth + 40
-
-                    --宿主还没死，并且也没有达到吸血上限，就更新自己的动画
-                    if not inst.target.components.health:IsDead() and inst.countHealth < HEALTH_FLOWER then
-                        SetFlowerState(inst, inst.countHealth, true)
-                        return
-                    end
-                end
-                inst.fn_onUnbind(inst.target)
-            end, 2)
-        end
-
+        inst.fn_onBind = Fn_onBind_flower --寄生
         inst._task_re = inst:DoTaskInTime(1, inst.Remove)
 
         return inst
@@ -1882,7 +1954,6 @@ table.insert(prefs, Prefab( --特效
         "siving_boss_flower"
     }
 ))
-
 table.insert(prefs, Prefab( --实体
     "siving_boss_flower",
     function()
@@ -1927,68 +1998,10 @@ table.insert(prefs, Prefab( --实体
 
         inst:AddComponent("combat")
 
-        inst:ListenForEvent("attacked", function(inst, data)
-            if not inst.components.health:IsDead() then
-                inst.AnimState:PlayAnimation("hit"..tostring(inst.state))
-                inst.AnimState:PushAnimation("idle"..tostring(inst.state), true)
-            end
-        end)
-        inst:ListenForEvent("death", function(inst, data)
-            if inst._task_health ~= nil then
-                inst._task_health:Cancel()
-                inst._task_health = nil
-            end
-            inst.Light:Enable(false)
-            inst.AnimState:ClearBloomEffectHandle()
-            inst.AnimState:PlayAnimation("dead"..tostring(inst.state), false)
-        end)
+        inst:ListenForEvent("attacked", OnAttacked_flower)
+        inst:ListenForEvent("death", OnDeath_flower)
 
-        inst._task_health = inst:DoTaskInTime(TIME_FLOWER, function(inst)
-            if inst.tree ~= nil and inst.tree:IsValid() then
-                local value = inst.components.health.currenthealth
-                local valuelast = 0
-                if inst.tree.bossBirds ~= nil then --优先直接给玄鸟加血(我嫌给神木再转给玄鸟的话太慢了)
-                    local female = inst.tree.bossBirds.female
-                    local male = inst.tree.bossBirds.male
-                    if female ~= nil and not IsValid(female) then
-                        female = nil
-                    end
-                    if male ~= nil and not IsValid(male) then
-                        male = nil
-                    end
-                    if female ~= nil or male ~= nil then
-                        if female ~= nil and male ~= nil then
-                            value = value/2
-                        end
-                        if female ~= nil then
-                            valuelast = valuelast + GiveLife(female, value)
-                        end
-                        if male ~= nil then
-                            valuelast = valuelast + GiveLife(male, value)
-                        end
-                    else
-                        valuelast = value
-                    end
-                else
-                    valuelast = value
-                end
-
-                if valuelast > 0 then --然后才是给神木增加生命计数器
-                    inst.tree.countHealth = inst.tree.countHealth + valuelast
-                end
-            elseif inst.bird ~= nil and IsValid(inst.bird) then
-                GiveLife(inst.bird, inst.components.health.currenthealth)
-            end
-
-            local fx = SpawnPrefab("siving_boss_flower_fx")
-            if fx ~= nil then
-                local x, y, z = inst.Transform:GetWorldPosition()
-                fx.Transform:SetPosition(x, 0, z)
-            end
-
-            inst._task_health = nil
-            inst:Remove()
-        end)
+        inst._task_health = inst:DoTaskInTime(TIME_FLOWER, Init_flower)
 
         return inst
     end,
@@ -2152,6 +2165,75 @@ local function EyeAttack(inst, dt, countnow, countmax, x, z, counthalo)
         end, 1)
     end)
 end
+local function Fn_onUnbind_eye(inst, landpos)
+    if inst.task_eye ~= nil then
+        inst.task_eye:Cancel()
+        inst.task_eye = nil
+    end
+    if inst.task_eye2 ~= nil then
+        inst.task_eye2:Cancel()
+        inst.task_eye2 = nil
+    end
+
+    if inst.tree:IsValid() then
+        inst.tree.components.timer:StopTimer("eye")
+        inst.tree.components.timer:StartTimer("eye", inst.tree.TIME_EYE)
+        if inst:IsAsleep() then
+            UnbindBird(inst, landpos)
+            inst.tree.myEye = nil
+            inst:Remove()
+        else
+            inst.AnimState:PlayAnimation("unbind")
+            inst:ListenForEvent("animover", function(inst) --如果离玩家太远，动画会暂停
+                UnbindBird(inst, landpos)
+                inst.tree.myEye = nil
+                inst:Remove()
+            end)
+        end
+    else
+        UnbindBird(inst, landpos)
+        inst.tree.myEye = nil
+        inst:Remove()
+    end
+end
+local function Fn_onBind_eye(inst, tree, bird)
+    if inst._task_re ~= nil then
+        inst._task_re:Cancel()
+        inst._task_re = nil
+    end
+
+    if bird.components.combat.target ~= nil then --把仇恨对象交给伴侣，不然仇恨就断了
+        CheckMate(bird)
+        if bird.mate ~= nil and bird.mate.components.combat.target == nil then
+            bird.mate.components.combat:SetTarget(bird.components.combat.target)
+        end
+        bird.components.combat:SetTarget(nil)
+    end
+
+    bird:RemoveFromScene()
+    bird.iseye = true
+    bird.eyefx = inst
+    tree.myEye = bird
+    inst.tree = tree
+    inst.bird = bird
+
+    local x, y, z = tree.Transform:GetWorldPosition()
+    inst.Transform:SetPosition(x, y, z)
+    bird.Transform:SetPosition(x, 0, z)
+
+    inst.entity:SetParent(tree.entity)
+    inst.Follower:FollowSymbol(tree.GUID, "trunk", 0, -760, 0)
+
+    inst.AnimState:PlayAnimation("bind")
+    inst.AnimState:PushAnimation("idle", true)
+
+    if bird.isgrief then
+        inst.AnimState:OverrideSymbol("eye", "siving_boss_eye", "griefeye")
+        EyeAttack(inst, TIME_EYE_DT_GRIEF, 0, COUNT_EYE_GRIEF, x, z, 0)
+    else
+        EyeAttack(inst, TIME_EYE_DT, 0, COUNT_EYE, x, z, 0)
+    end
+end
 
 table.insert(prefs, Prefab(
     "siving_boss_eye",
@@ -2184,76 +2266,8 @@ table.insert(prefs, Prefab(
         inst.bird = nil
         inst.target = nil
 
-        inst.fn_onUnbind = function(inst, landpos) --解除
-            if inst.task_eye ~= nil then
-                inst.task_eye:Cancel()
-                inst.task_eye = nil
-            end
-            if inst.task_eye2 ~= nil then
-                inst.task_eye2:Cancel()
-                inst.task_eye2 = nil
-            end
-
-            if inst.tree:IsValid() then
-                inst.tree.components.timer:StopTimer("eye")
-                inst.tree.components.timer:StartTimer("eye", inst.tree.TIME_EYE)
-                if inst:IsAsleep() then
-                    UnbindBird(inst, landpos)
-                    inst.tree.myEye = nil
-                    inst:Remove()
-                else
-                    inst.AnimState:PlayAnimation("unbind")
-                    inst:ListenForEvent("animover", function(inst) --如果离玩家太远，动画会暂停
-                        UnbindBird(inst, landpos)
-                        inst.tree.myEye = nil
-                        inst:Remove()
-                    end)
-                end
-            else
-                UnbindBird(inst, landpos)
-                inst.tree.myEye = nil
-                inst:Remove()
-            end
-        end
-        inst.fn_onBind = function(inst, tree, bird) --化作
-            if inst._task_re ~= nil then
-                inst._task_re:Cancel()
-                inst._task_re = nil
-            end
-
-            if bird.components.combat.target ~= nil then --把仇恨对象交给伴侣，不然仇恨就断了
-                CheckMate(bird)
-                if bird.mate ~= nil and bird.mate.components.combat.target == nil then
-                    bird.mate.components.combat:SetTarget(bird.components.combat.target)
-                end
-                bird.components.combat:SetTarget(nil)
-            end
-
-            bird:RemoveFromScene()
-            bird.iseye = true
-            bird.eyefx = inst
-            tree.myEye = bird
-            inst.tree = tree
-            inst.bird = bird
-
-            local x, y, z = tree.Transform:GetWorldPosition()
-            inst.Transform:SetPosition(x, y, z)
-            bird.Transform:SetPosition(x, 0, z)
-
-            inst.entity:SetParent(tree.entity)
-            inst.Follower:FollowSymbol(tree.GUID, "trunk", 0, -760, 0)
-
-            inst.AnimState:PlayAnimation("bind")
-            inst.AnimState:PushAnimation("idle", true)
-
-            if bird.isgrief then
-                inst.AnimState:OverrideSymbol("eye", "siving_boss_eye", "griefeye")
-                EyeAttack(inst, TIME_EYE_DT_GRIEF, 0, COUNT_EYE_GRIEF, x, z, 0)
-            else
-                EyeAttack(inst, TIME_EYE_DT, 0, COUNT_EYE, x, z, 0)
-            end
-        end
-
+        inst.fn_onUnbind = Fn_onUnbind_eye --解除
+        inst.fn_onBind = Fn_onBind_eye --化作
         inst._task_re = inst:DoTaskInTime(1, inst.Remove)
 
         return inst
@@ -2283,6 +2297,112 @@ local function SetOpenedPhysics(inst)
     inst.Physics:ClearCollisionMask()
     inst.Physics:CollidesWith(COLLISION.WORLD)
     inst.Physics:CollidesWith(COLLISION.ITEMS)
+end
+local function OnTreeLive_root1(inst, state)
+    inst.treeState = state
+    if state == 2 then
+        inst.AnimState:SetBuild("siving_boss_root2")
+        inst.components.bloomer:PushBloom("activetree", "shaders/anim.ksh", 1)
+        inst.Light:SetRadius(1.5)
+        inst.Light:Enable(true)
+    elseif state == 1 then
+        inst.AnimState:SetBuild("siving_boss_root")
+        inst.components.bloomer:PushBloom("activetree", "shaders/anim.ksh", 1)
+        inst.Light:SetRadius(0.8)
+        inst.Light:Enable(true)
+    else
+        inst.AnimState:SetBuild("siving_boss_root")
+        inst.components.bloomer:PopBloom("activetree")
+        inst.Light:Enable(false)
+    end
+end
+local function OnTreeLive_root2(inst, state)
+    inst.treeState = state
+    if state == 2 then
+        inst.components.bloomer:PushBloom("activetree", "shaders/anim.ksh", 1)
+        inst.Light:SetRadius(1.5)
+        inst.Light:Enable(true)
+    elseif state == 1 then
+        inst.components.bloomer:PushBloom("activetree", "shaders/anim.ksh", 1)
+        inst.Light:SetRadius(0.8)
+        inst.Light:Enable(true)
+    else
+        inst.components.bloomer:PopBloom("activetree")
+        inst.Light:Enable(false)
+    end
+end
+local function Fn_onAttack_root(inst, bird, delaytime)
+    inst.AnimState:PlayAnimation("grow"..tostring(inst.fenceid))
+    inst.AnimState:PushAnimation("idle"..tostring(inst.fenceid), false)
+    inst.SoundEmitter:PlaySound("dontstarve/common/together/atrium/gate_spike")
+    inst.components.workable:SetWorkable(false)
+    inst._task_atk = inst:DoTaskInTime(delaytime, function(inst)
+        inst._task_atk = nil
+
+        --攻击！破坏！
+        local x, y, z = inst.Transform:GetWorldPosition()
+        local ents = TheSim:FindEntities(x, y, z, DIST_ROOT_ATK,
+            nil, TAGS_CANT_BOSSFEA,
+            { "_combat", "CHOP_workable", "DIG_workable", "HAMMER_workable", "MINE_workable" }
+        )
+        for _, v in ipairs(ents) do
+            if v.components.combat ~= nil then
+                if v.components.health ~= nil and not v.components.health:IsDead() then
+                    if v.components.combat:CanBeAttacked() then
+                        v.components.combat:GetAttacked(inst, GetDamage(bird or inst, v, ATK_ROOT))
+                    end
+                end
+            elseif v.components.workable ~= nil then
+                if v.components.workable:CanBeWorked() then
+                    v.components.workable:WorkedBy(inst, 3)
+                end
+            end
+        end
+
+        SetClosedPhysics(inst)
+    end)
+    inst._task_work = inst:DoTaskInTime(delaytime+3, function(inst)
+        inst._task_work = nil
+        inst.components.workable:SetWorkable(true)
+    end)
+end
+local function Fn_onClear_root(inst)
+    if inst._task_atk ~= nil then
+        inst._task_atk:Cancel()
+        inst._task_atk = nil
+    end
+    if inst._task_work ~= nil then
+        inst._task_work:Cancel()
+        inst._task_work = nil
+    end
+
+    inst.persists = false
+    if inst:IsAsleep() then
+        inst:Remove()
+        return
+    end
+
+    inst:AddTag("NOCLICK")
+    inst.components.bloomer:PopBloom("activetree")
+    inst.Light:Enable(false)
+    inst.AnimState:PlayAnimation("shrink"..tostring(inst.fenceid))
+    inst:DoTaskInTime(0.6, inst.Remove) --我嫌动画末尾太拖了，提前结束！
+    inst.SoundEmitter:PlaySound("dontstarve/common/together/atrium/retract")
+end
+local function OnFinished_root(inst, worker)
+    SetOpenedPhysics(inst)
+    inst.components.lootdropper:DropLoot()
+    inst:fn_onClear()
+end
+local function OnSave_root(inst, data)
+    data.fenceid = inst.fenceid
+end
+local function OnLoad_root(inst, data)
+    if data ~= nil and data.fenceid ~= nil then
+        inst.fenceid = data.fenceid
+    end
+    inst.AnimState:PushAnimation("idle"..tostring(inst.fenceid), false)
+    SetClosedPhysics(inst)
 end
 
 table.insert(prefs, Prefab(
@@ -2328,102 +2448,13 @@ table.insert(prefs, Prefab(
         inst.treeState = 0
 
         if CONFIGS_LEGION.SIVINGROOTTEX == 1 then
-            inst.OnTreeLive = function(inst, state)
-                inst.treeState = state
-                if state == 2 then
-                    inst.AnimState:SetBuild("siving_boss_root2")
-                    inst.components.bloomer:PushBloom("activetree", "shaders/anim.ksh", 1)
-                    inst.Light:SetRadius(1.5)
-                    inst.Light:Enable(true)
-                elseif state == 1 then
-                    inst.AnimState:SetBuild("siving_boss_root")
-                    inst.components.bloomer:PushBloom("activetree", "shaders/anim.ksh", 1)
-                    inst.Light:SetRadius(0.8)
-                    inst.Light:Enable(true)
-                else
-                    inst.AnimState:SetBuild("siving_boss_root")
-                    inst.components.bloomer:PopBloom("activetree")
-                    inst.Light:Enable(false)
-                end
-            end
+            inst.OnTreeLive = OnTreeLive_root1
         else
-            inst.OnTreeLive = function(inst, state)
-                inst.treeState = state
-                if state == 2 then
-                    inst.components.bloomer:PushBloom("activetree", "shaders/anim.ksh", 1)
-                    inst.Light:SetRadius(1.5)
-                    inst.Light:Enable(true)
-                elseif state == 1 then
-                    inst.components.bloomer:PushBloom("activetree", "shaders/anim.ksh", 1)
-                    inst.Light:SetRadius(0.8)
-                    inst.Light:Enable(true)
-                else
-                    inst.components.bloomer:PopBloom("activetree")
-                    inst.Light:Enable(false)
-                end
-            end
+            inst.OnTreeLive = OnTreeLive_root2
         end
 
-        inst.fn_onAttack = function(inst, bird, delaytime)
-            inst.AnimState:PlayAnimation("grow"..tostring(inst.fenceid))
-            inst.AnimState:PushAnimation("idle"..tostring(inst.fenceid), false)
-            inst.SoundEmitter:PlaySound("dontstarve/common/together/atrium/gate_spike")
-            inst.components.workable:SetWorkable(false)
-            inst._task_atk = inst:DoTaskInTime(delaytime, function(inst)
-                inst._task_atk = nil
-
-                --攻击！破坏！
-                local x, y, z = inst.Transform:GetWorldPosition()
-                local ents = TheSim:FindEntities(x, 0, z, DIST_ROOT_ATK,
-                    nil, { "INLIMBO", "NOCLICK", "siving", "shadow", "ghost" },
-                    { "_combat", "CHOP_workable", "DIG_workable", "HAMMER_workable", "MINE_workable" }
-                )
-                for _, v in ipairs(ents) do
-                    if v.components.combat ~= nil then
-                        if v.components.health ~= nil and not v.components.health:IsDead() then
-                            if v.components.locomotor == nil then --可以秒杀触手等没有移动组件但有战斗组件的实体
-                                v.components.health:Kill()
-                            elseif v.components.combat:CanBeAttacked() then
-                                v.components.combat:GetAttacked(inst, GetDamage(bird or inst, v, ATK_ROOT))
-                            end
-                        end
-                    elseif v.components.workable ~= nil then
-                        if v.components.workable:CanBeWorked() then
-                            v.components.workable:WorkedBy(inst, 3)
-                        end
-                    end
-                end
-
-                SetClosedPhysics(inst)
-            end)
-            inst._task_work = inst:DoTaskInTime(delaytime+3, function(inst)
-                inst._task_work = nil
-                inst.components.workable:SetWorkable(true)
-            end)
-        end
-        inst.fn_onClear = function(inst)
-            if inst._task_atk ~= nil then
-                inst._task_atk:Cancel()
-                inst._task_atk = nil
-            end
-            if inst._task_work ~= nil then
-                inst._task_work:Cancel()
-                inst._task_work = nil
-            end
-
-            inst.persists = false
-            if inst:IsAsleep() then
-                inst:Remove()
-                return
-            end
-
-            inst:AddTag("NOCLICK")
-            inst.components.bloomer:PopBloom("activetree")
-            inst.Light:Enable(false)
-            inst.AnimState:PlayAnimation("shrink"..tostring(inst.fenceid))
-            inst:DoTaskInTime(0.6, inst.Remove) --我嫌动画末尾太拖了，提前结束！
-            inst.SoundEmitter:PlaySound("dontstarve/common/together/atrium/retract")
-        end
+        inst.fn_onAttack = Fn_onAttack_root
+        inst.fn_onClear = Fn_onClear_root
 
         inst:AddComponent("inspectable")
 
@@ -2432,27 +2463,15 @@ table.insert(prefs, Prefab(
         inst:AddComponent("workable")
         inst.components.workable:SetWorkAction(ACTIONS.MINE)
         inst.components.workable:SetWorkLeft(1)
-        inst.components.workable:SetOnFinishCallback(function(inst, worker)
-            SetOpenedPhysics(inst)
-            inst.components.lootdropper:DropLoot()
-            inst:fn_onClear()
-        end)
+        inst.components.workable:SetOnFinishCallback(OnFinished_root)
 
         inst:AddComponent("lootdropper")
         inst.components.lootdropper:AddChanceLoot("siving_rocks", 0.001)
 
         MakeHauntableWork(inst)
 
-        inst.OnSave = function(inst, data)
-            data.fenceid = inst.fenceid
-        end
-        inst.OnLoad = function(inst, data)
-            if data ~= nil and data.fenceid ~= nil then
-                inst.fenceid = data.fenceid
-            end
-            inst.AnimState:PushAnimation("idle"..tostring(inst.fenceid), false)
-            SetClosedPhysics(inst)
-        end
+        inst.OnSave = OnSave_root
+        inst.OnLoad = OnLoad_root
 
         return inst
     end,
@@ -2486,9 +2505,9 @@ local function AddWeaponLight(inst)
 end
 local function ExplodeFeather(inst)
     local x, y, z = inst.Transform:GetWorldPosition()
-    local ents = TheSim:FindEntities(x, y, z, DIST_FEA_EXPLODE, nil, { "INLIMBO", "NOCLICK", "FX", "siving" })
+    local ents = TheSim:FindEntities(x, y, z, DIST_FEA_EXPLODE, nil, TAGS_CANT_BOSSFEA)
     for _, v in ipairs(ents) do
-        if v ~= inst and v:IsValid() then
+        if v ~= inst then
             if v.components.workable ~= nil then
                 if v.components.workable:CanBeWorked() then
                     if v:HasTag("siv_boss_block") then
@@ -2498,7 +2517,7 @@ local function ExplodeFeather(inst)
                 end
             elseif
                 v.components.combat ~= nil and
-                not (v.components.health ~= nil and v.components.health:IsDead())
+                v.components.health ~= nil and not v.components.health:IsDead()
             then
                 v.components.combat:GetAttacked(inst, GetDamage2(v, ATK_FEA_EXPLODE), nil)
             end
@@ -2511,6 +2530,34 @@ local function ExplodeFeather(inst)
 
     inst.components.lootdropper:DropLoot()
     inst:Remove()
+end
+local function OnFinished_bossfea(inst, worker)
+    if inst.task_explode ~= nil then
+        inst.task_explode:Cancel()
+        inst.task_explode = nil
+    end
+    ExplodeFeather(inst)
+end
+local function TryExplode_bossfea(inst)
+    inst.task_explode = nil
+    ExplodeFeather(inst)
+end
+local function Fn_onClear_bossfea(inst)
+    if inst.task_explode ~= nil then
+        inst.task_explode:Cancel()
+        inst.task_explode = nil
+    end
+
+    inst.persists = false
+    if inst:IsAsleep() then
+        inst:Remove()
+        return
+    end
+
+    inst:AddTag("NOCLICK")
+    inst.Light:Enable(false)
+    inst.AnimState:ClearBloomEffectHandle()
+    ErodeAway(inst)
 end
 
 MakeBossWeapon({
@@ -2536,36 +2583,10 @@ MakeBossWeapon({
     end,
     fn_server2 = function(inst)
         inst.components.lootdropper:AddChanceLoot("siving_rocks", 0.1)
-        inst.components.workable:SetOnFinishCallback(function(inst, worker)
-            if inst.task_explode ~= nil then
-                inst.task_explode:Cancel()
-                inst.task_explode = nil
-            end
-            ExplodeFeather(inst)
-        end)
+        inst.components.workable:SetOnFinishCallback(OnFinished_bossfea)
 
-        inst.task_explode = inst:DoTaskInTime(TIME_FEA_EXPLODE, function(inst)
-            inst.task_explode = nil
-            ExplodeFeather(inst)
-        end)
-
-        inst.fn_onClear = function(inst)
-            if inst.task_explode ~= nil then
-                inst.task_explode:Cancel()
-                inst.task_explode = nil
-            end
-
-            inst.persists = false
-            if inst:IsAsleep() then
-                inst:Remove()
-                return
-            end
-
-            inst:AddTag("NOCLICK")
-            inst.Light:Enable(false)
-            inst.AnimState:ClearBloomEffectHandle()
-            ErodeAway(inst)
-        end
+        inst.task_explode = inst:DoTaskInTime(TIME_FEA_EXPLODE, TryExplode_bossfea)
+        inst.fn_onClear = Fn_onClear_bossfea
     end,
 })
 
@@ -2578,6 +2599,25 @@ MakeWeapon({
     name = "siving_feather_fake",
     isreal = nil
 })
+
+local function OnFinished_bossfea2(inst, worker)
+    if inst.explode_chain_l then --被连锁爆炸
+        ExplodeFeather(inst)
+        return
+    end
+    inst.components.lootdropper:DropLoot()
+    inst:Remove()
+end
+local function Fn_onClear_bossfea2(inst)
+    inst.persists = false
+    if inst:IsAsleep() then
+        inst:Remove()
+        return
+    end
+
+    inst:AddTag("NOCLICK")
+    ErodeAway(inst)
+end
 
 --BOSS产物：子圭翎羽
 MakeBossWeapon({
@@ -2601,26 +2641,9 @@ MakeBossWeapon({
     end,
     fn_server2 = function(inst)
         inst.components.lootdropper:AddChanceLoot("siving_rocks", 0.02)
-        inst.components.workable:SetOnFinishCallback(function(inst, worker)
-            if inst.explode_chain_l then --被连锁爆炸
-                ExplodeFeather(inst)
-                return
-            end
-            inst.components.lootdropper:DropLoot()
-            --特效 undo
-            inst:Remove()
-        end)
+        inst.components.workable:SetOnFinishCallback(OnFinished_bossfea2)
 
-        inst.fn_onClear = function(inst)
-            inst.persists = false
-            if inst:IsAsleep() then
-                inst:Remove()
-                return
-            end
-
-            inst:AddTag("NOCLICK")
-            ErodeAway(inst)
-        end
+        inst.fn_onClear = Fn_onClear_bossfea2
     end,
 })
 
@@ -2661,6 +2684,110 @@ local function RemoveLine(inst)
         RemoveFromOnwer(inst)
     end)
 end
+local function OnEquip_line(inst, owner)
+    owner:AddTag("s_l_pull") --skill_legion_pull
+    owner:AddTag("siv_line")
+end
+local function OnUnequip_line(inst, owner)
+    owner:RemoveTag("s_l_pull")
+    owner:RemoveTag("siv_line")
+    RemoveLine(inst)
+end
+local function Fn_spell_line(inst, doer, pos, options)
+    if doer.sivfeathers_l ~= nil then
+        ----查询能拉回的材料
+        local lines = doer.components.inventory:FindItems(function(i)
+            if i.line_l_value ~= nil or LineMap[i.prefab] then
+                return true
+            end
+        end)
+        if #lines <= 0 then --没有能拉回的材料，直接结束
+            doer.sivfeathers_l = nil
+            return
+        end
+
+        ----消耗材料
+        local cost = nil
+        if doer.feather_l_value == nil then --提前加1，用来消耗
+            cost = 1
+        else
+            cost = doer.feather_l_value + 1
+        end
+        for _,v in ipairs(lines) do
+            local value = v.line_l_value or LineMap[v.prefab]
+            if cost < value then --还未到消耗之时
+                break
+            end
+
+            if v.components.stackable == nil then
+                local costitem = doer.components.inventory:RemoveItem(v, nil, true)
+                if costitem then
+                    costitem:Remove()
+                end
+                cost = cost - value
+            else
+                local num = v.components.stackable:StackSize()
+                for i = 1, num, 1 do
+                    local costitem = doer.components.inventory:RemoveItem(v, nil, true)
+                    if costitem then
+                        costitem:Remove()
+                    end
+                    cost = cost - value
+                    if cost < value then
+                        break
+                    end
+                end
+            end
+            if cost < value then
+                break
+            end
+        end
+        if cost <= 0 then
+            doer.feather_l_value = nil
+        else
+            doer.feather_l_value = cost
+        end
+
+        ----检查是否有能拉回的羽毛
+        local throwed = false
+        local doerpos = doer:GetPosition()
+        for _,v in ipairs(doer.sivfeathers_l) do
+            if v and v:IsValid() then
+                -- if fea_name == nil then
+                --     fea_name = string.sub(v.prefab, 1, -5)
+                -- end
+                throwed = true
+                break
+            end
+        end
+
+        inst.linedoer = nil --拉回触发时，得提前把这个数据清除
+        RemoveLine(inst)
+        if throwed then
+            for _,v in ipairs(doer.sivfeathers_l) do
+                if v and v:IsValid() then
+                    local fly
+                    if v.isblk then --是滞留体，需要重新生成飞行体
+                        fly = SpawnPrefab((v.feather_skin or v.feather_name).."_fly")
+                        fly.shootidx = v.shootidx
+                        fly.caster = doer
+                        if doer.sivfeathers_l then --projectilelegion:Throw() 可能会清理 sivfeathers_l
+                            doer.sivfeathers_l[v.shootidx] = fly
+                        end
+                        fly.Transform:SetPosition(v.Transform:GetWorldPosition())
+                        v:Remove()
+                    else
+                        fly = v
+                    end
+                    fly.components.projectilelegion.isgoback = true
+                    fly.components.projectilelegion:Throw(v, doerpos, doer)
+                end
+            end
+        else
+            doer.sivfeathers_l = nil
+        end
+    end
+end
 
 table.insert(prefs, Prefab(
     "siving_feather_line",
@@ -2696,112 +2823,11 @@ table.insert(prefs, Prefab(
         inst.components.inventoryitem:SetOnDroppedFn(RemoveLine)
 
         inst:AddComponent("equippable")
-        inst.components.equippable:SetOnEquip(function(inst, owner)
-            owner:AddTag("s_l_pull") --skill_legion_pull
-            owner:AddTag("siv_line")
-        end)
-        inst.components.equippable:SetOnUnequip(function(inst, owner)
-            owner:RemoveTag("s_l_pull")
-            owner:RemoveTag("siv_line")
-            RemoveLine(inst)
-        end)
+        inst.components.equippable:SetOnEquip(OnEquip_line)
+        inst.components.equippable:SetOnUnequip(OnUnequip_line)
 
         inst:AddComponent("skillspelllegion")
-        inst.components.skillspelllegion.fn_spell = function(inst, doer, pos, options)
-            if doer.sivfeathers_l ~= nil then
-                ----查询能拉回的材料
-                local lines = doer.components.inventory:FindItems(function(i)
-                    if i.line_l_value ~= nil or LineMap[i.prefab] then
-                        return true
-                    end
-                end)
-                if #lines <= 0 then --没有能拉回的材料，直接结束
-                    doer.sivfeathers_l = nil
-                    return
-                end
-
-                ----消耗材料
-                local cost = nil
-                if doer.feather_l_value == nil then --提前加1，用来消耗
-                    cost = 1
-                else
-                    cost = doer.feather_l_value + 1
-                end
-                for _,v in ipairs(lines) do
-                    local value = v.line_l_value or LineMap[v.prefab]
-                    if cost < value then --还未到消耗之时
-                        break
-                    end
-
-                    if v.components.stackable == nil then
-                        local costitem = doer.components.inventory:RemoveItem(v, nil, true)
-                        if costitem then
-                            costitem:Remove()
-                        end
-                        cost = cost - value
-                    else
-                        local num = v.components.stackable:StackSize()
-                        for i = 1, num, 1 do
-                            local costitem = doer.components.inventory:RemoveItem(v, nil, true)
-                            if costitem then
-                                costitem:Remove()
-                            end
-                            cost = cost - value
-                            if cost < value then
-                                break
-                            end
-                        end
-                    end
-                    if cost < value then
-                        break
-                    end
-                end
-                if cost <= 0 then
-                    doer.feather_l_value = nil
-                else
-                    doer.feather_l_value = cost
-                end
-
-                ----检查是否有能拉回的羽毛
-                local throwed = false
-                local doerpos = doer:GetPosition()
-                for _,v in ipairs(doer.sivfeathers_l) do
-                    if v and v:IsValid() then
-                        -- if fea_name == nil then
-                        --     fea_name = string.sub(v.prefab, 1, -5)
-                        -- end
-                        throwed = true
-                        break
-                    end
-                end
-
-                inst.linedoer = nil --拉回触发时，得提前把这个数据清除
-                RemoveLine(inst)
-                if throwed then
-                    for _,v in ipairs(doer.sivfeathers_l) do
-                        if v and v:IsValid() then
-                            local fly
-                            if v.isblk then --是滞留体，需要重新生成飞行体
-                                fly = SpawnPrefab((v.feather_skin or v.feather_name).."_fly")
-                                fly.shootidx = v.shootidx
-                                fly.caster = doer
-                                if doer.sivfeathers_l then --projectilelegion:Throw() 可能会清理 sivfeathers_l
-                                    doer.sivfeathers_l[v.shootidx] = fly
-                                end
-                                fly.Transform:SetPosition(v.Transform:GetWorldPosition())
-                                v:Remove()
-                            else
-                                fly = v
-                            end
-                            fly.components.projectilelegion.isgoback = true
-                            fly.components.projectilelegion:Throw(v, doerpos, doer)
-                        end
-                    end
-                else
-                    doer.sivfeathers_l = nil
-                end
-            end
-        end
+        inst.components.skillspelllegion.fn_spell = Fn_spell_line
 
         inst.task_remove = inst:DoTaskInTime(3.5, RemoveLine)
 

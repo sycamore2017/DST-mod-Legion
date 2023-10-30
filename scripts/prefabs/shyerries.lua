@@ -1,3 +1,6 @@
+local TOOLS_L = require("tools_legion")
+local tags_cant_flower = TOOLS_L.TagsCombat2({
+    "plantkin", "shadow", "ghost", "glommer", "friendlyfruitfly", "abigail", "shadowminion" })
 local SpawnRadius = 2.5 --生成与检测的间隔距离
 
 local function Disappear(inst, delay)
@@ -34,7 +37,7 @@ local function CanSpawnHere(x, z, pre, pst) --0代表可以生成，1代表不�
 
     --检测周围的实体
     local ents = TheSim:FindEntities(x, 0, z, SpawnRadius + 1, nil, {"NOBLOCK", "FX", "palyer", "INLIMBO", "DECOR"}, nil)
-    for i, v in ipairs(ents) do
+    for _, v in ipairs(ents) do
         if v ~= pre and v ~= pst and v.entity:IsVisible() then
             if v:GetDistanceSqToPoint(x, 0, z) <= 1 or (v:HasTag("blocker") and v:GetPhysicsRadius(0) > 0.7) then
                 return 1
@@ -406,7 +409,7 @@ local function StartShy(inst)
     if inst.shytask == nil then
         inst.shytask = inst:DoPeriodicTask(1.5, function()
             --"shadowminion"暗影随从，"plantkin"植物人，"swampwhisperer"沼泽低语者，不会吓到颤栗花
-            if FindEntity(inst, 10, nil, nil, {"NOCLICK", "FX", "INLIMBO", "DECOR", "shadowminion", "plantkin", "swampwhisperer"}, {"scarytoprey"}) ~= nil then
+            if FindEntity(inst, 10, nil, { "scarytoprey" }, tags_cant_flower, nil) ~= nil then
                 if inst.components.pickable ~= nil then
                     inst.components.pickable.caninteractwith = false
                 end

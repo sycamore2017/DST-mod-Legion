@@ -2,15 +2,13 @@ local assets = {
     Asset("ANIM", "anim/fimbul_axe.zip"),
     Asset("ATLAS", "images/inventoryimages/fimbul_axe.xml"),
     Asset("IMAGE", "images/inventoryimages/fimbul_axe.tex"),
-    Asset("ANIM", "anim/boomerang.zip"), --官方回旋镖动画模板
+    Asset("ANIM", "anim/boomerang.zip") --官方回旋镖动画模板
 }
-
 local prefabs = {
     "fimbul_lightning",
-    "fimbul_cracklebase_fx",
+    "fimbul_cracklebase_fx"
 }
-
-local isPVP = false
+local TOOLS_L = require("tools_legion")
 
 local function OnFinished(inst)
     inst.AnimState:PlayAnimation("used")
@@ -101,25 +99,24 @@ local function DelayReturnToOwner(inst, owner)
     end)
 end
 
-local function GiveSomeShock(inst, owner, target)  --击中时的特殊效果
+local function GiveSomeShock(inst, owner, target) --击中时的特殊效果
     local x, y, z = target.Transform:GetWorldPosition()
     local givelightning = false
-
-    local ents = TheSim:FindEntities(x, y, z, 3, nil, {"playerghost", "INLIMBO"}, {"shockable", "CHOP_workable"})
-    for k, v in pairs(ents) do
+    local tags_cant = TOOLS_L.TagsCombat3(
+        TheNet:GetPVPEnabled() and { "lightningblocker" } or { "player", "lightningblocker" }) --排除了水中木
+    local ents = TheSim:FindEntities(x, y, z, 3, nil, tags_cant, { "shockable", "CHOP_workable" })
+    for _, v in ipairs(ents) do
         if v ~= owner then
-            if v.components.workable ~= nil and v.components.workable:CanBeWorked() then --直接破坏可以砍的物体
-                v.components.workable:Destroy(inst)
+            if v.components.workable ~= nil then --直接破坏可以砍的物体
+                if v.components.workable:CanBeWorked() and v.components.lightningblocker == nil then
+                    v.components.workable:Destroy(inst)
+                end
             elseif v.components.shockable ~= nil and math.random() < 0.3 then --有几率对生物造成触电
                 givelightning = true
-
-                if isPVP or not v:HasTag("player") then --只要是pvp模式就直接生效，若不是则只让非玩家生物触电
-                    v.components.shockable:Shock(6)
-                end
+                v.components.shockable:Shock(6)
             end
         end
     end
-
     if givelightning then
         local skindata = inst.components.skinedlegion:GetSkinedData()
         if skindata ~= nil and skindata.fn_onLightning ~= nil then
@@ -229,10 +226,6 @@ local function fn()
     inst:ListenForEvent("lightningstrike", OnLightning)
 
     MakeHauntableLaunch(inst)
-
-    if TheNet:GetPVPEnabled() then
-        isPVP = true
-    end
 
     inst.components.skinedlegion:SetOnPreLoad()
 

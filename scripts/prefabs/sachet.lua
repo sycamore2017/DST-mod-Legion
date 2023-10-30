@@ -1,14 +1,13 @@
-local assets =
-{
+local TOOLS_L = require("tools_legion")
+local assets = {
     Asset("ANIM", "anim/sachet.zip"),
 	Asset("ATLAS", "images/inventoryimages/sachet.xml"),
-    Asset("IMAGE", "images/inventoryimages/sachet.tex"),
+    Asset("IMAGE", "images/inventoryimages/sachet.tex")
 }
-
-local prefabs =
-{
-    "butterfly",
+local prefabs = {
+    "butterfly"
 }
+local tags_cant = TOOLS_L.TagsCombat1()
 
 local function CreateSanityAura() --抄的大佬的代码
 	local inst = CreateEntity()
@@ -24,7 +23,6 @@ local function CreateSanityAura() --抄的大佬的代码
 
 	return inst
 end
-
 local function onequip(inst, owner)
     owner.AnimState:OverrideSymbol("swap_body", "sachet", "swap_body")
 
@@ -50,7 +48,7 @@ local function onequip(inst, owner)
                 return
             end
             local x,y,z = owner.Transform:GetWorldPosition()
-            local ents = TheSim:FindEntities(x,y,z, 6, {"flower"})
+            local ents = TheSim:FindEntities(x,y,z, 6, { "flower" }, tags_cant)
             for _,v in ipairs(ents) do
                 if math.random() < 0.1 then
                     local fly = SpawnPrefab("butterfly")

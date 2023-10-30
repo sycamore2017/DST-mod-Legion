@@ -7,6 +7,9 @@ require "behaviours/standstill"
 -- require "behaviours/findlight"
 require "behaviours/follow"
 
+local TOOLS_L = require("tools_legion")
+local tags_cant_infest = TOOLS_L.TagsCombat2({ "nognatinfest", "insect", "glommer", "friendlyfruitfly", "shadowminion", "ghost" })
+
 local function GetValid(target)
     if target ~= nil and target:IsValid() then
         return target
@@ -45,7 +48,7 @@ local function GetInfestTarget(inst)
 
         inst.infesttarget = FindEntity(inst, 16, function(guy)
             return GetValid(guy.infester) == nil and inst.components.combat:CanTarget(guy)
-        end, {"character", "_combat", "_health"}, {"NOCLICK", "INLIMBO", "playerghost", "largecreature", "nognatinfest"}, nil)
+        end, { "_combat", "_health" }, tags_cant_infest, nil)
 
         if inst.infesttarget ~= nil then
             inst.infesttarget.infester = inst --做个标记，一个虫群只能认领一个侵扰对象

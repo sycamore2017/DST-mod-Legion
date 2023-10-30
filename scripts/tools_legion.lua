@@ -1,4 +1,39 @@
 
+--[ 各种常用标签 ]--
+local function CombineTags(tags1, tags2)
+    if tags2 ~= nil then
+        for _, v in pairs(tags2) do
+            table.insert(tags1, v)
+        end
+    end
+    return tags1
+end
+local function TagsCombat1(othertags) --普通的攻击标签
+    return CombineTags({
+        "INLIMBO", "notarget", "noattack", "invisible", "playerghost" --"NOCLICK"
+    }, othertags)
+end
+local function TagsCombat2(othertags) --建筑友好的攻击标签
+    return CombineTags({
+        "INLIMBO", "notarget", "noattack", "invisible", "playerghost", --"NOCLICK"
+        "wall", "structure", "balloon"
+    }, othertags)
+end
+local function TagsCombat3(othertags) --建筑与伙伴都友好的攻击标签
+    return CombineTags({
+        "INLIMBO", "notarget", "noattack", "invisible", "playerghost", --"NOCLICK"
+        "wall", "structure", "balloon",
+        "companion", "glommer", "friendlyfruitfly", "abigail", "shadowminion"
+    }, othertags)
+end
+local function TagsSiving(othertags) --子圭系列的窃血标签
+    return CombineTags({
+        "INLIMBO", "notarget", "noattack", "invisible", "playerghost", --"NOCLICK"
+        "wall", "structure", "balloon",
+        "shadowminion", "ghost" --"shadow"
+    }, othertags)
+end
+
 --[ 积雪监听(仅prefab定义时使用) ]--
 local function OnSnowCoveredChagned(inst, covered)
     if TheWorld.state.issnowcovered then
@@ -42,7 +77,7 @@ local function CallPlantDefender(inst, target, noone)
 	if target ~= nil and (noone or not target:HasTag("plantkin")) then
         inst:RemoveTag("farm_plant_defender") --其实是杂草才需要去除这个标签
         local x, y, z = inst.Transform:GetWorldPosition()
-        local defenders = TheSim:FindEntities(x, y, z, TUNING.FARM_PLANT_DEFENDER_SEARCH_DIST, {"farm_plant_defender"})
+        local defenders = TheSim:FindEntities(x, y, z, TUNING.FARM_PLANT_DEFENDER_SEARCH_DIST, { "farm_plant_defender" })
         for _, defender in ipairs(defenders) do
             if defender.components.burnable == nil or not defender.components.burnable.burning then
                 defender:PushEvent("defend_farm_plant", {source = inst, target = target})
@@ -95,7 +130,7 @@ local function FallingItem(itemname, x, y, z, hitrange, hitdamage, fallingtime, 
                     if hitrange ~= nil then
                         local someone = FindEntity(inst, hitrange,
                             function(target)
-                                if target and target:IsValid() and
+                                if
                                     target.components.combat ~= nil and
                                     target.components.health ~= nil and not target.components.health:IsDead()
                                 then
@@ -103,7 +138,7 @@ local function FallingItem(itemname, x, y, z, hitrange, hitdamage, fallingtime, 
                                 end
                                 return false
                             end,
-                            {"_combat", "_health"}, {"NOCLICK", "shadow", "playerghost", "INLIMBO"}, nil
+                            {"_combat", "_health"}, TagsCombat1(), nil
                         )
                         if someone ~= nil and someone.components.combat:CanBeAttacked() then
                             someone.components.combat:GetAttacked(inst, hitdamage)
@@ -562,5 +597,7 @@ return {
 	hat_off = hat_off,
 	hat_on_fullhead = hat_on_fullhead,
 	hat_off_fullhead = hat_off_fullhead,
-    MakeNoLossRepairableEquipment = MakeNoLossRepairableEquipment
+    MakeNoLossRepairableEquipment = MakeNoLossRepairableEquipment,
+    TagsCombat1 = TagsCombat1, TagsCombat2 = TagsCombat2, TagsCombat3 = TagsCombat3,
+    TagsSiving = TagsSiving
 }

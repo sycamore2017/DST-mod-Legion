@@ -14,6 +14,8 @@ local ElecarmetBrain = Class(Brain, function(self, inst)
     Brain._ctor(self, inst)
 end)
 
+local TOOLS_L = require("tools_legion")
+local tags_cant = TOOLS_L.TagsCombat1()
 local CHASE_DIST = 20
 local CHASE_TIME = 10
 
@@ -38,7 +40,7 @@ local function ValidTarget(target)
 end
 
 local function FindTarget(inst, radius)
-    return FindEntity(inst, radius, function(item) return ValidTarget(item) end, nil, {"NOCLICK", "FX", "shadow", "playerghost", "INLIMBO"}, nil)
+    return FindEntity(inst, radius, function(item) return ValidTarget(item) end, nil, tags_cant, nil)
 end
 
 local function StandStart(inst)

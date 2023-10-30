@@ -6,11 +6,7 @@ local ProjectileLegion = Class(function(self, inst)
 	self.speed = 20 --抛射速度
 	self.stimuli = nil
 	self.hittargets = {} --把已经被攻击过的对象记下来，防止重复攻击
-	self.exclude_tags = { "INLIMBO", "NOCLICK", "wall", "structure" }
-	if not TheNet:GetPVPEnabled() then
-		table.insert(self.exclude_tags, "player")
-		table.insert(self.exclude_tags, "abigail")
-	end
+	self.exclude_tags = { "INLIMBO", "notarget", "noattack", "invisible", "playerghost" }
 
 	self.onthrown = nil
 	self.onprehit = nil
@@ -135,14 +131,14 @@ function ProjectileLegion:OnUpdate(dt)
 				ent.sg == nil or
 				not (ent.sg:HasStateTag("flight") or ent.sg:HasStateTag("invisible"))
 			) and
-			(self.bulletradius+ent:GetPhysicsRadius(0))^2 >= distsq(current, ent:GetPosition()) and --范围内
 			(
 				(ent.components.combat ~= nil and ent.components.combat.target == self.attacker) or
 				(
 					(ent.components.domesticatable == nil or not ent.components.domesticatable:IsDomesticated()) and
 					(self.attacker.components.leader == nil or not self.attacker.components.leader:IsFollower(ent))
 				)
-			)
+			) and
+			(self.bulletradius+ent:GetPhysicsRadius(0))^2 >= distsq(current, ent:GetPosition()) --范围内
 		then
 			self:Hit(ent)
 			if not self.inst:IsValid() then

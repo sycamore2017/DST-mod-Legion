@@ -1,3 +1,4 @@
+local TOOLS_L = require("tools_legion")
 local assets = {
     Asset("ANIM", "anim/sand_spike.zip"),
     Asset("ANIM", "anim/sand_splash_fx.zip"),
@@ -74,7 +75,7 @@ local COLLAPSIBLE_TAGS = { "_combat", "siv_boss_block" }
 -- for k, v in pairs(COLLAPSIBLE_WORK_ACTIONS) do
 --     table.insert(COLLAPSIBLE_TAGS, k.."_workable")
 -- end
-local NON_COLLAPSIBLE_TAGS = { "player", "companion", "antlion", "groundspike", "flying", "shadow", "ghost", "playerghost", "NOCLICK", "DECOR", "INLIMBO", "wall" }
+local NON_COLLAPSIBLE_TAGS = TOOLS_L.TagsCombat3({ "player", "antlion", "groundspike", "flying", "ghost", "shadow" })
 
 local function DoBreak(inst)
     inst.task = nil
@@ -109,13 +110,11 @@ local function DoDamage(inst, OnIgnite)
         if v:IsValid() then
             if v.components.combat ~= nil then
                 if v.components.health ~= nil and not v.components.health:IsDead() then
-                    -- if v.components.locomotor == nil and not v:HasTag("epic") then --可秒杀触手等没有移动组件但有战斗组件的实体
-                    --     v.components.health:Kill()
-                    if not isblock and inst.components.combat:IsValidTarget(v) then
+                    if inst.components.combat:IsValidTarget(v) then
                         inst.components.combat:DoAttack(v)
                     end
                 end
-            elseif v.components.workable ~= nil then
+            elseif v.components.workable ~= nil then --这里主要用来破坏子圭突触
                 if v.components.workable:CanBeWorked() then
                     v.components.workable:WorkedBy(inst, 3)
                 end
@@ -124,7 +123,7 @@ local function DoDamage(inst, OnIgnite)
     end
 
     local totoss = TheSim:FindEntities(x, 0, z, inst.spikeradius + DAMAGE_RADIUS_PADDING, { "_inventoryitem" }, { "locomotor", "INLIMBO" })
-    for i, v in ipairs(totoss) do
+    for _, v in ipairs(totoss) do
         if v.components.mine ~= nil then
             v.components.mine:Deactivate()
         end

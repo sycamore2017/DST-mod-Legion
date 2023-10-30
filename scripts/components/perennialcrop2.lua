@@ -689,7 +689,7 @@ function PerennialCrop2:DoOverripe() --过熟（掉落果子，给周围植物�
 			local hasset = false
 			local ents = TheSim:FindEntities(x, y, z, 5,
 				nil,
-				{ "NOCLICK", "FX", "INLIMBO" },
+				{ "NOCLICK", "INLIMBO" },
 				{ "crop_legion", "withered", "barren" }
 			)
 			for _, v in pairs(ents) do

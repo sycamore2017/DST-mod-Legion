@@ -1,7 +1,7 @@
+local TOOLS_L = require("tools_legion")
 local assets = {
     Asset("ANIM", "anim/moondungeon.zip"),
 }
-
 local prefabs = {
     "staff_castinglight",   --释放怪物时的自身的发光特效
     --"rock_break_fx",    --虽说是特效，其实只是个用来播放声音(矿石破碎时)的载体
@@ -315,14 +315,12 @@ local function GetStatus(inst)
         return "SLEEP"
     end
 end
-
 local function GetSpawnPoint(inst, radius)
     local x, y, z = inst.Transform:GetWorldPosition()
     local rad = radius or math.random(4, 12)
     local angle = math.random() * 2 * PI
     return x + rad * math.cos(angle), y, z - rad * math.sin(angle)
 end
-
 local function GetDungeonProtector(inst, protector, protdata)
     local monster = SpawnPrefab(protector)
 
@@ -366,12 +364,12 @@ local function GetDungeonProtector(inst, protector, protdata)
 
     return monster
 end
-
 local function GetSpawnNumber(num)
     local result = math.random(-1, 1) + num
     return (result > 0 and result) or 1
 end
 
+local tags_cant = TOOLS_L.TagsCombat1()
 local protector_stage = { --各种保护者的生成方式
     --圆的阵势在月光中产生
     starsky = function(inst, worker, protector, protdata)
@@ -449,8 +447,8 @@ local protector_stage = { --各种保护者的生成方式
     staycool = function(inst, worker, protector, protdata)
         --先冻住入侵者
         local x, y, z = inst.Transform:GetWorldPosition()
-        local ents = TheSim:FindEntities(x, y, z, 10, { "freezable" }, { "FX", "NOCLICK", "INLIMBO" })
-        for i, v in pairs(ents) do
+        local ents = TheSim:FindEntities(x, y, z, 10, { "freezable" }, tags_cant)
+        for _, v in ipairs(ents) do
             if v.components.freezable ~= nil then
                 v.components.freezable:AddColdness(10)
             end
@@ -478,8 +476,8 @@ local protector_stage = { --各种保护者的生成方式
     --范围型冰控
     iceexplosion = function(inst, worker, protector, protdata)
         local x, y, z = inst.Transform:GetWorldPosition()
-        local ents = TheSim:FindEntities(x, y, z, 10, { "freezable" }, { "FX", "NOCLICK", "INLIMBO" })
-        for i, v in pairs(ents) do
+        local ents = TheSim:FindEntities(x, y, z, 10, { "freezable" }, tags_cant)
+        for _, v in ipairs(ents) do
             if v.components.freezable ~= nil then
                 v.components.freezable:AddColdness(10)
             end
@@ -551,11 +549,13 @@ local protector_stage = { --各种保护者的生成方式
     --范围式催眠
     goodnight = function(inst, worker, protector, protdata)
         local x, y, z = inst.Transform:GetWorldPosition()
-        local ents = TheSim:FindEntities(x, y, z, 20, nil, { "playerghost", "FX", "INLIMBO" }, { "sleeper", "player" })
-        for i, v in ipairs(ents) do
-            if not (v.components.freezable ~= nil and v.components.freezable:IsFrozen()) and
+        local ents = TheSim:FindEntities(x, y, z, 20, nil, tags_cant, { "sleeper", "player" })
+        for _, v in ipairs(ents) do
+            if
+                not (v.components.freezable ~= nil and v.components.freezable:IsFrozen()) and
                 not (v.components.pinnable ~= nil and v.components.pinnable:IsStuck()) and
-                not (v.components.fossilizable ~= nil and v.components.fossilizable:IsFossilized()) then
+                not (v.components.fossilizable ~= nil and v.components.fossilizable:IsFossilized())
+            then
                 local mount = v.components.rider ~= nil and v.components.rider:GetMount() or nil
                 if mount ~= nil then
                     mount:PushEvent("ridersleep", { sleepiness = 10, sleeptime = 20 })
@@ -574,11 +574,13 @@ local protector_stage = { --各种保护者的生成方式
     --先范围式催眠，后范围随机阵势产生
     baddream = function(inst, worker, protector, protdata)
         local x, y, z = inst.Transform:GetWorldPosition()
-        local ents = TheSim:FindEntities(x, y, z, 20, nil, { "playerghost", "FX", "INLIMBO" }, { "sleeper", "player" })
-        for i, v in ipairs(ents) do
-            if not (v.components.freezable ~= nil and v.components.freezable:IsFrozen()) and
+        local ents = TheSim:FindEntities(x, y, z, 20, nil, tags_cant, { "sleeper", "player" })
+        for _, v in ipairs(ents) do
+            if
+                not (v.components.freezable ~= nil and v.components.freezable:IsFrozen()) and
                 not (v.components.pinnable ~= nil and v.components.pinnable:IsStuck()) and
-                not (v.components.fossilizable ~= nil and v.components.fossilizable:IsFossilized()) then
+                not (v.components.fossilizable ~= nil and v.components.fossilizable:IsFossilized())
+            then
                 local mount = v.components.rider ~= nil and v.components.rider:GetMount() or nil
                 if mount ~= nil then
                     mount:PushEvent("ridersleep", { sleepiness = 10, sleeptime = 20 })

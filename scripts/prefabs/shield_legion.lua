@@ -379,6 +379,8 @@ MakeShield({
 --[[ 恐怖盾牌的机械火焰 ]]
 --------------------------------------------------------------------------
 
+local tags_cant_terror = TOOLS_L.TagsCombat3({ "player" })
+
 table.insert(prefs, Prefab("shieldterror_fire", function()
     local inst = CreateEntity()
 
@@ -426,8 +428,7 @@ table.insert(prefs, Prefab("shieldterror_fire", function()
     inst._taskfire = inst:DoPeriodicTask(2, function(inst)
         local number = 0
         local x, y, z = inst.Transform:GetWorldPosition()
-        local ents = TheSim:FindEntities(x, y, z, 2,
-            { "_combat", "_health" }, { "NOCLICK", "INLIMBO", "balloon", "structure", "wall", "player" })
+        local ents = TheSim:FindEntities(x, y, z, 2, { "_combat", "_health" }, tags_cant_terror)
         for _,v in ipairs(ents) do
             if
                 v.entity:IsVisible() and (

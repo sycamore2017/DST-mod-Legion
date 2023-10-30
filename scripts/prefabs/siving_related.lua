@@ -974,12 +974,11 @@ local function IsValidVictim(ent, owner)
     return false
 end
 local function StealHealth(inst, owner, ismask2)
-    local notags = {
-        "NOCLICK", "INLIMBO", "shadow", "shadowminion", "playerghost", "ghost", "wall",
-        "balloon", "siving", "glommer", "friendlyfruitfly", "structure"
-    }
+    local notags
     if owner:HasTag("player") or owner:HasTag("equipmentmodel") then --佩戴者是玩家、假人时，不吸收其他玩家
-        table.insert(notags, "player")
+        notags = TOOLS_L.TagsSiving({ "player", "siving", "companion", "glommer", "friendlyfruitfly", "abigail" })
+    else
+        notags = TOOLS_L.TagsSiving({ "siving", "glommer", "friendlyfruitfly" })
     end
     local _taskcounter = 0
     local doit = false
@@ -1167,7 +1166,7 @@ local function OnAttackOther(owner, data)
         data.target.components.health ~= nil and not data.target.components.health:IsDead() and
         (data.target.siv_blood_l_reducer_v == nil or data.target.siv_blood_l_reducer_v < 1) and
         not (
-            data.target:HasTag("shadow") or
+            -- data.target:HasTag("shadow") or
             data.target:HasTag("ghost") or
             data.target:HasTag("wall") or
             data.target:HasTag("structure") or

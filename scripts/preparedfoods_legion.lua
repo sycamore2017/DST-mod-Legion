@@ -8,12 +8,10 @@ local function OnIgniteFn(inst)
     inst.SoundEmitter:PlaySound("dontstarve/common/blackpowder_fuse_LP", "hiss")
     DefaultBurnFn(inst)
 end
-
 local function OnExtinguishFn(inst)
     inst.SoundEmitter:KillSound("hiss")
     DefaultExtinguishFn(inst)
 end
-
 local function OnExplodeFn(inst)
     inst.SoundEmitter:KillSound("hiss")
     SpawnPrefab("explode_small").Transform:SetPosition(inst.Transform:GetWorldPosition())
@@ -174,28 +172,28 @@ local foods_legion = {
             end
 
             local x1, y1, z1 = eater.Transform:GetWorldPosition()
-            local ents = TheSim:FindEntities(x1, y1, z1, 25, { "player" }, { "DECOR", "NOCLICK", "FX", "shadow", "playerghost", "INLIMBO" })
+            local ents = TheSim:FindEntities(x1, y1, z1, 25, { "player" }, { "NOCLICK", "playerghost", "INLIMBO" })
             local sanitycount = 0
 
             for i, ent in pairs(ents) do
-                if ent ~= eater and ent:IsValid() and ent.entity:IsVisible() and
+                if
+                    ent ~= eater and ent.entity:IsVisible() and
+                    ent.components.health ~= nil and not ent.components.health:IsDead() and
                     ent.components.inventory ~= nil and ent.components.sanity ~= nil
                 then
                     local sugar = ent.components.inventory:FindItem(function(item)
                         return item.components.edible ~= nil and item.components.edible.foodtype == FOODTYPE.GOODIES
                     end)
-
                     if sugar ~= nil then
                         local smallsugar = ent.components.inventory:DropItem(sugar, false)
                         if smallsugar ~= nil then
                             eater.components.inventory:GiveItem(smallsugar)
                         end
-
                         if ent.components.talker ~= nil then
                             ent.components.talker:Say(GetString(ent, "DESCRIBE", { "DISH_SUGARLESSTRICKMAKERCUPCAKES", "TREAT" }))
                         end
                     elseif ent.components.debuffable ~= nil and not ent.components.debuffable:HasDebuff("halloweenpotion_bravery_buff") then
-                        if ent.components.sanity:GetPercent() <= 0 and ent.components.health ~= nil then
+                        if ent.components.sanity:GetPercent() <= 0 then
                             ent.components.health:DoDelta(-10, nil, inst.prefab)
                         else
                             ent.components.sanity:DoDelta(-30)
@@ -245,15 +243,13 @@ local foods_legion = {
                 local x, y, z = inst.Transform:GetWorldPosition()
                 if eater.prefab == "wormwood" then --沃姆伍德对植物有思念
                     local ents = TheSim:FindEntities(x, y, z, 18, nil, { "INLIMBO", "wall", "structure" }, { "_combat", "plant" })
-                    for i, ent in ipairs(ents) do
+                    for _, ent in ipairs(ents) do
                         if ent ~= eater then
-                            if
-                                ent:HasTag("player")
-                            then
+                            if ent:HasTag("player") then
                                 numlove = numlove + 1
                             elseif
                                 ent:HasTag("companion")
-                                or ent:HasTag("plant") --普通植物，不管是否枯萎
+                                or ent:HasTag("plant") or ent:HasTag("veggie") --普通植物，不管是否枯萎
                                 or (ent.components.crop ~= nil and not ent:HasTag("withered")) --未枯萎的作物
                                 or (eater.components.leader ~= nil and eater.components.leader:IsFollower(ent)) --跟随者
                             then
@@ -326,7 +322,7 @@ local foods_legion = {
                     eater.components.talker:Say(GetString(eater, "DESCRIBE", { "DISH_FLOWERMOONCAKE", "LONELY" }))
                 end
             end
-        end,
+        end
     },
     dish_farewellcupcake = {
         test = function(cooker, names, tags)
@@ -405,7 +401,7 @@ local foods_legion = {
 
         prefabs = { "wormlight_light" },
         oneat_desc = STRINGS.UI.COOKBOOK.DISH_FLESHNAPOLEON,
-        oneatenfn = function(inst, eater)   --食用后生物发光
+        oneatenfn = function(inst, eater) --食用后生物发光
             ----------------
             --发光效果自带保存机制，所以就不用写成buff的机制了
             ----------------
@@ -429,7 +425,7 @@ local foods_legion = {
                     light.components.spell:StartSpell()
                 end
             end
-        end,
+        end
     },
     dish_beggingmeat = {
         test = function(cooker, names, tags)
@@ -530,7 +526,7 @@ local foods_legion = {
         oneatenfn = function(inst, eater)
             eater.time_l_batdisguise = { replace_min = TUNING.SEG_TIME*8 }
             eater:AddDebuff("buff_batdisguise", "buff_batdisguise")
-        end,
+        end
     },
     dish_fishjoyramen = {
         test = function(cooker, names, tags)
@@ -553,38 +549,33 @@ local foods_legion = {
 
         prefabs = { "sand_puff" },
         oneat_desc = STRINGS.UI.COOKBOOK.DISH_FISHJOYRAMEN,
-        oneatenfn = function(inst, eater)   --玩家食用后拾取周围一个物品
-            if eater:HasTag("player") then
-                if eater == nil or eater.components.inventory == nil then
-                    return
-                end
-                local x, y, z = eater.Transform:GetWorldPosition()
-                local ents = TheSim:FindEntities(x, y, z, TUNING.ORANGEAMULET_RANGE, { "_inventoryitem" }, { "INLIMBO", "NOCLICK", "catchable", "fire", "minesprung", "mineactive" })
-                for i, v in ipairs(ents) do
-                    if v.components.inventoryitem ~= nil and
-                        v.components.inventoryitem.canbepickedup and
-                        v.components.inventoryitem.cangoincontainer and
-                        not v.components.inventoryitem:IsHeld() and
-                        eater.components.inventory:CanAcceptCount(v, 1) > 0 then
+        oneatenfn = function(inst, eater) --玩家食用后拾取周围一组物品
+            if eater == nil or eater.components.inventory == nil then
+                return
+            end
+            local item = FindPickupableItem(eater, TUNING.ORANGEAMULET_RANGE, false)
+            if item == nil then
+                return
+            end
 
-                        --will only ever pick up items one at a time. Even from stacks.
-                        SpawnPrefab("sand_puff").Transform:SetPosition(v.Transform:GetWorldPosition())
+            local didpickup = false
+            if item.components.trap ~= nil then
+                item.components.trap:Harvest(eater)
+                didpickup = true
+            end
 
-                        local v_pos = v:GetPosition()
-                        if v.components.stackable ~= nil then
-                            v = v.components.stackable:Get()
-                        end
-
-                        if v.components.trap ~= nil and v.components.trap:IsSprung() then
-                            v.components.trap:Harvest(eater)
-                        else
-                            eater.components.inventory:GiveItem(v, nil, v_pos)
-                        end
-                        return
-                    end
+            if eater.components.minigame_participator ~= nil then
+                local minigame = eater.components.minigame_participator:GetMinigame()
+                if minigame ~= nil then
+                    minigame:PushEvent("pickupcheat", { cheater = eater, item = item })
                 end
             end
-        end,
+
+            SpawnPrefab("sand_puff").Transform:SetPosition(item.Transform:GetWorldPosition())
+            if not didpickup then
+                eater.components.inventory:GiveItem(item, nil, item:GetPosition())
+            end
+        end
     },
     dish_roastedmarshmallows = {
         test = function(cooker, names, tags)
@@ -640,7 +631,7 @@ local foods_legion = {
         potlevel = "low",
         float = {nil, "small", 0.2, 0.85},
 
-        cook_need = "熊毛簇 冰度",
+        cook_need = "毛丛 冰度",
         cook_cant = "肉度 甜度 蛋度 非食≤1",
         recipe_count = 6,
 

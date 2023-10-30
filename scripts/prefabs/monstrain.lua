@@ -145,6 +145,7 @@ local function OnBarrenFn(inst, wasempty) --枯萎时
         inst:AddTag("needwater2")
         inst.fn_l_needwater = Fn_needWater
     end
+    inst.components.pickable.targettime = nil --Pickable:MakeBarren() 并不会修改这个数据，所以只能这里手动改一下
 end
 
 local function ReturnChildren(inst)
@@ -170,10 +171,8 @@ local function OnSeasonChange(inst) --季节变化时
     elseif TheWorld.state.issummer then
         local hasit = false
         local x, y, z = inst.Transform:GetWorldPosition()
-        local ents = TheSim:FindEntities(x, y, z, 20,
-            { "siving_ctl" }, { "NOCLICK", "INLIMBO" }, nil
-        )
-        for _,v in pairs(ents) do
+        local ents = TheSim:FindEntities(x, y, z, 20, { "siving_ctl" }, { "NOCLICK", "INLIMBO" }, nil)
+        for _,v in ipairs(ents) do
             if v.components.botanycontroller ~= nil then
                 local cpt = v.components.botanycontroller
                 if (cpt.type == 1 or cpt.type == 3) and cpt.moisture > 0 then
@@ -309,10 +308,8 @@ local function OnTimerDone_tuber(inst, data)
 end
 local function Fn_planted_tuber(inst, pt)
     inst:DoTaskInTime(0, function(inst) --寻找周围的管理器
-        local ents = TheSim:FindEntities(pt.x, pt.y, pt.z, 20,
-            { "siving_ctl" }, { "NOCLICK", "INLIMBO" }, nil
-        )
-        for _,v in pairs(ents) do
+        local ents = TheSim:FindEntities(pt.x, pt.y, pt.z, 20, { "siving_ctl" }, { "NOCLICK", "INLIMBO" }, nil)
+        for _,v in ipairs(ents) do
             if v.components.botanycontroller ~= nil then
                 local cpt = v.components.botanycontroller
                 if (cpt.type == 1 or cpt.type == 3) and cpt.moisture > 0 then

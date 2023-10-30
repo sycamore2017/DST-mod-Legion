@@ -143,6 +143,7 @@ PrefabFiles = {
     "plantables_legion",        --新种植根
     "turfs_legion",             --新地皮
     "wants_sandwitch",          --沙之女巫所欲之物
+    "hands_legion",             --棱镜手持道具
     -- "guitar_greenery",
     -- "aatest_anim",
     "fx_legion",                --特效
