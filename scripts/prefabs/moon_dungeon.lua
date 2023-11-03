@@ -449,11 +449,13 @@ local protector_stage = { --各种保护者的生成方式
         local x, y, z = inst.Transform:GetWorldPosition()
         local ents = TheSim:FindEntities(x, y, z, 10, { "freezable" }, tags_cant)
         for _, v in ipairs(ents) do
-            if v.components.freezable ~= nil then
+            if
+                v.entity:IsVisible() and v.components.freezable ~= nil and
+                v.components.health ~= nil and not v.components.health:IsDead()
+            then
                 v.components.freezable:AddColdness(10)
             end
         end
-
         inst.SoundEmitter:PlaySound("dontstarve/creatures/hound/icehound_explo")
 
         --再召唤保护者
@@ -478,11 +480,13 @@ local protector_stage = { --各种保护者的生成方式
         local x, y, z = inst.Transform:GetWorldPosition()
         local ents = TheSim:FindEntities(x, y, z, 10, { "freezable" }, tags_cant)
         for _, v in ipairs(ents) do
-            if v.components.freezable ~= nil then
+            if
+                v.entity:IsVisible() and v.components.freezable ~= nil and
+                v.components.health ~= nil and not v.components.health:IsDead()
+            then
                 v.components.freezable:AddColdness(10)
             end
         end
-
         inst.SoundEmitter:PlaySound("dontstarve/creatures/hound/icehound_explo")
     end,
 
@@ -548,52 +552,22 @@ local protector_stage = { --各种保护者的生成方式
 
     --范围式催眠
     goodnight = function(inst, worker, protector, protdata)
-        local x, y, z = inst.Transform:GetWorldPosition()
-        local ents = TheSim:FindEntities(x, y, z, 20, nil, tags_cant, { "sleeper", "player" })
-        for _, v in ipairs(ents) do
-            if
-                not (v.components.freezable ~= nil and v.components.freezable:IsFrozen()) and
-                not (v.components.pinnable ~= nil and v.components.pinnable:IsStuck()) and
-                not (v.components.fossilizable ~= nil and v.components.fossilizable:IsFossilized())
-            then
-                local mount = v.components.rider ~= nil and v.components.rider:GetMount() or nil
-                if mount ~= nil then
-                    mount:PushEvent("ridersleep", { sleepiness = 10, sleeptime = 20 })
-                end
-                if v.components.sleeper ~= nil then
-                    v.components.sleeper:AddSleepiness(10, 20)
-                elseif v.components.grogginess ~= nil then
-                    v.components.grogginess:AddGrogginess(10, 20)
-                else
-                    v:PushEvent("knockedout")
-                end
-            end
-        end
+        TOOLS_L.DoAreaSleep({
+            doer = inst, --x = x, y = y, z = z,
+            range = 20, -- tagscant = nil, tagsone = nil,
+            lvl = 10, time = 15 + math.random(), noyawn = true,
+            -- fn_valid = nil, fn_do = nil
+        })
     end,
 
     --先范围式催眠，后范围随机阵势产生
     baddream = function(inst, worker, protector, protdata)
-        local x, y, z = inst.Transform:GetWorldPosition()
-        local ents = TheSim:FindEntities(x, y, z, 20, nil, tags_cant, { "sleeper", "player" })
-        for _, v in ipairs(ents) do
-            if
-                not (v.components.freezable ~= nil and v.components.freezable:IsFrozen()) and
-                not (v.components.pinnable ~= nil and v.components.pinnable:IsStuck()) and
-                not (v.components.fossilizable ~= nil and v.components.fossilizable:IsFossilized())
-            then
-                local mount = v.components.rider ~= nil and v.components.rider:GetMount() or nil
-                if mount ~= nil then
-                    mount:PushEvent("ridersleep", { sleepiness = 10, sleeptime = 20 })
-                end
-                if v.components.sleeper ~= nil then
-                    v.components.sleeper:AddSleepiness(10, 20)
-                elseif v.components.grogginess ~= nil then
-                    v.components.grogginess:AddGrogginess(10, 20)
-                else
-                    v:PushEvent("knockedout")
-                end
-            end
-        end
+        TOOLS_L.DoAreaSleep({
+            doer = inst, --x = x, y = y, z = z,
+            range = 20, -- tagscant = nil, tagsone = nil,
+            lvl = 10, time = 15 + math.random(), noyawn = true,
+            -- fn_valid = nil, fn_do = nil
+        })
 
         local timetime = 1.3
         local allnum = GetSpawnNumber(protdata.num)

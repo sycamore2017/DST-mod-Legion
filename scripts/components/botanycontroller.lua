@@ -51,9 +51,7 @@ end
 function BotanyController:TriggerPlant(isadd)
     local x, y, z = self.inst.Transform:GetWorldPosition()
     local ents = TheSim:FindEntities(x, y, z, 20,
-        nil,
-        { "NOCLICK", "INLIMBO" },
-        { "crop_legion", "crop2_legion" }
+        nil, { "INLIMBO", "NOCLICK" }, { "crop_legion", "crop2_legion" }
     )
     for _, v in pairs(ents) do
         if v.components.perennialcrop ~= nil then
@@ -246,7 +244,7 @@ local function ComputSoils(self, fn_tile, fn_wither, fn_check, fn_tend, tags)
     end
 
     --不需要考虑子圭作物，因为机制已经有了
-    local ents = TheSim:FindEntities(x, y, z, 20, nil, { "NOCLICK", "INLIMBO" }, tags)
+    local ents = TheSim:FindEntities(x, y, z, 20, nil, { "INLIMBO", "NOCLICK" }, tags)
     for _,v in pairs(ents) do
         local res
         if v.components.vase ~= nil then
@@ -296,7 +294,7 @@ function BotanyController:DoAreaFunction()
                 return self.moisture <= 0 and isEmptyNutrients(self)
             end,
             function(self, x, y, z)
-                local ents = TheSim:FindEntities(x, y, z, 20, { "tendable_farmplant" }, { "INLIMBO" })
+                local ents = TheSim:FindEntities(x, y, z, 20, { "tendable_farmplant" }, { "INLIMBO", "NOCLICK" })
                 for _,v in ipairs(ents) do
                     if v.components.farmplanttendable ~= nil then
                         v.components.farmplanttendable:TendTo(self.inst)

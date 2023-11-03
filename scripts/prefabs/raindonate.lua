@@ -74,7 +74,7 @@ local function KillerRetarget(inst) --主动寻找生物来攻击
             return inst.components.combat:CanTarget(guy)
         end,
         { "_combat", "_health", "insect" }, --必须有的标签
-        { "INLIMBO", "raindonate", "friendlyfruitfly", "companion" }, --不能有的标签
+        { "INLIMBO", "NOCLICK", "notarget", "noattack", "raindonate", "friendlyfruitfly", "companion" }, --不能有的标签
         { "smallcreature", "small" }) --必须有至少其中一个的标签
 end
 

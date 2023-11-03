@@ -111,11 +111,11 @@ local function TryDropRock(inst, chance)
 end
 local function GrowRock(inst, num)
     local x, y, z = inst.Transform:GetWorldPosition()
-    local ents = TheSim:FindEntities(x,y,z, 6, nil, { "INLIMBO" }, nil)
+    local ents = TheSim:FindEntities(x,y,z, 6, { "_inventoryitem" }, { "INLIMBO", "NOCLICK" }, nil)
     local numloot = 0
     local stackitem = nil
     for _, ent in ipairs(ents) do
-        if ent.prefab == "siving_rocks" then
+        if ent.prefab == "siving_rocks" and ent.components.inventoryitem.canbepickedup then
             numloot = numloot + 1
             if stackitem == nil and not ent.components.stackable:IsFull() then
                 stackitem = ent
@@ -757,7 +757,7 @@ local function InitEgg(inst, egg, ismale)
 end
 local function ClearBattlefield(inst) --打扫战场
     local x, y, z = inst.Transform:GetWorldPosition()
-    local ents = TheSim:FindEntities(x, 0, z, DIST_HEALTH+15, { "siv_boss_block" }, { "INLIMBO" })
+    local ents = TheSim:FindEntities(x, y, z, DIST_HEALTH+15, { "siv_boss_block" }, { "INLIMBO" })
     for _, v in ipairs(ents) do
         if v.fn_onClear ~= nil then
             v:fn_onClear()

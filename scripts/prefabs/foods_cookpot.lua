@@ -210,12 +210,15 @@ local function SingleFight(owner)
     -- end
     local hasenemy = false
     local x, y, z = owner.Transform:GetWorldPosition()
-    local ents = TheSim:FindEntities(x, y, z, 24, { "_combat" }, { "NOCLICK", "INLIMBO", "player" })
+    local ents = TheSim:FindEntities(x, y, z, 24,
+        { "_combat" }, { "INLIMBO", "NOCLICK", "player", "notarget", "nosinglefight_l" }, nil
+    )
     for _,v in ipairs(ents) do
         if
-            v ~= owner.singlefight_target
-            and v.components.health ~= nil and not v.components.health:IsDead()
-            and v.components.combat ~= nil and v.components.combat.target == owner
+            v ~= owner.singlefight_target and
+            v.entity:IsVisible() and
+            (v.components.health == nil or not v.components.health:IsDead()) and
+            v.components.combat ~= nil and v.components.combat.target == owner
         then
             v.components.combat:DropTarget(false)
             hasenemy = true

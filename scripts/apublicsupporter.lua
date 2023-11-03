@@ -2137,7 +2137,7 @@ AddAction(REMOVE_CARPET_L)
 AddComponentAction("POINT", "carpetpullerlegion", function(inst, doer, pos, actions, right, target)
     if right then
         local x, y, z = pos:Get()
-        if #TheSim:FindEntities(x, y, z, 2, {"carpet_l"}, nil, nil) > 0 then
+        if #TheSim:FindEntities(x, y, z, 2, { "carpet_l" }, { "INLIMBO" }, nil) > 0 then
             table.insert(actions, ACTIONS.REMOVE_CARPET_L)
         end
     end

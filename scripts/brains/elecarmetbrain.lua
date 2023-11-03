@@ -16,6 +16,7 @@ end)
 
 local TOOLS_L = require("tools_legion")
 local tags_cant = TOOLS_L.TagsCombat1()
+local tags_one = TOOLS_L.TagsWorkable2()
 local CHASE_DIST = 20
 local CHASE_TIME = 10
 
@@ -29,18 +30,17 @@ end
 
 local function ValidTarget(target)
     if target and target:IsValid() then
-        if target.components.health ~= nil and not target.components.health:IsDead() then   --有生命对象还没死
+        if target.components.health ~= nil and not target.components.health:IsDead() then --有生命对象还没死
             return true
-        elseif target.components.workable ~= nil and target.components.workable.action ~= ACTIONS.DIG then   --对象能被破坏(除了挖)
-            return true
+        elseif target.components.workable ~= nil then --对象能被破坏
+            return target.components.workable:CanBeWorked()
         end
     end
-
     return false
 end
 
 local function FindTarget(inst, radius)
-    return FindEntity(inst, radius, function(item) return ValidTarget(item) end, nil, tags_cant, nil)
+    return FindEntity(inst, radius, function(item) return ValidTarget(item) end, nil, tags_cant, tags_one)
 end
 
 local function StandStart(inst)

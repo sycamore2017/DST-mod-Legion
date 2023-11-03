@@ -1,4 +1,5 @@
 local SpDamageUtil = require("components/spdamageutil")
+local TOOLS_L = require("tools_legion")
 
 local function oncanatk(self)
     if self.canatk then
@@ -81,32 +82,7 @@ function ShieldLegion:Counterattack(doer, attacker, data, radius, dmgmult)
     then
         return false
     end
-
-    local weapon = self.inst.components.weapon
-    local stimuli = nil
-    if weapon ~= nil and weapon.overridestimulifn ~= nil then
-        stimuli = weapon.overridestimulifn(self.inst, doer, attacker)
-    end
-    if stimuli == nil and doer.components.electricattacks ~= nil then
-        stimuli = "electric"
-    end
-
-    doer:PushEvent("onattackother", { target = attacker, weapon = self.inst, projectile = nil, stimuli = stimuli })
-
-    local mult =
-        (
-            stimuli == "electric" or
-            (weapon ~= nil and weapon.stimuli == "electric")
-        ) and not (
-            attacker:HasTag("electricdamageimmune") or
-            (attacker.components.inventory ~= nil and attacker.components.inventory:IsInsulated())
-        ) and TUNING.ELECTRIC_DAMAGE_MULT + TUNING.ELECTRIC_WET_DAMAGE_MULT *
-            (
-                attacker.components.moisture ~= nil and attacker.components.moisture:GetMoisturePercent() or
-                (attacker:GetIsWet() and 1 or 0)
-            )
-        or 1
-    local dmg, spdmg = doer.components.combat:CalcDamage(attacker, self.inst, mult)
+    local dmg, spdmg, stimuli = TOOLS_L.CalcDamage(doer, attacker, self.inst, nil, nil, nil, nil, true)
     dmg = dmg * (dmgmult or 1) + ((data.damage + data.otherdamage) * 0.1)
     attacker.components.combat:GetAttacked(doer, dmg, self.inst, stimuli, spdmg)
 

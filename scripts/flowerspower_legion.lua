@@ -63,43 +63,37 @@ AddRecipe2(
 
 if IsServer then
     local function onisraining(inst, israining) --每次下雨时尝试生成花丛
-        if israining then
-            local hasBush = false
-            local flower = nil
-            local x, y, z = inst.Transform:GetWorldPosition()
-            local ents = TheSim:FindEntities(x, y, z, 8, nil, { "NOCLICK", "FX", "INLIMBO" }) --检测周围物体
-            for _, ent in ipairs(ents) do
-                if ent.prefab == inst.bushCreater.name then
-                    hasBush = true
-                    break
-                elseif ent.prefab == "flower" or ent.prefab == "flower_evil" or ent.prefab == "flower_rose" then
-                    flower = ent   --获取花的实体
-                end
-            end
-            if not hasBush and flower ~= nil then --周围没有花丛+有花，有几率把花变成花丛
-                if math.random() < inst.bushCreater.chance then
-                    local pos = flower:GetPosition()
-                    local flowerbush = SpawnPrefab(inst.bushCreater.name)
+        if math.random() >= inst.bushCreater.chance then
+            return
+        end
 
-                    if flowerbush ~= nil then
-                        flower:Remove()
-                        flowerbush.Transform:SetPosition(pos:Get())
-                        --flowerbush.components.pickable:OnTransplant() --这样生成的是枯萎状态的
-                    end
-                end
+        local flower = nil
+        local x, y, z = inst.Transform:GetWorldPosition()
+        local ents = TheSim:FindEntities(x, y, z, 8, nil, { "NOCLICK", "FX", "INLIMBO" }) --检测周围物体
+        for _, ent in ipairs(ents) do
+            if ent.prefab == inst.bushCreater.name then
+                return
+            elseif ent.prefab == "flower" or ent.prefab == "flower_evil" or ent.prefab == "flower_rose" then
+                flower = ent --获取花的实体
+            end
+        end
+        if flower ~= nil then --周围没有花丛+有花
+            local pos = flower:GetPosition()
+            local flowerbush = SpawnPrefab(inst.bushCreater.name)
+            if flowerbush ~= nil then
+                flower:Remove()
+                flowerbush.Transform:SetPosition(pos:Get())
+                --flowerbush.components.pickable:OnTransplant() --这样生成的是枯萎状态的
             end
         end
     end
-
     AddPrefabPostInit("gravestone", function(inst)    --通过api重写墓碑的功能
         inst.bushCreater = { name = "orchidbush", chance = 0.01 }
         inst:WatchWorldState("israining", onisraining)
-        onisraining(inst, TheWorld.state.israining)
     end)
     AddPrefabPostInit("pond", function(inst)    --通过api重写青蛙池塘的功能
         inst.bushCreater = { name = "lilybush", chance = 0.03 }
         inst:WatchWorldState("israining", onisraining)
-        onisraining(inst, TheWorld.state.israining)
     end)
 
     local function OnDeath_hedge(inst)

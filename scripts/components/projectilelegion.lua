@@ -6,7 +6,8 @@ local ProjectileLegion = Class(function(self, inst)
 	self.speed = 20 --抛射速度
 	self.stimuli = nil
 	self.hittargets = {} --把已经被攻击过的对象记下来，防止重复攻击
-	self.exclude_tags = { "INLIMBO", "notarget", "noattack", "invisible", "playerghost" }
+	self.exclude_tags = { "INLIMBO", "NOCLICK", "notarget", "noattack", "invisible", "playerghost" }
+	self.fn_validhit = nil
 
 	self.onthrown = nil
 	self.onprehit = nil
@@ -123,22 +124,12 @@ function ProjectileLegion:OnUpdate(dt)
 	end
 
 	local ents = TheSim:FindEntities(x, y, z, 7, { "_combat" }, self.exclude_tags)
-	for _,ent in ipairs(ents) do
+	for _, ent in ipairs(ents) do
 		if
 			ent ~= self.attacker and not self.hittargets[ent] and ent.entity:IsVisible() and --有效
-			ent.components.health ~= nil and not ent.components.health:IsDead() and --还活着
-			( --sg非无敌状态
-				ent.sg == nil or
-				not (ent.sg:HasStateTag("flight") or ent.sg:HasStateTag("invisible"))
-			) and
-			(
-				(ent.components.combat ~= nil and ent.components.combat.target == self.attacker) or
-				(
-					(ent.components.domesticatable == nil or not ent.components.domesticatable:IsDomesticated()) and
-					(self.attacker.components.leader == nil or not self.attacker.components.leader:IsFollower(ent))
-				)
-			) and
-			(self.bulletradius+ent:GetPhysicsRadius(0))^2 >= distsq(current, ent:GetPosition()) --范围内
+			(self.bulletradius+ent:GetPhysicsRadius(0))^2 >= distsq(current, ent:GetPosition()) and --范围内
+			ent.components.combat:CanBeAttacked(self.attacker) and --防止 attacker 打到不该打到的对象
+			(self.fn_validhit == nil or self.fn_validhit(self, ent))
 		then
 			self:Hit(ent)
 			if not self.inst:IsValid() then

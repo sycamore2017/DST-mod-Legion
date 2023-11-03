@@ -84,16 +84,16 @@ local function PlayDoing(inst, owner)
         inst.taskcount = inst.taskcount + 1
 
         if inst.taskcount % 3 == 0 then --每15秒，复活1个周围的玩家
-            local player = FindEntity(owner, 25, nil, {"playerghost"}, {"INLIMBO"}, nil)
+            local player = FindEntity(owner, 25, nil, { "playerghost" }, { "INLIMBO" }, nil)
             if player ~= nil then
                 player:PushEvent("respawnfromghost", { source = inst, user = owner })
                 inst.components.finiteuses:Use(1)
 
                 local xp, yp, zp = player.Transform:GetWorldPosition()
-                SpawnPrefab("guitar_miguel_float_fx").Transform:SetPosition(xp, 0.8 + math.random(), zp)
-                SpawnPrefab("guitar_miguel_float_fx").Transform:SetPosition(xp, 0.8 + math.random(), zp)
+                SpawnPrefab("guitar_miguel_float_fx").Transform:SetPosition(xp, yp+0.8+math.random(), zp)
+                SpawnPrefab("guitar_miguel_float_fx").Transform:SetPosition(xp, yp+0.8+math.random(), zp)
 
-                owner:DoTaskInTime(1, function()    --这里由使用者来操作，防止琴坏掉时这里不运行了
+                owner:DoTaskInTime(1, function() --这里由使用者来操作，防止琴坏掉时这里不运行了
                     local ground = SpawnPrefab("guitar_miguel_ground_fx")
                     ground.AnimState:PlayAnimation("idle_ground_small", false)
                     ground.Transform:SetPosition(xp, 0, zp)

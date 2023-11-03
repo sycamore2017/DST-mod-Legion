@@ -10,28 +10,353 @@ local function CombineTags(tags1, tags2)
 end
 local function TagsCombat1(othertags) --普通的攻击标签
     return CombineTags({
-        "INLIMBO", "notarget", "noattack", "invisible", "playerghost" --"NOCLICK"
+        "INLIMBO", "NOCLICK", "notarget", "noattack", "playerghost" --"invisible"
     }, othertags)
 end
 local function TagsCombat2(othertags) --建筑友好的攻击标签
     return CombineTags({
-        "INLIMBO", "notarget", "noattack", "invisible", "playerghost", --"NOCLICK"
+        "INLIMBO", "NOCLICK", "notarget", "noattack", "playerghost", --"invisible"
         "wall", "structure", "balloon"
     }, othertags)
 end
 local function TagsCombat3(othertags) --建筑与伙伴都友好的攻击标签
     return CombineTags({
-        "INLIMBO", "notarget", "noattack", "invisible", "playerghost", --"NOCLICK"
+        "INLIMBO", "NOCLICK", "notarget", "noattack", "playerghost", --"invisible"
         "wall", "structure", "balloon",
         "companion", "glommer", "friendlyfruitfly", "abigail", "shadowminion"
     }, othertags)
 end
 local function TagsSiving(othertags) --子圭系列的窃血标签
     return CombineTags({
-        "INLIMBO", "notarget", "noattack", "invisible", "playerghost", --"NOCLICK"
+        "INLIMBO", "NOCLICK", "notarget", "noattack", "playerghost", --"invisible"
         "wall", "structure", "balloon",
         "shadowminion", "ghost" --"shadow"
     }, othertags)
+end
+local function TagsWorkable1(othertags) --常见的可砍、挖、砸、凿标签(不包含“捕捉”)
+    return CombineTags({
+        "CHOP_workable", "DIG_workable", "HAMMER_workable", "MINE_workable" --"NET_workable"
+    }, othertags)
+end
+local function TagsWorkable2(othertags) --常见的可砍、挖、砸、凿标签，以及战斗标签
+    return CombineTags({
+        "_combat",
+        "CHOP_workable", "DIG_workable", "HAMMER_workable", "MINE_workable" --"NET_workable"
+    }, othertags)
+end
+
+--[ 判断是否能攻击 ]--
+local function IsMyFollower(inst, ent)
+    if ent.components.follower ~= nil then
+        local leader = ent.components.follower:GetLeader()
+        if leader ~= nil then
+            if leader == inst then
+                return true
+            end
+            if leader.components.inventoryitem ~= nil then --leader 是个物品
+                leader = leader.components.inventoryitem:GetGrandOwner()
+                return leader == inst
+            end
+        end
+    -- elseif inst.components.leader ~= nil then --follower 和 leader 组件是配对的，所以不需要再判断这个组件
+    --     if inst.components.leader:IsFollower(ent) then
+    --         return true
+    --     end
+    end
+    return false
+end
+local function IsPlayerFollower(ent)
+    if ent.components.follower ~= nil then
+        local leader = ent.components.follower:GetLeader()
+        if leader ~= nil then
+            if leader:HasTag("player") then
+                return true
+            end
+            if leader.components.inventoryitem ~= nil then --leader 是个物品
+                leader = leader.components.inventoryitem:GetGrandOwner()
+                return leader ~= nil and leader:HasTag("player")
+            end
+        end
+    end
+    return false
+end
+local function IsEnemyPre(inst, ent)
+    if
+        ent.components.health == nil or ent.components.health:IsDead() or
+        ent.components.combat == nil or ent.components.combat.target == nil
+    then
+        return true
+    end
+    if ent.sg ~= nil and (ent.sg:HasStateTag("flight") or ent.sg:HasStateTag("invisible")) then
+        return true
+    end
+end
+local function IsEnemy_me(inst, ent) --是否为 inst 的当前敌人
+    if IsEnemyPre(inst, ent) then
+        return false
+    end
+    if inst == nil then
+        return true
+    end
+    if ent.components.combat.target == inst then --仇视自己的对象，肯定是敌人
+        return true
+    end
+    if IsMyFollower(inst, ent) then --ent 跟随着我，就不要攻击了，防止后面逻辑引起跟随者内战
+        return false
+    end
+    if IsMyFollower(inst, ent.components.combat.target) then --ent 想攻击我的跟随者，打它！
+        return true
+    end
+    return false
+end
+local function IsEnemy_player(inst, ent) --是否为 全体玩家 的当前敌人
+    if IsEnemyPre(inst, ent) then
+        return false
+    end
+    if ent.components.combat.target:HasTag("player") then --仇视玩家的对象，肯定是敌人
+        return true
+    end
+    if IsPlayerFollower(ent) then --ent 跟随着玩家，就不要攻击了，防止后面逻辑引起跟随者内战
+        return false
+    end
+    if IsPlayerFollower(ent.components.combat.target) then --ent 想攻击玩家的跟随者，打它！
+        return true
+    end
+    return false
+end
+local function MaybeEnemyPre(inst, ent)
+    if
+        ent.components.health == nil or ent.components.health:IsDead() or
+        ent.components.combat == nil
+    then
+        return true
+    end
+    if ent.sg ~= nil and (ent.sg:HasStateTag("flight") or ent.sg:HasStateTag("invisible")) then
+        return true
+    end
+end
+local function MaybeEnemy_me(inst, ent, playerside) --是否为 inst 的潜在或当前敌人
+    if MaybeEnemyPre(inst, ent) then
+        return false
+    end
+    if inst == nil then
+        return true
+    end
+    if ent.components.combat.target == nil then
+        if IsMyFollower(inst, ent) then --ent 跟随着我，就不攻击
+            return false
+        end
+        --玩家立场时，不攻击驯化的对象(毕竟对于非玩家inst来说，驯化与否关系不大，只有玩家才关心这个)
+        if playerside and ent.components.domesticatable ~= nil and ent.components.domesticatable:IsDomesticated() then
+            return false
+        end
+    else
+        if ent.components.combat.target == inst then --仇视自己的对象，肯定是敌人
+            return true
+        end
+        if IsMyFollower(inst, ent) then --ent 跟随着我，就不攻击
+            return false
+        end
+        if playerside and ent.components.domesticatable ~= nil and ent.components.domesticatable:IsDomesticated() then
+            return IsMyFollower(inst, ent.components.combat.target) --ent 想攻击我的跟随者，打它！
+        end
+    end
+    return true
+end
+local function MaybeEnemy_player(inst, ent, playerside) --是否为 全体玩家 的潜在或当前敌人
+    if MaybeEnemyPre(inst, ent) then
+        return false
+    end
+    if ent.components.combat.target == nil then
+        if IsPlayerFollower(ent) then --ent 跟随着玩家，就不攻击
+            return false
+        end
+        --不攻击驯化的对象
+        if ent.components.domesticatable ~= nil and ent.components.domesticatable:IsDomesticated() then
+            return false
+        end
+    else
+        if ent.components.combat.target:HasTag("player") then --仇视玩家的对象，肯定是敌人
+            return true
+        end
+        if IsPlayerFollower(ent) then --ent 跟随着玩家，就不攻击
+            return false
+        end
+        if ent.components.domesticatable ~= nil and ent.components.domesticatable:IsDomesticated() then
+            return IsPlayerFollower(ent.components.combat.target) --ent 想攻击玩家的跟随者，打它！
+        end
+    end
+    return true
+end
+
+--[ 判定 attacker 对于 target 的攻击力 ]--
+local SpDamageUtil = require("components/spdamageutil")
+local function CalcDamage(attacker, target, weapon, projectile, stimuli, damage, spdamage, pushevent)
+    -- if weapon == nil then --这里不关注武器来源
+    --     weapon = attacker.components.combat:GetWeapon()
+    -- end
+    if stimuli == nil then
+        if weapon ~= nil and weapon.components.weapon ~= nil and weapon.components.weapon.overridestimulifn ~= nil then
+            stimuli = weapon.components.weapon.overridestimulifn(weapon, attacker, target)
+        end
+        if stimuli == nil and attacker.components.electricattacks ~= nil then
+            stimuli = "electric"
+        end
+    end
+
+    if pushevent then
+        attacker:PushEvent("onattackother", { target = target, weapon = weapon, projectile = projectile, stimuli = stimuli })
+    end
+
+    local multiplier =
+        (
+            stimuli == "electric" or
+            (weapon ~= nil and weapon.components.weapon ~= nil and weapon.components.weapon.stimuli == "electric")
+        ) and not (
+            target:HasTag("electricdamageimmune") or
+            (target.components.inventory ~= nil and target.components.inventory:IsInsulated())
+        ) and TUNING.ELECTRIC_DAMAGE_MULT + TUNING.ELECTRIC_WET_DAMAGE_MULT *
+            (
+                target.components.moisture ~= nil and target.components.moisture:GetMoisturePercent() or
+                (target:GetIsWet() and 1 or 0)
+            )
+        or 1
+
+    local dmg, spdmg
+    if damage == nil and spdamage == nil then --使用公用机制(获取 attacker 或 weapon 自己的数值)
+        dmg, spdmg = attacker.components.combat:CalcDamage(target, weapon, multiplier)
+        return dmg, spdmg, stimuli
+    end
+
+    --使用这次专门的数值
+    if target:HasTag("alwaysblock") then
+        return 0
+    end
+    dmg = damage or 0
+    if spdamage ~= nil then --由于 spdamage 是个表，我不想改动传参数据，所以这里新产生一个表
+        spdmg = SpDamageUtil.MergeSpDamage({}, spdamage)
+    end
+    local self = attacker.components.combat
+    local basemultiplier = self.damagemultiplier
+    local externaldamagemultipliers = self.externaldamagemultipliers
+    local damagetypemult = 1
+    local bonus = self.damagebonus
+    local playermultiplier = target ~= nil and target:HasTag("player")
+    local pvpmultiplier = playermultiplier and attacker:HasTag("player") and self.pvp_damagemod or 1
+    local mount = nil
+
+    if weapon ~= nil then
+        playermultiplier = 1
+		if attacker.components.damagetypebonus ~= nil then
+			damagetypemult = attacker.components.damagetypebonus:GetBonus(target)
+		end
+        spdmg = SpDamageUtil.CollectSpDamage(attacker, spdmg)
+    else
+        playermultiplier = playermultiplier and self.playerdamagepercent or 1
+        if attacker.components.rider ~= nil and attacker.components.rider:IsRiding() then
+            mount = attacker.components.rider:GetMount()
+            if mount ~= nil and mount.components.combat ~= nil then
+                basemultiplier = mount.components.combat.damagemultiplier
+                externaldamagemultipliers = mount.components.combat.externaldamagemultipliers
+                bonus = mount.components.combat.damagebonus
+				if mount.components.damagetypebonus ~= nil then
+					damagetypemult = mount.components.damagetypebonus:GetBonus(target)
+				end
+				spdmg = SpDamageUtil.CollectSpDamage(mount, spdmg)
+			else
+				if attacker.components.damagetypebonus ~= nil then
+					damagetypemult = attacker.components.damagetypebonus:GetBonus(target)
+				end
+				spdmg = SpDamageUtil.CollectSpDamage(attacker, spdmg)
+            end
+
+            local saddle = attacker.components.rider:GetSaddle()
+            if saddle ~= nil and saddle.components.saddler ~= nil then
+                dmg = dmg + saddle.components.saddler:GetBonusDamage()
+				if saddle.components.damagetypebonus ~= nil then
+					damagetypemult = damagetypemult * saddle.components.damagetypebonus:GetBonus(target)
+				end
+				spdmg = SpDamageUtil.CollectSpDamage(saddle, spdmg)
+            end
+		else
+			if attacker.components.damagetypebonus ~= nil then
+				damagetypemult = attacker.components.damagetypebonus:GetBonus(target)
+			end
+			spdmg = SpDamageUtil.CollectSpDamage(attacker, spdmg)
+        end
+    end
+
+	dmg = dmg
+        * (basemultiplier or 1)
+        * externaldamagemultipliers:Get()
+		* damagetypemult
+        * (multiplier or 1)
+        * playermultiplier
+        * pvpmultiplier
+		* (self.customdamagemultfn ~= nil and self.customdamagemultfn(attacker, target, weapon, multiplier, mount) or 1)
+        + (bonus or 0)
+
+    if spdmg ~= nil then
+        multiplier = damagetypemult * pvpmultiplier
+        if multiplier ~= 1 then
+            spdmg = SpDamageUtil.ApplyMult(spdmg, multiplier)
+        end
+    end
+    return dmg, spdmg, stimuli
+end
+
+--[ 催眠 ]--
+local function DoSingleSleep(v, data)
+    if
+        (data.fn_valid == nil or data.fn_valid(v, data)) and
+        not (v.components.freezable ~= nil and v.components.freezable:IsFrozen()) and
+        not (v.components.pinnable ~= nil and v.components.pinnable:IsStuck()) and
+        not (v.components.fossilizable ~= nil and v.components.fossilizable:IsFossilized())
+    then
+        local mount = v.components.rider ~= nil and v.components.rider:GetMount() or nil
+        if mount ~= nil then
+            mount:PushEvent("ridersleep", { sleepiness = data.lvl, sleeptime = data.time })
+        end
+        if data.fn_do ~= nil then
+            data.fn_do(v, data)
+        end
+        if not data.noyawn and v:HasTag("player") then
+            v:PushEvent("yawn", { grogginess = data.lvl, knockoutduration = data.time })
+        elseif v.components.sleeper ~= nil then
+            v.components.sleeper:AddSleepiness(data.lvl, data.time)
+        elseif v.components.grogginess ~= nil then
+            v.components.grogginess:AddGrogginess(data.lvl, data.time)
+        else
+            v:PushEvent("knockedout")
+        end
+        return true
+    end
+    return false
+end
+local function DoAreaSleep(data)
+    if data.x == nil and data.doer ~= nil then
+        data.x, data.y, data.z = data.doer.Transform:GetWorldPosition()
+    end
+    if data.tagscant == nil then
+        data.tagscant = TagsCombat1() --"FX", "DECOR" 不是很懂为什么官方要加这两个
+    end
+    if data.tagsone == nil then
+        data.tagsone = { "sleeper", "player" }
+    end
+
+    local countsleeper = 0
+    local ents = TheSim:FindEntities(data.x, data.y, data.z, data.range, nil, data.tagscant, data.tagsone)
+    for _, v in ipairs(ents) do
+        if DoSingleSleep(v, data) then
+            countsleeper = countsleeper + 1
+        end
+    end
+
+    if countsleeper > 0 then
+        return true
+    else
+        return false, "NOSLEEPTARGETS"
+    end
 end
 
 --[ 积雪监听(仅prefab定义时使用) ]--
@@ -126,25 +451,20 @@ local function FallingItem(itemname, x, y, z, hitrange, hitdamage, fallingtime, 
                     if inst.components.inventoryitem ~= nil then
                         inst.components.inventoryitem.canbepickedup = true
                     end
-
                     if hitrange ~= nil then
-                        local someone = FindEntity(inst, hitrange,
-                            function(target)
-                                if
-                                    target.components.combat ~= nil and
-                                    target.components.health ~= nil and not target.components.health:IsDead()
-                                then
-                                    return true
-                                end
-                                return false
-                            end,
-                            {"_combat", "_health"}, TagsCombat1(), nil
-                        )
-                        if someone ~= nil and someone.components.combat:CanBeAttacked() then
+                        local someone = FindEntity(inst, hitrange, function(target)
+                            if
+                                target.components.health ~= nil and not target.components.health:IsDead() and
+                                target.components.combat ~= nil and target.components.combat:CanBeAttacked()
+                            then
+                                return true
+                            end
+                            return false
+                        end, { "_combat", "_health" }, TagsCombat1(), nil)
+                        if someone ~= nil then
                             someone.components.combat:GetAttacked(inst, hitdamage)
                         end
                     end
-
                     if fn_end ~= nil then fn_end(inst) end
                 end
             end,
@@ -287,6 +607,29 @@ local function UndefendedATK(inst, data)
                     end
                 end
                 return AbsorbDamage_old(self, damage, attacker, weapon, spdmg, ...)
+            end
+        end
+
+        --修改防御的标签系数机制
+        if target.components.damagetyperesist ~= nil then
+            local GetResist_old = target.components.damagetyperesist.GetResist
+            target.components.damagetyperesist.GetResist = function(self, attacker, weapon, ...)
+                if self.inst.flag_undefended_l == 1 then
+                    local mult = 1
+                    local tagmult
+                    if attacker ~= nil then
+                        for k, v in pairs(self.tags) do
+                            if attacker:HasTag(k) or (weapon ~= nil and weapon:HasTag(k)) then
+                                tagmult = v:Get()
+                                if tagmult > 1 then --大于1 是代表增伤。这里需要忽略的是减伤
+                                    mult = mult * tagmult
+                                end
+                            end
+                        end
+                    end
+                    return mult
+                end
+                return GetResist_old(self, attacker, weapon, ...)
             end
         end
     end
@@ -599,5 +942,11 @@ return {
 	hat_off_fullhead = hat_off_fullhead,
     MakeNoLossRepairableEquipment = MakeNoLossRepairableEquipment,
     TagsCombat1 = TagsCombat1, TagsCombat2 = TagsCombat2, TagsCombat3 = TagsCombat3,
-    TagsSiving = TagsSiving
+    TagsSiving = TagsSiving,
+    TagsWorkable1 = TagsWorkable1, TagsWorkable2 = TagsWorkable2,
+    IsMyFollower = IsMyFollower, IsPlayerFollower = IsPlayerFollower,
+    IsEnemy_me = IsEnemy_me, IsEnemy_player = IsEnemy_player,
+    MaybeEnemy_me = MaybeEnemy_me, MaybeEnemy_player = MaybeEnemy_player,
+    CalcDamage = CalcDamage,
+    DoSingleSleep = DoSingleSleep, DoAreaSleep = DoAreaSleep
 }

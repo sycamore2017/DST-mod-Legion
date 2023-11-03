@@ -787,6 +787,7 @@ local assets_orchid = {
 local prefabs_orchid = {
     "impact_orchid_fx"
 }
+local atk_orchid_area = TUNING.BASE_SURVIVOR_ATTACK*0.7
 
 local function OnEquip_orchid(inst, owner)
     local skindata = inst.components.skinedlegion:GetSkinedData()
@@ -818,22 +819,27 @@ local function OnAttack_orchid(inst, owner, target)
             snap.Transform:SetRotation(angle * RADIANS)
         end
 
-        local tags_cant = TOOLS_L.TagsCombat3(not TheNet:GetPVPEnabled() and { "player" } or nil)
+        local tags_cant
+        local validfn
+        if TheNet:GetPVPEnabled() then
+            tags_cant = TOOLS_L.TagsCombat3()
+            validfn = TOOLS_L.MaybeEnemy_me
+        else
+            tags_cant = TOOLS_L.TagsCombat3({ "player" })
+            validfn = TOOLS_L.MaybeEnemy_player
+        end
+
+        local dmg, spdmg, stimuli
         local ents = TheSim:FindEntities(x1, y1, z1, 3, { "_combat" }, tags_cant)
         for _, ent in ipairs(ents) do
             if
-                ent ~= target and ent ~= owner and owner.components.combat:IsValidTarget(ent) and
-                ent.components.health ~= nil and not ent.components.health:IsDead() and
-                (
-                    (ent.components.combat.target == owner) or
-                    ( --不攻击驯化的对象、自己的跟随者
-                        (ent.components.domesticatable == nil or not ent.components.domesticatable:IsDomesticated()) and
-                        (owner.components.leader == nil or not owner.components.leader:IsFollower(ent))
-                    )
-                )
+                ent ~= target and ent ~= owner and
+                ent.entity:IsVisible() and
+                owner.components.combat:IsValidTarget(ent) and --Tip：范围性伤害还是加个判断！防止打到不该打的对象
+                validfn(owner, ent, true)
             then
-                -- owner:PushEvent("onareaattackother", { target = ent, weapon = inst, stimuli = nil })
-                ent.components.combat:GetAttacked(owner, TUNING.BASE_SURVIVOR_ATTACK*0.7, inst, nil)
+                dmg, spdmg, stimuli = TOOLS_L.CalcDamage(owner, ent, inst, nil, nil, atk_orchid_area, nil, true)
+                ent.components.combat:GetAttacked(owner, dmg, inst, stimuli, spdmg)
             end
         end
     end

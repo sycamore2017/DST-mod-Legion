@@ -56,14 +56,8 @@ local COUNT_EYE = 8 --8
 local COUNT_EYE_GRIEF = 11 --11
 
 local TAGS_CANT = TOOLS_L.TagsSiving({ "siving" })
-local tagsfornow = { "wall", "structure", "companion", "glommer", "friendlyfruitfly", "shadowminion" }
-if not TheNet:GetPVPEnabled() then
-    table.insert(tagsfornow, "player")
-    table.insert(tagsfornow, "abigail")
-end
-local TAGS_CANT_FEA = TOOLS_L.TagsCombat1(tagsfornow)
 local TAGS_CANT_BOSSFEA = TOOLS_L.TagsCombat1({ "siving" })
-tagsfornow = nil
+local TAGS_ONE_DESTROY = TOOLS_L.TagsWorkable2()
 
 if CONFIGS_LEGION.PHOENIXBATTLEDIFFICULTY == 1 then
     DIST_FLAP = 7
@@ -210,9 +204,12 @@ local SOUNDBLOCKINGHATS = {
 }
 local function MagicWarble(inst) --魔音绕梁
     local x, y, z = inst.Transform:GetWorldPosition()
-    local ents = TheSim:FindEntities(x, 0, z, DIST_REMOTE, { "_combat", "_inventory" }, { "INLIMBO", "siving", "l_noears" })
+    local ents = TheSim:FindEntities(x, 0, z, DIST_REMOTE,
+        { "_combat", "_inventory" }, TOOLS_L.TagsCombat1({ "siving", "noears_l" })
+    )
     for _, v in ipairs(ents) do
         if
+            v.entity:IsVisible() and
             (v.components.health == nil or not v.components.health:IsDead()) and
             v.components.inventory ~= nil and
             v.components.locomotor ~= nil
@@ -287,10 +284,10 @@ end
 local function ReleaseFlowers(inst) --花寄语
     local x, y, z = inst.Transform:GetWorldPosition()
     local ents = TheSim:FindEntities(x, 0, z, DIST_REMOTE, { "_combat", "_health" }, TAGS_CANT)
-
     for _, v in ipairs(ents) do
         if
             not v.hassivflower and --防止重复寄生
+            v.entity:IsVisible() and
             v.components.health ~= nil and not v.components.health:IsDead() and
             not v:HasTag("PreventSivFlower") and
             (inst.isgrief or math.random() < 0.33)
@@ -920,6 +917,18 @@ local function SetAnim_blk_collector(inst)
     end
 end
 
+local function Fn_validhit_fea_pvp(self, ent) --PVP模式下，只关注自己
+    if self.attacker ~= nil then
+        return TOOLS_L.MaybeEnemy_me(self.attacker, ent, true)
+    end
+    return true
+end
+local function Fn_validhit_fea(self, ent) --非PVP，就要关注所有玩家
+    if self.attacker ~= nil then
+        return TOOLS_L.MaybeEnemy_player(self.attacker, ent, true)
+    end
+    return true
+end
 local function InitFeaFx(inst)
     inst.OnLoad = function(inst, dataa)
         inst:DoTaskInTime(0.37, function(inst) --如果是加载时，应该恢复为正常的羽毛
@@ -1003,9 +1012,20 @@ local function MakeWeapon_replace(data)
             inst.components.projectilelegion.speed = 45
             inst.components.projectilelegion.onthrown = OnThrown_fly
             inst.components.projectilelegion.onmiss = OnMiss_fly
-            inst.components.projectilelegion.exclude_tags = TAGS_CANT_FEA
             if not data.isreal then
                 inst.components.projectilelegion.onhit = OnHit_fly_fake
+            end
+            if TheNet:GetPVPEnabled() then
+                inst.components.projectilelegion.fn_validhit = Fn_validhit_fea_pvp
+                inst.components.projectilelegion.exclude_tags = TOOLS_L.TagsCombat1({
+                    "wall", "structure", "companion", "glommer", "friendlyfruitfly", "shadowminion"
+                })
+            else
+                inst.components.projectilelegion.fn_validhit = Fn_validhit_fea
+                inst.components.projectilelegion.exclude_tags = TOOLS_L.TagsCombat1({
+                    "wall", "structure", "companion", "glommer", "friendlyfruitfly", "shadowminion",
+                    "player", "abigail"
+                })
             end
 
             InitFeaFx(inst)
@@ -1357,6 +1377,12 @@ end
 ------
 ------
 
+local function Fn_validhit_bossfea(self, ent)
+    if self.attacker ~= nil then
+        return TOOLS_L.MaybeEnemy_me(self.attacker, ent, false)
+    end
+    return true
+end
 local function OnThrown_bossfea(inst, owner, targetpos, attacker)
     inst.AnimState:PlayAnimation("shoot3", false)
     inst.SoundEmitter:PlaySound("dontstarve/creatures/leif/swipe", nil, 0.2)
@@ -1409,6 +1435,7 @@ local function MakeBossWeapon(data)
             inst.components.projectilelegion.speed = 45
             inst.components.projectilelegion.shootrange = DIST_FLAP
             inst.components.projectilelegion.exclude_tags = TAGS_CANT_BOSSFEA
+            inst.components.projectilelegion.fn_validhit = Fn_validhit_bossfea
             inst.components.projectilelegion.onthrown = OnThrown_bossfea
             inst.components.projectilelegion.onmiss = function(inst, targetpos, attacker)
                 local x, y, z = inst.Transform:GetWorldPosition()
@@ -2059,7 +2086,7 @@ local function EyeAttack(inst, dt, countnow, countmax, x, z, counthalo)
         else
             local ents = TheSim:FindEntities(x, 0, z, DIST_SPAWN, { "_combat", "_health" }, TAGS_CANT)
             for _, v in ipairs(ents) do
-                if v.components.health ~= nil and not v.components.health:IsDead() then
+                if v.entity:IsVisible() and v.components.health ~= nil and not v.components.health:IsDead() then
                     if v:HasTag("player") then
                         tar = v
                         break
@@ -2338,27 +2365,24 @@ local function Fn_onAttack_root(inst, bird, delaytime)
     inst.components.workable:SetWorkable(false)
     inst._task_atk = inst:DoTaskInTime(delaytime, function(inst)
         inst._task_atk = nil
-
         --攻击！破坏！
         local x, y, z = inst.Transform:GetWorldPosition()
-        local ents = TheSim:FindEntities(x, y, z, DIST_ROOT_ATK,
-            nil, TAGS_CANT_BOSSFEA,
-            { "_combat", "CHOP_workable", "DIG_workable", "HAMMER_workable", "MINE_workable" }
-        )
+        local ents = TheSim:FindEntities(x, y, z, DIST_ROOT_ATK, nil, TAGS_CANT_BOSSFEA, TAGS_ONE_DESTROY)
         for _, v in ipairs(ents) do
-            if v.components.combat ~= nil then
-                if v.components.health ~= nil and not v.components.health:IsDead() then
-                    if v.components.combat:CanBeAttacked() then
-                        v.components.combat:GetAttacked(inst, GetDamage(bird or inst, v, ATK_ROOT))
+            if v ~= inst and v.entity:IsVisible() then
+                if v.components.combat ~= nil then
+                    if v.components.health ~= nil and not v.components.health:IsDead() then
+                        if v.components.combat:CanBeAttacked() then
+                            v.components.combat:GetAttacked(inst, GetDamage(bird or inst, v, ATK_ROOT))
+                        end
                     end
-                end
-            elseif v.components.workable ~= nil then
-                if v.components.workable:CanBeWorked() then
-                    v.components.workable:WorkedBy(inst, 3)
+                elseif v.components.workable ~= nil then
+                    if v.components.workable:CanBeWorked() then
+                        v.components.workable:WorkedBy(inst, 3)
+                    end
                 end
             end
         end
-
         SetClosedPhysics(inst)
     end)
     inst._task_work = inst:DoTaskInTime(delaytime+3, function(inst)
@@ -2505,21 +2529,22 @@ local function AddWeaponLight(inst)
 end
 local function ExplodeFeather(inst)
     local x, y, z = inst.Transform:GetWorldPosition()
-    local ents = TheSim:FindEntities(x, y, z, DIST_FEA_EXPLODE, nil, TAGS_CANT_BOSSFEA)
+    local ents = TheSim:FindEntities(x, y, z, DIST_FEA_EXPLODE, nil, TAGS_CANT_BOSSFEA, TAGS_ONE_DESTROY)
     for _, v in ipairs(ents) do
-        if v ~= inst then
-            if v.components.workable ~= nil then
+        if v ~= inst and v.entity:IsVisible() then
+            if v.components.combat ~= nil then
+                if v.components.health ~= nil and not v.components.health:IsDead() then
+                    if v.components.combat:CanBeAttacked() then --Tip：范围性伤害还是加个判断！防止打到不该打的对象
+                        v.components.combat:GetAttacked(inst, GetDamage2(v, ATK_FEA_EXPLODE), nil)
+                    end
+                end
+            elseif v.components.workable ~= nil then
                 if v.components.workable:CanBeWorked() then
                     if v:HasTag("siv_boss_block") then
                         v.explode_chain_l = true --连锁爆炸
                     end
                     v.components.workable:WorkedBy(inst, 3)
                 end
-            elseif
-                v.components.combat ~= nil and
-                v.components.health ~= nil and not v.components.health:IsDead()
-            then
-                v.components.combat:GetAttacked(inst, GetDamage2(v, ATK_FEA_EXPLODE), nil)
             end
             v:PushEvent("explosion", { explosive = inst })
         end
@@ -2780,7 +2805,7 @@ local function Fn_spell_line(inst, doer, pos, options)
                         fly = v
                     end
                     fly.components.projectilelegion.isgoback = true
-                    fly.components.projectilelegion:Throw(v, doerpos, doer)
+                    fly.components.projectilelegion:Throw(fly, doerpos, doer)
                 end
             end
         else

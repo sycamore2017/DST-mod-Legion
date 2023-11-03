@@ -1,5 +1,4 @@
 local TOOLS_L = require("tools_legion")
-
 local assets = {
     Asset("ANIM", "anim/hat_albicans_mushroom.zip"),
 	Asset("ATLAS", "images/inventoryimages/hat_albicans_mushroom.xml"),
@@ -54,11 +53,10 @@ local function onuse(inst)
 end
 local function ReleaseSporesEffect(inst, owner)
     local x, y, z = owner.Transform:GetWorldPosition()
-    local tags_cant = TOOLS_L.TagsCombat1()
     local ents = TheSim:FindEntities(x, y, z, 3.5,
-        nil, tags_cant, { "player", "lamp", "mushroom_farm", "crop_legion", "crop2_legion" }
+        nil, TOOLS_L.TagsCombat1(), { "player", "lamp", "mushroom_farm", "crop_legion", "crop2_legion" }
     )
-    for _, ent in pairs(ents) do
+    for _, ent in ipairs(ents) do
         if ent.entity:IsVisible() then
             if ent:HasTag("player") then
                 ent.time_l_sporeresistance = { add = TUNING.SEG_TIME*6, max = TUNING.SEG_TIME*30 }

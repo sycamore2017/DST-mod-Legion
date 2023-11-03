@@ -102,18 +102,28 @@ end
 local function GiveSomeShock(inst, owner, target) --击中时的特殊效果
     local x, y, z = target.Transform:GetWorldPosition()
     local givelightning = false
-    local tags_cant = TOOLS_L.TagsCombat3(
-        TheNet:GetPVPEnabled() and { "lightningblocker" } or { "player", "lightningblocker" }) --排除了水中木
+    local tags_cant
+    local validfn
+    if TheNet:GetPVPEnabled() then
+        tags_cant = TOOLS_L.TagsCombat3({ "lightningblocker" }) --排除了水中木
+        validfn = TOOLS_L.MaybeEnemy_me
+    else
+        tags_cant = TOOLS_L.TagsCombat3({ "lightningblocker", "player" })
+        validfn = TOOLS_L.MaybeEnemy_player
+    end
+
     local ents = TheSim:FindEntities(x, y, z, 3, nil, tags_cant, { "shockable", "CHOP_workable" })
     for _, v in ipairs(ents) do
-        if v ~= owner then
+        if v ~= owner and v.entity:IsVisible() then
             if v.components.workable ~= nil then --直接破坏可以砍的物体
                 if v.components.workable:CanBeWorked() and v.components.lightningblocker == nil then
                     v.components.workable:Destroy(inst)
                 end
             elseif v.components.shockable ~= nil and math.random() < 0.3 then --有几率对生物造成触电
-                givelightning = true
-                v.components.shockable:Shock(6)
+                if validfn(owner, v, true) then --排除掉对自己友好的生物
+                    givelightning = true
+                    v.components.shockable:Shock(6)
+                end
             end
         end
     end

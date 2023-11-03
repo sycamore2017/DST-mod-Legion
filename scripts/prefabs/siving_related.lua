@@ -959,15 +959,8 @@ local function HealArmor(mask)
 end
 local function IsValidVictim(ent, owner)
     if
-        ent.components.health ~= nil and not ent.components.health:IsDead() and
         (ent.siv_blood_l_reducer_v == nil or ent.siv_blood_l_reducer_v < 1) and
-        (
-            (ent.components.combat ~= nil and ent.components.combat.target == owner) or
-            ( --不窃取驯化的对象、自己的跟随者
-                (ent.components.domesticatable == nil or not ent.components.domesticatable:IsDomesticated()) and
-                (owner.components.leader == nil or not owner.components.leader:IsFollower(ent))
-            )
-        )
+        TOOLS_L.MaybeEnemy_player(owner, ent, true)
     then
         return true
     end

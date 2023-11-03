@@ -365,16 +365,14 @@ end
 --[[ 颤栗花 ]]
 --------------------------------------------------------------------------
 
-local assets_flower =
-{
+local assets_flower = {
     Asset("ANIM", "anim/shyerrybush.zip"),
     -- Asset("ANIM", "anim/bramble_core.zip"), --荆棘花的动画模板
 }
 
-local prefabs_flower = 
-{
+local prefabs_flower = {
     "shyerry",
-    "shyerry_cooked",
+    "shyerry_cooked"
 }
 
 local function OnHaunt_flower(inst)
@@ -408,7 +406,6 @@ end
 local function StartShy(inst)
     if inst.shytask == nil then
         inst.shytask = inst:DoPeriodicTask(1.5, function()
-            --"shadowminion"暗影随从，"plantkin"植物人，"swampwhisperer"沼泽低语者，不会吓到颤栗花
             if FindEntity(inst, 10, nil, { "scarytoprey" }, tags_cant_flower, nil) ~= nil then
                 if inst.components.pickable ~= nil then
                     inst.components.pickable.caninteractwith = false

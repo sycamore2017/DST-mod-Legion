@@ -1,16 +1,16 @@
 require("stategraphs/commonstates")
 local TOOLS_L = require("tools_legion")
 local tags_cant = TOOLS_L.TagsCombat1()
+local tags_one = TOOLS_L.TagsWorkable2()
 
 local function ValidTarget(target)
     if target and target:IsValid() then
-        if target.components.health ~= nil and not target.components.health:IsDead() then   --有生命对象还没死
+        if target.components.health ~= nil and not target.components.health:IsDead() then --有生命对象还没死
             return true
-        elseif target.components.workable ~= nil and target.components.workable.action ~= ACTIONS.DIG then   --对象能被破坏
-            return true
+        elseif target.components.workable ~= nil then --对象能被破坏
+            return target.components.workable:CanBeWorked()
         end
     end
-
     return false
 end
 
@@ -19,7 +19,7 @@ local function GetDistance(inst, target)    --得到的是距离的平方
 end
 
 local function FindTarget(inst, radius)
-    return FindEntity(inst, radius, function(item) return ValidTarget(item) end, nil, tags_cant, nil)
+    return FindEntity(inst, radius, function(item) return ValidTarget(item) end, nil, tags_cant, tags_one)
 end
 
 local function TestRange(inst, target, radius_min, radius_max)  --最大范围与最小范围的数值都是平方值

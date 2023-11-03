@@ -139,8 +139,10 @@ local function PlayDoing(inst, owner)
         end
 
         --给其他对象加buff
-        local ents = TheSim:FindEntities(x, y, z, BUFFRADIUS, { "_combat", "_health" }, { "INLIMBO", "NOCLICK", "ghost", "shadowminion" }) --buff不对鬼魂和暗影随从生效
-        for i, ent in ipairs(ents) do
+        local ents = TheSim:FindEntities(x, y, z, BUFFRADIUS,
+            { "_combat", "_health" }, { "INLIMBO", "NOCLICK", "ghost", "shadowminion" } --buff不对鬼魂和暗影随从生效
+        )
+        for _, ent in ipairs(ents) do
             --如果对方buff没有消失，就加上
             if ent ~= owner and ent.guitar_greenery_buff_task == nil and ent.components.health ~= nil and not ent.components.health:IsDead() then
                 --玩家或者跟随玩家的对象，没死，就能享有buff

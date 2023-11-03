@@ -255,7 +255,7 @@ function GeneTrans:SetUp(seeds, doer)
 
 	--寻找周围的相同实体，一并放上去
 	local x, y, z = self.inst.Transform:GetWorldPosition()
-	local ents = TheSim:FindEntities(x, y, z, 12, { "_inventoryitem" }, { "NOCLICK", "INLIMBO" })
+	local ents = TheSim:FindEntities(x, y, z, 12, { "_inventoryitem" }, { "INLIMBO", "NOCLICK" })
 	for _, ent in ipairs(ents) do
 		if ent.prefab == self.seed then
 			if ent.components.stackable ~= nil then

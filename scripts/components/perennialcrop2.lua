@@ -688,11 +688,9 @@ function PerennialCrop2:DoOverripe() --过熟（掉落果子，给周围植物�
 		if numpoop > 0 then
 			local hasset = false
 			local ents = TheSim:FindEntities(x, y, z, 5,
-				nil,
-				{ "NOCLICK", "INLIMBO" },
-				{ "crop_legion", "withered", "barren" }
+				nil, { "INLIMBO", "NOCLICK" }, { "crop_legion", "withered", "barren" }
 			)
-			for _, v in pairs(ents) do
+			for _, v in ipairs(ents) do
 				local cpt = nil
 				if v.components.pickable ~= nil then
 					if v.components.pickable:CanBeFertilized() then
@@ -703,7 +701,6 @@ function PerennialCrop2:DoOverripe() --过熟（掉落果子，给周围植物�
 				-- elseif v.components.perennialcrop2 ~= nil then
 				-- 	cpt = v.components.perennialcrop2
 				end
-
 				if cpt ~= nil then
 					local poop = SpawnPrefab("glommerfuel")
 					if poop ~= nil then
@@ -716,7 +713,6 @@ function PerennialCrop2:DoOverripe() --过熟（掉落果子，给周围植物�
 					end
 				end
 			end
-
 			if hasset then
 				numpoop = numpoop - costplus
 			end

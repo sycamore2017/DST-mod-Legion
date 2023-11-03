@@ -75,7 +75,7 @@ local COLLAPSIBLE_TAGS = { "_combat", "siv_boss_block" }
 -- for k, v in pairs(COLLAPSIBLE_WORK_ACTIONS) do
 --     table.insert(COLLAPSIBLE_TAGS, k.."_workable")
 -- end
-local NON_COLLAPSIBLE_TAGS = TOOLS_L.TagsCombat3({ "player", "antlion", "groundspike", "flying", "ghost", "shadow" })
+local NON_COLLAPSIBLE_TAGS = TOOLS_L.TagsCombat3({ "player", "antlion", "groundspike", "flying", "ghost" })
 
 local function DoBreak(inst)
     inst.task = nil
@@ -107,12 +107,10 @@ local function DoDamage(inst, OnIgnite)
     local x, y, z = inst.Transform:GetWorldPosition()
     local ents = TheSim:FindEntities(x, 0, z, inst.spikeradius + DAMAGE_RADIUS_PADDING, nil, NON_COLLAPSIBLE_TAGS, COLLAPSIBLE_TAGS)
     for _, v in ipairs(ents) do
-        if v:IsValid() then
+        if v:IsValid() and v.entity:IsVisible() then
             if v.components.combat ~= nil then
-                if v.components.health ~= nil and not v.components.health:IsDead() then
-                    if inst.components.combat:IsValidTarget(v) then
-                        inst.components.combat:DoAttack(v)
-                    end
+                if TOOLS_L.MaybeEnemy_player(inst, v, true) and inst.components.combat:IsValidTarget(v) then
+                    inst.components.combat:DoAttack(v)
                 end
             elseif v.components.workable ~= nil then --这里主要用来破坏子圭突触
                 if v.components.workable:CanBeWorked() then

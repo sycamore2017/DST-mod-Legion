@@ -792,29 +792,22 @@ if IsServer then
             local SeekSoulStealer_old = upvaluehelper.Get(_G.Prefabs["wortox_soul_spawn"].fn, "SeekSoulStealer")
             if SeekSoulStealer_old ~= nil then
                 local function SeekSoulStealer_new(inst)
-                    local toer = FindEntity(
-                        inst,
-                        TUNING.WORTOX_SOULSTEALER_RANGE+4,
-                        function(one, inst)
-                            if one.components.finiteuses ~= nil then
-                                if one.components.finiteuses:GetPercent() >= 1 then
-                                    if
-                                        one._contractsowner ~= nil and one._contractsowner:IsValid() and
-                                        ValidSoulTarget(one._contractsowner)
-                                    then
-                                        return true
-                                    end
-                                else
+                    local toer = FindEntity(inst, TUNING.WORTOX_SOULSTEALER_RANGE+4, function(one, inst)
+                        if one.components.finiteuses ~= nil then
+                            if one.components.finiteuses:GetPercent() >= 1 then
+                                if
+                                    one._contractsowner ~= nil and one._contractsowner:IsValid() and
+                                    ValidSoulTarget(one._contractsowner)
+                                then
                                     return true
                                 end
-                            elseif one._contracts_l ~= nil and ValidSoulTarget(one) then
+                            else
                                 return true
                             end
-                        end,
-                        nil,
-                        { "NOCLICK", "INLIMBO", "playerghost", "notarget" },
-                        { "soulcontracts", "player" }
-                    )
+                        elseif one._contracts_l ~= nil and ValidSoulTarget(one) then
+                            return true
+                        end
+                    end, nil, { "INLIMBO", "NOCLICK", "playerghost", "notarget" }, { "soulcontracts", "player" })
                     if toer ~= nil then
                         if toer.components.finiteuses ~= nil and toer.components.finiteuses:GetPercent() >= 1 then
                             if toer._contractsowner ~= nil then

@@ -52,7 +52,6 @@ local function onequip(inst, owner)
             for _,v in ipairs(ents) do
                 if math.random() < 0.1 then
                     local fly = SpawnPrefab("butterfly")
-
                     if fly.components.pollinator ~= nil then
                         fly.components.pollinator:Pollinate(v)
                     end

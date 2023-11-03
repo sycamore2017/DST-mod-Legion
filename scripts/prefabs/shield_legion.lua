@@ -430,17 +430,11 @@ table.insert(prefs, Prefab("shieldterror_fire", function()
         local x, y, z = inst.Transform:GetWorldPosition()
         local ents = TheSim:FindEntities(x, y, z, 2, { "_combat", "_health" }, tags_cant_terror)
         for _,v in ipairs(ents) do
-            if
-                v.entity:IsVisible() and (
-                    v.components.combat ~= nil and v.components.combat.target ~= nil
-                    and v.components.combat.target:HasTag("player")
-                ) and v.components.health ~= nil and not v.components.health:IsDead()
-            then
+            if v.entity:IsVisible() and TOOLS_L.IsEnemy_player(inst, v) then
                 v.components.health:DoDelta(-5, nil, "NIL", true, nil, true)
                 number = number + 4
             end
         end
-
         if number > 0 and inst._belly ~= nil then
             if inst._belly:IsValid() then
                 if inst._belly.components.armor ~= nil and inst._belly.components.armor:GetPercent() < 1 then
@@ -450,7 +444,6 @@ table.insert(prefs, Prefab("shieldterror_fire", function()
                 inst._belly = nil
             end
         end
-
         if math.random() < 0.2 then
             inst._taskfire:Cancel()
             inst._taskfire = nil

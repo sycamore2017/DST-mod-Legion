@@ -160,7 +160,7 @@ local function Waving(inst)
         end
     end
 
-    local player = FindEntity(inst, 20, nil, nil, {"NOCLICK", "FX", "INLIMBO"}, {"player"})
+    local player = FindEntity(inst, 20, nil, nil, { "NOCLICK", "FX", "INLIMBO" }, { "player" })
     if player ~= nil and player.wavefx == nil then
         local plant = SpawnPrefab("lilypond_ripple_fx")
         if plant ~= nil then
@@ -205,7 +205,7 @@ local function fn()
     inst.OnEntityWake = StartWaving
 
     inst:DoTaskInTime(1, function()
-        if FindEntity(inst, 30, nil, nil, {"NOCLICK", "FX", "INLIMBO"}, {"player", "playerghost"}) then
+        if FindEntity(inst, 30, nil, nil, { "NOCLICK", "FX", "INLIMBO" }, { "player", "playerghost" }) then
             StartWaving(inst)
         end
     end)

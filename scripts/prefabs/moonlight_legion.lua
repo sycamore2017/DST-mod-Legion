@@ -1054,6 +1054,8 @@ local function TriggerRevolt(inst, doer, doit)
 
         if inst._lvl >= lvls_refracted[8] then
             inst.components.weapon:SetRange(2)
+        else
+            inst.components.weapon:SetRange(0)
         end
 
         TrySetOwnerSymbol(inst, doer, true)
@@ -1163,6 +1165,7 @@ local function OnStageUp_refracted(inst)
     local lvl = inst.components.upgradeable:GetStage() - 1
     inst._lvl = lvl
     inst._lvl_l:set(lvl)
+    inst.components.workable:SetWorkLeft(5)
     if lvl >= lvls_refracted[13] then
         inst._atk_lvl = 80
         inst._atk_sp_lvl = 60
@@ -1187,6 +1190,7 @@ local function OnStageUp_refracted(inst)
     else
         inst._atk_lvl = 0
         inst._atk_sp_lvl = 0
+        inst.components.workable:SetWorkable(false) --0级时不可以被锤
     end
     TriggerRevolt(inst, nil, inst._task_fx ~= nil or inst.components.timer:TimerExists("moonsurge"))
 end
@@ -1226,6 +1230,24 @@ local function OnOwnerChange_refracted(inst)
     end
 
     inst._owners = newowners
+end
+local function OnWork_refracted(inst, worker, workleft, numworks)
+    if worker == nil or not worker:HasTag("player") then
+        inst.components.workable:SetWorkLeft(5) --不能被非玩家破坏
+    end
+end
+local function OnFinished_refracted(inst, worker)
+    --归还宝石
+    DropGems(inst, "opalpreciousgem")
+
+    --恢复数据
+    inst.components.upgradeable:SetStage(1)
+    OnStageUp_refracted(inst)
+
+    --特效
+    local fx = SpawnPrefab("collapse_small")
+    fx.Transform:SetPosition(inst.Transform:GetWorldPosition())
+    fx:SetMaterial("stone")
 end
 
 local function OnSave_refracted(inst, data)
@@ -1348,6 +1370,13 @@ table.insert(prefs, Prefab("refractedmoonlight", function()
     inst.components.upgradeable.onstageadvancefn = OnStageUp_refracted
     inst.components.upgradeable.numstages = CONFIGS_LEGION.REFRACTEDUPDATETIMES + 1 --因为初始等级为1
     inst.components.upgradeable.upgradesperstage = 1
+
+    inst:AddComponent("workable")
+    inst.components.workable:SetWorkAction(ACTIONS.HAMMER)
+    inst.components.workable:SetWorkLeft(5)
+    inst.components.workable:SetOnWorkCallback(OnWork_refracted)
+    inst.components.workable:SetOnFinishCallback(OnFinished_refracted)
+    inst.components.workable:SetWorkable(false) --0级时不可以被锤
 
     inst:AddComponent("timer")
     inst:ListenForEvent("timerdone", TimerDone_refracted)

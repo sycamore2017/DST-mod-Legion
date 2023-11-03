@@ -171,7 +171,7 @@ local function OnSeasonChange(inst) --季节变化时
     elseif TheWorld.state.issummer then
         local hasit = false
         local x, y, z = inst.Transform:GetWorldPosition()
-        local ents = TheSim:FindEntities(x, y, z, 20, { "siving_ctl" }, { "NOCLICK", "INLIMBO" }, nil)
+        local ents = TheSim:FindEntities(x, y, z, 20, { "siving_ctl" }, { "INLIMBO", "NOCLICK" }, nil)
         for _,v in ipairs(ents) do
             if v.components.botanycontroller ~= nil then
                 local cpt = v.components.botanycontroller
@@ -308,7 +308,7 @@ local function OnTimerDone_tuber(inst, data)
 end
 local function Fn_planted_tuber(inst, pt)
     inst:DoTaskInTime(0, function(inst) --寻找周围的管理器
-        local ents = TheSim:FindEntities(pt.x, pt.y, pt.z, 20, { "siving_ctl" }, { "NOCLICK", "INLIMBO" }, nil)
+        local ents = TheSim:FindEntities(pt.x, pt.y, pt.z, 20, { "siving_ctl" }, { "INLIMBO", "NOCLICK" }, nil)
         for _,v in ipairs(ents) do
             if v.components.botanycontroller ~= nil then
                 local cpt = v.components.botanycontroller

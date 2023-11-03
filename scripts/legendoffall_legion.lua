@@ -591,7 +591,7 @@ if FindFarmPlant then
                 then
                     return true
                 end
-            end, nil, nil, { "crop_legion", "crop2_legion" })
+            end, nil, { "INLIMBO", "NOCLICK" }, { "crop_legion", "crop2_legion" })
 
             if self.inst.planttarget then
                 local action = BufferedAction(self.inst, self.inst.planttarget, self.action, nil, nil, nil, 0.1)
@@ -1270,44 +1270,25 @@ _G.CROPS_DATA_LEGION.mandrake = {
         end
     end,
     fn_defend = function(inst, target)
-        local doer = target or inst
+        local doer = target or inst --只能尽量由 target 来执行操作，因为下一帧 inst 可能就没了
         if doer.SoundEmitter then
             doer.SoundEmitter:PlaySound("dontstarve/creatures/mandrake/death")
         else
             inst.SoundEmitter:PlaySound("dontstarve/creatures/mandrake/death")
         end
-        local x, y, z = doer.Transform:GetWorldPosition()
+        local x, y, z = inst.Transform:GetWorldPosition()
         local timemult = inst.components.perennialcrop2.cluster*0.03 --99级大概会增加3倍时间
         doer:DoTaskInTime(0.4+0.2*math.random(), function()
-            local time = TUNING.MANDRAKE_SLEEP_TIME
+            local time = 10
             if timemult > 0 then
                 time = time + time*timemult
             end
-            local ents = TheSim:FindEntities(x, y, z, TUNING.MANDRAKE_SLEEP_RANGE_COOKED, nil,
-                { "playerghost", "INLIMBO" }, { "sleeper", "player" })
-            for i, v in ipairs(ents) do
-                if
-                    not (v.components.freezable ~= nil and v.components.freezable:IsFrozen()) and
-                    not (v.components.pinnable ~= nil and v.components.pinnable:IsStuck()) and
-                    not (v.components.fossilizable ~= nil and v.components.fossilizable:IsFossilized())
-                then
-                    local mount = v.components.rider ~= nil and v.components.rider:GetMount() or nil
-                    if mount ~= nil then
-                        mount:PushEvent("ridersleep", { sleepiness = 7, sleeptime = time + math.random() })
-                    end
-                    if v:HasTag("player") then
-                        if v.sg == nil or not v.sg:HasStateTag("yawn") then
-                            v:PushEvent("yawn", { grogginess = 4, knockoutduration = time + math.random() })
-                        end
-                    elseif v.components.sleeper ~= nil then
-                        v.components.sleeper:AddSleepiness(7, time + math.random())
-                    elseif v.components.grogginess ~= nil then
-                        v.components.grogginess:AddGrogginess(4, time + math.random())
-                    else
-                        v:PushEvent("knockedout")
-                    end
-                end
-            end
+            TOOLS_L.DoAreaSleep({
+                doer = doer, x = x, y = y, z = z,
+                range = 25, -- tagscant = nil, tagsone = nil,
+                lvl = 5, time = time + math.random(), --noyawn = nil,
+                -- fn_valid = nil, fn_do = nil
+            })
         end)
     end
 }

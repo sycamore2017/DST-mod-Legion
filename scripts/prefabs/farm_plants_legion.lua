@@ -988,7 +988,7 @@ local sounds_nep = {
 	leaf = "dontstarve/wilson/pickup_reeds",
 	rumble = "dontstarve/creatures/slurper/rumble"
 }
-local TAGS_CANT_NEP = TOOLS_L.TagsCombat3({ "player", "vaseherb", "nodigest_l" })
+local TAGS_CANT_NEP = TOOLS_L.TagsCombat3({ "player", "nodigest_l" })
 local ITEMS_NODIGEST = {
 	insectshell_l = true, boneshard = true, ahandfulofwings = true,
 	seeds_plantmeat_l = true, --不吃自己的异种
@@ -1221,7 +1221,11 @@ local function TrySwallow(inst)
 		nil, TAGS_CANT_NEP, { "_combat", "_health", "_inventoryitem" }
 	)
 	for _, v in ipairs(ents) do
-		if DIGEST_DATA_LEGION[v.prefab] ~= nil then
+		if
+			v.entity:IsVisible() and
+			DIGEST_DATA_LEGION[v.prefab] ~= nil and
+			(v.components.combat == nil or TOOLS_L.MaybeEnemy_player(inst, v, true))
+		then
 			local dd = DIGEST_DATA_LEGION[v.prefab]
 			if dd.lvl ~= nil and dd.lvl <= cluster then
 				inst.sg:GoToState("swallow")
@@ -1242,7 +1246,11 @@ local function DoSwallow(inst)
 		nil, TAGS_CANT_NEP, { "_combat", "_health", "_inventoryitem" }
 	)
 	for _, v in ipairs(ents) do
-		if DIGEST_DATA_LEGION[v.prefab] ~= nil then
+		if
+			v.entity:IsVisible() and
+			DIGEST_DATA_LEGION[v.prefab] ~= nil and
+			(v.components.combat == nil or TOOLS_L.MaybeEnemy_player(inst, v, true))
+		then
 			local dd = DIGEST_DATA_LEGION[v.prefab]
 			if dd.lvl ~= nil and dd.lvl <= cluster then
 				count = count + 1
@@ -1287,11 +1295,12 @@ local function DoLure(inst)
 
 	local x, y, z = inst.Transform:GetWorldPosition()
 	local cluster = inst.components.perennialcrop2.cluster
-	local ents = TheSim:FindEntities(x, y, z, inst.dist_lure, nil, TAGS_CANT_NEP, { "_combat" })
+	local ents = TheSim:FindEntities(x, y, z, inst.dist_lure, { "_combat" }, TAGS_CANT_NEP, nil)
 	for _, v in ipairs(ents) do
 		if
-			v.components.combat ~= nil and v.components.combat:CanTarget(inst) and
-			DIGEST_DATA_LEGION[v.prefab] ~= nil
+			v.entity:IsVisible() and
+			DIGEST_DATA_LEGION[v.prefab] ~= nil and
+			TOOLS_L.MaybeEnemy_player(inst, v, true) and v.components.combat:CanTarget(inst)
 		then
 			local dd = DIGEST_DATA_LEGION[v.prefab]
 			if dd.lvl ~= nil and dd.lvl <= cluster and dd.attract then

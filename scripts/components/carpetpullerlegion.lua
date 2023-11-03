@@ -5,7 +5,7 @@ end)
 function CarpetPullerLegion:DoIt(pos, doer)
     local res = false
     local x, y, z = pos:Get()
-	local ents = TheSim:FindEntities(x, y, z, 2, { "carpet_l" }, nil, nil)
+	local ents = TheSim:FindEntities(x, y, z, 2, { "carpet_l" }, { "INLIMBO" }, nil)
     for _, v in ipairs(ents) do
         if v.OnCarpetRemove ~= nil then
             v.OnCarpetRemove(v, doer)

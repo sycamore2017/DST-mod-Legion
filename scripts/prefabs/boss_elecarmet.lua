@@ -38,6 +38,8 @@ local brain = require "brains/elecarmetbrain"
 local TOOLS_L = require("tools_legion")
 local tags_cant_static = TOOLS_L.TagsCombat2({ "ghost" })
 local tags_cant_target = TOOLS_L.TagsCombat2({ "smallcreature", "animal" })
+local tags_cant_attack = TOOLS_L.TagsCombat1()
+local tags_one_destroy = TOOLS_L.TagsWorkable2()
 
 SetSharedLootTable('elecarmet', {
 	{"fimbul_axe",       1.00},
@@ -153,110 +155,10 @@ local function GetSpawnPoint(pos, radius)
     return pos.x + rad * math.cos(angle), pos.y, pos.z - rad * math.sin(angle)
 end
 
-local function SpawnLightning(x, y, z)
-    local closest_generic = nil
-    local closest_rod = nil
-    local closest_blocker = nil
-
-    local ents = TheSim:FindEntities(x, y, z, 40, nil, { "playerghost", "INLIMBO", "electrified" }, { "lightningrod", "lightningtarget", "lightningblocker" })
-    local blockers = nil
-    for _, v in pairs(ents) do
-        -- Track any blockers we find, since we redirect the strike position later,
-        -- and might redirect it into their block range.
-        local is_blocker = v.components.lightningblocker ~= nil
-        if is_blocker then
-            if blockers == nil then
-                blockers = {v}
-            else
-                table.insert(blockers, v)
-            end
-        end
-
-        if
-            closest_blocker == nil and is_blocker
-            and (v.components.lightningblocker.block_rsq + 0.0001) > v:GetDistanceSqToPoint(x, y, z)
-        then
-            closest_blocker = v
-        elseif closest_rod == nil and v:HasTag("lightningrod") then
-            closest_rod = v
-        elseif closest_generic == nil then
-            if
-                (v.components.health == nil or not v.components.health:IsInvincible())
-                and not is_blocker -- If we're out of range of the first branch, ignore blocker objects.
-                and (
-                    v.components.playerlightningtarget == nil or
-                    math.random() <= v.components.playerlightningtarget:GetHitChance()
-                )
-            then
-                closest_generic = v
-            end
-        end
-    end
-
-    local strike_position = Vector3(x,y,z)
-    local prefab_type = "fimbul_lightning"
-
-    if closest_blocker ~= nil then
-        closest_blocker.components.lightningblocker:DoLightningStrike(strike_position)
-        prefab_type = "thunder"
-    elseif closest_rod ~= nil then
-        strike_position = closest_rod:GetPosition()
-
-        -- Check if we just redirected into a lightning blocker's range.
-        if blockers ~= nil then
-            for _, blocker in ipairs(blockers) do
-                if blocker:GetDistanceSqToPoint(strike_position:Get()) < (blocker.components.lightningblocker.block_rsq + 0.0001) then
-                    prefab_type = "thunder"
-                    blocker.components.lightningblocker:DoLightningStrike(strike_position)
-                    break
-                end
-            end
-        end
-
-        -- If we didn't get blocked, push the event that does all the fx and behaviour.
-        if prefab_type == "fimbul_lightning" then
-            closest_rod:PushEvent("lightningstrike")
-        end
-    else
-        if closest_generic ~= nil then
-            strike_position = closest_generic:GetPosition()
-
-            -- Check if we just redirected into a lightning blocker's range.
-            if blockers ~= nil then
-                for _, blocker in ipairs(blockers) do
-                    if blocker:GetDistanceSqToPoint(strike_position:Get()) < (blocker.components.lightningblocker.block_rsq + 0.0001) then
-                        prefab_type = "thunder"
-                        blocker.components.lightningblocker:DoLightningStrike(strike_position)
-                        break
-                    end
-                end
-            end
-
-            -- If we didn't redirect, strike the playerlightningtarget if there is one.
-            if prefab_type == "fimbul_lightning" then
-                if closest_generic.components.playerlightningtarget ~= nil then
-                    closest_generic.components.playerlightningtarget:DoStrike()
-                end
-            end
-        end
-
-        -- If we're doing lightning, light nearby unprotected objects on fire.
-        if prefab_type == "fimbul_lightning" then
-            ents = TheSim:FindEntities(strike_position.x, strike_position.y, strike_position.z, 3, nil, { "player", "INLIMBO", "electrified" })
-            for _, v in pairs(ents) do
-                if v.components.burnable ~= nil then
-                    v.components.burnable:Ignite()
-                end
-            end
-        end
-    end
-
-    SpawnPrefab(prefab_type).Transform:SetPosition(strike_position:Get())
-end
-
 local function mine_test_fn(dude, inst)
-    return dude.components.health ~= nil and not dude.components.health:IsDead()
-        and dude.components.combat ~= nil and dude.components.combat:CanBeAttacked(inst)
+    return dude.components.shockable ~= nil and
+        dude.components.health ~= nil and not dude.components.health:IsDead() and
+        dude.components.combat ~= nil and dude.components.combat:CanBeAttacked(inst)
 end
 local function SpawnStatic(x, y, z)
 	local static = SpawnPrefab("fimbul_static_fx")
@@ -287,7 +189,7 @@ local function CallForLightning(inst)
     local pos = inst:GetPosition()
 
     local x1, y1, z1 = GetSpawnPoint(pos)
-    SpawnLightning(x1, y1, z1)
+    TheWorld:PushEvent("ms_sendlightningstrike", Vector3(x1, y1, z1))
 
     x1, y1, z1 = GetSpawnPoint(pos)
     if TheWorld.Map:IsAboveGroundAtPoint(x1, y1, z1) then   --只有有效地面上生成
@@ -307,7 +209,9 @@ local flashwhirl_knockback_radius = 8 	--旋风击退半径
 
 local function Knockback(inst, target, k_damage, k_radius)
     if target.components.workable ~= nil then
-        target.components.workable:Destroy(inst)
+        if target.components.workable:CanBeWorked() then
+            target.components.workable:Destroy(inst)
+        end
     elseif target.components.combat ~= nil and target.components.health ~= nil and not target.components.health:IsDead() then
         --先受伤害，再进行击退
         target.components.combat:GetAttacked(inst.attackowner or inst,
@@ -318,30 +222,31 @@ end
 
 local function FlashWhirl(inst)
 	local x1, y1, z1 = inst.Transform:GetWorldPosition()
+    local x2, y2, z2
 	local ents = TheSim:FindEntities(x1, y1, z1, flashwhirl_radius,
-        nil, { "DECOR", "NOCLICK", "FX", "shadow", "playerghost", "INLIMBO" })
-
-	for i, ent in pairs(ents) do
-		if ent ~= inst and ent.entity:IsVisible() and ent.Physics ~= nil then
-			local x2, y2, z2 = ent.Transform:GetWorldPosition()
-
+        nil, tags_cant_attack, TOOLS_L.TagsWorkable2({ "_inventoryitem" })
+    )
+	for _, ent in ipairs(ents) do
+		if ent ~= inst and ent.entity:IsVisible() then
 			if ent.components.inventoryitem ~= nil and ent.components.locomotor == nil then	--物品栏物品，非生物
-				local speed = ent:HasTag("heavy") and knockback_item_speed_heavy or knockback_item_speed
-				local vec = Vector3(x2 - x1, y2 - y1, z2 - z1):Normalize()
-
-				ent.Physics:Teleport(x2, 0.5, z2)
-				ent.Physics:SetVel(vec.x * speed, speed, vec.z * speed)
-			elseif --击飞生物，或摧毁可以锤、砍、凿的物体
+                if not ent.components.inventoryitem.nobounce and ent.Physics ~= nil and ent.Physics:IsActive() then
+                    x2, y2, z2 = ent.Transform:GetWorldPosition()
+                    local speed = ent:HasTag("heavy") and knockback_item_speed_heavy or knockback_item_speed
+                    local vec = Vector3(x2 - x1, y2 - y1, z2 - z1):Normalize()
+                    ent.Physics:Teleport(x2, 0.5, z2)
+                    ent.Physics:SetVel(vec.x * speed, speed, vec.z * speed)
+                end
+			elseif --击飞生物，或摧毁物体
                 ent.components.locomotor ~= nil or
-                (ent.components.workable ~= nil and not ent:HasTag("DIG_workable"))
+                ent.components.workable ~= nil
             then
 				Knockback(inst, ent, flashwhirl_damage, flashwhirl_knockback_radius)
 			end
 		end
 	end
-
 	for i = 1, 3 do
-		SpawnLightning(GetSpawnPoint({x = x1, y = y1, z = z1}, flashwhirl_radius))
+		x2, y2, z2 = GetSpawnPoint({x = x1, y = y1, z = z1}, flashwhirl_radius)
+        TheWorld:PushEvent("ms_sendlightningstrike", Vector3(x2, y2, z2))
 	end
 end
 
@@ -362,9 +267,9 @@ local function BattleCry(inst)
 		splash.Transform:SetPosition(x1, y1, z1)
 	end
 
-	local ents = TheSim:FindEntities(pos.x, pos.y, pos.z, battlecry_radius, nil, { "DECOR", "NOCLICK", "FX", "shadow", "playerghost", "INLIMBO" })
-	for k, v in pairs(ents) do
-        if v ~= inst then
+	local ents = TheSim:FindEntities(pos.x, pos.y, pos.z, battlecry_radius, nil, tags_cant_attack, tags_one_destroy)
+	for _, v in ipairs(ents) do
+        if v ~= inst and v.entity:IsVisible() then
             Knockback(inst, v, battlecry_damage, battlecry_knockback_radius)
         end
 	end
@@ -418,7 +323,7 @@ local heavyhack_radius = 6 		--重锤伤害的判断距离
 local heavyhack_damage = 20 	--重锤伤害
 local heavyhack_shocktime = 8 	--重锤麻痹时间
 
-local function juzhen(angle, cd, kd, s1, vp)    --这个函数来自于熔炉mod，感谢！
+local function juzhen(angle, cd, kd, s1, vp) --这个函数来自于熔炉mod，感谢！
     local s3 = Vector3(s1.x + math.cos(0) * cd, 0, s1.z + math.sin(0) * cd)
     local minx = s1.x + 0
     local maxx = s3.x + cd
@@ -432,14 +337,16 @@ local function juzhen(angle, cd, kd, s1, vp)    --这个函数来自于熔炉mod
 end
 local function HeavyHack(inst, angle)
     local pos = inst:GetPosition()
-    local ents = TheSim:FindEntities(pos.x, 0, pos.z, 10, nil, {"DECOR", "NOCLICK", "FX", "shadow", "playerghost", "INLIMBO"})
-    for k, v in ipairs(ents) do
-        if v ~= inst then
+    local ents = TheSim:FindEntities(pos.x, 0, pos.z, 10, nil, tags_cant_attack, tags_one_destroy)
+    for _, v in ipairs(ents) do
+        if v ~= inst and v.entity:IsVisible() then
             local vp = v:GetPosition()
             if juzhen(angle, 10, 4, Vector3(pos.x, pos.y, pos.z), vp) then
-                if v.components.workable ~= nil and not v:HasTag("DIG_workable") then    --摧毁对象
-                    v.components.workable:Destroy(inst)
-                elseif v.components.health ~= nil and not v.components.health:IsDead() then   --攻击并麻痹
+                if v.components.workable ~= nil then --摧毁对象
+                    if v.components.workable:CanBeWorked() then
+                        v.components.workable:Destroy(inst)
+                    end
+                elseif v.components.health ~= nil and not v.components.health:IsDead() then --攻击并麻痹
                     if v.components.combat ~= nil then
                         v.components.combat:GetAttacked(inst,
                             GetDamage(inst, v:HasTag("player") and heavyhack_damage or heavyhack_damage*3))

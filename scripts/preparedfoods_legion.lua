@@ -166,16 +166,15 @@ local foods_legion = {
 
         prefabs = { "debuff_panicvolcano" },
         oneat_desc = STRINGS.UI.COOKBOOK.DISH_SUGARLESSTRICKMAKERCUPCAKES,
-        oneatenfn = function(inst, eater)   --食用时，吸收周围没有携带糖的玩家的精神值加给自己，否则就偷走糖
+        oneatenfn = function(inst, eater) --食用时，吸收周围没有携带糖的玩家的精神值加给自己，否则就偷走糖
             if eater.components.inventory == nil then
                 return
             end
 
             local x1, y1, z1 = eater.Transform:GetWorldPosition()
-            local ents = TheSim:FindEntities(x1, y1, z1, 25, { "player" }, { "NOCLICK", "playerghost", "INLIMBO" })
+            local ents = TheSim:FindEntities(x1, y1, z1, 25, { "player" }, TOOLS_L.TagsCombat1())
             local sanitycount = 0
-
-            for i, ent in pairs(ents) do
+            for _, ent in ipairs(ents) do
                 if
                     ent ~= eater and ent.entity:IsVisible() and
                     ent.components.health ~= nil and not ent.components.health:IsDead() and
@@ -203,7 +202,6 @@ local foods_legion = {
                     end
                 end
             end
-
             if eater.components.sanity ~= nil and sanitycount > 0 then
                 eater.components.sanity:DoDelta(25 * sanitycount)
             end
@@ -236,13 +234,14 @@ local foods_legion = {
         oneat_desc = STRINGS.UI.COOKBOOK.DISH_FLOWERMOONCAKE,
         oneatenfn = function(inst, eater)   --食用时，周围队友越多，回复量越多
             local nummiss = 0
-            local numlove =  0
+            local numlove = 0
 
-             --计算周围有多少思念对象
+            --计算周围有多少思念对象
             if eater.prefab ~= "wx78" and not TheWorld.state.isnewmoon then --wx78没有思念对象，同时排除新月
                 local x, y, z = inst.Transform:GetWorldPosition()
                 if eater.prefab == "wormwood" then --沃姆伍德对植物有思念
-                    local ents = TheSim:FindEntities(x, y, z, 18, nil, { "INLIMBO", "wall", "structure" }, { "_combat", "plant" })
+                    local ents = TheSim:FindEntities(x, y, z, 18,
+                        nil, { "INLIMBO", "wall", "structure", "balloon", "notarget" }, { "_combat", "plant" })
                     for _, ent in ipairs(ents) do
                         if ent ~= eater then
                             if ent:HasTag("player") then
@@ -251,7 +250,7 @@ local foods_legion = {
                                 ent:HasTag("companion")
                                 or ent:HasTag("plant") or ent:HasTag("veggie") --普通植物，不管是否枯萎
                                 or (ent.components.crop ~= nil and not ent:HasTag("withered")) --未枯萎的作物
-                                or (eater.components.leader ~= nil and eater.components.leader:IsFollower(ent)) --跟随者
+                                or TOOLS_L.IsMyFollower(eater, ent) --跟随者
                             then
                                 nummiss = nummiss + 1
                             end
@@ -261,8 +260,9 @@ local foods_legion = {
                     if eater.prefab == "woodie" then --伍迪自带露西斧的加成
                         numlove = numlove + 1
                     end
-                    local ents = TheSim:FindEntities(x, y, z, 18, { "_combat" }, { "INLIMBO", "wall", "structure" })
-                    for i, ent in ipairs(ents) do
+                    local ents = TheSim:FindEntities(x, y, z, 18,
+                        { "_combat" }, { "INLIMBO", "wall", "structure", "balloon", "notarget" }, nil)
+                    for _, ent in ipairs(ents) do
                         if ent ~= eater then
                             if
                                 CONFIGS_LEGION.ENABLEDMODS.MythWords
@@ -292,7 +292,7 @@ local foods_legion = {
                                 ent:HasTag("companion")
                                 or (eater:HasTag("shadowmagic") and ent:HasTag("shadowminion")) --麦克斯韦的暗影随从
                                 or (eater:HasTag("spiderwhisperer") and ent:HasTag("spider")) --韦伯的蜘蛛
-                                or (eater.components.leader ~= nil and eater.components.leader:IsFollower(ent)) --跟随者
+                                or TOOLS_L.IsMyFollower(eater, ent) --跟随者
                             then
                                 nummiss = nummiss + 1
                             end
