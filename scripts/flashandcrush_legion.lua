@@ -1,10 +1,8 @@
 local prefabFiles = {
-    "fimbul_axe",               --芬布尔之斧
     "fimbul_fx",                --芬布尔相关fx
     "boss_elecarmet",           --莱克阿米特
     "elecourmaline",            --电气重铸台
     "hat_cowboy",               --牛仔套装
-    "dualwrench",               --扳手-双用型
     "icire_rock",               --鸳鸯石
     "guitar_miguel",            --米格尔的吉他
     "legion_soul_fx",           --灵魂契约特效

@@ -9,7 +9,6 @@ for k,v in pairs(prefabFiles) do
     table.insert(PrefabFiles, v)
 end
 if CONFIGS_LEGION.DRESSUP then
-    table.insert(PrefabFiles, "pinkstaff") --幻象法杖
     table.insert(PrefabFiles, "theemperorsnewclothes") --国王的新衣
 end
 

@@ -24,7 +24,6 @@ local prefabs_never = {
     "neverfade_shield",
     "buff_butterflysblessing"
 }
-
 local uses_never = 250
 
 local function ChangeSymbol_never(inst, owner, skindata)
@@ -900,7 +899,698 @@ local function Fn_orchid()
     return inst
 end
 
-return Prefab("neverfade", Fn_never, assets_never, prefabs_never),
-        Prefab("rosorns", Fn_rose, assets_rose),
-        Prefab("lileaves", Fn_lily, assets_lily),
-        Prefab("orchitwigs", Fn_orchid, assets_orchid, prefabs_orchid)
+--------------------------------------------------------------------------
+--[[ 多变的云 ]]
+--------------------------------------------------------------------------
+
+local assets_bookweather = {
+    Asset("ANIM", "anim/book_weather.zip"),
+    Asset("ATLAS", "images/inventoryimages/book_weather.xml"),
+    Asset("IMAGE", "images/inventoryimages/book_weather.tex")
+}
+local prefabs_bookweather = {
+    "waterballoon_splash", "fx_book_rain", "fx_book_rain_mount"
+}
+
+local function FixSymbol_bookweather(owner, data) --因为书籍的攻击贴图会因为读书而被替换，所以这里重新覆盖一次
+    if data and data.statename == "attack" then
+        -- owner.AnimState:OverrideSymbol("book_open", "book_weather", "book_open")
+        owner.AnimState:OverrideSymbol("book_closed", "book_weather", "book_closed") --书籍攻击贴图在这里面
+    end
+end
+local function OnEquip_bookweather(inst, owner)
+    owner.AnimState:ClearOverrideSymbol("swap_object") --清除上一把武器的贴图效果，因为一般武器卸下时都不清除贴图
+    owner.AnimState:OverrideSymbol("book_open", "book_weather", "book_open")
+    owner.AnimState:OverrideSymbol("book_closed", "book_weather", "book_closed")
+    -- owner.AnimState:OverrideSymbol("book_open_pages", "book_weather", "book_open_pages")
+
+    if owner:HasTag("equipmentmodel") then --假人！
+        return
+    end
+
+    TOOLS_L.AddTag(owner, "ignorewet", inst.prefab)
+    inst:ListenForEvent("newstate", FixSymbol_bookweather, owner)
+end
+local function OnUnequip_bookweather(inst, owner)
+    owner.AnimState:Hide("ARM_carry")
+    owner.AnimState:Show("ARM_normal")
+
+    --还原书的贴图
+    owner.AnimState:OverrideSymbol("book_open", "player_actions_uniqueitem", "book_open")
+    owner.AnimState:OverrideSymbol("book_closed", "player_actions_uniqueitem", "book_closed")
+    -- owner.AnimState:OverrideSymbol("book_open_pages", "player_actions_uniqueitem", "book_open_pages")
+
+    TOOLS_L.RemoveTag(owner, "ignorewet", inst.prefab)
+    inst:RemoveEventCallback("newstate", FixSymbol_bookweather, owner)
+end
+local function OnAttack_bookweather(inst, owner, target)
+    if target ~= nil and target:IsValid() then
+        SpawnPrefab("waterballoon_splash").Transform:SetPosition(target.Transform:GetWorldPosition())
+        inst.components.wateryprotection:SpreadProtection(target) --潮湿度组件增加潮湿
+
+        if
+            target.components.health ~= nil and not target.components.health:IsDead() and
+            not target:HasTag("likewateroffducksback")
+        then
+            if target.components.inventoryitem ~= nil then --物品组件增加潮湿
+                target.components.inventoryitem:AddMoisture(TUNING.OCEAN_WETNESS)
+                return
+            end
+
+            if target.task_l_iswet == nil then
+                if target:HasTag("wet") then
+                    return
+                end
+                target:AddTag("wet") --标签方式增加潮湿
+            else
+                target.task_l_iswet:Cancel()
+            end
+            target.task_l_iswet = target:DoTaskInTime(15, function()
+                target:RemoveTag("wet")
+                target.task_l_iswet = nil
+            end)
+        end
+    end
+end
+local function OnWateryProtection_bookweather(inst, x, y, z)
+    inst.components.finiteuses:Use(1)
+end
+local function ConsumeUse_bookweather(self)
+    self.inst.components.finiteuses:Use(20) --可以使用15次
+end
+
+local function OnRead_bookweather(inst, reader)
+    -- if TheWorld.state.israining or TheWorld.state.issnowing then
+    --     TheWorld:PushEvent("ms_forceprecipitation", false)
+    -- else
+    --     TheWorld:PushEvent("ms_forceprecipitation", true)
+    -- end
+    if TheWorld.state.precipitation ~= "none" then
+        TheWorld:PushEvent("ms_forceprecipitation", false)
+    else
+        TheWorld:PushEvent("ms_forceprecipitation", true)
+    end
+
+    local x, y, z = reader.Transform:GetWorldPosition()
+    local size = TILE_SCALE
+
+    for i = x-size, x+size do
+        for j = z-size, z+size do
+            if TheWorld.Map:GetTileAtPoint(i, 0, j) == WORLD_TILES.FARMING_SOIL then
+                TheWorld.components.farming_manager:AddSoilMoistureAtPoint(i, y, j, 100)
+            end
+        end
+    end
+
+    return true
+end
+local function OnPeruse_bookweather(inst, reader)
+    if reader.prefab == "wurt" then
+        if TheWorld.state.israining or TheWorld.state.issnowing then --雨雪天时，书中全是关于放晴的字眼，沃特不喜欢
+            inst.components.book:SetPeruseSanity(-TUNING.SANITY_LARGE)
+            reader.components.talker:Say(GetString(reader, "ANNOUNCE_READ_BOOK","BOOK_WEATHER_SUNNY"))
+        else --晴天时，书中全是关于下雨的字眼，沃特好喜欢
+            inst.components.book:SetPeruseSanity(TUNING.SANITY_LARGE)
+            reader.components.talker:Say(GetString(reader, "ANNOUNCE_READ_BOOK","BOOK_WEATHER_RAINY"))
+        end
+    else
+        if reader.peruse_weather ~= nil then
+            reader.peruse_weather(reader)
+        end
+        if reader.components.talker ~= nil then
+            reader.components.talker:Say(GetString(reader, "ANNOUNCE_READ_BOOK","BOOK_WEATHER"))
+        end
+    end
+
+    return true
+end
+
+local function Fn_bookweather()
+    local inst = CreateEntity()
+
+    inst.entity:AddTransform()
+    inst.entity:AddAnimState()
+    inst.entity:AddNetwork()
+
+    MakeInventoryPhysics(inst)
+
+    inst.AnimState:SetBank("book_weather")
+    inst.AnimState:SetBuild("book_weather")
+    inst.AnimState:PlayAnimation("idle")
+
+    inst:AddTag("book") --加入book标签就能使攻击时使用人物的书本攻击的动画
+    inst:AddTag("bookcabinet_item") --能放入书柜的标签
+    inst:AddTag("weapon")
+
+    MakeInventoryFloatable(inst, "med", 0.1, 0.75)
+
+    inst.entity:SetPristine()
+    if not TheWorld.ismastersim then
+        return inst
+    end
+
+    inst.swap_build = "book_weather"
+    inst.swap_prefix = "book"
+
+    inst:AddComponent("inventoryitem")
+    inst.components.inventoryitem.imagename = "book_weather"
+    inst.components.inventoryitem.atlasname = "images/inventoryimages/book_weather.xml"
+
+    inst:AddComponent("inspectable")
+
+    inst:AddComponent("equippable")
+    inst.components.equippable:SetOnEquip(OnEquip_bookweather)
+    inst.components.equippable:SetOnUnequip(OnUnequip_bookweather)
+
+    inst:AddComponent("weapon")
+    inst.components.weapon:SetDamage(50)
+    inst.components.weapon:SetOnAttack(OnAttack_bookweather)
+
+    inst:AddComponent("wateryprotection")
+    inst.components.wateryprotection.extinguishheatpercent = TUNING.WATERBALLOON_EXTINGUISH_HEAT_PERCENT
+    inst.components.wateryprotection.temperaturereduction = TUNING.WATERBALLOON_TEMP_REDUCTION
+    inst.components.wateryprotection.witherprotectiontime = TUNING.WATERBALLOON_PROTECTION_TIME
+    inst.components.wateryprotection.addwetness = TUNING.WATERBALLOON_ADD_WETNESS
+    inst.components.wateryprotection.onspreadprotectionfn = OnWateryProtection_bookweather
+    if TheNet:GetPVPEnabled() then
+        inst.components.wateryprotection:AddIgnoreTag("ignorewet")  --PVP，防止使用者被打湿
+    else
+        inst.components.wateryprotection:AddIgnoreTag("player")  --PVE，防止所有玩家被打湿
+    end
+
+    inst:AddComponent("finiteuses")
+    inst.components.finiteuses:SetMaxUses(300)
+    inst.components.finiteuses:SetUses(300)
+    inst.components.finiteuses:SetOnFinished(inst.Remove)
+
+    inst:AddComponent("book")
+    inst.components.book:SetOnRead(OnRead_bookweather)
+    inst.components.book:SetOnPeruse(OnPeruse_bookweather)
+    inst.components.book:SetReadSanity(-TUNING.SANITY_LARGE) --读书的精神消耗
+    -- inst.components.book:SetPeruseSanity() --阅读的精神消耗/增益
+    inst.components.book:SetFx("fx_book_rain", "fx_book_rain_mount")
+    inst.components.book.ConsumeUse = ConsumeUse_bookweather
+
+    inst:AddComponent("fuel")
+    inst.components.fuel.fuelvalue = TUNING.MED_FUEL
+
+    MakeSmallBurnable(inst, TUNING.MED_BURNTIME)
+    MakeSmallPropagator(inst)
+
+    MakeHauntableLaunch(inst)
+
+    return inst
+end
+
+--------------------------------------------------------------------------
+--[[ 幻象法杖 ]]
+--------------------------------------------------------------------------
+
+local assets_staffpink = {
+    Asset("ANIM", "anim/pinkstaff.zip"),
+    Asset("ANIM", "anim/swap_pinkstaff.zip"),
+    Asset("ATLAS", "images/inventoryimages/pinkstaff.xml"),
+    Asset("IMAGE", "images/inventoryimages/pinkstaff.tex")
+}
+
+local function OnFinished_staffpink(inst)
+    inst.SoundEmitter:PlaySound("dontstarve/common/gem_shatter")
+    inst:Remove()
+end
+local function OnEquip_staffpink(inst, owner)
+    local skindata = inst.components.skinedlegion:GetSkinedData()
+    if skindata ~= nil then
+        if skindata.equip ~= nil then
+            owner.AnimState:OverrideSymbol("swap_object", skindata.equip.build, skindata.equip.file)
+        else
+            owner.AnimState:OverrideSymbol("swap_object", "swap_pinkstaff", "swap_pinkstaff")
+        end
+        if skindata.equipfx ~= nil then
+            skindata.equipfx.start(inst, owner)
+        end
+    else
+        owner.AnimState:OverrideSymbol("swap_object", "swap_pinkstaff", "swap_pinkstaff")
+    end
+    owner.AnimState:Show("ARM_carry")
+    owner.AnimState:Hide("ARM_normal")
+end
+local function OnUnequip_staffpink(inst, owner)
+    local skindata = inst.components.skinedlegion:GetSkinedData()
+    if skindata ~= nil and skindata.equipfx ~= nil then
+        skindata.equipfx.stop(inst, owner)
+    end
+    owner.AnimState:Hide("ARM_carry")
+    owner.AnimState:Show("ARM_normal")
+end
+local function DressUpItem(staff, target)
+    local caster = staff.components.inventoryitem.owner
+    if caster ~= nil and caster.components.dressup ~= nil then
+        if target == nil then --解除幻化（右键装备栏的法杖）
+            caster.components.dressup:TakeOffAll()
+        elseif target == caster then --解除幻化（右键玩家自己）
+            caster.components.dressup:TakeOffAll()
+        else                  --添加幻化
+            local didit = caster.components.dressup:PutOn(target)
+            if didit then
+                caster.SoundEmitter:PlaySound("dontstarve/common/staff_dissassemble")
+                if caster.components.sanity ~= nil then
+                    caster.components.sanity:DoDelta(-10)
+                end
+                staff.components.finiteuses:Use(1)
+            end
+        end
+    end
+end
+local function DressUpTest(doer, target, pos)
+    if target == nil then --解除幻化，也是可以生效的
+        return true
+    elseif target == doer then --对自己施法：解除幻化
+        return true
+    elseif DRESSUP_DATA_LEGION[target.prefab] ~= nil then
+        return true
+    end
+    return false
+end
+
+local function Fn_staffpink()
+    local inst = CreateEntity()
+
+    inst.entity:AddTransform()
+    inst.entity:AddAnimState()
+    inst.entity:AddSoundEmitter()
+    inst.entity:AddNetwork()
+
+    MakeInventoryPhysics(inst)
+
+    inst.AnimState:SetBank("pinkstaff")
+    inst.AnimState:SetBuild("pinkstaff")
+    inst.AnimState:PlayAnimation("anim")
+
+    inst:AddTag("nopunch") --这个标签的作用应该是让本身没有武器组件的道具用武器攻击的动作，而不是用拳头攻击的动作
+
+    inst:AddComponent("skinedlegion")
+    inst.components.skinedlegion:InitWithFloater("pinkstaff")
+
+    inst.entity:SetPristine()
+    if not TheWorld.ismastersim then
+        return inst
+    end
+
+    inst.fxcolour = { 255/255, 80/255, 173/255 }
+
+    inst:AddComponent("finiteuses")
+    inst.components.finiteuses:SetMaxUses(30)
+    inst.components.finiteuses:SetUses(30)
+    inst.components.finiteuses:SetOnFinished(OnFinished_staffpink)
+
+    inst:AddComponent("inspectable")
+
+    inst:AddComponent("inventoryitem")
+    inst.components.inventoryitem.imagename = "pinkstaff"
+    inst.components.inventoryitem.atlasname = "images/inventoryimages/pinkstaff.xml"
+
+    inst:AddComponent("tradable")
+
+    inst:AddComponent("equippable")
+    inst.components.equippable:SetOnEquip(OnEquip_staffpink)
+    inst.components.equippable:SetOnUnequip(OnUnequip_staffpink)
+
+    inst:AddComponent("spellcaster")
+    inst.components.spellcaster.canuseontargets = true
+    inst.components.spellcaster.canusefrominventory = true
+    inst.components.spellcaster:SetSpellFn(DressUpItem)
+    inst.components.spellcaster:SetCanCastFn(DressUpTest)
+
+    MakeHauntableLaunch(inst)
+
+    inst.components.skinedlegion:SetOnPreLoad()
+
+    return inst
+end
+
+--------------------------------------------------------------------------
+--[[ 芬布尔斧 ]]
+--------------------------------------------------------------------------
+
+local assets_fimbulaxe = {
+    Asset("ANIM", "anim/fimbul_axe.zip"),
+    Asset("ATLAS", "images/inventoryimages/fimbul_axe.xml"),
+    Asset("IMAGE", "images/inventoryimages/fimbul_axe.tex"),
+    Asset("ANIM", "anim/boomerang.zip") --官方回旋镖动画模板
+}
+local prefabs_fimbulaxe = {
+    "fimbul_lightning",
+    "fimbul_cracklebase_fx"
+}
+local atk_fimbulaxe = TUNING.BASE_SURVIVOR_ATTACK*0.4 --13.6
+
+local function OnFinished_fimbulaxe(inst)
+    inst.AnimState:PlayAnimation("used")
+    inst:ListenForEvent("animover", inst.Remove)
+
+    local skindata = inst.components.skinedlegion:GetSkinedData()
+    if skindata ~= nil and skindata.fn_onThrownEnd ~= nil then
+        skindata.fn_onThrownEnd(inst)
+    end
+
+    if inst.returntask ~= nil then
+        inst.returntask:Cancel()
+        inst.returntask = nil
+    end
+end
+local function OnEquip_fimbulaxe(inst, owner)
+    local skindata = inst.components.skinedlegion:GetSkinedData()
+    if skindata ~= nil and skindata.equip ~= nil then
+        owner.AnimState:OverrideSymbol("swap_object", skindata.equip.build, skindata.equip.file)
+    else
+        owner.AnimState:OverrideSymbol("swap_object", "fimbul_axe", "swap_base")
+    end
+    owner.AnimState:Show("ARM_carry")
+    owner.AnimState:Hide("ARM_normal")
+end
+local function OnDropped_fimbulaxe(inst)
+    inst.AnimState:PlayAnimation("idle")
+    inst.components.inventoryitem.pushlandedevents = true
+    inst.components.inventoryitem.canbepickedup = true
+    inst:PushEvent("on_landed")
+
+    local skindata = inst.components.skinedlegion:GetSkinedData()
+    if skindata ~= nil and skindata.fn_onThrownEnd ~= nil then
+        skindata.fn_onThrownEnd(inst)
+    end
+end
+local function OnUnequip_fimbulaxe(inst, owner)
+    owner.AnimState:Hide("ARM_carry")
+    owner.AnimState:Show("ARM_normal")
+end
+local function OnThrown_fimbulaxe(inst, owner, target)
+    if owner and owner.SoundEmitter ~= nil then
+        owner.SoundEmitter:PlaySound("dontstarve/wilson/boomerang_throw")
+    end
+    inst.AnimState:PlayAnimation("spin_loop", true)
+    inst.components.inventoryitem.pushlandedevents = false
+    inst.components.inventoryitem.canbepickedup = false
+
+    local skindata = inst.components.skinedlegion:GetSkinedData()
+    if skindata ~= nil and skindata.fn_onThrown ~= nil then
+        skindata.fn_onThrown(inst, owner, target)
+    end
+end
+local function ReturnToOwner_fimbulaxe(inst, owner)
+    OnDropped_fimbulaxe(inst)
+    if owner ~= nil and owner:IsValid() then
+        -- owner.SoundEmitter:PlaySound("dontstarve/wilson/boomerang_return")
+        -- inst.components.projectile:Throw(owner, owner)
+
+        if not (owner.components.health ~= nil and owner.components.health:IsDead()) then --玩家还活着，自动接住
+            --如果使用者已装备手持武器，就放进物品栏，没有的话就直接装备上
+            if not owner.components.inventory:GetEquippedItem(inst.components.equippable.equipslot) then
+                owner.components.inventory:Equip(inst)
+            else
+                owner.components.inventory:GiveItem(inst)
+            end
+        end
+    end
+end
+local function GiveSomeShock(inst, owner, target, doshock, hittarget) --击中时的特殊效果
+    local givelightning = false
+    local tags_cant
+    local tags_one
+    local validfn
+    if TheNet:GetPVPEnabled() then
+        tags_cant = TOOLS_L.TagsCombat3({ "lightningblocker" }) --排除了水中木
+        validfn = TOOLS_L.MaybeEnemy_me
+    else
+        tags_cant = TOOLS_L.TagsCombat3({ "lightningblocker", "player" })
+        validfn = TOOLS_L.MaybeEnemy_player
+    end
+    if doshock then
+        tags_one = { "_combat", "shockable", "CHOP_workable" }
+    else
+        tags_one = { "_combat", "CHOP_workable" }
+    end
+
+    local x, y, z
+    if target ~= nil and target:IsValid() then
+        x, y, z = target.Transform:GetWorldPosition()
+    else
+        target = nil
+        x, y, z = inst.Transform:GetWorldPosition()
+    end
+    if owner ~= nil and not owner:IsValid() then
+        owner = nil
+    end
+
+    local dmg, spdmg, stimuli
+    local ents = TheSim:FindEntities(x, y, z, 3, nil, tags_cant, tags_one)
+    for _, v in ipairs(ents) do
+        if v ~= owner and v.entity:IsVisible() then
+            if v.components.workable ~= nil then --直接破坏可以砍的物体
+                if v.components.workable:CanBeWorked() and v.components.lightningblocker == nil then
+                    v.components.workable:Destroy(inst)
+                end
+            elseif (hittarget or v ~= target) or doshock then
+                if validfn(owner, v, true) then
+                    if (hittarget or v ~= target) and v.components.combat:CanBeAttacked(owner) then
+                        if owner ~= nil and owner.components.combat ~= nil then
+                            dmg, spdmg, stimuli = TOOLS_L.CalcDamage(owner, v, inst, inst, nil, nil, nil, true)
+                        else --没办法，此时玩家的组件已经没法用了
+                            dmg = atk_fimbulaxe
+                            spdmg = nil
+                            stimuli = "electric"
+                        end
+                        v.components.combat:GetAttacked(owner, dmg, inst, stimuli, spdmg)
+                    end
+                    if doshock and v.components.shockable ~= nil and math.random() < 0.3 then
+                        givelightning = true
+                        v.components.shockable:Shock(6)
+                    end
+                end
+            end
+        end
+    end
+
+    if givelightning then
+        local skindata = inst.components.skinedlegion:GetSkinedData()
+        if skindata ~= nil and skindata.fn_onLightning ~= nil then
+            skindata.fn_onLightning(inst, owner, target)
+            return
+        end
+
+        if not TheWorld:HasTag("cave") then
+            local lightning = SpawnPrefab("fimbul_lightning")
+            lightning.Transform:SetPosition(x, y, z)
+        end
+        local cracklebase = SpawnPrefab("fimbul_cracklebase_fx")
+        cracklebase.Transform:SetPosition(x, y, z)
+    end
+end
+local function DelayReturnToOwner(inst, owner, target)
+    inst.returntask = inst:DoTaskInTime(0.6, function(inst)
+        inst.returntask = inst:DoTaskInTime(0.4, function(inst)
+            ReturnToOwner_fimbulaxe(inst, owner)
+            inst.returntask = nil
+        end)
+        GiveSomeShock(inst, owner, target, false, true)
+    end)
+end
+local function OnPreHit_fimbulaxe(inst, owner, target) --击中前
+    GiveSomeShock(inst, owner, target, true, false)
+end
+local function OnHit_fimbulaxe(inst, owner, target) --击中后
+    if inst:IsValid() and inst.components.finiteuses:GetUses() > 0 then --耐久可能是用完了
+        DelayReturnToOwner(inst, owner, target)
+    end
+end
+local function OnMiss_fimbulaxe(inst, owner, target)
+    if owner == target then
+        ReturnToOwner_fimbulaxe(inst, owner)
+    else
+        DelayReturnToOwner(inst, owner, target)
+    end
+end
+local function OnLightning_fimbulaxe(inst) --因为拿在手上会有"INLIMBO"标签，所以装备时并不会吸引闪电，只有放在地上时才会
+    GiveSomeShock(inst, nil, nil, true, true)
+    if inst.components.finiteuses:GetPercent() < 1 then
+        inst.components.finiteuses:Repair(10)
+    end
+end
+
+local function Fn_fimbulaxe()
+    local inst = CreateEntity()
+
+    inst.entity:AddTransform()
+    inst.entity:AddAnimState()
+    inst.entity:AddNetwork()
+
+    MakeInventoryPhysics(inst)
+    RemovePhysicsColliders(inst)
+
+    inst.AnimState:SetBank("boomerang")
+    inst.AnimState:SetBuild("fimbul_axe")
+    inst.AnimState:PlayAnimation("idle")
+    inst.AnimState:SetRayTestOnBB(true)
+
+    inst:AddTag("thrown")
+    inst:AddTag("lightningrod") --避雷针标签，会吸引闪电
+    inst:AddTag("weapon")
+    inst:AddTag("projectile")
+
+    -- MakeInventoryFloatable(inst, "med", 0.1, {1.3, 0.6, 1.3}, true, -9, {
+    --     sym_build = "swap_fimbul_axe",
+    --     sym_name = "swap_fimbul_axe",
+    --     bank = "fimbul_axe",
+    --     anim = "idle"
+    -- })
+    inst:AddComponent("skinedlegion")
+    inst.components.skinedlegion:InitWithFloater("fimbul_axe")
+
+    inst.entity:SetPristine()
+    if not TheWorld.ismastersim then
+        return inst
+    end
+
+    -- inst.returntask = nil
+
+    inst:AddComponent("weapon")
+    inst.components.weapon:SetDamage(atk_fimbulaxe)
+    inst.components.weapon:SetRange(TUNING.BOOMERANG_DISTANCE, TUNING.BOOMERANG_DISTANCE + 2)
+    inst.components.weapon:SetElectric() --设置为带电的武器，带电武器自带攻击加成
+
+    inst:AddComponent("finiteuses")
+    inst.components.finiteuses:SetMaxUses(250)
+    inst.components.finiteuses:SetUses(250)
+    inst.components.finiteuses:SetOnFinished(OnFinished_fimbulaxe)
+
+    inst:AddComponent("inspectable")
+
+    inst:AddComponent("projectile")
+    inst.components.projectile:SetSpeed(15)
+    --inst.components.projectile:SetCanCatch(true)      --默认，不能被主动抓住
+    inst.components.projectile:SetOnThrownFn(OnThrown_fimbulaxe)  --扔出时
+    inst.components.projectile:SetOnPreHitFn(OnPreHit_fimbulaxe)  --敌方或者自己被击中前
+    inst.components.projectile:SetOnHitFn(OnHit_fimbulaxe)        --敌方或者自己被击中后
+    inst.components.projectile:SetOnMissFn(OnMiss_fimbulaxe)      --丢失目标时
+    --inst.components.projectile:SetOnCaughtFn(OnCaught)--被抓住时
+
+    inst:AddComponent("inventoryitem")
+    inst.components.inventoryitem.imagename = "fimbul_axe"
+    inst.components.inventoryitem.atlasname = "images/inventoryimages/fimbul_axe.xml"
+    inst.components.inventoryitem:SetOnDroppedFn(OnDropped_fimbulaxe)
+
+    inst:AddComponent("equippable")
+    inst.components.equippable:SetOnEquip(OnEquip_fimbulaxe)
+    inst.components.equippable:SetOnUnequip(OnUnequip_fimbulaxe)
+
+    inst:ListenForEvent("lightningstrike", OnLightning_fimbulaxe)
+
+    MakeHauntableLaunch(inst)
+
+    inst.components.skinedlegion:SetOnPreLoad()
+
+    return inst
+end
+
+--------------------------------------------------------------------------
+--[[ 扳手-双用型 ]]
+--------------------------------------------------------------------------
+
+local assets_dualwrench = {
+    Asset("ANIM", "anim/dualwrench.zip"),
+    Asset("ANIM", "anim/swap_dualwrench.zip"),
+    Asset("ATLAS", "images/inventoryimages/dualwrench.xml"),
+    Asset("IMAGE", "images/inventoryimages/dualwrench.tex")
+}
+
+local function OnEquip_dualwrench(inst, owner)
+    owner.AnimState:OverrideSymbol("swap_object", "swap_dualwrench", "swap_dualwrench")
+    owner.AnimState:Show("ARM_carry")
+    owner.AnimState:Hide("ARM_normal")
+end
+local function OnUnequip_dualwrench(inst, owner)
+    owner.AnimState:Hide("ARM_carry")
+    owner.AnimState:Show("ARM_normal")
+end
+
+local function Fn_dualwrench()
+    local inst = CreateEntity()
+
+    inst.entity:AddTransform()
+    inst.entity:AddAnimState()
+    inst.entity:AddSoundEmitter()
+    inst.entity:AddNetwork()
+
+    MakeInventoryPhysics(inst)
+
+    inst.AnimState:SetBank("dualwrench")
+    inst.AnimState:SetBuild("dualwrench")
+    inst.AnimState:PlayAnimation("idle")
+
+    inst:AddTag("hammer")
+    inst:AddTag("weapon")
+
+    --tool (from tool component) added to pristine state for optimization
+    inst:AddTag("tool")
+
+    MakeInventoryFloatable(inst, "med", 0.1, {1.1, 0.5, 1.1}, true, -9, {
+        sym_build = "swap_dualwrench",
+        sym_name = "swap_dualwrench",
+        bank = "dualwrench",
+        anim = "idle"
+    })
+
+    inst.entity:SetPristine()
+    if not TheWorld.ismastersim then
+        return inst
+    end
+
+    inst:AddComponent("weapon")
+    inst.components.weapon:SetDamage(TUNING.HAMMER_DAMAGE)
+
+    inst:AddComponent("inventoryitem")
+    inst.components.inventoryitem.imagename = "dualwrench"
+    inst.components.inventoryitem.atlasname = "images/inventoryimages/dualwrench.xml"
+
+    inst:AddComponent("tool")
+    inst.components.tool:SetAction(ACTIONS.HAMMER) --添加锤子功能
+
+    --添加草叉功能
+    inst:AddInherentAction(ACTIONS.TERRAFORM)
+    inst:AddComponent("terraformer")
+    inst:AddComponent("carpetpullerlegion")
+
+    inst:AddComponent("finiteuses")
+    inst.components.finiteuses:SetMaxUses(TUNING.HAMMER_USES) --总共75次，可攻击75次
+    inst.components.finiteuses:SetUses(TUNING.HAMMER_USES)
+    inst.components.finiteuses:SetOnFinished(inst.Remove)
+
+    --设置每种功能的消耗量
+    inst.components.finiteuses:SetConsumption(ACTIONS.HAMMER, 0.3) --可以使用75/0.3=250次
+    inst.components.finiteuses:SetConsumption(ACTIONS.TERRAFORM, 0.3)
+
+    MakeHauntableLaunch(inst)
+
+    inst:AddComponent("inspectable")
+
+    inst:AddComponent("equippable")
+    inst.components.equippable:SetOnEquip(OnEquip_dualwrench)
+    inst.components.equippable:SetOnUnequip(OnUnequip_dualwrench)
+
+    return inst
+end
+
+-------------------------
+
+local prefs = {}
+table.insert(prefs, Prefab("neverfade", Fn_never, assets_never, prefabs_never))
+table.insert(prefs, Prefab("rosorns", Fn_rose, assets_rose))
+table.insert(prefs, Prefab("lileaves", Fn_lily, assets_lily))
+table.insert(prefs, Prefab("orchitwigs", Fn_orchid, assets_orchid, prefabs_orchid))
+table.insert(prefs, Prefab("book_weather", Fn_bookweather, assets_bookweather, prefabs_bookweather))
+if CONFIGS_LEGION.DRESSUP then
+    table.insert(prefs, Prefab("pinkstaff", Fn_staffpink, assets_staffpink))
+end
+table.insert(prefs, Prefab("fimbul_axe", Fn_fimbulaxe, assets_fimbulaxe, prefabs_fimbulaxe))
+table.insert(prefs, Prefab("dualwrench", Fn_dualwrench, assets_dualwrench))
+
+return unpack(prefs)

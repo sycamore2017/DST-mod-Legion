@@ -2332,7 +2332,7 @@ _G.SKINS_LEGION = {
         },
         equip = { symbol = "swap_object", build = "fimbul_axe_collector", file = "swap_base" },
         fn_onThrown = function(inst, owner, target)
-            if owner:HasTag("player") then
+            if owner ~= nil and owner:HasTag("player") then
                 owner.AnimState:OverrideSymbol("swap_object", "fimbul_axe_collector", "swap_throw")
                 owner.AnimState:Show("ARM_carry")
                 owner.AnimState:Hide("ARM_normal")
@@ -2348,7 +2348,12 @@ _G.SKINS_LEGION = {
             end, 0)
         end,
         fn_onLightning = function(inst, owner, target)
-            local x, y, z = target.Transform:GetWorldPosition()
+            local x, y, z
+            if target == nil then
+                x, y, z = inst.Transform:GetWorldPosition()
+            else
+                x, y, z = target.Transform:GetWorldPosition()
+            end
             local fx = SpawnPrefab("fimbul_axe_collector2_fx")
             if fx ~= nil then
                 fx.Transform:SetPosition(x, y, z)

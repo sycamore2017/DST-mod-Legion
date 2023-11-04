@@ -1017,7 +1017,7 @@ local function IsDigestible(item)
 	elseif item.prefab == "glommerflower" then
 		return not item:HasTag("glommerflower") --没有 glommerflower 就代表是枯萎了
     end
-	return not ITEMS_NODIGEST(item.prefab) and
+	return not ITEMS_NODIGEST[item.prefab] and
 		not item:HasTag("irreplaceable") and not item:HasTag("nobundling") and
 		not item:HasTag("nodigest_l")
 end

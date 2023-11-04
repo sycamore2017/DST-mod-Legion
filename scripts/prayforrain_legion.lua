@@ -1,7 +1,6 @@
 local prefabFiles = {
     "raindonate",               --雨蝇
     "monstrain",                --雨竹
-    "book_weather",             --气象之书
     "hat_mermbreathing",        --鱼之息
     "merm_scales",              --鱼鳞
     "giantsfoot",               --巨脚背包

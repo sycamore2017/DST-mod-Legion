@@ -389,6 +389,7 @@ local function MakeBoss(data)
 
             inst._count_atk = 0 --啄击次数
             inst._count_rock = 0 --喂食后需要掉落的子圭石数量
+            TOOLS_L.AddEntValue(inst, "siv_blood_l_reducer", data.name, 1, 0.75) --窃血抵抗
 
             inst.sounds = BossSounds
             inst.sign_l_treehalo = 0
@@ -403,6 +404,7 @@ local function MakeBoss(data)
                 inst.AnimState:OverrideSymbol("buzzard_eye", data.name, "buzzard_angryeye")
                 inst.Light:SetColour(255/255, 127/255, 82/255)
                 inst.components.combat:SetDefaultDamage(ATK_NORMAL+ATK_GRIEF)
+                TOOLS_L.AddEntValue(inst, "siv_blood_l_reducer", data.name, 1, 1)
                 if dotaunt then
                     inst:PushEvent("dotaunt")
                 end
