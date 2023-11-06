@@ -161,16 +161,15 @@ end
 AddStategraphPostInit("wilson", function(sg)
     for k, v in pairs(sg.actionhandlers) do
         if v["action"]["id"] == "ATTACK" then
-            local SGWilson_atk_handler_fn = v.deststate
-
+            local wilson_atk_handler_fn = v.deststate
             v.deststate = function(inst, action)
                 if inst.needcombat then
                     inst.sg.mem.localchainattack = not action.forced or nil
                     if not (inst.sg:HasStateTag("attack") and action.target == inst.sg.statemem.attacktarget or inst.components.health:IsDead()) then
-                        EquipFightItem(inst)    --攻击之前先换攻击装备
+                        EquipFightItem(inst) --攻击之前先换攻击装备
                     end
                 end
-                return SGWilson_atk_handler_fn(inst, action)
+                return wilson_atk_handler_fn(inst, action)
             end
 
             break
@@ -179,8 +178,7 @@ AddStategraphPostInit("wilson", function(sg)
 
     for k, v in pairs(sg.events) do
         if v["name"] == "locomote" then
-            local SGWilson_loco_event_fn = v.fn
-
+            local wilson_locomote_event_fn = v.fn
             v.fn = function(inst, data)
                 if inst.needrun then
                     if inst.sg:HasStateTag("busy") then
@@ -195,10 +193,19 @@ AddStategraphPostInit("wilson", function(sg)
                         EquipSpeedItem(inst)    --行走之前先换加速装备
                     end
                 end
-                return SGWilson_loco_event_fn(inst, data)
+                return wilson_locomote_event_fn(inst, data)
             end
-
-            break
+        elseif v["name"] == "knockback" then
+            local wilson_knockback_event_fn = v.fn
+            v.fn = function(inst, data)
+                if
+                    inst.shield_l_success and inst.components.inventory ~= nil and
+                    (inst.components.inventory:EquipHasTag("heavyarmor") or inst:HasTag("heavybody"))
+                then
+                    return
+                end
+                return wilson_knockback_event_fn(inst, data)
+            end
         end
     end
 end)

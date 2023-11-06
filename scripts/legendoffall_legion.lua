@@ -2020,4 +2020,20 @@ if IsServer then
             end
         end
     end)
+
+    ------果蝇们会掉落虫翅碎片
+    local function LootSetup_fruitfly(lootdropper)
+        if lootdropper.inst.lootsetupfn_old_l ~= nil then
+            lootdropper.inst.lootsetupfn_old_l(lootdropper)
+        end
+        lootdropper:AddChanceLoot("ahandfulofwings", 0.25)
+    end
+    local function FnSet_fruitfly(inst)
+        if inst.components.lootdropper ~= nil then
+            inst.lootsetupfn_old_l = inst.components.lootdropper.lootsetupfn
+            inst.components.lootdropper:SetLootSetupFn(LootSetup_fruitfly)
+        end
+    end
+    AddPrefabPostInit("fruitfly", FnSet_fruitfly)
+    AddPrefabPostInit("friendlyfruitfly", FnSet_fruitfly)
 end

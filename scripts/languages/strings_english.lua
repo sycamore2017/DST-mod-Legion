@@ -2246,7 +2246,8 @@ STRINGS.PLANT_CROP_L = {
     CTL2_2 = "Nutrient1 {n1}/{nu_max}, Nutrient2 {n2}/{nu_max}, Nutrient3 {n3}/{nu_max}.",
     CTL1_3 = "Moisture {mo}; Nutrient1 {n1}, Nutrient2 {n2}, Nutrient3 {n3}.",
     CTL2_3 = "Moisture {mo}/{mo_max}; Nutrient1 {n1}/{nu_max}, Nutrient2 {n2}/{nu_max}, Nutrient3 {n3}/{nu_max}.",
-    SIVTREE = "Life Energy {health}, Light Energy {light}."
+    SIVTREE = "Life Energy {health}, Light Energy {light}.",
+    POLLUTED = "Polluted, "
 }
 S_NAMES.PLANT_CARROT_L = "Carrot Cluster"
 S_NAMES.PLANT_CORN_L = "Corn Straw"

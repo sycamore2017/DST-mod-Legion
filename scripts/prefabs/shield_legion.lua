@@ -282,6 +282,7 @@ local function SetupEquippable_sand(inst)
     inst.components.equippable:SetOnEquip(OnEquip_sand)
     inst.components.equippable:SetOnUnequip(OnUnequip_sand)
     inst.components.equippable.insulated = true --设为true，就能防电
+    inst.components.equippable.walkspeedmult = 0.85
 end
 local foreverequip_sand= {
     -- anim = nil, anim_broken = "broken", fn_broken = nil, fn_repaired = nil,
@@ -305,6 +306,7 @@ MakeShield({
     fn_common = function(inst)
         inst:AddTag("rp_sand_l")
         inst:AddTag("show_broken_ui") --装备损坏后展示特殊物品栏ui
+        inst:AddTag("heavyarmor") --减轻击退效果 官方tag
 
         inst:AddComponent("skinedlegion")
         inst.components.skinedlegion:Init("shield_l_sand")
@@ -485,6 +487,11 @@ local function OnAttack_agron(inst, owner, target)
         owner.components.health:DoDelta(-1.5, true, "agronssword")
     end
 end
+local function SetOwnerDefense(inst, owner, revolt)
+    if owner.components.planardefense ~= nil then
+        owner.components.planardefense:AddBonus(inst, revolt and planardefense_sword or planardefense_shield)
+    end
+end
 local function TrySetOwnerSymbol(inst, doer, revolt)
     if doer == nil then --因为此时有可能不再是装备状态，doer 发生了改变
         doer = inst.components.inventoryitem:GetGrandOwner()
@@ -495,6 +502,7 @@ local function TrySetOwnerSymbol(inst, doer, revolt)
                 if inst == doer.components.inventory:GetEquippedItem(EQUIPSLOTS.HANDS) then
                     doer.AnimState:OverrideSymbol("lantern_overlay", inst._dd.build, revolt and "swap2" or "swap1")
                     inst.fn_onHealthDelta(doer, nil)
+                    SetOwnerDefense(inst, doer, revolt)
                 end
             end
         elseif doer:HasTag("equipmentmodel") then
@@ -517,7 +525,7 @@ local function DoRevolt(inst, doer)
         inst.components.weapon:SetDamage(damage_sword)
         inst.components.armor:SetAbsorption(absorb_sword)
         inst.components.planardamage:SetBaseDamage(planardamage_sword)
-        inst.components.planardefense:SetBaseDefense(planardefense_sword)
+        -- inst.components.planardefense:SetBaseDefense(planardefense_sword)
         inst.components.damagetypebonus:AddBonus("lunar_aligned", inst, bonus_sword, "revolt")
         inst.components.damagetyperesist:AddResist("shadow_aligned", inst, resist_sword, "revolt")
 
@@ -540,7 +548,7 @@ local function TimerDone_agron(inst, data)
         inst.components.weapon:SetDamage(damage_shield)
         inst.components.armor:SetAbsorption(absorb_shield)
         inst.components.planardamage:SetBaseDamage(planardamage_shield)
-        inst.components.planardefense:SetBaseDefense(planardefense_shield)
+        -- inst.components.planardefense:SetBaseDefense(planardefense_shield)
         inst.components.damagetypebonus:RemoveBonus("lunar_aligned", inst, "revolt")
         inst.components.damagetyperesist:RemoveResist("shadow_aligned", inst, "revolt")
 
@@ -554,17 +562,18 @@ local function TimerDone_agron(inst, data)
 end
 
 local function OnEquip_agron(inst, owner)
-    owner.AnimState:OverrideSymbol("lantern_overlay", inst._dd.build,
-        inst.components.timer:TimerExists("revolt") and "swap2" or "swap1")
+    local revolt = inst.components.timer:TimerExists("revolt")
+    owner.AnimState:OverrideSymbol("lantern_overlay", inst._dd.build, revolt and "swap2" or "swap1")
     owner.AnimState:HideSymbol("swap_object")
-    owner.AnimState:Show("ARM_carry") --显示持物手
-    owner.AnimState:Hide("ARM_normal") --隐藏普通的手
+    owner.AnimState:Show("ARM_carry")
+    owner.AnimState:Hide("ARM_normal")
     owner.AnimState:Show("LANTERN_OVERLAY")
 
     if owner:HasTag("equipmentmodel") then --假人！
         return
     end
 
+    SetOwnerDefense(inst, owner, revolt)
     if owner.components.health ~= nil then
         owner:ListenForEvent("death", DeathCallForRain)
         owner:ListenForEvent("healthdelta", inst.fn_onHealthDelta)
@@ -575,7 +584,9 @@ local function OnUnequip_agron(inst, owner)
     owner:RemoveEventCallback("death", DeathCallForRain)
     owner:RemoveEventCallback("healthdelta", inst.fn_onHealthDelta)
     inst.components.weapon:SetDamage(inst._basedamage) --卸下时，恢复攻击力，为了让巨人之脚识别到
-
+    if owner.components.planardefense ~= nil then
+        owner.components.planardefense:RemoveBonus(inst, nil)
+    end
     OnUnequipFn(inst, owner)
 end
 local function HealMe(doer, data)
@@ -663,8 +674,8 @@ MakeShield({
         inst:AddComponent("planardamage")
         inst.components.planardamage:SetBaseDamage(planardamage_shield)
 
-        inst:AddComponent("planardefense")
-	    inst.components.planardefense:SetBaseDefense(planardefense_shield)
+        -- inst:AddComponent("planardefense")
+	    -- inst.components.planardefense:SetBaseDefense(planardefense_shield)
 
         inst:AddComponent("damagetypebonus")
         inst.components.damagetypebonus:AddBonus("lunar_aligned", inst, bonus_shield)

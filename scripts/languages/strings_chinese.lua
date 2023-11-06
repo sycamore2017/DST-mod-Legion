@@ -2334,7 +2334,8 @@ STRINGS.PLANT_CROP_L = {
     CTL2_2 = "1号肥{n1}/{nu_max}，2号肥{n2}/{nu_max}，3号肥{n3}/{nu_max}。",
     CTL1_3 = "含水量{mo}；1号肥{n1}，2号肥{n2}，3号肥{n3}。",
     CTL2_3 = "含水量{mo}/{mo_max}；1号肥{n1}/{nu_max}，2号肥{n2}/{nu_max}，3号肥{n3}/{nu_max}。",
-    SIVTREE = "生命能量{health}，光耀能量{light}。"
+    SIVTREE = "生命能量{health}，光耀能量{light}。",
+    POLLUTED = "被污染，"
 }
 S_NAMES.PLANT_CARROT_L = "芾萝卜"
 S_NAMES.PLANT_CORN_L = "玉米杆"

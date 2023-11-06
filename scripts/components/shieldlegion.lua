@@ -13,11 +13,14 @@ local function DoShieldSound(doer, sound)
         doer.SoundEmitter:PlaySound(sound, nil, doer.hurtsoundvolume)
     end
 end
-local function ComputSpDamage(self, spdamage)
+local function ComputSpDamage(self, doer, spdamage)
     local resdamage = 0
     for sptype, dmg in pairs(spdamage) do
-        local def = SpDamageUtil.GetSpDefenseForType(self.inst, sptype)
-        if def > 0 then --如果该盾有对应的防御能力，就完全防住
+        local def = SpDamageUtil.GetSpDefenseForType(doer, sptype) --如果 doer 有对应的防御能力
+        if def <= 0 then
+            def = SpDamageUtil.GetSpDefenseForType(self.inst, sptype) --如果该盾有对应的防御能力
+        end
+        if def > 0 then
             resdamage = resdamage + dmg
             spdamage[sptype] = nil --挡下时，清除这个伤害
         end
@@ -102,7 +105,7 @@ function ShieldLegion:ArmorTakeDamage(doer, attacker, data)
         end
     end
 end
-function ShieldLegion:GetAttacked(doer, attacker, damage, weapon, stimuli, spdamage)
+function ShieldLegion:GetAttacked(doer, attacker, damage, weapon, spdamage, stimuli)
     if self.inst:HasTag("broken") or not self.canatk then
         return false
     end
@@ -145,15 +148,17 @@ function ShieldLegion:GetAttacked(doer, attacker, damage, weapon, stimuli, spdam
 
     if data.issuccess then
         if spdamage ~= nil then
-            data.otherdamage = ComputSpDamage(self, spdamage)
+            data.otherdamage = ComputSpDamage(self, doer, spdamage)
         end
         if data.isstay then
             if self.atkstayingfn ~= nil and doer ~= attacker then --不能自己盾反自己
                 self.atkstayingfn(self.inst, doer, attacker, data)
             end
         else
-            if doer.sg:HasStateTag("atk_shield") then --加入防打断标签，这样本次sg后续被攻击不会进入被攻击sg
-                doer.sg:AddStateTag("nointerrupt")
+            if doer.sg:HasStateTag("atk_shield") then
+                doer.sg:AddStateTag("nointerrupt") --防打断！这样本次sg后续被攻击不会进入被攻击sg
+                doer.sg:AddStateTag("nosleep") --防催眠！
+                doer.sg:AddStateTag("nofreeze") --防冻！
             end
             if self.atkfn ~= nil and doer ~= attacker then --不能自己盾反自己
                 self.atkfn(self.inst, doer, attacker, data)
@@ -168,7 +173,7 @@ function ShieldLegion:GetAttacked(doer, attacker, damage, weapon, stimuli, spdam
         return true
     elseif data.israngedweapon then --完全抵御远程攻击
         if spdamage ~= nil then
-            data.otherdamage = ComputSpDamage(self, spdamage)
+            data.otherdamage = ComputSpDamage(self, doer, spdamage)
         end
         DoShieldSound(doer, self.inst.hurtsoundoverride)
         self:ArmorTakeDamage(doer, attacker, data)

@@ -1,5 +1,14 @@
 local TOOLS_L = require("tools_legion")
 
+local function OnEquip_base(inst, owner)
+    owner.AnimState:Show("ARM_carry") --显示持物手
+    owner.AnimState:Hide("ARM_normal") --隐藏普通的手
+end
+local function OnUnequip_base(inst, owner)
+    owner.AnimState:Hide("ARM_carry") --隐藏持物手
+    owner.AnimState:Show("ARM_normal") --显示普通的手
+end
+
 --------------------------------------------------------------------------
 --[[ 永不凋零 ]]
 --------------------------------------------------------------------------
@@ -58,8 +67,7 @@ end
 
 local function OnEquip_never(inst, owner) --装备武器时
     ChangeSymbol_never(inst, owner, inst.components.skinedlegion:GetSkinedData())
-    owner.AnimState:Show("ARM_carry") --显示持物手
-    owner.AnimState:Hide("ARM_normal") --隐藏普通的手
+    OnEquip_base(inst, owner)
 
     inst.components.deployable:SetDeployMode(DEPLOYMODE.NONE) --装备时去除可栽种功能
 
@@ -99,9 +107,7 @@ local function OnEquip_never(inst, owner) --装备武器时
     end
 end
 local function OnUnequip_never(inst, owner) --放下武器时
-    owner.AnimState:Hide("ARM_carry") --隐藏持物手
-    owner.AnimState:Show("ARM_normal") --显示普通的手
-
+    OnUnequip_base(inst, owner)
     if not inst.hassetbroken then
         if owner.components.health ~= nil then
             owner.components.health.redirect = inst.healthredirect_old
@@ -604,8 +610,7 @@ local function OnEquip_rose(inst, owner)
     else
         owner.AnimState:OverrideSymbol("swap_object", "swap_rosorns", "swap_rosorns")
     end
-    owner.AnimState:Show("ARM_carry")
-    owner.AnimState:Hide("ARM_normal")
+    OnEquip_base(inst, owner)
 
     if owner:HasTag("equipmentmodel") then --假人！
         return
@@ -615,8 +620,7 @@ local function OnEquip_rose(inst, owner)
     owner:ListenForEvent("onattackother", TOOLS_L.UndefendedATK)
 end
 local function OnUnequip_rose(inst, owner)
-    owner.AnimState:Hide("ARM_carry")
-    owner.AnimState:Show("ARM_normal")
+    OnUnequip_base(inst, owner)
     owner:RemoveEventCallback("onattackother", TOOLS_L.UndefendedATK)
 end
 local function OnAttack_rose(inst, owner, target)
@@ -701,17 +705,18 @@ local function OnEquip_lily(inst, owner)
     else
         owner.AnimState:OverrideSymbol("swap_object", "swap_lileaves", "swap_lileaves")
     end
-    owner.AnimState:Show("ARM_carry")
-    owner.AnimState:Hide("ARM_normal")
-end
-local function OnUnequip_lily(inst, owner)
-    owner.AnimState:Hide("ARM_carry")
-    owner.AnimState:Show("ARM_normal")
+    OnEquip_base(inst, owner)
 end
 local function OnAttack_lily(inst, owner, target)
     if
         target ~= nil and target:IsValid() and
-        (target.components.health == nil or not target.components.health:IsDead())
+        (target.components.health == nil or not target.components.health:IsDead()) and
+        not (
+            -- target:HasTag("ghost") or
+            target:HasTag("wall") or
+            target:HasTag("structure") or
+            target:HasTag("balloon")
+        )
     then
         target.time_l_attackreduce = { replace_min = TUNING.SEG_TIME*2 }
         target:AddDebuff("buff_attackreduce", "buff_attackreduce")
@@ -755,7 +760,7 @@ local function Fn_lily()
 
     inst:AddComponent("equippable")
     inst.components.equippable:SetOnEquip(OnEquip_lily)
-    inst.components.equippable:SetOnUnequip(OnUnequip_lily)
+    inst.components.equippable:SetOnUnequip(OnUnequip_base)
 
     inst:AddComponent("weapon")
     inst.components.weapon:SetDamage(51)
@@ -795,12 +800,7 @@ local function OnEquip_orchid(inst, owner)
     else
         owner.AnimState:OverrideSymbol("swap_object", "swap_orchitwigs", "swap_orchitwigs")
     end
-    owner.AnimState:Show("ARM_carry")
-    owner.AnimState:Hide("ARM_normal")
-end
-local function OnUnequip_orchid(inst, owner)
-    owner.AnimState:Hide("ARM_carry")
-    owner.AnimState:Show("ARM_normal")
+    OnEquip_base(inst, owner)
 end
 local function OnAttack_orchid(inst, owner, target)
     if target ~= nil and target:IsValid() then
@@ -829,7 +829,7 @@ local function OnAttack_orchid(inst, owner, target)
         end
 
         local dmg, spdmg, stimuli
-        local ents = TheSim:FindEntities(x1, y1, z1, 3, { "_combat" }, tags_cant)
+        local ents = TheSim:FindEntities(x1, y1, z1, 3.5, { "_combat" }, tags_cant)
         for _, ent in ipairs(ents) do
             if
                 ent ~= target and ent ~= owner and
@@ -881,7 +881,7 @@ local function Fn_orchid()
 
     inst:AddComponent("equippable")
     inst.components.equippable:SetOnEquip(OnEquip_orchid)
-    inst.components.equippable:SetOnUnequip(OnUnequip_orchid)
+    inst.components.equippable:SetOnUnequip(OnUnequip_base)
 
     inst:AddComponent("weapon")
     inst.components.weapon:SetDamage(TUNING.BASE_SURVIVOR_ATTACK*0.9)
@@ -932,8 +932,7 @@ local function OnEquip_bookweather(inst, owner)
     inst:ListenForEvent("newstate", FixSymbol_bookweather, owner)
 end
 local function OnUnequip_bookweather(inst, owner)
-    owner.AnimState:Hide("ARM_carry")
-    owner.AnimState:Show("ARM_normal")
+    OnUnequip_base(inst, owner)
 
     --还原书的贴图
     owner.AnimState:OverrideSymbol("book_open", "player_actions_uniqueitem", "book_open")
@@ -1131,16 +1130,14 @@ local function OnEquip_staffpink(inst, owner)
     else
         owner.AnimState:OverrideSymbol("swap_object", "swap_pinkstaff", "swap_pinkstaff")
     end
-    owner.AnimState:Show("ARM_carry")
-    owner.AnimState:Hide("ARM_normal")
+    OnEquip_base(inst, owner)
 end
 local function OnUnequip_staffpink(inst, owner)
     local skindata = inst.components.skinedlegion:GetSkinedData()
     if skindata ~= nil and skindata.equipfx ~= nil then
         skindata.equipfx.stop(inst, owner)
     end
-    owner.AnimState:Hide("ARM_carry")
-    owner.AnimState:Show("ARM_normal")
+    OnUnequip_base(inst, owner)
 end
 local function DressUpItem(staff, target)
     local caster = staff.components.inventoryitem.owner
@@ -1265,8 +1262,7 @@ local function OnEquip_fimbulaxe(inst, owner)
     else
         owner.AnimState:OverrideSymbol("swap_object", "fimbul_axe", "swap_base")
     end
-    owner.AnimState:Show("ARM_carry")
-    owner.AnimState:Hide("ARM_normal")
+    OnEquip_base(inst, owner)
 end
 local function OnDropped_fimbulaxe(inst)
     inst.AnimState:PlayAnimation("idle")
@@ -1278,10 +1274,6 @@ local function OnDropped_fimbulaxe(inst)
     if skindata ~= nil and skindata.fn_onThrownEnd ~= nil then
         skindata.fn_onThrownEnd(inst)
     end
-end
-local function OnUnequip_fimbulaxe(inst, owner)
-    owner.AnimState:Hide("ARM_carry")
-    owner.AnimState:Show("ARM_normal")
 end
 local function OnThrown_fimbulaxe(inst, owner, target)
     if owner and owner.SoundEmitter ~= nil then
@@ -1342,7 +1334,7 @@ local function GiveSomeShock(inst, owner, target, doshock, hittarget) --击中�
     end
 
     local dmg, spdmg, stimuli
-    local ents = TheSim:FindEntities(x, y, z, 3, nil, tags_cant, tags_one)
+    local ents = TheSim:FindEntities(x, y, z, 3.5, nil, tags_cant, tags_one)
     for _, v in ipairs(ents) do
         if v ~= owner and v.entity:IsVisible() then
             if v.components.workable ~= nil then --直接破坏可以砍的物体
@@ -1480,7 +1472,7 @@ local function Fn_fimbulaxe()
 
     inst:AddComponent("equippable")
     inst.components.equippable:SetOnEquip(OnEquip_fimbulaxe)
-    inst.components.equippable:SetOnUnequip(OnUnequip_fimbulaxe)
+    inst.components.equippable:SetOnUnequip(OnUnequip_base)
 
     inst:ListenForEvent("lightningstrike", OnLightning_fimbulaxe)
 
@@ -1495,24 +1487,19 @@ end
 --[[ 扳手-双用型 ]]
 --------------------------------------------------------------------------
 
-local assets_dualwrench = {
+local assets_2wrench = {
     Asset("ANIM", "anim/dualwrench.zip"),
     Asset("ANIM", "anim/swap_dualwrench.zip"),
     Asset("ATLAS", "images/inventoryimages/dualwrench.xml"),
     Asset("IMAGE", "images/inventoryimages/dualwrench.tex")
 }
 
-local function OnEquip_dualwrench(inst, owner)
+local function OnEquip_2wrench(inst, owner)
     owner.AnimState:OverrideSymbol("swap_object", "swap_dualwrench", "swap_dualwrench")
-    owner.AnimState:Show("ARM_carry")
-    owner.AnimState:Hide("ARM_normal")
-end
-local function OnUnequip_dualwrench(inst, owner)
-    owner.AnimState:Hide("ARM_carry")
-    owner.AnimState:Show("ARM_normal")
+    OnEquip_base(inst, owner)
 end
 
-local function Fn_dualwrench()
+local function Fn_2wrench()
     local inst = CreateEntity()
 
     inst.entity:AddTransform()
@@ -1573,8 +1560,172 @@ local function Fn_dualwrench()
     inst:AddComponent("inspectable")
 
     inst:AddComponent("equippable")
-    inst.components.equippable:SetOnEquip(OnEquip_dualwrench)
-    inst.components.equippable:SetOnUnequip(OnUnequip_dualwrench)
+    inst.components.equippable:SetOnEquip(OnEquip_2wrench)
+    inst.components.equippable:SetOnUnequip(OnUnequip_base)
+
+    return inst
+end
+
+--------------------------------------------------------------------------
+--[[ 斧铲-三用型 ]]
+--------------------------------------------------------------------------
+
+local assets_3axe = {
+    Asset("ANIM", "anim/tripleshovelaxe.zip"),
+    Asset("ATLAS", "images/inventoryimages/tripleshovelaxe.xml"),
+    Asset("IMAGE", "images/inventoryimages/tripleshovelaxe.tex")
+}
+
+local function OnEquip_3axe(inst, owner)
+    local skindata = inst.components.skinedlegion:GetSkinedData()
+    if skindata ~= nil and skindata.equip ~= nil then
+        owner.AnimState:OverrideSymbol("swap_object", skindata.equip.build, skindata.equip.file)
+    else
+        owner.AnimState:OverrideSymbol("swap_object", "tripleshovelaxe", "swap")
+    end
+    OnEquip_base(inst, owner)
+end
+
+local function Fn_3axe()
+    local inst = CreateEntity()
+
+    inst.entity:AddTransform()
+    inst.entity:AddAnimState()
+    inst.entity:AddSoundEmitter()
+    inst.entity:AddNetwork()
+
+    MakeInventoryPhysics(inst)
+
+    inst.AnimState:SetBank("tripleshovelaxe")
+    inst.AnimState:SetBuild("tripleshovelaxe")
+    inst.AnimState:PlayAnimation("idle")
+
+    inst:AddTag("sharp")
+    inst:AddTag("tool")
+    inst:AddTag("weapon")
+
+    inst:AddComponent("skinedlegion")
+    inst.components.skinedlegion:InitWithFloater("tripleshovelaxe")
+
+    inst.entity:SetPristine()
+    if not TheWorld.ismastersim then
+        return inst
+    end
+
+    inst:AddComponent("weapon")
+    inst.components.weapon:SetDamage(TUNING.AXE_DAMAGE)
+
+    inst:AddComponent("inventoryitem")
+    inst.components.inventoryitem.imagename = "tripleshovelaxe"
+    inst.components.inventoryitem.atlasname = "images/inventoryimages/tripleshovelaxe.xml"
+
+    inst:AddComponent("tool")
+    inst.components.tool:SetAction(ACTIONS.CHOP, 1)
+    inst.components.tool:SetAction(ACTIONS.MINE, 1)
+    inst.components.tool:SetAction(ACTIONS.DIG,  1)
+
+    inst:AddComponent("finiteuses")
+    inst.components.finiteuses:SetMaxUses(108) --总共108次，可攻击108次
+    inst.components.finiteuses:SetUses(108)
+    inst.components.finiteuses:SetOnFinished(inst.Remove)
+
+    --设置每种功能的消耗量
+    inst.components.finiteuses:SetConsumption(ACTIONS.CHOP, 0.6) --可以使用108/0.6=180次
+    inst.components.finiteuses:SetConsumption(ACTIONS.MINE, 0.6)
+    inst.components.finiteuses:SetConsumption(ACTIONS.DIG,  0.6)
+
+    inst:AddComponent("inspectable")
+
+    inst:AddComponent("equippable")
+    inst.components.equippable:SetOnEquip(OnEquip_3axe)
+    inst.components.equippable:SetOnUnequip(OnUnequip_base)
+
+    MakeHauntableLaunch(inst)
+
+    inst.components.skinedlegion:SetOnPreLoad()
+
+    return inst
+end
+
+--------------------------------------------------------------------------
+--[[ 斧铲-黄金三用型 ]]
+--------------------------------------------------------------------------
+
+local assets_3axegold = {
+    Asset("ANIM", "anim/triplegoldenshovelaxe.zip"),
+    Asset("ATLAS", "images/inventoryimages/triplegoldenshovelaxe.xml"),
+    Asset("IMAGE", "images/inventoryimages/triplegoldenshovelaxe.tex")
+}
+
+local function OnEquip_3axegold(inst, owner)
+    local skindata = inst.components.skinedlegion:GetSkinedData()
+    if skindata ~= nil and skindata.equip ~= nil then
+        owner.AnimState:OverrideSymbol("swap_object", skindata.equip.build, skindata.equip.file)
+    else
+        owner.AnimState:OverrideSymbol("swap_object", "triplegoldenshovelaxe", "swap")
+    end
+    OnEquip_base(inst, owner)
+end
+
+local function Fn_3axegold()
+    local inst = CreateEntity()
+
+    inst.entity:AddTransform()
+    inst.entity:AddAnimState()
+    inst.entity:AddSoundEmitter()
+    inst.entity:AddNetwork()
+
+    MakeInventoryPhysics(inst)
+
+    inst.AnimState:SetBank("triplegoldenshovelaxe")
+    inst.AnimState:SetBuild("triplegoldenshovelaxe")
+    inst.AnimState:PlayAnimation("idle")
+
+    inst:AddTag("sharp")
+    inst:AddTag("tool")
+    inst:AddTag("weapon")
+
+    inst:AddComponent("skinedlegion")
+    inst.components.skinedlegion:InitWithFloater("triplegoldenshovelaxe")
+
+    inst.entity:SetPristine()
+    if not TheWorld.ismastersim then
+        return inst
+    end
+
+    inst:AddComponent("weapon")
+    inst.components.weapon:SetDamage(TUNING.AXE_DAMAGE)
+
+    inst:AddComponent("inventoryitem")
+    inst.components.inventoryitem.imagename = "triplegoldenshovelaxe"
+    inst.components.inventoryitem.atlasname = "images/inventoryimages/triplegoldenshovelaxe.xml"
+
+    inst:AddComponent("tool")
+    inst.components.tool:SetAction(ACTIONS.CHOP, 1.25)
+    inst.components.tool:SetAction(ACTIONS.MINE, 1.25)
+    inst.components.tool:SetAction(ACTIONS.DIG,  1.25)
+    inst.components.tool:EnableToughWork(true) --可以开凿更坚硬的对象
+
+    inst:AddComponent("finiteuses")
+    inst.components.finiteuses:SetMaxUses(180)
+    inst.components.finiteuses:SetUses(180)
+    inst.components.finiteuses:SetOnFinished(inst.Remove)
+
+    --设置每种功能的消耗量
+    inst.components.finiteuses:SetConsumption(ACTIONS.CHOP, 0.1) --可以使用180/0.1=1800次
+    inst.components.finiteuses:SetConsumption(ACTIONS.MINE, 0.1)
+    inst.components.finiteuses:SetConsumption(ACTIONS.DIG,  0.1)
+    inst.components.weapon.attackwear = 0.1
+
+    inst:AddComponent("inspectable")
+
+    inst:AddComponent("equippable")
+    inst.components.equippable:SetOnEquip(OnEquip_3axegold)
+    inst.components.equippable:SetOnUnequip(OnUnequip_base)
+
+    MakeHauntableLaunch(inst)
+
+    inst.components.skinedlegion:SetOnPreLoad()
 
     return inst
 end
@@ -1591,6 +1742,8 @@ if CONFIGS_LEGION.DRESSUP then
     table.insert(prefs, Prefab("pinkstaff", Fn_staffpink, assets_staffpink))
 end
 table.insert(prefs, Prefab("fimbul_axe", Fn_fimbulaxe, assets_fimbulaxe, prefabs_fimbulaxe))
-table.insert(prefs, Prefab("dualwrench", Fn_dualwrench, assets_dualwrench))
+table.insert(prefs, Prefab("dualwrench", Fn_2wrench, assets_2wrench))
+table.insert(prefs, Prefab("tripleshovelaxe", Fn_3axe, assets_3axe))
+table.insert(prefs, Prefab("triplegoldenshovelaxe", Fn_3axegold, assets_3axegold))
 
 return unpack(prefs)

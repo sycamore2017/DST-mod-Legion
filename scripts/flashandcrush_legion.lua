@@ -8,7 +8,6 @@ local prefabFiles = {
     "legion_soul_fx",           --灵魂契约特效
     "the_gifted",               --重铸科技，针对每个角色的独有制作物
     "saddle_baggage",           --驮物牛鞍
-    "tripleshovelaxes",          --铲斧-三用型
     "hat_albicans_mushroom",    --素白蘑菇帽
     "albicansmushroomhat_fx",   --素白蘑菇帽相关fx
     "explodingfruitcake",       --爆炸水果蛋糕
@@ -275,11 +274,11 @@ lock_recast = nil
 local function CanShockable(inst)
     return (inst:HasTag("player")
            or inst:HasTag("character")
+           or inst:HasTag("hostile")
            or inst:HasTag("smallcreature")
            or inst:HasTag("largecreature")
            or inst:HasTag("animal")
-           or inst:HasTag("monster")
-           or inst:HasTag("mufflehat"))     --啜食者的专属标签
+           or inst:HasTag("monster"))
            and not inst:HasTag("shadowcreature")    --暗影生物不会被触电
            and not inst:HasTag("electrified")       --电气生物不会被触电
            and not inst:HasTag("lightninggoat")     --电羊不会被触电

@@ -188,7 +188,7 @@ local function MagicGrow_dt3(inst, doer)
     inst:PushEvent("timerdone", { name = "fallenleaf" })
 end
 local function OnGrow_dt(inst)
-    if inst.tradeditems == nil then
+    if inst.tradeditems == nil or inst.ispolluted then
         return
     end
     if inst.tradeditems.light >= 1 and inst.tradeditems.health >= 1 then
@@ -262,8 +262,12 @@ local growth_stages_dt = {
             inst.components.workable:SetOnFinishCallback(nil)
             inst.components.growable.domagicgrowthfn = MagicGrow_dt3
             inst.components.growable:StopGrowing()
-            if not inst.components.timer:TimerExists("fallenleaf") then
-                inst.components.timer:StartTimer("fallenleaf", stagedata.time(inst, stage, stagedata))
+            if inst.ispolluted then
+                inst.components.timer:StopTimer("fallenleaf")
+            else
+                if not inst.components.timer:TimerExists("fallenleaf") then
+                    inst.components.timer:StartTimer("fallenleaf", stagedata.time(inst, stage, stagedata))
+                end
             end
         end,
         growfn = OnGrow_dt
@@ -296,13 +300,31 @@ local function ComputTraded_dt(inst, light, health)
     inst.OnTreeLive(inst, inst.treeState)
 end
 local function AcceptTest_dt(inst, item, giver)
-    if item.tradableitem_siv ~= nil or tradableItems_siv[item.prefab] ~= nil then
+    if
+        item.tradableitem_siv ~= nil or tradableItems_siv[item.prefab] ~= nil or
+        (not inst.ispolluted and (item.prefab == "petals_evil" or item.prefab == "nightmarefuel"))
+    then
         return true
     else
         return false
     end
 end
 local function OnAccept_dt(inst, giver, item)
+    if item.prefab == "petals_evil" or item.prefab == "nightmarefuel" then
+        if not inst.ispolluted then
+            inst.ispolluted = true
+            inst.components.timer:StopTimer("fallenleaf")
+            item:Remove()
+        else
+            if giver and giver.components.inventory ~= nil then
+                giver.components.inventory:GiveItem(item, nil, giver:GetPosition())
+            else
+                item:Remove()
+            end
+        end
+        return
+    end
+
     local dd = item.tradableitem_siv or tradableItems_siv[item.prefab]
     local stacknum = 1
     if dd.needall then
@@ -351,6 +373,9 @@ local function TimerDone_dt(inst, data)
         end
         inst.components.workable:SetWorkLeft(12) --恢复破坏度
         inst.components.timer:StopTimer("fallenleaf")
+        if inst.ispolluted then
+            return
+        end
         inst.components.timer:StartTimer("fallenleaf", cpt.stages[4].time(inst, 4, cpt.stages[4]))
 
         if inst.tradeditems == nil then
@@ -424,7 +449,11 @@ local function GetDetailString_traded(inst, doer, type)
         health = tostring(DecimalPointTruncation(inst.tradeditems.health, 100))
 	}
 	if type == 2 then
-		return subfmt(STRINGS.PLANT_CROP_L.SIVTREE, data)
+        if inst.ispolluted then
+            return STRINGS.PLANT_CROP_L.POLLUTED..subfmt(STRINGS.PLANT_CROP_L.SIVTREE, data)
+        else
+            return subfmt(STRINGS.PLANT_CROP_L.SIVTREE, data)
+        end
 	else
 		return subfmt(STRINGS.PLANT_CROP_L.SIVTREE, data)
 	end
@@ -473,11 +502,18 @@ local function OnSave_dt(inst, data)
             data.traded_light = inst.tradeditems.light
         end
     end
+    if inst.ispolluted then
+        data.ispolluted = true
+    end
 end
 local function OnLoad_dt(inst, data, newents)
     if data ~= nil then
         if data.traded_health ~= nil or data.traded_light ~= nil then
             inst.ComputTraded(inst, data.traded_light, data.traded_health)
+        end
+        if data.ispolluted then
+            inst.ispolluted = true
+            inst.components.timer:StopTimer("fallenleaf")
         end
     end
 end
@@ -528,9 +564,10 @@ table.insert(prefs, Prefab(
             return inst
         end
 
-        inst.nighttask = nil
+        -- inst.nighttask = nil
         inst.treeState = 0
-        inst.tradeditems = nil
+        -- inst.tradeditems = nil
+        -- inst.ispolluted = nil
         inst.OnTreeLive = OnTreeLive_dt
         inst.ComputTraded = ComputTraded_dt
         inst.OnLifebBend_l = OnLifebBend_dt

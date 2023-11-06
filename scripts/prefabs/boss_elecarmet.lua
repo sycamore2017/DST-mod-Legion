@@ -216,7 +216,8 @@ local function Knockback(inst, target, k_damage, k_radius)
         --先受伤害，再进行击退
         target.components.combat:GetAttacked(inst.attackowner or inst,
             GetDamage(inst, target:HasTag("player") and k_damage or k_damage*3))
-        target:PushEvent("knockback", {knocker = inst, radius = k_radius}) --其实只有少部分生物有击退sg
+        target:PushEvent("knockback",
+            { knocker = inst, radius = k_radius, strengthmult = nil, forcelanded = nil }) --其实只有少部分生物有击退sg
     end
 end
 

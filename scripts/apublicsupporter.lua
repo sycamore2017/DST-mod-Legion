@@ -1105,7 +1105,7 @@ local function OnMurdered_player(inst, data)
         data.victim:fn_murdered_l()
     end
 end
-local function inv_ApplyDamage(self, damage, attacker, weapon, spdamage, ...)
+local function FnInv_ApplyDamage(self, damage, attacker, weapon, spdamage, ...)
     if damage >= 0 or spdamage ~= nil then
         local player = self.inst
         --盾反
@@ -1113,7 +1113,7 @@ local function inv_ApplyDamage(self, damage, attacker, weapon, spdamage, ...)
         if
             hand ~= nil and
             hand.components.shieldlegion ~= nil and
-            hand.components.shieldlegion:GetAttacked(player, attacker, damage, weapon, spdamage)
+            hand.components.shieldlegion:GetAttacked(player, attacker, damage, weapon, spdamage, nil)
         then
             if spdamage ~= nil then
                 if next(spdamage) == nil then
@@ -1186,7 +1186,13 @@ local function inv_ApplyDamage(self, damage, attacker, weapon, spdamage, ...)
             return damage, spdamage
         end
     end
-    return self.inst.inv_ApplyDamage_old_l(self, damage, attacker, weapon, spdamage, ...)
+    return self.inst.inv_ApplyDamage_l(self, damage, attacker, weapon, spdamage, ...)
+end
+local function FnPin_Stick(self, ...)
+    if self.inst.shield_l_success then
+        return
+    end
+    return self.inst.pin_Stick_l(self, ...)
 end
 
 AddPlayerPostInit(function(inst)
@@ -1256,8 +1262,14 @@ AddPlayerPostInit(function(inst)
 
     --受击修改
     if inst.components.inventory ~= nil then
-        inst.inv_ApplyDamage_old_l = inst.components.inventory.ApplyDamage
-        inst.components.inventory.ApplyDamage = inv_ApplyDamage
+        inst.inv_ApplyDamage_l = inst.components.inventory.ApplyDamage
+        inst.components.inventory.ApplyDamage = FnInv_ApplyDamage
+    end
+
+    --盾反成功能防止被鼻涕黏住
+    if inst.components.pinnable ~= nil then
+        inst.pin_Stick_l = inst.components.pinnable.Stick
+        inst.components.pinnable.Stick = FnPin_Stick
     end
 
     --谋杀生物时(一般是指物品栏里的)
@@ -1416,14 +1428,14 @@ AddStategraphState("wilson", State{
             if inst.AnimState:AnimDone() then
                 inst.sg:GoToState("idle")
             end
-        end),
+        end)
     },
 
     onexit = function(inst)
         if inst.sg.statemem.shield then
             inst.sg.statemem.shield.components.shieldlegion:FinishAttack(inst, true)
         end
-    end,
+    end
 })
 AddStategraphState("wilson_client", State{
     name = "atk_shield_l",
@@ -1562,6 +1574,22 @@ local function FlingItem_terror(dropper, loot, pt, flingtargetpos, flingtargetva
         end
     end
 end
+local function Equipped_shieldofterror(inst, data)
+    if data == nil or data.owner == nil then
+        return
+    end
+    if data.owner.components.planardefense ~= nil then
+        data.owner.components.planardefense:AddBonus(inst, 10)
+    end
+end
+local function Unequipped_shieldofterror(inst, data)
+    if data == nil or data.owner == nil then
+        return
+    end
+    if data.owner.components.planardefense ~= nil then
+        data.owner.components.planardefense:RemoveBonus(inst, nil)
+    end
+end
 AddPrefabPostInit("shieldofterror", function(inst)
     inst:AddTag("allow_action_on_impassable")
     inst:AddTag("shield_l")
@@ -1602,9 +1630,14 @@ AddPrefabPostInit("shieldofterror", function(inst)
         end
         -- inst.components.shieldlegion.atkfailfn = function(inst, doer, attacker, data) end
 
-        if inst.components.planardefense == nil then
-            inst:AddComponent("planardefense")
-	        inst.components.planardefense:SetBaseDefense(10)
+        -- if inst.components.planardefense == nil then
+        --     inst:AddComponent("planardefense")
+	    --     inst.components.planardefense:SetBaseDefense(10)
+        -- end
+
+        if inst.components.equippable ~= nil then
+            inst:ListenForEvent("equipped", Equipped_shieldofterror)
+            inst:ListenForEvent("unequipped", Unequipped_shieldofterror)
         end
     end
 end)
@@ -2775,11 +2808,15 @@ if IsServer then
         end
     end
     AddPrefabPostInit("world", function(inst)
-        if CONFIGS_LEGION.BACKCUBCHANCE > 0 and LootTables['bearger'] then
-            table.insert(LootTables['bearger'], {'backcub', CONFIGS_LEGION.BACKCUBCHANCE})
+        if CONFIGS_LEGION.BACKCUBCHANCE > 0 and LootTables['bearger'] then --熊獾会掉落靠背熊
+            table.insert(LootTables['bearger'], { 'backcub', CONFIGS_LEGION.BACKCUBCHANCE })
         end
-        if LootTables['antlion'] then
-            table.insert(LootTables['antlion'], {'shield_l_sand_blueprint', 1})
+        if LootTables['antlion'] then --蚁狮会掉落砂之抵御的蓝图
+            table.insert(LootTables['antlion'], { 'shield_l_sand_blueprint', 1 })
+        end
+        if LootTables['lordfruitfly'] then --果蝇王会掉落虫翅碎片
+            table.insert(LootTables['lordfruitfly'], { 'ahandfulofwings', 1 })
+            table.insert(LootTables['lordfruitfly'], { 'ahandfulofwings', 1 })
         end
 
         if inst.task_l_cc ~= nil then
