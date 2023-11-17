@@ -385,14 +385,15 @@ local function OnPlant(seed, doer, soilorcrop)
 			end
             TheWorld:PushEvent("itemplanted", { doer = doer, pos = pt })
 
+            --继承皮肤
+            if soilorcrop.components.skinedlegion ~= nil and soilorcrop.components.skinedlegion:GetSkin() ~= nil then
+                plant.components.skinedlegion:SetSkin(soilorcrop.components.skinedlegion:GetSkin(),
+                    soilorcrop.components.skinedlegion.userid or (doer and doer.userid or nil))
+            end
+
             --替换原本的作物
             if soilorcrop.components.perennialcrop ~= nil then
                 plant.components.perennialcrop:DisplayCrop(soilorcrop, doer)
-            end
-
-            plant.soilskin_l = soilorcrop.soilskin_l
-            if plant.fn_soiltype ~= nil then
-                plant.fn_soiltype(plant, soilorcrop.soiltype_l)
             end
 
             soilorcrop:Remove()

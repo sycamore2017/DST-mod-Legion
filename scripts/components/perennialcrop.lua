@@ -959,8 +959,14 @@ function PerennialCrop:GenerateLoot(doer, ispicked, isburnt) --生成收获物
 	end
 
 	if not ispicked then --非采集时，多半是破坏
-		local skin = self.inst.soilskin_l ~= nil and "siving_soil_item"..self.inst.soilskin_l or nil
-		local soil = SpawnPrefab("siving_soil_item", skin)
+		local soil
+		local skin = self.inst.components.skinedlegion:GetSkin()
+		if skin == nil then
+			soil = SpawnPrefab("siving_soil_item")
+		else
+			soil = SpawnPrefab("siving_soil_item", skin, nil,
+				self.inst.components.skinedlegion.userid or (doer and doer.userid or nil))
+		end
 		if soil ~= nil then
 			soil.Transform:SetPosition(pos:Get())
 		end

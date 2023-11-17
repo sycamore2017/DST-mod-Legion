@@ -357,11 +357,7 @@ local function UpdateSoilType_p(inst, soiltype)
 	if soiltype ~= nil then
 		inst.soiltype_l = soiltype
 	end
-	local soilbuild = "siving_soil"
-	if inst.soilskin_l ~= nil then
-		soilbuild = soilbuild..inst.soilskin_l
-	end
-	inst.AnimState:OverrideSymbol("soil01", soilbuild, "soil0"..inst.soiltype_l)
+	inst.AnimState:OverrideSymbol("soil01", inst.soilskin_l or "siving_soil", "soil0"..inst.soiltype_l)
 end
 local function OnCtlChange_p(inst, ctls)
 	local types = {}
@@ -405,20 +401,6 @@ local function OnPlant_p(inst, pt)
 	end
 	cpt:CostNutrition(true)
 	cpt:UpdateTimeMult() --更新生长速度
-end
-
-local function OnSave_p(inst, data)
-	if inst.soilskin_l ~= nil then
-		data.soilskin_l = inst.soilskin_l
-	end
-end
-local function OnLoad_p(inst, data)
-	if data ~= nil then
-		if data.soilskin_l ~= nil then
-			inst.soilskin_l = data.soilskin_l
-			inst.fn_soiltype(inst, nil)
-		end
-	end
 end
 
 local function MakePlant(data)
@@ -478,6 +460,10 @@ local function MakePlant(data)
 				data.fn_common(inst)
 			end
 
+			inst:AddComponent("skinedlegion")
+			inst.components.skinedlegion:OverrideSkin("siving_soil_item", "data_plant")
+			inst.components.skinedlegion:Init("siving_soil_item")
+
 			inst.entity:SetPristine()
 			if not TheWorld.ismastersim then
 				return inst
@@ -507,12 +493,11 @@ local function MakePlant(data)
 			inst.fn_planted = OnPlant_p
 			inst.fn_soiltype = UpdateSoilType_p
 
-			inst.OnSave = OnSave_p
-			inst.OnLoad = OnLoad_p
-
 			if data.fn_server ~= nil then
 				data.fn_server(inst)
 			end
+
+			-- inst.components.skinedlegion:SetOnPreLoad()
 
 			return inst
 		end,

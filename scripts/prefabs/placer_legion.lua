@@ -107,12 +107,15 @@ local function Fn_derivant(inst)
     inst.AnimState:SetScale(1.3, 1.3)
     inst.AnimState:SetPercent("lvl0", 0)
 end
+local function Fn_soilitem(inst)
+    Skined_deploy(inst, nil, GetSkin_base)
+end
 
 ----子圭奇型岩
 CreatePlacer("siving_derivant_item", "siving_derivant", "siving_derivant", "lvl0", nil, nil, nil, nil, nil, "two", Fn_derivant)
 
 ----子圭·垄
-CreatePlacer("siving_soil_item", "farm_soil", "siving_soil", "till_idle")
+CreatePlacer("siving_soil_item", "farm_soil", "siving_soil", "till_idle", nil, nil, nil, nil, nil, nil, Fn_soilitem)
 
 ----子圭·育
 CreatePlacer("siving_turn", "siving_turn", "siving_turn", "idle", nil, nil, nil, nil, nil, nil, Skined_build)

@@ -11,6 +11,7 @@ local ScrollableList = require "widgets/scrollablelist"
 local PopupDialogScreen = require "screens/redux/popupdialog"
 local TrueScrollArea = require "widgets/truescrollarea"
 local UIAnim = require "widgets/uianim"
+local PLANT_DEFS = require("prefabs/farm_plant_defs").PLANT_DEFS
 
 local TEST = false
 
@@ -501,6 +502,66 @@ local function SetClick_siving_ctl(self, anim, data)
         animstate:PlayAnimation("idle")
         anim.tag_anim = 2
     end
+end
+
+local function SetClick_soilcrop(self, anim, data)
+    local animstate = anim:GetAnimState()
+    local tag = anim.tag_anim or 5
+    if tag == 1 then
+        animstate:PlayAnimation("grow_seed")
+        animstate:PushAnimation("crop_seed", true)
+    elseif tag == 2 then
+        animstate:PlayAnimation("grow_sprout")
+        animstate:PushAnimation("crop_sprout", true)
+    elseif tag == 3 then
+        animstate:PlayAnimation("grow_small")
+        animstate:PushAnimation("crop_small", true)
+    elseif tag == 4 then
+        animstate:PlayAnimation("grow_med")
+        animstate:PushAnimation("crop_med", true)
+    elseif tag == 5 then
+        if math.random() < 0.5 then
+            animstate:PlayAnimation("grow_full")
+            animstate:PushAnimation("crop_full", true)
+        else
+            animstate:PlayAnimation("grow_oversized")
+            animstate:PushAnimation("crop_oversized", true)
+            anim.isoversized = true
+        end
+    elseif tag == 6 then
+        if anim.isoversized then
+            animstate:PlayAnimation("grow_rot_oversized")
+            animstate:PushAnimation("crop_rot_oversized", true)
+            anim.isoversized = nil
+        else
+            animstate:PlayAnimation("grow_rot")
+            animstate:PushAnimation("crop_rot", true)
+        end
+        tag = 0
+    else
+        tag = 0
+    end
+    anim.tag_anim = tag + 1
+end
+local function SetAnim_soilcrop(self, anim, data)
+    local animstate = anim:GetAnimState()
+    if data.bank and data.build then
+        animstate:SetBank(data.bank)
+        animstate:SetBuild(data.build)
+    else
+        local crops = {
+            "pineananas", "asparagus", "garlic", "pumpkin", "corn", "onion", "potato", "durian",
+            "dragonfruit", "pomegranate", "eggplant", "tomato", "watermelon", "pepper", "carrot"
+        }
+        local crop = crops[math.random( #crops )]
+        if PLANT_DEFS[crop] == nil then
+            crop = "pineananas"
+        end
+        animstate:SetBank(PLANT_DEFS[crop].bank)
+        animstate:SetBuild(PLANT_DEFS[crop].build)
+    end
+    animstate:OverrideSymbol("soil01", data.soilskin or "siving_soil", "soil04")
+    SetClick_soilcrop(self, anim, data)
 end
 
 local width_skininfo = 260
@@ -2534,7 +2595,85 @@ local SkinData = {
                 x = 56, y = 0, scale = 0.35
             }
         }
-    }
+    },
+    siving_soil_item_law = {
+        string = ischinese and {
+            name = "春泥",
+            collection = "LAW", access = "SPECIAL",
+            descitem = "解锁\"子圭·垄\"的皮肤。",
+            description = ""
+        } or {
+            name = "Spring Mud",
+            collection = "LAW", access = "SPECIAL",
+            descitem = "Unlock \"Siving-Sols\" skin.",
+            description = "The story was not translated."
+        },
+        height_anim = 310,
+        anims = {
+            {
+                bank = "siving_soil_item_law", build = "siving_soil_item_law",
+                anim = "item", anim2 = nil, isloop = false,
+                x = -60, y = 165, scale = 0.32
+            },
+            {
+                bank = "farm_soil", build = "siving_soil_item_law",
+                anim = "till_rise", anim2 = "till_idle", isloop = false,
+                x = -40, y = 240, scale = 0.32
+            },
+            {
+                soilskin = "siving_soil_item_law",
+                fn_anim = SetAnim_soilcrop,
+                fn_click = SetClick_soilcrop,
+                x = 50, y = 170, scale = 0.32
+            },
+            {
+                bank = "siving_soil_item_law2", build = "siving_soil_item_law2",
+                anim = "item", anim2 = nil, isloop = false,
+                x = -60, y = 15, scale = 0.32
+            },
+            {
+                bank = "farm_soil", build = "siving_soil_item_law2",
+                anim = "till_rise", anim2 = "till_idle", isloop = false,
+                x = -40, y = 90, scale = 0.32
+            },
+            {
+                soilskin = "siving_soil_item_law2",
+                fn_anim = SetAnim_soilcrop,
+                fn_click = SetClick_soilcrop,
+                x = 50, y = 20, scale = 0.32
+            }
+        }
+    },
+    siving_soil_item_law3 = {
+        string = ischinese and {
+            collection = "LAW", access = "SPECIAL",
+            descitem = "解锁\"子圭·垄\"的皮肤。",
+            description = ""
+        } or {
+            collection = "LAW", access = "SPECIAL",
+            descitem = "Unlock \"Siving-Sols\" skin.",
+            description = "The story was not translated."
+        },
+        height_anim = 160,
+        anims = {
+            {
+                bank = "siving_soil_item_law3", build = "siving_soil_item_law3",
+                anim = "item", anim2 = nil, isloop = false,
+                x = -60, y = 15, scale = 0.32
+            },
+            {
+                bank = "farm_soil", build = "siving_soil_item_law3",
+                anim = "till_rise", anim2 = "till_idle", isloop = false,
+                x = -40, y = 90, scale = 0.32
+            },
+            {
+                soilskin = "siving_soil_item_law3",
+                fn_anim = SetAnim_soilcrop,
+                fn_click = SetClick_soilcrop,
+                x = 50, y = 20, scale = 0.32
+            }
+        }
+    },
 }
 
 local function GetName(skin)
@@ -2744,6 +2883,7 @@ function SkinLegionDialog:ResetItems()
     local owned3 = 0
     local owned4 = 0
     local owned5 = 0
+    local owned6 = 0
     for skinname, value in pairs(SKIN_IDS_LEGION["6278c487c340bf24ab31152c"]) do
         if myskins[skinname] then
             owned1 = 1
@@ -2774,7 +2914,13 @@ function SkinLegionDialog:ResetItems()
             break
         end
     end
-    if (owned1 + owned2 + owned3 + owned4 + owned5) >= 2 then
+    for skinname, value in pairs(SKIN_IDS_LEGION["61f15bf4db102b0b8a529c66"]) do
+        if myskins[skinname] then
+            owned6 = 1
+            break
+        end
+    end
+    if (owned1 + owned2 + owned3 + owned4 + owned5 + owned6) >= 2 then
         expansionshow = true
     end
 

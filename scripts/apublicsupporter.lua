@@ -1368,7 +1368,6 @@ AddStategraphActionHandler("wilson_client", ActionHandler(ACTIONS.USE_UPGRADEKIT
 AddStategraphState("wilson", State{
     name = "atk_shield_l",
     tags = { "atk_shield", "busy", "notalking", "autopredict" },
-
     onenter = function(inst)
         -- if inst.components.combat:InCooldown() then
         --     inst:ClearBufferedAction()
@@ -1407,20 +1406,18 @@ AddStategraphState("wilson", State{
         end
 
         equip.components.shieldlegion:StartAttack(inst)
+        inst.components.combat:ResetCooldown() --(服务器)重置攻击冷却
     end,
-
     timeline = {
         TimeEvent(8 * FRAMES, function(inst)
             inst:PerformBufferedAction()
         end)
     },
-
     ontimeout = function(inst)
         -- inst.sg:RemoveStateTag("atk_shield")
         inst.sg:RemoveStateTag("busy")
         inst.sg:AddStateTag("idle")
     end,
-
     events = {
         EventHandler("equip", function(inst) inst.sg:GoToState("idle") end),
         EventHandler("unequip", function(inst) inst.sg:GoToState("idle") end),
@@ -1430,7 +1427,6 @@ AddStategraphState("wilson", State{
             end
         end)
     },
-
     onexit = function(inst)
         if inst.sg.statemem.shield then
             inst.sg.statemem.shield.components.shieldlegion:FinishAttack(inst, true)
@@ -1440,7 +1436,6 @@ AddStategraphState("wilson", State{
 AddStategraphState("wilson_client", State{
     name = "atk_shield_l",
     tags = { "atk_shield", "notalking", "abouttoattack" },
-
     onenter = function(inst)
         -- if inst.replica.combat ~= nil then
         --     if inst.replica.combat:InCooldown() then
@@ -1480,28 +1475,25 @@ AddStategraphState("wilson_client", State{
                 inst:ForceFacePoint(buffaction:GetActionPoint():Get())
             end
         end
+        inst.replica.combat:CancelAttack() --(客户端)重置攻击冷却
     end,
-
     timeline ={
         TimeEvent(8 * FRAMES, function(inst)
             inst:ClearBufferedAction()
             inst.sg:RemoveStateTag("abouttoattack")
         end)
     },
-
     ontimeout = function(inst)
         -- inst.sg:RemoveStateTag("atk_shield")
         inst.sg:AddStateTag("idle")
     end,
-
     events = {
         EventHandler("animqueueover", function(inst)
             if inst.AnimState:AnimDone() then
                 inst.sg:GoToState("idle")
             end
-        end),
+        end)
     },
-
     -- onexit = nil
 })
 
@@ -2446,6 +2438,7 @@ if IsServer then
     end
     AddPrefabPostInit("minisign", MiniSign_init)
     AddPrefabPostInit("minisign_drawn", MiniSign_init)
+    AddPrefabPostInit("decor_pictureframe", MiniSign_init)
 
     --------------------------------------------------------------------------
     --[[ 清理机制：让腐烂物、牛粪、鸟粪自动消失 ]]

@@ -2114,6 +2114,24 @@ MakeFx_life({
 --[[ 子圭·垄(物品) ]]
 --------------------------------------------------------------------------
 
+local function OnDeploy_soilitem(inst, pt, deployer, rot)
+    local tree
+    local skin = inst.components.skinedlegion:GetSkin()
+    if skin == nil then
+        tree = SpawnPrefab("siving_soil")
+    else
+        tree = SpawnPrefab("siving_soil", skin, nil,
+            inst.components.skinedlegion.userid or (deployer and deployer.userid or nil))
+    end
+    if tree ~= nil then
+        tree.Transform:SetPosition(pt:Get())
+        inst.components.stackable:Get():Remove()
+        if deployer ~= nil and deployer.SoundEmitter ~= nil then
+            deployer.SoundEmitter:PlaySound("dontstarve/wilson/plant_seeds")
+        end
+    end
+end
+
 table.insert(prefs, Prefab(
     "siving_soil_item",
     function()
@@ -2131,6 +2149,9 @@ table.insert(prefs, Prefab(
 
         inst:AddTag("molebait")
         inst:AddTag("eyeturret") --眼球塔的专属标签，但为了deployable组件的摆放名字而使用（显示为“放置”）
+
+        inst:AddComponent("skinedlegion")
+        inst.components.skinedlegion:Init("siving_soil_item")
 
         inst.entity:SetPristine()
         if not TheWorld.ismastersim then
@@ -2154,20 +2175,12 @@ table.insert(prefs, Prefab(
         inst.components.inventoryitem:SetSinks(true)
 
         inst:AddComponent("deployable")
-        inst.components.deployable.ondeploy = function(inst, pt, deployer, rot)
-            local tree = SpawnPrefab("siving_soil")
-            if tree ~= nil then
-                tree.Transform:SetPosition(pt:Get())
-                inst.components.stackable:Get():Remove()
-
-                if deployer ~= nil and deployer.SoundEmitter ~= nil then
-                    deployer.SoundEmitter:PlaySound("dontstarve/wilson/plant_seeds")
-                end
-            end
-        end
+        inst.components.deployable.ondeploy = OnDeploy_soilitem
         inst.components.deployable:SetDeploySpacing(DEPLOYSPACING.LESS)
 
         MakeHauntableLaunchAndIgnite(inst)
+
+        -- inst.components.skinedlegion:SetOnPreLoad()
 
         return inst
     end,
@@ -2183,6 +2196,17 @@ table.insert(prefs, Prefab(
 --------------------------------------------------------------------------
 --[[ 子圭·垄 ]]
 --------------------------------------------------------------------------
+
+local function OnFinished_soil(inst, worker)
+    local skin = inst.components.skinedlegion:GetSkin()
+    if skin == nil then
+        inst.components.lootdropper:SpawnLootPrefab("siving_soil_item")
+    else
+        inst.components.lootdropper:SpawnLootPrefab("siving_soil_item", nil,
+            skin, nil, inst.components.skinedlegion.userid or (worker and worker.userid or nil))
+    end
+    inst:Remove()
+end
 
 table.insert(prefs, Prefab(
     "siving_soil",
@@ -2201,6 +2225,10 @@ table.insert(prefs, Prefab(
 
         inst:AddTag("soil_legion")
 
+        inst:AddComponent("skinedlegion")
+        inst.components.skinedlegion:OverrideSkin("siving_soil_item", "data_soil")
+        inst.components.skinedlegion:Init("siving_soil_item")
+
         inst.entity:SetPristine()
         if not TheWorld.ismastersim then
             return inst
@@ -2218,12 +2246,17 @@ table.insert(prefs, Prefab(
         inst:AddComponent("workable")
         inst.components.workable:SetWorkAction(ACTIONS.DIG)
         inst.components.workable:SetWorkLeft(1)
-        inst.components.workable:SetOnFinishCallback(function(inst, worker)
-            inst.components.lootdropper:SpawnLootPrefab("siving_soil_item")
-            inst:Remove()
-        end)
+        inst.components.workable:SetOnFinishCallback(OnFinished_soil)
+
+        inst:AddComponent("inventoryitem")
+        inst.components.inventoryitem.imagename = "siving_soil_item"
+        inst.components.inventoryitem.atlasname = "images/inventoryimages/siving_soil_item.xml"
+
+        inst:AddComponent("equippable")
 
         MakeHauntableWork(inst)
+
+        -- inst.components.skinedlegion:SetOnPreLoad()
 
         return inst
     end,

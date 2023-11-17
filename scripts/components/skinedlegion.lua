@@ -50,10 +50,12 @@ local SkinedLegion = Class(function(self, inst)
 	self.isServe = TheNet:GetIsMasterSimulation()
 	self.isClient = not TheNet:IsDedicated()
 	self.skin = nil
+	self.userid = nil
 	self._skindata = nil
 	self._skin_idx = net_byte(inst.GUID, "skinedlegion._skin_idx", "skin_idx_l_dirty")
 	self._floater_cut = nil
 	self._floater_nofx = nil
+	self.overskin = nil --{ name = nil, key = nil }
 
 	if not self.isServe and self.isClient then --玩家客户端世界和服务端世界可能是同一个
 		--非主机【客户端】环境
@@ -73,12 +75,30 @@ end)
 
 ------以下均为【服务端、客户端】环境
 
+local SkinsOverride = {
+	siving_soil_item = true
+}
+function SkinedLegion:OverrideSkin(prefab, key)
+	if prefab ~= nil and SkinsOverride[prefab] then
+		self.overskin = { name = prefab, key = key }
+	else
+		self.overskin = nil
+	end
+end
+
 function SkinedLegion:GetSkin()
 	return self.skin
 end
 
 function SkinedLegion:GetSkinData(skinname)
-	return skinname == nil and SKIN_PREFABS_LEGION[self.inst.prefab] or SKINS_LEGION[skinname]
+	if self.overskin == nil then
+		return skinname == nil and SKIN_PREFABS_LEGION[self.inst.prefab] or SKINS_LEGION[skinname]
+	elseif SkinsOverride[self.overskin.name] then
+		local data = skinname == nil and SKIN_PREFABS_LEGION[self.overskin.name] or SKINS_LEGION[skinname]
+		if data ~= nil and self.overskin.key ~= nil then
+			return data[self.overskin.key]
+		end
+	end
 end
 
 function SkinedLegion:GetSkinedData()
@@ -94,12 +114,20 @@ function SkinedLegion:GetLinkedSkins()
 end
 
 function SkinedLegion:Init(prefab)
-	self._skindata = SKIN_PREFABS_LEGION[prefab]
+	self._skindata = nil
+	if self.overskin == nil then
+		self._skindata = SKIN_PREFABS_LEGION[prefab]
+	elseif SkinsOverride[self.overskin.name] then
+		local data = SKIN_PREFABS_LEGION[self.overskin.name]
+		if data ~= nil and self.overskin.key ~= nil then
+			self._skindata = data[self.overskin.key]
+		end
+	end
 end
 
 function SkinedLegion:InitWithFloater(prefab)
-	local skindata = SKIN_PREFABS_LEGION[prefab]
-	self._skindata = skindata
+	self:Init(prefab)
+	local skindata = self._skindata
 	if skindata ~= nil and skindata.floater ~= nil then
 		local data = skindata.floater
 		self.inst:AddComponent("floater")
@@ -154,6 +182,7 @@ function SkinedLegion:SpawnLinkedSkinLoot(prefabname, dropper, linkedkey, doer)
 		dropper.components.lootdropper:SpawnLootPrefab(prefabname)
 	end
 end
+
 function SkinedLegion:SetSkin(skinname, userid, isload)
 	if not self.isServe or self.skin == skinname then
 		return true

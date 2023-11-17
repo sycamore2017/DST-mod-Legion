@@ -971,6 +971,32 @@ _G.SKIN_PREFABS_LEGION = {
         equip = { symbol = nil, build = "siving_mask_gold", file = nil, isopenhat = true },
         exchangefx = { prefab = nil, offset_y = nil, scale = nil }
     },
+
+    siving_soil_item = {
+        image = { name = nil, atlas = nil, setable = true },
+        anim = {
+            bank = "siving_soil", build = "siving_soil",
+            anim = "item", animpush = nil, isloop = nil,
+            setable = true
+        },
+        exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
+
+        overridekeys = { "data_soil", "data_plant" },
+        data_soil = {
+            fn_start = function(inst)
+                inst.AnimState:SetBank("farm_soil")
+                inst.AnimState:SetBuild("siving_soil")
+            end
+        },
+        data_plant = {
+            fn_start = function(inst)
+                inst.soilskin_l = nil
+                if inst.fn_soiltype ~= nil then
+                    inst.fn_soiltype(inst, nil)
+                end
+            end
+        }
+    },
 }
 
 _G.SKINS_LEGION = {
@@ -3495,6 +3521,127 @@ _G.SKINS_LEGION = {
         },
         exchangefx = { prefab = nil, offset_y = nil, scale = nil }
     },
+
+    siving_soil_item_law = {
+        base_prefab = "siving_soil_item",
+        type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
+
+        skin_id = "65560bbdadf8ac0fd863e6d6",
+        onlyownedshow = true,
+        assets = {
+            Asset("ANIM", "anim/skin/siving_soil_item_law.zip")
+        },
+        image = { name = nil, atlas = nil, setable = true },
+
+        string = ischinese and { name = "落英" } or { name = "Bloomed Flowers" },
+
+        anim = {
+            bank = "siving_soil_item_law", build = "siving_soil_item_law",
+            anim = "item", animpush = nil, isloop = nil,
+            setable = true
+        },
+        exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
+        fn_placer = function(inst)
+            inst.AnimState:SetBank("farm_soil")
+            inst.AnimState:SetBuild("siving_soil_item_law")
+        end,
+
+        overridekeys = { "data_soil", "data_plant" },
+        data_soil = {
+            fn_start = function(inst)
+                inst.AnimState:SetBank("farm_soil")
+                inst.AnimState:SetBuild("siving_soil_item_law")
+            end
+        },
+        data_plant = {
+            fn_start = function(inst)
+                inst.soilskin_l = "siving_soil_item_law"
+                if inst.fn_soiltype ~= nil then
+                    inst.fn_soiltype(inst, nil)
+                end
+            end
+        }
+    },
+    siving_soil_item_law2 = {
+        base_prefab = "siving_soil_item",
+        type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
+
+        skin_id = "65560bbdadf8ac0fd863e6d6",
+        noshopshow = true,
+        assets = {
+            Asset("ANIM", "anim/skin/siving_soil_item_law2.zip")
+        },
+        image = { name = nil, atlas = nil, setable = true },
+
+        string = ischinese and { name = "春泥" } or { name = "Spring Mud" },
+
+        anim = {
+            bank = "siving_soil_item_law2", build = "siving_soil_item_law2",
+            anim = "item", animpush = nil, isloop = nil,
+            setable = true
+        },
+        exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
+        fn_placer = function(inst)
+            inst.AnimState:SetBank("farm_soil")
+            inst.AnimState:SetBuild("siving_soil_item_law2")
+        end,
+
+        overridekeys = { "data_soil", "data_plant" },
+        data_soil = {
+            fn_start = function(inst)
+                inst.AnimState:SetBank("farm_soil")
+                inst.AnimState:SetBuild("siving_soil_item_law2")
+            end
+        },
+        data_plant = {
+            fn_start = function(inst)
+                inst.soilskin_l = "siving_soil_item_law2"
+                if inst.fn_soiltype ~= nil then
+                    inst.fn_soiltype(inst, nil)
+                end
+            end
+        }
+    },
+    siving_soil_item_law3 = {
+        base_prefab = "siving_soil_item",
+        type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
+
+        skin_id = "65560bdbadf8ac0fd863e6da",
+        onlyownedshow = true,
+        assets = {
+            Asset("ANIM", "anim/skin/siving_soil_item_law3.zip")
+        },
+        image = { name = nil, atlas = nil, setable = true },
+
+        string = ischinese and { name = "归根" } or { name = "For Roots" },
+
+        anim = {
+            bank = "siving_soil_item_law3", build = "siving_soil_item_law3",
+            anim = "item", animpush = nil, isloop = nil,
+            setable = true
+        },
+        exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
+        fn_placer = function(inst)
+            inst.AnimState:SetBank("farm_soil")
+            inst.AnimState:SetBuild("siving_soil_item_law3")
+        end,
+
+        overridekeys = { "data_soil", "data_plant" },
+        data_soil = {
+            fn_start = function(inst)
+                inst.AnimState:SetBank("farm_soil")
+                inst.AnimState:SetBuild("siving_soil_item_law3")
+            end
+        },
+        data_plant = {
+            fn_start = function(inst)
+                inst.soilskin_l = "siving_soil_item_law3"
+                if inst.fn_soiltype ~= nil then
+                    inst.fn_soiltype(inst, nil)
+                end
+            end
+        }
+    },
 }
 
 _G.SKIN_IDS_LEGION = {
@@ -3516,6 +3663,7 @@ _G.SKIN_IDS_LEGION = {
         revolvedmoonlight_item_taste3 = true, revolvedmoonlight_taste3 = true, revolvedmoonlight_pro_taste3 = true,
         revolvedmoonlight_item_taste4 = true, revolvedmoonlight_taste4 = true, revolvedmoonlight_pro_taste4 = true,
         carpet_whitewood_law = true, carpet_whitewood_big_law = true, carpet_whitewood_law2 = true, carpet_whitewood_big_law2 = true,
+        siving_soil_item_law = true, siving_soil_item_law2 = true, siving_soil_item_law3 = true,
         icire_rock_day = true,
         neverfade_paper = true, neverfadebush_paper = true, neverfade_paper2 = true, neverfadebush_paper2 = true, siving_feather_real_paper = true, siving_feather_fake_paper = true,
         siving_turn_future = true, siving_turn_future2 = true
@@ -3568,8 +3716,9 @@ _G.SKIN_IDS_LEGION = {
         siving_mask_era = true, siving_mask_era2 = true, siving_mask_gold_era = true, siving_mask_gold_era2 = true,
         siving_turn_future = true, siving_turn_future2 = true
     },
-    -- ["61f15bf4db102b0b8a529c66"] = { --柳绿花红
-    -- },
+    ["61f15bf4db102b0b8a529c66"] = { --6连忘返
+        siving_soil_item_law = true, siving_soil_item_law2 = true, siving_soil_item_law3 = true,
+    },
     -- ["61627d927bbb727be174c4a0"] = { --棋举不定
     -- }
 }
@@ -3607,6 +3756,7 @@ local skinidxes = { --用以皮肤排序
     "siving_turn_future", "siving_turn_future2",
     "siving_feather_real_paper", "siving_feather_fake_paper",
     "icire_rock_day",
+    "siving_soil_item_law", "siving_soil_item_law2", "siving_soil_item_law3",
     "carpet_whitewood_law", "carpet_whitewood_big_law", "carpet_whitewood_law2", "carpet_whitewood_big_law2",
     "agronssword_taste", "soul_contracts_taste",
     "revolvedmoonlight_item_taste", "revolvedmoonlight_taste", "revolvedmoonlight_pro_taste",
@@ -3625,7 +3775,17 @@ local skinidxes = { --用以皮肤排序
 }
 for i,skinname in pairs(skinidxes) do
     _G.SKIN_IDX_LEGION[i] = skinname
-    _G.SKINS_LEGION[skinname].skin_idx = i
+
+    local dd = _G.SKINS_LEGION[skinname]
+    dd.skin_idx = i
+    if dd.overridekeys ~= nil then
+        for _, v in ipairs(dd.overridekeys) do
+            dd[v].skin_idx = i
+            if dd[v].exchangefx == nil then --特效！
+                dd[v].exchangefx = dd.exchangefx
+            end
+        end
+    end
 end
 
 for skinname,v in pairs(_G.SKINS_LEGION) do
@@ -3721,6 +3881,13 @@ for baseprefab,v in pairs(_G.SKIN_PREFABS_LEGION) do
     --         v.exchangefx.prefab = "explode_reskin"
     --     end
     -- end
+    if v.overridekeys ~= nil then
+        for _, k in ipairs(v.overridekeys) do
+            if v[k].exchangefx == nil then --特效！
+                v[k].exchangefx = v.exchangefx
+            end
+        end
+    end
     _G[baseprefab.."_clear_fn"] = function(inst) end --【服务端】给CreatePrefabSkin()用的
 end
 ischinese = nil
@@ -4376,14 +4543,21 @@ if IsServer then
                             return
                         end
 
-                        local skins = PREFAB_SKINS[target.prefab]
+                        local prefabname = nil
+                        if target.components.skinedlegion.overskin ~= nil then
+                            prefabname = target.components.skinedlegion.overskin.name or target.prefab
+                        else
+                            prefabname = target.prefab
+                        end
+
+                        local skins = PREFAB_SKINS[prefabname]
                         if skins == nil then
                             return
                         end
 
                         local skinname_new = nil
                         local skinname_old = target.components.skinedlegion:GetSkin()
-                        local skinname_cac = _G.SKINS_CACHE_CG_L[doer.userid] and _G.SKINS_CACHE_CG_L[doer.userid][target.prefab] or nil
+                        local skinname_cac = _G.SKINS_CACHE_CG_L[doer.userid] and _G.SKINS_CACHE_CG_L[doer.userid][prefabname] or nil
 
                         if skinname_old == nil then --原皮，尝试切换成其他皮肤，优先为缓存皮肤
                             if skinname_cac ~= nil and DoYouHaveSkin(skinname_cac, doer.userid) then
@@ -4585,7 +4759,7 @@ if not TheNet:IsDedicated() and _G.CONFIGS_LEGION.LANGUAGES == "chinese" then
     -- local PlayerAvatarPopup = require "widgets/playeravatarpopup"
     local PlayerInfoPopup = require "screens/playerinfopopupscreen"
     local TEMPLATES = require "widgets/templates"
-    local SkinLegionDialog = require "widgets/skinlegiondialog"
+    -- local SkinLegionDialog = require "widgets/skinlegiondialog"
 
     -- local right_root = nil
     -- AddClassPostConstruct("widgets/controls", function(self)
@@ -4613,7 +4787,7 @@ if not TheNet:IsDedicated() and _G.CONFIGS_LEGION.LANGUAGES == "chinese" then
                     if right_root.skinshop_l then
                         right_root.skinshop_l:Kill()
                     end
-                    -- local SkinLegionDialog = _G.require("widgets/skinlegiondialog") --test：动态更新
+                    local SkinLegionDialog = _G.require("widgets/skinlegiondialog") --test：动态更新
                     right_root.skinshop_l = right_root:AddChild(SkinLegionDialog(self.owner))
                     right_root.skinshop_l:SetPosition(-380, 0)
                     -- self:Kill() --直接删除并不能去除暂停状态
