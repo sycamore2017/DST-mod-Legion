@@ -1296,8 +1296,8 @@ table.insert(prefs, Prefab("refractedmoonlight", function()
     inst._lvl_l = net_byte(inst.GUID, "moonlight_l._lvl_l", "lvl_l_dirty")
     inst.displaynamefn = DisplayName
 
-    -- inst:AddComponent("skinedlegion")
-    -- inst.components.skinedlegion:Init("refractedmoonlight")
+    inst:AddComponent("skinedlegion")
+    inst.components.skinedlegion:Init("refractedmoonlight")
 
     inst.entity:SetPristine()
     if not TheWorld.ismastersim then
@@ -1399,7 +1399,7 @@ table.insert(prefs, Prefab("refractedmoonlight", function()
     inst.OnSave = OnSave_refracted
     inst.OnLoad = OnLoad_refracted
 
-    -- inst.components.skinedlegion:SetOnPreLoad()
+    inst.components.skinedlegion:SetOnPreLoad()
 
     return inst
 end, {

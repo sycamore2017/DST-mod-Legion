@@ -250,6 +250,10 @@ local InventoryPrefabsList = {  --每个元素的下标值为每种物品栏图�
     siving_soil_item_law = 8,
     siving_soil_item_law2 = 8,
     siving_soil_item_law3 = 8,
+    refractedmoonlight_taste = 8,
+    refractedmoonlight_taste2 = 8,
+    siving_mask_gold_marble = 8,
+    siving_armor_gold_marble = 8,
 }
 
 return InventoryPrefabsList

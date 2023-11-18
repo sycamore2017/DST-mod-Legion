@@ -554,6 +554,25 @@ MakeFx({ --月折宝剑：闪闪月耀
     end,
     fn_remove = nil
 })
+MakeFx({ --烤肠大王：闪闪月耀
+    name = "refracted_l_spark_taste_fx",
+    assets = {
+        Asset("ANIM", "anim/siving_boss_caw_fx.zip"),
+        Asset("ANIM", "anim/alterguardian_meteor.zip") --官方月晶石陷阱动画模板
+    },
+    fn_common = nil,
+    fn_anim = function(inst)
+        inst.AnimState:SetBank("alterguardian_meteor")
+        inst.AnimState:SetBuild("siving_boss_caw_fx")
+        inst.AnimState:PlayAnimation("meteorground_pre")
+        inst.AnimState:PushAnimation("meteorground_loop", false)
+        inst.AnimState:SetScale(0.4, 0.4)
+        inst.AnimState:SetMultColour(255/255, 222/255, 139/255, 0.7)
+        inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
+        inst.AnimState:SetFinalOffset(2)
+    end,
+    fn_remove = nil
+})
 MakeFx({ --月轮宝盘：光韵特效
     name = "revolvedmoonlight_fx",
     assets = {

@@ -777,7 +777,11 @@ end
 --[ 帽子装备通用函数 ]--
 
 local function hat_on(inst, owner, buildname, foldername) --遮住头顶部的帽子样式
-    owner.AnimState:OverrideSymbol("swap_hat", buildname, foldername)
+    if buildname == nil then
+        owner.AnimState:ClearOverrideSymbol("swap_hat")
+    else
+        owner.AnimState:OverrideSymbol("swap_hat", buildname, foldername)
+    end
     owner.AnimState:Show("HAT")
     owner.AnimState:Show("HAIR_HAT")
     owner.AnimState:Hide("HAIR_NOHAT")
@@ -791,7 +795,11 @@ local function hat_on(inst, owner, buildname, foldername) --遮住头顶部的�
     end
 end
 local function hat_on_opentop(inst, owner, buildname, foldername) --完全开放式的帽子样式
-    owner.AnimState:OverrideSymbol("swap_hat", buildname, foldername)
+    if buildname == nil then
+        owner.AnimState:ClearOverrideSymbol("swap_hat")
+    else
+        owner.AnimState:OverrideSymbol("swap_hat", buildname, foldername)
+    end
     owner.AnimState:Show("HAT")
     owner.AnimState:Hide("HAIR_HAT")
     owner.AnimState:Show("HAIR_NOHAT")

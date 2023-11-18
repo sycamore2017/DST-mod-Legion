@@ -3,6 +3,7 @@
 local _G = GLOBAL
 local IsServer = TheNet:GetIsServer() or TheNet:IsDedicated()
 local ischinese = _G.CONFIGS_LEGION.LANGUAGES == "chinese"
+local TOOLS_L = require("tools_legion")
 
 table.insert(Assets, Asset("ATLAS", "images/icon_skinbar_shadow_l.xml"))
 table.insert(Assets, Asset("IMAGE", "images/icon_skinbar_shadow_l.tex"))
@@ -19,6 +20,8 @@ RegisterInventoryItemAtlas("images/inventoryimages_skin/agronssword_taste2.xml",
 RegisterInventoryItemAtlas("images/inventoryimages_skin/siving_turn_collector.xml", "siving_turn_collector.tex")
 RegisterInventoryItemAtlas("images/inventoryimages_skin/siving_turn_future.xml", "siving_turn_future.tex")
 RegisterInventoryItemAtlas("images/inventoryimages_skin/siving_turn_future2.xml", "siving_turn_future2.tex")
+RegisterInventoryItemAtlas("images/inventoryimages_skin/refractedmoonlight_taste.xml", "refractedmoonlight_taste.tex")
+RegisterInventoryItemAtlas("images/inventoryimages_skin/refractedmoonlight_taste2.xml", "refractedmoonlight_taste2.tex")
 
 --------------------------------------------------------------------------
 --[[ 皮肤函数 ]]
@@ -201,6 +204,20 @@ local function Fn_start_agronssword(inst)
     inst.AnimState:SetBank(inst._dd.build)
     inst.AnimState:SetBuild(inst._dd.build)
     if inst.components.timer:TimerExists("revolt") then
+        inst.components.inventoryitem.atlasname = inst._dd.img_atlas2
+        inst.components.inventoryitem:ChangeImageName(inst._dd.img_tex2)
+    else
+        inst.components.inventoryitem.atlasname = inst._dd.img_atlas
+        inst.components.inventoryitem:ChangeImageName(inst._dd.img_tex)
+    end
+end
+
+------
+
+local function Fn_start_refracted(inst)
+    inst.AnimState:SetBank(inst._dd.build)
+    inst.AnimState:SetBuild(inst._dd.build)
+    if inst.components.timer:TimerExists("moonsurge") then
         inst.components.inventoryitem.atlasname = inst._dd.img_atlas2
         inst.components.inventoryitem:ChangeImageName(inst._dd.img_tex2)
     else
@@ -401,64 +418,50 @@ _G.SKIN_PREFABS_LEGION = {
     ]]--
 
     rosebush = {
-        assets = nil,
         fn_start = function(inst)
             inst.AnimState:SetBank("berrybush2")
             inst.AnimState:SetBuild("rosebush")
         end,
-        exchangefx = { prefab = nil, offset_y = nil, scale = 1.5 },
+        exchangefx = { prefab = nil, offset_y = nil, scale = 1.5 }
     },
     lilybush = {
-        assets = nil,
         fn_start = function(inst)
             inst.AnimState:SetBank("berrybush2")
             inst.AnimState:SetBuild("lilybush")
         end,
-        exchangefx = { prefab = nil, offset_y = nil, scale = 1.5 },
+        exchangefx = { prefab = nil, offset_y = nil, scale = 1.5 }
     },
     orchidbush = {
-        assets = nil,
         fn_start = function(inst)
             inst.AnimState:SetBank("berrybush2")
             inst.AnimState:SetBuild("orchidbush")
         end,
-        exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
+        exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 }
     },
 
     rosorns = {
-        assets = nil,
         image = { name = nil, atlas = nil, setable = true },
         anim = {
             bank = nil, build = nil,
             anim = nil, animpush = nil, isloop = nil,
             setable = true
         },
-        equip = {
-            symbol = "swap_object", build = "swap_rosorns", file = "swap_rosorns"
-        },
+        equip = { symbol = "swap_object", build = "swap_rosorns", file = "swap_rosorns" },
         exchangefx = { prefab = nil, offset_y = nil, scale = nil },
-        floater = {
-            cut = 0.15, size = "small", offset_y = 0.4, scale = 0.5, nofx = nil
-        },
+        floater = { cut = 0.15, size = "small", offset_y = 0.4, scale = 0.5, nofx = nil }
     },
     lileaves = {
-        assets = nil,
         image = { name = nil, atlas = nil, setable = true },
         anim = {
             bank = nil, build = nil,
             anim = nil, animpush = nil, isloop = nil,
             setable = true
         },
-        equip = {
-            symbol = "swap_object", build = "swap_lileaves", file = "swap_lileaves"
-        },
+        equip = { symbol = "swap_object", build = "swap_lileaves", file = "swap_lileaves" },
         exchangefx = { prefab = nil, offset_y = nil, scale = nil },
-        floater = {
-            cut = 0.15, size = "small", offset_y = 0.4, scale = 0.5, nofx = nil,
-        },
+        floater = { cut = 0.15, size = "small", offset_y = 0.4, scale = 0.5, nofx = nil }
     },
     orchitwigs = {
-        assets = nil,
         image = { name = nil, atlas = nil, setable = true },
         anim = {
             bank = nil, build = nil,
@@ -467,12 +470,10 @@ _G.SKIN_PREFABS_LEGION = {
         },
         equip = {
             symbol = "swap_object", build = "swap_orchitwigs", file = "swap_orchitwigs",
-            atkfx = "impact_orchid_fx",
+            atkfx = "impact_orchid_fx"
         },
         exchangefx = { prefab = nil, offset_y = nil, scale = nil },
-        floater = {
-            cut = 0.15, size = "small", offset_y = 0.4, scale = 0.5, nofx = nil,
-        },
+        floater = { cut = 0.15, size = "small", offset_y = 0.4, scale = 0.5, nofx = nil }
     },
 
     neverfade = {
@@ -496,9 +497,7 @@ _G.SKIN_PREFABS_LEGION = {
             build_broken = "swap_neverfade_broken", file_broken = "swap_neverfade_broken"
         },
         exchangefx = { prefab = nil, offset_y = nil, scale = nil },
-        floater = {
-            cut = 0.12, size = "med", offset_y = 0.4, scale = 0.5, nofx = nil,
-        }
+        floater = { cut = 0.12, size = "med", offset_y = 0.4, scale = 0.5, nofx = nil }
     },
     neverfadebush = {
         fn_start = function(inst)
@@ -509,7 +508,6 @@ _G.SKIN_PREFABS_LEGION = {
     },
 
     hat_lichen = {
-        assets = nil,
         image = { name = nil, atlas = nil, setable = true },
         anim = {
             bank = nil, build = nil,
@@ -518,13 +516,10 @@ _G.SKIN_PREFABS_LEGION = {
         },
         equip = { symbol = "swap_hat", build = "hat_lichen", file = "swap_hat", isopenhat = true },
         exchangefx = { prefab = nil, offset_y = nil, scale = nil },
-        floater = {
-            cut = 0.03, size = "med", offset_y = 0.2, scale = 0.5, nofx = nil,
-        },
+        floater = { cut = 0.03, size = "med", offset_y = 0.2, scale = 0.5, nofx = nil }
     },
 
     hat_cowboy = {
-        assets = nil,
         image = { name = nil, atlas = nil, setable = true },
         anim = {
             bank = nil, build = nil,
@@ -533,13 +528,10 @@ _G.SKIN_PREFABS_LEGION = {
         },
         equip = { symbol = "swap_hat", build = "hat_cowboy", file = "swap_hat" },
         exchangefx = { prefab = nil, offset_y = nil, scale = nil },
-        floater = {
-            cut = 0.03, size = "med", offset_y = 0.2, scale = 0.8, nofx = nil,
-        },
+        floater = { cut = 0.03, size = "med", offset_y = 0.2, scale = 0.8, nofx = nil }
     },
 
     pinkstaff = {
-        assets = nil,
         image = { name = nil, atlas = nil, setable = true },
         anim = {
             bank = nil, build = nil,
@@ -549,15 +541,12 @@ _G.SKIN_PREFABS_LEGION = {
         fn_start = function(inst)
             inst.fxcolour = {255/255, 80/255, 173/255}
         end,
-        equip = {
-            symbol = "swap_object", build = "swap_pinkstaff", file = "swap_pinkstaff"
-        },
+        equip = { symbol = "swap_object", build = "swap_pinkstaff", file = "swap_pinkstaff" },
         exchangefx = { prefab = nil, offset_y = nil, scale = nil },
         floater = { cut = 0.15, size = "small", offset_y = 0.35, scale = 0.5, nofx = nil }
     },
 
     boltwingout = {
-        assets = nil,
         image = { name = nil, atlas = nil, setable = true },
         anim = {
             bank = "swap_boltwingout", build = "swap_boltwingout",
@@ -567,13 +556,10 @@ _G.SKIN_PREFABS_LEGION = {
         equip = { symbol = "swap_body", build = "swap_boltwingout", file = "swap_body" },
         boltdata = { fx = "boltwingout_fx", build = nil },
         exchangefx = { prefab = nil, offset_y = nil, scale = nil },
-        floater = {
-            cut = 0.09, size = "small", offset_y = 0.2, scale = 0.45, nofx = nil,
-        },
+        floater = { cut = 0.09, size = "small", offset_y = 0.2, scale = 0.45, nofx = nil }
     },
 
     fishhomingtool_awesome = {
-        assets = nil,
         image = { name = nil, atlas = nil, setable = true },
         anim = {
             bank = nil, build = nil,
@@ -587,7 +573,6 @@ _G.SKIN_PREFABS_LEGION = {
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 }
     },
     fishhomingtool_normal = {
-        assets = nil,
         image = { name = nil, atlas = nil, setable = true },
         anim = {
             bank = nil, build = nil,
@@ -635,11 +620,10 @@ _G.SKIN_PREFABS_LEGION = {
             inst._dd = nil
             inst.fn_temp(inst)
         end,
-        exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
+        exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 }
     },
 
     shield_l_log = {
-        assets = nil,
         image = { name = nil, atlas = nil, setable = true },
         anim = {
             bank = "shield_l_log", build = "shield_l_log",
@@ -648,12 +632,9 @@ _G.SKIN_PREFABS_LEGION = {
         },
         equip = { symbol = nil, build = "shield_l_log", file = "swap_shield" },
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.7 },
-        floater = {
-            cut = nil, size = "small", offset_y = 0.2, scale = 0.9, nofx = nil,
-        },
+        floater = { cut = nil, size = "small", offset_y = 0.2, scale = 0.9, nofx = nil }
     },
     shield_l_sand = {
-        assets = nil,
         image = { name = nil, atlas = nil, setable = true },
         anim = {
             bank = "shield_l_sand", build = "shield_l_sand",
@@ -661,7 +642,7 @@ _G.SKIN_PREFABS_LEGION = {
             setable = true
         },
         equip = { symbol = nil, build = "shield_l_sand", file = "swap_shield" },
-        exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
+        exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 }
     },
     agronssword = {
         fn_start = function(inst)
@@ -672,42 +653,33 @@ _G.SKIN_PREFABS_LEGION = {
             }
             Fn_start_agronssword(inst)
         end,
-        exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
+        exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 }
     },
 
     tripleshovelaxe = {
-        assets = nil,
         image = { name = nil, atlas = nil, setable = true },
         anim = {
             bank = nil, build = nil,
             anim = nil, animpush = nil, isloop = nil,
             setable = true
         },
-        equip = {
-            symbol = "swap_object", build = "tripleshovelaxe", file = "swap"
-        },
+        equip = { symbol = "swap_object", build = "tripleshovelaxe", file = "swap" },
         exchangefx = { prefab = nil, offset_y = nil, scale = nil },
-        floater = {
-            cut = nil, size = "med", offset_y = 0.15, scale = 0.4, nofx = nil,
-        }
+        floater = { cut = nil, size = "med", offset_y = 0.15, scale = 0.4, nofx = nil }
     },
     triplegoldenshovelaxe = {
-        assets = nil,
         image = { name = nil, atlas = nil, setable = true },
         anim = {
             bank = nil, build = nil,
             anim = nil, animpush = nil, isloop = nil,
             setable = true
         },
-        equip = {
-            symbol = "swap_object", build = "triplegoldenshovelaxe", file = "swap"
-        },
+        equip = { symbol = "swap_object", build = "triplegoldenshovelaxe", file = "swap" },
         exchangefx = { prefab = nil, offset_y = nil, scale = nil },
         floater = { cut = nil, size = "med", offset_y = 0.15, scale = 0.4, nofx = nil }
     },
 
     backcub = {
-        assets = nil,
         image = { name = nil, atlas = nil, setable = true },
         anim = {
             bank = "backcub", build = "backcub",
@@ -726,22 +698,18 @@ _G.SKIN_PREFABS_LEGION = {
     },
 
     fimbul_axe = {
-        assets = nil,
         image = { name = nil, atlas = nil, setable = true },
         anim = {
             bank = "boomerang", build = nil,
             anim = nil, animpush = nil, isloop = nil,
             setable = true
         },
-        equip = {
-            symbol = "swap_object", build = "fimbul_axe", file = "swap_base"
-        },
+        equip = { symbol = "swap_object", build = "fimbul_axe", file = "swap_base" },
         exchangefx = { prefab = nil, offset_y = nil, scale = nil },
         floater = { cut = 0.1, size = "med", offset_y = 0.3, scale = 0.5, nofx = nil }
     },
 
     siving_derivant = {
-        assets = nil,
         fn_start = function(inst)
             inst.AnimState:SetBank("siving_derivant")
             inst.AnimState:SetBuild("siving_derivant")
@@ -758,7 +726,7 @@ _G.SKIN_PREFABS_LEGION = {
         fn_fruit = function(genetrans)
             Fn_sivturn_fruit(genetrans, "siving_turn")
         end,
-        exchangefx = { prefab = nil, offset_y = nil, scale = 1.5 },
+        exchangefx = { prefab = nil, offset_y = nil, scale = 1.5 }
     },
 
     carpet_whitewood = {
@@ -795,9 +763,7 @@ _G.SKIN_PREFABS_LEGION = {
             anim = nil, animpush = nil, isloop = nil,
             setable = true
         },
-        equip = {
-            symbol = "swap_object", build = "siving_feather_real", file = "swap"
-        },
+        equip = { symbol = "swap_object", build = "siving_feather_real", file = "swap" },
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
         floater = { cut = 0.04, size = "small", offset_y = 0.2, scale = 0.5, nofx = nil }
     },
@@ -808,9 +774,7 @@ _G.SKIN_PREFABS_LEGION = {
             anim = nil, animpush = nil, isloop = nil,
             setable = true
         },
-        equip = {
-            symbol = "swap_object", build = "siving_feather_fake", file = "swap"
-        },
+        equip = { symbol = "swap_object", build = "siving_feather_fake", file = "swap" },
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
         floater = { cut = 0.04, size = "small", offset_y = 0.2, scale = 0.5, nofx = nil }
     },
@@ -846,7 +810,6 @@ _G.SKIN_PREFABS_LEGION = {
     },
 
     plant_cactus_meat_l = {
-        assets = nil,
         fn_start = function(inst)
             local sets = _G.CROPS_DATA_LEGION["cactus_meat"]
             inst.AnimState:SetBank(sets.bank)
@@ -857,7 +820,6 @@ _G.SKIN_PREFABS_LEGION = {
     },
 
     siving_ctlwater_item = {
-        assets = nil,
         image = { name = nil, atlas = nil, setable = true },
         anim = {
             bank = "siving_ctlwater", build = "siving_ctlwater",
@@ -866,7 +828,6 @@ _G.SKIN_PREFABS_LEGION = {
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 }
     },
     siving_ctlwater = {
-        assets = nil,
         fn_start = function(inst)
             inst.AnimState:SetBank("siving_ctlwater")
             inst.AnimState:SetBuild("siving_ctlwater")
@@ -881,7 +842,6 @@ _G.SKIN_PREFABS_LEGION = {
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 }
     },
     siving_ctldirt_item = {
-        assets = nil,
         image = { name = nil, atlas = nil, setable = true },
         anim = {
             bank = "siving_ctldirt", build = "siving_ctldirt",
@@ -890,7 +850,6 @@ _G.SKIN_PREFABS_LEGION = {
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 }
     },
     siving_ctldirt = {
-        assets = nil,
         fn_start = function(inst)
             inst.AnimState:SetBank("siving_ctldirt")
             inst.AnimState:SetBuild("siving_ctldirt")
@@ -913,7 +872,6 @@ _G.SKIN_PREFABS_LEGION = {
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 }
     },
     siving_ctlall_item = {
-        assets = nil,
         image = { name = nil, atlas = nil, setable = true },
         anim = {
             bank = "siving_ctlall", build = "siving_ctlall",
@@ -922,7 +880,6 @@ _G.SKIN_PREFABS_LEGION = {
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 }
     },
     siving_ctlall = {
-        assets = nil,
         fn_start = function(inst)
             inst.AnimState:SetBank("siving_ctlall")
             inst.AnimState:SetBuild("siving_ctlall")
@@ -950,24 +907,26 @@ _G.SKIN_PREFABS_LEGION = {
     },
 
     siving_mask = {
-        assets = nil,
         image = { name = nil, atlas = nil, setable = true },
         anim = {
             bank = nil, build = nil,
-            anim = nil, animpush = nil, isloop = nil,
-            setable = true
+            anim = nil, animpush = nil, isloop = nil, setable = true
         },
+        fn_start = function(inst)
+            inst.maskfxoverride_l = nil
+        end,
         equip = { symbol = nil, build = "siving_mask", file = nil, isopenhat = true },
         exchangefx = { prefab = nil, offset_y = nil, scale = nil }
     },
     siving_mask_gold = {
-        assets = nil,
         image = { name = nil, atlas = nil, setable = true },
         anim = {
             bank = nil, build = nil,
-            anim = nil, animpush = nil, isloop = nil,
-            setable = true
+            anim = nil, animpush = nil, isloop = nil, setable = true
         },
+        fn_start = function(inst)
+            inst.maskfxoverride_l = nil
+        end,
         equip = { symbol = nil, build = "siving_mask_gold", file = nil, isopenhat = true },
         exchangefx = { prefab = nil, offset_y = nil, scale = nil }
     },
@@ -976,8 +935,7 @@ _G.SKIN_PREFABS_LEGION = {
         image = { name = nil, atlas = nil, setable = true },
         anim = {
             bank = "siving_soil", build = "siving_soil",
-            anim = "item", animpush = nil, isloop = nil,
-            setable = true
+            anim = "item", animpush = nil, isloop = nil, setable = true
         },
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
 
@@ -996,6 +954,18 @@ _G.SKIN_PREFABS_LEGION = {
                 end
             end
         }
+    },
+
+    refractedmoonlight = {
+        fn_start = function(inst)
+            inst._dd = {
+                img_tex = "refractedmoonlight", img_atlas = "images/inventoryimages/refractedmoonlight.xml",
+                img_tex2 = "refractedmoonlight2", img_atlas2 = "images/inventoryimages/refractedmoonlight2.xml",
+                build = "refractedmoonlight", fx = "refracted_l_spark_fx"
+            }
+            Fn_start_refracted(inst)
+        end,
+        exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 }
     },
 }
 
@@ -1070,17 +1040,13 @@ _G.SKINS_LEGION = {
     ]]--
 
     rosebush_marble = {
-        base_prefab = "rosebush",
+        base_prefab = "rosebush", skin_id = "619108a04c724c6f40e77bd4",
 		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
-
-        skin_id = "619108a04c724c6f40e77bd4",
 		assets = {
             Asset("ANIM", "anim/berrybush.zip"), --官方浆果丛动画
-			Asset("ANIM", "anim/skin/rosebush_marble.zip"),
+			Asset("ANIM", "anim/skin/rosebush_marble.zip")
 		},
-
         string = ischinese and { name = "理盛赤蔷" } or { name = "Rose Marble Pot" },
-
 		fn_start = function(inst)
             --官方代码写得挺好，直接改动画模板居然能继承已有的动画播放和symbol切换状态
             inst.AnimState:SetBank("berrybush")
@@ -1094,24 +1060,18 @@ _G.SKINS_LEGION = {
         end
     },
     rosorns_marble = {
-        base_prefab = "rosorns",
+        base_prefab = "rosorns", skin_id = "62e639928c2f781db2f79b3d", onlyownedshow = true,
 		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
-
-        skin_id = "62e639928c2f781db2f79b3d",
-        onlyownedshow = true,
 		assets = {
 			Asset("ANIM", "anim/skin/rosorns_marble.zip"),
             Asset("ATLAS", "images/inventoryimages_skin/foliageath_rosorns_marble.xml"),
             Asset("IMAGE", "images/inventoryimages_skin/foliageath_rosorns_marble.tex")
 		},
         image = { name = nil, atlas = nil, setable = true },
-
         string = ischinese and { name = "落薇剪" } or { name = "Falling Petals Scissors" },
-
 		anim = {
             bank = nil, build = nil,
-            anim = nil, animpush = nil, isloop = true,
-            setable = true
+            anim = nil, animpush = nil, isloop = true, setable = true
         },
         equip = { symbol = "swap_object", build = "rosorns_marble", file = "swap_object" },
         fn_onAttack = function(inst, owner, target)
@@ -1128,17 +1088,13 @@ _G.SKINS_LEGION = {
         floater = { cut = 0.15, size = "small", offset_y = 0.4, scale = 0.5, nofx = nil }
     },
     lilybush_marble = {
-        base_prefab = "lilybush",
+        base_prefab = "lilybush", skin_id = "619116c74c724c6f40e77c40",
 		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
-
-        skin_id = "619116c74c724c6f40e77c40",
 		assets = {
             Asset("ANIM", "anim/berrybush.zip"), --官方浆果丛动画
-			Asset("ANIM", "anim/skin/lilybush_marble.zip"),
+			Asset("ANIM", "anim/skin/lilybush_marble.zip")
 		},
-
         string = ischinese and { name = "理盛截莲" } or { name = "Lily Marble Pot" },
-
 		fn_start = function(inst)
             inst.AnimState:SetBank("berrybush")
             inst.AnimState:SetBuild("lilybush_marble")
@@ -1151,24 +1107,18 @@ _G.SKINS_LEGION = {
         end
     },
     lileaves_marble = {
-        base_prefab = "lileaves",
+        base_prefab = "lileaves", skin_id = "62e535bd8c2f781db2f79ae7", onlyownedshow = true,
 		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
-
-        skin_id = "62e535bd8c2f781db2f79ae7",
-        onlyownedshow = true,
 		assets = {
 			Asset("ANIM", "anim/skin/lileaves_marble.zip"),
             Asset("ATLAS", "images/inventoryimages_skin/foliageath_lileaves_marble.xml"),
             Asset("IMAGE", "images/inventoryimages_skin/foliageath_lileaves_marble.tex")
 		},
         image = { name = nil, atlas = nil, setable = true },
-
         string = ischinese and { name = "石莲长枪" } or { name = "Marble Lilance" },
-
 		anim = {
             bank = nil, build = nil,
-            anim = nil, animpush = nil, isloop = nil,
-            setable = true
+            anim = nil, animpush = nil, isloop = nil, setable = true
         },
         equip = { symbol = "swap_object", build = "lileaves_marble", file = "swap_object" },
         scabbard = {
@@ -1179,17 +1129,13 @@ _G.SKINS_LEGION = {
         floater = { cut = 0.15, size = "small", offset_y = 0.4, scale = 0.6, nofx = nil }
     },
     orchidbush_marble = {
-        base_prefab = "orchidbush",
+        base_prefab = "orchidbush", skin_id = "6191d0514c724c6f40e77eb9",
 		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
-
-        skin_id = "6191d0514c724c6f40e77eb9",
 		assets = {
             Asset("ANIM", "anim/berrybush.zip"), --官方浆果丛动画
-			Asset("ANIM", "anim/skin/orchidbush_marble.zip"),
+			Asset("ANIM", "anim/skin/orchidbush_marble.zip")
 		},
-
         string = ischinese and { name = "理盛瀑兰" } or { name = "Orchid Marble Pot" },
-
 		fn_start = function(inst)
             inst.AnimState:SetBank("berrybush")
             inst.AnimState:SetBuild("orchidbush_marble")
@@ -1202,24 +1148,18 @@ _G.SKINS_LEGION = {
         end
     },
     orchitwigs_marble = {
-        base_prefab = "orchitwigs",
+        base_prefab = "orchitwigs", skin_id = "62e61d158c2f781db2f79b1e", onlyownedshow = true,
 		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
-
-        skin_id = "62e61d158c2f781db2f79b1e",
-        onlyownedshow = true,
 		assets = {
 			Asset("ANIM", "anim/skin/orchitwigs_marble.zip"),
             Asset("ATLAS", "images/inventoryimages_skin/foliageath_orchitwigs_marble.xml"),
             Asset("IMAGE", "images/inventoryimages_skin/foliageath_orchitwigs_marble.tex")
 		},
         image = { name = nil, atlas = nil, setable = true },
-
         string = ischinese and { name = "铁艺兰珊" } or { name = "Ironchid" },
-
 		anim = {
             bank = nil, build = nil,
-            anim = nil, animpush = nil, isloop = nil,
-            setable = true
+            anim = nil, animpush = nil, isloop = nil, setable = true
         },
         equip = {
             symbol = "swap_object", build = "orchitwigs_marble", file = "swap_object",
@@ -1234,18 +1174,13 @@ _G.SKINS_LEGION = {
     },
 
     orchidbush_disguiser = {
-        base_prefab = "orchidbush",
+        base_prefab = "orchidbush", skin_id = "626029b9c340bf24ab31057a", onlyownedshow = true,
 		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
-
-        skin_id = "626029b9c340bf24ab31057a",
-        onlyownedshow = true,
 		assets = {
             Asset("ANIM", "anim/berrybush2.zip"), --官方浆果丛动画
-			Asset("ANIM", "anim/skin/orchidbush_disguiser.zip"),
+			Asset("ANIM", "anim/skin/orchidbush_disguiser.zip")
 		},
-
         string = ischinese and { name = "粉色猎园" } or { name = "Pink Orchid Bush" },
-
 		fn_start = function(inst)
             inst.AnimState:SetBank("berrybush2")
             inst.AnimState:SetBuild("orchidbush_disguiser")
@@ -1258,23 +1193,18 @@ _G.SKINS_LEGION = {
         end
     },
     orchitwigs_disguiser = {
-        base_prefab = "orchitwigs",
+        base_prefab = "orchitwigs", skin_id = "ooooonononon",
 		type = "item", skin_tags = {}, release_group = 555, rarity = rarityFree,
-
-        skin_id = "ooooonononon",
 		assets = {
 			Asset("ANIM", "anim/skin/orchitwigs_disguiser.zip"),
             Asset("ATLAS", "images/inventoryimages_skin/foliageath_orchitwigs_disguiser.xml"),
             Asset("IMAGE", "images/inventoryimages_skin/foliageath_orchitwigs_disguiser.tex")
 		},
         image = { name = nil, atlas = nil, setable = true },
-
         string = ischinese and { name = "粉色追猎" } or { name = "Pink Orchitwigs" },
-
 		anim = {
             bank = nil, build = nil,
-            anim = nil, animpush = nil, isloop = nil,
-            setable = true
+            anim = nil, animpush = nil, isloop = nil, setable = true
         },
         equip = {
             symbol = "swap_object", build = "orchitwigs_disguiser", file = "swap_object",
@@ -1289,11 +1219,8 @@ _G.SKINS_LEGION = {
     },
 
     neverfade_thanks = {
-        base_prefab = "neverfade",
+        base_prefab = "neverfade", skin_id = "6191d8f74c724c6f40e77ed0", onlyownedshow = true,
 		type = "item", skin_tags = {}, release_group = 555, rarity = raritySpecial,
-
-        skin_id = "6191d8f74c724c6f40e77ed0",
-        onlyownedshow = true,
 		assets = {
 			Asset("ANIM", "anim/skin/neverfade_thanks.zip"),
             Asset("ANIM", "anim/skin/neverfade_butterfly_thanks.zip"),
@@ -1303,13 +1230,10 @@ _G.SKINS_LEGION = {
             Asset("IMAGE", "images/inventoryimages_skin/foliageath_neverfade_thanks.tex")
 		},
         image = { name = nil, atlas = nil, setable = false },
-
         string = ischinese and { name = "扶伤" } or { name = "FuShang" },
-
 		anim = {
             bank = nil, build = nil,
-            anim = nil, animpush = nil, isloop = nil,
-            setable = true
+            anim = nil, animpush = nil, isloop = nil, setable = true
         },
         fn_start = function(inst)
             if inst.hasSetBroken then
@@ -1338,18 +1262,12 @@ _G.SKINS_LEGION = {
         end
     },
     neverfadebush_thanks = {
-        base_prefab = "neverfadebush",
+        base_prefab = "neverfadebush", skin_id = "6191d8f74c724c6f40e77ed0", noshopshow = true,
 		type = "item", skin_tags = {}, release_group = 555, rarity = raritySpecial,
-
-        skin_id = "6191d8f74c724c6f40e77ed0",
-        noshopshow = true,
 		assets = {
-			Asset("ANIM", "anim/skin/neverfadebush_thanks.zip"),
+			Asset("ANIM", "anim/skin/neverfadebush_thanks.zip")
 		},
-        string = {
-            name = ischinese and "扶伤剑冢" or "FuShang Tomb"
-        },
-
+        string = { name = ischinese and "扶伤剑冢" or "FuShang Tomb" },
 		fn_start = function(inst)
             inst.AnimState:SetBank("neverfadebush_thanks")
             inst.AnimState:SetBuild("neverfadebush_thanks")
@@ -1358,11 +1276,8 @@ _G.SKINS_LEGION = {
         linkedskins = { sword = "neverfade_thanks" }
     },
     neverfade_paper = {
-        base_prefab = "neverfade",
+        base_prefab = "neverfade", skin_id = "638362b68c2f781db2f7f524", onlyownedshow = true,
 		type = "item", skin_tags = {}, release_group = 555, rarity = raritySpecial,
-
-        skin_id = "638362b68c2f781db2f7f524",
-        onlyownedshow = true,
 		assets = {
 			Asset("ANIM", "anim/skin/neverfade_paper.zip"),
             Asset("ANIM", "anim/skin/neverfade_butterfly_paper.zip"),
@@ -1372,9 +1287,7 @@ _G.SKINS_LEGION = {
             Asset("IMAGE", "images/inventoryimages_skin/foliageath_neverfade_paper.tex")
 		},
         image = { name = nil, atlas = nil, setable = false },
-
         string = ischinese and { name = "青蝶纸剑" } or { name = "Paper-fly Sword" },
-
 		fn_anim = function(inst)
             inst.AnimState:SetBank("neverfade_paper")
             inst.AnimState:SetBuild("neverfade_paper")
@@ -1400,9 +1313,7 @@ _G.SKINS_LEGION = {
         },
         butterfly = { bank = "butterfly", build = "neverfade_butterfly_paper" },
         exchangefx = { prefab = nil, offset_y = nil, scale = nil },
-        floater = {
-            cut = 0.05, size = "small", offset_y = 0.15, scale = 0.5, nofx = nil,
-        },
+        floater = { cut = 0.05, size = "small", offset_y = 0.15, scale = 0.5, nofx = nil },
         linkedskins = { bush = "neverfadebush_paper" },
         fn_placer = function(inst)
             inst.AnimState:SetBank("berrybush2")
@@ -1410,18 +1321,12 @@ _G.SKINS_LEGION = {
         end
     },
     neverfadebush_paper = {
-        base_prefab = "neverfadebush",
+        base_prefab = "neverfadebush", skin_id = "638362b68c2f781db2f7f524", noshopshow = true,
 		type = "item", skin_tags = {}, release_group = 555, rarity = raritySpecial,
-
-        skin_id = "638362b68c2f781db2f7f524",
-        noshopshow = true,
 		assets = {
 			Asset("ANIM", "anim/skin/neverfadebush_paper.zip")
 		},
-        string = {
-            name = ischinese and "青蝶纸扇" or "Paper-fly Fan"
-        },
-
+        string = { name = ischinese and "青蝶纸扇" or "Paper-fly Fan" },
 		fn_start = function(inst)
             inst.AnimState:SetBank("berrybush2")
             inst.AnimState:SetBuild("neverfadebush_paper")
@@ -1430,11 +1335,8 @@ _G.SKINS_LEGION = {
         linkedskins = { sword = "neverfade_paper" }
     },
     neverfade_paper2 = {
-        base_prefab = "neverfade",
+        base_prefab = "neverfade", skin_id = "638362b68c2f781db2f7f524", onlyownedshow = true,
 		type = "item", skin_tags = {}, release_group = 555, rarity = raritySpecial,
-
-        skin_id = "638362b68c2f781db2f7f524",
-        onlyownedshow = true,
 		assets = {
 			Asset("ANIM", "anim/skin/neverfade_paper2.zip"),
             Asset("ANIM", "anim/skin/neverfade_butterfly_paper2.zip"),
@@ -1444,9 +1346,7 @@ _G.SKINS_LEGION = {
             Asset("IMAGE", "images/inventoryimages_skin/foliageath_neverfade_paper2.tex")
 		},
         image = { name = nil, atlas = nil, setable = false },
-
         string = ischinese and { name = "绀蝶纸剑" } or { name = "Violet Paper-fly Sword" },
-
 		fn_anim = function(inst)
             inst.AnimState:SetBank("neverfade_paper2")
             inst.AnimState:SetBuild("neverfade_paper2")
@@ -1472,9 +1372,7 @@ _G.SKINS_LEGION = {
         },
         butterfly = { bank = "butterfly", build = "neverfade_butterfly_paper2" },
         exchangefx = { prefab = nil, offset_y = nil, scale = nil },
-        floater = {
-            cut = 0.05, size = "small", offset_y = 0.15, scale = 0.5, nofx = nil,
-        },
+        floater = { cut = 0.05, size = "small", offset_y = 0.15, scale = 0.5, nofx = nil },
         linkedskins = { bush = "neverfadebush_paper2" },
         fn_placer = function(inst)
             inst.AnimState:SetBank("berrybush2")
@@ -1482,18 +1380,12 @@ _G.SKINS_LEGION = {
         end
     },
     neverfadebush_paper2 = {
-        base_prefab = "neverfadebush",
+        base_prefab = "neverfadebush", skin_id = "638362b68c2f781db2f7f524", noshopshow = true,
 		type = "item", skin_tags = {}, release_group = 555, rarity = raritySpecial,
-
-        skin_id = "638362b68c2f781db2f7f524",
-        noshopshow = true,
 		assets = {
 			Asset("ANIM", "anim/skin/neverfadebush_paper2.zip")
 		},
-        string = {
-            name = ischinese and "绀蝶纸扇" or "Violet Paper-fly Fan"
-        },
-
+        string = { name = ischinese and "绀蝶纸扇" or "Violet Paper-fly Fan" },
 		fn_start = function(inst)
             inst.AnimState:SetBank("berrybush2")
             inst.AnimState:SetBuild("neverfadebush_paper2")
@@ -1503,42 +1395,32 @@ _G.SKINS_LEGION = {
     },
 
     hat_lichen_emo_que = {
-        base_prefab = "hat_lichen",
+        base_prefab = "hat_lichen", skin_id = "61909c584c724c6f40e779fa",
 		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
-
-        skin_id = "61909c584c724c6f40e779fa",
 		assets = {
 			Asset("ANIM", "anim/skin/hat_lichen_emo_que.zip")
 		},
 		image = { name = nil, atlas = nil, setable = true },
-
         string = ischinese and { name = "困惑发卡" } or { name = "Question Hairpin" },
-
 		anim = {
             bank = nil, build = nil,
-            anim = nil, animpush = nil, isloop = nil,
-            setable = true
+            anim = nil, animpush = nil, isloop = nil, setable = true
         },
         equip = { symbol = "swap_hat", build = "hat_lichen_emo_que", file = "swap_hat", isopenhat = true },
         exchangefx = { prefab = nil, offset_y = nil, scale = nil },
         floater = { cut = 0.03, size = "small", offset_y = 0.15, scale = 0.5, nofx = nil }
     },
     hat_lichen_disguiser = {
-        base_prefab = "hat_lichen",
+        base_prefab = "hat_lichen", skin_id = "ooooonononon",
 		type = "item", skin_tags = {}, release_group = 555, rarity = rarityFree,
-
-        skin_id = "ooooonononon",
 		assets = {
 			Asset("ANIM", "anim/skin/hat_lichen_disguiser.zip")
 		},
 		image = { name = nil, atlas = nil, setable = true },
-
         string = ischinese and { name = "深渊的星" } or { name = "Abyss Star Hairpin" },
-
 		anim = {
             bank = nil, build = nil,
-            anim = nil, animpush = nil, isloop = nil,
-            setable = true
+            anim = nil, animpush = nil, isloop = nil, setable = true
         },
         equip = {
             symbol = "swap_hat", build = "hat_lichen_disguiser", file = "swap_hat",
@@ -1549,42 +1431,32 @@ _G.SKINS_LEGION = {
     },
 
     hat_cowboy_tvplay = {
-        base_prefab = "hat_cowboy",
+        base_prefab = "hat_cowboy", skin_id = "ooooonononon",
 		type = "item", skin_tags = {}, release_group = 555, rarity = rarityFree,
-
-        skin_id = "ooooonononon",
 		assets = {
-			Asset("ANIM", "anim/skin/hat_cowboy_tvplay.zip"),
+			Asset("ANIM", "anim/skin/hat_cowboy_tvplay.zip")
 		},
 		image = { name = nil, atlas = nil, setable = true },
-
         string = ischinese and { name = "卡尔的警帽，永远" } or { name = "Carl's Forever Police Cap" },
-
 		anim = {
             bank = nil, build = nil,
-            anim = nil, animpush = nil, isloop = nil,
-            setable = true
+            anim = nil, animpush = nil, isloop = nil, setable = true
         },
         equip = { symbol = "swap_hat", build = "hat_cowboy_tvplay", file = "swap_hat" },
         exchangefx = { prefab = nil, offset_y = nil, scale = nil },
         floater = { cut = 0.03, size = "med", offset_y = 0.2, scale = 0.8, nofx = nil }
     },
     pinkstaff_tvplay = {
-        base_prefab = "pinkstaff",
+        base_prefab = "pinkstaff", skin_id = "ooooonononon",
 		type = "item", skin_tags = {}, release_group = 555, rarity = rarityFree,
-
-        skin_id = "ooooonononon",
 		assets = {
 			Asset("ANIM", "anim/skin/pinkstaff_tvplay.zip")
 		},
         image = { name = nil, atlas = nil, setable = true },
-
         string = ischinese and { name = "音速起子12" } or { name = "Sonic Screwdriver 12" },
-
 		anim = {
             bank = nil, build = nil,
-            anim = nil, animpush = nil, isloop = nil,
-            setable = true
+            anim = nil, animpush = nil, isloop = nil, setable = true
         },
         fn_start = function(inst)
             inst.fxcolour = {115/255, 217/255, 255/255}
@@ -1606,22 +1478,17 @@ _G.SKINS_LEGION = {
     },
 
     boltwingout_disguiser = {
-        base_prefab = "boltwingout",
+        base_prefab = "boltwingout", skin_id = "61c57daadb102b0b8a50ae95",
 		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
-
-        skin_id = "61c57daadb102b0b8a50ae95",
 		assets = {
 			Asset("ANIM", "anim/skin/boltwingout_disguiser.zip"),
             Asset("ANIM", "anim/skin/boltwingout_shuck_disguiser.zip")
 		},
 		image = { name = nil, atlas = nil, setable = true },
-
         string = ischinese and { name = "枯叶飞舞" } or { name = "Fallen Dance" },
-
 		anim = {
             bank = nil, build = nil,
-            anim = nil, animpush = nil, isloop = nil,
-            setable = true
+            anim = nil, animpush = nil, isloop = nil, setable = true
         },
         equip = { symbol = "swap_body", build = "boltwingout_disguiser", file = "swap_body" },
         boltdata = { fx = "boltwingout_fx_disguiser", build = "boltwingout_shuck_disguiser" },
@@ -1630,22 +1497,16 @@ _G.SKINS_LEGION = {
     },
 
     fishhomingtool_awesome_thanks = {
-        base_prefab = "fishhomingtool_awesome",
+        base_prefab = "fishhomingtool_awesome", skin_id = "627f66c0c340bf24ab311783", onlyownedshow = true,
 		type = "item", skin_tags = {}, release_group = 555, rarity = raritySpecial,
-
-        skin_id = "627f66c0c340bf24ab311783",
-        onlyownedshow = true,
 		assets = {
 			Asset("ANIM", "anim/skin/fishhomingtool_awesome_thanks.zip")
 		},
         image = { name = nil, atlas = nil, setable = true },
-
         string = ischinese and { name = "云烟" } or { name = "YunYan" },
-
         anim = {
             bank = nil, build = nil,
-            anim = nil, animpush = nil, isloop = nil,
-            setable = true
+            anim = nil, animpush = nil, isloop = nil, setable = true
         },
         fn_start = function(inst)
             inst.components.bundlemaker:SetSkinData("fishhomingbait_thanks", nil)
@@ -1654,22 +1515,16 @@ _G.SKINS_LEGION = {
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 }
     },
     fishhomingtool_awesome_taste = {
-        base_prefab = "fishhomingtool_awesome",
+        base_prefab = "fishhomingtool_awesome", skin_id = "61ff45880a30fc7fca0db5e5", onlyownedshow = true, mustonwedshow = true,
 		type = "item", skin_tags = {}, release_group = 555, rarity = rarityFree,
-
-        skin_id = "61ff45880a30fc7fca0db5e5",
-        onlyownedshow = true, mustonwedshow = true,
 		assets = {
 			Asset("ANIM", "anim/skin/fishhomingtool_awesome_taste.zip")
 		},
         image = { name = nil, atlas = nil, setable = true },
-
         string = ischinese and { name = "茶之恋榨汁机" } or { name = "Tea Heart Juicer" },
-
         anim = {
             bank = nil, build = nil,
-            anim = nil, animpush = nil, isloop = nil,
-            setable = true
+            anim = nil, animpush = nil, isloop = nil, setable = true
         },
         fn_start = function(inst)
             inst.components.bundlemaker:SetSkinData("fishhomingbait_taste", nil)
@@ -1678,22 +1533,16 @@ _G.SKINS_LEGION = {
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 }
     },
     fishhomingtool_normal_thanks = {
-        base_prefab = "fishhomingtool_normal",
+        base_prefab = "fishhomingtool_normal", skin_id = "627f66c0c340bf24ab311783", noshopshow = true,
 		type = "item", skin_tags = {}, release_group = 555, rarity = raritySpecial,
-
-        skin_id = "627f66c0c340bf24ab311783",
-        noshopshow = true,
 		assets = {
 			Asset("ANIM", "anim/skin/fishhomingtool_normal_thanks.zip")
 		},
         image = { name = nil, atlas = nil, setable = true },
-
         string = { name = ischinese and "云烟草" or "YunYan Cigarette" },
-
         anim = {
             bank = nil, build = nil,
-            anim = nil, animpush = nil, isloop = nil,
-            setable = true
+            anim = nil, animpush = nil, isloop = nil, setable = true
         },
         fn_start = function(inst)
             inst.components.bundlemaker:SetSkinData("fishhomingbait_thanks", nil)
@@ -1701,22 +1550,16 @@ _G.SKINS_LEGION = {
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 }
     },
     fishhomingtool_normal_taste = {
-        base_prefab = "fishhomingtool_normal",
+        base_prefab = "fishhomingtool_normal", skin_id = "61ff45880a30fc7fca0db5e5", noshopshow = true,
 		type = "item", skin_tags = {}, release_group = 555, rarity = rarityFree,
-
-        skin_id = "61ff45880a30fc7fca0db5e5",
-        noshopshow = true,
 		assets = {
 			Asset("ANIM", "anim/skin/fishhomingtool_normal_taste.zip")
 		},
         image = { name = nil, atlas = nil, setable = true },
-
         string = ischinese and { name = "一袋茶之恋" } or { name = "A Bag of Tea Heart" },
-
         anim = {
             bank = nil, build = nil,
-            anim = nil, animpush = nil, isloop = nil,
-            setable = true
+            anim = nil, animpush = nil, isloop = nil, setable = true
         },
         fn_start = function(inst)
             inst.components.bundlemaker:SetSkinData("fishhomingbait_taste", nil)
@@ -1724,11 +1567,8 @@ _G.SKINS_LEGION = {
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 }
     },
     fishhomingbait_thanks = {
-        base_prefab = "fishhomingbait",
+        base_prefab = "fishhomingbait", skin_id = "627f66c0c340bf24ab311783", noshopshow = true,
 		type = "item", skin_tags = {}, release_group = 555, rarity = raritySpecial,
-
-        skin_id = "627f66c0c340bf24ab311783",
-        noshopshow = true,
 		assets = {
             Asset("ANIM", "anim/pollen_chum.zip"), --官方藤壶花粉动画
 			Asset("ANIM", "anim/skin/fishhomingbait_thanks.zip"),
@@ -1740,9 +1580,7 @@ _G.SKINS_LEGION = {
             Asset("IMAGE", "images/inventoryimages_skin/fishhomingbait3_thanks.tex")
 		},
         image = { name = nil, atlas = nil, setable = false }, --皮肤展示需要一个同prefab名的图片
-
         string = { name = ischinese and "云烟瓶" or "YunYan Bottle" },
-
         fn_start = function(inst)
             inst.baitimgs_l = {
                 dusty = {
@@ -1768,11 +1606,8 @@ _G.SKINS_LEGION = {
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 }
     },
     fishhomingbait_taste = {
-        base_prefab = "fishhomingbait",
+        base_prefab = "fishhomingbait", skin_id = "61ff45880a30fc7fca0db5e5", noshopshow = true,
 		type = "item", skin_tags = {}, release_group = 555, rarity = rarityFree,
-
-        skin_id = "61ff45880a30fc7fca0db5e5",
-        noshopshow = true,
 		assets = {
             Asset("ANIM", "anim/pollen_chum.zip"), --官方藤壶花粉动画
 			Asset("ANIM", "anim/skin/fishhomingbait_taste.zip"),
@@ -1784,9 +1619,7 @@ _G.SKINS_LEGION = {
             Asset("IMAGE", "images/inventoryimages_skin/fishhomingbait3_taste.tex")
 		},
         image = { name = nil, atlas = nil, setable = false }, --皮肤展示需要一个同prefab名的图片
-
         string = ischinese and { name = "茶之恋" } or { name = "Tea Heart" },
-
         fn_start = function(inst)
             inst.baitimgs_l = {
                 dusty = {
@@ -1813,72 +1646,52 @@ _G.SKINS_LEGION = {
     },
 
     shield_l_log_emo_pride = {
-        base_prefab = "shield_l_log",
+        base_prefab = "shield_l_log", skin_id = "ooooonononon",
 		type = "item", skin_tags = {}, release_group = 555, rarity = rarityFree,
-
-        skin_id = "ooooonononon",
 		assets = {
-			Asset("ANIM", "anim/skin/shield_l_log_emo_pride.zip"),
+			Asset("ANIM", "anim/skin/shield_l_log_emo_pride.zip")
 		},
 		image = { name = nil, atlas = nil, setable = true },
-
         string = ischinese and { name = "爱上彩虹" } or { name = "Love Rainbow" },
-
         anim = {
             bank = nil, build = nil,
-            anim = nil, animpush = nil, isloop = nil,
-            setable = true
+            anim = nil, animpush = nil, isloop = nil, setable = true
         },
         equip = { symbol = "lantern_overlay", build = "shield_l_log_emo_pride", file = "swap_shield" },
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.7 },
         floater = { cut = nil, size = "small", offset_y = 0.2, scale = 0.9, nofx = nil },
-
         fn_start = function(inst)
             FxInit(inst, {"fx_ranimbowspark"}, -10)
         end,
         fn_end = FxClear
     },
     shield_l_log_emo_fist = {
-        base_prefab = "shield_l_log",
+        base_prefab = "shield_l_log", skin_id = "629b0d278c2f781db2f77ef8", onlyownedshow = true,
 		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
-
-        skin_id = "629b0d278c2f781db2f77ef8",
-        onlyownedshow = true,
 		assets = {
 			Asset("ANIM", "anim/skin/shield_l_log_emo_fist.zip")
 		},
 		image = { name = nil, atlas = nil, setable = true },
-
         string = ischinese and { name = "重拳出击" } or { name = "Punch Quest" },
-
         anim = {
             bank = nil, build = nil,
-            anim = nil, animpush = nil, isloop = nil,
-            setable = true
+            anim = nil, animpush = nil, isloop = nil, setable = true
         },
-        equip = {
-            symbol = "lantern_overlay", build = "shield_l_log_emo_fist", file = "swap_shield"
-        },
+        equip = { symbol = "lantern_overlay", build = "shield_l_log_emo_fist", file = "swap_shield" },
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.6 },
         floater = { cut = nil, size = "small", offset_y = 0.2, scale = 0.8, nofx = nil }
     },
     shield_l_log_era = {
-        base_prefab = "shield_l_log",
+        base_prefab = "shield_l_log", skin_id = "629b0d088c2f781db2f77ef4", onlyownedshow = true,
 		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
-
-        skin_id = "629b0d088c2f781db2f77ef4",
-        onlyownedshow = true,
 		assets = {
 			Asset("ANIM", "anim/skin/shield_l_log_era.zip")
 		},
 		image = { name = nil, atlas = nil, setable = true },
-
         string = ischinese and { name = "三叶虫化石" } or { name = "Trilobite Fossil" },
-
         anim = {
             bank = nil, build = nil,
-            anim = nil, animpush = nil, isloop = nil,
-            setable = true
+            anim = nil, animpush = nil, isloop = nil, setable = true
         },
         equip = { symbol = "lantern_overlay", build = "shield_l_log_era", file = "swap_shield" },
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.7 },
@@ -1886,53 +1699,39 @@ _G.SKINS_LEGION = {
     },
 
     shield_l_sand_era = {
-        base_prefab = "shield_l_sand",
+        base_prefab = "shield_l_sand", skin_id = "62845917c340bf24ab311969", onlyownedshow = true,
 		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
-
-        skin_id = "62845917c340bf24ab311969",
-        onlyownedshow = true,
 		assets = {
 			Asset("ANIM", "anim/skin/shield_l_sand_era.zip")
 		},
 		image = { name = nil, atlas = nil, setable = true },
-
         string = ischinese and { name = "三角龙头骨" } or { name = "The Skull of Triceratops" },
-
         anim = {
             bank = nil, build = nil,
-            anim = nil, animpush = nil, isloop = nil,
-            setable = true
+            anim = nil, animpush = nil, isloop = nil, setable = true
         },
         equip = { symbol = "lantern_overlay", build = "shield_l_sand_era", file = "swap_shield" },
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 }
     },
     shield_l_sand_op = {
-        base_prefab = "shield_l_sand",
+        base_prefab = "shield_l_sand", skin_id = "ooooonononon",
 		type = "item", skin_tags = {}, release_group = 555, rarity = rarityFree,
-
-        skin_id = "ooooonononon",
 		assets = {
 			Asset("ANIM", "anim/skin/shield_l_sand_op.zip")
 		},
 		image = { name = nil, atlas = nil, setable = true },
-
         string = ischinese and { name = "旧稿" } or { name = "Old Art" },
-
         anim = {
             bank = nil, build = nil,
-            anim = nil, animpush = nil, isloop = nil,
-            setable = true
+            anim = nil, animpush = nil, isloop = nil, setable = true
         },
         equip = { symbol = "lantern_overlay", build = "shield_l_sand_op", file = "swap_shield" },
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 }
     },
 
     agronssword_taste = {
-        base_prefab = "agronssword",
+        base_prefab = "agronssword", skin_id = "637f66d88c2f781db2f7f2d0", onlyownedshow = true,
 		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
-
-        skin_id = "637f66d88c2f781db2f7f2d0",
-        onlyownedshow = true,
 		assets = {
 			Asset("ANIM", "anim/skin/agronssword_taste.zip"),
             Asset("ATLAS", "images/inventoryimages_skin/agronssword_taste.xml"),
@@ -1940,9 +1739,7 @@ _G.SKINS_LEGION = {
             Asset("ATLAS", "images/inventoryimages_skin/agronssword_taste2.xml"),
             Asset("IMAGE", "images/inventoryimages_skin/agronssword_taste2.tex")
 		},
-
         string = ischinese and { name = "糖霜法棍" } or { name = "Frosting Baguette" },
-
         fn_start = function(inst)
             inst._dd = {
                 img_tex = "agronssword_taste", img_atlas = "images/inventoryimages_skin/agronssword_taste.xml",
@@ -1955,11 +1752,8 @@ _G.SKINS_LEGION = {
     },
 
     icire_rock_era = {
-        base_prefab = "icire_rock",
+        base_prefab = "icire_rock", skin_id = "6280d4f2c340bf24ab3118b1", onlyownedshow = true,
 		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
-
-        skin_id = "6280d4f2c340bf24ab3118b1",
-        onlyownedshow = true,
 		assets = {
             -- Asset("ANIM", "anim/heat_rock.zip"), --官方热能石动画模板。因为本体也引用了，所以这不重复引用
 			Asset("ANIM", "anim/skin/icire_rock_era.zip"),
@@ -1972,12 +1766,10 @@ _G.SKINS_LEGION = {
             Asset("ATLAS", "images/inventoryimages_skin/icire_rock4_era.xml"),
             Asset("IMAGE", "images/inventoryimages_skin/icire_rock4_era.tex"),
             Asset("ATLAS", "images/inventoryimages_skin/icire_rock5_era.xml"),
-            Asset("IMAGE", "images/inventoryimages_skin/icire_rock5_era.tex"),
+            Asset("IMAGE", "images/inventoryimages_skin/icire_rock5_era.tex")
 		},
-		image = { name = nil, atlas = nil, setable = false, },
-
+		image = { name = nil, atlas = nil, setable = false },
         string = ischinese and { name = "琥珀石中蝇" } or { name = "In Amber" },
-
 		fn_start = function(inst)
             inst.AnimState:SetBank("heat_rock")
             inst.AnimState:SetBuild("heat_rock")
@@ -1987,14 +1779,11 @@ _G.SKINS_LEGION = {
             inst._dd = { img_pst = "_era", canbloom = true }
             inst.fn_temp(inst)
         end,
-        exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
+        exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 }
     },
     icire_rock_collector = {
-        base_prefab = "icire_rock",
+        base_prefab = "icire_rock", skin_id = "62df65b58c2f781db2f7998a", onlyownedshow = true, mustonwedshow = true,
 		type = "item", skin_tags = {}, release_group = 555, rarity = raritySpecial,
-
-        skin_id = "62df65b58c2f781db2f7998a",
-        onlyownedshow = true, mustonwedshow = true,
 		assets = {
 			Asset("ANIM", "anim/skin/icire_rock_collector.zip"),
             Asset("ATLAS", "images/inventoryimages_skin/icire_rock1_collector.xml"),
@@ -2006,12 +1795,10 @@ _G.SKINS_LEGION = {
             Asset("ATLAS", "images/inventoryimages_skin/icire_rock4_collector.xml"),
             Asset("IMAGE", "images/inventoryimages_skin/icire_rock4_collector.tex"),
             Asset("ATLAS", "images/inventoryimages_skin/icire_rock5_collector.xml"),
-            Asset("IMAGE", "images/inventoryimages_skin/icire_rock5_collector.tex"),
+            Asset("IMAGE", "images/inventoryimages_skin/icire_rock5_collector.tex")
 		},
-		image = { name = nil, atlas = nil, setable = false, },
-
+		image = { name = nil, atlas = nil, setable = false },
         string = ischinese and { name = "占星石" } or { name = "Astrological Stone" },
-
 		fn_start = function(inst)
             inst.AnimState:SetBank("icire_rock_collector")
             inst.AnimState:SetBuild("icire_rock_collector")
@@ -2021,14 +1808,11 @@ _G.SKINS_LEGION = {
             inst._dd = { img_pst = "_collector", canbloom = true }
             inst.fn_temp(inst)
         end,
-        exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
+        exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 }
     },
     icire_rock_day = {
-        base_prefab = "icire_rock",
+        base_prefab = "icire_rock", skin_id = "6380cbb88c2f781db2f7f400", onlyownedshow = true,
 		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
-
-        skin_id = "6380cbb88c2f781db2f7f400",
-        onlyownedshow = true,
 		assets = {
 			Asset("ANIM", "anim/skin/icire_rock_day.zip"),
             Asset("ATLAS", "images/inventoryimages_skin/icire_rock1_day.xml"),
@@ -2040,12 +1824,10 @@ _G.SKINS_LEGION = {
             Asset("ATLAS", "images/inventoryimages_skin/icire_rock4_day.xml"),
             Asset("IMAGE", "images/inventoryimages_skin/icire_rock4_day.tex"),
             Asset("ATLAS", "images/inventoryimages_skin/icire_rock5_day.xml"),
-            Asset("IMAGE", "images/inventoryimages_skin/icire_rock5_day.tex"),
+            Asset("IMAGE", "images/inventoryimages_skin/icire_rock5_day.tex")
 		},
 		image = { name = nil, atlas = nil, setable = false },
-
         string = ischinese and { name = "风景球" } or { name = "Landscape Ball" },
-
 		fn_start = function(inst)
             inst.AnimState:SetBank("icire_rock_day")
             inst.AnimState:SetBuild("icire_rock_day")
@@ -2067,18 +1849,13 @@ _G.SKINS_LEGION = {
     },
 
     lilybush_era = {
-        base_prefab = "lilybush",
+        base_prefab = "lilybush", skin_id = "629b0d5f8c2f781db2f77f0d", onlyownedshow = true,
 		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
-
-        skin_id = "629b0d5f8c2f781db2f77f0d",
-        onlyownedshow = true,
 		assets = {
             Asset("ANIM", "anim/berrybush2.zip"), --官方浆果丛动画
-			Asset("ANIM", "anim/skin/lilybush_era.zip"),
+			Asset("ANIM", "anim/skin/lilybush_era.zip")
 		},
-
         string = ischinese and { name = "婆娑角蕨" } or { name = "Platycerium Bush" },
-
 		fn_start = function(inst)
             inst.AnimState:SetBank("berrybush2")
             inst.AnimState:SetBuild("lilybush_era")
@@ -2091,26 +1868,18 @@ _G.SKINS_LEGION = {
         end
     },
     lileaves_era = {
-        base_prefab = "lileaves",
+        base_prefab = "lileaves", skin_id = "629b0d5f8c2f781db2f77f0d", noshopshow = true,
 		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
-
-        skin_id = "629b0d5f8c2f781db2f77f0d",
-        noshopshow = true,
 		assets = {
 			Asset("ANIM", "anim/skin/lileaves_era.zip"),
             Asset("ATLAS", "images/inventoryimages_skin/foliageath_lileaves_era.xml"),
             Asset("IMAGE", "images/inventoryimages_skin/foliageath_lileaves_era.tex")
 		},
         image = { name = nil, atlas = nil, setable = true },
-
-        string = {
-            name = ischinese and "婆娑花叶" or "Platycerium Leaves"
-        },
-
+        string = { name = ischinese and "婆娑花叶" or "Platycerium Leaves" },
 		anim = {
             bank = nil, build = nil,
-            anim = nil, animpush = nil, isloop = nil,
-            setable = true
+            anim = nil, animpush = nil, isloop = nil, setable = true
         },
         equip = { symbol = "swap_object", build = "lileaves_era", file = "swap_object" },
         scabbard = {
@@ -2122,46 +1891,33 @@ _G.SKINS_LEGION = {
     },
 
     triplegoldenshovelaxe_era = {
-        base_prefab = "triplegoldenshovelaxe",
+        base_prefab = "triplegoldenshovelaxe", skin_id = "629b0d848c2f781db2f77f11", onlyownedshow = true,
 		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
-
-        skin_id = "629b0d848c2f781db2f77f11",
-        onlyownedshow = true,
 		assets = {
 			Asset("ANIM", "anim/skin/triplegoldenshovelaxe_era.zip")
 		},
         image = { name = nil, atlas = nil, setable = true },
-
         string = ischinese and { name = "铛铛考古镐" } or { name = "Era River Explorer" },
-
 		anim = {
             bank = nil, build = nil,
-            anim = nil, animpush = nil, isloop = nil,
-            setable = true
+            anim = nil, animpush = nil, isloop = nil, setable = true
         },
         equip = { symbol = "swap_object", build = "triplegoldenshovelaxe_era", file = "swap" },
         exchangefx = { prefab = nil, offset_y = nil, scale = nil },
         floater = { cut = nil, size = "med", offset_y = 0.15, scale = 0.4, nofx = nil }
     },
     tripleshovelaxe_era = {
-        base_prefab = "tripleshovelaxe",
+        base_prefab = "tripleshovelaxe", skin_id = "629b0d848c2f781db2f77f11", noshopshow = true,
 		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
-
-        skin_id = "629b0d848c2f781db2f77f11",
-        noshopshow = true,
 		assets = {
 			Asset("ANIM", "anim/skin/tripleshovelaxe_era.zip")
 		},
         image = { name = nil, atlas = nil, setable = true },
-
-        string = {
-            name = ischinese and "叮叮考古镐" or "Era Valley Explorer"
-        },
+        string = { name = ischinese and "叮叮考古镐" or "Era Valley Explorer" },
 
 		anim = {
             bank = nil, build = nil,
-            anim = nil, animpush = nil, isloop = nil,
-            setable = true
+            anim = nil, animpush = nil, isloop = nil, setable = true
         },
         equip = { symbol = "swap_object", build = "tripleshovelaxe_era", file = "swap" },
         exchangefx = { prefab = nil, offset_y = nil, scale = nil },
@@ -2169,40 +1925,29 @@ _G.SKINS_LEGION = {
     },
 
     backcub_fans = {
-        base_prefab = "backcub",
+        base_prefab = "backcub", skin_id = "629cca398c2f781db2f78092", onlyownedshow = true, mustonwedshow = true,
 		type = "item", skin_tags = {}, release_group = 555, rarity = rarityFree,
-
-        skin_id = "629cca398c2f781db2f78092",
-        onlyownedshow = true, mustonwedshow = true,
 		assets = {
 			Asset("ANIM", "anim/skin/backcub_fans.zip")
 		},
 		image = { name = nil, atlas = nil, setable = true },
-
         string = ischinese and { name = "饭仔" } or { name = "Kid Fan" },
-
 		anim = {
             bank = nil, build = nil,
-            anim = nil, animpush = nil, isloop = nil,
-            setable = true
+            anim = nil, animpush = nil, isloop = nil, setable = true
         },
         equip = { symbol = "swap_body", build = "backcub_fans", file = "swap_body" },
         exchangefx = { prefab = nil, offset_y = nil, scale = nil },
         floater = { cut = nil, size = "med", offset_y = 0.1, scale = 1.1, nofx = nil }
     },
     backcub_thanks = {
-        base_prefab = "backcub",
+        base_prefab = "backcub", skin_id = "62f235928c2f781db2f7a2dd", onlyownedshow = true,
 		type = "item", skin_tags = {}, release_group = 555, rarity = raritySpecial,
-
-        skin_id = "62f235928c2f781db2f7a2dd",
-        onlyownedshow = true,
 		assets = {
 			Asset("ANIM", "anim/skin/backcub_thanks.zip")
 		},
 		image = { name = nil, atlas = nil, setable = true },
-
         string = ischinese and { name = "浮生儿" } or { name = "Foosen" },
-
 		fn_anim = function(inst)
             SetRandomSkinAnim(inst, {
                 "idle1", "idle1", "idle1", "idle2", "idle3", "idle3", "idle4", "idle5"
@@ -2228,19 +1973,14 @@ _G.SKINS_LEGION = {
         }
     },
     backcub_fans2 = {
-        base_prefab = "backcub",
+        base_prefab = "backcub", skin_id = "6309c6e88c2f781db2f7ae20", onlyownedshow = true, mustonwedshow = true,
 		type = "item", skin_tags = {}, release_group = 555, rarity = rarityFree,
-
-        skin_id = "6309c6e88c2f781db2f7ae20",
-        onlyownedshow = true, mustonwedshow = true,
 		assets = {
 			Asset("ANIM", "anim/skin/backcub_fans2.zip"),
-            Asset("ANIM", "anim/skin/ui_backcub_fans2_2x6.zip"),
+            Asset("ANIM", "anim/skin/ui_backcub_fans2_2x6.zip")
 		},
 		image = { name = nil, atlas = nil, setable = true },
-
         string = ischinese and { name = "饭豆子" } or { name = "Bean Fan" },
-
         fn_start = function(inst)
             inst.AnimState:SetBank("backcub_fans2")
             inst.AnimState:SetBuild("backcub_fans2")
@@ -2258,7 +1998,6 @@ _G.SKINS_LEGION = {
         fn_end_c = function(inst)
             SetWidget(inst, "backcub")
         end,
-
         fn_anim = function(inst)
             SetRandomSkinAnim(inst, {
                 "idle1", "idle1", "idle1", "idle1", "idle2", "idle3", "idle3"
@@ -2277,18 +2016,13 @@ _G.SKINS_LEGION = {
     },
 
     rosebush_collector = {
-        base_prefab = "rosebush",
+        base_prefab = "rosebush", skin_id = "62e3c3a98c2f781db2f79abc", onlyownedshow = true,
 		type = "item", skin_tags = {}, release_group = 555, rarity = raritySpecial,
-
-        skin_id = "62e3c3a98c2f781db2f79abc",
-        onlyownedshow = true,
 		assets = {
             Asset("ANIM", "anim/berrybush.zip"), --官方浆果丛动画
-			Asset("ANIM", "anim/skin/rosebush_collector.zip"),
+			Asset("ANIM", "anim/skin/rosebush_collector.zip")
 		},
-
         string = ischinese and { name = "朽星棘" } or { name = "Star Blighted Thorns" },
-
 		fn_start = function(inst)
             --官方代码写得挺好，直接改动画模板居然能继承已有的动画播放和symbol切换状态
             inst.AnimState:SetBank("berrybush")
@@ -2302,26 +2036,18 @@ _G.SKINS_LEGION = {
         end
     },
     rosorns_collector = {
-        base_prefab = "rosorns",
+        base_prefab = "rosorns", skin_id = "62e3c3a98c2f781db2f79abc", noshopshow = true,
 		type = "item", skin_tags = {}, release_group = 555, rarity = raritySpecial,
-
-        skin_id = "62e3c3a98c2f781db2f79abc",
-        noshopshow = true,
 		assets = {
 			Asset("ANIM", "anim/skin/rosorns_collector.zip"),
             Asset("ATLAS", "images/inventoryimages_skin/foliageath_rosorns_collector.xml"),
             Asset("IMAGE", "images/inventoryimages_skin/foliageath_rosorns_collector.tex")
 		},
         image = { name = nil, atlas = nil, setable = true },
-
-        string = {
-            name = ischinese and "贯星剑" or "Star Pierced Sword"
-        },
-
+        string = { name = ischinese and "贯星剑" or "Star Pierced Sword" },
 		anim = {
             bank = nil, build = nil,
-            anim = nil, animpush = nil, isloop = true,
-            setable = true
+            anim = nil, animpush = nil, isloop = true, setable = true
         },
         equip = { symbol = "swap_object", build = "rosorns_collector", file = "swap_object" },
         fn_onAttack = function(inst, owner, target)
@@ -2339,18 +2065,13 @@ _G.SKINS_LEGION = {
     },
 
     fimbul_axe_collector = {
-        base_prefab = "fimbul_axe",
+        base_prefab = "fimbul_axe", skin_id = "62e775148c2f781db2f79ba1", onlyownedshow = true,
 		type = "item", skin_tags = {}, release_group = 555, rarity = raritySpecial,
-
-        skin_id = "62e775148c2f781db2f79ba1",
-        onlyownedshow = true,
 		assets = {
 			Asset("ANIM", "anim/skin/fimbul_axe_collector.zip")
 		},
         image = { name = nil, atlas = nil, setable = true },
-
         string = ischinese and { name = "跃星杖" } or { name = "Star Leaping Staff" },
-
 		anim = {
             bank = nil, build = nil,
             anim = nil, animpush = nil, isloop = true, --为啥要为true?
@@ -2400,19 +2121,14 @@ _G.SKINS_LEGION = {
     },
 
     siving_turn_collector = {
-        base_prefab = "siving_turn",
+        base_prefab = "siving_turn", skin_id = "62eb8b9e8c2f781db2f79d21", onlyownedshow = true, mustonwedshow = true,
 		type = "item", skin_tags = {}, release_group = 555, rarity = raritySpecial,
-
-        skin_id = "62eb8b9e8c2f781db2f79d21",
-        onlyownedshow = true, mustonwedshow = true,
 		assets = {
 			Asset("ANIM", "anim/skin/siving_turn_collector.zip"),
             Asset("ATLAS", "images/inventoryimages_skin/siving_turn_collector.xml"),
             Asset("IMAGE", "images/inventoryimages_skin/siving_turn_collector.tex")
 		},
-
         string = ischinese and { name = "转星移" } or { name = "Revolving Star" },
-
 		fn_start = function(inst)
             Fn_sivturn(inst, "siving_turn_collector", false)
             inst.components.genetrans.fxdata.unlockfx = "siving_turn_collector_unlock_fx"
@@ -2427,19 +2143,14 @@ _G.SKINS_LEGION = {
         end
     },
     siving_turn_future = {
-        base_prefab = "siving_turn",
+        base_prefab = "siving_turn", skin_id = "647d83c269b4f368be4533e9", onlyownedshow = true,
 		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
-
-        skin_id = "647d83c269b4f368be4533e9",
-        onlyownedshow = true,
 		assets = {
 			Asset("ANIM", "anim/skin/siving_turn_future.zip"),
             Asset("ATLAS", "images/inventoryimages_skin/siving_turn_future.xml"),
             Asset("IMAGE", "images/inventoryimages_skin/siving_turn_future.tex")
 		},
-
         string = ischinese and { name = "爱汪基因诱变舱" } or { name = "Bark Gene Mutation Cabin" },
-
 		fn_start = function(inst)
             inst.components.genetrans.fn_setanim = Fn_sivturn_anim_futrue
             inst.components.genetrans.fxdata.unlockfx = "siving_turn_future_unlock_fx"
@@ -2459,19 +2170,14 @@ _G.SKINS_LEGION = {
         end
     },
     siving_turn_future2 = {
-        base_prefab = "siving_turn",
+        base_prefab = "siving_turn", skin_id = "647d972169b4f368be45343a", onlyownedshow = true,
 		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
-
-        skin_id = "647d972169b4f368be45343a",
-        onlyownedshow = true,
 		assets = {
 			Asset("ANIM", "anim/skin/siving_turn_future2.zip"),
             Asset("ATLAS", "images/inventoryimages_skin/siving_turn_future2.xml"),
             Asset("IMAGE", "images/inventoryimages_skin/siving_turn_future2.tex")
 		},
-
         string = ischinese and { name = "爱喵基因诱变舱" } or { name = "Mew Gene Mutation Cabin" },
-
 		fn_start = function(inst)
             inst.components.genetrans.fn_setanim = Fn_sivturn_anim_futrue
             inst.components.genetrans.fxdata.unlockfx = "siving_turn_future2_unlock_fx"
@@ -2492,17 +2198,12 @@ _G.SKINS_LEGION = {
     },
 
     siving_derivant_thanks = {
-        base_prefab = "siving_derivant",
+        base_prefab = "siving_derivant", skin_id = "62eb6e0e8c2f781db2f79cc2", onlyownedshow = true,
 		type = "item", skin_tags = {}, release_group = 555, rarity = raritySpecial,
-
-        skin_id = "62eb6e0e8c2f781db2f79cc2",
-        onlyownedshow = true,
 		assets = {
 			Asset("ANIM", "anim/skin/siving_derivant_thanks.zip")
 		},
-
         string = ischinese and { name = "梨花开" } or { name = "Snowflake Pine" },
-
 		fn_start = function(inst)
             inst.AnimState:SetBank("siving_derivant_thanks")
             inst.AnimState:SetBuild("siving_derivant_thanks")
@@ -2516,17 +2217,12 @@ _G.SKINS_LEGION = {
         end
     },
     siving_derivant_thanks2 = {
-        base_prefab = "siving_derivant",
+        base_prefab = "siving_derivant", skin_id = "62eb6e0e8c2f781db2f79cc2", noshopshow = true,
 		type = "item", skin_tags = {}, release_group = 555, rarity = raritySpecial,
-
-        skin_id = "62eb6e0e8c2f781db2f79cc2",
-        noshopshow = true,
 		assets = {
 			Asset("ANIM", "anim/skin/siving_derivant_thanks2.zip")
 		},
-
         string = ischinese and { name = "梨带雨" } or { name = "Snowflake Prayer Pine" },
-
 		fn_start = function(inst)
             inst.AnimState:SetBank("siving_derivant_thanks2")
             inst.AnimState:SetBuild("siving_derivant_thanks2")
@@ -2541,22 +2237,16 @@ _G.SKINS_LEGION = {
     },
 
     carpet_whitewood_law = {
-        base_prefab = "carpet_whitewood",
+        base_prefab = "carpet_whitewood", skin_id = "63805cf58c2f781db2f7f34b", onlyownedshow = true,
 		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
-
-        skin_id = "63805cf58c2f781db2f7f34b",
-        onlyownedshow = true,
 		assets = {
 			Asset("ANIM", "anim/skin/carpet_whitewood_law.zip")
 		},
         image = { name = nil, atlas = nil, setable = false },
-
         string = ischinese and { name = "小西洋棋棋盘" } or { name = "Quarter Chessboard" },
-
         anim = {
             bank = "carpet_whitewood_law", build = "carpet_whitewood_law",
-            anim = nil, animpush = nil, isloop = nil,
-            setable = true
+            anim = nil, animpush = nil, isloop = nil, setable = true
         },
         exchangefx = { prefab = nil, offset_y = nil, scale = nil },
         fn_placer = function(inst)
@@ -2565,22 +2255,16 @@ _G.SKINS_LEGION = {
         end
     },
     carpet_whitewood_big_law = {
-        base_prefab = "carpet_whitewood_big",
+        base_prefab = "carpet_whitewood_big", skin_id = "63805cf58c2f781db2f7f34b", noshopshow = true,
 		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
-
-        skin_id = "63805cf58c2f781db2f7f34b",
-        noshopshow = true,
 		assets = {
 			Asset("ANIM", "anim/skin/carpet_whitewood_law.zip")
 		},
         image = { name = nil, atlas = nil, setable = false },
-
         string = ischinese and { name = "西洋棋棋盘" } or { name = "Chessboard" },
-
         anim = {
             bank = "carpet_whitewood_law", build = "carpet_whitewood_law",
-            anim = "idle_big", animpush = nil, isloop = nil,
-            setable = true
+            anim = "idle_big", animpush = nil, isloop = nil, setable = true
         },
         fn_start = function(inst)
             inst.AnimState:SetScale(1.08, 1.08, 1.08)
@@ -2596,22 +2280,16 @@ _G.SKINS_LEGION = {
         end
     },
     carpet_whitewood_law2 = {
-        base_prefab = "carpet_whitewood",
+        base_prefab = "carpet_whitewood", skin_id = "63805d098c2f781db2f7f34f", onlyownedshow = true,
 		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
-
-        skin_id = "63805d098c2f781db2f7f34f",
-        onlyownedshow = true,
 		assets = {
 			Asset("ANIM", "anim/skin/carpet_whitewood_law2.zip")
 		},
         image = { name = nil, atlas = nil, setable = false },
-
         string = ischinese and { name = "小西洋棋黑棋盘" } or { name = "Quarter Black Chessboard" },
-
         anim = {
             bank = "carpet_whitewood_law2", build = "carpet_whitewood_law2",
-            anim = nil, animpush = nil, isloop = nil,
-            setable = true
+            anim = nil, animpush = nil, isloop = nil, setable = true
         },
         exchangefx = { prefab = nil, offset_y = nil, scale = nil },
         fn_placer = function(inst)
@@ -2620,22 +2298,16 @@ _G.SKINS_LEGION = {
         end
     },
     carpet_whitewood_big_law2 = {
-        base_prefab = "carpet_whitewood_big",
+        base_prefab = "carpet_whitewood_big", skin_id = "63805d098c2f781db2f7f34f", noshopshow = true,
 		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
-
-        skin_id = "63805d098c2f781db2f7f34f",
-        noshopshow = true,
 		assets = {
 			Asset("ANIM", "anim/skin/carpet_whitewood_law2.zip")
 		},
         image = { name = nil, atlas = nil, setable = false },
-
         string = ischinese and { name = "西洋棋黑棋盘" } or { name = "Black Chessboard" },
-
         anim = {
             bank = "carpet_whitewood_law2", build = "carpet_whitewood_law2",
-            anim = "idle_big", animpush = nil, isloop = nil,
-            setable = true
+            anim = "idle_big", animpush = nil, isloop = nil, setable = true
         },
         fn_start = function(inst)
             inst.AnimState:SetScale(1.08, 1.08, 1.08)
@@ -2652,19 +2324,14 @@ _G.SKINS_LEGION = {
     },
 
     soul_contracts_taste = {
-        base_prefab = "soul_contracts",
+        base_prefab = "soul_contracts", skin_id = "638074368c2f781db2f7f374", onlyownedshow = true,
 		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
-
-        skin_id = "638074368c2f781db2f7f374",
-        onlyownedshow = true,
 		assets = {
             -- Asset("ANIM", "anim/book_maxwell.zip"), --官方暗影秘典动画模板
-			Asset("ANIM", "anim/skin/soul_contracts_taste.zip"),
+			Asset("ANIM", "anim/skin/soul_contracts_taste.zip")
 		},
         image = { name = nil, atlas = nil, setable = true },
-
         string = ischinese and { name = "芝士三明治" } or { name = "Cheese Sandwich" },
-
 		fn_start = function(inst)
             inst.AnimState:SetBank("book_maxwell")
             inst.AnimState:SetBuild("soul_contracts_taste")
@@ -2674,22 +2341,16 @@ _G.SKINS_LEGION = {
     },
 
     siving_feather_real_paper = {
-        base_prefab = "siving_feather_real",
+        base_prefab = "siving_feather_real", skin_id = "6387156a8c2f781db2f7f670", onlyownedshow = true,
 		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
-
-        skin_id = "6387156a8c2f781db2f7f670",
-        onlyownedshow = true,
 		assets = {
 			Asset("ANIM", "anim/skin/siving_feather_real_paper.zip")
 		},
         image = { name = nil, atlas = nil, setable = true },
-
         string = ischinese and { name = "十字纸镖" } or { name = "Cross Paper Dart" },
-
 		anim = {
             bank = nil, build = nil,
-            anim = nil, animpush = nil, isloop = nil,
-            setable = true
+            anim = nil, animpush = nil, isloop = nil, setable = true
         },
         equip = {
             symbol = "lantern_overlay", build = "siving_feather_real_paper", file = "swap",
@@ -2699,22 +2360,16 @@ _G.SKINS_LEGION = {
         floater = { cut = 0.04, size = "small", offset_y = 0.2, scale = 0.5, nofx = nil }
     },
     siving_feather_fake_paper = {
-        base_prefab = "siving_feather_fake",
+        base_prefab = "siving_feather_fake", skin_id = "6387156a8c2f781db2f7f670", noshopshow = true,
 		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
-
-        skin_id = "6387156a8c2f781db2f7f670",
-        noshopshow = true,
 		assets = {
 			Asset("ANIM", "anim/skin/siving_feather_fake_paper.zip")
 		},
         image = { name = nil, atlas = nil, setable = true },
-
         string = ischinese and { name = "四方纸镖" } or { name = "Square Paper Dart" },
-
 		anim = {
             bank = nil, build = nil,
-            anim = nil, animpush = nil, isloop = nil,
-            setable = true
+            anim = nil, animpush = nil, isloop = nil, setable = true
         },
         equip = {
             symbol = "lantern_overlay", build = "siving_feather_fake_paper", file = "swap",
@@ -2724,11 +2379,8 @@ _G.SKINS_LEGION = {
         floater = { cut = 0.04, size = "small", offset_y = 0.2, scale = 0.5, nofx = nil }
     },
     siving_feather_real_collector = {
-        base_prefab = "siving_feather_real",
+        base_prefab = "siving_feather_real", skin_id = "646f760769b4f368be4526b4", onlyownedshow = true,
 		type = "item", skin_tags = {}, release_group = 555, rarity = raritySpecial,
-
-        skin_id = "646f760769b4f368be4526b4",
-        onlyownedshow = true,
 		assets = {
 			Asset("ANIM", "anim/skin/siving_feather_real_collector.zip"),
             Asset("ANIM", "anim/kitcoon_basic.zip"),  --官方猫咪动画模板
@@ -2736,9 +2388,7 @@ _G.SKINS_LEGION = {
             Asset("ANIM", "anim/kitcoon_jump.zip")
 		},
         image = { name = nil, atlas = nil, setable = true },
-
         string = ischinese and { name = "旅星猫" } or { name = "Traverse Star Cat" },
-
 		fn_anim = Fn_anim_sivfeather_collector,
         fn_start = function(inst)
             inst.AnimState:SetBank("kitcoon")
@@ -2765,11 +2415,8 @@ _G.SKINS_LEGION = {
         floater = { cut = nil, size = "med", offset_y = 0.1, scale = 0.5, nofx = nil }
     },
     siving_feather_fake_collector = {
-        base_prefab = "siving_feather_fake",
+        base_prefab = "siving_feather_fake", skin_id = "646f760769b4f368be4526b4", noshopshow = true,
 		type = "item", skin_tags = {}, release_group = 555, rarity = raritySpecial,
-
-        skin_id = "646f760769b4f368be4526b4",
-        noshopshow = true,
 		assets = {
 			Asset("ANIM", "anim/skin/siving_feather_fake_collector.zip"),
             Asset("ANIM", "anim/kitcoon_basic.zip"),  --官方猫咪动画模板
@@ -2777,9 +2424,7 @@ _G.SKINS_LEGION = {
             Asset("ANIM", "anim/kitcoon_jump.zip")
 		},
         image = { name = nil, atlas = nil, setable = true },
-
         string = ischinese and { name = "流星猫" } or { name = "Meteor Cat" },
-
 		fn_anim = Fn_anim_sivfeather_collector,
         fn_start = function(inst)
             inst.AnimState:SetBank("kitcoon")
@@ -2807,41 +2452,30 @@ _G.SKINS_LEGION = {
     },
 
     revolvedmoonlight_item_taste = { --芒果
-        base_prefab = "revolvedmoonlight_item",
+        base_prefab = "revolvedmoonlight_item", skin_id = "63889eaf8c2f781db2f7f763", onlyownedshow = true,
 		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
-
-        skin_id = "63889eaf8c2f781db2f7f763",
-        onlyownedshow = true,
 		assets = {
 			Asset("ANIM", "anim/skin/revolvedmoonlight_item_taste.zip")
 		},
         image = { name = nil, atlas = nil, setable = true },
-
         string = ischinese and { name = "芒果甜筒" } or { name = "Mango Cone" },
-
 		anim = {
             bank = nil, build = nil,
-            anim = nil, animpush = nil, isloop = nil,
-            setable = true
+            anim = nil, animpush = nil, isloop = nil, setable = true
         },
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
         linkedskins = { item = "revolvedmoonlight_taste", item_pro = "revolvedmoonlight_pro_taste" },
         floater = { cut = 0.18, size = "small", offset_y = 0.4, scale = 0.55, nofx = nil }
     },
     revolvedmoonlight_taste = {
-        base_prefab = "revolvedmoonlight",
+        base_prefab = "revolvedmoonlight", skin_id = "63889eaf8c2f781db2f7f763", noshopshow = true,
 		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
-
-        skin_id = "63889eaf8c2f781db2f7f763",
-        noshopshow = true,
 		assets = {
 			Asset("ANIM", "anim/skin/revolvedmoonlight_taste.zip"),
             Asset("ANIM", "anim/skin/ui_revolvedmoonlight_taste_4x3.zip")
 		},
         image = { name = nil, atlas = nil, setable = true },
-
         string = ischinese and { name = "芒果冰" } or { name = "Mango Ice Cream" },
-
 		fn_start = function(inst)
             inst.AnimState:SetScale(0.85, 0.85, 0.85)
             inst.AnimState:SetBank("revolvedmoonlight_taste")
@@ -2865,18 +2499,13 @@ _G.SKINS_LEGION = {
         floater = { cut = 0.1, size = "med", offset_y = 0.3, scale = 0.3, nofx = nil }
     },
     revolvedmoonlight_pro_taste = {
-        base_prefab = "revolvedmoonlight_pro",
+        base_prefab = "revolvedmoonlight_pro", skin_id = "63889eaf8c2f781db2f7f763", noshopshow = true,
 		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
-
-        skin_id = "63889eaf8c2f781db2f7f763",
-        noshopshow = true,
 		assets = {
 			Asset("ANIM", "anim/skin/revolvedmoonlight_pro_taste.zip")
 		},
         image = { name = nil, atlas = nil, setable = true },
-
         string = ischinese and { name = "黄桃芒芒" } or { name = "Mango Sundae" },
-
 		fn_start = function(inst)
             inst.AnimState:SetScale(0.85, 0.85, 0.85)
             inst.AnimState:SetBank("revolvedmoonlight_pro_taste")
@@ -2901,41 +2530,30 @@ _G.SKINS_LEGION = {
     },
 
     revolvedmoonlight_item_taste2 = { --草莓
-        base_prefab = "revolvedmoonlight_item",
+        base_prefab = "revolvedmoonlight_item", skin_id = "63889ecd8c2f781db2f7f768", onlyownedshow = true,
 		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
-
-        skin_id = "63889ecd8c2f781db2f7f768",
-        onlyownedshow = true,
 		assets = {
 			Asset("ANIM", "anim/skin/revolvedmoonlight_item_taste2.zip")
 		},
         image = { name = nil, atlas = nil, setable = true },
-
         string = ischinese and { name = "草莓甜筒" } or { name = "Strawberry Cone" },
-
 		anim = {
             bank = nil, build = nil,
-            anim = nil, animpush = nil, isloop = nil,
-            setable = true
+            anim = nil, animpush = nil, isloop = nil, setable = true
         },
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
         linkedskins = { item = "revolvedmoonlight_taste2", item_pro = "revolvedmoonlight_pro_taste2" },
         floater = { cut = 0.18, size = "small", offset_y = 0.4, scale = 0.55, nofx = nil }
     },
     revolvedmoonlight_taste2 = {
-        base_prefab = "revolvedmoonlight",
+        base_prefab = "revolvedmoonlight", skin_id = "63889ecd8c2f781db2f7f768", noshopshow = true,
 		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
-
-        skin_id = "63889ecd8c2f781db2f7f768",
-        noshopshow = true,
 		assets = {
 			Asset("ANIM", "anim/skin/revolvedmoonlight_taste2.zip"),
             Asset("ANIM", "anim/skin/ui_revolvedmoonlight_taste2_4x3.zip")
 		},
         image = { name = nil, atlas = nil, setable = true },
-
         string = ischinese and { name = "草莓冰" } or { name = "Strawberry Ice Cream" },
-
 		fn_start = function(inst)
             inst.AnimState:SetScale(0.85, 0.85, 0.85)
             inst.AnimState:SetBank("revolvedmoonlight_taste2")
@@ -2959,18 +2577,13 @@ _G.SKINS_LEGION = {
         floater = { cut = 0.1, size = "med", offset_y = 0.3, scale = 0.3, nofx = nil }
     },
     revolvedmoonlight_pro_taste2 = {
-        base_prefab = "revolvedmoonlight_pro",
+        base_prefab = "revolvedmoonlight_pro", skin_id = "63889ecd8c2f781db2f7f768", noshopshow = true,
 		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
-
-        skin_id = "63889ecd8c2f781db2f7f768",
-        noshopshow = true,
 		assets = {
 			Asset("ANIM", "anim/skin/revolvedmoonlight_pro_taste2.zip")
 		},
         image = { name = nil, atlas = nil, setable = true },
-
         string = ischinese and { name = "巧遇莓莓" } or { name = "Strawberry Sundae" },
-
 		fn_start = function(inst)
             inst.AnimState:SetScale(0.85, 0.85, 0.85)
             inst.AnimState:SetBank("revolvedmoonlight_pro_taste2")
@@ -2995,41 +2608,30 @@ _G.SKINS_LEGION = {
     },
 
     revolvedmoonlight_item_taste3 = { --柠檬
-        base_prefab = "revolvedmoonlight_item",
+        base_prefab = "revolvedmoonlight_item", skin_id = "63889eef8c2f781db2f7f76c", onlyownedshow = true,
 		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
-
-        skin_id = "63889eef8c2f781db2f7f76c",
-        onlyownedshow = true,
 		assets = {
 			Asset("ANIM", "anim/skin/revolvedmoonlight_item_taste3.zip")
 		},
         image = { name = nil, atlas = nil, setable = true },
-
         string = ischinese and { name = "柠檬甜筒" } or { name = "Lemon Cone" },
-
 		anim = {
             bank = nil, build = nil,
-            anim = nil, animpush = nil, isloop = nil,
-            setable = true
+            anim = nil, animpush = nil, isloop = nil, setable = true
         },
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
         linkedskins = { item = "revolvedmoonlight_taste3", item_pro = "revolvedmoonlight_pro_taste3" },
         floater = { cut = 0.18, size = "small", offset_y = 0.4, scale = 0.55, nofx = nil }
     },
     revolvedmoonlight_taste3 = {
-        base_prefab = "revolvedmoonlight",
+        base_prefab = "revolvedmoonlight", skin_id = "63889eef8c2f781db2f7f76c", noshopshow = true,
 		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
-
-        skin_id = "63889eef8c2f781db2f7f76c",
-        noshopshow = true,
 		assets = {
 			Asset("ANIM", "anim/skin/revolvedmoonlight_taste3.zip"),
             Asset("ANIM", "anim/skin/ui_revolvedmoonlight_taste3_4x3.zip")
 		},
         image = { name = nil, atlas = nil, setable = true },
-
         string = ischinese and { name = "柠檬冰" } or { name = "Lemon Ice Cream" },
-
 		fn_start = function(inst)
             inst.AnimState:SetScale(0.85, 0.85, 0.85)
             inst.AnimState:SetBank("revolvedmoonlight_taste3")
@@ -3053,18 +2655,13 @@ _G.SKINS_LEGION = {
         floater = { cut = 0.1, size = "med", offset_y = 0.3, scale = 0.3, nofx = nil }
     },
     revolvedmoonlight_pro_taste3 = {
-        base_prefab = "revolvedmoonlight_pro",
+        base_prefab = "revolvedmoonlight_pro", skin_id = "63889eef8c2f781db2f7f76c", noshopshow = true,
 		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
-
-        skin_id = "63889eef8c2f781db2f7f76c",
-        noshopshow = true,
 		assets = {
 			Asset("ANIM", "anim/skin/revolvedmoonlight_pro_taste3.zip")
 		},
         image = { name = nil, atlas = nil, setable = true },
-
         string = ischinese and { name = "奇异柠檬" } or { name = "Lemon Sundae" },
-
 		fn_start = function(inst)
             inst.AnimState:SetScale(0.85, 0.85, 0.85)
             inst.AnimState:SetBank("revolvedmoonlight_pro_taste3")
@@ -3089,41 +2686,30 @@ _G.SKINS_LEGION = {
     },
 
     revolvedmoonlight_item_taste4 = { --黑巧
-        base_prefab = "revolvedmoonlight_item",
+        base_prefab = "revolvedmoonlight_item", skin_id = "63889f4b8c2f781db2f7f770", onlyownedshow = true,
 		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
-
-        skin_id = "63889f4b8c2f781db2f7f770",
-        onlyownedshow = true,
 		assets = {
 			Asset("ANIM", "anim/skin/revolvedmoonlight_item_taste4.zip")
 		},
         image = { name = nil, atlas = nil, setable = true },
-
         string = ischinese and { name = "黑巧甜筒" } or { name = "Choccy Cone" },
-
 		anim = {
             bank = nil, build = nil,
-            anim = nil, animpush = nil, isloop = nil,
-            setable = true
+            anim = nil, animpush = nil, isloop = nil, setable = true
         },
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
         linkedskins = { item = "revolvedmoonlight_taste4", item_pro = "revolvedmoonlight_pro_taste4" },
         floater = { cut = 0.18, size = "small", offset_y = 0.4, scale = 0.55, nofx = nil }
     },
     revolvedmoonlight_taste4 = {
-        base_prefab = "revolvedmoonlight",
+        base_prefab = "revolvedmoonlight", skin_id = "63889f4b8c2f781db2f7f770", noshopshow = true,
 		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
-
-        skin_id = "63889f4b8c2f781db2f7f770",
-        noshopshow = true,
 		assets = {
 			Asset("ANIM", "anim/skin/revolvedmoonlight_taste4.zip"),
             Asset("ANIM", "anim/skin/ui_revolvedmoonlight_taste4_4x3.zip")
 		},
         image = { name = nil, atlas = nil, setable = true },
-
         string = ischinese and { name = "黑巧冰" } or { name = "Choccy Ice Cream" },
-
 		fn_start = function(inst)
             inst.AnimState:SetScale(0.85, 0.85, 0.85)
             inst.AnimState:SetBank("revolvedmoonlight_taste4")
@@ -3147,18 +2733,13 @@ _G.SKINS_LEGION = {
         floater = { cut = 0.1, size = "med", offset_y = 0.3, scale = 0.3, nofx = nil }
     },
     revolvedmoonlight_pro_taste4 = {
-        base_prefab = "revolvedmoonlight_pro",
+        base_prefab = "revolvedmoonlight_pro", skin_id = "63889f4b8c2f781db2f7f770", noshopshow = true,
 		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
-
-        skin_id = "63889f4b8c2f781db2f7f770",
-        noshopshow = true,
 		assets = {
 			Asset("ANIM", "anim/skin/revolvedmoonlight_pro_taste4.zip")
 		},
         image = { name = nil, atlas = nil, setable = true },
-
         string = ischinese and { name = "黑巧旋涡" } or { name = "Choccy Sundae" },
-
 		fn_start = function(inst)
             inst.AnimState:SetScale(0.85, 0.85, 0.85)
             inst.AnimState:SetBank("revolvedmoonlight_pro_taste4")
@@ -3183,17 +2764,12 @@ _G.SKINS_LEGION = {
     },
 
     plant_cactus_meat_l_world = {
-        base_prefab = "plant_cactus_meat_l",
+        base_prefab = "plant_cactus_meat_l", skin_id = "6473057469b4f368be45295a", onlyownedshow = true,
 		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
-
-        skin_id = "6473057469b4f368be45295a",
-        onlyownedshow = true,
 		assets = {
 			Asset("ANIM", "anim/skin/plant_cactus_meat_l_world.zip")
 		},
-
         string = ischinese and { name = "波蒂球" } or { name = "Dots Cactus" },
-
 		fn_start = function(inst)
             inst.AnimState:SetBank("plant_cactus_meat_l_world")
             inst.AnimState:SetBuild("plant_cactus_meat_l_world")
@@ -3207,18 +2783,13 @@ _G.SKINS_LEGION = {
     },
 
     siving_ctlwater_item_era = {
-        base_prefab = "siving_ctlwater_item",
+        base_prefab = "siving_ctlwater_item", skin_id = "64759cc569b4f368be452b14", noshopshow = true,
 		type = "item", skin_tags = {}, release_group = 555, rarity = raritySpecial,
-
-        skin_id = "64759cc569b4f368be452b14",
-        noshopshow = true,
 		assets = {
 			Asset("ANIM", "anim/skin/siving_ctlwater_era.zip")
 		},
         image = { name = nil, atlas = nil, setable = true },
-
         string = ischinese and { name = "翻海图腾柱" } or { name = "Surging Sea Totem Pole" },
-
 		anim = {
             bank = "siving_ctlwater_era", build = "siving_ctlwater_era",
             anim = "item", animpush = nil, isloop = nil, setable = true
@@ -3233,17 +2804,12 @@ _G.SKINS_LEGION = {
         exchangefx = { prefab = nil, offset_y = nil, scale = 1.5 }
     },
     siving_ctlwater_era = {
-        base_prefab = "siving_ctlwater",
+        base_prefab = "siving_ctlwater", skin_id = "64759cc569b4f368be452b14", noshopshow = true,
 		type = "item", skin_tags = {}, release_group = 555, rarity = raritySpecial,
-
-        skin_id = "64759cc569b4f368be452b14",
-        noshopshow = true,
 		assets = {
 			Asset("ANIM", "anim/skin/siving_ctlwater_era.zip")
 		},
-
         string = ischinese and { name = "翻海图腾柱" } or { name = "Surging Sea Totem Pole" },
-
         fn_start = function(inst)
             inst.AnimState:SetBank("siving_ctlwater_era")
             inst.AnimState:SetBuild("siving_ctlwater_era")
@@ -3259,18 +2825,13 @@ _G.SKINS_LEGION = {
         exchangefx = { prefab = nil, offset_y = nil, scale = 1.5 }
     },
     siving_ctldirt_item_era = {
-        base_prefab = "siving_ctldirt_item",
+        base_prefab = "siving_ctldirt_item", skin_id = "64759cc569b4f368be452b14", noshopshow = true,
 		type = "item", skin_tags = {}, release_group = 555, rarity = raritySpecial,
-
-        skin_id = "64759cc569b4f368be452b14",
-        noshopshow = true,
 		assets = {
 			Asset("ANIM", "anim/skin/siving_ctldirt_era.zip")
 		},
         image = { name = nil, atlas = nil, setable = true },
-
         string = ischinese and { name = "寻森图腾柱" } or { name = "Seeking Silva Totem Pole" },
-
 		anim = {
             bank = "siving_ctldirt_era", build = "siving_ctldirt_era",
             anim = "item", animpush = nil, isloop = nil, setable = true
@@ -3285,17 +2846,12 @@ _G.SKINS_LEGION = {
         exchangefx = { prefab = nil, offset_y = nil, scale = 1.5 }
     },
     siving_ctldirt_era = {
-        base_prefab = "siving_ctldirt",
+        base_prefab = "siving_ctldirt", skin_id = "64759cc569b4f368be452b14", noshopshow = true,
 		type = "item", skin_tags = {}, release_group = 555, rarity = raritySpecial,
-
-        skin_id = "64759cc569b4f368be452b14",
-        noshopshow = true,
 		assets = {
 			Asset("ANIM", "anim/skin/siving_ctldirt_era.zip")
 		},
-
         string = ischinese and { name = "寻森图腾柱" } or { name = "Seeking Silva Totem Pole" },
-
         fn_start = function(inst)
             inst.AnimState:SetBank("siving_ctldirt_era")
             inst.AnimState:SetBuild("siving_ctldirt_era")
@@ -3319,18 +2875,13 @@ _G.SKINS_LEGION = {
         exchangefx = { prefab = nil, offset_y = nil, scale = 1.5 }
     },
     siving_ctlall_item_era = {
-        base_prefab = "siving_ctlall_item",
+        base_prefab = "siving_ctlall_item", skin_id = "64759cc569b4f368be452b14", noshopshow = true,
 		type = "item", skin_tags = {}, release_group = 555, rarity = raritySpecial,
-
-        skin_id = "64759cc569b4f368be452b14",
-        noshopshow = true,
 		assets = {
 			Asset("ANIM", "anim/skin/siving_ctlall_era.zip")
 		},
         image = { name = nil, atlas = nil, setable = true },
-
         string = ischinese and { name = "耘天图腾柱" } or { name = "Singing Sky Totem Pole" },
-
 		anim = {
             bank = "siving_ctlall_era", build = "siving_ctlall_era",
             anim = "item", animpush = nil, isloop = nil, setable = true
@@ -3345,17 +2896,12 @@ _G.SKINS_LEGION = {
         exchangefx = { prefab = nil, offset_y = nil, scale = 1.5 }
     },
     siving_ctlall_era = {
-        base_prefab = "siving_ctlall",
+        base_prefab = "siving_ctlall", skin_id = "64759cc569b4f368be452b14", onlyownedshow = true,
 		type = "item", skin_tags = {}, release_group = 555, rarity = raritySpecial,
-
-        skin_id = "64759cc569b4f368be452b14",
-        onlyownedshow = true,
 		assets = {
 			Asset("ANIM", "anim/skin/siving_ctlall_era.zip")
 		},
-
         string = ischinese and { name = "耘天图腾柱" } or { name = "Sowing Sky Totem Pole" },
-
         fn_start = function(inst)
             inst.AnimState:SetBank("siving_ctlall_era")
             inst.AnimState:SetBuild("siving_ctlall_era")
@@ -3384,93 +2930,60 @@ _G.SKINS_LEGION = {
     },
 
     siving_mask_era = {
-        base_prefab = "siving_mask",
+        base_prefab = "siving_mask", skin_id = "647b394969b4f368be453202", noshopshow = true,
 		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
-
-        skin_id = "647b394969b4f368be453202",
-        noshopshow = true,
 		assets = {
 			Asset("ANIM", "anim/skin/siving_mask_era.zip")
 		},
 		image = { name = nil, atlas = nil, setable = true },
-
         string = ischinese and { name = "巫仆血骨面" } or { name = "Blood Servant Bone Mask" },
-
 		anim = {
             bank = nil, build = nil,
-            anim = nil, animpush = nil, isloop = nil,
-            setable = true
+            anim = nil, animpush = nil, isloop = nil, setable = true
         },
         fn_start = function(inst)
             inst.maskfxoverride_l = "siving_lifesteal_fx_era1"
-        end,
-        fn_end = function(inst)
-            inst.maskfxoverride_l = nil
         end,
         equip = { symbol = nil, build = "siving_mask_era", file = "swap_hat", isopenhat = true },
         exchangefx = { prefab = nil, offset_y = nil, scale = nil }
     },
     siving_mask_era2 = {
-        base_prefab = "siving_mask",
+        base_prefab = "siving_mask", skin_id = "647b394969b4f368be453202", noshopshow = true,
 		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
-
-        skin_id = "647b394969b4f368be453202",
-        noshopshow = true,
 		assets = {
 			Asset("ANIM", "anim/skin/siving_mask_era2.zip")
 		},
 		image = { name = nil, atlas = nil, setable = true },
-
         string = ischinese and { name = "巫仆毒骨面" } or { name = "Toxin Servant Bone Mask" },
-
 		anim = {
             bank = nil, build = nil,
-            anim = nil, animpush = nil, isloop = nil,
-            setable = true
+            anim = nil, animpush = nil, isloop = nil, setable = true
         },
         fn_start = function(inst)
             inst.maskfxoverride_l = "siving_lifesteal_fx_era2"
-        end,
-        fn_end = function(inst)
-            inst.maskfxoverride_l = nil
         end,
         equip = { symbol = nil, build = "siving_mask_era2", file = "swap_hat", isopenhat = true },
         exchangefx = { prefab = nil, offset_y = nil, scale = nil }
     },
     siving_mask_gold_era = {
-        base_prefab = "siving_mask_gold",
+        base_prefab = "siving_mask_gold", skin_id = "647b394969b4f368be453202", onlyownedshow = true,
 		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
-
-        skin_id = "647b394969b4f368be453202",
-        onlyownedshow = true,
 		assets = {
 			Asset("ANIM", "anim/skin/siving_mask_gold_era.zip")
 		},
 		image = { name = nil, atlas = nil, setable = true },
-
         string = ischinese and { name = "巫酋血骨面" } or { name = "Blood Chief Bone Mask" },
-
 		anim = {
             bank = nil, build = nil,
-            anim = nil, animpush = nil, isloop = nil,
-            setable = true
+            anim = nil, animpush = nil, isloop = nil, setable = true
         },
         fn_start = function(inst)
             inst.maskfxoverride_l = "siving_lifesteal_fx_era3"
         end,
-        fn_end = function(inst)
-            inst.maskfxoverride_l = nil
-        end,
         equip = {
             build = "siving_mask_gold_era", --幻化识别
             startfn = function(inst, owner)
-                owner.AnimState:ClearOverrideSymbol("swap_hat")
-                owner.AnimState:Show("HAT")
-                owner.AnimState:Hide("HAIR_HAT")
-                owner.AnimState:Show("HAIR_NOHAT")
-                owner.AnimState:Show("HAIR")
-                owner.AnimState:Show("HEAD")
-                owner.AnimState:Hide("HEAD_HAT")
+                TOOLS_L.hat_on_opentop(inst, owner, nil, nil)
                 Fn_setFollowFx(owner, "fx_l_sivmask", "sivmask_era_fofx")
             end,
             endfn = function(inst, owner)
@@ -3480,39 +2993,24 @@ _G.SKINS_LEGION = {
         exchangefx = { prefab = nil, offset_y = nil, scale = nil }
     },
     siving_mask_gold_era2 = {
-        base_prefab = "siving_mask_gold",
+        base_prefab = "siving_mask_gold", skin_id = "647b394969b4f368be453202", noshopshow = true,
 		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
-
-        skin_id = "647b394969b4f368be453202",
-        noshopshow = true,
 		assets = {
 			Asset("ANIM", "anim/skin/siving_mask_gold_era2.zip")
 		},
 		image = { name = nil, atlas = nil, setable = true },
-
         string = ischinese and { name = "巫酋毒骨面" } or { name = "Toxin Chief Bone Mask" },
-
 		anim = {
             bank = nil, build = nil,
-            anim = nil, animpush = nil, isloop = nil,
-            setable = true
+            anim = nil, animpush = nil, isloop = nil, setable = true
         },
         fn_start = function(inst)
             inst.maskfxoverride_l = "siving_lifesteal_fx_era4"
         end,
-        fn_end = function(inst)
-            inst.maskfxoverride_l = nil
-        end,
         equip = {
             build = "siving_mask_gold_era2", --幻化识别
             startfn = function(inst, owner)
-                owner.AnimState:ClearOverrideSymbol("swap_hat")
-                owner.AnimState:Show("HAT")
-                owner.AnimState:Hide("HAIR_HAT")
-                owner.AnimState:Show("HAIR_NOHAT")
-                owner.AnimState:Show("HAIR")
-                owner.AnimState:Show("HEAD")
-                owner.AnimState:Hide("HEAD_HAT")
+                TOOLS_L.hat_on_opentop(inst, owner, nil, nil)
                 Fn_setFollowFx(owner, "fx_l_sivmask", "sivmask_era2_fofx")
             end,
             endfn = function(inst, owner)
@@ -3521,24 +3019,53 @@ _G.SKINS_LEGION = {
         },
         exchangefx = { prefab = nil, offset_y = nil, scale = nil }
     },
+    siving_mask_gold_marble = {
+        base_prefab = "siving_mask_gold", skin_id = "6558bf96adf8ac0fd863e870", onlyownedshow = true,
+		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
+		assets = {
+			Asset("ANIM", "anim/skin/siving_mask_gold_marble.zip"),
+            Asset("ANIM", "anim/skin/siving_armor_gold_marble.zip")
+		},
+		image = { name = nil, atlas = nil, setable = true },
+        string = ischinese and { name = "圣洁面纱" } or { name = "Holy Veil" },
+		anim = {
+            bank = nil, build = nil,
+            anim = nil, animpush = nil, isloop = nil, setable = true
+        },
+        fn_start = function(inst)
+            inst.maskfxoverride_l = "siving_lifesteal_fx_era3"
+        end,
+        equip = { symbol = nil, build = "siving_mask_gold_marble", file = "swap_hat", isopenhat = nil },
+        exchangefx = { prefab = nil, offset_y = nil, scale = nil }
+    },
+
+    -- siving_armor_gold_marble = {
+    --     base_prefab = "siving_armor_gold", skin_id = "6558bf96adf8ac0fd863e870", noshopshow = true,
+	-- 	type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
+	-- 	assets = {
+    --         Asset("ANIM", "anim/skin/siving_armor_gold_marble.zip")
+	-- 	},
+	-- 	image = { name = nil, atlas = nil, setable = true },
+    --     string = ischinese and { name = "圣洁长袍" } or { name = "Holy Robe" },
+	-- 	anim = {
+    --         bank = nil, build = nil,
+    --         anim = nil, animpush = nil, isloop = nil, setable = true
+    --     },
+    --     equip = { symbol = "swap_body", build = "siving_armor_gold_marble", file = "swap_body" },
+    --     exchangefx = { prefab = nil, offset_y = nil, scale = nil }
+    -- },
 
     siving_soil_item_law = {
-        base_prefab = "siving_soil_item",
+        base_prefab = "siving_soil_item", skin_id = "65560bbdadf8ac0fd863e6d6", onlyownedshow = true,
         type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
-
-        skin_id = "65560bbdadf8ac0fd863e6d6",
-        onlyownedshow = true,
         assets = {
             Asset("ANIM", "anim/skin/siving_soil_item_law.zip")
         },
         image = { name = nil, atlas = nil, setable = true },
-
         string = ischinese and { name = "落英" } or { name = "Bloomed Flowers" },
-
         anim = {
             bank = nil, build = nil,
-            anim = "item", animpush = nil, isloop = nil,
-            setable = true
+            anim = "item", animpush = nil, isloop = nil, setable = true
         },
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
         fn_placer = function(inst)
@@ -3563,22 +3090,16 @@ _G.SKINS_LEGION = {
         }
     },
     siving_soil_item_law2 = {
-        base_prefab = "siving_soil_item",
+        base_prefab = "siving_soil_item", skin_id = "65560bbdadf8ac0fd863e6d6", noshopshow = true,
         type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
-
-        skin_id = "65560bbdadf8ac0fd863e6d6",
-        noshopshow = true,
         assets = {
             Asset("ANIM", "anim/skin/siving_soil_item_law2.zip")
         },
         image = { name = nil, atlas = nil, setable = true },
-
         string = ischinese and { name = "春泥" } or { name = "Spring Mud" },
-
         anim = {
             bank = nil, build = nil,
-            anim = "item", animpush = nil, isloop = nil,
-            setable = true
+            anim = "item", animpush = nil, isloop = nil, setable = true
         },
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
         fn_placer = function(inst)
@@ -3603,22 +3124,16 @@ _G.SKINS_LEGION = {
         }
     },
     siving_soil_item_law3 = {
-        base_prefab = "siving_soil_item",
+        base_prefab = "siving_soil_item", skin_id = "65560bdbadf8ac0fd863e6da", onlyownedshow = true,
         type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
-
-        skin_id = "65560bdbadf8ac0fd863e6da",
-        onlyownedshow = true,
         assets = {
             Asset("ANIM", "anim/skin/siving_soil_item_law3.zip")
         },
         image = { name = nil, atlas = nil, setable = true },
-
         string = ischinese and { name = "归根" } or { name = "For Roots" },
-
         anim = {
             bank = nil, build = nil,
-            anim = "item", animpush = nil, isloop = nil,
-            setable = true
+            anim = "item", animpush = nil, isloop = nil, setable = true
         },
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
         fn_placer = function(inst)
@@ -3642,31 +3157,61 @@ _G.SKINS_LEGION = {
             end
         }
     },
+
+    refractedmoonlight_taste = {
+        base_prefab = "refractedmoonlight", skin_id = "6558639aadf8ac0fd863e7f6", onlyownedshow = true,
+		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
+		assets = {
+			Asset("ANIM", "anim/skin/refractedmoonlight_taste.zip"),
+            Asset("ATLAS", "images/inventoryimages_skin/refractedmoonlight_taste.xml"),
+            Asset("IMAGE", "images/inventoryimages_skin/refractedmoonlight_taste.tex"),
+            Asset("ATLAS", "images/inventoryimages_skin/refractedmoonlight_taste2.xml"),
+            Asset("IMAGE", "images/inventoryimages_skin/refractedmoonlight_taste2.tex")
+		},
+        string = ischinese and { name = "烤肠大王" } or { name = "Roast Sausage King" },
+        fn_start = function(inst)
+            inst._dd = {
+                img_tex = "refractedmoonlight_taste", img_atlas = "images/inventoryimages_skin/refractedmoonlight_taste.xml",
+                img_tex2 = "refractedmoonlight_taste2", img_atlas2 = "images/inventoryimages_skin/refractedmoonlight_taste2.xml",
+                build = "refractedmoonlight_taste", fx = "refracted_l_spark_taste_fx"
+            }
+            Fn_start_refracted(inst)
+        end,
+        exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 }
+    },
 }
 
 _G.SKIN_IDS_LEGION = {
     ["ooooonononon"] = {}, --免费皮肤全部装这里面，skin_id设置为"ooooonononon"就好了
     ["6278c409c340bf24ab311522"] = { --余生
-        siving_derivant_thanks = true, siving_derivant_thanks2 = true, neverfade_thanks = true, neverfadebush_thanks = true, backcub_thanks = true,
+        siving_derivant_thanks = true, siving_derivant_thanks2 = true, backcub_thanks = true,
+        neverfade_thanks = true, neverfadebush_thanks = true,
         fishhomingtool_awesome_thanks = true, fishhomingtool_normal_thanks = true, fishhomingbait_thanks = true,
-        triplegoldenshovelaxe_era = true, tripleshovelaxe_era = true, lilybush_era = true, lileaves_era = true, icire_rock_era = true, shield_l_log_era = true, shield_l_sand_era = true,
-        siving_ctlwater_item_era = true, siving_ctlwater_era = true, siving_ctldirt_item_era = true, siving_ctldirt_era = true, siving_ctlall_item_era = true, siving_ctlall_era = true,
+        triplegoldenshovelaxe_era = true, tripleshovelaxe_era = true, lilybush_era = true, lileaves_era = true,
+        icire_rock_era = true, shield_l_log_era = true, shield_l_sand_era = true,
+        siving_ctlwater_item_era = true, siving_ctlwater_era = true, siving_ctldirt_item_era = true,
+        siving_ctldirt_era = true, siving_ctlall_item_era = true, siving_ctlall_era = true,
         siving_mask_era = true, siving_mask_era2 = true, siving_mask_gold_era = true, siving_mask_gold_era2 = true,
         orchidbush_disguiser = true, boltwingout_disguiser = true, plant_cactus_meat_l_world = true,
-        rosebush_marble = true, lilybush_marble = true, orchidbush_marble = true, rosorns_marble = true, lileaves_marble = true, orchitwigs_marble = true,
+        rosebush_marble = true, lilybush_marble = true, orchidbush_marble = true,
+        rosorns_marble = true, lileaves_marble = true, orchitwigs_marble = true,
+        siving_mask_gold_marble = true,
         shield_l_log_emo_fist = true, hat_lichen_emo_que = true,
-        rosebush_collector = true, rosorns_collector = true, fimbul_axe_collector = true, siving_turn_collector = true, siving_feather_real_collector = true, siving_feather_fake_collector = true,
+        rosebush_collector = true, rosorns_collector = true, fimbul_axe_collector = true, siving_turn_collector = true,
+        siving_feather_real_collector = true, siving_feather_fake_collector = true,
         backcub_fans2 = true,
         fishhomingtool_awesome_taste = true, fishhomingtool_normal_taste = true, fishhomingbait_taste = true,
-        agronssword_taste = true, soul_contracts_taste = true,
+        agronssword_taste = true, soul_contracts_taste = true, refractedmoonlight_taste = true,
         revolvedmoonlight_item_taste = true, revolvedmoonlight_taste = true, revolvedmoonlight_pro_taste = true,
         revolvedmoonlight_item_taste2 = true, revolvedmoonlight_taste2 = true, revolvedmoonlight_pro_taste2 = true,
         revolvedmoonlight_item_taste3 = true, revolvedmoonlight_taste3 = true, revolvedmoonlight_pro_taste3 = true,
         revolvedmoonlight_item_taste4 = true, revolvedmoonlight_taste4 = true, revolvedmoonlight_pro_taste4 = true,
-        carpet_whitewood_law = true, carpet_whitewood_big_law = true, carpet_whitewood_law2 = true, carpet_whitewood_big_law2 = true,
+        carpet_whitewood_law = true, carpet_whitewood_big_law = true,
+        carpet_whitewood_law2 = true, carpet_whitewood_big_law2 = true,
         siving_soil_item_law = true, siving_soil_item_law2 = true, siving_soil_item_law3 = true,
         icire_rock_day = true,
-        neverfade_paper = true, neverfadebush_paper = true, neverfade_paper2 = true, neverfadebush_paper2 = true, siving_feather_real_paper = true, siving_feather_fake_paper = true,
+        neverfade_paper = true, neverfadebush_paper = true, neverfade_paper2 = true, neverfadebush_paper2 = true,
+        siving_feather_real_paper = true, siving_feather_fake_paper = true,
         siving_turn_future = true, siving_turn_future2 = true
     },
     ["6278c450c340bf24ab311528"] = { --回忆(5)
@@ -3675,7 +3220,8 @@ _G.SKIN_IDS_LEGION = {
         hat_lichen_emo_que = true,
     },
     ["62eb7b148c2f781db2f79cf8"] = { --花潮(6+3)
-        rosebush_marble = true, lilybush_marble = true, orchidbush_marble = true, rosorns_marble = true, lileaves_marble = true, orchitwigs_marble = true,
+        rosebush_marble = true, lilybush_marble = true, orchidbush_marble = true,
+        rosorns_marble = true, lileaves_marble = true, orchitwigs_marble = true,
         rosebush_collector = true, rosorns_collector = true,
         lilybush_era = true, lileaves_era = true,
         orchidbush_disguiser = true,
@@ -3689,7 +3235,8 @@ _G.SKIN_IDS_LEGION = {
     },
     ["6278c4acc340bf24ab311530"] = { --2度梅开
         fishhomingtool_awesome_thanks = true, fishhomingtool_normal_thanks = true, fishhomingbait_thanks = true,
-        triplegoldenshovelaxe_era = true, tripleshovelaxe_era = true, lilybush_era = true, lileaves_era = true, icire_rock_era = true, shield_l_log_era = true, shield_l_sand_era = true,
+        triplegoldenshovelaxe_era = true, tripleshovelaxe_era = true, lilybush_era = true, lileaves_era = true,
+        icire_rock_era = true, shield_l_log_era = true, shield_l_sand_era = true,
         shield_l_log_emo_fist = true,
         carpet_whitewood_law = true, carpet_whitewood_big_law = true
     },
@@ -3706,7 +3253,8 @@ _G.SKIN_IDS_LEGION = {
         revolvedmoonlight_item_taste4 = true, revolvedmoonlight_taste4 = true, revolvedmoonlight_pro_taste4 = true,
         carpet_whitewood_law2 = true, carpet_whitewood_big_law2 = true,
         icire_rock_day = true,
-        neverfade_paper = true, neverfadebush_paper = true, neverfade_paper2 = true, neverfadebush_paper2 = true, siving_feather_real_paper = true, siving_feather_fake_paper = true,
+        neverfade_paper = true, neverfadebush_paper = true, neverfade_paper2 = true, neverfadebush_paper2 = true,
+        siving_feather_real_paper = true, siving_feather_fake_paper = true,
     },
     ["642c14d9f2b67d287a35d439"] = { --5谷丰登
         siving_feather_real_collector = true, siving_feather_fake_collector = true,
@@ -3719,6 +3267,8 @@ _G.SKIN_IDS_LEGION = {
     },
     ["61f15bf4db102b0b8a529c66"] = { --6连忘返
         siving_soil_item_law = true, siving_soil_item_law2 = true, siving_soil_item_law3 = true,
+        refractedmoonlight_taste = true,
+        siving_mask_gold_marble = true,
     },
     -- ["61627d927bbb727be174c4a0"] = { --棋举不定
     -- }
@@ -3747,7 +3297,8 @@ end
 ------
 
 local skinidxes = { --用以皮肤排序
-    "siving_ctlwater_item_era", "siving_ctlwater_era", "siving_ctldirt_item_era", "siving_ctldirt_era", "siving_ctlall_item_era", "siving_ctlall_era",
+    "siving_ctlwater_item_era", "siving_ctlwater_era", "siving_ctldirt_item_era", "siving_ctldirt_era",
+    "siving_ctlall_item_era", "siving_ctlall_era",
     "neverfade_thanks", "neverfadebush_thanks", "siving_derivant_thanks", "siving_derivant_thanks2",
     "backcub_thanks",
     "fishhomingtool_awesome_thanks", "fishhomingtool_normal_thanks", "fishhomingbait_thanks",
@@ -3759,20 +3310,23 @@ local skinidxes = { --用以皮肤排序
     "icire_rock_day",
     "siving_soil_item_law", "siving_soil_item_law2", "siving_soil_item_law3",
     "carpet_whitewood_law", "carpet_whitewood_big_law", "carpet_whitewood_law2", "carpet_whitewood_big_law2",
-    "agronssword_taste", "soul_contracts_taste",
+    "refractedmoonlight_taste", "agronssword_taste", "soul_contracts_taste",
     "revolvedmoonlight_item_taste", "revolvedmoonlight_taste", "revolvedmoonlight_pro_taste",
     "revolvedmoonlight_item_taste2", "revolvedmoonlight_taste2", "revolvedmoonlight_pro_taste2",
     "revolvedmoonlight_item_taste3", "revolvedmoonlight_taste3", "revolvedmoonlight_pro_taste3",
     "revolvedmoonlight_item_taste4", "revolvedmoonlight_taste4", "revolvedmoonlight_pro_taste4",
     "siving_mask_era", "siving_mask_era2", "siving_mask_gold_era", "siving_mask_gold_era2",
-    "triplegoldenshovelaxe_era", "tripleshovelaxe_era", "lilybush_era", "lileaves_era", "shield_l_log_era", "icire_rock_era", "shield_l_sand_era",
+    "triplegoldenshovelaxe_era", "tripleshovelaxe_era", "lilybush_era", "lileaves_era", "shield_l_log_era",
+    "icire_rock_era", "shield_l_sand_era",
     "plant_cactus_meat_l_world", "orchidbush_disguiser", "boltwingout_disguiser",
+    "siving_mask_gold_marble",
     "rosebush_marble", "rosorns_marble", "lilybush_marble", "lileaves_marble", "orchidbush_marble", "orchitwigs_marble",
     "shield_l_log_emo_fist", "hat_lichen_emo_que",
 
     "fishhomingtool_awesome_taste", "fishhomingtool_normal_taste", "fishhomingbait_taste",
     "backcub_fans2", "backcub_fans",
-    "shield_l_log_emo_pride", "shield_l_sand_op", "pinkstaff_tvplay",  "hat_cowboy_tvplay", "hat_lichen_disguiser", "orchitwigs_disguiser"
+    "shield_l_log_emo_pride", "shield_l_sand_op", "pinkstaff_tvplay",  "hat_cowboy_tvplay", "hat_lichen_disguiser",
+    "orchitwigs_disguiser"
 }
 for i,skinname in pairs(skinidxes) do
     _G.SKIN_IDX_LEGION[i] = skinname

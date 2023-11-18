@@ -22,7 +22,7 @@ local SkinStrings = ischinese and {
         UNKNOWN = "陌生系列",
         MAGICSPELL = "魔咒系列",
         EMOTICON = "印象系列",
-        MARBLE = "大理石园丁系列",
+        MARBLE = "理石园系列",
         THANKS = "江湖一枝花系列",
         TVPLAY = "N次元系列",
         DISGUISER = "奇妙物语系列",
@@ -53,7 +53,7 @@ local SkinStrings = ischinese and {
         UNKNOWN = "Strange Collection",
         MAGICSPELL = "Magic Spell Collection",
         EMOTICON = "Notion Collection",
-        MARBLE = "Marble Gardener Collection",
+        MARBLE = "Marble Palace Collection",
         THANKS = "Heartfelt Thanks Collection",
         TVPLAY = "N-dimension Collection",
         DISGUISER = "Wonderful Creatures Collection",
@@ -562,6 +562,13 @@ local function SetAnim_soilcrop(self, anim, data)
     end
     animstate:OverrideSymbol("soil01", data.soilskin or "siving_soil", "soil04")
     SetClick_soilcrop(self, anim, data)
+end
+
+local function SetAnim_refracted_taste_fx(self, anim, data)
+    local animstate = anim:GetAnimState()
+    SetAnim_base(animstate, data)
+    animstate:SetBloomEffectHandle("shaders/anim.ksh")
+    animstate:SetMultColour(255/255, 222/255, 139/255, 0.7)
 end
 
 local width_skininfo = 260
@@ -2596,11 +2603,53 @@ local SkinData = {
             }
         }
     },
+    siving_mask_gold_marble = {
+        string = ischinese and {
+            name = "圣女的纱袍",
+            collection = "MARBLE", access = "SPECIAL",
+            descitem = "解锁\"子圭·歃\"、\"子圭·釜\"的皮肤。",
+            description = ""
+        } or {
+            name = "Holy Suit",
+            collection = "MARBLE", access = "SPECIAL",
+            descitem = "Unlock \"Siving-Movili\", \"Siving-Kerty\" skin.",
+            description = "The story was not translated."
+        },
+        height_anim = 265,
+        anims = {
+            {
+                bank = "siving_mask_gold_marble", build = "siving_mask_gold_marble",
+                anim = "idle", anim2 = nil, isloop = nil,
+                x = -55, y = 133, scale = 0.38
+            },
+            {
+                symbol = {
+                    { symbol = "swap_hat", build = "siving_mask_gold_marble", file = "swap_hat", type = 2 }
+                },
+                fn_anim = SetAnim_player,
+                fn_click = SetAnim_player2,
+                x = 35, y = 130, scale = 0.38
+            },
+            {
+                bank = "siving_armor_gold_marble", build = "siving_armor_gold_marble",
+                anim = "idle", anim2 = nil, isloop = nil,
+                x = -55, y = 0, scale = 0.38
+            },
+            {
+                symbol = {
+                    { symbol = "swap_body", build = "siving_armor_gold_marble", file = "swap_body", type = nil }
+                },
+                fn_anim = SetAnim_player,
+                fn_click = SetAnim_player2,
+                x = 35, y = 0, scale = 0.38
+            }
+        }
+    },
     siving_soil_item_law = {
         string = ischinese and {
             name = "春泥",
             collection = "LAW", access = "SPECIAL",
-            descitem = "解锁\"子圭·垄\"的皮肤。",
+            descitem = "解锁\"子圭·垄\"的2套皮肤。",
             description = ""
         } or {
             name = "Spring Mud",
@@ -2671,6 +2720,52 @@ local SkinData = {
                 fn_anim = SetAnim_soilcrop,
                 fn_click = SetClick_soilcrop,
                 x = 50, y = 20, scale = 0.32
+            }
+        }
+    },
+    refractedmoonlight_taste = {
+        string = ischinese and {
+            collection = "TASTE", access = "SPECIAL",
+            descitem = "解锁\"月折宝剑\"的皮肤。",
+            description = ""
+        } or {
+            collection = "TASTE", access = "SPECIAL",
+            descitem = "Unlock \"Refracted Moonlight\" skin.",
+            description = "The story was not translated."
+        },
+        height_anim = 265,
+        anims = {
+            {
+                bank = "refractedmoonlight_taste", build = "refractedmoonlight_taste",
+                anim = "idle", anim2 = nil, isloop = true,
+                x = -55, y = 133, scale = 0.38
+            },
+            {
+                symbol = {
+                    { symbol = "swap_object", build = "refractedmoonlight_taste", file = "swap1", type = 1 },
+                },
+                fn_anim = SetAnim_player,
+                fn_click = SetAnim_player2,
+                x = 35, y = 130, scale = 0.38
+            },
+            {
+                bank = "refractedmoonlight_taste", build = "refractedmoonlight_taste",
+                anim = "idle2", anim2 = nil, isloop = true,
+                x = -55, y = 0, scale = 0.38
+            },
+            {
+                symbol = {
+                    { symbol = "swap_object", build = "refractedmoonlight_taste", file = "swap2", type = 1 },
+                },
+                fn_anim = SetAnim_player,
+                fn_click = SetAnim_player2,
+                x = 35, y = 0, scale = 0.38
+            },
+            {
+                bank = "alterguardian_meteor", build = "siving_boss_caw_fx",
+                anim = "meteorground_pre", anim2 = "meteorground_loop", isloop = true,
+                fn_anim = SetAnim_refracted_taste_fx,
+                x = -55, y = 66, scale = 0.152
             }
         }
     },
