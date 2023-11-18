@@ -3536,7 +3536,7 @@ _G.SKINS_LEGION = {
         string = ischinese and { name = "落英" } or { name = "Bloomed Flowers" },
 
         anim = {
-            bank = "siving_soil_item_law", build = "siving_soil_item_law",
+            bank = nil, build = nil,
             anim = "item", animpush = nil, isloop = nil,
             setable = true
         },
@@ -3576,7 +3576,7 @@ _G.SKINS_LEGION = {
         string = ischinese and { name = "春泥" } or { name = "Spring Mud" },
 
         anim = {
-            bank = "siving_soil_item_law2", build = "siving_soil_item_law2",
+            bank = nil, build = nil,
             anim = "item", animpush = nil, isloop = nil,
             setable = true
         },
@@ -3616,7 +3616,7 @@ _G.SKINS_LEGION = {
         string = ischinese and { name = "归根" } or { name = "For Roots" },
 
         anim = {
-            bank = "siving_soil_item_law3", build = "siving_soil_item_law3",
+            bank = nil, build = nil,
             anim = "item", animpush = nil, isloop = nil,
             setable = true
         },
@@ -3657,6 +3657,7 @@ _G.SKIN_IDS_LEGION = {
         shield_l_log_emo_fist = true, hat_lichen_emo_que = true,
         rosebush_collector = true, rosorns_collector = true, fimbul_axe_collector = true, siving_turn_collector = true, siving_feather_real_collector = true, siving_feather_fake_collector = true,
         backcub_fans2 = true,
+        fishhomingtool_awesome_taste = true, fishhomingtool_normal_taste = true, fishhomingbait_taste = true,
         agronssword_taste = true, soul_contracts_taste = true,
         revolvedmoonlight_item_taste = true, revolvedmoonlight_taste = true, revolvedmoonlight_pro_taste = true,
         revolvedmoonlight_item_taste2 = true, revolvedmoonlight_taste2 = true, revolvedmoonlight_pro_taste2 = true,
@@ -4036,6 +4037,48 @@ if IsServer then
     --     inst:AddComponent("shard_skin_legion")
     -- end)
 
+    local function Reward123(skins)
+        if not skins["backcub_fans2"] then
+            for skinname, _ in pairs(SKIN_IDS_LEGION["6278c487c340bf24ab31152c"]) do
+                if not skins[skinname] then
+                    return
+                end
+            end
+            for skinname, _ in pairs(SKIN_IDS_LEGION["6278c4acc340bf24ab311530"]) do
+                if not skins[skinname] then
+                    return
+                end
+            end
+            for skinname, _ in pairs(SKIN_IDS_LEGION["6278c4eec340bf24ab311534"]) do
+                if not skins[skinname] then
+                    return
+                end
+            end
+            skins["backcub_fans2"] = true
+        end
+    end
+    local function Reward456(skins)
+        if not skins["fishhomingbait_taste"] then
+            for skinname, _ in pairs(SKIN_IDS_LEGION["637f07a28c2f781db2f7f1e8"]) do
+                if not skins[skinname] then
+                    return
+                end
+            end
+            for skinname, _ in pairs(SKIN_IDS_LEGION["642c14d9f2b67d287a35d439"]) do
+                if not skins[skinname] then
+                    return
+                end
+            end
+            for skinname, _ in pairs(SKIN_IDS_LEGION["61f15bf4db102b0b8a529c66"]) do
+                if not skins[skinname] then
+                    return
+                end
+            end
+            skins["fishhomingtool_awesome_taste"] = true
+            skins["fishhomingtool_normal_taste"] = true
+            skins["fishhomingbait_taste"] = true
+        end
+    end
     _G.CheckSkinOwnedReward = function(skins)
         if skins == nil then
             return
@@ -4082,24 +4125,8 @@ if IsServer then
         end
 
         --全皮奖励
-        if not skins["backcub_fans2"] then
-            for skinname,_ in pairs(SKIN_IDS_LEGION["6278c487c340bf24ab31152c"]) do
-                if not skins[skinname] then
-                    return
-                end
-            end
-            for skinname,_ in pairs(SKIN_IDS_LEGION["6278c4acc340bf24ab311530"]) do
-                if not skins[skinname] then
-                    return
-                end
-            end
-            for skinname,_ in pairs(SKIN_IDS_LEGION["6278c4eec340bf24ab311534"]) do
-                if not skins[skinname] then
-                    return
-                end
-            end
-            skins["backcub_fans2"] = true
-        end
+        Reward123(skins)
+        Reward456(skins)
     end
 
     local function CloseGame()

@@ -2248,12 +2248,6 @@ table.insert(prefs, Prefab(
         inst.components.workable:SetWorkLeft(1)
         inst.components.workable:SetOnFinishCallback(OnFinished_soil)
 
-        inst:AddComponent("inventoryitem")
-        inst.components.inventoryitem.imagename = "siving_soil_item"
-        inst.components.inventoryitem.atlasname = "images/inventoryimages/siving_soil_item.xml"
-
-        inst:AddComponent("equippable")
-
         MakeHauntableWork(inst)
 
         -- inst.components.skinedlegion:SetOnPreLoad()
