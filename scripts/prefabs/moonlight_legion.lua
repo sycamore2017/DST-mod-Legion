@@ -211,11 +211,14 @@ MakeItem({
     assets = {
         Asset("ANIM", "anim/hiddenmoonlight.zip"),
         Asset("ATLAS", "images/inventoryimages/hiddenmoonlight_item.xml"),
-        Asset("IMAGE", "images/inventoryimages/hiddenmoonlight_item.tex"),
+        Asset("IMAGE", "images/inventoryimages/hiddenmoonlight_item.tex")
     },
     prefabs = { "hiddenmoonlight" },
-    floatable = { 0.1, "med", 0.3, 0.7 },
-    -- fn_common = function(inst)end,
+    -- floatable = { 0.1, "med", 0.3, 0.7 },
+    fn_common = function(inst)
+        inst:AddComponent("skinedlegion")
+        inst.components.skinedlegion:InitWithFloater("hiddenmoonlight_item")
+    end,
     fn_server = function(inst)
         inst.components.upgradekit:SetData({
             icebox = {

@@ -171,7 +171,7 @@ Assets = {
     Asset("ANIM", "anim/images_minisign4.zip"),
     Asset("ANIM", "anim/images_minisign5.zip"),
     Asset("ANIM", "anim/images_minisign6.zip"),
-
+    Asset("ANIM", "anim/snow_legion.zip"), --积雪的通用贴图
     Asset("ANIM", "anim/playguitar.zip"),   --弹吉他动画模板
     Asset("SOUNDPACKAGE", "sound/legion.fev"),   --吉他的声音
     Asset("SOUND", "sound/legion.fsb"),

@@ -613,7 +613,6 @@ table.insert(prefs, Prefab(
         return inst
     end,
     {
-        Asset("ANIM", "anim/hiddenmoonlight.zip"), --提供积雪贴图
         Asset("ANIM", "anim/siving_derivant.zip")
     },
     { "siving_derivant_item", "siving_rocks" }
@@ -2035,6 +2034,7 @@ local assets_fx_era = {
 local rbg_era1 = { 237/255, 67/255, 65/255 }
 local rbg_era2 = { 65/255, 237/255, 157/255 }
 local rbg_era3 = { 206/255, 65/255, 236/255 }
+local rbg_marble = { 255/255, 255/255, 153/255 }
 local function FnRun_era1(inst)
     if inst._count < 35 then
         inst.AnimState:SetMultColour(rbg_era1[1], rbg_era1[2], rbg_era1[3], inst._count/35)
@@ -2054,6 +2054,13 @@ local function FnRun_era3(inst)
         inst.AnimState:SetMultColour(rbg_era3[1], rbg_era3[2], rbg_era3[3], inst._count/35)
     else
         inst.AnimState:SetMultColour(rbg_era3[1], rbg_era3[2], rbg_era3[3], 1)
+    end
+end
+local function FnRun_marble(inst)
+    if inst._count < 35 then
+        inst.AnimState:SetMultColour(rbg_marble[1], rbg_marble[2], rbg_marble[3], inst._count/35)
+    else
+        inst.AnimState:SetMultColour(rbg_marble[1], rbg_marble[2], rbg_marble[3], 1)
     end
 end
 
@@ -2107,6 +2114,20 @@ MakeFx_life({
         inst.AnimState:SetMultColour(rbg_era3[1], rbg_era3[2], rbg_era3[3], 0)
         inst.AnimState:SetScale(0.6, 0.6)
         inst.fn_l_run = FnRun_era3
+    end
+})
+MakeFx_life({
+    name = "siving_lifesteal_fx_marble",
+    assets = {
+        Asset("ANIM", "anim/lifeplant_fx.zip")
+    },
+    fn_common = function(inst)
+        inst.AnimState:SetBank("lifeplant_fx")
+        inst.AnimState:SetBuild("lifeplant_fx")
+        inst.AnimState:PlayAnimation("single"..math.random(1,3), true)
+        inst.AnimState:SetMultColour(rbg_marble[1], rbg_marble[2], rbg_marble[3], 0)
+        inst.AnimState:SetScale(0.6, 0.6)
+        inst.fn_l_run = FnRun_marble
     end
 })
 

@@ -362,17 +362,14 @@ end
 --[ 积雪监听(仅prefab定义时使用) ]--
 local function OnSnowCoveredChagned(inst, covered)
     if TheWorld.state.issnowcovered then
-        inst.AnimState:OverrideSymbol("snow", "hiddenmoonlight", "snow")
+        inst.AnimState:OverrideSymbol("snow", "snow_legion", "snow")
     else
-        inst.AnimState:OverrideSymbol("snow", "hiddenmoonlight", "emptysnow")
+        inst.AnimState:OverrideSymbol("snow", "snow_legion", "emptysnow")
     end
 end
 local function MakeSnowCovered_comm(inst)
-    inst.AnimState:OverrideSymbol("snow", "hiddenmoonlight", "emptysnow")
-
-    --  1、为了注册积雪的贴图，需要提前在assets中添加：
-    --      Asset("ANIM", "anim/hiddenmoonlight.zip")
-    --  2、同时，动画制作中，需要添加“snow”的通道
+    inst.AnimState:OverrideSymbol("snow", "snow_legion", "emptysnow")
+    --动画制作中，需要添加“snow”的通道
 end
 local function MakeSnowCovered_serv(inst, delaytime, delayfn)
     inst:WatchWorldState("issnowcovered", OnSnowCoveredChagned)

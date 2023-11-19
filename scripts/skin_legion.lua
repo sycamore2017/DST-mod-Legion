@@ -371,6 +371,14 @@ local function SetWidget(inst, name)
     end
 end
 
+------
+
+local function OnUnequip_sivmask_gold_marble(owner, data)
+    if data ~= nil and data.eslot == EQUIPSLOTS.BODY then
+        owner.AnimState:OverrideSymbol("swap_body", "siving_armor_gold_marble", "swap_body")
+    end
+end
+
 --------------------------------------------------------------------------
 --[[ 全局皮肤总数据，以及修改 ]]
 --------------------------------------------------------------------------
@@ -966,6 +974,24 @@ _G.SKIN_PREFABS_LEGION = {
             Fn_start_refracted(inst)
         end,
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 }
+    },
+
+    hiddenmoonlight_item = {
+        image = { name = nil, atlas = nil, setable = true },
+        anim = {
+            bank = "hiddenmoonlight", build = "hiddenmoonlight",
+            anim = "idle_item", animpush = nil, isloop = nil, setable = true
+        },
+        exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
+
+        overridekeys = { "data_up" },
+        data_up = {
+            exchangefx = { prefab = nil, offset_y = nil, scale = nil },
+            fn_start = function(inst)
+                inst.AnimState:SetBank("hiddenmoonlight")
+                inst.AnimState:SetBuild("hiddenmoonlight")
+            end
+        }
     },
 }
 
@@ -3033,9 +3059,30 @@ _G.SKINS_LEGION = {
             anim = nil, animpush = nil, isloop = nil, setable = true
         },
         fn_start = function(inst)
-            inst.maskfxoverride_l = "siving_lifesteal_fx_era3"
+            inst.maskfxoverride_l = "siving_lifesteal_fx_marble"
         end,
-        equip = { symbol = nil, build = "siving_mask_gold_marble", file = "swap_hat", isopenhat = nil },
+        equip = {
+            symbol = nil, build = "siving_mask_gold_marble", file = "swap_hat", isopenhat = nil,
+            startfn = function(inst, owner)
+                TOOLS_L.hat_on(inst, owner, "siving_mask_gold_marble", "swap_hat")
+                owner:ListenForEvent("unequip", OnUnequip_sivmask_gold_marble)
+                if owner.components.inventory ~= nil then
+                    local equippedArmor = owner.components.inventory:GetEquippedItem(EQUIPSLOTS.BODY) or nil
+                    if equippedArmor == nil then
+                        owner.AnimState:OverrideSymbol("swap_body", "siving_armor_gold_marble", "swap_body")
+                    end
+                end
+            end,
+            endfn = function(inst, owner)
+                owner:RemoveEventCallback("unequip", OnUnequip_sivmask_gold_marble)
+                if owner.components.inventory ~= nil then
+                    local equippedArmor = owner.components.inventory:GetEquippedItem(EQUIPSLOTS.BODY) or nil
+                    if equippedArmor == nil then
+                        owner.AnimState:ClearOverrideSymbol("swap_body")
+                    end
+                end
+            end
+        },
         exchangefx = { prefab = nil, offset_y = nil, scale = nil }
     },
 
@@ -3179,6 +3226,44 @@ _G.SKINS_LEGION = {
         end,
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 }
     },
+
+    hiddenmoonlight_item_paper = {
+        base_prefab = "hiddenmoonlight_item", skin_id = "655a18f6adf8ac0fd863e900", onlyownedshow = true,
+		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
+		assets = {
+			Asset("ANIM", "anim/skin/hiddenmoonlight_paper.zip")
+		},
+        image = { name = nil, atlas = nil, setable = true },
+        string = ischinese and { name = "星愿满瓶" } or { name = "Star Wishes Bottle" },
+		anim = {
+            bank = "hiddenmoonlight_paper", build = "hiddenmoonlight_paper",
+            anim = "idle_item", animpush = nil, isloop = nil, setable = true
+        },
+        build_name_override = "hiddenmoonlight_paper",
+        exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
+        floater = { cut = 0.1, size = "med", offset_y = 0.3, scale = 0.7, nofx = nil },
+
+        overridekeys = { "data_up" },
+        data_up = {
+            exchangefx = { prefab = nil, offset_y = nil, scale = nil },
+            fn_start = function(inst)
+                inst.AnimState:SetBank("hiddenmoonlight_paper")
+                inst.AnimState:SetBuild("hiddenmoonlight_paper")
+                -- inst.components.container:Close()
+                -- inst.components.container:WidgetSetup("hiddenmoonlight_paper")
+            end,
+            -- fn_end = function(inst)
+            --     inst.components.container:Close()
+            --     inst.components.container:WidgetSetup("hiddenmoonlight")
+            -- end,
+            -- fn_start_c = function(inst)
+            --     SetWidget(inst, "hiddenmoonlight_paper")
+            -- end,
+            -- fn_end_c = function(inst)
+            --     SetWidget(inst, "hiddenmoonlight")
+            -- end
+        }
+    },
 }
 
 _G.SKIN_IDS_LEGION = {
@@ -3211,7 +3296,7 @@ _G.SKIN_IDS_LEGION = {
         siving_soil_item_law = true, siving_soil_item_law2 = true, siving_soil_item_law3 = true,
         icire_rock_day = true,
         neverfade_paper = true, neverfadebush_paper = true, neverfade_paper2 = true, neverfadebush_paper2 = true,
-        siving_feather_real_paper = true, siving_feather_fake_paper = true,
+        siving_feather_real_paper = true, siving_feather_fake_paper = true, hiddenmoonlight_item_paper = true,
         siving_turn_future = true, siving_turn_future2 = true
     },
     ["6278c450c340bf24ab311528"] = { --回忆(5)
@@ -3269,6 +3354,7 @@ _G.SKIN_IDS_LEGION = {
         siving_soil_item_law = true, siving_soil_item_law2 = true, siving_soil_item_law3 = true,
         refractedmoonlight_taste = true,
         siving_mask_gold_marble = true,
+        hiddenmoonlight_item_paper = true,
     },
     -- ["61627d927bbb727be174c4a0"] = { --棋举不定
     -- }
@@ -3306,7 +3392,7 @@ local skinidxes = { --用以皮肤排序
     "siving_turn_collector", "icire_rock_collector", "fimbul_axe_collector", "rosebush_collector", "rosorns_collector",
     "neverfade_paper", "neverfadebush_paper", "neverfade_paper2", "neverfadebush_paper2",
     "siving_turn_future", "siving_turn_future2",
-    "siving_feather_real_paper", "siving_feather_fake_paper",
+    "hiddenmoonlight_item_paper", "siving_feather_real_paper", "siving_feather_fake_paper",
     "icire_rock_day",
     "siving_soil_item_law", "siving_soil_item_law2", "siving_soil_item_law3",
     "carpet_whitewood_law", "carpet_whitewood_big_law", "carpet_whitewood_law2", "carpet_whitewood_big_law2",

@@ -2608,40 +2608,33 @@ local SkinData = {
             name = "圣女的纱袍",
             collection = "MARBLE", access = "SPECIAL",
             descitem = "解锁\"子圭·歃\"、\"子圭·釜\"的皮肤。",
-            description = ""
+            description = "她虔诚地伫立在教堂五彩琉璃光芒之下，在晨曦中那容貌竟与圣母雕像一般无二，她看向十字架上的蔷薇，面容上满是欢欣——她对主的爱至诚无疑。\n圣水从杨柳枝叶挥洒，落在她的睫毛之上，突然间有人高声呼喊：“是圣母在流泪！”她震惊地发现众人竟转而向她跪拜，唱诗班的孩童齐聚她身边亲吻她的衣裙，华贵的乐章倏然在空中响起，松针的冷香从远处飘来，随着风，被裹挟而来的还有一片火刑架的灰烬。"
         } or {
             name = "Holy Suit",
             collection = "MARBLE", access = "SPECIAL",
             descitem = "Unlock \"Siving-Movili\", \"Siving-Kerty\" skin.",
             description = "The story was not translated."
         },
-        height_anim = 265,
+        height_anim = 170,
         anims = {
-            {
-                bank = "siving_mask_gold_marble", build = "siving_mask_gold_marble",
-                anim = "idle", anim2 = nil, isloop = nil,
-                x = -55, y = 133, scale = 0.38
-            },
-            {
-                symbol = {
-                    { symbol = "swap_hat", build = "siving_mask_gold_marble", file = "swap_hat", type = 2 }
-                },
-                fn_anim = SetAnim_player,
-                fn_click = SetAnim_player2,
-                x = 35, y = 130, scale = 0.38
-            },
             {
                 bank = "siving_armor_gold_marble", build = "siving_armor_gold_marble",
                 anim = "idle", anim2 = nil, isloop = nil,
-                x = -55, y = 0, scale = 0.38
+                x = -35, y = 90, scale = 0.38
+            },
+            {
+                bank = "siving_mask_gold_marble", build = "siving_mask_gold_marble",
+                anim = "idle", anim2 = nil, isloop = nil,
+                x = -55, y = 20, scale = 0.38
             },
             {
                 symbol = {
+                    { symbol = "swap_hat", build = "siving_mask_gold_marble", file = "swap_hat", type = 2 },
                     { symbol = "swap_body", build = "siving_armor_gold_marble", file = "swap_body", type = nil }
                 },
                 fn_anim = SetAnim_player,
                 fn_click = SetAnim_player2,
-                x = 35, y = 0, scale = 0.38
+                x = 50, y = 0, scale = 0.38
             }
         }
     },

@@ -691,7 +691,6 @@ MakeChest({
     name = "chest_whitewood",
     assets = {
         Asset("ANIM", "anim/chest_whitewood.zip"),
-        Asset("ANIM", "anim/hiddenmoonlight.zip"),
         Asset("ANIM", "anim/ui_chester_shadow_3x4.zip"),
         Asset("ANIM", "anim/ui_chest_whitewood_3x4.zip")
     },
@@ -711,7 +710,6 @@ MakeChest({
     name = "chest_whitewood_big",
     assets = {
         Asset("ANIM", "anim/chest_whitewood_big.zip"),
-        Asset("ANIM", "anim/hiddenmoonlight.zip"),
         Asset("ANIM", "anim/ui_bookstation_4x5.zip"),
         Asset("ANIM", "anim/ui_chest_whitewood_4x6.zip")
     },
