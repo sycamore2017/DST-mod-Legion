@@ -107,7 +107,12 @@ end
 local function SetTarget_hidden(inst, targetprefab)
     inst.upgradetarget = targetprefab
     if targetprefab ~= "icebox" then
-        inst.AnimState:OverrideSymbol("base", "hiddenmoonlight", "saltbase")
+        local dd = inst.components.skinedlegion:GetSkinedData()
+        if dd and dd.build_name_override then
+            inst.AnimState:OverrideSymbol("base", dd.build_name_override, "saltbase")
+        else
+            inst.AnimState:OverrideSymbol("base", "hiddenmoonlight", "saltbase")
+        end
     end
 end
 
@@ -189,6 +194,12 @@ local function OnUpgrade_hidden(item, doer, target, result)
     if result.SoundEmitter ~= nil then
         result.SoundEmitter:PlaySound("dontstarve/common/place_structure_straw")
     end
+
+    local skin = item.components.skinedlegion:GetSkin()
+    if skin ~= nil then
+        result.components.skinedlegion:SetSkin(skin, item.components.skinedlegion.userid or (doer and doer.userid or nil))
+    end
+
     SetTarget_hidden(result, target.prefab)
     UpdatePerishRate_hidden(result)
 
@@ -314,7 +325,13 @@ local function OnFinished_hidden(inst, worker)
     --归还宝石
     DropGems(inst, "bluegem")
 
-    inst.components.lootdropper:SpawnLootPrefab("hiddenmoonlight_item")
+    local skin = inst.components.skinedlegion:GetSkin()
+    if skin == nil then
+        inst.components.lootdropper:SpawnLootPrefab("hiddenmoonlight_item")
+    else
+        inst.components.lootdropper:SpawnLootPrefab("hiddenmoonlight_item", nil,
+            skin, nil, inst.components.skinedlegion.userid or (worker and worker.userid or nil))
+    end
 
     local fx = SpawnPrefab("collapse_small")
     fx.Transform:SetPosition(x, y, z)
@@ -345,6 +362,10 @@ table.insert(prefs, Prefab("hiddenmoonlight", function()
 
     inst._lvl_l = net_byte(inst.GUID, "moonlight_l._lvl_l", "lvl_l_dirty")
     inst.displaynamefn = DisplayName
+
+    inst:AddComponent("skinedlegion")
+    inst.components.skinedlegion:OverrideSkin("hiddenmoonlight_item", "data_up")
+    inst.components.skinedlegion:Init("hiddenmoonlight_item")
 
     inst.entity:SetPristine()
     if not TheWorld.ismastersim then
@@ -396,6 +417,8 @@ table.insert(prefs, Prefab("hiddenmoonlight", function()
     if TUNING.SMART_SIGN_DRAW_ENABLE then
 		SMART_SIGN_DRAW(inst)
 	end
+
+    -- inst.components.skinedlegion:SetOnPreLoad()
 
     return inst
 end, {

@@ -76,7 +76,7 @@ end)
 ------以下均为【服务端、客户端】环境
 
 local SkinsOverride = {
-	siving_soil_item = true
+	siving_soil_item = true, hiddenmoonlight_item = true
 }
 function SkinedLegion:OverrideSkin(prefab, key)
 	if prefab ~= nil and SkinsOverride[prefab] then
@@ -266,8 +266,7 @@ function SkinedLegion:OnLoad(data)
 	if data == nil then
 		return
 	end
-
-	if data.skin ~= nil then
+	if data.skin ~= nil and SKINS_LEGION[data.skin] ~= nil then
 		self.skin = nil --先还原为原皮肤，才能应用新皮肤
 		self.inst.skinname = nil
 		self.userid = data.userid
@@ -279,7 +278,7 @@ end
 function SkinedLegion:SetOnPreLoad(onpreloadfn) --提前加载皮肤数据，好让其他组件应用
 	self.inst.OnPreLoad = function(inst, data, ...)
 		if data ~= nil then
-			if data.skin ~= nil then
+			if data.skin ~= nil and SKINS_LEGION[data.skin] ~= nil then
 				self.skin = data.skin
 				self.userid = data.userid
 				self.inst.skinname = data.skin

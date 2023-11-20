@@ -254,6 +254,7 @@ local InventoryPrefabsList = {  --每个元素的下标值为每种物品栏图�
     refractedmoonlight_taste2 = 8,
     siving_mask_gold_marble = 8,
     siving_armor_gold_marble = 8,
+    hiddenmoonlight_item_paper = 8,
 }
 
 return InventoryPrefabsList

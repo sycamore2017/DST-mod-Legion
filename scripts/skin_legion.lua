@@ -379,6 +379,14 @@ local function OnUnequip_sivmask_gold_marble(owner, data)
     end
 end
 
+------
+
+local function SetTarget_hidden(inst, build)
+    if inst.upgradetarget ~= "icebox" then
+        inst.AnimState:OverrideSymbol("base", build or "hiddenmoonlight", "saltbase")
+    end
+end
+
 --------------------------------------------------------------------------
 --[[ 全局皮肤总数据，以及修改 ]]
 --------------------------------------------------------------------------
@@ -983,6 +991,7 @@ _G.SKIN_PREFABS_LEGION = {
             anim = "idle_item", animpush = nil, isloop = nil, setable = true
         },
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
+        floater = { cut = 0.1, size = "med", offset_y = 0.3, scale = 0.7, nofx = nil },
 
         overridekeys = { "data_up" },
         data_up = {
@@ -3245,23 +3254,18 @@ _G.SKINS_LEGION = {
 
         overridekeys = { "data_up" },
         data_up = {
+            build_name_override = "hiddenmoonlight_paper",
             exchangefx = { prefab = nil, offset_y = nil, scale = nil },
             fn_start = function(inst)
+                inst.AnimState:SetScale(1.5, 1.5, 1.5)
                 inst.AnimState:SetBank("hiddenmoonlight_paper")
                 inst.AnimState:SetBuild("hiddenmoonlight_paper")
-                -- inst.components.container:Close()
-                -- inst.components.container:WidgetSetup("hiddenmoonlight_paper")
+                SetTarget_hidden(inst, "hiddenmoonlight_paper")
             end,
-            -- fn_end = function(inst)
-            --     inst.components.container:Close()
-            --     inst.components.container:WidgetSetup("hiddenmoonlight")
-            -- end,
-            -- fn_start_c = function(inst)
-            --     SetWidget(inst, "hiddenmoonlight_paper")
-            -- end,
-            -- fn_end_c = function(inst)
-            --     SetWidget(inst, "hiddenmoonlight")
-            -- end
+            fn_end = function(inst)
+                inst.AnimState:SetScale(1, 1, 1)
+                SetTarget_hidden(inst, nil)
+            end
         }
     },
 }
@@ -4221,7 +4225,6 @@ if IsServer then
                         if skins == nil then
                             return
                         end
-
                         local skinname_new = nil
                         local skinname_old = target.components.skinedlegion:GetSkin()
                         local skinname_cac = _G.SKINS_CACHE_CG_L[doer.userid] and _G.SKINS_CACHE_CG_L[doer.userid][prefabname] or nil

@@ -2762,6 +2762,21 @@ local SkinData = {
             }
         }
     },
+    hiddenmoonlight_item_paper = {
+        string = ischinese and {
+            collection = "PAPER", access = "SPECIAL",
+            descitem = "解锁\"月藏宝匣套件\"、\"月藏宝匣\"的皮肤。",
+            description = ""
+        } or {
+            collection = "PAPER", access = "SPECIAL",
+            descitem = "Unlock \"Hidden Moonlight Kit\", \"Hidden Moonlight\" skin.",
+            description = "The story was not translated."
+        },
+        height_anim = 310,
+        anims = {
+            
+        }
+    },
 }
 
 local function GetName(skin)
