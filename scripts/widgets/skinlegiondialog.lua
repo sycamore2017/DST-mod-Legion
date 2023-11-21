@@ -571,6 +571,29 @@ local function SetAnim_refracted_taste_fx(self, anim, data)
     animstate:SetMultColour(255/255, 222/255, 139/255, 0.7)
 end
 
+local function SetClick_hidden(self, anim, data)
+    local animstate = anim:GetAnimState()
+    local tag = anim.tag_anim or data.tag_anim
+    if tag == 1 then
+        animstate:PlayAnimation("open")
+        animstate:PushAnimation("opened", true)
+    elseif tag == 2 then
+        animstate:PlayAnimation("close")
+        animstate:PushAnimation("closed", true)
+        tag = 0
+    else
+        tag = 0
+    end
+    anim.tag_anim = tag + 1
+end
+local function SetAnim_hidden(self, anim, data)
+    local animstate = anim:GetAnimState()
+    SetAnim_base(animstate, data)
+    if data.issalt then
+        animstate:OverrideSymbol("base", data.build or "hiddenmoonlight", "saltbase")
+    end
+end
+
 local width_skininfo = 260
 local SkinData = {
     rosebush_marble = {
@@ -2650,39 +2673,39 @@ local SkinData = {
             descitem = "Unlock \"Siving-Sols\" skin.",
             description = "The story was not translated."
         },
-        height_anim = 310,
+        height_anim = 325,
         anims = {
             {
-                bank = "siving_soil_item_law", build = "siving_soil_item_law",
+                bank = "siving_soil_law", build = "siving_soil_law",
                 anim = "item", anim2 = nil, isloop = false,
-                x = -60, y = 165, scale = 0.32
+                x = -60, y = 165, scale = 0.35
             },
             {
-                bank = "farm_soil", build = "siving_soil_item_law",
+                bank = "farm_soil", build = "siving_soil_law",
                 anim = "till_rise", anim2 = "till_idle", isloop = false,
-                x = -40, y = 240, scale = 0.32
+                x = -40, y = 240, scale = 0.35
             },
             {
-                soilskin = "siving_soil_item_law",
+                soilskin = "siving_soil_law",
                 fn_anim = SetAnim_soilcrop,
                 fn_click = SetClick_soilcrop,
-                x = 50, y = 170, scale = 0.32
+                x = 50, y = 170, scale = 0.35
             },
             {
-                bank = "siving_soil_item_law2", build = "siving_soil_item_law2",
+                bank = "siving_soil_law2", build = "siving_soil_law2",
                 anim = "item", anim2 = nil, isloop = false,
-                x = -60, y = 15, scale = 0.32
+                x = -60, y = 15, scale = 0.35
             },
             {
-                bank = "farm_soil", build = "siving_soil_item_law2",
+                bank = "farm_soil", build = "siving_soil_law2",
                 anim = "till_rise", anim2 = "till_idle", isloop = false,
-                x = -40, y = 90, scale = 0.32
+                x = -40, y = 90, scale = 0.35
             },
             {
-                soilskin = "siving_soil_item_law2",
+                soilskin = "siving_soil_law2",
                 fn_anim = SetAnim_soilcrop,
                 fn_click = SetClick_soilcrop,
-                x = 50, y = 20, scale = 0.32
+                x = 50, y = 20, scale = 0.35
             }
         }
     },
@@ -2696,23 +2719,23 @@ local SkinData = {
             descitem = "Unlock \"Siving-Sols\" skin.",
             description = "The story was not translated."
         },
-        height_anim = 160,
+        height_anim = 175,
         anims = {
             {
-                bank = "siving_soil_item_law3", build = "siving_soil_item_law3",
+                bank = "siving_soil_law3", build = "siving_soil_law3",
                 anim = "item", anim2 = nil, isloop = false,
-                x = -60, y = 15, scale = 0.32
+                x = -60, y = 15, scale = 0.35
             },
             {
-                bank = "farm_soil", build = "siving_soil_item_law3",
+                bank = "farm_soil", build = "siving_soil_law3",
                 anim = "till_rise", anim2 = "till_idle", isloop = false,
-                x = -40, y = 90, scale = 0.32
+                x = -40, y = 90, scale = 0.35
             },
             {
-                soilskin = "siving_soil_item_law3",
+                soilskin = "siving_soil_law3",
                 fn_anim = SetAnim_soilcrop,
                 fn_click = SetClick_soilcrop,
-                x = 50, y = 20, scale = 0.32
+                x = 50, y = 20, scale = 0.35
             }
         }
     },
@@ -2772,9 +2795,29 @@ local SkinData = {
             descitem = "Unlock \"Hidden Moonlight Kit\", \"Hidden Moonlight\" skin.",
             description = "The story was not translated."
         },
-        height_anim = 310,
+        height_anim = 155,
         anims = {
-            
+            {
+                bank = "hiddenmoonlight_paper", build = "hiddenmoonlight_paper",
+                anim = "idle_item", anim2 = nil, isloop = false,
+                x = 0, y = 45, scale = 0.32
+            },
+            {
+                bank = "hiddenmoonlight_paper", build = "hiddenmoonlight_paper",
+                anim = "close", anim2 = "closed", isloop = true,
+                issalt = false, tag_anim = 1,
+                fn_anim = SetAnim_hidden,
+                fn_click = SetClick_hidden,
+                x = -63, y = 12, scale = 0.38*1.3
+            },
+            {
+                bank = "hiddenmoonlight_paper", build = "hiddenmoonlight_paper",
+                anim = "open", anim2 = "opened", isloop = true,
+                issalt = true, tag_anim = 2,
+                fn_anim = SetAnim_hidden,
+                fn_click = SetClick_hidden,
+                x = 63, y = 12, scale = 0.38*1.3
+            }
         }
     },
 }

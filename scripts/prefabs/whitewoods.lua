@@ -630,8 +630,8 @@ local function MakeChest(data)
 
             TOOLS_L.MakeSnowCovered_comm(inst)
 
-            -- inst:AddComponent("skinedlegion")
-            -- inst.components.skinedlegion:Init(data.name)
+            inst:AddComponent("skinedlegion")
+            inst.components.skinedlegion:Init(data.name)
 
             -- if data.fn_common ~= nil then
             --     data.fn_common(inst)

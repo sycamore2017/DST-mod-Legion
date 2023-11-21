@@ -22,6 +22,8 @@ RegisterInventoryItemAtlas("images/inventoryimages_skin/siving_turn_future.xml",
 RegisterInventoryItemAtlas("images/inventoryimages_skin/siving_turn_future2.xml", "siving_turn_future2.tex")
 RegisterInventoryItemAtlas("images/inventoryimages_skin/refractedmoonlight_taste.xml", "refractedmoonlight_taste.tex")
 RegisterInventoryItemAtlas("images/inventoryimages_skin/refractedmoonlight_taste2.xml", "refractedmoonlight_taste2.tex")
+RegisterInventoryItemAtlas("images/inventoryimages_skin/chest_whitewood_craft.xml", "chest_whitewood_craft.tex")
+RegisterInventoryItemAtlas("images/inventoryimages_skin/chest_whitewood_big_craft.xml", "chest_whitewood_big_craft.tex")
 
 --------------------------------------------------------------------------
 --[[ 皮肤函数 ]]
@@ -1001,6 +1003,21 @@ _G.SKIN_PREFABS_LEGION = {
                 inst.AnimState:SetBuild("hiddenmoonlight")
             end
         }
+    },
+
+    chest_whitewood = {
+        fn_start = function(inst)
+            inst.AnimState:SetBank("chest_whitewood")
+            inst.AnimState:SetBuild("chest_whitewood")
+        end,
+        exchangefx = { prefab = nil, offset_y = nil, scale = 1.5 }
+    },
+    chest_whitewood_big = {
+        fn_start = function(inst)
+            inst.AnimState:SetBank("chest_whitewood_big")
+            inst.AnimState:SetBuild("chest_whitewood_big")
+        end,
+        exchangefx = { prefab = nil, offset_y = nil, scale = 1.5 }
     },
 }
 
@@ -3115,30 +3132,31 @@ _G.SKINS_LEGION = {
         base_prefab = "siving_soil_item", skin_id = "65560bbdadf8ac0fd863e6d6", onlyownedshow = true,
         type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
         assets = {
-            Asset("ANIM", "anim/skin/siving_soil_item_law.zip")
+            Asset("ANIM", "anim/skin/siving_soil_law.zip")
         },
         image = { name = nil, atlas = nil, setable = true },
         string = ischinese and { name = "落英" } or { name = "Bloomed Flowers" },
         anim = {
-            bank = nil, build = nil,
+            bank = "siving_soil_law", build = "siving_soil_law",
             anim = "item", animpush = nil, isloop = nil, setable = true
         },
+        build_name_override = "siving_soil_law",
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
         fn_placer = function(inst)
             inst.AnimState:SetBank("farm_soil")
-            inst.AnimState:SetBuild("siving_soil_item_law")
+            inst.AnimState:SetBuild("siving_soil_law")
         end,
 
         overridekeys = { "data_soil", "data_plant" },
         data_soil = {
             fn_start = function(inst)
                 inst.AnimState:SetBank("farm_soil")
-                inst.AnimState:SetBuild("siving_soil_item_law")
+                inst.AnimState:SetBuild("siving_soil_law")
             end
         },
         data_plant = {
             fn_start = function(inst)
-                inst.soilskin_l = "siving_soil_item_law"
+                inst.soilskin_l = "siving_soil_law"
                 if inst.fn_soiltype ~= nil then
                     inst.fn_soiltype(inst, nil)
                 end
@@ -3149,30 +3167,31 @@ _G.SKINS_LEGION = {
         base_prefab = "siving_soil_item", skin_id = "65560bbdadf8ac0fd863e6d6", noshopshow = true,
         type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
         assets = {
-            Asset("ANIM", "anim/skin/siving_soil_item_law2.zip")
+            Asset("ANIM", "anim/skin/siving_soil_law2.zip")
         },
         image = { name = nil, atlas = nil, setable = true },
         string = ischinese and { name = "春泥" } or { name = "Spring Mud" },
         anim = {
-            bank = nil, build = nil,
+            bank = "siving_soil_law2", build = "siving_soil_law2",
             anim = "item", animpush = nil, isloop = nil, setable = true
         },
+        build_name_override = "siving_soil_law2",
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
         fn_placer = function(inst)
             inst.AnimState:SetBank("farm_soil")
-            inst.AnimState:SetBuild("siving_soil_item_law2")
+            inst.AnimState:SetBuild("siving_soil_law2")
         end,
 
         overridekeys = { "data_soil", "data_plant" },
         data_soil = {
             fn_start = function(inst)
                 inst.AnimState:SetBank("farm_soil")
-                inst.AnimState:SetBuild("siving_soil_item_law2")
+                inst.AnimState:SetBuild("siving_soil_law2")
             end
         },
         data_plant = {
             fn_start = function(inst)
-                inst.soilskin_l = "siving_soil_item_law2"
+                inst.soilskin_l = "siving_soil_law2"
                 if inst.fn_soiltype ~= nil then
                     inst.fn_soiltype(inst, nil)
                 end
@@ -3183,30 +3202,31 @@ _G.SKINS_LEGION = {
         base_prefab = "siving_soil_item", skin_id = "65560bdbadf8ac0fd863e6da", onlyownedshow = true,
         type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
         assets = {
-            Asset("ANIM", "anim/skin/siving_soil_item_law3.zip")
+            Asset("ANIM", "anim/skin/siving_soil_law3.zip")
         },
         image = { name = nil, atlas = nil, setable = true },
         string = ischinese and { name = "归根" } or { name = "For Roots" },
         anim = {
-            bank = nil, build = nil,
+            bank = "siving_soil_law3", build = "siving_soil_law3",
             anim = "item", animpush = nil, isloop = nil, setable = true
         },
+        build_name_override = "siving_soil_law3",
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
         fn_placer = function(inst)
             inst.AnimState:SetBank("farm_soil")
-            inst.AnimState:SetBuild("siving_soil_item_law3")
+            inst.AnimState:SetBuild("siving_soil_law3")
         end,
 
         overridekeys = { "data_soil", "data_plant" },
         data_soil = {
             fn_start = function(inst)
                 inst.AnimState:SetBank("farm_soil")
-                inst.AnimState:SetBuild("siving_soil_item_law3")
+                inst.AnimState:SetBuild("siving_soil_law3")
             end
         },
         data_plant = {
             fn_start = function(inst)
-                inst.soilskin_l = "siving_soil_item_law3"
+                inst.soilskin_l = "siving_soil_law3"
                 if inst.fn_soiltype ~= nil then
                     inst.fn_soiltype(inst, nil)
                 end
@@ -3268,6 +3288,45 @@ _G.SKINS_LEGION = {
             end
         }
     },
+
+    chest_whitewood_craft = {
+        base_prefab = "chest_whitewood", skin_id = "", onlyownedshow = true,
+		type = "item", skin_tags = {}, release_group = 555, rarity = raritySpecial,
+		assets = {
+			Asset("ANIM", "anim/skin/chest_whitewood_craft.zip"),
+            Asset("ATLAS", "images/inventoryimages_skin/chest_whitewood_craft.xml"),
+            Asset("IMAGE", "images/inventoryimages_skin/chest_whitewood_craft.tex")
+		},
+        string = ischinese and { name = "花梨木展台" } or { name = "Rosewood Cabinet" },
+		fn_start = function(inst)
+            inst.AnimState:SetBank("chest_whitewood_craft")
+            inst.AnimState:SetBuild("chest_whitewood_craft")
+        end,
+        exchangefx = { prefab = nil, offset_y = nil, scale = 1.5 },
+        fn_placer = function(inst)
+            inst.AnimState:SetBank("chest_whitewood_craft")
+            inst.AnimState:SetBuild("chest_whitewood_craft")
+        end
+    },
+    chest_whitewood_big_craft = {
+        base_prefab = "chest_whitewood_big", skin_id = "", noshopshow = true,
+		type = "item", skin_tags = {}, release_group = 555, rarity = raritySpecial,
+		assets = {
+			Asset("ANIM", "anim/skin/chest_whitewood_big_craft.zip"),
+            Asset("ATLAS", "images/inventoryimages_skin/chest_whitewood_big_craft.xml"),
+            Asset("IMAGE", "images/inventoryimages_skin/chest_whitewood_big_craft.tex")
+		},
+        string = ischinese and { name = "花梨木展柜" } or { name = "Rosewood Showcase" },
+		fn_start = function(inst)
+            inst.AnimState:SetBank("chest_whitewood_big_craft")
+            inst.AnimState:SetBuild("chest_whitewood_big_craft")
+        end,
+        exchangefx = { prefab = nil, offset_y = nil, scale = 1.5 },
+        fn_placer = function(inst)
+            inst.AnimState:SetBank("chest_whitewood_big_craft")
+            inst.AnimState:SetBuild("chest_whitewood_big_craft")
+        end
+    },
 }
 
 _G.SKIN_IDS_LEGION = {
@@ -3301,7 +3360,8 @@ _G.SKIN_IDS_LEGION = {
         icire_rock_day = true,
         neverfade_paper = true, neverfadebush_paper = true, neverfade_paper2 = true, neverfadebush_paper2 = true,
         siving_feather_real_paper = true, siving_feather_fake_paper = true, hiddenmoonlight_item_paper = true,
-        siving_turn_future = true, siving_turn_future2 = true
+        siving_turn_future = true, siving_turn_future2 = true,
+        chest_whitewood_craft = true, chest_whitewood_big_craft = true
     },
     ["6278c450c340bf24ab311528"] = { --回忆(5)
         boltwingout_disguiser = true,
@@ -3359,6 +3419,7 @@ _G.SKIN_IDS_LEGION = {
         refractedmoonlight_taste = true,
         siving_mask_gold_marble = true,
         hiddenmoonlight_item_paper = true,
+        chest_whitewood_craft = true, chest_whitewood_big_craft = true,
     },
     -- ["61627d927bbb727be174c4a0"] = { --棋举不定
     -- }
@@ -3387,6 +3448,7 @@ end
 ------
 
 local skinidxes = { --用以皮肤排序
+    "chest_whitewood_craft", "chest_whitewood_big_craft",
     "siving_ctlwater_item_era", "siving_ctlwater_era", "siving_ctldirt_item_era", "siving_ctldirt_era",
     "siving_ctlall_item_era", "siving_ctlall_era",
     "neverfade_thanks", "neverfadebush_thanks", "siving_derivant_thanks", "siving_derivant_thanks2",
