@@ -1,3 +1,5 @@
+-- local TOOLS_L = require("tools_legion")
+
 local assets = {
     Asset("ANIM", "anim/backcub.zip"),
     Asset("ANIM", "anim/swap_backcub.zip"),
@@ -5,7 +7,6 @@ local assets = {
     Asset("IMAGE", "images/inventoryimages/backcub.tex"),
     Asset("ANIM", "anim/ui_piggyback_2x6.zip"),
 }
-
 local prefabs = {
     "cookedsmallmeat",
     "furtuft",
@@ -166,6 +167,8 @@ local function fn()
     inst:AddComponent("skinedlegion")
     inst.components.skinedlegion:InitWithFloater("backcub")
 
+    -- TOOLS_L.SetImmortalBox_common(inst) --勋章已经自动对所有带 "backpack" 标签的物品加了不朽兼容
+
     inst.entity:SetPristine()
     if not TheWorld.ismastersim then
         inst.OnEntityReplicated = function(inst) inst.replica.container:WidgetSetup("backcub") end
@@ -202,6 +205,8 @@ local function fn()
     -- MakeHauntableLaunchAndDropFirstItem(inst)    --不能被作祟
 
     inst.components.skinedlegion:SetOnPreLoad()
+
+    -- TOOLS_L.SetImmortalBox_server(inst)
 
     return inst
 end

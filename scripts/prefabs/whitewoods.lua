@@ -520,12 +520,18 @@ local function SetShowSlot(inst, slot)
             if invPrefabList[image] ~= nil then
                 inst.AnimState:OverrideSymbol("slot"..tostring(slot), invBuildMaps[invPrefabList[image]] or invBuildMaps[1], image)
             else
+                if atlas ~= nil then
+                    atlas = resolvefilepath_soft(atlas) --为了兼容mod物品，不然是没有这道工序的
+                end
                 inst.AnimState:OverrideSymbol("slot"..tostring(slot), atlas or GetInventoryItemAtlas(image..".tex"), image..".tex")
             end
             if bgimage ~= nil then
                 if invPrefabList[bgimage] ~= nil then
                     inst.AnimState:OverrideSymbol("slotbg"..tostring(slot), invBuildMaps[invPrefabList[bgimage]] or invBuildMaps[1], bgimage)
                 else
+                    if bgatlas ~= nil then
+                        bgatlas = resolvefilepath_soft(bgatlas) --为了兼容mod物品，不然是没有这道工序的
+                    end
                     inst.AnimState:OverrideSymbol("slotbg"..tostring(slot), bgatlas or GetInventoryItemAtlas(bgimage..".tex"), bgimage..".tex")
                 end
             else
@@ -637,6 +643,8 @@ local function MakeChest(data)
             --     data.fn_common(inst)
             -- end
 
+            TOOLS_L.SetImmortalBox_common(inst)
+
             inst.entity:SetPristine()
             if not TheWorld.ismastersim then
                 inst.OnEntityReplicated = function(inst) inst.replica.container:WidgetSetup(data.name) end
@@ -679,6 +687,8 @@ local function MakeChest(data)
             if data.fn_server ~= nil then
                 data.fn_server(inst)
             end
+
+            TOOLS_L.SetImmortalBox_server(inst)
 
             return inst
         end,

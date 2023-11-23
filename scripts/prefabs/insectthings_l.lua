@@ -177,6 +177,8 @@ local function Fn_boltout()
     inst:AddComponent("skinedlegion")
     inst.components.skinedlegion:InitWithFloater("boltwingout")
 
+    -- TOOLS_L.SetImmortalBox_common(inst) --勋章已经自动对所有带 "backpack" 标签的物品加了不朽兼容
+
     inst.entity:SetPristine()
     if not TheWorld.ismastersim then
         inst.OnEntityReplicated = function(inst) inst.replica.container:WidgetSetup("boltwingout") end
@@ -208,6 +210,8 @@ local function Fn_boltout()
     MakeHauntableLaunchAndDropFirstItem(inst)
 
     inst.components.skinedlegion:SetOnPreLoad()
+
+    -- TOOLS_L.SetImmortalBox_server(inst)
 
     return inst
 end

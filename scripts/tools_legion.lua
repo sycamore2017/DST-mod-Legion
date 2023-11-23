@@ -925,6 +925,106 @@ local function MakeNoLossRepairableEquipment(inst, data)
 	end
 end
 
+--[ 能力勋章兼容：不朽容器 ]--
+local function GetDisplayName_immortal(inst)
+    local name = nil
+    if inst.displaynamefn_old_medal ~= nil then
+        name = inst.displaynamefn_old_medal(inst)
+    end
+    if name == nil then
+        name = inst.nameoverride
+			-- (inst.components.inspectable ~= nil and inst.components.inspectable.nameoverride) or nil
+		if name ~= nil then
+			name = STRINGS.NAMES[string.upper(name)]
+		end
+		if name == nil then
+			name = STRINGS.NAMES[string.upper(inst.prefab)] or "MISSING NAME"
+		end
+    end
+    return subfmt(STRINGS.NAMES["IMMORTAL_BACKPACK"], { backpack = name })
+end
+local function ImmortalChangeNameDirty(inst)
+    if inst:HasTag("keepfresh") then
+        if inst.immortalchangename:value() then
+            inst.displaynamefn_old_medal = inst.displaynamefn
+            inst.displaynamefn = GetDisplayName_immortal
+        end
+    end
+end
+local function GetPerishRateMult_immortal(inst, item)
+    if item ~= nil then
+        if not item:HasTag("fish") and item.components.health == nil then
+            return 0
+        end
+    end
+    if inst.perishrate_old_medal ~= nil then
+        return type(inst.perishrate_old_medal) == "number" and inst.perishrate_old_medal
+                or inst.perishrate_old_medal(inst, item)
+                or 1
+    end
+    return 1
+end
+local function Fn_setImmortal(inst)
+    inst:AddTag("keepfresh")
+    if inst.fn_immortal_over ~= nil then
+        inst.fn_immortal_over(inst)
+    else
+        if inst.components.preserver == nil then
+            inst:AddComponent("preserver")
+        else
+            inst.perishrate_old_medal = inst.components.preserver.perish_rate_multiplier
+        end
+        inst.components.preserver:SetPerishRateMultiplier(GetPerishRateMult_immortal)
+    end
+    inst.immortalchangename:set(true)
+end
+local function OnSave_immortal(inst, data)
+    local refs = nil
+    if inst.OnSave_old_medal ~= nil then
+        refs = inst.OnSave_old_medal(inst, data)
+    end
+    if inst:HasTag("keepfresh") then
+        data.immortal = true
+    end
+    return refs
+end
+local function OnLoad_immortal(inst, data)
+    if inst.OnLoad_old_medal ~= nil then
+        inst.OnLoad_old_medal(inst, data)
+    end
+    if data ~= nil and data.immortal then
+        if inst.setImmortal ~= nil then
+            inst.setImmortal(inst)
+        end
+    end
+end
+local function SetImmortalBox_common(inst, sets) --客户端
+    if not TUNING.FUNCTIONAL_MEDAL_IS_OPEN then
+        return
+    end
+    inst:AddTag("canbeimmortal")
+    inst.immortalchangename = net_bool(inst.GUID, "immortalchangename", "immortalchangenamedirty")
+    inst:ListenForEvent("immortalchangenamedirty", ImmortalChangeNameDirty) --加上不朽前缀
+end
+local function SetImmortalBox_server(inst, sets) --服务器
+    if not TUNING.FUNCTIONAL_MEDAL_IS_OPEN then
+        return
+    end
+    if sets then
+        if sets.no_consume_essences then
+            inst.no_consume_essences = true
+        end
+        if sets.fn_immortal_over then
+            inst.fn_immortal_over = sets.fn_immortal_over
+        end
+    end
+    inst.setImmortal = Fn_setImmortal
+    inst.OnSave_old_medal = inst.OnSave
+    inst.OnLoad_old_medal = inst.OnLoad
+    inst.OnSave = OnSave_immortal
+    inst.OnLoad = OnLoad_immortal
+end
+
 -- local TOOLS_L = require("tools_legion")
 return {
 	MakeSnowCovered_comm = MakeSnowCovered_comm,
@@ -953,5 +1053,7 @@ return {
     IsEnemy_me = IsEnemy_me, IsEnemy_player = IsEnemy_player,
     MaybeEnemy_me = MaybeEnemy_me, MaybeEnemy_player = MaybeEnemy_player,
     CalcDamage = CalcDamage,
-    DoSingleSleep = DoSingleSleep, DoAreaSleep = DoAreaSleep
+    DoSingleSleep = DoSingleSleep, DoAreaSleep = DoAreaSleep,
+
+    SetImmortalBox_common = SetImmortalBox_common, SetImmortalBox_server = SetImmortalBox_server
 }

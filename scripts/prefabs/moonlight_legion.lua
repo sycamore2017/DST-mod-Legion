@@ -367,6 +367,8 @@ table.insert(prefs, Prefab("hiddenmoonlight", function()
     inst.components.skinedlegion:OverrideSkin("hiddenmoonlight_item", "data_up")
     inst.components.skinedlegion:Init("hiddenmoonlight_item")
 
+    TOOLS_L.SetImmortalBox_common(inst)
+
     inst.entity:SetPristine()
     if not TheWorld.ismastersim then
         inst.OnEntityReplicated = function(inst) inst.replica.container:WidgetSetup("hiddenmoonlight") end
@@ -419,6 +421,8 @@ table.insert(prefs, Prefab("hiddenmoonlight", function()
 	end
 
     -- inst.components.skinedlegion:SetOnPreLoad()
+
+    TOOLS_L.SetImmortalBox_server(inst)
 
     return inst
 end, {
@@ -888,6 +892,8 @@ local function MakeRevolved(sets)
         --     sets.fn_common(inst)
         -- end
 
+        TOOLS_L.SetImmortalBox_common(inst)
+
         inst.entity:SetPristine()
         if not TheWorld.ismastersim then
             inst.OnEntityReplicated = function(inst) inst.replica.container:WidgetSetup(sets.name) end
@@ -956,6 +962,8 @@ local function MakeRevolved(sets)
         -- if sets.fn_server ~= nil then
         --     sets.fn_server(inst)
         -- end
+
+        TOOLS_L.SetImmortalBox_server(inst)
 
         return inst
     end, {

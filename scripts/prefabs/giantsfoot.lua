@@ -1,5 +1,6 @@
-local assets =
-{
+-- local TOOLS_L = require("tools_legion")
+
+local assets = {
     Asset("ANIM", "anim/giantsfoot.zip"),
     Asset("ATLAS", "images/inventoryimages/giantsfoot.xml"),
     Asset("IMAGE", "images/inventoryimages/giantsfoot.tex"),
@@ -179,8 +180,9 @@ local function fn()
         self.inst.AnimState:SetFloatParams(0.02, 1, self.bob_percent)
     end
 
-    inst.entity:SetPristine()
+    -- TOOLS_L.SetImmortalBox_common(inst) --勋章已经自动对所有带 "backpack" 标签的物品加了不朽兼容
 
+    inst.entity:SetPristine()
     if not TheWorld.ismastersim then
         inst.OnEntityReplicated = function(inst) inst.replica.container:WidgetSetup("giantsfoot") end
         return inst
@@ -208,6 +210,8 @@ local function fn()
     inst.components.burnable:SetOnExtinguishFn(onextinguish)
 
     MakeHauntableLaunchAndDropFirstItem(inst)
+
+    -- TOOLS_L.SetImmortalBox_server(inst)
 
     return inst
 end

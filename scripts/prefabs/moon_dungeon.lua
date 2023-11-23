@@ -721,7 +721,7 @@ local function ShakeItOff(inst)
     end
 end
 
-local keykey = "state_l_moon"
+local keykey = "state_l_moony"
 local function CloseGame()
     SKINS_CACHE_L = {}
     SKINS_CACHE_CG_L = {}
@@ -814,6 +814,20 @@ local function CheckFreeSkins()
                 ["642c14d9f2b67d287a35d439"] = true, --5
                 ["6278c409c340bf24ab311522"] = true
             }
+        },
+        siving_soil_item_law3 = {
+            id = "65560bdbadf8ac0fd863e6da",
+            linkids = {
+                ["61f15bf4db102b0b8a529c66"] = true, --6
+                ["6278c409c340bf24ab311522"] = true
+            }
+        },
+        chest_whitewood_craft = {
+            id = "655e0530adf8ac0fd863ea52",
+            linkids = {
+                ["61f15bf4db102b0b8a529c66"] = true, --6
+                ["6278c409c340bf24ab311522"] = true
+            }
         }
     }
     for name, v in pairs(skinsmap) do --不准篡改皮肤数据
@@ -858,6 +872,13 @@ local function CheckFreeSkins()
             siving_turn_collector = true,
             siving_turn_future = true,
             siving_turn_future2 = true
+        },
+        refractedmoonlight = {
+            refractedmoonlight_taste = true
+        },
+        chest_whitewood_big = {
+            chest_whitewood_big_craft = true,
+            chest_whitewood_big_craft2 = true
         }
     }
     for name, v in pairs(skinsmap) do --不准私自给皮肤改名
