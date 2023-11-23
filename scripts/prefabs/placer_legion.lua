@@ -227,10 +227,10 @@ CreatePlacer("shyerry", "shyerrytree1", "shyerrytree1", "placer")
 CreatePlacer("mat_whitewood_item", "mat_whitewood", "mat_whitewood", "idle1", true)
 
 ----白木展示台
-CreatePlacer("chest_whitewood", "chest_whitewood", "chest_whitewood", "placer")
+CreatePlacer("chest_whitewood", "chest_whitewood", "chest_whitewood", "placer", nil, nil, nil, nil, nil, nil, Skined_build)
 
 ----白木展示柜
-CreatePlacer("chest_whitewood_big", "chest_whitewood_big", "chest_whitewood_big", "placer")
+CreatePlacer("chest_whitewood_big", "chest_whitewood_big", "chest_whitewood_big", "placer", nil, nil, nil, nil, nil, nil, Skined_build)
 
 --------------------
 --------------------

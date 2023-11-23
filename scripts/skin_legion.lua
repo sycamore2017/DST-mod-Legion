@@ -24,6 +24,8 @@ RegisterInventoryItemAtlas("images/inventoryimages_skin/refractedmoonlight_taste
 RegisterInventoryItemAtlas("images/inventoryimages_skin/refractedmoonlight_taste2.xml", "refractedmoonlight_taste2.tex")
 RegisterInventoryItemAtlas("images/inventoryimages_skin/chest_whitewood_craft.xml", "chest_whitewood_craft.tex")
 RegisterInventoryItemAtlas("images/inventoryimages_skin/chest_whitewood_big_craft.xml", "chest_whitewood_big_craft.tex")
+RegisterInventoryItemAtlas("images/inventoryimages_skin/chest_whitewood_craft2.xml", "chest_whitewood_craft2.tex")
+RegisterInventoryItemAtlas("images/inventoryimages_skin/chest_whitewood_big_craft2.xml", "chest_whitewood_big_craft2.tex")
 
 --------------------------------------------------------------------------
 --[[ 皮肤函数 ]]
@@ -2517,7 +2519,18 @@ _G.SKINS_LEGION = {
         },
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
         linkedskins = { item = "revolvedmoonlight_taste", item_pro = "revolvedmoonlight_pro_taste" },
-        floater = { cut = 0.18, size = "small", offset_y = 0.4, scale = 0.55, nofx = nil }
+        floater = { cut = 0.18, size = "small", offset_y = 0.4, scale = 0.55, nofx = nil },
+
+        overridekeys = { "data_up", "data_uppro" },
+        data_up = {
+            fn_start = function(inst)
+                inst.AnimState:SetBank("farm_soil")
+                inst.AnimState:SetBuild("siving_soil_law")
+            end
+        },
+        data_uppro = {
+            
+        }
     },
     revolvedmoonlight_taste = {
         base_prefab = "revolvedmoonlight", skin_id = "63889eaf8c2f781db2f7f763", noshopshow = true,
@@ -3290,14 +3303,14 @@ _G.SKINS_LEGION = {
     },
 
     chest_whitewood_craft = {
-        base_prefab = "chest_whitewood", skin_id = "", onlyownedshow = true,
+        base_prefab = "chest_whitewood", skin_id = "655e0530adf8ac0fd863ea52", onlyownedshow = true,
 		type = "item", skin_tags = {}, release_group = 555, rarity = raritySpecial,
 		assets = {
 			Asset("ANIM", "anim/skin/chest_whitewood_craft.zip"),
             Asset("ATLAS", "images/inventoryimages_skin/chest_whitewood_craft.xml"),
             Asset("IMAGE", "images/inventoryimages_skin/chest_whitewood_craft.tex")
 		},
-        string = ischinese and { name = "花梨木展台" } or { name = "Rosewood Cabinet" },
+        string = ischinese and { name = "花梨木饰顶展台" } or { name = "Decorated Rosewood Cabinet" },
 		fn_start = function(inst)
             inst.AnimState:SetBank("chest_whitewood_craft")
             inst.AnimState:SetBuild("chest_whitewood_craft")
@@ -3308,15 +3321,39 @@ _G.SKINS_LEGION = {
             inst.AnimState:SetBuild("chest_whitewood_craft")
         end
     },
+    chest_whitewood_craft2 = {
+        base_prefab = "chest_whitewood", skin_id = "655e0530adf8ac0fd863ea52", noshopshow = true,
+		type = "item", skin_tags = {}, release_group = 555, rarity = raritySpecial,
+		assets = {
+			-- Asset("ANIM", "anim/skin/chest_whitewood_craft.zip"),
+            Asset("ATLAS", "images/inventoryimages_skin/chest_whitewood_craft2.xml"),
+            Asset("IMAGE", "images/inventoryimages_skin/chest_whitewood_craft2.tex")
+		},
+        string = ischinese and { name = "花梨木展台" } or { name = "Rosewood Cabinet" },
+		fn_start = function(inst)
+            inst.AnimState:SetBank("chest_whitewood_craft")
+            inst.AnimState:SetBuild("chest_whitewood_craft")
+            inst.AnimState:HideSymbol("deco")
+        end,
+        fn_end = function(inst)
+            inst.AnimState:ShowSymbol("deco")
+        end,
+        exchangefx = { prefab = nil, offset_y = nil, scale = 1.5 },
+        fn_placer = function(inst)
+            inst.AnimState:SetBank("chest_whitewood_craft")
+            inst.AnimState:SetBuild("chest_whitewood_craft")
+            inst.AnimState:HideSymbol("deco")
+        end
+    },
     chest_whitewood_big_craft = {
-        base_prefab = "chest_whitewood_big", skin_id = "", noshopshow = true,
+        base_prefab = "chest_whitewood_big", skin_id = "655e0530adf8ac0fd863ea52", noshopshow = true,
 		type = "item", skin_tags = {}, release_group = 555, rarity = raritySpecial,
 		assets = {
 			Asset("ANIM", "anim/skin/chest_whitewood_big_craft.zip"),
             Asset("ATLAS", "images/inventoryimages_skin/chest_whitewood_big_craft.xml"),
             Asset("IMAGE", "images/inventoryimages_skin/chest_whitewood_big_craft.tex")
 		},
-        string = ischinese and { name = "花梨木展柜" } or { name = "Rosewood Showcase" },
+        string = ischinese and { name = "花梨木饰顶展柜" } or { name = "Decorated Rosewood Showcase" },
 		fn_start = function(inst)
             inst.AnimState:SetBank("chest_whitewood_big_craft")
             inst.AnimState:SetBuild("chest_whitewood_big_craft")
@@ -3325,6 +3362,30 @@ _G.SKINS_LEGION = {
         fn_placer = function(inst)
             inst.AnimState:SetBank("chest_whitewood_big_craft")
             inst.AnimState:SetBuild("chest_whitewood_big_craft")
+        end
+    },
+    chest_whitewood_big_craft2 = {
+        base_prefab = "chest_whitewood_big", skin_id = "655e0530adf8ac0fd863ea52", noshopshow = true,
+		type = "item", skin_tags = {}, release_group = 555, rarity = raritySpecial,
+		assets = {
+			-- Asset("ANIM", "anim/skin/chest_whitewood_big_craft.zip"),
+            Asset("ATLAS", "images/inventoryimages_skin/chest_whitewood_big_craft2.xml"),
+            Asset("IMAGE", "images/inventoryimages_skin/chest_whitewood_big_craft2.tex")
+		},
+        string = ischinese and { name = "花梨木展柜" } or { name = "Rosewood Showcase" },
+		fn_start = function(inst)
+            inst.AnimState:SetBank("chest_whitewood_big_craft")
+            inst.AnimState:SetBuild("chest_whitewood_big_craft")
+            inst.AnimState:HideSymbol("deco")
+        end,
+        fn_end = function(inst)
+            inst.AnimState:ShowSymbol("deco")
+        end,
+        exchangefx = { prefab = nil, offset_y = nil, scale = 1.5 },
+        fn_placer = function(inst)
+            inst.AnimState:SetBank("chest_whitewood_big_craft")
+            inst.AnimState:SetBuild("chest_whitewood_big_craft")
+            inst.AnimState:HideSymbol("deco")
         end
     },
 }
@@ -3361,7 +3422,8 @@ _G.SKIN_IDS_LEGION = {
         neverfade_paper = true, neverfadebush_paper = true, neverfade_paper2 = true, neverfadebush_paper2 = true,
         siving_feather_real_paper = true, siving_feather_fake_paper = true, hiddenmoonlight_item_paper = true,
         siving_turn_future = true, siving_turn_future2 = true,
-        chest_whitewood_craft = true, chest_whitewood_big_craft = true
+        chest_whitewood_craft = true, chest_whitewood_big_craft = true,
+        chest_whitewood_craft2 = true, chest_whitewood_big_craft2 = true
     },
     ["6278c450c340bf24ab311528"] = { --回忆(5)
         boltwingout_disguiser = true,
@@ -3420,6 +3482,7 @@ _G.SKIN_IDS_LEGION = {
         siving_mask_gold_marble = true,
         hiddenmoonlight_item_paper = true,
         chest_whitewood_craft = true, chest_whitewood_big_craft = true,
+        chest_whitewood_craft2 = true, chest_whitewood_big_craft2 = true
     },
     -- ["61627d927bbb727be174c4a0"] = { --棋举不定
     -- }
@@ -3448,7 +3511,7 @@ end
 ------
 
 local skinidxes = { --用以皮肤排序
-    "chest_whitewood_craft", "chest_whitewood_big_craft",
+    "chest_whitewood_craft", "chest_whitewood_big_craft", "chest_whitewood_craft2", "chest_whitewood_big_craft2",
     "siving_ctlwater_item_era", "siving_ctlwater_era", "siving_ctldirt_item_era", "siving_ctldirt_era",
     "siving_ctlall_item_era", "siving_ctlall_era",
     "neverfade_thanks", "neverfadebush_thanks", "siving_derivant_thanks", "siving_derivant_thanks2",

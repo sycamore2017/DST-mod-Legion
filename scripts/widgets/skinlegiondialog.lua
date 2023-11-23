@@ -20,21 +20,23 @@ local SkinStrings = ischinese and {
     UNKNOWN_STORY = "这个故事不值一提。",
     COLLECTION = {
         UNKNOWN = "陌生系列",
-        MAGICSPELL = "魔咒系列",
-        EMOTICON = "印象系列",
-        MARBLE = "理石园系列",
-        THANKS = "江湖一枝花系列",
-        TVPLAY = "N次元系列",
-        DISGUISER = "奇妙物语系列",
-        ERA = "古早系列",
-        OLDPIC = "念旧系列",
-        FANS = "饭制系列",
-        COLLECTOR = "星河收藏家系列",
-        TASTE = "厨心百味系列",
-        LAW = "律系列",
-        DAY = "节典系列",
-        PAPER = "纸忆系列",
-        FUTURE = "关于未来系列"
+        MAGIC = "魔咒系列", --魔法、咒语、巫师
+        EMOTICON = "印象系列", --网络表情、梗
+        MARBLE = "理石园系列", --欧洲中世纪、古典装饰、宗教
+        THANKS = "江湖一枝花系列", --古风、江湖、侠客
+        TVPLAY = "N次元系列", --其他有版权的事物
+        DISGUISER = "奇妙物语系列", --奇妙世界、自然传奇
+        ERA = "古早系列", --古代、化石、考古
+        OLDPIC = "念旧系列", --旧稿或重绘
+        FANS = "饭制系列", --白饭或粉丝的作品
+        COLLECTOR = "星河收藏家系列", --星空、银河、奇异物品
+        TASTE = "厨心百味系列", --美食
+        LAW = "律系列", --自然法则、物理定律、规则
+        DAY = "节典系列", --节日、典礼
+        PAPER = "纸忆系列", --折纸、书籍、回忆
+        FUTURE = "关于未来系列", --未来、科技、机械
+        CRAFT = "巧匠系列", --工艺品、木工、玉石
+        TALE = "言如玉系列" --各种童话故事、历险记、传说
     },
     UI_ACCESS = "获取",
     UI_INPUT_CDK = "请输入兑换码",
@@ -51,7 +53,7 @@ local SkinStrings = ischinese and {
     UNKNOWN_STORY = "The story is not worth mentioning.",
     COLLECTION = {
         UNKNOWN = "Strange Collection",
-        MAGICSPELL = "Magic Spell Collection",
+        MAGIC = "Magic Spell Collection",
         EMOTICON = "Notion Collection",
         MARBLE = "Marble Palace Collection",
         THANKS = "Heartfelt Thanks Collection",
@@ -65,7 +67,9 @@ local SkinStrings = ischinese and {
         LAW = "Rule Collection",
         DAY = "Festival Collection",
         PAPER = "Paper Memoir Collection",
-        FUTURE = "About Future Collection"
+        FUTURE = "About Future Collection",
+        CRAFT = "Crafts Collection",
+        TALE = "Tales Collection"
     },
     UI_ACCESS = "Get It",
     UI_INPUT_CDK = "Please enter CDK",
@@ -591,6 +595,30 @@ local function SetAnim_hidden(self, anim, data)
     SetAnim_base(animstate, data)
     if data.issalt then
         animstate:OverrideSymbol("base", data.build or "hiddenmoonlight", "saltbase")
+    end
+end
+
+local function SetClick_chest_whitewood_craft(self, anim, data)
+    local animstate = anim:GetAnimState()
+    local tag = anim.tag_anim or data.tag_anim
+    if tag == nil or tag == 1 then
+        animstate:PlayAnimation("open")
+        tag = 1
+    elseif tag == 2 then
+        animstate:PlayAnimation("close")
+    elseif tag == 3 then
+        animstate:PlayAnimation("burnt")
+        tag = 0
+    else
+        tag = 0
+    end
+    anim.tag_anim = tag + 1
+end
+local function SetAnim_chest_whitewood_craft(self, anim, data)
+    local animstate = anim:GetAnimState()
+    SetAnim_base(animstate, data)
+    if data.nodeco then
+        animstate:HideSymbol("deco")
     end
 end
 
@@ -2817,6 +2845,50 @@ local SkinData = {
                 fn_anim = SetAnim_hidden,
                 fn_click = SetClick_hidden,
                 x = 63, y = 12, scale = 0.38*1.3
+            }
+        }
+    },
+    chest_whitewood_craft = {
+        string = ischinese and {
+            name = "花梨木展柜",
+            collection = "CRAFT", access = "SPECIAL",
+            descitem = "解锁\"白木展示台\"、\"白木展示柜\"的2套皮肤。",
+            description = ""
+        } or {
+            name = "Rosewood Showcase",
+            collection = "CRAFT", access = "SPECIAL",
+            descitem = "Unlock \"White Wood Cabinet\", \"White Wood Showcase\" skin.",
+            description = "The story was not translated."
+        },
+        height_anim = 300,
+        anims = {
+            {
+                bank = "chest_whitewood_craft", build = "chest_whitewood_craft",
+                anim = "closed", anim2 = nil, isloop = false,
+                fn_anim = SetAnim_chest_whitewood_craft, nodeco = true,
+                fn_click = SetClick_chest_whitewood_craft,
+                x = 55, y = 190, scale = 0.3
+            },
+            {
+                bank = "chest_whitewood_big_craft", build = "chest_whitewood_big_craft",
+                anim = "closed", anim2 = nil, isloop = false,
+                fn_anim = SetAnim_chest_whitewood_craft, nodeco = true,
+                fn_click = SetClick_chest_whitewood_craft,
+                x = -60, y = 155, scale = 0.3
+            },
+            {
+                bank = "chest_whitewood_craft", build = "chest_whitewood_craft",
+                anim = "close", anim2 = nil, isloop = false,
+                fn_anim = SetAnim_chest_whitewood_craft,
+                fn_click = SetClick_chest_whitewood_craft,
+                x = -65, y = 10, scale = 0.3
+            },
+            {
+                bank = "chest_whitewood_big_craft", build = "chest_whitewood_big_craft",
+                anim = "close", anim2 = nil, isloop = false,
+                fn_anim = SetAnim_chest_whitewood_craft,
+                fn_click = SetClick_chest_whitewood_craft,
+                x = 50, y = 10, scale = 0.3
             }
         }
     },
