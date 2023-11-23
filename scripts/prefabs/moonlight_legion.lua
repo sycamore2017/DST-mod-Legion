@@ -440,12 +440,16 @@ local function OnUpgrade_revolved(item, doer, target, result)
         result.SoundEmitter:PlaySound("dontstarve/common/place_structure_straw")
     end
 
+    local skin = item.components.skinedlegion:GetSkin()
+    if skin ~= nil then
+        result.components.skinedlegion:SetSkin(skin, item.components.skinedlegion.userid or (doer and doer.userid or nil))
+    end
+
     if target.components.container ~= nil then
         target.components.container:Close() --强制关闭使用中的箱子
         target.components.container.canbeopened = false
         target.components.container:DropEverything()
     end
-    item.components.skinedlegion:SetLinkedSkin(result, target.prefab == "piggyback" and "item" or "item_pro", doer)
     item:Remove() --该道具是一次性的
 end
 
@@ -831,7 +835,13 @@ local function OnFinished_revolved(inst, worker)
     DropGems(inst, "yellowgem")
 
     --归还套件
-    inst.components.skinedlegion:SpawnLinkedSkinLoot("revolvedmoonlight_item", inst, "item", worker)
+    local skin = inst.components.skinedlegion:GetSkin()
+    if skin == nil then
+        inst.components.lootdropper:SpawnLootPrefab("revolvedmoonlight_item")
+    else
+        inst.components.lootdropper:SpawnLootPrefab("revolvedmoonlight_item", nil,
+            skin, nil, inst.components.skinedlegion.userid or (worker and worker.userid or nil))
+    end
 
     --特效
     local fx = SpawnPrefab("collapse_small")
@@ -855,10 +865,15 @@ local function MakeRevolved(sets)
         inst.AnimState:SetBuild("revolvedmoonlight")
         inst.AnimState:PlayAnimation("closed")
 
+        inst:AddComponent("skinedlegion")
         if sets.ispro then
             inst.AnimState:OverrideSymbol("decorate", "revolvedmoonlight", "decoratepro")
             inst:SetPrefabNameOverride("revolvedmoonlight")
+            inst.components.skinedlegion:OverrideSkin("revolvedmoonlight_item", "data_uppro")
+        else
+            inst.components.skinedlegion:OverrideSkin("revolvedmoonlight_item", "data_up")
         end
+        inst.components.skinedlegion:InitWithFloater("revolvedmoonlight_item")
 
         inst:AddTag("meteor_protection") --防止被流星破坏
         --因为有容器组件，所以不会被猴子、食人花、坎普斯等拿走
@@ -868,9 +883,6 @@ local function MakeRevolved(sets)
 
         inst._lvl_l = net_byte(inst.GUID, "moonlight_l._lvl_l", "lvl_l_dirty")
 		inst.displaynamefn = DisplayName
-
-        inst:AddComponent("skinedlegion")
-        inst.components.skinedlegion:InitWithFloater(sets.name)
 
         -- if sets.fn_common ~= nil then
         --     sets.fn_common(inst)

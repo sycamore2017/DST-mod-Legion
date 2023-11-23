@@ -2320,12 +2320,10 @@ local SkinData = {
     },
     revolvedmoonlight_item_taste = {
         string = ischinese and {
-            name = "黄桃芒芒",
             collection = "TASTE", access = "SPECIAL",
             descitem = "解锁\"月轮宝盘套件\"、\"月轮宝盘\"的皮肤。",
             description = "近几月冰之国总是遭到蘑怪的侵扰。冰灵损失惨重，因为被蘑怪抓伤后会逐渐长满菌丝绒毛而死。冰王不得已加快了冰灵的创造，用料和做工也不再那么细心。小芒就是冰王用低廉的冰激凌底料，普通黄桃以及滥大街的芒果而创造出来的冰灵，然后马上就被派到了边哨站岗。\n芒队长每天都认真教授小芒等队员如何与蘑怪对抗。芒队长已经见证了太多队友的离别，所以格外强调，最重要的是如何活下来！\n没过几天，夜里警报响起！小芒虽然知道自己是粗制滥造出来的劣质冰灵，浑身发抖，但为了王国，坚定了信念，还是冲了出去……",
         } or {
-            name = "Mango Sundae",
             collection = "TASTE", access = "SPECIAL",
             descitem = "Unlock \"Revolved Moonlight Kit\", \"Revolved Moonlight\" skin.",
             description = "The story was not translated.",
@@ -2358,12 +2356,10 @@ local SkinData = {
     },
     revolvedmoonlight_item_taste2 = {
         string = ischinese and {
-            name = "巧遇莓莓",
             collection = "TASTE", access = "SPECIAL",
             descitem = "解锁\"月轮宝盘套件\"、\"月轮宝盘\"的皮肤。",
             description = "红主色调，黑色是点缀。草莓圣代，巧克力为其新增一种高级感。酸酸甜甜，如青春的可爱。",
         } or {
-            name = "Strawberry Sundae",
             collection = "TASTE", access = "SPECIAL",
             descitem = "Unlock \"Revolved Moonlight Kit\", \"Revolved Moonlight\" skin.",
             description = "The story was not translated.",
@@ -2396,12 +2392,10 @@ local SkinData = {
     },
     revolvedmoonlight_item_taste3 = {
         string = ischinese and {
-            name = "奇异柠檬",
             collection = "TASTE", access = "SPECIAL",
             descitem = "解锁\"月轮宝盘套件\"、\"月轮宝盘\"的皮肤。",
             description = "绿主色调，黄色是点缀。柠檬圣代，奇异果为其新增一种搞怪感。清新酸拧，如跳脱的思维。",
         } or {
-            name = "Lemon Sundae",
             collection = "TASTE", access = "SPECIAL",
             descitem = "Unlock \"Revolved Moonlight Kit\", \"Revolved Moonlight\" skin.",
             description = "The story was not translated.",
@@ -2434,12 +2428,10 @@ local SkinData = {
     },
     revolvedmoonlight_item_taste4 = {
         string = ischinese and {
-            name = "黑巧旋涡",
             collection = "TASTE", access = "SPECIAL",
             descitem = "解锁\"月轮宝盘套件\"、\"月轮宝盘\"的皮肤。",
             description = "黑主色调，蓝色是点缀。黑巧圣代，蓝莓为其新增一种活跃感。丝滑香软，如随性的心态。",
         } or {
-            name = "Choccy Sundae",
             collection = "TASTE", access = "SPECIAL",
             descitem = "Unlock \"Revolved Moonlight Kit\", \"Revolved Moonlight\" skin.",
             description = "The story was not translated.",

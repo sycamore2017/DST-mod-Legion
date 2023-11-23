@@ -76,7 +76,7 @@ end)
 ------以下均为【服务端、客户端】环境
 
 local SkinsOverride = {
-	siving_soil_item = true, hiddenmoonlight_item = true
+	siving_soil_item = true, hiddenmoonlight_item = true, revolvedmoonlight_item = true
 }
 function SkinedLegion:OverrideSkin(prefab, key)
 	if prefab ~= nil and SkinsOverride[prefab] then
