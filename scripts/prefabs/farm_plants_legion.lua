@@ -767,37 +767,52 @@ MakeTissue("berries")
 --[[ 胡萝卜长枪 ]]
 --------------------------------------------------------------------------
 
-local atk_min_carl = 34
-local atk_max_carl = 68
+local atk_min_carl = 10
+local atk_max_carl = 78
 local rad_min_carl = 0
 local rad_max_carl = 2.2
-local num_max_carl = 60
+local num_max_carl = 80
 
 local function UpdateCarrot(inst, force)
-	local num = 0.0
+	local num = 0
+	local num2 = 0
 	for k,v in pairs(inst.components.container.slots) do
-		if v and (v.prefab == "carrot" or v.prefab == "carrot_cooked") then
-			if v.components.stackable ~= nil then
-				num = num + v.components.stackable:StackSize()
-			else
-				num = num + 1
+		if v then
+			if v.prefab == "carrot" or v.prefab == "carrot_cooked" then
+				if v.components.stackable ~= nil then
+					num = num + v.components.stackable:StackSize()
+				else
+					num = num + 1
+				end
+			elseif v.prefab == "carrat" then
+				num2 = num2 + 1
 			end
 		end
 	end
 
-	if not force and inst.num_carrot_l == num then --防止一直计算
+	if not force and inst.num_carrot_l == num and inst.num_carrat_l == num2 then --防止一直计算
 		return
 	end
 
 	inst.num_carrot_l = num
+	inst.num_carrat_l = num2
 	if num > num_max_carl then
 		num = num_max_carl
 	end
 	inst.components.weapon:SetDamage(math.floor( Remap(num, 0, num_max_carl, atk_min_carl, atk_max_carl) ))
 
-	local va = Remap(num, 0, num_max_carl, rad_min_carl, rad_max_carl)
+	if num2 > 0 then
+		num2 = num2 / 2
+		inst.components.planardamage:SetBaseDamage(num2*(atk_max_carl-atk_min_carl))
+		inst.components.damagetypebonus:AddBonus("shadow_aligned", inst, 1+( 0.1*num2 ), "carrat")
+	else
+		inst.components.planardamage:SetBaseDamage(0)
+		inst.components.damagetypebonus:RemoveBonus("shadow_aligned", inst, "carrat")
+	end
+
+	local va = Remap(num, 0, num_max_carl, rad_min_carl, rad_max_carl) + num2*(rad_max_carl-rad_min_carl)
 	va = (math.floor(va*10)) / 10 --这一些操作是为了仅保留小数点后1位
-	inst.components.weapon:SetRange(va)
+	inst.components.weapon:SetRange(math.min(va, rad_max_carl))
 end
 local function OnOwnerItemChange_carl(owner, data)
 	local hands = owner.components.inventory:GetEquippedItem(EQUIPSLOTS.HANDS)
@@ -861,12 +876,6 @@ local function OnAttack_carl(inst, attacker, target)
 		UpdateCarrot(inst)
 	end
 end
-local function SetPerishRate_carl(inst, item)
-    -- if item == nil then
-    --     return 0.4
-    -- end
-    return 0.4
-end
 local function OnFinished_carl(inst)
 	if inst.components.container ~= nil then
 		inst.components.container:DropEverything()
@@ -891,8 +900,6 @@ table.insert(prefs, Prefab(
 
 		inst:AddTag("jab") --使用捅击的动作进行攻击
 		inst:AddTag("rp_carrot_l")
-
-        --weapon (from weapon component) added to pristine state for optimization
     	inst:AddTag("weapon")
 
 		-- inst:AddComponent("skinedlegion")
@@ -905,6 +912,8 @@ table.insert(prefs, Prefab(
 			self.inst.AnimState:SetFloatParams(0.15, 1, self.bob_percent)
 		end
 
+		TOOLS_L.SetImmortalBox_common(inst)
+
         inst.entity:SetPristine()
         if not TheWorld.ismastersim then
 			inst.OnEntityReplicated = function(inst) inst.replica.container:WidgetSetup("lance_carrot_l") end
@@ -912,6 +921,7 @@ table.insert(prefs, Prefab(
         end
 
 		inst.num_carrot_l = 0
+		inst.num_carrat_l = 0
 
 		inst:AddComponent("inspectable")
 
@@ -928,6 +938,11 @@ table.insert(prefs, Prefab(
 		-- inst.components.weapon:SetRange(-1, -1) --人物默认攻击距离为3、3
 		-- inst.components.weapon:SetOnAttack(OnAttack_carl)
 
+		inst:AddComponent("planardamage")
+		inst.components.planardamage:SetBaseDamage(0)
+
+		inst:AddComponent("damagetypebonus")
+
 		inst:AddComponent("finiteuses")
 		inst.components.finiteuses:SetMaxUses(200)
 		inst.components.finiteuses:SetUses(200)
@@ -938,11 +953,13 @@ table.insert(prefs, Prefab(
 		inst.components.container.canbeopened = false
 
 		inst:AddComponent("preserver")
-		inst.components.preserver:SetPerishRateMultiplier(SetPerishRate_carl)
+		inst.components.preserver:SetPerishRateMultiplier(0.3)
 
 		MakeHauntableLaunch(inst)
 
 		-- inst.components.skinedlegion:SetOnPreLoad()
+
+		TOOLS_L.SetImmortalBox_server(inst)
 
         return inst
     end,

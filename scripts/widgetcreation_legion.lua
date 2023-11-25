@@ -340,7 +340,7 @@ end
 ------
 
 local function IsCarrot(container, item, slot)
-    return item.prefab == "carrot" or item.prefab == "carrot_cooked"
+    return item.prefab == "carrot" or item.prefab == "carrot_cooked" or item.prefab == "carrat"
 end
 
 params.lance_carrot_l = {

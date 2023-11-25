@@ -87,6 +87,7 @@ _G.RegistMiniMapImage_legion("siving_ctldirt")
 _G.RegistMiniMapImage_legion("siving_ctlall")
 _G.RegistMiniMapImage_legion("siving_turn")
 _G.RegistMiniMapImage_legion("plant_crop_l")
+_G.RegistMiniMapImage_legion("boltwingout")
 
 AddRecipe2(
     "siving_soil_item", {
@@ -1060,8 +1061,8 @@ _G.CROPS_DATA_LEGION.carrot = {
                 crop = self.cropprefab, crop_rot = "spoiled_food",
                 lootothers = nil
             })
-            if self.cluster >= 35 then
-                self:AddLoot(loots, "lance_carrot_l", self.cluster >= 70 and 2 or 1)
+            if self.cluster >= 50 then
+                self:AddLoot(loots, "lance_carrot_l", 1)
             end
         end
     end

@@ -2854,6 +2854,13 @@ if IsServer then
                 return
             end
             if data.skins_legion ~= nil then
+                for ii, dd in pairs(data.skins_legion) do --过滤一下已经不存在的，防止崩溃
+                    for skinname, v in pairs(dd) do
+                        if _G.SKINS_LEGION[skinname] == nil then
+                            dd[skinname] = nil
+                        end
+                    end
+                end
                 _G.SKINS_CACHE_L = data.skins_legion
             end
             if data.skins_cg_legion ~= nil then

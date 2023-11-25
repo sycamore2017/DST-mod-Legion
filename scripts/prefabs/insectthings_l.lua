@@ -162,6 +162,7 @@ local function Fn_boltout()
 
     inst.entity:AddTransform()
     inst.entity:AddAnimState()
+    inst.entity:AddMiniMapEntity()
     inst.entity:AddNetwork()
 
     MakeInventoryPhysics(inst)
@@ -169,6 +170,8 @@ local function Fn_boltout()
     inst.AnimState:SetBank("swap_boltwingout")
     inst.AnimState:SetBuild("swap_boltwingout")
     inst.AnimState:PlayAnimation("idle")
+
+    inst.MiniMapEntity:SetIcon("boltwingout.tex")
 
     inst:AddTag("backpack")
 
