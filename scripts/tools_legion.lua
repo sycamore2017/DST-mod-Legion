@@ -729,10 +729,10 @@ local function RemoveEntValue(ent, key, key2, valuedeal)
 end
 
 --[ 生成堆叠的物品 ]--
-local function SpawnStackDrop(name, num, pos, doer, items, overname)
+local function SpawnStackDrop(name, num, pos, doer, items, sets)
     local item = SpawnPrefab(name)
 	if item == nil then
-		item = SpawnPrefab(overname or "siving_rocks")
+		item = SpawnPrefab(sets and sets.overname or "siving_rocks")
 	end
 	if item ~= nil then
 		if num > 1 and item.components.stackable ~= nil then
@@ -765,8 +765,15 @@ local function SpawnStackDrop(name, num, pos, doer, items, overname)
 			end
         end
 
+        if sets == nil or not sets.noevent then
+            item:PushEvent("on_loot_dropped", { dropper = sets.dropper })
+            if sets.dropper ~= nil then
+                sets.dropper:PushEvent("loot_prefab_spawned", { loot = item })
+            end
+        end
+
 		if num >= 1 then
-			SpawnStackDrop(name, num, pos, doer, items, overname)
+			SpawnStackDrop(name, num, pos, doer, items, sets)
 		end
 	end
 end

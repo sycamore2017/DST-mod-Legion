@@ -2982,4 +2982,71 @@ if IsServer then
         end
     end)
 
+    --------------------------------------------------------------------------
+    --[[ 实体产生掉落物时，自动叠加周围所有同类实体 ]]
+    --------------------------------------------------------------------------
+    if true then
+        local function CanAutoStack(inst)
+            return (inst.components.bait == nil or inst.components.bait:IsFree()) and
+                (inst.components.burnable == nil or not inst.components.burnable:IsBurning()) and
+                (inst.components.stackable and not inst.components.stackable:IsFull()) and
+                (inst.components.inventoryitem and not inst.components.inventoryitem:IsHeld()) and
+                inst.components.inventoryitem.canbepickedup and
+                inst.components.health == nil
+                -- Vector3(self.inst.Physics:GetVelocity()):LengthSq() < 1
+        end
+        local function DoAutoStack(inst)
+            inst.task_autostack_l = nil
+            -- if not CanAutoStack(inst) then --不用提前判定
+            --     return
+            -- end
+
+            local x, y, z = inst.Transform:GetWorldPosition()
+            local ents = TheSim:FindEntities(x, y, z, 20, { "_inventoryitem" }, { "NOCLICK", "FX", "INLIMBO" })
+            local ents_same = {}
+            local numall = 0
+            for _, v in ipairs(ents) do
+                if
+                    v.entity:IsVisible() and
+                    v.prefab == inst.prefab and v.skinname == inst.skinname and
+                    CanAutoStack(v)
+                then
+                    table.insert(ents_same, v)
+                    numall = numall + v.components.stackable:StackSize()
+                end
+            end
+
+            if numall <= 1 or #ents_same <= 1 then
+                return
+            end
+
+            local maxsize = inst.components.stackable.maxsize
+            for _, v in ipairs(ents_same) do
+                if v.task_autostack_l ~= nil then
+                    v.task_autostack_l:Cancel()
+                    v.task_autostack_l = nil
+                end
+                if numall > 0 then
+                    if numall > maxsize then
+                        v.components.stackable:SetStackSize(maxsize)
+                        numall = numall - maxsize
+                    else
+                        v.components.stackable:SetStackSize(numall)
+                        numall = 0
+                    end
+                    SpawnPrefab("sand_puff").Transform:SetPosition(v.Transform:GetWorldPosition())
+                else
+                    v:Remove() --多余的就要删除了
+                end
+            end
+        end
+        local function OnLootDrop_tryStack(inst, data)
+            if CanAutoStack(inst) then
+                inst.task_autostack_l = inst:DoTaskInTime(0.5+math.random(), DoAutoStack)
+            end
+        end
+        AddComponentPostInit("stackable", function(self)
+            self.inst:ListenForEvent("on_loot_dropped", OnLootDrop_tryStack)
+        end)
+    end
 end

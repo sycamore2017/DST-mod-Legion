@@ -719,11 +719,11 @@ function PerennialCrop2:DoOverripe() --过熟（掉落果子，给周围植物�
 		end
 
 		if numpoop > 0 then
-			TOOLS_L.SpawnStackDrop("spoiled_food", numpoop, pos)
+			TOOLS_L.SpawnStackDrop("spoiled_food", numpoop, pos, nil, nil, { dropper = self.inst })
 		end
 	end
 	if numloot > 0 then
-		TOOLS_L.SpawnStackDrop(self.cropprefab, numloot, pos)
+		TOOLS_L.SpawnStackDrop(self.cropprefab, numloot, pos, nil, nil, { dropper = self.inst })
 	end
 end
 function PerennialCrop2:DoGrowth() --生长到下一阶段
@@ -983,7 +983,7 @@ function PerennialCrop2:GenerateLoot(doer, ispicked, isburnt) --生成收获物
 
 	for name, num in pairs(lootprefabs) do --生成实体并设置物理掉落
 		if num > 0 then
-			TOOLS_L.SpawnStackDrop(name, num, pos, nil, loot)
+			TOOLS_L.SpawnStackDrop(name, num, pos, nil, loot, { dropper = self.inst })
 		end
 	end
 	if ispicked then

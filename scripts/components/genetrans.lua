@@ -113,7 +113,7 @@ local function GetLootFruit(self, doer, loot)
 				num = num + math.random(1, 2)
 			end
 		end
-		TOOLS_L.SpawnStackDrop(self.seeddata.fruit, num, self.inst:GetPosition(), doer, loot)
+		TOOLS_L.SpawnStackDrop(self.seeddata.fruit, num, self.inst:GetPosition(), doer, loot, { dropper = self.inst })
 	end
 end
 local function OnPickedFn(inst, doer)
@@ -190,7 +190,7 @@ function GeneTrans:DropLoot(needrecipe)
 	end
 	--最终产生
 	for name, num in pairs(lootmap) do
-		TOOLS_L.SpawnStackDrop(name, num, pos, nil, nil)
+		TOOLS_L.SpawnStackDrop(name, num, pos, nil, nil, { dropper = self.inst })
 	end
 end
 
@@ -285,7 +285,7 @@ function GeneTrans:ClearAll(doer, mustdrop, initanim) --恢复原始状态
 
 	--原始物品
 	if self.seednum > 0 then
-		TOOLS_L.SpawnStackDrop(self.seed, self.seednum, self.inst:GetPosition(), doer, nil)
+		TOOLS_L.SpawnStackDrop(self.seed, self.seednum, self.inst:GetPosition(), doer, nil, { dropper = self.inst })
 	end
 	--转化产物
 	GetLootFruit(self, doer, nil)

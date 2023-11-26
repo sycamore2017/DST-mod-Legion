@@ -63,7 +63,7 @@ end
 local function DropGems(inst, gemname)
     local numgems = inst.components.upgradeable:GetStage() - 1
     if numgems > 0 then
-        TOOLS_L.SpawnStackDrop(gemname, numgems, inst:GetPosition())
+        TOOLS_L.SpawnStackDrop(gemname, numgems, inst:GetPosition(), nil, nil, { noevent = true })
     end
 end
 local function OnUpgradeFn(inst, doer, item)

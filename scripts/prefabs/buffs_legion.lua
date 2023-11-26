@@ -799,7 +799,7 @@ MakeBuff({
             local pos = target:GetPosition()
             local rot = target.Transform:GetRotation()
             local poops = {}
-            TOOLS_L.SpawnStackDrop(poopname or "poop", buff.count_blocked_l, pos, nil, poops)
+            TOOLS_L.SpawnStackDrop(poopname or "poop", buff.count_blocked_l, pos, nil, poops, { dropper = target })
             for _, v in ipairs(poops) do
                 local theta = (rot + 20 - math.random()*40 + 180)*DEGREES
                 v.Transform:SetPosition(pos.x, pos.y+0.5, pos.z)

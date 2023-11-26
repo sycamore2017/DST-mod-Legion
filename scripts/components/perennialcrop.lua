@@ -969,6 +969,7 @@ function PerennialCrop:GenerateLoot(doer, ispicked, isburnt) --生成收获物
 		end
 		if soil ~= nil then
 			soil.Transform:SetPosition(pos:Get())
+			soil:PushEvent("on_loot_dropped", { dropper = self.inst })
 		end
 	end
 	if isburnt then
@@ -989,7 +990,7 @@ function PerennialCrop:GenerateLoot(doer, ispicked, isburnt) --生成收获物
 
 	for name, num in pairs(lootprefabs) do --生成实体并设置物理掉落
 		if num > 0 then
-			TOOLS_L.SpawnStackDrop(name, num, pos, nil, loot)
+			TOOLS_L.SpawnStackDrop(name, num, pos, nil, loot, { dropper = self.inst })
 		end
 	end
 	if ispicked then

@@ -264,6 +264,9 @@ local function SpawnStackDrop(name, num, bush, doer, mustdrop, checkskin, items)
 			end
         end
 
+        item:PushEvent("on_loot_dropped", { dropper = bush })
+        bush:PushEvent("loot_prefab_spawned", { loot = item })
+
 		if num >= 1 then
 			SpawnStackDrop(name, num, bush, doer, mustdrop, checkskin, items)
 		end

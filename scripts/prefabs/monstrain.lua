@@ -57,10 +57,10 @@ local function OnWorked(inst, worker, workleft, numworks)
 end
 local function OnFinished(inst, worker)
     local pos = inst:GetPosition()
-    TOOLS_L.SpawnStackDrop("dug_monstrain", 1, pos)
+    TOOLS_L.SpawnStackDrop("dug_monstrain", 1, pos, nil, nil, { dropper = inst })
     if inst.components.pickable:CanBePicked() then --成熟了
-        TOOLS_L.SpawnStackDrop("squamousfruit", 1, pos)
-        TOOLS_L.SpawnStackDrop("monstrain_leaf", math.random() < 0.5 and 2 or 1, pos)
+        TOOLS_L.SpawnStackDrop("squamousfruit", 1, pos, nil, nil, { dropper = inst })
+        TOOLS_L.SpawnStackDrop("monstrain_leaf", math.random() < 0.5 and 2 or 1, pos, nil, nil, { dropper = inst })
     end
     inst:Remove()
 end
@@ -97,8 +97,8 @@ local function OnPickedFn(inst, picker, lootbase) --被采集时
 
     local loot = {}
     local pos = inst:GetPosition()
-    TOOLS_L.SpawnStackDrop("squamousfruit", 1, pos, nil, loot)
-    TOOLS_L.SpawnStackDrop("monstrain_leaf", 1, pos, nil, loot)
+    TOOLS_L.SpawnStackDrop("squamousfruit", 1, pos, nil, loot, { dropper = inst })
+    TOOLS_L.SpawnStackDrop("monstrain_leaf", 1, pos, nil, loot, { dropper = inst })
     if picker ~= nil then
         picker:PushEvent("picksomething", { object = inst, loot = loot })
         if picker.components.inventory ~= nil then --给予采摘者
