@@ -2838,11 +2838,13 @@ if IsServer then
 
         local OnSave_old = inst.OnSave
         inst.OnSave = function(inst, data)
+            local refs = nil
             if OnSave_old ~= nil then
-                OnSave_old(inst, data)
+                refs = OnSave_old(inst, data)
             end
             SaveSkinData(_G.SKINS_CACHE_L, "skins_legion", data)
             SaveSkinData(_G.SKINS_CACHE_CG_L, "skins_cg_legion", data)
+            return refs
         end
 
         local OnPreLoad_old = inst.OnPreLoad
@@ -2985,7 +2987,8 @@ if IsServer then
     --------------------------------------------------------------------------
     --[[ 实体产生掉落物时，自动叠加周围所有同类实体 ]]
     --------------------------------------------------------------------------
-    if true then
+
+    if _G.CONFIGS_LEGION.AUTOSTACKEDLOOT then
         local function CanAutoStack(inst)
             return (inst.components.bait == nil or inst.components.bait:IsFree()) and
                 (inst.components.burnable == nil or not inst.components.burnable:IsBurning()) and
@@ -3049,4 +3052,59 @@ if IsServer then
             self.inst:ListenForEvent("on_loot_dropped", OnLootDrop_tryStack)
         end)
     end
+
+    --------------------------------------------------------------------------
+    --[[ 风滚草加入新的掉落物 ]]
+    --------------------------------------------------------------------------
+
+    local lootsMap_tumbleweed = {
+        { chance = 0.05, items = { "ahandfulofwings", "insectshell_l" } },
+        { chance = 0.03, items = { "cattenball" } },
+        { chance = 0.015, items = { "cutted_rosebush", "cutted_lilybush", "cutted_orchidbush" } },
+        { chance = 0.01, items = { "shyerry", "tourmalineshard", "tissue_l_cactus" } }
+    }
+    local chance = 0
+    for _, v in pairs(lootsMap_tumbleweed) do
+        v.c_min = chance
+        chance = v.chance + chance
+        v.c_max = chance
+        v.chance = nil
+    end
+    chance = nil
+
+    local function OnPicked_tumbleweed(inst, picker)
+        if inst.loot ~= nil then
+            local rand = math.random()
+            local newloot = nil
+            for _, v in pairs(lootsMap_tumbleweed) do
+                if rand < v.c_max and rand >= v.c_min then
+                    newloot = v.items[math.random(#v.items)]
+                    break
+                end
+            end
+            if newloot ~= nil then
+                for k, v in pairs(inst.loot) do --替换一些不重要的东西
+                    if
+                        v == "cutgrass" or v == "twigs" or
+                        v == "petals" or v == "foliage" or v == "seeds"
+                    then
+                        inst.loot[k] = newloot
+                        newloot = nil
+                        break
+                    end
+                end
+                if newloot ~= nil then --没有可替换的就直接加入
+                    table.insert(inst.loot, newloot)
+                end
+            end
+        end
+        if inst.onpicked_old_l ~= nil then
+            return inst.onpicked_old_l(inst, picker)
+        end
+        return true
+    end
+    AddPrefabPostInit("tumbleweed", function(inst)
+        inst.onpicked_old_l = inst.components.pickable.onpickedfn
+        inst.components.pickable.onpickedfn = OnPicked_tumbleweed
+    end)
 end

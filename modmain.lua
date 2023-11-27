@@ -252,6 +252,9 @@ _G.CONFIGS_LEGION = {
     ENABLEDMODS = {}
 }
 
+_G.CONFIGS_LEGION.CLEANINGUPSTENCH = GetModConfigData("CleaningUpStench") --自动清除地上的臭臭
+_G.CONFIGS_LEGION.AUTOSTACKEDLOOT = GetModConfigData("AutoStackedLoot") --掉落物自动堆叠
+
 _G.CONFIGS_LEGION.FLOWERWEAPONSCHANCE = GetModConfigData("FlowerWeaponsChance")
 _G.CONFIGS_LEGION.FOLIAGEATHCHANCE = GetModConfigData("FoliageathChance")
 _G.CONFIGS_LEGION.ROSEBUSHSPACING = GetModConfigData("RoseBushSpacing")
@@ -289,7 +292,6 @@ else
     _G.CONFIGS_LEGION.DRESSUP = false
 end
 
-_G.CONFIGS_LEGION.CLEANINGUPSTENCH = GetModConfigData("CleaningUpStench") --自动清除地上的臭臭 bool
 _G.CONFIGS_LEGION.BACKCUBCHANCE = GetModConfigData("BackCubChance") --靠背熊掉落几率
 
 ----------

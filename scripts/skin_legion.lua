@@ -4390,14 +4390,16 @@ if IsServer then
     AddPlayerPostInit(function(inst)
         local OnSave_old = inst.OnSave
         inst.OnSave = function(inst, data)
+            local refs = nil
             if OnSave_old ~= nil then
-                OnSave_old(inst, data)
+                refs = OnSave_old(inst, data)
             end
             if inst.userid == nil then
-                return
+                return refs
             end
             SaveSkinData(_G.SKINS_CACHE_L[inst.userid], "skins_le", data)
             SaveSkinData(_G.SKINS_CACHE_CG_L[inst.userid], "skins_cg_le", data)
+            return refs
         end
         local OnLoad_old = inst.OnLoad
         inst.OnLoad = function(inst, data)
@@ -4406,6 +4408,13 @@ if IsServer then
             end
             if inst.userid == nil then
                 return
+            end
+            if data.skins_le ~= nil then
+                for skinname, v in pairs(data.skins_le) do --过滤一下已经不存在的，防止崩溃
+                    if _G.SKINS_LEGION[skinname] == nil then
+                        data.skins_le[skinname] = nil --Tip：table.remove() 会导致循环的下标混乱，不按逻辑运行
+                    end
+                end
             end
             _G.SKINS_CACHE_L[inst.userid] = data.skins_le
             _G.SKINS_CACHE_CG_L[inst.userid] = data.skins_cg_le

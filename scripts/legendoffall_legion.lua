@@ -1593,68 +1593,50 @@ digest_data_l = nil
 --------------------------------------------------------------------------
 
 if IsServer then
-    AddPrefabPostInit("catcoon", function(inst)
-        local onaccept_old = inst.components.trader.onaccept
-        inst.components.trader.onaccept = function(cat, giver, item)
-            if not item:HasTag("catmint") then
-                onaccept_old(cat, giver, item)
-                return
-            end
-
-            if cat.components.sleeper:IsAsleep() then
-                cat.components.sleeper:WakeUp()
-            end
-            if cat.components.combat.target == giver then
-                cat.components.combat:SetTarget(nil)
-                cat.SoundEmitter:PlaySound("dontstarve_DLC001/creatures/catcoon/pickup")
-
-                -->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-                cat.excitedaboutmint = nil --取消兴奋
-                --<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-            elseif giver.components.leader ~= nil then
-                if giver.components.minigame_participator == nil then
-                    giver:PushEvent("makefriend")
-                    giver.components.leader:AddFollower(cat)
-                end
-
-                -->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-                cat.last_hairball_time = GetTime()
-                cat.hairball_friend_interval = math.random(2,4)
-                cat.components.follower:AddLoyaltyTime(TUNING.CATCOON_LOYALTY_PER_ITEM * 5) --提升了跟随的时间
-                cat.excitedaboutmint = true --兴奋时间到
-                --<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-
-                if not cat.sg:HasStateTag("busy") then
-                    cat:FacePoint(giver.Transform:GetWorldPosition())
-                    cat.sg:GoToState("pawground")
-                end
-            end
-            item:Remove()
+    local function OnAccept_catcoon(cat, giver, item)
+        if cat.onaccept_old_mint ~= nil then
+            cat.onaccept_old_mint(cat, giver, item)
         end
-
-        local PickRandomGift_old = inst.PickRandomGift
-        inst.PickRandomGift = function(cat, tier)
-            if cat.excitedaboutmint then
-                if --处于兴奋中，有跟随对象，并且，没有攻击目标，或者自己的攻击目标不是跟随对象
-                    cat.components.follower and cat.components.follower.leader and
-                    cat.components.combat.target ~= cat.components.follower.leader
-                then
-                    if math.random() < 0.1 then
-                        --恭喜，得到猫线球，退出兴奋状态
-                        cat.excitedaboutmint = nil
-                        return "cattenball"
-                    else
-                        --如果没有吐出猫线球，则减少下一次呕吐的间隔。因为在brain中已经算好这次的间隔了，所以在这只需减少即可
-                        if cat.hairball_friend_interval ~= nil then
-                            cat.hairball_friend_interval = cat.hairball_friend_interval / 4
-                        end
-                    end
-                else
-                    cat.excitedaboutmint = nil
-                end
+        if item:HasTag("catmint") then
+            cat.count_mint_l = (cat.count_mint_l or 0) + 1
+            if cat.components.follower ~= nil and cat.components.follower.task ~= nil then
+                cat.components.follower:AddLoyaltyTime(cat.components.follower.maxfollowtime or TUNING.CATCOON_LOYALTY_MAXTIME)
             end
+        end
+    end
+    local function PickRandomGift_catcoon(cat, tier)
+        if cat.count_mint_l ~= nil then
+            if cat.count_mint_l <= 1 then
+                cat.count_mint_l = nil
+            else
+                cat.count_mint_l = cat.count_mint_l - 1
+            end
+            if math.random() < 0.5 then
+                return "cattenball"
+            end
+        end
+        if cat.PickRandomGift_old_mint ~= nil then
+            return cat.PickRandomGift_old_mint(cat, tier)
+        end
+    end
 
-            return PickRandomGift_old(cat, tier)
+    local didfriendgift = nil
+    AddPrefabPostInit("catcoon", function(inst)
+        inst.onaccept_old_mint = inst.components.trader.onaccept
+        inst.components.trader.onaccept = OnAccept_catcoon
+
+        inst.PickRandomGift_old_mint = inst.PickRandomGift
+        inst.PickRandomGift = PickRandomGift_catcoon
+
+        if not didfriendgift then --由于索引效果，这一改会永久修改所有的表，所以这里只需要改一次就行
+            didfriendgift = true
+            if inst.friendGiftPrefabs ~= nil then
+                table.insert(inst.friendGiftPrefabs, {
+                    "cattenball",
+                    "cutted_rosebush", "cutted_lilybush", "cutted_orchidbush",
+                    "shyerry"
+                })
+            end
         end
     end)
 end
@@ -2018,7 +2000,7 @@ if IsServer then
                 data.num_sivrock_l = inst.num_sivrock_l
             end
             if OnSave_old then
-                OnSave_old(inst, data)
+                return OnSave_old(inst, data)
             end
         end
     end)

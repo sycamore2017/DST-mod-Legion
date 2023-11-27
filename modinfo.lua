@@ -63,6 +63,15 @@ configuration_options = L and {
         },
         default = false
     },
+    {   name = "AutoStackedLoot",
+        label = "Auto Stacking of Loots",
+        hover = "New dropped loots will auto stack within 2 seconds (Not much modification, but it should be quite useful).",
+        options = {
+            {description = "Yes", data = true},
+            {description = "No(default)", data = false}
+        },
+        default = false
+    },
 
     {name = "Title", label = "", options = {{description = "", data = ""}}, default = ""},
     {name = "Title", label = "The Power of Flowers", options = {{description = "", data = ""}}, default = ""},
@@ -528,6 +537,15 @@ configuration_options = L and {
     {   name = "CleaningUpStench",
         label = "臭臭自动清理",
         hover = "自动清除掉在地上的臭东西(大便、鸟粪、腐烂物)。化作春泥更护花。",
+        options = {
+            {description = "是", data = true},
+            {description = "否(默认)", data = false}
+        },
+        default = false
+    },
+    {   name = "AutoStackedLoot",
+        label = "掉落物自动堆叠",
+        hover = "掉落物产生后2秒内会自动堆叠在一起(涉及面不广，但应该够用了)。这算变态功能吗？",
         options = {
             {description = "是", data = true},
             {description = "否(默认)", data = false}
