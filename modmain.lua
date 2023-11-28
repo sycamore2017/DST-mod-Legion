@@ -147,12 +147,12 @@ local _G = GLOBAL
 
 PrefabFiles = {
     "bush_legion",              --棱镜灌木丛
-    "hat_lichen",               --苔衣发卡
     "backcub",                  --靠背熊
     "ingredients_legion",       --食材
     "plantables_legion",        --新种植根
     "turfs_legion",             --新地皮
     "wants_sandwitch",          --沙之女巫所欲之物
+    "hats_legion",              --棱镜头戴道具
     "hands_legion",             --棱镜手持道具
     -- "guitar_greenery",
     -- "aatest_anim",
@@ -536,25 +536,27 @@ AddRecipe2(
 )
 
 if IsServer then
-    AddPrefabPostInit("bunnyman", function(inst)    --通过api重写兔人的识别敌人函数
-        local targetfn_old = inst.components.combat.targetfn
-        inst.components.combat:SetRetargetFunction(3, function(inst)
-            local target = targetfn_old(inst)
-            if
-                target == nil or
-                (
-                    not target:HasTag("monster") and --可不会保护怪物
-                    (
-                        (target.components.inventory ~= nil and target.components.inventory:EquipHasTag("ignoreMeat")) or
-                        target:HasTag("ignoreMeat")
-                    )
-                )
-            then
-                return nil
-            else
-                return target
-            end
-        end)
+    local function CanTarget_lichen(self, target, ...)
+        if
+            target ~= nil and
+            self.target ~= target and --兔人对其没仇恨(已有仇恨不能解除)
+            not target:HasTag("monster") and --不会保护怪物
+            target:HasTag("ignoreMeat") and
+            target.components.combat ~= nil and (
+                target.components.combat.target == nil or
+                not target.components.combat.target:HasTag("manrabbit") --不能对兔人群体有仇恨
+            )
+        then
+            return false
+        end
+        if self.inst.CanTarget_old_lichen ~= nil then
+            return self.inst.CanTarget_old_lichen(self, target, ...)
+        end
+        return false
+    end
+    AddPrefabPostInit("bunnyman", function(inst)
+        inst.CanTarget_old_lichen = inst.components.combat.CanTarget
+        inst.components.combat.CanTarget = CanTarget_lichen
     end)
 end
 

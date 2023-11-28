@@ -2809,7 +2809,7 @@ local SkinData = {
         string = ischinese and {
             collection = "PAPER", access = "SPECIAL",
             descitem = "解锁\"月藏宝匣套件\"、\"月藏宝匣\"的皮肤。",
-            description = ""
+            description = "下午第一节课正开始，老爸突然出现在教室门口，和老师简单交流之后，我被老爸领走。原来是妈病倒了，已经住院，所以我们去了医院。\n连续几天，我都会在放学后自己坐公交去医院看我妈。眼看着我妈的皮肤逐渐发黄，真的很像动画片里某些角色的肤色，身体也逐渐虚弱。我很难过。\n同桌听说了我妈的事情，提出一个想法。于是我们和其他同学，买来纸张和玻璃瓶，一起折纸星星。同桌说等到纸星星放满玻璃瓶的时候，天上的星星就能实现一个愿望。\n后来不管是课间闲暇，作业完成后，还是陪着我妈时，我抽空就会折星星。每一个我折的星星，都寄托着我的心愿……"
         } or {
             collection = "PAPER", access = "SPECIAL",
             descitem = "Unlock \"Hidden Moonlight Kit\", \"Hidden Moonlight\" skin.",

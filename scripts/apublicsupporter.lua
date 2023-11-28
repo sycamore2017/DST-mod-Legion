@@ -3044,7 +3044,7 @@ if IsServer then
             end
         end
         local function OnLootDrop_tryStack(inst, data)
-            if CanAutoStack(inst) then
+            if inst.task_autostack_l == nil and CanAutoStack(inst) then
                 inst.task_autostack_l = inst:DoTaskInTime(0.5+math.random(), DoAutoStack)
             end
         end
@@ -3098,9 +3098,22 @@ if IsServer then
                 end
             end
         end
+
+        local x, y, z = inst.Transform:GetWorldPosition()
         if inst.onpicked_old_l ~= nil then
-            return inst.onpicked_old_l(inst, picker)
+            inst.onpicked_old_l(inst, picker)
         end
+
+        --为了让风滚草掉落物也能自动叠加
+        if CONFIGS_LEGION.AUTOSTACKEDLOOT then
+            local ents = TheSim:FindEntities(x, y, z, 2, { "_inventoryitem" }, { "NOCLICK", "FX", "INLIMBO" })
+            for _, v in ipairs(ents) do
+                if v.components.stackable ~= nil then
+                    v:PushEvent("on_loot_dropped", { dropper = nil })
+                end
+            end
+        end
+
         return true
     end
     AddPrefabPostInit("tumbleweed", function(inst)

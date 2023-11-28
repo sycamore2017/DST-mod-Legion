@@ -554,16 +554,11 @@ end
 local function RemoveLight_revolved(inst, owner)
     if owner ~= nil and owner:IsValid() and owner._revolves_light ~= nil then
         owner._revolves_light[inst] = nil
-        local newlights = nil
         for k,_ in pairs(owner._revolves_light) do
-            if k:IsValid() then
-                if newlights == nil then
-                    newlights = {}
-                end
-                newlights[k] = true
+            if not k:IsValid() then
+                owner._revolves_light[k] = nil
             end
         end
-        owner._revolves_light = newlights
         UpdateLight_revolved(owner)
     end
 end
@@ -853,6 +848,10 @@ local function OnFinished_revolved(inst, worker)
     fx:SetMaterial("stone")
     inst:Remove()
 end
+local function OnPutInInventory_revolved(inst)
+    inst.components.container:Close()
+    inst.AnimState:PlayAnimation("closed")
+end
 
 local function MakeRevolved(sets)
     table.insert(prefs, Prefab(sets.name, function()
@@ -908,10 +907,7 @@ local function MakeRevolved(sets)
         inst:AddComponent("inventoryitem")
         inst.components.inventoryitem.imagename = sets.name
         inst.components.inventoryitem.atlasname = "images/inventoryimages/"..sets.name..".xml"
-        inst.components.inventoryitem:SetOnPutInInventoryFn(function(inst)
-            inst.components.container:Close()
-            inst.AnimState:PlayAnimation("closed")
-        end)
+        inst.components.inventoryitem:SetOnPutInInventoryFn(OnPutInInventory_revolved)
 
         inst:AddComponent("container")
         inst.components.container:WidgetSetup(sets.name)

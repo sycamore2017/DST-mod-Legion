@@ -1749,18 +1749,19 @@ end
 
 -------------------------
 
-local prefs = {}
-table.insert(prefs, Prefab("neverfade", Fn_never, assets_never, prefabs_never))
-table.insert(prefs, Prefab("rosorns", Fn_rose, assets_rose))
-table.insert(prefs, Prefab("lileaves", Fn_lily, assets_lily))
-table.insert(prefs, Prefab("orchitwigs", Fn_orchid, assets_orchid, prefabs_orchid))
-table.insert(prefs, Prefab("book_weather", Fn_bookweather, assets_bookweather, prefabs_bookweather))
+local prefs = {
+    Prefab("neverfade", Fn_never, assets_never, prefabs_never),
+    Prefab("rosorns", Fn_rose, assets_rose),
+    Prefab("lileaves", Fn_lily, assets_lily),
+    Prefab("orchitwigs", Fn_orchid, assets_orchid, prefabs_orchid),
+    Prefab("book_weather", Fn_bookweather, assets_bookweather, prefabs_bookweather),
+    Prefab("fimbul_axe", Fn_fimbulaxe, assets_fimbulaxe, prefabs_fimbulaxe),
+    Prefab("dualwrench", Fn_2wrench, assets_2wrench),
+    Prefab("tripleshovelaxe", Fn_3axe, assets_3axe),
+    Prefab("triplegoldenshovelaxe", Fn_3axegold, assets_3axegold)
+}
 if CONFIGS_LEGION.DRESSUP then
     table.insert(prefs, Prefab("pinkstaff", Fn_staffpink, assets_staffpink))
 end
-table.insert(prefs, Prefab("fimbul_axe", Fn_fimbulaxe, assets_fimbulaxe, prefabs_fimbulaxe))
-table.insert(prefs, Prefab("dualwrench", Fn_2wrench, assets_2wrench))
-table.insert(prefs, Prefab("tripleshovelaxe", Fn_3axe, assets_3axe))
-table.insert(prefs, Prefab("triplegoldenshovelaxe", Fn_3axegold, assets_3axegold))
 
 return unpack(prefs)

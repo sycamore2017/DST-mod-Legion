@@ -1,15 +1,19 @@
 local TOOLS_L = require("tools_legion")
 
-local assets = {
+--------------------------------------------------------------------------
+--[[ 苔衣发卡 ]]
+--------------------------------------------------------------------------
+
+local assets_lichen = {
     Asset("ANIM", "anim/hat_lichen.zip"),
 	Asset("ATLAS", "images/inventoryimages/hat_lichen.xml"),
     Asset("IMAGE", "images/inventoryimages/hat_lichen.tex")
 }
-local prefabs = {
+local prefabs_lichen = {
     "lichenhatlight"
 }
 
-local function lichen_equip(inst, owner)    --装备时
+local function OnEquip_lichen(inst, owner)
     if inst._light == nil or not inst._light:IsValid() then
         inst._light = SpawnPrefab("lichenhatlight") --生成光源
         inst._light.entity:SetParent(owner.entity)  --给光源设置父节点
@@ -30,31 +34,27 @@ local function lichen_equip(inst, owner)    --装备时
         TOOLS_L.hat_on_opentop(inst, owner, "hat_lichen", "swap_hat")
     end
 
-    -- owner:AddTag("ignoreMeat")  --添加忽略带着肉的标签
+    TOOLS_L.AddTag(owner, "ignoreMeat", inst.prefab) --添加忽略带着肉的标签
 
     local soundemitter = owner ~= nil and owner.SoundEmitter or inst.SoundEmitter
-    soundemitter:PlaySound("dontstarve/common/minerhatAddFuel") --添加装备时的音效
+    soundemitter:PlaySound("dontstarve/common/minerhatAddFuel") --装备时的音效
 end
-
-local function lichen_unequip(inst, owner)  --卸下时
+local function OnUnequip_lichen(inst, owner)
     TOOLS_L.hat_off(inst, owner)
 
-    -- owner:RemoveTag("ignoreMeat")    --移除忽略带肉的标签
-
+    TOOLS_L.RemoveTag(owner, "ignoreMeat", inst.prefab)
     if inst._light ~= nil then
         if inst._light:IsValid() then
-            inst._light:Remove()    --把光源去掉
+            inst._light:Remove() --把光源移除
         end
         inst._light = nil
     end
 
     local soundemitter = owner ~= nil and owner.SoundEmitter or inst.SoundEmitter
-    soundemitter:PlaySound("dontstarve/common/minerhatOut") --添加卸下时的音效
+    soundemitter:PlaySound("dontstarve/common/minerhatOut") --卸下时的音效
 end
 
------------------------------------
-
-local function fn(Sim)
+local function Fn_lichen()
     local inst = CreateEntity()
 
     inst.entity:AddTransform()
@@ -69,10 +69,9 @@ local function fn(Sim)
     inst.AnimState:PlayAnimation("anim")
 
     inst:AddTag("hat")
-    inst:AddTag("show_spoilage") --显示新鲜度的背景
+    inst:AddTag("show_spoilage")
     inst:AddTag("icebox_valid")
-    inst:AddTag("open_top_hat")
-    inst:AddTag("ignoreMeat")
+    inst:AddTag("open_top_hat") --虽然这个标签作用于植物人的贴图切换，但我没看出来到底哪里变了
 
     inst:AddComponent("skinedlegion")
     inst.components.skinedlegion:InitWithFloater("hat_lichen")
@@ -85,23 +84,23 @@ local function fn(Sim)
     inst._light = nil
 
     inst:AddComponent("perishable")
-    inst.components.perishable:SetPerishTime(TUNING.PERISH_ONE_DAY*5)   --5天新鲜度
+    inst.components.perishable:SetPerishTime(TUNING.PERISH_ONE_DAY*5)
     inst.components.perishable:StartPerishing()
     inst.components.perishable:SetOnPerishFn(inst.Remove)
 
-    inst:AddComponent("inspectable") --可检查
+    inst:AddComponent("inspectable")
 
-    inst:AddComponent("inventoryitem") --物品组件
+    inst:AddComponent("inventoryitem")
     inst.components.inventoryitem.imagename = "hat_lichen"
     inst.components.inventoryitem.atlasname = "images/inventoryimages/hat_lichen.xml"
 
-    inst:AddComponent("equippable") --装备组件
-    inst.components.equippable.equipslot = EQUIPSLOTS.HEAD --装在头上
-    inst.components.equippable.dapperness = TUNING.DAPPERNESS_MED  --添加增加精神值效果，和高礼帽一样
-    inst.components.equippable:SetOnEquip(lichen_equip)
-    inst.components.equippable:SetOnUnequip(lichen_unequip)
+    inst:AddComponent("equippable")
+    inst.components.equippable.equipslot = EQUIPSLOTS.HEAD
+    inst.components.equippable.dapperness = TUNING.DAPPERNESS_MED
+    inst.components.equippable:SetOnEquip(OnEquip_lichen)
+    inst.components.equippable:SetOnUnequip(OnUnequip_lichen)
 
-    inst:AddComponent("tradable") --可交易组件  有了这个就可以给猪猪
+    inst:AddComponent("tradable")
 
     MakeHauntableLaunchAndPerish(inst)
 
@@ -110,7 +109,7 @@ local function fn(Sim)
     return inst
 end
 
-local function lichenhatlightfn()   --设置苔衣发卡的光源
+local function Fn_lichenlight() --苔衣发卡的光源实体
     local inst = CreateEntity()
 
     inst.entity:AddTransform()
@@ -119,13 +118,12 @@ local function lichenhatlightfn()   --设置苔衣发卡的光源
 
     inst:AddTag("FX")
 
-    inst.Light:SetFalloff(0.55)  --衰减
+    inst.Light:SetFalloff(0.4)  --衰减
     inst.Light:SetIntensity(.7) --亮度
     inst.Light:SetRadius(2)     --半径
     inst.Light:SetColour(237/255, 237/255, 209/255) --颜色，和灯泡花一样
 
     inst.entity:SetPristine()
-
     if not TheWorld.ismastersim then
         return inst
     end
@@ -135,5 +133,11 @@ local function lichenhatlightfn()   --设置苔衣发卡的光源
     return inst
 end
 
-return Prefab("hat_lichen", fn, assets, prefabs),
-        Prefab("lichenhatlight", lichenhatlightfn)
+-------------------------
+
+local prefs = {
+    Prefab("hat_lichen", Fn_lichen, assets_lichen, prefabs_lichen),
+    Prefab("lichenhatlight", Fn_lichenlight)
+}
+
+return unpack(prefs)
