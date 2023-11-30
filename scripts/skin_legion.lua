@@ -418,6 +418,10 @@ local function SetTarget_hidden(inst, build)
     end
 end
 
+------
+
+local battery_fx_tale = { name = "eleccore_spark_fx_tale", y = nil, y_rand = nil }
+
 --------------------------------------------------------------------------
 --[[ 全局皮肤总数据，以及修改 ]]
 --------------------------------------------------------------------------
@@ -558,11 +562,10 @@ _G.SKIN_PREFABS_LEGION = {
         image = { name = nil, atlas = nil, setable = true },
         anim = {
             bank = nil, build = nil,
-            anim = "anim", animpush = nil, isloop = nil,
-            setable = true
+            anim = "anim", animpush = nil, isloop = nil, setable = true
         },
         equip = { symbol = "swap_hat", build = "hat_lichen", file = "swap_hat", isopenhat = true },
-        exchangefx = { prefab = nil, offset_y = nil, scale = nil },
+        exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
         floater = { cut = 0.03, size = "med", offset_y = 0.2, scale = 0.5, nofx = nil }
     },
 
@@ -1050,6 +1053,15 @@ _G.SKIN_PREFABS_LEGION = {
         end,
         exchangefx = { prefab = nil, offset_y = nil, scale = 1.5 }
     },
+
+    tourmalinecore = {
+        image = { name = nil, atlas = nil, setable = true },
+        anim = {
+            bank = nil, build = nil,
+            anim = nil, animpush = nil, isloop = nil, setable = true
+        },
+        exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 }
+    },
 }
 
 _G.SKINS_LEGION = {
@@ -1477,23 +1489,23 @@ _G.SKINS_LEGION = {
         linkedskins = { sword = "neverfade_paper2" }
     },
 
-    hat_lichen_emo_que = {
+    hat_lichen_emo_que = { --疑问
         base_prefab = "hat_lichen", skin_id = "61909c584c724c6f40e779fa",
 		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
 		assets = {
 			Asset("ANIM", "anim/skin/hat_lichen_emo_que.zip")
 		},
 		image = { name = nil, atlas = nil, setable = true },
-        string = ischinese and { name = "困惑发卡" } or { name = "Question Hairpin" },
+        string = ischinese and { name = "困惑" } or { name = "Confusion" },
 		anim = {
             bank = nil, build = nil,
             anim = nil, animpush = nil, isloop = nil, setable = true
         },
         equip = { symbol = "swap_hat", build = "hat_lichen_emo_que", file = "swap_hat", isopenhat = true },
-        exchangefx = { prefab = nil, offset_y = nil, scale = nil },
+        exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
         floater = { cut = 0.03, size = "small", offset_y = 0.15, scale = 0.5, nofx = nil }
     },
-    hat_lichen_disguiser = {
+    hat_lichen_disguiser = { --爱上彩虹
         base_prefab = "hat_lichen", skin_id = "ooooonononon",
 		type = "item", skin_tags = {}, release_group = 555, rarity = rarityFree,
 		assets = {
@@ -1511,6 +1523,101 @@ _G.SKINS_LEGION = {
         },
         exchangefx = { prefab = nil, offset_y = nil, scale = nil },
         floater = { cut = 0.03, size = "med", offset_y = 0.2, scale = 0.7, nofx = nil }
+    },
+    hat_lichen_emo_3shock = { --非常震惊
+        base_prefab = "hat_lichen", skin_id = "6568725bce45c22cf18df688", onlyownedshow = true,
+		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
+		assets = {
+			Asset("ANIM", "anim/skin/hat_lichen_emo_3shock.zip")
+		},
+		image = { name = nil, atlas = nil, setable = true },
+        string = ischinese and { name = "非常震惊" } or { name = "So Shock" },
+		anim = {
+            bank = nil, build = nil,
+            anim = nil, animpush = nil, isloop = nil, setable = true
+        },
+        equip = {
+            symbol = "swap_hat", build = "hat_lichen_emo_3shock", file = "swap_hat",
+            isopenhat = true, lightcolor = { r = 1, g = 226/255, b = 208/255 }
+        },
+        exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
+        floater = { cut = 0.03, size = "small", offset_y = 0.15, scale = 0.7, nofx = nil }
+    },
+    hat_lichen_emo_shock = { --惊讶
+        base_prefab = "hat_lichen", skin_id = "6568725bce45c22cf18df688", noshopshow = true,
+		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
+		assets = {
+			Asset("ANIM", "anim/skin/hat_lichen_emo_shock.zip")
+		},
+		image = { name = nil, atlas = nil, setable = true },
+        string = ischinese and { name = "惊讶" } or { name = "Shock" },
+		anim = {
+            bank = nil, build = nil,
+            anim = nil, animpush = nil, isloop = nil, setable = true
+        },
+        equip = {
+            symbol = "swap_hat", build = "hat_lichen_emo_shock", file = "swap_hat",
+            isopenhat = true, lightcolor = { r = 1, g = 241/255, b = 212/255 }
+        },
+        exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
+        floater = { cut = 0.03, size = "small", offset_y = 0.15, scale = 0.4, nofx = nil }
+    },
+    hat_lichen_emo_anger = { --生气
+        base_prefab = "hat_lichen", skin_id = "6568725bce45c22cf18df688", noshopshow = true,
+		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
+		assets = {
+			Asset("ANIM", "anim/skin/hat_lichen_emo_anger.zip")
+		},
+		image = { name = nil, atlas = nil, setable = true },
+        string = ischinese and { name = "生气" } or { name = "Anger" },
+		anim = {
+            bank = nil, build = nil,
+            anim = nil, animpush = nil, isloop = nil, setable = true
+        },
+        equip = {
+            symbol = "swap_hat", build = "hat_lichen_emo_anger", file = "swap_hat",
+            isopenhat = true, lightcolor = { r = 1, g = 221/255, b = 214/255 }
+        },
+        exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
+        floater = { cut = 0.03, size = "small", offset_y = 0.15, scale = 0.5, nofx = nil }
+    },
+    hat_lichen_emo_sweat = { --流汗
+        base_prefab = "hat_lichen", skin_id = "6568725bce45c22cf18df688", noshopshow = true,
+		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
+		assets = {
+			Asset("ANIM", "anim/skin/hat_lichen_emo_sweat.zip")
+		},
+		image = { name = nil, atlas = nil, setable = true },
+        string = ischinese and { name = "流汗" } or { name = "Sweat" },
+		anim = {
+            bank = nil, build = nil,
+            anim = nil, animpush = nil, isloop = nil, setable = true
+        },
+        equip = {
+            symbol = "swap_hat", build = "hat_lichen_emo_sweat", file = "swap_hat",
+            isopenhat = true, lightcolor = { r = 210/255, g = 243/255, b = 255/255 }
+        },
+        exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
+        floater = { cut = 0.02, size = "small", offset_y = 0.15, scale = 0.5, nofx = nil }
+    },
+    hat_lichen_emo_heart = { --心动
+        base_prefab = "hat_lichen", skin_id = "6568725bce45c22cf18df688", noshopshow = true,
+		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
+		assets = {
+			Asset("ANIM", "anim/skin/hat_lichen_emo_heart.zip")
+		},
+		image = { name = nil, atlas = nil, setable = true },
+        string = ischinese and { name = "心动" } or { name = "Heart" },
+		anim = {
+            bank = nil, build = nil,
+            anim = nil, animpush = nil, isloop = nil, setable = true
+        },
+        equip = {
+            symbol = "swap_hat", build = "hat_lichen_emo_heart", file = "swap_hat",
+            isopenhat = true, lightcolor = { r = 255/255, g = 208/255, b = 208/255 }
+        },
+        exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
+        floater = { cut = 0.02, size = "small", offset_y = 0.15, scale = 0.8, nofx = nil }
     },
 
     hat_cowboy_tvplay = {
@@ -3351,6 +3458,25 @@ _G.SKINS_LEGION = {
             inst.AnimState:HideSymbol("deco")
         end
     },
+
+    tourmalinecore_tale = {
+        base_prefab = "tourmalinecore", skin_id = "65687273ce45c22cf18df68d", onlyownedshow = true,
+		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
+		assets = {
+			Asset("ANIM", "anim/skin/tourmalinecore_tale.zip")
+		},
+		image = { name = nil, atlas = nil, setable = true },
+        string = ischinese and { name = "霹雳神灯" } or { name = "Thunder Lamp" },
+		fn_start = function(inst)
+            inst.AnimState:SetBank("tourmalinecore_tale")
+            inst.AnimState:SetBuild("tourmalinecore_tale")
+            inst.battery_fx_l = battery_fx_tale
+        end,
+        fn_end = function(inst)
+            inst.battery_fx_l = nil
+        end,
+        exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 }
+    }
 }
 
 _G.SKIN_IDS_LEGION = {
@@ -3368,7 +3494,8 @@ _G.SKIN_IDS_LEGION = {
         rosebush_marble = true, lilybush_marble = true, orchidbush_marble = true,
         rosorns_marble = true, lileaves_marble = true, orchitwigs_marble = true,
         siving_mask_gold_marble = true,
-        shield_l_log_emo_fist = true, hat_lichen_emo_que = true,
+        shield_l_log_emo_fist = true, hat_lichen_emo_que = true, hat_lichen_emo_3shock = true, hat_lichen_emo_shock = true,
+        hat_lichen_emo_anger = true, hat_lichen_emo_sweat = true, hat_lichen_emo_heart = true,
         rosebush_collector = true, rosorns_collector = true, fimbul_axe_collector = true, siving_turn_collector = true,
         siving_feather_real_collector = true, siving_feather_fake_collector = true,
         backcub_fans2 = true,
@@ -3384,7 +3511,8 @@ _G.SKIN_IDS_LEGION = {
         siving_feather_real_paper = true, siving_feather_fake_paper = true, hiddenmoonlight_item_paper = true,
         siving_turn_future = true, siving_turn_future2 = true,
         chest_whitewood_craft = true, chest_whitewood_big_craft = true,
-        chest_whitewood_craft2 = true, chest_whitewood_big_craft2 = true
+        chest_whitewood_craft2 = true, chest_whitewood_big_craft2 = true,
+        tourmalinecore_tale = true
     },
     ["6278c450c340bf24ab311528"] = { --回忆(5)
         boltwingout_disguiser = true,
@@ -3441,7 +3569,10 @@ _G.SKIN_IDS_LEGION = {
         siving_mask_gold_marble = true,
         hiddenmoonlight_item_paper = true,
         chest_whitewood_craft = true, chest_whitewood_big_craft = true,
-        chest_whitewood_craft2 = true, chest_whitewood_big_craft2 = true
+        chest_whitewood_craft2 = true, chest_whitewood_big_craft2 = true,
+        hat_lichen_emo_3shock = true, hat_lichen_emo_shock = true, hat_lichen_emo_anger = true,
+        hat_lichen_emo_sweat = true, hat_lichen_emo_heart = true,
+        tourmalinecore_tale = true
     },
     -- ["61627d927bbb727be174c4a0"] = { --棋举不定
     -- }
@@ -3479,6 +3610,7 @@ local skinidxes = { --用以皮肤排序
     "siving_feather_real_collector", "siving_feather_fake_collector",
     "siving_turn_collector", "icire_rock_collector", "fimbul_axe_collector", "rosebush_collector", "rosorns_collector",
     "neverfade_paper", "neverfadebush_paper", "neverfade_paper2", "neverfadebush_paper2",
+    "tourmalinecore_tale",
     "siving_turn_future", "siving_turn_future2",
     "hiddenmoonlight_item_paper", "siving_feather_real_paper", "siving_feather_fake_paper",
     "icire_rock_day",
@@ -3493,7 +3625,8 @@ local skinidxes = { --用以皮肤排序
     "plant_cactus_meat_l_world", "orchidbush_disguiser", "boltwingout_disguiser",
     "siving_mask_gold_marble",
     "rosebush_marble", "rosorns_marble", "lilybush_marble", "lileaves_marble", "orchidbush_marble", "orchitwigs_marble",
-    "shield_l_log_emo_fist", "hat_lichen_emo_que",
+    "hat_lichen_emo_3shock", "hat_lichen_emo_shock", "hat_lichen_emo_anger", "hat_lichen_emo_sweat",
+    "hat_lichen_emo_heart", "shield_l_log_emo_fist", "hat_lichen_emo_que",
 
     "fishhomingtool_awesome_taste", "fishhomingtool_normal_taste", "fishhomingbait_taste",
     "backcub_fans2", "backcub_fans",
@@ -4529,7 +4662,7 @@ if not TheNet:IsDedicated() and _G.CONFIGS_LEGION.LANGUAGES == "chinese" then
     -- local PlayerAvatarPopup = require "widgets/playeravatarpopup"
     local PlayerInfoPopup = require "screens/playerinfopopupscreen"
     local TEMPLATES = require "widgets/templates"
-    -- local SkinLegionDialog = require "widgets/skinlegiondialog"
+    local SkinLegionDialog = require "widgets/skinlegiondialog"
 
     -- local right_root = nil
     -- AddClassPostConstruct("widgets/controls", function(self)
@@ -4557,7 +4690,7 @@ if not TheNet:IsDedicated() and _G.CONFIGS_LEGION.LANGUAGES == "chinese" then
                     if right_root.skinshop_l then
                         right_root.skinshop_l:Kill()
                     end
-                    local SkinLegionDialog = _G.require("widgets/skinlegiondialog") --test：动态更新
+                    -- local SkinLegionDialog = _G.require("widgets/skinlegiondialog") --test：动态更新
                     right_root.skinshop_l = right_root:AddChild(SkinLegionDialog(self.owner))
                     right_root.skinshop_l:SetPosition(-380, 0)
                     -- self:Kill() --直接删除并不能去除暂停状态

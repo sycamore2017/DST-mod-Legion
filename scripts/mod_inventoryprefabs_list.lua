@@ -254,6 +254,12 @@ local InventoryPrefabsList = {  --每个元素的下标值为每种物品栏图�
     siving_mask_gold_marble = 8,
     siving_armor_gold_marble = 8,
     hiddenmoonlight_item_paper = 8,
+    hat_lichen_emo_3shock = 8,
+    hat_lichen_emo_shock = 8,
+    hat_lichen_emo_anger = 8,
+    hat_lichen_emo_sweat = 8,
+    hat_lichen_emo_heart = 8,
+    tourmalinecore_tale = 8
 }
 
 return InventoryPrefabsList

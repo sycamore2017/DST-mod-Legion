@@ -994,6 +994,87 @@ local SkinData = {
             }
         }
     },
+    hat_lichen_emo_3shock = {
+        string = ischinese and {
+            name = "情绪化",
+            collection = "EMOTICON", access = "SPECIAL",
+            descitem = "解锁\"苔衣发卡\"的5套皮肤。",
+            description = "突然间，眼前的景象让我有些惊讶得说不出话来。那种心动，就像是突然被一阵暖风拂过，让整个世界都变得明亮而美好。可随之而来的，却是一种紧张的情绪，就像是踏上未知的路途，不安与期待交织。\n然后，情感如暴风雨一般激荡，那种愤怒仿佛是从心底涌出的怒火，让每个细胞都在生气的烈焰中颤抖。这一系列情绪，像是一场短暂的旋律，快速切换，让生活充满了未知的惊喜与波澜。"
+        } or {
+            name = "Moody",
+            collection = "EMOTICON", access = "SPECIAL",
+            descitem = "Unlock \"Lichen Hairpin\" skin.",
+            description = "The story was not translated."
+        },
+        height_anim = 265,
+        anims = {
+            {
+                bank = "hat_lichen_emo_anger", build = "hat_lichen_emo_anger",
+                anim = "idle", anim2 = nil, isloop = false,
+                x = -34, y = 135, scale = 0.28
+            },
+            {
+                bank = "hat_lichen_emo_sweat", build = "hat_lichen_emo_sweat",
+                anim = "idle", anim2 = nil, isloop = false,
+                x = 26, y = 135, scale = 0.28
+            },
+            {
+                symbol = {
+                    { symbol = "swap_hat", build = "hat_lichen_emo_anger", file = "swap_hat", type = 3 }
+                },
+                fn_anim = SetAnim_player,
+                fn_click = SetAnim_player2,
+                x = -68, y = 130, scale = 0.35
+            },
+            {
+                symbol = {
+                    { symbol = "swap_hat", build = "hat_lichen_emo_sweat", file = "swap_hat", type = 3 },
+                },
+                fn_anim = SetAnim_player,
+                fn_click = SetAnim_player2,
+                x = 56, y = 130, scale = 0.35
+            },
+            {
+                bank = "hat_lichen_emo_heart", build = "hat_lichen_emo_heart",
+                anim = "idle", anim2 = nil, isloop = false,
+                x = -30, y = 50, scale = 0.28
+            },
+            {
+                symbol = {
+                    { symbol = "swap_hat", build = "hat_lichen_emo_heart", file = "swap_hat", type = 3 }
+                },
+                fn_anim = SetAnim_player,
+                fn_click = SetAnim_player2,
+                x = 0, y = 45, scale = 0.35
+            },
+            {
+                bank = "hat_lichen_emo_3shock", build = "hat_lichen_emo_3shock",
+                anim = "idle", anim2 = nil, isloop = false,
+                x = -34, y = 5, scale = 0.28
+            },
+            {
+                bank = "hat_lichen_emo_shock", build = "hat_lichen_emo_shock",
+                anim = "idle", anim2 = nil, isloop = false,
+                x = 26, y = 5, scale = 0.28
+            },
+            {
+                symbol = {
+                    { symbol = "swap_hat", build = "hat_lichen_emo_3shock", file = "swap_hat", type = 3 }
+                },
+                fn_anim = SetAnim_player,
+                fn_click = SetAnim_player2,
+                x = -68, y = 0, scale = 0.35
+            },
+            {
+                symbol = {
+                    { symbol = "swap_hat", build = "hat_lichen_emo_shock", file = "swap_hat", type = 3 },
+                },
+                fn_anim = SetAnim_player,
+                fn_click = SetAnim_player2,
+                x = 56, y = 0, scale = 0.35
+            }
+        }
+    },
     hat_cowboy_tvplay = {
         string = ischinese and {
             collection = "TVPLAY", access = "FREE",
@@ -2686,7 +2767,7 @@ local SkinData = {
             name = "春泥",
             collection = "LAW", access = "SPECIAL",
             descitem = "解锁\"子圭·垄\"的2套皮肤。",
-            description = ""
+            description = "繁花如雪，在微风的吻中纷纷坠落，如羽毛般轻柔，仿佛花开的瞬间已经注定了它们轻盈的陨落。\n这并非终结，每一片花瓣都被温暖地接纳。融入春泥的沉寂，化作春末的生机。\n离别并非终结，是下一场盛夏的开始！"
         } or {
             name = "Spring Mud",
             collection = "LAW", access = "SPECIAL",
@@ -2733,7 +2814,7 @@ local SkinData = {
         string = ischinese and {
             collection = "LAW", access = "SPECIAL",
             descitem = "解锁\"子圭·垄\"的皮肤。",
-            description = ""
+            description = "秋风轻抚，树叶如金，悠然而下。它们舞动在空中，如翩翩起舞的旧时舞者，最后，轻轻降落，归根成土。\n一场自然的别离，落叶在飘零中找到了回家的路。它们归根，如同生命循环的奏章，告别是为了更深的相遇。在这个季节的交响中，落叶的离去并非终结，而是融入了大地的怀抱，成为了生命的延续。"
         } or {
             collection = "LAW", access = "SPECIAL",
             descitem = "Unlock \"Siving-Sols\" skin.",
@@ -2763,7 +2844,7 @@ local SkinData = {
         string = ischinese and {
             collection = "TASTE", access = "SPECIAL",
             descitem = "解锁\"月折宝剑\"的皮肤。",
-            description = ""
+            description = "在灰蒙的城市街角，有一位孤独的烤肠大王。他沉默地翻转着烤叉，眼神深邃，仿佛迷失在过往的回忆中。每一根烤肠都是他心灵的投影，孤寂忧郁回味深重。\n深夜刚下班的顾客，常会来摊前驻足，享受深夜椒香，将生活的疲惫抛给孤独，自己独占惊艳味蕾。"
         } or {
             collection = "TASTE", access = "SPECIAL",
             descitem = "Unlock \"Refracted Moonlight\" skin.",
@@ -2845,7 +2926,7 @@ local SkinData = {
             name = "花梨木展柜",
             collection = "CRAFT", access = "SPECIAL",
             descitem = "解锁\"白木展示台\"、\"白木展示柜\"的2套皮肤。",
-            description = ""
+            description = "花梨木展柜的制作是一场沉默的精湛艺术表演。\n木匠首先精选上佳的花梨木，剔除瑕疵，保留天然的美感。在悉心设计的蓝图下，巧手雕琢，将木材塑造成优雅的柜体，榫卯精准相扣，确保结构牢固。手工雕刻细节，赋予其独特纹理和精致的花纹。最后，经过多次打磨和上漆，使表面光滑如玉，散发着淡淡木香。\n每一步骤都是匠心独运，呈现出一件精致而高贵的花梨木展柜。"
         } or {
             name = "Rosewood Showcase",
             collection = "CRAFT", access = "SPECIAL",
@@ -2884,6 +2965,25 @@ local SkinData = {
             }
         }
     },
+    tourmalinecore_tale = {
+        string = ischinese and {
+            collection = "TALE", access = "SPECIAL",
+            descitem = "解锁\"电气石\"的皮肤。",
+            description = "雷霆之势袭来，沙漠狂风呼啸。\n大萨满高举神灯，摩擦灯身，试图吸收雷暴的力量，以保一方人民。一阵灯光闪耀，雷霆之力化解其中，然而，神灯并非神器，强大的自然力量让灯身出现裂纹，大萨满无奈取下自己的命石镶在灯盖上以压住狂躁霹雳，并用自己的血肉修复裂纹。雷暴渐歇，大萨满虽完成任务，但只剩一具白骨。\n此后，每百年需献祭一名法力强大的萨满，固神灯力量，保世代平安！"
+        } or {
+            collection = "TALE", access = "SPECIAL",
+            descitem = "Unlock \"Tourmaline\" skin.",
+            description = "The story was not translated.",
+        },
+        height_anim = 70,
+        anims = {
+            {
+                bank = "tourmalinecore_tale", build = "tourmalinecore_tale",
+                anim = "idle", anim2 = nil, isloop = false,
+                x = 0, y = 6, scale = 0.38
+            }
+        }
+    }
 }
 
 local function GetName(skin)

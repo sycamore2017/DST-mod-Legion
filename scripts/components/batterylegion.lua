@@ -49,7 +49,7 @@ function BatteryLegion:StopCharge() --结束自动充能
 	self.time_start = nil
 end
 
-local function SpawnFx(doer, target)
+local function SpawnFx(doer, target, inst)
 	local owner = target
 	if target.components.inventoryitem ~= nil then
 		local owner2 = target.components.inventoryitem:GetGrandOwner()
@@ -58,7 +58,23 @@ local function SpawnFx(doer, target)
 		end
 	end
 	local x, y, z = owner.Transform:GetWorldPosition()
-    SpawnPrefab("eleccore_spark_fx").Transform:SetPosition(x, y+0.7 + math.random()*1.3, z)
+	if inst.battery_fx_l ~= nil then
+		local fx = SpawnPrefab(inst.battery_fx_l.name)
+		if fx ~= nil then
+			if inst.battery_fx_l.y ~= nil then
+				y = y + inst.battery_fx_l.y
+			end
+			if inst.battery_fx_l.y_rand ~= nil then
+				y = y + math.random()*inst.battery_fx_l.y_rand
+			end
+			fx.Transform:SetPosition(x, y, z)
+		end
+	else
+		local fx = SpawnPrefab("eleccore_spark_fx")
+		if fx ~= nil then
+			fx.Transform:SetPosition(x, y+0.7 + math.random()*1.3, z)
+		end
+	end
 end
 local function TryCostEnergy(cpt, cost, doer)
 	if cpt == nil then
@@ -80,7 +96,7 @@ function BatteryLegion:Do(doer, target)
 			if target.chargeleft ~= nil then
 				cpt:DoDelta(target.chargeleft*10, doer)
 				target.components.battery:OnUsed(self.inst)
-				SpawnFx(doer, target)
+				SpawnFx(doer, target, self.inst)
 				return true
 			else
 				return false, "NOUSE"
@@ -235,7 +251,7 @@ function BatteryLegion:Do(doer, target)
 	end
 
 	if cost > 0 then
-		SpawnFx(doer, target)
+		SpawnFx(doer, target, self.inst)
 		if self.inst.components.fueled == nil then
 			if self.inst.components.stackable ~= nil then
 				self.inst.components.stackable:Get():Remove()

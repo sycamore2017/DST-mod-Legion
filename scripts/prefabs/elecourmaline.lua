@@ -826,6 +826,9 @@ local function Fn_core()
 
     inst.pickupsound = "gem"
 
+    inst:AddComponent("skinedlegion")
+    inst.components.skinedlegion:Init("tourmalinecore")
+
     inst.entity:SetPristine()
     if not TheWorld.ismastersim then
         return inst
@@ -851,6 +854,8 @@ local function Fn_core()
     inst:ListenForEvent("lightningstrike", OnLightning_core)
 
     MakeHauntableLaunch(inst)
+
+    -- inst.components.skinedlegion:SetOnPreLoad()
 
     return inst
 end

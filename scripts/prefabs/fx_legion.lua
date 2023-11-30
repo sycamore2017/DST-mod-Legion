@@ -891,6 +891,39 @@ MakeFx({ --电气石：摩擦电
         inst:ListenForEvent("animover", OnAnimOver_eleccore)
     end
 })
+MakeFx({ --霹雳神灯：摩擦电
+    name = "eleccore_spark_fx_tale",
+    assets = {
+        Asset("ANIM", "anim/fimbul_static_fx.zip"),
+        Asset("ANIM", "anim/lavaarena_hammer_attack_fx.zip") --官方熔炉锤子大招特效动画模板
+    },
+    fn_common = nil,
+    fn_anim = function(inst)
+        inst.entity:AddSoundEmitter()
+        inst.entity:AddLight()
+
+        inst.AnimState:SetBank("lavaarena_hammer_attack_fx")
+        inst.AnimState:SetBuild("fimbul_static_fx")
+        inst.AnimState:PlayAnimation("crackle_pst")
+        inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
+        inst.AnimState:SetMultColour(255/255, 133/255, 149/255, 1)
+        inst.AnimState:SetFinalOffset(3)
+
+        inst.Light:Enable(true)
+        inst.Light:SetRadius(2)
+        inst.Light:SetFalloff(1)
+        inst.Light:SetIntensity(.9)
+        inst.Light:SetColour(255/255, 133/255, 149/255)
+
+        local dt = 1 / 20
+        inst.i = .9
+        inst.sound = inst.SoundEmitter ~= nil
+        inst.task = inst:DoPeriodicTask(dt, OnUpdate_eleccore, nil, dt)
+    end,
+    fn_remove = function(inst)
+        inst:ListenForEvent("animover", OnAnimOver_eleccore)
+    end
+})
 
 ------
 --尘世蜃楼
