@@ -1747,6 +1747,214 @@ local function Fn_3axegold()
     return inst
 end
 
+--------------------------------------------------------------------------
+--[[ 胡萝卜长枪 ]]
+--------------------------------------------------------------------------
+
+local assets_carl = {
+    Asset("ANIM", "anim/lance_carrot_l.zip"),
+    Asset("ATLAS", "images/inventoryimages/lance_carrot_l.xml"),
+    Asset("IMAGE", "images/inventoryimages/lance_carrot_l.tex")
+}
+
+local atk_min_carl = 10
+
+local function UpdateCarrot(inst, force)
+	local num = 0
+	local num2 = 0
+	for k,v in pairs(inst.components.container.slots) do
+		if v then
+			if v.prefab == "carrot" or v.prefab == "carrot_cooked" then
+				if v.components.stackable ~= nil then
+					num = num + v.components.stackable:StackSize()
+				else
+					num = num + 1
+				end
+			elseif v.prefab == "carrat" then
+				num2 = num2 + 1
+			end
+		end
+	end
+
+	if not force and inst.num_carrot_l == num and inst.num_carrat_l == num2 then --防止一直计算
+		return
+	end
+
+	inst.num_carrot_l = num
+	inst.num_carrat_l = num2
+    if num2 == 1 then --防止用加堆叠上限的mod来做骚操作
+        if num > 40 then
+            num = 40
+        end
+    elseif num2 == 0 then
+        if num > 80 then
+            num = 80
+        end
+    else
+        num2 = 2
+        num = 0
+    end
+    inst.components.weapon:SetDamage(atk_min_carl + num*0.85) --0.85=68/80
+    num = 0.0275*num --0.0275=2.2/80
+    if num2 > 0 then
+        inst.components.planardamage:SetBaseDamage(num2*34)
+        inst.components.damagetypebonus:AddBonus("shadow_aligned", inst, 1+( 0.05*num2 ), "carrat")
+        num = num + 1.1*num2
+    else
+        inst.components.planardamage:SetBaseDamage(0)
+        inst.components.damagetypebonus:RemoveBonus("shadow_aligned", inst, "carrat")
+    end
+	num = math.floor(num*10) / 10 --这一些操作是为了仅保留小数点后1位
+	inst.components.weapon:SetRange(num)
+end
+local function OnOwnerItemChange_carl(owner, data)
+	local hands = owner.components.inventory:GetEquippedItem(EQUIPSLOTS.HANDS)
+	if hands ~= nil and hands.prefab == "lance_carrot_l" then
+		if hands.task_carrot_l ~= nil then
+			hands.task_carrot_l:Cancel()
+		end
+		hands.task_carrot_l = hands:DoTaskInTime(0, function(hands)
+			if hands.components.container ~= nil then
+				UpdateCarrot(hands)
+			end
+			hands.task_carrot_l = nil
+		end)
+	end
+end
+local function OnEquip_carl(inst, owner)
+    -- local skindata = inst.components.skinedlegion:GetSkinedData()
+    -- if skindata ~= nil and skindata.equip ~= nil then
+    --     owner.AnimState:OverrideSymbol("swap_object", skindata.equip.build, skindata.equip.file)
+    -- else
+        owner.AnimState:OverrideSymbol("swap_object", "lance_carrot_l", "swap_object")
+    -- end
+
+    owner.AnimState:Show("ARM_carry")
+    owner.AnimState:Hide("ARM_normal")
+
+	if owner:HasTag("equipmentmodel") then --假人！
+        return
+    end
+
+	if inst.components.container ~= nil then
+        inst.components.container:Open(owner)
+
+		inst:ListenForEvent("gotnewitem", OnOwnerItemChange_carl, owner)
+		inst:ListenForEvent("itemget", OnOwnerItemChange_carl, owner)
+		inst:ListenForEvent("itemlose", OnOwnerItemChange_carl, owner)
+		UpdateCarrot(inst, true)
+    end
+end
+local function OnUnequip_carl(inst, owner)
+    owner.AnimState:Hide("ARM_carry")
+    owner.AnimState:Show("ARM_normal")
+
+	if owner:HasTag("equipmentmodel") then --假人！
+        return
+    end
+
+	if inst.components.container ~= nil then
+        inst.components.container:Close()
+    end
+	inst:RemoveEventCallback("gotnewitem", OnOwnerItemChange_carl, owner)
+	inst:RemoveEventCallback("itemget", OnOwnerItemChange_carl, owner)
+	inst:RemoveEventCallback("itemlose", OnOwnerItemChange_carl, owner)
+end
+local function OnAttack_carl(inst, attacker, target)
+	if inst.task_carrot_l ~= nil then
+		inst.task_carrot_l:Cancel()
+		inst.task_carrot_l = nil
+	end
+	if inst.components.container ~= nil then
+		UpdateCarrot(inst)
+	end
+end
+local function OnFinished_carl(inst)
+	if inst.components.container ~= nil then
+		inst.components.container:DropEverything()
+	end
+	inst:Remove()
+end
+
+local function Fn_carl()
+    local inst = CreateEntity()
+
+    inst.entity:AddTransform()
+    inst.entity:AddAnimState()
+    inst.entity:AddNetwork()
+
+    MakeInventoryPhysics(inst)
+
+    inst.AnimState:SetBank("lance_carrot_l")
+    inst.AnimState:SetBuild("lance_carrot_l")
+    inst.AnimState:PlayAnimation("idle")
+
+    inst:AddTag("jab") --使用捅击的动作进行攻击
+    inst:AddTag("rp_carrot_l")
+    inst:AddTag("weapon")
+
+    -- inst:AddComponent("skinedlegion")
+    -- inst.components.skinedlegion:InitWithFloater("lance_carrot_l")
+
+    MakeInventoryFloatable(inst, "small", 0.4, 0.5)
+    local OnLandedClient_old = inst.components.floater.OnLandedClient
+    inst.components.floater.OnLandedClient = function(self)
+        OnLandedClient_old(self)
+        self.inst.AnimState:SetFloatParams(0.15, 1, self.bob_percent)
+    end
+
+    TOOLS_L.SetImmortalBox_common(inst)
+
+    inst.entity:SetPristine()
+    if not TheWorld.ismastersim then
+        inst.OnEntityReplicated = function(inst) inst.replica.container:WidgetSetup("lance_carrot_l") end
+        return inst
+    end
+
+    inst.num_carrot_l = 0
+    inst.num_carrat_l = 0
+
+    inst:AddComponent("inspectable")
+
+    inst:AddComponent("inventoryitem")
+    inst.components.inventoryitem.imagename = "lance_carrot_l"
+    inst.components.inventoryitem.atlasname = "images/inventoryimages/lance_carrot_l.xml"
+
+    inst:AddComponent("equippable")
+    inst.components.equippable:SetOnEquip(OnEquip_carl)
+    inst.components.equippable:SetOnUnequip(OnUnequip_carl)
+
+    inst:AddComponent("weapon")
+    inst.components.weapon:SetDamage(atk_min_carl)
+    -- inst.components.weapon:SetRange(-1, -1) --人物默认攻击距离为3、3
+    -- inst.components.weapon:SetOnAttack(OnAttack_carl)
+
+    inst:AddComponent("planardamage")
+    inst.components.planardamage:SetBaseDamage(0)
+
+    inst:AddComponent("damagetypebonus")
+
+    inst:AddComponent("finiteuses")
+    inst.components.finiteuses:SetMaxUses(200)
+    inst.components.finiteuses:SetUses(200)
+    inst.components.finiteuses:SetOnFinished(OnFinished_carl)
+
+    inst:AddComponent("container")
+    inst.components.container:WidgetSetup("lance_carrot_l")
+    inst.components.container.canbeopened = false
+
+    inst:AddComponent("preserver")
+    inst.components.preserver:SetPerishRateMultiplier(0.3)
+
+    MakeHauntableLaunch(inst)
+
+    -- inst.components.skinedlegion:SetOnPreLoad()
+
+    TOOLS_L.SetImmortalBox_server(inst)
+
+    return inst
+end
+
 -------------------------
 
 local prefs = {
@@ -1758,7 +1966,8 @@ local prefs = {
     Prefab("fimbul_axe", Fn_fimbulaxe, assets_fimbulaxe, prefabs_fimbulaxe),
     Prefab("dualwrench", Fn_2wrench, assets_2wrench),
     Prefab("tripleshovelaxe", Fn_3axe, assets_3axe),
-    Prefab("triplegoldenshovelaxe", Fn_3axegold, assets_3axegold)
+    Prefab("triplegoldenshovelaxe", Fn_3axegold, assets_3axegold),
+    Prefab("lance_carrot_l", Fn_carl, assets_carl)
 }
 if CONFIGS_LEGION.DRESSUP then
     table.insert(prefs, Prefab("pinkstaff", Fn_staffpink, assets_staffpink))

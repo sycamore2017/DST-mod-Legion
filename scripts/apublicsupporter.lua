@@ -1541,6 +1541,24 @@ end))
 
 ------给恐怖盾牌增加盾反机制------
 
+
+local function Equipped_shieldofterror(inst, data)
+    if data == nil or data.owner == nil then
+        return
+    end
+    if data.owner.components.planardefense ~= nil then
+        data.owner.components.planardefense:AddBonus(inst, 10)
+    end
+end
+local function Unequipped_shieldofterror(inst, data)
+    if data == nil or data.owner == nil then
+        return
+    end
+    if data.owner.components.planardefense ~= nil then
+        data.owner.components.planardefense:RemoveBonus(inst, nil)
+    end
+end
+
 local function FlingItem_terror(dropper, loot, pt, flingtargetpos, flingtargetvariance)
     loot.Transform:SetPosition(pt:Get())
 
@@ -1566,22 +1584,58 @@ local function FlingItem_terror(dropper, loot, pt, flingtargetpos, flingtargetva
         end
     end
 end
-local function Equipped_shieldofterror(inst, data)
-    if data == nil or data.owner == nil then
-        return
+local function ShieldAtk_terror(inst, doer, attacker, data)
+    if inst.components.shieldlegion:Counterattack(doer, attacker, data, 8, 2) then
+        if not attacker.components.health:IsDead() then
+            if attacker.task_fire_l == nil then
+                attacker.components.combat.externaldamagetakenmultipliers:SetModifier("shieldterror_fire", 1.1)
+            else
+                attacker.task_fire_l:Cancel()
+            end
+            attacker.task_fire_l = attacker:DoTaskInTime(8, function(attacker)
+                attacker.task_fire_l = nil
+                attacker.components.combat.externaldamagetakenmultipliers:RemoveModifier("shieldterror_fire")
+            end)
+        end
     end
-    if data.owner.components.planardefense ~= nil then
-        data.owner.components.planardefense:AddBonus(inst, 10)
+
+    local doerpos = doer:GetPosition()
+    for i = 1, math.random(2, 3), 1 do
+        local snap = SpawnPrefab("shieldterror_fire")
+        snap._belly = inst
+        if attacker ~= nil then
+            FlingItem_terror(doer, snap, doerpos, attacker:GetPosition(), 40)
+        else
+            FlingItem_terror(doer, snap, doerpos)
+        end
     end
 end
-local function Unequipped_shieldofterror(inst, data)
-    if data == nil or data.owner == nil then
-        return
-    end
-    if data.owner.components.planardefense ~= nil then
-        data.owner.components.planardefense:RemoveBonus(inst, nil)
+local function ShieldAtkStay_terror(inst, doer, attacker, data)
+    inst.components.shieldlegion:Counterattack(doer, attacker, data, 8, 0.5)
+end
+
+local function OnCharged_shield(inst)
+    if inst.components.shieldlegion ~= nil then
+        inst.components.shieldlegion.canatk = true
     end
 end
+local function OnDischarged_shield(inst)
+	if inst.components.shieldlegion ~= nil then
+        inst.components.shieldlegion.canatk = false
+    end
+end
+local function SetRechargeable_shield(inst, time)
+    if time == nil or time <= 0 then
+        return
+    end
+    if inst.components.rechargeable == nil then
+        inst:AddComponent("rechargeable")
+    end
+    inst.components.rechargeable:SetOnDischargedFn(OnDischarged_shield)
+	inst.components.rechargeable:SetOnChargedFn(OnCharged_shield)
+    inst.components.shieldlegion.time_charge = time
+end
+
 AddPrefabPostInit("shieldofterror", function(inst)
     inst:AddTag("allow_action_on_impassable")
     inst:AddTag("shield_l")
@@ -1591,36 +1645,11 @@ AddPrefabPostInit("shieldofterror", function(inst)
         inst:AddComponent("shieldlegion")
         inst.hurtsoundoverride = "terraria1/robo_eyeofterror/charge"
         inst.components.shieldlegion.armormult_success = 0
-        inst.components.shieldlegion.atkfn = function(inst, doer, attacker, data)
-            if inst.components.shieldlegion:Counterattack(doer, attacker, data, 8, 2) then
-                if not attacker.components.health:IsDead() then
-                    if attacker.task_fire_l == nil then
-                        attacker.components.combat.externaldamagetakenmultipliers:SetModifier("shieldterror_fire", 1.1)
-                    else
-                        attacker.task_fire_l:Cancel()
-                    end
-                    attacker.task_fire_l = attacker:DoTaskInTime(8, function(attacker)
-                        attacker.task_fire_l = nil
-                        attacker.components.combat.externaldamagetakenmultipliers:RemoveModifier("shieldterror_fire")
-                    end)
-                end
-            end
-
-            local doerpos = doer:GetPosition()
-            for i = 1, math.random(2, 3), 1 do
-                local snap = SpawnPrefab("shieldterror_fire")
-                snap._belly = inst
-                if attacker ~= nil then
-                    FlingItem_terror(doer, snap, doerpos, attacker:GetPosition(), 40)
-                else
-                    FlingItem_terror(doer, snap, doerpos)
-                end
-            end
-        end
-        inst.components.shieldlegion.atkstayingfn = function(inst, doer, attacker, data)
-            inst.components.shieldlegion:Counterattack(doer, attacker, data, 8, 0.5)
-        end
+        inst.components.shieldlegion.atkfn = ShieldAtk_terror
+        inst.components.shieldlegion.atkstayingfn = ShieldAtkStay_terror
         -- inst.components.shieldlegion.atkfailfn = function(inst, doer, attacker, data) end
+
+        SetRechargeable_shield(inst, CONFIGS_LEGION.SHIELDRECHARGETIME)
 
         -- if inst.components.planardefense == nil then
         --     inst:AddComponent("planardefense")
@@ -2352,7 +2381,10 @@ AddComponentAction("INVENTORY", "batterylegion", function(inst, doer, actions, r
 end)
 --用物品对其他对象进行操作
 AddComponentAction("USEITEM", "batterylegion", function(inst, doer, target, actions, right)
-    if right and not target:HasTag("battery_l") then
+    if
+        right and not target:HasTag("battery_l") and --不能对其他电池使用
+        (target.replica.combat ~= nil or target.replica.container == nil) --不能对无战斗组件的容器使用
+    then
         table.insert(actions, ACTIONS.RUB_L)
     end
 end)

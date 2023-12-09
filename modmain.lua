@@ -113,11 +113,9 @@
         * 鞍具标签系数 * 自身标签系数 * 额外受击系数
         + 额外受击系数 * 额外攻击值
     ▷最终特攻伤害值：如果最终结果不大于0，则不参与计算，代表完全防御住了
-        (
-            spdamage(是个表，非数字) --传参。可能是由 Combat:DoAttack() 而来，也可能是 Combat:GetAttacked() 直接设置的数值
-            * 所有装备的标签系数累乘
-        )
-        - 所有具有对应特殊防御的装备的特殊防御值之和 - 被攻击者自身对应的的特殊防御值
+        ( ( spdamage(是个表，非数字) --传参。可能是由 Combat:DoAttack() 而来，也可能是 Combat:GetAttacked() 直接设置的数值
+            * 所有装备的标签系数累乘 ) - 所有具有对应特殊防御的装备的特殊防御值之和 - 被攻击者自身对应的的特殊防御值
+        ) * 鞍具标签系数 * 自身标签系数
     ▷位面生物抵抗：若被攻击者有 planarentity组件，则减免普攻伤害
         --最终普攻伤害值2 = (√(最终普攻伤害值1 * 4 + 64) - 8) *4 --公式含义：伤害越高，减免比例越高，比如10->8.8、100->54
     ▷最终伤害 = 最终普攻伤害值2 + 最终特攻伤害值 --有的对象还有生命损失减免，比如女武神，但这里只考虑战斗伤害
@@ -293,6 +291,8 @@ else
 end
 
 _G.CONFIGS_LEGION.BACKCUBCHANCE = GetModConfigData("BackCubChance") --靠背熊掉落几率
+_G.CONFIGS_LEGION.SHIELDRECHARGETIME = GetModConfigData("ShieldRechargeTime") --盾牌冷却时间
+_G.CONFIGS_LEGION.AGRONRECHARGETIME = GetModConfigData("AgronRechargeTime") --艾力冈的剑冷却时间
 
 ----------
 --语言设置

@@ -59,6 +59,28 @@ local function OnUnequipFn(inst, owner)
     owner.AnimState:ShowSymbol("swap_object")
 end
 
+local function OnCharged(inst)
+    if inst.components.shieldlegion ~= nil then
+        inst.components.shieldlegion.canatk = true
+    end
+end
+local function OnDischarged(inst)
+	if inst.components.shieldlegion ~= nil then
+        inst.components.shieldlegion.canatk = false
+    end
+end
+local function SetRechargeable(inst, time)
+    if time == nil or time <= 0 then
+        return
+    end
+    if inst.components.rechargeable == nil then
+        inst:AddComponent("rechargeable")
+    end
+    inst.components.rechargeable:SetOnDischargedFn(OnDischarged)
+	inst.components.rechargeable:SetOnChargedFn(OnCharged)
+    inst.components.shieldlegion.time_charge = time
+end
+
 local function MakeShield(data)
 	table.insert(prefs, Prefab(
 		data.name,
@@ -284,7 +306,7 @@ local function SetupEquippable_sand(inst)
     inst.components.equippable.insulated = true --设为true，就能防电
     inst.components.equippable.walkspeedmult = 0.85
 end
-local foreverequip_sand= {
+local foreverequip_sand = {
     -- anim = nil, anim_broken = "broken", fn_broken = nil, fn_repaired = nil,
     fn_setEquippable = function(inst)
         inst:AddComponent("equippable")
@@ -322,6 +344,8 @@ MakeShield({
         inst.components.shieldlegion.atkstayingfn = ShieldAtkStay_sand
         -- inst.components.shieldlegion.atkfailfn = function(inst, doer, attacker, data) end
 
+        SetRechargeable(inst, CONFIGS_LEGION.SHIELDRECHARGETIME)
+
         inst.components.weapon:SetDamage(damage_normal)
 
         inst.components.armor:InitCondition(1050, absorb_normal) --150*10*0.7= 1050防具耐久
@@ -335,6 +359,13 @@ MakeShield({
 --------------------------------------------------------------------------
 --[[ 木盾 ]]
 --------------------------------------------------------------------------
+
+local function ShieldAtk_log(inst, doer, attacker, data)
+    Counterattack_base(inst, doer, attacker, data, 6, 2.5)
+end
+local function ShieldAtkStay_log(inst, doer, attacker, data)
+    inst.components.shieldlegion:Counterattack(doer, attacker, data, 6, 0.8)
+end
 
 MakeShield({
     name = "shield_l_log",
@@ -354,13 +385,11 @@ MakeShield({
 
         inst.hurtsoundoverride = "dontstarve/wilson/hit_armour"
         inst.components.shieldlegion.armormult_success = 0.4
-        inst.components.shieldlegion.atkfn = function(inst, doer, attacker, data)
-            Counterattack_base(inst, doer, attacker, data, 6, 2.5)
-        end
-        inst.components.shieldlegion.atkstayingfn = function(inst, doer, attacker, data)
-            inst.components.shieldlegion:Counterattack(doer, attacker, data, 6, 0.8)
-        end
+        inst.components.shieldlegion.atkfn = ShieldAtk_log
+        inst.components.shieldlegion.atkstayingfn = ShieldAtkStay_log
         -- inst.components.shieldlegion.atkfailfn = function(inst, doer, attacker, data) end
+
+        SetRechargeable(inst, CONFIGS_LEGION.SHIELDRECHARGETIME)
 
         inst.components.weapon:SetDamage(27.2) --34*0.8
 
@@ -691,6 +720,8 @@ MakeShield({
         inst.components.shieldlegion.atkfn = ShieldAtk_agron
         inst.components.shieldlegion.atkstayingfn = ShieldAtkStay_agron
         -- inst.components.shieldlegion.atkfailfn = function(inst, doer, attacker, data) end
+
+        SetRechargeable(inst, CONFIGS_LEGION.AGRONRECHARGETIME)
 
         inst.OnLoad = OnLoad_agron
 

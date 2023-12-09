@@ -8,7 +8,7 @@ local L = locale ~= "zh" and locale ~= "zhr" --true-英文; false-中文
 
 name = L and "[DST] Legion" or "[DST] 棱镜"
 author = "ti_Tout"
-version = "7.3.5" --每次更新时为了上传必须更改
+version = "7.3.7" --每次更新时为了上传必须更改
 description =
     L and "Thanks for using this mod!\n                                           [version]"..version.."  [file]1392778117\n\n*As you can see, this mod includes much of the imagination of the mod makers. I really want to make this mod like a DLC, can we wait until it happens?\n\nSpecial thanks：半夏微暖半夏凉(Code consultant)、羽中就是他(Guest artist)、风铃草(Functional supporter)、白饭(Wiki editor)"
     or "感谢订阅本mod！                                    [版本]"..version.."  [文件]1392778117\n\n*如你所见，本mod包括了作者的很多的脑洞，我也很想把这个mod做成像DLC一样的规模，敬请期待吧。\n*本mod为个人爱好所做，禁止任何个人或组织转载、除自用外的修改、发布或其他形式的侵犯本mod权益的行为！\n\n特别感谢：半夏微暖半夏凉(代码指导)、羽中就是他(客串画佬)、风铃草(特功支持)、白饭(百科编辑)"
@@ -522,6 +522,54 @@ configuration_options = L and {
         },
         default = 0.7
     },
+    {   name = "ShieldRechargeTime",
+        label = "Cooldown Time of Shield",
+        hover = "Set the cooldown time required to lift the shield again after each lift.",
+        options = {
+            {description = "1 sec", data = 1},
+            {description = "1.5 sec", data = 1.5},
+            {description = "2 sec", data = 2},
+            {description = "2.5 sec", data = 2.5},
+            {description = "3 sec", data = 3},
+            {description = "4 sec", data = 4},
+            {description = "5 sec", data = 5},
+            {description = "6 sec", data = 6},
+            {description = "No cooldown(default)", data = 0},
+            {description = "10 sec", data = 10},
+            {description = "15 sec", data = 15},
+            {description = "20 sec", data = 20},
+            {description = "30 sec", data = 30},
+            {description = "60 sec", data = 60},
+            {description = "120 sec", data = 120},
+            {description = "240 sec", data = 240},
+            {description = "480 sec", data = 480}
+        },
+        default = 0
+    },
+    {   name = "AgronRechargeTime",
+        label = "Cooldown Time of Agron's Sword",
+        hover = "Set the cooldown time required to lift the Agron's Sword again after each lift.",
+        options = {
+            {description = "1 sec", data = 1},
+            {description = "1.5 sec", data = 1.5},
+            {description = "2 sec", data = 2},
+            {description = "2.5 sec", data = 2.5},
+            {description = "3 sec", data = 3},
+            {description = "4 sec", data = 4},
+            {description = "5 sec", data = 5},
+            {description = "6 sec", data = 6},
+            {description = "No cooldown(default)", data = 0},
+            {description = "10 sec", data = 10},
+            {description = "15 sec", data = 15},
+            {description = "20 sec", data = 20},
+            {description = "30 sec", data = 30},
+            {description = "60 sec", data = 60},
+            {description = "120 sec", data = 120},
+            {description = "240 sec", data = 240},
+            {description = "480 sec", data = 480}
+        },
+        default = 0
+    },
 } or {
     {name = "Title", label = "特殊设置", options = {{description = "", data = ""},}, default = ""},
     {   name = "Language",
@@ -1001,5 +1049,53 @@ configuration_options = L and {
             {description = "不会掉落", data = 0}
         },
         default = 0.7
+    },
+    {   name = "ShieldRechargeTime",
+        label = "盾牌冷却时间",
+        hover = "设置每次举盾结束后能再次举盾所需的冷却时间。盾太重了？",
+        options = {
+            {description = "1秒", data = 1},
+            {description = "1.5秒", data = 1.5},
+            {description = "2秒", data = 2},
+            {description = "2.5秒", data = 2.5},
+            {description = "3秒", data = 3},
+            {description = "4秒", data = 4},
+            {description = "5秒", data = 5},
+            {description = "6秒", data = 6},
+            {description = "无冷却(默认)", data = 0},
+            {description = "10秒", data = 10},
+            {description = "15秒", data = 15},
+            {description = "20秒", data = 20},
+            {description = "30秒", data = 30},
+            {description = "60秒", data = 60},
+            {description = "120秒", data = 120},
+            {description = "240秒", data = 240},
+            {description = "480秒", data = 480}
+        },
+        default = 0
+    },
+    {   name = "AgronRechargeTime",
+        label = "艾力冈的剑冷却时间",
+        hover = "设置每次艾力冈的剑举盾结束后能再次举盾所需的冷却时间。能力越大，约束越大。",
+        options = {
+            {description = "1秒", data = 1},
+            {description = "1.5秒", data = 1.5},
+            {description = "2秒", data = 2},
+            {description = "2.5秒", data = 2.5},
+            {description = "3秒", data = 3},
+            {description = "4秒", data = 4},
+            {description = "5秒", data = 5},
+            {description = "6秒", data = 6},
+            {description = "无冷却(默认)", data = 0},
+            {description = "10秒", data = 10},
+            {description = "15秒", data = 15},
+            {description = "20秒", data = 20},
+            {description = "30秒", data = 30},
+            {description = "60秒", data = 60},
+            {description = "120秒", data = 120},
+            {description = "240秒", data = 240},
+            {description = "480秒", data = 480}
+        },
+        default = 0
     },
 }

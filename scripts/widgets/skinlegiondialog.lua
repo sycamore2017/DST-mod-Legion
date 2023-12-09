@@ -84,7 +84,7 @@ local SkinStrings = ischinese and {
     }
 }
 
-local AnimModels = TEST and { "wx78" } or {
+local AnimModels = TEST and { "wickerbottom" } or {
     "wilson", "willow", "wendy", "wolfgang", "wx78", "wickerbottom", "woodie", "waxwell", "wathgrithr",
     "webber", "winona", "warly", "wes"
 }
@@ -3495,34 +3495,36 @@ function SkinLegionDialog:BuildSkinDesc(item)
         height = height - 20
     end
 
-    --皮肤包含项描述
-    local label_skindescitem = w:AddChild(Text(CHATFONT, 20))
-    label_skindescitem:SetColour(UICOLOURS.BROWN_DARK)
-    label_skindescitem:SetHAlign(ANCHOR_LEFT)
-    label_skindescitem:SetVAlign(ANCHOR_TOP)
-    label_skindescitem:EnableWordWrap(true)
-    label_skindescitem:SetRegionSize(200, 36)
-    label_skindescitem:SetString(GetDescItem(skindata))
-    x, y = label_skindescitem:GetRegionSize()
-    label_skindescitem:SetPosition(left + 0.5*x, height - 0.5*y)
-    height = height - y - height_lag
+    if not TEST then
+        --皮肤包含项描述
+        local label_skindescitem = w:AddChild(Text(CHATFONT, 20))
+        label_skindescitem:SetColour(UICOLOURS.BROWN_DARK)
+        label_skindescitem:SetHAlign(ANCHOR_LEFT)
+        label_skindescitem:SetVAlign(ANCHOR_TOP)
+        label_skindescitem:EnableWordWrap(true)
+        label_skindescitem:SetRegionSize(200, 36)
+        label_skindescitem:SetString(GetDescItem(skindata))
+        x, y = label_skindescitem:GetRegionSize()
+        label_skindescitem:SetPosition(left + 0.5*x, height - 0.5*y)
+        height = height - y - height_lag
 
-    --故事分割线
-    local line2 = w:AddChild(Image("images/quagmire_recipebook.xml", "quagmire_recipe_line.tex"))
-    line2:SetScale(.36, -0.25)
-    line2:SetPosition(0.5*width, height - 0.5*height_line)
-    height = height - height_line - height_lag
+        --故事分割线
+        local line2 = w:AddChild(Image("images/quagmire_recipebook.xml", "quagmire_recipe_line.tex"))
+        line2:SetScale(.36, -0.25)
+        line2:SetPosition(0.5*width, height - 0.5*height_line)
+        height = height - height_line - height_lag
 
-    --短篇故事
-    local text_story = w:AddChild(Text(CHATFONT, 21))
-    text_story:SetColour(UICOLOURS.BROWN_DARK)
-    text_story:SetHAlign(ANCHOR_LEFT)
-    text_story:SetVAlign(ANCHOR_TOP)
-    text_story:EnableWordWrap(true)
-    text_story:SetMultilineTruncatedString(GetDescription(skindata), 100, 220)
-    x, y = text_story:GetRegionSize()
-    text_story:SetPosition(left + 0.5*x, height - 0.5*y)
-    height = height - y - height_lag
+        --短篇故事
+        local text_story = w:AddChild(Text(CHATFONT, 21))
+        text_story:SetColour(UICOLOURS.BROWN_DARK)
+        text_story:SetHAlign(ANCHOR_LEFT)
+        text_story:SetVAlign(ANCHOR_TOP)
+        text_story:EnableWordWrap(true)
+        text_story:SetMultilineTruncatedString(GetDescription(skindata), 100, 220)
+        x, y = text_story:GetRegionSize()
+        text_story:SetPosition(left + 0.5*x, height - 0.5*y)
+        height = height - y - height_lag
+    end
 
     height = math.abs(height)
 

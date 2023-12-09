@@ -43,6 +43,7 @@ local ShieldLegion = Class(function(self, inst)
     self.delta = 8 * FRAMES --FRAMES为0.033秒。并且举盾sg动画总时长为 13*FRAMES，最好小于这个值
     self.armormult_success = 1 --盾反成功时的损害系数
 
+    -- self.time_charge = nil --举盾的冷却时间
     -- self.startfn = nil
     -- self.atkfn = nil
     -- self.atkstayingfn = nil
@@ -193,7 +194,12 @@ function ShieldLegion:FinishAttack(doer, issgend)
         --     self.resultfn(self.inst, doer)
         -- end
     end
-    self.issuccess = false
+    if self.issuccess then --只有成功盾反了，才会进入冷却
+        if self.time_charge ~= nil and self.time_charge > 0 and self.inst.components.rechargeable ~= nil then
+            self.inst.components.rechargeable:Discharge(self.time_charge)
+        end
+        self.issuccess = false
+    end
     doer.shield_l_success = nil
 
     -- if self.fx_protect ~= nil and self.fx_protect:IsValid() then

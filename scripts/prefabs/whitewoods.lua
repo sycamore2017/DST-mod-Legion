@@ -647,7 +647,11 @@ local function MakeChest(data)
 
             inst.entity:SetPristine()
             if not TheWorld.ismastersim then
-                inst.OnEntityReplicated = function(inst) inst.replica.container:WidgetSetup(data.name) end
+                inst.OnEntityReplicated = function(inst)
+                    if inst.replica.container ~= nil then --烧毁后 container 组件会被移除
+                        inst.replica.container:WidgetSetup(data.name)
+                    end
+                end
                 return inst
             end
 
