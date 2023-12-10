@@ -107,7 +107,7 @@ function ShieldLegion:ArmorTakeDamage(doer, attacker, data)
     end
 end
 function ShieldLegion:GetAttacked(doer, attacker, damage, weapon, spdamage, stimuli)
-    if self.inst:HasTag("broken") or not self.canatk then
+    if self.inst:HasTag("broken") then
         return false
     end
 
@@ -129,7 +129,7 @@ function ShieldLegion:GetAttacked(doer, attacker, damage, weapon, spdamage, stim
         else --如果因为数据问题进入这里，就校正数据
             self:FinishAttack(doer)
         end
-    elseif self.time ~= nil then
+    elseif self.canatk and self.time ~= nil then
         if GetTime()-self.time < self.delta then --达成盾反条件
             data.issuccess = true
         else

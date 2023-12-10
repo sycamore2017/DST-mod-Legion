@@ -544,13 +544,16 @@ MakeBuff({
         if target.components.damagetypebonus == nil then --通过这个组件能使得弱化效果能同时应用给普攻和特攻
             target:AddComponent("damagetypebonus")
         end
-        target.components.damagetypebonus:AddBonus("_health", target, 0.7, "buff_attackreduce")
+        -- target.components.damagetypebonus:AddBonus("_health", target, 0.7, "buff_attackreduce")
+        --"inspectable"标签覆盖范围比"_health"标签广
+        target.components.damagetypebonus:AddBonus("inspectable", target, 0.7, "buff_attackreduce")
         target.AnimState:SetMultColour(165/255, 188/255, 47/255, 1)
     end,
     fn_again = nil,
     fn_end = function(buff, target)
         if target.components.damagetypebonus ~= nil then
-            target.components.damagetypebonus:RemoveBonus("_health", target, "buff_attackreduce")
+            -- target.components.damagetypebonus:RemoveBonus("_health", target, "buff_attackreduce")
+            target.components.damagetypebonus:RemoveBonus("inspectable", target, "buff_attackreduce")
         end
         target.AnimState:SetMultColour(1, 1, 1, 1)
     end,
@@ -917,15 +920,27 @@ local function BuffSet_tree(buff, target)
         end
         buff.AnimState:PushAnimation("loop", true)
         buff.state_l = state
-        if target.components.combat ~= nil then
-            if state == 3 then
-                target.components.combat.externaldamagetakenmultipliers:SetModifier(buff, 0.01)
-            elseif state == 2 then
-                target.components.combat.externaldamagetakenmultipliers:SetModifier(buff, 0.34)
-            elseif state == 1 then
-                target.components.combat.externaldamagetakenmultipliers:SetModifier(buff, 0.67)
-            end
+
+        if target.components.damagetyperesist == nil then --通过这个组件能使得防御效果能同时应用给普防和特防
+            target:AddComponent("damagetyperesist")
         end
+        --"inspectable"标签覆盖范围比"_health"标签广
+        if state >= 3 then
+            target.components.damagetyperesist:AddResist("inspectable", target, 0.01, "buff_treehalo")
+        elseif state >= 2 then
+            target.components.damagetyperesist:AddResist("inspectable", target, 0.34, "buff_treehalo")
+        elseif state >= 1 then
+            target.components.damagetyperesist:AddResist("inspectable", target, 0.67, "buff_treehalo")
+        end
+        -- if target.components.combat ~= nil then --externaldamagetakenmultipliers机制只能影响普防
+        --     if state == 3 then
+        --         target.components.combat.externaldamagetakenmultipliers:SetModifier(buff, 0.01)
+        --     elseif state == 2 then
+        --         target.components.combat.externaldamagetakenmultipliers:SetModifier(buff, 0.34)
+        --     elseif state == 1 then
+        --         target.components.combat.externaldamagetakenmultipliers:SetModifier(buff, 0.67)
+        --     end
+        -- end
     end
 end
 
@@ -954,8 +969,9 @@ MakeBuff({
             buff.task_ex:Cancel()
             buff.task_ex = nil
         end
-        if target:IsValid() and target.components.combat ~= nil then
-            target.components.combat.externaldamagetakenmultipliers:RemoveModifier(buff)
+        if target:IsValid() and target.components.damagetyperesist ~= nil then
+            -- target.components.combat.externaldamagetakenmultipliers:RemoveModifier(buff)
+            target.components.damagetyperesist:RemoveResist("inspectable", target, "buff_treehalo")
         end
     end,
     fn_common = function(buff)

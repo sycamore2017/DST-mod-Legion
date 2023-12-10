@@ -1782,6 +1782,27 @@ local function GiveLife(target, value)
     end
     return value
 end
+local function StealLife_flower(inst)
+    if IsValid(inst.target) then
+        local reducer = inst.target.siv_blood_l_reducer_v or 0
+        inst.countTry = inst.countTry + 1
+        if reducer < 1 then
+            reducer = 1 - reducer
+            inst.target.components.health:DoDelta(-4*reducer, true, "siving_boss_flower", false, inst, true)
+            inst.countHealth = inst.countHealth + 40*reducer
+        end
+
+        --宿主还没死，并且也没有达到吸血上限，就更新自己的动画
+        if
+            not inst.target.components.health:IsDead() and
+            inst.countTry < 12 and inst.countHealth < HEALTH_FLOWER
+        then
+            SetFlowerState(inst, inst.countHealth, true)
+            return
+        end
+    end
+    inst.fn_onUnbind(inst.target)
+end
 local function Fn_onBind_flower(inst, bird, target)
     inst.tree = bird.tree
     inst.bird = bird
@@ -1837,20 +1858,7 @@ local function Fn_onBind_flower(inst, bird, target)
         inst._task_re:Cancel()
         inst._task_re = nil
     end
-
-    inst.task_bind = inst:DoPeriodicTask(2, function(inst)
-        if IsValid(inst.target) then
-            inst.target.components.health:DoDelta(-4, true, "siving_boss_flower", false, inst, true)
-            inst.countHealth = inst.countHealth + 40
-
-            --宿主还没死，并且也没有达到吸血上限，就更新自己的动画
-            if not inst.target.components.health:IsDead() and inst.countHealth < HEALTH_FLOWER then
-                SetFlowerState(inst, inst.countHealth, true)
-                return
-            end
-        end
-        inst.fn_onUnbind(inst.target)
-    end, 2)
+    inst.task_bind = inst:DoPeriodicTask(2, StealLife_flower, 2)
 end
 local function OnAttacked_flower(inst, data)
     if not inst.components.health:IsDead() then
@@ -1943,9 +1951,14 @@ table.insert(prefs, Prefab( --特效
         inst.bird = nil
         inst.target = nil
         inst.countHealth = 0
+        inst.countTry = 0
         inst.state = 1
 
         inst.fn_onUnbind = function(target) --落地
+            if not inst:IsValid() then
+                return
+            end
+
             inst:RemoveEventCallback("death", inst.fn_onUnbind, target)
             inst:RemoveEventCallback("onremove", inst.fn_onUnbind, target)
             target.hassivflower = nil

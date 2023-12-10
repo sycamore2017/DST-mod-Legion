@@ -987,8 +987,8 @@ local function Fn_setImmortal(inst)
 end
 local function OnSave_immortal(inst, data)
     local refs = nil
-    if inst.OnSave_old_medal ~= nil then
-        refs = inst.OnSave_old_medal(inst, data)
+    if inst.OnSave_l_imtbox ~= nil then
+        refs = inst.OnSave_l_imtbox(inst, data)
     end
     if inst:HasTag("keepfresh") then
         data.immortal = true
@@ -996,8 +996,8 @@ local function OnSave_immortal(inst, data)
     return refs
 end
 local function OnLoad_immortal(inst, data)
-    if inst.OnLoad_old_medal ~= nil then
-        inst.OnLoad_old_medal(inst, data)
+    if inst.OnLoad_l_imtbox ~= nil then
+        inst.OnLoad_l_imtbox(inst, data)
     end
     if data ~= nil and data.immortal then
         if inst.setImmortal ~= nil then
@@ -1026,8 +1026,8 @@ local function SetImmortalBox_server(inst, sets) --服务器
         end
     end
     inst.setImmortal = Fn_setImmortal
-    inst.OnSave_old_medal = inst.OnSave
-    inst.OnLoad_old_medal = inst.OnLoad
+    inst.OnSave_l_imtbox = inst.OnSave
+    inst.OnLoad_l_imtbox = inst.OnLoad
     inst.OnSave = OnSave_immortal
     inst.OnLoad = OnLoad_immortal
 end

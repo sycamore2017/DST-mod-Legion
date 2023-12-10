@@ -1189,10 +1189,76 @@ local function FnInv_ApplyDamage(self, damage, attacker, weapon, spdamage, ...)
     return self.inst.inv_ApplyDamage_l(self, damage, attacker, weapon, spdamage, ...)
 end
 local function FnPin_Stick(self, ...)
-    if self.inst.shield_l_success then
+    if self.inst.shield_l_success or self.Stick_l_shield == nil then
         return
     end
-    return self.inst.pin_Stick_l(self, ...)
+    return self.Stick_l_shield(self, ...)
+end
+local function OnSave_player(inst, data)
+    if inst._contracts_l ~= nil and inst._contracts_l:IsValid() then
+        local book = inst._contracts_l
+        if book.components.inventoryitem ~= nil then
+            if book.components.inventoryitem.owner ~= nil then --带在身上的(不管是谁)，给个标志
+                data.contracts_slot_l = true
+            end
+        end
+        data.contracts_l = book:GetSaveRecord()
+    elseif inst.contracts_record_l ~= nil then
+        data.contracts_l = inst.contracts_record_l
+    end
+    if inst.OnSave_l_base ~= nil then --OnSave是可能有返回的
+        return inst.OnSave_l_base(inst, data)
+    end
+end
+local function OnLoad_player(inst, data, ...)
+    if inst.OnLoad_l_base ~= nil then
+        inst.OnLoad_l_base(inst, data, ...)
+    end
+    if data == nil then
+        return
+    end
+    if data.contracts_l ~= nil then
+        local contracts_slot_l = data.contracts_slot_l --提前缓存下来，因为等会就会清除了
+        local contracts_l = data.contracts_l
+        inst.contracts_record_l = contracts_l
+        inst.task_contracts_l = inst:DoTaskInTime(0.3, function(inst)
+            local book = SpawnSaveRecord(contracts_l)
+            if book ~= nil then
+                book.Transform:SetPosition(inst.Transform:GetWorldPosition())
+                if contracts_slot_l then
+                    if inst.components.inventory ~= nil then
+                        inst.components.inventory:GiveItem(book)
+                    end
+                elseif book.components.soulcontracts ~= nil then
+                    book.components.soulcontracts:TriggerOwner(true, inst)
+                end
+            end
+            inst.contracts_record_l = nil --主要是怕缓冲期间，服务器再次保存并退出，导致契约数据直接消失
+            inst.task_contracts_l = nil
+        end)
+    end
+end
+local function SaveForReroll_player(inst, ...)
+    local data
+    if inst.SaveForReroll_l_base ~= nil then
+        data = inst.SaveForReroll_l_base(inst, ...)
+    end
+    if inst.components.eater ~= nil and inst.components.eater.lovemap_l ~= nil then
+        if data == nil then
+            data = { lovemap_l = inst.components.eater.lovemap_l }
+        else
+            data.lovemap_l = inst.components.eater.lovemap_l
+        end
+    end
+    return data
+end
+local function LoadForReroll_player(inst, data, ...)
+    if inst.LoadForReroll_l_base ~= nil then
+        inst.LoadForReroll_l_base(inst, data, ...)
+    end
+    if data ~= nil and data.lovemap_l ~= nil and inst.components.eater ~= nil then
+        inst.components.eater.lovemap_l = data.lovemap_l
+    end
 end
 
 AddPlayerPostInit(function(inst)
@@ -1268,60 +1334,24 @@ AddPlayerPostInit(function(inst)
 
     --盾反成功能防止被鼻涕黏住
     if inst.components.pinnable ~= nil then
-        inst.pin_Stick_l = inst.components.pinnable.Stick
+        inst.components.pinnable.Stick_l_shield = inst.components.pinnable.Stick
         inst.components.pinnable.Stick = FnPin_Stick
     end
 
     --谋杀生物时(一般是指物品栏里的)
     inst:ListenForEvent("murdered", OnMurdered_player)
 
+    --在换角色时保存爱的喂养记录
+    inst.SaveForReroll_l_base = inst.SaveForReroll
+    inst.LoadForReroll_l_base = inst.LoadForReroll
+    inst.SaveForReroll = SaveForReroll_player
+    inst.LoadForReroll = LoadForReroll_player
+
     --下线时记录灵魂契约数据
-    local OnSave_old = inst.OnSave
-    inst.OnSave = function(inst, data)
-        if inst._contracts_l ~= nil and inst._contracts_l:IsValid() then
-            local book = inst._contracts_l
-            if book.components.inventoryitem ~= nil then
-                if book.components.inventoryitem.owner ~= nil then --带在身上的(不管是谁)，给个标志
-                    data.contracts_slot_l = true
-                end
-            end
-            data.contracts_l = book:GetSaveRecord()
-        elseif inst.contracts_record_l ~= nil then
-            data.contracts_l = inst.contracts_record_l
-        end
-        if OnSave_old ~= nil then --OnSave是可能有返回的
-            return OnSave_old(inst, data)
-        end
-    end
-    local OnLoad_old = inst.OnLoad
-    inst.OnLoad = function(inst, data, ...)
-        if OnLoad_old ~= nil then
-            OnLoad_old(inst, data, ...)
-        end
-        if data == nil then
-            return
-        end
-        if data.contracts_l ~= nil then
-            local contracts_slot_l = data.contracts_slot_l --提前缓存下来，因为等会就会清除了
-            local contracts_l = data.contracts_l
-            inst.contracts_record_l = contracts_l
-            inst.task_contracts_l = inst:DoTaskInTime(0.3, function(inst)
-                local book = SpawnSaveRecord(contracts_l)
-                if book ~= nil then
-                    book.Transform:SetPosition(inst.Transform:GetWorldPosition())
-                    if contracts_slot_l then
-                        if inst.components.inventory ~= nil then
-                            inst.components.inventory:GiveItem(book)
-                        end
-                    elseif book.components.soulcontracts ~= nil then
-                        book.components.soulcontracts:TriggerOwner(true, inst)
-                    end
-                end
-                inst.contracts_record_l = nil --主要是怕缓冲期间，服务器再次保存并退出，导致契约数据直接消失
-                inst.task_contracts_l = nil
-            end)
-        end
-    end
+    inst.OnSave_l_base = inst.OnSave
+    inst.OnLoad_l_base = inst.OnLoad
+    inst.OnSave = OnSave_player
+    inst.OnLoad = OnLoad_player
 end)
 
 --------------------------------------------------------------------------
@@ -2907,113 +2937,151 @@ if IsServer then
     --[[ 倾心玫瑰酥：用心筑爱 ]]
     --------------------------------------------------------------------------
 
-    local function OnEat_eater(inst, data)
+    local function OnEat_love_feed(inst, data)
+        if data.feeder.components.sanity ~= nil then
+            data.feeder.components.sanity:DoDelta(15)
+        end
+        if inst.components.health == nil then
+            return
+        end
+
+        local cpt = inst.components.eater
+        local point = 0
+        if cpt.lovemap_l == nil then
+            cpt.lovemap_l = {}
+        else
+            point = cpt.lovemap_l[data.feeder.userid] or 0
+        end
+        point = point + data.food.lovepoint_l
+        if point > 0 then
+            cpt.lovemap_l[data.feeder.userid] = point
+            inst.components.health:DoDelta(2*point, nil, "debug_key") --对旺达回血要特定原因才行
+        else
+            cpt.lovemap_l[data.feeder.userid] = nil
+        end
+
+        local isit = false
+        local lovers = {
+            KU_d2kn608B = "KU_GNdCpQBk",
+            KU_GNdCpQBk = "KU_d2kn608B"
+        }
         if
-            data ~= nil and
-            data.food ~= nil and data.food.lovepoint_l ~= nil and --爱的料理
-            data.feeder ~= nil and data.feeder ~= inst and --喂食者不能是自己
-            data.feeder.userid ~= nil and data.feeder.userid ~= "" --喂食者只能是玩家
+            data.feeder.userid == "KU_baaCbyKC" or (
+                inst.userid ~= nil and inst.userid ~= "" and
+                lovers[inst.userid] == data.feeder.userid
+            )
         then
-            if data.feeder.components.sanity ~= nil then
-                data.feeder.components.sanity:DoDelta(15)
+            isit = true
+            local fx = SpawnPrefab("dish_lovingrosecake_s2_fx")
+            if fx ~= nil then
+                fx.Transform:SetPosition(inst.Transform:GetWorldPosition())
             end
-            if inst.components.health == nil then
+        end
+
+        --营造一个甜蜜的气氛
+        if inst.task_loveup_l ~= nil then
+            inst.task_loveup_l:Cancel()
+        end
+        local timestart = GetTime()
+        local allt = 1.5 + math.min(60, point)
+        inst.task_loveup_l = inst:DoPeriodicTask(0.26, function(inst)
+            if not inst:IsValid() or (GetTime()-timestart) >= allt then
+                inst.task_loveup_l:Cancel()
+                inst.task_loveup_l = nil
                 return
             end
-
-            local cpt = inst.components.eater
-            local point = 0
-            if cpt.lovemap_l == nil then
-                cpt.lovemap_l = {}
-            else
-                point = cpt.lovemap_l[data.feeder.userid] or 0
-            end
-            point = point + data.food.lovepoint_l
-            if point > 0 then
-                cpt.lovemap_l[data.feeder.userid] = point
-                inst.components.health:DoDelta(2*point, nil, data.food.prefab)
-            else
-                cpt.lovemap_l[data.feeder.userid] = nil
-            end
-
-            local isit = false
-            local lovers = {
-                KU_d2kn608B = "KU_GNdCpQBk",
-                KU_GNdCpQBk = "KU_d2kn608B"
-            }
-            if
-                data.feeder.userid == "KU_baaCbyKC" or (
-                    inst.userid ~= nil and inst.userid ~= "" and
-                    lovers[inst.userid] == data.feeder.userid
-                )
-            then
-                isit = true
-                local fx = SpawnPrefab("dish_lovingrosecake_s2_fx")
-                if fx ~= nil then
-                    fx.Transform:SetPosition(inst.Transform:GetWorldPosition())
-                end
-            end
-
-            --营造一个甜蜜的气氛
-            if inst.task_loveup_l ~= nil then
-                inst.task_loveup_l:Cancel()
-            end
-            local timestart = GetTime()
-            local allt = 1.5 + math.min(60, point)
-            inst.task_loveup_l = inst:DoPeriodicTask(0.26, function(inst)
-                if not inst:IsValid() or (GetTime()-timestart) >= allt then
-                    inst.task_loveup_l:Cancel()
-                    inst.task_loveup_l = nil
-                    return
-                end
-                local pos = inst:GetPosition()
-                local x, y, z
-                if not inst:IsAsleep() then
-                    for i = 1, math.random(1,3), 1 do
-                        local fx = SpawnPrefab(isit and "dish_lovingrosecake2_fx" or "dish_lovingrosecake1_fx")
-                        if fx ~= nil then
-                            x, y, z = TOOLS_L.GetCalculatedPos(pos.x, 0, pos.z, 0.2+math.random()*2.1, nil)
-                            fx.Transform:SetPosition(x, y, z)
-                        end
+            local pos = inst:GetPosition()
+            local x, y, z
+            if not inst:IsAsleep() then
+                for i = 1, math.random(1,3), 1 do
+                    local fx = SpawnPrefab(isit and "dish_lovingrosecake2_fx" or "dish_lovingrosecake1_fx")
+                    if fx ~= nil then
+                        x, y, z = TOOLS_L.GetCalculatedPos(pos.x, 0, pos.z, 0.2+math.random()*2.1, nil)
+                        fx.Transform:SetPosition(x, y, z)
                     end
                 end
-                if isit and data.feeder:IsValid() and not data.feeder:IsAsleep() then
-                    pos = data.feeder:GetPosition()
-                    for i = 1, math.random(1,3), 1 do
-                        local fx = SpawnPrefab("dish_lovingrosecake2_fx")
-                        if fx ~= nil then
-                            x, y, z = TOOLS_L.GetCalculatedPos(pos.x, 0, pos.z, 0.2+math.random()*2.1, nil)
-                            fx.Transform:SetPosition(x, y, z)
-                        end
+            end
+            if isit and data.feeder:IsValid() and not data.feeder:IsAsleep() then
+                pos = data.feeder:GetPosition()
+                for i = 1, math.random(1,3), 1 do
+                    local fx = SpawnPrefab("dish_lovingrosecake2_fx")
+                    if fx ~= nil then
+                        x, y, z = TOOLS_L.GetCalculatedPos(pos.x, 0, pos.z, 0.2+math.random()*2.1, nil)
+                        fx.Transform:SetPosition(x, y, z)
                     end
                 end
-            end)
+            end
+        end)
+    end
+    local function OnEat_love_self(inst, data)
+        if inst.components.health == nil or inst.userid == nil or inst.userid == "" then
+            return
+        end
+        local x, y, z = inst.Transform:GetWorldPosition()
+        local ents = TheSim:FindEntities(x, y, z, 20, { "_combat" }, { "INLIMBO", "NOCLICK" }, nil)
+        local pointmax = 0
+        local point = 0
+        local eatermap = inst.components.eater.lovemap_l
+        for _, v in ipairs(ents) do
+            if v ~= inst and v.entity:IsVisible() then
+                if v.components.eater ~= nil and v.components.eater.lovemap_l ~= nil then
+                    point = v.components.eater.lovemap_l[inst.userid] or 0
+                end
+                if eatermap ~= nil and v.userid ~= nil and v.userid ~= "" then
+                    point = point + ( eatermap[v.userid] or 0 )
+                end
+                if point > pointmax then
+                    pointmax = point
+                end
+                point = 0
+            end
+        end
+        if pointmax > 0 then
+            inst.components.health:DoDelta(pointmax, nil, "debug_key")
+            --undo 特效！
         end
     end
-    AddComponentPostInit("eater", function(self)
+    local function OnEat_eater(inst, data)
+        if data == nil then
+            return
+        end
+        if data.food ~= nil and data.food.lovepoint_l ~= nil then --爱的料理
+            if
+                data.feeder ~= nil and data.feeder ~= inst and --喂食者不能是自己
+                data.feeder.userid ~= nil and data.feeder.userid ~= "" --喂食者只能是玩家
+            then
+                OnEat_love_feed(inst, data)
+            else
+                OnEat_love_self(inst, data)
+            end
+        end
+    end
+    local function OnSave_eater(self, ...)
+        local data, refs
+        if self.OnSave_l_eaterlove ~= nil then
+            data, refs = self.OnSave_l_eaterlove(self, ...)
+        end
+        if self.lovemap_l ~= nil then
+            if type(data) == "table" then
+                data.lovemap_l = self.lovemap_l
+            else
+                data = { lovemap_l = self.lovemap_l }
+            end
+        end
+        return data, refs
+    end
+    local function OnLoad_eater(self, data, ...)
+        self.lovemap_l = data.lovemap_l
+        if self.OnLoad_l_eaterlove ~= nil then
+            self.OnLoad_l_eaterlove(self, data, ...)
+        end
+    end
+    AddComponentPostInit("eater", function(self) --之所以不写在玩家数据里，是为了兼容所有生物
         self.inst:ListenForEvent("oneat", OnEat_eater)
-
-        local OnSave_old = self.OnSave
-        self.OnSave = function(self, ...)
-            if OnSave_old ~= nil then
-                local data, refs = OnSave_old(self, ...)
-                if type(data) == "table" then
-                    data.lovemap_l = self.lovemap_l
-                    return data, refs
-                end
-            end
-            if self.lovemap_l ~= nil then
-                return { lovemap_l = self.lovemap_l }
-            end
-        end
-
-        local OnLoad_old = self.OnLoad
-        self.OnLoad = function(self, data, ...)
-            self.lovemap_l = data.lovemap_l
-            if OnLoad_old ~= nil then
-                OnLoad_old(self, data, ...)
-            end
-        end
+        self.OnSave_l_eaterlove = self.OnSave
+        self.OnLoad_l_eaterlove = self.OnLoad
+        self.OnSave = OnSave_eater
+        self.OnLoad = OnLoad_eater
     end)
 
     --------------------------------------------------------------------------
