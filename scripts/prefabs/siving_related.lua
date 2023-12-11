@@ -1309,6 +1309,7 @@ local function FnBend_mask2(mask, doer, target, options)
         local cpt = target.components.perennialcrop
         if cpt.isrotten then
             if CalcuCost(mask, doer, 5) then
+                cpt:StopGrowing() --恢复前清除生长进度
                 cpt:SetStage(cpt.stage, cpt.ishuge, false)
             else
                 return false, "NOLIFE"
@@ -1320,6 +1321,7 @@ local function FnBend_mask2(mask, doer, target, options)
         local cpt = target.components.perennialcrop2
         if cpt.isrotten then
             if CalcuCost(mask, doer, 5) then
+                cpt:StopGrowing() --恢复前清除生长进度
                 cpt:SetStage(cpt.stage, false)
             else
                 return false, "NOLIFE"

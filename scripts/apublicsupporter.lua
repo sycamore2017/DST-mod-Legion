@@ -2937,13 +2937,84 @@ if IsServer then
     --[[ 倾心玫瑰酥：用心筑爱 ]]
     --------------------------------------------------------------------------
 
+    local function IsLover(inst, buddy)
+        local lovers = {
+            KU_d2kn608B = "KU_GNdCpQBk", KU_GNdCpQBk = "KU_d2kn608B",
+            KU_baaCbyKC = 1
+        }
+        if inst.userid ~= nil and inst.userid ~= "" and lovers[inst.userid] ~= nil then
+            if lovers[inst.userid] == 1 or lovers[inst.userid] == buddy.userid then
+                return true
+            end
+        elseif buddy.userid ~= nil and buddy.userid ~= "" and lovers[buddy.userid] ~= nil then
+            if lovers[buddy.userid] == 1 or lovers[buddy.userid] == inst.userid then
+                return true
+            end
+        end
+        return false
+    end
+    local function GetLovePoint(v, userid, eatermap, pointmax, buddy)
+        local point = 0
+        if v.components.eater ~= nil and v.components.eater.lovemap_l ~= nil then
+            point = v.components.eater.lovemap_l[userid] or 0
+        end
+        if eatermap ~= nil and v.userid ~= nil and v.userid ~= "" then
+            point = point + ( eatermap[v.userid] or 0 )
+        end
+        if point > pointmax then
+            return point, v
+        end
+        return pointmax, buddy
+    end
+    local function SetFx_love(inst, buddy, alltime, isit) --营造一个甜蜜的气氛
+        if inst.task_loveup_l ~= nil then
+            inst.task_loveup_l:Cancel()
+        end
+        local timestart = GetTime()
+        inst.task_loveup_l = inst:DoPeriodicTask(0.26, function(inst)
+            if not inst:IsValid() then
+                if inst.task_loveup_l ~= nil then
+                    inst.task_loveup_l:Cancel()
+                    inst.task_loveup_l = nil
+                end
+                return
+            end
+            local pos = inst:GetPosition()
+            local x, y, z
+            if not inst:IsAsleep() and not inst:IsInLimbo() then
+                for i = 1, math.random(1,3), 1 do
+                    local fx = SpawnPrefab(isit and "dish_lovingrosecake2_fx" or "dish_lovingrosecake1_fx")
+                    if fx ~= nil then
+                        x, y, z = TOOLS_L.GetCalculatedPos(pos.x, 0, pos.z, 0.2+math.random()*2.1, nil)
+                        fx.Transform:SetPosition(x, y, z)
+                    end
+                end
+            end
+            if isit and buddy:IsValid() and not buddy:IsAsleep() and not buddy:IsInLimbo() then
+                pos = buddy:GetPosition()
+                for i = 1, math.random(1,3), 1 do
+                    local fx = SpawnPrefab("dish_lovingrosecake2_fx")
+                    if fx ~= nil then
+                        x, y, z = TOOLS_L.GetCalculatedPos(pos.x, 0, pos.z, 0.2+math.random()*2.1, nil)
+                        fx.Transform:SetPosition(x, y, z)
+                    end
+                end
+            end
+            if (GetTime()-timestart) >= alltime then
+                if inst.task_loveup_l ~= nil then
+                    inst.task_loveup_l:Cancel()
+                    inst.task_loveup_l = nil
+                end
+            end
+        end)
+    end
     local function OnEat_love_feed(inst, data)
         if data.feeder.components.sanity ~= nil then
             data.feeder.components.sanity:DoDelta(15)
         end
-        if inst.components.health == nil then
-            return
-        end
+        -- if inst.components.health == nil then
+        --     return
+        -- end
 
         local cpt = inst.components.eater
         local point = 0
@@ -2955,90 +3026,80 @@ if IsServer then
         point = point + data.food.lovepoint_l
         if point > 0 then
             cpt.lovemap_l[data.feeder.userid] = point
-            inst.components.health:DoDelta(2*point, nil, "debug_key") --对旺达回血要特定原因才行
+            if inst.components.health ~= nil then
+                inst.components.health:DoDelta(2*point, nil, "debug_key") --对旺达回血要特定原因才行
+            end
+            -- print("喂着吃："..tostring(point))
         else
             cpt.lovemap_l[data.feeder.userid] = nil
         end
 
-        local isit = false
-        local lovers = {
-            KU_d2kn608B = "KU_GNdCpQBk",
-            KU_GNdCpQBk = "KU_d2kn608B"
-        }
-        if
-            data.feeder.userid == "KU_baaCbyKC" or (
-                inst.userid ~= nil and inst.userid ~= "" and
-                lovers[inst.userid] == data.feeder.userid
-            )
-        then
-            isit = true
+        local isit = IsLover(inst, data.feeder)
+        if isit then
             local fx = SpawnPrefab("dish_lovingrosecake_s2_fx")
             if fx ~= nil then
                 fx.Transform:SetPosition(inst.Transform:GetWorldPosition())
             end
         end
-
-        --营造一个甜蜜的气氛
-        if inst.task_loveup_l ~= nil then
-            inst.task_loveup_l:Cancel()
-        end
-        local timestart = GetTime()
-        local allt = 1.5 + math.min(60, point)
-        inst.task_loveup_l = inst:DoPeriodicTask(0.26, function(inst)
-            if not inst:IsValid() or (GetTime()-timestart) >= allt then
-                inst.task_loveup_l:Cancel()
-                inst.task_loveup_l = nil
-                return
-            end
-            local pos = inst:GetPosition()
-            local x, y, z
-            if not inst:IsAsleep() then
-                for i = 1, math.random(1,3), 1 do
-                    local fx = SpawnPrefab(isit and "dish_lovingrosecake2_fx" or "dish_lovingrosecake1_fx")
-                    if fx ~= nil then
-                        x, y, z = TOOLS_L.GetCalculatedPos(pos.x, 0, pos.z, 0.2+math.random()*2.1, nil)
-                        fx.Transform:SetPosition(x, y, z)
-                    end
-                end
-            end
-            if isit and data.feeder:IsValid() and not data.feeder:IsAsleep() then
-                pos = data.feeder:GetPosition()
-                for i = 1, math.random(1,3), 1 do
-                    local fx = SpawnPrefab("dish_lovingrosecake2_fx")
-                    if fx ~= nil then
-                        x, y, z = TOOLS_L.GetCalculatedPos(pos.x, 0, pos.z, 0.2+math.random()*2.1, nil)
-                        fx.Transform:SetPosition(x, y, z)
-                    end
-                end
-            end
-        end)
+        SetFx_love(inst, data.feeder, 1.5+math.min(120, point), isit)
     end
     local function OnEat_love_self(inst, data)
         if inst.components.health == nil or inst.userid == nil or inst.userid == "" then
             return
         end
         local x, y, z = inst.Transform:GetWorldPosition()
-        local ents = TheSim:FindEntities(x, y, z, 20, { "_combat" }, { "INLIMBO", "NOCLICK" }, nil)
         local pointmax = 0
-        local point = 0
+        local buddy
         local eatermap = inst.components.eater.lovemap_l
+        local mount
+
+        --周围
+        local ents = TheSim:FindEntities(x, y, z, 20, nil, { "INLIMBO", "NOCLICK" }, nil)
         for _, v in ipairs(ents) do
             if v ~= inst and v.entity:IsVisible() then
-                if v.components.eater ~= nil and v.components.eater.lovemap_l ~= nil then
-                    point = v.components.eater.lovemap_l[inst.userid] or 0
+                pointmax, buddy = GetLovePoint(v, inst.userid, eatermap, pointmax, buddy)
+                mount = v.components.rider ~= nil and v.components.rider:GetMount() or nil
+                if mount ~= nil then
+                    pointmax, buddy = GetLovePoint(mount, inst.userid, eatermap, pointmax, buddy)
+                    mount = nil
                 end
-                if eatermap ~= nil and v.userid ~= nil and v.userid ~= "" then
-                    point = point + ( eatermap[v.userid] or 0 )
-                end
-                if point > pointmax then
-                    pointmax = point
-                end
-                point = 0
             end
         end
+        --携带
+        if inst.components.inventory ~= nil then
+            local inv = inst.components.inventory
+            for _, v in pairs(inv.itemslots) do
+                if v then
+                    pointmax, buddy = GetLovePoint(v, inst.userid, eatermap, pointmax, buddy)
+                end
+            end
+            for _, v in pairs(inv.equipslots) do
+                if v then
+                    pointmax, buddy = GetLovePoint(v, inst.userid, eatermap, pointmax, buddy)
+                end
+            end
+            if inv.activeitem then
+                pointmax, buddy = GetLovePoint(inv.activeitem, inst.userid, eatermap, pointmax, buddy)
+            end
+            local overflow = inv:GetOverflowContainer()
+            if overflow ~= nil then
+                for _, v in pairs(overflow.slots) do
+                    if v then
+                        pointmax, buddy = GetLovePoint(v, inst.userid, eatermap, pointmax, buddy)
+                    end
+                end
+            end
+        end
+        --坐骑
+        mount = inst.components.rider ~= nil and inst.components.rider:GetMount() or nil
+        if mount ~= nil then
+            pointmax, buddy = GetLovePoint(mount, inst.userid, eatermap, pointmax, buddy)
+        end
+
         if pointmax > 0 then
+            -- print("自己吃："..tostring(pointmax))
             inst.components.health:DoDelta(pointmax, nil, "debug_key")
-            --undo 特效！
+            SetFx_love(inst, buddy, 0.75+math.min(60, pointmax/2), IsLover(inst, buddy))
         end
     end
     local function OnEat_eater(inst, data)

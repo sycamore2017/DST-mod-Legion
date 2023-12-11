@@ -1001,7 +1001,7 @@ local function TriggerLifeExtractTask(inst, doit)
 end
 
 local function OnRestoreSoul(victim)
-    victim.nosoultask = nil
+    victim.nosoultask_siv = nil
 end
 local function IsValidVictim(victim)
     return wortox_soul_common.HasSoul(victim) and (victim.components.health == nil or victim.components.health:IsDead())
@@ -1046,7 +1046,7 @@ local function OnEntityDropLoot(inst, data)
     local victim = data.inst
     if
         victim ~= nil and
-        victim.nosoultask == nil and
+        victim.nosoultask_siv == nil and
         victim:IsValid() and
         (
             victim == inst or
@@ -1057,7 +1057,7 @@ local function OnEntityDropLoot(inst, data)
         )
     then
         --V2C: prevents multiple Wortoxes in range from spawning multiple souls per corpse
-        victim.nosoultask = victim:DoTaskInTime(5, OnRestoreSoul)
+        victim.nosoultask_siv = victim:DoTaskInTime(5, OnRestoreSoul)
 
         local health = victim.components.health ~= nil and victim.components.health.maxhealth or 100
         LetLifeWalkToTree(inst, victim, health)
@@ -1072,13 +1072,13 @@ local function OnStarvedTrapSouls(inst, data)
     local trap = data.trap
     if
         trap ~= nil and
-        trap.nosoultask == nil and
+        trap.nosoultask_siv == nil and
         (data.numsouls or 0) > 0 and
         trap:IsValid() and
         inst:IsNear(trap, DIST_HEALTH)
     then
         --V2C: prevents multiple Wortoxes in range from spawning multiple souls per trap
-        trap.nosoultask = trap:DoTaskInTime(5, OnRestoreSoul)
+        trap.nosoultask_siv = trap:DoTaskInTime(5, OnRestoreSoul)
         LetLifeWalkToTree(inst, trap, data.numsouls*50)
     end
 end

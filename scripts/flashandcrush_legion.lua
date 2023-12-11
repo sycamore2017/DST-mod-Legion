@@ -65,7 +65,7 @@ local IsServer = TheNet:GetIsServer() or TheNet:IsDedicated()
 local TOOLS_L = require("tools_legion")
 
 --监听函数修改工具，超强der大佬写滴！
-local upvaluehelper = require "hua_upvaluehelper"
+-- local upvaluehelper = require "hua_upvaluehelper"
 
 _G.RegistMiniMapImage_legion("elecourmaline")
 _G.RegistMiniMapImage_legion("soul_contracts")
@@ -756,6 +756,20 @@ end)
 ]]--
 
 if IsServer then
+    local wortox_soul_c = require("prefabs/wortox_soul_common")
+    local GiveSouls_old = wortox_soul_c.GiveSouls
+    wortox_soul_c.GiveSouls = function(inst, num, pos, ...)
+        if inst._contracts_l ~= nil then --受契约的保护
+            if wortox_soul_c.SpawnSoulsAt ~= nil then --让灵魂直接掉地上，重新进行一遍逻辑，这样就不用多写什么了
+                wortox_soul_c.SpawnSoulsAt(inst, num)
+                return
+            end
+        end
+        if GiveSouls_old ~= nil then
+            GiveSouls_old(inst, num, pos, ...)
+        end
+    end
+
     local function GetSouls(inst)
         local souls = inst.components.inventory:FindItems(function(item)
             return item.prefab == "wortox_soul"
@@ -781,9 +795,96 @@ if IsServer then
         end
     end
 
-    local seeksoulstealer_f = false
+    local function OnHit_soul(inst, attacker, target)
+        inst:Remove()
+    end
+    local function OnPreHit_soul(inst, attacker, target)
+        if target ~= nil then
+            local owner = nil
+            local book = nil
+            if target:HasTag("soulcontracts") then
+                book = target
+                if book._contractsowner ~= nil and book._contractsowner:IsValid() then
+                    owner = book._contractsowner
+                end
+            elseif target.components.inventory ~= nil then
+                owner = target
+                if owner._contracts_l ~= nil and owner._contracts_l:IsValid() then
+                    book = owner._contracts_l
+                end
+            end
+            if book ~= nil and book.components.finiteuses ~= nil then
+                if book.components.finiteuses:GetPercent() < 1 then
+                    book.components.finiteuses:Repair(1)
+                    SetSoulFx(book, book)
+                elseif
+                    owner ~= nil and owner.components.inventory ~= nil and
+                    owner.components.inventory.isopen --这里应该可以规避死亡状态的玩家，所以就不多判断了
+                then
+                    local souls, count = GetSouls(owner)
+                    if count >= TUNING.WORTOX_MAX_SOULS then --灵魂达到上限，自动释放
+                        if book._SoulHealing ~= nil  then
+                            book._SoulHealing(owner)
+                        end
+                    else
+                        owner.components.inventory:GiveItem(SpawnPrefab("wortox_soul"), nil, owner:GetPosition())
+                    end
+                    SetSoulFx(book, owner)
+                elseif book._SoulHealing ~= nil then
+                    book._SoulHealing(book)
+                    SetSoulFx(book, book)
+                end
+                -- inst:Remove()
+                inst.components.projectile.onhit = OnHit_soul --这里就是契约逻辑主导了，不能再执行原本的
+                return
+            end
+        end
+        if inst.onprehit_l_contract ~= nil then
+            inst.onprehit_l_contract(inst, attacker, target)
+        end
+    end
+    local function SeekSoulContracts(inst)
+        local toer = FindEntity(inst, TUNING.WORTOX_SOULSTEALER_RANGE+4, function(one, inst)
+            if one.components.finiteuses ~= nil then
+                if one.components.finiteuses:GetPercent() >= 1 then
+                    if --契约耐久满了，应该把灵魂给主人，不然也装不下
+                        one._contractsowner ~= nil and one._contractsowner:IsValid() and
+                        ValidSoulTarget(one._contractsowner)
+                    then
+                        return true
+                    end
+                else
+                    return true
+                end
+            elseif one._contracts_l ~= nil and ValidSoulTarget(one) then
+                return true
+            end
+        end, nil, { "INLIMBO", "NOCLICK", "playerghost" }, { "soulcontracts", "player" })
+        if toer ~= nil then
+            if toer.components.finiteuses ~= nil and toer.components.finiteuses:GetPercent() >= 1 then
+                if toer._contractsowner ~= nil then
+                    toer = toer._contractsowner --如果耐久满了，则寻找其主人
+                end
+            end
+            if inst._seektask ~= nil then --停止原有的逻辑
+                inst._seektask:Cancel()
+                inst._seektask = nil
+            end
+            if inst._seektask_l ~= nil then
+                inst._seektask_l:Cancel()
+                inst._seektask_l = nil
+            end
+            inst.components.projectile:Throw(inst, toer, inst)
+        end
+    end
+
+    -- local seeksoulstealer_f = false
     AddPrefabPostInit("wortox_soul_spawn", function(inst)
         --灵魂优先寻找契约，或者契约的主人
+        --为了兼容勋章，另外执行一个函数，比原有逻辑快一步触发就行
+        inst._seektask_l = inst:DoPeriodicTask(0.5, SeekSoulContracts, 0.5)
+
+        --[[
         if not seeksoulstealer_f then
             seeksoulstealer_f = true
             local SeekSoulStealer_old = upvaluehelper.Get(_G.Prefabs["wortox_soul_spawn"].fn, "SeekSoulStealer")
@@ -819,53 +920,12 @@ if IsServer then
                 upvaluehelper.Set(_G.Prefabs["wortox_soul_spawn"].fn, "SeekSoulStealer", SeekSoulStealer_new)
             end
         end
+        ]]--
 
         --优化灵魂进入契约或者玩家时的逻辑
-        local OnHit_old = inst.components.projectile.onhit
-        inst.components.projectile:SetOnHitFn(function(inst, attacker, target)
-            if target ~= nil then
-                local owner = nil
-                local book = nil
-                if target:HasTag("soulcontracts") then
-                    book = target
-                    if book._contractsowner ~= nil and book._contractsowner:IsValid() then
-                        owner = book._contractsowner
-                    end
-                elseif target.components.inventory ~= nil then
-                    owner = target
-                    if owner._contracts_l ~= nil and owner._contracts_l:IsValid() then
-                        book = owner._contracts_l
-                    end
-                end
-                if book ~= nil and book.components.finiteuses ~= nil then
-                    if book.components.finiteuses:GetPercent() < 1 then
-                        book.components.finiteuses:Repair(1)
-                        SetSoulFx(book, book)
-                    elseif
-                        owner ~= nil and owner.components.inventory ~= nil and
-                        owner.components.inventory.isopen --这里应该可以规避死亡状态的玩家，所以就不多判断了
-                    then
-                        local souls, count = GetSouls(owner)
-                        if count >= TUNING.WORTOX_MAX_SOULS then --灵魂达到上限，自动释放
-                            if book._SoulHealing ~= nil  then
-                                book._SoulHealing(owner)
-                            end
-                        else
-                            owner.components.inventory:GiveItem(SpawnPrefab("wortox_soul"), nil, owner:GetPosition())
-                        end
-                        SetSoulFx(book, owner)
-                    elseif book._SoulHealing ~= nil then
-                        book._SoulHealing(book)
-                        SetSoulFx(book, book)
-                    end
-                    inst:Remove()
-                    return
-                end
-            end
-            if OnHit_old ~= nil then
-                OnHit_old(inst, attacker, target)
-            end
-        end)
+        --为了兼容勋章，我改的 onprehit 而不是 onhit
+        inst.onprehit_l_contract = inst.components.projectile.onprehit
+        inst.components.projectile:SetOnPreHitFn(OnPreHit_soul)
     end)
 end
 

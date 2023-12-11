@@ -1071,7 +1071,7 @@ function PerennialCrop:Pollinate(doer, value) --授粉
 	self.pollinated = self.pollinated + (value or 1)
 end
 
-function PerennialCrop:Infest(doer, value) --侵害
+function PerennialCrop:Infest(doer, value) --侵扰
 	if self.isrotten then
 		return false
 	end
@@ -1079,7 +1079,8 @@ function PerennialCrop:Infest(doer, value) --侵害
 	self.infested = self.infested + (value or 1)
 	if self.infested >= self.infested_max then
 		self.infested = 0
-		self:SetStage(self.stage, self.ishuge, true)
+		self:StopGrowing() --先清除生长进度
+		self:SetStage(self.stage, self.ishuge, true) --再设置枯萎
 	end
 
 	return true

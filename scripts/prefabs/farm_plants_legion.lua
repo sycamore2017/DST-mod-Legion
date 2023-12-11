@@ -1056,6 +1056,7 @@ local function DoSwallow(inst)
 				elseif v.components.container ~= nil then
 					v.components.container:DropEverything()
 				end
+				v:PushEvent("detachchild") --让spawner组件知道自己的child消失了，好继续刷新下一只
 				v:Remove()
 				if count >= inst.num_swallow then
 					break

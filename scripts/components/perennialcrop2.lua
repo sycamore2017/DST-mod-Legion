@@ -393,6 +393,9 @@ function PerennialCrop2:SetPauseReason(key, value) --更新暂停生长原因
 	end
 end
 function PerennialCrop2:GetGrowTime() --获取当前阶段的总生长时间
+	if self.isrotten then
+		return 3*TUNING.TOTAL_DAY_TIME
+	end
 	if self.level ~= nil and self.level.time ~= nil then
 		return self.level.time
 	end
@@ -1284,7 +1287,7 @@ function PerennialCrop2:Pollinate(doer, value) --授粉
 	self.pollinated = self.pollinated + (value or 1)
 end
 
-function PerennialCrop2:Infest(doer, value) --侵害
+function PerennialCrop2:Infest(doer, value) --侵扰
 	if self.isrotten then
 		return false
 	end
@@ -1292,7 +1295,8 @@ function PerennialCrop2:Infest(doer, value) --侵害
 	self.infested = self.infested + (value or 1)
 	if self.infested >= self.infested_max then
 		self.infested = 0
-		self:SetStage(self.stage, true)
+		self:StopGrowing() --先清除生长进度
+		self:SetStage(self.stage, true) --再设置枯萎
 	end
 
 	return true
