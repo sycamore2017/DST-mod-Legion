@@ -760,10 +760,8 @@ if IsServer then
     local GiveSouls_old = wortox_soul_c.GiveSouls
     wortox_soul_c.GiveSouls = function(inst, num, pos, ...)
         if inst._contracts_l ~= nil then --受契约的保护
-            if wortox_soul_c.SpawnSoulsAt ~= nil then --让灵魂直接掉地上，重新进行一遍逻辑，这样就不用多写什么了
-                wortox_soul_c.SpawnSoulsAt(inst, num)
-                return
-            end
+            wortox_soul_c.SpawnSoulsAt(inst, num) --让灵魂直接掉地上，重新进行一遍逻辑，这样就不用多写什么了
+            return
         end
         if GiveSouls_old ~= nil then
             GiveSouls_old(inst, num, pos, ...)
@@ -844,6 +842,13 @@ if IsServer then
         end
     end
     local function SeekSoulContracts(inst)
+        if inst.components.projectile:IsThrown() then --有target了，就不执行逻辑了，防止和别的逻辑冲突
+            if inst._seektask_l ~= nil then
+                inst._seektask_l:Cancel()
+                inst._seektask_l = nil
+            end
+            return
+        end
         local toer = FindEntity(inst, TUNING.WORTOX_SOULSTEALER_RANGE+4, function(one, inst)
             if one.components.finiteuses ~= nil then
                 if one.components.finiteuses:GetPercent() >= 1 then

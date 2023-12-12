@@ -7,28 +7,42 @@ local function onstaying(self)
         self.inst:RemoveTag("bookstaying")
     end
 end
-local function OnRestoreSoul(inst)
-    inst.nosoultask_l = nil
-end
-local function OnTargetDeath(inst, data)
-    if
-        inst.nosoultask == nil and --沃托克斯的灵魂机制应该比 death 事件还要早执行
-        inst.nosoultask_l == nil and --契约的机制
-        inst:IsValid() and
-        not inst:IsInLimbo() and not inst:IsAsleep() and --在奇怪状态就算了，产生了灵魂也接收不到
-        wortox_soul_common.HasSoul(inst)
-    then
-        inst.nosoultask_l = inst:DoTaskInTime(5, OnRestoreSoul)
-
-        local numsoul = (wortox_soul_common.GetNumSouls(inst)) / 2
+local function SpawnSoulsAt(doer, numsoul, ishalf)
+    if ishalf then
+        numsoul = numsoul/2
         local soulchance = numsoul - math.floor(numsoul)
         numsoul = math.floor(numsoul)
         if soulchance > 0 and math.random() < soulchance then
             numsoul = numsoul + 1
         end
-        if numsoul > 0 then
-            wortox_soul_common.SpawnSoulsAt(inst, numsoul)
-        end
+    end
+    if numsoul > 0 then
+        wortox_soul_common.SpawnSoulsAt(doer, numsoul)
+    end
+end
+local function OnRestoreSoul(inst)
+    inst.nosoultask = nil
+end
+local function OnTargetDeath(inst, data) --掉落50%的灵魂
+    if
+        inst.nosoultask == nil and --沃托克斯的灵魂机制应该比 death 事件还要早执行
+        inst:IsValid() and
+        not inst:IsInLimbo() and not inst:IsAsleep() and --在奇怪状态就算了，产生了灵魂也接收不到
+        wortox_soul_common.HasSoul(inst)
+    then
+        inst.nosoultask = inst:DoTaskInTime(5, OnRestoreSoul)
+        SpawnSoulsAt(inst, wortox_soul_common.GetNumSouls(inst), true)
+    end
+end
+local function OnTargetDeath2(inst, data) --掉落100%的灵魂
+    if
+        inst.nosoultask == nil and --沃托克斯的灵魂机制应该比 death 事件还要早执行
+        inst:IsValid() and
+        not inst:IsInLimbo() and not inst:IsAsleep() and --在奇怪状态就算了，产生了灵魂也接收不到
+        wortox_soul_common.HasSoul(inst)
+    then
+        inst.nosoultask = inst:DoTaskInTime(5, OnRestoreSoul)
+        SpawnSoulsAt(inst, wortox_soul_common.GetNumSouls(inst), false)
     end
 end
 
@@ -43,19 +57,43 @@ local SoulContracts = Class(function(self, inst)
         self.inst:Remove()
     end
     self._OnOwnerHitOther = function(owner, data) --主人攻击时，让敌人死后能产生灵魂
-        if self.inst._lvl_l:value() ~= nil and self.inst._lvl_l:value() >= 20 then
-            if
-                data and data.target and not data.target.mark_contract_l and
-                data.target:IsValid() and
-                data.target.components.health ~= nil
-            then
-                data.target.mark_contract_l = true
+        if self.inst._lvl_l:value() == nil or self.inst._lvl_l:value() < 35 then
+            return
+        end
+        if
+            data and data.target and not data.target.mark_contract_l and
+            data.target:IsValid() and
+            data.target.components.health ~= nil
+        then
+            data.target.mark_contract_l = true
+            if self.inst._lvl_l:value() >= 85 then
                 if data.target.components.health:IsDead() then --攻击时就已经死了，就不需要监听了
+                    OnTargetDeath2(data.target)
+                else
+                    data.target:ListenForEvent("death", OnTargetDeath2)
+                end
+            else
+                if data.target.components.health:IsDead() then
                     OnTargetDeath(data.target)
                 else
                     data.target:ListenForEvent("death", OnTargetDeath)
                 end
             end
+        end
+    end
+    self._OnOwnerMurdered = function(owner, data) --主人“谋杀”物品栏里的生物，能得到灵魂
+        if owner:HasTag("soulstealer") or self.inst._lvl_l:value() == nil or self.inst._lvl_l:value() < 35 then
+            return
+        end
+        if
+            data and data.victim and
+            data.victim.nosoultask == nil and
+            data.victim:IsValid() and
+            wortox_soul_common.HasSoul(data.victim)
+        then
+            data.victim.nosoultask = data.victim:DoTaskInTime(5, OnRestoreSoul)
+            SpawnSoulsAt(owner, wortox_soul_common.GetNumSouls(data.victim)*(data.stackmult or 1),
+                            self.inst._lvl_l:value() < 85)
         end
     end
 
@@ -120,6 +158,7 @@ local function UnlinkOwner(self, doer)
     self.inst:RemoveEventCallback("ms_playerreroll", self._OnOwnerReroll, doer)
     self.inst:RemoveEventCallback("onremove", self._OnOwnerRemoved, doer)
     self.inst:RemoveEventCallback("onhitother", self._OnOwnerHitOther, doer)
+    self.inst:RemoveEventCallback("murdered", self._OnOwnerMurdered, doer)
 end
 function SoulContracts:TriggerOwner(dolink, doer)
     if doer == nil or not doer:HasTag("player") then
@@ -157,7 +196,10 @@ function SoulContracts:TriggerOwner(dolink, doer)
         self.inst.persists = false
         self.inst:ListenForEvent("ms_playerreroll", self._OnOwnerReroll, doer)
         self.inst:ListenForEvent("onremove", self._OnOwnerRemoved, doer)
-        self.inst:ListenForEvent("onhitother", self._OnOwnerHitOther, doer)
+        self.inst:ListenForEvent("onhitother", self._OnOwnerHitOther, doer) --攻击
+        self.inst:ListenForEvent("murdered", self._OnOwnerMurdered, doer) --谋杀
+        -- self.inst:ListenForEvent("harvesttrapsouls", self._OnOwnerHarvestTrapSouls, doer) --契约只管主动性的灵魂获取
+        -- self.inst:ListenForEvent("starvedtrapsouls", self._onstarvedtrapsoulsfn, TheWorld) --契约只管主动性的灵魂获取
         if doer.components.leader ~= nil then
             doer.components.leader:RemoveFollowersByTag("soulcontracts") --清除其他所有契约的跟随
             doer.components.leader:AddFollower(self.inst)

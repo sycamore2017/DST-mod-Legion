@@ -1,4 +1,6 @@
 
+local fns
+
 --[ 各种常用标签 ]--
 local function CombineTags(tags1, tags2)
     if tags2 ~= nil then
@@ -101,10 +103,10 @@ local function IsEnemy_me(inst, ent) --是否为 inst 的当前敌人
     if ent.components.combat.target == inst then --仇视自己的对象，肯定是敌人
         return true
     end
-    if IsMyFollower(inst, ent) then --ent 跟随着我，就不要攻击了，防止后面逻辑引起跟随者内战
+    if fns.IsMyFollower(inst, ent) then --ent 跟随着我，就不要攻击了，防止后面逻辑引起跟随者内战
         return false
     end
-    if IsMyFollower(inst, ent.components.combat.target) then --ent 想攻击我的跟随者，打它！
+    if fns.IsMyFollower(inst, ent.components.combat.target) then --ent 想攻击我的跟随者，打它！
         return true
     end
     return false
@@ -116,10 +118,10 @@ local function IsEnemy_player(inst, ent) --是否为 全体玩家 的当前敌�
     if ent.components.combat.target:HasTag("player") then --仇视玩家的对象，肯定是敌人
         return true
     end
-    if IsPlayerFollower(ent) then --ent 跟随着玩家，就不要攻击了，防止后面逻辑引起跟随者内战
+    if fns.IsPlayerFollower(ent) then --ent 跟随着玩家，就不要攻击了，防止后面逻辑引起跟随者内战
         return false
     end
-    if IsPlayerFollower(ent.components.combat.target) then --ent 想攻击玩家的跟随者，打它！
+    if fns.IsPlayerFollower(ent.components.combat.target) then --ent 想攻击玩家的跟随者，打它！
         return true
     end
     return false
@@ -143,7 +145,7 @@ local function MaybeEnemy_me(inst, ent, playerside) --是否为 inst 的潜在�
         return true
     end
     if ent.components.combat.target == nil then
-        if IsMyFollower(inst, ent) then --ent 跟随着我，就不攻击
+        if fns.IsMyFollower(inst, ent) then --ent 跟随着我，就不攻击
             return false
         end
         --玩家立场时，不攻击驯化的对象(毕竟对于非玩家inst来说，驯化与否关系不大，只有玩家才关心这个)
@@ -154,11 +156,11 @@ local function MaybeEnemy_me(inst, ent, playerside) --是否为 inst 的潜在�
         if ent.components.combat.target == inst then --仇视自己的对象，肯定是敌人
             return true
         end
-        if IsMyFollower(inst, ent) then --ent 跟随着我，就不攻击
+        if fns.IsMyFollower(inst, ent) then --ent 跟随着我，就不攻击
             return false
         end
         if playerside and ent.components.domesticatable ~= nil and ent.components.domesticatable:IsDomesticated() then
-            return IsMyFollower(inst, ent.components.combat.target) --ent 想攻击我的跟随者，打它！
+            return fns.IsMyFollower(inst, ent.components.combat.target) --ent 想攻击我的跟随者，打它！
         end
     end
     return true
@@ -168,7 +170,7 @@ local function MaybeEnemy_player(inst, ent, playerside) --是否为 全体玩家
         return false
     end
     if ent.components.combat.target == nil then
-        if IsPlayerFollower(ent) then --ent 跟随着玩家，就不攻击
+        if fns.IsPlayerFollower(ent) then --ent 跟随着玩家，就不攻击
             return false
         end
         --不攻击驯化的对象
@@ -179,11 +181,11 @@ local function MaybeEnemy_player(inst, ent, playerside) --是否为 全体玩家
         if ent.components.combat.target:HasTag("player") then --仇视玩家的对象，肯定是敌人
             return true
         end
-        if IsPlayerFollower(ent) then --ent 跟随着玩家，就不攻击
+        if fns.IsPlayerFollower(ent) then --ent 跟随着玩家，就不攻击
             return false
         end
         if ent.components.domesticatable ~= nil and ent.components.domesticatable:IsDomesticated() then
-            return IsPlayerFollower(ent.components.combat.target) --ent 想攻击玩家的跟随者，打它！
+            return fns.IsPlayerFollower(ent.components.combat.target) --ent 想攻击玩家的跟随者，打它！
         end
     end
     return true
@@ -347,7 +349,7 @@ local function DoAreaSleep(data)
     local countsleeper = 0
     local ents = TheSim:FindEntities(data.x, data.y, data.z, data.range, nil, data.tagscant, data.tagsone)
     for _, v in ipairs(ents) do
-        if DoSingleSleep(v, data) then
+        if fns.DoSingleSleep(v, data) then
             countsleeper = countsleeper + 1
         end
     end
@@ -457,10 +459,13 @@ local function FallingItem(itemname, x, y, z, hitrange, hitdamage, fallingtime, 
                                 return true
                             end
                             return false
-                        end, { "_combat", "_health" }, TagsCombat1(), nil)
+                        end, { "_combat", "_health" }, fns.TagsCombat1(), nil)
                         if someone ~= nil then
                             someone.components.combat:GetAttacked(inst, hitdamage)
                         end
+                    end
+                    if inst.components.stackable ~= nil then --自动堆叠
+                        inst:PushEvent("on_loot_dropped", {dropper = nil})
                     end
                     if fn_end ~= nil then fn_end(inst) end
                 end
@@ -482,6 +487,27 @@ local function ForceStopHeavyLifting(inst)
 end
 
 --[ 无视防御的攻击 ]--
+local function GetResist_dtr(self, attacker, weapon, ...)
+    local mult = 1
+    if self.all_l_v ~= nil then
+        mult = self.all_l_v
+        if self.inst.flag_undefended_l == 1 then
+            if mult < 1 then --大于1 是代表增伤。这里需要忽略的是减伤
+                mult = 1
+            end
+        end
+    end
+    if self.GetResist_l_base ~= nil then
+        local mult2 = self.GetResist_l_base(self, attacker, weapon, ...)
+        if self.inst.flag_undefended_l == 1 then
+            if mult2 < 1 then --大于1 是代表增伤。这里需要忽略的是减伤
+                mult2 = 1
+            end
+        end
+        mult = mult * mult2
+    end
+    return mult
+end
 local function RecalculateModifier_combat_l(inst)
     local m = inst._base
     for source, src_params in pairs(inst._modifiers) do
@@ -608,26 +634,9 @@ local function UndefendedATK(inst, data)
         end
 
         --修改防御的标签系数机制
-        if target.components.damagetyperesist ~= nil then
-            local GetResist_old = target.components.damagetyperesist.GetResist
-            target.components.damagetyperesist.GetResist = function(self, attacker, weapon, ...)
-                if self.inst.flag_undefended_l == 1 then
-                    local mult = 1
-                    local tagmult
-                    if attacker ~= nil then
-                        for k, v in pairs(self.tags) do
-                            if attacker:HasTag(k) or (weapon ~= nil and weapon:HasTag(k)) then
-                                tagmult = v:Get()
-                                if tagmult > 1 then --大于1 是代表增伤。这里需要忽略的是减伤
-                                    mult = mult * tagmult
-                                end
-                            end
-                        end
-                    end
-                    return mult
-                end
-                return GetResist_old(self, attacker, weapon, ...)
-            end
+        if target.components.damagetyperesist ~= nil and target.components.damagetyperesist.GetResist_l_base == nil then
+            target.components.damagetyperesist.GetResist_l_base = target.components.damagetyperesist.GetResist
+            target.components.damagetyperesist.GetResist = fns.GetResist_dtr
         end
     end
 
@@ -673,23 +682,27 @@ local function RemoveTag(inst, tagname, key)
 end
 
 --[ 兼容性数值管理 ]--
+--ent不一定会是prefab，可能也是个组件或者表
 local function AddEntValue(ent, key, key2, valuedeal, value)
     if ent[key] == nil then
         ent[key] = {}
     end
     ent[key][key2] = value
     if valuedeal ~= nil then
-        local res = 0
+        local res
         if valuedeal == 1 then --加法
+            res = 0 --加法基础为0
             for _, v in pairs(ent[key]) do
                 res = res + v
             end
+            ent[key.."_v"] = res ~= 0 and res or nil
         else --乘法
+            res = 1 --乘法基础为1
             for _, v in pairs(ent[key]) do
                 res = res * v
             end
+            ent[key.."_v"] = res ~= 1 and res or nil
         end
-        ent[key.."_v"] = res ~= 0 and res or nil
     end
 end
 local function RemoveEntValue(ent, key, key2, valuedeal)
@@ -706,23 +719,24 @@ local function RemoveEntValue(ent, key, key2, valuedeal)
         end
         ent[key] = nil
     else
-        local res = 0
+        local res
         local hasit = false
         if valuedeal == 1 then --加法
+            res = 0 --加法基础为0
             for _, v in pairs(ent[key]) do
                 res = res + v
                 hasit = true
             end
+            ent[key.."_v"] = res ~= 0 and res or nil
         else --乘法
+            res = 1 --乘法基础为1
             for _, v in pairs(ent[key]) do
                 res = res * v
                 hasit = true
             end
+            ent[key.."_v"] = res ~= 1 and res or nil
         end
-        if hasit then
-            ent[key.."_v"] = res ~= 0 and res or nil
-        else
-            ent[key.."_v"] = nil
+        if not hasit then
             ent[key] = nil
         end
     end
@@ -757,7 +771,7 @@ local function SpawnStackDrop(name, num, pos, doer, items, sets)
 				doer.components.inventory:GiveItem(item, nil, pos)
 			else
 				if item:HasTag("heavy") then --巨大作物不知道为啥不能弹射，可能是和别的物体碰撞了，就失效了
-					local x, y, z = GetCalculatedPos(pos.x, pos.y, pos.z, 0.5+1.8*math.random())
+					local x, y, z = fns.GetCalculatedPos(pos.x, pos.y, pos.z, 0.5+1.8*math.random())
 					item.Transform:SetPosition(x, y, z)
 				else
 					item.components.inventoryitem:OnDropped(true)
@@ -773,7 +787,7 @@ local function SpawnStackDrop(name, num, pos, doer, items, sets)
         end
 
 		if num >= 1 then
-			SpawnStackDrop(name, num, pos, doer, items, sets)
+			fns.SpawnStackDrop(name, num, pos, doer, items, sets)
 		end
 	end
 end
@@ -863,7 +877,7 @@ local function hat_on_fullhead(inst, owner, buildname, foldername) --遮住整�
     end
 end
 local function hat_off_fullhead(inst, owner)
-    hat_off(inst, owner)
+    fns.hat_off(inst, owner)
 
     if owner:HasTag("player") then
         owner.AnimState:ShowSymbol("face")
@@ -930,6 +944,49 @@ local function MakeNoLossRepairableEquipment(inst, data)
 	elseif inst.components.fueled ~= nil then
 		inst.components.fueled:SetDepletedFn(OnBroken)
 	end
+end
+
+--[ 全能攻击系数的管理(普通和特殊) ]--
+local function GetBonus_dtb(self, target, ...)
+    local mult = self.all_l_v or 1
+    if self.GetBonus_l_base ~= nil then
+        mult = mult * self.GetBonus_l_base(self, target, ...)
+    end
+    return mult
+end
+local function AddBonusAll(inst, key, value)
+    if inst.components.damagetypebonus == nil then --通过这个组件能使得系数效果能同时应用给普攻和特攻
+        inst:AddComponent("damagetypebonus")
+    end
+    local cpt = inst.components.damagetypebonus
+    if cpt.GetBonus_l_base == nil then
+        cpt.GetBonus_l_base = cpt.GetBonus
+        cpt.GetBonus = GetBonus_dtb
+    end
+    fns.AddEntValue(cpt, "all_l", key, 2, value) --乘法系数
+end
+local function RemoveBonusAll(inst, key)
+    if inst.components.damagetypebonus ~= nil then
+        fns.RemoveEntValue(inst.components.damagetypebonus, "all_l", key, 2)
+    end
+end
+
+--[ 全能防御系数的管理(普通和特殊) ]--
+local function AddResistAll(inst, key, value)
+    if inst.components.damagetyperesist == nil then --通过这个组件能使得防御效果能同时应用给普防和特防
+        inst:AddComponent("damagetyperesist")
+    end
+    local cpt = inst.components.damagetyperesist
+    if cpt.GetResist_l_base == nil then
+        cpt.GetResist_l_base = cpt.GetResist
+        cpt.GetResist = fns.GetResist_dtr
+    end
+    fns.AddEntValue(cpt, "all_l", key, 2, value) --乘法系数
+end
+local function RemoveResistAll(inst, key)
+    if inst.components.damagetyperesist ~= nil then
+        fns.RemoveEntValue(inst.components.damagetyperesist, "all_l", key, 2)
+    end
 end
 
 --[ 能力勋章兼容：不朽容器 ]--
@@ -1033,7 +1090,7 @@ local function SetImmortalBox_server(inst, sets) --服务器
 end
 
 -- local TOOLS_L = require("tools_legion")
-return {
+fns = {
 	MakeSnowCovered_comm = MakeSnowCovered_comm,
 	MakeSnowCovered_serv = MakeSnowCovered_serv,
 	IsTooDarkToGrow = IsTooDarkToGrow,
@@ -1060,7 +1117,12 @@ return {
     IsEnemy_me = IsEnemy_me, IsEnemy_player = IsEnemy_player,
     MaybeEnemy_me = MaybeEnemy_me, MaybeEnemy_player = MaybeEnemy_player,
     CalcDamage = CalcDamage,
+    GetBonus_dtb = GetBonus_dtb, GetResist_dtr = GetResist_dtr, --这个列出来，方便别的mod改
+    AddBonusAll = AddBonusAll, RemoveBonusAll = RemoveBonusAll,
+    AddResistAll = AddResistAll, RemoveResistAll = RemoveResistAll,
     DoSingleSleep = DoSingleSleep, DoAreaSleep = DoAreaSleep,
 
     SetImmortalBox_common = SetImmortalBox_common, SetImmortalBox_server = SetImmortalBox_server
 }
+
+return fns

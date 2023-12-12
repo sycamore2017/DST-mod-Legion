@@ -362,7 +362,7 @@ local function PercentChanged_contracts(inst, data) --耐久变化时
 end
 
 local function EmptyCptFn(self, ...)end
-local function DisplayName(inst)
+local function DisplayName_contracts(inst)
     local namepre = inst.nameoverride or inst.prefab
 	namepre = STRINGS.NAMES[string.upper(namepre or "hiddenmoonlight")] or "Something"
 	local lvl = inst._lvl_l:value()
@@ -374,13 +374,10 @@ end
 local function OnUpgradeFn_contracts(inst, doer, item)
     (inst.SoundEmitter or doer.SoundEmitter):PlaySound("dontstarve/characters/wortox/soul/spawn", nil, .5)
 end
-local function SetLevel(inst)
-    inst._lvl_l:set(inst.components.upgradeable:GetStage() - 1)
-end
 local function UpdateUses_contracts(inst, uses)
     local lvl = inst.components.upgradeable:GetStage() - 1
     if lvl > 0 then
-        local maxuse = 40 + lvl*2
+        local maxuse = 40 + lvl
         if uses == nil then
             uses = inst.components.finiteuses:GetUses()
         end
@@ -389,7 +386,7 @@ local function UpdateUses_contracts(inst, uses)
     end
 end
 local function SetLevel_contracts(inst, uses)
-    SetLevel(inst)
+    inst._lvl_l:set(inst.components.upgradeable:GetStage() - 1)
     UpdateUses_contracts(inst, uses)
 end
 local function OnSave_contracts(inst, data)
@@ -425,7 +422,7 @@ local function Fn_contracts()
     inst:AddTag("NORATCHECK") --mod兼容：永不妥协。该道具不算鼠潮分
 
     inst._lvl_l = net_byte(inst.GUID, "contracts_l._lvl_l", "lvl_l_dirty")
-    inst.displaynamefn = DisplayName
+    inst.displaynamefn = DisplayName_contracts
 
     inst:AddComponent("skinedlegion")
     inst.components.skinedlegion:Init("soul_contracts")
