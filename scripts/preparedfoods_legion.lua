@@ -390,7 +390,7 @@ local foods_legion = {
         health = 12,
         hunger = 25,
         sanity = 10,
-        perishtime = TUNING.PERISH_SLOW,   --15天
+        perishtime = TUNING.PERISH_SLOW, --15天
         cooktime = 2.5,
         potlevel = "low",
         float = {nil, "small", 0.2, 0.9},
@@ -399,32 +399,11 @@ local foods_legion = {
         cook_cant = "肉度 非食 冰度",
         recipe_count = 6,
 
-        prefabs = { "wormlight_light" },
+        prefabs = { "buff_radiantskin" },
         oneat_desc = STRINGS.UI.COOKBOOK.DISH_FLESHNAPOLEON,
-        oneatenfn = function(inst, eater) --食用后生物发光
-            ----------------
-            --发光效果自带保存机制，所以就不用写成buff的机制了
-            ----------------
-            if eater.wormlight ~= nil then
-                if eater.wormlight.prefab == "wormlight_light" then
-                    eater.wormlight.components.spell.lifetime = 0   --本身还有光效时就重置发光时间
-                    eater.wormlight.components.spell:ResumeSpell()
-                    return
-                else
-                    eater.wormlight.components.spell:OnFinish() --如果是其他类型的光效，会被新的给替换掉
-                end
-            end
-
-            local light = SpawnPrefab("wormlight_light")
-            light.components.spell.duration = 480   --8分钟的发光时间，神秘浆果发光时间为4分钟，发光浆果时间为1分钟
-            light.components.spell:SetTarget(eater)
-            if light:IsValid() then
-                if light.components.spell.target == nil then
-                    light:Remove()
-                else
-                    light.components.spell:StartSpell()
-                end
-            end
+        oneatenfn = function(inst, eater)
+            eater.time_l_radiantskin = { add = TUNING.SEG_TIME*16, max = TUNING.SEG_TIME*30 }
+            eater:AddDebuff("buff_radiantskin", "buff_radiantskin")
         end
     },
     dish_beggingmeat = {
@@ -638,50 +617,40 @@ local foods_legion = {
         prefabs = { "buff_strengthenhancer" },
         oneat_desc = STRINGS.UI.COOKBOOK.DISH_MEDICINALLIQUOR,
         oneatenfn = function(inst, eater)
+            --加强攻击力
+            if eater.components.combat ~= nil then --这个buff需要攻击组件
+                eater.time_l_strengthenhancer = { replace_min = TUNING.SEG_TIME*16 }
+                eater:AddDebuff("buff_strengthenhancer", "buff_strengthenhancer")
+            end
+            --醉酒
             if eater:HasTag("player") then
-                --说醉酒话
-                if eater.components.talker ~= nil then
+                if eater.components.talker ~= nil then --说醉酒话
                     eater.components.talker:Say(GetString(eater, "DESCRIBE", { "DISH_MEDICINALLIQUOR", "DRUNK" }))
                 end
-
-                --加强攻击力
-                if eater.components.combat ~= nil then --这个buff需要攻击组件
-                    eater.time_l_strengthenhancer = { replace_min = TUNING.SEG_TIME*16 }
-                    eater:AddDebuff("buff_strengthenhancer", "buff_strengthenhancer")
-                end
-
                 local drunkmap = {
-                    wathgrithr = 0,
-                    wolfgang = 0,
-                    wendy = 1,
-                    webber = 1,
-                    willow = 1,
-                    wes = 1,
-                    wormwood = 1,
-                    wurt = 1,
-                    walter = 1,
-                    yangjian = 0,
-                    yama_commissioners = 0,
-                    myth_yutu = 1,
+                    wathgrithr = 0, wolfgang = 0, warly = 0, --酒量好
+                    wormwood = 0, wx78 = 0, --身体结构不一样
+                    wendy = 1, webber = 1, willow = 1, wes = 1, wurt = 1, walter = 1, --酒量差
+                    yangjian = 0, yama_commissioners = 0, myth_yutu = 1 --mod人物
                 }
                 if drunkmap[eater.prefab] == 0 then --没有任何事
                     return
                 elseif drunkmap[eater.prefab] == 1 then --直接睡着8-12秒
                     eater:PushEvent("yawn", { grogginess = 5, knockoutduration = 8+math.random()*4 })
-                else --20-28秒内减速
-                    if eater.groggy_time ~= nil then
-                        eater.groggy_time:Cancel()
-                        eater.groggy_time = nil
+                else --12-20秒内减速
+                    if eater.task_l_groggy ~= nil then
+                        eater.task_l_groggy:Cancel()
+                        eater.task_l_groggy = nil
                     end
                     if eater.components.locomotor ~= nil then
                         eater:AddTag("groggy") --添加标签，走路会摇摇晃晃
                         eater.components.locomotor:SetExternalSpeedMultiplier(eater, "dish_medicinalliquor", 0.4)
-                        eater.groggy_time = eater:DoTaskInTime(20+math.random()*8, function(eater)
+                        eater.task_l_groggy = eater:DoTaskInTime(12+math.random()*8, function(eater)
                             if eater.components.locomotor ~= nil then
                                 eater.components.locomotor:RemoveExternalSpeedMultiplier(eater, "dish_medicinalliquor")
                             end
                             eater:RemoveTag("groggy")
-                            eater.groggy_time = nil
+                            eater.task_l_groggy = nil
                         end)
                     end
                 end
@@ -692,7 +661,7 @@ local foods_legion = {
             else
                 eater:PushEvent("knockedout")
             end
-        end,
+        end
     },
     dish_bananamousse = {
         test = function(cooker, names, tags)

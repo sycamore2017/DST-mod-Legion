@@ -84,64 +84,76 @@ local function StartTimer_extend(buff, target, timekey, timedefault)
     end
 end
 
-local function InitTimerBuff(inst, data)
-    inst.components.debuff:SetAttachedFn(function(inst, target, ...)
-        inst.entity:SetParent(target.entity)
-        inst.Transform:SetPosition(0, 0, 0) --in case of loading
-        inst:ListenForEvent("death", function()
-            inst.components.debuff:Stop()
-        end, target)
+local function Attached_timer(inst, target, ...)
+    inst.entity:SetParent(target.entity)
+    inst.Transform:SetPosition(0, 0, 0) --in case of loading
+    inst:ListenForEvent("death", function(owner, data)
+        inst.components.debuff:Stop()
+    end, target)
 
-        StartTimer_attach(inst, target, data.time_key, data.time_default)
-
-        if data.fn_start ~= nil then
-            data.fn_start(inst, target, ...)
-        end
-    end)
-    inst.components.debuff:SetDetachedFn(function(inst, target)
-        if data.fn_end ~= nil then
-            data.fn_end(inst, target)
-        end
-        inst:Remove()
-    end)
-    inst.components.debuff:SetExtendedFn(function(inst, target, ...)
-        StartTimer_extend(inst, target, data.time_key, data.time_default)
-
-        if data.fn_again ~= nil then
-            data.fn_again(inst, target, ...)
-        end
-    end)
+    local data = inst._dd
+    StartTimer_attach(inst, target, data.time_key, data.time_default)
+    if data.fn_start ~= nil then
+        data.fn_start(inst, target, ...)
+    end
+end
+local function Detached_timer(inst, target, ...)
+    if inst._dd.fn_end ~= nil then
+        inst._dd.fn_end(inst, target, ...)
+    end
+    inst:Remove()
+end
+local function Extended_timer(inst, target, ...)
+    local data = inst._dd
+    StartTimer_extend(inst, target, data.time_key, data.time_default)
+    if data.fn_again ~= nil then
+        data.fn_again(inst, target, ...)
+    end
+end
+local function OnTimerDone(inst, data)
+    if data.name == "buffover" then
+        inst.components.debuff:Stop()
+        return
+    end
+    if inst._dd.fn_timerdone ~= nil then
+        inst._dd.fn_timerdone(inst, data)
+    end
+end
+local function InitTimerBuff(inst)
+    inst.components.debuff:SetAttachedFn(Attached_timer)
+    inst.components.debuff:SetDetachedFn(Detached_timer)
+    inst.components.debuff:SetExtendedFn(Extended_timer)
 
     inst:AddComponent("timer")
-    inst:ListenForEvent("timerdone", function(inst, data)
-        if data.name == "buffover" then
-            inst.components.debuff:Stop()
-        end
-    end)
+    inst:ListenForEvent("timerdone", OnTimerDone)
 end
-local function InitNoTimerBuff(inst, data)
-    inst.components.debuff:SetAttachedFn(function(inst, target, ...)
-        inst.entity:SetParent(target.entity)
-        inst.Transform:SetPosition(0, 0, 0) --in case of loading
-        inst:ListenForEvent("death", function()
-            inst.components.debuff:Stop()
-        end, target)
 
-        if data.fn_start ~= nil then
-            data.fn_start(inst, target, ...)
-        end
-    end)
-    inst.components.debuff:SetDetachedFn(function(inst, target)
-        if data.fn_end ~= nil then
-            data.fn_end(inst, target)
-        end
-        inst:Remove()
-    end)
-    inst.components.debuff:SetExtendedFn(function(inst, target, ...)
-        if data.fn_again ~= nil then
-            data.fn_again(inst, target, ...)
-        end
-    end)
+local function Attached_notimer(inst, target, ...)
+    inst.entity:SetParent(target.entity)
+    inst.Transform:SetPosition(0, 0, 0) --in case of loading
+    inst:ListenForEvent("death", function(owner, data)
+        inst.components.debuff:Stop()
+    end, target)
+
+    if inst._dd.fn_start ~= nil then
+        inst._dd.fn_start(inst, target, ...)
+    end
+end
+local function Detached_notimer(inst, target, ...)
+    if inst._dd.fn_end ~= nil then
+        inst._dd.fn_end(inst, target, ...)
+    end
+    inst:Remove()
+end
+local function Extended_notimer(inst, target, ...)
+    if inst._dd.fn_again ~= nil then
+        inst._dd.fn_again(inst, target, ...)
+    end
+end
+local function InitNoTimerBuff(inst)
+    inst.components.debuff:SetAttachedFn(Attached_notimer)
+    inst.components.debuff:SetDetachedFn(Detached_notimer)
+    inst.components.debuff:SetExtendedFn(Extended_notimer)
 end
 
 local function MakeBuff(data)
@@ -181,12 +193,14 @@ local function MakeBuff(data)
                 inst:AddTag("CLASSIFIED")
             end
 
+            inst._dd = data
+
             inst:AddComponent("debuff")
             inst.components.debuff.keepondespawn = true
             if data.notimer then
-                InitNoTimerBuff(inst, data)
+                InitNoTimerBuff(inst)
             else
-                InitTimerBuff(inst, data)
+                InitTimerBuff(inst)
             end
 
             if data.fn_server ~= nil then
@@ -203,9 +217,15 @@ end
 -----
 
 local function BuffTalk_start(target, buff)
+    if not target:HasTag("player") then
+        return
+    end
     target:PushEvent("foodbuffattached", { buff = "ANNOUNCE_ATTACH_"..string.upper(buff.prefab), priority = 1 })
 end
 local function BuffTalk_end(target, buff)
+    if not target:HasTag("player") then
+        return
+    end
     target:PushEvent("foodbuffdetached", { buff = "ANNOUNCE_DETACH_"..string.upper(buff.prefab), priority = 1 })
 end
 
@@ -516,7 +536,7 @@ MakeBuff({
     notimer = nil,
     fn_start = function(buff, target)
         if target.components.combat ~= nil then
-            target.components.combat.externaldamagemultipliers:SetModifier(buff, 1.5) --攻击力系数乘以1.5倍
+            target.components.combat.externaldamagemultipliers:SetModifier(buff, 1.5) --普通攻击系数x1.5倍
         end
     end,
     fn_again = nil,
@@ -525,8 +545,7 @@ MakeBuff({
         if target.components.combat ~= nil then
             target.components.combat.externaldamagemultipliers:RemoveModifier(buff)
         end
-    end,
-    fn_server = nil,
+    end
 })
 
 --------------------------------------------------------------------------
@@ -823,6 +842,20 @@ MakeBuff({
 --[[ 魔音绕耳：不断卸下装备 ]]
 --------------------------------------------------------------------------
 
+local function DropEquipment_magicwarble(v)
+    if v.components.inventory ~= nil then
+        if v.components.health == nil or not v.components.health:IsDead() then
+            -- v.components.inventory:DropEquipped(false)
+            local inv = v.components.inventory
+            for slot, item in pairs(inv.equipslots) do
+                if slot ~= EQUIPSLOTS.BEARD then --可不能把威尔逊的“胡子”给吼下来了
+                    inv:DropItem(item, true, true)
+                end
+            end
+        end
+    end
+end
+
 MakeBuff({
     name = "debuff_magicwarble",
     assets = nil,
@@ -836,19 +869,7 @@ MakeBuff({
             target.task_l_magicwarble = nil
         end
         if target.components.inventory ~= nil then
-            target.task_l_magicwarble = target:DoPeriodicTask(0.9, function(v)
-                if v.components.inventory ~= nil then
-                    if v.components.health == nil or not v.components.health:IsDead() then
-                        -- v.components.inventory:DropEquipped(false)
-                        local inv = v.components.inventory
-                        for slot, item in pairs(inv.equipslots) do
-                            if slot ~= EQUIPSLOTS.BEARD then --可不能把威尔逊的“胡子”给吼下来了
-                                inv:DropItem(item, true, true)
-                            end
-                        end
-                    end
-                end
-            end, 1)
+            target.task_l_magicwarble = target:DoPeriodicTask(0.9, DropEquipment_magicwarble, 1)
         end
     end,
     fn_again = nil,
@@ -857,8 +878,7 @@ MakeBuff({
             target.task_l_magicwarble:Cancel()
             target.task_l_magicwarble = nil
         end
-    end,
-    fn_server = nil,
+    end
 })
 
 --------------------------------------------------------------------------
@@ -1009,7 +1029,91 @@ MakeBuff({
                 inst.state_l = data.state_l
             end
         end
+    end
+})
+
+--------------------------------------------------------------------------
+--[[ 焕肤：身体发光 ]]
+--------------------------------------------------------------------------
+
+local time_radiant = 20
+local step_radiant = FRAMES*2
+local radius_radiant = 3
+local steprad_radiant = radius_radiant/time_radiant
+local function LightFading_radiant(buff)
+    buff.time_fade = buff.time_fade - step_radiant
+    if buff.time_fade > 0 then
+        buff.Light:SetRadius(steprad_radiant*buff.time_fade)
+    else
+        buff.Light:Enable(false)
+        if buff.task_fade ~= nil then
+            buff.task_fade:Cancel()
+            buff.task_fade = nil
+        end
+    end
+end
+local function BuffSet_radiant(buff, target)
+    if buff.task_fade ~= nil then
+        buff.task_fade:Cancel()
+        buff.task_fade = nil
+    end
+
+    local timeleft = buff.components.timer:GetTimeLeft("buffover") or 0
+    if timeleft <= 0 then --按理来说，这里不该发生
+        buff:DoTaskInTime(0, function(fx) --下一帧再执行，不然加buff的函数里移除buff可能会崩
+            fx.components.debuff:Stop()
+        end)
+        return
+    end
+    if timeleft > time_radiant then
+        buff.time_fade = time_radiant
+        timeleft = timeleft - time_radiant
+    else
+        buff.time_fade = timeleft
+        timeleft = 0
+    end
+    buff.Light:SetRadius(steprad_radiant*buff.time_fade)
+    buff.Light:Enable(true)
+    buff.task_fade = buff:DoPeriodicTask(step_radiant, LightFading_radiant, timeleft)
+end
+
+MakeBuff({
+    name = "buff_radiantskin",
+    assets = nil,
+    prefabs = nil,
+    time_key = "time_l_radiantskin",
+    time_default = TUNING.SEG_TIME*16, --8分钟
+    notimer = nil,
+    addnetwork = true,
+    fn_start = function(buff, target)
+        BuffSet_radiant(buff, target)
+        if target.components.bloomer ~= nil then
+            target.components.bloomer:PushBloom(buff, "shaders/anim.ksh", 0.33)
+        else
+            target.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
+        end
     end,
+    fn_again = BuffSet_radiant,
+    fn_end = function(buff, target)
+        if buff.task_fade ~= nil then
+            buff.task_fade:Cancel()
+            buff.task_fade = nil
+        end
+        if target.components.bloomer ~= nil then
+            target.components.bloomer:PopBloom(buff)
+        else
+            target.AnimState:ClearBloomEffectHandle()
+        end
+    end,
+    fn_common = function(buff)
+        buff.entity:AddLight()
+        buff.Light:SetRadius(radius_radiant)
+        buff.Light:SetIntensity(0.8)
+        buff.Light:SetFalloff(0.5)
+        buff.Light:SetColour(169/255, 231/255, 245/255) --发光浆果的颜色
+        buff.Light:Enable(true)
+        -- buff.Light:EnableClientModulation(true)
+    end
 })
 
 --------------------
