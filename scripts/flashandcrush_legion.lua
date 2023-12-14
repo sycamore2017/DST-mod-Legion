@@ -2,7 +2,6 @@ local prefabFiles = {
     "fimbul_fx",                --芬布尔相关fx
     "boss_elecarmet",           --莱克阿米特
     "elecourmaline",            --电气重铸台
-    "hat_cowboy",               --牛仔套装
     "icire_rock",               --鸳鸯石
     "guitar_miguel",            --米格尔的吉他
     "legion_soul_fx",           --灵魂契约特效
@@ -154,7 +153,7 @@ AddRecipe2(
 )
 AddRecipe2(
     "hat_cowboy", {
-        Ingredient("beefalohat", 1),
+        Ingredient("beefalohat", 2),
         Ingredient("rainhat", 1),
         Ingredient("tophat", 1)
     }, tech_recast[2], {

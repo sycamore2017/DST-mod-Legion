@@ -1110,7 +1110,7 @@ MakeBuff({
         buff.Light:SetRadius(radius_radiant)
         buff.Light:SetIntensity(0.8)
         buff.Light:SetFalloff(0.5)
-        buff.Light:SetColour(169/255, 231/255, 245/255) --发光浆果的颜色
+        buff.Light:SetColour(169/255, 231/255, 245/255) --光源配置和发光浆果一致
         buff.Light:Enable(true)
         -- buff.Light:EnableClientModulation(true)
     end

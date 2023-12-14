@@ -198,10 +198,13 @@ AddStategraphPostInit("wilson", function(sg)
         elseif v["name"] == "knockback" then
             local wilson_knockback_event_fn = v.fn
             v.fn = function(inst, data)
-                if
+                if --盾反+厚重=防击退
                     inst.shield_l_success and inst.components.inventory ~= nil and
                     (inst.components.inventory:EquipHasTag("heavyarmor") or inst:HasTag("heavybody"))
                 then
+                    return
+                end
+                if inst:HasTag("firmbody_l") then --特殊标签防击退
                     return
                 end
                 return wilson_knockback_event_fn(inst, data)

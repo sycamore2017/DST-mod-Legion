@@ -2374,6 +2374,26 @@ ACTIONS.ROTATE_FENCE.fn = function(act)
 end
 
 --------------------------------------------------------------------------
+--[[ 让牛仔尝试骑上坐骑时能忽略其服从度和战斗仇恨的影响 ]]
+--------------------------------------------------------------------------
+
+local MOUNT_fn_old = ACTIONS.MOUNT.fn
+ACTIONS.MOUNT.fn = function(act)
+    if act.doer:HasTag("cowboy_l") then
+        if
+            act.target.components.domesticatable ~= nil and
+            act.target.components.domesticatable:GetObedience() < act.target.components.domesticatable.maxobedience
+        then
+            act.target.components.domesticatable:DeltaObedience(1) --其实就是加满服从度，这样就可以骑上去了
+        end
+        if act.target.components.combat ~= nil then --清除仇恨，这样不影响骑行
+            act.target.components.combat:DropTarget()
+        end
+    end
+    return MOUNT_fn_old(act)
+end
+
+--------------------------------------------------------------------------
 --[[ 电气石的动作 ]]
 --------------------------------------------------------------------------
 
