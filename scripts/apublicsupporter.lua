@@ -1292,7 +1292,7 @@ AddPlayerPostInit(function(inst)
         if inst.components.foodmemory ~= nil then
             local GetFoodMultiplier_old = inst.components.foodmemory.GetFoodMultiplier
             inst.components.foodmemory.GetFoodMultiplier = function(self, ...)
-                if inst.components.debuffable:HasDebuff("buff_bestappetite") then
+                if inst.buffenable_l_bestappetite then
                     return 1
                 elseif GetFoodMultiplier_old ~= nil then
                     return GetFoodMultiplier_old(self, ...)
@@ -1301,7 +1301,7 @@ AddPlayerPostInit(function(inst)
 
             local GetMemoryCount_old = inst.components.foodmemory.GetMemoryCount
             inst.components.foodmemory.GetMemoryCount = function(self, ...)
-                if inst.components.debuffable:HasDebuff("buff_bestappetite") then
+                if inst.buffenable_l_bestappetite then
                     return 0
                 elseif GetMemoryCount_old ~= nil then
                     return GetMemoryCount_old(self, ...)
@@ -1315,7 +1315,7 @@ AddPlayerPostInit(function(inst)
                 if food.prefab == "winter_food4" then
                     --V2C: fruitcake hack. see how long this code stays untouched - _-"
                     return false
-                elseif inst.components.debuffable:HasDebuff("buff_bestappetite") then
+                elseif inst.buffenable_l_bestappetite then
                     -- return self:TestFood(food, self.preferseating) --这里需要改成caneat，不能按照喜好来
                     return self:TestFood(food, self.caneat)
                 elseif PrefersToEat_old ~= nil then

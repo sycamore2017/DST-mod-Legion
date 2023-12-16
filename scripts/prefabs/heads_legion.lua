@@ -326,7 +326,7 @@ local function Fn_cowboy()
 
     inst:AddComponent("fueled")
     inst.components.fueled.fueltype = FUELTYPE.USAGE
-    inst.components.fueled:InitializeFuelLevel(TUNING.TOTAL_DAY_TIME*8) --8天的佩戴时间
+    inst.components.fueled:InitializeFuelLevel(TUNING.TOTAL_DAY_TIME*10) --10天的佩戴时间
     inst.components.fueled:SetDepletedFn(inst.Remove)
 
     MakeHauntableLaunch(inst)

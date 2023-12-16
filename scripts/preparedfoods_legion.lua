@@ -567,7 +567,7 @@ local foods_legion = {
         sanity = 5,
         perishtime = TUNING.PERISH_MED*3,   --30天
         cooktime = 0.5,
-        tags = {"honeyed"},
+        tags = { "honeyed" },
         potlevel = "low",
         float = {nil, "small", 0.2, 0.7},
 
@@ -686,11 +686,9 @@ local foods_legion = {
         prefabs = { "buff_bestappetite" },
         oneat_desc = STRINGS.UI.COOKBOOK.DISH_BANANAMOUSSE,
         oneatenfn = function(inst, eater)
-            if eater:HasTag("player") then
-                eater.time_l_bestappetite = { replace_min = TUNING.SEG_TIME*2 }
-                eater:AddDebuff("buff_bestappetite", "buff_bestappetite")
-            end
-        end,
+            eater.time_l_bestappetite = { replace_min = TUNING.SEG_TIME*2 }
+            eater:AddDebuff("buff_bestappetite", "buff_bestappetite")
+        end
     },
     dish_friedfishwithpuree = {
         test = function(cooker, names, tags)
@@ -930,6 +928,7 @@ local foods_legion = {
         perishtime = TUNING.PERISH_MED * 3,   --30天
         stacksize = 2,
         cooktime = 0.5,
+        tags = { "honeyed" },
         potlevel = "low",
         float = {0.02, "small", 0.2, 0.9},
 

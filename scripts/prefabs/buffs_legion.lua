@@ -272,6 +272,7 @@ MakeBuff({
     notimer = nil,
     fn_start = function(buff, target)
         BuffTalk_start(target, buff)
+        target.buffenable_l_bestappetite = true --做标记
         --此处并没有任何操作，因为已经修改全局食性组件了，有这个buff就会启用
     end,
     fn_again = function(buff, target)
@@ -279,6 +280,7 @@ MakeBuff({
     end,
     fn_end = function(buff, target)
         BuffTalk_end(target, buff)
+        target.buffenable_l_bestappetite = nil
     end,
     fn_server = nil,
 })

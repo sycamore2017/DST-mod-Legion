@@ -153,7 +153,8 @@ AddRecipe2(
 )
 AddRecipe2(
     "hat_cowboy", {
-        Ingredient("beefalohat", 2),
+        Ingredient("beefalohat", 1),
+        Ingredient("brush", 1),
         Ingredient("rainhat", 1),
         Ingredient("tophat", 1)
     }, tech_recast[2], {
