@@ -20,7 +20,7 @@ local hunger_max_backcub = 300
 local hungerrate_backcub = 50*cycle_backcub/TUNING.TOTAL_DAY_TIME
 local stage_full_backcub = 0.9
 
-local function SetHunger_backcub(inst, value)
+local function SetHunger_backcub(inst, value, force)
     value = value + inst.hunger_l
     if value < 0 then
         value = 0
@@ -28,17 +28,37 @@ local function SetHunger_backcub(inst, value)
         value = hunger_max_backcub
     end
     local percent = value/hunger_max_backcub
-    if math.floor(inst.hunger_l/hunger_max_backcub*100) ~= math.floor(percent*100) then --变化足够大时
-        inst:PushEvent("perishchange", { percent = percent })
-        if percent >= TUNING.PERISH_FRESH then
-            inst.components.insulator:SetInsulation(TUNING.INSULATION_LARGE)
-        elseif percent > TUNING.PERISH_STALE then
-            inst.components.insulator:SetInsulation(TUNING.INSULATION_MED_LARGE)
-        elseif percent > 0 then
+    if percent >= TUNING.PERISH_FRESH then
+        if not inst:HasTag("fresh") then
+            inst:RemoveTag("stale")
+            inst:RemoveTag("spoiled")
+            inst:AddTag("fresh")
+            inst:PushEvent("forceperishchange")
+        end
+        inst.components.insulator:SetInsulation(TUNING.INSULATION_LARGE)
+    elseif percent > TUNING.PERISH_STALE then
+        if not inst:HasTag("stale") then
+            inst:RemoveTag("fresh")
+            inst:RemoveTag("spoiled")
+            inst:AddTag("stale")
+            inst:PushEvent("forceperishchange")
+        end
+        inst.components.insulator:SetInsulation(TUNING.INSULATION_MED_LARGE)
+    else
+        if not inst:HasTag("spoiled") then
+            inst:RemoveTag("fresh")
+            inst:RemoveTag("stale")
+            inst:AddTag("spoiled")
+            inst:PushEvent("forceperishchange")
+        end
+        if percent > 0 then
             inst.components.insulator:SetInsulation(TUNING.INSULATION_SMALL)
         else
             inst.components.insulator:SetInsulation(TUNING.INSULATION_TINY)
         end
+    end
+    if force or math.floor(inst.hunger_l/hunger_max_backcub*100) ~= math.floor(percent*100) then --变化足够大时
+        inst:PushEvent("perishchange", { percent = percent })
     end
     inst.hunger_l = value
     return percent
@@ -54,14 +74,39 @@ local function SetHungerCount_backcub(inst, value)
     end
     inst.count_hunger_l = value
 end
+local function IsFull_backcub(inst)
+    if not inst.buffon_l_bestappetite and inst.hunger_l/hunger_max_backcub > stage_full_backcub then
+        return true
+    end
+    return false
+end
 local function OnEat_backcub(inst, food)
     local v = food.components.edible:GetHunger(inst) * inst.components.eater.hungerabsorption
                 + food.components.edible:GetSanity(inst) * inst.components.eater.sanityabsorption
                 + food.components.edible:GetHealth(inst) * inst.components.eater.healthabsorption
-    if v > 0 and food:HasTag("honeyed") then
-        v = v * 1.2
+    if v > 0 then
+        if food:HasTag("honeyed") then --蜜类料理加成
+            v = v * 1.2
+        end
+        if not IsFull_backcub(inst) then
+            local tempcpt = inst.components.inventoryitem.owner
+            if
+                tempcpt ~= nil and
+                tempcpt.components.temperature ~= nil and
+                (tempcpt.components.health == nil or not tempcpt.components.health:IsDead())
+            then
+                tempcpt = tempcpt.components.temperature
+                if
+                    tempcpt:GetCurrent() <= 10 or
+                    (inst.dotemphelp_l and tempcpt:GetCurrent() < tempcpt.overheattemp)
+                then
+                    tempcpt:SetTemperature(math.min(tempcpt:GetCurrent()+v*0.4, tempcpt.overheattemp))
+                    v = v * 0.6
+                end
+            end
+        end
     end
-    --根据情况来恢复undo
+    inst.dotemphelp_l = nil
     SetHunger_backcub(inst, v)
 
     if inst:IsInLimbo() then
@@ -87,27 +132,30 @@ local function ConsumeHunger_backcub(inst)
     end
 
     local percent = SetHunger_backcub(inst, -hungerrate_backcub)
-    local needhelp = false
+    local tempcpt = nil
     --装备者是否需要回温
-    if percent <= stage_full_backcub then
-        local owner = inst.components.inventoryitem.owner
+    if not IsFull_backcub(inst) then
+        tempcpt = inst.components.inventoryitem.owner
         if
-            owner ~= nil and
-            owner.components.temperature ~= nil and owner.components.temperature:GetCurrent() <= 10 and
-            (owner.components.health == nil or not owner.components.health:IsDead())
+            tempcpt ~= nil and
+            tempcpt.components.temperature ~= nil and tempcpt.components.temperature:GetCurrent() <= 10 and
+            (tempcpt.components.health == nil or not tempcpt.components.health:IsDead())
         then
-            needhelp = true
+            tempcpt = tempcpt.components.temperature
+        else
+            tempcpt = nil
         end
     end
     --偷吃食物
-    if needhelp or percent <= TUNING.PERISH_STALE then --太饿了或者装备者需要回温
+    if tempcpt ~= nil or percent <= TUNING.PERISH_STALE then --太饿了或者装备者需要回温
         local container = inst.components.container
         for i = container.numslots-1, container.numslots do --一次只吃最后两格的东西
             local item = container.slots[i]
             if item and inst.components.eater:CanEat(item) then
+                inst.dotemphelp_l = tempcpt ~= nil
                 inst.components.eater:Eat(item, nil)
-                if needhelp then
-                    if inst.hunger_l/hunger_max_backcub > stage_full_backcub then --太饱了就不吃了
+                if tempcpt ~= nil and tempcpt:GetCurrent() < tempcpt.overheattemp then --尽量温度补满
+                    if IsFull_backcub(inst) then --太饱了就不吃了
                         break
                     end
                 elseif inst.hunger_l/hunger_max_backcub > TUNING.PERISH_STALE then --不饿了就不吃了
@@ -116,9 +164,6 @@ local function ConsumeHunger_backcub(inst)
             end
         end
     end
-end
-local function Init_backcub(inst) --主要是为了显示新鲜度ui
-    inst:PushEvent("perishchange", { percent = inst.hunger_l/hunger_max_backcub })
 end
 local function OnEquip_backcub(inst, owner)
     local symbol = owner.prefab == "webber" and "swap_body_tall" or "swap_body"
@@ -142,6 +187,9 @@ local function OnEquip_backcub(inst, owner)
     if inst.components.container ~= nil then
         inst.components.container:Open(owner)
     end
+    inst:DoTaskInTime(0, function() --需要主动更新一下，不然没反应
+        inst:PushEvent("perishchange", { percent = inst.hunger_l/hunger_max_backcub })
+    end)
 end
 local function OnUnequip_backcub(inst, owner)
     if owner.prefab == "webber" then
@@ -172,6 +220,27 @@ local function OnExtinguish_backcub(inst)
     if inst.components.container ~= nil then
         inst.components.container.canbeopened = true
     end
+end
+local function OnSave_backcub(inst, data)
+	if inst.hunger_l > 0 then
+		data.hunger_l = inst.hunger_l
+	end
+    if inst.count_hunger_l > 0 then
+		data.count_hunger_l = inst.count_hunger_l
+	end
+end
+local function OnLoad_backcub(inst, data)
+	if data ~= nil then
+		if data.hunger_l ~= nil then
+			SetHunger_backcub(inst, data.hunger_l, true)
+		end
+        if data.count_hunger_l ~= nil then
+			inst.count_hunger_l = data.count_hunger_l --这个就不初始化了
+		end
+	end
+end
+local function OnLongUpdate_backcub(inst, dt)
+    
 end
 
 local function Fn_backcub()
@@ -232,6 +301,7 @@ local function Fn_backcub()
 
     inst.hunger_l = 0
     inst.count_hunger_l = 0
+    -- inst.dotemphelp_l = nil
 
     inst:AddComponent("inspectable")
 
@@ -267,9 +337,12 @@ local function Fn_backcub()
     inst:ListenForEvent("ondropped", OnGround_backcub)
     OnGround_backcub(inst)
     inst.task_l_hunger = inst:DoPeriodicTask(cycle_backcub, ConsumeHunger_backcub, cycle_backcub)
-    -- inst.task_init = inst:DoTaskInTime(1+math.random(), Init_backcub)
 
     -- MakeHauntableLaunchAndDropFirstItem(inst) --不能被作祟
+
+    inst.OnSave = OnSave_backcub
+    inst.OnLoad = OnLoad_backcub
+    inst.OnLongUpdate = OnLongUpdate_backcub
 
     inst.components.skinedlegion:SetOnPreLoad()
 
