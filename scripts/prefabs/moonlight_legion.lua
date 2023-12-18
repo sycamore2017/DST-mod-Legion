@@ -1423,8 +1423,6 @@ table.insert(prefs, Prefab("refractedmoonlight", function()
     inst:AddComponent("timer")
     inst:ListenForEvent("timerdone", TimerDone_refracted)
 
-    inst:PushEvent("percentusedchange", { percent = 0 })
-
     inst._light = SpawnPrefab("alterguardianhatlight")
     -- inst._light.Light:SetRadius(0.25)
     -- inst._light.Light:SetFalloff(0.7)
