@@ -976,10 +976,10 @@ local foods_legion = {
         end,
         priority = 20,
         foodtype = FOODTYPE.GOODIES,
-        health = TUNING.HEALING_MED,    --20
-        hunger = TUNING.CALORIES_SMALL,   --12.5
-        sanity = TUNING.SANITY_TINY,    --5
-        perishtime = nil,   --不会腐烂
+        health = TUNING.HEALING_MED, --20
+        hunger = TUNING.CALORIES_SMALL, --12.5
+        sanity = TUNING.SANITY_TINY, --5
+        perishtime = nil, --不会腐烂
         stacksize = 2,
         cooktime = 3,
         potlevel = "low",
@@ -991,10 +991,13 @@ local foods_legion = {
 
         prefabs = { "buff_healthstorage" },
         oneat_desc = STRINGS.UI.COOKBOOK.DISH_SHYERRYJAM,
-        oneatenfn = function(inst, eater)   --食用后获得优化的加血buff
-            eater.buff_healthstorage_times = 50 --因为buff相关组件不支持相同buff叠加时的数据传输，所以这里自己定义了一个传输方式
-            eater:AddDebuff("buff_healthstorage", "buff_healthstorage")
-        end,
+        oneatenfn = function(inst, eater) --食用后获得优化的加血buff
+            if eater.components.health ~= nil then
+                --因为buff相关组件不支持相同buff叠加时的数据传输，所以这里自己定义了一个传输方式
+                eater.buff_healthstorage_times = 50
+                eater:AddDebuff("buff_healthstorage", "buff_healthstorage")
+            end
+        end
     }
 
 	--[[

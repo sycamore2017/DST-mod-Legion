@@ -1963,48 +1963,6 @@ if IsServer then
     AddPrefabPostInit("berrybush2", FnSet_berry)
     AddPrefabPostInit("berrybush_juicy", FnSet_berry)
 
-    ------食人花的
-    local function OnDeath_lure(inst)
-        if inst.num_sivrock_l ~= nil and inst.num_sivrock_l >= 20 then
-            inst.num_sivrock_l = nil
-            inst.components.lootdropper:SpawnLootPrefab("tissue_l_lureplant")
-        end
-    end
-    AddPrefabPostInit("lureplant", function(inst)
-        local itemstodigestfn_old = inst.components.digester.itemstodigestfn
-        inst.components.digester.itemstodigestfn = function(owner, item, ...)
-            if item and item.prefab == "siving_rocks" then
-                owner.num_sivrock_l = (owner.num_sivrock_l or 0) + item.components.stackable.stacksize
-                owner.components.inventory:RemoveItem(item, true):Remove()
-                return false
-            end
-            if itemstodigestfn_old then
-                return itemstodigestfn_old(owner, item, ...)
-            end
-        end
-
-        inst:ListenForEvent("death", OnDeath_lure)
-
-        local OnLoad_old = inst.OnLoad
-        inst.OnLoad = function(inst, data)
-            if data ~= nil and data.num_sivrock_l ~= nil then
-                inst.num_sivrock_l = data.num_sivrock_l
-            end
-            if OnLoad_old then
-                OnLoad_old(inst, data)
-            end
-        end
-        local OnSave_old = inst.OnSave
-        inst.OnSave = function(inst, data)
-            if inst.num_sivrock_l ~= nil then
-                data.num_sivrock_l = inst.num_sivrock_l
-            end
-            if OnSave_old then
-                return OnSave_old(inst, data)
-            end
-        end
-    end)
-
     ------果蝇们会掉落虫翅碎片
     local function LootSetup_fruitfly(lootdropper)
         if lootdropper.inst.lootsetupfn_old_l ~= nil then

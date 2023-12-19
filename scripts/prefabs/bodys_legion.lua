@@ -366,10 +366,189 @@ local function Fn_backcub()
     return inst
 end
 
+--------------------------------------------------------------------------
+--[[ 香包 ]]
+--------------------------------------------------------------------------
+
+local assets_sachet = {
+    Asset("ANIM", "anim/sachet.zip"),
+	Asset("ATLAS", "images/inventoryimages/sachet.xml"),
+    Asset("IMAGE", "images/inventoryimages/sachet.tex")
+}
+local prefabs_sachet = {
+    "butterfly"
+}
+local tags_cant_sachet = { "INLIMBO", "NOCLICK" }
+
+-- local function CreateSanityAura_sachet()
+-- 	local inst = CreateEntity()
+-- 	inst.entity:AddTransform()
+
+--     inst:AddTag("NOBLOCK")
+--     inst:AddTag("NOCLICK")
+--     -- inst:AddTag("flower")
+
+-- 	inst:AddComponent("sanityaura")
+-- 	inst.components.sanityaura.aura = TUNING.SANITYAURA_SMALL --和猪人一样：+25精神/分钟
+
+-- 	inst.persists = false
+
+-- 	return inst
+-- end
+local function ButterflyCycle_sachet(inst)
+    if inst.owner_l == nil or not inst.owner_l:IsValid() then
+        if inst.task_l_flower ~= nil then
+            inst.task_l_flower:Cancel()
+            inst.task_l_flower = nil
+        end
+        inst.owner_l = nil
+        return
+    end
+
+    local mult = 1
+    if TheWorld.state.isnight or TheWorld.state.iscavenight then
+        mult = 0.4
+    elseif TheWorld.state.isdusk or TheWorld.state.iscavedusk then
+        mult = 0.8
+    end
+    if TheWorld.state.iswinter then
+        mult = mult * 0.2
+    elseif TheWorld.state.isspring then
+        mult = mult * 1.3
+    end
+
+    local x, y, z = inst.owner_l.Transform:GetWorldPosition()
+    local ents = TheSim:FindEntities(x, y, z, 8, { "flower" }, tags_cant_sachet)
+    for _, v in ipairs(ents) do
+        if math.random() < 0.1*mult then
+            local fly = SpawnPrefab("butterfly")
+            if fly.components.pollinator ~= nil then
+                fly.components.pollinator:Pollinate(v)
+            end
+            -- fly.components.homeseeker:SetHome(inst.owner_l)
+            fly.Physics:Teleport(v.Transform:GetWorldPosition())
+        end
+    end
+end
+local function OnEquip_sachet(inst, owner)
+    owner.AnimState:OverrideSymbol("swap_body", "sachet", "swap_body")
+
+    if owner:HasTag("equipmentmodel") then --假人！
+        return
+    end
+
+    if inst.components.fueled ~= nil then
+        inst.components.fueled:StartConsuming()
+    end
+
+    -- owner:AddComponent("sanityaura")
+    -- if owner.sanityaura_l_sachet == nil then
+    --     owner.sanityaura_l_sachet = CreateSanityAura_sachet()
+	--     owner.sanityaura_l_sachet.entity:SetParent(owner.entity) --这样弄了之后 sanityaura组件 就失效了，所以干脆不弄了
+    -- end
+    TOOLS_L.AddTag(owner, "fragrantbody_l", inst.prefab)
+
+    if inst.task_l_flower ~= nil then
+        inst.task_l_flower:Cancel()
+    end
+    inst.owner_l = owner
+    inst.task_l_flower = inst:DoPeriodicTask(5, ButterflyCycle_sachet, 3)
+end
+local function FnOff_sachet(inst, owner)
+    if inst.task_l_flower ~= nil then
+        inst.task_l_flower:Cancel()
+        inst.task_l_flower = nil
+    end
+    inst.owner_l = nil
+
+    if owner == nil then
+        owner = inst.components.inventoryitem and inst.components.inventoryitem.owner
+        if owner == nil then
+            return
+        end
+    end
+    -- owner:RemoveComponent("sanityaura")
+    -- if owner.sanityaura_l_sachet ~= nil and owner.sanityaura_l_sachet:IsValid() then
+    --     owner.sanityaura_l_sachet:Remove()
+    --     owner.sanityaura_l_sachet = nil
+    -- end
+    TOOLS_L.RemoveTag(owner, "fragrantbody_l", inst.prefab)
+end
+local function OnUnequip_sachet(inst, owner)
+    owner.AnimState:ClearOverrideSymbol("swap_body")
+
+    if inst.components.fueled ~= nil then
+        inst.components.fueled:StopConsuming()
+    end
+    FnOff_sachet(inst, owner)
+end
+local function OnDepleted_sachet(inst)
+    FnOff_sachet(inst, nil)
+    inst:Remove()
+end
+
+local function Fn_sachet()
+    local inst = CreateEntity()
+
+    inst.entity:AddTransform()
+    inst.entity:AddAnimState()
+    inst.entity:AddNetwork()
+
+    MakeInventoryPhysics(inst)
+
+    inst.AnimState:SetBank("sachet")
+    inst.AnimState:SetBuild("sachet")
+    inst.AnimState:PlayAnimation("anim")
+
+    MakeInventoryFloatable(inst, "small", 0.2, 0.8)
+    local OnLandedClient_old = inst.components.floater.OnLandedClient
+    inst.components.floater.OnLandedClient = function(self)
+        OnLandedClient_old(self)
+        self.inst.AnimState:SetFloatParams(0.03, 1, self.bob_percent)
+    end
+
+    inst.entity:SetPristine()
+    if not TheWorld.ismastersim then
+        return inst
+    end
+
+    -- inst.owner_l = nil
+    -- inst.task_l_flower = nil
+
+    inst:AddComponent("inspectable")
+
+    inst:AddComponent("inventoryitem")
+    inst.components.inventoryitem.imagename = "sachet"
+    inst.components.inventoryitem.atlasname = "images/inventoryimages/sachet.xml"
+
+    inst:AddComponent("equippable")
+    inst.components.equippable.equipslot = EQUIPSLOTS.BODY --EQUIPSLOTS.NECK
+    inst.components.equippable.dapperness = TUNING.DAPPERNESS_LARGE -- +6.66精神/分钟
+    inst.components.equippable:SetOnEquip(OnEquip_sachet)
+    inst.components.equippable:SetOnUnequip(OnUnequip_sachet)
+
+    inst:AddComponent("fueled")
+    inst.components.fueled.fueltype = FUELTYPE.USAGE
+    inst.components.fueled:InitializeFuelLevel(TUNING.SEG_TIME*12) --6分钟的佩戴时间
+    inst.components.fueled:SetDepletedFn(OnDepleted_sachet)
+    -- inst.components.fueled.no_sewing = true --不可修复
+
+    inst:AddComponent("fuel")
+    inst.components.fuel.fuelvalue = TUNING.MED_FUEL
+
+    MakeSmallBurnable(inst, TUNING.SMALL_BURNTIME)
+    MakeSmallPropagator(inst)
+
+    MakeHauntableLaunch(inst)
+
+    return inst
+end
+
 -------------------------
 
 local prefs = {
-    Prefab("backcub", Fn_backcub, assets_backcub, prefabs_backcub)
+    Prefab("backcub", Fn_backcub, assets_backcub, prefabs_backcub),
+    Prefab("sachet", Fn_sachet, assets_sachet, prefabs_sachet)
 }
 
 return unpack(prefs)

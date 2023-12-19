@@ -1,6 +1,5 @@
 local prefabFiles = {
     "foliageath",               --青枝绿叶
-    "sachet",                   --香包
     "neverfade_butterfly",      --永不凋零的蝴蝶
 }
 for k,v in pairs(prefabFiles) do

@@ -418,7 +418,7 @@ MakeBuff({
 local function OnTick_healthstorage(inst, target)
     if IsAlive(target) then
         if target.components.health:IsHurt() then --需要加血
-            target.components.health:DoDelta(2, nil, "shyerry")
+            target.components.health:DoDelta(2, true, "shyerry", true, nil, true)
             inst.times = inst.times - 1
             if inst.times <= 0 then
                 inst.components.debuff:Stop()
@@ -426,6 +426,29 @@ local function OnTick_healthstorage(inst, target)
         end
     else
         inst.components.debuff:Stop()
+    end
+end
+local function OnSave_healthstorage(inst, data)
+	if inst.times ~= nil and inst.times > 0 then
+        data.times = inst.times
+    end
+end
+local function OnLoad_healthstorage(inst, data)
+	if data ~= nil and data.times ~= nil and data.times > 0 then
+        inst.times = inst.times + data.times
+    end
+end
+local function BuffSet_healthstorage(buff, target)
+    if target.buff_healthstorage_times ~= nil then --buff次数可以无限叠加
+        buff.times = buff.times + target.buff_healthstorage_times
+        target.buff_healthstorage_times = nil
+    end
+    if buff.task_l_heal ~= nil then
+        buff.task_l_heal:Cancel()
+        buff.task_l_heal = nil
+    end
+    if buff.times > 0 then
+        buff.task_l_heal = buff:DoPeriodicTask(2, OnTick_healthstorage, nil, target)
     end
 end
 
@@ -436,48 +459,20 @@ MakeBuff({
     time_key = nil,
     time_default = nil,
     notimer = true,
-    fn_start = function(buff, target)
-        if target.buff_healthstorage_times ~= nil then
-            buff.times = buff.times + target.buff_healthstorage_times
-            target.buff_healthstorage_times = nil
-        end
-        if buff.times > 0 then
-            buff.task = buff:DoPeriodicTask(2, OnTick_healthstorage, nil, target)
-        end
-    end,
-    fn_again = function(buff, target)
-        if target.buff_healthstorage_times ~= nil then --buff次数可以无限叠加
-            buff.times = buff.times + target.buff_healthstorage_times
-            target.buff_healthstorage_times = nil
-        end
-
-        if buff.task ~= nil then
-            buff.task:Cancel()
-        end
-        if buff.times > 0 then
-            buff.task = buff:DoPeriodicTask(TUNING.JELLYBEAN_TICK_RATE, OnTick_healthstorage, nil, target)
-        end
-    end,
+    fn_start = BuffSet_healthstorage,
+    fn_again = BuffSet_healthstorage,
     fn_end = function(buff, target)
-        if buff.task ~= nil then
-            buff.task:Cancel()
-            buff.task = nil
+        if buff.task_l_heal ~= nil then
+            buff.task_l_heal:Cancel()
+            buff.task_l_heal = nil
         end
+        buff.times = 0
     end,
     fn_server = function(buff)
         buff.times = 0
-
-        buff.OnSave = function(inst, data)
-            if inst.times ~= nil and inst.times > 0 then
-                data.times = inst.times
-            end
-        end
-        buff.OnLoad = function(inst, data) --这个比OnAttached更早执行
-            if data ~= nil and data.times ~= nil and data.times > 0 then
-                inst.times = data.times
-            end
-        end
-    end,
+        buff.OnSave = OnSave_healthstorage
+        buff.OnLoad = OnLoad_healthstorage --这个比OnAttached更早执行
+    end
 })
 
 --------------------------------------------------------------------------

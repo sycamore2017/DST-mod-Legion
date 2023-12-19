@@ -85,8 +85,11 @@ local ingredients_legion = {
             end,
             fn_server = function(inst)
                 inst.components.edible:SetOnEatenFn(function(food, eater)
-                    eater.buff_healthstorage_times = 20 --因为buff相关组件不支持相同buff叠加时的数据传输，所以这里自己定义了一个传输方式
-                    eater:AddDebuff("buff_healthstorage", "buff_healthstorage")
+                    if eater.components.health ~= nil then
+                        --因为buff相关组件不支持相同buff叠加时的数据传输，所以这里自己定义了一个传输方式
+                        eater.buff_healthstorage_times = 20
+                        eater:AddDebuff("buff_healthstorage", "buff_healthstorage")
+                    end
                 end)
 
                 inst:AddComponent("deployable")

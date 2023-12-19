@@ -1150,6 +1150,9 @@ local function AcceptTest_tt(inst, item, giver)
     if inst.treeState == 0 then
         return false
     end
+    if item.prefab == "lureplantbulb" then --特殊给予物
+        return true
+    end
     if item.tradableitem_siv ~= nil or tradableItems_siv[item.prefab] ~= nil then
         return true
     else
@@ -1157,6 +1160,14 @@ local function AcceptTest_tt(inst, item, giver)
     end
 end
 local function OnAccept_tt(inst, giver, item)
+    if item.prefab == "lureplantbulb" then --特殊给予物
+        local xx, yy, zz = inst.Transform:GetWorldPosition()
+        local x, y, z = TOOLS_L.GetCalculatedPos(xx, yy, zz, 2.6+math.random()*3, nil)
+        TOOLS_L.FallingItem("tissue_l_lureplant", x, y+13, z, 1.5, 10, 15*FRAMES, nil, nil, nil)
+        item:Remove()
+        return
+    end
+
     local dd = item.tradableitem_siv or tradableItems_siv[item.prefab]
     local stacknum = 1
     if dd.needall then

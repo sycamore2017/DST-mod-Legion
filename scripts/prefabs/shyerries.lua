@@ -1,6 +1,10 @@
 local TOOLS_L = require("tools_legion")
 local tags_cant_flower = TOOLS_L.TagsCombat2({
-    "plantkin", "shadow", "ghost", "glommer", "friendlyfruitfly", "abigail", "shadowminion" })
+    "fragrantbody_l",
+    "plantkin", "shadow", "ghost", "abigail", "shadowminion"
+    -- "glommer", "friendlyfruitfly"
+    -- "chester", "hutch"
+})
 local SpawnRadius = 2.5 --生成与检测的间隔距离
 
 local function Disappear(inst, delay)
