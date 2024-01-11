@@ -170,9 +170,11 @@ Assets = {
     Asset("ANIM", "anim/images_minisign5.zip"),
     Asset("ANIM", "anim/images_minisign6.zip"),
     Asset("ANIM", "anim/snow_legion.zip"), --积雪的通用贴图
-    Asset("ANIM", "anim/playguitar.zip"),   --弹吉他动画模板
-    Asset("SOUNDPACKAGE", "sound/legion.fev"),   --吉他的声音
+    Asset("ANIM", "anim/playguitar.zip"), --弹吉他动画模板
+    Asset("SOUNDPACKAGE", "sound/legion.fev"), --吉他的声音
     Asset("SOUND", "sound/legion.fsb"),
+    Asset("ATLAS", "images/slot_bearspaw_l.xml"), --靠背熊的格子背景
+    Asset("IMAGE", "images/slot_bearspaw_l.tex"),
 
     --预加载，给科技栏用的
     Asset("ATLAS", "images/inventoryimages/hat_lichen.xml"),

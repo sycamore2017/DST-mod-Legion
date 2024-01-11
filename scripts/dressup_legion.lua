@@ -145,6 +145,56 @@ local dressup_data = {
     },
     hambat = { buildfile = "swap_ham_bat", buildsymbol = "swap_ham_bat" },
     spear_wathgrithr = { buildfile = "swap_spear_wathgrithr", buildsymbol = "swap_spear_wathgrithr" },
+    spear_wathgrithr_lightning = { --奔雷矛
+        buildfile = "spear_wathgrithr_lightning", buildsymbol = "swap_spear_wathgrithr_lightning"
+    },
+    spear_wathgrithr_lightning_charged = { --充能奔雷矛
+        buildfile = "spear_wathgrithr_lightning", buildsymbol = "swap_spear_wathgrithr_lightning",
+        equipfn = function(owner, item)
+            local fx = SpawnPrefab("spear_wathgrithr_lightning_fx")
+            if fx == nil then
+                return
+            end
+            owner.fx_d_spear_wathgrithr_l_c = fx
+            local skin_build = item:GetSkinBuild()
+            if skin_build ~= nil then
+                fx.AnimState:OverrideItemSkinSymbol("swap_spear_wathgrithr_lightning", skin_build, "swap_spear_wathgrithr_lightning", item.GUID, "swap_spear_wathgrithr_lightning")
+                fx.AnimState:PlayAnimation("swap_straight_loop", true)
+            else
+                fx.AnimState:ClearOverrideSymbol("swap_spear_wathgrithr_lightning")
+                fx.AnimState:PlayAnimation("swap_loop", true)
+            end
+
+            local FX_OFFSETS = { --每出一个新皮肤，多半得更新这里
+                DEFAULT = {0, 0, 0},
+                ["spear_wathgrithr_lightning_lunar"]    = {0,  20, 0},
+                ["spear_wathgrithr_lightning_valkyrie"] = {0,   0, 0},
+                ["spear_wathgrithr_lightning_wrestle"]  = {0, -20, 0},
+                ["spear_wathgrithr_lightning_northern"] = {0, -10, 0},
+            }
+            local offset = FX_OFFSETS[skin_build] or FX_OFFSETS.DEFAULT
+            fx.entity:SetParent(owner.entity)
+            fx.Follower:FollowSymbol(owner.GUID, "swap_object", offset[1], offset[2], offset[3], true)
+            fx.components.highlightchild:SetOwner(owner)
+            if owner.components.colouradder ~= nil then
+                owner.components.colouradder:AttachChild(fx)
+            end
+        end,
+        unequipfn = function(owner, item)
+            if owner.fx_d_spear_wathgrithr_l_c == nil then
+                return
+            end
+            if owner.components.colouradder ~= nil then
+                owner.components.colouradder:DetachChild(owner.fx_d_spear_wathgrithr_l_c)
+            end
+            owner.fx_d_spear_wathgrithr_l_c:Remove()
+        end,
+        onequipfn = function(owner, item)
+            if item.SetFxOwner ~= nil then
+                item:SetFxOwner(nil)
+            end
+        end
+    },
     nightsword = { buildfile = "swap_nightmaresword", buildsymbol = "swap_nightmaresword" },
     lantern = {
         buildfn = function(dressup, item, buildskin)
@@ -384,6 +434,20 @@ local dressup_data = {
     },
     walking_stick = { buildfile = "walking_stick", buildsymbol = "swap_walking_stick" },
     houndstooth_blowpipe = { buildfile = "swap_houndstooth_blowpipe", buildsymbol = "swap_blowdart_pipe" }, --嚎弹炮
+    wathgrithr_shield = { --战斗圆盾
+        -- isshield = true,
+        buildfn = function(dressup, item, buildskin)
+            local itemswap = {}
+            itemswap["lantern_overlay"] = dressup:GetDressData(
+                buildskin, "swap_wathgrithr_shield", "swap_shield", item.GUID, "swap"
+            )
+            itemswap["swap_shield"] = dressup:GetDressData(
+                buildskin, "swap_wathgrithr_shield", "swap_shield", item.GUID, "swap"
+            )
+            dressup:SetDressShield(itemswap)
+            return itemswap
+        end
+    },
     -- minifan = { buildfile = "swap_minifan", buildsymbol = "swap_minifan" }, --有贴图之外的实体，不做幻化
     -- redlantern = { buildfile = "swap_redlantern", buildsymbol = "swap_redlantern" }, --有贴图之外的实体，不做幻化
     -- thurible = { buildfile = "swap_thurible", buildsymbol = "swap_thurible" }, --暗影香炉。有贴图之外的实体，不做幻化
@@ -449,19 +513,33 @@ local dressup_data = {
     wathgrithrhat = {
         buildfn = function(dressup, item, buildskin)
             local itemswap = {}
-
+            itemswap["swap_hat"] = dressup:GetDressData(
+                buildskin, "hat_wathgrithr", "swap_hat", item.GUID, "swap"
+            )
             if
                 buildskin == "wathgrithrhat_valkyrie" or
                 buildskin == "wathgrithrhat_lunar"
             then
-                itemswap["swap_hat"] = dressup:GetDressData(
-                    buildskin, "hat_wathgrithr", "swap_hat", item.GUID, "swap"
-                )
                 dressup:SetDressOpenTop(itemswap)
             else
-                itemswap["swap_hat"] = dressup:GetDressData(
-                    buildskin, "hat_wathgrithr", "swap_hat", item.GUID, "swap"
-                )
+                dressup:SetDressTop(itemswap)
+            end
+
+            return itemswap
+        end
+    },
+    wathgrithr_improvedhat = {
+        buildfn = function(dressup, item, buildskin)
+            local itemswap = {}
+            itemswap["swap_hat"] = dressup:GetDressData(
+                buildskin, "hat_wathgrithr_improved", "swap_hat", item.GUID, "swap"
+            )
+            if
+                buildskin == "wathgrithr_improvedhat_valkyrie" or
+                buildskin == "wathgrithr_improvedhat_lunar"
+            then
+                dressup:SetDressOpenTop(itemswap)
+            else
                 dressup:SetDressTop(itemswap)
             end
 
@@ -955,7 +1033,6 @@ local dressup_data = {
         -- isshield = true,
         buildfn = function(dressup, item, buildskin)
             local itemswap = {}
-
             local skindata = item.components.skinedlegion:GetSkinedData()
             if skindata ~= nil and skindata.equip ~= nil then
                 itemswap["lantern_overlay"] = dressup:GetDressData(
@@ -967,7 +1044,6 @@ local dressup_data = {
                 )
             end
             dressup:SetDressShield(itemswap)
-
             return itemswap
         end
     },
@@ -976,7 +1052,6 @@ local dressup_data = {
         -- isshield = true,
         buildfn = function(dressup, item, buildskin)
             local itemswap = {}
-
             local skindata = item.components.skinedlegion:GetSkinedData()
             if skindata ~= nil and skindata.equip ~= nil then
                 itemswap["lantern_overlay"] = dressup:GetDressData(
@@ -988,7 +1063,6 @@ local dressup_data = {
                 )
             end
             dressup:SetDressShield(itemswap)
-
             return itemswap
         end
     },

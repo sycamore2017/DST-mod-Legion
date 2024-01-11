@@ -26,10 +26,12 @@ end
 --靠背熊
 ------
 
+local slotbg_backcub = { image = "slot_bearspaw_l.tex", atlas = "images/slot_bearspaw_l.xml" }
 local function MakeBackcub(name, animbuild)
     params[name] = {
         widget = {
             slotpos = {},
+            slotbg = { [11] = slotbg_backcub, [12] = slotbg_backcub },
             animbank = "ui_piggyback_2x6",
             animbuild = animbuild,
             pos = Vector3(-5, -90, 0)
@@ -365,6 +367,7 @@ end
 --巨食草
 ------
 
+local slotbg_nepenthes = { image = "slot_juice_l.tex", atlas = "images/slot_juice_l.xml" }
 params.plant_nepenthes_l = {
     widget = {
         slotpos = {},
@@ -379,7 +382,7 @@ params.plant_nepenthes_l = {
 for y = 3, 0, -1 do
     for x = 0, 3 do
         table.insert(params.plant_nepenthes_l.widget.slotpos, Vector3(80 * (x - 2) + 40, 80 * (y - 2) + 40, 0))
-        table.insert(params.plant_nepenthes_l.widget.slotbg, { image = "slot_juice_l.tex", atlas = "images/slot_juice_l.xml" })
+        table.insert(params.plant_nepenthes_l.widget.slotbg, slotbg_nepenthes)
     end
 end
 function params.plant_nepenthes_l.itemtestfn(container, item, slot)

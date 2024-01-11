@@ -49,7 +49,7 @@ end
 --------------------------------------------------------------------------
 
 local function GetSkin_base(placer)
-    if placer.invobject == nil then
+    if placer.invobject == nil or placer.invobject.components.skinedlegion == nil then
         return
     end
     return placer.invobject.components.skinedlegion:GetSkin()
