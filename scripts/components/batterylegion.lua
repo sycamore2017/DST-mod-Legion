@@ -50,12 +50,18 @@ function BatteryLegion:StopCharge() --结束自动充能
 end
 
 local function SpawnFx(doer, target, inst)
-	local owner = target
-	if target.components.inventoryitem ~= nil then
-		local owner2 = target.components.inventoryitem:GetGrandOwner()
-		if owner2 ~= nil then
-			owner = owner2
+	local owner
+	if target and target:IsValid() then --某些对象可能在充能过程中被删除了，比如奔雷矛
+		owner = target
+		if target.components.inventoryitem ~= nil then
+			local owner2 = target.components.inventoryitem:GetGrandOwner()
+			if owner2 ~= nil then
+				owner = owner2
+			end
 		end
+	end
+	if owner == nil then
+		owner = doer or inst
 	end
 	local x, y, z = owner.Transform:GetWorldPosition()
 	if inst.battery_fx_l ~= nil then
@@ -107,7 +113,10 @@ function BatteryLegion:Do(doer, target)
 		end
 	end
 
-	if target.prefab == "fimbul_axe" then --芬布尔斧
+	if
+		target.prefab == "fimbul_axe" or --芬布尔斧
+		target.prefab == "spear_wathgrithr_lightning_charged" --充能奔雷矛
+	then
 		if target.components.finiteuses ~= nil and target.components.finiteuses:GetPercent() < 1 then
 			cost = 25
 			if not TryCostEnergy(cpt, cost, doer) then
@@ -184,6 +193,18 @@ function BatteryLegion:Do(doer, target)
 			end
 		else
 			return false, "NONEED"
+		end
+	elseif target.prefab == "spear_wathgrithr_lightning" then --奔雷矛
+		if target.components.upgradeable ~= nil then
+			local upgradeable = target.components.upgradeable
+			local can_upgrade, reason = upgradeable:CanUpgrade()
+			if can_upgrade and upgradeable.onupgradefn ~= nil then
+				cost = 200
+				if not TryCostEnergy(cpt, cost, doer) then
+					return false, "NOENERGY"
+				end
+				upgradeable.onupgradefn(target, doer, self.inst)
+			end
 		end
 	elseif target:HasTag("lightninggoat") then --伏特羊
 		if target:HasTag("charged") then

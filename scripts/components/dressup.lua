@@ -56,6 +56,9 @@ local function OnEquip_dress(inst, data)
         return
     end
 	EquipSet_dress(inst, data.item)
+    if data.eslot == EQUIPSLOTS.HANDS then --装备手部装备时显示提灯图层，恢复盾牌贴图
+        inst.AnimState:Show("lantern_overlay") --这里用的小写，和 LANTERN_OVERLAY 不同，就可以不被幻化逻辑覆盖
+    end
 end
 local function OnFix_dress(inst, data)
     if inst.components.inventory == nil then
@@ -67,11 +70,14 @@ local function OnFix_dress(inst, data)
         end
     end
 end
--- local function OnUnequip_dress(inst, data)
---     if data == nil then
---         return
---     end
--- end
+local function OnUnequip_dress(inst, data)
+    if data == nil then
+        return
+    end
+    if data.eslot == EQUIPSLOTS.HANDS then --卸下手部装备时隐藏提灯图层，防止悬空盾牌出现
+        inst.AnimState:Hide("lantern_overlay") --这里用的小写，和 LANTERN_OVERLAY 不同，就可以不被幻化逻辑覆盖
+    end
+end
 
 local BODYTALL = "body_t"
 
@@ -95,7 +101,7 @@ local DressUp = Class(function(self, inst)
     inst:ListenForEvent("ms_playerreroll", OnReroll) --重选人物时
     inst:ListenForEvent("equip", OnEquip_dress)
     inst:ListenForEvent("dressup_l", OnFix_dress)
-	-- inst:ListenForEvent("unequip", OnUnequip_dress)
+	inst:ListenForEvent("unequip", OnUnequip_dress)
 end)
 
 function DressUp:GetDressData(buildskin, buildfile, buildsymbol, guid, type)
@@ -262,6 +268,7 @@ function DressUp:UpdateReal() --更新实际展示效果
                 else
                     self.inst.AnimState:OverrideSymbol(k, v.buildfile, v.buildsymbol)
                 end
+                self.inst.AnimState:ShowSymbol(k) --都 swap 了，肯定是要显示的
             elseif v.type == "show" then
                 self.inst.AnimState:Show(k)
             elseif v.type == "hide" then
