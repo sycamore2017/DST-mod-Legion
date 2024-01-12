@@ -434,20 +434,7 @@ local dressup_data = {
     },
     walking_stick = { buildfile = "walking_stick", buildsymbol = "swap_walking_stick" },
     houndstooth_blowpipe = { buildfile = "swap_houndstooth_blowpipe", buildsymbol = "swap_blowdart_pipe" }, --嚎弹炮
-    wathgrithr_shield = { --战斗圆盾
-        -- isshield = true,
-        buildfn = function(dressup, item, buildskin)
-            local itemswap = {}
-            itemswap["lantern_overlay"] = dressup:GetDressData(
-                buildskin, "swap_wathgrithr_shield", "swap_shield", item.GUID, "swap"
-            )
-            itemswap["swap_shield"] = dressup:GetDressData(
-                buildskin, "swap_wathgrithr_shield", "swap_shield", item.GUID, "swap"
-            )
-            dressup:SetDressShield(itemswap)
-            return itemswap
-        end
-    },
+    wathgrithr_shield = { isshield = true, buildfile = "swap_wathgrithr_shield", buildsymbol = "swap_shield" }, --战斗圆盾
     -- minifan = { buildfile = "swap_minifan", buildsymbol = "swap_minifan" }, --有贴图之外的实体，不做幻化
     -- redlantern = { buildfile = "swap_redlantern", buildsymbol = "swap_redlantern" }, --有贴图之外的实体，不做幻化
     -- thurible = { buildfile = "swap_thurible", buildsymbol = "swap_thurible" }, --暗影香炉。有贴图之外的实体，不做幻化
@@ -961,6 +948,11 @@ local dressup_data = {
                 item.components.timer:TimerExists("revolt") and "swap2" or "swap1",
                 item.GUID, "swap"
             )
+            itemswap["swap_shield"] = dressup:GetDressData(
+                nil, item._dd.build,
+                item.components.timer:TimerExists("revolt") and "swap2" or "swap1",
+                item.GUID, "swap"
+            )
             dressup:SetDressShield(itemswap)
 
             return itemswap
@@ -1038,8 +1030,14 @@ local dressup_data = {
                 itemswap["lantern_overlay"] = dressup:GetDressData(
                     nil, skindata.equip.build, skindata.equip.file, item.GUID, "swap"
                 )
+                itemswap["swap_shield"] = dressup:GetDressData(
+                    nil, skindata.equip.build, skindata.equip.file, item.GUID, "swap"
+                )
             else
                 itemswap["lantern_overlay"] = dressup:GetDressData(
+                    nil, "shield_l_sand", "swap_shield", item.GUID, "swap"
+                )
+                itemswap["swap_shield"] = dressup:GetDressData(
                     nil, "shield_l_sand", "swap_shield", item.GUID, "swap"
                 )
             end
@@ -1057,8 +1055,14 @@ local dressup_data = {
                 itemswap["lantern_overlay"] = dressup:GetDressData(
                     nil, skindata.equip.build, skindata.equip.file, item.GUID, "swap"
                 )
+                itemswap["swap_shield"] = dressup:GetDressData(
+                    nil, skindata.equip.build, skindata.equip.file, item.GUID, "swap"
+                )
             else
                 itemswap["lantern_overlay"] = dressup:GetDressData(
+                    nil, "shield_l_log", "swap_shield", item.GUID, "swap"
+                )
+                itemswap["swap_shield"] = dressup:GetDressData(
                     nil, "shield_l_log", "swap_shield", item.GUID, "swap"
                 )
             end

@@ -111,7 +111,7 @@ function DressUp:GetDressData(buildskin, buildfile, buildsymbol, guid, type)
         buildsymbol = buildsymbol,
         guid = guid,
         type = type,
-        priority = 0, --默认最高优先度，后面才更新
+        priority = 0 --默认最高优先度，后面才更新
     }
 end
 
@@ -344,6 +344,7 @@ function DressUp:PutOn(item, loaddata, noevent) --幻化一个物品
     else
         if slot == EQUIPSLOTS.HANDS then
             if data.isshield then
+                itemswap["swap_shield"] = self:GetDressData(buildskin, data.buildfile, data.buildsymbol, item.GUID, "swap")
                 itemswap["lantern_overlay"] = self:GetDressData(buildskin, data.buildfile, data.buildsymbol, item.GUID, "swap")
                 itemswap["LANTERN_OVERLAY"] = self:GetDressData(nil, nil, nil, nil, "show")
                 itemswap["swap_object"] = self:GetDressData(nil, nil, nil, nil, "clear")
