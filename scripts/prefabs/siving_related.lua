@@ -523,12 +523,12 @@ local function MakeMask(data)
 
             MakeInventoryPhysics(inst)
 
-            inst:AddTag("hat")
-            inst:AddTag("open_top_hat")
-
             inst.AnimState:SetBank(data.name)
             inst.AnimState:SetBuild(data.name)
             inst.AnimState:PlayAnimation("idle")
+
+            inst:AddTag("hat")
+            inst:AddTag("open_top_hat")
 
             inst:AddComponent("skinedlegion")
             inst.components.skinedlegion:Init(data.name)
@@ -573,6 +573,64 @@ local function MakeMask(data)
                     end
                 end
             end
+
+            inst.components.skinedlegion:SetOnPreLoad()
+
+            if data.fn_server ~= nil then
+                data.fn_server(inst)
+            end
+
+            return inst
+        end,
+        data.assets,
+        data.prefabs
+    ))
+end
+
+local function MakeArmor(data)
+    table.insert(prefs, Prefab(
+        data.name,
+        function()
+            local inst = CreateEntity()
+
+            inst.entity:AddTransform()
+            inst.entity:AddAnimState()
+            inst.entity:AddNetwork()
+
+            MakeInventoryPhysics(inst)
+
+            inst.AnimState:SetBank(data.name)
+            inst.AnimState:SetBuild(data.name)
+            inst.AnimState:PlayAnimation("idle")
+
+            inst.foleysound = "dontstarve/movement/foley/marblearmour"
+
+            inst:AddComponent("skinedlegion")
+            inst.components.skinedlegion:Init(data.name)
+
+            -- if data.fn_common ~= nil then
+            --     data.fn_common(inst)
+            -- end
+
+            inst.entity:SetPristine()
+            if not TheWorld.ismastersim then
+                return inst
+            end
+
+            inst:AddComponent("inspectable")
+
+            inst:AddComponent("inventoryitem")
+            inst.components.inventoryitem.imagename = data.name
+            inst.components.inventoryitem.atlasname = "images/inventoryimages/"..data.name..".xml"
+            inst.components.inventoryitem:SetSinks(true) --它是石头做的，不可漂浮
+
+            inst:AddComponent("equippable")
+
+            inst:AddComponent("armor")
+
+            inst:AddComponent("setbonus")
+
+            MakeHauntableLaunch(inst)
 
             inst.components.skinedlegion:SetOnPreLoad()
 
@@ -1146,11 +1204,13 @@ local function OnRepaired_mask2(inst, amount)
     end
 end
 local function OnBroken_mask2(inst)
-    inst:AddTag("broken") --这个标签会让名称显示加入“损坏”前缀
-    inst:RemoveTag("siv_mask2")
-    inst.components.inspectable.nameoverride = "BROKEN_FORGEDITEM" --改为统一的损坏描述
-    inst.components.armor:SetAbsorption(0)
-    inst:PushEvent("percentusedchange", { percent = 0 }) --界面需要更新百分比
+    if not inst:HasTag("broken") then
+        inst:AddTag("broken") --这个标签会让名称显示加入“损坏”前缀
+        inst:RemoveTag("siv_mask2")
+        inst.components.inspectable.nameoverride = "BROKEN_FORGEDITEM" --改为统一的损坏描述
+        inst.components.armor:SetAbsorption(0)
+        inst:PushEvent("percentusedchange", { percent = 0 }) --界面需要更新百分比
+    end
 end
 local function OnAttackOther(owner, data)
     if
@@ -1380,6 +1440,13 @@ local function OnUnequip_mask2(inst, owner)
     TOOLS_L.RemoveTag(owner, "PreventSivFlower", inst.prefab)
     CancelTask_life(inst, owner)
 end
+local function SetKeepOnFinished_legion(inst)
+    if inst.components.armor.SetKeepOnFinished == nil then --有的mod替换了这个组件，导致没兼容官方的新函数
+        inst.components.armor.keeponfinished = true
+    else
+        inst.components.armor:SetKeepOnFinished(true) --耐久为0不消失
+    end
+end
 
 MakeMask({
     name = "siving_mask_gold",
@@ -1404,11 +1471,7 @@ MakeMask({
         inst.components.equippable:SetOnUnequip(OnUnequip_mask2)
 
         inst.components.armor:InitCondition(735, 0.75)
-        if inst.components.armor.SetKeepOnFinished == nil then --有的mod替换了这个组件，导致没兼容官方的新函数
-            inst.components.armor.keeponfinished = true
-        else
-            inst.components.armor:SetKeepOnFinished(true) --耐久为0不消失
-        end
+        SetKeepOnFinished_legion(inst)
 		inst.components.armor:SetOnFinished(OnBroken_mask2)
         inst.components.armor.onrepair = OnRepaired_mask2
 
@@ -1416,6 +1479,311 @@ MakeMask({
         inst.components.lifebender.fn_bend = FnBend_mask2
     end
 })
+
+--------------------------------------------------------------------------
+--[[ 子圭·庇 ]]
+--------------------------------------------------------------------------
+
+local function EmptyCptFn(self, ...)end
+local function SetSymbols_suit(inst, owner)
+    local skindata = inst.components.skinedlegion:GetSkinedData()
+    if skindata ~= nil and skindata.equip ~= nil then
+        owner.AnimState:OverrideSymbol("swap_body", skindata.equip.build, skindata.equip.file)
+    else
+        owner.AnimState:OverrideSymbol("swap_body", inst.prefab, "swap_body")
+    end
+end
+local function ClearSymbols_suit(inst, owner)
+    -- local skindata = inst.components.skinedlegion:GetSkinedData()
+    -- if skindata ~= nil and skindata.equip ~= nil then
+    --     if skindata.equip.endfn ~= nil then
+    --         skindata.equip.endfn(inst, owner)
+    --     end
+    -- end
+    owner.AnimState:ClearOverrideSymbol("swap_body")
+end
+
+local function OnSetBonusOn_suit(inst)
+	inst.bloodclotmult_l = 0.25
+    inst.counteratkmax_l = 100
+end
+local function OnSetBonusOff_suit(inst)
+	inst.bloodclotmult_l = 0.2 --凝血系数
+    inst.counteratkmax_l = 80 --反伤上限
+end
+local function OnRepaired_suit(inst, amount)
+    if amount > 0 and inst._broken then
+        inst._broken = nil
+        inst.components.armor:SetAbsorption(0.7)
+    end
+end
+local function OnBroken_suit(inst)
+    if not inst._broken then
+        inst._broken = true
+        inst.components.armor:SetAbsorption(0.05)
+        inst:PushEvent("percentusedchange", { percent = 0 }) --界面需要更新百分比
+    end
+end
+local function OnHitOther_suit(owner, data)
+    local armor = owner._bloodarmor_l
+    if armor == nil or not armor:IsValid() then
+        return
+    end
+    if not armor.components.armor:IsDamaged() then
+        return
+    end
+    local value = data.damageresolved or data.damage
+    if value ~= nil and value > 0 then --造成了伤害才行
+        armor.components.armor:Repair(value*(armor.bloodclotmult_l or 0.2))
+    end
+end
+local function OnCooldown_suit(inst)
+    inst._cdtask = nil
+end
+local function OnAttacked_suit(owner, data)
+    if
+        data == nil or data.redirected or --redirected 代表是骑牛等牛帮玩家抵挡伤害的情况
+        (data.damageresolved == nil or data.damageresolved <= 0) --damageresolved 就是指本次受击的血量损失值
+    then
+        return
+    end
+    local armor = owner._bloodarmor_l
+    if
+        armor == nil or not armor:IsValid() or
+        armor._cdtask ~= nil or armor.components.armor.condition <= 0
+    then
+        return
+    end
+    armor._cdtask = armor:DoTaskInTime(0.3, OnCooldown_suit)
+    if owner.SoundEmitter ~= nil then
+        owner.SoundEmitter:PlaySound("dontstarve/common/together/armor/cactus") --undo得改个声音
+    end
+
+    local fx = SpawnPrefab("sivsuitatk_fx") --这个不是单纯的特效，反伤逻辑也在里面
+    if fx ~= nil then
+        fx.InitCounterAtk(fx, owner, armor, data.attacker)
+    end
+end
+local function OnEquip_suit(inst, owner)
+    SetSymbols_suit(inst, owner)
+    if owner:HasTag("equipmentmodel") then --假人！
+        return
+    end
+    TOOLS_L.AddEntValue(owner, "siv_blood_l_reducer", inst.prefab, 1, 0.25)
+    owner._bloodarmor_l = inst
+    owner:ListenForEvent("onhitother", OnHitOther_suit)
+    owner:ListenForEvent("blocked", OnAttacked_suit)
+    owner:ListenForEvent("attacked", OnAttacked_suit)
+end
+local function OnUnequip_suit(inst, owner)
+    ClearSymbols_suit(inst, owner)
+    TOOLS_L.RemoveEntValue(owner, "siv_blood_l_reducer", inst.prefab, 1)
+    owner._bloodarmor_l = nil
+    owner:RemoveEventCallback("onhitother", OnHitOther_suit)
+    owner:RemoveEventCallback("blocked", OnAttacked_suit)
+    owner:RemoveEventCallback("attacked", OnAttacked_suit)
+end
+
+MakeArmor({
+    name = "siving_suit",
+    assets = {
+        Asset("ANIM", "anim/siving_suit.zip"),
+        Asset("ATLAS", "images/inventoryimages/siving_suit.xml"),
+        Asset("IMAGE", "images/inventoryimages/siving_suit.tex")
+    },
+    prefabs = { "sivsuitatk_fx" },
+    -- fn_common = function(inst)end,
+    fn_server = function(inst)
+        -- inst._broken = nil
+        -- inst._cdtask = nil
+        -- inst.armorcostmult_l = 1
+        OnSetBonusOff_suit(inst)
+
+        inst.components.equippable.equipslot = EQUIPSLOTS.BODY
+        inst.components.equippable:SetOnEquip(OnEquip_suit)
+        inst.components.equippable:SetOnUnequip(OnUnequip_suit)
+
+        inst.components.armor:InitCondition(525, 0.7)
+        SetKeepOnFinished_legion(inst)
+		inst.components.armor:SetOnFinished(OnBroken_suit)
+        inst.components.armor.onrepair = OnRepaired_suit
+        inst.components.armor.TakeDamage = EmptyCptFn --不会因为吸收战斗伤害而损失耐久
+
+        inst.components.setbonus:SetSetName(EQUIPMENTSETNAMES.SIVING)
+        inst.components.setbonus:SetOnEnabledFn(OnSetBonusOn_suit)
+        inst.components.setbonus:SetOnDisabledFn(OnSetBonusOff_suit)
+    end
+})
+
+--------------------------------------------------------------------------
+--[[ 子圭·釜 ]]
+--------------------------------------------------------------------------
+
+MakeArmor({
+    name = "siving_suit_gold",
+    assets = {
+        Asset("ANIM", "anim/siving_suit_gold.zip"),
+        Asset("ATLAS", "images/inventoryimages/siving_suit_gold.xml"),
+        Asset("IMAGE", "images/inventoryimages/siving_suit_gold.tex")
+    },
+    prefabs = { "sivsuitatk_fx" },
+    -- fn_common = function(inst)end,
+    fn_server = function(inst)
+        inst.components.equippable.equipslot = EQUIPSLOTS.BACK or EQUIPSLOTS.BODY
+    end
+})
+
+--------------------------------------------------------------------------
+--[[ 子圭护甲的反伤特效 ]]
+--------------------------------------------------------------------------
+
+local function DoFxCounterAtk(inst)
+    inst.task_atk = nil
+    if not inst.armor:IsValid() or inst.armor.components.armor == nil then
+        inst.armor = nil
+    end
+    if not inst.owner:IsValid() or inst.owner.components.combat == nil then
+        inst.owner = nil
+    end
+    if inst.attacker ~= nil and not inst.attacker:IsValid() then
+        inst.attacker = nil
+    end
+
+    local tags_cant
+    local validfn
+    if TheNet:GetPVPEnabled() then
+        tags_cant = TOOLS_L.TagsCombat3()
+        validfn = TOOLS_L.MaybeEnemy_me
+    else
+        tags_cant = TOOLS_L.TagsCombat3({ "player" })
+        validfn = TOOLS_L.MaybeEnemy_player
+    end
+    local data = {}
+    local hasattacker = false
+    local dmg, spdmg, stimuli
+    local x, y, z = inst.Transform:GetWorldPosition()
+    local ents = TheSim:FindEntities(x, y, z, inst.range, { "_combat" }, tags_cant)
+    for _, ent in ipairs(ents) do
+        if ent ~= inst.owner and ent.entity:IsVisible() and validfn(inst.owner, ent, true) then
+            if inst.owner ~= nil then
+                if inst.owner.components.combat:CanTarget(ent) then
+                    dmg, spdmg, stimuli = TOOLS_L.CalcDamage(inst.owner, ent, nil, nil, nil, inst.damage, nil, false)
+                    table.insert(data, { target = ent, dmg = dmg, spdmg = spdmg, stimuli = stimuli })
+                    if not hasattacker and ent == inst.attacker then
+                        hasattacker = true
+                    end
+                end
+            elseif ent.components.combat:CanBeAttacked() then
+                table.insert(data, { target = ent, dmg = inst.damage })
+                if not hasattacker and ent == inst.attacker then
+                    hasattacker = true
+                end
+            end
+        end
+    end
+
+    dmg = #data
+    if hasattacker then --去掉攻击者
+        dmg = dmg - 1
+    end
+    if dmg > 0 then --计算所受伤害系数
+        stimuli = math.max(1 - dmg/10, 0.1)
+    else
+        stimuli = 1
+    end
+    --先进行攻击
+    for _, v in ipairs(data) do
+        if v.target ~= inst.attacker then
+            v.dmg = v.dmg * stimuli
+        end
+        v.target.components.combat:GetAttacked(inst.armor, v.dmg, nil, v.stimuli, v.spdmg)
+    end
+    --后计算护甲消耗，因为怕有反伤怪
+    if (hasattacker or dmg > 0) and inst.armor ~= nil then --有反伤对象，则扣除护甲耐久
+        inst.armor.components.armor:SetCondition(inst.armor.components.armor.condition - inst.damage*inst.armorcostmult)
+    end
+
+    if inst:IsAsleep() then
+        inst:Remove()
+    end
+end
+local function InitCounterAtk(inst, owner, armor, attacker)
+    local poser = owner
+    local health = 0
+    local condition = armor.components.armor.condition
+
+    inst.armor = armor
+    inst.owner = owner
+    inst.armorcostmult = armor.armorcostmult_l or 1
+    if armor.prefab == "siving_suit_gold" then
+        inst.range = 4
+    end
+    if attacker ~= nil and attacker:IsValid() then
+        poser = attacker
+        if attacker.components.health ~= nil and not attacker.components.health:IsDead() then
+            health = attacker.components.health.currenthealth
+            inst.attacker = attacker
+        end
+    end
+    inst.damage = armor.counteratkmax_l or 80
+    health = math.max(health, condition)
+    if health < inst.damage and health > 0 then
+        inst.damage = health
+    end
+    inst.Transform:SetPosition(poser.Transform:GetWorldPosition())
+    inst.task_atk = inst:DoTaskInTime(0, DoFxCounterAtk)
+end
+
+table.insert(prefs, Prefab(
+    "sivsuitatk_fx",
+    function()
+        local inst = CreateEntity()
+
+        inst.entity:AddTransform()
+        inst.entity:AddAnimState()
+        inst.entity:AddNetwork()
+
+        inst.Transform:SetFourFaced()
+
+        inst.AnimState:SetBank("bramblefx")
+        inst.AnimState:SetBuild("sivsuitatk_fx")
+        inst.AnimState:SetFinalOffset(3)
+
+        inst:AddTag("FX")
+
+        inst.entity:SetPristine()
+        if not TheWorld.ismastersim then
+            return inst
+        end
+
+        if math.random() < 0.5 then
+            inst.AnimState:PlayAnimation("idle")
+        else
+            inst.AnimState:PlayAnimation("trap")
+            inst.AnimState:SetScale(1.5, 1.5)
+        end
+
+        inst.persists = false
+
+        inst.damage = 80
+        inst.range = 3
+        inst.armorcostmult = 1
+        -- inst.armor = nil
+        -- inst.owner = nil
+        -- inst.attacker = nil
+        -- inst.task_atk = nil
+        inst.InitCounterAtk = InitCounterAtk
+
+        inst:ListenForEvent("animover", inst.Remove)
+
+        return inst
+    end,
+    {
+        Asset("ANIM", "anim/bramblefx.zip"),
+        Asset("ANIM", "anim/sivsuitatk_fx.zip")
+    },
+    nil
+))
 
 --------------------
 --------------------

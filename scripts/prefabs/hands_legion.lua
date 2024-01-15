@@ -848,14 +848,22 @@ local function OnAttack_orchid(inst, owner, target)
         local dmg, spdmg, stimuli
         local ents = TheSim:FindEntities(x1, y1, z1, 3.5, { "_combat" }, tags_cant)
         for _, ent in ipairs(ents) do
-            if
-                ent ~= target and ent ~= owner and
-                ent.entity:IsVisible() and
-                owner.components.combat:IsValidTarget(ent) and --Tip：范围性伤害还是加个判断！防止打到不该打的对象
-                validfn(owner, ent, true)
-            then
-                dmg, spdmg, stimuli = TOOLS_L.CalcDamage(owner, ent, inst, nil, nil, atk_orchid_area, nil, true)
-                ent.components.combat:GetAttacked(owner, dmg, inst, stimuli, spdmg)
+            if ent ~= target and ent ~= owner and ent.entity:IsVisible() then
+                --为啥官方要这样写，难道是 owner 会因为那些受击者的反伤导致自身失效？
+                if owner ~= nil and (not owner:IsValid() or owner.components.combat == nil) then
+                    owner = nil
+                end
+                if validfn(owner, ent, true) then
+                    --Tip：范围性伤害还是加个判断！防止打到不该打的对象
+                    if owner ~= nil then
+                        if owner.components.combat:IsValidTarget(ent) then
+                            dmg, spdmg, stimuli = TOOLS_L.CalcDamage(owner, ent, inst, nil, nil, atk_orchid_area, nil, true)
+                            ent.components.combat:GetAttacked(owner, dmg, inst, stimuli, spdmg)
+                        end
+                    elseif ent.components.combat:CanBeAttacked() then
+                        ent.components.combat:GetAttacked(inst, atk_orchid_area, nil, nil, nil)
+                    end
+                end
             end
         end
     end
@@ -1359,16 +1367,18 @@ local function GiveSomeShock(inst, owner, target, doshock, hittarget) --击中�
                     v.components.workable:Destroy(inst)
                 end
             elseif (hittarget or v ~= target) or doshock then
+                --为啥官方要这样写，难道是 owner 会因为那些受击者的反伤导致自身失效？
+                if owner ~= nil and (not owner:IsValid() or owner.components.combat == nil) then
+                    owner = nil
+                end
                 if validfn(owner, v, true) then
                     if (hittarget or v ~= target) and v.components.combat:CanBeAttacked(owner) then
-                        if owner ~= nil and owner.components.combat ~= nil then
+                        if owner ~= nil then
                             dmg, spdmg, stimuli = TOOLS_L.CalcDamage(owner, v, inst, inst, nil, nil, nil, true)
-                        else --没办法，此时玩家的组件已经没法用了
-                            dmg = atk_fimbulaxe
-                            spdmg = nil
-                            stimuli = "electric"
+                            v.components.combat:GetAttacked(owner, dmg, inst, stimuli, spdmg)
+                        else
+                            v.components.combat:GetAttacked(inst, atk_fimbulaxe, nil, "electric", nil)
                         end
-                        v.components.combat:GetAttacked(owner, dmg, inst, stimuli, spdmg)
                     end
                     if doshock and v.components.shockable ~= nil and math.random() < 0.3 then
                         givelightning = true

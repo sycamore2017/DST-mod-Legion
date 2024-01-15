@@ -64,6 +64,10 @@ local assets = {
     Asset("IMAGE", "images/inventoryimages/carpet_plush_big.tex"),
     Asset("ATLAS", "images/inventoryimages/carpet_plush.xml"),
     Asset("IMAGE", "images/inventoryimages/carpet_plush.tex"),
+    Asset("ATLAS", "images/inventoryimages/siving_suit.xml"),
+    Asset("IMAGE", "images/inventoryimages/siving_suit.tex"),
+    Asset("ATLAS", "images/inventoryimages/siving_suit_gold.xml"),
+    Asset("IMAGE", "images/inventoryimages/siving_suit_gold.tex"),
 }
 
 for k,v in pairs(assets) do
@@ -88,6 +92,9 @@ _G.RegistMiniMapImage_legion("siving_ctlall")
 _G.RegistMiniMapImage_legion("siving_turn")
 _G.RegistMiniMapImage_legion("plant_crop_l")
 _G.RegistMiniMapImage_legion("boltwingout")
+
+_G.EQUIPMENTSETNAMES.SIVING = "siving"
+_G.EQUIPMENTSETNAMES.SIVING2 = "siving2"
 
 AddRecipe2(
     "siving_soil_item", {
@@ -145,10 +152,18 @@ AddRecipe2(
 AddRecipe2(
     "siving_mask", {
         Ingredient("siving_rocks", 12, "images/inventoryimages/siving_rocks.xml"),
-        Ingredient("reviver", 2),
+        Ingredient("reviver", 2)
     }, TECH.LOST, {
         atlas = "images/inventoryimages/siving_mask.xml", image = "siving_mask.tex"
-    }, { "ARMOUR", "MAGIC", "RESTORATION" }
+    }, { "ARMOUR", "RESTORATION" }
+)
+AddRecipe2(
+    "siving_suit", {
+        Ingredient("siving_rocks", 16, "images/inventoryimages/siving_rocks.xml"),
+        Ingredient("yellowgem", 1)
+    }, TECH.LOST, {
+        atlas = "images/inventoryimages/siving_suit.xml", image = "siving_suit.tex"
+    }, { "ARMOUR" }
 )
 AddRecipe2(
     "siving_feather_real", {
@@ -900,7 +915,7 @@ local fishhoming_ingredients = {
     shroom_skin =           { pasty=5, meat=2, monster=5, rotten=4, evil=5 }, --蘑菇皮(龙虾、邪天翁)
     compost =               { pasty=1, veggie=0.5, rotten=1 }, --堆肥(龙虾)
     spoiled_fish =          { pasty=1, hardy=1, meat=0.5, rotten=1 }, --变质的鱼(龙虾)
-    spoiled_fish_small =    { pasty=1, hardy=1, meat=0.5, rotten=1 }, --坏掉的小鱼(龙虾)
+    spoiled_fish_small =    { pasty=1, hardy=1, meat=0.5, rotten=1 }, --变质的小鱼块(龙虾)
     guano =                 { dusty=1, rotten=1, salty=0.5 }, --鸟粪(龙虾、饼干切割机)
     rottenegg =             { pasty=1, hardy=1, rotten=1, slippery=1 }, --腐烂鸟蛋(龙虾、口水鱼)
     lightflier =            { dusty=1, pasty=1, meat=0.5, shiny=1, shaking=1 }, --球状光虫(鱿鱼、海黾)

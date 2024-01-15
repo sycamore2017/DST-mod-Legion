@@ -155,6 +155,9 @@ local InventoryPrefabsList = {  --每个元素的下标值为每种物品栏图�
     tissue_l_lureplant = 6,
     tissue_l_berries = 6,
 
+    siving_suit = 6,
+    siving_suit_gold = 6,
+
     --skins1：56个
     hat_lichen_emo_que = 7,
     neverfade_thanks = 7,

@@ -192,14 +192,16 @@ local function MaybeEnemy_player(inst, ent, playerside) --是否为 全体玩家
 end
 
 --[ 判定 attacker 对于 target 的攻击力 ]--
+--目前官方没有这样的单独计算 对象A 对于 对象B 能打出的伤害的单独逻辑，所以这里专门写个逻辑，需要不定期更新官方的逻辑
 local SpDamageUtil = require("components/spdamageutil")
 local function CalcDamage(attacker, target, weapon, projectile, stimuli, damage, spdamage, pushevent)
     -- if weapon == nil then --这里不关注武器来源
     --     weapon = attacker.components.combat:GetWeapon()
     -- end
+    local weapon_cmp = weapon ~= nil and weapon.components.weapon or nil
     if stimuli == nil then
-        if weapon ~= nil and weapon.components.weapon ~= nil and weapon.components.weapon.overridestimulifn ~= nil then
-            stimuli = weapon.components.weapon.overridestimulifn(weapon, attacker, target)
+        if weapon_cmp ~= nil and weapon_cmp.overridestimulifn ~= nil then
+            stimuli = weapon_cmp.overridestimulifn(weapon, attacker, target)
         end
         if stimuli == nil and attacker.components.electricattacks ~= nil then
             stimuli = "electric"
@@ -210,19 +212,23 @@ local function CalcDamage(attacker, target, weapon, projectile, stimuli, damage,
         attacker:PushEvent("onattackother", { target = target, weapon = weapon, projectile = projectile, stimuli = stimuli })
     end
 
-    local multiplier =
+    local multiplier = 1
+    if
         (
             stimuli == "electric" or
-            (weapon ~= nil and weapon.components.weapon ~= nil and weapon.components.weapon.stimuli == "electric")
+            (weapon_cmp ~= nil and weapon_cmp.stimuli == "electric")
         ) and not (
             target:HasTag("electricdamageimmune") or
             (target.components.inventory ~= nil and target.components.inventory:IsInsulated())
-        ) and TUNING.ELECTRIC_DAMAGE_MULT + TUNING.ELECTRIC_WET_DAMAGE_MULT *
-            (
-                target.components.moisture ~= nil and target.components.moisture:GetMoisturePercent() or
-                (target:GetIsWet() and 1 or 0)
-            )
-        or 1
+        )
+    then
+        local elec_mult = weapon_cmp ~= nil and weapon_cmp.electric_damage_mult or TUNING.ELECTRIC_DAMAGE_MULT
+        local elec_wet_mult = weapon_cmp ~= nil and weapon_cmp.electric_wet_damage_mult or TUNING.ELECTRIC_WET_DAMAGE_MULT
+        multiplier = elec_mult + elec_wet_mult * (
+            target.components.moisture ~= nil and target.components.moisture:GetMoisturePercent() or
+            (target:GetIsWet() and 1 or 0)
+        )
+    end
 
     local dmg, spdmg
     if damage == nil and spdamage == nil then --使用公用机制(获取 attacker 或 weapon 自己的数值)
@@ -232,7 +238,7 @@ local function CalcDamage(attacker, target, weapon, projectile, stimuli, damage,
 
     --使用这次专门的数值
     if target:HasTag("alwaysblock") then
-        return 0
+        return 0, nil, stimuli
     end
     dmg = damage or 0
     if spdamage ~= nil then --由于 spdamage 是个表，我不想改动传参数据，所以这里新产生一个表
