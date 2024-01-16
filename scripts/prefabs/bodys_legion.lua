@@ -255,6 +255,11 @@ local function OnEntitySleep_backcub(inst)
     end
     inst.hungertime_l = GetTime()
 end
+local function OnEntityReplicated_backcub(inst)
+    if inst.replica.container ~= nil then
+        inst.replica.container:WidgetSetup("backcub")
+    end
+end
 
 local function Fn_backcub()
     local inst = CreateEntity()
@@ -307,7 +312,7 @@ local function Fn_backcub()
 
     inst.entity:SetPristine()
     if not TheWorld.ismastersim then
-        inst.OnEntityReplicated = function(inst) inst.replica.container:WidgetSetup("backcub") end
+        inst.OnEntityReplicated = OnEntityReplicated_backcub
         return inst
     end
 

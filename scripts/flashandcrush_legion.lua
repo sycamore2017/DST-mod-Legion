@@ -191,7 +191,18 @@ AddRecipe2(
     }, tech_recast[2], {
         nounlock = lock_recast,
         atlas = "images/inventoryimages/siving_mask_gold.xml", image = "siving_mask_gold.tex"
-    }, { "RECAST", "ARMOUR", "MAGIC", "RESTORATION" }
+    }, { "RECAST", "ARMOUR", "RESTORATION" }
+)
+AddRecipe2(
+    "siving_suit_gold", {
+        Ingredient("onemanband", 1),
+        Ingredient("siving_suit", 1, "images/inventoryimages/siving_suit.xml"),
+        Ingredient("siving_derivant_item", 1, "images/inventoryimages/siving_derivant_item.xml"),
+        Ingredient("bundlewrap", 1)
+    }, tech_recast[2], {
+        nounlock = lock_recast,
+        atlas = "images/inventoryimages/siving_suit_gold.xml", image = "siving_suit_gold.tex"
+    }, { "RECAST", "ARMOUR" }
 )
 AddRecipe2(
     "siving_ctlall_item", {

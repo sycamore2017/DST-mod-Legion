@@ -1885,6 +1885,11 @@ local function OnFinished_carl(inst)
 	end
 	inst:Remove()
 end
+local function OnEntityReplicated_carl(inst)
+    if inst.replica.container ~= nil then
+        inst.replica.container:WidgetSetup("lance_carrot_l")
+    end
+end
 
 local function Fn_carl()
     local inst = CreateEntity()
@@ -1917,7 +1922,7 @@ local function Fn_carl()
 
     inst.entity:SetPristine()
     if not TheWorld.ismastersim then
-        inst.OnEntityReplicated = function(inst) inst.replica.container:WidgetSetup("lance_carrot_l") end
+        inst.OnEntityReplicated = OnEntityReplicated_carl
         return inst
     end
 

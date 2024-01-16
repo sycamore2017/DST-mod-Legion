@@ -404,14 +404,6 @@ end
 
 ------
 
-local function OnUnequip_sivmask_gold_marble(owner, data)
-    if data ~= nil and data.eslot == EQUIPSLOTS.BODY then
-        owner.AnimState:OverrideSymbol("swap_body", "siving_armor_gold_marble", "swap_body")
-    end
-end
-
-------
-
 local function SetTarget_hidden(inst, build)
     if inst.upgradetarget ~= "icebox" then
         inst.AnimState:OverrideSymbol("base", build or "hiddenmoonlight", "saltbase")
@@ -948,6 +940,31 @@ _G.SKIN_PREFABS_LEGION = {
             inst.maskfxoverride_l = nil
         end,
         equip = { symbol = nil, build = "siving_mask_gold", file = nil, isopenhat = true },
+        exchangefx = { prefab = nil, offset_y = nil, scale = nil }
+    },
+
+    siving_suit = {
+        image = { name = nil, atlas = nil, setable = true },
+        anim = {
+            bank = nil, build = nil,
+            anim = nil, animpush = nil, isloop = nil, setable = true
+        },
+        fn_start = function(inst)
+            inst.suitfxoverride_l = nil
+        end,
+        equip = { symbol = "swap_body", build = "siving_suit", file = "swap_body" },
+        exchangefx = { prefab = nil, offset_y = nil, scale = nil }
+    },
+    siving_suit_gold = {
+        image = { name = nil, atlas = nil, setable = true },
+        anim = {
+            bank = nil, build = nil,
+            anim = nil, animpush = nil, isloop = nil, setable = true
+        },
+        fn_start = function(inst)
+            inst.suitfxoverride_l = nil
+        end,
+        equip = { symbol = "swap_body", build = "siving_suit_gold", file = "swap_body" },
         exchangefx = { prefab = nil, offset_y = nil, scale = nil }
     },
 
@@ -3158,8 +3175,7 @@ _G.SKINS_LEGION = {
         base_prefab = "siving_mask_gold", skin_id = "6558bf96adf8ac0fd863e870", onlyownedshow = true,
 		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
 		assets = {
-			Asset("ANIM", "anim/skin/siving_mask_gold_marble.zip"),
-            Asset("ANIM", "anim/skin/siving_armor_gold_marble.zip")
+			Asset("ANIM", "anim/skin/siving_mask_gold_marble.zip")
 		},
 		image = { name = nil, atlas = nil, setable = true },
         string = ischinese and { name = "圣洁面纱" } or { name = "Holy Veil" },
@@ -3170,46 +3186,28 @@ _G.SKINS_LEGION = {
         fn_start = function(inst)
             inst.maskfxoverride_l = "siving_lifesteal_fx_marble"
         end,
-        equip = {
-            symbol = nil, build = "siving_mask_gold_marble", file = "swap_hat", isopenhat = nil,
-            startfn = function(inst, owner)
-                TOOLS_L.hat_on(inst, owner, "siving_mask_gold_marble", "swap_hat")
-                owner:ListenForEvent("unequip", OnUnequip_sivmask_gold_marble)
-                if owner.components.inventory ~= nil then
-                    local equippedArmor = owner.components.inventory:GetEquippedItem(EQUIPSLOTS.BODY) or nil
-                    if equippedArmor == nil then
-                        owner.AnimState:OverrideSymbol("swap_body", "siving_armor_gold_marble", "swap_body")
-                    end
-                end
-            end,
-            endfn = function(inst, owner)
-                owner:RemoveEventCallback("unequip", OnUnequip_sivmask_gold_marble)
-                if owner.components.inventory ~= nil then
-                    local equippedArmor = owner.components.inventory:GetEquippedItem(EQUIPSLOTS.BODY) or nil
-                    if equippedArmor == nil then
-                        owner.AnimState:ClearOverrideSymbol("swap_body")
-                    end
-                end
-            end
-        },
+        equip = { symbol = nil, build = "siving_mask_gold_marble", file = "swap_hat", isopenhat = nil },
         exchangefx = { prefab = nil, offset_y = nil, scale = nil }
     },
 
-    -- siving_armor_gold_marble = {
-    --     base_prefab = "siving_armor_gold", skin_id = "6558bf96adf8ac0fd863e870", noshopshow = true,
-	-- 	type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
-	-- 	assets = {
-    --         Asset("ANIM", "anim/skin/siving_armor_gold_marble.zip")
-	-- 	},
-	-- 	image = { name = nil, atlas = nil, setable = true },
-    --     string = ischinese and { name = "圣洁长袍" } or { name = "Holy Robe" },
-	-- 	anim = {
-    --         bank = nil, build = nil,
-    --         anim = nil, animpush = nil, isloop = nil, setable = true
-    --     },
-    --     equip = { symbol = "swap_body", build = "siving_armor_gold_marble", file = "swap_body" },
-    --     exchangefx = { prefab = nil, offset_y = nil, scale = nil }
-    -- },
+    siving_suit_gold_marble = {
+        base_prefab = "siving_suit_gold", skin_id = "6558bf96adf8ac0fd863e870", noshopshow = true,
+		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
+		assets = {
+            Asset("ANIM", "anim/skin/siving_suit_gold_marble.zip")
+		},
+		image = { name = nil, atlas = nil, setable = true },
+        string = ischinese and { name = "圣洁长袍" } or { name = "Holy Robe" },
+		anim = {
+            bank = nil, build = nil,
+            anim = nil, animpush = nil, isloop = nil, setable = true
+        },
+        -- fn_start = function(inst)
+        --     inst.suitfxoverride_l = "sivsuitatk_fx" --undo 特效！
+        -- end,
+        equip = { symbol = "swap_body", build = "siving_suit_gold_marble", file = "swap_body" },
+        exchangefx = { prefab = nil, offset_y = nil, scale = nil }
+    },
 
     siving_soil_item_law = {
         base_prefab = "siving_soil_item", skin_id = "65560bbdadf8ac0fd863e6d6", onlyownedshow = true,
@@ -3493,7 +3491,7 @@ _G.SKIN_IDS_LEGION = {
         orchidbush_disguiser = true, boltwingout_disguiser = true, plant_cactus_meat_l_world = true,
         rosebush_marble = true, lilybush_marble = true, orchidbush_marble = true,
         rosorns_marble = true, lileaves_marble = true, orchitwigs_marble = true,
-        siving_mask_gold_marble = true,
+        siving_mask_gold_marble = true, siving_suit_gold_marble = true,
         shield_l_log_emo_fist = true, hat_lichen_emo_que = true, hat_lichen_emo_3shock = true, hat_lichen_emo_shock = true,
         hat_lichen_emo_anger = true, hat_lichen_emo_sweat = true, hat_lichen_emo_heart = true,
         rosebush_collector = true, rosorns_collector = true, fimbul_axe_collector = true, siving_turn_collector = true,
@@ -3566,7 +3564,7 @@ _G.SKIN_IDS_LEGION = {
     ["61f15bf4db102b0b8a529c66"] = { --6连忘返
         siving_soil_item_law = true, siving_soil_item_law2 = true, siving_soil_item_law3 = true,
         refractedmoonlight_taste = true,
-        siving_mask_gold_marble = true,
+        siving_mask_gold_marble = true, siving_suit_gold_marble = true,
         hiddenmoonlight_item_paper = true,
         chest_whitewood_craft = true, chest_whitewood_big_craft = true,
         chest_whitewood_craft2 = true, chest_whitewood_big_craft2 = true,
@@ -3623,7 +3621,7 @@ local skinidxes = { --用以皮肤排序
     "triplegoldenshovelaxe_era", "tripleshovelaxe_era", "lilybush_era", "lileaves_era", "shield_l_log_era",
     "icire_rock_era", "shield_l_sand_era",
     "plant_cactus_meat_l_world", "orchidbush_disguiser", "boltwingout_disguiser",
-    "siving_mask_gold_marble",
+    "siving_mask_gold_marble", "siving_suit_gold_marble",
     "rosebush_marble", "rosorns_marble", "lilybush_marble", "lileaves_marble", "orchidbush_marble", "orchitwigs_marble",
     "hat_lichen_emo_3shock", "hat_lichen_emo_shock", "hat_lichen_emo_anger", "hat_lichen_emo_sweat",
     "hat_lichen_emo_heart", "shield_l_log_emo_fist", "hat_lichen_emo_que",

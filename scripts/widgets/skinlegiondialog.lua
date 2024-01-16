@@ -2742,7 +2742,7 @@ local SkinData = {
         height_anim = 170,
         anims = {
             {
-                bank = "siving_armor_gold_marble", build = "siving_armor_gold_marble",
+                bank = "siving_suit_gold_marble", build = "siving_suit_gold_marble",
                 anim = "idle", anim2 = nil, isloop = nil,
                 x = -35, y = 90, scale = 0.38
             },
@@ -2754,7 +2754,7 @@ local SkinData = {
             {
                 symbol = {
                     { symbol = "swap_hat", build = "siving_mask_gold_marble", file = "swap_hat", type = 2 },
-                    { symbol = "swap_body", build = "siving_armor_gold_marble", file = "swap_body", type = nil }
+                    { symbol = "swap_body", build = "siving_suit_gold_marble", file = "swap_body", type = nil }
                 },
                 fn_anim = SetAnim_player,
                 fn_click = SetAnim_player2,

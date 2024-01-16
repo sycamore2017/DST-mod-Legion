@@ -3,7 +3,7 @@
 local assets = {
     Asset("ANIM", "anim/giantsfoot.zip"),
     Asset("ATLAS", "images/inventoryimages/giantsfoot.xml"),
-    Asset("IMAGE", "images/inventoryimages/giantsfoot.tex"),
+    Asset("IMAGE", "images/inventoryimages/giantsfoot.tex")
 }
 
 local function UpdateNeed(owner, object)
@@ -24,7 +24,6 @@ local function UpdateNeed(owner, object)
         owner.needcombat = true
     end
 end
-
 local function BackpackOnEquip(owner, data) --装备道具时设定开关值
     if data ~= nil and data.eslot == EQUIPSLOTS.HANDS then
         local item = data.item
@@ -40,14 +39,12 @@ local function BackpackOnEquip(owner, data) --装备道具时设定开关值
         UpdateNeed(owner, item)
     end
 end
-
 local function BackpackOnUnEquip(owner, data) --卸下手持道具时设定开关值
     if data ~= nil and data.eslot == EQUIPSLOTS.HANDS then
         owner.needrun = true
         owner.needcombat = true
     end
 end
-
 local function BackpackOnMounted(owner, data)   --骑牛时
     owner:RemoveEventCallback("equip", BackpackOnEquip)
     owner:RemoveEventCallback("unequip", BackpackOnUnEquip)
@@ -55,7 +52,6 @@ local function BackpackOnMounted(owner, data)   --骑牛时
     owner.needrun = false
     owner.needcombat = false
 end
-
 local function BackpackOnDismounted(owner, data)    --下牛时
     owner:ListenForEvent("equip", BackpackOnEquip)
     owner:ListenForEvent("unequip", BackpackOnUnEquip)
@@ -111,7 +107,6 @@ local function onequip(inst, owner)
         owner.needcombat = false
     end
 end
-
 local function onunequip(inst, owner)
     owner.AnimState:ClearOverrideSymbol("swap_body")
     owner.AnimState:ClearOverrideSymbol("backpack")
@@ -139,16 +134,20 @@ local function onburnt(inst)
 
     inst:Remove()
 end
-
 local function onignite(inst)
     if inst.components.container ~= nil then
         inst.components.container.canbeopened = false
     end
 end
-
 local function onextinguish(inst)
     if inst.components.container ~= nil then
         inst.components.container.canbeopened = true
+    end
+end
+
+local function OnEntityReplicated_gfoot(inst)
+    if inst.replica.container ~= nil then
+        inst.replica.container:WidgetSetup("giantsfoot")
     end
 end
 
@@ -184,7 +183,7 @@ local function fn()
 
     inst.entity:SetPristine()
     if not TheWorld.ismastersim then
-        inst.OnEntityReplicated = function(inst) inst.replica.container:WidgetSetup("giantsfoot") end
+        inst.OnEntityReplicated = OnEntityReplicated_gfoot
         return inst
     end
 

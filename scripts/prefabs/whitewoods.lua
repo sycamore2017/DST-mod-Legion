@@ -613,6 +613,17 @@ local function OnLoad_chest(inst, data)
     end
 end
 
+local function OnEntityReplicated_chest(inst)
+    if inst.replica.container ~= nil then --烧毁后 container 组件会被移除
+        inst.replica.container:WidgetSetup("chest_whitewood")
+    end
+end
+local function OnEntityReplicated_chest2(inst)
+    if inst.replica.container ~= nil then --烧毁后 container 组件会被移除
+        inst.replica.container:WidgetSetup("chest_whitewood_big")
+    end
+end
+
 local function MakeChest(data)
     table.insert(prefs, Prefab(
         data.name,
@@ -639,19 +650,14 @@ local function MakeChest(data)
             inst:AddComponent("skinedlegion")
             inst.components.skinedlegion:Init(data.name)
 
-            -- if data.fn_common ~= nil then
-            --     data.fn_common(inst)
-            -- end
+            if data.fn_common ~= nil then
+                data.fn_common(inst)
+            end
 
             TOOLS_L.SetImmortalBox_common(inst)
 
             inst.entity:SetPristine()
             if not TheWorld.ismastersim then
-                inst.OnEntityReplicated = function(inst)
-                    if inst.replica.container ~= nil then --烧毁后 container 组件会被移除
-                        inst.replica.container:WidgetSetup(data.name)
-                    end
-                end
                 return inst
             end
 
@@ -709,7 +715,11 @@ MakeChest({
         Asset("ANIM", "anim/ui_chest_whitewood_3x4.zip")
     },
     -- prefabs = {},
-    -- fn_common = function(inst)end,
+    fn_common = function(inst)
+        if not TheWorld.ismastersim then
+            inst.OnEntityReplicated = OnEntityReplicated_chest
+        end
+    end,
     fn_server = function(inst)
         inst.shownum_l = 3
 
@@ -728,7 +738,11 @@ MakeChest({
         Asset("ANIM", "anim/ui_chest_whitewood_4x6.zip")
     },
     -- prefabs = {},
-    -- fn_common = function(inst)end,
+    fn_common = function(inst)
+        if not TheWorld.ismastersim then
+            inst.OnEntityReplicated = OnEntityReplicated_chest2
+        end
+    end,
     fn_server = function(inst)
         inst.shownum_l = 8
 

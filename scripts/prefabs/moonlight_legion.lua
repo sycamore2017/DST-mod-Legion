@@ -247,6 +247,11 @@ MakeItem({
 ----------
 ----------
 
+local function OnEntityReplicated_hidden(inst)
+    if inst.replica.container ~= nil then
+        inst.replica.container:WidgetSetup("hiddenmoonlight")
+    end
+end
 local function OnOpen(inst)
     if inst.AnimState:IsCurrentAnimation("opened") or inst.AnimState:IsCurrentAnimation("open") then
         return
@@ -371,7 +376,7 @@ table.insert(prefs, Prefab("hiddenmoonlight", function()
 
     inst.entity:SetPristine()
     if not TheWorld.ismastersim then
-        inst.OnEntityReplicated = function(inst) inst.replica.container:WidgetSetup("hiddenmoonlight") end
+        inst.OnEntityReplicated = OnEntityReplicated_hidden
         return inst
     end
 
@@ -853,6 +858,17 @@ local function OnPutInInventory_revolved(inst)
     inst.AnimState:PlayAnimation("closed")
 end
 
+local function OnReplicated_revolved(inst)
+    if inst.replica.container ~= nil then
+        inst.replica.container:WidgetSetup("revolvedmoonlight")
+    end
+end
+local function OnReplicated_revolved2(inst)
+    if inst.replica.container ~= nil then
+        inst.replica.container:WidgetSetup("revolvedmoonlight_pro")
+    end
+end
+
 local function MakeRevolved(sets)
     table.insert(prefs, Prefab(sets.name, function()
         local inst = CreateEntity()
@@ -895,7 +911,7 @@ local function MakeRevolved(sets)
 
         inst.entity:SetPristine()
         if not TheWorld.ismastersim then
-            inst.OnEntityReplicated = function(inst) inst.replica.container:WidgetSetup(sets.name) end
+            inst.OnEntityReplicated = sets.ispro and OnReplicated_revolved2 or OnReplicated_revolved
             return inst
         end
 

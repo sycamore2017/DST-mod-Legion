@@ -92,6 +92,7 @@ _G.RegistMiniMapImage_legion("siving_ctlall")
 _G.RegistMiniMapImage_legion("siving_turn")
 _G.RegistMiniMapImage_legion("plant_crop_l")
 _G.RegistMiniMapImage_legion("boltwingout")
+_G.RegistMiniMapImage_legion("siving_suit_gold")
 
 _G.EQUIPMENTSETNAMES.SIVING = "siving"
 _G.EQUIPMENTSETNAMES.SIVING2 = "siving2"

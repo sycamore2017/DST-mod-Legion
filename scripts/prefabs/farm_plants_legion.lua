@@ -1496,7 +1496,11 @@ local function OnDeath_nep(inst, data)
 
 	inst.fn_switch(inst)
 end
-
+local function OnEntityReplicated_nep(inst)
+    if inst.replica.container ~= nil then
+        inst.replica.container:WidgetSetup("plant_nepenthes_l")
+    end
+end
 local function OnSave_nep(inst, data)
 	if inst.count_digest > 0 then
 		data.count_digest = inst.count_digest
@@ -1546,7 +1550,7 @@ table.insert(prefs, Prefab(
 
         inst.entity:SetPristine()
         if not TheWorld.ismastersim then
-			inst.OnEntityReplicated = function(inst) inst.replica.container:WidgetSetup("plant_nepenthes_l") end
+			inst.OnEntityReplicated = OnEntityReplicated_nep
             return inst
         end
 

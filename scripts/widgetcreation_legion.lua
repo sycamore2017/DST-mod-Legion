@@ -9,7 +9,8 @@ local showmeneed = {
     "backcub", "beefalo", "giantsfoot",
     "hiddenmoonlight", "revolvedmoonlight", "revolvedmoonlight_pro",
     "boltwingout", "plant_nepenthes_l",
-    "chest_whitewood", "chest_whitewood_big"
+    "chest_whitewood", "chest_whitewood_big",
+    "siving_suit_gold"
 }
 local params = {}
 
@@ -435,6 +436,26 @@ for y = 0, 5 do
     table.insert(params.chest_whitewood_big.widget.slotpos, Vector3(-114 + 225, (-77 * y) + 114 - (y * 2), 0))
 end
 
+------
+--子圭·釜
+------
+
+params.siving_suit_gold = {
+    widget = {
+        slotpos = {},
+        animbank = "ui_piggyback_2x6",
+        animbuild = "ui_piggyback_2x6",
+        pos = Vector3(-5, -90, 0)
+    },
+    issidewidget = true,
+    type = "pack",
+    openlimit = 1
+}
+for y = 0, 5 do
+    table.insert(params.siving_suit_gold.widget.slotpos, Vector3(-162, -75 * y + 170, 0))
+    table.insert(params.siving_suit_gold.widget.slotpos, Vector3(-162 + 75, -75 * y + 170, 0))
+end
+
 --------------------------------------------------------------------------
 --[[ 修改容器注册函数 ]]
 --------------------------------------------------------------------------
@@ -463,7 +484,7 @@ for k, mod in pairs(ModManager.mods) do
 				mod.postinitfns.PrefabPostInit[v] = mod.postinitfns.PrefabPostInit.treasurechest
 			end
         end
-        break --及时跳出来循环？
+        break
     end
 end
 

@@ -6,6 +6,12 @@ local assets_cont = {
     Asset("ANIM", "anim/ui_bundle_2x2.zip"),
 }
 
+local function OnEntityReplicated_cont(inst)
+    if inst.replica.container ~= nil then
+        inst.replica.container:WidgetSetup("fishhomingtool")
+    end
+end
+
 local function Fn_cont()
     local inst = CreateEntity()
 
@@ -19,7 +25,7 @@ local function Fn_cont()
 
     inst.entity:SetPristine()
     if not TheWorld.ismastersim then
-        inst.OnEntityReplicated = function(inst) inst.replica.container:WidgetSetup("fishhomingtool") end
+        inst.OnEntityReplicated = OnEntityReplicated_cont
         return inst
     end
 

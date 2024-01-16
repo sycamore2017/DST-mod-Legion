@@ -157,6 +157,12 @@ local function OnExtinguish_boltout(inst)
     end
 end
 
+local function OnEntityReplicated_boltout(inst)
+    if inst.replica.container ~= nil then
+        inst.replica.container:WidgetSetup("boltwingout")
+    end
+end
+
 local function Fn_boltout()
     local inst = CreateEntity()
 
@@ -184,7 +190,7 @@ local function Fn_boltout()
 
     inst.entity:SetPristine()
     if not TheWorld.ismastersim then
-        inst.OnEntityReplicated = function(inst) inst.replica.container:WidgetSetup("boltwingout") end
+        inst.OnEntityReplicated = OnEntityReplicated_boltout
         return inst
     end
 
