@@ -846,14 +846,18 @@ local function OnAttack_orchid(inst, owner, target)
         end
 
         local dmg, spdmg, stimuli
-        local ents = TheSim:FindEntities(x1, y1, z1, 3.5, { "_combat" }, tags_cant)
+        local ents = TheSim:FindEntities(x1, y1, z1, 6.5, { "_combat" }, tags_cant)
         for _, ent in ipairs(ents) do
-            if ent ~= target and ent ~= owner and ent.entity:IsVisible() then
+            if ent ~= target and ent ~= owner and ent:IsValid() and ent.entity:IsVisible() then
                 --为啥官方要这样写，难道是 owner 会因为那些受击者的反伤导致自身失效？
                 if owner ~= nil and (not owner:IsValid() or owner.components.combat == nil) then
                     owner = nil
                 end
-                if validfn(owner, ent, true) then
+                tags_cant = 3.5 + ent:GetPhysicsRadius(0)
+                if
+                    ent:GetDistanceSqToPoint(x1, y1, z1) < tags_cant * tags_cant --这里的距离算上了生物的体积半径
+                    and validfn(owner, ent, true)
+                then
                     --Tip：范围性伤害还是加个判断！防止打到不该打的对象
                     if owner ~= nil then
                         if owner.components.combat:IsValidTarget(ent) then
@@ -1359,9 +1363,9 @@ local function GiveSomeShock(inst, owner, target, doshock, hittarget) --击中�
     end
 
     local dmg, spdmg, stimuli
-    local ents = TheSim:FindEntities(x, y, z, 3.5, nil, tags_cant, tags_one)
+    local ents = TheSim:FindEntities(x, y, z, 6.5, nil, tags_cant, tags_one)
     for _, v in ipairs(ents) do
-        if v ~= owner and v.entity:IsVisible() then
+        if v ~= owner and v:IsValid() and v.entity:IsVisible() then
             if v.components.workable ~= nil then --直接破坏可以砍的物体
                 if v.components.workable:CanBeWorked() and v.components.lightningblocker == nil then
                     v.components.workable:Destroy(inst)
@@ -1371,7 +1375,11 @@ local function GiveSomeShock(inst, owner, target, doshock, hittarget) --击中�
                 if owner ~= nil and (not owner:IsValid() or owner.components.combat == nil) then
                     owner = nil
                 end
-                if validfn(owner, v, true) then
+                tags_cant = 3.5 + v:GetPhysicsRadius(0)
+                if
+                    v:GetDistanceSqToPoint(x, y, z) < tags_cant * tags_cant --这里的距离算上了生物的体积半径
+                    and validfn(owner, v, true)
+                then
                     if (hittarget or v ~= target) and v.components.combat:CanBeAttacked(owner) then
                         if owner ~= nil then
                             dmg, spdmg, stimuli = TOOLS_L.CalcDamage(owner, v, inst, inst, nil, nil, nil, true)

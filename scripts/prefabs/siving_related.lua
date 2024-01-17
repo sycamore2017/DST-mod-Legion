@@ -1750,6 +1750,8 @@ MakeArmor({
         -- inst._cdtask = nil
         OnSetBonusOff_suit2(inst)
 
+        inst.components.inventoryitem.cangoincontainer = false
+
         inst.components.equippable.equipslot = EQUIPSLOTS.BACK or EQUIPSLOTS.BODY
         inst.components.equippable:SetOnEquip(OnEquip_suit2)
         inst.components.equippable:SetOnUnequip(OnUnequip_suit2)
@@ -1798,21 +1800,27 @@ local function DoFxCounterAtk(inst)
     local hasattacker = false
     local dmg, spdmg, stimuli
     local x, y, z = inst.Transform:GetWorldPosition()
-    local ents = TheSim:FindEntities(x, y, z, inst.range, { "_combat" }, tags_cant)
+    local ents = TheSim:FindEntities(x, y, z, inst.range+3, { "_combat" }, tags_cant)
     for _, ent in ipairs(ents) do
-        if ent ~= inst.owner and ent.entity:IsVisible() and validfn(inst.owner, ent, true) then
-            if inst.owner ~= nil then
-                if inst.owner.components.combat:CanTarget(ent) then
-                    dmg, spdmg, stimuli = TOOLS_L.CalcDamage(inst.owner, ent, nil, nil, nil, inst.damage, nil, false)
-                    table.insert(data, { target = ent, dmg = dmg, spdmg = spdmg, stimuli = stimuli })
+        if ent ~= inst.owner and ent:IsValid() and ent.entity:IsVisible() then
+            tags_cant = inst.range + ent:GetPhysicsRadius(0)
+            if
+                ent:GetDistanceSqToPoint(x, y, z) < tags_cant * tags_cant --这里的距离算上了生物的体积半径
+                and validfn(inst.owner, ent, true)
+            then
+                if inst.owner ~= nil then
+                    if inst.owner.components.combat:CanTarget(ent) then
+                        dmg, spdmg, stimuli = TOOLS_L.CalcDamage(inst.owner, ent, nil, nil, nil, inst.damage, nil, false)
+                        table.insert(data, { target = ent, dmg = dmg, spdmg = spdmg, stimuli = stimuli })
+                        if not hasattacker and ent == inst.attacker then
+                            hasattacker = true
+                        end
+                    end
+                elseif ent.components.combat:CanBeAttacked() then
+                    table.insert(data, { target = ent, dmg = inst.damage })
                     if not hasattacker and ent == inst.attacker then
                         hasattacker = true
                     end
-                end
-            elseif ent.components.combat:CanBeAttacked() then
-                table.insert(data, { target = ent, dmg = inst.damage })
-                if not hasattacker and ent == inst.attacker then
-                    hasattacker = true
                 end
             end
         end
@@ -1886,6 +1894,9 @@ table.insert(prefs, Prefab(
         inst.AnimState:SetBank("bramblefx")
         inst.AnimState:SetBuild("sivsuitatk_fx")
         inst.AnimState:SetFinalOffset(3)
+        inst.AnimState:SetSymbolBloom("needle01")
+        inst.AnimState:SetSymbolLightOverride("needle01", .5)
+        inst.AnimState:SetLightOverride(.1)
 
         inst:AddTag("FX")
 
@@ -1898,7 +1909,7 @@ table.insert(prefs, Prefab(
             inst.AnimState:PlayAnimation("idle")
         else
             inst.AnimState:PlayAnimation("trap")
-            inst.AnimState:SetScale(1.5, 1.5)
+            inst.AnimState:SetScale(1.3, 1.3)
         end
 
         inst.persists = false
