@@ -1227,18 +1227,16 @@ MakeMask({
 --------------------------------------------------------------------------
 
 local function OnRepaired_mask2(inst, amount)
-    if amount > 0 and inst:HasTag("broken") then
-        inst:RemoveTag("broken")
+    if amount > 0 and inst._broken then
+        inst._broken = nil
         inst:AddTag("siv_mask2")
-        inst.components.inspectable.nameoverride = nil
         inst.components.armor:SetAbsorption(0.75)
     end
 end
 local function OnBroken_mask2(inst)
-    if not inst:HasTag("broken") then
-        inst:AddTag("broken") --这个标签会让名称显示加入“损坏”前缀
+    if not inst._broken then
+        inst._broken = true
         inst:RemoveTag("siv_mask2")
-        inst.components.inspectable.nameoverride = "BROKEN_FORGEDITEM" --改为统一的损坏描述
         inst.components.armor:SetAbsorption(0)
         inst:PushEvent("percentusedchange", { percent = 0 }) --界面需要更新百分比
     end
@@ -1462,13 +1460,13 @@ local function OnEquip_mask2(inst, owner)
 
     owner:ListenForEvent("onattackother", OnAttackOther)
     TOOLS_L.AddEntValue(owner, "siv_blood_l_reducer", inst.prefab, 1, 0.5)
-    TOOLS_L.AddTag(owner, "PreventSivFlower", inst.prefab)
+    -- TOOLS_L.AddTag(owner, "PreventSivFlower", inst.prefab)
 end
 local function OnUnequip_mask2(inst, owner)
     ClearSymbols_mask(inst, owner)
     owner:RemoveEventCallback("onattackother", OnAttackOther)
     TOOLS_L.RemoveEntValue(owner, "siv_blood_l_reducer", inst.prefab, 1)
-    TOOLS_L.RemoveTag(owner, "PreventSivFlower", inst.prefab)
+    -- TOOLS_L.RemoveTag(owner, "PreventSivFlower", inst.prefab)
     CancelTask_life(inst, owner)
 end
 local function SetKeepOnFinished_legion(inst)
@@ -1502,9 +1500,9 @@ MakeMask({
     },
     fn_common = function(inst)
         inst:AddTag("siv_mask2") --给特殊动作用
-        inst:AddTag("show_broken_ui") --装备损坏后展示特殊物品栏ui
     end,
     fn_server = function(inst)
+        -- inst._broken = nil
         OnSetBonusOff_mask2(inst)
         inst.OnCalcuCost_l = CalcuCost
 
