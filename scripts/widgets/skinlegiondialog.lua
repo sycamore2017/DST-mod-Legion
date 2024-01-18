@@ -1742,7 +1742,7 @@ local SkinData = {
             description = "自从飞船失控，他被困在这片星漩中已过去3周。他无数次尝试与总部沟通，皆以失败告终。每每失落之际，他都会望着那颗最近的星球，星体一开始如黑洞般深邃，但又会逐渐闪耀起来，如同他的遭遇。“真好，你一直在我身边”，望着这颗美丽的星球他总能重燃信心，“你就是我的希望”。如今弹尽粮绝，飞船内的氧气也低到极限，他瘫倒在甲板，恍惚间，他好像发现很多生物的残骸漂浮在星环中，“为什么3周以来我都没看到过？”，他心生疑问。三周前，飞船突然收到求救讯号，然后他决定脱离航线前去救援，到达救援坐标后，飞船突然失控，那颗暗星也开始了光与暗的循环。在昏迷前，他终于理解这颗星球的秘密，“来吧，来吧，投入我的怀抱……”。昏迷的他，居然打开了舱门，向那颗星球跳去，很快便隐没在星环之中。",
         } or {
             collection = "COLLECTOR", access = "LUCK",
-            descitem = "Unlock \"Siving-Trans\" skin.",
+            descitem = "Unlock \"Siving-Mutator\" skin.",
             description = "The story was not translated.",
         },
         height_anim = 190,
@@ -1776,7 +1776,7 @@ local SkinData = {
             description = "以后的以后会发生什么，我们总是充满遐想，今天给大家讲个故事，关于未来。\n那时候，人们都依赖高科技已达到近乎长生不老的地步，也没有了更高尚的追求。而且你要知道很多动植物都在人类科技发展过程中灭绝了，甚至包括人类的爱犬，那是一段黑暗的时期，这里就不讲啦，继续讲今天的主题，幸好人类有喜欢存档的习惯，各种或消失或灭绝的动植物基因都被保留了下来。\n一个无聊的民间科学家无意间翻到一张自己祖先抱着一只非常可爱的生物的照片，于是去基因档案所窃取了这个生物的基因，并违规制造了生化打印器。很快，几只可爱的汪汪叫狗狗重现人间，科学家和狗狗玩的很开心呢。不过未来世界很难有不透风的纳米墙，科学家很快就被举报，他的所有成果都被没收，他自己也被关了起来……"
         } or {
             collection = "FUTURE", access = "SPECIAL",
-            descitem = "Unlock \"Siving-Trans\" skin.",
+            descitem = "Unlock \"Siving-Mutator\" skin.",
             description = "The story was not translated."
         },
         height_anim = 155,
@@ -1811,7 +1811,7 @@ local SkinData = {
             description = "关于未来的故事还有下文。\n近百年来突然掀起一场宠物选美潮流，不时有各种宠物选美大赛冲入人们视野。可能那时人类无聊至极，开始培养新的兴趣。在赛场上，可以看到各种名流展示着自己的爱宠，越是有权有威望人士的爱宠会更加“美丽动人”，但说实话，这些人并不爱他们的爱宠，只是把它当做炫耀的工具。所有宠物都由一家神秘机构负责创造，可根据卖家的想法来培育宠物。机构里有一台改装过的仪器，叫做基因诱变舱。机构人员其实并不是它的建造者，但会用就够了。他们会往里面注入各种动植物的基因，然后链接在一起，短短8小时，便能打印出新的生物。\n有一天一位外星流浪客，带着古老星系的生物基因找到这个神秘机构，机构由于只接受宠物创造，所以不得以将猫的基因也加了进来……于是，在这个洁白的舱体里，第一只全身布满金色星纹，闪着金光的，星猫，诞生了！毫无疑问，外星流浪客带着它赢了很多次选美比赛，他和星猫引起了多次全球轰动，可真是让人羡慕得不行……"
         } or {
             collection = "FUTURE", access = "SPECIAL",
-            descitem = "Unlock \"Siving-Trans\" skin.",
+            descitem = "Unlock \"Siving-Mutator\" skin.",
             description = "The story was not translated."
         },
         height_anim = 155,
@@ -2619,7 +2619,7 @@ local SkinData = {
             description = "在遥远古代，人类还处在部落阶段。在海滨旁，在密林里，在高原上，以大大小小的部落分而居之。\n海滨部落敬畏无垠大海。他们渴望探索翻涌的海洋，但总有一个极限，无情的洋流总能将他们拍落。于是他们树起图腾，关于海，关于他们在海里见过的庞大造物。\n密林部落崇敬广袤山川。他们勇于在一山又一山中寻觅并建立新的栖息地，但总有一个极限，连绵山川阻碍了他们的联系与团结。于是他们树起图腾，关于山，关于他们想要团结，想要走遍大地。\n高原部落向往自由蓝天。恶劣的生存环境让他们信仰魂魄能翱翔天空。于是他们树起图腾，关于天，关于美好生活和每天都能望见的自由飞鸟。"
         } or {
             collection = "ERA", access = "SPECIAL",
-            descitem = "Unlock \"Siving-Eau\", \"Siving-Alim\", \"Siving-Ridge\" skin.",
+            descitem = "Unlock \"Siving-Irrigator\", \"Siving-Fertilizer\", \"Siving-Agriculture\" skin.",
             description = "The story was not translated."
         },
         height_anim = 226,
@@ -2668,7 +2668,7 @@ local SkinData = {
         } or {
             name = "Witch Bone Mask",
             collection = "ERA", access = "SPECIAL",
-            descitem = "Unlock \"Siving-Absor\", \"Siving-Movili\" skin.",
+            descitem = "Unlock \"Siving-Leakage\", \"Siving-Thaumaturgy\" skin.",
             description = "The story was not translated."
         },
         height_anim = 265,
@@ -2736,7 +2736,7 @@ local SkinData = {
         } or {
             name = "Holy Suit",
             collection = "MARBLE", access = "SPECIAL",
-            descitem = "Unlock \"Siving-Movili\", \"Siving-Kerty\" skin.",
+            descitem = "Unlock \"Siving-Thaumaturgy\", \"Siving-Cauldron\" skin.",
             description = "The story was not translated."
         },
         height_anim = 170,
@@ -2771,7 +2771,7 @@ local SkinData = {
         } or {
             name = "Spring Mud",
             collection = "LAW", access = "SPECIAL",
-            descitem = "Unlock \"Siving-Sols\" skin.",
+            descitem = "Unlock \"Siving-Soil\" skin.",
             description = "The story was not translated."
         },
         height_anim = 325,
@@ -2817,7 +2817,7 @@ local SkinData = {
             description = "秋风轻抚，树叶如金，悠然而下。它们舞动在空中，如翩翩起舞的旧时舞者，最后，轻轻降落，归根成土。\n一场自然的别离，落叶在飘零中找到了回家的路。它们归根，如同生命循环的奏章，告别是为了更深的相遇。在这个季节的交响中，落叶的离去并非终结，而是融入了大地的怀抱，成为了生命的延续。"
         } or {
             collection = "LAW", access = "SPECIAL",
-            descitem = "Unlock \"Siving-Sols\" skin.",
+            descitem = "Unlock \"Siving-Soil\" skin.",
             description = "The story was not translated."
         },
         height_anim = 175,

@@ -1970,7 +1970,7 @@ S________WANDA.DESCRIBE.SIVING_THETREE = {
     NOTTHIS = "I don't think so."
 }
 
-S_NAMES.SIVING_SOIL_ITEM = "Siving-Sols"   --未放置的子圭·垄
+S_NAMES.SIVING_SOIL_ITEM = "Siving-Soil"   --未放置的子圭·垄
 S_RECIPE_DESC.SIVING_SOIL_ITEM = "An unusual soil bursting with life energy."
 S______GENERIC.DESCRIBE.SIVING_SOIL_ITEM = "Put it down, and plant a seed."
 -- S_______WILLOW.DESCRIBE.SIVING_SOIL_ITEM = ""
@@ -1990,7 +1990,7 @@ S_________WURT.DESCRIBE.SIVING_SOIL_ITEM = "I'm interested, florp."
 -- S_______WALTER.DESCRIBE.SIVING_SOIL_ITEM = ""
 -- S________WANDA.DESCRIBE.SIVING_SOIL_ITEM = ""
 
-S_NAMES.SIVING_SOIL = "Siving-Sols"    --子圭·垄
+S_NAMES.SIVING_SOIL = "Siving-Soil"    --子圭·垄
 S______GENERIC.DESCRIBE.SIVING_SOIL = "First step of planting, one big step of being stuffed."
 S_______WILLOW.DESCRIBE.SIVING_SOIL = "Sow, germinate, mature, burn!"
 S_____WOLFGANG.DESCRIBE.SIVING_SOIL = "My industrious hands are ready."
@@ -2009,7 +2009,7 @@ S_________WURT.DESCRIBE.SIVING_SOIL = "I'm so excited. What should I plant."
 S_______WALTER.DESCRIBE.SIVING_SOIL = "This will get me the planting medal."
 S________WANDA.DESCRIBE.SIVING_SOIL = "Will the crops fall into the cycle of time?"
 
-S_NAMES.SIVING_CTLWATER_ITEM = "Siving-Eau" --未放置的子圭·利川
+S_NAMES.SIVING_CTLWATER_ITEM = "Siving-Irrigator" --未放置的子圭·利川
 S_RECIPE_DESC.SIVING_CTLWATER_ITEM = "It can control moisture after being placed."
 S______GENERIC.DESCRIBE.SIVING_CTLWATER_ITEM = "It can control moisture after being placed."
 -- S_______WILLOW.DESCRIBE.SIVING_CTLWATER_ITEM = ""
@@ -2029,7 +2029,7 @@ S______GENERIC.DESCRIBE.SIVING_CTLWATER_ITEM = "It can control moisture after be
 -- S_______WALTER.DESCRIBE.SIVING_CTLWATER_ITEM = ""
 -- S________WANDA.DESCRIBE.SIVING_CTLWATER_ITEM = ""
 
-S_NAMES.SIVING_CTLWATER = "Siving-Eau" --子圭·利川
+S_NAMES.SIVING_CTLWATER = "Siving-Irrigator" --子圭·利川
 S______GENERIC.DESCRIBE.SIVING_CTLWATER = {
     GENERIC = "It can transport water to the surrounding soil.",
     ISFULL = "It's full.",
@@ -2052,7 +2052,7 @@ S______GENERIC.DESCRIBE.SIVING_CTLWATER = {
 -- S_______WALTER.DESCRIBE.SIVING_CTLWATER = ""
 -- S________WANDA.DESCRIBE.SIVING_CTLWATER = ""
 
-S_NAMES.SIVING_CTLDIRT_ITEM = "Siving-Alim" --未放置的子圭·益矩
+S_NAMES.SIVING_CTLDIRT_ITEM = "Siving-Fertilizer" --未放置的子圭·益矩
 S_RECIPE_DESC.SIVING_CTLDIRT_ITEM = "It can control nutrients in the soil after being placed."
 S______GENERIC.DESCRIBE.SIVING_CTLDIRT_ITEM = "It can control nutrients after being placed."
 -- S_______WILLOW.DESCRIBE.SIVING_CTLDIRT_ITEM = ""
@@ -2072,7 +2072,7 @@ S______GENERIC.DESCRIBE.SIVING_CTLDIRT_ITEM = "It can control nutrients after be
 -- S_______WALTER.DESCRIBE.SIVING_CTLDIRT_ITEM = ""
 -- S________WANDA.DESCRIBE.SIVING_CTLDIRT_ITEM = ""
 
-S_NAMES.SIVING_CTLDIRT = "Siving-Alim" --子圭·益矩
+S_NAMES.SIVING_CTLDIRT = "Siving-Fertilizer" --子圭·益矩
 S______GENERIC.DESCRIBE.SIVING_CTLDIRT = {
     GENERIC = "It can transport nutrients to the surrounding soil.",
     ISFULL = "It's full.",
@@ -2095,7 +2095,7 @@ S______GENERIC.DESCRIBE.SIVING_CTLDIRT = {
 -- S_______WALTER.DESCRIBE.SIVING_CTLDIRT = ""
 -- S________WANDA.DESCRIBE.SIVING_CTLDIRT = ""
 
-S_NAMES.SIVING_CTLALL_ITEM = "Siving-Ridge" --未放置的子圭·崇溟
+S_NAMES.SIVING_CTLALL_ITEM = "Siving-Agriculture" --未放置的子圭·崇溟
 S_RECIPE_DESC.SIVING_CTLALL_ITEM = "It can control moisture and nutrients in the soil after being placed."
 S______GENERIC.DESCRIBE.SIVING_CTLALL_ITEM = "It can control moisture and nutrients after being placed."
 -- S_______WILLOW.DESCRIBE.SIVING_CTLALL_ITEM = ""
@@ -2115,7 +2115,7 @@ S______GENERIC.DESCRIBE.SIVING_CTLALL_ITEM = "It can control moisture and nutrie
 -- S_______WALTER.DESCRIBE.SIVING_CTLALL_ITEM = ""
 -- S________WANDA.DESCRIBE.SIVING_CTLALL_ITEM = ""
 
-S_NAMES.SIVING_CTLALL = "Siving-Ridge" --子圭·崇溟
+S_NAMES.SIVING_CTLALL = "Siving-Agriculture" --子圭·崇溟
 S______GENERIC.DESCRIBE.SIVING_CTLALL = {
     GENERIC = "It can transport water and nutrients to the surrounding soil.",
     ISFULL = "It's full.",
@@ -2296,7 +2296,7 @@ S_____WORMWOOD.DESCRIBE.SEEDS_CROP_L = "Baby, different."
 -- S_______WALTER.DESCRIBE.SEEDS_CROP_L = ""
 -- S________WANDA.DESCRIBE.SEEDS_CROP_L = ""
 
-S_NAMES.SIVING_TURN = "Siving-Trans" --子圭·育
+S_NAMES.SIVING_TURN = "Siving-Mutator" --子圭·育
 S_RECIPE_DESC.SIVING_TURN = "An odd thing that transforms giant crops. Yesterday a giant crop flourishing and tomorrow full of wonder."
 S______GENERIC.DESCRIBE.SIVING_TURN = {
     GENERIC = "Is this the time shuttle?",
@@ -2389,7 +2389,7 @@ S________WARLY.DESCRIBE.SIVING_FEATHER_LINE = "This technique is also used to cu
 S_______WALTER.DESCRIBE.SIVING_FEATHER_LINE = "I tried to add this to slingshot, but never succeeded."
 -- S________WANDA.DESCRIBE.SIVING_FEATHER_LINE = ""
 
-S_NAMES.SIVING_MASK = "Siving-Absor" --子圭·汲
+S_NAMES.SIVING_MASK = "Siving-Leakage" --子圭·汲
 S_RECIPE_DESC.SIVING_MASK = "What is the price of wearing life."
 S______GENERIC.DESCRIBE.SIVING_MASK = "A stone mask that draws blood."
 S_______WILLOW.DESCRIBE.SIVING_MASK = "Burn your lives for me, humble servants!"
@@ -2409,7 +2409,7 @@ S________WARLY.DESCRIBE.SIVING_MASK = "Eat what sates you, right?"
 -- S_______WALTER.DESCRIBE.SIVING_MASK = ""
 S________WANDA.DESCRIBE.SIVING_MASK = "Time will also slowly take away the lives of all in a similar way."
 
-S_NAMES.SIVING_MASK_GOLD = "Siving-Movili" --子圭·歃
+S_NAMES.SIVING_MASK_GOLD = "Siving-Thaumaturgy" --子圭·歃
 S_RECIPE_DESC.SIVING_MASK_GOLD = "Calls for lives."
 S______GENERIC.DESCRIBE.SIVING_MASK_GOLD = "A mask of exquisite broken gold that plays with life."
 S_______WILLOW.DESCRIBE.SIVING_MASK_GOLD = "Give your lives for the queen of flames, humble servants!"
@@ -2429,7 +2429,7 @@ S________WARLY.DESCRIBE.SIVING_MASK_GOLD = "Eats grass, produces superb milk!"
 -- S_______WALTER.DESCRIBE.SIVING_MASK_GOLD = ""
 S________WANDA.DESCRIBE.SIVING_MASK_GOLD = "More efficient and cruel than the magic of time."
 
-S_NAMES.SIVING_SUIT = "Siving-Hylki"
+S_NAMES.SIVING_SUIT = "Siving-Vengeance" --子圭·庇
 S_RECIPE_DESC.SIVING_SUIT = "The price of a tooth for a tooth."
 S______GENERIC.DESCRIBE.SIVING_SUIT = "Repay my suffering with the blood of the enemy."
 S_______WILLOW.DESCRIBE.SIVING_SUIT = "I need to fight back! Those who have hurt me."
@@ -2449,19 +2449,19 @@ S_______WILLOW.DESCRIBE.SIVING_SUIT = "I need to fight back! Those who have hurt
 -- S_______WALTER.DESCRIBE.SIVING_SUIT = ""
 -- S________WANDA.DESCRIBE.SIVING_SUIT = ""
 
-S_NAMES.SIVING_SUIT_GOLD = "Siving-Hugrekki"
+S_NAMES.SIVING_SUIT_GOLD = "Siving-Cauldron" --子圭·釜
 S_RECIPE_DESC.SIVING_SUIT_GOLD = "Breaking a cauldron avoids sinking a boat."
 S______GENERIC.DESCRIBE.SIVING_SUIT_GOLD = "This is not a pot for cooking."
 S_______WILLOW.DESCRIBE.SIVING_SUIT_GOLD = "Wear this, the villain who provoked me will disappear!"
--- S_____WOLFGANG.DESCRIBE.SIVING_SUIT_GOLD = ""
+S_____WOLFGANG.DESCRIBE.SIVING_SUIT_GOLD = "Wolfgang hopes to wear it without getting stuck."
 -- S________WENDY.DESCRIBE.SIVING_SUIT_GOLD = ""
 -- S_________WX78.DESCRIBE.SIVING_SUIT_GOLD = ""
 S_WICKERBOTTOM.DESCRIBE.SIVING_SUIT_GOLD = "Amazing. The damage to the enemy will become my armor."
 S_______WOODIE.DESCRIBE.SIVING_SUIT_GOLD = "I thought it was a pot."
-S______WAXWELL.DESCRIBE.SIVING_SUIT_GOLD = "I like the anti damage magic."
+S______WAXWELL.DESCRIBE.SIVING_SUIT_GOLD = "I like the counterattack magic."
 -- S___WATHGRITHR.DESCRIBE.SIVING_SUIT_GOLD = ""
 S_______WEBBER.DESCRIBE.SIVING_SUIT_GOLD = "Is this about putting the pot on the body?"
-S_______WINONA.DESCRIBE.SIVING_SUIT_GOLD = "Exquisite vessels."
+S_______WINONA.DESCRIBE.SIVING_SUIT_GOLD = "You have to put in effort to get its reward."
 S_______WORTOX.DESCRIBE.SIVING_SUIT_GOLD = "I have never been the scapegoat."
 S_____WORMWOOD.DESCRIBE.SIVING_SUIT_GOLD = "Bowl?"
 S________WARLY.DESCRIBE.SIVING_SUIT_GOLD = "The cooker will explode!"

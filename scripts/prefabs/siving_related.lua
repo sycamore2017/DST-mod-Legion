@@ -1577,7 +1577,7 @@ local function OnAttacked_bloodarmor(owner, data, armor)
     end
     armor._cdtask = armor:DoTaskInTime(0.3, OnCooldown_suit)
     if owner.SoundEmitter ~= nil then
-        owner.SoundEmitter:PlaySound("dontstarve/common/together/armor/cactus") --undo得改个声音
+        owner.SoundEmitter:PlaySound("moonstorm/creatures/boss/alterguardian2/atk_spike")
     end
 
     local fx = SpawnPrefab(armor.suitfxoverride_l or "sivsuitatk_fx") --这个不是单纯的特效，反伤逻辑也在里面
@@ -1879,16 +1879,67 @@ local function InitCounterAtk(inst, owner, armor, attacker)
     inst.Transform:SetPosition(poser.Transform:GetWorldPosition())
     inst.task_atk = inst:DoTaskInTime(0, DoFxCounterAtk)
 end
+local function MakeSuitAtkFx(data)
+    table.insert(prefs, Prefab(
+        data.name,
+        function()
+            local inst = CreateEntity()
 
-table.insert(prefs, Prefab(
-    "sivsuitatk_fx",
-    function()
-        local inst = CreateEntity()
+            inst.entity:AddTransform()
+            inst.entity:AddAnimState()
+            inst.entity:AddNetwork()
 
-        inst.entity:AddTransform()
-        inst.entity:AddAnimState()
-        inst.entity:AddNetwork()
+            inst:AddTag("FX")
 
+            if data.fn_common ~= nil then
+                data.fn_common(inst)
+            end
+
+            inst.entity:SetPristine()
+            if not TheWorld.ismastersim then
+                return inst
+            end
+
+            inst.persists = false
+
+            inst.damage = 80
+            inst.range = 3
+            inst.armorcostmult = 1
+            -- inst.armor = nil
+            -- inst.owner = nil
+            -- inst.attacker = nil
+            -- inst.task_atk = nil
+            inst.InitCounterAtk = InitCounterAtk
+
+            inst:ListenForEvent("animover", inst.Remove)
+
+            if data.fn_server ~= nil then
+                data.fn_server(inst)
+            end
+
+            return inst
+        end,
+        data.assets,
+        nil
+    ))
+end
+
+local function SetSuitAtkFxAnim_server(inst)
+    if math.random() < 0.5 then
+        inst.AnimState:PlayAnimation("idle")
+    else
+        inst.AnimState:PlayAnimation("trap")
+        inst.AnimState:SetScale(1.3, 1.3)
+    end
+end
+
+MakeSuitAtkFx({
+    name = "sivsuitatk_fx",
+    assets = {
+        Asset("ANIM", "anim/bramblefx.zip"),
+        Asset("ANIM", "anim/sivsuitatk_fx.zip")
+    },
+    fn_common = function(inst)
         inst.Transform:SetFourFaced()
 
         inst.AnimState:SetBank("bramblefx")
@@ -1897,43 +1948,28 @@ table.insert(prefs, Prefab(
         inst.AnimState:SetSymbolBloom("needle01")
         inst.AnimState:SetSymbolLightOverride("needle01", .5)
         inst.AnimState:SetLightOverride(.1)
-
-        inst:AddTag("FX")
-
-        inst.entity:SetPristine()
-        if not TheWorld.ismastersim then
-            return inst
-        end
-
-        if math.random() < 0.5 then
-            inst.AnimState:PlayAnimation("idle")
-        else
-            inst.AnimState:PlayAnimation("trap")
-            inst.AnimState:SetScale(1.3, 1.3)
-        end
-
-        inst.persists = false
-
-        inst.damage = 80
-        inst.range = 3
-        inst.armorcostmult = 1
-        -- inst.armor = nil
-        -- inst.owner = nil
-        -- inst.attacker = nil
-        -- inst.task_atk = nil
-        inst.InitCounterAtk = InitCounterAtk
-
-        inst:ListenForEvent("animover", inst.Remove)
-
-        return inst
     end,
-    {
+    fn_server = SetSuitAtkFxAnim_server
+})
+MakeSuitAtkFx({
+    name = "sivsuitatk_fx_marble",
+    assets = {
         Asset("ANIM", "anim/bramblefx.zip"),
-        Asset("ANIM", "anim/sivsuitatk_fx.zip")
+        Asset("ANIM", "anim/skin/sivsuitatk_fx_marble.zip")
     },
-    nil
-))
+    fn_common = function(inst)
+        inst.Transform:SetFourFaced()
 
+        inst.AnimState:SetBank("bramblefx")
+        inst.AnimState:SetBuild("sivsuitatk_fx_marble")
+        inst.AnimState:SetFinalOffset(3)
+        inst.AnimState:SetMultColour(255/255, 255/255, 153/255, 1)
+        inst.AnimState:SetSymbolBloom("needle01")
+        inst.AnimState:SetSymbolLightOverride("needle01", .5)
+        inst.AnimState:SetLightOverride(.1)
+    end,
+    fn_server = SetSuitAtkFxAnim_server
+})
 --------------------
 --------------------
 

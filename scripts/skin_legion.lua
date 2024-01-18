@@ -3202,9 +3202,9 @@ _G.SKINS_LEGION = {
             bank = nil, build = nil,
             anim = nil, animpush = nil, isloop = nil, setable = true
         },
-        -- fn_start = function(inst)
-        --     inst.suitfxoverride_l = "sivsuitatk_fx" --undo 特效！
-        -- end,
+        fn_start = function(inst)
+            inst.suitfxoverride_l = "sivsuitatk_fx_marble"
+        end,
         equip = { symbol = "swap_body", build = "siving_suit_gold_marble", file = "swap_body" },
         exchangefx = { prefab = nil, offset_y = nil, scale = nil }
     },

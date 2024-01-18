@@ -350,7 +350,7 @@ configuration_options = L and {
     },
     {   name = "TransTimeCrop",
         label = "Mutation Time of Crops",
-        hover = "Set the time for ordinary crops mutation with Siving-Trans.",
+        hover = "Set the time for ordinary crops mutation with Siving-Mutator.",
         options = {
             {description = "30 sec", data = 0.0625},
             {description = "1 min", data = 0.125},
@@ -367,7 +367,7 @@ configuration_options = L and {
     },
     {   name = "TransTimeSpec",
         label = "Mutation Time Mult of Plants",
-        hover = "Set the Time Multiplier for special plants mutation with Siving-Trans.",
+        hover = "Set the Time Multiplier for special plants mutation with Siving-Mutator.",
         options = {
             {description = "0.0625x", data = 0.0625},
             {description = "0.125x", data = 0.125},
@@ -383,8 +383,8 @@ configuration_options = L and {
         default = 1
     },
     {   name = "SivSolToMedal",
-        label = "Siving-Sols Bans Crops in Medals",
-        hover = "Set whether the crops in the Functional Medal mod can be planted in Siving-Sols.",
+        label = "Siving-Soil Bans Crops in Medals",
+        hover = "Set whether the crops in the Functional Medal mod can be planted in Siving-Soil.",
         options = {
             {description = "Not Plantable", data = false},
             {description = "Plantable(default)", data = true}
