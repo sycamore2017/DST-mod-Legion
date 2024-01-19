@@ -1,5 +1,69 @@
 local TOOLS_L = require("tools_legion")
 
+local function GetAssets(name, other)
+    local sets = {
+        Asset("ANIM", "anim/"..name..".zip"),
+        Asset("ATLAS", "images/inventoryimages/"..name..".xml"),
+        Asset("IMAGE", "images/inventoryimages/"..name..".tex")
+    }
+    if other ~= nil then
+        for _, v in pairs(other) do
+            table.insert(sets, v)
+        end
+    end
+    return sets
+end
+
+local function Fn_common(inst, bank, build, anim, isloop)
+    inst.entity:AddTransform() --添加坐标系机制
+    inst.entity:AddAnimState() --添加动画机制
+    inst.entity:AddNetwork() --添加网络机制
+
+    MakeInventoryPhysics(inst) --设置物理机制
+
+    inst.AnimState:SetBank(bank) --动画的bank：骨架+运动轨迹
+    inst.AnimState:SetBuild(build or bank) --动画的build：贴图+贴图通道
+    inst.AnimState:PlayAnimation(anim or "idle", isloop) --播放的动画
+end
+local function Fn_server(inst, img, OnEquip, OnUnequip)
+    inst:AddComponent("inspectable") --可检查组件
+
+    -- inst:AddComponent("tradable")
+
+    inst:AddComponent("inventoryitem") --物品栏物品组件，有了这个组件，你才能把这个物品捡起放到物品栏里
+    inst.components.inventoryitem.imagename = img
+    inst.components.inventoryitem.atlasname = "images/inventoryimages/"..img..".xml"
+
+    inst:AddComponent("equippable") --可装备组件，有了这个组件，它才能被装备 
+    -- inst.components.equippable.equipslot = EQUIPSLOTS.HANDS --默认就是手部
+    inst.components.equippable:SetOnEquip(OnEquip)
+    inst.components.equippable:SetOnUnequip(OnUnequip)
+end
+
+local function SetWeapon(inst, damage, OnAttack)
+    inst:AddComponent("weapon") --武器组件，能设置攻击力
+    inst.components.weapon:SetDamage(damage)
+    if OnAttack ~= nil then
+        inst.components.weapon:SetOnAttack(OnAttack)
+    end
+end
+local function SetFiniteUses(inst, uses, OnFinished)
+    inst:AddComponent("finiteuses") --耐久次数组件
+    inst.components.finiteuses:SetMaxUses(uses)
+    inst.components.finiteuses:SetUses(uses)
+    inst.components.finiteuses:SetOnFinished(OnFinished or inst.Remove)
+end
+local function SetPerishable(inst, time, replacement)
+    inst:AddComponent("perishable") --新鲜度组件
+    inst.components.perishable:SetPerishTime(time)
+    inst.components.perishable.onperishreplacement = replacement or "spoiled_food"
+    inst.components.perishable:StartPerishing()
+end
+local function SetFuel(inst, value)
+    inst:AddComponent("fuel")
+    inst.components.fuel.fuelvalue = value or TUNING.MED_FUEL
+end
+
 local function OnEquip_base(inst, owner)
     owner.AnimState:Show("ARM_carry") --显示持物手
     owner.AnimState:Hide("ARM_normal") --隐藏普通的手
@@ -542,23 +606,13 @@ end
 local function Fn_never()
     local inst = CreateEntity()
 
-    inst.entity:AddTransform() --添加坐标系机制
-    inst.entity:AddAnimState() --添加动画机制
-    inst.entity:AddNetwork() --添加网络机制
-
-    MakeInventoryPhysics(inst) --设置物理机制
-
-    inst.AnimState:SetBank("neverfade")--动画的bank：骨架+运动轨迹
-    inst.AnimState:SetBuild("neverfade")--动画的build：贴图+贴图通道
-    inst.AnimState:PlayAnimation("idle")--播放的动画
+    Fn_common(inst, "neverfade", nil, nil, nil)
 
     inst:AddTag("sharp") --该标签跟攻击音效有关
     inst:AddTag("pointy") --该标签跟攻击音效有关
     -- inst:AddTag("hide_percentage") --该标签能让耐久比例不显示出来
     inst:AddTag("deployedplant") --deployable组件 需要的标签
     inst:AddTag("show_broken_ui") --装备损坏后展示特殊物品栏ui
-
-    --weapon (from weapon component) added to pristine state for optimization
     inst:AddTag("weapon")
 
     inst:AddComponent("skinedlegion")
@@ -574,25 +628,9 @@ local function Fn_never()
     inst.healthredirect_old = nil
     inst.OnScabbardRecoveredFn = OnRecovered_never
 
-    inst:AddComponent("inventoryitem") --物品栏物品组件，有了这个组件，你才能把这个物品捡起放到物品栏里
-    inst.components.inventoryitem.imagename = "neverfade"
-    inst.components.inventoryitem.atlasname = "images/inventoryimages/neverfade.xml"
-
-    inst:AddComponent("inspectable") --可检查组件
-
-    inst:AddComponent("equippable") --可装备组件，有了这个组件，它才能被装备 
-    inst.components.equippable:SetOnEquip(OnEquip_never)
-    inst.components.equippable:SetOnUnequip(OnUnequip_never)
-    -- inst.components.equippable.dapperness = TUNING.DAPPERNESS_MED --高礼帽般的回复精神效果
-
-    inst:AddComponent("weapon") --武器组件，能设置攻击力
-    inst.components.weapon:SetDamage(55)
-    inst.components.weapon:SetOnAttack(OnAttack_never)
-
-    inst:AddComponent("finiteuses") --耐久次数组件
-    inst.components.finiteuses:SetMaxUses(uses_never)
-    inst.components.finiteuses:SetUses(uses_never)
-    inst.components.finiteuses:SetOnFinished(OnFinished_never)
+    Fn_server(inst, "neverfade", OnEquip_never, OnUnequip_never)
+    SetWeapon(inst, 55, OnAttack_never)
+    SetFiniteUses(inst, uses_never, OnFinished_never)
 
     inst:AddComponent("deployable") --可摆放组件
     inst.components.deployable.ondeploy = OnDeploy_never
@@ -613,12 +651,7 @@ end
 --[[ 带刺蔷薇 ]]
 --------------------------------------------------------------------------
 
-local assets_rose = {
-    Asset("ANIM", "anim/rosorns.zip"),
-    Asset("ANIM", "anim/swap_rosorns.zip"),
-    Asset("ATLAS", "images/inventoryimages/rosorns.xml"),
-    Asset("IMAGE", "images/inventoryimages/rosorns.tex")
-}
+local assets_rose = GetAssets("rosorns", { Asset("ANIM", "anim/swap_rosorns.zip") })
 
 local function OnEquip_rose(inst, owner)
     local skindata = inst.components.skinedlegion:GetSkinedData()
@@ -652,22 +685,12 @@ end
 local function Fn_rose()
     local inst = CreateEntity()
 
-    inst.entity:AddTransform()
-    inst.entity:AddAnimState()
-    inst.entity:AddNetwork()
-
-    MakeInventoryPhysics(inst)
-
-    inst.AnimState:SetBank("rosorns")
-    inst.AnimState:SetBuild("rosorns")
-    inst.AnimState:PlayAnimation("idle")
+    Fn_common(inst, "rosorns", nil, nil, nil)
 
     inst:AddTag("sharp")
     inst:AddTag("pointy")
     inst:AddTag("show_spoilage") --显示新鲜度
     inst:AddTag("icebox_valid") --能装进冰箱
-
-    --weapon (from weapon component) added to pristine state for optimization
     inst:AddTag("weapon")
 
     inst:AddComponent("skinedlegion")
@@ -678,24 +701,9 @@ local function Fn_rose()
         return inst
     end
 
-    inst:AddComponent("inventoryitem")
-    inst.components.inventoryitem.imagename = "rosorns"
-    inst.components.inventoryitem.atlasname = "images/inventoryimages/rosorns.xml"
-
-    inst:AddComponent("inspectable")
-
-    inst:AddComponent("equippable")
-    inst.components.equippable:SetOnEquip(OnEquip_rose)
-    inst.components.equippable:SetOnUnequip(OnUnequip_rose)
-
-    inst:AddComponent("weapon")
-    inst.components.weapon:SetDamage(51)
-    inst.components.weapon:SetOnAttack(OnAttack_rose)
-
-    inst:AddComponent("perishable") --新鲜度组件
-    inst.components.perishable:SetPerishTime(TUNING.TOTAL_DAY_TIME*8)
-    inst.components.perishable:StartPerishing()
-    inst.components.perishable.onperishreplacement = "spoiled_food"
+    Fn_server(inst, "rosorns", OnEquip_rose, OnUnequip_rose)
+    SetWeapon(inst, 51, OnAttack_rose)
+    SetPerishable(inst, TUNING.TOTAL_DAY_TIME*8, nil)
 
     MakeHauntableLaunchAndPerish(inst)
 
@@ -708,12 +716,7 @@ end
 --[[ 蹄莲翠叶 ]]
 --------------------------------------------------------------------------
 
-local assets_lily = {
-    Asset("ANIM", "anim/lileaves.zip"),
-    Asset("ANIM", "anim/swap_lileaves.zip"),
-    Asset("ATLAS", "images/inventoryimages/lileaves.xml"),
-    Asset("IMAGE", "images/inventoryimages/lileaves.tex")
-}
+local assets_lily = GetAssets("lileaves", { Asset("ANIM", "anim/swap_lileaves.zip") })
 
 local function OnEquip_lily(inst, owner)
     local skindata = inst.components.skinedlegion:GetSkinedData()
@@ -743,22 +746,12 @@ end
 local function Fn_lily()
     local inst = CreateEntity()
 
-    inst.entity:AddTransform()
-    inst.entity:AddAnimState()
-    inst.entity:AddNetwork()
-
-    MakeInventoryPhysics(inst)
-
-    inst.AnimState:SetBank("lileaves")
-    inst.AnimState:SetBuild("lileaves")
-    inst.AnimState:PlayAnimation("idle")
+    Fn_common(inst, "lileaves", nil, nil, nil)
 
     inst:AddTag("sharp")
     inst:AddTag("pointy")
     inst:AddTag("show_spoilage")
     inst:AddTag("icebox_valid")
-
-    --weapon (from weapon component) added to pristine state for optimization
     inst:AddTag("weapon")
 
     inst:AddComponent("skinedlegion")
@@ -769,24 +762,9 @@ local function Fn_lily()
         return inst
     end
 
-    inst:AddComponent("inventoryitem")
-    inst.components.inventoryitem.imagename = "lileaves"
-    inst.components.inventoryitem.atlasname = "images/inventoryimages/lileaves.xml"
-
-    inst:AddComponent("inspectable")
-
-    inst:AddComponent("equippable")
-    inst.components.equippable:SetOnEquip(OnEquip_lily)
-    inst.components.equippable:SetOnUnequip(OnUnequip_base)
-
-    inst:AddComponent("weapon")
-    inst.components.weapon:SetDamage(51)
-    inst.components.weapon:SetOnAttack(OnAttack_lily)
-
-    inst:AddComponent("perishable")
-    inst.components.perishable:SetPerishTime(TUNING.TOTAL_DAY_TIME*8)
-    inst.components.perishable:StartPerishing()
-    inst.components.perishable.onperishreplacement = "spoiled_food"
+    Fn_server(inst, "lileaves", OnEquip_lily, OnUnequip_base)
+    SetWeapon(inst, 51, OnAttack_lily)
+    SetPerishable(inst, TUNING.TOTAL_DAY_TIME*8, nil)
 
     MakeHauntableLaunchAndPerish(inst)
 
@@ -799,15 +777,8 @@ end
 --[[ 兰草花穗 ]]
 --------------------------------------------------------------------------
 
-local assets_orchid = {
-    Asset("ANIM", "anim/orchitwigs.zip"),
-    Asset("ANIM", "anim/swap_orchitwigs.zip"),
-    Asset("ATLAS", "images/inventoryimages/orchitwigs.xml"),
-    Asset("IMAGE", "images/inventoryimages/orchitwigs.tex")
-}
-local prefabs_orchid = {
-    "impact_orchid_fx"
-}
+local assets_orchid = GetAssets("orchitwigs", { Asset("ANIM", "anim/swap_orchitwigs.zip") })
+local prefabs_orchid = { "impact_orchid_fx" }
 local atk_orchid_area = TUNING.BASE_SURVIVOR_ATTACK*0.7
 
 local function OnEquip_orchid(inst, owner)
@@ -876,22 +847,12 @@ end
 local function Fn_orchid()
     local inst = CreateEntity()
 
-    inst.entity:AddTransform()
-    inst.entity:AddAnimState()
-    inst.entity:AddNetwork()
-
-    MakeInventoryPhysics(inst)
-
-    inst.AnimState:SetBank("orchitwigs")
-    inst.AnimState:SetBuild("orchitwigs")
-    inst.AnimState:PlayAnimation("idle")
+    Fn_common(inst, "orchitwigs", nil, nil, nil)
 
     inst:AddTag("sharp")
     inst:AddTag("pointy")
     inst:AddTag("show_spoilage")
     inst:AddTag("icebox_valid")
-
-    --weapon (from weapon component) added to pristine state for optimization
     inst:AddTag("weapon")
 
     inst:AddComponent("skinedlegion")
@@ -902,24 +863,9 @@ local function Fn_orchid()
         return inst
     end
 
-    inst:AddComponent("inventoryitem")
-    inst.components.inventoryitem.imagename = "orchitwigs"
-    inst.components.inventoryitem.atlasname = "images/inventoryimages/orchitwigs.xml"
-
-    inst:AddComponent("inspectable")
-
-    inst:AddComponent("equippable")
-    inst.components.equippable:SetOnEquip(OnEquip_orchid)
-    inst.components.equippable:SetOnUnequip(OnUnequip_base)
-
-    inst:AddComponent("weapon")
-    inst.components.weapon:SetDamage(TUNING.BASE_SURVIVOR_ATTACK*0.9)
-    inst.components.weapon:SetOnAttack(OnAttack_orchid)
-
-    inst:AddComponent("perishable")
-    inst.components.perishable:SetPerishTime(TUNING.TOTAL_DAY_TIME*8)
-    inst.components.perishable:StartPerishing()
-    inst.components.perishable.onperishreplacement = "spoiled_food"
+    Fn_server(inst, "orchitwigs", OnEquip_orchid, OnUnequip_base)
+    SetWeapon(inst, TUNING.BASE_SURVIVOR_ATTACK*0.9, OnAttack_orchid)
+    SetPerishable(inst, TUNING.TOTAL_DAY_TIME*8, nil)
 
     MakeHauntableLaunchAndPerish(inst)
 
@@ -932,11 +878,7 @@ end
 --[[ 多变的云 ]]
 --------------------------------------------------------------------------
 
-local assets_bookweather = {
-    Asset("ANIM", "anim/book_weather.zip"),
-    Asset("ATLAS", "images/inventoryimages/book_weather.xml"),
-    Asset("IMAGE", "images/inventoryimages/book_weather.tex")
-}
+local assets_bookweather = GetAssets("book_weather")
 local prefabs_bookweather = {
     "waterballoon_splash", "fx_book_rain", "fx_book_rain_mount"
 }
@@ -1056,15 +998,7 @@ end
 local function Fn_bookweather()
     local inst = CreateEntity()
 
-    inst.entity:AddTransform()
-    inst.entity:AddAnimState()
-    inst.entity:AddNetwork()
-
-    MakeInventoryPhysics(inst)
-
-    inst.AnimState:SetBank("book_weather")
-    inst.AnimState:SetBuild("book_weather")
-    inst.AnimState:PlayAnimation("idle")
+    Fn_common(inst, "book_weather", nil, nil, nil)
 
     inst:AddTag("book") --加入book标签就能使攻击时使用人物的书本攻击的动画
     inst:AddTag("bookcabinet_item") --能放入书柜的标签
@@ -1080,19 +1014,10 @@ local function Fn_bookweather()
     inst.swap_build = "book_weather"
     inst.swap_prefix = "book"
 
-    inst:AddComponent("inventoryitem")
-    inst.components.inventoryitem.imagename = "book_weather"
-    inst.components.inventoryitem.atlasname = "images/inventoryimages/book_weather.xml"
-
-    inst:AddComponent("inspectable")
-
-    inst:AddComponent("equippable")
-    inst.components.equippable:SetOnEquip(OnEquip_bookweather)
-    inst.components.equippable:SetOnUnequip(OnUnequip_bookweather)
-
-    inst:AddComponent("weapon")
-    inst.components.weapon:SetDamage(50)
-    inst.components.weapon:SetOnAttack(OnAttack_bookweather)
+    Fn_server(inst, "book_weather", OnEquip_bookweather, OnUnequip_bookweather)
+    SetWeapon(inst, 50, OnAttack_bookweather)
+    SetFiniteUses(inst, 300, nil)
+    SetFuel(inst, nil)
 
     inst:AddComponent("wateryprotection")
     inst.components.wateryprotection.extinguishheatpercent = TUNING.WATERBALLOON_EXTINGUISH_HEAT_PERCENT
@@ -1106,11 +1031,6 @@ local function Fn_bookweather()
         inst.components.wateryprotection:AddIgnoreTag("player")  --PVE，防止所有玩家被打湿
     end
 
-    inst:AddComponent("finiteuses")
-    inst.components.finiteuses:SetMaxUses(300)
-    inst.components.finiteuses:SetUses(300)
-    inst.components.finiteuses:SetOnFinished(inst.Remove)
-
     inst:AddComponent("book")
     inst.components.book:SetOnRead(OnRead_bookweather)
     inst.components.book:SetOnPeruse(OnPeruse_bookweather)
@@ -1118,9 +1038,6 @@ local function Fn_bookweather()
     -- inst.components.book:SetPeruseSanity() --阅读的精神消耗/增益
     inst.components.book:SetFx("fx_book_rain", "fx_book_rain_mount")
     inst.components.book.ConsumeUse = ConsumeUse_bookweather
-
-    inst:AddComponent("fuel")
-    inst.components.fuel.fuelvalue = TUNING.MED_FUEL
 
     MakeSmallBurnable(inst, TUNING.MED_BURNTIME)
     MakeSmallPropagator(inst)
@@ -1134,12 +1051,7 @@ end
 --[[ 幻象法杖 ]]
 --------------------------------------------------------------------------
 
-local assets_staffpink = {
-    Asset("ANIM", "anim/pinkstaff.zip"),
-    Asset("ANIM", "anim/swap_pinkstaff.zip"),
-    Asset("ATLAS", "images/inventoryimages/pinkstaff.xml"),
-    Asset("IMAGE", "images/inventoryimages/pinkstaff.tex")
-}
+local assets_staffpink = GetAssets("pinkstaff", { Asset("ANIM", "anim/swap_pinkstaff.zip") })
 
 local function OnFinished_staffpink(inst)
     inst.SoundEmitter:PlaySound("dontstarve/common/gem_shatter")
@@ -1200,17 +1112,9 @@ end
 
 local function Fn_staffpink()
     local inst = CreateEntity()
-
-    inst.entity:AddTransform()
-    inst.entity:AddAnimState()
     inst.entity:AddSoundEmitter()
-    inst.entity:AddNetwork()
 
-    MakeInventoryPhysics(inst)
-
-    inst.AnimState:SetBank("pinkstaff")
-    inst.AnimState:SetBuild("pinkstaff")
-    inst.AnimState:PlayAnimation("anim")
+    Fn_common(inst, "pinkstaff", nil, "anim", nil)
 
     inst:AddTag("nopunch") --这个标签的作用应该是让本身没有武器组件的道具用武器攻击的动作，而不是用拳头攻击的动作
 
@@ -1224,22 +1128,8 @@ local function Fn_staffpink()
 
     inst.fxcolour = { 255/255, 80/255, 173/255 }
 
-    inst:AddComponent("finiteuses")
-    inst.components.finiteuses:SetMaxUses(30)
-    inst.components.finiteuses:SetUses(30)
-    inst.components.finiteuses:SetOnFinished(OnFinished_staffpink)
-
-    inst:AddComponent("inspectable")
-
-    inst:AddComponent("inventoryitem")
-    inst.components.inventoryitem.imagename = "pinkstaff"
-    inst.components.inventoryitem.atlasname = "images/inventoryimages/pinkstaff.xml"
-
-    inst:AddComponent("tradable")
-
-    inst:AddComponent("equippable")
-    inst.components.equippable:SetOnEquip(OnEquip_staffpink)
-    inst.components.equippable:SetOnUnequip(OnUnequip_staffpink)
+    Fn_server(inst, "pinkstaff", OnEquip_staffpink, OnUnequip_staffpink)
+    SetFiniteUses(inst, 30, OnFinished_staffpink)
 
     inst:AddComponent("spellcaster")
     inst.components.spellcaster.canuseontargets = true
@@ -1258,12 +1148,7 @@ end
 --[[ 芬布尔斧 ]]
 --------------------------------------------------------------------------
 
-local assets_fimbulaxe = {
-    Asset("ANIM", "anim/fimbul_axe.zip"),
-    Asset("ATLAS", "images/inventoryimages/fimbul_axe.xml"),
-    Asset("IMAGE", "images/inventoryimages/fimbul_axe.tex"),
-    Asset("ANIM", "anim/boomerang.zip") --官方回旋镖动画模板
-}
+local assets_fimbulaxe = GetAssets("fimbul_axe", { Asset("ANIM", "anim/boomerang.zip") }) --官方回旋镖动画模板
 local prefabs_fimbulaxe = {
     "fimbul_lightning",
     "fimbul_cracklebase_fx"
@@ -1446,16 +1331,8 @@ end
 local function Fn_fimbulaxe()
     local inst = CreateEntity()
 
-    inst.entity:AddTransform()
-    inst.entity:AddAnimState()
-    inst.entity:AddNetwork()
-
-    MakeInventoryPhysics(inst)
+    Fn_common(inst, "boomerang", "fimbul_axe", nil, nil)
     RemovePhysicsColliders(inst)
-
-    inst.AnimState:SetBank("boomerang")
-    inst.AnimState:SetBuild("fimbul_axe")
-    inst.AnimState:PlayAnimation("idle")
     inst.AnimState:SetRayTestOnBB(true)
 
     inst:AddTag("thrown")
@@ -1479,17 +1356,14 @@ local function Fn_fimbulaxe()
 
     -- inst.returntask = nil
 
-    inst:AddComponent("weapon")
-    inst.components.weapon:SetDamage(atk_fimbulaxe)
+    Fn_server(inst, "fimbul_axe", OnEquip_fimbulaxe, OnUnequip_base)
+    inst.components.inventoryitem:SetOnDroppedFn(OnDropped_fimbulaxe)
+
+    SetWeapon(inst, atk_fimbulaxe, nil)
     inst.components.weapon:SetRange(TUNING.BOOMERANG_DISTANCE, TUNING.BOOMERANG_DISTANCE + 2)
     inst.components.weapon:SetElectric() --设置为带电的武器，带电武器自带攻击加成
 
-    inst:AddComponent("finiteuses")
-    inst.components.finiteuses:SetMaxUses(250)
-    inst.components.finiteuses:SetUses(250)
-    inst.components.finiteuses:SetOnFinished(OnFinished_fimbulaxe)
-
-    inst:AddComponent("inspectable")
+    SetFiniteUses(inst, 250, OnFinished_fimbulaxe)
 
     inst:AddComponent("projectile")
     inst.components.projectile:SetSpeed(15)
@@ -1499,15 +1373,6 @@ local function Fn_fimbulaxe()
     inst.components.projectile:SetOnHitFn(OnHit_fimbulaxe)        --敌方或者自己被击中后
     inst.components.projectile:SetOnMissFn(OnMiss_fimbulaxe)      --丢失目标时
     --inst.components.projectile:SetOnCaughtFn(OnCaught)--被抓住时
-
-    inst:AddComponent("inventoryitem")
-    inst.components.inventoryitem.imagename = "fimbul_axe"
-    inst.components.inventoryitem.atlasname = "images/inventoryimages/fimbul_axe.xml"
-    inst.components.inventoryitem:SetOnDroppedFn(OnDropped_fimbulaxe)
-
-    inst:AddComponent("equippable")
-    inst.components.equippable:SetOnEquip(OnEquip_fimbulaxe)
-    inst.components.equippable:SetOnUnequip(OnUnequip_base)
 
     inst:ListenForEvent("lightningstrike", OnLightning_fimbulaxe)
 
@@ -1522,12 +1387,7 @@ end
 --[[ 扳手-双用型 ]]
 --------------------------------------------------------------------------
 
-local assets_2wrench = {
-    Asset("ANIM", "anim/dualwrench.zip"),
-    Asset("ANIM", "anim/swap_dualwrench.zip"),
-    Asset("ATLAS", "images/inventoryimages/dualwrench.xml"),
-    Asset("IMAGE", "images/inventoryimages/dualwrench.tex")
-}
+local assets_2wrench = GetAssets("dualwrench", { Asset("ANIM", "anim/swap_dualwrench.zip") })
 
 local function OnEquip_2wrench(inst, owner)
     owner.AnimState:OverrideSymbol("swap_object", "swap_dualwrench", "swap_dualwrench")
@@ -1536,22 +1396,12 @@ end
 
 local function Fn_2wrench()
     local inst = CreateEntity()
-
-    inst.entity:AddTransform()
-    inst.entity:AddAnimState()
     inst.entity:AddSoundEmitter()
-    inst.entity:AddNetwork()
 
-    MakeInventoryPhysics(inst)
-
-    inst.AnimState:SetBank("dualwrench")
-    inst.AnimState:SetBuild("dualwrench")
-    inst.AnimState:PlayAnimation("idle")
+    Fn_common(inst, "dualwrench", nil, nil, nil)
 
     inst:AddTag("hammer")
     inst:AddTag("weapon")
-
-    --tool (from tool component) added to pristine state for optimization
     inst:AddTag("tool")
 
     MakeInventoryFloatable(inst, "med", 0.1, {1.1, 0.5, 1.1}, true, -9, {
@@ -1566,12 +1416,8 @@ local function Fn_2wrench()
         return inst
     end
 
-    inst:AddComponent("weapon")
-    inst.components.weapon:SetDamage(TUNING.HAMMER_DAMAGE)
-
-    inst:AddComponent("inventoryitem")
-    inst.components.inventoryitem.imagename = "dualwrench"
-    inst.components.inventoryitem.atlasname = "images/inventoryimages/dualwrench.xml"
+    Fn_server(inst, "dualwrench", OnEquip_2wrench, OnUnequip_base)
+    SetWeapon(inst, TUNING.HAMMER_DAMAGE, nil)
 
     inst:AddComponent("tool")
     inst.components.tool:SetAction(ACTIONS.HAMMER) --添加锤子功能
@@ -1581,22 +1427,12 @@ local function Fn_2wrench()
     inst:AddComponent("terraformer")
     inst:AddComponent("carpetpullerlegion")
 
-    inst:AddComponent("finiteuses")
-    inst.components.finiteuses:SetMaxUses(TUNING.HAMMER_USES) --总共75次，可攻击75次
-    inst.components.finiteuses:SetUses(TUNING.HAMMER_USES)
-    inst.components.finiteuses:SetOnFinished(inst.Remove)
-
+    SetFiniteUses(inst, TUNING.HAMMER_USES, nil) --总共75次，可攻击75次
     --设置每种功能的消耗量
     inst.components.finiteuses:SetConsumption(ACTIONS.HAMMER, 0.3) --可以使用75/0.3=250次
     inst.components.finiteuses:SetConsumption(ACTIONS.TERRAFORM, 0.3)
 
     MakeHauntableLaunch(inst)
-
-    inst:AddComponent("inspectable")
-
-    inst:AddComponent("equippable")
-    inst.components.equippable:SetOnEquip(OnEquip_2wrench)
-    inst.components.equippable:SetOnUnequip(OnUnequip_base)
 
     return inst
 end
@@ -1605,11 +1441,7 @@ end
 --[[ 斧铲-三用型 ]]
 --------------------------------------------------------------------------
 
-local assets_3axe = {
-    Asset("ANIM", "anim/tripleshovelaxe.zip"),
-    Asset("ATLAS", "images/inventoryimages/tripleshovelaxe.xml"),
-    Asset("IMAGE", "images/inventoryimages/tripleshovelaxe.tex")
-}
+local assets_3axe = GetAssets("tripleshovelaxe")
 
 local function OnEquip_3axe(inst, owner)
     local skindata = inst.components.skinedlegion:GetSkinedData()
@@ -1623,17 +1455,9 @@ end
 
 local function Fn_3axe()
     local inst = CreateEntity()
-
-    inst.entity:AddTransform()
-    inst.entity:AddAnimState()
     inst.entity:AddSoundEmitter()
-    inst.entity:AddNetwork()
 
-    MakeInventoryPhysics(inst)
-
-    inst.AnimState:SetBank("tripleshovelaxe")
-    inst.AnimState:SetBuild("tripleshovelaxe")
-    inst.AnimState:PlayAnimation("idle")
+    Fn_common(inst, "tripleshovelaxe", nil, nil, nil)
 
     inst:AddTag("sharp")
     inst:AddTag("tool")
@@ -1647,33 +1471,19 @@ local function Fn_3axe()
         return inst
     end
 
-    inst:AddComponent("weapon")
-    inst.components.weapon:SetDamage(TUNING.AXE_DAMAGE)
-
-    inst:AddComponent("inventoryitem")
-    inst.components.inventoryitem.imagename = "tripleshovelaxe"
-    inst.components.inventoryitem.atlasname = "images/inventoryimages/tripleshovelaxe.xml"
+    Fn_server(inst, "tripleshovelaxe", OnEquip_3axe, OnUnequip_base)
+    SetWeapon(inst, TUNING.AXE_DAMAGE, nil)
 
     inst:AddComponent("tool")
     inst.components.tool:SetAction(ACTIONS.CHOP, 1)
     inst.components.tool:SetAction(ACTIONS.MINE, 1)
     inst.components.tool:SetAction(ACTIONS.DIG,  1)
 
-    inst:AddComponent("finiteuses")
-    inst.components.finiteuses:SetMaxUses(108) --总共108次，可攻击108次
-    inst.components.finiteuses:SetUses(108)
-    inst.components.finiteuses:SetOnFinished(inst.Remove)
-
+    SetFiniteUses(inst, 108, nil) --总共108次，可攻击108次
     --设置每种功能的消耗量
     inst.components.finiteuses:SetConsumption(ACTIONS.CHOP, 0.6) --可以使用108/0.6=180次
     inst.components.finiteuses:SetConsumption(ACTIONS.MINE, 0.6)
     inst.components.finiteuses:SetConsumption(ACTIONS.DIG,  0.6)
-
-    inst:AddComponent("inspectable")
-
-    inst:AddComponent("equippable")
-    inst.components.equippable:SetOnEquip(OnEquip_3axe)
-    inst.components.equippable:SetOnUnequip(OnUnequip_base)
 
     MakeHauntableLaunch(inst)
 
@@ -1686,11 +1496,7 @@ end
 --[[ 斧铲-黄金三用型 ]]
 --------------------------------------------------------------------------
 
-local assets_3axegold = {
-    Asset("ANIM", "anim/triplegoldenshovelaxe.zip"),
-    Asset("ATLAS", "images/inventoryimages/triplegoldenshovelaxe.xml"),
-    Asset("IMAGE", "images/inventoryimages/triplegoldenshovelaxe.tex")
-}
+local assets_3axegold = GetAssets("triplegoldenshovelaxe")
 
 local function OnEquip_3axegold(inst, owner)
     local skindata = inst.components.skinedlegion:GetSkinedData()
@@ -1704,17 +1510,9 @@ end
 
 local function Fn_3axegold()
     local inst = CreateEntity()
-
-    inst.entity:AddTransform()
-    inst.entity:AddAnimState()
     inst.entity:AddSoundEmitter()
-    inst.entity:AddNetwork()
 
-    MakeInventoryPhysics(inst)
-
-    inst.AnimState:SetBank("triplegoldenshovelaxe")
-    inst.AnimState:SetBuild("triplegoldenshovelaxe")
-    inst.AnimState:PlayAnimation("idle")
+    Fn_common(inst, "triplegoldenshovelaxe", nil, nil, nil)
 
     inst:AddTag("sharp")
     inst:AddTag("tool")
@@ -1728,12 +1526,8 @@ local function Fn_3axegold()
         return inst
     end
 
-    inst:AddComponent("weapon")
-    inst.components.weapon:SetDamage(TUNING.AXE_DAMAGE)
-
-    inst:AddComponent("inventoryitem")
-    inst.components.inventoryitem.imagename = "triplegoldenshovelaxe"
-    inst.components.inventoryitem.atlasname = "images/inventoryimages/triplegoldenshovelaxe.xml"
+    Fn_server(inst, "triplegoldenshovelaxe", OnEquip_3axegold, OnUnequip_base)
+    SetWeapon(inst, TUNING.AXE_DAMAGE, nil)
 
     inst:AddComponent("tool")
     inst.components.tool:SetAction(ACTIONS.CHOP, 1.25)
@@ -1741,22 +1535,12 @@ local function Fn_3axegold()
     inst.components.tool:SetAction(ACTIONS.DIG,  1.25)
     inst.components.tool:EnableToughWork(true) --可以开凿更坚硬的对象
 
-    inst:AddComponent("finiteuses")
-    inst.components.finiteuses:SetMaxUses(180)
-    inst.components.finiteuses:SetUses(180)
-    inst.components.finiteuses:SetOnFinished(inst.Remove)
-
+    SetFiniteUses(inst, 180, nil)
     --设置每种功能的消耗量
     inst.components.finiteuses:SetConsumption(ACTIONS.CHOP, 0.1) --可以使用180/0.1=1800次
     inst.components.finiteuses:SetConsumption(ACTIONS.MINE, 0.1)
     inst.components.finiteuses:SetConsumption(ACTIONS.DIG,  0.1)
     inst.components.weapon.attackwear = 0.1
-
-    inst:AddComponent("inspectable")
-
-    inst:AddComponent("equippable")
-    inst.components.equippable:SetOnEquip(OnEquip_3axegold)
-    inst.components.equippable:SetOnUnequip(OnUnequip_base)
 
     MakeHauntableLaunch(inst)
 
@@ -1769,12 +1553,7 @@ end
 --[[ 胡萝卜长枪 ]]
 --------------------------------------------------------------------------
 
-local assets_carl = {
-    Asset("ANIM", "anim/lance_carrot_l.zip"),
-    Asset("ATLAS", "images/inventoryimages/lance_carrot_l.xml"),
-    Asset("IMAGE", "images/inventoryimages/lance_carrot_l.tex")
-}
-
+local assets_carl = GetAssets("lance_carrot_l")
 local atk_min_carl = 10
 
 local function UpdateCarrot(inst, force)
@@ -1878,15 +1657,6 @@ local function OnUnequip_carl(inst, owner)
 	inst:RemoveEventCallback("itemget", OnOwnerItemChange_carl, owner)
 	inst:RemoveEventCallback("itemlose", OnOwnerItemChange_carl, owner)
 end
-local function OnAttack_carl(inst, attacker, target)
-	if inst.task_carrot_l ~= nil then
-		inst.task_carrot_l:Cancel()
-		inst.task_carrot_l = nil
-	end
-	if inst.components.container ~= nil then
-		UpdateCarrot(inst)
-	end
-end
 local function OnFinished_carl(inst)
 	if inst.components.container ~= nil then
 		inst.components.container:DropEverything()
@@ -1902,15 +1672,7 @@ end
 local function Fn_carl()
     local inst = CreateEntity()
 
-    inst.entity:AddTransform()
-    inst.entity:AddAnimState()
-    inst.entity:AddNetwork()
-
-    MakeInventoryPhysics(inst)
-
-    inst.AnimState:SetBank("lance_carrot_l")
-    inst.AnimState:SetBuild("lance_carrot_l")
-    inst.AnimState:PlayAnimation("idle")
+    Fn_common(inst, "lance_carrot_l", nil, nil, nil)
 
     inst:AddTag("jab") --使用捅击的动作进行攻击
     inst:AddTag("rp_carrot_l")
@@ -1937,30 +1699,15 @@ local function Fn_carl()
     inst.num_carrot_l = 0
     inst.num_carrat_l = 0
 
-    inst:AddComponent("inspectable")
-
-    inst:AddComponent("inventoryitem")
-    inst.components.inventoryitem.imagename = "lance_carrot_l"
-    inst.components.inventoryitem.atlasname = "images/inventoryimages/lance_carrot_l.xml"
-
-    inst:AddComponent("equippable")
-    inst.components.equippable:SetOnEquip(OnEquip_carl)
-    inst.components.equippable:SetOnUnequip(OnUnequip_carl)
-
-    inst:AddComponent("weapon")
-    inst.components.weapon:SetDamage(atk_min_carl)
+    Fn_server(inst, "lance_carrot_l", OnEquip_carl, OnUnequip_carl)
+    SetWeapon(inst, atk_min_carl, nil)
     -- inst.components.weapon:SetRange(-1, -1) --人物默认攻击距离为3、3
-    -- inst.components.weapon:SetOnAttack(OnAttack_carl)
+    SetFiniteUses(inst, 200, OnFinished_carl)
 
     inst:AddComponent("planardamage")
     inst.components.planardamage:SetBaseDamage(0)
 
     inst:AddComponent("damagetypebonus")
-
-    inst:AddComponent("finiteuses")
-    inst.components.finiteuses:SetMaxUses(200)
-    inst.components.finiteuses:SetUses(200)
-    inst.components.finiteuses:SetOnFinished(OnFinished_carl)
 
     inst:AddComponent("container")
     inst.components.container:WidgetSetup("lance_carrot_l")

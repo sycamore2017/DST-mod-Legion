@@ -96,6 +96,7 @@ _G.RegistMiniMapImage_legion("siving_suit_gold")
 
 _G.EQUIPMENTSETNAMES.SIVING = "siving"
 _G.EQUIPMENTSETNAMES.SIVING2 = "siving2"
+_G.EQUIPMENTSETNAMES.ELEPHEETLE = "elepheetle"
 
 AddRecipe2(
     "siving_soil_item", {

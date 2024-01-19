@@ -419,9 +419,13 @@ local function CheckForeverEquip(inst, item, doer, now)
     end
 end
 local function ComputCost(valuenow, valuemax, value, item)
-    local need = math.ceil((valuemax - valuenow) / value)
-    if need > 1 then --最后一次很可能会比较浪费，所以不主动填满
-        need = need - 1
+    local need = (valuemax - valuenow) / value
+    value = math.ceil(need)
+    if need ~= value then --说明不整除
+        need = value
+        if need > 1 then --最后一次很可能会比较浪费，所以不主动填满
+            need = need - 1
+        end
     end
     if item.components.stackable ~= nil then
         local stack = item.components.stackable:StackSize() or 1
@@ -681,7 +685,7 @@ _G.REPAIRERS_L["insectshell_l"] = {
     fn_try = Fn_try_bugshell,
     fn_sg = Fn_sg_handy,
     fn_do = function(act)
-        return DoArmorRepair(act.doer, act.invobject, act.target, 100)
+        return DoArmorRepair(act.doer, act.invobject, act.target, 105)
     end
 }
 

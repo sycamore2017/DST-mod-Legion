@@ -218,8 +218,8 @@ AddRecipe2(
 AddRecipe2(
     "hat_elepheetle", {
         Ingredient("cookiecutterhat", 1),
-        Ingredient("insectshell_l", 30, "images/inventoryimages/insectshell_l.xml"),
-        Ingredient("goldnugget", 10),
+        Ingredient("insectshell_l", 35, "images/inventoryimages/insectshell_l.xml"),
+        Ingredient("goldnugget", 15),
         Ingredient("slurtlehat", 1)
     }, tech_recast[2], {
         nounlock = lock_recast,
@@ -229,8 +229,8 @@ AddRecipe2(
 AddRecipe2(
     "armor_elepheetle", {
         Ingredient("armormarble", 1),
-        Ingredient("insectshell_l", 30, "images/inventoryimages/insectshell_l.xml"),
-        Ingredient("goldnugget", 10),
+        Ingredient("insectshell_l", 45, "images/inventoryimages/insectshell_l.xml"),
+        Ingredient("goldnugget", 20),
         Ingredient("armorsnurtleshell", 1)
     }, tech_recast[2], {
         nounlock = lock_recast,

@@ -149,9 +149,9 @@ PrefabFiles = {
     "plantables_legion",        --新种植根
     "turfs_legion",             --新地皮
     "wants_sandwitch",          --沙之女巫所欲之物
-    "heads_legion",             --棱镜头戴道具
-    "hands_legion",             --棱镜手持道具
-    "bodys_legion",             --棱镜身穿道具
+    "euip_head_legion",         --棱镜头戴道具
+    "euip_hand_legion",         --棱镜手持道具
+    "euip_body_legion",         --棱镜身穿道具
     -- "guitar_greenery",
     -- "aatest_anim",
     "fx_legion",                --特效
