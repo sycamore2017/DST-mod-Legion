@@ -3305,4 +3305,60 @@ if IsServer then
         inst.onpicked_old_l = inst.components.pickable.onpickedfn
         inst.components.pickable.onpickedfn = OnPicked_tumbleweed
     end)
+
+    --------------------------------------------------------------------------
+    --[[ 修改燃烧组件，达到条件就不会燃烧 ]]
+    --------------------------------------------------------------------------
+
+    local function Ignite_fireproof(self, ...)
+        if self.fireproof_l or self.inst.fireproof_l ~= nil then
+            return
+        end
+        if self.Ignite_l_fireproof ~= nil then
+            self.Ignite_l_fireproof(self, ...)
+        end
+    end
+    local function StartWildfire_fireproof(self, ...)
+        if self.fireproof_l or self.inst.fireproof_l ~= nil then
+            return
+        end
+        if self.StartWildfire_l_fireproof ~= nil then
+            self.StartWildfire_l_fireproof(self, ...)
+        end
+    end
+    local function OnSave_fireproof(self, ...)
+        local data, refs
+        if self.OnSave_l_fireproof ~= nil then
+            data, refs = self.OnSave_l_fireproof(self, ...)
+        end
+        if self.fireproof_l then
+            if type(data) == "table" then
+                data.fireproof_l = true
+            else
+                data = { fireproof_l = true }
+            end
+        end
+        return data, refs
+    end
+    local function OnLoad_fireproof(self, data, ...)
+        if data.fireproof_l then
+            self.fireproof_l = true
+        end
+        if self.OnLoad_l_fireproof ~= nil then
+            self.OnLoad_l_fireproof(self, data, ...)
+        end
+    end
+
+    AddComponentPostInit("burnable", function(self)
+        self.Ignite_l_fireproof = self.Ignite
+        self.Ignite = Ignite_fireproof
+
+        self.StartWildfire_l_fireproof = self.StartWildfire
+        self.StartWildfire = StartWildfire_fireproof
+
+        self.OnSave_l_fireproof = self.OnSave
+        self.OnLoad_l_fireproof = self.OnLoad
+        self.OnSave = OnSave_fireproof
+        self.OnLoad = OnLoad_fireproof
+    end)
 end

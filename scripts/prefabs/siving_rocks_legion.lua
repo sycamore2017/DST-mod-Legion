@@ -51,7 +51,7 @@ if not CONFIGS_LEGION.ENABLEDMODS.MythWords then --未开启神话书说时才�
             inst.components.inventoryitem.atlasname = "images/inventoryimages/siving_rocks.xml"
             inst.components.inventoryitem:SetSinks(true)
 
-            MakeHauntableLaunchAndIgnite(inst)
+            MakeHauntableLaunch(inst)
 
             return inst
         end,

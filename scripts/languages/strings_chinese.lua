@@ -3247,7 +3247,6 @@ S_WICKERBOTTOM.DESCRIBE.SHIELD_L_SAND = "它的魔法可以保护我免于雷电
 S___WATHGRITHR.DESCRIBE.SHIELD_L_SAND = "作我明镜，作我利剑与护盾！"
 --S_______WINONA.DESCRIBE.SHIELD_L_SAND = ""
 
-
 S_NAMES.SHYERRYTREE = "颤栗树"
 S______GENERIC.DESCRIBE.SHYERRYTREE =
 {
@@ -3698,6 +3697,43 @@ S________WARLY.DESCRIBE.CHEST_WHITEWOOD_BIG = {
 -- S_______WALTER.DESCRIBE.CHEST_WHITEWOOD_BIG = ""
 -- S________WANDA.DESCRIBE.CHEST_WHITEWOOD_BIG = ""
 
+--防火buff
+S______GENERIC.ANNOUNCE_ATTACH_BUFF_L_FIREPROOF = "在此之后，火焰伤不了我。"
+S_______WILLOW.ANNOUNCE_ATTACH_BUFF_L_FIREPROOF = "火焰本来就不会伤我分毫。"
+-- S_____WOLFGANG.ANNOUNCE_ATTACH_BUFF_L_FIREPROOF = ""
+-- S________WENDY.ANNOUNCE_ATTACH_BUFF_L_FIREPROOF = ""
+-- S_________WX78.ANNOUNCE_ATTACH_BUFF_L_FIREPROOF = ""
+-- S_WICKERBOTTOM.ANNOUNCE_ATTACH_BUFF_L_FIREPROOF = ""
+-- S_______WOODIE.ANNOUNCE_ATTACH_BUFF_L_FIREPROOF = ""
+-- S______WAXWELL.ANNOUNCE_ATTACH_BUFF_L_FIREPROOF = ""
+-- S___WATHGRITHR.ANNOUNCE_ATTACH_BUFF_L_FIREPROOF = ""
+-- S_______WEBBER.ANNOUNCE_ATTACH_BUFF_L_FIREPROOF = ""
+-- S_______WINONA.ANNOUNCE_ATTACH_BUFF_L_FIREPROOF = ""
+S_______WORTOX.ANNOUNCE_ATTACH_BUFF_L_FIREPROOF = "火之于人，利害甚焉。"
+-- S_____WORMWOOD.ANNOUNCE_ATTACH_BUFF_L_FIREPROOF = ""
+-- S________WARLY.ANNOUNCE_ATTACH_BUFF_L_FIREPROOF =
+-- S_________WURT.ANNOUNCE_ATTACH_BUFF_L_FIREPROOF =
+-- S_______WALTER.ANNOUNCE_ATTACH_BUFF_L_FIREPROOF =
+-- S________WANDA.ANNOUNCE_ATTACH_BUFF_L_FIREPROOF =
+--
+S______GENERIC.ANNOUNCE_DETACH_BUFF_L_FIREPROOF = "从现在开始，我得离火远远的。"
+S_______WILLOW.ANNOUNCE_DETACH_BUFF_L_FIREPROOF = "哈，再次燃烧起来吧！"
+-- S_____WOLFGANG.ANNOUNCE_DETACH_BUFF_L_FIREPROOF = ""
+-- S________WENDY.ANNOUNCE_DETACH_BUFF_L_FIREPROOF = ""
+-- S_________WX78.ANNOUNCE_DETACH_BUFF_L_FIREPROOF = ""
+-- S_WICKERBOTTOM.ANNOUNCE_DETACH_BUFF_L_FIREPROOF = ""
+-- S_______WOODIE.ANNOUNCE_DETACH_BUFF_L_FIREPROOF = ""
+-- S______WAXWELL.ANNOUNCE_DETACH_BUFF_L_FIREPROOF = ""
+-- S___WATHGRITHR.ANNOUNCE_DETACH_BUFF_L_FIREPROOF = ""
+-- S_______WEBBER.ANNOUNCE_DETACH_BUFF_L_FIREPROOF = ""
+-- S_______WINONA.ANNOUNCE_DETACH_BUFF_L_FIREPROOF = ""
+S_______WORTOX.ANNOUNCE_DETACH_BUFF_L_FIREPROOF = "天干物燥，小心火烛。"
+-- S_____WORMWOOD.ANNOUNCE_DETACH_BUFF_L_FIREPROOF =
+-- S________WARLY.ANNOUNCE_DETACH_BUFF_L_FIREPROOF =
+-- S_________WURT.ANNOUNCE_DETACH_BUFF_L_FIREPROOF =
+-- S_______WALTER.ANNOUNCE_DETACH_BUFF_L_FIREPROOF =
+-- S________WANDA.ANNOUNCE_DETACH_BUFF_L_FIREPROOF =
+
 --------------------------------------------------------------------------
 --[[ tips ]]--[[ 加载台词 ]]
 --------------------------------------------------------------------------
@@ -3706,7 +3742,7 @@ local SURVIVAL_TIPS = { --介绍探险技巧
     "用心的花匠靠扦插与播种繁殖他的爱花，还能使其根系更容易适应新的土壤环境，不容易枯萎。",
     "月圆之夜时，月藏宝匣能吸收月光能量，让其中的物品保持活性。",
     "对付暴怒状态的莱克阿米特，砂之抵御、雨帽和眼球伞等防电装备是很必要的……",
-    "颤栗花对接触非常敏感，会被靠近的生物吓得枯萎，如果我能隐藏自己的生物气息就可以靠近它了吧。",
+    "颤栗花对接触非常敏感，会被靠近的生物吓得枯萎，如果我能掩盖自己的生物气息就可以靠近它了吧。",
     "在我进行基地大装修时，偶然发现人造地皮居然能阻止颤栗树的再生……",
     "《多变的云》里的知识水分非常重，字面意思。",
     "今晚没有月亮，他不知道在冰箱捣鼓什么，我昏沉睡去。醒来发现每个烹饪锅都盛满了诡异笑脸的黑色蛋糕……",

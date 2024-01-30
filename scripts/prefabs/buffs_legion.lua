@@ -1113,6 +1113,36 @@ MakeBuff({
     end
 })
 
+--------------------------------------------------------------------------
+--[[ 煊肤：完全防火 ]]
+--------------------------------------------------------------------------
+
+MakeBuff({
+    name = "buff_l_fireproof",
+    assets = nil,
+    prefabs = nil,
+    time_key = "time_l_fireproof",
+    time_default = TUNING.SEG_TIME*12, --6分钟
+    notimer = nil,
+    fn_start = function(buff, target)
+        BuffTalk_start(target, buff)
+        if target.components.health ~= nil then --免疫火焰伤
+            target.components.health.externalfiredamagemultipliers:SetModifier(buff, 0)
+        end
+        TOOLS_L.AddEntValue(target, "fireproof_l", buff.prefab, nil, 1)
+    end,
+    fn_again = function(buff, target)
+        BuffTalk_start(target, buff)
+    end,
+    fn_end = function(buff, target)
+        BuffTalk_end(target, buff)
+        if target.components.health ~= nil then
+            target.components.health.externalfiredamagemultipliers:RemoveModifier(buff)
+        end
+        TOOLS_L.RemoveEntValue(target, "fireproof_l", buff.prefab, nil)
+    end
+})
+
 --------------------
 --------------------
 

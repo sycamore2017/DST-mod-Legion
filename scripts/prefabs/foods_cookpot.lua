@@ -8,15 +8,22 @@ local prefabs = {
     "spoiled_food"
 }
 
+local function OnLandedClient(self, ...)
+    if self.OnLandedClient_l_base ~= nil then
+        self.OnLandedClient_l_base(self, ...)
+    end
+    if self.floatparam_l ~= nil then
+        self.inst.AnimState:SetFloatParams(self.floatparam_l, 1, self.bob_percent)
+    end
+end
 local function MakeFoodFloatable(inst, float)
     if float ~= nil then
         MakeInventoryFloatable(inst, float[2], float[3], float[4])
         if float[1] ~= nil then
-            local OnLandedClient_old = inst.components.floater.OnLandedClient
-            inst.components.floater.OnLandedClient = function(self)
-                OnLandedClient_old(self)
-                self.inst.AnimState:SetFloatParams(float[1], 1, self.bob_percent)
-            end
+            local floater = inst.components.floater
+            floater.OnLandedClient_l_base = floater.OnLandedClient
+            floater.floatparam_l = float[1]
+            floater.OnLandedClient = OnLandedClient
         end
     end
 end
