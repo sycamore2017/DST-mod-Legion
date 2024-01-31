@@ -1130,9 +1130,21 @@ MakeBuff({
             target.components.health.externalfiredamagemultipliers:SetModifier(buff, 0)
         end
         TOOLS_L.AddEntValue(target, "fireproof_l", buff.prefab, nil, 1)
+        if
+            target.components.burnable ~= nil and
+            (target.components.burnable:IsBurning() or target.components.burnable:IsSmoldering())
+        then
+            target.components.burnable:Extinguish() --顺便灭火
+        end
     end,
     fn_again = function(buff, target)
         BuffTalk_start(target, buff)
+        if
+            target.components.burnable ~= nil and
+            (target.components.burnable:IsBurning() or target.components.burnable:IsSmoldering())
+        then
+            target.components.burnable:Extinguish() --顺便灭火
+        end
     end,
     fn_end = function(buff, target)
         BuffTalk_end(target, buff)

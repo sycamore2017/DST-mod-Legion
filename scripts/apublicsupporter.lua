@@ -2447,6 +2447,153 @@ AddStategraphActionHandler("wilson", ActionHandler(ACTIONS.RUB_L, Fn_sg_robot_ha
 AddStategraphActionHandler("wilson_client", ActionHandler(ACTIONS.RUB_L, Fn_sg_robot_handy))
 
 --------------------------------------------------------------------------
+--[[ 涂抹道具的动作 ]]
+--------------------------------------------------------------------------
+
+local SMEAR_L = Action({ priority = 1, mount_valid = true })
+SMEAR_L.id = "SMEAR_L"
+SMEAR_L.str = STRINGS.ACTIONS_LEGION.SMEAR_L
+SMEAR_L.fn = function(act)
+    if
+        act.invobject ~= nil and act.invobject.components.ointmentlegion ~= nil and
+        act.doer ~= nil and act.target ~= nil
+        --and not (act.doer.components.rider ~= nil and act.doer.components.rider:IsRiding())
+    then
+        local res, reason = act.invobject.components.ointmentlegion:Check(act.doer, act.target)
+        if res then
+            act.invobject.components.ointmentlegion:Smear(act.doer, act.target)
+            return true
+        end
+        return res, reason
+    end
+end
+AddAction(SMEAR_L)
+
+AddComponentAction("INVENTORY", "ointmentlegion", function(inst, doer, actions, right)
+    if not doer:HasTag("burnt") then --INVENTORY 模式，不能用right
+        table.insert(actions, ACTIONS.SMEAR_L)
+    end
+end)
+AddComponentAction("USEITEM", "ointmentlegion", function(inst, doer, target, actions, right)
+    if right and not target:HasTag("burnt") then --不能对已经烧焦的对象使用
+        table.insert(actions, ACTIONS.SMEAR_L)
+    end
+end)
+
+AddStategraphState("wilson", State{
+    name = "smear_l",
+    tags = { "doing", "busy", "nomorph" },
+    onenter = function(inst)
+        local dd = inst:GetBufferedAction()
+        if dd ~= nil and dd.invobject ~= nil and dd.invobject.dd_l_smear ~= nil then
+            dd = dd.invobject.dd_l_smear
+            inst.AnimState:OverrideSymbol("prop_poop", dd.build, "prop_poop")
+        end
+        inst.components.locomotor:Stop()
+        inst.AnimState:PlayAnimation("fertilize_pre")
+        if
+            inst:HasTag("fastbuilder") or inst:HasTag("fastrepairer") or inst:HasTag("handyperson") or
+            (inst.components.skilltreeupdater ~= nil and
+                inst.components.skilltreeupdater:IsActivated("wormwood_quick_selffertilizer"))
+        then
+            inst.sg.statemem.fast = true
+            inst.AnimState:PushAnimation("shortest_fertilize", false)
+        else
+            inst.AnimState:PushAnimation("fertilize", false)
+        end
+    end,
+    timeline = {
+        FrameEvent(27, function(inst)
+            inst.SoundEmitter:PlaySound("dontstarve/characters/wormwood/fertalize_LP", "rub")
+            inst.SoundEmitter:SetParameter("rub", "start", math.random())
+        end),
+        FrameEvent(45, function(inst)
+            if inst.sg.statemem.fast then
+                inst:PerformBufferedAction()
+            end
+        end),
+        FrameEvent(50, function(inst)
+            if inst.sg.statemem.fast then
+                inst.SoundEmitter:KillSound("rub")
+            end
+        end),
+        FrameEvent(52, function(inst)
+            if inst.sg.statemem.fast then
+                inst.sg:RemoveStateTag("busy")
+            end
+        end),
+        FrameEvent(82, function(inst)
+            if not inst.sg.statemem.fast then
+                inst.SoundEmitter:KillSound("rub")
+            end
+        end),
+        FrameEvent(88, function(inst)
+            if not inst.sg.statemem.fast then
+                inst:PerformBufferedAction()
+            end
+        end),
+        FrameEvent(90, function(inst)
+            if not inst.sg.statemem.fast then
+                inst.sg:RemoveStateTag("busy")
+            end
+        end)
+    },
+    events = {
+        EventHandler("animqueueover", function(inst)
+            if inst.AnimState:AnimDone() then
+                inst.sg:GoToState("idle")
+            end
+        end)
+    },
+    onexit = function(inst)
+        inst.AnimState:OverrideSymbol("prop_poop", "player_wormwood_fertilizer", "prop_poop")
+        inst.SoundEmitter:KillSound("rub")
+    end
+})
+AddStategraphState("wilson_client", State{
+    name = "smear_l",
+    tags = { "doing", "busy" },
+    server_states = { "smear_l" },
+    onenter = function(inst)
+        inst.components.locomotor:Stop()
+        inst.AnimState:PlayAnimation("fertilize_pre")
+        inst.AnimState:PushAnimation("fertilize_lag", false)
+        inst:PerformPreviewBufferedAction()
+        inst.sg:SetTimeout(2)
+    end,
+    onupdate = function(inst)
+        if inst.sg:ServerStateMatches() then
+            if inst.entity:FlattenMovementPrediction() then
+                inst.sg:GoToState("idle", "noanim")
+            end
+        elseif inst.bufferedaction == nil then
+            inst.AnimState:PlayAnimation("item_hat")
+            inst.sg:GoToState("idle", true)
+        end
+    end,
+    ontimeout = function(inst)
+        inst:ClearBufferedAction()
+        inst.AnimState:PlayAnimation("item_hat")
+        inst.sg:GoToState("idle", true)
+    end
+})
+
+AddStategraphActionHandler("wilson", ActionHandler(ACTIONS.SMEAR_L, function(inst, action)
+    if action.target == inst then
+        return "smear_l"
+    else
+        return Fn_sg_handy(inst, action)
+    end
+end))
+AddStategraphActionHandler("wilson_client", ActionHandler(ACTIONS.SMEAR_L, function(inst, action)
+    if action.target == inst then
+        return "smear_l"
+    else
+        return Fn_sg_handy(inst, action)
+    end
+end))
+
+--------------------------------------------------------------------------
 --[[ 服务器专属修改 ]]
 --------------------------------------------------------------------------
 

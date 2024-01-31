@@ -49,6 +49,8 @@ local function MakeOintment(data)
                 return inst
             end
 
+            inst.dd_l_smear = { build = data.name }
+
             inst:AddComponent("inspectable")
 
             inst:AddComponent("inventoryitem")
@@ -57,6 +59,11 @@ local function MakeOintment(data)
 
             inst:AddComponent("stackable")
             inst.components.stackable.maxsize = TUNING.STACK_SIZE_SMALLITEM
+
+            inst:AddComponent("ointmentlegion")
+
+            inst:AddComponent("fuel")
+            inst.components.fuel.fuelvalue = TUNING.TINY_FUEL
 
             if not data.noburnable then
                 MakeSmallBurnable(inst)
@@ -80,6 +87,33 @@ end
 --[[ 防火漆 ]]
 --------------------------------------------------------------------------
 
+local function FnCheck_fireproof(inst, doer, target)
+    if target.components.burnable == nil or target:HasTag("burnt") then
+        return false, "NOUSE"
+    end
+    if target.components.burnable.fireproof_l then
+        return false, "NONEED"
+    end
+    if target.components.health ~= nil and target.components.health:IsDead() then
+        return false, "NOUSE"
+    end
+    return true
+end
+local function FnSmear_fireproof(inst, doer, target)
+    if --是可燃物
+        target:HasTag("wall") or target:HasTag("structure") or target:HasTag("balloon") or
+        target.components.health == nil or target.components.combat == nil
+    then
+        target.components.burnable.fireproof_l = true
+        if target.components.burnable:IsBurning() or target.components.burnable:IsSmoldering() then
+            target.components.burnable:Extinguish(true, -4) --涂抹完成，顺便灭火
+        end
+    else --是生物
+        target.time_l_fireproof = { add = TUNING.SEG_TIME*12, max = TUNING.SEG_TIME*30 }
+        target:AddDebuff("buff_l_fireproof", "buff_l_fireproof")
+    end
+end
+
 MakeOintment({
     name = "ointment_l_fireproof",
     assets = {
@@ -90,8 +124,31 @@ MakeOintment({
     prefabs = nil,
     float = { nil, "small", 0.25, 0.8 }, noburnable = true,
     -- fn_common = function(inst)end,
-    -- fn_server = function(inst)end
+    fn_server = function(inst)
+        inst.components.ointmentlegion.fn_check = FnCheck_fireproof
+        inst.components.ointmentlegion.fn_smear = FnSmear_fireproof
+    end
 })
+
+--------------------------------------------------------------------------
+--[[ 弱肤药膏 ]]
+--------------------------------------------------------------------------
+
+-- MakeOintment({
+--     name = "ointment_l_sivbloodreduce",
+--     assets = {
+--         Asset("ANIM", "anim/ointment_l_sivbloodreduce.zip"),
+--         Asset("ATLAS", "images/inventoryimages/ointment_l_sivbloodreduce.xml"),
+--         Asset("IMAGE", "images/inventoryimages/ointment_l_sivbloodreduce.tex")
+--     },
+--     prefabs = nil,
+--     float = { nil, "small", 0.25, 0.8 }, --noburnable = nil,
+--     -- fn_common = function(inst)end,
+--     fn_server = function(inst)
+--         inst.components.ointmentlegion.fn_check = FnCheck_sivbloodreduce
+--         inst.components.ointmentlegion.fn_smear = FnSmear_sivbloodreduce
+--     end
+-- })
 
 ----------
 
