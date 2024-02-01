@@ -2450,18 +2450,18 @@ AddStategraphActionHandler("wilson_client", ActionHandler(ACTIONS.RUB_L, Fn_sg_r
 --[[ 涂抹道具的动作 ]]
 --------------------------------------------------------------------------
 
-local SMEAR_L = Action({ priority = 1, mount_valid = true })
+local SMEAR_L = Action({ priority = 5, mount_valid = true })
 SMEAR_L.id = "SMEAR_L"
 SMEAR_L.str = STRINGS.ACTIONS_LEGION.SMEAR_L
 SMEAR_L.fn = function(act)
     if
         act.invobject ~= nil and act.invobject.components.ointmentlegion ~= nil and
-        act.doer ~= nil and act.target ~= nil
-        --and not (act.doer.components.rider ~= nil and act.doer.components.rider:IsRiding())
+        act.doer ~= nil
     then
-        local res, reason = act.invobject.components.ointmentlegion:Check(act.doer, act.target)
+        local target = act.target or act.doer --在物品栏直接使用时，act.target 是空的
+        local res, reason = act.invobject.components.ointmentlegion:Check(act.doer, target)
         if res then
-            act.invobject.components.ointmentlegion:Smear(act.doer, act.target)
+            act.invobject.components.ointmentlegion:Smear(act.doer, target)
             return true
         end
         return res, reason
@@ -2578,15 +2578,16 @@ AddStategraphState("wilson_client", State{
     end
 })
 
+
 AddStategraphActionHandler("wilson", ActionHandler(ACTIONS.SMEAR_L, function(inst, action)
-    if action.target == inst then
+    if action.target == nil or action.target == inst then --在物品栏直接使用时，act.target 是空的
         return "smear_l"
     else
         return Fn_sg_handy(inst, action)
     end
 end))
 AddStategraphActionHandler("wilson_client", ActionHandler(ACTIONS.SMEAR_L, function(inst, action)
-    if action.target == inst then
+    if action.target == nil or action.target == inst then
         return "smear_l"
     else
         return Fn_sg_handy(inst, action)
@@ -3488,11 +3489,12 @@ if IsServer then
         return data, refs
     end
     local function OnLoad_fireproof(self, data, ...)
-        if data.fireproof_l then
-            self.fireproof_l = true
-        end
         if self.OnLoad_l_fireproof ~= nil then
             self.OnLoad_l_fireproof(self, data, ...)
+        end
+        if data.fireproof_l then
+            self.fireproof_l = true
+            self.canlight = false --这样就不会出现点燃选项
         end
     end
 

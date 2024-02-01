@@ -41,6 +41,8 @@ local assets = {
     Asset("IMAGE", "images/inventoryimages/chest_whitewood_big.tex"),
     Asset("ATLAS", "images/inventoryimages/chest_whitewood.xml"),
     Asset("IMAGE", "images/inventoryimages/chest_whitewood.tex"),
+    Asset("ATLAS", "images/inventoryimages/ointment_l_fireproof.xml"),
+    Asset("IMAGE", "images/inventoryimages/ointment_l_fireproof.tex"),
 }
 
 for k,v in pairs(assets) do
@@ -320,6 +322,16 @@ AddRecipe2(
         atlas = "images/inventoryimages/chest_whitewood_big.xml", image = "chest_whitewood_big.tex",
         placer = "chest_whitewood_big_placer", min_spacing = 1
     }, { "CONTAINERS", "STRUCTURES" }
+)
+AddRecipe2(
+    "ointment_l_fireproof", {
+        Ingredient("firenettles", 5),
+        Ingredient("lavae_egg", 1),
+        Ingredient("slurtleslime", 5)
+    }, TECH.SCIENCE_TWO, {
+        numtogive = 12, no_deconstruction = true,
+        atlas = "images/inventoryimages/ointment_l_fireproof.xml", image = "ointment_l_fireproof.tex"
+    }, { "TOOLS", "SUMMER" }
 )
 
 if CONFIGS_LEGION.DRESSUP then

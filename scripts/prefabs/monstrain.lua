@@ -157,7 +157,7 @@ local function ReturnChildren(inst)
     end
 end
 local function OnIsNight(inst)
-    if TheWorld.state.isnight or inst.components.pickable:IsBarren() then
+    if inst.lifeless_l or TheWorld.state.isnight or inst.components.pickable:IsBarren() then
         inst.components.childspawner:StopSpawning()
         ReturnChildren(inst)
     else
@@ -200,6 +200,18 @@ local function InitSelf(inst)
     inst:WatchWorldState("isnight", OnIsNight)
     -- OnSeasonChange(inst) --pickable组件会维护状态的
     OnIsNight(inst)
+end
+local function OnSave(inst, data)
+    if inst.lifeless_l then
+        data.lifeless_l = true
+    end
+end
+local function OnLoad(inst, data)
+    if data ~= nil then
+        if data.lifeless_l then
+            inst.lifeless_l = true
+        end
+    end
 end
 
 local function MonstrainFn()
@@ -269,6 +281,8 @@ local function MonstrainFn()
     AddHauntableCustomReaction(inst, OnHaunt, false, false, true)
 
     inst.task_init = inst:DoTaskInTime(0.3, InitSelf)
+    inst.OnSave = OnSave
+    inst.OnLoad = OnLoad
 
     return inst
 end

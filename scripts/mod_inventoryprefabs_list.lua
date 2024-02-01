@@ -157,6 +157,8 @@ local InventoryPrefabsList = {  --每个元素的下标值为每种物品栏图�
 
     siving_suit = 6,
     siving_suit_gold = 6,
+    ointment_l_fireproof = 6,
+    ointment_l_sivbloodreduce = 6,
 
     --skins1：56个
     hat_lichen_emo_que = 7,

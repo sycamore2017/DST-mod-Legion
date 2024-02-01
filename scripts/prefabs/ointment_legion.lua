@@ -102,12 +102,15 @@ end
 local function FnSmear_fireproof(inst, doer, target)
     if --是可燃物
         target:HasTag("wall") or target:HasTag("structure") or target:HasTag("balloon") or
+        target.components.childspawner ~= nil or
         target.components.health == nil or target.components.combat == nil
     then
-        target.components.burnable.fireproof_l = true
-        if target.components.burnable:IsBurning() or target.components.burnable:IsSmoldering() then
-            target.components.burnable:Extinguish(true, -4) --涂抹完成，顺便灭火
+        local burnable = target.components.burnable
+        burnable.fireproof_l = true
+        if burnable:IsBurning() or burnable:IsSmoldering() then
+            burnable:Extinguish(true, -4) --涂抹完成，顺便灭火
         end
+        burnable.canlight = false --官方逻辑，这样就不会出现点燃选项
     else --是生物
         target.time_l_fireproof = { add = TUNING.SEG_TIME*12, max = TUNING.SEG_TIME*30 }
         target:AddDebuff("buff_l_fireproof", "buff_l_fireproof")
@@ -134,21 +137,50 @@ MakeOintment({
 --[[ 弱肤药膏 ]]
 --------------------------------------------------------------------------
 
--- MakeOintment({
---     name = "ointment_l_sivbloodreduce",
---     assets = {
---         Asset("ANIM", "anim/ointment_l_sivbloodreduce.zip"),
---         Asset("ATLAS", "images/inventoryimages/ointment_l_sivbloodreduce.xml"),
---         Asset("IMAGE", "images/inventoryimages/ointment_l_sivbloodreduce.tex")
---     },
---     prefabs = nil,
---     float = { nil, "small", 0.25, 0.8 }, --noburnable = nil,
---     -- fn_common = function(inst)end,
---     fn_server = function(inst)
---         inst.components.ointmentlegion.fn_check = FnCheck_sivbloodreduce
---         inst.components.ointmentlegion.fn_smear = FnSmear_sivbloodreduce
---     end
--- })
+local function FnCheck_sivbloodreduce(inst, doer, target)
+    if target.prefab == "monstrain" then
+        if target.lifeless_l then
+            return false, "NONEED"
+        else
+            return true
+        end
+    end
+    if target.components.combat == nil or target.components.health == nil or target.components.health:IsDead() then
+        return false, "NOUSE"
+    end
+    if --具有以下标签的对象，根本不会被窃血，所以也不用加buff
+        target:HasTag("wall") or target:HasTag("structure") or target:HasTag("balloon") or
+        target:HasTag("shadowminion") or target:HasTag("ghost")
+    then
+        return false, "NOUSE"
+    end
+    return true
+end
+local function FnSmear_sivbloodreduce(inst, doer, target)
+    if target.prefab == "monstrain" then
+        target.lifeless_l = true
+        target.components.childspawner:StopSpawning()
+    else
+        target.time_l_sivbloodreduce = { add = TUNING.SEG_TIME*12, max = TUNING.SEG_TIME*30 }
+        target:AddDebuff("buff_l_sivbloodreduce", "buff_l_sivbloodreduce")
+    end
+end
+
+MakeOintment({
+    name = "ointment_l_sivbloodreduce",
+    assets = {
+        Asset("ANIM", "anim/ointment_l_sivbloodreduce.zip"),
+        Asset("ATLAS", "images/inventoryimages/ointment_l_sivbloodreduce.xml"),
+        Asset("IMAGE", "images/inventoryimages/ointment_l_sivbloodreduce.tex")
+    },
+    prefabs = nil,
+    float = { nil, "small", 0.25, 0.8 }, --noburnable = nil,
+    -- fn_common = function(inst)end,
+    fn_server = function(inst)
+        inst.components.ointmentlegion.fn_check = FnCheck_sivbloodreduce
+        inst.components.ointmentlegion.fn_smear = FnSmear_sivbloodreduce
+    end
+})
 
 ----------
 

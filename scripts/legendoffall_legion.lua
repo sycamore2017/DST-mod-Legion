@@ -68,6 +68,8 @@ local assets = {
     Asset("IMAGE", "images/inventoryimages/siving_suit.tex"),
     Asset("ATLAS", "images/inventoryimages/siving_suit_gold.xml"),
     Asset("IMAGE", "images/inventoryimages/siving_suit_gold.tex"),
+    Asset("ATLAS", "images/inventoryimages/ointment_l_sivbloodreduce.xml"),
+    Asset("IMAGE", "images/inventoryimages/ointment_l_sivbloodreduce.tex")
 }
 
 for k,v in pairs(assets) do
@@ -175,6 +177,17 @@ AddRecipe2(
     }, TECH.LOST, {
         atlas = "images/inventoryimages/siving_feather_real.xml", image = "siving_feather_real.tex"
     }, { "WEAPONS" }
+)
+AddRecipe2(
+    "ointment_l_sivbloodreduce", {
+        Ingredient("succulent_picked", 1),
+        Ingredient("green_cap", 3),
+        Ingredient("spoiled_fish_small", 1),
+        Ingredient("rock_avocado_fruit", 3, nil, nil, "rock_avocado_fruit_rockhard.tex") --石果的贴图和名字不一样
+    }, TECH.SCIENCE_TWO, {
+        numtogive = 4,
+        atlas = "images/inventoryimages/ointment_l_sivbloodreduce.xml", image = "ointment_l_sivbloodreduce.tex"
+    }, { "TOOLS", "RESTORATION" }
 )
 
 --这个配方用来便于绿宝石法杖分解

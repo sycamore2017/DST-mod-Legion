@@ -1155,6 +1155,30 @@ MakeBuff({
     end
 })
 
+--------------------------------------------------------------------------
+--[[ 弱肤：50%窃血抵抗 ]]
+--------------------------------------------------------------------------
+
+MakeBuff({
+    name = "buff_l_sivbloodreduce",
+    assets = nil,
+    prefabs = nil,
+    time_key = "time_l_sivbloodreduce",
+    time_default = TUNING.SEG_TIME*12, --6分钟
+    notimer = nil,
+    fn_start = function(buff, target)
+        BuffTalk_start(target, buff)
+        TOOLS_L.AddEntValue(target, "siv_blood_l_reducer", "buff_l_sivbloodreduce", 1, 0.5)
+    end,
+    fn_again = function(buff, target)
+        BuffTalk_start(target, buff)
+    end,
+    fn_end = function(buff, target)
+        BuffTalk_end(target, buff)
+        TOOLS_L.RemoveEntValue(target, "siv_blood_l_reducer", "buff_l_sivbloodreduce", 1)
+    end
+})
+
 --------------------
 --------------------
 

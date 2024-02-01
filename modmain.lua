@@ -160,6 +160,7 @@ PrefabFiles = {
     "carpet_legion",            --地毯
     "foods_cookpot",            --料理
     "placer_legion",            --大多数的placer
+    "ointment_legion",          --涂抹类道具
 }
 
 Assets = {

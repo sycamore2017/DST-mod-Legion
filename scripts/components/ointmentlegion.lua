@@ -16,6 +16,12 @@ function OintmentLegion:Smear(doer, target)
     if self.fn_smear ~= nil then
         self.fn_smear(self.inst, doer, target)
     end
+    if doer ~= target then
+        local sound = target.SoundEmitter or doer.SoundEmitter
+        if sound ~= nil then
+            sound:PlaySound("dontstarve/creatures/together/toad_stool/spore_grow")
+        end
+    end
     if not self.noremoved then
         if self.inst.components.stackable ~= nil then
             self.inst.components.stackable:Get():Remove()
