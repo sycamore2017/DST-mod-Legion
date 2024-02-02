@@ -1,3 +1,4 @@
+local TOOLS_L = require("tools_legion")
 local prefs = {}
 
 local function OnLandedClient(self, ...)
@@ -107,10 +108,10 @@ local function FnSmear_fireproof(inst, doer, target)
     then
         local burnable = target.components.burnable
         burnable.fireproof_l = true
+        TOOLS_L.AddTag(target, "fireproof_l", "fireproof_base")
         if burnable:IsBurning() or burnable:IsSmoldering() then
             burnable:Extinguish(true, -4) --涂抹完成，顺便灭火
         end
-        burnable.canlight = false --官方逻辑，这样就不会出现点燃选项
     else --是生物
         target.time_l_fireproof = { add = TUNING.SEG_TIME*12, max = TUNING.SEG_TIME*30 }
         target:AddDebuff("buff_l_fireproof", "buff_l_fireproof")
@@ -159,6 +160,7 @@ end
 local function FnSmear_sivbloodreduce(inst, doer, target)
     if target.prefab == "monstrain" then
         target.lifeless_l = true
+        target.net_lifeless_l:set(true)
         target.components.childspawner:StopSpawning()
     else
         target.time_l_sivbloodreduce = { add = TUNING.SEG_TIME*12, max = TUNING.SEG_TIME*30 }

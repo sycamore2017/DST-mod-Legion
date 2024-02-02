@@ -274,6 +274,20 @@ local growth_stages_dt = {
     }
 }
 
+local function OmitDecimalPoint(value, plus) --截取小数点
+	value = math.floor(value*plus)
+	return value/plus
+end
+local function SetInfoNet_dt(inst)
+    local info = inst.ispolluted and "1" or "0"
+    if inst.tradeditems == nil then
+        info = info.."_0_0"
+    else
+        info = info.."_"..tostring(OmitDecimalPoint(inst.tradeditems.light, 100)) --i1
+            .."_"..tostring(OmitDecimalPoint(inst.tradeditems.health, 100)) --i2
+    end
+    inst.net_info_l:set(info)
+end
 local function GetAllActiveItems(giver, item)
     if item.components.stackable ~= nil then --有叠加组件，说明鼠标上可能有物品
         if giver.components.inventory ~= nil then
@@ -298,6 +312,7 @@ local function ComputTraded_dt(inst, light, health)
         inst.tradeditems.health = math.max(0, inst.tradeditems.health + health)
     end
     inst.OnTreeLive(inst, inst.treeState)
+    SetInfoNet_dt(inst)
 end
 local function AcceptTest_dt(inst, item, giver)
     if
@@ -313,6 +328,7 @@ local function OnAccept_dt(inst, giver, item)
     if item.prefab == "petals_evil" or item.prefab == "nightmarefuel" then
         if not inst.ispolluted then
             inst.ispolluted = true
+            SetInfoNet_dt(inst)
             inst.components.timer:StopTimer("fallenleaf")
             item:Remove()
         else
@@ -436,17 +452,14 @@ local function OnLifebBend_dt(mask, doer, target, options)
     end
 end
 
-local function DecimalPointTruncation(value, plus) --截取小数点
-	value = math.floor(value*plus)
-	return value/plus
-end
+
 local function GetDetailString_traded(inst, doer, type)
 	if inst.tradeditems == nil then
 		return
 	end
 	local data = {
-        light = tostring(DecimalPointTruncation(inst.tradeditems.light, 100)),
-        health = tostring(DecimalPointTruncation(inst.tradeditems.health, 100))
+        light = tostring(OmitDecimalPoint(inst.tradeditems.light, 100)),
+        health = tostring(OmitDecimalPoint(inst.tradeditems.health, 100))
 	}
 	if type == 2 then
         if inst.ispolluted then
@@ -508,14 +521,29 @@ local function OnSave_dt(inst, data)
 end
 local function OnLoad_dt(inst, data, newents)
     if data ~= nil then
-        if data.traded_health ~= nil or data.traded_light ~= nil then
-            inst.ComputTraded(inst, data.traded_light, data.traded_health)
-        end
         if data.ispolluted then
             inst.ispolluted = true
             inst.components.timer:StopTimer("fallenleaf")
         end
+        if data.traded_health ~= nil or data.traded_light ~= nil then
+            inst.ComputTraded(inst, data.traded_light, data.traded_health)
+        else
+            SetInfoNet_dt(inst)
+        end
     end
+end
+local function Fn_nameDetail_dt(inst)
+    if inst.net_info_l:value() then
+        local infos = string.split(inst.net_info_l:value(), "_")
+        if infos[1] ~= nil then
+            local str = subfmt(STRINGS.NAMEDETAIL_L.SIVDT, { i1 = infos[2] or "0", i2 = infos[3] or "0" })
+            if infos[1] == "1" then
+                return str.."\n"..STRINGS.NAMEDETAIL_L.SIVDT_POLLUTED
+            end
+            return str
+        end
+    end
+    return subfmt(STRINGS.NAMEDETAIL_L.SIVDT, { i1 = "0", i2 = "0" })
 end
 
 table.insert(prefs, Prefab(
@@ -552,12 +580,13 @@ table.insert(prefs, Prefab(
         inst:AddTag("silviculture") --这个标签能让《造林学》发挥作用
         inst:AddTag("rotatableobject") --能让栅栏击剑起作用
         inst:AddTag("flatrotated_l") --棱镜标签：旋转时旋转180度
-
-        --trader (from trader component) added to pristine state for optimization
         inst:AddTag("trader")
 
         inst:AddComponent("skinedlegion")
         inst.components.skinedlegion:Init("siving_derivant")
+
+        inst.net_info_l = net_string(inst.GUID, "sivdt.info_l", "info_l_dirty")
+        inst.fn_l_namedetail = Fn_nameDetail_dt
 
         inst.entity:SetPristine()
         if not TheWorld.ismastersim then
@@ -573,7 +602,6 @@ table.insert(prefs, Prefab(
         inst.OnLifebBend_l = OnLifebBend_dt
 
         inst:AddComponent("inspectable")
-        inst.components.inspectable.descriptionfn = GetDesc_traded
         inst.components.inspectable.getstatus = GetStatus_dt
 
         inst:AddComponent("lootdropper")

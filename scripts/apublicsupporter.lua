@@ -2578,7 +2578,6 @@ AddStategraphState("wilson_client", State{
     end
 })
 
-
 AddStategraphActionHandler("wilson", ActionHandler(ACTIONS.SMEAR_L, function(inst, action)
     if action.target == nil or action.target == inst then --在物品栏直接使用时，act.target 是空的
         return "smear_l"
@@ -2593,6 +2592,49 @@ AddStategraphActionHandler("wilson_client", ActionHandler(ACTIONS.SMEAR_L, funct
         return Fn_sg_handy(inst, action)
     end
 end))
+
+--------------------------------------------------------------------------
+--[[ 名称显示中增加更多细节 ]]
+--------------------------------------------------------------------------
+
+local function AssembleInfoString(pststr, str)
+    if pststr == nil then
+        return str
+    else
+        return pststr.." "..str
+    end
+end
+local function GetDisplayName_detail(self, ...)
+    local name = ""
+    if self.GetDisplayName_l_info ~= nil then
+        name = self.GetDisplayName_l_info(self, ...)
+    end
+
+    local pststr1 = nil
+    local pststr2 = nil
+    --自定义内容
+    if self.fn_l_namedetail ~= nil then
+        pststr1 = self.fn_l_namedetail(self)
+    end
+    --固定内容
+    if self:HasTag("fireproof_l") then
+        pststr2 = AssembleInfoString(pststr2, STRINGS.NAMEDETAIL_L.FIREPROOF)
+    end
+    if pststr1 == nil then
+        pststr1 = pststr2
+    elseif pststr2 ~= nil then
+        pststr1 = pststr1.."\n"..pststr2
+    end
+    if pststr1 ~= nil then
+        return name.."\n"..pststr1
+    end
+    return name
+end
+
+AddGlobalClassPostConstruct("entityscript", "EntityScript", function(self) --文件路径、代码中的类名字、函数
+    self.GetDisplayName_l_info = self.GetDisplayName
+    self.GetDisplayName = GetDisplayName_detail
+end)
 
 --------------------------------------------------------------------------
 --[[ 服务器专属修改 ]]
@@ -3494,7 +3536,8 @@ if IsServer then
         end
         if data.fireproof_l then
             self.fireproof_l = true
-            self.canlight = false --这样就不会出现点燃选项
+            TOOLS_L.AddTag(self.inst, "fireproof_l", "fireproof_base")
+            -- self.canlight = false --官方用的多，直接改怕出问题，还是算了
         end
     end
 

@@ -1133,7 +1133,7 @@ local function OnTimerDone_nep(inst, data)
 		inst:PushEvent("digested")
 	end
 end
-local function DecimalPointTruncation(value, plus) --截取小数点
+local function OmitDecimalPoint(value, plus) --截取小数点
 	value = math.floor(value*plus)
 	return value/plus
 end
@@ -1141,16 +1141,16 @@ local function OnCluster_nep(cpt, now)
 	now = math.min(now*1.25, cpt.cluster_max) --提前让数值达到最大
 
 	local value = Remap(now, 0, cpt.cluster_max, DIST_SWALLOW[1], DIST_SWALLOW[2])
-	cpt.inst.dist_swallow = DecimalPointTruncation(value, 10)
+	cpt.inst.dist_swallow = OmitDecimalPoint(value, 10)
 
 	value = Remap(now, 0, cpt.cluster_max, NUM_SWALLOW[1], NUM_SWALLOW[2])
 	cpt.inst.num_swallow = math.floor(value)
 
 	value = Remap(now, 0, cpt.cluster_max, TIME_SWALLOW[1], TIME_SWALLOW[2])
-	cpt.inst.time_swallow = DecimalPointTruncation(value, 10)
+	cpt.inst.time_swallow = OmitDecimalPoint(value, 10)
 
 	value = Remap(now, 0, cpt.cluster_max, DIST_LURE[1], DIST_LURE[2])
-	cpt.inst.dist_lure = DecimalPointTruncation(value, 10)
+	cpt.inst.dist_lure = OmitDecimalPoint(value, 10)
 end
 
 local keykey = "state_l_plant23"

@@ -72,14 +72,16 @@ end
 local function OnRemove_light(inst)
     inst._light:Remove()
 end
-local function DisplayName(inst)
-    local namepre = inst.nameoverride or inst.prefab
-	namepre = STRINGS.NAMES[string.upper(namepre or "hiddenmoonlight")] or "Something"
-	local lvl = inst._lvl_l:value()
-	if lvl ~= nil and lvl > 0 then
-		namepre = namepre.."(Lv."..tostring(lvl)..")"
-	end
-	return namepre
+local function Fn_nameDetail(inst, max)
+    local lvl = inst._lvl_l:value()
+    if lvl == nil or lvl < 0 then
+        lvl = 0
+    end
+    return subfmt(STRINGS.NAMEDETAIL_L.MOONTREASURE, { lvl = tostring(lvl), lvlmax = max })
+end
+local function InitLevelNet(inst, fn_detail)
+    inst._lvl_l = net_byte(inst.GUID, "moonlight_l._lvl_l", "lvl_l_dirty")
+    inst.fn_l_namedetail = fn_detail
 end
 local function SetLevel(inst)
     inst._lvl_l:set(inst.components.upgradeable:GetStage() - 1)
@@ -115,7 +117,6 @@ local function SetTarget_hidden(inst, targetprefab)
         end
     end
 end
-
 local function DoBenefit(inst)
     local items = inst.components.container:GetAllItems()
     local items_valid = {}
@@ -189,7 +190,6 @@ local function OnFullMoon_hidden(inst)
         inst:DoTaskInTime(math.random() + 0.4, DoBenefit)
     end
 end
-
 local function OnUpgrade_hidden(item, doer, target, result)
     if result.SoundEmitter ~= nil then
         result.SoundEmitter:PlaySound("dontstarve/common/place_structure_straw")
@@ -291,7 +291,6 @@ local function SetLevel_hidden(inst)
     SetLevel(inst)
     UpdatePerishRate_hidden(inst)
 end
-
 local function OnSave_hidden(inst, data)
 	if inst.upgradetarget ~= "icebox" then
         data.upgradetarget = inst.upgradetarget
@@ -305,7 +304,6 @@ local function OnLoad_hidden(inst, data)
     end
     SetLevel_hidden(inst)
 end
-
 local function OnWork_hidden(inst, worker, workleft, numworks)
     inst.AnimState:PlayAnimation("hit")
     inst.AnimState:PushAnimation("closed", true)
@@ -343,6 +341,9 @@ local function OnFinished_hidden(inst, worker)
     fx:SetMaterial("stone")
     inst:Remove()
 end
+local function Fn_nameDetail_hidden(inst)
+    return Fn_nameDetail(inst, times_hidden)
+end
 
 table.insert(prefs, Prefab("hiddenmoonlight", function()
     local inst = CreateEntity()
@@ -365,8 +366,7 @@ table.insert(prefs, Prefab("hiddenmoonlight", function()
     inst.AnimState:PlayAnimation("closed", true)
     TOOLS_L.MakeSnowCovered_comm(inst)
 
-    inst._lvl_l = net_byte(inst.GUID, "moonlight_l._lvl_l", "lvl_l_dirty")
-    inst.displaynamefn = DisplayName
+    InitLevelNet(inst, Fn_nameDetail_hidden)
 
     inst:AddComponent("skinedlegion")
     inst.components.skinedlegion:OverrideSkin("hiddenmoonlight_item", "data_up")
@@ -868,6 +868,12 @@ local function OnReplicated_revolved2(inst)
         inst.replica.container:WidgetSetup("revolvedmoonlight_pro")
     end
 end
+local function Fn_nameDetail_revolved(inst)
+    return Fn_nameDetail(inst, times_revolved-1)
+end
+local function Fn_nameDetail_revolved2(inst)
+    return Fn_nameDetail(inst, times_revolved_pro-1)
+end
 
 local function MakeRevolved(sets)
     table.insert(prefs, Prefab(sets.name, function()
@@ -889,8 +895,10 @@ local function MakeRevolved(sets)
             inst.AnimState:OverrideSymbol("decorate", "revolvedmoonlight", "decoratepro")
             inst:SetPrefabNameOverride("revolvedmoonlight")
             inst.components.skinedlegion:OverrideSkin("revolvedmoonlight_item", "data_uppro")
+            InitLevelNet(inst, Fn_nameDetail_revolved2)
         else
             inst.components.skinedlegion:OverrideSkin("revolvedmoonlight_item", "data_up")
+            InitLevelNet(inst, Fn_nameDetail_revolved)
         end
         inst.components.skinedlegion:InitWithFloater("revolvedmoonlight_item")
 
@@ -899,9 +907,6 @@ local function MakeRevolved(sets)
         inst:AddTag("nosteal") --防止被火药猴偷走
         inst:AddTag("NORATCHECK") --mod兼容：永不妥协。该道具不算鼠潮分
         inst:AddTag("moontreasure_l")
-
-        inst._lvl_l = net_byte(inst.GUID, "moonlight_l._lvl_l", "lvl_l_dirty")
-		inst.displaynamefn = DisplayName
 
         -- if sets.fn_common ~= nil then
         --     sets.fn_common(inst)
@@ -1307,7 +1312,9 @@ local function OnFinished_refracted(inst, worker)
     fx.Transform:SetPosition(inst.Transform:GetWorldPosition())
     fx:SetMaterial("stone")
 end
-
+local function Fn_nameDetail_refracted(inst)
+    return Fn_nameDetail(inst, CONFIGS_LEGION.REFRACTEDUPDATETIMES)
+end
 local function OnSave_refracted(inst, data)
 	if inst._count > 0 then
 		data.count = inst._count
@@ -1351,8 +1358,7 @@ table.insert(prefs, Prefab("refractedmoonlight", function()
 
     inst.MiniMapEntity:SetIcon("refractedmoonlight.tex")
 
-    inst._lvl_l = net_byte(inst.GUID, "moonlight_l._lvl_l", "lvl_l_dirty")
-    inst.displaynamefn = DisplayName
+    InitLevelNet(inst, Fn_nameDetail_refracted)
 
     inst:AddComponent("skinedlegion")
     inst.components.skinedlegion:Init("refractedmoonlight")

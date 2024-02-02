@@ -346,16 +346,16 @@ function BotanyController:OnLoad(data)
     end
 end
 
-local function DecimalPointTruncation(value, plus) --截取小数点
+local function OmitDecimalPoint(value, plus) --截取小数点
 	value = math.floor(value*plus)
 	return value/plus
 end
 local function GetDetailString(self, doer, type)
 	local data = {
-		n1 = tostring(DecimalPointTruncation(self.nutrients[1], 10)),
-        n2 = tostring(DecimalPointTruncation(self.nutrients[2], 10)),
-        n3 = tostring(DecimalPointTruncation(self.nutrients[3], 10)),
-        mo = tostring(DecimalPointTruncation(self.moisture, 10))
+		n1 = tostring(OmitDecimalPoint(self.nutrients[1], 10)),
+        n2 = tostring(OmitDecimalPoint(self.nutrients[2], 10)),
+        n3 = tostring(OmitDecimalPoint(self.nutrients[3], 10)),
+        mo = tostring(OmitDecimalPoint(self.moisture, 10))
 	}
 
 	if type == 2 then

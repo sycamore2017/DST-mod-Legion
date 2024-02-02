@@ -1130,6 +1130,9 @@ MakeBuff({
             target.components.health.externalfiredamagemultipliers:SetModifier(buff, 0)
         end
         TOOLS_L.AddEntValue(target, "fireproof_l", buff.prefab, nil, 1)
+        if not target:HasTag("player") then --为了方便玩家观察
+            TOOLS_L.AddTag(target, "fireproof_l", "fireproof_base")
+        end
         if
             target.components.burnable ~= nil and
             (target.components.burnable:IsBurning() or target.components.burnable:IsSmoldering())
@@ -1152,6 +1155,7 @@ MakeBuff({
             target.components.health.externalfiredamagemultipliers:RemoveModifier(buff)
         end
         TOOLS_L.RemoveEntValue(target, "fireproof_l", buff.prefab, nil)
+        TOOLS_L.RemoveTag(target, "fireproof_l", "fireproof_base")
     end
 })
 

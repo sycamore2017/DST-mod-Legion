@@ -4111,3 +4111,9 @@ S______GENERIC.ACTIONFAIL.SMEAR_L = {
 -- S_________WURT.ACTIONFAIL.SMEAR_L = ""
 -- S_______WALTER.ACTIONFAIL.SMEAR_L = ""
 -- S________WANDA.ACTIONFAIL.SMEAR_L = ""
+
+STRINGS.NAMEDETAIL_L = {
+    FIREPROOF = "Fireproof",
+    MOONTREASURE = "Moon Treasure: {lvl} / {lvlmax}",
+    WEAKMONSTRAIN = "Production of Raindonate Stops"
+}

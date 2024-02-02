@@ -717,7 +717,7 @@ function GeneTrans:UnlockGene(items, doer)
 	return true
 end
 
-local function DecimalPointTruncation(value, plus) --截取小数点
+local function OmitDecimalPoint(value, plus) --截取小数点
 	value = math.floor(value*plus)
 	return value/plus
 end
@@ -732,20 +732,20 @@ local function GetDetailString(self, doer, type)
 		fruitnum = tostring(self.fruitnum),
 		timepass = 0,
 		timeall = 0,
-		power = tostring(DecimalPointTruncation(self.energytime/TUNING.TOTAL_DAY_TIME, 100)),
+		power = tostring(OmitDecimalPoint(self.energytime/TUNING.TOTAL_DAY_TIME, 100)),
 		timefast = 0
 	}
 	if self.timedata_fast.now ~= nil then
-		data.timefast = DecimalPointTruncation(self.timedata_fast.now/TUNING.TOTAL_DAY_TIME, 100)
+		data.timefast = OmitDecimalPoint(self.timedata_fast.now/TUNING.TOTAL_DAY_TIME, 100)
 	end
 	data.timefast = tostring(data.timefast)
 
 	if type == 2 then
 		if self.timedata.pass ~= nil then
-			data.timepass = DecimalPointTruncation(self.timedata.pass/TUNING.TOTAL_DAY_TIME, 100)
+			data.timepass = OmitDecimalPoint(self.timedata.pass/TUNING.TOTAL_DAY_TIME, 100)
 		end
 		if self.timedata.all ~= nil then
-			data.timeall = DecimalPointTruncation(self.timedata.all/TUNING.TOTAL_DAY_TIME, 100)
+			data.timeall = OmitDecimalPoint(self.timedata.all/TUNING.TOTAL_DAY_TIME, 100)
 		end
 		data.timepass = tostring(data.timepass)
 		data.timeall = tostring(data.timeall)

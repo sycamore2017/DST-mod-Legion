@@ -4297,3 +4297,11 @@ S______GENERIC.ACTIONFAIL.SMEAR_L = {
 -- S_________WURT.ACTIONFAIL.SMEAR_L = ""
 -- S_______WALTER.ACTIONFAIL.SMEAR_L = ""
 -- S________WANDA.ACTIONFAIL.SMEAR_L = ""
+
+STRINGS.NAMEDETAIL_L = {
+    FIREPROOF = "防火",
+    MOONTREASURE = "月之宝具：{lvl} / {lvlmax}",
+    WEAKMONSTRAIN = "停止产生雨蝇",
+    SIVDT = "能量：光耀{i1} 生命{i2}",
+    SIVDT_POLLUTED = "停止掉落子圭石"
+}

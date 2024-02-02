@@ -210,7 +210,13 @@ local function OnLoad(inst, data)
     if data ~= nil then
         if data.lifeless_l then
             inst.lifeless_l = true
+            inst.net_lifeless_l:set(true)
         end
+    end
+end
+local function Fn_nameDetail(inst)
+    if inst.net_lifeless_l:value() then
+        return STRINGS.NAMEDETAIL_L.WEAKMONSTRAIN
     end
 end
 
@@ -239,6 +245,8 @@ local function MonstrainFn()
     inst:AddTag("plant")
 
     inst.no_wet_prefix = true
+    inst.net_lifeless_l = net_bool(inst.GUID, "monstrain.lifeless_l", "lifeless_l_dirty")
+    inst.fn_l_namedetail = Fn_nameDetail
 
     --inst:SetPrefabNameOverride("cactus") --因为官方的两种仙人掌在表面上都叫“cactus”，所以有一个需要覆盖原本名字
 
@@ -246,6 +254,8 @@ local function MonstrainFn()
     if not TheWorld.ismastersim then
         return inst
     end
+
+    -- inst.lifeless_l = nil
 
     inst.AnimState:SetTime(math.random() * inst.AnimState:GetCurrentAnimationLength())
 
