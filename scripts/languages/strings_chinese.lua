@@ -2327,15 +2327,7 @@ STRINGS.PLANT_CROP_L = {
     DIGEST = "【{doer}】向{eater}投喂了{items}。",
     DIGESTSELF = "{eater}消化了{items}。",
     TURN_D1 = "【{name}】{seednum}转化中；能量{power}天；加速{timefast}天。",
-    TURN_D2 = "【{name}】{seednum}转化中，{fruitnum}已完成；当前{timepass}/{timeall}天；能量{power}天；加速{timefast}天。",
-    CTL1_1 = "含水量{mo}。",
-    CTL2_1 = "含水量{mo}/{mo_max}。",
-    CTL1_2 = "1号肥{n1}，2号肥{n2}，3号肥{n3}。",
-    CTL2_2 = "1号肥{n1}/{nu_max}，2号肥{n2}/{nu_max}，3号肥{n3}/{nu_max}。",
-    CTL1_3 = "含水量{mo}；1号肥{n1}，2号肥{n2}，3号肥{n3}。",
-    CTL2_3 = "含水量{mo}/{mo_max}；1号肥{n1}/{nu_max}，2号肥{n2}/{nu_max}，3号肥{n3}/{nu_max}。",
-    SIVTREE = "生命能量{health}，光耀能量{light}。",
-    POLLUTED = "被污染，"
+    TURN_D2 = "【{name}】{seednum}转化中，{fruitnum}已完成；当前{timepass}/{timeall}天；能量{power}天；加速{timefast}天。"
 }
 S_NAMES.PLANT_CARROT_L = "芾萝卜"
 S_NAMES.PLANT_CORN_L = "玉米杆"
@@ -4302,6 +4294,13 @@ STRINGS.NAMEDETAIL_L = {
     FIREPROOF = "防火",
     MOONTREASURE = "月之宝具：{lvl} / {lvlmax}",
     WEAKMONSTRAIN = "停止产生雨蝇",
-    SIVDT = "能量：光耀{i1} 生命{i2}",
-    SIVDT_POLLUTED = "停止掉落子圭石"
+    SIVTT = "献祭能量：光耀{i1} 生命{i2}\n生命积累：{heal}\n征服次数：{con}",
+    SIVDT = "献祭能量：光耀{i1} 生命{i2}",
+    SIVDT_POLLUTED = "停止掉落子圭石",
+    SIVMASK = "生命积累：{val} / {valmax}",
+    SIVCTL = {
+        "含水量：{mo} / {momax}",
+        "肥料值：催剂{n1} 堆肥{n2} 粪肥{n3} / {nmax}",
+        "肥料值：催剂{n1} 堆肥{n2} 粪肥{n3} / {nmax}\n含水量：{mo} / {momax}"
+    }
 }

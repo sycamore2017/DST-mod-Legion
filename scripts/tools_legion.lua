@@ -995,6 +995,15 @@ local function RemoveResistAll(inst, key)
     end
 end
 
+--[ 截取小数点 ]--
+local function ODPoint(value, plus)
+    if value == 0 or not value then
+        return 0
+    end
+	value = math.floor(value*plus)
+	return value/plus
+end
+
 --[ 能力勋章兼容：不朽容器 ]--
 local function GetDisplayName_immortal(inst)
     local name = nil
@@ -1127,6 +1136,7 @@ fns = {
     AddBonusAll = AddBonusAll, RemoveBonusAll = RemoveBonusAll,
     AddResistAll = AddResistAll, RemoveResistAll = RemoveResistAll,
     DoSingleSleep = DoSingleSleep, DoAreaSleep = DoAreaSleep,
+    ODPoint = ODPoint,
 
     SetImmortalBox_common = SetImmortalBox_common, SetImmortalBox_server = SetImmortalBox_server
 }

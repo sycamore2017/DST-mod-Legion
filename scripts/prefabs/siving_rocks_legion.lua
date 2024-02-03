@@ -274,17 +274,13 @@ local growth_stages_dt = {
     }
 }
 
-local function OmitDecimalPoint(value, plus) --截取小数点
-	value = math.floor(value*plus)
-	return value/plus
-end
-local function SetInfoNet_dt(inst)
+local function SetNet_info_dt(inst)
     local info = inst.ispolluted and "1" or "0"
     if inst.tradeditems == nil then
         info = info.."_0_0"
     else
-        info = info.."_"..tostring(OmitDecimalPoint(inst.tradeditems.light, 100)) --i1
-            .."_"..tostring(OmitDecimalPoint(inst.tradeditems.health, 100)) --i2
+        info = info.."_"..tostring(TOOLS_L.ODPoint(inst.tradeditems.light, 100)) --i1
+            .."_"..tostring(TOOLS_L.ODPoint(inst.tradeditems.health, 100)) --i2
     end
     inst.net_info_l:set(info)
 end
@@ -312,7 +308,7 @@ local function ComputTraded_dt(inst, light, health)
         inst.tradeditems.health = math.max(0, inst.tradeditems.health + health)
     end
     inst.OnTreeLive(inst, inst.treeState)
-    SetInfoNet_dt(inst)
+    SetNet_info_dt(inst)
 end
 local function AcceptTest_dt(inst, item, giver)
     if
@@ -328,7 +324,7 @@ local function OnAccept_dt(inst, giver, item)
     if item.prefab == "petals_evil" or item.prefab == "nightmarefuel" then
         if not inst.ispolluted then
             inst.ispolluted = true
-            SetInfoNet_dt(inst)
+            SetNet_info_dt(inst)
             inst.components.timer:StopTimer("fallenleaf")
             item:Remove()
         else
@@ -451,51 +447,6 @@ local function OnLifebBend_dt(mask, doer, target, options)
         return "NOLIFE"
     end
 end
-
-
-local function GetDetailString_traded(inst, doer, type)
-	if inst.tradeditems == nil then
-		return
-	end
-	local data = {
-        light = tostring(OmitDecimalPoint(inst.tradeditems.light, 100)),
-        health = tostring(OmitDecimalPoint(inst.tradeditems.health, 100))
-	}
-	if type == 2 then
-        if inst.ispolluted then
-            return STRINGS.PLANT_CROP_L.POLLUTED..subfmt(STRINGS.PLANT_CROP_L.SIVTREE, data)
-        else
-            return subfmt(STRINGS.PLANT_CROP_L.SIVTREE, data)
-        end
-	else
-		return subfmt(STRINGS.PLANT_CROP_L.SIVTREE, data)
-	end
-end
-local function GetDesc_traded(inst, doer)
-    if doer == nil or doer:HasTag("mime") then
-		return
-	end
-
-	local str = nil
-
-	if doer:HasTag("sharpeye") then
-		str = GetDetailString_traded(inst, doer, 2)
-	else
-		local hat = doer.components.inventory and doer.components.inventory:GetEquippedItem(EQUIPSLOTS.HEAD) or nil
-		if hat == nil then
-			-- if doer:HasTag("plantkin") then
-			-- 	str = GetDetailString_traded(inst, doer, 1)
-			-- end
-			return str
-		elseif hat:HasTag("detailedplanthappiness") then
-			str = GetDetailString_traded(inst, doer, 2)
-		elseif hat:HasTag("plantinspector") then
-			str = GetDetailString_traded(inst, doer, 1)
-		end
-	end
-
-	return str
-end
 local function GetStatus_dt(inst)
 	local cpt = inst.components.growable
 	return (cpt == nil and "GENERIC")
@@ -528,7 +479,7 @@ local function OnLoad_dt(inst, data, newents)
         if data.traded_health ~= nil or data.traded_light ~= nil then
             inst.ComputTraded(inst, data.traded_light, data.traded_health)
         else
-            SetInfoNet_dt(inst)
+            SetNet_info_dt(inst)
         end
     end
 end
@@ -586,6 +537,7 @@ table.insert(prefs, Prefab(
         inst.components.skinedlegion:Init("siving_derivant")
 
         inst.net_info_l = net_string(inst.GUID, "sivdt.info_l", "info_l_dirty")
+        inst.net_info_l:set_local("0_0_0")
         inst.fn_l_namedetail = Fn_nameDetail_dt
 
         inst.entity:SetPristine()
@@ -701,6 +653,19 @@ elseif CONFIGS_LEGION.PHOENIXBATTLEDIFFICULTY == 3 then
     TIME_EYE = 54
 end
 
+local function SetNet_info_tt(inst)
+    local info = tostring(inst.num_conquest_l)
+    if inst.tradeditems == nil then
+        info = info.."_0_0"
+    else
+        info = info.."_"..tostring(TOOLS_L.ODPoint(inst.tradeditems.light, 100)) --i1
+            .."_"..tostring(TOOLS_L.ODPoint(inst.tradeditems.health, 100)) --i2
+    end
+    inst.net_info_l:set(info)
+end
+local function SetNet_heal_tt(inst)
+    inst.net_heal_l:set(tostring(TOOLS_L.ODPoint(inst.countHealth, 10)))
+end
 local function IsValid(bird)
     return bird ~= nil and bird:IsValid() and
         bird.components.health ~= nil and not bird.components.health:IsDead()
@@ -772,6 +737,7 @@ local function ComputTraded(inst, light, health)
     if health ~= nil then
         inst.tradeditems.health = math.max(0, inst.tradeditems.health + health)
     end
+    SetNet_info_tt(inst)
 end
 local function FixSpawnPoint(inst, one) --防止神木被挪动后，位置错位而太远
     local mypos = one:GetPosition()
@@ -889,6 +855,7 @@ local function OnStealLife(inst, value)
             inst.countHealth = inst.countHealth - 800
         end
     end
+    SetNet_heal_tt(inst)
 end
 local function TriggerLifeExtractTask(inst, doit)
     if doit then
@@ -1224,6 +1191,293 @@ local function OnLifebBend_tt(mask, doer, target, options)
     else
         return "NOLIFE"
     end
+end
+local function OnWorked_tt(inst, worker, workleft, numworks)
+    inst.components.workable:SetWorkLeft(20) --恢复工作量，永远都破坏不了
+    if inst.treeState > 0 then
+        if numworks == nil then
+            numworks = 1
+        elseif numworks >= 8 then --这里是为了防止直接破坏型（比如熊大、战车的撞击）
+            numworks = 2
+        end
+
+        inst.countWorked = inst.countWorked + numworks
+
+        local numall = inst.treeState == 1 and 30 or 20
+        if inst.countWorked >= numall then
+            inst.countWorked = inst.countWorked - numall
+            DropRock(inst)
+        end
+
+        if worker ~= nil and inst.bossBirds ~= nil then --攻击破坏神木的对象
+            local birds = inst.bossBirds
+            if birds.female ~= nil then
+                if birds.male ~= nil then
+                    local x, y, z = worker.Transform:GetWorldPosition()
+                    if --谁离得近就派谁
+                        birds.female:GetDistanceSqToPoint(x, y, z) <= birds.male:GetDistanceSqToPoint(x, y, z)
+                    then
+                        if birds.female.components.combat:CanTarget(worker) then
+                            birds.female.components.combat:SetTarget(worker)
+                        end
+                    else
+                        if birds.male.components.combat:CanTarget(worker) then
+                            birds.male.components.combat:SetTarget(worker)
+                        end
+                    end
+                else
+                    if birds.female.components.combat:CanTarget(worker) then
+                        birds.female.components.combat:SetTarget(worker)
+                    end
+                end
+            else
+                if birds.male ~= nil then
+                    if birds.male.components.combat:CanTarget(worker) then
+                        birds.male.components.combat:SetTarget(worker)
+                    end
+                end
+            end
+        end
+    end
+end
+local function OnTimerDone_tt(inst, data)
+    if data.name == "birddeath" then
+        StateChange(inst)
+    elseif data.name == "birdstart" or data.name == "birdstart2" then
+        local pos = inst:GetPosition()
+        local offset1 = FindWalkableOffset(pos, 2*PI*math.random(), 3+math.random()*3, 8, false, true)
+        local offset2 = FindWalkableOffset(pos, 2*PI*math.random(), 3+math.random()*3, 8, false, true)
+
+        if offset1 ~= nil or offset2 ~= nil then
+            local offsetfinal = offset1 or offset2
+
+            local boss1 = SpawnPrefab("siving_moenix")
+            boss1.Transform:SetPosition(pos.x + offsetfinal.x, 30, pos.z + offsetfinal.z)
+            InitBird(inst, boss1, true)
+            boss1.sg:GoToState("glide")
+            boss1.sg.mem.to_caw = true
+
+            if offset2 ~= nil then
+                offsetfinal = offset2
+            end
+            local boss2 = SpawnPrefab("siving_foenix")
+            boss2.Transform:SetPosition(pos.x + offsetfinal.x, 30, pos.z + offsetfinal.z)
+            InitBird(inst, boss2, true)
+            boss2.sg:GoToState("glide")
+            boss2.sg.mem.to_taunt = true
+
+            boss1.mate = boss2
+            boss2.mate = boss1
+
+            inst.components.timer:StopTimer("eye")
+            inst.components.timer:StartTimer("eye", TIME_EYE)
+        elseif data.name == "birdstart" then --一次没成功，再试一次
+            inst.components.timer:StartTimer("birdstart2", 9)
+        else --两次都没找到合适的位置下落，就不来了
+            ComputTraded(inst, 2, 2)
+        end
+    elseif data.name == "endfight" then
+        if inst.bossBirds == nil then
+            EndFight(inst, nil, nil)
+        else
+            local female = inst.bossBirds.female
+            local male = inst.bossBirds.male
+            if not IsValid(female) then
+                female = nil
+            end
+            if not IsValid(male) then
+                male = nil
+            end
+            EndFight(inst, male, female)
+        end
+    elseif data.name == "eye" then
+        if inst.bossBirds ~= nil and inst.myEye == nil then
+            local female = inst.bossBirds.female
+            local male = inst.bossBirds.male
+
+            if IsValid(female) then --已经被赋予过化目，就不再继续了
+                if female.sg.mem.to_flyaway and female.sg.mem.to_flyaway.beeye then
+                    return
+                end
+            else
+                female = nil
+            end
+            if IsValid(male) then
+                if male.sg.mem.to_flyaway and male.sg.mem.to_flyaway.beeye then
+                    return
+                end
+            else
+                male = nil
+            end
+
+            if female ~= nil then
+                if male ~= nil then --都活着情况下，谁血少谁去
+                    if female.components.health.currenthealth <= male.components.health.currenthealth then
+                        female:PushEvent("dotakeoff", { beeye = true })
+                    else
+                        male:PushEvent("dotakeoff", { beeye = true })
+                    end
+                else
+                    female:PushEvent("dotakeoff", { beeye = true })
+                end
+            else
+                if male ~= nil then
+                    male:PushEvent("dotakeoff", { beeye = true })
+                end
+            end
+        end
+    end
+end
+local function Fn_nameDetail_tt(inst)
+    local keys = { heal = inst.net_heal_l:value() or "0", con = "0", i1 = "0", i2 = "0" }
+    if inst.net_info_l:value() then
+        local infos = string.split(inst.net_info_l:value(), "_")
+        if infos[1] ~= nil then
+            keys.con = infos[1]
+            keys.i1 = infos[2] or "0"
+            keys.i2 = infos[3] or "0"
+        end
+    end
+    return subfmt(STRINGS.NAMEDETAIL_L.SIVTT, keys)
+end
+
+local function OnSave_tt(inst, data)
+    if inst.countWorked > 0 then
+        data.countWorked = inst.countWorked
+    end
+    if inst.countHealth > 0 then
+        data.countHealth = inst.countHealth
+    end
+    if inst.num_conquest_l > 0 then
+        data.num_conquest_l = inst.num_conquest_l
+    end
+    if inst.tradeditems ~= nil then
+        if inst.tradeditems.health > 0 then
+            data.traded_health = inst.tradeditems.health
+        end
+        if inst.tradeditems.light > 0 then
+            data.traded_light = inst.tradeditems.light
+        end
+    end
+    if inst.bossBirds ~= nil then
+        if IsValid(inst.bossBirds.female) then
+            data.female = inst.bossBirds.female:GetSaveRecord()
+        end
+        if IsValid(inst.bossBirds.male) then
+            data.male = inst.bossBirds.male:GetSaveRecord()
+        end
+    end
+    if IsValid(inst.bossEgg) then
+        data.egg = inst.bossEgg:GetSaveRecord()
+        if inst.bossEgg.ismale then
+            data.eggismale = true
+        end
+    end
+    if inst.rebirthed then
+        data.rebirthed = true
+    end
+end
+local function OnLoad_tt(inst, data, newents)
+    if data ~= nil then
+        if data.countWorked ~= nil then
+            inst.countWorked = data.countWorked
+        end
+        if data.countHealth ~= nil then
+            inst.countHealth = data.countHealth
+            SetNet_heal_tt(inst)
+        end
+        if data.num_conquest_l ~= nil then
+            inst.num_conquest_l = data.num_conquest_l
+        end
+        if data.traded_health ~= nil or data.traded_light ~= nil then
+            ComputTraded(inst, data.traded_light, data.traded_health)
+        else
+            SetNet_info_tt(inst)
+        end
+        if data.rebirthed then
+            inst.rebirthed = true
+        end
+        if data.male ~= nil or data.female ~= nil then
+            local boss1, boss2
+            if data.male ~= nil then
+                boss1 = SpawnSaveRecord(data.male, newents)
+                if boss1 ~= nil then
+                    InitBird(inst, boss1, false)
+                end
+            end
+            if data.female ~= nil then
+                boss2 = SpawnSaveRecord(data.female, newents)
+                if boss2 ~= nil then
+                    InitBird(inst, boss2, false)
+                end
+            end
+
+            if boss1 ~= nil and boss2 ~= nil then
+                boss1.mate = boss2
+                boss2.mate = boss1
+            elseif boss2 ~= nil then
+                boss2:fn_onGrief(inst)
+            elseif boss1 ~= nil then
+                boss1:fn_onGrief(inst)
+            end
+        end
+        if data.egg ~= nil then
+            inst.bossEgg = SpawnSaveRecord(data.egg, newents)
+            if inst.bossEgg ~= nil then
+                InitEgg(inst, inst.bossEgg, data.eggismale)
+            end
+        end
+
+        if inst.bossBirds ~= nil then
+            if not inst.components.timer:TimerExists("eye") then
+                inst.components.timer:StartTimer("eye", TIME_EYE)
+            end
+        else
+            inst.components.timer:StopTimer("eye")
+        end
+        if inst.bossBirds ~= nil or inst.bossEgg ~= nil then
+            inst.components.timer:StopTimer("birddeath")
+        end
+    end
+
+    if inst.taskState ~= nil then
+        inst.taskState:Cancel()
+        inst.taskState = nil
+    end
+    StateChange(inst)
+end
+local function OnEntityWake_tt(inst)
+    inst.components.timer:StopTimer("endfight")
+    AddLivesListen(inst)
+end
+local function OnEntitySleep_tt(inst)
+    if inst.bossBirds ~= nil or inst.bossEgg ~= nil then
+        inst.components.timer:StartTimer("endfight", TIME_FREE)
+    end
+    RemoveLivesListen(inst)
+end
+local function OnRemoveEntity_tt(inst) --自身被移除时，结束BOSS战(防止有人用特殊方法移除神木)
+    if inst.bossBirds ~= nil then
+        local female = inst.bossBirds.female
+        local male = inst.bossBirds.male
+        if IsValid(female) then
+            StopListenBird(inst, female)
+            female:fn_leave()
+        end
+        if IsValid(male) then
+            StopListenBird(inst, male)
+            male:fn_leave()
+        end
+        inst.bossBirds = nil
+    end
+    if IsValid(inst.bossEgg) then
+        inst.bossEgg.tree = nil
+        StopListenEgg(inst, inst.bossEgg)
+        inst.bossEgg:Remove()
+        inst.bossEgg = nil
+    end
+    inst.rebirthed = false
+    ClearBattlefield(inst)
 end
 
 -----
@@ -1568,9 +1822,13 @@ table.insert(prefs, Prefab(
         inst:AddTag("siving_thetree")
         inst:AddTag("siving")
         inst:AddTag("lifebox_l") --棱镜标签：能容纳生命能量
-
-        --trader (from trader component) added to pristine state for optimization
         inst:AddTag("trader")
+
+        inst.net_heal_l = net_string(inst.GUID, "sivtt.heal_l", "heal_l_dirty") --生命计数变化频繁，单独拿出来
+        inst.net_info_l = net_string(inst.GUID, "sivtt.info_l", "info_l_dirty")
+        inst.net_heal_l:set_local("0")
+        inst.net_info_l:set_local("0_0_0")
+        inst.fn_l_namedetail = Fn_nameDetail_tt
 
         inst.entity:SetPristine()
         if not TheWorld.ismastersim then
@@ -1585,7 +1843,8 @@ table.insert(prefs, Prefab(
         inst.bossEgg = nil
         inst.myEye = nil --正在同目同心的玄鸟
         inst.rebirthed = false --玄鸟是否已经重生过了
-        inst.tradeditems = nil --已给予的物品
+        inst.tradeditems = nil --已献祭的能量
+        inst.num_conquest_l = 0 --征服次数
 
         inst.TIME_EYE = TIME_EYE
 
@@ -1611,6 +1870,9 @@ table.insert(prefs, Prefab(
                     inst.components.timer:StartTimer("birddeath", TIME_WITHER)
                     StateChange(inst)
                     inst:DoTaskInTime(1+math.random()*1.5, ClearBattlefield)
+                    --三只玄鸟都打败了，才算一次征服
+                    inst.num_conquest_l = inst.num_conquest_l + 1
+                    SetNet_info_tt(inst)
                 else --玄鸟第一次团灭，产生一个蛋供玩家选择
                     local egg = SpawnPrefab("siving_egg")
                     if egg ~= nil then
@@ -1660,7 +1922,6 @@ table.insert(prefs, Prefab(
         inst.OnLifebBend_l = OnLifebBend_tt
 
         inst:AddComponent("inspectable")
-        inst.components.inspectable.descriptionfn = GetDesc_traded
 
         inst:AddComponent("lootdropper")
 
@@ -1669,54 +1930,7 @@ table.insert(prefs, Prefab(
         inst:AddComponent("workable")
         inst.components.workable:SetWorkAction(ACTIONS.MINE)
         inst.components.workable:SetWorkLeft(20)
-        inst.components.workable:SetOnWorkCallback(function(inst, worker, workleft, numworks)
-            inst.components.workable:SetWorkLeft(20) --恢复工作量，永远都破坏不了
-            if inst.treeState > 0 then
-                if numworks == nil then
-                    numworks = 1
-                elseif numworks >= 8 then --这里是为了防止直接破坏型（比如熊大、战车的撞击）
-                    numworks = 2
-                end
-
-                inst.countWorked = inst.countWorked + numworks
-
-                local numall = inst.treeState == 1 and 30 or 20
-                if inst.countWorked >= numall then
-                    inst.countWorked = inst.countWorked - numall
-                    DropRock(inst)
-                end
-
-                if worker ~= nil and inst.bossBirds ~= nil then --攻击破坏神木的对象
-                    local birds = inst.bossBirds
-                    if birds.female ~= nil then
-                        if birds.male ~= nil then
-                            local x, y, z = worker.Transform:GetWorldPosition()
-                            if --谁离得近就派谁
-                                birds.female:GetDistanceSqToPoint(x, y, z) <= birds.male:GetDistanceSqToPoint(x, y, z)
-                            then
-                                if birds.female.components.combat:CanTarget(worker) then
-                                    birds.female.components.combat:SetTarget(worker)
-                                end
-                            else
-                                if birds.male.components.combat:CanTarget(worker) then
-                                    birds.male.components.combat:SetTarget(worker)
-                                end
-                            end
-                        else
-                            if birds.female.components.combat:CanTarget(worker) then
-                                birds.female.components.combat:SetTarget(worker)
-                            end
-                        end
-                    else
-                        if birds.male ~= nil then
-                            if birds.male.components.combat:CanTarget(worker) then
-                                birds.male.components.combat:SetTarget(worker)
-                            end
-                        end
-                    end
-                end
-            end
-        end)
+        inst.components.workable:SetOnWorkCallback(OnWorked_tt)
 
         inst:AddComponent("trader")
         inst.components.trader.deleteitemonaccept = false
@@ -1728,94 +1942,7 @@ table.insert(prefs, Prefab(
         MakeHauntableWork(inst)
 
         inst:AddComponent("timer")
-        inst:ListenForEvent("timerdone", function(inst, data)
-            if data.name == "birddeath" then
-                StateChange(inst)
-            elseif data.name == "birdstart" or data.name == "birdstart2" then
-                local pos = inst:GetPosition()
-                local offset1 = FindWalkableOffset(pos, 2*PI*math.random(), 3+math.random()*3, 8, false, true)
-                local offset2 = FindWalkableOffset(pos, 2*PI*math.random(), 3+math.random()*3, 8, false, true)
-
-                if offset1 ~= nil or offset2 ~= nil then
-                    local offsetfinal = offset1 or offset2
-
-                    local boss1 = SpawnPrefab("siving_moenix")
-                    boss1.Transform:SetPosition(pos.x + offsetfinal.x, 30, pos.z + offsetfinal.z)
-                    InitBird(inst, boss1, true)
-                    boss1.sg:GoToState("glide")
-                    boss1.sg.mem.to_caw = true
-
-                    if offset2 ~= nil then
-                        offsetfinal = offset2
-                    end
-                    local boss2 = SpawnPrefab("siving_foenix")
-                    boss2.Transform:SetPosition(pos.x + offsetfinal.x, 30, pos.z + offsetfinal.z)
-                    InitBird(inst, boss2, true)
-                    boss2.sg:GoToState("glide")
-                    boss2.sg.mem.to_taunt = true
-
-                    boss1.mate = boss2
-                    boss2.mate = boss1
-
-                    inst.components.timer:StopTimer("eye")
-                    inst.components.timer:StartTimer("eye", TIME_EYE)
-                elseif data.name == "birdstart" then --一次没成功，再试一次
-                    inst.components.timer:StartTimer("birdstart2", 9)
-                else --两次都没找到合适的位置下落，就不来了
-                    ComputTraded(inst, 2, 2)
-                end
-            elseif data.name == "endfight" then
-                if inst.bossBirds == nil then
-                    EndFight(inst, nil, nil)
-                else
-                    local female = inst.bossBirds.female
-                    local male = inst.bossBirds.male
-                    if not IsValid(female) then
-                        female = nil
-                    end
-                    if not IsValid(male) then
-                        male = nil
-                    end
-                    EndFight(inst, male, female)
-                end
-            elseif data.name == "eye" then
-                if inst.bossBirds ~= nil and inst.myEye == nil then
-                    local female = inst.bossBirds.female
-                    local male = inst.bossBirds.male
-
-                    if IsValid(female) then --已经被赋予过化目，就不再继续了
-                        if female.sg.mem.to_flyaway and female.sg.mem.to_flyaway.beeye then
-                            return
-                        end
-                    else
-                        female = nil
-                    end
-                    if IsValid(male) then
-                        if male.sg.mem.to_flyaway and male.sg.mem.to_flyaway.beeye then
-                            return
-                        end
-                    else
-                        male = nil
-                    end
-
-                    if female ~= nil then
-                        if male ~= nil then --都活着情况下，谁血少谁去
-                            if female.components.health.currenthealth <= male.components.health.currenthealth then
-                                female:PushEvent("dotakeoff", { beeye = true })
-                            else
-                                male:PushEvent("dotakeoff", { beeye = true })
-                            end
-                        else
-                            female:PushEvent("dotakeoff", { beeye = true })
-                        end
-                    else
-                        if male ~= nil then
-                            male:PushEvent("dotakeoff", { beeye = true })
-                        end
-                    end
-                end
-            end
-        end)
+        inst:ListenForEvent("timerdone", OnTimerDone_tt)
 
         inst:WatchWorldState("isspring", StateChange)
         inst.taskState = inst:DoTaskInTime(0.1, function(inst)
@@ -1823,135 +1950,11 @@ table.insert(prefs, Prefab(
             inst.taskState = nil
         end)
 
-        inst.OnSave = function(inst, data)
-            if inst.countWorked > 0 then
-                data.countWorked = inst.countWorked
-            end
-            if inst.countHealth > 0 then
-                data.countHealth = inst.countHealth
-            end
-            if inst.tradeditems ~= nil then
-                if inst.tradeditems.health > 0 then
-                    data.traded_health = inst.tradeditems.health
-                end
-                if inst.tradeditems.light > 0 then
-                    data.traded_light = inst.tradeditems.light
-                end
-            end
-            if inst.bossBirds ~= nil then
-                if IsValid(inst.bossBirds.female) then
-                    data.female = inst.bossBirds.female:GetSaveRecord()
-                end
-                if IsValid(inst.bossBirds.male) then
-                    data.male = inst.bossBirds.male:GetSaveRecord()
-                end
-            end
-            if IsValid(inst.bossEgg) then
-                data.egg = inst.bossEgg:GetSaveRecord()
-                if inst.bossEgg.ismale then
-                    data.eggismale = true
-                end
-            end
-            if inst.rebirthed then
-                data.rebirthed = true
-            end
-        end
-        inst.OnLoad = function(inst, data, newents)
-            if data ~= nil then
-                if data.countWorked ~= nil then
-                    inst.countWorked = data.countWorked
-                end
-                if data.countHealth ~= nil then
-                    inst.countHealth = data.countHealth
-                end
-                if data.traded_health ~= nil or data.traded_light ~= nil then
-                    ComputTraded(inst, data.traded_light, data.traded_health)
-                end
-                if data.male ~= nil or data.female ~= nil then
-                    local boss1, boss2
-                    if data.male ~= nil then
-                        boss1 = SpawnSaveRecord(data.male, newents)
-                        if boss1 ~= nil then
-                            InitBird(inst, boss1, false)
-                        end
-                    end
-                    if data.female ~= nil then
-                        boss2 = SpawnSaveRecord(data.female, newents)
-                        if boss2 ~= nil then
-                            InitBird(inst, boss2, false)
-                        end
-                    end
-
-                    if boss1 ~= nil and boss2 ~= nil then
-                        boss1.mate = boss2
-                        boss2.mate = boss1
-                    elseif boss2 ~= nil then
-                        boss2:fn_onGrief(inst)
-                    elseif boss1 ~= nil then
-                        boss1:fn_onGrief(inst)
-                    end
-                end
-                if data.rebirthed then
-                    inst.rebirthed = true
-                end
-                if data.egg ~= nil then
-                    inst.bossEgg = SpawnSaveRecord(data.egg, newents)
-                    if inst.bossEgg ~= nil then
-                        InitEgg(inst, inst.bossEgg, data.eggismale)
-                    end
-                end
-
-                if inst.bossBirds ~= nil then
-                    if not inst.components.timer:TimerExists("eye") then
-                        inst.components.timer:StartTimer("eye", TIME_EYE)
-                    end
-                else
-                    inst.components.timer:StopTimer("eye")
-                end
-                if inst.bossBirds ~= nil or inst.bossEgg ~= nil then
-                    inst.components.timer:StopTimer("birddeath")
-                end
-            end
-
-            if inst.taskState ~= nil then
-                inst.taskState:Cancel()
-                inst.taskState = nil
-            end
-            StateChange(inst)
-        end
-        inst.OnEntityWake = function(inst)
-            inst.components.timer:StopTimer("endfight")
-            AddLivesListen(inst)
-        end
-        inst.OnEntitySleep = function(inst)
-            if inst.bossBirds ~= nil or inst.bossEgg ~= nil then
-                inst.components.timer:StartTimer("endfight", TIME_FREE)
-            end
-            RemoveLivesListen(inst)
-        end
-        inst.OnRemoveEntity = function(inst) --自身被移除时，结束BOSS战(防止有人用特殊方法移除神木)
-            if inst.bossBirds ~= nil then
-                local female = inst.bossBirds.female
-                local male = inst.bossBirds.male
-                if IsValid(female) then
-                    StopListenBird(inst, female)
-                    female:fn_leave()
-                end
-                if IsValid(male) then
-                    StopListenBird(inst, male)
-                    male:fn_leave()
-                end
-                inst.bossBirds = nil
-            end
-            if IsValid(inst.bossEgg) then
-                inst.bossEgg.tree = nil
-                StopListenEgg(inst, inst.bossEgg)
-                inst.bossEgg:Remove()
-                inst.bossEgg = nil
-            end
-            inst.rebirthed = false
-            ClearBattlefield(inst)
-        end
+        inst.OnSave = OnSave_tt
+        inst.OnLoad = OnLoad_tt
+        inst.OnEntityWake = OnEntityWake_tt
+        inst.OnEntitySleep = OnEntitySleep_tt
+        inst.OnRemoveEntity = OnRemoveEntity_tt
 
         return inst
     end,

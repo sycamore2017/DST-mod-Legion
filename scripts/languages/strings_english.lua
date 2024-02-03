@@ -1835,97 +1835,97 @@ S________WANDA.DESCRIBE.SIVING_DERIVANT = {
 S_NAMES.SIVING_THETREE = "Siving Alpha" --子圭神木岩
 S______GENERIC.DESCRIBE.SIVING_THETREE = {
     GENERIC = "My life bows to its mysterious majesty.",
-    NEEDALL = "It says it needs the energy of life and light.",
+    NEEDALL = "It says it needs the energy of vitality and light.",
     NEEDLIGHT = "It says it still needs the energy of light.",
-    NEEDHEALTH = "It says it still needs the energy of life.",
+    NEEDHEALTH = "It says it still needs the energy of vitality.",
     NONEED = "It seems that everything is ready.",
     NOTTHIS = "It doesn't want this."
 }
 S_______WILLOW.DESCRIBE.SIVING_THETREE = {
     GENERIC = "It cannot burn, but it can burn the fire of life.",
-    NEEDALL = "Hum, it unexpectedly asked me for the energy of life and light.",
+    NEEDALL = "Hum, it unexpectedly asked me for the energy of vitality and light.",
     NEEDLIGHT = "It even needs such precious the energy of light.",
-    NEEDHEALTH = "My hand hurts for the energy of life, but it still needs it?!",
+    NEEDHEALTH = "My hand hurts for the energy of vitality, but it still needs it?!",
     NONEED = "Girl's mission is finally over.",
     NOTTHIS = "Forget it."
 }
 S_____WOLFGANG.DESCRIBE.SIVING_THETREE = {
     GENERIC = "Wolfgang shouldn't be so close to Kryptonite.",
-    NEEDALL = "It wants Wolfgang's the energy of life and light.",
+    NEEDALL = "It wants Wolfgang's the energy of vitality and light.",
     NEEDLIGHT = "It still wants Wolfgang's the energy of light.",
-    NEEDHEALTH = "It still wants Wolfgang's the energy of life.",
+    NEEDHEALTH = "It still wants Wolfgang's the energy of vitality.",
     NONEED = "It no longer needs Wolfgang.",
     NOTTHIS = "Does it despise Wolfgang's items?"
 }
 S________WENDY.DESCRIBE.SIVING_THETREE = {
     GENERIC = "Leading me to death peacefully, what a relief.",
-    NEEDALL = "The sacrificial ceremony needs the energy of life and light.",
+    NEEDALL = "The sacrificial ceremony needs the energy of vitality and light.",
     NEEDLIGHT = "The energy of light is also needed in the sacrifice process.",
-    NEEDHEALTH = "The energy of life is also needed in the sacrifice process.",
+    NEEDHEALTH = "The energy of vitality is also needed in the sacrifice process.",
     NONEED = "Everything is ready. Let's start the ceremony.",
     NOTTHIS = "This is a useless sacrifice."
 }
 S_________WX78.DESCRIBE.SIVING_THETREE = {
     GENERIC = "EAGER TO TAKE LIFE.",
-    NEEDALL = "WHY DOES IT WANT THE ENERGY OF LIFE AND LIGHT?",
+    NEEDALL = "WHY DOES IT WANT THE ENERGY OF VITALITY AND LIGHT?",
     NEEDLIGHT = "THE ENERGY OF LIGHT. WHY SHOULD I GIVE IT THIS.",
-    NEEDHEALTH = "THE ENERGY OF LIFE. WHY SHOULD I GIVE IT THIS.",
+    NEEDHEALTH = "THE ENERGY OF VITALITY. WHY SHOULD I GIVE IT THIS.",
     NONEED = "I HOPE IT CAN GIVE ME MORE POWERFUL CHIPS.",
     NOTTHIS = "USELESS."
 }
 S_WICKERBOTTOM.DESCRIBE.SIVING_THETREE = {
     GENERIC = "DANGER! It has a life attraction like a black hole.",
-    NEEDALL = "The energy of life and light, it can actually telepathize with me.",
+    NEEDALL = "The energy of vitality and light, it can actually telepathize with me.",
     NEEDLIGHT = "It also needs the energy of light. I don't understand the intention of this alien.",
-    NEEDHEALTH = "It also needs the energy of life. I don't understand the intention of this alien.",
+    NEEDHEALTH = "It also needs the energy of vitality. I don't understand the intention of this alien.",
     NONEED = "That's it. I hope what follows is a feast of knowledge.",
     NOTTHIS = "I don't need this."
 }
 S_______WOODIE.DESCRIBE.SIVING_THETREE = {
     GENERIC = "Lucy, don't try to chop it down.",
-    NEEDALL = "The energy of life and light, should I follow the instructions, Lucy?",
+    NEEDALL = "The energy of vitality and light, should I follow the instructions, Lucy?",
     NEEDLIGHT = "It's really demanding. It still needs the energy of light.",
-    NEEDHEALTH = "It's really demanding. It still needs the energy of life.",
+    NEEDHEALTH = "It's really demanding. It still needs the energy of vitality.",
     NONEED = "Finished. Will it create a forest for me to chop?",
     NOTTHIS = "It doesn't want this."
 }
 S______WAXWELL.DESCRIBE.SIVING_THETREE = {
     GENERIC = "It doesn't look like Charlie's work.",
-    NEEDALL = "The mysterious tree needs the energy of life and light. It's really suspicious.",
+    NEEDALL = "The mysterious tree needs the energy of vitality and light. It's really suspicious.",
     NEEDLIGHT = "Suspicious tree also need the energy of light.",
-    NEEDHEALTH = "Suspicious tree also need the energy of life.",
+    NEEDHEALTH = "Suspicious tree also need the energy of vitality.",
     NONEED = "It's over.",
     NOTTHIS = "Not this one."
 }
 S___WATHGRITHR.DESCRIBE.SIVING_THETREE = {
     GENERIC = "Ode to Yggdrasill!",
-    NEEDALL = "Yggdrasil wants the energy of life and light. I'll find it right away.",
+    NEEDALL = "Yggdrasil wants the energy of vitality and light. I'll find it right away.",
     NEEDLIGHT = "Yggdrasil also needs the energy of light.",
-    NEEDHEALTH = "Yggdrasil also needs the energy of life.",
+    NEEDHEALTH = "Yggdrasil also needs the energy of vitality.",
     NONEED = "I'm ready to accept the gift of Yggdrasil!",
     NOTTHIS = "The requirements of Yggdrasil are very clear."
 }
 S_______WEBBER.DESCRIBE.SIVING_THETREE = {
     GENERIC = "We really want to climb up and play.",
-    NEEDALL = "The energy of life and light, what are these two?",
+    NEEDALL = "The energy of vitality and light, what are these two?",
     NEEDLIGHT = "The energy of light is hard to find. Want more?",
-    NEEDHEALTH = "It's hard to make the energy of life. Want more?",
+    NEEDHEALTH = "It's hard to make the energy of vitality. Want more?",
     NONEED = "It's done. We'll have a nice adventure time!",
     NOTTHIS = "Can't we use other items?"
 }
 S_______WINONA.DESCRIBE.SIVING_THETREE = {
     GENERIC = "What beautiful lines.",
-    NEEDALL = "The energy of life and light. It has its own requirements?!",
+    NEEDALL = "The energy of vitality and light. It has its own requirements?!",
     NEEDLIGHT = "It still wants to absorb the energy of light.",
-    NEEDHEALTH = "It still wants to absorb the energy of life.",
+    NEEDHEALTH = "It still wants to absorb the energy of vitality.",
     NONEED = "What will happen after the transformation?",
     NOTTHIS = "It won't want it."
 }
 S_______WORTOX.DESCRIBE.SIVING_THETREE = {
-    GENERIC = "This thing wants my life, but my soul is too strong for it.",
-    NEEDALL = "This thing told me that it wants the energy of life and light.",
+    GENERIC = "This thing wants my vitality, but my soul is too strong for it.",
+    NEEDALL = "This thing told me that it wants the energy of vitality and light.",
     NEEDLIGHT = "This thing said it also wanted the energy of light.",
-    NEEDHEALTH = "This thing said it also wanted the energy of life.",
+    NEEDHEALTH = "This thing said it also wanted the energy of vitality.",
     NONEED = "I was deceived. I've got to run away!",
     NOTTHIS = "Dear, this is wrong."
 }
@@ -1938,44 +1938,44 @@ S_____WORMWOOD.DESCRIBE.SIVING_THETREE = {
     NOTTHIS = "No."
 }
 S________WARLY.DESCRIBE.SIVING_THETREE = {
-    GENERIC = "My life is as delicious as my cooking.",
-    NEEDALL = "It said that the energy of life and light are the secret recipe of luxury feast.",
+    GENERIC = "My vitality is as delicious as my cooking.",
+    NEEDALL = "It said that the energy of vitality and light are the secret recipe of luxury feast.",
     NEEDLIGHT = "The luxury feast also needs the energy of light.",
-    NEEDHEALTH = "The luxury feast also needs the energy of life.",
+    NEEDHEALTH = "The luxury feast also needs the energy of vitality.",
     NONEED = "What will the luxury feast look like? I'm so curious!",
     NOTTHIS = "I'm not here to make trouble."
 }
 S_________WURT.DESCRIBE.SIVING_THETREE = {
     GENERIC = "Why isn't it as safe as home, glorp?",
-    NEEDALL = "I should have seen the energy of life and light somewhere.",
+    NEEDALL = "I should have seen the energy of vitality and light somewhere.",
     NEEDLIGHT = "It's asking me for the energy of light, glort.",
-    NEEDHEALTH = "It's asking me for the energy of life, glort.",
+    NEEDHEALTH = "It's asking me for the energy of vitality, glort.",
     NONEED = "It says to show me the greatness of life, flort.",
     NOTTHIS = "Grrr, it's wrong."
 }
 S_______WALTER.DESCRIBE.SIVING_THETREE = {
     GENERIC = "The closer to the truth, the more dangerous it is.",
-    NEEDALL = "It needs the energy of life and light. Is it giving me orders?",
+    NEEDALL = "It needs the energy of vitality and light. Is it giving me orders?",
     NEEDLIGHT = "It said it needed the energy of light to save it.",
-    NEEDHEALTH = "It said it needed the energy of life to save it.",
+    NEEDHEALTH = "It said it needed the energy of vitality to save it.",
     NONEED = "I saved you. Remember to send me a medal.",
     NOTTHIS = "I shouldn't have made such a mistake."
 }
 S________WANDA.DESCRIBE.SIVING_THETREE = {
     GENERIC = "As soon as I got close to it, I felt that my time was speeding up.",
-    NEEDALL = "I know what it wants, the energy of life and light!",
+    NEEDALL = "I know what it wants, the energy of vitality and light!",
     NEEDLIGHT = "The energy of light. I'll make the same mistake again.",
-    NEEDHEALTH = "The energy of life. I just want to try another ending.",
+    NEEDHEALTH = "The energy of vitality. I just want to try another ending.",
     NONEED = "I have been ready many times.",
     NOTTHIS = "I don't think so."
 }
 
 S_NAMES.SIVING_SOIL_ITEM = "Siving-Soil"   --未放置的子圭·垄
-S_RECIPE_DESC.SIVING_SOIL_ITEM = "An unusual soil bursting with life energy."
+S_RECIPE_DESC.SIVING_SOIL_ITEM = "An unusual soil bursting with vitality energy."
 S______GENERIC.DESCRIBE.SIVING_SOIL_ITEM = "Put it down, and plant a seed."
 -- S_______WILLOW.DESCRIBE.SIVING_SOIL_ITEM = ""
 -- S_____WOLFGANG.DESCRIBE.SIVING_SOIL_ITEM = ""
-S________WENDY.DESCRIBE.SIVING_SOIL_ITEM = "Traps seeds souls in the cage of life."
+S________WENDY.DESCRIBE.SIVING_SOIL_ITEM = "Traps seeds souls in the cage of vitality."
 -- S_________WX78.DESCRIBE.SIVING_SOIL_ITEM = ""
 S_WICKERBOTTOM.DESCRIBE.SIVING_SOIL_ITEM = "It can provide an environment for plant regeneration."
 -- S_______WOODIE.DESCRIBE.SIVING_SOIL_ITEM = ""
@@ -2239,15 +2239,7 @@ STRINGS.PLANT_CROP_L = {
     DIGEST = "[{doer}] fed {items} to the {eater}.",
     DIGESTSELF = "{eater} digested {items}.",
     TURN_D1 = "[{name}] {seednum} doing; Energy {power} days; Acceleration {timefast} days.",
-    TURN_D2 = "[{name}] {seednum} doing, {fruitnum} done; Now {timepass}/{timeall} days; Energy {power} days; Acceleration {timefast} days.",
-    CTL1_1 = "Moisture {mo}.",
-    CTL2_1 = "Moisture {mo}/{mo_max}.",
-    CTL1_2 = "Nutrient1 {n1}, Nutrient2 {n2}, Nutrient3 {n3}.",
-    CTL2_2 = "Nutrient1 {n1}/{nu_max}, Nutrient2 {n2}/{nu_max}, Nutrient3 {n3}/{nu_max}.",
-    CTL1_3 = "Moisture {mo}; Nutrient1 {n1}, Nutrient2 {n2}, Nutrient3 {n3}.",
-    CTL2_3 = "Moisture {mo}/{mo_max}; Nutrient1 {n1}/{nu_max}, Nutrient2 {n2}/{nu_max}, Nutrient3 {n3}/{nu_max}.",
-    SIVTREE = "Life Energy {health}, Light Energy {light}.",
-    POLLUTED = "Polluted, "
+    TURN_D2 = "[{name}] {seednum} doing, {fruitnum} done; Now {timepass}/{timeall} days; Energy {power} days; Acceleration {timefast} days."
 }
 S_NAMES.PLANT_CARROT_L = "Carrot Cluster"
 S_NAMES.PLANT_CORN_L = "Corn Straw"
@@ -4115,5 +4107,14 @@ S______GENERIC.ACTIONFAIL.SMEAR_L = {
 STRINGS.NAMEDETAIL_L = {
     FIREPROOF = "Fireproof",
     MOONTREASURE = "Moon Treasure: {lvl} / {lvlmax}",
-    WEAKMONSTRAIN = "Production of Raindonate Stops"
+    WEAKMONSTRAIN = "Production of Raindonate Stops",
+    SIVTT = "Sacrifice Energy: Light {i1} Vitality {i2}\nLife Counter: {heal}\nConquest Times: {con}",
+    SIVDT = "Sacrifice Energy: Light {i1} Vitality {i2}",
+    SIVDT_POLLUTED = "Drop of Siving Stone Stops",
+    SIVMASK = "Life Counter: {val} / {valmax}",
+    SIVCTL = {
+        "Moisture: {mo} / {momax}",
+        "Nutrients: Formula {n1} Compost {n2} Manure {n3} / {nmax}",
+        "Nutrients: Formula {n1} Compost {n2} Manure {n3} / {nmax}\nMoisture: {mo} / {momax}"
+    }
 }

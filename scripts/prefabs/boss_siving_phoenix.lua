@@ -405,6 +405,9 @@ local function MakeBoss(data)
                 inst.Light:SetColour(255/255, 127/255, 82/255)
                 inst.components.combat:SetDefaultDamage(ATK_NORMAL+ATK_GRIEF)
                 TOOLS_L.AddEntValue(inst, "siv_blood_l_reducer", data.name, 1, 1)
+                if tree and tree.rebirthed then --对于重生的玄鸟需要改一下掉落物
+                    inst.components.lootdropper:SetChanceLootTable(data.name.."_rebirth")
+                end
                 if dotaunt then
                     inst:PushEvent("dotaunt")
                 end
@@ -1533,13 +1536,20 @@ end
 --------------------------------------------------------------------------
 
 SetSharedLootTable('siving_foenix', {
-    {'siving_rocks',        0.50},
-    {'siving_rocks',        0.50},
-    {'siving_rocks',        0.50},
-    {'siving_derivant_item',    1.00},
-    {'siving_derivant_item',    1.00},
-    {'siving_mask_blueprint',   1.00},
-    -- {'chesspiece_moosegoose_sketch', 1.00},
+    {'siving_rocks', 0.50},
+    {'siving_rocks', 0.50},
+    {'siving_rocks', 0.50},
+    {'siving_derivant_item', 1.00},
+    {'siving_derivant_item', 1.00},
+    {'siving_mask_blueprint', 1.00}
+})
+SetSharedLootTable('siving_foenix_rebirth', {
+    {'siving_rocks', 0.50},
+    {'siving_rocks', 0.50},
+    {'siving_rocks', 0.50},
+    {'siving_derivant_item', 1.00},
+    {'siving_derivant_item', 1.00},
+    {'siving_feather_real_blueprint', 1.00}
 })
 
 MakeBoss({
@@ -1557,19 +1567,32 @@ MakeBoss({
 --------------------------------------------------------------------------
 
 SetSharedLootTable('siving_moenix', {
-    {'siving_rocks',        0.50},
-    {'siving_rocks',        0.50},
-    {'siving_rocks',        0.50},
-    {'siving_feather_fake',     1.00},
-    {'siving_feather_fake',     1.00},
-    {'siving_feather_fake',     1.00},
-    {'siving_feather_fake',     1.00},
-    {'siving_feather_fake',     0.50},
-    {'siving_feather_fake',     0.50},
-    {'siving_feather_fake',     0.50},
-    {'siving_feather_fake',     0.50},
-    {'siving_feather_real_blueprint',   1.00},
-    -- {'chesspiece_moosegoose_sketch', 1.00},
+    {'siving_rocks', 0.50},
+    {'siving_rocks', 0.50},
+    {'siving_rocks', 0.50},
+    {'siving_feather_fake', 1.00},
+    {'siving_feather_fake', 1.00},
+    {'siving_feather_fake', 1.00},
+    {'siving_feather_fake', 1.00},
+    {'siving_feather_fake', 0.50},
+    {'siving_feather_fake', 0.50},
+    {'siving_feather_fake', 0.50},
+    {'siving_feather_fake', 0.50},
+    {'siving_suit_blueprint', 1.00}
+})
+SetSharedLootTable('siving_moenix_rebirth', {
+    {'siving_rocks', 0.50},
+    {'siving_rocks', 0.50},
+    {'siving_rocks', 0.50},
+    {'siving_feather_fake', 1.00},
+    {'siving_feather_fake', 1.00},
+    {'siving_feather_fake', 1.00},
+    {'siving_feather_fake', 1.00},
+    {'siving_feather_fake', 0.50},
+    {'siving_feather_fake', 0.50},
+    {'siving_feather_fake', 0.50},
+    {'siving_feather_fake', 0.50},
+    {'siving_feather_real_blueprint', 1.00}
 })
 
 MakeBoss({

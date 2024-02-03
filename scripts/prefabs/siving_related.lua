@@ -32,9 +32,6 @@ local ctlFuledItems = {
 }
 local PLACER_SCALE_CTL = 1.79 --这个大小就是20半径的
 
-local function GetDesc_ctl(inst, doer)
-    return inst.components.botanycontroller:SayDetail(doer, false)
-end
 local function OnEnableHelper_ctl(inst, enabled)
     if enabled then
         if inst.helper == nil then
@@ -291,19 +288,64 @@ end
 
 local function OnBarChange_ctlwater(ctl)
     SetBar(ctl.inst, "siv_bar", ctl.moisture, ctl.moisture_max)
+
+    if ctl.task_delay_net ~= nil then return end --为了防止同时间大量修改，导致不断发送数据
+    ctl.task_delay_net = ctl.inst:DoTaskInTime(2, function()
+        ctl.task_delay_net = nil
+        ctl.inst.net_moi_l:set(tostring(TOOLS_L.ODPoint(ctl.moisture, 10)))
+    end)
 end
 local function OnBarChange_ctldirt(ctl)
     SetBar(ctl.inst, "siv_bar1", ctl.nutrients[1], ctl.nutrient_max)
     SetBar(ctl.inst, "siv_bar2", ctl.nutrients[2], ctl.nutrient_max)
     SetBar(ctl.inst, "siv_bar3", ctl.nutrients[3], ctl.nutrient_max)
+
+    if ctl.task_delay_net ~= nil then return end --为了防止同时间大量修改，导致不断发送数据
+    ctl.task_delay_net = ctl.inst:DoTaskInTime(2, function()
+        ctl.task_delay_net = nil
+        ctl.inst.net_nut_l:set(
+            tostring(TOOLS_L.ODPoint(ctl.nutrients[1], 10)).."_"..
+            tostring(TOOLS_L.ODPoint(ctl.nutrients[2], 10)).."_"..
+            tostring(TOOLS_L.ODPoint(ctl.nutrients[3], 10))
+        )
+    end)
 end
 local function OnBarChange_ctlall(ctl)
     SetBar(ctl.inst, "siv_bar1", ctl.nutrients[1], ctl.nutrient_max)
     SetBar(ctl.inst, "siv_bar2", ctl.nutrients[2], ctl.nutrient_max)
     SetBar(ctl.inst, "siv_bar3", ctl.nutrients[3], ctl.nutrient_max)
     SetBar(ctl.inst, "siv_bar4", ctl.moisture, ctl.moisture_max)
+
+    if ctl.task_delay_net ~= nil then return end --为了防止同时间大量修改，导致不断发送数据
+    ctl.task_delay_net = ctl.inst:DoTaskInTime(2, function()
+        ctl.task_delay_net = nil
+        ctl.inst.net_moi_l:set(tostring(TOOLS_L.ODPoint(ctl.moisture, 10)))
+        ctl.inst.net_nut_l:set(
+            tostring(TOOLS_L.ODPoint(ctl.nutrients[1], 10)).."_"..
+            tostring(TOOLS_L.ODPoint(ctl.nutrients[2], 10)).."_"..
+            tostring(TOOLS_L.ODPoint(ctl.nutrients[3], 10))
+        )
+    end)
 end
 
+local function SetData_ctlitem(inst, moi, nut)
+    if inst.ctltype_l ~= 2 then --含水量
+        if moi ~= nil then
+            inst.siv_moisture = moi
+            inst.net_moi_l:set(tostring(TOOLS_L.ODPoint(moi, 10)))
+        end
+    end
+    if inst.ctltype_l ~= 1 then --肥料值
+        if nut ~= nil then
+            inst.siv_nutrients = nut
+            inst.net_nut_l:set(
+                tostring(TOOLS_L.ODPoint(nut[1], 10)).."_"..
+                tostring(TOOLS_L.ODPoint(nut[2], 10)).."_"..
+                tostring(TOOLS_L.ODPoint(nut[3], 10))
+            )
+        end
+    end
+end
 local function OnSave_ctlitem(inst, data)
     if inst.siv_moisture ~= nil then
         data.siv_moisture = inst.siv_moisture
@@ -314,13 +356,30 @@ local function OnSave_ctlitem(inst, data)
 end
 local function OnLoad_ctlitem(inst, data)
     if data ~= nil then
-        if data.siv_moisture ~= nil then
-            inst.siv_moisture = data.siv_moisture
-        end
-        if data.siv_nutrients ~= nil then
-            inst.siv_nutrients = data.siv_nutrients
+        SetData_ctlitem(inst, data.siv_moisture, data.siv_nutrients)
+    end
+end
+local function Fn_nameDetail_sivctl(inst)
+    local key = {}
+    if inst.ctltype_l ~= 1 then --肥料值
+        key.n1 = "0"
+        key.n2 = "0"
+        key.n3 = "0"
+        key.nmax = inst.ctltype_l == 3 and "2400" or "800"
+        if inst.net_nut_l:value() then
+            local infos = string.split(inst.net_nut_l:value(), "_")
+            if infos[1] ~= nil then
+                key.n1 = infos[1]
+                key.n2 = infos[2] or "0"
+                key.n3 = infos[3] or "0"
+            end
         end
     end
+    if inst.ctltype_l ~= 2 then --含水量
+        key.mo = inst.net_moi_l:value() or "0"
+        key.momax = inst.ctltype_l == 3 and "6000" or "2000"
+    end
+    return subfmt(STRINGS.NAMEDETAIL_L.SIVCTL[inst.ctltype_l], key)
 end
 
 local function MakeItem(data)
@@ -344,6 +403,17 @@ local function MakeItem(data)
 
             inst:AddComponent("skinedlegion")
             inst.components.skinedlegion:Init(basename.."_item")
+
+            inst.ctltype_l = data.ctltype
+            if data.ctltype ~= 2 then
+                inst.net_moi_l = net_string(inst.GUID, "sivctl_item.moi_l", "moi_l_dirty")
+                inst.net_moi_l:set_local("0")
+            end
+            if data.ctltype ~= 1 then
+                inst.net_nut_l = net_string(inst.GUID, "sivctl_item.nut_l", "nut_l_dirty")
+                inst.net_nut_l:set_local("0_0_0")
+            end
+            inst.fn_l_namedetail = Fn_nameDetail_sivctl
 
             inst.entity:SetPristine()
             if not TheWorld.ismastersim then
@@ -421,6 +491,17 @@ local function MakeConstruct(data)
             inst:AddComponent("skinedlegion")
             inst.components.skinedlegion:Init(basename)
 
+            inst.ctltype_l = data.ctltype
+            if data.ctltype ~= 2 then
+                inst.net_moi_l = net_string(inst.GUID, "sivctl.moi_l", "moi_l_dirty")
+                inst.net_moi_l:set_local("0")
+            end
+            if data.ctltype ~= 1 then
+                inst.net_nut_l = net_string(inst.GUID, "sivctl.nut_l", "nut_l_dirty")
+                inst.net_nut_l:set_local("0_0_0")
+            end
+            inst.fn_l_namedetail = Fn_nameDetail_sivctl
+
             inst.entity:SetPristine()
             if not TheWorld.ismastersim then
                 return inst
@@ -429,15 +510,14 @@ local function MakeConstruct(data)
             inst.UpdateBars_l = UpdateBars
 
             inst:AddComponent("inspectable")
-            inst.components.inspectable.descriptionfn = GetDesc_ctl
 
             inst:AddComponent("portablestructure")
             inst.components.portablestructure:SetOnDismantleFn(function(inst, doer)
                 local item = SpawnPrefab(basename.."_item")
                 if item ~= nil then
                     inst.components.skinedlegion:SetLinkedSkin(item, "link", doer)
-                    item.siv_moisture = inst.components.botanycontroller.moisture
-                    item.siv_nutrients = inst.components.botanycontroller.nutrients
+                    SetData_ctlitem(item,
+                        inst.components.botanycontroller.moisture, inst.components.botanycontroller.nutrients)
                     if doer ~= nil and doer.components.inventory ~= nil then
                         doer.components.inventory:GiveItem(item)
                         if doer.SoundEmitter ~= nil then
@@ -452,26 +532,6 @@ local function MakeConstruct(data)
                 end
             end)
 
-            inst:AddComponent("workable")
-            inst.components.workable:SetWorkAction(ACTIONS.HAMMER)
-            inst.components.workable:SetWorkLeft(1)
-            inst.components.workable:SetOnFinishCallback(function(inst, worker)
-                local x, y, z = inst.Transform:GetWorldPosition()
-                local item = SpawnPrefab(basename.."_item")
-                if item ~= nil then
-                    inst.components.skinedlegion:SetLinkedSkin(item, "link", worker)
-                    item.siv_moisture = inst.components.botanycontroller.moisture
-                    item.siv_nutrients = inst.components.botanycontroller.nutrients
-                    item.Transform:SetPosition(x, y, z)
-                end
-                local fx = SpawnPrefab("collapse_small")
-                fx.Transform:SetPosition(x, y, z)
-                fx:SetMaterial("rock")
-                inst.components.botanycontroller:TriggerPlant(false)
-                DoFunction_ctl(inst, false)
-                inst:Remove()
-            end)
-
             inst:AddComponent("hauntable")
             inst.components.hauntable:SetHauntValue(TUNING.HAUNT_SMALL)
 
@@ -483,12 +543,13 @@ local function MakeConstruct(data)
             inst.components.trader.acceptnontradable = true
 
             inst:AddComponent("botanycontroller")
+            inst.components.botanycontroller.type = data.ctltype
 
-            inst.task_function = nil
+            -- inst.task_function = nil
             inst:DoTaskInTime(0.2+math.random()*0.4, function(inst)
-                if inst.components.botanycontroller.type == 3 then
+                if data.ctltype == 3 then
                     inst.components.botanycontroller.onbarchange = OnBarChange_ctlall
-                elseif inst.components.botanycontroller.type == 2 then
+                elseif data.ctltype == 2 then
                     inst.components.botanycontroller.onbarchange = OnBarChange_ctldirt
                 else
                     inst.components.botanycontroller.onbarchange = OnBarChange_ctlwater
@@ -528,7 +589,8 @@ MakeItem({
         Asset("ANIM", "anim/firefighter_placement.zip") --灭火器的placer圈
     },
     prefabs = { "siving_ctlwater" },
-    sound = "dontstarve/common/rain_meter_craft"
+    sound = "dontstarve/common/rain_meter_craft",
+    ctltype = 1
 })
 MakeConstruct({
     name = "water",
@@ -539,14 +601,12 @@ MakeConstruct({
     prefabs = { "siving_ctlwater_item", "siving_ctl_bar" },
     ctltype = 1,
     fn_server = function(inst)
-        inst.components.botanycontroller.type = 1
         inst.barsets_l = {
             siv_bar = {
                 x = 0, y = -180, z = 0, scale = nil,
                 bank = "siving_ctlwater", build = "siving_ctlwater", anim = "bar"
             }
         }
-
         inst:WatchWorldState("israining", OnRain_ctlwater)
     end
 })
@@ -564,7 +624,8 @@ MakeItem({
         Asset("ANIM", "anim/firefighter_placement.zip") --灭火器的placer圈
     },
     prefabs = { "siving_ctldirt" },
-    sound = "dontstarve/common/winter_meter_craft"
+    sound = "dontstarve/common/winter_meter_craft",
+    ctltype = 2
 })
 MakeConstruct({
     name = "dirt",
@@ -575,7 +636,6 @@ MakeConstruct({
     prefabs = { "siving_ctldirt_item", "siving_ctl_bar" },
     ctltype = 2,
     fn_server = function(inst)
-        inst.components.botanycontroller.type = 2
         inst.barsets_l = {
             siv_bar1 = {
                 x = -48, y = -140, z = 0, scale = nil,
@@ -606,7 +666,8 @@ MakeItem({
         Asset("ANIM", "anim/firefighter_placement.zip") --灭火器的placer圈
     },
     prefabs = { "siving_ctlall" },
-    sound = "dontstarve/halloween_2018/madscience_machine/place"
+    sound = "dontstarve/halloween_2018/madscience_machine/place",
+    ctltype = 3
 })
 MakeConstruct({
     name = "all",
@@ -619,7 +680,6 @@ MakeConstruct({
     prefabs = { "siving_ctlall_item", "siving_ctl_bar" },
     ctltype = 3,
     fn_server = function(inst)
-        inst.components.botanycontroller.type = 3
         inst.components.botanycontroller.moisture_max = 6000
         inst.components.botanycontroller.nutrient_max = 2400
         inst.barsets_l = {
@@ -640,7 +700,6 @@ MakeConstruct({
                 bank = "siving_ctlwater", build = "siving_ctlwater", anim = "bar"
             }
         }
-
         inst:WatchWorldState("israining", OnRain_ctlwater)
     end
 })

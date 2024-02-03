@@ -246,6 +246,7 @@ local function MonstrainFn()
 
     inst.no_wet_prefix = true
     inst.net_lifeless_l = net_bool(inst.GUID, "monstrain.lifeless_l", "lifeless_l_dirty")
+    inst.net_lifeless_l:set_local(false)
     inst.fn_l_namedetail = Fn_nameDetail
 
     --inst:SetPrefabNameOverride("cactus") --因为官方的两种仙人掌在表面上都叫“cactus”，所以有一个需要覆盖原本名字

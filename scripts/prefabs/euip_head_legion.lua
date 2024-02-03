@@ -480,6 +480,9 @@ end
 local assets_sivmask = GetAssets("siving_mask")
 local prefabs_sivmask = { "siving_lifesteal_fx" }
 
+local function SetNet_heal_sivmask(inst)
+    inst.net_heal_l:set(tostring(TOOLS_L.ODPoint(inst.healthcounter, 10)))
+end
 local function OnSave_sivmask(inst, data)
     if inst.healthcounter > 0 then
         data.healthcounter = inst.healthcounter
@@ -489,6 +492,7 @@ local function OnLoad_sivmask(inst, data)
     if data ~= nil then
         if data.healthcounter ~= nil then
             inst.healthcounter = data.healthcounter
+            SetNet_heal_sivmask(inst)
         end
     end
 end
@@ -614,6 +618,7 @@ local function StealHealth(inst, owner, ismask2)
 
         ----积累的管理
         if doit then
+            local healthold = inst.healthcounter
             if costnow > 0 then
                 DrinkLife(inst, target, costnow)
             end
@@ -639,6 +644,9 @@ local function StealHealth(inst, owner, ismask2)
                     end
                 end
             end
+            if healthold ~= inst.healthcounter then --有变化了才更新
+                SetNet_heal_sivmask(inst)
+            end
         end
     end, 1)
 end
@@ -646,10 +654,12 @@ end
 local function OnSetBonusOn_sivmask(inst)
 	inst.bloodsteal_l = 3
     inst.healthcounter_max = 120
+    inst.net_healmax_l:set("120")
 end
 local function OnSetBonusOff_sivmask(inst)
-	inst.bloodsteal_l = 2 --窃血值
-    inst.healthcounter_max = 80 --积累上限
+	inst.bloodsteal_l = 2
+    inst.healthcounter_max = 80
+    inst.net_healmax_l:set("80")
 end
 local function GetSwapSymbol(owner)
     local maps = {
@@ -712,6 +722,10 @@ local function OnUnequip_sivmask(inst, owner)
     TOOLS_L.RemoveEntValue(owner, "siv_blood_l_reducer", inst.prefab, 1)
     CancelTask_life(inst, owner)
 end
+local function Fn_nameDetail_sivmask(inst)
+    return subfmt(STRINGS.NAMEDETAIL_L.SIVMASK,
+        { val = inst.net_heal_l:value() or "0", valmax = inst.net_healmax_l:value() or "80" })
+end
 
 local function Fn_sivmask()
     local inst = CreateEntity()
@@ -724,6 +738,12 @@ local function Fn_sivmask()
     inst:AddComponent("skinedlegion")
     inst.components.skinedlegion:Init("siving_mask")
 
+    inst.net_heal_l = net_string(inst.GUID, "sivmask.heal_l", "heal_l_dirty")
+    inst.net_healmax_l = net_string(inst.GUID, "sivmask.healmax_l", "healmax_l_dirty")
+    inst.net_heal_l:set_local("0")
+    inst.net_healmax_l:set_local("80")
+    inst.fn_l_namedetail = Fn_nameDetail_sivmask
+
     inst.entity:SetPristine()
     if not TheWorld.ismastersim then
         return inst
@@ -731,7 +751,8 @@ local function Fn_sivmask()
 
     inst.healthcounter = 0
     -- inst.lifetarget = nil
-    OnSetBonusOff_sivmask(inst)
+    inst.bloodsteal_l = 2 --窃血值
+    inst.healthcounter_max = 80 --积累上限
 
     Fn_server(inst, "siving_mask", OnEquip_sivmask, OnUnequip_sivmask)
 
@@ -1004,11 +1025,13 @@ local function OnSetBonusOn_sivmask2(inst)
 	inst.bloodsteal_l = 5.5
     inst.healthcounter_max = 225
     inst.healpower_l = 3
+    inst.net_healmax_l:set("225")
 end
 local function OnSetBonusOff_sivmask2(inst)
-	inst.bloodsteal_l = 4 --窃血值
-    inst.healthcounter_max = 135 --积累上限
-    inst.healpower_l = 2 --恢复力
+	inst.bloodsteal_l = 4
+    inst.healthcounter_max = 135
+    inst.healpower_l = 2
+    inst.net_healmax_l:set("135")
 end
 
 local function Fn_sivmask2()
@@ -1022,6 +1045,12 @@ local function Fn_sivmask2()
     inst:AddComponent("skinedlegion")
     inst.components.skinedlegion:Init("siving_mask_gold")
 
+    inst.net_heal_l = net_string(inst.GUID, "sivmask2.heal_l", "heal_l_dirty")
+    inst.net_healmax_l = net_string(inst.GUID, "sivmask2.healmax_l", "healmax_l_dirty")
+    inst.net_heal_l:set_local("0")
+    inst.net_healmax_l:set_local("135")
+    inst.fn_l_namedetail = Fn_nameDetail_sivmask
+
     inst.entity:SetPristine()
     if not TheWorld.ismastersim then
         return inst
@@ -1030,7 +1059,9 @@ local function Fn_sivmask2()
     inst.healthcounter = 0
     -- inst.lifetarget = nil
     -- inst._broken = nil
-    OnSetBonusOff_sivmask2(inst)
+    inst.bloodsteal_l = 4 --窃血值
+    inst.healthcounter_max = 135 --积累上限
+    inst.healpower_l = 2 --恢复力
     inst.OnCalcuCost_l = CalcuCost
 
     Fn_server(inst, "siving_mask_gold", OnEquip_sivmask2, OnUnequip_sivmask2)

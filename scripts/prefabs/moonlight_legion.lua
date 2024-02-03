@@ -81,6 +81,7 @@ local function Fn_nameDetail(inst, max)
 end
 local function InitLevelNet(inst, fn_detail)
     inst._lvl_l = net_byte(inst.GUID, "moonlight_l._lvl_l", "lvl_l_dirty")
+    inst._lvl_l:set_local(0)
     inst.fn_l_namedetail = fn_detail
 end
 local function SetLevel(inst)
