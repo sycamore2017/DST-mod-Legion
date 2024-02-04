@@ -2009,3 +2009,33 @@ if IsServer then
     AddPrefabPostInit("fruitfly", FnSet_fruitfly)
     AddPrefabPostInit("friendlyfruitfly", FnSet_fruitfly)
 end
+
+--------------------------------------------------------------------------
+--[[ 添加新的世界唯一型容器 ]]
+--------------------------------------------------------------------------
+
+local worldboxes = require("prefabs/pocketdimensioncontainer_defs")
+table.insert(worldboxes.POCKETDIMENSIONCONTAINER_DEFS, {
+    name = "cloudpine_l1", --世界容器id
+    prefab = "cloudpine_box_l1", --预制物名
+    -- ui = "anim/ui_portal_shadow_3x4.zip",
+    widgetname = "cloudpine_box_l1", --容器名
+    -- tags = { "spoiler" },
+    data_only = true --只加数据，不用官方的预制物逻辑，因为我还需要加别的机制
+})
+table.insert(worldboxes.POCKETDIMENSIONCONTAINER_DEFS, {
+    name = "cloudpine_l2",
+    prefab = "cloudpine_box_l2",
+    -- ui = "anim/ui_portal_shadow_3x4.zip",
+    widgetname = "cloudpine_box_l2",
+    -- tags = { "spoiler" },
+    data_only = true
+})
+table.insert(worldboxes.POCKETDIMENSIONCONTAINER_DEFS, {
+    name = "cloudpine_l3",
+    prefab = "cloudpine_box_l3",
+    -- ui = "anim/ui_portal_shadow_3x4.zip",
+    widgetname = "cloudpine_box_l3",
+    -- tags = { "spoiler" },
+    data_only = true
+})

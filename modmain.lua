@@ -161,6 +161,7 @@ PrefabFiles = {
     "foods_cookpot",            --料理
     "placer_legion",            --大多数的placer
     "ointment_legion",          --涂抹类道具
+    "worldbox_legion",          --世界唯一型容器相关
 }
 
 Assets = {
@@ -324,7 +325,7 @@ end
 --------------------------------------------------------------------------
 
 modimport("scripts/apublicsupporter.lua")
-modimport("scripts/widgetcreation_legion.lua")
+modimport("scripts/containers_legion.lua")
 
 --------------------------------------------------------------------------
 --[[ the power of flowers ]]--[[ 花香四溢 ]]
