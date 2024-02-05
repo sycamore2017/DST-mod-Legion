@@ -180,7 +180,7 @@ end
 local prefabs_steak = { "boneshard" }
 local foliageath_data_steak = {
     image = "foliageath_dish_tomahawksteak", atlas = "images/inventoryimages/foliageath_dish_tomahawksteak.xml",
-    bank = "foliageath", build = "foliageath", anim = "dish_tomahawksteak", isloop = false
+    bank = nil, build = nil, anim = "dish_tomahawksteak", isloop = nil
 }
 
 local function UpdateAxe(inst)

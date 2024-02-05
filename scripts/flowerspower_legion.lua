@@ -190,8 +190,9 @@ end)
 
 AddStategraphActionHandler("wilson", ActionHandler(ACTIONS.INTOSHEATH_L, "doskipaction_l"))
 
---------掉落物设定
+
 if IsServer then
+    --------掉落物设定
     if CONFIGS_LEGION.FOLIAGEATHCHANCE > 0 then
         --砍粗壮常青树有几率掉青枝绿叶
         local trees = {
@@ -231,4 +232,20 @@ if IsServer then
             end)
         end)
     end
+
+    --------让部分官方物品能入鞘
+    local foliageath_data_hambat = {
+        image = "foliageath_hambat", atlas = "images/inventoryimages/foliageath_hambat.xml",
+        bank = nil, build = nil, anim = "hambat", isloop = nil
+    }
+    local foliageath_data_bullkelp = {
+        image = "foliageath_bullkelp_root", atlas = "images/inventoryimages/foliageath_bullkelp_root.xml",
+        bank = nil, build = nil, anim = "bullkelp_root", isloop = nil
+    }
+    AddPrefabPostInit("hambat", function(inst)
+        inst.foliageath_data = foliageath_data_hambat
+    end)
+    AddPrefabPostInit("bullkelp_root", function(inst)
+        inst.foliageath_data = foliageath_data_bullkelp
+    end)
 end

@@ -3,28 +3,22 @@ local assets = {
     Asset("ATLAS", "images/inventoryimages/foliageath.xml"),
     Asset("IMAGE", "images/inventoryimages/foliageath.tex")
 }
-
 local prefabs = {
     "foliageath_together",
     "foliageath_mylove"
 }
+local foliageath_data_fol = {
+    image = "foliageath_foliageath", atlas = "images/inventoryimages/foliageath_foliageath.xml",
+    bank = nil, build = nil, anim = "foliageath", isloop = nil,
+    togethered = "foliageath_mylove", --替换合并后的预制物名。默认不需要写，因为剑鞘本身特殊才写的
+    --判断是否需要恢复耐久。第二个参数是为了识别是何种原因恢复耐久
+    -- fn_recovercheck = function(inst, tag)end,
+    --恢复耐久。根据 dt 这个时间参数来确定恢复的程度
+    -- fn_recover = function(inst, dt, player, tag)end
+}
 
 local function ItemTradeTest(inst, item, giver)
-    local tradeableSwords = {
-        rosorns = true,
-        lileaves = true,
-        orchitwigs = true,
-        neverfade = true,
-        hambat = true,
-        bullkelp_root = true,
-        foliageath = true,
-        -- dish_tomahawksteak = true,
-    }
-    if item == nil then
-        return false, "WRONGSWORD"
-    elseif item.foliageath_data ~= nil then --兼容其他mod
-        return true
-    elseif not tradeableSwords[item.prefab] then
+    if item == nil or item.foliageath_data == nil then
         return false, "WRONGSWORD"
     end
     return true
@@ -34,12 +28,12 @@ local function OnSwordGiven(inst, giver, item)
         -- if item.prefab == "foliageath" and giver ~= nil and giver.components.talker ~= nil then
         --     giver.components.talker:Say(GetString(giver, "ANNOUNCE_HIS_LOVE_WISH"))
         -- end
-        local togethered = SpawnPrefab(item.prefab == "foliageath" and "foliageath_mylove" or "foliageath_together")
+        local togethered = SpawnPrefab(item.foliageath_data.togethered or "foliageath_together")
         togethered.components.swordscabbard:BeTogether(inst, item)
     end
 end
 
-local function fn()
+local function Fn()
     local inst = CreateEntity()
 
     inst.entity:AddTransform()
@@ -55,8 +49,6 @@ local function fn()
 
     inst:AddTag("swordscabbard")
     inst:AddTag("NORATCHECK") --mod兼容：永不妥协。该道具不算鼠潮分
-
-    --trader (from trader component) added to pristine state for optimization
     inst:AddTag("trader")
 
     MakeInventoryFloatable(inst, "small", 0.4, 0.65)
@@ -70,6 +62,8 @@ local function fn()
     if not TheWorld.ismastersim then
         return inst
     end
+
+    inst.foliageath_data = foliageath_data_fol
 
     inst:AddComponent("inspectable")
 
@@ -183,6 +177,6 @@ end
 
 ----------------------------
 
-return Prefab("foliageath", fn, assets, prefabs),
+return Prefab("foliageath", Fn, assets, prefabs),
     MakeIt("foliageath_together", false),
     MakeIt("foliageath_mylove", true)

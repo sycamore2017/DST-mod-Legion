@@ -6,19 +6,20 @@ local SwordScabbard = Class(function(self, inst)
 end)
 
 function SwordScabbard:SetAnim(sword)
-    local skindata = sword.components.skinedlegion ~= nil and sword.components.skinedlegion:GetSkinedData() or nil
-    if skindata ~= nil and skindata.scabbard ~= nil then
-        self.inst.components.inventoryitem.atlasname = skindata.scabbard.atlas
-        self.inst.components.inventoryitem:ChangeImageName(skindata.scabbard.image)
-        self.inst.AnimState:SetBank(skindata.scabbard.bank)
-        self.inst.AnimState:SetBuild(skindata.scabbard.build)
-        self.inst.AnimState:PlayAnimation(skindata.scabbard.anim, skindata.scabbard.isloop)
-    elseif sword.foliageath_data ~= nil then --兼容其他mod
-        self.inst.components.inventoryitem.atlasname = sword.foliageath_data.atlas
-        self.inst.components.inventoryitem:ChangeImageName(sword.foliageath_data.image)
-        self.inst.AnimState:SetBank(sword.foliageath_data.bank)
-        self.inst.AnimState:SetBuild(sword.foliageath_data.build)
-        self.inst.AnimState:PlayAnimation(sword.foliageath_data.anim, sword.foliageath_data.isloop)
+    local dd = sword.components.skinedlegion ~= nil and sword.components.skinedlegion:GetSkinedData() or nil
+    if dd ~= nil and dd.scabbard ~= nil then
+        dd = dd.scabbard
+    else
+        dd = sword.foliageath_data
+    end
+    if dd ~= nil then
+        self.inst.components.inventoryitem.atlasname = dd.atlas
+        self.inst.components.inventoryitem:ChangeImageName(dd.image)
+        if dd.bank ~= nil then
+            self.inst.AnimState:SetBank(dd.bank)
+            self.inst.AnimState:SetBuild(dd.build)
+        end
+        self.inst.AnimState:PlayAnimation(dd.anim, dd.isloop)
     else
         self.inst.components.inventoryitem.atlasname = "images/inventoryimages/foliageath_"..sword.prefab..".xml"
         self.inst.components.inventoryitem:ChangeImageName("foliageath_"..sword.prefab)
@@ -29,15 +30,12 @@ end
 function SwordScabbard:Merge(sword)
     self.origin = TheWorld.meta.session_identifier
     self.sworddata = sword:GetSaveRecord()
-
     self:SetAnim(sword)
 
     if
-        ( sword.foliageath_data ~= nil and sword.foliageath_data.fn_recover ~= nil ) or --兼容其他mod
-        (
-            sword.prefab == "neverfade" and --能恢复永不凋零的耐久
-            sword.components.finiteuses ~= nil and sword.components.finiteuses:GetPercent() < 1
-        )
+        sword.foliageath_data ~= nil and
+        sword.foliageath_data.fn_recovercheck ~= nil and
+        sword.foliageath_data.fn_recovercheck(sword, "foliageath") --第二个参数是为了识别是何种原因恢复耐久
     then
         self.time = { start = GetTime(), now = 0 }
     end
@@ -89,9 +87,7 @@ function SwordScabbard:BreakUp(player)
                 end
                 if dt > 0 then
                     if sword.foliageath_data ~= nil and sword.foliageath_data.fn_recover ~= nil then
-                        sword.foliageath_data.fn_recover(sword, dt, player)
-                    elseif sword.OnScabbardRecoveredFn ~= nil then
-                        sword.OnScabbardRecoveredFn(sword, dt, player)
+                        sword.foliageath_data.fn_recover(sword, dt, player, "foliageath")
                     end
                 end
                 self.time = nil
@@ -142,7 +138,7 @@ function SwordScabbard:OnSave()
                 dt = dt + (GetTime() - self.time.start)
             end
             if dt > 0 then
-                data.time = math.min(dt, 30*TUNING.TOTAL_DAY_TIME)
+                data.time = math.min(dt, 50*TUNING.TOTAL_DAY_TIME)
             end
         end
         return data
@@ -168,22 +164,16 @@ function SwordScabbard:OnLoad(data, newents)
             if sword ~= nil and sword:IsValid() then
                 sword:SetPersistData(self.sworddata.data)
                 self:SetAnim(sword)
-
                 --检查一下是否还需要自动计时功能
                 if self.time ~= nil then
                     if
-                        ( sword.foliageath_data ~= nil and sword.foliageath_data.fn_recover ~= nil ) or --兼容其他mod
-                        (
-                            sword.prefab == "neverfade" and
-                            sword.components.finiteuses ~= nil and sword.components.finiteuses:GetPercent() < 1
-                        )
+                        sword.foliageath_data == nil or
+                        sword.foliageath_data.fn_recovercheck == nil or
+                        not sword.foliageath_data.fn_recovercheck(sword, "foliageath")
                     then
-                        --nothing
-                    else
                         self.time = nil
                     end
                 end
-
                 --为了动态兼容性更新自身的动画情况，每次重载时都生成一个暂时的实体来使用，用完就删
                 sword:Remove()
             end

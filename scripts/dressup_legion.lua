@@ -1608,7 +1608,8 @@ local pieces = {
     "crabking", "malbatross", "toadstool", "stalker", "klaus", "beequeen", "antlion",
     "eyeofterror", "twinsofterror",
     "kitcoon", "catcoon", "manrabbit",
-    "daywalker", "deerclops_mutated", "warg_mutated", "bearger_mutated"
+    "daywalker", "deerclops_mutated", "warg_mutated", "bearger_mutated",
+    "lggoldgod", "lgfiregod"  --【海洋传说】
 }
 -- local materials = {
 --     "marble", "stone", "moonglass",
@@ -1639,7 +1640,9 @@ local oversizecrops = {
     durian = "farm_plant_durian_build",
     carrot = "farm_plant_carrot",
     pineananas = "farm_plant_pineananas",
-    gourd = "farm_plant_gourd" --【神话书说】巨型葫芦(没有做腐烂状态的)
+    gourd = "farm_plant_gourd", --【神话书说】巨型葫芦(没有做腐烂状态的)
+    lg_putao = "farm_plant_lg_putao", --【海洋传说】巨型葡萄
+    lg_mangguo = "farm_plant_lg_mangguo", --【海洋传说】巨型芒果
 }
 local cropdressdata = {
     isnoskin = true,

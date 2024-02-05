@@ -237,28 +237,6 @@ local function OnFinished_never(inst)
         inst:PushEvent("percentusedchange", { percent = 0 }) --界面需要更新百分比
     end
 end
-local function OnRecovered_never(inst, dt, player) --每次被剑鞘恢复时执行的函数
-    if inst.components.finiteuses:GetPercent() >= 1 then
-        return
-    end
-
-    local value = dt * uses_never/(TUNING.TOTAL_DAY_TIME*3) --后面一截是每秒该恢复多少耐久
-    if value >= 1 then
-        value = math.floor(value)
-    else
-        return
-    end
-
-    local newvalue = inst.components.finiteuses:GetUses() + value
-    inst.components.finiteuses:SetUses(math.min(uses_never, newvalue))
-    if inst.hassetbroken then
-        inst.hassetbroken = false
-        inst:RemoveTag("broken")
-        inst.components.weapon:SetDamage(55)
-        inst.components.weapon:SetOnAttack(OnAttack_never)
-        ChangeInvImg_never(inst, inst.components.skinedlegion:GetSkinedData())
-    end
-end
 
 local keykey = "state_l_faded"
 local function CloseGame()
@@ -603,6 +581,34 @@ local function OnLoad_never(inst, data)
 	end
 end
 
+local foliageath_data_never = {
+    image = "foliageath_neverfade", atlas = "images/inventoryimages/foliageath_neverfade.xml",
+    bank = nil, build = nil, anim = "neverfade", isloop = nil,
+    fn_recovercheck = function(inst, tag)
+        return inst.components.finiteuses:GetPercent() < 1
+    end,
+    fn_recover = function(inst, dt, player, tag)
+        if not inst.foliageath_data.fn_recovercheck(inst, tag) then
+            return
+        end
+
+        local value = dt * uses_never/(TUNING.TOTAL_DAY_TIME*3)
+        if value >= 1 then
+            value = math.floor(value)
+        else
+            return
+        end
+        inst.components.finiteuses:Repair(value)
+        if inst.hassetbroken then
+            inst.hassetbroken = false
+            inst:RemoveTag("broken")
+            inst.components.weapon:SetDamage(55)
+            inst.components.weapon:SetOnAttack(OnAttack_never)
+            ChangeInvImg_never(inst, inst.components.skinedlegion:GetSkinedData())
+        end
+    end
+}
+
 local function Fn_never()
     local inst = CreateEntity()
 
@@ -626,7 +632,7 @@ local function Fn_never()
     inst.hassetbroken = false
     inst.atkcounter = 0
     inst.healthredirect_old = nil
-    inst.OnScabbardRecoveredFn = OnRecovered_never
+    inst.foliageath_data = foliageath_data_never
 
     Fn_server(inst, "neverfade", OnEquip_never, OnUnequip_never)
     SetWeapon(inst, 55, OnAttack_never)
@@ -652,6 +658,10 @@ end
 --------------------------------------------------------------------------
 
 local assets_rose = GetAssets("rosorns", { Asset("ANIM", "anim/swap_rosorns.zip") })
+local foliageath_data_rose = {
+    image = "foliageath_rosorns", atlas = "images/inventoryimages/foliageath_rosorns.xml",
+    bank = nil, build = nil, anim = "rosorns", isloop = nil
+}
 
 local function OnEquip_rose(inst, owner)
     local skindata = inst.components.skinedlegion:GetSkinedData()
@@ -701,6 +711,8 @@ local function Fn_rose()
         return inst
     end
 
+    inst.foliageath_data = foliageath_data_rose
+
     Fn_server(inst, "rosorns", OnEquip_rose, OnUnequip_rose)
     SetWeapon(inst, 51, OnAttack_rose)
     SetPerishable(inst, TUNING.TOTAL_DAY_TIME*8, nil)
@@ -717,6 +729,10 @@ end
 --------------------------------------------------------------------------
 
 local assets_lily = GetAssets("lileaves", { Asset("ANIM", "anim/swap_lileaves.zip") })
+local foliageath_data_lily = {
+    image = "foliageath_lileaves", atlas = "images/inventoryimages/foliageath_lileaves.xml",
+    bank = nil, build = nil, anim = "lileaves", isloop = nil
+}
 
 local function OnEquip_lily(inst, owner)
     local skindata = inst.components.skinedlegion:GetSkinedData()
@@ -762,6 +778,8 @@ local function Fn_lily()
         return inst
     end
 
+    inst.foliageath_data = foliageath_data_lily
+
     Fn_server(inst, "lileaves", OnEquip_lily, OnUnequip_base)
     SetWeapon(inst, 51, OnAttack_lily)
     SetPerishable(inst, TUNING.TOTAL_DAY_TIME*8, nil)
@@ -780,6 +798,10 @@ end
 local assets_orchid = GetAssets("orchitwigs", { Asset("ANIM", "anim/swap_orchitwigs.zip") })
 local prefabs_orchid = { "impact_orchid_fx" }
 local atk_orchid_area = TUNING.BASE_SURVIVOR_ATTACK*0.7
+local foliageath_data_orchid = {
+    image = "foliageath_orchitwigs", atlas = "images/inventoryimages/foliageath_orchitwigs.xml",
+    bank = nil, build = nil, anim = "orchitwigs", isloop = nil
+}
 
 local function OnEquip_orchid(inst, owner)
     local skindata = inst.components.skinedlegion:GetSkinedData()
@@ -862,6 +884,8 @@ local function Fn_orchid()
     if not TheWorld.ismastersim then
         return inst
     end
+
+    inst.foliageath_data = foliageath_data_orchid
 
     Fn_server(inst, "orchitwigs", OnEquip_orchid, OnUnequip_base)
     SetWeapon(inst, TUNING.BASE_SURVIVOR_ATTACK*0.9, OnAttack_orchid)
