@@ -1677,6 +1677,7 @@ local function OnWorkedFinish_pine2(inst, worker)
 		crop.fn_defend(inst, worker)
 	end
 	crop:GenerateLoot(worker, false, false)
+	crop:StopGrowing() --清除生长进度
 	if crop.stage == 3 then
 		crop:SetStage(2, false)
 	else
