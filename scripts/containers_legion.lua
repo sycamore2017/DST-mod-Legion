@@ -473,10 +473,10 @@ params.cloudpine_box_l3 = {
     itemtestfn = TestContainer_base
 }
 for y = 0, 5 do
-    table.insert(params.cloudpine_box_l3.widget.slotpos, Vector3(-114      , (-77 * y) + 114 - (y * 2), 0))
-    table.insert(params.cloudpine_box_l3.widget.slotpos, Vector3(-114 + 75 , (-77 * y) + 114 - (y * 2), 0))
-    table.insert(params.cloudpine_box_l3.widget.slotpos, Vector3(-114 + 150, (-77 * y) + 114 - (y * 2), 0))
-    table.insert(params.cloudpine_box_l3.widget.slotpos, Vector3(-114 + 225, (-77 * y) + 114 - (y * 2), 0))
+    table.insert(params.cloudpine_box_l3.widget.slotpos, Vector3(-114      , (-77 * y) + 127 - (y * 2), 0))
+    table.insert(params.cloudpine_box_l3.widget.slotpos, Vector3(-114 + 75 , (-77 * y) + 127 - (y * 2), 0))
+    table.insert(params.cloudpine_box_l3.widget.slotpos, Vector3(-114 + 150, (-77 * y) + 127 - (y * 2), 0))
+    table.insert(params.cloudpine_box_l3.widget.slotpos, Vector3(-114 + 225, (-77 * y) + 127 - (y * 2), 0))
 end
 
 ------中级
@@ -485,17 +485,17 @@ params.cloudpine_box_l2 = {
         slotpos = {},
         animbank = "ui_bookstation_4x5",
         animbuild = "ui_cloudpine_box_4x3",
-        pos = Vector3(0, 280, 0),
+        pos = Vector3(0, 200, 0),
         side_align_tip = 160
     },
     type = "chest",
     itemtestfn = TestContainer_base
 }
 for y = 0, 2 do
-    table.insert(params.cloudpine_box_l2.widget.slotpos, Vector3(-114      , (-77 * y) + 114 - (y * 2), 0))
-    table.insert(params.cloudpine_box_l2.widget.slotpos, Vector3(-114 + 75 , (-77 * y) + 114 - (y * 2), 0))
-    table.insert(params.cloudpine_box_l2.widget.slotpos, Vector3(-114 + 150, (-77 * y) + 114 - (y * 2), 0))
-    table.insert(params.cloudpine_box_l2.widget.slotpos, Vector3(-114 + 225, (-77 * y) + 114 - (y * 2), 0))
+    table.insert(params.cloudpine_box_l2.widget.slotpos, Vector3(-114      , (-77 * y) + 80 - (y * 2), 0))
+    table.insert(params.cloudpine_box_l2.widget.slotpos, Vector3(-114 + 75 , (-77 * y) + 80 - (y * 2), 0))
+    table.insert(params.cloudpine_box_l2.widget.slotpos, Vector3(-114 + 150, (-77 * y) + 80 - (y * 2), 0))
+    table.insert(params.cloudpine_box_l2.widget.slotpos, Vector3(-114 + 225, (-77 * y) + 80 - (y * 2), 0))
 end
 
 ------低级
@@ -504,16 +504,16 @@ params.cloudpine_box_l1 = {
         slotpos = {},
         animbank = "ui_bookstation_4x5",
         animbuild = "ui_cloudpine_box_4x1",
-        pos = Vector3(0, 280, 0),
+        pos = Vector3(0, 160, 0),
         side_align_tip = 160
     },
     type = "chest",
     itemtestfn = TestContainer_base
 }
-table.insert(params.cloudpine_box_l1.widget.slotpos, Vector3(-114      , 114, 0))
-table.insert(params.cloudpine_box_l1.widget.slotpos, Vector3(-114 + 75 , 114, 0))
-table.insert(params.cloudpine_box_l1.widget.slotpos, Vector3(-114 + 150, 114, 0))
-table.insert(params.cloudpine_box_l1.widget.slotpos, Vector3(-114 + 225, 114, 0))
+table.insert(params.cloudpine_box_l1.widget.slotpos, Vector3(-114      , 0, 0))
+table.insert(params.cloudpine_box_l1.widget.slotpos, Vector3(-114 + 75 , 0, 0))
+table.insert(params.cloudpine_box_l1.widget.slotpos, Vector3(-114 + 150, 0, 0))
+table.insert(params.cloudpine_box_l1.widget.slotpos, Vector3(-114 + 225, 0, 0))
 
 --------------------------------------------------------------------------
 --[[ 修改容器注册函数 ]]

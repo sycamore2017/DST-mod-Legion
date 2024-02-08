@@ -18,7 +18,7 @@ local function setfruit(inst, hasfruit) --设置果实的贴图
     end
 
     if hasfruit then
-        inst.AnimState:Show("fruit") --这里参数为贴图所在文件夹的名字，因为一个文件夹为一个symbol
+        inst.AnimState:Show("fruit") --这里参数为动画中贴图的设定名字，不是通道名
     else
         inst.AnimState:Hide("fruit")
     end

@@ -23,6 +23,7 @@ local assets = {
     Asset("ANIM", "anim/crop_legion_cactus.zip"), --异种动画，让子圭育提前用的
     Asset("ANIM", "anim/crop_legion_lureplant.zip"),
     Asset("ANIM", "anim/crop_legion_berries.zip"),
+    Asset("ANIM", "anim/crop_legion_pine.zip"),
     Asset("ATLAS", "images/slot_juice_l.xml"), --巨食草的格子背景
     Asset("IMAGE", "images/slot_juice_l.tex"),
 
@@ -1077,6 +1078,7 @@ _G.CROPS_DATA_LEGION.carrot = {
     -- getsickchance = 0.007, --害虫产生率
     -- fireproof = false, --是否防火
     -- nomagicgrow = true, --是否禁止被魔法催熟
+    -- dataonly = true, --是否不用通用预制物代码
     bank = "crop_legion_carrot", build = "crop_legion_carrot",
     leveldata = {
         { anim = "level1", time = time_crop*0.45, deadanim = "dead1", witheredprefab = nil },
@@ -1132,7 +1134,7 @@ _G.CROPS_DATA_LEGION.eggplant = {
     },
     lootothers = {
         { israndom=true, factor=0.4, name="bird_egg", name_rot="rottenegg" },
-        { israndom=false, factor=0.2, name="bird_egg", name_rot="rottenegg" } --16
+        { israndom=false, factor=0.2, name="bird_egg", name_rot="rottenegg" }
     }
 }
 _G.CROPS_DATA_LEGION.durian = {
@@ -1147,7 +1149,7 @@ _G.CROPS_DATA_LEGION.durian = {
     },
     lootothers = {
         { israndom=true, factor=0.05, name="livinglog", name_rot="livinglog" },
-        { israndom=false, factor=0.0625, name="livinglog", name_rot="livinglog" } --5
+        { israndom=false, factor=0.0625, name="livinglog", name_rot="livinglog" }
     }
 }
 _G.CROPS_DATA_LEGION.pomegranate = {
@@ -1197,7 +1199,7 @@ _G.CROPS_DATA_LEGION.pineananas = {
     cluster_size = { 1, 1.5 },
     lootothers = {
         { israndom=true, factor=0.05, name="pinecone", name_rot="pinecone" },
-        { israndom=false, factor=0.0625, name="pinecone", name_rot="pinecone" } --5
+        { israndom=false, factor=0.0625, name="pinecone", name_rot="pinecone" }
     }
 }
 _G.CROPS_DATA_LEGION.onion = {
@@ -1225,7 +1227,7 @@ _G.CROPS_DATA_LEGION.pepper = {
     },
     lootothers = {
         { israndom=true, factor=0.4, name="mint_l", name_rot=nil },
-        { israndom=false, factor=0.2, name="mint_l", name_rot=nil } --16
+        { israndom=false, factor=0.2, name="mint_l", name_rot=nil }
     }
 }
 _G.CROPS_DATA_LEGION.potato = {
@@ -1251,9 +1253,9 @@ _G.CROPS_DATA_LEGION.garlic = {
     },
     lootothers = {
         { israndom=true, factor=0.03, name="feather_crow", name_rot="feather_crow" },
-        { israndom=false, factor=0.0375, name="feather_crow", name_rot="feather_crow" }, --3
+        { israndom=false, factor=0.0375, name="feather_crow", name_rot="feather_crow" },
         { israndom=true, factor=0.02, name="feather_robin", name_rot="feather_robin" },
-        { israndom=false, factor=0.025, name="feather_robin", name_rot="feather_robin" } --2
+        { israndom=false, factor=0.025, name="feather_robin", name_rot="feather_robin" }
     }
 }
 _G.CROPS_DATA_LEGION.tomato = {
@@ -1349,17 +1351,13 @@ _G.CROPS_DATA_LEGION.cactus_meat = {
     cluster_size = { 0.9, 1.3 },
     fn_loot = function(self, doer, ispicked, isburnt, loots)
         if self.stage == self.stage_max or self.level.pickable == 1 then
-            local lootother = nil
-            if self.stage == self.stage_max then --最终阶段才有仙人掌花
-                lootother = {
-                    { israndom=true, factor=0.4, name="cactus_flower", name_rot=nil },
-                    { israndom=false, factor= TheWorld.state.issummer and 0.7 or 0.2, name="cactus_flower", name_rot=nil } --16、56
-                }
-            end
             self:GetBaseLoot(loots, {
                 doer = doer, ispicked = ispicked, isburnt = isburnt,
                 crop = self.cropprefab, crop_rot = "spoiled_food",
-                lootothers = lootother
+                lootothers = self.stage == self.stage_max and { --最终阶段才有仙人掌花
+                    { israndom=true, factor=0.4, name="cactus_flower", name_rot=nil },
+                    { israndom=false, factor= TheWorld.state.issummer and 0.7 or 0.2, name="cactus_flower", name_rot=nil }
+                } or nil
             })
         end
     end,
@@ -1463,6 +1461,21 @@ _G.CROPS_DATA_LEGION.berries = {
         else
             self.inst.AnimState:ClearOverrideSymbol("fruit1")
         end
+    end
+}
+_G.CROPS_DATA_LEGION.log = {
+    growthmults = { 1.2, 0.8, 1.2, 0.5 }, --春x秋冬
+    regrowstage = 1, cangrowindrak = true, dataonly = true,
+    bank = "crop_legion_pine", build = "crop_legion_pine",
+    leveldata = {
+        { anim = "idle", time = time_day1*8*0.34, deadanim = nil, witheredprefab = nil },
+        { anim = "idle", time = time_day1*8*0.66, deadanim = nil, witheredprefab = nil },
+        { anim = "idle", time = nil, deadanim = nil, witheredprefab = nil, pickable = -1 }
+    },
+    cluster_size = { 0.9, 1.5 },
+    fn_placer = function(placer)
+        placer.AnimState:Hide("base2") --Tip：动画中，对应贴图名需要复写为base2_00x，x为序号，否则就只会第一个生效
+		placer.AnimState:Hide("base3")
     end
 }
 
@@ -1778,6 +1791,11 @@ local mapseeds = {
         swap = { build = "crop_legion_berries", file = "swap_turn3", symboltype = "1" },
         fruit = "seeds_berries_l", time = 5*TUNING.TOTAL_DAY_TIME,
         fruitnum_min = 2, fruitnum_max = 3, genekey = "tissue_l_berries"
+    },
+    pinecone = {
+        swap = { build = "crop_legion_pine", file = "swap_turn", symboltype = "1" },
+        fruit = "seeds_log_l",
+        fruitnum_min = 1, fruitnum_max = 1, genekey = "foliageath"
     }
 }
 for k,v in pairs(mapseeds) do

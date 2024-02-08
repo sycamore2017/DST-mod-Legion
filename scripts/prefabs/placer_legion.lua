@@ -137,6 +137,9 @@ local function Fn_xeeds(inst, v)
     if v.cluster_size ~= nil then
         inst.AnimState:SetScale(v.cluster_size[1], v.cluster_size[1], v.cluster_size[1])
     end
+    if v.fn_placer ~= nil then
+        v.fn_placer(inst)
+    end
 end
 for k,v in pairs(CROPS_DATA_LEGION) do
     CreatePlacer(

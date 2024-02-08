@@ -510,6 +510,10 @@ end
 --[[ 异种植物 ]]
 --------------------------------------------------------------------------
 
+local skinedplant = {
+	cactus_meat = true
+}
+
 local function GetStatus_p2(inst)
 	local crop = inst.components.perennialcrop2
 	return (crop == nil and "GROWING")
@@ -580,7 +584,6 @@ local function OnPlant_p2(inst, pt)
 end
 local function OnWorkedFinish_p2(inst, worker)
 	local crop = inst.components.perennialcrop2
-
 	local x, y, z = inst.Transform:GetWorldPosition()
 	SpawnPrefab("dirt_puff").Transform:SetPosition(x, y, z)
 
@@ -591,9 +594,31 @@ local function OnWorkedFinish_p2(inst, worker)
 	inst:Remove()
 end
 
-local skinedplant = {
-	cactus_meat = true
-}
+local function Fn_common_p2(inst, sets) --异种的通用设置
+	inst.entity:AddTransform()
+	inst.entity:AddAnimState()
+	inst.entity:AddMiniMapEntity()
+	inst.entity:AddSoundEmitter()
+	inst.entity:AddNetwork()
+
+	inst.AnimState:SetBank(sets.bank)
+	inst.AnimState:SetBuild(sets.build)
+	-- inst.AnimState:PlayAnimation(sets.leveldata[1].anim, true) --组件里会设置动画的
+
+	inst.Transform:SetTwoFaced() --两个面，这样就可以左右不同（再多貌似有问题，因为动画不兼容）
+	inst:AddTag("rotatableobject") --能让栅栏击剑起作用
+	inst:AddTag("flatrotated_l") --棱镜标签：旋转时旋转180度
+	inst:AddTag("crop2_legion")
+
+	inst._cluster_l = net_byte(inst.GUID, "plant_crop_l._cluster_l", "cluster_l_dirty")
+end
+local function Fn_server_p2(inst) --异种的通用设置
+	inst:AddComponent("savedrotation")
+
+	inst:AddComponent("inspectable")
+
+	inst:AddComponent("perennialcrop2")
+end
 
 local function MakePlant2(cropprefab, sets)
 	local assets = sets.assets or {}
@@ -608,15 +633,7 @@ local function MakePlant2(cropprefab, sets)
 		function()
 			local inst = CreateEntity()
 
-			inst.entity:AddTransform()
-			inst.entity:AddAnimState()
-			inst.entity:AddMiniMapEntity()
-			inst.entity:AddSoundEmitter()
-			inst.entity:AddNetwork()
-
-			inst.AnimState:SetBank(sets.bank)
-			inst.AnimState:SetBuild(sets.build)
-			-- inst.AnimState:PlayAnimation(sets.leveldata[1].anim, true) --组件里会设置动画的
+			Fn_common_p2(inst, sets)
 
 			inst:SetPhysicsRadiusOverride(TUNING.FARM_PLANT_PHYSICS_RADIUS)
 
@@ -627,14 +644,8 @@ local function MakePlant2(cropprefab, sets)
 			end
 
 			inst.MiniMapEntity:SetIcon("plant_crop_l.tex")
-			inst.Transform:SetTwoFaced() --两个面，这样就可以左右不同（再多貌似有问题）
 
 			inst:AddTag("plant")
-			inst:AddTag("crop2_legion")
-			inst:AddTag("rotatableobject") --能让栅栏击剑起作用
-            inst:AddTag("flatrotated_l") --棱镜标签：旋转时旋转180度
-
-			inst._cluster_l = net_byte(inst.GUID, "plant_crop_l._cluster_l", "cluster_l_dirty")
 
 			inst.displaynamefn = DisplayName_p2
 
@@ -652,9 +663,8 @@ local function MakePlant2(cropprefab, sets)
 				return inst
 			end
 
-			inst:AddComponent("savedrotation")
+			Fn_server_p2(inst)
 
-			inst:AddComponent("inspectable")
 			inst.components.inspectable.nameoverride = "PLANT_CROP_L" --用来统一描述，懒得每种作物都搞个描述了
     		inst.components.inspectable.getstatus = GetStatus_p2
 
@@ -667,7 +677,6 @@ local function MakePlant2(cropprefab, sets)
 			inst.components.workable:SetWorkLeft(1)
 			inst.components.workable:SetOnFinishCallback(OnWorkedFinish_p2)
 
-			inst:AddComponent("perennialcrop2")
 			inst.components.perennialcrop2:SetUp(cropprefab, sets, {
 				moisture = true, nutrient = true, tendable = true, seasonlisten = true,
 				nomagicgrow = sets.nomagicgrow, fireproof = sets.fireproof, cangrowindrak = sets.cangrowindrak
@@ -1519,32 +1528,18 @@ table.insert(prefs, Prefab(
     function()
         local inst = CreateEntity()
 
-        inst.entity:AddTransform()
-		inst.entity:AddAnimState()
-		inst.entity:AddSoundEmitter()
-		inst.entity:AddMiniMapEntity()
-		inst.entity:AddNetwork()
+        Fn_common_p2(inst, CROPS_DATA_LEGION["plantmeat"])
 
 		inst:SetPhysicsRadiusOverride(.5)
     	MakeObstaclePhysics(inst, inst.physicsradiusoverride)
 
-        inst.AnimState:SetBank("crop_legion_lureplant")
-        inst.AnimState:SetBuild("crop_legion_lureplant")
-        -- inst.AnimState:PlayAnimation("idle") --组件里会设置动画的
-
 		inst.MiniMapEntity:SetIcon("plant_crop_l.tex")
-		inst.Transform:SetTwoFaced() --两个面，这样就可以左右不同（再多貌似有问题）
 
-		inst:AddTag("crop2_legion")
 		inst:AddTag("veggie")
 		inst:AddTag("notraptrigger")
     	inst:AddTag("noauradamage")
 		inst:AddTag("companion")
 		inst:AddTag("vaseherb")
-		inst:AddTag("rotatableobject") --能让栅栏击剑起作用
-		inst:AddTag("flatrotated_l") --棱镜标签：旋转时旋转180度
-
-		inst._cluster_l = net_byte(inst.GUID, "plant_crop_l._cluster_l", "cluster_l_dirty")
 
 		inst.displaynamefn = DisplayName_nep
 
@@ -1569,9 +1564,7 @@ table.insert(prefs, Prefab(
 		inst.fn_death = OnDeath_nep
 		inst.fn_switch = SwitchPlant
 
-		inst:AddComponent("inspectable")
-
-		inst:AddComponent("savedrotation")
+		Fn_server_p2(inst)
 
 		inst:AddComponent("health")
     	inst.components.health:SetMaxHealth(1200)
@@ -1589,12 +1582,11 @@ table.insert(prefs, Prefab(
 
 		inst:AddComponent("timer")
 
-		inst:AddComponent("perennialcrop2")
 		inst.components.perennialcrop2.fn_cluster = OnCluster_nep
 		inst.components.perennialcrop2.infested_max = 50 --我可不想它直接被害虫干掉了
 		inst.components.perennialcrop2:SetNoFunction()
 		inst.components.perennialcrop2:SetUp("plantmeat", CROPS_DATA_LEGION["plantmeat"], {
-			moisture = nil, nutrient = nil, tendable = nil, seasonlisten = nil,
+			-- moisture = nil, nutrient = nil, tendable = nil, seasonlisten = nil,
 			nomagicgrow = true, fireproof = true, cangrowindrak = true
 		})
 		inst.components.perennialcrop2:SetStage(3, false)
@@ -1621,6 +1613,225 @@ table.insert(prefs, Prefab(
     nil
 ))
 
+--------------------------------------------------------------------------
+--[[ 云青松 ]]
+--------------------------------------------------------------------------
+
+local function OnWorkedFinish_pine1(inst, worker)
+	--undo 通知世界，有青松被移除了
+	inst.components.container_proxy:Close() --关掉世界容器
+	OnWorkedFinish_p2(inst, worker)
+end
+local function WakeUpLeif(ent)
+    ent.components.sleeper:WakeUp()
+end
+local function OnWorked_pine(inst, worker, workleft, numworks)
+	if not (worker ~= nil and worker:HasTag("playerghost")) then
+        inst.SoundEmitter:PlaySound(
+            worker ~= nil and worker:HasTag("beaver") and
+            "dontstarve/characters/woodie/beaver_chop_tree" or
+            "dontstarve/wilson/use_axe_tree"
+        )
+    end
+
+	inst.components.container_proxy:Close() --关掉世界容器
+
+	inst.AnimState:PlayAnimation("chop")
+    inst.AnimState:PushAnimation("idle", true)
+
+	local x, y, z = inst.Transform:GetWorldPosition()
+	SpawnPrefab("pine_needles_chop").Transform:SetPosition(x, y + math.random() * 2, z)
+
+	--唤醒周围的树精守卫
+	local ents = TheSim:FindEntities(x, y, z, TUNING.LEIF_REAWAKEN_RADIUS, { "leif" })
+	for _, v in ipairs(ents) do
+		if v.components.sleeper ~= nil and v.components.sleeper:IsAsleep() then
+			v:DoTaskInTime(math.random(), WakeUpLeif)
+		end
+		v.components.combat:SuggestTarget(worker)
+	end
+end
+local function ShakeAllCameras_pine(inst)
+    ShakeAllCameras(CAMERASHAKE.FULL, .25, .03,
+        inst.components.perennialcrop2 ~= nil and
+        inst.components.perennialcrop2.stage == 2 and .5 or .25,
+        inst, 6
+	)
+end
+local function FindLeifTree(item)
+    return not item.noleif
+        and item.components.growable ~= nil
+        and item.components.growable.stage <= 3
+end
+local function OnWorkedFinish_pine2(inst, worker)
+	local crop = inst.components.perennialcrop2
+	local x, y, z = inst.Transform:GetWorldPosition()
+
+	inst.SoundEmitter:PlaySound("dontstarve/forest/treefall")
+	inst:DoTaskInTime(0.4, ShakeAllCameras_pine)
+
+	-- inst.AnimState:PlayAnimation("chopdown")
+	-- inst.AnimState:PushAnimation("idle", true)
+
+	if crop.fn_defend ~= nil then
+		crop.fn_defend(inst, worker)
+	end
+	crop:GenerateLoot(worker, false, false)
+	if crop.stage == 3 then
+		crop:SetStage(2, false)
+	else
+		crop:SetStage(1, false)
+	end
+
+	local days_survived = worker.components.age ~= nil and worker.components.age:GetAgeInDays() or TheWorld.state.cycles
+	if days_survived >= TUNING.LEIF_MIN_DAY then
+		local chance = TUNING.LEIF_PERCENT_CHANCE
+		if worker:HasTag("beaver") then
+			chance = chance * TUNING.BEAVER_LEIF_CHANCE_MOD
+		elseif worker:HasTag("woodcutter") then
+			chance = chance * TUNING.WOODCUTTER_LEIF_CHANCE_MOD
+		end
+		if math.random() < chance then
+			for k = 1, (days_survived <= 30 and 1) or math.random(days_survived <= 80 and 2 or 3) do
+				local target = FindEntity(inst, TUNING.LEIF_MAXSPAWNDIST,
+					FindLeifTree, { "evergreens", "tree" }, { "leif", "stump", "burnt" })
+				if target ~= nil then
+					target:TransformIntoLeif(worker)
+				end
+			end
+		end
+	end
+end
+
+local function OnStage_pine(self)
+	local inst = self.inst
+	if self.stage == 1 then
+		-- inst.AnimState:Show("base1")
+		inst.AnimState:Hide("base2")
+		inst.AnimState:Hide("base3")
+
+		inst.components.workable:SetWorkAction(ACTIONS.DIG)
+		inst.components.workable:SetWorkLeft(1)
+		inst.components.workable:SetOnWorkCallback(nil)
+		inst.components.workable:SetOnFinishCallback(OnWorkedFinish_pine1)
+	elseif self.stage == 2 then
+		-- inst.AnimState:Show("base1")
+		inst.AnimState:Show("base2")
+		inst.AnimState:Hide("base3")
+
+		inst.components.workable:SetWorkAction(ACTIONS.DIG)
+		inst.components.workable:SetWorkLeft(10)
+		inst.components.workable:SetOnWorkCallback(OnWorked_pine)
+		inst.components.workable:SetOnFinishCallback(OnWorkedFinish_pine2)
+	else
+		-- inst.AnimState:Show("base1")
+		inst.AnimState:Show("base2")
+		inst.AnimState:Show("base3")
+
+		inst.components.workable:SetWorkAction(ACTIONS.CHOP)
+		inst.components.workable:SetWorkLeft(20)
+		inst.components.workable:SetOnWorkCallback(OnWorked_pine)
+		inst.components.workable:SetOnFinishCallback(OnWorkedFinish_pine2)
+	end
+end
+local function OnLoot_pine(self, doer, ispicked, isburnt, lootprefabs)
+	if self.stage ~= 1 then
+		self:GetBaseLoot(lootprefabs, {
+			doer = doer, ispicked = ispicked, isburnt = isburnt,
+			crop = self.cropprefab, crop_rot = self.cropprefab,
+			lootothers = self.stage == self.stage_max and { --最终阶段才有嫩枝
+				{ israndom=true, factor=0.6, name="cactus_flower", name_rot=nil },
+				{ israndom=false, factor=0.3, name="cactus_flower", name_rot=nil }
+			} or nil
+		})
+		if self.stage == self.stage_max then --由于后面两阶段都能获取，所以收获物就分成两部分
+			for name, num in pairs(lootprefabs) do
+				if name == "log" then
+					lootprefabs[name] = math.ceil(num*2/3)
+				end
+			end
+		else
+			for name, num in pairs(lootprefabs) do
+				if name == "log" then
+					lootprefabs[name] = math.ceil(num/3)
+				end
+			end
+		end
+	end
+end
+
+local function OnOpen_pine(inst)
+	inst.AnimState:PlayAnimation("open")
+	inst.SoundEmitter:PlaySound("maxwell_rework/magician_chest/open")
+end
+local function OnClose_pine(inst)
+	inst.AnimState:PlayAnimation("close")
+	inst.SoundEmitter:PlaySound("maxwell_rework/magician_chest/close")
+end
+local function AttachContainer_pine(inst)
+	inst.components.container_proxy:SetMaster(TheWorld:GetPocketDimensionContainer("cloudpine_l3"))
+end
+
+table.insert(prefs, Prefab(
+    "plant_log_l",
+    function()
+        local inst = CreateEntity()
+
+        Fn_common_p2(inst, CROPS_DATA_LEGION["log"])
+
+		inst:SetPhysicsRadiusOverride(TUNING.FARM_PLANT_PHYSICS_RADIUS)
+
+		inst.MiniMapEntity:SetIcon("plant_crop_l.tex")
+
+		inst:AddTag("plant")
+		inst:AddTag("silviculture") --该标签会使得仅限《造林学》发挥作用
+
+		inst.displaynamefn = DisplayName_p2
+
+		inst:AddComponent("container_proxy")
+
+		inst.entity:SetPristine()
+		if not TheWorld.ismastersim then
+			return inst
+		end
+
+		Fn_server_p2(inst)
+
+		inst.components.inspectable.nameoverride = "PLANT_CROP_L" --用来统一描述，懒得每种作物都搞个描述了
+		inst.components.inspectable.getstatus = GetStatus_p2
+
+		inst:AddComponent("hauntable")
+		inst.components.hauntable:SetHauntValue(TUNING.HAUNT_TINY)
+		inst.components.hauntable:SetOnHauntFn(OnHaunt_p2)
+
+		inst:AddComponent("workable")
+
+		inst.components.perennialcrop2:SetUp("log", CROPS_DATA_LEGION["log"], {
+			moisture = true, nutrient = true, tendable = true, seasonlisten = nil,
+			nomagicgrow = nil, fireproof = nil, cangrowindrak = true
+		})
+		inst.components.perennialcrop2.fn_stage = OnStage_pine
+		inst.components.perennialcrop2.fn_loot = OnLoot_pine
+		inst.components.perennialcrop2:SetStage(1, false)
+
+		inst.components.container_proxy:SetOnOpenFn(OnOpen_pine)
+		inst.components.container_proxy:SetOnCloseFn(OnClose_pine)
+
+		inst.fn_planted = OnPlant_p2
+
+		inst.OnLoadPostPass = AttachContainer_pine
+		if not POPULATING then
+			AttachContainer_pine(inst)
+		end
+
+		return inst
+    end,
+    {
+		Asset("ANIM", "anim/crop_legion_pine.zip")
+    },
+    nil
+))
+
 --------------------
 --------------------
 
@@ -1628,7 +1839,9 @@ for k,v in pairs(defs) do
 	table.insert(prefs, MakePlant(v))
 end
 for k,v in pairs(CROPS_DATA_LEGION) do
-	table.insert(prefs, MakePlant2(k, v))
+	if not v.dataonly then
+		table.insert(prefs, MakePlant2(k, v))
+	end
 end
 
 return unpack(prefs)

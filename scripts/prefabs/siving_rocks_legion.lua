@@ -528,7 +528,7 @@ table.insert(prefs, Prefab(
 
         inst:AddTag("lifebox_l") --棱镜标签：能容纳生命能量
         inst:AddTag("siving_derivant")
-        inst:AddTag("silviculture") --这个标签能让《造林学》发挥作用
+        inst:AddTag("silviculture") --该标签会使得仅限《造林学》发挥作用
         inst:AddTag("rotatableobject") --能让栅栏击剑起作用
         inst:AddTag("flatrotated_l") --棱镜标签：旋转时旋转180度
         inst:AddTag("trader")
