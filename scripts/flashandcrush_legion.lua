@@ -345,50 +345,58 @@ end
 
 local MakeSmallBurnableCharacter_old = MakeSmallBurnableCharacter
 _G.MakeSmallBurnableCharacter = function(inst, sym, offset)
-    MakeSmallBurnableCharacter_old(inst, sym, offset)
+    local burnable, propagator = MakeSmallBurnableCharacter_old(inst, sym, offset)
     AddShockable(inst, 1)
+    return burnable, propagator
 end
 
 local MakeMediumBurnableCharacter_old = MakeMediumBurnableCharacter
 _G.MakeMediumBurnableCharacter = function(inst, sym, offset)
-    MakeMediumBurnableCharacter_old(inst, sym, offset)
+    local burnable, propagator = MakeMediumBurnableCharacter_old(inst, sym, offset)
     AddShockable(inst, 2)
+    return burnable, propagator
 end
 
 local MakeLargeBurnableCharacter_old = MakeLargeBurnableCharacter
 _G.MakeLargeBurnableCharacter = function(inst, sym, offset)
-    MakeLargeBurnableCharacter_old(inst, sym, offset)
+    local burnable, propagator = MakeLargeBurnableCharacter_old(inst, sym, offset)
     AddShockable(inst, 3)
+    return burnable, propagator
 end
 
 local MakeTinyFreezableCharacter_old = MakeTinyFreezableCharacter
 _G.MakeTinyFreezableCharacter = function(inst, sym, offset)
-    MakeTinyFreezableCharacter_old(inst, sym, offset)
+    local freezable = MakeTinyFreezableCharacter_old(inst, sym, offset)
     AddShockable(inst, 1)
+    return freezable
 end
 
 local MakeSmallFreezableCharacter_old = MakeSmallFreezableCharacter
 _G.MakeSmallFreezableCharacter = function(inst, sym, offset)
-    MakeSmallFreezableCharacter_old(inst, sym, offset)
+    local freezable = MakeSmallFreezableCharacter_old(inst, sym, offset)
     AddShockable(inst, 1)
+    return freezable
 end
 
 local MakeMediumFreezableCharacter_old = MakeMediumFreezableCharacter
 _G.MakeMediumFreezableCharacter = function(inst, sym, offset)
-    MakeMediumFreezableCharacter_old(inst, sym, offset)
+    local freezable = MakeMediumFreezableCharacter_old(inst, sym, offset)
     AddShockable(inst, 2)
+    return freezable
 end
 
 local MakeLargeFreezableCharacter_old = MakeLargeFreezableCharacter
 _G.MakeLargeFreezableCharacter = function(inst, sym, offset)
-    MakeLargeFreezableCharacter_old(inst, sym, offset)
+    local freezable = MakeLargeFreezableCharacter_old(inst, sym, offset)
     AddShockable(inst, 2)
+    return freezable
 end
 
 local MakeHugeFreezableCharacter_old = MakeHugeFreezableCharacter
 _G.MakeHugeFreezableCharacter = function(inst, sym, offset)
-    MakeHugeFreezableCharacter_old(inst, sym, offset)
+    local freezable = MakeHugeFreezableCharacter_old(inst, sym, offset)
     AddShockable(inst, 3)
+    return freezable
 end
 
 --------------------------------------------------------------------------

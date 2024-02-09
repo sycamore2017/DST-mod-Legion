@@ -179,8 +179,6 @@ local function fn()
         self.inst.AnimState:SetFloatParams(0.02, 1, self.bob_percent)
     end
 
-    -- TOOLS_L.SetImmortalBox_common(inst) --勋章已经自动对所有带 "backpack" 标签的物品加了不朽兼容
-
     inst.entity:SetPristine()
     if not TheWorld.ismastersim then
         inst.OnEntityReplicated = OnEntityReplicated_gfoot
@@ -210,7 +208,9 @@ local function fn()
 
     MakeHauntableLaunchAndDropFirstItem(inst)
 
-    -- TOOLS_L.SetImmortalBox_server(inst)
+    -- if TUNING.FUNCTIONAL_MEDAL_IS_OPEN then --勋章已经自动对所有带 "backpack" 标签的物品加了不朽兼容
+    --     SetImmortalable(inst, 2, nil)
+    -- end
 
     return inst
 end

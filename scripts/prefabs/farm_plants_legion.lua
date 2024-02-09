@@ -1665,7 +1665,7 @@ local function FindLeifTree(item)
 end
 local function OnWorkedFinish_pine2(inst, worker)
 	local crop = inst.components.perennialcrop2
-	local x, y, z = inst.Transform:GetWorldPosition()
+	-- local x, y, z = inst.Transform:GetWorldPosition()
 
 	inst.SoundEmitter:PlaySound("dontstarve/forest/treefall")
 	inst:DoTaskInTime(0.4, ShakeAllCameras_pine)
@@ -1676,7 +1676,7 @@ local function OnWorkedFinish_pine2(inst, worker)
 	if crop.fn_defend ~= nil then
 		crop.fn_defend(inst, worker)
 	end
-	crop:GenerateLoot(worker, false, false)
+	crop:GenerateLoot(nil, true, false) --不传doer，这样就会强制收获物掉地上
 	crop:StopGrowing() --清除生长进度
 	if crop.stage == 3 then
 		crop:SetStage(2, false)
@@ -1720,7 +1720,7 @@ local function OnStage_pine(self)
 		inst.AnimState:Show("base2")
 		inst.AnimState:Hide("base3")
 
-		inst.components.workable:SetWorkAction(ACTIONS.DIG)
+		inst.components.workable:SetWorkAction(ACTIONS.CHOP)
 		inst.components.workable:SetWorkLeft(10)
 		inst.components.workable:SetOnWorkCallback(OnWorked_pine)
 		inst.components.workable:SetOnFinishCallback(OnWorkedFinish_pine2)
@@ -1741,8 +1741,8 @@ local function OnLoot_pine(self, doer, ispicked, isburnt, lootprefabs)
 			doer = doer, ispicked = ispicked, isburnt = isburnt,
 			crop = self.cropprefab, crop_rot = self.cropprefab,
 			lootothers = self.stage == self.stage_max and { --最终阶段才有嫩枝
-				{ israndom=true, factor=0.6, name="cactus_flower", name_rot=nil },
-				{ israndom=false, factor=0.3, name="cactus_flower", name_rot=nil }
+				{ israndom=true, factor=0.6, name="cutted_lumpyevergreen", name_rot=nil },
+				{ israndom=false, factor=0.3, name="cutted_lumpyevergreen", name_rot=nil }
 			} or nil
 		})
 		if self.stage == self.stage_max then --由于后面两阶段都能获取，所以收获物就分成两部分
@@ -1770,7 +1770,7 @@ local function OnClose_pine(inst)
 	inst.SoundEmitter:PlaySound("maxwell_rework/magician_chest/close")
 end
 local function AttachContainer_pine(inst)
-	inst.components.container_proxy:SetMaster(TheWorld:GetPocketDimensionContainer("cloudpine_l3"))
+	inst.components.container_proxy:SetMaster(TheWorld:GetPocketDimensionContainer("cloudpine_l2"))
 end
 
 table.insert(prefs, Prefab(

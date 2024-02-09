@@ -120,6 +120,9 @@ CreatePlacer("siving_soil_item", "farm_soil", "siving_soil", "till_idle", nil, n
 ----子圭·育
 CreatePlacer("siving_turn", "siving_turn", "siving_turn", "idle", nil, nil, nil, nil, nil, nil, Skined_build)
 
+----臃肿常青树嫩枝
+CreatePlacer("cutted_lumpyevergreen", "pinecone", "pinecone", "idle_planted2")
+
 ----异种
 local skinedplant = {
 	cactus_meat = true

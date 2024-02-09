@@ -329,6 +329,25 @@ local plantables = {
 			end)
         end
     },
+    cutted_lumpyevergreen = { --臃肿常青树嫩枝
+        animstate = { bank = "cutted_lumpyevergreen", build = "cutted_lumpyevergreen", anim = "idle" },
+        floater = {nil, "small", 0.2, 1.35},
+        stacksize = TUNING.STACK_SIZE_SMALLITEM,
+        fuelvalue = TUNING.SMALL_FUEL,
+        burnable = {
+            time = TUNING.SMALL_BURNTIME,
+            fxsize = "small",
+            lightedsize = "small"
+        },
+        deployable = {
+            prefab = "lumpy_sapling",
+            mode = DEPLOYMODE.PLANT, spacing = DEPLOYSPACING.LESS
+        },
+        fn_common = function(inst)
+            inst:AddTag("deployedplant")
+        end,
+        fn_server = nil
+    },
     ------
     --祈雨祭
     ------

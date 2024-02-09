@@ -654,8 +654,6 @@ local function MakeChest(data)
                 data.fn_common(inst)
             end
 
-            TOOLS_L.SetImmortalBox_common(inst)
-
             inst.entity:SetPristine()
             if not TheWorld.ismastersim then
                 return inst
@@ -698,7 +696,9 @@ local function MakeChest(data)
                 data.fn_server(inst)
             end
 
-            TOOLS_L.SetImmortalBox_server(inst)
+            if TUNING.FUNCTIONAL_MEDAL_IS_OPEN then
+                SetImmortalable(inst, 2, nil)
+            end
 
             return inst
         end,

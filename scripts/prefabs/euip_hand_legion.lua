@@ -1712,8 +1712,6 @@ local function Fn_carl()
         self.inst.AnimState:SetFloatParams(0.15, 1, self.bob_percent)
     end
 
-    TOOLS_L.SetImmortalBox_common(inst)
-
     inst.entity:SetPristine()
     if not TheWorld.ismastersim then
         inst.OnEntityReplicated = OnEntityReplicated_carl
@@ -1744,7 +1742,9 @@ local function Fn_carl()
 
     -- inst.components.skinedlegion:SetOnPreLoad()
 
-    TOOLS_L.SetImmortalBox_server(inst)
+    if TUNING.FUNCTIONAL_MEDAL_IS_OPEN then
+        SetImmortalable(inst, 2, nil)
+    end
 
     return inst
 end

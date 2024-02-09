@@ -9,19 +9,21 @@ local InventoryPrefabsList = {  --每个元素的下标值为每种物品栏图�
     petals_lily = 1,
     petals_orchid = 1,
     dug_rosebush = 1,
-    --10
     dug_lilybush = 1,
     dug_orchidbush = 1,
     cutted_rosebush = 1,
     cutted_orchidbush = 1,
     cutted_lilybush = 1,
-    -- portablecookpot_item = 1,
     hat_cowboy = 1,
-    desertdefense = 1,
     hat_lichen = 1,
     agronssword = 1,
     agronssword2 = 1,
-    --20
+    siving_suit = 1,
+    siving_suit_gold = 1,
+    ointment_l_fireproof = 1,
+    ointment_l_sivbloodreduce = 1,
+    cutted_lumpyevergreen = 1,
+    --24
 
     dish_chilledrosejuice = 2,
     dish_twistedrolllily = 2,
@@ -154,11 +156,6 @@ local InventoryPrefabsList = {  --每个元素的下标值为每种物品栏图�
     tissue_l_cactus = 6,
     tissue_l_lureplant = 6,
     tissue_l_berries = 6,
-
-    siving_suit = 6,
-    siving_suit_gold = 6,
-    ointment_l_fireproof = 6,
-    ointment_l_sivbloodreduce = 6,
 
     --skins1：56个
     hat_lichen_emo_que = 7,

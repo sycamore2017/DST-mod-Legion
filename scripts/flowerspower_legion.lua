@@ -194,7 +194,7 @@ AddStategraphActionHandler("wilson", ActionHandler(ACTIONS.INTOSHEATH_L, "doskip
 if IsServer then
     --------掉落物设定
     if CONFIGS_LEGION.FOLIAGEATHCHANCE > 0 then
-        --砍粗壮常青树有几率掉青枝绿叶
+        --砍臃肿常青树有几率掉青枝绿叶
         local trees = {
             "evergreen_sparse",
             "evergreen_sparse_normal",
@@ -221,7 +221,7 @@ if IsServer then
         end
         trees = nil
 
-        --粗壮常青树的树精有几率掉青枝绿叶
+        --臃肿常青树的树精有几率掉青枝绿叶
         AddPrefabPostInit("leif_sparse", function(inst)
             inst:ListenForEvent("death", function(inst, data)
                 if inst.components.lootdropper ~= nil then

@@ -126,7 +126,7 @@ MakeOintment({
         Asset("IMAGE", "images/inventoryimages/ointment_l_fireproof.tex")
     },
     prefabs = nil,
-    float = { nil, "small", 0.25, 0.8 }, noburnable = true,
+    float = { nil, "small", 0.25, 1 }, noburnable = true,
     -- fn_common = function(inst)end,
     fn_server = function(inst)
         inst.components.ointmentlegion.fn_check = FnCheck_fireproof
@@ -176,7 +176,7 @@ MakeOintment({
         Asset("IMAGE", "images/inventoryimages/ointment_l_sivbloodreduce.tex")
     },
     prefabs = nil,
-    float = { nil, "small", 0.25, 0.8 }, --noburnable = nil,
+    float = { nil, "small", 0.25, 1 }, --noburnable = nil,
     -- fn_common = function(inst)end,
     fn_server = function(inst)
         inst.components.ointmentlegion.fn_check = FnCheck_sivbloodreduce
