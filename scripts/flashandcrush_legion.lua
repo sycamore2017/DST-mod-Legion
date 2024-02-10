@@ -202,7 +202,7 @@ AddRecipe2(
     }, tech_recast[2], {
         nounlock = lock_recast,
         atlas = "images/inventoryimages/siving_suit_gold.xml", image = "siving_suit_gold.tex"
-    }, { "RECAST", "ARMOUR" }
+    }, { "RECAST", "ARMOUR", "CONTAINERS" }
 )
 AddRecipe2(
     "siving_ctlall_item", {
