@@ -9,7 +9,7 @@ local function OnLandedClient(self, ...)
         self.inst.AnimState:SetFloatParams(self.floatparam_l, 1, self.bob_percent)
     end
 end
-local function MakeFloatable(inst, float)
+local function SetFloatable(inst, float)
     if float ~= nil then
         MakeInventoryFloatable(inst, float[2], float[3], float[4])
         if float[1] ~= nil then
@@ -39,7 +39,7 @@ local function MakeOintment(data)
 
             -- inst:AddTag("DECOR")
 
-            MakeFloatable(inst, data.float)
+            SetFloatable(inst, data.float)
 
             if data.fn_common ~= nil then
                 data.fn_common(inst)

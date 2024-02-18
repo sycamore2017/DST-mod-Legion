@@ -46,7 +46,7 @@ configuration_options = L and {
     {name = "Title", label = "Special Settings", options = {{description = "", data = ""}}, default = ""},
     {   name = "Language",
         label = "Set Language",
-        hover = "Choose your language", --这个是鼠标指向选项时会显示更详细的信息
+        hover = "Set mod language.", --这个是鼠标指向选项时会显示更详细的信息
         options = {
             -- {description = "Auto", data = "auto"},
             {description = "English", data = "english"},

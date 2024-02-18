@@ -3346,7 +3346,9 @@ if IsServer then
         return data, refs
     end
     local function OnLoad_eater(self, data, ...)
-        self.lovemap_l = data.lovemap_l
+        if data ~= nil then
+            self.lovemap_l = data.lovemap_l
+        end
         if self.OnLoad_l_eaterlove ~= nil then
             self.OnLoad_l_eaterlove(self, data, ...)
         end
@@ -3534,7 +3536,7 @@ if IsServer then
         if self.OnLoad_l_fireproof ~= nil then
             self.OnLoad_l_fireproof(self, data, ...)
         end
-        if data.fireproof_l then
+        if data ~= nil and data.fireproof_l then
             self.fireproof_l = true
             TOOLS_L.AddTag(self.inst, "fireproof_l", "fireproof_base")
             -- self.canlight = false --官方用的多，直接改怕出问题，还是算了

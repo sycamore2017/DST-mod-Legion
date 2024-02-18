@@ -1,5 +1,5 @@
 --------------------------------------------------------------------------
---[[ Encoding Tips ]]--[[ 编码小贴士 ]]
+--[[ 编码小贴士 ]]
 --------------------------------------------------------------------------
 
 --[[ Follower组件讲解 Tip:
@@ -132,16 +132,12 @@
 ]]--
 
 --------------------------------------------------------------------------
---[[ Globals ]]--[[ 全局 ]]
+--[[ 全局 ]]
 --------------------------------------------------------------------------
 
 --下行代码只代表查值时自动查global，增加global的变量或者修改global的变量时还是需要带"GLOBAL."
 GLOBAL.setmetatable(env, { __index = function(t, k) return GLOBAL.rawget(GLOBAL, k) end })
 local _G = GLOBAL
-
---------------------------------------------------------------------------
---[[ Main ]]--[[ 主要 ]]
---------------------------------------------------------------------------
 
 PrefabFiles = {
     "bush_legion",              --棱镜灌木丛
@@ -223,7 +219,7 @@ Assets = {
     Asset("IMAGE", "images/inventoryimages/shield_l_log.tex"),
 }
 
---为了在菜谱和农谱里显示材料的图片，所以不管玩家设置，还是要注册一遍
+--为了在菜谱和农谱里显示材料的图片，需要注册全局的图片资源
 RegisterInventoryItemAtlas("images/inventoryimages/monstrain_leaf.xml", "monstrain_leaf.tex")
 RegisterInventoryItemAtlas("images/inventoryimages/shyerry.xml", "shyerry.tex")
 RegisterInventoryItemAtlas("images/inventoryimages/shyerry_cooked.xml", "shyerry_cooked.tex")
@@ -239,7 +235,7 @@ RegisterInventoryItemAtlas("images/inventoryimages/albicans_cap.xml", "albicans_
 local IsServer = TheNet:GetIsServer() or TheNet:IsDedicated()
 
 --------------------------------------------------------------------------
---[[ Test ]]--[[ test ]]
+--[[ test ]]
 --------------------------------------------------------------------------
 
 -- TheInput:AddKeyUpHandler(KEY_V, function()
@@ -247,7 +243,7 @@ local IsServer = TheNet:GetIsServer() or TheNet:IsDedicated()
 -- end)
 
 --------------------------------------------------------------------------
---[[ Options ]]--[[ 各项设置 ]]
+--[[ 各项设置 ]]
 --------------------------------------------------------------------------
 
 _G.CONFIGS_LEGION = {
@@ -315,26 +311,26 @@ else
 end
 
 --------------------------------------------------------------------------
---[[ hot reload ]]--[[ 热更新机制 ]]
+--[[ 热更新机制 ]]
 --------------------------------------------------------------------------
 
 -- modimport("scripts/hotreload_legion.lua")
 
 --------------------------------------------------------------------------
---[[ compatibility enhancement ]]--[[ 兼容性修改 ]]
+--[[ 兼容性修改 ]]
 --------------------------------------------------------------------------
 
 modimport("scripts/apublicsupporter.lua")
 modimport("scripts/containers_legion.lua")
 
 --------------------------------------------------------------------------
---[[ the power of flowers ]]--[[ 花香四溢 ]]
+--[[ 花香四溢 ]]
 --------------------------------------------------------------------------
 
 modimport("scripts/flowerspower_legion.lua")
 
 --------------------------------------------------------------------------
---[[ superb cuisine ]]--[[ 美味佳肴 ]]
+--[[ 美味佳肴 ]]
 --------------------------------------------------------------------------
 
 -- AddIngredientValues({"batwing"}, {meat=.5}, true, false) --蝙蝠翅膀，虽然可以晾晒，但是得到的不是蝙蝠翅膀干，而是小肉干，所以candry不能填true
@@ -481,7 +477,7 @@ cooking.IsCookingIngredient = function(prefabname, ...)
 end
 
 --------------------------------------------------------------------------
---[[ desert secret ]]--[[ 尘市蜃楼 ]]
+--[[ 尘市蜃楼 ]]
 --------------------------------------------------------------------------
 
 if CONFIGS_LEGION.DRESSUP then
@@ -491,19 +487,19 @@ end
 modimport("scripts/desertsecret_legion.lua")
 
 --------------------------------------------------------------------------
---[[ the sacrifice of rain ]]--[[ 祈雨祭 ]]
+--[[ 祈雨祭 ]]
 --------------------------------------------------------------------------
 
 modimport("scripts/prayforrain_legion.lua")
 
 --------------------------------------------------------------------------
---[[ legends of the fall ]]--[[ 丰饶传说 ]]
+--[[ 丰饶传说 ]]
 --------------------------------------------------------------------------
 
 modimport("scripts/legendoffall_legion.lua")
 
 --------------------------------------------------------------------------
---[[ flash and crush ]]--[[ 电闪雷鸣 ]]
+--[[ 电闪雷鸣 ]]
 --------------------------------------------------------------------------
 
 if _G.CONFIGS_LEGION.TECHUNLOCK == "prototyper" then
@@ -512,7 +508,7 @@ end
 modimport("scripts/flashandcrush_legion.lua")
 
 --------------------------------------------------------------------------
---[[ other ]]--[[ 其他补充 ]]
+--[[ 黯涌 ]]
 --------------------------------------------------------------------------
 
 _G.RegistMiniMapImage_legion("backcub")

@@ -1483,7 +1483,7 @@ S_______WALTER.DESCRIBE.REVOLVEDMOONLIGHT_ITEM = "Maybe I can use it to play Fri
 --[[ legends of the fall ]]--[[ 丰饶传说 ]]
 --------------------------------------------------------------------------
 
-S_NAMES.PINEANANAS = "Pineananas"    --松萝
+S_NAMES.PINEANANAS = "Pineananas" --松萝
 S______GENERIC.DESCRIBE.PINEANANAS = "Eating it raw may numb my mouth."
 -- S_______WILLOW.DESCRIBE.PINEANANAS = ""
 -- S_____WOLFGANG.DESCRIBE.PINEANANAS = ""
@@ -1501,7 +1501,7 @@ S______GENERIC.DESCRIBE.PINEANANAS = "Eating it raw may numb my mouth."
 -- S_________WURT.DESCRIBE.PINEANANAS = ""
 -- S_______WALTER.DESCRIBE.PINEANANAS = ""
 
-S_NAMES.PINEANANAS_COOKED = "Roasted Pineananas"    --烤松萝
+S_NAMES.PINEANANAS_COOKED = "Roasted Pineananas" --烤松萝
 S______GENERIC.DESCRIBE.PINEANANAS_COOKED = "It tastes much better after roasted."
 -- S_______WILLOW.DESCRIBE.PINEANANAS_COOKED = ""
 -- S_____WOLFGANG.DESCRIBE.PINEANANAS_COOKED = ""
@@ -1519,7 +1519,7 @@ S______GENERIC.DESCRIBE.PINEANANAS_COOKED = "It tastes much better after roasted
 -- S_________WURT.DESCRIBE.PINEANANAS_COOKED = ""
 -- S_______WALTER.DESCRIBE.PINEANANAS_COOKED = ""
 
-S_NAMES.PINEANANAS_SEEDS = "Chimeric Seeds"    --嵌合种子
+S_NAMES.PINEANANAS_SEEDS = "Chimeric Seeds" --嵌合种子
 S______GENERIC.DESCRIBE.PINEANANAS_SEEDS = "I'm not sure if it should be a pinecone or pineapple seed."
 -- S_______WILLOW.DESCRIBE.PINEANANAS_SEEDS = ""
 -- S_____WOLFGANG.DESCRIBE.PINEANANAS_SEEDS = ""
@@ -1537,7 +1537,7 @@ S______GENERIC.DESCRIBE.PINEANANAS_SEEDS = "I'm not sure if it should be a pinec
 -- S_________WURT.DESCRIBE.PINEANANAS_SEEDS = ""
 -- S_______WALTER.DESCRIBE.PINEANANAS_SEEDS = ""
 
-S_NAMES.PINEANANAS_OVERSIZED = "Giant Pineananas"
+S_NAMES.PINEANANAS_OVERSIZED = "Giant Pineananas" --巨型松萝
 S______GENERIC.DESCRIBE.PINEANANAS_OVERSIZED = "What a big orange pinecone!"
 -- S_______WILLOW.DESCRIBE.PINEANANAS_OVERSIZED = ""
 -- S_____WOLFGANG.DESCRIBE.PINEANANAS_OVERSIZED = ""
