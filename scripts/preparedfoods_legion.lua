@@ -1,18 +1,20 @@
-require("constants")
-local cookbookui_legion = require "widgets/cookbookui_legion"
+-- local cookbookui_legion = require "widgets/cookbookui_legion"
 local TOOLS_L = require("tools_legion")
+local priority_low = 61
+local priority_med = 91
+local priority_hig = 121
 
 ------
 
-local function OnIgniteFn(inst)
+local function OnIgniteFn_snail(inst)
     inst.SoundEmitter:PlaySound("dontstarve/common/blackpowder_fuse_LP", "hiss")
     DefaultBurnFn(inst)
 end
-local function OnExtinguishFn(inst)
+local function OnExtinguishFn_snail(inst)
     inst.SoundEmitter:KillSound("hiss")
     DefaultExtinguishFn(inst)
 end
-local function OnExplodeFn(inst)
+local function OnExplodeFn_snail(inst)
     inst.SoundEmitter:KillSound("hiss")
     SpawnPrefab("explode_small").Transform:SetPosition(inst.Transform:GetWorldPosition())
 end
@@ -20,45 +22,52 @@ end
 ------
 
 local foods_legion = {
-    dish_duriantartare = {
-        test = function(cooker, names, tags)
+    dish_duriantartare = { --怪味鞑靼
+        test = function(cooker, names, tags) --烹饪配方函数
             return (names.durian or names.durian_cooked) and tags.meat and (tags.monster and tags.monster > 2)
         end,
-        priority = 20,
-        foodtype = FOODTYPE.MEAT,
-        secondaryfoodtype = FOODTYPE.MONSTER,
-        health = 0,
-        hunger = 62.5,
-        sanity = 0,
-        perishtime = TUNING.PERISH_FAST, --6天
-        -- cookpot_perishtime = 0, --在烹饪锅上的新鲜度时间，能替换perishtime
-        cooktime = 0.5, --【Tip】基础时间20秒，最终用时= cooktime*20
-        potlevel = "low",
-        float = {nil, "small", 0.2, 1.05},
-        -- overridebuild = nil, --替换料理build，这样所有料理都可以共享一个build了
-        -- overridesymbolname = nil, --替换烹饪锅的料理贴图的symbol
-
-        cook_need = "(烤)榴莲 肉度 怪物度>2",
-        cook_cant = nil,
-        recipe_count = 4,
-
-        oneat_desc = STRINGS.UI.COOKBOOK.DISH_DURIANTARTARE,
-        oneatenfn = function(inst, eater)   --带怪物标签的生物吃下会回复额外属性
+        card_def = { ingredients = { {"durian",1}, {"monstermeat",2}, {"twigs",1} } }, --食谱卡的配方。为空时则无对应卡片产生
+        priority = priority_med, --烹饪优先级。在烹饪条件都满足时，选择优先级最高的为结果。如果都一样按 weight 权重随机得到结果
+        foodtype = FOODTYPE.MEAT, --食物类型
+        secondaryfoodtype = FOODTYPE.MONSTER, --第二食物类型
+        hunger = 62.5, sanity = 0, health = 0, --食用回复属性
+        perishtime = TUNING.PERISH_FAST, --新鲜度。为空时代表无新鲜度
+        -- temperature = TUNING.HOT_FOOD_BONUS_TEMP, --食用影响体温。大于0为升温，反之为降温。比较复杂最好借鉴官方数据
+		-- temperatureduration = TUNING.FOOD_TEMP_AVERAGE, --食用后影响体温的时间。比较复杂最好借鉴官方数据
+        -- cookpot_perishtime = 0, --在烹饪锅上的新鲜度时间，为空时则会使用 perishtime
+        cooktime = 0.5, --烹饪时间。最终用时= cooktime*20，单位秒
+        -- stacksize = 3, --一次烹饪出的料理数量。默认为1
+        potlevel = "low", --在烹饪锅上所用的通道类型。用来控制料理与锅的相对高度。"high"(高)、空值(中)、"low"(低)
+        float = { nil, "small", 0.2, 1.05 }, --(本mod专属)漂浮数据。底部切割比例、特效类型、特效高度、特效大小
+        -- prefabs = { "buff_xxx" }, --所需要引用的预制物名
+        -- tags = { "honeyed" }, --该料理额外添加的标签
+        -- wet_prefix = STRINGS.WET_PREFIX.WETGOOP, --用来替换潮湿时的前缀
+        -- fireproof = true, --(本mod专属)该料理是否防火
+        oneatenfn = function(inst, eater) --食用时会触发的特殊效果
             if eater:HasTag("monster") then
-                local Health = eater.components.health
-                local Sanity = eater.components.sanity
-
-                if Health ~= nil then
-                    Health:DoDelta(30, nil, inst.prefab) --加30血
+                if eater.components.health ~= nil then
+                    eater.components.health:DoDelta(30, nil, inst.prefab)
                 end
-
-                if Sanity ~= nil then
-                    Sanity:DoDelta(10)   --加10精神
+                if eater.components.sanity ~= nil then
+                    eater.components.sanity:DoDelta(10)
                 end
             end
         end,
+        -- fn_common = function(inst)end, --(本mod专属)预制物：服务器和客户端都会触发的函数
+        -- fn_server = function(inst)end, --(本mod专属)预制物：仅服务器会触发的函数
+        -- data_only = true, --(本mod专属)为true时，代表不用料理预制物逻辑，比如料理有特殊的功能，完全没有料理的基础功能等
+        -- notinitprefab = true, --兼容勋章的机制。此配方，不以勋章的通用方式生成调料后预制物
+
+        --以下参数为棱镜兼容所需。不写则不兼容
+        cook_need = "(烤)榴莲 肉度 怪物度>2", --中文语言的料理配方，所需描述
+        cook_cant = nil, --中文语言的料理配方，禁用描述
+        recipe_count = 4 --需要使用多少种配方搭配才能完全解锁料理配方的描述。最多6，最少1。有的配方不一定有6种，所以不要乱写
+
+        --以下参数，本mod不需要
+        -- floater = { "med", 0.05, 0.65 }, --官方所用的漂浮数据
+        -- OnPutInInventory = function(inst, owner)end, --放入物品栏时触发的函数。官方用来让玩家解锁一些无法食用料理的食谱数据
     },
-    dish_merrychristmassalad = {
+    dish_merrychristmassalad = { --圣诞快乐沙拉
         test = function(cooker, names, tags)
             return names.twiggy_nut and names.corn and names.carrot and (tags.veggie and tags.veggie >= 3)
                     and (
@@ -66,29 +75,15 @@ local foods_legion = {
                         CONFIGS_LEGION.FESTIVALRECIPES or IsSpecialEventActive(SPECIAL_EVENTS.WINTERS_FEAST) --冬季盛宴专属
                     )
         end,
-        priority = 20,
+        -- card_def = { ingredients = { {"twiggy_nut",1}, {"corn",1}, {"carrot",2} } },
+        priority = priority_med,
         foodtype = FOODTYPE.VEGGIE,
-        health = TUNING.HEALING_SMALL,  --3
-        hunger = 120,
-        sanity = TUNING.SANITY_TINY,    --5
-        perishtime = TUNING.PERISH_SUPERFAST,   --3天
+        hunger = 120, sanity = 5, health = 3,
+        perishtime = TUNING.PERISH_SUPERFAST, --3天
         cooktime = 1,
         potlevel = "low",
-        float = {nil, "small", 0.2, 1},
-
-        cook_need = "多枝树种 玉米 萝卜 菜度≥3",
-        cook_cant = "冬季盛宴专属",
-        recipe_count = 4,
-
-        -- prefabs = { "sanity_lower", "gift",
-        --             "flint", "moonrocknugget", "silk", "nitre", "gears", "ice", "twigs", "rocks", "goldnugget", "cutgrass", "cutreeds", "beefalowool",
-        --             "redgem", "bluegem", "greengem", "orangegem", "yellowgem", "opalpreciousgem",
-        --             "red_cap", "green_cap", "blue_cap", "spore_tall", "spore_medium", "spore_small",
-        --             "mole", "rabbit", "bee", "butterfly", "robin", "robin_winter", "canary", "oceanfish_medium_4_inv", "oceanfish_medium_6_inv", "fireflies",
-        --             "glommerfuel", "carrot_seeds", "corn_seeds", "twiggy_nut", "livinglog", "walrus_tusk", "honeycomb", "tentaclespots", "steelwool",
-        -- },
-        oneat_desc = STRINGS.UI.COOKBOOK.DISH_MERRYCHRISTMASSALAD,
-        oneatenfn = function(inst, eater)   --食用时，有33%几率获得一个小礼物
+        float = { nil, "small", 0.2, 1 },
+        oneatenfn = function(inst, eater) --食用时，有33%几率获得一个小礼物
             if math.random() < 0.33 then
                 local items = {
                     --基础材料
@@ -132,7 +127,6 @@ local foods_legion = {
 
                 --生成特效与礼物
                 local fx = SpawnPrefab("sanity_lower")
-
                 if TheWorld.Map:IsAboveGroundAtPoint(x, 0, z) then --只在有效地面上生成
                     fx.Transform:SetPosition(x, 0, z)
                     gift.Transform:SetPosition(x, 0, z)
@@ -142,8 +136,12 @@ local foods_legion = {
                 end
             end
         end,
+
+        cook_need = "多枝树种 玉米 萝卜 菜度≥3",
+        cook_cant = "冬季盛宴专属",
+        recipe_count = 4
     },
-    dish_sugarlesstrickmakercupcakes = {
+    dish_sugarlesstrickmakercupcakes = { --无糖捣蛋鬼纸杯蛋糕
         test = function(cooker, names, tags)
             return names.pumpkin and tags.egg and tags.magic and tags.monster and not tags.meat
                     and (
@@ -151,21 +149,15 @@ local foods_legion = {
                         CONFIGS_LEGION.FESTIVALRECIPES or IsSpecialEventActive(SPECIAL_EVENTS.HALLOWED_NIGHTS) --万圣节专属
                     )
         end,
-        priority = 20,
+        -- card_def = { ingredients = { {"pumpkin",1}, {"bird_egg",1}, {"nightmarefuel",1}, {"monstrain_leaf",1} } },
+        priority = priority_med,
         foodtype = FOODTYPE.VEGGIE,
-        health = 0,
-        hunger = TUNING.CALORIES_SMALL*5, --62.5
-        sanity = TUNING.SANITY_MEDLARGE,    --20
-        perishtime = TUNING.PERISH_PRESERVED,   --20天
+        hunger = 62.5, sanity = 20, health = 0,
+        perishtime = TUNING.PERISH_PRESERVED, --20天
         cooktime = 2.5,
-        float = {nil, "small", 0.08, 1},
-
-        cook_need = "南瓜 蛋度 魔法度 怪物度",
-        cook_cant = "肉度 疯狂万圣专属",
-        recipe_count = 4,
-
+        -- potlevel = nil,
+        float = { nil, "small", 0.08, 1 },
         prefabs = { "debuff_panicvolcano" },
-        oneat_desc = STRINGS.UI.COOKBOOK.DISH_SUGARLESSTRICKMAKERCUPCAKES,
         oneatenfn = function(inst, eater) --食用时，吸收周围没有携带糖的玩家的精神值加给自己，否则就偷走糖
             if eater.components.inventory == nil then
                 return
@@ -202,12 +194,16 @@ local foods_legion = {
                     end
                 end
             end
-            if eater.components.sanity ~= nil and sanitycount > 0 then
+            if sanitycount > 0 and eater.components.sanity ~= nil then
                 eater.components.sanity:DoDelta(25 * sanitycount)
             end
         end,
+
+        cook_need = "南瓜 蛋度 魔法度 怪物度",
+        cook_cant = "肉度 疯狂万圣专属",
+        recipe_count = 4
     },
-    dish_flowermooncake = {
+    dish_flowermooncake = { --鲜花月饼
         test = function(cooker, names, tags)
             return
                 (tags.petals_legion or 0) >= 3
@@ -218,21 +214,15 @@ local foods_legion = {
                     and TheWorld.state.moonphase == "full" and TheWorld.state.isautumn
                 )
         end,
-        priority = 20,
+        -- card_def = { ingredients = { {"petals_rose",4} } },
+        priority = priority_med,
         foodtype = FOODTYPE.GOODIES,
-        health = 15,
-        hunger = TUNING.CALORIES_MED,   --25
-        sanity = 15,
-        perishtime = TUNING.PERISH_PRESERVED*3,   --60天
+        hunger = 25, sanity = 15, health = 15,
+        perishtime = TUNING.PERISH_PRESERVED * 3, --60天
         cooktime = 2,
-        float = {nil, "small", 0.08, 1},
-
-        cook_need = "花类食材≥3 菜度≥2",
-        cook_cant = "怪物度 秋季月圆天专属",
-        recipe_count = 6,
-
-        oneat_desc = STRINGS.UI.COOKBOOK.DISH_FLOWERMOONCAKE,
-        oneatenfn = function(inst, eater)   --食用时，周围队友越多，回复量越多
+        -- potlevel = nil,
+        float = { nil, "small", 0.08, 1 },
+        oneatenfn = function(inst, eater) --食用时，周围队友越多，回复量越多
             local nummiss = 0
             local numlove = 0
 
@@ -322,9 +312,13 @@ local foods_legion = {
                     eater.components.talker:Say(GetString(eater, "DESCRIBE", { "DISH_FLOWERMOONCAKE", "LONELY" }))
                 end
             end
-        end
+        end,
+
+        cook_need = "花度≥3 菜度≥2",
+        cook_cant = "怪物度 秋季月圆天专属",
+        recipe_count = 6
     },
-    dish_farewellcupcake = {
+    dish_farewellcupcake = { --临别的纸杯蛋糕
         test = function(cooker, names, tags)
             return (names.red_cap or names.red_cap_cooked) and tags.monster and tags.decoration
                 and ( --新月那天才能做出来
@@ -333,201 +327,175 @@ local foods_legion = {
                     and TheWorld.state.moonphase == "new"
                 )
         end,
-        priority = 20,
+        -- card_def = { ingredients = { {"red_cap",1}, {"monstermeat",1}, {"butterflywings",1}, {"twigs",1} } },
+        priority = priority_med,
         foodtype = FOODTYPE.VEGGIE,
-        health = 0,
-        hunger = 37.5,
-        sanity = 72,
+        hunger = 37.5, sanity = 72, health = 0,
         perishtime = TUNING.PERISH_PRESERVED, --20天
         cooktime = 1,
         potlevel = "low",
-        float = {nil, "small", 0.12, 0.7},
-
-        cook_need = "(烤)红蘑菇 怪物度 装饰度",
-        cook_cant = "新月天专属",
-        recipe_count = 6,
-
-        oneat_desc = STRINGS.UI.COOKBOOK.DISH_FAREWELLCUPCAKE,
+        float = { nil, "small", 0.12, 0.7 },
         oneatenfn = function(inst, eater) --食用者受到1000点的攻击伤害
             if eater.components.combat ~= nil then
                 local damage = 1000
-
                 --如果是一次性吃完类型的对象，伤害应该是整组算的
                 if eater.components.eater and eater.components.eater.eatwholestack then
                     damage = damage * inst.components.stackable:StackSize()
                 end
-
                 eater.components.combat:GetAttacked(inst, damage)
             end
-        end
+        end,
+
+        cook_need = "(烤)红蘑菇 怪物度 装饰度",
+        cook_cant = "新月天专属",
+        recipe_count = 6
     },
-    dish_braisedmeatwithfoliages = {
+    dish_braisedmeatwithfoliages = { --蕨叶扣肉
         test = function(cooker, names, tags)
             return (names.foliage and names.foliage >= 2) and (tags.meat and tags.meat >= 1)
                 and not tags.inedible and not tags.sweetener
         end,
-        priority = 56, --和【永不妥协】里的 simpsalad(优先级20、权重20) 冲突，这里调高优先级
+        card_def = { ingredients = { {"monstermeat",1}, {"foliage",3} } },
+        priority = priority_med, --和【永不妥协】里的 simpsalad(优先级20、权重20) 冲突，这里调高优先级
         foodtype = FOODTYPE.MEAT,
-        health = 10,
-        hunger = 62.5,
-        sanity = 8,
+        hunger = 62.5, sanity = 8, health = 10,
         perishtime = TUNING.PERISH_MED, --10天
         cooktime = 1,
         potlevel = "low",
-        float = {0.02, "small", 0.2, 1.1},
+        float = { 0.02, "small", 0.2, 1.1 },
 
         cook_need = "蕨叶≥2 肉度≥1",
         cook_cant = "非食 甜度",
-        recipe_count = 6,
+        recipe_count = 6
     },
-    dish_fleshnapoleon = {
+    dish_fleshnapoleon = { --真果拿破仑
         test = function(cooker, names, tags)
             return ((names.wormlight_lesser and names.wormlight_lesser > 1) or names.wormlight)
                 and not tags.meat and not tags.inedible and not tags.frozen
         end,
-        priority = 20,
+        card_def = { ingredients = { {"wormlight_lesser",2}, {"cutlichen",2} } },
+        priority = priority_med,
         foodtype = FOODTYPE.GOODIES,
-        health = 12,
-        hunger = 25,
-        sanity = 10,
+        hunger = 25, sanity = 10, health = 12,
         perishtime = TUNING.PERISH_SLOW, --15天
         cooktime = 2.5,
         potlevel = "low",
-        float = {nil, "small", 0.2, 0.9},
-
-        cook_need = "发光浆果/小发光浆果>1",
-        cook_cant = "肉度 非食 冰度",
-        recipe_count = 6,
-
+        float = { nil, "small", 0.2, 0.9 },
         prefabs = { "buff_radiantskin" },
-        oneat_desc = STRINGS.UI.COOKBOOK.DISH_FLESHNAPOLEON,
         oneatenfn = function(inst, eater)
             eater.time_l_radiantskin = { add = TUNING.SEG_TIME*16, max = TUNING.SEG_TIME*30 }
             eater:AddDebuff("buff_radiantskin", "buff_radiantskin")
-        end
-    },
-    dish_beggingmeat = {
-        test = function(cooker, names, tags)
-            return names.ash and tags.meat and (not tags.monster or tags.monster <= 1) and not tags.sweetener and not tags.frozen
         end,
-        priority = 20,
+
+        cook_need = "发光浆果/小发光浆果>1",
+        cook_cant = "肉度 非食 冰度",
+        recipe_count = 6
+    },
+    dish_beggingmeat = { --叫花焖肉
+        test = function(cooker, names, tags)
+            return names.ash and tags.meat and
+                (not tags.monster or tags.monster <= 1) and not tags.sweetener and not tags.frozen
+        end,
+        card_def = { ingredients = { {"ash",1}, {"smallmeat",1}, {"twigs",2} } },
+        priority = priority_med,
         foodtype = FOODTYPE.MEAT,
-        health = 0,
-        hunger = 37.5,
-        sanity = 5,
+        hunger = 37.5, sanity = 5, health = 0,
         perishtime = TUNING.PERISH_FAST, --6天
         cooktime = 0.75,
         potlevel = "low",
-        float = {nil, "small", 0.2, 1},
-
-        cook_need = "肉度 灰烬",
-        cook_cant = "怪物度≤1 甜度 冰度",
-        recipe_count = 6,
-
-        oneat_desc = STRINGS.UI.COOKBOOK.DISH_BEGGINGMEAT,
-        oneatenfn = function(inst, eater)   --角色低饱食吃下去时会有额外回复属性
+        float = { nil, "small", 0.2, 1 },
+        oneatenfn = function(inst, eater) --角色低饱食吃下去时会有额外回复属性
             if eater:HasTag("player") then
-                local Health = eater.components.health
-                local Hunger = eater.components.hunger
-                local Sanity = eater.components.sanity
-
-                if Hunger ~= nil and (Hunger.current - 37.5)/Hunger.max <= 0.06 then    --吃之前低饱食的话，增加回复属性
-                    Hunger:DoDelta(25)  --加25饱食
-
-                    if Health ~= nil then
-                        Health:DoDelta(3, nil, inst.prefab) --加3血
+                local hunger = eater.components.hunger
+                if hunger ~= nil and (hunger.current - 37.5)/hunger.max <= 0.06 then --吃之前低饱食的话，增加回复属性
+                    hunger:DoDelta(25)
+                    if eater.components.health ~= nil then
+                        eater.components.health:DoDelta(3, nil, inst.prefab)
                     end
-
-                    if Sanity ~= nil then
-                        Sanity:DoDelta(5)   --加5精神
+                    if eater.components.sanity ~= nil then
+                        eater.components.sanity:DoDelta(5)
                     end
                 end
             end
         end,
+
+        cook_need = "肉度 灰烬",
+        cook_cant = "怪物度≤1 甜度 冰度",
+        recipe_count = 6
     },
-    dish_frenchsnailsbaked = {
+    dish_frenchsnailsbaked = { --法式焗蜗牛
         test = function(cooker, names, tags)
             return names.slurtleslime and names.cutlichen and tags.meat and (not tags.monster or tags.monster <= 1)
         end,
-        priority = 20,
+        card_def = { ingredients = { {"slurtleslime",1}, {"cutlichen",1}, {"smallmeat",1}, {"twigs",1} } },
+        priority = priority_med,
         foodtype = FOODTYPE.MEAT,
-        health = 30,
-        hunger = 37.5,
-        sanity = 33,
+        hunger = 37.5, sanity = 33, health = 30,
         perishtime = TUNING.PERISH_SUPERFAST, --3天
         cooktime = 0.5,
-        tags = {"explosive"},
+        -- potlevel = nil,
+        float = { nil, "small", 0.2, 1.05 },
         prefabs = { "explode_small" },
-        float = {nil, "small", 0.2, 1.05},
-
-        cook_need = "蛞蝓龟黏液 苔藓 肉度",
-        cook_cant = "怪物度≤1",
-        recipe_count = 6,
-
+        fireproof = true,
         oneat_desc = STRINGS.UI.COOKBOOK.DISH_FRENCHSNAILSBAKED,
-
-        noburnable = true,
         fn_common = function(inst)
             inst.entity:AddSoundEmitter()
+            inst:AddTag("explosive")
         end,
         fn_server = function(inst)
-            MakeSmallBurnable(inst, 3 + math.random() * 3)  --延时着火
+            MakeSmallBurnable(inst, 3 + math.random() * 3) --延时着火
             inst.components.burnable:SetOnBurntFn(nil)
-            inst.components.burnable:SetOnIgniteFn(OnIgniteFn)
-            inst.components.burnable:SetOnExtinguishFn(OnExtinguishFn)
+            inst.components.burnable:SetOnIgniteFn(OnIgniteFn_snail)
+            inst.components.burnable:SetOnExtinguishFn(OnExtinguishFn_snail)
 
             inst:AddComponent("explosive")
-            inst.components.explosive:SetOnExplodeFn(OnExplodeFn)
+            inst.components.explosive:SetOnExplodeFn(OnExplodeFn_snail)
             inst.components.explosive.explosivedamage = TUNING.SLURTLESLIME_EXPLODE_DAMAGE
             inst.components.explosive.buildingdamage = 1
             inst.components.explosive.lightonexplode = false
-        end
-    },
-    dish_neworleanswings = {
-        test = function(cooker, names, tags)
-            return (names.batwing or names.batwing_cooked) and (tags.meat and tags.meat >= 2) and (not tags.monster or tags.monster <= 2)
         end,
-        priority = 20,
+
+        cook_need = "蛞蝓龟黏液 苔藓 肉度",
+        cook_cant = "怪物度≤1",
+        recipe_count = 6
+    },
+    dish_neworleanswings = { --新奥尔良烤翅
+        test = function(cooker, names, tags)
+            return (names.batwing or names.batwing_cooked) and (tags.meat and tags.meat >= 2) and
+                (not tags.monster or tags.monster <= 2)
+        end,
+        card_def = { ingredients = { {"batwing",1}, {"monstermeat",2}, {"twigs",1} } },
+        priority = priority_med,
         foodtype = FOODTYPE.MEAT,
-        health = 3,
-        hunger = 120,
-        sanity = 5,
+        hunger = 120, sanity = 5, health = 3,
         perishtime = TUNING.PERISH_MED, --10天
         cooktime = 2,
-        float = {nil, "small", 0.2, 1.05},
-
-        cook_need = "(烤)蝙蝠翅膀 肉度≥2",
-        cook_cant = "怪物度≤2",
-        recipe_count = 6,
-
+        -- potlevel = nil,
+        float = { nil, "small", 0.2, 1.05 },
         prefabs = { "buff_batdisguise" },
-        oneat_desc = STRINGS.UI.COOKBOOK.DISH_NEWORLEANSWINGS,
         oneatenfn = function(inst, eater)
             eater.time_l_batdisguise = { replace_min = TUNING.SEG_TIME*8 }
             eater:AddDebuff("buff_batdisguise", "buff_batdisguise")
-        end
-    },
-    dish_fishjoyramen = {
-        test = function(cooker, names, tags)
-            return (names.plantmeat or names.plantmeat_cooked) and tags.fish and (not tags.monster or tags.monster <= 1)
-                and not tags.inedible and not tags.sweetener
         end,
-        priority = 20,
+
+        cook_need = "(烤)蝙蝠翅膀 肉度≥2",
+        cook_cant = "怪物度≤2",
+        recipe_count = 6
+    },
+    dish_fishjoyramen = { --鱼乐拉面
+        test = function(cooker, names, tags)
+            return (names.plantmeat or names.plantmeat_cooked) and tags.fish and
+                (not tags.monster or tags.monster <= 1) and not tags.inedible and not tags.sweetener
+        end,
+        card_def = { ingredients = { {"plantmeat",1}, {"fishmeat_small",1}, {"berries",2} } },
+        priority = priority_med,
         foodtype = FOODTYPE.MEAT,
-        health = 3,
-        hunger = 62.5,
-        sanity = 15,
+        hunger = 62.5, sanity = 15, health = 3,
         perishtime = TUNING.PERISH_MED, --10天
         cooktime = 0.5,
         potlevel = "low",
-        float = {nil, "small", 0.2, 1},
-
-        cook_need = "(烤)叶肉 鱼度",
-        cook_cant = "怪物度≤1 非食 甜度",
-        recipe_count = 6,
-
+        float = { nil, "small", 0.2, 1 },
         prefabs = { "sand_puff" },
-        oneat_desc = STRINGS.UI.COOKBOOK.DISH_FISHJOYRAMEN,
         oneatenfn = function(inst, eater) --玩家食用后拾取周围一组物品
             if eater == nil or eater.components.inventory == nil then
                 return
@@ -554,68 +522,64 @@ local foods_legion = {
             if not didpickup then
                 eater.components.inventory:GiveItem(item, nil, item:GetPosition())
             end
-        end
-    },
-    dish_roastedmarshmallows = {
-        test = function(cooker, names, tags)
-            return names.glommerfuel and tags.sweetener and names.twigs and not tags.meat and not tags.frozen and not tags.egg
         end,
-        priority = 20,
+
+        cook_need = "(烤)叶肉 鱼度",
+        cook_cant = "怪物度≤1 非食 甜度",
+        recipe_count = 6
+    },
+    dish_roastedmarshmallows = { --烤棉花糖
+        test = function(cooker, names, tags)
+            return names.glommerfuel and tags.sweetener and names.twigs and
+                not tags.meat and not tags.frozen and not tags.egg
+        end,
+        card_def = { ingredients = { {"glommerfuel",1}, {"honey",1}, {"twigs",2} } },
+        priority = priority_med,
         foodtype = FOODTYPE.VEGGIE,
-        health = 60,
-        hunger = 18.75,
-        sanity = 5,
-        perishtime = TUNING.PERISH_MED*3,   --30天
+        hunger = 18.75, sanity = 5, health = 60,
+        perishtime = TUNING.PERISH_MED * 3, --30天
         cooktime = 0.5,
-        tags = { "honeyed" },
         potlevel = "low",
-        float = {nil, "small", 0.2, 0.7},
+        float = { nil, "small", 0.2, 0.7 },
+        tags = { "honeyed" },
 
         cook_need = "格罗姆黏液 甜度 树枝",
         cook_cant = "肉度 冰度 蛋度",
-        recipe_count = 6,
+        recipe_count = 6
     },
-    dish_pomegranatejelly = {
+    dish_pomegranatejelly = { --石榴子果冻
         test = function(cooker, names, tags)
             return (names.pomegranate or names.pomegranate_cooked) and
                 (tags.gel or names.slurtleslime or names.glommerfuel or names.phlegm) and
                 not tags.veggie and not tags.meat and not tags.egg
         end,
-        priority = 25,
+        card_def = { ingredients = { {"pomegranate",1}, {"phlegm",1}, {"twigs",2} } },
+        priority = priority_med,
         foodtype = FOODTYPE.VEGGIE,
-        health = 3,
-        hunger = 37.5,
-        sanity = 50,
-        perishtime = TUNING.PERISH_SLOW,   --15天
+        hunger = 37.5, sanity = 50, health = 3,
+        perishtime = TUNING.PERISH_SLOW, --15天
         cooktime = 3,
         potlevel = "low",
-        float = {nil, "small", 0.2, 1.05},
+        float = { nil, "small", 0.2, 1.05 },
 
         cook_need = "(烤)石榴 黏液度",
         cook_cant = "菜度 肉度 蛋度",
-        recipe_count = 6,
+        recipe_count = 6
     },
-    dish_medicinalliquor = {
+    dish_medicinalliquor = { --药酒
         test = function(cooker, names, tags)
             return names.furtuft and tags.frozen and not tags.meat and not tags.sweetener
                 and not tags.egg and (tags.inedible and tags.inedible <= 1)
         end,
-        priority = 20,
+        card_def = { ingredients = { {"furtuft",1}, {"ice",3} } },
+        priority = priority_med,
         foodtype = FOODTYPE.GOODIES,
-        health = 8,
-        hunger = 9.375,
-        sanity = 10,
-        perishtime = nil,   --不会腐烂
+        hunger = 9.375, sanity = 10, health = 8,
+        -- perishtime = nil, --不会腐烂
         cooktime = 3,
         potlevel = "low",
-        float = {nil, "small", 0.2, 0.85},
-
-        cook_need = "毛丛 冰度",
-        cook_cant = "肉度 甜度 蛋度 非食≤1",
-        recipe_count = 6,
-
+        float = { nil, "small", 0.2, 0.85 },
         prefabs = { "buff_strengthenhancer" },
-        oneat_desc = STRINGS.UI.COOKBOOK.DISH_MEDICINALLIQUOR,
         oneatenfn = function(inst, eater)
             --加强攻击力
             if eater.components.combat ~= nil then --这个buff需要攻击组件
@@ -661,116 +625,100 @@ local foods_legion = {
             else
                 eater:PushEvent("knockedout")
             end
-        end
+        end,
+
+        cook_need = "毛丛 冰度",
+        cook_cant = "肉度 甜度 蛋度 非食≤1",
+        recipe_count = 6
     },
-    dish_bananamousse = {
+    dish_bananamousse = { --香蕉慕斯
         test = function(cooker, names, tags)
             return (names.cave_banana or names.cave_banana_cooked) and (tags.fruit and tags.fruit > 1) and tags.egg
                 and not tags.meat and not tags.inedible and not tags.monster
         end,
-        priority = 20,
+        card_def = { ingredients = { {"cave_banana",1}, {"berries",2}, {"bird_egg",1} } },
+        priority = priority_med,
         foodtype = FOODTYPE.GOODIES,
-        health = 8,
-        hunger = 9.375,
-        sanity = 5,
-        perishtime = TUNING.PERISH_MED,   --10天
+        hunger = 9.375, sanity = 5, health = 8,
+        perishtime = TUNING.PERISH_MED, --10天
         cooktime = 0.75,
         stacksize = 2,
         potlevel = "low",
-        float = {nil, "small", 0.2, 0.9},
-
-        cook_need = "(烤)香蕉 果度>1 蛋度",
-        cook_cant = "肉度 非食 怪物度",
-        recipe_count = 6,
-
+        float = { nil, "small", 0.2, 0.9 },
         prefabs = { "buff_bestappetite" },
-        oneat_desc = STRINGS.UI.COOKBOOK.DISH_BANANAMOUSSE,
         oneatenfn = function(inst, eater)
             eater.time_l_bestappetite = { replace_min = TUNING.SEG_TIME*2 }
             eater:AddDebuff("buff_bestappetite", "buff_bestappetite")
-        end
+        end,
+
+        cook_need = "(烤)香蕉 果度>1 蛋度",
+        cook_cant = "肉度 非食 怪物度",
+        recipe_count = 6
     },
-    dish_friedfishwithpuree = {
+    dish_friedfishwithpuree = { --果泥香煎鱼
         test = function(cooker, names, tags)
             return names.fig and (names.oceanfish_small_3_inv or names.oceanfish_medium_9_inv)
                 and not names.twigs
         end,
+        card_def = { ingredients = { {"oceanfish_medium_9_inv",1}, {"fig",1}, {"butterflywings",2} } },
         priority = 666,
         foodtype = FOODTYPE.MEAT,
         secondaryfoodtype = FOODTYPE.ROUGHAGE,
-        health = 6,
-        hunger = 66,
-        sanity = 6,
-        perishtime = TUNING.PERISH_SUPERFAST,   --3天
+        hunger = 66, sanity = 6, health = 6,
+        perishtime = TUNING.PERISH_SUPERFAST, --3天
         cooktime = 0.75,
-        potlevel = nil,
-        float = {0.02, "small", 0.2, 1.1},
-
-        cook_need = "无花果 小饵鱼/甜味鱼",
-        cook_cant = "树枝",
-        recipe_count = 6,
-
+        -- potlevel = nil,
+        float = { 0.02, "small", 0.2, 1.1 },
         prefabs = { "buff_oilflow" },
-        oneat_desc = STRINGS.UI.COOKBOOK.DISH_FRIEDFISHWITHPUREE,
         oneatenfn = function(inst, eater)
             eater.time_l_oilflow = { add = TUNING.SEG_TIME*3, max = TUNING.SEG_TIME*30 }
             eater:AddDebuff("buff_oilflow", "buff_oilflow")
-        end
-    },
-    dish_lovingrosecake = {
-        test = function(cooker, names, tags)
-            return names.petals_rose and names.reviver
-                and not tags.monster
         end,
-        priority = 56,
+
+        cook_need = "无花果 小饵鱼/甜味鱼",
+        cook_cant = "树枝",
+        recipe_count = 6
+    },
+    dish_lovingrosecake = { --倾心玫瑰酥
+        test = function(cooker, names, tags)
+            return names.petals_rose and names.reviver and not tags.monster
+        end,
+        card_def = { ingredients = { {"reviver",1}, {"petals_rose",1}, {"twigs",2} } },
+        priority = priority_med,
         foodtype = FOODTYPE.GOODIES,
         secondaryfoodtype = FOODTYPE.ROUGHAGE,
-        health = 20,
-        hunger = 13,
-        sanity = 14,
+        hunger = 13, sanity = 14, health = 20,
         perishtime = 10000*TUNING.TOTAL_DAY_TIME,
         cooktime = 1,
-        potlevel = nil,
-        float = {nil, "small", 0.12, 1},
+        -- potlevel = nil,
+        float = { nil, "small", 0.12, 1 },
+        oneat_desc = STRINGS.UI.COOKBOOK.DISH_LOVINGROSECAKE,
+        fn_common = function(inst)
+            inst.lovepoint_l = 1
+        end,
 
         cook_need = "蔷薇花瓣 告密的心",
         cook_cant = "怪物度",
-        recipe_count = 6,
-
-        oneat_desc = STRINGS.UI.COOKBOOK.DISH_LOVINGROSECAKE,
-
-        fn_common = function(inst)
-            inst.lovepoint_l = 1
-        end
+        recipe_count = 6
     },
-    ------
-    --花香四溢
-    ------
-    dish_chilledrosejuice = {
+    ------花香四溢
+    dish_chilledrosejuice = { --蔷薇冰果汁
         test = function(cooker, names, tags)
             return (names.petals_rose and names.petals_rose > 1) and tags.frozen and (tags.fruit and tags.fruit >= 1)
                 and not tags.meat and not tags.monster
         end,
-        priority = 20,
+        card_def = { ingredients = { {"petals_rose",2}, {"ice",1}, {"pineananas",1} } },
+        priority = priority_med,
         foodtype = FOODTYPE.VEGGIE,
-        health = 45,
-        hunger = 12.5,
-        sanity = 25,
-        perishtime = TUNING.PERISH_SUPERFAST,   --3天
-        cooktime = .5,
-        potlevel = "low",
-        float = {nil, "small", 0.2, 0.7},
-
+        hunger = 12.5, sanity = 25, health = 45,
+        perishtime = TUNING.PERISH_SUPERFAST, --3天
         temperature = TUNING.COLD_FOOD_BONUS_TEMP,
         temperatureduration = TUNING.FOOD_TEMP_AVERAGE,
-
-        cook_need = "蔷薇花瓣>1 冰度 果度≥1",
-        cook_cant = "肉度 怪物度",
-        recipe_count = 4,
-
+        cooktime = 0.5,
+        potlevel = "low",
+        float = { nil, "small", 0.2, 0.7 },
         prefabs = { "flower_rose", "flower" },
-        oneat_desc = STRINGS.UI.COOKBOOK.DISH_CHILLEDROSEJUICE,
-        oneatenfn = function(inst, eater)   --食用产生花朵
+        oneatenfn = function(inst, eater) --食用后产生花朵
             local pos = eater:GetPosition()
             local flower = nil
             local ran = math.random()
@@ -780,34 +728,31 @@ local foods_legion = {
             elseif ran <= 0.33 then
                 flower = SpawnPrefab("flower")
             end
-
             if flower ~= nil and pos ~= nil then
                 flower.Transform:SetPosition(pos:Get())
                 flower.planted = true
             end
         end,
+
+        cook_need = "蔷薇花瓣>1 冰度 果度≥1",
+        cook_cant = "肉度 怪物度",
+        recipe_count = 4
     },
-    dish_twistedrolllily = {
+    dish_twistedrolllily = { --蹄莲花卷
         test = function(cooker, names, tags)
-            return (names.petals_lily and names.petals_lily > 1) and (tags.meat and tags.meat >= 1) and (tags.veggie and tags.veggie >= 2)
+            return (names.petals_lily and names.petals_lily > 1) and (tags.meat and tags.meat >= 1) and
+                (tags.veggie and tags.veggie >= 2)
         end,
-        priority = 20,
+        card_def = { ingredients = { {"petals_lily",2}, {"monstermeat",1}, {"corn",1} } },
+        priority = priority_med,
         foodtype = FOODTYPE.MEAT,
-        health = -3,
-        hunger = 62.5,
-        sanity = 35,
+        hunger = 62.5, sanity = 35, health = -3,
         perishtime = TUNING.PERISH_MED, --10天
         cooktime = 1,
         potlevel = "low",
-        float = {nil, "small", 0.2, 1.05},
-
-        cook_need = "蹄莲花瓣>1 肉度≥1 菜度≥2",
-        cook_cant = nil,
-        recipe_count = 6,
-
+        float = { nil, "small", 0.2, 1.05 },
         prefabs = { "butterfly", "moonbutterfly" },
-        oneat_desc = STRINGS.UI.COOKBOOK.DISH_TWISTEDROLLLILY,
-        oneatenfn = function(inst, eater)   --食用产生蝴蝶
+        oneatenfn = function(inst, eater) --食用产生蝴蝶
             local pos = eater:GetPosition()
             local fly = nil
             local ran = math.random()
@@ -817,34 +762,30 @@ local foods_legion = {
             elseif ran <= 0.5 then
                 fly = SpawnPrefab("butterfly")
             end
-
             if fly ~= nil and pos ~= nil then
                 fly.Transform:SetPosition(pos:Get())
                 fly.sg:GoToState("idle")
             end
         end,
+
+        cook_need = "蹄莲花瓣>1 肉度≥1 菜度≥2",
+        cook_cant = nil,
+        recipe_count = 6
     },
-    dish_orchidcake = {
+    dish_orchidcake = { --兰花糕
         test = function(cooker, names, tags)
-            return (names.petals_orchid and names.petals_orchid > 1) and (tags.veggie and tags.veggie >= 1.5) and tags.fruit
-                and not tags.meat and not tags.monster
+            return (names.petals_orchid and names.petals_orchid > 1) and (tags.veggie and tags.veggie >= 1.5) and
+                tags.fruit and not tags.meat and not tags.monster
         end,
-        priority = 20,
+        card_def = { ingredients = { {"petals_orchid",2}, {"red_cap",1}, {"berries",1} } },
+        priority = priority_med,
         foodtype = FOODTYPE.VEGGIE,
-        health = 10,
-        hunger = 75,
-        sanity = 0,
-        perishtime = TUNING.PERISH_PRESERVED,   --20天
+        hunger = 75, sanity = 0, health = 10,
+        perishtime = TUNING.PERISH_PRESERVED, --20天
         cooktime = 2,
         potlevel = "low",
-        float = {nil, "small", 0.2, 1.05},
-
-        cook_need = "兰草花瓣>1 菜度≥1.5 果度",
-        cook_cant = "肉度 怪物度",
-        recipe_count = 6,
-
-        oneat_desc = STRINGS.UI.COOKBOOK.DISH_ORCHIDCAKE,
-        oneatenfn = function(inst, eater)   --食用改变玩家体温
+        float = { nil, "small", 0.2, 1.05 },
+        oneatenfn = function(inst, eater) --食用改变玩家体温
             if eater.components.temperature ~= nil then
                 local current = eater.components.temperature:GetCurrent()
                 if current == nil then return end
@@ -858,30 +799,25 @@ local foods_legion = {
                 end
             end
         end,
+
+        cook_need = "兰草花瓣>1 菜度≥1.5 果度",
+        cook_cant = "肉度 怪物度",
+        recipe_count = 6
     },
-    ------
-    --祈雨祭
-    ------
-    dish_ricedumpling = {
+    ------祈雨祭
+    dish_ricedumpling = { --金黄香粽
         test = function(cooker, names, tags)
             return names.monstrain_leaf and (tags.veggie and tags.veggie >= 2.5) and tags.egg and not tags.meat
         end,
-        priority = 56, --和【永不妥协】里的 um_deviled_eggs(优先级52) 冲突，这里调高优先级
+        card_def = { ingredients = { {"monstrain_leaf",1}, {"corn",2}, {"bird_egg",1} } },
+        priority = priority_med, --和【永不妥协】里的 um_deviled_eggs(优先级52) 冲突，这里调高优先级
         foodtype = FOODTYPE.VEGGIE,
-        health = 3,
-        hunger = 62.5,
-        sanity = 5,
-        perishtime = TUNING.PERISH_SLOW,   --15天
+        hunger = 62.5, sanity = 5, health = 3,
+        perishtime = TUNING.PERISH_SLOW, --15天
         cooktime = 2.5,
         potlevel = "low",
-        float = {nil, "small", 0.2, 1.05},
-
-        cook_need = "雨竹叶 菜度≥2.5 蛋度",
-        cook_cant = "肉度",
-        recipe_count = 6,
-
+        float = { nil, "small", 0.2, 1.05 },
         prefabs = { "buff_hungerretarder" },
-        oneat_desc = STRINGS.UI.COOKBOOK.DISH_RICEDUMPLING,
         oneatenfn = function(inst, eater)
             if eater.components.hunger ~= nil or eater.components.periodicspawner ~= nil then
                 if not eater:HasTag("player") and eater.components.periodicspawner ~= nil then
@@ -891,113 +827,102 @@ local foods_legion = {
                 end
                 eater:AddDebuff("buff_hungerretarder", "buff_hungerretarder")
             end
-        end
-    },
-    ------
-    --丰饶传说
-    ------
-    dish_murmurananas = {
-        test = function(cooker, names, tags)
-            return (names.pineananas or names.pineananas_cooked) and (tags.meat and tags.meat >= 2)
-                and (not tags.monster or tags.monster <= 1)
         end,
-        priority = 20,
+
+        cook_need = "雨竹叶 菜度≥2.5 蛋度",
+        cook_cant = "肉度",
+        recipe_count = 6
+    },
+    ------丰饶传说
+    dish_murmurananas = { --松萝咕咾肉
+        test = function(cooker, names, tags)
+            return (names.pineananas or names.pineananas_cooked) and (tags.meat and tags.meat >= 2) and
+                (not tags.monster or tags.monster <= 1)
+        end,
+        card_def = { ingredients = { {"pineananas",1}, {"meat",1}, {"monstermeat",1}, {"twigs",1} } },
+        priority = priority_med,
         foodtype = FOODTYPE.MEAT,
-        health = 18,
-        hunger = 150,
-        sanity = 12.5,
-        perishtime = TUNING.PERISH_MED,   --10天
+        hunger = 150, sanity = 12.5, health = 18,
+        perishtime = TUNING.PERISH_MED,
         cooktime = 1,
         potlevel = "low",
-        float = {nil, "small", 0.2, 1.05},
+        float = { nil, "small", 0.2, 1.05 },
 
         cook_need = "(烤)松萝 肉度≥2",
         cook_cant = "怪物度≤1",
-        recipe_count = 6,
+        recipe_count = 6
     },
-    dish_sosweetjarkfruit = {
+    dish_sosweetjarkfruit = { --甜到裂开的松萝蜜
         test = function(cooker, names, tags)
             return names.pineananas and tags.frozen and (tags.sweetener and tags.sweetener >= 2)
                 and not tags.monster and not tags.meat
         end,
-        priority = 51, --比太真mod的奇异甜食优先级高一点，防止被顶替
+        card_def = { ingredients = { {"pineananas",1}, {"ice",1}, {"honey",2} } },
+        priority = priority_med, --得比太真mod的奇异甜食优先级高，防止被顶替
         foodtype = FOODTYPE.VEGGIE,
-        health = 0,
-        hunger = 18,
-        sanity = 24,
-        perishtime = TUNING.PERISH_MED * 3,   --30天
-        stacksize = 2,
+        hunger = 18, sanity = 24, health = 0,
+        perishtime = TUNING.PERISH_MED * 3,
         cooktime = 0.5,
-        tags = { "honeyed" },
+        stacksize = 2,
         potlevel = "low",
-        float = {0.02, "small", 0.2, 0.9},
+        float = { 0.02, "small", 0.2, 0.9 },
+        tags = { "honeyed" },
 
         cook_need = "松萝 冰度 甜度≥2",
         cook_cant = "怪物度 肉度",
-        recipe_count = 2,
+        recipe_count = 2
     },
-    ------
-    --电闪雷鸣
-    ------
-    dish_wrappedshrimppaste = {
+    ------电闪雷鸣
+    dish_wrappedshrimppaste = { --白菇虾滑卷
         test = function(cooker, names, tags)
             return names.wobster_sheller_land and names.albicans_cap and (tags.decoration and tags.decoration >= 1)
                 and not tags.fruit and not tags.monster
         end,
-        priority = 20,
+        card_def = { ingredients = { {"albicans_cap",1}, {"wobster_sheller_land",1}, {"butterflywings",1}, {"twigs",1} } },
+        priority = priority_med,
         foodtype = FOODTYPE.MEAT,
-        health = 45,
-        hunger = 37.5,
-        sanity = 40,
-        perishtime = TUNING.PERISH_FASTISH,   --8天
-        stacksize = 2,
+        hunger = 37.5, sanity = 40, health = 45,
+        perishtime = TUNING.PERISH_FASTISH, --8天
         cooktime = 0.75,
-        potlevel = nil,
-        float = {0.01, "small", 0.2, 1.2},
-
-        cook_need = "龙虾 素白菇 装饰度≥1",
-        cook_cant = "果度 怪物度",
-        recipe_count = 4,
-
+        stacksize = 2,
+        -- potlevel = nil,
+        float = { 0.01, "small", 0.2, 1.2 },
         prefabs = { "buff_sporeresistance" },
-        oneat_desc = STRINGS.UI.COOKBOOK.DISH_WRAPPEDSHRIMPPASTE,
         oneatenfn = function(inst, eater)
             eater.time_l_sporeresistance = { add = TUNING.SEG_TIME*24, max = TUNING.SEG_TIME*30 }
             eater:AddDebuff("buff_sporeresistance", "buff_sporeresistance")
         end,
+
+        cook_need = "龙虾 素白菇 装饰度≥1",
+        cook_cant = "果度 怪物度",
+        recipe_count = 4
     },
-    ------
-    --尘世蜃楼
-    ------
-    dish_shyerryjam = {
+    ------尘世蜃楼
+    dish_shyerryjam = { --颤栗果酱
         test = function(cooker, names, tags)
             return names.shyerry and not tags.veggie and not tags.monster
                 and not tags.egg and not tags.meat and not tags.inedible and not tags.frozen
         end,
-        priority = 20,
+        card_def = { ingredients = { {"shyerry",1}, {"honey",3} } },
+        priority = priority_med,
         foodtype = FOODTYPE.GOODIES,
-        health = TUNING.HEALING_MED, --20
-        hunger = TUNING.CALORIES_SMALL, --12.5
-        sanity = TUNING.SANITY_TINY, --5
-        perishtime = nil, --不会腐烂
-        stacksize = 2,
+        hunger = 12.5, sanity = 5, health = 20,
+        -- perishtime = nil, --不会腐烂
         cooktime = 3,
+        stacksize = 2,
         potlevel = "low",
-        float = {nil, "small", 0.25, 0.8},
-
-        cook_need = "颤栗果",
-        cook_cant = "菜/怪物/蛋/肉/冰度 非食",
-        recipe_count = 4,
-
+        float = { nil, "small", 0.25, 0.8 },
         prefabs = { "buff_healthstorage" },
-        oneat_desc = STRINGS.UI.COOKBOOK.DISH_SHYERRYJAM,
-        oneatenfn = function(inst, eater) --食用后获得优化的加血buff
+        oneatenfn = function(inst, eater)
             if eater.components.health ~= nil then
-                --因为buff相关组件不支持相同buff叠加时的数据传输，所以这里自己定义了一个传输方式
                 eater.buff_healthstorage_times = 50
                 eater:AddDebuff("buff_healthstorage", "buff_healthstorage")
             end
-        end
+        end,
+
+        cook_need = "颤栗果",
+        cook_cant = "菜/怪物/蛋/肉/冰度 非食",
+        recipe_count = 4
     }
 
 	--[[
@@ -1041,46 +966,36 @@ local foods_legion = {
 ------
 ------
 
-if CONFIGS_LEGION.BETTERCOOKBOOK then
-    for k,v in pairs(foods_legion) do
-        v.name = k
-        v.weight = v.weight or 1
-        v.priority = v.priority or 0
-        if v.overridebuild == nil then
-            v.overridebuild = "dishes_legion"
-        end
-
-        -- v.cookbook_category = "portablecookpot" --如果要设置为便携烹饪锅专属，可以写这个
-        -- v.cookbook_category = "cookpot"
-        -- v.cookbook_category = "mod" --官方在AddCookerRecipe时就设置好了，所以，cookbook_category字段不需要自己写
-        if v.cookbook_tex == nil then
-            v.cookbook_tex = k..".tex"
-        end
-        if v.cookbook_atlas == nil then
-            v.cookbook_atlas = "images/cookbookimages/"..k..".xml"
-        end
-        v.recipe_count = v.recipe_count or 1
-        v.custom_cookbook_details_fn = function(data, self, top, left) --不用给英语环境的使用这个，因为文本太长，不可能装得下
-            local root = cookbookui_legion(data, self, top, left)
-            return root
-        end
+for k, v in pairs(foods_legion) do
+    v.name = k
+    if v.weight == nil then
+        v.weight = 1
     end
-else
-    for k,v in pairs(foods_legion) do
-        v.name = k
-        v.weight = v.weight or 1
-        v.priority = v.priority or 0
-        if v.overridebuild == nil then
-            v.overridebuild = "dishes_legion"
-        end
-
-        if v.cookbook_tex == nil then
-            v.cookbook_tex = k..".tex"
-        end
-        if v.cookbook_atlas == nil then
-            v.cookbook_atlas = "images/cookbookimages/"..k..".xml"
-        end
+    if v.priority == nil then
+        v.priority = priority_low
     end
+    if v.overridebuild == nil then --替换料理build。这样所有料理都可以共享一个build了，默认与料理名同名
+        v.overridebuild = "dishes_legion"
+    end
+    -- v.overridesymbolname = nil, --替换烹饪锅的料理贴图的symbol。默认与料理名同名
+    if v.oneatenfn ~= nil and v.oneat_desc == nil then
+        v.oneat_desc = STRINGS.UI.COOKBOOK[string.upper(k)] --食谱中的食用效果的介绍语句
+    end
+    if v.cookbook_tex == nil then --食谱大图所用的image
+        v.cookbook_tex = k..".tex"
+    end
+    if v.cookbook_atlas == nil then --食谱大图所用的atlas
+        v.cookbook_atlas = "images/cookbookimages/"..k..".xml"
+    end
+    -- v.cookbook_category = "mod" --官方在AddCookerRecipe时就设置了，所以，cookbook_category 不需要自己写
 end
+
+-- if CONFIGS_LEGION.BETTERCOOKBOOK then --undo
+--     v.recipe_count = v.recipe_count or 1
+--     v.custom_cookbook_details_fn = function(data, self, top, left) --不用给英语环境的使用这个，因为文本太长，不可能装得下
+--         local root = cookbookui_legion(data, self, top, left)
+--         return root
+--     end
+-- end
 
 return foods_legion

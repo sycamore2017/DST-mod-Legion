@@ -2,21 +2,21 @@ require("tuning")
 
 local foods_spiced = {}
 
-local function oneaten_garlic(inst, eater)
+local function OnEat_garlic(inst, eater)
     eater:AddDebuff("buff_playerabsorption", "buff_playerabsorption")
 end
-local function oneaten_sugar(inst, eater)
+local function OnEat_sugar(inst, eater)
     eater:AddDebuff("buff_workeffectiveness", "buff_workeffectiveness")
 end
-local function oneaten_chili(inst, eater)
+local function OnEat_chili(inst, eater)
     eater:AddDebuff("buff_attack", "buff_attack")
 end
 
 local SPICES = {
-    SPICE_GARLIC = { oneatenfn = oneaten_garlic, prefabs = { "buff_playerabsorption" } },
-    SPICE_SUGAR  = { oneatenfn = oneaten_sugar, prefabs = { "buff_workeffectiveness" } },
-    SPICE_CHILI  = { oneatenfn = oneaten_chili, prefabs = { "buff_attack" } },
-    SPICE_SALT   = {},
+    SPICE_GARLIC = { oneatenfn = OnEat_garlic, prefabs = { "buff_playerabsorption" } },
+    SPICE_SUGAR  = { oneatenfn = OnEat_sugar, prefabs = { "buff_workeffectiveness" } },
+    SPICE_CHILI  = { oneatenfn = OnEat_chili, prefabs = { "buff_attack" } },
+    SPICE_SALT   = {}
 }
 
 local function GenerateSpicedFoods(foods)
@@ -41,14 +41,10 @@ local function GenerateSpicedFoods(foods)
             -- newdata.official = true
 			-- newdata.cookbook_category = fooddata.cookbook_category ~= nil and ("spiced_"..fooddata.cookbook_category) or nil
 
-            ------------
-
             if newdata.float ~= nil then --原本就会沉的料理，即使加了调料一样会沉
-                newdata.float = {nil, "med", 0.05, {0.8, 0.7, 0.8}}
+                newdata.float = {nil, "med", 0.05, {0.8, 0.7, 0.8}} --改成通用格式，因为带调料的料理动画格式一样的
             end
             foods_spiced[newdata.name] = newdata
-
-            ------------
 
             if spicename == "spice_chili" then
                 if newdata.temperature == nil then
@@ -64,7 +60,6 @@ local function GenerateSpicedFoods(foods)
             end
 
             if spicedata.prefabs ~= nil then
-                --make a copy (via ArrayUnion) if there are dependencies from the original food
                 newdata.prefabs = newdata.prefabs ~= nil and ArrayUnion(newdata.prefabs, spicedata.prefabs) or spicedata.prefabs
             end
 

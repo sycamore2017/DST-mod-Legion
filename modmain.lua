@@ -247,7 +247,8 @@ local IsServer = TheNet:GetIsServer() or TheNet:IsDedicated()
 --------------------------------------------------------------------------
 
 _G.CONFIGS_LEGION = {
-    ENABLEDMODS = {}
+    ENABLEDMODS = {},
+    LANGUAGES = GetModConfigData("Language") or "chinese" --语言
 }
 
 _G.CONFIGS_LEGION.CLEANINGUPSTENCH = GetModConfigData("CleaningUpStench") --自动清除地上的臭臭
@@ -294,20 +295,11 @@ _G.CONFIGS_LEGION.BACKCUBCHANCE = GetModConfigData("BackCubChance") --靠背熊�
 _G.CONFIGS_LEGION.SHIELDRECHARGETIME = GetModConfigData("ShieldRechargeTime") --盾牌冷却时间
 _G.CONFIGS_LEGION.AGRONRECHARGETIME = GetModConfigData("AgronRechargeTime") --艾力冈的剑冷却时间
 
-----------
---语言设置
-----------
-
-local language_legion = GetModConfigData("Language")    --获取设置里"语言"的选项值
-
-if language_legion == "english" then
+if _G.CONFIGS_LEGION.LANGUAGES == "english" then
     modimport("scripts/languages/strings_english.lua")
-elseif language_legion == "chinese" then
-    modimport("scripts/languages/strings_chinese.lua")
-
-    _G.CONFIGS_LEGION.BETTERCOOKBOOK = GetModConfigData("BetterCookBook")
 else
-    modimport("scripts/languages/strings_english.lua")
+    modimport("scripts/languages/strings_chinese.lua")
+    _G.CONFIGS_LEGION.BETTERCOOKBOOK = GetModConfigData("BetterCookBook")
 end
 
 --------------------------------------------------------------------------
@@ -1445,4 +1437,7 @@ AddSimPostInit(function()
     end
     ingredients_l = nil
 
+    ----------
+    --食谱优化
+    ----------
 end)
