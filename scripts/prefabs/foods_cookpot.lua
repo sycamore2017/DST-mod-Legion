@@ -628,7 +628,7 @@ end
 for k, v in pairs(require("preparedfoods_legion")) do
     table.insert(prefs, MakePreparedFood(v))
 end
-for k, v in pairs(require("preparedfoods_l_spiced")) do
+for k, v in pairs(require("preparedfoods_legion_spiced")) do
     table.insert(prefs, MakePreparedFood(v))
 end
 

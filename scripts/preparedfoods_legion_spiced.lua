@@ -78,6 +78,43 @@ local function GenerateSpicedFoods(foods)
     end
 end
 
+------
+
+local SPICES2 = {
+    SPICE_GARLIC = true,
+    SPICE_SUGAR  = true,
+    SPICE_CHILI  = true,
+    SPICE_SALT   = true,
+
+    --兼容勋章的香料
+    SPICE_VOLTJELLY = true,
+    SPICE_PHOSPHOR = true,
+    SPICE_CACTUS_FLOWER = true,
+    SPICE_RAGE_BLOOD_SUGAR = true,
+    SPICE_POTATO_STARCH = true
+}
+
+local function GenerateSpicedItems(foods)
+    for foodname, fooddata in pairs(foods) do
+        for spicenameupper, spicedata in pairs(SPICES2) do
+            local newdata = shallowcopy(fooddata)
+            local spicename = string.lower(spicenameupper)
+            newdata.test = function(cooker, names, tags) return names[foodname] and names[spicename] end
+            newdata.priority = 100
+            newdata.cooktime = .12
+            newdata.stacksize = nil
+            newdata.spice = spicenameupper
+            newdata.basename = foodname
+            newdata.name = foodname.."_"..spicename
+            foods_spiced[newdata.name] = newdata
+            --后续的数据就不需要了，毕竟不需要用到通用预制物逻辑
+        end
+    end
+end
+
+------
+
 GenerateSpicedFoods(require("preparedfoods_legion"))
+GenerateSpicedItems(require("prepareditems_legion"))
 
 return foods_spiced

@@ -344,6 +344,10 @@ for k, recipe in pairs(require("preparedfoods_legion")) do
     AddCookerRecipe("portablecookpot", recipe)
     AddCookerRecipe("archive_cookpot", recipe)
     RegisterInventoryItemAtlas("images/inventoryimages/"..recipe.name..".xml", recipe.name..".tex") --应该注册物品栏贴图
+
+    if recipe.card_def ~= nil then
+		AddRecipeCard("cookpot", recipe)
+	end
 end
 for k, recipe in pairs(require("prepareditems_legion")) do
     table.insert(Assets, Asset("ATLAS", "images/cookbookimages/"..recipe.name..".xml"))
@@ -355,12 +359,8 @@ for k, recipe in pairs(require("prepareditems_legion")) do
     RegisterInventoryItemAtlas("images/inventoryimages/"..recipe.name..".xml", recipe.name..".tex")
 end
 
-local foodrecipes_spice = require("preparedfoods_l_spiced")
+local foodrecipes_spice = require("preparedfoods_legion_spiced")
 for k, recipe in pairs(foodrecipes_spice) do
-    AddCookerRecipe("portablespicer", recipe)
-end
-local itemrecipes_spice = require("prepareditems_l_spiced")
-for k, recipe in pairs(itemrecipes_spice) do
     AddCookerRecipe("portablespicer", recipe)
 end
 
@@ -376,34 +376,6 @@ end
 --     end
 --     return false
 -- end
-
---食谱中官方料理的修改
-if CONFIGS_LEGION.BETTERCOOKBOOK then
-    local cookbookui_legion = require("widgets/cookbookui_legion")
-    local fooduidata_legion = require("languages/recipedesc_legion_chinese")
-
-    local function SetNewCookBookUI(recipe, uidata)
-        if uidata ~= nil then
-            recipe.cook_need = uidata.cook_need
-            recipe.cook_cant = uidata.cook_cant
-            recipe.recipe_count = uidata.recipe_count or 1
-            recipe.custom_cookbook_details_fn = function(data, self, top, left)
-                local root = cookbookui_legion(data, self, top, left)
-                return root
-            end
-        end
-    end
-
-    for k,v in pairs(require("preparedfoods")) do
-        SetNewCookBookUI(v, fooduidata_legion.klei[k])
-    end
-    for k,v in pairs(require("preparedfoods_warly")) do
-        SetNewCookBookUI(v, fooduidata_legion.warly[k])
-    end
-    for k,v in pairs(require("preparednonfoods")) do
-        SetNewCookBookUI(v, fooduidata_legion.nofood[k])
-    end
-end
 
 local cooking = require("cooking")
 local ingredients_l = {
@@ -1399,7 +1371,7 @@ AddSimPostInit(function()
     ----------
     --烹饪食材属性 兼容性修改(官方逻辑没有兼容性，只能自己写个有兼容性的啦)
     ----------
-    cooking = require("cooking")
+    cooking = require("cooking") --不清楚别的修改会不会自动修改原有的，所以这里重新获取一遍
     local ingredients_base = cooking.ingredients
     if ingredients_base then
         for _,ing in ipairs(ingredients_l) do
@@ -1438,6 +1410,34 @@ AddSimPostInit(function()
     ingredients_l = nil
 
     ----------
-    --食谱优化
+    --食谱页面优化
     ----------
+    if _G.CONFIGS_LEGION.BETTERCOOKBOOK then
+        local cookbookui_legion = require("widgets/cookbookui_legion")
+        local fooduidata_legion = require("languages/recipedesc_legion_chinese")
+
+        local function SetNewCookBookPage(data, self, top, left)
+            local root = cookbookui_legion(data, self, top, left)
+            return root
+        end
+        for cooker, reps in pairs(cooking.recipes) do
+            for repname, dd in pairs(reps) do
+                if dd.custom_cookbook_details_fn == nil then --经过一类循环后，后面的数据多半是重复索引的
+                    if cooking.IsModCookerFood(repname) then --是mod料理
+                        if dd.recipe_count ~= nil then
+                            dd.custom_cookbook_details_fn = SetNewCookBookPage
+                        end
+                    else
+                        if fooduidata_legion[repname] ~= nil then
+                            dd.cook_need = fooduidata_legion[repname].cook_need
+                            dd.cook_cant = fooduidata_legion[repname].cook_cant
+                            dd.recipe_count = fooduidata_legion[repname].recipe_count or 1
+                            dd.custom_cookbook_details_fn = SetNewCookBookPage
+                        end
+                    end
+                end
+            end
+        end
+    end
+
 end)

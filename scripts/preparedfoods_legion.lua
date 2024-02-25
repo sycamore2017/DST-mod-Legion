@@ -1,4 +1,3 @@
--- local cookbookui_legion = require "widgets/cookbookui_legion"
 local TOOLS_L = require("tools_legion")
 local priority_low = 61
 local priority_med = 91
@@ -989,13 +988,5 @@ for k, v in pairs(foods_legion) do
     end
     -- v.cookbook_category = "mod" --官方在AddCookerRecipe时就设置了，所以，cookbook_category 不需要自己写
 end
-
--- if CONFIGS_LEGION.BETTERCOOKBOOK then --undo
---     v.recipe_count = v.recipe_count or 1
---     v.custom_cookbook_details_fn = function(data, self, top, left) --不用给英语环境的使用这个，因为文本太长，不可能装得下
---         local root = cookbookui_legion(data, self, top, left)
---         return root
---     end
--- end
 
 return foods_legion
