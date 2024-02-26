@@ -54,7 +54,6 @@ local foods_legion = {
         end,
         -- fn_common = function(inst)end, --(本mod专属)预制物：服务器和客户端都会触发的函数
         -- fn_server = function(inst)end, --(本mod专属)预制物：仅服务器会触发的函数
-        -- data_only = true, --(本mod专属)为true时，代表不用料理预制物逻辑，比如料理有特殊的功能，完全没有料理的基础功能等
         -- notinitprefab = true, --兼容勋章的机制。此配方，不以勋章的通用方式生成调料后预制物
 
         --以下参数为棱镜兼容所需。不写则不兼容

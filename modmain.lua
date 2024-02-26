@@ -138,6 +138,8 @@
 --下行代码只代表查值时自动查global，增加global的变量或者修改global的变量时还是需要带"GLOBAL."
 GLOBAL.setmetatable(env, { __index = function(t, k) return GLOBAL.rawget(GLOBAL, k) end })
 local _G = GLOBAL
+local IsServer = TheNet:GetIsServer() or TheNet:IsDedicated()
+TUNING.mod_legion_enabled = true --方便别的mod做判定。不过就算这样，也受mod加载顺序影响
 
 PrefabFiles = {
     "bush_legion",              --棱镜灌木丛
@@ -158,8 +160,10 @@ PrefabFiles = {
     "placer_legion",            --大多数的placer
     "ointment_legion",          --涂抹类道具
     "worldbox_legion",          --世界唯一型容器相关
-}
 
+    "foliageath",               --青枝绿叶
+    "neverfade_butterfly",      --永不凋零的蝴蝶
+}
 Assets = {
     Asset("ANIM", "anim/images_minisign1.zip"),  --专门为小木牌上的图画准备的文件(真是奢侈0.0)
     Asset("ANIM", "anim/images_minisign2.zip"),
@@ -174,10 +178,6 @@ Assets = {
     Asset("ATLAS", "images/slot_bearspaw_l.xml"), --靠背熊的格子背景
     Asset("IMAGE", "images/slot_bearspaw_l.tex"),
 
-    --预加载，给科技栏用的
-    Asset("ATLAS", "images/inventoryimages/hat_lichen.xml"),
-    Asset("IMAGE", "images/inventoryimages/hat_lichen.tex"),
-
     --为工艺锅mod加的（此时并不明确是否启用了该mod）
     Asset("ATLAS", "images/foodtags/foodtag_gel.xml"),
     Asset("IMAGE", "images/foodtags/foodtag_gel.tex"),
@@ -190,49 +190,8 @@ Assets = {
     Asset("ATLAS", "images/foodtags/foodtag_hallowednights.xml"),
     Asset("IMAGE", "images/foodtags/foodtag_hallowednights.tex"),
     Asset("ATLAS", "images/foodtags/foodtag_newmoon.xml"),
-    Asset("IMAGE", "images/foodtags/foodtag_newmoon.tex"),
-
-    --为了在菜谱和农谱里显示材料的图片，所以不管玩家设置，还是要注册一遍
-    Asset("ATLAS", "images/inventoryimages/monstrain_leaf.xml"),
-    Asset("IMAGE", "images/inventoryimages/monstrain_leaf.tex"),
-    Asset("ATLAS", "images/inventoryimages/shyerry.xml"),
-    Asset("IMAGE", "images/inventoryimages/shyerry.tex"),
-    Asset("ATLAS", "images/inventoryimages/shyerry_cooked.xml"),
-    Asset("IMAGE", "images/inventoryimages/shyerry_cooked.tex"),
-    Asset("ATLAS", "images/inventoryimages/petals_rose.xml"),
-    Asset("IMAGE", "images/inventoryimages/petals_rose.tex"),
-    Asset("ATLAS", "images/inventoryimages/petals_lily.xml"),
-    Asset("IMAGE", "images/inventoryimages/petals_lily.tex"),
-    Asset("ATLAS", "images/inventoryimages/petals_orchid.xml"),
-    Asset("IMAGE", "images/inventoryimages/petals_orchid.tex"),
-    Asset("ATLAS", "images/inventoryimages/pineananas.xml"),
-    Asset("IMAGE", "images/inventoryimages/pineananas.tex"),
-    Asset("ATLAS", "images/inventoryimages/pineananas_cooked.xml"),
-    Asset("IMAGE", "images/inventoryimages/pineananas_cooked.tex"),
-    Asset("ATLAS", "images/inventoryimages/pineananas_seeds.xml"),
-    Asset("IMAGE", "images/inventoryimages/pineananas_seeds.tex"),
-    Asset("ATLAS", "images/inventoryimages/mint_l.xml"),
-    Asset("IMAGE", "images/inventoryimages/mint_l.tex"),
-    Asset("ATLAS", "images/inventoryimages/albicans_cap.xml"),
-    Asset("IMAGE", "images/inventoryimages/albicans_cap.tex"),
-    Asset("ATLAS", "images/inventoryimages/shield_l_log.xml"),
-    Asset("IMAGE", "images/inventoryimages/shield_l_log.tex"),
+    Asset("IMAGE", "images/foodtags/foodtag_newmoon.tex")
 }
-
---为了在菜谱和农谱里显示材料的图片，需要注册全局的图片资源
-RegisterInventoryItemAtlas("images/inventoryimages/monstrain_leaf.xml", "monstrain_leaf.tex")
-RegisterInventoryItemAtlas("images/inventoryimages/shyerry.xml", "shyerry.tex")
-RegisterInventoryItemAtlas("images/inventoryimages/shyerry_cooked.xml", "shyerry_cooked.tex")
-RegisterInventoryItemAtlas("images/inventoryimages/petals_rose.xml", "petals_rose.tex")
-RegisterInventoryItemAtlas("images/inventoryimages/petals_lily.xml", "petals_lily.tex")
-RegisterInventoryItemAtlas("images/inventoryimages/petals_orchid.xml", "petals_orchid.tex")
-RegisterInventoryItemAtlas("images/inventoryimages/pineananas.xml", "pineananas.tex")
-RegisterInventoryItemAtlas("images/inventoryimages/pineananas_cooked.xml", "pineananas_cooked.tex")
-RegisterInventoryItemAtlas("images/inventoryimages/pineananas_seeds.xml", "pineananas_seeds.tex")
-RegisterInventoryItemAtlas("images/inventoryimages/mint_l.xml", "mint_l.tex")
-RegisterInventoryItemAtlas("images/inventoryimages/albicans_cap.xml", "albicans_cap.tex")
-
-local IsServer = TheNet:GetIsServer() or TheNet:IsDedicated()
 
 --------------------------------------------------------------------------
 --[[ test ]]
@@ -303,6 +262,77 @@ else
 end
 
 --------------------------------------------------------------------------
+--[[ 资源注册 ]]
+--------------------------------------------------------------------------
+
+------物品栏图标
+
+local function RegisterInvItems(imgs)
+    local url
+    local atex
+    for _, v in ipairs(imgs) do
+        url = "images/inventoryimages/"..v..".xml"
+        atex = v..".tex"
+        table.insert(Assets, Asset("ATLAS", url))
+        table.insert(Assets, Asset("IMAGE", "images/inventoryimages/"..atex))
+        table.insert(Assets, Asset("ATLAS_BUILD", url, 256)) --生成小木牌需要的动画格式的贴图缓存
+        RegisterInventoryItemAtlas(url, atex) --为了在菜谱和农谱里等需要显示材料的图片，需要注册全局的图片资源
+    end
+end
+
+RegisterInvItems({
+    ------花香四溢
+    "petals_rose", "petals_lily", "petals_orchid",
+    "rosorns", "lileaves", "orchitwigs", "neverfade",
+    "sachet",
+    ------美味佳肴
+    ------尘世蜃楼
+    "shyerry", "shyerry_cooked",
+    ------丰饶传说
+    "pineananas", "pineananas_cooked", "pineananas_seeds",
+    "pineananas_oversized", "pineananas_oversized_waxed", "pineananas_oversized_rotten",
+    "mint_l",
+    ------电闪雷鸣
+    "albicans_cap",
+    ------祈雨祭
+    "monstrain_leaf",
+    ------黯涌
+    "shield_l_log", "hat_lichen"
+})
+
+------小地图图标
+
+local function RegisterMapImages(imgs)
+    local url
+    for _, v in ipairs(imgs) do
+        url = "images/map_icons/"..v
+        table.insert(Assets, Asset("ATLAS", url..".xml"))
+        table.insert(Assets, Asset("IMAGE", url..".tex"))
+        AddMinimapAtlas(url..".xml")
+    end
+    --  接下来就需要在prefab定义里添加：
+    --      inst.entity:AddMiniMapEntity()
+    --      inst.MiniMapEntity:SetIcon("图片文件名.tex")
+end
+
+RegisterMapImages({
+    ------花香四溢
+    "rosebush", "lilybush", "orchidbush", "neverfadebush",
+    ------美味佳肴
+    ------尘世蜃楼
+    "shyerrytree", "chest_whitewood",
+    ------丰饶传说
+    "siving_derivant", "siving_thetree", "siving_ctlwater", "siving_ctldirt", "siving_ctlall",
+    "siving_turn", "plant_crop_l", "boltwingout", "siving_suit_gold",
+    ------电闪雷鸣
+    "elecourmaline", "soul_contracts",
+    ------祈雨祭
+    "monstrain", "agronssword", "hiddenmoonlight", "giantsfoot", "refractedmoonlight", "moondungeon",
+    ------黯涌
+    "backcub"
+})
+
+--------------------------------------------------------------------------
 --[[ 热更新机制 ]]
 --------------------------------------------------------------------------
 
@@ -316,92 +346,81 @@ modimport("scripts/apublicsupporter.lua")
 modimport("scripts/containers_legion.lua")
 
 --------------------------------------------------------------------------
---[[ 花香四溢 ]]
+--[[ 料理相关 ]]
 --------------------------------------------------------------------------
 
-modimport("scripts/flowerspower_legion.lua")
-
---------------------------------------------------------------------------
---[[ 美味佳肴 ]]
---------------------------------------------------------------------------
-
--- AddIngredientValues({"batwing"}, {meat=.5}, true, false) --蝙蝠翅膀，虽然可以晾晒，但是得到的不是蝙蝠翅膀干，而是小肉干，所以candry不能填true
--- AddIngredientValues({"ash"}, {inedible=1}, false, false) --灰烬
--- AddIngredientValues({"slurtleslime"}, {gel=1}, false, false) --蜗牛黏液
--- AddIngredientValues({"glommerfuel"}, {gel=1}, false, false) --格罗姆黏液
--- AddIngredientValues({"phlegm"}, {gel=1}, false, false) --钢羊黏痰
--- AddIngredientValues({"furtuft"}, {inedible=1}, false, false) --熊毛屑(非熊皮)
--- AddIngredientValues({"twiggy_nut"}, {inedible=1}, false, false) --添加树枝树种作为新的料理原材料
--- AddIngredientValues({"moon_tree_blossom"}, {veggie=.5, petals_legion=1}, false, false) --月树花
--- AddIngredientValues({"foliage"}, {decoration=1}, false, false) --蕨叶
--- AddIngredientValues({"horn"}, {inedible=1, decoration=2}, false, false) --牛角
-
-for k, recipe in pairs(require("preparedfoods_legion")) do
+local dishes_l = {}
+for _, recipe in pairs(require("preparedfoods_legion")) do
     table.insert(Assets, Asset("ATLAS", "images/cookbookimages/"..recipe.name..".xml"))
     table.insert(Assets, Asset("IMAGE", "images/cookbookimages/"..recipe.name..".tex"))
+    table.insert(dishes_l, recipe.name)
+
+    AddCookerRecipe("cookpot", recipe) --将料理配方加入“烹饪锅”集合中，这样“烹饪锅”才能烹饪出该料理
+    AddCookerRecipe("portablecookpot", recipe)
+    AddCookerRecipe("archive_cookpot", recipe)
+    if recipe.card_def ~= nil then --加入烹饪卡片
+		AddRecipeCard("cookpot", recipe)
+	end
+end
+for _, recipe in pairs(require("prepareditems_legion")) do
+    table.insert(Assets, Asset("ATLAS", "images/cookbookimages/"..recipe.name..".xml"))
+    table.insert(Assets, Asset("IMAGE", "images/cookbookimages/"..recipe.name..".tex"))
+    table.insert(dishes_l, recipe.name)
 
     AddCookerRecipe("cookpot", recipe)
     AddCookerRecipe("portablecookpot", recipe)
     AddCookerRecipe("archive_cookpot", recipe)
-    RegisterInventoryItemAtlas("images/inventoryimages/"..recipe.name..".xml", recipe.name..".tex") --应该注册物品栏贴图
-
     if recipe.card_def ~= nil then
 		AddRecipeCard("cookpot", recipe)
 	end
 end
-for k, recipe in pairs(require("prepareditems_legion")) do
-    table.insert(Assets, Asset("ATLAS", "images/cookbookimages/"..recipe.name..".xml"))
-    table.insert(Assets, Asset("IMAGE", "images/cookbookimages/"..recipe.name..".tex"))
-
-    AddCookerRecipe("cookpot", recipe)
-    AddCookerRecipe("portablecookpot", recipe)
-    AddCookerRecipe("archive_cookpot", recipe)
-    RegisterInventoryItemAtlas("images/inventoryimages/"..recipe.name..".xml", recipe.name..".tex")
-end
-
-local foodrecipes_spice = require("preparedfoods_legion_spiced")
-for k, recipe in pairs(foodrecipes_spice) do
+for _, recipe in pairs(require("preparedfoods_legion_spiced")) do
     AddCookerRecipe("portablespicer", recipe)
 end
+RegisterInvItems(dishes_l)
+dishes_l = nil
 
---已经修复了，好耶！
---官方的便携香料站代码没改新机制，这里用另类方式手动改一下。等官方修复了我就删除。相关文件 prefabs\portablespicer.lua
--- local IsModCookingProduct_old = IsModCookingProduct
--- _G.IsModCookingProduct = function(cooker, name)
---     if foodrecipes_spice[name] ~= nil or itemrecipes_spice[name] ~= nil then
---         return false
---     end
---     if IsModCookingProduct_old ~= nil then
---         return IsModCookingProduct_old(cooker, name)
---     end
---     return false
--- end
+--蝙蝠翅膀，虽然可以晾晒，但是得到的不是蝙蝠翅膀干，而是小肉干，所以candry不能填true
+-- AddIngredientValues({"batwing"}, {meat=.5}, true, false)
 
 local cooking = require("cooking")
 local ingredients_l = {
-    { {"ash", "furtuft", "twiggy_nut"}, {inedible=1}, false, false }, --灰烬、熊毛屑(非熊皮)、树枝树种
-    { {"slurtleslime", "glommerfuel", "phlegm"}, {gel=1}, false, false }, --蜗牛黏液、格罗姆黏液、钢羊黏痰
-    { {"moon_tree_blossom"}, {veggie=.5, petals_legion=1}, false, false }, --月树花
-    { {"foliage"}, {decoration=1}, false, false }, --蕨叶
-    { {"horn"}, {inedible=1, decoration=2}, false, false }, --牛角
-    { {"forgetmelots", "cactus_flower", "myth_lotus_flower", "aip_veggie_sunflower"}, {petals_legion=1}, false, false }, --必忘我、仙人掌花、【神话书说】莲花、【额外物品包】向日葵
-    { {"reviver"}, {meat=1.5, magic=1}, false, false }, --告密的心
-
-    { {"shyerry"}, {fruit=4}, true, false }, --颤栗果
-    { {"albicans_cap"}, {veggie=2}, false, false }, --素白菇
-    { {"petals_rose", "petals_lily", "petals_orchid"}, {veggie=.5, petals_legion=1}, false, false }, --三花
-    { {"pineananas"}, {veggie=1, fruit=1}, true, false }, --松萝
-    { {"mint_l"}, {veggie=.5}, false, false }, --猫薄荷
-    { {"monstrain_leaf"}, {monster=1, veggie=.5}, false, false }, --雨竹叶
+    --灰烬、毛丛、树枝树种
+    { {"ash", "furtuft", "twiggy_nut"}, { inedible=1 }, false, false },
+    --蜗牛黏液、格罗姆黏液、钢羊黏痰
+    { {"slurtleslime", "glommerfuel", "phlegm"}, { gel=1 }, false, false },
+    --蕨叶
+    { {"foliage"}, { decoration=1 }, false, false },
+    --牛角
+    { {"horn"}, { inedible=1, decoration=2 }, false, false },
+    --月树花
+    { {"moon_tree_blossom"}, { veggie=.5, petals_legion=1 }, false, false },
+    --必忘我、仙人掌花、【神话书说】莲花、【额外物品包】向日葵、皮服玫瑰
+    { {"forgetmelots", "cactus_flower", "myth_lotus_flower", "aip_veggie_sunflower",
+        "pm_rose"}, { petals_legion=1 }, false, false },
+    --告密的心
+    { {"reviver"}, { meat=1.5, magic=1 }, false, false },
+    --颤栗果
+    { {"shyerry"}, { fruit=4 }, true, false },
+    --素白菇
+    { {"albicans_cap"}, { veggie=2 }, false, false },
+    --三花
+    { {"petals_rose", "petals_lily", "petals_orchid"}, { veggie=.5, petals_legion=1 }, false, false },
+    --松萝
+    { {"pineananas"}, { veggie=1, fruit=1 }, true, false },
+    --猫薄荷
+    { {"mint_l"}, { veggie=.5 }, false, false },
+    --雨竹叶
+    { {"monstrain_leaf"}, { monster=1, veggie=.5 }, false, false }
 }
 local ingredients_map = {}
-for _,ing in ipairs(ingredients_l) do
-    for _,name in pairs(ing[1]) do
+for _, ing in ipairs(ingredients_l) do
+    for _, name in pairs(ing[1]) do
         ingredients_map[name] = true
     end
 end
 
---因为有的料理我只需要部分香料能调，兼容原因，其他香料制作时会崩溃，所以这里设置默认的返回值
+--因为有的料理只有部分香料能调，所以这里设置默认返回值，防止其他香料制作时的崩溃
 local CalculateRecipe_old = cooking.CalculateRecipe
 cooking.CalculateRecipe = function(cooker, names, ...)
     local product, cooktime = CalculateRecipe_old(cooker, names, ...)
@@ -441,41 +460,42 @@ cooking.IsCookingIngredient = function(prefabname, ...)
 end
 
 --------------------------------------------------------------------------
---[[ 尘市蜃楼 ]]
+--[[ 导入数据 ]]
 --------------------------------------------------------------------------
 
-if CONFIGS_LEGION.DRESSUP then
+------花香四溢
+
+modimport("scripts/legion1_flower.lua")
+
+------尘世蜃楼
+
+if _G.CONFIGS_LEGION.DRESSUP then
     modimport("scripts/fengl_userdatahook.lua")
     modimport("scripts/dressup_legion.lua")
 end
-modimport("scripts/desertsecret_legion.lua")
+modimport("scripts/legion3_desert.lua")
 
---------------------------------------------------------------------------
---[[ 祈雨祭 ]]
---------------------------------------------------------------------------
-
-modimport("scripts/prayforrain_legion.lua")
-
---------------------------------------------------------------------------
---[[ 丰饶传说 ]]
---------------------------------------------------------------------------
+------丰饶传说
 
 modimport("scripts/legendoffall_legion.lua")
 
---------------------------------------------------------------------------
---[[ 电闪雷鸣 ]]
---------------------------------------------------------------------------
+------电闪雷鸣
 
 if _G.CONFIGS_LEGION.TECHUNLOCK == "prototyper" then
-    modimport("scripts/new_techtree_legion.lua")    --新增制作栏的所需代码
+    modimport("scripts/new_techtree_legion.lua") --新增制作栏的所需代码
 end
 modimport("scripts/flashandcrush_legion.lua")
+
+------祈雨祭
+
+modimport("scripts/prayforrain_legion.lua")
+
+------黯涌
+
 
 --------------------------------------------------------------------------
 --[[ 黯涌 ]]
 --------------------------------------------------------------------------
-
-_G.RegistMiniMapImage_legion("backcub")
 
 AddRecipe2(
     "shield_l_log", {
@@ -575,7 +595,7 @@ end
 modimport("scripts/skin_legion.lua") --skined_legion
 
 --------------------------------------------------------------------------
---[[ mod之间的兼容 ]]
+--[[ mod之间的兼容，以及其他 ]]
 --------------------------------------------------------------------------
 
 ----------
@@ -1374,8 +1394,8 @@ AddSimPostInit(function()
     cooking = require("cooking") --不清楚别的修改会不会自动修改原有的，所以这里重新获取一遍
     local ingredients_base = cooking.ingredients
     if ingredients_base then
-        for _,ing in ipairs(ingredients_l) do
-            for _,name in pairs(ing[1]) do
+        for _, ing in ipairs(ingredients_l) do
+            for _, name in pairs(ing[1]) do
                 local cancook = ing[3]
                 local candry = ing[4]
 
@@ -1393,7 +1413,7 @@ AddSimPostInit(function()
                     end
                 end
 
-                for tagname,tagval in pairs(ing[2]) do
+                for tagname, tagval in pairs(ing[2]) do
                     ingredients_base[name].tags[tagname] = tagval
                     if cancook then
                         ingredients_base[name.."_cooked"].tags.precook = 1

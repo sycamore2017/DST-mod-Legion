@@ -49,13 +49,6 @@ local IsServer = TheNet:GetIsServer() or TheNet:IsDedicated()
 --[[ 基础 ]]
 --------------------------------------------------------------------------
 
-_G.RegistMiniMapImage_legion("monstrain")
-_G.RegistMiniMapImage_legion("agronssword")
-_G.RegistMiniMapImage_legion("giantsfoot")
-_G.RegistMiniMapImage_legion("refractedmoonlight")
-_G.RegistMiniMapImage_legion("moondungeon")
-_G.RegistMiniMapImage_legion("hiddenmoonlight")
-
 AddRecipe2(
     "book_weather", {
         Ingredient("papyrus", 8),

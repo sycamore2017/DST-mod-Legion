@@ -66,9 +66,6 @@ local TOOLS_L = require("tools_legion")
 --监听函数修改工具，超强der大佬写滴！
 -- local upvaluehelper = require "hua_upvaluehelper"
 
-_G.RegistMiniMapImage_legion("elecourmaline")
-_G.RegistMiniMapImage_legion("soul_contracts")
-
 --------------------------------------------------------------------------
 --[[ 电气石重铸台相关 ]]
 --------------------------------------------------------------------------

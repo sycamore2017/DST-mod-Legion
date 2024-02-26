@@ -87,16 +87,6 @@ local TOOLS_L = require("tools_legion")
 --[[ 基础 ]]
 --------------------------------------------------------------------------
 
-_G.RegistMiniMapImage_legion("siving_derivant")
-_G.RegistMiniMapImage_legion("siving_thetree")
-_G.RegistMiniMapImage_legion("siving_ctlwater")
-_G.RegistMiniMapImage_legion("siving_ctldirt")
-_G.RegistMiniMapImage_legion("siving_ctlall")
-_G.RegistMiniMapImage_legion("siving_turn")
-_G.RegistMiniMapImage_legion("plant_crop_l")
-_G.RegistMiniMapImage_legion("boltwingout")
-_G.RegistMiniMapImage_legion("siving_suit_gold")
-
 _G.EQUIPMENTSETNAMES.SIVING = "siving"
 _G.EQUIPMENTSETNAMES.SIVING2 = "siving2"
 _G.EQUIPMENTSETNAMES.ELEPHEETLE = "elepheetle"

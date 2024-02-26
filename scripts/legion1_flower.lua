@@ -1,28 +1,4 @@
-local prefabFiles = {
-    "foliageath",               --青枝绿叶
-    "neverfade_butterfly",      --永不凋零的蝴蝶
-}
-for k,v in pairs(prefabFiles) do
-    table.insert(PrefabFiles, v)
-end
 
------
-
-local assets = {
-    Asset("ATLAS", "images/inventoryimages/lileaves.xml"),
-    Asset("IMAGE", "images/inventoryimages/lileaves.tex"),
-    Asset("ATLAS", "images/inventoryimages/orchitwigs.xml"),
-    Asset("IMAGE", "images/inventoryimages/orchitwigs.tex"),
-    Asset("ATLAS", "images/inventoryimages/neverfade.xml"),
-    Asset("IMAGE", "images/inventoryimages/neverfade.tex"),
-    Asset("ATLAS", "images/inventoryimages/sachet.xml"), --预加载，给科技栏用的
-    Asset("IMAGE", "images/inventoryimages/sachet.tex"),
-}
-for k,v in pairs(assets) do
-    table.insert(Assets, v)
-end
-
------
 
 local _G = GLOBAL
 local IsServer = TheNet:GetIsServer() or TheNet:IsDedicated()
@@ -30,11 +6,6 @@ local IsServer = TheNet:GetIsServer() or TheNet:IsDedicated()
 --------------------------------------------------------------------------
 --[[ 基础 ]]
 --------------------------------------------------------------------------
-
-_G.RegistMiniMapImage_legion("rosebush")
-_G.RegistMiniMapImage_legion("lilybush")
-_G.RegistMiniMapImage_legion("orchidbush")
-_G.RegistMiniMapImage_legion("neverfadebush")
 
 AddRecipe2(
     "neverfade", {

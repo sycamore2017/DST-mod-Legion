@@ -8,20 +8,6 @@ local IsServer = TheNet:GetIsServer() or TheNet:IsDedicated()
 --[[ 方便进行代码开发的各种自定义工具函数 ]]
 --------------------------------------------------------------------------
 
---[ 地图图标注册 ]--
-_G.RegistMiniMapImage_legion = function(filename, fileaddresspre)
-    local fileaddresscut = (fileaddresspre or "images/map_icons/")..filename
-
-    table.insert(Assets, Asset("ATLAS", fileaddresscut..".xml"))
-    table.insert(Assets, Asset("IMAGE", fileaddresscut..".tex"))
-
-    AddMinimapAtlas(fileaddresscut..".xml")
-
-    --  接下来就需要在prefab定义里添加：
-    --      inst.entity:AddMiniMapEntity()
-    --      inst.MiniMapEntity:SetIcon("图片文件名.tex")
-end
-
 --[ 吉他曲管理(mod兼容用的，如果其他mod想要增加自己的曲子就用以下代码) ]--
 if not _G.rawget(_G, "GUITARSONGSPOOL_LEGION") then
     _G.GUITARSONGSPOOL_LEGION = {}
