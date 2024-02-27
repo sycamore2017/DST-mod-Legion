@@ -1,64 +1,3 @@
-local prefabFiles = {
-    "fimbul_fx",                --芬布尔相关fx
-    "boss_elecarmet",           --莱克阿米特
-    "elecourmaline",            --电气重铸台
-    "icire_rock",               --鸳鸯石
-    "guitar_miguel",            --米格尔的吉他
-    "legion_soul_fx",           --灵魂契约特效
-    "the_gifted",               --重铸科技，针对每个角色的独有制作物
-    "saddle_baggage",           --驮物牛鞍
-    "hat_albicans_mushroom",    --素白蘑菇帽
-    "albicansmushroomhat_fx",   --素白蘑菇帽相关fx
-    "explodingfruitcake",       --爆炸水果蛋糕
-}
-
-for k,v in pairs(prefabFiles) do
-    table.insert(PrefabFiles, v)
-end
-
------
-
-local assets = {
-    Asset("ATLAS", "images/station_recast.xml"),
-    Asset("IMAGE", "images/station_recast.tex"),
-
-    Asset("ANIM", "anim/albicansspore_fx.zip"),
-    Asset("ANIM", "anim/mushroom_farm_albicans_cap_build.zip"), --竹荪的蘑菇农场贴图
-
-    Asset("ATLAS", "images/inventoryimages/tripleshovelaxe.xml"), --预加载，给科技栏用的
-    Asset("IMAGE", "images/inventoryimages/tripleshovelaxe.tex"),
-    Asset("ATLAS", "images/inventoryimages/triplegoldenshovelaxe.xml"),
-    Asset("IMAGE", "images/inventoryimages/triplegoldenshovelaxe.tex"),
-    Asset("ATLAS", "images/inventoryimages/dualwrench.xml"),
-    Asset("IMAGE", "images/inventoryimages/dualwrench.tex"),
-    Asset("ATLAS", "images/inventoryimages/icire_rock.xml"),
-    Asset("IMAGE", "images/inventoryimages/icire_rock.tex"),
-    Asset("ATLAS", "images/inventoryimages/hat_cowboy.xml"),
-    Asset("IMAGE", "images/inventoryimages/hat_cowboy.tex"),
-    Asset("ATLAS", "images/inventoryimages/guitar_miguel.xml"),
-    Asset("IMAGE", "images/inventoryimages/guitar_miguel.tex"),
-    Asset("ATLAS", "images/inventoryimages/web_hump_item.xml"),
-    Asset("IMAGE", "images/inventoryimages/web_hump_item.tex"),
-    Asset("ATLAS", "images/inventoryimages/saddle_baggage.xml"),
-    Asset("IMAGE", "images/inventoryimages/saddle_baggage.tex"),
-    Asset("ATLAS", "images/inventoryimages/hat_albicans_mushroom.xml"),
-    Asset("IMAGE", "images/inventoryimages/hat_albicans_mushroom.tex"),
-    Asset("ATLAS", "images/inventoryimages/soul_contracts.xml"),
-    Asset("IMAGE", "images/inventoryimages/soul_contracts.tex"),
-    Asset("ATLAS", "images/inventoryimages/explodingfruitcake.xml"),
-    Asset("IMAGE", "images/inventoryimages/explodingfruitcake.tex"),
-    Asset("ATLAS", "images/inventoryimages/tourmalinecore.xml"),
-    Asset("IMAGE", "images/inventoryimages/tourmalinecore.tex"),
-    Asset("ATLAS", "images/inventoryimages/tourmalineshard.xml"),
-    Asset("IMAGE", "images/inventoryimages/tourmalineshard.tex")
-}
-
-for k,v in pairs(assets) do
-    table.insert(Assets, v)
-end
-
------
-
 local _G = GLOBAL
 local IsServer = TheNet:GetIsServer() or TheNet:IsDedicated()
 local TOOLS_L = require("tools_legion")
@@ -67,334 +6,247 @@ local TOOLS_L = require("tools_legion")
 -- local upvaluehelper = require "hua_upvaluehelper"
 
 --------------------------------------------------------------------------
---[[ 电气石重铸台相关 ]]
+--[[ 修改人物SG，行走与战斗时，需要切换道具时自动切换 ]]
 --------------------------------------------------------------------------
 
-local tech_recast
-local lock_recast
-if _G.CONFIGS_LEGION.TECHUNLOCK == "lootdropper" then
-    tech_recast = { TECH.LOST, TECH.LOST }
-    lock_recast = nil
-else
-    tech_recast = { TECH.ELECOURMALINE_ONE, TECH.ELECOURMALINE_THREE }
-    lock_recast = true
-end
+local function EquipSpeedItem(inst)
+    local backpack = inst.components.inventory:GetEquippedItem(EQUIPSLOTS.BACK or EQUIPSLOTS.BODY) or nil
 
-AddRecipe2(
-    "tripleshovelaxe", {
-        Ingredient("axe", 1),
-        Ingredient("pickaxe", 1),
-        Ingredient("shovel", 1)
-    }, tech_recast[1], {
-        nounlock = lock_recast,
-        atlas = "images/inventoryimages/tripleshovelaxe.xml", image = "tripleshovelaxe.tex"
-    }, { "RECAST", "TOOLS" }
-)
-AddRecipe2(
-    "dualwrench", {
-        Ingredient("hammer", 1),
-        Ingredient("goldnugget", 1),
-        Ingredient("pitchfork", 1)
-    }, tech_recast[1], {
-        nounlock = lock_recast,
-        atlas = "images/inventoryimages/dualwrench.xml", image = "dualwrench.tex"
-    }, { "RECAST", "TOOLS" }
-)
-AddRecipe2(
-    "icire_rock", {
-        Ingredient("amulet", 1),
-        Ingredient("heatrock", 2),
-        Ingredient("blueamulet", 1)
-    }, tech_recast[1], {
-        nounlock = lock_recast,
-        atlas = "images/inventoryimages/icire_rock.xml", image = "icire_rock.tex"
-    }, { "RECAST", "WINTER", "SUMMER" }
-)
-AddRecipe2(
-    "explodingfruitcake", {
-        Ingredient("winter_food4", 1),
-        Ingredient("gunpowder", 2)
-    }, tech_recast[1], {
-        nounlock = lock_recast,
-        atlas = "images/inventoryimages/explodingfruitcake.xml", image = "explodingfruitcake.tex"
-    }, { "RECAST", "WEAPONS" }
-)
-AddRecipe2(
-    "fishhomingtool_awesome", {
-        Ingredient("fishhomingtool_normal", 5, "images/inventoryimages/fishhomingtool_normal.xml"),
-        Ingredient("chum", 2)
-    }, tech_recast[1], {
-        nounlock = lock_recast,
-        atlas = "images/inventoryimages/fishhomingtool_awesome.xml", image = "fishhomingtool_awesome.tex"
-    }, { "RECAST", "FISHING" }
-)
-AddRecipe2(
-    "tourmalinecore", {
-        Ingredient("redgem", 10),
-        Ingredient("tourmalineshard", 10, "images/inventoryimages/tourmalineshard.xml"),
-        Ingredient("moonstorm_spark", 10)
-    }, tech_recast[2], {
-        nounlock = lock_recast, no_deconstruction = true,
-        atlas = "images/inventoryimages/tourmalinecore.xml", image = "tourmalinecore.tex"
-    }, { "RECAST", "REFINE" }
-)
-AddRecipe2(
-    "triplegoldenshovelaxe", {
-        Ingredient("goldenaxe", 2),
-        Ingredient("goldenpickaxe", 2),
-        Ingredient("goldenshovel", 2)
-    }, tech_recast[2], {
-        nounlock = lock_recast,
-        atlas = "images/inventoryimages/triplegoldenshovelaxe.xml", image = "triplegoldenshovelaxe.tex"
-    }, { "RECAST", "TOOLS" }
-)
-AddRecipe2(
-    "hat_cowboy", {
-        Ingredient("beefalohat", 1),
-        Ingredient("brush", 1),
-        Ingredient("rainhat", 1),
-        Ingredient("tophat", 1)
-    }, tech_recast[2], {
-        nounlock = lock_recast,
-        atlas = "images/inventoryimages/hat_cowboy.xml", image = "hat_cowboy.tex"
-    }, { "RECAST", "RAIN", "SUMMER", "RIDING", "CLOTHING" }
-)
-AddRecipe2(
-    "saddle_baggage", {
-        Ingredient("bedroll_straw", 1),
-        Ingredient("saddle_basic", 1),
-        Ingredient("bundlewrap", 2)
-    }, tech_recast[2], {
-        nounlock = lock_recast,
-        atlas = "images/inventoryimages/saddle_baggage.xml", image = "saddle_baggage.tex"
-    }, { "RECAST", "RIDING", "COOKING", "CONTAINERS" }
-)
-AddRecipe2(
-    "hat_albicans_mushroom", {
-        Ingredient("red_mushroomhat", 1),
-        Ingredient("green_mushroomhat", 1),
-        Ingredient("blue_mushroomhat", 1)
-    }, tech_recast[2], {
-        nounlock = lock_recast,
-        atlas = "images/inventoryimages/hat_albicans_mushroom.xml", image = "hat_albicans_mushroom.tex"
-    }, { "RECAST", "CLOTHING", "SUMMER", "GARDENING", "RAIN" }
-)
-AddRecipe2(
-    "siving_mask_gold", {
-        Ingredient("goggleshat", 1),
-        Ingredient("siving_mask", 1, "images/inventoryimages/siving_mask.xml"),
-        Ingredient("siving_derivant_item", 1, "images/inventoryimages/siving_derivant_item.xml"),
-        Ingredient("dish_shyerryjam", 1, "images/inventoryimages/dish_shyerryjam.xml")
-    }, tech_recast[2], {
-        nounlock = lock_recast,
-        atlas = "images/inventoryimages/siving_mask_gold.xml", image = "siving_mask_gold.tex"
-    }, { "RECAST", "ARMOUR", "RESTORATION" }
-)
-AddRecipe2(
-    "siving_suit_gold", {
-        Ingredient("onemanband", 1),
-        Ingredient("siving_suit", 1, "images/inventoryimages/siving_suit.xml"),
-        Ingredient("siving_derivant_item", 1, "images/inventoryimages/siving_derivant_item.xml"),
-        Ingredient("bundlewrap", 1)
-    }, tech_recast[2], {
-        nounlock = lock_recast,
-        atlas = "images/inventoryimages/siving_suit_gold.xml", image = "siving_suit_gold.tex"
-    }, { "RECAST", "ARMOUR", "CONTAINERS" }
-)
-AddRecipe2(
-    "siving_ctlall_item", {
-        Ingredient("siving_ctlwater_item", 1, "images/inventoryimages/siving_ctlwater_item.xml"),
-        Ingredient("siving_ctldirt_item", 1, "images/inventoryimages/siving_ctldirt_item.xml"),
-        Ingredient("siving_derivant_item", 1, "images/inventoryimages/siving_derivant_item.xml"),
-        Ingredient("singingshell_octave4", 1, nil, nil, "singingshell_octave4_1.tex")
-    }, tech_recast[2], {
-        nounlock = lock_recast,
-        atlas = "images/inventoryimages/siving_ctlall_item.xml", image = "siving_ctlall_item.tex"
-    }, { "RECAST", "MAGIC", "GARDENING", "STRUCTURES" }
-)
-AddRecipe2(
-    "hat_elepheetle", {
-        Ingredient("cookiecutterhat", 1),
-        Ingredient("insectshell_l", 35, "images/inventoryimages/insectshell_l.xml"),
-        Ingredient("goldnugget", 15),
-        Ingredient("slurtlehat", 1)
-    }, tech_recast[2], {
-        nounlock = lock_recast,
-        atlas = "images/inventoryimages/hat_elepheetle.xml", image = "hat_elepheetle.tex"
-    }, { "RECAST", "ARMOUR" }
-)
-AddRecipe2(
-    "armor_elepheetle", {
-        Ingredient("armormarble", 1),
-        Ingredient("insectshell_l", 45, "images/inventoryimages/insectshell_l.xml"),
-        Ingredient("goldnugget", 20),
-        Ingredient("armorsnurtleshell", 1)
-    }, tech_recast[2], {
-        nounlock = lock_recast,
-        atlas = "images/inventoryimages/armor_elepheetle.xml", image = "armor_elepheetle.tex"
-    }, { "RECAST", "ARMOUR" }
-)
-AddRecipe2(
-    "guitar_miguel", {
-        Ingredient("panflute", 1),
-        Ingredient("onemanband", 1)
-    }, tech_recast[2], {
-        nounlock = lock_recast,
-        atlas = "images/inventoryimages/guitar_miguel.xml", image = "guitar_miguel.tex"
-    }, { "RECAST", "GARDENING", "MAGIC" }
-)
-AddRecipe2(
-    "web_hump_item", {
-        Ingredient("monstermeat_dried", 12),
-        Ingredient("minisign_item", 2),
-        Ingredient("silk", 12)
-    }, tech_recast[2], {
-        nounlock = lock_recast, builder_tag = lock_recast and "spiderwhisperer" or nil,
-        atlas = "images/inventoryimages/web_hump_item.xml", image = "web_hump_item.tex"
-    }, { "RECAST", "STRUCTURES", "DECOR", "CHARACTER" }
-)
-AddRecipe2(
-    "soul_contracts", {
-        Ingredient("wortox_soul", 20),
-        Ingredient("mapscroll", 5),
-        Ingredient("reviver", 2),
-        Ingredient("nightmarefuel", 20)
-    }, tech_recast[2], {
-        nounlock = lock_recast, builder_tag = lock_recast and "soulstealer" or nil,
-        atlas = "images/inventoryimages/soul_contracts.xml", image = "soul_contracts.tex"
-    }, { "RECAST", "RESTORATION", "MAGIC", "CHARACTER" }
-)
+    if backpack ~= nil and backpack.components.container ~= nil then
+        local item1 = backpack.components.container:FindItem(function(item)
+            return item.components.equippable ~= nil and item.components.equippable.walkspeedmult ~= nil and item.components.equippable.walkspeedmult > 1
+        end)
 
---这个配方用来便于绿宝石法杖分解
-AddDeconstructRecipe("web_hump", {
-    Ingredient("monstermeat_dried", 12),
-    Ingredient("minisign_item", 2),
-    Ingredient("silk", 12)
-})
-
-tech_recast = nil
-lock_recast = nil
-
---------------------------------------------------------------------------
---[[ 修改基础函数以给生物添加触电组件 ]]
---------------------------------------------------------------------------
-
-local function CanShockable(inst)
-    return (inst:HasTag("player")
-           or inst:HasTag("character")
-           or inst:HasTag("hostile")
-           or inst:HasTag("smallcreature")
-           or inst:HasTag("largecreature")
-           or inst:HasTag("animal")
-           or inst:HasTag("monster"))
-           and not inst:HasTag("shadowcreature")    --暗影生物不会被触电
-           and not inst:HasTag("electrified")       --电气生物不会被触电
-           and not inst:HasTag("lightninggoat")     --电羊不会被触电
-end
-local function AddShockable(inst, level)
-    if not CanShockable(inst) then
-        return
-    end
-    local symbol = nil
-    local x, y, z = 0, 0, 0
-    local cpt = inst.components.burnable
-    if cpt ~= nil then
-        for _, v in pairs(cpt.fxdata) do
-            if v.follow ~= nil then
-                symbol = v.follow
-                -- level = cpt.fxlevel
-                x = v.x
-                y = v.y
-                z = v.z
-                break
-            end
+        if item1 ~= nil then
+            inst.components.inventory:Equip(item1)
         end
     end
-    if symbol == nil or symbol == "" then
-        cpt = inst.components.freezable
-        if cpt ~= nil then
-            for _, v in pairs(cpt.fxdata) do
-                if v.follow ~= nil then
-                    symbol = v.follow
-                    -- level = cpt.fxlevel
-                    x = v.x
-                    y = v.y
-                    z = v.z
-                    break
+end
+local function EquipFightItem(inst)
+    local backpack = inst.components.inventory:GetEquippedItem(EQUIPSLOTS.BACK or EQUIPSLOTS.BODY) or nil
+
+    if backpack ~= nil and backpack.components.container ~= nil then
+        local item1 = backpack.components.container:FindItem(function(item)
+            if item.components.weapon ~= nil and not item:HasTag("projectile") then
+                local dmg = item.components.weapon:GetDamage(inst, nil) or 0
+                if dmg > 17 or dmg <= 0 then
+                    return true
                 end
             end
+            return false
+        end)
+
+        if item1 ~= nil then
+            inst.components.inventory:Equip(item1)
         end
-        if symbol == nil or symbol == "" then
-            cpt = inst.components.combat
-            if cpt ~= nil then
-                symbol = cpt.hiteffectsymbol
+    end
+end
+
+-- local SGWilson = require "stategraphs/SGwilson" --会使这个文件不再加载，后面新增的动作sg绑定也不会再更新到这里了
+-- package.loaded["stategraphs/SGwilson"] = nil --恢复这个文件的加载状态，以便后面的更新
+
+AddStategraphPostInit("wilson", function(sg)
+    for k, v in pairs(sg.actionhandlers) do
+        if v["action"]["id"] == "ATTACK" then
+            local wilson_atk_handler_fn = v.deststate
+            v.deststate = function(inst, action)
+                if inst.needcombat then
+                    inst.sg.mem.localchainattack = not action.forced or nil
+                    if not (inst.sg:HasStateTag("attack") and action.target == inst.sg.statemem.attacktarget or inst.components.health:IsDead()) then
+                        EquipFightItem(inst) --攻击之前先换攻击装备
+                    end
+                end
+                return wilson_atk_handler_fn(inst, action)
+            end
+
+            break
+        end
+    end
+
+    for k, v in pairs(sg.events) do
+        if v["name"] == "locomote" then
+            local wilson_locomote_event_fn = v.fn
+            v.fn = function(inst, data)
+                if inst.needrun then
+                    if inst.sg:HasStateTag("busy") then
+                        return
+                    end
+                    local is_moving = inst.sg:HasStateTag("moving")
+                    local should_move = inst.components.locomotor:WantsToMoveForward()
+
+                    if not (inst.sg:HasStateTag("bedroll") or inst.sg:HasStateTag("tent") or inst.sg:HasStateTag("waking"))
+                        and not (is_moving and not should_move) 
+                        and (not is_moving and should_move) then
+                        EquipSpeedItem(inst)    --行走之前先换加速装备
+                    end
+                end
+                return wilson_locomote_event_fn(inst, data)
+            end
+        elseif v["name"] == "knockback" then
+            local wilson_knockback_event_fn = v.fn
+            v.fn = function(inst, data)
+                if --盾反+厚重=防击退
+                    inst.shield_l_success and inst.components.inventory ~= nil and
+                    (inst.components.inventory:EquipHasTag("heavyarmor") or inst:HasTag("heavybody"))
+                then
+                    return
+                end
+                if inst:HasTag("firmbody_l") then --特殊标签防击退
+                    return
+                end
+                return wilson_knockback_event_fn(inst, data)
             end
         end
     end
-    if inst.components.shockable == nil then
-        inst:AddComponent("shockable")
+end)
+
+-- AddStategraphEvent("wilson", EventHandler("locomote",
+--     function(inst, data)
+--         if inst.sg:HasStateTag("busy") then
+--             return
+--         end
+--         local is_moving = inst.sg:HasStateTag("moving")
+--         local should_move = inst.components.locomotor:WantsToMoveForward()
+
+--         if not (inst.sg:HasStateTag("bedroll") or inst.sg:HasStateTag("tent") or inst.sg:HasStateTag("waking")) 
+--             and not (is_moving and not should_move) 
+--             and (not is_moving and should_move) then
+--             EquipSpeedItem(inst)    --行走之前先换加速装备
+--         end
+
+--         return SGWilson_loco_event_fn(inst, data)
+--     end)
+-- )
+
+-- AddStategraphActionHandler("wilson", ActionHandler(ACTIONS.ATTACK,
+--     function(inst, action)
+--         inst.sg.mem.localchainattack = not action.forced or nil
+--         if not (inst.sg:HasStateTag("attack") and action.target == inst.sg.statemem.attacktarget or inst.components.health:IsDead()) then
+--             EquipFightItem(inst)    --攻击之前先换攻击装备
+--             return SGWilson_atk_handler_fn(inst, action)
+--         end
+--     end)
+-- )
+
+-- AddStategraphActionHandler("wilson_client", ActionHandler(ACTIONS.ATTACK,
+--     function(inst, action)
+--         if not (inst.sg:HasStateTag("attack") and action.target == inst.sg.statemem.attacktarget or inst.replica.health:IsDead()) then
+--             local equip = inst.replica.inventory:GetEquippedItem(EQUIPSLOTS.HANDS)
+--             if equip == nil then
+--                 return "attack"
+--             end
+--             local inventoryitem = equip.replica.inventoryitem
+--             return (not (inventoryitem ~= nil and inventoryitem:IsWeapon()) and "attack")
+--                 or (equip:HasTag("blowdart") and "blowdart")
+--                 or (equip:HasTag("thrown") and "throw")
+--                 or (equip:HasTag("propweapon") and "attack_prop_pre")
+--                 or "attack"
+--         end
+--     end)
+-- )
+
+--------------------------------------------------------------------------
+--[[ 月折宝剑 ]]
+--------------------------------------------------------------------------
+
+AddStategraphState("wilson", State{
+    name = "moonsurge_l",
+    tags = { "doing", "busy", "canrotate" },
+    onenter = function(inst)
+        local equip = inst.components.inventory:GetEquippedItem(EQUIPSLOTS.HANDS)
+        if equip == nil or not (equip:HasTag("canmoonsurge_l") or equip:HasTag("cansurge_l")) then
+            inst:ClearBufferedAction()
+            inst.sg:GoToState("idle", true)
+            return
+        end
+
+        -- inst.AnimState:PlayAnimation("staff_pre")
+        -- inst.AnimState:PushAnimation("staff", false)
+        inst.AnimState:PlayAnimation("staff") --太拖沓了，直接不要staff_pre那部分的
+        inst.components.locomotor:Stop()
+        inst.SoundEmitter:PlaySound("moonstorm/creatures/boss/alterguardian3/atk_beam", "lightstart", 0.3)
+
+        local fx_skylight = SpawnPrefab(equip:HasTag("canmoonsurge_l") and "refracted_l_skylight_fx" or "refracted_l_light_fx")
+        if fx_skylight ~= nil then
+            fx_skylight.Transform:SetPosition(inst.Transform:GetWorldPosition())
+        end
+    end,
+    timeline = {
+        TimeEvent(21 * FRAMES, function(inst)
+            inst.AnimState:SetFrame(47) --施法动画太长了，直接跳过拖沓的部分
+        end),
+        TimeEvent(25 * FRAMES, function(inst)
+            inst.SoundEmitter:PlaySound("dontstarve/common/together/moonbase/beam_stop", nil, 0.4)
+            inst.SoundEmitter:KillSound("lightstart")
+        end),
+        TimeEvent(29 * FRAMES, function(inst)
+            inst:PerformBufferedAction()
+            inst.sg:RemoveStateTag("busy")
+            inst.sg:AddStateTag("idle")
+            local fx = SpawnPrefab("refracted_l_wave_fx")
+            if fx ~= nil then
+                fx.Transform:SetPosition(inst.Transform:GetWorldPosition())
+            end
+        end)
+    },
+    events = {
+        EventHandler("equip", function(inst) inst.sg:GoToState("idle") end),
+        EventHandler("unequip", function(inst) inst.sg:GoToState("idle") end),
+        EventHandler("animqueueover", function(inst)
+            if inst.AnimState:AnimDone() then
+                inst.sg:GoToState("idle")
+            end
+        end)
+    },
+    onexit = function(inst)
+        inst.SoundEmitter:KillSound("lightstart")
     end
-    if z == 0 then
-        z = 1
-    end
-    inst.components.shockable:InitStaticFx(symbol, Vector3(x or 0, y or 0, z), level or 1)
-end
+})
+AddStategraphState("wilson_client", State{
+    name = "moonsurge_l",
+    tags = { "doing", "busy", "canrotate" },
+    server_states = { "moonsurge_l" },
+    onenter = function(inst)
+        inst.components.locomotor:Stop()
+        -- inst.AnimState:PlayAnimation("staff_pre")
+        -- inst.AnimState:PushAnimation("staff_lag", false)
+        inst.AnimState:PlayAnimation("staff") --太拖沓了，直接不要staff_pre那部分的
 
-local MakeSmallBurnableCharacter_old = MakeSmallBurnableCharacter
-_G.MakeSmallBurnableCharacter = function(inst, sym, offset)
-    local burnable, propagator = MakeSmallBurnableCharacter_old(inst, sym, offset)
-    AddShockable(inst, 1)
-    return burnable, propagator
-end
+        inst:PerformPreviewBufferedAction()
+        inst.sg:SetTimeout(2)
+    end,
+    onupdate = function(inst)
+        if inst.sg:ServerStateMatches() then
+            if inst.entity:FlattenMovementPrediction() then
+                inst.sg:GoToState("idle", "noanim")
+            end
+        elseif inst.bufferedaction == nil then
+            inst.sg:GoToState("idle")
+        end
+    end,
+    ontimeout = function(inst)
+        inst:ClearBufferedAction()
+        inst.sg:GoToState("idle")
+    end,
+    timeline = {
+        TimeEvent(21 * FRAMES, function(inst)
+            inst.AnimState:SetFrame(47) --施法动画太长了，直接跳过拖沓的部分
+        end),
+        TimeEvent(29 * FRAMES, function(inst)
+            inst.sg:RemoveStateTag("busy")
+            inst.sg:AddStateTag("idle")
+        end)
+    }
+})
 
-local MakeMediumBurnableCharacter_old = MakeMediumBurnableCharacter
-_G.MakeMediumBurnableCharacter = function(inst, sym, offset)
-    local burnable, propagator = MakeMediumBurnableCharacter_old(inst, sym, offset)
-    AddShockable(inst, 2)
-    return burnable, propagator
-end
 
-local MakeLargeBurnableCharacter_old = MakeLargeBurnableCharacter
-_G.MakeLargeBurnableCharacter = function(inst, sym, offset)
-    local burnable, propagator = MakeLargeBurnableCharacter_old(inst, sym, offset)
-    AddShockable(inst, 3)
-    return burnable, propagator
-end
 
-local MakeTinyFreezableCharacter_old = MakeTinyFreezableCharacter
-_G.MakeTinyFreezableCharacter = function(inst, sym, offset)
-    local freezable = MakeTinyFreezableCharacter_old(inst, sym, offset)
-    AddShockable(inst, 1)
-    return freezable
-end
 
-local MakeSmallFreezableCharacter_old = MakeSmallFreezableCharacter
-_G.MakeSmallFreezableCharacter = function(inst, sym, offset)
-    local freezable = MakeSmallFreezableCharacter_old(inst, sym, offset)
-    AddShockable(inst, 1)
-    return freezable
-end
 
-local MakeMediumFreezableCharacter_old = MakeMediumFreezableCharacter
-_G.MakeMediumFreezableCharacter = function(inst, sym, offset)
-    local freezable = MakeMediumFreezableCharacter_old(inst, sym, offset)
-    AddShockable(inst, 2)
-    return freezable
-end
 
-local MakeLargeFreezableCharacter_old = MakeLargeFreezableCharacter
-_G.MakeLargeFreezableCharacter = function(inst, sym, offset)
-    local freezable = MakeLargeFreezableCharacter_old(inst, sym, offset)
-    AddShockable(inst, 2)
-    return freezable
-end
 
-local MakeHugeFreezableCharacter_old = MakeHugeFreezableCharacter
-_G.MakeHugeFreezableCharacter = function(inst, sym, offset)
-    local freezable = MakeHugeFreezableCharacter_old(inst, sym, offset)
-    AddShockable(inst, 3)
-    return freezable
-end
+
+
 
 --------------------------------------------------------------------------
 --[[ 添加触电相关的sg ]]

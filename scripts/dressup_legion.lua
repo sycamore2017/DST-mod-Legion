@@ -1,10 +1,6 @@
 local _G = GLOBAL
 local IsServer = TheNet:GetIsServer() or TheNet:IsDedicated()
 
----
-
-table.insert(Assets, Asset("ANIM", "anim/hat_straw_perd.zip"))
-
 --------------------------------------------------------------------------
 --[[ 全局幻化数据 ]]
 --------------------------------------------------------------------------

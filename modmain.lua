@@ -163,6 +163,39 @@ PrefabFiles = {
 
     "foliageath",               --青枝绿叶
     "neverfade_butterfly",      --永不凋零的蝴蝶
+
+    -- "lilypond",             --荷花池相关特效
+    "shyerries",            --颤栗树相关
+    "sand_spike_legion",    --对玩家友好的沙之咬
+    "whitewoods",           --白木相关
+
+    "siving_rocks_legion",
+    "farm_plants_legion",
+    "cropgnat",
+    "insectthings_l",
+    "siving_related",
+    "fishhomingtools",
+    "boss_siving_phoenix",
+
+    "fimbul_fx",                --芬布尔相关fx
+    "boss_elecarmet",           --莱克阿米特
+    "elecourmaline",            --电气重铸台
+    "icire_rock",               --鸳鸯石
+    "guitar_miguel",            --米格尔的吉他
+    "legion_soul_fx",           --灵魂契约特效
+    "the_gifted",               --重铸科技，针对每个角色的独有制作物
+    "saddle_baggage",           --驮物牛鞍
+    "hat_albicans_mushroom",    --素白蘑菇帽
+    "albicansmushroomhat_fx",   --素白蘑菇帽相关fx
+    "explodingfruitcake",       --爆炸水果蛋糕
+
+    "raindonate",               --雨蝇
+    "monstrain",                --雨竹
+    "hat_mermbreathing",        --鱼之息
+    "merm_scales",              --鱼鳞
+    "giantsfoot",               --巨脚背包
+    "moonlight_legion",         --月之宝具
+    "moon_dungeon",             --月的地下城
 }
 Assets = {
     Asset("ANIM", "anim/images_minisign1.zip"),  --专门为小木牌上的图画准备的文件(真是奢侈0.0)
@@ -175,8 +208,15 @@ Assets = {
     Asset("ANIM", "anim/playguitar.zip"), --弹吉他动画模板
     Asset("SOUNDPACKAGE", "sound/legion.fev"), --吉他的声音
     Asset("SOUND", "sound/legion.fsb"),
+
+    Asset("ANIM", "anim/ui_hiddenmoonlight_4x4.zip"),
+    Asset("ANIM", "anim/ui_revolvedmoonlight_4x3.zip"),
     Asset("ATLAS", "images/slot_bearspaw_l.xml"), --靠背熊的格子背景
     Asset("IMAGE", "images/slot_bearspaw_l.tex"),
+    Asset("ATLAS", "images/slot_juice_l.xml"), --巨食草的格子背景
+    Asset("IMAGE", "images/slot_juice_l.tex"),
+    Asset("ATLAS", "images/station_recast.xml"), --重铸科技栏图标
+    Asset("IMAGE", "images/station_recast.tex"),
 
     --为工艺锅mod加的（此时并不明确是否启用了该mod）
     Asset("ATLAS", "images/foodtags/foodtag_gel.xml"),
@@ -190,7 +230,20 @@ Assets = {
     Asset("ATLAS", "images/foodtags/foodtag_hallowednights.xml"),
     Asset("IMAGE", "images/foodtags/foodtag_hallowednights.tex"),
     Asset("ATLAS", "images/foodtags/foodtag_newmoon.xml"),
-    Asset("IMAGE", "images/foodtags/foodtag_newmoon.tex")
+    Asset("IMAGE", "images/foodtags/foodtag_newmoon.tex"),
+
+    Asset("ANIM", "anim/mushroom_farm_albicans_cap_build.zip"), --竹荪的蘑菇农场贴图
+    Asset("ANIM", "anim/mushroom_farm_cutlichen_build.zip"), --洞穴苔藓的蘑菇农场贴图
+    Asset("ANIM", "anim/mushroom_farm_foliage1_build.zip"), --蕨叶(森林)的蘑菇农场贴图
+    Asset("ANIM", "anim/mushroom_farm_foliage2_build.zip"), --蕨叶(洞穴)的蘑菇农场贴图
+    Asset("ANIM", "anim/farm_plant_pineananas.zip"),
+    Asset("ANIM", "anim/player_actions_roll.zip"), --脱壳之翅所需动作（来自单机版）
+    Asset("ANIM", "anim/albicansspore_fx.zip"), --素白蘑菇帽技能特效相关贴图
+
+    Asset("ANIM", "anim/crop_legion_cactus.zip"), --异种动画，让子圭育提前用的
+    Asset("ANIM", "anim/crop_legion_lureplant.zip"),
+    Asset("ANIM", "anim/crop_legion_berries.zip"),
+    Asset("ANIM", "anim/crop_legion_pine.zip")
 }
 
 --------------------------------------------------------------------------
@@ -287,15 +340,24 @@ RegisterInvItems({
     "sachet",
     ------美味佳肴
     ------尘世蜃楼
-    "shyerry", "shyerry_cooked",
+    "shyerry", "shyerry_cooked", "shyerrylog", "shield_l_sand", "guitar_whitewood", "mat_whitewood_item",
+    "carpet_whitewood_big", "carpet_whitewood", "chest_whitewood_big", "chest_whitewood",
+    "ointment_l_fireproof",
     ------丰饶传说
-    "pineananas", "pineananas_cooked", "pineananas_seeds",
-    "pineananas_oversized", "pineananas_oversized_waxed", "pineananas_oversized_rotten",
-    "mint_l",
+    "pineananas", "pineananas_cooked", "pineananas_seeds", "siving_turn", "siving_feather_fake",
+    "pineananas_oversized", "pineananas_oversized_waxed", "pineananas_oversized_rotten", "carpet_plush",
+    "mint_l", "siving_soil_item", "ahandfulofwings", "insectshell_l", "boltwingout", "hat_elepheetle",
+    "siving_rocks", --mod之间注册相同的文件是有效的
+    "siving_ctlwater_item", "siving_ctldirt_item", "siving_ctlall_item", "fishhomingtool_normal",
+    "fishhomingtool_awesome", "siving_mask", "siving_mask_gold", "siving_feather_real", "armor_elepheetle",
+    "carpet_plush_big", "siving_suit", "siving_suit_gold", "ointment_l_sivbloodreduce",
     ------电闪雷鸣
-    "albicans_cap",
+    "albicans_cap", "tripleshovelaxe", "triplegoldenshovelaxe", "dualwrench", "icire_rock", "hat_cowboy",
+    "guitar_miguel", "web_hump_item", "saddle_baggage", "hat_albicans_mushroom", "soul_contracts",
+    "explodingfruitcake", "tourmalinecore", "tourmalineshard",
     ------祈雨祭
-    "monstrain_leaf",
+    "monstrain_leaf", "squamousfruit", "raindonate", "book_weather", "merm_scales", "hat_mermbreathing",
+    "giantsfoot", "hiddenmoonlight_item", "revolvedmoonlight_item",
     ------黯涌
     "shield_l_log", "hat_lichen"
 })
@@ -331,6 +393,14 @@ RegisterMapImages({
     ------黯涌
     "backcub"
 })
+
+if _G.CONFIGS_LEGION.DRESSUP then
+    table.insert(Assets, Asset("ANIM", "anim/hat_straw_perd.zip"))
+    table.insert(PrefabFiles, "theemperorsnewclothes") --国王的新衣
+    RegisterInvItems({
+        "pinkstaff", "theemperorscrown", "theemperorsmantle", "theemperorsscepter", "theemperorspendant"
+    })
+end
 
 --------------------------------------------------------------------------
 --[[ 热更新机制 ]]
@@ -463,17 +533,26 @@ end
 --[[ 导入数据 ]]
 --------------------------------------------------------------------------
 
-------花香四溢
-
-modimport("scripts/legion1_flower.lua")
-
-------尘世蜃楼
-
+------组件与预制物相关
+modimport("scripts/postinit_legion.lua")
+--新增科技与科技栏
+if _G.CONFIGS_LEGION.TECHUNLOCK == "prototyper" then
+    modimport("scripts/new_techtree_legion.lua")
+end
+------制作相关
+modimport("scripts/recipes_legion.lua")
+------sg相关
+modimport("scripts/stategraph_legion.lua")
+------动作相关
+modimport("scripts/actions_legoin.lua")
+------幻化相关
 if _G.CONFIGS_LEGION.DRESSUP then
     modimport("scripts/fengl_userdatahook.lua")
     modimport("scripts/dressup_legion.lua")
 end
-modimport("scripts/legion3_desert.lua")
+
+
+
 
 ------丰饶传说
 
@@ -481,14 +560,12 @@ modimport("scripts/legendoffall_legion.lua")
 
 ------电闪雷鸣
 
-if _G.CONFIGS_LEGION.TECHUNLOCK == "prototyper" then
-    modimport("scripts/new_techtree_legion.lua") --新增制作栏的所需代码
-end
-modimport("scripts/flashandcrush_legion.lua")
+
+
 
 ------祈雨祭
 
-modimport("scripts/prayforrain_legion.lua")
+
 
 ------黯涌
 
@@ -497,27 +574,13 @@ modimport("scripts/prayforrain_legion.lua")
 --[[ 黯涌 ]]
 --------------------------------------------------------------------------
 
-AddRecipe2(
-    "shield_l_log", {
-        Ingredient("boards", 2),
-        Ingredient("rope", 2),
-    }, TECH.SCIENCE_ONE, {
-        atlas = "images/inventoryimages/shield_l_log.xml", image = "shield_l_log.tex"
-    }, { "WEAPONS", "ARMOUR" }
-)
+
 
 ----------
 --苔衣发卡的作用
 ----------
 
-AddRecipe2(
-    "hat_lichen", {
-        Ingredient("lightbulb", 6),
-        Ingredient("cutlichen", 4),
-    }, TECH.NONE, {
-        atlas = "images/inventoryimages/hat_lichen.xml", image = "hat_lichen.tex"
-    }, { "CLOTHING", "LIGHT" }
-)
+
 
 if IsServer then
     local function CanTarget_lichen(self, target, ...)
