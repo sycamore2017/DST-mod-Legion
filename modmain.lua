@@ -138,7 +138,7 @@
 --下行代码只代表查值时自动查global，增加global的变量或者修改global的变量时还是需要带"GLOBAL."
 GLOBAL.setmetatable(env, { __index = function(t, k) return GLOBAL.rawget(GLOBAL, k) end })
 local _G = GLOBAL
-local IsServer = TheNet:GetIsServer() or TheNet:IsDedicated()
+-- local IsServer = TheNet:GetIsServer() or TheNet:IsDedicated()
 TUNING.mod_legion_enabled = true --方便别的mod做判定。不过就算这样，也受mod加载顺序影响
 
 PrefabFiles = {
@@ -541,121 +541,15 @@ if _G.CONFIGS_LEGION.TECHUNLOCK == "prototyper" then
 end
 ------制作相关
 modimport("scripts/recipes_legion.lua")
-------sg相关
-modimport("scripts/stategraph_legion.lua")
-------动作相关
-modimport("scripts/actions_legoin.lua")
+------sg、动作相关
+modimport("scripts/sgactions_legoin.lua")
 ------幻化相关
 if _G.CONFIGS_LEGION.DRESSUP then
     modimport("scripts/fengl_userdatahook.lua")
     modimport("scripts/dressup_legion.lua")
 end
-
-
-
-
-------丰饶传说
-
-modimport("scripts/legendoffall_legion.lua")
-
-------电闪雷鸣
-
-
-
-
-------祈雨祭
-
-
-
-------黯涌
-
-
---------------------------------------------------------------------------
---[[ 黯涌 ]]
---------------------------------------------------------------------------
-
-
-
-----------
---苔衣发卡的作用
-----------
-
-
-
-if IsServer then
-    local function CanTarget_lichen(self, target, ...)
-        if
-            target ~= nil and
-            self.target ~= target and --兔人对其没仇恨(已有仇恨不能解除)
-            not target:HasTag("monster") and --不会保护怪物
-            target:HasTag("ignoreMeat") and
-            target.components.combat ~= nil and (
-                target.components.combat.target == nil or
-                not target.components.combat.target:HasTag("manrabbit") --不能对兔人群体有仇恨
-            )
-        then
-            return false
-        end
-        if self.inst.CanTarget_old_lichen ~= nil then
-            return self.inst.CanTarget_old_lichen(self, target, ...)
-        end
-        return false
-    end
-    AddPrefabPostInit("bunnyman", function(inst)
-        inst.CanTarget_old_lichen = inst.components.combat.CanTarget
-        inst.components.combat.CanTarget = CanTarget_lichen
-    end)
-end
-
-----------
---增加新的周期性怪物
-----------
-
--- AddPrefabPostInit("forest", function(inst)
---     if TheWorld.ismastersim then
---         local houndspawn =
---         {
---             base_prefab = "bishop",
---             winter_prefab = "killerbee",
---             summer_prefab = "killerbee",
-
---             attack_levels =
---             {
---                 intro   = { warnduration = function() return 120 end, numspawns = function() return 2 end },
---                 light   = { warnduration = function() return 60 end, numspawns = function() return 2 + math.random(2) end },
---                 med     = { warnduration = function() return 45 end, numspawns = function() return 3 + math.random(3) end },
---                 heavy   = { warnduration = function() return 30 end, numspawns = function() return 4 + math.random(3) end },
---                 crazy   = { warnduration = function() return 30 end, numspawns = function() return 6 + math.random(4) end },
---             },
-
---             attack_delays =
---             {
---                 rare        = function() return TUNING.TOTAL_DAY_TIME * 3, math.random() * TUNING.TOTAL_DAY_TIME * 1 end,
---                 occasional  = function() return TUNING.TOTAL_DAY_TIME * 2, math.random() * TUNING.TOTAL_DAY_TIME * 1 end,
---                 frequent    = function() return TUNING.TOTAL_DAY_TIME * 1, math.random() * TUNING.TOTAL_DAY_TIME * 1 end,
---             },
-
---             warning_speech = "ANNOUNCE_HOUNDS",
-
---             --Key = time, Value = sound prefab
---             warning_sound_thresholds =
---             {
---                 { time = 30, sound =  "LVL4" },
---                 { time = 60, sound =  "LVL3" },
---                 { time = 90, sound =  "LVL2" },
---                 { time = 500, sound = "LVL1" },
---             },
---         }
-
---         inst.components.hounded:SetSpawnData(houndspawn)
---     end
--- end)
-
---------------------------------------------------------------------------
---[[ 皮肤 ]]
---------------------------------------------------------------------------
-
-modimport("scripts/skin_legion.lua") --skined_legion
+------皮肤相关
+modimport("scripts/skin_legion.lua")
 
 --------------------------------------------------------------------------
 --[[ mod之间的兼容，以及其他 ]]
@@ -673,11 +567,9 @@ AddComponentPostInit("actionqueuer", function(self)
 	end
 end)
 
---AddSimPostInit()在所有mod加载完毕后才执行，这时能更准确判定是否启用某mod，不用考虑优先级
+--AddSimPostInit() 会在所有预制物都初始化完成后才执行，所以就不用担心官方逻辑产生相同的预制物
+--AddSimPostInit() 在所有mod加载完毕后才执行，这时能更准确判定是否启用某mod，不用考虑优先级
 AddSimPostInit(function()
-	--table.insert(Assets, Asset("ANIM", "anim/player_actions_roll.zip")) --这个函数里没法再注册动画数据了
-    --注意：运行这里时，所有mod的prefab已经注册完成了
-
     ----------
     --丰饶传说
     ----------
@@ -695,11 +587,83 @@ AddSimPostInit(function()
         cooked_float_settings = {"small", 0.2, 1},
 
         seed_weight = TUNING.SEED_CHANCE_RARE, --大概只有这里起作用了
-        dryable = nil,
-        halloweenmoonmutable_settings = nil,
-        secondary_foodtype = nil,
-        lure_data = nil
+        -- dryable = nil,
+        -- halloweenmoonmutable_settings = nil,
+        -- secondary_foodtype = nil,
+        -- lure_data = nil
     }
+
+    ----------
+    --烹饪食材属性 兼容性修改(官方逻辑没有兼容性，只能自己写个有兼容性的啦)
+    ----------
+    cooking = require("cooking") --不清楚别的修改会不会自动修改原有的，所以这里重新获取一遍
+    local ingredients_base = cooking.ingredients
+    if ingredients_base then
+        for _, ing in ipairs(ingredients_l) do
+            for _, name in pairs(ing[1]) do
+                local cancook = ing[3]
+                local candry = ing[4]
+
+                if ingredients_base[name] == nil then
+                    ingredients_base[name] = { tags={} }
+                end
+                if cancook then
+                    if ingredients_base[name.."_cooked"] == nil then
+                        ingredients_base[name.."_cooked"] = { tags={} }
+                    end
+                end
+                if candry then
+                    if ingredients_base[name.."_dried"] == nil then
+                        ingredients_base[name.."_dried"] = { tags={} }
+                    end
+                end
+
+                for tagname, tagval in pairs(ing[2]) do
+                    ingredients_base[name].tags[tagname] = tagval
+                    if cancook then
+                        ingredients_base[name.."_cooked"].tags.precook = 1
+                        ingredients_base[name.."_cooked"].tags[tagname] = tagval
+                    end
+                    if candry then
+                        ingredients_base[name.."_dried"].tags.dried = 1
+                        ingredients_base[name.."_dried"].tags[tagname] = tagval
+                    end
+                end
+            end
+        end
+    end
+    ingredients_l = nil
+
+    ----------
+    --食谱页面优化
+    ----------
+    if _G.CONFIGS_LEGION.BETTERCOOKBOOK then
+        local cookbookui_legion = require("widgets/cookbookui_legion")
+        local fooduidata_legion = require("languages/recipedesc_legion_chinese")
+
+        local function SetNewCookBookPage(data, self, top, left)
+            local root = cookbookui_legion(data, self, top, left)
+            return root
+        end
+        for cooker, reps in pairs(cooking.recipes) do
+            for repname, dd in pairs(reps) do
+                if dd.custom_cookbook_details_fn == nil then --经过一类循环后，后面的数据多半是重复索引的
+                    if cooking.IsModCookerFood(repname) then --是mod料理
+                        if dd.recipe_count ~= nil then
+                            dd.custom_cookbook_details_fn = SetNewCookBookPage
+                        end
+                    else
+                        if fooduidata_legion[repname] ~= nil then
+                            dd.cook_need = fooduidata_legion[repname].cook_need
+                            dd.cook_cant = fooduidata_legion[repname].cook_cant
+                            dd.recipe_count = fooduidata_legion[repname].recipe_count or 1
+                            dd.custom_cookbook_details_fn = SetNewCookBookPage
+                        end
+                    end
+                end
+            end
+        end
+    end
 
     ----------
     --神话书说
@@ -1448,78 +1412,6 @@ AddSimPostInit(function()
             DRESSUP_DATA["ab_yzjxq"] = { --月之交响曲
                 isnoskin = true, buildfile = "abigail_williams_wand_full", buildsymbol = "swap_object"
             }
-        end
-    end
-
-    ----------
-    --烹饪食材属性 兼容性修改(官方逻辑没有兼容性，只能自己写个有兼容性的啦)
-    ----------
-    cooking = require("cooking") --不清楚别的修改会不会自动修改原有的，所以这里重新获取一遍
-    local ingredients_base = cooking.ingredients
-    if ingredients_base then
-        for _, ing in ipairs(ingredients_l) do
-            for _, name in pairs(ing[1]) do
-                local cancook = ing[3]
-                local candry = ing[4]
-
-                if ingredients_base[name] == nil then
-                    ingredients_base[name] = { tags={} }
-                end
-                if cancook then
-                    if ingredients_base[name.."_cooked"] == nil then
-                        ingredients_base[name.."_cooked"] = { tags={} }
-                    end
-                end
-                if candry then
-                    if ingredients_base[name.."_dried"] == nil then
-                        ingredients_base[name.."_dried"] = { tags={} }
-                    end
-                end
-
-                for tagname, tagval in pairs(ing[2]) do
-                    ingredients_base[name].tags[tagname] = tagval
-                    if cancook then
-                        ingredients_base[name.."_cooked"].tags.precook = 1
-                        ingredients_base[name.."_cooked"].tags[tagname] = tagval
-                    end
-                    if candry then
-                        ingredients_base[name.."_dried"].tags.dried = 1
-                        ingredients_base[name.."_dried"].tags[tagname] = tagval
-                    end
-                end
-            end
-        end
-    end
-    ingredients_l = nil
-
-    ----------
-    --食谱页面优化
-    ----------
-    if _G.CONFIGS_LEGION.BETTERCOOKBOOK then
-        local cookbookui_legion = require("widgets/cookbookui_legion")
-        local fooduidata_legion = require("languages/recipedesc_legion_chinese")
-
-        local function SetNewCookBookPage(data, self, top, left)
-            local root = cookbookui_legion(data, self, top, left)
-            return root
-        end
-        for cooker, reps in pairs(cooking.recipes) do
-            for repname, dd in pairs(reps) do
-                if dd.custom_cookbook_details_fn == nil then --经过一类循环后，后面的数据多半是重复索引的
-                    if cooking.IsModCookerFood(repname) then --是mod料理
-                        if dd.recipe_count ~= nil then
-                            dd.custom_cookbook_details_fn = SetNewCookBookPage
-                        end
-                    else
-                        if fooduidata_legion[repname] ~= nil then
-                            dd.cook_need = fooduidata_legion[repname].cook_need
-                            dd.cook_cant = fooduidata_legion[repname].cook_cant
-                            dd.recipe_count = fooduidata_legion[repname].recipe_count or 1
-                            dd.custom_cookbook_details_fn = SetNewCookBookPage
-                        end
-                    end
-                end
-            end
         end
     end
 
