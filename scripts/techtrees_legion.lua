@@ -41,7 +41,7 @@ AddRecipeFilter({
 
 _G.TECH.NONE.ELECOURMALINE = 0
 _G.TECH.ELECOURMALINE_ONE = { ELECOURMALINE = 1 }
--- _G.TECH.ELECOURMALINE_TWO = { ELECOURMALINE = 2 }
+-- _G.TECH.ELECOURMALINE_TWO = { ELECOURMALINE = 2 } --解锁等级中间隔一个等级，能使得没法解锁时，不会显示出来
 _G.TECH.ELECOURMALINE_THREE = { ELECOURMALINE = 3 }
 
 --------------------------------------------------------------------------

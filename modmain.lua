@@ -137,6 +137,7 @@
 
 --下行代码只代表查值时自动查global，增加global的变量或者修改global的变量时还是需要带"GLOBAL."
 GLOBAL.setmetatable(env, { __index = function(t, k) return GLOBAL.rawget(GLOBAL, k) end })
+
 local _G = GLOBAL
 -- local IsServer = TheNet:GetIsServer() or TheNet:IsDedicated()
 TUNING.mod_legion_enabled = true --方便别的mod做判定。不过就算这样，也受mod加载顺序影响
@@ -260,53 +261,49 @@ Assets = {
 
 _G.CONFIGS_LEGION = {
     ENABLEDMODS = {},
-    LANGUAGES = GetModConfigData("Language") or "chinese" --语言
+    LANGUAGES = GetModConfigData("Language") or "chinese", --语言
+    CLEANINGUPSTENCH = GetModConfigData("CleaningUpStench"), --自动清除地上的臭臭
+    AUTOSTACKEDLOOT = GetModConfigData("AutoStackedLoot"), --掉落物自动堆叠
+
+    FLOWERWEAPONSCHANCE = GetModConfigData("FlowerWeaponsChance"), --花剑掉落几率
+    FOLIAGEATHCHANCE = GetModConfigData("FoliageathChance"), --青枝绿叶掉落几率
+    ROSEBUSHSPACING = GetModConfigData("RoseBushSpacing"), --蔷薇花丛种植距离限制半径
+    LILYBUSHSPACING = GetModConfigData("LilyBushSpacing"), --蹄莲花丛种植距离限制半径
+    ORCHIDBUSHSPACING = GetModConfigData("OrchidBushSpacing"), --兰草花丛种植距离限制半径
+
+    BETTERCOOKBOOK = false, --更好的食谱界面。仅限中文
+    FESTIVALRECIPES = GetModConfigData("FestivalRecipes"), --解禁节日料理
+
+    HIDDENUPDATETIMES = GetModConfigData("HiddenUpdateTimes"), --月藏宝匣最大升级次数
+    REVOLVEDUPDATETIMES = GetModConfigData("RevolvedUpdateTimes"), --月轮宝盘最大升级次数
+    REFRACTEDUPDATETIMES = GetModConfigData("RefractedUpdateTimes"), --月折宝剑最大升级次数
+
+    X_GROWTHTIME = GetModConfigData("X_growthTime"), --设置异种生长的时间倍数
+    X_OVERRIPETIME = GetModConfigData("X_overripeTime"), --设置异种过熟的时间倍数
+    X_PESTRISK = GetModConfigData("X_pestRisk"), --设置异种虫害几率
+    PHOENIXREBIRTHCYCLE = GetModConfigData("PhoenixRebirthCycle"), --设置玄鸟重生时间
+    SIVINGROOTTEX = GetModConfigData("SivingRootTex"), --设置子圭突触贴图
+    PHOENIXBATTLEDIFFICULTY = GetModConfigData("PhoenixBattleDifficulty"), --设置玄鸟战斗难度
+    SIVFEADAMAGE = GetModConfigData("SivFeaDamage"), --设置子圭·翰的攻击力
+    SIVFEAHEALTHCOST = GetModConfigData("SivFeaHealthCost"), --设置子圭·翰的技能耗血量
+    SIVFEATHROWEDNUM = GetModConfigData("SivFeaThrowedNum"), --设置羽刃分掷的最大投掷数
+    DIGESTEDITEMMSG = GetModConfigData("DigestedItemMsg"), --巨食草消化提醒
+    TRANSTIMECROP = GetModConfigData("TransTimeCrop"), --普通作物转成异种的时间
+    TRANSTIMESPEC = GetModConfigData("TransTimeSpec"), --特殊植物转成异种的时间倍率
+    SIVSOLTOMEDAL = GetModConfigData("SivSolToMedal"), --子圭·垄兼容能力勋章的作物
+    TISSUECACTUSCHANCE = GetModConfigData("TissueCactusChance"), --仙人掌活性组织掉落几率
+    TISSUEBERRIESCHANCE = GetModConfigData("TissueBerriesChance"), --浆果丛活性组织掉落几率
+
+    TECHUNLOCK = GetModConfigData("TechUnlock"), --设置新道具的科技解锁方式 "lootdropper" "prototyper"
+
+    DRESSUP = GetModConfigData("DressUp"), --启用幻化机制
+
+    BACKCUBCHANCE = GetModConfigData("BackCubChance"), --靠背熊掉落几率
+    SHIELDRECHARGETIME = GetModConfigData("ShieldRechargeTime"), --盾牌冷却时间
+    AGRONRECHARGETIME = GetModConfigData("AgronRechargeTime"), --艾力冈的剑冷却时间
 }
 
-_G.CONFIGS_LEGION.CLEANINGUPSTENCH = GetModConfigData("CleaningUpStench") --自动清除地上的臭臭
-_G.CONFIGS_LEGION.AUTOSTACKEDLOOT = GetModConfigData("AutoStackedLoot") --掉落物自动堆叠
-
-_G.CONFIGS_LEGION.FLOWERWEAPONSCHANCE = GetModConfigData("FlowerWeaponsChance")
-_G.CONFIGS_LEGION.FOLIAGEATHCHANCE = GetModConfigData("FoliageathChance")
-_G.CONFIGS_LEGION.ROSEBUSHSPACING = GetModConfigData("RoseBushSpacing")
-_G.CONFIGS_LEGION.LILYBUSHSPACING = GetModConfigData("LilyBushSpacing")
-_G.CONFIGS_LEGION.ORCHIDBUSHSPACING = GetModConfigData("OrchidBushSpacing")
-
-_G.CONFIGS_LEGION.BETTERCOOKBOOK = false
-_G.CONFIGS_LEGION.FESTIVALRECIPES = GetModConfigData("FestivalRecipes")
-
-_G.CONFIGS_LEGION.HIDDENUPDATETIMES = GetModConfigData("HiddenUpdateTimes") --月藏宝匣最大升级次数
-_G.CONFIGS_LEGION.REVOLVEDUPDATETIMES = GetModConfigData("RevolvedUpdateTimes") --月轮宝盘最大升级次数
-_G.CONFIGS_LEGION.REFRACTEDUPDATETIMES = GetModConfigData("RefractedUpdateTimes") --月折宝剑最大升级次数
-
-_G.CONFIGS_LEGION.X_GROWTHTIME = GetModConfigData("X_growthTime") --设置异种生长的时间倍数
-_G.CONFIGS_LEGION.X_OVERRIPETIME = GetModConfigData("X_overripeTime") --设置异种过熟的时间倍数
-_G.CONFIGS_LEGION.X_PESTRISK = GetModConfigData("X_pestRisk") --设置异种虫害几率
-_G.CONFIGS_LEGION.PHOENIXREBIRTHCYCLE = GetModConfigData("PhoenixRebirthCycle") --设置玄鸟重生时间
-_G.CONFIGS_LEGION.SIVINGROOTTEX = GetModConfigData("SivingRootTex") --设置子圭突触贴图
-_G.CONFIGS_LEGION.PHOENIXBATTLEDIFFICULTY = GetModConfigData("PhoenixBattleDifficulty") --设置玄鸟战斗难度
-_G.CONFIGS_LEGION.SIVFEADAMAGE = GetModConfigData("SivFeaDamage") --设置子圭·翰的攻击力
-_G.CONFIGS_LEGION.SIVFEAHEALTHCOST = GetModConfigData("SivFeaHealthCost") --设置子圭·翰的技能耗血量
-_G.CONFIGS_LEGION.SIVFEATHROWEDNUM = GetModConfigData("SivFeaThrowedNum") --设置羽刃分掷的最大投掷数
-_G.CONFIGS_LEGION.DIGESTEDITEMMSG = GetModConfigData("DigestedItemMsg") --巨食草消化提醒
-_G.CONFIGS_LEGION.TRANSTIMECROP = GetModConfigData("TransTimeCrop") --普通作物转成异种的时间
-_G.CONFIGS_LEGION.TRANSTIMESPEC = GetModConfigData("TransTimeSpec") --特殊植物转成异种的时间倍率
-_G.CONFIGS_LEGION.SIVSOLTOMEDAL = GetModConfigData("SivSolToMedal") --子圭·垄兼容能力勋章的作物
-_G.CONFIGS_LEGION.TISSUECACTUSCHANCE = GetModConfigData("TissueCactusChance")
-_G.CONFIGS_LEGION.TISSUEBERRIESCHANCE = GetModConfigData("TissueBerriesChance")
-
-_G.CONFIGS_LEGION.TECHUNLOCK = GetModConfigData("TechUnlock") --设置新道具的科技解锁方式 "lootdropper" "prototyper"
-
-if GetModConfigData("DressUp") then --启用幻化机制 bool
-    _G.CONFIGS_LEGION.DRESSUP = true
-else
-    _G.CONFIGS_LEGION.DRESSUP = false
-end
-
-_G.CONFIGS_LEGION.BACKCUBCHANCE = GetModConfigData("BackCubChance") --靠背熊掉落几率
-_G.CONFIGS_LEGION.SHIELDRECHARGETIME = GetModConfigData("ShieldRechargeTime") --盾牌冷却时间
-_G.CONFIGS_LEGION.AGRONRECHARGETIME = GetModConfigData("AgronRechargeTime") --艾力冈的剑冷却时间
-
+------台词文本
 if _G.CONFIGS_LEGION.LANGUAGES == "english" then
     modimport("scripts/languages/strings_english.lua")
 else
@@ -401,19 +398,6 @@ if _G.CONFIGS_LEGION.DRESSUP then
         "pinkstaff", "theemperorscrown", "theemperorsmantle", "theemperorsscepter", "theemperorspendant"
     })
 end
-
---------------------------------------------------------------------------
---[[ 热更新机制 ]]
---------------------------------------------------------------------------
-
--- modimport("scripts/hotreload_legion.lua")
-
---------------------------------------------------------------------------
---[[ 兼容性修改 ]]
---------------------------------------------------------------------------
-
-modimport("scripts/apublicsupporter.lua")
-modimport("scripts/containers_legion.lua")
 
 --------------------------------------------------------------------------
 --[[ 料理相关 ]]
@@ -530,19 +514,25 @@ cooking.IsCookingIngredient = function(prefabname, ...)
 end
 
 --------------------------------------------------------------------------
---[[ 导入数据 ]]
+--[[ 导入文件 ]]
 --------------------------------------------------------------------------
 
+------热更新机制
+-- modimport("scripts/hotreload_legion.lua")
+------专用数据相关
+modimport("scripts/datafix_legion.lua")
 ------组件与预制物相关
 modimport("scripts/postinit_legion.lua")
---新增科技与科技栏
+------sg、动作相关
+modimport("scripts/sgactions_legoin.lua")
+------新增科技与科技栏
 if _G.CONFIGS_LEGION.TECHUNLOCK == "prototyper" then
-    modimport("scripts/new_techtree_legion.lua")
+    modimport("scripts/techtrees_legion.lua")
 end
 ------制作相关
 modimport("scripts/recipes_legion.lua")
-------sg、动作相关
-modimport("scripts/sgactions_legoin.lua")
+------容器相关
+modimport("scripts/containers_legion.lua")
 ------幻化相关
 if _G.CONFIGS_LEGION.DRESSUP then
     modimport("scripts/fengl_userdatahook.lua")
@@ -578,13 +568,13 @@ AddSimPostInit(function()
         hunger = 12,
         sanity = -10,
         perishtime = TUNING.PERISH_MED,
-        float_settings = {"small", 0.2, 0.9},
+        -- float_settings = {"small", 0.2, 0.9},
 
         cooked_health = 16,
         cooked_hunger = 18.5,
         cooked_sanity = 5,
         cooked_perishtime = TUNING.PERISH_SUPERFAST,
-        cooked_float_settings = {"small", 0.2, 1},
+        -- cooked_float_settings = {"small", 0.2, 1},
 
         seed_weight = TUNING.SEED_CHANCE_RARE, --大概只有这里起作用了
         -- dryable = nil,

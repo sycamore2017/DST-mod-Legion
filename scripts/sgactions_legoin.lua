@@ -1340,76 +1340,6 @@ AddStategraphEvent("wilson", EventHandler("awkwardpropeller", function(inst, dat
 end))
 
 --------------------------------------------------------------------------
---[[ 修改人物SG，行走与战斗时，需要切换道具时自动切换 ]]
---------------------------------------------------------------------------
-
-
-
---[[
-AddStategraphEvent("wilson", EventHandler("locomote",
-    function(inst, data)
-        if inst.sg:HasStateTag("busy") then
-            return
-        end
-        local is_moving = inst.sg:HasStateTag("moving")
-        local should_move = inst.components.locomotor:WantsToMoveForward()
-
-        if not (inst.sg:HasStateTag("bedroll") or inst.sg:HasStateTag("tent") or inst.sg:HasStateTag("waking")) 
-            and not (is_moving and not should_move) 
-            and (not is_moving and should_move) then
-            EquipSpeedItem(inst)    --行走之前先换加速装备
-        end
-
-        return SGWilson_loco_event_fn(inst, data)
-    end)
-)
-
-AddStategraphActionHandler("wilson", ActionHandler(ACTIONS.ATTACK,
-    function(inst, action)
-        inst.sg.mem.localchainattack = not action.forced or nil
-        if not (inst.sg:HasStateTag("attack") and action.target == inst.sg.statemem.attacktarget or inst.components.health:IsDead()) then
-            EquipFightItem(inst)    --攻击之前先换攻击装备
-            return SGWilson_atk_handler_fn(inst, action)
-        end
-    end)
-)
-
-AddStategraphActionHandler("wilson_client", ActionHandler(ACTIONS.ATTACK,
-    function(inst, action)
-        if not (inst.sg:HasStateTag("attack") and action.target == inst.sg.statemem.attacktarget or inst.replica.health:IsDead()) then
-            local equip = inst.replica.inventory:GetEquippedItem(EQUIPSLOTS.HANDS)
-            if equip == nil then
-                return "attack"
-            end
-            local inventoryitem = equip.replica.inventoryitem
-            return (not (inventoryitem ~= nil and inventoryitem:IsWeapon()) and "attack")
-                or (equip:HasTag("blowdart") and "blowdart")
-                or (equip:HasTag("thrown") and "throw")
-                or (equip:HasTag("propweapon") and "attack_prop_pre")
-                or "attack"
-        end
-    end)
-)
-]]--
-
---------------------------------------------------------------------------
---[[ 让地毯类建筑能摆更远 ]]
---------------------------------------------------------------------------
-
-local build_dist_old = ACTIONS.BUILD.extra_arrive_dist
-ACTIONS.BUILD.extra_arrive_dist = function(doer, dest, bufferedaction)
-    if bufferedaction and bufferedaction.recipe then
-        if
-            string.len(bufferedaction.recipe) > 7 and
-            string.sub(bufferedaction.recipe, 1, 7) == "carpet_"
-        then
-            return 4
-        end
-    end
-    return build_dist_old and build_dist_old(doer, dest, bufferedaction) or 0
-end
-
---------------------------------------------------------------------------
 --[[ 青枝绿叶相关 ]]
 --------------------------------------------------------------------------
 
@@ -2272,6 +2202,23 @@ local function FnSgGeneTrans(inst, action)
 end
 AddStategraphActionHandler("wilson", ActionHandler(ACTIONS.GENETRANS, FnSgGeneTrans))
 AddStategraphActionHandler("wilson_client", ActionHandler(ACTIONS.GENETRANS, FnSgGeneTrans))
+
+--------------------------------------------------------------------------
+--[[ 让地毯类建筑能摆更远 ]]
+--------------------------------------------------------------------------
+
+local build_dist_old = ACTIONS.BUILD.extra_arrive_dist
+ACTIONS.BUILD.extra_arrive_dist = function(doer, dest, bufferedaction)
+    if bufferedaction and bufferedaction.recipe then
+        if
+            string.len(bufferedaction.recipe) > 7 and
+            string.sub(bufferedaction.recipe, 1, 7) == "carpet_"
+        then
+            return 4
+        end
+    end
+    return build_dist_old and build_dist_old(doer, dest, bufferedaction) or 0
+end
 
 --------------------------------------------------------------------------
 --[[ 修改采集动作的名称 ]]

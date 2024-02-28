@@ -1,5 +1,6 @@
 local _G = GLOBAL
 local IsServer = TheNet:GetIsServer() or TheNet:IsDedicated()
+local TOOLS_L = require("tools_legion")
 
 --监听函数修改工具，超强der大佬写滴！
 -- local upvaluehelper = require "hua_upvaluehelper"
@@ -224,12 +225,11 @@ AddPrefabPostInit("shieldofterror", function(inst)
     end
 end)
 
-------
-------
+-------------------------|||||||||||||||||||||||||||||||||||||||||-------------------------
+-------------------------|||后面的是针对服务器的修改，客户端不需要|||-------------------------
+-------------------------|||||||||||||||||||||||||||||||||||||||||-------------------------
 
-if not IsServer then --后面的是针对服务器的修改，客户端不需要
-    return
-end
+if not IsServer then return end
 
 --------------------------------------------------------------------------
 --[[ 给三种花丛增加自然再生方式，防止绝种 ]]
@@ -987,73 +987,528 @@ AddPrefabPostInit("goldenpitchfork", FnSet_pitchfork)
 --[[ 修改传粉组件，防止非花朵但是也具有flower标签的东西被非法生成出来 ]]
 --------------------------------------------------------------------------
 
+local function CreateFlower_pollinator(self, ...)
+    if self:HasCollectedEnough() and self.inst:IsOnValidGround() then
+        local parentFlower = GetRandomItem(self.flowers)
+        local flower
+        if
+            parentFlower.prefab ~= "flower"
+            and parentFlower.prefab ~= "flower_rose"
+            and parentFlower.prefab ~= "planted_flower"
+            and parentFlower.prefab ~= "flower_evil"
+        then
+            flower = SpawnPrefab(math.random()<0.3 and "flower_rose" or "flower")
+        else
+            flower = SpawnPrefab(parentFlower.prefab)
+        end
+        if flower ~= nil then
+            flower.planted = true --这里需要改成true，不然会被世界当成一个生成点
+            flower.Transform:SetPosition(self.inst.Transform:GetWorldPosition())
+        end
+        self.flowers = {}
+    end
+end
+local function Pollinate_pollinator(self, flower, ...)
+    if self:CanPollinate(flower) then
+        if flower.components.perennialcrop ~= nil then
+            flower.components.perennialcrop:Pollinate(self.inst)
+        elseif flower.components.perennialcrop2 ~= nil then
+            flower.components.perennialcrop2:Pollinate(self.inst)
+        end
+    end
+    if self.Pollinate_l ~= nil then
+        self.Pollinate_l(self, flower, ...)
+    end
+end
 AddComponentPostInit("pollinator", function(self)
+    --防止传粉者生成非花朵但却有flower标签的实体
     --local CreateFlower_old = self.CreateFlower
-    self.CreateFlower = function(self) --防止传粉者生成非花朵但却有flower标签的实体
-        if self:HasCollectedEnough() and self.inst:IsOnValidGround() then
-            local parentFlower = GetRandomItem(self.flowers)
-            local flower
+    self.CreateFlower = CreateFlower_pollinator
 
-            if
-                parentFlower.prefab ~= "flower"
-                and parentFlower.prefab ~= "flower_rose"
-                and parentFlower.prefab ~= "planted_flower"
-                and parentFlower.prefab ~= "flower_evil"
-            then
-                flower = SpawnPrefab(math.random()<0.3 and "flower_rose" or "flower")
-            else
-                flower = SpawnPrefab(parentFlower.prefab)
-            end
-
-            if flower ~= nil then
-                flower.planted = true --这里需要改成true，不然会被世界当成一个生成点
-                flower.Transform:SetPosition(self.inst.Transform:GetWorldPosition())
-            end
-            self.flowers = {}
-        end
-    end
-
-    local Pollinate_old = self.Pollinate
-    self.Pollinate = function(self, flower, ...)
-        if self:CanPollinate(flower) then
-            if flower.components.perennialcrop ~= nil then
-                flower.components.perennialcrop:Pollinate(self.inst)
-            elseif flower.components.perennialcrop2 ~= nil then
-                flower.components.perennialcrop2:Pollinate(self.inst)
-            end
-        end
-        if Pollinate_old ~= nil then
-            Pollinate_old(self, flower, ...)
-        end
-    end
+    --传粉者能给棱镜植物授粉
+    self.Pollinate_l = self.Pollinate
+    self.Pollinate = Pollinate_pollinator
 end)
 
 --------------------------------------------------------------------------
 --[[ 重写小木牌(插在地上的)的绘图机制，让小木牌可以画上本mod里的物品 ]]
 --------------------------------------------------------------------------
 
-local invPrefabList = require("mod_inventoryprefabs_list")  --mod中有物品栏图片的prefabs的表
+local invPrefabList = require("mod_inventoryprefabs_list") --mod中有物品栏图片的prefabs的表
 local invBuildMaps = {
     "images_minisign1", "images_minisign2", "images_minisign3",
     "images_minisign4", "images_minisign5", "images_minisign6",
     "images_minisign_skins1", "images_minisign_skins2" --7、8
 }
-
+local function OnDrawn_minisign(inst, image, src, atlas, bgimage, bgatlas, ...) --这里image是所用图片的名字，而非prefab的名字
+    if inst.ondrawnfn_l_inv ~= nil then
+        inst.ondrawnfn_l_inv(inst, image, src, atlas, bgimage, bgatlas, ...)
+    end
+    --src在重载后就没了，所以没法让信息存在src里
+    if image ~= nil and invPrefabList[image] ~= nil then
+        inst.AnimState:OverrideSymbol("SWAP_SIGN", invBuildMaps[invPrefabList[image]] or invBuildMaps[1], image)
+    end
+    if bgimage ~= nil and invPrefabList[bgimage] ~= nil then
+        inst.AnimState:OverrideSymbol("SWAP_SIGN_BG", invBuildMaps[invPrefabList[bgimage]] or invBuildMaps[1], bgimage)
+    end
+end
 local function MiniSign_init(inst)
-    local OnDrawnFn_old = inst.components.drawable.ondrawnfn
-    inst.components.drawable:SetOnDrawnFn(function(inst, image, src, atlas, bgimage, bgatlas) --这里image是所用图片的名字，而非prefab的名字
-        if OnDrawnFn_old ~= nil then
-            OnDrawnFn_old(inst, image, src, atlas, bgimage, bgatlas)
-        end
-        --src在重载后就没了，所以没法让信息存在src里
-        if image ~= nil and invPrefabList[image] ~= nil then
-            inst.AnimState:OverrideSymbol("SWAP_SIGN", invBuildMaps[invPrefabList[image]] or invBuildMaps[1], image)
-        end
-        if bgimage ~= nil and invPrefabList[bgimage] ~= nil then
-            inst.AnimState:OverrideSymbol("SWAP_SIGN_BG", invBuildMaps[invPrefabList[bgimage]] or invBuildMaps[1], bgimage)
-        end
-    end)
+    if inst.components.drawable ~= nil then
+        inst.ondrawnfn_l_inv = inst.components.drawable.ondrawnfn
+        inst.components.drawable:SetOnDrawnFn(OnDrawn_minisign)
+    end
 end
 AddPrefabPostInit("minisign", MiniSign_init)
 AddPrefabPostInit("minisign_drawn", MiniSign_init)
 AddPrefabPostInit("decor_pictureframe", MiniSign_init)
+
+--------------------------------------------------------------------------
+--[[ 清理机制：让腐烂物、牛粪、鸟粪自动消失 ]]
+--------------------------------------------------------------------------
+
+if _G.CONFIGS_LEGION.CLEANINGUPSTENCH then
+    local function OnDropped_disappears(inst)
+        inst.components.disappears:PrepareDisappear()
+    end
+    local function OnPutInInventory_inventoryitem(inst, owner, ...)
+        if inst.onputininventoryfn_l_dis ~= nil then
+            inst.onputininventoryfn_l_dis(inst, owner, ...)
+        end
+        inst.components.disappears:StopDisappear()
+    end
+    local function AutoDisappears(inst, delayTime, anim)
+        if inst.components.disappears == nil then
+            inst:AddComponent("disappears")
+        end
+        if inst.SoundEmitter ~= nil then --消失组件里没有对声音组件的判断
+            inst.components.disappears.sound = "dontstarve/common/dust_blowaway"
+        end
+        inst.components.disappears.anim = anim --消失时动画
+        inst.components.disappears.delay = delayTime --设置消失延迟时间
+
+        inst.onputininventoryfn_l_dis = inst.components.inventoryitem.onputininventoryfn
+        inst.components.inventoryitem:SetOnPutInInventoryFn(OnPutInInventory_inventoryitem)
+
+        inst:ListenForEvent("ondropped", OnDropped_disappears)
+        inst.components.disappears:PrepareDisappear()
+    end
+
+    AddPrefabPostInit("spoiled_food", function(inst)
+        AutoDisappears(inst, TUNING.TOTAL_DAY_TIME, "idle")
+    end)
+    AddPrefabPostInit("poop", function(inst)
+        AutoDisappears(inst, TUNING.TOTAL_DAY_TIME, "idle")
+    end)
+    AddPrefabPostInit("guano", function(inst)
+        AutoDisappears(inst, TUNING.TOTAL_DAY_TIME * 3, "idle")
+    end)
+end
+
+--------------------------------------------------------------------------
+--[[ 倾心玫瑰酥：用心筑爱 ]]
+--------------------------------------------------------------------------
+
+local function IsLover(inst, buddy)
+    local lovers = {
+        KU_d2kn608B = "KU_GNdCpQBk", KU_GNdCpQBk = "KU_d2kn608B",
+        KU_baaCbyKC = 1
+    }
+    if inst.userid ~= nil and inst.userid ~= "" and lovers[inst.userid] ~= nil then
+        if lovers[inst.userid] == 1 or lovers[inst.userid] == buddy.userid then
+            return true
+        end
+    elseif buddy.userid ~= nil and buddy.userid ~= "" and lovers[buddy.userid] ~= nil then
+        if lovers[buddy.userid] == 1 or lovers[buddy.userid] == inst.userid then
+            return true
+        end
+    end
+    return false
+end
+local function GetLovePoint(v, userid, eatermap, pointmax, buddy)
+    local point = 0
+    if v.components.eater ~= nil and v.components.eater.lovemap_l ~= nil then
+        point = v.components.eater.lovemap_l[userid] or 0
+    end
+    if eatermap ~= nil and v.userid ~= nil and v.userid ~= "" then
+        point = point + ( eatermap[v.userid] or 0 )
+    end
+    if point > pointmax then
+        return point, v
+    end
+    return pointmax, buddy
+end
+local function SetFx_love(inst, buddy, alltime, isit) --营造一个甜蜜的气氛
+    if inst.task_loveup_l ~= nil then
+        inst.task_loveup_l:Cancel()
+    end
+    local timestart = GetTime()
+    inst.task_loveup_l = inst:DoPeriodicTask(0.26, function(inst)
+        if not inst:IsValid() then
+            if inst.task_loveup_l ~= nil then
+                inst.task_loveup_l:Cancel()
+                inst.task_loveup_l = nil
+            end
+            return
+        end
+        local pos = inst:GetPosition()
+        local x, y, z
+        if not inst:IsAsleep() and not inst:IsInLimbo() then
+            for i = 1, math.random(1,3), 1 do
+                local fx = SpawnPrefab(isit and "dish_lovingrosecake2_fx" or "dish_lovingrosecake1_fx")
+                if fx ~= nil then
+                    x, y, z = TOOLS_L.GetCalculatedPos(pos.x, 0, pos.z, 0.2+math.random()*2.1, nil)
+                    fx.Transform:SetPosition(x, y, z)
+                end
+            end
+        end
+        if isit and buddy:IsValid() and not buddy:IsAsleep() and not buddy:IsInLimbo() then
+            pos = buddy:GetPosition()
+            for i = 1, math.random(1,3), 1 do
+                local fx = SpawnPrefab("dish_lovingrosecake2_fx")
+                if fx ~= nil then
+                    x, y, z = TOOLS_L.GetCalculatedPos(pos.x, 0, pos.z, 0.2+math.random()*2.1, nil)
+                    fx.Transform:SetPosition(x, y, z)
+                end
+            end
+        end
+        if (GetTime()-timestart) >= alltime then
+            if inst.task_loveup_l ~= nil then
+                inst.task_loveup_l:Cancel()
+                inst.task_loveup_l = nil
+            end
+        end
+    end)
+end
+local function OnEat_love_feed(inst, data)
+    if data.feeder.components.sanity ~= nil then
+        data.feeder.components.sanity:DoDelta(15)
+    end
+    -- if inst.components.health == nil then
+    --     return
+    -- end
+
+    local cpt = inst.components.eater
+    local point = 0
+    if cpt.lovemap_l == nil then
+        cpt.lovemap_l = {}
+    else
+        point = cpt.lovemap_l[data.feeder.userid] or 0
+    end
+    point = point + data.food.lovepoint_l
+    if point > 0 then
+        cpt.lovemap_l[data.feeder.userid] = point
+        if inst.components.health ~= nil then
+            inst.components.health:DoDelta(2*point, nil, "debug_key") --对旺达回血要特定原因才行
+        end
+        -- print("喂着吃："..tostring(point))
+    else
+        cpt.lovemap_l[data.feeder.userid] = nil
+    end
+
+    local isit = IsLover(inst, data.feeder)
+    if isit then
+        local fx = SpawnPrefab("dish_lovingrosecake_s2_fx")
+        if fx ~= nil then
+            fx.Transform:SetPosition(inst.Transform:GetWorldPosition())
+        end
+    end
+    SetFx_love(inst, data.feeder, 1.5+math.min(120, point), isit)
+end
+local function OnEat_love_self(inst, data)
+    if inst.components.health == nil or inst.userid == nil or inst.userid == "" then
+        return
+    end
+    local x, y, z = inst.Transform:GetWorldPosition()
+    local pointmax = 0
+    local buddy
+    local eatermap = inst.components.eater.lovemap_l
+    local mount
+
+    --周围
+    local ents = TheSim:FindEntities(x, y, z, 20, nil, { "INLIMBO", "NOCLICK" }, nil)
+    for _, v in ipairs(ents) do
+        if v ~= inst and v.entity:IsVisible() then
+            pointmax, buddy = GetLovePoint(v, inst.userid, eatermap, pointmax, buddy)
+            mount = v.components.rider ~= nil and v.components.rider:GetMount() or nil
+            if mount ~= nil then
+                pointmax, buddy = GetLovePoint(mount, inst.userid, eatermap, pointmax, buddy)
+                mount = nil
+            end
+        end
+    end
+    --携带
+    if inst.components.inventory ~= nil then
+        local inv = inst.components.inventory
+        for _, v in pairs(inv.itemslots) do
+            if v then
+                pointmax, buddy = GetLovePoint(v, inst.userid, eatermap, pointmax, buddy)
+            end
+        end
+        for _, v in pairs(inv.equipslots) do
+            if v then
+                pointmax, buddy = GetLovePoint(v, inst.userid, eatermap, pointmax, buddy)
+            end
+        end
+        if inv.activeitem then
+            pointmax, buddy = GetLovePoint(inv.activeitem, inst.userid, eatermap, pointmax, buddy)
+        end
+        local overflow = inv:GetOverflowContainer()
+        if overflow ~= nil then
+            for _, v in pairs(overflow.slots) do
+                if v then
+                    pointmax, buddy = GetLovePoint(v, inst.userid, eatermap, pointmax, buddy)
+                end
+            end
+        end
+    end
+    --坐骑
+    mount = inst.components.rider ~= nil and inst.components.rider:GetMount() or nil
+    if mount ~= nil then
+        pointmax, buddy = GetLovePoint(mount, inst.userid, eatermap, pointmax, buddy)
+    end
+
+    if pointmax > 0 then
+        -- print("自己吃："..tostring(pointmax))
+        inst.components.health:DoDelta(pointmax, nil, "debug_key")
+        SetFx_love(inst, buddy, 0.75+math.min(60, pointmax/2), IsLover(inst, buddy))
+    end
+end
+local function OnEat_eater(inst, data)
+    if data == nil then
+        return
+    end
+    if data.food ~= nil and data.food.lovepoint_l ~= nil then --爱的料理
+        if
+            data.feeder ~= nil and data.feeder ~= inst and --喂食者不能是自己
+            data.feeder.userid ~= nil and data.feeder.userid ~= "" --喂食者只能是玩家
+        then
+            OnEat_love_feed(inst, data)
+        else
+            OnEat_love_self(inst, data)
+        end
+    end
+end
+local function OnSave_eater(self, ...)
+    local data, refs
+    if self.OnSave_l_eaterlove ~= nil then
+        data, refs = self.OnSave_l_eaterlove(self, ...)
+    end
+    if self.lovemap_l ~= nil then
+        if type(data) == "table" then
+            data.lovemap_l = self.lovemap_l
+        else
+            data = { lovemap_l = self.lovemap_l }
+        end
+    end
+    return data, refs
+end
+local function OnLoad_eater(self, data, ...)
+    if data ~= nil then
+        self.lovemap_l = data.lovemap_l
+    end
+    if self.OnLoad_l_eaterlove ~= nil then
+        self.OnLoad_l_eaterlove(self, data, ...)
+    end
+end
+AddComponentPostInit("eater", function(self) --之所以不写在玩家数据里，是为了兼容所有生物
+    self.inst:ListenForEvent("oneat", OnEat_eater)
+    self.OnSave_l_eaterlove = self.OnSave
+    self.OnLoad_l_eaterlove = self.OnLoad
+    self.OnSave = OnSave_eater
+    self.OnLoad = OnLoad_eater
+end)
+
+--------------------------------------------------------------------------
+--[[ 实体产生掉落物时，自动叠加周围所有同类实体 ]]
+--------------------------------------------------------------------------
+
+if _G.CONFIGS_LEGION.AUTOSTACKEDLOOT then
+    local function CanAutoStack(inst)
+        return (inst.components.bait == nil or inst.components.bait:IsFree()) and
+            (inst.components.burnable == nil or not inst.components.burnable:IsBurning()) and
+            (inst.components.stackable and not inst.components.stackable:IsFull()) and
+            (inst.components.inventoryitem and not inst.components.inventoryitem:IsHeld()) and
+            inst.components.inventoryitem.canbepickedup and
+            inst.components.health == nil
+            -- Vector3(self.inst.Physics:GetVelocity()):LengthSq() < 1
+    end
+    local function DoAutoStack(inst)
+        inst.task_autostack_l = nil
+        -- if not CanAutoStack(inst) then --不用提前判定
+        --     return
+        -- end
+
+        local x, y, z = inst.Transform:GetWorldPosition()
+        local ents = TheSim:FindEntities(x, y, z, 20, { "_inventoryitem" }, { "NOCLICK", "FX", "INLIMBO" })
+        local ents_same = {}
+        local numall = 0
+        for _, v in ipairs(ents) do
+            if
+                v.entity:IsVisible() and
+                v.prefab == inst.prefab and v.skinname == inst.skinname and
+                CanAutoStack(v)
+            then
+                table.insert(ents_same, v)
+                numall = numall + v.components.stackable:StackSize()
+            end
+        end
+
+        if numall <= 1 or #ents_same <= 1 then
+            return
+        end
+
+        local maxsize = inst.components.stackable.maxsize
+        for _, v in ipairs(ents_same) do
+            if v.task_autostack_l ~= nil then
+                v.task_autostack_l:Cancel()
+                v.task_autostack_l = nil
+            end
+            if numall > 0 then
+                if numall > maxsize then
+                    v.components.stackable:SetStackSize(maxsize)
+                    numall = numall - maxsize
+                else
+                    v.components.stackable:SetStackSize(numall)
+                    numall = 0
+                end
+                SpawnPrefab("sand_puff").Transform:SetPosition(v.Transform:GetWorldPosition())
+            else
+                v:Remove() --多余的就要删除了
+            end
+        end
+    end
+    local function OnLootDrop_tryStack(inst, data)
+        if inst.task_autostack_l == nil and CanAutoStack(inst) then
+            inst.task_autostack_l = inst:DoTaskInTime(0.5+math.random(), DoAutoStack)
+        end
+    end
+    AddComponentPostInit("stackable", function(self)
+        self.inst:ListenForEvent("on_loot_dropped", OnLootDrop_tryStack)
+    end)
+end
+
+--------------------------------------------------------------------------
+--[[ 风滚草加入新的掉落物 ]]
+--------------------------------------------------------------------------
+
+local lootsMap_tumbleweed = {
+    { chance = 0.05, items = { "ahandfulofwings", "insectshell_l" } },
+    { chance = 0.03, items = { "cattenball" } },
+    { chance = 0.015, items = { "cutted_rosebush", "cutted_lilybush", "cutted_orchidbush" } },
+    { chance = 0.01, items = { "shyerry", "tourmalineshard", "tissue_l_cactus" } }
+}
+local chance = 0
+for _, v in pairs(lootsMap_tumbleweed) do
+    v.c_min = chance
+    chance = v.chance + chance
+    v.c_max = chance
+    v.chance = nil
+end
+chance = nil
+
+local function OnPicked_tumbleweed(inst, picker)
+    if inst.loot ~= nil then
+        local rand = math.random()
+        local newloot = nil
+        for _, v in pairs(lootsMap_tumbleweed) do
+            if rand < v.c_max and rand >= v.c_min then
+                newloot = v.items[math.random(#v.items)]
+                break
+            end
+        end
+        if newloot ~= nil then
+            for k, v in pairs(inst.loot) do --替换一些不重要的东西
+                if
+                    v == "cutgrass" or v == "twigs" or
+                    v == "petals" or v == "foliage" or v == "seeds"
+                then
+                    inst.loot[k] = newloot
+                    newloot = nil
+                    break
+                end
+            end
+            if newloot ~= nil then --没有可替换的就直接加入
+                table.insert(inst.loot, newloot)
+            end
+        end
+    end
+
+    local x, y, z = inst.Transform:GetWorldPosition()
+    if inst.onpicked_old_l ~= nil then
+        inst.onpicked_old_l(inst, picker)
+    end
+
+    --为了让风滚草掉落物也能自动叠加
+    if CONFIGS_LEGION.AUTOSTACKEDLOOT then
+        local ents = TheSim:FindEntities(x, y, z, 2, { "_inventoryitem" }, { "NOCLICK", "FX", "INLIMBO" })
+        for _, v in ipairs(ents) do
+            if v.components.stackable ~= nil then
+                v:PushEvent("on_loot_dropped", { dropper = nil })
+            end
+        end
+    end
+
+    return true
+end
+AddPrefabPostInit("tumbleweed", function(inst)
+    inst.onpicked_old_l = inst.components.pickable.onpickedfn
+    inst.components.pickable.onpickedfn = OnPicked_tumbleweed
+end)
+
+--------------------------------------------------------------------------
+--[[ 修改燃烧组件，达到条件就不会燃烧 ]]
+--------------------------------------------------------------------------
+
+local function Ignite_fireproof(self, ...)
+    if self.fireproof_l or self.inst.fireproof_l ~= nil then
+        return
+    end
+    if self.Ignite_l_fireproof ~= nil then
+        self.Ignite_l_fireproof(self, ...)
+    end
+end
+local function StartWildfire_fireproof(self, ...)
+    if self.fireproof_l or self.inst.fireproof_l ~= nil then
+        return
+    end
+    if self.StartWildfire_l_fireproof ~= nil then
+        self.StartWildfire_l_fireproof(self, ...)
+    end
+end
+local function OnSave_fireproof(self, ...)
+    local data, refs
+    if self.OnSave_l_fireproof ~= nil then
+        data, refs = self.OnSave_l_fireproof(self, ...)
+    end
+    if self.fireproof_l then
+        if type(data) == "table" then
+            data.fireproof_l = true
+        else
+            data = { fireproof_l = true }
+        end
+    end
+    return data, refs
+end
+local function OnLoad_fireproof(self, data, ...)
+    if self.OnLoad_l_fireproof ~= nil then
+        self.OnLoad_l_fireproof(self, data, ...)
+    end
+    if data ~= nil and data.fireproof_l then
+        self.fireproof_l = true
+        TOOLS_L.AddTag(self.inst, "fireproof_l", "fireproof_base")
+        -- self.canlight = false --官方用的多，直接改怕出问题，还是算了
+    end
+end
+
+AddComponentPostInit("burnable", function(self)
+    self.Ignite_l_fireproof = self.Ignite
+    self.Ignite = Ignite_fireproof
+
+    self.StartWildfire_l_fireproof = self.StartWildfire
+    self.StartWildfire = StartWildfire_fireproof
+
+    self.OnSave_l_fireproof = self.OnSave
+    self.OnLoad_l_fireproof = self.OnLoad
+    self.OnSave = OnSave_fireproof
+    self.OnLoad = OnLoad_fireproof
+end)
