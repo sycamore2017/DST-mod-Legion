@@ -144,10 +144,8 @@ TUNING.mod_legion_enabled = true --方便别的mod做判定。不过就算这样
 
 PrefabFiles = {
     "bush_legion",              --棱镜灌木丛
-    "ingredients_legion",       --食材
+    "items_legion",             --各种食物、物品
     "plantables_legion",        --新种植根
-    "turfs_legion",             --新地皮
-    "wants_sandwitch",          --沙之女巫所欲之物
     "euip_head_legion",         --棱镜头戴道具
     "euip_hand_legion",         --棱镜手持道具
     "euip_body_legion",         --棱镜身穿道具
@@ -157,9 +155,7 @@ PrefabFiles = {
     "buffs_legion",             --buff
     "shield_legion",            --盾类武器
     "carpet_legion",            --地毯
-    "foods_cookpot",            --料理
     "placer_legion",            --大多数的placer
-    "ointment_legion",          --涂抹类道具
     "worldbox_legion",          --世界唯一型容器相关
 
     "foliageath",               --青枝绿叶
@@ -173,7 +169,6 @@ PrefabFiles = {
     "siving_rocks_legion",
     "farm_plants_legion",
     "cropgnat",
-    "insectthings_l",
     "siving_related",
     "fishhomingtools",
     "boss_siving_phoenix",

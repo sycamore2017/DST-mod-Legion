@@ -1,10 +1,12 @@
 local TOOLS_L = require("tools_legion")
+local prefs = {}
 
 local function GetAssets(name, other)
     local sets = {
         Asset("ANIM", "anim/"..name..".zip"),
         Asset("ATLAS", "images/inventoryimages/"..name..".xml"),
-        Asset("IMAGE", "images/inventoryimages/"..name..".tex")
+        Asset("IMAGE", "images/inventoryimages/"..name..".tex"),
+        Asset("ATLAS_BUILD", "images/inventoryimages/"..name..".xml", 256)
     }
     if other ~= nil then
         for _, v in pairs(other) do
@@ -53,15 +55,46 @@ local function SetFiniteUses(inst, uses, OnFinished)
     inst.components.finiteuses:SetUses(uses)
     inst.components.finiteuses:SetOnFinished(OnFinished or inst.Remove)
 end
-local function SetPerishable(inst, time, replacement)
-    inst:AddComponent("perishable") --新鲜度组件
+local function SetPerishable(inst, time, replacement, onperish) --新鲜度组件
+    inst:AddComponent("perishable")
     inst.components.perishable:SetPerishTime(time)
-    inst.components.perishable.onperishreplacement = replacement or "spoiled_food"
+    inst.components.perishable.onperishreplacement = replacement
+    if onperish ~= nil then
+        inst.components.perishable:SetOnPerishFn(onperish)
+    end
     inst.components.perishable:StartPerishing()
 end
 local function SetFuel(inst, value)
     inst:AddComponent("fuel")
     inst.components.fuel.fuelvalue = value or TUNING.MED_FUEL
+end
+local function SetDeployable(inst, ondeploy, mode, spacing) --摆放组件
+    inst:AddComponent("deployable")
+    inst.components.deployable.ondeploy = ondeploy
+    if mode ~= nil then
+        inst.components.deployable:SetDeployMode(mode)
+    end
+    if spacing ~= nil then
+        inst.components.deployable:SetDeploySpacing(spacing)
+    end
+end
+
+local function OnLandedClient(self, ...)
+    if self.OnLandedClient_l_base ~= nil then
+        self.OnLandedClient_l_base(self, ...)
+    end
+    if self.floatparam_l ~= nil then
+        self.inst.AnimState:SetFloatParams(self.floatparam_l, 1, self.bob_percent)
+    end
+end
+local function SetFloatable(inst, float) --漂浮组件
+    MakeInventoryFloatable(inst, float[2], float[3], float[4])
+    if float[1] ~= nil then
+        local floater = inst.components.floater
+        floater.OnLandedClient_l_base = floater.OnLandedClient
+        floater.floatparam_l = float[1]
+        floater.OnLandedClient = OnLandedClient
+    end
 end
 
 local function OnEquip_base(inst, owner)
@@ -77,26 +110,6 @@ end
 --[[ 永不凋零 ]]
 --------------------------------------------------------------------------
 
-local assets_never = {
-    Asset("ANIM", "anim/neverfade.zip"),--这个是放在地上的动画文件
-
-     --正常的动画
-    Asset("ANIM", "anim/swap_neverfade.zip"),
-    Asset("ATLAS", "images/inventoryimages/neverfade.xml"),
-    Asset("IMAGE", "images/inventoryimages/neverfade.tex"),
-
-    --破损的动画
-    Asset("ANIM", "anim/swap_neverfade_broken.zip"),
-    Asset("ATLAS", "images/inventoryimages/neverfade_broken.xml"),
-    Asset("IMAGE", "images/inventoryimages/neverfade_broken.tex"),
-
-    Asset("ANIM", "anim/neverfadebush.zip") --花丛的动画
-}
-local prefabs_never = {
-    "neverfadebush",
-    "neverfade_shield",
-    "buff_butterflysblessing"
-}
 local uses_never = 250
 
 local function ChangeSymbol_never(inst, owner, skindata)
@@ -609,15 +622,14 @@ local foliageath_data_never = {
     end
 }
 
-local function Fn_never()
+table.insert(prefs, Prefab("neverfade", function()
     local inst = CreateEntity()
-
     Fn_common(inst, "neverfade", nil, nil, nil)
 
     inst:AddTag("sharp") --该标签跟攻击音效有关
     inst:AddTag("pointy") --该标签跟攻击音效有关
     -- inst:AddTag("hide_percentage") --该标签能让耐久比例不显示出来
-    inst:AddTag("deployedplant") --deployable组件 需要的标签
+    inst:AddTag("deployedplant")
     inst:AddTag("show_broken_ui") --装备损坏后展示特殊物品栏ui
     inst:AddTag("weapon")
 
@@ -625,9 +637,8 @@ local function Fn_never()
     inst.components.skinedlegion:InitWithFloater("neverfade") --客户端才初始化时居然获取不了inst.prefab
 
     inst.entity:SetPristine()
-    if not TheWorld.ismastersim then
-        return inst --此处截断：往下的代码是仅服务器运行，往上的代码是服务器和客户端都会运行的
-    end
+    --此处截断：往下的代码是仅服务器运行，往上的代码是服务器和客户端都会运行的
+    if not TheWorld.ismastersim then return inst end
 
     inst.hassetbroken = false
     inst.atkcounter = 0
@@ -637,12 +648,7 @@ local function Fn_never()
     Fn_server(inst, "neverfade", OnEquip_never, OnUnequip_never)
     SetWeapon(inst, 55, OnAttack_never)
     SetFiniteUses(inst, uses_never, OnFinished_never)
-
-    inst:AddComponent("deployable") --可摆放组件
-    inst.components.deployable.ondeploy = OnDeploy_never
-    inst.components.deployable:SetDeployMode(DEPLOYMODE.PLANT)
-    inst.components.deployable:SetDeploySpacing(DEPLOYSPACING.MEDIUM) --草根一样的种植所需范围
-
+    SetDeployable(inst, OnDeploy_never, DEPLOYMODE.PLANT, DEPLOYSPACING.MEDIUM)
     MakeHauntableLaunch(inst) --作祟相关函数
 
     inst.OnSave = OnSave_never
@@ -651,13 +657,20 @@ local function Fn_never()
     inst.components.skinedlegion:SetOnPreLoad()
 
     return inst
-end
+end, GetAssets("neverfade", {
+    Asset("ANIM", "anim/swap_neverfade.zip"),
+    Asset("ANIM", "anim/swap_neverfade_broken.zip"),
+    Asset("ATLAS", "images/inventoryimages/neverfade_broken.xml"),
+    Asset("IMAGE", "images/inventoryimages/neverfade_broken.tex"),
+    Asset("ATLAS_BUILD", "images/inventoryimages/neverfade_broken.xml", 256)
+}), {
+    "neverfadebush", "neverfade_shield", "buff_butterflysblessing"
+}))
 
 --------------------------------------------------------------------------
 --[[ 带刺蔷薇 ]]
 --------------------------------------------------------------------------
 
-local assets_rose = GetAssets("rosorns", { Asset("ANIM", "anim/swap_rosorns.zip") })
 local foliageath_data_rose = {
     image = "foliageath_rosorns", atlas = "images/inventoryimages/foliageath_rosorns.xml",
     bank = nil, build = nil, anim = "rosorns", isloop = nil
@@ -692,9 +705,8 @@ local function OnAttack_rose(inst, owner, target)
     end
 end
 
-local function Fn_rose()
+table.insert(prefs, Prefab("rosorns", function()
     local inst = CreateEntity()
-
     Fn_common(inst, "rosorns", nil, nil, nil)
 
     inst:AddTag("sharp")
@@ -707,28 +719,24 @@ local function Fn_rose()
     inst.components.skinedlegion:InitWithFloater("rosorns")
 
     inst.entity:SetPristine()
-    if not TheWorld.ismastersim then
-        return inst
-    end
+    if not TheWorld.ismastersim then return inst end
 
     inst.foliageath_data = foliageath_data_rose
 
     Fn_server(inst, "rosorns", OnEquip_rose, OnUnequip_rose)
     SetWeapon(inst, 51, OnAttack_rose)
-    SetPerishable(inst, TUNING.TOTAL_DAY_TIME*8, nil)
-
+    SetPerishable(inst, TUNING.TOTAL_DAY_TIME*8, "spoiled_food", nil)
     MakeHauntableLaunchAndPerish(inst)
 
     inst.components.skinedlegion:SetOnPreLoad()
 
     return inst
-end
+end, GetAssets("rosorns", { Asset("ANIM", "anim/swap_rosorns.zip") }), nil))
 
 --------------------------------------------------------------------------
 --[[ 蹄莲翠叶 ]]
 --------------------------------------------------------------------------
 
-local assets_lily = GetAssets("lileaves", { Asset("ANIM", "anim/swap_lileaves.zip") })
 local foliageath_data_lily = {
     image = "foliageath_lileaves", atlas = "images/inventoryimages/foliageath_lileaves.xml",
     bank = nil, build = nil, anim = "lileaves", isloop = nil
@@ -759,9 +767,8 @@ local function OnAttack_lily(inst, owner, target)
     end
 end
 
-local function Fn_lily()
+table.insert(prefs, Prefab("lileaves", function()
     local inst = CreateEntity()
-
     Fn_common(inst, "lileaves", nil, nil, nil)
 
     inst:AddTag("sharp")
@@ -774,29 +781,24 @@ local function Fn_lily()
     inst.components.skinedlegion:InitWithFloater("lileaves")
 
     inst.entity:SetPristine()
-    if not TheWorld.ismastersim then
-        return inst
-    end
+    if not TheWorld.ismastersim then return inst end
 
     inst.foliageath_data = foliageath_data_lily
 
     Fn_server(inst, "lileaves", OnEquip_lily, OnUnequip_base)
     SetWeapon(inst, 51, OnAttack_lily)
-    SetPerishable(inst, TUNING.TOTAL_DAY_TIME*8, nil)
-
+    SetPerishable(inst, TUNING.TOTAL_DAY_TIME*8, "spoiled_food", nil)
     MakeHauntableLaunchAndPerish(inst)
 
     inst.components.skinedlegion:SetOnPreLoad()
 
     return inst
-end
+end, GetAssets("lileaves", { Asset("ANIM", "anim/swap_lileaves.zip") }), nil))
 
 --------------------------------------------------------------------------
 --[[ 兰草花穗 ]]
 --------------------------------------------------------------------------
 
-local assets_orchid = GetAssets("orchitwigs", { Asset("ANIM", "anim/swap_orchitwigs.zip") })
-local prefabs_orchid = { "impact_orchid_fx" }
 local atk_orchid_area = TUNING.BASE_SURVIVOR_ATTACK*0.7
 local foliageath_data_orchid = {
     image = "foliageath_orchitwigs", atlas = "images/inventoryimages/foliageath_orchitwigs.xml",
@@ -866,9 +868,8 @@ local function OnAttack_orchid(inst, owner, target)
     end
 end
 
-local function Fn_orchid()
+table.insert(prefs, Prefab("orchitwigs", function()
     local inst = CreateEntity()
-
     Fn_common(inst, "orchitwigs", nil, nil, nil)
 
     inst:AddTag("sharp")
@@ -881,31 +882,23 @@ local function Fn_orchid()
     inst.components.skinedlegion:InitWithFloater("orchitwigs")
 
     inst.entity:SetPristine()
-    if not TheWorld.ismastersim then
-        return inst
-    end
+    if not TheWorld.ismastersim then return inst end
 
     inst.foliageath_data = foliageath_data_orchid
 
     Fn_server(inst, "orchitwigs", OnEquip_orchid, OnUnequip_base)
     SetWeapon(inst, TUNING.BASE_SURVIVOR_ATTACK*0.9, OnAttack_orchid)
-    SetPerishable(inst, TUNING.TOTAL_DAY_TIME*8, nil)
-
+    SetPerishable(inst, TUNING.TOTAL_DAY_TIME*8, "spoiled_food", nil)
     MakeHauntableLaunchAndPerish(inst)
 
     inst.components.skinedlegion:SetOnPreLoad()
 
     return inst
-end
+end, GetAssets("orchitwigs", { Asset("ANIM", "anim/swap_orchitwigs.zip") }), { "impact_orchid_fx" }))
 
 --------------------------------------------------------------------------
 --[[ 多变的云 ]]
 --------------------------------------------------------------------------
-
-local assets_bookweather = GetAssets("book_weather")
-local prefabs_bookweather = {
-    "waterballoon_splash", "fx_book_rain", "fx_book_rain_mount"
-}
 
 local function FixSymbol_bookweather(owner, data) --因为书籍的攻击贴图会因为读书而被替换，所以这里重新覆盖一次
     if data and data.statename == "attack" then
@@ -1019,9 +1012,8 @@ local function OnPeruse_bookweather(inst, reader)
     return true
 end
 
-local function Fn_bookweather()
+table.insert(prefs, Prefab("book_weather", function()
     local inst = CreateEntity()
-
     Fn_common(inst, "book_weather", nil, nil, nil)
 
     inst:AddTag("book") --加入book标签就能使攻击时使用人物的书本攻击的动画
@@ -1031,9 +1023,7 @@ local function Fn_bookweather()
     MakeInventoryFloatable(inst, "med", 0.1, 0.75)
 
     inst.entity:SetPristine()
-    if not TheWorld.ismastersim then
-        return inst
-    end
+    if not TheWorld.ismastersim then return inst end
 
     inst.swap_build = "book_weather"
     inst.swap_prefix = "book"
@@ -1050,9 +1040,9 @@ local function Fn_bookweather()
     inst.components.wateryprotection.addwetness = TUNING.WATERBALLOON_ADD_WETNESS
     inst.components.wateryprotection.onspreadprotectionfn = OnWateryProtection_bookweather
     if TheNet:GetPVPEnabled() then
-        inst.components.wateryprotection:AddIgnoreTag("ignorewet")  --PVP，防止使用者被打湿
+        inst.components.wateryprotection:AddIgnoreTag("ignorewet") --PVP，防止使用者被打湿
     else
-        inst.components.wateryprotection:AddIgnoreTag("player")  --PVE，防止所有玩家被打湿
+        inst.components.wateryprotection:AddIgnoreTag("player") --PVE，防止所有玩家被打湿
     end
 
     inst:AddComponent("book")
@@ -1065,118 +1055,109 @@ local function Fn_bookweather()
 
     MakeSmallBurnable(inst, TUNING.MED_BURNTIME)
     MakeSmallPropagator(inst)
-
     MakeHauntableLaunch(inst)
 
     return inst
-end
+end, GetAssets("book_weather"), { "waterballoon_splash", "fx_book_rain", "fx_book_rain_mount" }))
 
 --------------------------------------------------------------------------
 --[[ 幻象法杖 ]]
 --------------------------------------------------------------------------
 
-local assets_staffpink = GetAssets("pinkstaff", { Asset("ANIM", "anim/swap_pinkstaff.zip") })
-
-local function OnFinished_staffpink(inst)
-    inst.SoundEmitter:PlaySound("dontstarve/common/gem_shatter")
-    inst:Remove()
-end
-local function OnEquip_staffpink(inst, owner)
-    local skindata = inst.components.skinedlegion:GetSkinedData()
-    if skindata ~= nil then
-        if skindata.equip ~= nil then
-            owner.AnimState:OverrideSymbol("swap_object", skindata.equip.build, skindata.equip.file)
+if CONFIGS_LEGION.DRESSUP then
+    local function OnFinished_staffpink(inst)
+        inst.SoundEmitter:PlaySound("dontstarve/common/gem_shatter")
+        inst:Remove()
+    end
+    local function OnEquip_staffpink(inst, owner)
+        local skindata = inst.components.skinedlegion:GetSkinedData()
+        if skindata ~= nil then
+            if skindata.equip ~= nil then
+                owner.AnimState:OverrideSymbol("swap_object", skindata.equip.build, skindata.equip.file)
+            else
+                owner.AnimState:OverrideSymbol("swap_object", "swap_pinkstaff", "swap_pinkstaff")
+            end
+            if skindata.equipfx ~= nil then
+                skindata.equipfx.start(inst, owner)
+            end
         else
             owner.AnimState:OverrideSymbol("swap_object", "swap_pinkstaff", "swap_pinkstaff")
         end
-        if skindata.equipfx ~= nil then
-            skindata.equipfx.start(inst, owner)
+        OnEquip_base(inst, owner)
+    end
+    local function OnUnequip_staffpink(inst, owner)
+        local skindata = inst.components.skinedlegion:GetSkinedData()
+        if skindata ~= nil and skindata.equipfx ~= nil then
+            skindata.equipfx.stop(inst, owner)
         end
-    else
-        owner.AnimState:OverrideSymbol("swap_object", "swap_pinkstaff", "swap_pinkstaff")
+        OnUnequip_base(inst, owner)
     end
-    OnEquip_base(inst, owner)
-end
-local function OnUnequip_staffpink(inst, owner)
-    local skindata = inst.components.skinedlegion:GetSkinedData()
-    if skindata ~= nil and skindata.equipfx ~= nil then
-        skindata.equipfx.stop(inst, owner)
-    end
-    OnUnequip_base(inst, owner)
-end
-local function DressUpItem(staff, target)
-    local caster = staff.components.inventoryitem.owner
-    if caster ~= nil and caster.components.dressup ~= nil then
-        if target == nil then --解除幻化（右键装备栏的法杖）
-            caster.components.dressup:TakeOffAll()
-        elseif target == caster then --解除幻化（右键玩家自己）
-            caster.components.dressup:TakeOffAll()
-        else                  --添加幻化
-            local didit = caster.components.dressup:PutOn(target)
-            if didit then
-                caster.SoundEmitter:PlaySound("dontstarve/common/staff_dissassemble")
-                if caster.components.sanity ~= nil then
-                    caster.components.sanity:DoDelta(-10)
+    local function DressUpItem(staff, target)
+        local caster = staff.components.inventoryitem.owner
+        if caster ~= nil and caster.components.dressup ~= nil then
+            if target == nil then --解除幻化（右键装备栏的法杖）
+                caster.components.dressup:TakeOffAll()
+            elseif target == caster then --解除幻化（右键玩家自己）
+                caster.components.dressup:TakeOffAll()
+            else                  --添加幻化
+                local didit = caster.components.dressup:PutOn(target)
+                if didit then
+                    caster.SoundEmitter:PlaySound("dontstarve/common/staff_dissassemble")
+                    if caster.components.sanity ~= nil then
+                        caster.components.sanity:DoDelta(-10)
+                    end
+                    staff.components.finiteuses:Use(1)
                 end
-                staff.components.finiteuses:Use(1)
             end
         end
     end
-end
-local function DressUpTest(doer, target, pos)
-    if target == nil then --解除幻化，也是可以生效的
-        return true
-    elseif target == doer then --对自己施法：解除幻化
-        return true
-    elseif DRESSUP_DATA_LEGION[target.prefab] ~= nil then
-        return true
+    local function DressUpTest(doer, target, pos)
+        if target == nil then --解除幻化，也是可以生效的
+            return true
+        elseif target == doer then --对自己施法：解除幻化
+            return true
+        elseif DRESSUP_DATA_LEGION[target.prefab] ~= nil then
+            return true
+        end
+        return false
     end
-    return false
-end
 
-local function Fn_staffpink()
-    local inst = CreateEntity()
-    inst.entity:AddSoundEmitter()
+    table.insert(prefs, Prefab("pinkstaff", function()
+        local inst = CreateEntity()
+        inst.entity:AddSoundEmitter()
+        Fn_common(inst, "pinkstaff", nil, "anim", nil)
 
-    Fn_common(inst, "pinkstaff", nil, "anim", nil)
+        inst:AddTag("nopunch") --这个标签的作用应该是让本身没有武器组件的道具用武器攻击的动作，而不是用拳头攻击的动作
 
-    inst:AddTag("nopunch") --这个标签的作用应该是让本身没有武器组件的道具用武器攻击的动作，而不是用拳头攻击的动作
+        inst:AddComponent("skinedlegion")
+        inst.components.skinedlegion:InitWithFloater("pinkstaff")
 
-    inst:AddComponent("skinedlegion")
-    inst.components.skinedlegion:InitWithFloater("pinkstaff")
+        inst.entity:SetPristine()
+        if not TheWorld.ismastersim then return inst end
 
-    inst.entity:SetPristine()
-    if not TheWorld.ismastersim then
+        inst.fxcolour = { 255/255, 80/255, 173/255 }
+
+        Fn_server(inst, "pinkstaff", OnEquip_staffpink, OnUnequip_staffpink)
+        SetFiniteUses(inst, 30, OnFinished_staffpink)
+
+        inst:AddComponent("spellcaster")
+        inst.components.spellcaster.canuseontargets = true
+        inst.components.spellcaster.canusefrominventory = true
+        inst.components.spellcaster:SetSpellFn(DressUpItem)
+        inst.components.spellcaster:SetCanCastFn(DressUpTest)
+
+        MakeHauntableLaunch(inst)
+
+        inst.components.skinedlegion:SetOnPreLoad()
+
         return inst
-    end
-
-    inst.fxcolour = { 255/255, 80/255, 173/255 }
-
-    Fn_server(inst, "pinkstaff", OnEquip_staffpink, OnUnequip_staffpink)
-    SetFiniteUses(inst, 30, OnFinished_staffpink)
-
-    inst:AddComponent("spellcaster")
-    inst.components.spellcaster.canuseontargets = true
-    inst.components.spellcaster.canusefrominventory = true
-    inst.components.spellcaster:SetSpellFn(DressUpItem)
-    inst.components.spellcaster:SetCanCastFn(DressUpTest)
-
-    MakeHauntableLaunch(inst)
-
-    inst.components.skinedlegion:SetOnPreLoad()
-
-    return inst
+    end, GetAssets("pinkstaff", { Asset("ANIM", "anim/swap_pinkstaff.zip") }), nil))
 end
 
 --------------------------------------------------------------------------
 --[[ 芬布尔斧 ]]
 --------------------------------------------------------------------------
 
-local assets_fimbulaxe = GetAssets("fimbul_axe", { Asset("ANIM", "anim/boomerang.zip") }) --官方回旋镖动画模板
-local prefabs_fimbulaxe = {
-    "fimbul_lightning",
-    "fimbul_cracklebase_fx"
-}
 local atk_fimbulaxe = TUNING.BASE_SURVIVOR_ATTACK*0.4 --13.6
 
 local function OnFinished_fimbulaxe(inst)
@@ -1352,9 +1333,8 @@ local function OnLightning_fimbulaxe(inst) --因为拿在手上会有"INLIMBO"�
     end
 end
 
-local function Fn_fimbulaxe()
+table.insert(prefs, Prefab("fimbul_axe", function()
     local inst = CreateEntity()
-
     Fn_common(inst, "boomerang", "fimbul_axe", nil, nil)
     RemovePhysicsColliders(inst)
     inst.AnimState:SetRayTestOnBB(true)
@@ -1364,19 +1344,11 @@ local function Fn_fimbulaxe()
     inst:AddTag("weapon")
     inst:AddTag("projectile")
 
-    -- MakeInventoryFloatable(inst, "med", 0.1, {1.3, 0.6, 1.3}, true, -9, {
-    --     sym_build = "swap_fimbul_axe",
-    --     sym_name = "swap_fimbul_axe",
-    --     bank = "fimbul_axe",
-    --     anim = "idle"
-    -- })
     inst:AddComponent("skinedlegion")
     inst.components.skinedlegion:InitWithFloater("fimbul_axe")
 
     inst.entity:SetPristine()
-    if not TheWorld.ismastersim then
-        return inst
-    end
+    if not TheWorld.ismastersim then return inst end
 
     -- inst.returntask = nil
 
@@ -1391,7 +1363,7 @@ local function Fn_fimbulaxe()
 
     inst:AddComponent("projectile")
     inst.components.projectile:SetSpeed(15)
-    --inst.components.projectile:SetCanCatch(true)      --默认，不能被主动抓住
+    --inst.components.projectile:SetCanCatch(true) --默认，不能被主动抓住
     inst.components.projectile:SetOnThrownFn(OnThrown_fimbulaxe)  --扔出时
     inst.components.projectile:SetOnPreHitFn(OnPreHit_fimbulaxe)  --敌方或者自己被击中前
     inst.components.projectile:SetOnHitFn(OnHit_fimbulaxe)        --敌方或者自己被击中后
@@ -1405,23 +1377,22 @@ local function Fn_fimbulaxe()
     inst.components.skinedlegion:SetOnPreLoad()
 
     return inst
-end
+end, GetAssets("fimbul_axe", {
+    Asset("ANIM", "anim/boomerang.zip") --官方回旋镖动画模板
+}), { "fimbul_lightning", "fimbul_cracklebase_fx" }))
 
 --------------------------------------------------------------------------
 --[[ 扳手-双用型 ]]
 --------------------------------------------------------------------------
-
-local assets_2wrench = GetAssets("dualwrench", { Asset("ANIM", "anim/swap_dualwrench.zip") })
 
 local function OnEquip_2wrench(inst, owner)
     owner.AnimState:OverrideSymbol("swap_object", "swap_dualwrench", "swap_dualwrench")
     OnEquip_base(inst, owner)
 end
 
-local function Fn_2wrench()
+table.insert(prefs, Prefab("dualwrench", function()
     local inst = CreateEntity()
     inst.entity:AddSoundEmitter()
-
     Fn_common(inst, "dualwrench", nil, nil, nil)
 
     inst:AddTag("hammer")
@@ -1436,9 +1407,7 @@ local function Fn_2wrench()
     })
 
     inst.entity:SetPristine()
-    if not TheWorld.ismastersim then
-        return inst
-    end
+    if not TheWorld.ismastersim then return inst end
 
     Fn_server(inst, "dualwrench", OnEquip_2wrench, OnUnequip_base)
     SetWeapon(inst, TUNING.HAMMER_DAMAGE, nil)
@@ -1459,13 +1428,11 @@ local function Fn_2wrench()
     MakeHauntableLaunch(inst)
 
     return inst
-end
+end, GetAssets("dualwrench", { Asset("ANIM", "anim/swap_dualwrench.zip") }), nil))
 
 --------------------------------------------------------------------------
 --[[ 斧铲-三用型 ]]
 --------------------------------------------------------------------------
-
-local assets_3axe = GetAssets("tripleshovelaxe")
 
 local function OnEquip_3axe(inst, owner)
     local skindata = inst.components.skinedlegion:GetSkinedData()
@@ -1477,10 +1444,9 @@ local function OnEquip_3axe(inst, owner)
     OnEquip_base(inst, owner)
 end
 
-local function Fn_3axe()
+table.insert(prefs, Prefab("tripleshovelaxe", function()
     local inst = CreateEntity()
     inst.entity:AddSoundEmitter()
-
     Fn_common(inst, "tripleshovelaxe", nil, nil, nil)
 
     inst:AddTag("sharp")
@@ -1491,9 +1457,7 @@ local function Fn_3axe()
     inst.components.skinedlegion:InitWithFloater("tripleshovelaxe")
 
     inst.entity:SetPristine()
-    if not TheWorld.ismastersim then
-        return inst
-    end
+    if not TheWorld.ismastersim then return inst end
 
     Fn_server(inst, "tripleshovelaxe", OnEquip_3axe, OnUnequip_base)
     SetWeapon(inst, TUNING.AXE_DAMAGE, nil)
@@ -1514,13 +1478,11 @@ local function Fn_3axe()
     inst.components.skinedlegion:SetOnPreLoad()
 
     return inst
-end
+end, GetAssets("tripleshovelaxe"), nil))
 
 --------------------------------------------------------------------------
 --[[ 斧铲-黄金三用型 ]]
 --------------------------------------------------------------------------
-
-local assets_3axegold = GetAssets("triplegoldenshovelaxe")
 
 local function OnEquip_3axegold(inst, owner)
     local skindata = inst.components.skinedlegion:GetSkinedData()
@@ -1532,10 +1494,9 @@ local function OnEquip_3axegold(inst, owner)
     OnEquip_base(inst, owner)
 end
 
-local function Fn_3axegold()
+table.insert(prefs, Prefab("triplegoldenshovelaxe", function()
     local inst = CreateEntity()
     inst.entity:AddSoundEmitter()
-
     Fn_common(inst, "triplegoldenshovelaxe", nil, nil, nil)
 
     inst:AddTag("sharp")
@@ -1546,9 +1507,7 @@ local function Fn_3axegold()
     inst.components.skinedlegion:InitWithFloater("triplegoldenshovelaxe")
 
     inst.entity:SetPristine()
-    if not TheWorld.ismastersim then
-        return inst
-    end
+    if not TheWorld.ismastersim then return inst end
 
     Fn_server(inst, "triplegoldenshovelaxe", OnEquip_3axegold, OnUnequip_base)
     SetWeapon(inst, TUNING.AXE_DAMAGE, nil)
@@ -1571,13 +1530,12 @@ local function Fn_3axegold()
     inst.components.skinedlegion:SetOnPreLoad()
 
     return inst
-end
+end, GetAssets("triplegoldenshovelaxe"), nil))
 
 --------------------------------------------------------------------------
 --[[ 胡萝卜长枪 ]]
 --------------------------------------------------------------------------
 
-local assets_carl = GetAssets("lance_carrot_l")
 local atk_min_carl = 10
 
 local function UpdateCarrot(inst, force)
@@ -1693,9 +1651,8 @@ local function OnEntityReplicated_carl(inst)
     end
 end
 
-local function Fn_carl()
+table.insert(prefs, Prefab("lance_carrot_l", function()
     local inst = CreateEntity()
-
     Fn_common(inst, "lance_carrot_l", nil, nil, nil)
 
     inst:AddTag("jab") --使用捅击的动作进行攻击
@@ -1705,12 +1662,7 @@ local function Fn_carl()
     -- inst:AddComponent("skinedlegion")
     -- inst.components.skinedlegion:InitWithFloater("lance_carrot_l")
 
-    MakeInventoryFloatable(inst, "small", 0.4, 0.5)
-    local OnLandedClient_old = inst.components.floater.OnLandedClient
-    inst.components.floater.OnLandedClient = function(self)
-        OnLandedClient_old(self)
-        self.inst.AnimState:SetFloatParams(0.15, 1, self.bob_percent)
-    end
+    SetFloatable(inst, { 0.15, "small", 0.4, 0.5 })
 
     inst.entity:SetPristine()
     if not TheWorld.ismastersim then
@@ -1747,24 +1699,430 @@ local function Fn_carl()
     end
 
     return inst
+end, GetAssets("lance_carrot_l"), nil))
+
+--------------------------------------------------------------------------
+--[[ 牛排战斧 ]]
+--------------------------------------------------------------------------
+
+local foliageath_data_steak = {
+    image = "foliageath_dish_tomahawksteak", atlas = "images/inventoryimages/foliageath_dish_tomahawksteak.xml",
+    bank = nil, build = nil, anim = "dish_tomahawksteak", isloop = nil
+}
+
+local function UpdateAxe(inst)
+    local value
+    if inst._damage then
+        value = inst.components.perishable:GetPercent()
+        value = Remap(value, 0, 1, inst._damage[1], inst._damage[2])
+        inst.components.weapon:SetDamage(value)
+    end
+    if inst._chopvalue then
+        value = inst.components.perishable:GetPercent()
+        value = Remap(value, 0, 1, inst._chopvalue[1], inst._chopvalue[2])
+        inst.components.tool.actions[ACTIONS.CHOP] = value
+    end
+end
+local function AfterWorking(inst, data)
+    if
+        data.target and
+        data.target.components.workable ~= nil and
+        data.target.components.workable:CanBeWorked() and
+        data.target.components.workable:GetWorkAction() == ACTIONS.CHOP and
+        math.random() < (inst.steak_l_chop or 0.05)
+    then
+        --TIP：事件机制会在发送者那边逻辑当前帧就处理完的。所以这里只需要设置关键变量 workleft=0 即可
+        data.target.components.workable.workleft = 0
+        if inst.components.talker ~= nil then
+            inst.components.talker:Say(GetString(inst, "DESCRIBE", { "DISH_TOMAHAWKSTEAK", "CHOP" }))
+        end
+    end
+end
+local function SingleFight(owner)
+    -- if owner.singlefight_target == nil then
+    --     return
+    -- end
+    local hasenemy = false
+    local x, y, z = owner.Transform:GetWorldPosition()
+    local ents = TheSim:FindEntities(x, y, z, 24,
+        { "_combat" }, { "INLIMBO", "NOCLICK", "player", "notarget", "nosinglefight_l" }, nil
+    )
+    for _,v in ipairs(ents) do
+        if
+            v ~= owner.singlefight_target and
+            v.entity:IsVisible() and
+            (v.components.health == nil or not v.components.health:IsDead()) and
+            v.components.combat ~= nil and v.components.combat.target == owner
+        then
+            v.components.combat:DropTarget(false)
+            hasenemy = true
+        end
+    end
+    if owner.singlefight_count == nil or owner.singlefight_count <= 1 then
+        owner.singlefight_count = nil
+        owner.singlefight_target = nil
+        if owner.singlefight_task ~= nil then
+            owner.singlefight_task:Cancel()
+            owner.singlefight_task = nil
+        end
+    else
+        owner.singlefight_count = owner.singlefight_count - 1
+        if hasenemy and owner.components.talker ~= nil and math.random() < 0.1 then
+            owner.components.talker:Say(GetString(owner, "DESCRIBE", { "DISH_TOMAHAWKSTEAK", "ATK" }))
+        end
+    end
+end
+local function TrySingleFight(inst, owner, target)
+    if target ~= nil and owner ~= nil and owner:IsValid() then
+        owner.singlefight_target = target
+        owner.singlefight_count = 7
+        if owner.singlefight_task == nil then
+            owner.singlefight_task = owner:DoPeriodicTask(0.5, SingleFight, 0)
+        else
+            SingleFight(owner) --每次攻击立即触发一下，免得 task 的效果跟不上
+        end
+    end
+end
+
+local function OnEquip_steak_pre(inst, owner)
+    owner.AnimState:OverrideSymbol("swap_object", "dish_tomahawksteak", "swap")
+    OnEquip_base(inst, owner)
+end
+local function OnEquip_steak_pst(inst, owner)
+    if inst._UpdateAxe then
+        inst._UpdateAxe(inst)
+    end
+    owner:PushEvent("learncookbookstats", inst.food_basename or inst.prefab) --解锁烹饪书数据
+    owner:ListenForEvent("working", AfterWorking)
+    owner.steak_l_chop = inst._chopchance
+end
+local function OnEquip_steak(inst, owner)
+    OnEquip_steak_pre(inst, owner)
+    if owner:HasTag("equipmentmodel") then --假人！
+        return
+    end
+    OnEquip_steak_pst(inst, owner)
+end
+local function OnUnequip_steak(inst, owner)
+    OnUnequip_base(inst, owner)
+
+    if inst._UpdateAxe then
+        inst._UpdateAxe(inst)
+    end
+    owner:RemoveEventCallback("working", AfterWorking)
+    owner.steak_l_chop = nil
+end
+local function OnAttack_steak(inst, owner, target)
+    if inst._UpdateAxe then
+        inst._UpdateAxe(inst)
+    end
+    TrySingleFight(inst, owner, target)
+end
+local function OnLoad_steak(inst, data)
+    if inst._UpdateAxe then
+        inst._UpdateAxe(inst)
+    end
+end
+local function InitSteak(inst)
+    inst._damage = { 47.6, 61.2 } --34x1.8
+    inst._chopvalue = { 1.2, 1.66 }
+    inst._chopchance = 0.05
+    inst._UpdateAxe = UpdateAxe
+
+    inst.components.tool:SetAction(ACTIONS.CHOP, inst._chopvalue[2])
+
+    inst.components.weapon:SetDamage(inst._damage[2])
+end
+
+local function MakeSteak(data)
+    local assets = GetAssets("dish_tomahawksteak")
+    local basename = "dish_tomahawksteak"
+    local prefabname = "dish_tomahawksteak"
+
+    if data.spicename ~= nil then
+        if data.spicebuild ~= nil then
+            table.insert(assets, Asset("ANIM", "anim/"..data.spicebuild..".zip"))
+        else
+            table.insert(assets, Asset("ANIM", "anim/spices.zip"))
+        end
+        if data.spiceatlas ~= nil then
+            table.insert(assets, Asset("ATLAS", data.spiceatlas))
+        else
+            table.insert(assets, Asset("INV_IMAGE", data.spicename.."_over"))
+        end
+        table.insert(assets, Asset("ANIM", "anim/plate_food.zip"))
+        prefabname = prefabname.."_"..data.spicename
+    end
+
+    local function DisplayName_steak(inst)
+        return subfmt(
+                STRINGS.NAMES[string.upper(data.spicename).."_FOOD"],
+                { food = STRINGS.NAMES[string.upper(basename)] }
+            )
+    end
+
+    table.insert(prefs, Prefab(prefabname, function()
+        local inst = CreateEntity()
+        inst.entity:AddTransform()
+        inst.entity:AddAnimState()
+        inst.entity:AddNetwork()
+
+        MakeInventoryPhysics(inst)
+
+        if data.spicename ~= nil then
+            inst.AnimState:SetBuild("plate_food")
+            inst.AnimState:SetBank("plate_food")
+            inst.AnimState:OverrideSymbol("swap_garnish", data.spicebuild or "spices", data.spicename)
+            inst.AnimState:OverrideSymbol("swap_food", basename, "base")
+
+            inst:AddTag("spicedfood")
+
+            --设置作为背景的料理图
+            inst.inv_image_bg = { atlas = "images/inventoryimages/"..basename..".xml", image = basename..".tex" }
+
+            inst:SetPrefabNameOverride(basename)
+            inst.displaynamefn = DisplayName_steak
+
+            SetFloatable(inst, { nil, "med", 0.05, {0.8, 0.7, 0.8} })
+        else
+            inst.AnimState:SetBank(basename)
+            inst.AnimState:SetBuild(basename)
+
+            MakeInventoryFloatable(inst, "small", 0.2, 0.75)
+        end
+        inst.AnimState:PlayAnimation("idle")
+
+        inst:AddTag("show_spoilage")
+        inst:AddTag("icebox_valid")
+        inst:AddTag("preparedfood") --这个标签能使其被放入香料站
+        inst:AddTag("sharp")
+        inst:AddTag("tool")
+        inst:AddTag("weapon")
+
+        if data.fn_common ~= nil then
+            data.fn_common(inst)
+        end
+
+        inst.entity:SetPristine()
+        if not TheWorld.ismastersim then
+            return inst
+        end
+
+        inst.food_symbol_build = basename
+        inst.food_basename = data.spicename ~= nil and basename or nil
+
+        inst.foliageath_data = foliageath_data_steak
+
+        inst._damage = nil --基础攻击力
+        inst._chopvalue = nil --基础砍伐效率
+        inst._chopchance = nil --直接砍倒树的几率
+        inst._UpdateAxe = nil
+
+        inst:AddComponent("inspectable")
+
+        inst:AddComponent("inventoryitem")
+        inst.components.inventoryitem.imagename = basename
+        if data.spicename ~= nil then
+            if data.spiceatlas ~= nil then
+                inst.components.inventoryitem.atlasname = data.spiceatlas
+            end
+            inst.components.inventoryitem:ChangeImageName(data.spicename.."_over")
+        else
+            inst.components.inventoryitem.atlasname = "images/inventoryimages/"..basename..".xml"
+        end
+
+        SetPerishable(inst, data.perishtime or TUNING.PERISH_MED, "boneshard", nil)
+
+        inst:AddComponent("tool")
+
+        inst:AddComponent("weapon")
+        inst.components.weapon:SetOnAttack(OnAttack_steak)
+
+        inst:AddComponent("equippable")
+        inst.components.equippable:SetOnEquip(OnEquip_steak)
+        inst.components.equippable:SetOnUnequip(OnUnequip_steak)
+
+        inst.OnLoad = OnLoad_steak
+
+        MakeHauntableLaunchAndPerish(inst)
+
+        if data.fn_server ~= nil then
+            data.fn_server(inst)
+        end
+
+        return inst
+    end, assets, nil))
+end
+
+MakeSteak({ --普通
+    -- spicename = nil, perishtime = nil,
+    fn_server = InitSteak
+})
+MakeSteak({ --大蒜香料：加护甲
+    spicename = "spice_garlic", --perishtime = nil,
+    fn_common = function(inst)
+        inst:AddTag("hide_percentage")
+    end,
+    fn_server = function(inst)
+        InitSteak(inst)
+
+        inst:AddComponent("armor")
+        inst.components.armor:InitCondition(100, 0.4)
+        inst.components.armor.indestructible = true --无敌的护甲
+    end
+})
+MakeSteak({ --蜂蜜香料：加工作效率
+    spicename = "spice_sugar", --perishtime = nil,
+    fn_server = function(inst)
+        inst._damage = { 47.6, 61.2 } --34x1.8
+        inst._chopvalue = { 1.8, 2.5 }
+        inst._chopchance = 0.15
+        inst._UpdateAxe = UpdateAxe
+
+        inst.components.tool:SetAction(ACTIONS.CHOP, inst._chopvalue[2])
+
+        inst.components.weapon:SetDamage(inst._damage[2])
+    end
+})
+MakeSteak({ --辣椒香料：加攻击
+    spicename = "spice_chili", --perishtime = nil,
+    fn_server = function(inst)
+        inst._damage = { 64.26, 82.62 } --34x1.8x1.35
+        inst._chopvalue = { 1.2, 1.66 }
+        inst._chopchance = 0.05
+        inst._UpdateAxe = UpdateAxe
+
+        inst.components.tool:SetAction(ACTIONS.CHOP, inst._chopvalue[2])
+
+        inst.components.weapon:SetDamage(inst._damage[2])
+    end
+})
+MakeSteak({ --盐香料：加新鲜度
+    spicename = "spice_salt", perishtime = TUNING.TOTAL_DAY_TIME * 14.5,
+    fn_server = function(inst)
+        inst.components.tool:SetAction(ACTIONS.CHOP, 1.66)
+
+        inst.components.weapon:SetDamage(61.2)
+
+        inst.OnLoad = nil
+    end
+})
+
+if TUNING.FUNCTIONAL_MEDAL_IS_OPEN then --能力勋章兼容
+    local function OnAttack_steak_voltjelly(inst, owner, target)
+        OnAttack_steak(inst, owner, target)
+        if target ~= nil and target:IsValid() and owner ~= nil and owner:IsValid() then
+            SpawnPrefab("electrichitsparks"):AlignToTarget(target, owner, true)
+        end
+    end
+    MakeSteak({ --带电果冻粉：武器带电
+        spicename = "spice_voltjelly", --perishtime = nil,
+        spicebuild = "medal_spices", spiceatlas = "images/spice_voltjelly_over.xml",
+        fn_server = function(inst)
+            InitSteak(inst)
+            inst.components.weapon:SetElectric()
+            inst.components.weapon:SetOnAttack(OnAttack_steak_voltjelly)
+        end
+    })
+
+    local function onremovefire(fire)
+        fire.nightstick.fire = nil
+    end
+    local function OnEquip_steak_phosphor(inst, owner)
+        OnEquip_steak_pre(inst, owner)
+        if inst.fire == nil then
+            inst.fire = SpawnPrefab("lichenhatlight")
+            inst.fire.nightstick = inst
+            inst:ListenForEvent("onremove", onremovefire, inst.fire)
+        end
+        inst.fire.entity:SetParent(owner.entity)
+        if owner:HasTag("equipmentmodel") then --假人！
+            return
+        end
+        OnEquip_steak_pst(inst, owner)
+    end
+    local function OnUnequip_steak_phosphor(inst, owner)
+        OnUnequip_steak(inst, owner)
+        if inst.fire ~= nil then
+            inst.fire:Remove()
+        end
+    end
+    MakeSteak({ --荧光粉：武器发光
+        spicename = "spice_phosphor", --perishtime = nil,
+        spicebuild = "medal_spices", spiceatlas = "images/spice_phosphor_over.xml",
+        fn_common = function(inst)
+            inst:AddTag("wildfireprotected")
+        end,
+        fn_server = function(inst)
+            InitSteak(inst)
+            inst.components.equippable:SetOnEquip(OnEquip_steak_phosphor)
+            inst.components.equippable:SetOnUnequip(OnUnequip_steak_phosphor)
+        end
+    })
+
+    MakeSteak({ --仙人掌花粉：加移速
+        spicename = "spice_cactus_flower", --perishtime = nil,
+        spicebuild = "medal_spices", spiceatlas = "images/spice_cactus_flower_over.xml",
+        fn_server = function(inst)
+            InitSteak(inst)
+            inst.components.equippable.walkspeedmult = TUNING.CANE_SPEED_MULT
+        end
+    })
+
+    local function BattleBornAttack(inst, data)
+        if inst.components.health ~= nil and not inst.components.health:IsDead() then
+            inst.components.health:DoDelta(0.6, false, inst.food_basename)
+        end
+    end
+    local function OnEquip_steak_rage_blood(inst, owner)
+        OnEquip_steak_pre(inst, owner)
+        if owner:HasTag("equipmentmodel") then --假人！
+            return
+        end
+        OnEquip_steak_pst(inst, owner)
+        owner:ListenForEvent("onattackother", BattleBornAttack)
+    end
+    local function OnUnequip_steak_rage_blood(inst, owner)
+        OnUnequip_steak(inst, owner)
+        owner:RemoveEventCallback("onattackother", BattleBornAttack)
+    end
+    MakeSteak({ --黑暗血糖：攻击回血
+        spicename = "spice_rage_blood_sugar", --perishtime = nil,
+        spicebuild = "medal_spices", spiceatlas = "images/spice_rage_blood_sugar_over.xml",
+        fn_server = function(inst)
+            InitSteak(inst)
+            inst.components.equippable:SetOnEquip(OnEquip_steak_rage_blood)
+            inst.components.equippable:SetOnUnequip(OnUnequip_steak_rage_blood)
+        end
+    })
+
+    local function OnEquip_steak_potato_starch(inst, owner)
+        OnEquip_steak_pre(inst, owner)
+        if owner:HasTag("equipmentmodel") then --假人！
+            return
+        end
+        OnEquip_steak_pst(inst, owner)
+        if owner.components.hunger ~= nil then
+            owner.components.hunger.burnratemodifiers:SetModifier(inst, 0.2)
+        end
+    end
+    local function OnUnequip_steak_potato_starch(inst, owner)
+        OnUnequip_steak(inst, owner)
+        if owner.components.hunger ~= nil then
+            owner.components.hunger.burnratemodifiers:RemoveModifier(inst)
+        end
+    end
+    MakeSteak({ --土豆淀粉：耐饿
+        spicename = "spice_potato_starch", --perishtime = nil,
+        spicebuild = "medal_spices", spiceatlas = "images/spice_potato_starch_over.xml",
+        fn_server = function(inst)
+            InitSteak(inst)
+            inst.components.equippable:SetOnEquip(OnEquip_steak_potato_starch)
+            inst.components.equippable:SetOnUnequip(OnUnequip_steak_potato_starch)
+        end
+    })
 end
 
 -------------------------
-
-local prefs = {
-    Prefab("neverfade", Fn_never, assets_never, prefabs_never),
-    Prefab("rosorns", Fn_rose, assets_rose),
-    Prefab("lileaves", Fn_lily, assets_lily),
-    Prefab("orchitwigs", Fn_orchid, assets_orchid, prefabs_orchid),
-    Prefab("book_weather", Fn_bookweather, assets_bookweather, prefabs_bookweather),
-    Prefab("fimbul_axe", Fn_fimbulaxe, assets_fimbulaxe, prefabs_fimbulaxe),
-    Prefab("dualwrench", Fn_2wrench, assets_2wrench),
-    Prefab("tripleshovelaxe", Fn_3axe, assets_3axe),
-    Prefab("triplegoldenshovelaxe", Fn_3axegold, assets_3axegold),
-    Prefab("lance_carrot_l", Fn_carl, assets_carl)
-}
-if CONFIGS_LEGION.DRESSUP then
-    table.insert(prefs, Prefab("pinkstaff", Fn_staffpink, assets_staffpink))
-end
 
 return unpack(prefs)

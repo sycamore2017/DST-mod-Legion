@@ -1,9 +1,6 @@
 local PLANT_DEFS = require("prefabs/farm_plant_defs").PLANT_DEFS
+local TOOLS_L = require("tools_legion")
 local prefs = {}
-
---------------------------------------------------------------------------
---[[ 通用 ]]
---------------------------------------------------------------------------
 
 local function GetAssets(name, other)
     local sets = {
@@ -63,6 +60,19 @@ local function Fn_server(inst, img)
     inst.components.inventoryitem.imagename = img
     inst.components.inventoryitem.atlasname = "images/inventoryimages/"..img..".xml"
 end
+local function InitVeggie(inst)
+    inst:AddComponent("bait")
+    inst:AddComponent("tradable")
+
+    MakeSmallBurnable(inst)
+    MakeSmallPropagator(inst)
+    MakeHauntableLaunch(inst)
+end
+local function InitItem(inst, burntime)
+    MakeSmallBurnable(inst, burntime)
+    MakeSmallPropagator(inst)
+    MakeHauntableLaunch(inst)
+end
 
 local function SetStackable(inst, maxsize) --叠加组件
     inst:AddComponent("stackable")
@@ -79,7 +89,7 @@ local function SetPerishable(inst, time, replacement, onperish) --新鲜度组�
 end
 local function SetFuel(inst, value) --燃料组件
     inst:AddComponent("fuel")
-    inst.components.fuel.fuelvalue = value or TUNING.MED_FUEL
+    inst.components.fuel.fuelvalue = value or TUNING.TINY_FUEL
 end
 local function SetEdible(inst, dd) --食物组件
     inst:AddComponent("edible")
@@ -108,6 +118,30 @@ end
 local function SetWaxable(inst, onwaxed) --打蜡组件
     inst:AddComponent("waxable")
     inst.components.waxable:SetWaxfn(onwaxed)
+end
+local function SetDeployable(inst, ondeploy, mode, spacing) --摆放组件
+    inst:AddComponent("deployable")
+    inst.components.deployable.ondeploy = ondeploy
+    if mode ~= nil then
+        inst.components.deployable:SetDeployMode(mode)
+    end
+    if spacing ~= nil then
+        inst.components.deployable:SetDeploySpacing(spacing)
+    end
+end
+local function SetOintmentLegion(inst, fn_check, fn_smear) --涂抹组件
+    inst:AddComponent("ointmentlegion")
+    inst.components.ointmentlegion.fn_check = fn_check
+    inst.components.ointmentlegion.fn_smear = fn_smear
+end
+local function SetTradable(inst, goldvalue, rocktribute) --交易组件
+    inst:AddComponent("tradable")
+    if goldvalue ~= nil then --大于0就能和猪王换等量金块，或者和蚁狮换1沙之石
+        inst.components.tradable.goldvalue = goldvalue
+    end
+    if rocktribute ~= nil then --大于0就能给蚁狮，让蚁狮暂缓地震，值越大，延缓时间越长
+        inst.components.tradable.rocktribute = rocktribute
+    end
 end
 
 local function OnLandedClient(self, ...)
@@ -284,6 +318,384 @@ end
 --[[ 各种食物 ]]
 --------------------------------------------------------------------------
 
+table.insert(prefs, Prefab("petals_rose", function() ------蔷薇花瓣
+    local inst = CreateEntity()
+    Fn_common(inst, "petals_rose", nil, "idle", nil)
+    SetFloatable(inst, { nil, "small", 0.08, 0.95 })
+
+    inst.pickupsound = "vegetation_firm"
+
+    inst.entity:SetPristine()
+    if not TheWorld.ismastersim then return inst end
+
+    Fn_server(inst, "petals_rose")
+    SetEdible(inst, { hunger = 9.375, sanity = 1, health = 8 })
+    SetStackable(inst, nil)
+    SetPerishable(inst, TUNING.PERISH_FAST, "spoiled_food", nil)
+    SetFuel(inst, nil)
+    InitVeggie(inst)
+
+    return inst
+end, GetAssets("petals_rose"), nil))
+
+table.insert(prefs, Prefab("petals_lily", function() ------蹄莲花瓣
+    local inst = CreateEntity()
+    Fn_common(inst, "petals_lily", nil, "idle", nil)
+    SetFloatable(inst, { nil, "small", 0.08, 0.95 })
+
+    inst.pickupsound = "vegetation_firm"
+
+    inst.entity:SetPristine()
+    if not TheWorld.ismastersim then return inst end
+
+    Fn_server(inst, "petals_lily")
+    SetEdible(inst, { hunger = 9.375, sanity = 10, health = -3 })
+    SetStackable(inst, nil)
+    SetPerishable(inst, TUNING.PERISH_FAST, "spoiled_food", nil)
+    SetFuel(inst, nil)
+    InitVeggie(inst)
+
+    return inst
+end, GetAssets("petals_lily"), nil))
+
+table.insert(prefs, Prefab("petals_orchid", function() ------兰草花瓣
+    local inst = CreateEntity()
+    Fn_common(inst, "petals_orchid", nil, "idle", nil)
+    SetFloatable(inst, { nil, "small", 0.08, 0.95 })
+
+    inst.pickupsound = "vegetation_firm"
+
+    inst.entity:SetPristine()
+    if not TheWorld.ismastersim then return inst end
+
+    Fn_server(inst, "petals_orchid")
+    SetEdible(inst, { hunger = 12.5, sanity = 5, health = 0 })
+    SetStackable(inst, nil)
+    SetPerishable(inst, TUNING.PERISH_FAST, "spoiled_food", nil)
+    SetFuel(inst, nil)
+    InitVeggie(inst)
+
+    return inst
+end, GetAssets("petals_orchid"), nil))
+
+local function OnEat_shyerry(inst, eater)
+    if eater.components.health ~= nil then
+        eater.buff_healthstorage_times = 20
+        eater:AddDebuff("buff_healthstorage", "buff_healthstorage")
+    end
+end
+local function OnDeploy_shyerry(inst, pt, deployer, rot)
+    local names = { "shyerrytree1_planted", "shyerrytree3_planted" }
+    local tree = SpawnPrefab(names[math.random(#names)])
+    if tree ~= nil then
+        tree.Transform:SetPosition(pt:Get())
+        inst.components.stackable:Get():Remove()
+        if deployer ~= nil and deployer.SoundEmitter ~= nil then
+            deployer.SoundEmitter:PlaySound("dontstarve/common/plant")
+        end
+    end
+end
+table.insert(prefs, Prefab("shyerry", function() ------颤栗果
+    local inst = CreateEntity()
+    Fn_common(inst, "shyerry", nil, "idle", nil)
+    SetFloatable(inst, { 0.04, "small", 0.25, 0.9 })
+
+    inst.pickupsound = "vegetation_firm"
+    inst:AddTag("cookable")
+    inst:AddTag("deployedplant")
+
+    inst.entity:SetPristine()
+    if not TheWorld.ismastersim then return inst end
+
+    Fn_server(inst, "shyerry")
+    SetEdible(inst, { hunger = 18.75, sanity = 0, health = 8, fn_eat = OnEat_shyerry })
+    SetCookable(inst, "shyerry_cooked")
+    SetStackable(inst, nil)
+    SetPerishable(inst, TUNING.PERISH_MED, "spoiled_food", nil)
+    SetDeployable(inst, OnDeploy_shyerry, DEPLOYMODE.PLANT, nil)
+    InitVeggie(inst)
+
+    return inst
+end, GetAssets("shyerry"), { "buff_healthstorage", "shyerrytree1_planted", "shyerrytree3_planted", "shyerry_cooked" }))
+
+table.insert(prefs, Prefab("shyerry_cooked", function() ------烤颤栗果
+    local inst = CreateEntity()
+    Fn_common(inst, "shyerry", nil, "cooked", nil)
+    SetFloatable(inst, { 0.02, "small", 0.2, 0.9 })
+
+    inst.entity:SetPristine()
+    if not TheWorld.ismastersim then return inst end
+
+    Fn_server(inst, "shyerry_cooked")
+    SetEdible(inst, { hunger = 12.5, sanity = 1, health = 0 })
+    SetStackable(inst, nil)
+    SetPerishable(inst, TUNING.PERISH_FAST, "spoiled_food", nil)
+    SetFuel(inst, nil)
+    InitVeggie(inst)
+
+    return inst
+end, GetAssets_inv("shyerry_cooked", { Asset("ANIM", "anim/shyerry.zip") }), nil))
+
+table.insert(prefs, Prefab("mint_l", function() ------猫薄荷
+    local inst = CreateEntity()
+    Fn_common(inst, "mint_l", nil, "idle", nil)
+    SetFloatable(inst, { nil, "small", 0.08, 0.95 })
+
+    inst.pickupsound = "vegetation_firm"
+    inst:AddTag("catfood")
+    inst:AddTag("cattoy")
+    inst:AddTag("catmint")
+
+    inst.entity:SetPristine()
+    if not TheWorld.ismastersim then return inst end
+
+    Fn_server(inst, "mint_l")
+    SetEdible(inst, { hunger = 6, sanity = 8, health = 0 })
+    SetStackable(inst, nil)
+    SetPerishable(inst, TUNING.PERISH_MED, "spoiled_food", nil)
+    SetFuel(inst, nil)
+    InitVeggie(inst)
+
+    return inst
+end, GetAssets("mint_l"), nil))
+
+table.insert(prefs, Prefab("albicans_cap", function() ------采摘的素白菇
+    local inst = CreateEntity()
+    Fn_common(inst, "albicans_cap", nil, "idle", nil)
+    SetFloatable(inst, { 0.01, "small", 0.15, 1 })
+
+    inst.pickupsound = "vegetation_firm"
+    inst:AddTag("mushroom") --蘑菇农场用的
+
+    inst.entity:SetPristine()
+    if not TheWorld.ismastersim then return inst end
+
+    Fn_server(inst, "albicans_cap")
+    SetEdible(inst, { hunger = 15, sanity = 15, health = 15 })
+    SetStackable(inst, nil)
+    SetPerishable(inst, TUNING.PERISH_FASTISH, "spoiled_food", nil)
+    SetFuel(inst, nil)
+    InitVeggie(inst)
+
+    return inst
+end, GetAssets("albicans_cap"), nil))
+
+------熟素白菇 undo 应该有这个才对，之后补全吧
+
+table.insert(prefs, Prefab("monstrain_leaf", function() ------雨竹叶
+    local inst = CreateEntity()
+    Fn_common(inst, "monstrain_leaf", nil, "idle", nil)
+    SetFloatable(inst, { nil, "small", 0.05, 1.1 })
+
+    inst.pickupsound = "vegetation_firm"
+
+    inst.entity:SetPristine()
+    if not TheWorld.ismastersim then return inst end
+
+    Fn_server(inst, "monstrain_leaf")
+    SetEdible(inst, { hunger = 12.5, sanity = -15, health = -30, foodtype2 = FOODTYPE.MONSTER })
+    SetStackable(inst, nil)
+    SetPerishable(inst, TUNING.PERISH_MED, "spoiled_food", nil)
+    SetFuel(inst, nil)
+    InitVeggie(inst)
+
+    return inst
+end, GetAssets("monstrain_leaf"), nil))
+
+local function OnEat_squamousfruit(inst, eater)
+    if eater.components.moisture ~= nil then
+        eater.components.moisture:DoDelta(-100)
+    end
+end
+table.insert(prefs, Prefab("squamousfruit", function() ------鳞果
+    local inst = CreateEntity()
+    Fn_common(inst, "squamousfruit", nil, "idle", nil)
+    SetFloatable(inst, { 0.05, "small", 0.2, 0.7 })
+
+    inst.pickupsound = "vegetation_firm"
+
+    inst.entity:SetPristine()
+    if not TheWorld.ismastersim then return inst end
+
+    Fn_server(inst, "squamousfruit")
+    SetEdible(inst, { hunger = 25, sanity = -5, health = -3, fn_eat = OnEat_squamousfruit })
+    SetStackable(inst, nil)
+    SetFuel(inst, nil)
+    InitVeggie(inst)
+
+    return inst
+end, GetAssets("squamousfruit"), nil))
+
+--------------------------------------------------------------------------
+--[[ 涂抹类道具 ]]
+--------------------------------------------------------------------------
+
+local dd_smear_sivbloodreduce = { build = "ointment_l_sivbloodreduce" }
+local dd_smear_fireproof = { build = "ointment_l_fireproof" }
+
+local function FnCheck_sivbloodreduce(inst, doer, target)
+    if target.prefab == "monstrain" then
+        if target.lifeless_l then
+            return false, "NONEED"
+        else
+            return true
+        end
+    end
+    if target.components.combat == nil or target.components.health == nil or target.components.health:IsDead() then
+        return false, "NOUSE"
+    end
+    if --具有以下标签的对象，根本不会被窃血，所以也不用加buff
+        target:HasTag("wall") or target:HasTag("structure") or target:HasTag("balloon") or
+        target:HasTag("shadowminion") or target:HasTag("ghost")
+    then
+        return false, "NOUSE"
+    end
+    return true
+end
+local function FnSmear_sivbloodreduce(inst, doer, target)
+    if target.prefab == "monstrain" then
+        target.lifeless_l = true
+        target.net_lifeless_l:set(true)
+        target.components.childspawner:StopSpawning()
+    else
+        target.time_l_sivbloodreduce = { add = TUNING.SEG_TIME*12, max = TUNING.SEG_TIME*30 }
+        target:AddDebuff("buff_l_sivbloodreduce", "buff_l_sivbloodreduce")
+    end
+end
+table.insert(prefs, Prefab("ointment_l_sivbloodreduce", function() ------弱肤药膏
+    local inst = CreateEntity()
+    Fn_common(inst, "ointment_l_sivbloodreduce", nil, "idle", nil)
+    SetFloatable(inst, { nil, "small", 0.25, 1 })
+
+    inst.entity:SetPristine()
+    if not TheWorld.ismastersim then return inst end
+
+    inst.dd_l_smear = dd_smear_sivbloodreduce
+    Fn_server(inst, "ointment_l_sivbloodreduce")
+    SetStackable(inst, nil)
+    SetOintmentLegion(inst, FnCheck_sivbloodreduce, FnSmear_sivbloodreduce)
+    SetFuel(inst, nil)
+    InitItem(inst, nil)
+
+    return inst
+end, GetAssets("ointment_l_sivbloodreduce"), nil))
+
+local function FnCheck_fireproof(inst, doer, target)
+    if target.components.burnable == nil or target:HasTag("burnt") then
+        return false, "NOUSE"
+    end
+    if target.components.burnable.fireproof_l then
+        return false, "NONEED"
+    end
+    if target.components.health ~= nil and target.components.health:IsDead() then
+        return false, "NOUSE"
+    end
+    return true
+end
+local function FnSmear_fireproof(inst, doer, target)
+    if --是可燃物
+        target:HasTag("wall") or target:HasTag("structure") or target:HasTag("balloon") or
+        target.components.childspawner ~= nil or
+        target.components.health == nil or target.components.combat == nil
+    then
+        local burnable = target.components.burnable
+        burnable.fireproof_l = true
+        TOOLS_L.AddTag(target, "fireproof_l", "fireproof_base")
+        if burnable:IsBurning() or burnable:IsSmoldering() then
+            burnable:Extinguish(true, -4) --涂抹完成，顺便灭火
+        end
+    else --是生物
+        target.time_l_fireproof = { add = TUNING.SEG_TIME*12, max = TUNING.SEG_TIME*30 }
+        target:AddDebuff("buff_l_fireproof", "buff_l_fireproof")
+    end
+end
+table.insert(prefs, Prefab("ointment_l_fireproof", function() ------防火漆
+    local inst = CreateEntity()
+    Fn_common(inst, "ointment_l_fireproof", nil, "idle", nil)
+    SetFloatable(inst, { nil, "small", 0.25, 1 })
+
+    inst.entity:SetPristine()
+    if not TheWorld.ismastersim then return inst end
+
+    inst.dd_l_smear = dd_smear_fireproof
+    Fn_server(inst, "ointment_l_fireproof")
+    SetStackable(inst, nil)
+    SetOintmentLegion(inst, FnCheck_fireproof, FnSmear_fireproof)
+    SetFuel(inst, nil)
+    MakeHauntableLaunch(inst)
+
+    return inst
+end, GetAssets("ointment_l_fireproof"), nil))
+
+--------------------------------------------------------------------------
+--[[ 基础材料 ]]
+--------------------------------------------------------------------------
+
+table.insert(prefs, Prefab("ahandfulofwings", function() ------虫翅碎片
+    local inst = CreateEntity()
+    Fn_common(inst, "insectthings_l", nil, "wing", nil)
+    SetFloatable(inst, { nil, "small", 0.1, 1.2 })
+
+    inst.pickupsound = "vegetation_grassy"
+
+    inst.entity:SetPristine()
+    if not TheWorld.ismastersim then return inst end
+
+    Fn_server(inst, "ahandfulofwings")
+    SetStackable(inst, nil)
+    SetFuel(inst, TUNING.SMALL_FUEL)
+    inst:AddComponent("tradable")
+    InitItem(inst, TUNING.SMALL_BURNTIME)
+
+    return inst
+end, GetAssets_inv("ahandfulofwings", { Asset("ANIM", "anim/insectthings_l.zip") }), nil))
+
+table.insert(prefs, Prefab("insectshell_l", function() ------虫甲碎片
+    local inst = CreateEntity()
+    Fn_common(inst, "insectthings_l", nil, "shell", nil)
+    SetFloatable(inst, { nil, "small", 0.1, 1.1 })
+
+    inst.pickupsound = "vegetation_grassy"
+
+    inst.entity:SetPristine()
+    if not TheWorld.ismastersim then return inst end
+
+    Fn_server(inst, "insectshell_l")
+    SetStackable(inst, nil)
+    SetFuel(inst, TUNING.SMALL_FUEL)
+    inst:AddComponent("z_repairerlegion")
+    inst:AddComponent("tradable")
+    InitItem(inst, TUNING.SMALL_BURNTIME)
+
+    return inst
+end, GetAssets_inv("insectshell_l", { Asset("ANIM", "anim/insectthings_l.zip") }), nil))
+
+--------------------------------------------------------------------------
+--[[ 玩具 ]]
+--------------------------------------------------------------------------
+
+table.insert(prefs, Prefab("cattenball", function() ------猫线球
+    local inst = CreateEntity()
+    Fn_common(inst, "toy_legion", nil, "toy_cattenball", nil)
+    SetFloatable(inst, { 0.08, "med", 0.25, 0.5 })
+
+    inst:AddTag("cattoy")
+    inst.pickupsound = "cloth"
+
+    inst.entity:SetPristine()
+    if not TheWorld.ismastersim then return inst end
+
+    Fn_server(inst, "cattenball")
+    SetStackable(inst, TUNING.STACK_SIZE_MEDITEM)
+    SetTradable(inst, 9, 3)
+    SetFuel(inst, TUNING.SMALL_FUEL)
+    InitItem(inst, TUNING.SMALL_BURNTIME)
+
+    return inst
+end, GetAssets_inv("cattenball", { Asset("ANIM", "anim/toy_legion.zip") }), nil))
+
+------玩具小海绵与玩具小海星：toy_spongebob，toy_patrickstar。隐藏废稿，不会做了
+
 --------------------------------------------------------------------------
 --[[ 作物种子、果实相关 ]]
 --------------------------------------------------------------------------
@@ -334,14 +746,6 @@ local function SetCropSeeds_server(inst, product)
     inst.components.deployable:SetDeployMode(DEPLOYMODE.CUSTOM) -- use inst._custom_candeploy_fn
     inst.components.deployable.restrictedtag = "plantkin"
     inst.components.deployable.ondeploy = OnDeploy_seeds
-end
-local function InitVeggie(inst)
-    inst:AddComponent("bait")
-    inst:AddComponent("tradable")
-
-    MakeSmallBurnable(inst)
-    MakeSmallPropagator(inst)
-    MakeHauntableLaunchAndPerish(inst)
 end
 
 local OVERSIZED_PHYSICS_RADIUS = 0.1
@@ -545,10 +949,8 @@ local lure_seeds = {
 --松萝相关
 ----------
 
-------松萝种子
-table.insert(prefs, Prefab("pineananas_seeds", function()
+table.insert(prefs, Prefab("pineananas_seeds", function() ------松萝种子
     local inst = CreateEntity()
-
     Fn_common(inst, "pineananas", nil, "seeds", nil)
     SetCropSeeds_common(inst, "pineananas")
     SetFloatable(inst, { -0.1, "small", nil, nil })
@@ -560,10 +962,7 @@ table.insert(prefs, Prefab("pineananas_seeds", function()
     if not TheWorld.ismastersim then return inst end
 
     Fn_server(inst, "pineananas_seeds")
-    SetEdible(inst, {
-        foodtype = FOODTYPE.SEEDS, foodtype2 = nil, fn_eat = nil,
-        hunger = TUNING.CALORIES_TINY, sanity = nil, health = 0.5
-    })
+    SetEdible(inst, { hunger = TUNING.CALORIES_TINY, sanity = nil, health = 0.5, foodtype = FOODTYPE.SEEDS })
     SetStackable(inst, nil)
     SetPerishable(inst, TUNING.PERISH_SUPERSLOW, "spoiled_food", nil)
     SetCookable(inst, "seeds_cooked")
@@ -578,10 +977,8 @@ end, GetAssets_inv("pineananas_seeds", {
     Asset("ANIM", "anim/oceanfishing_lure_mis.zip")
 }), { "farm_plant_pineananas" }))
 
-------松萝
-table.insert(prefs, Prefab("pineananas", function()
+table.insert(prefs, Prefab("pineananas", function() ------松萝
     local inst = CreateEntity()
-
     Fn_common(inst, "pineananas", nil, "idle", nil)
     SetFloatable(inst, { nil, "small", 0.2, 0.9 })
 
@@ -594,10 +991,7 @@ table.insert(prefs, Prefab("pineananas", function()
     if not TheWorld.ismastersim then return inst end
 
     Fn_server(inst, "pineananas")
-    SetEdible(inst, {
-        -- foodtype = nil, foodtype2 = nil, fn_eat = nil,
-        hunger = 12, sanity = -10, health = 8
-    })
+    SetEdible(inst, { hunger = 12, sanity = -10, health = 8 })
     SetStackable(inst, nil)
     SetPerishable(inst, TUNING.PERISH_MED, "spoiled_food", nil)
     SetCookable(inst, "pineananas_cooked")
@@ -607,10 +1001,8 @@ table.insert(prefs, Prefab("pineananas", function()
     return inst
 end, GetAssets("pineananas"), GetPrefabs_crop("pineananas", { "pineananas_cooked" })))
 
-------烤松萝
-table.insert(prefs, Prefab("pineananas_cooked", function()
+table.insert(prefs, Prefab("pineananas_cooked", function() ------烤松萝
     local inst = CreateEntity()
-
     Fn_common(inst, "pineananas", nil, "cooked", nil)
     SetFloatable(inst, { nil, "small", 0.2, 1 })
 
@@ -618,10 +1010,7 @@ table.insert(prefs, Prefab("pineananas_cooked", function()
     if not TheWorld.ismastersim then return inst end
 
     Fn_server(inst, "pineananas_cooked")
-    SetEdible(inst, {
-        -- foodtype = nil, foodtype2 = nil, fn_eat = nil,
-        hunger = 18.5, sanity = 5, health = 16
-    })
+    SetEdible(inst, { hunger = 18.5, sanity = 5, health = 16 })
     SetStackable(inst, nil)
     SetPerishable(inst, TUNING.PERISH_SUPERFAST, "spoiled_food", nil)
     InitVeggie(inst)
@@ -629,8 +1018,7 @@ table.insert(prefs, Prefab("pineananas_cooked", function()
     return inst
 end, GetAssets_inv("pineananas_cooked", { Asset("ANIM", "anim/pineananas.zip") }), nil))
 
-------巨型松萝
-table.insert(prefs, Prefab("pineananas_oversized", function()
+table.insert(prefs, Prefab("pineananas_oversized", function() ------巨型松萝
     local inst = CreateEntity()
 
     local plant_def = PLANT_DEFS["pineananas"]
@@ -655,8 +1043,7 @@ table.insert(prefs, Prefab("pineananas_oversized", function()
     return inst
 end, GetAssets_inv("pineananas_oversized", { Asset("ANIM", "anim/farm_plant_pineananas.zip") }), nil))
 
-------巨型松萝（打过蜡的）
-table.insert(prefs, Prefab("pineananas_oversized_waxed", function()
+table.insert(prefs, Prefab("pineananas_oversized_waxed", function() ------巨型松萝（打过蜡的）
     local inst = CreateEntity()
 
     local plant_def = PLANT_DEFS["pineananas"]
@@ -675,8 +1062,7 @@ table.insert(prefs, Prefab("pineananas_oversized_waxed", function()
     return inst
 end, GetAssets_inv("pineananas_oversized_waxed", { Asset("ANIM", "anim/farm_plant_pineananas.zip") }), nil))
 
-------巨型腐烂松萝
-table.insert(prefs, Prefab("pineananas_oversized_rotten", function()
+table.insert(prefs, Prefab("pineananas_oversized_rotten", function() ------巨型腐烂松萝
     local inst = CreateEntity()
 
     local plant_def = PLANT_DEFS["pineananas"]
