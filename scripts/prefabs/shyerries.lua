@@ -493,68 +493,7 @@ local function fn_flower()
     return inst
 end
 
---------------------------------------------------------------------------
---[[ 宽大的木墩 ]]
---------------------------------------------------------------------------
-
-local assets_log =
-{
-    Asset("ANIM", "anim/shyerrylog.zip"),
-    Asset("ATLAS", "images/inventoryimages/shyerrylog.xml"),
-    Asset("IMAGE", "images/inventoryimages/shyerrylog.tex"),
-}
-
-local function fn_log()
-    local inst = CreateEntity()
-
-    inst.entity:AddTransform()
-    inst.entity:AddAnimState()
-    inst.entity:AddNetwork()
-
-    MakeInventoryPhysics(inst)
-
-    inst.AnimState:SetBank("shyerrylog")
-    inst.AnimState:SetBuild("shyerrylog")
-    inst.AnimState:PlayAnimation("idle")
-
-    inst.pickupsound = "wood"
-
-    MakeInventoryFloatable(inst, "med", 0.2, 0.8)
-
-    inst.entity:SetPristine()
-    if not TheWorld.ismastersim then
-        return inst
-    end
-
-    inst:AddComponent("inspectable")
-
-    inst:AddComponent("inventoryitem")
-    inst.components.inventoryitem.imagename = "shyerrylog"
-    inst.components.inventoryitem.atlasname = "images/inventoryimages/shyerrylog.xml"
-
-    inst:AddComponent("edible")
-    inst.components.edible.foodtype = FOODTYPE.WOOD
-    -- inst.components.edible.woodiness = 25
-    inst.components.edible.healthvalue = 0
-    inst.components.edible.hungervalue = 0
-
-    inst:AddComponent("stackable")
-    inst.components.stackable.maxsize = TUNING.STACK_SIZE_LARGEITEM
-
-    inst:AddComponent("repairer")
-    inst.components.repairer.repairmaterial = MATERIALS.WOOD
-    inst.components.repairer.healthrepairvalue = TUNING.REPAIR_BOARDS_HEALTH
-
-    inst:AddComponent("fuel")
-    inst.components.fuel.fuelvalue = TUNING.LARGE_FUEL
-
-    MakeSmallBurnable(inst, TUNING.LARGE_BURNTIME)
-    MakeSmallPropagator(inst)
-
-    MakeHauntableLaunchAndIgnite(inst)
-
-    return inst
-end
+----------
 
 return Prefab("shyerrymanager", fn_manager, nil, prefabs_manager),
         createtree("shyerrytree1", "shyerrytree1", true, 10, 1, nil, 'shyerrytree_large'),
@@ -562,6 +501,5 @@ return Prefab("shyerrymanager", fn_manager, nil, prefabs_manager),
         createtree("shyerrytree3", "shyerrytree3", true, 10, 1, nil, 'shyerrytree_large'),
         createtree("shyerrytree4", "shyerrytree4", true, 6, 0.45, 0.8, 'shyerrytree_medium'),
         Prefab("shyerryflower", fn_flower, assets_flower, prefabs_flower),
-        Prefab("shyerrylog", fn_log, assets_log),
         createtree("shyerrytree1_planted", "shyerrytree1", false, 1, 1, nil, 'shyerrytree_large'),
         createtree("shyerrytree3_planted", "shyerrytree3", false, 1, 1, nil, 'shyerrytree_large')

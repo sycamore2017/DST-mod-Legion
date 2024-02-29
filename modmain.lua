@@ -144,7 +144,7 @@ TUNING.mod_legion_enabled = true --方便别的mod做判定。不过就算这样
 
 PrefabFiles = {
     "bush_legion",              --棱镜灌木丛
-    "items_legion",             --各种食物、物品
+    "items_legion",             --各种功能简单的食物、材料、道具
     "plantables_legion",        --新种植根
     "euip_head_legion",         --棱镜头戴道具
     "euip_hand_legion",         --棱镜手持道具
@@ -161,7 +161,6 @@ PrefabFiles = {
     "foliageath",               --青枝绿叶
     "neverfade_butterfly",      --永不凋零的蝴蝶
 
-    -- "lilypond",             --荷花池相关特效
     "shyerries",            --颤栗树相关
     "sand_spike_legion",    --对玩家友好的沙之咬
     "whitewoods",           --白木相关
@@ -188,7 +187,6 @@ PrefabFiles = {
     "raindonate",               --雨蝇
     "monstrain",                --雨竹
     "hat_mermbreathing",        --鱼之息
-    "merm_scales",              --鱼鳞
     "giantsfoot",               --巨脚背包
     "moonlight_legion",         --月之宝具
     "moon_dungeon",             --月的地下城
