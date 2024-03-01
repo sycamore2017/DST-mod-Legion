@@ -258,7 +258,7 @@ local function OnFinished(inst)
     inst.broken = true
 end
 
-local function Fn_guitar()
+table.insert(prefs, Prefab("guitar_whitewood", function()
     local inst = CreateEntity()
 
     inst.entity:AddTransform()
@@ -281,9 +281,7 @@ local function Fn_guitar()
     end
 
     inst.entity:SetPristine()
-    if not TheWorld.ismastersim then
-        return inst
-    end
+    if not TheWorld.ismastersim then return inst end
 
     inst:AddComponent("inspectable")
 
@@ -306,29 +304,22 @@ local function Fn_guitar()
     MakeHauntableLaunch(inst)
 
     return inst
-end
-
-table.insert(prefs, Prefab(
-    "guitar_whitewood",
-    Fn_guitar,
-    {
-        Asset("ANIM", "anim/guitar_whitewood.zip"),
-        Asset("ANIM", "anim/swap_guitar_whitewood.zip"),
-        Asset("ATLAS", "images/inventoryimages/guitar_whitewood.xml"),
-        Asset("IMAGE", "images/inventoryimages/guitar_whitewood.tex"),
-    },
-    {
-        "battlesong_attach",
-        "battlesong_detach",
-        "guitar_whitewood_doing_fx",
-    }
-))
+end, {
+    Asset("ANIM", "anim/guitar_whitewood.zip"),
+    Asset("ANIM", "anim/swap_guitar_whitewood.zip"),
+    Asset("ATLAS", "images/inventoryimages/guitar_whitewood.xml"),
+    Asset("IMAGE", "images/inventoryimages/guitar_whitewood.tex"),
+}, {
+    "battlesong_attach",
+    "battlesong_detach",
+    "guitar_whitewood_doing_fx",
+}))
 
 --------------------------------------------------------------------------
 --[[ 白木地片 ]]
 --------------------------------------------------------------------------
 
-local function Fn_mat_item()
+table.insert(prefs, Prefab("mat_whitewood_item", function()
     local inst = CreateEntity()
 
     inst.entity:AddTransform()
@@ -351,9 +342,7 @@ local function Fn_mat_item()
     end
 
     inst.entity:SetPristine()
-    if not TheWorld.ismastersim then
-        return inst
-    end
+    if not TheWorld.ismastersim then return inst end
 
     inst:AddComponent("inspectable")
 
@@ -392,24 +381,13 @@ local function Fn_mat_item()
     MakeHauntableLaunch(inst)
 
     return inst
-end
+end, {
+    Asset("ANIM", "anim/mat_whitewood.zip"),
+    Asset("ATLAS", "images/inventoryimages/mat_whitewood_item.xml"),
+    Asset("IMAGE", "images/inventoryimages/mat_whitewood_item.tex"),
+}, { "mat_whitewood" }))
 
-table.insert(prefs, Prefab(
-    "mat_whitewood_item",
-    Fn_mat_item,
-    {
-        Asset("ANIM", "anim/mat_whitewood.zip"),
-        Asset("ATLAS", "images/inventoryimages/mat_whitewood_item.xml"),
-        Asset("IMAGE", "images/inventoryimages/mat_whitewood_item.tex"),
-    },
-    {
-        "mat_whitewood"
-    }
-))
-
------
-
-local function Fn_mat()
+table.insert(prefs, Prefab("mat_whitewood", function()
     local inst = CreateEntity()
 
     inst.entity:AddTransform()
@@ -429,9 +407,7 @@ local function Fn_mat()
     inst.AnimState:SetSortOrder(2)
 
     inst.entity:SetPristine()
-    if not TheWorld.ismastersim then
-        return inst
-    end
+    if not TheWorld.ismastersim then return inst end
 
     -- inst:AddComponent("inspectable")
 
@@ -478,18 +454,7 @@ local function Fn_mat()
     end
 
     return inst
-end
-
-table.insert(prefs, Prefab(
-    "mat_whitewood",
-    Fn_mat,
-    {
-        Asset("ANIM", "anim/mat_whitewood.zip"),
-    },
-    {
-        "mat_whitewood_item"
-    }
-))
+end, { Asset("ANIM", "anim/mat_whitewood.zip") }, { "mat_whitewood_item" }))
 
 --------------------------------------------------------------------------
 --[[ 白木展示台、白木展示柜 ]]
@@ -625,86 +590,79 @@ local function OnEntityReplicated_chest2(inst)
 end
 
 local function MakeChest(data)
-    table.insert(prefs, Prefab(
-        data.name,
-        function()
-            local inst = CreateEntity()
+    table.insert(prefs, Prefab(data.name, function()
+        local inst = CreateEntity()
 
-            inst.entity:AddTransform()
-            inst.entity:AddAnimState()
-            inst.entity:AddSoundEmitter()
-            inst.entity:AddMiniMapEntity()
-            inst.entity:AddNetwork()
+        inst.entity:AddTransform()
+        inst.entity:AddAnimState()
+        inst.entity:AddSoundEmitter()
+        inst.entity:AddMiniMapEntity()
+        inst.entity:AddNetwork()
 
-            inst.MiniMapEntity:SetIcon("chest_whitewood.tex")
+        inst.MiniMapEntity:SetIcon("chest_whitewood.tex")
 
-            inst:AddTag("structure")
-            inst:AddTag("chest")
+        inst:AddTag("structure")
+        inst:AddTag("chest")
 
-            inst.AnimState:SetBank(data.name)
-            inst.AnimState:SetBuild(data.name)
-            inst.AnimState:PlayAnimation("closed")
+        inst.AnimState:SetBank(data.name)
+        inst.AnimState:SetBuild(data.name)
+        inst.AnimState:PlayAnimation("closed")
 
-            TOOLS_L.MakeSnowCovered_comm(inst)
+        TOOLS_L.MakeSnowCovered_comm(inst)
 
-            inst:AddComponent("skinedlegion")
-            inst.components.skinedlegion:Init(data.name)
+        inst:AddComponent("skinedlegion")
+        inst.components.skinedlegion:Init(data.name)
 
-            if data.fn_common ~= nil then
-                data.fn_common(inst)
-            end
+        if data.fn_common ~= nil then
+            data.fn_common(inst)
+        end
 
-            inst.entity:SetPristine()
-            if not TheWorld.ismastersim then
-                return inst
-            end
+        inst.entity:SetPristine()
+        if not TheWorld.ismastersim then return inst end
 
-            inst.shownum_l = 3
+        inst.shownum_l = 3
 
-            inst:AddComponent("inspectable")
+        inst:AddComponent("inspectable")
 
-            inst:AddComponent("container")
-            inst.components.container:WidgetSetup(data.name)
-            inst.components.container.onopenfn = OnOpen_chest
-            inst.components.container.onclosefn = OnClose_chest
-            inst.components.container.skipclosesnd = true
-            inst.components.container.skipopensnd = true
+        inst:AddComponent("container")
+        inst.components.container:WidgetSetup(data.name)
+        inst.components.container.onopenfn = OnOpen_chest
+        inst.components.container.onclosefn = OnClose_chest
+        inst.components.container.skipclosesnd = true
+        inst.components.container.skipopensnd = true
 
-            inst:AddComponent("lootdropper")
+        inst:AddComponent("lootdropper")
 
-            inst:AddComponent("workable")
-            inst.components.workable:SetWorkAction(ACTIONS.HAMMER)
-            -- inst.components.workable:SetWorkLeft(2)
-            inst.components.workable:SetOnWorkCallback(OnHit_chest)
-            inst.components.workable:SetOnFinishCallback(OnHammered_chest)
+        inst:AddComponent("workable")
+        inst.components.workable:SetWorkAction(ACTIONS.HAMMER)
+        -- inst.components.workable:SetWorkLeft(2)
+        inst.components.workable:SetOnWorkCallback(OnHit_chest)
+        inst.components.workable:SetOnFinishCallback(OnHammered_chest)
 
-            inst:AddComponent("hauntable")
-            inst.components.hauntable:SetHauntValue(TUNING.HAUNT_TINY)
+        inst:AddComponent("hauntable")
+        inst.components.hauntable:SetHauntValue(TUNING.HAUNT_TINY)
 
-            TOOLS_L.MakeSnowCovered_serv(inst, 0.1 + 0.3*math.random(), nil)
+        TOOLS_L.MakeSnowCovered_serv(inst, 0.1 + 0.3*math.random(), nil)
 
-            inst.OnSave = OnSave_chest
-            inst.OnLoad = OnLoad_chest
+        inst.OnSave = OnSave_chest
+        inst.OnLoad = OnLoad_chest
 
-            -- inst:ListenForEvent("onbuilt", onbuilt)
-            inst:ListenForEvent("itemget", ItemGet_chest)
-            inst:ListenForEvent("itemlose", ItemLose_chest)
+        -- inst:ListenForEvent("onbuilt", onbuilt)
+        inst:ListenForEvent("itemget", ItemGet_chest)
+        inst:ListenForEvent("itemlose", ItemLose_chest)
 
-            -- inst.components.skinedlegion:SetOnPreLoad()
+        -- inst.components.skinedlegion:SetOnPreLoad()
 
-            if data.fn_server ~= nil then
-                data.fn_server(inst)
-            end
+        if data.fn_server ~= nil then
+            data.fn_server(inst)
+        end
 
-            if TUNING.FUNCTIONAL_MEDAL_IS_OPEN then
-                SetImmortalable(inst, 2, nil)
-            end
+        if TUNING.FUNCTIONAL_MEDAL_IS_OPEN then
+            SetImmortalable(inst, 2, nil)
+        end
 
-            return inst
-        end,
-        data.assets,
-        data.prefabs
-    ))
+        return inst
+    end, data.assets, data.prefabs))
 end
 
 MakeChest({

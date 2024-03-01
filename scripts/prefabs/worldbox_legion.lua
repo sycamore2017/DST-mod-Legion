@@ -26,48 +26,41 @@ local function OnAnyCloseStorage(inst, data)
 	end
 end
 local function MakeWorldBox(data) --这些内容和官方差不多一样的，具体请查看 \prefabs\pocketdimensioncontainers.lua
-    table.insert(prefs, Prefab(
-        data.name,
-        function()
-            local inst = CreateEntity()
+    table.insert(prefs, Prefab(data.name, function()
+        local inst = CreateEntity()
 
-            if TheWorld.ismastersim then
-                inst.entity:AddTransform() --按官方说法，有这个才能实行保存机制
-            end
-            inst.entity:AddNetwork()
-            inst.entity:AddServerNonSleepable()
-            inst.entity:SetCanSleep(false)
-            inst.entity:Hide()
-            inst:AddTag("CLASSIFIED")
-            inst:AddTag("pocketdimension_container")
-            inst:AddTag("irreplaceable")
+        if TheWorld.ismastersim then
+            inst.entity:AddTransform() --按官方说法，有这个才能实行保存机制
+        end
+        inst.entity:AddNetwork()
+        inst.entity:AddServerNonSleepable()
+        inst.entity:SetCanSleep(false)
+        inst.entity:Hide()
+        inst:AddTag("CLASSIFIED")
+        inst:AddTag("pocketdimension_container")
+        inst:AddTag("irreplaceable")
 
-            inst.entity:SetPristine()
-            if not TheWorld.ismastersim then
-                return inst
-            end
+        inst.entity:SetPristine()
+        if not TheWorld.ismastersim then return inst end
 
-            inst.Network:SetClassifiedTarget(inst)
+        inst.Network:SetClassifiedTarget(inst)
 
-            inst:AddComponent("container")
-            inst.components.container:WidgetSetup(data.name)
-            inst.components.container.skipclosesnd = true
-            inst.components.container.skipopensnd = true
-            inst.components.container.skipautoclose = true
-            inst.components.container.onanyopenfn = OnAnyOpenStorage
-            inst.components.container.onanyclosefn = OnAnyCloseStorage
+        inst:AddComponent("container")
+        inst.components.container:WidgetSetup(data.name)
+        inst.components.container.skipclosesnd = true
+        inst.components.container.skipopensnd = true
+        inst.components.container.skipautoclose = true
+        inst.components.container.onanyopenfn = OnAnyOpenStorage
+        inst.components.container.onanyclosefn = OnAnyCloseStorage
 
-            TheWorld:SetPocketDimensionContainer(data.boxkey, inst)
+        TheWorld:SetPocketDimensionContainer(data.boxkey, inst)
 
-            if data.fn_server ~= nil then
-                data.fn_server(inst)
-            end
+        if data.fn_server ~= nil then
+            data.fn_server(inst)
+        end
 
-            return inst
-        end,
-        data.assets,
-        data.prefabs
-    ))
+        return inst
+    end, data.assets, data.prefabs))
 end
 
 local function SetPerishRate_pine(inst, item)

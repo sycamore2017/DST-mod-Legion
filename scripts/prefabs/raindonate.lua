@@ -152,9 +152,7 @@ local function raindonate()
     MakeFeedableSmallLivestockPristine(inst) --可以在背包里被喂食
 
     inst.entity:SetPristine()
-    if not TheWorld.ismastersim then
-        return inst
-    end
+    if not TheWorld.ismastersim then return inst end
 
     inst:SetBrain(brain)
 

@@ -49,10 +49,7 @@ local function fn()
     inst.Light:SetColour(180 / 255, 195 / 255, 225 / 255)
 
     inst.entity:SetPristine()
-
-    if not TheWorld.ismastersim then
-        return inst
-    end
+    if not TheWorld.ismastersim then return inst end
 
     inst.dead = false
 

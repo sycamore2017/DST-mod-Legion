@@ -145,7 +145,6 @@ TUNING.mod_legion_enabled = true --方便别的mod做判定。不过就算这样
 PrefabFiles = {
     "bush_legion",              --棱镜灌木丛
     "items_legion",             --各种功能简单的食物、材料、道具
-    "plantables_legion",        --新种植根
     "euip_head_legion",         --棱镜头戴道具
     "euip_hand_legion",         --棱镜手持道具
     "euip_body_legion",         --棱镜身穿道具
@@ -165,7 +164,7 @@ PrefabFiles = {
     "sand_spike_legion",    --对玩家友好的沙之咬
     "whitewoods",           --白木相关
 
-    "siving_rocks_legion",
+    "siving_base_legion",
     "farm_plants_legion",
     "cropgnat",
     "siving_related",

@@ -383,9 +383,7 @@ local function MakeBoss(data)
             -- end
 
             inst.entity:SetPristine()
-            if not TheWorld.ismastersim then
-                return inst
-            end
+            if not TheWorld.ismastersim then return inst end
 
             inst._count_atk = 0 --啄击次数
             inst._count_rock = 0 --喂食后需要掉落的子圭石数量
@@ -997,9 +995,7 @@ local function MakeWeapon_replace(data)
             end
 
             inst.entity:SetPristine()
-            if not TheWorld.ismastersim then
-                return inst
-            end
+            if not TheWorld.ismastersim then return inst end
 
             inst.hasline = false
             inst.shootidx = 1
@@ -1068,9 +1064,7 @@ local function MakeWeapon_replace(data)
             end
 
             inst.entity:SetPristine()
-            if not TheWorld.ismastersim then
-                return inst
-            end
+            if not TheWorld.ismastersim then return inst end
 
             inst.hasline = false
             inst.shootidx = 1
@@ -1146,9 +1140,7 @@ local function MakeWeapon(data)
             -- inst.components.aoetargeting.reticule.mouseenabled = true
 
             inst.entity:SetPristine()
-            if not TheWorld.ismastersim then
-                return inst
-            end
+            if not TheWorld.ismastersim then return inst end
 
             inst:AddComponent("inspectable")
 
@@ -1428,9 +1420,7 @@ local function MakeBossWeapon(data)
             end
 
             inst.entity:SetPristine()
-            if not TheWorld.ismastersim then
-                return inst
-            end
+            if not TheWorld.ismastersim then return inst end
 
             inst.persists = false
 
@@ -1497,9 +1487,7 @@ local function MakeBossWeapon(data)
             end
 
             inst.entity:SetPristine()
-            if not TheWorld.ismastersim then
-                return inst
-            end
+            if not TheWorld.ismastersim then return inst end
 
             --加载水面特效
             inst:DoTaskInTime(POPULATING and math.random()*5*FRAMES or 0, function(inst)
@@ -1708,9 +1696,7 @@ table.insert(prefs, Prefab(
         inst.AnimState:PlayAnimation("idle1", true)
 
         inst.entity:SetPristine()
-        if not TheWorld.ismastersim then
-            return inst
-        end
+        if not TheWorld.ismastersim then return inst end
 
         inst.ismale = false
         inst.ishatched = nil --是否正常孵化
@@ -1965,9 +1951,7 @@ table.insert(prefs, Prefab( --特效
         inst.AnimState:SetFinalOffset(3)
 
         inst.entity:SetPristine()
-        if not TheWorld.ismastersim then
-            return inst
-        end
+        if not TheWorld.ismastersim then return inst end
 
         inst.persists = false
         inst.tree = nil
@@ -2047,9 +2031,7 @@ table.insert(prefs, Prefab( --实体
         inst.Light:SetColour(15/255, 180/255, 132/255)
 
         inst.entity:SetPristine()
-        if not TheWorld.ismastersim then
-            return inst
-        end
+        if not TheWorld.ismastersim then return inst end
 
         inst.persists = false
         inst.tree = nil
@@ -2322,9 +2304,7 @@ table.insert(prefs, Prefab(
         inst.AnimState:SetSortOrder(3)
 
         inst.entity:SetPristine()
-        if not TheWorld.ismastersim then
-            return inst
-        end
+        if not TheWorld.ismastersim then return inst end
 
         inst.persists = false
         inst.tree = nil
@@ -2502,9 +2482,7 @@ table.insert(prefs, Prefab(
         SetOpenedPhysics(inst)
 
         inst.entity:SetPristine()
-        if not TheWorld.ismastersim then
-            return inst
-        end
+        if not TheWorld.ismastersim then return inst end
 
         inst.fenceid = math.random(5)
         inst.treeState = 0
@@ -2871,9 +2849,7 @@ table.insert(prefs, Prefab(
         inst:AddTag("allow_action_on_impassable")
 
         inst.entity:SetPristine()
-        if not TheWorld.ismastersim then
-            return inst
-        end
+        if not TheWorld.ismastersim then return inst end
 
         inst.persists = false
         inst.linedoer = nil --指发起这个动作的玩家

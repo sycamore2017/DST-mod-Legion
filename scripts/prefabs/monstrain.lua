@@ -252,9 +252,7 @@ local function MonstrainFn()
     --inst:SetPrefabNameOverride("cactus") --因为官方的两种仙人掌在表面上都叫“cactus”，所以有一个需要覆盖原本名字
 
     inst.entity:SetPristine()
-    if not TheWorld.ismastersim then
-        return inst
-    end
+    if not TheWorld.ismastersim then return inst end
 
     -- inst.lifeless_l = nil
 
@@ -375,9 +373,7 @@ local function TuberFn()
     inst:AddTag("needwater2") --使其可被浇水，不过是我自己加的，官方没有
 
     inst.entity:SetPristine()
-    if not TheWorld.ismastersim then
-        return inst
-    end
+    if not TheWorld.ismastersim then return inst end
 
     inst:AddComponent("inspectable")
 

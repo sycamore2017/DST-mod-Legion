@@ -1122,10 +1122,7 @@ local function create()
     inst:AddTag("antlion_sinkhole_blocker")
 
     inst.entity:SetPristine()
-
-    if not TheWorld.ismastersim then
-        return inst
-    end
+    if not TheWorld.ismastersim then return inst end
 
     inst.hasSword = true
     inst.workTrigger = 0

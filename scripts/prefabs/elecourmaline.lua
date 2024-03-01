@@ -696,9 +696,7 @@ local function Fn()
     inst:AddTag("prototyper")   --prototyper (from prototyper component) added to pristine state for optimization
 
     inst.entity:SetPristine()
-    if not TheWorld.ismastersim then
-        return inst
-    end
+    if not TheWorld.ismastersim then return inst end
 
     inst._activecount = 0
     inst._activetask = nil
@@ -772,10 +770,7 @@ local function Fn_key()
     -- inst:AddTag("structure")
 
     inst.entity:SetPristine()
-
-    if not TheWorld.ismastersim then
-        return inst
-    end
+    if not TheWorld.ismastersim then return inst end
 
     inst:AddComponent("inspectable")
 

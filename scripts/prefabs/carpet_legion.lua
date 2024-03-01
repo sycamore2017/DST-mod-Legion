@@ -7,61 +7,54 @@ local prefs = {}
 local function MakeCarpet(data)
     local name_base = "carpet_"..data.name
     local name_prefab = data.size == 2 and name_base.."_big" or name_base
-    table.insert(prefs, Prefab(
-        name_prefab,
-		function()
-            local inst = CreateEntity()
+    table.insert(prefs, Prefab(name_prefab, function()
+        local inst = CreateEntity()
 
-            inst.entity:AddTransform()
-            inst.entity:AddAnimState()
-            inst.entity:AddNetwork()
+        inst.entity:AddTransform()
+        inst.entity:AddAnimState()
+        inst.entity:AddNetwork()
 
-            inst.AnimState:SetBank(name_base)
-            inst.AnimState:SetBuild(name_base)
-            inst.AnimState:SetOrientation(ANIM_ORIENTATION.OnGround)
-            inst.AnimState:SetLayer(LAYER_BACKGROUND)
-            inst.AnimState:SetFinalOffset(1)
+        inst.AnimState:SetBank(name_base)
+        inst.AnimState:SetBuild(name_base)
+        inst.AnimState:SetOrientation(ANIM_ORIENTATION.OnGround)
+        inst.AnimState:SetLayer(LAYER_BACKGROUND)
+        inst.AnimState:SetFinalOffset(1)
 
-            inst:AddTag("DECOR")
-            inst:AddTag("NOCLICK")
-            inst:AddTag("NOBLOCK")
-            inst:AddTag("carpet_l")
-            if data.size == 2 then
-                inst:AddTag("carpet_big")
-                inst.AnimState:PlayAnimation("idle_big")
-            else
-                inst.AnimState:PlayAnimation("idle")
-            end
+        inst:AddTag("DECOR")
+        inst:AddTag("NOCLICK")
+        inst:AddTag("NOBLOCK")
+        inst:AddTag("carpet_l")
+        if data.size == 2 then
+            inst:AddTag("carpet_big")
+            inst.AnimState:PlayAnimation("idle_big")
+        else
+            inst.AnimState:PlayAnimation("idle")
+        end
 
-            if data.fn_common ~= nil then
-                data.fn_common(inst)
-            end
+        if data.fn_common ~= nil then
+            data.fn_common(inst)
+        end
 
-            inst:AddComponent("skinedlegion")
-            inst.components.skinedlegion:Init(name_prefab)
+        inst:AddComponent("skinedlegion")
+        inst.components.skinedlegion:Init(name_prefab)
 
-            inst.entity:SetPristine()
-            if not TheWorld.ismastersim then
-                return inst
-            end
+        inst.entity:SetPristine()
+        if not TheWorld.ismastersim then return inst end
 
-            -- inst:AddComponent("inspectable")
+        -- inst:AddComponent("inspectable")
 
-            inst:AddComponent("lootdropper")
+        inst:AddComponent("lootdropper")
 
-            inst:AddComponent("savedrotation")
+        inst:AddComponent("savedrotation")
 
-            if data.fn_server ~= nil then
-                data.fn_server(inst)
-            end
+        if data.fn_server ~= nil then
+            data.fn_server(inst)
+        end
 
-            -- inst.components.skinedlegion:SetOnPreLoad()
+        -- inst.components.skinedlegion:SetOnPreLoad()
 
-            return inst
-		end,
-		data.assets,
-		data.prefabs
-	))
+        return inst
+    end, data.assets, data.prefabs))
 end
 
 local function MakeCarpets(data)
@@ -82,36 +75,6 @@ local function MakeCarpets(data)
         assets = assets, prefabs = data.prefabs
     })
 end
-
---------------------------------------------------------------------------
---[[ 信标(用来让其绑定物被摧毁) ]]
---------------------------------------------------------------------------
-
--- table.insert(prefs, Prefab(
---     "beacon_work_l",
---     function()
---         local inst = CreateEntity()
-
---         inst.entity:AddTransform()
---         inst.entity:AddNetwork()
-
---         inst:AddTag("NOBLOCK")
-
---         inst.entity:SetPristine()
---         if not TheWorld.ismastersim then
---             return inst
---         end
-
---         inst.persists = false
-
---         inst:AddComponent("workable")
---         inst.components.workable:SetWorkAction(ACTIONS.HAMMER)
-
---         return inst
---     end,
---     nil,
---     nil
--- ))
 
 --------------------------------------------------------------------------
 --[[ 白木地垫、地毯 ]]

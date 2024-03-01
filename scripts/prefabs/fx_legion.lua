@@ -50,9 +50,7 @@ local function MakeFx(data) --不需要网络功能
 			end
 
 			inst.entity:SetPristine()
-			if not TheWorld.ismastersim then
-				return inst
-			end
+			if not TheWorld.ismastersim then return inst end
 
 			inst.persists = false
 			inst:DoTaskInTime(1, inst.Remove)
@@ -80,9 +78,7 @@ local function MakeFx2(data) --需要网络功能
 			end
 
             inst.entity:SetPristine()
-            if not TheWorld.ismastersim then
-                return inst
-            end
+            if not TheWorld.ismastersim then return inst end
 
             inst.persists = false
 

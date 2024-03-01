@@ -146,9 +146,7 @@ local function fn(Sim)
     end
 
     inst.entity:SetPristine()
-    if not TheWorld.ismastersim then
-        return inst
-    end
+    if not TheWorld.ismastersim then return inst end
 
     inst.releasedfn = ReleaseSporesEffect --存下来，在sg中调用
     inst.fxcolour = {255/255, 255/255, 255/255}

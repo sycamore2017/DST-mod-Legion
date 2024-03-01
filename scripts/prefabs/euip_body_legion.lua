@@ -365,9 +365,7 @@ local function Fn_backcub()
     inst.components.skinedlegion:InitWithFloater("backcub")
 
     inst.entity:SetPristine()
-    if not TheWorld.ismastersim then
-        return inst
-    end
+    if not TheWorld.ismastersim then return inst end
 
     inst.hunger_l = 0
     inst.count_hunger_l = 0
@@ -523,9 +521,7 @@ local function Fn_sachet()
     end
 
     inst.entity:SetPristine()
-    if not TheWorld.ismastersim then
-        return inst
-    end
+    if not TheWorld.ismastersim then return inst end
 
     -- inst.owner_l = nil
     -- inst.task_l_flower = nil
@@ -623,9 +619,7 @@ local function Fn_beetlearmor()
     end
 
     inst.entity:SetPristine()
-    if not TheWorld.ismastersim then
-        return inst
-    end
+    if not TheWorld.ismastersim then return inst end
 
     inst:AddComponent("inspectable")
 
@@ -764,9 +758,7 @@ local function Fn_shuck()
     MakeSnowCoveredPristine(inst)
 
     inst.entity:SetPristine()
-    if not TheWorld.ismastersim then
-        return inst
-    end
+    if not TheWorld.ismastersim then return inst end
 
     inst:AddComponent("health")
     inst.components.health:SetMaxHealth(20)
@@ -883,9 +875,7 @@ local function Fn_boltout()
     inst.components.skinedlegion:InitWithFloater("boltwingout")
 
     inst.entity:SetPristine()
-    if not TheWorld.ismastersim then
-        return inst
-    end
+    if not TheWorld.ismastersim then return inst end
 
     Fn_server(inst, "boltwingout", EQUIPSLOTS.BACK, OnEquip_boltout, OnUnequip_boltout)
     SetBackpack_server(inst, "boltwingout")
@@ -1024,9 +1014,7 @@ local function Fn_sivsuit()
     inst.components.skinedlegion:Init("siving_suit")
 
     inst.entity:SetPristine()
-    if not TheWorld.ismastersim then
-        return inst
-    end
+    if not TheWorld.ismastersim then return inst end
 
     -- inst._broken = nil
     -- inst._cdtask = nil
@@ -1129,9 +1117,7 @@ local function Fn_sivsuit2()
     inst.components.skinedlegion:Init("siving_suit_gold")
 
     inst.entity:SetPristine()
-    if not TheWorld.ismastersim then
-        return inst
-    end
+    if not TheWorld.ismastersim then return inst end
 
     -- inst._broken = nil
     -- inst._cdtask = nil

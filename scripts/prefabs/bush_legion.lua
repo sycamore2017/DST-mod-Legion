@@ -170,9 +170,7 @@ local function MakeBush(data)
             end
 
             inst.entity:SetPristine()
-            if not TheWorld.ismastersim then
-                return inst
-            end
+            if not TheWorld.ismastersim then return inst end
 
             -- inst.AnimState:SetTime(math.random() * inst.AnimState:GetCurrentAnimationLength())
             inst.AnimState:SetFrame(math.random(inst.AnimState:GetCurrentAnimationNumFrames()) - 1)

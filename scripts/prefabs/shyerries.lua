@@ -173,10 +173,7 @@ local function fn_manager()
     inst.entity:AddNetwork()
 
     inst.entity:SetPristine()
-
-    if not TheWorld.ismastersim then
-        return inst
-    end
+    if not TheWorld.ismastersim then return inst end
 
     inst.positions = nil
 
@@ -311,10 +308,7 @@ local function createtree(name, buildname, iswild, workleft, physicsize, scalesi
         inst:SetPrefabNameOverride(iswild and "shyerrytree" or "shyerrytree_planted")
 
         inst.entity:SetPristine()
-
-        if not TheWorld.ismastersim then
-            return inst
-        end
+        if not TheWorld.ismastersim then return inst end
 
         inst:DoTaskInTime(0, function()
             inst.AnimState:PlayAnimation("grow")
@@ -456,10 +450,7 @@ local function fn_flower()
     inst:AddTag("plant")
 
     inst.entity:SetPristine()
-
-    if not TheWorld.ismastersim then
-        return inst
-    end
+    if not TheWorld.ismastersim then return inst end
 
     inst.shytask = nil
     inst:DoTaskInTime(0, function()

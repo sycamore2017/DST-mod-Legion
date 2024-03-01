@@ -384,192 +384,178 @@ end
 
 local function MakeItem(data)
     local basename = "siving_ctl"..data.name
-    table.insert(prefs, Prefab(
-        basename.."_item",
-        function()
-            local inst = CreateEntity()
+    table.insert(prefs, Prefab(basename.."_item", function()
+        local inst = CreateEntity()
 
-            inst.entity:AddTransform()
-            inst.entity:AddAnimState()
-            inst.entity:AddNetwork()
+        inst.entity:AddTransform()
+        inst.entity:AddAnimState()
+        inst.entity:AddNetwork()
 
-            MakeInventoryPhysics(inst)
+        MakeInventoryPhysics(inst)
 
-            inst.AnimState:SetBank(basename)
-            inst.AnimState:SetBuild(basename)
-            inst.AnimState:PlayAnimation("item")
+        inst.AnimState:SetBank(basename)
+        inst.AnimState:SetBuild(basename)
+        inst.AnimState:PlayAnimation("item")
 
-            inst:AddTag("eyeturret") --眼球塔的专属标签，但为了deployable组件的摆放名字而使用（显示为“放置”）
+        inst:AddTag("eyeturret") --眼球塔的专属标签，但为了deployable组件的摆放名字而使用（显示为“放置”）
 
-            inst:AddComponent("skinedlegion")
-            inst.components.skinedlegion:Init(basename.."_item")
+        inst:AddComponent("skinedlegion")
+        inst.components.skinedlegion:Init(basename.."_item")
 
-            inst.ctltype_l = data.ctltype
-            if data.ctltype ~= 2 then
-                inst.net_moi_l = net_string(inst.GUID, "sivctl_item.moi_l", "moi_l_dirty")
-                inst.net_moi_l:set_local("0")
-            end
-            if data.ctltype ~= 1 then
-                inst.net_nut_l = net_string(inst.GUID, "sivctl_item.nut_l", "nut_l_dirty")
-                inst.net_nut_l:set_local("0_0_0")
-            end
-            inst.fn_l_namedetail = Fn_nameDetail_sivctl
+        inst.ctltype_l = data.ctltype
+        if data.ctltype ~= 2 then
+            inst.net_moi_l = net_string(inst.GUID, "sivctl_item.moi_l", "moi_l_dirty")
+            inst.net_moi_l:set_local("0")
+        end
+        if data.ctltype ~= 1 then
+            inst.net_nut_l = net_string(inst.GUID, "sivctl_item.nut_l", "nut_l_dirty")
+            inst.net_nut_l:set_local("0_0_0")
+        end
+        inst.fn_l_namedetail = Fn_nameDetail_sivctl
 
-            inst.entity:SetPristine()
-            if not TheWorld.ismastersim then
-                return inst
-            end
+        inst.entity:SetPristine()
+        if not TheWorld.ismastersim then return inst end
 
-            inst.siv_moisture = nil
-            inst.siv_nutrients = nil
+        inst.siv_moisture = nil
+        inst.siv_nutrients = nil
 
-            inst:AddComponent("inspectable")
+        inst:AddComponent("inspectable")
 
-            inst:AddComponent("inventoryitem")
-            inst.components.inventoryitem.imagename = basename.."_item"
-            inst.components.inventoryitem.atlasname = "images/inventoryimages/"..basename.."_item.xml"
-            inst.components.inventoryitem:SetSinks(true)
+        inst:AddComponent("inventoryitem")
+        inst.components.inventoryitem.imagename = basename.."_item"
+        inst.components.inventoryitem.atlasname = "images/inventoryimages/"..basename.."_item.xml"
+        inst.components.inventoryitem:SetSinks(true)
 
-            inst:AddComponent("deployable")
-            inst.components.deployable:SetDeploySpacing(DEPLOYSPACING.MEDIUM)
-            inst.components.deployable.ondeploy = function(inst, pt, deployer, rot)
-                local tree = SpawnPrefab(basename)
-                if tree ~= nil then
-                    inst.components.skinedlegion:SetLinkedSkin(tree, "link", deployer)
-                    tree.components.botanycontroller:SetValue(inst.siv_moisture, inst.siv_nutrients, false)
-                    tree.Transform:SetPosition(pt:Get())
-                    if deployer ~= nil and deployer.SoundEmitter ~= nil then
-                        deployer.SoundEmitter:PlaySound(data.sound)
-                    end
-                    inst:Remove()
+        inst:AddComponent("deployable")
+        inst.components.deployable:SetDeploySpacing(DEPLOYSPACING.MEDIUM)
+        inst.components.deployable.ondeploy = function(inst, pt, deployer, rot)
+            local tree = SpawnPrefab(basename)
+            if tree ~= nil then
+                inst.components.skinedlegion:SetLinkedSkin(tree, "link", deployer)
+                tree.components.botanycontroller:SetValue(inst.siv_moisture, inst.siv_nutrients, false)
+                tree.Transform:SetPosition(pt:Get())
+                if deployer ~= nil and deployer.SoundEmitter ~= nil then
+                    deployer.SoundEmitter:PlaySound(data.sound)
                 end
+                inst:Remove()
             end
+        end
 
-            MakeHauntableLaunchAndIgnite(inst)
+        MakeHauntableLaunchAndIgnite(inst)
 
-            inst.OnSave = OnSave_ctlitem
-            inst.OnLoad = OnLoad_ctlitem
+        inst.OnSave = OnSave_ctlitem
+        inst.OnLoad = OnLoad_ctlitem
 
-            -- inst.components.skinedlegion:SetOnPreLoad()
+        -- inst.components.skinedlegion:SetOnPreLoad()
 
-            return inst
-        end,
-        data.assets,
-        data.prefabs
-    ))
+        return inst
+    end, data.assets, data.prefabs))
 end
 local function MakeConstruct(data)
     local basename = "siving_ctl"..data.name
-    table.insert(prefs, Prefab(
-        basename,
-        function()
-            local inst = CreateEntity()
+    table.insert(prefs, Prefab(basename, function()
+        local inst = CreateEntity()
 
-            inst.entity:AddTransform()
-            inst.entity:AddAnimState()
-            inst.entity:AddMiniMapEntity()
-            inst.entity:AddNetwork()
+        inst.entity:AddTransform()
+        inst.entity:AddAnimState()
+        inst.entity:AddMiniMapEntity()
+        inst.entity:AddNetwork()
 
-            inst:SetPhysicsRadiusOverride(.16)
-            MakeObstaclePhysics(inst, inst.physicsradiusoverride)
+        inst:SetPhysicsRadiusOverride(.16)
+        MakeObstaclePhysics(inst, inst.physicsradiusoverride)
 
-            inst.MiniMapEntity:SetIcon(basename..".tex")
+        inst.MiniMapEntity:SetIcon(basename..".tex")
 
-            inst.AnimState:SetBank(basename)
-            inst.AnimState:SetBuild(basename)
-            inst.AnimState:PlayAnimation("idle")
+        inst.AnimState:SetBank(basename)
+        inst.AnimState:SetBuild(basename)
+        inst.AnimState:PlayAnimation("idle")
 
-            inst:AddTag("structure")
-            inst:AddTag("siving_ctl")
+        inst:AddTag("structure")
+        inst:AddTag("siving_ctl")
 
-            --Dedicated server does not need deployhelper
-            if not TheNet:IsDedicated() then
-                inst:AddComponent("deployhelper")
-                inst.components.deployhelper.onenablehelper = OnEnableHelper_ctl
-            end
+        --Dedicated server does not need deployhelper
+        if not TheNet:IsDedicated() then
+            inst:AddComponent("deployhelper")
+            inst.components.deployhelper.onenablehelper = OnEnableHelper_ctl
+        end
 
-            inst:AddComponent("skinedlegion")
-            inst.components.skinedlegion:Init(basename)
+        inst:AddComponent("skinedlegion")
+        inst.components.skinedlegion:Init(basename)
 
-            inst.ctltype_l = data.ctltype
-            if data.ctltype ~= 2 then
-                inst.net_moi_l = net_string(inst.GUID, "sivctl.moi_l", "moi_l_dirty")
-                inst.net_moi_l:set_local("0")
-            end
-            if data.ctltype ~= 1 then
-                inst.net_nut_l = net_string(inst.GUID, "sivctl.nut_l", "nut_l_dirty")
-                inst.net_nut_l:set_local("0_0_0")
-            end
-            inst.fn_l_namedetail = Fn_nameDetail_sivctl
+        inst.ctltype_l = data.ctltype
+        if data.ctltype ~= 2 then
+            inst.net_moi_l = net_string(inst.GUID, "sivctl.moi_l", "moi_l_dirty")
+            inst.net_moi_l:set_local("0")
+        end
+        if data.ctltype ~= 1 then
+            inst.net_nut_l = net_string(inst.GUID, "sivctl.nut_l", "nut_l_dirty")
+            inst.net_nut_l:set_local("0_0_0")
+        end
+        inst.fn_l_namedetail = Fn_nameDetail_sivctl
 
-            inst.entity:SetPristine()
-            if not TheWorld.ismastersim then
-                return inst
-            end
+        inst.entity:SetPristine()
+        if not TheWorld.ismastersim then return inst end
 
-            inst.UpdateBars_l = UpdateBars
+        inst.UpdateBars_l = UpdateBars
 
-            inst:AddComponent("inspectable")
+        inst:AddComponent("inspectable")
 
-            inst:AddComponent("portablestructure")
-            inst.components.portablestructure:SetOnDismantleFn(function(inst, doer)
-                local item = SpawnPrefab(basename.."_item")
-                if item ~= nil then
-                    inst.components.skinedlegion:SetLinkedSkin(item, "link", doer)
-                    SetData_ctlitem(item,
-                        inst.components.botanycontroller.moisture, inst.components.botanycontroller.nutrients)
-                    if doer ~= nil and doer.components.inventory ~= nil then
-                        doer.components.inventory:GiveItem(item)
-                        if doer.SoundEmitter ~= nil then
-                            doer.SoundEmitter:PlaySound("dontstarve/common/together/succulent_craft")
-                        end
-                    else
-                        item.Transform:SetPosition(inst.Transform:GetWorldPosition())
+        inst:AddComponent("portablestructure")
+        inst.components.portablestructure:SetOnDismantleFn(function(inst, doer)
+            local item = SpawnPrefab(basename.."_item")
+            if item ~= nil then
+                inst.components.skinedlegion:SetLinkedSkin(item, "link", doer)
+                SetData_ctlitem(item,
+                    inst.components.botanycontroller.moisture, inst.components.botanycontroller.nutrients)
+                if doer ~= nil and doer.components.inventory ~= nil then
+                    doer.components.inventory:GiveItem(item)
+                    if doer.SoundEmitter ~= nil then
+                        doer.SoundEmitter:PlaySound("dontstarve/common/together/succulent_craft")
                     end
-                    inst.components.botanycontroller:TriggerPlant(false)
-                    DoFunction_ctl(inst, false)
-                    inst:Remove()
-                end
-            end)
-
-            inst:AddComponent("hauntable")
-            inst.components.hauntable:SetHauntValue(TUNING.HAUNT_SMALL)
-
-            inst:AddComponent("trader")
-            inst.components.trader:SetAcceptTest(AcceptTest_ctl)
-            inst.components.trader.onaccept = OnAccept_ctl
-            inst.components.trader.onrefuse = OnRefuse_ctl
-            inst.components.trader.deleteitemonaccept = false --收到物品不马上移除，根据具体物品决定
-            inst.components.trader.acceptnontradable = true
-
-            inst:AddComponent("botanycontroller")
-            inst.components.botanycontroller.type = data.ctltype
-
-            -- inst.task_function = nil
-            inst:DoTaskInTime(0.2+math.random()*0.4, function(inst)
-                if data.ctltype == 3 then
-                    inst.components.botanycontroller.onbarchange = OnBarChange_ctlall
-                elseif data.ctltype == 2 then
-                    inst.components.botanycontroller.onbarchange = OnBarChange_ctldirt
                 else
-                    inst.components.botanycontroller.onbarchange = OnBarChange_ctlwater
+                    item.Transform:SetPosition(inst.Transform:GetWorldPosition())
                 end
-                UpdateBars(inst)
-                inst.components.botanycontroller:TriggerPlant(true)
-                DoFunction_ctl(inst, true)
-            end)
-
-            -- inst.components.skinedlegion:SetOnPreLoad()
-
-            if data.fn_server ~= nil then
-                data.fn_server(inst)
+                inst.components.botanycontroller:TriggerPlant(false)
+                DoFunction_ctl(inst, false)
+                inst:Remove()
             end
+        end)
 
-            return inst
-        end,
-        data.assets,
-        data.prefabs
-    ))
+        inst:AddComponent("hauntable")
+        inst.components.hauntable:SetHauntValue(TUNING.HAUNT_SMALL)
+
+        inst:AddComponent("trader")
+        inst.components.trader:SetAcceptTest(AcceptTest_ctl)
+        inst.components.trader.onaccept = OnAccept_ctl
+        inst.components.trader.onrefuse = OnRefuse_ctl
+        inst.components.trader.deleteitemonaccept = false --收到物品不马上移除，根据具体物品决定
+        inst.components.trader.acceptnontradable = true
+
+        inst:AddComponent("botanycontroller")
+        inst.components.botanycontroller.type = data.ctltype
+
+        -- inst.task_function = nil
+        inst:DoTaskInTime(0.2+math.random()*0.4, function(inst)
+            if data.ctltype == 3 then
+                inst.components.botanycontroller.onbarchange = OnBarChange_ctlall
+            elseif data.ctltype == 2 then
+                inst.components.botanycontroller.onbarchange = OnBarChange_ctldirt
+            else
+                inst.components.botanycontroller.onbarchange = OnBarChange_ctlwater
+            end
+            UpdateBars(inst)
+            inst.components.botanycontroller:TriggerPlant(true)
+            DoFunction_ctl(inst, true)
+        end)
+
+        -- inst.components.skinedlegion:SetOnPreLoad()
+
+        if data.fn_server ~= nil then
+            data.fn_server(inst)
+        end
+
+        return inst
+    end, data.assets, data.prefabs))
 end
 
 --------------------------------------------------------------------------
@@ -708,37 +694,30 @@ MakeConstruct({
 --[[ 状态栏 ]]
 --------------------------------------------------------------------------
 
-table.insert(prefs, Prefab(
-    "siving_ctl_bar",
-    function()
-        local inst = CreateEntity()
+table.insert(prefs, Prefab("siving_ctl_bar", function()
+    local inst = CreateEntity()
 
-        inst.entity:AddTransform()
-        inst.entity:AddAnimState()
-        inst.entity:AddNetwork()
-        inst.entity:AddFollower()
+    inst.entity:AddTransform()
+    inst.entity:AddAnimState()
+    inst.entity:AddNetwork()
+    inst.entity:AddFollower()
 
-        -- inst.AnimState:SetBank("siving_ctldirt")
-        -- inst.AnimState:SetBuild("siving_ctldirt")
-        -- inst.AnimState:PlayAnimation("bar2")
-        inst.AnimState:SetFinalOffset(3)
+    -- inst.AnimState:SetBank("siving_ctldirt")
+    -- inst.AnimState:SetBuild("siving_ctldirt")
+    -- inst.AnimState:PlayAnimation("bar2")
+    inst.AnimState:SetFinalOffset(3)
 
-        inst:AddComponent("highlightchild")
+    inst:AddComponent("highlightchild")
 
-        inst:AddTag("FX")
+    inst:AddTag("FX")
 
-        inst.entity:SetPristine()
-        if not TheWorld.ismastersim then
-            return inst
-        end
+    inst.entity:SetPristine()
+    if not TheWorld.ismastersim then return inst end
 
-        inst.persists = false
+    inst.persists = false
 
-        return inst
-    end,
-    nil,
-    nil
-))
+    return inst
+end, nil, nil))
 
 --------------------------------------------------------------------------
 --[[ 子圭·育 ]]
@@ -792,107 +771,93 @@ local function OnDeconstruct_turn(inst, worker)
     OnBroken_turn(inst, false) --拆解机制自带建造材料的还原，所以这里不再还原材料
 end
 
-table.insert(prefs, Prefab(
-    "siving_turn",
-    function()
-        local inst = CreateEntity()
+table.insert(prefs, Prefab("siving_turn", function()
+    local inst = CreateEntity()
 
-        inst.entity:AddTransform()
-        inst.entity:AddAnimState()
-        inst.entity:AddSoundEmitter()
-        inst.entity:AddMiniMapEntity()
-        inst.entity:AddLight()
-        inst.entity:AddNetwork()
+    inst.entity:AddTransform()
+    inst.entity:AddAnimState()
+    inst.entity:AddSoundEmitter()
+    inst.entity:AddMiniMapEntity()
+    inst.entity:AddLight()
+    inst.entity:AddNetwork()
 
-        MakeObstaclePhysics(inst, .15)
+    MakeObstaclePhysics(inst, .15)
 
-        inst.MiniMapEntity:SetIcon("siving_turn.tex")
+    inst.MiniMapEntity:SetIcon("siving_turn.tex")
 
-        inst.Light:Enable(false)
-        inst.Light:SetRadius(2)
-        inst.Light:SetFalloff(1.5)
-        inst.Light:SetIntensity(.5)
-        inst.Light:SetColour(35/255, 167/255, 172/255)
+    inst.Light:Enable(false)
+    inst.Light:SetRadius(2)
+    inst.Light:SetFalloff(1.5)
+    inst.Light:SetIntensity(.5)
+    inst.Light:SetColour(35/255, 167/255, 172/255)
 
-        inst.AnimState:SetBank("siving_turn")
-        inst.AnimState:SetBuild("siving_turn")
-        inst.AnimState:PlayAnimation("idle")
+    inst.AnimState:SetBank("siving_turn")
+    inst.AnimState:SetBuild("siving_turn")
+    inst.AnimState:PlayAnimation("idle")
 
-        inst:AddTag("structure")
-        inst:AddTag("genetrans")
+    inst:AddTag("structure")
+    inst:AddTag("genetrans")
 
-        inst:AddComponent("skinedlegion")
-        inst.components.skinedlegion:Init("siving_turn")
+    inst:AddComponent("skinedlegion")
+    inst.components.skinedlegion:Init("siving_turn")
 
-        inst.entity:SetPristine()
-        if not TheWorld.ismastersim then
-            return inst
-        end
+    inst.entity:SetPristine()
+    if not TheWorld.ismastersim then return inst end
 
-        inst.worked_l = nil
+    inst.worked_l = nil
 
-        inst:AddComponent("inspectable")
-        inst.components.inspectable.descriptionfn = GetDesc_turn
-        inst.components.inspectable.getstatus = GetStatus_turn
+    inst:AddComponent("inspectable")
+    inst.components.inspectable.descriptionfn = GetDesc_turn
+    inst.components.inspectable.getstatus = GetStatus_turn
 
-        inst:AddComponent("hauntable")
-        inst.components.hauntable:SetHauntValue(TUNING.HAUNT_TINY)
+    inst:AddComponent("hauntable")
+    inst.components.hauntable:SetHauntValue(TUNING.HAUNT_TINY)
 
-        inst:AddComponent("lootdropper")
+    inst:AddComponent("lootdropper")
 
-        inst:AddComponent("genetrans") --实在不想做无谓的代码优化了，所以该组件与该实体的耦合性特别特别高
+    inst:AddComponent("genetrans") --实在不想做无谓的代码优化了，所以该组件与该实体的耦合性特别特别高
 
-        inst:AddComponent("workable")
-        inst.components.workable:SetWorkAction(ACTIONS.HAMMER)
-        inst.components.workable:SetWorkLeft(5)
-        inst.components.workable:SetOnWorkCallback(OnWork_turn)
-        inst.components.workable:SetOnFinishCallback(OnFinished_turn)
+    inst:AddComponent("workable")
+    inst.components.workable:SetWorkAction(ACTIONS.HAMMER)
+    inst.components.workable:SetWorkLeft(5)
+    inst.components.workable:SetOnWorkCallback(OnWork_turn)
+    inst.components.workable:SetOnFinishCallback(OnFinished_turn)
 
-        inst:ListenForEvent("ondeconstructstructure", OnDeconstruct_turn)
+    inst:ListenForEvent("ondeconstructstructure", OnDeconstruct_turn)
 
-        inst.components.skinedlegion:SetOnPreLoad()
+    inst.components.skinedlegion:SetOnPreLoad()
 
-        return inst
-    end,
-    { Asset("ANIM", "anim/siving_turn.zip") },
-    { "siving_turn_fruit" }
-))
+    return inst
+end, { Asset("ANIM", "anim/siving_turn.zip") }, { "siving_turn_fruit" }))
 
 --------------------------------------------------------------------------
 --[[ 子圭·育之果 ]]
 --------------------------------------------------------------------------
 
-table.insert(prefs, Prefab(
-    "siving_turn_fruit",
-    function()
-        local inst = CreateEntity()
+table.insert(prefs, Prefab("siving_turn_fruit", function()
+    local inst = CreateEntity()
 
-        inst.entity:AddTransform()
-        inst.entity:AddAnimState()
-        inst.entity:AddNetwork()
-        inst.entity:AddFollower()
+    inst.entity:AddTransform()
+    inst.entity:AddAnimState()
+    inst.entity:AddNetwork()
+    inst.entity:AddFollower()
 
-        inst.AnimState:SetBank("siving_turn")
-        inst.AnimState:SetBuild("siving_turn")
-        inst.AnimState:SetPercent("fruit", 0)
-        inst.AnimState:SetFinalOffset(3)
+    inst.AnimState:SetBank("siving_turn")
+    inst.AnimState:SetBuild("siving_turn")
+    inst.AnimState:SetPercent("fruit", 0)
+    inst.AnimState:SetFinalOffset(3)
 
-        inst:AddComponent("highlightchild")
+    inst:AddComponent("highlightchild")
 
-        inst:AddTag("FX")
+    inst:AddTag("FX")
 
-        inst.entity:SetPristine()
-        if not TheWorld.ismastersim then
-            return inst
-        end
+    inst.entity:SetPristine()
+    if not TheWorld.ismastersim then return inst end
 
-        inst.persists = false
+    inst.persists = false
 
-        return inst
-    end,
-    nil,
-    nil
-))
+    return inst
+end, nil, nil))
 
 --------------------------------------------------------------------------
 --[[ 子圭护甲的反伤特效 ]]
@@ -1003,48 +968,41 @@ local function InitCounterAtk(inst, owner, armor, attacker)
     inst.task_atk = inst:DoTaskInTime(0, DoFxCounterAtk)
 end
 local function MakeSuitAtkFx(data)
-    table.insert(prefs, Prefab(
-        data.name,
-        function()
-            local inst = CreateEntity()
+    table.insert(prefs, Prefab(data.name, function()
+        local inst = CreateEntity()
 
-            inst.entity:AddTransform()
-            inst.entity:AddAnimState()
-            inst.entity:AddNetwork()
+        inst.entity:AddTransform()
+        inst.entity:AddAnimState()
+        inst.entity:AddNetwork()
 
-            inst:AddTag("FX")
+        inst:AddTag("FX")
 
-            if data.fn_common ~= nil then
-                data.fn_common(inst)
-            end
+        if data.fn_common ~= nil then
+            data.fn_common(inst)
+        end
 
-            inst.entity:SetPristine()
-            if not TheWorld.ismastersim then
-                return inst
-            end
+        inst.entity:SetPristine()
+        if not TheWorld.ismastersim then return inst end
 
-            inst.persists = false
+        inst.persists = false
 
-            inst.damage = 80
-            inst.range = 3
-            inst.armorcostmult = 1
-            -- inst.armor = nil
-            -- inst.owner = nil
-            -- inst.attacker = nil
-            -- inst.task_atk = nil
-            inst.InitCounterAtk = InitCounterAtk
+        inst.damage = 80
+        inst.range = 3
+        inst.armorcostmult = 1
+        -- inst.armor = nil
+        -- inst.owner = nil
+        -- inst.attacker = nil
+        -- inst.task_atk = nil
+        inst.InitCounterAtk = InitCounterAtk
 
-            inst:ListenForEvent("animover", inst.Remove)
+        inst:ListenForEvent("animover", inst.Remove)
 
-            if data.fn_server ~= nil then
-                data.fn_server(inst)
-            end
+        if data.fn_server ~= nil then
+            data.fn_server(inst)
+        end
 
-            return inst
-        end,
-        data.assets,
-        nil
-    ))
+        return inst
+    end, data.assets, nil))
 end
 
 local function SetSuitAtkFxAnim_server(inst)
@@ -1093,6 +1051,137 @@ MakeSuitAtkFx({
     end,
     fn_server = SetSuitAtkFxAnim_server
 })
+
+--------------------------------------------------------------------------
+--[[ 子圭·垄 ]]
+--------------------------------------------------------------------------
+
+local function OnDeploy_soilitem(inst, pt, deployer, rot)
+    local tree
+    local skin = inst.components.skinedlegion:GetSkin()
+    if skin == nil then
+        tree = SpawnPrefab("siving_soil")
+    else
+        tree = SpawnPrefab("siving_soil", skin, nil,
+            inst.components.skinedlegion.userid or (deployer and deployer.userid or nil))
+    end
+    if tree ~= nil then
+        tree.Transform:SetPosition(pt:Get())
+        inst.components.stackable:Get():Remove()
+        if deployer ~= nil and deployer.SoundEmitter ~= nil then
+            deployer.SoundEmitter:PlaySound("dontstarve/wilson/plant_seeds")
+        end
+    end
+end
+table.insert(prefs, Prefab("siving_soil_item", function() ------子圭垄(物品)
+    local inst = CreateEntity()
+
+    inst.entity:AddTransform()
+    inst.entity:AddAnimState()
+    inst.entity:AddNetwork()
+
+    MakeInventoryPhysics(inst)
+
+    inst.AnimState:SetBank("siving_soil")
+    inst.AnimState:SetBuild("siving_soil")
+    inst.AnimState:PlayAnimation("item")
+
+    inst:AddTag("molebait")
+    inst:AddTag("eyeturret") --眼球塔的专属标签，但为了deployable组件的摆放名字而使用（显示为“放置”）
+
+    inst:AddComponent("skinedlegion")
+    inst.components.skinedlegion:Init("siving_soil_item")
+
+    inst.entity:SetPristine()
+    if not TheWorld.ismastersim then return inst end
+
+    inst:AddComponent("stackable")
+    inst.components.stackable.maxsize = TUNING.STACK_SIZE_MEDITEM
+
+    inst:AddComponent("inspectable")
+
+    inst:AddComponent("tradable")
+    inst.components.tradable.rocktribute = 18 --延缓 0.33x18 天地震
+    inst.components.tradable.goldvalue = 15 --换1个砂之石或15金块
+
+    inst:AddComponent("bait")
+
+    inst:AddComponent("inventoryitem")
+    inst.components.inventoryitem.imagename = "siving_soil_item"
+    inst.components.inventoryitem.atlasname = "images/inventoryimages/siving_soil_item.xml"
+    inst.components.inventoryitem:SetSinks(true)
+
+    inst:AddComponent("deployable")
+    inst.components.deployable.ondeploy = OnDeploy_soilitem
+    inst.components.deployable:SetDeploySpacing(DEPLOYSPACING.LESS)
+
+    MakeHauntableLaunchAndIgnite(inst)
+
+    -- inst.components.skinedlegion:SetOnPreLoad()
+
+    return inst
+end, {
+    Asset("ANIM", "anim/farm_soil.zip"), --官方栽培土动画模板（为了placer加载的）
+    Asset("ANIM", "anim/siving_soil.zip"),
+    Asset("ATLAS", "images/inventoryimages/siving_soil_item.xml"),
+    Asset("IMAGE", "images/inventoryimages/siving_soil_item.tex")
+}, { "siving_soil" }))
+
+local function OnFinished_soil(inst, worker)
+    local skin = inst.components.skinedlegion:GetSkin()
+    if skin == nil then
+        inst.components.lootdropper:SpawnLootPrefab("siving_soil_item")
+    else
+        inst.components.lootdropper:SpawnLootPrefab("siving_soil_item", nil,
+            skin, nil, inst.components.skinedlegion.userid or (worker and worker.userid or nil))
+    end
+    inst:Remove()
+end
+table.insert(prefs, Prefab("siving_soil", function() ------子圭垄
+    local inst = CreateEntity()
+
+    inst.entity:AddTransform()
+    inst.entity:AddAnimState()
+    inst.entity:AddNetwork()
+
+    inst.AnimState:SetBank("farm_soil")
+    inst.AnimState:SetBuild("siving_soil")
+    -- inst.AnimState:PlayAnimation("till_idle")
+
+    inst:SetPhysicsRadiusOverride(TUNING.FARM_PLANT_PHYSICS_RADIUS)
+
+    inst:AddTag("soil_legion")
+
+    inst:AddComponent("skinedlegion")
+    inst.components.skinedlegion:OverrideSkin("siving_soil_item", "data_soil")
+    inst.components.skinedlegion:Init("siving_soil_item")
+
+    inst.entity:SetPristine()
+    if not TheWorld.ismastersim then return inst end
+
+    inst:DoTaskInTime(0, function()
+        inst.AnimState:PlayAnimation("till_rise")
+        inst.AnimState:PushAnimation("till_idle", false)
+    end)
+
+    inst:AddComponent("inspectable")
+
+    inst:AddComponent("lootdropper")
+
+    inst:AddComponent("workable")
+    inst.components.workable:SetWorkAction(ACTIONS.DIG)
+    inst.components.workable:SetWorkLeft(1)
+    inst.components.workable:SetOnFinishCallback(OnFinished_soil)
+
+    MakeHauntableWork(inst)
+
+    -- inst.components.skinedlegion:SetOnPreLoad()
+
+    return inst
+end, {
+    Asset("ANIM", "anim/farm_soil.zip"), --官方栽培土动画模板
+    Asset("ANIM", "anim/siving_soil.zip")
+}, { "siving_soil_item" }))
 
 --------------------
 --------------------

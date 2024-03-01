@@ -59,9 +59,7 @@ local function Fn()
     end
 
     inst.entity:SetPristine()
-    if not TheWorld.ismastersim then
-        return inst
-    end
+    if not TheWorld.ismastersim then return inst end
 
     inst.foliageath_data = foliageath_data_fol
 
@@ -148,9 +146,7 @@ local function MakeIt(name, ismylove)
         end
 
         inst.entity:SetPristine()
-        if not TheWorld.ismastersim then
-            return inst
-        end
+        if not TheWorld.ismastersim then return inst end
 
         inst:AddComponent("inspectable")
 
@@ -171,7 +167,6 @@ local function MakeIt(name, ismylove)
 
         return inst
     end
-
     return Prefab(name, fn_together, assets_together, prefabs_together)
 end
 

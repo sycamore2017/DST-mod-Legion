@@ -429,81 +429,74 @@ local function MakePlant(data)
 		end
 	end
 
-	return Prefab(
-		data.prefab,
-		function()
-			local inst = CreateEntity()
+	return Prefab(data.prefab, function()
+		local inst = CreateEntity()
 
-			inst.entity:AddTransform()
-			inst.entity:AddAnimState()
-			inst.entity:AddSoundEmitter()
-			inst.entity:AddNetwork()
+		inst.entity:AddTransform()
+		inst.entity:AddAnimState()
+		inst.entity:AddSoundEmitter()
+		inst.entity:AddNetwork()
 
-			inst.AnimState:SetBank(data.bank)
-			inst.AnimState:SetBuild(data.build)
-			inst.AnimState:OverrideSymbol("soil01", "siving_soil", "soil01")
+		inst.AnimState:SetBank(data.bank)
+		inst.AnimState:SetBuild(data.build)
+		inst.AnimState:OverrideSymbol("soil01", "siving_soil", "soil01")
 
-			inst:SetPhysicsRadiusOverride(TUNING.FARM_PLANT_PHYSICS_RADIUS)
+		inst:SetPhysicsRadiusOverride(TUNING.FARM_PLANT_PHYSICS_RADIUS)
 
-			inst:AddTag("plant")
-			inst:AddTag("crop_legion")
-			inst:AddTag("tendable_farmplant") -- for farmplanttendable component
-			if data.tags ~= nil then
-				for k, v in pairs(data.tags) do
-					inst:AddTag(v)
-				end
+		inst:AddTag("plant")
+		inst:AddTag("crop_legion")
+		inst:AddTag("tendable_farmplant") -- for farmplanttendable component
+		if data.tags ~= nil then
+			for k, v in pairs(data.tags) do
+				inst:AddTag(v)
 			end
+		end
 
-			inst.displaynamefn = GetDisplayName
+		inst.displaynamefn = GetDisplayName
 
-			if data.fn_common ~= nil then
-				data.fn_common(inst)
-			end
+		if data.fn_common ~= nil then
+			data.fn_common(inst)
+		end
 
-			inst:AddComponent("skinedlegion")
-			inst.components.skinedlegion:OverrideSkin("siving_soil_item", "data_plant")
-			inst.components.skinedlegion:Init("siving_soil_item")
+		inst:AddComponent("skinedlegion")
+		inst.components.skinedlegion:OverrideSkin("siving_soil_item", "data_plant")
+		inst.components.skinedlegion:Init("siving_soil_item")
 
-			inst.entity:SetPristine()
-			if not TheWorld.ismastersim then
-				return inst
-			end
+		inst.entity:SetPristine()
+		if not TheWorld.ismastersim then return inst end
 
-			inst.soiltype_l = "1"
-			inst.soilskin_l = nil
+		inst.soiltype_l = "1"
+		inst.soilskin_l = nil
 
-			inst:AddComponent("inspectable")
-			inst.components.inspectable.nameoverride = "FARM_PLANT"
-			inst.components.inspectable.descriptionfn = DescriptionFn_p --提示自身的生长数据
-			inst.components.inspectable.getstatus = GetStatusFn_p
+		inst:AddComponent("inspectable")
+		inst.components.inspectable.nameoverride = "FARM_PLANT"
+		inst.components.inspectable.descriptionfn = DescriptionFn_p --提示自身的生长数据
+		inst.components.inspectable.getstatus = GetStatusFn_p
 
-			inst:AddComponent("hauntable")
-			inst.components.hauntable:SetHauntValue(TUNING.HAUNT_TINY)
+		inst:AddComponent("hauntable")
+		inst.components.hauntable:SetHauntValue(TUNING.HAUNT_TINY)
 
-			inst:AddComponent("workable")
-			inst.components.workable:SetWorkAction(ACTIONS.DIG)
-			inst.components.workable:SetWorkLeft(1)
-			inst.components.workable:SetOnFinishCallback(OnWorkedFinish_p)
+		inst:AddComponent("workable")
+		inst.components.workable:SetWorkAction(ACTIONS.DIG)
+		inst.components.workable:SetWorkLeft(1)
+		inst.components.workable:SetOnFinishCallback(OnWorkedFinish_p)
 
-			inst:AddComponent("perennialcrop")
-			inst.components.perennialcrop.onctlchange = OnCtlChange_p
-			inst.components.perennialcrop:SetUp(data)
-			inst.components.perennialcrop:SetStage(1, false, false)
+		inst:AddComponent("perennialcrop")
+		inst.components.perennialcrop.onctlchange = OnCtlChange_p
+		inst.components.perennialcrop:SetUp(data)
+		inst.components.perennialcrop:SetStage(1, false, false)
 
-			inst.fn_planted = OnPlant_p
-			inst.fn_soiltype = UpdateSoilType_p
+		inst.fn_planted = OnPlant_p
+		inst.fn_soiltype = UpdateSoilType_p
 
-			if data.fn_server ~= nil then
-				data.fn_server(inst)
-			end
+		if data.fn_server ~= nil then
+			data.fn_server(inst)
+		end
 
-			-- inst.components.skinedlegion:SetOnPreLoad()
+		-- inst.components.skinedlegion:SetOnPreLoad()
 
-			return inst
-		end,
-		nil,
-		nil
-	)
+		return inst
+	end, nil, nil)
 end
 
 --------------------------------------------------------------------------
@@ -628,76 +621,69 @@ local function MakePlant2(cropprefab, sets)
 	end
 	table.insert(assets, Asset("ANIM", "anim/crop_soil_legion.zip"))
 
-	return Prefab(
-		"plant_"..cropprefab.."_l",
-		function()
-			local inst = CreateEntity()
+	return Prefab("plant_"..cropprefab.."_l", function()
+		local inst = CreateEntity()
 
-			Fn_common_p2(inst, sets)
+		Fn_common_p2(inst, sets)
 
-			inst:SetPhysicsRadiusOverride(TUNING.FARM_PLANT_PHYSICS_RADIUS)
+		inst:SetPhysicsRadiusOverride(TUNING.FARM_PLANT_PHYSICS_RADIUS)
 
-			if sets.bank == "plant_normal_legion" then
-				-- inst.AnimState:OverrideSymbol("dirt", "crop_soil_legion", "dirt")
-			else
-				inst.AnimState:OverrideSymbol("soil", "crop_soil_legion", "soil")
-			end
+		if sets.bank == "plant_normal_legion" then
+			-- inst.AnimState:OverrideSymbol("dirt", "crop_soil_legion", "dirt")
+		else
+			inst.AnimState:OverrideSymbol("soil", "crop_soil_legion", "soil")
+		end
 
-			inst.MiniMapEntity:SetIcon("plant_crop_l.tex")
+		inst.MiniMapEntity:SetIcon("plant_crop_l.tex")
 
-			inst:AddTag("plant")
+		inst:AddTag("plant")
 
-			inst.displaynamefn = DisplayName_p2
+		inst.displaynamefn = DisplayName_p2
 
-			if skinedplant[cropprefab] then
-				inst:AddComponent("skinedlegion")
-        		inst.components.skinedlegion:Init("plant_"..cropprefab.."_l")
-			end
+		if skinedplant[cropprefab] then
+			inst:AddComponent("skinedlegion")
+			inst.components.skinedlegion:Init("plant_"..cropprefab.."_l")
+		end
 
-			if sets.fn_common ~= nil then
-				sets.fn_common(inst)
-			end
+		if sets.fn_common ~= nil then
+			sets.fn_common(inst)
+		end
 
-			inst.entity:SetPristine()
-			if not TheWorld.ismastersim then
-				return inst
-			end
+		inst.entity:SetPristine()
+		if not TheWorld.ismastersim then return inst end
 
-			Fn_server_p2(inst)
+		Fn_server_p2(inst)
 
-			inst.components.inspectable.nameoverride = "PLANT_CROP_L" --用来统一描述，懒得每种作物都搞个描述了
-    		inst.components.inspectable.getstatus = GetStatus_p2
+		inst.components.inspectable.nameoverride = "PLANT_CROP_L" --用来统一描述，懒得每种作物都搞个描述了
+		inst.components.inspectable.getstatus = GetStatus_p2
 
-			inst:AddComponent("hauntable")
-			inst.components.hauntable:SetHauntValue(TUNING.HAUNT_TINY)
-			inst.components.hauntable:SetOnHauntFn(OnHaunt_p2)
+		inst:AddComponent("hauntable")
+		inst.components.hauntable:SetHauntValue(TUNING.HAUNT_TINY)
+		inst.components.hauntable:SetOnHauntFn(OnHaunt_p2)
 
-			inst:AddComponent("workable")
-			inst.components.workable:SetWorkAction(ACTIONS.DIG)
-			inst.components.workable:SetWorkLeft(1)
-			inst.components.workable:SetOnFinishCallback(OnWorkedFinish_p2)
+		inst:AddComponent("workable")
+		inst.components.workable:SetWorkAction(ACTIONS.DIG)
+		inst.components.workable:SetWorkLeft(1)
+		inst.components.workable:SetOnFinishCallback(OnWorkedFinish_p2)
 
-			inst.components.perennialcrop2:SetUp(cropprefab, sets, {
-				moisture = true, nutrient = true, tendable = true, seasonlisten = true,
-				nomagicgrow = sets.nomagicgrow, fireproof = sets.fireproof, cangrowindrak = sets.cangrowindrak
-			})
-			inst.components.perennialcrop2:SetStage(1, false)
+		inst.components.perennialcrop2:SetUp(cropprefab, sets, {
+			moisture = true, nutrient = true, tendable = true, seasonlisten = true,
+			nomagicgrow = sets.nomagicgrow, fireproof = sets.fireproof, cangrowindrak = sets.cangrowindrak
+		})
+		inst.components.perennialcrop2:SetStage(1, false)
 
-			inst.fn_planted = OnPlant_p2
+		inst.fn_planted = OnPlant_p2
 
-			-- if inst.components.skinedlegion ~= nil then
-			-- 	inst.components.skinedlegion:SetOnPreLoad()
-			-- end
+		-- if inst.components.skinedlegion ~= nil then
+		-- 	inst.components.skinedlegion:SetOnPreLoad()
+		-- end
 
-			if sets.fn_server ~= nil then
-				sets.fn_server(inst)
-			end
+		if sets.fn_server ~= nil then
+			sets.fn_server(inst)
+		end
 
-			return inst
-		end,
-		assets,
-		sets.prefabs
-	)
+		return inst
+	end, assets, sets.prefabs)
 end
 
 --------------------------------------------------------------------------
@@ -1451,95 +1437,90 @@ local function OnLoad_nep(inst, data)
 	end
 end
 
-table.insert(prefs, Prefab(
-    "plant_nepenthes_l",
-    function()
-        local inst = CreateEntity()
+table.insert(prefs, Prefab("plant_nepenthes_l", function()
+	local inst = CreateEntity()
 
-        Fn_common_p2(inst, CROPS_DATA_LEGION["plantmeat"])
+	Fn_common_p2(inst, CROPS_DATA_LEGION["plantmeat"])
 
-		inst:SetPhysicsRadiusOverride(.5)
-    	MakeObstaclePhysics(inst, inst.physicsradiusoverride)
+	inst:SetPhysicsRadiusOverride(.5)
+	MakeObstaclePhysics(inst, inst.physicsradiusoverride)
 
-		inst.MiniMapEntity:SetIcon("plant_crop_l.tex")
+	inst.MiniMapEntity:SetIcon("plant_crop_l.tex")
 
-		inst:AddTag("veggie")
-		inst:AddTag("notraptrigger")
-    	inst:AddTag("noauradamage")
-		inst:AddTag("companion")
-		inst:AddTag("vaseherb")
+	inst:AddTag("veggie")
+	inst:AddTag("notraptrigger")
+	inst:AddTag("noauradamage")
+	inst:AddTag("companion")
+	inst:AddTag("vaseherb")
 
-		inst.displaynamefn = DisplayName_nep
+	inst.displaynamefn = DisplayName_nep
 
-        inst.entity:SetPristine()
-        if not TheWorld.ismastersim then
-			inst.OnEntityReplicated = OnEntityReplicated_nep
-            return inst
-        end
+	inst.entity:SetPristine()
+	if not TheWorld.ismastersim then
+		inst.OnEntityReplicated = OnEntityReplicated_nep
+		return inst
+	end
 
-		inst.count_digest = 0 --已消化物品的数量
-		inst.dist_swallow = DIST_SWALLOW[1] --吞食半径
-		inst.num_swallow = NUM_SWALLOW[1] --一次能吞下对象的最大数量
-		inst.time_swallow = TIME_SWALLOW[1] --主动吞食后的消化时间
-		inst.dist_lure = DIST_LURE[1] --引诱半径
-		inst.sounds = sounds_nep
-		inst.task_digest = nil
+	inst.count_digest = 0 --已消化物品的数量
+	inst.dist_swallow = DIST_SWALLOW[1] --吞食半径
+	inst.num_swallow = NUM_SWALLOW[1] --一次能吞下对象的最大数量
+	inst.time_swallow = TIME_SWALLOW[1] --主动吞食后的消化时间
+	inst.dist_lure = DIST_LURE[1] --引诱半径
+	inst.sounds = sounds_nep
+	inst.task_digest = nil
 
-		inst.fn_tryDigest = TryDigest
-		inst.fn_trySwallow = TrySwallow
-		inst.fn_doSwallow = DoSwallow
-		inst.fn_doLure = DoLure
-		inst.fn_death = OnDeath_nep
-		inst.fn_switch = SwitchPlant
+	inst.fn_tryDigest = TryDigest
+	inst.fn_trySwallow = TrySwallow
+	inst.fn_doSwallow = DoSwallow
+	inst.fn_doLure = DoLure
+	inst.fn_death = OnDeath_nep
+	inst.fn_switch = SwitchPlant
 
-		Fn_server_p2(inst)
+	Fn_server_p2(inst)
 
-		inst:AddComponent("health")
-    	inst.components.health:SetMaxHealth(1200)
-		inst.components.health.destroytime = 0.7
+	inst:AddComponent("health")
+	inst.components.health:SetMaxHealth(1200)
+	inst.components.health.destroytime = 0.7
 
-		inst:AddComponent("combat")
-		inst.components.combat.hiteffectsymbol = "base"
+	inst:AddComponent("combat")
+	inst.components.combat.hiteffectsymbol = "base"
 
-		inst:AddComponent("container")
-		inst.components.container:WidgetSetup("plant_nepenthes_l")
-        inst.components.container.onopenfn = OnOpen_nep
-        inst.components.container.onclosefn = OnClose_nep
-        inst.components.container.skipclosesnd = true
-        inst.components.container.skipopensnd = true
+	inst:AddComponent("container")
+	inst.components.container:WidgetSetup("plant_nepenthes_l")
+	inst.components.container.onopenfn = OnOpen_nep
+	inst.components.container.onclosefn = OnClose_nep
+	inst.components.container.skipclosesnd = true
+	inst.components.container.skipopensnd = true
 
-		inst:AddComponent("timer")
+	inst:AddComponent("timer")
 
-		inst.components.perennialcrop2.fn_cluster = OnCluster_nep
-		inst.components.perennialcrop2.infested_max = 50 --我可不想它直接被害虫干掉了
-		inst.components.perennialcrop2:SetNoFunction()
-		inst.components.perennialcrop2:SetUp("plantmeat", CROPS_DATA_LEGION["plantmeat"], {
-			-- moisture = nil, nutrient = nil, tendable = nil, seasonlisten = nil,
-			nomagicgrow = true, fireproof = true, cangrowindrak = true
-		})
-		inst.components.perennialcrop2:SetStage(3, false)
+	inst.components.perennialcrop2.fn_cluster = OnCluster_nep
+	inst.components.perennialcrop2.infested_max = 50 --我可不想它直接被害虫干掉了
+	inst.components.perennialcrop2:SetNoFunction()
+	inst.components.perennialcrop2:SetUp("plantmeat", CROPS_DATA_LEGION["plantmeat"], {
+		-- moisture = nil, nutrient = nil, tendable = nil, seasonlisten = nil,
+		nomagicgrow = true, fireproof = true, cangrowindrak = true
+	})
+	inst.components.perennialcrop2:SetStage(3, false)
 
-		inst:SetStateGraph("SGplant_nepenthes_l")
+	inst:SetStateGraph("SGplant_nepenthes_l")
 
-		inst:ListenForEvent("timerdone", OnTimerDone_nep)
+	inst:ListenForEvent("timerdone", OnTimerDone_nep)
 
-		inst.OnSave = OnSave_nep
-		inst.OnLoad = OnLoad_nep
+	inst.OnSave = OnSave_nep
+	inst.OnLoad = OnLoad_nep
 
-		MakeHauntableDropFirstItem(inst)
+	MakeHauntableDropFirstItem(inst)
 
-		-- if TUNING.SMART_SIGN_DRAW_ENABLE then
-		-- 	SMART_SIGN_DRAW(inst)
-		-- end
+	-- if TUNING.SMART_SIGN_DRAW_ENABLE then
+	-- 	SMART_SIGN_DRAW(inst)
+	-- end
 
-        return inst
-    end,
-    {
-        Asset("ANIM", "anim/ui_nepenthes_l_4x4.zip"),
-		Asset("ANIM", "anim/crop_legion_lureplant.zip")
-    },
-    nil
-))
+	return inst
+end, {
+	Asset("ANIM", "anim/ui_nepenthes_l_4x4.zip"),
+	Asset("ANIM", "anim/crop_legion_lureplant.zip")
+}, nil))
 
 --------------------------------------------------------------------------
 --[[ 云青松 ]]
@@ -1701,65 +1682,56 @@ local function AttachContainer_pine(inst)
 	inst.components.container_proxy:SetMaster(TheWorld:GetPocketDimensionContainer("cloudpine_l2"))
 end
 
-table.insert(prefs, Prefab(
-    "plant_log_l",
-    function()
-        local inst = CreateEntity()
+table.insert(prefs, Prefab("plant_log_l", function()
+	local inst = CreateEntity()
 
-        Fn_common_p2(inst, CROPS_DATA_LEGION["log"])
+	Fn_common_p2(inst, CROPS_DATA_LEGION["log"])
 
-		inst:SetPhysicsRadiusOverride(TUNING.FARM_PLANT_PHYSICS_RADIUS)
+	inst:SetPhysicsRadiusOverride(TUNING.FARM_PLANT_PHYSICS_RADIUS)
 
-		inst.MiniMapEntity:SetIcon("plant_crop_l.tex")
+	inst.MiniMapEntity:SetIcon("plant_crop_l.tex")
 
-		inst:AddTag("plant")
-		inst:AddTag("silviculture") --该标签会使得仅限《造林学》发挥作用
+	inst:AddTag("plant")
+	inst:AddTag("silviculture") --该标签会使得仅限《造林学》发挥作用
 
-		inst.displaynamefn = DisplayName_p2
+	inst.displaynamefn = DisplayName_p2
 
-		inst:AddComponent("container_proxy")
+	inst:AddComponent("container_proxy")
 
-		inst.entity:SetPristine()
-		if not TheWorld.ismastersim then
-			return inst
-		end
+	inst.entity:SetPristine()
+	if not TheWorld.ismastersim then return inst end
 
-		Fn_server_p2(inst)
+	Fn_server_p2(inst)
 
-		inst.components.inspectable.nameoverride = "PLANT_CROP_L" --用来统一描述，懒得每种作物都搞个描述了
-		inst.components.inspectable.getstatus = GetStatus_p2
+	inst.components.inspectable.nameoverride = "PLANT_CROP_L" --用来统一描述，懒得每种作物都搞个描述了
+	inst.components.inspectable.getstatus = GetStatus_p2
 
-		inst:AddComponent("hauntable")
-		inst.components.hauntable:SetHauntValue(TUNING.HAUNT_TINY)
-		inst.components.hauntable:SetOnHauntFn(OnHaunt_p2)
+	inst:AddComponent("hauntable")
+	inst.components.hauntable:SetHauntValue(TUNING.HAUNT_TINY)
+	inst.components.hauntable:SetOnHauntFn(OnHaunt_p2)
 
-		inst:AddComponent("workable")
+	inst:AddComponent("workable")
 
-		inst.components.perennialcrop2:SetUp("log", CROPS_DATA_LEGION["log"], {
-			moisture = true, nutrient = true, tendable = true, seasonlisten = nil,
-			nomagicgrow = nil, fireproof = nil, cangrowindrak = true
-		})
-		inst.components.perennialcrop2.fn_stage = OnStage_pine
-		inst.components.perennialcrop2.fn_loot = OnLoot_pine
-		inst.components.perennialcrop2:SetStage(1, false)
+	inst.components.perennialcrop2:SetUp("log", CROPS_DATA_LEGION["log"], {
+		moisture = true, nutrient = true, tendable = true, seasonlisten = nil,
+		nomagicgrow = nil, fireproof = nil, cangrowindrak = true
+	})
+	inst.components.perennialcrop2.fn_stage = OnStage_pine
+	inst.components.perennialcrop2.fn_loot = OnLoot_pine
+	inst.components.perennialcrop2:SetStage(1, false)
 
-		inst.components.container_proxy:SetOnOpenFn(OnOpen_pine)
-		inst.components.container_proxy:SetOnCloseFn(OnClose_pine)
+	inst.components.container_proxy:SetOnOpenFn(OnOpen_pine)
+	inst.components.container_proxy:SetOnCloseFn(OnClose_pine)
 
-		inst.fn_planted = OnPlant_p2
+	inst.fn_planted = OnPlant_p2
 
-		inst.OnLoadPostPass = AttachContainer_pine
-		if not POPULATING then
-			AttachContainer_pine(inst)
-		end
+	inst.OnLoadPostPass = AttachContainer_pine
+	if not POPULATING then
+		AttachContainer_pine(inst)
+	end
 
-		return inst
-    end,
-    {
-		Asset("ANIM", "anim/crop_legion_pine.zip")
-    },
-    nil
-))
+	return inst
+end, { Asset("ANIM", "anim/crop_legion_pine.zip") }, nil))
 
 --------------------
 --------------------

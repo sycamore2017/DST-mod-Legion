@@ -118,9 +118,7 @@ local function Fn_lichen()
     inst.components.skinedlegion:InitWithFloater("hat_lichen")
 
     inst.entity:SetPristine()
-    if not TheWorld.ismastersim then
-        return inst
-    end
+    if not TheWorld.ismastersim then return inst end
 
     -- inst._light = nil
 
@@ -154,9 +152,7 @@ local function Fn_lichenlight() --苔衣发卡的光源实体
     inst.Light:SetColour(237/255, 237/255, 209/255) --颜色，和灯泡花一样
 
     inst.entity:SetPristine()
-    if not TheWorld.ismastersim then
-        return inst
-    end
+    if not TheWorld.ismastersim then return inst end
 
     inst.persists = false
 
@@ -313,9 +309,7 @@ local function Fn_cowboy()
     inst.components.skinedlegion:InitWithFloater("hat_cowboy")
 
     inst.entity:SetPristine()
-    if not TheWorld.ismastersim then
-        return inst
-    end
+    if not TheWorld.ismastersim then return inst end
 
     -- inst.mycowboy = nil
 
@@ -443,9 +437,7 @@ local function Fn_beetlehat()
     MakeInventoryFloatable(inst, "small", 0.2, 1.35)
 
     inst.entity:SetPristine()
-    if not TheWorld.ismastersim then
-        return inst
-    end
+    if not TheWorld.ismastersim then return inst end
 
     inst:AddComponent("tradable")
     inst:AddComponent("inspectable")
@@ -745,9 +737,7 @@ local function Fn_sivmask()
     inst.fn_l_namedetail = Fn_nameDetail_sivmask
 
     inst.entity:SetPristine()
-    if not TheWorld.ismastersim then
-        return inst
-    end
+    if not TheWorld.ismastersim then return inst end
 
     inst.healthcounter = 0
     -- inst.lifetarget = nil
@@ -1052,9 +1042,7 @@ local function Fn_sivmask2()
     inst.fn_l_namedetail = Fn_nameDetail_sivmask
 
     inst.entity:SetPristine()
-    if not TheWorld.ismastersim then
-        return inst
-    end
+    if not TheWorld.ismastersim then return inst end
 
     inst.healthcounter = 0
     -- inst.lifetarget = nil

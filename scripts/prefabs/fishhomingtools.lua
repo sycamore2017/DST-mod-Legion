@@ -69,9 +69,7 @@ local function Fn_normal()
     inst.components.skinedlegion:Init("fishhomingtool_normal")
 
     inst.entity:SetPristine()
-    if not TheWorld.ismastersim then
-        return inst
-    end
+    if not TheWorld.ismastersim then return inst end
 
     inst:AddComponent("stackable")
     inst.components.stackable.maxsize = TUNING.STACK_SIZE_MEDITEM
@@ -129,9 +127,7 @@ local function Fn_awesome()
     inst.components.skinedlegion:Init("fishhomingtool_awesome")
 
     inst.entity:SetPristine()
-    if not TheWorld.ismastersim then
-        return inst
-    end
+    if not TheWorld.ismastersim then return inst end
 
     inst:AddComponent("inspectable")
 
@@ -326,9 +322,7 @@ local function Fn_bag()
     end
 
     inst.entity:SetPristine()
-    if not TheWorld.ismastersim then
-        return inst
-    end
+    if not TheWorld.ismastersim then return inst end
 
     inst.baitimgs_l = {
 		dusty = {
@@ -419,9 +413,7 @@ local function Fn_baiting()
     inst.SoundEmitter:PlaySound("dontstarve/creatures/together/toad_stool/spore_cloud_LP", "spore_loop")
 
     inst.entity:SetPristine()
-    if not TheWorld.ismastersim then
-        return inst
-    end
+    if not TheWorld.ismastersim then return inst end
 
     inst.baitcolors_l = {
 		meat = { r = 138/255, g = 109/255, b = 94/255 },

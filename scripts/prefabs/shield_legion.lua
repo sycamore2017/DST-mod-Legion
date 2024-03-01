@@ -82,61 +82,54 @@ local function SetRechargeable(inst, time)
 end
 
 local function MakeShield(data)
-	table.insert(prefs, Prefab(
-		data.name,
-		function()
-            local inst = CreateEntity()
-            inst.entity:AddTransform()
-            inst.entity:AddAnimState()
-            inst.entity:AddNetwork()
+	table.insert(prefs, Prefab(data.name, function()
+        local inst = CreateEntity()
+        inst.entity:AddTransform()
+        inst.entity:AddAnimState()
+        inst.entity:AddNetwork()
 
-            MakeInventoryPhysics(inst)
+        MakeInventoryPhysics(inst)
 
-            inst.AnimState:SetBank(data.name)
-            inst.AnimState:SetBuild(data.name)
-            inst.AnimState:PlayAnimation("idle")
+        inst.AnimState:SetBank(data.name)
+        inst.AnimState:SetBuild(data.name)
+        inst.AnimState:PlayAnimation("idle")
 
-            inst:AddTag("allow_action_on_impassable")
-            inst:AddTag("shield_l")
+        inst:AddTag("allow_action_on_impassable")
+        inst:AddTag("shield_l")
 
-            --weapon (from weapon component) added to pristine state for optimization
-            inst:AddTag("weapon")
+        --weapon (from weapon component) added to pristine state for optimization
+        inst:AddTag("weapon")
 
-            if data.fn_common ~= nil then
-                data.fn_common(inst)
-            end
+        if data.fn_common ~= nil then
+            data.fn_common(inst)
+        end
 
-            inst.entity:SetPristine()
-            if not TheWorld.ismastersim then
-                return inst
-            end
+        inst.entity:SetPristine()
+        if not TheWorld.ismastersim then return inst end
 
-            inst:AddComponent("inspectable")
+        inst:AddComponent("inspectable")
 
-            inst:AddComponent("inventoryitem")
-            inst.components.inventoryitem.imagename = data.name
-            inst.components.inventoryitem.atlasname = "images/inventoryimages/"..data.name..".xml"
+        inst:AddComponent("inventoryitem")
+        inst.components.inventoryitem.imagename = data.name
+        inst.components.inventoryitem.atlasname = "images/inventoryimages/"..data.name..".xml"
 
-            inst:AddComponent("shieldlegion")
+        inst:AddComponent("shieldlegion")
 
-            inst:AddComponent("equippable")
-            inst.components.equippable.equipslot = EQUIPSLOTS.HANDS
+        inst:AddComponent("equippable")
+        inst.components.equippable.equipslot = EQUIPSLOTS.HANDS
 
-            inst:AddComponent("weapon")
+        inst:AddComponent("weapon")
 
-            inst:AddComponent("armor")
+        inst:AddComponent("armor")
 
-            MakeHauntableLaunch(inst)
+        MakeHauntableLaunch(inst)
 
-            if data.fn_server ~= nil then
-                data.fn_server(inst)
-            end
+        if data.fn_server ~= nil then
+            data.fn_server(inst)
+        end
 
-            return inst
-		end,
-		data.assets,
-		data.prefabs
-	))
+        return inst
+    end, data.assets, data.prefabs))
 end
 
 --------------------------------------------------------------------------
@@ -448,9 +441,7 @@ table.insert(prefs, Prefab("shieldterror_fire", function()
     inst:AddTag("HASHEATER")
 
     inst.entity:SetPristine()
-    if not TheWorld.ismastersim then
-        return inst
-    end
+    if not TheWorld.ismastersim then return inst end
 
     inst.persists = false
 
@@ -483,9 +474,7 @@ table.insert(prefs, Prefab("shieldterror_fire", function()
     end, 0)
 
     return inst
-end, {
-    Asset("ANIM", "anim/coldfire_fire.zip")
-}, nil))
+end, { Asset("ANIM", "anim/coldfire_fire.zip") }, nil))
 
 --------------------------------------------------------------------------
 --[[ 艾力冈的剑 ]]

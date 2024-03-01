@@ -45,10 +45,7 @@ local function fn_creep_item()
     MakeInventoryFloatable(inst, "med", 0.3, 0.65)
 
     inst.entity:SetPristine()
-
-    if not TheWorld.ismastersim then
-        return inst
-    end
+    if not TheWorld.ismastersim then return inst end
 
     inst:AddComponent("inspectable")
 
@@ -183,10 +180,7 @@ local function fn_creep()
     inst.AnimState:PlayAnimation("anim")
 
     inst.entity:SetPristine()
-
-    if not TheWorld.ismastersim then
-        return inst
-    end
+    if not TheWorld.ismastersim then return inst end
 
     inst.spiderdens = {}
     inst.lasttesttime = 0
@@ -428,9 +422,7 @@ local function Fn_contracts()
     inst.components.skinedlegion:Init("soul_contracts")
 
     inst.entity:SetPristine()
-    if not TheWorld.ismastersim then
-        return inst
-    end
+    if not TheWorld.ismastersim then return inst end
 
     inst._needheal = false
     inst._taskheal = nil
@@ -536,10 +528,7 @@ local function fn_elecrazor()
     MakeInventoryFloatable(inst, "small", 0.08, {0.9, 0.7, 0.9}, true, -2, {sym_build = "swap_razor"})
 
     inst.entity:SetPristine()
-
-    if not TheWorld.ismastersim then
-        return inst
-    end
+    if not TheWorld.ismastersim then return inst end
 
     inst:AddComponent("inspectable")
 

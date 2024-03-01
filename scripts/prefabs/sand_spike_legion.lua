@@ -255,9 +255,7 @@ local function MakeSpikeFn(shape, size)
         inst:AddTag("stone")
 
         inst.entity:SetPristine()
-        if not TheWorld.ismastersim then
-            return inst
-        end
+        if not TheWorld.ismastersim then return inst end
 
         inst:AddComponent("health")
         inst.components.health:SetMaxHealth(TUNING.SANDSPIKE.HEALTH[string.upper(inst.animname)])

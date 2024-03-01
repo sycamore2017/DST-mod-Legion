@@ -1904,9 +1904,7 @@ local function MakeSteak(data)
         end
 
         inst.entity:SetPristine()
-        if not TheWorld.ismastersim then
-            return inst
-        end
+        if not TheWorld.ismastersim then return inst end
 
         inst.food_symbol_build = basename
         inst.food_basename = data.spicename ~= nil and basename or nil

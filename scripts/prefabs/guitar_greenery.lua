@@ -200,10 +200,7 @@ local function fn_guitar()
     inst.AnimState:PlayAnimation("idle")
 
     inst.entity:SetPristine()
-
-    if not TheWorld.ismastersim then
-        return inst
-    end
+    if not TheWorld.ismastersim then return inst end
 
     inst:AddComponent("inspectable")
 
@@ -303,12 +300,9 @@ local function MakeGreeneryFx(name, build)
         end
 
         inst:AddTag("FX")
-        
-        inst.entity:SetPristine()
 
-        if not TheWorld.ismastersim then
-            return inst
-        end
+        inst.entity:SetPristine()
+        if not TheWorld.ismastersim then return inst end
 
         inst.persists = false
         inst:DoTaskInTime(1, inst.Remove)

@@ -588,32 +588,6 @@ table.insert(prefs, Prefab("tourmalinecore", function() ------电气石
     return inst
 end, GetAssets("tourmalinecore"), nil))
 
-table.insert(prefs, Prefab("tourmalineshard", function() ------带电的晶石
-    local inst = CreateEntity()
-    Fn_common(inst, "tourmalinecore", nil, "idle_shard", nil)
-
-    inst:AddTag("battery_l")
-    inst:AddTag("molebait")
-
-    inst.pickupsound = "metal"
-
-    inst.entity:SetPristine()
-    if not TheWorld.ismastersim then return inst end
-
-    Fn_server(inst, "tourmalineshard")
-    inst.components.inventoryitem:SetSinks(true) --它是石头，应该要沉入水底
-
-    SetStackable(inst, TUNING.STACK_SIZE_MEDITEM)
-    SetTradable(inst, 4, 12)
-    SetEdible(inst, { hunger = 5, sanity = 0, health = 0, foodtype = FOODTYPE.ELEMENTAL })
-    inst:AddComponent("bait")
-    inst:AddComponent("batterylegion")
-    inst:AddComponent("z_repairerlegion")
-    MakeHauntableLaunch(inst)
-
-    return inst
-end, GetAssets2("tourmalineshard", "tourmalinecore"), nil))
-
 ------
 
 local dd_smear_sivbloodreduce = { build = "ointment_l_sivbloodreduce" }
@@ -801,6 +775,57 @@ table.insert(prefs, Prefab("merm_scales", function() ------鱼鳞
     return inst
 end, GetAssets("merm_scales"), nil))
 
+table.insert(prefs, Prefab("tourmalineshard", function() ------带电的晶石
+    local inst = CreateEntity()
+    Fn_common(inst, "tourmalinecore", nil, "idle_shard", nil)
+
+    inst:AddTag("battery_l")
+    inst:AddTag("molebait")
+
+    inst.pickupsound = "metal"
+
+    inst.entity:SetPristine()
+    if not TheWorld.ismastersim then return inst end
+
+    Fn_server(inst, "tourmalineshard")
+    inst.components.inventoryitem:SetSinks(true) --它是石头，应该要沉入水底
+
+    SetStackable(inst, TUNING.STACK_SIZE_MEDITEM)
+    SetTradable(inst, 4, 12)
+    SetEdible(inst, { hunger = 5, sanity = 0, health = 0, foodtype = FOODTYPE.ELEMENTAL })
+    inst:AddComponent("bait")
+    inst:AddComponent("batterylegion")
+    inst:AddComponent("z_repairerlegion")
+    MakeHauntableLaunch(inst)
+
+    return inst
+end, GetAssets2("tourmalineshard", "tourmalinecore"), nil))
+
+if not CONFIGS_LEGION.ENABLEDMODS.MythWords then ------子圭石。未开启神话书说时才注册这个prefab
+    table.insert(prefs, Prefab("siving_rocks", function()
+        local inst = CreateEntity()
+        Fn_common(inst, "myth_siving", nil, "siving_rocks", nil)
+
+        inst:AddTag("molebait")
+        inst:AddTag("quakedebris") --部分装备和生物能防御它的伤害
+        inst.pickupsound = "rock"
+
+        inst.entity:SetPristine()
+        if not TheWorld.ismastersim then return inst end
+
+        Fn_server(inst, "siving_rocks")
+        inst.components.inventoryitem:SetSinks(true)
+
+        SetStackable(inst, nil)
+        SetTradable(inst, 4, 6)
+        SetEdible(inst, { hunger = 5, sanity = 0, health = 0, foodtype = FOODTYPE.ELEMENTAL })
+        inst:AddComponent("bait")
+        MakeHauntableLaunch(inst)
+
+        return inst
+    end, GetAssets2("siving_rocks", "myth_siving"), nil))
+end
+
 --------------------------------------------------------------------------
 --[[ 活性组织 ]]
 --------------------------------------------------------------------------
@@ -861,7 +886,7 @@ end, GetAssets2("cattenball", "toy_legion"), nil))
 ------玩具小海绵与玩具小海星：toy_spongebob，toy_patrickstar。隐藏废稿，不会做了
 
 --------------------------------------------------------------------------
---[[ 可种植物 ]]
+--[[ 可种植的物品 ]]
 --------------------------------------------------------------------------
 
 local function OnDeploy_base(inst, pt, deployer, rot, dd)
@@ -1166,8 +1191,60 @@ end, GetAssets2("dug_monstrain", "monstrain"), nil))
 --异种
 ----------
 
+local assets_xeed = GetAssets2("seeds_crop_l2", "seeds_crop_l")
 local function MakeXeed(k, dd)
-    
+    local cropprefab = "plant_"..k.."_l"
+    local function DisplayName_xeed(inst)
+        return STRINGS.NAMES[string.upper(cropprefab)]..STRINGS.PLANT_CROP_L["SEEDS"]
+    end
+    local function OnDeploy_xeed(inst, pt, deployer, rot)
+        OnDeploy_base(inst, pt, deployer, rot, {
+            prefab = cropprefab, skined = true, sound = "dontstarve/wilson/plant_seeds"
+        })
+    end
+    table.insert(prefs, Prefab("seeds_"..k.."_l", function()
+        local inst = CreateEntity()
+        Fn_common(inst, "seeds_crop_l", nil, "idle", nil)
+        SetFloatable(inst, { nil, "small", 0.2, 1.2 })
+
+        inst:AddTag("deployedplant")
+        inst:AddTag("treeseed")
+        inst.pickupsound = "vegetation_firm"
+        -- inst.overridedeployplacername = seedsprefab.."_placer" --这个可以让placer换成另一个
+        inst.displaynamefn = DisplayName_xeed
+
+        if dd.image ~= nil then
+            inst.inv_image_bg = { image = dd.image.name, atlas = dd.image.atlas }
+        else
+            inst.inv_image_bg = {}
+        end
+        if inst.inv_image_bg.image == nil then
+            inst.inv_image_bg.image = k..".tex"
+        end
+        if inst.inv_image_bg.atlas == nil then
+            inst.inv_image_bg.atlas = GetInventoryItemAtlas(inst.inv_image_bg.image)
+        end
+
+        inst.entity:SetPristine()
+        if not TheWorld.ismastersim then return inst end
+
+        inst.sivbird_l_food = 0.5 --能给予玄鸟换取子圭石
+
+        Fn_server(inst, "seeds_crop_l2")
+        inst.components.inspectable.nameoverride = "SEEDS_CROP_L"
+
+        SetStackable(inst, nil)
+        SetFuel(inst, TUNING.SMALL_FUEL)
+        SetDeployable(inst, OnDeploy_xeed, DEPLOYMODE.PLANT, DEPLOYSPACING.MEDIUM)
+
+        inst:AddComponent("plantablelegion")
+        inst.components.plantablelegion.plant = cropprefab
+        inst.components.plantablelegion.plant2 = dd.plant2 --同一个异种种子可能能升级第二种对象
+
+        InitItem(inst, TUNING.SMALL_BURNTIME)
+
+        return inst
+    end, assets_xeed, nil))
 end
 
 for k, v in pairs(CROPS_DATA_LEGION) do

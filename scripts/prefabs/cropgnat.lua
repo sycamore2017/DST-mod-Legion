@@ -79,9 +79,7 @@ local function MakeGnat(name, isinfester)
         end
 
         inst.entity:SetPristine()
-        if not TheWorld.ismastersim then
-            return inst
-        end
+        if not TheWorld.ismastersim then return inst end
 
         inst:AddComponent("locomotor") --速度组件一定要写在sg声明之前
         inst.components.locomotor:EnableGroundSpeedMultiplier(false)
@@ -221,7 +219,6 @@ local function MakeGnat(name, isinfester)
 
         return inst
     end
-
     return Prefab(name, Fn, assets, prefabs)
 end
 

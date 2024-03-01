@@ -62,10 +62,7 @@ local function MakeClothes(namepst, slot, fn_equip, fn_unequip)
         end
 
         inst.entity:SetPristine()
-
-        if not TheWorld.ismastersim then
-            return inst
-        end
+        if not TheWorld.ismastersim then return inst end
 
         inst:AddComponent("inventoryitem")
         inst.components.inventoryitem.imagename = name

@@ -177,9 +177,7 @@ local function MakeBuff(data)
                 end
 
                 inst.entity:SetPristine()
-                if not TheWorld.ismastersim then
-                    return inst
-                end
+                if not TheWorld.ismastersim then return inst end
             else --无网络组件
                 if not TheWorld.ismastersim then
                     --Not meant for client!

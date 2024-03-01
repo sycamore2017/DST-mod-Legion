@@ -85,9 +85,7 @@ local function fn_lightning()
     end
 
     inst.entity:SetPristine()
-    if not TheWorld.ismastersim then
-        return inst
-    end
+    if not TheWorld.ismastersim then return inst end
 
 	inst:DoTaskInTime(0, StartLightningFX) -- so we can use the position to affect the screen flash
 
@@ -135,9 +133,7 @@ local function fn_static()
     inst:AddTag("NOCLICK")
 
     inst.entity:SetPristine()
-    if not TheWorld.ismastersim then
-      return inst
-    end
+    if not TheWorld.ismastersim then return inst end
 
     inst.DoRemove = OnStaticRemove
 

@@ -231,10 +231,7 @@ local function fn()
     MakeInventoryFloatable(inst, "med", 0.3, 0.8)
 
     inst.entity:SetPristine()
-
-    if not TheWorld.ismastersim then
-        return inst
-    end
+    if not TheWorld.ismastersim then return inst end
 
     inst:AddComponent("inspectable")
 
@@ -308,10 +305,7 @@ local function fn_ground()
     inst:AddTag("NOCLICK")
 
     inst.entity:SetPristine()
-
-    if not TheWorld.ismastersim then
-      return inst
-    end
+    if not TheWorld.ismastersim then return inst end
 
     inst.dirtfx = {}
     inst:DoTaskInTime(1, function()
@@ -357,10 +351,7 @@ local function fn_dirt()
     inst:AddTag("NOCLICK")
 
     inst.entity:SetPristine()
-
-    if not TheWorld.ismastersim then
-      return inst
-    end
+    if not TheWorld.ismastersim then return inst end
 
     inst.persists = false
 

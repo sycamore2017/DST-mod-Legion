@@ -36,9 +36,7 @@ local function MakeItem(sets)
         end
 
         inst.entity:SetPristine()
-        if not TheWorld.ismastersim then
-            return inst
-        end
+        if not TheWorld.ismastersim then return inst end
 
         inst:AddComponent("inspectable")
 
@@ -1365,9 +1363,7 @@ table.insert(prefs, Prefab("refractedmoonlight", function()
     inst.components.skinedlegion:Init("refractedmoonlight")
 
     inst.entity:SetPristine()
-    if not TheWorld.ismastersim then
-        return inst
-    end
+    if not TheWorld.ismastersim then return inst end
 
     inst._dd = {
         img_tex = "refractedmoonlight", img_atlas = "images/inventoryimages/refractedmoonlight.xml",
