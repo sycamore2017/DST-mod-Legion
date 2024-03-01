@@ -334,403 +334,398 @@ local function IsTreeHaloCrusher(attacker, weapon)
 end
 
 local function MakeBoss(data)
-    table.insert(prefs, Prefab(
-        data.name,
-        function()
-            local inst = CreateEntity()
+    table.insert(prefs, Prefab(data.name, function()
+        local inst = CreateEntity()
 
-            inst.entity:AddTransform()
-            inst.entity:AddAnimState()
-            inst.entity:AddSoundEmitter()
-            inst.entity:AddDynamicShadow()
-            inst.entity:AddLight()
-            inst.entity:AddNetwork()
+        inst.entity:AddTransform()
+        inst.entity:AddAnimState()
+        inst.entity:AddSoundEmitter()
+        inst.entity:AddDynamicShadow()
+        inst.entity:AddLight()
+        inst.entity:AddNetwork()
 
-            inst.DynamicShadow:SetSize(2.5, 1.5)
-            inst.Transform:SetScale(2.1, 2.1, 2.1)
-            inst.Transform:SetFourFaced()
+        inst.DynamicShadow:SetSize(2.5, 1.5)
+        inst.Transform:SetScale(2.1, 2.1, 2.1)
+        inst.Transform:SetFourFaced()
 
-            MakeGhostPhysics(inst, 1500, 1.2) --鬼魂类物理，主要是为了不对子圭羽毛产生碰撞
+        MakeGhostPhysics(inst, 1500, 1.2) --鬼魂类物理，主要是为了不对子圭羽毛产生碰撞
 
-            inst:AddTag("epic")
-            -- inst:AddTag("noepicmusic")
-            inst:AddTag("scarytoprey")
-            inst:AddTag("hostile")
-            inst:AddTag("largecreature")
-            inst:AddTag("siving")
-            inst:AddTag("siving_boss")
-            -- inst:AddTag("flying")
-            inst:AddTag("ignorewalkableplatformdrowning")
+        inst:AddTag("epic")
+        -- inst:AddTag("noepicmusic")
+        inst:AddTag("scarytoprey")
+        inst:AddTag("hostile")
+        inst:AddTag("largecreature")
+        inst:AddTag("siving")
+        inst:AddTag("siving_boss")
+        -- inst:AddTag("flying")
+        inst:AddTag("ignorewalkableplatformdrowning")
 
-            --trader (from trader component) added to pristine state for optimization
-            inst:AddTag("trader")
+        --trader (from trader component) added to pristine state for optimization
+        inst:AddTag("trader")
 
-            inst.Light:Enable(true)
-            inst.Light:SetRadius(2)
-            inst.Light:SetFalloff(1)
-            inst.Light:SetIntensity(.5)
-            inst.Light:SetColour(15/255, 180/255, 132/255)
-            inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
+        inst.Light:Enable(true)
+        inst.Light:SetRadius(2)
+        inst.Light:SetFalloff(1)
+        inst.Light:SetIntensity(.5)
+        inst.Light:SetColour(15/255, 180/255, 132/255)
+        inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
 
-            inst.AnimState:SetBank("buzzard")
-            inst.AnimState:SetBuild(data.name)
-            inst.AnimState:PlayAnimation("idle", true)
+        inst.AnimState:SetBank("buzzard")
+        inst.AnimState:SetBuild(data.name)
+        inst.AnimState:PlayAnimation("idle", true)
 
-            inst:SetPrefabNameOverride("siving_phoenix")
+        inst:SetPrefabNameOverride("siving_phoenix")
 
-            -- if data.fn_common ~= nil then
-            --     data.fn_common(inst)
-            -- end
+        -- if data.fn_common ~= nil then
+        --     data.fn_common(inst)
+        -- end
 
-            inst.entity:SetPristine()
-            if not TheWorld.ismastersim then return inst end
+        inst.entity:SetPristine()
+        if not TheWorld.ismastersim then return inst end
 
-            inst._count_atk = 0 --啄击次数
-            inst._count_rock = 0 --喂食后需要掉落的子圭石数量
-            TOOLS_L.AddEntValue(inst, "siv_blood_l_reducer", data.name, 1, 0.75) --窃血抵抗
+        inst._count_atk = 0 --啄击次数
+        inst._count_rock = 0 --喂食后需要掉落的子圭石数量
+        TOOLS_L.AddEntValue(inst, "siv_blood_l_reducer", data.name, 1, 0.75) --窃血抵抗
 
-            inst.sounds = BossSounds
-            inst.sign_l_treehalo = 0
-            inst.count_toolatk = 0 --被镐子类工具攻击次数
+        inst.sounds = BossSounds
+        inst.sign_l_treehalo = 0
+        inst.count_toolatk = 0 --被镐子类工具攻击次数
+        inst.tree = nil
+        inst.mate = nil --另一个伴侣
+        inst.isgrief = false --是否处于悲愤状态
+        inst.iseye = false --是否是木之眼状态
+        inst.eyefx = nil --木之眼实体
+        inst.fn_onGrief = function(inst, tree, dotaunt)
+            inst.isgrief = true
+            inst.AnimState:OverrideSymbol("buzzard_eye", data.name, "buzzard_angryeye")
+            inst.Light:SetColour(255/255, 127/255, 82/255)
+            inst.components.combat:SetDefaultDamage(ATK_NORMAL+ATK_GRIEF)
+            TOOLS_L.AddEntValue(inst, "siv_blood_l_reducer", data.name, 1, 1)
+            if tree and tree.rebirthed then --对于重生的玄鸟需要改一下掉落物
+                inst.components.lootdropper:SetChanceLootTable(data.name.."_rebirth")
+            end
+            if dotaunt then
+                inst:PushEvent("dotaunt")
+            end
+        end
+        inst.fn_leave = function(inst)
             inst.tree = nil
-            inst.mate = nil --另一个伴侣
-            inst.isgrief = false --是否处于悲愤状态
-            inst.iseye = false --是否是木之眼状态
-            inst.eyefx = nil --木之眼实体
-            inst.fn_onGrief = function(inst, tree, dotaunt)
-                inst.isgrief = true
-                inst.AnimState:OverrideSymbol("buzzard_eye", data.name, "buzzard_angryeye")
-                inst.Light:SetColour(255/255, 127/255, 82/255)
-                inst.components.combat:SetDefaultDamage(ATK_NORMAL+ATK_GRIEF)
-                TOOLS_L.AddEntValue(inst, "siv_blood_l_reducer", data.name, 1, 1)
-                if tree and tree.rebirthed then --对于重生的玄鸟需要改一下掉落物
-                    inst.components.lootdropper:SetChanceLootTable(data.name.."_rebirth")
-                end
-                if dotaunt then
-                    inst:PushEvent("dotaunt")
-                end
+            inst.mate = nil
+            if inst.eyefx ~= nil and inst.eyefx:IsValid() then
+                inst.eyefx:Remove()
             end
-            inst.fn_leave = function(inst)
-                inst.tree = nil
-                inst.mate = nil
-                if inst.eyefx ~= nil and inst.eyefx:IsValid() then
-                    inst.eyefx:Remove()
-                end
-                if inst:IsAsleep() or inst.iseye then
-                    inst:Remove()
-                else
-                    inst:PushEvent("dotakeoff")
-                end
+            if inst:IsAsleep() or inst.iseye then
+                inst:Remove()
+            else
+                inst:PushEvent("dotakeoff")
             end
-            inst.fn_canBeEye = function(inst)
-                if
-                    inst.tree ~= nil and inst.tree:IsValid()
-                then
-                    if inst.tree.myEye == nil then
-                        return true
-                    end
-                    if inst.tree.myEye == inst then --因为提前占用了，所以是自己很正常
-                        return true
-                    end
-                    if not IsValid(inst.tree.myEye) then
+        end
+        inst.fn_canBeEye = function(inst)
+            if
+                inst.tree ~= nil and inst.tree:IsValid()
+            then
+                if inst.tree.myEye == nil then
+                    return true
+                end
+                if inst.tree.myEye == inst then --因为提前占用了，所以是自己很正常
+                    return true
+                end
+                if not IsValid(inst.tree.myEye) then
+                    inst.tree.myEye = nil
+                    return true
+                end
+                if not inst.tree.myEye.iseye then --木眼对象没有木眼标志(猜测可能正在进入木眼状态)
+                    if not inst.tree.myEye.sg:HasStateTag("flyaway") then --然而并没有在进入木眼状态
                         inst.tree.myEye = nil
                         return true
                     end
-                    if not inst.tree.myEye.iseye then --木眼对象没有木眼标志(猜测可能正在进入木眼状态)
-                        if not inst.tree.myEye.sg:HasStateTag("flyaway") then --然而并没有在进入木眼状态
+                end
+            end
+            return false
+        end
+        inst.fn_onFly = function(inst, params)
+            if params ~= nil then
+                if params.x and params.z then
+                    inst.Transform:SetPosition(params.x, params.y or 30, params.z)
+                    inst.sg:GoToState("glide")
+                    return
+                elseif params.beeye then --同目同心
+                    if not inst:fn_beTreeEye() then
+                        if inst.tree then
                             inst.tree.myEye = nil
-                            return true
                         end
-                    end
-                end
-                return false
-            end
-            inst.fn_onFly = function(inst, params)
-                if params ~= nil then
-                    if params.x and params.z then
-                        inst.Transform:SetPosition(params.x, params.y or 30, params.z)
+                        local x, y, z = inst.Transform:GetWorldPosition()
+                        inst.Transform:SetPosition(x, 30, z)
                         inst.sg:GoToState("glide")
-                        return
-                    elseif params.beeye then --同目同心
-                        if not inst:fn_beTreeEye() then
-                            if inst.tree then
-                                inst.tree.myEye = nil
-                            end
-                            local x, y, z = inst.Transform:GetWorldPosition()
-                            inst.Transform:SetPosition(x, 30, z)
-                            inst.sg:GoToState("glide")
-                        end
-                        return
                     end
+                    return
                 end
-                inst:Remove() --飞上天就消失啦
             end
+            inst:Remove() --飞上天就消失啦
+        end
 
-            inst.COUNT_FLAP = COUNT_FLAP
-            inst.COUNT_FLAP_GRIEF = COUNT_FLAP_GRIEF
-            inst.DIST_FLAP = DIST_FLAP
-            inst.DIST_REMOTE = DIST_REMOTE
-            inst.DIST_MATE = DIST_MATE
-            inst.DIST_ATK = DIST_ATK
-            inst.DIST_SPAWN = DIST_SPAWN
-            inst.TIME_FLAP = TIME_FLAP
+        inst.COUNT_FLAP = COUNT_FLAP
+        inst.COUNT_FLAP_GRIEF = COUNT_FLAP_GRIEF
+        inst.DIST_FLAP = DIST_FLAP
+        inst.DIST_REMOTE = DIST_REMOTE
+        inst.DIST_MATE = DIST_MATE
+        inst.DIST_ATK = DIST_ATK
+        inst.DIST_SPAWN = DIST_SPAWN
+        inst.TIME_FLAP = TIME_FLAP
 
-            inst.fn_magicWarble = MagicWarble
-            inst.fn_discerningPeck = DiscerningPeck
-            inst.fn_releaseFlowers = ReleaseFlowers
-            inst.fn_beTreeEye = BeTreeEye
-            inst.fn_feathersFlap = FeathersFlap
+        inst.fn_magicWarble = MagicWarble
+        inst.fn_discerningPeck = DiscerningPeck
+        inst.fn_releaseFlowers = ReleaseFlowers
+        inst.fn_beTreeEye = BeTreeEye
+        inst.fn_feathersFlap = FeathersFlap
 
-            inst:AddComponent("locomotor") --locomotor must be constructed before the stategraph
-            inst.components.locomotor.walkspeed = 4
-            inst.components.locomotor.runspeed = 5
-            inst.components.locomotor:EnableGroundSpeedMultiplier(true)
-            inst.components.locomotor:SetTriggersCreep(true)
-            inst.components.locomotor.pathcaps = { ignorewalls = true, allowocean = true }
+        inst:AddComponent("locomotor") --locomotor must be constructed before the stategraph
+        inst.components.locomotor.walkspeed = 4
+        inst.components.locomotor.runspeed = 5
+        inst.components.locomotor:EnableGroundSpeedMultiplier(true)
+        inst.components.locomotor:SetTriggersCreep(true)
+        inst.components.locomotor.pathcaps = { ignorewalls = true, allowocean = true }
 
-            inst:AddComponent("health")
-            inst.components.health:SetMaxHealth(9000)
-            inst.components.health.destroytime = 3
+        inst:AddComponent("health")
+        inst.components.health:SetMaxHealth(9000)
+        inst.components.health.destroytime = 3
 
-            inst:AddComponent("combat")
-            inst.components.combat:SetDefaultDamage(ATK_NORMAL)
-            -- inst.components.combat.playerdamagepercent = 0.5
-            inst.components.combat.hiteffectsymbol = "buzzard_body"
-            inst.components.combat.battlecryenabled = false
-            inst.components.combat:SetRange(DIST_ATK)
-            inst.components.combat:SetAttackPeriod(3)
-            inst.components.combat:SetRetargetFunction(1.5, function(inst)
-                CheckMate(inst)
-                return FindEntity(inst.tree or inst, DIST_SPAWN,
-                        inst.mate == nil and function(guy) --对自己有仇恨就行
-                            return (inst.isgrief or guy.components.combat.target == inst)
-                                and inst.components.combat:CanTarget(guy)
-                        end or function(guy) --对自己有仇恨并且不能和伴侣的目标相同
-                            return (inst.isgrief or guy.components.combat.target == inst)
-                                and inst.components.combat:CanTarget(guy)
-                                and inst.mate.components.combat.target ~= guy
-                        end,
-                        { "_combat" },
-                        TAGS_CANT_BOSSFEA
-                    )
-            end)
-            inst.components.combat:SetKeepTargetFunction(function(inst, target)
-                CheckMate(inst)
-                if inst.components.combat:CanTarget(target) then
-                    if inst.mate == nil then --只需要不跑出神木范围就行
-                        return target:GetDistanceSqToPoint(
+        inst:AddComponent("combat")
+        inst.components.combat:SetDefaultDamage(ATK_NORMAL)
+        -- inst.components.combat.playerdamagepercent = 0.5
+        inst.components.combat.hiteffectsymbol = "buzzard_body"
+        inst.components.combat.battlecryenabled = false
+        inst.components.combat:SetRange(DIST_ATK)
+        inst.components.combat:SetAttackPeriod(3)
+        inst.components.combat:SetRetargetFunction(1.5, function(inst)
+            CheckMate(inst)
+            return FindEntity(inst.tree or inst, DIST_SPAWN,
+                    inst.mate == nil and function(guy) --对自己有仇恨就行
+                        return (inst.isgrief or guy.components.combat.target == inst)
+                            and inst.components.combat:CanTarget(guy)
+                    end or function(guy) --对自己有仇恨并且不能和伴侣的目标相同
+                        return (inst.isgrief or guy.components.combat.target == inst)
+                            and inst.components.combat:CanTarget(guy)
+                            and inst.mate.components.combat.target ~= guy
+                    end,
+                    { "_combat" },
+                    TAGS_CANT_BOSSFEA
+                )
+        end)
+        inst.components.combat:SetKeepTargetFunction(function(inst, target)
+            CheckMate(inst)
+            if inst.components.combat:CanTarget(target) then
+                if inst.mate == nil then --只需要不跑出神木范围就行
+                    return target:GetDistanceSqToPoint(
+                            inst.components.knownlocations:GetLocation("tree") or
+                            inst.components.knownlocations:GetLocation("spawnpoint")
+                        ) < DIST_SPAWN^2
+                else --不跑得离伴侣以及神木范围太远就行
+                    return (
+                            target:GetDistanceSqToPoint(
                                 inst.components.knownlocations:GetLocation("tree") or
                                 inst.components.knownlocations:GetLocation("spawnpoint")
                             ) < DIST_SPAWN^2
-                    else --不跑得离伴侣以及神木范围太远就行
-                        return (
-                                target:GetDistanceSqToPoint(
-                                    inst.components.knownlocations:GetLocation("tree") or
-                                    inst.components.knownlocations:GetLocation("spawnpoint")
-                                ) < DIST_SPAWN^2
-                            ) and (
-                                inst.mate.iseye or
-                                inst:GetDistanceSqToPoint(inst.mate:GetPosition()) < (DIST_MATE+DIST_ATK)^2
-                            )
-                    end
+                        ) and (
+                            inst.mate.iseye or
+                            inst:GetDistanceSqToPoint(inst.mate:GetPosition()) < (DIST_MATE+DIST_ATK)^2
+                        )
                 end
-            end)
-            inst.components.combat:SetHurtSound(BossSounds.hurt) --undo
-
-            --攻击时针对于被攻击对象的额外伤害值
-            inst.components.combat.bonusdamagefn = function(inst, target, damage, weapon)
-                if not target:HasTag("player") then
-                    return inst.components.combat.defaultdamage*2 --加上已有的伤害，就是3倍伤害啦
-                end
-                return 0
             end
+        end)
+        inst.components.combat:SetHurtSound(BossSounds.hurt) --undo
 
-            inst:AddComponent("trader")
-            inst.components.trader.acceptnontradable = true
-            inst.components.trader:SetAcceptTest(function(inst, item, giver)
-                if inst.components.combat.target ~= nil or inst.sg:HasStateTag("busy") then
-                    return false
-                end
-                local loveditems = {
-                    myth_lotus_flower = 1,
-                    aip_veggie_sunflower = 1,
-                    cutted_rosebush = 1,
-                    cutted_lilybush = 1,
-                    cutted_orchidbush = 1
-                }
-                if loveditems[item.prefab] ~= nil or item.sivbird_l_food ~= nil then
-                    --由于一次只给一个太慢了，这里手动从玩家身上全部拿下来
-                    local num = item.components.stackable ~= nil and item.components.stackable.stacksize or 1
-                    if num > 1 then
-                        --拿走只剩1个，以供剩下的逻辑调用
-                        local itemlast = item.components.stackable:Get(num - 1)
-                        itemlast:Remove()
-                    end
-                    inst._count_rock = inst._count_rock + num*(loveditems[item.prefab] or item.sivbird_l_food)
-                    return true
-                else
-                    return false
-                end
-            end)
-            inst.components.trader.onaccept = function(inst, giver, item)
-                inst:PushEvent("dofeeded")
+        --攻击时针对于被攻击对象的额外伤害值
+        inst.components.combat.bonusdamagefn = function(inst, target, damage, weapon)
+            if not target:HasTag("player") then
+                return inst.components.combat.defaultdamage*2 --加上已有的伤害，就是3倍伤害啦
             end
-            inst.components.trader.onrefuse = function(inst, giver, item)
-                inst:PushEvent("dorefuse")
-            end
+            return 0
+        end
 
-            inst:AddComponent("debuffable")
-            inst.components.debuffable:SetFollowSymbol("buzzard_body", 0, -200, 0)
-
-            inst:AddComponent("inspectable")
-            inst.components.inspectable.getstatus = function(inst)
-                return inst.isgrief and "GRIEF" or "GENERIC"
-            end
-
-            inst:AddComponent("explosiveresist")
-
-            inst:AddComponent("sleeper")
-            inst.components.sleeper:SetResistance(4)
-            inst.components.sleeper:SetSleepTest(function(inst)
+        inst:AddComponent("trader")
+        inst.components.trader.acceptnontradable = true
+        inst.components.trader:SetAcceptTest(function(inst, item, giver)
+            if inst.components.combat.target ~= nil or inst.sg:HasStateTag("busy") then
                 return false
-            end)
-            inst.components.sleeper:SetWakeTest(function(inst)
+            end
+            local loveditems = {
+                myth_lotus_flower = 1,
+                aip_veggie_sunflower = 1,
+                cutted_rosebush = 1,
+                cutted_lilybush = 1,
+                cutted_orchidbush = 1
+            }
+            if loveditems[item.prefab] ~= nil or item.sivbird_l_food ~= nil then
+                --由于一次只给一个太慢了，这里手动从玩家身上全部拿下来
+                local num = item.components.stackable ~= nil and item.components.stackable.stacksize or 1
+                if num > 1 then
+                    --拿走只剩1个，以供剩下的逻辑调用
+                    local itemlast = item.components.stackable:Get(num - 1)
+                    itemlast:Remove()
+                end
+                inst._count_rock = inst._count_rock + num*(loveditems[item.prefab] or item.sivbird_l_food)
                 return true
-            end)
+            else
+                return false
+            end
+        end)
+        inst.components.trader.onaccept = function(inst, giver, item)
+            inst:PushEvent("dofeeded")
+        end
+        inst.components.trader.onrefuse = function(inst, giver, item)
+            inst:PushEvent("dorefuse")
+        end
 
-            inst:AddComponent("knownlocations")
+        inst:AddComponent("debuffable")
+        inst.components.debuffable:SetFollowSymbol("buzzard_body", 0, -200, 0)
 
-            inst:AddComponent("timer")
-            inst.components.timer:StartTimer("flap", TIME_FLAP)
-            inst.components.timer:StartTimer("taunt", TIME_TAUNT)
-            inst.components.timer:StartTimer("caw", TIME_CAW)
+        inst:AddComponent("inspectable")
+        inst.components.inspectable.getstatus = function(inst)
+            return inst.isgrief and "GRIEF" or "GENERIC"
+        end
 
-            inst:AddComponent("lootdropper")
+        inst:AddComponent("explosiveresist")
 
-            MakeMediumFreezableCharacter(inst, "buzzard_body")
+        inst:AddComponent("sleeper")
+        inst.components.sleeper:SetResistance(4)
+        inst.components.sleeper:SetSleepTest(function(inst)
+            return false
+        end)
+        inst.components.sleeper:SetWakeTest(function(inst)
+            return true
+        end)
 
-            inst:AddComponent("hauntable")
+        inst:AddComponent("knownlocations")
 
-            inst:SetStateGraph("SGsiving_phoenix") --这个应该是指文件的名字，而不是数据的名字
-            inst:SetBrain(birdbrain)
+        inst:AddComponent("timer")
+        inst.components.timer:StartTimer("flap", TIME_FLAP)
+        inst.components.timer:StartTimer("taunt", TIME_TAUNT)
+        inst.components.timer:StartTimer("caw", TIME_CAW)
 
-            inst:ListenForEvent("attacked", function(inst, data)
-                if data.attacker and IsValid(data.attacker) then
-                    if ATK_HUTR > 0 and data.damage and data.attacker.components.combat ~= nil then
-                        --将单次伤害超过伤害上限的部分反弹给攻击者
-                        if data.damage > ATK_HUTR then
-                            --为了不受到盾反伤害，不设定玄鸟为攻击者
-                            data.attacker.components.combat:GetAttacked(nil, data.damage-ATK_HUTR)
-                            --反击特效 undo
-                            if not IsValid(data.attacker) then --攻击者死亡，就结束
-                                return
-                            end
-                        end
+        inst:AddComponent("lootdropper")
 
-                        --受到远程攻击，神木会帮忙做出惩罚
-                        if --远程武器分为两类，一类是有projectile组件、一类是weapon组件中有projectile属性
-                            data.attacker:HasTag("structure") or --针对建筑型攻击者
-                            (data.weapon ~= nil and (
-                                data.weapon.components.projectile ~= nil or
-                                data.weapon.components.projectilelegion ~= nil or
-                                data.weapon:HasTag("rangedweapon") or
-                                (data.weapon.components.weapon ~= nil and data.weapon.components.weapon.projectile ~= nil)
-                            ))
-                        then
-                            local x, y, z = data.attacker.Transform:GetWorldPosition()
-                            SpawnRoot(inst, x, z)
+        MakeMediumFreezableCharacter(inst, "buzzard_body")
+
+        inst:AddComponent("hauntable")
+
+        inst:SetStateGraph("SGsiving_phoenix") --这个应该是指文件的名字，而不是数据的名字
+        inst:SetBrain(birdbrain)
+
+        inst:ListenForEvent("attacked", function(inst, data)
+            if data.attacker and IsValid(data.attacker) then
+                if ATK_HUTR > 0 and data.damage and data.attacker.components.combat ~= nil then
+                    --将单次伤害超过伤害上限的部分反弹给攻击者
+                    if data.damage > ATK_HUTR then
+                        --为了不受到盾反伤害，不设定玄鸟为攻击者
+                        data.attacker.components.combat:GetAttacked(nil, data.damage-ATK_HUTR)
+                        --反击特效 undo
+                        if not IsValid(data.attacker) then --攻击者死亡，就结束
+                            return
                         end
                     end
 
-                    CheckMate(inst)
-                    if inst.components.health:IsDead() then
-                        if inst.mate ~= nil then --自己被打死，伴侣仇恨攻击者
-                            inst.mate.components.combat:SetTarget(data.attacker)
-                        end
-                        return
+                    --受到远程攻击，神木会帮忙做出惩罚
+                    if --远程武器分为两类，一类是有projectile组件、一类是weapon组件中有projectile属性
+                        data.attacker:HasTag("structure") or --针对建筑型攻击者
+                        (data.weapon ~= nil and (
+                            data.weapon.components.projectile ~= nil or
+                            data.weapon.components.projectilelegion ~= nil or
+                            data.weapon:HasTag("rangedweapon") or
+                            (data.weapon.components.weapon ~= nil and data.weapon.components.weapon.projectile ~= nil)
+                        ))
+                    then
+                        local x, y, z = data.attacker.Transform:GetWorldPosition()
+                        SpawnRoot(inst, x, z)
                     end
+                end
 
-                    --现在是雌雄双打
-                    local lasttarget = inst.components.combat.target
-                    --谁离得近打谁
-                    if lasttarget ~= nil and IsValid(lasttarget) then
-                        if
-                            inst:GetDistanceSqToPoint(lasttarget:GetPosition())
-                            > inst:GetDistanceSqToPoint(data.attacker:GetPosition())
-                        then
-                            inst.components.combat:SetTarget(data.attacker)
-                        end
-                    else
+                CheckMate(inst)
+                if inst.components.health:IsDead() then
+                    if inst.mate ~= nil then --自己被打死，伴侣仇恨攻击者
+                        inst.mate.components.combat:SetTarget(data.attacker)
+                    end
+                    return
+                end
+
+                --现在是雌雄双打
+                local lasttarget = inst.components.combat.target
+                --谁离得近打谁
+                if lasttarget ~= nil and IsValid(lasttarget) then
+                    if
+                        inst:GetDistanceSqToPoint(lasttarget:GetPosition())
+                        > inst:GetDistanceSqToPoint(data.attacker:GetPosition())
+                    then
                         inst.components.combat:SetTarget(data.attacker)
                     end
-                    lasttarget = inst.components.combat.target
-                    if lasttarget and inst.mate ~= nil and inst.mate.components.combat.target == nil then
-                        inst.mate.components.combat:SetTarget(lasttarget)
-                    end
+                else
+                    inst.components.combat:SetTarget(data.attacker)
                 end
-                if inst.sign_l_treehalo > 0 and IsTreeHaloCrusher(data.attacker, data.weapon) then
-                    inst.count_toolatk = inst.count_toolatk + 1
-                    if inst.count_toolatk >= 4 then --达到4次就减少一层buff
-                        SetTreeBuff(inst, -1)
-                        inst.count_toolatk = 0
-                    end
+                lasttarget = inst.components.combat.target
+                if lasttarget and inst.mate ~= nil and inst.mate.components.combat.target == nil then
+                    inst.mate.components.combat:SetTarget(lasttarget)
                 end
-            end)
-            inst:ListenForEvent("timerdone", function(inst, data)
-                if data.name == "flap" then
-                    inst:PushEvent("doflap")
-                elseif data.name == "taunt" then
-                    inst:PushEvent("dotaunt")
-                elseif data.name == "caw" then
-                    inst:PushEvent("docaw")
+            end
+            if inst.sign_l_treehalo > 0 and IsTreeHaloCrusher(data.attacker, data.weapon) then
+                inst.count_toolatk = inst.count_toolatk + 1
+                if inst.count_toolatk >= 4 then --达到4次就减少一层buff
+                    SetTreeBuff(inst, -1)
+                    inst.count_toolatk = 0
                 end
-            end)
+            end
+        end)
+        inst:ListenForEvent("timerdone", function(inst, data)
+            if data.name == "flap" then
+                inst:PushEvent("doflap")
+            elseif data.name == "taunt" then
+                inst:PushEvent("dotaunt")
+            elseif data.name == "caw" then
+                inst:PushEvent("docaw")
+            end
+        end)
 
-            inst.OnSave = function(inst, data)
-                if inst.sign_l_treehalo > 0 then
-                    data.sign_l_treehalo = inst.sign_l_treehalo
-                end
+        inst.OnSave = function(inst, data)
+            if inst.sign_l_treehalo > 0 then
+                data.sign_l_treehalo = inst.sign_l_treehalo
             end
-            inst.OnPreLoad = function(inst, data) --防止保存时正在飞起或降落导致重载时位置不对
-                local x, y, z = inst.Transform:GetWorldPosition()
-                if y > 0 then
-                    inst.Transform:SetPosition(x, 0, z)
-                end
+        end
+        inst.OnPreLoad = function(inst, data) --防止保存时正在飞起或降落导致重载时位置不对
+            local x, y, z = inst.Transform:GetWorldPosition()
+            if y > 0 then
+                inst.Transform:SetPosition(x, 0, z)
             end
-            inst.OnLoad = function(inst, data)
-                if data ~= nil and data.sign_l_treehalo ~= nil then
-                    inst:DoTaskInTime(0.2, function(inst)
-                        SetTreeBuff(inst, data.sign_l_treehalo)
-                    end)
-                end
+        end
+        inst.OnLoad = function(inst, data)
+            if data ~= nil and data.sign_l_treehalo ~= nil then
+                inst:DoTaskInTime(0.2, function(inst)
+                    SetTreeBuff(inst, data.sign_l_treehalo)
+                end)
             end
-            inst.OnEntitySleep = function(inst)
-                inst.components.combat:SetTarget(nil)
-            end
-            -- inst.OnRemoveEntity = function(inst)end
+        end
+        inst.OnEntitySleep = function(inst)
+            inst.components.combat:SetTarget(nil)
+        end
+        -- inst.OnRemoveEntity = function(inst)end
 
-            if data.fn_server ~= nil then
-                data.fn_server(inst)
-            end
+        if data.fn_server ~= nil then
+            data.fn_server(inst)
+        end
 
-            return inst
-        end,
-        {
-            Asset("ANIM", "anim/buzzard_basic.zip"), --官方秃鹫动画模板
-            Asset("ANIM", "anim/"..data.name..".zip"),
-        },
-        {
-            "debuff_magicwarble",
-            "siving_boss_flowerfx",
-            "siving_boss_eye",
-            "siving_bossfea_real",
-            "siving_bossfea_fake",
-            "siving_boss_taunt_fx",
-            "siving_boss_caw_fx",
-            "siving_boss_root",
-            "buff_treehalo"
-        }
-    ))
+        return inst
+    end, {
+        Asset("ANIM", "anim/buzzard_basic.zip"), --官方秃鹫动画模板
+        Asset("ANIM", "anim/"..data.name..".zip"),
+    }, {
+        "debuff_magicwarble",
+        "siving_boss_flowerfx",
+        "siving_boss_eye",
+        "siving_bossfea_real",
+        "siving_bossfea_fake",
+        "siving_boss_taunt_fx",
+        "siving_boss_caw_fx",
+        "siving_boss_root",
+        "buff_treehalo"
+    }))
 end
 
 ------
@@ -966,122 +961,112 @@ local function InitFloatable(inst, data)
     end
 end
 local function MakeWeapon_replace(data)
-    table.insert(prefs, Prefab( --飞行体
-        data.name.."_fly",
-        function()
-            local inst = CreateEntity()
+    table.insert(prefs, Prefab(data.name.."_fly", function() ------飞行体
+        local inst = CreateEntity()
 
-            inst.entity:AddTransform()
-            inst.entity:AddAnimState()
-            inst.entity:AddSoundEmitter()
-            inst.entity:AddNetwork()
+        inst.entity:AddTransform()
+        inst.entity:AddAnimState()
+        inst.entity:AddSoundEmitter()
+        inst.entity:AddNetwork()
 
-            MakeInventoryPhysics(inst)
-            RemovePhysicsColliders(inst)
+        MakeInventoryPhysics(inst)
+        RemovePhysicsColliders(inst)
 
-            inst.AnimState:SetBank(data.name)
-            inst.AnimState:SetBuild(data.name)
+        inst.AnimState:SetBank(data.name)
+        inst.AnimState:SetBuild(data.name)
 
-            inst:AddTag("sharp")
-            inst:AddTag("nosteal")
-            inst:AddTag("NOCLICK")
-            inst:AddTag("moistureimmunity") --禁止潮湿：EntityScript:GetIsWet()
+        inst:AddTag("sharp")
+        inst:AddTag("nosteal")
+        inst:AddTag("NOCLICK")
+        inst:AddTag("moistureimmunity") --禁止潮湿：EntityScript:GetIsWet()
 
-            --weapon (from weapon component) added to pristine state for optimization
-            inst:AddTag("weapon")
+        --weapon (from weapon component) added to pristine state for optimization
+        inst:AddTag("weapon")
 
-            if data.fn_common_fly ~= nil then
-                data.fn_common_fly(inst)
-            end
+        if data.fn_common_fly ~= nil then
+            data.fn_common_fly(inst)
+        end
 
-            inst.entity:SetPristine()
-            if not TheWorld.ismastersim then return inst end
+        inst.entity:SetPristine()
+        if not TheWorld.ismastersim then return inst end
 
-            inst.hasline = false
-            inst.shootidx = 1
-            inst.caster = nil
+        inst.hasline = false
+        inst.shootidx = 1
+        inst.caster = nil
 
-            --因为大力士攻击时会在不判空的情况下直接使用 inventoryitem，为了不崩溃，只能加个这个
-            inst:AddComponent("inventoryitem")
-            inst.components.inventoryitem:EnableMoisture(false) --禁止潮湿：官方的代码有问题，会导致潮湿攻击滑落时叠加数变为1
-            inst.components.inventoryitem.pushlandedevents = false
-            inst.components.inventoryitem.canbepickedup = false
+        --因为大力士攻击时会在不判空的情况下直接使用 inventoryitem，为了不崩溃，只能加个这个
+        inst:AddComponent("inventoryitem")
+        inst.components.inventoryitem:EnableMoisture(false) --禁止潮湿：官方的代码有问题，会导致潮湿攻击滑落时叠加数变为1
+        inst.components.inventoryitem.pushlandedevents = false
+        inst.components.inventoryitem.canbepickedup = false
 
-            inst:AddComponent("weapon")
+        inst:AddComponent("weapon")
 
-            inst:AddComponent("projectilelegion")
-            inst.components.projectilelegion.speed = 45
-            inst.components.projectilelegion.onthrown = OnThrown_fly
-            inst.components.projectilelegion.onmiss = OnMiss_fly
-            if not data.isreal then
-                inst.components.projectilelegion.onhit = OnHit_fly_fake
-            end
-            if TheNet:GetPVPEnabled() then
-                inst.components.projectilelegion.fn_validhit = Fn_validhit_fea_pvp
-                inst.components.projectilelegion.exclude_tags = TOOLS_L.TagsCombat1({
-                    "wall", "structure", "companion", "glommer", "friendlyfruitfly", "shadowminion"
-                })
-            else
-                inst.components.projectilelegion.fn_validhit = Fn_validhit_fea
-                inst.components.projectilelegion.exclude_tags = TOOLS_L.TagsCombat1({
-                    "wall", "structure", "companion", "glommer", "friendlyfruitfly", "shadowminion",
-                    "player", "abigail"
-                })
-            end
+        inst:AddComponent("projectilelegion")
+        inst.components.projectilelegion.speed = 45
+        inst.components.projectilelegion.onthrown = OnThrown_fly
+        inst.components.projectilelegion.onmiss = OnMiss_fly
+        if not data.isreal then
+            inst.components.projectilelegion.onhit = OnHit_fly_fake
+        end
+        if TheNet:GetPVPEnabled() then
+            inst.components.projectilelegion.fn_validhit = Fn_validhit_fea_pvp
+            inst.components.projectilelegion.exclude_tags = TOOLS_L.TagsCombat1({
+                "wall", "structure", "companion", "glommer", "friendlyfruitfly", "shadowminion"
+            })
+        else
+            inst.components.projectilelegion.fn_validhit = Fn_validhit_fea
+            inst.components.projectilelegion.exclude_tags = TOOLS_L.TagsCombat1({
+                "wall", "structure", "companion", "glommer", "friendlyfruitfly", "shadowminion",
+                "player", "abigail"
+            })
+        end
 
-            InitFeaFx(inst)
+        InitFeaFx(inst)
 
-            if data.fn_server_fly ~= nil then
-                data.fn_server_fly(inst)
-            end
+        if data.fn_server_fly ~= nil then
+            data.fn_server_fly(inst)
+        end
 
-            return inst
-        end,
-        nil,
-        nil
-    ))
+        return inst
+    end, nil, nil))
 
-    table.insert(prefs, Prefab( --滞留体
-        data.name.."_blk",
-        function()
-            local inst = CreateEntity()
+    table.insert(prefs, Prefab(data.name.."_blk", function() ------滞留体
+        local inst = CreateEntity()
 
-            inst.entity:AddTransform()
-            inst.entity:AddAnimState()
-            inst.entity:AddNetwork()
+        inst.entity:AddTransform()
+        inst.entity:AddAnimState()
+        inst.entity:AddNetwork()
 
-            MakeInventoryPhysics(inst)
-            RemovePhysicsColliders(inst)
+        MakeInventoryPhysics(inst)
+        RemovePhysicsColliders(inst)
 
-            inst.AnimState:SetBank(data.name)
-            inst.AnimState:SetBuild(data.name)
-            inst.Transform:SetEightFaced()
+        inst.AnimState:SetBank(data.name)
+        inst.AnimState:SetBuild(data.name)
+        inst.Transform:SetEightFaced()
 
-            inst:AddTag("NOCLICK")
+        inst:AddTag("NOCLICK")
 
-            if data.fn_common_blk ~= nil then
-                data.fn_common_blk(inst)
-            end
+        if data.fn_common_blk ~= nil then
+            data.fn_common_blk(inst)
+        end
 
-            inst.entity:SetPristine()
-            if not TheWorld.ismastersim then return inst end
+        inst.entity:SetPristine()
+        if not TheWorld.ismastersim then return inst end
 
-            inst.hasline = false
-            inst.shootidx = 1
-            inst.caster = nil
-            inst.isblk = true
+        inst.hasline = false
+        inst.shootidx = 1
+        inst.caster = nil
+        inst.isblk = true
 
-            InitFeaFx(inst)
+        InitFeaFx(inst)
 
-            if data.fn_server_blk ~= nil then
-                data.fn_server_blk(inst)
-            end
+        if data.fn_server_blk ~= nil then
+            data.fn_server_blk(inst)
+        end
 
-            return inst
-        end,
-        nil,
-        nil
-    ))
+        return inst
+    end, nil, nil))
 end
 local function MakeWeapon(data)
     local fea_damage
@@ -1097,203 +1082,200 @@ local function MakeWeapon(data)
         fea_hpcost = 3
     end
 
-    table.insert(prefs, Prefab( --手持物品
-        data.name,
-        function()
-            local inst = CreateEntity()
+    table.insert(prefs, Prefab(data.name, function() ------手持物品
+        local inst = CreateEntity()
 
-            inst.entity:AddTransform()
-            inst.entity:AddAnimState()
-            inst.entity:AddNetwork()
+        inst.entity:AddTransform()
+        inst.entity:AddAnimState()
+        inst.entity:AddNetwork()
 
-            MakeInventoryPhysics(inst)
+        MakeInventoryPhysics(inst)
 
-            inst:AddTag("sharp")
-            inst:AddTag("s_l_throw") --skill_legion_throw
-            inst:AddTag("allow_action_on_impassable")
-            inst:AddTag("moistureimmunity") --禁止潮湿：EntityScript:GetIsWet()
+        inst:AddTag("sharp")
+        inst:AddTag("s_l_throw") --skill_legion_throw
+        inst:AddTag("allow_action_on_impassable")
+        inst:AddTag("moistureimmunity") --禁止潮湿：EntityScript:GetIsWet()
 
-            --weapon (from weapon component) added to pristine state for optimization
-            inst:AddTag("weapon")
+        --weapon (from weapon component) added to pristine state for optimization
+        inst:AddTag("weapon")
 
-            inst.AnimState:SetBank(data.name)
-            inst.AnimState:SetBuild(data.name)
-            inst.AnimState:PlayAnimation("idle", false)
-            inst.Transform:SetEightFaced()
+        inst.AnimState:SetBank(data.name)
+        inst.AnimState:SetBuild(data.name)
+        inst.AnimState:PlayAnimation("idle", false)
+        inst.Transform:SetEightFaced()
 
-            inst:AddComponent("skinedlegion")
-            inst.components.skinedlegion:InitWithFloater(data.name)
+        inst:AddComponent("skinedlegion")
+        inst.components.skinedlegion:InitWithFloater(data.name)
 
-            inst.projectiledelay = 2 * FRAMES --不能大于7帧
+        inst.projectiledelay = 2 * FRAMES --不能大于7帧
 
-            --Tip：官方的战斗辅助组件。加上后就能右键先瞄准再触发攻击。缺点是会导致其他对象的右键动作全部不起作用
-            -- inst:AddComponent("aoetargeting")
-            -- inst.components.aoetargeting:SetAlwaysValid(true)
-            -- inst.components.aoetargeting.reticule.reticuleprefab = "reticulelongmulti"
-            -- inst.components.aoetargeting.reticule.pingprefab = "reticulelongmultiping"
-            -- inst.components.aoetargeting.reticule.targetfn = ReticuleTargetFn
-            -- inst.components.aoetargeting.reticule.mousetargetfn = ReticuleMouseTargetFn
-            -- inst.components.aoetargeting.reticule.updatepositionfn = ReticuleUpdatePositionFn
-            -- inst.components.aoetargeting.reticule.validcolour = { 117/255, 1, 1, 1 }
-            -- inst.components.aoetargeting.reticule.invalidcolour = { 0, 72/255, 72/255, 1 }
-            -- inst.components.aoetargeting.reticule.ease = true
-            -- inst.components.aoetargeting.reticule.mouseenabled = true
+        --Tip：官方的战斗辅助组件。加上后就能右键先瞄准再触发攻击。缺点是会导致其他对象的右键动作全部不起作用
+        -- inst:AddComponent("aoetargeting")
+        -- inst.components.aoetargeting:SetAlwaysValid(true)
+        -- inst.components.aoetargeting.reticule.reticuleprefab = "reticulelongmulti"
+        -- inst.components.aoetargeting.reticule.pingprefab = "reticulelongmultiping"
+        -- inst.components.aoetargeting.reticule.targetfn = ReticuleTargetFn
+        -- inst.components.aoetargeting.reticule.mousetargetfn = ReticuleMouseTargetFn
+        -- inst.components.aoetargeting.reticule.updatepositionfn = ReticuleUpdatePositionFn
+        -- inst.components.aoetargeting.reticule.validcolour = { 117/255, 1, 1, 1 }
+        -- inst.components.aoetargeting.reticule.invalidcolour = { 0, 72/255, 72/255, 1 }
+        -- inst.components.aoetargeting.reticule.ease = true
+        -- inst.components.aoetargeting.reticule.mouseenabled = true
 
-            inst.entity:SetPristine()
-            if not TheWorld.ismastersim then return inst end
+        inst.entity:SetPristine()
+        if not TheWorld.ismastersim then return inst end
 
-            inst:AddComponent("inspectable")
+        inst:AddComponent("inspectable")
 
-            inst:AddComponent("stackable")
-            inst.components.stackable.maxsize = TUNING.STACK_SIZE_MEDITEM
+        inst:AddComponent("stackable")
+        inst.components.stackable.maxsize = TUNING.STACK_SIZE_MEDITEM
 
-            inst:AddComponent("inventoryitem")
-            inst.components.inventoryitem.imagename = data.name
-            inst.components.inventoryitem.atlasname = "images/inventoryimages/"..data.name..".xml"
-            inst.components.inventoryitem.TryToSink = function(self, ...)end --防止在虚空里消失
-            inst.components.inventoryitem:EnableMoisture(false) --禁止潮湿：官方的代码有问题，会导致潮湿攻击滑落时叠加数变为1
-            inst.components.inventoryitem:SetOnPickupFn(OnPickedUp_fea) --被捡起时，修改自己的旋转角度
+        inst:AddComponent("inventoryitem")
+        inst.components.inventoryitem.imagename = data.name
+        inst.components.inventoryitem.atlasname = "images/inventoryimages/"..data.name..".xml"
+        inst.components.inventoryitem.TryToSink = function(self, ...)end --防止在虚空里消失
+        inst.components.inventoryitem:EnableMoisture(false) --禁止潮湿：官方的代码有问题，会导致潮湿攻击滑落时叠加数变为1
+        inst.components.inventoryitem:SetOnPickupFn(OnPickedUp_fea) --被捡起时，修改自己的旋转角度
 
-            inst:AddComponent("savedrotation") --保存旋转角度的组件
+        inst:AddComponent("savedrotation") --保存旋转角度的组件
 
-            inst:AddComponent("equippable")
-            inst.components.equippable:SetOnEquip(OnEquip)
-            inst.components.equippable:SetOnUnequip(OnUnequip)
-            inst.components.equippable.equipstack = true --装备时可以叠加装备
+        inst:AddComponent("equippable")
+        inst.components.equippable:SetOnEquip(OnEquip)
+        inst.components.equippable:SetOnUnequip(OnUnequip)
+        inst.components.equippable.equipstack = true --装备时可以叠加装备
 
-            inst:AddComponent("weapon")
-            inst.components.weapon:SetRange(-1, -1) --人物默认攻击距离为3、3
-            inst.components.weapon:SetDamage(fea_damage)
+        inst:AddComponent("weapon")
+        inst.components.weapon:SetRange(-1, -1) --人物默认攻击距离为3、3
+        inst.components.weapon:SetDamage(fea_damage)
 
-            inst:AddComponent("skillspelllegion")
-            inst.components.skillspelllegion.fn_spell = function(inst, caster, pos, options)
-                if caster.components.inventory == nil then
-                    return false
-                end
-
-                local doerpos = caster:GetPosition()
-                local angles = {}
-                local poss = {}
-                local direction = (pos - doerpos):GetNormalized() --单位向量
-                local angle = math.acos(direction:Dot(Vector3(1, 0, 0))) / DEGREES --这个角度是动画的，不能用来做物理的角度
-
-                --查询是否有能拉回的材料
-                local lines = caster.components.inventory:FindItems(function(i)
-                    if i.line_l_value ~= nil or LineMap[i.prefab] then
-                        return true
-                    end
-                end)
-                if #lines <= 0 then
-                    lines = false
-                else
-                    lines = true
-                end
-
-                local items = nil --需要丢出去的羽毛
-                local num = inst.components.stackable:StackSize()
-                if num <= throwednum then
-                    items = caster.components.inventory:RemoveItem(inst, true)
-                else
-                    items = inst.components.stackable:Get(throwednum)
-                    -- items.components.inventoryitem:OnRemoved() --由于此时还处于物品栏状态，需要恢复为非物品栏状态
-                    num = throwednum
-                end
-
-                if num == 1 then
-                    angles = { 0 }
-                    poss[1] = pos
-                else
-                    local ang_lag = 2.5
-                    if num == 2 then
-                        angles = { -ang_lag, ang_lag }
-                    elseif num == 3 then
-                        angles = { -2*ang_lag, 0, 2*ang_lag }
-                    elseif num == 4 then
-                        angles = { -3*ang_lag, -ang_lag, ang_lag, 3*ang_lag }
-                    elseif num == 5 then
-                        angles = { -4*ang_lag, -2*ang_lag, 0, 2*ang_lag, 4*ang_lag }
-                    elseif num == 6 then
-                        angles = { -5*ang_lag, -3*ang_lag, -ang_lag, ang_lag, 3*ang_lag, 5*ang_lag }
-                    elseif num == 7 then
-                        angles = { -6*ang_lag, -4*ang_lag, -2*ang_lag, 0, 2*ang_lag, 4*ang_lag, 6*ang_lag }
-                    elseif num == 8 then
-                        angles = { -7*ang_lag, -5*ang_lag, -3*ang_lag, -ang_lag, ang_lag, 3*ang_lag, 5*ang_lag, 7*ang_lag }
-                    elseif num == 9 then
-                        angles = { -8*ang_lag, -6*ang_lag, -4*ang_lag, -2*ang_lag, 0, 2*ang_lag, 4*ang_lag, 6*ang_lag, 8*ang_lag }
-                    else
-                        angles = { -9*ang_lag, -7*ang_lag, -5*ang_lag, -3*ang_lag, -ang_lag, ang_lag, 3*ang_lag, 5*ang_lag, 7*ang_lag, 9*ang_lag }
-                    end
-
-                    local ang = caster:GetAngleToPoint(pos.x, pos.y, pos.z) --原始角度，单位:度，比如33
-                    for i,v in ipairs(angles) do
-                        v = v + math.random()*2 - 1
-                        angles[i] = v
-                        local an = (ang+v)*DEGREES
-                        poss[i] = Vector3(doerpos.x+math.cos(an), 0, doerpos.z-math.sin(an))
-                    end
-                end
-
-                local feathers = {}
-                for i,v in ipairs(angles) do
-                    local fly = SpawnPrefab((inst.skinname or data.name).."_fly")
-                    fly.hasline = lines
-                    fly.shootidx = i
-                    fly.caster = caster
-
-                    fly.Transform:SetPosition(doerpos:Get())
-                    feathers[i] = fly
-
-                    fly.components.projectilelegion:Throw(fly, poss[i], caster, angle+v)
-                    fly.components.projectilelegion:DelayVisibility(inst.projectiledelay)
-                end
-
-                if caster.components.health ~= nil and not caster.components.health:IsDead() then
-                    local costt = fea_hpcost
-                    if costt > 0 and caster.siv_blood_l_reducer_v ~= nil then
-                        if caster.siv_blood_l_reducer_v >= 1 then
-                            costt = 0
-                        else
-                            costt = costt * (1-caster.siv_blood_l_reducer_v)
-                        end
-                    end
-                    if costt > 0 then
-                        caster.components.health:DoDelta(-costt*num, true, data.name, false, nil, true)
-                    end
-                    caster.sivfeathers_l = nil
-                    if not caster.components.health:IsDead() and lines then
-                        local line = SpawnPrefab("siving_feather_line")
-                        caster.sivfeathers_l = feathers
-                        line.linedoer = caster
-                        if not caster.components.inventory:Equip(line) then
-                            line:Remove()
-                            caster.sivfeathers_l = nil
-                        end
-                    end
-                end
-
-                items:Remove() --全部删了吧，到时候重新生成，懒得保存以及恢复了
-
-                return true
+        inst:AddComponent("skillspelllegion")
+        inst.components.skillspelllegion.fn_spell = function(inst, caster, pos, options)
+            if caster.components.inventory == nil then
+                return false
             end
 
-            MakeHauntableLaunch(inst)
+            local doerpos = caster:GetPosition()
+            local angles = {}
+            local poss = {}
+            local direction = (pos - doerpos):GetNormalized() --单位向量
+            local angle = math.acos(direction:Dot(Vector3(1, 0, 0))) / DEGREES --这个角度是动画的，不能用来做物理的角度
 
-            inst.components.skinedlegion:SetOnPreLoad()
+            --查询是否有能拉回的材料
+            local lines = caster.components.inventory:FindItems(function(i)
+                if i.line_l_value ~= nil or LineMap[i.prefab] then
+                    return true
+                end
+            end)
+            if #lines <= 0 then
+                lines = false
+            else
+                lines = true
+            end
 
-            return inst
-        end,
-        {
-            Asset("ANIM", "anim/"..data.name..".zip"),
-            Asset("ATLAS", "images/inventoryimages/"..data.name..".xml"),
-            Asset("IMAGE", "images/inventoryimages/"..data.name..".tex"),
-        }, {
-            -- "reticulelongmulti", --Tip：官方的战斗辅助组件
-            -- "reticulelongmultiping",
-            data.name.."_fly",
-            data.name.."_blk",
-            "siving_feather_line"
-        }
-    ))
+            local items = nil --需要丢出去的羽毛
+            local num = inst.components.stackable:StackSize()
+            if num <= throwednum then
+                items = caster.components.inventory:RemoveItem(inst, true)
+            else
+                items = inst.components.stackable:Get(throwednum)
+                -- items.components.inventoryitem:OnRemoved() --由于此时还处于物品栏状态，需要恢复为非物品栏状态
+                num = throwednum
+            end
+
+            if num == 1 then
+                angles = { 0 }
+                poss[1] = pos
+            else
+                local ang_lag = 2.5
+                if num == 2 then
+                    angles = { -ang_lag, ang_lag }
+                elseif num == 3 then
+                    angles = { -2*ang_lag, 0, 2*ang_lag }
+                elseif num == 4 then
+                    angles = { -3*ang_lag, -ang_lag, ang_lag, 3*ang_lag }
+                elseif num == 5 then
+                    angles = { -4*ang_lag, -2*ang_lag, 0, 2*ang_lag, 4*ang_lag }
+                elseif num == 6 then
+                    angles = { -5*ang_lag, -3*ang_lag, -ang_lag, ang_lag, 3*ang_lag, 5*ang_lag }
+                elseif num == 7 then
+                    angles = { -6*ang_lag, -4*ang_lag, -2*ang_lag, 0, 2*ang_lag, 4*ang_lag, 6*ang_lag }
+                elseif num == 8 then
+                    angles = { -7*ang_lag, -5*ang_lag, -3*ang_lag, -ang_lag, ang_lag, 3*ang_lag, 5*ang_lag, 7*ang_lag }
+                elseif num == 9 then
+                    angles = { -8*ang_lag, -6*ang_lag, -4*ang_lag, -2*ang_lag, 0, 2*ang_lag, 4*ang_lag, 6*ang_lag, 8*ang_lag }
+                else
+                    angles = { -9*ang_lag, -7*ang_lag, -5*ang_lag, -3*ang_lag, -ang_lag, ang_lag, 3*ang_lag, 5*ang_lag, 7*ang_lag, 9*ang_lag }
+                end
+
+                local ang = caster:GetAngleToPoint(pos.x, pos.y, pos.z) --原始角度，单位:度，比如33
+                for i,v in ipairs(angles) do
+                    v = v + math.random()*2 - 1
+                    angles[i] = v
+                    local an = (ang+v)*DEGREES
+                    poss[i] = Vector3(doerpos.x+math.cos(an), 0, doerpos.z-math.sin(an))
+                end
+            end
+
+            local feathers = {}
+            for i,v in ipairs(angles) do
+                local fly = SpawnPrefab((inst.skinname or data.name).."_fly")
+                fly.hasline = lines
+                fly.shootidx = i
+                fly.caster = caster
+
+                fly.Transform:SetPosition(doerpos:Get())
+                feathers[i] = fly
+
+                fly.components.projectilelegion:Throw(fly, poss[i], caster, angle+v)
+                fly.components.projectilelegion:DelayVisibility(inst.projectiledelay)
+            end
+
+            if caster.components.health ~= nil and not caster.components.health:IsDead() then
+                local costt = fea_hpcost
+                if costt > 0 and caster.siv_blood_l_reducer_v ~= nil then
+                    if caster.siv_blood_l_reducer_v >= 1 then
+                        costt = 0
+                    else
+                        costt = costt * (1-caster.siv_blood_l_reducer_v)
+                    end
+                end
+                if costt > 0 then
+                    caster.components.health:DoDelta(-costt*num, true, data.name, false, nil, true)
+                end
+                caster.sivfeathers_l = nil
+                if not caster.components.health:IsDead() and lines then
+                    local line = SpawnPrefab("siving_feather_line")
+                    caster.sivfeathers_l = feathers
+                    line.linedoer = caster
+                    if not caster.components.inventory:Equip(line) then
+                        line:Remove()
+                        caster.sivfeathers_l = nil
+                    end
+                end
+            end
+
+            items:Remove() --全部删了吧，到时候重新生成，懒得保存以及恢复了
+
+            return true
+        end
+
+        MakeHauntableLaunch(inst)
+
+        inst.components.skinedlegion:SetOnPreLoad()
+
+        return inst
+    end, {
+        Asset("ANIM", "anim/"..data.name..".zip"),
+        Asset("ATLAS", "images/inventoryimages/"..data.name..".xml"),
+        Asset("IMAGE", "images/inventoryimages/"..data.name..".tex"),
+        Asset("ATLAS_BUILD", "images/inventoryimages/"..data.name..".xml", 256)
+    }, {
+        -- "reticulelongmulti", --Tip：官方的战斗辅助组件
+        -- "reticulelongmultiping",
+        data.name.."_fly",
+        data.name.."_blk",
+        "siving_feather_line"
+    }))
 
     MakeWeapon_replace({
         name = data.name, isreal = data.isreal,
@@ -1392,131 +1374,114 @@ local function OnCollide_bossfea(inst, data)
 end
 local function MakeBossWeapon(data)
     local scale = 1.2
-    table.insert(prefs, Prefab(
-        data.name,
-        function()
-            local inst = CreateEntity()
+    table.insert(prefs, Prefab(data.name, function()
+        local inst = CreateEntity()
+        inst.entity:AddTransform()
+        inst.entity:AddAnimState()
+        inst.entity:AddSoundEmitter()
+        inst.entity:AddNetwork()
 
-            inst.entity:AddTransform()
-            inst.entity:AddAnimState()
-            inst.entity:AddSoundEmitter()
-            inst.entity:AddNetwork()
+        MakeInventoryPhysics(inst)
+        RemovePhysicsColliders(inst)
 
-            MakeInventoryPhysics(inst)
-            RemovePhysicsColliders(inst)
+        inst.Transform:SetScale(scale, scale, scale)
+        inst.AnimState:SetOrientation(ANIM_ORIENTATION.OnGround)
 
-            inst.Transform:SetScale(scale, scale, scale)
-            inst.AnimState:SetOrientation(ANIM_ORIENTATION.OnGround)
+        inst:AddTag("sharp")
 
-            inst:AddTag("sharp")
+        --weapon (from weapon component) added to pristine state for optimization
+        inst:AddTag("weapon")
 
-            --weapon (from weapon component) added to pristine state for optimization
-            inst:AddTag("weapon")
+        inst.projectiledelay = 3 * FRAMES
 
-            inst.projectiledelay = 3 * FRAMES
+        if data.fn_common ~= nil then
+            data.fn_common(inst)
+        end
 
-            if data.fn_common ~= nil then
-                data.fn_common(inst)
-            end
+        inst.entity:SetPristine()
+        if not TheWorld.ismastersim then return inst end
 
-            inst.entity:SetPristine()
-            if not TheWorld.ismastersim then return inst end
+        inst.persists = false
 
-            inst.persists = false
+        inst:AddComponent("weapon")
 
-            inst:AddComponent("weapon")
-
-            inst:AddComponent("projectilelegion")
-            inst.components.projectilelegion.speed = 45
-            inst.components.projectilelegion.shootrange = DIST_FLAP
-            inst.components.projectilelegion.exclude_tags = TAGS_CANT_BOSSFEA
-            inst.components.projectilelegion.fn_validhit = Fn_validhit_bossfea
-            inst.components.projectilelegion.onthrown = OnThrown_bossfea
-            inst.components.projectilelegion.onmiss = function(inst, targetpos, attacker)
-                local x, y, z = inst.Transform:GetWorldPosition()
-                -- if TheWorld.Map:IsVisualGroundAtPoint(x, 0, z) then --仅限陆地
-                if TheWorld.Map:IsAboveGroundAtPoint(x, 0, z) or TheWorld.Map:IsOceanTileAtPoint(x, 0, z) then
-                    local block = SpawnPrefab(data.name.."_block")
-                    if block ~= nil then
-                        block.Transform:SetRotation(inst.Transform:GetRotation())
-                        block.Transform:SetPosition(x, y, z)
-                    end
+        inst:AddComponent("projectilelegion")
+        inst.components.projectilelegion.speed = 45
+        inst.components.projectilelegion.shootrange = DIST_FLAP
+        inst.components.projectilelegion.exclude_tags = TAGS_CANT_BOSSFEA
+        inst.components.projectilelegion.fn_validhit = Fn_validhit_bossfea
+        inst.components.projectilelegion.onthrown = OnThrown_bossfea
+        inst.components.projectilelegion.onmiss = function(inst, targetpos, attacker)
+            local x, y, z = inst.Transform:GetWorldPosition()
+            -- if TheWorld.Map:IsVisualGroundAtPoint(x, 0, z) then --仅限陆地
+            if TheWorld.Map:IsAboveGroundAtPoint(x, 0, z) or TheWorld.Map:IsOceanTileAtPoint(x, 0, z) then
+                local block = SpawnPrefab(data.name.."_block")
+                if block ~= nil then
+                    block.Transform:SetRotation(inst.Transform:GetRotation())
+                    block.Transform:SetPosition(x, y, z)
                 end
-                inst:Remove()
             end
+            inst:Remove()
+        end
 
-            if data.fn_server ~= nil then
-                data.fn_server(inst)
-            end
+        if data.fn_server ~= nil then
+            data.fn_server(inst)
+        end
 
-            return inst
-        end,
-        data.assets,
-        data.prefabs
-    ))
-    table.insert(prefs, Prefab(
-        data.name.."_block",
-        function()
-            local inst = CreateEntity()
+        return inst
+    end, data.assets, data.prefabs))
+    table.insert(prefs, Prefab(data.name.."_block", function()
+        local inst = CreateEntity()
+        inst.entity:AddTransform()
+        inst.entity:AddAnimState()
+        inst.entity:AddSoundEmitter()
+        inst.entity:AddNetwork()
 
-            inst.entity:AddTransform()
-            inst.entity:AddAnimState()
-            inst.entity:AddSoundEmitter()
-            inst.entity:AddNetwork()
+        inst:SetPhysicsRadiusOverride(0.15)
+        MakeWaterObstaclePhysics(inst, 0.15, 2, 0.75)
 
-            inst:SetPhysicsRadiusOverride(0.15)
-            MakeWaterObstaclePhysics(inst, 0.15, 2, 0.75)
+        inst:AddTag("siv_boss_block") --用来被清场
+        inst:AddTag("ignorewalkableplatforms")
 
-            inst:AddTag("siv_boss_block") --用来被清场
-            inst:AddTag("ignorewalkableplatforms")
+        inst.Transform:SetScale(scale, scale, scale)
+        inst.Transform:SetEightFaced()
 
-            inst.Transform:SetScale(scale, scale, scale)
-            inst.Transform:SetEightFaced()
+        inst:SetPrefabNameOverride(data.name)
 
-            inst:SetPrefabNameOverride(data.name)
+        MakeInventoryFloatable(inst, "small", 0.2, 0.5)
 
-            MakeInventoryFloatable(inst, "small", 0.2, 0.5)
-            -- local OnLandedClient_old = inst.components.floater.OnLandedClient
-            -- inst.components.floater.OnLandedClient = function(self)
-            --     OnLandedClient_old(self)
-            --     self.inst.AnimState:SetFloatParams(0.04, 1, self.bob_percent)
-            -- end
+        if data.fn_common2 ~= nil then
+            data.fn_common2(inst)
+        end
 
-            if data.fn_common2 ~= nil then
-                data.fn_common2(inst)
-            end
+        inst.entity:SetPristine()
+        if not TheWorld.ismastersim then return inst end
 
-            inst.entity:SetPristine()
-            if not TheWorld.ismastersim then return inst end
+        --加载水面特效
+        inst:DoTaskInTime(POPULATING and math.random()*5*FRAMES or 0, function(inst)
+            inst.components.floater:OnLandedServer()
+        end)
 
-            --加载水面特效
-            inst:DoTaskInTime(POPULATING and math.random()*5*FRAMES or 0, function(inst)
-                inst.components.floater:OnLandedServer()
-            end)
+        inst:AddComponent("inspectable")
 
-            inst:AddComponent("inspectable")
+        inst:AddComponent("lootdropper")
 
-            inst:AddComponent("lootdropper")
+        inst:AddComponent("workable")
+        inst.components.workable:SetWorkAction(ACTIONS.MINE)
+        inst.components.workable:SetWorkLeft(1)
 
-            inst:AddComponent("workable")
-            inst.components.workable:SetWorkAction(ACTIONS.MINE)
-            inst.components.workable:SetWorkLeft(1)
+        inst:AddComponent("savedrotation") --保存旋转角度的组件
 
-            inst:AddComponent("savedrotation") --保存旋转角度的组件
+        MakeHauntableWork(inst)
 
-            MakeHauntableWork(inst)
+        inst:ListenForEvent("on_collide", OnCollide_bossfea) --被船撞时
 
-            inst:ListenForEvent("on_collide", OnCollide_bossfea) --被船撞时
+        if data.fn_server2 ~= nil then
+            data.fn_server2(inst)
+        end
 
-            if data.fn_server2 ~= nil then
-                data.fn_server2(inst)
-            end
-
-            return inst
-        end,
-        data.assets,
-        data.prefabs2
-    ))
+        return inst
+    end, data.assets, data.prefabs2))
 end
 
 --------------------------------------------------------------------------
@@ -1542,8 +1507,6 @@ SetSharedLootTable('siving_foenix_rebirth', {
 
 MakeBoss({
     name = "siving_foenix",
-    -- assets = nil,
-    -- prefabs = nil,
     -- fn_common = function(inst)end,
     fn_server = function(inst)
         inst.components.lootdropper:SetChanceLootTable('siving_foenix')
@@ -1585,8 +1548,6 @@ SetSharedLootTable('siving_moenix_rebirth', {
 
 MakeBoss({
     name = "siving_moenix",
-    -- assets = nil,
-    -- prefabs = nil,
     -- fn_common = function(inst)end,
     fn_server = function(inst)
         inst.ismale = true
@@ -1676,71 +1637,63 @@ local function OnLoad_egg(inst, data)
     end
 end
 
-table.insert(prefs, Prefab(
-    "siving_egg",
-    function()
-        local inst = CreateEntity()
+table.insert(prefs, Prefab("siving_egg", function()
+    local inst = CreateEntity()
+    inst.entity:AddTransform()
+    inst.entity:AddAnimState()
+    inst.entity:AddSoundEmitter()
+    inst.entity:AddNetwork()
 
-        inst.entity:AddTransform()
-        inst.entity:AddAnimState()
-        inst.entity:AddSoundEmitter()
-        inst.entity:AddNetwork()
+    MakeObstaclePhysics(inst, 0.4)
 
-        MakeObstaclePhysics(inst, 0.4)
+    inst:AddTag("hostile")
+    inst:AddTag("siving")
 
-        inst:AddTag("hostile")
-        inst:AddTag("siving")
+    inst.AnimState:SetBank("siving_egg")
+    inst.AnimState:SetBuild("siving_egg")
+    inst.AnimState:PlayAnimation("idle1", true)
 
-        inst.AnimState:SetBank("siving_egg")
-        inst.AnimState:SetBuild("siving_egg")
-        inst.AnimState:PlayAnimation("idle1", true)
+    inst.entity:SetPristine()
+    if not TheWorld.ismastersim then return inst end
 
-        inst.entity:SetPristine()
-        if not TheWorld.ismastersim then return inst end
+    inst.ismale = false
+    inst.ishatched = nil --是否正常孵化
+    inst.tree = nil
+    inst.state = 1
 
-        inst.ismale = false
-        inst.ishatched = nil --是否正常孵化
-        inst.tree = nil
-        inst.state = 1
+    inst.DIST_SPAWN = DIST_SPAWN
 
-        inst.DIST_SPAWN = DIST_SPAWN
+    inst:AddComponent("inspectable")
 
-        inst:AddComponent("inspectable")
+    inst:AddComponent("health")
+    inst.components.health:SetMaxHealth(300)
+    inst.components.health:SetInvincible(true)
 
-        inst:AddComponent("health")
-        inst.components.health:SetMaxHealth(300)
-        inst.components.health:SetInvincible(true)
+    inst:AddComponent("combat")
 
-        inst:AddComponent("combat")
+    inst:AddComponent("lootdropper")
+    inst.components.lootdropper:SetLoot({ "siving_rocks", "siving_rocks", "siving_rocks",
+        "siving_rocks", "siving_rocks", "siving_rocks" })
 
-        inst:AddComponent("lootdropper")
-        inst.components.lootdropper:SetLoot({ "siving_rocks", "siving_rocks", "siving_rocks",
-            "siving_rocks", "siving_rocks", "siving_rocks" })
+    inst:AddComponent("timer")
+    inst.components.timer:StartTimer("state1", TIME_EGG*0.3)
 
-        inst:AddComponent("timer")
-        inst.components.timer:StartTimer("state1", TIME_EGG*0.3)
+    inst:ListenForEvent("timerdone", OnTimerDone_egg)
+    inst:ListenForEvent("attacked", OnAttacked_egg)
+    inst:ListenForEvent("death", OnDeath_egg)
 
-        inst:ListenForEvent("timerdone", OnTimerDone_egg)
-        inst:ListenForEvent("attacked", OnAttacked_egg)
-        inst:ListenForEvent("death", OnDeath_egg)
+    inst.OnLoad = OnLoad_egg
 
-        inst.OnLoad = OnLoad_egg
+    inst:DoTaskInTime(2, function(inst) --防止产生瞬间暴毙
+        inst.components.health:SetInvincible(false)
+    end)
 
-        inst:DoTaskInTime(2, function(inst) --防止产生瞬间暴毙
-            inst.components.health:SetInvincible(false)
-        end)
-
-        return inst
-    end,
-    {
-        Asset("ANIM", "anim/siving_egg.zip")
-    },
-    {
-        "siving_foenix",
-        "siving_moenix",
-        "siving_egg_hatched_fx"
-    }
-))
+    return inst
+end, { Asset("ANIM", "anim/siving_egg.zip") }, {
+    "siving_foenix",
+    "siving_moenix",
+    "siving_egg_hatched_fx"
+}))
 
 --------------------------------------------------------------------------
 --[[ 子圭寄生花 ]]
@@ -1931,132 +1884,114 @@ local function Init_flower(inst)
     inst:Remove()
 end
 
-table.insert(prefs, Prefab( --特效
-    "siving_boss_flowerfx",
-    function()
-        local inst = CreateEntity()
+table.insert(prefs, Prefab("siving_boss_flowerfx", function() ------特效
+    local inst = CreateEntity()
+    inst.entity:AddTransform()
+    inst.entity:AddFollower()
+    inst.entity:AddAnimState()
+    inst.entity:AddNetwork()
 
-        inst.entity:AddTransform()
-        inst.entity:AddFollower()
-        inst.entity:AddAnimState()
-        inst.entity:AddNetwork()
+    inst:AddTag("NOCLICK")
+    inst:AddTag("FX")
 
-        inst:AddTag("NOCLICK")
-        inst:AddTag("FX")
+    inst.AnimState:SetBank("siving_boss_flower")
+    inst.AnimState:SetBuild("siving_boss_flower")
+    inst.AnimState:PlayAnimation("idle1", true)
+    inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
+    inst.AnimState:SetFinalOffset(3)
 
-        inst.AnimState:SetBank("siving_boss_flower")
-        inst.AnimState:SetBuild("siving_boss_flower")
-        inst.AnimState:PlayAnimation("idle1", true)
-        inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
-        inst.AnimState:SetFinalOffset(3)
+    inst.entity:SetPristine()
+    if not TheWorld.ismastersim then return inst end
 
-        inst.entity:SetPristine()
-        if not TheWorld.ismastersim then return inst end
+    inst.persists = false
+    inst.tree = nil
+    inst.bird = nil
+    inst.target = nil
+    inst.countHealth = 0
+    inst.countTry = 0
+    inst.state = 1
 
-        inst.persists = false
-        inst.tree = nil
-        inst.bird = nil
-        inst.target = nil
-        inst.countHealth = 0
-        inst.countTry = 0
-        inst.state = 1
-
-        inst.fn_onUnbind = function(target) --落地
-            if not inst:IsValid() then
-                return
-            end
-
-            inst:RemoveEventCallback("death", inst.fn_onUnbind, target)
-            inst:RemoveEventCallback("onremove", inst.fn_onUnbind, target)
-            target.hassivflower = nil
-
-            if inst.task_bind ~= nil then
-                inst.task_bind:Cancel()
-                inst.task_bind = nil
-            end
-            if inst.countHealth > 0 then
-                local flower = SpawnPrefab("siving_boss_flower")
-                if flower ~= nil then
-                    flower.tree = inst.tree
-                    flower.bird = inst.bird
-                    if inst.countHealth < HEALTH_FLOWER then
-                        flower.components.health:SetCurrentHealth(inst.countHealth)
-                    end
-                    SetFlowerState(flower, inst.countHealth, false)
-                    flower.Transform:SetRotation(target.Transform:GetRotation())
-
-                    local x, y, z = target.Transform:GetWorldPosition()
-                    flower.Transform:SetPosition(x, 0.5, z)
-                end
-            end
-            inst:Remove()
+    inst.fn_onUnbind = function(target) --落地
+        if not inst:IsValid() then
+            return
         end
-        inst.fn_onBind = Fn_onBind_flower --寄生
-        inst._task_re = inst:DoTaskInTime(1, inst.Remove)
 
-        return inst
-    end,
-    {
-        Asset("ANIM", "anim/siving_boss_flower.zip")
-    },
-    {
-        "siving_boss_flower"
-    }
-))
-table.insert(prefs, Prefab( --实体
-    "siving_boss_flower",
-    function()
-        local inst = CreateEntity()
+        inst:RemoveEventCallback("death", inst.fn_onUnbind, target)
+        inst:RemoveEventCallback("onremove", inst.fn_onUnbind, target)
+        target.hassivflower = nil
 
-        inst.entity:AddTransform()
-        inst.entity:AddAnimState()
-        inst.entity:AddNetwork()
-        inst.entity:AddLight()
+        if inst.task_bind ~= nil then
+            inst.task_bind:Cancel()
+            inst.task_bind = nil
+        end
+        if inst.countHealth > 0 then
+            local flower = SpawnPrefab("siving_boss_flower")
+            if flower ~= nil then
+                flower.tree = inst.tree
+                flower.bird = inst.bird
+                if inst.countHealth < HEALTH_FLOWER then
+                    flower.components.health:SetCurrentHealth(inst.countHealth)
+                end
+                SetFlowerState(flower, inst.countHealth, false)
+                flower.Transform:SetRotation(target.Transform:GetRotation())
 
-        inst:AddTag("hostile")
-        inst:AddTag("siving")
-        inst:AddTag("soulless") --没有灵魂
+                local x, y, z = target.Transform:GetWorldPosition()
+                flower.Transform:SetPosition(x, 0.5, z)
+            end
+        end
+        inst:Remove()
+    end
+    inst.fn_onBind = Fn_onBind_flower --寄生
+    inst._task_re = inst:DoTaskInTime(1, inst.Remove)
 
-        inst.Transform:SetTwoFaced()
+    return inst
+end, { Asset("ANIM", "anim/siving_boss_flower.zip") }, { "siving_boss_flower" }))
+table.insert(prefs, Prefab("siving_boss_flower", function() ------实体
+    local inst = CreateEntity()
+    inst.entity:AddTransform()
+    inst.entity:AddAnimState()
+    inst.entity:AddNetwork()
+    inst.entity:AddLight()
 
-        inst.AnimState:SetBank("siving_boss_flower")
-        inst.AnimState:SetBuild("siving_boss_flower")
-        inst.AnimState:PlayAnimation("idle3", true)
-        inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
+    inst:AddTag("hostile")
+    inst:AddTag("siving")
+    inst:AddTag("soulless") --没有灵魂
 
-        inst.Light:Enable(true)
-        inst.Light:SetRadius(.6)
-        inst.Light:SetFalloff(1)
-        inst.Light:SetIntensity(.5)
-        inst.Light:SetColour(15/255, 180/255, 132/255)
+    inst.Transform:SetTwoFaced()
 
-        inst.entity:SetPristine()
-        if not TheWorld.ismastersim then return inst end
+    inst.AnimState:SetBank("siving_boss_flower")
+    inst.AnimState:SetBuild("siving_boss_flower")
+    inst.AnimState:PlayAnimation("idle3", true)
+    inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
 
-        inst.persists = false
-        inst.tree = nil
-        inst.bird = nil
-        inst.state = 3
+    inst.Light:Enable(true)
+    inst.Light:SetRadius(.6)
+    inst.Light:SetFalloff(1)
+    inst.Light:SetIntensity(.5)
+    inst.Light:SetColour(15/255, 180/255, 132/255)
 
-        inst:AddComponent("inspectable")
+    inst.entity:SetPristine()
+    if not TheWorld.ismastersim then return inst end
 
-        inst:AddComponent("health")
-        inst.components.health:SetMaxHealth(HEALTH_FLOWER)
+    inst.persists = false
+    inst.tree = nil
+    inst.bird = nil
+    inst.state = 3
 
-        inst:AddComponent("combat")
+    inst:AddComponent("inspectable")
 
-        inst:ListenForEvent("attacked", OnAttacked_flower)
-        inst:ListenForEvent("death", OnDeath_flower)
+    inst:AddComponent("health")
+    inst.components.health:SetMaxHealth(HEALTH_FLOWER)
 
-        inst._task_health = inst:DoTaskInTime(TIME_FLOWER, Init_flower)
+    inst:AddComponent("combat")
 
-        return inst
-    end,
-    {
-        Asset("ANIM", "anim/siving_boss_flower.zip")
-    },
-    { "siving_boss_flower_fx" }
-))
+    inst:ListenForEvent("attacked", OnAttacked_flower)
+    inst:ListenForEvent("death", OnDeath_flower)
+
+    inst._task_health = inst:DoTaskInTime(TIME_FLOWER, Init_flower)
+
+    return inst
+end, { Asset("ANIM", "anim/siving_boss_flower.zip") }, { "siving_boss_flower_fx" }))
 
 --------------------------------------------------------------------------
 --[[ 子圭之眼 ]]
@@ -2282,48 +2217,38 @@ local function Fn_onBind_eye(inst, tree, bird)
     end
 end
 
-table.insert(prefs, Prefab(
-    "siving_boss_eye",
-    function()
-        local inst = CreateEntity()
+table.insert(prefs, Prefab("siving_boss_eye", function()
+    local inst = CreateEntity()
+    inst.entity:AddTransform()
+    inst.entity:AddFollower()
+    inst.entity:AddAnimState()
+    inst.entity:AddNetwork()
 
-        inst.entity:AddTransform()
-        inst.entity:AddFollower()
-        inst.entity:AddAnimState()
-        inst.entity:AddNetwork()
+    -- inst:AddTag("NOCLICK")
+    inst:AddTag("FX")
 
-        -- inst:AddTag("NOCLICK")
-        inst:AddTag("FX")
+    inst.AnimState:SetBank("siving_boss_eye")
+    inst.AnimState:SetBuild("siving_boss_eye")
+    inst.AnimState:PlayAnimation("bind")
+    inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
+    inst.AnimState:SetScale(1.3, 1.3)
+    inst.AnimState:SetFinalOffset(3)
+    inst.AnimState:SetSortOrder(3)
 
-        inst.AnimState:SetBank("siving_boss_eye")
-        inst.AnimState:SetBuild("siving_boss_eye")
-        inst.AnimState:PlayAnimation("bind")
-        inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
-        inst.AnimState:SetScale(1.3, 1.3)
-        inst.AnimState:SetFinalOffset(3)
-        inst.AnimState:SetSortOrder(3)
+    inst.entity:SetPristine()
+    if not TheWorld.ismastersim then return inst end
 
-        inst.entity:SetPristine()
-        if not TheWorld.ismastersim then return inst end
+    inst.persists = false
+    inst.tree = nil
+    inst.bird = nil
+    inst.target = nil
 
-        inst.persists = false
-        inst.tree = nil
-        inst.bird = nil
-        inst.target = nil
+    inst.fn_onUnbind = Fn_onUnbind_eye --解除
+    inst.fn_onBind = Fn_onBind_eye --化作
+    inst._task_re = inst:DoTaskInTime(1, inst.Remove)
 
-        inst.fn_onUnbind = Fn_onUnbind_eye --解除
-        inst.fn_onBind = Fn_onBind_eye --化作
-        inst._task_re = inst:DoTaskInTime(1, inst.Remove)
-
-        return inst
-    end,
-    {
-        Asset("ANIM", "anim/siving_boss_eye.zip")
-    },
-    {
-        "siving_boss_root"
-    }
-))
+    return inst
+end, { Asset("ANIM", "anim/siving_boss_eye.zip") }, { "siving_boss_root" }))
 
 --------------------------------------------------------------------------
 --[[ 子圭突触 ]]
@@ -2447,81 +2372,75 @@ local function OnLoad_root(inst, data)
     SetClosedPhysics(inst)
 end
 
-table.insert(prefs, Prefab(
-    "siving_boss_root",
-    function()
-        local inst = CreateEntity()
+table.insert(prefs, Prefab("siving_boss_root", function()
+    local inst = CreateEntity()
+    inst.entity:AddTransform()
+    inst.entity:AddAnimState()
+    inst.entity:AddSoundEmitter()
+    inst.entity:AddNetwork()
+    inst.entity:AddLight()
 
-        inst.entity:AddTransform()
-        inst.entity:AddAnimState()
-        inst.entity:AddSoundEmitter()
-        inst.entity:AddNetwork()
-        inst.entity:AddLight()
+    inst:AddTag("siv_boss_block") --用来被清场
+    inst:AddTag("siving_derivant")
+    inst:AddTag("trapdamage") --让骨甲能生效
 
-        inst:AddTag("siv_boss_block") --用来被清场
-        inst:AddTag("siving_derivant")
-        inst:AddTag("trapdamage") --让骨甲能生效
+    inst.AnimState:SetBank("atrium_fence")
+    if CONFIGS_LEGION.SIVINGROOTTEX == 1 then
+        inst.AnimState:SetBuild("siving_boss_root")
+    else
+        inst.AnimState:SetBuild("atrium_fence")
+        inst.AnimState:SetMultColour(80/255, 147/255, 150/255, 1)
+    end
+    inst.AnimState:PlayAnimation("shrunk")
+    -- inst.AnimState:SetScale(1.3, 1.3)
 
-        inst.AnimState:SetBank("atrium_fence")
-        if CONFIGS_LEGION.SIVINGROOTTEX == 1 then
-            inst.AnimState:SetBuild("siving_boss_root")
-        else
-            inst.AnimState:SetBuild("atrium_fence")
-            inst.AnimState:SetMultColour(80/255, 147/255, 150/255, 1)
-        end
-        inst.AnimState:PlayAnimation("shrunk")
-        -- inst.AnimState:SetScale(1.3, 1.3)
+    inst.Light:Enable(false)
+    inst.Light:SetRadius(1.5)
+    inst.Light:SetFalloff(1)
+    inst.Light:SetIntensity(.6)
+    inst.Light:SetColour(15/255, 180/255, 132/255)
 
-        inst.Light:Enable(false)
-        inst.Light:SetRadius(1.5)
-        inst.Light:SetFalloff(1)
-        inst.Light:SetIntensity(.6)
-        inst.Light:SetColour(15/255, 180/255, 132/255)
+    MakeObstaclePhysics(inst, 0.15)
+    SetOpenedPhysics(inst)
 
-        MakeObstaclePhysics(inst, 0.15)
-        SetOpenedPhysics(inst)
+    inst.entity:SetPristine()
+    if not TheWorld.ismastersim then return inst end
 
-        inst.entity:SetPristine()
-        if not TheWorld.ismastersim then return inst end
+    inst.fenceid = math.random(5)
+    inst.treeState = 0
 
-        inst.fenceid = math.random(5)
-        inst.treeState = 0
+    if CONFIGS_LEGION.SIVINGROOTTEX == 1 then
+        inst.OnTreeLive = OnTreeLive_root1
+    else
+        inst.OnTreeLive = OnTreeLive_root2
+    end
 
-        if CONFIGS_LEGION.SIVINGROOTTEX == 1 then
-            inst.OnTreeLive = OnTreeLive_root1
-        else
-            inst.OnTreeLive = OnTreeLive_root2
-        end
+    inst.fn_onAttack = Fn_onAttack_root
+    inst.fn_onClear = Fn_onClear_root
 
-        inst.fn_onAttack = Fn_onAttack_root
-        inst.fn_onClear = Fn_onClear_root
+    inst:AddComponent("inspectable")
 
-        inst:AddComponent("inspectable")
+    inst:AddComponent("bloomer")
 
-        inst:AddComponent("bloomer")
+    inst:AddComponent("workable")
+    inst.components.workable:SetWorkAction(ACTIONS.MINE)
+    inst.components.workable:SetWorkLeft(1)
+    inst.components.workable:SetOnFinishCallback(OnFinished_root)
 
-        inst:AddComponent("workable")
-        inst.components.workable:SetWorkAction(ACTIONS.MINE)
-        inst.components.workable:SetWorkLeft(1)
-        inst.components.workable:SetOnFinishCallback(OnFinished_root)
+    inst:AddComponent("lootdropper")
+    inst.components.lootdropper:AddChanceLoot("siving_rocks", 0.001)
 
-        inst:AddComponent("lootdropper")
-        inst.components.lootdropper:AddChanceLoot("siving_rocks", 0.001)
+    MakeHauntableWork(inst)
 
-        MakeHauntableWork(inst)
+    inst.OnSave = OnSave_root
+    inst.OnLoad = OnLoad_root
 
-        inst.OnSave = OnSave_root
-        inst.OnLoad = OnLoad_root
-
-        return inst
-    end,
-    {
-        Asset("ANIM", "anim/siving_boss_root.zip"),
-        Asset("ANIM", "anim/siving_boss_root2.zip"),
-        Asset("ANIM", "anim/atrium_fence.zip")
-    },
-    nil
-))
+    return inst
+end, {
+    Asset("ANIM", "anim/siving_boss_root.zip"),
+    Asset("ANIM", "anim/siving_boss_root2.zip"),
+    Asset("ANIM", "anim/atrium_fence.zip")
+}, nil))
 
 --------------------------------------------------------------------------
 --[[ 子圭·翰 ]]
@@ -2628,7 +2547,7 @@ MakeBossWeapon({
 
         inst.task_explode = inst:DoTaskInTime(TIME_FEA_EXPLODE, TryExplode_bossfea)
         inst.fn_onClear = Fn_onClear_bossfea
-    end,
+    end
 })
 
 --------------------------------------------------------------------------
@@ -2685,7 +2604,7 @@ MakeBossWeapon({
         inst.components.workable:SetOnFinishCallback(OnFinished_bossfea2)
 
         inst.fn_onClear = Fn_onClear_bossfea2
-    end,
+    end
 })
 
 --------------------------------------------------------------------------
@@ -2830,54 +2749,49 @@ local function Fn_spell_line(inst, doer, pos, options)
     end
 end
 
-table.insert(prefs, Prefab(
-    "siving_feather_line",
-    function()
-        local inst = CreateEntity()
+table.insert(prefs, Prefab("siving_feather_line", function()
+    local inst = CreateEntity()
+    inst.entity:AddTransform() --Tip：AddAnimState 组件 必需在该组件之后，否则会崩溃
 
-        inst.entity:AddTransform() --Tip：AddAnimState 组件 必需在该组件之后，否则会崩溃
+    --这个prefab我本来不准备加动画机制的，但是【Super Wall】mod 里会因此崩溃：它的机制默认装备物品是有这个组件的
+    inst.entity:AddAnimState()
 
-        --这个prefab我本来不准备加动画机制的，但是【Super Wall】mod 里会因此崩溃：它的机制默认装备物品是有这个组件的
-        inst.entity:AddAnimState()
+    inst.entity:AddNetwork()
 
-        inst.entity:AddNetwork()
+    MakeInventoryPhysics(inst)
 
-        MakeInventoryPhysics(inst)
+    inst:AddTag("s_l_pull") --skill_legion_pull
+    inst:AddTag("siv_line")
+    inst:AddTag("allow_action_on_impassable")
 
-        inst:AddTag("s_l_pull") --skill_legion_pull
-        inst:AddTag("siv_line")
-        inst:AddTag("allow_action_on_impassable")
+    inst.entity:SetPristine()
+    if not TheWorld.ismastersim then return inst end
 
-        inst.entity:SetPristine()
-        if not TheWorld.ismastersim then return inst end
+    inst.persists = false
+    inst.linedoer = nil --指发起这个动作的玩家
 
-        inst.persists = false
-        inst.linedoer = nil --指发起这个动作的玩家
+    inst:AddComponent("inspectable")
 
-        inst:AddComponent("inspectable")
+    inst:AddComponent("inventoryitem")
+    inst.components.inventoryitem.imagename = "siving_feather_line"
+    inst.components.inventoryitem.atlasname = "images/inventoryimages/siving_feather_line.xml"
+    inst.components.inventoryitem:SetOnDroppedFn(RemoveLine)
 
-        inst:AddComponent("inventoryitem")
-        inst.components.inventoryitem.imagename = "siving_feather_line"
-        inst.components.inventoryitem.atlasname = "images/inventoryimages/siving_feather_line.xml"
-        inst.components.inventoryitem:SetOnDroppedFn(RemoveLine)
+    inst:AddComponent("equippable")
+    inst.components.equippable:SetOnEquip(OnEquip_line)
+    inst.components.equippable:SetOnUnequip(OnUnequip_line)
 
-        inst:AddComponent("equippable")
-        inst.components.equippable:SetOnEquip(OnEquip_line)
-        inst.components.equippable:SetOnUnequip(OnUnequip_line)
+    inst:AddComponent("skillspelllegion")
+    inst.components.skillspelllegion.fn_spell = Fn_spell_line
 
-        inst:AddComponent("skillspelllegion")
-        inst.components.skillspelllegion.fn_spell = Fn_spell_line
+    inst.task_remove = inst:DoTaskInTime(3.5, RemoveLine)
 
-        inst.task_remove = inst:DoTaskInTime(3.5, RemoveLine)
-
-        return inst
-    end,
-    {
-        Asset("ATLAS", "images/inventoryimages/siving_feather_line.xml"),
-        Asset("IMAGE", "images/inventoryimages/siving_feather_line.tex"),
-    },
-    nil
-))
+    return inst
+end, {
+    Asset("ATLAS", "images/inventoryimages/siving_feather_line.xml"),
+    Asset("IMAGE", "images/inventoryimages/siving_feather_line.tex"),
+    -- Asset("ATLAS_BUILD", "images/inventoryimages/siving_feather_line.xml", 256) --不需要这个
+}, nil))
 
 --------------------
 --------------------

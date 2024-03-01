@@ -325,8 +325,10 @@ end
 RegisterInvItems({
     ------花香四溢
     "petals_rose", "petals_lily", "petals_orchid",
-    "rosorns", "lileaves", "orchitwigs", "neverfade",
-    "sachet",
+    "rosorns", "lileaves", "orchitwigs", "neverfade", "neverfade_broken",
+    "sachet", "foliageath", "foliageath_rosorns", "foliageath_lileaves", "foliageath_orchitwigs",
+    "foliageath_neverfade", "foliageath_hambat", "foliageath_bullkelp_root", "foliageath_foliageath",
+    "foliageath_dish_tomahawksteak",
     ------美味佳肴
     ------尘世蜃楼
     "shyerry", "shyerry_cooked", "shyerrylog", "shield_l_sand", "guitar_whitewood", "mat_whitewood_item",
@@ -337,19 +339,21 @@ RegisterInvItems({
     "pineananas_oversized", "pineananas_oversized_waxed", "pineananas_oversized_rotten", "carpet_plush",
     "mint_l", "siving_soil_item", "ahandfulofwings", "insectshell_l", "boltwingout", "hat_elepheetle",
     "siving_rocks", --mod之间注册相同的文件是有效的
-    "siving_ctlwater_item", "siving_ctldirt_item", "siving_ctlall_item", "fishhomingtool_normal",
-    "fishhomingtool_awesome", "siving_mask", "siving_mask_gold", "siving_feather_real", "armor_elepheetle",
-    "carpet_plush_big", "siving_suit", "siving_suit_gold", "ointment_l_sivbloodreduce",
+    "siving_ctlwater_item", "siving_ctldirt_item", "siving_ctlall_item", "ointment_l_sivbloodreduce",
+    "siving_mask", "siving_mask_gold", "siving_feather_real", "armor_elepheetle", "lance_carrot_l",
+    "carpet_plush_big", "siving_suit", "siving_suit_gold",
     ------电闪雷鸣
     "albicans_cap", "tripleshovelaxe", "triplegoldenshovelaxe", "dualwrench", "icire_rock", "hat_cowboy",
     "guitar_miguel", "web_hump_item", "saddle_baggage", "hat_albicans_mushroom", "soul_contracts",
-    "explodingfruitcake", "tourmalinecore", "tourmalineshard",
+    "explodingfruitcake", "tourmalinecore", "tourmalineshard", "fimbul_axe",
     ------祈雨祭
     "monstrain_leaf", "squamousfruit", "raindonate", "book_weather", "merm_scales", "hat_mermbreathing",
-    "giantsfoot", "hiddenmoonlight_item", "revolvedmoonlight_item",
+    "giantsfoot", "hiddenmoonlight_item", "revolvedmoonlight_item", "agronssword", "agronssword2",
+    "fishhomingbait1", "fishhomingbait2", "fishhomingbait3", "fishhomingtool_awesome", "fishhomingtool_normal",
     ------黯涌
-    "shield_l_log", "hat_lichen"
+    "shield_l_log", "hat_lichen", "backcub",
 })
+RegisterInventoryItemAtlas("images/inventoryimages/siving_feather_line.xml", "siving_feather_line.tex")
 
 ------小地图图标
 

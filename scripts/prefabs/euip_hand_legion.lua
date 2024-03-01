@@ -58,7 +58,9 @@ end
 local function SetPerishable(inst, time, replacement, onperish) --新鲜度组件
     inst:AddComponent("perishable")
     inst.components.perishable:SetPerishTime(time)
-    inst.components.perishable.onperishreplacement = replacement
+    if replacement ~= nil then
+        inst.components.perishable.onperishreplacement = replacement
+    end
     if onperish ~= nil then
         inst.components.perishable:SetOnPerishFn(onperish)
     end
@@ -725,7 +727,7 @@ table.insert(prefs, Prefab("rosorns", function()
 
     Fn_server(inst, "rosorns", OnEquip_rose, OnUnequip_rose)
     SetWeapon(inst, 51, OnAttack_rose)
-    SetPerishable(inst, TUNING.TOTAL_DAY_TIME*8, "spoiled_food", nil)
+    SetPerishable(inst, TUNING.TOTAL_DAY_TIME*8, nil, inst.Remove)
     MakeHauntableLaunchAndPerish(inst)
 
     inst.components.skinedlegion:SetOnPreLoad()
@@ -787,7 +789,7 @@ table.insert(prefs, Prefab("lileaves", function()
 
     Fn_server(inst, "lileaves", OnEquip_lily, OnUnequip_base)
     SetWeapon(inst, 51, OnAttack_lily)
-    SetPerishable(inst, TUNING.TOTAL_DAY_TIME*8, "spoiled_food", nil)
+    SetPerishable(inst, TUNING.TOTAL_DAY_TIME*8, nil, inst.Remove)
     MakeHauntableLaunchAndPerish(inst)
 
     inst.components.skinedlegion:SetOnPreLoad()
@@ -888,7 +890,7 @@ table.insert(prefs, Prefab("orchitwigs", function()
 
     Fn_server(inst, "orchitwigs", OnEquip_orchid, OnUnequip_base)
     SetWeapon(inst, TUNING.BASE_SURVIVOR_ATTACK*0.9, OnAttack_orchid)
-    SetPerishable(inst, TUNING.TOTAL_DAY_TIME*8, "spoiled_food", nil)
+    SetPerishable(inst, TUNING.TOTAL_DAY_TIME*8, nil, inst.Remove)
     MakeHauntableLaunchAndPerish(inst)
 
     inst.components.skinedlegion:SetOnPreLoad()
@@ -2121,6 +2123,7 @@ if TUNING.FUNCTIONAL_MEDAL_IS_OPEN then --能力勋章兼容
     })
 end
 
--------------------------
+--------------------
+--------------------
 
 return unpack(prefs)

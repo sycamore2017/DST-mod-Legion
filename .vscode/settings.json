@@ -199,5 +199,7 @@
     ],
     "Lua.diagnostics.disable": [
         "undefined-field"
-    ]
+    ],
+    "editor.fontSize": 16,
+    "editor.fontVariations": false
 }

@@ -1,7 +1,8 @@
 local assets = {
     Asset("ANIM", "anim/foliageath.zip"),
     Asset("ATLAS", "images/inventoryimages/foliageath.xml"),
-    Asset("IMAGE", "images/inventoryimages/foliageath.tex")
+    Asset("IMAGE", "images/inventoryimages/foliageath.tex"),
+    Asset("ATLAS_BUILD", "images/inventoryimages/foliageath.xml", 256)
 }
 local prefabs = {
     "foliageath_together",
@@ -92,20 +93,28 @@ local assets_together = {
     Asset("ANIM", "anim/foliageath.zip"),
     Asset("ATLAS", "images/inventoryimages/foliageath_rosorns.xml"),
     Asset("IMAGE", "images/inventoryimages/foliageath_rosorns.tex"),
+    Asset("ATLAS_BUILD", "images/inventoryimages/foliageath_rosorns.xml", 256),
     Asset("ATLAS", "images/inventoryimages/foliageath_lileaves.xml"),
     Asset("IMAGE", "images/inventoryimages/foliageath_lileaves.tex"),
+    Asset("ATLAS_BUILD", "images/inventoryimages/foliageath_lileaves.xml", 256),
     Asset("ATLAS", "images/inventoryimages/foliageath_orchitwigs.xml"),
     Asset("IMAGE", "images/inventoryimages/foliageath_orchitwigs.tex"),
+    Asset("ATLAS_BUILD", "images/inventoryimages/foliageath_orchitwigs.xml", 256),
     Asset("ATLAS", "images/inventoryimages/foliageath_neverfade.xml"),
     Asset("IMAGE", "images/inventoryimages/foliageath_neverfade.tex"),
+    Asset("ATLAS_BUILD", "images/inventoryimages/foliageath_neverfade.xml", 256),
     Asset("ATLAS", "images/inventoryimages/foliageath_hambat.xml"),
     Asset("IMAGE", "images/inventoryimages/foliageath_hambat.tex"),
+    Asset("ATLAS_BUILD", "images/inventoryimages/foliageath_hambat.xml", 256),
     Asset("ATLAS", "images/inventoryimages/foliageath_bullkelp_root.xml"),
     Asset("IMAGE", "images/inventoryimages/foliageath_bullkelp_root.tex"),
+    Asset("ATLAS_BUILD", "images/inventoryimages/foliageath_bullkelp_root.xml", 256),
     Asset("ATLAS", "images/inventoryimages/foliageath_foliageath.xml"),
     Asset("IMAGE", "images/inventoryimages/foliageath_foliageath.tex"),
+    Asset("ATLAS_BUILD", "images/inventoryimages/foliageath_foliageath.xml", 256),
     Asset("ATLAS", "images/inventoryimages/foliageath_dish_tomahawksteak.xml"),
-    Asset("IMAGE", "images/inventoryimages/foliageath_dish_tomahawksteak.tex")
+    Asset("IMAGE", "images/inventoryimages/foliageath_dish_tomahawksteak.tex"),
+    Asset("ATLAS_BUILD", "images/inventoryimages/foliageath_dish_tomahawksteak.xml", 256)
 }
 local prefabs_together = {
     "foliageath"

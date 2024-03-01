@@ -1,10 +1,26 @@
 local TOOLS_L = require("tools_legion")
+local prefs = {}
 
 local function GetAssets(name, other)
     local sets = {
         Asset("ANIM", "anim/"..name..".zip"),
         Asset("ATLAS", "images/inventoryimages/"..name..".xml"),
-        Asset("IMAGE", "images/inventoryimages/"..name..".tex")
+        Asset("IMAGE", "images/inventoryimages/"..name..".tex"),
+        Asset("ATLAS_BUILD", "images/inventoryimages/"..name..".xml", 256)
+    }
+    if other ~= nil then
+        for _, v in pairs(other) do
+            table.insert(sets, v)
+        end
+    end
+    return sets
+end
+local function GetAssets2(name, build, other)
+    local sets = {
+        Asset("ANIM", "anim/"..build..".zip"),
+        Asset("ATLAS", "images/inventoryimages/"..name..".xml"),
+        Asset("IMAGE", "images/inventoryimages/"..name..".tex"),
+        Asset("ATLAS_BUILD", "images/inventoryimages/"..name..".xml", 256)
     }
     if other ~= nil then
         for _, v in pairs(other) do
@@ -78,14 +94,6 @@ local function EmptyCptFn(self, ...)end
 --[[ 靠背熊 ]]
 --------------------------------------------------------------------------
 
-local assets_backcub = GetAssets("backcub", {
-    Asset("ANIM", "anim/swap_backcub.zip"),
-    Asset("ANIM", "anim/ui_piggyback_2x6.zip")
-})
-local prefabs_backcub = {
-    "cookedsmallmeat",
-    "furtuft"
-}
 local cycle_backcub = 10
 local hunger_max_backcub = 300
 local hungerrate_backcub = 50*cycle_backcub/TUNING.TOTAL_DAY_TIME
@@ -332,10 +340,9 @@ local function OnEntityReplicated_backcub(inst)
     end
 end
 
-local function Fn_backcub()
+table.insert(prefs, Prefab("backcub", function()
     local inst = CreateEntity()
     inst.entity:AddSoundEmitter()
-
     Fn_common(inst, "backcub", nil, "anim", true, nil)
     SetBackpack_common(inst, "backcub", OnEntityReplicated_backcub)
     -- inst.Transform:SetScale(0.5, 0.5, 0.5) --一旦这里改变动画大小，会导致火焰燃烧特效也跟着变化
@@ -406,14 +413,15 @@ local function Fn_backcub()
     inst.components.skinedlegion:SetOnPreLoad()
 
     return inst
-end
+end, GetAssets("backcub", {
+    Asset("ANIM", "anim/swap_backcub.zip"),
+    Asset("ANIM", "anim/ui_piggyback_2x6.zip")
+}), { "cookedsmallmeat", "furtuft" }))
 
 --------------------------------------------------------------------------
 --[[ 香包 ]]
 --------------------------------------------------------------------------
 
-local assets_sachet = GetAssets("sachet")
-local prefabs_sachet = { "butterfly" }
 local tags_cant_sachet = { "INLIMBO", "NOCLICK" }
 
 local function ButterflyCycle_sachet(inst)
@@ -508,9 +516,8 @@ local function OnDepleted_sachet(inst)
     inst:Remove()
 end
 
-local function Fn_sachet()
+table.insert(prefs, Prefab("sachet", function()
     local inst = CreateEntity()
-
     Fn_common(inst, "sachet", nil, "anim", nil, nil)
 
     MakeInventoryFloatable(inst, "small", 0.2, 0.8)
@@ -541,17 +548,14 @@ local function Fn_sachet()
 
     MakeSmallBurnable(inst, TUNING.SMALL_BURNTIME)
     MakeSmallPropagator(inst)
-
     MakeHauntableLaunch(inst)
 
     return inst
-end
+end, GetAssets("sachet"), { "butterfly" }))
 
 --------------------------------------------------------------------------
 --[[ 犀金护甲 ]]
 --------------------------------------------------------------------------
-
-local assets_beetlearmor = GetAssets("armor_elepheetle")
 
 local function OnSetBonusOn_beetlearmor(inst)
 	inst.components.armor:SetAbsorption(0.95)
@@ -599,9 +603,8 @@ local foreverequip_beetlearmor = {
     fn_setEquippable = SetupEquippable_beetlearmor
 }
 
-local function Fn_beetlearmor()
+table.insert(prefs, Prefab("armor_elepheetle", function()
     local inst = CreateEntity()
-
     Fn_common(inst, "armor_elepheetle", nil, nil, nil, "dontstarve/movement/foley/shellarmour")
 
     inst:AddTag("heavyarmor") --减轻击退效果 官方tag
@@ -641,16 +644,12 @@ local function Fn_beetlearmor()
     -- inst.components.skinedlegion:SetOnPreLoad()
 
     return inst
-end
+end, GetAssets("armor_elepheetle"), nil))
 
 --------------------------------------------------------------------------
 --[[ 羽化后的壳 ]]
 --------------------------------------------------------------------------
 
-local assets_shuck = {
-    Asset("ANIM", "anim/spider_cocoon.zip"), --官方蜘蛛巢动画
-    Asset("ANIM", "anim/boltwingout_shuck.zip")
-}
 local tags_cant_shuck = TOOLS_L.TagsCombat3({ "player" })
 
 local function AttractEnemies_shuck(inst)
@@ -735,7 +734,7 @@ local function OnHaunt_shuck(inst)
     return false
 end
 
-local function Fn_shuck()
+table.insert(prefs, Prefab("boltwingout_shuck", function()
     local inst = CreateEntity()
 
     inst.entity:AddTransform()
@@ -795,22 +794,14 @@ local function Fn_shuck()
     inst.OnEntityWake = OnEntityWake_shuck
 
     return inst
-end
+end, {
+    Asset("ANIM", "anim/spider_cocoon.zip"), --官方蜘蛛巢动画
+    Asset("ANIM", "anim/boltwingout_shuck.zip")
+}, nil))
 
 --------------------------------------------------------------------------
 --[[ 脱壳之翅 ]]
 --------------------------------------------------------------------------
-
-local assets_boltout = {
-    Asset("ANIM", "anim/swap_boltwingout.zip"),
-    Asset("ATLAS", "images/inventoryimages/boltwingout.xml"),
-    Asset("IMAGE", "images/inventoryimages/boltwingout.tex"),
-    Asset("ANIM", "anim/ui_piggyback_2x6.zip")
-}
-local prefabs_boltout = {
-    "boltwingout_fx",
-    "boltwingout_shuck"
-}
 
 local function OnEquip_boltout(inst, owner)
     local skindata = inst.components.skinedlegion:GetSkinedData()
@@ -864,9 +855,8 @@ local function OnEntityReplicated_boltout(inst)
     end
 end
 
-local function Fn_boltout()
+table.insert(prefs, Prefab("boltwingout", function()
     local inst = CreateEntity()
-
     Fn_common(inst, "swap_boltwingout", nil, nil, nil, "dontstarve/movement/foley/grassarmour")
     SetBackpack_common(inst, "boltwingout", OnEntityReplicated_boltout)
     -- inst.foleysound = "legion/foleysound/insect"
@@ -893,13 +883,15 @@ local function Fn_boltout()
     inst.components.skinedlegion:SetOnPreLoad()
 
     return inst
-end
+end, GetAssets2("boltwingout", "swap_boltwingout", { Asset("ANIM", "anim/ui_piggyback_2x6.zip") }), {
+    "boltwingout_fx",
+    "boltwingout_shuck"
+}))
 
 --------------------------------------------------------------------------
 --[[ 子圭·庇 ]]
 --------------------------------------------------------------------------
 
-local assets_sivsuit = GetAssets("siving_suit")
 local prefabs_sivsuit = { "sivsuitatk_fx" }
 
 local function SetSymbols_sivsuit(inst, owner)
@@ -1005,9 +997,8 @@ local function OnUnequip_sivsuit(inst, owner)
     owner:RemoveEventCallback("attacked", OnAttacked_sivsuit)
 end
 
-local function Fn_sivsuit()
+table.insert(prefs, Prefab("siving_suit", function()
     local inst = CreateEntity()
-
     Fn_common(inst, "siving_suit", nil, nil, nil, "dontstarve/movement/foley/marblearmour")
 
     inst:AddComponent("skinedlegion")
@@ -1039,13 +1030,11 @@ local function Fn_sivsuit()
     inst.components.skinedlegion:SetOnPreLoad()
 
     return inst
-end
+end, GetAssets("siving_suit"), prefabs_sivsuit))
 
 --------------------------------------------------------------------------
 --[[ 子圭·釜 ]]
 --------------------------------------------------------------------------
-
-local assets_sivsuit2 = GetAssets("siving_suit_gold", { Asset("ANIM", "anim/ui_piggyback_2x6.zip") })
 
 local function OnSetBonusOn_sivsuit2(inst)
 	inst.bloodclotmult_l = 0.45
@@ -1107,9 +1096,8 @@ local function OnEntityReplicated_sivsuit2(inst)
     end
 end
 
-local function Fn_sivsuit2()
+table.insert(prefs, Prefab("siving_suit_gold", function()
     local inst = CreateEntity()
-
     Fn_common(inst, "siving_suit_gold", nil, nil, nil, "dontstarve/movement/foley/marblearmour")
     SetBackpack_common(inst, "siving_suit_gold", OnEntityReplicated_sivsuit2)
 
@@ -1142,18 +1130,9 @@ local function Fn_sivsuit2()
     inst.components.skinedlegion:SetOnPreLoad()
 
     return inst
-end
+end, GetAssets("siving_suit_gold", { Asset("ANIM", "anim/ui_piggyback_2x6.zip") }), prefabs_sivsuit))
 
--------------------------
-
-local prefs = {
-    Prefab("backcub", Fn_backcub, assets_backcub, prefabs_backcub),
-    Prefab("sachet", Fn_sachet, assets_sachet, prefabs_sachet),
-    Prefab("armor_elepheetle", Fn_beetlearmor, assets_beetlearmor),
-    Prefab("boltwingout_shuck", Fn_shuck, assets_shuck),
-    Prefab("boltwingout", Fn_boltout, assets_boltout, prefabs_boltout),
-    Prefab("siving_suit", Fn_sivsuit, assets_sivsuit, prefabs_sivsuit),
-    Prefab("siving_suit_gold", Fn_sivsuit2, assets_sivsuit2, prefabs_sivsuit)
-}
+--------------------
+--------------------
 
 return unpack(prefs)

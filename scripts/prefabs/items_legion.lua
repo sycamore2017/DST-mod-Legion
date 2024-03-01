@@ -95,7 +95,9 @@ end
 local function SetPerishable(inst, time, replacement, onperish) --新鲜度组件
     inst:AddComponent("perishable")
     inst.components.perishable:SetPerishTime(time)
-    inst.components.perishable.onperishreplacement = replacement
+    if replacement ~= nil then
+        inst.components.perishable.onperishreplacement = replacement
+    end
     if onperish ~= nil then
         inst.components.perishable:SetOnPerishFn(onperish)
     end

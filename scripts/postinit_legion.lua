@@ -956,8 +956,8 @@ local function CanTarget_bunnyman(self, target, ...)
     then
         return false
     end
-    if self.CanTarget_l_lichen ~= nil then
-        return self.CanTarget_l_lichen(self, target, ...)
+    if self.CanTarget_l ~= nil then
+        return self.CanTarget_l(self, target, ...)
     end
     return false
 end

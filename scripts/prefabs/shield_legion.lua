@@ -5,6 +5,21 @@ local TOOLS_L = require("tools_legion")
 --[[ 通用函数 ]]
 --------------------------------------------------------------------------
 
+local function GetAssets(name, other)
+    local sets = {
+        Asset("ANIM", "anim/"..name..".zip"),
+        Asset("ATLAS", "images/inventoryimages/"..name..".xml"),
+        Asset("IMAGE", "images/inventoryimages/"..name..".tex"),
+        Asset("ATLAS_BUILD", "images/inventoryimages/"..name..".xml", 256)
+    }
+    if other ~= nil then
+        for _, v in pairs(other) do
+            table.insert(sets, v)
+        end
+    end
+    return sets
+end
+
 local function Counterattack_base(inst, doer, attacker, data, range, atk)
     local snap = SpawnPrefab("impact")
     local x, y, z = doer.Transform:GetWorldPosition()
@@ -309,11 +324,7 @@ local foreverequip_sand = {
 
 MakeShield({
     name = "shield_l_sand",
-    assets = {
-        Asset("ANIM", "anim/shield_l_sand.zip"),
-        Asset("ATLAS", "images/inventoryimages/shield_l_sand.xml"),
-        Asset("IMAGE", "images/inventoryimages/shield_l_sand.tex"),
-    },
+    assets = GetAssets("shield_l_sand", nil),
     prefabs = {
         "sandspike_legion",    --对玩家友好的沙之咬
         "shield_attack_l_fx",
@@ -346,7 +357,7 @@ MakeShield({
         TOOLS_L.MakeNoLossRepairableEquipment(inst, foreverequip_sand)
 
         inst.components.skinedlegion:SetOnPreLoad()
-    end,
+    end
 })
 
 --------------------------------------------------------------------------
@@ -362,11 +373,7 @@ end
 
 MakeShield({
     name = "shield_l_log",
-    assets = {
-        Asset("ANIM", "anim/shield_l_log.zip"),
-        Asset("ATLAS", "images/inventoryimages/shield_l_log.xml"),
-        Asset("IMAGE", "images/inventoryimages/shield_l_log.tex"),
-    },
+    assets = GetAssets("shield_l_log", nil),
     prefabs = { "shield_attack_l_fx" },
     fn_common = function(inst)
         inst:AddComponent("skinedlegion")
@@ -396,7 +403,7 @@ MakeShield({
         MakeSmallPropagator(inst)
 
         inst.components.skinedlegion:SetOnPreLoad()
-    end,
+    end
 })
 
 --------------------------------------------------------------------------
@@ -633,13 +640,11 @@ end
 
 MakeShield({
     name = "agronssword",
-    assets = {
-        Asset("ANIM", "anim/agronssword.zip"),
-        Asset("ATLAS", "images/inventoryimages/agronssword.xml"),
-        Asset("IMAGE", "images/inventoryimages/agronssword.tex"),
+    assets = GetAssets("agronssword", {
         Asset("ATLAS", "images/inventoryimages/agronssword2.xml"),
-        Asset("IMAGE", "images/inventoryimages/agronssword2.tex")
-    },
+        Asset("IMAGE", "images/inventoryimages/agronssword2.tex"),
+        Asset("ATLAS_BUILD", "images/inventoryimages/agronssword2.xml", 256)
+    }),
     prefabs = { "agronssword_fx" },
     fn_common = function(inst)
         inst.entity:AddMiniMapEntity()
@@ -715,7 +720,7 @@ MakeShield({
         inst.OnLoad = OnLoad_agron
 
         inst.components.skinedlegion:SetOnPreLoad()
-    end,
+    end
 })
 
 --------------------

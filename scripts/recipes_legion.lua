@@ -205,7 +205,7 @@ AddRecipe2( --蛛网标记
     }, tech_recast[2], {
         nounlock = lock_recast, builder_tag = lock_recast and "spiderwhisperer" or nil,
         atlas = "images/inventoryimages/web_hump_item.xml"
-    }, { "RECAST", "STRUCTURES", "DECOR", "CHARACTER" }
+    }, { "RECAST", "STRUCTURES", "CHARACTER" }
 )
 AddRecipe2( --灵魂契约
     "soul_contracts", {

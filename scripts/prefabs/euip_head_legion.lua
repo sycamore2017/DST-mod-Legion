@@ -1,10 +1,12 @@
 local TOOLS_L = require("tools_legion")
+local prefs = {}
 
 local function GetAssets(name, other)
     local sets = {
         Asset("ANIM", "anim/"..name..".zip"),
         Asset("ATLAS", "images/inventoryimages/"..name..".xml"),
-        Asset("IMAGE", "images/inventoryimages/"..name..".tex")
+        Asset("IMAGE", "images/inventoryimages/"..name..".tex"),
+        Asset("ATLAS_BUILD", "images/inventoryimages/"..name..".xml", 256)
     }
     if other ~= nil then
         for _, v in pairs(other) do
@@ -42,6 +44,18 @@ local function Fn_server(inst, img, OnEquip, OnUnequip)
     inst.components.equippable:SetOnUnequip(OnUnequip)
 end
 
+local function SetPerishable(inst, time, replacement, onperish) --新鲜度组件
+    inst:AddComponent("perishable")
+    inst.components.perishable:SetPerishTime(time)
+    if replacement ~= nil then
+        inst.components.perishable.onperishreplacement = replacement
+    end
+    if onperish ~= nil then
+        inst.components.perishable:SetOnPerishFn(onperish)
+    end
+    inst.components.perishable:StartPerishing()
+end
+
 local function SetBonus(inst, name, OnSetBonusOn, OnSetBonusOff)
     inst:AddComponent("setbonus")
     inst.components.setbonus:SetSetName(EQUIPMENTSETNAMES[name])
@@ -59,9 +73,6 @@ end
 --------------------------------------------------------------------------
 --[[ 苔衣发卡 ]]
 --------------------------------------------------------------------------
-
-local assets_lichen = GetAssets("hat_lichen")
-local prefabs_lichen = { "lichenhatlight" }
 
 local function OnEquip_lichen(inst, owner)
     if inst._light == nil or not inst._light:IsValid() then
@@ -104,9 +115,8 @@ local function OnUnequip_lichen(inst, owner)
     soundemitter:PlaySound("dontstarve/common/minerhatOut") --卸下时的音效
 end
 
-local function Fn_lichen()
+table.insert(prefs, Prefab("hat_lichen", function()
     local inst = CreateEntity()
-
     inst.entity:AddSoundEmitter()
     Fn_common(inst, "hat_lichen", nil, "anim", nil)
 
@@ -123,23 +133,19 @@ local function Fn_lichen()
     -- inst._light = nil
 
     Fn_server(inst, "hat_lichen", OnEquip_lichen, OnUnequip_lichen)
+    SetPerishable(inst, TUNING.PERISH_ONE_DAY*5, nil, inst.Remove)
 
     inst.components.equippable.dapperness = TUNING.DAPPERNESS_MED
-
-    inst:AddComponent("perishable")
-    inst.components.perishable:SetPerishTime(TUNING.PERISH_ONE_DAY*5)
-    inst.components.perishable:SetOnPerishFn(inst.Remove)
-    inst.components.perishable:StartPerishing()
 
     MakeHauntableLaunchAndPerish(inst)
 
     inst.components.skinedlegion:SetOnPreLoad()
 
     return inst
-end
-local function Fn_lichenlight() --苔衣发卡的光源实体
-    local inst = CreateEntity()
+end, GetAssets("hat_lichen"), { "lichenhatlight" }))
 
+table.insert(prefs, Prefab("lichenhatlight", function() ------苔衣发卡的光源实体
+    local inst = CreateEntity()
     inst.entity:AddTransform()
     inst.entity:AddLight()
     inst.entity:AddNetwork()
@@ -157,13 +163,12 @@ local function Fn_lichenlight() --苔衣发卡的光源实体
     inst.persists = false
 
     return inst
-end
+end, nil, nil))
 
 --------------------------------------------------------------------------
 --[[ 牛仔帽 ]]
 --------------------------------------------------------------------------
 
-local assets_cowboy = GetAssets("hat_cowboy")
 local COW_PERIOD = 10
 local GAIN_DOMESTICATION = TUNING.BEEFALO_DOMESTICATION_GAIN_DOMESTICATION * 0.33 * COW_PERIOD
 
@@ -298,9 +303,8 @@ local function OnUnequip_cowboy(inst, owner)
     inst.mycowboy = nil
 end
 
-local function Fn_cowboy()
+table.insert(prefs, Prefab("hat_cowboy", function()
     local inst = CreateEntity()
-
     Fn_common(inst, "hat_cowboy", nil, "anim", nil)
 
     inst:AddTag("waterproofer")
@@ -335,13 +339,11 @@ local function Fn_cowboy()
     inst.components.skinedlegion:SetOnPreLoad()
 
     return inst
-end
+end, GetAssets("hat_cowboy"), nil))
 
 --------------------------------------------------------------------------
 --[[ 犀金胄甲 ]]
 --------------------------------------------------------------------------
-
-local assets_beetlehat = GetAssets("hat_elepheetle")
 
 local function OnSetBonusOn_beetlehat(inst)
     inst.components.armor.conditionlossmultipliers:SetModifier(inst, 0.6, "setbonus")
@@ -421,9 +423,8 @@ local foreverequip_beetlehat = {
     fn_setEquippable = SetupEquippable_beetlehat
 }
 
-local function Fn_beetlehat()
+table.insert(prefs, Prefab("hat_elepheetle", function()
     local inst = CreateEntity()
-
     Fn_common(inst, "hat_elepheetle", nil, nil, nil)
 
     inst:AddTag("waterproofer")
@@ -463,14 +464,11 @@ local function Fn_beetlehat()
     -- inst.components.skinedlegion:SetOnPreLoad()
 
     return inst
-end
+end, GetAssets("hat_elepheetle"), nil))
 
 --------------------------------------------------------------------------
 --[[ 子圭·汲 ]]
 --------------------------------------------------------------------------
-
-local assets_sivmask = GetAssets("siving_mask")
-local prefabs_sivmask = { "siving_lifesteal_fx" }
 
 local function SetNet_heal_sivmask(inst)
     inst.net_heal_l:set(tostring(TOOLS_L.ODPoint(inst.healthcounter, 10)))
@@ -719,9 +717,8 @@ local function Fn_nameDetail_sivmask(inst)
         { val = inst.net_heal_l:value() or "0", valmax = inst.net_healmax_l:value() or "80" })
 end
 
-local function Fn_sivmask()
+table.insert(prefs, Prefab("siving_mask", function()
     local inst = CreateEntity()
-
     Fn_common(inst, "siving_mask", nil, nil, nil)
 
     -- inst:AddTag("open_top_hat")
@@ -745,7 +742,6 @@ local function Fn_sivmask()
     inst.healthcounter_max = 80 --积累上限
 
     Fn_server(inst, "siving_mask", OnEquip_sivmask, OnUnequip_sivmask)
-
     inst.components.inventoryitem:SetSinks(true) --它是石头做的，不可漂浮
 
     inst:AddComponent("armor")
@@ -761,14 +757,11 @@ local function Fn_sivmask()
     inst.components.skinedlegion:SetOnPreLoad()
 
     return inst
-end
+end, GetAssets("siving_mask"), { "siving_lifesteal_fx" }))
 
 --------------------------------------------------------------------------
 --[[ 子圭·歃 ]]
 --------------------------------------------------------------------------
-
-local assets_sivmask2 = GetAssets("siving_mask_gold")
-local prefabs_sivmask2 = { "siving_lifesteal_fx", "life_trans_fx" }
 
 local function OnRepaired_sivmask2(inst, amount)
     if amount > 0 and inst._broken then
@@ -1024,9 +1017,8 @@ local function OnSetBonusOff_sivmask2(inst)
     inst.net_healmax_l:set("135")
 end
 
-local function Fn_sivmask2()
+table.insert(prefs, Prefab("siving_mask_gold", function()
     local inst = CreateEntity()
-
     Fn_common(inst, "siving_mask_gold", nil, nil, nil)
 
     -- inst:AddTag("open_top_hat")
@@ -1053,7 +1045,6 @@ local function Fn_sivmask2()
     inst.OnCalcuCost_l = CalcuCost
 
     Fn_server(inst, "siving_mask_gold", OnEquip_sivmask2, OnUnequip_sivmask2)
-
     inst.components.inventoryitem:SetSinks(true) --它是石头做的，不可漂浮
 
     inst:AddComponent("armor")
@@ -1075,17 +1066,9 @@ local function Fn_sivmask2()
     inst.components.skinedlegion:SetOnPreLoad()
 
     return inst
-end
+end, GetAssets("siving_mask_gold"), { "siving_lifesteal_fx", "life_trans_fx" }))
 
--------------------------
-
-local prefs = {
-    Prefab("hat_lichen", Fn_lichen, assets_lichen, prefabs_lichen),
-    Prefab("lichenhatlight", Fn_lichenlight),
-    Prefab("hat_cowboy", Fn_cowboy, assets_cowboy),
-    Prefab("hat_elepheetle", Fn_beetlehat, assets_beetlehat),
-    Prefab("siving_mask", Fn_sivmask, assets_sivmask, prefabs_sivmask),
-    Prefab("siving_mask_gold", Fn_sivmask2, assets_sivmask2, prefabs_sivmask2)
-}
+--------------------
+--------------------
 
 return unpack(prefs)

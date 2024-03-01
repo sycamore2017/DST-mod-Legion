@@ -139,70 +139,64 @@ local function OnPicked(inst, picker)
 end
 
 local function MakeBush(data)
-    table.insert(prefs, Prefab(
-        data.name,
-        function()
-            local inst = CreateEntity()
+    table.insert(prefs, Prefab(data.name, function()
+        local inst = CreateEntity()
+        inst.entity:AddTransform()
+        inst.entity:AddAnimState()
+        inst.entity:AddMiniMapEntity()
+        inst.entity:AddNetwork()
 
-            inst.entity:AddTransform()
-            inst.entity:AddAnimState()
-            inst.entity:AddMiniMapEntity()
-            inst.entity:AddNetwork()
+        inst.MiniMapEntity:SetIcon(data.name..".tex")
+        inst.Transform:SetTwoFaced() --两个面，这样就可以左右不同（再多貌似有问题）
 
-            inst.MiniMapEntity:SetIcon(data.name..".tex")
-            inst.Transform:SetTwoFaced() --两个面，这样就可以左右不同（再多貌似有问题）
+        inst.AnimState:SetBank("berrybush2")
+        inst.AnimState:SetBuild(data.name)
+        inst.AnimState:PlayAnimation("idle", true)
+        setberries(inst, 1)
 
-            inst.AnimState:SetBank("berrybush2")
-            inst.AnimState:SetBuild(data.name)
-            inst.AnimState:PlayAnimation("idle", true)
-            setberries(inst, 1)
+        inst:AddTag("bush")
+        inst:AddTag("plant")
+        inst:AddTag("bush_l") --棱镜标签：暂无作用
+        inst:AddTag("rotatableobject") --能让栅栏击剑起作用
+        inst:AddTag("flatrotated_l") --棱镜标签：旋转时旋转180度
 
-            inst:AddTag("bush")
-            inst:AddTag("plant")
-            inst:AddTag("bush_l") --棱镜标签：暂无作用
-            inst:AddTag("rotatableobject") --能让栅栏击剑起作用
-            inst:AddTag("flatrotated_l") --棱镜标签：旋转时旋转180度
+        -- MakeSnowCoveredPristine(inst) --由于某些花丛因体型原因，积雪效果有破绽，就不用了
 
-            -- MakeSnowCoveredPristine(inst) --由于某些花丛因体型原因，积雪效果有破绽，就不用了
+        if data.fn_common ~= nil then
+            data.fn_common(inst)
+        end
 
-            if data.fn_common ~= nil then
-                data.fn_common(inst)
-            end
+        inst.entity:SetPristine()
+        if not TheWorld.ismastersim then return inst end
 
-            inst.entity:SetPristine()
-            if not TheWorld.ismastersim then return inst end
+        -- inst.AnimState:SetTime(math.random() * inst.AnimState:GetCurrentAnimationLength())
+        inst.AnimState:SetFrame(math.random(inst.AnimState:GetCurrentAnimationNumFrames()) - 1)
 
-            -- inst.AnimState:SetTime(math.random() * inst.AnimState:GetCurrentAnimationLength())
-            inst.AnimState:SetFrame(math.random(inst.AnimState:GetCurrentAnimationNumFrames()) - 1)
+        inst:AddComponent("inspectable")
 
-            inst:AddComponent("inspectable")
+        inst:AddComponent("savedrotation")
 
-            inst:AddComponent("savedrotation")
+        inst:AddComponent("lootdropper")
 
-            inst:AddComponent("lootdropper")
+        inst:AddComponent("pickable")
+        inst.components.pickable.picksound = "dontstarve/wilson/harvest_berries"
+        inst.components.pickable.ontransplantfn = OnTransplant
+        inst.components.pickable.makeemptyfn = MakeEmpty
+        inst.components.pickable.makebarrenfn = MakeBarren
+        inst.components.pickable.makefullfn = MakeFull
+        -- inst.components.pickable.onpickedfn = onpickedfn
 
-            inst:AddComponent("pickable")
-            inst.components.pickable.picksound = "dontstarve/wilson/harvest_berries"
-            inst.components.pickable.ontransplantfn = OnTransplant
-            inst.components.pickable.makeemptyfn = MakeEmpty
-            inst.components.pickable.makebarrenfn = MakeBarren
-            inst.components.pickable.makefullfn = MakeFull
-            -- inst.components.pickable.onpickedfn = onpickedfn
+        inst:ListenForEvent("onwenthome", ShakeBush) --监听生物回家事件，目前只有火鸡吧
 
-            inst:ListenForEvent("onwenthome", ShakeBush) --监听生物回家事件，目前只有火鸡吧
+        MakeHauntableIgnite(inst)
+        AddHauntableCustomReaction(inst, OnHaunt, false, false, true)
 
-            MakeHauntableIgnite(inst)
-            AddHauntableCustomReaction(inst, OnHaunt, false, false, true)
+        if data.fn_server ~= nil then
+            data.fn_server(inst)
+        end
 
-            if data.fn_server ~= nil then
-                data.fn_server(inst)
-            end
-
-            return inst
-        end,
-        data.assets,
-        data.prefabs
-    ))
+        return inst
+    end, data.assets, data.prefabs))
 end
 
 --------------------------------------------------------------------------

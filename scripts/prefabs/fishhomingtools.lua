@@ -45,6 +45,7 @@ local assets_normal = {
     Asset("ANIM", "anim/fishhomingtool_normal.zip"),
     Asset("ATLAS", "images/inventoryimages/fishhomingtool_normal.xml"),
     Asset("IMAGE", "images/inventoryimages/fishhomingtool_normal.tex"),
+    Asset("ATLAS_BUILD", "images/inventoryimages/fishhomingtool_normal.xml", 256)
 }
 
 local prefabs_normal = {
@@ -108,6 +109,7 @@ local assets_awesome = {
     Asset("ANIM", "anim/fishhomingtool_awesome.zip"),
     Asset("ATLAS", "images/inventoryimages/fishhomingtool_awesome.xml"),
     Asset("IMAGE", "images/inventoryimages/fishhomingtool_awesome.tex"),
+    Asset("ATLAS_BUILD", "images/inventoryimages/fishhomingtool_awesome.xml", 256)
 }
 
 local function Fn_awesome()
@@ -161,12 +163,14 @@ local assets_bag = {
     Asset("ANIM", "anim/fishhomingbait.zip"),
     Asset("ATLAS", "images/inventoryimages/fishhomingbait1.xml"),
     Asset("IMAGE", "images/inventoryimages/fishhomingbait1.tex"),
+    Asset("ATLAS_BUILD", "images/inventoryimages/fishhomingbait1.xml", 256),
     Asset("ATLAS", "images/inventoryimages/fishhomingbait2.xml"),
     Asset("IMAGE", "images/inventoryimages/fishhomingbait2.tex"),
+    Asset("ATLAS_BUILD", "images/inventoryimages/fishhomingbait2.xml", 256),
     Asset("ATLAS", "images/inventoryimages/fishhomingbait3.xml"),
-    Asset("IMAGE", "images/inventoryimages/fishhomingbait3.tex")
+    Asset("IMAGE", "images/inventoryimages/fishhomingbait3.tex"),
+    Asset("ATLAS_BUILD", "images/inventoryimages/fishhomingbait3.xml", 256)
 }
-
 local prefabs_bag = {
     "fishhomingbaiting"
 }
@@ -382,11 +386,10 @@ end
 --------------------------------------------------------------------------
 
 local assets_baiting = {
-    Asset("ANIM", "anim/fish_chum.zip"),
+    Asset("ANIM", "anim/fish_chum.zip")
 }
-
 local prefabs_baiting = {
-    "chumpiece",
+    "chumpiece"
 }
 
 local function Fn_baiting()
