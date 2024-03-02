@@ -3,16 +3,22 @@ local assets =
     Asset("ANIM", "anim/icire_rock.zip"),
     Asset("ATLAS", "images/inventoryimages/icire_rock.xml"),
     Asset("IMAGE", "images/inventoryimages/icire_rock.tex"),
+    Asset("ATLAS_BUILD", "images/inventoryimages/icire_rock.xml", 256),
     Asset("ATLAS", "images/inventoryimages/icire_rock1.xml"),
     Asset("IMAGE", "images/inventoryimages/icire_rock1.tex"),
+    Asset("ATLAS_BUILD", "images/inventoryimages/icire_rock1.xml", 256),
     Asset("ATLAS", "images/inventoryimages/icire_rock2.xml"),
     Asset("IMAGE", "images/inventoryimages/icire_rock2.tex"),
+    Asset("ATLAS_BUILD", "images/inventoryimages/icire_rock2.xml", 256),
     Asset("ATLAS", "images/inventoryimages/icire_rock3.xml"),
     Asset("IMAGE", "images/inventoryimages/icire_rock3.tex"),
+    Asset("ATLAS_BUILD", "images/inventoryimages/icire_rock3.xml", 256),
     Asset("ATLAS", "images/inventoryimages/icire_rock4.xml"),
     Asset("IMAGE", "images/inventoryimages/icire_rock4.tex"),
+    Asset("ATLAS_BUILD", "images/inventoryimages/icire_rock4.xml", 256),
     Asset("ATLAS", "images/inventoryimages/icire_rock5.xml"),
     Asset("IMAGE", "images/inventoryimages/icire_rock5.tex"),
+    Asset("ATLAS_BUILD", "images/inventoryimages/icire_rock5.xml", 256),
     Asset("ANIM", "anim/heat_rock.zip"), --官方热能石动画模板
 }
 

@@ -3,7 +3,8 @@
 local assets = {
     Asset("ANIM", "anim/giantsfoot.zip"),
     Asset("ATLAS", "images/inventoryimages/giantsfoot.xml"),
-    Asset("IMAGE", "images/inventoryimages/giantsfoot.tex")
+    Asset("IMAGE", "images/inventoryimages/giantsfoot.tex"),
+    Asset("ATLAS_BUILD", "images/inventoryimages/giantsfoot.xml", 256)
 }
 
 local function UpdateNeed(owner, object)

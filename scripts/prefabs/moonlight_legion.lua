@@ -221,7 +221,8 @@ MakeItem({
     assets = {
         Asset("ANIM", "anim/hiddenmoonlight.zip"),
         Asset("ATLAS", "images/inventoryimages/hiddenmoonlight_item.xml"),
-        Asset("IMAGE", "images/inventoryimages/hiddenmoonlight_item.tex")
+        Asset("IMAGE", "images/inventoryimages/hiddenmoonlight_item.tex"),
+        Asset("ATLAS_BUILD", "images/inventoryimages/hiddenmoonlight_item.xml", 256)
     },
     prefabs = { "hiddenmoonlight" },
     -- floatable = { 0.1, "med", 0.3, 0.7 },
@@ -466,7 +467,8 @@ MakeItem({
     assets = {
         Asset("ANIM", "anim/revolvedmoonlight.zip"),
         Asset("ATLAS", "images/inventoryimages/revolvedmoonlight_item.xml"),
-        Asset("IMAGE", "images/inventoryimages/revolvedmoonlight_item.tex")
+        Asset("IMAGE", "images/inventoryimages/revolvedmoonlight_item.tex"),
+        Asset("ATLAS_BUILD", "images/inventoryimages/revolvedmoonlight_item.xml", 256)
     },
     prefabs = { "revolvedmoonlight", "revolvedmoonlight_pro" },
     -- floatable = { 0.18, "small", 0.4, 0.55 },
@@ -987,7 +989,8 @@ local function MakeRevolved(sets)
         Asset("ANIM", "anim/ui_revolvedmoonlight_4x3.zip"),
         Asset("ANIM", "anim/revolvedmoonlight.zip"),
         Asset("ATLAS", "images/inventoryimages/"..sets.name..".xml"),
-        Asset("IMAGE", "images/inventoryimages/"..sets.name..".tex")
+        Asset("IMAGE", "images/inventoryimages/"..sets.name..".tex"),
+        Asset("ATLAS_BUILD", "images/inventoryimages/"..sets.name..".xml", 256)
     }, {
         "revolvedmoonlight_item",
         "collapse_small",
@@ -1465,8 +1468,10 @@ end, {
     Asset("ANIM", "anim/refractedmoonlight.zip"),
     Asset("ATLAS", "images/inventoryimages/refractedmoonlight.xml"),
     Asset("IMAGE", "images/inventoryimages/refractedmoonlight.tex"),
+    Asset("ATLAS_BUILD", "images/inventoryimages/refractedmoonlight.xml", 256),
     Asset("ATLAS", "images/inventoryimages/refractedmoonlight2.xml"),
-    Asset("IMAGE", "images/inventoryimages/refractedmoonlight2.tex")
+    Asset("IMAGE", "images/inventoryimages/refractedmoonlight2.tex"),
+    Asset("ATLAS_BUILD", "images/inventoryimages/refractedmoonlight2.xml", 256)
 }, {
     "refracted_l_spark_fx", "refracted_l_wave_fx",
     "refracted_l_skylight_fx", "refracted_l_light_fx",

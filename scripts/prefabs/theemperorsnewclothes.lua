@@ -35,11 +35,11 @@ end
 
 local function MakeClothes(namepst, slot, fn_equip, fn_unequip)
     local name  = "theemperors"..namepst
-    local assets =
-    {
+    local assets = {
         Asset("ANIM", "anim/theemperorsnewclothes.zip"),
         Asset("ATLAS", "images/inventoryimages/"..name..".xml"),
         Asset("IMAGE", "images/inventoryimages/"..name..".tex"),
+        Asset("ATLAS_BUILD", "images/inventoryimages/"..name..".xml", 256)
     }
 
     local function Fn()

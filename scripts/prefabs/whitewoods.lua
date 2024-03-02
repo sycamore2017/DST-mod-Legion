@@ -309,6 +309,7 @@ end, {
     Asset("ANIM", "anim/swap_guitar_whitewood.zip"),
     Asset("ATLAS", "images/inventoryimages/guitar_whitewood.xml"),
     Asset("IMAGE", "images/inventoryimages/guitar_whitewood.tex"),
+    Asset("ATLAS_BUILD", "images/inventoryimages/guitar_whitewood.xml", 256)
 }, {
     "battlesong_attach",
     "battlesong_detach",
@@ -385,6 +386,7 @@ end, {
     Asset("ANIM", "anim/mat_whitewood.zip"),
     Asset("ATLAS", "images/inventoryimages/mat_whitewood_item.xml"),
     Asset("IMAGE", "images/inventoryimages/mat_whitewood_item.tex"),
+    Asset("ATLAS_BUILD", "images/inventoryimages/mat_whitewood_item.xml", 256)
 }, { "mat_whitewood" }))
 
 table.insert(prefs, Prefab("mat_whitewood", function()

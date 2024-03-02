@@ -12,6 +12,7 @@ local assets = {
     Asset("ANIM", "anim/saddle_baggage.zip"),
     Asset("ATLAS", "images/inventoryimages/saddle_baggage.xml"),
     Asset("IMAGE", "images/inventoryimages/saddle_baggage.tex"),
+    Asset("ATLAS_BUILD", "images/inventoryimages/saddle_baggage.xml", 256)
 }
 
 local function fn()

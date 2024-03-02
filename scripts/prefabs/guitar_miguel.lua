@@ -3,6 +3,7 @@ local assets = {
     Asset("ANIM", "anim/swap_guitar_miguel.zip"),
     Asset("ATLAS", "images/inventoryimages/guitar_miguel.xml"),
     Asset("IMAGE", "images/inventoryimages/guitar_miguel.tex"),
+    Asset("ATLAS_BUILD", "images/inventoryimages/guitar_miguel.xml", 256),
 
     Asset("ANIM", "anim/ghost_pig_build.zip"),
     Asset("ANIM", "anim/ghost_pirate_build.zip"),
@@ -215,7 +216,6 @@ end
 
 local function fn()
     local inst = CreateEntity()
-
     inst.entity:AddTransform()
     inst.entity:AddAnimState()
     inst.entity:AddNetwork()
@@ -286,7 +286,6 @@ end
 
 local function fn_ground()
     local inst = CreateEntity()
-
     inst.entity:AddTransform()
     inst.entity:AddAnimState()
     inst.entity:AddNetwork()
@@ -334,7 +333,6 @@ end
 
 local function fn_dirt()
     local inst = CreateEntity()
-
     inst.entity:AddTransform()
     inst.entity:AddAnimState()
     inst.entity:AddNetwork()

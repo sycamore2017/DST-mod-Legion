@@ -1,7 +1,8 @@
 local assets = {
     Asset("ANIM", "anim/explodingfruitcake.zip"),
     Asset("ATLAS", "images/inventoryimages/explodingfruitcake.xml"),
-    Asset("IMAGE", "images/inventoryimages/explodingfruitcake.tex")
+    Asset("IMAGE", "images/inventoryimages/explodingfruitcake.tex"),
+    Asset("ATLAS_BUILD", "images/inventoryimages/explodingfruitcake.xml", 256)
 }
 
 local prefabs = {

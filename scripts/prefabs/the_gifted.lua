@@ -7,6 +7,7 @@ local assets_creep_item =
     Asset("ANIM", "anim/web_hump.zip"),
     Asset("ATLAS", "images/inventoryimages/web_hump_item.xml"),
     Asset("IMAGE", "images/inventoryimages/web_hump_item.tex"),
+    Asset("ATLAS_BUILD", "images/inventoryimages/web_hump_item.xml", 256)
 }
 
 local prefabs_creep_item =
@@ -227,6 +228,7 @@ local assets_contracts = {
     Asset("ANIM", "anim/soul_contracts.zip"),
     Asset("ATLAS", "images/inventoryimages/soul_contracts.xml"),
     Asset("IMAGE", "images/inventoryimages/soul_contracts.tex"),
+    Asset("ATLAS_BUILD", "images/inventoryimages/soul_contracts.xml", 256),
     Asset("SOUND", "sound/together.fsb"),   --官方音效包
     Asset("SCRIPT", "scripts/prefabs/wortox_soul_common.lua") --官方灵魂通用功能函数文件
 }
@@ -493,67 +495,6 @@ end
 --[[ 威尔逊 ]]
 --------------------------------------------------------------------------
 
-local assets_elecrazor =
-{
-    -- Asset("ANIM", "anim/elecrazor.zip"),
-    -- Asset("ATLAS", "images/inventoryimages/elecrazor.xml"),
-    -- Asset("IMAGE", "images/inventoryimages/elecrazor.tex"),
-    Asset("ANIM", "anim/razor.zip"),
-    Asset("ANIM", "anim/swap_razor.zip"),
-}
-
--- local prefabs_elecrazor =
--- {
--- }
-
-local function fn_elecrazor()
-    local inst = CreateEntity()
-
-    inst.entity:AddTransform()
-    inst.entity:AddAnimState()
-    inst.entity:AddNetwork()
-
-    MakeInventoryPhysics(inst)
-
-    -- inst.AnimState:SetBank("elecrazor")
-    -- inst.AnimState:SetBuild("elecrazor")
-    inst.AnimState:SetBank("razor")
-    inst.AnimState:SetBuild("razor")
-    inst.AnimState:PlayAnimation("idle")
-
-    -- inst:AddTag("soulcontracts")
-
-    -- MakeInventoryFloatable(inst, "small", 0.1, 0.75)
-    -- MakeInventoryFloatable(inst, "med", 0.3, 0.65)
-    MakeInventoryFloatable(inst, "small", 0.08, {0.9, 0.7, 0.9}, true, -2, {sym_build = "swap_razor"})
-
-    inst.entity:SetPristine()
-    if not TheWorld.ismastersim then return inst end
-
-    inst:AddComponent("inspectable")
-
-    inst:AddComponent("inventoryitem")
-    -- inst.components.inventoryitem.imagename = "elecrazor"
-    -- inst.components.inventoryitem.atlasname = "images/inventoryimages/elecrazor.xml"
-
-    -- inst:AddComponent("finiteuses")
-    -- inst.components.finiteuses:SetMaxUses(20)
-    -- inst.components.finiteuses:SetUses(20)
-    -- inst:ListenForEvent("percentusedchange", PercentChanged_contracts)
-
-    -- inst:AddComponent("shaver")
-
-    --除了玩家，都得是睡眠状态才能剃毛；玩家之间互相剃毛会额外增加双方精神值
-    --对于没有Beard组件的男性玩家，添加Beard组件，只有1个胡须的收获量，但是会恢复精神值额，gay gay的
-    --普通动物【添加Shaveable组件，刮一次之后删除Shaveable组件】：普通兔子-胡须；怪物兔子-2胡须；雪兔-兔毛；啜食者-啜食者皮；小鹅-鹅毛；各种鸟-对应羽毛；兔人-兔毛
-    --自带可刮毛机制的【增加收获数量】：牛；藤壶花；威尔逊/韦伯-精细到下个阶段
-    --大型生物【添加Beard组件】：蜘蛛女王-2~5蜘蛛网，0.1几率蜘蛛巢；熊獾-4~8皮屑，0.01几率熊皮；鹿鹅-2~5鹅毛
-
-    MakeHauntableLaunch(inst)
-
-    return inst
-end
-
 --------------------------------------------------------------------------
 --[[ 薇诺娜 ]]
 --------------------------------------------------------------------------
@@ -578,4 +519,3 @@ end
 return Prefab("web_hump_item", fn_creep_item, assets_creep_item, prefabs_creep_item),
         Prefab("web_hump", fn_creep, assets_creep, prefabs_creep),
         Prefab("soul_contracts", Fn_contracts, assets_contracts, prefabs_contracts)
-        -- Prefab("elecrazor", fn_elecrazor, assets_elecrazor, nil)

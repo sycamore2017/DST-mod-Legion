@@ -2,6 +2,7 @@ local assets = {
     Asset("ANIM", "anim/raindonate.zip"),
     Asset("ATLAS", "images/inventoryimages/raindonate.xml"),
     Asset("IMAGE", "images/inventoryimages/raindonate.tex"),
+    Asset("ATLAS_BUILD", "images/inventoryimages/raindonate.xml", 256),
     Asset("ANIM", "anim/mosquito.zip") --官方蚊子动画模板
 }
 local prefabs = {

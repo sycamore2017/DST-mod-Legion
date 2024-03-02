@@ -324,11 +324,11 @@ end
 
 RegisterInvItems({
     ------花香四溢
-    "petals_rose", "petals_lily", "petals_orchid",
-    "rosorns", "lileaves", "orchitwigs", "neverfade", "neverfade_broken",
+    "petals_rose", "petals_lily", "petals_orchid", "cutted_rosebush", "cutted_lilybush",
+    "rosorns", "lileaves", "orchitwigs", "neverfade", "neverfade_broken", "cutted_orchidbush",
     "sachet", "foliageath", "foliageath_rosorns", "foliageath_lileaves", "foliageath_orchitwigs",
     "foliageath_neverfade", "foliageath_hambat", "foliageath_bullkelp_root", "foliageath_foliageath",
-    "foliageath_dish_tomahawksteak",
+    "foliageath_dish_tomahawksteak", "dug_rosebush", "dug_lilybush", "dug_orchidbush",
     ------美味佳肴
     ------尘世蜃楼
     "shyerry", "shyerry_cooked", "shyerrylog", "shield_l_sand", "guitar_whitewood", "mat_whitewood_item",
@@ -341,15 +341,18 @@ RegisterInvItems({
     "siving_rocks", --mod之间注册相同的文件是有效的
     "siving_ctlwater_item", "siving_ctldirt_item", "siving_ctlall_item", "ointment_l_sivbloodreduce",
     "siving_mask", "siving_mask_gold", "siving_feather_real", "armor_elepheetle", "lance_carrot_l",
-    "carpet_plush_big", "siving_suit", "siving_suit_gold",
+    "carpet_plush_big", "siving_suit", "siving_suit_gold", "tissue_l_cactus", "tissue_l_lureplant",
+    "tissue_l_berries", "cattenball", "cutted_lumpyevergreen", "siving_derivant_item", "seeds_crop_l2",
     ------电闪雷鸣
-    "albicans_cap", "tripleshovelaxe", "triplegoldenshovelaxe", "dualwrench", "icire_rock", "hat_cowboy",
+    "albicans_cap", "tripleshovelaxe", "triplegoldenshovelaxe", "dualwrench", "fimbul_axe", "hat_cowboy",
     "guitar_miguel", "web_hump_item", "saddle_baggage", "hat_albicans_mushroom", "soul_contracts",
-    "explodingfruitcake", "tourmalinecore", "tourmalineshard", "fimbul_axe",
+    "explodingfruitcake", "tourmalinecore", "tourmalineshard", "dug_monstrain",
+    "icire_rock", "icire_rock1", "icire_rock2", "icire_rock3", "icire_rock4", "icire_rock5",
     ------祈雨祭
     "monstrain_leaf", "squamousfruit", "raindonate", "book_weather", "merm_scales", "hat_mermbreathing",
     "giantsfoot", "hiddenmoonlight_item", "revolvedmoonlight_item", "agronssword", "agronssword2",
     "fishhomingbait1", "fishhomingbait2", "fishhomingbait3", "fishhomingtool_awesome", "fishhomingtool_normal",
+    "revolvedmoonlight", "revolvedmoonlight_pro", "refractedmoonlight", "refractedmoonlight2",
     ------黯涌
     "shield_l_log", "hat_lichen", "backcub",
 })

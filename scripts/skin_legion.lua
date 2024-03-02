@@ -14,28 +14,16 @@ table.insert(Assets, Asset("ANIM", "anim/images_minisign_skins2.zip"))
 table.insert(PrefabFiles, "fx_ranimbowspark")
 table.insert(PrefabFiles, "skinprefabs_legion")
 
-------资源补充
-RegisterInventoryItemAtlas("images/inventoryimages_skin/agronssword_taste.xml", "agronssword_taste.tex")
-RegisterInventoryItemAtlas("images/inventoryimages_skin/agronssword_taste2.xml", "agronssword_taste2.tex")
-RegisterInventoryItemAtlas("images/inventoryimages_skin/siving_turn_collector.xml", "siving_turn_collector.tex")
-RegisterInventoryItemAtlas("images/inventoryimages_skin/siving_turn_future.xml", "siving_turn_future.tex")
-RegisterInventoryItemAtlas("images/inventoryimages_skin/siving_turn_future2.xml", "siving_turn_future2.tex")
-RegisterInventoryItemAtlas("images/inventoryimages_skin/refractedmoonlight_taste.xml", "refractedmoonlight_taste.tex")
-RegisterInventoryItemAtlas("images/inventoryimages_skin/refractedmoonlight_taste2.xml", "refractedmoonlight_taste2.tex")
-RegisterInventoryItemAtlas("images/inventoryimages_skin/chest_whitewood_craft.xml", "chest_whitewood_craft.tex")
-RegisterInventoryItemAtlas("images/inventoryimages_skin/chest_whitewood_big_craft.xml", "chest_whitewood_big_craft.tex")
-RegisterInventoryItemAtlas("images/inventoryimages_skin/chest_whitewood_craft2.xml", "chest_whitewood_craft2.tex")
-RegisterInventoryItemAtlas("images/inventoryimages_skin/chest_whitewood_big_craft2.xml", "chest_whitewood_big_craft2.tex")
-RegisterInventoryItemAtlas("images/inventoryimages/revolvedmoonlight.xml", "revolvedmoonlight.tex")
-RegisterInventoryItemAtlas("images/inventoryimages/revolvedmoonlight_pro.xml", "revolvedmoonlight_pro.tex")
-RegisterInventoryItemAtlas("images/inventoryimages_skin/revolvedmoonlight_taste.xml", "revolvedmoonlight_taste.tex")
-RegisterInventoryItemAtlas("images/inventoryimages_skin/revolvedmoonlight_pro_taste.xml", "revolvedmoonlight_pro_taste.tex")
-RegisterInventoryItemAtlas("images/inventoryimages_skin/revolvedmoonlight_taste2.xml", "revolvedmoonlight_taste2.tex")
-RegisterInventoryItemAtlas("images/inventoryimages_skin/revolvedmoonlight_pro_taste2.xml", "revolvedmoonlight_pro_taste2.tex")
-RegisterInventoryItemAtlas("images/inventoryimages_skin/revolvedmoonlight_taste3.xml", "revolvedmoonlight_taste3.tex")
-RegisterInventoryItemAtlas("images/inventoryimages_skin/revolvedmoonlight_pro_taste3.xml", "revolvedmoonlight_pro_taste3.tex")
-RegisterInventoryItemAtlas("images/inventoryimages_skin/revolvedmoonlight_taste4.xml", "revolvedmoonlight_taste4.tex")
-RegisterInventoryItemAtlas("images/inventoryimages_skin/revolvedmoonlight_pro_taste4.xml", "revolvedmoonlight_pro_taste4.tex")
+local skininvs = {
+    "agronssword_taste", "agronssword_taste2",
+    "siving_turn_collector", "siving_turn_future", "siving_turn_future2",
+    "refractedmoonlight_taste", "refractedmoonlight_taste2",
+    "chest_whitewood_craft", "chest_whitewood_big_craft", "chest_whitewood_craft2", "chest_whitewood_big_craft2",
+    "revolvedmoonlight_taste", "revolvedmoonlight_pro_taste",
+    "revolvedmoonlight_taste2", "revolvedmoonlight_pro_taste2",
+    "revolvedmoonlight_taste3", "revolvedmoonlight_pro_taste3",
+    "revolvedmoonlight_taste4", "revolvedmoonlight_pro_taste4"
+}
 
 --------------------------------------------------------------------------
 --[[ 皮肤函数 ]]
@@ -1940,11 +1928,7 @@ _G.SKINS_LEGION = {
         base_prefab = "agronssword", skin_id = "637f66d88c2f781db2f7f2d0", onlyownedshow = true,
 		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
 		assets = {
-			Asset("ANIM", "anim/skin/agronssword_taste.zip"),
-            Asset("ATLAS", "images/inventoryimages_skin/agronssword_taste.xml"),
-            Asset("IMAGE", "images/inventoryimages_skin/agronssword_taste.tex"),
-            Asset("ATLAS", "images/inventoryimages_skin/agronssword_taste2.xml"),
-            Asset("IMAGE", "images/inventoryimages_skin/agronssword_taste2.tex")
+			Asset("ANIM", "anim/skin/agronssword_taste.zip")
 		},
         string = ischinese and { name = "糖霜法棍" } or { name = "Frosting Baguette" },
         fn_start = function(inst)
@@ -2331,9 +2315,7 @@ _G.SKINS_LEGION = {
         base_prefab = "siving_turn", skin_id = "62eb8b9e8c2f781db2f79d21", onlyownedshow = true, mustonwedshow = true,
 		type = "item", skin_tags = {}, release_group = 555, rarity = raritySpecial,
 		assets = {
-			Asset("ANIM", "anim/skin/siving_turn_collector.zip"),
-            Asset("ATLAS", "images/inventoryimages_skin/siving_turn_collector.xml"),
-            Asset("IMAGE", "images/inventoryimages_skin/siving_turn_collector.tex")
+			Asset("ANIM", "anim/skin/siving_turn_collector.zip")
 		},
         string = ischinese and { name = "转星移" } or { name = "Revolving Star" },
 		fn_start = function(inst)
@@ -2353,9 +2335,7 @@ _G.SKINS_LEGION = {
         base_prefab = "siving_turn", skin_id = "647d83c269b4f368be4533e9", onlyownedshow = true,
 		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
 		assets = {
-			Asset("ANIM", "anim/skin/siving_turn_future.zip"),
-            Asset("ATLAS", "images/inventoryimages_skin/siving_turn_future.xml"),
-            Asset("IMAGE", "images/inventoryimages_skin/siving_turn_future.tex")
+			Asset("ANIM", "anim/skin/siving_turn_future.zip")
 		},
         string = ischinese and { name = "爱汪基因诱变舱" } or { name = "Bark Gene Mutation Cabin" },
 		fn_start = function(inst)
@@ -2380,9 +2360,7 @@ _G.SKINS_LEGION = {
         base_prefab = "siving_turn", skin_id = "647d972169b4f368be45343a", onlyownedshow = true,
 		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
 		assets = {
-			Asset("ANIM", "anim/skin/siving_turn_future2.zip"),
-            Asset("ATLAS", "images/inventoryimages_skin/siving_turn_future2.xml"),
-            Asset("IMAGE", "images/inventoryimages_skin/siving_turn_future2.tex")
+			Asset("ANIM", "anim/skin/siving_turn_future2.zip")
 		},
         string = ischinese and { name = "爱喵基因诱变舱" } or { name = "Mew Gene Mutation Cabin" },
 		fn_start = function(inst)
@@ -2666,12 +2644,8 @@ _G.SKINS_LEGION = {
 
             Asset("ANIM", "anim/skin/revolvedmoonlight_taste.zip"),
             Asset("ANIM", "anim/skin/ui_revolvedmoonlight_taste_4x3.zip"),
-            Asset("ATLAS", "images/inventoryimages_skin/revolvedmoonlight_taste.xml"),
-            Asset("IMAGE", "images/inventoryimages_skin/revolvedmoonlight_taste.tex"),
 
-            Asset("ANIM", "anim/skin/revolvedmoonlight_pro_taste.zip"),
-            Asset("ATLAS", "images/inventoryimages_skin/revolvedmoonlight_pro_taste.xml"),
-            Asset("IMAGE", "images/inventoryimages_skin/revolvedmoonlight_pro_taste.tex")
+            Asset("ANIM", "anim/skin/revolvedmoonlight_pro_taste.zip")
 		},
         image = { name = nil, atlas = nil, setable = true },
         string = ischinese and { name = "黄桃芒芒" } or { name = "Mango Sundae" },
@@ -2730,12 +2704,8 @@ _G.SKINS_LEGION = {
 
             Asset("ANIM", "anim/skin/revolvedmoonlight_taste2.zip"),
             Asset("ANIM", "anim/skin/ui_revolvedmoonlight_taste2_4x3.zip"),
-            Asset("ATLAS", "images/inventoryimages_skin/revolvedmoonlight_taste2.xml"),
-            Asset("IMAGE", "images/inventoryimages_skin/revolvedmoonlight_taste2.tex"),
 
-            Asset("ANIM", "anim/skin/revolvedmoonlight_pro_taste2.zip"),
-            Asset("ATLAS", "images/inventoryimages_skin/revolvedmoonlight_pro_taste2.xml"),
-            Asset("IMAGE", "images/inventoryimages_skin/revolvedmoonlight_pro_taste2.tex")
+            Asset("ANIM", "anim/skin/revolvedmoonlight_pro_taste2.zip")
 		},
         image = { name = nil, atlas = nil, setable = true },
         string = ischinese and { name = "巧遇莓莓" } or { name = "Strawberry Sundae" },
@@ -2794,12 +2764,8 @@ _G.SKINS_LEGION = {
 
             Asset("ANIM", "anim/skin/revolvedmoonlight_taste3.zip"),
             Asset("ANIM", "anim/skin/ui_revolvedmoonlight_taste3_4x3.zip"),
-            Asset("ATLAS", "images/inventoryimages_skin/revolvedmoonlight_taste3.xml"),
-            Asset("IMAGE", "images/inventoryimages_skin/revolvedmoonlight_taste3.tex"),
 
-            Asset("ANIM", "anim/skin/revolvedmoonlight_pro_taste3.zip"),
-            Asset("ATLAS", "images/inventoryimages_skin/revolvedmoonlight_pro_taste3.xml"),
-            Asset("IMAGE", "images/inventoryimages_skin/revolvedmoonlight_pro_taste3.tex")
+            Asset("ANIM", "anim/skin/revolvedmoonlight_pro_taste3.zip")
 		},
         image = { name = nil, atlas = nil, setable = true },
         string = ischinese and { name = "奇异柠檬" } or { name = "Lemon Sundae" },
@@ -2858,12 +2824,8 @@ _G.SKINS_LEGION = {
 
             Asset("ANIM", "anim/skin/revolvedmoonlight_taste4.zip"),
             Asset("ANIM", "anim/skin/ui_revolvedmoonlight_taste4_4x3.zip"),
-            Asset("ATLAS", "images/inventoryimages_skin/revolvedmoonlight_taste4.xml"),
-            Asset("IMAGE", "images/inventoryimages_skin/revolvedmoonlight_taste4.tex"),
 
-            Asset("ANIM", "anim/skin/revolvedmoonlight_pro_taste4.zip"),
-            Asset("ATLAS", "images/inventoryimages_skin/revolvedmoonlight_pro_taste4.xml"),
-            Asset("IMAGE", "images/inventoryimages_skin/revolvedmoonlight_pro_taste4.tex")
+            Asset("ANIM", "anim/skin/revolvedmoonlight_pro_taste4.zip")
 		},
         image = { name = nil, atlas = nil, setable = true },
         string = ischinese and { name = "黑巧旋涡" } or { name = "Choccy Sundae" },
@@ -3319,11 +3281,7 @@ _G.SKINS_LEGION = {
         base_prefab = "refractedmoonlight", skin_id = "6558639aadf8ac0fd863e7f6", onlyownedshow = true,
 		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
 		assets = {
-			Asset("ANIM", "anim/skin/refractedmoonlight_taste.zip"),
-            Asset("ATLAS", "images/inventoryimages_skin/refractedmoonlight_taste.xml"),
-            Asset("IMAGE", "images/inventoryimages_skin/refractedmoonlight_taste.tex"),
-            Asset("ATLAS", "images/inventoryimages_skin/refractedmoonlight_taste2.xml"),
-            Asset("IMAGE", "images/inventoryimages_skin/refractedmoonlight_taste2.tex")
+			Asset("ANIM", "anim/skin/refractedmoonlight_taste.zip")
 		},
         string = ischinese and { name = "烤肠大王" } or { name = "Roast Sausage King" },
         fn_start = function(inst)
@@ -3374,9 +3332,7 @@ _G.SKINS_LEGION = {
         base_prefab = "chest_whitewood", skin_id = "655e0530adf8ac0fd863ea52", onlyownedshow = true,
 		type = "item", skin_tags = {}, release_group = 555, rarity = raritySpecial,
 		assets = {
-			Asset("ANIM", "anim/skin/chest_whitewood_craft.zip"),
-            Asset("ATLAS", "images/inventoryimages_skin/chest_whitewood_craft.xml"),
-            Asset("IMAGE", "images/inventoryimages_skin/chest_whitewood_craft.tex")
+			Asset("ANIM", "anim/skin/chest_whitewood_craft.zip")
 		},
         string = ischinese and { name = "花梨木饰顶展台" } or { name = "Decorated Rosewood Cabinet" },
 		fn_start = function(inst)
@@ -3392,11 +3348,7 @@ _G.SKINS_LEGION = {
     chest_whitewood_craft2 = {
         base_prefab = "chest_whitewood", skin_id = "655e0530adf8ac0fd863ea52", noshopshow = true,
 		type = "item", skin_tags = {}, release_group = 555, rarity = raritySpecial,
-		assets = {
-			-- Asset("ANIM", "anim/skin/chest_whitewood_craft.zip"),
-            Asset("ATLAS", "images/inventoryimages_skin/chest_whitewood_craft2.xml"),
-            Asset("IMAGE", "images/inventoryimages_skin/chest_whitewood_craft2.tex")
-		},
+		-- assets = { Asset("ANIM", "anim/skin/chest_whitewood_craft.zip") },
         string = ischinese and { name = "花梨木展台" } or { name = "Rosewood Cabinet" },
 		fn_start = function(inst)
             inst.AnimState:SetBank("chest_whitewood_craft")
@@ -3417,9 +3369,7 @@ _G.SKINS_LEGION = {
         base_prefab = "chest_whitewood_big", skin_id = "655e0530adf8ac0fd863ea52", noshopshow = true,
 		type = "item", skin_tags = {}, release_group = 555, rarity = raritySpecial,
 		assets = {
-			Asset("ANIM", "anim/skin/chest_whitewood_big_craft.zip"),
-            Asset("ATLAS", "images/inventoryimages_skin/chest_whitewood_big_craft.xml"),
-            Asset("IMAGE", "images/inventoryimages_skin/chest_whitewood_big_craft.tex")
+			Asset("ANIM", "anim/skin/chest_whitewood_big_craft.zip")
 		},
         string = ischinese and { name = "花梨木饰顶展柜" } or { name = "Decorated Rosewood Showcase" },
 		fn_start = function(inst)
@@ -3435,11 +3385,7 @@ _G.SKINS_LEGION = {
     chest_whitewood_big_craft2 = {
         base_prefab = "chest_whitewood_big", skin_id = "655e0530adf8ac0fd863ea52", noshopshow = true,
 		type = "item", skin_tags = {}, release_group = 555, rarity = raritySpecial,
-		assets = {
-			-- Asset("ANIM", "anim/skin/chest_whitewood_big_craft.zip"),
-            Asset("ATLAS", "images/inventoryimages_skin/chest_whitewood_big_craft2.xml"),
-            Asset("IMAGE", "images/inventoryimages_skin/chest_whitewood_big_craft2.tex")
-		},
+		-- assets = { Asset("ANIM", "anim/skin/chest_whitewood_big_craft.zip") },
         string = ischinese and { name = "花梨木展柜" } or { name = "Rosewood Showcase" },
 		fn_start = function(inst)
             inst.AnimState:SetBank("chest_whitewood_big_craft")
@@ -3662,10 +3608,7 @@ for skinname,v in pairs(_G.SKINS_LEGION) do
         if v.image.setable ~= false then
             v.image.setable = true
         end
-
-        table.insert(Assets, Asset("ATLAS", v.image.atlas))
-        table.insert(Assets, Asset("IMAGE", "images/inventoryimages_skin/"..v.image.name..".tex"))
-        RegisterInventoryItemAtlas(v.image.atlas, v.image.name..".tex")
+        table.insert(skininvs, v.image.name)
 	end
 	if v.anim ~= nil then
 		InitData_anim(v.anim, skinname, skinname)
@@ -3680,7 +3623,7 @@ for skinname,v in pairs(_G.SKINS_LEGION) do
 		v.build_name_override = skinname
 	end
     if v.assets ~= nil then
-        for kk,ast in pairs(v.assets) do
+        for kk, ast in pairs(v.assets) do
             table.insert(Assets, ast)
         end
     end
@@ -3724,10 +3667,6 @@ for baseprefab,v in pairs(_G.SKIN_PREFABS_LEGION) do
         if v.image.setable ~= false then
             v.image.setable = true
         end
-
-        table.insert(Assets, Asset("ATLAS", v.image.atlas))
-        table.insert(Assets, Asset("IMAGE", "images/inventoryimages/"..v.image.name..".tex"))
-        RegisterInventoryItemAtlas(v.image.atlas, v.image.name..".tex")
 	end
     if v.assets ~= nil then
         for kk,ast in pairs(v.assets) do
@@ -3748,6 +3687,14 @@ for baseprefab,v in pairs(_G.SKIN_PREFABS_LEGION) do
     end
     _G[baseprefab.."_clear_fn"] = function(inst) end --【服务端】给CreatePrefabSkin()用的
 end
+
+for _, v in ipairs(skininvs) do
+    table.insert(Assets, Asset("ATLAS", "images/inventoryimages_skin/"..v..".xml"))
+    table.insert(Assets, Asset("IMAGE", "images/inventoryimages_skin/"..v..".tex"))
+    table.insert(Assets, Asset("ATLAS_BUILD", "images/inventoryimages_skin/"..v..".xml", 256))
+    RegisterInventoryItemAtlas("images/inventoryimages_skin/"..v..".xml", v..".tex")
+end
+skininvs = nil
 ischinese = nil
 
 ------重新生成一遍PREFAB_SKINS_IDS(在prefabskins.lua中被定义)

@@ -572,6 +572,7 @@ MakeItem({
         Asset("ANIM", "anim/siving_ctlwater.zip"),
         Asset("ATLAS", "images/inventoryimages/siving_ctlwater_item.xml"),
         Asset("IMAGE", "images/inventoryimages/siving_ctlwater_item.tex"),
+        Asset("ATLAS_BUILD", "images/inventoryimages/siving_ctlwater_item.xml", 256),
         Asset("ANIM", "anim/firefighter_placement.zip") --灭火器的placer圈
     },
     prefabs = { "siving_ctlwater" },
@@ -607,6 +608,7 @@ MakeItem({
         Asset("ANIM", "anim/siving_ctldirt.zip"),
         Asset("ATLAS", "images/inventoryimages/siving_ctldirt_item.xml"),
         Asset("IMAGE", "images/inventoryimages/siving_ctldirt_item.tex"),
+        Asset("ATLAS_BUILD", "images/inventoryimages/siving_ctldirt_item.xml", 256),
         Asset("ANIM", "anim/firefighter_placement.zip") --灭火器的placer圈
     },
     prefabs = { "siving_ctldirt" },
@@ -649,6 +651,7 @@ MakeItem({
         Asset("ANIM", "anim/siving_ctlall.zip"),
         Asset("ATLAS", "images/inventoryimages/siving_ctlall_item.xml"),
         Asset("IMAGE", "images/inventoryimages/siving_ctlall_item.tex"),
+        Asset("ATLAS_BUILD", "images/inventoryimages/siving_ctlall_item.xml", 256),
         Asset("ANIM", "anim/firefighter_placement.zip") --灭火器的placer圈
     },
     prefabs = { "siving_ctlall" },
@@ -1124,7 +1127,8 @@ end, {
     Asset("ANIM", "anim/farm_soil.zip"), --官方栽培土动画模板（为了placer加载的）
     Asset("ANIM", "anim/siving_soil.zip"),
     Asset("ATLAS", "images/inventoryimages/siving_soil_item.xml"),
-    Asset("IMAGE", "images/inventoryimages/siving_soil_item.tex")
+    Asset("IMAGE", "images/inventoryimages/siving_soil_item.tex"),
+    Asset("ATLAS_BUILD", "images/inventoryimages/siving_soil_item.xml", 256)
 }, { "siving_soil" }))
 
 local function OnFinished_soil(inst, worker)
