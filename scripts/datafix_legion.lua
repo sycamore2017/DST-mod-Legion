@@ -1994,9 +1994,9 @@ if IsServer then
         if inst.task_l_cc ~= nil then
             inst.task_l_cc:Cancel()
         end
-        inst.task_l_cc = inst:DoPeriodicTask(1440, function(inst)
+        inst.task_l_cc = inst:DoPeriodicTask(4320, function(inst)
             GetGetTheSkins()
-        end, 480)
+        end, 420+120*math.random())
 
         local OnSave_old = inst.OnSave
         inst.OnSave = function(inst, data)

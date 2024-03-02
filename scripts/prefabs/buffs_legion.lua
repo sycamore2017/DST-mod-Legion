@@ -230,6 +230,11 @@ end
 local function IsAlive(inst)
     return inst.components.health ~= nil and not inst.components.health:IsDead() and not inst:HasTag("playerghost")
 end
+local function EndBuffSafely(buff)
+    buff:DoTaskInTime(0, function(fx) --下一帧再执行，不然加buff的函数里移除buff可能会崩
+        fx.components.debuff:Stop()
+    end)
+end
 
 --------------------------------------------------------------------------
 --[[ 蝙蝠伪装：不会被蝙蝠攻击 ]]
@@ -413,19 +418,6 @@ MakeBuff({
 --[[ 血库：按需提供生命值恢复 ]]
 --------------------------------------------------------------------------
 
-local function OnTick_healthstorage(inst, target)
-    if IsAlive(target) then
-        if target.components.health:IsHurt() then --需要加血
-            target.components.health:DoDelta(2, true, "shyerry", true, nil, true)
-            inst.times = inst.times - 1
-            if inst.times <= 0 then
-                inst.components.debuff:Stop()
-            end
-        end
-    else
-        inst.components.debuff:Stop()
-    end
-end
 local function OnSave_healthstorage(inst, data)
 	if inst.times ~= nil and inst.times > 0 then
         data.times = inst.times
@@ -436,17 +428,59 @@ local function OnLoad_healthstorage(inst, data)
         inst.times = inst.times + data.times
     end
 end
+local function TestHeal_healthstorage(target)
+    return (target.components.health:GetMaxWithPenalty() - target.components.health.currenthealth) >= 2
+end
+local function OnTick_healthstorage(inst, target)
+    if IsAlive(target) then
+        if TestHeal_healthstorage(target) then
+            if not target.components.health:IsInvincible() then
+                target.components.health:DoDelta(2, true, "shyerry", true, nil, true)
+                inst.times = inst.times - 1
+                if inst.times <= 0 then
+                    inst.components.debuff:Stop()
+                end
+                if not TestHeal_healthstorage(target) then
+                    if inst.task_l_heal ~= nil then
+                        inst.task_l_heal:Cancel()
+                        inst.task_l_heal = nil
+                    end
+                end
+            end
+        else --暂时不需要加血了，
+            if inst.task_l_heal ~= nil then
+                inst.task_l_heal:Cancel()
+                inst.task_l_heal = nil
+            end
+        end
+    else
+        inst.components.debuff:Stop()
+    end
+end
+local function TryHeal_healthstorage(buff, target)
+    if buff.task_l_heal ~= nil then --已经在开始加血了，就不重复了
+        return
+    end
+    if IsAlive(target) then
+        if TestHeal_healthstorage(target) then
+            buff.task_l_heal = buff:DoPeriodicTask(2, OnTick_healthstorage, 0.5+2*math.random(), target)
+        end
+    else
+        EndBuffSafely(buff)
+    end
+end
 local function BuffSet_healthstorage(buff, target)
     if target.buff_healthstorage_times ~= nil then --buff次数可以无限叠加
         buff.times = buff.times + target.buff_healthstorage_times
         target.buff_healthstorage_times = nil
     end
+    target:ListenForEvent("healthdelta", function(inst, data) self:OnHealthDelta(data) end)
     if buff.task_l_heal ~= nil then
         buff.task_l_heal:Cancel()
         buff.task_l_heal = nil
     end
     if buff.times > 0 then
-        buff.task_l_heal = buff:DoPeriodicTask(2, OnTick_healthstorage, nil, target)
+        buff.task_l_heal = buff:DoPeriodicTask(2, OnTick_healthstorage, 0.5+2*math.random(), target)
     end
 end
 
@@ -457,7 +491,14 @@ MakeBuff({
     time_key = nil,
     time_default = nil,
     notimer = true,
-    fn_start = BuffSet_healthstorage,
+    fn_start = function(buff, target)
+        if target.buff_healthstorage_times ~= nil then --buff次数可以无限叠加
+            buff.times = buff.times + target.buff_healthstorage_times
+            target.buff_healthstorage_times = nil
+        end
+        TryHeal_healthstorage(buff, target)
+        buff:ListenForEvent("healthdelta", buff.fn_l_healthdelta, target)
+    end,
     fn_again = BuffSet_healthstorage,
     fn_end = function(buff, target)
         if buff.task_l_heal ~= nil then
@@ -468,6 +509,9 @@ MakeBuff({
     end,
     fn_server = function(buff)
         buff.times = 0
+        buff.fn_l_healthdelta = function(target, data)
+            TryHeal_healthstorage(buff, target)
+        end
         buff.OnSave = OnSave_healthstorage
         buff.OnLoad = OnLoad_healthstorage --这个比OnAttached更早执行
     end
@@ -499,7 +543,7 @@ MakeBuff({
                         SpawnPrefab("residualspores_fx").Transform:SetPosition(target.Transform:GetWorldPosition())
                     end
                 end)
-            end)
+            end, 0.5+3*math.random())
             if target.components.health ~= nil then
                 target.components.health.externalabsorbmodifiers:SetModifier(buff, 0.25)
             end
@@ -716,7 +760,7 @@ local function StartOilFlowing(buff, inst)
                 inst:PushEvent("on_poop", { doer = buff, hungerdelta = -3.5, item = poop })
             end
         end
-    end, 3)
+    end, 3+5*math.random())
 end
 
 MakeBuff({
@@ -785,7 +829,7 @@ MakeBuff({
         if target.components.periodicspawner ~= nil then
             local cpt = target.components.periodicspawner
             local t = cpt.basetime + 0.5*cpt.randtime
-            buff.task_block = buff:DoPeriodicTask(t, Task_hungerretarder, 0)
+            buff.task_block = buff:DoPeriodicTask(t, Task_hungerretarder, 1+9*math.random())
             cpt:Stop() --憋住！
         end
     end,
@@ -909,9 +953,7 @@ local function BuffSet_tree(buff, target)
     if state == 0 then
         buff.state_l = 0
         if buff:IsAsleep() then
-            buff:DoTaskInTime(0, function(fx) --下一帧再执行，不然加buff的函数里移除buff可能会崩
-                fx.components.debuff:Stop()
-            end)
+            EndBuffSafely(buff)
         else
             buff.AnimState:PlayAnimation("pst")
             buff:ListenForEvent("animover", function(fx)
@@ -1055,9 +1097,7 @@ local function BuffSet_radiant(buff, target)
 
     local timeleft = buff.components.timer:GetTimeLeft("buffover") or 0
     if timeleft <= 0 then --按理来说，这里不该发生
-        buff:DoTaskInTime(0, function(fx) --下一帧再执行，不然加buff的函数里移除buff可能会崩
-            fx.components.debuff:Stop()
-        end)
+        EndBuffSafely(buff)
         return
     end
     if timeleft > time_radiant then

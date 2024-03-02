@@ -412,7 +412,7 @@ local function StartShy(inst)
                 EndShy(inst)
                 Disappear(inst)
             end
-        end)
+        end, 0.5+5*math.random())
     end
 end
 

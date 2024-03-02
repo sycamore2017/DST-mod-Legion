@@ -164,7 +164,7 @@ local function OnIsDark(inst)
 	UpdateGrowing(inst)
 	if TheWorld.state.isnight then
 		if inst.nighttask == nil then
-			inst.nighttask = inst:DoPeriodicTask(5, UpdateGrowing, math.random() * 5)
+			inst.nighttask = inst:DoPeriodicTask(5, UpdateGrowing, 1+5*math.random())
 		end
 	else
 		if inst.nighttask ~= nil then
@@ -517,7 +517,7 @@ function PerennialCrop2:StartGrowing() --尝试生长
 				self.task_grow:Cancel()
 				self.task_grow = nil
 			end
-		end, 5+math.random()*5, self)
+		end, 5+math.random()*10, self)
 	end
 end
 function PerennialCrop2:StopGrowing() --停止生长

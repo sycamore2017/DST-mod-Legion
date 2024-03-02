@@ -306,7 +306,7 @@ local function OnIsDark_dt(inst)
     UpdateGrowing_dt(inst)
     if TheWorld.state.isnight then
         if inst.nighttask == nil then
-            inst.nighttask = inst:DoPeriodicTask(5, UpdateGrowing_dt, math.random()*5)
+            inst.nighttask = inst:DoPeriodicTask(5, UpdateGrowing_dt, 1+5*math.random())
         end
     else
         if inst.nighttask ~= nil then
@@ -909,7 +909,7 @@ local function TriggerLifeExtractTask(inst, doit)
                     end
                 end
 
-            end, 0)
+            end, 0.5+3.5*math.random())
         end
     else
         if inst.taskLifeExtract ~= nil then
@@ -1973,7 +1973,7 @@ local function MakeFx_life(data)
             else
                 inst:ForceFacePoint(inst.movingTarget.Transform:GetWorldPosition())
                 inst.components.locomotor:WalkForward()
-                inst.taskMove = inst:DoPeriodicTask(0.1, RunTo_life, 0)
+                inst.taskMove = inst:DoPeriodicTask(0.3, RunTo_life, 0.5*math.random())
             end
         end)
         inst.OnEntitySleep = OnEntitySleep_life

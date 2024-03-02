@@ -16,6 +16,7 @@ local ctlFuledItems = {
     cutted_rosebush = { moisture = nil, nutrients = { 5, 5, 8 } },
     cutted_lilybush = { moisture = nil, nutrients = { 5, 5, 8 } },
     cutted_orchidbush = { moisture = nil, nutrients = { 5, 5, 8 } },
+    cutted_lumpyevergreen = { moisture = nil, nutrients = { 8, nil, nil } },
     sachet = { moisture = nil, nutrients = { 8, 8, 8 } },
     rosorns = { moisture = nil, nutrients = { 12, 12, 48 } },
     lileaves = { moisture = nil, nutrients = { 12, 48, 12 } },
@@ -245,7 +246,7 @@ local function DoFunction_ctl(inst, doit)
             inst.components.botanycontroller:SetValue(800, nil, true)
         end
         inst.components.botanycontroller:DoAreaFunction()
-    end, math.random()*2)
+    end, math.random()*3)
 end
 
 local function TryAddBar(inst)

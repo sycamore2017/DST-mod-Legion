@@ -273,7 +273,7 @@ local function OnEquip_cowboy(inst, owner)
         inst.task_cowboy:Cancel()
     end
     inst.mycowboy = owner
-    inst.task_cowboy = inst:DoPeriodicTask(COW_PERIOD, CowboyTaming, COW_PERIOD)
+    inst.task_cowboy = inst:DoPeriodicTask(COW_PERIOD, CowboyTaming, COW_PERIOD+5*math.random())
 end
 local function OnUnequip_cowboy(inst, owner)
     TOOLS_L.hat_off(inst, owner)
@@ -638,7 +638,7 @@ local function StealHealth(inst, owner, ismask2)
                 SetNet_heal_sivmask(inst)
             end
         end
-    end, 1)
+    end, 0.5+2.5*math.random())
 end
 
 local function OnSetBonusOn_sivmask(inst)

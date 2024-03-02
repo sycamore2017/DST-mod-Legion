@@ -10,7 +10,7 @@ local function OnFuelChange(inst, data)
 	end
 end
 local function DoCharge_task(inst, self)
-	self.time_start = GetTime()
+	self.time_start = GetTime() --懒得考虑非常详细的时间，只要执行就算是已经过了 charge_period 这么久
 	self:Charge(self.charge_value, nil)
 end
 
@@ -19,8 +19,8 @@ local BatteryLegion = Class(function(self, inst)
 
 	self.time_start = nil
 	self.task = nil
-	self.charge_period = 240 --每隔这个时间，恢复能量
-	self.charge_value = 5 --每次恢复的能量
+	self.charge_period = 120 --每隔这个时间，恢复能量
+	self.charge_value = 2.5 --每次恢复的能量
 
 	self.inst:ListenForEvent("percentusedchange", OnFuelChange)
 end)
@@ -38,7 +38,7 @@ function BatteryLegion:StartCharge() --开始自动充能
     end
 	self.time_start = GetTime()
 	if not self.inst:IsAsleep() then
-		self.task = self.inst:DoPeriodicTask(self.charge_period, DoCharge_task, nil, self)
+		self.task = self.inst:DoPeriodicTask(self.charge_period, DoCharge_task, 30+90*math.random(), self)
 	end
 end
 function BatteryLegion:StopCharge() --结束自动充能

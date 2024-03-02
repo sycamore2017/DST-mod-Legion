@@ -1571,6 +1571,46 @@ local dressup_data = {
             Fn_removeFollowFx(owner, "fx_l_sivmask")
         end
     },
+    siving_suit = {
+        isnoskin = true,
+        buildfn = function(dressup, item, buildskin)
+            local itemswap = {}
+
+            local skindata = item.components.skinedlegion:GetSkinedData()
+            if skindata ~= nil and skindata.equip ~= nil then
+                itemswap["swap_body"] = dressup:GetDressData(
+                    nil, skindata.equip.build, skindata.equip.file, item.GUID, "swap"
+                )
+            else
+                itemswap["swap_body"] = dressup:GetDressData(
+                    nil, "siving_suit", "swap_body", item.GUID, "swap"
+                )
+            end
+            itemswap["backpack"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
+
+            return itemswap
+        end
+    },
+    siving_suit_gold = {
+        isnoskin = true,
+        buildfn = function(dressup, item, buildskin)
+            local itemswap = {}
+
+            local skindata = item.components.skinedlegion:GetSkinedData()
+            if skindata ~= nil and skindata.equip ~= nil then
+                itemswap["swap_body"] = dressup:GetDressData(
+                    nil, skindata.equip.build, skindata.equip.file, item.GUID, "swap"
+                )
+            else
+                itemswap["swap_body"] = dressup:GetDressData(
+                    nil, "siving_suit_gold", "swap_body", item.GUID, "swap"
+                )
+            end
+            itemswap["backpack"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
+
+            return itemswap
+        end
+    },
     hat_elepheetle = {
         isnoskin = true,
         buildfile = "hat_elepheetle",

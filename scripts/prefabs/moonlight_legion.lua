@@ -1110,7 +1110,7 @@ local function TriggerRevolt(inst, doer, doit)
                         fx.Transform:SetPosition(0, 1.4, 0)
                     end
                 end
-            end, 0)
+            end, math.random())
         end
 
         inst._atk = atk_rf_buff

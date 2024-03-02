@@ -251,7 +251,7 @@ local function UpadateHealTag(inst)
 
     local shouldheal = false
     local x, y, z = inst.Transform:GetWorldPosition()
-    for _,v in ipairs(AllPlayers) do
+    for _, v in ipairs(AllPlayers) do
         if
             v.entity:IsVisible() and
             not v:HasTag("health_as_oldage") and --旺达没法被加血，所以不管她了
@@ -268,7 +268,7 @@ end
 local function StartUpadateHealTag(inst)
     if inst._taskheal == nil then
         inst._needheal = false
-        inst._taskheal = inst:DoPeriodicTask(0.6, UpadateHealTag, 1)
+        inst._taskheal = inst:DoPeriodicTask(0.6, UpadateHealTag, 1+5*math.random())
     end
 end
 local function StopUpadateHealTag(inst)

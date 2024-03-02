@@ -786,7 +786,7 @@ function FishHomingBait:SpawnChums()
 	if self.onspawnchumsfn ~= nil then
 		self.onspawnchumsfn(self.inst)
 	end
-	self.task_chums = self.inst:DoPeriodicTask(0.6, self.inst._spawn_chum_piece_fn)
+	self.task_chums = self.inst:DoPeriodicTask(0.6, self.inst._spawn_chum_piece_fn, 1+5*math.random())
 	self.inst:ListenForEvent("onremove", function(inst)
 		for k,_ in pairs(inst._chumpieces) do
 			if k:IsValid() then

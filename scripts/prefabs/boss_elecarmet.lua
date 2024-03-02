@@ -176,7 +176,7 @@ local function SpawnStatic(x, y, z)
         	end
         	inst:DoRemove()
         end
-    end)
+    end, 2*math.random())
     static.quittask = static:DoTaskInTime(60+math.random()*120, function(inst)
         if inst.findtask ~= nil then
             inst.findtask:Cancel()

@@ -176,7 +176,7 @@ local function OnGround_backcub(inst)
         inst.task_l_sound = inst:DoPeriodicTask(4, function()
             inst.SoundEmitter:KillSound("sleep")
             inst.SoundEmitter:PlaySound("dontstarve/creatures/monkey/sleep", "sleep")
-        end, 0)
+        end, 3+17*math.random())
     end
 end
 local function ConsumeHunger_backcub(inst, value)
@@ -324,7 +324,7 @@ local function OnEntityWake_backcub(inst)
         inst.hungertime_l = nil
     end
     if inst.task_l_hunger == nil then
-        inst.task_l_hunger = inst:DoPeriodicTask(cycle_backcub, HungerCycle_backcub, cycle_backcub)
+        inst.task_l_hunger = inst:DoPeriodicTask(cycle_backcub, HungerCycle_backcub, cycle_backcub+10*math.random())
     end
 end
 local function OnEntitySleep_backcub(inst)
@@ -400,7 +400,7 @@ table.insert(prefs, Prefab("backcub", function()
 
     inst:ListenForEvent("ondropped", OnGround_backcub)
     OnGround_backcub(inst)
-    inst.task_l_hunger = inst:DoPeriodicTask(cycle_backcub, HungerCycle_backcub, cycle_backcub)
+    inst.task_l_hunger = inst:DoPeriodicTask(cycle_backcub, HungerCycle_backcub, cycle_backcub+10*math.random())
 
     -- MakeHauntableLaunchAndDropFirstItem(inst) --不能被作祟
 
@@ -481,7 +481,7 @@ local function OnEquip_sachet(inst, owner)
         inst.task_l_flower:Cancel()
     end
     inst.owner_l = owner
-    inst.task_l_flower = inst:DoPeriodicTask(5, ButterflyCycle_sachet, 3)
+    inst.task_l_flower = inst:DoPeriodicTask(5, ButterflyCycle_sachet, 2.5+3*math.random())
 end
 local function FnOff_sachet(inst, owner)
     if inst.task_l_flower ~= nil then

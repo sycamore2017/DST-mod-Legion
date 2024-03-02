@@ -559,7 +559,7 @@ local function DoRevolt(inst, doer)
         inst._task_fx = inst:DoPeriodicTask(0.25, function(inst)
             local fx = SpawnPrefab(inst._dd.fx or "agronssword_fx")
             fx.Transform:SetPosition((inst.components.inventoryitem:GetGrandOwner() or inst).Transform:GetWorldPosition())
-        end, 0)
+        end, math.random())
     end
 end
 local function OnLoad_agron(inst, data)
