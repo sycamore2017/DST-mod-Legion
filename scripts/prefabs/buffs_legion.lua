@@ -419,38 +419,35 @@ MakeBuff({
 --------------------------------------------------------------------------
 
 local function OnSave_healthstorage(inst, data)
-	if inst.times ~= nil and inst.times > 0 then
-        data.times = inst.times
+	if inst.healthall ~= nil and inst.healthall > 0 then
+        data.healthall = inst.healthall
     end
 end
 local function OnLoad_healthstorage(inst, data)
-	if data ~= nil and data.times ~= nil and data.times > 0 then
-        inst.times = inst.times + data.times
+    if data == nil then
+        return
+    end
+	if data.times ~= nil and data.times > 0 then --兼容旧版本数据
+        inst.healthall = inst.healthall + data.times*2
+    end
+    if data.healthall ~= nil and data.healthall > 0 then
+        inst.healthall = inst.healthall + data.healthall
     end
 end
-local function TestHeal_healthstorage(target)
-    return (target.components.health:GetMaxWithPenalty() - target.components.health.currenthealth) >= 2
-end
-local function OnTick_healthstorage(inst, target)
-    if IsAlive(target) then
-        if TestHeal_healthstorage(target) then
-            if not target.components.health:IsInvincible() then
-                target.components.health:DoDelta(2, true, "shyerry", true, nil, true)
-                inst.times = inst.times - 1
-                if inst.times <= 0 then
-                    inst.components.debuff:Stop()
-                end
-                if not TestHeal_healthstorage(target) then
-                    if inst.task_l_heal ~= nil then
-                        inst.task_l_heal:Cancel()
-                        inst.task_l_heal = nil
-                    end
-                end
+local function Heal_healthstorage(inst, target)
+    inst.task_l_heal = nil
+    if IsAlive(target) and inst.healthall > 0 then
+        local need = target.components.health:GetMaxWithPenalty() - target.components.health.currenthealth
+        if need >= 5 then
+            if inst.healthall > need then
+                inst.healthall = inst.healthall - need
+            else
+                need = inst.healthall
+                inst.healthall = 0
             end
-        else --暂时不需要加血了，
-            if inst.task_l_heal ~= nil then
-                inst.task_l_heal:Cancel()
-                inst.task_l_heal = nil
+            target.components.health:DoDelta(need, true, "shyerry", true, nil, true)
+            if inst.healthall <= 0 then
+                inst.components.debuff:Stop()
             end
         end
     else
@@ -458,29 +455,15 @@ local function OnTick_healthstorage(inst, target)
     end
 end
 local function TryHeal_healthstorage(buff, target)
-    if buff.task_l_heal ~= nil then --已经在开始加血了，就不重复了
-        return
-    end
-    if IsAlive(target) then
-        if TestHeal_healthstorage(target) then
-            buff.task_l_heal = buff:DoPeriodicTask(2, OnTick_healthstorage, 0.5+2*math.random(), target)
+    if IsAlive(target) and buff.healthall > 0 then
+        if
+            buff.task_l_heal == nil and
+            (target.components.health:GetMaxWithPenalty() - target.components.health.currenthealth) >= 5
+        then
+            buff.task_l_heal = buff:DoTaskInTime(0, Heal_healthstorage, target)
         end
     else
         EndBuffSafely(buff)
-    end
-end
-local function BuffSet_healthstorage(buff, target)
-    if target.buff_healthstorage_times ~= nil then --buff次数可以无限叠加
-        buff.times = buff.times + target.buff_healthstorage_times
-        target.buff_healthstorage_times = nil
-    end
-    target:ListenForEvent("healthdelta", function(inst, data) self:OnHealthDelta(data) end)
-    if buff.task_l_heal ~= nil then
-        buff.task_l_heal:Cancel()
-        buff.task_l_heal = nil
-    end
-    if buff.times > 0 then
-        buff.task_l_heal = buff:DoPeriodicTask(2, OnTick_healthstorage, 0.5+2*math.random(), target)
     end
 end
 
@@ -492,23 +475,40 @@ MakeBuff({
     time_default = nil,
     notimer = true,
     fn_start = function(buff, target)
-        if target.buff_healthstorage_times ~= nil then --buff次数可以无限叠加
-            buff.times = buff.times + target.buff_healthstorage_times
-            target.buff_healthstorage_times = nil
+        if target.components.oldager ~= nil then --物理回血效果，无法对旺达起作用
+            target.buff_healthstorage_v = nil
+            EndBuffSafely(buff)
+            return
+        end
+        if target.buff_healthstorage_v ~= nil then --血库可以无限叠加
+            buff.healthall = buff.healthall + target.buff_healthstorage_v
+            target.buff_healthstorage_v = nil
         end
         TryHeal_healthstorage(buff, target)
         buff:ListenForEvent("healthdelta", buff.fn_l_healthdelta, target)
     end,
-    fn_again = BuffSet_healthstorage,
+    fn_again = function(buff, target)
+        if target.components.oldager ~= nil then
+            target.buff_healthstorage_v = nil
+            EndBuffSafely(buff)
+            return
+        end
+        if target.buff_healthstorage_v ~= nil then
+            buff.healthall = buff.healthall + target.buff_healthstorage_v
+            target.buff_healthstorage_v = nil
+        end
+        TryHeal_healthstorage(buff, target)
+    end,
     fn_end = function(buff, target)
         if buff.task_l_heal ~= nil then
             buff.task_l_heal:Cancel()
             buff.task_l_heal = nil
         end
-        buff.times = 0
+        buff.healthall = 0
+        buff:RemoveEventCallback("healthdelta", buff.fn_l_healthdelta, target)
     end,
     fn_server = function(buff)
-        buff.times = 0
+        buff.healthall = 0
         buff.fn_l_healthdelta = function(target, data)
             TryHeal_healthstorage(buff, target)
         end

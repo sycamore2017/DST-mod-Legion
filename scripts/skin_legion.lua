@@ -22,7 +22,16 @@ local skininvs = {
     "revolvedmoonlight_taste", "revolvedmoonlight_pro_taste",
     "revolvedmoonlight_taste2", "revolvedmoonlight_pro_taste2",
     "revolvedmoonlight_taste3", "revolvedmoonlight_pro_taste3",
-    "revolvedmoonlight_taste4", "revolvedmoonlight_pro_taste4"
+    "revolvedmoonlight_taste4", "revolvedmoonlight_pro_taste4",
+    "foliageath_rosorns_marble", "foliageath_lileaves_marble", "foliageath_orchitwigs_marble",
+    "foliageath_orchitwigs_disguiser", "neverfade_thanks_broken", "foliageath_neverfade_thanks",
+    "neverfade_paper_broken", "foliageath_neverfade_paper", "neverfade_paper2_broken",
+    "foliageath_neverfade_paper2", "fishhomingbait1_thanks", "fishhomingbait2_thanks", "fishhomingbait3_thanks",
+    "fishhomingbait1_taste", "fishhomingbait2_taste", "fishhomingbait3_taste", "icire_rock1_era",
+    "icire_rock2_era", "icire_rock3_era", "icire_rock4_era", "icire_rock5_era", "icire_rock1_collector",
+    "icire_rock2_collector", "icire_rock3_collector", "icire_rock4_collector", "icire_rock5_collector",
+    "icire_rock1_day", "icire_rock2_day", "icire_rock3_day", "icire_rock4_day", "icire_rock5_day",
+    "foliageath_lileaves_era", "foliageath_rosorns_collector",
 }
 
 --------------------------------------------------------------------------
@@ -1163,9 +1172,7 @@ _G.SKINS_LEGION = {
         base_prefab = "rosorns", skin_id = "62e639928c2f781db2f79b3d", onlyownedshow = true,
 		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
 		assets = {
-			Asset("ANIM", "anim/skin/rosorns_marble.zip"),
-            Asset("ATLAS", "images/inventoryimages_skin/foliageath_rosorns_marble.xml"),
-            Asset("IMAGE", "images/inventoryimages_skin/foliageath_rosorns_marble.tex")
+			Asset("ANIM", "anim/skin/rosorns_marble.zip")
 		},
         image = { name = nil, atlas = nil, setable = true },
         string = ischinese and { name = "落薇剪" } or { name = "Falling Petals Scissors" },
@@ -1210,9 +1217,7 @@ _G.SKINS_LEGION = {
         base_prefab = "lileaves", skin_id = "62e535bd8c2f781db2f79ae7", onlyownedshow = true,
 		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
 		assets = {
-			Asset("ANIM", "anim/skin/lileaves_marble.zip"),
-            Asset("ATLAS", "images/inventoryimages_skin/foliageath_lileaves_marble.xml"),
-            Asset("IMAGE", "images/inventoryimages_skin/foliageath_lileaves_marble.tex")
+			Asset("ANIM", "anim/skin/lileaves_marble.zip")
 		},
         image = { name = nil, atlas = nil, setable = true },
         string = ischinese and { name = "石莲长枪" } or { name = "Marble Lilance" },
@@ -1251,9 +1256,7 @@ _G.SKINS_LEGION = {
         base_prefab = "orchitwigs", skin_id = "62e61d158c2f781db2f79b1e", onlyownedshow = true,
 		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
 		assets = {
-			Asset("ANIM", "anim/skin/orchitwigs_marble.zip"),
-            Asset("ATLAS", "images/inventoryimages_skin/foliageath_orchitwigs_marble.xml"),
-            Asset("IMAGE", "images/inventoryimages_skin/foliageath_orchitwigs_marble.tex")
+			Asset("ANIM", "anim/skin/orchitwigs_marble.zip")
 		},
         image = { name = nil, atlas = nil, setable = true },
         string = ischinese and { name = "铁艺兰珊" } or { name = "Ironchid" },
@@ -1296,9 +1299,7 @@ _G.SKINS_LEGION = {
         base_prefab = "orchitwigs", skin_id = "ooooonononon",
 		type = "item", skin_tags = {}, release_group = 555, rarity = rarityFree,
 		assets = {
-			Asset("ANIM", "anim/skin/orchitwigs_disguiser.zip"),
-            Asset("ATLAS", "images/inventoryimages_skin/foliageath_orchitwigs_disguiser.xml"),
-            Asset("IMAGE", "images/inventoryimages_skin/foliageath_orchitwigs_disguiser.tex")
+			Asset("ANIM", "anim/skin/orchitwigs_disguiser.zip")
 		},
         image = { name = nil, atlas = nil, setable = true },
         string = ischinese and { name = "粉色追猎" } or { name = "Pink Orchitwigs" },
@@ -1323,11 +1324,7 @@ _G.SKINS_LEGION = {
 		type = "item", skin_tags = {}, release_group = 555, rarity = raritySpecial,
 		assets = {
 			Asset("ANIM", "anim/skin/neverfade_thanks.zip"),
-            Asset("ANIM", "anim/skin/neverfade_butterfly_thanks.zip"),
-            Asset("ATLAS", "images/inventoryimages_skin/neverfade_thanks_broken.xml"),
-            Asset("IMAGE", "images/inventoryimages_skin/neverfade_thanks_broken.tex"),
-            Asset("ATLAS", "images/inventoryimages_skin/foliageath_neverfade_thanks.xml"),
-            Asset("IMAGE", "images/inventoryimages_skin/foliageath_neverfade_thanks.tex")
+            Asset("ANIM", "anim/skin/neverfade_butterfly_thanks.zip")
 		},
         image = { name = nil, atlas = nil, setable = false },
         string = ischinese and { name = "扶伤" } or { name = "FuShang" },
@@ -1380,11 +1377,7 @@ _G.SKINS_LEGION = {
 		type = "item", skin_tags = {}, release_group = 555, rarity = raritySpecial,
 		assets = {
 			Asset("ANIM", "anim/skin/neverfade_paper.zip"),
-            Asset("ANIM", "anim/skin/neverfade_butterfly_paper.zip"),
-            Asset("ATLAS", "images/inventoryimages_skin/neverfade_paper_broken.xml"),
-            Asset("IMAGE", "images/inventoryimages_skin/neverfade_paper_broken.tex"),
-            Asset("ATLAS", "images/inventoryimages_skin/foliageath_neverfade_paper.xml"),
-            Asset("IMAGE", "images/inventoryimages_skin/foliageath_neverfade_paper.tex")
+            Asset("ANIM", "anim/skin/neverfade_butterfly_paper.zip")
 		},
         image = { name = nil, atlas = nil, setable = false },
         string = ischinese and { name = "青蝶纸剑" } or { name = "Paper-fly Sword" },
@@ -1439,11 +1432,7 @@ _G.SKINS_LEGION = {
 		type = "item", skin_tags = {}, release_group = 555, rarity = raritySpecial,
 		assets = {
 			Asset("ANIM", "anim/skin/neverfade_paper2.zip"),
-            Asset("ANIM", "anim/skin/neverfade_butterfly_paper2.zip"),
-            Asset("ATLAS", "images/inventoryimages_skin/neverfade_paper2_broken.xml"),
-            Asset("IMAGE", "images/inventoryimages_skin/neverfade_paper2_broken.tex"),
-            Asset("ATLAS", "images/inventoryimages_skin/foliageath_neverfade_paper2.xml"),
-            Asset("IMAGE", "images/inventoryimages_skin/foliageath_neverfade_paper2.tex")
+            Asset("ANIM", "anim/skin/neverfade_butterfly_paper2.zip")
 		},
         image = { name = nil, atlas = nil, setable = false },
         string = ischinese and { name = "绀蝶纸剑" } or { name = "Violet Paper-fly Sword" },
@@ -1766,13 +1755,7 @@ _G.SKINS_LEGION = {
 		type = "item", skin_tags = {}, release_group = 555, rarity = raritySpecial,
 		assets = {
             Asset("ANIM", "anim/pollen_chum.zip"), --官方藤壶花粉动画
-			Asset("ANIM", "anim/skin/fishhomingbait_thanks.zip"),
-            Asset("ATLAS", "images/inventoryimages_skin/fishhomingbait1_thanks.xml"),
-            Asset("IMAGE", "images/inventoryimages_skin/fishhomingbait1_thanks.tex"),
-            Asset("ATLAS", "images/inventoryimages_skin/fishhomingbait2_thanks.xml"),
-            Asset("IMAGE", "images/inventoryimages_skin/fishhomingbait2_thanks.tex"),
-            Asset("ATLAS", "images/inventoryimages_skin/fishhomingbait3_thanks.xml"),
-            Asset("IMAGE", "images/inventoryimages_skin/fishhomingbait3_thanks.tex")
+			Asset("ANIM", "anim/skin/fishhomingbait_thanks.zip")
 		},
         image = { name = nil, atlas = nil, setable = false }, --皮肤展示需要一个同prefab名的图片
         string = { name = ischinese and "云烟瓶" or "YunYan Bottle" },
@@ -1805,13 +1788,7 @@ _G.SKINS_LEGION = {
 		type = "item", skin_tags = {}, release_group = 555, rarity = rarityFree,
 		assets = {
             Asset("ANIM", "anim/pollen_chum.zip"), --官方藤壶花粉动画
-			Asset("ANIM", "anim/skin/fishhomingbait_taste.zip"),
-            Asset("ATLAS", "images/inventoryimages_skin/fishhomingbait1_taste.xml"),
-            Asset("IMAGE", "images/inventoryimages_skin/fishhomingbait1_taste.tex"),
-            Asset("ATLAS", "images/inventoryimages_skin/fishhomingbait2_taste.xml"),
-            Asset("IMAGE", "images/inventoryimages_skin/fishhomingbait2_taste.tex"),
-            Asset("ATLAS", "images/inventoryimages_skin/fishhomingbait3_taste.xml"),
-            Asset("IMAGE", "images/inventoryimages_skin/fishhomingbait3_taste.tex")
+			Asset("ANIM", "anim/skin/fishhomingbait_taste.zip")
 		},
         image = { name = nil, atlas = nil, setable = false }, --皮肤展示需要一个同prefab名的图片
         string = ischinese and { name = "茶之恋" } or { name = "Tea Heart" },
@@ -1947,17 +1924,7 @@ _G.SKINS_LEGION = {
 		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
 		assets = {
             -- Asset("ANIM", "anim/heat_rock.zip"), --官方热能石动画模板。因为本体也引用了，所以这不重复引用
-			Asset("ANIM", "anim/skin/icire_rock_era.zip"),
-            Asset("ATLAS", "images/inventoryimages_skin/icire_rock1_era.xml"),
-            Asset("IMAGE", "images/inventoryimages_skin/icire_rock1_era.tex"),
-            Asset("ATLAS", "images/inventoryimages_skin/icire_rock2_era.xml"),
-            Asset("IMAGE", "images/inventoryimages_skin/icire_rock2_era.tex"),
-            Asset("ATLAS", "images/inventoryimages_skin/icire_rock3_era.xml"),
-            Asset("IMAGE", "images/inventoryimages_skin/icire_rock3_era.tex"),
-            Asset("ATLAS", "images/inventoryimages_skin/icire_rock4_era.xml"),
-            Asset("IMAGE", "images/inventoryimages_skin/icire_rock4_era.tex"),
-            Asset("ATLAS", "images/inventoryimages_skin/icire_rock5_era.xml"),
-            Asset("IMAGE", "images/inventoryimages_skin/icire_rock5_era.tex")
+			Asset("ANIM", "anim/skin/icire_rock_era.zip")
 		},
 		image = { name = nil, atlas = nil, setable = false },
         string = ischinese and { name = "琥珀石中蝇" } or { name = "In Amber" },
@@ -1976,17 +1943,7 @@ _G.SKINS_LEGION = {
         base_prefab = "icire_rock", skin_id = "62df65b58c2f781db2f7998a", onlyownedshow = true, mustonwedshow = true,
 		type = "item", skin_tags = {}, release_group = 555, rarity = raritySpecial,
 		assets = {
-			Asset("ANIM", "anim/skin/icire_rock_collector.zip"),
-            Asset("ATLAS", "images/inventoryimages_skin/icire_rock1_collector.xml"),
-            Asset("IMAGE", "images/inventoryimages_skin/icire_rock1_collector.tex"),
-            Asset("ATLAS", "images/inventoryimages_skin/icire_rock2_collector.xml"),
-            Asset("IMAGE", "images/inventoryimages_skin/icire_rock2_collector.tex"),
-            Asset("ATLAS", "images/inventoryimages_skin/icire_rock3_collector.xml"),
-            Asset("IMAGE", "images/inventoryimages_skin/icire_rock3_collector.tex"),
-            Asset("ATLAS", "images/inventoryimages_skin/icire_rock4_collector.xml"),
-            Asset("IMAGE", "images/inventoryimages_skin/icire_rock4_collector.tex"),
-            Asset("ATLAS", "images/inventoryimages_skin/icire_rock5_collector.xml"),
-            Asset("IMAGE", "images/inventoryimages_skin/icire_rock5_collector.tex")
+			Asset("ANIM", "anim/skin/icire_rock_collector.zip")
 		},
 		image = { name = nil, atlas = nil, setable = false },
         string = ischinese and { name = "占星石" } or { name = "Astrological Stone" },
@@ -2005,17 +1962,7 @@ _G.SKINS_LEGION = {
         base_prefab = "icire_rock", skin_id = "6380cbb88c2f781db2f7f400", onlyownedshow = true,
 		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
 		assets = {
-			Asset("ANIM", "anim/skin/icire_rock_day.zip"),
-            Asset("ATLAS", "images/inventoryimages_skin/icire_rock1_day.xml"),
-            Asset("IMAGE", "images/inventoryimages_skin/icire_rock1_day.tex"),
-            Asset("ATLAS", "images/inventoryimages_skin/icire_rock2_day.xml"),
-            Asset("IMAGE", "images/inventoryimages_skin/icire_rock2_day.tex"),
-            Asset("ATLAS", "images/inventoryimages_skin/icire_rock3_day.xml"),
-            Asset("IMAGE", "images/inventoryimages_skin/icire_rock3_day.tex"),
-            Asset("ATLAS", "images/inventoryimages_skin/icire_rock4_day.xml"),
-            Asset("IMAGE", "images/inventoryimages_skin/icire_rock4_day.tex"),
-            Asset("ATLAS", "images/inventoryimages_skin/icire_rock5_day.xml"),
-            Asset("IMAGE", "images/inventoryimages_skin/icire_rock5_day.tex")
+			Asset("ANIM", "anim/skin/icire_rock_day.zip")
 		},
 		image = { name = nil, atlas = nil, setable = false },
         string = ischinese and { name = "风景球" } or { name = "Landscape Ball" },
@@ -2062,9 +2009,7 @@ _G.SKINS_LEGION = {
         base_prefab = "lileaves", skin_id = "629b0d5f8c2f781db2f77f0d", noshopshow = true,
 		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
 		assets = {
-			Asset("ANIM", "anim/skin/lileaves_era.zip"),
-            Asset("ATLAS", "images/inventoryimages_skin/foliageath_lileaves_era.xml"),
-            Asset("IMAGE", "images/inventoryimages_skin/foliageath_lileaves_era.tex")
+			Asset("ANIM", "anim/skin/lileaves_era.zip")
 		},
         image = { name = nil, atlas = nil, setable = true },
         string = { name = ischinese and "婆娑花叶" or "Platycerium Leaves" },
@@ -2230,9 +2175,7 @@ _G.SKINS_LEGION = {
         base_prefab = "rosorns", skin_id = "62e3c3a98c2f781db2f79abc", noshopshow = true,
 		type = "item", skin_tags = {}, release_group = 555, rarity = raritySpecial,
 		assets = {
-			Asset("ANIM", "anim/skin/rosorns_collector.zip"),
-            Asset("ATLAS", "images/inventoryimages_skin/foliageath_rosorns_collector.xml"),
-            Asset("IMAGE", "images/inventoryimages_skin/foliageath_rosorns_collector.tex")
+			Asset("ANIM", "anim/skin/rosorns_collector.zip")
 		},
         image = { name = nil, atlas = nil, setable = true },
         string = { name = ischinese and "贯星剑" or "Star Pierced Sword" },

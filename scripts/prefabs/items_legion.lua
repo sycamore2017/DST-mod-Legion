@@ -395,8 +395,8 @@ table.insert(prefs, Prefab("petals_orchid", function() ------兰草花瓣
 end, GetAssets("petals_orchid"), nil))
 
 local function OnEat_shyerry(inst, eater)
-    if eater.components.health ~= nil then
-        eater.buff_healthstorage_times = 20
+    if eater.components.oldager == nil and eater.components.health ~= nil then
+        eater.buff_healthstorage_v = 40
         eater:AddDebuff("buff_healthstorage", "buff_healthstorage")
     end
 end
@@ -424,7 +424,7 @@ table.insert(prefs, Prefab("shyerry", function() ------颤栗果
     if not TheWorld.ismastersim then return inst end
 
     Fn_server(inst, "shyerry")
-    SetEdible(inst, { hunger = 18.75, sanity = 0, health = 8, fn_eat = OnEat_shyerry })
+    SetEdible(inst, { hunger = 18.75, sanity = 0, health = 0, fn_eat = OnEat_shyerry })
     SetCookable(inst, "shyerry_cooked")
     SetStackable(inst, nil)
     SetPerishable(inst, TUNING.PERISH_MED, "spoiled_food", nil)

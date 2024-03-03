@@ -904,7 +904,7 @@ local foods_legion = {
         card_def = { ingredients = { {"shyerry",1}, {"honey",3} } },
         priority = priority_med,
         foodtype = FOODTYPE.GOODIES,
-        hunger = 12.5, sanity = 5, health = 20,
+        hunger = 12.5, sanity = 5, health = 0,
         -- perishtime = nil, --不会腐烂
         cooktime = 3,
         stacksize = 2,
@@ -912,8 +912,8 @@ local foods_legion = {
         float = { nil, "small", 0.25, 0.8 },
         prefabs = { "buff_healthstorage" },
         oneatenfn = function(inst, eater)
-            if eater.components.health ~= nil then
-                eater.buff_healthstorage_times = 50
+            if eater.components.oldager == nil and eater.components.health ~= nil then
+                eater.buff_healthstorage_v = 100
                 eater:AddDebuff("buff_healthstorage", "buff_healthstorage")
             end
         end,

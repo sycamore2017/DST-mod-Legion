@@ -1758,6 +1758,7 @@ AddStategraphActionHandler("wilson_client", ActionHandler(ACTIONS.GIVE_CONTRACTS
 --[[ 让种子能种在 子圭·垄 和 异种植物 里 ]]
 --------------------------------------------------------------------------
 
+local PLANT_DEFS = require("prefabs/farm_plant_defs").PLANT_DEFS
 local WEIGHTED_SEED_TABLE = require("prefabs/weed_defs").weighted_seed_table
 
 local function PickFarmPlant()
