@@ -540,16 +540,17 @@ local function HealArmor(mask, owner, ismask2)
         end
     end
 end
-local function IsValidVictim(ent, owner)
-    if
-        (ent.siv_blood_l_reducer_v == nil or ent.siv_blood_l_reducer_v < 1) and
-        TOOLS_L.MaybeEnemy_player(owner, ent, true)
-    then
-        return true
+local function IsValidVictim(ent, owner, isfriendly)
+    if ent.siv_blood_l_reducer_v ~= nil and ent.siv_blood_l_reducer_v >= 1 then
+        return false
     end
-    return false
+    if isfriendly then --向善模式，只吸收对装备者有仇恨的对象
+        return TOOLS_L.IsEnemy_me(owner, ent)
+    else --皆苦模式，所有可能的敌人都会被吸收
+        return TOOLS_L.MaybeEnemy_player(owner, ent, true)
+    end
 end
-local function StealHealth(inst, owner, ismask2)
+local function StealHealth(inst, owner, ismask2, isfriendly)
     local notags
     if owner:HasTag("player") or owner:HasTag("equipmentmodel") then --佩戴者是玩家、假人时，不吸收其他玩家
         notags = TOOLS_L.TagsSiving({ "player", "siving", "companion", "glommer", "friendlyfruitfly", "abigail" })
@@ -580,11 +581,11 @@ local function StealHealth(inst, owner, ismask2)
         target = inst.lifetarget
         if --吸血对象失效了，重新找新对象
             target == nil or not target:IsValid() or
-            not IsValidVictim(target, owner) or
+            not IsValidVictim(target, owner, isfriendly) or
             target:GetDistanceSqToPoint(x, y, z) > 400 --20*20
         then
             target = FindEntity(owner, 20, function(ent, finder)
-                return IsValidVictim(ent, finder)
+                return IsValidVictim(ent, finder, isfriendly)
             end, { "_health", "_combat" }, notags, nil)
             inst.lifetarget = target
         end
@@ -699,7 +700,7 @@ local function ClearSymbols_sivmask(inst, owner)
 end
 local function OnEquip_sivmask(inst, owner)
     SetSymbols_sivmask(inst, owner)
-    StealHealth(inst, owner, false)
+    StealHealth(inst, owner, false, false)
 
     if owner:HasTag("equipmentmodel") then --假人！
         return
@@ -987,9 +988,23 @@ local function FnBend_sivmask2(mask, doer, target, options)
 
     return true
 end
+local function TriggerMode_sivmask2(inst, owner, mode)
+    CancelTask_life(inst, owner)
+    if mode ~= 3 then
+        StealHealth(inst, owner, true, mode == 2)
+    end
+end
+local function SetMode_sivmask2(inst, newmode, doer)
+    inst.net_mode_l:set(newmode)
+    if inst.components.equippable ~= nil and inst.components.equippable:IsEquipped() then
+        if inst.components.inventoryitem ~= nil and inst.components.inventoryitem.owner then
+            TriggerMode_sivmask2(inst, inst.components.inventoryitem.owner, newmode)
+        end
+    end
+end
 local function OnEquip_sivmask2(inst, owner)
     SetSymbols_sivmask(inst, owner)
-    StealHealth(inst, owner, true)
+    TriggerMode_sivmask2(inst, owner, inst.net_mode_l:value())
     if owner:HasTag("equipmentmodel") then --假人！
         return
     end
@@ -1016,6 +1031,13 @@ local function OnSetBonusOff_sivmask2(inst)
     inst.healpower_l = 2
     inst.net_healmax_l:set("135")
 end
+local function Fn_nameDetail_sivmask2(inst)
+    local str = Fn_nameDetail_sivmask(inst)
+    if inst.net_mode_l:value() then
+        str = str.."\n"..(STRINGS.NAMEDETAIL_L.SIVMASK_MODE[inst.net_mode_l:value()] or "未知")
+    end
+    return str
+end
 
 table.insert(prefs, Prefab("siving_mask_gold", function()
     local inst = CreateEntity()
@@ -1023,15 +1045,18 @@ table.insert(prefs, Prefab("siving_mask_gold", function()
 
     -- inst:AddTag("open_top_hat")
     inst:AddTag("siv_mask2") --给特殊动作用
+    inst:AddTag("cansetmode_l") --模式切换必需，没有就代表无法切换
 
     inst:AddComponent("skinedlegion")
     inst.components.skinedlegion:Init("siving_mask_gold")
 
     inst.net_heal_l = net_string(inst.GUID, "sivmask2.heal_l", "heal_l_dirty")
     inst.net_healmax_l = net_string(inst.GUID, "sivmask2.healmax_l", "healmax_l_dirty")
+    inst.net_mode_l = net_tinybyte(inst.GUID, "sivmask2.mode_l", "mode_l_dirty")
     inst.net_heal_l:set_local("0")
     inst.net_healmax_l:set_local("135")
-    inst.fn_l_namedetail = Fn_nameDetail_sivmask
+    inst.net_mode_l:set_local(3)
+    inst.fn_l_namedetail = Fn_nameDetail_sivmask2
 
     inst.entity:SetPristine()
     if not TheWorld.ismastersim then return inst end
@@ -1057,6 +1082,9 @@ table.insert(prefs, Prefab("siving_mask_gold", function()
 
     inst:AddComponent("lifebender") --御血神通！然而并不
     inst.components.lifebender.fn_bend = FnBend_sivmask2
+
+    inst:AddComponent("modelegion")
+    inst.components.modelegion:Init(3, 3, nil, SetMode_sivmask2)
 
     MakeHauntableLaunch(inst)
 
