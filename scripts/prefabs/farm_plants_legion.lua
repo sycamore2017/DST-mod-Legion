@@ -690,8 +690,6 @@ end
 --[[ 巨食草 三阶段 ]]
 --------------------------------------------------------------------------
 
-local TIME_TRYSWALLOW = 4.5 --吞食检查周期
-local TIME_DOLURE = 10 --引诱周期
 local DIST_SWALLOW = { 2, 6 } --吞食半径 极限值
 local NUM_SWALLOW = { 1, 10 } --吞食对象数量 极限值
 local TIME_SWALLOW = { 35, 5 } --吞食消化时间 极限值
@@ -719,10 +717,6 @@ local function DisplayName_nep(inst)
 		namepre = namepre.."(Lv."..tostring(cluster)..")"
 	end
 	return namepre
-end
-local function StartTimer(inst, name, time)
-	inst.components.timer:StopTimer(name)
-	inst.components.timer:StartTimer(name, time)
 end
 local function ComputStackNum(value, item)
 	return (value or 0) + (item.components.stackable and item.components.stackable.stacksize or 1)
@@ -909,14 +903,14 @@ local function DoDigest(inst, doer)
 		end
 	end
 end
-local function StopDigest(inst)
-	if inst.task_digest ~= nil then
-		inst.task_digest:Cancel()
-		inst.task_digest = nil
+local function StopTask(inst, key)
+	if inst[key] ~= nil then
+		inst[key]:Cancel()
+		inst[key] = nil
 	end
 end
 local function TryDigest(inst, doer)
-	StopDigest(inst)
+	StopTask(inst, "task_digest")
 	for k,v in pairs(inst.components.container.slots) do
         if IsDigestible(v) then
 			inst.task_digest = inst:DoTaskInTime(5, function(inst)
@@ -928,9 +922,6 @@ local function TryDigest(inst, doer)
 end
 
 local function TrySwallow(inst)
-	inst.sg.mem.to_swallow = nil
-	StartTimer(inst, "swallow", TIME_TRYSWALLOW)
-
 	local x, y, z = inst.Transform:GetWorldPosition()
 	local cluster = inst.components.perennialcrop2.cluster
 	local ents = TheSim:FindEntities(x, y, z, inst.dist_swallow,
@@ -1004,12 +995,11 @@ local function DoSwallow(inst)
 			inst.components.container:GiveItem(item)
 		end
 	end
-	StartTimer(inst, "digested", inst.time_swallow) --开始冷却计时
+
+	inst.components.timer:StopTimer("digested")
+	inst.components.timer:StartTimer("digested", inst.time_swallow) --开始冷却计时
 end
 local function DoLure(inst)
-	inst.sg.mem.to_lure = nil
-	StartTimer(inst, "lure", TIME_DOLURE)
-
 	local x, y, z = inst.Transform:GetWorldPosition()
 	local cluster = inst.components.perennialcrop2.cluster
 	local ents = TheSim:FindEntities(x, y, z, inst.dist_lure, { "_combat" }, TAGS_CANT_NEP, nil)
@@ -1035,7 +1025,7 @@ end
 
 local function OnOpen_nep(inst, data)
 	if not inst.components.health:IsDead() then
-		StopDigest(inst)
+		StopTask(inst, "task_digest")
         inst.sg:GoToState("openmouth", data)
     end
 end
@@ -1048,32 +1038,24 @@ local function OnClose_nep(inst, doer)
     end
 end
 local function OnTimerDone_nep(inst, data)
-	if data.name == "swallow" then
-		inst:PushEvent("doswallow")
-	elseif data.name == "lure" then
-		inst:PushEvent("dolure")
-	elseif data.name == "digested" then
+	if data.name == "digested" then
 		inst:PushEvent("digested")
 	end
-end
-local function OmitDecimalPoint(value, plus) --截取小数点
-	value = math.floor(value*plus)
-	return value/plus
 end
 local function OnCluster_nep(cpt, now)
 	now = math.min(now*1.25, cpt.cluster_max) --提前让数值达到最大
 
 	local value = Remap(now, 0, cpt.cluster_max, DIST_SWALLOW[1], DIST_SWALLOW[2])
-	cpt.inst.dist_swallow = OmitDecimalPoint(value, 10)
+	cpt.inst.dist_swallow = TOOLS_L.ODPoint(value, 10)
 
 	value = Remap(now, 0, cpt.cluster_max, NUM_SWALLOW[1], NUM_SWALLOW[2])
 	cpt.inst.num_swallow = math.floor(value)
 
 	value = Remap(now, 0, cpt.cluster_max, TIME_SWALLOW[1], TIME_SWALLOW[2])
-	cpt.inst.time_swallow = OmitDecimalPoint(value, 10)
+	cpt.inst.time_swallow = TOOLS_L.ODPoint(value, 10)
 
 	value = Remap(now, 0, cpt.cluster_max, DIST_LURE[1], DIST_LURE[2])
-	cpt.inst.dist_lure = OmitDecimalPoint(value, 10)
+	cpt.inst.dist_lure = TOOLS_L.ODPoint(value, 10)
 end
 
 local function SwitchPlant(inst, plant)
@@ -1101,9 +1083,9 @@ local function SwitchPlant(inst, plant)
 end
 local function OnDeath_nep(inst, data)
 	inst.components.perennialcrop2:GenerateLoot(nil, true, false)
-	StopDigest(inst)
-	inst.components.timer:StopTimer("swallow")
-	inst.components.timer:StopTimer("lure")
+	StopTask(inst, "task_digest")
+	StopTask(inst, "task_lure")
+	StopTask(inst, "task_swallow")
 	inst.components.timer:StopTimer("digested")
 
 	inst.fn_switch(inst)
@@ -1125,12 +1107,48 @@ local function OnLoad_nep(inst, data)
 		end
 	end
 end
+
+local function SendSwallowEvent(inst)
+	inst:PushEvent("doswallow")
+end
+local function DoSome_nep(inst)
+	if inst.task_lure == nil then
+		inst.task_lure = inst:DoPeriodicTask(11, inst.fn_doLure, 2+13*math.random())
+	end
+	if inst.task_swallow == nil then
+		inst.task_swallow = inst:DoPeriodicTask(4.5, SendSwallowEvent, 1+5*math.random())
+	end
+end
 local function SetMode_nep(inst, newmode, doer)
     if newmode == 1 then
 		inst.net_mode_l:set(true)
+		DoSome_nep(inst)
 	else
 		inst.net_mode_l:set(false)
+		StopTask(inst, "task_lure")
+		StopTask(inst, "task_swallow")
+		inst.todo_swallow = nil
 	end
+	if doer ~= nil then
+		inst.SoundEmitter:PlaySound("dontstarve_DLC001/creatures/together/kittington/emote_nuzzle")
+		inst.SoundEmitter:PlaySound(inst.sounds.leaf, nil, 0.4)
+		inst.SoundEmitter:PlaySound(inst.sounds.rumble, nil, 0.5)
+	end
+end
+local function OnEntityWake_nep(inst)
+    if inst.net_mode_l:value() then
+		DoSome_nep(inst)
+		inst.todo_swallow = true
+	end
+end
+local function OnEntitySleep_nep(inst)
+    StopTask(inst, "task_lure")
+	StopTask(inst, "task_swallow")
+end
+local function Fn_nameDetail_nep(inst)
+    local str = "xix"
+    str = str.."\n"..(STRINGS.NAMEDETAIL_L.VASEHERB_MODE[inst.net_mode_l:value() and 1 or 2] or "未知")
+    return str
 end
 
 table.insert(prefs, Prefab("plant_nepenthes_l", function()
@@ -1139,6 +1157,7 @@ table.insert(prefs, Prefab("plant_nepenthes_l", function()
 	Fn_common_p2(inst, CROPS_DATA_LEGION["plantmeat"])
 	inst.net_mode_l = net_bool(inst.GUID, "plant_crop_l.mode_l", "mode_l_dirty")
 	inst.net_mode_l:set_local(true)
+	inst.fn_l_namedetail = Fn_nameDetail_nep
 
 	inst:SetPhysicsRadiusOverride(.5)
 	MakeObstaclePhysics(inst, inst.physicsradiusoverride)
@@ -1166,12 +1185,14 @@ table.insert(prefs, Prefab("plant_nepenthes_l", function()
 	inst.time_swallow = TIME_SWALLOW[1] --主动吞食后的消化时间
 	inst.dist_lure = DIST_LURE[1] --引诱半径
 	inst.sounds = sounds_nep
-	inst.task_digest = nil
+	-- inst.task_digest = nil
+	-- inst.task_swallow = nil
+	-- inst.todo_swallow = nil
 
-	inst.fn_tryDigest = TryDigest
 	inst.fn_trySwallow = TrySwallow
 	inst.fn_doSwallow = DoSwallow
 	inst.fn_doLure = DoLure
+	inst.fn_tryDigest = TryDigest
 	inst.fn_death = OnDeath_nep
 	inst.fn_switch = SwitchPlant
 
@@ -1211,8 +1232,12 @@ table.insert(prefs, Prefab("plant_nepenthes_l", function()
 
 	inst.OnSave = OnSave_nep
 	inst.OnLoad = OnLoad_nep
+	inst.OnEntitySleep = OnEntitySleep_nep
+    inst.OnEntityWake = OnEntityWake_nep
 
 	MakeHauntableDropFirstItem(inst)
+
+	DoSome_nep(inst)
 
 	return inst
 end, {

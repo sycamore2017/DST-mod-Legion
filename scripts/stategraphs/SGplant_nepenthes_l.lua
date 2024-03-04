@@ -1,8 +1,5 @@
 require("stategraphs/commonstates")
 
-local TIME_TRYSWALLOW = 4.5 --吞食检查周期
-local TIME_DOLURE = 10 --引诱周期
-
 local function IsBusy(inst)
     return inst.sg:HasStateTag("busy") or inst.components.health:IsDead()
 end
@@ -14,19 +11,11 @@ local function CheckState(inst)
     end
 
     --尝试吞食
-    if inst.sg.mem.to_swallow then
+    if inst.todo_swallow then
+        inst.todo_swallow = nil
         if inst.fn_trySwallow(inst) then
             return true
         end
-    elseif not inst.components.timer:TimerExists("swallow") then
-        inst.components.timer:StartTimer("swallow", TIME_TRYSWALLOW)
-    end
-
-    --尝试引诱
-    if inst.sg.mem.to_lure then
-        inst.fn_doLure(inst)
-    elseif not inst.components.timer:TimerExists("lure") then
-        inst.components.timer:StartTimer("lure", TIME_DOLURE)
     end
 
     return false
@@ -46,17 +35,12 @@ local events = {
         inst.sg:GoToState("hit")
     end),
     EventHandler("doswallow", function(inst) --可以吞食了
-        inst.sg.mem.to_swallow = true
-        if IsBusy(inst) then return end
-        CheckState(inst)
-    end),
-    EventHandler("dolure", function(inst) --可以引诱了
-        inst.sg.mem.to_lure = true
-        if IsBusy(inst) then return end
+        inst.todo_swallow = true
+        if inst:IsAsleep() or IsBusy(inst) then return end
         CheckState(inst)
     end),
     EventHandler("digested", function(inst) --主动吞食的冷却时间结束
-        if IsBusy(inst) then return end
+        if inst:IsAsleep() or IsBusy(inst) then return end
         CheckState(inst)
     end),
     -- EventHandler("onopen", function(inst, data) --不用该方式，因为它是每次有人打开容器就会触发，onopenfn 才是第一次打开时才触发

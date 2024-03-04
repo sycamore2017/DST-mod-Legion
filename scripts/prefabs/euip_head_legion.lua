@@ -1000,6 +1000,9 @@ local function SetMode_sivmask2(inst, newmode, doer)
             TriggerMode_sivmask2(inst, inst.components.inventoryitem.owner, newmode)
         end
     end
+    if doer ~= nil then
+        --undo 声音
+    end
 end
 local function OnEquip_sivmask2(inst, owner)
     SetSymbols_sivmask(inst, owner)

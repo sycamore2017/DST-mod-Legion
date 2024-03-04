@@ -4132,6 +4132,7 @@ STRINGS.NAMEDETAIL_L = {
     SIVDT_POLLUTED = "Drop of Siving Stone Stops",
     SIVMASK = "Life Counter: {val} / {valmax}",
     SIVMASK_MODE = { "Bitter Mode", "Pure Mode", "Blank Mode" },
+    VASEHERB_MODE = { "Restless", "Tame" },
     SIVCTL = {
         "Moisture: {mo} / {momax}",
         "Nutrients: Formula {n1} Compost {n2} Manure {n3} / {nmax}",

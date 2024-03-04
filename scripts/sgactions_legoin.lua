@@ -1412,9 +1412,12 @@ local SETMODE_L = Action({ priority = 2, mount_valid = true, canforce = true })
 SETMODE_L.id = "SETMODE_L"
 SETMODE_L.str = STRINGS.ACTIONS.SETMODE_L
 SETMODE_L.strfn = function(act)
-    if act.invobject ~= nil then
-        if act.invobject:HasTag("siv_mask2") then
+    local obj = act.target or act.invobject
+    if obj ~= nil then
+        if obj:HasTag("siv_mask2") then
             return "MYSTERY"
+        elseif obj:HasTag("vaseherb") then
+            return "TOUCH"
         end
     end
     return "GENERIC"
