@@ -779,9 +779,11 @@ local function OnBroken_sivmask2(inst)
         inst:PushEvent("percentusedchange", { percent = 0 }) --界面需要更新百分比
     end
 end
-local function OnAttackOther(owner, data)
+local function OnAttackOther_sivmask2(owner, data, mask)
+    if mask.net_mode_l:value() ~= 1 or data == nil then
+        return
+    end
     if
-        owner.components.inventory ~= nil and
         data.target ~= nil and data.target:IsValid() and
         data.target.components.health ~= nil and not data.target.components.health:IsDead() and
         (data.target.siv_blood_l_reducer_v == nil or data.target.siv_blood_l_reducer_v < 1) and
@@ -793,10 +795,7 @@ local function OnAttackOther(owner, data)
             data.target:HasTag("balloon")
         )
     then
-        local mask = owner.components.inventory:GetEquippedItem(EQUIPSLOTS.HEAD)
-        if mask ~= nil and mask.prefab == "siving_mask_gold" then
-            mask.lifetarget = data.target
-        end
+        mask.lifetarget = data.target
     end
 end
 local function CalcuCost(mask, doer, cost)
@@ -1008,13 +1007,15 @@ local function OnEquip_sivmask2(inst, owner)
     if owner:HasTag("equipmentmodel") then --假人！
         return
     end
-    owner:ListenForEvent("onattackother", OnAttackOther)
+    inst:AddTag("cansetmode_l") --模式切换必需，没有就代表无法切换
+    inst:ListenForEvent("onattackother", inst.OnAttackOther_l, owner)
     TOOLS_L.AddEntValue(owner, "siv_blood_l_reducer", inst.prefab, 1, 0.5)
     -- TOOLS_L.AddTag(owner, "PreventSivFlower", inst.prefab)
 end
 local function OnUnequip_sivmask2(inst, owner)
     ClearSymbols_sivmask(inst, owner)
-    owner:RemoveEventCallback("onattackother", OnAttackOther)
+    inst:RemoveTag("cansetmode_l")
+    inst:RemoveEventCallback("onattackother", inst.OnAttackOther_l, owner)
     TOOLS_L.RemoveEntValue(owner, "siv_blood_l_reducer", inst.prefab, 1)
     -- TOOLS_L.RemoveTag(owner, "PreventSivFlower", inst.prefab)
     CancelTask_life(inst, owner)
@@ -1045,7 +1046,6 @@ table.insert(prefs, Prefab("siving_mask_gold", function()
 
     -- inst:AddTag("open_top_hat")
     inst:AddTag("siv_mask2") --给特殊动作用
-    inst:AddTag("cansetmode_l") --模式切换必需，没有就代表无法切换
 
     inst:AddComponent("skinedlegion")
     inst.components.skinedlegion:Init("siving_mask_gold")
@@ -1068,6 +1068,9 @@ table.insert(prefs, Prefab("siving_mask_gold", function()
     inst.healthcounter_max = 135 --积累上限
     inst.healpower_l = 2 --恢复力
     inst.OnCalcuCost_l = CalcuCost
+    inst.OnAttackOther_l = function(owner, data)
+        OnAttackOther_sivmask2(owner, data, inst)
+    end
 
     Fn_server(inst, "siving_mask_gold", OnEquip_sivmask2, OnUnequip_sivmask2)
     inst.components.inventoryitem:SetSinks(true) --它是石头做的，不可漂浮

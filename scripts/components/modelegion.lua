@@ -14,7 +14,7 @@ function ModeLegion:Init(num, nummax, fn_test, fn_do)
 	self.fn_do = fn_do
 end
 
-function ModeLegion:SetMode(mode, doer)
+function ModeLegion:SetMode(mode, doer, notest)
     if mode ~= nil then
 		mode = math.clamp(mode, 1, self.max)
 	else --如果为空，则按顺序切换到下一个
@@ -24,12 +24,24 @@ function ModeLegion:SetMode(mode, doer)
 			mode = self.now + 1
 		end
 	end
-	if self.fn_test == nil or self.fn_test(self.inst, mode, doer) then
+	if notest or self.fn_test == nil or self.fn_test(self.inst, mode, doer) then
 		self.now = mode
 		self.fn_do(self.inst, mode, doer)
 		return true
 	end
 	return false
+end
+
+function ModeLegion:OnSave()
+	local data = { now = self.now }
+	return data
+end
+function ModeLegion:OnLoad(data) --Tip：如果组件中的 OnSave() 没有返回数据，则 OnLoad() 也不会执行到了
+	if data ~= nil then
+        self:SetMode(data.now or 1, nil, true)
+	else
+		self:SetMode(1, nil, true)
+    end
 end
 
 return ModeLegion

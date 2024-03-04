@@ -321,9 +321,12 @@ local function FeathersFlap(inst) --羽乱舞
     SetBehaviorTree(inst, "flap")
 end
 local function IsTreeHaloCrusher(attacker, weapon)
-    if attacker ~= nil and attacker.prefab == "tornado" or attacker.treehalo_crusher_l then
-        return true
-    elseif weapon ~= nil then
+    if attacker ~= nil then
+        if attacker.prefab == "tornado" or attacker.treehalo_crusher_l then
+            return true
+        end
+    end
+    if weapon ~= nil then
         if weapon.treehalo_crusher_l then
             return true
         elseif weapon.components.tool ~= nil and weapon.components.tool:CanDoAction(ACTIONS.MINE) then

@@ -4316,10 +4316,16 @@ STRINGS.NAMEDETAIL_L = {
     SIVDT = "献祭能量：光耀{i1} 生命{i2}",
     SIVDT_POLLUTED = "停止掉落子圭石",
     SIVMASK = "生命积累：{val} / {valmax}",
-    SIVMASK_MODE = { "皆苦式", "向善式", "暂息式" },
+    SIVMASK_MODE = { "皆苦式", "向善式", "虚息式" },
     SIVCTL = {
         "含水量：{mo} / {momax}",
         "肥料值：催剂{n1} 堆肥{n2} 粪肥{n3} / {nmax}",
         "肥料值：催剂{n1} 堆肥{n2} 粪肥{n3} / {nmax}\n含水量：{mo} / {momax}"
     }
+}
+
+STRINGS.ACTIONS.SETMODE_L = {
+    GENERIC = "切换",
+    MYSTERY = "私语",
+    TOUCH = "抚摸"
 }

@@ -1405,6 +1405,46 @@ end)
 AddStategraphActionHandler("wilson", ActionHandler(ACTIONS.INTOSHEATH_L, "doskipaction_l"))
 
 --------------------------------------------------------------------------
+--[[ 模式切换相关 ]]
+--------------------------------------------------------------------------
+
+local SETMODE_L = Action({ priority = 2, mount_valid = true, canforce = true })
+SETMODE_L.id = "SETMODE_L"
+SETMODE_L.str = STRINGS.ACTIONS.SETMODE_L
+SETMODE_L.strfn = function(act)
+    if act.invobject ~= nil then
+        if act.invobject:HasTag("siv_mask2") then
+            return "MYSTERY"
+        end
+    end
+    return "GENERIC"
+end
+SETMODE_L.fn = function(act)
+    local obj = act.target or act.invobject
+    if obj ~= nil and obj.components.modelegion ~= nil then
+        local able, reason = obj.components.modelegion:SetMode(nil, act.doer, false)
+        if not able then
+            return false, reason
+        end
+        return true
+    end
+end
+AddAction(SETMODE_L)
+
+AddComponentAction("INVENTORY", "modelegion", function(inst, doer, actions, right)
+    if inst:HasTag("cansetmode_l") then
+        table.insert(actions, ACTIONS.SETMODE_L)
+    end
+end)
+AddComponentAction("SCENE", "modelegion", function(inst, doer, actions, right)
+    if right and inst:HasTag("cansetmode_l") then
+        table.insert(actions, ACTIONS.SETMODE_L)
+    end
+end)
+
+AddStategraphActionHandler("wilson", ActionHandler(ACTIONS.SETMODE_L, "doskipaction_l"))
+
+--------------------------------------------------------------------------
 --[[ 月折宝剑相关 ]]
 --------------------------------------------------------------------------
 

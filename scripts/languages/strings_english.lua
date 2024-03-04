@@ -4138,3 +4138,9 @@ STRINGS.NAMEDETAIL_L = {
         "Nutrients: Formula {n1} Compost {n2} Manure {n3} / {nmax}\nMoisture: {mo} / {momax}"
     }
 }
+
+STRINGS.ACTIONS.SETMODE_L = {
+    GENERIC = "Switch",
+    MYSTERY = "Whisper",
+    TOUCH = "Pet"
+}
