@@ -1172,6 +1172,7 @@ table.insert(prefs, Prefab("plant_nepenthes_l", function()
 	inst.fn_l_namedetail = Fn_nameDetail_nep
 	inst.mouseinfo_l = {
 		--【客户端】
+		limitedtime = nil, --对于一些网络占用太多的，可以选择限制更新频率
 		lasttime = nil, --上次获取时间
 		fn_dealbaseinfo = Fn_dealbaseinfo_nep,
 		str = nil, --展示字符串

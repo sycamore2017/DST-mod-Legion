@@ -1035,12 +1035,24 @@ local function OnSetBonusOff_sivmask2(inst)
     inst.healpower_l = 2
     inst.net_healmax_l:set("135")
 end
+
+local function Fn_dealbaseinfo_nep(inst, dd)
+	if dd == nil then
+		return
+	end
+	return tostring(dd.time).."__"
+		.."\n"..(STRINGS.NAMEDETAIL_L.SIVMASK_MODE[dd.mode] or "未知")
+end
+local function Fn_getbaseinfo_nep(inst)
+	return { mode = inst.components.modelegion.now }
+end
 local function Fn_nameDetail_sivmask2(inst)
-    local str = Fn_nameDetail_sivmask(inst)
-    if inst.net_mode_l:value() then
-        str = str.."\n"..(STRINGS.NAMEDETAIL_L.SIVMASK_MODE[inst.net_mode_l:value()] or "未知")
-    end
-    return str
+    -- local str = Fn_nameDetail_sivmask(inst)
+    -- if inst.net_mode_l:value() then
+    --     str = str.."\n"..(STRINGS.NAMEDETAIL_L.SIVMASK_MODE[inst.net_mode_l:value()] or "未知")
+    -- end
+    -- return str
+    return inst.mouseinfo_l.str
 end
 
 table.insert(prefs, Prefab("siving_mask_gold", function()
@@ -1060,6 +1072,17 @@ table.insert(prefs, Prefab("siving_mask_gold", function()
     inst.net_healmax_l:set_local("135")
     inst.net_mode_l:set_local(3)
     inst.fn_l_namedetail = Fn_nameDetail_sivmask2
+
+    inst.mouseinfo_l = {
+		--【客户端】
+		limitedtime = nil, --对于一些网络占用太多的，可以选择限制更新频率
+		lasttime = nil, --上次获取时间
+		fn_dealbaseinfo = Fn_dealbaseinfo_nep,
+		str = nil, --展示字符串
+		dd = nil, --原始数据
+		--【服务器】
+		fn_getbaseinfo = Fn_getbaseinfo_nep
+	}
 
     inst.entity:SetPristine()
     if not TheWorld.ismastersim then return inst end
