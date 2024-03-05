@@ -1145,10 +1145,22 @@ local function OnEntitySleep_nep(inst)
     StopTask(inst, "task_lure")
 	StopTask(inst, "task_swallow")
 end
+
+local function Fn_dealbaseinfo_nep(inst, dd)
+	if dd == nil then
+		return
+	end
+	return tostring(dd.time).."__"
+		.."\n"..(STRINGS.NAMEDETAIL_L.VASEHERB_MODE[dd.mode] or "未知")
+end
+local function Fn_getbaseinfo_nep(inst)
+	return { time = inst.components.health.destroytime, mode = inst.components.modelegion.now }
+end
 local function Fn_nameDetail_nep(inst)
-    local str = "xix"
-    str = str.."\n"..(STRINGS.NAMEDETAIL_L.VASEHERB_MODE[inst.net_mode_l:value() and 1 or 2] or "未知")
-    return str
+    -- local str = "xix"
+    -- str = str.."\n"..(STRINGS.NAMEDETAIL_L.VASEHERB_MODE[inst.net_mode_l:value() and 1 or 2] or "未知")
+    -- return str
+	return inst.mouseinfo_l.str
 end
 
 table.insert(prefs, Prefab("plant_nepenthes_l", function()
@@ -1158,6 +1170,15 @@ table.insert(prefs, Prefab("plant_nepenthes_l", function()
 	inst.net_mode_l = net_bool(inst.GUID, "plant_crop_l.mode_l", "mode_l_dirty")
 	inst.net_mode_l:set_local(true)
 	inst.fn_l_namedetail = Fn_nameDetail_nep
+	inst.mouseinfo_l = {
+		--【客户端】
+		lasttime = nil, --上次获取时间
+		fn_dealbaseinfo = Fn_dealbaseinfo_nep,
+		str = nil, --展示字符串
+		dd = nil, --原始数据
+		--【服务器】
+		fn_getbaseinfo = Fn_getbaseinfo_nep
+	}
 
 	inst:SetPhysicsRadiusOverride(.5)
 	MakeObstaclePhysics(inst, inst.physicsradiusoverride)

@@ -3031,6 +3031,7 @@ local function DoRpc(type, data)
     end
 
     local success, result  = pcall(json.encode, data)
+    -- local success, result = pcall(function() return json.encode(data) end)
 	if success then
         SendModRPCToServer(GetModRPC("LegionSkined", "BarHandle"), type, result)
 	end

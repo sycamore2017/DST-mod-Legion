@@ -1599,6 +1599,43 @@ _G.FindPickupableItem = function(owner, radius, furthestfirst, positionoverride,
 end
 
 --------------------------------------------------------------------------
+--[[ 服务器与客户端的响应 ]]
+--------------------------------------------------------------------------
+
+------客户端响应服务器请求【客户端环境】
+
+AddClientModRPCHandler("LegionMsg", "MouseInfo", function(data, ...) --接收处理服务器发来的描述所需的原始数据
+    if data ~= nil and type(data) == "string" then
+        local success, result = pcall(function() return json.decode(data) end)
+        if result and result.guid ~= nil then
+            local target = Ents[result.guid]
+            if target ~= nil and target.mouseinfo_l ~= nil then
+                target.mouseinfo_l.dd = result.dd
+                target.mouseinfo_l.str = target.mouseinfo_l.fn_dealbaseinfo(target, result.dd)
+            end
+        end
+    end
+end)
+
+------服务端响应客户端请求【服务端环境】
+
+AddModRPCHandler("LegionMsg", "GetMouseInfo", function(player, data, ...) --整理并向客户端发送描述所需的原始数据
+    if data ~= nil and type(data) == "string" then
+        local success, result = pcall(function() return json.decode(data) end)
+        if result and result.guid ~= nil and player and player.userid and player.userid ~= "" then
+            local target = Ents[result.guid]
+            if target ~= nil and target.mouseinfo_l ~= nil then
+                local dd = { guid = result.guid, dd = target.mouseinfo_l.fn_getbaseinfo(target) }
+                local success, res = pcall(function() return json.encode(dd) end)
+                if success then
+                    SendModRPCToClient(GetClientModRPC("LegionMsg", "MouseInfo"), player.userid, res)
+                end
+            end
+        end
+    end
+end)
+
+--------------------------------------------------------------------------
 --[[ 名称显示中增加更多细节 ]]
 --------------------------------------------------------------------------
 
@@ -1640,6 +1677,52 @@ AddGlobalClassPostConstruct("entityscript", "EntityScript", function(self) --文
     self.GetDisplayName_l_info = self.GetDisplayName
     self.GetDisplayName = GetDisplayName_detail
 end)
+
+if not TheNet:IsDedicated() then
+    local itemtile = require("widgets/itemtile")
+    -- local hoverer = require("widgets/hoverer")
+
+    local function TryGetMouseInfo(target)
+        if target.mouseinfo_l ~= nil and target.GUID ~= nil then
+            local info = target.mouseinfo_l
+            local timenow = GetTime()
+            if info.lasttime == nil or (timenow - info.lasttime) >= 2 then
+                info.lasttime = timenow
+                local data = { guid = target.GUID }
+                local success, result = pcall(function() return json.encode(data) end)
+                if success then
+                    SendModRPCToServer(GetModRPC("LegionMsg", "GetMouseInfo"), result)
+                end
+            end
+        end
+    end
+
+    --修改物品栏ui，鼠标移上去时就尝试获取数据
+    local GetDescriptionString_old = itemtile.GetDescriptionString
+    itemtile.GetDescriptionString = function(self, ...)
+        if self.item ~= nil and self.item:IsValid() and self.item.replica.inventoryitem ~= nil then
+            TryGetMouseInfo(self.item)
+        end
+        return GetDescriptionString_old(self, ...)
+    end
+
+    --修改玩家操作组件，鼠标移到世界上的对象上时，尝试获取数据
+    local function GetLeftMouseAction_new(self, ...)
+        local lmb = self.GetLeftMouseAction_l(self, ...)
+        if lmb ~= nil and ThePlayer then
+            local overriden, str
+            str, overriden = lmb:GetActionString()
+            if not overriden and lmb.target ~= nil and lmb.invobject == nil and lmb.target ~= lmb.doer then
+                TryGetMouseInfo(lmb.target)
+            end
+        end
+        return lmb
+    end
+    AddComponentPostInit("playercontroller", function(self)
+        self.GetLeftMouseAction_l = self.GetLeftMouseAction
+        self.GetLeftMouseAction = GetLeftMouseAction_new --目前只有 widgets/hoverer 调用了这里，刚好就是我要改的
+    end)
+end
 
 --------------------------------------------------------------------------
 --[[ 世界修改 ]]
