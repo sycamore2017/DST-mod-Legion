@@ -1004,6 +1004,40 @@ local function ODPoint(value, plus)
 	return value/plus
 end
 
+--[ 名称中显示更多细节 ]--
+local function Fn_nameDetail(inst)
+	return inst.mouseinfo_l.str
+end
+local function InitMouseInfo(inst, fn_dealdata, fn_getdata, limitedtime)
+    inst.fn_l_namedetail = Fn_nameDetail
+	inst.mouseinfo_l = {
+		--【客户端】
+		limitedtime = limitedtime, --对于一些数据量太多的，可以选择限制更新频率
+		lasttime = nil, --上次获取时间
+		fn_dealdata = fn_dealdata, --将数据转化成展示用的字符串
+		str = nil, --展示字符串
+		dd = nil, --原始数据
+		--【服务器】
+		fn_getdata = fn_getdata --获取展示需要的数据
+	}
+end
+local function SendMouseInfoRPC(player, target, newdd, isfixed, newtime)
+    if target.GUID ~= nil and target.mouseinfo_l ~= nil and player.userid ~= nil then
+        if newtime then
+            player.mouseinfo_ls_time = GetTime()
+        end
+        local dd = { guid = target.GUID, dd = newdd }
+        if isfixed then
+            dd.fixed = true
+        end
+        local success, res = pcall(function() return json.encode(dd) end)
+        if success then
+            SendModRPCToClient(GetClientModRPC("LegionMsg", "MouseInfo"), player.userid, res)
+            return true
+        end
+    end
+end
+
 -- local TOOLS_L = require("tools_legion")
 fns = {
 	MakeSnowCovered_comm = MakeSnowCovered_comm,
@@ -1036,7 +1070,8 @@ fns = {
     AddBonusAll = AddBonusAll, RemoveBonusAll = RemoveBonusAll,
     AddResistAll = AddResistAll, RemoveResistAll = RemoveResistAll,
     DoSingleSleep = DoSingleSleep, DoAreaSleep = DoAreaSleep,
-    ODPoint = ODPoint
+    ODPoint = ODPoint,
+    InitMouseInfo = InitMouseInfo, SendMouseInfoRPC = SendMouseInfoRPC
 }
 
 return fns

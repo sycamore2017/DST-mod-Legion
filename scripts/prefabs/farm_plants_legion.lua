@@ -1121,10 +1121,8 @@ local function DoSome_nep(inst)
 end
 local function SetMode_nep(inst, newmode, doer)
     if newmode == 1 then
-		inst.net_mode_l:set(true)
 		DoSome_nep(inst)
 	else
-		inst.net_mode_l:set(false)
 		StopTask(inst, "task_lure")
 		StopTask(inst, "task_swallow")
 		inst.todo_swallow = nil
@@ -1133,10 +1131,11 @@ local function SetMode_nep(inst, newmode, doer)
 		inst.SoundEmitter:PlaySound("dontstarve_DLC001/creatures/together/kittington/emote_nuzzle")
 		inst.SoundEmitter:PlaySound(inst.sounds.leaf, nil, 0.4)
 		inst.SoundEmitter:PlaySound(inst.sounds.rumble, nil, 0.5)
+		TOOLS_L.SendMouseInfoRPC(doer, inst, { mode = newmode }, true, false)
 	end
 end
 local function OnEntityWake_nep(inst)
-    if inst.net_mode_l:value() then
+    if inst.components.modelegion.now == 1 then
 		DoSome_nep(inst)
 		inst.todo_swallow = true
 	end
@@ -1146,40 +1145,22 @@ local function OnEntitySleep_nep(inst)
 	StopTask(inst, "task_swallow")
 end
 
-local function Fn_dealbaseinfo_nep(inst, dd)
+local function Fn_dealdata_nep(inst, dd)
 	if dd == nil then
 		return
 	end
 	return tostring(dd.time).."__"
 		.."\n"..(STRINGS.NAMEDETAIL_L.VASEHERB_MODE[dd.mode] or "未知")
 end
-local function Fn_getbaseinfo_nep(inst)
-	return { time = inst.components.health.destroytime, mode = inst.components.modelegion.now }
-end
-local function Fn_nameDetail_nep(inst)
-    -- local str = "xix"
-    -- str = str.."\n"..(STRINGS.NAMEDETAIL_L.VASEHERB_MODE[inst.net_mode_l:value() and 1 or 2] or "未知")
-    -- return str
-	return inst.mouseinfo_l.str
+local function Fn_getdata_nep(inst)
+	return { mode = inst.components.modelegion.now }
 end
 
 table.insert(prefs, Prefab("plant_nepenthes_l", function()
 	local inst = CreateEntity()
 
 	Fn_common_p2(inst, CROPS_DATA_LEGION["plantmeat"])
-	inst.net_mode_l = net_bool(inst.GUID, "plant_crop_l.mode_l", "mode_l_dirty")
-	inst.net_mode_l:set_local(true)
-	inst.fn_l_namedetail = Fn_nameDetail_nep
-	inst.mouseinfo_l = {
-		--【客户端】
-		limitedtime = nil, --对于一些网络占用太多的，可以选择限制更新频率
-		lasttime = nil, --上次获取时间
-		fn_dealbaseinfo = Fn_dealbaseinfo_nep,
-		str = nil, --展示字符串
-		dd = nil, --原始数据
-		--【服务器】
-		fn_getbaseinfo = Fn_getbaseinfo_nep
-	}
+	TOOLS_L.InitMouseInfo(inst, Fn_dealdata_nep, Fn_getdata_nep)
 
 	inst:SetPhysicsRadiusOverride(.5)
 	MakeObstaclePhysics(inst, inst.physicsradiusoverride)

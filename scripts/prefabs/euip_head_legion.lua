@@ -780,7 +780,7 @@ local function OnBroken_sivmask2(inst)
     end
 end
 local function OnAttackOther_sivmask2(owner, data, mask)
-    if mask.net_mode_l:value() ~= 1 or data == nil then
+    if data == nil or mask.components.modelegion.now ~= 1 then
         return
     end
     if
@@ -994,19 +994,21 @@ local function TriggerMode_sivmask2(inst, owner, mode)
     end
 end
 local function SetMode_sivmask2(inst, newmode, doer)
-    inst.net_mode_l:set(newmode)
     if inst.components.equippable ~= nil and inst.components.equippable:IsEquipped() then
         if inst.components.inventoryitem ~= nil and inst.components.inventoryitem.owner then
             TriggerMode_sivmask2(inst, inst.components.inventoryitem.owner, newmode)
         end
     end
     if doer ~= nil then
-        --undo 声音
+        if doer.SoundEmitter ~= nil then
+            doer.SoundEmitter:PlaySound("dontstarve/characters/wendy/small_ghost/howl", nil, 0.5)
+        end
+        TOOLS_L.SendMouseInfoRPC(doer, inst, { mode = newmode }, true, false)
     end
 end
 local function OnEquip_sivmask2(inst, owner)
     SetSymbols_sivmask(inst, owner)
-    TriggerMode_sivmask2(inst, owner, inst.net_mode_l:value())
+    TriggerMode_sivmask2(inst, owner, inst.components.modelegion.now)
     if owner:HasTag("equipmentmodel") then --假人！
         return
     end
@@ -1036,23 +1038,16 @@ local function OnSetBonusOff_sivmask2(inst)
     inst.net_healmax_l:set("135")
 end
 
-local function Fn_dealbaseinfo_nep(inst, dd)
+local function Fn_dealdata_sivmask2(inst, dd)
+    local str = Fn_nameDetail_sivmask(inst)
 	if dd == nil then
-		return
+		return str
 	end
-	return tostring(dd.time).."__"
-		.."\n"..(STRINGS.NAMEDETAIL_L.SIVMASK_MODE[dd.mode] or "未知")
+	str = str.."\n"..(STRINGS.NAMEDETAIL_L.SIVMASK_MODE[dd.mode] or "未知")
+    return str
 end
-local function Fn_getbaseinfo_nep(inst)
+local function Fn_getdata_sivmask2(inst)
 	return { mode = inst.components.modelegion.now }
-end
-local function Fn_nameDetail_sivmask2(inst)
-    -- local str = Fn_nameDetail_sivmask(inst)
-    -- if inst.net_mode_l:value() then
-    --     str = str.."\n"..(STRINGS.NAMEDETAIL_L.SIVMASK_MODE[inst.net_mode_l:value()] or "未知")
-    -- end
-    -- return str
-    return inst.mouseinfo_l.str
 end
 
 table.insert(prefs, Prefab("siving_mask_gold", function()
@@ -1067,22 +1062,9 @@ table.insert(prefs, Prefab("siving_mask_gold", function()
 
     inst.net_heal_l = net_string(inst.GUID, "sivmask2.heal_l", "heal_l_dirty")
     inst.net_healmax_l = net_string(inst.GUID, "sivmask2.healmax_l", "healmax_l_dirty")
-    inst.net_mode_l = net_tinybyte(inst.GUID, "sivmask2.mode_l", "mode_l_dirty")
     inst.net_heal_l:set_local("0")
     inst.net_healmax_l:set_local("135")
-    inst.net_mode_l:set_local(3)
-    inst.fn_l_namedetail = Fn_nameDetail_sivmask2
-
-    inst.mouseinfo_l = {
-		--【客户端】
-		limitedtime = nil, --对于一些网络占用太多的，可以选择限制更新频率
-		lasttime = nil, --上次获取时间
-		fn_dealbaseinfo = Fn_dealbaseinfo_nep,
-		str = nil, --展示字符串
-		dd = nil, --原始数据
-		--【服务器】
-		fn_getbaseinfo = Fn_getbaseinfo_nep
-	}
+    TOOLS_L.InitMouseInfo(inst, Fn_dealdata_sivmask2, Fn_getdata_sivmask2)
 
     inst.entity:SetPristine()
     if not TheWorld.ismastersim then return inst end
