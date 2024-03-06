@@ -1022,17 +1022,17 @@ local function InitMouseInfo(inst, fn_dealdata, fn_getdata, limitedtime)
 	}
 end
 local function SendMouseInfoRPC(player, target, newdd, isfixed, newtime)
-    if target.GUID ~= nil and target.mouseinfo_l ~= nil and player.userid ~= nil then
+    if target.mouseinfo_l ~= nil and player.userid ~= nil then
         if newtime then
             player.mouseinfo_ls_time = GetTime()
         end
-        local dd = { guid = target.GUID, dd = newdd }
+        local dd = { dd = newdd }
         if isfixed then
             dd.fixed = true
         end
         local success, res = pcall(function() return json.encode(dd) end)
         if success then
-            SendModRPCToClient(GetClientModRPC("LegionMsg", "MouseInfo"), player.userid, res)
+            SendModRPCToClient(GetClientModRPC("LegionMsg", "MouseInfo"), player.userid, res, target)
             return true
         end
     end

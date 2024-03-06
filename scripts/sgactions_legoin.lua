@@ -611,7 +611,7 @@ end))
 --------------------------------------------------------------------------
 
 AddStategraphState("wilson", State{ name = "doskipaction_l",
-    tags = { "idle", "nodangle" },
+    tags = { "idle", "keepchannelcasting" },
     onenter = function(inst)
         inst.components.locomotor:StopMoving()
         if inst:HasTag("beaver") then
@@ -624,7 +624,7 @@ AddStategraphState("wilson", State{ name = "doskipaction_l",
         inst:PerformBufferedAction()
     end,
     events = {
-        EventHandler("animover", function(inst)
+        EventHandler("animqueueover", function(inst)
             if inst.AnimState:AnimDone() then
                 inst.sg:GoToState("idle")
             end
