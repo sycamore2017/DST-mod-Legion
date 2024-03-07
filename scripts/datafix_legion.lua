@@ -1626,7 +1626,7 @@ AddClientModRPCHandler("LegionMsg", "MouseInfo", function(data, target) --接收
                 target.mouseinfo_l.dd = result.dd
                 dd_old = result.dd
             end
-            target.mouseinfo_l.str = target.mouseinfo_l.fn_dealdata(target, dd_old)
+            target.mouseinfo_l.str = target.mouseinfo_l.fn_dealdata(target, dd_old or {})
             if
                 ThePlayer and ThePlayer.mouseinfo_l_log ~= nil and
                 ThePlayer.mouseinfo_l_log.ent == target --说明玩家在这期间还没换查看对象，所以直接更新

@@ -470,9 +470,6 @@ end, GetAssets("hat_elepheetle"), nil))
 --[[ 子圭·汲 ]]
 --------------------------------------------------------------------------
 
-local function SetNet_heal_sivmask(inst)
-    inst.net_heal_l:set(tostring(TOOLS_L.ODPoint(inst.healthcounter, 10)))
-end
 local function OnSave_sivmask(inst, data)
     if inst.healthcounter > 0 then
         data.healthcounter = inst.healthcounter
@@ -482,7 +479,6 @@ local function OnLoad_sivmask(inst, data)
     if data ~= nil then
         if data.healthcounter ~= nil then
             inst.healthcounter = data.healthcounter
-            SetNet_heal_sivmask(inst)
         end
     end
 end
@@ -609,7 +605,6 @@ local function StealHealth(inst, owner, ismask2, isfriendly)
 
         ----积累的管理
         if doit then
-            local healthold = inst.healthcounter
             if costnow > 0 then
                 DrinkLife(inst, target, costnow)
             end
@@ -635,9 +630,6 @@ local function StealHealth(inst, owner, ismask2, isfriendly)
                     end
                 end
             end
-            if healthold ~= inst.healthcounter then --有变化了才更新
-                SetNet_heal_sivmask(inst)
-            end
         end
     end, 0.5+2.5*math.random())
 end
@@ -645,12 +637,10 @@ end
 local function OnSetBonusOn_sivmask(inst)
 	inst.bloodsteal_l = 3
     inst.healthcounter_max = 120
-    inst.net_healmax_l:set("120")
 end
 local function OnSetBonusOff_sivmask(inst)
 	inst.bloodsteal_l = 2
     inst.healthcounter_max = 80
-    inst.net_healmax_l:set("80")
 end
 local function GetSwapSymbol(owner)
     local maps = {
@@ -713,26 +703,40 @@ local function OnUnequip_sivmask(inst, owner)
     TOOLS_L.RemoveEntValue(owner, "siv_blood_l_reducer", inst.prefab, 1)
     CancelTask_life(inst, owner)
 end
-local function Fn_nameDetail_sivmask(inst)
-    return subfmt(STRINGS.NAMEDETAIL_L.SIVMASK,
-        { val = inst.net_heal_l:value() or "0", valmax = inst.net_healmax_l:value() or "80" })
+
+local function Fn_dealdata_sivmask(inst, data)
+    local dd = {
+        v = tostring(data.v or 0),
+        vmax = tostring(data.vmax or 80),
+        st = tostring(data.st or 2),
+        h = "2"
+    }
+    return subfmt(STRINGS.NAMEDETAIL_L.SIVMASK, dd)
+end
+local function Fn_getdata_sivmask(inst)
+    local data = {}
+    if inst.healthcounter > 0 then
+        data.v = TOOLS_L.ODPoint(inst.healthcounter, 10) --变化大的数据记得省略小数点
+    end
+    if inst.healthcounter_max ~= 80 then
+        data.vmax = inst.healthcounter_max
+    end
+    if inst.bloodsteal_l ~= 2 then
+        data.st = inst.bloodsteal_l
+    end
+    return data
 end
 
 table.insert(prefs, Prefab("siving_mask", function()
     local inst = CreateEntity()
     Fn_common(inst, "siving_mask", nil, nil, nil)
+    TOOLS_L.InitMouseInfo(inst, Fn_dealdata_sivmask, Fn_getdata_sivmask)
 
     -- inst:AddTag("open_top_hat")
     -- inst:AddTag("siv_mask")
 
     inst:AddComponent("skinedlegion")
     inst.components.skinedlegion:Init("siving_mask")
-
-    inst.net_heal_l = net_string(inst.GUID, "sivmask.heal_l", "heal_l_dirty")
-    inst.net_healmax_l = net_string(inst.GUID, "sivmask.healmax_l", "healmax_l_dirty")
-    inst.net_heal_l:set_local("0")
-    inst.net_healmax_l:set_local("80")
-    inst.fn_l_namedetail = Fn_nameDetail_sivmask
 
     inst.entity:SetPristine()
     if not TheWorld.ismastersim then return inst end
@@ -994,16 +998,16 @@ local function TriggerMode_sivmask2(inst, owner, mode)
     end
 end
 local function SetMode_sivmask2(inst, newmode, doer)
-    if inst.components.equippable ~= nil and inst.components.equippable:IsEquipped() then
-        if inst.components.inventoryitem ~= nil and inst.components.inventoryitem.owner then
+    if inst.components.inventoryitem ~= nil and inst.components.inventoryitem.owner then
+        if inst.components.equippable ~= nil and inst.components.equippable:IsEquipped() then
             TriggerMode_sivmask2(inst, inst.components.inventoryitem.owner, newmode)
+            if doer ~= nil then
+                if doer.SoundEmitter ~= nil then
+                    doer.SoundEmitter:PlaySound("dontstarve/characters/wendy/small_ghost/howl", nil, 0.5)
+                end
+                TOOLS_L.SendMouseInfoRPC(doer, inst, { mo = newmode }, true, false)
+            end
         end
-    end
-    if doer ~= nil then
-        if doer.SoundEmitter ~= nil then
-            doer.SoundEmitter:PlaySound("dontstarve/characters/wendy/small_ghost/howl", nil, 0.5)
-        end
-        TOOLS_L.SendMouseInfoRPC(doer, inst, { mode = newmode }, true, false)
     end
 end
 local function OnEquip_sivmask2(inst, owner)
@@ -1029,42 +1033,52 @@ local function OnSetBonusOn_sivmask2(inst)
 	inst.bloodsteal_l = 5.5
     inst.healthcounter_max = 225
     inst.healpower_l = 3
-    inst.net_healmax_l:set("225")
 end
 local function OnSetBonusOff_sivmask2(inst)
 	inst.bloodsteal_l = 4
     inst.healthcounter_max = 135
     inst.healpower_l = 2
-    inst.net_healmax_l:set("135")
 end
 
-local function Fn_dealdata_sivmask2(inst, dd)
-    local str = Fn_nameDetail_sivmask(inst)
-	if dd == nil then
-		return str
-	end
-	str = str.."\n"..(STRINGS.NAMEDETAIL_L.SIVMASK_MODE[dd.mode] or "未知")
-    return str
+local function Fn_dealdata_sivmask2(inst, data)
+    local dd = {
+        v = tostring(data.v or 0),
+        vmax = tostring(data.vmax or 135),
+        st = tostring(data.st or 4),
+        h = tostring(data.h or 2)
+    }
+    return subfmt(STRINGS.NAMEDETAIL_L.SIVMASK, dd).."\n"..(STRINGS.NAMEDETAIL_L.SIVMASK_MODE[data.mo or 3])
 end
 local function Fn_getdata_sivmask2(inst)
-	return { mode = inst.components.modelegion.now }
+    local data = {}
+    if inst.healthcounter > 0 then
+        data.v = TOOLS_L.ODPoint(inst.healthcounter, 10) --变化大的数据记得省略小数点
+    end
+    if inst.healthcounter_max ~= 135 then
+        data.vmax = inst.healthcounter_max
+    end
+    if inst.bloodsteal_l ~= 4 then
+        data.st = inst.bloodsteal_l
+    end
+    if inst.healpower_l ~= 2 then
+        data.h = inst.healpower_l
+    end
+    if inst.components.modelegion.now ~= 3 then
+        data.mo = inst.components.modelegion.now
+    end
+    return data
 end
 
 table.insert(prefs, Prefab("siving_mask_gold", function()
     local inst = CreateEntity()
     Fn_common(inst, "siving_mask_gold", nil, nil, nil)
+    TOOLS_L.InitMouseInfo(inst, Fn_dealdata_sivmask2, Fn_getdata_sivmask2)
 
     -- inst:AddTag("open_top_hat")
     inst:AddTag("siv_mask2") --给特殊动作用
 
     inst:AddComponent("skinedlegion")
     inst.components.skinedlegion:Init("siving_mask_gold")
-
-    inst.net_heal_l = net_string(inst.GUID, "sivmask2.heal_l", "heal_l_dirty")
-    inst.net_healmax_l = net_string(inst.GUID, "sivmask2.healmax_l", "healmax_l_dirty")
-    inst.net_heal_l:set_local("0")
-    inst.net_healmax_l:set_local("135")
-    TOOLS_L.InitMouseInfo(inst, Fn_dealdata_sivmask2, Fn_getdata_sivmask2)
 
     inst.entity:SetPristine()
     if not TheWorld.ismastersim then return inst end

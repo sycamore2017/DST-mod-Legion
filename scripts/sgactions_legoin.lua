@@ -480,7 +480,21 @@ local CA_U_INVENTORYITEM_L = {
             return true
         end
         return false
-    end
+    end,
+    function(inst, doer, target, actions, right) --物品右键剑鞘尝试入鞘
+        if
+            right and target:HasTag("swordscabbard") and
+            not (doer.replica.inventory ~= nil and doer.replica.inventory:IsHeavyLifting())
+        then
+            if target.replica.inventoryitem ~= nil and target.replica.inventoryitem:IsGrandOwner(doer) then
+                table.insert(actions, ACTIONS.ITEMINTOSHEATH_L2)
+            else
+                table.insert(actions, ACTIONS.ITEMINTOSHEATH_L)
+            end
+            return true
+        end
+        return false
+    end,
 }
 AddComponentAction("USEITEM", "inventoryitem", function(inst, doer, target, actions, right)
     for _,fn in ipairs(CA_U_INVENTORYITEM_L) do
@@ -610,8 +624,14 @@ end))
 --[[ 一个没有前置时间需求的action的sg ]]
 --------------------------------------------------------------------------
 
+local function SayActionFailString(inst, actionname, reason)
+    if inst.components.talker ~= nil and reason ~= nil then
+        inst.components.talker:Say(GetActionFailString(inst, actionname, reason))
+    end
+end
+
 AddStategraphState("wilson", State{ name = "doskipaction_l",
-    tags = { "idle", "keepchannelcasting" },
+    tags = { "idle", "nodangle", "keepchannelcasting" },
     onenter = function(inst)
         inst.components.locomotor:StopMoving()
         if inst:HasTag("beaver") then
@@ -621,7 +641,7 @@ AddStategraphState("wilson", State{ name = "doskipaction_l",
             inst.AnimState:PlayAnimation("pickup")
             inst.AnimState:PushAnimation("pickup_pst", false)
         end
-        inst:PerformBufferedAction()
+        -- inst:PerformBufferedAction()
     end,
     events = {
         EventHandler("animqueueover", function(inst)
@@ -731,19 +751,6 @@ AddStategraphPostInit("wilson", function(sg)
             end
         end
         return event_fn_locomote(inst, data, ...)
-    end
-
-    --给予动作能用特殊sg
-    local ach1 = sg.actionhandlers[ACTIONS.GIVE]
-    if ach1 then
-        local ach_fn_GIVE = ach1.deststate
-        ach1.deststate = function(inst, action, ...)
-            --入鞘使用短动作
-            if action.invobject ~= nil and action.target ~= nil and action.target:HasTag("swordscabbard") then
-                return "doskipaction_l"
-            end
-            return ach_fn_GIVE(inst, action, ...)
-        end
     end
 
     --攻击时自动切换武器
@@ -1345,21 +1352,34 @@ end))
 
 ------出鞘
 
-local PULLOUTSWORD = Action({ priority = 2, mount_valid = true, encumbered_valid = true, canforce = true })
+local PULLOUTSWORD = Action({ priority = 2, mount_valid = true, encumbered_valid = true })
 PULLOUTSWORD.id = "PULLOUTSWORD"
 PULLOUTSWORD.str = STRINGS.ACTIONS_LEGION.PULLOUTSWORD
 PULLOUTSWORD.fn = function(act)
-    local obj = act.target or act.invobject
-    if obj ~= nil and obj.components.swordscabbard ~= nil and act.doer ~= nil then
-        obj.components.swordscabbard:BreakUp(act.doer)
+    if act.target ~= nil and act.target.components.swordscabbard ~= nil and act.doer ~= nil then
+        act.target.components.swordscabbard:BreakUp(act.doer)
         return true
     end
 end
 AddAction(PULLOUTSWORD)
 
+--Tip: 如果 instant 为 true，表示这个动作不管距离和动画立即执行，此时最好不要给该动作设置 ActionHandler
+--一般用于物品栏动作。这种方式在失败时，需要主动写失败台词的触发
+local PULLOUTSWORD2 = Action({ priority = 2, mount_valid = true, encumbered_valid = true, instant = true })
+PULLOUTSWORD2.id = "PULLOUTSWORD2"
+PULLOUTSWORD2.str = STRINGS.ACTIONS_LEGION.PULLOUTSWORD
+PULLOUTSWORD2.fn = function(act)
+    if act.invobject ~= nil and act.invobject.components.swordscabbard ~= nil and act.doer ~= nil then
+        act.invobject.components.swordscabbard:BreakUp(act.doer)
+        act.doer:PushEvent("noaction_l")
+        return true
+    end
+end
+AddAction(PULLOUTSWORD2)
+
 --往具有某组件的物品添加动作的检测函数，如果满足条件，就向人物的动作可执行表中加入某个动作。right表示是否是右键动作
 AddComponentAction("INVENTORY", "swordscabbard", function(inst, doer, actions, right)
-    table.insert(actions, ACTIONS.PULLOUTSWORD)
+    table.insert(actions, ACTIONS.PULLOUTSWORD2)
 end)
 AddComponentAction("SCENE", "swordscabbard", function(inst, doer, actions, right)
     if right then
@@ -1368,41 +1388,84 @@ AddComponentAction("SCENE", "swordscabbard", function(inst, doer, actions, right
 end)
 
 --将一个动作与state绑定
-AddStategraphActionHandler("wilson", ActionHandler(ACTIONS.PULLOUTSWORD, "doskipaction_l"))
+AddStategraphActionHandler("wilson", ActionHandler(ACTIONS.PULLOUTSWORD, "doshortaction"))
 
-------入鞘
+------右键剑鞘尝试将手持物入鞘
 
-local INTOSHEATH_L = Action({ priority = 2, mount_valid = true, canforce = true })
+local function TryIntoSheath(doer, scabbard, sword)
+    if scabbard ~= nil and scabbard.components.emptyscabbardlegion ~= nil then
+        return scabbard.components.emptyscabbardlegion:PutInto(doer, sword, nil)
+    end
+end
+
+local INTOSHEATH_L = Action({ priority = 2, mount_valid = true })
 INTOSHEATH_L.id = "INTOSHEATH_L"
-INTOSHEATH_L.str = STRINGS.ACTIONS.GIVE.SCABBARD
+INTOSHEATH_L.str = STRINGS.ACTIONS_LEGION.SCABBARD
 INTOSHEATH_L.fn = function(act)
-    local obj = act.target or act.invobject
-    if
-        obj ~= nil and
-        obj.components.z_emptyscabbard ~= nil and obj.components.trader ~= nil and
-        act.doer.components.inventory ~= nil
-    then
+    if act.doer ~= nil and act.doer.components.inventory ~= nil then
         local sword = act.doer.components.inventory:GetEquippedItem(EQUIPSLOTS.HANDS)
-        local able, reason = obj.components.trader:AbleToAccept(sword, act.doer)
-        if not able then
-            return false, reason
-        end
-        obj.components.trader:AcceptGift(act.doer, sword)
-        return true
+        return TryIntoSheath(act.doer, act.target, sword)
     end
 end
 AddAction(INTOSHEATH_L)
 
-AddComponentAction("INVENTORY", "z_emptyscabbard", function(inst, doer, actions, right)
-    table.insert(actions, ACTIONS.INTOSHEATH_L)
+local INTOSHEATH_L2 = Action({ priority = 2, mount_valid = true, instant = true })
+INTOSHEATH_L2.id = "INTOSHEATH_L2"
+INTOSHEATH_L2.str = STRINGS.ACTIONS_LEGION.SCABBARD
+INTOSHEATH_L2.fn = function(act)
+    if act.doer ~= nil and act.doer.components.inventory ~= nil then
+        local sword = act.doer.components.inventory:GetEquippedItem(EQUIPSLOTS.HANDS)
+        local able, reason = TryIntoSheath(act.doer, act.invobject, sword)
+        if able then
+            act.doer:PushEvent("noaction_l")
+            return true
+        else
+            SayActionFailString(act.doer, "INTOSHEATH_L2", reason)
+            return false, reason
+        end
+    end
+end
+AddAction(INTOSHEATH_L2)
+
+AddComponentAction("INVENTORY", "emptyscabbardlegion", function(inst, doer, actions, right)
+    table.insert(actions, ACTIONS.INTOSHEATH_L2)
 end)
-AddComponentAction("SCENE", "z_emptyscabbard", function(inst, doer, actions, right)
+AddComponentAction("SCENE", "emptyscabbardlegion", function(inst, doer, actions, right)
     if right then
         table.insert(actions, ACTIONS.INTOSHEATH_L)
     end
 end)
 
-AddStategraphActionHandler("wilson", ActionHandler(ACTIONS.INTOSHEATH_L, "doskipaction_l"))
+AddStategraphActionHandler("wilson", ActionHandler(ACTIONS.INTOSHEATH_L, "give"))
+
+------鼠标物品右键剑鞘尝试将其入鞘
+
+local ITEMINTOSHEATH_L = Action({ priority = 2, mount_valid = true })
+ITEMINTOSHEATH_L.id = "ITEMINTOSHEATH_L"
+ITEMINTOSHEATH_L.str = STRINGS.ACTIONS_LEGION.SCABBARD
+ITEMINTOSHEATH_L.fn = function(act)
+    return TryIntoSheath(act.doer, act.target, act.invobject)
+end
+AddAction(ITEMINTOSHEATH_L)
+
+local ITEMINTOSHEATH_L2 = Action({ priority = 2, mount_valid = true, instant = true })
+ITEMINTOSHEATH_L2.id = "ITEMINTOSHEATH_L2"
+ITEMINTOSHEATH_L2.str = STRINGS.ACTIONS_LEGION.SCABBARD
+ITEMINTOSHEATH_L2.fn = function(act)
+    if act.doer ~= nil then
+        local able, reason = TryIntoSheath(act.doer, act.target, act.invobject)
+        if able then
+            act.doer:PushEvent("noaction_l")
+            return true
+        else
+            SayActionFailString(act.doer, "ITEMINTOSHEATH_L2", reason)
+            return false, reason
+        end
+    end
+end
+AddAction(ITEMINTOSHEATH_L2)
+
+AddStategraphActionHandler("wilson", ActionHandler(ACTIONS.ITEMINTOSHEATH_L, "give"))
 
 --------------------------------------------------------------------------
 --[[ 模式切换相关 ]]
@@ -1423,9 +1486,8 @@ SETMODE_L.strfn = function(act)
     return "GENERIC"
 end
 SETMODE_L.fn = function(act)
-    local obj = act.target or act.invobject
-    if obj ~= nil and obj.components.modelegion ~= nil then
-        local able, reason = obj.components.modelegion:SetMode(nil, act.doer, false)
+    if act.doer ~= nil and act.target ~= nil and act.target.components.modelegion ~= nil then
+        local able, reason = act.target.components.modelegion:SetMode(nil, act.doer, false)
         if not able then
             return false, reason
         end
@@ -1434,9 +1496,27 @@ SETMODE_L.fn = function(act)
 end
 AddAction(SETMODE_L)
 
+local SETMODE_L2 = Action({ priority = 2, mount_valid = true, instant = true })
+SETMODE_L2.id = "SETMODE_L2"
+SETMODE_L2.str = STRINGS.ACTIONS.SETMODE_L
+SETMODE_L2.strfn = SETMODE_L.strfn
+SETMODE_L2.fn = function(act)
+    if act.doer ~= nil and act.invobject ~= nil and act.invobject.components.modelegion ~= nil then
+        local able, reason = act.invobject.components.modelegion:SetMode(nil, act.doer, false)
+        if able then
+            act.doer:PushEvent("noaction_l")
+            return true
+        else
+            -- SayActionFailString(act.doer, "SETMODE_L2", reason)
+            return false, reason
+        end
+    end
+end
+AddAction(SETMODE_L2)
+
 AddComponentAction("INVENTORY", "modelegion", function(inst, doer, actions, right)
     if inst:HasTag("cansetmode_l") then
-        table.insert(actions, ACTIONS.SETMODE_L)
+        table.insert(actions, ACTIONS.SETMODE_L2)
     end
 end)
 AddComponentAction("SCENE", "modelegion", function(inst, doer, actions, right)
@@ -1445,7 +1525,15 @@ AddComponentAction("SCENE", "modelegion", function(inst, doer, actions, right)
     end
 end)
 
-AddStategraphActionHandler("wilson", ActionHandler(ACTIONS.SETMODE_L, "doskipaction_l"))
+AddStategraphActionHandler("wilson", ActionHandler(ACTIONS.SETMODE_L, "give"))
+AddStategraphEvent("wilson", EventHandler("noaction_l", function(inst, data)
+    if inst.sg:HasStateTag("acting") then
+        return
+    end
+    if inst.sg:HasStateTag("idle") or inst.sg:HasStateTag("channeling") then
+        inst.sg:GoToState("doskipaction_l")
+    end
+end))
 
 --------------------------------------------------------------------------
 --[[ 月折宝剑相关 ]]
@@ -2283,9 +2371,7 @@ end
 local give_strfn_old = ACTIONS.GIVE.strfn
 ACTIONS.GIVE.strfn = function(act)
     if act.target ~= nil then
-        if act.target:HasTag("swordscabbard") then
-            return "SCABBARD"
-        elseif act.target:HasTag("genetrans") then
+        if act.target:HasTag("genetrans") then
             if act.invobject and act.invobject.prefab == "siving_rocks" then
                 return "NEEDENERGY"
             end

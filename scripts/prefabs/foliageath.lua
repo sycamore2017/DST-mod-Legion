@@ -18,25 +18,48 @@ local foliageath_data_fol = {
     -- fn_recover = function(inst, dt, player, tag)end
 }
 
-local function ItemTradeTest(inst, item, giver)
-    if item == nil or item.foliageath_data == nil then
+local function OnLandedClient(self, ...)
+    if self.OnLandedClient_l_base ~= nil then
+        self.OnLandedClient_l_base(self, ...)
+    end
+    if self.floatparam_l ~= nil then
+        self.inst.AnimState:SetFloatParams(self.floatparam_l, 1, self.bob_percent)
+    end
+end
+local function SetFloatable(inst, float) --漂浮组件
+    MakeInventoryFloatable(inst, float[2], float[3], float[4])
+    if float[1] ~= nil then
+        local floater = inst.components.floater
+        floater.OnLandedClient_l_base = floater.OnLandedClient
+        floater.floatparam_l = float[1]
+        floater.OnLandedClient = OnLandedClient
+    end
+end
+
+local function Fn_test_fol(inst, doer, item, count)
+    if item == nil then
+        return false, "NOSWORD"
+    elseif item.foliageath_data == nil then
         return false, "WRONGSWORD"
     end
     return true
 end
-local function OnSwordGiven(inst, giver, item)
+local function Fn_do_fol(inst, doer, item, count)
     if item ~= nil then
         -- if item.prefab == "foliageath" and giver ~= nil and giver.components.talker ~= nil then
         --     giver.components.talker:Say(GetString(giver, "ANNOUNCE_HIS_LOVE_WISH"))
         -- end
         local togethered = SpawnPrefab(item.foliageath_data.togethered or "foliageath_together")
-        togethered.components.swordscabbard:BeTogether(inst, item)
+        if togethered ~= nil then
+            togethered.components.swordscabbard:BeTogether(inst, item) --inst和item会在这里面被删除
+        else
+            item:Remove()
+        end
     end
 end
 
 local function Fn()
     local inst = CreateEntity()
-
     inst.entity:AddTransform()
     inst.entity:AddAnimState()
     -- inst.entity:AddSoundEmitter()
@@ -50,14 +73,8 @@ local function Fn()
 
     inst:AddTag("swordscabbard")
     inst:AddTag("NORATCHECK") --mod兼容：永不妥协。该道具不算鼠潮分
-    inst:AddTag("trader")
 
-    MakeInventoryFloatable(inst, "small", 0.4, 0.65)
-    local OnLandedClient_old = inst.components.floater.OnLandedClient
-    inst.components.floater.OnLandedClient = function(self)
-        OnLandedClient_old(self)
-        self.inst.AnimState:SetFloatParams(0.15, 1, self.bob_percent)
-    end
+    SetFloatable(inst, { 0.15, "small", 0.4, 0.65 })
 
     inst.entity:SetPristine()
     if not TheWorld.ismastersim then return inst end
@@ -70,13 +87,9 @@ local function Fn()
     inst.components.inventoryitem.imagename = "foliageath"
     inst.components.inventoryitem.atlasname = "images/inventoryimages/foliageath.xml"
 
-    inst:AddComponent("trader")
-    inst.components.trader:SetAbleToAcceptTest(ItemTradeTest)
-    inst.components.trader.onaccept = OnSwordGiven
-    inst.components.trader.deleteitemonaccept = false --交易时不自动删除
-    inst.components.trader.acceptnontradable = true --可以交易无交易组件的物品
-
-    inst:AddComponent("z_emptyscabbard")
+    inst:AddComponent("emptyscabbardlegion")
+    inst.components.emptyscabbardlegion.fn_test = Fn_test_fol
+    inst.components.emptyscabbardlegion.fn_do = Fn_do_fol
 
     inst:AddComponent("fuel")
     inst.components.fuel.fuelvalue = TUNING.LARGE_FUEL
@@ -147,12 +160,7 @@ local function MakeIt(name, ismylove)
         end
         inst:AddTag("NORATCHECK") --mod兼容：永不妥协。该道具不算鼠潮分
 
-        MakeInventoryFloatable(inst, "small", 0.4, 0.65)
-        local OnLandedClient_old = inst.components.floater.OnLandedClient
-        inst.components.floater.OnLandedClient = function(self)
-            OnLandedClient_old(self)
-            self.inst.AnimState:SetFloatParams(0.15, 1, self.bob_percent)
-        end
+        SetFloatable(inst, { 0.15, "small", 0.4, 0.65 })
 
         inst.entity:SetPristine()
         if not TheWorld.ismastersim then return inst end
