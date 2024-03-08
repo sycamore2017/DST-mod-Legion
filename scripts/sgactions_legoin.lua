@@ -494,7 +494,7 @@ local CA_U_INVENTORYITEM_L = {
             return true
         end
         return false
-    end,
+    end
 }
 AddComponentAction("USEITEM", "inventoryitem", function(inst, doer, target, actions, right)
     for _,fn in ipairs(CA_U_INVENTORYITEM_L) do
@@ -651,6 +651,15 @@ AddStategraphState("wilson", State{ name = "doskipaction_l",
         end)
     }
 })
+
+AddStategraphEvent("wilson", EventHandler("noaction_l", function(inst, data)
+    if inst.sg:HasStateTag("acting") then
+        return
+    end
+    if inst.sg:HasStateTag("idle") or inst.sg:HasStateTag("channeling") then
+        inst.sg:GoToState("doskipaction_l")
+    end
+end))
 
 --------------------------------------------------------------------------
 --[[ 人物StateGraph修改 ]]
@@ -1389,6 +1398,7 @@ end)
 
 --将一个动作与state绑定
 AddStategraphActionHandler("wilson", ActionHandler(ACTIONS.PULLOUTSWORD, "doshortaction"))
+AddStategraphActionHandler("wilson_client", ActionHandler(ACTIONS.PULLOUTSWORD, "doshortaction"))
 
 ------右键剑鞘尝试将手持物入鞘
 
@@ -1436,7 +1446,9 @@ AddComponentAction("SCENE", "emptyscabbardlegion", function(inst, doer, actions,
     end
 end)
 
+--Tip：有的sg动画需要"wilson"和"wilson_client"都有才行，否则就会出现动作执行了，但没有任何人物动画的情况
 AddStategraphActionHandler("wilson", ActionHandler(ACTIONS.INTOSHEATH_L, "give"))
+AddStategraphActionHandler("wilson_client", ActionHandler(ACTIONS.INTOSHEATH_L, "give"))
 
 ------鼠标物品右键剑鞘尝试将其入鞘
 
@@ -1466,18 +1478,19 @@ end
 AddAction(ITEMINTOSHEATH_L2)
 
 AddStategraphActionHandler("wilson", ActionHandler(ACTIONS.ITEMINTOSHEATH_L, "give"))
+AddStategraphActionHandler("wilson_client", ActionHandler(ACTIONS.ITEMINTOSHEATH_L, "give"))
 
 --------------------------------------------------------------------------
 --[[ 模式切换相关 ]]
 --------------------------------------------------------------------------
 
-local SETMODE_L = Action({ priority = 2, mount_valid = true, canforce = true })
+local SETMODE_L = Action({ priority = 2, mount_valid = true })
 SETMODE_L.id = "SETMODE_L"
 SETMODE_L.str = STRINGS.ACTIONS.SETMODE_L
 SETMODE_L.strfn = function(act)
     local obj = act.target or act.invobject
     if obj ~= nil then
-        if obj:HasTag("siv_mask2") then
+        if obj:HasTag("modemystery_l") then
             return "MYSTERY"
         elseif obj:HasTag("vaseherb") then
             return "TOUCH"
@@ -1526,14 +1539,7 @@ AddComponentAction("SCENE", "modelegion", function(inst, doer, actions, right)
 end)
 
 AddStategraphActionHandler("wilson", ActionHandler(ACTIONS.SETMODE_L, "give"))
-AddStategraphEvent("wilson", EventHandler("noaction_l", function(inst, data)
-    if inst.sg:HasStateTag("acting") then
-        return
-    end
-    if inst.sg:HasStateTag("idle") or inst.sg:HasStateTag("channeling") then
-        inst.sg:GoToState("doskipaction_l")
-    end
-end))
+AddStategraphActionHandler("wilson_client", ActionHandler(ACTIONS.SETMODE_L, "give"))
 
 --------------------------------------------------------------------------
 --[[ 月折宝剑相关 ]]

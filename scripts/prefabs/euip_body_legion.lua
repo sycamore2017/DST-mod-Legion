@@ -933,10 +933,7 @@ local function OnAttacked_bloodarmor(owner, data, armor)
     then
         return
     end
-    if
-        armor == nil or not armor:IsValid() or
-        armor._cdtask ~= nil or armor.components.armor.condition <= 0
-    then
+    if armor._cdtask ~= nil or armor.components.armor.condition <= 0 then
         return
     end
     armor._cdtask = armor:DoTaskInTime(0.3, OnCooldown_suit)
@@ -975,7 +972,11 @@ local function OnHitOther_sivsuit(owner, data)
     OnHitOther_bloodarmor(owner, data, owner._bloodarmor_l)
 end
 local function OnAttacked_sivsuit(owner, data)
-    OnAttacked_bloodarmor(owner, data, owner._bloodarmor_l)
+    local armor = owner._bloodarmor_l
+    if armor == nil or not armor:IsValid() then
+        return
+    end
+    OnAttacked_bloodarmor(owner, data, armor)
 end
 local function OnEquip_sivsuit(inst, owner)
     SetSymbols_sivsuit(inst, owner)
@@ -997,9 +998,29 @@ local function OnUnequip_sivsuit(inst, owner)
     owner:RemoveEventCallback("attacked", OnAttacked_sivsuit)
 end
 
+local function Fn_dealdata_sivsuit(inst, data)
+    local dd = {
+        cmax = tostring(data.cmax or 80),
+        bc = tostring((data.bc or 0.2)*100),
+        ac = "100"
+    }
+    return subfmt(STRINGS.NAMEDETAIL_L.SIVSUIT, dd)
+end
+local function Fn_getdata_sivsuit(inst)
+    local data = {}
+    if inst.counteratkmax_l ~= 80 then
+        data.cmax = inst.counteratkmax_l
+    end
+    if inst.bloodclotmult_l ~= 0.2 then
+        data.bc = inst.bloodclotmult_l
+    end
+    return data
+end
+
 table.insert(prefs, Prefab("siving_suit", function()
     local inst = CreateEntity()
     Fn_common(inst, "siving_suit", nil, nil, nil, "dontstarve/movement/foley/marblearmour")
+    TOOLS_L.InitMouseInfo(inst, Fn_dealdata_sivsuit, Fn_getdata_sivsuit)
 
     inst:AddComponent("skinedlegion")
     inst.components.skinedlegion:Init("siving_suit")
@@ -1063,10 +1084,23 @@ local function OnHitOther_sivsuit2(owner, data)
     OnHitOther_bloodarmor(owner, data, owner._bloodarmor2_l)
 end
 local function OnAttacked_sivsuit2(owner, data)
-    OnAttacked_bloodarmor(owner, data, owner._bloodarmor2_l)
+    local armor = owner._bloodarmor2_l
+    if armor == nil or not armor:IsValid() or armor.components.modelegion.now == 3 then
+        return
+    end
+    OnAttacked_bloodarmor(owner, data, armor)
+end
+local function SetMode_sivsuit2(inst, newmode, doer)
+    if doer ~= nil then
+        if doer.SoundEmitter ~= nil then
+            doer.SoundEmitter:PlaySound("dontstarve/characters/wendy/small_ghost/howl", nil, 0.5)
+        end
+        TOOLS_L.SendMouseInfoRPC(doer, inst, { mo = newmode }, true, false)
+    end
 end
 local function OnEquip_sivsuit2(inst, owner)
     SetSymbols_sivsuit(inst, owner)
+    inst:RemoveTag("cansetmode_l")
     if owner:HasTag("equipmentmodel") then --假人！
         return
     end
@@ -1081,6 +1115,7 @@ local function OnEquip_sivsuit2(inst, owner)
 end
 local function OnUnequip_sivsuit2(inst, owner)
     ClearSymbols_sivsuit(inst, owner)
+    inst:AddTag("cansetmode_l")
     TOOLS_L.RemoveEntValue(owner, "siv_blood_l_reducer", inst.prefab, 1)
     owner._bloodarmor2_l = nil
     owner:RemoveEventCallback("onhitother", OnHitOther_sivsuit2)
@@ -1096,10 +1131,39 @@ local function OnEntityReplicated_sivsuit2(inst)
     end
 end
 
+local function Fn_dealdata_sivsuit2(inst, data)
+    local dd = {
+        cmax = tostring(data.cmax or 150),
+        bc = tostring((data.bc or 0.35)*100),
+        ac = tostring((data.ac or 1)*100)
+    }
+    return subfmt(STRINGS.NAMEDETAIL_L.SIVSUIT, dd).."\n"..(STRINGS.NAMEDETAIL_L.SIVEQUIP_MODE[data.mo or 1])
+end
+local function Fn_getdata_sivsuit2(inst)
+    local data = {}
+    if inst.counteratkmax_l ~= 150 then
+        data.cmax = inst.counteratkmax_l
+    end
+    if inst.bloodclotmult_l ~= 0.35 then
+        data.bc = inst.bloodclotmult_l
+    end
+    if inst.armorcostmult_l ~= 1 then
+        data.ac = inst.armorcostmult_l
+    end
+    if inst.components.modelegion.now ~= 1 then
+        data.mo = inst.components.modelegion.now
+    end
+    return data
+end
+
 table.insert(prefs, Prefab("siving_suit_gold", function()
     local inst = CreateEntity()
     Fn_common(inst, "siving_suit_gold", nil, nil, nil, "dontstarve/movement/foley/marblearmour")
     SetBackpack_common(inst, "siving_suit_gold", OnEntityReplicated_sivsuit2)
+    TOOLS_L.InitMouseInfo(inst, Fn_dealdata_sivsuit2, Fn_getdata_sivsuit2)
+
+    inst:AddTag("cansetmode_l")
+    inst:AddTag("modemystery_l")
 
     inst:AddComponent("skinedlegion")
     inst.components.skinedlegion:Init("siving_suit_gold")
@@ -1124,6 +1188,9 @@ table.insert(prefs, Prefab("siving_suit_gold", function()
     inst.components.armor.TakeDamage = EmptyCptFn --不会因为吸收战斗伤害而损失耐久
 
     SetBonus(inst, "SIVING2", OnSetBonusOn_sivsuit2, OnSetBonusOff_sivsuit2)
+
+    inst:AddComponent("modelegion")
+    inst.components.modelegion:Init(1, 3, nil, SetMode_sivsuit2)
 
     MakeHauntableLaunch(inst)
 

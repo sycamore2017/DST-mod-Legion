@@ -1047,7 +1047,7 @@ local function Fn_dealdata_sivmask2(inst, data)
         st = tostring(data.st or 4),
         h = tostring(data.h or 2)
     }
-    return subfmt(STRINGS.NAMEDETAIL_L.SIVMASK, dd).."\n"..(STRINGS.NAMEDETAIL_L.SIVMASK_MODE[data.mo or 3])
+    return subfmt(STRINGS.NAMEDETAIL_L.SIVMASK, dd).."\n"..(STRINGS.NAMEDETAIL_L.SIVEQUIP_MODE[data.mo or 3])
 end
 local function Fn_getdata_sivmask2(inst)
     local data = {}
@@ -1076,6 +1076,7 @@ table.insert(prefs, Prefab("siving_mask_gold", function()
 
     -- inst:AddTag("open_top_hat")
     inst:AddTag("siv_mask2") --给特殊动作用
+    inst:AddTag("modemystery_l")
 
     inst:AddComponent("skinedlegion")
     inst.components.skinedlegion:Init("siving_mask_gold")

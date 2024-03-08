@@ -883,10 +883,10 @@ local function DoFxCounterAtk(inst)
     local validfn
     if TheNet:GetPVPEnabled() then
         tags_cant = TOOLS_L.TagsCombat3()
-        validfn = TOOLS_L.MaybeEnemy_me
+        validfn = inst.mode == 1 and TOOLS_L.MaybeEnemy_me or TOOLS_L.IsEnemy_me
     else
         tags_cant = TOOLS_L.TagsCombat3({ "player" })
-        validfn = TOOLS_L.MaybeEnemy_player
+        validfn = inst.mode == 1 and TOOLS_L.MaybeEnemy_player or TOOLS_L.IsEnemy_player
     end
     local data = {}
     local hasattacker = false
@@ -956,6 +956,13 @@ local function InitCounterAtk(inst, owner, armor, attacker)
     if armor.prefab == "siving_suit_gold" then
         inst.range = 4
     end
+    if armor.components.modelegion ~= nil then
+        inst.mode = armor.components.modelegion.now
+        if inst.mode == 3 then
+            inst:Remove()
+            return
+        end
+    end
     if attacker ~= nil and attacker:IsValid() then
         poser = attacker
         if attacker.components.health ~= nil and not attacker.components.health:IsDead() then
@@ -993,6 +1000,7 @@ local function MakeSuitAtkFx(data)
         inst.damage = 80
         inst.range = 3
         inst.armorcostmult = 1
+        inst.mode = 1
         -- inst.armor = nil
         -- inst.owner = nil
         -- inst.attacker = nil

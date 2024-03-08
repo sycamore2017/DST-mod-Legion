@@ -212,16 +212,6 @@ local growth_stages_dt = {
     }
 }
 
-local function SetNet_info_dt(inst)
-    local info = inst.ispolluted and "1" or "0"
-    if inst.tradeditems == nil then
-        info = info.."_0_0"
-    else
-        info = info.."_"..tostring(TOOLS_L.ODPoint(inst.tradeditems.light, 100)) --i1
-            .."_"..tostring(TOOLS_L.ODPoint(inst.tradeditems.health, 100)) --i2
-    end
-    inst.net_info_l:set(info)
-end
 local function GetAllActiveItems(giver, item)
     if item.components.stackable ~= nil then --有叠加组件，说明鼠标上可能有物品
         if giver.components.inventory ~= nil then
@@ -246,7 +236,6 @@ local function ComputTraded_dt(inst, light, health)
         inst.tradeditems.health = math.max(0, inst.tradeditems.health + health)
     end
     inst.OnTreeLive(inst, inst.treeState)
-    SetNet_info_dt(inst)
 end
 local function AcceptTest_dt(inst, item, giver)
     if
@@ -262,7 +251,6 @@ local function OnAccept_dt(inst, giver, item)
     if item.prefab == "petals_evil" or item.prefab == "nightmarefuel" then
         if not inst.ispolluted then
             inst.ispolluted = true
-            SetNet_info_dt(inst)
             inst.components.timer:StopTimer("fallenleaf")
             item:Remove()
         else
@@ -416,28 +404,39 @@ local function OnLoad_dt(inst, data, newents)
         end
         if data.traded_health ~= nil or data.traded_light ~= nil then
             inst.ComputTraded(inst, data.traded_light, data.traded_health)
-        else
-            SetNet_info_dt(inst)
         end
     end
 end
-local function Fn_nameDetail_dt(inst)
-    if inst.net_info_l:value() then
-        local infos = string.split(inst.net_info_l:value(), "_")
-        if infos[1] ~= nil then
-            local str = subfmt(STRINGS.NAMEDETAIL_L.SIVDT, { i1 = infos[2] or "0", i2 = infos[3] or "0" })
-            if infos[1] == "1" then
-                return str.."\n"..STRINGS.NAMEDETAIL_L.SIVDT_POLLUTED
-            end
-            return str
+local function Fn_dealdata_dt(inst, data)
+    local dd = {
+        i1 = tostring(data.i1 or 0),
+        i2 = tostring(data.i2 or 0)
+    }
+    local str = subfmt(STRINGS.NAMEDETAIL_L.SIVDT, dd)
+    if data.p then
+        return str.."\n"..STRINGS.NAMEDETAIL_L.SIVDT_POLLUTED
+    else
+        return str
+    end
+end
+local function Fn_getdata_dt(inst)
+    local data = {}
+    if inst.tradeditems ~= nil then
+        if inst.tradeditems.light > 0 then
+            data.i1 = TOOLS_L.ODPoint(inst.tradeditems.light, 100)
+        end
+        if inst.tradeditems.health > 0 then
+            data.i2 = TOOLS_L.ODPoint(inst.tradeditems.health, 100)
         end
     end
-    return subfmt(STRINGS.NAMEDETAIL_L.SIVDT, { i1 = "0", i2 = "0" })
+    if inst.ispolluted then
+        data.p = true
+    end
+    return data
 end
 
 table.insert(prefs, Prefab("siving_derivant", function()
     local inst = CreateEntity()
-
     inst.entity:AddTransform()
     inst.entity:AddSoundEmitter()
     inst.entity:AddAnimState()
@@ -472,9 +471,7 @@ table.insert(prefs, Prefab("siving_derivant", function()
     inst:AddComponent("skinedlegion")
     inst.components.skinedlegion:Init("siving_derivant")
 
-    inst.net_info_l = net_string(inst.GUID, "sivdt.info_l", "info_l_dirty")
-    inst.net_info_l:set_local("0_0_0")
-    inst.fn_l_namedetail = Fn_nameDetail_dt
+    TOOLS_L.InitMouseInfo(inst, Fn_dealdata_dt, Fn_getdata_dt)
 
     inst.entity:SetPristine()
     if not TheWorld.ismastersim then return inst end
@@ -577,19 +574,6 @@ elseif CONFIGS_LEGION.PHOENIXBATTLEDIFFICULTY == 3 then
     TIME_EYE = 54
 end
 
-local function SetNet_info_tt(inst)
-    local info = tostring(inst.num_conquest_l)
-    if inst.tradeditems == nil then
-        info = info.."_0_0"
-    else
-        info = info.."_"..tostring(TOOLS_L.ODPoint(inst.tradeditems.light, 100)) --i1
-            .."_"..tostring(TOOLS_L.ODPoint(inst.tradeditems.health, 100)) --i2
-    end
-    inst.net_info_l:set(info)
-end
-local function SetNet_heal_tt(inst)
-    inst.net_heal_l:set(tostring(TOOLS_L.ODPoint(inst.countHealth, 10)))
-end
 local function IsValid(bird)
     return bird ~= nil and bird:IsValid() and
         bird.components.health ~= nil and not bird.components.health:IsDead()
@@ -626,7 +610,7 @@ local function CheckBirds(inst)
     end
     return false
 end
-local function StateChange(inst) --0休眠状态(玄鸟死亡)、1正常状态(玄鸟活着，非春季)、2活力状态(玄鸟活着，春季)
+local function StateChange(inst) --0枯萎状态(玄鸟死亡)、1正常状态(玄鸟活着，非春季)、2活力状态(玄鸟活着，春季)
     if inst.components.timer:TimerExists("birddeath") then --玄鸟死亡
         inst.treeState = 0
         inst.bossBirds = nil
@@ -661,7 +645,6 @@ local function ComputTraded(inst, light, health)
     if health ~= nil then
         inst.tradeditems.health = math.max(0, inst.tradeditems.health + health)
     end
-    SetNet_info_tt(inst)
 end
 local function FixSpawnPoint(inst, one) --防止神木被挪动后，位置错位而太远
     local mypos = one:GetPosition()
@@ -779,7 +762,6 @@ local function OnStealLife(inst, value)
             inst.countHealth = inst.countHealth - 800
         end
     end
-    SetNet_heal_tt(inst)
 end
 local function TriggerLifeExtractTask(inst, doit)
     if doit then
@@ -1252,17 +1234,44 @@ local function OnTimerDone_tt(inst, data)
         end
     end
 end
-local function Fn_nameDetail_tt(inst)
-    local keys = { heal = inst.net_heal_l:value() or "0", con = "0", i1 = "0", i2 = "0" }
-    if inst.net_info_l:value() then
-        local infos = string.split(inst.net_info_l:value(), "_")
-        if infos[1] ~= nil then
-            keys.con = infos[1]
-            keys.i1 = infos[2] or "0"
-            keys.i2 = infos[3] or "0"
+local function Fn_dealdata_tt(inst, data)
+    if data.state == nil then
+        data.state = 1
+    end
+    local dd = {
+        i1 = tostring(data.i1 or 0),
+        i2 = tostring(data.i2 or 0),
+        con = tostring(data.con or 0),
+        heal = tostring(data.heal or 0),
+        work = tostring(data.work or 0),
+        wmax = data.state == 1 and "30" or "20",
+        sta = STRINGS.NAMEDETAIL_L.SIVTT_MODE[data.state]
+    }
+    return subfmt(STRINGS.NAMEDETAIL_L.SIVTT, dd)
+end
+local function Fn_getdata_tt(inst)
+    local data = {}
+    if inst.tradeditems ~= nil then
+        if inst.tradeditems.light > 0 then
+            data.i1 = TOOLS_L.ODPoint(inst.tradeditems.light, 100)
+        end
+        if inst.tradeditems.health > 0 then
+            data.i2 = TOOLS_L.ODPoint(inst.tradeditems.health, 100)
         end
     end
-    return subfmt(STRINGS.NAMEDETAIL_L.SIVTT, keys)
+    if inst.countHealth > 0 then
+        data.heal = TOOLS_L.ODPoint(inst.countHealth, 10)
+    end
+    if inst.countWorked > 0 then
+        data.work = TOOLS_L.ODPoint(inst.countWorked, 10)
+    end
+    if inst.num_conquest_l > 0 then
+        data.con = inst.num_conquest_l
+    end
+    if inst.treeState ~= 1 then
+        data.state = inst.treeState
+    end
+    return data
 end
 
 local function OnSave_tt(inst, data)
@@ -1308,15 +1317,12 @@ local function OnLoad_tt(inst, data, newents)
         end
         if data.countHealth ~= nil then
             inst.countHealth = data.countHealth
-            SetNet_heal_tt(inst)
         end
         if data.num_conquest_l ~= nil then
             inst.num_conquest_l = data.num_conquest_l
         end
         if data.traded_health ~= nil or data.traded_light ~= nil then
             ComputTraded(inst, data.traded_light, data.traded_health)
-        else
-            SetNet_info_tt(inst)
         end
         if data.rebirthed then
             inst.rebirthed = true
@@ -1718,7 +1724,6 @@ end
 
 table.insert(prefs, Prefab("siving_thetree", function()
     local inst = CreateEntity()
-
     inst.entity:AddTransform()
     inst.entity:AddSoundEmitter()
     inst.entity:AddAnimState()
@@ -1746,11 +1751,7 @@ table.insert(prefs, Prefab("siving_thetree", function()
     inst:AddTag("lifebox_l") --棱镜标签：能容纳生命能量
     inst:AddTag("trader")
 
-    inst.net_heal_l = net_string(inst.GUID, "sivtt.heal_l", "heal_l_dirty") --生命计数变化频繁，单独拿出来
-    inst.net_info_l = net_string(inst.GUID, "sivtt.info_l", "info_l_dirty")
-    inst.net_heal_l:set_local("0")
-    inst.net_info_l:set_local("0_0_0")
-    inst.fn_l_namedetail = Fn_nameDetail_tt
+    TOOLS_L.InitMouseInfo(inst, Fn_dealdata_tt, Fn_getdata_tt)
 
     inst.entity:SetPristine()
     if not TheWorld.ismastersim then return inst end
@@ -1792,7 +1793,6 @@ table.insert(prefs, Prefab("siving_thetree", function()
                 inst:DoTaskInTime(1+math.random()*1.5, ClearBattlefield)
                 --三只玄鸟都打败了，才算一次征服
                 inst.num_conquest_l = inst.num_conquest_l + 1
-                SetNet_info_tt(inst)
             else --玄鸟第一次团灭，产生一个蛋供玩家选择
                 local egg = SpawnPrefab("siving_egg")
                 if egg ~= nil then

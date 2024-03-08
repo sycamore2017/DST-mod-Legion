@@ -1602,8 +1602,8 @@ end
 --[[ 服务器与客户端的响应 ]]
 --------------------------------------------------------------------------
 
-local TIME_S_GETMOUSEINFO = 1.3
-local TIME_C_GETMOUSEINFO = 1.5
+local TIME_S_GETMOUSEINFO = 0.9
+local TIME_C_GETMOUSEINFO = 1
 
 ------客户端响应服务器请求【客户端环境】
 
