@@ -1009,7 +1009,6 @@ local function Fn_nameDetail(inst)
 	return inst.mouseinfo_l.str
 end
 local function InitMouseInfo(inst, fn_dealdata, fn_getdata, limitedtime)
-    inst.fn_l_namedetail = Fn_nameDetail
 	inst.mouseinfo_l = {
 		--【客户端】
 		limitedtime = limitedtime, --对于一些数据量太多的，可以选择限制更新频率
@@ -1023,6 +1022,7 @@ local function InitMouseInfo(inst, fn_dealdata, fn_getdata, limitedtime)
     if not TheWorld.ismastersim then
         inst.mouseinfo_l.str = inst.mouseinfo_l.fn_dealdata(inst, {})
     end
+    inst.fn_l_namedetail = Fn_nameDetail
 end
 local function SendMouseInfoRPC(player, target, newdd, isfixed, newtime)
     if target.mouseinfo_l ~= nil and player.userid ~= nil then

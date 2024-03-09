@@ -4370,12 +4370,14 @@ STRINGS.NAMEDETAIL_L = {
     SIVSUIT = "反伤上限：{cmax}\n凝血：{bc}%；损耗：{ac}%",
     SIVEQUIP_MODE = { "皆苦式", "向善式", "虚息式" },
     VASEHERB_MODE = { "躁动", "温驯" },
-    SIVTT_MODE = { [0] = "枯萎", [1] = "正常", [2] = "活力" },
+    SIVTT_MODE = { [0] = "枯萎", [1] = "平常", [2] = "活耀" },
     SIVCTL = {
         "含水量：{mo} / {momax}",
         "肥料值：催剂{n1} 堆肥{n2} 粪肥{n3} / {nmax}",
         "肥料值：催剂{n1} 堆肥{n2} 粪肥{n3} / {nmax}\n含水量：{mo} / {momax}"
-    }
+    },
+    SIVPLANT = "{des}阶段：{st} / {stmax}；生长速度：{gr}%\n肥料值：催长{n1} 防虫{n2} 必需{n3} / {n1max}\n含水量：{mo} / {momax}\n虫害：{sk}%；侵扰：{it} / {itmax}\n授粉：{pl} / {plmax}\n满意度：{np} / 5",
+    SIVPLANT2 = "{des}阶段：{st} / {stmax}；生长速度：{gr}%\n肥料值：催长{n1} 防虫{n2} 必需{n3} / {n1max}\n含水量：{mo} / {momax}\n虫害：{sk}%；侵扰：{it} / {itmax}\n授粉：{pl} / {plmax}\n生长结算：吃肥{nn} 汲水{nm} 照顾{nt}",
 }
 
 STRINGS.ACTIONS.SETMODE_L = {

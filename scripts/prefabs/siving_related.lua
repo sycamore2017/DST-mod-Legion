@@ -289,61 +289,28 @@ end
 
 local function OnBarChange_ctlwater(ctl)
     SetBar(ctl.inst, "siv_bar", ctl.moisture, ctl.moisture_max)
-
-    if ctl.task_delay_net ~= nil then return end --为了防止同时间大量修改，导致不断发送数据
-    ctl.task_delay_net = ctl.inst:DoTaskInTime(2, function()
-        ctl.task_delay_net = nil
-        ctl.inst.net_moi_l:set(tostring(TOOLS_L.ODPoint(ctl.moisture, 10)))
-    end)
 end
 local function OnBarChange_ctldirt(ctl)
     SetBar(ctl.inst, "siv_bar1", ctl.nutrients[1], ctl.nutrient_max)
     SetBar(ctl.inst, "siv_bar2", ctl.nutrients[2], ctl.nutrient_max)
     SetBar(ctl.inst, "siv_bar3", ctl.nutrients[3], ctl.nutrient_max)
-
-    if ctl.task_delay_net ~= nil then return end --为了防止同时间大量修改，导致不断发送数据
-    ctl.task_delay_net = ctl.inst:DoTaskInTime(2, function()
-        ctl.task_delay_net = nil
-        ctl.inst.net_nut_l:set(
-            tostring(TOOLS_L.ODPoint(ctl.nutrients[1], 10)).."_"..
-            tostring(TOOLS_L.ODPoint(ctl.nutrients[2], 10)).."_"..
-            tostring(TOOLS_L.ODPoint(ctl.nutrients[3], 10))
-        )
-    end)
 end
 local function OnBarChange_ctlall(ctl)
     SetBar(ctl.inst, "siv_bar1", ctl.nutrients[1], ctl.nutrient_max)
     SetBar(ctl.inst, "siv_bar2", ctl.nutrients[2], ctl.nutrient_max)
     SetBar(ctl.inst, "siv_bar3", ctl.nutrients[3], ctl.nutrient_max)
     SetBar(ctl.inst, "siv_bar4", ctl.moisture, ctl.moisture_max)
-
-    if ctl.task_delay_net ~= nil then return end --为了防止同时间大量修改，导致不断发送数据
-    ctl.task_delay_net = ctl.inst:DoTaskInTime(2, function()
-        ctl.task_delay_net = nil
-        ctl.inst.net_moi_l:set(tostring(TOOLS_L.ODPoint(ctl.moisture, 10)))
-        ctl.inst.net_nut_l:set(
-            tostring(TOOLS_L.ODPoint(ctl.nutrients[1], 10)).."_"..
-            tostring(TOOLS_L.ODPoint(ctl.nutrients[2], 10)).."_"..
-            tostring(TOOLS_L.ODPoint(ctl.nutrients[3], 10))
-        )
-    end)
 end
 
 local function SetData_ctlitem(inst, moi, nut)
     if inst.ctltype_l ~= 2 then --含水量
         if moi ~= nil then
             inst.siv_moisture = moi
-            inst.net_moi_l:set(tostring(TOOLS_L.ODPoint(moi, 10)))
         end
     end
     if inst.ctltype_l ~= 1 then --肥料值
         if nut ~= nil then
             inst.siv_nutrients = nut
-            inst.net_nut_l:set(
-                tostring(TOOLS_L.ODPoint(nut[1], 10)).."_"..
-                tostring(TOOLS_L.ODPoint(nut[2], 10)).."_"..
-                tostring(TOOLS_L.ODPoint(nut[3], 10))
-            )
         end
     end
 end
@@ -360,34 +327,62 @@ local function OnLoad_ctlitem(inst, data)
         SetData_ctlitem(inst, data.siv_moisture, data.siv_nutrients)
     end
 end
-local function Fn_nameDetail_sivctl(inst)
-    local key = {}
-    if inst.ctltype_l ~= 1 then --肥料值
-        key.n1 = "0"
-        key.n2 = "0"
-        key.n3 = "0"
-        key.nmax = inst.ctltype_l == 3 and "2400" or "800"
-        if inst.net_nut_l:value() then
-            local infos = string.split(inst.net_nut_l:value(), "_")
-            if infos[1] ~= nil then
-                key.n1 = infos[1]
-                key.n2 = infos[2] or "0"
-                key.n3 = infos[3] or "0"
-            end
+local function Fn_dealdata_sivctl(inst, data)
+    local dd = {}
+    if inst.ctltype_l ~= 1 then
+        dd.n1 = tostring(data.n1 or 0)
+        dd.n2 = tostring(data.n2 or 0)
+        dd.n3 = tostring(data.n3 or 0)
+        dd.nmax = inst.ctltype_l == 3 and "2400" or "800"
+    end
+    if inst.ctltype_l ~= 2 then
+        dd.mo = tostring(data.mo or 0)
+        dd.momax = inst.ctltype_l == 3 and "6000" or "2000"
+    end
+    return subfmt(STRINGS.NAMEDETAIL_L.SIVCTL[inst.ctltype_l], dd)
+end
+local function Fn_getdata_sivctl(inst)
+    local data = {}
+    if inst.ctltype_l ~= 1 and inst.siv_nutrients ~= nil then
+        if inst.siv_nutrients[1] ~= 0 then
+            data.n1 = TOOLS_L.ODPoint(inst.siv_nutrients[1], 10)
+        end
+        if inst.siv_nutrients[2] ~= 0 then
+            data.n2 = TOOLS_L.ODPoint(inst.siv_nutrients[2], 10)
+        end
+        if inst.siv_nutrients[3] ~= 0 then
+            data.n3 = TOOLS_L.ODPoint(inst.siv_nutrients[3], 10)
         end
     end
-    if inst.ctltype_l ~= 2 then --含水量
-        key.mo = inst.net_moi_l:value() or "0"
-        key.momax = inst.ctltype_l == 3 and "6000" or "2000"
+    if inst.ctltype_l ~= 2 and inst.siv_moisture ~= 0 then
+        data.mo = TOOLS_L.ODPoint(inst.siv_moisture, 10)
     end
-    return subfmt(STRINGS.NAMEDETAIL_L.SIVCTL[inst.ctltype_l], key)
+    return data
+end
+local function Fn_getdata_sivctlcon(inst)
+    local data = {}
+    local bc = inst.components.botanycontroller
+    if inst.ctltype_l ~= 1 and bc.nutrients ~= nil then
+        if bc.nutrients[1] ~= 0 then
+            data.n1 = TOOLS_L.ODPoint(bc.nutrients[1], 10)
+        end
+        if bc.nutrients[2] ~= 0 then
+            data.n2 = TOOLS_L.ODPoint(bc.nutrients[2], 10)
+        end
+        if bc.nutrients[3] ~= 0 then
+            data.n3 = TOOLS_L.ODPoint(bc.nutrients[3], 10)
+        end
+    end
+    if inst.ctltype_l ~= 2 and bc.moisture ~= 0 then
+        data.mo = TOOLS_L.ODPoint(bc.moisture, 10)
+    end
+    return data
 end
 
 local function MakeItem(data)
     local basename = "siving_ctl"..data.name
     table.insert(prefs, Prefab(basename.."_item", function()
         local inst = CreateEntity()
-
         inst.entity:AddTransform()
         inst.entity:AddAnimState()
         inst.entity:AddNetwork()
@@ -404,15 +399,7 @@ local function MakeItem(data)
         inst.components.skinedlegion:Init(basename.."_item")
 
         inst.ctltype_l = data.ctltype
-        if data.ctltype ~= 2 then
-            inst.net_moi_l = net_string(inst.GUID, "sivctl_item.moi_l", "moi_l_dirty")
-            inst.net_moi_l:set_local("0")
-        end
-        if data.ctltype ~= 1 then
-            inst.net_nut_l = net_string(inst.GUID, "sivctl_item.nut_l", "nut_l_dirty")
-            inst.net_nut_l:set_local("0_0_0")
-        end
-        inst.fn_l_namedetail = Fn_nameDetail_sivctl
+        TOOLS_L.InitMouseInfo(inst, Fn_dealdata_sivctl, Fn_getdata_sivctl, 1)
 
         inst.entity:SetPristine()
         if not TheWorld.ismastersim then return inst end
@@ -456,7 +443,6 @@ local function MakeConstruct(data)
     local basename = "siving_ctl"..data.name
     table.insert(prefs, Prefab(basename, function()
         local inst = CreateEntity()
-
         inst.entity:AddTransform()
         inst.entity:AddAnimState()
         inst.entity:AddMiniMapEntity()
@@ -484,15 +470,7 @@ local function MakeConstruct(data)
         inst.components.skinedlegion:Init(basename)
 
         inst.ctltype_l = data.ctltype
-        if data.ctltype ~= 2 then
-            inst.net_moi_l = net_string(inst.GUID, "sivctl.moi_l", "moi_l_dirty")
-            inst.net_moi_l:set_local("0")
-        end
-        if data.ctltype ~= 1 then
-            inst.net_nut_l = net_string(inst.GUID, "sivctl.nut_l", "nut_l_dirty")
-            inst.net_nut_l:set_local("0_0_0")
-        end
-        inst.fn_l_namedetail = Fn_nameDetail_sivctl
+        TOOLS_L.InitMouseInfo(inst, Fn_dealdata_sivctl, Fn_getdata_sivctlcon, 1)
 
         inst.entity:SetPristine()
         if not TheWorld.ismastersim then return inst end

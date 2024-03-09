@@ -53,7 +53,7 @@ local regrowMaps = {
 	gourd = 3
 }
 
---mod里再次加载农场作物的动画会导致官方的作物动画不显示。因为官方作物动画有加载顺序限制，一旦mod里引用会导致顺序变化
+--Tip：mod里再次加载农场作物的动画会导致官方的作物动画不显示。因为官方作物动画有加载顺序限制，一旦mod里引用会导致顺序变化
 -- local function InitAssets(data, assetspre, assetsbase)
 -- 	if assetspre ~= nil then
 -- 		for k, v in pairs(assetspre) do
@@ -323,9 +323,6 @@ end
 --[[ 子圭·垄的多年生植物 ]]
 --------------------------------------------------------------------------
 
-local function DescriptionFn_p(inst, doer)
-	return inst.components.perennialcrop:SayDetail(doer, false)
-end
 local function GetStatusFn_p(inst)
 	if inst.components.burnable ~= nil and inst.components.burnable:IsBurning() then
 		return "BURNING"
@@ -403,8 +400,112 @@ local function OnPlant_p(inst, pt)
 	cpt:UpdateTimeMult() --更新生长速度
 end
 
+local function Fn_dealdata_p(inst, data)
+    local dd = {
+        st = tostring(data.st or 1), stmax = tostring(data.stmax or 5),
+        -- name = data.name,
+        n1 = tostring(data.n1 or 0), n1max = tostring(data.n1max or 50),
+		n2 = tostring(data.n2 or 0), --n2max = tostring(data.n2max or 50),
+		n3 = tostring(data.n3 or 0), --n3max = tostring(data.n3max or 50),
+		mo = tostring(data.mo or 0), momax = tostring(data.momax or 20),
+		sk = tostring(data.sk or 0),
+		gr = tostring(data.gr or 100),
+		pl = tostring(data.pl or 0), plmax = tostring(data.plmax or 3),
+		it = tostring(data.it or 0), itmax = tostring(data.itmax or 10),
+		des = inst:HasTag("flower") and "花期" or ""
+    }
+	if dd.st == dd.stmax then
+		-- dd.huge = data.huge
+		dd.np = tostring(data.np or 0)
+		return subfmt(STRINGS.NAMEDETAIL_L.SIVPLANT, dd)
+	else
+		dd.nn = tostring(data.nn or 0)
+		dd.nm = tostring(data.nm or 0)
+		dd.nt = tostring(data.nt or 0)
+		return subfmt(STRINGS.NAMEDETAIL_L.SIVPLANT2, dd)
+	end
+end
+local function Fn_getdata_p(inst)
+    local data = {}
+	local crop = inst.components.perennialcrop
+	if crop.stage ~= 1 then
+		data.st = crop.stage
+	end
+	if crop.stage_max ~= 5 then
+		data.stmax = crop.stage_max
+	end
+	if crop.stagedata.name ~= nil then
+		data.name = crop.stagedata.name
+	end
+	if crop.nutrientgrow ~= 0 then
+		data.n1 = TOOLS_L.ODPoint(crop.nutrientgrow, 10)
+	end
+	if crop.nutrientgrow_max ~= 50 then
+		data.n1max = crop.nutrientgrow_max
+	end
+	if crop.nutrientsick ~= 0 then
+		data.n2 = TOOLS_L.ODPoint(crop.nutrientsick, 10)
+	end
+	-- if crop.nutrientsick_max ~= 50 then
+	-- 	data.n2max = crop.nutrientsick_max
+	-- end
+	if crop.nutrient ~= 0 then
+		data.n3 = TOOLS_L.ODPoint(crop.nutrient, 10)
+	end
+	-- if crop.nutrient_max ~= 50 then
+	-- 	data.n3max = crop.nutrient_max
+	-- end
+	if crop.moisture ~= 0 then
+		data.mo = TOOLS_L.ODPoint(crop.moisture, 10)
+	end
+	if crop.moisture_max ~= 20 then
+		data.momax = crop.moisture_max
+	end
+	if crop.sickness ~= 0 then
+		data.sk = math.floor(crop.sickness*100)
+	end
+	if crop.time_mult ~= 1 then
+		if crop.time_mult == nil then
+			data.gr = 0
+		else
+			data.gr = math.floor(crop.time_mult*100)
+		end
+	end
+	if crop.pollinated ~= 0 then
+		data.pl = crop.pollinated
+	end
+	if crop.pollinated_max ~= 3 then
+		data.plmax = crop.pollinated_max
+	end
+	if crop.infested ~= 0 then
+		data.it = crop.infested
+	end
+	if crop.infested_max ~= 10 then
+		data.itmax = crop.infested_max
+	end
+	if crop.stage == crop.stage_max then
+		-- if crop.ishuge then
+		-- 	data.huge = true
+		-- end
+		if crop.num_perfect ~= nil then
+			data.np = crop.num_perfect
+		end
+	else
+		if crop.num_nutrient ~= 0 then
+			data.nn = crop.num_nutrient
+		end
+		if crop.num_moisture ~= 0 then
+			data.nm = crop.num_moisture
+		end
+		if crop.num_tended ~= 0 then
+			data.nt = crop.num_tended
+		end
+	end
+    return data
+end
+
 local function MakePlant(data)
-	local function GetDisplayName(inst)
+	local function GetDisplayName_p(inst)
 		local stagename = nil
 		for k, v in pairs(data.stages) do
 			if inst.AnimState:IsCurrentAnimation(v.anim) or inst.AnimState:IsCurrentAnimation(v.anim_grow) then
@@ -431,7 +532,6 @@ local function MakePlant(data)
 
 	return Prefab(data.prefab, function()
 		local inst = CreateEntity()
-
 		inst.entity:AddTransform()
 		inst.entity:AddAnimState()
 		inst.entity:AddSoundEmitter()
@@ -452,7 +552,8 @@ local function MakePlant(data)
 			end
 		end
 
-		inst.displaynamefn = GetDisplayName
+		inst.displaynamefn = GetDisplayName_p
+		TOOLS_L.InitMouseInfo(inst, Fn_dealdata_p, Fn_getdata_p, 3)
 
 		if data.fn_common ~= nil then
 			data.fn_common(inst)
@@ -466,11 +567,11 @@ local function MakePlant(data)
 		if not TheWorld.ismastersim then return inst end
 
 		inst.soiltype_l = "1"
-		inst.soilskin_l = nil
+		-- inst.soilskin_l = nil
 
 		inst:AddComponent("inspectable")
 		inst.components.inspectable.nameoverride = "FARM_PLANT"
-		inst.components.inspectable.descriptionfn = DescriptionFn_p --提示自身的生长数据
+		-- inst.components.inspectable.descriptionfn = DescriptionFn_p
 		inst.components.inspectable.getstatus = GetStatusFn_p
 
 		inst:AddComponent("hauntable")

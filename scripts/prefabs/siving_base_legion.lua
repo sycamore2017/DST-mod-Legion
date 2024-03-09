@@ -610,7 +610,7 @@ local function CheckBirds(inst)
     end
     return false
 end
-local function StateChange(inst) --0枯萎状态(玄鸟死亡)、1正常状态(玄鸟活着，非春季)、2活力状态(玄鸟活着，春季)
+local function StateChange(inst) --0枯萎状态(玄鸟死亡)、1平常状态(玄鸟活着，非春季)、2活耀状态(玄鸟活着，春季)
     if inst.components.timer:TimerExists("birddeath") then --玄鸟死亡
         inst.treeState = 0
         inst.bossBirds = nil
@@ -1751,7 +1751,7 @@ table.insert(prefs, Prefab("siving_thetree", function()
     inst:AddTag("lifebox_l") --棱镜标签：能容纳生命能量
     inst:AddTag("trader")
 
-    TOOLS_L.InitMouseInfo(inst, Fn_dealdata_tt, Fn_getdata_tt)
+    TOOLS_L.InitMouseInfo(inst, Fn_dealdata_tt, Fn_getdata_tt, 3)
 
     inst.entity:SetPristine()
     if not TheWorld.ismastersim then return inst end

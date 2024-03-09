@@ -9,7 +9,6 @@ local function MakeItem(sets)
     local basename = sets.name.."_item"
     table.insert(prefs, Prefab(basename, function()
         local inst = CreateEntity()
-
         inst.entity:AddTransform()
         inst.entity:AddAnimState()
         inst.entity:AddNetwork()
@@ -20,20 +19,8 @@ local function MakeItem(sets)
         inst.AnimState:SetBuild(sets.name)
         inst.AnimState:PlayAnimation("idle_item")
 
-        if sets.floatable ~= nil then
-            MakeInventoryFloatable(inst, sets.floatable[2], sets.floatable[3], sets.floatable[4])
-            if sets.floatable[1] ~= nil then
-                local OnLandedClient_old = inst.components.floater.OnLandedClient
-                inst.components.floater.OnLandedClient = function(self)
-                    OnLandedClient_old(self)
-                    self.inst.AnimState:SetFloatParams(sets.floatable[1], 1, self.bob_percent)
-                end
-            end
-        end
-
-        if sets.fn_common ~= nil then
-            sets.fn_common(inst)
-        end
+        inst:AddComponent("skinedlegion")
+        inst.components.skinedlegion:InitWithFloater(basename)
 
         inst.entity:SetPristine()
         if not TheWorld.ismastersim then return inst end
@@ -43,21 +30,23 @@ local function MakeItem(sets)
         inst:AddComponent("inventoryitem")
         inst.components.inventoryitem.imagename = basename
         inst.components.inventoryitem.atlasname = "images/inventoryimages/"..basename..".xml"
-        -- if sets.floatable == nil then
-        --     inst.components.inventoryitem:SetSinks(true)
-        -- end
 
         inst:AddComponent("upgradekit")
+        inst.components.upgradekit:SetData(sets.kitdata)
 
         MakeHauntableLaunch(inst)
 
-        if sets.fn_server ~= nil then
-            sets.fn_server(inst)
-        end
+        -- inst.components.skinedlegion:SetOnPreLoad() --它没有装备组件，不需要 OnPreLoad 吧
 
         return inst
-    end, sets.assets, sets.prefabs))
+    end, {
+        Asset("ANIM", "anim/"..sets.name..".zip"),
+        Asset("ATLAS", "images/inventoryimages/"..basename..".xml"),
+        Asset("IMAGE", "images/inventoryimages/"..basename..".tex"),
+        Asset("ATLAS_BUILD", "images/inventoryimages/"..basename..".xml", 256)
+    }, sets.prefabs))
 end
+
 local function DropGems(inst, gemname)
     local numgems = inst.components.upgradeable:GetStage() - 1
     if numgems > 0 then
@@ -84,6 +73,12 @@ local function InitLevelNet(inst, fn_detail)
 end
 local function SetLevel(inst)
     inst._lvl_l:set(inst.components.upgradeable:GetStage() - 1)
+end
+local function NoWorked(inst, worker)
+    if worker ~= nil and (worker:HasTag("player") or worker.components.walkableplatform ~= nil) then
+        return false
+    end
+    return true
 end
 
 --------------------------------------------------------------------------
@@ -207,7 +202,7 @@ local function OnUpgrade_hidden(item, doer, target, result)
         target.components.container:Close() --强制关闭使用中的箱子
         target.components.container.canbeopened = false
         local allitems = target.components.container:RemoveAllItems()
-        for _,v in ipairs(allitems) do
+        for _, v in ipairs(allitems) do
             result.components.container:GiveItem(v)
         end
     end
@@ -218,30 +213,17 @@ end
 
 MakeItem({
     name = "hiddenmoonlight",
-    assets = {
-        Asset("ANIM", "anim/hiddenmoonlight.zip"),
-        Asset("ATLAS", "images/inventoryimages/hiddenmoonlight_item.xml"),
-        Asset("IMAGE", "images/inventoryimages/hiddenmoonlight_item.tex"),
-        Asset("ATLAS_BUILD", "images/inventoryimages/hiddenmoonlight_item.xml", 256)
-    },
     prefabs = { "hiddenmoonlight" },
-    -- floatable = { 0.1, "med", 0.3, 0.7 },
-    fn_common = function(inst)
-        inst:AddComponent("skinedlegion")
-        inst.components.skinedlegion:InitWithFloater("hiddenmoonlight_item")
-    end,
-    fn_server = function(inst)
-        inst.components.upgradekit:SetData({
-            icebox = {
-                prefabresult = "hiddenmoonlight",
-                onupgradefn = OnUpgrade_hidden
-            },
-            saltbox = {
-                prefabresult = "hiddenmoonlight",
-                onupgradefn = OnUpgrade_hidden
-            }
-        })
-    end
+    kitdata = {
+        icebox = {
+            prefabresult = "hiddenmoonlight",
+            onupgradefn = OnUpgrade_hidden
+        },
+        saltbox = {
+            prefabresult = "hiddenmoonlight",
+            onupgradefn = OnUpgrade_hidden
+        }
+    }
 })
 
 ----------
@@ -308,8 +290,8 @@ local function OnWork_hidden(inst, worker, workleft, numworks)
     inst.AnimState:PlayAnimation("hit")
     inst.AnimState:PushAnimation("closed", true)
     inst.components.container:Close()
-    if worker == nil or not worker:HasTag("player") then
-        inst.components.workable:SetWorkLeft(5) --不能被非玩家破坏
+    if NoWorked(inst, worker) then --只能被玩家或者船体破坏
+        inst.components.workable:SetWorkLeft(5)
         return
     end
     inst.components.container:DropEverything()
@@ -347,7 +329,6 @@ end
 
 table.insert(prefs, Prefab("hiddenmoonlight", function()
     local inst = CreateEntity()
-
     inst.entity:AddTransform()
     inst.entity:AddAnimState()
     inst.entity:AddSoundEmitter()
@@ -464,31 +445,17 @@ end
 
 MakeItem({
     name = "revolvedmoonlight",
-    assets = {
-        Asset("ANIM", "anim/revolvedmoonlight.zip"),
-        Asset("ATLAS", "images/inventoryimages/revolvedmoonlight_item.xml"),
-        Asset("IMAGE", "images/inventoryimages/revolvedmoonlight_item.tex"),
-        Asset("ATLAS_BUILD", "images/inventoryimages/revolvedmoonlight_item.xml", 256)
-    },
     prefabs = { "revolvedmoonlight", "revolvedmoonlight_pro" },
-    -- floatable = { 0.18, "small", 0.4, 0.55 },
-    fn_common = function(inst)
-        inst:AddComponent("skinedlegion")
-        inst.components.skinedlegion:InitWithFloater("revolvedmoonlight_item")
-    end,
-    fn_server = function(inst)
-        inst.components.upgradekit:SetData({
-            piggyback = {
-                prefabresult = "revolvedmoonlight",
-                onupgradefn = OnUpgrade_revolved,
-            },
-            krampus_sack = {
-                prefabresult = "revolvedmoonlight_pro",
-                onupgradefn = OnUpgrade_revolved,
-            }
-        })
-        -- inst.components.skinedlegion:SetOnPreLoad() --它没有装备组件，不需要 OnPreLoad 吧
-    end
+    kitdata = {
+        piggyback = {
+            prefabresult = "revolvedmoonlight",
+            onupgradefn = OnUpgrade_revolved
+        },
+        krampus_sack = {
+            prefabresult = "revolvedmoonlight_pro",
+            onupgradefn = OnUpgrade_revolved
+        }
+    }
 })
 
 ----------
@@ -534,7 +501,7 @@ local function OnClose_revolved(inst)
 end
 
 local function UpdateLight_revolved(owner)
-    if owner._revolves_light == nil or owner.prefab == "shadow_container" then
+    if owner._revolves_light == nil or owner:HasTag("pocketdimension_container") then
         return
     end
 
@@ -614,7 +581,7 @@ local function ResetRadius(inst, grandowner)
         end
         inst._owner_light = grandowner
         grandowner._revolves_light[inst] = true
-        if grandowner.prefab == "shadow_container" then
+        if grandowner:HasTag("pocketdimension_container") then
             inst._light.Light:Enable(false)
         else
             UpdateLight_revolved(grandowner)
@@ -796,7 +763,7 @@ local function OnOwnerChange(inst)
     inst._owners = newowners
 
     --暗影容器里，打开时会自动掉地上，防止崩溃
-    if owner and owner.prefab == "shadow_container" then
+    if owner and owner:HasTag("pocketdimension_container") then
         inst.components.container.droponopen = true
     else
         inst.components.container.droponopen = nil
@@ -820,8 +787,8 @@ local function OnWork_revolved(inst, worker, workleft, numworks)
     inst.AnimState:PushAnimation("closed")
     inst.SoundEmitter:PlaySound("grotto/common/turf_crafting_station/hit")
     inst.components.container:Close()
-    if worker == nil or not worker:HasTag("player") then
-        inst.components.workable:SetWorkLeft(5) --不能被非玩家破坏
+    if NoWorked(inst, worker) then --只能被玩家或者船体破坏
+        inst.components.workable:SetWorkLeft(5)
         return
     end
     inst.components.container:DropEverything()
@@ -879,7 +846,6 @@ end
 local function MakeRevolved(sets)
     table.insert(prefs, Prefab(sets.name, function()
         local inst = CreateEntity()
-
         inst.entity:AddTransform()
         inst.entity:AddAnimState()
         inst.entity:AddSoundEmitter()
@@ -909,10 +875,6 @@ local function MakeRevolved(sets)
         inst:AddTag("NORATCHECK") --mod兼容：永不妥协。该道具不算鼠潮分
         inst:AddTag("moontreasure_l")
 
-        -- if sets.fn_common ~= nil then
-        --     sets.fn_common(inst)
-        -- end
-
         inst.entity:SetPristine()
         if not TheWorld.ismastersim then
             inst.OnEntityReplicated = sets.ispro and OnReplicated_revolved2 or OnReplicated_revolved
@@ -935,7 +897,6 @@ local function MakeRevolved(sets)
         inst.components.container.onclosefn = OnClose_revolved
         inst.components.container.skipclosesnd = true
         inst.components.container.skipopensnd = true
-        -- inst.components.container.droponopen = true --去掉这个就能打开不掉落了
 
         inst:AddComponent("lootdropper")
 
@@ -969,15 +930,7 @@ local function MakeRevolved(sets)
         OnOwnerChange(inst)
         inst.OnRemoveEntity = OnRemove_light
 
-        -- if TUNING.SMART_SIGN_DRAW_ENABLE then --由于这个容器是便携的，不适合兼容【智能小木牌】
-        --     SMART_SIGN_DRAW(inst)
-        -- end
-
         -- inst.components.skinedlegion:SetOnPreLoad() --它没有装备组件，不需要 OnPreLoad 吧
-
-        -- if sets.fn_server ~= nil then
-        --     sets.fn_server(inst)
-        -- end
 
         if TUNING.FUNCTIONAL_MEDAL_IS_OPEN then
             SetImmortalable(inst, 2, nil)
@@ -1000,20 +953,8 @@ local function MakeRevolved(sets)
     }))
 end
 
-MakeRevolved({
-    name = "revolvedmoonlight",
-    -- floatable = { 0.1, "med", 0.3, 0.3 },
-    ispro = nil,
-    -- fn_common = function(inst)end,
-    -- fn_server = function(inst)end
-})
-MakeRevolved({
-    name = "revolvedmoonlight_pro",
-    -- floatable = { 0.1, "med", 0.3, 0.45 },
-    ispro = true,
-    -- fn_common = function(inst)end,
-    -- fn_server = function(inst)end
-})
+MakeRevolved({ name = "revolvedmoonlight" })
+MakeRevolved({ name = "revolvedmoonlight_pro", ispro = true })
 
 --------------------------------------------------------------------------
 --[[ 月折宝剑 ]]
@@ -1297,8 +1238,8 @@ local function OnOwnerChange_refracted(inst)
     inst._owners = newowners
 end
 local function OnWork_refracted(inst, worker, workleft, numworks)
-    if worker == nil or not worker:HasTag("player") then
-        inst.components.workable:SetWorkLeft(5) --不能被非玩家破坏
+    if worker == nil or not worker:HasTag("player") then --不能被非玩家破坏
+        inst.components.workable:SetWorkLeft(5)
     end
 end
 local function OnFinished_refracted(inst, worker)
@@ -1336,7 +1277,6 @@ end
 
 table.insert(prefs, Prefab("refractedmoonlight", function()
     local inst = CreateEntity()
-
     inst.entity:AddTransform()
     inst.entity:AddAnimState()
     inst.entity:AddMiniMapEntity() --要在小地图上显示的话，记得加这句
@@ -1354,8 +1294,6 @@ table.insert(prefs, Prefab("refractedmoonlight", function()
     inst:AddTag("nonpotatable") --这个貌似是？
     inst:AddTag("NORATCHECK") --mod兼容：永不妥协。该道具不算鼠潮分
     inst:AddTag("moontreasure_l")
-
-    --weapon (from weapon component) added to pristine state for optimization
     inst:AddTag("weapon")
 
     inst.MiniMapEntity:SetIcon("refractedmoonlight.tex")

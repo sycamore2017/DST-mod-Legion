@@ -2054,7 +2054,6 @@ FERTILIZE_LEGION.fn = function(act)
         if act.target.components.perennialcrop ~= nil then
             if act.target.components.perennialcrop:Fertilize(act.invobject, act.doer) then
                 act.invobject.components.fertilizer:OnApplied(act.doer, act.target)
-                act.target.components.perennialcrop:SayDetail(act.doer, true)
                 return true
             else
                 return false
@@ -2839,11 +2838,6 @@ POUR_WATER_LEGION.fn = function(act)
 
         if act.target ~= nil and act.target:IsValid() then
             act.invobject.components.wateryprotection:SpreadProtection(act.target) --耐久消耗在这里面的
-
-            --由于wateryprotection:SpreadProtection无法直接确定浇水者是谁，所以说话提示逻辑单独拿出来
-            if act.target.components.perennialcrop ~= nil then
-                act.target.components.perennialcrop:SayDetail(act.doer, true)
-            end
         end
 
         return true

@@ -353,7 +353,6 @@ end
 
 local function TuberFn()
     local inst = CreateEntity()
-
     inst.entity:AddTransform()
     inst.entity:AddAnimState()
     inst.entity:AddMiniMapEntity()
