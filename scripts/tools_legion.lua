@@ -1019,9 +1019,9 @@ local function InitMouseInfo(inst, fn_dealdata, fn_getdata, limitedtime)
 		--【服务器】
 		fn_getdata = fn_getdata --获取展示需要的数据
 	}
-    if not TheWorld.ismastersim then
-        inst.mouseinfo_l.str = inst.mouseinfo_l.fn_dealdata(inst, {})
-    end
+    -- if not TheWorld.ismastersim then
+    --     inst.mouseinfo_l.str = inst.mouseinfo_l.fn_dealdata(inst, {})
+    -- end
     inst.fn_l_namedetail = Fn_nameDetail
 end
 local function SendMouseInfoRPC(player, target, newdd, isfixed, newtime)

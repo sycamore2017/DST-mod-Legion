@@ -231,6 +231,7 @@ function PerennialCrop:SetUp(data)
 		self.sounds = data.sounds
 	end
 	self.fn_stage = data.fn_stage
+	self.fn_researchstage = data.fn_researchstage
 	SetCallDefender(self, data.fn_defend)
 
 	if not data.fireproof then
@@ -872,6 +873,9 @@ function PerennialCrop:SetStage(stage, ishuge, isrotten) --设置为某阶段
 	--额外设置
 	if self.fn_stage ~= nil then
 		self.fn_stage(self.inst, not self.isrotten and self.stage == self.stage_max) --第二个参数为：是否成熟/巨型成熟
+	end
+	if self.fn_researchstage ~= nil then
+		self.fn_researchstage(self)
 	end
 
 	TriggerNutrient(self)

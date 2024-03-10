@@ -4,6 +4,8 @@ local TOOLS_L = require("tools_legion")
 local prefs = {}
 local defs = {}
 
+--Tip：mod里再次加载农场作物的动画会导致官方的作物动画不显示。因为官方作物动画有加载顺序限制，一旦mod里引用会导致顺序变化
+
 --------------------------------------------------------------------------
 --[[ 合并所有作物数据，并加入个性化数据 ]]
 --------------------------------------------------------------------------
@@ -53,20 +55,40 @@ local regrowMaps = {
 	gourd = 3
 }
 
---Tip：mod里再次加载农场作物的动画会导致官方的作物动画不显示。因为官方作物动画有加载顺序限制，一旦mod里引用会导致顺序变化
--- local function InitAssets(data, assetspre, assetsbase)
--- 	if assetspre ~= nil then
--- 		for k, v in pairs(assetspre) do
--- 			table.insert(assetsbase, v)
--- 		end
--- 	end
-
--- 	if data.bank ~= data.build then
--- 		table.insert(assetsbase, Asset("ANIM", "anim/"..data.build..".zip"))
--- 	end
-
--- 	data.assets = assetsbase
--- end
+local function Fn_researchstage(self)
+	local stage
+	if self.isrotten then
+		if self.ishuge then --枯萎巨型：5+3
+			stage = self.stage_max + 3
+		else --枯萎：5+2
+			stage = self.stage_max + 2
+		end
+	else
+		if self.ishuge then --巨型：5+1
+			stage = self.stage_max + 1
+		else
+			stage = self.stage
+		end
+	end
+	self.inst._research_stage:set(stage - 1) -- to make it a 0 a based range
+end
+local function Fn_researchstage_weed(self)
+	local stage
+	local def = WEED_DEFS[self.inst.plantregistrykey]
+	if self.isrotten then --枯萎：3+1为实际的枯萎状态、3+2为被采摘等待重生的状态
+		stage = (#def.plantregistryinfo) - self.stage_max
+		if stage == 1 then
+			stage = self.stage_max + 1
+		elseif stage > 1 then
+			stage = self.stage_max + math.random(stage) --随机设置一个官方阶段，这样就能兼容了
+		else
+			stage = self.stage
+		end
+	else
+		stage = self.stage
+	end
+	self.inst._research_stage:set(stage - 1)
+end
 
 for k, v in pairs(PLANT_DEFS) do
 	if k ~= "randomseed" then
@@ -94,7 +116,9 @@ for k, v in pairs(PLANT_DEFS) do
 			fn_common = v.fn_common, --额外设定函数（通用）：fn(inst)
 			fn_server = v.fn_server, --额外设定函数（主机）：fn(inst)
 			fn_defend = v.fn_defend, --作物被采集/破坏时会寻求庇护的函数：fn(inst, target)
-			fn_stage = v.fn_stage --每次设定生长阶段时额外触发的函数：fn(inst, isfull)
+			fn_stage = v.fn_stage, --每次设定生长阶段时额外触发的函数：fn(inst, isfull)
+			fn_researchstage = v.fn_researchstage or Fn_researchstage,
+			stage_netvar = v.stage_netvar
 		}
 
 		--确定花期map（其他mod想要增加花期，可仿造目前格式写在PLANT_DEFS中即可）
@@ -202,6 +226,8 @@ for k, v in pairs(WEED_DEFS) do
 		fn_server = v.fn_server or v.masterpostinit, --额外设定函数（主机）：fn(inst)
 		fn_defend = v.fn_defend, --作物被采集/破坏时会寻求庇护的函数：fn(inst, target)
 		-- fn_stage = v.fn_stage or v.OnMakeFullFn, --每次设定生长阶段时额外触发的函数：fn(inst, isfull)
+		fn_researchstage = v.fn_researchstage or Fn_researchstage_weed,
+		stage_netvar = v.stage_netvar
 	}
 
 	--确定花期map（其他mod想要增加花期，可仿造目前格式写在PLANT_DEFS中即可）
@@ -399,7 +425,26 @@ local function OnPlant_p(inst, pt)
 	cpt:CostNutrition(true)
 	cpt:UpdateTimeMult() --更新生长速度
 end
-
+local function GetPlantRegistryKey(inst)
+    return inst.plantregistrykey
+end
+local function GetResearchStage(inst)
+    return inst._research_stage:value() + 1	-- +1 to make it 1 a based rage
+end
+local function OnPlantResearch(inst)
+    return inst:GetPlantRegistryKey(), inst:GetResearchStage()
+end
+local function GetDisplayName_p(inst)
+	local stagename = inst.mouseinfo_l.dd and inst.mouseinfo_l.dd.name or nil
+	local basename = STRINGS.NAMES[string.upper(inst.prefab_l)]
+	if stagename == nil then
+		return basename
+	elseif STRINGS.CROP_LEGION[string.upper(stagename)] ~= nil then
+		return subfmt(STRINGS.CROP_LEGION[string.upper(stagename)], {crop = basename})
+	else
+		return subfmt(STRINGS.CROP_LEGION.GROWING, {crop = basename})
+	end
+end
 local function Fn_dealdata_p(inst, data)
     local dd = {
         st = tostring(data.st or 1), stmax = tostring(data.stmax or 5),
@@ -412,8 +457,12 @@ local function Fn_dealdata_p(inst, data)
 		gr = tostring(data.gr or 100),
 		pl = tostring(data.pl or 0), plmax = tostring(data.plmax or 3),
 		it = tostring(data.it or 0), itmax = tostring(data.itmax or 10),
-		des = inst:HasTag("flower") and "花期" or ""
+		des = "",
+		li = tostring(data.li or 0), limax = tostring(data.limax or 0),
     }
+	if inst:HasTag("flower") then
+		dd.des = "("..STRINGS.NAMEDETAIL_L.FLORESCENCE..")"
+	end
 	if dd.st == dd.stmax then
 		-- dd.huge = data.huge
 		dd.np = tostring(data.np or 0)
@@ -434,8 +483,16 @@ local function Fn_getdata_p(inst)
 	if crop.stage_max ~= 5 then
 		data.stmax = crop.stage_max
 	end
-	if crop.stagedata.name ~= nil then
-		data.name = crop.stagedata.name
+	if crop.stagedata ~= nil then
+		if crop.stagedata.name ~= nil then
+			data.name = crop.stagedata.name
+		end
+		if crop.stagedata.time ~= nil and crop.stagedata.time > 0 then
+			data.limax = TOOLS_L.ODPoint(crop.stagedata.time/TUNING.TOTAL_DAY_TIME, 100)
+		end
+	end
+	if crop.time_grow ~= nil and crop.time_grow > 0 then
+		data.li = TOOLS_L.ODPoint(crop.time_grow/TUNING.TOTAL_DAY_TIME, 100)
 	end
 	if crop.nutrientgrow ~= 0 then
 		data.n1 = TOOLS_L.ODPoint(crop.nutrientgrow, 10)
@@ -504,32 +561,7 @@ local function Fn_getdata_p(inst)
     return data
 end
 
-local function MakePlant(data)
-	local function GetDisplayName_p(inst)
-		local stagename = nil
-		for k, v in pairs(data.stages) do
-			if inst.AnimState:IsCurrentAnimation(v.anim) or inst.AnimState:IsCurrentAnimation(v.anim_grow) then
-				stagename = v.name
-				break
-			end
-		end
-		for k, v in pairs(data.stages_other) do
-			if inst.AnimState:IsCurrentAnimation(v.anim) or inst.AnimState:IsCurrentAnimation(v.anim_grow) then
-				stagename = v.name
-				break
-			end
-		end
-
-		local basename = STRINGS.NAMES[string.upper(data.prefab_old)]
-		if stagename == nil then
-			return basename
-		elseif STRINGS.CROP_LEGION[string.upper(stagename)] ~= nil then
-			return subfmt(STRINGS.CROP_LEGION[string.upper(stagename)], {crop = basename})
-		else
-			return subfmt(STRINGS.CROP_LEGION.GROWING, {crop = basename})
-		end
-	end
-
+local function MakePlant(defkey, data)
 	return Prefab(data.prefab, function()
 		local inst = CreateEntity()
 		inst.entity:AddTransform()
@@ -552,8 +584,15 @@ local function MakePlant(data)
 			end
 		end
 
+		inst:AddTag("plantresearchable") --可研究标签
+		inst._research_stage = (data.stage_netvar or net_tinybyte)(inst.GUID, "sivplant.research_stage")
+		inst.prefab_l = data.prefab_old
+		inst.plantregistrykey = defkey
+        inst.GetPlantRegistryKey = GetPlantRegistryKey
+        inst.GetResearchStage = GetResearchStage
+
+		TOOLS_L.InitMouseInfo(inst, Fn_dealdata_p, Fn_getdata_p, 3.5)
 		inst.displaynamefn = GetDisplayName_p
-		TOOLS_L.InitMouseInfo(inst, Fn_dealdata_p, Fn_getdata_p, 3)
 
 		if data.fn_common ~= nil then
 			data.fn_common(inst)
@@ -586,6 +625,9 @@ local function MakePlant(data)
 		inst.components.perennialcrop.onctlchange = OnCtlChange_p
 		inst.components.perennialcrop:SetUp(data)
 		inst.components.perennialcrop:SetStage(1, false, false)
+
+		inst:AddComponent("plantresearchable")
+        inst.components.plantresearchable:SetResearchFn(OnPlantResearch)
 
 		inst.fn_planted = OnPlant_p
 		inst.fn_soiltype = UpdateSoilType_p
@@ -1563,10 +1605,10 @@ end, { Asset("ANIM", "anim/crop_legion_pine.zip") }, nil))
 --------------------
 --------------------
 
-for k,v in pairs(defs) do
-	table.insert(prefs, MakePlant(v))
+for k, v in pairs(defs) do
+	table.insert(prefs, MakePlant(k, v))
 end
-for k,v in pairs(CROPS_DATA_LEGION) do
+for k, v in pairs(CROPS_DATA_LEGION) do
 	if not v.dataonly then
 		table.insert(prefs, MakePlant2(k, v))
 	end

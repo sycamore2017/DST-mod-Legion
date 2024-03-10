@@ -4359,25 +4359,26 @@ S______GENERIC.ACTIONFAIL.SMEAR_L = {
 -- S_______WALTER.ACTIONFAIL.SMEAR_L = ""
 -- S________WANDA.ACTIONFAIL.SMEAR_L = ""
 
-STRINGS.NAMEDETAIL_L = {
+STRINGS.NAMEDETAIL_L = { --Tip：额外的描述行数，最多4行，不然就会挡住动作名字了
     FIREPROOF = "防火",
-    MOONTREASURE = "月之宝具：{lvl} / {lvlmax}",
+    MOONTREASURE = "月之宝具{lvl}/{lvlmax}",
     WEAKMONSTRAIN = "停止产生雨蝇",
-    SIVTT = "献祭能量：光耀{i1} 生命{i2}\n破坏度：{work} / {wmax}\n生命积累：{heal}\n征服次数：{con}\n{sta}期",
-    SIVDT = "献祭能量：光耀{i1} 生命{i2}",
+    SIVTT = "献祭能量(光耀{i1} 生命{i2})\n生命积累{heal} 破坏{work}/{wmax}\n征服{con}次\n{sta}期",
+    SIVDT = "献祭能量(光耀{i1} 生命{i2})",
     SIVDT_POLLUTED = "停止掉落子圭石",
-    SIVMASK = "生命积累：{v} / {vmax}\n窃血值：{st}；恢复力：{h}",
-    SIVSUIT = "反伤上限：{cmax}\n凝血：{bc}%；损耗：{ac}%",
+    SIVMASK = "生命积累{v}/{vmax}\n窃血值{st} 恢复力{h}",
+    SIVSUIT = "反伤上限{cmax}\n凝血{bc}% 损耗{ac}%",
     SIVEQUIP_MODE = { "皆苦式", "向善式", "虚息式" },
     VASEHERB_MODE = { "躁动", "温驯" },
     SIVTT_MODE = { [0] = "枯萎", [1] = "平常", [2] = "活耀" },
     SIVCTL = {
-        "含水量：{mo} / {momax}",
-        "肥料值：催剂{n1} 堆肥{n2} 粪肥{n3} / {nmax}",
-        "肥料值：催剂{n1} 堆肥{n2} 粪肥{n3} / {nmax}\n含水量：{mo} / {momax}"
+        "水分{mo}/{momax}",
+        "肥料(催剂{n1} 堆肥{n2} 粪肥{n3}) /{nmax}",
+        "肥料(催剂{n1} 堆肥{n2} 粪肥{n3}) /{nmax}\n水分{mo}/{momax}"
     },
-    SIVPLANT = "{des}阶段：{st} / {stmax}；生长速度：{gr}%\n肥料值：催长{n1} 防虫{n2} 必需{n3} / {n1max}\n含水量：{mo} / {momax}\n虫害：{sk}%；侵扰：{it} / {itmax}\n授粉：{pl} / {plmax}\n满意度：{np} / 5",
-    SIVPLANT2 = "{des}阶段：{st} / {stmax}；生长速度：{gr}%\n肥料值：催长{n1} 防虫{n2} 必需{n3} / {n1max}\n含水量：{mo} / {momax}\n虫害：{sk}%；侵扰：{it} / {itmax}\n授粉：{pl} / {plmax}\n生长结算：吃肥{nn} 汲水{nm} 照顾{nt}",
+    FLORESCENCE = "花期",
+    SIVPLANT = "{des}{st}/{stmax}阶段 {li}/{limax}天 {gr}%速度\n肥料(催长{n1} 防虫{n2} 必需{n3}) /{n1max}\n水分{mo}/{momax} 授粉{pl}/{plmax} 虫害{sk}% 侵扰{it}/{itmax}\n满意度{np}/5",
+    SIVPLANT2 = "{des}{st}/{stmax}阶段 {li}/{limax}天 {gr}%速度\n肥料(催长{n1} 防虫{n2} 必需{n3}) /{n1max}\n水分{mo}/{momax} 授粉{pl}/{plmax} 虫害{sk}% 侵扰{it}/{itmax}\n生长结算(吃肥{nn} 汲水{nm} 照顾{nt})",
 }
 
 STRINGS.ACTIONS.SETMODE_L = {
