@@ -4152,7 +4152,8 @@ STRINGS.NAMEDETAIL_L = {
     DIGESTSELF = "{eater} digested {items}.",
     TURN_D1 = "[{name}] {seednum} doing; Energy {power} days; Acceleration {timefast} days.",
     TURN_D2 = "[{name}] {seednum} doing, {fruitnum} done; Now {timepass}/{timeall} days; Energy {power} days; Acceleration {timefast} days.",
-
+    VASEHERB = "簇栽等级{c}/{cmax} 已吃数量{ea}/80\n吞食(半径{d_s} 数量{n_s} 消化{t_s}秒) 引诱半径{d_l}",
+    CLOUDPINE = "簇栽等级{c}/{cmax}\n{st}/{stmax}阶段 侵扰{it}/{itmax}",
 }
 
 STRINGS.ACTIONS.SETMODE_L = {

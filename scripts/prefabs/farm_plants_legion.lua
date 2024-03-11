@@ -713,25 +713,27 @@ local function Fn_dealdata_p2(inst, data)
 	elseif inst:HasTag("flower") then
 		dd.des = "("..STRINGS.NAMEDETAIL_L.BLOOMY..")"
 	end
-	if inst:HasTag("needwater") then
-		if strpst == nil then
-			strpst = STRINGS.NAMEDETAIL_L.THIRSTY
-		else
-			strpst = strpst..STRINGS.NAMEDETAIL_L.SPACE..STRINGS.NAMEDETAIL_L.THIRSTY
+	if dd.st ~= dd.stmax then
+		if inst:HasTag("needwater") then
+			if strpst == nil then
+				strpst = STRINGS.NAMEDETAIL_L.THIRSTY
+			else
+				strpst = strpst..STRINGS.NAMEDETAIL_L.SPACE..STRINGS.NAMEDETAIL_L.THIRSTY
+			end
 		end
-	end
-	if inst:HasTag("fertableall") then
-		if strpst == nil then
-			strpst = STRINGS.NAMEDETAIL_L.FEEBLE
-		else
-			strpst = strpst..STRINGS.NAMEDETAIL_L.SPACE..STRINGS.NAMEDETAIL_L.FEEBLE
+		if inst:HasTag("fertableall") then
+			if strpst == nil then
+				strpst = STRINGS.NAMEDETAIL_L.FEEBLE
+			else
+				strpst = strpst..STRINGS.NAMEDETAIL_L.SPACE..STRINGS.NAMEDETAIL_L.FEEBLE
+			end
 		end
-	end
-	if inst:HasTag("tendable_farmplant") then
-		if strpst == nil then
-			strpst = STRINGS.NAMEDETAIL_L.UNHAPPY
-		else
-			strpst = strpst..STRINGS.NAMEDETAIL_L.SPACE..STRINGS.NAMEDETAIL_L.UNHAPPY
+		if inst:HasTag("tendable_farmplant") then
+			if strpst == nil then
+				strpst = STRINGS.NAMEDETAIL_L.UNHAPPY
+			else
+				strpst = strpst..STRINGS.NAMEDETAIL_L.SPACE..STRINGS.NAMEDETAIL_L.UNHAPPY
+			end
 		end
 	end
 	str = subfmt(STRINGS.NAMEDETAIL_L.XPLANT, dd)
@@ -1329,21 +1331,58 @@ local function OnEntitySleep_nep(inst)
 	StopTask(inst, "task_swallow")
 end
 
-local function Fn_dealdata_nep(inst, dd)
-	if dd == nil then
-		return
+local function Fn_dealdata_nep(inst, data)
+	if data.c == nil then
+		data.c = 0
 	end
-	return tostring(dd.time).."__"
-		.."\n"..(STRINGS.NAMEDETAIL_L.VASEHERB_MODE[dd.mode] or "未知")
+	if data.cmax == nil then
+		data.cmax = 99
+	end
+	local dd = {
+		c = tostring(data.c), cmax = tostring(data.cmax),
+		ea = tostring(data.ea or 0)
+		-- it = tostring(data.it or 0), itmax = tostring(data.itmax or 50)
+	}
+	--遵循 OnCluster_nep() 的逻辑
+	local now = math.min(data.c*1.25, data.cmax)
+	local value = Remap(now, 0, data.cmax, DIST_SWALLOW[1], DIST_SWALLOW[2])
+	dd.d_s = tostring(TOOLS_L.ODPoint(value, 10))
+	value = Remap(now, 0, data.cmax, NUM_SWALLOW[1], NUM_SWALLOW[2])
+	dd.n_s = tostring(math.floor(value))
+	value = Remap(now, 0, data.cmax, TIME_SWALLOW[1], TIME_SWALLOW[2])
+	dd.t_s = tostring(TOOLS_L.ODPoint(value, 10))
+	value = Remap(now, 0, data.cmax, DIST_LURE[1], DIST_LURE[2])
+	dd.d_l = tostring(TOOLS_L.ODPoint(value, 10))
+
+	return subfmt(STRINGS.NAMEDETAIL_L.VASEHERB, dd).."\n"..(STRINGS.NAMEDETAIL_L.VASEHERB_MODE[data.mode or 1])
 end
 local function Fn_getdata_nep(inst)
-	return { mode = inst.components.modelegion.now }
+	local data = {}
+	local crop = inst.components.perennialcrop2
+	-- if crop.infested ~= 0 then
+	-- 	data.it = crop.infested
+	-- end
+	-- if crop.infested_max ~= 50 then
+	-- 	data.itmax = crop.infested_max
+	-- end
+	if crop.cluster ~= 0 then
+		data.c = crop.cluster
+	end
+	if crop.cluster_max ~= 99 then
+		data.cmax = crop.cluster_max
+	end
+	if inst.components.modelegion.now ~= 1 then
+		data.mode = inst.components.modelegion.now
+	end
+	if inst.count_digest ~= 0 then
+		data.ea = inst.count_digest
+	end
+	return data
 end
 
 table.insert(prefs, Prefab("plant_nepenthes_l", function()
 	local inst = CreateEntity()
 	Fn_common_p2(inst, CROPS_DATA_LEGION["plantmeat"])
-	TOOLS_L.InitMouseInfo(inst, Fn_dealdata_nep, Fn_getdata_nep)
 	inst:SetPhysicsRadiusOverride(.5)
 	MakeObstaclePhysics(inst, inst.physicsradiusoverride)
 	inst.MiniMapEntity:SetIcon("plant_crop_l.tex")
@@ -1354,6 +1393,9 @@ table.insert(prefs, Prefab("plant_nepenthes_l", function()
 	inst:AddTag("companion")
 	inst:AddTag("vaseherb")
 	inst:AddTag("cansetmode_l") --模式切换必需，没有就代表无法切换
+
+	inst.xeedkey = "plantmeat"
+	TOOLS_L.InitMouseInfo(inst, Fn_dealdata_nep, Fn_getdata_nep, 1)
 
 	inst.entity:SetPristine()
 	if not TheWorld.ismastersim then
@@ -1517,7 +1559,6 @@ local function OnWorkedFinish_pine2(inst, worker)
 		end
 	end
 end
-
 local function OnStage_pine(self)
 	local inst = self.inst
 	if self.stage == 1 then
@@ -1574,7 +1615,6 @@ local function OnLoot_pine(self, doer, ispicked, isburnt, lootprefabs)
 		end
 	end
 end
-
 local function OnOpen_pine(inst)
 	inst.AnimState:PlayAnimation("open")
 	inst.SoundEmitter:PlaySound("maxwell_rework/magician_chest/open")
@@ -1585,6 +1625,86 @@ local function OnClose_pine(inst)
 end
 local function AttachContainer_pine(inst)
 	inst.components.container_proxy:SetMaster(TheWorld:GetPocketDimensionContainer("cloudpine_l2"))
+end
+local function Fn_dealdata_pine(inst, data)
+	local str, strpst
+	local def = CROPS_DATA_LEGION[inst.xeedkey]
+    local dd = {
+        st = tostring(data.st or 1), stmax = tostring(#def.leveldata),
+		c = tostring(data.c or 0), cmax = tostring(data.cmax or 99),
+		it = tostring(data.it or 0), itmax = tostring(data.itmax or 10)
+    }
+	if dd.st == dd.stmax then
+		return subfmt(STRINGS.NAMEDETAIL_L.CLOUDPINE, dd)
+	else
+		dd.li = tostring(data.li or 0)
+		dd.limax = tostring(data.limax or 0)
+		dd.gr = tostring(data.gr or 100)
+		dd.pl = "0"
+		dd.plmax = "3"
+		dd.des = ""
+		if inst:HasTag("needwater") then
+			if strpst == nil then
+				strpst = STRINGS.NAMEDETAIL_L.THIRSTY
+			else
+				strpst = strpst..STRINGS.NAMEDETAIL_L.SPACE..STRINGS.NAMEDETAIL_L.THIRSTY
+			end
+		end
+		if inst:HasTag("fertableall") then
+			if strpst == nil then
+				strpst = STRINGS.NAMEDETAIL_L.FEEBLE
+			else
+				strpst = strpst..STRINGS.NAMEDETAIL_L.SPACE..STRINGS.NAMEDETAIL_L.FEEBLE
+			end
+		end
+		if inst:HasTag("tendable_farmplant") then
+			if strpst == nil then
+				strpst = STRINGS.NAMEDETAIL_L.UNHAPPY
+			else
+				strpst = strpst..STRINGS.NAMEDETAIL_L.SPACE..STRINGS.NAMEDETAIL_L.UNHAPPY
+			end
+		end
+		str = subfmt(STRINGS.NAMEDETAIL_L.XPLANT, dd)
+		if strpst == nil then
+			return str
+		else
+			return str.."\n"..strpst
+		end
+	end
+end
+local function Fn_getdata_pine(inst)
+	local data = {}
+	local crop = inst.components.perennialcrop2
+	if crop.stage ~= 1 then
+		data.st = crop.stage
+	end
+	if crop.stage ~= crop.stage_max then
+		if crop.pause_reason ~= nil or crop.time_mult == nil or crop.time_mult <= 0 then
+			data.gr = 0
+		elseif crop.time_mult ~= 1 then
+			data.gr = math.floor(crop.time_mult*100)
+		end
+		local time = crop:GetGrowTime()
+		if time ~= nil and time > 0 then
+			data.limax = TOOLS_L.ODPoint(time/TUNING.TOTAL_DAY_TIME, 100)
+		end
+		if crop.time_grow ~= nil and crop.time_grow > 0 then
+			data.li = TOOLS_L.ODPoint(crop.time_grow/TUNING.TOTAL_DAY_TIME, 100)
+		end
+	end
+	if crop.infested ~= 0 then
+		data.it = crop.infested
+	end
+	if crop.infested_max ~= 10 then
+		data.itmax = crop.infested_max
+	end
+	if crop.cluster ~= 0 then
+		data.c = crop.cluster
+	end
+	if crop.cluster_max ~= 99 then
+		data.cmax = crop.cluster_max
+	end
+    return data
 end
 
 table.insert(prefs, Prefab("plant_log_l", function()
@@ -1597,6 +1717,9 @@ table.insert(prefs, Prefab("plant_log_l", function()
 	inst:AddTag("silviculture") --该标签会使得仅限《造林学》发挥作用
 
 	inst:AddComponent("container_proxy")
+
+	inst.xeedkey = "log"
+	TOOLS_L.InitMouseInfo(inst, Fn_dealdata_pine, Fn_getdata_pine, 2)
 
 	inst.entity:SetPristine()
 	if not TheWorld.ismastersim then return inst end

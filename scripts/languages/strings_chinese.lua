@@ -4377,7 +4377,8 @@ STRINGS.NAMEDETAIL_L = { --Tip：额外的描述行数，最多4行，不然就�
     DIGESTSELF = "{eater}消化了{items}。",
     TURN_D1 = "【{name}】{seednum}转化中；能量{power}天；加速{timefast}天。",
     TURN_D2 = "【{name}】{seednum}转化中，{fruitnum}已完成；当前{timepass}/{timeall}天；能量{power}天；加速{timefast}天。",
-
+    VASEHERB = "簇栽等级{c}/{cmax} 已吃数量{ea}/80\n吞食(半径{d_s} 数量{n_s} 消化{t_s}秒) 引诱半径{d_l}",
+    CLOUDPINE = "簇栽等级{c}/{cmax}\n{st}/{stmax}阶段 侵扰{it}/{itmax}",
 }
 
 STRINGS.ACTIONS.SETMODE_L = {
