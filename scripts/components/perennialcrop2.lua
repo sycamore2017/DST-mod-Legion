@@ -1183,9 +1183,6 @@ end
 
 function PerennialCrop2:OnClusterChange() --簇栽等级变化时
 	local now = self.cluster or 0
-	if self.inst._cluster_l then
-		self.inst._cluster_l:set(now)
-	end
 	if self.fn_cluster ~= nil then
 		self.fn_cluster(self, now)
 	end
@@ -1230,6 +1227,9 @@ function PerennialCrop2:ClusteredPlant(seeds, doer) --簇栽
 	self:OnClusterChange()
 	seeds:Remove()
 
+	if doer ~= nil and doer:HasTag("player") then
+		TOOLS_L.SendMouseInfoRPC(doer, self.inst, { c = self.cluster }, true, false)
+	end
 	if self.inst.SoundEmitter ~= nil then
 		self.inst.SoundEmitter:PlaySound("dontstarve/common/plant")
 	end

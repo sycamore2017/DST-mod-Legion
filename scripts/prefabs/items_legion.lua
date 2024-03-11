@@ -1197,7 +1197,7 @@ local assets_xeed = GetAssets2("seeds_crop_l2", "seeds_crop_l")
 local function MakeXeed(k, dd)
     local cropprefab = "plant_"..k.."_l"
     local function DisplayName_xeed(inst)
-        return STRINGS.NAMES[string.upper(cropprefab)]..STRINGS.PLANT_CROP_L["SEEDS"]
+        return STRINGS.NAMES[string.upper(cropprefab)]..STRINGS.NAMEDETAIL_L.XEEDS
     end
     local function OnDeploy_xeed(inst, pt, deployer, rot)
         OnDeploy_base(inst, pt, deployer, rot, {

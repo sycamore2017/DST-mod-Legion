@@ -749,9 +749,9 @@ local function GetDetailString(self, doer, type)
 		end
 		data.timepass = tostring(data.timepass)
 		data.timeall = tostring(data.timeall)
-		return subfmt(STRINGS.PLANT_CROP_L.TURN_D2, data)
+		return subfmt(STRINGS.NAMEDETAIL_L.TURN_D2, data)
 	else
-		return subfmt(STRINGS.PLANT_CROP_L.TURN_D1, data)
+		return subfmt(STRINGS.NAMEDETAIL_L.TURN_D1, data)
 	end
 end
 function GeneTrans:SayDetail(doer, dotalk) --介绍细节

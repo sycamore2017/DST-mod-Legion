@@ -2365,19 +2365,6 @@ S_________WURT.DESCRIBE.FISHHOMINGBAIT = "浮勒浮，今天是哪条可爱的�
 S_______WALTER.DESCRIBE.FISHHOMINGBAIT = "我记得某电影里男主角说去钓鱼却从没打开过钓具袋..."
 S________WANDA.DESCRIBE.FISHHOMINGBAIT = "好了好了，某人就是想挥霍时间钓鱼对吧。"
 
-STRINGS.PLANT_CROP_L = {
-    WITHERED = "枯萎",
-    BLUE = "沮丧",
-    DRY = "干燥",
-    FEEBLE = "虚弱",
-    PREPOSITION = "的",
-    FLORESCENCE = "花期",
-    SEEDS = "异种",
-    DIGEST = "【{doer}】向{eater}投喂了{items}。",
-    DIGESTSELF = "{eater}消化了{items}。",
-    TURN_D1 = "【{name}】{seednum}转化中；能量{power}天；加速{timefast}天。",
-    TURN_D2 = "【{name}】{seednum}转化中，{fruitnum}已完成；当前{timepass}/{timeall}天；能量{power}天；加速{timefast}天。"
-}
 S_NAMES.PLANT_CARROT_L = "芾萝卜"
 S_NAMES.PLANT_CORN_L = "玉米杆"
 S_NAMES.PLANT_PUMPKIN_L = "南瓜架"
@@ -2404,7 +2391,7 @@ S______GENERIC.DESCRIBE.PLANT_CROP_L = {
     WITHERED = "已经枯萎了，就待春风吹又生...",
     SPROUT = "已经发芽了，接下来会是什么样子呢...",
     GROWING = "长吧，长吧，我会等到丰饶号角吹响的那天...",
-    FLORESCENCE = "开花了，正是招蜂引蝶的好时候...",
+    BLOOMY = "开花了，正是招蜂引蝶的好时候...",
     READY = "感谢我的付出与等待，更感谢自然的慷慨馈赠！",
 }
 
@@ -4376,9 +4363,21 @@ STRINGS.NAMEDETAIL_L = { --Tip：额外的描述行数，最多4行，不然就�
         "肥料(催剂{n1} 堆肥{n2} 粪肥{n3}) /{nmax}",
         "肥料(催剂{n1} 堆肥{n2} 粪肥{n3}) /{nmax}\n水分{mo}/{momax}"
     },
-    FLORESCENCE = "花期",
+    BLOOMY = "花期",
+    WITHERED = "枯萎",
+    UNHAPPY = "无聊",
+    THIRSTY = "干燥",
+    FEEBLE = "虚弱",
+    SPACE = " ",
     SIVPLANT = "{des}{st}/{stmax}阶段 {li}/{limax}天 {gr}%速度\n肥料(催长{n1} 防虫{n2} 必需{n3}) /{n1max}\n水分{mo}/{momax} 授粉{pl}/{plmax} 虫害{sk}% 侵扰{it}/{itmax}\n满意度{np}/5",
     SIVPLANT2 = "{des}{st}/{stmax}阶段 {li}/{limax}天 {gr}%速度\n肥料(催长{n1} 防虫{n2} 必需{n3}) /{n1max}\n水分{mo}/{momax} 授粉{pl}/{plmax} 虫害{sk}% 侵扰{it}/{itmax}\n生长结算(吃肥{nn} 汲水{nm} 照顾{nt})",
+    XPLANT = "簇栽等级{c}/{cmax}\n{des}{st}/{stmax}阶段 {li}/{limax}天 {gr}%速度\n授粉{pl}/{plmax} 侵扰{it}/{itmax}",
+    XEEDS = "异种",
+    DIGEST = "【{doer}】向{eater}投喂了{items}。",
+    DIGESTSELF = "{eater}消化了{items}。",
+    TURN_D1 = "【{name}】{seednum}转化中；能量{power}天；加速{timefast}天。",
+    TURN_D2 = "【{name}】{seednum}转化中，{fruitnum}已完成；当前{timepass}/{timeall}天；能量{power}天；加速{timefast}天。",
+
 }
 
 STRINGS.ACTIONS.SETMODE_L = {

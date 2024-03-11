@@ -2239,19 +2239,6 @@ S_________WURT.DESCRIBE.FISHHOMINGBAIT = "Flurph, which lovely fish will be attr
 S_______WALTER.DESCRIBE.FISHHOMINGBAIT = "I remember a man who said he went fishing but never opened his bait bag."
 S________WANDA.DESCRIBE.FISHHOMINGBAIT = "Well, someone just wants to waste time fishing, right?"
 
-STRINGS.PLANT_CROP_L = {
-    WITHERED = "Withered ",
-    BLUE = "Blue ",
-    DRY = "Dry ",
-    FEEBLE = "Feeble ",
-    PREPOSITION = "",
-    FLORESCENCE = "Blooming ",
-    SEEDS = " Xeeds",
-    DIGEST = "[{doer}] fed {items} to the {eater}.",
-    DIGESTSELF = "{eater} digested {items}.",
-    TURN_D1 = "[{name}] {seednum} doing; Energy {power} days; Acceleration {timefast} days.",
-    TURN_D2 = "[{name}] {seednum} doing, {fruitnum} done; Now {timepass}/{timeall} days; Energy {power} days; Acceleration {timefast} days."
-}
 S_NAMES.PLANT_CARROT_L = "Carrot Cluster"
 S_NAMES.PLANT_CORN_L = "Corn Straw"
 S_NAMES.PLANT_PUMPKIN_L = "Pumpkin Rack"
@@ -2278,7 +2265,7 @@ S______GENERIC.DESCRIBE.PLANT_CROP_L = {
     WITHERED = "It will be born again when spring breeze blows...",
     SPROUT = "What will it look like next...",
     GROWING = "I will wait until the day when the horn of harvest blows...",
-    FLORESCENCE = "Flowering is a good time to attract bees and butterflies...",
+    BLOOMY = "Flowering is a good time to attract bees and butterflies...",
     READY = "Thank nature for its generous gifts!",
 }
 
@@ -4137,21 +4124,35 @@ S______GENERIC.ACTIONFAIL.SMEAR_L = {
 
 STRINGS.NAMEDETAIL_L = {
     FIREPROOF = "Fireproof",
-    MOONTREASURE = "Moon Treasure: {lvl} / {lvlmax}",
+    MOONTREASURE = "Moon Treasure {lvl}/{lvlmax}",
     WEAKMONSTRAIN = "Production of Raindonate Stops",
-    SIVTT = "Sacrifice Energy: Light {i1} Vitality {i2}\nExcavation: {work} / {wmax}\nLife Counter: {heal}\nConquest Times: {con}\n{sta} State",
-    SIVDT = "Sacrifice Energy: Light {i1} Vitality {i2}",
+    SIVTT = "Energy (Light {i1} Vitality {i2})\nLife Counter {heal}, Excavation {work}/{wmax}\nConquest Times {con}\n{sta} State",
+    SIVDT = "Energy (Light {i1} Vitality {i2})",
     SIVDT_POLLUTED = "Drop of Siving Stone Stops",
-    SIVMASK = "Life Counter: {v} / {vmax}\nBlood Steal: {st}, Healing Power: {h}",
-    SIVSUIT = "Counteratk Max: {cmax}\nBlood Clot: {bc}%, Armor Loss: {ac}%",
+    SIVMASK = "Life Counter {v}/{vmax}\nBlood Steal {st}, Healing Power {h}",
+    SIVSUIT = "Counteratk Max {cmax}\nBlood Clot {bc}%, Armor Loss {ac}%",
     SIVEQUIP_MODE = { "Bitter Mode", "Pure Mode", "Blank Mode" },
     VASEHERB_MODE = { "Restless", "Tame" },
     SIVTT_MODE = { [0] = "Withered", [1] = "Normal", [2] = "Energetic" },
     SIVCTL = {
-        "Moisture: {mo} / {momax}",
-        "Nutrients: Formula {n1} Compost {n2} Manure {n3} / {nmax}",
-        "Nutrients: Formula {n1} Compost {n2} Manure {n3} / {nmax}\nMoisture: {mo} / {momax}"
-    }
+        "Moi. {mo}/{momax}",
+        "Nut. (Formula {n1} Compost {n2} Manure {n3}) /{nmax}",
+        "Nut. (Formula {n1} Compost {n2} Manure {n3}) /{nmax}\nMoi. {mo}/{momax}"
+    },
+    BLOOMY = "Bloomy",
+    WITHERED = "Withered",
+    UNHAPPY = "Bored",
+    THIRSTY = "Dry",
+    FEEBLE = "Feeble",
+    SPACE = ", ",
+    SIVPLANT = "{des}{st}/{stmax}Stage, {li}/{limax}Days, {gr}%Rate\nNut. (Formula {n1} Cure {n2} Need {n3}) /{n1max}\nMoi.{mo}/{momax}, Pollen{pl}/{plmax}, Pest{sk}%, Infest{it}/{itmax}\nSatisfaction {np}/5",
+    SIVPLANT2 = "{des}{st}/{stmax}Stage, {li}/{limax}Days, {gr}%Rate\nNut. (Formula {n1} Cure {n2} Need {n3}) /{n1max}\nMoi.{mo}/{momax}, Pollen{pl}/{plmax}, Pest{sk}%, Infest{it}/{itmax}\nSummary (Nut. {nn} Moi. {nm} Tend {nt})",
+    XEEDS = " Xeeds",
+    DIGEST = "[{doer}] fed {items} to the {eater}.",
+    DIGESTSELF = "{eater} digested {items}.",
+    TURN_D1 = "[{name}] {seednum} doing; Energy {power} days; Acceleration {timefast} days.",
+    TURN_D2 = "[{name}] {seednum} doing, {fruitnum} done; Now {timepass}/{timeall} days; Energy {power} days; Acceleration {timefast} days.",
+
 }
 
 STRINGS.ACTIONS.SETMODE_L = {

@@ -461,7 +461,7 @@ local function Fn_dealdata_p(inst, data)
 		li = tostring(data.li or 0), limax = tostring(data.limax or 0),
     }
 	if inst:HasTag("flower") then
-		dd.des = "("..STRINGS.NAMEDETAIL_L.FLORESCENCE..")"
+		dd.des = "("..STRINGS.NAMEDETAIL_L.BLOOMY..")"
 	end
 	if dd.st == dd.stmax then
 		-- dd.huge = data.huge
@@ -521,12 +521,10 @@ local function Fn_getdata_p(inst)
 	if crop.sickness ~= 0 then
 		data.sk = math.floor(crop.sickness*100)
 	end
-	if crop.time_mult ~= 1 then
-		if crop.time_mult == nil then
-			data.gr = 0
-		else
-			data.gr = math.floor(crop.time_mult*100)
-		end
+	if crop.pause_reason ~= nil or crop.time_mult == nil or crop.time_mult <= 0 then
+		data.gr = 0
+	elseif crop.time_mult ~= 1 then
+		data.gr = math.floor(crop.time_mult*100)
 	end
 	if crop.pollinated ~= 0 then
 		data.pl = crop.pollinated
@@ -656,40 +654,9 @@ local function GetStatus_p2(inst)
 		or (crop.isrotten and "WITHERED")
 		or (crop.stage == crop.stage_max and "READY")
 		or (crop.level.pickable == 1 and "READY")
-		or (crop.isflower and "FLORESCENCE")
+		or (crop.isflower and "BLOOMY")
 		-- or (crop.stage <= 2 and "SPROUT")
 		or "GROWING"
-end
-local function DisplayName_p2(inst) --特殊的阶段加点前缀
-	local namepre = ""
-	if inst:HasTag("nognatinfest") then
-		namepre = STRINGS.PLANT_CROP_L["WITHERED"]
-	else
-		if inst:HasTag("tendable_farmplant") then --可以照顾
-			namepre = namepre..STRINGS.PLANT_CROP_L["BLUE"]
-		end
-		if inst:HasTag("needwater") then --可以浇水
-			namepre = namepre..STRINGS.PLANT_CROP_L["DRY"]
-		end
-		if inst:HasTag("fertableall") then --可以施肥
-			namepre = namepre..STRINGS.PLANT_CROP_L["FEEBLE"]
-		end
-		if namepre ~= "" then
-			namepre = namepre..STRINGS.PLANT_CROP_L["PREPOSITION"]
-		end
-		if inst:HasTag("flower") then --花期
-			namepre = namepre..STRINGS.PLANT_CROP_L["FLORESCENCE"]
-		end
-	end
-
-	namepre = namepre..STRINGS.NAMES[string.upper(inst.prefab or "plant_carrot_l")]
-
-	local cluster = inst._cluster_l:value()
-	if cluster ~= nil and cluster > 0 then
-		namepre = namepre.."(Lv."..tostring(cluster)..")"
-	end
-
-	return namepre
 end
 local function OnHaunt_p2(inst, haunter)
 	if inst:HasTag("fertableall") and math.random() <= TUNING.HAUNT_CHANCE_OFTEN then
@@ -729,6 +696,92 @@ local function OnWorkedFinish_p2(inst, worker)
 	crop:GenerateLoot(worker, false, false)
 	inst:Remove()
 end
+local function Fn_dealdata_p2(inst, data)
+	local str, strpst
+	local def = CROPS_DATA_LEGION[inst.xeedkey]
+    local dd = {
+        st = tostring(data.st or 1), stmax = tostring(#def.leveldata),
+		c = tostring(data.c or 0), cmax = tostring(data.cmax or 99),
+		li = tostring(data.li or 0), limax = tostring(data.limax or 0),
+		gr = tostring(data.gr or 100),
+		pl = tostring(data.pl or 0), plmax = tostring(data.plmax or 3),
+		it = tostring(data.it or 0), itmax = tostring(data.itmax or 10),
+		des = ""
+    }
+	if data.wt then
+		dd.des = "("..STRINGS.NAMEDETAIL_L.WITHERED..")"
+	elseif inst:HasTag("flower") then
+		dd.des = "("..STRINGS.NAMEDETAIL_L.BLOOMY..")"
+	end
+	if inst:HasTag("needwater") then
+		if strpst == nil then
+			strpst = STRINGS.NAMEDETAIL_L.THIRSTY
+		else
+			strpst = strpst..STRINGS.NAMEDETAIL_L.SPACE..STRINGS.NAMEDETAIL_L.THIRSTY
+		end
+	end
+	if inst:HasTag("fertableall") then
+		if strpst == nil then
+			strpst = STRINGS.NAMEDETAIL_L.FEEBLE
+		else
+			strpst = strpst..STRINGS.NAMEDETAIL_L.SPACE..STRINGS.NAMEDETAIL_L.FEEBLE
+		end
+	end
+	if inst:HasTag("tendable_farmplant") then
+		if strpst == nil then
+			strpst = STRINGS.NAMEDETAIL_L.UNHAPPY
+		else
+			strpst = strpst..STRINGS.NAMEDETAIL_L.SPACE..STRINGS.NAMEDETAIL_L.UNHAPPY
+		end
+	end
+	str = subfmt(STRINGS.NAMEDETAIL_L.XPLANT, dd)
+	if strpst == nil then
+		return str
+	else
+		return str.."\n"..strpst
+	end
+end
+local function Fn_getdata_p2(inst)
+    local data = {}
+	local crop = inst.components.perennialcrop2
+	if crop.stage ~= 1 then
+		data.st = crop.stage
+	end
+	if crop.isrotten then
+		data.wt = true
+	end
+	if crop.pollinated ~= 0 then
+		data.pl = crop.pollinated
+	end
+	if crop.pollinated_max ~= 3 then
+		data.plmax = crop.pollinated_max
+	end
+	if crop.infested ~= 0 then
+		data.it = crop.infested
+	end
+	if crop.infested_max ~= 10 then
+		data.itmax = crop.infested_max
+	end
+	if crop.pause_reason ~= nil or crop.time_mult == nil or crop.time_mult <= 0 then
+		data.gr = 0
+	elseif crop.time_mult ~= 1 then
+		data.gr = math.floor(crop.time_mult*100)
+	end
+	if crop.cluster ~= 0 then
+		data.c = crop.cluster
+	end
+	if crop.cluster_max ~= 99 then
+		data.cmax = crop.cluster_max
+	end
+	local time = crop:GetGrowTime()
+	if time ~= nil and time > 0 then
+		data.limax = TOOLS_L.ODPoint(time/TUNING.TOTAL_DAY_TIME, 100)
+	end
+	if crop.time_grow ~= nil and crop.time_grow > 0 then
+		data.li = TOOLS_L.ODPoint(crop.time_grow/TUNING.TOTAL_DAY_TIME, 100)
+	end
+    return data
+end
 
 local function Fn_common_p2(inst, sets) --异种的通用设置
 	inst.entity:AddTransform()
@@ -745,8 +798,6 @@ local function Fn_common_p2(inst, sets) --异种的通用设置
 	inst:AddTag("rotatableobject") --能让栅栏击剑起作用
 	inst:AddTag("flatrotated_l") --棱镜标签：旋转时旋转180度
 	inst:AddTag("crop2_legion")
-
-	inst._cluster_l = net_byte(inst.GUID, "plant_crop_l._cluster_l", "cluster_l_dirty")
 end
 local function Fn_server_p2(inst) --异种的通用设置
 	inst:AddComponent("savedrotation")
@@ -766,10 +817,9 @@ local function MakePlant2(cropprefab, sets)
 
 	return Prefab("plant_"..cropprefab.."_l", function()
 		local inst = CreateEntity()
-
 		Fn_common_p2(inst, sets)
-
 		inst:SetPhysicsRadiusOverride(TUNING.FARM_PLANT_PHYSICS_RADIUS)
+		inst.MiniMapEntity:SetIcon("plant_crop_l.tex")
 
 		if sets.bank == "plant_normal_legion" then
 			-- inst.AnimState:OverrideSymbol("dirt", "crop_soil_legion", "dirt")
@@ -777,11 +827,10 @@ local function MakePlant2(cropprefab, sets)
 			inst.AnimState:OverrideSymbol("soil", "crop_soil_legion", "soil")
 		end
 
-		inst.MiniMapEntity:SetIcon("plant_crop_l.tex")
-
 		inst:AddTag("plant")
 
-		inst.displaynamefn = DisplayName_p2
+		inst.xeedkey = cropprefab
+		TOOLS_L.InitMouseInfo(inst, Fn_dealdata_p2, Fn_getdata_p2, 3)
 
 		if skinedplant[cropprefab] then
 			inst:AddComponent("skinedlegion")
@@ -853,14 +902,6 @@ local ITEMS_NODIGEST = {
 	plantmeat = true, plantmeat_cooked = true --这是巨食草主产物，不能吃掉
 }
 
-local function DisplayName_nep(inst)
-	local namepre = STRINGS.NAMES[string.upper(inst.prefab or "plant_carrot_l")]
-	local cluster = inst._cluster_l:value()
-	if cluster ~= nil and cluster > 0 then
-		namepre = namepre.."(Lv."..tostring(cluster)..")"
-	end
-	return namepre
-end
 local function ComputStackNum(value, item)
 	return (value or 0) + (item.components.stackable and item.components.stackable.stacksize or 1)
 end
@@ -1017,10 +1058,10 @@ local function DoDigest(inst, doer)
 			end
 		end
 		if doer ~= nil then
-			itemtxt = subfmt(STRINGS.PLANT_CROP_L.DIGEST,
+			itemtxt = subfmt(STRINGS.NAMEDETAIL_L.DIGEST,
 				{ doer = tostring(doer.name), eater = STRINGS.NAMES[string.upper(inst.prefab)], items = itemtxt })
 		else
-			itemtxt = subfmt(STRINGS.PLANT_CROP_L.DIGESTSELF,
+			itemtxt = subfmt(STRINGS.NAMEDETAIL_L.DIGESTSELF,
 				{ eater = STRINGS.NAMES[string.upper(inst.prefab)], items = itemtxt })
 		end
 		TheNet:Announce(itemtxt)
@@ -1301,13 +1342,10 @@ end
 
 table.insert(prefs, Prefab("plant_nepenthes_l", function()
 	local inst = CreateEntity()
-
 	Fn_common_p2(inst, CROPS_DATA_LEGION["plantmeat"])
 	TOOLS_L.InitMouseInfo(inst, Fn_dealdata_nep, Fn_getdata_nep)
-
 	inst:SetPhysicsRadiusOverride(.5)
 	MakeObstaclePhysics(inst, inst.physicsradiusoverride)
-
 	inst.MiniMapEntity:SetIcon("plant_crop_l.tex")
 
 	inst:AddTag("veggie")
@@ -1316,8 +1354,6 @@ table.insert(prefs, Prefab("plant_nepenthes_l", function()
 	inst:AddTag("companion")
 	inst:AddTag("vaseherb")
 	inst:AddTag("cansetmode_l") --模式切换必需，没有就代表无法切换
-
-	inst.displaynamefn = DisplayName_nep
 
 	inst.entity:SetPristine()
 	if not TheWorld.ismastersim then
@@ -1553,17 +1589,12 @@ end
 
 table.insert(prefs, Prefab("plant_log_l", function()
 	local inst = CreateEntity()
-
 	Fn_common_p2(inst, CROPS_DATA_LEGION["log"])
-
 	inst:SetPhysicsRadiusOverride(TUNING.FARM_PLANT_PHYSICS_RADIUS)
-
 	inst.MiniMapEntity:SetIcon("plant_crop_l.tex")
 
 	inst:AddTag("plant")
 	inst:AddTag("silviculture") --该标签会使得仅限《造林学》发挥作用
-
-	inst.displaynamefn = DisplayName_p2
 
 	inst:AddComponent("container_proxy")
 

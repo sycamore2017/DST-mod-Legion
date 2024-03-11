@@ -399,7 +399,7 @@ local function MakeItem(data)
         inst.components.skinedlegion:Init(basename.."_item")
 
         inst.ctltype_l = data.ctltype
-        TOOLS_L.InitMouseInfo(inst, Fn_dealdata_sivctl, Fn_getdata_sivctl, 1)
+        TOOLS_L.InitMouseInfo(inst, Fn_dealdata_sivctl, Fn_getdata_sivctl, 3)
 
         inst.entity:SetPristine()
         if not TheWorld.ismastersim then return inst end
