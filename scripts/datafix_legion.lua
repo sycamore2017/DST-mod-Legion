@@ -925,7 +925,7 @@ local mapseeds = {
     },
     mandrake = {
         swap = { build = "siving_turn", file = "swap_mandrake", symboltype = "1" },
-        fruit = "seeds_mandrake_l", time = 20*TUNING.TOTAL_DAY_TIME,
+        fruit = "seeds_mandrake_l", time = 20,
         fruitnum_min = 1, fruitnum_max = 1, genekey = "mandrakesoup"
     },
     gourd_oversized = {
@@ -934,32 +934,32 @@ local mapseeds = {
     },
     squamousfruit = {
         swap = { build = "squamousfruit", file = "swap_turn", symboltype = "1" },
-        fruit = "dug_monstrain", time = 2*TUNING.TOTAL_DAY_TIME,
+        fruit = "dug_monstrain", time = 2,
         fruitnum_min = 1, fruitnum_max = 1, genekey = "raindonate"
     },
     cactus_flower = {
         swap = { build = "crop_legion_cactus", file = "swap_turn", symboltype = "1" },
-        fruit = "seeds_cactus_meat_l", time = 2*TUNING.TOTAL_DAY_TIME,
+        fruit = "seeds_cactus_meat_l", time = 2,
         fruitnum_min = 1, fruitnum_max = 1, genekey = "tissue_l_cactus"
     },
     lureplantbulb = {
         swap = { build = "crop_legion_lureplant", file = "swap_turn", symboltype = "1" },
-        fruit = "seeds_plantmeat_l", time = 2*TUNING.TOTAL_DAY_TIME,
+        fruit = "seeds_plantmeat_l", time = 2,
         fruitnum_min = 1, fruitnum_max = 1, genekey = "tissue_l_lureplant"
     },
     dug_berrybush = {
         swap = { build = "crop_legion_berries", file = "swap_turn1", symboltype = "1" },
-        fruit = "seeds_berries_l", time = 2*TUNING.TOTAL_DAY_TIME,
+        fruit = "seeds_berries_l", time = 2,
         fruitnum_min = 1, fruitnum_max = 1, genekey = "tissue_l_berries"
     },
     dug_berrybush2 = {
         swap = { build = "crop_legion_berries", file = "swap_turn2", symboltype = "1" },
-        fruit = "seeds_berries_l", time = 2*TUNING.TOTAL_DAY_TIME,
+        fruit = "seeds_berries_l", time = 2,
         fruitnum_min = 1, fruitnum_max = 2, genekey = "tissue_l_berries"
     },
     dug_berrybush_juicy = {
         swap = { build = "crop_legion_berries", file = "swap_turn3", symboltype = "1" },
-        fruit = "seeds_berries_l", time = 5*TUNING.TOTAL_DAY_TIME,
+        fruit = "seeds_berries_l", time = 5,
         fruitnum_min = 2, fruitnum_max = 3, genekey = "tissue_l_berries"
     },
     pinecone = {

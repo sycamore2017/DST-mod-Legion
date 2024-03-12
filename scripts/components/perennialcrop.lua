@@ -50,13 +50,6 @@ local PerennialCrop = Class(function(self, inst)
 	self.ctls = {}
 	self.onctlchange = nil
 
-	-- self.taskgrow = nil
-	-- self.timedata = {
-	-- 	start = nil, --开始进行生长的时间点
-	-- 	left = nil, --当暂停生长时，达到下一个阶段的剩余时间
-	-- 	paused = false, --是否暂停生长
-	-- 	all = nil, --到下一个阶段的全局时间（包含缩减与增加的时间）
-	-- }
 	self.task_grow = nil
 	self.pause_reason = nil --暂停生长的原因。为 nil 代表没有暂停
 	self.time_mult = nil --当前生长速度。为 nil 或 0 代表停止生长

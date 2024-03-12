@@ -1004,6 +1004,31 @@ local function ODPoint(value, plus)
 	return value/plus
 end
 
+--[ 计算补满一个值的所需最大最合适的数量。比如修复、充能的消耗之类的 ]--
+local function ComputCost(valuenow, valuemax, value, item)
+    local need = (valuemax - valuenow) / value
+    value = math.ceil(need)
+    if need ~= value then --说明不整除
+        need = value
+        if need > 1 then --最后一次很可能会比较浪费，所以不主动填满
+            need = need - 1
+        end
+    end
+    if item ~= nil then
+        if item.components.stackable ~= nil then
+            local stack = item.components.stackable:StackSize() or 1
+            if need > stack then
+                need = stack
+            end
+            item.components.stackable:Get(need):Remove()
+        else
+            need = 1
+            item:Remove()
+        end
+    end
+    return need
+end
+
 --[ 名称中显示更多细节 ]--
 local function Fn_nameDetail(inst)
 	return inst.mouseinfo_l.str
@@ -1073,7 +1098,7 @@ fns = {
     AddBonusAll = AddBonusAll, RemoveBonusAll = RemoveBonusAll,
     AddResistAll = AddResistAll, RemoveResistAll = RemoveResistAll,
     DoSingleSleep = DoSingleSleep, DoAreaSleep = DoAreaSleep,
-    ODPoint = ODPoint,
+    ODPoint = ODPoint, ComputCost = ComputCost,
     InitMouseInfo = InitMouseInfo, SendMouseInfoRPC = SendMouseInfoRPC
 }
 

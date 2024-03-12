@@ -678,7 +678,6 @@ MakeConstruct({
 
 table.insert(prefs, Prefab("siving_ctl_bar", function()
     local inst = CreateEntity()
-
     inst.entity:AddTransform()
     inst.entity:AddAnimState()
     inst.entity:AddNetwork()
@@ -705,9 +704,6 @@ end, nil, nil))
 --[[ 子圭·育 ]]
 --------------------------------------------------------------------------
 
-local function GetDesc_turn(inst, doer) --提示自身的转化数据
-    return inst.components.genetrans:SayDetail(doer, false)
-end
 local function GetStatus_turn(inst)
     local cpt = inst.components.genetrans
     return (cpt == nil and "GENERIC")
@@ -718,12 +714,11 @@ local function GetStatus_turn(inst)
 end
 local function OnWork_turn(inst, worker, workleft, numworks)
     local cpt = inst.components.genetrans
-
     if cpt.seed ~= nil then --还有东西在上面
         inst.components.workable:SetWorkLeft(5)
         if inst.worked_l then --说明已经敲过一次，这一次该掉落了
             inst.worked_l = nil
-            cpt:ClearAll(worker, true, false)
+            cpt:ClearAll()
         else
             inst.worked_l = true
         end
@@ -752,10 +747,40 @@ end
 local function OnDeconstruct_turn(inst, worker)
     OnBroken_turn(inst, false) --拆解机制自带建造材料的还原，所以这里不再还原材料
 end
+local function Fn_dealdata_turn(inst, data)
+    local dd = {
+        v = tostring(data.v or 0),
+        vmax = tostring(data.vmax or 135),
+        st = tostring(data.st or 4),
+        h = tostring(data.h or 2)
+    }
+    return subfmt(STRINGS.NAMEDETAIL_L.SIVMASK, dd).."\n"..(STRINGS.NAMEDETAIL_L.SIVEQUIP_MODE[data.mo or 3])
+end
+local function Fn_getdata_turn(inst)
+    local data = {}
+    local cpt = inst.components.genetrans
+
+
+    -- if inst.healthcounter > 0 then
+    --     data.v = TOOLS_L.ODPoint(inst.healthcounter, 10) --变化大的数据记得省略小数点
+    -- end
+    -- if inst.healthcounter_max ~= 135 then
+    --     data.vmax = inst.healthcounter_max
+    -- end
+    -- if inst.bloodsteal_l ~= 4 then
+    --     data.st = inst.bloodsteal_l
+    -- end
+    -- if inst.healpower_l ~= 2 then
+    --     data.h = inst.healpower_l
+    -- end
+    -- if inst.components.modelegion.now ~= 3 then
+    --     data.mo = inst.components.modelegion.now
+    -- end
+    return data
+end
 
 table.insert(prefs, Prefab("siving_turn", function()
     local inst = CreateEntity()
-
     inst.entity:AddTransform()
     inst.entity:AddAnimState()
     inst.entity:AddSoundEmitter()
@@ -783,13 +808,14 @@ table.insert(prefs, Prefab("siving_turn", function()
     inst:AddComponent("skinedlegion")
     inst.components.skinedlegion:Init("siving_turn")
 
+    -- TOOLS_L.InitMouseInfo(inst, Fn_dealdata_turn, Fn_getdata_turn, 3.5)
+
     inst.entity:SetPristine()
     if not TheWorld.ismastersim then return inst end
 
-    inst.worked_l = nil
+    -- inst.worked_l = nil
 
     inst:AddComponent("inspectable")
-    inst.components.inspectable.descriptionfn = GetDesc_turn
     inst.components.inspectable.getstatus = GetStatus_turn
 
     inst:AddComponent("hauntable")

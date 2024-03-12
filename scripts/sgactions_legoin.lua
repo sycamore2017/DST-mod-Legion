@@ -34,27 +34,6 @@ local function CheckForeverEquip(inst, item, doer, now)
         inst.foreverequip_l.fn_repaired(inst, item, doer, now)
     end
 end
-local function ComputCost(valuenow, valuemax, value, item)
-    local need = (valuemax - valuenow) / value
-    value = math.ceil(need)
-    if need ~= value then --说明不整除
-        need = value
-        if need > 1 then --最后一次很可能会比较浪费，所以不主动填满
-            need = need - 1
-        end
-    end
-    if item.components.stackable ~= nil then
-        local stack = item.components.stackable:StackSize() or 1
-        if need > stack then
-            need = stack
-        end
-        item.components.stackable:Get(need):Remove()
-    else
-        need = 1
-        item:Remove()
-    end
-    return need
-end
 local function CommonDoerCheck(doer, target)
     if doer.replica.rider ~= nil and doer.replica.rider:IsRiding() then --骑牛时只能修复自己的携带物品
         if not (target.replica.inventoryitem ~= nil and target.replica.inventoryitem:IsGrandOwner(doer)) then
@@ -118,7 +97,7 @@ local function DoArmorRepair(doer, item, target, value)
     then
         value = value*(doer.mult_repair_l or 1)
         local cpt = target.components.armor
-        local need = ComputCost(cpt.condition, cpt.maxcondition, value, item)
+        local need = TOOLS_L.ComputCost(cpt.condition, cpt.maxcondition, value, item)
         cpt:Repair(value*need)
         CheckForeverEquip(target, item, doer, cpt.condition)
         return true
@@ -132,7 +111,7 @@ local function DoFiniteusesRepair(doer, item, target, value)
     then
         value = value*(doer.mult_repair_l or 1)
         local cpt = target.components.finiteuses
-        local need = ComputCost(cpt.current, cpt.total, value, item)
+        local need = TOOLS_L.ComputCost(cpt.current, cpt.total, value, item)
         cpt:Repair(value*need)
         CheckForeverEquip(target, item, doer, cpt.current)
         return true
@@ -146,7 +125,7 @@ local function DoFueledRepair(doer, item, target, value, reason)
         target.components.fueled:GetPercent() < 1
     then
         local cpt = target.components.fueled
-        local need = ComputCost(cpt.currentfuel, cpt.maxfuel, value, item)
+        local need = TOOLS_L.ComputCost(cpt.currentfuel, cpt.maxfuel, value, item)
         cpt:DoDelta(value*need, doer)
         if cpt.ontakefuelfn ~= nil then
             cpt.ontakefuelfn(target, value)

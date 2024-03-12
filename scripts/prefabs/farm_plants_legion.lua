@@ -1244,7 +1244,7 @@ local function OnCluster_nep(cpt, now)
 	cpt.inst.dist_lure = TOOLS_L.ODPoint(value, 10)
 end
 
-local function SwitchPlant(inst, plant)
+local function SwitchPlant(inst, plant) --还缺一些数据的继承，比如侵扰值、异种插件，不过之后再说啦
 	local cpt = inst.components.perennialcrop2
 	if plant ~= nil then --说明是植物到生物
 		cpt.cluster = plant.components.perennialcrop2.cluster

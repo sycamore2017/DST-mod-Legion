@@ -3,25 +3,36 @@ local TOOLS_L = require("tools_legion")
 local GeneTrans = Class(function(self, inst)
 	self.inst = inst
 
-	self.energytime = TUNING.TOTAL_DAY_TIME*40 --当前能量时间
-	self.energytime_max = self.energytime --最大能量时间
-
+	self.energynum = 60 --当前能量点数。可以为负数，代表欠多少能量
+	self.energynum_max = 500 --最大能量点数
 	self.seed = nil --播下的种子的prefab名
 	self.seednum = 0 --已放入的种子数量
 	self.seeddata = nil --该异种的配置参数
 	self.fruitnum = 0 --转化完成的异种数量
-
 	self.genepool = { --基因池
 		--种子名 = true
 	}
 
-	self.taskgrow = nil
-	self.timedata = {
-		start = nil, --当前task开始的时间点
-		pass = nil, --单个的已经生长的时间
-		all = nil --单个的总体生长时间
-	}
-	self.timedata_fast = { start = nil, now = nil, max = TUNING.TOTAL_DAY_TIME*100 }
+	-- self.timedata = {
+	-- 	start = nil, --当前task开始的时间点
+	-- 	pass = nil, --单个的已经生长的时间
+	-- 	all = nil --单个的总体生长时间
+	-- }
+	-- self.timedata_fast = { start = nil, now = nil, max = TUNING.TOTAL_DAY_TIME*100 }
+	self.task_grow = nil
+	self.pause_reason = nil --暂停转化的原因。为 nil 代表没有暂停
+	self.time_mult = nil --当前转化速度。为 nil 或 0 代表停止转化
+	self.time_grow = nil --已经转化的时间
+	self.time_all = nil --单个转化的总时间
+	self.time_start = nil --本次 task_grow 周期开始的时间
+	self.cg_fast_reason = nil
+	-- self.fast_reason = { --影响转化速度的因素
+	-- 	xx = {
+	-- 		mult = 1.5, --对转化速度的影响系数
+	-- 		time = 0, --剩余影响点数，如果为 nil 代表无时间限制
+	-- 		timemax = 100 --time 的最大值
+	-- 	}
+	-- }
 
 	self.fxdata = {
 		prefab = "siving_turn_fruit", symbol = "followed", x = 0, y = 0, z = 0,
@@ -31,23 +42,6 @@ local GeneTrans = Class(function(self, inst)
 	self.fn_setanim = nil
 end)
 
-local function SetLight(self, islight)
-	if islight then
-		self.inst.Light:Enable(true)
-		if self.fxdata.bloom then
-			self.inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
-		end
-		-- if self.fx ~= nil then --太亮了，还是别弄这个
-		-- 	self.fx.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
-		-- end
-	else
-		self.inst.Light:Enable(false)
-		self.inst.AnimState:ClearBloomEffectHandle()
-		-- if self.fx ~= nil then
-		-- 	self.fx.AnimState:ClearBloomEffectHandle()
-		-- end
-	end
-end
 local function SpawnFx(self)
 	self.fx = SpawnPrefab(self.fxdata.prefab)
 	local skindata = self.inst.components.skinedlegion:GetSkinedData()
@@ -62,42 +56,7 @@ local function SpawnFx(self)
 	)
 	self.fx.components.highlightchild:SetOwner(self.inst)
 end
-local function SetAnims(self) --有果子时设置各种动画
-	--设置本体的动画
-	if self.energytime > 0 then
-		if self.inst:IsAsleep() then
-			self.inst.AnimState:PlayAnimation("on", true)
-		else
-			self.inst.AnimState:PlayAnimation("idle_to_on")
-			self.inst.AnimState:PushAnimation("on", true)
-		end
-	else
-		self.inst.AnimState:PlayAnimation("idle", false)
-	end
-
-	--设置果实的动画
-	if self.fx == nil or not self.fx:IsValid() then
-		SpawnFx(self)
-	end
-	if self.fn_setanim ~= nil then
-		self.fn_setanim(self, true)
-	end
-	self.fx.AnimState:OverrideSymbol("swap", self.seeddata.swap.build, self.seeddata.swap.file)
-	if self.seeddata.swap.symboltype == "3" then
-		self.fx.AnimState:Show("SWAPFRUIT-3")
-		self.fx.AnimState:Hide("SWAPFRUIT-2")
-		self.fx.AnimState:Hide("SWAPFRUIT-1")
-	elseif self.seeddata.swap.symboltype == "2" then
-		self.fx.AnimState:Hide("SWAPFRUIT-3")
-		self.fx.AnimState:Show("SWAPFRUIT-2")
-		self.fx.AnimState:Hide("SWAPFRUIT-1")
-	else
-		self.fx.AnimState:Hide("SWAPFRUIT-3")
-		self.fx.AnimState:Hide("SWAPFRUIT-2")
-		self.fx.AnimState:Show("SWAPFRUIT-1")
-	end
-end
-local function GetLootFruit(self, doer, loot)
+local function SpawnLootFruit(self, doer, loot)
 	if self.fruitnum > 0 then
 		local num = 0
 		if self.seeddata.fruitnum_min ~= nil then
@@ -119,7 +78,7 @@ end
 local function OnPickedFn(inst, doer)
 	local cpt = inst.components.genetrans
 	local loot = {}
-	GetLootFruit(cpt, doer, loot)
+	SpawnLootFruit(cpt, doer, loot)
 	if doer ~= nil then
 		doer:PushEvent("picksomething", { object = inst, loot = loot })
 	end
@@ -138,29 +97,410 @@ local function OnPickedFn(inst, doer)
 		if cpt.fn_setanim ~= nil then
 			cpt.fn_setanim(cpt, false)
 		end
-		if cpt.energytime <= 0 then
+		if cpt.energynum <= 0 then
 			inst.AnimState:PlayAnimation("idle", false)
 		else
 			inst.AnimState:PlayAnimation("on_to_idle")
 			inst.AnimState:PushAnimation("idle", false)
 		end
-		SetLight(cpt, false)
+		cpt:SetLight(false)
 	else
 		cpt:UpdateFxProgress()
 	end
 	cpt:TriggerPickable(false)
 end
 
-function GeneTrans:SetTransTime()
-	self.timedata.all = self.seeddata.time or TUNING.TOTAL_DAY_TIME
-	if self.seeddata.genekey ~= nil then --特殊植物
-		self.timedata.all = self.timedata.all * (CONFIGS_LEGION.TRANSTIMESPEC or 1)
-	else --普通作物
-		self.timedata.all = self.timedata.all * (CONFIGS_LEGION.TRANSTIMECROP or 1)
+function GeneTrans:SetLight(ison) --设置光源
+	if ison then
+		self.inst.Light:Enable(true)
+		if self.fxdata.bloom then
+			self.inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
+		end
+		-- if self.fx ~= nil then --太亮了，还是别弄这个
+		-- 	self.fx.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
+		-- end
+	else
+		self.inst.Light:Enable(false)
+		self.inst.AnimState:ClearBloomEffectHandle()
+		-- if self.fx ~= nil then
+		-- 	self.fx.AnimState:ClearBloomEffectHandle()
+		-- end
+	end
+end
+function GeneTrans:InitAnims() --初始化各种动画
+	--设置本体的动画
+	if self.energynum > 0 then
+		if self.inst:IsAsleep() then
+			self.inst.AnimState:PlayAnimation("on", true)
+		else
+			self.inst.AnimState:PlayAnimation("idle_to_on")
+			self.inst.AnimState:PushAnimation("on", true)
+		end
+	else
+		self.inst.AnimState:PlayAnimation("idle", false)
+	end
+
+	--设置果实的动画
+	if self.fx == nil or not self.fx:IsValid() then
+		SpawnFx(self)
+	end
+	if self.fn_setanim ~= nil then
+		self.fn_setanim(self, true)
+	else
+		self.fx.AnimState:OverrideSymbol("swap", self.seeddata.swap.build, self.seeddata.swap.file)
+		if self.seeddata.swap.symboltype == "3" then
+			self.fx.AnimState:Show("SWAPFRUIT-3")
+			self.fx.AnimState:Hide("SWAPFRUIT-2")
+			self.fx.AnimState:Hide("SWAPFRUIT-1")
+		elseif self.seeddata.swap.symboltype == "2" then
+			self.fx.AnimState:Hide("SWAPFRUIT-3")
+			self.fx.AnimState:Show("SWAPFRUIT-2")
+			self.fx.AnimState:Hide("SWAPFRUIT-1")
+		else
+			self.fx.AnimState:Hide("SWAPFRUIT-3")
+			self.fx.AnimState:Hide("SWAPFRUIT-2")
+			self.fx.AnimState:Show("SWAPFRUIT-1")
+		end
+	end
+end
+function GeneTrans:UpdateFxProgress() --更新果实进度动画
+	if self.fx == nil then
+		return
+	end
+
+	local percent = 1
+	if self.seednum > 0 then --如果未转化的没有了，则必定是已100%完成了
+		if self.time_all ~= nil then
+			local alltime = (self.fruitnum + self.seednum) * self.time_all
+			if alltime > 0 then
+				percent = ( self.fruitnum*self.time_all + (self.time_grow or 0) ) / alltime
+			end
+		end
+	end
+	if percent >= 1 then
+		self.fx.AnimState:PlayAnimation(self.energynum <= 0 and "fruit_max" or "fruit_max_on", false)
+	else --无语子，动画末尾的呈现状态总是不对，缺了最后一块，怎么调都不行，只能单独做个满的动画
+		self.fx.AnimState:SetPercent(self.energynum <= 0 and "fruit" or "fruit_on", percent)
 	end
 end
 
-function GeneTrans:DropLoot(needrecipe)
+function GeneTrans:SetTransTime() --设置单个的转化总时间
+	self.time_all = (self.seeddata.time or 1) * TUNING.TOTAL_DAY_TIME
+	if self.seeddata.genekey ~= nil then --特殊植物
+		self.time_all = self.time_all * (CONFIGS_LEGION.TRANSTIMESPEC or 1)
+	else --普通作物
+		self.time_all = self.time_all * (CONFIGS_LEGION.TRANSTIMECROP or 1)
+	end
+end
+function GeneTrans:SetUp(seeds, doer) --放入转化材料
+	if doer ~= nil and self.inst.components.pickable ~= nil then --先把已完成的拿下来
+        self.inst.components.pickable:Pick(doer)
+    end
+
+	if TRANS_DATA_LEGION[seeds.prefab] == nil then --不能转化
+		return false, "WRONGITEM"
+	end
+	if TRANS_DATA_LEGION[seeds.prefab].genekey ~= nil and not self.genepool[seeds.prefab] then --基因池未解锁
+		return false, "NOGENE"
+	end
+	if self.energynum <= 0 then --没能量了
+		return false, "ENERGYOUT"
+	end
+	if self.seed ~= nil then --已有种子
+		if self.seednum > 0 then --还有在转化的
+			if self.seed ~= seeds.prefab then --正在转化的和要放入的不一样
+				return false, "GROWING"
+			end
+		end
+	end
+
+	--基础数据
+	self.seeddata = TRANS_DATA_LEGION[seeds.prefab]
+	self.seed = seeds.prefab
+	if seeds.components.stackable ~= nil then
+		self.seednum = self.seednum + seeds.components.stackable:StackSize()
+	else
+		self.seednum = self.seednum + 1
+	end
+
+	--删除种子实体
+	seeds:Remove()
+
+	--寻找周围的相同实体，一并放上去
+	local x, y, z = self.inst.Transform:GetWorldPosition()
+	local ents = TheSim:FindEntities(x, y, z, 12, { "_inventoryitem" }, { "INLIMBO", "NOCLICK" })
+	for _, ent in ipairs(ents) do
+		if ent.prefab == self.seed then
+			if ent.components.stackable ~= nil then
+				self.seednum = self.seednum + ent.components.stackable:StackSize()
+			else
+				self.seednum = self.seednum + 1
+			end
+			ent:Remove()
+		end
+	end
+
+	--开始基因转化
+	self:SetTransTime()
+	self:UpdateTimeMult()
+	self:StartTransing()
+	self:InitAnims()
+	self:UpdateFxProgress()
+	if self.energynum > 0 then
+		self:SetLight(true)
+	end
+
+    return true
+end
+function GeneTrans:ClearAll(doer) --恢复未转化状态
+	--原始物品
+	if self.seednum > 0 then
+		TOOLS_L.SpawnStackDrop(self.seed, self.seednum, self.inst:GetPosition(), doer, nil, { dropper = self.inst })
+	end
+	--转化产物
+	SpawnLootFruit(self, doer, nil)
+
+	--数据初始化
+	self:StopTransing()
+	self.time_all = nil
+	self.seed = nil
+	self.seeddata = nil
+	self.seednum = 0
+	self.fruitnum = 0
+	self:SetLight(false)
+	self:TriggerPickable(false)
+
+	if self.fx ~= nil then
+		self.fx:Remove()
+		self.fx = nil
+	end
+	if self.fn_setanim ~= nil then
+		self.fn_setanim(self, false)
+	end
+end
+function GeneTrans:TriggerPickable(can)
+	if can == nil then
+		can = self.fruitnum > 0
+	end
+    if can then
+		if self.inst.components.pickable == nil then
+			self.inst:AddComponent("pickable")
+			self.inst.components.pickable.onpickedfn = OnPickedFn
+			self.inst.components.pickable:SetUp(nil)
+			-- self.inst.components.pickable.use_lootdropper_for_product = true
+			self.inst.components.pickable.picksound = "dontstarve/common/destroy_magic"
+		end
+	elseif self.inst.components.pickable ~= nil then
+		self.inst:RemoveComponent("pickable")
+	end
+end
+
+function GeneTrans:TryDoTransing() --循环转化
+	if self.time_grow == nil then
+		return
+	end
+	if self.time_grow <= 0 then
+		self.time_grow = nil
+		return
+	end
+	if self.time_all == nil or self.time_all <= 0 or self.seednum <= 0 then
+		self:StopTransing()
+		return
+	end
+	if self.time_grow >= self.time_all then
+		self.time_grow = self.time_grow - self.time_all
+
+		self.seednum = self.seednum - 1
+		self.fruitnum = self.fruitnum + 1
+		self:TriggerPickable()
+
+		local cost = self.seeddata.time or 1
+		self.energynum = self.energynum - cost
+		if self.fast_reason ~= nil then
+			for k, v in pairs(self.fast_reason) do
+				if v.time ~= nil then
+					v.time = v.time - cost
+					if v.time <= 0 then
+						self.fast_reason[k] = nil --Tip：table.remove() 会导致循环的下标混乱，不按逻辑运行
+						self.cg_fast_reason = true
+					end
+				end
+			end
+		end
+
+		if self.seednum <= 0 then --全部完成。即使时间还有剩的，但转化完成了，多的就不管了
+			self:StopTransing()
+			self.time_all = nil
+			return
+		elseif self.energynum <= 0 then --没能量了。即使时间还有剩的，但没法继续了，多的就不管了
+			self.time_grow = nil
+			return
+		end
+		self:TryDoTransing()
+	end
+end
+function GeneTrans:TimePassed(time, nogrow)
+	if time > 0 and self.time_mult ~= nil and self.time_mult > 0 then
+		self.time_grow = (self.time_grow or 0) + time*self.time_mult
+		if not nogrow then
+			self:TryDoTransing()
+			if self.energynum <= 0 then --能执行到这里，按理来说之前的能量是大于0的，所以这里只判断是否没能量
+				self:OnEnergyChange()
+			end
+			if self.cg_fast_reason then --需要主动更新 time_mult
+				self:UpdateTimeMult()
+			end
+		end
+		self:UpdateFxProgress()
+	end
+end
+local function TaskGrow(inst, self)
+	if self.time_start ~= nil then
+		local dt = GetTime() - self.time_start
+		self.time_start = GetTime()
+		self:TimePassed(dt)
+	else --和 time_start 同步
+		self.task_grow:Cancel()
+		self.task_grow = nil
+	end
+end
+function GeneTrans:StartTransing() --尝试转化
+	if self.seednum <= 0 or self.seed == nil then
+		self:StopTransing()
+		return
+	end
+	if self.pause_reason ~= nil then
+		return
+	end
+	if self.time_start == nil then
+		self.time_start = GetTime()
+	end
+	if self.task_grow == nil and not self.inst:IsAsleep() then
+		self.task_grow = self.inst:DoPeriodicTask(15+math.random()*10, TaskGrow, 5+math.random()*10, self)
+	end
+end
+function GeneTrans:StopTransing() --停止转化
+	if self.task_grow ~= nil then
+		self.task_grow:Cancel()
+		self.task_grow = nil
+	end
+	self.time_start = nil
+	self.time_grow = nil
+end
+function GeneTrans:Pause() --暂停转化
+	if self.time_start ~= nil then
+		if self.task_grow ~= nil then
+			self.task_grow:Cancel()
+			self.task_grow = nil
+		end
+		local dt = GetTime() - self.time_start
+		self.time_start = nil --停止
+		self:TimePassed(dt, true) --只增加 time_grow，这里不管转化
+	end
+end
+function GeneTrans:Resume() --继续转化
+	if self.time_start == nil then
+		self:StartTransing() --不管 time_grow 已有进度，让 task_grow 自己之后执行，反正只有几十秒
+	end
+end
+
+function GeneTrans:SetPauseReason(key, value) --设置暂停转化原因
+	if value == nil then --减
+		if self.pause_reason ~= nil then
+			self.pause_reason[key] = nil
+			for k, hasit in pairs(self.pause_reason) do
+				if hasit then
+					self:Pause()
+					return --还有原因，就继续暂停
+				end
+			end
+			self.pause_reason = nil
+		end
+		self:Resume()
+	else --增
+		if self.pause_reason == nil then
+			self.pause_reason = {}
+		end
+		self.pause_reason[key] = value
+		self:Pause()
+	end
+end
+function GeneTrans:UpdateTimeMult() --更新转化速度
+	local multnew = 1
+	if self.fast_reason ~= nil then
+		for k, v in pairs(self.fast_reason) do
+			if v.mult ~= nil then
+				multnew = multnew * v.mult
+			end
+		end
+	end
+	self.cg_fast_reason = nil
+	if multnew ~= self.time_mult then
+		local dt = GetTime()
+		if self.time_start ~= nil and dt > self.time_start then --变化前，需要将之前的时间总结起来
+			if self.task_grow ~= nil then
+				self.task_grow:Cancel()
+				self.task_grow = nil
+			end
+			dt = dt - self.time_start
+			self.time_start = nil
+			self:StartGrowing()
+			self:TimePassed(dt, true) --只增加 time_grow，这里不管转化
+		end
+		self.time_mult = multnew
+	end
+end
+function GeneTrans:SetFastReason(key, value) --设置影响转化速度的因素
+	if value == nil then --减
+		if self.fast_reason ~= nil and self.fast_reason[key] ~= nil then
+			self.fast_reason[key] = nil
+			for k, v in pairs(self.fast_reason) do
+				if v then --还有因素
+					value = true
+					break
+				end
+			end
+			if not value then
+				self.fast_reason = nil
+			end
+			self:UpdateTimeMult()
+		end
+	else --增
+		if self.fast_reason == nil then
+			self.fast_reason = {}
+		end
+		self.fast_reason[key] = value
+		self:UpdateTimeMult()
+	end
+end
+
+local function SetPushAnim(inst, anim, animpush, isloop)
+	if not (inst.AnimState:IsCurrentAnimation(animpush) or inst.AnimState:IsCurrentAnimation(anim)) then
+		if inst:IsAsleep() then
+			inst.AnimState:PlayAnimation(animpush, isloop)
+		else
+			inst.AnimState:PlayAnimation(anim)
+			inst.AnimState:PushAnimation(animpush, isloop)
+		end
+	end
+end
+function GeneTrans:OnEnergyChange() --能量变化时
+	if self.energynum <= 0 then --没有能量
+		self:SetPauseReason("noenergy", true)
+		self:SetLight(false)
+		SetPushAnim(self.inst, "on_to_idle", "idle", false)
+	else
+		self:SetPauseReason("noenergy", nil)
+		if self.seed ~= nil then
+			self:SetLight(true)
+			SetPushAnim(self.inst, "idle_to_on", "on", true)
+		else
+			self:SetLight(false)
+			self.inst.AnimState:PlayAnimation("idle", false)
+		end
+	end
+end
+function GeneTrans:DropLoot(needrecipe) --生成掉落物
 	local lootmap = {}
 	local pos = self.inst:GetPosition()
 	--原始物品
@@ -168,7 +508,7 @@ function GeneTrans:DropLoot(needrecipe)
 		lootmap[self.seed] = self.seednum
 	end
 	--转化产物
-	GetLootFruit(self, nil, nil)
+	SpawnLootFruit(self, nil, nil)
 	--建筑材料
 	if needrecipe then
 		local recipe = AllRecipes[self.inst.prefab]
@@ -193,496 +533,20 @@ function GeneTrans:DropLoot(needrecipe)
 		TOOLS_L.SpawnStackDrop(name, num, pos, nil, nil, { dropper = self.inst })
 	end
 end
-
-function GeneTrans:UpdateFxProgress() --更新果实进度动画
-	if self.fx == nil then
-		return
-	end
-
-	local percent = 1
-	if self.timedata.all ~= nil then
-		local alltime = (self.fruitnum + self.seednum) * self.timedata.all
-		if alltime > 0 then
-			percent = ( self.fruitnum*self.timedata.all + (self.timedata.pass or 0) ) / alltime
-		end
-	end
-	if percent >= 1 then
-		self.fx.AnimState:PlayAnimation(self.energytime <= 0 and "fruit_max" or "fruit_max_on", false)
-	else --无语子，动画末尾的呈现状态总是不对，缺了最后一块，怎么调都不行，只能单独做个满的动画
-		self.fx.AnimState:SetPercent(self.energytime <= 0 and "fruit" or "fruit_on", percent)
-	end
-end
-
-function GeneTrans:SetUp(seeds, doer)
-	if doer ~= nil and self.inst.components.pickable ~= nil then --先把已完成的拿下来
-        self.inst.components.pickable:Pick(doer)
-    end
-
-	if TRANS_DATA_LEGION[seeds.prefab] == nil then --不能转化
-		return false, "WRONGITEM"
-	end
-	if TRANS_DATA_LEGION[seeds.prefab].genekey ~= nil and not self.genepool[seeds.prefab] then --基因池未解锁
-		return false, "NOGENE"
-	end
-	if self.energytime <= 0 then --没能量了
-		return false, "ENERGYOUT"
-	end
-	if self.seed ~= nil then --已有种子
-		if self.seednum > 0 then --还有在转化的
-			if self.seed ~= seeds.prefab then --正在转化的和要放入的不一样
-				return false, "GROWING"
-			end
-		end
-	end
-
-	--基础数据
-	self.seeddata = TRANS_DATA_LEGION[seeds.prefab]
-	self.seed = seeds.prefab
-	if seeds.components.stackable ~= nil then
-		self.seednum = self.seednum + seeds.components.stackable:StackSize()
-	else
-		self.seednum = self.seednum + 1
-	end
-
-	--设置动画
-	SetAnims(self)
-
-	--undo 声音
-	-- inst.SoundEmitter:PlaySound("dontstarve/halloween_2018/madscience_machine/idle_LP", "loop")
-
-	--删除种子实体
-	seeds:Remove()
-
-	--寻找周围的相同实体，一并放上去
-	local x, y, z = self.inst.Transform:GetWorldPosition()
-	local ents = TheSim:FindEntities(x, y, z, 12, { "_inventoryitem" }, { "INLIMBO", "NOCLICK" })
-	for _, ent in ipairs(ents) do
-		if ent.prefab == self.seed then
-			if ent.components.stackable ~= nil then
-				self.seednum = self.seednum + ent.components.stackable:StackSize()
-			else
-				self.seednum = self.seednum + 1
-			end
-			ent:Remove()
-		end
-	end
-
-	--开始基因转化
-	self:SetTransTime()
-	self:StartTransing()
-	self:UpdateFxProgress()
-	if self.energytime > 0 then
-		SetLight(self, true)
-	end
-
-    return true
-end
-
-function GeneTrans:ClearAll(doer, mustdrop, initanim) --恢复原始状态
-	if mustdrop then
-		doer = nil
-	end
-
-	--原始物品
-	if self.seednum > 0 then
-		TOOLS_L.SpawnStackDrop(self.seed, self.seednum, self.inst:GetPosition(), doer, nil, { dropper = self.inst })
-	end
-	--转化产物
-	GetLootFruit(self, doer, nil)
-
-	--数据初始化
-	if self.taskgrow ~= nil then
-		self.taskgrow:Cancel()
-		self.taskgrow = nil
-	end
-	self.timedata.start = nil
-	self.timedata.all = nil
-	self.timedata.pass = nil
-	self.seed = nil
-	self.seeddata = nil
-	self.seednum = 0
-	self.fruitnum = 0
-	SetLight(self, false)
-	self:TriggerPickable(false)
-
-	if initanim then
-		if self.energytime <= 0 or self.fx == nil then
-			self.AnimState:PlayAnimation("idle", false)
-		else
-			self.AnimState:PlayAnimation("on_to_idle")
-			self.AnimState:PushAnimation("idle", false)
-		end
-	end
-	if self.fx ~= nil then
-		self.fx:Remove()
-		self.fx = nil
-	end
-	if self.fn_setanim ~= nil then
-		self.fn_setanim(self, false)
-	end
-end
-
-function GeneTrans:CostEnergy(cost)
-	local old = self.energytime
-	cost = old - cost
-	if cost <= 0 then
-		self.energytime = 0
-		if self.taskgrow ~= nil then
-			self.taskgrow:Cancel()
-			self.taskgrow = nil
-		end
-		self.timedata.start = nil
-	else
-		self.energytime = math.min(self.energytime_max, cost)
-	end
-
-	if self.energytime <= 0 then --没有能量
-		SetLight(self, false)
-		if old > 0 and self.seed ~= nil then
-			if self.inst:IsAsleep() then
-				self.inst.AnimState:PlayAnimation("idle", false)
-			else
-				self.inst.AnimState:PlayAnimation("on_to_idle")
-				self.inst.AnimState:PushAnimation("idle", false)
-			end
-		elseif not self.inst.AnimState:IsCurrentAnimation("on_to_idle") then
-			self.inst.AnimState:PlayAnimation("idle", false)
-		end
-	else
-		if self.seed ~= nil then
-			SetLight(self, true)
-			if old <= 0 then
-				if self.inst:IsAsleep() then
-					self.inst.AnimState:PlayAnimation("on", true)
-				else
-					self.inst.AnimState:PlayAnimation("idle_to_on")
-					self.inst.AnimState:PushAnimation("on", true)
-				end
-			elseif not (self.inst.AnimState:IsCurrentAnimation("on") or self.inst.AnimState:IsCurrentAnimation("idle_to_on")) then
-				self.inst.AnimState:PlayAnimation("on", true)
-			end
-		else
-			SetLight(self, false)
-			self.inst.AnimState:PlayAnimation("idle", false)
-		end
-	end
-end
-
-function GeneTrans:TriggerPickable(can)
-	if can == nil then
-		can = self.fruitnum > 0
-	end
-    if can then
-		if self.inst.components.pickable == nil then
-			self.inst:AddComponent("pickable")
-			self.inst.components.pickable.onpickedfn = OnPickedFn
-			self.inst.components.pickable:SetUp(nil)
-			-- self.inst.components.pickable.use_lootdropper_for_product = true
-			self.inst.components.pickable.picksound = "dontstarve/common/destroy_magic"
-		end
-	elseif self.inst.components.pickable ~= nil then
-		self.inst:RemoveComponent("pickable")
-	end
-end
-
-function GeneTrans:StartTransing()
-	if self.taskgrow ~= nil then
-		self.taskgrow:Cancel()
-		self.taskgrow = nil
-	end
-
-	if self.seednum <= 0 or self.seed == nil then
-		return
-	end
-
-	if self.timedata.pass == nil then
-		self.timedata.pass = 0
-	end
-	if self.energytime <= 0 then
-		self.timedata.start = nil
-		return
-	else
-		self.timedata.start = GetTime()
-	end
-
-	if not self.inst:IsAsleep() then
-		self.taskgrow = self.inst:DoTaskInTime(9+math.random()*2, function(inst, self)
-			self.taskgrow = nil
-			self:LongUpdate(GetTime()-self.timedata.start)
-		end, self)
-	end
-end
-
-function GeneTrans:AddFastTime(time)
-	if self.timedata_fast.start == nil then
-		self.timedata_fast.start = GetTime()
-	end
-	self.timedata_fast.now = math.min(self.timedata_fast.max, (self.timedata_fast.now or 0) + time)
-end
-function GeneTrans:GetFastTimePercent()
-	if self.timedata_fast.now == nil then
-		return 0
-	end
-	return self.timedata_fast.now/self.timedata_fast.max
-end
-
-function GeneTrans:ComputTime(dt, costtime)
-	if self.timedata.all == nil or self.energytime <= 0 then
-		return
-	end
-	if dt == nil or dt < 0 then
-		return
-	end
-
-	if self.timedata.pass == nil then
-		self.timedata.pass = 0
-	elseif self.timedata.pass >= self.timedata.all then --确保 all 比 pass 大
-		self.seednum = math.max(0, self.seednum - 1)
-		self.fruitnum = self.fruitnum + 1
-		self:TriggerPickable()
-		if self.seednum <= 0 then --全部完成
-			self.timedata.start = nil
-			self.timedata.pass = nil
-			self.timedata.all = nil
-			if self.taskgrow ~= nil then
-				self.taskgrow:Cancel()
-				self.taskgrow = nil
-			end
-			self:UpdateFxProgress()
-			return
-		else
-			self.timedata.pass = self.timedata.pass - self.timedata.all
-			if self.timedata.pass >= self.timedata.all then
-				self:ComputTime(dt, costtime)
-				return
-			end
-		end
-	end
-
-	dt = math.min(self.energytime, dt) --得到能量范围内最大的经过时间
-	local needtime = self.timedata.all - self.timedata.pass --单个的剩余需求时间
-	if needtime <= dt then --完成了单个
-		self.seednum = math.max(0, self.seednum - 1)
-		self.fruitnum = self.fruitnum + 1
-		self:TriggerPickable()
-		costtime = (costtime or 0) + needtime
-		if self.seednum <= 0 then --全部完成
-			self.timedata.start = nil
-			self.timedata.pass = nil
-			self.timedata.all = nil
-			if self.taskgrow ~= nil then
-				self.taskgrow:Cancel()
-				self.taskgrow = nil
-			end
-			self:CostEnergy(costtime)
-			self:UpdateFxProgress()
-			return
-		else
-			self.timedata.pass = 0
-			dt = dt - needtime
-		end
-	else
-		costtime = (costtime or 0) + dt
-		self.timedata.pass = self.timedata.pass + dt
-		dt = 0
-	end
-
-	if dt > 0 then --还有时间可以经过
-		self:ComputTime(dt, costtime)
-	else
-		self:CostEnergy(costtime)
-		self:StartTransing()
-		self:UpdateFxProgress()
-	end
-end
-function GeneTrans:LongUpdate(dt)
-	if self.timedata_fast.now ~= nil then
-		if self.timedata_fast.now > dt then
-			self.timedata_fast.now = self.timedata_fast.now - dt
-			self.timedata_fast.start = GetTime()
-			dt = dt*2
-		else
-			dt = dt + self.timedata_fast.now
-			self.timedata_fast.now = nil
-			self.timedata_fast.start = nil
-		end
-	end
-	self:ComputTime(dt, nil)
-end
-
-function GeneTrans:OnEntitySleep()
-    if self.taskgrow ~= nil then
-		self.taskgrow:Cancel()
-		self.taskgrow = nil
-	end
-end
-function GeneTrans:OnEntityWake()
-	if self.timedata.start == nil or self.energytime <= 0 then
-		if self.timedata_fast.now ~= nil and self.timedata_fast.start ~= nil then
-			local timenow = GetTime()
-			local past = timenow - self.timedata_fast.start
-			if past >= self.timedata_fast.now then
-				self.timedata_fast.now = nil
-				self.timedata_fast.start = nil
-			else
-				self.timedata_fast.now = self.timedata_fast.now - past
-				self.timedata_fast.start = timenow
-			end
-		end
-		return
-	end
-	self:LongUpdate(GetTime()-self.timedata.start)
-end
-
-function GeneTrans:OnSave()
-    local data = {}
-
-	if self.seed ~= nil then
-		data.seed = self.seed
-		if self.seednum > 0 then
-			data.seednum = self.seednum
-		end
-		if self.fruitnum > 0 then
-			data.fruitnum = self.fruitnum
-		end
-		if self.timedata.all ~= nil then
-			if self.timedata.start ~= nil then
-				data.time_dt = GetTime() - self.timedata.start
-			end
-			if self.timedata.pass ~= nil and self.timedata.pass > 0 then
-				data.time_pass = self.timedata.pass
-			end
-		end
-	end
-	if self.energytime < self.energytime_max then
-		data.energytime = self.energytime
-	end
-	if self.timedata_fast.now ~= nil then --先不计算经过的时间，因为转化时间还没判断
-		data.time_fast = self.timedata_fast.now
-	end
-
-	local genepool = nil
-	for seedname, isfull in pairs(self.genepool) do
-		if isfull then
-			if genepool == nil then
-				genepool = {}
-			end
-			table.insert(genepool, seedname)
-		end
-	end
-	if genepool ~= nil then
-		data.genepool = genepool
-	end
-
-    return data
-end
-function GeneTrans:OnLoad(data, newents)
-	if data.energytime ~= nil then
-		self.energytime = math.min(data.energytime, self.energytime_max)
-	end
-	if data.genepool ~= nil then
-		for _, value in ipairs(data.genepool) do
-			if TRANS_DATA_LEGION[value] ~= nil then
-				self.genepool[value] = true
-			end
-		end
-	end
-	if data.time_fast ~= nil then
-		self:AddFastTime(data.time_fast)
-	end
-
-	local seedname = nil
-	if data.seed ~= nil then
-		if type(data.seed) == "table" then --兼容以前的数据格式
-			seedname = data.seed.prefab
-		else
-			seedname = data.seed
-		end
-	end
-	if data.fruit ~= nil then --兼容以前的数据格式
-		for name, value in pairs(TRANS_DATA_LEGION) do
-			if value.fruit == data.fruit then
-				seedname = name
-				break
-			end
-		end
-	end
-	if seedname ~= nil and seedname ~= "" then
-		if TRANS_DATA_LEGION[seedname] == nil then
-			self:CostEnergy(0)
-			return
-		end
-		if data.seednum ~= nil and data.seednum > 0 then
-			self.seednum = data.seednum
-		end
-		if data.fruitnum ~= nil and data.fruitnum > 0 then
-			self.fruitnum = data.fruitnum
-			self:TriggerPickable()
-		elseif data.fruit ~= nil then --旧数据格式有果子，说明已经成功了1个
-			self.fruitnum = 1
-			self:TriggerPickable()
-		end
-		if self.fruitnum <= 0 and self.seednum <= 0 then --什么都没有？那就是默认带有1个未转化的
-			self.seednum = 1
-		end
-
-		self.seeddata = TRANS_DATA_LEGION[seedname]
-		self.seed = seedname
-		SetAnims(self)
-
-		if self.seednum > 0 then --还有需要转化的，所以继续判定时间
-			local dt = data.time_dt or 0
-			self:SetTransTime()
-			self.timedata.pass = data.time_pass or 0
-			if dt > 0 or self.timedata.pass > 0 then --有多余的时间：循环更新
-				self:LongUpdate(dt)
-			else --无多余时间：更新能量状态、继续转化、更新进度
-				self:CostEnergy(0)
-				self:StartTransing()
-				self:UpdateFxProgress()
-			end
-		else --转化完成：更新能量状态、更新进度
-			self:CostEnergy(0)
-			self:UpdateFxProgress()
-		end
-	else --无种子：需要更新能量状态
-		self:CostEnergy(0)
-	end
-end
-
-function GeneTrans:Charge(items, doer)
-    if self.energytime >= self.energytime_max then
+function GeneTrans:Charge(items, doer) --充能
+    if self.energynum >= self.energynum_max then
 		return false, "ENERGYMAX"
 	end
 
-	local addtime = items.sivturnenergy or TUNING.TOTAL_DAY_TIME
-	local needtime = self.energytime_max - self.energytime
-	local itemtime = 0
-
-	if items.components.stackable ~= nil then
-		local num = items.components.stackable:StackSize() or 1
-		local numused = 0
-		for i = 1, num, 1 do
-			numused = i
-			itemtime = itemtime + addtime
-			if itemtime >= needtime then
-				break
-			end
-		end
-		items.components.stackable:Get(numused):Remove()
-	else
-		itemtime = addtime
-		items:Remove()
-	end
-
-	self:CostEnergy(-itemtime)
-	self:StartTransing()
+	local value = items.sivturnenergy or 1.5
+	local need = TOOLS_L.ComputCost(self.energynum, self.energynum_max, value, items)
+    self.energynum = self.energynum + value*need
+	self:OnEnergyChange()
 	self:UpdateFxProgress()
 
 	return true
 end
-
-function GeneTrans:UnlockGene(items, doer)
+function GeneTrans:UnlockGene(items, doer) --基因解锁
 	local seed = nil
     for seedname, data in pairs(TRANS_DATA_LEGION) do
 		if items.prefab == data.genekey then
@@ -713,75 +577,178 @@ function GeneTrans:UnlockGene(items, doer)
 		end
 		self.inst.SoundEmitter:PlaySound("wintersfeast2019/winters_feast/table/fx")
 	end
-
 	return true
 end
 
-local function OmitDecimalPoint(value, plus) --截取小数点
-	value = math.floor(value*plus)
-	return value/plus
-end
-local function GetDetailString(self, doer, type)
-	if self.seed == nil then
-		return
-	end
-
-	local data = {
-		name = STRINGS.NAMES[string.upper(self.seed)] or self.seed,
-		seednum = tostring(self.seednum),
-		fruitnum = tostring(self.fruitnum),
-		timepass = 0,
-		timeall = 0,
-		power = tostring(OmitDecimalPoint(self.energytime/TUNING.TOTAL_DAY_TIME, 100)),
-		timefast = 0
-	}
-	if self.timedata_fast.now ~= nil then
-		data.timefast = OmitDecimalPoint(self.timedata_fast.now/TUNING.TOTAL_DAY_TIME, 100)
-	end
-	data.timefast = tostring(data.timefast)
-
-	if type == 2 then
-		if self.timedata.pass ~= nil then
-			data.timepass = OmitDecimalPoint(self.timedata.pass/TUNING.TOTAL_DAY_TIME, 100)
-		end
-		if self.timedata.all ~= nil then
-			data.timeall = OmitDecimalPoint(self.timedata.all/TUNING.TOTAL_DAY_TIME, 100)
-		end
-		data.timepass = tostring(data.timepass)
-		data.timeall = tostring(data.timeall)
-		return subfmt(STRINGS.NAMEDETAIL_L.TURN_D2, data)
-	else
-		return subfmt(STRINGS.NAMEDETAIL_L.TURN_D1, data)
+function GeneTrans:LongUpdate(dt)
+	if self.time_start ~= nil then --没有暂停转化
+		self:TimePassed(dt, self.inst:IsAsleep()) --休眠时，只增加 time_grow
 	end
 end
-function GeneTrans:SayDetail(doer, dotalk) --介绍细节
-	if doer == nil or doer:HasTag("mime") then
-		return
+function GeneTrans:OnEntitySleep()
+    if self.task_grow ~= nil then --只是 task_grow 暂停而已，time_start 不能清除
+		self.task_grow:Cancel()
+		self.task_grow = nil
 	end
+end
+function GeneTrans:OnEntityWake()
+	if self.task_grow == nil then
+		--刚加载时不处理什么，防止卡顿
+		--不管 time_grow 已有进度，让 task_grow 自己之后执行，反正只有几十秒
+		self:StartGrowing()
+	end
+end
+function GeneTrans:OnSave()
+    local data = {}
+	if self.seed ~= nil then
+		data.seed = self.seed
+		if self.seednum > 0 then
+			data.seednum = self.seednum
 
-	local str = nil
-
-	if doer:HasTag("sharpeye") then
-		str = GetDetailString(self, doer, 2)
-	else
-		local hat = doer.components.inventory and doer.components.inventory:GetEquippedItem(EQUIPSLOTS.HEAD) or nil
-		if hat == nil then
-			-- if doer:HasTag("plantkin") then
-			-- 	str = GetDetailString(self, doer, 1)
-			-- end
-			return str
-		elseif hat:HasTag("detailedplanthappiness") then
-			str = GetDetailString(self, doer, 2)
-		elseif hat:HasTag("plantinspector") then
-			str = GetDetailString(self, doer, 1)
+			local dt = self.time_grow
+			if self.time_start ~= nil then
+				if self.time_mult ~= nil and self.time_mult > 0 then
+					dt = (dt or 0) + (GetTime() - self.time_start)*self.time_mult
+				end
+			end
+			if dt ~= nil and dt > 0 then
+				data.time_dt = dt
+			end
+		end
+		if self.fruitnum > 0 then
+			data.fruitnum = self.fruitnum
+		end
+	end
+	if self.energynum < self.energynum_max then
+		data.energynum = self.energynum
+	end
+	if self.fast_reason ~= nil then
+		for k, v in pairs(self.fast_reason) do
+			if v then
+				data.fast_reason = self.fast_reason
+				break
+			end
 		end
 	end
 
-	if dotalk and str ~= nil and doer.components.talker ~= nil then
-		doer.components.talker:Say(str)
+	local genepool = nil
+	for seedname, isfull in pairs(self.genepool) do
+		if isfull then
+			if genepool == nil then
+				genepool = {}
+			end
+			table.insert(genepool, seedname)
+		end
+	end
+	if genepool ~= nil then
+		data.genepool = genepool
 	end
 
-	return str
+    return data
 end
+function GeneTrans:OnLoad(data, newents)
+	if data == nil then
+        return
+    end
+
+	local energy
+	if data.energytime ~= nil and data.energytime > 0 then --兼容旧数据
+		energy = data.energytime / TUNING.TOTAL_DAY_TIME
+	end
+	if data.energynum ~= nil then
+		energy = (energy or 0) + data.energynum
+	end
+	if energy ~= nil then
+		self.energynum = math.min(energy, self.energynum_max)
+		if self.energynum <= 0 then
+			self:SetPauseReason("noenergy", true)
+		end
+	end
+
+	if data.genepool ~= nil then
+		for _, value in ipairs(data.genepool) do
+			if TRANS_DATA_LEGION[value] ~= nil then
+				self.genepool[value] = true
+			end
+		end
+	end
+	if data.fast_reason ~= nil then
+		self.fast_reason = {}
+		for k, v in pairs(data.fast_reason) do
+			if v.mult ~= nil and v.mult > 0 then
+				self.fast_reason[k] = {
+					mult = v.mult,
+					time = v.time,
+					timemax = v.timemax
+				}
+			end
+		end
+	end
+
+	local seedname = data.seed
+	if seedname ~= nil and TRANS_DATA_LEGION[seedname] ~= nil then
+		self.seeddata = TRANS_DATA_LEGION[seedname]
+		self.seed = seedname
+		if data.seednum ~= nil and data.seednum > 0 then
+			self.seednum = data.seednum
+		end
+		if data.fruitnum ~= nil and data.fruitnum > 0 then
+			self.fruitnum = data.fruitnum
+			self:TriggerPickable()
+		end
+		if self.fruitnum <= 0 and self.seednum <= 0 then --什么都没有？那就是默认带有1个未转化的
+			self.seednum = 1
+		end
+		if self.seednum > 0 then --还有需要转化的，所以继续判定时间
+			if data.time_dt ~= nil and data.time_dt > 0 then
+				self.time_grow = data.time_dt
+			end
+			self:SetTransTime()
+			self:UpdateTimeMult()
+			self:StartTransing()
+		end
+		self:InitAnims()
+		self:UpdateFxProgress()
+		if self.energynum > 0 then
+			self:SetLight(true)
+		end
+	else --无种子：只需要更新能量状态
+		self:OnEnergyChange()
+	end
+end
+
+-- local function GetDetailString(self, doer, type)
+-- 	if self.seed == nil then
+-- 		return
+-- 	end
+
+-- 	local data = {
+-- 		name = STRINGS.NAMES[string.upper(self.seed)] or self.seed,
+-- 		seednum = tostring(self.seednum),
+-- 		fruitnum = tostring(self.fruitnum),
+-- 		timepass = 0,
+-- 		timeall = 0,
+-- 		power = tostring(OmitDecimalPoint(self.energynum/TUNING.TOTAL_DAY_TIME, 100)),
+-- 		timefast = 0
+-- 	}
+-- 	if self.timedata_fast.now ~= nil then
+-- 		data.timefast = OmitDecimalPoint(self.timedata_fast.now/TUNING.TOTAL_DAY_TIME, 100)
+-- 	end
+-- 	data.timefast = tostring(data.timefast)
+
+-- 	if type == 2 then
+-- 		if self.timedata.pass ~= nil then
+-- 			data.timepass = OmitDecimalPoint(self.timedata.pass/TUNING.TOTAL_DAY_TIME, 100)
+-- 		end
+-- 		if self.timedata.all ~= nil then
+-- 			data.timeall = OmitDecimalPoint(self.timedata.all/TUNING.TOTAL_DAY_TIME, 100)
+-- 		end
+-- 		data.timepass = tostring(data.timepass)
+-- 		data.timeall = tostring(data.timeall)
+-- 		return subfmt(STRINGS.NAMEDETAIL_L.TURN_D2, data)
+-- 	else
+-- 		return subfmt(STRINGS.NAMEDETAIL_L.TURN_D1, data)
+-- 	end
+-- end
 
 return GeneTrans

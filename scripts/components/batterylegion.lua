@@ -127,6 +127,23 @@ function BatteryLegion:Do(doer, target)
 			return false, "NONEED"
 		end
 	elseif target.components.genetrans ~= nil then --子圭·育
+		local gene = target.components.genetrans
+		local dd = gene.fast_reason ~= nil and gene.fast_reason["batterylgion"] or nil
+		if dd == nil then
+			dd = { mult = 2, time = 0, timemax = 500 }
+		else
+		end
+		if gene.fast_reason ~= nil then
+			if
+				gene.fast_reason["batterylgion"] ~= nil and
+				gene.fast_reason["batterylgion"].time ~= nil and
+				gene.fast_reason["batterylgion"].time
+			then
+				
+			end
+		end
+
+
 		if target.components.genetrans:GetFastTimePercent() <= 0.99 then
 			cost = 50
 			if not TryCostEnergy(cpt, cost, doer) then

@@ -275,7 +275,7 @@ function SkinedLegion:OnLoad(data)
 	end
 end
 
-function SkinedLegion:SetOnPreLoad(onpreloadfn) --提前加载皮肤数据，好让其他组件应用
+function SkinedLegion:SetOnPreLoad(onpreloadfn) --提前加载皮肤数据，好让其他组件应用。因为组件本身没有 OnPreLoad 机制
 	self.inst.OnPreLoad = function(inst, data, ...)
 		if data ~= nil then
 			if data.skin ~= nil and SKINS_LEGION[data.skin] ~= nil then
