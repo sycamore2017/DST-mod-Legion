@@ -1006,6 +1006,9 @@ end
 
 --[ 计算补满一个值的所需最大最合适的数量。比如修复、充能的消耗之类的 ]--
 local function ComputCost(valuenow, valuemax, value, item)
+    if valuenow >= valuemax then
+        return 0
+    end
     local need = (valuemax - valuenow) / value
     value = math.ceil(need)
     if need ~= value then --说明不整除

@@ -13,12 +13,6 @@ local GeneTrans = Class(function(self, inst)
 		--种子名 = true
 	}
 
-	-- self.timedata = {
-	-- 	start = nil, --当前task开始的时间点
-	-- 	pass = nil, --单个的已经生长的时间
-	-- 	all = nil --单个的总体生长时间
-	-- }
-	-- self.timedata_fast = { start = nil, now = nil, max = TUNING.TOTAL_DAY_TIME*100 }
 	self.task_grow = nil
 	self.pause_reason = nil --暂停转化的原因。为 nil 代表没有暂停
 	self.time_mult = nil --当前转化速度。为 nil 或 0 代表停止转化
@@ -30,7 +24,6 @@ local GeneTrans = Class(function(self, inst)
 	-- 	xx = {
 	-- 		mult = 1.5, --对转化速度的影响系数
 	-- 		time = 0, --剩余影响点数，如果为 nil 代表无时间限制
-	-- 		timemax = 100 --time 的最大值
 	-- 	}
 	-- }
 
@@ -75,6 +68,16 @@ local function SpawnLootFruit(self, doer, loot)
 		TOOLS_L.SpawnStackDrop(self.seeddata.fruit, num, self.inst:GetPosition(), doer, loot, { dropper = self.inst })
 	end
 end
+local function SetPushAnim(inst, anim, animpush, isloop)
+	if not (inst.AnimState:IsCurrentAnimation(animpush) or inst.AnimState:IsCurrentAnimation(anim)) then
+		if inst:IsAsleep() then
+			inst.AnimState:PlayAnimation(animpush, isloop)
+		else
+			inst.AnimState:PlayAnimation(anim)
+			inst.AnimState:PushAnimation(animpush, isloop)
+		end
+	end
+end
 local function OnPickedFn(inst, doer)
 	local cpt = inst.components.genetrans
 	local loot = {}
@@ -87,9 +90,9 @@ local function OnPickedFn(inst, doer)
 		cpt.seed = nil
 		cpt.seeddata = nil
 		cpt.seednum = 0
-		cpt.timedata.start = nil
-		cpt.timedata.all = nil
-		cpt.timedata.pass = nil
+		cpt.time_start = nil
+		cpt.time_all = nil
+		cpt.time_grow = nil
 		if cpt.fx ~= nil then
 			cpt.fx:Remove()
 			cpt.fx = nil
@@ -97,12 +100,7 @@ local function OnPickedFn(inst, doer)
 		if cpt.fn_setanim ~= nil then
 			cpt.fn_setanim(cpt, false)
 		end
-		if cpt.energynum <= 0 then
-			inst.AnimState:PlayAnimation("idle", false)
-		else
-			inst.AnimState:PlayAnimation("on_to_idle")
-			inst.AnimState:PushAnimation("idle", false)
-		end
+		SetPushAnim(inst, "on_to_idle", "idle", false)
 		cpt:SetLight(false)
 	else
 		cpt:UpdateFxProgress()
@@ -444,7 +442,7 @@ function GeneTrans:UpdateTimeMult() --更新转化速度
 			end
 			dt = dt - self.time_start
 			self.time_start = nil
-			self:StartGrowing()
+			self:StartTransing()
 			self:TimePassed(dt, true) --只增加 time_grow，这里不管转化
 		end
 		self.time_mult = multnew
@@ -474,16 +472,6 @@ function GeneTrans:SetFastReason(key, value) --设置影响转化速度的因素
 	end
 end
 
-local function SetPushAnim(inst, anim, animpush, isloop)
-	if not (inst.AnimState:IsCurrentAnimation(animpush) or inst.AnimState:IsCurrentAnimation(anim)) then
-		if inst:IsAsleep() then
-			inst.AnimState:PlayAnimation(animpush, isloop)
-		else
-			inst.AnimState:PlayAnimation(anim)
-			inst.AnimState:PushAnimation(animpush, isloop)
-		end
-	end
-end
 function GeneTrans:OnEnergyChange() --能量变化时
 	if self.energynum <= 0 then --没有能量
 		self:SetPauseReason("noenergy", true)
@@ -540,7 +528,7 @@ function GeneTrans:Charge(items, doer) --充能
 
 	local value = items.sivturnenergy or 1.5
 	local need = TOOLS_L.ComputCost(self.energynum, self.energynum_max, value, items)
-    self.energynum = self.energynum + value*need
+    self.energynum = math.min(self.energynum + value*need, self.energynum_max)
 	self:OnEnergyChange()
 	self:UpdateFxProgress()
 
@@ -582,6 +570,7 @@ end
 
 function GeneTrans:LongUpdate(dt)
 	if self.time_start ~= nil then --没有暂停转化
+		self.time_start = GetTime() --得更新标记时间
 		self:TimePassed(dt, self.inst:IsAsleep()) --休眠时，只增加 time_grow
 	end
 end
@@ -595,11 +584,11 @@ function GeneTrans:OnEntityWake()
 	if self.task_grow == nil then
 		--刚加载时不处理什么，防止卡顿
 		--不管 time_grow 已有进度，让 task_grow 自己之后执行，反正只有几十秒
-		self:StartGrowing()
+		self:StartTransing()
 	end
 end
 function GeneTrans:OnSave()
-    local data = {}
+    local data = { energynum = self.energynum }
 	if self.seed ~= nil then
 		data.seed = self.seed
 		if self.seednum > 0 then
@@ -619,14 +608,13 @@ function GeneTrans:OnSave()
 			data.fruitnum = self.fruitnum
 		end
 	end
-	if self.energynum < self.energynum_max then
-		data.energynum = self.energynum
-	end
 	if self.fast_reason ~= nil then
 		for k, v in pairs(self.fast_reason) do
-			if v then
-				data.fast_reason = self.fast_reason
-				break
+			if v.mult ~= nil and v.mult >= 0 then
+				if data.fast_reason == nil then
+					data.fast_reason = {}
+				end
+				data.fast_reason[k] = { mult = v.mult, time = v.time }
 			end
 		end
 	end
@@ -675,12 +663,8 @@ function GeneTrans:OnLoad(data, newents)
 	if data.fast_reason ~= nil then
 		self.fast_reason = {}
 		for k, v in pairs(data.fast_reason) do
-			if v.mult ~= nil and v.mult > 0 then
-				self.fast_reason[k] = {
-					mult = v.mult,
-					time = v.time,
-					timemax = v.timemax
-				}
+			if v.mult ~= nil and v.mult >= 0 then
+				self.fast_reason[k] = { mult = v.mult, time = v.time }
 			end
 		end
 	end
@@ -716,39 +700,5 @@ function GeneTrans:OnLoad(data, newents)
 		self:OnEnergyChange()
 	end
 end
-
--- local function GetDetailString(self, doer, type)
--- 	if self.seed == nil then
--- 		return
--- 	end
-
--- 	local data = {
--- 		name = STRINGS.NAMES[string.upper(self.seed)] or self.seed,
--- 		seednum = tostring(self.seednum),
--- 		fruitnum = tostring(self.fruitnum),
--- 		timepass = 0,
--- 		timeall = 0,
--- 		power = tostring(OmitDecimalPoint(self.energynum/TUNING.TOTAL_DAY_TIME, 100)),
--- 		timefast = 0
--- 	}
--- 	if self.timedata_fast.now ~= nil then
--- 		data.timefast = OmitDecimalPoint(self.timedata_fast.now/TUNING.TOTAL_DAY_TIME, 100)
--- 	end
--- 	data.timefast = tostring(data.timefast)
-
--- 	if type == 2 then
--- 		if self.timedata.pass ~= nil then
--- 			data.timepass = OmitDecimalPoint(self.timedata.pass/TUNING.TOTAL_DAY_TIME, 100)
--- 		end
--- 		if self.timedata.all ~= nil then
--- 			data.timeall = OmitDecimalPoint(self.timedata.all/TUNING.TOTAL_DAY_TIME, 100)
--- 		end
--- 		data.timepass = tostring(data.timepass)
--- 		data.timeall = tostring(data.timeall)
--- 		return subfmt(STRINGS.NAMEDETAIL_L.TURN_D2, data)
--- 	else
--- 		return subfmt(STRINGS.NAMEDETAIL_L.TURN_D1, data)
--- 	end
--- end
 
 return GeneTrans

@@ -484,6 +484,7 @@ function PerennialCrop:OnEntityWake()
 end
 function PerennialCrop:LongUpdate(dt)
 	if self.time_start ~= nil then --没有暂停生长
+		self.time_start = GetTime() --得更新标记时间
 		self:TimePassed(dt, self.inst:IsAsleep()) --植株休眠时，只增加 time_grow
 	end
 end

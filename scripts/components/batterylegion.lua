@@ -93,6 +93,28 @@ local function TryCostEnergy(cpt, cost, doer)
 		return false
 	end
 end
+local function ComputCost(cpt, doer, step, now, max, mult)
+	if now >= max then
+		return 0, "NONEED"
+	end
+	local allnum
+	if cpt == nil then
+		allnum = math.floor(150 / mult)
+	else
+		allnum = math.floor(cpt.currentfuel / mult)
+	end
+	if allnum <= 0 then
+		return 0, "NOENERGY"
+	end
+	local cost = math.min(now + step, max) - now
+	if cost > allnum then
+		cost = allnum
+	end
+	if cpt ~= nil then
+		cpt:DoDelta(-cost*mult, doer)
+	end
+	return cost
+end
 function BatteryLegion:Do(doer, target)
 	local cost = 0
     local cpt = self.inst.components.fueled
@@ -117,68 +139,66 @@ function BatteryLegion:Do(doer, target)
 		target.prefab == "fimbul_axe" or --芬布尔斧
 		target.prefab == "spear_wathgrithr_lightning_charged" --充能奔雷矛
 	then
-		if target.components.finiteuses ~= nil and target.components.finiteuses:GetPercent() < 1 then
-			cost = 25
-			if not TryCostEnergy(cpt, cost, doer) then
-				return false, "NOENERGY"
+		if target.components.finiteuses ~= nil then
+			local finit = target.components.finiteuses
+			local reason
+			cost, reason = ComputCost(cpt, doer, 100, finit.current, finit.total, 0.5) --50/100
+			if reason ~= nil then
+				return false, reason
 			end
-			target.components.finiteuses:Repair(50)
+			finit:Repair(cost)
 		else
 			return false, "NONEED"
 		end
 	elseif target.components.genetrans ~= nil then --子圭·育
 		local gene = target.components.genetrans
-		local dd = gene.fast_reason ~= nil and gene.fast_reason["batterylgion"] or nil
+		local dd = gene.fast_reason ~= nil and gene.fast_reason["batterylegion"] or nil
 		if dd == nil then
-			dd = { mult = 2, time = 0, timemax = 500 }
+			dd = { mult = 2, time = 0 }
 		else
-		end
-		if gene.fast_reason ~= nil then
-			if
-				gene.fast_reason["batterylgion"] ~= nil and
-				gene.fast_reason["batterylgion"].time ~= nil and
-				gene.fast_reason["batterylgion"].time
-			then
-				
+			dd.mult = 2
+			if dd.time == nil then
+				dd.time = 0
 			end
 		end
 
-
-		if target.components.genetrans:GetFastTimePercent() <= 0.99 then
-			cost = 50
-			if not TryCostEnergy(cpt, cost, doer) then
-				return false, "NOENERGY"
-			end
-			target.components.genetrans:AddFastTime(TUNING.TOTAL_DAY_TIME*10)
-		else
-			return false, "NONEED"
+		local reason
+		cost, reason = ComputCost(cpt, doer, 60, dd.time, gene.energynum_max, 2.5) --150/60
+		if reason ~= nil then
+			return false, reason
 		end
+		dd.time = dd.time + cost
+		gene:SetFastReason("batterylegion", dd)
 	elseif
 		target.prefab == "firesuppressor" or --雪球发射器
 		target.prefab == "winona_battery_low" or --薇诺娜的发电机
 		target.prefab == "nightstick" --晨星锤
 	then
-		if target.components.fueled ~= nil and target.components.fueled:GetPercent() < 0.99 then
-			if target.prefab ~= "nightstick" and not target.components.fueled.accepting then
+		if target.components.fueled ~= nil then
+			local fueled = target.components.fueled
+			if target.prefab ~= "nightstick" and not fueled.accepting then
 				return false, "REFUSE"
 			end
+			if fueled.maxfuel <= 0 then
+				return false, "NOUSE"
+			end
+			local reason
 			if target.prefab == "firesuppressor" then
-				cost = 20
+				cost = 40
 			elseif target.prefab == "winona_battery_low" then
-				cost = 10
+				cost = 20
 			else
-				cost = 15
+				cost = 30
 			end
-			if not TryCostEnergy(cpt, cost, doer) then
-				return false, "NOENERGY"
+			cost, reason = ComputCost(cpt, doer, fueled.maxfuel, fueled.currentfuel, fueled.maxfuel, cost/fueled.maxfuel)
+			if reason ~= nil then
+				return false, reason
 			end
-			local fueled = target.components.fueled
-			local value = fueled.maxfuel*0.5
-			fueled:DoDelta(value, doer)
+			fueled:DoDelta(cost, doer)
 			if fueled.ontakefuelfn ~= nil then
-				fueled.ontakefuelfn(target, value)
+				fueled.ontakefuelfn(target, cost)
 			end
-			target:PushEvent("takefuel", { fuelvalue = value })
+			target:PushEvent("takefuel", { fuelvalue = cost })
 		else
 			return false, "NONEED"
 		end

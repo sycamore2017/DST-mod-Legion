@@ -4150,10 +4150,12 @@ STRINGS.NAMEDETAIL_L = {
     XEEDS = " Xeeds",
     DIGEST = "[{doer}] fed {items} to the {eater}.",
     DIGESTSELF = "{eater} digested {items}.",
-    TURN_D1 = "[{name}] {seednum} doing; Energy {power} days; Acceleration {timefast} days.",
-    TURN_D2 = "[{name}] {seednum} doing, {fruitnum} done; Now {timepass}/{timeall} days; Energy {power} days; Acceleration {timefast} days.",
+    -- TURN_D1 = "[{name}] {seednum} doing; Energy {power} days; Acceleration {timefast} days.",
+    -- TURN_D2 = "[{name}] {seednum} doing, {fruitnum} done; Now {timepass}/{timeall} days; Energy {power} days; Acceleration {timefast} days.",
     VASEHERB = "簇栽等级{c}/{cmax} 已吃数量{ea}/80\n吞食(半径{d_s} 数量{n_s} 消化{t_s}秒) 引诱半径{d_l}",
     CLOUDPINE = "簇栽等级{c}/{cmax}\n{st}/{stmax}阶段 侵扰{it}/{itmax}",
+    GENETRANS1 = "{s}(转化{n1} 完成{n2})\n当前{gr}/{grmax}天 {mt}%速度\n点数(能量{e} 加速{ft}) /{emax}",
+    GENETRANS2 = "点数(能量{e} 加速{ft}) /{emax}",
 }
 
 STRINGS.ACTIONS.SETMODE_L = {

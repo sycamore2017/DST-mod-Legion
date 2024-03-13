@@ -708,7 +708,7 @@ local function GetStatus_turn(inst)
     local cpt = inst.components.genetrans
     return (cpt == nil and "GENERIC")
         or (cpt.fruitnum > 0 and "DONE")
-        or (cpt.energytime <= 0 and "NOENERGY")
+        or (cpt.energynum <= 0 and "NOENERGY")
         or (cpt.seed and "DOING")
         or "GENERIC"
 end
@@ -725,8 +725,7 @@ local function OnWork_turn(inst, worker, workleft, numworks)
     else
         inst.worked_l = nil
     end
-
-    if cpt.energytime > 0 and cpt.seed ~= nil then
+    if cpt.energynum > 0 and cpt.seed ~= nil then
         inst.AnimState:PlayAnimation("hit_on")
         inst.AnimState:PushAnimation("on", true)
     else
@@ -749,33 +748,72 @@ local function OnDeconstruct_turn(inst, worker)
 end
 local function Fn_dealdata_turn(inst, data)
     local dd = {
-        v = tostring(data.v or 0),
-        vmax = tostring(data.vmax or 135),
-        st = tostring(data.st or 4),
-        h = tostring(data.h or 2)
+        e = tostring(data.e or 0), emax = tostring(data.emax or 500),
     }
-    return subfmt(STRINGS.NAMEDETAIL_L.SIVMASK, dd).."\n"..(STRINGS.NAMEDETAIL_L.SIVEQUIP_MODE[data.mo or 3])
+    if data.ft == -1 then
+        dd.ft = "∞"
+    else
+        dd.ft = tostring(data.ft or 0)
+    end
+    if data.s ~= nil then
+        dd.s = STRINGS.NAMES[string.upper(data.s)] or data.s
+        dd.n1 = tostring(data.n1 or 0)
+        dd.n2 = tostring(data.n2 or 0)
+        dd.mt = tostring(data.mt or 100)
+        dd.gr = tostring(data.gr or 0)
+        dd.grmax = tostring(data.grmax or 0)
+        return subfmt(STRINGS.NAMEDETAIL_L.GENETRANS1, dd)
+    else
+        return subfmt(STRINGS.NAMEDETAIL_L.GENETRANS2, dd)
+    end
 end
 local function Fn_getdata_turn(inst)
     local data = {}
     local cpt = inst.components.genetrans
-
-
-    -- if inst.healthcounter > 0 then
-    --     data.v = TOOLS_L.ODPoint(inst.healthcounter, 10) --变化大的数据记得省略小数点
-    -- end
-    -- if inst.healthcounter_max ~= 135 then
-    --     data.vmax = inst.healthcounter_max
-    -- end
-    -- if inst.bloodsteal_l ~= 4 then
-    --     data.st = inst.bloodsteal_l
-    -- end
-    -- if inst.healpower_l ~= 2 then
-    --     data.h = inst.healpower_l
-    -- end
-    -- if inst.components.modelegion.now ~= 3 then
-    --     data.mo = inst.components.modelegion.now
-    -- end
+    if cpt.energynum ~= 0 then
+        data.e = TOOLS_L.ODPoint(cpt.energynum, 10)
+    end
+    if cpt.energynum_max ~= 500 then
+        data.emax = cpt.energynum_max
+    end
+    if cpt.seed ~= nil then
+        data.s = cpt.seed
+        if cpt.seednum > 0 then
+            data.n1 = cpt.seednum
+        end
+        if cpt.fruitnum > 0 then
+            data.n2 = cpt.fruitnum
+        end
+        if cpt.pause_reason ~= nil or cpt.time_mult == nil or cpt.time_mult <= 0 then
+            data.mt = 0
+        elseif cpt.time_mult ~= 1 then
+            data.mt = math.floor(cpt.time_mult*100)
+        end
+        if cpt.time_grow ~= nil and cpt.time_grow > 0 then
+            data.gr = TOOLS_L.ODPoint(cpt.time_grow/TUNING.TOTAL_DAY_TIME, 100)
+        end
+        if cpt.time_all ~= nil and cpt.time_all > 0 then
+            data.grmax = TOOLS_L.ODPoint(cpt.time_all/TUNING.TOTAL_DAY_TIME, 100)
+        end
+    end
+    if cpt.fast_reason ~= nil then
+        local ft = 0
+        for k, v in pairs(cpt.fast_reason) do
+            if v.mult ~= nil and v.mult > 0 then
+                if v.time == nil then
+                    ft = -1
+                    break
+                else
+                    if v.time > ft then
+                        ft = v.time
+                    end
+                end
+            end
+        end
+        if ft ~= 0 then
+            data.ft = ft
+        end
+    end
     return data
 end
 
@@ -808,7 +846,7 @@ table.insert(prefs, Prefab("siving_turn", function()
     inst:AddComponent("skinedlegion")
     inst.components.skinedlegion:Init("siving_turn")
 
-    -- TOOLS_L.InitMouseInfo(inst, Fn_dealdata_turn, Fn_getdata_turn, 3.5)
+    TOOLS_L.InitMouseInfo(inst, Fn_dealdata_turn, Fn_getdata_turn, 3.5)
 
     inst.entity:SetPristine()
     if not TheWorld.ismastersim then return inst end
