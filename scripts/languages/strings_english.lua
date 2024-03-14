@@ -4147,15 +4147,14 @@ STRINGS.NAMEDETAIL_L = {
     SPACE = ", ",
     SIVPLANT = "{des}{st}/{stmax}Stage, {li}/{limax}Days, {gr}%Rate\nNut. (Formula {n1} Cure {n2} Need {n3}) /{n1max}\nMoi.{mo}/{momax}, Pollen{pl}/{plmax}, Pest{sk}%, Infest{it}/{itmax}\nSatisfaction {np}/5",
     SIVPLANT2 = "{des}{st}/{stmax}Stage, {li}/{limax}Days, {gr}%Rate\nNut. (Formula {n1} Cure {n2} Need {n3}) /{n1max}\nMoi.{mo}/{momax}, Pollen{pl}/{plmax}, Pest{sk}%, Infest{it}/{itmax}\nSummary (Nut. {nn} Moi. {nm} Tend {nt})",
+    XPLANT = "Cluster Lv. {c}/{cmax}\n{des}{st}/{stmax}Stage, {li}/{limax}Days, {gr}%Rate\nPollen {pl}/{plmax}, Infest {it}/{itmax}",
     XEEDS = " Xeeds",
     DIGEST = "[{doer}] fed {items} to the {eater}.",
     DIGESTSELF = "{eater} digested {items}.",
-    -- TURN_D1 = "[{name}] {seednum} doing; Energy {power} days; Acceleration {timefast} days.",
-    -- TURN_D2 = "[{name}] {seednum} doing, {fruitnum} done; Now {timepass}/{timeall} days; Energy {power} days; Acceleration {timefast} days.",
-    VASEHERB = "簇栽等级{c}/{cmax} 已吃数量{ea}/80\n吞食(半径{d_s} 数量{n_s} 消化{t_s}秒) 引诱半径{d_l}",
-    CLOUDPINE = "簇栽等级{c}/{cmax}\n{st}/{stmax}阶段 侵扰{it}/{itmax}",
-    GENETRANS1 = "{s}(转化{n1} 完成{n2})\n当前{gr}/{grmax}天 {mt}%速度\n点数(能量{e} 加速{ft}) /{emax}",
-    GENETRANS2 = "点数(能量{e} 加速{ft}) /{emax}",
+    VASEHERB = "Cluster Lv. {c}/{cmax}, Eated {ea}/80\nSwallow(Rad.{d_s} Num.{n_s} CD.{t_s}sec), Lure Rad.{d_l}",
+    CLOUDPINE = "Cluster Lv. {c}/{cmax}\n{st}/{stmax} Stage, Infest {it}/{itmax}",
+    GENETRANS1 = "{s}(Doing {n1} Done {n2})\nCurrent {gr}/{grmax} Days, {mt}% Rate\nPoints (Energy {e} SpeedUp {ft}) /{emax}",
+    GENETRANS2 = "Points (Energy {e} SpeedUp {ft}) /{emax}",
 }
 
 STRINGS.ACTIONS.SETMODE_L = {

@@ -231,7 +231,10 @@ local dressup_data = {
     goldenpickaxe = { buildfile = "swap_goldenpickaxe", buildsymbol = "swap_goldenpickaxe" },
     shovel = { buildfile = "swap_shovel", buildsymbol = "swap_shovel" },
     goldenshovel = { buildfile = "swap_goldenshovel", buildsymbol = "swap_goldenshovel" },
-    multitool_axe_pickaxe = { buildfile = "swap_multitool_axe_pickaxe", buildsymbol = "swap_object" },
+    multitool_axe_pickaxe = {
+        buildfile = "swap_multitool_axe_pickaxe",
+        buildsymbol = "swap_multitool_axe_pickaxe"
+    },
     hammer = { buildfile = "swap_hammer", buildsymbol = "swap_hammer" },
     pitchfork = { buildfile = "swap_pitchfork", buildsymbol = "swap_pitchfork" },
     saddlehorn = { buildfile = "swap_saddlehorn", buildsymbol = "swap_saddlehorn" },

@@ -261,6 +261,7 @@ _G.CONFIGS_LEGION = {
     LANGUAGES = GetModConfigData("Language") or "chinese", --语言
     CLEANINGUPSTENCH = GetModConfigData("CleaningUpStench"), --自动清除地上的臭臭
     AUTOSTACKEDLOOT = GetModConfigData("AutoStackedLoot"), --掉落物自动堆叠
+    MOUSEINFO = GetModConfigData("MouseInfo"), --鼠标悬停展示特殊信息
 
     FLOWERWEAPONSCHANCE = GetModConfigData("FlowerWeaponsChance"), --花剑掉落几率
     FOLIAGEATHCHANCE = GetModConfigData("FoliageathChance"), --青枝绿叶掉落几率

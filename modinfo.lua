@@ -72,6 +72,25 @@ configuration_options = L and {
         },
         default = false
     },
+    {   name = "MouseInfo",
+        label = "Mouse Hover Display Info",
+        hover = "When the mouse points to some items, it displays special info about that item.",
+        options = {
+            {description = "Disable", data = 0},
+            {description = "0.5 sec limit", data = 0.5},
+            {description = "0.8 sec limit", data = 0.8},
+            {description = "1 sec limit(default)", data = 1},
+            {description = "1.2 sec limit", data = 1.2},
+            {description = "1.5 sec limit", data = 1.5},
+            {description = "2 sec limit", data = 2},
+            {description = "2.5 sec limit", data = 2.5},
+            {description = "3 sec limit", data = 3},
+            {description = "3.5 sec limit", data = 3.5},
+            {description = "4 sec limit", data = 4},
+            {description = "4.5 sec limit", data = 4.5}
+        },
+        default = 1
+    },
 
     {name = "Title", label = "", options = {{description = "", data = ""}}, default = ""},
     {name = "Title", label = "The Power of Flowers", options = {{description = "", data = ""}}, default = ""},
@@ -599,6 +618,25 @@ configuration_options = L and {
             {description = "否(默认)", data = false}
         },
         default = false
+    },
+    {   name = "MouseInfo",
+        label = "鼠标悬停展示特殊信息",
+        hover = "鼠标指向某些物品时，自动展示该物品的特殊信息。频率限制时间越久，刷新速度越慢。开了天眼吧。",
+        options = {
+            {description = "关闭该功能", data = 0},
+            {description = "频率0.5秒", data = 0.5},
+            {description = "频率0.8秒", data = 0.8},
+            {description = "频率1秒(默认)", data = 1},
+            {description = "频率1.2秒", data = 1.2},
+            {description = "频率1.5秒", data = 1.5},
+            {description = "频率2秒", data = 2},
+            {description = "频率2.5秒", data = 2.5},
+            {description = "频率3秒", data = 3},
+            {description = "频率3.5秒", data = 3.5},
+            {description = "频率4秒", data = 4},
+            {description = "频率4.5秒", data = 4.5}
+        },
+        default = 1
     },
 
     {name = "Title", label = "", options = {{description = "", data = ""}}, default = ""},
