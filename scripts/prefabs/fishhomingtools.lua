@@ -55,7 +55,6 @@ local prefabs_normal = {
 
 local function Fn_normal()
     local inst = CreateEntity()
-
     inst.entity:AddTransform()
     inst.entity:AddAnimState()
     inst.entity:AddNetwork()
@@ -66,8 +65,7 @@ local function Fn_normal()
     inst.AnimState:SetBuild("fishhomingtool_normal")
     inst.AnimState:PlayAnimation("idle")
 
-    inst:AddComponent("skinedlegion")
-    inst.components.skinedlegion:Init("fishhomingtool_normal")
+    LS_C_Init(inst, "fishhomingtool_normal", false)
 
     inst.entity:SetPristine()
     if not TheWorld.ismastersim then return inst end
@@ -96,7 +94,7 @@ local function Fn_normal()
 
     MakeHauntableLaunchAndIgnite(inst)
 
-    inst.components.skinedlegion:SetOnPreLoad()
+    LS_C_OnPreLoad(inst)
 
     return inst
 end
@@ -114,7 +112,6 @@ local assets_awesome = {
 
 local function Fn_awesome()
     local inst = CreateEntity()
-
     inst.entity:AddTransform()
     inst.entity:AddAnimState()
     inst.entity:AddNetwork()
@@ -125,8 +122,7 @@ local function Fn_awesome()
     inst.AnimState:SetBuild("fishhomingtool_awesome")
     inst.AnimState:PlayAnimation("idle")
 
-    inst:AddComponent("skinedlegion")
-    inst.components.skinedlegion:Init("fishhomingtool_awesome")
+    LS_C_Init(inst, "fishhomingtool_awesome", false)
 
     inst.entity:SetPristine()
     if not TheWorld.ismastersim then return inst end
@@ -149,7 +145,7 @@ local function Fn_awesome()
 
     MakeHauntableLaunchAndIgnite(inst)
 
-    inst.components.skinedlegion:SetOnPreLoad()
+    LS_C_OnPreLoad(inst)
 
     return inst
 end
@@ -225,7 +221,6 @@ local function OnAddProjectile(inst)
     inst.components.complexprojectile:SetOnLaunch(OnThrown)
     inst.components.complexprojectile:SetOnHit(OnHit)
 end
-
 local function OnEquip(inst, owner)
     local data = inst.baitimgs_l[inst.components.fishhomingbait.type_shape]
     if data ~= nil then
@@ -259,10 +254,37 @@ local function OnUnequip(inst, owner)
     owner.AnimState:Hide("ARM_carry")
     owner.AnimState:Show("ARM_normal")
 end
+local function DisplayName_bag(inst)
+    local namepre = ""
+
+    for k, str in pairs(STRINGS.FISHHOMING2_LEGION) do
+        if inst:HasTag("FH_"..k) then
+            namepre = str
+            break
+        end
+    end
+    for k, str in pairs(STRINGS.FISHHOMING1_LEGION) do
+        if inst:HasTag("FH_"..k) then
+            namepre = str..namepre
+            break
+        end
+    end
+
+    local times = 0
+    for k, str in pairs(STRINGS.FISHHOMING3_LEGION) do
+        if inst:HasTag("FH_"..k) then
+            namepre = str..namepre
+            times = times + 1
+
+            if times >= 2 then break end
+        end
+    end
+
+    return namepre..STRINGS.NAMES.FISHHOMINGBAIT
+end
 
 local function Fn_bag()
     local inst = CreateEntity()
-
     inst.entity:AddTransform()
     inst.entity:AddAnimState()
     inst.entity:AddSoundEmitter()
@@ -292,38 +314,9 @@ local function Fn_bag()
 
     inst:AddTag("allow_action_on_impassable")
 
-    inst:AddComponent("skinedlegion")
-    inst.components.skinedlegion:Init("fishhomingbait")
+    LS_C_Init(inst, "fishhomingbait", false)
 
-    inst.displaynamefn = function(inst)
-        local namepre = ""
-
-        for k,str in pairs(STRINGS.FISHHOMING2_LEGION) do
-            if inst:HasTag("FH_"..k) then
-                namepre = str
-                break
-            end
-        end
-
-        for k,str in pairs(STRINGS.FISHHOMING1_LEGION) do
-            if inst:HasTag("FH_"..k) then
-                namepre = str..namepre
-                break
-            end
-        end
-
-        local times = 0
-        for k,str in pairs(STRINGS.FISHHOMING3_LEGION) do
-            if inst:HasTag("FH_"..k) then
-                namepre = str..namepre
-                times = times + 1
-
-                if times >= 2 then break end
-            end
-        end
-
-		return namepre..STRINGS.NAMES.FISHHOMINGBAIT
-    end
+    inst.displaynamefn = DisplayName_bag
 
     inst.entity:SetPristine()
     if not TheWorld.ismastersim then return inst end
@@ -376,7 +369,7 @@ local function Fn_bag()
 
     MakeHauntableLaunch(inst)
 
-    inst.components.skinedlegion:SetOnPreLoad()
+    LS_C_OnPreLoad(inst)
 
     return inst
 end

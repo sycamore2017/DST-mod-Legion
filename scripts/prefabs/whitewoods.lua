@@ -594,7 +594,6 @@ end
 local function MakeChest(data)
     table.insert(prefs, Prefab(data.name, function()
         local inst = CreateEntity()
-
         inst.entity:AddTransform()
         inst.entity:AddAnimState()
         inst.entity:AddSoundEmitter()
@@ -612,8 +611,7 @@ local function MakeChest(data)
 
         TOOLS_L.MakeSnowCovered_comm(inst)
 
-        inst:AddComponent("skinedlegion")
-        inst.components.skinedlegion:Init(data.name)
+        LS_C_Init(inst, data.name, false)
 
         if data.fn_common ~= nil then
             data.fn_common(inst)
@@ -653,8 +651,6 @@ local function MakeChest(data)
         inst:ListenForEvent("itemget", ItemGet_chest)
         inst:ListenForEvent("itemlose", ItemLose_chest)
 
-        -- inst.components.skinedlegion:SetOnPreLoad()
-
         if data.fn_server ~= nil then
             data.fn_server(inst)
         end
@@ -662,6 +658,8 @@ local function MakeChest(data)
         if TUNING.FUNCTIONAL_MEDAL_IS_OPEN then
             SetImmortalable(inst, 2, nil)
         end
+
+        -- LS_C_OnPreLoad(inst)
 
         return inst
     end, data.assets, data.prefabs))

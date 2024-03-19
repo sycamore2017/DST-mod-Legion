@@ -564,8 +564,7 @@ table.insert(prefs, Prefab("tourmalinecore", function() ------电气石
 
     inst.pickupsound = "gem"
 
-    inst:AddComponent("skinedlegion")
-    inst.components.skinedlegion:Init("tourmalinecore")
+    LS_C_Init(inst, "tourmalinecore", false)
 
     inst.entity:SetPristine()
     if not TheWorld.ismastersim then return inst end

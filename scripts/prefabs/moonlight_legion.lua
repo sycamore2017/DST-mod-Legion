@@ -19,8 +19,7 @@ local function MakeItem(sets)
         inst.AnimState:SetBuild(sets.name)
         inst.AnimState:PlayAnimation("idle_item")
 
-        inst:AddComponent("skinedlegion")
-        inst.components.skinedlegion:InitWithFloater(basename)
+        LS_C_Init(inst, basename, true)
 
         inst.entity:SetPristine()
         if not TheWorld.ismastersim then return inst end
@@ -36,7 +35,7 @@ local function MakeItem(sets)
 
         MakeHauntableLaunch(inst)
 
-        -- inst.components.skinedlegion:SetOnPreLoad() --它没有装备组件，不需要 OnPreLoad 吧
+        -- LS_C_OnPreLoad(inst) --它没有装备组件，不需要 OnPreLoad
 
         return inst
     end, {
@@ -349,9 +348,7 @@ table.insert(prefs, Prefab("hiddenmoonlight", function()
 
     InitLevelNet(inst, Fn_nameDetail_hidden)
 
-    inst:AddComponent("skinedlegion")
-    inst.components.skinedlegion:OverrideSkin("hiddenmoonlight_item", "data_up")
-    inst.components.skinedlegion:Init("hiddenmoonlight_item")
+    LS_C_Init(inst, "hiddenmoonlight_item", false, "data_up")
 
     inst.entity:SetPristine()
     if not TheWorld.ismastersim then
@@ -404,7 +401,7 @@ table.insert(prefs, Prefab("hiddenmoonlight", function()
 		SMART_SIGN_DRAW(inst)
 	end
 
-    -- inst.components.skinedlegion:SetOnPreLoad()
+    -- LS_C_OnPreLoad(inst)
 
     if TUNING.FUNCTIONAL_MEDAL_IS_OPEN then
         SetImmortalable(inst, 2, nil)
@@ -857,17 +854,15 @@ local function MakeRevolved(sets)
         inst.AnimState:SetBuild("revolvedmoonlight")
         inst.AnimState:PlayAnimation("closed")
 
-        inst:AddComponent("skinedlegion")
         if sets.ispro then
             inst.AnimState:OverrideSymbol("decorate", "revolvedmoonlight", "decoratepro")
             inst:SetPrefabNameOverride("revolvedmoonlight")
-            inst.components.skinedlegion:OverrideSkin("revolvedmoonlight_item", "data_uppro")
+            LS_C_Init(inst, "revolvedmoonlight_item", true, "data_uppro")
             InitLevelNet(inst, Fn_nameDetail_revolved2)
         else
-            inst.components.skinedlegion:OverrideSkin("revolvedmoonlight_item", "data_up")
+            LS_C_Init(inst, "revolvedmoonlight_item", true, "data_up")
             InitLevelNet(inst, Fn_nameDetail_revolved)
         end
-        inst.components.skinedlegion:InitWithFloater("revolvedmoonlight_item")
 
         inst:AddTag("meteor_protection") --防止被流星破坏
         --因为有容器组件，所以不会被猴子、食人花、坎普斯等拿走
@@ -930,7 +925,7 @@ local function MakeRevolved(sets)
         OnOwnerChange(inst)
         inst.OnRemoveEntity = OnRemove_light
 
-        -- inst.components.skinedlegion:SetOnPreLoad() --它没有装备组件，不需要 OnPreLoad 吧
+        -- LS_C_OnPreLoad(inst) --它没有装备组件，不需要 OnPreLoad
 
         if TUNING.FUNCTIONAL_MEDAL_IS_OPEN then
             SetImmortalable(inst, 2, nil)
@@ -1300,8 +1295,7 @@ table.insert(prefs, Prefab("refractedmoonlight", function()
 
     InitLevelNet(inst, Fn_nameDetail_refracted)
 
-    inst:AddComponent("skinedlegion")
-    inst.components.skinedlegion:Init("refractedmoonlight")
+    LS_C_Init(inst, "refractedmoonlight", false)
 
     inst.entity:SetPristine()
     if not TheWorld.ismastersim then return inst end
@@ -1398,8 +1392,7 @@ table.insert(prefs, Prefab("refractedmoonlight", function()
 
     inst.OnSave = OnSave_refracted
     inst.OnLoad = OnLoad_refracted
-
-    inst.components.skinedlegion:SetOnPreLoad()
+    LS_C_OnPreLoad(inst)
 
     return inst
 end, {

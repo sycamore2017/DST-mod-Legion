@@ -352,24 +352,7 @@ table.insert(prefs, Prefab("backcub", function()
     inst:AddTag("eatsrawmeat")
     inst:AddTag("strongstomach")
 
-    --漂浮动画与地面动画的修改
-    -- MakeInventoryFloatable(inst, "small", 0, nil, false, -9)
-    -- inst.components.floater.OnLandedClient = function(self) --取消掉进海里时生成的波纹特效
-    --     self.showing_effect = true
-    -- end
-    -- local OnLandedServer_old = inst.components.floater.OnLandedServer
-    -- inst.components.floater.OnLandedServer = function(self) --掉进海里时使用自己的水面动画
-    --     OnLandedServer_old(self)
-    --     inst.AnimState:PlayAnimation(self:IsFloating() and "anim_water" or "anim", true)
-    -- end
-    -- local OnNoLongerLandedServer_old = inst.components.floater.OnNoLongerLandedServer
-    -- inst.components.floater.OnNoLongerLandedServer = function(self) --非待在海里时使用自己的陆地动画
-    --     OnNoLongerLandedServer_old(self)
-    --     inst.AnimState:PlayAnimation(self:IsFloating() and "anim_water" or "anim", true)
-    -- end
-
-    inst:AddComponent("skinedlegion")
-    inst.components.skinedlegion:InitWithFloater("backcub")
+    LS_C_Init(inst, "backcub", true)
 
     inst.entity:SetPristine()
     if not TheWorld.ismastersim then return inst end
@@ -409,8 +392,7 @@ table.insert(prefs, Prefab("backcub", function()
     inst.OnLongUpdate = OnLongUpdate_backcub
     inst.OnEntitySleep = OnEntitySleep_backcub
     inst.OnEntityWake = OnEntityWake_backcub
-
-    inst.components.skinedlegion:SetOnPreLoad()
+    LS_C_OnPreLoad(inst)
 
     return inst
 end, GetAssets("backcub", {
@@ -611,8 +593,7 @@ table.insert(prefs, Prefab("armor_elepheetle", function()
     inst:AddTag("rp_bugshell_l")
     inst:AddTag("show_broken_ui") --装备损坏后展示特殊物品栏ui
 
-    -- inst:AddComponent("skinedlegion")
-    -- inst.components.skinedlegion:InitWithFloater("armor_elepheetle")
+    -- LS_C_Init(inst, "armor_elepheetle", true)
 
     MakeInventoryFloatable(inst, "small", 0.4, 0.95)
     local OnLandedClient_old = inst.components.floater.OnLandedClient
@@ -641,7 +622,7 @@ table.insert(prefs, Prefab("armor_elepheetle", function()
 
     TOOLS_L.MakeNoLossRepairableEquipment(inst, foreverequip_beetlearmor)
 
-    -- inst.components.skinedlegion:SetOnPreLoad()
+    -- LS_C_OnPreLoad(inst)
 
     return inst
 end, GetAssets("armor_elepheetle"), nil))
@@ -859,10 +840,8 @@ table.insert(prefs, Prefab("boltwingout", function()
     local inst = CreateEntity()
     Fn_common(inst, "swap_boltwingout", nil, nil, nil, "dontstarve/movement/foley/grassarmour")
     SetBackpack_common(inst, "boltwingout", OnEntityReplicated_boltout)
+    LS_C_Init(inst, "boltwingout", true)
     -- inst.foleysound = "legion/foleysound/insect"
-
-    inst:AddComponent("skinedlegion")
-    inst.components.skinedlegion:InitWithFloater("boltwingout")
 
     inst.entity:SetPristine()
     if not TheWorld.ismastersim then return inst end
@@ -880,7 +859,7 @@ table.insert(prefs, Prefab("boltwingout", function()
 
     MakeHauntableLaunchAndDropFirstItem(inst)
 
-    inst.components.skinedlegion:SetOnPreLoad()
+    LS_C_OnPreLoad(inst)
 
     return inst
 end, GetAssets2("boltwingout", "swap_boltwingout", { Asset("ANIM", "anim/ui_piggyback_2x6.zip") }), {
@@ -1021,9 +1000,7 @@ table.insert(prefs, Prefab("siving_suit", function()
     local inst = CreateEntity()
     Fn_common(inst, "siving_suit", nil, nil, nil, "dontstarve/movement/foley/marblearmour")
     TOOLS_L.InitMouseInfo(inst, Fn_dealdata_sivsuit, Fn_getdata_sivsuit)
-
-    inst:AddComponent("skinedlegion")
-    inst.components.skinedlegion:Init("siving_suit")
+    LS_C_Init(inst, "siving_suit", false)
 
     inst.entity:SetPristine()
     if not TheWorld.ismastersim then return inst end
@@ -1048,7 +1025,7 @@ table.insert(prefs, Prefab("siving_suit", function()
 
     MakeHauntableLaunch(inst)
 
-    inst.components.skinedlegion:SetOnPreLoad()
+    LS_C_OnPreLoad(inst)
 
     return inst
 end, GetAssets("siving_suit"), prefabs_sivsuit))
@@ -1161,12 +1138,10 @@ table.insert(prefs, Prefab("siving_suit_gold", function()
     Fn_common(inst, "siving_suit_gold", nil, nil, nil, "dontstarve/movement/foley/marblearmour")
     SetBackpack_common(inst, "siving_suit_gold", OnEntityReplicated_sivsuit2)
     TOOLS_L.InitMouseInfo(inst, Fn_dealdata_sivsuit2, Fn_getdata_sivsuit2)
+    LS_C_Init(inst, "siving_suit_gold", false)
 
     inst:AddTag("cansetmode_l")
     inst:AddTag("modemystery_l")
-
-    inst:AddComponent("skinedlegion")
-    inst.components.skinedlegion:Init("siving_suit_gold")
 
     inst.entity:SetPristine()
     if not TheWorld.ismastersim then return inst end
@@ -1194,7 +1169,7 @@ table.insert(prefs, Prefab("siving_suit_gold", function()
 
     MakeHauntableLaunch(inst)
 
-    inst.components.skinedlegion:SetOnPreLoad()
+    LS_C_OnPreLoad(inst)
 
     return inst
 end, GetAssets("siving_suit_gold", { Asset("ANIM", "anim/ui_piggyback_2x6.zip") }), prefabs_sivsuit))

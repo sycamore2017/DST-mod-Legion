@@ -1107,8 +1107,7 @@ local function MakeWeapon(data)
         inst.AnimState:PlayAnimation("idle", false)
         inst.Transform:SetEightFaced()
 
-        inst:AddComponent("skinedlegion")
-        inst.components.skinedlegion:InitWithFloater(data.name)
+        LS_C_Init(inst, data.name, true)
 
         inst.projectiledelay = 2 * FRAMES --不能大于7帧
 
@@ -1264,7 +1263,7 @@ local function MakeWeapon(data)
 
         MakeHauntableLaunch(inst)
 
-        inst.components.skinedlegion:SetOnPreLoad()
+        LS_C_OnPreLoad(inst)
 
         return inst
     end, {

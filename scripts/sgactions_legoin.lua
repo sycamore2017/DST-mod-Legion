@@ -204,8 +204,8 @@ end
 
 _G.REPAIRERS_L["silk"] = {
     fn_try = Fn_try_guitar, --【客户端】
-    fn_sg = Fn_sg_handy, --【服务端、客户端】
-    fn_do = function(act) --【服务端】
+    fn_sg = Fn_sg_handy, --【服务器、客户端】
+    fn_do = function(act) --【服务器】
         local value = TUNING.TOTAL_DAY_TIME*0.1*(act.doer.mult_repair_l or 1)
         return DoFueledRepair(act.doer, act.invobject, act.target, value, "GUITAR")
     end

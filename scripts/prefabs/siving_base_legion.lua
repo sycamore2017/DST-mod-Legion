@@ -468,8 +468,7 @@ table.insert(prefs, Prefab("siving_derivant", function()
     inst:AddTag("flatrotated_l") --棱镜标签：旋转时旋转180度
     inst:AddTag("trader")
 
-    inst:AddComponent("skinedlegion")
-    inst.components.skinedlegion:Init("siving_derivant")
+    LS_C_Init(inst, "siving_derivant", false)
 
     TOOLS_L.InitMouseInfo(inst, Fn_dealdata_dt, Fn_getdata_dt)
 
@@ -519,7 +518,7 @@ table.insert(prefs, Prefab("siving_derivant", function()
 
     MakeHauntableWork(inst)
 
-    -- inst.components.skinedlegion:SetOnPreLoad()
+    -- LS_C_OnPreLoad(inst)
 
     return inst
 end, { Asset("ANIM", "anim/siving_derivant.zip") }, { "siving_derivant_item", "siving_rocks" }))

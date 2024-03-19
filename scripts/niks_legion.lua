@@ -1,9 +1,11 @@
-------skined_legion
-
 local _G = GLOBAL
 local IsServer = TheNet:GetIsServer() or TheNet:IsDedicated()
 local ischinese = _G.CONFIGS_LEGION.LANGUAGES == "chinese"
 local TOOLS_L = require("tools_legion")
+
+local rarityRepay = "ProofOfPurchase"
+local rarityFree = "Distinguished"
+local raritySpecial = "HeirloomElegant"
 
 table.insert(Assets, Asset("ATLAS", "images/icon_skinbar_shadow_l.xml"))
 table.insert(Assets, Asset("IMAGE", "images/icon_skinbar_shadow_l.tex"))
@@ -37,6 +39,8 @@ local skininvs = {
 --------------------------------------------------------------------------
 --[[ 皮肤函数 ]]
 --------------------------------------------------------------------------
+
+local battery_fx_tale = { name = "eleccore_spark_fx_tale", y = nil, y_rand = nil }
 
 ------特效设置
 
@@ -407,22 +411,13 @@ local function SetTarget_hidden(inst, build)
     end
 end
 
-------
-
-local battery_fx_tale = { name = "eleccore_spark_fx_tale", y = nil, y_rand = nil }
-
 --------------------------------------------------------------------------
---[[ 全局皮肤总数据，以及修改 ]]
+--[[ 皮肤数据，以及官方数据修改 ]]
 --------------------------------------------------------------------------
 
-local rarityRepay = "ProofOfPurchase"
-local rarityFree = "Distinguished"
-local raritySpecial = "HeirloomElegant"
-
-_G.SKIN_PREFABS_LEGION = {
+local SKIN_DEFAULT_LEGION = {
     --[[
     rosorns = {
-        assets = nil, --仅仅是用于初始化注册
         image = { name = nil, atlas = nil, setable = true }, --提前注册，或者皮肤初始化使用
 
         anim = { --皮肤初始化使用
@@ -432,8 +427,8 @@ _G.SKIN_PREFABS_LEGION = {
         },
         -- fn_anim = function(inst)end, --处于地面时的动画设置，替换anim的默认方式
 
-        -- fn_start = function(inst)end, --应用皮肤时的函数(服务端)
-        -- fn_end = nil, --取消皮肤时的函数(服务端)
+        -- fn_start = function(inst)end, --应用皮肤时的函数(服务器)
+        -- fn_end = nil, --取消皮肤时的函数(服务器)
         -- fn_start_c = nil, --应用皮肤时的函数(客户端)
         -- fn_end_c = nil, --取消皮肤时的函数(客户端)
 
@@ -1077,8 +1072,7 @@ _G.SKIN_PREFABS_LEGION = {
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 }
     },
 }
-
-_G.SKINS_LEGION = {
+local SKINS_LEGION = {
     --[[
 	rosorns_spell = {
         base_prefab = "rosorns",
@@ -1116,8 +1110,8 @@ _G.SKINS_LEGION = {
         },
         -- fn_anim = function(inst)end, --处于地面时的动画设置，替换anim的默认方式
 
-        -- fn_start = function(inst)end, --应用皮肤时的函数(服务端)
-        -- fn_end = nil, --取消皮肤时的函数(服务端)
+        -- fn_start = function(inst)end, --应用皮肤时的函数(服务器)
+        -- fn_end = nil, --取消皮肤时的函数(服务器)
         -- fn_start_c = nil, --应用皮肤时的函数(客户端)
         -- fn_end_c = nil, --取消皮肤时的函数(客户端)
 
@@ -3365,8 +3359,7 @@ _G.SKINS_LEGION = {
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 }
     }
 }
-
-_G.SKIN_IDS_LEGION = {
+local SKIN_IDS_LEGION = {
     ["ooooonononon"] = {}, --免费皮肤全部装这里面，skin_id设置为"ooooonononon"就好了
     ["6278c409c340bf24ab311522"] = { --余生
         siving_derivant_thanks = true, siving_derivant_thanks2 = true, backcub_thanks = true,
@@ -3464,30 +3457,43 @@ _G.SKIN_IDS_LEGION = {
     -- ["61627d927bbb727be174c4a0"] = { --棋举不定
     -- }
 }
-_G.SKIN_IDX_LEGION = {
+local SKIN_IDX_LEGION = {
     -- [1] = "rosorns_spell",
 }
 
-------
+local dirty_cache = true --代表皮肤数据是否需要保存成文件
+local ls_cache = { --所有玩家的已有皮肤缓存
+    -- Kxx_xxxx = { --用户ID
+    --     skinname1 = true,
+    --     skinname2 = true,
+    -- },
+}
+local ls_cache_ex = { --所有玩家的皮肤切换缓存
+    -- Kxx_xxxx = { --用户ID
+    --     prefab1 = "skinname1" --上次切换的皮肤名
+    -- }
+}
+local ls_players = { --所有进过这个档的玩家
+    -- Kxx_xxxx = true
+}
+local ls_cache_net = { --所有玩家的网络请求缓存
+    -- Kxx_xxxx = { --用户ID
+    --     GetSkins = { --某种请求
+    --         lastcode = nil, --上次请求的结果
+    --         lasttime = nil, --上次请求时的现实时间
+    --     }
+    -- }
+}
+local ls_skinneedclients = { --需要请求客户端数据的玩家
+    -- Kxx_xxxx = true
+}
+local ls_delaycheckitems = { --需要延迟判断皮肤有效性的物品
+    -- skinname = { ent = true }
+}
+local USERID = TheNet:GetUserID() or "OU_fake"
 
-local function InitData_anim(anim, bank, build)
-    if anim.bank == nil then
-        anim.bank = bank
-    end
-    if anim.build == nil then
-        anim.build = build
-    end
-    if anim.anim == nil then
-        anim.anim = "idle"
-    end
-    -- if anim.isloop ~= true then
-    --     anim.isloop = false
-    -- end
-end
-
-------
-
-local skinidxes = { --用以皮肤排序
+------皮肤排序
+local skinidxes = {
     "chest_whitewood_craft", "chest_whitewood_big_craft", "chest_whitewood_craft2", "chest_whitewood_big_craft2",
     "siving_ctlwater_item_era", "siving_ctlwater_era", "siving_ctldirt_item_era", "siving_ctldirt_era",
     "siving_ctlall_item_era", "siving_ctlall_era",
@@ -3520,13 +3526,14 @@ local skinidxes = { --用以皮肤排序
     "shield_l_log_emo_pride", "shield_l_sand_op", "pinkstaff_tvplay",  "hat_cowboy_tvplay", "hat_lichen_disguiser",
     "orchitwigs_disguiser"
 }
-for i,skinname in pairs(skinidxes) do
-    _G.SKIN_IDX_LEGION[i] = skinname
+for i, skinname in pairs(skinidxes) do
+    SKIN_IDX_LEGION[i] = skinname
 
-    local dd = _G.SKINS_LEGION[skinname]
+    local dd = SKINS_LEGION[skinname]
     dd.skin_idx = i
     if dd.overridekeys ~= nil then
         for _, v in ipairs(dd.overridekeys) do
+            -- dd[v].base_prefab = dd.base_prefab
             dd[v].skin_idx = i
             if dd[v].exchangefx == nil then --特效！
                 dd[v].exchangefx = dd.exchangefx
@@ -3534,12 +3541,28 @@ for i,skinname in pairs(skinidxes) do
         end
     end
 end
+skinidxes = nil
 
-for skinname,v in pairs(_G.SKINS_LEGION) do
-    if _G.SKIN_IDS_LEGION[v.skin_id] == nil then
-        _G.SKIN_IDS_LEGION[v.skin_id] = {}
+------皮肤相关数据补充
+local function InitData_anim(anim, bank, build)
+    if anim.bank == nil then
+        anim.bank = bank
     end
-    _G.SKIN_IDS_LEGION[v.skin_id][skinname] = true
+    if anim.build == nil then
+        anim.build = build
+    end
+    if anim.anim == nil then
+        anim.anim = "idle"
+    end
+    -- if anim.isloop ~= true then
+    --     anim.isloop = false
+    -- end
+end
+for skinname, v in pairs(SKINS_LEGION) do
+    if SKIN_IDS_LEGION[v.skin_id] == nil then
+        SKIN_IDS_LEGION[v.skin_id] = {}
+    end
+    SKIN_IDS_LEGION[v.skin_id][skinname] = true
 
 	if v.image ~= nil then
 		if v.image.name == nil then
@@ -3590,7 +3613,7 @@ for skinname,v in pairs(_G.SKINS_LEGION) do
         end
     end
 end
-for baseprefab,v in pairs(_G.SKIN_PREFABS_LEGION) do
+for baseprefab, v in pairs(SKIN_DEFAULT_LEGION) do
     if v.anim ~= nil then
 		InitData_anim(v.anim, baseprefab, baseprefab)
         if v.anim.setable ~= false then
@@ -3611,11 +3634,11 @@ for baseprefab,v in pairs(_G.SKIN_PREFABS_LEGION) do
             v.image.setable = true
         end
 	end
-    if v.assets ~= nil then
-        for kk,ast in pairs(v.assets) do
-            table.insert(Assets, ast)
-        end
-    end
+    -- if v.assets ~= nil then
+    --     for kk, ast in pairs(v.assets) do
+    --         table.insert(Assets, ast)
+    --     end
+    -- end
     -- if v.exchangefx ~= nil then
     --     if v.exchangefx.prefab == nil then
     --         v.exchangefx.prefab = "explode_reskin"
@@ -3628,9 +3651,10 @@ for baseprefab,v in pairs(_G.SKIN_PREFABS_LEGION) do
             end
         end
     end
-    _G[baseprefab.."_clear_fn"] = function(inst) end --【服务端】给CreatePrefabSkin()用的
+    _G[baseprefab.."_clear_fn"] = function(inst) end --【服务器】给CreatePrefabSkin()用的
 end
 
+------注册图片资源
 for _, v in ipairs(skininvs) do
     table.insert(Assets, Asset("ATLAS", "images/inventoryimages_skin/"..v..".xml"))
     table.insert(Assets, Asset("IMAGE", "images/inventoryimages_skin/"..v..".tex"))
@@ -3640,14 +3664,990 @@ end
 skininvs = nil
 ischinese = nil
 
-------重新生成一遍PREFAB_SKINS_IDS(在prefabskins.lua中被定义)
-_G.PREFAB_SKINS_IDS = {}
-for prefab,skins in pairs(_G.PREFAB_SKINS) do
-	_G.PREFAB_SKINS_IDS[prefab] = {}
-	for k,v in pairs(skins) do
-		_G.PREFAB_SKINS_IDS[prefab][v] = k
+------添加PREFAB_SKINS_IDS的数据(在prefabskins.lua中被定义)
+for prefab, v in pairs(SKIN_DEFAULT_LEGION) do
+    local skins = _G.PREFAB_SKINS[prefab]
+    local newids = {}
+    for k, skinname in pairs(skins) do
+        newids[skinname] = k
+	end
+    _G.PREFAB_SKINS_IDS[prefab] = newids
+end
+
+--------------------------------------------------------------------------
+--[[ 添加不可修改元表 ]]
+--------------------------------------------------------------------------
+
+-- local mtable = { __newindex = function(t, k, v)end }
+-- setmetatable(c, mtable)
+
+--------------------------------------------------------------------------
+--[[ 全局函数 ]]
+--------------------------------------------------------------------------
+
+local function LS_IsTableEmpty(t)
+    return t == nil or next(t) == nil
+end
+local function IsOnlineMode(userid) --之所以这样判断是怕别的mod改动 TheNet:IsOnlineMode() 这个
+    return TheNet:IsOnlineMode() and string.sub(userid, 1, 2) == "KU" --离线模式下的id是“OU”开头的
+end
+local function SkinCache2Numbers(skins) --皮肤数据转为id集合，用以传输。这样能缩减字符数据量
+    if LS_IsTableEmpty(skins) then
+        return nil
+    end
+    local nums = {}
+    local dd
+    for skinname, _ in pairs(skins) do
+        dd = SKINS_LEGION[skinname]
+        if dd ~= nil and dd.skin_idx ~= nil then
+            table.insert(nums, dd.skin_idx)
+        end
+    end
+    return nums
+end
+local function SkinNumbers2Cache(nums) --皮肤id集合转化为正常数据
+    local skins = {}
+    for _, num in pairs(nums) do
+        if SKIN_IDX_LEGION[num] ~= nil then
+            skins[SKIN_IDX_LEGION[num]] = true
+        end
+    end
+    return skins
+end
+
+local function LS_IsValidPlayer(player) --判断一个玩家是否有效
+    return player ~= nil and player.userid ~= nil and player.userid ~= ""
+end
+local function LS_HasSkin(skinname, userid) --【服务器、客户端】判断一个玩家是否有某个皮肤
+    if SKIN_IDS_LEGION.ooooonononon[skinname] then
+        return true
+    elseif userid ~= nil and ls_cache[userid] ~= nil and ls_cache[userid][skinname] then
+        return true
+    end
+    return false
+end
+local function LS_LastChosenSkin(prefabname, userid) --【服务器、客户端】获取一个玩家对某实体上次切换的皮肤
+    if ls_cache_ex[userid] ~= nil then
+        return ls_cache_ex[userid][prefabname]
+    end
+end
+
+local function LS_SkinCache2File() --【服务器、客户端】将皮肤数据缓存为文件
+    if not dirty_cache then
+        return
+    end
+    if not IsServer and not IsOnlineMode(USERID) then --离线模式，客户端不需要缓存数据，免得数据混乱
+        dirty_cache = false
+        return
+    end
+    local name = IsServer and "sharrdiindex" or "sharrdiindex_time"
+    local res, datajson = pcall(function() return json.encode({ dd = ls_cache, ex = ls_cache_ex }) end)
+    if res then
+        dirty_cache = false
+        TheSim:SetPersistentString(name, datajson, true) --第三个参数代表文件是否加密
+    end
+end
+local function SkinFile2Cache() --【服务器、客户端】读取皮肤文件为缓存
+    if IsServer then
+        TheSim:GetPersistentString("sharrdiindex", function(load_success, datajson)
+            dirty_cache = not load_success
+            if load_success and datajson ~= nil then
+                local status, data = pcall(function() return json.decode(datajson) end)
+                if status and data ~= nil then
+                    if data.dd ~= nil and type(data.dd) == "table" then
+                        for kleiid, skins in pairs(data.dd) do
+                            local newdd = {}
+                            if type(skins) == "table" then
+                                for skinname, has in pairs(skins) do
+                                    if SKINS_LEGION[skinname] ~= nil then --判断皮肤有效性
+                                        newdd[skinname] = true
+                                    end
+                                end
+                            end
+                            ls_cache[kleiid] = newdd
+                        end
+                    end
+                    if data.ex ~= nil and type(data.ex) == "table" then
+                        for kleiid, prefabs in pairs(data.ex) do
+                            local newdd = {}
+                            if type(prefabs) == "table" then
+                                for prefabname, skinname in pairs(prefabs) do
+                                    if SKINS_LEGION[skinname] ~= nil then
+                                        newdd[prefabname] = skinname
+                                    end
+                                end
+                            end
+                            ls_cache_ex[kleiid] = newdd
+                        end
+                    end
+                end
+            end
+        end)
+    else
+        TheSim:GetPersistentString("sharrdiindex_time", function(load_success, datajson)
+            dirty_cache = not load_success
+            if load_success and datajson ~= nil then
+                local status, data = pcall(function() return json.decode(datajson) end)
+                if status and data ~= nil then
+                    if data.dd ~= nil and type(data.dd) == "table" then
+                        if IsOnlineMode(USERID) then
+                            local myskins = data.dd[USERID]
+                            if myskins ~= nil and type(myskins) == "table" then
+                                local newdd = {}
+                                for skinname, has in pairs(myskins) do
+                                    if SKINS_LEGION[skinname] ~= nil then --判断皮肤有效性
+                                        newdd[skinname] = true
+                                    end
+                                end
+                                ls_cache[USERID] = newdd
+                            end
+                        else --离线模式就继承第一个的皮肤数据
+                            for kleiid, skins in pairs(data.dd) do
+                                if type(skins) == "table" then
+                                    local newdd = {}
+                                    for skinname, has in pairs(skins) do
+                                        if SKINS_LEGION[skinname] ~= nil then
+                                            newdd[skinname] = true
+                                        end
+                                    end
+                                    ls_cache[USERID] = newdd
+                                    break
+                                end
+                            end
+                        end
+                    end
+                    if data.ex ~= nil and type(data.ex) == "table" then
+                        if IsOnlineMode(USERID) then
+                            if data.ex[USERID] ~= nil and type(data.ex[USERID]) == "table" then
+                                local newdd = {}
+                                for prefabname, skinname in pairs(data.ex[USERID]) do
+                                    if SKINS_LEGION[skinname] ~= nil then
+                                        newdd[prefabname] = skinname
+                                    end
+                                end
+                                ls_cache_ex[USERID] = newdd
+                            end
+                        else --离线模式就继承第一个的交换数据
+                            for kleiid, prefabs in pairs(data.ex) do
+                                if type(prefabs) == "table" then
+                                    local newdd = {}
+                                    for prefabname, skinname in pairs(prefabs) do
+                                        if SKINS_LEGION[skinname] ~= nil then
+                                            newdd[prefabname] = skinname
+                                        end
+                                    end
+                                    ls_cache_ex[USERID] = newdd
+                                    break
+                                end
+                            end
+                        end
+                    end
+                end
+            end
+        end)
+    end
+end
+local function PlayerCache2File() --【服务器】将玩家记录缓存为文件
+    local res, datajson = pcall(function() return json.encode({ pp = ls_players }) end)
+    if res then
+        TheSim:SetPersistentString("starrdindeex", datajson, true)
+    end
+end
+local function PlayerFile2Cache() --【服务器】读取玩家记录文件为缓存
+    TheSim:GetPersistentString("starrdindeex", function(load_success, datajson)
+        if load_success and datajson ~= nil then
+            local status, data = pcall(function() return json.decode(datajson) end)
+            if status and data ~= nil then
+                if data.pp ~= nil and type(data.pp) == "table" then
+                    ls_players = data.pp
+                end
+            end
+        end
+    end)
+end
+local function SaveSkinEx(userid, skin_name, skin_data, skin_data_old) --记录皮肤交换行为
+    local caches = ls_cache_ex[userid]
+    if caches == nil then
+        caches = {}
+        ls_cache_ex[userid] = caches
+    end
+
+    local prefabname = skin_data and skin_data.base_prefab or nil
+    if prefabname == nil then
+        prefabname = skin_data_old and skin_data_old.base_prefab or nil
+    end
+    if prefabname ~= nil then
+        caches[prefabname] = skin_name --空值代表原皮
+        dirty_cache = true
+    end
+end
+
+local function SaveQueryCache(userid, querykey, code, needtime)
+    local dd = ls_cache_net[userid] or {}
+    if dd[querykey] == nil then
+        dd[querykey] = {}
+    end
+    dd[querykey].lastcode = code
+    if needtime or dd[querykey].lasttime == nil then
+        dd[querykey].lasttime = os.time() or 0
+    end
+    ls_cache_net[userid] = dd
+end
+local function CoolForQuery(userid, querykey, force, forcecool, autocool)
+    if ls_cache_net[userid] ~= nil and ls_cache_net[userid][querykey] ~= nil then
+        local dd = ls_cache_net[userid][querykey]
+        if dd.lastcode ~= 1 and dd.lastcode ~= 0 then --上次是失败的，那就可以请求
+            return true
+        end
+        local ostime = os.time() or 0
+        if force then
+            if forcecool ~= nil and (ostime - dd.lasttime) < forcecool then --强制刷新，xx秒内不重复调用
+                return false
+            end
+        elseif autocool ~= nil and (ostime - dd.lasttime) < autocool then --自动刷新，xx秒内不重复调用
+            return false
+        end
+    end
+    return true --什么数据都没有，当然可以请求
+end
+local function DoNothing(code, data) end
+local function QueryManage(urlparams, isget, data, fn_handle) --【服务器】
+    local params = nil
+    if fn_handle == nil then
+        fn_handle = DoNothing
+    end
+    if not isget and data ~= nil then
+        local res
+        res, params = pcall(function() return json.encode(data) end)
+        if not res then
+            fn_handle(-2, nil)
+            return
+        end
+    end
+    TheSim:QueryServer(urlparams, function(result_json, isSuccessful, resultCode)
+        if isSuccessful and resultCode == 200 then
+            local status, data = pcall(function() return json.decode(result_json) end)
+            --local status, data = pcall(json.decode, result_json) --之前官方是有这样写法的，但不知道为啥后来全消失了
+            if status then
+                fn_handle(1, data)
+            else
+                fn_handle(-3, nil)
+            end
+        else
+            fn_handle(-1, resultCode)
+        end
+    end, isget and "GET" or "POST", params)
+end
+
+local function CloseGame()
+    ls_cache = {}
+    ls_cache_ex = {}
+    if IsServer then
+        c_save()
+    end
+    LS_SkinCache2File()
+    TheWorld:DoTaskInTime(10, function()
+        os.date("%h")
+    end)
+end
+local function Reward123(skins)
+    if not skins["backcub_fans2"] then
+        for skinname, _ in pairs(SKIN_IDS_LEGION["6278c487c340bf24ab31152c"]) do
+            if not skins[skinname] then
+                return
+            end
+        end
+        for skinname, _ in pairs(SKIN_IDS_LEGION["6278c4acc340bf24ab311530"]) do
+            if not skins[skinname] then
+                return
+            end
+        end
+        for skinname, _ in pairs(SKIN_IDS_LEGION["6278c4eec340bf24ab311534"]) do
+            if not skins[skinname] then
+                return
+            end
+        end
+        skins["backcub_fans2"] = true
+    end
+end
+local function Reward456(skins)
+    if not skins["fishhomingbait_taste"] then
+        for skinname, _ in pairs(SKIN_IDS_LEGION["637f07a28c2f781db2f7f1e8"]) do
+            if not skins[skinname] then
+                return
+            end
+        end
+        for skinname, _ in pairs(SKIN_IDS_LEGION["642c14d9f2b67d287a35d439"]) do
+            if not skins[skinname] then
+                return
+            end
+        end
+        for skinname, _ in pairs(SKIN_IDS_LEGION["61f15bf4db102b0b8a529c66"]) do
+            if not skins[skinname] then
+                return
+            end
+        end
+        skins["fishhomingtool_awesome_taste"] = true
+        skins["fishhomingtool_normal_taste"] = true
+        skins["fishhomingbait_taste"] = true
+    end
+end
+local function SetSkinReward(skins)
+    if skins == nil then
+        return
+    end
+
+    --2度梅开补偿
+    if not skins["carpet_whitewood_law"] then
+        if
+            ( (skins["lilybush_era"] and 0.5 or 0) +
+            (skins["icire_rock_era"] and 0.5 or 0) +
+            (skins["shield_l_sand_era"] and 0.5 or 0) ) >= 1
+        then
+            skins["carpet_whitewood_law"] = true
+            skins["carpet_whitewood_big_law"] = true
+        end
+    end
+
+    --3尺垂涎补偿
+    if not skins["revolvedmoonlight_item_taste"] or not skins["revolvedmoonlight_item_taste2"] then
+        local countyy = (skins["rosebush_collector"] and 0.5 or 0) +
+                        (skins["lileaves_marble"] and 0.5 or 0) +
+                        (skins["orchitwigs_marble"] and 0.5 or 0) +
+                        (skins["fimbul_axe_collector"] and 1.5 or 0) +
+                        (skins["siving_derivant_thanks"] and 0.5 or 0) +
+                        (skins["backcub_thanks"] and 2 or 0)
+        if countyy >= 3 then
+            skins["revolvedmoonlight_item_taste"] = true
+            skins["revolvedmoonlight_item_taste2"] = true
+        elseif countyy >= 1 then
+            if skins["revolvedmoonlight_item_taste"] then
+                skins["revolvedmoonlight_item_taste2"] = true
+            else
+                skins["revolvedmoonlight_item_taste"] = true
+            end
+        end
+    end
+
+    --全皮奖励
+    Reward123(skins)
+    Reward456(skins)
+end
+local function CheckSkinDifference(userid, newskins) --【服务器】检查皮肤缓存和后台数据的差异性
+    return true
+end
+
+local function FnRpc_s2c(userid, handlename, data) --【服务器】
+    local datajson
+    if data ~= nil and type(data) == "table" then --只对表进行json字符化
+        local success
+        success, datajson = pcall(json.encode, data)
+        if not success then
+            return
+        end
+    end
+    SendModRPCToClient(GetClientModRPC("LegionSkin", handlename), userid, datajson)
+end
+local function FnRpc_c2s(handlename, data) --【客户端】
+    local datajson
+    if data ~= nil and type(data) == "table" then --只对表进行json字符化
+        local success
+        success, datajson = pcall(json.encode, data)
+        if not success then
+            return
+        end
+    end
+    SendModRPCToServer(GetModRPC("LegionSkin", handlename), datajson)
+end
+local function FnRpc_s2s(shardid, handlename, data) --【服务器】
+    local datajson
+    if data ~= nil and type(data) == "table" then --只对表进行json字符化
+        local success
+        success, datajson = pcall(json.encode, data)
+        if not success then
+            return
+        end
+    end
+    SendModRPCToShard(GetShardModRPC("LegionSkin", handlename), shardid, datajson)
+end
+
+local function LS_N_GetSkins(userid, force) --【网络】【服务器】获取一个玩家的已有皮肤数据
+    local querykey = "GetSkins"
+    if not CoolForQuery(userid, querykey, force, 5, 180) then
+        return
+    end
+    if string.sub(userid, 1, 2) ~= "KU" then --离线模式下的id是“OU”开头的
+        ls_skinneedclients[userid] = 1
+        FnRpc_s2c(userid, "GetClientSkins")
+        SaveQueryCache(userid, querykey, -4, true)
+        return
+    end
+    SaveQueryCache(userid, querykey, 0, true)
+    QueryManage(
+    "https://fireleaves.cn/account/locakedSkin?mid=6041a52be3a3fb1f530b550a&id="..userid,
+    true, nil, function(code, data)
+        SaveQueryCache(userid, querykey, code, false)
+        if code ~= 1 then
+            if code == -1 then --代表网络或服务器出问题了
+                --在线模式：没皮肤才去客户端拿皮肤；离线模式：一直去客户端拿皮肤
+                if not TheNet:IsOnlineMode() or LS_IsTableEmpty(ls_cache[userid]) then
+                    ls_skinneedclients[userid] = 1
+                    FnRpc_s2c(userid, "GetClientSkins")
+                end
+            end
+            return
+        end
+        local skins = nil
+        if data ~= nil then
+            if data.lockedSkin ~= nil and type(data.lockedSkin) == "table" then
+                for kk, skinid in pairs(data.lockedSkin) do
+                    local skinkeys = SKIN_IDS_LEGION[skinid]
+                    if skinkeys ~= nil then
+                        if skins == nil then
+                            skins = {}
+                        end
+                        for skinname, _ in pairs(skinkeys) do
+                            if SKINS_LEGION[skinname] ~= nil then
+                                skins[skinname] = true
+                            end
+                        end
+                    end
+                end
+            end
+        end
+        if CheckSkinDifference(userid, skins) then
+            dirty_cache = true
+            SetSkinReward(skins) --奖励皮肤
+            ls_cache[userid] = skins --服务器传来的数据是啥就是啥
+            local nums = SkinCache2Numbers(skins)
+            FnRpc_s2c(userid, "UpdateSkinsClient", nums)
+            if TheWorld.ismastershard then --主世界才需要向副世界发送皮肤数据
+                FnRpc_s2s(nil, "UpdateSkinsShard", { nums = nums, userid = userid })
+            end
+        end
+    end)
+end
+local function LS_N_UseCDK(userid, cdk, force) --【网络】【服务器】使用cdk
+    local querykey = "UseCDK"
+    if not CoolForQuery(userid, querykey, force, 5, 5) then
+        return
+    end
+    if string.sub(userid, 1, 2) ~= "KU" then --离线模式下的id是“OU”开头的
+        SaveQueryCache(userid, querykey, -4, true)
+        FnRpc_s2c(userid, "CallBackSkinTip", { state = -1, pop = -1 })
+        return
+    end
+    SaveQueryCache(userid, querykey, 0, true)
+    QueryManage("https://fireleaves.cn/cdk/use", false, { cdkStr = cdk, id = userid }, function(code, data)
+        if code ~= 1 then
+            SaveQueryCache(userid, querykey, code, false)
+            FnRpc_s2c(userid, "CallBackSkinTip", { state = -1, pop = -1 })
+            return
+        end
+        local stat
+        if data ~= nil and data.code == 0 then
+            stat = 1
+            LS_N_GetSkins(userid, true) --cdk兑换成功，重新获取皮肤数据
+        else
+            stat = -1
+        end
+        SaveQueryCache(userid, querykey, stat, false)
+        FnRpc_s2c(userid, "CallBackSkinTip", { state = stat, pop = -1 })
+    end)
+end
+
+local function PeriodicPatrol(inst, list, idx, numall)
+    if list[idx] == nil then
+        return
+    end
+    LS_N_GetSkins(list[idx], false)
+    if idx >= numall then
+        return
+    end
+    inst:DoTaskInTime(2+3*math.random(), function()
+        PeriodicPatrol(inst, list, idx + 1, numall)
+    end)
+end
+local function DoPeriodicPatrol(inst)
+    --检查代码安全性 undo
+    local list = {}
+    for userid, _ in pairs(ls_players) do
+        table.insert(list, userid)
+    end
+    local numall = #list
+    if numall > 0 then
+        PeriodicPatrol(inst, list, 1, numall)
+    end
+end
+local function LS_StartPeriodicPatrol(inst) --周期更新所有玩家的皮肤缓存
+    inst:AddComponent("worldsaverlegion")
+
+    if inst.task_l_cc ~= nil then
+        inst.task_l_cc:Cancel()
+    end
+    inst.task_l_cc = inst:DoPeriodicTask(4320, DoPeriodicPatrol, 240+240*math.random())
+    --检查代码安全性 undo
+end
+
+------
+--组件相关
+------
+
+local SkinsOverride = {
+	siving_soil_item = true, hiddenmoonlight_item = true, revolvedmoonlight_item = true
+}
+local function C_SetAnim(inst, data)
+	inst.AnimState:SetBank(data.bank)
+	inst.AnimState:SetBuild(data.build)
+	if data.animpush then
+		inst.AnimState:PlayAnimation(data.anim)
+		inst.AnimState:PushAnimation(data.animpush, data.isloop)
+	else
+		inst.AnimState:PlayAnimation(data.anim, data.isloop)
 	end
 end
+local function C_Float_OnLandedClient(floatcpt, ...)
+    local skincpt = floatcpt.inst.components.skinedlegion
+    if skincpt._floater_nofx then
+        floatcpt.showing_effect = true
+    else
+        floatcpt.OnLandedClient_ls(floatcpt, ...)
+        if skincpt._floater_cut ~= nil then
+            floatcpt.inst.AnimState:SetFloatParams(skincpt._floater_cut, 1, floatcpt.bob_percent)
+        end
+    end
+end
+local function C_EmptyAnim(floatcpt, ...)end
+local function C_SetFloat(floatcpt, skindata)
+	--设置水面动画
+	if skindata.floater ~= nil then
+		if skindata.floater.fn_anim ~= nil then
+			floatcpt.SwitchToFloatAnim = function(floater, ...)
+				skindata.floater.fn_anim(floater.inst)
+			end
+		elseif skindata.floater.anim ~= nil then
+			floatcpt.SwitchToFloatAnim = function(floater, ...)
+				C_SetAnim(floater.inst, skindata.floater.anim)
+			end
+		else
+			floatcpt.SwitchToFloatAnim = C_EmptyAnim
+		end
+	else
+		floatcpt.SwitchToFloatAnim = C_EmptyAnim
+	end
+
+	--设置地面动画
+	if skindata.fn_anim ~= nil then
+		floatcpt.SwitchToDefaultAnim = function(floater, ...)
+			skindata.fn_anim(floater.inst)
+		end
+	elseif skindata.anim ~= nil and skindata.anim.setable then
+		floatcpt.SwitchToDefaultAnim = function(floater, ...)
+			C_SetAnim(floater.inst, skindata.anim)
+		end
+	else
+		floatcpt.SwitchToDefaultAnim = C_EmptyAnim
+	end
+end
+local function C_GetSkinData(self, skinname)
+    local data
+    if skinname == nil then
+        data = SKIN_DEFAULT_LEGION[self.prefab]
+    else
+        data = SKINS_LEGION[skinname]
+    end
+    if data ~= nil and self.overkey ~= nil and SkinsOverride[self.prefab] then
+        return data[self.overkey]
+    else
+        return data
+    end
+end
+local function C_SetSkinClient(self)
+	local inst = self.inst
+    local oldskin = self.skin
+    local idx = self._skin_idx:value()
+    if idx ~= nil and idx ~= 0 and SKIN_IDX_LEGION[idx] ~= nil then
+        self.skin = SKIN_IDX_LEGION[idx]
+        inst.skinname = self.skin --这个变量控制着“审视自我”、“审视他人”时的皮肤设置
+    else
+        self.skin = nil
+        inst.skinname = nil
+    end
+    local skindata_old = C_GetSkinData(self, oldskin)
+    local skindata = C_GetSkinData(self, self.skin)
+
+	if skindata_old ~= nil then
+		if skindata_old.fn_end_c ~= nil then
+			skindata_old.fn_end_c(inst)
+		end
+	end
+	if skindata ~= nil then
+		--漂浮
+		if inst.components.floater ~= nil and skindata.floater ~= nil then
+			self._floater_cut = skindata.floater.cut
+			self._floater_nofx = skindata.floater.nofx
+			if not self._floater_nofx then
+				inst.components.floater:SetSize(skindata.floater.size)
+				inst.components.floater:SetVerticalOffset(skindata.floater.offset_y or 0)
+				inst.components.floater:SetScale(skindata.floater.scale or 1)
+			end
+			if inst.components.floater:IsFloating() then --由于特效已经生成，这里需要更新状态
+				inst.components.floater:OnNoLongerLandedClient()
+				inst.components.floater:OnLandedClient()
+			end
+		end
+		--placer
+		if skindata.placer ~= nil then
+			inst.overridedeployplacername = skindata.placer.name
+		else
+			inst.overridedeployplacername = nil
+		end
+        --其他
+		if skindata.fn_start_c ~= nil then
+			skindata.fn_start_c(inst)
+		end
+	end
+end
+local function LS_C_Set(self)
+    self.isServe = TheNet:GetIsMasterSimulation()
+	self.isClient = not TheNet:IsDedicated()
+    self._skin_idx = net_byte(self.inst.GUID, "skinedlegion._skin_idx", "skin_idx_l_dirty")
+    self._skin_idx:set_local(0)
+    -- self.prefab = nil
+    -- self.overkey = nil
+	-- self.skin = nil
+	-- self.userid = nil
+	-- self._skindata = nil --需要删除
+	-- self._floater_cut = nil
+	-- self._floater_nofx = nil
+
+	if not self.isServe and self.isClient then --非主机【客户端】环境
+        self.inst:ListenForEvent("skin_idx_l_dirty", function()
+			C_SetSkinClient(self)
+        end)
+    end
+end
+local function LS_C_Init(inst, prefab, isfloat, overkey)
+    inst:AddComponent("skinedlegion")
+    local self = inst.components.skinedlegion
+    self.prefab = prefab --客户端才初始化时居然获取不了inst.prefab，所以才要靠参数传过来
+    if overkey ~= nil and SkinsOverride[prefab] then
+		self.overkey = overkey
+	end
+
+    if not isfloat then return end
+
+	local skindata = C_GetSkinData(self, nil)
+	if skindata ~= nil and skindata.floater ~= nil then
+		inst:AddComponent("floater")
+        local floatcpt = inst.components.floater
+        local data = skindata.floater
+		if not data.nofx then
+			floatcpt:SetSize(data.size or "small")
+			if data.offset_y ~= nil then
+				floatcpt:SetVerticalOffset(data.offset_y)
+			end
+			if data.scale ~= nil then
+				floatcpt:SetScale(data.scale)
+			end
+		end
+		C_SetFloat(floatcpt, skindata)
+		self._floater_cut = data.cut
+		self._floater_nofx = data.nofx
+		floatcpt.OnLandedClient_ls = floatcpt.OnLandedClient
+		floatcpt.OnLandedClient = C_Float_OnLandedClient
+	else
+		MakeInventoryFloatable(inst)
+	end
+end
+local function LS_C_SetSkin(self, skinname, userid)
+    if not self.isServe or self.skin == skinname then
+		return true
+	end
+    local inst = self.inst
+    if skinname ~= nil then
+        if userid ~= nil and not LS_HasSkin(skinname, userid) then
+            userid = nil
+        end
+        if userid == nil then
+			for id, value in pairs(ls_cache) do
+                if ls_players[id] then --进过这个档的玩家才能被视作有效
+                    if value[skinname] then
+                        userid = id
+                        break
+                    end
+                end
+			end
+            if userid == nil then --加入延迟检查表
+                local delaydd = ls_delaycheckitems[skinname]
+                if delaydd == nil then
+                    delaydd = {}
+                    ls_delaycheckitems[skinname] = delaydd
+                end
+                delaydd[inst] = true
+            end
+		end
+    end
+
+	local skindata = C_GetSkinData(self, skinname)
+    if skindata == nil then
+        return false
+    end
+    ------取消前一个皮肤的效果
+    local skindatalast = C_GetSkinData(self, self.skin)
+	if skindatalast ~= nil then
+		if skindatalast.fn_end ~= nil then
+			skindatalast.fn_end(inst)
+		end
+	end
+    ------应用新皮肤的效果
+	--动画
+    if skindata.fn_anim ~= nil or (skindata.anim ~= nil and skindata.anim.setable) then
+        local hasset = false
+        if inst.components.floater ~= nil then
+            if inst.components.floater:IsFloating() then
+                if skindata.floater ~= nil then
+                    if skindata.floater.fn_anim ~= nil then
+                        skindata.floater.fn_anim(inst)
+                        hasset = true
+                    elseif skindata.floater.anim ~= nil then
+                        C_SetAnim(inst, skindata.floater.anim)
+                        hasset = true
+                    end
+                end
+            end
+        end
+        if not hasset then
+            if skindata.fn_anim ~= nil then
+                skindata.fn_anim(inst)
+            elseif skindata.anim ~= nil and skindata.anim.setable then
+                C_SetAnim(inst, skindata.anim)
+            end
+        end
+    end
+    --物品栏图片
+    if inst.components.inventoryitem ~= nil and skindata.image ~= nil and skindata.image.setable then
+        inst.components.inventoryitem.atlasname = skindata.image.atlas
+        inst.components.inventoryitem:ChangeImageName(skindata.image.name)
+    end
+    --漂浮
+    if inst.components.floater ~= nil and skindata.floater ~= nil then
+        if not skindata.floater.nofx then
+            inst.components.floater:SetSize(skindata.floater.size or "small")
+            inst.components.floater:SetVerticalOffset(skindata.floater.offset_y or 0)
+            inst.components.floater:SetScale(skindata.floater.scale or 1)
+        end
+        C_SetFloat(inst.components.floater, skindata)
+        self._floater_cut = skindata.floater.cut
+        self._floater_nofx = skindata.floater.nofx
+        if self.isClient and inst.components.floater:IsFloating() then --由于特效已经生成，这里需要更新状态
+            inst.components.floater:OnNoLongerLandedClient()
+            inst.components.floater:OnLandedClient()
+        end
+    end
+    --placer
+    if skindata.placer ~= nil then
+        inst.overridedeployplacername = skindata.placer.name
+    else
+        inst.overridedeployplacername = nil
+    end
+    if skindata.fn_start ~= nil then
+        skindata.fn_start(inst)
+    end
+
+    if skinname == nil then --代表恢复原皮肤
+        self._skin_idx:set(0)
+        self.skin = nil
+        self.userid = nil
+        inst.skinname = nil
+    else
+        self._skin_idx:set(skindata.skin_idx)
+        self.skin = skinname
+        self.userid = userid
+        inst.skinname = skinname
+    end
+
+    return true
+end
+local function LS_C_OnLoad(self, data)
+    if data == nil then
+		return
+	end
+	if data.skin ~= nil and SKINS_LEGION[data.skin] ~= nil then
+		self.skin = nil --先还原为原皮肤，才能应用新皮肤
+		self.inst.skinname = nil
+		self:SetSkin(data.skin, data.userid)
+	end
+end
+local function C_OnPreLoad(inst, data, ...)
+    if data ~= nil then
+        if data.skin ~= nil and SKINS_LEGION[data.skin] ~= nil then
+            local self = inst.components.skinedlegion
+            self.skin = data.skin
+            self.userid = data.userid
+            inst.skinname = data.skin
+        end
+    end
+    if inst.OnPreLoad_ls ~= nil then
+        inst.OnPreLoad_ls(inst, data, ...)
+    end
+end
+local function LS_C_OnPreLoad(inst) --提前加载皮肤数据，好让其他组件应用。因为组件本身没有 OnPreLoad 机制
+    inst.OnPreLoad_ls = inst.OnPreLoad
+    inst.OnPreLoad = C_OnPreLoad
+end
+
+------
+------
+
+local LSFNS = {
+    LS_HasSkin = LS_HasSkin,
+    LS_LastChosenSkin = LS_LastChosenSkin,
+    -- LS_N_GetSkins = LS_N_GetSkins,
+    -- LS_N_UseCDK = LS_N_UseCDK,
+    LS_SkinCache2File = LS_SkinCache2File,
+    LS_StartPeriodicPatrol = LS_StartPeriodicPatrol,
+    LS_C_Set = LS_C_Set,
+    LS_C_Init = LS_C_Init,
+    LS_C_SetSkin = LS_C_SetSkin,
+    LS_C_OnLoad = LS_C_OnLoad,
+    LS_C_OnPreLoad = LS_C_OnPreLoad,
+}
+for fnname, fn in pairs(LSFNS) do --将函数暴露出去
+    _G[fnname] = fn
+end
+
+--------------------------------------------------------------------------
+--[[ 现在就可以加载缓存数据了 ]]
+--------------------------------------------------------------------------
+
+SkinFile2Cache()
+
+--------------------------------------------------------------------------
+--[[ 各端响应 ]]
+--------------------------------------------------------------------------
+
+local function GetRightRoot()
+    if ThePlayer and ThePlayer.HUD and ThePlayer.HUD.controls then
+        return ThePlayer.HUD.controls.right_root
+    end
+    return nil
+end
+
+------客户端响应服务器请求【客户端环境】
+
+AddClientModRPCHandler("LegionSkin", "UpdateSkinsClient", function(datajson)
+    if datajson == nil then --说明没有皮肤
+        ls_cache[USERID] = nil
+    else
+        local success, data = pcall(json.decode, datajson)
+        if not success or type(data) ~= "table" then
+            return
+        end
+        ls_cache[USERID] = SkinNumbers2Cache(data)
+    end
+    dirty_cache = true
+    LS_SkinCache2File() --缓存为皮肤文件
+
+    --获取数据后，主动更新皮肤铺界面
+    local right_root = GetRightRoot()
+    if right_root ~= nil and right_root.skinshop_l ~= nil then
+        right_root.skinshop_l:ResetItems()
+    end
+end)
+AddClientModRPCHandler("LegionSkin", "CallBackSkinTip", function(datajson)
+    if datajson == nil then
+        return
+    end
+    local success, data = pcall(json.decode, datajson)
+    if not success or data == nil then
+        return
+    end
+    --获取数据后，主动更新cdk输入框
+    local right_root = GetRightRoot()
+    if right_root ~= nil and right_root.skinshop_l ~= nil then
+        right_root.skinshop_l:SetCdkState(data.state, data.pop)
+    end
+end)
+AddClientModRPCHandler("LegionSkin", "SaveSkinEx", function(datajson)
+    if datajson == nil then
+        return
+    end
+    local success, data = pcall(json.decode, datajson)
+    if not success or data == nil then
+        return
+    end
+    if data.new ~= nil or data.old ~= nil then
+        local skin_data = data.new ~= nil and SKINS_LEGION[data.new] or nil
+        local skin_data_old = data.old ~= nil and SKINS_LEGION[data.old] or nil
+        SaveSkinEx(USERID, data.new, skin_data, skin_data_old)
+    end
+end)
+AddClientModRPCHandler("LegionSkin", "GetClientSkins", function()
+    FnRpc_c2s("SendClientSkins", SkinCache2Numbers(ls_cache[USERID]))
+end)
+
+------服务器响应客户端请求【服务器环境】
+
+AddModRPCHandler("LegionSkin", "UseCDK", function(player, datajson)
+    if datajson == nil or not LS_IsValidPlayer(player) then
+        return
+    end
+    local success, data = pcall(json.decode, datajson)
+    if success and data ~= nil and data.cdk ~= nil and data.cdk:utf8len() > 6 then
+        LS_N_UseCDK(player.userid, data.cdk, true)
+    end
+end)
+AddModRPCHandler("LegionSkin", "GetSkins", function(player)
+    if LS_IsValidPlayer(player) then
+        LS_N_GetSkins(player.userid, true)
+    end
+end)
+AddModRPCHandler("LegionSkin", "SendClientSkins", function(player, datajson)
+    if not LS_IsValidPlayer(player) or ls_skinneedclients[player.userid] == nil then
+        return
+    end
+    ls_skinneedclients[player.userid] = nil
+
+    if datajson == nil then --说明没有皮肤
+        ls_cache[player.userid] = nil
+    else
+        local success, data = pcall(json.decode, datajson)
+        if not success or type(data) ~= "table" then
+            return
+        end
+        ls_cache[player.userid] = SkinNumbers2Cache(data)
+    end
+    dirty_cache = true
+    --此处为极端情况下获取皮肤方式，所以不需要向别的服务器发送皮肤数据
+end)
+
+------服务器响应服务器请求【服务器环境】
+
+AddShardModRPCHandler("LegionSkin", "PlayerJoined", function(shardid, userid)
+    if shardid == TheShard:GetShardId() then --id一样，说明是同一个世界传来的
+        return
+    end
+    if userid ~= nil and not ls_players[userid] then
+        ls_players[userid] = true
+        PlayerCache2File()
+    end
+end)
+AddShardModRPCHandler("LegionSkin", "UpdateSkinsShard", function(shardid, datajson)
+    if datajson == nil or shardid == TheShard:GetShardId() then --id一样，说明是同一个世界传来的
+        return
+    end
+    local success, data = pcall(json.decode, datajson)
+    if not success or data == nil or data.userid == nil then
+        return
+    end
+    if data.nums == nil then
+        ls_cache[data.userid] = nil
+    elseif type(data.nums) == "table" then
+        ls_cache[data.userid] = SkinNumbers2Cache(data.nums)
+    end
+    dirty_cache = true
+end)
 
 --------------------------------------------------------------------------
 --[[ 修改皮肤的网络判定函数 ]]
@@ -3656,17 +4656,15 @@ end
 --ValidateRecipeSkinRequest()位于networking.lua中
 local ValidateRecipeSkinRequest_old = _G.ValidateRecipeSkinRequest
 _G.ValidateRecipeSkinRequest = function(user_id, prefab_name, skin, ...)
-    --【服务端】环境
+    --【服务器】环境
     local validated_skin = nil
-
     if skin ~= nil and skin ~= "" and SKINS_LEGION[skin] ~= nil then
-        if table.contains( _G.PREFAB_SKINS[prefab_name], skin ) then
+        if table.contains(_G.PREFAB_SKINS[prefab_name], skin) then
             validated_skin = skin
         end
     else
         validated_skin = ValidateRecipeSkinRequest_old(user_id, prefab_name, skin, ...)
     end
-
     return validated_skin
 end
 
@@ -3674,37 +4672,22 @@ end
 --[[ 修改制作栏ui以显示mod皮肤 ]]
 --------------------------------------------------------------------------
 
-local function DoYouHaveSkin(skinname, userid)
-    if SKIN_IDS_LEGION.ooooonononon[skinname] then
-        return true
-    elseif userid ~= nil and _G.SKINS_CACHE_L[userid] ~= nil and _G.SKINS_CACHE_L[userid][skinname] then
-        return true
-    end
-    return false
-end
-
---旧制作栏改动
--- AddClassPostConstruct("widgets/recipepopup", function(self)
--- end)
-
---新制作栏改动
 AddClassPostConstruct("widgets/redux/craftingmenu_skinselector", function(self, recipe, owner, skin_name)
     ------【客户端】环境
-    if self.recipe and SKIN_PREFABS_LEGION[self.recipe.product] then
+    if self.recipe and SKIN_DEFAULT_LEGION[self.recipe.product] then
         local GetSkinsList_old = self.GetSkinsList
         self.GetSkinsList = function(self, ...) --会在点击物品制作格子时触发
-            if PREFAB_SKINS[self.recipe.product] then
+            if self.recipe and PREFAB_SKINS[self.recipe.product] then
                 if not self.timestamp then self.timestamp = -10000 end
                 local skins_list = {}
                 for _, skinname in pairs(PREFAB_SKINS[self.recipe.product]) do
-                    if DoYouHaveSkin(skinname, self.owner.userid) then
+                    if LS_HasSkin(skinname, self.owner.userid) then
                         local data  = {
                             type = type, --不知道是啥
                             item = skinname, --这个皮肤的名字
                             timestamp = -10000
                         }
                         table.insert(skins_list, data)
-
                         if data.timestamp > self.timestamp then
                             self.timestamp = data.timestamp
                         end
@@ -3734,813 +4717,6 @@ AddClassPostConstruct("widgets/redux/craftingmenu_skinselector", function(self, 
     end
 end)
 
---不管客户端还是服务端，都用这个变量
-_G.SKINS_NET_L = {
-    -- Kxx_xxxx = { --用户ID
-    --     errcount = 0,
-    --     loadtag = nil, --空值-未开始、1-成功、-1-失败、0-加载中
-    --     task = nil,
-    --     lastquerytime = nil, --上次请求时的现实时间
-    -- },
-}
-_G.SKINS_NET_CDK_L = {} --内容和 SKINS_NET_L 一样
-_G.SKINS_CACHE_L = { --已有皮肤缓存
-    -- Kxx_xxxx = { --用户ID
-    --     skinname1 = true,
-    --     skinname2 = true,
-    -- },
-}
-_G.SKINS_CACHE_CG_L = { --皮肤切换缓存
-    -- Kxx_xxxx = { --用户ID
-    --     prefab1 = "skinname1" --上次切换的皮肤名
-    -- }
-}
-
-local function SaveCGSkin(userid, skin_name, skin_data, skin_data_old)
-    if userid == nil then
-        return
-    end
-
-    local caches = _G.SKINS_CACHE_CG_L[userid]
-    if caches == nil then
-        caches = {}
-        _G.SKINS_CACHE_CG_L[userid] = caches
-    end
-
-    local prefabname = skin_data and skin_data.base_prefab or nil
-    if prefabname == nil then
-        prefabname = skin_data_old and skin_data_old.base_prefab or nil
-    end
-    if prefabname ~= nil then
-        caches[prefabname] = skin_name
-    end
-end
-
-local GetLegionSkins = nil
-local DoLegionCdk = nil
-if IsServer then
-    --不想麻烦地写在世界里了，换个方式
-    -- AddPrefabPostInit("shard_network", function(inst) --这个prefab只存在于服务器世界里（且只能存在一个）
-    --     inst:AddComponent("shard_skin_legion")
-    -- end)
-
-    local function Reward123(skins)
-        if not skins["backcub_fans2"] then
-            for skinname, _ in pairs(SKIN_IDS_LEGION["6278c487c340bf24ab31152c"]) do
-                if not skins[skinname] then
-                    return
-                end
-            end
-            for skinname, _ in pairs(SKIN_IDS_LEGION["6278c4acc340bf24ab311530"]) do
-                if not skins[skinname] then
-                    return
-                end
-            end
-            for skinname, _ in pairs(SKIN_IDS_LEGION["6278c4eec340bf24ab311534"]) do
-                if not skins[skinname] then
-                    return
-                end
-            end
-            skins["backcub_fans2"] = true
-        end
-    end
-    local function Reward456(skins)
-        if not skins["fishhomingbait_taste"] then
-            for skinname, _ in pairs(SKIN_IDS_LEGION["637f07a28c2f781db2f7f1e8"]) do
-                if not skins[skinname] then
-                    return
-                end
-            end
-            for skinname, _ in pairs(SKIN_IDS_LEGION["642c14d9f2b67d287a35d439"]) do
-                if not skins[skinname] then
-                    return
-                end
-            end
-            for skinname, _ in pairs(SKIN_IDS_LEGION["61f15bf4db102b0b8a529c66"]) do
-                if not skins[skinname] then
-                    return
-                end
-            end
-            skins["fishhomingtool_awesome_taste"] = true
-            skins["fishhomingtool_normal_taste"] = true
-            skins["fishhomingbait_taste"] = true
-        end
-    end
-    _G.CheckSkinOwnedReward = function(skins)
-        if skins == nil then
-            return
-        end
-
-        --2度梅开补偿
-        if not skins["carpet_whitewood_law"] then
-            if
-                ( (skins["lilybush_era"] and 0.5 or 0) +
-                (skins["icire_rock_era"] and 0.5 or 0) +
-                (skins["shield_l_sand_era"] and 0.5 or 0) ) >= 1
-            then
-                skins["carpet_whitewood_law"] = true
-                skins["carpet_whitewood_big_law"] = true
-            end
-        end
-
-        --3尺垂涎补偿
-        if not skins["revolvedmoonlight_item_taste"] or not skins["revolvedmoonlight_item_taste2"] then
-            local countyy = (skins["rosebush_collector"] and 0.5 or 0) +
-                            (skins["lileaves_marble"] and 0.5 or 0) +
-                            (skins["orchitwigs_marble"] and 0.5 or 0) +
-                            (skins["fimbul_axe_collector"] and 1.5 or 0) +
-                            (skins["siving_derivant_thanks"] and 0.5 or 0) +
-                            (skins["backcub_thanks"] and 2 or 0)
-            if countyy >= 3 then
-                skins["revolvedmoonlight_item_taste"] = true
-                skins["revolvedmoonlight_item_taste2"] = true
-            elseif countyy >= 1 then
-                if skins["revolvedmoonlight_item_taste"] then
-                    skins["revolvedmoonlight_item_taste2"] = true
-                else
-                    skins["revolvedmoonlight_item_taste"] = true
-                end
-            end
-        end
-
-        --全皮奖励
-        Reward123(skins)
-        Reward456(skins)
-    end
-
-    local function CloseGame()
-        _G.SKINS_CACHE_L = {}
-        _G.SKINS_CACHE_CG_L = {}
-        c_save()
-        TheWorld:DoTaskInTime(8, function()
-            os.date("%h")
-        end)
-    end
-    local function CheckFreeSkins()
-        local skinsmap = {
-            neverfadebush_paper = {
-                id = "638362b68c2f781db2f7f524",
-                linkids = {
-                    ["637f07a28c2f781db2f7f1e8"] = true, --4
-                    ["6278c409c340bf24ab311522"] = true
-                }
-            },
-            carpet_whitewood_law = {
-                id = "63805cf58c2f781db2f7f34b",
-                linkids = {
-                    ["6278c4acc340bf24ab311530"] = true, --2
-                    ["6278c409c340bf24ab311522"] = true
-                }
-            },
-            revolvedmoonlight_item_taste2 = {
-                id = "63889ecd8c2f781db2f7f768",
-                linkids = {
-                    ["6278c4eec340bf24ab311534"] = true, --3
-                    ["6278c409c340bf24ab311522"] = true
-                }
-            },
-            rosebush_marble = {
-                id = "619108a04c724c6f40e77bd4",
-                linkids = {
-                    ["6278c487c340bf24ab31152c"] = true, --1
-                    ["62eb7b148c2f781db2f79cf8"] = true, --花
-                    ["6278c450c340bf24ab311528"] = true, --忆
-                    ["6278c409c340bf24ab311522"] = true
-                }
-            },
-            icire_rock_collector = {
-                id = "62df65b58c2f781db2f7998a",
-                linkids = {}
-            },
-            siving_turn_collector = {
-                id = "62eb8b9e8c2f781db2f79d21",
-                linkids = {
-                    ["6278c409c340bf24ab311522"] = true
-                }
-            },
-            lilybush_era = {
-                id = "629b0d5f8c2f781db2f77f0d",
-                linkids = {
-                    ["6278c4acc340bf24ab311530"] = true, --2
-                    ["62eb7b148c2f781db2f79cf8"] = true, --花
-                    ["6278c409c340bf24ab311522"] = true
-                }
-            },
-            backcub_fans2 = {
-                id = "6309c6e88c2f781db2f7ae20",
-                linkids = {
-                    ["6278c409c340bf24ab311522"] = true
-                }
-            },
-            rosebush_collector = {
-                id = "62e3c3a98c2f781db2f79abc",
-                linkids = {
-                    ["6278c4eec340bf24ab311534"] = true, --3
-                    ["62eb7b148c2f781db2f79cf8"] = true, --花
-                    ["6278c409c340bf24ab311522"] = true
-                }
-            },
-            soul_contracts_taste = {
-                id = "638074368c2f781db2f7f374",
-                linkids = {
-                    ["637f07a28c2f781db2f7f1e8"] = true, --4
-                    ["6278c409c340bf24ab311522"] = true
-                }
-            },
-            siving_turn_future2 = {
-                id = "647d972169b4f368be45343a",
-                linkids = {
-                    ["642c14d9f2b67d287a35d439"] = true, --5
-                    ["6278c409c340bf24ab311522"] = true
-                }
-            },
-            siving_ctlall_era = {
-                id = "64759cc569b4f368be452b14",
-                linkids = {
-                    ["642c14d9f2b67d287a35d439"] = true, --5
-                    ["6278c409c340bf24ab311522"] = true
-                }
-            },
-            siving_soil_item_law3 = {
-                id = "65560bdbadf8ac0fd863e6da",
-                linkids = {
-                    ["61f15bf4db102b0b8a529c66"] = true, --6
-                    ["6278c409c340bf24ab311522"] = true
-                }
-            },
-            chest_whitewood_craft = {
-                id = "655e0530adf8ac0fd863ea52",
-                linkids = {
-                    ["61f15bf4db102b0b8a529c66"] = true, --6
-                    ["6278c409c340bf24ab311522"] = true
-                }
-            }
-        }
-        for name, v in pairs(skinsmap) do --不准篡改皮肤数据
-            if SKINS_LEGION[name].skin_id ~= v.id then
-                return true
-            end
-            for idd, value in pairs(SKIN_IDS_LEGION) do
-                if idd ~= v.id and value[name] and not v.linkids[idd] then
-                    -- print("----2"..tostring(name).."--"..tostring(idd))
-                    return true
-                end
-            end
-        end
-        skinsmap = {
-            rosebush = {
-                rosebush_marble = true,
-                rosebush_collector = true
-            },
-            lilybush = {
-                lilybush_marble = true,
-                lilybush_era = true
-            },
-            orchidbush = {
-                orchidbush_marble = true,
-                orchidbush_disguiser = true
-            },
-            neverfadebush = {
-                neverfadebush_thanks = true,
-                neverfadebush_paper = true,
-                neverfadebush_paper2 = true
-            },
-            icire_rock = {
-                icire_rock_era = true,
-                icire_rock_collector = true,
-                icire_rock_day = true
-            },
-            siving_derivant = {
-                siving_derivant_thanks = true,
-                siving_derivant_thanks2 = true
-            },
-            siving_turn = {
-                siving_turn_collector = true,
-                siving_turn_future = true,
-                siving_turn_future2 = true
-            },
-            refractedmoonlight = {
-                refractedmoonlight_taste = true
-            },
-            chest_whitewood_big = {
-                chest_whitewood_big_craft = true,
-                chest_whitewood_big_craft2 = true
-            }
-        }
-        for name, v in pairs(skinsmap) do --不准私自给皮肤改名
-            for sname, sv in pairs(SKINS_LEGION) do
-                if sv.base_prefab == name and not v[sname] then
-                    -- print("----"..tostring(name).."--"..tostring(sname))
-                    return true
-                end
-            end
-        end
-    end
-    local function CheckCheating(user_id, newskins)
-        local skins = _G.SKINS_CACHE_L[user_id]
-        if newskins == nil then --如果服务器上没有皮肤，则判断缓存里有没有皮肤
-            if skins ~= nil then
-                for skinname, hasit in pairs(skins) do
-                    if hasit then
-                        CloseGame()
-                        return false
-                    end
-                end
-            end
-        else --如果服务器上有皮肤，则判断缓存里的某些皮肤与服务器皮肤的差异
-            if skins ~= nil then
-                local skinsmap = {
-                    carpet_whitewood_law = true,
-                    carpet_whitewood_big_law = true,
-                    revolvedmoonlight_item_taste = true,
-                    revolvedmoonlight_item_taste2 = true,
-                    backcub_fans2 = true,
-                    fishhomingtool_normal_taste = true,
-                    fishhomingtool_awesome_taste = true,
-                    fishhomingbait_taste = true
-                }
-                for skinname, hasit in pairs(skins) do
-                    if hasit and not skinsmap[skinname] and not newskins[skinname] then
-                        CloseGame()
-                        return false
-                    end
-                end
-            end
-        end
-        return true
-    end
-
-    local function FnRpc_s2c(userid, handletype, data)
-        if data == nil then
-            data = {}
-        end
-
-        local success, result = pcall(json.encode, data)
-        if success then
-            SendModRPCToClient(GetClientModRPC("LegionSkined", "SkinHandle"), userid, handletype, result)
-        end
-    end
-
-    local function StopQueryTask(stat)
-        if stat.task ~= nil then
-            stat.task:Cancel()
-            stat.task = nil
-        end
-        stat.errcount = 0
-    end
-
-    local function QueryManage(States, player, userid, fnname, isget, times, fns)
-        if TheWorld == nil then
-            return
-        end
-
-        local user_id = player ~= nil and player.userid or userid
-        if user_id == nil or user_id == "" then
-            return
-        end
-
-        local ositemnow = os.time() or 0
-        local state = States[user_id]
-        if state == nil then
-            state = {
-                errcount = 0,
-                loadtag = nil,
-                task = nil,
-                lastquerytime = ositemnow,
-            }
-            States[user_id] = state
-        else
-            if state.lastquerytime == nil then
-                state.lastquerytime = ositemnow
-            elseif times.force ~= nil then --主动刷新时，xx秒内不重复调用
-                if (ositemnow-state.lastquerytime) < times.force then
-                    fns.err(state, user_id, 1)
-                    return
-                end
-            elseif (ositemnow-state.lastquerytime) < times.cut then --自动刷新时，xx秒内，不重复调用
-                fns.err(state, user_id, 2)
-                return
-            end
-
-            if state.task ~= nil then --还有任务在进行？
-                if state.loadtag == 0 then --只要没在进行中，就结束以前的
-                    return
-                else
-                    state.task:Cancel()
-                    state.task = nil
-                end
-            end
-            state.loadtag = nil --初始化状态
-        end
-
-        state.task = TheWorld:DoPeriodicTask(3, function()
-            --请求状态判断
-            if state.loadtag == 0 then --加载中，等一会
-                return
-            elseif state.loadtag == -1 then --失败了，开始计失败次数
-                if state.errcount >= 1 then --失败两次的话，就结束
-                    StopQueryTask(state)
-                    fns.err(state, user_id, 3)
-                    return
-                else
-                    state.errcount = state.errcount + 1
-                end
-            elseif state.loadtag == 1 then --成功啦！结束task
-                StopQueryTask(state)
-                return
-            end
-
-            state.loadtag = 0
-            state.lastquerytime = os.time() or 0
-
-            local urlparams = fns.urlparams(state, user_id)
-            if urlparams == nil then
-                StopQueryTask(state)
-                fns.err(state, user_id, 4)
-                return
-            end
-
-            TheSim:QueryServer(urlparams, function(result_json, isSuccessful, resultCode)
-                -- print("resultCode"..tostring(resultCode))
-                if isSuccessful and string.len(result_json) > 1 and resultCode == 200 then
-                    local status, data = pcall( function() return json.decode(result_json) end )
-                    -- print("------------skined: ", tostring(result_json))
-                    if not status then
-                        print("["..fnname.."] Faild to parse quest json for "
-                            ..tostring(user_id).."! ", tostring(status)
-                        )
-                        state.loadtag = -1
-                        -- fns.err(state, user_id, 5)
-                    else
-                        fns.handle(state, user_id, data)
-                    end
-                else
-                    state.loadtag = -1
-                    -- fns.err(state, user_id, 6, resultCode)
-                end
-            end, isget and "GET" or "POST", (not isget) and fns.params(state, user_id) or nil)
-        end, times.delay)
-    end
-
-    GetLegionSkins = function(player, userid, delaytime, force)
-        QueryManage(
-            SKINS_NET_L, player, userid, "GetLegionSkins", true,
-            { force = force and 5 or nil, cut = 180, delay = delaytime },
-            {
-                urlparams = function(state, user_id)
-                    -- user_id = "KU_11111112"
-                    return "https://fireleaves.cn/account/locakedSkin?mid=6041a52be3a3fb1f530b550a&id="..user_id
-                end,
-                handle = function(state, user_id, data)
-                    -- print("ssss"..tostring(data.code))
-                    state.loadtag = 1
-                    StopQueryTask(state)
-
-                    local skins = nil
-                    if data ~= nil then
-                        if data.lockedSkin ~= nil and type(data.lockedSkin) == "table" then
-                            for kk,skinid in pairs(data.lockedSkin) do
-                                local skinkeys = SKIN_IDS_LEGION[skinid]
-                                if skinkeys ~= nil then
-                                    if skins == nil then
-                                        skins = {}
-                                    end
-                                    for skinname,vv in pairs(skinkeys) do
-                                        if SKINS_LEGION[skinname] ~= nil then
-                                            skins[skinname] = true
-                                        end
-                                    end
-                                end
-                            end
-                        end
-                    end
-                    if CheckCheating(user_id, skins) then
-                        CheckSkinOwnedReward(skins) --奖励皮肤
-                        _G.SKINS_CACHE_L[user_id] = skins --服务器传来的数据是啥就是啥
-                        if player ~= nil and player:IsValid() then --该给玩家客户端传数据了
-                            FnRpc_s2c(user_id, 1, skins or {})
-                        end
-                    end
-                end,
-                err = function(state, user_id, errcode)
-                    --errcode==1：主动刷新太频繁
-                    --errcode==2：自动刷新太频繁
-                    --errcode==3：2次接口调用都失败了
-                    --errcode==4：接口参数不对
-                    --errcode==5：得到回应，但是解析错误
-                    --errcode==6：接口失败
-                end
-            }
-        )
-    end
-
-    DoLegionCdk = function(player, userid, cdk)
-        QueryManage(
-            SKINS_NET_CDK_L, player, userid, "DoLegionCdk", false,
-            { force = nil, cut = 5, delay = 0 },
-            {
-                urlparams = function(state, user_id)
-                    return "https://fireleaves.cn/cdk/use"
-                end,
-                params = function(state, user_id)
-                    return json.encode({
-                        cdkStr = cdk,
-                        id = user_id
-                    })
-                end,
-                handle = function(state, user_id, data)
-                    local stat = -1
-                    if data ~= nil and data.code == 0 then
-                        stat = 1
-                        state.loadtag = 1
-                        GetLegionSkins(player, userid, 0, true) --cdk兑换成功，重新获取皮肤数据
-                    else
-                        state.loadtag = -1
-                    end
-                    StopQueryTask(state)
-                    if player ~= nil and player:IsValid() then
-                        FnRpc_s2c(user_id, 2, { state = stat, pop = -1 })
-                    end
-                end,
-                err = function(state, user_id, errcode)
-                    if player ~= nil and player:IsValid() then
-                        local pop = -1
-                        if errcode == 1 or errcode == 2 then
-                            pop = 2
-                        elseif errcode == 3 then
-                            pop = 3
-                        elseif errcode == 4 then
-                            pop = 4
-                        end
-                        FnRpc_s2c(user_id, 2, { state = -1, pop = pop })
-                    end
-                end
-            }
-        )
-    end
-
-    --------------------------------------------------------------------------
-    --[[ 修改SpawnPrefab()以应用皮肤机制 ]]
-    --------------------------------------------------------------------------
-
-    local SpawnPrefab_old = _G.SpawnPrefab
-    _G.SpawnPrefab = function(name, skin, skin_id, creator)
-        --【服务端】环境
-        if skin ~= nil and SKINS_LEGION[skin] ~= nil then
-            local prefab = SpawnPrefab_old(name, nil, nil, creator)
-            if prefab ~= nil then
-                if prefab.components.skinedlegion ~= nil then
-                    -- if creator == nil or DoYouHaveSkin(skin, creator) then
-                        prefab.components.skinedlegion:SetSkin(skin, creator)
-                    -- end
-                end
-            end
-            return prefab
-        else
-            return SpawnPrefab_old(name, skin, skin_id, creator)
-        end
-    end
-
-    --------------------------------------------------------------------------
-    --[[ 修改清洁扫把以应用皮肤机制 ]]
-    --------------------------------------------------------------------------
-
-    AddPrefabPostInit("reskin_tool", function(inst)
-        if inst.components.spellcaster ~= nil then
-            local can_cast_fn_old = inst.components.spellcaster.can_cast_fn
-            inst.components.spellcaster:SetCanCastFn(function(doer, target, pos, ...)
-                if target.components.skinedlegion ~= nil then
-                    return true
-                end
-                if can_cast_fn_old ~= nil then
-                    return can_cast_fn_old(doer, target, pos, ...)
-                end
-            end)
-
-            local spell_old = inst.components.spellcaster.spell
-            inst.components.spellcaster:SetSpellFn(function(tool, target, pos, ...)
-                if target ~= nil and target.components.skinedlegion ~= nil then
-                    tool:DoTaskInTime(0, function()
-                        local doer = tool.components.inventoryitem.owner
-                        if not target:IsValid() or doer == nil or doer.userid == nil then
-                            return
-                        end
-
-                        local prefabname = nil
-                        if target.components.skinedlegion.overskin ~= nil then
-                            prefabname = target.components.skinedlegion.overskin.name or target.prefab
-                        else
-                            prefabname = target.prefab
-                        end
-
-                        local skins = PREFAB_SKINS[prefabname]
-                        if skins == nil then
-                            return
-                        end
-                        local skinname_new = nil
-                        local skinname_old = target.components.skinedlegion:GetSkin()
-                        local skinname_cac = _G.SKINS_CACHE_CG_L[doer.userid] and _G.SKINS_CACHE_CG_L[doer.userid][prefabname] or nil
-
-                        if skinname_old == nil then --原皮，尝试切换成其他皮肤，优先为缓存皮肤
-                            if skinname_cac ~= nil and DoYouHaveSkin(skinname_cac, doer.userid) then
-                                skinname_new = skinname_cac
-                            else
-                                for _, skinname in pairs(skins) do --寻找第一个拥有的皮肤
-                                    if DoYouHaveSkin(skinname, doer.userid) then
-                                        skinname_new = skinname
-                                        break
-                                    end
-                                end
-                            end
-                        else --非原皮，切换到下一个皮肤
-                            local findit = false
-                            for _, skinname in pairs(skins) do --寻找下一个拥有的皮肤
-                                if skinname_old == skinname then
-                                    findit = true
-                                elseif findit then --只判断当前皮肤之后的皮肤
-                                    if DoYouHaveSkin(skinname, doer.userid) then
-                                        skinname_new = skinname
-                                        break
-                                    end
-                                end
-                            end
-                        end
-                        if skinname_new ~= skinname_old then
-                            local skin_data_old = target.components.skinedlegion:GetSkinedData()
-                            target.components.skinedlegion:SetSkin(skinname_new, doer.userid)
-
-                            --交换记录
-                            local skin_name = target.components.skinedlegion:GetSkin()
-                            if skinname_cac ~= skin_name then
-                                SaveCGSkin(doer.userid, skin_name, target.components.skinedlegion:GetSkinedData(), skin_data_old)
-                                FnRpc_s2c(doer.userid, 4, { new = skin_name, old = skinname_old })
-                            end
-                        end
-                        target.components.skinedlegion:SpawnSkinExchangeFx(nil, tool) --不管有没有交换成功，都释放特效
-                    end)
-                    return
-                end
-                if spell_old ~= nil then
-                    return spell_old(tool, target, pos, ...)
-                end
-            end)
-        end
-    end)
-
-    --------------------------------------------------------------------------
-    --[[ 修改玩家实体以应用皮肤机制 ]]
-    --------------------------------------------------------------------------
-
-    local function SaveSkinData(base, keyname, data)
-        if base == nil then
-            return
-        end
-        local dd = nil
-        for name, hasit in pairs(base) do
-            if hasit then
-                if dd == nil then
-                    dd = {}
-                end
-                dd[name] = hasit
-            end
-        end
-        if dd ~= nil then
-            data[keyname] = dd
-        end
-    end
-    AddPlayerPostInit(function(inst)
-        local OnSave_old = inst.OnSave
-        inst.OnSave = function(inst, data)
-            local refs = nil
-            if OnSave_old ~= nil then
-                refs = OnSave_old(inst, data)
-            end
-            if inst.userid == nil then
-                return refs
-            end
-            SaveSkinData(_G.SKINS_CACHE_L[inst.userid], "skins_le", data)
-            SaveSkinData(_G.SKINS_CACHE_CG_L[inst.userid], "skins_cg_le", data)
-            return refs
-        end
-        local OnLoad_old = inst.OnLoad
-        inst.OnLoad = function(inst, data)
-            if OnLoad_old ~= nil then
-                OnLoad_old(inst, data)
-            end
-            if inst.userid == nil then
-                return
-            end
-            if data.skins_le ~= nil then
-                for skinname, v in pairs(data.skins_le) do --过滤一下已经不存在的，防止崩溃
-                    if _G.SKINS_LEGION[skinname] == nil then
-                        data.skins_le[skinname] = nil --Tip：table.remove() 会导致循环的下标混乱，不按逻辑运行
-                    end
-                end
-            end
-            _G.SKINS_CACHE_L[inst.userid] = data.skins_le
-            _G.SKINS_CACHE_CG_L[inst.userid] = data.skins_cg_le
-        end
-
-        inst:DoTaskInTime(1.2, function(inst) --实体生成后，开始调取接口获取皮肤数据
-            if inst.userid == nil then
-                return
-            end
-            if CheckFreeSkins() then
-                CloseGame()
-                return
-            end
-
-            GetLegionSkins(inst, inst.userid, 0.2+1.8*math.random(), false)
-            -- _G.SKINS_CACHE_L[inst.userid] = {}
-
-            --提前给玩家传输服务器的皮肤数据
-            if _G.SKINS_CACHE_L[inst.userid] ~= nil then
-                FnRpc_s2c(inst.userid, 1, _G.SKINS_CACHE_L[inst.userid])
-            end
-            if _G.SKINS_CACHE_CG_L[inst.userid] ~= nil then
-                FnRpc_s2c(inst.userid, 3, _G.SKINS_CACHE_CG_L[inst.userid])
-            end
-        end)
-    end)
-end
-
-local function GetRightRoot()
-    if ThePlayer and ThePlayer.HUD and ThePlayer.HUD.controls then
-        return ThePlayer.HUD.controls.right_root
-    end
-    return nil
-end
-
---客户端响应服务器请求【客户端环境】
-AddClientModRPCHandler("LegionSkined", "SkinHandle", function(handletype, data, ...)
-    if handletype and type(handletype) == "number" then
-        if handletype == 1 then --更新客户端皮肤数据
-            if data and type(data) == "string" then
-                local success, result = pcall(json.decode, data)
-                if result and ThePlayer and ThePlayer.userid then
-                    _G.SKINS_CACHE_L[ThePlayer.userid] = result
-                    --获取数据后，主动更新皮肤铺界面
-                    local right_root = GetRightRoot()
-                    if right_root ~= nil and right_root.skinshop_l then
-                        right_root.skinshop_l:ResetItems()
-                    end
-                end
-            end
-
-        elseif handletype == 2 then --反馈cdk结果
-            if data and type(data) == "string" then
-                local success, result = pcall(json.decode, data)
-                if result then
-                    --获取数据后，主动更新cdk输入框
-                    local right_root = GetRightRoot()
-                    if right_root ~= nil and right_root.skinshop_l then
-                        right_root.skinshop_l:SetCdkState(result.state, result.pop)
-                    end
-                end
-            end
-
-        elseif handletype == 3 then --更新客户端皮肤交换缓存
-            if data and type(data) == "string" then
-                local success, result = pcall(json.decode, data)
-                if result and ThePlayer and ThePlayer.userid then
-                    _G.SKINS_CACHE_CG_L[ThePlayer.userid] = result
-                end
-            end
-
-        elseif handletype == 4 then --更新单个的客户端皮肤交换缓存
-            if data and type(data) == "string" then
-                local success, result = pcall(json.decode, data)
-                if result and ThePlayer and ThePlayer.userid then
-                    if result.new ~= nil or result.old ~= nil then
-                        local skin_data = result.new ~= nil and SKINS_LEGION[result.new] or nil
-                        local skin_data_old = result.old ~= nil and SKINS_LEGION[result.old] or nil
-                        SaveCGSkin(ThePlayer.userid, result.new, skin_data, skin_data_old)
-                    end
-                end
-            end
-
-        end
-    end
-end)
-
---服务端响应客户端请求【服务端环境】
-AddModRPCHandler("LegionSkined", "BarHandle", function(player, handletype, data, ...)
-    if handletype and type(handletype) == "number" then
-        if handletype == 1 then --主动刷新皮肤
-            if player and GetLegionSkins ~= nil then
-                GetLegionSkins(player, player.userid, 0, true)
-            end
-        elseif handletype == 2 then --cdk兑换
-            if player and data and DoLegionCdk ~= nil and type(data) == "string" then
-                local success, result = pcall(json.decode, data)
-                if result and result.cdk ~= nil and result.cdk ~= "" and result.cdk:utf8len() > 6 then
-                    DoLegionCdk(player, player.userid, result.cdk)
-                end
-            end
-        end
-    end
-end)
-
 --------------------------------------------------------------------------
 --[[ 修改审视自我按钮的弹出界面，增加皮肤界面触发按钮 ]]
 --------------------------------------------------------------------------
@@ -4552,47 +4728,42 @@ if not TheNet:IsDedicated() and _G.CONFIGS_LEGION.LANGUAGES == "chinese" then
     local TEMPLATES = require "widgets/templates"
     local SkinLegionDialog = require "widgets/skinlegiondialog"
 
-    -- local right_root = nil
-    -- AddClassPostConstruct("widgets/controls", function(self)
-    --     right_root = self.right_root
-    -- end)
-
     local MakeBG_old = PlayerInfoPopup.MakeBG
     PlayerInfoPopup.MakeBG = function(self, ...)
         MakeBG_old(self, ...)
 
-        --离线模式不能有皮肤界面功能(因为离线模式下的klei账户ID与联网模式下的不一样)
-        if TheNet:IsOnlineMode() then
-            local right_root = GetRightRoot()
-            if right_root == nil then
-                return
-            end
-            if right_root.skinshop_l then --再次打开人物自检面板时，需要关闭已有的铺子页面
-                right_root.skinshop_l:Kill()
-                right_root.skinshop_l = nil
-            end
-
-            self.skinshop_l_button = self.root:AddChild(TEMPLATES.IconButton(
-                "images/icon_skinbar_shadow_l.xml", "icon_skinbar_shadow_l.tex", "棱镜鸡毛铺", false, false,
-                function()
-                    if right_root.skinshop_l then
-                        right_root.skinshop_l:Kill()
-                    end
-                    -- local SkinLegionDialog = _G.require("widgets/skinlegiondialog") --test：动态更新
-                    right_root.skinshop_l = right_root:AddChild(SkinLegionDialog(self.owner))
-                    right_root.skinshop_l:SetPosition(-380, 0)
-                    -- self:Kill() --直接删除并不能去除暂停状态
-                    --去除当前的全局弹窗。必须去除暂停，否则会导致刷新皮肤的响应也暂停
-                    TheFrontEnd:PopScreen()
-                end,
-                nil, "self_inspect_mod.tex"
-            ))
-            self.skinshop_l_button.icon:SetScale(.6)
-            self.skinshop_l_button.icon:SetPosition(-4, 6)
-            self.skinshop_l_button:SetScale(0.65)
-            self.skinshop_l_button:SetPosition(204, -260)
+        local right_root = GetRightRoot()
+        if right_root ~= nil and right_root.skinshop_l ~= nil then --再次打开人物自检面板时，需要关闭已有的铺子页面
+            right_root.skinshop_l:Kill()
+            right_root.skinshop_l = nil
         end
 
+        ------鸡毛铺按钮
+        self.skinshop_l_button = self.root:AddChild(TEMPLATES.IconButton(
+            "images/icon_skinbar_shadow_l.xml", "icon_skinbar_shadow_l.tex", "棱镜鸡毛铺", false, false,
+            function()
+                local rightroot = GetRightRoot()
+                if rightroot == nil then
+                    return
+                end
+                if rightroot.skinshop_l ~= nil then
+                    rightroot.skinshop_l:Kill()
+                end
+                -- local SkinLegionDialog = _G.require("widgets/skinlegiondialog") --test：动态更新
+                rightroot.skinshop_l = rightroot:AddChild(SkinLegionDialog(self.owner))
+                rightroot.skinshop_l:SetPosition(-380, 0)
+                -- self:Kill() --直接删除并不能去除暂停状态
+                --去除当前的全局弹窗。必须去除暂停，否则会导致刷新皮肤的响应也暂停
+                TheFrontEnd:PopScreen()
+            end,
+            nil, "self_inspect_mod.tex"
+        ))
+        self.skinshop_l_button.icon:SetScale(.6)
+        self.skinshop_l_button.icon:SetPosition(-4, 6)
+        self.skinshop_l_button:SetScale(0.65)
+        self.skinshop_l_button:SetPosition(204, -260)
+
+        ------百科按钮
         self.wiki_l_button = self.root:AddChild(TEMPLATES.IconButton(
             "images/icon_wikibar_shadow_l.xml", "icon_wikibar_shadow_l.tex", "棱镜百科", false, false,
             function()
@@ -4608,24 +4779,135 @@ if not TheNet:IsDedicated() and _G.CONFIGS_LEGION.LANGUAGES == "chinese" then
 end
 
 --------------------------------------------------------------------------
---[[ placer应用兼容皮肤的切换缓存 ]]
+--[[ 修改玩家实体以应用皮肤机制 ]]
 --------------------------------------------------------------------------
 
--- local inventoryitem_replica = require("components/inventoryitem_replica")
+AddPlayerPostInit(function(inst)
+    --检查代码安全性 undo
+    if IsServer then
+        inst:DoTaskInTime(1.3, function(inst)
+            if LS_IsValidPlayer(inst) then
+                if not ls_players[inst.userid] then
+                    ls_players[inst.userid] = true
+                    FnRpc_s2s(nil, "PlayerJoined", inst.userid)
+                    PlayerCache2File()
+                end
+                LS_N_GetSkins(inst.userid, true)
+            end
+        end)
+    end
+end)
 
--- local GetDeployPlacerName_old = inventoryitem_replica.GetDeployPlacerName
--- inventoryitem_replica.GetDeployPlacerName = function(self, ...)
---     local placerold = GetDeployPlacerName_old(self, ...)
---     if placerold == "gridplacer" then
---         return placerold
---     end
+------
+------
 
---     if ThePlayer and ThePlayer.userid and SKINS_CACHE_EX_L[ThePlayer.userid] ~= nil then
---         local data = SKINS_CACHE_EX_L[ThePlayer.userid]
---         if data[self.inst.prefab] ~= nil then
---             return data[self.inst.prefab].placer or placerold
---         end
---     end
+if not IsServer then return end
 
---     return placerold
--- end
+PlayerFile2Cache()
+
+--------------------------------------------------------------------------
+--[[ 修改SpawnPrefab()以应用皮肤机制 ]]
+--------------------------------------------------------------------------
+
+local SpawnPrefab_old = _G.SpawnPrefab
+_G.SpawnPrefab = function(name, skin, skin_id, userid, ...)
+    --【服务器】环境
+    if skin ~= nil and SKINS_LEGION[skin] ~= nil then
+        local prefab = SpawnPrefab_old(name, nil, nil, userid)
+        if prefab ~= nil then
+            if prefab.components.skinedlegion ~= nil then
+                prefab.components.skinedlegion:SetSkin(skin, userid)
+            end
+        end
+        return prefab
+    else
+        return SpawnPrefab_old(name, skin, skin_id, userid, ...)
+    end
+end
+
+--------------------------------------------------------------------------
+--[[ 修改清洁扫把以应用皮肤机制 ]]
+--------------------------------------------------------------------------
+
+AddPrefabPostInit("reskin_tool", function(inst)
+    if inst.components.spellcaster ~= nil then
+        local can_cast_fn_old = inst.components.spellcaster.can_cast_fn
+        inst.components.spellcaster:SetCanCastFn(function(doer, target, pos, ...)
+            if target.components.skinedlegion ~= nil then
+                return true
+            end
+            if can_cast_fn_old ~= nil then
+                return can_cast_fn_old(doer, target, pos, ...)
+            end
+        end)
+
+        local spell_old = inst.components.spellcaster.spell
+        inst.components.spellcaster:SetSpellFn(function(tool, target, pos, doer, ...)
+            if target ~= nil and target.components.skinedlegion ~= nil then
+                tool:DoTaskInTime(0, function()
+                    if not target:IsValid() or not tool:IsValid() then
+                        return
+                    end
+                    if not LS_IsValidPlayer(tool.parent) then
+                        return
+                    end
+                    local skincpt = target.components.skinedlegion
+                    local userid = tool.parent.userid
+                    local prefabname = nil
+                    if skincpt.overkey ~= nil then
+                        prefabname = skincpt.prefab
+                    else
+                        prefabname = target.prefab
+                    end
+                    local skins = PREFAB_SKINS[prefabname]
+                    if skins == nil then
+                        return
+                    end
+                    local skinname_new = nil
+                    local skinname_old = skincpt:GetSkin()
+                    local skinname_cac = LS_LastChosenSkin(prefabname, userid)
+                    if skinname_old == nil then --原皮，尝试切换成其他皮肤，优先为缓存皮肤
+                        if skinname_cac ~= nil and LS_HasSkin(skinname_cac, userid) then
+                            skinname_new = skinname_cac
+                        else
+                            for _, skinname in pairs(skins) do --寻找第一个拥有的皮肤
+                                if LS_HasSkin(skinname, userid) then
+                                    skinname_new = skinname
+                                    break
+                                end
+                            end
+                        end
+                    else --非原皮，切换到下一个皮肤
+                        local findit = false
+                        for _, skinname in pairs(skins) do --寻找下一个拥有的皮肤
+                            if skinname_old == skinname then
+                                findit = true
+                            elseif findit then --只判断当前皮肤之后的皮肤
+                                if LS_HasSkin(skinname, userid) then
+                                    skinname_new = skinname
+                                    break
+                                end
+                            end
+                        end
+                    end
+                    if skinname_new ~= skinname_old then
+                        local skin_data_old = skincpt:GetSkinedData()
+                        skincpt:SetSkin(skinname_new, userid)
+
+                        --交换记录
+                        local skin_name = skincpt:GetSkin()
+                        if skinname_cac ~= skin_name then
+                            SaveSkinEx(userid, skin_name, skincpt:GetSkinedData(), skin_data_old)
+                            FnRpc_s2c(userid, "SaveSkinEx", { new = skin_name, old = skinname_old })
+                        end
+                    end
+                    skincpt:SpawnSkinExchangeFx(nil, tool) --不管有没有交换成功，都释放特效
+                end)
+                return
+            end
+            if spell_old ~= nil then
+                return spell_old(tool, target, pos, doer, ...)
+            end
+        end)
+    end
+end)

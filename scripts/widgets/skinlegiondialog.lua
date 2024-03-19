@@ -3110,7 +3110,7 @@ local SkinLegionDialog = Class(Widget, function(self, owner)
             PushPopupDialog(self, "轻声提醒", "请输入正确的兑换码。", "知道啦", nil)
             return
         end
-        self:SetCdkState(0, nil) --后续的状态更新需要服务端返回结果过来
+        self:SetCdkState(0, nil) --后续的状态更新需要服务器返回结果过来
         DoRpc(2, { cdk = cdk })
     end)
     ]]--

@@ -635,8 +635,7 @@ table.insert(prefs, Prefab("neverfade", function()
     inst:AddTag("show_broken_ui") --装备损坏后展示特殊物品栏ui
     inst:AddTag("weapon")
 
-    inst:AddComponent("skinedlegion")
-    inst.components.skinedlegion:InitWithFloater("neverfade") --客户端才初始化时居然获取不了inst.prefab
+    LS_C_Init(inst, "neverfade", true)
 
     inst.entity:SetPristine()
     --此处截断：往下的代码是仅服务器运行，往上的代码是服务器和客户端都会运行的
@@ -655,8 +654,7 @@ table.insert(prefs, Prefab("neverfade", function()
 
     inst.OnSave = OnSave_never
     inst.OnLoad = OnLoad_never
-
-    inst.components.skinedlegion:SetOnPreLoad()
+    LS_C_OnPreLoad(inst)
 
     return inst
 end, GetAssets("neverfade", {
@@ -717,8 +715,7 @@ table.insert(prefs, Prefab("rosorns", function()
     inst:AddTag("icebox_valid") --能装进冰箱
     inst:AddTag("weapon")
 
-    inst:AddComponent("skinedlegion")
-    inst.components.skinedlegion:InitWithFloater("rosorns")
+    LS_C_Init(inst, "rosorns", true)
 
     inst.entity:SetPristine()
     if not TheWorld.ismastersim then return inst end
@@ -730,7 +727,7 @@ table.insert(prefs, Prefab("rosorns", function()
     SetPerishable(inst, TUNING.TOTAL_DAY_TIME*8, nil, inst.Remove)
     MakeHauntableLaunchAndPerish(inst)
 
-    inst.components.skinedlegion:SetOnPreLoad()
+    LS_C_OnPreLoad(inst)
 
     return inst
 end, GetAssets("rosorns", { Asset("ANIM", "anim/swap_rosorns.zip") }), nil))
@@ -779,8 +776,7 @@ table.insert(prefs, Prefab("lileaves", function()
     inst:AddTag("icebox_valid")
     inst:AddTag("weapon")
 
-    inst:AddComponent("skinedlegion")
-    inst.components.skinedlegion:InitWithFloater("lileaves")
+    LS_C_Init(inst, "lileaves", true)
 
     inst.entity:SetPristine()
     if not TheWorld.ismastersim then return inst end
@@ -792,7 +788,7 @@ table.insert(prefs, Prefab("lileaves", function()
     SetPerishable(inst, TUNING.TOTAL_DAY_TIME*8, nil, inst.Remove)
     MakeHauntableLaunchAndPerish(inst)
 
-    inst.components.skinedlegion:SetOnPreLoad()
+    LS_C_OnPreLoad(inst)
 
     return inst
 end, GetAssets("lileaves", { Asset("ANIM", "anim/swap_lileaves.zip") }), nil))
@@ -880,8 +876,7 @@ table.insert(prefs, Prefab("orchitwigs", function()
     inst:AddTag("icebox_valid")
     inst:AddTag("weapon")
 
-    inst:AddComponent("skinedlegion")
-    inst.components.skinedlegion:InitWithFloater("orchitwigs")
+    LS_C_Init(inst, "orchitwigs", true)
 
     inst.entity:SetPristine()
     if not TheWorld.ismastersim then return inst end
@@ -893,7 +888,7 @@ table.insert(prefs, Prefab("orchitwigs", function()
     SetPerishable(inst, TUNING.TOTAL_DAY_TIME*8, nil, inst.Remove)
     MakeHauntableLaunchAndPerish(inst)
 
-    inst.components.skinedlegion:SetOnPreLoad()
+    LS_C_OnPreLoad(inst)
 
     return inst
 end, GetAssets("orchitwigs", { Asset("ANIM", "anim/swap_orchitwigs.zip") }), { "impact_orchid_fx" }))
@@ -1128,11 +1123,9 @@ if CONFIGS_LEGION.DRESSUP then
         local inst = CreateEntity()
         inst.entity:AddSoundEmitter()
         Fn_common(inst, "pinkstaff", nil, "anim", nil)
+        LS_C_Init(inst, "pinkstaff", true)
 
         inst:AddTag("nopunch") --这个标签的作用应该是让本身没有武器组件的道具用武器攻击的动作，而不是用拳头攻击的动作
-
-        inst:AddComponent("skinedlegion")
-        inst.components.skinedlegion:InitWithFloater("pinkstaff")
 
         inst.entity:SetPristine()
         if not TheWorld.ismastersim then return inst end
@@ -1150,7 +1143,7 @@ if CONFIGS_LEGION.DRESSUP then
 
         MakeHauntableLaunch(inst)
 
-        inst.components.skinedlegion:SetOnPreLoad()
+        LS_C_OnPreLoad(inst)
 
         return inst
     end, GetAssets("pinkstaff", { Asset("ANIM", "anim/swap_pinkstaff.zip") }), nil))
@@ -1346,8 +1339,7 @@ table.insert(prefs, Prefab("fimbul_axe", function()
     inst:AddTag("weapon")
     inst:AddTag("projectile")
 
-    inst:AddComponent("skinedlegion")
-    inst.components.skinedlegion:InitWithFloater("fimbul_axe")
+    LS_C_Init(inst, "fimbul_axe", true)
 
     inst.entity:SetPristine()
     if not TheWorld.ismastersim then return inst end
@@ -1376,7 +1368,7 @@ table.insert(prefs, Prefab("fimbul_axe", function()
 
     MakeHauntableLaunch(inst)
 
-    inst.components.skinedlegion:SetOnPreLoad()
+    LS_C_OnPreLoad(inst)
 
     return inst
 end, GetAssets("fimbul_axe", {
@@ -1455,8 +1447,7 @@ table.insert(prefs, Prefab("tripleshovelaxe", function()
     inst:AddTag("tool")
     inst:AddTag("weapon")
 
-    inst:AddComponent("skinedlegion")
-    inst.components.skinedlegion:InitWithFloater("tripleshovelaxe")
+    LS_C_Init(inst, "tripleshovelaxe", true)
 
     inst.entity:SetPristine()
     if not TheWorld.ismastersim then return inst end
@@ -1477,7 +1468,7 @@ table.insert(prefs, Prefab("tripleshovelaxe", function()
 
     MakeHauntableLaunch(inst)
 
-    inst.components.skinedlegion:SetOnPreLoad()
+    LS_C_OnPreLoad(inst)
 
     return inst
 end, GetAssets("tripleshovelaxe"), nil))
@@ -1505,8 +1496,7 @@ table.insert(prefs, Prefab("triplegoldenshovelaxe", function()
     inst:AddTag("tool")
     inst:AddTag("weapon")
 
-    inst:AddComponent("skinedlegion")
-    inst.components.skinedlegion:InitWithFloater("triplegoldenshovelaxe")
+    LS_C_Init(inst, "triplegoldenshovelaxe", true)
 
     inst.entity:SetPristine()
     if not TheWorld.ismastersim then return inst end
@@ -1529,7 +1519,7 @@ table.insert(prefs, Prefab("triplegoldenshovelaxe", function()
 
     MakeHauntableLaunch(inst)
 
-    inst.components.skinedlegion:SetOnPreLoad()
+    LS_C_OnPreLoad(inst)
 
     return inst
 end, GetAssets("triplegoldenshovelaxe"), nil))
@@ -1661,9 +1651,7 @@ table.insert(prefs, Prefab("lance_carrot_l", function()
     inst:AddTag("rp_carrot_l")
     inst:AddTag("weapon")
 
-    -- inst:AddComponent("skinedlegion")
-    -- inst.components.skinedlegion:InitWithFloater("lance_carrot_l")
-
+    -- LS_C_Init(inst, "lance_carrot_l", true)
     SetFloatable(inst, { 0.15, "small", 0.4, 0.5 })
 
     inst.entity:SetPristine()
@@ -1694,11 +1682,11 @@ table.insert(prefs, Prefab("lance_carrot_l", function()
 
     MakeHauntableLaunch(inst)
 
-    -- inst.components.skinedlegion:SetOnPreLoad()
-
     if TUNING.FUNCTIONAL_MEDAL_IS_OPEN then
         SetImmortalable(inst, 2, nil)
     end
+
+    -- LS_C_OnPreLoad(inst)
 
     return inst
 end, GetAssets("lance_carrot_l"), nil))

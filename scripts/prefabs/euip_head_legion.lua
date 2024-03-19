@@ -124,8 +124,7 @@ table.insert(prefs, Prefab("hat_lichen", function()
     inst:AddTag("icebox_valid")
     inst:AddTag("open_top_hat") --虽然这个标签作用于植物人的贴图切换，但我没看出来到底哪里变了
 
-    inst:AddComponent("skinedlegion")
-    inst.components.skinedlegion:InitWithFloater("hat_lichen")
+    LS_C_Init(inst, "hat_lichen", true)
 
     inst.entity:SetPristine()
     if not TheWorld.ismastersim then return inst end
@@ -139,7 +138,7 @@ table.insert(prefs, Prefab("hat_lichen", function()
 
     MakeHauntableLaunchAndPerish(inst)
 
-    inst.components.skinedlegion:SetOnPreLoad()
+    LS_C_OnPreLoad(inst)
 
     return inst
 end, GetAssets("hat_lichen"), { "lichenhatlight" }))
@@ -306,11 +305,9 @@ end
 table.insert(prefs, Prefab("hat_cowboy", function()
     local inst = CreateEntity()
     Fn_common(inst, "hat_cowboy", nil, "anim", nil)
+    LS_C_Init(inst, "hat_cowboy", true)
 
     inst:AddTag("waterproofer")
-
-    inst:AddComponent("skinedlegion")
-    inst.components.skinedlegion:InitWithFloater("hat_cowboy")
 
     inst.entity:SetPristine()
     if not TheWorld.ismastersim then return inst end
@@ -336,7 +333,7 @@ table.insert(prefs, Prefab("hat_cowboy", function()
 
     MakeHauntableLaunch(inst)
 
-    inst.components.skinedlegion:SetOnPreLoad()
+    LS_C_OnPreLoad(inst)
 
     return inst
 end, GetAssets("hat_cowboy"), nil))
@@ -432,9 +429,7 @@ table.insert(prefs, Prefab("hat_elepheetle", function()
     inst:AddTag("rp_bugshell_l")
     inst:AddTag("show_broken_ui") --装备损坏后展示特殊物品栏ui
 
-    -- inst:AddComponent("skinedlegion")
-    -- inst.components.skinedlegion:InitWithFloater("hat_elepheetle")
-
+    -- LS_C_Init(inst, "hat_elepheetle", true)
     MakeInventoryFloatable(inst, "small", 0.2, 1.35)
 
     inst.entity:SetPristine()
@@ -461,7 +456,7 @@ table.insert(prefs, Prefab("hat_elepheetle", function()
 
     TOOLS_L.MakeNoLossRepairableEquipment(inst, foreverequip_beetlehat)
 
-    -- inst.components.skinedlegion:SetOnPreLoad()
+    -- LS_C_OnPreLoad(inst)
 
     return inst
 end, GetAssets("hat_elepheetle"), nil))
@@ -731,12 +726,10 @@ table.insert(prefs, Prefab("siving_mask", function()
     local inst = CreateEntity()
     Fn_common(inst, "siving_mask", nil, nil, nil)
     TOOLS_L.InitMouseInfo(inst, Fn_dealdata_sivmask, Fn_getdata_sivmask)
+    LS_C_Init(inst, "siving_mask", false)
 
     -- inst:AddTag("open_top_hat")
     -- inst:AddTag("siv_mask")
-
-    inst:AddComponent("skinedlegion")
-    inst.components.skinedlegion:Init("siving_mask")
 
     inst.entity:SetPristine()
     if not TheWorld.ismastersim then return inst end
@@ -759,7 +752,7 @@ table.insert(prefs, Prefab("siving_mask", function()
     inst.OnSave = OnSave_sivmask
     inst.OnLoad = OnLoad_sivmask
 
-    inst.components.skinedlegion:SetOnPreLoad()
+    LS_C_OnPreLoad(inst)
 
     return inst
 end, GetAssets("siving_mask"), { "siving_lifesteal_fx" }))
@@ -1073,13 +1066,11 @@ table.insert(prefs, Prefab("siving_mask_gold", function()
     local inst = CreateEntity()
     Fn_common(inst, "siving_mask_gold", nil, nil, nil)
     TOOLS_L.InitMouseInfo(inst, Fn_dealdata_sivmask2, Fn_getdata_sivmask2)
+    LS_C_Init(inst, "siving_mask_gold", false)
 
     -- inst:AddTag("open_top_hat")
     inst:AddTag("siv_mask2") --给特殊动作用
     inst:AddTag("modemystery_l")
-
-    inst:AddComponent("skinedlegion")
-    inst.components.skinedlegion:Init("siving_mask_gold")
 
     inst.entity:SetPristine()
     if not TheWorld.ismastersim then return inst end
@@ -1116,8 +1107,7 @@ table.insert(prefs, Prefab("siving_mask_gold", function()
 
     inst.OnSave = OnSave_sivmask
     inst.OnLoad = OnLoad_sivmask
-
-    inst.components.skinedlegion:SetOnPreLoad()
+    LS_C_OnPreLoad(inst)
 
     return inst
 end, GetAssets("siving_mask_gold"), { "siving_lifesteal_fx", "life_trans_fx" }))

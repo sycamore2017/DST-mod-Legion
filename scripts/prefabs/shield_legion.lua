@@ -334,8 +334,7 @@ MakeShield({
         inst:AddTag("show_broken_ui") --装备损坏后展示特殊物品栏ui
         inst:AddTag("heavyarmor") --减轻击退效果 官方tag
 
-        inst:AddComponent("skinedlegion")
-        inst.components.skinedlegion:Init("shield_l_sand")
+        LS_C_Init(inst, "shield_l_sand", false)
     end,
     fn_server = function(inst)
         inst.components.inventoryitem:SetSinks(true) --它是石头做的，不可漂浮
@@ -356,7 +355,7 @@ MakeShield({
 
         TOOLS_L.MakeNoLossRepairableEquipment(inst, foreverequip_sand)
 
-        inst.components.skinedlegion:SetOnPreLoad()
+        LS_C_OnPreLoad(inst)
     end
 })
 
@@ -376,8 +375,7 @@ MakeShield({
     assets = GetAssets("shield_l_log", nil),
     prefabs = { "shield_attack_l_fx" },
     fn_common = function(inst)
-        inst:AddComponent("skinedlegion")
-        inst.components.skinedlegion:InitWithFloater("shield_l_log")
+        LS_C_Init(inst, "shield_l_log", true)
     end,
     fn_server = function(inst)
         inst.components.equippable:SetOnEquip(OnEquipFn)
@@ -402,7 +400,7 @@ MakeShield({
         MakeSmallBurnable(inst, TUNING.SMALL_BURNTIME)
         MakeSmallPropagator(inst)
 
-        inst.components.skinedlegion:SetOnPreLoad()
+        LS_C_OnPreLoad(inst)
     end
 })
 
@@ -657,8 +655,7 @@ MakeShield({
         inst:AddTag("hide_percentage")  --这个标签能让护甲耐久比例不显示出来
         inst:AddTag("NORATCHECK") --mod兼容：永不妥协。该道具不算鼠潮分
 
-        inst:AddComponent("skinedlegion")
-        inst.components.skinedlegion:Init("agronssword")
+        LS_C_Init(inst, "agronssword", false)
     end,
     fn_server = function(inst)
         inst._dd = {
@@ -718,8 +715,7 @@ MakeShield({
         SetRechargeable(inst, CONFIGS_LEGION.AGRONRECHARGETIME)
 
         inst.OnLoad = OnLoad_agron
-
-        inst.components.skinedlegion:SetOnPreLoad()
+        LS_C_OnPreLoad(inst)
     end
 })
 

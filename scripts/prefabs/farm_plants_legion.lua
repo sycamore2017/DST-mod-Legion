@@ -596,9 +596,7 @@ local function MakePlant(defkey, data)
 			data.fn_common(inst)
 		end
 
-		inst:AddComponent("skinedlegion")
-		inst.components.skinedlegion:OverrideSkin("siving_soil_item", "data_plant")
-		inst.components.skinedlegion:Init("siving_soil_item")
+		LS_C_Init(inst, "siving_soil_item", false, "data_plant")
 
 		inst.entity:SetPristine()
 		if not TheWorld.ismastersim then return inst end
@@ -634,7 +632,7 @@ local function MakePlant(defkey, data)
 			data.fn_server(inst)
 		end
 
-		-- inst.components.skinedlegion:SetOnPreLoad()
+		-- LS_C_OnPreLoad(inst)
 
 		return inst
 	end, nil, nil)
@@ -835,8 +833,7 @@ local function MakePlant2(cropprefab, sets)
 		TOOLS_L.InitMouseInfo(inst, Fn_dealdata_p2, Fn_getdata_p2, 3)
 
 		if skinedplant[cropprefab] then
-			inst:AddComponent("skinedlegion")
-			inst.components.skinedlegion:Init("plant_"..cropprefab.."_l")
+			LS_C_Init(inst, "plant_"..cropprefab.."_l", false)
 		end
 
 		if sets.fn_common ~= nil then
@@ -869,7 +866,7 @@ local function MakePlant2(cropprefab, sets)
 		inst.fn_planted = OnPlant_p2
 
 		-- if inst.components.skinedlegion ~= nil then
-		-- 	inst.components.skinedlegion:SetOnPreLoad()
+		-- 	LS_C_OnPreLoad(inst)
 		-- end
 
 		if sets.fn_server ~= nil then

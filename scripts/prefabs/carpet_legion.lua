@@ -35,8 +35,7 @@ local function MakeCarpet(data)
             data.fn_common(inst)
         end
 
-        inst:AddComponent("skinedlegion")
-        inst.components.skinedlegion:Init(name_prefab)
+        LS_C_Init(inst, name_prefab, false)
 
         inst.entity:SetPristine()
         if not TheWorld.ismastersim then return inst end
@@ -51,7 +50,7 @@ local function MakeCarpet(data)
             data.fn_server(inst)
         end
 
-        -- inst.components.skinedlegion:SetOnPreLoad()
+        -- LS_C_OnPreLoad(inst)
 
         return inst
     end, data.assets, data.prefabs))

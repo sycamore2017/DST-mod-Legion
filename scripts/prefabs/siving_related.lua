@@ -395,8 +395,7 @@ local function MakeItem(data)
 
         inst:AddTag("eyeturret") --眼球塔的专属标签，但为了deployable组件的摆放名字而使用（显示为“放置”）
 
-        inst:AddComponent("skinedlegion")
-        inst.components.skinedlegion:Init(basename.."_item")
+        LS_C_Init(inst, basename.."_item", false)
 
         inst.ctltype_l = data.ctltype
         TOOLS_L.InitMouseInfo(inst, Fn_dealdata_sivctl, Fn_getdata_sivctl, 3)
@@ -434,7 +433,7 @@ local function MakeItem(data)
         inst.OnSave = OnSave_ctlitem
         inst.OnLoad = OnLoad_ctlitem
 
-        -- inst.components.skinedlegion:SetOnPreLoad()
+        -- LS_C_OnPreLoad(inst)
 
         return inst
     end, data.assets, data.prefabs))
@@ -466,8 +465,7 @@ local function MakeConstruct(data)
             inst.components.deployhelper.onenablehelper = OnEnableHelper_ctl
         end
 
-        inst:AddComponent("skinedlegion")
-        inst.components.skinedlegion:Init(basename)
+        LS_C_Init(inst, basename, false)
 
         inst.ctltype_l = data.ctltype
         TOOLS_L.InitMouseInfo(inst, Fn_dealdata_sivctl, Fn_getdata_sivctlcon, 1)
@@ -527,7 +525,7 @@ local function MakeConstruct(data)
             DoFunction_ctl(inst, true)
         end)
 
-        -- inst.components.skinedlegion:SetOnPreLoad()
+        -- LS_C_OnPreLoad(inst)
 
         if data.fn_server ~= nil then
             data.fn_server(inst)
@@ -843,8 +841,7 @@ table.insert(prefs, Prefab("siving_turn", function()
     inst:AddTag("structure")
     inst:AddTag("genetrans")
 
-    inst:AddComponent("skinedlegion")
-    inst.components.skinedlegion:Init("siving_turn")
+    LS_C_Init(inst, "siving_turn", false)
 
     TOOLS_L.InitMouseInfo(inst, Fn_dealdata_turn, Fn_getdata_turn, 3.5)
 
@@ -871,7 +868,7 @@ table.insert(prefs, Prefab("siving_turn", function()
 
     inst:ListenForEvent("ondeconstructstructure", OnDeconstruct_turn)
 
-    inst.components.skinedlegion:SetOnPreLoad()
+    LS_C_OnPreLoad(inst)
 
     return inst
 end, { Asset("ANIM", "anim/siving_turn.zip") }, { "siving_turn_fruit" }))
@@ -1129,7 +1126,6 @@ local function OnDeploy_soilitem(inst, pt, deployer, rot)
 end
 table.insert(prefs, Prefab("siving_soil_item", function() ------子圭垄(物品)
     local inst = CreateEntity()
-
     inst.entity:AddTransform()
     inst.entity:AddAnimState()
     inst.entity:AddNetwork()
@@ -1143,8 +1139,7 @@ table.insert(prefs, Prefab("siving_soil_item", function() ------子圭垄(物品
     inst:AddTag("molebait")
     inst:AddTag("eyeturret") --眼球塔的专属标签，但为了deployable组件的摆放名字而使用（显示为“放置”）
 
-    inst:AddComponent("skinedlegion")
-    inst.components.skinedlegion:Init("siving_soil_item")
+    LS_C_Init(inst, "siving_soil_item", false)
 
     inst.entity:SetPristine()
     if not TheWorld.ismastersim then return inst end
@@ -1171,7 +1166,7 @@ table.insert(prefs, Prefab("siving_soil_item", function() ------子圭垄(物品
 
     MakeHauntableLaunchAndIgnite(inst)
 
-    -- inst.components.skinedlegion:SetOnPreLoad()
+    -- LS_C_OnPreLoad(inst)
 
     return inst
 end, {
@@ -1207,9 +1202,7 @@ table.insert(prefs, Prefab("siving_soil", function() ------子圭垄
 
     inst:AddTag("soil_legion")
 
-    inst:AddComponent("skinedlegion")
-    inst.components.skinedlegion:OverrideSkin("siving_soil_item", "data_soil")
-    inst.components.skinedlegion:Init("siving_soil_item")
+    LS_C_Init(inst, "siving_soil_item", false, "data_soil")
 
     inst.entity:SetPristine()
     if not TheWorld.ismastersim then return inst end
@@ -1230,7 +1223,7 @@ table.insert(prefs, Prefab("siving_soil", function() ------子圭垄
 
     MakeHauntableWork(inst)
 
-    -- inst.components.skinedlegion:SetOnPreLoad()
+    -- LS_C_OnPreLoad(inst)
 
     return inst
 end, {

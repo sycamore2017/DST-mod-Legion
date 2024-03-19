@@ -110,7 +110,6 @@ end
 
 function ProjectileLegion:OnUpdate(dt)
 	local current = self.inst:GetPosition()
-
 	local x, y, z = current:Get()
 
 	--检测目前所在地皮，如果进入虚空领地，就直接停止
@@ -127,6 +126,7 @@ function ProjectileLegion:OnUpdate(dt)
 	for _, ent in ipairs(ents) do
 		if
 			ent ~= self.attacker and not self.hittargets[ent] and ent.entity:IsVisible() and --有效
+			ent.components.combat ~= nil and --有 _combat 标签不一定会有战斗组件，因为别的mod的生物可能不遵循这个规则
 			(self.bulletradius+ent:GetPhysicsRadius(0))^2 >= distsq(current, ent:GetPosition()) and --范围内
 			ent.components.combat:CanBeAttacked(self.attacker) and --防止 attacker 打到不该打到的对象
 			(self.fn_validhit == nil or self.fn_validhit(self, ent))

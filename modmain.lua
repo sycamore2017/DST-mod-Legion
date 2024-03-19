@@ -14,23 +14,35 @@
 ]]--
 
 --[[ RPC使用讲解 Tip:
-    !参数建议弄成数字类型或者字符类型
+    !参数建议弄成数字类型或者字符类型；如果是表，可以转成json字符再发送
     !!参数是可以直接填写一个有网络组件的实体的：
         逻辑上并不会把整个实体都发送出去，而是只使用了部分数据
         一个实体在服务器与客户端的 GUID 并不一致，没法直接对应
         官方逻辑是根据 netid 自动对应客户端和服务器的实体
         需要注意，客户端收到数据时，若实体不在玩家加载范围内，则参数很可能传来的是空值
 
-    【客户端发送请求给服务器】SendModRPCToServer(GetModRPC("LegionMsg", "operate"), 参数2, 参数3, ...)
-    【服务器监听与响应请求】
+    【客户端发送请求给服务器】
+        SendModRPCToServer(GetModRPC("LegionMsg", "operate"), 参数2, 参数3, ...)
+    【服务器响应客户端请求】
         AddModRPCHandler("LegionMsg", "operate", function(player, 参数2, ...) --第一个参数固定为发起请求的玩家
             --做你想做的
         end)
 
-    【服务端发送请求给客户端】SendModRPCToClient(GetClientModRPC("LegionMsg", "operate"), 玩家ID, 参数2, 参数3, ...)
-    --若 玩家ID 为table，则服务端会向table里的全部玩家ID都发送请求
-    【客户端监听与响应请求】
+    【服务器发送请求给客户端】
+        SendModRPCToClient(GetClientModRPC("LegionMsg", "operate"), 玩家ID, 参数2, 参数3, ...)
+        --若 玩家ID 为table，则服务器会向table里的全部玩家ID都发送请求
+    【客户端响应服务器请求】
         AddClientModRPCHandler("LegionMsg", "operate", function(参数2, ...) --通过 ThePlayer 确定客户端玩家
+            --做你想做的
+        end)
+
+    【服务器发送请求给服务器】
+        SendModRPCToShard(GetShardModRPC("LegionMsg", "operate"), 服务器ID, 参数2, 参数3, ...)
+        --若 服务器ID 为nil，则服务器会向所有服务器(包括发起请求的这个服务器自己)发送请求
+        --若 服务器ID 为table，则服务器会向table里的全部玩家ID都发送请求
+    【服务器响应服务器请求】
+        --使用右边代码能获取所有的服务器信息：local connected_shards = Shard_GetConnectedShards()
+        AddShardModRPCHandler("LegionMsg", "operate", function(shardid, 参数2, ...) --第一个参数为发起请求的服务器id
             --做你想做的
         end)
 ]]--
@@ -53,7 +65,7 @@
     TheWorld.ismastersim        --是否为服务器世界(主机+云服。本质上就是 TheNet:GetIsMasterSimulation())
     TheWorld.ismastershard      --是否为主世界(本质上就是 TheWorld.ismastersim and not TheShard:IsSecondary())
     TheNet:GetIsServer() or TheNet:IsDedicated() --是否为非客户端世界，这个是最精确的判定方式
-    not TheNet:IsDedicated()    --这个方式也能判定客户端，但是无法排除客户端和服务端为一体的世界的情况
+    not TheNet:IsDedicated()    --这个方式也能判定客户端，但是无法排除客户端和服务器为一体的世界的情况
 ]]--
 
 --[[ combat机制 Tip:
@@ -544,7 +556,7 @@ if _G.CONFIGS_LEGION.DRESSUP then
     modimport("scripts/dressup_legion.lua")
 end
 ------皮肤相关
-modimport("scripts/skin_legion.lua")
+modimport("scripts/niks_legion.lua")
 
 --------------------------------------------------------------------------
 --[[ mod之间的兼容，以及其他 ]]

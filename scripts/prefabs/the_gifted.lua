@@ -394,7 +394,6 @@ end
 
 local function Fn_contracts()
     local inst = CreateEntity()
-
     inst.entity:AddTransform()
     inst.entity:AddAnimState()
     inst.entity:AddSoundEmitter()
@@ -420,8 +419,7 @@ local function Fn_contracts()
     inst._lvl_l = net_byte(inst.GUID, "contracts_l._lvl_l", "lvl_l_dirty")
     inst.displaynamefn = DisplayName_contracts
 
-    inst:AddComponent("skinedlegion")
-    inst.components.skinedlegion:Init("soul_contracts")
+    LS_C_Init(inst, "soul_contracts", false)
 
     inst.entity:SetPristine()
     if not TheWorld.ismastersim then return inst end
@@ -485,8 +483,7 @@ local function Fn_contracts()
 
     inst.OnSave = OnSave_contracts
     inst.OnLoad = OnLoad_contracts
-
-    inst.components.skinedlegion:SetOnPreLoad()
+    LS_C_OnPreLoad(inst)
 
     return inst
 end

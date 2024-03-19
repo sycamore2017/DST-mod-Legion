@@ -170,7 +170,6 @@ end
 
 local function fn()
     local inst = CreateEntity()
-
     inst.entity:AddTransform()
     inst.entity:AddAnimState()
     inst.entity:AddSoundEmitter()
@@ -192,8 +191,7 @@ local function fn()
     --HASHEATER (from heater component) added to pristine state for optimization
     inst:AddTag("HASHEATER")
 
-    inst:AddComponent("skinedlegion")
-    inst.components.skinedlegion:Init("icire_rock")
+    LS_C_Init(inst, "icire_rock", false)
 
     inst.entity:SetPristine()
     if not TheWorld.ismastersim then return inst end
@@ -246,8 +244,7 @@ local function fn()
     -- inst.OnSave = OnSave
     -- inst.OnLoad = OnLoad
     inst.OnRemoveEntity = OnRemove
-
-    inst.components.skinedlegion:SetOnPreLoad()
+    LS_C_OnPreLoad(inst)
 
     return inst
 end

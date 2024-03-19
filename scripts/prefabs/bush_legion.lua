@@ -338,8 +338,7 @@ MakeBush({
         inst:AddTag("renewable")
         inst:AddTag("bush_l_f") --棱镜标签：表示能被暗影仆从采摘(默认是带 flwoer 标签的东西无法被采摘)
 
-        inst:AddComponent("skinedlegion")
-        inst.components.skinedlegion:Init("rosebush")
+        LS_C_Init(inst, "rosebush", false)
     end,
     fn_server = function(inst)
         inst:AddComponent("witherable")
@@ -359,7 +358,7 @@ MakeBush({
         MakeLargeBurnable(inst)
         MakeMediumPropagator(inst)
 
-        -- inst.components.skinedlegion:SetOnPreLoad()
+        -- LS_C_OnPreLoad(inst)
     end
 })
 
@@ -415,8 +414,7 @@ MakeBush({
         inst:AddTag("renewable")
         inst:AddTag("bush_l_f") --棱镜标签：表示能被暗影仆从采摘(默认是带 flwoer 标签的东西无法被采摘)
 
-        inst:AddComponent("skinedlegion")
-        inst.components.skinedlegion:Init("lilybush")
+        LS_C_Init(inst, "lilybush", false)
     end,
     fn_server = function(inst)
         inst:AddComponent("witherable")
@@ -436,7 +434,7 @@ MakeBush({
         MakeLargeBurnable(inst)
         MakeMediumPropagator(inst)
 
-        -- inst.components.skinedlegion:SetOnPreLoad()
+        -- LS_C_OnPreLoad(inst)
     end,
 })
 
@@ -492,8 +490,7 @@ MakeBush({
         inst:AddTag("renewable")
         inst:AddTag("bush_l_f") --棱镜标签：表示能被暗影仆从采摘(默认是带 flwoer 标签的东西无法被采摘)
 
-        inst:AddComponent("skinedlegion")
-        inst.components.skinedlegion:Init("orchidbush")
+        LS_C_Init(inst, "orchidbush", false)
     end,
     fn_server = function(inst)
         inst:AddComponent("witherable")
@@ -513,7 +510,7 @@ MakeBush({
         MakeMediumBurnable(inst)
         MakeSmallPropagator(inst)
 
-        -- inst.components.skinedlegion:SetOnPreLoad()
+        -- LS_C_OnPreLoad(inst)
     end,
 })
 
@@ -547,8 +544,7 @@ MakeBush({
         inst:SetPhysicsRadiusOverride(.5)
         inst:AddTag("flower")
 
-        inst:AddComponent("skinedlegion")
-        inst.components.skinedlegion:Init("neverfadebush")
+        LS_C_Init(inst, "neverfadebush", false)
     end,
     fn_server = function(inst)
         inst.components.pickable:SetUp("petals", TUNING.TOTAL_DAY_TIME * 3) --3天的成熟时间
@@ -557,7 +553,7 @@ MakeBush({
         inst.components.pickable.cycles_left = inst.components.pickable.max_cycles
         inst.components.pickable.onpickedfn = OnPicked_never
 
-        -- inst.components.skinedlegion:SetOnPreLoad()
+        -- LS_C_OnPreLoad(inst)
     end,
 })
 
