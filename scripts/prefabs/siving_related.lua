@@ -1113,8 +1113,7 @@ local function OnDeploy_soilitem(inst, pt, deployer, rot)
     if skin == nil then
         tree = SpawnPrefab("siving_soil")
     else
-        tree = SpawnPrefab("siving_soil", skin, nil,
-            inst.components.skinedlegion.userid or (deployer and deployer.userid or nil))
+        tree = SpawnPrefab("siving_soil", skin, nil, LS_C_UserID(inst, deployer))
     end
     if tree ~= nil then
         tree.Transform:SetPosition(pt:Get())
@@ -1182,8 +1181,7 @@ local function OnFinished_soil(inst, worker)
     if skin == nil then
         inst.components.lootdropper:SpawnLootPrefab("siving_soil_item")
     else
-        inst.components.lootdropper:SpawnLootPrefab("siving_soil_item", nil,
-            skin, nil, inst.components.skinedlegion.userid or (worker and worker.userid or nil))
+        inst.components.lootdropper:SpawnLootPrefab("siving_soil_item", nil, skin, nil, LS_C_UserID(inst, worker))
     end
     inst:Remove()
 end

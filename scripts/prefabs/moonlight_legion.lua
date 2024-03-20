@@ -190,7 +190,7 @@ local function OnUpgrade_hidden(item, doer, target, result)
 
     local skin = item.components.skinedlegion:GetSkin()
     if skin ~= nil then
-        result.components.skinedlegion:SetSkin(skin, item.components.skinedlegion.userid or (doer and doer.userid or nil))
+        result.components.skinedlegion:SetSkin(skin, LS_C_UserID(item, doer))
     end
 
     SetTarget_hidden(result, target.prefab)
@@ -313,8 +313,7 @@ local function OnFinished_hidden(inst, worker)
     if skin == nil then
         inst.components.lootdropper:SpawnLootPrefab("hiddenmoonlight_item")
     else
-        inst.components.lootdropper:SpawnLootPrefab("hiddenmoonlight_item", nil,
-            skin, nil, inst.components.skinedlegion.userid or (worker and worker.userid or nil))
+        inst.components.lootdropper:SpawnLootPrefab("hiddenmoonlight_item", nil, skin, nil, LS_C_UserID(inst, worker))
     end
 
     local fx = SpawnPrefab("collapse_small")
@@ -429,7 +428,7 @@ local function OnUpgrade_revolved(item, doer, target, result)
 
     local skin = item.components.skinedlegion:GetSkin()
     if skin ~= nil then
-        result.components.skinedlegion:SetSkin(skin, item.components.skinedlegion.userid or (doer and doer.userid or nil))
+        result.components.skinedlegion:SetSkin(skin, LS_C_UserID(item, doer))
     end
 
     if target.components.container ~= nil then
@@ -809,7 +808,7 @@ local function OnFinished_revolved(inst, worker)
         inst.components.lootdropper:SpawnLootPrefab("revolvedmoonlight_item")
     else
         inst.components.lootdropper:SpawnLootPrefab("revolvedmoonlight_item", nil,
-            skin, nil, inst.components.skinedlegion.userid or (worker and worker.userid or nil))
+            skin, nil, LS_C_UserID(inst, worker))
     end
 
     --特效

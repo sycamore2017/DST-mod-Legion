@@ -1741,9 +1741,7 @@ animaldd = nil
 -------------------
 -------------------
 
-if not IsServer then
-    return
-end
+if not IsServer then return end
 
 --------------------------------------------------------------------------
 --[[ 切换symbol时固定为幻化的装饰 ]]

@@ -937,8 +937,7 @@ function PerennialCrop:GenerateLoot(doer, ispicked, isburnt) --生成收获物
 		if skin == nil then
 			soil = SpawnPrefab("siving_soil_item")
 		else
-			soil = SpawnPrefab("siving_soil_item", skin, nil,
-				self.inst.components.skinedlegion.userid or (doer and doer.userid or nil))
+			soil = SpawnPrefab("siving_soil_item", skin, nil, LS_C_UserID(self.inst, doer))
 		end
 		if soil ~= nil then
 			soil.Transform:SetPosition(pos:Get())

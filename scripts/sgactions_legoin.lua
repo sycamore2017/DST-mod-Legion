@@ -1933,9 +1933,9 @@ local function OnPlant(seed, doer, soilorcrop)
             TheWorld:PushEvent("itemplanted", { doer = doer, pos = pt })
 
             --继承皮肤
-            if soilorcrop.components.skinedlegion ~= nil and soilorcrop.components.skinedlegion:GetSkin() ~= nil then
-                plant.components.skinedlegion:SetSkin(soilorcrop.components.skinedlegion:GetSkin(),
-                    soilorcrop.components.skinedlegion.userid or (doer and doer.userid or nil))
+            local skin = soilorcrop.components.skinedlegion and soilorcrop.components.skinedlegion:GetSkin() or nil
+            if skin ~= nil then
+                plant.components.skinedlegion:SetSkin(skin, LS_C_UserID(soilorcrop, doer))
             end
 
             --替换原本的作物

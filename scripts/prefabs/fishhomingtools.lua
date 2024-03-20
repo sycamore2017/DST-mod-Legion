@@ -175,7 +175,10 @@ local function OnHit(inst, attacker, target)
     local x, y, z = inst.Transform:GetWorldPosition()
 
     if not TheWorld.Map:IsOceanAtPoint(x, y, z) then
-        SpawnPrefab("fishhomingbait", inst.components.skinedlegion:GetSkin()).Transform:SetPosition(x, y, z)
+        local ba = SpawnPrefab("fishhomingbait", inst.components.skinedlegion:GetSkin(), LS_C_UserID(inst, attacker))
+        if ba ~= nil then
+            ba.Transform:SetPosition(x, y, z)
+        end
     else
         SpawnPrefab("splash_green").Transform:SetPosition(x, y, z)
 
