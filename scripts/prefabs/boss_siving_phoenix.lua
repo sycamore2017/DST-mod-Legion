@@ -953,14 +953,21 @@ local function InitFeaFx(inst)
         inst:Remove()
     end
 end
-local function InitFloatable(inst, data)
-    MakeInventoryFloatable(inst, data.size, data.offset_y, data.scale)
-    if data.cut ~= nil then
-        local OnLandedClient_old = inst.components.floater.OnLandedClient
-        inst.components.floater.OnLandedClient = function(self)
-            OnLandedClient_old(self)
-            self.inst.AnimState:SetFloatParams(data.cut, 1, self.bob_percent)
-        end
+local function OnLandedClient(self, ...)
+    if self.OnLandedClient_l_base ~= nil then
+        self.OnLandedClient_l_base(self, ...)
+    end
+    if self.floatparam_l ~= nil then
+        self.inst.AnimState:SetFloatParams(self.floatparam_l, 1, self.bob_percent)
+    end
+end
+local function SetFloatable(inst, float)
+    MakeInventoryFloatable(inst, float[2], float[3], float[4])
+    if float[1] ~= nil then
+        local floater = inst.components.floater
+        floater.OnLandedClient_l_base = floater.OnLandedClient
+        floater.floatparam_l = float[1]
+        floater.OnLandedClient = OnLandedClient
     end
 end
 local function MakeWeapon_replace(data)
@@ -1293,7 +1300,7 @@ local function MakeWeapon(data)
         end,
         fn_common_blk = function(inst)
             inst.AnimState:PlayAnimation("idle", false)
-            InitFloatable(inst, { cut = 0.04, size = "small", offset_y = 0.2, scale = 0.5 })
+            SetFloatable(inst, { 0.04, "small", 0.2, 0.5 })
         end,
         fn_server_blk = function(inst)
             inst.feather_name = data.name
@@ -1316,7 +1323,7 @@ local function MakeWeapon(data)
         end,
         fn_common_blk = function(inst)
             inst.AnimState:PlayAnimation("idle", false)
-            InitFloatable(inst, SKINS_LEGION[skinname].floater)
+            SetFloatable(inst, { 0.04, "small", 0.2, 0.5 })
         end,
         fn_server_blk = function(inst)
             inst.feather_name = data.name
@@ -1346,7 +1353,7 @@ local function MakeWeapon(data)
             inst.Transform:SetSixFaced()
             inst.AnimState:SetScale(0.9, 0.9)
             SetAnim_blk_collector(inst)
-            InitFloatable(inst, SKINS_LEGION[skinname2].floater)
+            SetFloatable(inst, { nil, "med", 0.1, 0.5 })
         end,
         fn_server_blk = function(inst)
             inst.feather_name = data.name

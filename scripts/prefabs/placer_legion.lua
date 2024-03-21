@@ -7,13 +7,16 @@ local prefs = {}
 ----建筑物placer兼容：建筑的皮肤placer请看playercontroller.StartBuildPlacementMode
 local function Skined_build(inst)
     --之所以把皮肤修改写到 SetBuilder 里，是因为 Skined_build 执行时还没有皮肤数据
-    local SetBuilder_old = inst.components.placer.SetBuilder
+    if inst.components.placer.SetBuilder_l ~= nil then
+        return
+    end
+    inst.components.placer.SetBuilder_l = inst.components.placer.SetBuilder
     inst.components.placer.SetBuilder = function(self, ...)
-        SetBuilder_old(self, ...)
+        self.SetBuilder_l(self, ...)
         if self.builder and self.builder.components.playercontroller ~= nil then
             local skin = self.builder.components.playercontroller.placer_recipe_skin
-            if skin and SKINS_LEGION[skin] and SKINS_LEGION[skin].fn_placer then
-                SKINS_LEGION[skin].fn_placer(self.inst)
+            if skin and ls_skineddata[skin] and ls_skineddata[skin].fn_placer then
+                ls_skineddata[skin].fn_placer(self.inst)
             end
         end
     end
@@ -22,20 +25,22 @@ end
 ----放置物placer兼容：放置物的皮肤placer请看playercontroller.OnUpdate
 local function Skined_deploy(inst, toskinprefab, skinfn)
     --之所以把皮肤修改写到 SetBuilder 里，是因为 Skined_build 执行时还没有皮肤数据
-    local SetBuilder_old = inst.components.placer.SetBuilder
+    if inst.components.placer.SetBuilder_l ~= nil then
+        return
+    end
+    inst.components.placer.SetBuilder_l = inst.components.placer.SetBuilder
     inst.components.placer.SetBuilder = function(self, ...)
-        SetBuilder_old(self, ...)
-
+        self.SetBuilder_l(self, ...)
         local skin = nil
         if skinfn ~= nil then
             skin = skinfn(self)
         else
-            if self.builder and self.builder.userid ~= nil and SKINS_CACHE_CG_L[self.builder.userid] ~= nil then
-                skin = SKINS_CACHE_CG_L[self.builder.userid][toskinprefab]
+            if LS_IsValidPlayer(self.builder) then
+                skin = LS_LastChosenSkin(toskinprefab, self.builder.userid)
             end
         end
-        if skin and SKINS_LEGION[skin] and SKINS_LEGION[skin].fn_placer then
-            SKINS_LEGION[skin].fn_placer(self.inst)
+        if skin and ls_skineddata[skin] and ls_skineddata[skin].fn_placer then
+            ls_skineddata[skin].fn_placer(self.inst)
         end
     end
 end

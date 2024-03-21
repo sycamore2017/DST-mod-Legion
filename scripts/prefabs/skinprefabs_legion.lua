@@ -1,8 +1,6 @@
-------skined_legion
-
 local prefs = {}
 
-for skin_name,skin_data in pairs(SKINS_LEGION) do
+for skin_name, skin_data in pairs(ls_skineddata) do
 	--CreatePrefabSkin()和spear_init_fn()等在prefabskin.lua中被定义
 	if skin_data.base_prefab ~= nil then
 		table.insert(prefs, CreatePrefabSkin(skin_name, {

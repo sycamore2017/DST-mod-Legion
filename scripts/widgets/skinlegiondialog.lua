@@ -3074,7 +3074,7 @@ local SkinLegionDialog = Class(Widget, function(self, owner)
     self.bg:SetScale(.71, .85)
     self.bg:SetPosition(-50, 0)
 
-    --[[(tip: 皮肤获取通道删除)
+    --[[
     --cdk输入框
     self.input_cdk = self.proot:AddChild(TEMPLATES2.StandardSingleLineTextEntry(nil, 200, 40))
     self.input_cdk.textbox:SetTextLengthLimit(20)
@@ -3304,46 +3304,6 @@ function SkinLegionDialog:SetItemInfo(item)
         end
         self.scroll_skindesc = self.panel_iteminfo:AddChild( self:BuildSkinDesc(item) )
         self.scroll_skindesc:SetPosition(-128, -242)
-
-        --获取按钮(tip: 皮肤获取通道删除)
-        --[[
-        if item.isowned then
-            if self.button_access ~= nil then
-                self.button_access:Kill()
-                self.button_access = nil
-            end
-        else
-            if item.isunlockable then
-                if self.button_access == nil then
-                    self.button_access = self.panel_iteminfo:AddChild(
-                        ImageButton("images/global_redux.xml", "button_carny_long_normal.tex",
-                            "button_carny_long_hover.tex", "button_carny_long_disabled.tex", "button_carny_long_down.tex")
-                    )
-                    self.button_access.image:SetScale(.2, .35)
-                    self.button_access:SetFont(CHATFONT)
-                    self.button_access:SetPosition(50, -212)
-                    self.button_access.text:SetColour(0,0,0,1)
-                    self.button_access:SetTextSize(20)
-                    self.button_access:SetText(SkinStrings.UI_ACCESS)
-                    self.button_access:SetOnClick(function()
-                        local skin = SKINS_LEGION[item.item_key]
-                        if skin ~= nil then
-                            VisitURL("https://wap.fireleaves.cn/#/qrcode?userId="..self.owner.userid
-                                .."&skinId="..skin.skin_id, false)
-                            PushPopupDialog(self, "感谢支持！", "打赏成功了吗？请点击按钮刷新皮肤数据。", "弄好了吧？", function()
-                                DoRpc(1, nil)
-                            end)
-                        end
-                    end)
-                end
-            else
-                if self.button_access ~= nil then
-                    self.button_access:Kill()
-                    self.button_access = nil
-                end
-            end
-        end
-        ]]--
     end
 end
 

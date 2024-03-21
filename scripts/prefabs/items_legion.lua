@@ -894,8 +894,8 @@ local function OnDeploy_base(inst, pt, deployer, rot, dd)
     local tree = nil
     if dd.skined then
         local skinname = nil
-        if deployer and deployer.userid and SKINS_CACHE_CG_L[deployer.userid] ~= nil then
-            skinname = SKINS_CACHE_CG_L[deployer.userid][dd.prefab]
+        if LS_IsValidPlayer(deployer) then
+            skinname = LS_LastChosenSkin(dd.prefab, deployer.userid)
         end
         if skinname == nil then
             tree = SpawnPrefab(dd.prefab)

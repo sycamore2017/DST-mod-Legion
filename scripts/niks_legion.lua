@@ -3592,6 +3592,7 @@ for skinname, v in pairs(SKINS_LEGION) do
         for kk, ast in pairs(v.assets) do
             table.insert(Assets, ast)
         end
+        v.assets = nil
     end
     -- if v.exchangefx ~= nil then
     --     if v.exchangefx.prefab == nil then
@@ -3603,6 +3604,7 @@ for skinname, v in pairs(SKINS_LEGION) do
     table.insert(v.skin_tags, "CRAFTABLE")
 
     STRINGS.SKIN_NAMES[skinname] = v.string.name
+    v.string = nil
 
     ------修改PREFAB_SKINS(在prefabskins.lua中被定义)
     if v.base_prefab ~= nil then
@@ -3669,51 +3671,22 @@ local SkinsOverride = {
 	siving_soil_item = true, hiddenmoonlight_item = true, revolvedmoonlight_item = true
 }
 local function CopyValue(data)
-    if data == nil then
-        return
+    if data == nil or type(data) ~= "table" then
+        return data
     end
     local dd = {}
     for k, v in pairs(data) do
-        if type(v) == "table" then
-            dd[k] = CopyValue(v)
-        else
-            dd[k] = v
-        end
+        dd[k] = CopyValue(v)
     end
-    return dd
-end
-local function SetSkinedData(data)
-    local dd = {
-        equip = CopyValue(data.equip),
-        linkedskins = CopyValue(data.linkedskins),
-        fn_fruit = data.fn_fruit,
-        scabbard = CopyValue(data.scabbard),
-        boltdata = CopyValue(data.boltdata),
-        fn_start = data.fn_start,
-        butterfly = CopyValue(data.butterfly),
-        fn_onAttack = data.fn_onAttack,
-        equipfx = CopyValue(data.equipfx),
-        fn_onThrownEnd = data.fn_onThrownEnd,
-        fn_onThrown = data.fn_onThrown,
-        fn_onLightning = data.fn_onLightning,
-        baiting = CopyValue(data.baiting),
-
-        base_prefab = data.base_prefab,
-        type = data.type,
-        build_name_override = data.build_name_override,
-        rarity = data.rarity,
-        skin_tags = CopyValue(data.skin_tags),
-    }
     return dd
 end
 local function UpdateSkinedData(skindata)
     for name, data in pairs(skindata) do
-        local dd = SetSkinedData(data)
-        if data.overridekeys ~= nil then
-            for _, overkey in pairs(data.overridekeys) do
-                dd[overkey] = SetSkinedData(data[overkey])
-            end
-        end
+        local dd = CopyValue(data)
+        dd.skin_id = nil
+        dd.skin_idx = nil
+        dd.onlyownedshow = nil
+        dd.mustonwedshow = nil
         ls_skineddata[name] = dd
     end
 end
@@ -3787,12 +3760,13 @@ local function LS_SkinCache2File() --【服务器、客户端】将皮肤数据�
         return
     end
     local name
-    local data = { dd = ls_cache, ex = ls_cache_ex }
+    local data = { dd = ls_cache }
     if IsServer then
         name = "sharrdiindex"
         data.origin = TheWorld.meta.session_identifier
     else
         name = "sharrdiindex_time"
+        data.ex = ls_cache_ex
     end
     local res, datajson = pcall(function() return json.encode(data) end)
     if res then
@@ -3822,21 +3796,6 @@ local function SkinFile2Cache() --【服务器、客户端】读取皮肤文件�
                                     end
                                 end
                                 ls_cache[kleiid] = newdd
-                            end
-                        end
-                    end
-                    if data.ex ~= nil and type(data.ex) == "table" then
-                        for kleiid, prefabs in pairs(data.ex) do
-                            if ls_players[kleiid] then
-                                local newdd = {}
-                                if type(prefabs) == "table" then
-                                    for prefabname, skinname in pairs(prefabs) do
-                                        if SKINS_LEGION[skinname] ~= nil then
-                                            newdd[prefabname] = skinname
-                                        end
-                                    end
-                                end
-                                ls_cache_ex[kleiid] = newdd
                             end
                         end
                     end
@@ -3920,7 +3879,6 @@ local function SaveSkinEx(userid, skin_name, prefabname) --记录皮肤交换行
         ls_cache_ex[userid] = caches
     end
     caches[prefabname] = skin_name --空值代表原皮
-    dirty_cache = true
 end
 
 local function SaveQueryCache(userid, querykey, code, needtime)
@@ -4700,8 +4658,8 @@ end
 ------
 
 local LSFNS = {
-    ls_skineddata = ls_skineddata,
-    LS_HasSkin = LS_HasSkin,
+    LS_IsValidPlayer = LS_IsValidPlayer,
+    -- LS_HasSkin = LS_HasSkin,
     LS_LastChosenSkin = LS_LastChosenSkin,
     -- LS_N_GetSkins = LS_N_GetSkins,
     -- LS_N_UseCDK = LS_N_UseCDK,
@@ -4718,6 +4676,7 @@ local LSFNS = {
 for fnname, fn in pairs(LSFNS) do --将数据暴露出去
     _G[fnname] = fn
 end
+_G.ls_skineddata = ls_skineddata
 
 --------------------------------------------------------------------------
 --[[ 现在就可以加载缓存数据了 ]]
@@ -4794,6 +4753,7 @@ AddClientModRPCHandler("LegionSkin", "SaveSkinEx", function(datajson)
         return
     end
     SaveSkinEx(USERID, data.newskin, data.prefab)
+    dirty_cache = true
 end)
 AddClientModRPCHandler("LegionSkin", "GetClientSkins", function()
     FnRpc_c2s("SendClientSkins", SkinCache2Numbers(ls_cache[USERID]))
@@ -4832,6 +4792,26 @@ AddModRPCHandler("LegionSkin", "SendClientSkins", function(player, datajson)
     end
     dirty_cache = true
     --此处为极端情况下获取皮肤方式，所以不需要向别的服务器发送皮肤数据
+end)
+AddModRPCHandler("LegionSkin", "SendClientSkinEx", function(player, datajson)
+    if not LS_IsValidPlayer(player) then
+        return
+    end
+    if datajson == nil then --说明没有数据
+        ls_cache_ex[player.userid] = nil
+    else
+        local success, data = pcall(json.decode, datajson)
+        if not success or type(data) ~= "table" then
+            return
+        end
+        local res = {}
+        for prefab, num in pairs(data) do
+            if SKIN_IDX_LEGION[num] ~= nil then
+                res[prefab] = SKIN_IDX_LEGION[num]
+            end
+        end
+        ls_cache_ex[player.userid] = res
+    end
 end)
 
 ------服务器响应服务器请求【服务器环境】
@@ -5008,6 +4988,23 @@ AddPlayerPostInit(function(inst)
             end
             print("【玩家生成】世界id："..tostring(TheWorld.meta.session_identifier))
             print("shardid："..tostring(TheShard:GetShardId()))
+        end)
+    else
+        inst:DoTaskInTime(1.3, function(inst)
+            if USERID ~= "" then
+                local ex = ls_cache_ex[USERID]
+                local res
+                if not LS_IsTableEmpty(ex) then
+                    res = {}
+                    for prefab, skinname in pairs(ex) do
+                        local dd = SKINS_LEGION[skinname]
+                        if dd ~= nil and dd.skin_idx ~= nil then
+                            res[prefab] = dd.skin_idx
+                        end
+                    end
+                end
+                FnRpc_c2s("SendClientSkinEx", res)
+            end
         end)
     end
 end)
