@@ -3490,6 +3490,7 @@ local ls_skinneedclients = { --需要请求客户端数据的玩家
 local ls_delaycheckitems = { --需要延迟判断皮肤有效性的物品
     -- skinname = { ent = true }
 }
+local ls_delaychecktime = nil --上次延迟判断的系统时间
 local ls_skineddata = {} --单独复制出来的皮肤数据，用以暴露出去，会定期修正以防篡改
 local USERID = TheNet:GetUserID() or "OU_fake"
 
@@ -3657,13 +3658,15 @@ skininvs = nil
 ischinese = nil
 
 ------添加PREFAB_SKINS_IDS的数据(在prefabskins.lua中被定义)
-for prefab, v in pairs(SKIN_DEFAULT_LEGION) do
+for prefab, _ in pairs(SKIN_DEFAULT_LEGION) do
     local skins = _G.PREFAB_SKINS[prefab]
-    local newids = {}
-    for k, skinname in pairs(skins) do
-        newids[skinname] = k
-	end
-    _G.PREFAB_SKINS_IDS[prefab] = newids
+    if skins ~= nil then
+        local newids = {}
+        for k, skinname in pairs(skins) do
+            newids[skinname] = k
+        end
+        _G.PREFAB_SKINS_IDS[prefab] = newids
+    end
 end
 
 ------生成皮肤复制数据
@@ -3676,22 +3679,23 @@ local function CopyValue(data)
     end
     local dd = {}
     for k, v in pairs(data) do
-        dd[k] = CopyValue(v)
+        if --部分数据不需要复制
+            k ~= "skin_id" and k ~= "skin_idx" and k ~= "onlyownedshow" and
+            k ~= "mustonwedshow" and k ~= "overridekeys"
+        then
+            dd[k] = CopyValue(v)
+        end
     end
     return dd
 end
-local function UpdateSkinedData(skindata)
-    for name, data in pairs(skindata) do
+local function UpdateSkinedData(basedata, copyeddata)
+    for name, data in pairs(copyeddata) do
         local dd = CopyValue(data)
-        dd.skin_id = nil
-        dd.skin_idx = nil
-        dd.onlyownedshow = nil
-        dd.mustonwedshow = nil
-        ls_skineddata[name] = dd
+        basedata[name] = dd
     end
 end
-UpdateSkinedData(SKIN_DEFAULT_LEGION)
-UpdateSkinedData(SKINS_LEGION)
+UpdateSkinedData(ls_skineddata, SKIN_DEFAULT_LEGION)
+UpdateSkinedData(ls_skineddata, SKINS_LEGION)
 
 --------------------------------------------------------------------------
 --[[ 添加不可修改元表 ]]
@@ -3755,23 +3759,31 @@ local function LS_SkinCache2File() --【服务器、客户端】将皮肤数据�
     if not dirty_cache then
         return
     end
-    if not IsServer and not IsOnlineMode(USERID) then --离线模式，客户端不需要缓存数据，免得数据混乱
-        dirty_cache = false
-        return
-    end
-    local name
-    local data = { dd = ls_cache }
     if IsServer then
-        name = "sharrdiindex"
-        data.origin = TheWorld.meta.session_identifier
-    else
-        name = "sharrdiindex_time"
-        data.ex = ls_cache_ex
+        local data = { dd = ls_cache, origin = TheWorld.meta.session_identifier }
+        local res, datajson = pcall(function() return json.encode(data) end)
+        if res then
+            dirty_cache = false
+            TheSim:SetPersistentString("sharrdiindex", datajson, true) --第三个参数代表文件是否加密
+        end
     end
-    local res, datajson = pcall(function() return json.encode(data) end)
-    if res then
-        dirty_cache = false
-        TheSim:SetPersistentString(name, datajson, true) --第三个参数代表文件是否加密
+    if not TheNet:IsDedicated() then --客户端或者不带洞穴的服务器
+        if not IsOnlineMode(USERID) then --离线模式，客户端不需要缓存数据，免得数据混乱
+            dirty_cache = false
+            return
+        end
+        local data = { dd = {}, ex = {} } --只保存自己的
+        if ls_cache[USERID] ~= nil then
+            data.dd[USERID] = ls_cache[USERID]
+        end
+        if ls_cache_ex[USERID] ~= nil then
+            data.ex[USERID] = ls_cache_ex[USERID]
+        end
+        local res, datajson = pcall(function() return json.encode(data) end)
+        if res then
+            dirty_cache = false
+            TheSim:SetPersistentString("sharrdiindex_time", datajson, true)
+        end
     end
 end
 local function SkinFile2Cache() --【服务器、客户端】读取皮肤文件为缓存
@@ -3802,7 +3814,8 @@ local function SkinFile2Cache() --【服务器、客户端】读取皮肤文件�
                 end
             end
         end)
-    else
+    end
+    if not TheNet:IsDedicated() then --客户端或者不带洞穴的服务器
         TheSim:GetPersistentString("sharrdiindex_time", function(load_success, datajson)
             dirty_cache = not load_success
             if load_success and datajson ~= nil then
@@ -4178,6 +4191,15 @@ local function PeriodicPatrol(inst, list, idx, numall)
 end
 local function DoPeriodicPatrol(inst)
     --检查代码安全性 undo
+
+    --重新复制数据
+    local newskineddata = {}
+    UpdateSkinedData(newskineddata, SKIN_DEFAULT_LEGION)
+    UpdateSkinedData(newskineddata, SKINS_LEGION)
+    ls_skineddata = newskineddata
+    _G.ls_skineddata = newskineddata
+
+    --刷新皮肤
     local list = {}
     for userid, _ in pairs(ls_players) do
         table.insert(list, userid)
@@ -5102,13 +5124,13 @@ AddPrefabPostInit("reskin_tool", function(inst)
                     if skinname_new ~= skinname_old then
                         skincpt:SetSkin(skinname_new, userid)
                         skinname_new = skincpt:GetSkin()
-                        C_SpawnSkinExchangeFx(inst, skinname_new, tool)
+                        C_SpawnSkinExchangeFx(target, skinname_new, tool)
                         if skinname_cac ~= skinname_new then
                             SaveSkinEx(userid, skinname_new, target.prefab)
                             FnRpc_s2c(userid, "SaveSkinEx", { newskin = skinname_new, prefab = target.prefab })
                         end
                     else
-                        C_SpawnSkinExchangeFx(inst, skinname_old, tool)
+                        C_SpawnSkinExchangeFx(target, skinname_old, tool)
                     end
                 end)
                 return

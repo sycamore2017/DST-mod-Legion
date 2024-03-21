@@ -48,24 +48,23 @@
 ]]--
 
 --[[ 关于世界 Tip：
-    TheNet:GetIsMasterSimulation()  --是否为服务器世界(主机+云服)
-    TheNet:GetIsServer()            --是否为主机世界(玩家本地电脑开的，既跑进程，也要运行ui)
-    TheNet:IsDedicated()            --是否为云服世界(只跑进程，不运行ui)
-    TheShard:IsSecondary()          --是否为副世界(所以，not TheShard:IsSecondary() 就能确定是主世界了)
-    TheShard:GetShardId()           --获取当前世界的ID
+    开了洞穴的世界(其实也算专服)：房主服务器进程(地面+洞穴)、房主客户端进程、其他人客户端进程
+    不开洞穴的世界：房主地面服务器进程(也是房主客户端进程，是一体的)、其他人客户端进程
+    专服(云服)的世界：专服服务器进程(地面+洞穴+或其他世界)、任何人客户端进程
 
-    世界分为3种
-        1、主世界(运行主服务器代码，与客户端通信)、
-        2、副世界(运行副服务器代码，与客户端通信)、
-        3、客户端世界(运行客户端代码，与当前所处的服务器世界通信)
-    例如，1个玩家用本地电脑开无洞穴存档，则世界有主世界(与房主客户端世界是同一个)、客户端(其他玩家的各有一个)。
-        开了含洞穴的本地存档或云服存档，则世界有主世界(主机或云服)、洞穴世界(副世界)、客户端(所有玩家各有一个)
-    modmain会在每个世界都加载一次
+    TheNet:GetIsMasterSimulation()  --暂不清楚和 TheNet:GetIsServer() 的区别
+    TheNet:GetIsServer()            --是否为服务器进程(所有服务器进程，也包括 不开洞穴的房主客户端进程)
+    TheNet:IsDedicated()            --是否为单纯的服务器进程(带洞穴的服务器进程+专服的服务器进程。只跑进程，不运行ui)
+    TheNet:GetIsClient()            --是否为单纯的客户端进程(任何人客户端进程，不包括 不开洞穴的房主客户端进程)
 
-    TheWorld.ismastersim        --是否为服务器世界(主机+云服。本质上就是 TheNet:GetIsMasterSimulation())
-    TheWorld.ismastershard      --是否为主世界(本质上就是 TheWorld.ismastersim and not TheShard:IsSecondary())
-    TheNet:GetIsServer() or TheNet:IsDedicated() --是否为非客户端世界，这个是最精确的判定方式
-    not TheNet:IsDedicated()    --这个方式也能判定客户端，但是无法排除客户端和服务器为一体的世界的情况
+    TheShard对应一个进程(世界)，多个世界就会有一个主世界，其它的世界都是副进程(从世界)
+    TheShard:IsSecondary()          --是否为副进程(所以，not TheShard:IsSecondary() 就能确定是主进程了)
+    TheShard:GetShardId()           --获取当前进程的ID
+    --注意以上 TheShard 判定在客户端使用不能拿到正确的结果
+
+    not TheNet:IsDedicated()    --是否为客户端或不开洞穴的房主服务器进程(因为这个进程也是房主客户端进程)
+    TheWorld.ismastersim        --是否为服务器进程(可以说就是 TheNet:GetIsServer())
+    TheWorld.ismastershard      --是否为服务器主进程(本质上就是 TheWorld.ismastersim and not TheShard:IsSecondary())
 ]]--
 
 --[[ combat机制 Tip:
