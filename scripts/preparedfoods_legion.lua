@@ -567,7 +567,7 @@ local foods_legion = {
     dish_medicinalliquor = { --药酒
         test = function(cooker, names, tags)
             return names.furtuft and tags.frozen and not tags.meat and not tags.sweetener
-                and not tags.egg and (tags.inedible and tags.inedible <= 1)
+                and not tags.egg and (not tags.inedible or tags.inedible <= 1)
         end,
         card_def = { ingredients = { {"furtuft",1}, {"ice",3} } },
         priority = priority_med,

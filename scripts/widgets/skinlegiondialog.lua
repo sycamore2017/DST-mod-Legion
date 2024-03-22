@@ -3023,18 +3023,16 @@ local function GetDescItem(data)
         return "未知解锁项目"
     end
 end
-
-local function DoRpc(type, data)
-    if data == nil then
-        SendModRPCToServer(GetModRPC("LegionSkined", "BarHandle"), type, nil)
-        return
+local function FnRpc_c2s(handlename, data)
+    local datajson
+    if data ~= nil and type(data) == "table" then --只对表进行json字符化
+        local success
+        success, datajson = pcall(json.encode, data)
+        if not success then
+            return
+        end
     end
-
-    local success, result  = pcall(json.encode, data)
-    -- local success, result = pcall(function() return json.encode(data) end)
-	if success then
-        SendModRPCToServer(GetModRPC("LegionSkined", "BarHandle"), type, result)
-	end
+    SendModRPCToServer(GetModRPC("LegionSkin", handlename), datajson)
 end
 local function PushPopupDialog(self, title, message, buttontext, fn)
     if self.context_popup ~= nil then
@@ -3111,7 +3109,7 @@ local SkinLegionDialog = Class(Widget, function(self, owner)
             return
         end
         self:SetCdkState(0, nil) --后续的状态更新需要服务器返回结果过来
-        DoRpc(2, { cdk = cdk })
+        FnRpc_c2s("UseCDK", { cdk = cdk })
     end)
     ]]--
 
@@ -3126,7 +3124,7 @@ local SkinLegionDialog = Class(Widget, function(self, owner)
     self.button_regetskins = self.proot:AddChild(TEMPLATES.IconButton(
         "images/button_icons.xml", "refresh.tex", "刷新我的皮肤", false, false,
         function()
-            DoRpc(1, nil)
+            FnRpc_c2s("GetSkins", nil)
         end,
         nil, "self_inspect_mod.tex"
     ))
