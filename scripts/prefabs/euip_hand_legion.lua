@@ -386,8 +386,8 @@ end
 local function OnAttack_rose(inst, owner, target)
     if target ~= nil and target:IsValid() then
         local skindata = inst.components.skinedlegion:GetSkinedData()
-        if skindata ~= nil and skindata.fn_onAttack ~= nil then
-            skindata.fn_onAttack(inst, owner, target)
+        if skindata ~= nil and skindata.fn_onatk ~= nil then
+            skindata.fn_onatk(inst, owner, target)
         end
     end
 end

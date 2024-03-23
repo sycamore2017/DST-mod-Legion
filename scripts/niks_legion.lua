@@ -411,6 +411,17 @@ local function SetTarget_hidden(inst, build)
     end
 end
 
+------
+
+local function GetEquippedOwner(inst)
+    if
+        inst.components.inventoryitem ~= nil and
+        inst.components.equippable ~= nil and inst.components.equippable:IsEquipped()
+    then
+        return inst.components.inventoryitem.owner
+    end
+end
+
 --------------------------------------------------------------------------
 --[[ 皮肤数据，以及官方数据修改 ]]
 --------------------------------------------------------------------------
@@ -418,7 +429,7 @@ end
 local SKIN_DEFAULT_LEGION = {
     --[[
     rosorns = {
-        image = { name = nil, atlas = nil, setable = true }, --提前注册，或者皮肤初始化使用
+        image = { name = nil, atlas = nil, setable = true }, --皮肤初始化使用
 
         anim = { --皮肤初始化使用
             bank = nil, build = nil,
@@ -433,10 +444,7 @@ local SKIN_DEFAULT_LEGION = {
         -- fn_end_c = nil, --取消皮肤时的函数(客户端)
 
         equip = { symbol = "swap_object", build = "swap_rosorns", file = "swap_rosorns" },
-        -- fn_equip = function(inst, owner)end, --装备时的贴图切换函数，替换equip的默认方式
-        -- fn_unequip = function(inst, owner)end, --卸下装备时的贴图切换函数
-
-        -- fn_onAttack = function(inst, owner, target)end, --攻击时的函数
+        -- fn_onatk = function(inst, owner, target)end, --攻击时的函数
 
         exchangefx = { prefab = nil, offset_y = nil, scale = nil },
         -- fn_spawnSkinExchangeFx = function(inst)end, --皮肤交换时的特效生成函数，替换exchangefx的默认方式
@@ -478,8 +486,7 @@ local SKIN_DEFAULT_LEGION = {
         image = { name = nil, atlas = nil, setable = true },
         anim = {
             bank = nil, build = nil,
-            anim = nil, animpush = nil, isloop = nil,
-            setable = true
+            anim = nil, animpush = nil, isloop = nil, setable = true
         },
         equip = { symbol = "swap_object", build = "swap_rosorns", file = "swap_rosorns" },
         exchangefx = { prefab = nil, offset_y = nil, scale = nil },
@@ -489,8 +496,7 @@ local SKIN_DEFAULT_LEGION = {
         image = { name = nil, atlas = nil, setable = true },
         anim = {
             bank = nil, build = nil,
-            anim = nil, animpush = nil, isloop = nil,
-            setable = true
+            anim = nil, animpush = nil, isloop = nil, setable = true
         },
         equip = { symbol = "swap_object", build = "swap_lileaves", file = "swap_lileaves" },
         exchangefx = { prefab = nil, offset_y = nil, scale = nil },
@@ -500,8 +506,7 @@ local SKIN_DEFAULT_LEGION = {
         image = { name = nil, atlas = nil, setable = true },
         anim = {
             bank = nil, build = nil,
-            anim = nil, animpush = nil, isloop = nil,
-            setable = true
+            anim = nil, animpush = nil, isloop = nil, setable = true
         },
         equip = {
             symbol = "swap_object", build = "swap_orchitwigs", file = "swap_orchitwigs",
@@ -515,8 +520,7 @@ local SKIN_DEFAULT_LEGION = {
         image = { name = nil, atlas = nil, setable = false },
         anim = {
             bank = nil, build = nil,
-            anim = nil, animpush = nil, isloop = nil,
-            setable = true
+            anim = nil, animpush = nil, isloop = nil, setable = true
         },
         fn_start = function(inst)
             if inst.hasSetBroken then
@@ -557,8 +561,7 @@ local SKIN_DEFAULT_LEGION = {
         image = { name = nil, atlas = nil, setable = true },
         anim = {
             bank = nil, build = nil,
-            anim = "anim", animpush = nil, isloop = nil,
-            setable = true
+            anim = "anim", animpush = nil, isloop = nil, setable = true
         },
         equip = { symbol = "swap_hat", build = "hat_cowboy", file = "swap_hat" },
         exchangefx = { prefab = nil, offset_y = nil, scale = nil },
@@ -569,8 +572,7 @@ local SKIN_DEFAULT_LEGION = {
         image = { name = nil, atlas = nil, setable = true },
         anim = {
             bank = nil, build = nil,
-            anim = "anim", animpush = nil, isloop = nil,
-            setable = true
+            anim = "anim", animpush = nil, isloop = nil, setable = true
         },
         fn_start = function(inst)
             inst.fxcolour = {255/255, 80/255, 173/255}
@@ -584,8 +586,7 @@ local SKIN_DEFAULT_LEGION = {
         image = { name = nil, atlas = nil, setable = true },
         anim = {
             bank = "swap_boltwingout", build = "swap_boltwingout",
-            anim = nil, animpush = nil, isloop = nil,
-            setable = true
+            anim = nil, animpush = nil, isloop = nil, setable = true
         },
         equip = { symbol = "swap_body", build = "swap_boltwingout", file = "swap_body" },
         boltdata = { fx = "boltwingout_fx", build = nil },
@@ -597,8 +598,7 @@ local SKIN_DEFAULT_LEGION = {
         image = { name = nil, atlas = nil, setable = true },
         anim = {
             bank = nil, build = nil,
-            anim = nil, animpush = nil, isloop = nil,
-            setable = true
+            anim = nil, animpush = nil, isloop = nil, setable = true
         },
         fn_start = function(inst)
             inst.components.bundlemaker:SetSkinData()
@@ -610,8 +610,7 @@ local SKIN_DEFAULT_LEGION = {
         image = { name = nil, atlas = nil, setable = true },
         anim = {
             bank = nil, build = nil,
-            anim = nil, animpush = nil, isloop = nil,
-            setable = true
+            anim = nil, animpush = nil, isloop = nil, setable = true
         },
         fn_start = function(inst)
             inst.components.bundlemaker:SetSkinData()
@@ -687,6 +686,7 @@ local SKIN_DEFAULT_LEGION = {
             }
             Fn_start_agronssword(inst)
         end,
+        equip = true, --为了能自动更新手部贴图
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 }
     },
 
@@ -1116,10 +1116,7 @@ local SKINS_LEGION = {
         -- fn_end_c = nil, --取消皮肤时的函数(客户端)
 
         equip = { symbol = "swap_object", build = "swap_spear_mirrorrose", file = "swap_spear" },
-        -- fn_equip = function(inst, owner)end, --装备时的贴图切换函数，替换equip的默认方式
-        -- fn_unequip = function(inst, owner)end, --卸下装备时的贴图切换函数
-
-        fn_onAttack = function(inst, owner, target) --攻击时的函数
+        fn_onatk = function(inst, owner, target) --攻击时的函数
             -- local fx = SpawnPrefab("wanda_attack_pocketwatch_normal_fx")
             local fx = SpawnPrefab("rosorns_spell_fx")
             if fx ~= nil then
@@ -1175,7 +1172,7 @@ local SKINS_LEGION = {
             anim = nil, animpush = nil, isloop = true, setable = true
         },
         equip = { symbol = "swap_object", build = "rosorns_marble", file = "swap_object" },
-        fn_onAttack = function(inst, owner, target)
+        fn_onatk = function(inst, owner, target)
             local fx = SpawnPrefab("rosorns_marble_fx")
             if fx ~= nil then
                 fx.Transform:SetPosition(target.Transform:GetWorldPosition())
@@ -1910,6 +1907,7 @@ local SKINS_LEGION = {
             }
             Fn_start_agronssword(inst)
         end,
+        equip = true, --为了能自动更新手部贴图
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
     },
 
@@ -2178,7 +2176,7 @@ local SKINS_LEGION = {
             anim = nil, animpush = nil, isloop = true, setable = true
         },
         equip = { symbol = "swap_object", build = "rosorns_collector", file = "swap_object" },
-        fn_onAttack = function(inst, owner, target)
+        fn_onatk = function(inst, owner, target)
             local fx = SpawnPrefab("rosorns_collector_fx")
             if fx ~= nil then
                 fx.Transform:SetPosition(target.Transform:GetWorldPosition())
@@ -2206,6 +2204,12 @@ local SKINS_LEGION = {
             setable = true
         },
         equip = { symbol = "swap_object", build = "fimbul_axe_collector", file = "swap_base" },
+        fn_end = function(inst)
+            if inst.task_skinfx ~= nil then
+                inst.task_skinfx:Cancel()
+                inst.task_skinfx = nil
+            end
+        end,
         fn_onThrown = function(inst, owner, target)
             if owner ~= nil and owner:HasTag("player") then
                 owner.AnimState:OverrideSymbol("swap_object", "fimbul_axe_collector", "swap_throw")
@@ -2519,6 +2523,10 @@ local SKINS_LEGION = {
             inst.AnimState:SetScale(0.9, 0.9)
         end,
         fn_end = function(inst)
+            local owner = GetEquippedOwner(inst)
+            if owner ~= nil then
+                Fn_removeFollowFx(owner, "fx_l_sivfea_real")
+            end
             CancelSgSkinAnim(inst)
             inst.Transform:SetEightFaced()
             inst.AnimState:SetScale(1, 1)
@@ -2555,6 +2563,10 @@ local SKINS_LEGION = {
             inst.AnimState:SetScale(0.9, 0.9)
         end,
         fn_end = function(inst)
+            local owner = GetEquippedOwner(inst)
+            if owner ~= nil then
+                Fn_removeFollowFx(owner, "fx_l_sivfea_fake")
+            end
             CancelSgSkinAnim(inst)
             inst.Transform:SetEightFaced()
             inst.AnimState:SetScale(1, 1)
@@ -3031,6 +3043,12 @@ local SKINS_LEGION = {
         fn_start = function(inst)
             inst.maskfxoverride_l = "siving_lifesteal_fx_era3"
         end,
+        fn_end = function(inst)
+            local owner = GetEquippedOwner(inst)
+            if owner ~= nil then
+                Fn_removeFollowFx(owner, "fx_l_sivmask")
+            end
+        end,
         equip = {
             build = "siving_mask_gold_era", --幻化识别
             startfn = function(inst, owner)
@@ -3057,6 +3075,12 @@ local SKINS_LEGION = {
         },
         fn_start = function(inst)
             inst.maskfxoverride_l = "siving_lifesteal_fx_era4"
+        end,
+        fn_end = function(inst)
+            local owner = GetEquippedOwner(inst)
+            if owner ~= nil then
+                Fn_removeFollowFx(owner, "fx_l_sivmask")
+            end
         end,
         equip = {
             build = "siving_mask_gold_era2", --幻化识别
@@ -4627,6 +4651,15 @@ local function C_SpawnSkinExchangeFx(inst, skinname, tool)
 		end
 	end
 end
+local function SetSkinEx(inst) --这样做是为了在重载游戏时，更新玩家身上的装备贴图
+    local owner = GetEquippedOwner(inst)
+    if owner ~= nil and owner.components.inventory ~= nil then
+        local item = owner.components.inventory:Unequip(inst.components.equippable.equipslot)
+        if item ~= nil then
+            owner.components.inventory:Equip(item, nil, true, nil)
+        end
+    end
+end
 LS_C_SetSkin = function(self, skinname, userid)
     if not IsServer or self.skin == skinname then
 		return true
@@ -4734,6 +4767,13 @@ LS_C_SetSkin = function(self, skinname, userid)
         self.userid = userid
         inst.skinname = skinname
         self.skineddata = C_GetSkinedData(self, skinname)
+    end
+
+    if skindata.equip ~= nil then
+        if inst.task_ls_ex ~= nil then
+            inst.task_ls_ex:Cancel()
+        end
+        inst.task_ls_ex = inst:DoTaskInTime(0.1+0.4*math.random(), SetSkinEx)
     end
 
     return true
