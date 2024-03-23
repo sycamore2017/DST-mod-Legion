@@ -433,8 +433,6 @@ local function MakeItem(data)
         inst.OnSave = OnSave_ctlitem
         inst.OnLoad = OnLoad_ctlitem
 
-        -- LS_C_OnPreLoad(inst)
-
         return inst
     end, data.assets, data.prefabs))
 end
@@ -524,8 +522,6 @@ local function MakeConstruct(data)
             inst.components.botanycontroller:TriggerPlant(true)
             DoFunction_ctl(inst, true)
         end)
-
-        -- LS_C_OnPreLoad(inst)
 
         if data.fn_server ~= nil then
             data.fn_server(inst)
@@ -868,8 +864,6 @@ table.insert(prefs, Prefab("siving_turn", function()
 
     inst:ListenForEvent("ondeconstructstructure", OnDeconstruct_turn)
 
-    LS_C_OnPreLoad(inst)
-
     return inst
 end, { Asset("ANIM", "anim/siving_turn.zip") }, { "siving_turn_fruit" }))
 
@@ -1165,8 +1159,6 @@ table.insert(prefs, Prefab("siving_soil_item", function() ------子圭垄(物品
 
     MakeHauntableLaunchAndIgnite(inst)
 
-    -- LS_C_OnPreLoad(inst)
-
     return inst
 end, {
     Asset("ANIM", "anim/farm_soil.zip"), --官方栽培土动画模板（为了placer加载的）
@@ -1220,8 +1212,6 @@ table.insert(prefs, Prefab("siving_soil", function() ------子圭垄
     inst.components.workable:SetOnFinishCallback(OnFinished_soil)
 
     MakeHauntableWork(inst)
-
-    -- LS_C_OnPreLoad(inst)
 
     return inst
 end, {

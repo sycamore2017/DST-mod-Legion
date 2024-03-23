@@ -483,7 +483,6 @@ local function Fn_contracts()
 
     inst.OnSave = OnSave_contracts
     inst.OnLoad = OnLoad_contracts
-    LS_C_OnPreLoad(inst)
 
     return inst
 end

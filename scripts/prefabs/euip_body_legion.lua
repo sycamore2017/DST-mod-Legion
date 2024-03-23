@@ -392,7 +392,6 @@ table.insert(prefs, Prefab("backcub", function()
     inst.OnLongUpdate = OnLongUpdate_backcub
     inst.OnEntitySleep = OnEntitySleep_backcub
     inst.OnEntityWake = OnEntityWake_backcub
-    LS_C_OnPreLoad(inst)
 
     return inst
 end, GetAssets("backcub", {
@@ -621,8 +620,6 @@ table.insert(prefs, Prefab("armor_elepheetle", function()
     MakeHauntableLaunch(inst)
 
     TOOLS_L.MakeNoLossRepairableEquipment(inst, foreverequip_beetlearmor)
-
-    -- LS_C_OnPreLoad(inst)
 
     return inst
 end, GetAssets("armor_elepheetle"), nil))
@@ -859,8 +856,6 @@ table.insert(prefs, Prefab("boltwingout", function()
 
     MakeHauntableLaunchAndDropFirstItem(inst)
 
-    LS_C_OnPreLoad(inst)
-
     return inst
 end, GetAssets2("boltwingout", "swap_boltwingout", { Asset("ANIM", "anim/ui_piggyback_2x6.zip") }), {
     "boltwingout_fx",
@@ -1025,8 +1020,6 @@ table.insert(prefs, Prefab("siving_suit", function()
 
     MakeHauntableLaunch(inst)
 
-    LS_C_OnPreLoad(inst)
-
     return inst
 end, GetAssets("siving_suit"), prefabs_sivsuit))
 
@@ -1168,8 +1161,6 @@ table.insert(prefs, Prefab("siving_suit_gold", function()
     inst.components.modelegion:Init(1, 3, nil, SetMode_sivsuit2)
 
     MakeHauntableLaunch(inst)
-
-    LS_C_OnPreLoad(inst)
 
     return inst
 end, GetAssets("siving_suit_gold", { Asset("ANIM", "anim/ui_piggyback_2x6.zip") }), prefabs_sivsuit))

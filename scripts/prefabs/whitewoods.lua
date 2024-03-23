@@ -659,8 +659,6 @@ local function MakeChest(data)
             SetImmortalable(inst, 2, nil)
         end
 
-        -- LS_C_OnPreLoad(inst)
-
         return inst
     end, data.assets, data.prefabs))
 end

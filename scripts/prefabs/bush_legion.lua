@@ -357,8 +357,6 @@ MakeBush({
         MakeNoGrowInWinter(inst) --冬季停止生长
         MakeLargeBurnable(inst)
         MakeMediumPropagator(inst)
-
-        -- LS_C_OnPreLoad(inst)
     end
 })
 
@@ -433,9 +431,7 @@ MakeBush({
         MakeNoGrowInWinter(inst) --冬季停止生长
         MakeLargeBurnable(inst)
         MakeMediumPropagator(inst)
-
-        -- LS_C_OnPreLoad(inst)
-    end,
+    end
 })
 
 --------------------------------------------------------------------------
@@ -509,9 +505,7 @@ MakeBush({
         MakeNoGrowInWinter(inst) --冬季停止生长
         MakeMediumBurnable(inst)
         MakeSmallPropagator(inst)
-
-        -- LS_C_OnPreLoad(inst)
-    end,
+    end
 })
 
 --------------------------------------------------------------------------
@@ -552,9 +546,7 @@ MakeBush({
         inst.components.pickable.max_cycles = TUNING.BERRYBUSH_CYCLES + math.random(2)
         inst.components.pickable.cycles_left = inst.components.pickable.max_cycles
         inst.components.pickable.onpickedfn = OnPicked_never
-
-        -- LS_C_OnPreLoad(inst)
-    end,
+    end
 })
 
 --------------------

@@ -26,7 +26,7 @@ SkinedLegion.SetSkin = LS_C_SetSkin
 
 function SkinedLegion:OnSave()
 	if self.skin ~= nil then
-		return { skin = self.skin, userid = self.userid }
+		return { skin = self.skin, userid = self.userid, pskin = self.problemskin }
 	end
 end
 SkinedLegion.OnLoad = LS_C_OnLoad

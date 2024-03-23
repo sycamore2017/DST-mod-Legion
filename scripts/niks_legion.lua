@@ -3487,9 +3487,6 @@ local ls_cache_net = { --所有玩家的网络请求缓存
 local ls_skinneedclients = { --需要请求客户端数据的玩家
     -- Kxx_xxxx = true
 }
-local ls_problemitems = { --需要延迟判断皮肤有效性的物品
-    -- ent = skinname
-}
 local ls_delaychecktime = nil --上次延迟判断的系统时间
 local ls_skineddata = {} --单独复制出来的皮肤数据，用以暴露出去，会定期修正以防篡改
 local USERID = TheNet:GetUserID() or "OU_fake"
@@ -3710,8 +3707,8 @@ UpdateSkinedData(ls_skineddata, SKINS_LEGION)
 --------------------------------------------------------------------------
 
 local LS_C_SetSkin
+local DoPeriodicPatrol
 local task_periodicpatrol
-local task_updateallskins
 
 local function FnRpc_s2c(userid, handlename, data) --【服务器】
     local datajson
@@ -4205,12 +4202,12 @@ local function CheckCodeSafety()
     _G.ls_skineddata = newskineddata
 
     if not IsServer then return end
-    if TheWorld ~= nil then
-        if TheWorld.task_l_cc == nil then
-            CloseGame()
-            return true
-        end
+    if task_periodicpatrol == nil or task_periodicpatrol.fn ~= DoPeriodicPatrol then
+        CloseGame()
+        return true
     end
+    -- if TheWorld ~= nil then
+    -- end
 end
 
 local function LS_N_GetSkins(userid, force) --【网络】【服务器】获取一个玩家的已有皮肤数据
@@ -4307,92 +4304,46 @@ local function LS_N_UseCDK(userid, cdk, force) --【网络】【服务器】使�
     end)
 end
 
-local function DealDelayItems(inst, delayitems, time)
-    inst:DoTaskInTime(time or 10, function()
-        local allskins = {}
-        for userid, skins in pairs(ls_cache) do
-            for skinname, _ in pairs(skins) do
-                allskins[skinname] = userid
-            end
-        end
-        
-        for _, item in ipairs(delayitems) do
-            if item:IsValid() and item.components.skinedlegion ~= nil then
-                local skincpt = item.components.skinedlegion
-                if skincpt.skin ~= nil and not LS_HasSkin(skincpt.skin, skincpt.userid) then
-                    if allskins[skincpt.skin] then
-                        LS_C_SetSkin(skincpt, skincpt.skin, allskins[skincpt.skin])
-                    else
-                        LS_C_SetSkin(skincpt, nil, nil)
-                    end
-                end
-            end
-        end
-    end)
-end
-local function PeriodicPatrol(inst, list, idx, numall, delayitems)
+local function PeriodicPatrol(inst, list, idx, numall)
     if list[idx] == nil then
-        if delayitems ~= nil then
-            DealDelayItems(inst, delayitems)
-        end
         return
     end
     LS_N_GetSkins(list[idx], false)
     if idx >= numall then
-        if delayitems ~= nil then
-            DealDelayItems(inst, delayitems)
-        end
         return
     end
     inst:DoTaskInTime(2+3*math.random(), function()
-        PeriodicPatrol(inst, list, idx + 1, numall, delayitems)
+        PeriodicPatrol(inst, list, idx + 1, numall)
     end)
 end
-local function DoPeriodicPatrol(inst)
-    if CoolForCheck() and CheckCodeSafety() then
+DoPeriodicPatrol = function(inst)
+    if CheckCodeSafety() then
         return
     end
     print("开始获取皮肤！")
 
-    local delayitems = {}
-    for item, _ in pairs(ls_problemitems) do
-        if item:IsValid() then
-            table.insert(delayitems, item)
-        end
-    end
-    if LS_IsTableEmpty(delayitems) then
-        delayitems = nil
-        ls_problemitems = {}
-    end
-    print("世界id-hasdelayitem："..tostring(delayitems ~= nil))
-
+    --更新当前玩家以及所有很久未更新的玩家
     local list = {}
-    if delayitems ~= nil then --更新所有人的
-        for userid, _ in pairs(ls_players) do
-            table.insert(list, userid)
+    local ostime = os.time() or 0
+    local players = {}
+    for _, v in ipairs(AllPlayers) do
+        if LS_IsValidPlayer(v) then
+            players[v.userid] = true
+            table.insert(list, v.userid)
         end
-    else --更新当前玩家以及所有很久未更新的玩家
-        local ostime = os.time() or 0
-        local players = {}
-        for _, v in ipairs(AllPlayers) do
-            if LS_IsValidPlayer(v) then
-                players[v.userid] = true
-                table.insert(list, v.userid)
-            end
-        end
-        for userid, _ in pairs(ls_players) do
-            if not players[userid] then
-                local netdd = ls_cache_net[userid] and ls_cache_net[userid]["GetSkins"] or nil
-                if netdd == nil or netdd.lasttime == nil or (ostime - netdd.lasttime) >= 14400 then --30天
-                    table.insert(list, userid)
-                end
+    end
+    for userid, _ in pairs(ls_players) do
+        if not players[userid] then
+            local netdd = ls_cache_net[userid] and ls_cache_net[userid]["GetSkins"] or nil
+            if netdd == nil or netdd.lasttime == nil or (ostime - netdd.lasttime) >= 14400 then --30天
+                table.insert(list, userid)
             end
         end
     end
 
     local numall = #list
     if numall > 0 then
-        PeriodicPatrol(inst, list, 1, numall, delayitems)
+        PeriodicPatrol(inst, list, 1, numall)
     end
 end
 local function LS_StartPeriodicPatrol(inst) --周期更新所有玩家的皮肤缓存
@@ -4488,8 +4439,8 @@ local function C_GetSkinedData(self, skinname)
         return data
     end
 end
-local function C_SetSkinClient(self)
-	local inst = self.inst
+local function C_SetSkinClient(inst)
+    local self = inst.components.skinedlegion
     local oldskin = self.skin
     local idx = self._skin_idx:value()
     if idx ~= nil and idx ~= 0 and SKIN_IDX_LEGION[idx] ~= nil then
@@ -4536,11 +4487,22 @@ local function C_SetSkinClient(self)
 		end
 	end
 end
+local function C_SetPSkinClient(inst)
+    local self = inst.components.skinedlegion
+    local idx = self._pskin_idx:value()
+    if idx ~= nil and idx ~= 0 and SKIN_IDX_LEGION[idx] ~= nil then
+        self.problemskin = SKIN_IDX_LEGION[idx]
+    else
+        self.problemskin = nil
+    end
+end
 local function LS_C_Set(self)
-    self.isServe = TheNet:GetIsMasterSimulation()
-	self.isClient = not TheNet:IsDedicated()
+    -- self.isServe = TheNet:GetIsMasterSimulation()
+	-- self.isClient = not TheNet:IsDedicated()
     self._skin_idx = net_byte(self.inst.GUID, "skinedlegion._skin_idx", "skin_idx_l_dirty")
     self._skin_idx:set_local(0)
+    self._pskin_idx = net_byte(self.inst.GUID, "skinedlegion._pskin_idx", "pskin_idx_l_dirty")
+    self._pskin_idx:set_local(0)
     -- self.prefab = nil
     -- self.overkey = nil
 	-- self.skin = nil
@@ -4550,10 +4512,10 @@ local function LS_C_Set(self)
 	-- self._floater_cut = nil
 	-- self._floater_nofx = nil
 
-	if not self.isServe and self.isClient then --非主机【客户端】环境
-        self.inst:ListenForEvent("skin_idx_l_dirty", function()
-			C_SetSkinClient(self)
-        end)
+	-- if not self.isServe and self.isClient then --非主机【客户端】环境
+    if TheNet:GetIsClient() then
+        self.inst:ListenForEvent("skin_idx_l_dirty", C_SetSkinClient)
+        self.inst:ListenForEvent("pskin_idx_l_dirty", C_SetPSkinClient)
     end
 end
 local function LS_C_Init(inst, prefab, isfloat, overkey)
@@ -4590,34 +4552,39 @@ local function LS_C_Init(inst, prefab, isfloat, overkey)
 		MakeInventoryFloatable(inst)
 	end
 end
+local function C_SetProblemSkin(self, skinname)
+    if skinname == nil then
+        self._pskin_idx:set(0)
+        self.problemskin = nil
+    else
+        local skindata = C_GetSkinData(self, skinname)
+        if skindata == nil then
+            self._pskin_idx:set(0)
+            self.problemskin = nil
+        else
+            self._pskin_idx:set(skindata.skin_idx)
+            self.problemskin = skinname
+        end
+    end
+end
 local function LS_C_OnLoad(self, data)
     if data == nil then
 		return
 	end
-	if data.skin ~= nil and SKINS_LEGION[data.skin] ~= nil then
-		self.skin = nil --先还原为原皮肤，才能应用新皮肤
-		self.inst.skinname = nil
-        self.skineddata = nil
-		self:SetSkin(data.skin, data.userid)
-	end
-end
-local function C_OnPreLoad(inst, data, ...)
-    if data ~= nil then
-        if data.skin ~= nil and SKINS_LEGION[data.skin] ~= nil then
-            local self = inst.components.skinedlegion
-            self.skin = data.skin
-            self.userid = data.userid
-            inst.skinname = data.skin
-            self.skineddata = C_GetSkinedData(self, data.skin)
+    local pskin = data.pskin
+    if pskin ~= nil and SKINS_LEGION[pskin] ~= nil then --尝试恢复问题皮肤
+        if LS_C_SetSkin(self, pskin, data.userid) then
+            return
         end
+    else
+        pskin = nil
     end
-    if inst.OnPreLoad_ls ~= nil then
-        inst.OnPreLoad_ls(inst, data, ...)
+	if data.skin ~= nil and SKINS_LEGION[data.skin] ~= nil then --如果问题皮肤还是没恢复，那就先按已有皮肤来
+		LS_C_SetSkin(self, data.skin, data.userid)
+	end
+    if pskin ~= nil and self.problemskin == nil then
+        C_SetProblemSkin(self, pskin)
     end
-end
-local function LS_C_OnPreLoad(inst) --提前加载皮肤数据，好让其他组件应用。因为组件本身没有 OnPreLoad 机制
-    inst.OnPreLoad_ls = inst.OnPreLoad
-    inst.OnPreLoad = C_OnPreLoad
 end
 local function LS_C_UserID(inst, player) --获取继承的userid
     if inst.components.skinedlegion.userid ~= nil then
@@ -4661,9 +4628,10 @@ local function C_SpawnSkinExchangeFx(inst, skinname, tool)
 	end
 end
 LS_C_SetSkin = function(self, skinname, userid)
-    if not self.isServe or self.skin == skinname then
+    if not IsServer or self.skin == skinname then
 		return true
 	end
+
     local inst = self.inst
     if skinname ~= nil then
         if userid ~= nil and not LS_HasSkin(skinname, userid) then
@@ -4678,13 +4646,14 @@ LS_C_SetSkin = function(self, skinname, userid)
                     end
                 end
 			end
-            if userid == nil then --加入检查
-                self.problemskin = skinname
+            if userid == nil then
+                C_SetProblemSkin(self, skinname)
+                return
             end
 		end
     end
-    if self.problemskin == nil then
-    else
+    if self.problemskin ~= nil then
+        C_SetProblemSkin(self, nil)
     end
 
 	local skindata = C_GetSkinData(self, skinname)
@@ -4738,7 +4707,7 @@ LS_C_SetSkin = function(self, skinname, userid)
         C_SetFloat(inst.components.floater, skindata)
         self._floater_cut = skindata.floater.cut
         self._floater_nofx = skindata.floater.nofx
-        if self.isClient and inst.components.floater:IsFloating() then --由于特效已经生成，这里需要更新状态
+        if not TheNet:IsDedicated() and inst.components.floater:IsFloating() then --特效已经生成，这里需要更新状态
             inst.components.floater:OnNoLongerLandedClient()
             inst.components.floater:OnLandedClient()
         end
@@ -4785,7 +4754,6 @@ LSFNS = {
     LS_C_Init = LS_C_Init,
     LS_C_SetSkin = LS_C_SetSkin,
     LS_C_OnLoad = LS_C_OnLoad,
-    LS_C_OnPreLoad = LS_C_OnPreLoad,
     LS_C_UserID = LS_C_UserID,
     LS_UI_ResetItems = LS_UI_ResetItems,
 }

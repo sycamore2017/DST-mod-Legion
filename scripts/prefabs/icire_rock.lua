@@ -244,7 +244,6 @@ local function fn()
     -- inst.OnSave = OnSave
     -- inst.OnLoad = OnLoad
     inst.OnRemoveEntity = OnRemove
-    LS_C_OnPreLoad(inst)
 
     return inst
 end

@@ -35,8 +35,6 @@ local function MakeItem(sets)
 
         MakeHauntableLaunch(inst)
 
-        -- LS_C_OnPreLoad(inst) --它没有装备组件，不需要 OnPreLoad
-
         return inst
     end, {
         Asset("ANIM", "anim/"..sets.name..".zip"),
@@ -399,9 +397,6 @@ table.insert(prefs, Prefab("hiddenmoonlight", function()
     if TUNING.SMART_SIGN_DRAW_ENABLE then
 		SMART_SIGN_DRAW(inst)
 	end
-
-    -- LS_C_OnPreLoad(inst)
-
     if TUNING.FUNCTIONAL_MEDAL_IS_OPEN then
         SetImmortalable(inst, 2, nil)
     end
@@ -924,8 +919,6 @@ local function MakeRevolved(sets)
         OnOwnerChange(inst)
         inst.OnRemoveEntity = OnRemove_light
 
-        -- LS_C_OnPreLoad(inst) --它没有装备组件，不需要 OnPreLoad
-
         if TUNING.FUNCTIONAL_MEDAL_IS_OPEN then
             SetImmortalable(inst, 2, nil)
         end
@@ -1391,7 +1384,6 @@ table.insert(prefs, Prefab("refractedmoonlight", function()
 
     inst.OnSave = OnSave_refracted
     inst.OnLoad = OnLoad_refracted
-    LS_C_OnPreLoad(inst)
 
     return inst
 end, {

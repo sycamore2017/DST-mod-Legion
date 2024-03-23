@@ -1270,8 +1270,6 @@ local function MakeWeapon(data)
 
         MakeHauntableLaunch(inst)
 
-        LS_C_OnPreLoad(inst)
-
         return inst
     end, {
         Asset("ANIM", "anim/"..data.name..".zip"),

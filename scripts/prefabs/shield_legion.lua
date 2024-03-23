@@ -354,8 +354,6 @@ MakeShield({
         inst.components.armor:InitCondition(1050, absorb_normal) --150*10*0.7= 1050防具耐久
 
         TOOLS_L.MakeNoLossRepairableEquipment(inst, foreverequip_sand)
-
-        LS_C_OnPreLoad(inst)
     end
 })
 
@@ -399,8 +397,6 @@ MakeShield({
 
         MakeSmallBurnable(inst, TUNING.SMALL_BURNTIME)
         MakeSmallPropagator(inst)
-
-        LS_C_OnPreLoad(inst)
     end
 })
 
@@ -715,7 +711,6 @@ MakeShield({
         SetRechargeable(inst, CONFIGS_LEGION.AGRONRECHARGETIME)
 
         inst.OnLoad = OnLoad_agron
-        LS_C_OnPreLoad(inst)
     end
 })
 

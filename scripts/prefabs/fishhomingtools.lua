@@ -94,8 +94,6 @@ local function Fn_normal()
 
     MakeHauntableLaunchAndIgnite(inst)
 
-    LS_C_OnPreLoad(inst)
-
     return inst
 end
 
@@ -144,8 +142,6 @@ local function Fn_awesome()
     inst.components.fuel.fuelvalue = TUNING.MED_FUEL
 
     MakeHauntableLaunchAndIgnite(inst)
-
-    LS_C_OnPreLoad(inst)
 
     return inst
 end
@@ -371,8 +367,6 @@ local function Fn_bag()
     end
 
     MakeHauntableLaunch(inst)
-
-    LS_C_OnPreLoad(inst)
 
     return inst
 end

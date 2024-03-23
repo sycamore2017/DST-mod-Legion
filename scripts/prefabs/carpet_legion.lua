@@ -50,8 +50,6 @@ local function MakeCarpet(data)
             data.fn_server(inst)
         end
 
-        -- LS_C_OnPreLoad(inst)
-
         return inst
     end, data.assets, data.prefabs))
 end

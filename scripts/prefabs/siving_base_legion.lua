@@ -518,8 +518,6 @@ table.insert(prefs, Prefab("siving_derivant", function()
 
     MakeHauntableWork(inst)
 
-    -- LS_C_OnPreLoad(inst)
-
     return inst
 end, { Asset("ANIM", "anim/siving_derivant.zip") }, { "siving_derivant_item", "siving_rocks" }))
 

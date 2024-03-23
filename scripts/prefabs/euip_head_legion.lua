@@ -138,8 +138,6 @@ table.insert(prefs, Prefab("hat_lichen", function()
 
     MakeHauntableLaunchAndPerish(inst)
 
-    LS_C_OnPreLoad(inst)
-
     return inst
 end, GetAssets("hat_lichen"), { "lichenhatlight" }))
 
@@ -333,8 +331,6 @@ table.insert(prefs, Prefab("hat_cowboy", function()
 
     MakeHauntableLaunch(inst)
 
-    LS_C_OnPreLoad(inst)
-
     return inst
 end, GetAssets("hat_cowboy"), nil))
 
@@ -455,8 +451,6 @@ table.insert(prefs, Prefab("hat_elepheetle", function()
     MakeHauntableLaunch(inst)
 
     TOOLS_L.MakeNoLossRepairableEquipment(inst, foreverequip_beetlehat)
-
-    -- LS_C_OnPreLoad(inst)
 
     return inst
 end, GetAssets("hat_elepheetle"), nil))
@@ -751,8 +745,6 @@ table.insert(prefs, Prefab("siving_mask", function()
 
     inst.OnSave = OnSave_sivmask
     inst.OnLoad = OnLoad_sivmask
-
-    LS_C_OnPreLoad(inst)
 
     return inst
 end, GetAssets("siving_mask"), { "siving_lifesteal_fx" }))
@@ -1107,7 +1099,6 @@ table.insert(prefs, Prefab("siving_mask_gold", function()
 
     inst.OnSave = OnSave_sivmask
     inst.OnLoad = OnLoad_sivmask
-    LS_C_OnPreLoad(inst)
 
     return inst
 end, GetAssets("siving_mask_gold"), { "siving_lifesteal_fx", "life_trans_fx" }))

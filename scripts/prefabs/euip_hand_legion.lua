@@ -342,7 +342,6 @@ table.insert(prefs, Prefab("neverfade", function()
 
     inst.OnSave = OnSave_never
     inst.OnLoad = OnLoad_never
-    LS_C_OnPreLoad(inst)
 
     return inst
 end, GetAssets("neverfade", {
@@ -415,8 +414,6 @@ table.insert(prefs, Prefab("rosorns", function()
     SetPerishable(inst, TUNING.TOTAL_DAY_TIME*8, nil, inst.Remove)
     MakeHauntableLaunchAndPerish(inst)
 
-    LS_C_OnPreLoad(inst)
-
     return inst
 end, GetAssets("rosorns", { Asset("ANIM", "anim/swap_rosorns.zip") }), nil))
 
@@ -475,8 +472,6 @@ table.insert(prefs, Prefab("lileaves", function()
     SetWeapon(inst, 51, OnAttack_lily)
     SetPerishable(inst, TUNING.TOTAL_DAY_TIME*8, nil, inst.Remove)
     MakeHauntableLaunchAndPerish(inst)
-
-    LS_C_OnPreLoad(inst)
 
     return inst
 end, GetAssets("lileaves", { Asset("ANIM", "anim/swap_lileaves.zip") }), nil))
@@ -575,8 +570,6 @@ table.insert(prefs, Prefab("orchitwigs", function()
     SetWeapon(inst, TUNING.BASE_SURVIVOR_ATTACK*0.9, OnAttack_orchid)
     SetPerishable(inst, TUNING.TOTAL_DAY_TIME*8, nil, inst.Remove)
     MakeHauntableLaunchAndPerish(inst)
-
-    LS_C_OnPreLoad(inst)
 
     return inst
 end, GetAssets("orchitwigs", { Asset("ANIM", "anim/swap_orchitwigs.zip") }), { "impact_orchid_fx" }))
@@ -831,8 +824,6 @@ if CONFIGS_LEGION.DRESSUP then
 
         MakeHauntableLaunch(inst)
 
-        LS_C_OnPreLoad(inst)
-
         return inst
     end, GetAssets("pinkstaff", { Asset("ANIM", "anim/swap_pinkstaff.zip") }), nil))
 end
@@ -1056,8 +1047,6 @@ table.insert(prefs, Prefab("fimbul_axe", function()
 
     MakeHauntableLaunch(inst)
 
-    LS_C_OnPreLoad(inst)
-
     return inst
 end, GetAssets("fimbul_axe", {
     Asset("ANIM", "anim/boomerang.zip") --官方回旋镖动画模板
@@ -1156,8 +1145,6 @@ table.insert(prefs, Prefab("tripleshovelaxe", function()
 
     MakeHauntableLaunch(inst)
 
-    LS_C_OnPreLoad(inst)
-
     return inst
 end, GetAssets("tripleshovelaxe"), nil))
 
@@ -1206,8 +1193,6 @@ table.insert(prefs, Prefab("triplegoldenshovelaxe", function()
     inst.components.weapon.attackwear = 0.1
 
     MakeHauntableLaunch(inst)
-
-    LS_C_OnPreLoad(inst)
 
     return inst
 end, GetAssets("triplegoldenshovelaxe"), nil))
@@ -1373,8 +1358,6 @@ table.insert(prefs, Prefab("lance_carrot_l", function()
     if TUNING.FUNCTIONAL_MEDAL_IS_OPEN then
         SetImmortalable(inst, 2, nil)
     end
-
-    -- LS_C_OnPreLoad(inst)
 
     return inst
 end, GetAssets("lance_carrot_l"), nil))

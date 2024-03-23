@@ -632,8 +632,6 @@ local function MakePlant(defkey, data)
 			data.fn_server(inst)
 		end
 
-		-- LS_C_OnPreLoad(inst)
-
 		return inst
 	end, nil, nil)
 end
@@ -864,10 +862,6 @@ local function MakePlant2(cropprefab, sets)
 		inst.components.perennialcrop2:SetStage(1, false)
 
 		inst.fn_planted = OnPlant_p2
-
-		-- if inst.components.skinedlegion ~= nil then
-		-- 	LS_C_OnPreLoad(inst)
-		-- end
 
 		if sets.fn_server ~= nil then
 			sets.fn_server(inst)
