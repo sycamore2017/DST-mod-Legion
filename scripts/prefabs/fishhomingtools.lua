@@ -3,7 +3,7 @@
 --------------------------------------------------------------------------
 
 local assets_cont = {
-    Asset("ANIM", "anim/ui_bundle_2x2.zip"),
+    Asset("ANIM", "anim/ui_bundle_2x2.zip")
 }
 
 local function OnEntityReplicated_cont(inst)
@@ -166,6 +166,20 @@ local assets_bag = {
 local prefabs_bag = {
     "fishhomingbaiting"
 }
+local baiting_base = {
+    dusty = {
+        img = "fishhomingbait1", atlas = "images/inventoryimages/fishhomingbait1.xml",
+        anim = "idle1", swap = "swap1", symbol = "base1", build = "fishhomingbait"
+    },
+    pasty = {
+        img = "fishhomingbait2", atlas = "images/inventoryimages/fishhomingbait2.xml",
+        anim = "idle2", swap = "swap2", symbol = "base2", build = "fishhomingbait"
+    },
+    hardy = {
+        img = "fishhomingbait3", atlas = "images/inventoryimages/fishhomingbait3.xml",
+        anim = "idle3", swap = "swap3", symbol = "base3", build = "fishhomingbait"
+    }
+}
 
 local function OnHit(inst, attacker, target)
     local x, y, z = inst.Transform:GetWorldPosition()
@@ -180,10 +194,9 @@ local function OnHit(inst, attacker, target)
 
         local baiting = SpawnPrefab("fishhomingbaiting")
         if baiting ~= nil then
-            local skindata = inst.components.skinedlegion:GetSkinedData()
-            if skindata ~= nil and skindata.baiting ~= nil then
-                baiting.AnimState:SetBank(skindata.baiting.bank)
-                baiting.AnimState:SetBuild(skindata.baiting.build)
+            if inst._dd ~= nil and inst._dd.build ~= nil then
+                baiting.AnimState:SetBank(inst._dd.bank)
+                baiting.AnimState:SetBuild(inst._dd.build)
             end
             baiting.Transform:SetPosition(x, y, z)
             inst.components.fishhomingbait:Handover(baiting)
@@ -197,7 +210,7 @@ local function OnThrown(inst)
     inst.persists = false
 
     inst.AnimState:SetBank("chum_pouch")
-    local data = inst.baitimgs_l[inst.components.fishhomingbait.type_shape]
+    local data = (inst._dd or baiting_base)[inst.components.fishhomingbait.type_shape]
     if data ~= nil then
         inst.AnimState:OverrideSymbol("chum_pouch01", data.build, data.symbol)
     else
@@ -221,13 +234,13 @@ local function OnAddProjectile(inst)
     inst.components.complexprojectile:SetOnHit(OnHit)
 end
 local function OnEquip(inst, owner)
-    local data = inst.baitimgs_l[inst.components.fishhomingbait.type_shape]
+    local data = (inst._dd or baiting_base)[inst.components.fishhomingbait.type_shape]
     if data ~= nil then
         if data.isshield then
-            owner.AnimState:Show("LANTERN_OVERLAY")
             owner.AnimState:HideSymbol("swap_object")
             owner.AnimState:ClearOverrideSymbol("swap_object")
             owner.AnimState:OverrideSymbol("lantern_overlay", data.build, data.swap)
+            owner.AnimState:Show("LANTERN_OVERLAY")
         else
             owner.AnimState:OverrideSymbol("swap_object", data.build, data.swap)
         end
@@ -238,7 +251,7 @@ local function OnEquip(inst, owner)
     owner.AnimState:Hide("ARM_normal")
 end
 local function OnUnequip(inst, owner)
-    local data = inst.baitimgs_l[inst.components.fishhomingbait.type_shape]
+    local data = (inst._dd or baiting_base)[inst.components.fishhomingbait.type_shape]
     if data ~= nil then
         if data.isshield then
             owner.AnimState:Hide("LANTERN_OVERLAY")
@@ -252,6 +265,14 @@ local function OnUnequip(inst, owner)
     end
     owner.AnimState:Hide("ARM_carry")
     owner.AnimState:Show("ARM_normal")
+end
+local function Init_bag(inst)
+    local data = (inst._dd or baiting_base)[inst.components.fishhomingbait.type_shape]
+    if data ~= nil then
+        inst.components.inventoryitem.atlasname = data.atlas
+        inst.components.inventoryitem:ChangeImageName(data.img)
+        inst.AnimState:PlayAnimation(data.anim)
+    end
 end
 local function DisplayName_bag(inst)
     local namepre = ""
@@ -320,20 +341,7 @@ local function Fn_bag()
     inst.entity:SetPristine()
     if not TheWorld.ismastersim then return inst end
 
-    inst.baitimgs_l = {
-		dusty = {
-            img = "fishhomingbait1", atlas = "images/inventoryimages/fishhomingbait1.xml",
-            anim = "idle1", swap = "swap1", symbol = "base1", build = "fishhomingbait"
-        },
-		pasty = {
-            img = "fishhomingbait2", atlas = "images/inventoryimages/fishhomingbait2.xml",
-            anim = "idle2", swap = "swap2", symbol = "base2", build = "fishhomingbait"
-        },
-		hardy = {
-            img = "fishhomingbait3", atlas = "images/inventoryimages/fishhomingbait3.xml",
-            anim = "idle3", swap = "swap3", symbol = "base3", build = "fishhomingbait"
-        }
-	}
+    inst._dd = baiting_base
 
     inst:AddComponent("locomotor")
 
@@ -357,14 +365,7 @@ local function Fn_bag()
     inst.components.forcecompostable.green = true
 
     inst:AddComponent("fishhomingbait")
-    inst.components.fishhomingbait.oninitfn = function(inst)
-        local data = inst.baitimgs_l[inst.components.fishhomingbait.type_shape]
-        if data ~= nil then
-            inst.components.inventoryitem.atlasname = data.atlas
-            inst.components.inventoryitem:ChangeImageName(data.img)
-            inst.AnimState:PlayAnimation(data.anim)
-        end
-    end
+    inst.components.fishhomingbait.oninitfn = Init_bag
 
     MakeHauntableLaunch(inst)
 
@@ -381,6 +382,21 @@ local assets_baiting = {
 local prefabs_baiting = {
     "chumpiece"
 }
+
+local function Init_baiting(inst)
+    local type_eat = inst.baitcolors_l[inst.components.fishhomingbait.type_eat]
+    if type_eat ~= nil then
+        inst.AnimState:SetMultColour(type_eat.r, type_eat.g, type_eat.b, 0.5)
+    end
+    local type_shape = inst.components.fishhomingbait.type_shape
+    if type_shape == "hardy" then
+        inst.AnimState:SetScale(0.5, 0.5)
+    elseif type_shape == "pasty" then
+        inst.AnimState:SetScale(0.75, 0.75)
+    else
+        inst.AnimState:SetScale(1, 1)
+    end
+end
 
 local function Fn_baiting()
     local inst = CreateEntity()
@@ -416,20 +432,7 @@ local function Fn_baiting()
 
     inst:AddComponent("fishhomingbait")
     inst.components.fishhomingbait.isbaiting = true
-    inst.components.fishhomingbait.oninitfn = function(inst)
-        local type_eat = inst.baitcolors_l[inst.components.fishhomingbait.type_eat]
-        if type_eat ~= nil then
-            inst.AnimState:SetMultColour(type_eat.r, type_eat.g, type_eat.b, 0.5)
-        end
-        local type_shape = inst.components.fishhomingbait.type_shape
-        if type_shape == "hardy" then
-            inst.AnimState:SetScale(0.5, 0.5)
-        elseif type_shape == "pasty" then
-            inst.AnimState:SetScale(0.75, 0.75)
-        else
-            inst.AnimState:SetScale(1, 1)
-        end
-    end
+    inst.components.fishhomingbait.oninitfn = Init_baiting
 
     inst:DoTaskInTime(3 + math.random()*3, function()
         inst.components.fishhomingbait:Baiting()

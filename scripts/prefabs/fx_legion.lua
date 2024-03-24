@@ -956,6 +956,8 @@ MakeFx2({ --幻象法杖：电光(音速起子12)
         inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
         inst.AnimState:SetMultColour(115/255, 217/255, 255/255, 0.6)
         inst.AnimState:SetFinalOffset(1)
+
+        inst:AddComponent("highlightchild")
     end,
     -- fn_server = function(inst)end
 })

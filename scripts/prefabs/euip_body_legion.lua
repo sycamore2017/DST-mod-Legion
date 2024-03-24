@@ -782,10 +782,9 @@ end, {
 --------------------------------------------------------------------------
 
 local function OnEquip_boltout(inst, owner)
-    local skindata = inst.components.skinedlegion:GetSkinedData()
-    if skindata ~= nil and skindata.equip ~= nil then
-        owner.AnimState:OverrideSymbol(skindata.equip.symbol, skindata.equip.build, skindata.equip.file)
-        owner.bolt_skin_l = skindata.boltdata
+    if inst._dd ~= nil then
+        owner.AnimState:OverrideSymbol("swap_body", inst._dd.build, inst._dd.file)
+        owner.bolt_skin_l = inst._dd.boltdata
     else
         owner.AnimState:OverrideSymbol("swap_body", "swap_boltwingout", "swap_body")
         owner.bolt_skin_l = nil

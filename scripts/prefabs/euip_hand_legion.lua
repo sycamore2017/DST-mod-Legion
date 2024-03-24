@@ -114,12 +114,12 @@ end
 
 local uses_never = 250
 
-local function ChangeSymbol_never(inst, owner, skindata)
-    if skindata ~= nil and skindata.equip ~= nil then
+local function ChangeSymbol_never(inst, owner)
+    if inst._dd ~= nil then
         if inst.hassetbroken then
-            owner.AnimState:OverrideSymbol("swap_object", skindata.equip.build_broken, skindata.equip.file_broken)
+            owner.AnimState:OverrideSymbol("swap_object", inst._dd.build2, inst._dd.file2)
         else
-            owner.AnimState:OverrideSymbol("swap_object", skindata.equip.build, skindata.equip.file)
+            owner.AnimState:OverrideSymbol("swap_object", inst._dd.build, inst._dd.file)
         end
     else
         if inst.hassetbroken then
@@ -129,10 +129,8 @@ local function ChangeSymbol_never(inst, owner, skindata)
         end
     end
 end
-local function ChangeInvImg_never(inst, skindata)
-    if skindata ~= nil and skindata.fn_start ~= nil then
-        skindata.fn_start(inst)
-    else
+local function UpdateImg_never(inst)
+    if inst._dd == nil then
         if inst.hassetbroken then
             --改变物品栏图片，先改atlasname，再改贴图
             inst.components.inventoryitem.atlasname = "images/inventoryimages/neverfade_broken.xml"
@@ -141,11 +139,25 @@ local function ChangeInvImg_never(inst, skindata)
             inst.components.inventoryitem.atlasname = "images/inventoryimages/neverfade.xml"
             inst.components.inventoryitem:ChangeImageName("neverfade")
         end
+    else
+        if inst.hasSetBroken then
+            inst.components.inventoryitem.atlasname = inst._dd.img_atlas2
+            inst.components.inventoryitem:ChangeImageName(inst._dd.img_tex2)
+            if inst._dd.doanim then
+                inst.AnimState:PlayAnimation("idle_broken")
+            end
+        else
+            inst.components.inventoryitem.atlasname = inst._dd.img_atlas
+            inst.components.inventoryitem:ChangeImageName(inst._dd.img_tex)
+            if inst._dd.doanim then
+                inst.AnimState:PlayAnimation("idle")
+            end
+        end
     end
 end
 
 local function OnEquip_never(inst, owner) --装备武器时
-    ChangeSymbol_never(inst, owner, inst.components.skinedlegion:GetSkinedData())
+    ChangeSymbol_never(inst, owner)
     OnEquip_base(inst, owner)
 
     inst.components.deployable:SetDeployMode(DEPLOYMODE.NONE) --装备时去除可栽种功能
@@ -214,9 +226,8 @@ local function OnAttack_never(inst, owner, target)
             inst.atkcounter = inst.atkcounter + 1
 
             if inst.atkcounter >= 10 then --如果达到10，添加buff
-                local skin = inst.components.skinedlegion:GetSkinedData()
-                if skin ~= nil then
-                    owner.butterfly_skin_l = skin.butterfly
+                if inst._dd ~= nil then
+                    owner.butterfly_skin_l = inst._dd.butterfly
                 end
                 owner:AddDebuff("buff_butterflysblessing", "buff_butterflysblessing")
                 inst.atkcounter = 0
@@ -231,12 +242,12 @@ local function OnFinished_never(inst)
         inst.components.weapon:SetDamage(17)
         inst.components.weapon:SetOnAttack(nil)
 
-        ChangeInvImg_never(inst, inst.components.skinedlegion:GetSkinedData())
+        UpdateImg_never(inst)
         -- inst.components.equippable.dapperness = 0
         if inst.components.equippable:IsEquipped() then
             local owner = inst.components.inventoryitem.owner
             if owner ~= nil then
-                ChangeSymbol_never(inst, owner, inst.components.skinedlegion:GetSkinedData())
+                ChangeSymbol_never(inst, owner)
 
                 if owner.components.health ~= nil then
                     owner.components.health.redirect = inst.healthredirect_old
@@ -307,7 +318,7 @@ local foliageath_data_never = {
             inst:RemoveTag("broken")
             inst.components.weapon:SetDamage(55)
             inst.components.weapon:SetOnAttack(OnAttack_never)
-            ChangeInvImg_never(inst, inst.components.skinedlegion:GetSkinedData())
+            UpdateImg_never(inst)
         end
     end
 }
@@ -340,6 +351,8 @@ table.insert(prefs, Prefab("neverfade", function()
     SetDeployable(inst, OnDeploy_never, DEPLOYMODE.PLANT, DEPLOYSPACING.MEDIUM)
     MakeHauntableLaunch(inst) --作祟相关函数
 
+    inst:ListenForEvent("ls_update", UpdateImg_never)
+
     inst.OnSave = OnSave_never
     inst.OnLoad = OnLoad_never
 
@@ -364,9 +377,8 @@ local foliageath_data_rose = {
 }
 
 local function OnEquip_rose(inst, owner)
-    local skindata = inst.components.skinedlegion:GetSkinedData()
-    if skindata ~= nil and skindata.equip ~= nil then
-        owner.AnimState:OverrideSymbol("swap_object", skindata.equip.build, skindata.equip.file)
+    if inst._dd ~= nil then
+        owner.AnimState:OverrideSymbol("swap_object", inst._dd.build, inst._dd.file)
     else
         owner.AnimState:OverrideSymbol("swap_object", "swap_rosorns", "swap_rosorns")
     end
@@ -385,9 +397,8 @@ local function OnUnequip_rose(inst, owner)
 end
 local function OnAttack_rose(inst, owner, target)
     if target ~= nil and target:IsValid() then
-        local skindata = inst.components.skinedlegion:GetSkinedData()
-        if skindata ~= nil and skindata.fn_onatk ~= nil then
-            skindata.fn_onatk(inst, owner, target)
+        if inst._dd ~= nil and inst._dd.fn_onatk ~= nil then
+            inst._dd.fn_onatk(inst, owner, target)
         end
     end
 end
@@ -427,9 +438,8 @@ local foliageath_data_lily = {
 }
 
 local function OnEquip_lily(inst, owner)
-    local skindata = inst.components.skinedlegion:GetSkinedData()
-    if skindata ~= nil and skindata.equip ~= nil then
-        owner.AnimState:OverrideSymbol("swap_object", skindata.equip.build, skindata.equip.file)
+    if inst._dd ~= nil then
+        owner.AnimState:OverrideSymbol("swap_object", inst._dd.build, inst._dd.file)
     else
         owner.AnimState:OverrideSymbol("swap_object", "swap_lileaves", "swap_lileaves")
     end
@@ -487,9 +497,8 @@ local foliageath_data_orchid = {
 }
 
 local function OnEquip_orchid(inst, owner)
-    local skindata = inst.components.skinedlegion:GetSkinedData()
-    if skindata ~= nil and skindata.equip ~= nil then
-        owner.AnimState:OverrideSymbol("swap_object", skindata.equip.build, skindata.equip.file)
+    if inst._dd ~= nil then
+        owner.AnimState:OverrideSymbol("swap_object", inst._dd.build, inst._dd.file)
     else
         owner.AnimState:OverrideSymbol("swap_object", "swap_orchitwigs", "swap_orchitwigs")
     end
@@ -498,12 +507,7 @@ end
 local function OnAttack_orchid(inst, owner, target)
     if target ~= nil and target:IsValid() then
         local x1, y1, z1 = target.Transform:GetWorldPosition()
-        local skindata = inst.components.skinedlegion:GetSkinedData()
-        local snap = nil
-        if skindata ~= nil and skindata.equip ~= nil then
-            snap = skindata.equip.atkfx
-        end
-        snap = SpawnPrefab(snap or "impact_orchid_fx")
+        local snap = SpawnPrefab(inst._dd and inst._dd.atkfx or "impact_orchid_fx")
         if snap ~= nil then
             local x, y, z = inst.Transform:GetWorldPosition()
             local angle = -math.atan2(z1 - z, x1 - x)
@@ -744,19 +748,17 @@ end, GetAssets("book_weather"), { "waterballoon_splash", "fx_book_rain", "fx_boo
 
 if CONFIGS_LEGION.DRESSUP then
     local function OnFinished_staffpink(inst)
+        if inst._dd ~= nil and inst._dd.endfn ~= nil then
+            inst._dd.endfn(inst, nil)
+        end
         inst.SoundEmitter:PlaySound("dontstarve/common/gem_shatter")
         inst:Remove()
     end
     local function OnEquip_staffpink(inst, owner)
-        local skindata = inst.components.skinedlegion:GetSkinedData()
-        if skindata ~= nil then
-            if skindata.equip ~= nil then
-                owner.AnimState:OverrideSymbol("swap_object", skindata.equip.build, skindata.equip.file)
-            else
-                owner.AnimState:OverrideSymbol("swap_object", "swap_pinkstaff", "swap_pinkstaff")
-            end
-            if skindata.equipfx ~= nil then
-                skindata.equipfx.start(inst, owner)
+        if inst._dd ~= nil then
+            owner.AnimState:OverrideSymbol("swap_object", inst._dd.build, inst._dd.file)
+            if inst._dd.startfn ~= nil then
+                inst._dd.startfn(inst, owner)
             end
         else
             owner.AnimState:OverrideSymbol("swap_object", "swap_pinkstaff", "swap_pinkstaff")
@@ -764,9 +766,8 @@ if CONFIGS_LEGION.DRESSUP then
         OnEquip_base(inst, owner)
     end
     local function OnUnequip_staffpink(inst, owner)
-        local skindata = inst.components.skinedlegion:GetSkinedData()
-        if skindata ~= nil and skindata.equipfx ~= nil then
-            skindata.equipfx.stop(inst, owner)
+        if inst._dd ~= nil and inst._dd.endfn ~= nil then
+            inst._dd.endfn(inst, owner)
         end
         OnUnequip_base(inst, owner)
     end

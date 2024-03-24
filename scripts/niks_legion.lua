@@ -276,8 +276,13 @@ local function SetFollowedFx(inst, owner, fxname, sym, x, y, fxkey)
     local fx = SpawnPrefab(fxname)
     if fx ~= nil then
         fx.entity:SetParent(owner.entity)
-        -- fx.entity:AddFollower()
+        if fx.Follower == nil then
+            fx.entity:AddFollower()
+        end
         fx.Follower:FollowSymbol(owner.GUID, sym or "swap_object", x or 0, y or 0, 0)
+        if fx.components.highlightchild ~= nil then
+            fx.components.highlightchild:SetOwner(owner)
+        end
         inst[fxkey] = fx
     end
 end
@@ -422,6 +427,53 @@ local function GetEquippedOwner(inst)
     end
 end
 
+------
+
+local function Fn_start_equip(inst, skined)
+    if skined ~= nil then
+        inst._dd = skined.equip
+    else
+        inst._dd = nil
+    end
+end
+local function Fn_start_equipevent(inst, skined)
+    if skined ~= nil then
+        inst._dd = skined.equip
+    else
+        inst._dd = nil
+    end
+    inst:PushEvent("ls_update")
+end
+
+local function Fn_start_pinkstaff(inst, skined)
+    if skined ~= nil then
+        inst._dd = skined.equip
+        inst.fxcolour = skined.fxcolour
+    else
+        inst._dd = nil
+        inst.fxcolour = {255/255, 80/255, 173/255}
+    end
+end
+local function Fn_start_fishhomingtool(inst, skined)
+    if skined ~= nil then
+        inst._dd = skined.dressup
+        inst.components.bundlemaker:SetSkinData(skined.baitskin, nil)
+    else
+        inst._dd = nil
+        inst.components.bundlemaker:SetSkinData()
+    end
+end
+local function Fn_start_fishhomingbait(inst, skined)
+    if skined ~= nil then
+        inst._dd = skined.baiting
+    else
+        -- inst._dd = nil
+    end
+    if inst.components.fishhomingbait and inst.components.fishhomingbait.oninitfn then
+        inst.components.fishhomingbait.oninitfn(inst)
+    end
+end
+
 --------------------------------------------------------------------------
 --[[ 皮肤数据，以及官方数据修改 ]]
 --------------------------------------------------------------------------
@@ -438,13 +490,12 @@ local SKIN_DEFAULT_LEGION = {
         },
         -- fn_anim = function(inst)end, --处于地面时的动画设置，替换anim的默认方式
 
-        -- fn_start = function(inst)end, --应用皮肤时的函数(服务器)
+        -- fn_start = function(inst, skined)end, --应用皮肤时的函数(服务器)
         -- fn_end = nil, --取消皮肤时的函数(服务器)
         -- fn_start_c = nil, --应用皮肤时的函数(客户端)
         -- fn_end_c = nil, --取消皮肤时的函数(客户端)
 
         equip = { symbol = "swap_object", build = "swap_rosorns", file = "swap_rosorns" },
-        -- fn_onatk = function(inst, owner, target)end, --攻击时的函数
 
         exchangefx = { prefab = nil, offset_y = nil, scale = nil },
         -- fn_spawnSkinExchangeFx = function(inst)end, --皮肤交换时的特效生成函数，替换exchangefx的默认方式
@@ -461,24 +512,24 @@ local SKIN_DEFAULT_LEGION = {
     ]]--
 
     rosebush = {
-        fn_start = function(inst)
-            inst.AnimState:SetBank("berrybush2")
-            inst.AnimState:SetBuild("rosebush")
-        end,
+        anim = {
+            bank = "berrybush2", build = nil,
+            anim = 0, animpush = nil, isloop = nil, setable = true
+        },
         exchangefx = { prefab = nil, offset_y = nil, scale = 1.5 }
     },
     lilybush = {
-        fn_start = function(inst)
-            inst.AnimState:SetBank("berrybush2")
-            inst.AnimState:SetBuild("lilybush")
-        end,
+        anim = {
+            bank = "berrybush2", build = nil,
+            anim = 0, animpush = nil, isloop = nil, setable = true
+        },
         exchangefx = { prefab = nil, offset_y = nil, scale = 1.5 }
     },
     orchidbush = {
-        fn_start = function(inst)
-            inst.AnimState:SetBank("berrybush2")
-            inst.AnimState:SetBuild("orchidbush")
-        end,
+        anim = {
+            bank = "berrybush2", build = nil,
+            anim = 0, animpush = nil, isloop = nil, setable = true
+        },
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 }
     },
 
@@ -488,6 +539,7 @@ local SKIN_DEFAULT_LEGION = {
             bank = nil, build = nil,
             anim = nil, animpush = nil, isloop = nil, setable = true
         },
+        fn_start = Fn_start_equip,
         equip = { symbol = "swap_object", build = "swap_rosorns", file = "swap_rosorns" },
         exchangefx = { prefab = nil, offset_y = nil, scale = nil },
         floater = { cut = 0.15, size = "small", offset_y = 0.4, scale = 0.5, nofx = nil }
@@ -498,6 +550,7 @@ local SKIN_DEFAULT_LEGION = {
             bank = nil, build = nil,
             anim = nil, animpush = nil, isloop = nil, setable = true
         },
+        fn_start = Fn_start_equip,
         equip = { symbol = "swap_object", build = "swap_lileaves", file = "swap_lileaves" },
         exchangefx = { prefab = nil, offset_y = nil, scale = nil },
         floater = { cut = 0.15, size = "small", offset_y = 0.4, scale = 0.5, nofx = nil }
@@ -508,6 +561,7 @@ local SKIN_DEFAULT_LEGION = {
             bank = nil, build = nil,
             anim = nil, animpush = nil, isloop = nil, setable = true
         },
+        fn_start = Fn_start_equip,
         equip = {
             symbol = "swap_object", build = "swap_orchitwigs", file = "swap_orchitwigs",
             atkfx = "impact_orchid_fx"
@@ -522,27 +576,22 @@ local SKIN_DEFAULT_LEGION = {
             bank = nil, build = nil,
             anim = nil, animpush = nil, isloop = nil, setable = true
         },
-        fn_start = function(inst)
-            if inst.hasSetBroken then
-                inst.components.inventoryitem.atlasname = "images/inventoryimages/neverfade_broken.xml"
-                inst.components.inventoryitem:ChangeImageName("neverfade_broken")
-            else
-                inst.components.inventoryitem.atlasname = "images/inventoryimages/neverfade.xml"
-                inst.components.inventoryitem:ChangeImageName("neverfade")
-            end
-        end,
+        fn_start = Fn_start_equipevent,
         equip = {
-            symbol = "swap_object", build = "swap_neverfade", file = "swap_neverfade",
-            build_broken = "swap_neverfade_broken", file_broken = "swap_neverfade_broken"
+            symbol = "swap_object", doanim = nil,
+            build = "swap_neverfade", file = "swap_neverfade",
+            build2 = "swap_neverfade_broken", file2 = "swap_neverfade_broken",
+            img_tex = "neverfade", img_atlas = "images/inventoryimages/neverfade.xml",
+            img_tex2 = "neverfade_broken", img_atlas2 = "images/inventoryimages/neverfade_broken.xml"
         },
         exchangefx = { prefab = nil, offset_y = nil, scale = nil },
         floater = { cut = 0.12, size = "med", offset_y = 0.4, scale = 0.5, nofx = nil }
     },
     neverfadebush = {
-        fn_start = function(inst)
-            inst.AnimState:SetBank("berrybush2")
-            inst.AnimState:SetBuild("neverfadebush")
-        end,
+        anim = {
+            bank = "berrybush2", build = nil,
+            anim = 0, animpush = nil, isloop = nil, setable = true
+        },
         exchangefx = { prefab = nil, offset_y = 0.9, scale = nil }
     },
 
@@ -552,7 +601,8 @@ local SKIN_DEFAULT_LEGION = {
             bank = nil, build = nil,
             anim = "anim", animpush = nil, isloop = nil, setable = true
         },
-        equip = { symbol = "swap_hat", build = "hat_lichen", file = "swap_hat", isopenhat = true },
+        fn_start = Fn_start_equip,
+        equip = { symbol = "swap_hat", build = "hat_lichen", file = "swap_hat", isopentop = true },
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
         floater = { cut = 0.03, size = "med", offset_y = 0.2, scale = 0.5, nofx = nil }
     },
@@ -563,6 +613,7 @@ local SKIN_DEFAULT_LEGION = {
             bank = nil, build = nil,
             anim = "anim", animpush = nil, isloop = nil, setable = true
         },
+        fn_start = Fn_start_equip,
         equip = { symbol = "swap_hat", build = "hat_cowboy", file = "swap_hat" },
         exchangefx = { prefab = nil, offset_y = nil, scale = nil },
         floater = { cut = 0.03, size = "med", offset_y = 0.2, scale = 0.8, nofx = nil }
@@ -574,10 +625,9 @@ local SKIN_DEFAULT_LEGION = {
             bank = nil, build = nil,
             anim = "anim", animpush = nil, isloop = nil, setable = true
         },
-        fn_start = function(inst)
-            inst.fxcolour = {255/255, 80/255, 173/255}
-        end,
+        fn_start = Fn_start_pinkstaff,
         equip = { symbol = "swap_object", build = "swap_pinkstaff", file = "swap_pinkstaff" },
+        fxcolour = {255/255, 80/255, 173/255},
         exchangefx = { prefab = nil, offset_y = nil, scale = nil },
         floater = { cut = 0.15, size = "small", offset_y = 0.35, scale = 0.5, nofx = nil }
     },
@@ -588,8 +638,11 @@ local SKIN_DEFAULT_LEGION = {
             bank = "swap_boltwingout", build = "swap_boltwingout",
             anim = nil, animpush = nil, isloop = nil, setable = true
         },
-        equip = { symbol = "swap_body", build = "swap_boltwingout", file = "swap_body" },
-        boltdata = { fx = "boltwingout_fx", build = nil },
+        fn_start = Fn_start_equip,
+        equip = {
+            symbol = "swap_body", build = "swap_boltwingout", file = "swap_body",
+            boltdata = { fx = "boltwingout_fx", build = nil }
+        },
         exchangefx = { prefab = nil, offset_y = nil, scale = nil },
         floater = { cut = 0.09, size = "small", offset_y = 0.2, scale = 0.45, nofx = nil }
     },
@@ -600,10 +653,8 @@ local SKIN_DEFAULT_LEGION = {
             bank = nil, build = nil,
             anim = nil, animpush = nil, isloop = nil, setable = true
         },
-        fn_start = function(inst)
-            inst.components.bundlemaker:SetSkinData()
-        end,
-        equip = { symbol = "swap_object", build = "fishhomingtool_awesome", file = "swap" },
+        fn_start = Fn_start_fishhomingtool,
+        dressup = { symbol = "swap_object", build = "fishhomingtool_awesome", file = "swap" },
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 }
     },
     fishhomingtool_normal = {
@@ -612,39 +663,36 @@ local SKIN_DEFAULT_LEGION = {
             bank = nil, build = nil,
             anim = nil, animpush = nil, isloop = nil, setable = true
         },
-        fn_start = function(inst)
+        fn_start = function(inst, skined)
             inst.components.bundlemaker:SetSkinData()
         end,
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 }
     },
     fishhomingbait = {
-        fn_start = function(inst)
-            inst.baitimgs_l = {
-                dusty = {
-                    img = "fishhomingbait1", atlas = "images/inventoryimages/fishhomingbait1.xml",
-                    anim = "idle1", swap = "swap1", symbol = "base1", build = "fishhomingbait"
-                },
-                pasty = {
-                    img = "fishhomingbait2", atlas = "images/inventoryimages/fishhomingbait2.xml",
-                    anim = "idle2", swap = "swap2", symbol = "base2", build = "fishhomingbait"
-                },
-                hardy = {
-                    img = "fishhomingbait3", atlas = "images/inventoryimages/fishhomingbait3.xml",
-                    anim = "idle3", swap = "swap3", symbol = "base3", build = "fishhomingbait"
-                }
+        anim = {
+            bank = nil, build = nil,
+            anim = 0, animpush = nil, isloop = nil, setable = true
+        },
+        fn_start = Fn_start_fishhomingbait,
+        baiting = {
+            dusty = {
+                img = "fishhomingbait1", atlas = "images/inventoryimages/fishhomingbait1.xml",
+                anim = "idle1", swap = "swap1", symbol = "base1", build = "fishhomingbait"
+            },
+            pasty = {
+                img = "fishhomingbait2", atlas = "images/inventoryimages/fishhomingbait2.xml",
+                anim = "idle2", swap = "swap2", symbol = "base2", build = "fishhomingbait"
+            },
+            hardy = {
+                img = "fishhomingbait3", atlas = "images/inventoryimages/fishhomingbait3.xml",
+                anim = "idle3", swap = "swap3", symbol = "base3", build = "fishhomingbait"
             }
-            inst.AnimState:SetBank("fishhomingbait")
-            inst.AnimState:SetBuild("fishhomingbait")
-            if inst.components.fishhomingbait and inst.components.fishhomingbait.oninitfn then
-                inst.components.fishhomingbait.oninitfn(inst)
-            end
-        end,
-        -- baiting = nil,
+        },
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 }
     },
 
     icire_rock = {
-		fn_start = function(inst)
+		fn_start = function(inst, skined)
             inst.AnimState:SetBank("heat_rock")
             inst.AnimState:SetBuild("heat_rock")
             inst.AnimState:OverrideSymbol("rock", "icire_rock", "rock")
@@ -678,7 +726,7 @@ local SKIN_DEFAULT_LEGION = {
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 }
     },
     agronssword = {
-        fn_start = function(inst)
+        fn_start = function(inst, skined)
             inst._dd = {
                 img_tex = "agronssword", img_atlas = "images/inventoryimages/agronssword.xml",
                 img_tex2 = "agronssword2", img_atlas2 = "images/inventoryimages/agronssword2.xml",
@@ -686,7 +734,6 @@ local SKIN_DEFAULT_LEGION = {
             }
             Fn_start_agronssword(inst)
         end,
-        equip = true, --为了能自动更新手部贴图
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 }
     },
 
@@ -744,7 +791,7 @@ local SKIN_DEFAULT_LEGION = {
     },
 
     siving_derivant = {
-        fn_start = function(inst)
+        fn_start = function(inst, skined)
             inst.AnimState:SetBank("siving_derivant")
             inst.AnimState:SetBuild("siving_derivant")
             inst.AnimState:SetScale(1.3, 1.3)
@@ -753,7 +800,7 @@ local SKIN_DEFAULT_LEGION = {
     },
 
     siving_turn = {
-        fn_start = function(inst)
+        fn_start = function(inst, skined)
             Fn_sivturn(inst, "siving_turn", true)
             inst.components.genetrans.fxdata.unlockfx = "siving_turn_unlock_fx"
         end,
@@ -782,7 +829,7 @@ local SKIN_DEFAULT_LEGION = {
 
     soul_contracts = {
         image = { name = nil, atlas = nil, setable = true },
-        fn_start = function(inst)
+        fn_start = function(inst, skined)
             inst.AnimState:SetBank("book_maxwell")
             inst.AnimState:SetBuild("soul_contracts")
             inst._dd = { fx = "l_soul_fx" }
@@ -814,7 +861,7 @@ local SKIN_DEFAULT_LEGION = {
     },
 
     plant_cactus_meat_l = {
-        fn_start = function(inst)
+        fn_start = function(inst, skined)
             local sets = _G.CROPS_DATA_LEGION["cactus_meat"]
             inst.AnimState:SetBank(sets.bank)
             inst.AnimState:SetBuild(sets.build)
@@ -832,7 +879,7 @@ local SKIN_DEFAULT_LEGION = {
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 }
     },
     siving_ctlwater = {
-        fn_start = function(inst)
+        fn_start = function(inst, skined)
             inst.AnimState:SetBank("siving_ctlwater")
             inst.AnimState:SetBuild("siving_ctlwater")
             inst.barsets_l = {
@@ -854,7 +901,7 @@ local SKIN_DEFAULT_LEGION = {
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 }
     },
     siving_ctldirt = {
-        fn_start = function(inst)
+        fn_start = function(inst, skined)
             inst.AnimState:SetBank("siving_ctldirt")
             inst.AnimState:SetBuild("siving_ctldirt")
             inst.barsets_l = {
@@ -884,7 +931,7 @@ local SKIN_DEFAULT_LEGION = {
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 }
     },
     siving_ctlall = {
-        fn_start = function(inst)
+        fn_start = function(inst, skined)
             inst.AnimState:SetBank("siving_ctlall")
             inst.AnimState:SetBuild("siving_ctlall")
             inst.barsets_l = {
@@ -916,10 +963,10 @@ local SKIN_DEFAULT_LEGION = {
             bank = nil, build = nil,
             anim = nil, animpush = nil, isloop = nil, setable = true
         },
-        fn_start = function(inst)
+        fn_start = function(inst, skined)
             inst.maskfxoverride_l = nil
         end,
-        equip = { symbol = nil, build = "siving_mask", file = nil, isopenhat = true },
+        equip = { symbol = nil, build = "siving_mask", file = nil, isopentop = true },
         exchangefx = { prefab = nil, offset_y = nil, scale = nil }
     },
     siving_mask_gold = {
@@ -928,10 +975,10 @@ local SKIN_DEFAULT_LEGION = {
             bank = nil, build = nil,
             anim = nil, animpush = nil, isloop = nil, setable = true
         },
-        fn_start = function(inst)
+        fn_start = function(inst, skined)
             inst.maskfxoverride_l = nil
         end,
-        equip = { symbol = nil, build = "siving_mask_gold", file = nil, isopenhat = true },
+        equip = { symbol = nil, build = "siving_mask_gold", file = nil, isopentop = true },
         exchangefx = { prefab = nil, offset_y = nil, scale = nil }
     },
 
@@ -941,7 +988,7 @@ local SKIN_DEFAULT_LEGION = {
             bank = nil, build = nil,
             anim = nil, animpush = nil, isloop = nil, setable = true
         },
-        fn_start = function(inst)
+        fn_start = function(inst, skined)
             inst.suitfxoverride_l = nil
         end,
         equip = { symbol = "swap_body", build = "siving_suit", file = "swap_body" },
@@ -953,7 +1000,7 @@ local SKIN_DEFAULT_LEGION = {
             bank = nil, build = nil,
             anim = nil, animpush = nil, isloop = nil, setable = true
         },
-        fn_start = function(inst)
+        fn_start = function(inst, skined)
             inst.suitfxoverride_l = nil
         end,
         equip = { symbol = "swap_body", build = "siving_suit_gold", file = "swap_body" },
@@ -970,13 +1017,13 @@ local SKIN_DEFAULT_LEGION = {
 
         overridekeys = { "data_soil", "data_plant" },
         data_soil = {
-            fn_start = function(inst)
+            fn_start = function(inst, skined)
                 inst.AnimState:SetBank("farm_soil")
                 inst.AnimState:SetBuild("siving_soil")
             end
         },
         data_plant = {
-            fn_start = function(inst)
+            fn_start = function(inst, skined)
                 inst.soilskin_l = nil
                 if inst.fn_soiltype ~= nil then
                     inst.fn_soiltype(inst, nil)
@@ -986,7 +1033,7 @@ local SKIN_DEFAULT_LEGION = {
     },
 
     refractedmoonlight = {
-        fn_start = function(inst)
+        fn_start = function(inst, skined)
             inst._dd = {
                 img_tex = "refractedmoonlight", img_atlas = "images/inventoryimages/refractedmoonlight.xml",
                 img_tex2 = "refractedmoonlight2", img_atlas2 = "images/inventoryimages/refractedmoonlight2.xml",
@@ -1009,7 +1056,7 @@ local SKIN_DEFAULT_LEGION = {
         overridekeys = { "data_up" },
         data_up = {
             exchangefx = { prefab = nil, offset_y = nil, scale = nil },
-            fn_start = function(inst)
+            fn_start = function(inst, skined)
                 inst.AnimState:SetBank("hiddenmoonlight")
                 inst.AnimState:SetBuild("hiddenmoonlight")
             end
@@ -1029,7 +1076,7 @@ local SKIN_DEFAULT_LEGION = {
         data_up = {
             image = { name = "revolvedmoonlight", atlas = "images/inventoryimages/revolvedmoonlight.xml", setable = true },
             floater = { cut = 0.1, size = "med", offset_y = 0.3, scale = 0.3, nofx = nil },
-            fn_start = function(inst)
+            fn_start = function(inst, skined)
                 inst.AnimState:SetBank("revolvedmoonlight")
                 inst.AnimState:SetBuild("revolvedmoonlight")
             end
@@ -1040,7 +1087,7 @@ local SKIN_DEFAULT_LEGION = {
                 setable = true
             },
             floater = { cut = 0.1, size = "med", offset_y = 0.3, scale = 0.45, nofx = nil },
-            fn_start = function(inst)
+            fn_start = function(inst, skined)
                 inst.AnimState:SetBank("revolvedmoonlight")
                 inst.AnimState:SetBuild("revolvedmoonlight")
                 inst.AnimState:OverrideSymbol("decorate", "revolvedmoonlight", "decoratepro")
@@ -1049,14 +1096,14 @@ local SKIN_DEFAULT_LEGION = {
     },
 
     chest_whitewood = {
-        fn_start = function(inst)
+        fn_start = function(inst, skined)
             inst.AnimState:SetBank("chest_whitewood")
             inst.AnimState:SetBuild("chest_whitewood")
         end,
         exchangefx = { prefab = nil, offset_y = nil, scale = 1.5 }
     },
     chest_whitewood_big = {
-        fn_start = function(inst)
+        fn_start = function(inst, skined)
             inst.AnimState:SetBank("chest_whitewood_big")
             inst.AnimState:SetBuild("chest_whitewood_big")
         end,
@@ -1110,19 +1157,12 @@ local SKINS_LEGION = {
         },
         -- fn_anim = function(inst)end, --处于地面时的动画设置，替换anim的默认方式
 
-        -- fn_start = function(inst)end, --应用皮肤时的函数(服务器)
+        -- fn_start = function(inst, skined)end, --应用皮肤时的函数(服务器)
         -- fn_end = nil, --取消皮肤时的函数(服务器)
         -- fn_start_c = nil, --应用皮肤时的函数(客户端)
         -- fn_end_c = nil, --取消皮肤时的函数(客户端)
 
         equip = { symbol = "swap_object", build = "swap_spear_mirrorrose", file = "swap_spear" },
-        fn_onatk = function(inst, owner, target) --攻击时的函数
-            -- local fx = SpawnPrefab("wanda_attack_pocketwatch_normal_fx")
-            local fx = SpawnPrefab("rosorns_spell_fx")
-            if fx ~= nil then
-                fx.Transform:SetPosition(target.Transform:GetWorldPosition())
-            end
-        end,
 
         exchangefx = { prefab = nil, offset_y = nil, scale = nil }, --prefab填了的话，就会替换扫把的皮肤切换特效
         -- fn_spawnSkinExchangeFx = function(inst)end, --皮肤交换时的特效生成函数，替换exchangefx的默认方式
@@ -1147,11 +1187,10 @@ local SKINS_LEGION = {
 			Asset("ANIM", "anim/skin/rosebush_marble.zip")
 		},
         string = ischinese and { name = "理盛赤蔷" } or { name = "Rose Marble Pot" },
-		fn_start = function(inst)
-            --官方代码写得挺好，直接改动画模板居然能继承已有的动画播放和symbol切换状态
-            inst.AnimState:SetBank("berrybush")
-            inst.AnimState:SetBuild("rosebush_marble")
-        end,
+        anim = {
+            bank = "berrybush", build = nil,
+            anim = 0, animpush = nil, isloop = nil, setable = true
+        },
         exchangefx = { prefab = nil, offset_y = nil, scale = 1.5 },
         linkedskins = { sword = "rosorns_marble" },
         fn_placer = function(inst)
@@ -1171,13 +1210,16 @@ local SKINS_LEGION = {
             bank = nil, build = nil,
             anim = nil, animpush = nil, isloop = true, setable = true
         },
-        equip = { symbol = "swap_object", build = "rosorns_marble", file = "swap_object" },
-        fn_onatk = function(inst, owner, target)
-            local fx = SpawnPrefab("rosorns_marble_fx")
-            if fx ~= nil then
-                fx.Transform:SetPosition(target.Transform:GetWorldPosition())
+        fn_start = Fn_start_equip,
+        equip = {
+            symbol = "swap_object", build = "rosorns_marble", file = "swap_object",
+            fn_onatk = function(inst, owner, target)
+                local fx = SpawnPrefab("rosorns_marble_fx")
+                if fx ~= nil then
+                    fx.Transform:SetPosition(target.Transform:GetWorldPosition())
+                end
             end
-        end,
+        },
         scabbard = {
             anim = "idle_cover", isloop = true, bank = "rosorns_marble", build = "rosorns_marble",
             image = "foliageath_rosorns_marble", atlas = "images/inventoryimages_skin/foliageath_rosorns_marble.xml"
@@ -1193,10 +1235,10 @@ local SKINS_LEGION = {
 			Asset("ANIM", "anim/skin/lilybush_marble.zip")
 		},
         string = ischinese and { name = "理盛截莲" } or { name = "Lily Marble Pot" },
-		fn_start = function(inst)
-            inst.AnimState:SetBank("berrybush")
-            inst.AnimState:SetBuild("lilybush_marble")
-        end,
+        anim = {
+            bank = "berrybush", build = nil,
+            anim = 0, animpush = nil, isloop = nil, setable = true
+        },
         exchangefx = { prefab = nil, offset_y = nil, scale = nil },
         linkedskins = { sword = "lileaves_marble" },
         fn_placer = function(inst)
@@ -1216,6 +1258,7 @@ local SKINS_LEGION = {
             bank = nil, build = nil,
             anim = nil, animpush = nil, isloop = nil, setable = true
         },
+        fn_start = Fn_start_equip,
         equip = { symbol = "swap_object", build = "lileaves_marble", file = "swap_object" },
         scabbard = {
             anim = "idle_cover", isloop = nil, bank = "lileaves_marble", build = "lileaves_marble",
@@ -1232,10 +1275,10 @@ local SKINS_LEGION = {
 			Asset("ANIM", "anim/skin/orchidbush_marble.zip")
 		},
         string = ischinese and { name = "理盛瀑兰" } or { name = "Orchid Marble Pot" },
-		fn_start = function(inst)
-            inst.AnimState:SetBank("berrybush")
-            inst.AnimState:SetBuild("orchidbush_marble")
-        end,
+        anim = {
+            bank = "berrybush", build = nil,
+            anim = 0, animpush = nil, isloop = nil, setable = true
+        },
         exchangefx = { prefab = nil, offset_y = 1.3, scale = nil },
         linkedskins = { sword = "orchitwigs_marble" },
         fn_placer = function(inst)
@@ -1255,9 +1298,10 @@ local SKINS_LEGION = {
             bank = nil, build = nil,
             anim = nil, animpush = nil, isloop = nil, setable = true
         },
+        fn_start = Fn_start_equip,
         equip = {
             symbol = "swap_object", build = "orchitwigs_marble", file = "swap_object",
-            atkfx = "impact_orchid_fx_marble",
+            atkfx = "impact_orchid_fx_marble"
         },
         scabbard = {
             anim = "idle_cover", isloop = nil, bank = "orchitwigs_marble", build = "orchitwigs_marble",
@@ -1275,10 +1319,10 @@ local SKINS_LEGION = {
 			Asset("ANIM", "anim/skin/orchidbush_disguiser.zip")
 		},
         string = ischinese and { name = "粉色猎园" } or { name = "Pink Orchid Bush" },
-		fn_start = function(inst)
-            inst.AnimState:SetBank("berrybush2")
-            inst.AnimState:SetBuild("orchidbush_disguiser")
-        end,
+        anim = {
+            bank = "berrybush2", build = nil,
+            anim = 0, animpush = nil, isloop = nil, setable = true
+        },
         exchangefx = { prefab = nil, offset_y = 1.3, scale = nil },
         linkedskins = { sword = "orchitwigs_disguiser" },
         fn_placer = function(inst)
@@ -1298,6 +1342,7 @@ local SKINS_LEGION = {
             bank = nil, build = nil,
             anim = nil, animpush = nil, isloop = nil, setable = true
         },
+        fn_start = Fn_start_equip,
         equip = {
             symbol = "swap_object", build = "orchitwigs_disguiser", file = "swap_object",
             atkfx = "impact_orchid_fx_disguiser"
@@ -1323,24 +1368,19 @@ local SKINS_LEGION = {
             bank = nil, build = nil,
             anim = nil, animpush = nil, isloop = nil, setable = true
         },
-        fn_start = function(inst)
-            if inst.hasSetBroken then
-                inst.components.inventoryitem.atlasname = "images/inventoryimages_skin/neverfade_thanks_broken.xml"
-                inst.components.inventoryitem:ChangeImageName("neverfade_thanks_broken")
-            else
-                inst.components.inventoryitem.atlasname = "images/inventoryimages_skin/neverfade_thanks.xml"
-                inst.components.inventoryitem:ChangeImageName("neverfade_thanks")
-            end
-        end,
+        fn_start = Fn_start_equipevent,
         equip = {
-            symbol = "swap_object", build = "neverfade_thanks", file = "normal_swap",
-            build_broken = "neverfade_thanks", file_broken = "broken_swap"
+            symbol = "swap_object", doanim = nil,
+            build = "neverfade_thanks", file = "normal_swap",
+            build2 = "neverfade_thanks", file2 = "broken_swap",
+            img_tex = "neverfade_thanks", img_atlas = "images/inventoryimages_skin/neverfade_thanks.xml",
+            img_tex2 = "neverfade_thanks_broken", img_atlas2 = "images/inventoryimages_skin/neverfade_thanks_broken.xml",
+            butterfly = { bank = "butterfly", build = "neverfade_butterfly_thanks" }
         },
         scabbard = {
             anim = "idle_cover", isloop = nil, bank = "neverfade_thanks", build = "neverfade_thanks",
             image = "foliageath_neverfade_thanks", atlas = "images/inventoryimages_skin/foliageath_neverfade_thanks.xml"
         },
-        butterfly = { bank = "butterfly", build = "neverfade_butterfly_thanks" },
         exchangefx = { prefab = nil, offset_y = nil, scale = nil },
         floater = { cut = 0.05, size = "small", offset_y = 0.15, scale = 0.5, nofx = nil },
         linkedskins = { bush = "neverfadebush_thanks" },
@@ -1356,10 +1396,10 @@ local SKINS_LEGION = {
 			Asset("ANIM", "anim/skin/neverfadebush_thanks.zip")
 		},
         string = { name = ischinese and "扶伤剑冢" or "FuShang Tomb" },
-		fn_start = function(inst)
-            inst.AnimState:SetBank("neverfadebush_thanks")
-            inst.AnimState:SetBuild("neverfadebush_thanks")
-        end,
+        anim = {
+            bank = nil, build = nil,
+            anim = 0, animpush = nil, isloop = nil, setable = true
+        },
         exchangefx = { prefab = nil, offset_y = 1.2, scale = nil },
         linkedskins = { sword = "neverfade_thanks" }
     },
@@ -1376,26 +1416,19 @@ local SKINS_LEGION = {
             inst.AnimState:SetBank("neverfade_paper")
             inst.AnimState:SetBuild("neverfade_paper")
         end,
-        fn_start = function(inst)
-            if inst.hasSetBroken then
-                inst.components.inventoryitem.atlasname = "images/inventoryimages_skin/neverfade_paper_broken.xml"
-                inst.components.inventoryitem:ChangeImageName("neverfade_paper_broken")
-                inst.AnimState:PlayAnimation("idle_broken")
-            else
-                inst.components.inventoryitem.atlasname = "images/inventoryimages_skin/neverfade_paper.xml"
-                inst.components.inventoryitem:ChangeImageName("neverfade_paper")
-                inst.AnimState:PlayAnimation("idle")
-            end
-        end,
+        fn_start = Fn_start_equipevent,
         equip = {
-            symbol = "swap_object", build = "neverfade_paper", file = "normal_swap",
-            build_broken = "neverfade_paper", file_broken = "broken_swap"
+            symbol = "swap_object", doanim = true,
+            build = "neverfade_paper", file = "normal_swap",
+            build2 = "neverfade_paper", file2 = "broken_swap",
+            img_tex = "neverfade_paper", img_atlas = "images/inventoryimages_skin/neverfade_paper.xml",
+            img_tex2 = "neverfade_paper_broken", img_atlas2 = "images/inventoryimages_skin/neverfade_paper_broken.xml",
+            butterfly = { bank = "butterfly", build = "neverfade_butterfly_paper" }
         },
         scabbard = {
             anim = "idle_cover", isloop = nil, bank = "neverfade_paper", build = "neverfade_paper",
             image = "foliageath_neverfade_paper", atlas = "images/inventoryimages_skin/foliageath_neverfade_paper.xml",
         },
-        butterfly = { bank = "butterfly", build = "neverfade_butterfly_paper" },
         exchangefx = { prefab = nil, offset_y = nil, scale = nil },
         floater = { cut = 0.05, size = "small", offset_y = 0.15, scale = 0.5, nofx = nil },
         linkedskins = { bush = "neverfadebush_paper" },
@@ -1411,10 +1444,10 @@ local SKINS_LEGION = {
 			Asset("ANIM", "anim/skin/neverfadebush_paper.zip")
 		},
         string = { name = ischinese and "青蝶纸扇" or "Paper-fly Fan" },
-		fn_start = function(inst)
-            inst.AnimState:SetBank("berrybush2")
-            inst.AnimState:SetBuild("neverfadebush_paper")
-        end,
+        anim = {
+            bank = "berrybush2", build = nil,
+            anim = 0, animpush = nil, isloop = nil, setable = true
+        },
         exchangefx = { prefab = nil, offset_y = 1.2, scale = nil },
         linkedskins = { sword = "neverfade_paper" }
     },
@@ -1431,26 +1464,19 @@ local SKINS_LEGION = {
             inst.AnimState:SetBank("neverfade_paper2")
             inst.AnimState:SetBuild("neverfade_paper2")
         end,
-        fn_start = function(inst)
-            if inst.hasSetBroken then
-                inst.components.inventoryitem.atlasname = "images/inventoryimages_skin/neverfade_paper2_broken.xml"
-                inst.components.inventoryitem:ChangeImageName("neverfade_paper2_broken")
-                inst.AnimState:PlayAnimation("idle_broken")
-            else
-                inst.components.inventoryitem.atlasname = "images/inventoryimages_skin/neverfade_paper2.xml"
-                inst.components.inventoryitem:ChangeImageName("neverfade_paper2")
-                inst.AnimState:PlayAnimation("idle")
-            end
-        end,
+        fn_start = Fn_start_equipevent,
         equip = {
-            symbol = "swap_object", build = "neverfade_paper2", file = "normal_swap",
-            build_broken = "neverfade_paper2", file_broken = "broken_swap"
+            symbol = "swap_object", doanim = true,
+            build = "neverfade_paper2", file = "normal_swap",
+            build2 = "neverfade_paper2", file2 = "broken_swap",
+            img_tex = "neverfade_paper2", img_atlas = "images/inventoryimages_skin/neverfade_paper2.xml",
+            img_tex2 = "neverfade_paper2_broken", img_atlas2 = "images/inventoryimages_skin/neverfade_paper2_broken.xml",
+            butterfly = { bank = "butterfly", build = "neverfade_butterfly_paper2" }
         },
         scabbard = {
             anim = "idle_cover", isloop = nil, bank = "neverfade_paper2", build = "neverfade_paper2",
             image = "foliageath_neverfade_paper2", atlas = "images/inventoryimages_skin/foliageath_neverfade_paper2.xml",
         },
-        butterfly = { bank = "butterfly", build = "neverfade_butterfly_paper2" },
         exchangefx = { prefab = nil, offset_y = nil, scale = nil },
         floater = { cut = 0.05, size = "small", offset_y = 0.15, scale = 0.5, nofx = nil },
         linkedskins = { bush = "neverfadebush_paper2" },
@@ -1466,10 +1492,10 @@ local SKINS_LEGION = {
 			Asset("ANIM", "anim/skin/neverfadebush_paper2.zip")
 		},
         string = { name = ischinese and "绀蝶纸扇" or "Violet Paper-fly Fan" },
-		fn_start = function(inst)
-            inst.AnimState:SetBank("berrybush2")
-            inst.AnimState:SetBuild("neverfadebush_paper2")
-        end,
+        anim = {
+            bank = "berrybush2", build = nil,
+            anim = 0, animpush = nil, isloop = nil, setable = true
+        },
         exchangefx = { prefab = nil, offset_y = 1.2, scale = nil },
         linkedskins = { sword = "neverfade_paper2" }
     },
@@ -1486,11 +1512,12 @@ local SKINS_LEGION = {
             bank = nil, build = nil,
             anim = nil, animpush = nil, isloop = nil, setable = true
         },
-        equip = { symbol = "swap_hat", build = "hat_lichen_emo_que", file = "swap_hat", isopenhat = true },
+        fn_start = Fn_start_equip,
+        equip = { symbol = "swap_hat", build = "hat_lichen_emo_que", file = "swap_hat", isopentop = true },
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
         floater = { cut = 0.03, size = "small", offset_y = 0.15, scale = 0.5, nofx = nil }
     },
-    hat_lichen_disguiser = { --爱上彩虹
+    hat_lichen_disguiser = {
         base_prefab = "hat_lichen", skin_id = "ooooonononon",
 		type = "item", skin_tags = {}, release_group = 555, rarity = rarityFree,
 		assets = {
@@ -1502,9 +1529,10 @@ local SKINS_LEGION = {
             bank = nil, build = nil,
             anim = nil, animpush = nil, isloop = nil, setable = true
         },
+        fn_start = Fn_start_equip,
         equip = {
             symbol = "swap_hat", build = "hat_lichen_disguiser", file = "swap_hat",
-            isopenhat = false, lightcolor = { r = 0, g = 1, b = 1 }
+            isopentop = nil, lightcolor = { r = 0, g = 1, b = 1 }
         },
         exchangefx = { prefab = nil, offset_y = nil, scale = nil },
         floater = { cut = 0.03, size = "med", offset_y = 0.2, scale = 0.7, nofx = nil }
@@ -1521,9 +1549,10 @@ local SKINS_LEGION = {
             bank = nil, build = nil,
             anim = nil, animpush = nil, isloop = nil, setable = true
         },
+        fn_start = Fn_start_equip,
         equip = {
             symbol = "swap_hat", build = "hat_lichen_emo_3shock", file = "swap_hat",
-            isopenhat = true, lightcolor = { r = 1, g = 226/255, b = 208/255 }
+            isopentop = true, lightcolor = { r = 1, g = 226/255, b = 208/255 }
         },
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
         floater = { cut = 0.03, size = "small", offset_y = 0.15, scale = 0.7, nofx = nil }
@@ -1540,9 +1569,10 @@ local SKINS_LEGION = {
             bank = nil, build = nil,
             anim = nil, animpush = nil, isloop = nil, setable = true
         },
+        fn_start = Fn_start_equip,
         equip = {
             symbol = "swap_hat", build = "hat_lichen_emo_shock", file = "swap_hat",
-            isopenhat = true, lightcolor = { r = 1, g = 241/255, b = 212/255 }
+            isopentop = true, lightcolor = { r = 1, g = 241/255, b = 212/255 }
         },
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
         floater = { cut = 0.03, size = "small", offset_y = 0.15, scale = 0.4, nofx = nil }
@@ -1559,9 +1589,10 @@ local SKINS_LEGION = {
             bank = nil, build = nil,
             anim = nil, animpush = nil, isloop = nil, setable = true
         },
+        fn_start = Fn_start_equip,
         equip = {
             symbol = "swap_hat", build = "hat_lichen_emo_anger", file = "swap_hat",
-            isopenhat = true, lightcolor = { r = 1, g = 221/255, b = 214/255 }
+            isopentop = true, lightcolor = { r = 1, g = 221/255, b = 214/255 }
         },
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
         floater = { cut = 0.03, size = "small", offset_y = 0.15, scale = 0.5, nofx = nil }
@@ -1578,9 +1609,10 @@ local SKINS_LEGION = {
             bank = nil, build = nil,
             anim = nil, animpush = nil, isloop = nil, setable = true
         },
+        fn_start = Fn_start_equip,
         equip = {
             symbol = "swap_hat", build = "hat_lichen_emo_sweat", file = "swap_hat",
-            isopenhat = true, lightcolor = { r = 210/255, g = 243/255, b = 255/255 }
+            isopentop = true, lightcolor = { r = 210/255, g = 243/255, b = 255/255 }
         },
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
         floater = { cut = 0.02, size = "small", offset_y = 0.15, scale = 0.5, nofx = nil }
@@ -1597,9 +1629,10 @@ local SKINS_LEGION = {
             bank = nil, build = nil,
             anim = nil, animpush = nil, isloop = nil, setable = true
         },
+        fn_start = Fn_start_equip,
         equip = {
             symbol = "swap_hat", build = "hat_lichen_emo_heart", file = "swap_hat",
-            isopenhat = true, lightcolor = { r = 255/255, g = 208/255, b = 208/255 }
+            isopentop = true, lightcolor = { r = 255/255, g = 208/255, b = 208/255 }
         },
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
         floater = { cut = 0.02, size = "small", offset_y = 0.15, scale = 0.8, nofx = nil }
@@ -1617,6 +1650,7 @@ local SKINS_LEGION = {
             bank = nil, build = nil,
             anim = nil, animpush = nil, isloop = nil, setable = true
         },
+        fn_start = Fn_start_equip,
         equip = { symbol = "swap_hat", build = "hat_cowboy_tvplay", file = "swap_hat" },
         exchangefx = { prefab = nil, offset_y = nil, scale = nil },
         floater = { cut = 0.03, size = "med", offset_y = 0.2, scale = 0.8, nofx = nil }
@@ -1633,21 +1667,20 @@ local SKINS_LEGION = {
             bank = nil, build = nil,
             anim = nil, animpush = nil, isloop = nil, setable = true
         },
-        fn_start = function(inst)
-            inst.fxcolour = {115/255, 217/255, 255/255}
-        end,
-        fn_end = function(inst)
+        fn_start = Fn_start_pinkstaff,
+        fn_end = function(inst, skined)
             EndFollowedFx(inst, nil, "fx_l_pinkstaff_tv")
         end,
-        equip = { symbol = "swap_object", build = "pinkstaff_tvplay", file = "swap_object" },
-        equipfx = {
-            start = function(inst, owner)
+        equip = {
+            symbol = "swap_object", build = "pinkstaff_tvplay", file = "swap_object",
+            startfn = function(inst, owner)
                 SetFollowedFx(inst, owner, "pinkstaff_fx_tvplay", "swap_object", 0, -140, "fx_l_pinkstaff_tv")
             end,
-            stop = function(inst, owner)
+            endfn = function(inst, owner)
                 EndFollowedFx(inst, nil, "fx_l_pinkstaff_tv")
             end
         },
+        fxcolour = {115/255, 217/255, 255/255},
         exchangefx = { prefab = nil, offset_y = nil, scale = nil },
         floater = { cut = 0.15, size = "small", offset_y = 0.35, scale = 0.5, nofx = nil }
     },
@@ -1665,8 +1698,11 @@ local SKINS_LEGION = {
             bank = nil, build = nil,
             anim = nil, animpush = nil, isloop = nil, setable = true
         },
-        equip = { symbol = "swap_body", build = "boltwingout_disguiser", file = "swap_body" },
-        boltdata = { fx = "boltwingout_fx_disguiser", build = "boltwingout_shuck_disguiser" },
+        fn_start = Fn_start_equip,
+        equip = {
+            symbol = "swap_body", build = "boltwingout_disguiser", file = "swap_body",
+            boltdata = { fx = "boltwingout_fx_disguiser", build = "boltwingout_shuck_disguiser" }
+        },
         exchangefx = { prefab = nil, offset_y = nil, scale = nil },
         floater = { cut = nil, size = "med", offset_y = 0.1, scale = 0.8, nofx = nil }
     },
@@ -1683,10 +1719,9 @@ local SKINS_LEGION = {
             bank = nil, build = nil,
             anim = nil, animpush = nil, isloop = nil, setable = true
         },
-        fn_start = function(inst)
-            inst.components.bundlemaker:SetSkinData("fishhomingbait_thanks", nil)
-        end,
-        equip = { symbol = "swap_object", build = "fishhomingtool_awesome_thanks", file = "swap" },
+        fn_start = Fn_start_fishhomingtool,
+        dressup = { symbol = "swap_object", build = "fishhomingtool_awesome_thanks", file = "swap" },
+        baitskin = "fishhomingbait_thanks",
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 }
     },
     fishhomingtool_awesome_taste = {
@@ -1701,10 +1736,9 @@ local SKINS_LEGION = {
             bank = nil, build = nil,
             anim = nil, animpush = nil, isloop = nil, setable = true
         },
-        fn_start = function(inst)
-            inst.components.bundlemaker:SetSkinData("fishhomingbait_taste", nil)
-        end,
-        equip = { symbol = "swap_object", build = "fishhomingtool_awesome_taste", file = "swap" },
+        fn_start = Fn_start_fishhomingtool,
+        dressup = { symbol = "swap_object", build = "fishhomingtool_awesome_taste", file = "swap" },
+        baitskin = "fishhomingbait_taste",
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 }
     },
     fishhomingtool_normal_thanks = {
@@ -1719,7 +1753,7 @@ local SKINS_LEGION = {
             bank = nil, build = nil,
             anim = nil, animpush = nil, isloop = nil, setable = true
         },
-        fn_start = function(inst)
+        fn_start = function(inst, skined)
             inst.components.bundlemaker:SetSkinData("fishhomingbait_thanks", nil)
         end,
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 }
@@ -1736,7 +1770,7 @@ local SKINS_LEGION = {
             bank = nil, build = nil,
             anim = nil, animpush = nil, isloop = nil, setable = true
         },
-        fn_start = function(inst)
+        fn_start = function(inst, skined)
             inst.components.bundlemaker:SetSkinData("fishhomingbait_taste", nil)
         end,
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 }
@@ -1750,28 +1784,26 @@ local SKINS_LEGION = {
 		},
         image = { name = nil, atlas = nil, setable = false }, --皮肤展示需要一个同prefab名的图片
         string = { name = ischinese and "云烟瓶" or "YunYan Bottle" },
-        fn_start = function(inst)
-            inst.baitimgs_l = {
-                dusty = {
-                    img = "fishhomingbait1_thanks", atlas = "images/inventoryimages_skin/fishhomingbait1_thanks.xml",
-                    anim = "idle1", swap = "swap1", symbol = "base1", build = "fishhomingbait_thanks"
-                },
-                pasty = {
-                    img = "fishhomingbait2_thanks", atlas = "images/inventoryimages_skin/fishhomingbait2_thanks.xml",
-                    anim = "idle2", swap = "swap2", symbol = "base2", build = "fishhomingbait_thanks"
-                },
-                hardy = {
-                    img = "fishhomingbait3_thanks", atlas = "images/inventoryimages_skin/fishhomingbait3_thanks.xml",
-                    anim = "idle3", swap = "swap3", symbol = "base3", build = "fishhomingbait_thanks"
-                }
+        anim = {
+            bank = nil, build = nil,
+            anim = 0, animpush = nil, isloop = nil, setable = true
+        },
+        fn_start = Fn_start_fishhomingbait,
+        baiting = {
+            bank = "pollen_chum", build = "pollen_chum",
+            dusty = {
+                img = "fishhomingbait1_thanks", atlas = "images/inventoryimages_skin/fishhomingbait1_thanks.xml",
+                anim = "idle1", swap = "swap1", symbol = "base1", build = "fishhomingbait_thanks"
+            },
+            pasty = {
+                img = "fishhomingbait2_thanks", atlas = "images/inventoryimages_skin/fishhomingbait2_thanks.xml",
+                anim = "idle2", swap = "swap2", symbol = "base2", build = "fishhomingbait_thanks"
+            },
+            hardy = {
+                img = "fishhomingbait3_thanks", atlas = "images/inventoryimages_skin/fishhomingbait3_thanks.xml",
+                anim = "idle3", swap = "swap3", symbol = "base3", build = "fishhomingbait_thanks"
             }
-            inst.AnimState:SetBank("fishhomingbait_thanks")
-            inst.AnimState:SetBuild("fishhomingbait_thanks")
-            if inst.components.fishhomingbait and inst.components.fishhomingbait.oninitfn then
-                inst.components.fishhomingbait.oninitfn(inst)
-            end
-        end,
-        baiting = { bank = "pollen_chum", build = "pollen_chum" },
+        },
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 }
     },
     fishhomingbait_taste = {
@@ -1783,28 +1815,26 @@ local SKINS_LEGION = {
 		},
         image = { name = nil, atlas = nil, setable = false }, --皮肤展示需要一个同prefab名的图片
         string = ischinese and { name = "茶之恋" } or { name = "Tea Heart" },
-        fn_start = function(inst)
-            inst.baitimgs_l = {
-                dusty = {
-                    img = "fishhomingbait1_taste", atlas = "images/inventoryimages_skin/fishhomingbait1_taste.xml",
-                    anim = "idle1", swap = "swap1", symbol = "base1", build = "fishhomingbait_taste", isshield = true
-                },
-                pasty = {
-                    img = "fishhomingbait2_taste", atlas = "images/inventoryimages_skin/fishhomingbait2_taste.xml",
-                    anim = "idle2", swap = "swap2", symbol = "base2", build = "fishhomingbait_taste", isshield = true
-                },
-                hardy = {
-                    img = "fishhomingbait3_taste", atlas = "images/inventoryimages_skin/fishhomingbait3_taste.xml",
-                    anim = "idle3", swap = "swap3", symbol = "base3", build = "fishhomingbait_taste", isshield = true
-                }
+        anim = {
+            bank = nil, build = nil,
+            anim = 0, animpush = nil, isloop = nil, setable = true
+        },
+        fn_start = Fn_start_fishhomingbait,
+        baiting = {
+            bank = "pollen_chum", build = "pollen_chum",
+            dusty = {
+                img = "fishhomingbait1_taste", atlas = "images/inventoryimages_skin/fishhomingbait1_taste.xml",
+                anim = "idle1", swap = "swap1", symbol = "base1", build = "fishhomingbait_taste", isshield = true
+            },
+            pasty = {
+                img = "fishhomingbait2_taste", atlas = "images/inventoryimages_skin/fishhomingbait2_taste.xml",
+                anim = "idle2", swap = "swap2", symbol = "base2", build = "fishhomingbait_taste", isshield = true
+            },
+            hardy = {
+                img = "fishhomingbait3_taste", atlas = "images/inventoryimages_skin/fishhomingbait3_taste.xml",
+                anim = "idle3", swap = "swap3", symbol = "base3", build = "fishhomingbait_taste", isshield = true
             }
-            inst.AnimState:SetBank("fishhomingbait_taste")
-            inst.AnimState:SetBuild("fishhomingbait_taste")
-            if inst.components.fishhomingbait and inst.components.fishhomingbait.oninitfn then
-                inst.components.fishhomingbait.oninitfn(inst)
-            end
-        end,
-        baiting = { bank = "pollen_chum", build = "pollen_chum" },
+        },
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 }
     },
 
@@ -1823,7 +1853,7 @@ local SKINS_LEGION = {
         equip = { symbol = "lantern_overlay", build = "shield_l_log_emo_pride", file = "swap_shield" },
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.7 },
         floater = { cut = nil, size = "small", offset_y = 0.2, scale = 0.9, nofx = nil },
-        fn_start = function(inst)
+        fn_start = function(inst, skined)
             FxInit(inst, {"fx_ranimbowspark"}, -10)
         end,
         fn_end = FxClear
@@ -1899,7 +1929,7 @@ local SKINS_LEGION = {
 			Asset("ANIM", "anim/skin/agronssword_taste.zip")
 		},
         string = ischinese and { name = "糖霜法棍" } or { name = "Frosting Baguette" },
-        fn_start = function(inst)
+        fn_start = function(inst, skined)
             inst._dd = {
                 img_tex = "agronssword_taste", img_atlas = "images/inventoryimages_skin/agronssword_taste.xml",
                 img_tex2 = "agronssword_taste2", img_atlas2 = "images/inventoryimages_skin/agronssword_taste2.xml",
@@ -1907,7 +1937,6 @@ local SKINS_LEGION = {
             }
             Fn_start_agronssword(inst)
         end,
-        equip = true, --为了能自动更新手部贴图
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
     },
 
@@ -1920,7 +1949,7 @@ local SKINS_LEGION = {
 		},
 		image = { name = nil, atlas = nil, setable = false },
         string = ischinese and { name = "琥珀石中蝇" } or { name = "In Amber" },
-		fn_start = function(inst)
+		fn_start = function(inst, skined)
             inst.AnimState:SetBank("heat_rock")
             inst.AnimState:SetBuild("heat_rock")
             inst.AnimState:OverrideSymbol("rock", "icire_rock_era", "rock")
@@ -1939,7 +1968,7 @@ local SKINS_LEGION = {
 		},
 		image = { name = nil, atlas = nil, setable = false },
         string = ischinese and { name = "占星石" } or { name = "Astrological Stone" },
-		fn_start = function(inst)
+		fn_start = function(inst, skined)
             inst.AnimState:SetBank("icire_rock_collector")
             inst.AnimState:SetBuild("icire_rock_collector")
             inst.AnimState:ClearOverrideSymbol("rock")
@@ -1958,7 +1987,7 @@ local SKINS_LEGION = {
 		},
 		image = { name = nil, atlas = nil, setable = false },
         string = ischinese and { name = "风景球" } or { name = "Landscape Ball" },
-		fn_start = function(inst)
+		fn_start = function(inst, skined)
             inst.AnimState:SetBank("icire_rock_day")
             inst.AnimState:SetBuild("icire_rock_day")
             inst.AnimState:ClearOverrideSymbol("rock")
@@ -1967,7 +1996,7 @@ local SKINS_LEGION = {
             inst._dd = { img_pst = "_day", canbloom = false, fn_temp = Fn_icire_rock_day }
             inst.fn_temp(inst)
         end,
-        fn_end = function(inst)
+        fn_end = function(inst, skined)
             if inst._dd_fx then
                 if inst._dd_fx:IsValid() then
                     inst._dd_fx:Remove()
@@ -1986,10 +2015,10 @@ local SKINS_LEGION = {
 			Asset("ANIM", "anim/skin/lilybush_era.zip")
 		},
         string = ischinese and { name = "婆娑角蕨" } or { name = "Platycerium Bush" },
-		fn_start = function(inst)
-            inst.AnimState:SetBank("berrybush2")
-            inst.AnimState:SetBuild("lilybush_era")
-        end,
+        anim = {
+            bank = "berrybush2", build = nil,
+            anim = 0, animpush = nil, isloop = nil, setable = true
+        },
         exchangefx = { prefab = nil, offset_y = nil, scale = 1.5 },
         linkedskins = { sword = "lileaves_era" },
         fn_placer = function(inst)
@@ -2009,6 +2038,7 @@ local SKINS_LEGION = {
             bank = nil, build = nil,
             anim = nil, animpush = nil, isloop = nil, setable = true
         },
+        fn_start = Fn_start_equip,
         equip = { symbol = "swap_object", build = "lileaves_era", file = "swap_object" },
         scabbard = {
             anim = "idle_cover", isloop = nil, bank = "lileaves_era", build = "lileaves_era",
@@ -2081,11 +2111,11 @@ local SKINS_LEGION = {
                 "idle1", "idle1", "idle1", "idle2", "idle3", "idle3", "idle4", "idle5"
             })
         end,
-        fn_start = function(inst)
+        fn_start = function(inst, skined)
             inst.AnimState:SetBank("backcub_thanks")
             inst.AnimState:SetBuild("backcub_thanks")
         end,
-        fn_end = function(inst)
+        fn_end = function(inst, skined)
             CancelRandomSkinAnim(inst)
         end,
         equip = { symbol = "swap_body", build = "backcub_thanks", file = "swap_body" },
@@ -2109,21 +2139,21 @@ local SKINS_LEGION = {
 		},
 		image = { name = nil, atlas = nil, setable = true },
         string = ischinese and { name = "饭豆子" } or { name = "Bean Fan" },
-        fn_start = function(inst)
+        fn_start = function(inst, skined)
             inst.AnimState:SetBank("backcub_fans2")
             inst.AnimState:SetBuild("backcub_fans2")
             inst.components.container:Close()
             inst.components.container:WidgetSetup("backcub_fans2")
         end,
-        fn_end = function(inst)
+        fn_end = function(inst, skined)
             CancelRandomSkinAnim(inst)
             inst.components.container:Close()
             inst.components.container:WidgetSetup("backcub")
         end,
-        fn_start_c = function(inst)
+        fn_start_c = function(inst, skined)
             SetWidget(inst, "backcub_fans2")
         end,
-        fn_end_c = function(inst)
+        fn_end_c = function(inst, skined)
             SetWidget(inst, "backcub")
         end,
         fn_anim = function(inst)
@@ -2151,11 +2181,10 @@ local SKINS_LEGION = {
 			Asset("ANIM", "anim/skin/rosebush_collector.zip")
 		},
         string = ischinese and { name = "朽星棘" } or { name = "Star Blighted Thorns" },
-		fn_start = function(inst)
-            --官方代码写得挺好，直接改动画模板居然能继承已有的动画播放和symbol切换状态
-            inst.AnimState:SetBank("berrybush")
-            inst.AnimState:SetBuild("rosebush_collector")
-        end,
+        anim = {
+            bank = "berrybush", build = nil,
+            anim = 0, animpush = nil, isloop = nil, setable = true
+        },
         exchangefx = { prefab = nil, offset_y = nil, scale = 1.5 },
         linkedskins = { sword = "rosorns_collector" },
         fn_placer = function(inst)
@@ -2175,13 +2204,16 @@ local SKINS_LEGION = {
             bank = nil, build = nil,
             anim = nil, animpush = nil, isloop = true, setable = true
         },
-        equip = { symbol = "swap_object", build = "rosorns_collector", file = "swap_object" },
-        fn_onatk = function(inst, owner, target)
-            local fx = SpawnPrefab("rosorns_collector_fx")
-            if fx ~= nil then
-                fx.Transform:SetPosition(target.Transform:GetWorldPosition())
+        fn_start = Fn_start_equip,
+        equip = {
+            symbol = "swap_object", build = "rosorns_collector", file = "swap_object",
+            fn_onatk = function(inst, owner, target)
+                local fx = SpawnPrefab("rosorns_collector_fx")
+                if fx ~= nil then
+                    fx.Transform:SetPosition(target.Transform:GetWorldPosition())
+                end
             end
-        end,
+        },
         scabbard = {
             anim = "idle_cover", isloop = true, bank = "rosorns_collector", build = "rosorns_collector",
             image = "foliageath_rosorns_collector", atlas = "images/inventoryimages_skin/foliageath_rosorns_collector.xml"
@@ -2204,7 +2236,7 @@ local SKINS_LEGION = {
             setable = true
         },
         equip = { symbol = "swap_object", build = "fimbul_axe_collector", file = "swap_base" },
-        fn_end = function(inst)
+        fn_end = function(inst, skined)
             if inst.task_skinfx ~= nil then
                 inst.task_skinfx:Cancel()
                 inst.task_skinfx = nil
@@ -2259,7 +2291,7 @@ local SKINS_LEGION = {
 			Asset("ANIM", "anim/skin/siving_turn_collector.zip")
 		},
         string = ischinese and { name = "转星移" } or { name = "Revolving Star" },
-		fn_start = function(inst)
+		fn_start = function(inst, skined)
             Fn_sivturn(inst, "siving_turn_collector", false)
             inst.components.genetrans.fxdata.unlockfx = "siving_turn_collector_unlock_fx"
         end,
@@ -2279,12 +2311,12 @@ local SKINS_LEGION = {
 			Asset("ANIM", "anim/skin/siving_turn_future.zip")
 		},
         string = ischinese and { name = "爱汪基因诱变舱" } or { name = "Bark Gene Mutation Cabin" },
-		fn_start = function(inst)
+		fn_start = function(inst, skined)
             inst.components.genetrans.fn_setanim = Fn_sivturn_anim_futrue
             inst.components.genetrans.fxdata.unlockfx = "siving_turn_future_unlock_fx"
             Fn_sivturn(inst, "siving_turn_future", false)
         end,
-        fn_end = function(inst)
+        fn_end = function(inst, skined)
             inst.components.genetrans.fn_setanim = nil
             inst.AnimState:ClearOverrideSymbol("followed")
         end,
@@ -2304,12 +2336,12 @@ local SKINS_LEGION = {
 			Asset("ANIM", "anim/skin/siving_turn_future2.zip")
 		},
         string = ischinese and { name = "爱喵基因诱变舱" } or { name = "Mew Gene Mutation Cabin" },
-		fn_start = function(inst)
+		fn_start = function(inst, skined)
             inst.components.genetrans.fn_setanim = Fn_sivturn_anim_futrue
             inst.components.genetrans.fxdata.unlockfx = "siving_turn_future2_unlock_fx"
             Fn_sivturn(inst, "siving_turn_future2", false)
         end,
-        fn_end = function(inst)
+        fn_end = function(inst, skined)
             inst.components.genetrans.fn_setanim = nil
             inst.AnimState:ClearOverrideSymbol("followed")
         end,
@@ -2330,7 +2362,7 @@ local SKINS_LEGION = {
 			Asset("ANIM", "anim/skin/siving_derivant_thanks.zip")
 		},
         string = ischinese and { name = "梨花开" } or { name = "Snowflake Pine" },
-		fn_start = function(inst)
+		fn_start = function(inst, skined)
             inst.AnimState:SetBank("siving_derivant_thanks")
             inst.AnimState:SetBuild("siving_derivant_thanks")
             inst.AnimState:SetScale(1.3, 1.3)
@@ -2349,7 +2381,7 @@ local SKINS_LEGION = {
 			Asset("ANIM", "anim/skin/siving_derivant_thanks2.zip")
 		},
         string = ischinese and { name = "梨带雨" } or { name = "Snowflake Prayer Pine" },
-		fn_start = function(inst)
+		fn_start = function(inst, skined)
             inst.AnimState:SetBank("siving_derivant_thanks2")
             inst.AnimState:SetBuild("siving_derivant_thanks2")
             inst.AnimState:SetScale(1.3, 1.3)
@@ -2392,10 +2424,10 @@ local SKINS_LEGION = {
             bank = "carpet_whitewood_law", build = "carpet_whitewood_law",
             anim = "idle_big", animpush = nil, isloop = nil, setable = true
         },
-        fn_start = function(inst)
+        fn_start = function(inst, skined)
             inst.AnimState:SetScale(1.08, 1.08, 1.08)
         end,
-        fn_end = function(inst)
+        fn_end = function(inst, skined)
             inst.AnimState:SetScale(1, 1, 1)
         end,
         exchangefx = { prefab = nil, offset_y = nil, scale = nil },
@@ -2435,10 +2467,10 @@ local SKINS_LEGION = {
             bank = "carpet_whitewood_law2", build = "carpet_whitewood_law2",
             anim = "idle_big", animpush = nil, isloop = nil, setable = true
         },
-        fn_start = function(inst)
+        fn_start = function(inst, skined)
             inst.AnimState:SetScale(1.08, 1.08, 1.08)
         end,
-        fn_end = function(inst)
+        fn_end = function(inst, skined)
             inst.AnimState:SetScale(1, 1, 1)
         end,
         exchangefx = { prefab = nil, offset_y = nil, scale = nil },
@@ -2458,7 +2490,7 @@ local SKINS_LEGION = {
 		},
         image = { name = nil, atlas = nil, setable = true },
         string = ischinese and { name = "芝士三明治" } or { name = "Cheese Sandwich" },
-		fn_start = function(inst)
+		fn_start = function(inst, skined)
             inst.AnimState:SetBank("book_maxwell")
             inst.AnimState:SetBuild("soul_contracts_taste")
             inst._dd = { fx = "l_soul_fx_taste" }
@@ -2516,13 +2548,13 @@ local SKINS_LEGION = {
         image = { name = nil, atlas = nil, setable = true },
         string = ischinese and { name = "旅星猫" } or { name = "Traverse Star Cat" },
 		fn_anim = Fn_anim_sivfeather_collector,
-        fn_start = function(inst)
+        fn_start = function(inst, skined)
             inst.AnimState:SetBank("kitcoon")
             inst.AnimState:SetBuild("siving_feather_real_collector")
             inst.Transform:SetSixFaced()
             inst.AnimState:SetScale(0.9, 0.9)
         end,
-        fn_end = function(inst)
+        fn_end = function(inst, skined)
             local owner = GetEquippedOwner(inst)
             if owner ~= nil then
                 Fn_removeFollowFx(owner, "fx_l_sivfea_real")
@@ -2556,13 +2588,13 @@ local SKINS_LEGION = {
         image = { name = nil, atlas = nil, setable = true },
         string = ischinese and { name = "流星猫" } or { name = "Meteor Cat" },
 		fn_anim = Fn_anim_sivfeather_collector,
-        fn_start = function(inst)
+        fn_start = function(inst, skined)
             inst.AnimState:SetBank("kitcoon")
             inst.AnimState:SetBuild("siving_feather_fake_collector")
             inst.Transform:SetSixFaced()
             inst.AnimState:SetScale(0.9, 0.9)
         end,
-        fn_end = function(inst)
+        fn_end = function(inst, skined)
             local owner = GetEquippedOwner(inst)
             if owner ~= nil then
                 Fn_removeFollowFx(owner, "fx_l_sivfea_fake")
@@ -2612,7 +2644,7 @@ local SKINS_LEGION = {
                 setable = true
             },
             floater = { cut = 0.1, size = "med", offset_y = 0.3, scale = 0.3, nofx = nil },
-            fn_start = function(inst)
+            fn_start = function(inst, skined)
                 inst.AnimState:SetScale(0.85, 0.85, 0.85)
                 inst.AnimState:SetBank("revolvedmoonlight_taste")
                 inst.AnimState:SetBuild("revolvedmoonlight_taste")
@@ -2620,7 +2652,7 @@ local SKINS_LEGION = {
                 inst.components.container:WidgetSetup("revolvedmoonlight_taste")
             end,
             fn_end = Fn_end_revolved,
-            fn_start_c = function(inst)
+            fn_start_c = function(inst, skined)
                 SetWidget(inst, "revolvedmoonlight_taste")
             end,
             fn_end_c = SetWidget_revolved
@@ -2631,7 +2663,7 @@ local SKINS_LEGION = {
                 setable = true
             },
             floater = { cut = 0.1, size = "med", offset_y = 0.3, scale = 0.3, nofx = nil },
-            fn_start = function(inst)
+            fn_start = function(inst, skined)
                 inst.AnimState:SetScale(0.85, 0.85, 0.85)
                 inst.AnimState:SetBank("revolvedmoonlight_pro_taste")
                 inst.AnimState:SetBuild("revolvedmoonlight_taste")
@@ -2639,7 +2671,7 @@ local SKINS_LEGION = {
                 inst.components.container:WidgetSetup("revolvedmoonlight_pro_taste")
             end,
             fn_end = Fn_end_revolved_pro,
-            fn_start_c = function(inst)
+            fn_start_c = function(inst, skined)
                 SetWidget(inst, "revolvedmoonlight_pro_taste")
             end,
             fn_end_c = SetWidget_revolved_pro
@@ -2672,7 +2704,7 @@ local SKINS_LEGION = {
                 setable = true
             },
             floater = { cut = 0.1, size = "med", offset_y = 0.3, scale = 0.3, nofx = nil },
-            fn_start = function(inst)
+            fn_start = function(inst, skined)
                 inst.AnimState:SetScale(0.85, 0.85, 0.85)
                 inst.AnimState:SetBank("revolvedmoonlight_taste2")
                 inst.AnimState:SetBuild("revolvedmoonlight_taste")
@@ -2680,7 +2712,7 @@ local SKINS_LEGION = {
                 inst.components.container:WidgetSetup("revolvedmoonlight_taste2")
             end,
             fn_end = Fn_end_revolved,
-            fn_start_c = function(inst)
+            fn_start_c = function(inst, skined)
                 SetWidget(inst, "revolvedmoonlight_taste2")
             end,
             fn_end_c = SetWidget_revolved
@@ -2691,7 +2723,7 @@ local SKINS_LEGION = {
                 setable = true
             },
             floater = { cut = 0.1, size = "med", offset_y = 0.3, scale = 0.3, nofx = nil },
-            fn_start = function(inst)
+            fn_start = function(inst, skined)
                 inst.AnimState:SetScale(0.85, 0.85, 0.85)
                 inst.AnimState:SetBank("revolvedmoonlight_pro_taste2")
                 inst.AnimState:SetBuild("revolvedmoonlight_taste")
@@ -2699,7 +2731,7 @@ local SKINS_LEGION = {
                 inst.components.container:WidgetSetup("revolvedmoonlight_pro_taste2")
             end,
             fn_end = Fn_end_revolved_pro,
-            fn_start_c = function(inst)
+            fn_start_c = function(inst, skined)
                 SetWidget(inst, "revolvedmoonlight_pro_taste2")
             end,
             fn_end_c = SetWidget_revolved_pro
@@ -2732,7 +2764,7 @@ local SKINS_LEGION = {
                 setable = true
             },
             floater = { cut = 0.1, size = "med", offset_y = 0.3, scale = 0.3, nofx = nil },
-            fn_start = function(inst)
+            fn_start = function(inst, skined)
                 inst.AnimState:SetScale(0.85, 0.85, 0.85)
                 inst.AnimState:SetBank("revolvedmoonlight_taste3")
                 inst.AnimState:SetBuild("revolvedmoonlight_taste")
@@ -2740,7 +2772,7 @@ local SKINS_LEGION = {
                 inst.components.container:WidgetSetup("revolvedmoonlight_taste3")
             end,
             fn_end = Fn_end_revolved,
-            fn_start_c = function(inst)
+            fn_start_c = function(inst, skined)
                 SetWidget(inst, "revolvedmoonlight_taste3")
             end,
             fn_end_c = SetWidget_revolved
@@ -2751,7 +2783,7 @@ local SKINS_LEGION = {
                 setable = true
             },
             floater = { cut = 0.1, size = "med", offset_y = 0.3, scale = 0.3, nofx = nil },
-            fn_start = function(inst)
+            fn_start = function(inst, skined)
                 inst.AnimState:SetScale(0.85, 0.85, 0.85)
                 inst.AnimState:SetBank("revolvedmoonlight_pro_taste3")
                 inst.AnimState:SetBuild("revolvedmoonlight_taste")
@@ -2759,7 +2791,7 @@ local SKINS_LEGION = {
                 inst.components.container:WidgetSetup("revolvedmoonlight_pro_taste3")
             end,
             fn_end = Fn_end_revolved_pro,
-            fn_start_c = function(inst)
+            fn_start_c = function(inst, skined)
                 SetWidget(inst, "revolvedmoonlight_pro_taste3")
             end,
             fn_end_c = SetWidget_revolved_pro
@@ -2792,7 +2824,7 @@ local SKINS_LEGION = {
                 setable = true
             },
             floater = { cut = 0.1, size = "med", offset_y = 0.3, scale = 0.3, nofx = nil },
-            fn_start = function(inst)
+            fn_start = function(inst, skined)
                 inst.AnimState:SetScale(0.85, 0.85, 0.85)
                 inst.AnimState:SetBank("revolvedmoonlight_taste4")
                 inst.AnimState:SetBuild("revolvedmoonlight_taste")
@@ -2800,7 +2832,7 @@ local SKINS_LEGION = {
                 inst.components.container:WidgetSetup("revolvedmoonlight_taste4")
             end,
             fn_end = Fn_end_revolved,
-            fn_start_c = function(inst)
+            fn_start_c = function(inst, skined)
                 SetWidget(inst, "revolvedmoonlight_taste4")
             end,
             fn_end_c = SetWidget_revolved
@@ -2811,7 +2843,7 @@ local SKINS_LEGION = {
                 setable = true
             },
             floater = { cut = 0.1, size = "med", offset_y = 0.3, scale = 0.3, nofx = nil },
-            fn_start = function(inst)
+            fn_start = function(inst, skined)
                 inst.AnimState:SetScale(0.85, 0.85, 0.85)
                 inst.AnimState:SetBank("revolvedmoonlight_pro_taste4")
                 inst.AnimState:SetBuild("revolvedmoonlight_taste")
@@ -2819,7 +2851,7 @@ local SKINS_LEGION = {
                 inst.components.container:WidgetSetup("revolvedmoonlight_pro_taste4")
             end,
             fn_end = Fn_end_revolved_pro,
-            fn_start_c = function(inst)
+            fn_start_c = function(inst, skined)
                 SetWidget(inst, "revolvedmoonlight_pro_taste4")
             end,
             fn_end_c = SetWidget_revolved_pro
@@ -2833,7 +2865,7 @@ local SKINS_LEGION = {
 			Asset("ANIM", "anim/skin/plant_cactus_meat_l_world.zip")
 		},
         string = ischinese and { name = "波蒂球" } or { name = "Dots Cactus" },
-		fn_start = function(inst)
+		fn_start = function(inst, skined)
             inst.AnimState:SetBank("plant_cactus_meat_l_world")
             inst.AnimState:SetBuild("plant_cactus_meat_l_world")
             OnSummer_cactus(inst, "plant_cactus_meat_l_world")
@@ -2873,7 +2905,7 @@ local SKINS_LEGION = {
 			Asset("ANIM", "anim/skin/siving_ctlwater_era.zip")
 		},
         string = ischinese and { name = "翻海图腾柱" } or { name = "Surging Sea Totem Pole" },
-        fn_start = function(inst)
+        fn_start = function(inst, skined)
             inst.AnimState:SetBank("siving_ctlwater_era")
             inst.AnimState:SetBuild("siving_ctlwater_era")
             inst.barsets_l = {
@@ -2915,7 +2947,7 @@ local SKINS_LEGION = {
 			Asset("ANIM", "anim/skin/siving_ctldirt_era.zip")
 		},
         string = ischinese and { name = "寻森图腾柱" } or { name = "Seeking Silva Totem Pole" },
-        fn_start = function(inst)
+        fn_start = function(inst, skined)
             inst.AnimState:SetBank("siving_ctldirt_era")
             inst.AnimState:SetBuild("siving_ctldirt_era")
             inst.barsets_l = {
@@ -2965,7 +2997,7 @@ local SKINS_LEGION = {
 			Asset("ANIM", "anim/skin/siving_ctlall_era.zip")
 		},
         string = ischinese and { name = "耘天图腾柱" } or { name = "Sowing Sky Totem Pole" },
-        fn_start = function(inst)
+        fn_start = function(inst, skined)
             inst.AnimState:SetBank("siving_ctlall_era")
             inst.AnimState:SetBuild("siving_ctlall_era")
             inst.barsets_l = {
@@ -3004,10 +3036,10 @@ local SKINS_LEGION = {
             bank = nil, build = nil,
             anim = nil, animpush = nil, isloop = nil, setable = true
         },
-        fn_start = function(inst)
+        fn_start = function(inst, skined)
             inst.maskfxoverride_l = "siving_lifesteal_fx_era1"
         end,
-        equip = { symbol = nil, build = "siving_mask_era", file = "swap_hat", isopenhat = true },
+        equip = { symbol = nil, build = "siving_mask_era", file = "swap_hat", isopentop = true },
         exchangefx = { prefab = nil, offset_y = nil, scale = nil }
     },
     siving_mask_era2 = {
@@ -3022,10 +3054,10 @@ local SKINS_LEGION = {
             bank = nil, build = nil,
             anim = nil, animpush = nil, isloop = nil, setable = true
         },
-        fn_start = function(inst)
+        fn_start = function(inst, skined)
             inst.maskfxoverride_l = "siving_lifesteal_fx_era2"
         end,
-        equip = { symbol = nil, build = "siving_mask_era2", file = "swap_hat", isopenhat = true },
+        equip = { symbol = nil, build = "siving_mask_era2", file = "swap_hat", isopentop = true },
         exchangefx = { prefab = nil, offset_y = nil, scale = nil }
     },
     siving_mask_gold_era = {
@@ -3040,10 +3072,10 @@ local SKINS_LEGION = {
             bank = nil, build = nil,
             anim = nil, animpush = nil, isloop = nil, setable = true
         },
-        fn_start = function(inst)
+        fn_start = function(inst, skined)
             inst.maskfxoverride_l = "siving_lifesteal_fx_era3"
         end,
-        fn_end = function(inst)
+        fn_end = function(inst, skined)
             local owner = GetEquippedOwner(inst)
             if owner ~= nil then
                 Fn_removeFollowFx(owner, "fx_l_sivmask")
@@ -3073,10 +3105,10 @@ local SKINS_LEGION = {
             bank = nil, build = nil,
             anim = nil, animpush = nil, isloop = nil, setable = true
         },
-        fn_start = function(inst)
+        fn_start = function(inst, skined)
             inst.maskfxoverride_l = "siving_lifesteal_fx_era4"
         end,
-        fn_end = function(inst)
+        fn_end = function(inst, skined)
             local owner = GetEquippedOwner(inst)
             if owner ~= nil then
                 Fn_removeFollowFx(owner, "fx_l_sivmask")
@@ -3106,10 +3138,10 @@ local SKINS_LEGION = {
             bank = nil, build = nil,
             anim = nil, animpush = nil, isloop = nil, setable = true
         },
-        fn_start = function(inst)
+        fn_start = function(inst, skined)
             inst.maskfxoverride_l = "siving_lifesteal_fx_marble"
         end,
-        equip = { symbol = nil, build = "siving_mask_gold_marble", file = "swap_hat", isopenhat = nil },
+        equip = { symbol = nil, build = "siving_mask_gold_marble", file = "swap_hat", isopentop = nil },
         exchangefx = { prefab = nil, offset_y = nil, scale = nil }
     },
 
@@ -3125,7 +3157,7 @@ local SKINS_LEGION = {
             bank = nil, build = nil,
             anim = nil, animpush = nil, isloop = nil, setable = true
         },
-        fn_start = function(inst)
+        fn_start = function(inst, skined)
             inst.suitfxoverride_l = "sivsuitatk_fx_marble"
         end,
         equip = { symbol = "swap_body", build = "siving_suit_gold_marble", file = "swap_body" },
@@ -3153,13 +3185,13 @@ local SKINS_LEGION = {
 
         overridekeys = { "data_soil", "data_plant" },
         data_soil = {
-            fn_start = function(inst)
+            fn_start = function(inst, skined)
                 inst.AnimState:SetBank("farm_soil")
                 inst.AnimState:SetBuild("siving_soil_law")
             end
         },
         data_plant = {
-            fn_start = function(inst)
+            fn_start = function(inst, skined)
                 inst.soilskin_l = "siving_soil_law"
                 if inst.fn_soiltype ~= nil then
                     inst.fn_soiltype(inst, nil)
@@ -3188,13 +3220,13 @@ local SKINS_LEGION = {
 
         overridekeys = { "data_soil", "data_plant" },
         data_soil = {
-            fn_start = function(inst)
+            fn_start = function(inst, skined)
                 inst.AnimState:SetBank("farm_soil")
                 inst.AnimState:SetBuild("siving_soil_law2")
             end
         },
         data_plant = {
-            fn_start = function(inst)
+            fn_start = function(inst, skined)
                 inst.soilskin_l = "siving_soil_law2"
                 if inst.fn_soiltype ~= nil then
                     inst.fn_soiltype(inst, nil)
@@ -3223,13 +3255,13 @@ local SKINS_LEGION = {
 
         overridekeys = { "data_soil", "data_plant" },
         data_soil = {
-            fn_start = function(inst)
+            fn_start = function(inst, skined)
                 inst.AnimState:SetBank("farm_soil")
                 inst.AnimState:SetBuild("siving_soil_law3")
             end
         },
         data_plant = {
-            fn_start = function(inst)
+            fn_start = function(inst, skined)
                 inst.soilskin_l = "siving_soil_law3"
                 if inst.fn_soiltype ~= nil then
                     inst.fn_soiltype(inst, nil)
@@ -3245,7 +3277,7 @@ local SKINS_LEGION = {
 			Asset("ANIM", "anim/skin/refractedmoonlight_taste.zip")
 		},
         string = ischinese and { name = "烤肠大王" } or { name = "Roast Sausage King" },
-        fn_start = function(inst)
+        fn_start = function(inst, skined)
             inst._dd = {
                 img_tex = "refractedmoonlight_taste", img_atlas = "images/inventoryimages_skin/refractedmoonlight_taste.xml",
                 img_tex2 = "refractedmoonlight_taste2", img_atlas2 = "images/inventoryimages_skin/refractedmoonlight_taste2.xml",
@@ -3276,13 +3308,13 @@ local SKINS_LEGION = {
         data_up = {
             build_name_override = "hiddenmoonlight_paper",
             exchangefx = { prefab = nil, offset_y = nil, scale = nil },
-            fn_start = function(inst)
+            fn_start = function(inst, skined)
                 inst.AnimState:SetScale(1.5, 1.5, 1.5)
                 inst.AnimState:SetBank("hiddenmoonlight_paper")
                 inst.AnimState:SetBuild("hiddenmoonlight_paper")
                 SetTarget_hidden(inst, "hiddenmoonlight_paper")
             end,
-            fn_end = function(inst)
+            fn_end = function(inst, skined)
                 inst.AnimState:SetScale(1, 1, 1)
                 SetTarget_hidden(inst, nil)
             end
@@ -3296,7 +3328,7 @@ local SKINS_LEGION = {
 			Asset("ANIM", "anim/skin/chest_whitewood_craft.zip")
 		},
         string = ischinese and { name = "花梨木饰顶展台" } or { name = "Decorated Rosewood Cabinet" },
-		fn_start = function(inst)
+		fn_start = function(inst, skined)
             inst.AnimState:SetBank("chest_whitewood_craft")
             inst.AnimState:SetBuild("chest_whitewood_craft")
         end,
@@ -3311,12 +3343,12 @@ local SKINS_LEGION = {
 		type = "item", skin_tags = {}, release_group = 555, rarity = raritySpecial,
 		-- assets = { Asset("ANIM", "anim/skin/chest_whitewood_craft.zip") },
         string = ischinese and { name = "花梨木展台" } or { name = "Rosewood Cabinet" },
-		fn_start = function(inst)
+		fn_start = function(inst, skined)
             inst.AnimState:SetBank("chest_whitewood_craft")
             inst.AnimState:SetBuild("chest_whitewood_craft")
             inst.AnimState:HideSymbol("deco")
         end,
-        fn_end = function(inst)
+        fn_end = function(inst, skined)
             inst.AnimState:ShowSymbol("deco")
         end,
         exchangefx = { prefab = nil, offset_y = nil, scale = 1.5 },
@@ -3333,7 +3365,7 @@ local SKINS_LEGION = {
 			Asset("ANIM", "anim/skin/chest_whitewood_big_craft.zip")
 		},
         string = ischinese and { name = "花梨木饰顶展柜" } or { name = "Decorated Rosewood Showcase" },
-		fn_start = function(inst)
+		fn_start = function(inst, skined)
             inst.AnimState:SetBank("chest_whitewood_big_craft")
             inst.AnimState:SetBuild("chest_whitewood_big_craft")
         end,
@@ -3348,12 +3380,12 @@ local SKINS_LEGION = {
 		type = "item", skin_tags = {}, release_group = 555, rarity = raritySpecial,
 		-- assets = { Asset("ANIM", "anim/skin/chest_whitewood_big_craft.zip") },
         string = ischinese and { name = "花梨木展柜" } or { name = "Rosewood Showcase" },
-		fn_start = function(inst)
+		fn_start = function(inst, skined)
             inst.AnimState:SetBank("chest_whitewood_big_craft")
             inst.AnimState:SetBuild("chest_whitewood_big_craft")
             inst.AnimState:HideSymbol("deco")
         end,
-        fn_end = function(inst)
+        fn_end = function(inst, skined)
             inst.AnimState:ShowSymbol("deco")
         end,
         exchangefx = { prefab = nil, offset_y = nil, scale = 1.5 },
@@ -3372,12 +3404,12 @@ local SKINS_LEGION = {
 		},
 		image = { name = nil, atlas = nil, setable = true },
         string = ischinese and { name = "霹雳神灯" } or { name = "Thunder Lamp" },
-		fn_start = function(inst)
+		fn_start = function(inst, skined)
             inst.AnimState:SetBank("tourmalinecore_tale")
             inst.AnimState:SetBuild("tourmalinecore_tale")
             inst.battery_fx_l = battery_fx_tale
         end,
-        fn_end = function(inst)
+        fn_end = function(inst, skined)
             inst.battery_fx_l = nil
         end,
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 }
@@ -3606,7 +3638,11 @@ for skinname, v in pairs(SKINS_LEGION) do
         end
 	end
     if v.floater ~= nil and v.floater.anim ~= nil then
-		InitData_anim(v.floater.anim, v.anim.bank, v.anim.bank.build)
+        if v.anim ~= nil then
+            InitData_anim(v.floater.anim, v.anim.bank, v.anim.bank.build)
+        else
+            InitData_anim(v.floater.anim, skinname, skinname)
+        end
 	end
 	if v.build_name_override == nil then
 		v.build_name_override = skinname
@@ -3646,7 +3682,11 @@ for baseprefab, v in pairs(SKIN_DEFAULT_LEGION) do
         end
 	end
     if v.floater ~= nil and v.floater.anim ~= nil then
-		InitData_anim(v.floater.anim, v.anim.bank, v.anim.bank.build)
+        if v.anim ~= nil then
+            InitData_anim(v.floater.anim, v.anim.bank, v.anim.bank.build)
+        else
+            InitData_anim(v.floater.anim, baseprefab, baseprefab)
+        end
 	end
     if v.image ~= nil then
 		if v.image.name == nil then
@@ -4385,8 +4425,12 @@ end
 ------
 
 local function C_SetAnim(inst, data)
+    --官方代码写得挺好，直接改动画模板居然能继承已有的动画播放和symbol切换状态
 	inst.AnimState:SetBank(data.bank)
 	inst.AnimState:SetBuild(data.build)
+    if data.anim == 0 then --有时候只想更新模板而不是动画
+        return
+    end
 	if data.animpush then
 		inst.AnimState:PlayAnimation(data.anim)
 		inst.AnimState:PushAnimation(data.animpush, data.isloop)
@@ -4470,20 +4514,19 @@ local function C_SetSkinClient(inst)
     if idx ~= nil and idx ~= 0 and SKIN_IDX_LEGION[idx] ~= nil then
         self.skin = SKIN_IDX_LEGION[idx]
         inst.skinname = self.skin --这个变量控制着“审视自我”、“审视他人”时的皮肤设置
-        self.skineddata = C_GetSkinedData(self, self.skin)
     else
         self.skin = nil
         inst.skinname = nil
-        self.skineddata = C_GetSkinedData(self, nil)
     end
     local skindata_old = C_GetSkinData(self, oldskin)
     local skindata = C_GetSkinData(self, self.skin)
 
 	if skindata_old ~= nil then
 		if skindata_old.fn_end_c ~= nil then
-			skindata_old.fn_end_c(inst)
+			skindata_old.fn_end_c(inst, self.skineddata)
 		end
 	end
+    self.skineddata = C_GetSkinedData(self, self.skin)
 	if skindata ~= nil then
 		--漂浮
 		if inst.components.floater ~= nil and skindata.floater ~= nil then
@@ -4507,7 +4550,7 @@ local function C_SetSkinClient(inst)
 		end
         --其他
 		if skindata.fn_start_c ~= nil then
-			skindata.fn_start_c(inst)
+			skindata.fn_start_c(inst, self.skineddata)
 		end
 	end
 end
@@ -4697,7 +4740,7 @@ LS_C_SetSkin = function(self, skinname, userid)
     local skindatalast = C_GetSkinData(self, self.skin)
 	if skindatalast ~= nil then
 		if skindatalast.fn_end ~= nil then
-			skindatalast.fn_end(inst)
+			skindatalast.fn_end(inst, self.skineddata)
 		end
 	end
     ------应用新皮肤的效果
@@ -4751,8 +4794,9 @@ LS_C_SetSkin = function(self, skinname, userid)
     else
         inst.overridedeployplacername = nil
     end
+    self.skineddata = C_GetSkinedData(self, skinname)
     if skindata.fn_start ~= nil then
-        skindata.fn_start(inst)
+        skindata.fn_start(inst, self.skineddata)
     end
 
     if skinname == nil then --代表恢复原皮肤
@@ -4760,15 +4804,12 @@ LS_C_SetSkin = function(self, skinname, userid)
         self.skin = nil
         self.userid = nil
         inst.skinname = nil
-        self.skineddata = C_GetSkinedData(self, nil)
     else
         self._skin_idx:set(skindata.skin_idx)
         self.skin = skinname
         self.userid = userid
         inst.skinname = skinname
-        self.skineddata = C_GetSkinedData(self, skinname)
     end
-
     if skindata.equip ~= nil then
         if inst.task_ls_ex ~= nil then
             inst.task_ls_ex:Cancel()

@@ -79,17 +79,15 @@ local function OnEquip_lichen(inst, owner)
         inst._light = SpawnPrefab("lichenhatlight") --生成光源
         inst._light.entity:SetParent(owner.entity)  --给光源设置父节点
     end
-
-    local skindata = inst.components.skinedlegion:GetSkinedData()
-    if skindata ~= nil and skindata.equip ~= nil then
-        if skindata.equip.isopenhat then
-            TOOLS_L.hat_on_opentop(inst, owner, skindata.equip.build, skindata.equip.file)
+    if inst._dd ~= nil then
+        local dd = inst._dd
+        if dd.isopentop then
+            TOOLS_L.hat_on_opentop(inst, owner, dd.build, dd.file)
         else
-            TOOLS_L.hat_on(inst, owner, skindata.equip.build, skindata.equip.file)
+            TOOLS_L.hat_on(inst, owner, dd.build, dd.file)
         end
-        if skindata.equip.lightcolor ~= nil then
-            local rgb = skindata.equip.lightcolor
-            inst._light.Light:SetColour(rgb.r, rgb.g, rgb.b)
+        if dd.lightcolor ~= nil then
+            inst._light.Light:SetColour(dd.lightcolor.r, dd.lightcolor.g, dd.lightcolor.b)
         end
     else
         TOOLS_L.hat_on_opentop(inst, owner, "hat_lichen", "swap_hat")
@@ -232,10 +230,9 @@ local function OnDismounted_cowboy(owner, data)
     TOOLS_L.RemoveTag(owner, "firmbody_l", "hat_cowboy")
 end
 local function OnEquip_cowboy(inst, owner)
-    local skindata = inst.components.skinedlegion:GetSkinedData()
-    if skindata ~= nil and skindata.equip ~= nil then
-        TOOLS_L.hat_on(inst, owner, skindata.equip.build, skindata.equip.file)
-        owner.scarf_skin_l = skindata.equip.build
+    if inst._dd ~= nil then
+        TOOLS_L.hat_on(inst, owner, inst._dd.build, inst._dd.file)
+        owner.scarf_skin_l = inst._dd.build
     else
         TOOLS_L.hat_on(inst, owner, "hat_cowboy", "swap_hat")
         owner.scarf_skin_l = nil
@@ -659,7 +656,7 @@ local function SetSymbols_sivmask(inst, owner)
             skindata.equip.startfn(inst, owner)
             return
         end
-        if skindata.equip.isopenhat then
+        if skindata.equip.isopentop then
             TOOLS_L.hat_on_opentop(inst, owner, skindata.equip.build, skindata.equip.file or GetSwapSymbol(owner))
         else
             TOOLS_L.hat_on(inst, owner, skindata.equip.build, skindata.equip.file or GetSwapSymbol(owner))

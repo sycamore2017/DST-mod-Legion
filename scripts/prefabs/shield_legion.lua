@@ -49,6 +49,8 @@ local function OnEquipFn(inst, owner)
         owner.AnimState:OverrideSymbol("lantern_overlay", inst.prefab, "swap_shield")
     end
 
+    owner.AnimState:Show("LANTERN_OVERLAY")
+    owner.AnimState:ClearOverrideSymbol("swap_object")
     owner.AnimState:HideSymbol("swap_object")
 
     --本来是想让这个和书本的攻击一样来低频率高伤害的方式攻击，但是由于会导致读书时也用本武器来显示动画，所以干脆去除了
@@ -58,7 +60,6 @@ local function OnEquipFn(inst, owner)
 
     owner.AnimState:Show("ARM_carry") --显示持物手
     owner.AnimState:Hide("ARM_normal") --隐藏普通的手
-    owner.AnimState:Show("LANTERN_OVERLAY")
 
     -- if owner:HasTag("equipmentmodel") then --假人！
     --     return

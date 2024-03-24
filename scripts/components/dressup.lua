@@ -87,14 +87,13 @@ local DressUp = Class(function(self, inst)
         -- body = { item = nil, swaps = {结构与self.swaplist相同}, priority = 0 },
     }
     self.swaplist = {
-        -- swap_object =
-        -- {
+        -- swap_object = {
         --     buildskin = nil,
         --     buildfile = nil,
         --     buildsymbol = nil,
         --     guid = nil,
         --     type = nil, --clear、swap、show、hide
-        --     priority = 0,
+        --     priority = 0
         -- }
     }
 
@@ -262,7 +261,6 @@ function DressUp:UpdateReal() --更新实际展示效果
     for k,v in pairs(self.swaplist) do
         if v ~= nil then
             if v.type == "swap" then
-                -- print("通道"..tostring(k).."皮肤"..tostring(v.buildskin).."动画内通道"..tostring(v.buildsymbol).."guid"..tostring(v.guid).."动画"..tostring(v.buildfile))
                 if v.buildskin ~= nil then
                     self.inst.AnimState:OverrideItemSkinSymbol(k, v.buildskin, v.buildsymbol, v.guid, v.buildfile)
                 else
@@ -324,10 +322,10 @@ function DressUp:PutOn(item, loaddata, noevent) --幻化一个物品
         self.itemlist[slot] = nil
 
         --因为有数据删了，需要将优先级再次连续起来
-        for slot,itemdata in pairs(self.itemlist) do
+        for slot, itemdata in pairs(self.itemlist) do
             if itemdata.priority > itemdataold.priority then
                 itemdata.priority = itemdata.priority - 1
-                for k,v in pairs(itemdata.swaps) do
+                for k, v in pairs(itemdata.swaps) do
                     v.priority = itemdata.priority
                 end
             end
@@ -342,19 +340,29 @@ function DressUp:PutOn(item, loaddata, noevent) --幻化一个物品
     if data.buildfn ~= nil then
         itemswap = data.buildfn(self, item, buildskin)
     else
+        local _dd = item._dd
+        local _build, _file
+        if _dd ~= nil then
+            _build = _dd.build
+            _file = _dd.file
+        else
+            _dd = data
+            _build = data.buildfile
+            _file = data.buildsymbol
+        end
         if slot == EQUIPSLOTS.HANDS then
-            if data.isshield then
-                itemswap["swap_shield"] = self:GetDressData(buildskin, data.buildfile, data.buildsymbol, item.GUID, "swap")
-                itemswap["lantern_overlay"] = self:GetDressData(buildskin, data.buildfile, data.buildsymbol, item.GUID, "swap")
+            if _dd.isshield then
+                itemswap["swap_shield"] = self:GetDressData(buildskin, _build, _file, item.GUID, "swap")
+                itemswap["lantern_overlay"] = self:GetDressData(buildskin, _build, _file, item.GUID, "swap")
                 itemswap["LANTERN_OVERLAY"] = self:GetDressData(nil, nil, nil, nil, "show")
                 itemswap["swap_object"] = self:GetDressData(nil, nil, nil, nil, "clear")
                 itemswap["whipline"] = self:GetDressData(nil, nil, nil, nil, "clear")
             else
-                if data.iswhip then
-                    itemswap["swap_object"] = self:GetDressData(buildskin, data.buildfile, data.buildsymbol, item.GUID, "swap")
-                    itemswap["whipline"] = self:GetDressData(buildskin, data.buildfile, "whipline", item.GUID, "swap")
+                if _dd.iswhip then
+                    itemswap["swap_object"] = self:GetDressData(buildskin, _build, _file, item.GUID, "swap")
+                    itemswap["whipline"] = self:GetDressData(buildskin, _build, "whipline", item.GUID, "swap")
                 else
-                    itemswap["swap_object"] = self:GetDressData(buildskin, data.buildfile, data.buildsymbol, item.GUID, "swap")
+                    itemswap["swap_object"] = self:GetDressData(buildskin, _build, _file, item.GUID, "swap")
                     itemswap["whipline"] = self:GetDressData(nil, nil, nil, nil, "clear")
                 end
                 itemswap["lantern_overlay"] = self:GetDressData(nil, nil, nil, nil, "clear")
@@ -362,25 +370,25 @@ function DressUp:PutOn(item, loaddata, noevent) --幻化一个物品
             --手臂的隐藏与显示不需要操作，因为需要跟随实际装备状态
         elseif slot == EQUIPSLOTS.HEAD then
             local symres = "swap_hat"
-            if data.isopentop then
+            if _dd.isopentop then
                 self:SetDressOpenTop(itemswap)
-            elseif data.isfullhead then
+            elseif _dd.isfullhead then
                 self:SetDressFullHead(itemswap)
                 symres = "headbase_hat"
             else
                 self:SetDressTop(itemswap)
             end
-            itemswap[symres] = self:GetDressData(buildskin, data.buildfile, data.buildsymbol, item.GUID, "swap")
+            itemswap[symres] = self:GetDressData(buildskin, _build, _file, item.GUID, "swap")
         elseif slot == EQUIPSLOTS.BODY or slot == EQUIPSLOTS.BACK or slot == EQUIPSLOTS.NECK then
-            if data.isbackpack then
-                itemswap["backpack"] = self:GetDressData(buildskin, data.buildfile, "backpack", item.GUID, "swap")
-                itemswap["swap_body"] = self:GetDressData(buildskin, data.buildfile, "swap_body", item.GUID, "swap")
+            if _dd.isbackpack then
+                itemswap["backpack"] = self:GetDressData(buildskin, _build, "backpack", item.GUID, "swap")
+                itemswap["swap_body"] = self:GetDressData(buildskin, _build, "swap_body", item.GUID, "swap")
             else
-                itemswap["swap_body"] = self:GetDressData(buildskin, data.buildfile, data.buildsymbol, item.GUID, "swap")
+                itemswap["swap_body"] = self:GetDressData(buildskin, _build, _file, item.GUID, "swap")
                 itemswap["backpack"] = self:GetDressData(nil, nil, nil, nil, "clear")
             end
         elseif slot == BODYTALL then
-            itemswap["swap_body_tall"] = self:GetDressData(buildskin, data.buildfile, data.buildsymbol, item.GUID, "swap")
+            itemswap["swap_body_tall"] = self:GetDressData(buildskin, _build, _file, item.GUID, "swap")
         end
     end
 
@@ -389,22 +397,6 @@ function DressUp:PutOn(item, loaddata, noevent) --幻化一个物品
         item.components.container:DropEverything()
         item.components.container:Close()
     end
-    -- if item.brain ~= nil and not item.brain.stopped then --停掉脑子
-    --     item.brain:Stop()
-    -- end
-    -- if item.components.burnable ~= nil then --灭掉火源
-    --     if item.components.burnable:IsBurning() then
-    --         item.components.burnable:Extinguish(true, TUNING.FIRESUPPRESSOR_EXTINGUISH_HEAT_PERCENT)
-    --     elseif item.components.burnable:IsSmoldering() then
-    --         item.components.burnable:Extinguish(true)
-    --     end
-    -- end
-    -- if item.components.fueled ~= nil then --停止耐久消耗
-    --     item.components.fueled:StopConsuming()
-    -- end
-    -- if item.components.perishable ~= nil then --停止腐烂
-    --     item.components.perishable:StopPerishing()
-    -- end
 
     if data.equipfn ~= nil then
         data.equipfn(self.inst, item)
