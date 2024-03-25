@@ -38,17 +38,13 @@ local function Counterattack_base(inst, doer, attacker, data, range, atk)
 end
 
 local function OnEquipFn(inst, owner)
-    if inst.components.skinedlegion ~= nil then
-        local skindata = inst.components.skinedlegion:GetSkinedData()
-        if skindata ~= nil and skindata.equip ~= nil then
-            owner.AnimState:OverrideSymbol("lantern_overlay", skindata.equip.build, skindata.equip.file)
-        else
-            owner.AnimState:OverrideSymbol("lantern_overlay", inst.prefab, "swap_shield")
-        end
+    if inst._dd ~= nil then
+        owner.AnimState:OverrideSymbol("lantern_overlay", inst._dd.build, inst._dd.file)
+        owner.AnimState:OverrideSymbol("swap_shield", inst._dd.build, inst._dd.file)
     else
         owner.AnimState:OverrideSymbol("lantern_overlay", inst.prefab, "swap_shield")
+        owner.AnimState:OverrideSymbol("swap_shield", inst.prefab, "swap_shield")
     end
-
     owner.AnimState:Show("LANTERN_OVERLAY")
     owner.AnimState:ClearOverrideSymbol("swap_object")
     owner.AnimState:HideSymbol("swap_object")
@@ -71,6 +67,7 @@ local function OnUnequipFn(inst, owner)
     owner.AnimState:Hide("ARM_carry") --隐藏持物手
     owner.AnimState:Show("ARM_normal") --显示普通的手
     owner.AnimState:ClearOverrideSymbol("lantern_overlay")
+    owner.AnimState:ClearOverrideSymbol("swap_shield")
     owner.AnimState:Hide("LANTERN_OVERLAY")
     owner.AnimState:ShowSymbol("swap_object")
 end
@@ -260,11 +257,10 @@ local function OnEquip_sand(inst, owner)
         return
     end
 
-    onisraining(inst)   --装备时先更新一次
+    onisraining(inst) --装备时先更新一次
 
     inst:ListenForEvent("blocked", OnBlocked, owner)
     inst:ListenForEvent("attacked", OnBlocked, owner)
-
     inst:WatchWorldState("israining", onisraining)
     inst:WatchWorldState("issummer", onisraining)
 
@@ -292,7 +288,6 @@ local function OnUnequip_sand(inst, owner)
 
     inst:RemoveEventCallback("blocked", OnBlocked, owner)
     inst:RemoveEventCallback("attacked", OnBlocked, owner)
-
     owner:RemoveEventCallback("changearea", onsandstorm)
     inst:StopWatchingWorldState("israining", onisraining)
     inst:StopWatchingWorldState("issummer", onisraining)
@@ -584,10 +579,12 @@ end
 local function OnEquip_agron(inst, owner)
     local revolt = inst.components.timer:TimerExists("revolt")
     owner.AnimState:OverrideSymbol("lantern_overlay", inst._dd.build, revolt and "swap2" or "swap1")
+    owner.AnimState:OverrideSymbol("swap_shield", inst._dd.build, revolt and "swap2" or "swap1")
     owner.AnimState:HideSymbol("swap_object")
+    owner.AnimState:ClearOverrideSymbol("swap_object")
+    owner.AnimState:Show("LANTERN_OVERLAY")
     owner.AnimState:Show("ARM_carry")
     owner.AnimState:Hide("ARM_normal")
-    owner.AnimState:Show("LANTERN_OVERLAY")
 
     if owner:HasTag("equipmentmodel") then --假人！
         return

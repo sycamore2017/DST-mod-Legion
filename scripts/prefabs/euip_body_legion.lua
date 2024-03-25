@@ -226,13 +226,11 @@ local function HungerCycle_backcub(inst)
 end
 local function OnEquip_backcub(inst, owner)
     local symbol = owner.prefab == "webber" and "swap_body_tall" or "swap_body"
-    local skindata = inst.components.skinedlegion:GetSkinedData()
-    if skindata ~= nil and skindata.equip ~= nil then
-        owner.AnimState:OverrideSymbol(symbol, skindata.equip.build, skindata.equip.file)
+    if inst._dd ~= nil then
+        owner.AnimState:OverrideSymbol(symbol, inst._dd.build, inst._dd.file)
     else
         owner.AnimState:OverrideSymbol(symbol, "swap_backcub", "swap_body")
     end
-
     if inst.task_l_sound ~= nil then
         inst.task_l_sound:Cancel()
         inst.task_l_sound = nil
@@ -256,7 +254,6 @@ local function OnUnequip_backcub(inst, owner)
     else
         owner.AnimState:ClearOverrideSymbol("swap_body")
     end
-
     if inst.components.container ~= nil then
         inst.components.container:Close(owner)
     end

@@ -210,7 +210,7 @@ local function OnThrown(inst)
     inst.persists = false
 
     inst.AnimState:SetBank("chum_pouch")
-    local data = (inst._dd or baiting_base)[inst.components.fishhomingbait.type_shape]
+    local data = inst._dd[inst.components.fishhomingbait.type_shape]
     if data ~= nil then
         inst.AnimState:OverrideSymbol("chum_pouch01", data.build, data.symbol)
     else
@@ -234,12 +234,13 @@ local function OnAddProjectile(inst)
     inst.components.complexprojectile:SetOnHit(OnHit)
 end
 local function OnEquip(inst, owner)
-    local data = (inst._dd or baiting_base)[inst.components.fishhomingbait.type_shape]
+    local data = inst._dd[inst.components.fishhomingbait.type_shape]
     if data ~= nil then
         if data.isshield then
+            owner.AnimState:OverrideSymbol("lantern_overlay", data.build, data.swap)
+            owner.AnimState:OverrideSymbol("swap_shield", data.build, data.swap)
             owner.AnimState:HideSymbol("swap_object")
             owner.AnimState:ClearOverrideSymbol("swap_object")
-            owner.AnimState:OverrideSymbol("lantern_overlay", data.build, data.swap)
             owner.AnimState:Show("LANTERN_OVERLAY")
         else
             owner.AnimState:OverrideSymbol("swap_object", data.build, data.swap)
@@ -251,12 +252,13 @@ local function OnEquip(inst, owner)
     owner.AnimState:Hide("ARM_normal")
 end
 local function OnUnequip(inst, owner)
-    local data = (inst._dd or baiting_base)[inst.components.fishhomingbait.type_shape]
+    local data = inst._dd[inst.components.fishhomingbait.type_shape]
     if data ~= nil then
         if data.isshield then
             owner.AnimState:Hide("LANTERN_OVERLAY")
             owner.AnimState:ShowSymbol("swap_object")
             owner.AnimState:ClearOverrideSymbol("lantern_overlay")
+            owner.AnimState:ClearOverrideSymbol("swap_shield")
         else
             owner.AnimState:ClearOverrideSymbol("swap_object")
         end
@@ -267,7 +269,7 @@ local function OnUnequip(inst, owner)
     owner.AnimState:Show("ARM_normal")
 end
 local function Init_bag(inst)
-    local data = (inst._dd or baiting_base)[inst.components.fishhomingbait.type_shape]
+    local data = inst._dd[inst.components.fishhomingbait.type_shape]
     if data ~= nil then
         inst.components.inventoryitem.atlasname = data.atlas
         inst.components.inventoryitem:ChangeImageName(data.img)

@@ -838,21 +838,17 @@ local atk_fimbulaxe = TUNING.BASE_SURVIVOR_ATTACK*0.4 --13.6
 local function OnFinished_fimbulaxe(inst)
     inst.AnimState:PlayAnimation("used")
     inst:ListenForEvent("animover", inst.Remove)
-
-    local skindata = inst.components.skinedlegion:GetSkinedData()
-    if skindata ~= nil and skindata.fn_onThrownEnd ~= nil then
-        skindata.fn_onThrownEnd(inst)
+    if inst._dd ~= nil and inst._dd.thrownendfn ~= nil then
+        inst._dd.thrownendfn(inst)
     end
-
     if inst.returntask ~= nil then
         inst.returntask:Cancel()
         inst.returntask = nil
     end
 end
 local function OnEquip_fimbulaxe(inst, owner)
-    local skindata = inst.components.skinedlegion:GetSkinedData()
-    if skindata ~= nil and skindata.equip ~= nil then
-        owner.AnimState:OverrideSymbol("swap_object", skindata.equip.build, skindata.equip.file)
+    if inst._dd ~= nil then
+        owner.AnimState:OverrideSymbol("swap_object", inst._dd.build, inst._dd.file)
     else
         owner.AnimState:OverrideSymbol("swap_object", "fimbul_axe", "swap_base")
     end
@@ -863,10 +859,8 @@ local function OnDropped_fimbulaxe(inst)
     inst.components.inventoryitem.pushlandedevents = true
     inst.components.inventoryitem.canbepickedup = true
     inst:PushEvent("on_landed")
-
-    local skindata = inst.components.skinedlegion:GetSkinedData()
-    if skindata ~= nil and skindata.fn_onThrownEnd ~= nil then
-        skindata.fn_onThrownEnd(inst)
+    if inst._dd ~= nil and inst._dd.thrownendfn ~= nil then
+        inst._dd.thrownendfn(inst)
     end
 end
 local function OnThrown_fimbulaxe(inst, owner, target)
@@ -876,10 +870,8 @@ local function OnThrown_fimbulaxe(inst, owner, target)
     inst.AnimState:PlayAnimation("spin_loop", true)
     inst.components.inventoryitem.pushlandedevents = false
     inst.components.inventoryitem.canbepickedup = false
-
-    local skindata = inst.components.skinedlegion:GetSkinedData()
-    if skindata ~= nil and skindata.fn_onThrown ~= nil then
-        skindata.fn_onThrown(inst, owner, target)
+    if inst._dd ~= nil and inst._dd.thrownfn ~= nil then
+        inst._dd.thrownfn(inst, owner, target)
     end
 end
 local function ReturnToOwner_fimbulaxe(inst, owner)
@@ -887,7 +879,6 @@ local function ReturnToOwner_fimbulaxe(inst, owner)
     if owner ~= nil and owner:IsValid() then
         -- owner.SoundEmitter:PlaySound("dontstarve/wilson/boomerang_return")
         -- inst.components.projectile:Throw(owner, owner)
-
         if not (owner.components.health ~= nil and owner.components.health:IsDead()) then --玩家还活着，自动接住
             --如果使用者已装备手持武器，就放进物品栏，没有的话就直接装备上
             if not owner.components.inventory:GetEquippedItem(inst.components.equippable.equipslot) then
@@ -963,12 +954,10 @@ local function GiveSomeShock(inst, owner, target, doshock, hittarget) --击中�
     end
 
     if givelightning then
-        local skindata = inst.components.skinedlegion:GetSkinedData()
-        if skindata ~= nil and skindata.fn_onLightning ~= nil then
-            skindata.fn_onLightning(inst, owner, target)
+        if inst._dd ~= nil and inst._dd.lightningfn ~= nil then
+            inst._dd.lightningfn(inst, owner, target)
             return
         end
-
         if not TheWorld:HasTag("cave") then
             local lightning = SpawnPrefab("fimbul_lightning")
             lightning.Transform:SetPosition(x, y, z)
@@ -1107,9 +1096,8 @@ end, GetAssets("dualwrench", { Asset("ANIM", "anim/swap_dualwrench.zip") }), nil
 --------------------------------------------------------------------------
 
 local function OnEquip_3axe(inst, owner)
-    local skindata = inst.components.skinedlegion:GetSkinedData()
-    if skindata ~= nil and skindata.equip ~= nil then
-        owner.AnimState:OverrideSymbol("swap_object", skindata.equip.build, skindata.equip.file)
+    if inst._dd ~= nil then
+        owner.AnimState:OverrideSymbol("swap_object", inst._dd.build, inst._dd.file)
     else
         owner.AnimState:OverrideSymbol("swap_object", "tripleshovelaxe", "swap")
     end
@@ -1154,9 +1142,8 @@ end, GetAssets("tripleshovelaxe"), nil))
 --------------------------------------------------------------------------
 
 local function OnEquip_3axegold(inst, owner)
-    local skindata = inst.components.skinedlegion:GetSkinedData()
-    if skindata ~= nil and skindata.equip ~= nil then
-        owner.AnimState:OverrideSymbol("swap_object", skindata.equip.build, skindata.equip.file)
+    if inst._dd ~= nil then
+        owner.AnimState:OverrideSymbol("swap_object", inst._dd.build, inst._dd.file)
     else
         owner.AnimState:OverrideSymbol("swap_object", "triplegoldenshovelaxe", "swap")
     end
@@ -1267,13 +1254,7 @@ local function OnOwnerItemChange_carl(owner, data)
 	end
 end
 local function OnEquip_carl(inst, owner)
-    -- local skindata = inst.components.skinedlegion:GetSkinedData()
-    -- if skindata ~= nil and skindata.equip ~= nil then
-    --     owner.AnimState:OverrideSymbol("swap_object", skindata.equip.build, skindata.equip.file)
-    -- else
-        owner.AnimState:OverrideSymbol("swap_object", "lance_carrot_l", "swap_object")
-    -- end
-
+    owner.AnimState:OverrideSymbol("swap_object", "lance_carrot_l", "swap_object")
     owner.AnimState:Show("ARM_carry")
     owner.AnimState:Hide("ARM_normal")
 

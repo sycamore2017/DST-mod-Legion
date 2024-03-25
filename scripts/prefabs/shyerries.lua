@@ -56,13 +56,12 @@ end
 --[[ 野生的颤栗树与颤栗花的生长管理器 ]]
 --------------------------------------------------------------------------
 
-local prefabs_manager = 
-{
+local prefabs_manager = {
     "shyerrytree1",
     "shyerrytree2",
     "shyerrytree3",
     "shyerrytree4",
-    "shyerryflower",
+    "shyerryflower"
 }
 
 local Lines = 6         --生成线路总数
@@ -168,9 +167,10 @@ end
 
 local function fn_manager()
     local inst = CreateEntity()
-
     inst.entity:AddTransform()
     inst.entity:AddNetwork()
+
+    inst:AddTag("NOBLOCK")
 
     inst.entity:SetPristine()
     if not TheWorld.ismastersim then return inst end

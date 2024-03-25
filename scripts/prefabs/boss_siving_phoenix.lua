@@ -735,16 +735,17 @@ end
 ------
 
 local function OnEquip(inst, owner)
-    local skindata = inst.components.skinedlegion:GetSkinedData()
-    if skindata ~= nil and skindata.equip ~= nil then
-        owner.AnimState:OverrideSymbol(skindata.equip.symbol, skindata.equip.build, skindata.equip.file)
-        if skindata.equip.isshield then
+    if inst._dd ~= nil then
+        local dd = inst._dd
+        owner.AnimState:OverrideSymbol(dd.symbol, dd.build, dd.file)
+        if dd.isshield then
+            owner.AnimState:OverrideSymbol("swap_shield", dd.build, dd.file)
             owner.AnimState:Show("LANTERN_OVERLAY")
             owner.AnimState:HideSymbol("swap_object")
             owner.AnimState:ClearOverrideSymbol("swap_object")
         end
-        if skindata.equip.startfn then
-            skindata.equip.startfn(inst, owner)
+        if dd.startfn ~= nil then
+            dd.startfn(inst, owner)
         end
     else
         owner.AnimState:OverrideSymbol("swap_object", inst.prefab, "swap")
@@ -760,15 +761,15 @@ local function OnEquip(inst, owner)
     owner:AddTag("siv_feather")
 end
 local function OnUnequip(inst, owner)
-    local skindata = inst.components.skinedlegion:GetSkinedData()
-    if skindata ~= nil and skindata.equip ~= nil then
-        owner.AnimState:ClearOverrideSymbol(skindata.equip.symbol)
-        if skindata.equip.isshield then
+    if inst._dd ~= nil then
+        owner.AnimState:ClearOverrideSymbol(inst._dd.symbol)
+        if inst._dd.isshield then
+            owner.AnimState:ClearOverrideSymbol("swap_shield")
             owner.AnimState:Hide("LANTERN_OVERLAY")
             owner.AnimState:ShowSymbol("swap_object")
         end
-        if skindata.equip.endfn then
-            skindata.equip.endfn(inst, owner)
+        if inst._dd.endfn ~= nil then
+            inst._dd.endfn(inst, owner)
         end
     else
         owner.AnimState:ClearOverrideSymbol("swap_object")

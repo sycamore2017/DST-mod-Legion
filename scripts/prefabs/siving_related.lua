@@ -463,7 +463,7 @@ local function MakeConstruct(data)
             inst.components.deployhelper.onenablehelper = OnEnableHelper_ctl
         end
 
-        LS_C_Init(inst, basename, false)
+        LS_C_Init(inst, basename.."_item", false, "data_build")
 
         inst.ctltype_l = data.ctltype
         TOOLS_L.InitMouseInfo(inst, Fn_dealdata_sivctl, Fn_getdata_sivctlcon, 1)

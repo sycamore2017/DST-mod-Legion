@@ -1,5 +1,4 @@
-local assets =
-{
+local assets = {
     Asset("ANIM", "anim/icire_rock.zip"),
     Asset("ATLAS", "images/inventoryimages/icire_rock.xml"),
     Asset("IMAGE", "images/inventoryimages/icire_rock.tex"),
@@ -19,12 +18,10 @@ local assets =
     Asset("ATLAS", "images/inventoryimages/icire_rock5.xml"),
     Asset("IMAGE", "images/inventoryimages/icire_rock5.tex"),
     Asset("ATLAS_BUILD", "images/inventoryimages/icire_rock5.xml", 256),
-    Asset("ANIM", "anim/heat_rock.zip"), --官方热能石动画模板
+    Asset("ANIM", "anim/heat_rock.zip") --官方热能石动画模板
 }
-
-local prefabs =
-{
-    "heatrocklight",
+local prefabs = {
+    "heatrocklight"
 }
 
 local function OnRemove(inst)
@@ -58,7 +55,6 @@ local function HeatFn(inst, observer)
     end
     return emitted_temperatures[range]
 end
-
 local function GetStatus(inst)
     if inst.currentTempRange == 1 then
         return "FROZEN"
@@ -70,19 +66,18 @@ local function GetStatus(inst)
         return "HOT"
     end
 end
-
 local function UpdateImages(inst, range)
     inst.currentTempRange = range
     inst.AnimState:PlayAnimation(tostring(range), true)
 
     local canbloom = true
     local newname = "icire_rock"..tostring(range)
-    if inst._dd then
+    if inst._dd ~= nil then
         newname = newname..inst._dd.img_pst
         inst.components.inventoryitem.atlasname = "images/inventoryimages_skin/"..newname..".xml"
         inst.components.inventoryitem:ChangeImageName(newname)
         canbloom = inst._dd.canbloom
-        if inst._dd.fn_temp then
+        if inst._dd.fn_temp ~= nil then
             inst._dd.fn_temp(inst, range)
         end
     else
@@ -107,7 +102,6 @@ local function UpdateImages(inst, range)
         inst.AnimState:ClearBloomEffectHandle()
     end
 end
-
 local function AdjustLighting(inst, range, ambient)
     if range == 1 then
         local relativetemp = ambient - inst.components.temperature:GetCurrent() --目前的温差
@@ -123,7 +117,6 @@ local function AdjustLighting(inst, range, ambient)
         inst._light.Light:SetIntensity(0)
     end
 end
-
 local function TemperatureChange(inst, data)
     local ambient_temp = TheWorld.state.temperature
     local range = GetRangeForTemperature(inst.components.temperature:GetCurrent(), ambient_temp)
@@ -134,7 +127,6 @@ local function TemperatureChange(inst, data)
         UpdateImages(inst, range)
     end
 end
-
 local function OnOwnerChange(inst)
     local newowners = {}
     local owner = inst
@@ -166,6 +158,9 @@ local function OnOwnerChange(inst)
     end
 
     inst._owners = newowners
+end
+local function Fn_temp(inst)
+    UpdateImages(inst, inst.currentTempRange or 3)
 end
 
 local function fn()
@@ -233,9 +228,7 @@ local function fn()
     inst._owners = {}
     inst._onownerchange = function() OnOwnerChange(inst) end
 
-    inst.fn_temp = function(inst)
-        UpdateImages(inst, inst.currentTempRange or 3)
-    end
+    inst.fn_temp = Fn_temp
     UpdateImages(inst, 1)
     OnOwnerChange(inst)
 
