@@ -1227,16 +1227,17 @@ local SKINS_LEGION = {
         fn_start = Fn_start_equip,
         equip = {
             symbol = "swap_object", build = "rosorns_marble", file = "swap_object",
-            fn_onatk = function(inst, owner, target)
+            scabbard = {
+                anim = "idle_cover", isloop = true, bank = "rosorns_marble", build = "rosorns_marble",
+                image = "foliageath_rosorns_marble",
+                atlas = "images/inventoryimages_skin/foliageath_rosorns_marble.xml"
+            },
+            atkfn = function(inst, owner, target)
                 local fx = SpawnPrefab("rosorns_marble_fx")
                 if fx ~= nil then
                     fx.Transform:SetPosition(target.Transform:GetWorldPosition())
                 end
             end
-        },
-        scabbard = {
-            anim = "idle_cover", isloop = true, bank = "rosorns_marble", build = "rosorns_marble",
-            image = "foliageath_rosorns_marble", atlas = "images/inventoryimages_skin/foliageath_rosorns_marble.xml"
         },
         exchangefx = { prefab = nil, offset_y = nil, scale = nil },
         floater = { cut = 0.15, size = "small", offset_y = 0.4, scale = 0.5, nofx = nil }
@@ -1270,10 +1271,13 @@ local SKINS_LEGION = {
             anim = nil, animpush = nil, isloop = nil, setable = true
         },
         fn_start = Fn_start_equip,
-        equip = { symbol = "swap_object", build = "lileaves_marble", file = "swap_object" },
-        scabbard = {
-            anim = "idle_cover", isloop = nil, bank = "lileaves_marble", build = "lileaves_marble",
-            image = "foliageath_lileaves_marble", atlas = "images/inventoryimages_skin/foliageath_lileaves_marble.xml"
+        equip = {
+            symbol = "swap_object", build = "lileaves_marble", file = "swap_object",
+            scabbard = {
+                anim = "idle_cover", isloop = nil, bank = "lileaves_marble", build = "lileaves_marble",
+                image = "foliageath_lileaves_marble",
+                atlas = "images/inventoryimages_skin/foliageath_lileaves_marble.xml"
+            }
         },
         exchangefx = { prefab = nil, offset_y = nil, scale = nil },
         floater = { cut = 0.15, size = "small", offset_y = 0.4, scale = 0.6, nofx = nil }
@@ -1309,11 +1313,12 @@ local SKINS_LEGION = {
         fn_start = Fn_start_equip,
         equip = {
             symbol = "swap_object", build = "orchitwigs_marble", file = "swap_object",
-            atkfx = "impact_orchid_fx_marble"
-        },
-        scabbard = {
-            anim = "idle_cover", isloop = nil, bank = "orchitwigs_marble", build = "orchitwigs_marble",
-            image = "foliageath_orchitwigs_marble", atlas = "images/inventoryimages_skin/foliageath_orchitwigs_marble.xml",
+            atkfx = "impact_orchid_fx_marble",
+            scabbard = {
+                anim = "idle_cover", isloop = nil, bank = "orchitwigs_marble", build = "orchitwigs_marble",
+                image = "foliageath_orchitwigs_marble",
+                atlas = "images/inventoryimages_skin/foliageath_orchitwigs_marble.xml"
+            }
         },
         exchangefx = { prefab = nil, offset_y = nil, scale = nil },
         floater = { cut = 0.05, size = "small", offset_y = 0.15, scale = 0.5, nofx = nil }
@@ -1350,11 +1355,12 @@ local SKINS_LEGION = {
         fn_start = Fn_start_equip,
         equip = {
             symbol = "swap_object", build = "orchitwigs_disguiser", file = "swap_object",
-            atkfx = "impact_orchid_fx_disguiser"
-        },
-        scabbard = {
-            anim = "idle_cover", isloop = nil, bank = "orchitwigs_disguiser", build = "orchitwigs_disguiser",
-            image = "foliageath_orchitwigs_disguiser", atlas = "images/inventoryimages_skin/foliageath_orchitwigs_disguiser.xml"
+            atkfx = "impact_orchid_fx_disguiser",
+            scabbard = {
+                anim = "idle_cover", isloop = nil, bank = "orchitwigs_disguiser", build = "orchitwigs_disguiser",
+                image = "foliageath_orchitwigs_disguiser",
+                atlas = "images/inventoryimages_skin/foliageath_orchitwigs_disguiser.xml"
+            }
         },
         exchangefx = { prefab = nil, offset_y = nil, scale = nil },
         floater = { cut = 0.05, size = "small", offset_y = 0.15, scale = 0.5, nofx = nil }
@@ -1380,11 +1386,12 @@ local SKINS_LEGION = {
             build2 = "neverfade_thanks", file2 = "broken_swap",
             img_tex = "neverfade_thanks", img_atlas = "images/inventoryimages_skin/neverfade_thanks.xml",
             img_tex2 = "neverfade_thanks_broken", img_atlas2 = "images/inventoryimages_skin/neverfade_thanks_broken.xml",
-            butterfly = { bank = "butterfly", build = "neverfade_butterfly_thanks" }
-        },
-        scabbard = {
-            anim = "idle_cover", isloop = nil, bank = "neverfade_thanks", build = "neverfade_thanks",
-            image = "foliageath_neverfade_thanks", atlas = "images/inventoryimages_skin/foliageath_neverfade_thanks.xml"
+            butterfly = { bank = "butterfly", build = "neverfade_butterfly_thanks" },
+            scabbard = {
+                anim = "idle_cover", isloop = nil, bank = "neverfade_thanks", build = "neverfade_thanks",
+                image = "foliageath_neverfade_thanks",
+                atlas = "images/inventoryimages_skin/foliageath_neverfade_thanks.xml"
+            }
         },
         exchangefx = { prefab = nil, offset_y = nil, scale = nil },
         floater = { cut = 0.05, size = "small", offset_y = 0.15, scale = 0.5, nofx = nil },
@@ -1425,11 +1432,12 @@ local SKINS_LEGION = {
             build2 = "neverfade_paper", file2 = "broken_swap",
             img_tex = "neverfade_paper", img_atlas = "images/inventoryimages_skin/neverfade_paper.xml",
             img_tex2 = "neverfade_paper_broken", img_atlas2 = "images/inventoryimages_skin/neverfade_paper_broken.xml",
-            butterfly = { bank = "butterfly", build = "neverfade_butterfly_paper" }
-        },
-        scabbard = {
-            anim = "idle_cover", isloop = nil, bank = "neverfade_paper", build = "neverfade_paper",
-            image = "foliageath_neverfade_paper", atlas = "images/inventoryimages_skin/foliageath_neverfade_paper.xml",
+            butterfly = { bank = "butterfly", build = "neverfade_butterfly_paper" },
+            scabbard = {
+                anim = "idle_cover", isloop = nil, bank = "neverfade_paper", build = "neverfade_paper",
+                image = "foliageath_neverfade_paper",
+                atlas = "images/inventoryimages_skin/foliageath_neverfade_paper.xml"
+            }
         },
         exchangefx = { prefab = nil, offset_y = nil, scale = nil },
         floater = { cut = 0.05, size = "small", offset_y = 0.15, scale = 0.5, nofx = nil },
@@ -1470,11 +1478,12 @@ local SKINS_LEGION = {
             build2 = "neverfade_paper2", file2 = "broken_swap",
             img_tex = "neverfade_paper2", img_atlas = "images/inventoryimages_skin/neverfade_paper2.xml",
             img_tex2 = "neverfade_paper2_broken", img_atlas2 = "images/inventoryimages_skin/neverfade_paper2_broken.xml",
-            butterfly = { bank = "butterfly", build = "neverfade_butterfly_paper2" }
-        },
-        scabbard = {
-            anim = "idle_cover", isloop = nil, bank = "neverfade_paper2", build = "neverfade_paper2",
-            image = "foliageath_neverfade_paper2", atlas = "images/inventoryimages_skin/foliageath_neverfade_paper2.xml",
+            butterfly = { bank = "butterfly", build = "neverfade_butterfly_paper2" },
+            scabbard = {
+                anim = "idle_cover", isloop = nil, bank = "neverfade_paper2", build = "neverfade_paper2",
+                image = "foliageath_neverfade_paper2",
+                atlas = "images/inventoryimages_skin/foliageath_neverfade_paper2.xml"
+            }
         },
         exchangefx = { prefab = nil, offset_y = nil, scale = nil },
         floater = { cut = 0.05, size = "small", offset_y = 0.15, scale = 0.5, nofx = nil },
@@ -2036,10 +2045,13 @@ local SKINS_LEGION = {
             anim = nil, animpush = nil, isloop = nil, setable = true
         },
         fn_start = Fn_start_equip,
-        equip = { symbol = "swap_object", build = "lileaves_era", file = "swap_object" },
-        scabbard = {
-            anim = "idle_cover", isloop = nil, bank = "lileaves_era", build = "lileaves_era",
-            image = "foliageath_lileaves_era", atlas = "images/inventoryimages_skin/foliageath_lileaves_era.xml"
+        equip = {
+            symbol = "swap_object", build = "lileaves_era", file = "swap_object",
+            scabbard = {
+                anim = "idle_cover", isloop = nil, bank = "lileaves_era", build = "lileaves_era",
+                image = "foliageath_lileaves_era",
+                atlas = "images/inventoryimages_skin/foliageath_lileaves_era.xml"
+            }
         },
         exchangefx = { prefab = nil, offset_y = nil, scale = nil },
         floater = { cut = 0.05, size = "small", offset_y = 0.15, scale = 0.5, nofx = nil }
@@ -2205,16 +2217,17 @@ local SKINS_LEGION = {
         fn_start = Fn_start_equip,
         equip = {
             symbol = "swap_object", build = "rosorns_collector", file = "swap_object",
-            fn_onatk = function(inst, owner, target)
+            scabbard = {
+                anim = "idle_cover", isloop = true, bank = "rosorns_collector", build = "rosorns_collector",
+                image = "foliageath_rosorns_collector",
+                atlas = "images/inventoryimages_skin/foliageath_rosorns_collector.xml"
+            },
+            atkfn = function(inst, owner, target)
                 local fx = SpawnPrefab("rosorns_collector_fx")
                 if fx ~= nil then
                     fx.Transform:SetPosition(target.Transform:GetWorldPosition())
                 end
             end
-        },
-        scabbard = {
-            anim = "idle_cover", isloop = true, bank = "rosorns_collector", build = "rosorns_collector",
-            image = "foliageath_rosorns_collector", atlas = "images/inventoryimages_skin/foliageath_rosorns_collector.xml"
         },
         exchangefx = { prefab = nil, offset_y = nil, scale = nil },
         floater = { nofx = true }
@@ -3826,10 +3839,10 @@ local function SkinFile2Cache() --【服务器、客户端】读取皮肤文件�
             if load_success and datajson ~= nil then
                 local status, data = pcall(function() return json.decode(datajson) end)
                 if status and data ~= nil then
-                    -- if data.origin ~= nil then
-                        print("保存的世界id："..tostring(data.origin))
-                    -- end
-                    if data.dd ~= nil and type(data.dd) == "table" then
+                    if
+                        data.dd ~= nil and type(data.dd) == "table" and
+                        data.origin ~= nil and data.origin == TheNet:GetSessionIdentifier() --验证世界id
+                    then
                         for kleiid, skins in pairs(data.dd) do
                             if ls_players[kleiid] then --只有进过该档的玩家的数据才能被使用，防止别人直接替换缓存文件
                                 local newdd = {}
@@ -4743,7 +4756,7 @@ LS_C_SetSkin = function(self, skinname, userid)
         self.userid = userid
         inst.skinname = skinname
     end
-    if skindata.equip ~= nil then
+    if inst.components.equippable ~= nil then --为了更新玩家的装备贴图
         if inst.task_ls_ex ~= nil then
             inst.task_ls_ex:Cancel()
         end
@@ -5201,8 +5214,8 @@ AddPrefabPostInit("reskin_tool", function(inst)
                         end
                     end
                     if skinname_new ~= skinname_old then
-                        skincpt:SetSkin(skinname_new, userid)
-                        skinname_new = skincpt:GetSkin()
+                        LS_C_SetSkin(skincpt, skinname_new, userid)
+                        skinname_new = skincpt:GetSkin() --重新获取，看看是不是切换成功了
                         C_SpawnSkinExchangeFx(target, skinname_new, tool)
                         if skinname_cac ~= skinname_new then
                             SaveSkinEx(userid, skinname_new, prefabname)

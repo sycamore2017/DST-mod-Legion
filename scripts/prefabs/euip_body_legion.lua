@@ -544,12 +544,7 @@ local function OnSetBonusOff_beetlearmor(inst)
     inst.components.armor.conditionlossmultipliers:RemoveModifier(inst, "setbonus")
 end
 local function OnEquip_beetlearmor(inst, owner)
-    -- local skindata = inst.components.skinedlegion:GetSkinedData()
-    -- if skindata ~= nil and skindata.equip ~= nil then
-    --     owner.AnimState:OverrideSymbol("swap_body", skindata.equip.build, skindata.equip.file)
-    -- else
-        owner.AnimState:OverrideSymbol("swap_body", "armor_elepheetle", "swap_body")
-    -- end
+    owner.AnimState:OverrideSymbol("swap_body", "armor_elepheetle", "swap_body")
 
     if owner:HasTag("equipmentmodel") then --假人！
         return

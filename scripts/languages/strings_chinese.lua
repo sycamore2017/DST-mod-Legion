@@ -4347,6 +4347,7 @@ S______GENERIC.ACTIONFAIL.SMEAR_L = {
 -- S________WANDA.ACTIONFAIL.SMEAR_L = ""
 
 STRINGS.NAMEDETAIL_L = { --Tip：额外的描述行数，最多4行，不然就会挡住动作名字了
+    PROBLEMSKIN = "皮肤失效 {sk}",
     FIREPROOF = "防火",
     MOONTREASURE = "月之宝具{lvl}/{lvlmax}",
     WEAKMONSTRAIN = "停止产生雨蝇",

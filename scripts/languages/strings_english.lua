@@ -4123,6 +4123,7 @@ S______GENERIC.ACTIONFAIL.SMEAR_L = {
 -- S________WANDA.ACTIONFAIL.SMEAR_L = ""
 
 STRINGS.NAMEDETAIL_L = {
+    PROBLEMSKIN = "SkinError ({sk})",
     FIREPROOF = "Fireproof",
     MOONTREASURE = "Moon Treasure {lvl}/{lvlmax}",
     WEAKMONSTRAIN = "Production of Raindonate Stops",

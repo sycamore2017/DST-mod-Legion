@@ -1644,6 +1644,9 @@ local function OnLoad_egg(inst, data)
         SetEggState(inst, 4)
     end
 end
+local function NoDebrisDmg_egg(inst, amount, overtime, cause, ignore_invincible, afflicter, ignore_absorb)
+    return afflicter ~= nil and afflicter:HasTag("quakedebris")
+end
 
 table.insert(prefs, Prefab("siving_egg", function()
     local inst = CreateEntity()
@@ -1676,6 +1679,7 @@ table.insert(prefs, Prefab("siving_egg", function()
     inst:AddComponent("health")
     inst.components.health:SetMaxHealth(300)
     inst.components.health:SetInvincible(true)
+    inst.components.health.redirect = NoDebrisDmg_egg
 
     inst:AddComponent("combat")
 

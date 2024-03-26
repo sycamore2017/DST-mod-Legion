@@ -9,10 +9,6 @@ function SkinedLegion:GetSkin()
 	return self.skin
 end
 
-function SkinedLegion:GetSkinedData()
-	return self.skineddata
-end
-
 ------以下均为【服务器】环境
 
 function SkinedLegion:SetLinkedSkin(newinst, linkedkey, doer)
@@ -25,7 +21,7 @@ end
 SkinedLegion.SetSkin = LS_C_SetSkin
 
 function SkinedLegion:OnSave()
-	if self.skin ~= nil then
+	if self.skin ~= nil or self.problemskin ~= nil then
 		return { skin = self.skin, userid = self.userid, pskin = self.problemskin }
 	end
 end

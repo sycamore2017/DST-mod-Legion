@@ -940,7 +940,6 @@ local dressup_data = {
         isnoskin = true, -- isshield = true,
         buildfn = function(dressup, item, buildskin)
             local itemswap = {}
-
             itemswap["lantern_overlay"] = dressup:GetDressData(
                 nil, item._dd.build,
                 item.components.timer:TimerExists("revolt") and "swap2" or "swap1",
@@ -952,7 +951,6 @@ local dressup_data = {
                 item.GUID, "swap"
             )
             dressup:SetDressShield(itemswap)
-
             return itemswap
         end
     },
@@ -987,28 +985,14 @@ local dressup_data = {
     -- book_weather --该道具贴图切换比较特殊，不做幻化
     shield_l_sand = { isnoskin = true, isshield = true, buildfile = "shield_l_sand", buildsymbol = "swap_shield" },
     shield_l_log = { isnoskin = true, isshield = true, buildfile = "shield_l_log", buildsymbol = "swap_shield" },
-    dualwrench = {
-        isnoskin = true,
-        buildfile = "swap_dualwrench",
-        buildsymbol = "swap_dualwrench"
-    },
+    dualwrench = { isnoskin = true, buildfile = "swap_dualwrench", buildsymbol = "swap_dualwrench" },
     fimbul_axe = { isnoskin = true, buildfile = "fimbul_axe", buildsymbol = "swap_base" },
-    giantsfoot = {
-        isnoskin = true,
-        isbackpack = true,
-        buildfile = "giantsfoot",
-        buildsymbol = "swap_body"
-    },
-    hat_albicans_mushroom = {
-        isnoskin = true,
-        buildfile = "hat_albicans_mushroom",
-        buildsymbol = "swap_hat"
-    },
+    giantsfoot = { isnoskin = true, isbackpack = true, buildfile = "giantsfoot", buildsymbol = "swap_body" },
+    hat_albicans_mushroom = { isnoskin = true, buildfile = "hat_albicans_mushroom", buildsymbol = "swap_hat" },
     hat_cowboy = {
         isnoskin = true,
         buildfn = function(dressup, item, buildskin)
             local itemswap = {}
-
             if item._dd ~= nil then
                 itemswap["swap_hat"] = dressup:GetDressData(
                     nil, item._dd.build, item._dd.file, item.GUID, "swap"
@@ -1025,7 +1009,6 @@ local dressup_data = {
                 )
             end
             dressup:SetDressTop(itemswap)
-
             return itemswap
         end,
         unbuildfn = function(dressup, item)
@@ -1093,10 +1076,8 @@ local dressup_data = {
         isnoskin = true,
         buildfn = function(dressup, item, buildskin)
             local itemswap = {}
-
             itemswap["swap_hat"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
             dressup:SetDressOpenTop(itemswap)
-
             return itemswap
         end,
         unbuildfn = function(dressup, item) end --没啥好恢复的
@@ -1106,9 +1087,7 @@ local dressup_data = {
         istallbody = true,
         buildfn = function(dressup, item, buildskin)
             local itemswap = {}
-
             itemswap["swap_body_tall"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
-
             return itemswap
         end,
         unbuildfn = function(dressup, item) end --没啥好恢复的
@@ -1117,10 +1096,8 @@ local dressup_data = {
         isnoskin = true,
         buildfn = function(dressup, item, buildskin)
             local itemswap = {}
-
             itemswap["backpack"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
             itemswap["swap_body"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
-
             return itemswap
         end,
         unbuildfn = function(dressup, item) end --没啥好恢复的
@@ -1129,10 +1106,8 @@ local dressup_data = {
         isnoskin = true,
         buildfn = function(dressup, item, buildskin)
             local itemswap = {}
-
             itemswap["swap_object"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
             dressup:SetDressHand(itemswap)
-
             return itemswap
         end,
         unbuildfn = function(dressup, item) end --没啥好恢复的
@@ -1248,21 +1223,9 @@ local dressup_data = {
     },
     siving_suit = { isnoskin = true, buildfile = "siving_suit", buildsymbol = "swap_body" },
     siving_suit_gold = { isnoskin = true, buildfile = "siving_suit_gold", buildsymbol = "swap_body" },
-    hat_elepheetle = {
-        isnoskin = true,
-        buildfile = "hat_elepheetle",
-        buildsymbol = "swap_hat"
-    },
-    armor_elepheetle = {
-        isnoskin = true,
-        buildfile = "armor_elepheetle",
-        buildsymbol = "swap_body"
-    },
-    lance_carrot_l = {
-        isnoskin = true,
-        buildfile = "lance_carrot_l",
-        buildsymbol = "swap_object"
-    },
+    hat_elepheetle = { isnoskin = true, buildfile = "hat_elepheetle", buildsymbol = "swap_hat" },
+    armor_elepheetle = { isnoskin = true, buildfile = "armor_elepheetle", buildsymbol = "swap_body" },
+    lance_carrot_l = { isnoskin = true, buildfile = "lance_carrot_l", buildsymbol = "swap_object" },
 }
 
 if not _G.rawget(_G, "DRESSUP_DATA_LEGION") then

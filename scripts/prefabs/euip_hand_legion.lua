@@ -397,8 +397,8 @@ local function OnUnequip_rose(inst, owner)
 end
 local function OnAttack_rose(inst, owner, target)
     if target ~= nil and target:IsValid() then
-        if inst._dd ~= nil and inst._dd.fn_onatk ~= nil then
-            inst._dd.fn_onatk(inst, owner, target)
+        if inst._dd ~= nil and inst._dd.atkfn ~= nil then
+            inst._dd.atkfn(inst, owner, target)
         end
     end
 end

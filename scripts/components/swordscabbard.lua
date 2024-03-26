@@ -6,9 +6,9 @@ local SwordScabbard = Class(function(self, inst)
 end)
 
 function SwordScabbard:SetAnim(sword)
-    local dd = sword.components.skinedlegion ~= nil and sword.components.skinedlegion:GetSkinedData() or nil
-    if dd ~= nil and dd.scabbard ~= nil then
-        dd = dd.scabbard
+    local dd
+    if sword._dd ~= nil and sword._dd.scabbard ~= nil then
+        dd = sword._dd.scabbard
     else
         dd = sword.foliageath_data
     end

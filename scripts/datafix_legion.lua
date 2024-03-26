@@ -757,8 +757,8 @@ _G.CROPS_DATA_LEGION.cactus_meat = {
     end,
     fn_season = function(self) --夏季时切换花朵贴图
         if TheWorld.state.season == "summer" then
-            local skin = self.inst.components.skinedlegion:GetSkin()
-            self.inst.AnimState:OverrideSymbol("flowerplus", skin or "crop_legion_cactus", "flomax")
+            self.inst.AnimState:OverrideSymbol("flowerplus",
+                self.inst.AnimState:GetBuild() or "crop_legion_cactus", "flomax")
         else
             self.inst.AnimState:ClearOverrideSymbol("flowerplus")
         end
@@ -830,8 +830,6 @@ _G.CROPS_DATA_LEGION.berries = {
     end,
     fn_stage = function(self)
         if self.stage >= self.stage_max then
-            -- local skin = self.inst.components.skinedlegion:GetSkin()
-            -- self.inst.AnimState:OverrideSymbol("fruit1", skin or "crop_legion_berries", "fruit2")
             self.inst.AnimState:OverrideSymbol("fruit1", "crop_legion_berries", "fruit2")
         else
             self.inst.AnimState:ClearOverrideSymbol("fruit1")
@@ -1749,11 +1747,22 @@ end
 
 if not TheNet:IsDedicated() then --不受 CONFIGS_LEGION.MOUSEINFO 影响
     --实体名称显示的修改
-    local function AssembleInfoString(pststr, str)
-        if pststr == nil then
+    local function AssembleStr(now, str)
+        if now == nil then
             return str
+        elseif str == nil then
+            return now
         else
-            return pststr.." "..str
+            return now.." "..str
+        end
+    end
+    local function AssembleNextStr(now, str)
+        if now == nil then
+            return str
+        elseif str == nil then
+            return now
+        else
+            return now.."\n"..str
         end
     end
     local function GetDisplayName_new(self, ...)
@@ -1770,13 +1779,17 @@ if not TheNet:IsDedicated() then --不受 CONFIGS_LEGION.MOUSEINFO 影响
         end
         --固定内容
         if self:HasTag("fireproof_l") then
-            pststr2 = AssembleInfoString(pststr2, STRINGS.NAMEDETAIL_L.FIREPROOF)
+            pststr2 = AssembleStr(pststr2, STRINGS.NAMEDETAIL_L.FIREPROOF)
         end
-        if pststr1 == nil then
-            pststr1 = pststr2
-        elseif pststr2 ~= nil then
-            pststr1 = pststr1.."\n"..pststr2
+        --问题皮肤
+        if self.components.skinedlegion and self.components.skinedlegion.problemskin ~= nil then
+            local skinstr = STRINGS.SKIN_NAMES[self.components.skinedlegion.problemskin]
+            if skinstr ~= nil then
+                pststr2 = AssembleNextStr(pststr2, subfmt(STRINGS.NAMEDETAIL_L.PROBLEMSKIN, {sk = skinstr}))
+            end
         end
+
+        pststr1 = AssembleNextStr(pststr1, pststr2)
         if pststr1 ~= nil then
             return name.."\n"..pststr1
         end
