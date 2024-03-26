@@ -250,7 +250,7 @@ local function DoFunction_ctl(inst, doit)
 end
 
 local function TryAddBar(inst)
-    for barkey, data in pairs(inst.barsets_l) do
+    for barkey, data in pairs(inst._dd) do
         local fx = inst[barkey]
         if fx == nil then
             fx = SpawnPrefab("siving_ctl_bar")
@@ -272,11 +272,11 @@ end
 local function SetBar(inst, barkey, value, valuemax)
     if inst[barkey] ~= nil then
         if value <= 0 then
-            inst[barkey].AnimState:SetPercent(inst.barsets_l[barkey].anim, 0)
+            inst[barkey].AnimState:SetPercent(inst._dd[barkey].anim, 0)
         elseif value < valuemax then
-            inst[barkey].AnimState:SetPercent(inst.barsets_l[barkey].anim, value/valuemax)
+            inst[barkey].AnimState:SetPercent(inst._dd[barkey].anim, value/valuemax)
         else
-            inst[barkey].AnimState:SetPercent(inst.barsets_l[barkey].anim, 1)
+            inst[barkey].AnimState:SetPercent(inst._dd[barkey].anim, 1)
         end
     end
 end
@@ -286,7 +286,6 @@ local function UpdateBars(inst)
         inst.components.botanycontroller:onbarchange()
     end
 end
-
 local function OnBarChange_ctlwater(ctl)
     SetBar(ctl.inst, "siv_bar", ctl.moisture, ctl.moisture_max)
 end
@@ -416,9 +415,14 @@ local function MakeItem(data)
         inst:AddComponent("deployable")
         inst.components.deployable:SetDeploySpacing(DEPLOYSPACING.MEDIUM)
         inst.components.deployable.ondeploy = function(inst, pt, deployer, rot)
-            local tree = SpawnPrefab(basename)
+            local tree
+            local skin = inst.components.skinedlegion:GetSkin()
+            if skin == nil then
+                tree = SpawnPrefab(basename)
+            else
+                tree = SpawnPrefab(basename, skin, nil, LS_C_UserID(inst, deployer))
+            end
             if tree ~= nil then
-                inst.components.skinedlegion:SetLinkedSkin(tree, "link", deployer)
                 tree.components.botanycontroller:SetValue(inst.siv_moisture, inst.siv_nutrients, false)
                 tree.Transform:SetPosition(pt:Get())
                 if deployer ~= nil and deployer.SoundEmitter ~= nil then
@@ -477,9 +481,14 @@ local function MakeConstruct(data)
 
         inst:AddComponent("portablestructure")
         inst.components.portablestructure:SetOnDismantleFn(function(inst, doer)
-            local item = SpawnPrefab(basename.."_item")
+            local item
+            local skin = inst.components.skinedlegion:GetSkin()
+            if skin == nil then
+                item = SpawnPrefab(basename.."_item")
+            else
+                item = SpawnPrefab(basename.."_item", skin, nil, LS_C_UserID(inst, doer))
+            end
             if item ~= nil then
-                inst.components.skinedlegion:SetLinkedSkin(item, "link", doer)
                 SetData_ctlitem(item,
                     inst.components.botanycontroller.moisture, inst.components.botanycontroller.nutrients)
                 if doer ~= nil and doer.components.inventory ~= nil then
@@ -535,6 +544,12 @@ end
 --[[ 子圭·利川 ]]
 --------------------------------------------------------------------------
 
+local dd_siving_ctlwater = {
+    siv_bar = {
+        x = 0, y = -180, z = 0, scale = nil,
+        bank = "siving_ctlwater", build = "siving_ctlwater", anim = "bar"
+    }
+}
 local function OnRain_ctlwater(inst)
     inst.components.botanycontroller:SetValue(200, nil, true) --下雨/雪开始与结束时，直接恢复一定水分
 end
@@ -561,12 +576,7 @@ MakeConstruct({
     prefabs = { "siving_ctlwater_item", "siving_ctl_bar" },
     ctltype = 1,
     fn_server = function(inst)
-        inst.barsets_l = {
-            siv_bar = {
-                x = 0, y = -180, z = 0, scale = nil,
-                bank = "siving_ctlwater", build = "siving_ctlwater", anim = "bar"
-            }
-        }
+        inst._dd = dd_siving_ctlwater
         inst:WatchWorldState("israining", OnRain_ctlwater)
     end
 })
@@ -574,6 +584,21 @@ MakeConstruct({
 --------------------------------------------------------------------------
 --[[ 子圭·益矩 ]]
 --------------------------------------------------------------------------
+
+local dd_siving_ctldirt = {
+    siv_bar1 = {
+        x = -48, y = -140, z = 0, scale = nil,
+        bank = "siving_ctldirt", build = "siving_ctldirt", anim = "bar1"
+    },
+    siv_bar2 = {
+        x = -5, y = -140, z = 0, scale = nil,
+        bank = "siving_ctldirt", build = "siving_ctldirt", anim = "bar2"
+    },
+    siv_bar3 = {
+        x = 39, y = -140, z = 0, scale = nil,
+        bank = "siving_ctldirt", build = "siving_ctldirt", anim = "bar3"
+    }
+}
 
 MakeItem({
     name = "dirt",
@@ -597,26 +622,32 @@ MakeConstruct({
     prefabs = { "siving_ctldirt_item", "siving_ctl_bar" },
     ctltype = 2,
     fn_server = function(inst)
-        inst.barsets_l = {
-            siv_bar1 = {
-                x = -48, y = -140, z = 0, scale = nil,
-                bank = "siving_ctldirt", build = "siving_ctldirt", anim = "bar1"
-            },
-            siv_bar2 = {
-                x = -5, y = -140, z = 0, scale = nil,
-                bank = "siving_ctldirt", build = "siving_ctldirt", anim = "bar2"
-            },
-            siv_bar3 = {
-                x = 39, y = -140, z = 0, scale = nil,
-                bank = "siving_ctldirt", build = "siving_ctldirt", anim = "bar3"
-            }
-        }
+        inst._dd = dd_siving_ctldirt
     end
 })
 
 --------------------------------------------------------------------------
 --[[ 子圭·崇溟 ]]
 --------------------------------------------------------------------------
+
+local dd_siving_ctlall = {
+    siv_bar1 = {
+        x = -53, y = -335, z = 0, scale = nil,
+        bank = "siving_ctldirt", build = "siving_ctldirt", anim = "bar1"
+    },
+    siv_bar2 = {
+        x = -10, y = -360, z = 0, scale = nil,
+        bank = "siving_ctldirt", build = "siving_ctldirt", anim = "bar2"
+    },
+    siv_bar3 = {
+        x = 34, y = -335, z = 0, scale = nil,
+        bank = "siving_ctldirt", build = "siving_ctldirt", anim = "bar3"
+    },
+    siv_bar4 = {
+        x = -10, y = -297, z = 0, scale = nil,
+        bank = "siving_ctlwater", build = "siving_ctlwater", anim = "bar"
+    }
+}
 
 MakeItem({
     name = "all",
@@ -644,24 +675,7 @@ MakeConstruct({
     fn_server = function(inst)
         inst.components.botanycontroller.moisture_max = 6000
         inst.components.botanycontroller.nutrient_max = 2400
-        inst.barsets_l = {
-            siv_bar1 = {
-                x = -53, y = -335, z = 0, scale = nil,
-                bank = "siving_ctldirt", build = "siving_ctldirt", anim = "bar1"
-            },
-            siv_bar2 = {
-                x = -10, y = -360, z = 0, scale = nil,
-                bank = "siving_ctldirt", build = "siving_ctldirt", anim = "bar2"
-            },
-            siv_bar3 = {
-                x = 34, y = -335, z = 0, scale = nil,
-                bank = "siving_ctldirt", build = "siving_ctldirt", anim = "bar3"
-            },
-            siv_bar4 = {
-                x = -10, y = -297, z = 0, scale = nil,
-                bank = "siving_ctlwater", build = "siving_ctlwater", anim = "bar"
-            }
-        }
+        inst._dd = dd_siving_ctlall
         inst:WatchWorldState("israining", OnRain_ctlwater)
     end
 })

@@ -865,20 +865,13 @@ end, GetAssets2("boltwingout", "swap_boltwingout", { Asset("ANIM", "anim/ui_pigg
 local prefabs_sivsuit = { "sivsuitatk_fx" }
 
 local function SetSymbols_sivsuit(inst, owner)
-    local skindata = inst.components.skinedlegion:GetSkinedData()
-    if skindata ~= nil and skindata.equip ~= nil then
-        owner.AnimState:OverrideSymbol("swap_body", skindata.equip.build, skindata.equip.file)
+    if inst._dd ~= nil then
+        owner.AnimState:OverrideSymbol("swap_body", inst._dd.build, inst._dd.file)
     else
         owner.AnimState:OverrideSymbol("swap_body", inst.prefab, "swap_body")
     end
 end
 local function ClearSymbols_sivsuit(inst, owner)
-    -- local skindata = inst.components.skinedlegion:GetSkinedData()
-    -- if skindata ~= nil and skindata.equip ~= nil then
-    --     if skindata.equip.endfn ~= nil then
-    --         skindata.equip.endfn(inst, owner)
-    --     end
-    -- end
     owner.AnimState:ClearOverrideSymbol("swap_body")
 end
 local function OnHitOther_bloodarmor(owner, data, armor)

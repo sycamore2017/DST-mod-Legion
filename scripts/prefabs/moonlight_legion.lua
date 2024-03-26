@@ -100,12 +100,7 @@ end
 local function SetTarget_hidden(inst, targetprefab)
     inst.upgradetarget = targetprefab
     if targetprefab ~= "icebox" then
-        local dd = inst.components.skinedlegion:GetSkinedData()
-        if dd and dd.build_name_override then
-            inst.AnimState:OverrideSymbol("base", dd.build_name_override, "saltbase")
-        else
-            inst.AnimState:OverrideSymbol("base", "hiddenmoonlight", "saltbase")
-        end
+        inst.AnimState:OverrideSymbol("base", inst.AnimState:GetBuild() or "hiddenmoonlight", "saltbase")
     end
 end
 local function DoBenefit(inst)
@@ -1128,7 +1123,7 @@ local function OnUnequip_refracted(inst, owner) --卸下武器时
     owner:RemoveEventCallback("healthdelta", inst.fn_onHealthDelta)
     inst:RemoveEventCallback("attacked", inst.fn_onAttacked, owner)
     if inst._atkmult == atkmult_rf_hurt then
-        inst.fn_onHealthDelta(owner, { newpercent = 1 }) --卸下时，恢复武器默认攻击力，为了让巨人之脚识别到
+        inst.fn_onHealthDelta(owner, { newpercent = 1 }) --卸下时，恢复武器默认攻击力，为了正常显示数值
     end
 end
 local function OnAttack_refracted(inst, owner, target)

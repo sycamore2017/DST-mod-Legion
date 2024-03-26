@@ -1076,14 +1076,12 @@ local dressup_data = {
         isnoskin = true,
         buildfn = function(dressup, item, buildskin)
             local itemswap = {}
-
             itemswap["swap_object"] = dressup:GetDressData(
                 nil, item._dd.build,
                 item.components.timer:TimerExists("moonsurge") and "swap2" or "swap1",
                 item.GUID, "swap"
             )
             dressup:SetDressHand(itemswap)
-
             return itemswap
         end
     },
@@ -1192,13 +1190,11 @@ local dressup_data = {
         isnoskin = true,
         buildfn = function(dressup, item, buildskin)
             local itemswap = {}
-
-            local skindata = item.components.skinedlegion:GetSkinedData()
-            if skindata ~= nil and skindata.equip ~= nil then
+            if item._dd ~= nil then
                 itemswap["swap_hat"] = dressup:GetDressData(
-                    nil, skindata.equip.build, skindata.equip.file or GetSymbol_sivmask(dressup), item.GUID, "swap"
+                    nil, item._dd.build, item._dd.file or GetSymbol_sivmask(dressup), item.GUID, "swap"
                 )
-                if skindata.equip.isopentop then
+                if item._dd.isopentop then
                     dressup:SetDressOpenTop(itemswap)
                 else
                     dressup:SetDressTop(itemswap)
@@ -1209,7 +1205,6 @@ local dressup_data = {
                 )
                 dressup:SetDressOpenTop(itemswap)
             end
-
             return itemswap
         end
     },
@@ -1217,22 +1212,20 @@ local dressup_data = {
         isnoskin = true,
         buildfn = function(dressup, item, buildskin)
             local itemswap = {}
-
-            local skindata = item.components.skinedlegion:GetSkinedData()
-            if skindata ~= nil and skindata.equip ~= nil then
-                if skindata.equip.build == "siving_mask_gold_era" then
+            if item._dd ~= nil then
+                if item._dd.build == "siving_mask_gold_era" then
                     Fn_setFollowFx(dressup.inst, "fx_d_sivmask", "sivmask_era_fofx")
                     itemswap["swap_hat"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
                     dressup:SetDressOpenTop(itemswap)
-                elseif skindata.equip.build == "siving_mask_gold_era2" then
+                elseif item._dd.build == "siving_mask_gold_era2" then
                     Fn_setFollowFx(dressup.inst, "fx_d_sivmask", "sivmask_era2_fofx")
                     itemswap["swap_hat"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
                     dressup:SetDressOpenTop(itemswap)
                 else
                     itemswap["swap_hat"] = dressup:GetDressData(
-                        nil, skindata.equip.build, skindata.equip.file or GetSymbol_sivmask(dressup), item.GUID, "swap"
+                        nil, item._dd.build, item._dd.file or GetSymbol_sivmask(dressup), item.GUID, "swap"
                     )
-                    if skindata.equip.isopentop then
+                    if item._dd.isopentop then
                         dressup:SetDressOpenTop(itemswap)
                     else
                         dressup:SetDressTop(itemswap)
@@ -1244,7 +1237,6 @@ local dressup_data = {
                 )
                 dressup:SetDressOpenTop(itemswap)
             end
-
             return itemswap
         end,
         unequipfn = function(owner, item)
@@ -1254,46 +1246,8 @@ local dressup_data = {
             Fn_removeFollowFx(owner, "fx_l_sivmask")
         end
     },
-    siving_suit = {
-        isnoskin = true,
-        buildfn = function(dressup, item, buildskin)
-            local itemswap = {}
-
-            local skindata = item.components.skinedlegion:GetSkinedData()
-            if skindata ~= nil and skindata.equip ~= nil then
-                itemswap["swap_body"] = dressup:GetDressData(
-                    nil, skindata.equip.build, skindata.equip.file, item.GUID, "swap"
-                )
-            else
-                itemswap["swap_body"] = dressup:GetDressData(
-                    nil, "siving_suit", "swap_body", item.GUID, "swap"
-                )
-            end
-            itemswap["backpack"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
-
-            return itemswap
-        end
-    },
-    siving_suit_gold = {
-        isnoskin = true,
-        buildfn = function(dressup, item, buildskin)
-            local itemswap = {}
-
-            local skindata = item.components.skinedlegion:GetSkinedData()
-            if skindata ~= nil and skindata.equip ~= nil then
-                itemswap["swap_body"] = dressup:GetDressData(
-                    nil, skindata.equip.build, skindata.equip.file, item.GUID, "swap"
-                )
-            else
-                itemswap["swap_body"] = dressup:GetDressData(
-                    nil, "siving_suit_gold", "swap_body", item.GUID, "swap"
-                )
-            end
-            itemswap["backpack"] = dressup:GetDressData(nil, nil, nil, nil, "clear")
-
-            return itemswap
-        end
-    },
+    siving_suit = { isnoskin = true, buildfile = "siving_suit", buildsymbol = "swap_body" },
+    siving_suit_gold = { isnoskin = true, buildfile = "siving_suit_gold", buildsymbol = "swap_body" },
     hat_elepheetle = {
         isnoskin = true,
         buildfile = "hat_elepheetle",

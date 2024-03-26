@@ -352,12 +352,7 @@ local function OnSetBonusOff_beetlehat(inst)
     end
 end
 local function OnEquip_beetlehat(inst, owner)
-    -- local skindata = inst.components.skinedlegion:GetSkinedData()
-    -- if skindata ~= nil and skindata.equip ~= nil then
-    --     TOOLS_L.hat_on(inst, owner, skindata.equip.build, skindata.equip.file)
-    -- else
-        TOOLS_L.hat_on(inst, owner, "hat_elepheetle", "swap_hat")
-    -- end
+    TOOLS_L.hat_on(inst, owner, "hat_elepheetle", "swap_hat")
 
     if owner:HasTag("equipmentmodel") then --假人！
         return
@@ -650,26 +645,25 @@ local function GetSwapSymbol(owner)
     end
 end
 local function SetSymbols_sivmask(inst, owner)
-    local skindata = inst.components.skinedlegion:GetSkinedData()
-    if skindata ~= nil and skindata.equip ~= nil then
-        if skindata.equip.startfn ~= nil then
-            skindata.equip.startfn(inst, owner)
+    if inst._dd ~= nil then
+        local dd = inst._dd
+        if dd.startfn ~= nil then
+            dd.startfn(inst, owner)
             return
         end
-        if skindata.equip.isopentop then
-            TOOLS_L.hat_on_opentop(inst, owner, skindata.equip.build, skindata.equip.file or GetSwapSymbol(owner))
+        if dd.isopentop then
+            TOOLS_L.hat_on_opentop(inst, owner, dd.build, dd.file or GetSwapSymbol(owner))
         else
-            TOOLS_L.hat_on(inst, owner, skindata.equip.build, skindata.equip.file or GetSwapSymbol(owner))
+            TOOLS_L.hat_on(inst, owner, dd.build, dd.file or GetSwapSymbol(owner))
         end
     else
         TOOLS_L.hat_on_opentop(inst, owner, inst.prefab, GetSwapSymbol(owner))
     end
 end
 local function ClearSymbols_sivmask(inst, owner)
-    local skindata = inst.components.skinedlegion:GetSkinedData()
-    if skindata ~= nil and skindata.equip ~= nil then
-        if skindata.equip.endfn ~= nil then
-            skindata.equip.endfn(inst, owner)
+    if inst._dd ~= nil then
+        if inst._dd.endfn ~= nil then
+            inst._dd.endfn(inst, owner)
         end
     end
     TOOLS_L.hat_off(inst, owner)

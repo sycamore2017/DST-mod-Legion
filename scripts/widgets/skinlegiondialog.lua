@@ -2612,7 +2612,7 @@ local SkinData = {
             }
         }
     },
-    siving_ctlall_era = {
+    siving_ctlall_item_era = {
         string = ischinese and {
             collection = "ERA", access = "SPECIAL",
             descitem = "解锁\"子圭·利川\"、\"子圭·益矩\"、\"子圭·崇溟\"的皮肤。",

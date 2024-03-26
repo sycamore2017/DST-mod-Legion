@@ -64,14 +64,14 @@ local function SpawnFx(doer, target, inst)
 		owner = doer or inst
 	end
 	local x, y, z = owner.Transform:GetWorldPosition()
-	if inst.battery_fx_l ~= nil then
-		local fx = SpawnPrefab(inst.battery_fx_l.name)
+	if inst._dd ~= nil then
+		local fx = SpawnPrefab(inst._dd.name)
 		if fx ~= nil then
-			if inst.battery_fx_l.y ~= nil then
-				y = y + inst.battery_fx_l.y
+			if inst._dd.y ~= nil then
+				y = y + inst._dd.y
 			end
-			if inst.battery_fx_l.y_rand ~= nil then
-				y = y + math.random()*inst.battery_fx_l.y_rand
+			if inst._dd.y_rand ~= nil then
+				y = y + math.random()*inst._dd.y_rand
 			end
 			fx.Transform:SetPosition(x, y, z)
 		end
