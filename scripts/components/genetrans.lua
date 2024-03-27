@@ -142,23 +142,22 @@ function GeneTrans:InitAnims() --初始化各种动画
 	if self.fx == nil or not self.fx:IsValid() then
 		SpawnFx(self)
 	end
+	self.fx.AnimState:OverrideSymbol("swap", self.seeddata.swap.build, self.seeddata.swap.file)
+	if self.seeddata.swap.symboltype == "3" then
+		self.fx.AnimState:Show("SWAPFRUIT-3")
+		self.fx.AnimState:Hide("SWAPFRUIT-2")
+		self.fx.AnimState:Hide("SWAPFRUIT-1")
+	elseif self.seeddata.swap.symboltype == "2" then
+		self.fx.AnimState:Hide("SWAPFRUIT-3")
+		self.fx.AnimState:Show("SWAPFRUIT-2")
+		self.fx.AnimState:Hide("SWAPFRUIT-1")
+	else
+		self.fx.AnimState:Hide("SWAPFRUIT-3")
+		self.fx.AnimState:Hide("SWAPFRUIT-2")
+		self.fx.AnimState:Show("SWAPFRUIT-1")
+	end
 	if self.fn_setanim ~= nil then
 		self.fn_setanim(self, true)
-	else
-		self.fx.AnimState:OverrideSymbol("swap", self.seeddata.swap.build, self.seeddata.swap.file)
-		if self.seeddata.swap.symboltype == "3" then
-			self.fx.AnimState:Show("SWAPFRUIT-3")
-			self.fx.AnimState:Hide("SWAPFRUIT-2")
-			self.fx.AnimState:Hide("SWAPFRUIT-1")
-		elseif self.seeddata.swap.symboltype == "2" then
-			self.fx.AnimState:Hide("SWAPFRUIT-3")
-			self.fx.AnimState:Show("SWAPFRUIT-2")
-			self.fx.AnimState:Hide("SWAPFRUIT-1")
-		else
-			self.fx.AnimState:Hide("SWAPFRUIT-3")
-			self.fx.AnimState:Hide("SWAPFRUIT-2")
-			self.fx.AnimState:Show("SWAPFRUIT-1")
-		end
 	end
 end
 function GeneTrans:UpdateFxProgress() --更新果实进度动画

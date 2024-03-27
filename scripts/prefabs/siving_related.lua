@@ -467,7 +467,7 @@ local function MakeConstruct(data)
             inst.components.deployhelper.onenablehelper = OnEnableHelper_ctl
         end
 
-        LS_C_Init(inst, basename.."_item", false, "data_build")
+        LS_C_Init(inst, basename.."_item", false, "data_build", basename)
 
         inst.ctltype_l = data.ctltype
         TOOLS_L.InitMouseInfo(inst, Fn_dealdata_sivctl, Fn_getdata_sivctlcon, 1)
@@ -1206,7 +1206,7 @@ table.insert(prefs, Prefab("siving_soil", function() ------子圭垄
 
     inst:AddTag("soil_legion")
 
-    LS_C_Init(inst, "siving_soil_item", false, "data_soil")
+    LS_C_Init(inst, "siving_soil_item", false, "data_soil", "siving_soil")
 
     inst.entity:SetPristine()
     if not TheWorld.ismastersim then return inst end

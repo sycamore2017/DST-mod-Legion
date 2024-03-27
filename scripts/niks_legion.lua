@@ -784,9 +784,8 @@ local SKIN_DEFAULT_LEGION = {
     },
 
     icire_rock = {
+        anim = { bank = "heat_rock", build = "heat_rock", anim = 0, setable = true },
 		fn_start = function(inst, skined)
-            inst.AnimState:SetBank("heat_rock")
-            inst.AnimState:SetBuild("heat_rock")
             inst.AnimState:OverrideSymbol("rock", "icire_rock", "rock")
             inst.AnimState:OverrideSymbol("shadow", "icire_rock", "shadow")
             inst._dd = nil
@@ -849,7 +848,7 @@ local SKIN_DEFAULT_LEGION = {
     backcub = {
         image = { name = nil, atlas = nil, setable = true },
         anim = {
-            bank = "backcub", build = "backcub",
+            bank = nil, build = nil,
             anim = "anim", animpush = nil, isloop = true, setable = true
         },
         fn_start = Fn_start_equip,
@@ -1421,10 +1420,7 @@ local SKINS_LEGION = {
 		},
         image = { name = nil, atlas = nil, setable = false },
         string = ischinese and { name = "青蝶纸剑" } or { name = "Paper-fly Sword" },
-		fn_anim = function(inst)
-            inst.AnimState:SetBank("neverfade_paper")
-            inst.AnimState:SetBuild("neverfade_paper")
-        end,
+        anim = { bank = nil, build = nil, anim = 0, setable = true },
         fn_start = Fn_start_equipevent,
         equip = {
             symbol = "swap_object", doanim = true,
@@ -1467,10 +1463,7 @@ local SKINS_LEGION = {
 		},
         image = { name = nil, atlas = nil, setable = false },
         string = ischinese and { name = "绀蝶纸剑" } or { name = "Violet Paper-fly Sword" },
-		fn_anim = function(inst)
-            inst.AnimState:SetBank("neverfade_paper2")
-            inst.AnimState:SetBuild("neverfade_paper2")
-        end,
+        anim = { bank = nil, build = nil, anim = 0, setable = true },
         fn_start = Fn_start_equipevent,
         equip = {
             symbol = "swap_object", doanim = true,
@@ -1977,9 +1970,8 @@ local SKINS_LEGION = {
 		},
 		image = { name = nil, atlas = nil, setable = false },
         string = ischinese and { name = "占星石" } or { name = "Astrological Stone" },
+        anim = { bank = nil, build = nil, anim = 0, setable = true },
 		fn_start = function(inst, skined)
-            inst.AnimState:SetBank("icire_rock_collector")
-            inst.AnimState:SetBuild("icire_rock_collector")
             inst.AnimState:ClearOverrideSymbol("rock")
             inst.AnimState:ClearOverrideSymbol("shadow")
             inst._dd = skined and skined.temp or nil
@@ -1996,9 +1988,8 @@ local SKINS_LEGION = {
 		},
 		image = { name = nil, atlas = nil, setable = false },
         string = ischinese and { name = "风景球" } or { name = "Landscape Ball" },
+        anim = { bank = nil, build = nil, anim = 0, setable = true },
 		fn_start = function(inst, skined)
-            inst.AnimState:SetBank("icire_rock_day")
-            inst.AnimState:SetBuild("icire_rock_day")
             inst.AnimState:ClearOverrideSymbol("rock")
             inst.AnimState:ClearOverrideSymbol("shadow")
             inst._dd = skined and skined.temp or nil
@@ -2151,6 +2142,11 @@ local SKINS_LEGION = {
 		},
 		image = { name = nil, atlas = nil, setable = true },
         string = ischinese and { name = "饭豆子" } or { name = "Bean Fan" },
+        fn_anim = function(inst)
+            SetRandomSkinAnim(inst, {
+                "idle1", "idle1", "idle1", "idle1", "idle2", "idle3", "idle3"
+            })
+        end,
         fn_start = function(inst, skined)
             Fn_start_equip(inst, skined)
             inst.AnimState:SetBank("backcub_fans2")
@@ -2168,11 +2164,6 @@ local SKINS_LEGION = {
         end,
         fn_end_c = function(inst, skined)
             SetWidget(inst, "backcub")
-        end,
-        fn_anim = function(inst)
-            SetRandomSkinAnim(inst, {
-                "idle1", "idle1", "idle1", "idle1", "idle2", "idle3", "idle3"
-            })
         end,
         equip = { symbol = "swap_body", build = "backcub_fans2", file = "swap_body" },
         exchangefx = { prefab = nil, offset_y = nil, scale = nil },
@@ -2243,7 +2234,7 @@ local SKINS_LEGION = {
         string = ischinese and { name = "跃星杖" } or { name = "Star Leaping Staff" },
 		anim = {
             bank = nil, build = nil,
-            anim = nil, animpush = nil, isloop = true, --为啥要为true?
+            anim = nil, animpush = nil, isloop = nil, --为啥要为true?
             setable = true
         },
         fn_start = Fn_start_equip,
@@ -3488,6 +3479,9 @@ local ls_cache = { --所有玩家的已有皮肤缓存
     --     skinname2 = true,
     -- },
 }
+local ls_skinmap = { --根据已有皮肤产生的对应表，用以快速比对数据
+    -- skinname = userid
+}
 local ls_cache_ex = { --所有玩家的皮肤切换缓存
     -- Kxx_xxxx = { --用户ID
     --     prefab1 = "skinname1" --上次切换的皮肤名
@@ -3511,6 +3505,51 @@ local ls_delaychecktime = nil --上次延迟判断的系统时间
 local ls_skineddata = {} --单独复制出来的皮肤数据，用以暴露出去，会定期修正以防篡改
 local USERID = TheNet:GetUserID() or "OU_fake"
 local LSFNS
+local ls_buildmap = { --prefab，build与皮肤的对应表，用以比对动画
+    -- prefab = { --其中装有所有能用的build
+    --     buildname1 = 0, --代表原皮
+    --     buildname2 = skinname,
+    -- }
+    siving_ctlwater = {
+        siving_ctlwater = 0, siving_ctlwater_era = "siving_ctlwater_item_era"
+    },
+    siving_ctldirt = {
+        siving_ctldirt = 0, siving_ctldirt_era = "siving_ctldirt_item_era"
+    },
+    siving_ctlall = {
+        siving_ctlall = 0, siving_ctlall_era = "siving_ctlall_item_era"
+    },
+    siving_soil = {
+        siving_soil = 0, siving_soil_law = "siving_soil_item_law", siving_soil_law2 = "siving_soil_item_law2",
+        siving_soil_law3 = "siving_soil_item_law3"
+    },
+    hiddenmoonlight = {
+        hiddenmoonlight = 0, hiddenmoonlight_paper = "hiddenmoonlight_item_paper"
+    },
+    revolvedmoonlight = {
+        revolvedmoonlight = 0,
+        revolvedmoonlight_taste = {
+            revolvedmoonlight_item_taste = true, revolvedmoonlight_item_taste2 = true,
+            revolvedmoonlight_item_taste3 = true, revolvedmoonlight_item_taste4 = true
+        }
+    },
+    revolvedmoonlight_pro = {
+        revolvedmoonlight = 0,
+        revolvedmoonlight_taste = {
+            revolvedmoonlight_item_taste = true, revolvedmoonlight_item_taste2 = true,
+            revolvedmoonlight_item_taste3 = true, revolvedmoonlight_item_taste4 = true
+        }
+    },
+    backcub = {
+        backcub_thanks = "backcub_thanks", backcub_fans2 = "backcub_fans2"
+    },
+    siving_feather_real = {
+        siving_feather_real_collector = "siving_feather_real_collector"
+    },
+    siving_feather_fake = {
+        siving_feather_fake_collector = "siving_feather_fake_collector"
+    }
+}
 
 ------皮肤排序
 local skinidxes = {
@@ -3599,6 +3638,12 @@ for skinname, v in pairs(SKINS_LEGION) do
         if v.anim.setable ~= false then
             v.anim.setable = true
         end
+        local builds = ls_buildmap[v.base_prefab]
+        if builds == nil then
+            builds = {}
+            ls_buildmap[v.base_prefab] = builds
+        end
+        builds[v.anim.build] = skinname
 	end
     if v.floater ~= nil and v.floater.anim ~= nil then
         if v.anim ~= nil then
@@ -3629,12 +3674,10 @@ for skinname, v in pairs(SKINS_LEGION) do
     v.string = nil
 
     ------修改PREFAB_SKINS(在prefabskins.lua中被定义)
-    if v.base_prefab ~= nil then
-        if _G.PREFAB_SKINS[v.base_prefab] == nil then
-            _G.PREFAB_SKINS[v.base_prefab] = { skinname }
-        else
-            table.insert(_G.PREFAB_SKINS[v.base_prefab], skinname)
-        end
+    if _G.PREFAB_SKINS[v.base_prefab] == nil then
+        _G.PREFAB_SKINS[v.base_prefab] = { skinname }
+    else
+        table.insert(_G.PREFAB_SKINS[v.base_prefab], skinname)
     end
 end
 for baseprefab, v in pairs(SKIN_DEFAULT_LEGION) do
@@ -3643,6 +3686,12 @@ for baseprefab, v in pairs(SKIN_DEFAULT_LEGION) do
         if v.anim.setable ~= false then
             v.anim.setable = true
         end
+        local builds = ls_buildmap[baseprefab]
+        if builds == nil then
+            builds = {}
+            ls_buildmap[baseprefab] = builds
+        end
+        builds[v.anim.build] = 0
 	end
     if v.floater ~= nil and v.floater.anim ~= nil then
         if v.anim ~= nil then
@@ -3754,6 +3803,20 @@ local function FnRpc_s2s(shardid, handlename, data) --【服务器】
     SendModRPCToShard(GetShardModRPC("LegionSkin", handlename), shardid, datajson)
 end
 
+local function UpdateSkinMap(userid, skins)
+    if skins == nil then
+        return
+    end
+    for skinname, _ in pairs(skins) do
+        ls_skinmap[skinname] = userid
+    end
+end
+local function NewSkinMap()
+    ls_skinmap = {}
+    for userid, skins in pairs(ls_cache) do
+        UpdateSkinMap(userid, skins)
+    end
+end
 local function LS_IsTableEmpty(t)
     return t == nil or next(t) == nil
 end
@@ -3834,22 +3897,28 @@ local function LS_SkinCache2File() --【服务器、客户端】将皮肤数据�
 end
 local function SkinFile2Cache() --【服务器、客户端】读取皮肤文件为缓存
     if IsServer then
+        --不开洞穴的服务器进程时，sharrdiindex 文件是读取不到的
         TheSim:GetPersistentString("sharrdiindex", function(load_success, datajson)
             dirty_cache = not load_success
+            print("1111"..tostring(load_success)..tostring(datajson ~= nil))
             if load_success and datajson ~= nil then
+                print("2222")
                 local status, data = pcall(function() return json.decode(datajson) end)
                 if status and data ~= nil then
+                    print("来啦："..tostring(data.origin))
+                    print("来啦2："..tostring(TheNet:GetSessionIdentifier()))
                     if
-                        data.dd ~= nil and type(data.dd) == "table" and
-                        data.origin ~= nil and data.origin == TheNet:GetSessionIdentifier() --验证世界id
+                        data.dd ~= nil and type(data.dd) == "table"
+                        -- data.origin ~= nil and data.origin == TheNet:GetSessionIdentifier() --验证世界id
                     then
                         for kleiid, skins in pairs(data.dd) do
-                            if ls_players[kleiid] then --只有进过该档的玩家的数据才能被使用，防止别人直接替换缓存文件
+                            if ls_players[kleiid] then --只有进过该档的玩家的数据才能被使用
                                 local newdd = {}
                                 if type(skins) == "table" then
                                     for skinname, has in pairs(skins) do
                                         if SKINS_LEGION[skinname] ~= nil then --判断皮肤有效性
                                             newdd[skinname] = true
+                                            ls_skinmap[skinname] = kleiid
                                         end
                                     end
                                 end
@@ -3859,6 +3928,7 @@ local function SkinFile2Cache() --【服务器、客户端】读取皮肤文件�
                     end
                 end
             end
+            print("服务器："..tostring(LS_IsTableEmpty(ls_skinmap)))
         end)
     end
     if not TheNet:IsDedicated() then --客户端或者不带洞穴的服务器
@@ -3875,6 +3945,7 @@ local function SkinFile2Cache() --【服务器、客户端】读取皮肤文件�
                                 for skinname, has in pairs(myskins) do
                                     if SKINS_LEGION[skinname] ~= nil then --判断皮肤有效性
                                         newdd[skinname] = true
+                                        -- ls_skinmap[skinname] = USERID
                                     end
                                 end
                                 ls_cache[USERID] = newdd
@@ -3886,6 +3957,7 @@ local function SkinFile2Cache() --【服务器、客户端】读取皮肤文件�
                                     for skinname, has in pairs(skins) do
                                         if SKINS_LEGION[skinname] ~= nil then
                                             newdd[skinname] = true
+                                            -- ls_skinmap[skinname] = USERID
                                         end
                                     end
                                     ls_cache[USERID] = newdd
@@ -3922,6 +3994,7 @@ local function SkinFile2Cache() --【服务器、客户端】读取皮肤文件�
                     end
                 end
             end
+            print("客户端："..tostring(LS_IsTableEmpty(ls_skinmap)))
         end)
     end
 end
@@ -4272,6 +4345,7 @@ local function LS_N_GetSkins(userid, force) --【网络】【服务器】获取�
             dirty_cache = true
             SetSkinReward(skins) --奖励皮肤
             ls_cache[userid] = skins --服务器传来的数据是啥就是啥
+            UpdateSkinMap(userid, skins)
             local nums = SkinCache2Numbers(skins)
             FnRpc_s2c(userid, "UpdateSkinsClient", nums)
             if TheWorld.ismastershard then --主世界才需要向副世界发送皮肤数据
@@ -4316,10 +4390,16 @@ end
 
 local function PeriodicPatrol(inst, list, idx, numall)
     if list[idx] == nil then
+        inst:DoTaskInTime(10, function()
+            NewSkinMap()
+        end)
         return
     end
     LS_N_GetSkins(list[idx], false)
     if idx >= numall then
+        inst:DoTaskInTime(10, function()
+            NewSkinMap()
+        end)
         return
     end
     inst:DoTaskInTime(2+3*math.random(), function()
@@ -4531,7 +4611,42 @@ local function LS_C_Set(self)
         self.inst:ListenForEvent("pskin_idx_l_dirty", C_SetPSkinClient)
     end
 end
-local function LS_C_Init(inst, prefab, isfloat, overkey)
+local function CheckBuildValid(prefab, build)
+    if build == nil then
+        return false
+    end
+    local dd = ls_buildmap[prefab][build]
+    if dd == nil then --该build没有记录
+        return true
+    elseif dd == 0 then
+        return false
+    else
+        if type(dd) == "table" then
+            for skinname, _ in pairs(dd) do
+                if ls_skinmap[skinname] ~= nil then
+                    return false
+                end
+            end
+            return true
+        elseif SKIN_IDS_LEGION.ooooonononon[dd] then
+            return false
+        elseif ls_skinmap[dd] == nil then --build对应的皮肤是无人拥有的
+            return true
+        end
+    end
+    return false
+end
+local hook_SetBuild = IsServer and UserDataHook.MakeHook("AnimState", "SetBuild", function(inst, build, ...)
+    if inst.prefab ~= nil and inst.prefab ~= "" and ls_buildmap[inst.prefab] then
+        local res = CheckBuildValid(inst.prefab, build)
+        if res then
+            print("build是是："..tostring(build))
+        end
+        return res
+    end
+    return false
+end) or nil
+local function LS_C_Init(inst, prefab, isfloat, overkey, realprefab)
     inst:AddComponent("skinedlegion")
     local self = inst.components.skinedlegion
     self.prefab = prefab --客户端才初始化时居然获取不了inst.prefab，所以才要靠参数传过来
@@ -4564,6 +4679,22 @@ local function LS_C_Init(inst, prefab, isfloat, overkey)
 	else
 		MakeInventoryFloatable(inst)
 	end
+
+    if IsServer then
+        local name = realprefab or prefab
+        if name ~= nil and ls_buildmap[name] ~= nil then
+            if CheckBuildValid(name, inst.AnimState:GetBuild()) then
+                print("build是："..tostring(inst.AnimState:GetBuild()))
+                for build, skin in pairs(ls_buildmap[name]) do
+                    if skin == 0 then
+                        inst.AnimState:SetBuild(build)
+                        break
+                    end
+                end
+            end
+            UserDataHook.Hook(inst, hook_SetBuild)
+        end
+    end
 end
 local function C_SetProblemSkin(self, skinname)
     if skinname == nil then
@@ -4640,7 +4771,7 @@ local function C_SpawnSkinExchangeFx(inst, skinname, tool)
 		end
 	end
 end
-local function SetSkinEx(inst) --这样做是为了在重载游戏时，更新玩家身上的装备贴图
+local function SetSkinEx(inst) --这样做是为了在切换皮肤时，更新玩家身上的装备贴图
     local owner = GetEquippedOwner(inst)
     if owner ~= nil and owner.components.inventory ~= nil then
         local item = owner.components.inventory:Unequip(inst.components.equippable.equipslot)
@@ -4656,23 +4787,13 @@ LS_C_SetSkin = function(self, skinname, userid)
 
     local inst = self.inst
     if skinname ~= nil then
-        if userid ~= nil and not LS_HasSkin(skinname, userid) then
-            userid = nil
-        end
-        if userid == nil then
-			for id, value in pairs(ls_cache) do
-                if ls_players[id] then --进过这个档的玩家才能被视作有效
-                    if value[skinname] then
-                        userid = id
-                        break
-                    end
-                end
-			end
+        if not LS_HasSkin(skinname, userid) then
+            userid = ls_skinmap[skinname]
             if userid == nil then
                 C_SetProblemSkin(self, skinname)
                 return
             end
-		end
+        end
     end
     if self.problemskin ~= nil then
         C_SetProblemSkin(self, nil)
@@ -4756,7 +4877,7 @@ LS_C_SetSkin = function(self, skinname, userid)
         self.userid = userid
         inst.skinname = skinname
     end
-    if inst.components.equippable ~= nil then --为了更新玩家的装备贴图
+    if inst.components.equippable ~= nil and inst.components.equippable:IsEquipped() then --为了更新玩家的装备贴图
         if inst.task_ls_ex ~= nil then
             inst.task_ls_ex:Cancel()
         end
@@ -4899,7 +5020,9 @@ AddModRPCHandler("LegionSkin", "SendClientSkins", function(player, datajson)
         if not success or type(data) ~= "table" then
             return
         end
-        ls_cache[player.userid] = SkinNumbers2Cache(data)
+        local newskins = SkinNumbers2Cache(data)
+        ls_cache[player.userid] = newskins
+        UpdateSkinMap(player.userid, newskins)
     end
     dirty_cache = true
     --此处为极端情况下获取皮肤方式，所以不需要向别的服务器发送皮肤数据
@@ -4947,7 +5070,9 @@ AddShardModRPCHandler("LegionSkin", "UpdateSkinsShard", function(shardid, datajs
     if data.nums == nil then
         ls_cache[data.userid] = nil
     elseif type(data.nums) == "table" then
-        ls_cache[data.userid] = SkinNumbers2Cache(data.nums)
+        local newskins = SkinNumbers2Cache(data.nums)
+        ls_cache[data.userid] = newskins
+        UpdateSkinMap(data.userid, newskins)
     end
     dirty_cache = true
 end)

@@ -140,7 +140,7 @@ local function UpdateImg_never(inst)
             inst.components.inventoryitem:ChangeImageName("neverfade")
         end
     else
-        if inst.hasSetBroken then
+        if inst.hassetbroken then
             inst.components.inventoryitem.atlasname = inst._dd.img_atlas2
             inst.components.inventoryitem:ChangeImageName(inst._dd.img_tex2)
             if inst._dd.doanim then

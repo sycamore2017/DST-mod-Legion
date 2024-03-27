@@ -340,7 +340,7 @@ table.insert(prefs, Prefab("hiddenmoonlight", function()
 
     InitLevelNet(inst, Fn_nameDetail_hidden)
 
-    LS_C_Init(inst, "hiddenmoonlight_item", false, "data_up")
+    LS_C_Init(inst, "hiddenmoonlight_item", false, "data_up", "hiddenmoonlight")
 
     inst.entity:SetPristine()
     if not TheWorld.ismastersim then
@@ -846,10 +846,10 @@ local function MakeRevolved(sets)
         if sets.ispro then
             inst.AnimState:OverrideSymbol("decorate", "revolvedmoonlight", "decoratepro")
             inst:SetPrefabNameOverride("revolvedmoonlight")
-            LS_C_Init(inst, "revolvedmoonlight_item", true, "data_uppro")
+            LS_C_Init(inst, "revolvedmoonlight_item", true, "data_uppro", sets.name)
             InitLevelNet(inst, Fn_nameDetail_revolved2)
         else
-            LS_C_Init(inst, "revolvedmoonlight_item", true, "data_up")
+            LS_C_Init(inst, "revolvedmoonlight_item", true, "data_up", sets.name)
             InitLevelNet(inst, Fn_nameDetail_revolved)
         end
 

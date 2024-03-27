@@ -1028,7 +1028,7 @@ local dressup_data = {
             local itemswap = {}
 
             if item._dd ~= nil then
-                if item.hasSetBroken then
+                if item.hassetbroken then
                     itemswap["swap_object"] = dressup:GetDressData(
                         nil, item._dd.build2, item._dd.file2, item.GUID, "swap"
                     )
@@ -1038,7 +1038,7 @@ local dressup_data = {
                     )
                 end
             else
-                if item.hasSetBroken then
+                if item.hassetbroken then
                     itemswap["swap_object"] = dressup:GetDressData(
                         nil, "swap_neverfade_broken", "swap_neverfade_broken", item.GUID, "swap"
                     )
