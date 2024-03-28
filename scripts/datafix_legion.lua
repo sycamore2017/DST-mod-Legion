@@ -1807,7 +1807,10 @@ end
 
 if IsServer then
     AddPrefabPostInit("world", function(inst)
+        inst:AddComponent("worldsaverlegion")
+
         LS_StartPeriodicPatrol(inst)
+
         if CONFIGS_LEGION.BACKCUBCHANCE > 0 and LootTables['bearger'] then --熊獾会掉落靠背熊
             table.insert(LootTables['bearger'], { 'backcub', CONFIGS_LEGION.BACKCUBCHANCE })
         end
