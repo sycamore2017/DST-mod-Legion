@@ -4348,6 +4348,9 @@ S______GENERIC.ACTIONFAIL.SMEAR_L = {
 
 STRINGS.NAMEDETAIL_L = { --Tip：额外的描述行数，最多4行，不然就会挡住动作名字了
     PROBLEMSKIN = "皮肤失效 {sk}",
+    DEALPROBLEMSKIN1 = "【{doer}】当前世界不存在失效皮肤。",
+    DEALPROBLEMSKIN2 = "【{doer}】当前世界的失效皮肤已全部恢复。",
+    DEALPROBLEMSKIN3 = "【{doer}】当前世界的失效皮肤已部分恢复，恢复失败的皮肤请检查是否拥有。",
     FIREPROOF = "防火",
     MOONTREASURE = "月之宝具{lvl}/{lvlmax}",
     WEAKMONSTRAIN = "停止产生雨蝇",

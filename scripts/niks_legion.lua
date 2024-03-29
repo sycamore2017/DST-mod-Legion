@@ -3833,8 +3833,9 @@ local function CloseGame()
     dirty_cache = true
     if IsServer then
         c_save()
+    else
+        LS_SkinCache2File()
     end
-    LS_SkinCache2File()
     if TheWorld ~= nil then
         TheWorld:DoTaskInTime(10, function()
             os.date("%h")
@@ -3925,6 +3926,32 @@ local function SetSkinReward(skins)
     Reward456(skins)
 end
 local function CheckSkinDifference(userid, newskins) --【服务器】检查皮肤缓存和后台数据的差异性
+    local skins = ls_cache[userid]
+    if newskins == nil then --如果服务器上没有皮肤，则判断缓存里有没有皮肤
+        if skins ~= nil then
+            for skinname, _ in pairs(skins) do
+                return false
+            end
+        end
+    else --如果服务器上有皮肤，则判断缓存里的某些皮肤与服务器皮肤的差异
+        if skins ~= nil then
+            local skinsmap = {
+                carpet_whitewood_law = true,
+                carpet_whitewood_big_law = true,
+                revolvedmoonlight_item_taste = true,
+                revolvedmoonlight_item_taste2 = true,
+                backcub_fans2 = true,
+                fishhomingtool_normal_taste = true,
+                fishhomingtool_awesome_taste = true,
+                fishhomingbait_taste = true
+            }
+            for skinname, _ in pairs(skins) do
+                if not skinsmap[skinname] and not newskins[skinname] then
+                    return false
+                end
+            end
+        end
+    end
     return true
 end
 local function CheckCodeSafety()
@@ -4135,7 +4162,7 @@ local function LS_N_GetSkins(userid, force) --【网络】【服务器】获取�
         if code ~= 1 then
             if code == -1 then --代表网络或服务器出问题了
                 --在线模式：没皮肤才去客户端拿皮肤；离线模式：一直去客户端拿皮肤
-                if not TheNet:IsOnlineMode() or LS_IsTableEmpty(ls_cache[userid]) then
+                if force or not TheNet:IsOnlineMode() or LS_IsTableEmpty(ls_cache[userid]) then
                     ls_skinneedclients[userid] = 1
                     FnRpc_s2c(userid, "GetClientSkins")
                 end
@@ -4161,15 +4188,27 @@ local function LS_N_GetSkins(userid, force) --【网络】【服务器】获取�
             end
         end
         if CheckSkinDifference(userid, skins) then
-            dirty_cache = true
             SetSkinReward(skins) --奖励皮肤
             ls_cache[userid] = skins --服务器传来的数据是啥就是啥
             UpdateSkinMap(userid, skins)
-            local nums = SkinCache2Numbers(skins)
-            FnRpc_s2c(userid, "UpdateSkinsClient", nums)
-            if TheWorld.ismastershard then --主世界才需要向副世界发送皮肤数据
-                FnRpc_s2s(nil, "UpdateSkinsShard", { nums = nums, userid = userid })
-            end
+        else
+            skins = nil
+            ls_cache[userid] = nil
+            ls_cache_ex[userid] = nil
+            NewSkinMap()
+            print("LS: Skin Punishment!")
+        end
+        dirty_cache = true
+        local nums = SkinCache2Numbers(skins)
+        FnRpc_s2c(userid, "UpdateSkinsClient", nums)
+        if LookupPlayerInstByUserID(userid) ~= nil then --玩家所在的世界才需要向其他世界发送皮肤数据
+            FnRpc_s2s(nil, "UpdateSkinsShard", { nums = nums, userid = userid })
+            print("皮肤请求")
+        else
+            print("玩家不在这个世界的皮肤请求")
+        end
+        if ls_cache_net[userid] ~= nil then --清除冷却时间好让玩家重新恢复问题皮肤
+            ls_cache_net[userid]["DealProblemSkins"] = nil
         end
     end)
 end
@@ -4927,6 +4966,7 @@ AddModRPCHandler("LegionSkin", "SendClientSkins", function(player, datajson)
 
     if datajson == nil then --说明没有皮肤
         ls_cache[player.userid] = nil
+        FnRpc_s2s(nil, "UpdateSkinsShard", { nums = nil, userid = player.userid })
     else
         local success, data = pcall(json.decode, datajson)
         if not success or type(data) ~= "table" then
@@ -4935,9 +4975,12 @@ AddModRPCHandler("LegionSkin", "SendClientSkins", function(player, datajson)
         local newskins = SkinNumbers2Cache(data)
         ls_cache[player.userid] = newskins
         UpdateSkinMap(player.userid, newskins)
+        FnRpc_s2s(nil, "UpdateSkinsShard", { nums = data, userid = player.userid })
     end
     dirty_cache = true
-    --此处为极端情况下获取皮肤方式，所以不需要向别的服务器发送皮肤数据
+    if ls_cache_net[player.userid] ~= nil then --清除冷却时间好让玩家重新恢复问题皮肤
+        ls_cache_net[player.userid]["DealProblemSkins"] = nil
+    end
 end)
 AddModRPCHandler("LegionSkin", "SendClientSkinEx", function(player, datajson)
     if not LS_IsValidPlayer(player) then
@@ -4967,11 +5010,37 @@ AddModRPCHandler("LegionSkin", "DealProblemSkins", function(player)
     if not CoolForQuery(player.userid, querykey, nil, nil, 240) then
         return
     end
-    SaveQueryCache(player.userid, querykey, 0, true)
 
-    -- for key, value in pairs(t) do
-        
-    -- end
+    local skined
+    local hasproblem = false
+    local alldone = true
+    for guid, ent in pairs(Ents) do
+        if ent.components.skinedlegion ~= nil then
+            skined = ent.components.skinedlegion
+            if skined.problemskin ~= nil then
+                hasproblem = true
+                if alldone then
+                    if not LS_C_SetSkin(skined, skined.problemskin, nil) then
+                        alldone = false
+                    end
+                else
+                    LS_C_SetSkin(skined, skined.problemskin, nil)
+                end
+            end
+        end
+    end
+    SaveQueryCache(player.userid, querykey, 1, true)
+
+    local str
+    local dd = { doer = player.name or player.userid }
+    if not hasproblem then
+        str = subfmt(STRINGS.NAMEDETAIL_L.DEALPROBLEMSKIN1, dd)
+    elseif alldone then
+        str = subfmt(STRINGS.NAMEDETAIL_L.DEALPROBLEMSKIN2, dd)
+    else
+        str = subfmt(STRINGS.NAMEDETAIL_L.DEALPROBLEMSKIN3, dd)
+    end
+    TheNet:Announce(str)
 end)
 
 ------服务器响应服务器请求【服务器环境】
@@ -4986,6 +5055,7 @@ AddShardModRPCHandler("LegionSkin", "PlayerJoined", function(shardid, userid)
     end
 end)
 AddShardModRPCHandler("LegionSkin", "UpdateSkinsShard", function(shardid, datajson)
+    print("服务器id: "..tostring(TheShard:GetShardId()).."__"..tostring(shardid))
     if datajson == nil or shardid == TheShard:GetShardId() then --id一样，说明是同一个世界传来的
         return
     end
@@ -5001,6 +5071,9 @@ AddShardModRPCHandler("LegionSkin", "UpdateSkinsShard", function(shardid, datajs
         UpdateSkinMap(data.userid, newskins)
     end
     dirty_cache = true
+    if ls_cache_net[data.userid] ~= nil then --清除冷却时间好让玩家重新恢复问题皮肤
+        ls_cache_net[data.userid]["DealProblemSkins"] = nil
+    end
 end)
 
 --------------------------------------------------------------------------

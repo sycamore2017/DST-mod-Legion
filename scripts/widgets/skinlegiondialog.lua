@@ -3133,6 +3133,19 @@ local SkinLegionDialog = Class(Widget, function(self, owner)
     self.button_regetskins:SetScale(0.65)
     self.button_regetskins:SetPosition(x_btn+110, y_btn-5)
 
+    --恢复问题皮肤按钮
+    self.button_problemskin = self.proot:AddChild(TEMPLATES.IconButton(
+        "images/button_icons.xml", "random.tex", "恢复当前世界的失效皮肤", false, false,
+        function()
+            FnRpc_c2s("DealProblemSkins", nil)
+        end,
+        nil, "self_inspect_mod.tex"
+    ))
+    self.button_problemskin.icon:SetScale(.15)
+    self.button_problemskin.icon:SetPosition(-5, 6)
+    self.button_problemskin:SetScale(0.65)
+    self.button_problemskin:SetPosition(x_btn+170, y_btn-5)
+
     self.selected_item = nil
     self.context_popup = nil
     self.items = nil

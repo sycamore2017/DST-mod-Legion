@@ -4124,6 +4124,9 @@ S______GENERIC.ACTIONFAIL.SMEAR_L = {
 
 STRINGS.NAMEDETAIL_L = {
     PROBLEMSKIN = "SkinError ({sk})",
+    DEALPROBLEMSKIN1 = "[{doer}] There are no expired skins in the current world.",
+    DEALPROBLEMSKIN2 = "[{doer}] All expired skins in the current world have been restored.",
+    DEALPROBLEMSKIN3 = "[{doer}] The current world's expired skins have been partially restored. Please check the ownership of those failed skins.",
     FIREPROOF = "Fireproof",
     MOONTREASURE = "Moon Treasure {lvl}/{lvlmax}",
     WEAKMONSTRAIN = "Production of Raindonate Stops",
