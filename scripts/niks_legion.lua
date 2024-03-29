@@ -1939,15 +1939,13 @@ local SKINS_LEGION = {
 		image = { name = nil, atlas = nil, setable = true },
         string = ischinese and { name = "浮生儿" } or { name = "Foosen" },
 		fn_anim = function(inst)
+            inst.AnimState:SetBank("backcub_thanks")
+            inst.AnimState:SetBuild("backcub_thanks")
             SetRandomSkinAnim(inst, {
                 "idle1", "idle1", "idle1", "idle2", "idle3", "idle3", "idle4", "idle5"
             })
         end,
-        fn_start = function(inst, skined)
-            Fn_start_equip(inst, skined)
-            inst.AnimState:SetBank("backcub_thanks")
-            inst.AnimState:SetBuild("backcub_thanks")
-        end,
+        fn_start = Fn_start_equip,
         fn_end = function(inst, skined)
             CancelRandomSkinAnim(inst)
         end,
@@ -1956,6 +1954,8 @@ local SKINS_LEGION = {
         floater = {
             cut = nil, size = "med", offset_y = 0.1, scale = 0.9, nofx = nil,
             fn_anim = function(inst)
+                inst.AnimState:SetBank("backcub_thanks")
+                inst.AnimState:SetBuild("backcub_thanks")
                 SetRandomSkinAnim(inst, {
                     "idle1_water", "idle1_water", "idle1_water", "idle2_water",
                     "idle3_water", "idle3_water", "idle4_water", "idle5_water"
@@ -1973,14 +1973,14 @@ local SKINS_LEGION = {
 		image = { name = nil, atlas = nil, setable = true },
         string = ischinese and { name = "饭豆子" } or { name = "Bean Fan" },
         fn_anim = function(inst)
+            inst.AnimState:SetBank("backcub_fans2")
+            inst.AnimState:SetBuild("backcub_fans2")
             SetRandomSkinAnim(inst, {
                 "idle1", "idle1", "idle1", "idle1", "idle2", "idle3", "idle3"
             })
         end,
         fn_start = function(inst, skined)
             Fn_start_equip(inst, skined)
-            inst.AnimState:SetBank("backcub_fans2")
-            inst.AnimState:SetBuild("backcub_fans2")
             inst.components.container:Close()
             inst.components.container:WidgetSetup("backcub_fans2")
         end,
@@ -2000,6 +2000,8 @@ local SKINS_LEGION = {
         floater = {
             cut = nil, size = "med", offset_y = 0.1, scale = 0.9, nofx = nil,
             fn_anim = function(inst)
+                inst.AnimState:SetBank("backcub_fans2")
+                inst.AnimState:SetBuild("backcub_fans2")
                 SetRandomSkinAnim(inst, {
                     "idle1_water", "idle1_water", "idle1_water", "idle2_water"
                 })
@@ -4053,7 +4055,7 @@ local function CheckCodeSafety()
                 ["660579cace45c22cf18e4a87"] = true, --前六
             }
         },
-        siving_ctlall_era = {
+        siving_ctlall_item_era = {
             id = "64759cc569b4f368be452b14",
             linkids = {
                 ["642c14d9f2b67d287a35d439"] = true, --5
@@ -4203,9 +4205,6 @@ local function LS_N_GetSkins(userid, force) --【网络】【服务器】获取�
         FnRpc_s2c(userid, "UpdateSkinsClient", nums)
         if LookupPlayerInstByUserID(userid) ~= nil then --玩家所在的世界才需要向其他世界发送皮肤数据
             FnRpc_s2s(nil, "UpdateSkinsShard", { nums = nums, userid = userid })
-            print("皮肤请求")
-        else
-            print("玩家不在这个世界的皮肤请求")
         end
         if ls_cache_net[userid] ~= nil then --清除冷却时间好让玩家重新恢复问题皮肤
             ls_cache_net[userid]["DealProblemSkins"] = nil
@@ -4298,8 +4297,8 @@ local function LS_StartPeriodicPatrol(inst) --周期更新所有玩家的皮肤�
     if task_periodicpatrol ~= nil then
         task_periodicpatrol:Cancel()
     end
-    -- task_periodicpatrol = inst:DoPeriodicTask(4800, DoPeriodicPatrol, 240+240*math.random())
-    task_periodicpatrol = inst:DoPeriodicTask(400, DoPeriodicPatrol, 15)
+    task_periodicpatrol = inst:DoPeriodicTask(4800, DoPeriodicPatrol, 240+240*math.random())
+    -- task_periodicpatrol = inst:DoPeriodicTask(400, DoPeriodicPatrol, 15)
 end
 
 ------
@@ -5055,7 +5054,6 @@ AddShardModRPCHandler("LegionSkin", "PlayerJoined", function(shardid, userid)
     end
 end)
 AddShardModRPCHandler("LegionSkin", "UpdateSkinsShard", function(shardid, datajson)
-    print("服务器id: "..tostring(TheShard:GetShardId()).."__"..tostring(shardid))
     if datajson == nil or shardid == TheShard:GetShardId() then --id一样，说明是同一个世界传来的
         return
     end
@@ -5074,6 +5072,7 @@ AddShardModRPCHandler("LegionSkin", "UpdateSkinsShard", function(shardid, datajs
     if ls_cache_net[data.userid] ~= nil then --清除冷却时间好让玩家重新恢复问题皮肤
         ls_cache_net[data.userid]["DealProblemSkins"] = nil
     end
+    SaveQueryCache(data.userid, "GetSkins", 1, true) --刷新冷却时间，防止重复请求
 end)
 
 --------------------------------------------------------------------------

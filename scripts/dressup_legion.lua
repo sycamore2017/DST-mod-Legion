@@ -749,6 +749,9 @@ local dressup_data = {
             Fn_removeFollowFx(item, "fx")
         end
     },
+    moon_mushroomhat = { buildfile = "hat_moon_mushroom", buildsymbol = "swap_hat" },
+    scrap_monoclehat = { isopentop = true, buildfile = "hat_scrap_monocle", buildsymbol = "swap_hat" },
+    scraphat = { buildfile = "hat_scrap", buildsymbol = "swap_hat" },
 
     -------------------------------
     --身体-------------------------
@@ -878,6 +881,21 @@ local dressup_data = {
         end,
         unequipfn = function(owner, item)
             Fn_removeFollowFx(owner, "fx_d_armor_lunarplant")
+            -- owner.AnimState:SetSymbolLightOverride("swap_body", 0)
+        end,
+        onequipfn = function(owner, item)
+            Fn_removeFollowFx(item, "fx")
+            -- owner.AnimState:SetSymbolLightOverride("swap_body", 0)
+        end
+    },
+    armor_lunarplant_husk = {
+        buildfile = "armor_lunarplant_husk", buildsymbol = "swap_body",
+        equipfn = function(owner, item)
+            Fn_setFollowFx(owner, "fx_d_armor_lunarplant_husk", "armor_lunarplant_husk_glow_fx")
+            -- owner.AnimState:SetSymbolLightOverride("swap_body", .1)
+        end,
+        unequipfn = function(owner, item)
+            Fn_removeFollowFx(owner, "fx_d_armor_lunarplant_husk")
             -- owner.AnimState:SetSymbolLightOverride("swap_body", 0)
         end,
         onequipfn = function(owner, item)

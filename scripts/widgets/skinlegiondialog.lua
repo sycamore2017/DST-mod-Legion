@@ -3144,7 +3144,7 @@ local SkinLegionDialog = Class(Widget, function(self, owner)
     self.button_problemskin.icon:SetScale(.15)
     self.button_problemskin.icon:SetPosition(-5, 6)
     self.button_problemskin:SetScale(0.65)
-    self.button_problemskin:SetPosition(x_btn+170, y_btn-5)
+    self.button_problemskin:SetPosition(x_btn+150, y_btn-5)
 
     self.selected_item = nil
     self.context_popup = nil
