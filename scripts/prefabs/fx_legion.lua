@@ -916,6 +916,25 @@ MakeFx({ --霹雳神灯：摩擦电
         inst:ListenForEvent("animover", OnAnimOver_eleccore)
     end
 })
+MakeFx({ --占星石：发光特效
+    name = "icire_rock_fx_collector",
+    assets = {
+        Asset("ANIM", "anim/skin/icire_rock_fx_collector.zip")
+    },
+    fn_common = nil,
+    fn_anim = function(inst)
+        inst.AnimState:SetBank("icire_rock_fx_collector")
+        inst.AnimState:SetBuild("icire_rock_fx_collector")
+        inst.AnimState:PlayAnimation(math.random() < 0.5 and "idle1" or "idle2")
+        inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
+        inst.AnimState:SetFinalOffset(1)
+        inst.AnimState:SetLightOverride(.5)
+        if math.random() < 0.5 then
+            inst.AnimState:OverrideSymbol("sparkle", "icire_rock_fx_collector", "sparkle2")
+        end
+    end,
+    fn_remove = nil
+})
 
 ------
 --尘世蜃楼
@@ -1177,9 +1196,13 @@ MakeFx({ --旅星猫：投射路径特效
         inst.AnimState:SetBank("goldnugget")
         inst.AnimState:SetBuild("siving_feather_collector_fx")
         inst.AnimState:PlayAnimation("sparkle")
-        inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
+        inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")  --使整个动画有光晕效果
         inst.AnimState:SetFinalOffset(1)
         inst.AnimState:SetFrame(math.random( math.floor(inst.AnimState:GetCurrentAnimationNumFrames()/2) ) - 1)
+
+        -- inst.AnimState:SetSymbolBloom("sparkle") --使某通道贴图有光晕效果
+        -- inst.AnimState:SetSymbolLightOverride("sparkle", .5) --使某通道贴图不被黑暗色调覆盖，范围0-1，值越大越亮
+        inst.AnimState:SetLightOverride(.5) --使整个动画不被黑暗色调覆盖，范围0-1，值越大越亮
 
         if math.random() < 0.4 then
             inst.AnimState:OverrideSymbol("sparkle", "siving_feather_collector_fx", "star2")
@@ -1208,6 +1231,7 @@ MakeFx({ --流星猫：投射路径特效
         inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
         inst.AnimState:SetFinalOffset(1)
         inst.AnimState:SetFrame(math.random( math.floor(inst.AnimState:GetCurrentAnimationNumFrames()/2) ) - 1)
+        inst.AnimState:SetLightOverride(.5)
 
         if math.random() < 0.6 then
             inst.AnimState:OverrideSymbol("sparkle", "siving_feather_collector_fx", "star2")

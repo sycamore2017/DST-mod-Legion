@@ -748,8 +748,8 @@ local function OnOwnerChange(inst)
 
     inst._owners = newowners
 
-    --暗影容器里，打开时会自动掉地上，防止崩溃
-    if owner and owner:HasTag("pocketdimension_container") then
+    --世界容器里，打开时会自动掉地上，防止崩溃
+    if owner:HasTag("pocketdimension_container") then
         inst.components.container.droponopen = true
     else
         inst.components.container.droponopen = nil

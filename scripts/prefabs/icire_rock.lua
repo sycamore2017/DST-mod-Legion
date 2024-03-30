@@ -77,8 +77,8 @@ local function UpdateImages(inst, range)
         inst.components.inventoryitem.atlasname = "images/inventoryimages_skin/"..newname..".xml"
         inst.components.inventoryitem:ChangeImageName(newname)
         canbloom = inst._dd.canbloom
-        if inst._dd.fn_temp ~= nil then
-            inst._dd.fn_temp(inst, range)
+        if inst._dd.tempfn ~= nil then
+            inst._dd.tempfn(inst, range)
         end
     else
         inst.components.inventoryitem.atlasname = "images/inventoryimages/"..newname..".xml"
@@ -150,7 +150,7 @@ local function OnOwnerChange(inst)
 
     inst._light.entity:SetParent(owner.entity)
 
-    for k, v in pairs(inst._owners) do
+    for k, _ in pairs(inst._owners) do
         if k:IsValid() then
             inst:RemoveEventCallback("onputininventory", inst._onownerchange, k)
             inst:RemoveEventCallback("ondropped", inst._onownerchange, k)
@@ -158,9 +158,33 @@ local function OnOwnerChange(inst)
     end
 
     inst._owners = newowners
+
+    if owner:HasTag("pocketdimension_container") then
+        inst.inworldbox_l = true
+        if inst._dd ~= nil and inst._dd.entsleepfn ~= nil then
+            inst._dd.entsleepfn(inst)
+        end
+    else
+        inst.inworldbox_l = nil
+        if not inst:IsAsleep() then
+            if inst._dd ~= nil and inst._dd.entwakefn ~= nil then
+                inst._dd.entwakefn(inst)
+            end
+        end
+    end
 end
 local function Fn_temp(inst)
     UpdateImages(inst, inst.currentTempRange or 3)
+end
+local function OnEntityWake_icire(inst)
+    if inst._dd ~= nil and inst._dd.entwakefn ~= nil then
+        inst._dd.entwakefn(inst)
+    end
+end
+local function OnEntitySleep_icire(inst)
+    if inst._dd ~= nil and inst._dd.entsleepfn ~= nil then
+        inst._dd.entsleepfn(inst)
+    end
 end
 
 local function fn()
@@ -236,6 +260,8 @@ local function fn()
 
     -- inst.OnSave = OnSave
     -- inst.OnLoad = OnLoad
+    inst.OnEntitySleep = OnEntitySleep_icire
+    inst.OnEntityWake = OnEntityWake_icire
     inst.OnRemoveEntity = OnRemove
 
     return inst

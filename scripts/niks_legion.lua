@@ -473,6 +473,30 @@ end
 
 ------
 
+local function Start_icire_rock_collector(inst)
+    if inst.inworldbox_l or inst.task_l_skinfx ~= nil then
+        return
+    end
+    inst.task_l_skinfx = inst:DoPeriodicTask(0.4, function(inst)
+        local x, y, z = inst.Transform:GetWorldPosition()
+        for i = 1, math.random(3), 1 do
+            local fx = SpawnPrefab("icire_rock_fx_collector")
+            if fx ~= nil then
+                local x1, y1, z1 = TOOLS_L.GetCalculatedPos(x, y+math.random()*1.1, z, 0.05+math.random()*0.5, nil)
+                fx.Transform:SetPosition(x1, y1, z1)
+            end
+        end
+    end, 0.1+math.random())
+end
+local function End_icire_rock_collector(inst)
+    if inst.task_l_skinfx ~= nil then
+        inst.task_l_skinfx:Cancel()
+        inst.task_l_skinfx = nil
+    end
+end
+
+------
+
 local function Fn_start_equip(inst, skined)
     if skined ~= nil then
         inst._dd = skined.equip
@@ -1818,8 +1842,15 @@ local SKINS_LEGION = {
             inst.AnimState:ClearOverrideSymbol("shadow")
             inst._dd = skined and skined.temp or nil
             inst.fn_temp(inst)
+            if not inst:IsAsleep() then
+                Start_icire_rock_collector(inst)
+            end
         end,
-        temp = { img_pst = "_collector", canbloom = true },
+        fn_end = End_icire_rock_collector,
+        temp = {
+            img_pst = "_collector", canbloom = true,
+            entwakefn = Start_icire_rock_collector, entsleepfn = End_icire_rock_collector
+        },
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 }
     },
     icire_rock_day = {
@@ -1845,7 +1876,7 @@ local SKINS_LEGION = {
                 inst._dd_fx = nil
             end
         end,
-        temp = { img_pst = "_day", canbloom = false, fn_temp = Fn_icire_rock_day },
+        temp = { img_pst = "_day", canbloom = false, tempfn = Fn_icire_rock_day },
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 }
     },
 
