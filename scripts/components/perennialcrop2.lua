@@ -105,12 +105,6 @@ local function OnTendTo(inst, doer)
 	inst.components.perennialcrop2:TendTo(doer, true)
 	return true
 end
--- local function TendTo(self, doer, ...)
--- 	if self.tendable and self.ontendtofn ~= nil and self.ontendtofn(self.inst, doer) then
--- 		-- self.tendable = false --不让官方默认让它不能再照顾
--- 		return true
--- 	end
--- end
 local function DoMagicGrowth(inst, doer)
 	if inst:IsValid() then
 		return inst.components.perennialcrop2:DoMagicGrowth(doer, 6*TUNING.TOTAL_DAY_TIME, false)
@@ -235,9 +229,11 @@ function PerennialCrop2:TriggerMoisture(isadd) --控制浇水机制
 		local cpt = inst.components.moisture
 		cpt.OnUpdate = EmptyCptFn --取消下雨时的潮湿度增加
 		cpt.LongUpdate = EmptyCptFn
+		cpt.ForceDry = EmptyCptFn
 		cpt.OnSave = EmptyCptFn
 		cpt.OnLoad = EmptyCptFn
 		cpt.DoDelta = OnMoiWater
+		inst:StopUpdatingComponent(cpt) --该组件会周期刷新，不需要其逻辑，所以得停止该机制
 
 		inst:WatchWorldState("israining", OnIsRaining) --下雨时补充水分
 	else

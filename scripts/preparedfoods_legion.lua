@@ -221,12 +221,16 @@ local foods_legion = {
         -- potlevel = nil,
         float = { nil, "small", 0.08, 1 },
         oneatenfn = function(inst, eater) --食用时，周围队友越多，回复量越多
+            if eater.components.health == nil and eater.components.sanity == nil then
+                return
+            end
+
             local nummiss = 0
             local numlove = 0
 
             --计算周围有多少思念对象
             if eater.prefab ~= "wx78" and not TheWorld.state.isnewmoon then --wx78没有思念对象，同时排除新月
-                local x, y, z = inst.Transform:GetWorldPosition()
+                local x, y, z = eater.Transform:GetWorldPosition()
                 if eater.prefab == "wormwood" then --沃姆伍德对植物有思念
                     local ents = TheSim:FindEntities(x, y, z, 18,
                         nil, { "INLIMBO", "wall", "structure", "balloon", "notarget" }, { "_combat", "plant" })

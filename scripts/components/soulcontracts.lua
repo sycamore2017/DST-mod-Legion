@@ -57,7 +57,7 @@ local SoulContracts = Class(function(self, inst)
         self.inst:Remove()
     end
     self._OnOwnerHitOther = function(owner, data) --主人攻击时，让敌人死后能产生灵魂
-        if self.inst._lvl_l:value() == nil or self.inst._lvl_l:value() < 35 then
+        if owner:HasTag("soulstealer") or self.inst._lvl_l:value() == nil or self.inst._lvl_l:value() < 35 then
             return
         end
         if
