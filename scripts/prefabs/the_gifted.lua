@@ -1,3 +1,5 @@
+local TOOLS_L = require("tools_legion")
+
 --------------------------------------------------------------------------
 --[[ 韦伯 ]]
 --------------------------------------------------------------------------
@@ -358,19 +360,10 @@ local function PercentChanged_contracts(inst, data) --耐久变化时
 end
 
 local function EmptyCptFn(self, ...)end
-local function DisplayName_contracts(inst)
-    local namepre = inst.nameoverride or inst.prefab
-	namepre = STRINGS.NAMES[string.upper(namepre or "hiddenmoonlight")] or "Something"
-	local lvl = inst._lvl_l:value()
-	if lvl ~= nil and lvl > 0 then
-		namepre = namepre.."(Lv."..tostring(lvl)..")"
-	end
-	return namepre
-end
 local function OnUpgradeFn_contracts(inst, doer, item)
     (inst.SoundEmitter or doer.SoundEmitter):PlaySound("dontstarve/characters/wortox/soul/spawn", nil, .5)
 end
-local function UpdateUses_contracts(inst, uses)
+local function SetLevel_contracts(inst, uses)
     local lvl = inst.components.upgradeable:GetStage() - 1
     if lvl > 0 then
         local maxuse = 40 + lvl
@@ -381,15 +374,38 @@ local function UpdateUses_contracts(inst, uses)
         inst.components.finiteuses:SetUses(math.min(maxuse, uses))
     end
 end
-local function SetLevel_contracts(inst, uses)
-    inst._lvl_l:set(inst.components.upgradeable:GetStage() - 1)
-    UpdateUses_contracts(inst, uses)
-end
 local function OnSave_contracts(inst, data)
 	data.uses_l = inst.components.finiteuses:GetUses() --主要是怕 finiteuses 以后会限制大小
 end
 local function OnLoad_contracts(inst, data)
     SetLevel_contracts(inst, data and data.uses_l or nil)
+end
+local function Fn_dealdata_contracts(inst, data)
+    local dd = {
+        us = tostring(data.us or 0), usmax = tostring((data.lv or 0)+40),
+        lv = tostring(data.lv or 0)
+    }
+    if data.ow == nil then
+        return subfmt(STRINGS.NAMEDETAIL_L.SOUL_CONTRACTS1, dd)
+    else
+        dd.ow = data.ow
+        return subfmt(STRINGS.NAMEDETAIL_L.SOUL_CONTRACTS2, dd)
+    end
+end
+local function Fn_getdata_contracts(inst)
+    local data = {}
+    data.us = inst.components.finiteuses:GetUses()
+    if data.us <= 0 then
+        data.us = nil
+    end
+    data.lv = inst.components.upgradeable:GetStage() - 1
+    if data.lv <= 0 then
+        data.lv = nil
+    end
+    if inst._contractsowner ~= nil and inst._contractsowner:IsValid() then
+        data.ow = inst._contractsowner.name or inst._contractsowner.userid
+    end
+    return data
 end
 
 local function Fn_contracts()
@@ -416,9 +432,7 @@ local function Fn_contracts()
     inst:AddTag("meteor_protection") --防止被流星破坏
     inst:AddTag("NORATCHECK") --mod兼容：永不妥协。该道具不算鼠潮分
 
-    inst._lvl_l = net_byte(inst.GUID, "contracts_l._lvl_l", "lvl_l_dirty")
-    inst.displaynamefn = DisplayName_contracts
-
+    TOOLS_L.InitMouseInfo(inst, Fn_dealdata_contracts, Fn_getdata_contracts)
     LS_C_Init(inst, "soul_contracts", false)
 
     inst.entity:SetPristine()

@@ -2345,6 +2345,26 @@ STRINGS.FISHHOMING3_LEGION = {
     FRIZZY = "蠕动的", --海鹦鹉
     SALTY = "忒咸的" --饼干切割机
 }
+STRINGS.FISHHOMING3_INFO_LEGION = {
+    lucky = { fish = S_NAMES.OCEANFISH_MEDIUM_7_INV..","..S_NAMES.OCEANFISH_MEDIUM_6_INV, chance = 0.1 },
+    frozen = { fish = S_NAMES.OCEANFISH_MEDIUM_8_INV, chance = 0.01 },
+    hot = { fish = S_NAMES.OCEANFISH_SMALL_8_INV, chance = 0.01 },
+    sticky = { fish = S_NAMES.OCEANFISH_MEDIUM_9_INV, chance = 0.1 },
+    slippery = { fish = S_NAMES.OCEANFISH_SMALL_9_INV, chance = 0.1 },
+    fragrant = { fish = S_NAMES.OCEANFISH_SMALL_7_INV, chance = 0.01 },
+    wrinkled = { fish = S_NAMES.OCEANFISH_SMALL_6_INV, chance = 0.01 },
+    comical = { fish = S_NAMES.OCEANFISH_SMALL_5_INV..","..S_NAMES.OCEANFISH_MEDIUM_5_INV, chance = 0.2 },
+    shiny = { fish = S_NAMES.SQUID, chance = 0.02 },
+    bloody = { fish = S_NAMES.SHARK, chance = 0.02 },
+    whispering = { fish = S_NAMES.GNARWAIL, chance = 0.04 },
+    rotten = { fish = S_NAMES.WOBSTER_SHELLER_LAND, chance = 0.1 },
+    rusty = { fish = S_NAMES.WOBSTER_MOONGLASS, chance = 0.1 },
+    shaking = { fish = S_NAMES.SPIDER_WATER, chance = 0.1 },
+    grassy = { fish = S_NAMES.GRASSGATOR, chance = 0.04 },
+    evil = { fish = S_NAMES.MALBATROSS, chance = 0.09 },
+    frizzy = { fish = S_NAMES.PUFFIN, chance = 0.06 },
+    salty = { fish = S_NAMES.COOKIECUTTER, chance = 0.09 }
+}
 
 S_NAMES.FISHHOMINGBAIT = "打窝饵"
 S______GENERIC.DESCRIBE.FISHHOMINGBAIT = "丢进水里吸引鱼儿的饵料。"
@@ -4383,6 +4403,11 @@ STRINGS.NAMEDETAIL_L = { --Tip：额外的描述行数，最多4行，不然就�
     CLOUDPINE = "簇栽等级{c}/{cmax}\n{st}/{stmax}阶段 侵扰{it}/{itmax}",
     GENETRANS1 = "{s}(转化{n1} 完成{n2})\n当前{gr}/{grmax}天 {mt}%速度\n点数(能量{e} 加速{ft}) /{emax}",
     GENETRANS2 = "点数(能量{e} 加速{ft}) /{emax}",
+    SOUL_CONTRACTS1 = "拓展{lv}/99 灵魂{us}/{usmax}\n未绑定",
+    SOUL_CONTRACTS2 = "拓展{lv}/99 灵魂{us}/{usmax}\n主人 {ow}",
+    FISHHOMINGBAIT1 = "打窝次数{ti}",
+    FISHHOMINGBAIT2 = "特殊吸引({dt})\n打窝次数{ti}",
+    FISHHOMING = "{fi}{ch}%",
 }
 
 STRINGS.ACTIONS.SETMODE_L = {

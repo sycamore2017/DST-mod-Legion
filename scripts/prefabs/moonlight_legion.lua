@@ -773,7 +773,7 @@ local function OnWork_revolved(inst, worker, workleft, numworks)
     inst.AnimState:PushAnimation("closed")
     inst.SoundEmitter:PlaySound("grotto/common/turf_crafting_station/hit")
     inst.components.container:Close()
-    if NoWorked(inst, worker) then --只能被玩家或者船体破坏
+    if worker == nil or not worker:HasTag("player") then --不能被非玩家破坏
         inst.components.workable:SetWorkLeft(5)
         return
     end

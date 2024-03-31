@@ -1,3 +1,5 @@
+local TOOLS_L = require("tools_legion")
+
 --------------------------------------------------------------------------
 --[[ 打开的容器也是个实体 ]]
 --------------------------------------------------------------------------
@@ -304,6 +306,50 @@ local function DisplayName_bag(inst)
 
     return namepre..STRINGS.NAMES.FISHHOMINGBAIT
 end
+local function Fn_dealdata_bag(inst, data)
+    local dd = {
+        ti = tostring(data.ti or 1)
+    }
+    if data.sp ~= nil then
+        for k, _ in pairs(data.sp) do
+            local fh = STRINGS.FISHHOMING3_INFO_LEGION[k]
+            if fh ~= nil then
+                local fhdd = { fi = tostring(fh.fish), ch = fh.chance }
+                if k == "fragrant" then
+                    if TheWorld.state.isspring then fhdd.ch = 0.1 end
+                elseif k == "hot" then
+                    if TheWorld.state.issummer then fhdd.ch = 0.1 end
+                elseif k == "wrinkled" then
+                    if TheWorld.state.isautumn then fhdd.ch = 0.1 end
+                elseif k == "frozen" then
+                    if TheWorld.state.iswinter then fhdd.ch = 0.1 end
+                end
+                fhdd.ch = tostring(fhdd.ch*100)
+                if dd.dt == nil then
+                    dd.dt = subfmt(STRINGS.NAMEDETAIL_L.FISHHOMING, fhdd)
+                else
+                    dd.dt = dd.dt..STRINGS.NAMEDETAIL_L.SPACE..subfmt(STRINGS.NAMEDETAIL_L.FISHHOMING, fhdd)
+                end
+            end
+        end
+    end
+    if dd.dt == nil then
+        return subfmt(STRINGS.NAMEDETAIL_L.FISHHOMINGBAIT1, dd)
+    else
+        return subfmt(STRINGS.NAMEDETAIL_L.FISHHOMINGBAIT2, dd)
+    end
+end
+local function Fn_getdata_bag(inst)
+    local data = {}
+    local cpt = inst.components.fishhomingbait
+    if cpt.times > 1 then
+        data.ti = cpt.times
+    end
+    if cpt.type_special ~= nil then
+        data.sp = cpt.type_special
+    end
+    return data
+end
 
 local function Fn_bag()
     local inst = CreateEntity()
@@ -336,6 +382,7 @@ local function Fn_bag()
 
     inst:AddTag("allow_action_on_impassable")
 
+    TOOLS_L.InitMouseInfo(inst, Fn_dealdata_bag, Fn_getdata_bag, 5)
     LS_C_Init(inst, "fishhomingbait", false)
 
     inst.displaynamefn = DisplayName_bag

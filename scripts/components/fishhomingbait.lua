@@ -45,11 +45,11 @@ function FishHomingBait:InitSelf()
 	end
 
 	if self.type_special == nil then
-		for k,_ in pairs(STRINGS.FISHHOMING3_LEGION) do
+		for k, _ in pairs(STRINGS.FISHHOMING3_LEGION) do
 			self.inst:RemoveTag("FH_"..k)
 		end
 	else
-		for k,_ in pairs(STRINGS.FISHHOMING3_LEGION) do
+		for k, _ in pairs(STRINGS.FISHHOMING3_LEGION) do
 			if self.type_special[string.lower(k)] then
 				self.inst:AddTag("FH_"..k)
 			else
@@ -284,10 +284,8 @@ function FishHomingBait:OnSave()
 
 	if self.type_special ~= nil then
 		data.type_special = {}
-		for name,bo in pairs(self.type_special) do
-			if bo then
-				table.insert(data.type_special, name)
-			end
+		for name, _ in pairs(self.type_special) do
+			table.insert(data.type_special, name)
 		end
 	end
 
@@ -312,7 +310,7 @@ function FishHomingBait:OnLoad(data)
 
 		if data.type_special ~= nil then
 			self.type_special = {}
-			for _,name in pairs(data.type_special) do
+			for _, name in pairs(data.type_special) do
 				self.type_special[name] = true
 			end
 		end
@@ -499,17 +497,17 @@ function FishHomingBait:GetPreys()
 	local allweight = 0
 	local weight = 0
 	local specialchance = 0
-	local specialmult = 1
-	for prefab,data in pairs(list) do
+	for prefab, data in pairs(list) do
 		if self.type_special ~= nil then
-			for k,bo in pairs(self.type_special) do
-				if bo and data[k] ~= nil then
+			for k, _ in pairs(self.type_special) do
+				if data[k] ~= nil then
 					specialchance = specialchance + data[k]
 				end
 			end
 		end
 
 		if specialchance > 0 then --说明是特殊对象
+			local specialmult = 1
 			if data[self.type_eat] ~= nil then
 				specialmult = specialmult + 0.25
 			end
@@ -538,7 +536,6 @@ function FishHomingBait:GetPreys()
 
 		weight = 0
 		specialchance = 0
-		specialmult = 1
 	end
 
 	if preys.normal ~= nil or preys.special ~= nil then

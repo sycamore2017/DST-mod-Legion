@@ -2219,6 +2219,26 @@ STRINGS.FISHHOMING3_LEGION = {
     FRIZZY = "Frizzy ", --海鹦鹉
     SALTY = "Briny " --饼干切割机
 }
+STRINGS.FISHHOMING3_INFO_LEGION = {
+    lucky = { fish = S_NAMES.OCEANFISH_MEDIUM_7_INV..", "..S_NAMES.OCEANFISH_MEDIUM_6_INV, chance = 0.1 },
+    frozen = { fish = S_NAMES.OCEANFISH_MEDIUM_8_INV, chance = 0.01 },
+    hot = { fish = S_NAMES.OCEANFISH_SMALL_8_INV, chance = 0.01 },
+    sticky = { fish = S_NAMES.OCEANFISH_MEDIUM_9_INV, chance = 0.1 },
+    slippery = { fish = S_NAMES.OCEANFISH_SMALL_9_INV, chance = 0.1 },
+    fragrant = { fish = S_NAMES.OCEANFISH_SMALL_7_INV, chance = 0.01 },
+    wrinkled = { fish = S_NAMES.OCEANFISH_SMALL_6_INV, chance = 0.01 },
+    comical = { fish = S_NAMES.OCEANFISH_SMALL_5_INV..", "..S_NAMES.OCEANFISH_MEDIUM_5_INV, chance = 0.2 },
+    shiny = { fish = S_NAMES.SQUID, chance = 0.02 },
+    bloody = { fish = S_NAMES.SHARK, chance = 0.02 },
+    whispering = { fish = S_NAMES.GNARWAIL, chance = 0.04 },
+    rotten = { fish = S_NAMES.WOBSTER_SHELLER_LAND, chance = 0.1 },
+    rusty = { fish = S_NAMES.WOBSTER_MOONGLASS, chance = 0.1 },
+    shaking = { fish = S_NAMES.SPIDER_WATER, chance = 0.1 },
+    grassy = { fish = S_NAMES.GRASSGATOR, chance = 0.04 },
+    evil = { fish = S_NAMES.MALBATROSS, chance = 0.09 },
+    frizzy = { fish = S_NAMES.PUFFIN, chance = 0.06 },
+    salty = { fish = S_NAMES.COOKIECUTTER, chance = 0.09 }
+}
 
 S_NAMES.FISHHOMINGBAIT = "Fish-Homing Bait" --打窝饵
 S______GENERIC.DESCRIBE.FISHHOMINGBAIT = "Throw it into water to attract fish."
@@ -4157,8 +4177,13 @@ STRINGS.NAMEDETAIL_L = {
     DIGESTSELF = "{eater} digested {items}.",
     VASEHERB = "Cluster Lv. {c}/{cmax}, Eated {ea}/80\nSwallow(Rad.{d_s} Num.{n_s} CD.{t_s}sec), Lure Rad.{d_l}",
     CLOUDPINE = "Cluster Lv. {c}/{cmax}\n{st}/{stmax} Stage, Infest {it}/{itmax}",
-    GENETRANS1 = "{s}(Doing {n1} Done {n2})\nCurrent {gr}/{grmax} Days, {mt}% Rate\nPoints (Energy {e} SpeedUp {ft}) /{emax}",
+    GENETRANS1 = "{s} (Doing {n1} Done {n2})\nCurrent {gr}/{grmax} Days, {mt}% Rate\nPoints (Energy {e} SpeedUp {ft}) /{emax}",
     GENETRANS2 = "Points (Energy {e} SpeedUp {ft}) /{emax}",
+    SOUL_CONTRACTS1 = "Expansion {lv}/99, Souls {us}/{usmax}\nUnbound",
+    SOUL_CONTRACTS2 = "Expansion {lv}/99, Souls {us}/{usmax}\nOwner [{ow}]",
+    FISHHOMINGBAIT1 = "Lure Times {ti}",
+    FISHHOMINGBAIT2 = "Special Lure ({dt})\nLure Times {ti}",
+    FISHHOMING = "{fi} {ch}%",
 }
 
 STRINGS.ACTIONS.SETMODE_L = {
