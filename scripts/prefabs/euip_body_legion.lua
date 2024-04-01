@@ -237,9 +237,7 @@ local function OnEquip_backcub(inst, owner)
     end
     inst.SoundEmitter:KillSound("sleep")
 
-    if owner:HasTag("equipmentmodel") then --假人！
-        return
-    end
+    if owner:HasTag("equipmentmodel") then return end --假人
 
     if inst.components.container ~= nil then
         inst.components.container:Open(owner)
@@ -440,9 +438,7 @@ end
 local function OnEquip_sachet(inst, owner)
     owner.AnimState:OverrideSymbol("swap_body", "sachet", "swap_body")
 
-    if owner:HasTag("equipmentmodel") then --假人！
-        return
-    end
+    if owner:HasTag("equipmentmodel") then return end --假人
 
     if inst.components.fueled ~= nil then
         inst.components.fueled:StartConsuming()
@@ -546,9 +542,7 @@ end
 local function OnEquip_beetlearmor(inst, owner)
     owner.AnimState:OverrideSymbol("swap_body", "armor_elepheetle", "swap_body")
 
-    if owner:HasTag("equipmentmodel") then --假人！
-        return
-    end
+    if owner:HasTag("equipmentmodel") then return end --假人
 
     TOOLS_L.AddTag(owner, "stable_l", inst.prefab) --无硬直 棱镜tag
     TOOLS_L.AddTag(owner, "sedate_l", inst.prefab) --免疫麻痹 棱镜tag
@@ -556,9 +550,7 @@ end
 local function OnUnequip_beetlearmor(inst, owner)
     owner.AnimState:ClearOverrideSymbol("swap_body")
 
-    if owner:HasTag("equipmentmodel") then --假人！
-        return
-    end
+    if owner:HasTag("equipmentmodel") then return end --假人
 
     TOOLS_L.RemoveTag(owner, "stable_l", inst.prefab)
     TOOLS_L.RemoveTag(owner, "sedate_l", inst.prefab)
@@ -782,9 +774,7 @@ local function OnEquip_boltout(inst, owner)
         owner.bolt_skin_l = nil
     end
 
-    if owner:HasTag("equipmentmodel") then --假人！
-        return
-    end
+    if owner:HasTag("equipmentmodel") then return end --假人
 
     if inst.components.container ~= nil then
         inst.components.container:Open(owner)
@@ -938,9 +928,7 @@ local function OnAttacked_sivsuit(owner, data)
 end
 local function OnEquip_sivsuit(inst, owner)
     SetSymbols_sivsuit(inst, owner)
-    if owner:HasTag("equipmentmodel") then --假人！
-        return
-    end
+    if owner:HasTag("equipmentmodel") then return end --假人
     TOOLS_L.AddEntValue(owner, "siv_blood_l_reducer", inst.prefab, 1, 0.25)
     owner._bloodarmor_l = inst
     owner:ListenForEvent("onhitother", OnHitOther_sivsuit)
@@ -1055,9 +1043,7 @@ end
 local function OnEquip_sivsuit2(inst, owner)
     SetSymbols_sivsuit(inst, owner)
     inst:RemoveTag("cansetmode_l")
-    if owner:HasTag("equipmentmodel") then --假人！
-        return
-    end
+    if owner:HasTag("equipmentmodel") then return end --假人
     TOOLS_L.AddEntValue(owner, "siv_blood_l_reducer", inst.prefab, 1, 0.5)
     owner._bloodarmor2_l = inst --本来继续用 _bloodarmor_l 变量名就行的，但是多格装备栏mod会导致有两种护甲都能穿上的情况
     owner:ListenForEvent("onhitother", OnHitOther_sivsuit2)

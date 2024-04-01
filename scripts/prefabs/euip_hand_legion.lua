@@ -162,9 +162,7 @@ local function OnEquip_never(inst, owner) --装备武器时
 
     inst.components.deployable:SetDeployMode(DEPLOYMODE.NONE) --装备时去除可栽种功能
 
-    if owner:HasTag("equipmentmodel") then --假人！
-        return
-    end
+    if owner:HasTag("equipmentmodel") then return end --假人
 
     if not inst.hassetbroken then
         if owner.components.health ~= nil then
@@ -384,9 +382,7 @@ local function OnEquip_rose(inst, owner)
     end
     OnEquip_base(inst, owner)
 
-    if owner:HasTag("equipmentmodel") then --假人！
-        return
-    end
+    if owner:HasTag("equipmentmodel") then return end --假人
 
     --TIP: "onattackother"事件在 targ.components.combat:GetAttacked 之前，所以能提前改攻击配置
     owner:ListenForEvent("onattackother", TOOLS_L.UndefendedATK)
@@ -594,9 +590,7 @@ local function OnEquip_bookweather(inst, owner)
     owner.AnimState:OverrideSymbol("book_closed", "book_weather", "book_closed")
     -- owner.AnimState:OverrideSymbol("book_open_pages", "book_weather", "book_open_pages")
 
-    if owner:HasTag("equipmentmodel") then --假人！
-        return
-    end
+    if owner:HasTag("equipmentmodel") then return end --假人
 
     TOOLS_L.AddTag(owner, "ignorewet", inst.prefab)
     inst:ListenForEvent("newstate", FixSymbol_bookweather, owner)
@@ -1258,9 +1252,7 @@ local function OnEquip_carl(inst, owner)
     owner.AnimState:Show("ARM_carry")
     owner.AnimState:Hide("ARM_normal")
 
-	if owner:HasTag("equipmentmodel") then --假人！
-        return
-    end
+	if owner:HasTag("equipmentmodel") then return end --假人
 
 	if inst.components.container ~= nil then
         inst.components.container:Open(owner)
@@ -1275,9 +1267,7 @@ local function OnUnequip_carl(inst, owner)
     owner.AnimState:Hide("ARM_carry")
     owner.AnimState:Show("ARM_normal")
 
-	if owner:HasTag("equipmentmodel") then --假人！
-        return
-    end
+	if owner:HasTag("equipmentmodel") then return end --假人
 
 	if inst.components.container ~= nil then
         inst.components.container:Close()
@@ -1441,9 +1431,7 @@ local function OnEquip_steak_pst(inst, owner)
 end
 local function OnEquip_steak(inst, owner)
     OnEquip_steak_pre(inst, owner)
-    if owner:HasTag("equipmentmodel") then --假人！
-        return
-    end
+    if owner:HasTag("equipmentmodel") then return end --假人
     OnEquip_steak_pst(inst, owner)
 end
 local function OnUnequip_steak(inst, owner)
@@ -1677,9 +1665,7 @@ if TUNING.FUNCTIONAL_MEDAL_IS_OPEN then --能力勋章兼容
             inst:ListenForEvent("onremove", onremovefire, inst.fire)
         end
         inst.fire.entity:SetParent(owner.entity)
-        if owner:HasTag("equipmentmodel") then --假人！
-            return
-        end
+        if owner:HasTag("equipmentmodel") then return end --假人
         OnEquip_steak_pst(inst, owner)
     end
     local function OnUnequip_steak_phosphor(inst, owner)
@@ -1717,9 +1703,7 @@ if TUNING.FUNCTIONAL_MEDAL_IS_OPEN then --能力勋章兼容
     end
     local function OnEquip_steak_rage_blood(inst, owner)
         OnEquip_steak_pre(inst, owner)
-        if owner:HasTag("equipmentmodel") then --假人！
-            return
-        end
+        if owner:HasTag("equipmentmodel") then return end --假人
         OnEquip_steak_pst(inst, owner)
         owner:ListenForEvent("onattackother", BattleBornAttack)
     end
@@ -1739,9 +1723,7 @@ if TUNING.FUNCTIONAL_MEDAL_IS_OPEN then --能力勋章兼容
 
     local function OnEquip_steak_potato_starch(inst, owner)
         OnEquip_steak_pre(inst, owner)
-        if owner:HasTag("equipmentmodel") then --假人！
-            return
-        end
+        if owner:HasTag("equipmentmodel") then return end --假人
         OnEquip_steak_pst(inst, owner)
         if owner.components.hunger ~= nil then
             owner.components.hunger.burnratemodifiers:SetModifier(inst, 0.2)

@@ -1105,9 +1105,7 @@ local function OnEquip_refracted(inst, owner) --装备武器时
     owner.AnimState:Hide("ARM_normal") --隐藏普通的手
     inst._equip_l = true
 
-    if owner:HasTag("equipmentmodel") then --假人！
-        return
-    end
+    if owner:HasTag("equipmentmodel") then return end --假人
 
     owner:ListenForEvent("healthdelta", inst.fn_onHealthDelta)
     inst:ListenForEvent("attacked", inst.fn_onAttacked, owner)

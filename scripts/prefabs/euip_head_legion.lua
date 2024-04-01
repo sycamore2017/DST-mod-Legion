@@ -238,9 +238,7 @@ local function OnEquip_cowboy(inst, owner)
         owner.scarf_skin_l = nil
     end
 
-    if owner:HasTag("equipmentmodel") then --假人！
-        return
-    end
+    if owner:HasTag("equipmentmodel") then return end --假人
 
     if inst.components.fueled ~= nil then
         inst.components.fueled:StartConsuming()
@@ -354,9 +352,7 @@ end
 local function OnEquip_beetlehat(inst, owner)
     TOOLS_L.hat_on(inst, owner, "hat_elepheetle", "swap_hat")
 
-    if owner:HasTag("equipmentmodel") then --假人！
-        return
-    end
+    if owner:HasTag("equipmentmodel") then return end --假人
 
     --工作效率
     if owner.components.workmultiplier == nil then
@@ -379,9 +375,7 @@ end
 local function OnUnequip_beetlehat(inst, owner)
     TOOLS_L.hat_off(inst, owner)
 
-    if owner:HasTag("equipmentmodel") then --假人！
-        return
-    end
+    if owner:HasTag("equipmentmodel") then return end --假人
 
     if owner.components.workmultiplier ~= nil then
         owner.components.workmultiplier:RemoveMultiplier(ACTIONS.CHOP,   inst)
@@ -672,9 +666,7 @@ local function OnEquip_sivmask(inst, owner)
     SetSymbols_sivmask(inst, owner)
     StealHealth(inst, owner, false, false)
 
-    if owner:HasTag("equipmentmodel") then --假人！
-        return
-    end
+    if owner:HasTag("equipmentmodel") then return end --假人
 
     TOOLS_L.AddEntValue(owner, "siv_blood_l_reducer", inst.prefab, 1, 0.25)
 end
@@ -989,9 +981,7 @@ end
 local function OnEquip_sivmask2(inst, owner)
     SetSymbols_sivmask(inst, owner)
     TriggerMode_sivmask2(inst, owner, inst.components.modelegion.now)
-    if owner:HasTag("equipmentmodel") then --假人！
-        return
-    end
+    if owner:HasTag("equipmentmodel") then return end --假人
     inst:AddTag("cansetmode_l") --模式切换必需，没有就代表无法切换
     inst:ListenForEvent("onattackother", inst.OnAttackOther_l, owner)
     TOOLS_L.AddEntValue(owner, "siv_blood_l_reducer", inst.prefab, 1, 0.5)

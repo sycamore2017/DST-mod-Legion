@@ -28,9 +28,7 @@ end
 local function onequip(inst, owner) --佩戴
     TOOLS_L.hat_on_opentop(inst, owner, "hat_mermbreathing", "swap_hat")
 
-    if owner:HasTag("equipmentmodel") then --假人！
-        return
-    end
+    if owner:HasTag("equipmentmodel") then return end --假人
 
     if owner.components.moisture then
         owner:ListenForEvent("moisturedelta", onPretendingMerm)

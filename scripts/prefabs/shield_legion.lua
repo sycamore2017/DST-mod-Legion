@@ -57,9 +57,7 @@ local function OnEquipFn(inst, owner)
     owner.AnimState:Show("ARM_carry") --显示持物手
     owner.AnimState:Hide("ARM_normal") --隐藏普通的手
 
-    -- if owner:HasTag("equipmentmodel") then --假人！
-    --     return
-    -- end
+    -- if owner:HasTag("equipmentmodel") then return end --假人
 end
 local function OnUnequipFn(inst, owner)
     --owner.AnimState:ClearOverrideSymbol("book_closed")
@@ -253,9 +251,7 @@ end
 
 local function OnEquip_sand(inst, owner)
     OnEquipFn(inst, owner)
-    if owner:HasTag("equipmentmodel") then --假人！
-        return
-    end
+    if owner:HasTag("equipmentmodel") then return end --假人
 
     onisraining(inst) --装备时先更新一次
 
@@ -282,9 +278,7 @@ local function OnEquip_sand(inst, owner)
 end
 local function OnUnequip_sand(inst, owner)
     OnUnequipFn(inst, owner)
-    if owner:HasTag("equipmentmodel") then --假人！
-        return
-    end
+    if owner:HasTag("equipmentmodel") then return end --假人
 
     inst:RemoveEventCallback("blocked", OnBlocked, owner)
     inst:RemoveEventCallback("attacked", OnBlocked, owner)
@@ -586,9 +580,7 @@ local function OnEquip_agron(inst, owner)
     owner.AnimState:Show("ARM_carry")
     owner.AnimState:Hide("ARM_normal")
 
-    if owner:HasTag("equipmentmodel") then --假人！
-        return
-    end
+    if owner:HasTag("equipmentmodel") then return end --假人
 
     SetOwnerDefense(inst, owner, revolt)
     if owner.components.health ~= nil then

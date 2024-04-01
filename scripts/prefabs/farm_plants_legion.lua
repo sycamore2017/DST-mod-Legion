@@ -1615,7 +1615,9 @@ local function OnClose_pine(inst)
 	inst.SoundEmitter:PlaySound("maxwell_rework/magician_chest/close")
 end
 local function AttachContainer_pine(inst)
-	inst.components.container_proxy:SetMaster(TheWorld:GetPocketDimensionContainer("cloudpine_l2"))
+	if TheWorld.components.boxcloudpine ~= nil then
+		TheWorld.components.boxcloudpine:SetMaster(inst)
+	end
 end
 local function Fn_dealdata_pine(inst, data)
 	local str, strpst

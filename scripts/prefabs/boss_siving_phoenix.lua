@@ -753,9 +753,7 @@ local function OnEquip(inst, owner)
     owner.AnimState:Show("ARM_carry")
     owner.AnimState:Hide("ARM_normal")
 
-    if owner:HasTag("equipmentmodel") then --假人！
-        return
-    end
+    if owner:HasTag("equipmentmodel") then return end --假人
 
     owner:AddTag("s_l_throw") --skill_legion_throw
     owner:AddTag("siv_feather")
