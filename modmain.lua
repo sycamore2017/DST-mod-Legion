@@ -224,8 +224,12 @@ Assets = {
     Asset("IMAGE", "images/slot_bearspaw_l.tex"),
     Asset("ATLAS", "images/slot_juice_l.xml"), --巨食草的格子背景
     Asset("IMAGE", "images/slot_juice_l.tex"),
-    Asset("ATLAS", "images/station_recast.xml"), --重铸科技栏图标
+    Asset("ATLAS", "images/station_recast.xml"), --科技栏图标
     Asset("IMAGE", "images/station_recast.tex"),
+    Asset("ATLAS", "images/filter_siving.xml"),
+    Asset("IMAGE", "images/filter_siving.tex"),
+    Asset("ATLAS", "images/filter_legion.xml"),
+    Asset("IMAGE", "images/filter_legion.tex"),
 
     --为工艺锅mod加的（此时并不明确是否启用了该mod）
     Asset("ATLAS", "images/foodtags/foodtag_gel.xml"),

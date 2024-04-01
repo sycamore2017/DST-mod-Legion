@@ -29,10 +29,14 @@ AddPrototyperDef("elecourmaline", { --第一个参数是指玩家靠近时会解
 	filter_text = STRINGS.UI.CRAFTING_STATION_FILTERS.RECAST --台词已在语言文件中
 })
 
-AddRecipeFilter({
-	name = "RECAST",
-	atlas = "images/station_recast.xml", image = "station_recast.tex",
-	custom_pos = true
+AddRecipeFilter({ --重铸青光
+	name = "RECAST", atlas = "images/station_recast.xml", image = "station_recast.tex", custom_pos = true
+})
+AddRecipeFilter({ --生命子圭
+	name = "SIVING", atlas = "images/filter_siving.xml", image = "filter_siving.tex"
+})
+AddRecipeFilter({ --棱镜里
+	name = "LEGION", atlas = "images/filter_legion.xml", image = "filter_legion.tex"
 })
 
 --------------------------------------------------------------------------
@@ -74,5 +78,40 @@ TUNING.PROTOTYPER_TREES.ELECOURMALINE_THREE = TechTree.Create({
 for i, v in pairs(AllRecipes) do
 	if v.level.ELECOURMALINE == nil then
 		v.level.ELECOURMALINE = 0
+	end
+end
+
+--------------------------------------------------------------------------
+--[[ 让某个制作栏分类能显示全部对象，不管能不能解锁或制作 ]]
+--------------------------------------------------------------------------
+
+if not TheNet:IsDedicated() then
+	local craftingmenu_widget = require "widgets/redux/craftingmenu_widget"
+
+	local ApplyFilters_old = craftingmenu_widget.ApplyFilters
+	craftingmenu_widget.ApplyFilters = function(self, ...)
+		if
+			(self.current_filter_name == "LEGION" or self.current_filter_name == "SIVING") and
+			CRAFTING_FILTERS[self.current_filter_name] ~= nil
+		then
+			self.filtered_recipes = {}
+			local filter_recipes = FunctionOrValue(CRAFTING_FILTERS[self.current_filter_name].default_sort_values) or nil
+			if filter_recipes == nil then
+				return ApplyFilters_old(self, ...)
+			end
+			for i, recipe_name in metaipairs(self.sort_class) do
+				local data = self.crafting_hud.valid_recipes[recipe_name]
+				if data and filter_recipes[recipe_name] ~= nil then
+					table.insert(self.filtered_recipes, data)
+				end
+			end
+			if self.crafting_hud:IsCraftingOpen() then
+				self:UpdateRecipeGrid(self.focus and not TheFrontEnd.tracking_mouse)
+			else
+				self.recipe_grid.dirty = true
+			end
+		else
+			return ApplyFilters_old(self, ...)
+		end
 	end
 end

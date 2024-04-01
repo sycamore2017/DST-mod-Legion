@@ -5156,7 +5156,8 @@ AddClassPostConstruct("widgets/redux/craftingmenu_skinselector", function(self, 
             end
         end
 
-        --官方代码提前且只执行了一次，所以这里只能重新执行一次部分逻辑，把mod皮肤加进去
+        --因为这种接口 AddClassPostConstruct，多半是在对象初始化后才执行
+        --所以这里只能重新执行一次部分逻辑，把mod皮肤加进去
         self.skins_list = self:GetSkinsList()
         self.skins_options = self:GetSkinOptions()
         if #self.skins_options == 1 then

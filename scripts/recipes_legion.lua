@@ -27,12 +27,12 @@ local _G = GLOBAL
     MAGIC 魔法、暗影(主要是指关于暗影的魔法，和暗影无关或者与月亮有关的魔法就不要分类到这里了)
     RIDING 骑乘、驯化
     WINTER 冬季物品、御寒
-    SUMMER 夏季物品、避暑
+    SUMMER 夏季物品、避暑、沙漠物品
     RAIN 天气物品、雨具
     DECOR 装饰建筑、装饰道具(没有太实际的功能，单纯好看，可以归类到这里)
 
     --棱镜专属
-    RECAST 重铸闪光
+    RECAST 重铸青光
     SIVING 生命子圭
     LEGION 棱镜里
 ]]--
@@ -53,7 +53,7 @@ local function PlacerTest_carpet2(pt, rot)
 	return PlacerTest_carpet(pt, rot, { -3.1, 0, 3.1 })
 end
 
-------重铸闪光
+------重铸青光
 
 local tech_recast
 local lock_recast
@@ -73,7 +73,7 @@ AddRecipe2( --斧铲-三用型
     }, tech_recast[1], {
         nounlock = lock_recast,
         atlas = "images/inventoryimages/tripleshovelaxe.xml"
-    }, { "RECAST", "TOOLS" }
+    }, { "LEGION", "RECAST", "TOOLS" }
 )
 AddRecipe2( --扳手-双用型
     "dualwrench", {
@@ -83,7 +83,7 @@ AddRecipe2( --扳手-双用型
     }, tech_recast[1], {
         nounlock = lock_recast,
         atlas = "images/inventoryimages/dualwrench.xml"
-    }, { "RECAST", "TOOLS" }
+    }, { "LEGION", "RECAST", "TOOLS" }
 )
 AddRecipe2( --鸳鸯石
     "icire_rock", {
@@ -93,7 +93,7 @@ AddRecipe2( --鸳鸯石
     }, tech_recast[1], {
         nounlock = lock_recast,
         atlas = "images/inventoryimages/icire_rock.xml"
-    }, { "RECAST", "WINTER", "SUMMER" }
+    }, { "LEGION", "RECAST", "WINTER", "SUMMER" }
 )
 AddRecipe2( --爆炸水果蛋糕
     "explodingfruitcake", {
@@ -102,7 +102,7 @@ AddRecipe2( --爆炸水果蛋糕
     }, tech_recast[1], {
         nounlock = lock_recast,
         atlas = "images/inventoryimages/explodingfruitcake.xml"
-    }, { "RECAST", "WEAPONS" }
+    }, { "LEGION", "RECAST", "WEAPONS" }
 )
 AddRecipe2( --专业打窝饵制作器
     "fishhomingtool_awesome", {
@@ -111,7 +111,7 @@ AddRecipe2( --专业打窝饵制作器
     }, tech_recast[1], {
         nounlock = lock_recast,
         atlas = "images/inventoryimages/fishhomingtool_awesome.xml"
-    }, { "RECAST", "FISHING" }
+    }, { "LEGION", "RECAST", "FISHING" }
 )
 
 AddRecipe2( --电气石
@@ -122,7 +122,7 @@ AddRecipe2( --电气石
     }, tech_recast[2], {
         nounlock = lock_recast, no_deconstruction = true,
         atlas = "images/inventoryimages/tourmalinecore.xml"
-    }, { "RECAST", "REFINE" }
+    }, { "LEGION", "RECAST" }
 )
 AddRecipe2( --斧铲-黄金三用型
     "triplegoldenshovelaxe", {
@@ -132,7 +132,7 @@ AddRecipe2( --斧铲-黄金三用型
     }, tech_recast[2], {
         nounlock = lock_recast,
         atlas = "images/inventoryimages/triplegoldenshovelaxe.xml"
-    }, { "RECAST", "TOOLS" }
+    }, { "LEGION", "RECAST", "TOOLS" }
 )
 AddRecipe2( --牛仔帽
     "hat_cowboy", {
@@ -143,7 +143,7 @@ AddRecipe2( --牛仔帽
     }, tech_recast[2], {
         nounlock = lock_recast,
         atlas = "images/inventoryimages/hat_cowboy.xml"
-    }, { "RECAST", "RAIN", "SUMMER", "RIDING", "CLOTHING" }
+    }, { "LEGION", "RECAST", "RAIN", "SUMMER", "RIDING", "CLOTHING" }
 )
 AddRecipe2( --驮运鞍具
     "saddle_baggage", {
@@ -153,7 +153,7 @@ AddRecipe2( --驮运鞍具
     }, tech_recast[2], {
         nounlock = lock_recast,
         atlas = "images/inventoryimages/saddle_baggage.xml"
-    }, { "RECAST", "RIDING", "COOKING", "CONTAINERS" }
+    }, { "LEGION", "RECAST", "RIDING", "COOKING", "CONTAINERS" }
 )
 AddRecipe2( --素白蘑菇帽
     "hat_albicans_mushroom", {
@@ -163,7 +163,7 @@ AddRecipe2( --素白蘑菇帽
     }, tech_recast[2], {
         nounlock = lock_recast,
         atlas = "images/inventoryimages/hat_albicans_mushroom.xml"
-    }, { "RECAST", "CLOTHING", "SUMMER", "GARDENING", "RAIN" }
+    }, { "LEGION", "RECAST", "CLOTHING", "SUMMER", "GARDENING", "RAIN" }
 )
 AddRecipe2( --犀金胄甲
     "hat_elepheetle", {
@@ -174,7 +174,7 @@ AddRecipe2( --犀金胄甲
     }, tech_recast[2], {
         nounlock = lock_recast,
         atlas = "images/inventoryimages/hat_elepheetle.xml"
-    }, { "RECAST", "ARMOUR" }
+    }, { "LEGION", "RECAST", "ARMOUR" }
 )
 AddRecipe2( --犀金护甲
     "armor_elepheetle", {
@@ -185,7 +185,7 @@ AddRecipe2( --犀金护甲
     }, tech_recast[2], {
         nounlock = lock_recast,
         atlas = "images/inventoryimages/armor_elepheetle.xml"
-    }, { "RECAST", "ARMOUR" }
+    }, { "LEGION", "RECAST", "ARMOUR" }
 )
 AddRecipe2( --米格尔的吉他
     "guitar_miguel", {
@@ -194,7 +194,7 @@ AddRecipe2( --米格尔的吉他
     }, tech_recast[2], {
         nounlock = lock_recast,
         atlas = "images/inventoryimages/guitar_miguel.xml"
-    }, { "RECAST", "GARDENING", "MAGIC" }
+    }, { "LEGION", "RECAST", "GARDENING", "RESTORATION", "TOOLS" }
 )
 
 AddRecipe2( --蛛网标记
@@ -205,7 +205,7 @@ AddRecipe2( --蛛网标记
     }, tech_recast[2], {
         nounlock = lock_recast, builder_tag = lock_recast and "spiderwhisperer" or nil,
         atlas = "images/inventoryimages/web_hump_item.xml"
-    }, { "RECAST", "STRUCTURES", "CHARACTER" }
+    }, { "LEGION", "RECAST", "STRUCTURES", "CHARACTER" }
 )
 AddRecipe2( --灵魂契约
     "soul_contracts", {
@@ -216,7 +216,7 @@ AddRecipe2( --灵魂契约
     }, tech_recast[2], {
         nounlock = lock_recast, builder_tag = lock_recast and "soulstealer" or nil,
         atlas = "images/inventoryimages/soul_contracts.xml"
-    }, { "RECAST", "RESTORATION", "MAGIC", "CHARACTER" }
+    }, { "LEGION", "RECAST", "RESTORATION", "MAGIC", "CHARACTER" }
 )
 
 -- tech_recast = nil
@@ -230,7 +230,7 @@ AddRecipe2( --苔衣发卡
         Ingredient("cutlichen", 4)
     }, TECH.NONE, {
         atlas = "images/inventoryimages/hat_lichen.xml"
-    }, { "CLOTHING", "LIGHT" }
+    }, { "LEGION", "CLOTHING", "LIGHT" }
 )
 AddRecipe2( --香包
     "sachet", {
@@ -239,7 +239,7 @@ AddRecipe2( --香包
         Ingredient("petals_orchid", 3, "images/inventoryimages/petals_orchid.xml")
     }, TECH.NONE, {
         atlas = "images/inventoryimages/sachet.xml"
-    }, { "CLOTHING" }
+    }, { "LEGION", "CLOTHING" }
 )
 AddRecipe2( --脱壳之翅
     "boltwingout", {
@@ -248,7 +248,7 @@ AddRecipe2( --脱壳之翅
         Ingredient("stinger", 40)
     }, TECH.SCIENCE_TWO, {
         atlas = "images/inventoryimages/boltwingout.xml"
-    }, { "ARMOUR", "CONTAINERS" }
+    }, { "LEGION", "ARMOUR", "CONTAINERS" }
 )
 AddRecipe2( --永不凋零
     "neverfade", {
@@ -269,7 +269,7 @@ AddRecipe2( --永不凋零
         -- placer = "carpet_whitewood_big_placer", --如果是建筑摆放类的，需要指定 placer
         -- min_spacing = 1.5, --摆放限制距离。也就是 1.5半径内不能有其他对象。默认为3.2
         -- testfn = function(pt, rot) end, --额外的摆放限制函数
-    }, { "WEAPONS", "MAGIC" }
+    }, { "LEGION", "WEAPONS" }
 )
 AddRecipe2( --木盾
     "shield_l_log", {
@@ -277,7 +277,7 @@ AddRecipe2( --木盾
         Ingredient("rope", 2)
     }, TECH.SCIENCE_ONE, {
         atlas = "images/inventoryimages/shield_l_log.xml"
-    }, { "WEAPONS", "ARMOUR" }
+    }, { "LEGION", "WEAPONS", "ARMOUR" }
 )
 AddRecipe2( --砂之抵御
     "shield_l_sand", {
@@ -286,7 +286,7 @@ AddRecipe2( --砂之抵御
         Ingredient("turf_desertdirt", 3)
     }, TECH.LOST, {
         atlas = "images/inventoryimages/shield_l_sand.xml"
-    }, { "WEAPONS", "ARMOUR" }
+    }, { "LEGION", "WEAPONS", "ARMOUR", "SUMMER" }
 )
 AddRecipe2( --多变的云
     "book_weather", {
@@ -295,14 +295,14 @@ AddRecipe2( --多变的云
         Ingredient("raindonate", 3, "images/inventoryimages/raindonate.xml")
     }, TECH.MAGIC_THREE, {
         atlas = "images/inventoryimages/book_weather.xml"
-    }, { "MAGIC", "WEAPONS", "RAIN" }
+    }, { "LEGION", "MAGIC", "WEAPONS", "RAIN" }
 )
 AddRecipe2( --鱼之息
     "hat_mermbreathing", {
         Ingredient("merm_scales", 3, "images/inventoryimages/merm_scales.xml")
     }, TECH.SCIENCE_TWO, {
         atlas = "images/inventoryimages/hat_mermbreathing.xml"
-    }, { "CLOTHING" }
+    }, { "LEGION", "CLOTHING" }
 )
 AddRecipe2( --巨人之脚
     "giantsfoot", {
@@ -311,7 +311,7 @@ AddRecipe2( --巨人之脚
         Ingredient("manrabbit_tail", 3)
     }, TECH.SCIENCE_TWO, {
         atlas = "images/inventoryimages/giantsfoot.xml"
-    }, { "CLOTHING", "CONTAINERS" }
+    }, { "LEGION", "CLOTHING", "CONTAINERS" }
 )
 AddRecipe2( --简易打窝饵制作器
     "fishhomingtool_normal", {
@@ -319,7 +319,7 @@ AddRecipe2( --简易打窝饵制作器
         Ingredient("stinger", 1)
     }, TECH.FISHING_ONE, {
         atlas = "images/inventoryimages/fishhomingtool_normal.xml"
-    }, { "FISHING" }
+    }, { "LEGION", "FISHING" }
 )
 AddRecipe2( --月藏宝匣套件
     "hiddenmoonlight_item", {
@@ -328,7 +328,7 @@ AddRecipe2( --月藏宝匣套件
         Ingredient("slurtle_shellpieces", 1)
     }, TECH.LOST, {
         atlas = "images/inventoryimages/hiddenmoonlight_item.xml"
-    }, { "STRUCTURES", "CONTAINERS", "COOKING" }
+    }, { "LEGION", "STRUCTURES", "CONTAINERS", "COOKING" }
 )
 AddRecipe2( --月轮宝盘套件
     "revolvedmoonlight_item", {
@@ -337,11 +337,8 @@ AddRecipe2( --月轮宝盘套件
         Ingredient("houndstooth", 1)
     }, TECH.LOST, {
         atlas = "images/inventoryimages/revolvedmoonlight_item.xml"
-    }, { "LIGHT", "CONTAINERS" }
+    }, { "LEGION", "LIGHT", "CONTAINERS", "WINTER" }
 )
-
-------生命子圭
-
 AddRecipe2( --防火漆
     "ointment_l_fireproof", {
         Ingredient("firenettles", 5),
@@ -350,8 +347,11 @@ AddRecipe2( --防火漆
     }, TECH.SCIENCE_TWO, {
         numtogive = 12, no_deconstruction = true,
         atlas = "images/inventoryimages/ointment_l_fireproof.xml"
-    }, { "TOOLS", "SUMMER" }
+    }, { "LEGION", "SUMMER" }
 )
+
+------生命子圭
+
 AddRecipe2( --弱肤药膏
     "ointment_l_sivbloodreduce", {
         Ingredient("succulent_picked", 1),
@@ -361,7 +361,7 @@ AddRecipe2( --弱肤药膏
     }, TECH.SCIENCE_TWO, {
         numtogive = 4,
         atlas = "images/inventoryimages/ointment_l_sivbloodreduce.xml"
-    }, { "TOOLS", "RESTORATION" }
+    }, { "LEGION", "SIVING", "RESTORATION" }
 )
 AddRecipe2( --子圭·垄
     "siving_soil_item", {
@@ -369,7 +369,7 @@ AddRecipe2( --子圭·垄
         Ingredient("pinecone", 10)
     }, TECH.MAGIC_TWO, {
         atlas = "images/inventoryimages/siving_soil_item.xml"
-    }, { "MAGIC", "GARDENING" }
+    }, { "LEGION", "SIVING", "GARDENING" }
 )
 AddRecipe2( --子圭·利川
     "siving_ctlwater_item", {
@@ -378,7 +378,7 @@ AddRecipe2( --子圭·利川
         Ingredient("moonglass", 10)
     }, TECH.MAGIC_THREE, {
         atlas = "images/inventoryimages/siving_ctlwater_item.xml"
-    }, { "MAGIC", "GARDENING", "STRUCTURES" }
+    }, { "LEGION", "SIVING", "GARDENING", "STRUCTURES" }
 )
 AddRecipe2( --子圭·益矩
     "siving_ctldirt_item", {
@@ -387,7 +387,7 @@ AddRecipe2( --子圭·益矩
         Ingredient("townportaltalisman", 10)
     }, TECH.MAGIC_THREE, {
         atlas = "images/inventoryimages/siving_ctldirt_item.xml"
-    }, { "MAGIC", "GARDENING", "STRUCTURES" }
+    }, { "LEGION", "SIVING", "GARDENING", "STRUCTURES" }
 )
 AddRecipe2( --子圭·崇溟
     "siving_ctlall_item", {
@@ -398,7 +398,7 @@ AddRecipe2( --子圭·崇溟
     }, tech_recast[2], {
         nounlock = lock_recast,
         atlas = "images/inventoryimages/siving_ctlall_item.xml"
-    }, { "RECAST", "MAGIC", "GARDENING", "STRUCTURES" }
+    }, { "LEGION", "SIVING", "RECAST", "GARDENING", "STRUCTURES" }
 )
 AddRecipe2( --子圭·育
     "siving_turn", {
@@ -408,7 +408,7 @@ AddRecipe2( --子圭·育
     }, TECH.MAGIC_THREE, {
         placer = "siving_turn_placer",
         atlas = "images/inventoryimages/siving_turn.xml"
-    }, { "MAGIC", "GARDENING", "STRUCTURES" }
+    }, { "LEGION", "SIVING", "GARDENING", "STRUCTURES" }
 )
 AddRecipe2( --子圭·汲
     "siving_mask", {
@@ -416,7 +416,24 @@ AddRecipe2( --子圭·汲
         Ingredient("reviver", 2)
     }, TECH.LOST, {
         atlas = "images/inventoryimages/siving_mask.xml"
-    }, { "ARMOUR", "RESTORATION" }
+    }, { "LEGION", "SIVING", "ARMOUR", "RESTORATION" }
+)
+AddRecipe2( --子圭·庇
+    "siving_suit", {
+        Ingredient("siving_rocks", 16, "images/inventoryimages/siving_rocks.xml"),
+        Ingredient("yellowgem", 1)
+    }, TECH.LOST, {
+        atlas = "images/inventoryimages/siving_suit.xml"
+    }, { "LEGION", "SIVING", "ARMOUR" }
+)
+AddRecipe2( --子圭·翰
+    "siving_feather_real", {
+        Ingredient("siving_derivant_item", 1, "images/inventoryimages/siving_derivant_item.xml"),
+        Ingredient("siving_feather_fake", 6, "images/inventoryimages/siving_feather_fake.xml"),
+        Ingredient(CHARACTER_INGREDIENT.HEALTH, 30)
+    }, TECH.LOST, {
+        atlas = "images/inventoryimages/siving_feather_real.xml"
+    }, { "LEGION", "SIVING", "WEAPONS" }
 )
 AddRecipe2( --子圭·歃
     "siving_mask_gold", {
@@ -427,15 +444,7 @@ AddRecipe2( --子圭·歃
     }, tech_recast[2], {
         nounlock = lock_recast,
         atlas = "images/inventoryimages/siving_mask_gold.xml"
-    }, { "RECAST", "ARMOUR", "RESTORATION" }
-)
-AddRecipe2( --子圭·庇
-    "siving_suit", {
-        Ingredient("siving_rocks", 16, "images/inventoryimages/siving_rocks.xml"),
-        Ingredient("yellowgem", 1)
-    }, TECH.LOST, {
-        atlas = "images/inventoryimages/siving_suit.xml"
-    }, { "ARMOUR" }
+    }, { "LEGION", "SIVING", "RECAST", "ARMOUR", "RESTORATION" }
 )
 AddRecipe2( --子圭·釜
     "siving_suit_gold", {
@@ -446,16 +455,7 @@ AddRecipe2( --子圭·釜
     }, tech_recast[2], {
         nounlock = lock_recast,
         atlas = "images/inventoryimages/siving_suit_gold.xml"
-    }, { "RECAST", "ARMOUR", "CONTAINERS" }
-)
-AddRecipe2( --子圭·翰
-    "siving_feather_real", {
-        Ingredient("siving_derivant_item", 1, "images/inventoryimages/siving_derivant_item.xml"),
-        Ingredient("siving_feather_fake", 6, "images/inventoryimages/siving_feather_fake.xml"),
-        Ingredient(CHARACTER_INGREDIENT.HEALTH, 30)
-    }, TECH.LOST, {
-        atlas = "images/inventoryimages/siving_feather_real.xml"
-    }, { "WEAPONS" }
+    }, { "LEGION", "SIVING", "RECAST", "ARMOUR", "CONTAINERS" }
 )
 
 ------装饰类
@@ -466,7 +466,7 @@ AddRecipe2( --白木吉他
         Ingredient("steelwool", 1)
     }, TECH.SCIENCE_ONE, {
         atlas = "images/inventoryimages/guitar_whitewood.xml"
-    }, { "GARDENING", "TOOLS" }
+    }, { "LEGION", "GARDENING", "TOOLS" }
 )
 AddRecipe2( --白木地垫
     "carpet_whitewood", {
@@ -475,7 +475,7 @@ AddRecipe2( --白木地垫
         placer = "carpet_whitewood_placer", min_spacing = 0,
         atlas = "images/inventoryimages/carpet_whitewood.xml",
         testfn = PlacerTest_carpet
-    }, { "DECOR" }
+    }, { "LEGION", "DECOR" }
 )
 AddRecipe2( --白木地毯
     "carpet_whitewood_big", {
@@ -484,7 +484,7 @@ AddRecipe2( --白木地毯
         placer = "carpet_whitewood_big_placer", min_spacing = 0,
         atlas = "images/inventoryimages/carpet_whitewood_big.xml",
         testfn = PlacerTest_carpet2
-    }, { "DECOR" }
+    }, { "LEGION", "DECOR" }
 )
 AddRecipe2( --线绒地垫
     "carpet_plush", {
@@ -495,7 +495,7 @@ AddRecipe2( --线绒地垫
         placer = "carpet_plush_placer", min_spacing = 0,
         atlas = "images/inventoryimages/carpet_plush.xml",
         testfn = PlacerTest_carpet
-    }, { "DECOR" }
+    }, { "LEGION", "DECOR" }
 )
 AddRecipe2( --线绒地毯
     "carpet_plush_big", {
@@ -506,7 +506,7 @@ AddRecipe2( --线绒地毯
         placer = "carpet_plush_big_placer", min_spacing = 0,
         atlas = "images/inventoryimages/carpet_plush_big.xml",
         testfn = PlacerTest_carpet2
-    }, { "DECOR" }
+    }, { "LEGION", "DECOR" }
 )
 AddRecipe2( --白木展示台
     "chest_whitewood", {
@@ -516,7 +516,7 @@ AddRecipe2( --白木展示台
     }, TECH.SCIENCE_ONE, {
         atlas = "images/inventoryimages/chest_whitewood.xml",
         placer = "chest_whitewood_placer", min_spacing = 1
-    }, { "CONTAINERS", "STRUCTURES" }
+    }, { "LEGION", "CONTAINERS", "STRUCTURES" }
 )
 AddRecipe2( --白木展示柜
     "chest_whitewood_big", {
@@ -526,7 +526,7 @@ AddRecipe2( --白木展示柜
     }, TECH.SCIENCE_TWO, {
         atlas = "images/inventoryimages/chest_whitewood_big.xml",
         placer = "chest_whitewood_big_placer", min_spacing = 1
-    }, { "CONTAINERS", "STRUCTURES" }
+    }, { "LEGION", "CONTAINERS", "STRUCTURES" }
 )
 AddRecipe2( --白木地片
     "mat_whitewood_item", {
@@ -534,7 +534,7 @@ AddRecipe2( --白木地片
     }, TECH.NONE, {
         numtogive = 6,
         atlas = "images/inventoryimages/mat_whitewood_item.xml", image = "mat_whitewood_item.tex"
-    }, { "DECOR" }
+    }, { "LEGION", "DECOR" }
 )
 
 if _G.CONFIGS_LEGION.DRESSUP then
@@ -545,7 +545,7 @@ if _G.CONFIGS_LEGION.DRESSUP then
             Ingredient("glommerfuel", 1)
         }, TECH.MAGIC_TWO, {
             atlas = "images/inventoryimages/pinkstaff.xml"
-        }, { "MAGIC", "DECOR" }
+        }, { "LEGION", "MAGIC", "DECOR" }
     )
     AddRecipe2( --皇帝的王冠
         "theemperorscrown", {
@@ -553,7 +553,7 @@ if _G.CONFIGS_LEGION.DRESSUP then
             Ingredient("rocks", 1)
         }, TECH.NONE, {
             atlas = "images/inventoryimages/theemperorscrown.xml"
-        }, { "CLOTHING", "DECOR" }
+        }, { "LEGION", "CLOTHING", "DECOR" }
     )
     AddRecipe2( --皇帝的披风
         "theemperorsmantle", {
@@ -561,7 +561,7 @@ if _G.CONFIGS_LEGION.DRESSUP then
             Ingredient("cutgrass", 1)
         }, TECH.NONE, {
             atlas = "images/inventoryimages/theemperorsmantle.xml"
-        }, { "CLOTHING", "DECOR" }
+        }, { "LEGION", "CLOTHING", "DECOR" }
     )
     AddRecipe2( --皇帝的权杖
         "theemperorsscepter", {
@@ -569,7 +569,7 @@ if _G.CONFIGS_LEGION.DRESSUP then
             Ingredient("twigs", 1)
         }, TECH.NONE, {
             atlas = "images/inventoryimages/theemperorsscepter.xml"
-        }, { "CLOTHING", "DECOR" }
+        }, { "LEGION", "CLOTHING", "DECOR" }
     )
     AddRecipe2( --皇帝的吊坠
         "theemperorspendant", {
@@ -577,7 +577,7 @@ if _G.CONFIGS_LEGION.DRESSUP then
             Ingredient("flint", 1)
         }, TECH.NONE, {
             atlas = "images/inventoryimages/theemperorspendant.xml"
-        }, { "CLOTHING", "DECOR" }
+        }, { "LEGION", "CLOTHING", "DECOR" }
     )
 end
 
