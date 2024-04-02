@@ -1142,17 +1142,19 @@ table.insert(worldboxes.POCKETDIMENSIONCONTAINER_DEFS, {
 table.insert(worldboxes.POCKETDIMENSIONCONTAINER_DEFS, {
     name = "cloudpine_l2",
     prefab = "cloudpine_box_l2",
-    -- ui = "anim/ui_portal_shadow_3x4.zip",
     widgetname = "cloudpine_box_l2",
-    -- tags = { "spoiler" },
     data_only = true
 })
 table.insert(worldboxes.POCKETDIMENSIONCONTAINER_DEFS, {
     name = "cloudpine_l3",
     prefab = "cloudpine_box_l3",
-    -- ui = "anim/ui_portal_shadow_3x4.zip",
     widgetname = "cloudpine_box_l3",
-    -- tags = { "spoiler" },
+    data_only = true
+})
+table.insert(worldboxes.POCKETDIMENSIONCONTAINER_DEFS, {
+    name = "cloudpine_l4",
+    prefab = "cloudpine_box_l4",
+    widgetname = "cloudpine_box_l4",
     data_only = true
 })
 
@@ -1803,41 +1805,40 @@ end
 --[[ 世界修改 ]]
 --------------------------------------------------------------------------
 
-AddPrefabPostInit("world", function(inst)
-    inst:AddComponent("boxcloudpine")
+if IsServer then
+    AddPrefabPostInit("world", function(inst)
+        inst:AddComponent("boxcloudpine")
+        inst:AddComponent("worldsaverlegion")
 
-    if not IsServer then return end
+        LS_StartPeriodicPatrol(inst)
 
-    inst:AddComponent("worldsaverlegion")
+        if CONFIGS_LEGION.BACKCUBCHANCE > 0 and LootTables['bearger'] then --熊獾会掉落靠背熊
+            table.insert(LootTables['bearger'], { 'backcub', CONFIGS_LEGION.BACKCUBCHANCE })
+        end
+        if LootTables['antlion'] then --蚁狮会掉落砂之抵御的蓝图
+            table.insert(LootTables['antlion'], { 'shield_l_sand_blueprint', 1 })
+        end
+        if LootTables['lordfruitfly'] then --果蝇王会掉落虫翅碎片
+            table.insert(LootTables['lordfruitfly'], { 'ahandfulofwings', 1 })
+            table.insert(LootTables['lordfruitfly'], { 'ahandfulofwings', 1 })
+        end
+        -- local OnSave_old = inst.OnSave
+        -- inst.OnSave = function(inst, data)
+        --     local refs = nil
+        --     if OnSave_old ~= nil then
+        --         refs = OnSave_old(inst, data)
+        --     end
+        --     return refs
+        -- end
 
-    LS_StartPeriodicPatrol(inst)
-
-    if CONFIGS_LEGION.BACKCUBCHANCE > 0 and LootTables['bearger'] then --熊獾会掉落靠背熊
-        table.insert(LootTables['bearger'], { 'backcub', CONFIGS_LEGION.BACKCUBCHANCE })
-    end
-    if LootTables['antlion'] then --蚁狮会掉落砂之抵御的蓝图
-        table.insert(LootTables['antlion'], { 'shield_l_sand_blueprint', 1 })
-    end
-    if LootTables['lordfruitfly'] then --果蝇王会掉落虫翅碎片
-        table.insert(LootTables['lordfruitfly'], { 'ahandfulofwings', 1 })
-        table.insert(LootTables['lordfruitfly'], { 'ahandfulofwings', 1 })
-    end
-    -- local OnSave_old = inst.OnSave
-    -- inst.OnSave = function(inst, data)
-    --     local refs = nil
-    --     if OnSave_old ~= nil then
-    --         refs = OnSave_old(inst, data)
-    --     end
-    --     return refs
-    -- end
-
-    -- local OnPreLoad_old = inst.OnPreLoad
-    -- inst.OnPreLoad = function(inst, data, ...)
-    --     if OnPreLoad_old ~= nil then
-    --         OnPreLoad_old(inst, data, ...)
-    --     end
-    --     if data == nil then
-    --         return
-    --     end
-    -- end
-end)
+        -- local OnPreLoad_old = inst.OnPreLoad
+        -- inst.OnPreLoad = function(inst, data, ...)
+        --     if OnPreLoad_old ~= nil then
+        --         OnPreLoad_old(inst, data, ...)
+        --     end
+        --     if data == nil then
+        --         return
+        --     end
+        -- end
+    end)
+end

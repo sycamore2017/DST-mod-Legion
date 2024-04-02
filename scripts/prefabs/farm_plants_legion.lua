@@ -1464,9 +1464,16 @@ end, {
 --[[ 云青松 ]]
 --------------------------------------------------------------------------
 
+local function OnRemoveEntity_pine(inst)
+	if TheWorld.components.boxcloudpine ~= nil then
+		TheWorld.components.boxcloudpine:ManageEnt(inst, false, nil)
+		TheWorld.components.boxcloudpine:UpdateBox(inst)
+	end
+end
 local function OnWorkedFinish_pine1(inst, worker)
-	--undo 通知世界，有青松被移除了
 	inst.components.container_proxy:Close() --关掉世界容器
+	inst.OnRemoveEntity = nil --防止重复触发
+	OnRemoveEntity_pine(inst)
 	OnWorkedFinish_p2(inst, worker)
 end
 local function WakeUpLeif(ent)
@@ -1699,6 +1706,12 @@ local function Fn_getdata_pine(inst)
 	end
     return data
 end
+local function OnCluster_pine(cpt, now)
+	if TheWorld.components.boxcloudpine ~= nil then
+		TheWorld.components.boxcloudpine:ManageEnt(cpt.inst, true, now)
+		TheWorld.components.boxcloudpine:UpdateBox(cpt.inst)
+	end
+end
 
 table.insert(prefs, Prefab("plant_log_l", function()
 	local inst = CreateEntity()
@@ -1728,6 +1741,7 @@ table.insert(prefs, Prefab("plant_log_l", function()
 
 	inst:AddComponent("workable")
 
+	inst.components.perennialcrop2.fn_cluster = OnCluster_pine
 	inst.components.perennialcrop2:SetUp("log", CROPS_DATA_LEGION["log"], {
 		moisture = true, nutrient = true, tendable = true, seasonlisten = nil,
 		nomagicgrow = nil, fireproof = nil, cangrowindrak = true
@@ -1741,6 +1755,7 @@ table.insert(prefs, Prefab("plant_log_l", function()
 
 	inst.fn_planted = OnPlant_p2
 
+	inst.OnRemoveEntity = OnRemoveEntity_pine
 	inst.OnLoadPostPass = AttachContainer_pine
 	if not POPULATING then
 		AttachContainer_pine(inst)

@@ -98,6 +98,14 @@ MakeWorldBox({
     },
     fn_server = FnServer_pine
 })
+MakeWorldBox({
+    name = "cloudpine_box_l4", boxkey = "cloudpine_l4",
+    assets = {
+        Asset("ANIM", "anim/ui_bookstation_4x5.zip"),
+        Asset("ANIM", "anim/ui_cloudpine_box_4x6.zip")
+    },
+    fn_server = FnServer_pine
+})
 
 --------------------
 --------------------

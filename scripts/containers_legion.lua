@@ -479,6 +479,9 @@ for y = 0, 5 do
     table.insert(params.cloudpine_box_l3.widget.slotpos, Vector3(-114 + 225, (-77 * y) + 127 - (y * 2), 0))
 end
 
+------豪华高级
+params.cloudpine_box_l4 = params.cloudpine_box_l3
+
 ------中级
 params.cloudpine_box_l2 = {
     widget = {
