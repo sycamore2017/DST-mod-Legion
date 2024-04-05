@@ -107,6 +107,31 @@ MakeWorldBox({
     fn_server = FnServer_pine
 })
 
+--------------------------------------------------------------------------
+--[[ 云青松容器的临时管理实体 ]]
+--------------------------------------------------------------------------
+
+table.insert(prefs, Prefab("cloudpine_container", function()
+    local inst = CreateEntity()
+	inst.entity:AddNetwork()
+
+	inst:AddTag("CLASSIFIED")
+	inst:Hide()
+
+	inst:AddComponent("container_proxy")
+
+	inst.entity:SetPristine()
+	if not TheWorld.ismastersim then return inst end
+
+	if TheWorld.components.boxcloudpine ~= nil then
+		TheWorld.components.boxcloudpine:SetMaster(inst)
+	end
+
+	inst.persists = false
+
+	return inst
+end, nil, nil))
+
 --------------------
 --------------------
 

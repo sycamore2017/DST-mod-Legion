@@ -688,6 +688,111 @@ table.insert(prefs, Prefab("ointment_l_fireproof", function() ------防火漆
     return inst
 end, GetAssets("ointment_l_fireproof"), nil))
 
+local function CP_Open_nut(self, doer, ...)
+    self.Open_l(self, doer, ...)
+    if
+        doer ~= nil and doer.boxopener_l == nil and
+        self.master.components.container:IsOpenedBy(doer)
+    then
+        doer.boxopener_l = doer:GetPosition()
+        if doer.task_boxopener_l ~= nil then
+            doer.task_boxopener_l:Cancel()
+        end
+        doer.task_boxopener_l = doer:DoPeriodicTask(0.5, function(doer)
+            if doer.components.health ~= nil and doer.components.health:IsDead() then
+                self:Close(doer)
+            elseif doer:GetDistanceSqToPoint(doer.boxopener_l) > 4 then
+                self:Close(doer)
+            end
+        end, 0.5)
+    end
+end
+local function CP_OnClose_nut(self, doer, ...)
+    self.OnClose_l(self, doer, ...)
+    if doer ~= nil then
+        if doer.task_boxopener_l ~= nil then
+            doer.task_boxopener_l:Cancel()
+            doer.task_boxopener_l = nil
+        end
+        if doer.boxopener_l ~= nil then
+            doer.boxopener_l = nil
+            if doer.components.health ~= nil and not doer.components.health:IsDead() then
+                local cost = 2
+                if doer.siv_blood_l_reducer_v ~= nil then
+                    if doer.siv_blood_l_reducer_v >= 1 then
+                        cost = 0
+                    else
+                        cost = cost * (1-doer.siv_blood_l_reducer_v)
+                    end
+                end
+                if cost > 0 then
+                    doer.components.health:DoDelta(-cost, nil, self.inst.prefab, nil, nil, true)
+                end
+            end
+        end
+    end
+end
+local function OnOpen_nut(inst)
+    if inst._dd == nil then
+        inst.AnimState:PlayAnimation("idle_nut_o")
+        inst.components.inventoryitem.atlasname = "images/inventoryimages/boxopener_l_o.xml"
+        inst.components.inventoryitem:ChangeImageName("boxopener_l_o")
+    else
+        inst.AnimState:PlayAnimation(inst._dd.anim2)
+        inst.components.inventoryitem.atlasname = inst._dd.img_atlas2
+        inst.components.inventoryitem:ChangeImageName(inst._dd.img_tex2)
+    end
+end
+local function OnClose_nut(inst)
+    if inst._dd == nil then
+        inst.AnimState:PlayAnimation("idle_nut")
+        inst.components.inventoryitem.atlasname = "images/inventoryimages/boxopener_l.xml"
+        inst.components.inventoryitem:ChangeImageName("boxopener_l")
+    else
+        inst.AnimState:PlayAnimation(inst._dd.anim)
+        inst.components.inventoryitem.atlasname = inst._dd.img_atlas
+        inst.components.inventoryitem:ChangeImageName(inst._dd.img_tex)
+    end
+end
+local function AttachContainer_nut(inst)
+	if TheWorld.components.boxcloudpine ~= nil then
+		TheWorld.components.boxcloudpine:SetMaster(inst)
+	end
+end
+table.insert(prefs, Prefab("boxopener_l", function() ------云松子
+    local inst = CreateEntity()
+    Fn_common(inst, "boxopener_l", nil, "idle_nut", nil)
+    SetFloatable(inst, { nil, "small", 0.25, 1 })
+
+    inst:AddComponent("container_proxy")
+
+    inst.entity:SetPristine()
+    if not TheWorld.ismastersim then return inst end
+
+    Fn_server(inst, "boxopener_l")
+    SetFuel(inst, nil)
+    MakeHauntableLaunch(inst)
+
+    local container_proxy = inst.components.container_proxy
+    container_proxy.Open_l = container_proxy.Open
+    container_proxy.OnClose_l = container_proxy.OnClose
+    container_proxy.Open = CP_Open_nut
+    container_proxy.OnClose = CP_OnClose_nut
+    container_proxy:SetOnOpenFn(OnOpen_nut)
+	container_proxy:SetOnCloseFn(OnClose_nut)
+
+    inst.OnLoadPostPass = AttachContainer_nut
+	if not POPULATING then
+		AttachContainer_nut(inst)
+	end
+
+    return inst
+end, GetAssets("boxopener_l", {
+    Asset("ATLAS", "images/inventoryimages/boxopener_l_o.xml"),
+    Asset("IMAGE", "images/inventoryimages/boxopener_l_o.tex"),
+    Asset("ATLAS_BUILD", "images/inventoryimages/boxopener_l_o.xml", 256)
+}), nil))
+
 --------------------------------------------------------------------------
 --[[ 基础材料 ]]
 --------------------------------------------------------------------------

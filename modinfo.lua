@@ -54,15 +54,6 @@ configuration_options = L and {
         },
         default = "english"
     },
-    {   name = "CleaningUpStench",
-        label = "Cleaning Up Stench",
-        hover = "Auto-cleaning-up smelly things on the ground.",
-        options = {
-            {description = "Yes", data = true},
-            {description = "No(default)", data = false}
-        },
-        default = false
-    },
     {   name = "AutoStackedLoot",
         label = "Auto Stacking of Loots",
         hover = "New dropped loots will auto stack within 2 seconds (Not much modification, but it should be quite useful).",
@@ -600,15 +591,6 @@ configuration_options = L and {
             {description = "中文", data = "chinese"}
         },
         default = "chinese"
-    },
-    {   name = "CleaningUpStench",
-        label = "臭臭自动清理",
-        hover = "自动清除掉在地上的臭东西(大便、鸟粪、腐烂物)。化作春泥更护花。",
-        options = {
-            {description = "是", data = true},
-            {description = "否(默认)", data = false}
-        },
-        default = false
     },
     {   name = "AutoStackedLoot",
         label = "掉落物自动堆叠",

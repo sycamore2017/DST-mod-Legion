@@ -274,7 +274,6 @@ Assets = {
 _G.CONFIGS_LEGION = {
     ENABLEDMODS = {},
     LANGUAGES = GetModConfigData("Language") or "chinese", --语言
-    CLEANINGUPSTENCH = GetModConfigData("CleaningUpStench"), --自动清除地上的臭臭
     AUTOSTACKEDLOOT = GetModConfigData("AutoStackedLoot"), --掉落物自动堆叠
     MOUSEINFO = GetModConfigData("MouseInfo"), --鼠标悬停展示特殊信息
 

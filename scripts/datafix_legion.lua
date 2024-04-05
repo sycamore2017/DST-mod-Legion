@@ -1547,7 +1547,10 @@ end)
 --------------------------------------------------------------------------
 
 --整个函数都改了，删掉了没用的逻辑
-local function FindPickupableItem_filter(v, ba, owner, radius, furthestfirst, positionoverride, ignorethese, onlytheseprefabs, allowpickables, ispickable, worker)
+local function FindPickupableItem_filter(v, ba, owner, radius, furthestfirst, positionoverride, ignorethese, onlytheseprefabs, allowpickables, ispickable, worker, extra_filter)
+    if extra_filter ~= nil and not extra_filter(worker, v, owner) then
+        return false
+    end
     if v.components.burnable ~= nil and (v.components.burnable:IsBurning() or v.components.burnable:IsSmoldering()) then
         return false
     end
@@ -1569,7 +1572,7 @@ local function FindPickupableItem_filter(v, ba, owner, radius, furthestfirst, po
 end
 
 local FindPickupableItem_old = _G.FindPickupableItem
-_G.FindPickupableItem = function(owner, radius, furthestfirst, positionoverride, ignorethese, onlytheseprefabs, allowpickables, worker)
+_G.FindPickupableItem = function(owner, radius, furthestfirst, positionoverride, ignorethese, onlytheseprefabs, allowpickables, worker, extra_filter)
     if owner == nil or owner.components.inventory == nil then
         return nil
     end
@@ -1589,11 +1592,11 @@ _G.FindPickupableItem = function(owner, radius, furthestfirst, positionoverride,
     for i = istart, iend, idiff do
         local v = ents[i]
         local ispickable = v:HasTag("pickable")
-        if FindPickupableItem_filter(v, ba, owner, radius, furthestfirst, positionoverride, ignorethese, onlytheseprefabs, allowpickables, ispickable, worker) then
+        if FindPickupableItem_filter(v, ba, owner, radius, furthestfirst, positionoverride, ignorethese, onlytheseprefabs, allowpickables, ispickable, worker, extra_filter) then
             return v, ispickable
         end
     end
-    return FindPickupableItem_old(owner, radius, furthestfirst, positionoverride, ignorethese, onlytheseprefabs, allowpickables, worker)
+    return FindPickupableItem_old(owner, radius, furthestfirst, positionoverride, ignorethese, onlytheseprefabs, allowpickables, worker, extra_filter)
 end
 
 --------------------------------------------------------------------------

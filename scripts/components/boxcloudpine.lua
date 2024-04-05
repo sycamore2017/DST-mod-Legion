@@ -12,6 +12,10 @@ local BoxCloudPine = Class(function(self, inst)
     -- self.task_load = nil
 end)
 
+function BoxCloudPine:CanBeOpened()
+    return self.boxkey ~= nil
+end
+
 function BoxCloudPine:SetMaster(target)
     if self.boxkey == nil then
         if target.components.container_proxy:CanBeOpened() then
