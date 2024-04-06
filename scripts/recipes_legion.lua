@@ -53,8 +53,6 @@ local function PlacerTest_carpet2(pt, rot)
 	return PlacerTest_carpet(pt, rot, { -3.1, 0, 3.1 })
 end
 
-------重铸青光
-
 local tech_recast
 local lock_recast
 if _G.CONFIGS_LEGION.TECHUNLOCK == "lootdropper" then
@@ -64,6 +62,263 @@ else
     tech_recast = { TECH.ELECOURMALINE_ONE, TECH.ELECOURMALINE_THREE }
     lock_recast = true
 end
+
+------
+
+AddRecipe2( --苔衣发卡
+    "hat_lichen", {
+        Ingredient("lightbulb", 6),
+        Ingredient("cutlichen", 4)
+    }, TECH.NONE, {
+        atlas = "images/inventoryimages/hat_lichen.xml"
+    }, { "LEGION", "CLOTHING", "LIGHT" }
+)
+AddRecipe2( --香包
+    "sachet", {
+        Ingredient("petals_rose", 3, "images/inventoryimages/petals_rose.xml"),
+        Ingredient("petals_lily", 3, "images/inventoryimages/petals_lily.xml"),
+        Ingredient("petals_orchid", 3, "images/inventoryimages/petals_orchid.xml")
+    }, TECH.NONE, {
+        atlas = "images/inventoryimages/sachet.xml"
+    }, { "LEGION", "CLOTHING" }
+)
+AddRecipe2( --脱壳之翅
+    "boltwingout", {
+        Ingredient("ahandfulofwings", 40, "images/inventoryimages/ahandfulofwings.xml"),
+        Ingredient("glommerwings", 1),
+        Ingredient("stinger", 40)
+    }, TECH.SCIENCE_TWO, {
+        atlas = "images/inventoryimages/boltwingout.xml"
+    }, { "LEGION", "ARMOUR", "CONTAINERS" }
+)
+AddRecipe2( --永不凋零
+    "neverfade", {
+        Ingredient("rosorns", 1, "images/inventoryimages/rosorns.xml"),
+        Ingredient("lileaves", 1, "images/inventoryimages/lileaves.xml"),
+        Ingredient("orchitwigs", 1, "images/inventoryimages/orchitwigs.xml")
+    }, TECH.MAGIC_THREE, {
+        atlas = "images/inventoryimages/neverfade.xml",
+        -- image = nil, --默认为 (product参数 或 制作物名)..".tex"
+        -- builder_tag = "masterchef", --拥有该标签的玩家才可制作，否则就完全不显示出来
+        -- numtogive = 2, --一次制作得到物品数量
+        -- nounlock = true, --该配方制作了不会永久解锁。不写就是制作一次就可以永久解锁了
+        -- no_deconstruction = true, --该配方无法被魔法拆解
+        -- station_tag = "shadow_forge", --科技站需要带有该标签，才能制作该道具
+        -- product = "chum", --制作物会被替换为该参数所指对象
+        -- description = "transmute_log", --制作栏描述会被该参数替换
+
+        -- placer = "carpet_whitewood_big_placer", --如果是建筑摆放类的，需要指定 placer
+        -- min_spacing = 1.5, --摆放限制距离。也就是 1.5半径内不能有其他对象。默认为3.2
+        -- testfn = function(pt, rot) end, --额外的摆放限制函数
+    }, { "LEGION", "WEAPONS" }
+)
+AddRecipe2( --木盾
+    "shield_l_log", {
+        Ingredient("boards", 2),
+        Ingredient("rope", 2)
+    }, TECH.SCIENCE_ONE, {
+        atlas = "images/inventoryimages/shield_l_log.xml"
+    }, { "LEGION", "WEAPONS", "ARMOUR" }
+)
+AddRecipe2( --砂之抵御
+    "shield_l_sand", {
+        Ingredient("townportaltalisman", 6),
+        Ingredient("shield_l_log", 1, "images/inventoryimages/shield_l_log.xml"),
+        Ingredient("turf_desertdirt", 3)
+    }, TECH.LOST, {
+        atlas = "images/inventoryimages/shield_l_sand.xml"
+    }, { "LEGION", "WEAPONS", "ARMOUR", "SUMMER" }
+)
+AddRecipe2( --多变的云
+    "book_weather", {
+        Ingredient("papyrus", 8),
+        Ingredient("squamousfruit", 3, "images/inventoryimages/squamousfruit.xml"),
+        Ingredient("raindonate", 3, "images/inventoryimages/raindonate.xml")
+    }, TECH.MAGIC_THREE, {
+        atlas = "images/inventoryimages/book_weather.xml"
+    }, { "LEGION", "MAGIC", "WEAPONS", "RAIN" }
+)
+AddRecipe2( --鱼之息
+    "hat_mermbreathing", {
+        Ingredient("merm_scales", 3, "images/inventoryimages/merm_scales.xml")
+    }, TECH.SCIENCE_TWO, {
+        atlas = "images/inventoryimages/hat_mermbreathing.xml"
+    }, { "LEGION", "CLOTHING" }
+)
+AddRecipe2( --巨人之脚
+    "giantsfoot", {
+        Ingredient("merm_scales", 3, "images/inventoryimages/merm_scales.xml"),
+        Ingredient("pigskin", 3),
+        Ingredient("manrabbit_tail", 3)
+    }, TECH.SCIENCE_TWO, {
+        atlas = "images/inventoryimages/giantsfoot.xml"
+    }, { "LEGION", "CLOTHING", "CONTAINERS" }
+)
+AddRecipe2( --简易打窝饵制作器
+    "fishhomingtool_normal", {
+        Ingredient("cutreeds", 1),
+        Ingredient("stinger", 1)
+    }, TECH.FISHING_ONE, {
+        atlas = "images/inventoryimages/fishhomingtool_normal.xml"
+    }, { "LEGION", "FISHING" }
+)
+AddRecipe2( --月藏宝匣套件
+    "hiddenmoonlight_item", {
+        Ingredient("bluemooneye", 1),
+        Ingredient("moonrocknugget", 2),
+        Ingredient("slurtle_shellpieces", 1)
+    }, TECH.LOST, {
+        atlas = "images/inventoryimages/hiddenmoonlight_item.xml"
+    }, { "LEGION", "STRUCTURES", "CONTAINERS", "COOKING" }
+)
+AddRecipe2( --月轮宝盘套件
+    "revolvedmoonlight_item", {
+        Ingredient("yellowmooneye", 1),
+        Ingredient("moonrocknugget", 2),
+        Ingredient("houndstooth", 1)
+    }, TECH.LOST, {
+        atlas = "images/inventoryimages/revolvedmoonlight_item.xml"
+    }, { "LEGION", "LIGHT", "CONTAINERS", "WINTER" }
+)
+AddRecipe2( --云松子
+    "boxopener_l", {
+        Ingredient("foliageath", 1, "images/inventoryimages/foliageath.xml"),
+        Ingredient("waterplant_planter", 1),
+        Ingredient("cutted_lumpyevergreen", 5, "images/inventoryimages/cutted_lumpyevergreen.xml")
+    }, TECH.MAGIC_TWO, {
+        atlas = "images/inventoryimages/boxopener_l.xml"
+    }, { "LEGION", "CONTAINERS" }
+)
+AddRecipe2( --防火漆
+    "ointment_l_fireproof", {
+        Ingredient("firenettles", 5),
+        Ingredient("lavae_egg", 1),
+        Ingredient("slurtleslime", 5)
+    }, TECH.SCIENCE_TWO, {
+        numtogive = 12, no_deconstruction = true,
+        atlas = "images/inventoryimages/ointment_l_fireproof.xml"
+    }, { "LEGION", "SUMMER" }
+)
+
+------生命子圭
+
+AddRecipe2( --弱肤药膏
+    "ointment_l_sivbloodreduce", {
+        Ingredient("succulent_picked", 1),
+        Ingredient("green_cap", 3),
+        Ingredient("spoiled_fish_small", 1),
+        Ingredient("rock_avocado_fruit", 3, nil, nil, "rock_avocado_fruit_rockhard.tex") --石果的贴图和名字不一样
+    }, TECH.SCIENCE_TWO, {
+        numtogive = 4,
+        atlas = "images/inventoryimages/ointment_l_sivbloodreduce.xml"
+    }, { "LEGION", "SIVING", "RESTORATION" }
+)
+AddRecipe2( --子圭·垄
+    "siving_soil_item", {
+        Ingredient("siving_rocks", 6, "images/inventoryimages/siving_rocks.xml"),
+        Ingredient("pinecone", 10)
+    }, TECH.MAGIC_TWO, {
+        atlas = "images/inventoryimages/siving_soil_item.xml"
+    }, { "LEGION", "SIVING", "GARDENING" }
+)
+AddRecipe2( --子圭·利川
+    "siving_ctlwater_item", {
+        Ingredient("siving_rocks", 20, "images/inventoryimages/siving_rocks.xml"),
+        Ingredient("greengem", 1),
+        Ingredient("moonglass", 10)
+    }, TECH.MAGIC_THREE, {
+        atlas = "images/inventoryimages/siving_ctlwater_item.xml"
+    }, { "LEGION", "SIVING", "GARDENING", "STRUCTURES" }
+)
+AddRecipe2( --子圭·益矩
+    "siving_ctldirt_item", {
+        Ingredient("siving_rocks", 20, "images/inventoryimages/siving_rocks.xml"),
+        Ingredient("greengem", 1),
+        Ingredient("townportaltalisman", 10)
+    }, TECH.MAGIC_THREE, {
+        atlas = "images/inventoryimages/siving_ctldirt_item.xml"
+    }, { "LEGION", "SIVING", "GARDENING", "STRUCTURES" }
+)
+AddRecipe2( --子圭·崇溟
+    "siving_ctlall_item", {
+        Ingredient("siving_ctlwater_item", 1, "images/inventoryimages/siving_ctlwater_item.xml"),
+        Ingredient("siving_ctldirt_item", 1, "images/inventoryimages/siving_ctldirt_item.xml"),
+        Ingredient("siving_derivant_item", 1, "images/inventoryimages/siving_derivant_item.xml"),
+        Ingredient("singingshell_octave4", 1, nil, nil, "singingshell_octave4_1.tex")
+    }, tech_recast[2], {
+        nounlock = lock_recast,
+        atlas = "images/inventoryimages/siving_ctlall_item.xml"
+    }, { "LEGION", "SIVING", "RECAST", "GARDENING", "STRUCTURES" }
+)
+AddRecipe2( --子圭·育
+    "siving_turn", {
+        Ingredient("siving_rocks", 40, "images/inventoryimages/siving_rocks.xml"),
+        Ingredient("siving_derivant_item", 1, "images/inventoryimages/siving_derivant_item.xml"),
+        Ingredient("seeds", 40),
+    }, TECH.MAGIC_THREE, {
+        placer = "siving_turn_placer",
+        atlas = "images/inventoryimages/siving_turn.xml"
+    }, { "LEGION", "SIVING", "GARDENING", "STRUCTURES" }
+)
+AddRecipe2( --子圭·汲
+    "siving_mask", {
+        Ingredient("siving_rocks", 12, "images/inventoryimages/siving_rocks.xml"),
+        Ingredient("reviver", 2)
+    }, TECH.LOST, {
+        atlas = "images/inventoryimages/siving_mask.xml"
+    }, { "LEGION", "SIVING", "ARMOUR", "RESTORATION" }
+)
+AddRecipe2( --子圭·庇
+    "siving_suit", {
+        Ingredient("siving_rocks", 16, "images/inventoryimages/siving_rocks.xml"),
+        Ingredient("yellowgem", 1)
+    }, TECH.LOST, {
+        atlas = "images/inventoryimages/siving_suit.xml"
+    }, { "LEGION", "SIVING", "ARMOUR" }
+)
+AddRecipe2( --子圭·翰
+    "siving_feather_real", {
+        Ingredient("siving_derivant_item", 1, "images/inventoryimages/siving_derivant_item.xml"),
+        Ingredient("siving_feather_fake", 6, "images/inventoryimages/siving_feather_fake.xml"),
+        Ingredient(CHARACTER_INGREDIENT.HEALTH, 30)
+    }, TECH.LOST, {
+        atlas = "images/inventoryimages/siving_feather_real.xml"
+    }, { "LEGION", "SIVING", "WEAPONS" }
+)
+AddRecipe2( --子圭·歃
+    "siving_mask_gold", {
+        Ingredient("goggleshat", 1),
+        Ingredient("siving_mask", 1, "images/inventoryimages/siving_mask.xml"),
+        Ingredient("siving_derivant_item", 1, "images/inventoryimages/siving_derivant_item.xml"),
+        Ingredient("dish_shyerryjam", 1, "images/inventoryimages/dish_shyerryjam.xml")
+    }, tech_recast[2], {
+        nounlock = lock_recast,
+        atlas = "images/inventoryimages/siving_mask_gold.xml"
+    }, { "LEGION", "SIVING", "RECAST", "ARMOUR", "RESTORATION" }
+)
+AddRecipe2( --子圭·釜
+    "siving_suit_gold", {
+        Ingredient("onemanband", 1),
+        Ingredient("siving_suit", 1, "images/inventoryimages/siving_suit.xml"),
+        Ingredient("siving_derivant_item", 1, "images/inventoryimages/siving_derivant_item.xml"),
+        Ingredient("bundlewrap", 1)
+    }, tech_recast[2], {
+        nounlock = lock_recast,
+        atlas = "images/inventoryimages/siving_suit_gold.xml"
+    }, { "LEGION", "SIVING", "RECAST", "ARMOUR", "CONTAINERS" }
+)
+AddRecipe2( --子圭·系
+    "siving_boxopener", {
+        Ingredient("boxopener_l", 1, "images/inventoryimages/boxopener_l.xml"),
+        Ingredient("siving_derivant_item", 1, "images/inventoryimages/siving_derivant_item.xml"),
+        Ingredient("foliageath", 1, "images/inventoryimages/foliageath.xml"),
+        Ingredient("rock_avocado_fruit_sprout", 1)
+    }, TECH.MAGIC_THREE, {
+        atlas = "images/inventoryimages/siving_boxopener.xml"
+    }, { "LEGION", "SIVING", "CONTAINERS" }
+)
+
+------重铸青光
 
 AddRecipe2( --斧铲-三用型
     "tripleshovelaxe", {
@@ -221,242 +476,6 @@ AddRecipe2( --灵魂契约
 
 -- tech_recast = nil
 -- lock_recast = nil
-
-------
-
-AddRecipe2( --苔衣发卡
-    "hat_lichen", {
-        Ingredient("lightbulb", 6),
-        Ingredient("cutlichen", 4)
-    }, TECH.NONE, {
-        atlas = "images/inventoryimages/hat_lichen.xml"
-    }, { "LEGION", "CLOTHING", "LIGHT" }
-)
-AddRecipe2( --香包
-    "sachet", {
-        Ingredient("petals_rose", 3, "images/inventoryimages/petals_rose.xml"),
-        Ingredient("petals_lily", 3, "images/inventoryimages/petals_lily.xml"),
-        Ingredient("petals_orchid", 3, "images/inventoryimages/petals_orchid.xml")
-    }, TECH.NONE, {
-        atlas = "images/inventoryimages/sachet.xml"
-    }, { "LEGION", "CLOTHING" }
-)
-AddRecipe2( --脱壳之翅
-    "boltwingout", {
-        Ingredient("ahandfulofwings", 40, "images/inventoryimages/ahandfulofwings.xml"),
-        Ingredient("glommerwings", 1),
-        Ingredient("stinger", 40)
-    }, TECH.SCIENCE_TWO, {
-        atlas = "images/inventoryimages/boltwingout.xml"
-    }, { "LEGION", "ARMOUR", "CONTAINERS" }
-)
-AddRecipe2( --永不凋零
-    "neverfade", {
-        Ingredient("rosorns", 1, "images/inventoryimages/rosorns.xml"),
-        Ingredient("lileaves", 1, "images/inventoryimages/lileaves.xml"),
-        Ingredient("orchitwigs", 1, "images/inventoryimages/orchitwigs.xml")
-    }, TECH.MAGIC_THREE, {
-        atlas = "images/inventoryimages/neverfade.xml",
-        -- image = nil, --默认为 (product参数 或 制作物名)..".tex"
-        -- builder_tag = "masterchef", --拥有该标签的玩家才可制作，否则就完全不显示出来
-        -- numtogive = 2, --一次制作得到物品数量
-        -- nounlock = true, --该配方制作了不会永久解锁。不写就是制作一次就可以永久解锁了
-        -- no_deconstruction = true, --该配方无法被魔法拆解
-        -- station_tag = "shadow_forge", --科技站需要带有该标签，才能制作该道具
-        -- product = "chum", --制作物会被替换为该参数所指对象
-        -- description = "transmute_log", --制作栏描述会被该参数替换
-
-        -- placer = "carpet_whitewood_big_placer", --如果是建筑摆放类的，需要指定 placer
-        -- min_spacing = 1.5, --摆放限制距离。也就是 1.5半径内不能有其他对象。默认为3.2
-        -- testfn = function(pt, rot) end, --额外的摆放限制函数
-    }, { "LEGION", "WEAPONS" }
-)
-AddRecipe2( --木盾
-    "shield_l_log", {
-        Ingredient("boards", 2),
-        Ingredient("rope", 2)
-    }, TECH.SCIENCE_ONE, {
-        atlas = "images/inventoryimages/shield_l_log.xml"
-    }, { "LEGION", "WEAPONS", "ARMOUR" }
-)
-AddRecipe2( --砂之抵御
-    "shield_l_sand", {
-        Ingredient("townportaltalisman", 6),
-        Ingredient("shield_l_log", 1, "images/inventoryimages/shield_l_log.xml"),
-        Ingredient("turf_desertdirt", 3)
-    }, TECH.LOST, {
-        atlas = "images/inventoryimages/shield_l_sand.xml"
-    }, { "LEGION", "WEAPONS", "ARMOUR", "SUMMER" }
-)
-AddRecipe2( --多变的云
-    "book_weather", {
-        Ingredient("papyrus", 8),
-        Ingredient("squamousfruit", 3, "images/inventoryimages/squamousfruit.xml"),
-        Ingredient("raindonate", 3, "images/inventoryimages/raindonate.xml")
-    }, TECH.MAGIC_THREE, {
-        atlas = "images/inventoryimages/book_weather.xml"
-    }, { "LEGION", "MAGIC", "WEAPONS", "RAIN" }
-)
-AddRecipe2( --鱼之息
-    "hat_mermbreathing", {
-        Ingredient("merm_scales", 3, "images/inventoryimages/merm_scales.xml")
-    }, TECH.SCIENCE_TWO, {
-        atlas = "images/inventoryimages/hat_mermbreathing.xml"
-    }, { "LEGION", "CLOTHING" }
-)
-AddRecipe2( --巨人之脚
-    "giantsfoot", {
-        Ingredient("merm_scales", 3, "images/inventoryimages/merm_scales.xml"),
-        Ingredient("pigskin", 3),
-        Ingredient("manrabbit_tail", 3)
-    }, TECH.SCIENCE_TWO, {
-        atlas = "images/inventoryimages/giantsfoot.xml"
-    }, { "LEGION", "CLOTHING", "CONTAINERS" }
-)
-AddRecipe2( --简易打窝饵制作器
-    "fishhomingtool_normal", {
-        Ingredient("cutreeds", 1),
-        Ingredient("stinger", 1)
-    }, TECH.FISHING_ONE, {
-        atlas = "images/inventoryimages/fishhomingtool_normal.xml"
-    }, { "LEGION", "FISHING" }
-)
-AddRecipe2( --月藏宝匣套件
-    "hiddenmoonlight_item", {
-        Ingredient("bluemooneye", 1),
-        Ingredient("moonrocknugget", 2),
-        Ingredient("slurtle_shellpieces", 1)
-    }, TECH.LOST, {
-        atlas = "images/inventoryimages/hiddenmoonlight_item.xml"
-    }, { "LEGION", "STRUCTURES", "CONTAINERS", "COOKING" }
-)
-AddRecipe2( --月轮宝盘套件
-    "revolvedmoonlight_item", {
-        Ingredient("yellowmooneye", 1),
-        Ingredient("moonrocknugget", 2),
-        Ingredient("houndstooth", 1)
-    }, TECH.LOST, {
-        atlas = "images/inventoryimages/revolvedmoonlight_item.xml"
-    }, { "LEGION", "LIGHT", "CONTAINERS", "WINTER" }
-)
-AddRecipe2( --防火漆
-    "ointment_l_fireproof", {
-        Ingredient("firenettles", 5),
-        Ingredient("lavae_egg", 1),
-        Ingredient("slurtleslime", 5)
-    }, TECH.SCIENCE_TWO, {
-        numtogive = 12, no_deconstruction = true,
-        atlas = "images/inventoryimages/ointment_l_fireproof.xml"
-    }, { "LEGION", "SUMMER" }
-)
-
-------生命子圭
-
-AddRecipe2( --弱肤药膏
-    "ointment_l_sivbloodreduce", {
-        Ingredient("succulent_picked", 1),
-        Ingredient("green_cap", 3),
-        Ingredient("spoiled_fish_small", 1),
-        Ingredient("rock_avocado_fruit", 3, nil, nil, "rock_avocado_fruit_rockhard.tex") --石果的贴图和名字不一样
-    }, TECH.SCIENCE_TWO, {
-        numtogive = 4,
-        atlas = "images/inventoryimages/ointment_l_sivbloodreduce.xml"
-    }, { "LEGION", "SIVING", "RESTORATION" }
-)
-AddRecipe2( --子圭·垄
-    "siving_soil_item", {
-        Ingredient("siving_rocks", 6, "images/inventoryimages/siving_rocks.xml"),
-        Ingredient("pinecone", 10)
-    }, TECH.MAGIC_TWO, {
-        atlas = "images/inventoryimages/siving_soil_item.xml"
-    }, { "LEGION", "SIVING", "GARDENING" }
-)
-AddRecipe2( --子圭·利川
-    "siving_ctlwater_item", {
-        Ingredient("siving_rocks", 20, "images/inventoryimages/siving_rocks.xml"),
-        Ingredient("greengem", 1),
-        Ingredient("moonglass", 10)
-    }, TECH.MAGIC_THREE, {
-        atlas = "images/inventoryimages/siving_ctlwater_item.xml"
-    }, { "LEGION", "SIVING", "GARDENING", "STRUCTURES" }
-)
-AddRecipe2( --子圭·益矩
-    "siving_ctldirt_item", {
-        Ingredient("siving_rocks", 20, "images/inventoryimages/siving_rocks.xml"),
-        Ingredient("greengem", 1),
-        Ingredient("townportaltalisman", 10)
-    }, TECH.MAGIC_THREE, {
-        atlas = "images/inventoryimages/siving_ctldirt_item.xml"
-    }, { "LEGION", "SIVING", "GARDENING", "STRUCTURES" }
-)
-AddRecipe2( --子圭·崇溟
-    "siving_ctlall_item", {
-        Ingredient("siving_ctlwater_item", 1, "images/inventoryimages/siving_ctlwater_item.xml"),
-        Ingredient("siving_ctldirt_item", 1, "images/inventoryimages/siving_ctldirt_item.xml"),
-        Ingredient("siving_derivant_item", 1, "images/inventoryimages/siving_derivant_item.xml"),
-        Ingredient("singingshell_octave4", 1, nil, nil, "singingshell_octave4_1.tex")
-    }, tech_recast[2], {
-        nounlock = lock_recast,
-        atlas = "images/inventoryimages/siving_ctlall_item.xml"
-    }, { "LEGION", "SIVING", "RECAST", "GARDENING", "STRUCTURES" }
-)
-AddRecipe2( --子圭·育
-    "siving_turn", {
-        Ingredient("siving_rocks", 40, "images/inventoryimages/siving_rocks.xml"),
-        Ingredient("siving_derivant_item", 1, "images/inventoryimages/siving_derivant_item.xml"),
-        Ingredient("seeds", 40),
-    }, TECH.MAGIC_THREE, {
-        placer = "siving_turn_placer",
-        atlas = "images/inventoryimages/siving_turn.xml"
-    }, { "LEGION", "SIVING", "GARDENING", "STRUCTURES" }
-)
-AddRecipe2( --子圭·汲
-    "siving_mask", {
-        Ingredient("siving_rocks", 12, "images/inventoryimages/siving_rocks.xml"),
-        Ingredient("reviver", 2)
-    }, TECH.LOST, {
-        atlas = "images/inventoryimages/siving_mask.xml"
-    }, { "LEGION", "SIVING", "ARMOUR", "RESTORATION" }
-)
-AddRecipe2( --子圭·庇
-    "siving_suit", {
-        Ingredient("siving_rocks", 16, "images/inventoryimages/siving_rocks.xml"),
-        Ingredient("yellowgem", 1)
-    }, TECH.LOST, {
-        atlas = "images/inventoryimages/siving_suit.xml"
-    }, { "LEGION", "SIVING", "ARMOUR" }
-)
-AddRecipe2( --子圭·翰
-    "siving_feather_real", {
-        Ingredient("siving_derivant_item", 1, "images/inventoryimages/siving_derivant_item.xml"),
-        Ingredient("siving_feather_fake", 6, "images/inventoryimages/siving_feather_fake.xml"),
-        Ingredient(CHARACTER_INGREDIENT.HEALTH, 30)
-    }, TECH.LOST, {
-        atlas = "images/inventoryimages/siving_feather_real.xml"
-    }, { "LEGION", "SIVING", "WEAPONS" }
-)
-AddRecipe2( --子圭·歃
-    "siving_mask_gold", {
-        Ingredient("goggleshat", 1),
-        Ingredient("siving_mask", 1, "images/inventoryimages/siving_mask.xml"),
-        Ingredient("siving_derivant_item", 1, "images/inventoryimages/siving_derivant_item.xml"),
-        Ingredient("dish_shyerryjam", 1, "images/inventoryimages/dish_shyerryjam.xml")
-    }, tech_recast[2], {
-        nounlock = lock_recast,
-        atlas = "images/inventoryimages/siving_mask_gold.xml"
-    }, { "LEGION", "SIVING", "RECAST", "ARMOUR", "RESTORATION" }
-)
-AddRecipe2( --子圭·釜
-    "siving_suit_gold", {
-        Ingredient("onemanband", 1),
-        Ingredient("siving_suit", 1, "images/inventoryimages/siving_suit.xml"),
-        Ingredient("siving_derivant_item", 1, "images/inventoryimages/siving_derivant_item.xml"),
-        Ingredient("bundlewrap", 1)
-    }, tech_recast[2], {
-        nounlock = lock_recast,
-        atlas = "images/inventoryimages/siving_suit_gold.xml"
-    }, { "LEGION", "SIVING", "RECAST", "ARMOUR", "CONTAINERS" }
-)
 
 ------装饰类
 

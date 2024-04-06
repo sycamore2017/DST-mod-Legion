@@ -363,6 +363,7 @@ RegisterInvItems({
     "siving_mask", "siving_mask_gold", "siving_feather_real", "armor_elepheetle", "lance_carrot_l",
     "carpet_plush_big", "siving_suit", "siving_suit_gold", "tissue_l_cactus", "tissue_l_lureplant",
     "tissue_l_berries", "cattenball", "cutted_lumpyevergreen", "siving_derivant_item", "seeds_crop_l2",
+    "boxopener_l", "siving_boxopener",
     ------电闪雷鸣
     "albicans_cap", "tripleshovelaxe", "triplegoldenshovelaxe", "dualwrench", "fimbul_axe", "hat_cowboy",
     "guitar_miguel", "web_hump_item", "saddle_baggage", "hat_albicans_mushroom", "soul_contracts",

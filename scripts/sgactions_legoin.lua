@@ -3059,3 +3059,39 @@ AddStategraphActionHandler("wilson_client", ActionHandler(ACTIONS.SMEAR_L, funct
         return Fn_sg_handy(inst, action)
     end
 end))
+
+--------------------------------------------------------------------------
+--[[ 云容器打开器的动作 ]]
+--------------------------------------------------------------------------
+
+--ACTIONS.RUMMAGE 的优先级太低了，为了能在物品栏里被打开，只能新写一个动作
+
+local BOXOPENER_L = Action({ priority = 10, mount_valid = true })
+BOXOPENER_L.id = "BOXOPENER_L"
+BOXOPENER_L.str = STRINGS.ACTIONS.RUMMAGE
+BOXOPENER_L.strfn = ACTIONS.RUMMAGE.strfn
+BOXOPENER_L.fn = ACTIONS.RUMMAGE.fn
+AddAction(BOXOPENER_L)
+
+AddComponentAction("INVENTORY", "container_proxy", function(inst, doer, actions, right)
+    if --INVENTORY 模式，不能用right
+        inst:HasTag("boxopener_l") and
+        inst.components.container_proxy:CanBeOpened() and
+        doer.replica.inventory ~= nil
+    then
+        table.insert(actions, ACTIONS.BOXOPENER_L)
+    end
+end)
+AddComponentAction("SCENE", "container_proxy", function(inst, doer, actions, right)
+    if
+        right and inst:HasTag("boxopener_l") and
+        inst.components.container_proxy:CanBeOpened() and
+        doer.replica.inventory ~= nil and
+        not (doer.replica.rider ~= nil and doer.replica.rider:IsRiding())
+    then
+        table.insert(actions, ACTIONS.BOXOPENER_L)
+    end
+end)
+
+AddStategraphActionHandler("wilson", ActionHandler(ACTIONS.BOXOPENER_L, "doshortaction"))
+AddStategraphActionHandler("wilson_client", ActionHandler(ACTIONS.BOXOPENER_L, "doshortaction"))

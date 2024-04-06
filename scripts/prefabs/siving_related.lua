@@ -1233,6 +1233,90 @@ end, {
     Asset("ANIM", "anim/siving_soil.zip")
 }, { "siving_soil_item" }))
 
+--------------------------------------------------------------------------
+--[[ 子圭·系 ]]
+--------------------------------------------------------------------------
+
+local function CP_Open_opener(self, doer, ...)
+    self.Open_l(self, doer, ...)
+    if
+        doer ~= nil and doer.task_boxopener2_l == nil and
+        self.master.components.container:IsOpenedBy(doer)
+    then
+        local openpos = doer:GetPosition()
+        doer.task_boxopener2_l = doer:DoPeriodicTask(0.5, function(doer)
+            if doer.components.health ~= nil and doer.components.health:IsDead() then
+                self:Close(doer)
+            elseif doer:GetDistanceSqToPoint(openpos) > 4 then
+                self:Close(doer)
+            end
+        end, 0.5)
+    end
+end
+local function CP_OnClose_opener(self, doer, ...)
+    self.OnClose_l(self, doer, ...)
+    if doer ~= nil then
+        if doer.task_boxopener2_l ~= nil then
+            doer.task_boxopener2_l:Cancel()
+            doer.task_boxopener2_l = nil
+        end
+    end
+end
+local function AttachContainer_opener(inst)
+	if TheWorld.components.boxcloudpine ~= nil then
+		TheWorld.components.boxcloudpine:SetMaster(inst)
+	end
+end
+
+table.insert(prefs, Prefab("siving_boxopener", function()
+    local inst = CreateEntity()
+    inst.entity:AddTransform()
+    inst.entity:AddAnimState()
+    inst.entity:AddNetwork()
+
+    MakeInventoryPhysics(inst)
+
+    inst.AnimState:SetBank("boxopener_l")
+    inst.AnimState:SetBuild("boxopener_l")
+    inst.AnimState:PlayAnimation("idle_siv")
+
+    inst:AddTag("boxopener_l")
+
+    inst:AddComponent("container_proxy")
+
+    inst.entity:SetPristine()
+    if not TheWorld.ismastersim then return inst end
+
+    inst:AddComponent("inspectable")
+
+    inst:AddComponent("inventoryitem")
+    inst.components.inventoryitem.imagename = "siving_boxopener"
+    inst.components.inventoryitem.atlasname = "images/inventoryimages/siving_boxopener.xml"
+    inst.components.inventoryitem:SetSinks(true)
+
+    local container_proxy = inst.components.container_proxy
+    container_proxy.Open_l = container_proxy.Open
+    container_proxy.OnClose_l = container_proxy.OnClose
+    container_proxy.Open = CP_Open_opener
+    container_proxy.OnClose = CP_OnClose_opener
+    -- container_proxy:SetOnOpenFn(OnOpen_opener)
+	-- container_proxy:SetOnCloseFn(OnClose_opener)
+
+    inst.OnLoadPostPass = AttachContainer_opener
+	if not POPULATING then
+		AttachContainer_opener(inst)
+	end
+
+    MakeHauntableLaunch(inst)
+
+    return inst
+end, {
+    Asset("ANIM", "anim/boxopener_l.zip"),
+    Asset("ATLAS", "images/inventoryimages/siving_boxopener.xml"),
+    Asset("IMAGE", "images/inventoryimages/siving_boxopener.tex"),
+    Asset("ATLAS_BUILD", "images/inventoryimages/siving_boxopener.xml", 256)
+}, nil))
+
 --------------------
 --------------------
 

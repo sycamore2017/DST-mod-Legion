@@ -23,6 +23,9 @@ local InventoryPrefabsList = {  --每个元素的下标值为每种物品栏图�
     ointment_l_fireproof = 1,
     ointment_l_sivbloodreduce = 1,
     cutted_lumpyevergreen = 1,
+
+    boxopener_l = 1,
+    siving_boxopener = 1,
     --24
 
     dish_chilledrosejuice = 2,

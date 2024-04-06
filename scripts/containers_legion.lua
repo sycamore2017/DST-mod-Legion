@@ -15,7 +15,7 @@ local showmeneed = {
 local params = {}
 
 local function TestContainer_base(container, item, slot)
-    return not (item:HasTag("irreplaceable") or item:HasTag("nobundling"))
+    return not (item:HasTag("irreplaceable") or item:HasTag("nobundling") or item:HasTag("boxopener_l"))
         and (
             item:HasTag("unwrappable") or not (
                 item:HasTag("_container") or item:HasTag("bundle")
