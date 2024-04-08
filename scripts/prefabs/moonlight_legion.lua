@@ -53,9 +53,6 @@ end
 local function OnUpgradeFn(inst, doer, item)
     (inst.SoundEmitter or doer.SoundEmitter):PlaySound("dontstarve/common/telebase_gemplace")
 end
-local function OnRemove_light(inst)
-    inst._light:Remove()
-end
 local function Fn_nameDetail(inst, max)
     local lvl = inst._lvl_l:value()
     if lvl == nil or lvl < 0 then
@@ -454,6 +451,16 @@ local temp_revolved = 35/times_revolved_pro
 local times_revolved = math.floor(times_revolved_pro/2) + 1
 times_revolved_pro = times_revolved_pro + 1
 
+local function EnableLight(light)
+    if not light.Light:IsEnabled() then
+        light.Light:Enable(true)
+    end
+end
+local function DisableLight(light)
+    if light.Light:IsEnabled() then
+        light.Light:Enable(false)
+    end
+end
 local function OnOpen_revolved(inst)
     if inst.AnimState:IsCurrentAnimation("opened") or inst.AnimState:IsCurrentAnimation("open") then
         return
@@ -484,95 +491,6 @@ local function OnClose_revolved(inst)
     inst.SoundEmitter:KillSound("idlesound1")
     inst.SoundEmitter:KillSound("idlesound2")
     inst.SoundEmitter:PlaySound("dontstarve/cave/mushtree_tall_spore_land", nil, 0.6)
-end
-
-local function UpdateLight_revolved(owner)
-    if owner._revolves_light == nil or owner:HasTag("pocketdimension_container") then
-        return
-    end
-
-    local chosen = nil
-    local range = 0
-    for k,_ in pairs(owner._revolves_light) do
-        if k:IsValid() then
-            local stagenow = k.components.upgradeable:GetStage()
-            if stagenow > range then
-                range = stagenow
-                chosen = k
-            end
-        end
-    end
-    if chosen ~= nil then
-        for k,_ in pairs(owner._revolves_light) do
-            if k:IsValid() then
-                k._light.Light:Enable(k == chosen)
-            end
-        end
-    end
-end
-local function RemoveLight_revolved(inst, owner)
-    if owner ~= nil and owner:IsValid() and owner._revolves_light ~= nil then
-        owner._revolves_light[inst] = nil
-        for k,_ in pairs(owner._revolves_light) do
-            if not k:IsValid() then
-                owner._revolves_light[k] = nil
-            end
-        end
-        UpdateLight_revolved(owner)
-    end
-end
-local function ResetRadius(inst, grandowner)
-    --先获取最上层携带者
-    if grandowner == nil then
-        grandowner = inst
-        while grandowner.components.inventoryitem ~= nil do
-            local nextowner = grandowner.components.inventoryitem.owner
-            if nextowner == nil then
-                break
-            end
-            grandowner = nextowner
-        end
-    end
-    if grandowner == inst then
-        grandowner = nil
-    end
-
-    --更新光照范围
-    local stagenow = inst.components.upgradeable:GetStage()
-    if stagenow > 1 then
-        if stagenow > times_revolved_pro then --在设置变换中，会出现当前等级大于最大等级的情况
-            stagenow = times_revolved_pro
-        end
-        local rad = 0.25 + (stagenow-1)*value_revolved
-        if grandowner ~= nil then --被携带时，发光范围减半
-            rad = rad / 2
-            inst._light.Light:SetFalloff(0.65)
-        else
-            inst._light.Light:SetFalloff(0.7)
-        end
-        inst._light.Light:SetRadius(rad) --最大约2.75和5.25半径
-    end
-
-    local owner_last = inst._owner_light
-    if grandowner == nil then --没有新主人，只取消原主人
-        RemoveLight_revolved(inst, owner_last)
-        inst._owner_light = nil
-        inst._light.Light:Enable(true)
-    else
-        if grandowner._revolves_light == nil then
-            grandowner._revolves_light = {}
-        end
-        if owner_last ~= grandowner then
-            RemoveLight_revolved(inst, owner_last)
-        end
-        inst._owner_light = grandowner
-        grandowner._revolves_light[inst] = true
-        if grandowner:HasTag("pocketdimension_container") then
-            inst._light.Light:Enable(false)
-        else
-            UpdateLight_revolved(grandowner)
-        end
-    end
 end
 local function IsValid(one)
     return one:IsValid() and
@@ -670,90 +588,116 @@ local function OnTempDelta(owner, data)
         end, 0)
     end
 end
-local function TemperatureProtect(inst, owner)
-    --先取消监听以前的对象
-    if inst._owner_temp ~= nil then
-        if inst._owner_temp == owner then --监听对象没有发生变化，就结束
-            return
-        end
-        if inst._owner_temp._revolves ~= nil then
-            local newrevolves = nil
-            inst._owner_temp._revolves[inst] = nil
-            for k,_ in pairs(inst._owner_temp._revolves) do
-                if k:IsValid() then
-                    if newrevolves == nil then
-                        newrevolves = {}
-                    end
-                    newrevolves[k] = true
-                end
-            end
-            if newrevolves == nil then
-                inst._owner_temp:RemoveEventCallback("temperaturedelta", OnTempDelta)
-                inst._owner_temp:RemoveEventCallback("death", OnTempDelta)
-            end
-            inst._owner_temp._revolves = newrevolves
-        else
-            inst._owner_temp:RemoveEventCallback("temperaturedelta", OnTempDelta)
-            inst._owner_temp:RemoveEventCallback("death", OnTempDelta)
-        end
-        inst._owner_temp = nil
+local function UpdateLight_revolved(inst, owner) --更新光照范围
+    if owner == inst then
+        owner = nil
     end
-
-    --再尝试监听目前的对象
-    if
-        owner and owner.components.temperature ~= nil and IsValid(owner)
-    then
-        if owner._revolves == nil then --第一次携带，把基础设定加上
-            owner._revolves = {}
-            owner:ListenForEvent("temperaturedelta", OnTempDelta)
-            owner:ListenForEvent("death", OnTempDelta)
-            --温度监听 触发非常频繁，所以应该不需要主动触发一次
-            -- OnTempDelta(owner, { last = 0, new = owner.components.temperature:GetCurrent() })
+    local stagenow = inst.components.upgradeable:GetStage()
+    if stagenow > 1 then
+        if stagenow > times_revolved_pro then --在设置变换中，会出现当前等级大于最大等级的情况
+            stagenow = times_revolved_pro
         end
-        owner._revolves[inst] = true
-        inst._owner_temp = owner
+        local rad = 0.25 + (stagenow-1)*value_revolved
+        if owner ~= nil then --被携带时，发光范围减半
+            rad = rad / 2
+            inst._light.Light:SetFalloff(0.65)
+        else
+            inst._light.Light:SetFalloff(0.7)
+        end
+        inst._light.Light:SetRadius(rad) --最大约2.75和5.25半径
     end
 end
-local function OnOwnerChange(inst)
-    local newowners = {}
-    local owner = inst
-    while owner.components.inventoryitem ~= nil do
-        newowners[owner] = true
-
-        if inst._owners[owner] then
-            inst._owners[owner] = nil
-        else
-            inst:ListenForEvent("onputininventory", inst._onownerchange, owner)
-            inst:ListenForEvent("ondropped", inst._onownerchange, owner)
-        end
-
-        local nextowner = owner.components.inventoryitem.owner
-        if nextowner == nil then
-            break
-        end
-
-        owner = nextowner
+local function UpdateOwnerLights_revolved(owner) --统一管理，只更新等级最高的那一个
+    if owner._revolves_l == nil then
+        return
     end
-
-    inst._light.entity:SetParent(owner.entity)
-    ResetRadius(inst, owner)
-    TemperatureProtect(inst, owner)
-
-    for k, v in pairs(inst._owners) do
+    local chosen = nil
+    local lvl = 0
+    for k, _ in pairs(owner._revolves_l) do
         if k:IsValid() then
-            inst:RemoveEventCallback("onputininventory", inst._onownerchange, k)
-            inst:RemoveEventCallback("ondropped", inst._onownerchange, k)
+            local stagenow = k.components.upgradeable:GetStage()
+            if stagenow > lvl then
+                lvl = stagenow
+                chosen = k
+            end
         end
     end
+    if chosen ~= nil then
+        UpdateLight_revolved(chosen, owner)
+        for k, _ in pairs(owner._revolves_l) do
+            if k:IsValid() then
+                if k == chosen then
+                    EnableLight(k._light)
+                else
+                    DisableLight(k._light)
+                end
+            end
+        end
+    end
+end
+local function ClearOwnerData_revolved(inst)
+    local ownerold = inst.owner_l
+    if ownerold ~= nil and ownerold ~= inst and ownerold:IsValid() then
+        if ownerold._revolves_l ~= nil then
+            local newtbl
+            ownerold._revolves_l[inst] = nil
+            for k, _ in pairs(ownerold._revolves_l) do
+                if k:IsValid() then
+                    if newtbl == nil then
+                        newtbl = {}
+                    end
+                    newtbl[k] = true
+                end
+            end
+            ownerold._revolves_l = newtbl
+            if newtbl == nil then
+                ownerold:RemoveEventCallback("temperaturedelta", OnTempDelta)
+            else
+                UpdateOwnerLights_revolved(ownerold)
+            end
+        else
+            ownerold:RemoveEventCallback("temperaturedelta", OnTempDelta)
+        end
+    end
+end
+local function OnOwnerChange_revolved(inst, owner, newowners)
+    if inst.owner_l == owner then --没变化
+        return
+    end
 
-    inst._owners = newowners
+    --先取消以前的对象
+    ClearOwnerData_revolved(inst)
 
-    --世界容器里，打开时会自动掉地上，防止崩溃
-    if owner:HasTag("pocketdimension_container") then
-        inst.components.container.droponopen = true
+    --再尝试设置目前的对象
+    inst.owner_l = owner
+    inst._light.entity:SetParent(owner.entity)
+    if owner ~= inst then
+        if owner:HasTag("pocketdimension_container") or owner:HasTag("buried") then
+            inst.components.container.droponopen = true --世界容器里，打开时会自动掉地上，防止崩溃
+            DisableLight(inst._light)
+        else
+            inst.components.container.droponopen = nil
+            if owner._revolves_l == nil then
+                owner._revolves_l = {}
+                if owner:HasTag("player") then
+                    owner:ListenForEvent("temperaturedelta", OnTempDelta)
+                    --温度监听 触发非常频繁，所以应该不需要主动触发一次
+                    -- OnTempDelta(owner, { last = 0, new = owner.components.temperature:GetCurrent() })
+                end
+            end
+            owner._revolves_l[inst] = true
+            UpdateOwnerLights_revolved(owner)
+        end
     else
+        UpdateLight_revolved(inst, nil)
+        EnableLight(inst._light)
         inst.components.container.droponopen = nil
     end
+end
+local function OnRemove_revolved(inst)
+    ClearOwnerData_revolved(inst)
+    inst.owner_l = nil
+    inst._light:Remove()
 end
 
 local function OnStageUp_revolved(inst)
@@ -909,10 +853,7 @@ local function MakeRevolved(sets)
         inst._light.Light:SetColour(255/255, 242/255, 169/255)
         inst._light.Light:SetIntensity(0.75)
         inst._light.Light:Enable(true)
-        inst._owners = {}
-        inst._onownerchange = function() OnOwnerChange(inst) end
-        OnOwnerChange(inst)
-        inst.OnRemoveEntity = OnRemove_light
+        TOOLS_L.ListenOwnerChange(inst, OnOwnerChange_revolved, OnRemove_revolved)
 
         if TUNING.FUNCTIONAL_MEDAL_IS_OPEN then
             SetImmortalable(inst, 2, nil)
@@ -979,9 +920,9 @@ end
 local function SetLight_refracted(inst)
     if inst._lvl >= lvls_refracted[4] then
         inst._light.Light:SetRadius(inst._task_fx == nil and 1 or 4)
-        inst._light.Light:Enable(true)
+        EnableLight(inst._light)
     else
-        inst._light.Light:Enable(false)
+        DisableLight(inst._light)
     end
 end
 local function TrySetOwnerSymbol(inst, doer, revolt)
@@ -1185,37 +1126,21 @@ local function TimerDone_refracted(inst, data)
         TriggerRevolt(inst, nil, false)
     end
 end
-local function OnOwnerChange_refracted(inst)
-    local newowners = {}
-    local owner = inst
-    while owner.components.inventoryitem ~= nil do
-        newowners[owner] = true
-
-        if inst._owners[owner] then
-            inst._owners[owner] = nil
-        else
-            inst:ListenForEvent("onputininventory", inst._onownerchange, owner)
-            inst:ListenForEvent("ondropped", inst._onownerchange, owner)
-        end
-
-        local nextowner = owner.components.inventoryitem.owner
-        if nextowner == nil then
-            break
-        end
-
-        owner = nextowner
-    end
-
-    inst._light.entity:SetParent(owner.entity)
-
-    for k, v in pairs(inst._owners) do
-        if k:IsValid() then
-            inst:RemoveEventCallback("onputininventory", inst._onownerchange, k)
-            inst:RemoveEventCallback("ondropped", inst._onownerchange, k)
-        end
-    end
-
-    inst._owners = newowners
+local function OnOwnerChange_refracted(inst, owner, newowners)
+    if owner:HasTag("pocketdimension_container") or owner:HasTag("buried") then
+		inst._light.entity:SetParent(inst.entity)
+		if not inst._light:IsInLimbo() then
+			inst._light:RemoveFromScene() --直接隐藏，就算因为等级变化导致亮起来了也没事
+		end
+	else
+		inst._light.entity:SetParent(owner.entity)
+		if inst._light:IsInLimbo() then
+			inst._light:ReturnToScene()
+		end
+	end
+end
+local function OnRemove_refracted(inst)
+    inst._light:Remove()
 end
 local function OnWork_refracted(inst, worker, workleft, numworks)
     if worker == nil or not worker:HasTag("player") then --不能被非玩家破坏
@@ -1368,10 +1293,7 @@ table.insert(prefs, Prefab("refractedmoonlight", function()
     inst._light.Light:SetColour(180/255, 195/255, 150/255)
     -- inst._light.Light:SetIntensity(0.75)
     inst._light.Light:Enable(false)
-    inst._owners = {}
-    inst._onownerchange = function() OnOwnerChange_refracted(inst) end
-    OnOwnerChange_refracted(inst)
-    inst.OnRemoveEntity = OnRemove_light
+    TOOLS_L.ListenOwnerChange(inst, OnOwnerChange_refracted, OnRemove_refracted)
 
     MakeHauntableLaunch(inst)
 

@@ -1,3 +1,5 @@
+local TOOLS_L = require("tools_legion")
+
 local assets = {
     Asset("ANIM", "anim/icire_rock.zip"),
     Asset("ATLAS", "images/inventoryimages/icire_rock.xml"),
@@ -127,44 +129,21 @@ local function TemperatureChange(inst, data)
         UpdateImages(inst, range)
     end
 end
-local function OnOwnerChange(inst)
-    local newowners = {}
-    local owner = inst
-    while owner.components.inventoryitem ~= nil do
-        newowners[owner] = true
-
-        if inst._owners[owner] then
-            inst._owners[owner] = nil
-        else
-            inst:ListenForEvent("onputininventory", inst._onownerchange, owner)
-            inst:ListenForEvent("ondropped", inst._onownerchange, owner)
-        end
-
-        local nextowner = owner.components.inventoryitem.owner
-        if nextowner == nil then
-            break
-        end
-
-        owner = nextowner
-    end
-
-    inst._light.entity:SetParent(owner.entity)
-
-    for k, _ in pairs(inst._owners) do
-        if k:IsValid() then
-            inst:RemoveEventCallback("onputininventory", inst._onownerchange, k)
-            inst:RemoveEventCallback("ondropped", inst._onownerchange, k)
-        end
-    end
-
-    inst._owners = newowners
-
-    if owner:HasTag("pocketdimension_container") then
+local function OnOwnerChange(inst, owner, newowners)
+    if owner:HasTag("pocketdimension_container") or owner:HasTag("buried") then
+        inst._light.entity:SetParent(inst.entity)
+		if not inst._light:IsInLimbo() then
+			inst._light:RemoveFromScene() --直接隐藏，就算因为温度变化导致亮起来了也没事
+		end
         inst.inworldbox_l = true
         if inst._dd ~= nil and inst._dd.entsleepfn ~= nil then
             inst._dd.entsleepfn(inst)
         end
     else
+        inst._light.entity:SetParent(owner.entity)
+		if inst._light:IsInLimbo() then
+			inst._light:ReturnToScene()
+		end
         inst.inworldbox_l = nil
         if not inst:IsAsleep() then
             if inst._dd ~= nil and inst._dd.entwakefn ~= nil then
@@ -249,12 +228,10 @@ local function fn()
 
     --Create light
     inst._light = SpawnPrefab("heatrocklight")
-    inst._owners = {}
-    inst._onownerchange = function() OnOwnerChange(inst) end
 
     inst.fn_temp = Fn_temp
     UpdateImages(inst, 1)
-    OnOwnerChange(inst)
+    TOOLS_L.ListenOwnerChange(inst, OnOwnerChange)
 
     MakeHauntableLaunchAndSmash(inst)
 

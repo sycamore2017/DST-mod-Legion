@@ -1465,12 +1465,6 @@ AddPlayerPostInit(function(inst)
 
     if not IsServer then return end
 
-    --人物携带青锋剑时回复精神
-    if inst.components.itemaffinity == nil then
-        inst:AddComponent("itemaffinity")
-    end
-    inst.components.itemaffinity:AddAffinity(nil, "feelmylove", TUNING.DAPPERNESS_LARGE, 1)
-
     --香蕉慕斯的好胃口buff兼容化
     local pickyeaters = {
         wathgrithr = true,

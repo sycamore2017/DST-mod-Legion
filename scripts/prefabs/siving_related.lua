@@ -1267,6 +1267,67 @@ local function AttachContainer_opener(inst)
 		TheWorld.components.boxcloudpine:SetMaster(inst)
 	end
 end
+local function UpdateSanityHelper_opener(owner)
+    if owner.components.sanity ~= nil then
+        local bonus = TUNING.DAPPERNESS_LARGE
+        if owner.components.sanity:IsLunacyMode() then
+            bonus = -bonus
+        end
+        owner.components.sanity.externalmodifiers:SetModifier("sanityhelper_l", bonus, "boxopener_l")
+    end
+end
+local function SetSanityHelper_opener(owner, isadd)
+    if isadd then
+        owner:ListenForEvent("sanitymodechanged", UpdateSanityHelper_opener)
+        UpdateSanityHelper_opener(owner)
+    else
+        owner:RemoveEventCallback("sanitymodechanged", UpdateSanityHelper_opener)
+        if owner.components.sanity ~= nil then
+            owner.components.sanity.externalmodifiers:RemoveModifier("sanityhelper_l", "boxopener_l")
+        end
+    end
+end
+local function OnOwnerChange_opener(inst, owner, newowners)
+    if inst.owner_l == owner then --没变化
+        return
+    end
+
+    --先取消以前的对象
+    local ownerold = inst.owner_l
+    if ownerold ~= nil and ownerold:IsValid() and ownerold:HasTag("player") then
+        if ownerold._boxopener_l ~= nil then
+            local newtbl
+            ownerold._boxopener_l[inst] = nil
+            for k, _ in pairs(ownerold._boxopener_l) do
+                if k:IsValid() then
+                    if newtbl == nil then
+                        newtbl = {}
+                    end
+                    newtbl[k] = true
+                end
+            end
+            if newtbl == nil then
+                SetSanityHelper_opener(ownerold, false)
+            end
+            ownerold._boxopener_l = newtbl
+        else
+            SetSanityHelper_opener(ownerold, false)
+        end
+    end
+
+    --再尝试设置目前的对象
+    inst.owner_l = owner
+    if owner:HasTag("player") then
+        if owner._boxopener_l == nil then
+            owner._boxopener_l = {}
+            SetSanityHelper_opener(owner, true)
+        end
+        owner._boxopener_l[inst] = true
+    end
+end
+local function OnRemove_opener(inst)
+    OnOwnerChange_opener(inst, inst)
+end
 
 table.insert(prefs, Prefab("siving_boxopener", function()
     local inst = CreateEntity()
@@ -1299,8 +1360,9 @@ table.insert(prefs, Prefab("siving_boxopener", function()
     container_proxy.OnClose_l = container_proxy.OnClose
     container_proxy.Open = CP_Open_opener
     container_proxy.OnClose = CP_OnClose_opener
-    -- container_proxy:SetOnOpenFn(OnOpen_opener)
-	-- container_proxy:SetOnCloseFn(OnClose_opener)
+
+    -- inst.owner_l = nil
+    TOOLS_L.ListenOwnerChange(inst, OnOwnerChange_opener, OnRemove_opener)
 
     inst.OnLoadPostPass = AttachContainer_opener
 	if not POPULATING then

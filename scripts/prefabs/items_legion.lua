@@ -589,6 +589,251 @@ table.insert(prefs, Prefab("tourmalinecore", function() ------电气石
     return inst
 end, GetAssets("tourmalinecore"), nil))
 
+local function CP_Open_nut(self, doer, ...)
+    self.Open_l(self, doer, ...)
+    if
+        doer ~= nil and doer.task_boxopener_l == nil and
+        self.master.components.container:IsOpenedBy(doer)
+    then
+        local openpos = doer:GetPosition()
+        doer.task_boxopener_l = doer:DoPeriodicTask(0.5, function(doer)
+            if doer.components.health ~= nil and doer.components.health:IsDead() then
+                self:Close(doer)
+            elseif doer:GetDistanceSqToPoint(openpos) > 4 then
+                self:Close(doer)
+            end
+        end, 0.5)
+    end
+end
+local function CP_OnClose_nut(self, doer, ...)
+    self.OnClose_l(self, doer, ...)
+    if doer ~= nil then
+        if doer.task_boxopener_l ~= nil then
+            doer.task_boxopener_l:Cancel()
+            doer.task_boxopener_l = nil
+            if doer.components.health ~= nil and not doer.components.health:IsDead() then
+                local cost = 2
+                if doer.siv_blood_l_reducer_v ~= nil then
+                    if doer.siv_blood_l_reducer_v >= 1 then
+                        cost = 0
+                    else
+                        cost = cost * (1-doer.siv_blood_l_reducer_v)
+                    end
+                end
+                if cost > 0 then
+                    doer.components.health:DoDelta(-cost, nil, self.inst.prefab, nil, nil, true)
+                end
+            end
+        end
+    end
+end
+local function AttachContainer_nut(inst)
+	if TheWorld.components.boxcloudpine ~= nil then
+		TheWorld.components.boxcloudpine:SetMaster(inst)
+	end
+end
+table.insert(prefs, Prefab("boxopener_l", function() ------云松子
+    local inst = CreateEntity()
+    Fn_common(inst, "boxopener_l", nil, "idle_nut", nil)
+    SetFloatable(inst, { 0.03, "small", 0.25, 0.9 })
+
+    inst:AddTag("boxopener_l")
+
+    inst:AddComponent("container_proxy")
+
+    inst.entity:SetPristine()
+    if not TheWorld.ismastersim then return inst end
+
+    Fn_server(inst, "boxopener_l")
+    SetFuel(inst, nil)
+    MakeHauntableLaunch(inst)
+
+    local container_proxy = inst.components.container_proxy
+    container_proxy.Open_l = container_proxy.Open
+    container_proxy.OnClose_l = container_proxy.OnClose
+    container_proxy.Open = CP_Open_nut
+    container_proxy.OnClose = CP_OnClose_nut
+
+    inst.OnLoadPostPass = AttachContainer_nut
+	if not POPULATING then
+		AttachContainer_nut(inst)
+	end
+
+    return inst
+end, GetAssets("boxopener_l"), nil))
+
+local foliageath_data_fol = {
+    image = "foliageath_foliageath", atlas = "images/inventoryimages/foliageath_foliageath.xml",
+    bank = nil, build = nil, anim = "foliageath", isloop = nil,
+    togethered = "foliageath_mylove", --替换合并后的预制物名。默认不需要写，因为剑鞘本身特殊才写的
+    --判断是否需要恢复耐久。第二个参数是为了识别是何种原因恢复耐久
+    -- fn_recovercheck = function(inst, tag)end,
+    --恢复耐久。根据 dt 这个时间参数来确定恢复的程度
+    -- fn_recover = function(inst, dt, player, tag)end
+}
+local function Fn_test_fol(inst, doer, item, count)
+    if item == nil then
+        return false, "NOSWORD"
+    elseif item.foliageath_data == nil then
+        return false, "WRONGSWORD"
+    end
+    return true
+end
+local function Fn_do_fol(inst, doer, item, count)
+    if item ~= nil then
+        local togethered = SpawnPrefab(item.foliageath_data.togethered or "foliageath_together")
+        if togethered ~= nil then
+            togethered.components.swordscabbard:BeTogether(inst, item) --inst和item会在这里面被删除
+        else
+            item:Remove()
+        end
+    end
+end
+table.insert(prefs, Prefab("foliageath", function() ------青枝绿叶
+    local inst = CreateEntity()
+    Fn_common(inst, "foliageath", nil, "lonely", nil)
+    SetFloatable(inst, { 0.15, "small", 0.4, 0.65 })
+
+    inst:AddTag("swordscabbard")
+    inst:AddTag("NORATCHECK") --mod兼容：永不妥协。该道具不算鼠潮分
+
+    inst.entity:SetPristine()
+    if not TheWorld.ismastersim then return inst end
+
+    inst.foliageath_data = foliageath_data_fol
+
+    Fn_server(inst, "foliageath")
+    SetFuel(inst, TUNING.LARGE_FUEL)
+
+    inst:AddComponent("emptyscabbardlegion")
+    inst.components.emptyscabbardlegion.fn_test = Fn_test_fol
+    inst.components.emptyscabbardlegion.fn_do = Fn_do_fol
+
+    MakeHauntableLaunch(inst)
+
+    return inst
+end, GetAssets("foliageath"), { "foliageath_together", "foliageath_mylove" }))
+
+local function GetStatus_folto(inst)
+    return "MERGED"
+end
+table.insert(prefs, Prefab("foliageath_together", function() ------入鞘后的青枝绿叶
+    local inst = CreateEntity()
+    inst.entity:AddSoundEmitter()
+    Fn_common(inst, "foliageath", nil, "hambat", nil)
+    SetFloatable(inst, { 0.15, "small", 0.4, 0.65 })
+    inst:SetPrefabNameOverride("foliageath")
+
+    inst:AddTag("NORATCHECK") --mod兼容：永不妥协。该道具不算鼠潮分
+
+    inst.entity:SetPristine()
+    if not TheWorld.ismastersim then return inst end
+
+    Fn_server(inst, "foliageath_hambat") --默认是火腿棒入鞘后的贴图
+    inst.components.inspectable.getstatus = GetStatus_folto
+
+    inst:AddComponent("swordscabbard")
+    MakeHauntableLaunch(inst)
+
+    return inst
+end, {
+    Asset("ANIM", "anim/foliageath.zip"),
+    Asset("ATLAS", "images/inventoryimages/foliageath_rosorns.xml"),
+    Asset("IMAGE", "images/inventoryimages/foliageath_rosorns.tex"),
+    Asset("ATLAS_BUILD", "images/inventoryimages/foliageath_rosorns.xml", 256),
+    Asset("ATLAS", "images/inventoryimages/foliageath_lileaves.xml"),
+    Asset("IMAGE", "images/inventoryimages/foliageath_lileaves.tex"),
+    Asset("ATLAS_BUILD", "images/inventoryimages/foliageath_lileaves.xml", 256),
+    Asset("ATLAS", "images/inventoryimages/foliageath_orchitwigs.xml"),
+    Asset("IMAGE", "images/inventoryimages/foliageath_orchitwigs.tex"),
+    Asset("ATLAS_BUILD", "images/inventoryimages/foliageath_orchitwigs.xml", 256),
+    Asset("ATLAS", "images/inventoryimages/foliageath_neverfade.xml"),
+    Asset("IMAGE", "images/inventoryimages/foliageath_neverfade.tex"),
+    Asset("ATLAS_BUILD", "images/inventoryimages/foliageath_neverfade.xml", 256),
+    Asset("ATLAS", "images/inventoryimages/foliageath_hambat.xml"),
+    Asset("IMAGE", "images/inventoryimages/foliageath_hambat.tex"),
+    Asset("ATLAS_BUILD", "images/inventoryimages/foliageath_hambat.xml", 256),
+    Asset("ATLAS", "images/inventoryimages/foliageath_bullkelp_root.xml"),
+    Asset("IMAGE", "images/inventoryimages/foliageath_bullkelp_root.tex"),
+    Asset("ATLAS_BUILD", "images/inventoryimages/foliageath_bullkelp_root.xml", 256),
+    Asset("ATLAS", "images/inventoryimages/foliageath_foliageath.xml"),
+    Asset("IMAGE", "images/inventoryimages/foliageath_foliageath.tex"),
+    Asset("ATLAS_BUILD", "images/inventoryimages/foliageath_foliageath.xml", 256),
+    Asset("ATLAS", "images/inventoryimages/foliageath_dish_tomahawksteak.xml"),
+    Asset("IMAGE", "images/inventoryimages/foliageath_dish_tomahawksteak.tex"),
+    Asset("ATLAS_BUILD", "images/inventoryimages/foliageath_dish_tomahawksteak.xml", 256)
+}, { "foliageath" }))
+
+local function OnOwnerChange_follv(inst, owner, newowners)
+    if inst.owner_l == owner then --没变化
+        return
+    end
+
+    --先取消以前的对象
+    local ownerold = inst.owner_l
+    if ownerold ~= nil and ownerold:IsValid() and ownerold:HasTag("player") then
+        if ownerold._follv_l ~= nil then
+            local newtbl
+            ownerold._follv_l[inst] = nil
+            for k, _ in pairs(ownerold._follv_l) do
+                if k:IsValid() then
+                    if newtbl == nil then
+                        newtbl = {}
+                    end
+                    newtbl[k] = true
+                end
+            end
+            if newtbl == nil then
+                if ownerold.components.sanity ~= nil then
+                    ownerold.components.sanity.externalmodifiers:RemoveModifier("sanityhelper_l", "foliageath")
+                end
+            end
+            ownerold._follv_l = newtbl
+        else
+            if ownerold.components.sanity ~= nil then
+                ownerold.components.sanity.externalmodifiers:RemoveModifier("sanityhelper_l", "foliageath")
+            end
+        end
+    end
+
+    --再尝试设置目前的对象
+    inst.owner_l = owner
+    if owner:HasTag("player") then
+        if owner._follv_l == nil then
+            owner._follv_l = {}
+            if owner.components.sanity ~= nil then
+                owner.components.sanity.externalmodifiers:SetModifier(
+                    "sanityhelper_l", TUNING.DAPPERNESS_LARGE, "foliageath")
+            end
+        end
+        owner._follv_l[inst] = true
+    end
+end
+local function OnRemove_follv(inst)
+    OnOwnerChange_follv(inst, inst)
+end
+table.insert(prefs, Prefab("foliageath_mylove", function() ------青锋剑
+    local inst = CreateEntity()
+    inst.entity:AddSoundEmitter()
+    Fn_common(inst, "foliageath", nil, "foliageath", nil)
+    SetFloatable(inst, { 0.15, "small", 0.4, 0.65 })
+
+    inst:AddTag("feelmylove")
+    inst:AddTag("NORATCHECK") --mod兼容：永不妥协。该道具不算鼠潮分
+
+    inst.entity:SetPristine()
+    if not TheWorld.ismastersim then return inst end
+
+    Fn_server(inst, "foliageath_foliageath")
+    inst:AddComponent("swordscabbard")
+    MakeHauntableLaunch(inst)
+
+    -- inst.owner_l = nil
+    TOOLS_L.ListenOwnerChange(inst, OnOwnerChange_follv, OnRemove_follv)
+
+    return inst
+end, GetAssets2("foliageath_foliageath", "foliageath"), { "foliageath" }))
+
 ------
 
 local dd_smear_sivbloodreduce = { build = "ointment_l_sivbloodreduce" }
@@ -687,79 +932,6 @@ table.insert(prefs, Prefab("ointment_l_fireproof", function() ------防火漆
 
     return inst
 end, GetAssets("ointment_l_fireproof"), nil))
-
-local function CP_Open_nut(self, doer, ...)
-    self.Open_l(self, doer, ...)
-    if
-        doer ~= nil and doer.task_boxopener_l == nil and
-        self.master.components.container:IsOpenedBy(doer)
-    then
-        local openpos = doer:GetPosition()
-        doer.task_boxopener_l = doer:DoPeriodicTask(0.5, function(doer)
-            if doer.components.health ~= nil and doer.components.health:IsDead() then
-                self:Close(doer)
-            elseif doer:GetDistanceSqToPoint(openpos) > 4 then
-                self:Close(doer)
-            end
-        end, 0.5)
-    end
-end
-local function CP_OnClose_nut(self, doer, ...)
-    self.OnClose_l(self, doer, ...)
-    if doer ~= nil then
-        if doer.task_boxopener_l ~= nil then
-            doer.task_boxopener_l:Cancel()
-            doer.task_boxopener_l = nil
-            if doer.components.health ~= nil and not doer.components.health:IsDead() then
-                local cost = 2
-                if doer.siv_blood_l_reducer_v ~= nil then
-                    if doer.siv_blood_l_reducer_v >= 1 then
-                        cost = 0
-                    else
-                        cost = cost * (1-doer.siv_blood_l_reducer_v)
-                    end
-                end
-                if cost > 0 then
-                    doer.components.health:DoDelta(-cost, nil, self.inst.prefab, nil, nil, true)
-                end
-            end
-        end
-    end
-end
-local function AttachContainer_nut(inst)
-	if TheWorld.components.boxcloudpine ~= nil then
-		TheWorld.components.boxcloudpine:SetMaster(inst)
-	end
-end
-table.insert(prefs, Prefab("boxopener_l", function() ------云松子
-    local inst = CreateEntity()
-    Fn_common(inst, "boxopener_l", nil, "idle_nut", nil)
-    SetFloatable(inst, { 0.03, "small", 0.25, 0.9 })
-
-    inst:AddTag("boxopener_l")
-
-    inst:AddComponent("container_proxy")
-
-    inst.entity:SetPristine()
-    if not TheWorld.ismastersim then return inst end
-
-    Fn_server(inst, "boxopener_l")
-    SetFuel(inst, nil)
-    MakeHauntableLaunch(inst)
-
-    local container_proxy = inst.components.container_proxy
-    container_proxy.Open_l = container_proxy.Open
-    container_proxy.OnClose_l = container_proxy.OnClose
-    container_proxy.Open = CP_Open_nut
-    container_proxy.OnClose = CP_OnClose_nut
-
-    inst.OnLoadPostPass = AttachContainer_nut
-	if not POPULATING then
-		AttachContainer_nut(inst)
-	end
-
-    return inst
-end, GetAssets("boxopener_l"), nil))
 
 --------------------------------------------------------------------------
 --[[ 基础材料 ]]

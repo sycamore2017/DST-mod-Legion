@@ -173,7 +173,6 @@ PrefabFiles = {
     "placer_legion",            --大多数的placer
     "worldbox_legion",          --世界唯一型容器相关
 
-    "foliageath",               --青枝绿叶
     "neverfade_butterfly",      --永不凋零的蝴蝶
 
     "shyerries",            --颤栗树相关

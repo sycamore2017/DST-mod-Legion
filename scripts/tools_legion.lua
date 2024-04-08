@@ -1069,6 +1069,60 @@ local function SendMouseInfoRPC(player, target, newdd, isfixed, newtime)
     end
 end
 
+--[ 监听父实体的变化 ]--
+local function OnOwnerChange(inst, changefn)
+    local newowners = {}
+    local owner = inst
+    while owner.components.inventoryitem ~= nil do
+        newowners[owner] = true
+
+        if inst._owners[owner] then
+            inst._owners[owner] = nil
+        else
+            inst:ListenForEvent("onputininventory", inst._onownerchange, owner)
+            inst:ListenForEvent("ondropped", inst._onownerchange, owner)
+        end
+
+        local nextowner = owner.components.inventoryitem.owner
+        if nextowner == nil then
+            break
+        end
+
+        owner = nextowner
+    end
+    for k, _ in pairs(inst._owners) do --还在 _owners 里的实体就说明不是 inst 的父实体了
+        if k:IsValid() then
+            inst:RemoveEventCallback("onputininventory", inst._onownerchange, k)
+            inst:RemoveEventCallback("ondropped", inst._onownerchange, k)
+        end
+    end
+    inst._owners = newowners
+
+    if changefn ~= nil then --此时的 owner 就是最外层的父实体
+        changefn(inst, owner, newowners)
+    end
+
+	-- if owner:HasTag("pocketdimension_container") or owner:HasTag("buried") then
+	-- 	inst._light.entity:SetParent(inst.entity)
+	-- 	if not inst._light:IsInLimbo() then
+	-- 		inst._light:RemoveFromScene()
+	-- 	end
+	-- else
+	-- 	inst._light.entity:SetParent(owner.entity)
+	-- 	if inst._light:IsInLimbo() then
+	-- 		inst._light:ReturnToScene()
+	-- 	end
+	-- end
+end
+local function ListenOwnerChange(inst, changefn, removefn)
+    inst._owners = {}
+    inst._onownerchange = function() OnOwnerChange(inst, changefn) end
+    OnOwnerChange(inst, changefn)
+    if removefn ~= nil then
+        inst:ListenForEvent("onremove", removefn)
+    end
+end
+
 -- local TOOLS_L = require("tools_legion")
 fns = {
 	MakeSnowCovered_comm = MakeSnowCovered_comm,
@@ -1102,7 +1156,8 @@ fns = {
     AddResistAll = AddResistAll, RemoveResistAll = RemoveResistAll,
     DoSingleSleep = DoSingleSleep, DoAreaSleep = DoAreaSleep,
     ODPoint = ODPoint, ComputCost = ComputCost,
-    InitMouseInfo = InitMouseInfo, SendMouseInfoRPC = SendMouseInfoRPC
+    InitMouseInfo = InitMouseInfo, SendMouseInfoRPC = SendMouseInfoRPC,
+    ListenOwnerChange = ListenOwnerChange
 }
 
 return fns
