@@ -1406,6 +1406,34 @@ local function OnRemoveEntity_tt(inst) --自身被移除时，结束BOSS战(防�
     inst.rebirthed = false
     ClearBattlefield(inst)
 end
+local function OnTurnOn_tt(inst)
+    if not inst.SoundEmitter:PlayingSound("loopsound1") then
+		inst.SoundEmitter:PlaySound("dontstarve/ghost/ghost_howl_LP", "loopsound1", 0.6)
+	end
+    if not inst.SoundEmitter:PlayingSound("loopsound2") then
+		inst.SoundEmitter:PlaySound("rifts/forge/proximity_lp", "loopsound2", 0.5)
+	end
+end
+local function OnTurnOff_tt(inst)
+    inst.SoundEmitter:KillSound("loopsound1")
+    inst.SoundEmitter:KillSound("loopsound2")
+end
+local function SpawnActivateFx_tt(doer)
+    local x, y, z = doer.Transform:GetWorldPosition()
+    y = y + 2
+    local fx = SpawnPrefab("siving_thetree_unlock_fx")
+    if fx ~= nil then
+        fx.Transform:SetPosition(x, y, z)
+    end
+end
+local function OnActivate_tt(inst, doer, recipe)
+    inst.SoundEmitter:PlaySound("dontstarve/ghost/ghost_girl_howl")
+    inst.SoundEmitter:PlaySound("dontstarve/characters/wortox/soul/spawn", nil, 0.3)
+    if doer ~= nil then
+        SpawnActivateFx_tt(doer)
+        doer:DoTaskInTime(0.15, SpawnActivateFx_tt)
+    end
+end
 
 table.insert(prefs, Prefab("siving_thetree", function()
     local inst = CreateEntity()
@@ -1435,6 +1463,7 @@ table.insert(prefs, Prefab("siving_thetree", function()
     inst:AddTag("siving")
     inst:AddTag("lifebox_l") --棱镜标签：能容纳生命能量
     inst:AddTag("trader")
+    inst:AddTag("prototyper")
 
     TOOLS_L.InitMouseInfo(inst, Fn_dealdata_tt, Fn_getdata_tt, 3)
 
@@ -1542,6 +1571,12 @@ table.insert(prefs, Prefab("siving_thetree", function()
     inst.components.trader.onaccept = OnAccept_tt
     inst.components.trader.onrefuse = OnRefuse_tt
 
+    inst:AddComponent("prototyper")
+    inst.components.prototyper.onturnon = OnTurnOn_tt
+    inst.components.prototyper.onturnoff = OnTurnOff_tt
+    inst.components.prototyper.trees = TUNING.PROTOTYPER_TREES.SIVING_ONE
+    inst.components.prototyper.onactivate = OnActivate_tt
+
     MakeHauntableWork(inst)
 
     inst:AddComponent("timer")
@@ -1569,7 +1604,8 @@ end, {
     "siving_lifesteal_fx",
     "siving_foenix",
     "siving_moenix",
-    "siving_egg"
+    "siving_egg",
+    "siving_thetree_unlock_fx"
 }))
 
 --------------------------------------------------------------------------

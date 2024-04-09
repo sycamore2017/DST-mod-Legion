@@ -180,15 +180,6 @@ AddRecipe2( --月轮宝盘套件
         atlas = "images/inventoryimages/revolvedmoonlight_item.xml"
     }, { "LEGION", "LIGHT", "CONTAINERS", "WINTER" }
 )
-AddRecipe2( --云松子
-    "boxopener_l", {
-        Ingredient("foliageath", 1, "images/inventoryimages/foliageath.xml"),
-        Ingredient("waterplant_planter", 1),
-        Ingredient("cutted_lumpyevergreen", 5, "images/inventoryimages/cutted_lumpyevergreen.xml")
-    }, TECH.MAGIC_TWO, {
-        atlas = "images/inventoryimages/boxopener_l.xml"
-    }, { "LEGION", "CONTAINERS" }
-)
 AddRecipe2( --防火漆
     "ointment_l_fireproof", {
         Ingredient("firenettles", 5),
@@ -213,11 +204,40 @@ AddRecipe2( --弱肤药膏
         atlas = "images/inventoryimages/ointment_l_sivbloodreduce.xml"
     }, { "LEGION", "SIVING", "RESTORATION" }
 )
+AddRecipe2( --云松子
+    "boxopener_l", {
+        Ingredient("foliageath", 1, "images/inventoryimages/foliageath.xml"),
+        Ingredient("waterplant_planter", 1),
+        Ingredient("cutted_lumpyevergreen", 5, "images/inventoryimages/cutted_lumpyevergreen.xml")
+    }, TECH.MAGIC_THREE, {
+        atlas = "images/inventoryimages/boxopener_l.xml"
+    }, { "LEGION", "SIVING", "CONTAINERS" }
+)
+AddRecipe2( --子圭·系
+    "siving_boxopener", {
+        Ingredient("boxopener_l", 1, "images/inventoryimages/boxopener_l.xml"),
+        Ingredient("siving_derivant_item", 1, "images/inventoryimages/siving_derivant_item.xml"),
+        Ingredient("foliageath", 1, "images/inventoryimages/foliageath.xml"),
+        Ingredient("rock_avocado_fruit_sprout", 1)
+    }, TECH.SIVING_ONE, {
+        atlas = "images/inventoryimages/siving_boxopener.xml"
+    }, { "LEGION", "SIVING", "CONTAINERS" }
+)
+AddRecipe2( --子圭·育
+    "siving_turn", {
+        Ingredient("siving_rocks", 40, "images/inventoryimages/siving_rocks.xml"),
+        Ingredient("siving_derivant_item", 1, "images/inventoryimages/siving_derivant_item.xml"),
+        Ingredient("seeds", 40),
+    }, TECH.SIVING_ONE, {
+        placer = "siving_turn_placer",
+        atlas = "images/inventoryimages/siving_turn.xml"
+    }, { "LEGION", "SIVING", "GARDENING", "STRUCTURES" }
+)
 AddRecipe2( --子圭·垄
     "siving_soil_item", {
         Ingredient("siving_rocks", 6, "images/inventoryimages/siving_rocks.xml"),
         Ingredient("pinecone", 10)
-    }, TECH.MAGIC_TWO, {
+    }, TECH.SIVING_ONE, {
         atlas = "images/inventoryimages/siving_soil_item.xml"
     }, { "LEGION", "SIVING", "GARDENING" }
 )
@@ -226,7 +246,7 @@ AddRecipe2( --子圭·利川
         Ingredient("siving_rocks", 20, "images/inventoryimages/siving_rocks.xml"),
         Ingredient("greengem", 1),
         Ingredient("moonglass", 10)
-    }, TECH.MAGIC_THREE, {
+    }, TECH.SIVING_ONE, {
         atlas = "images/inventoryimages/siving_ctlwater_item.xml"
     }, { "LEGION", "SIVING", "GARDENING", "STRUCTURES" }
 )
@@ -235,7 +255,7 @@ AddRecipe2( --子圭·益矩
         Ingredient("siving_rocks", 20, "images/inventoryimages/siving_rocks.xml"),
         Ingredient("greengem", 1),
         Ingredient("townportaltalisman", 10)
-    }, TECH.MAGIC_THREE, {
+    }, TECH.SIVING_ONE, {
         atlas = "images/inventoryimages/siving_ctldirt_item.xml"
     }, { "LEGION", "SIVING", "GARDENING", "STRUCTURES" }
 )
@@ -249,16 +269,6 @@ AddRecipe2( --子圭·崇溟
         nounlock = lock_recast,
         atlas = "images/inventoryimages/siving_ctlall_item.xml"
     }, { "LEGION", "SIVING", "RECAST", "GARDENING", "STRUCTURES" }
-)
-AddRecipe2( --子圭·育
-    "siving_turn", {
-        Ingredient("siving_rocks", 40, "images/inventoryimages/siving_rocks.xml"),
-        Ingredient("siving_derivant_item", 1, "images/inventoryimages/siving_derivant_item.xml"),
-        Ingredient("seeds", 40),
-    }, TECH.MAGIC_THREE, {
-        placer = "siving_turn_placer",
-        atlas = "images/inventoryimages/siving_turn.xml"
-    }, { "LEGION", "SIVING", "GARDENING", "STRUCTURES" }
 )
 AddRecipe2( --子圭·汲
     "siving_mask", {
@@ -306,16 +316,6 @@ AddRecipe2( --子圭·釜
         nounlock = lock_recast,
         atlas = "images/inventoryimages/siving_suit_gold.xml"
     }, { "LEGION", "SIVING", "RECAST", "ARMOUR", "CONTAINERS" }
-)
-AddRecipe2( --子圭·系
-    "siving_boxopener", {
-        Ingredient("boxopener_l", 1, "images/inventoryimages/boxopener_l.xml"),
-        Ingredient("siving_derivant_item", 1, "images/inventoryimages/siving_derivant_item.xml"),
-        Ingredient("foliageath", 1, "images/inventoryimages/foliageath.xml"),
-        Ingredient("rock_avocado_fruit_sprout", 1)
-    }, TECH.MAGIC_THREE, {
-        atlas = "images/inventoryimages/siving_boxopener.xml"
-    }, { "LEGION", "SIVING", "CONTAINERS" }
 )
 
 ------重铸青光

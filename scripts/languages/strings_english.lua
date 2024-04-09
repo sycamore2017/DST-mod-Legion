@@ -3789,6 +3789,7 @@ STRINGS.ACTIONS_LEGION = {
 STRINGS.ACTIONS.PICK.GENETRANS = "Take down" --收获子圭·育的名字
 
 STRINGS.ACTIONS.OPEN_CRAFTING.RECAST = "Brainstorm with" --靠近解锁时的前置提示。名字与AddPrototyperDef里的action_str一致
+STRINGS.ACTIONS.OPEN_CRAFTING.SIVING = "Whisper with"
 STRINGS.UI.CRAFTING_STATION_FILTERS.RECAST = "Recast"
 
 STRINGS.UI.CRAFTING_FILTERS.RECAST = "Recast"
@@ -3798,7 +3799,11 @@ STRINGS.UI.CRAFTING_FILTERS.LEGION = "Legion"
 --NEEDS..新tech的名字
 STRINGS.UI.CRAFTING.NEEDSELECOURMALINE_ONE = "Find the Elecourmaline to build this!"
 STRINGS.UI.CRAFTING.NEEDSELECOURMALINE_TWO = "It seems that this stone is not fully activated!"
-STRINGS.UI.CRAFTING.NEEDSELECOURMALINE_THREE = "Find an activated Elecourmaline to build this!"
+STRINGS.UI.CRAFTING.NEEDSELECOURMALINE_THREE = "Find the activated Elecourmaline to build this!"
+
+STRINGS.UI.CRAFTING.NEEDSSIVING_ONE = "Whisper to the Siving Alpha to build a prototype!"
+STRINGS.UI.CRAFTING.NEEDSSIVING_TWO = "It seems that the Siving Alpha has lost faith in you!"
+STRINGS.UI.CRAFTING.NEEDSSIVING_THREE = "Use a Siving-Sacrifice to build a prototype!"
 
 STRINGS.ACTIONS.REPAIR_LEGION = {
     GENERIC = "Repair",

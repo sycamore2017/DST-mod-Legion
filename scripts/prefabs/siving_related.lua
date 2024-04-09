@@ -1251,6 +1251,9 @@ local function CP_Open_opener(self, doer, ...)
                 self:Close(doer)
             end
         end, 0.5)
+        if doer.SoundEmitter then
+            doer.SoundEmitter:PlaySound("maxwell_rework/magician_chest/open", nil, 0.7)
+        end
     end
 end
 local function CP_OnClose_opener(self, doer, ...)
@@ -1259,6 +1262,9 @@ local function CP_OnClose_opener(self, doer, ...)
         if doer.task_boxopener2_l ~= nil then
             doer.task_boxopener2_l:Cancel()
             doer.task_boxopener2_l = nil
+            if doer.SoundEmitter then
+                doer.SoundEmitter:PlaySound("maxwell_rework/magician_chest/close", nil, 0.7)
+            end
         end
     end
 end

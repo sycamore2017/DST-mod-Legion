@@ -603,6 +603,9 @@ local function CP_Open_nut(self, doer, ...)
                 self:Close(doer)
             end
         end, 0.5)
+        if doer.SoundEmitter then
+            doer.SoundEmitter:PlaySound("maxwell_rework/magician_chest/open", nil, 0.7)
+        end
     end
 end
 local function CP_OnClose_nut(self, doer, ...)
@@ -611,6 +614,9 @@ local function CP_OnClose_nut(self, doer, ...)
         if doer.task_boxopener_l ~= nil then
             doer.task_boxopener_l:Cancel()
             doer.task_boxopener_l = nil
+            if doer.SoundEmitter then
+                doer.SoundEmitter:PlaySound("maxwell_rework/magician_chest/close", nil, 0.7)
+            end
             if doer.components.health ~= nil and not doer.components.health:IsDead() then
                 local cost = 2
                 if doer.siv_blood_l_reducer_v ~= nil then

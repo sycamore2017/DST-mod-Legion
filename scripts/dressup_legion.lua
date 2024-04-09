@@ -434,6 +434,7 @@ local dressup_data = {
     walking_stick = { buildfile = "walking_stick", buildsymbol = "swap_walking_stick" },
     houndstooth_blowpipe = { buildfile = "swap_houndstooth_blowpipe", buildsymbol = "swap_blowdart_pipe" }, --嚎弹炮
     wathgrithr_shield = { isshield = true, buildfile = "swap_wathgrithr_shield", buildsymbol = "swap_shield" }, --战斗圆盾
+    beeswax_spray = { buildfile = "plant_spray", buildsymbol = "swap_plant_spray" }, --防腐喷雾
     -- minifan = { buildfile = "swap_minifan", buildsymbol = "swap_minifan" }, --有贴图之外的实体，不做幻化
     -- redlantern = { buildfile = "swap_redlantern", buildsymbol = "swap_redlantern" }, --有贴图之外的实体，不做幻化
     -- thurible = { buildfile = "swap_thurible", buildsymbol = "swap_thurible" }, --暗影香炉。有贴图之外的实体，不做幻化

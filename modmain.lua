@@ -225,8 +225,8 @@ Assets = {
     Asset("IMAGE", "images/slot_juice_l.tex"),
     Asset("ATLAS", "images/station_recast.xml"), --科技栏图标
     Asset("IMAGE", "images/station_recast.tex"),
-    Asset("ATLAS", "images/filter_siving.xml"),
-    Asset("IMAGE", "images/filter_siving.tex"),
+    Asset("ATLAS", "images/station_siving.xml"),
+    Asset("IMAGE", "images/station_siving.tex"),
     Asset("ATLAS", "images/filter_legion.xml"),
     Asset("IMAGE", "images/filter_legion.tex"),
 

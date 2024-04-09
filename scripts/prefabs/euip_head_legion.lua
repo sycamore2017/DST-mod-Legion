@@ -972,6 +972,7 @@ local function SetMode_sivmask2(inst, newmode, doer)
             if doer ~= nil then
                 if doer.SoundEmitter ~= nil then
                     doer.SoundEmitter:PlaySound("dontstarve/characters/wendy/small_ghost/howl", nil, 0.5)
+                    doer.SoundEmitter:PlaySound("dontstarve/characters/wortox/soul/spawn", nil, 0.3)
                 end
                 TOOLS_L.SendMouseInfoRPC(doer, inst, { mo = newmode }, true, false)
             end
