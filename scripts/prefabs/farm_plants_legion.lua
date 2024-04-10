@@ -1524,9 +1524,6 @@ local function OnWorkedFinish_pine2(inst, worker)
 	inst.SoundEmitter:PlaySound("dontstarve/forest/treefall")
 	inst:DoTaskInTime(0.4, ShakeAllCameras_pine)
 
-	-- inst.AnimState:PlayAnimation("chopdown")
-	-- inst.AnimState:PushAnimation("idle", true)
-
 	if crop.fn_defend ~= nil then
 		crop.fn_defend(inst, worker)
 	end
@@ -1537,6 +1534,9 @@ local function OnWorkedFinish_pine2(inst, worker)
 	else
 		crop:SetStage(1, false)
 	end
+
+	inst.AnimState:PlayAnimation("chop")
+    inst.AnimState:PushAnimation("idle", true)
 
 	local days_survived = worker.components.age ~= nil and worker.components.age:GetAgeInDays() or TheWorld.state.cycles
 	if days_survived >= TUNING.LEIF_MIN_DAY then
@@ -1619,6 +1619,7 @@ local function OnOpen_pine(inst)
 end
 local function OnClose_pine(inst)
 	inst.AnimState:PlayAnimation("close")
+	inst.AnimState:PushAnimation("idle", true)
 	inst.SoundEmitter:PlaySound("maxwell_rework/magician_chest/close")
 end
 local function AttachContainer_pine(inst)
