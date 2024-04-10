@@ -99,6 +99,18 @@ function BoxCloudPine:UpdateBox(doer)
             end
         end
 
+        if oldbox == boxkeys[4] then --将已有时间加上去
+            local box = self.inst:GetPocketDimensionContainer(boxkeys[4])
+            if box ~= nil and box.SwordRecovery_l ~= nil then
+                box.SwordRecovery_l(box, doer)
+            end
+        elseif self.boxkey == boxkeys[4] then --初始化时间
+            local box = self.inst:GetPocketDimensionContainer(boxkeys[4])
+            if box ~= nil and box.SwordRecovery_l ~= nil then
+                box.healtime_l = GetTime()
+            end
+        end
+
         --物品装不下时的掉落坐标
         local x, y, z
         if dropper == nil then
@@ -162,7 +174,7 @@ function BoxCloudPine:OnLoad(data)
     if self.task_load ~= nil then
         self.task_load:Cancel()
     end
-    self.task_load = self.inst:DoTaskInTime(2.5, function()
+    self.task_load = self.inst:DoTaskInTime(3, function()
         self.task_load = nil
         self:UpdateBox()
     end)

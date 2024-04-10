@@ -74,6 +74,65 @@ local function FnServer_pine(inst)
     inst.components.preserver:SetPerishRateMultiplier(SetPerishRate_pine)
 end
 
+local function SwordRecovery_box4(inst, doer)
+    if inst.healtime_l == nil then
+        inst.healtime_l = GetTime()
+    else
+        local dt = inst.healtime_l
+        inst.healtime_l = GetTime()
+        dt = inst.healtime_l - dt
+        if inst.healdt_l ~= nil then
+            dt = dt + inst.healdt_l
+            inst.healdt_l = nil
+        end
+        if dt <= 0 then
+            return
+        end
+        for _, v in pairs(inst.components.container.slots) do
+            if v ~= nil and v.foliageath_data ~= nil then
+                if v.foliageath_data.fn_recover ~= nil then
+                    v.foliageath_data.fn_recover(v, dt, doer, "foliageath")
+                elseif v.components.perishable ~= nil then
+                    local cpt = v.components.perishable
+                    if cpt.perishtime and cpt.perishremainingtime and cpt.perishremainingtime < cpt.perishtime then
+                        cpt.perishremainingtime = math.min(cpt.perishremainingtime+dt, cpt.perishtime)
+                        v:PushEvent("perishchange", {percent = v.components.perishable:GetPercent()})
+                    end
+                end
+            end
+        end
+    end
+end
+local function OnOpenStorage_box4(inst, data) -- data = {doer = doer}
+    inst.SwordRecovery_l(inst, data and data.doer or nil)
+end
+local function OnCloseStorage_box4(inst, doer) --官方在干啥，一会用表把 doer 包起来，一会又不包了
+    if inst.healtime_l == nil then
+        inst.healtime_l = GetTime()
+    end
+end
+local function OnLongUpdate_box4(inst, dt)
+    if dt ~= nil and dt > 0 then
+        inst.healdt_l = (inst.healdt_l or 0) + dt
+    end
+end
+local function OnSave_box4(inst, data)
+    local dt = inst.healdt_l or 0
+    if inst.healtime_l ~= nil then
+        dt = GetTime() - inst.healtime_l + dt
+    end
+    if dt > 0 then
+        data.healdt = dt
+    end
+end
+local function OnLoad_box4(inst, data)
+    if data ~= nil then
+        if data.healdt ~= nil then
+            inst.healdt_l = data.healdt
+        end
+    end
+end
+
 MakeWorldBox({
     name = "cloudpine_box_l1", boxkey = "cloudpine_l1",
     assets = {
@@ -104,7 +163,17 @@ MakeWorldBox({
         Asset("ANIM", "anim/ui_bookstation_4x5.zip"),
         Asset("ANIM", "anim/ui_cloudpine_box_4x6.zip")
     },
-    fn_server = FnServer_pine
+    fn_server = function(inst)
+        FnServer_pine(inst)
+
+        inst.SwordRecovery_l = SwordRecovery_box4
+        inst.components.container.onopenfn = OnOpenStorage_box4
+        inst.components.container.onclosefn = OnCloseStorage_box4
+
+        inst.OnLongUpdate = OnLongUpdate_box4
+        inst.OnSave = OnSave_box4
+        inst.OnLoad = OnLoad_box4
+    end
 })
 
 --------------------
