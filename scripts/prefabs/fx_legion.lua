@@ -1090,20 +1090,20 @@ MakeFx({ --花寄语：音波特效
         end)
     end,
 })
-MakeFx({ --子圭神木岩：音波特效
+MakeFx({ --子圭神木岩：科技解锁特效
     name = "siving_thetree_unlock_fx",
     assets = {
-        Asset("ANIM", "anim/bearger_ring_fx.zip") --官方的动画
+        Asset("ANIM", "anim/fence_rotator_fx.zip") --官方的栅栏击剑特效动画
     },
     fn_common = nil,
     fn_anim = function(inst)
-        inst.AnimState:SetBank("bearger_ring_fx")
-        inst.AnimState:SetBuild("bearger_ring_fx")
+        inst.AnimState:SetBank("fence_rotator_fx")
+        inst.AnimState:SetBuild("fence_rotator_fx")
         inst.AnimState:PlayAnimation("idle")
+        inst.AnimState:HideSymbol("fx_puff")
         inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
-        inst.AnimState:SetScale(0.2, 0.2)
         inst.AnimState:SetFinalOffset(3)
-        inst.AnimState:SetMultColour(0/255, 255/255, 255/255, 0.13)
+        inst.AnimState:SetMultColour(115/255, 255/255, 255/255, 0.7)
         inst.AnimState:SetLightOverride(1)
     end,
     fn_remove = nil

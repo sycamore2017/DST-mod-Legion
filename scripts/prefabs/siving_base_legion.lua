@@ -1420,7 +1420,7 @@ local function OnTurnOff_tt(inst)
 end
 local function SpawnActivateFx_tt(doer)
     local x, y, z = doer.Transform:GetWorldPosition()
-    y = y + 2
+    -- y = y + 2
     local fx = SpawnPrefab("siving_thetree_unlock_fx")
     if fx ~= nil then
         fx.Transform:SetPosition(x, y, z)
@@ -1431,7 +1431,7 @@ local function OnActivate_tt(inst, doer, recipe)
     inst.SoundEmitter:PlaySound("dontstarve/characters/wortox/soul/spawn", nil, 0.3)
     if doer ~= nil then
         SpawnActivateFx_tt(doer)
-        doer:DoTaskInTime(0.15, SpawnActivateFx_tt)
+        doer:DoTaskInTime(0.2, SpawnActivateFx_tt)
     end
 end
 
