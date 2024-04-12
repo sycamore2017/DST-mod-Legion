@@ -2355,7 +2355,6 @@ S_________WURT.DESCRIBE.FISHHOMINGBAIT = "浮勒浮，今天是哪条可爱的�
 S_______WALTER.DESCRIBE.FISHHOMINGBAIT = "我记得某电影里男主角说去钓鱼却从没打开过钓具袋..."
 S________WANDA.DESCRIBE.FISHHOMINGBAIT = "好了好了，某人就是想挥霍时间钓鱼对吧。"
 
-S_NAMES.PLANT_CARROT_L = "芾萝卜"
 S_NAMES.PLANT_CORN_L = "玉米杆"
 S_NAMES.PLANT_PUMPKIN_L = "南瓜架"
 S_NAMES.PLANT_EGGPLANT_L = "茄巢"
@@ -2372,14 +2371,9 @@ S_NAMES.PLANT_TOMATO_L = "刺茄"
 S_NAMES.PLANT_ASPARAGUS_L = "芦笋丛"
 S_NAMES.PLANT_MANDRAKE_L = "培植曼草"
 S_NAMES.PLANT_GOURD_L = "葫芦藤"
-S_NAMES.PLANT_CACTUS_MEAT_L = "仙人柱"
-S_NAMES.PLANT_PLANTMEAT_L = "巨食草"
-S_NAMES.PLANT_BERRIES_L = "果攀树"
-S_NAMES.PLANT_LOG_L = "云青松"
 
 S______GENERIC.DESCRIBE.PLANT_CROP_L = {
     WITHERED = "已经枯萎了，就待春风吹又生...",
-    SPROUT = "已经发芽了，接下来会是什么样子呢...",
     GROWING = "长吧，长吧，我会等到丰饶号角吹响的那天...",
     BLOOMY = "开花了，正是招蜂引蝶的好时候...",
     READY = "感谢我的付出与等待，更感谢自然的慷慨馈赠！",
@@ -2805,7 +2799,44 @@ S_________WURT.DESCRIBE.LANCE_CARROT_L = "哈，我觉得它很适合我。"
 -- S_______WALTER.DESCRIBE.LANCE_CARROT_L = ""
 S________WANDA.DESCRIBE.LANCE_CARROT_L = "没啥好稀奇的。"
 
-S_NAMES.PLANT_NEPENTHES_L = "巨食草"
+S_NAMES.PLANT_PLANTMEAT_L = "巨食草" --生长阶段的
+S______GENERIC.DESCRIBE.PLANT_PLANTMEAT_L = {
+    GROWING = "瞧瞧这粉嘟嘟樱桃小嘴，真可爱。",
+    READY = "长大了。", WITHERED = "枯萎了。", BLOOMY = "开花了。"
+}
+-- S_______WILLOW.DESCRIBE.PLANT_PLANTMEAT_L = ""
+S_____WOLFGANG.DESCRIBE.PLANT_PLANTMEAT_L = {
+    GROWING = "瞧！大嘴巴花诶。",
+    READY = "长大了。", WITHERED = "枯萎了。", BLOOMY = "开花了。"
+}
+-- S________WENDY.DESCRIBE.PLANT_PLANTMEAT_L = ""
+-- S_________WX78.DESCRIBE.PLANT_PLANTMEAT_L = ""
+S_WICKERBOTTOM.DESCRIBE.PLANT_PLANTMEAT_L = {
+    GROWING = "食虫植物的捕食器官正在发育中。",
+    READY = "长大了。", WITHERED = "枯萎了。", BLOOMY = "开花了。"
+}
+-- S_______WOODIE.DESCRIBE.PLANT_PLANTMEAT_L = ""
+-- S______WAXWELL.DESCRIBE.PLANT_PLANTMEAT_L = ""
+-- S___WATHGRITHR.DESCRIBE.PLANT_PLANTMEAT_L = ""
+S_______WEBBER.DESCRIBE.PLANT_PLANTMEAT_L = {
+    GROWING = "这是它开的花吗？",
+    READY = "长大了。", WITHERED = "枯萎了。", BLOOMY = "开花了。"
+}
+-- S_______WINONA.DESCRIBE.PLANT_PLANTMEAT_L = ""
+S_______WORTOX.DESCRIBE.PLANT_PLANTMEAT_L = {
+    GROWING = "噢，我的朋友，你是真饿了。",
+    READY = "长大了。", WITHERED = "枯萎了。", BLOOMY = "开花了。"
+}
+S_____WORMWOOD.DESCRIBE.PLANT_PLANTMEAT_L = {
+    GROWING = "朋友的嘴巴还没大能到吃虫虫。",
+    READY = "长大了。", WITHERED = "枯萎了。", BLOOMY = "开花了。"
+}
+-- S________WARLY.DESCRIBE.PLANT_PLANTMEAT_L = ""
+-- S_________WURT.DESCRIBE.PLANT_PLANTMEAT_L = ""
+-- S_______WALTER.DESCRIBE.PLANT_PLANTMEAT_L = ""
+-- S________WANDA.DESCRIBE.PLANT_PLANTMEAT_L = ""
+
+S_NAMES.PLANT_NEPENTHES_L = "巨食草" --成熟阶段的
 S______GENERIC.DESCRIBE.PLANT_NEPENTHES_L = "好大一棵食虫植物！"
 -- S_______WILLOW.DESCRIBE.PLANT_NEPENTHES_L = ""
 S_____WOLFGANG.DESCRIBE.PLANT_NEPENTHES_L = "谢天谢地，沃尔夫冈的菜园有救了。"
@@ -2823,6 +2854,144 @@ S________WARLY.DESCRIBE.PLANT_NEPENTHES_L = "它不吃我，我也不吃它。"
 -- S_________WURT.DESCRIBE.PLANT_NEPENTHES_L = ""
 S_______WALTER.DESCRIBE.PLANT_NEPENTHES_L = "它什么都吃，比沃比还贪吃。"
 S________WANDA.DESCRIBE.PLANT_NEPENTHES_L = "我以前见过的可没这么大。"
+
+S_NAMES.PLANT_LOG_L = "云青松"
+S______GENERIC.DESCRIBE.PLANT_LOG_L = {
+    GROWING = "它的树根有魔法，与其他同类相连。",
+    READY = "郁郁葱葱的，顶端的枝丫特别娇嫩。",
+    WITHERED = "枯萎了。", BLOOMY = "开花了。"
+}
+-- S_______WILLOW.DESCRIBE.PLANT_LOG_L = ""
+-- S_____WOLFGANG.DESCRIBE.PLANT_LOG_L = ""
+-- S________WENDY.DESCRIBE.PLANT_LOG_L = ""
+-- S_________WX78.DESCRIBE.PLANT_LOG_L = ""
+-- S_WICKERBOTTOM.DESCRIBE.PLANT_LOG_L = ""
+S_______WOODIE.DESCRIBE.PLANT_LOG_L = {
+    GROWING = "别急，露西，还得等等。",
+    READY = "真是茂盛，我的露西早已饥渴难耐了。",
+    WITHERED = "枯萎了。", BLOOMY = "开花了。"
+}
+-- S______WAXWELL.DESCRIBE.PLANT_LOG_L = ""
+-- S___WATHGRITHR.DESCRIBE.PLANT_LOG_L = ""
+-- S_______WEBBER.DESCRIBE.PLANT_LOG_L = ""
+-- S_______WINONA.DESCRIBE.PLANT_LOG_L = ""
+-- S_______WORTOX.DESCRIBE.PLANT_LOG_L = ""
+S_____WORMWOOD.DESCRIBE.PLANT_LOG_L = {
+    GROWING = "树朋友可以存放我的东东。",
+    READY = "我也能长这么大就好了。",
+    WITHERED = "枯萎了。", BLOOMY = "开花了。"
+}
+-- S________WARLY.DESCRIBE.PLANT_LOG_L = ""
+-- S_________WURT.DESCRIBE.PLANT_LOG_L = ""
+-- S_______WALTER.DESCRIBE.PLANT_LOG_L = ""
+-- S________WANDA.DESCRIBE.PLANT_LOG_L = ""
+
+S_NAMES.PLANT_BERRIES_L = "果攀树"
+S______GENERIC.DESCRIBE.PLANT_BERRIES_L = {
+    GROWING = "一棵比较高大的灌木丛。",
+    READY = "大大小小的浆果长满了树干。",
+    WITHERED = "谁把它养死了，反正不是我。",
+    BLOOMY = "橘黄色花朵开满了树干。"
+}
+-- S_______WILLOW.DESCRIBE.PLANT_BERRIES_L = ""
+-- S_____WOLFGANG.DESCRIBE.PLANT_BERRIES_L = ""
+-- S________WENDY.DESCRIBE.PLANT_BERRIES_L = ""
+-- S_________WX78.DESCRIBE.PLANT_BERRIES_L = ""
+S_WICKERBOTTOM.DESCRIBE.PLANT_BERRIES_L = {
+    GROWING = "树干上留了足够空间来结果。",
+    READY = "如果足够成熟，果子会更硬更耐放。",
+    WITHERED = "只要根不死，那它就有救。",
+    BLOOMY = "花期的果树最动人。"
+}
+-- S_______WOODIE.DESCRIBE.PLANT_BERRIES_L = ""
+-- S______WAXWELL.DESCRIBE.PLANT_BERRIES_L = ""
+-- S___WATHGRITHR.DESCRIBE.PLANT_BERRIES_L = ""
+-- S_______WEBBER.DESCRIBE.PLANT_BERRIES_L = ""
+-- S_______WINONA.DESCRIBE.PLANT_BERRIES_L = ""
+-- S_______WORTOX.DESCRIBE.PLANT_BERRIES_L = ""
+S_____WORMWOOD.DESCRIBE.PLANT_BERRIES_L = {
+    GROWING = "会结果的小树朋友。",
+    READY = "朋友脖子上结了好多果果。",
+    WITHERED = "朋友只是累了。",
+    BLOOMY = "朋友脖子上开了好多花花。"
+}
+-- S________WARLY.DESCRIBE.PLANT_BERRIES_L = ""
+-- S_________WURT.DESCRIBE.PLANT_BERRIES_L = ""
+-- S_______WALTER.DESCRIBE.PLANT_BERRIES_L = ""
+-- S________WANDA.DESCRIBE.PLANT_BERRIES_L = ""
+
+S_NAMES.PLANT_CACTUS_MEAT_L = "仙人柱"
+S______GENERIC.DESCRIBE.PLANT_CACTUS_MEAT_L = {
+    GROWING = "它给这里添了一抹沙漠风情。",
+    READY = "要不是那些刺，我真想咬一口这清新多汁的叶肉。",
+    WITHERED = "这都能养死的吗！",
+    BLOOMY = "没想到这秃子植物还能开花的。"
+}
+-- S_______WILLOW.DESCRIBE.PLANT_CACTUS_MEAT_L = ""
+-- S_____WOLFGANG.DESCRIBE.PLANT_CACTUS_MEAT_L = ""
+-- S________WENDY.DESCRIBE.PLANT_CACTUS_MEAT_L = ""
+-- S_________WX78.DESCRIBE.PLANT_CACTUS_MEAT_L = ""
+S_WICKERBOTTOM.DESCRIBE.PLANT_CACTUS_MEAT_L = {
+    GROWING = "一棵仙人掌科植物。",
+    READY = "这种仙人掌科植物是可以食用的。",
+    WITHERED = "浇浇水也许就能恢复生机了。",
+    BLOOMY = "要是在夏天，它的花会开得更繁盛。"
+}
+-- S_______WOODIE.DESCRIBE.PLANT_CACTUS_MEAT_L = ""
+-- S______WAXWELL.DESCRIBE.PLANT_CACTUS_MEAT_L = ""
+-- S___WATHGRITHR.DESCRIBE.PLANT_CACTUS_MEAT_L = ""
+-- S_______WEBBER.DESCRIBE.PLANT_CACTUS_MEAT_L = ""
+-- S_______WINONA.DESCRIBE.PLANT_CACTUS_MEAT_L = ""
+S_______WORTOX.DESCRIBE.PLANT_CACTUS_MEAT_L = {
+    GROWING = "看你扎不扎我就完事了。",
+    READY = "等我快渴死了，我再来找你。",
+    WITHERED = "大抵是死了。",
+    BLOOMY = "惊鸿一般短暂，如夏花一样绚烂。"
+}
+S_____WORMWOOD.DESCRIBE.PLANT_CACTUS_MEAT_L = {
+    GROWING = "沙漠风格的朋友。",
+    READY = "太强壮啦。",
+    WITHERED = "该轮到我来照顾你了。",
+    BLOOMY = "沙漠花花。"
+}
+-- S________WARLY.DESCRIBE.PLANT_CACTUS_MEAT_L = ""
+-- S_________WURT.DESCRIBE.PLANT_CACTUS_MEAT_L = ""
+-- S_______WALTER.DESCRIBE.PLANT_CACTUS_MEAT_L = ""
+-- S________WANDA.DESCRIBE.PLANT_CACTUS_MEAT_L = ""
+
+S_NAMES.PLANT_CARROT_L = "芾萝卜"
+S______GENERIC.DESCRIBE.PLANT_CARROT_L = {
+    GROWING = "这？真的是胡萝卜吗。",
+    READY = "看这红润饱满的根茎，已经熟了吧。",
+    WITHERED = "枯萎之后非常硬。",
+    BLOOMY = "开花了。"
+}
+-- S_______WILLOW.DESCRIBE.PLANT_CARROT_L = ""
+-- S_____WOLFGANG.DESCRIBE.PLANT_CARROT_L = ""
+-- S________WENDY.DESCRIBE.PLANT_CARROT_L = ""
+-- S_________WX78.DESCRIBE.PLANT_CARROT_L = ""
+-- S_WICKERBOTTOM.DESCRIBE.PLANT_CARROT_L = ""
+-- S_______WOODIE.DESCRIBE.PLANT_CARROT_L = ""
+-- S______WAXWELL.DESCRIBE.PLANT_CARROT_L = ""
+S___WATHGRITHR.DESCRIBE.PLANT_CARROT_L = {
+    GROWING = "再长再硬一些就能用做武器了。",
+    READY = "也许我能挑几根拿来当武器。",
+    WITHERED = "虽然质地坚硬，但是太脆了。",
+    BLOOMY = "开花了。"
+}
+-- S_______WEBBER.DESCRIBE.PLANT_CARROT_L = ""
+-- S_______WINONA.DESCRIBE.PLANT_CARROT_L = ""
+-- S_______WORTOX.DESCRIBE.PLANT_CARROT_L = ""
+S_____WORMWOOD.DESCRIBE.PLANT_CARROT_L = {
+    GROWING = "你是胡萝卜朋友？",
+    READY = "一茬又一茬。",
+    WITHERED = "朋友还有一部分在地下活着。",
+    BLOOMY = "开花了。"
+}
+-- S________WARLY.DESCRIBE.PLANT_CARROT_L = ""
+-- S_________WURT.DESCRIBE.PLANT_CARROT_L = ""
+-- S_______WALTER.DESCRIBE.PLANT_CARROT_L = ""
+-- S________WANDA.DESCRIBE.PLANT_CARROT_L = ""
 
 S______GENERIC.DESCRIBE.TISSUE_L = "鲜活的植物组织能用于研究。"
 -- S_______WILLOW.DESCRIBE.TISSUE_L = ""

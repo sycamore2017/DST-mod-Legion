@@ -2229,7 +2229,6 @@ S_________WURT.DESCRIBE.FISHHOMINGBAIT = "Flurph, which lovely fish will be attr
 S_______WALTER.DESCRIBE.FISHHOMINGBAIT = "I remember a man who said he went fishing but never opened his bait bag."
 S________WANDA.DESCRIBE.FISHHOMINGBAIT = "Well, someone just wants to waste time fishing, right?"
 
-S_NAMES.PLANT_CARROT_L = "Carrot Cluster"
 S_NAMES.PLANT_CORN_L = "Corn Straw"
 S_NAMES.PLANT_PUMPKIN_L = "Pumpkin Rack"
 S_NAMES.PLANT_EGGPLANT_L = "Eggplant Nest"
@@ -2246,14 +2245,9 @@ S_NAMES.PLANT_TOMATO_L = "Thormato"
 S_NAMES.PLANT_ASPARAGUS_L = "Asparagus Clump"
 S_NAMES.PLANT_MANDRAKE_L = "Planted Mandrake"
 S_NAMES.PLANT_GOURD_L = "Gourd Vine"
-S_NAMES.PLANT_CACTUS_MEAT_L = "Cactaceae"
-S_NAMES.PLANT_PLANTMEAT_L = "Vase Herb"
-S_NAMES.PLANT_BERRIES_L = "Jabuticaba"
-S_NAMES.PLANT_LOG_L = "Cloud Pinus"
 
 S______GENERIC.DESCRIBE.PLANT_CROP_L = {
     WITHERED = "It will be born again when spring breeze blows...",
-    SPROUT = "What will it look like next...",
     GROWING = "I will wait until the day when the horn of harvest blows...",
     BLOOMY = "Flowering is a good time to attract bees and butterflies...",
     READY = "Thank nature for its generous gifts!",
@@ -2674,7 +2668,44 @@ S_________WURT.DESCRIBE.LANCE_CARROT_L = "Ha, I think it suits me very well."
 -- S_______WALTER.DESCRIBE.LANCE_CARROT_L = ""
 S________WANDA.DESCRIBE.LANCE_CARROT_L = "Nothing new."
 
-S_NAMES.PLANT_NEPENTHES_L = "Vase Herb" --巨食草
+S_NAMES.PLANT_PLANTMEAT_L = "Vase Herb" --巨食草(生长阶段的)
+S______GENERIC.DESCRIBE.PLANT_PLANTMEAT_L = {
+    GROWING = "Look at this pink cherry mouth, it's really cute.",
+    READY = "Matured.", WITHERED = "Withered.", BLOOMY = "Blooming."
+}
+-- S_______WILLOW.DESCRIBE.PLANT_PLANTMEAT_L = ""
+S_____WOLFGANG.DESCRIBE.PLANT_PLANTMEAT_L = {
+    GROWING = "Look! A big mouth flower.",
+    READY = "Matured.", WITHERED = "Withered.", BLOOMY = "Blooming."
+}
+-- S________WENDY.DESCRIBE.PLANT_PLANTMEAT_L = ""
+-- S_________WX78.DESCRIBE.PLANT_PLANTMEAT_L = ""
+S_WICKERBOTTOM.DESCRIBE.PLANT_PLANTMEAT_L = {
+    GROWING = "The predatory organs of carnivorous plants are developing.",
+    READY = "Matured.", WITHERED = "Withered.", BLOOMY = "Blooming."
+}
+-- S_______WOODIE.DESCRIBE.PLANT_PLANTMEAT_L = ""
+-- S______WAXWELL.DESCRIBE.PLANT_PLANTMEAT_L = ""
+-- S___WATHGRITHR.DESCRIBE.PLANT_PLANTMEAT_L = ""
+S_______WEBBER.DESCRIBE.PLANT_PLANTMEAT_L = {
+    GROWING = "Is this the flower it blooms?",
+    READY = "Matured.", WITHERED = "Withered.", BLOOMY = "Blooming."
+}
+-- S_______WINONA.DESCRIBE.PLANT_PLANTMEAT_L = ""
+S_______WORTOX.DESCRIBE.PLANT_PLANTMEAT_L = {
+    GROWING = "Oh, my friend, you're really hungry.",
+    READY = "Matured.", WITHERED = "Withered.", BLOOMY = "Blooming."
+}
+S_____WORMWOOD.DESCRIBE.PLANT_PLANTMEAT_L = {
+    GROWING = "My friend's mouth is not big enough to eat insects.",
+    READY = "Matured.", WITHERED = "Withered.", BLOOMY = "Blooming."
+}
+-- S________WARLY.DESCRIBE.PLANT_PLANTMEAT_L = ""
+-- S_________WURT.DESCRIBE.PLANT_PLANTMEAT_L = ""
+-- S_______WALTER.DESCRIBE.PLANT_PLANTMEAT_L = ""
+-- S________WANDA.DESCRIBE.PLANT_PLANTMEAT_L = ""
+
+S_NAMES.PLANT_NEPENTHES_L = "Vase Herb" --巨食草(成熟阶段的)
 S______GENERIC.DESCRIBE.PLANT_NEPENTHES_L = "What a big insect eating plant!"
 -- S_______WILLOW.DESCRIBE.PLANT_NEPENTHES_L = ""
 S_____WOLFGANG.DESCRIBE.PLANT_NEPENTHES_L = "Wolfgang's farm has been saved."
@@ -2692,6 +2723,144 @@ S________WARLY.DESCRIBE.PLANT_NEPENTHES_L = "It doesn't eat me, and I don't eat 
 -- S_________WURT.DESCRIBE.PLANT_NEPENTHES_L = ""
 S_______WALTER.DESCRIBE.PLANT_NEPENTHES_L = "It eats everything, even more gluttonous than Woby."
 S________WANDA.DESCRIBE.PLANT_NEPENTHES_L = "The ones I've seen before aren't that big."
+
+S_NAMES.PLANT_LOG_L = "Cloud Pinus" --云青松
+S______GENERIC.DESCRIBE.PLANT_LOG_L = {
+    GROWING = "Its magical tree roots are connected to other same kind.",
+    READY = "It is lush and the top branches are particularly tender.",
+    WITHERED = "Withered.", BLOOMY = "Blooming."
+}
+-- S_______WILLOW.DESCRIBE.PLANT_LOG_L = ""
+-- S_____WOLFGANG.DESCRIBE.PLANT_LOG_L = ""
+-- S________WENDY.DESCRIBE.PLANT_LOG_L = ""
+-- S_________WX78.DESCRIBE.PLANT_LOG_L = ""
+-- S_WICKERBOTTOM.DESCRIBE.PLANT_LOG_L = ""
+S_______WOODIE.DESCRIBE.PLANT_LOG_L = {
+    GROWING = "Be patient, Lucy, we still have to wait.",
+    READY = "It's really lush, my Lucy can't wait anymore.",
+    WITHERED = "Withered.", BLOOMY = "Blooming."
+}
+-- S______WAXWELL.DESCRIBE.PLANT_LOG_L = ""
+-- S___WATHGRITHR.DESCRIBE.PLANT_LOG_L = ""
+-- S_______WEBBER.DESCRIBE.PLANT_LOG_L = ""
+-- S_______WINONA.DESCRIBE.PLANT_LOG_L = ""
+-- S_______WORTOX.DESCRIBE.PLANT_LOG_L = ""
+S_____WORMWOOD.DESCRIBE.PLANT_LOG_L = {
+    GROWING = "This tree friend can store my belongings.",
+    READY = "I wish I could grow this big too.",
+    WITHERED = "Withered.", BLOOMY = "Blooming."
+}
+-- S________WARLY.DESCRIBE.PLANT_LOG_L = ""
+-- S_________WURT.DESCRIBE.PLANT_LOG_L = ""
+-- S_______WALTER.DESCRIBE.PLANT_LOG_L = ""
+-- S________WANDA.DESCRIBE.PLANT_LOG_L = ""
+
+S_NAMES.PLANT_BERRIES_L = "Jabuticaba" --果攀树
+S______GENERIC.DESCRIBE.PLANT_BERRIES_L = {
+    GROWING = "A tall shrub.",
+    READY = "Berries covered the trunk of the tree.",
+    WITHERED = "Who raised it to death, it's not me anyway.",
+    BLOOMY = "Orange flowers bloom all over the tree trunk."
+}
+-- S_______WILLOW.DESCRIBE.PLANT_BERRIES_L = ""
+-- S_____WOLFGANG.DESCRIBE.PLANT_BERRIES_L = ""
+-- S________WENDY.DESCRIBE.PLANT_BERRIES_L = ""
+-- S_________WX78.DESCRIBE.PLANT_BERRIES_L = ""
+S_WICKERBOTTOM.DESCRIBE.PLANT_BERRIES_L = {
+    GROWING = "There is enough space left on the trunk to bear fruit.",
+    READY = "If it is mature enough, the fruit will be harder and more durable.",
+    WITHERED = "As long as the root does not die, it will be saved.",
+    BLOOMY = "The fruit trees in their flowering period are the most charming."
+}
+-- S_______WOODIE.DESCRIBE.PLANT_BERRIES_L = ""
+-- S______WAXWELL.DESCRIBE.PLANT_BERRIES_L = ""
+-- S___WATHGRITHR.DESCRIBE.PLANT_BERRIES_L = ""
+-- S_______WEBBER.DESCRIBE.PLANT_BERRIES_L = ""
+-- S_______WINONA.DESCRIBE.PLANT_BERRIES_L = ""
+-- S_______WORTOX.DESCRIBE.PLANT_BERRIES_L = ""
+S_____WORMWOOD.DESCRIBE.PLANT_BERRIES_L = {
+    GROWING = "A fruiting little tree friend.",
+    READY = "My friend has a lot of fruit on his neck.",
+    WITHERED = "My friend is just tired.",
+    BLOOMY = "My friend has many flowers blooming around his neck."
+}
+-- S________WARLY.DESCRIBE.PLANT_BERRIES_L = ""
+-- S_________WURT.DESCRIBE.PLANT_BERRIES_L = ""
+-- S_______WALTER.DESCRIBE.PLANT_BERRIES_L = ""
+-- S________WANDA.DESCRIBE.PLANT_BERRIES_L = ""
+
+S_NAMES.PLANT_CACTUS_MEAT_L = "Cactaceae" --仙人柱
+S______GENERIC.DESCRIBE.PLANT_CACTUS_MEAT_L = {
+    GROWING = "It adds a touch of desert charm to this place.",
+    READY = "I really want to take a bite of this fresh and juicy leaf flesh.",
+    WITHERED = "Can this be raised to death!",
+    BLOOMY = "I didn't expect this bald plant to still bloom."
+}
+-- S_______WILLOW.DESCRIBE.PLANT_CACTUS_MEAT_L = ""
+-- S_____WOLFGANG.DESCRIBE.PLANT_CACTUS_MEAT_L = ""
+-- S________WENDY.DESCRIBE.PLANT_CACTUS_MEAT_L = ""
+-- S_________WX78.DESCRIBE.PLANT_CACTUS_MEAT_L = ""
+S_WICKERBOTTOM.DESCRIBE.PLANT_CACTUS_MEAT_L = {
+    GROWING = "A cactus plant.",
+    READY = "This cactus plant is edible.",
+    WITHERED = "Watering may restore vitality.",
+    BLOOMY = "If it were in summer, its flowers would bloom even more vigorously."
+}
+-- S_______WOODIE.DESCRIBE.PLANT_CACTUS_MEAT_L = ""
+-- S______WAXWELL.DESCRIBE.PLANT_CACTUS_MEAT_L = ""
+-- S___WATHGRITHR.DESCRIBE.PLANT_CACTUS_MEAT_L = ""
+-- S_______WEBBER.DESCRIBE.PLANT_CACTUS_MEAT_L = ""
+-- S_______WINONA.DESCRIBE.PLANT_CACTUS_MEAT_L = ""
+S_______WORTOX.DESCRIBE.PLANT_CACTUS_MEAT_L = {
+    GROWING = "See if you can prick me.",
+    READY = "When I'm almost thirsty, I'll come find you.",
+    WITHERED = "Most likely dead.",
+    BLOOMY = "Brilliant like summer flowers."
+}
+S_____WORMWOOD.DESCRIBE.PLANT_CACTUS_MEAT_L = {
+    GROWING = "A friend in desert style.",
+    READY = "Really strong.",
+    WITHERED = "It's my turn to take care of you.",
+    BLOOMY = "Desert flowers."
+}
+-- S________WARLY.DESCRIBE.PLANT_CACTUS_MEAT_L = ""
+-- S_________WURT.DESCRIBE.PLANT_CACTUS_MEAT_L = ""
+-- S_______WALTER.DESCRIBE.PLANT_CACTUS_MEAT_L = ""
+-- S________WANDA.DESCRIBE.PLANT_CACTUS_MEAT_L = ""
+
+S_NAMES.PLANT_CARROT_L = "Carrot Cluster" --芾萝卜
+S______GENERIC.DESCRIBE.PLANT_CARROT_L = {
+    GROWING = "This? Is it really a carrot?",
+    READY = "Look at this plump and red rhizome, it's already ripe.",
+    WITHERED = "After withering, it becomes very hard.",
+    BLOOMY = "Blooming."
+}
+-- S_______WILLOW.DESCRIBE.PLANT_CARROT_L = ""
+-- S_____WOLFGANG.DESCRIBE.PLANT_CARROT_L = ""
+-- S________WENDY.DESCRIBE.PLANT_CARROT_L = ""
+-- S_________WX78.DESCRIBE.PLANT_CARROT_L = ""
+-- S_WICKERBOTTOM.DESCRIBE.PLANT_CARROT_L = ""
+-- S_______WOODIE.DESCRIBE.PLANT_CARROT_L = ""
+-- S______WAXWELL.DESCRIBE.PLANT_CARROT_L = ""
+S___WATHGRITHR.DESCRIBE.PLANT_CARROT_L = {
+    GROWING = "A longer and harder one can be used as a weapon.",
+    READY = "Maybe I can pick a few to use as weapons.",
+    WITHERED = "Although it looks hard, it's too brittle.",
+    BLOOMY = "Blooming."
+}
+-- S_______WEBBER.DESCRIBE.PLANT_CARROT_L = ""
+-- S_______WINONA.DESCRIBE.PLANT_CARROT_L = ""
+-- S_______WORTOX.DESCRIBE.PLANT_CARROT_L = ""
+S_____WORMWOOD.DESCRIBE.PLANT_CARROT_L = {
+    GROWING = "Are you a carrot friend?",
+    READY = "One after another.",
+    WITHERED = "My friends are still alive underground.",
+    BLOOMY = "Blooming."
+}
+-- S________WARLY.DESCRIBE.PLANT_CARROT_L = ""
+-- S_________WURT.DESCRIBE.PLANT_CARROT_L = ""
+-- S_______WALTER.DESCRIBE.PLANT_CARROT_L = ""
+-- S________WANDA.DESCRIBE.PLANT_CARROT_L = ""
 
 S______GENERIC.DESCRIBE.TISSUE_L = "This fresh plant tissue can be used for research."
 -- S_______WILLOW.DESCRIBE.TISSUE_L = ""

@@ -643,15 +643,17 @@ end
 local skinedplant = {
 	cactus_meat = true
 }
+local checkedplant = {
+	berries = true, plantmeat = true, cactus_meat = true, carrot = true
+}
 
 local function GetStatus_p2(inst)
 	local crop = inst.components.perennialcrop2
 	return (crop == nil and "GROWING")
 		or (crop.isrotten and "WITHERED")
+		or (crop.isflower and "BLOOMY")
 		or (crop.stage == crop.stage_max and "READY")
 		or (crop.level.pickable == 1 and "READY")
-		or (crop.isflower and "BLOOMY")
-		-- or (crop.stage <= 2 and "SPROUT")
 		or "GROWING"
 end
 local function OnHaunt_p2(inst, haunter)
@@ -843,7 +845,9 @@ local function MakePlant2(cropprefab, sets)
 
 		Fn_server_p2(inst)
 
-		inst.components.inspectable.nameoverride = "PLANT_CROP_L" --用来统一描述，懒得每种作物都搞个描述了
+		if not checkedplant[cropprefab] then
+			inst.components.inspectable.nameoverride = "PLANT_CROP_L" --用来统一描述，懒得每种作物都搞个描述了
+		end
 		inst.components.inspectable.getstatus = GetStatus_p2
 
 		inst:AddComponent("hauntable")
@@ -1733,7 +1737,6 @@ table.insert(prefs, Prefab("plant_log_l", function()
 
 	Fn_server_p2(inst)
 
-	inst.components.inspectable.nameoverride = "PLANT_CROP_L" --用来统一描述，懒得每种作物都搞个描述了
 	inst.components.inspectable.getstatus = GetStatus_p2
 
 	inst:AddComponent("hauntable")
