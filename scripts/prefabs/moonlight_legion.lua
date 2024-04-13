@@ -236,7 +236,7 @@ local function OnOpen(inst)
     if not inst.SoundEmitter:PlayingSound("idlesound2") then
         inst.SoundEmitter:PlaySound("dontstarve/bee/bee_hive_LP", "idlesound2", 0.7)
     end
-    inst.SoundEmitter:PlaySound("dontstarve/cave/mushtree_tall_spore_land", nil, 0.6)
+    inst.SoundEmitter:PlaySound("dontstarve/cave/mushtree_tall_spore_land")
 end
 local function OnClose(inst)
     if inst.AnimState:IsCurrentAnimation("close") or inst.AnimState:IsCurrentAnimation("closed") then
@@ -247,7 +247,7 @@ local function OnClose(inst)
 
     inst.SoundEmitter:KillSound("idlesound1")
     inst.SoundEmitter:KillSound("idlesound2")
-    inst.SoundEmitter:PlaySound("dontstarve/cave/mushtree_tall_spore_land", nil, 0.6)
+    inst.SoundEmitter:PlaySound("dontstarve/cave/mushtree_tall_spore_land")
 end
 local function SetPerishRate_hidden(inst, item)
     if item == nil then
@@ -299,7 +299,7 @@ local function OnFinished_hidden(inst, worker)
     --归还宝石
     DropGems(inst, "bluegem")
 
-    local skin = inst.components.skinedlegion:GetSkin()
+    local skin = inst.components.skinedlegion and inst.components.skinedlegion:GetSkin() or nil
     if skin == nil then
         inst.components.lootdropper:SpawnLootPrefab("hiddenmoonlight_item")
     else
@@ -315,94 +315,201 @@ local function Fn_nameDetail_hidden(inst)
     return Fn_nameDetail(inst, times_hidden)
 end
 
-table.insert(prefs, Prefab("hiddenmoonlight", function()
-    local inst = CreateEntity()
-    inst.entity:AddTransform()
-    inst.entity:AddAnimState()
-    inst.entity:AddSoundEmitter()
-    inst.entity:AddMiniMapEntity()
-    inst.entity:AddNetwork()
-
-    inst.MiniMapEntity:SetIcon("hiddenmoonlight.tex")
-
-    inst:AddTag("structure")
-    inst:AddTag("fridge") --加了该标签，就能给热能石降温啦
-    inst:AddTag("meteor_protection") --防止被流星破坏
-    inst:AddTag("moontreasure_l")
-
-    inst.AnimState:SetBank("hiddenmoonlight")
-    inst.AnimState:SetBuild("hiddenmoonlight")
-    inst.AnimState:PlayAnimation("closed", true)
-    TOOLS_L.MakeSnowCovered_comm(inst)
-
-    InitLevelNet(inst, Fn_nameDetail_hidden)
-
-    LS_C_Init(inst, "hiddenmoonlight_item", false, "data_up", "hiddenmoonlight")
-
-    inst.entity:SetPristine()
-    if not TheWorld.ismastersim then
-        inst.OnEntityReplicated = OnEntityReplicated_hidden
-        return inst
+local function OnWork_hidden_inf(inst, worker, workleft, numworks)
+    inst.AnimState:PlayAnimation("hit")
+    inst.AnimState:PushAnimation("closed", true)
+    inst.components.container:Close()
+    if worker == nil or not worker:HasTag("player") then --只能被玩家破坏。要是船坏了，原地留下宝匣，没必要弄烂箱子设定
+        inst.components.workable:SetWorkLeft(5)
+        return
     end
-
-    inst.upgradetarget = "icebox"
-    inst.perishrate_l = 0.5
-
-    inst:AddComponent("inspectable")
-
-    inst:AddComponent("container")
-    inst.components.container:WidgetSetup("hiddenmoonlight")
-    inst.components.container.onopenfn = OnOpen
-    inst.components.container.onclosefn = OnClose
-    inst.components.container.skipclosesnd = true
-    inst.components.container.skipopensnd = true
-
-    inst:AddComponent("preserver")
-	inst.components.preserver:SetPerishRateMultiplier(SetPerishRate_hidden)
-
-    inst:AddComponent("lootdropper")
-
-    inst:AddComponent("workable")
-    inst.components.workable:SetWorkAction(ACTIONS.HAMMER)
-    inst.components.workable:SetWorkLeft(5)
-    inst.components.workable:SetOnWorkCallback(OnWork_hidden)
-    inst.components.workable:SetOnFinishCallback(OnFinished_hidden)
-
-    inst:AddComponent("upgradeable")
-    inst.components.upgradeable.upgradetype = UPGRADETYPES.HIDDEN_L
-    inst.components.upgradeable.onupgradefn = OnUpgradeFn --升级前
-    inst.components.upgradeable.onstageadvancefn = SetLevel_hidden --升级时
-    inst.components.upgradeable.numstages = times_hidden + 1
-    inst.components.upgradeable.upgradesperstage = 1
-
-    inst:WatchWorldState("isfullmoon", OnFullMoon_hidden)
-
-    MakeHauntableLaunchAndDropFirstItem(inst)
-
-    TOOLS_L.MakeSnowCovered_serv(inst, 0.1 + 0.3*math.random(), function(inst)
-        inst.AnimState:SetTime(math.random() * inst.AnimState:GetCurrentAnimationLength())
-    end)
-
-    inst.OnSave = OnSave_hidden
-    inst.OnLoad = OnLoad_hidden
-
-    if TUNING.SMART_SIGN_DRAW_ENABLE then
-		SMART_SIGN_DRAW(inst)
+    inst.components.container:DropEverything(nil, true)
+    if not inst.components.container:IsEmpty() then --如果箱子里还有物品，那就不能被破坏
+        inst.components.workable:SetWorkLeft(5)
+    end
+end
+local function OnFinished_hidden_inf(inst, worker)
+    inst.components.lootdropper:SpawnLootPrefab("chestupgrade_stacksize")
+    OnFinished_hidden(inst, worker)
+end
+local function OnUpgrade_hidden_inf(inst, item, doer)
+    if item.components.stackable ~= nil then
+		item.components.stackable:Get(1):Remove()
+	else
+		item:Remove()
 	end
-    if TUNING.FUNCTIONAL_MEDAL_IS_OPEN then
-        SetImmortalable(inst, 2, nil)
+
+    local x, y, z = inst.Transform:GetWorldPosition()
+    local fx = SpawnPrefab("chestupgrade_stacksize_fx")
+    if fx ~= nil then
+        fx.Transform:SetPosition(x, y, z)
     end
 
-    return inst
-end, {
-    Asset("ANIM", "anim/ui_chest_3x3.zip"), --官方的容器栏背景动画模板
-    Asset("ANIM", "anim/ui_hiddenmoonlight_4x4.zip"),
-    Asset("ANIM", "anim/hiddenmoonlight.zip")
-}, {
-    "collapse_small",
-    "hiddenmoonlight_item",
-    "chesterlight"
-}))
+    local newbox = SpawnPrefab("hiddenmoonlight_inf")
+    if newbox ~= nil then
+        -- local skin = inst.components.skinedlegion:GetSkin()
+        -- if skin ~= nil then
+        --     newbox.components.skinedlegion:SetSkin(skin, LS_C_UserID(inst, doer))
+        -- end
+
+        SetTarget_hidden(newbox, inst.upgradetarget)
+
+        --继承之前的等级
+        newbox.components.upgradeable:SetStage(inst.components.upgradeable:GetStage())
+        SetLevel_hidden(newbox)
+
+        newbox.Transform:SetPosition(x, y, z)
+
+        --将原箱子中的物品转移到新箱子中
+        if inst.components.container ~= nil and newbox.components.container ~= nil then
+            inst.components.container:Close() --强制关闭使用中的箱子
+            inst.components.container.canbeopened = false
+            local allitems = inst.components.container:RemoveAllItems()
+            for _, v in ipairs(allitems) do
+                newbox.components.container:GiveItem(v)
+            end
+        end
+    end
+
+    inst:Remove()
+end
+
+local function MakeHidden(dd)
+    table.insert(prefs, Prefab(dd.name, function()
+        local inst = CreateEntity()
+        inst.entity:AddTransform()
+        inst.entity:AddAnimState()
+        inst.entity:AddSoundEmitter()
+        inst.entity:AddMiniMapEntity()
+        inst.entity:AddNetwork()
+
+        inst.MiniMapEntity:SetIcon("hiddenmoonlight.tex")
+
+        inst:AddTag("structure")
+        inst:AddTag("fridge") --加了该标签，就能给热能石降温啦
+        inst:AddTag("meteor_protection") --防止被流星破坏
+        inst:AddTag("moontreasure_l")
+
+        inst.AnimState:SetBank(dd.name)
+        inst.AnimState:SetBuild(dd.name)
+        inst.AnimState:PlayAnimation("closed", true)
+
+        -- TOOLS_L.MakeSnowCovered_comm(inst)
+        InitLevelNet(inst, Fn_nameDetail_hidden)
+
+        if dd.fn_common ~= nil then
+            dd.fn_common(inst)
+        end
+
+        inst.entity:SetPristine()
+        if not TheWorld.ismastersim then
+            inst.OnEntityReplicated = OnEntityReplicated_hidden
+            return inst
+        end
+
+        inst.upgradetarget = "icebox"
+        inst.perishrate_l = 0.5
+
+        inst:AddComponent("inspectable")
+
+        inst:AddComponent("container")
+        inst.components.container:WidgetSetup("hiddenmoonlight")
+        inst.components.container.onopenfn = OnOpen
+        inst.components.container.onclosefn = OnClose
+        inst.components.container.skipclosesnd = true
+        inst.components.container.skipopensnd = true
+
+        inst:AddComponent("preserver")
+        inst.components.preserver:SetPerishRateMultiplier(SetPerishRate_hidden)
+
+        inst:AddComponent("lootdropper")
+
+        inst:AddComponent("workable")
+        inst.components.workable:SetWorkAction(ACTIONS.HAMMER)
+        inst.components.workable:SetWorkLeft(5)
+
+        inst:AddComponent("upgradeable")
+        inst.components.upgradeable.upgradetype = UPGRADETYPES.HIDDEN_L
+        inst.components.upgradeable.onupgradefn = OnUpgradeFn --升级前
+        inst.components.upgradeable.onstageadvancefn = SetLevel_hidden --升级时
+        inst.components.upgradeable.numstages = times_hidden + 1
+        inst.components.upgradeable.upgradesperstage = 1
+
+        inst:WatchWorldState("isfullmoon", OnFullMoon_hidden)
+
+        MakeHauntableLaunchAndDropFirstItem(inst)
+
+        TOOLS_L.MakeSnowCovered_serv(inst, 0.1 + 0.3*math.random(), function(inst)
+            inst.AnimState:SetTime(math.random() * inst.AnimState:GetCurrentAnimationLength())
+        end)
+
+        inst.OnSave = OnSave_hidden
+        inst.OnLoad = OnLoad_hidden
+
+        if TUNING.SMART_SIGN_DRAW_ENABLE then
+            SMART_SIGN_DRAW(inst)
+        end
+        if TUNING.FUNCTIONAL_MEDAL_IS_OPEN then
+            SetImmortalable(inst, 2, nil)
+        end
+
+        if dd.fn_server ~= nil then
+            dd.fn_server(inst)
+        end
+
+        return inst
+    end, dd.assets, dd.prefabs))
+end
+
+MakeHidden({
+    name = "hiddenmoonlight",
+    assets = {
+        Asset("ANIM", "anim/ui_chest_3x3.zip"), --官方的容器栏背景动画模板
+        Asset("ANIM", "anim/ui_hiddenmoonlight_4x4.zip"),
+        Asset("ANIM", "anim/hiddenmoonlight.zip")
+    },
+    prefabs = {
+        "collapse_small",
+        "hiddenmoonlight_item",
+        "hiddenmoonlight_inf",
+        "chesterlight",
+        "chestupgrade_stacksize_fx"
+    },
+    fn_common = function(inst)
+        inst:AddTag("chest_upgradeable") --能被 弹性空间制造器 升级
+        LS_C_Init(inst, "hiddenmoonlight_item", false, "data_up", "hiddenmoonlight")
+    end,
+    fn_server = function(inst)
+        inst.components.workable:SetOnWorkCallback(OnWork_hidden)
+        inst.components.workable:SetOnFinishCallback(OnFinished_hidden)
+
+        inst.fn_upgrade_chest_l = OnUpgrade_hidden_inf
+    end
+})
+MakeHidden({
+    name = "hiddenmoonlight_inf",
+    assets = {
+        Asset("ANIM", "anim/ui_chest_3x3.zip"), --官方的容器栏背景动画模板
+        Asset("ANIM", "anim/ui_hiddenmoonlight_4x4.zip"),
+        Asset("ANIM", "anim/hiddenmoonlight_inf.zip")
+    },
+    prefabs = {
+        "collapse_small",
+        "hiddenmoonlight_item",
+        "hiddenmoonlight",
+        "chesterlight",
+        "chestupgrade_stacksize"
+    },
+    fn_common = function(inst)
+        -- LS_C_Init(inst, "hiddenmoonlight_item", false, "data_upinf", "hiddenmoonlight_inf")
+    end,
+    fn_server = function(inst)
+        inst.components.container:EnableInfiniteStackSize(true)
+
+        inst.components.workable:SetOnWorkCallback(OnWork_hidden_inf)
+        inst.components.workable:SetOnFinishCallback(OnFinished_hidden_inf)
+    end
+})
 
 --------------------------------------------------------------------------
 --[[ 月轮宝盘 ]]

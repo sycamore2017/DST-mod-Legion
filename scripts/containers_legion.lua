@@ -104,6 +104,8 @@ params.hiddenmoonlight = {
         slotpos = {},
         animbank = "ui_chest_3x3",
         animbuild = "ui_hiddenmoonlight_4x4",
+        -- animbank_upgraded = "ui_chest_3x3",
+        animbuild_upgraded = "ui_hiddenmoonlight_4x4",
         pos = Vector3(0, 200, 0),
         side_align_tip = 160
     },

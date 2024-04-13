@@ -1401,6 +1401,25 @@ S_________WURT.DESCRIBE.HIDDENMOONLIGHT = "Why is there no sound of waves coming
 -- S_______WALTER.DESCRIBE.HIDDENMOONLIGHT = ""
 S________WANDA.DESCRIBE.HIDDENMOONLIGHT = "I won't bring yesterday's food to today."
 
+S_NAMES.HIDDENMOONLIGHT_INF = "Infinite Hidden Moonlight" --月藏宝匣·无限
+S______GENERIC.DESCRIBE.HIDDENMOONLIGHT_INF = "As empty as the Milky way, as vast as the universe."
+-- S_______WILLOW.DESCRIBE.HIDDENMOONLIGHT_INF = ""
+S_____WOLFGANG.DESCRIBE.HIDDENMOONLIGHT_INF = "Wolfgang's eyes were dazzled."
+S________WENDY.DESCRIBE.HIDDENMOONLIGHT_INF = "So bright, so cold."
+-- S_________WX78.DESCRIBE.HIDDENMOONLIGHT_INF = ""
+S_WICKERBOTTOM.DESCRIBE.HIDDENMOONLIGHT_INF = "Unlimited capacity, unlimited time, it's amazing."
+-- S_______WOODIE.DESCRIBE.HIDDENMOONLIGHT_INF = ""
+S______WAXWELL.DESCRIBE.HIDDENMOONLIGHT_INF = "Has a more mysterious moon magic."
+-- S___WATHGRITHR.DESCRIBE.HIDDENMOONLIGHT_INF = ""
+S_______WEBBER.DESCRIBE.HIDDENMOONLIGHT_INF = "We can't touch it all, our hands will disappear inside."
+-- S_______WINONA.DESCRIBE.HIDDENMOONLIGHT_INF = ""
+-- S_______WORTOX.DESCRIBE.HIDDENMOONLIGHT_INF = ""
+S_____WORMWOOD.DESCRIBE.HIDDENMOONLIGHT_INF = "A hollow box."
+S________WARLY.DESCRIBE.HIDDENMOONLIGHT_INF = "Many people ask the chef why the ingredients are so fresh, shh!"
+-- S_________WURT.DESCRIBE.HIDDENMOONLIGHT_INF = ""
+-- S_______WALTER.DESCRIBE.HIDDENMOONLIGHT_INF = ""
+-- S________WANDA.DESCRIBE.HIDDENMOONLIGHT_INF = ""
+
 S_NAMES.HIDDENMOONLIGHT_ITEM = "Hidden Moonlight Kit" --月藏宝匣套件
 S_RECIPE_DESC.HIDDENMOONLIGHT_ITEM = "Hiding dainties between moon and stars."
 S______GENERIC.DESCRIBE.HIDDENMOONLIGHT_ITEM = "Seems to be an upgrade kit for food storage."

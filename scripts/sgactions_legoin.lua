@@ -2404,6 +2404,24 @@ ACTIONS.MOUNT.fn = function(act)
 end
 
 --------------------------------------------------------------------------
+--[[ 修改官方升级组件的动作，来兼容 弹性空间制造器 的升级 ]]
+--------------------------------------------------------------------------
+
+local UPGRADE_fn_old = ACTIONS.UPGRADE.fn
+ACTIONS.UPGRADE.fn = function(act)
+    if
+        act.invobject ~= nil and act.target ~= nil and
+        act.target.fn_upgrade_chest_l ~= nil and
+        act.invobject.components.upgrader ~= nil and
+        act.invobject.components.upgrader.upgradetype == UPGRADETYPES.CHEST
+    then
+        act.target.fn_upgrade_chest_l(act.target, act.invobject, act.doer)
+        return true
+    end
+    return UPGRADE_fn_old(act)
+end
+
+--------------------------------------------------------------------------
 --[[ 子圭面具相关 ]]
 --------------------------------------------------------------------------
 
