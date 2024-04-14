@@ -998,7 +998,7 @@ MakeFx({ --脱壳之翅：逃脱时的茸毛特效
         inst.AnimState:SetFinalOffset(-1)
         inst.AnimState:PlayAnimation("hit")
     end,
-    fn_remove = nil,
+    fn_remove = nil
 })
 MakeFx({ --枯叶飞舞：逃脱时的茸毛特效
     name = "boltwingout_fx_disguiser",
@@ -1013,7 +1013,7 @@ MakeFx({ --枯叶飞舞：逃脱时的茸毛特效
         inst.AnimState:SetFinalOffset(-1)
         inst.AnimState:PlayAnimation("hit")
     end,
-    fn_remove = nil,
+    fn_remove = nil
 })
 MakeFx({ --子圭·歃：生命转移特效
     name = "life_trans_fx",
@@ -1030,7 +1030,7 @@ MakeFx({ --子圭·歃：生命转移特效
         inst.AnimState:SetFinalOffset(3)
         inst.AnimState:SetScale(0.65, 0.65)
     end,
-    fn_remove = nil,
+    fn_remove = nil
 })
 MakeFx({ --子圭寄生花：消失特效
     name = "siving_boss_flower_fx",
@@ -1047,7 +1047,7 @@ MakeFx({ --子圭寄生花：消失特效
         inst.AnimState:SetFinalOffset(1)
         inst.AnimState:SetMultColour(1/255, 248/255, 255/255, 1)
     end,
-    fn_remove = nil,
+    fn_remove = nil
 })
 MakeFx({ --魔音绕梁：音波特效
     name = "siving_boss_taunt_fx",
@@ -1065,7 +1065,7 @@ MakeFx({ --魔音绕梁：音波特效
         inst.AnimState:SetSortOrder(3)
         inst.AnimState:SetMultColour(111/255, 255/255, 2/255, 0.25)
     end,
-    fn_remove = nil,
+    fn_remove = nil
 })
 MakeFx({ --花寄语：音波特效
     name = "siving_boss_caw_fx",
@@ -1088,7 +1088,32 @@ MakeFx({ --花寄语：音波特效
         inst:DoTaskInTime(0.8, function()
             inst:Remove()
         end)
+    end
+})
+MakeFx({ --高攻反伤：炸开特效
+    name = "siving_boss_thorns_fx",
+    assets = {
+        Asset("ANIM", "anim/bramblefx.zip"),
+        Asset("ANIM", "anim/sivsuitatk_fx.zip")
+    },
+    fn_common = nil,
+    fn_anim = function(inst)
+        inst.Transform:SetFourFaced()
+
+        inst.AnimState:SetBank("bramblefx")
+        inst.AnimState:SetBuild("sivsuitatk_fx")
+        inst.AnimState:SetFinalOffset(3)
+        inst.AnimState:SetSymbolBloom("needle01")
+        inst.AnimState:SetSymbolLightOverride("needle01", .5)
+        inst.AnimState:SetLightOverride(.1)
+        if math.random() < 0.5 then
+            inst.AnimState:PlayAnimation("idle")
+        else
+            inst.AnimState:PlayAnimation("trap")
+            inst.AnimState:SetScale(1.3, 1.3)
+        end
     end,
+    fn_remove = nil
 })
 MakeFx({ --子圭神木岩：科技解锁特效
     name = "siving_thetree_unlock_fx",
@@ -1121,7 +1146,7 @@ MakeFx({ --子圭石子：碎掉特效
         inst.AnimState:OverrideSymbol("eggbase", "siving_egg", "egg4")
         inst.AnimState:SetFinalOffset(3)
     end,
-    fn_remove = nil,
+    fn_remove = nil
 })
 MakeFx({ --子圭·育：基因解锁时的花火特效(蓝绿色)
     name = "siving_turn_unlock_fx",

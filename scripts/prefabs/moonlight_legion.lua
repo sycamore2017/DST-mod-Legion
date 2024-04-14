@@ -299,7 +299,7 @@ local function OnFinished_hidden(inst, worker)
     --归还宝石
     DropGems(inst, "bluegem")
 
-    local skin = inst.components.skinedlegion and inst.components.skinedlegion:GetSkin() or nil
+    local skin = inst.components.skinedlegion:GetSkin()
     if skin == nil then
         inst.components.lootdropper:SpawnLootPrefab("hiddenmoonlight_item")
     else
@@ -347,10 +347,10 @@ local function OnUpgrade_hidden_inf(inst, item, doer)
 
     local newbox = SpawnPrefab("hiddenmoonlight_inf")
     if newbox ~= nil then
-        -- local skin = inst.components.skinedlegion:GetSkin()
-        -- if skin ~= nil then
-        --     newbox.components.skinedlegion:SetSkin(skin, LS_C_UserID(inst, doer))
-        -- end
+        local skin = inst.components.skinedlegion:GetSkin()
+        if skin ~= nil then
+            newbox.components.skinedlegion:SetSkin(skin, LS_C_UserID(inst, doer))
+        end
 
         SetTarget_hidden(newbox, inst.upgradetarget)
 
@@ -501,7 +501,7 @@ MakeHidden({
         "chestupgrade_stacksize"
     },
     fn_common = function(inst)
-        -- LS_C_Init(inst, "hiddenmoonlight_item", false, "data_upinf", "hiddenmoonlight_inf")
+        LS_C_Init(inst, "hiddenmoonlight_item", false, "data_upinf", "hiddenmoonlight_inf")
     end,
     fn_server = function(inst)
         inst.components.container:EnableInfiniteStackSize(true)

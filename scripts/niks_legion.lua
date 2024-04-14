@@ -1024,10 +1024,14 @@ local SKIN_DEFAULT_LEGION = {
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
         floater = { cut = 0.1, size = "med", offset_y = 0.3, scale = 0.7, nofx = nil },
 
-        overridekeys = { "data_up" },
+        overridekeys = { "data_up", "data_upinf" },
         data_up = {
             exchangefx = { prefab = nil, offset_y = nil, scale = nil },
             anim = { bank = "hiddenmoonlight", build = "hiddenmoonlight", anim = 0 }
+        },
+        data_upinf = {
+            exchangefx = { prefab = nil, offset_y = nil, scale = nil },
+            anim = { bank = "hiddenmoonlight_inf", build = "hiddenmoonlight_inf", anim = 0 }
         }
     },
     revolvedmoonlight_item = {
@@ -3083,8 +3087,21 @@ local SKINS_LEGION = {
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
         floater = { cut = 0.1, size = "med", offset_y = 0.3, scale = 0.7, nofx = nil },
 
-        overridekeys = { "data_up" },
+        overridekeys = { "data_up", "data_upinf" },
         data_up = {
+            exchangefx = { prefab = nil, offset_y = nil, scale = nil },
+            fn_start = function(inst, skined)
+                inst.AnimState:SetBank("hiddenmoonlight_paper")
+                inst.AnimState:SetBuild("hiddenmoonlight_paper")
+                inst.AnimState:SetScale(1.5, 1.5, 1.5)
+                SetTarget_hidden(inst, "hiddenmoonlight_paper")
+            end,
+            fn_end = function(inst, skined)
+                inst.AnimState:SetScale(1, 1, 1)
+                SetTarget_hidden(inst, nil)
+            end
+        },
+        data_upinf = {
             exchangefx = { prefab = nil, offset_y = nil, scale = nil },
             fn_start = function(inst, skined)
                 inst.AnimState:SetBank("hiddenmoonlight_paper")
@@ -3335,6 +3352,9 @@ local ls_buildmap = { --prefab，build与皮肤的对应表，用以比对动画
     },
     hiddenmoonlight = {
         hiddenmoonlight = 0, hiddenmoonlight_paper = "hiddenmoonlight_item_paper"
+    },
+    hiddenmoonlight_inf = {
+        hiddenmoonlight_inf = 0, hiddenmoonlight_paper = "hiddenmoonlight_item_paper"
     },
     revolvedmoonlight = {
         revolvedmoonlight = 0,

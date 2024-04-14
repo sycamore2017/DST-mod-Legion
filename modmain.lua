@@ -207,7 +207,7 @@ PrefabFiles = {
 }
 Assets = {
     Asset("ANIM", "anim/images_minisign1.zip"),  --专门为小木牌上的图画准备的文件(真是奢侈0.0)
-    Asset("ANIM", "anim/images_minisign2.zip"),
+    -- Asset("ANIM", "anim/images_minisign2.zip"),
     Asset("ANIM", "anim/images_minisign3.zip"),
     Asset("ANIM", "anim/images_minisign4.zip"),
     Asset("ANIM", "anim/images_minisign5.zip"),

@@ -622,7 +622,11 @@ local function MakeBoss(data)
                     if data.damage > ATK_HUTR then
                         --为了不受到盾反伤害，不设定玄鸟为攻击者
                         data.attacker.components.combat:GetAttacked(nil, data.damage-ATK_HUTR)
-                        --反击特效 undo
+                        local fx = SpawnPrefab("siving_boss_thorns_fx")
+                        if fx ~= nil then
+                            local x, y, z = inst.Transform:GetWorldPosition()
+                            fx.Transform:SetPosition(x, y+1.5, z)
+                        end
                         if not IsValid(data.attacker) then --攻击者死亡，就结束
                             return
                         end
