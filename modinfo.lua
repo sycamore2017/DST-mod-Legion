@@ -39,7 +39,7 @@ icon_atlas = "modicon.xml"
 icon = "modicon.tex"
 
 -- The mod's tags displayed on the server list
-server_filter_tags = L and { "LEGION", } or { "棱镜", }
+server_filter_tags = L and { "LEGION" } or { "棱镜" }
 
 --mod设置
 configuration_options = L and {

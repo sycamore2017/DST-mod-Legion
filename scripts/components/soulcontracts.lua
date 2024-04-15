@@ -49,6 +49,7 @@ end
 local SoulContracts = Class(function(self, inst)
     self.inst = inst
     self.staying = true
+    self.lvl = 0
 
     self._OnOwnerReroll = function(owner) --主人重选人物时，解除联系
         self:TriggerOwner(false, owner)
@@ -57,7 +58,7 @@ local SoulContracts = Class(function(self, inst)
         self.inst:Remove()
     end
     self._OnOwnerHitOther = function(owner, data) --主人攻击时，让敌人死后能产生灵魂
-        if owner:HasTag("soulstealer") or self.inst._lvl_l:value() == nil or self.inst._lvl_l:value() < 35 then
+        if owner:HasTag("soulstealer") or self.lvl < 35 then
             return
         end
         if
@@ -66,7 +67,7 @@ local SoulContracts = Class(function(self, inst)
             data.target.components.health ~= nil
         then
             data.target.mark_contract_l = true
-            if self.inst._lvl_l:value() >= 85 then
+            if self.lvl >= 85 then
                 if data.target.components.health:IsDead() then --攻击时就已经死了，就不需要监听了
                     OnTargetDeath2(data.target)
                 else
@@ -82,7 +83,7 @@ local SoulContracts = Class(function(self, inst)
         end
     end
     self._OnOwnerMurdered = function(owner, data) --主人“谋杀”物品栏里的生物，能得到灵魂
-        if owner:HasTag("soulstealer") or self.inst._lvl_l:value() == nil or self.inst._lvl_l:value() < 35 then
+        if owner:HasTag("soulstealer") or self.lvl < 35 then
             return
         end
         if
@@ -92,8 +93,7 @@ local SoulContracts = Class(function(self, inst)
             wortox_soul_common.HasSoul(data.victim)
         then
             data.victim.nosoultask = data.victim:DoTaskInTime(5, OnRestoreSoul)
-            SpawnSoulsAt(owner, wortox_soul_common.GetNumSouls(data.victim)*(data.stackmult or 1),
-                            self.inst._lvl_l:value() < 85)
+            SpawnSoulsAt(owner, wortox_soul_common.GetNumSouls(data.victim)*(data.stackmult or 1), self.lvl < 85)
         end
     end
 

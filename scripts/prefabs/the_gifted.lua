@@ -373,6 +373,9 @@ local function SetLevel_contracts(inst, uses)
         inst.components.finiteuses:SetMaxUses(maxuse)
         inst.components.finiteuses:SetUses(math.min(maxuse, uses))
     end
+    if inst.components.soulcontracts ~= nil then
+        inst.components.soulcontracts.lvl = lvl
+    end
 end
 local function OnSave_contracts(inst, data)
 	data.uses_l = inst.components.finiteuses:GetUses() --主要是怕 finiteuses 以后会限制大小
