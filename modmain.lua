@@ -545,9 +545,7 @@ modimport("scripts/postinit_legion.lua")
 ------sg、动作相关
 modimport("scripts/sgactions_legoin.lua")
 ------新增科技与科技栏
-if _G.CONFIGS_LEGION.TECHUNLOCK == "prototyper" then
-    modimport("scripts/techtrees_legion.lua")
-end
+modimport("scripts/techtrees_legion.lua")
 ------制作相关
 modimport("scripts/recipes_legion.lua")
 ------容器相关

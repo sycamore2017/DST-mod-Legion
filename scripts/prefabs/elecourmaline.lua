@@ -136,6 +136,12 @@ local LIGHT_RADIUS = 2
 local LIGHT_RADIUS_ACTIVATED = 3.5
 local SPEED_ON = LIGHT_RADIUS_ACTIVATED / 15
 local SPEED_OFF = -(LIGHT_RADIUS_ACTIVATED / 30)
+local prototypers_rock
+if CONFIGS_LEGION.TECHUNLOCK == "lootdropper" then
+    prototypers_rock = { TUNING.PROTOTYPER_TREES.SCIENCEMACHINE, TUNING.PROTOTYPER_TREES.ALCHEMYMACHINE }
+else
+    prototypers_rock = { TUNING.PROTOTYPER_TREES.ELECOURMALINE_ONE, TUNING.PROTOTYPER_TREES.ELECOURMALINE_THREE }
+end
 
 local function OnUpdateLight(inst)
     local lighton = inst._islighton         --是否关灯
@@ -301,7 +307,7 @@ local function onactivate(inst, doer, recipe)
             -- inst.AnimState:PushAnimation("active_to_idle", false)
             inst.AnimState:PushAnimation("loop", true)
             OnLightDirty(inst, true, LIGHT_RADIUS)
-            inst.components.prototyper.trees = TUNING.PROTOTYPER_TREES.ELECOURMALINE_ONE or TUNING.PROTOTYPER_TREES.SCIENCEMACHINE
+            inst.components.prototyper.trees = prototypers_rock[1]
         end
     else
         inst.AnimState:PlayAnimation("use")
@@ -320,10 +326,9 @@ local function onactivate(inst, doer, recipe)
     end
     inst._activetask = inst:DoTaskInTime(inst.AnimState:GetCurrentAnimationLength() + 2 * FRAMES, doneact)
 end
-
 local function ActivateRocks(inst)
     inst.activated = 7
-    inst.components.prototyper.trees = TUNING.PROTOTYPER_TREES.ELECOURMALINE_THREE or TUNING.PROTOTYPER_TREES.ALCHEMYMACHINE
+    inst.components.prototyper.trees = prototypers_rock[2]
 end
 
 local function onsave(inst, data)
@@ -334,12 +339,11 @@ local function onsave(inst, data)
         data.deathcounter = inst.deathcounter
     end
 end
-
 local function onload(inst, data)
     if data ~= nil then
         if data.activated ~= nil then
             inst.activated = data.activated
-            inst.components.prototyper.trees = TUNING.PROTOTYPER_TREES.ELECOURMALINE_THREE or TUNING.PROTOTYPER_TREES.ALCHEMYMACHINE
+            inst.components.prototyper.trees = prototypers_rock[2]
         end
         if data.deathcounter ~= nil then
             inst.deathcounter = data.deathcounter
@@ -378,7 +382,7 @@ local function Fn()
 
     -- inst:AddTag("structure")
     inst:AddTag("antlion_sinkhole_blocker")
-    inst:AddTag("prototyper")   --prototyper (from prototyper component) added to pristine state for optimization
+    inst:AddTag("prototyper") --prototyper (from prototyper component) added to pristine state for optimization
 
     inst.entity:SetPristine()
     if not TheWorld.ismastersim then return inst end
@@ -399,7 +403,7 @@ local function Fn()
     inst:AddComponent("prototyper")
     inst.components.prototyper.onturnon = onturnon
     inst.components.prototyper.onturnoff = onturnoff
-    inst.components.prototyper.trees = TUNING.PROTOTYPER_TREES.ELECOURMALINE_ONE or TUNING.PROTOTYPER_TREES.SCIENCEMACHINE
+    inst.components.prototyper.trees = prototypers_rock[1]
     inst.components.prototyper.onactivate = onactivate
 
     inst:AddComponent("lootdropper")
@@ -461,8 +465,6 @@ local function Fn_key()
 
     inst:AddComponent("hauntable")
     inst.components.hauntable:SetHauntValue(TUNING.HAUNT_TINY)
-
-    -- inst:ListenForEvent("startfollowing", OnStartFollowing)
 
     return inst
 end
