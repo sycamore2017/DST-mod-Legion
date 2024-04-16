@@ -490,7 +490,7 @@ MakeHidden({
     name = "hiddenmoonlight_inf",
     assets = {
         Asset("ANIM", "anim/ui_chest_3x3.zip"), --官方的容器栏背景动画模板
-        Asset("ANIM", "anim/ui_hiddenmoonlight_4x4.zip"),
+        Asset("ANIM", "anim/ui_hiddenmoonlight_inf_4x4.zip"),
         Asset("ANIM", "anim/hiddenmoonlight_inf.zip")
     },
     prefabs = {

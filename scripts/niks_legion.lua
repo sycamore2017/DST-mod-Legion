@@ -454,9 +454,9 @@ end
 
 ------
 
-local function SetTarget_hidden(inst, build)
+local function SetTarget_hidden(inst)
     if inst.upgradetarget ~= "icebox" then
-        inst.AnimState:OverrideSymbol("base", build or "hiddenmoonlight", "saltbase")
+        inst.AnimState:OverrideSymbol("base", inst.AnimState:GetBuild() or "hiddenmoonlight", "saltbase")
     end
 end
 
@@ -1027,11 +1027,17 @@ local SKIN_DEFAULT_LEGION = {
         overridekeys = { "data_up", "data_upinf" },
         data_up = {
             exchangefx = { prefab = nil, offset_y = nil, scale = nil },
-            anim = { bank = "hiddenmoonlight", build = "hiddenmoonlight", anim = 0 }
+            anim = { bank = "hiddenmoonlight", build = "hiddenmoonlight", anim = 0 },
+            fn_start = function(inst, skined)
+                SetTarget_hidden(inst)
+            end
         },
         data_upinf = {
             exchangefx = { prefab = nil, offset_y = nil, scale = nil },
-            anim = { bank = "hiddenmoonlight_inf", build = "hiddenmoonlight_inf", anim = 0 }
+            anim = { bank = "hiddenmoonlight_inf", build = "hiddenmoonlight_inf", anim = 0 },
+            fn_start = function(inst, skined)
+                SetTarget_hidden(inst)
+            end
         }
     },
     revolvedmoonlight_item = {
@@ -3094,11 +3100,10 @@ local SKINS_LEGION = {
                 inst.AnimState:SetBank("hiddenmoonlight_paper")
                 inst.AnimState:SetBuild("hiddenmoonlight_paper")
                 inst.AnimState:SetScale(1.5, 1.5, 1.5)
-                SetTarget_hidden(inst, "hiddenmoonlight_paper")
+                SetTarget_hidden(inst)
             end,
             fn_end = function(inst, skined)
                 inst.AnimState:SetScale(1, 1, 1)
-                SetTarget_hidden(inst, nil)
             end
         },
         data_upinf = {
@@ -3107,11 +3112,10 @@ local SKINS_LEGION = {
                 inst.AnimState:SetBank("hiddenmoonlight_paper")
                 inst.AnimState:SetBuild("hiddenmoonlight_paper")
                 inst.AnimState:SetScale(1.5, 1.5, 1.5)
-                SetTarget_hidden(inst, "hiddenmoonlight_paper")
+                SetTarget_hidden(inst)
             end,
             fn_end = function(inst, skined)
                 inst.AnimState:SetScale(1, 1, 1)
-                SetTarget_hidden(inst, nil)
             end
         }
     },

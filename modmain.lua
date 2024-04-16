@@ -218,6 +218,7 @@ Assets = {
     Asset("SOUND", "sound/legion.fsb"),
 
     Asset("ANIM", "anim/ui_hiddenmoonlight_4x4.zip"),
+    Asset("ANIM", "anim/ui_hiddenmoonlight_inf_4x4.zip"),
     Asset("ANIM", "anim/ui_revolvedmoonlight_4x3.zip"),
     Asset("ATLAS", "images/slot_bearspaw_l.xml"), --靠背熊的格子背景
     Asset("IMAGE", "images/slot_bearspaw_l.tex"),
