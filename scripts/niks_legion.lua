@@ -3081,7 +3081,8 @@ local SKINS_LEGION = {
         base_prefab = "hiddenmoonlight_item", skin_id = "655a18f6adf8ac0fd863e900", onlyownedshow = true,
 		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
 		assets = {
-			Asset("ANIM", "anim/skin/hiddenmoonlight_paper.zip")
+			Asset("ANIM", "anim/skin/hiddenmoonlight_paper.zip"),
+            Asset("ANIM", "anim/skin/hiddenmoonlight_inf_paper.zip")
 		},
         image = { name = nil, atlas = nil, setable = true },
         string = ischinese and { name = "星愿满瓶" } or { name = "Star Wishes Bottle" },
@@ -3108,14 +3109,34 @@ local SKINS_LEGION = {
         },
         data_upinf = {
             exchangefx = { prefab = nil, offset_y = nil, scale = nil },
+            dd = {
+                openfn = function(inst)
+                    if math.random() >= 0.95 then
+                        if not inst._iscloudsp then
+                            inst._iscloudsp = true
+                            inst.AnimState:OverrideSymbol("cloud", "hiddenmoonlight_inf_paper", "cloud_sp")
+                        end
+                    else
+                        if inst._iscloudsp then
+                            inst._iscloudsp = nil
+                            inst.AnimState:OverrideSymbol("cloud", "hiddenmoonlight_inf_paper", "cloud")
+                        end
+                    end
+                end
+            },
             fn_start = function(inst, skined)
-                inst.AnimState:SetBank("hiddenmoonlight_paper")
-                inst.AnimState:SetBuild("hiddenmoonlight_paper")
+                if skined ~= nil then
+                    inst._dd = skined.dd
+                end
+                inst.AnimState:SetBank("hiddenmoonlight_inf_paper")
+                inst.AnimState:SetBuild("hiddenmoonlight_inf_paper")
                 inst.AnimState:SetScale(1.5, 1.5, 1.5)
                 SetTarget_hidden(inst)
             end,
             fn_end = function(inst, skined)
                 inst.AnimState:SetScale(1, 1, 1)
+                inst._iscloudsp = nil
+                inst._dd = nil
             end
         }
     },
@@ -3358,7 +3379,7 @@ local ls_buildmap = { --prefab，build与皮肤的对应表，用以比对动画
         hiddenmoonlight = 0, hiddenmoonlight_paper = "hiddenmoonlight_item_paper"
     },
     hiddenmoonlight_inf = {
-        hiddenmoonlight_inf = 0, hiddenmoonlight_paper = "hiddenmoonlight_item_paper"
+        hiddenmoonlight_inf = 0, hiddenmoonlight_inf_paper = "hiddenmoonlight_item_paper"
     },
     revolvedmoonlight = {
         revolvedmoonlight = 0,

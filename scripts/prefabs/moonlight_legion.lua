@@ -230,6 +230,10 @@ local function OnOpen(inst)
     inst.AnimState:PlayAnimation("open")
     inst.AnimState:PushAnimation("opened", true)
 
+    if inst._dd ~= nil and inst._dd.openfn ~= nil then
+        inst._dd.openfn(inst)
+    end
+
     if not inst.SoundEmitter:PlayingSound("idlesound1") then
         inst.SoundEmitter:PlaySound("dontstarve/creatures/together/toad_stool/spore_cloud_LP", "idlesound1", 0.7)
     end
