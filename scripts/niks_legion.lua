@@ -3111,7 +3111,7 @@ local SKINS_LEGION = {
             exchangefx = { prefab = nil, offset_y = nil, scale = nil },
             dd = {
                 openfn = function(inst)
-                    if math.random() >= 0.95 then
+                    if math.random() >= 0.975 then
                         if not inst._iscloudsp then
                             inst._iscloudsp = true
                             inst.AnimState:OverrideSymbol("cloud", "hiddenmoonlight_inf_paper", "cloud_sp")
