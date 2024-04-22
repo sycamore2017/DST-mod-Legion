@@ -220,6 +220,10 @@ Assets = {
     Asset("ANIM", "anim/ui_hiddenmoonlight_4x4.zip"),
     Asset("ANIM", "anim/ui_hiddenmoonlight_inf_4x4.zip"),
     Asset("ANIM", "anim/ui_revolvedmoonlight_4x3.zip"),
+    Asset("ANIM", "anim/ui_chest_whitewood_3x4.zip"),
+    Asset("ANIM", "anim/ui_chest_whitewood_inf_3x4.zip"),
+    Asset("ANIM", "anim/ui_chest_whitewood_4x6.zip"),
+    Asset("ANIM", "anim/ui_chest_whitewood_inf_4x6.zip"),
     Asset("ATLAS", "images/slot_bearspaw_l.xml"), --靠背熊的格子背景
     Asset("IMAGE", "images/slot_bearspaw_l.tex"),
     Asset("ATLAS", "images/slot_juice_l.xml"), --巨食草的格子背景

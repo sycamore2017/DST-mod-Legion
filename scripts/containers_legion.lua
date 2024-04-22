@@ -406,6 +406,8 @@ params.chest_whitewood = {
         slotpos = {},
         animbank = "ui_chester_shadow_3x4",
         animbuild = "ui_chest_whitewood_3x4",
+        -- animbank_upgraded = "ui_chester_shadow_3x4",
+        animbuild_upgraded = "ui_chest_whitewood_inf_3x4",
         pos = Vector3(0, 220, 0),
         side_align_tip = 160
     },
@@ -426,6 +428,8 @@ params.chest_whitewood_big = {
         slotpos = {},
         animbank = "ui_bookstation_4x5",
         animbuild = "ui_chest_whitewood_4x6",
+        -- animbank_upgraded = "ui_bookstation_4x5",
+        animbuild_upgraded = "ui_chest_whitewood_inf_4x6",
         pos = Vector3(0, 280, 0),
         side_align_tip = 160
     },

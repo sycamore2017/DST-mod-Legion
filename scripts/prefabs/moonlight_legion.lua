@@ -323,7 +323,7 @@ local function OnWork_hidden_inf(inst, worker, workleft, numworks)
     inst.AnimState:PlayAnimation("hit")
     inst.AnimState:PushAnimation("closed", true)
     inst.components.container:Close()
-    if worker == nil or not worker:HasTag("player") then --只能被玩家破坏。要是船坏了，原地留下宝匣，没必要弄烂箱子设定
+    if worker == nil or not worker:HasTag("player") then --只能被玩家破坏。没必要弄烂箱子设定
         inst.components.workable:SetWorkLeft(5)
         return
     end
@@ -473,7 +473,6 @@ MakeHidden({
         Asset("ANIM", "anim/hiddenmoonlight.zip")
     },
     prefabs = {
-        "collapse_small",
         "hiddenmoonlight_item",
         "hiddenmoonlight_inf",
         "chesterlight",
@@ -498,7 +497,6 @@ MakeHidden({
         Asset("ANIM", "anim/hiddenmoonlight_inf.zip")
     },
     prefabs = {
-        "collapse_small",
         "hiddenmoonlight_item",
         "hiddenmoonlight",
         "chesterlight",
@@ -933,7 +931,6 @@ local function MakeRevolved(sets)
         Asset("ATLAS_BUILD", "images/inventoryimages/"..sets.name..".xml", 256)
     }, {
         "revolvedmoonlight_item",
-        "collapse_small",
         "yellowgem",
         "heatrocklight",
         "revolvedmoonlight_fx"

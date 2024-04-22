@@ -591,6 +591,65 @@ local function OnEntityReplicated_chest2(inst)
     end
 end
 
+local function OnHit_chest_inf(inst, worker)
+    inst.AnimState:PlayAnimation("hit")
+    inst.AnimState:PushAnimation("closed", false)
+    inst.components.container:Close()
+    if worker == nil or not worker:HasTag("player") then --只能被玩家破坏。没必要弄烂箱子设定
+        inst.components.workable:SetWorkLeft(inst.shownum_l == 3 and 2 or 4)
+        return
+    end
+    inst.components.container:DropEverything(nil, true)
+    if not inst.components.container:IsEmpty() then --如果箱子里还有物品，那就不能被破坏
+        inst.components.workable:SetWorkLeft(inst.shownum_l == 3 and 2 or 4)
+    end
+end
+local function OnHammered_chest_inf(inst, worker)
+    local box = SpawnPrefab(inst.shownum_l == 3 and "chest_whitewood" or "chest_whitewood_big")
+    if box ~= nil then
+        box.Transform:SetPosition(inst.Transform:GetWorldPosition())
+    end
+    inst.components.lootdropper:SpawnLootPrefab("chestupgrade_stacksize")
+    OnHammered_chest(inst, worker)
+end
+local function OnUpgrade_chest_inf(inst, item, doer)
+    if item.components.stackable ~= nil then
+		item.components.stackable:Get(1):Remove()
+	else
+		item:Remove()
+	end
+
+    local x, y, z = inst.Transform:GetWorldPosition()
+    local fx = SpawnPrefab("chestupgrade_stacksize_fx")
+    if fx ~= nil then
+        fx.Transform:SetPosition(x, y, z)
+    end
+
+    local newbox = SpawnPrefab(inst.shownum_l == 3 and "chest_whitewood_inf" or "chest_whitewood_big_inf")
+    if newbox ~= nil then
+        -- local skin = inst.components.skinedlegion:GetSkin()
+        -- if skin ~= nil then
+        --     newbox.components.skinedlegion:SetSkin(skin, LS_C_UserID(inst, doer))
+        -- end
+
+        --按理来说这里应该继承勋章的不朽等级的，现在懒得弄了
+
+        newbox.Transform:SetPosition(x, y, z)
+
+        --将原箱子中的物品转移到新箱子中
+        if inst.components.container ~= nil and newbox.components.container ~= nil then
+            inst.components.container:Close() --强制关闭使用中的箱子
+            inst.components.container.canbeopened = false
+            local allitems = inst.components.container:RemoveAllItems()
+            for _, v in ipairs(allitems) do
+                newbox.components.container:GiveItem(v)
+            end
+        end
+    end
+
+    inst:Remove()
+end
+
 local function MakeChest(data)
     table.insert(prefs, Prefab(data.name, function()
         local inst = CreateEntity()
@@ -605,17 +664,10 @@ local function MakeChest(data)
         inst:AddTag("structure")
         inst:AddTag("chest")
 
-        inst.AnimState:SetBank(data.name)
-        inst.AnimState:SetBuild(data.name)
-        inst.AnimState:PlayAnimation("closed")
-
-        TOOLS_L.MakeSnowCovered_comm(inst)
-
-        LS_C_Init(inst, data.name, false)
-
         if data.fn_common ~= nil then
             data.fn_common(inst)
         end
+        inst.AnimState:PlayAnimation("closed")
 
         inst.entity:SetPristine()
         if not TheWorld.ismastersim then return inst end
@@ -625,7 +677,6 @@ local function MakeChest(data)
         inst:AddComponent("inspectable")
 
         inst:AddComponent("container")
-        inst.components.container:WidgetSetup(data.name)
         inst.components.container.onopenfn = OnOpen_chest
         inst.components.container.onclosefn = OnClose_chest
         inst.components.container.skipclosesnd = true
@@ -635,17 +686,11 @@ local function MakeChest(data)
 
         inst:AddComponent("workable")
         inst.components.workable:SetWorkAction(ACTIONS.HAMMER)
-        -- inst.components.workable:SetWorkLeft(2)
-        inst.components.workable:SetOnWorkCallback(OnHit_chest)
-        inst.components.workable:SetOnFinishCallback(OnHammered_chest)
 
         inst:AddComponent("hauntable")
         inst.components.hauntable:SetHauntValue(TUNING.HAUNT_TINY)
 
         TOOLS_L.MakeSnowCovered_serv(inst, 0.1 + 0.3*math.random(), nil)
-
-        inst.OnSave = OnSave_chest
-        inst.OnLoad = OnLoad_chest
 
         -- inst:ListenForEvent("onbuilt", onbuilt)
         inst:ListenForEvent("itemget", ItemGet_chest)
@@ -670,8 +715,44 @@ MakeChest({
         Asset("ANIM", "anim/ui_chester_shadow_3x4.zip"),
         Asset("ANIM", "anim/ui_chest_whitewood_3x4.zip")
     },
-    -- prefabs = {},
+    prefabs = { "chest_whitewood_inf", "chestupgrade_stacksize_fx" },
     fn_common = function(inst)
+        inst:AddTag("chest_upgradeable") --能被 弹性空间制造器 升级
+        inst.AnimState:SetBank("chest_whitewood")
+        inst.AnimState:SetBuild("chest_whitewood")
+        LS_C_Init(inst, "chest_whitewood", false)
+        if not TheWorld.ismastersim then
+            inst.OnEntityReplicated = OnEntityReplicated_chest
+        end
+    end,
+    fn_server = function(inst)
+        inst.shownum_l = 3
+        inst.fn_upgrade_chest_l = OnUpgrade_chest_inf
+        inst.OnSave = OnSave_chest
+        inst.OnLoad = OnLoad_chest
+
+        inst.components.container:WidgetSetup("chest_whitewood")
+
+        inst.components.workable:SetWorkLeft(2)
+        inst.components.workable:SetOnWorkCallback(OnHit_chest)
+        inst.components.workable:SetOnFinishCallback(OnHammered_chest)
+
+        MakeMediumBurnable(inst, nil, nil, true)
+        MakeMediumPropagator(inst)
+    end
+})
+MakeChest({
+    name = "chest_whitewood_inf",
+    assets = {
+        Asset("ANIM", "anim/chest_whitewood_inf.zip"),
+        Asset("ANIM", "anim/ui_chester_shadow_3x4.zip"),
+        Asset("ANIM", "anim/ui_chest_whitewood_inf_3x4.zip")
+    },
+    prefabs = { "chestupgrade_stacksize" },
+    fn_common = function(inst)
+        inst.AnimState:SetBank("chest_whitewood")
+        inst.AnimState:SetBuild("chest_whitewood_inf")
+        -- LS_C_Init(inst, "chest_whitewood", false, "data_inf", "chest_whitewood_inf")
         if not TheWorld.ismastersim then
             inst.OnEntityReplicated = OnEntityReplicated_chest
         end
@@ -679,10 +760,12 @@ MakeChest({
     fn_server = function(inst)
         inst.shownum_l = 3
 
-        inst.components.workable:SetWorkLeft(2)
+        inst.components.container:WidgetSetup("chest_whitewood")
+        inst.components.container:EnableInfiniteStackSize(true)
 
-        MakeMediumBurnable(inst, nil, nil, true)
-        MakeMediumPropagator(inst)
+        inst.components.workable:SetWorkLeft(2)
+        inst.components.workable:SetOnWorkCallback(OnHit_chest_inf)
+        inst.components.workable:SetOnFinishCallback(OnHammered_chest_inf)
     end
 })
 
@@ -693,8 +776,44 @@ MakeChest({
         Asset("ANIM", "anim/ui_bookstation_4x5.zip"),
         Asset("ANIM", "anim/ui_chest_whitewood_4x6.zip")
     },
-    -- prefabs = {},
+    prefabs = { "chest_whitewood_big_inf", "chestupgrade_stacksize_fx" },
     fn_common = function(inst)
+        inst:AddTag("chest_upgradeable") --能被 弹性空间制造器 升级
+        inst.AnimState:SetBank("chest_whitewood_big")
+        inst.AnimState:SetBuild("chest_whitewood_big")
+        LS_C_Init(inst, "chest_whitewood_big", false)
+        if not TheWorld.ismastersim then
+            inst.OnEntityReplicated = OnEntityReplicated_chest2
+        end
+    end,
+    fn_server = function(inst)
+        inst.shownum_l = 8
+        inst.fn_upgrade_chest_l = OnUpgrade_chest_inf
+        inst.OnSave = OnSave_chest
+        inst.OnLoad = OnLoad_chest
+
+        inst.components.container:WidgetSetup("chest_whitewood_big")
+
+        inst.components.workable:SetWorkLeft(4)
+        inst.components.workable:SetOnWorkCallback(OnHit_chest)
+        inst.components.workable:SetOnFinishCallback(OnHammered_chest)
+
+        MakeLargeBurnable(inst, nil, nil, true)
+        MakeLargePropagator(inst)
+    end
+})
+MakeChest({
+    name = "chest_whitewood_big_inf",
+    assets = {
+        Asset("ANIM", "anim/chest_whitewood_big_inf.zip"),
+        Asset("ANIM", "anim/ui_bookstation_4x5.zip"),
+        Asset("ANIM", "anim/ui_chest_whitewood_inf_4x6.zip")
+    },
+    prefabs = { "chestupgrade_stacksize" },
+    fn_common = function(inst)
+        inst.AnimState:SetBank("chest_whitewood_big")
+        inst.AnimState:SetBuild("chest_whitewood_big_inf")
+        -- LS_C_Init(inst, "chest_whitewood_big", false, "data_inf", "chest_whitewood_big_inf")
         if not TheWorld.ismastersim then
             inst.OnEntityReplicated = OnEntityReplicated_chest2
         end
@@ -702,10 +821,12 @@ MakeChest({
     fn_server = function(inst)
         inst.shownum_l = 8
 
-        inst.components.workable:SetWorkLeft(4)
+        inst.components.container:WidgetSetup("chest_whitewood_big")
+        inst.components.container:EnableInfiniteStackSize(true)
 
-        MakeLargeBurnable(inst, nil, nil, true)
-        MakeLargePropagator(inst)
+        inst.components.workable:SetWorkLeft(4)
+        inst.components.workable:SetOnWorkCallback(OnHit_chest_inf)
+        inst.components.workable:SetOnFinishCallback(OnHammered_chest_inf)
     end
 })
 

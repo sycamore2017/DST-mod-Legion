@@ -1662,6 +1662,8 @@ local function MakeFx_life(data)
         inst:AddTag("FX")
         inst:AddTag("NOBLOCK")
 
+        inst.AnimState:SetLightOverride(0.8)
+
         if data.fn_common ~= nil then
             data.fn_common(inst)
         end
