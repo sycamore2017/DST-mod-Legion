@@ -607,6 +607,10 @@ end
 local function OnHammered_chest_inf(inst, worker)
     local box = SpawnPrefab(inst.shownum_l == 3 and "chest_whitewood" or "chest_whitewood_big")
     if box ~= nil then
+        local skin = inst.components.skinedlegion:GetSkin()
+        if skin ~= nil then
+            box.components.skinedlegion:SetSkin(skin, LS_C_UserID(inst, worker))
+        end
         box.Transform:SetPosition(inst.Transform:GetWorldPosition())
     end
     inst.components.lootdropper:SpawnLootPrefab("chestupgrade_stacksize")
@@ -627,10 +631,10 @@ local function OnUpgrade_chest_inf(inst, item, doer)
 
     local newbox = SpawnPrefab(inst.shownum_l == 3 and "chest_whitewood_inf" or "chest_whitewood_big_inf")
     if newbox ~= nil then
-        -- local skin = inst.components.skinedlegion:GetSkin()
-        -- if skin ~= nil then
-        --     newbox.components.skinedlegion:SetSkin(skin, LS_C_UserID(inst, doer))
-        -- end
+        local skin = inst.components.skinedlegion:GetSkin()
+        if skin ~= nil then
+            newbox.components.skinedlegion:SetSkin(skin, LS_C_UserID(inst, doer))
+        end
 
         --按理来说这里应该继承勋章的不朽等级的，现在懒得弄了
 
@@ -752,7 +756,7 @@ MakeChest({
     fn_common = function(inst)
         inst.AnimState:SetBank("chest_whitewood")
         inst.AnimState:SetBuild("chest_whitewood_inf")
-        -- LS_C_Init(inst, "chest_whitewood", false, "data_inf", "chest_whitewood_inf")
+        LS_C_Init(inst, "chest_whitewood", false, "data_inf", "chest_whitewood_inf")
         if not TheWorld.ismastersim then
             inst.OnEntityReplicated = OnEntityReplicated_chest
         end
@@ -813,7 +817,7 @@ MakeChest({
     fn_common = function(inst)
         inst.AnimState:SetBank("chest_whitewood_big")
         inst.AnimState:SetBuild("chest_whitewood_big_inf")
-        -- LS_C_Init(inst, "chest_whitewood_big", false, "data_inf", "chest_whitewood_big_inf")
+        LS_C_Init(inst, "chest_whitewood_big", false, "data_inf", "chest_whitewood_big_inf")
         if not TheWorld.ismastersim then
             inst.OnEntityReplicated = OnEntityReplicated_chest2
         end

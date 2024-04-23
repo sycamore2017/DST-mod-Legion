@@ -394,16 +394,12 @@ local function MakeHidden(dd)
         inst:AddTag("meteor_protection") --防止被流星破坏
         inst:AddTag("moontreasure_l")
 
-        inst.AnimState:SetBank(dd.name)
-        inst.AnimState:SetBuild(dd.name)
-        inst.AnimState:PlayAnimation("closed", true)
-
-        -- TOOLS_L.MakeSnowCovered_comm(inst)
-        InitLevelNet(inst, Fn_nameDetail_hidden)
-
         if dd.fn_common ~= nil then
             dd.fn_common(inst)
         end
+        inst.AnimState:PlayAnimation("closed", true)
+
+        InitLevelNet(inst, Fn_nameDetail_hidden)
 
         inst.entity:SetPristine()
         if not TheWorld.ismastersim then
@@ -480,6 +476,8 @@ MakeHidden({
     },
     fn_common = function(inst)
         inst:AddTag("chest_upgradeable") --能被 弹性空间制造器 升级
+        inst.AnimState:SetBank("hiddenmoonlight")
+        inst.AnimState:SetBuild("hiddenmoonlight")
         LS_C_Init(inst, "hiddenmoonlight_item", false, "data_up", "hiddenmoonlight")
     end,
     fn_server = function(inst)
@@ -503,6 +501,8 @@ MakeHidden({
         "chestupgrade_stacksize"
     },
     fn_common = function(inst)
+        inst.AnimState:SetBank("hiddenmoonlight")
+        inst.AnimState:SetBuild("hiddenmoonlight_inf")
         LS_C_Init(inst, "hiddenmoonlight_item", false, "data_upinf", "hiddenmoonlight_inf")
     end,
     fn_server = function(inst)

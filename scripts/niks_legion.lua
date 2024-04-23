@@ -1034,7 +1034,7 @@ local SKIN_DEFAULT_LEGION = {
         },
         data_upinf = {
             exchangefx = { prefab = nil, offset_y = nil, scale = nil },
-            anim = { bank = "hiddenmoonlight_inf", build = "hiddenmoonlight_inf", anim = 0 },
+            anim = { bank = "hiddenmoonlight", build = "hiddenmoonlight_inf", anim = 0 },
             fn_start = function(inst, skined)
                 SetTarget_hidden(inst)
             end
@@ -1071,11 +1071,19 @@ local SKIN_DEFAULT_LEGION = {
 
     chest_whitewood = {
         anim = { bank = nil, build = nil, anim = 0 },
-        exchangefx = { prefab = nil, offset_y = nil, scale = 1.5 }
+        exchangefx = { prefab = nil, offset_y = nil, scale = 1.5 },
+        overridekeys = { "data_inf" },
+        data_inf = {
+            anim = { bank = "chest_whitewood", build = "chest_whitewood_inf", anim = 0 }
+        }
     },
     chest_whitewood_big = {
         anim = { bank = nil, build = nil, anim = 0 },
-        exchangefx = { prefab = nil, offset_y = nil, scale = 1.5 }
+        exchangefx = { prefab = nil, offset_y = nil, scale = 1.5 },
+        overridekeys = { "data_inf" },
+        data_inf = {
+            anim = { bank = "chest_whitewood_big", build = "chest_whitewood_big_inf", anim = 0 }
+        }
     },
 
     tourmalinecore = {
@@ -3128,7 +3136,7 @@ local SKINS_LEGION = {
                 if skined ~= nil then
                     inst._dd = skined.dd
                 end
-                inst.AnimState:SetBank("hiddenmoonlight_inf_paper")
+                inst.AnimState:SetBank("hiddenmoonlight_paper")
                 inst.AnimState:SetBuild("hiddenmoonlight_inf_paper")
                 inst.AnimState:SetScale(1.5, 1.5, 1.5)
                 SetTarget_hidden(inst)
@@ -3145,7 +3153,8 @@ local SKINS_LEGION = {
         base_prefab = "chest_whitewood", skin_id = "655e0530adf8ac0fd863ea52", onlyownedshow = true,
 		type = "item", skin_tags = {}, release_group = 555, rarity = raritySpecial,
 		assets = {
-			Asset("ANIM", "anim/skin/chest_whitewood_craft.zip")
+			Asset("ANIM", "anim/skin/chest_whitewood_craft.zip"),
+            Asset("ANIM", "anim/skin/chest_whitewood_inf_craft.zip")
 		},
         string = ischinese and { name = "花梨木饰顶展台" } or { name = "Decorated Rosewood Cabinet" },
         anim = { bank = nil, build = nil, anim = 0 },
@@ -3153,7 +3162,12 @@ local SKINS_LEGION = {
         fn_placer = function(inst)
             inst.AnimState:SetBank("chest_whitewood_craft")
             inst.AnimState:SetBuild("chest_whitewood_craft")
-        end
+        end,
+
+        overridekeys = { "data_inf" },
+        data_inf = {
+            anim = { bank = "chest_whitewood_craft", build = "chest_whitewood_inf_craft", anim = 0 }
+        }
     },
     chest_whitewood_craft2 = {
         base_prefab = "chest_whitewood", skin_id = "655e0530adf8ac0fd863ea52", noshopshow = true,
@@ -3173,13 +3187,26 @@ local SKINS_LEGION = {
             inst.AnimState:SetBank("chest_whitewood_craft")
             inst.AnimState:SetBuild("chest_whitewood_craft")
             inst.AnimState:HideSymbol("deco")
-        end
+        end,
+
+        overridekeys = { "data_inf" },
+        data_inf = {
+            fn_start = function(inst, skined)
+                inst.AnimState:SetBank("chest_whitewood_craft")
+                inst.AnimState:SetBuild("chest_whitewood_inf_craft")
+                inst.AnimState:HideSymbol("deco")
+            end,
+            fn_end = function(inst, skined)
+                inst.AnimState:ShowSymbol("deco")
+            end
+        }
     },
     chest_whitewood_big_craft = {
         base_prefab = "chest_whitewood_big", skin_id = "655e0530adf8ac0fd863ea52", noshopshow = true,
 		type = "item", skin_tags = {}, release_group = 555, rarity = raritySpecial,
 		assets = {
-			Asset("ANIM", "anim/skin/chest_whitewood_big_craft.zip")
+			Asset("ANIM", "anim/skin/chest_whitewood_big_craft.zip"),
+            Asset("ANIM", "anim/skin/chest_whitewood_big_inf_craft.zip")
 		},
         string = ischinese and { name = "花梨木饰顶展柜" } or { name = "Decorated Rosewood Showcase" },
 		anim = { bank = nil, build = nil, anim = 0 },
@@ -3187,7 +3214,12 @@ local SKINS_LEGION = {
         fn_placer = function(inst)
             inst.AnimState:SetBank("chest_whitewood_big_craft")
             inst.AnimState:SetBuild("chest_whitewood_big_craft")
-        end
+        end,
+
+        overridekeys = { "data_inf" },
+        data_inf = {
+            anim = { bank = "chest_whitewood_big_craft", build = "chest_whitewood_big_inf_craft", anim = 0 }
+        }
     },
     chest_whitewood_big_craft2 = {
         base_prefab = "chest_whitewood_big", skin_id = "655e0530adf8ac0fd863ea52", noshopshow = true,
@@ -3207,7 +3239,19 @@ local SKINS_LEGION = {
             inst.AnimState:SetBank("chest_whitewood_big_craft")
             inst.AnimState:SetBuild("chest_whitewood_big_craft")
             inst.AnimState:HideSymbol("deco")
-        end
+        end,
+
+        overridekeys = { "data_inf" },
+        data_inf = {
+            fn_start = function(inst, skined)
+                inst.AnimState:SetBank("chest_whitewood_big_craft")
+                inst.AnimState:SetBuild("chest_whitewood_big_inf_craft")
+                inst.AnimState:HideSymbol("deco")
+            end,
+            fn_end = function(inst, skined)
+                inst.AnimState:ShowSymbol("deco")
+            end
+        }
     },
 
     tourmalinecore_tale = {
@@ -3403,6 +3447,12 @@ local ls_buildmap = { --prefab，build与皮肤的对应表，用以比对动画
     },
     siving_feather_fake = {
         siving_feather_fake_collector = "siving_feather_fake_collector"
+    },
+    chest_whitewood_inf = {
+        chest_whitewood_inf = 0, chest_whitewood_inf_craft = "chest_whitewood_craft"
+    },
+    chest_whitewood_big_inf = {
+        chest_whitewood_big_inf = 0, chest_whitewood_big_inf_craft = "chest_whitewood_big_craft"
     }
 }
 
@@ -3595,7 +3645,8 @@ end
 ------生成皮肤复制数据
 local SkinsOverride = {
 	siving_soil_item = true, hiddenmoonlight_item = true, revolvedmoonlight_item = true,
-    siving_ctlwater_item = true, siving_ctldirt_item = true, siving_ctlall_item = true
+    siving_ctlwater_item = true, siving_ctldirt_item = true, siving_ctlall_item = true,
+    chest_whitewood = true, chest_whitewood_big = true
 }
 local nocopykeys = {
     skin_id = true, skin_idx = true, onlyownedshow = true, mustonwedshow = true, overridekeys = true

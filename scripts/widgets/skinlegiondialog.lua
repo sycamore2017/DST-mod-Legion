@@ -84,7 +84,7 @@ local SkinStrings = ischinese and {
     }
 }
 
-local AnimModels = TEST and { "wickerbottom" } or {
+local AnimModels = TEST and { "wes" } or {
     "wilson", "willow", "wendy", "wolfgang", "wx78", "wickerbottom", "woodie", "waxwell", "wathgrithr",
     "webber", "winona", "warly", "wes"
 }
@@ -2889,11 +2889,11 @@ local SkinData = {
     hiddenmoonlight_item_paper = {
         string = ischinese and {
             collection = "PAPER", access = "SPECIAL",
-            descitem = "解锁\"月藏宝匣套件\"、\"月藏宝匣\"的皮肤。",
+            descitem = "解锁\"月藏宝匣套件\"、\"月藏宝匣\"、\"月藏宝匣·无限\"的皮肤。",
             description = "下午第一节课正开始，老爸突然出现在教室门口，和老师简单交流之后，我被老爸领走。原来是妈病倒了，已经住院，所以我们去了医院。\n连续几天，我都会在放学后自己坐公交去医院看我妈。眼看着我妈的皮肤逐渐发黄，真的很像动画片里某些角色的肤色，身体也逐渐虚弱。我很难过。\n同桌听说了我妈的事情，提出一个想法。于是我们和其他同学，买来纸张和玻璃瓶，一起折纸星星。同桌说等到纸星星放满玻璃瓶的时候，天上的星星就能实现一个愿望。\n后来不管是课间闲暇，作业完成后，还是陪着我妈时，我抽空就会折星星。每一个我折的星星，都寄托着我的心愿……"
         } or {
             collection = "PAPER", access = "SPECIAL",
-            descitem = "Unlock \"Hidden Moonlight Kit\", \"Hidden Moonlight\" skin.",
+            descitem = "Unlock \"Hidden Moonlight Kit\", \"Hidden Moonlight\", \"Infinite Hidden Moonlight\" skin.",
             description = "The story was not translated."
         },
         height_anim = 155,
@@ -2905,14 +2905,14 @@ local SkinData = {
             },
             {
                 bank = "hiddenmoonlight_paper", build = "hiddenmoonlight_paper",
-                anim = "close", anim2 = "closed", isloop = true,
-                issalt = false, tag_anim = 1,
+                anim = "open", anim2 = "opened", isloop = true,
+                issalt = true, tag_anim = 2,
                 fn_anim = SetAnim_hidden,
                 fn_click = SetClick_hidden,
                 x = -63, y = 12, scale = 0.38*1.3
             },
             {
-                bank = "hiddenmoonlight_paper", build = "hiddenmoonlight_paper",
+                bank = "hiddenmoonlight_paper", build = "hiddenmoonlight_inf_paper",
                 anim = "open", anim2 = "opened", isloop = true,
                 issalt = true, tag_anim = 2,
                 fn_anim = SetAnim_hidden,
@@ -2925,39 +2925,39 @@ local SkinData = {
         string = ischinese and {
             name = "花梨木展柜",
             collection = "CRAFT", access = "SPECIAL",
-            descitem = "解锁\"白木展示台\"、\"白木展示柜\"的2套皮肤。",
+            descitem = "解锁\"白木展示台\"、\"白木展示柜\"、\"白木展示台·无限\"、\"白木展示柜·无限\"的2套皮肤。",
             description = "花梨木展柜的制作是一场沉默的精湛艺术表演。\n木匠首先精选上佳的花梨木，剔除瑕疵，保留天然的美感。在悉心设计的蓝图下，巧手雕琢，将木材塑造成优雅的柜体，榫卯精准相扣，确保结构牢固。手工雕刻细节，赋予其独特纹理和精致的花纹。最后，经过多次打磨和上漆，使表面光滑如玉，散发着淡淡木香。\n每一步骤都是匠心独运，呈现出一件精致而高贵的花梨木展柜。"
         } or {
             name = "Rosewood Showcase",
             collection = "CRAFT", access = "SPECIAL",
-            descitem = "Unlock \"White Wood Cabinet\", \"White Wood Showcase\" skin.",
+            descitem = "Unlock \"White Wood Cabinet\", \"White Wood Showcase\", \"Infinite White Wood Cabinet\", \"Infinite White Wood Showcase\" skin.",
             description = "The story was not translated."
         },
-        height_anim = 300,
+        height_anim = 320,
         anims = {
             {
                 bank = "chest_whitewood_craft", build = "chest_whitewood_craft",
                 anim = "closed", anim2 = nil, isloop = false,
-                fn_anim = SetAnim_chest_whitewood_craft, nodeco = true,
+                fn_anim = SetAnim_chest_whitewood_craft, --nodeco = true,
                 fn_click = SetClick_chest_whitewood_craft,
                 x = 55, y = 190, scale = 0.3
             },
             {
                 bank = "chest_whitewood_big_craft", build = "chest_whitewood_big_craft",
                 anim = "closed", anim2 = nil, isloop = false,
-                fn_anim = SetAnim_chest_whitewood_craft, nodeco = true,
+                fn_anim = SetAnim_chest_whitewood_craft, --nodeco = true,
                 fn_click = SetClick_chest_whitewood_craft,
                 x = -60, y = 155, scale = 0.3
             },
             {
-                bank = "chest_whitewood_craft", build = "chest_whitewood_craft",
+                bank = "chest_whitewood_craft", build = "chest_whitewood_inf_craft",
                 anim = "close", anim2 = nil, isloop = false,
                 fn_anim = SetAnim_chest_whitewood_craft,
                 fn_click = SetClick_chest_whitewood_craft,
                 x = -65, y = 10, scale = 0.3
             },
             {
-                bank = "chest_whitewood_big_craft", build = "chest_whitewood_big_craft",
+                bank = "chest_whitewood_big_craft", build = "chest_whitewood_big_inf_craft",
                 anim = "close", anim2 = nil, isloop = false,
                 fn_anim = SetAnim_chest_whitewood_craft,
                 fn_click = SetClick_chest_whitewood_craft,
@@ -3371,11 +3371,12 @@ function SkinLegionDialog:BuildSkinDesc(item)
         label_skindescitem:SetHAlign(ANCHOR_LEFT)
         label_skindescitem:SetVAlign(ANCHOR_TOP)
         label_skindescitem:EnableWordWrap(true)
-        label_skindescitem:SetRegionSize(200, 36)
-        label_skindescitem:SetString(GetDescItem(skindata))
+        -- label_skindescitem:SetRegionSize(200, 36)
+        -- label_skindescitem:SetString(GetDescItem(skindata))
+        label_skindescitem:SetMultilineTruncatedString(GetDescItem(skindata), 10, 220)
         x, y = label_skindescitem:GetRegionSize()
         label_skindescitem:SetPosition(left + 0.5*x, height - 0.5*y)
-        height = height - y - height_lag
+        height = height - y - height_lag*2
 
         --故事分割线
         local line2 = w:AddChild(Image("images/quagmire_recipebook.xml", "quagmire_recipe_line.tex"))
