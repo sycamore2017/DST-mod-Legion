@@ -1376,7 +1376,10 @@ local function FnInv_ApplyDamage(self, damage, attacker, weapon, spdamage, ...)
             return damage, spdamage
         end
     end
-    return self.inst.inv_ApplyDamage_l(self, damage, attacker, weapon, spdamage, ...)
+    if self.inst.inventory_ApplyDamage_l ~= nil then
+        return self.inst.inventory_ApplyDamage_l(self, damage, attacker, weapon, spdamage, ...)
+    end
+    return 0
 end
 local function FnPin_Stick(self, ...)
     if self.inst.shield_l_success or self.Stick_l_shield == nil then
@@ -1509,13 +1512,13 @@ AddPlayerPostInit(function(inst)
     pickyeaters = nil
 
     --受击修改
-    if inst.components.inventory ~= nil then
-        inst.inv_ApplyDamage_l = inst.components.inventory.ApplyDamage
+    if inst.inventory_ApplyDamage_l == nil and inst.components.inventory ~= nil then
+        inst.inventory_ApplyDamage_l = inst.components.inventory.ApplyDamage
         inst.components.inventory.ApplyDamage = FnInv_ApplyDamage
     end
 
     --盾反成功能防止被鼻涕黏住
-    if inst.components.pinnable ~= nil then
+    if inst.components.pinnable ~= nil and inst.components.pinnable.Stick_l_shield == nil then
         inst.components.pinnable.Stick_l_shield = inst.components.pinnable.Stick
         inst.components.pinnable.Stick = FnPin_Stick
     end
@@ -1524,16 +1527,24 @@ AddPlayerPostInit(function(inst)
     inst:ListenForEvent("murdered", OnMurdered_player)
 
     --在换角色时保存爱的喂养记录
-    inst.SaveForReroll_l_base = inst.SaveForReroll
-    inst.LoadForReroll_l_base = inst.LoadForReroll
-    inst.SaveForReroll = SaveForReroll_player
-    inst.LoadForReroll = LoadForReroll_player
+    if inst.SaveForReroll_l_base == nil then
+        inst.SaveForReroll_l_base = inst.SaveForReroll
+        inst.SaveForReroll = SaveForReroll_player
+    end
+    if inst.LoadForReroll_l_base == nil then
+        inst.LoadForReroll_l_base = inst.LoadForReroll
+        inst.LoadForReroll = LoadForReroll_player
+    end
 
     --下线时记录灵魂契约数据
-    inst.OnSave_l_base = inst.OnSave
-    inst.OnLoad_l_base = inst.OnLoad
-    inst.OnSave = OnSave_player
-    inst.OnLoad = OnLoad_player
+    if inst.OnSave_l_base == nil then
+        inst.OnSave_l_base = inst.OnSave
+        inst.OnSave = OnSave_player
+    end
+    if inst.OnLoad_l_base == nil then
+        inst.OnLoad_l_base = inst.OnLoad
+        inst.OnLoad = OnLoad_player
+    end
 end)
 
 --------------------------------------------------------------------------
@@ -1736,8 +1747,10 @@ if _G.CONFIGS_LEGION.MOUSEINFO ~= nil and _G.CONFIGS_LEGION.MOUSEINFO > 0 then
             return lmb
         end
         AddComponentPostInit("playercontroller", function(self)
-            self.GetLeftMouseAction_l = self.GetLeftMouseAction
-            self.GetLeftMouseAction = GetLeftMouseAction_new --目前只有 widgets/hoverer 调用了这里，刚好就是我要改的
+            if self.GetLeftMouseAction_l == nil then
+                self.GetLeftMouseAction_l = self.GetLeftMouseAction
+                self.GetLeftMouseAction = GetLeftMouseAction_new --目前只有 widgets/hoverer 调用了这里，刚好就是我要改的
+            end
         end)
     end
 end

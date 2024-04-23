@@ -1037,6 +1037,9 @@ local function Fn_nameDetail(inst)
 	return inst.mouseinfo_l.str
 end
 local function InitMouseInfo(inst, fn_dealdata, fn_getdata, limitedtime)
+    if CONFIGS_LEGION.MOUSEINFO == nil or CONFIGS_LEGION.MOUSEINFO <= 0 then
+        return
+    end
 	inst.mouseinfo_l = {
 		--【客户端】
 		limitedtime = limitedtime, --对于一些数据量太多的，可以选择限制更新频率

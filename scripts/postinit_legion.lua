@@ -318,17 +318,17 @@ if _G.CONFIGS_LEGION.FOLIAGEATHCHANCE > 0 then
                 inst.components.lootdropper:SpawnLootPrefab("foliageath")
             end
         end
-        if inst.components.workable.onfinish_l ~= nil then
-            inst.components.workable.onfinish_l(inst, chopper)
+        if inst.workable_onfinish_l ~= nil then
+            inst.workable_onfinish_l(inst, chopper)
         end
     end
     local function FnSet_evergreen(inst)
-        if inst.components.workable ~= nil then
-            inst.components.workable.onfinish_l = inst.components.workable.onfinish
+        if inst.workable_onfinish_l == nil and inst.components.workable ~= nil then
+            inst.workable_onfinish_l = inst.components.workable.onfinish
             inst.components.workable:SetOnFinishCallback(OnFinish_evergreen_sparse)
         end
     end
-    for _,v in pairs(trees) do
+    for _, v in pairs(trees) do
         AddPrefabPostInit(v, FnSet_evergreen)
     end
     trees = nil
@@ -533,8 +533,8 @@ local function OnPreHit_soul(inst, attacker, target)
             return
         end
     end
-    if inst.onprehit_l_contract ~= nil then
-        inst.onprehit_l_contract(inst, attacker, target)
+    if inst.projectile_onprehit_l ~= nil then
+        inst.projectile_onprehit_l(inst, attacker, target)
     end
 end
 local function SeekSoulContracts(inst)
@@ -583,6 +583,9 @@ end
 AddPrefabPostInit("wortox_soul_spawn", function(inst)
     --灵魂优先寻找契约，或者契约的主人
     --为了兼容勋章，另外执行一个函数，比原有逻辑快一步触发就行
+    if inst._seektask_l ~= nil then
+        inst._seektask_l:Cancel()
+    end
     inst._seektask_l = inst:DoPeriodicTask(0.5, SeekSoulContracts, 0.5)
 
     --[[
@@ -625,8 +628,10 @@ AddPrefabPostInit("wortox_soul_spawn", function(inst)
 
     --优化灵魂进入契约或者玩家时的逻辑
     --为了兼容勋章，我改的 onprehit 而不是 onhit
-    inst.onprehit_l_contract = inst.components.projectile.onprehit
-    inst.components.projectile:SetOnPreHitFn(OnPreHit_soul)
+    if inst.projectile_onprehit_l == nil then
+        inst.projectile_onprehit_l = inst.components.projectile.onprehit
+        inst.components.projectile:SetOnPreHitFn(OnPreHit_soul)
+    end
 end)
 
 --------------------------------------------------------------------------
@@ -734,8 +739,10 @@ local function SetNutrients_fertilizer(self, ...)
     end
 end
 AddComponentPostInit("fertilizer", function(self)
-    self.SetNutrients_l = self.SetNutrients
-    self.SetNutrients = SetNutrients_fertilizer
+    if self.SetNutrients_l == nil then
+        self.SetNutrients_l = self.SetNutrients
+        self.SetNutrients = SetNutrients_fertilizer
+    end
 end)
 
 --------------------------------------------------------------------------
@@ -795,8 +802,10 @@ local function OnFinishBundling_bundler(self, ...)
     end
 end
 AddComponentPostInit("bundler", function(self)
-    self.OnFinishBundling_l = self.OnFinishBundling
-    self.OnFinishBundling = OnFinishBundling_bundler
+    if self.OnFinishBundling_l == nil then
+        self.OnFinishBundling_l = self.OnFinishBundling
+        self.OnFinishBundling = OnFinishBundling_bundler
+    end
 end)
 
 --------------------------------------------------------------------------
@@ -804,8 +813,8 @@ end)
 --------------------------------------------------------------------------
 
 local function OnAccept_catcoon(cat, giver, item)
-    if cat.onaccept_l_mint ~= nil then
-        cat.onaccept_l_mint(cat, giver, item)
+    if cat.trader_onaccept_l ~= nil then
+        cat.trader_onaccept_l(cat, giver, item)
     end
     if item:HasTag("catmint") then
         cat.count_mint_l = (cat.count_mint_l or 0) + 1
@@ -825,19 +834,21 @@ local function PickRandomGift_catcoon(cat, tier)
             return "cattenball"
         end
     end
-    if cat.PickRandomGift_l_mint ~= nil then
-        return cat.PickRandomGift_l_mint(cat, tier)
+    if cat.PickRandomGift_l ~= nil then
+        return cat.PickRandomGift_l(cat, tier)
     end
 end
 
 local didfriendgift = nil
 AddPrefabPostInit("catcoon", function(inst)
-    inst.onaccept_l_mint = inst.components.trader.onaccept
-    inst.components.trader.onaccept = OnAccept_catcoon
-
-    inst.PickRandomGift_l_mint = inst.PickRandomGift
-    inst.PickRandomGift = PickRandomGift_catcoon
-
+    if inst.trader_onaccept_l == nil then
+        inst.trader_onaccept_l = inst.components.trader.onaccept
+        inst.components.trader.onaccept = OnAccept_catcoon
+    end
+    if inst.PickRandomGift_l == nil then
+        inst.PickRandomGift_l = inst.PickRandomGift
+        inst.PickRandomGift = PickRandomGift_catcoon
+    end
     if not didfriendgift then --由于索引效果，这一改会永久修改所有的表，所以这里只需要改一次就行
         didfriendgift = true
         if inst.friendGiftPrefabs ~= nil then
@@ -865,8 +876,10 @@ local function GetWalkSpeedMult_equippable(self, ...)
     return res
 end
 AddComponentPostInit("equippable", function(self)
-    self.GetWalkSpeedMult_l = self.GetWalkSpeedMult
-    self.GetWalkSpeedMult = GetWalkSpeedMult_equippable
+    if self.GetWalkSpeedMult_l == nil then
+        self.GetWalkSpeedMult_l = self.GetWalkSpeedMult
+        self.GetWalkSpeedMult = GetWalkSpeedMult_equippable
+    end
 end)
 
 --------------------------------------------------------------------------
@@ -888,8 +901,8 @@ end
 
 ------仙人掌的
 local function onpickedfn_cactus(inst, picker, ...)
-    if inst.onpickedfn_l_tissue ~= nil then
-        inst.onpickedfn_l_tissue(inst, picker, ...)
+    if inst.pickable_onpickedfn_l ~= nil then
+        inst.pickable_onpickedfn_l(inst, picker, ...)
     end
     if not TheWorld.state.israining or math.random() >= (CONFIGS_LEGION.TISSUECACTUSCHANCE or 0.05) then
         return
@@ -897,8 +910,8 @@ local function onpickedfn_cactus(inst, picker, ...)
     GiveTissue(inst, picker, "tissue_l_cactus")
 end
 local function FnSet_cactus(inst)
-    if inst.components.pickable ~= nil then
-        inst.onpickedfn_l_tissue = inst.components.pickable.onpickedfn
+    if inst.pickable_onpickedfn_l == nil and inst.components.pickable ~= nil then
+        inst.pickable_onpickedfn_l = inst.components.pickable.onpickedfn
         inst.components.pickable.onpickedfn = onpickedfn_cactus
     end
 end
@@ -907,8 +920,8 @@ AddPrefabPostInit("oasis_cactus", FnSet_cactus)
 
 ------浆果丛的
 local function onpickedfn_berrybush(inst, picker, ...)
-    if inst.onpickedfn_l_tissue ~= nil then
-        inst.onpickedfn_l_tissue(inst, picker, ...)
+    if inst.pickable_onpickedfn_l ~= nil then
+        inst.pickable_onpickedfn_l(inst, picker, ...)
     end
     if not TheWorld.state.isdusk or math.random() >= (CONFIGS_LEGION.TISSUEBERRIESCHANCE or 0.01) then
         return
@@ -916,8 +929,10 @@ local function onpickedfn_berrybush(inst, picker, ...)
     GiveTissue(inst, picker, "tissue_l_berries")
 end
 local function FnSet_berry(inst)
-    inst.onpickedfn_l_tissue = inst.components.pickable.onpickedfn
-    inst.components.pickable.onpickedfn = onpickedfn_berrybush
+    if inst.pickable_onpickedfn_l == nil and inst.components.pickable ~= nil then
+        inst.pickable_onpickedfn_l = inst.components.pickable.onpickedfn
+        inst.components.pickable.onpickedfn = onpickedfn_berrybush
+    end
 end
 AddPrefabPostInit("berrybush", FnSet_berry)
 AddPrefabPostInit("berrybush2", FnSet_berry)
@@ -925,14 +940,14 @@ AddPrefabPostInit("berrybush_juicy", FnSet_berry)
 
 ------果蝇们会掉落虫翅碎片
 local function LootSetup_fruitfly(lootdropper)
-    if lootdropper.inst.lootsetupfn_l_tissue ~= nil then
-        lootdropper.inst.lootsetupfn_l_tissue(lootdropper)
+    if lootdropper.inst.lootdropper_lootsetupfn_l ~= nil then
+        lootdropper.inst.lootdropper_lootsetupfn_l(lootdropper)
     end
     lootdropper:AddChanceLoot("ahandfulofwings", 0.25)
 end
 local function FnSet_fruitfly(inst)
-    if inst.components.lootdropper ~= nil then
-        inst.lootsetupfn_l_tissue = inst.components.lootdropper.lootsetupfn
+    if inst.lootdropper_lootsetupfn_l == nil and inst.components.lootdropper ~= nil then
+        inst.lootdropper_lootsetupfn_l = inst.components.lootdropper.lootsetupfn
         inst.components.lootdropper:SetLootSetupFn(LootSetup_fruitfly)
     end
 end
@@ -956,14 +971,14 @@ local function CanTarget_bunnyman(self, target, ...)
     then
         return false
     end
-    if self.CanTarget_l ~= nil then
-        return self.CanTarget_l(self, target, ...)
+    if self.inst.combat_CanTarget_l ~= nil then
+        return self.inst.combat_CanTarget_l(self, target, ...)
     end
     return false
 end
 AddPrefabPostInit("bunnyman", function(inst)
-    if inst.components.combat ~= nil then
-        inst.components.combat.CanTarget_l = inst.components.combat.CanTarget
+    if inst.combat_CanTarget_l == nil and inst.components.combat ~= nil then
+        inst.combat_CanTarget_l = inst.components.combat.CanTarget
         inst.components.combat.CanTarget = CanTarget_bunnyman
     end
 end)
@@ -1026,8 +1041,10 @@ AddComponentPostInit("pollinator", function(self)
     self.CreateFlower = CreateFlower_pollinator
 
     --传粉者能给棱镜植物授粉
-    self.Pollinate_l = self.Pollinate
-    self.Pollinate = Pollinate_pollinator
+    if self.Pollinate_l == nil then
+        self.Pollinate_l = self.Pollinate
+        self.Pollinate = Pollinate_pollinator
+    end
 end)
 
 --------------------------------------------------------------------------
@@ -1041,8 +1058,8 @@ local invBuildMaps = {
     "images_minisign_skins1", "images_minisign_skins2" --7、8
 }
 local function OnDrawn_minisign(inst, image, src, atlas, bgimage, bgatlas, ...) --这里image是所用图片的名字，而非prefab的名字
-    if inst.ondrawnfn_l_inv ~= nil then
-        inst.ondrawnfn_l_inv(inst, image, src, atlas, bgimage, bgatlas, ...)
+    if inst.drawable_ondrawnfn_l ~= nil then
+        inst.drawable_ondrawnfn_l(inst, image, src, atlas, bgimage, bgatlas, ...)
     end
     --src在重载后就没了，所以没法让信息存在src里
     if image ~= nil and invPrefabList[image] ~= nil then
@@ -1053,8 +1070,8 @@ local function OnDrawn_minisign(inst, image, src, atlas, bgimage, bgatlas, ...) 
     end
 end
 local function MiniSign_init(inst)
-    if inst.components.drawable ~= nil then
-        inst.ondrawnfn_l_inv = inst.components.drawable.ondrawnfn
+    if inst.drawable_ondrawnfn_l == nil and inst.components.drawable ~= nil then
+        inst.drawable_ondrawnfn_l = inst.components.drawable.ondrawnfn
         inst.components.drawable:SetOnDrawnFn(OnDrawn_minisign)
     end
 end
@@ -1270,10 +1287,14 @@ local function OnLoad_eater(self, data, ...)
 end
 AddComponentPostInit("eater", function(self) --之所以不写在玩家数据里，是为了兼容所有生物
     self.inst:ListenForEvent("oneat", OnEat_eater)
-    self.OnSave_l_eaterlove = self.OnSave
-    self.OnLoad_l_eaterlove = self.OnLoad
-    self.OnSave = OnSave_eater
-    self.OnLoad = OnLoad_eater
+    if self.OnSave_l_eaterlove == nil then
+        self.OnSave_l_eaterlove = self.OnSave
+        self.OnSave = OnSave_eater
+    end
+    if self.OnLoad_l_eaterlove == nil then
+        self.OnLoad_l_eaterlove = self.OnLoad
+        self.OnLoad = OnLoad_eater
+    end
 end)
 
 --------------------------------------------------------------------------
@@ -1392,8 +1413,8 @@ local function OnPicked_tumbleweed(inst, picker)
     end
 
     local x, y, z = inst.Transform:GetWorldPosition()
-    if inst.onpicked_old_l ~= nil then
-        inst.onpicked_old_l(inst, picker)
+    if inst.pickable_onpickedfn_l ~= nil then
+        inst.pickable_onpickedfn_l(inst, picker)
     end
 
     --为了让风滚草掉落物也能自动叠加
@@ -1409,8 +1430,10 @@ local function OnPicked_tumbleweed(inst, picker)
     return true
 end
 AddPrefabPostInit("tumbleweed", function(inst)
-    inst.onpicked_old_l = inst.components.pickable.onpickedfn
-    inst.components.pickable.onpickedfn = OnPicked_tumbleweed
+    if inst.pickable_onpickedfn_l == nil and inst.components.pickable ~= nil then
+        inst.pickable_onpickedfn_l = inst.components.pickable.onpickedfn
+        inst.components.pickable.onpickedfn = OnPicked_tumbleweed
+    end
 end)
 
 --------------------------------------------------------------------------
@@ -1459,14 +1482,20 @@ local function OnLoad_fireproof(self, data, ...)
 end
 
 AddComponentPostInit("burnable", function(self)
-    self.Ignite_l_fireproof = self.Ignite
-    self.Ignite = Ignite_fireproof
-
-    self.StartWildfire_l_fireproof = self.StartWildfire
-    self.StartWildfire = StartWildfire_fireproof
-
-    self.OnSave_l_fireproof = self.OnSave
-    self.OnLoad_l_fireproof = self.OnLoad
-    self.OnSave = OnSave_fireproof
-    self.OnLoad = OnLoad_fireproof
+    if self.Ignite_l_fireproof == nil then
+        self.Ignite_l_fireproof = self.Ignite
+        self.Ignite = Ignite_fireproof
+    end
+    if self.StartWildfire_l_fireproof == nil then
+        self.StartWildfire_l_fireproof = self.StartWildfire
+        self.StartWildfire = StartWildfire_fireproof
+    end
+    if self.OnSave_l_fireproof == nil then
+        self.OnSave_l_fireproof = self.OnSave
+        self.OnSave = OnSave_fireproof
+    end
+    if self.OnLoad_l_fireproof == nil then
+        self.OnLoad_l_fireproof = self.OnLoad
+        self.OnLoad = OnLoad_fireproof
+    end
 end)
