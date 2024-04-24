@@ -877,7 +877,9 @@ end
 local function OnAttacked_bloodarmor(owner, data, armor)
     if
         data == nil or data.redirected or --redirected 代表是骑牛等牛帮玩家抵挡伤害的情况
-        (data.damageresolved == nil or data.damageresolved <= 0) --damageresolved 就是指本次受击的血量损失值
+        (owner.components.oldager == nil and --旺达你可真厉害
+            (data.damageresolved == nil or data.damageresolved <= 0) --damageresolved 就是指本次受击的血量损失值
+        )
     then
         return
     end

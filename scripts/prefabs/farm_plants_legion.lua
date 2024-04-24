@@ -435,8 +435,11 @@ local function OnPlantResearch(inst)
     return inst:GetPlantRegistryKey(), inst:GetResearchStage()
 end
 local function GetDisplayName_p(inst)
-	local stagename = inst.mouseinfo_l.dd and inst.mouseinfo_l.dd.name or nil
+	local stagename
 	local basename = STRINGS.NAMES[string.upper(inst.prefab_l)]
+	if inst.mouseinfo_l ~= nil then
+		stagename = inst.mouseinfo_l.dd and inst.mouseinfo_l.dd.name or nil
+	end
 	if stagename == nil then
 		return basename
 	elseif STRINGS.CROP_LEGION[string.upper(stagename)] ~= nil then

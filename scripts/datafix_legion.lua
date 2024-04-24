@@ -1611,76 +1611,76 @@ end
 ]]--
 --------------------------------------------------------------------------
 
-if _G.CONFIGS_LEGION.MOUSEINFO ~= nil and _G.CONFIGS_LEGION.MOUSEINFO > 0 then
-    local TIME_C_GETMOUSEINFO = _G.CONFIGS_LEGION.MOUSEINFO
-    local TIME_S_GETMOUSEINFO = TIME_C_GETMOUSEINFO - 0.1
+local TIME_C_GETMOUSEINFO = _G.CONFIGS_LEGION.MOUSEINFO or 0
+local TIME_S_GETMOUSEINFO = TIME_C_GETMOUSEINFO - 0.1
 
-    ------客户端响应服务器请求【客户端环境】
+------客户端响应服务器请求【客户端环境】
 
-    AddClientModRPCHandler("LegionMsg", "MouseInfo", function(data, target) --接收处理服务器发来的描述所需的原始数据
-        if data ~= nil and type(data) == "string" and target ~= nil and target.mouseinfo_l ~= nil then
-            local success, result = pcall(function() return json.decode(data) end)
-            if result then
-                local dd_old = target.mouseinfo_l.dd
-                if result.fixed and dd_old ~= nil then --兼容只更新部分数据的情况
-                    if result.dd ~= nil then
-                        for k, v in pairs(result.dd) do
-                            if v == "_" then
-                                dd_old[k] = nil
-                            else
-                                dd_old[k] = v
-                            end
-                        end
-                    end
-                else
-                    target.mouseinfo_l.dd = result.dd
-                    dd_old = result.dd
-                end
-                target.mouseinfo_l.str = target.mouseinfo_l.fn_dealdata(target, dd_old or {})
-                if
-                    ThePlayer and ThePlayer.mouseinfo_l_log ~= nil and
-                    ThePlayer.mouseinfo_l_log.ent == target --说明玩家在这期间还没换查看对象，所以直接更新
-                then
-                    local todo = ThePlayer.mouseinfo_l_log
-                    if todo.it ~= nil then
-                        todo.it:UpdateTooltip() --这样做很可能会再次触发整个流程，但没关系，有次数限制的，就当是不断刷新吧
-                    elseif todo.pc ~= nil then
-                        if ThePlayer.HUD and ThePlayer.HUD.controls then
-                            local hover = ThePlayer.HUD.controls.hover
-                            if hover ~= nil then
-                                hover:OnUpdate()
-                            end
+AddClientModRPCHandler("LegionMsg", "MouseInfo", function(data, target) --接收处理服务器发来的描述所需的原始数据
+    if data ~= nil and type(data) == "string" and target ~= nil and target.mouseinfo_l ~= nil then
+        local success, result = pcall(function() return json.decode(data) end)
+        if result then
+            local dd_old = target.mouseinfo_l.dd
+            if result.fixed and dd_old ~= nil then --兼容只更新部分数据的情况
+                if result.dd ~= nil then
+                    for k, v in pairs(result.dd) do
+                        if v == "_" then
+                            dd_old[k] = nil
+                        else
+                            dd_old[k] = v
                         end
                     end
                 end
+            else
+                target.mouseinfo_l.dd = result.dd
+                dd_old = result.dd
             end
-        end
-    end)
-
-    ------服务器响应客户端请求【服务器环境】
-
-    AddModRPCHandler("LegionMsg", "GetMouseInfo", function(player, data) --整理并向客户端发送描述所需的原始数据
-        if data ~= nil and data.mouseinfo_l ~= nil then --type(data) == "string"
-            local timenow = GetTime()
+            target.mouseinfo_l.str = target.mouseinfo_l.fn_dealdata(target, dd_old or {})
             if
-                player == nil or player.userid == nil or player.userid == "" or
-                (player.mouseinfo_ls_time ~= nil and (timenow - player.mouseinfo_ls_time) < TIME_S_GETMOUSEINFO)
+                ThePlayer and ThePlayer.mouseinfo_l_log ~= nil and
+                ThePlayer.mouseinfo_l_log.ent == target --说明玩家在这期间还没换查看对象，所以直接更新
             then
-                return
-            end
-
-            player.mouseinfo_ls_time = timenow --主机模式下，player 就是 ThePlayer，所以变量名得用不一样的
-            local dd = {
-                -- fixed = nil, --为true代表这个数据是不完整的
-                dd = data.mouseinfo_l.fn_getdata(data)
-            }
-            local success, res = pcall(function() return json.encode(dd) end)
-            if success then
-                SendModRPCToClient(GetClientModRPC("LegionMsg", "MouseInfo"), player.userid, res, data)
+                local todo = ThePlayer.mouseinfo_l_log
+                if todo.it ~= nil then
+                    todo.it:UpdateTooltip() --这样做很可能会再次触发整个流程，但没关系，有次数限制的，就当是不断刷新吧
+                elseif todo.pc ~= nil then
+                    if ThePlayer.HUD and ThePlayer.HUD.controls then
+                        local hover = ThePlayer.HUD.controls.hover
+                        if hover ~= nil then
+                            hover:OnUpdate()
+                        end
+                    end
+                end
             end
         end
-    end)
+    end
+end)
 
+------服务器响应客户端请求【服务器环境】
+
+AddModRPCHandler("LegionMsg", "GetMouseInfo", function(player, data) --整理并向客户端发送描述所需的原始数据
+    if data ~= nil and data.mouseinfo_l ~= nil then --type(data) == "string"
+        local timenow = GetTime()
+        if
+            player == nil or player.userid == nil or player.userid == "" or
+            (player.mouseinfo_ls_time ~= nil and (timenow - player.mouseinfo_ls_time) < TIME_S_GETMOUSEINFO)
+        then
+            return
+        end
+
+        player.mouseinfo_ls_time = timenow --主机模式下，player 就是 ThePlayer，所以变量名得用不一样的
+        local dd = {
+            -- fixed = nil, --为true代表这个数据是不完整的
+            dd = data.mouseinfo_l.fn_getdata(data)
+        }
+        local success, res = pcall(function() return json.encode(dd) end)
+        if success then
+            SendModRPCToClient(GetClientModRPC("LegionMsg", "MouseInfo"), player.userid, res, data)
+        end
+    end
+end)
+
+if TIME_C_GETMOUSEINFO > 0 then
     if not TheNet:IsDedicated() then
         local itemtile = require("widgets/itemtile")
         -- local hoverer = require("widgets/hoverer")

@@ -627,7 +627,12 @@ local function CP_OnClose_nut(self, doer, ...)
                     end
                 end
                 if cost > 0 then
-                    doer.components.health:DoDelta(-cost, nil, self.inst.prefab, nil, nil, true)
+                    --有人反馈被云松子扣血扣死后，背包打不开了，所以这里延迟扣血
+                    doer:DoTaskInTime(0.3, function()
+                        if doer.components.health ~= nil and not doer.components.health:IsDead() then
+                            doer.components.health:DoDelta(-cost, nil, self.inst.prefab, nil, nil, true)
+                        end
+                    end)
                 end
             end
         end
