@@ -30,6 +30,8 @@ local tradableItems_siv = {
     alterguardianhatshard = { kind = 1, value_dt = 150, value = 10 },
     alterguardianhat = { kind = 1, value_dt = 750, value = 50 },
 
+    pomegranate = { kind = 2, value_dt = 0.5, value = 0.08, needall = true },
+    pomegranate_cooked = { kind = 2, value_dt = 0.25, value = 0.04, needall = true },
     redgem = { kind = 2, value_dt = 8, value = 0.25 },
     redmooneye = { kind = 2, value_dt = 15, value = 0.5 },
     amulet = { kind = 2, value_dt = 15, value = 0.5 },
@@ -39,8 +41,6 @@ local tradableItems_siv = {
     tissue_l_cactus = { kind = 2, value_dt = 3, value = 0.2 },
     tissue_l_lureplant = { kind = 2, value_dt = 3, value = 0.2 },
     tissue_l_berries = { kind = 2, value_dt = 3, value = 0.2 },
-    pomegranate = { kind = 2, value_dt = 0.5, value = 0.08, needall = true },
-    pomegranate_cooked = { kind = 2, value_dt = 0.25, value = 0.04, needall = true },
     -- siving_mask_gold = { kind = 2, value_dt = 1, value = 0.15 }
 }
 
