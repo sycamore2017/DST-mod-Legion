@@ -453,7 +453,6 @@ table.insert(prefs, Prefab("siving_derivant", function()
     inst.AnimState:PlayAnimation("lvl0", false)
     inst.AnimState:SetScale(1.3, 1.3)
 
-    TOOLS_L.MakeSnowCovered_comm(inst)
     inst.Transform:SetTwoFaced()
     inst.MiniMapEntity:SetIcon("siving_derivant.tex")
 

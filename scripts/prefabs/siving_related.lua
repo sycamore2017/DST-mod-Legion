@@ -1205,6 +1205,7 @@ table.insert(prefs, Prefab("siving_soil", function() ------子圭垄
     inst:SetPhysicsRadiusOverride(TUNING.FARM_PLANT_PHYSICS_RADIUS)
 
     inst:AddTag("soil_legion")
+    inst:AddTag("tornado_nosucky") --mod兼容：永不妥协。不会被龙卷风刮走
 
     LS_C_Init(inst, "siving_soil_item", false, "data_soil", "siving_soil")
 

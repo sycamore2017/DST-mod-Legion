@@ -579,6 +579,7 @@ local function MakePlant(defkey, data)
 		inst:AddTag("plant")
 		inst:AddTag("crop_legion")
 		inst:AddTag("tendable_farmplant") -- for farmplanttendable component
+		inst:AddTag("tornado_nosucky") --mod兼容：永不妥协。不会被龙卷风刮走
 		if data.tags ~= nil then
 			for k, v in pairs(data.tags) do
 				inst:AddTag(v)
@@ -801,6 +802,7 @@ local function Fn_common_p2(inst, sets) --异种的通用设置
 	inst:AddTag("rotatableobject") --能让栅栏击剑起作用
 	inst:AddTag("flatrotated_l") --棱镜标签：旋转时旋转180度
 	inst:AddTag("crop2_legion")
+	inst:AddTag("tornado_nosucky") --mod兼容：永不妥协。不会被龙卷风刮走
 end
 local function Fn_server_p2(inst) --异种的通用设置
 	inst:AddComponent("savedrotation")

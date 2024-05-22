@@ -409,7 +409,7 @@ S______GENERIC.DESCRIBE.DISH_ORCHIDCAKE = "I seemed to hear a quiet voice that c
 --S_______WINONA.DESCRIBE.DISH_ORCHIDCAKE = ""
 
 S_NAMES.DISH_FLESHNAPOLEON = "Flesh Napoleon" --真果拿破仑
-STRINGS.UI.COOKBOOK.DISH_FLESHNAPOLEON = "Glowing skin"
+STRINGS.UI.COOKBOOK.DISH_FLESHNAPOLEON = "Gives off a healthy glow steadily"
 S______GENERIC.DESCRIBE.DISH_FLESHNAPOLEON = "The brightest star in the night sky is coming!"
 --S_______WILLOW.DESCRIBE.DISH_FLESHNAPOLEON = ""
 --S_____WOLFGANG.DESCRIBE.DISH_FLESHNAPOLEON = ""

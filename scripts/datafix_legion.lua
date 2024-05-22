@@ -1061,6 +1061,7 @@ local digest_data_l = {
     spider_hider = { lvl = lvls[4], attract = nil, loot = { boneshard = 1 } }, --洞穴蜘蛛
     spider_spitter = { lvl = lvls[4], attract = nil, loot = { boneshard = 1 } }, --喷射蜘蛛
     spider_dropper = { lvl = lvls[4], attract = nil, loot = { boneshard = 1 } }, --穴居悬蛛
+    lunarfrog = { lvl = lvls[4], attract = nil, loot = { boneshard = 1 } }, --明眼青蛙
     monkey = { lvl = lvls[4], attract = nil, loot = { boneshard = 1 } }, --穴居猴
     bird_mutant = { lvl = lvls[4], attract = nil, loot = { boneshard = 1 } }, --月盲乌鸦
     bird_mutant_spitter = { lvl = lvls[4], attract = nil, loot = { boneshard = 1 } }, --奇形鸟

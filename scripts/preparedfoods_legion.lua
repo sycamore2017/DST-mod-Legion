@@ -372,10 +372,10 @@ local foods_legion = {
     },
     dish_fleshnapoleon = { --真果拿破仑
         test = function(cooker, names, tags)
-            return ((names.wormlight_lesser and names.wormlight_lesser > 1) or names.wormlight)
-                and not tags.meat and not tags.inedible and not tags.frozen
+            return ((names.wormlight_lesser and names.wormlight_lesser >= 2) or names.wormlight) and names.foliage
+                and not tags.meat
         end,
-        card_def = { ingredients = { {"wormlight_lesser",2}, {"cutlichen",2} } },
+        card_def = { ingredients = { {"wormlight_lesser",2}, {"foliage",1}, {"twigs",1} } },
         priority = priority_med,
         foodtype = FOODTYPE.GOODIES,
         hunger = 25, sanity = 10, health = 12,
@@ -389,8 +389,8 @@ local foods_legion = {
             eater:AddDebuff("buff_radiantskin", "buff_radiantskin")
         end,
 
-        cook_need = "发光浆果/小发光浆果>1",
-        cook_cant = "肉度 非食 冰度",
+        cook_need = "小发光浆果≥2/发光浆果 蕨叶",
+        cook_cant = "肉度",
         recipe_count = 6
     },
     dish_beggingmeat = { --叫花焖肉

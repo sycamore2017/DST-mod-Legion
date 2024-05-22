@@ -326,7 +326,7 @@ MakeFx({ --粉色追猎：飞溅花瓣
         inst.AnimState:PlayAnimation("hit")
         inst.AnimState:SetFinalOffset(1)
     end,
-    fn_remove = nil,
+    fn_remove = nil
 })
 MakeFx({ --铁艺兰珊：飞溅花瓣
     name = "impact_orchid_fx_marble",
@@ -341,7 +341,7 @@ MakeFx({ --铁艺兰珊：飞溅花瓣
         inst.AnimState:PlayAnimation("hit")
         inst.AnimState:SetFinalOffset(1)
     end,
-    fn_remove = nil,
+    fn_remove = nil
 })
 MakeFx({ --永不凋零：损坏自己庇佑玩家的特效
     name = "neverfade_shield",

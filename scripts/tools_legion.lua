@@ -375,10 +375,10 @@ local function OnSnowCoveredChagned(inst, covered)
         inst.AnimState:OverrideSymbol("snow", "snow_legion", "emptysnow")
     end
 end
-local function MakeSnowCovered_comm(inst)
-    inst.AnimState:OverrideSymbol("snow", "snow_legion", "emptysnow")
-    --动画制作中，需要添加“snow”的通道
-end
+-- local function MakeSnowCovered_comm(inst)
+--     inst.AnimState:OverrideSymbol("snow", "snow_legion", "emptysnow")
+--     --动画制作中，需要添加“snow”的通道
+-- end
 local function MakeSnowCovered_serv(inst, delaytime, delayfn)
     inst:WatchWorldState("issnowcovered", OnSnowCoveredChagned)
     inst:DoTaskInTime(delaytime, function(inst)
@@ -1128,7 +1128,7 @@ end
 
 -- local TOOLS_L = require("tools_legion")
 fns = {
-	MakeSnowCovered_comm = MakeSnowCovered_comm,
+	-- MakeSnowCovered_comm = MakeSnowCovered_comm,
 	MakeSnowCovered_serv = MakeSnowCovered_serv,
 	IsTooDarkToGrow = IsTooDarkToGrow,
     CallPlantDefender = CallPlantDefender,

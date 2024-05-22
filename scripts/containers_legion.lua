@@ -5,13 +5,6 @@ local containers = require("containers")
 --[[ 容器数据设定 ]]
 --------------------------------------------------------------------------
 
-local showmeneed = {
-    "backcub", "beefalo", "giantsfoot",
-    "hiddenmoonlight", "revolvedmoonlight", "revolvedmoonlight_pro",
-    "boltwingout", "plant_nepenthes_l",
-    "chest_whitewood", "chest_whitewood_big",
-    "siving_suit_gold"
-}
 local params = {}
 
 local function TestContainer_base(container, item, slot)
@@ -204,7 +197,6 @@ local function MakeSkin_revolvedmoonlight(data)
         end
     end
     params[name].itemtestfn = TestContainer_base
-    table.insert(showmeneed, name)
 
     name = "revolvedmoonlight_pro_"..data.skin
     params[name] = {
@@ -225,7 +217,6 @@ local function MakeSkin_revolvedmoonlight(data)
         table.insert(params[name].widget.slotpos, Vector3(-122 + 225, (-77*y) + 80 - (y*2), 0))
     end
     params[name].itemtestfn = TestContainer_base
-    table.insert(showmeneed, name)
 end
 MakeSkin_revolvedmoonlight({ skin = "taste" })
 MakeSkin_revolvedmoonlight({ skin = "taste2" })
@@ -541,6 +532,15 @@ params = nil
 --------------------------------------------------------------------------
 
 ------以下代码参考自风铃草大佬的穹妹------
+
+local showmeneed = { --这里的名字是指容器所属预制物的名字，不是指容器本身的名字
+    "backcub", "beefalo", "giantsfoot",
+    "hiddenmoonlight", "hiddenmoonlight_inf", "revolvedmoonlight", "revolvedmoonlight_pro",
+    "boltwingout", "plant_nepenthes_l",
+    "chest_whitewood", "chest_whitewood_big", "chest_whitewood_inf", "chest_whitewood_big_inf",
+    "siving_suit_gold"
+}
+
 --showme优先级如果比本mod高，那么这部分代码会生效
 for k, mod in pairs(ModManager.mods) do
     if mod and _G.rawget(mod, "SHOWME_STRINGS") then --showme特有的全局变量
@@ -548,7 +548,7 @@ for k, mod in pairs(ModManager.mods) do
             mod.postinitfns and mod.postinitfns.PrefabPostInit and
             mod.postinitfns.PrefabPostInit.treasurechest
         then
-            for _,v in ipairs(showmeneed) do
+            for _, v in ipairs(showmeneed) do
 				mod.postinitfns.PrefabPostInit[v] = mod.postinitfns.PrefabPostInit.treasurechest
 			end
         end
@@ -561,3 +561,5 @@ TUNING.MONITOR_CHESTS = TUNING.MONITOR_CHESTS or {}
 for _, v in ipairs(showmeneed) do
 	TUNING.MONITOR_CHESTS[v] = true
 end
+
+showmeneed = nil
