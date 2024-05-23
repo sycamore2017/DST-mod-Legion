@@ -57,19 +57,15 @@ local InventoryPrefabsList = {  --每个元素的下标值为每种物品栏图�
     mint_l = 1,
     --56
 
-    -- squamousfruit = 3,
-    -- refractedmoonlight = 3,
-    -- refractedmoonlight2 = 3,
+    dish_mushedeggs = 3,
     fimbul_axe = 3,
     backcub = 3,
-    -- dish_merrychristmassalad = 3,
     dualwrench = 3,
     tourmalinecore = 3,
     tourmalineshard = 3,
     icire_rock1 = 3,
     icire_rock2 = 3,
     icire_rock3 = 3,
-    --50
     icire_rock4 = 3,
     icire_rock5 = 3,
     guitar_miguel = 3,
@@ -78,9 +74,9 @@ local InventoryPrefabsList = {  --每个元素的下标值为每种物品栏图�
     shyerry = 3,
     shyerry_cooked = 3,
     shyerrylog = 3,
-    -- farmingdungball_item = 3,
+    -- farmingdungball_item = 3, --旧物品，留作纪念
     pineananas = 3,
-    --60
+    --?
 
     pineananas_cooked = 4,
     pineananas_seeds = 4,

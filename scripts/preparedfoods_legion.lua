@@ -381,12 +381,12 @@ local foods_legion = {
         hunger = 25, sanity = 10, health = 12,
         perishtime = TUNING.PERISH_SLOW, --15天
         cooktime = 2.5,
-        potlevel = "low",
-        float = { nil, "small", 0.2, 0.9 },
-        prefabs = { "buff_radiantskin" },
+        -- potlevel = "low",
+        float = { 0.02, "small", 0.2, 1.2 },
+        prefabs = { "buff_l_radiantskin" },
         oneatenfn = function(inst, eater)
             eater.time_l_radiantskin = { add = TUNING.SEG_TIME*16, max = TUNING.SEG_TIME*30 }
-            eater:AddDebuff("buff_radiantskin", "buff_radiantskin")
+            eater:AddDebuff("buff_l_radiantskin", "buff_l_radiantskin")
         end,
 
         cook_need = "小发光浆果≥2/发光浆果 蕨叶",
@@ -702,6 +702,34 @@ local foods_legion = {
         cook_need = "蔷薇花瓣 告密的心",
         cook_cant = "怪物度",
         recipe_count = 6
+    },
+    dish_mushedeggs = { --双菇烩蛋
+        test = function(cooker, names, tags)
+            return ((names.tallbirdegg or 0) + (names.tallbirdegg_cooked or 0)) >= 2
+                and (
+                    ((names.red_cap or names.red_cap_cooked) and 1 or 0) +
+                    ((names.green_cap or names.green_cap_cooked) and 1 or 0) +
+                    ((names.blue_cap or names.blue_cap_cooked) and 1 or 0) +
+                    ((names.moon_cap or names.moon_cap_cooked) and 1 or 0) +
+                    ((names.albicans_cap or names.albicans_cap_cooked) and 1 or 0)
+                ) >= 2
+        end,
+        card_def = { ingredients = { {"tallbirdegg",2}, {"red_cap",1}, {"blue_cap",1} } },
+        priority = priority_med,
+        foodtype = FOODTYPE.GOODIES,
+        hunger = 75, sanity = 10, health = 0,
+        perishtime = TUNING.PERISH_FAST, --6天
+        cooktime = 0.5,
+        potlevel = "low",
+        float = { 0.02, "small", 0.2, 1.1 },
+        prefabs = { "buff_l_effortluck" },
+        oneatenfn = function(inst, eater)
+            eater:AddDebuff("buff_l_effortluck", "buff_l_effortluck")
+        end,
+
+        cook_need = "(烤)高脚鸟蛋≥2 蘑菇种类≥2",
+        cook_cant = nil,
+        recipe_count = 5
     },
     ------花香四溢
     dish_chilledrosejuice = { --蔷薇冰果汁

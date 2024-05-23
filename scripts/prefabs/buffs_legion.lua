@@ -26,6 +26,11 @@ local function CheckOppositeBuff(buff, target) --去除相克的buff，不让某
         end
     end
 end
+local function EndBuffSafely(buff)
+    buff:DoTaskInTime(0, function(fx) --下一帧再执行，不然加buff的函数里移除buff可能会崩
+        fx.components.debuff:Stop()
+    end)
+end
 
 local function StartTimer_attach(buff, target, timekey, timedefault)
     --因为是新加buff，不需要考虑buff时间问题
@@ -84,7 +89,53 @@ local function StartTimer_extend(buff, target, timekey, timedefault)
     end
 end
 
-local function Attached_timer(inst, target, ...)
+local function UpdateCount(buff, target, sets)
+    if buff._count_load_l ~= nil then --onsave比这里先加载
+        buff._count_l = buff._count_load_l
+        buff._count_load_l = nil
+        if buff._count_l == 0 then
+            EndBuffSafely(buff)
+        end
+        return
+    end
+
+    local now = buff._count_l or 0
+    local setsbase = buff._dd.sets
+    if sets == nil then
+        sets = setsbase
+    end
+    if sets.add ~= nil then --增加型：在已有数值上增加，可设置最大数值限制
+        local max = sets.max or setsbase.max
+        now = now + sets.add
+        if max ~= nil and now >= max then
+            now = max
+        end
+    elseif sets.replace ~= nil then --替换型：不管已有数值，直接覆盖
+        now = sets.replace
+    elseif sets.replace_min ~= nil then --最小替换型：若 已有数值<设定数值 时才设置新数值
+        if now < sets.replace_min then
+            now = sets.replace_min
+        end
+    end
+    buff._count_l = now
+    if now == 0 then
+        EndBuffSafely(buff)
+    end
+end
+local function OnSave_count(buff, data)
+    if buff._count_l ~= nil then
+        data._count_l = buff._count_l
+    end
+end
+local function OnLoad_count(buff, data, newents)
+    if data ~= nil then
+        if data._count_l ~= nil then
+            buff._count_load_l = data._count_l
+        end
+    end
+end
+
+local function Attached_timer(inst, target, followsymbol, followoffset, sets, ...)
     inst.entity:SetParent(target.entity)
     inst.Transform:SetPosition(0, 0, 0) --in case of loading
     inst:ListenForEvent("death", function(owner, data)
@@ -94,7 +145,7 @@ local function Attached_timer(inst, target, ...)
     local data = inst._dd
     StartTimer_attach(inst, target, data.time_key, data.time_default)
     if data.fn_start ~= nil then
-        data.fn_start(inst, target, ...)
+        data.fn_start(inst, target, followsymbol, followoffset, sets, ...)
     end
 end
 local function Detached_timer(inst, target, ...)
@@ -103,11 +154,11 @@ local function Detached_timer(inst, target, ...)
     end
     inst:Remove()
 end
-local function Extended_timer(inst, target, ...)
+local function Extended_timer(inst, target, followsymbol, followoffset, sets, ...)
     local data = inst._dd
     StartTimer_extend(inst, target, data.time_key, data.time_default)
     if data.fn_again ~= nil then
-        data.fn_again(inst, target, ...)
+        data.fn_again(inst, target, followsymbol, followoffset, sets, ...)
     end
 end
 local function OnTimerDone(inst, data)
@@ -128,7 +179,7 @@ local function InitTimerBuff(inst)
     inst:ListenForEvent("timerdone", OnTimerDone)
 end
 
-local function Attached_notimer(inst, target, ...)
+local function Attached_notimer(inst, target, followsymbol, followoffset, sets, ...)
     inst.entity:SetParent(target.entity)
     inst.Transform:SetPosition(0, 0, 0) --in case of loading
     inst:ListenForEvent("death", function(owner, data)
@@ -136,7 +187,7 @@ local function Attached_notimer(inst, target, ...)
     end, target)
 
     if inst._dd.fn_start ~= nil then
-        inst._dd.fn_start(inst, target, ...)
+        inst._dd.fn_start(inst, target, followsymbol, followoffset, sets, ...)
     end
 end
 local function Detached_notimer(inst, target, ...)
@@ -145,9 +196,9 @@ local function Detached_notimer(inst, target, ...)
     end
     inst:Remove()
 end
-local function Extended_notimer(inst, target, ...)
+local function Extended_notimer(inst, target, followsymbol, followoffset, sets, ...)
     if inst._dd.fn_again ~= nil then
-        inst._dd.fn_again(inst, target, ...)
+        inst._dd.fn_again(inst, target, followsymbol, followoffset, sets, ...)
     end
 end
 local function InitNoTimerBuff(inst)
@@ -229,11 +280,6 @@ end
 
 local function IsAlive(inst)
     return inst.components.health ~= nil and not inst.components.health:IsDead() and not inst:HasTag("playerghost")
-end
-local function EndBuffSafely(buff)
-    buff:DoTaskInTime(0, function(fx) --下一帧再执行，不然加buff的函数里移除buff可能会崩
-        fx.components.debuff:Stop()
-    end)
 end
 
 --------------------------------------------------------------------------
@@ -411,7 +457,7 @@ MakeBuff({
                 inst.flyskins = data.flyskins
             end
         end
-    end,
+    end
 })
 
 --------------------------------------------------------------------------
@@ -1113,7 +1159,7 @@ local function BuffSet_radiant(buff, target)
 end
 
 MakeBuff({
-    name = "buff_radiantskin",
+    name = "buff_l_radiantskin",
     assets = nil,
     prefabs = nil,
     time_key = "time_l_radiantskin",
@@ -1218,6 +1264,33 @@ MakeBuff({
     fn_end = function(buff, target)
         BuffTalk_end(target, buff)
         TOOLS_L.RemoveEntValue(target, "siv_blood_l_reducer", "buff_l_sivbloodreduce", 1)
+    end
+})
+
+--------------------------------------------------------------------------
+--[[ 好事多蘑：增加稀有掉落物的掉落概率 ]]
+--------------------------------------------------------------------------
+
+MakeBuff({
+    name = "buff_l_effortluck",
+    assets = nil,
+    prefabs = nil,
+    sets = { add = 1, max = 3 },
+    notimer = true,
+    fn_start = function(buff, target, followsymbol, followoffset, sets)
+        BuffTalk_start(target, buff)
+        UpdateCount(buff, target, sets)
+    end,
+    fn_again = function(buff, target, followsymbol, followoffset, sets)
+        BuffTalk_start(target, buff)
+        UpdateCount(buff, target, sets)
+    end,
+    fn_end = function(buff, target)
+        BuffTalk_end(target, buff)
+    end,
+    fn_server = function(buff)
+        buff.OnSave = OnSave_count
+        buff.OnLoad = OnLoad_count
     end
 })
 
