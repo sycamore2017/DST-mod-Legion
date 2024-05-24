@@ -159,50 +159,11 @@ end
 local function OnEquip_never(inst, owner) --装备武器时
     ChangeSymbol_never(inst, owner)
     OnEquip_base(inst, owner)
-
     inst.components.deployable:SetDeployMode(DEPLOYMODE.NONE) --装备时去除可栽种功能
-
-    if owner:HasTag("equipmentmodel") then return end --假人
-
-    if not inst.hassetbroken then
-        if owner.components.health ~= nil then
-            inst.healthredirect_old = owner.components.health.redirect --记下原有的函数，方便以后恢复
-            owner.components.health.redirect = function(ow, amount, overtime, cause, ignore_invincible, afflicter, ignore_absorb)
-                local self = ow.components.health
-
-                if not ignore_invincible and (self.invincible or self.inst.is_teleporting) then --无敌
-                    return true
-                elseif amount < 0 then --是伤害，不是恢复
-                    if not ignore_absorb then --不忽略对伤害的吸收，则进行吸收的计算
-                        amount = amount - amount * (self.playerabsorb ~= 0 and afflicter ~= nil and afflicter:HasTag("player") and self.playerabsorb + self.absorb or self.absorb)
-                    end
-
-                    if self.currenthealth > 0 and self.currenthealth + amount <= 0 then --刚好死掉
-                        inst.components.finiteuses:Use(uses_never) --直接坏掉，以此来保住持有者生命
-
-                        local fx = SpawnPrefab("neverfade_shield") --护盾特效
-                        fx.entity:SetParent(ow.entity)
-
-                        return true
-                    end
-                end
-
-                --如果上面的条件都不满足，就直接返回原来的函数
-                if inst.healthredirect_old ~= nil then
-                    return inst.healthredirect_old(ow, amount, overtime, cause, ignore_invincible, afflicter, ignore_absorb)
-                end
-            end
-        end
-    end
+    -- if owner:HasTag("equipmentmodel") then return end --假人
 end
 local function OnUnequip_never(inst, owner) --放下武器时
     OnUnequip_base(inst, owner)
-    if not inst.hassetbroken then
-        if owner.components.health ~= nil then
-            owner.components.health.redirect = inst.healthredirect_old
-        end
-        inst.healthredirect_old = nil
-    end
     inst.components.deployable:SetDeployMode(DEPLOYMODE.PLANT) --卸下时恢复可摆栽种功能
 end
 
@@ -227,7 +188,7 @@ local function OnAttack_never(inst, owner, target)
                 if inst._dd ~= nil then
                     owner.butterfly_skin_l = inst._dd.butterfly
                 end
-                owner:AddDebuff("buff_butterflysblessing", "buff_butterflysblessing")
+                owner:AddDebuff("buff_l_butterflybless", "buff_l_butterflybless")
                 inst.atkcounter = 0
             end
         end
@@ -246,13 +207,7 @@ local function OnFinished_never(inst)
             local owner = inst.components.inventoryitem.owner
             if owner ~= nil then
                 ChangeSymbol_never(inst, owner)
-
-                if owner.components.health ~= nil then
-                    owner.components.health.redirect = inst.healthredirect_old
-                end
-                inst.healthredirect_old = nil
-
-                if owner.SoundEmitter ~= nil then   --发出破碎的声音
+                if owner.SoundEmitter ~= nil then --发出破碎的声音
                     owner.SoundEmitter:PlaySound("dontstarve/common/together/moonbase/repair")
                 end
             end
@@ -340,7 +295,6 @@ table.insert(prefs, Prefab("neverfade", function()
 
     inst.hassetbroken = false
     inst.atkcounter = 0
-    inst.healthredirect_old = nil
     inst.foliageath_data = foliageath_data_never
 
     Fn_server(inst, "neverfade", OnEquip_never, OnUnequip_never)
@@ -362,7 +316,7 @@ end, GetAssets("neverfade", {
     Asset("IMAGE", "images/inventoryimages/neverfade_broken.tex"),
     Asset("ATLAS_BUILD", "images/inventoryimages/neverfade_broken.xml", 256)
 }), {
-    "neverfadebush", "neverfade_shield", "buff_butterflysblessing"
+    "neverfadebush", "buff_l_butterflybless"
 }))
 
 --------------------------------------------------------------------------

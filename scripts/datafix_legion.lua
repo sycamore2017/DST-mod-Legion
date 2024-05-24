@@ -1296,7 +1296,7 @@ local function OnMurdered_player(inst, data)
         data.victim:fn_murdered_l()
     end
 end
-local function FnInv_ApplyDamage(self, damage, attacker, weapon, spdamage, ...)
+local function inventory_ApplyDamage_player(self, damage, attacker, weapon, spdamage, ...)
     if damage >= 0 or spdamage ~= nil then
         local player = self.inst
         --盾反
@@ -1317,12 +1317,9 @@ local function FnInv_ApplyDamage(self, damage, attacker, weapon, spdamage, ...)
             end
         end
         --蝴蝶庇佑
-        if player.countblessing ~= nil and player.countblessing > 0 then
-            local mybuff = player.components.debuffable:GetDebuff("buff_butterflysblessing")
-            if mybuff and mybuff.countbutterflies ~= nil and mybuff.countbutterflies > 0 then
-                mybuff.DeleteButterfly(mybuff, player)
-                return 0
-            end
+        if player.legionfn_butterflyblessed ~= nil then
+            player.legionfn_butterflyblessed(player)
+            return 0
         end
         --金蝉脱壳
         if
@@ -1377,16 +1374,16 @@ local function FnInv_ApplyDamage(self, damage, attacker, weapon, spdamage, ...)
             return damage, spdamage
         end
     end
-    if self.inst.inventory_ApplyDamage_l ~= nil then
-        return self.inst.inventory_ApplyDamage_l(self, damage, attacker, weapon, spdamage, ...)
+    if self.ApplyDamage_legion ~= nil then
+        return self.ApplyDamage_legion(self, damage, attacker, weapon, spdamage, ...)
     end
     return 0
 end
-local function FnPin_Stick(self, ...)
-    if self.inst.shield_l_success or self.Stick_l_shield == nil then
+local function pinnable_Stick_player(self, ...)
+    if self.inst.shield_l_success or self.Stick_legion == nil then
         return
     end
-    return self.Stick_l_shield(self, ...)
+    return self.Stick_legion(self, ...)
 end
 local function OnSave_player(inst, data)
     if inst._contracts_l ~= nil and inst._contracts_l:IsValid() then
@@ -1400,13 +1397,13 @@ local function OnSave_player(inst, data)
     elseif inst.contracts_record_l ~= nil then
         data.contracts_l = inst.contracts_record_l
     end
-    if inst.OnSave_l_base ~= nil then --OnSave是可能有返回的
-        return inst.OnSave_l_base(inst, data)
+    if inst.OnSave_legion ~= nil then --OnSave是可能有返回的
+        return inst.OnSave_legion(inst, data)
     end
 end
 local function OnLoad_player(inst, data, ...)
-    if inst.OnLoad_l_base ~= nil then
-        inst.OnLoad_l_base(inst, data, ...)
+    if inst.OnLoad_legion ~= nil then
+        inst.OnLoad_legion(inst, data, ...)
     end
     if data == nil then
         return
@@ -1434,8 +1431,8 @@ local function OnLoad_player(inst, data, ...)
 end
 local function SaveForReroll_player(inst, ...)
     local data
-    if inst.SaveForReroll_l_base ~= nil then
-        data = inst.SaveForReroll_l_base(inst, ...)
+    if inst.SaveForReroll_legion ~= nil then
+        data = inst.SaveForReroll_legion(inst, ...)
     end
     if inst.components.eater ~= nil and inst.components.eater.lovemap_l ~= nil then
         if data == nil then
@@ -1447,12 +1444,49 @@ local function SaveForReroll_player(inst, ...)
     return data
 end
 local function LoadForReroll_player(inst, data, ...)
-    if inst.LoadForReroll_l_base ~= nil then
-        inst.LoadForReroll_l_base(inst, data, ...)
+    if inst.LoadForReroll_legion ~= nil then
+        inst.LoadForReroll_legion(inst, data, ...)
     end
     if data ~= nil and data.lovemap_l ~= nil and inst.components.eater ~= nil then
         inst.components.eater.lovemap_l = data.lovemap_l
     end
+end
+local function foodmemory_GetMemoryCount_player(self, ...)
+    if self.inst.legiontag_bestappetite then
+        return 0
+    elseif self.GetMemoryCount_legion ~= nil then
+        return self.GetMemoryCount_legion(self, ...)
+    end
+end
+local function eater_PrefersToEat_player(self, food, ...)
+    if self.inst.legiontag_bestappetite then
+        -- if food.prefab ~= "winter_food4" then end --永恒水果蛋糕也能吃了！哈哈哈
+        -- self.nospoiledfood --忽略了这个逻辑，维克波顿就可以吃不新鲜的食物了
+        -- self.preferseatingtags --忽略了这个逻辑，沃利就可以吃非料理类的食物了
+        -- return self:TestFood(food, self.preferseating) --这里需要改成caneat，不能按照喜好来
+        return self:TestFood(food, self.caneat)
+    end
+    if self.PrefersToEat_legion ~= nil then
+        return self.PrefersToEat_legion(self, food, ...)
+    end
+end
+local function eater_modmultfn_player(inst, health_v, hunger_v, sanity_v, food, feeder, ...)
+    local eatercpt = inst.components.eater
+    if eatercpt.modmultfn_legion ~= nil then
+        health_v, hunger_v, sanity_v = eatercpt.modmultfn_legion(inst, health_v, hunger_v, sanity_v, food, feeder, ...)
+    end
+    if inst.legiontag_bestappetite then
+        if health_v ~= 0 and eatercpt.healthabsorption < 1 and eatercpt.healthabsorption > 0 then
+            health_v = health_v / eatercpt.healthabsorption
+        end
+        if hunger_v ~= 0 and eatercpt.hungerabsorption < 1 and eatercpt.hungerabsorption > 0 then
+            hunger_v = hunger_v / eatercpt.hungerabsorption
+        end
+        if sanity_v ~= 0 and eatercpt.sanityabsorption < 1 and eatercpt.sanityabsorption > 0 then
+            sanity_v = sanity_v / eatercpt.sanityabsorption
+        end
+    end
+    return health_v, hunger_v, sanity_v
 end
 
 AddPlayerPostInit(function(inst)
@@ -1469,81 +1503,55 @@ AddPlayerPostInit(function(inst)
 
     if not IsServer then return end
 
-    --香蕉慕斯的好胃口buff兼容化
-    local pickyeaters = {
-        wathgrithr = true,
-        warly = true
-    }
-    if inst.components.debuffable ~= nil and pickyeaters[inst.prefab] then
-        if inst.components.foodmemory ~= nil then
-            local GetFoodMultiplier_old = inst.components.foodmemory.GetFoodMultiplier
-            inst.components.foodmemory.GetFoodMultiplier = function(self, ...)
-                if inst.buffon_l_bestappetite then
-                    return 1
-                elseif GetFoodMultiplier_old ~= nil then
-                    return GetFoodMultiplier_old(self, ...)
-                end
-            end
-
-            local GetMemoryCount_old = inst.components.foodmemory.GetMemoryCount
-            inst.components.foodmemory.GetMemoryCount = function(self, ...)
-                if inst.buffon_l_bestappetite then
-                    return 0
-                elseif GetMemoryCount_old ~= nil then
-                    return GetMemoryCount_old(self, ...)
-                end
-            end
+    --好胃口buff的兼容
+    if inst.components.foodmemory ~= nil and inst.components.foodmemory.GetMemoryCount_legion == nil then
+        inst.components.foodmemory.GetMemoryCount_legion = inst.components.foodmemory.GetMemoryCount
+        inst.components.foodmemory.GetMemoryCount = foodmemory_GetMemoryCount_player
+    end
+    if inst.components.eater ~= nil then
+        if inst.components.eater.PrefersToEat_legion == nil then
+            inst.components.eater.PrefersToEat_legion = inst.components.eater.PrefersToEat
+            inst.components.eater.PrefersToEat = eater_PrefersToEat_player
         end
-
-        if inst.components.eater ~= nil then
-            local PrefersToEat_old = inst.components.eater.PrefersToEat
-            inst.components.eater.PrefersToEat = function(self, food, ...)
-                if food.prefab == "winter_food4" then
-                    --V2C: fruitcake hack. see how long this code stays untouched - _-"
-                    return false
-                elseif inst.buffon_l_bestappetite then
-                    -- return self:TestFood(food, self.preferseating) --这里需要改成caneat，不能按照喜好来
-                    return self:TestFood(food, self.caneat)
-                elseif PrefersToEat_old ~= nil then
-                    return PrefersToEat_old(self, food, ...)
-                end
-            end
+        if inst.legiontag_eater_modmultfn == nil then
+            inst.legiontag_eater_modmultfn = true
+            inst.components.eater.modmultfn_legion = inst.components.eater.custom_stats_mod_fn
+            inst.components.eater.custom_stats_mod_fn = eater_modmultfn_player
         end
     end
-    pickyeaters = nil
 
     --受击修改
-    if inst.inventory_ApplyDamage_l == nil and inst.components.inventory ~= nil then
-        inst.inventory_ApplyDamage_l = inst.components.inventory.ApplyDamage
-        inst.components.inventory.ApplyDamage = FnInv_ApplyDamage
+    if inst.components.inventory ~= nil and inst.components.inventory.ApplyDamage_legion == nil then
+        inst.components.inventory.ApplyDamage_legion = inst.components.inventory.ApplyDamage
+        inst.components.inventory.ApplyDamage = inventory_ApplyDamage_player
     end
 
     --盾反成功能防止被鼻涕黏住
-    if inst.components.pinnable ~= nil and inst.components.pinnable.Stick_l_shield == nil then
-        inst.components.pinnable.Stick_l_shield = inst.components.pinnable.Stick
-        inst.components.pinnable.Stick = FnPin_Stick
+    if inst.components.pinnable ~= nil and inst.components.pinnable.Stick_legion == nil then
+        inst.components.pinnable.Stick_legion = inst.components.pinnable.Stick
+        inst.components.pinnable.Stick = pinnable_Stick_player
     end
 
     --谋杀生物时(一般是指物品栏里的)
     inst:ListenForEvent("murdered", OnMurdered_player)
 
     --在换角色时保存爱的喂养记录
-    if inst.SaveForReroll_l_base == nil then
-        inst.SaveForReroll_l_base = inst.SaveForReroll
+    if inst.SaveForReroll_legion == nil then
+        inst.SaveForReroll_legion = inst.SaveForReroll
         inst.SaveForReroll = SaveForReroll_player
     end
-    if inst.LoadForReroll_l_base == nil then
-        inst.LoadForReroll_l_base = inst.LoadForReroll
+    if inst.LoadForReroll_legion == nil then
+        inst.LoadForReroll_legion = inst.LoadForReroll
         inst.LoadForReroll = LoadForReroll_player
     end
 
     --下线时记录灵魂契约数据
-    if inst.OnSave_l_base == nil then
-        inst.OnSave_l_base = inst.OnSave
+    if inst.OnSave_legion == nil then
+        inst.OnSave_legion = inst.OnSave
         inst.OnSave = OnSave_player
     end
-    if inst.OnLoad_l_base == nil then
-        inst.OnLoad_l_base = inst.OnLoad
+    if inst.OnLoad_legion == nil then
+        inst.OnLoad_legion = inst.OnLoad
         inst.OnLoad = OnLoad_player
     end
 end)

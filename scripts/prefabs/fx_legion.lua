@@ -343,32 +343,6 @@ MakeFx({ --铁艺兰珊：飞溅花瓣
     end,
     fn_remove = nil
 })
-MakeFx({ --永不凋零：损坏自己庇佑玩家的特效
-    name = "neverfade_shield",
-    assets = {
-        Asset("ANIM", "anim/stalker_shield.zip"), --官方影织者护盾动画模板
-        Asset("ANIM", "anim/neverfade_shield.zip"),
-    },
-    fn_common = nil,
-    fn_anim = function(inst)
-        inst.entity:AddSoundEmitter()
-        inst:DoTaskInTime(0, function(inst)
-            inst.SoundEmitter:PlaySound("dontstarve/creatures/together/stalker/shield")
-        end)
-
-        inst.AnimState:SetBank("stalker_shield")
-        inst.AnimState:SetBuild("neverfade_shield")
-        -- inst.AnimState:PlayAnimation("idle"..tostring(math.random(1, 3)))
-        inst.AnimState:PlayAnimation("idle1")   --原图太大了，所以我去除了多余的贴图，只用了这个动画里的贴图
-        -- inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
-        -- inst.AnimState:SetSortOrder(1)
-        -- inst.AnimState:SetScale(1.5, 1.5)
-        -- inst.AnimState:SetMultColour(140/255, 239/255, 255/255, 1)
-        inst.AnimState:SetScale(Vector3(-1, 1, 1):Get())
-        inst.AnimState:SetFinalOffset(2)
-    end,
-    fn_remove = nil,
-})
 -- MakeFx({ --施咒蔷薇：火花爆炸
 --     name = "rosorns_spell_fx",
 --     assets = {

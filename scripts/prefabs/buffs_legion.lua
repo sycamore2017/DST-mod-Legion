@@ -5,265 +5,11 @@ local TOOLS_L = require("tools_legion")
 --[[ 通用函数 ]]
 --------------------------------------------------------------------------
 
+local TIME_MAX = TUNING.SEG_TIME*30
 local oppositeBuffs = {
     buff_hungerretarder = { buff_oilflow = true },
     buff_oilflow = { buff_hungerretarder = true }
 }
-
-local function CheckOppositeBuff(buff, target) --去除相克的buff，不让某些buff同时存在
-    local nobuffs = oppositeBuffs[buff.prefab]
-    if nobuffs == nil then
-        return
-    end
-    local abuff
-    for k, _ in pairs(nobuffs) do
-        abuff = target:GetDebuff(k)
-        if abuff ~= nil then
-            if abuff.oppositefn_l ~= nil then
-                abuff.oppositefn_l(abuff, buff, target)
-            end
-            target:RemoveDebuff(k)
-        end
-    end
-end
-local function EndBuffSafely(buff)
-    buff:DoTaskInTime(0, function(fx) --下一帧再执行，不然加buff的函数里移除buff可能会崩
-        fx.components.debuff:Stop()
-    end)
-end
-
-local function StartTimer_attach(buff, target, timekey, timedefault)
-    --因为是新加buff，不需要考虑buff时间问题
-    if timekey == nil or target[timekey] == nil then
-        if not buff.components.timer:TimerExists("buffover") then --因为onsave比这里先加载，所以不能替换先加载的
-            buff.components.timer:StartTimer("buffover", timedefault)
-        end
-    else
-        if not buff.components.timer:TimerExists("buffover") then
-            local times = target[timekey]
-            if times.add ~= nil then
-                times = times.add
-            elseif times.replace ~= nil then
-                times = times.replace
-            elseif times.replace_min ~= nil then
-                times = times.replace_min
-            else
-                buff:DoTaskInTime(0, function()
-                    buff.components.debuff:Stop()
-                end)
-                target[timekey] = nil
-                return
-            end
-            buff.components.timer:StartTimer("buffover", times)
-        end
-        target[timekey] = nil
-    end
-end
-local function StartTimer_extend(buff, target, timekey, timedefault)
-    --因为是续加buff，需要考虑buff时间的更新方式
-    if timekey == nil or target[timekey] == nil then
-        buff.components.timer:StopTimer("buffover")
-        buff.components.timer:StartTimer("buffover", timedefault)
-    else
-        local times = target[timekey]
-        target[timekey] = nil
-        if times.add ~= nil then --增加型：在已有时间上增加，可设置最大时间限制
-            local timeleft = buff.components.timer:GetTimeLeft("buffover") or 0
-            timeleft = timeleft + times.add
-
-            if times.max ~= nil and timeleft > times.max then
-                timeleft = times.max
-            end
-            buff.components.timer:StopTimer("buffover")
-            buff.components.timer:StartTimer("buffover", timeleft)
-        elseif times.replace ~= nil then --替换型：不管已有时间，直接设置
-            buff.components.timer:StopTimer("buffover")
-            buff.components.timer:StartTimer("buffover", times.replace)
-        elseif times.replace_min ~= nil then --最小替换型：若已有时间<该时间时才设置新时间（比较建议的类型）
-            local timeleft = buff.components.timer:GetTimeLeft("buffover") or 0
-            if timeleft < times.replace_min then
-                buff.components.timer:StopTimer("buffover")
-                buff.components.timer:StartTimer("buffover", times.replace_min)
-            end
-        end
-    end
-end
-
-local function UpdateCount(buff, target, sets)
-    if buff._count_load_l ~= nil then --onsave比这里先加载
-        buff._count_l = buff._count_load_l
-        buff._count_load_l = nil
-        if buff._count_l == 0 then
-            EndBuffSafely(buff)
-        end
-        return
-    end
-
-    local now = buff._count_l or 0
-    local setsbase = buff._dd.sets
-    if sets == nil then
-        sets = setsbase
-    end
-    if sets.add ~= nil then --增加型：在已有数值上增加，可设置最大数值限制
-        local max = sets.max or setsbase.max
-        now = now + sets.add
-        if max ~= nil and now >= max then
-            now = max
-        end
-    elseif sets.replace ~= nil then --替换型：不管已有数值，直接覆盖
-        now = sets.replace
-    elseif sets.replace_min ~= nil then --最小替换型：若 已有数值<设定数值 时才设置新数值
-        if now < sets.replace_min then
-            now = sets.replace_min
-        end
-    end
-    buff._count_l = now
-    if now == 0 then
-        EndBuffSafely(buff)
-    end
-end
-local function OnSave_count(buff, data)
-    if buff._count_l ~= nil then
-        data._count_l = buff._count_l
-    end
-end
-local function OnLoad_count(buff, data, newents)
-    if data ~= nil then
-        if data._count_l ~= nil then
-            buff._count_load_l = data._count_l
-        end
-    end
-end
-
-local function Attached_timer(inst, target, followsymbol, followoffset, sets, ...)
-    inst.entity:SetParent(target.entity)
-    inst.Transform:SetPosition(0, 0, 0) --in case of loading
-    inst:ListenForEvent("death", function(owner, data)
-        inst.components.debuff:Stop()
-    end, target)
-
-    local data = inst._dd
-    StartTimer_attach(inst, target, data.time_key, data.time_default)
-    if data.fn_start ~= nil then
-        data.fn_start(inst, target, followsymbol, followoffset, sets, ...)
-    end
-end
-local function Detached_timer(inst, target, ...)
-    if inst._dd.fn_end ~= nil then
-        inst._dd.fn_end(inst, target, ...)
-    end
-    inst:Remove()
-end
-local function Extended_timer(inst, target, followsymbol, followoffset, sets, ...)
-    local data = inst._dd
-    StartTimer_extend(inst, target, data.time_key, data.time_default)
-    if data.fn_again ~= nil then
-        data.fn_again(inst, target, followsymbol, followoffset, sets, ...)
-    end
-end
-local function OnTimerDone(inst, data)
-    if data.name == "buffover" then
-        inst.components.debuff:Stop()
-        return
-    end
-    if inst._dd.fn_timerdone ~= nil then
-        inst._dd.fn_timerdone(inst, data)
-    end
-end
-local function InitTimerBuff(inst)
-    inst.components.debuff:SetAttachedFn(Attached_timer)
-    inst.components.debuff:SetDetachedFn(Detached_timer)
-    inst.components.debuff:SetExtendedFn(Extended_timer)
-
-    inst:AddComponent("timer")
-    inst:ListenForEvent("timerdone", OnTimerDone)
-end
-
-local function Attached_notimer(inst, target, followsymbol, followoffset, sets, ...)
-    inst.entity:SetParent(target.entity)
-    inst.Transform:SetPosition(0, 0, 0) --in case of loading
-    inst:ListenForEvent("death", function(owner, data)
-        inst.components.debuff:Stop()
-    end, target)
-
-    if inst._dd.fn_start ~= nil then
-        inst._dd.fn_start(inst, target, followsymbol, followoffset, sets, ...)
-    end
-end
-local function Detached_notimer(inst, target, ...)
-    if inst._dd.fn_end ~= nil then
-        inst._dd.fn_end(inst, target, ...)
-    end
-    inst:Remove()
-end
-local function Extended_notimer(inst, target, followsymbol, followoffset, sets, ...)
-    if inst._dd.fn_again ~= nil then
-        inst._dd.fn_again(inst, target, followsymbol, followoffset, sets, ...)
-    end
-end
-local function InitNoTimerBuff(inst)
-    inst.components.debuff:SetAttachedFn(Attached_notimer)
-    inst.components.debuff:SetDetachedFn(Detached_notimer)
-    inst.components.debuff:SetExtendedFn(Extended_notimer)
-end
-
-local function MakeBuff(data)
-	table.insert(prefs, Prefab(
-		data.name,
-		function()
-            local inst = CreateEntity()
-
-            if data.addnetwork then --带有网络组件
-                inst.entity:AddTransform()
-                inst.entity:AddNetwork()
-                -- inst.entity:Hide()
-                inst.persists = false
-
-                -- inst:AddTag("CLASSIFIED")
-                inst:AddTag("NOCLICK")
-                inst:AddTag("NOBLOCK")
-
-                if data.fn_common ~= nil then
-                    data.fn_common(inst)
-                end
-
-                inst.entity:SetPristine()
-                if not TheWorld.ismastersim then return inst end
-            else --无网络组件
-                if not TheWorld.ismastersim then
-                    --Not meant for client!
-                    inst:DoTaskInTime(0, inst.Remove)
-                    return inst
-                end
-                inst.entity:AddTransform()
-                --Non-networked entity
-                inst.entity:Hide()
-                inst.persists = false
-                inst:AddTag("CLASSIFIED")
-            end
-
-            inst._dd = data
-
-            inst:AddComponent("debuff")
-            inst.components.debuff.keepondespawn = true
-            if data.notimer then
-                InitNoTimerBuff(inst)
-            else
-                InitTimerBuff(inst)
-            end
-
-            if data.fn_server ~= nil then
-                data.fn_server(inst)
-            end
-
-            return inst
-		end,
-		data.assets,
-		data.prefabs
-	))
-end
-
------
 
 local function BuffTalk_start(target, buff)
     if not target:HasTag("player") then
@@ -281,31 +27,270 @@ end
 local function IsAlive(inst)
     return inst.components.health ~= nil and not inst.components.health:IsDead() and not inst:HasTag("playerghost")
 end
+local function CheckOppositeBuff(buff, target) --去除相克的buff，不让某些buff同时存在
+    local nobuffs = oppositeBuffs[buff.prefab]
+    if nobuffs == nil then
+        return
+    end
+    local abuff
+    for k, _ in pairs(nobuffs) do
+        abuff = target:GetDebuff(k)
+        if abuff ~= nil then
+            if abuff.oppositefn_l ~= nil then
+                abuff.oppositefn_l(abuff, buff, target)
+            end
+            target:RemoveDebuff(k)
+        end
+    end
+end
+local function EndBuffSafely(buff)
+    if buff.task_l_end ~= nil then
+        return
+    end
+    buff.task_l_end = buff:DoTaskInTime(0, function(fx) --下一帧再执行，不然加buff的函数里移除buff可能会崩
+        fx.components.debuff:Stop()
+    end)
+end
+
+local function UpdateCount(buff, target, sets)
+    if buff._count_load_l ~= nil then --onsave比这里先加载
+        buff._count_l = buff._count_load_l
+        buff._count_load_l = nil
+        if buff._count_l <= 0 then
+            EndBuffSafely(buff)
+        end
+        return
+    end
+
+    local now = buff._count_l or 0
+    local setsbase = buff._dd.sets
+    if sets == nil then
+        sets = setsbase
+    end
+    if sets.add ~= nil then --增加型：在已有数值上增加，可设置最大数值限制
+        local max = sets.max
+        if setsbase.max ~= nil then
+            if max == nil or max > setsbase.max then --临时设置的最大值不能大于原本的最大值
+                max = setsbase.max
+            end
+        end
+        now = now + sets.add
+        if max ~= nil and now > max then
+            now = max
+        end
+    elseif sets.replace ~= nil then --替换型：不管已有数值，直接覆盖
+        now = sets.replace
+    elseif sets.replace_min ~= nil then --最小替换型：若 已有数值<设定数值 时才设置新数值
+        if now < sets.replace_min then
+            now = sets.replace_min
+        end
+    end
+    buff._count_l = now
+    if now <= 0 then
+        EndBuffSafely(buff)
+    end
+end
+local function OnSave_count(buff, data)
+    if buff._count_l ~= nil then
+        data._count_l = buff._count_l
+    end
+end
+local function OnLoad_count(buff, data, newents)
+    if data ~= nil then
+        if data._count_l ~= nil then
+            buff._count_load_l = data._count_l
+        end
+    end
+end
+
+local function TimerAttach(buff, target, sets)
+    if buff.components.timer:TimerExists("buffover") then --因为onsave比这里先加载，所以不能替换先加载的
+        return
+    end
+
+    local now = 0
+    local setsbase = buff._dd.sets
+    if sets == nil then
+        sets = setsbase
+    end
+
+    --因为是新加buff，不需要考虑buff时间问题
+    if sets.add ~= nil then --增加型
+        local max = sets.max
+        if setsbase.max ~= nil then
+            if max == nil or max > setsbase.max then --临时设置的最大值不能大于原本的最大值
+                max = setsbase.max
+            end
+        end
+        now = sets.add
+        if max ~= nil and now > max then
+            now = max
+        end
+    elseif sets.replace ~= nil then --替换型
+        now = sets.replace
+    elseif sets.replace_min ~= nil then --最小替换型
+        now = sets.replace_min
+    end
+
+    if now <= 0 then
+        EndBuffSafely(buff)
+    else
+        buff.components.timer:StartTimer("buffover", now)
+    end
+end
+local function TimerExtend(buff, target, sets)
+    local now = 0
+    local setsbase = buff._dd.sets
+    if sets == nil then
+        sets = setsbase
+    end
+
+    --因为是续加buff，需要考虑buff时间的更新方式
+    if sets.add ~= nil then --增加型：在已有时间上增加，可设置最大时间限制
+        local max = sets.max
+        if setsbase.max ~= nil then
+            if max == nil or max > setsbase.max then --临时设置的最大值不能大于原本的最大值
+                max = setsbase.max
+            end
+        end
+        now = (buff.components.timer:GetTimeLeft("buffover") or 0) + sets.add
+        if max ~= nil and now > max then
+            now = max
+        end
+    elseif sets.replace ~= nil then --替换型：不管已有时间，直接覆盖
+        now = sets.replace
+    elseif sets.replace_min ~= nil then --最小替换型：若 已有时间<设定时间 时才设置新时间
+        now = buff.components.timer:GetTimeLeft("buffover") or 0
+        if now < sets.replace_min then
+            now = sets.replace_min
+        end
+    end
+
+    if now <= 0 then
+        EndBuffSafely(buff)
+    else
+        buff.components.timer:StopTimer("buffover")
+        buff.components.timer:StartTimer("buffover", now)
+    end
+end
+local function Fn_attached(inst, target, followsymbol, followoffset, sets, ...)
+    inst.entity:SetParent(target.entity)
+    inst.Transform:SetPosition(0, 0, 0) --in case of loading
+    inst:ListenForEvent("death", function(owner, data)
+        inst.components.debuff:Stop()
+    end, target)
+
+    if not inst._dd.notimer then
+        TimerAttach(inst, target, sets)
+    end
+    if inst._dd.fn_start ~= nil then
+        inst._dd.fn_start(inst, target, followsymbol, followoffset, sets, ...)
+    end
+end
+local function Fn_detached(inst, target, ...)
+    if inst._dd.fn_end ~= nil then
+        inst._dd.fn_end(inst, target, ...)
+    end
+    inst:Remove()
+end
+local function Fn_extended(inst, target, followsymbol, followoffset, sets, ...)
+    if not inst._dd.notimer then
+        TimerExtend(inst, target, sets)
+    end
+    if inst._dd.fn_again ~= nil then
+        inst._dd.fn_again(inst, target, followsymbol, followoffset, sets, ...)
+    end
+end
+local function OnTimerDone(inst, data)
+    if data.name == "buffover" then
+        inst.components.debuff:Stop()
+        return
+    end
+    if inst._dd.fn_timerdone ~= nil then
+        inst._dd.fn_timerdone(inst, data)
+    end
+end
+
+local function MakeBuff(data)
+	table.insert(prefs, Prefab(data.name, function()
+        local inst = CreateEntity()
+
+        if data.addnetwork then --带有网络组件
+            inst.entity:AddTransform()
+            inst.entity:AddNetwork()
+            -- inst.entity:Hide()
+            inst.persists = false
+
+            -- inst:AddTag("CLASSIFIED")
+            inst:AddTag("NOCLICK")
+            inst:AddTag("NOBLOCK")
+
+            if data.fn_common ~= nil then
+                data.fn_common(inst)
+            end
+
+            inst.entity:SetPristine()
+            if not TheWorld.ismastersim then return inst end
+        else --无网络组件
+            if not TheWorld.ismastersim then
+                --Not meant for client!
+                inst:DoTaskInTime(0, inst.Remove)
+                return inst
+            end
+            inst.entity:AddTransform()
+            --Non-networked entity
+            inst.entity:Hide()
+            inst.persists = false
+            inst:AddTag("CLASSIFIED")
+        end
+
+        inst._dd = data
+
+        if not data.notimer then
+            inst:AddComponent("timer")
+            inst:ListenForEvent("timerdone", OnTimerDone)
+        end
+
+        inst:AddComponent("debuff")
+        inst.components.debuff.keepondespawn = true
+        inst.components.debuff:SetAttachedFn(Fn_attached)
+        inst.components.debuff:SetDetachedFn(Fn_detached)
+        inst.components.debuff:SetExtendedFn(Fn_extended)
+
+        if data.fn_server ~= nil then
+            data.fn_server(inst)
+        end
+
+        return inst
+    end, data.assets, data.prefabs))
+end
 
 --------------------------------------------------------------------------
---[[ 蝙蝠伪装：不会被蝙蝠攻击 ]]
+--[[ 蝙蝠伪装：不会被蝙蝠主动攻击 ]]
 --------------------------------------------------------------------------
 
 MakeBuff({
-    name = "buff_batdisguise",
-    assets = nil,
-    prefabs = nil,
-    time_key = "time_l_batdisguise",
-    time_default = TUNING.SEG_TIME*8, --SEG_TIME = 30秒 = 0.5分钟
-    notimer = nil,
-    fn_start = function(buff, target)
+    name = "buff_l_batdisguise",
+    -- assets = nil, prefabs = nil, notimer = nil,
+    sets = { add = TUNING.SEG_TIME*8, max = TIME_MAX },
+    fn_start = function(buff, target, followsymbol, followoffset, sets)
         BuffTalk_start(target, buff)
-        target:AddTag("bat") --添加蝙蝠标签，蝙蝠不会攻击有该标签的生物
+        if target.prefab ~= "bat" and target.prefab ~= "molebat" then
+            target:AddTag("bat") --添加蝙蝠标签，蝙蝠不会攻击有该标签的生物
+        end
     end,
-    fn_again = function(buff, target)
+    fn_again = function(buff, target, followsymbol, followoffset, sets)
         BuffTalk_start(target, buff)
-        target:AddTag("bat")
+        if target.prefab ~= "bat" and target.prefab ~= "molebat" then
+            target:AddTag("bat")
+        end
     end,
     fn_end = function(buff, target)
         BuffTalk_end(target, buff)
-        target:RemoveTag("bat") --移除蝙蝠标签
-    end,
-    fn_server = nil,
+        if target.prefab ~= "bat" and target.prefab ~= "molebat" then
+            target:RemoveTag("bat")
+        end
+    end
 })
 
 --------------------------------------------------------------------------
@@ -313,150 +298,156 @@ MakeBuff({
 --------------------------------------------------------------------------
 
 MakeBuff({
-    name = "buff_bestappetite",
-    assets = nil,
-    prefabs = nil,
-    time_key = "time_l_bestappetite",
-    time_default = TUNING.SEG_TIME*2, --1分钟
-    notimer = nil,
-    fn_start = function(buff, target)
+    name = "buff_l_bestappetite",
+    -- assets = nil, prefabs = nil, notimer = nil,
+    sets = { add = TUNING.SEG_TIME*2, max = TUNING.SEG_TIME*15 },
+    fn_start = function(buff, target, followsymbol, followoffset, sets)
         BuffTalk_start(target, buff)
-        target.buffon_l_bestappetite = true --做标记
-        --此处并没有任何操作，因为已经修改全局食性组件了，有这个buff就会启用
+        target.legiontag_bestappetite = true --做标记。此处并没有别的操作，因为已经修改全局食性组件了，有这个buff就会启用
     end,
-    fn_again = function(buff, target)
+    fn_again = function(buff, target, followsymbol, followoffset, sets)
         BuffTalk_start(target, buff)
+        target.legiontag_bestappetite = true
     end,
     fn_end = function(buff, target)
         BuffTalk_end(target, buff)
-        target.buffon_l_bestappetite = nil
-    end,
-    fn_server = nil,
+        target.legiontag_bestappetite = nil
+    end
 })
 
 --------------------------------------------------------------------------
 --[[ 蝴蝶庇佑：100%抵挡一次任何攻击 ]]
 --------------------------------------------------------------------------
 
-local function GetSkin(buff, player)
-    if player.butterfly_skin_l ~= nil then
-        return player.butterfly_skin_l
-    elseif buff.flyskins ~= nil then
-        local kk = nil
-        local vv = nil
-        for k,v in pairs(buff.flyskins) do
-            if v ~= nil then
-                vv = v
-                kk = k
+local function AddButterfly(buff, target, num)
+    local nummax = buff._dd.sets.max
+    for i = 1, nummax, 1 do
+        local fly = buff.flies[i]
+        if fly == nil or not fly:IsValid() then
+            fly = SpawnPrefab("neverfade_butterfly")
+            buff.flies[i] = fly
+            if fly ~= nil then
+                local skin = target.butterfly_skin_l or buff.flyskins[i]
+                if skin ~= nil then
+                    if skin.bank ~= nil then
+                        fly.AnimState:SetBank(skin.bank)
+                    end
+                    if skin.build ~= nil then
+                        fly.AnimState:SetBuild(skin.build)
+                    end
+                    fly.skin_l = skin
+                end
+                buff.flyskins[i] = skin
+
+                local x, y, z = target.Transform:GetWorldPosition()
+                local x2, y2, z2 = TOOLS_L.GetCalculatedPos(x, y, z, 1+math.random()*2, nil)
+                fly.Transform:SetPosition(x2, y2, z2)
+
+                if target.components.leader ~= nil then
+                    target.components.leader:AddFollower(fly)
+                end
+            end
+            num = num - 1
+            if num <= 0 then
+                return
             end
         end
-        if kk == nil then
-            buff.flyskins = nil
-        else
-            buff.flyskins[kk] = nil
+    end
+end
+local function DeleteButterfly(buff, target, num, doit)
+    local nummax = buff._dd.sets.max
+    for i = 1, nummax, 1 do
+        local fly = buff.flies[i]
+        if fly ~= nil then
+            buff.flies[i] = nil
+            buff.flyskins[i] = nil
+            if fly:IsValid() then
+                if fly:IsAsleep() then
+                    fly:Remove()
+                else
+                    fly.tag_l_dead = doit and 2 or 1
+                end
+            end
+            if num ~= nil then
+                num = num - 1
+                if num <= 0 then
+                    return
+                end
+            end
         end
-        return vv
     end
 end
-local function SpawnButterfly(buff, target)
-    local butterfly = SpawnPrefab("neverfade_butterfly")
-    if target.components.leader ~= nil then
-        target.components.leader:AddFollower(butterfly)
-
-        local skin = GetSkin(buff, target)
-        if skin ~= nil and skin.bank ~= nil and skin.build ~= nil then
-            butterfly.AnimState:SetBank(skin.bank)
-            butterfly.AnimState:SetBuild(skin.build)
-            butterfly.skin_l = skin
+local function OnButterflyBlessed(doer)
+    local buff = doer.components.debuffable:GetDebuff("buff_l_butterflybless")
+    if buff ~= nil then
+        if buff._count_l > 0 then
+            buff._count_l = buff._count_l - 1
+            DeleteButterfly(buff, doer, 1, true)
+            if buff._count_l > 0 then
+                doer.legion_numblessing = buff._count_l
+                return
+            end
         end
-
-        local x, y, z = target.Transform:GetWorldPosition()
-        local x2, y2, z2 = TOOLS_L.GetCalculatedPos(x, y, z, 1+math.random()*2, nil)
-        butterfly.Transform:SetPosition(x2, y2, z2)
-
-        return butterfly
-    end
-    return nil
-end
-local function AddButterfly(buff, player)
-    buff.countbutterflies = buff.countbutterflies + 1
-    buff.blessingbutterflies[buff.countbutterflies] = SpawnButterfly(buff, player)
-    player.countblessing = buff.countbutterflies --更新玩家的数据
-end
-local function DeleteButterfly(buff, player)
-    if buff.blessingbutterflies[buff.countbutterflies] ~= nil then
-        buff.blessingbutterflies[buff.countbutterflies].dead = true
-        buff.blessingbutterflies[buff.countbutterflies] = nil
-    end
-    buff.countbutterflies = buff.countbutterflies - 1
-    player.countblessing = buff.countbutterflies --更新玩家的数据
-
-    if buff.countbutterflies <= 0 then
         buff.components.debuff:Stop()
+    else
+        doer.legion_numblessing = nil
+        doer.legionfn_butterflyblessed = nil
     end
+end
+local function OnSave_butterflybless(buff, data)
+    data.flyskins = buff.flyskins
+    OnSave_count(buff, data)
+end
+local function OnLoad_butterflybless(buff, data, newents)
+    if data ~= nil then
+        if data.flyskins ~= nil then
+            buff.flyskins = data.flyskins
+        end
+    end
+    OnLoad_count(buff, data, newents)
 end
 
 MakeBuff({
-    name = "buff_butterflysblessing",
-    assets = nil,
-    prefabs = nil,
-    time_key = nil,
-    time_default = nil,
+    name = "buff_l_butterflybless",
+    -- assets = nil, prefabs = nil,
     notimer = true,
-    fn_start = function(buff, target)
-        if buff.precount ~= nil then
-            for i = 1, buff.precount do
-                AddButterfly(buff, target)
-            end
-            buff.precount = nil
-        else
-            AddButterfly(buff, target)
+    sets = { add = 1, max = 5 },
+    fn_start = function(buff, target, followsymbol, followoffset, sets)
+        UpdateCount(buff, target, sets)
+        if buff._count_l <= 0 then
+            return
         end
-        -- SetBuff_butterflysblessing(buff, target)
+        target.legion_numblessing = buff._count_l
+        target.legionfn_butterflyblessed = OnButterflyBlessed
+        AddButterfly(buff, target, buff._count_l)
     end,
-    fn_again = function(buff, target)
-        AddButterfly(buff, target) --在这里并不限制增加的数量，是否要增加数量只在生成方那边判断，不在这边的响应方进行
+    fn_again = function(buff, target, followsymbol, followoffset, sets)
+        local oldv = buff._count_l
+        UpdateCount(buff, target, sets)
+        if buff._count_l <= 0 then
+            return
+        end
+        target.legion_numblessing = buff._count_l
+        target.legionfn_butterflyblessed = OnButterflyBlessed
+        oldv = buff._count_l - oldv
+        if oldv < 0 then
+            DeleteButterfly(buff, target, -oldv)
+        elseif oldv > 0 then
+            AddButterfly(buff, target, oldv)
+        end
     end,
     fn_end = function(buff, target)
-        --清除buff所有的数据
-        for k, v in pairs(buff.blessingbutterflies) do
-            v.dead = true
-        end
-        buff.countbutterflies = 0
-        buff.blessingbutterflies = {}
-        target.countblessing = 0 --一般触发这里都是因为玩家死亡，此时应该清除玩家的数据
+        buff._count_l = 0
+        target.legion_numblessing = nil
+        target.legionfn_butterflyblessed = nil
+        DeleteButterfly(buff, target, nil)
     end,
     fn_server = function(buff)
-        buff.precount = nil --记录保存下的数量（OnLoad()比OnAttached()先执行）
-        buff.countbutterflies = 0 --记录蝴蝶的数量，并作为下标
-        buff.blessingbutterflies = {} --记录了每只蝴蝶的数据
-        buff.flyskins = nil
-        buff.DeleteButterfly = DeleteButterfly
-
-        buff.OnSave = function(inst, data)
-            if inst.countbutterflies >= 2 then --只保存大于1数量的数量，因为初始化时本身肯定就有1只蝴蝶
-                data.countbutterflies = inst.countbutterflies
-            end
-
-            local flyskins = nil
-            for k,v in pairs(inst.blessingbutterflies) do
-                if v and not v.dead and v.skin_l ~= nil then
-                    if flyskins == nil then
-                        flyskins = {}
-                    end
-                    table.insert(flyskins, v.skin_l)
-                end
-            end
-            if flyskins ~= nil then
-                data.flyskins = flyskins
-            end
-        end
-        buff.OnLoad = function(inst, data)
-            if data ~= nil then
-                inst.precount = data.countbutterflies
-                inst.flyskins = data.flyskins
-            end
-        end
+        buff._count_l = 0
+        buff.flies = {}
+        buff.flyskins = {}
+        buff.OnSave = OnSave_butterflybless
+        buff.OnLoad = OnLoad_butterflybless
     end
 })
 
@@ -1273,10 +1264,9 @@ MakeBuff({
 
 MakeBuff({
     name = "buff_l_effortluck",
-    assets = nil,
-    prefabs = nil,
-    sets = { add = 1, max = 3 },
+    -- assets = nil, prefabs = nil,
     notimer = true,
+    sets = { add = 1, max = 3 },
     fn_start = function(buff, target, followsymbol, followoffset, sets)
         BuffTalk_start(target, buff)
         UpdateCount(buff, target, sets)

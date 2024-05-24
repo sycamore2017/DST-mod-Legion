@@ -134,15 +134,24 @@ local function SetHungerCount_backcub(inst, value)
     inst.count_hunger_l = value
 end
 local function IsFull_backcub(inst)
-    if not inst.buffon_l_bestappetite and inst.hunger_l/hunger_max_backcub > stage_full_backcub then
+    if not inst.legiontag_bestappetite and inst.hunger_l/hunger_max_backcub > stage_full_backcub then
         return true
     end
     return false
 end
+local function GetEaterAbsorption(inst, key)
+    local va = inst.components.eater[key] or 1
+    if va < 1 and va > 0 then
+        if inst.legiontag_bestappetite then
+            return 1
+        end
+    end
+    return va
+end
 local function OnEat_backcub(inst, food)
-    local v = food.components.edible:GetHunger(inst) * inst.components.eater.hungerabsorption
-                + food.components.edible:GetSanity(inst) * inst.components.eater.sanityabsorption
-                + food.components.edible:GetHealth(inst) * inst.components.eater.healthabsorption
+    local v = food.components.edible:GetHunger(inst) * GetEaterAbsorption(inst, "hungerabsorption")
+                + food.components.edible:GetSanity(inst) * GetEaterAbsorption(inst, "sanityabsorption")
+                + food.components.edible:GetHealth(inst) * GetEaterAbsorption(inst, "healthabsorption")
     if v > 0 then
         if food:HasTag("honeyed") then --蜜类料理加成
             v = v * 1.2

@@ -474,10 +474,11 @@ local foods_legion = {
         cooktime = 2,
         -- potlevel = nil,
         float = { nil, "small", 0.2, 1.05 },
-        prefabs = { "buff_batdisguise" },
+        prefabs = { "buff_l_batdisguise" },
         oneatenfn = function(inst, eater)
-            eater.time_l_batdisguise = { replace_min = TUNING.SEG_TIME*8 }
-            eater:AddDebuff("buff_batdisguise", "buff_batdisguise")
+            if eater.prefab ~= "bat" and eater.prefab ~= "molebat" then
+                eater:AddDebuff("buff_l_batdisguise", "buff_l_batdisguise")
+            end
         end,
 
         cook_need = "(烤)蝙蝠翅膀 肉度≥2",
@@ -647,10 +648,9 @@ local foods_legion = {
         stacksize = 2,
         potlevel = "low",
         float = { nil, "small", 0.2, 0.9 },
-        prefabs = { "buff_bestappetite" },
+        prefabs = { "buff_l_bestappetite" },
         oneatenfn = function(inst, eater)
-            eater.time_l_bestappetite = { replace_min = TUNING.SEG_TIME*2 }
-            eater:AddDebuff("buff_bestappetite", "buff_bestappetite")
+            eater:AddDebuff("buff_l_bestappetite", "buff_l_bestappetite")
         end,
 
         cook_need = "(烤)香蕉 果度>1 蛋度",
