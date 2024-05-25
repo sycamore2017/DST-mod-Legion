@@ -582,12 +582,11 @@ local foods_legion = {
         cooktime = 3,
         potlevel = "low",
         float = { nil, "small", 0.2, 0.85 },
-        prefabs = { "buff_strengthenhancer" },
+        prefabs = { "buff_l_strengthenhancer" },
         oneatenfn = function(inst, eater)
             --加强攻击力
             if eater.components.combat ~= nil then --这个buff需要攻击组件
-                eater.time_l_strengthenhancer = { replace_min = TUNING.SEG_TIME*16 }
-                eater:AddDebuff("buff_strengthenhancer", "buff_strengthenhancer")
+                eater:AddDebuff("buff_l_strengthenhancer", "buff_l_strengthenhancer")
             end
             --醉酒
             if eater:HasTag("player") then
@@ -917,10 +916,9 @@ local foods_legion = {
         stacksize = 2,
         -- potlevel = nil,
         float = { 0.01, "small", 0.2, 1.2 },
-        prefabs = { "buff_sporeresistance" },
+        prefabs = { "buff_l_sporeresistance" },
         oneatenfn = function(inst, eater)
-            eater.time_l_sporeresistance = { add = TUNING.SEG_TIME*24, max = TUNING.SEG_TIME*30 }
-            eater:AddDebuff("buff_sporeresistance", "buff_sporeresistance")
+            eater:AddDebuff("buff_l_sporeresistance", "buff_l_sporeresistance", { value = TUNING.SEG_TIME*24 })
         end,
 
         cook_need = "龙虾 素白菇 装饰度≥1",
@@ -942,11 +940,10 @@ local foods_legion = {
         stacksize = 2,
         potlevel = "low",
         float = { nil, "small", 0.25, 0.8 },
-        prefabs = { "buff_healthstorage" },
+        prefabs = { "buff_l_healthstorage" },
         oneatenfn = function(inst, eater)
             if eater.components.oldager == nil and eater.components.health ~= nil then
-                eater.buff_healthstorage_v = 100
-                eater:AddDebuff("buff_healthstorage", "buff_healthstorage")
+                eater:AddDebuff("buff_l_healthstorage", "buff_l_healthstorage")
             end
         end,
 

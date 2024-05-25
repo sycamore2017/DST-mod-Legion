@@ -52,6 +52,37 @@ local function EndBuffSafely(buff)
     end)
 end
 
+local function ComputValue(buff, target, sets, now)
+    local setsbase = buff._dd.sets
+    local kind = setsbase.kind or 1
+    local value = setsbase.value or 1
+    if sets ~= nil then
+        if sets.kind ~= nil then kind = sets.kind end
+        if sets.value ~= nil then value = sets.value end
+    end
+    if kind == 1 then --增加型：在已有数值上增加，可设置最大数值限制
+        kind = sets and sets.max or 0 --自定义的最大值
+        if kind > 0 then
+            --当前值小于自定义最大值，可以尝试相加
+            --如果当前值本来就不小于自定义最大值了，那就什么都不改，不能影响已有的数值
+            if now < kind then
+                now = math.min(now + value, kind)
+            end
+        else
+            now = now + value
+        end
+    elseif kind == 2 then --替换型：不管已有数值，直接覆盖
+        now = value
+    else --最小替换型：若 已有数值<设定数值 时才设置新数值
+        if now < value then
+            now = value
+        end
+    end
+    if setsbase.max ~= nil and now > setsbase.max then --就算是自定义的也得小于默认的最大值
+        now = setsbase.max
+    end
+    return now
+end
 local function UpdateCount(buff, target, sets)
     if buff._count_load_l ~= nil then --onsave比这里先加载
         buff._count_l = buff._count_load_l
@@ -61,32 +92,9 @@ local function UpdateCount(buff, target, sets)
         end
         return
     end
-
-    local now = buff._count_l or 0
-    local setsbase = buff._dd.sets
-    if sets == nil then
-        sets = setsbase
-    end
-    if sets.add ~= nil then --增加型：在已有数值上增加，可设置最大数值限制
-        local max = sets.max
-        if setsbase.max ~= nil then
-            if max == nil or max > setsbase.max then --临时设置的最大值不能大于原本的最大值
-                max = setsbase.max
-            end
-        end
-        now = now + sets.add
-        if max ~= nil and now > max then
-            now = max
-        end
-    elseif sets.replace ~= nil then --替换型：不管已有数值，直接覆盖
-        now = sets.replace
-    elseif sets.replace_min ~= nil then --最小替换型：若 已有数值<设定数值 时才设置新数值
-        if now < sets.replace_min then
-            now = sets.replace_min
-        end
-    end
-    buff._count_l = now
-    if now <= 0 then
+    local newvalue = ComputValue(buff, target, sets, buff._count_l or 0)
+    buff._count_l = newvalue
+    if newvalue <= 0 then
         EndBuffSafely(buff)
     end
 end
@@ -107,70 +115,20 @@ local function TimerAttach(buff, target, sets)
     if buff.components.timer:TimerExists("buffover") then --因为onsave比这里先加载，所以不能替换先加载的
         return
     end
-
-    local now = 0
-    local setsbase = buff._dd.sets
-    if sets == nil then
-        sets = setsbase
-    end
-
-    --因为是新加buff，不需要考虑buff时间问题
-    if sets.add ~= nil then --增加型
-        local max = sets.max
-        if setsbase.max ~= nil then
-            if max == nil or max > setsbase.max then --临时设置的最大值不能大于原本的最大值
-                max = setsbase.max
-            end
-        end
-        now = sets.add
-        if max ~= nil and now > max then
-            now = max
-        end
-    elseif sets.replace ~= nil then --替换型
-        now = sets.replace
-    elseif sets.replace_min ~= nil then --最小替换型
-        now = sets.replace_min
-    end
-
-    if now <= 0 then
+    local newvalue = ComputValue(buff, target, sets, 0)
+    if newvalue <= 0 then
         EndBuffSafely(buff)
     else
-        buff.components.timer:StartTimer("buffover", now)
+        buff.components.timer:StartTimer("buffover", newvalue)
     end
 end
 local function TimerExtend(buff, target, sets)
-    local now = 0
-    local setsbase = buff._dd.sets
-    if sets == nil then
-        sets = setsbase
-    end
-
-    --因为是续加buff，需要考虑buff时间的更新方式
-    if sets.add ~= nil then --增加型：在已有时间上增加，可设置最大时间限制
-        local max = sets.max
-        if setsbase.max ~= nil then
-            if max == nil or max > setsbase.max then --临时设置的最大值不能大于原本的最大值
-                max = setsbase.max
-            end
-        end
-        now = (buff.components.timer:GetTimeLeft("buffover") or 0) + sets.add
-        if max ~= nil and now > max then
-            now = max
-        end
-    elseif sets.replace ~= nil then --替换型：不管已有时间，直接覆盖
-        now = sets.replace
-    elseif sets.replace_min ~= nil then --最小替换型：若 已有时间<设定时间 时才设置新时间
-        now = buff.components.timer:GetTimeLeft("buffover") or 0
-        if now < sets.replace_min then
-            now = sets.replace_min
-        end
-    end
-
-    if now <= 0 then
+    local newvalue = ComputValue(buff, target, sets, buff.components.timer:GetTimeLeft("buffover") or 0)
+    if newvalue <= 0 then
         EndBuffSafely(buff)
     else
         buff.components.timer:StopTimer("buffover")
-        buff.components.timer:StartTimer("buffover", now)
+        buff.components.timer:StartTimer("buffover", newvalue)
     end
 end
 local function Fn_attached(inst, target, followsymbol, followoffset, sets, ...)
@@ -272,7 +230,7 @@ end
 MakeBuff({
     name = "buff_l_batdisguise",
     -- assets = nil, prefabs = nil, notimer = nil,
-    sets = { add = TUNING.SEG_TIME*8, max = TIME_MAX },
+    sets = { value = TUNING.SEG_TIME*8, max = TIME_MAX },
     fn_start = function(buff, target, followsymbol, followoffset, sets)
         BuffTalk_start(target, buff)
         if target.prefab ~= "bat" and target.prefab ~= "molebat" then
@@ -300,7 +258,7 @@ MakeBuff({
 MakeBuff({
     name = "buff_l_bestappetite",
     -- assets = nil, prefabs = nil, notimer = nil,
-    sets = { add = TUNING.SEG_TIME*2, max = TUNING.SEG_TIME*15 },
+    sets = { value = TUNING.SEG_TIME*2, max = TUNING.SEG_TIME*15 },
     fn_start = function(buff, target, followsymbol, followoffset, sets)
         BuffTalk_start(target, buff)
         target.legiontag_bestappetite = true --做标记。此处并没有别的操作，因为已经修改全局食性组件了，有这个buff就会启用
@@ -319,7 +277,7 @@ MakeBuff({
 --[[ 蝴蝶庇佑：100%抵挡一次任何攻击 ]]
 --------------------------------------------------------------------------
 
-local function AddButterfly(buff, target, num)
+local function AddButterfly(buff, target, num, sets)
     local nummax = buff._dd.sets.max
     for i = 1, nummax, 1 do
         local fly = buff.flies[i]
@@ -327,7 +285,12 @@ local function AddButterfly(buff, target, num)
             fly = SpawnPrefab("neverfade_butterfly")
             buff.flies[i] = fly
             if fly ~= nil then
-                local skin = target.butterfly_skin_l or buff.flyskins[i]
+                local skin
+                if sets ~= nil and sets.skin ~= nil then
+                    skin = sets.skin
+                else
+                    skin = buff.flyskins[i]
+                end
                 if skin ~= nil then
                     if skin.bank ~= nil then
                         fly.AnimState:SetBank(skin.bank)
@@ -365,7 +328,7 @@ local function DeleteButterfly(buff, target, num, doit)
                 if fly:IsAsleep() then
                     fly:Remove()
                 else
-                    fly.tag_l_dead = doit and 2 or 1
+                    fly.legiontag_dead = doit and 2 or 1
                 end
             end
             if num ~= nil then
@@ -378,6 +341,16 @@ local function DeleteButterfly(buff, target, num, doit)
     end
 end
 local function OnButterflyBlessed(doer)
+    local x, y, z = doer.Transform:GetWorldPosition()
+    local fx1 = SpawnPrefab("buff_l_butterflybless_fx")
+    local fx2 = SpawnPrefab("buff_l_butterflybless_fx2")
+    if fx1 ~= nil then
+        fx1.Transform:SetPosition(x, y, z)
+    end
+    if fx2 ~= nil then
+        fx2.Transform:SetPosition(x, y, z)
+    end
+
     local buff = doer.components.debuffable:GetDebuff("buff_l_butterflybless")
     if buff ~= nil then
         if buff._count_l > 0 then
@@ -409,9 +382,10 @@ end
 
 MakeBuff({
     name = "buff_l_butterflybless",
-    -- assets = nil, prefabs = nil,
+    -- assets = nil,
+    prefabs = { "buff_l_butterflybless_fx", "buff_l_butterflybless_fx2" },
     notimer = true,
-    sets = { add = 1, max = 5 },
+    sets = { value = 1, max = 5 },
     fn_start = function(buff, target, followsymbol, followoffset, sets)
         UpdateCount(buff, target, sets)
         if buff._count_l <= 0 then
@@ -419,7 +393,7 @@ MakeBuff({
         end
         target.legion_numblessing = buff._count_l
         target.legionfn_butterflyblessed = OnButterflyBlessed
-        AddButterfly(buff, target, buff._count_l)
+        AddButterfly(buff, target, buff._count_l, sets)
     end,
     fn_again = function(buff, target, followsymbol, followoffset, sets)
         local oldv = buff._count_l
@@ -433,7 +407,7 @@ MakeBuff({
         if oldv < 0 then
             DeleteButterfly(buff, target, -oldv)
         elseif oldv > 0 then
-            AddButterfly(buff, target, oldv)
+            AddButterfly(buff, target, oldv, sets)
         end
     end,
     fn_end = function(buff, target)
@@ -455,44 +429,28 @@ MakeBuff({
 --[[ 血库：按需提供生命值恢复 ]]
 --------------------------------------------------------------------------
 
-local function OnSave_healthstorage(inst, data)
-	if inst.healthall ~= nil and inst.healthall > 0 then
-        data.healthall = inst.healthall
-    end
-end
-local function OnLoad_healthstorage(inst, data)
-    if data == nil then
-        return
-    end
-	if data.times ~= nil and data.times > 0 then --兼容旧版本数据
-        inst.healthall = inst.healthall + data.times*2
-    end
-    if data.healthall ~= nil and data.healthall > 0 then
-        inst.healthall = inst.healthall + data.healthall
-    end
-end
 local function Heal_healthstorage(inst, target)
     inst.task_l_heal = nil
-    if IsAlive(target) and inst.healthall > 0 then
+    if IsAlive(target) and inst._count_l > 0 then
         local need = target.components.health:GetMaxWithPenalty() - target.components.health.currenthealth
         if need >= 5 then
-            if inst.healthall > need then
-                inst.healthall = inst.healthall - need
+            if inst._count_l > need then
+                inst._count_l = inst._count_l - need
             else
-                need = inst.healthall
-                inst.healthall = 0
+                need = inst._count_l
+                inst._count_l = 0
             end
             target.components.health:DoDelta(need, true, "shyerry", true, nil, true)
-            if inst.healthall <= 0 then
-                inst.components.debuff:Stop()
+            if inst._count_l <= 0 then
+                EndBuffSafely(inst)
             end
         end
     else
-        inst.components.debuff:Stop()
+        EndBuffSafely(inst)
     end
 end
 local function TryHeal_healthstorage(buff, target)
-    if IsAlive(target) and buff.healthall > 0 then
+    if IsAlive(target) and buff._count_l > 0 then
         if
             buff.task_l_heal == nil and
             (target.components.health:GetMaxWithPenalty() - target.components.health.currenthealth) >= 5
@@ -505,34 +463,30 @@ local function TryHeal_healthstorage(buff, target)
 end
 
 MakeBuff({
-    name = "buff_healthstorage",
-    assets = nil,
-    prefabs = nil,
-    time_key = nil,
-    time_default = nil,
+    name = "buff_l_healthstorage",
+    -- assets = nil, prefabs = nil,
     notimer = true,
-    fn_start = function(buff, target)
+    sets = { value = 100 },
+    fn_start = function(buff, target, followsymbol, followoffset, sets)
         if target.components.oldager ~= nil then --物理回血效果，无法对旺达起作用
-            target.buff_healthstorage_v = nil
             EndBuffSafely(buff)
             return
         end
-        if target.buff_healthstorage_v ~= nil then --血库可以无限叠加
-            buff.healthall = buff.healthall + target.buff_healthstorage_v
-            target.buff_healthstorage_v = nil
+        UpdateCount(buff, target, sets)
+        if buff._count_l <= 0 then
+            return
         end
         TryHeal_healthstorage(buff, target)
         buff:ListenForEvent("healthdelta", buff.fn_l_healthdelta, target)
     end,
-    fn_again = function(buff, target)
+    fn_again = function(buff, target, followsymbol, followoffset, sets)
         if target.components.oldager ~= nil then
-            target.buff_healthstorage_v = nil
             EndBuffSafely(buff)
             return
         end
-        if target.buff_healthstorage_v ~= nil then
-            buff.healthall = buff.healthall + target.buff_healthstorage_v
-            target.buff_healthstorage_v = nil
+        UpdateCount(buff, target, sets)
+        if buff._count_l <= 0 then
+            return
         end
         TryHeal_healthstorage(buff, target)
     end,
@@ -541,81 +495,69 @@ MakeBuff({
             buff.task_l_heal:Cancel()
             buff.task_l_heal = nil
         end
-        buff.healthall = 0
+        buff._count_l = 0
         buff:RemoveEventCallback("healthdelta", buff.fn_l_healthdelta, target)
     end,
     fn_server = function(buff)
-        buff.healthall = 0
+        buff._count_l = 0
         buff.fn_l_healthdelta = function(target, data)
             TryHeal_healthstorage(buff, target)
         end
-        buff.OnSave = OnSave_healthstorage
-        buff.OnLoad = OnLoad_healthstorage --这个比OnAttached更早执行
+        buff.OnSave = OnSave_count
+        buff.OnLoad = OnLoad_count
     end
 })
 
 --------------------------------------------------------------------------
---[[ 孢子抵抗力：减少25%受到的伤害（进行防具抵扣之后的值） ]]
+--[[ 孢子抵抗力：减少25%受到的伤害(进行防具抵扣之后的值) ]]
 --------------------------------------------------------------------------
 
 MakeBuff({
-    name = "buff_sporeresistance",
-    assets = nil,
-    prefabs = nil,
-    time_key = "time_l_sporeresistance",
-    time_default = TUNING.SEG_TIME*6, --3分钟
-    notimer = nil,
-    fn_start = function(buff, target)
-        if buff.task == nil then
-            buff.task = buff:DoPeriodicTask(0.7, function()
+    name = "buff_l_sporeresistance",
+    -- assets = nil, notimer = nil,
+    prefabs = { "buff_l_sporeresistance_fx" },
+    sets = { value = TUNING.SEG_TIME*6, max = TIME_MAX },
+    fn_start = function(buff, target, followsymbol, followoffset, sets)
+        if buff.task_l_fx == nil then
+            buff.task_l_fx = buff:DoPeriodicTask(0.7, function()
                 buff:DoTaskInTime(math.random()*0.6, function()
-                    if
-                        not (
-                            target.components.health == nil or target.components.health:IsDead() or
-                            target.sg:HasStateTag("nomorph") or
-                            target.sg:HasStateTag("silentmorph") or
-                            target.sg:HasStateTag("ghostbuild")
-                        ) and target.entity:IsVisible()
-                    then
-                        SpawnPrefab("residualspores_fx").Transform:SetPosition(target.Transform:GetWorldPosition())
+                    if target:IsValid() then
+                        SpawnPrefab("buff_l_sporeresistance_fx").Transform:SetPosition(target.Transform:GetWorldPosition())
                     end
                 end)
             end, 0.5+3*math.random())
-            if target.components.health ~= nil then
-                target.components.health.externalabsorbmodifiers:SetModifier(buff, 0.25)
-            end
+        end
+        if target.components.health ~= nil then
+            target.components.health.externalabsorbmodifiers:SetModifier(buff, 0.25) --生命组件里的这个机制是a+b的
         end
     end,
-    fn_again = nil,
+    -- fn_again = nil,
     fn_end = function(buff, target)
         if target.components.health ~= nil then
             target.components.health.externalabsorbmodifiers:RemoveModifier(buff)
         end
-        if buff.task ~= nil then
-            buff.task:Cancel()
-            buff.task = nil
+        if buff.task_l_fx ~= nil then
+            buff.task_l_fx:Cancel()
+            buff.task_l_fx = nil
         end
-    end,
-    fn_server = nil,
+    end
 })
 
 --------------------------------------------------------------------------
---[[ 蛮力：增加攻击力 ]]
+--[[ 蛮力：增加50%普通攻击力 ]]
 --------------------------------------------------------------------------
 
 MakeBuff({
-    name = "buff_strengthenhancer",
-    assets = nil,
-    prefabs = nil,
-    time_key = "time_l_strengthenhancer",
-    time_default = TUNING.SEG_TIME*16, --8分钟
-    notimer = nil,
-    fn_start = function(buff, target)
+    name = "buff_l_strengthenhancer",
+    -- assets = nil, prefabs = nil, notimer = nil,
+    sets = { value = TUNING.SEG_TIME*16, max = TIME_MAX },
+    fn_start = function(buff, target, followsymbol, followoffset, sets)
+        --因为触发一般是喝药酒，吃的时候已经说话提示了，所以这里就不用再说
         if target.components.combat ~= nil then
             target.components.combat.externaldamagemultipliers:SetModifier(buff, 1.5) --普通攻击系数x1.5倍
         end
     end,
-    fn_again = nil,
+    -- fn_again = nil,
     fn_end = function(buff, target)
         BuffTalk_end(target, buff)
         if target.components.combat ~= nil then
@@ -625,17 +567,17 @@ MakeBuff({
 })
 
 --------------------------------------------------------------------------
---[[ 怜悯：降低攻击力 ]]
+--[[ 怜悯：降低30%全能攻击力 ]]
 --------------------------------------------------------------------------
 
 MakeBuff({
-    name = "buff_attackreduce",
+    name = "buff_attackreduce", --buff_l_merciful
     assets = nil,
     prefabs = nil,
     time_key = "time_l_attackreduce",
     time_default = TUNING.SEG_TIME*2, --1分钟
     notimer = nil,
-    fn_start = function(buff, target)
+    fn_start = function(buff, target, followsymbol, followoffset, sets)
         -- if target.components.damagetypebonus == nil then --通过这个组件能使得弱化效果能同时应用给普攻和特攻
         --     target:AddComponent("damagetypebonus")
         -- end
@@ -645,7 +587,9 @@ MakeBuff({
         TOOLS_L.AddBonusAll(target, "buff_attackreduce", 0.7)
         target.AnimState:SetMultColour(165/255, 188/255, 47/255, 1)
     end,
-    fn_again = nil,
+    fn_again = function(buff, target, followsymbol, followoffset, sets)
+        target.AnimState:SetMultColour(165/255, 188/255, 47/255, 1)
+    end,
     fn_end = function(buff, target)
         -- if target.components.damagetypebonus ~= nil then
             -- target.components.damagetypebonus:RemoveBonus("_health", target, "buff_attackreduce")
@@ -653,8 +597,7 @@ MakeBuff({
         -- end
         TOOLS_L.RemoveBonusAll(target, "buff_attackreduce")
         target.AnimState:SetMultColour(1, 1, 1, 1)
-    end,
-    fn_server = nil
+    end
 })
 
 --------------------------------------------------------------------------
@@ -1266,7 +1209,7 @@ MakeBuff({
     name = "buff_l_effortluck",
     -- assets = nil, prefabs = nil,
     notimer = true,
-    sets = { add = 1, max = 3 },
+    sets = { value = 1, max = 5 },
     fn_start = function(buff, target, followsymbol, followoffset, sets)
         BuffTalk_start(target, buff)
         UpdateCount(buff, target, sets)

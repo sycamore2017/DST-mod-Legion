@@ -396,8 +396,7 @@ end, GetAssets("petals_orchid"), nil))
 
 local function OnEat_shyerry(inst, eater)
     if eater.components.oldager == nil and eater.components.health ~= nil then
-        eater.buff_healthstorage_v = 40
-        eater:AddDebuff("buff_healthstorage", "buff_healthstorage")
+        eater:AddDebuff("buff_l_healthstorage", "buff_l_healthstorage", { value = 40 })
     end
 end
 local function OnDeploy_shyerry(inst, pt, deployer, rot)
@@ -432,7 +431,7 @@ table.insert(prefs, Prefab("shyerry", function() ------颤栗果
     InitVeggie(inst)
 
     return inst
-end, GetAssets("shyerry"), { "buff_healthstorage", "shyerrytree1_planted", "shyerrytree3_planted", "shyerry_cooked" }))
+end, GetAssets("shyerry"), { "buff_l_healthstorage", "shyerrytree1_planted", "shyerrytree3_planted", "shyerry_cooked" }))
 
 table.insert(prefs, Prefab("shyerry_cooked", function() ------烤颤栗果
     local inst = CreateEntity()

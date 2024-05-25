@@ -343,6 +343,36 @@ MakeFx({ --铁艺兰珊：飞溅花瓣
     end,
     fn_remove = nil
 })
+MakeFx({ --庇佑蝴蝶：护佑
+    name = "buff_l_butterflybless_fx",
+    assets = {
+        Asset("ANIM", "anim/lavaarena_boarrior_fx.zip"), --官方的动画模板
+        Asset("ANIM", "anim/buff_l_butterflybless_fx.zip")
+    },
+    fn_anim = function(inst)
+        inst.AnimState:SetBank("lavaarena_boarrior_fx")
+        inst.AnimState:SetBuild("buff_l_butterflybless_fx")
+        inst.AnimState:PlayAnimation("ground_hit_"..tostring(math.random(3)))
+        inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
+        inst.AnimState:SetLightOverride(.5)
+        inst.AnimState:SetFinalOffset(3)
+    end
+})
+MakeFx({ --庇佑蝴蝶：护佑边线
+    name = "buff_l_butterflybless_fx2",
+    assets = {
+        Asset("ANIM", "anim/abigail_shield.zip"), --官方的动画模板
+        Asset("ANIM", "anim/buff_l_butterflybless_fx.zip")
+    },
+    fn_anim = function(inst)
+        inst.AnimState:SetBank("abigail_shield")
+        inst.AnimState:SetBuild("buff_l_butterflybless_fx")
+        inst.AnimState:PlayAnimation("shield")
+        inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
+        inst.AnimState:SetLightOverride(.5)
+        inst.AnimState:SetFinalOffset(3)
+    end
+})
 -- MakeFx({ --施咒蔷薇：火花爆炸
 --     name = "rosorns_spell_fx",
 --     assets = {
@@ -583,16 +613,15 @@ MakeFx({ --素白蘑菇帽：作物疾病的治愈时，消散的细菌
     fn_remove = nil,
 })
 MakeFx({ --素白蘑菇帽：玩家身上不断冒出的孢子
-    name = "residualspores_fx",
+    name = "buff_l_sporeresistance_fx",
     assets = {
-        Asset("ANIM", "anim/wormwood_pollen_fx.zip"),    --需要官方的动画模板
-        Asset("ANIM", "anim/residualspores_fx.zip"),
+        Asset("ANIM", "anim/wormwood_pollen_fx.zip"), --官方的动画模板
+        Asset("ANIM", "anim/residualspores_fx.zip")
     },
-    fn_common = nil,
     fn_anim = function(inst)
         inst.AnimState:SetBank("wormwood_pollen_fx")
         inst.AnimState:SetBuild("residualspores_fx")
-        inst.AnimState:PlayAnimation("pollen"..math.random(1, 5))
+        inst.AnimState:PlayAnimation("pollen"..tostring(math.random(5)))
         inst.AnimState:SetFinalOffset(2)
 
         local rand = math.random()
@@ -603,8 +632,7 @@ MakeFx({ --素白蘑菇帽：玩家身上不断冒出的孢子
         elseif rand < 0.3 then
             inst.AnimState:SetMultColour(165/255, 187/255, 237/255, 1)
         end
-    end,
-    fn_remove = nil,
+    end
 })
 
 MakeFx({ --芬布尔斧：击中时贴地扩散的闪电

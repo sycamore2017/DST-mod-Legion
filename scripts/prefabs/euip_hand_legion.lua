@@ -113,16 +113,17 @@ end
 --------------------------------------------------------------------------
 
 local uses_never = 250
+local atk_never = 59.5
 
 local function ChangeSymbol_never(inst, owner)
     if inst._dd ~= nil then
-        if inst.hassetbroken then
+        if inst.isbroken_l then
             owner.AnimState:OverrideSymbol("swap_object", inst._dd.build2, inst._dd.file2)
         else
             owner.AnimState:OverrideSymbol("swap_object", inst._dd.build, inst._dd.file)
         end
     else
-        if inst.hassetbroken then
+        if inst.isbroken_l then
             owner.AnimState:OverrideSymbol("swap_object", "swap_neverfade_broken", "swap_neverfade_broken")
         else
             owner.AnimState:OverrideSymbol("swap_object", "swap_neverfade", "swap_neverfade")
@@ -131,7 +132,7 @@ local function ChangeSymbol_never(inst, owner)
 end
 local function UpdateImg_never(inst)
     if inst._dd == nil then
-        if inst.hassetbroken then
+        if inst.isbroken_l then
             --改变物品栏图片，先改atlasname，再改贴图
             inst.components.inventoryitem.atlasname = "images/inventoryimages/neverfade_broken.xml"
             inst.components.inventoryitem:ChangeImageName("neverfade_broken")
@@ -140,7 +141,7 @@ local function UpdateImg_never(inst)
             inst.components.inventoryitem:ChangeImageName("neverfade")
         end
     else
-        if inst.hassetbroken then
+        if inst.isbroken_l then
             inst.components.inventoryitem.atlasname = inst._dd.img_atlas2
             inst.components.inventoryitem:ChangeImageName(inst._dd.img_tex2)
             if inst._dd.doanim then
@@ -155,7 +156,6 @@ local function UpdateImg_never(inst)
         end
     end
 end
-
 local function OnEquip_never(inst, owner) --装备武器时
     ChangeSymbol_never(inst, owner)
     OnEquip_base(inst, owner)
@@ -166,43 +166,54 @@ local function OnUnequip_never(inst, owner) --放下武器时
     OnUnequip_base(inst, owner)
     inst.components.deployable:SetDeployMode(DEPLOYMODE.PLANT) --卸下时恢复可摆栽种功能
 end
-
-local function IsValidVictim(victim)
-    return victim ~= nil
-        and not ((victim:HasTag("prey") and not victim:HasTag("hostile")) or
-                victim:HasTag("veggie") or
-                victim:HasTag("structure") or
-                victim:HasTag("wall"))
-        and victim.components.health ~= nil
-        and victim.components.combat ~= nil
-end
-local function OnAttack_never(inst, owner, target)
-    if owner.countblessing == nil then
-        owner.countblessing = 0
+local function OnAttack_never(inst, owner, target) --攻击时
+    if target == nil or not target:IsValid() then
+        return
     end
-    if owner.countblessing < 3 then --最多3只庇佑蝴蝶
-        if IsValidVictim(target) then
-            inst.atkcounter = inst.atkcounter + 1
+    inst.atkcounter_l = inst.atkcounter_l + 1
+    if inst.atkcounter_l < 9 then
+        return
+    else --如果达到9次，尝试添加buff
+        inst.atkcounter_l = 0
+    end
 
-            if inst.atkcounter >= 10 then --如果达到10，添加buff
-                if inst._dd ~= nil then
-                    owner.butterfly_skin_l = inst._dd.butterfly
-                end
-                owner:AddDebuff("buff_l_butterflybless", "buff_l_butterflybless")
-                inst.atkcounter = 0
+    local skin = inst._dd and inst._dd.butterfly or nil
+    if owner.legion_numblessing == nil or owner.legion_numblessing < 3 then --装备者最多3只庇佑蝴蝶
+        owner:AddDebuff("buff_l_butterflybless", "buff_l_butterflybless", { max = 3, skin = skin })
+    else
+        local x, y, z = owner.Transform:GetWorldPosition()
+        local distsq = 625 --25半径
+        local players = {}
+        local num = 0
+        for _, v in ipairs(AllPlayers) do
+            if
+                v ~= owner and
+                not (v.components.health:IsDead() or v:HasTag("playerghost")) and
+                v.entity:IsVisible() and
+                (v.legion_numblessing == nil or v.legion_numblessing < 2) and --其他人最多2只庇佑蝴蝶
+                v:GetDistanceSqToPoint(x, y, z) < distsq
+            then
+                table.insert(players, v)
+                num = num + 1
             end
         end
+        if num <= 0 then --无人可加时，增加武器耐久
+            if inst.components.finiteuses:GetPercent() < 1 then
+                inst.components.finiteuses:Repair(7)
+            end
+            return
+        end
+        local theone = players[math.random(num)]
+        theone:AddDebuff("buff_l_butterflybless", "buff_l_butterflybless", { max = 2, skin = skin })
     end
 end
 local function OnFinished_never(inst)
-    if not inst.hassetbroken then
-        inst.hassetbroken = true
-        inst.atkcounter = 0
+    if not inst.isbroken_l then
+        inst.isbroken_l = true
+        -- inst.atkcounter_l = 0 --损坏时不清除攻击次数
         inst.components.weapon:SetDamage(17)
         inst.components.weapon:SetOnAttack(nil)
-
         UpdateImg_never(inst)
-        -- inst.components.equippable.dapperness = 0
         if inst.components.equippable:IsEquipped() then
             local owner = inst.components.inventoryitem.owner
             if owner ~= nil then
@@ -236,14 +247,14 @@ local function OnDeploy_never(inst, pt, deployer, rot) --这里是右键种植�
     end
 end
 local function OnSave_never(inst, data)
-	if inst.atkcounter > 0 then
-		data.atkcounter = inst.atkcounter
+	if inst.atkcounter_l > 0 then
+		data.atkcounter_l = inst.atkcounter_l
 	end
 end
 local function OnLoad_never(inst, data)
 	if data ~= nil then
-		if data.atkcounter ~= nil then
-			inst.atkcounter = data.atkcounter
+		if data.atkcounter_l ~= nil then
+			inst.atkcounter_l = data.atkcounter_l
 		end
 	end
 end
@@ -258,18 +269,15 @@ local foliageath_data_never = {
         if not inst.foliageath_data.fn_recovercheck(inst, tag) then
             return
         end
-
         local value = dt * uses_never/(TUNING.TOTAL_DAY_TIME*3)
-        if value >= 1 then
-            value = math.floor(value)
-        else
+        if value < 0.001 then
             return
         end
         inst.components.finiteuses:Repair(value)
-        if inst.hassetbroken then
-            inst.hassetbroken = false
+        if inst.isbroken_l and inst.components.finiteuses:GetUses() >= 1 then
+            inst.isbroken_l = nil
             inst:RemoveTag("broken")
-            inst.components.weapon:SetDamage(55)
+            inst.components.weapon:SetDamage(atk_never)
             inst.components.weapon:SetOnAttack(OnAttack_never)
             UpdateImg_never(inst)
         end
@@ -293,12 +301,12 @@ table.insert(prefs, Prefab("neverfade", function()
     --此处截断：往下的代码是仅服务器运行，往上的代码是服务器和客户端都会运行的
     if not TheWorld.ismastersim then return inst end
 
-    inst.hassetbroken = false
-    inst.atkcounter = 0
+    -- inst.isbroken_l = false
+    inst.atkcounter_l_l = 0
     inst.foliageath_data = foliageath_data_never
 
     Fn_server(inst, "neverfade", OnEquip_never, OnUnequip_never)
-    SetWeapon(inst, 55, OnAttack_never)
+    SetWeapon(inst, atk_never, OnAttack_never)
     SetFiniteUses(inst, uses_never, OnFinished_never)
     SetDeployable(inst, OnDeploy_never, DEPLOYMODE.PLANT, DEPLOYSPACING.MEDIUM)
     MakeHauntableLaunch(inst) --作祟相关函数

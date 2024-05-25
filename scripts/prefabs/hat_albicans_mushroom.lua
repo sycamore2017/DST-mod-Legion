@@ -6,8 +6,7 @@ local assets = {
 }
 local prefabs = {
     "escapinggerms_fx",
-    "residualspores_fx",
-    "buff_sporeresistance",
+    "buff_l_sporeresistance",
     "albicanscloud_fx",
     "albicans_cap",
     "spore_small",
@@ -57,8 +56,7 @@ local function ReleaseSporesEffect(inst, owner)
     for _, ent in ipairs(ents) do
         if ent.entity:IsVisible() then
             if ent:HasTag("player") then
-                ent.time_l_sporeresistance = { add = TUNING.SEG_TIME*6, max = TUNING.SEG_TIME*30 }
-                ent:AddDebuff("buff_sporeresistance", "buff_sporeresistance")
+                ent:AddDebuff("buff_l_sporeresistance", "buff_l_sporeresistance")
             elseif ent.prefab == "mushroom_light2" then
                 if ent.components.container ~= nil then
                     local numitems = ent.components.container:NumItems()
