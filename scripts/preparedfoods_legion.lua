@@ -155,7 +155,7 @@ local foods_legion = {
         cooktime = 2.5,
         -- potlevel = nil,
         float = { nil, "small", 0.08, 1 },
-        prefabs = { "debuff_panicvolcano" },
+        prefabs = { "buff_l_panicvolcano" },
         oneatenfn = function(inst, eater) --食用时，吸收周围没有携带糖的玩家的精神值加给自己，否则就偷走糖
             if eater.components.inventory == nil then
                 return
@@ -188,7 +188,7 @@ local foods_legion = {
                             ent.components.sanity:DoDelta(-30)
                         end
                         sanitycount = sanitycount + 1
-                        ent:AddDebuff("debuff_panicvolcano", "debuff_panicvolcano")
+                        ent:AddDebuff("buff_l_panicvolcano", "buff_l_panicvolcano")
                     end
                 end
             end
@@ -670,10 +670,9 @@ local foods_legion = {
         cooktime = 0.75,
         -- potlevel = nil,
         float = { 0.02, "small", 0.2, 1.1 },
-        prefabs = { "buff_oilflow" },
+        prefabs = { "buff_l_oilflow" },
         oneatenfn = function(inst, eater)
-            eater.time_l_oilflow = { add = TUNING.SEG_TIME*3, max = TUNING.SEG_TIME*30 }
-            eater:AddDebuff("buff_oilflow", "buff_oilflow")
+            eater:AddDebuff("buff_l_oilflow", "buff_l_oilflow")
         end,
 
         cook_need = "无花果 小饵鱼/甜味鱼",
@@ -846,15 +845,16 @@ local foods_legion = {
         cooktime = 2.5,
         potlevel = "low",
         float = { nil, "small", 0.2, 1.05 },
-        prefabs = { "buff_hungerretarder" },
+        prefabs = { "buff_l_hungerretarder" },
         oneatenfn = function(inst, eater)
             if eater.components.hunger ~= nil or eater.components.periodicspawner ~= nil then
+                local sets
                 if not eater:HasTag("player") and eater.components.periodicspawner ~= nil then
-                    eater.time_l_hungerretarder = { add = TUNING.TOTAL_DAY_TIME*5, max = TUNING.TOTAL_DAY_TIME*50 }
+                    sets = { value = TUNING.TOTAL_DAY_TIME*5 }
                 else
-                    eater.time_l_hungerretarder = { add = TUNING.SEG_TIME*10, max = TUNING.SEG_TIME*50 }
+                    sets = { max = TUNING.SEG_TIME*50 }
                 end
-                eater:AddDebuff("buff_hungerretarder", "buff_hungerretarder")
+                eater:AddDebuff("buff_l_hungerretarder", "buff_l_hungerretarder", sets)
             end
         end,
 

@@ -414,8 +414,7 @@ local function OnAttack_lily(inst, owner, target)
             target:HasTag("balloon")
         )
     then
-        target.time_l_attackreduce = { replace_min = TUNING.SEG_TIME*2 }
-        target:AddDebuff("buff_attackreduce", "buff_attackreduce")
+        target:AddDebuff("buff_l_merciful", "buff_l_merciful", { max = TUNING.SEG_TIME*6 }) --这种方式最多只加3分钟
     end
 end
 
@@ -442,7 +441,7 @@ table.insert(prefs, Prefab("lileaves", function()
     MakeHauntableLaunchAndPerish(inst)
 
     return inst
-end, GetAssets("lileaves", { Asset("ANIM", "anim/swap_lileaves.zip") }), nil))
+end, GetAssets("lileaves", { Asset("ANIM", "anim/swap_lileaves.zip") }), { "buff_l_merciful" }))
 
 --------------------------------------------------------------------------
 --[[ 兰草花穗 ]]

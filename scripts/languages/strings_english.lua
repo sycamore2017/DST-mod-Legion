@@ -910,41 +910,41 @@ S______GENERIC.ANNOUNCE_DETACH_BUFF_L_BESTAPPETITE = "My appetite has returned t
 -- S________WANDA.ANNOUNCE_DETACH_BUFF_L_BESTAPPETITE = ""
 
 --胃梗塞buff
-S______GENERIC.ANNOUNCE_ATTACH_BUFF_HUNGERRETARDER = "No appetite at all."
--- S_______WILLOW.ANNOUNCE_ATTACH_BUFF_HUNGERRETARDER = ""
--- S_____WOLFGANG.ANNOUNCE_ATTACH_BUFF_HUNGERRETARDER = ""
--- S________WENDY.ANNOUNCE_ATTACH_BUFF_HUNGERRETARDER = ""
--- S_________WX78.ANNOUNCE_ATTACH_BUFF_HUNGERRETARDER = ""
-S_WICKERBOTTOM.ANNOUNCE_ATTACH_BUFF_HUNGERRETARDER = "This food boosts my satiety."
--- S_______WOODIE.ANNOUNCE_ATTACH_BUFF_HUNGERRETARDER = ""
-S______WAXWELL.ANNOUNCE_ATTACH_BUFF_HUNGERRETARDER = "Not good for my old stomach."
--- S___WATHGRITHR.ANNOUNCE_ATTACH_BUFF_HUNGERRETARDER = ""
--- S_______WEBBER.ANNOUNCE_ATTACH_BUFF_HUNGERRETARDER = ""
-S_______WINONA.ANNOUNCE_ATTACH_BUFF_HUNGERRETARDER = "The less hungry you are, the better you can work."
--- S_______WORTOX.ANNOUNCE_ATTACH_BUFF_HUNGERRETARDER = ""
--- S_____WORMWOOD.ANNOUNCE_ATTACH_BUFF_HUNGERRETARDER =
--- S________WARLY.ANNOUNCE_ATTACH_BUFF_HUNGERRETARDER =
--- S_________WURT.ANNOUNCE_ATTACH_BUFF_HUNGERRETARDER =
--- S_______WALTER.ANNOUNCE_ATTACH_BUFF_HUNGERRETARDER =
--- S________WANDA.ANNOUNCE_ATTACH_BUFF_HUNGERRETARDER =
+S______GENERIC.ANNOUNCE_ATTACH_BUFF_L_HUNGERRETARDER = "No appetite at all."
+-- S_______WILLOW.ANNOUNCE_ATTACH_BUFF_L_HUNGERRETARDER = ""
+-- S_____WOLFGANG.ANNOUNCE_ATTACH_BUFF_L_HUNGERRETARDER = ""
+-- S________WENDY.ANNOUNCE_ATTACH_BUFF_L_HUNGERRETARDER = ""
+-- S_________WX78.ANNOUNCE_ATTACH_BUFF_L_HUNGERRETARDER = ""
+S_WICKERBOTTOM.ANNOUNCE_ATTACH_BUFF_L_HUNGERRETARDER = "This food boosts my satiety."
+-- S_______WOODIE.ANNOUNCE_ATTACH_BUFF_L_HUNGERRETARDER = ""
+S______WAXWELL.ANNOUNCE_ATTACH_BUFF_L_HUNGERRETARDER = "Not good for my old stomach."
+-- S___WATHGRITHR.ANNOUNCE_ATTACH_BUFF_L_HUNGERRETARDER = ""
+-- S_______WEBBER.ANNOUNCE_ATTACH_BUFF_L_HUNGERRETARDER = ""
+S_______WINONA.ANNOUNCE_ATTACH_BUFF_L_HUNGERRETARDER = "The less hungry you are, the better you can work."
+-- S_______WORTOX.ANNOUNCE_ATTACH_BUFF_L_HUNGERRETARDER = ""
+-- S_____WORMWOOD.ANNOUNCE_ATTACH_BUFF_L_HUNGERRETARDER = ""
+-- S________WARLY.ANNOUNCE_ATTACH_BUFF_L_HUNGERRETARDER = ""
+-- S_________WURT.ANNOUNCE_ATTACH_BUFF_L_HUNGERRETARDER = ""
+-- S_______WALTER.ANNOUNCE_ATTACH_BUFF_L_HUNGERRETARDER = ""
+-- S________WANDA.ANNOUNCE_ATTACH_BUFF_L_HUNGERRETARDER = ""
 --
-S______GENERIC.ANNOUNCE_DETACH_BUFF_HUNGERRETARDER = "Good luck comes when you have an appetite."
--- S_______WILLOW.ANNOUNCE_DETACH_BUFF_HUNGERRETARDER = ""
--- S_____WOLFGANG.ANNOUNCE_DETACH_BUFF_HUNGERRETARDER = ""
--- S________WENDY.ANNOUNCE_DETACH_BUFF_HUNGERRETARDER = ""
--- S_________WX78.ANNOUNCE_DETACH_BUFF_HUNGERRETARDER = ""
-S_WICKERBOTTOM.ANNOUNCE_DETACH_BUFF_HUNGERRETARDER = "Hunger returns to normal."
--- S_______WOODIE.ANNOUNCE_DETACH_BUFF_HUNGERRETARDER = ""
-S______WAXWELL.ANNOUNCE_DETACH_BUFF_HUNGERRETARDER = "My stomach feels better at last."
--- S___WATHGRITHR.ANNOUNCE_DETACH_BUFF_HUNGERRETARDER = ""
--- S_______WEBBER.ANNOUNCE_DETACH_BUFF_HUNGERRETARDER = ""
-S_______WINONA.ANNOUNCE_DETACH_BUFF_HUNGERRETARDER = "Even if you're hungry, you have to keep working."
--- S_______WORTOX.ANNOUNCE_DETACH_BUFF_HUNGERRETARDER = ""
--- S_____WORMWOOD.ANNOUNCE_DETACH_BUFF_HUNGERRETARDER =
--- S________WARLY.ANNOUNCE_DETACH_BUFF_HUNGERRETARDER =
--- S_________WURT.ANNOUNCE_DETACH_BUFF_HUNGERRETARDER =
--- S_______WALTER.ANNOUNCE_DETACH_BUFF_HUNGERRETARDER =
--- S________WANDA.ANNOUNCE_DETACH_BUFF_HUNGERRETARDER =
+S______GENERIC.ANNOUNCE_DETACH_BUFF_L_HUNGERRETARDER = "Good luck comes when you have an appetite."
+-- S_______WILLOW.ANNOUNCE_DETACH_BUFF_L_HUNGERRETARDER = ""
+-- S_____WOLFGANG.ANNOUNCE_DETACH_BUFF_L_HUNGERRETARDER = ""
+-- S________WENDY.ANNOUNCE_DETACH_BUFF_L_HUNGERRETARDER = ""
+-- S_________WX78.ANNOUNCE_DETACH_BUFF_L_HUNGERRETARDER = ""
+S_WICKERBOTTOM.ANNOUNCE_DETACH_BUFF_L_HUNGERRETARDER = "Hunger returns to normal."
+-- S_______WOODIE.ANNOUNCE_DETACH_BUFF_L_HUNGERRETARDER = ""
+S______WAXWELL.ANNOUNCE_DETACH_BUFF_L_HUNGERRETARDER = "My stomach feels better at last."
+-- S___WATHGRITHR.ANNOUNCE_DETACH_BUFF_L_HUNGERRETARDER = ""
+-- S_______WEBBER.ANNOUNCE_DETACH_BUFF_L_HUNGERRETARDER = ""
+S_______WINONA.ANNOUNCE_DETACH_BUFF_L_HUNGERRETARDER = "Even if you're hungry, you have to keep working."
+-- S_______WORTOX.ANNOUNCE_DETACH_BUFF_L_HUNGERRETARDER = ""
+-- S_____WORMWOOD.ANNOUNCE_DETACH_BUFF_L_HUNGERRETARDER = ""
+-- S________WARLY.ANNOUNCE_DETACH_BUFF_L_HUNGERRETARDER = ""
+-- S_________WURT.ANNOUNCE_DETACH_BUFF_L_HUNGERRETARDER = ""
+-- S_______WALTER.ANNOUNCE_DETACH_BUFF_L_HUNGERRETARDER = ""
+-- S________WANDA.ANNOUNCE_DETACH_BUFF_L_HUNGERRETARDER = ""
 
 --力量增幅buff
 -- S______GENERIC.ANNOUNCE_ATTACH_BUFF_L_STRENGTHENHANCER = "" --属于药酒的buff，但是药酒已经会让玩家说话了，所以这里不再重复说
@@ -968,84 +968,84 @@ S________WARLY.ANNOUNCE_DETACH_BUFF_L_STRENGTHENHANCER = "Extra power has been c
 S________WANDA.ANNOUNCE_DETACH_BUFF_L_STRENGTHENHANCER = "I should go back and regain my strength."
 
 --腹得流油buff
-S______GENERIC.ANNOUNCE_ATTACH_BUFF_OILFLOW = "Seems nothing happened."
--- S_______WILLOW.ANNOUNCE_ATTACH_BUFF_OILFLOW = ""
-S_____WOLFGANG.ANNOUNCE_ATTACH_BUFF_OILFLOW = "Wolfgang want to go to the bathroom."
--- S________WENDY.ANNOUNCE_ATTACH_BUFF_OILFLOW = ""
-S_________WX78.ANNOUNCE_ATTACH_BUFF_OILFLOW = "UNKNOWN LEAK IN FUEL SYSTEM!"
-S_WICKERBOTTOM.ANNOUNCE_ATTACH_BUFF_OILFLOW = "I think I'll need adult diapers."
--- S_______WOODIE.ANNOUNCE_ATTACH_BUFF_OILFLOW = ""
-S______WAXWELL.ANNOUNCE_ATTACH_BUFF_OILFLOW = "I have a bad feeling in my stomach."
--- S___WATHGRITHR.ANNOUNCE_ATTACH_BUFF_OILFLOW = ""
-S_______WEBBER.ANNOUNCE_ATTACH_BUFF_OILFLOW = "Stomach is going to cry, but we can't cry."
--- S_______WINONA.ANNOUNCE_ATTACH_BUFF_OILFLOW = ""
-S_______WORTOX.ANNOUNCE_ATTACH_BUFF_OILFLOW = "A self mischief is coming."
-S_____WORMWOOD.ANNOUNCE_ATTACH_BUFF_OILFLOW = "Come on!"
-S________WARLY.ANNOUNCE_ATTACH_BUFF_OILFLOW = "Is that how curious I am?"
--- S_________WURT.ANNOUNCE_ATTACH_BUFF_OILFLOW = ""
-S_______WALTER.ANNOUNCE_ATTACH_BUFF_OILFLOW = "Walter has to be adventurous."
-S________WANDA.ANNOUNCE_ATTACH_BUFF_OILFLOW = "There is no going back!"
+S______GENERIC.ANNOUNCE_ATTACH_BUFF_L_OILFLOW = "Seems nothing happened."
+-- S_______WILLOW.ANNOUNCE_ATTACH_BUFF_L_OILFLOW = ""
+S_____WOLFGANG.ANNOUNCE_ATTACH_BUFF_L_OILFLOW = "Wolfgang want to go to the bathroom."
+-- S________WENDY.ANNOUNCE_ATTACH_BUFF_L_OILFLOW = ""
+S_________WX78.ANNOUNCE_ATTACH_BUFF_L_OILFLOW = "UNKNOWN LEAK IN FUEL SYSTEM!"
+S_WICKERBOTTOM.ANNOUNCE_ATTACH_BUFF_L_OILFLOW = "I think I'll need adult diapers."
+-- S_______WOODIE.ANNOUNCE_ATTACH_BUFF_L_OILFLOW = ""
+S______WAXWELL.ANNOUNCE_ATTACH_BUFF_L_OILFLOW = "I have a bad feeling in my stomach."
+-- S___WATHGRITHR.ANNOUNCE_ATTACH_BUFF_L_OILFLOW = ""
+S_______WEBBER.ANNOUNCE_ATTACH_BUFF_L_OILFLOW = "Stomach is going to cry, but we can't cry."
+-- S_______WINONA.ANNOUNCE_ATTACH_BUFF_L_OILFLOW = ""
+S_______WORTOX.ANNOUNCE_ATTACH_BUFF_L_OILFLOW = "A self mischief is coming."
+S_____WORMWOOD.ANNOUNCE_ATTACH_BUFF_L_OILFLOW = "Come on!"
+S________WARLY.ANNOUNCE_ATTACH_BUFF_L_OILFLOW = "Is that how curious I am?"
+-- S_________WURT.ANNOUNCE_ATTACH_BUFF_L_OILFLOW = ""
+S_______WALTER.ANNOUNCE_ATTACH_BUFF_L_OILFLOW = "Walter has to be adventurous."
+S________WANDA.ANNOUNCE_ATTACH_BUFF_L_OILFLOW = "There is no going back!"
 --
-S______GENERIC.ANNOUNCE_DETACH_BUFF_OILFLOW = "Oh, finally, now I just want to find a hole to hide in."
-S_______WILLOW.ANNOUNCE_DETACH_BUFF_OILFLOW = "I don't want to talk to anyone right now!"
-S_____WOLFGANG.ANNOUNCE_DETACH_BUFF_OILFLOW = "Wolfgang is finished."
-S________WENDY.ANNOUNCE_DETACH_BUFF_OILFLOW = "Do you think this will happen to me?"
-S_________WX78.ANNOUNCE_DETACH_BUFF_OILFLOW = "FUEL SYSTEM HAS BEEN REPAIRED."
-S_WICKERBOTTOM.ANNOUNCE_DETACH_BUFF_OILFLOW = "Fortunately, no one saw it. There's no shame."
-S_______WOODIE.ANNOUNCE_DETACH_BUFF_OILFLOW = "It should be used. We can't waste it."
-S______WAXWELL.ANNOUNCE_DETACH_BUFF_OILFLOW = "Where is my dignity?!"
-S___WATHGRITHR.ANNOUNCE_DETACH_BUFF_OILFLOW = "This has nothing to do with the glory of fighter."
-S_______WEBBER.ANNOUNCE_DETACH_BUFF_OILFLOW = "Oh, that's too bad. I'll be scolded by mom."
-S_______WINONA.ANNOUNCE_DETACH_BUFF_OILFLOW = "It's over. There's a lot to clean up."
-S_______WORTOX.ANNOUNCE_DETACH_BUFF_OILFLOW = "Amazing, I feel like my soul was about to be pulled out."
-S_____WORMWOOD.ANNOUNCE_DETACH_BUFF_OILFLOW = "A wonderful experience."
-S________WARLY.ANNOUNCE_DETACH_BUFF_OILFLOW = "Curiosity killed the cat."
-S_________WURT.ANNOUNCE_DETACH_BUFF_OILFLOW = "So funny, I used to have beefalos that did this."
-S_______WALTER.ANNOUNCE_DETACH_BUFF_OILFLOW = "This will be a stain on my life."
-S________WANDA.ANNOUNCE_DETACH_BUFF_OILFLOW = "I regret it, truely."
+S______GENERIC.ANNOUNCE_DETACH_BUFF_L_OILFLOW = "Oh, finally, now I just want to find a hole to hide in."
+S_______WILLOW.ANNOUNCE_DETACH_BUFF_L_OILFLOW = "I don't want to talk to anyone right now!"
+S_____WOLFGANG.ANNOUNCE_DETACH_BUFF_L_OILFLOW = "Wolfgang is finished."
+S________WENDY.ANNOUNCE_DETACH_BUFF_L_OILFLOW = "Do you think this will happen to me?"
+S_________WX78.ANNOUNCE_DETACH_BUFF_L_OILFLOW = "FUEL SYSTEM HAS BEEN REPAIRED."
+S_WICKERBOTTOM.ANNOUNCE_DETACH_BUFF_L_OILFLOW = "Fortunately, no one saw it. There's no shame."
+S_______WOODIE.ANNOUNCE_DETACH_BUFF_L_OILFLOW = "It should be used. We can't waste it."
+S______WAXWELL.ANNOUNCE_DETACH_BUFF_L_OILFLOW = "Where is my dignity?!"
+S___WATHGRITHR.ANNOUNCE_DETACH_BUFF_L_OILFLOW = "This has nothing to do with the glory of fighter."
+S_______WEBBER.ANNOUNCE_DETACH_BUFF_L_OILFLOW = "Oh, that's too bad. I'll be scolded by mom."
+S_______WINONA.ANNOUNCE_DETACH_BUFF_L_OILFLOW = "It's over. There's a lot to clean up."
+S_______WORTOX.ANNOUNCE_DETACH_BUFF_L_OILFLOW = "Amazing, I feel like my soul was about to be pulled out."
+S_____WORMWOOD.ANNOUNCE_DETACH_BUFF_L_OILFLOW = "A wonderful experience."
+S________WARLY.ANNOUNCE_DETACH_BUFF_L_OILFLOW = "Curiosity killed the cat."
+S_________WURT.ANNOUNCE_DETACH_BUFF_L_OILFLOW = "So funny, I used to have beefalos that did this."
+S_______WALTER.ANNOUNCE_DETACH_BUFF_L_OILFLOW = "This will be a stain on my life."
+S________WANDA.ANNOUNCE_DETACH_BUFF_L_OILFLOW = "I regret it, truely."
 --
-S______GENERIC.BUFF_OILFLOW = {
+S______GENERIC.BUFF_L_OILFLOW = {
     "OMG...", "...", "... ...", "......", "This is embarrassing.", "Don't look at me.", "Oh, no!",
     "When does it stop?", "Am I having a nightmare?", "Crazy...", "Stop!", "No...", "Where is the toilet?!",
     "I just want to die.", "No.", "Stop, stop, stop!", "This...", "I'm collapsing.", "No!", "...!",
     "I'm so sorry.", "Sorry...", "Sorry!", "Ah...",
 }
--- S_______WILLOW.BUFF_OILFLOW = ""
--- S_____WOLFGANG.BUFF_OILFLOW = ""
--- S________WENDY.BUFF_OILFLOW = ""
--- S_________WX78.BUFF_OILFLOW = ""
-S_WICKERBOTTOM.BUFF_OILFLOW = {
+-- S_______WILLOW.BUFF_L_OILFLOW = ""
+-- S_____WOLFGANG.BUFF_L_OILFLOW = ""
+-- S________WENDY.BUFF_L_OILFLOW = ""
+-- S_________WX78.BUFF_L_OILFLOW = ""
+S_WICKERBOTTOM.BUFF_L_OILFLOW = {
     "I knew it.", "Something was wrong with that dish.", "Where's the bathroom.", "No!", "...!", "...", "... ...",
     "No...", "This...", "Don't look at me, don't look at me...", "Learn from my mistakes.", "I can't bear it.", "......",
     "I'm not old enough for this to be happening to me.", "Nature calls...", "Maybe we can look at this like medicine...", "I think I know why...",
     "Chill, lady!", "It's no big deal.", "Why do I have to suffer so much?", "This moment is devoid of elegance.",
 }
--- S_______WOODIE.BUFF_OILFLOW = ""
-S______WAXWELL.BUFF_OILFLOW = {
+-- S_______WOODIE.BUFF_L_OILFLOW = ""
+S______WAXWELL.BUFF_L_OILFLOW = {
     "I knew it.", "Something was wrong with that food.", "There's no bathroom.", "No!", "...!", "...", "... ...",
     "No...", "This...", "Don't look at me, don't look at me...", "Learn from my mistakes.", "I can't bear it.", "......",
     "I'm not old enough for this to be happening to me.", "Nature calls...", "What can I do?!", "I think I know why...",
     "Calm down!", "It's no big deal.", "What a disgrace!", "Why do I have to suffer so much?",
     "This moment is devoid of class.",
 }
--- S___WATHGRITHR.BUFF_OILFLOW = ""
--- S_______WEBBER.BUFF_OILFLOW = ""
--- S_______WINONA.BUFF_OILFLOW = ""
-S_______WORTOX.BUFF_OILFLOW = {
+-- S___WATHGRITHR.BUFF_L_OILFLOW = ""
+-- S_______WEBBER.BUFF_L_OILFLOW = ""
+-- S_______WINONA.BUFF_L_OILFLOW = ""
+S_______WORTOX.BUFF_L_OILFLOW = {
     "Hello, little thing. Heh.", "Oh well.", "What are you looking at?!", "Hello!", "...!", "...", "... ...", "......",
     "No...", "This...", "Hi...", "Hmm.", "Well...", "Well.", "What a vulgar prank!", "Funny!",
     "Not funny at all.", "Haha, haha, so embarrassing.", "Embarrassing.", "Excuse me, where is the bathroom?",
     "Hmm...", "I'm doing good for the lawn.", "Hey! There's nothing.", "A careless person would be sad.",
     "I should slip away.", "Sorry...", "Go away! Haven't you seen a demon poop?",
 }
-S_____WORMWOOD.BUFF_OILFLOW = {
+S_____WORMWOOD.BUFF_L_OILFLOW = {
     "Strange.", "But it's good.", "Not bad for me.", "Can't stop?", "...", "... ...", "......", "Haha.", "This...",
     "Now my friends have something good.", "Great.", "I'm getting hungry.", "Ah...", "Not bad.", "Interesting.",
 }
--- S________WARLY.BUFF_OILFLOW = ""
--- S_________WURT.BUFF_OILFLOW = ""
--- S_______WALTER.BUFF_OILFLOW = ""
--- S________WANDA.BUFF_OILFLOW = ""
+-- S________WARLY.BUFF_L_OILFLOW = ""
+-- S_________WURT.BUFF_L_OILFLOW = ""
+-- S_______WALTER.BUFF_L_OILFLOW = ""
+-- S________WANDA.BUFF_L_OILFLOW = ""
 
 S_NAMES.DISH_TOMAHAWKSTEAK = "Steak Tomahawk" --牛排战斧
 STRINGS.UI.COOKBOOK.DISH_TOMAHAWKSTEAK = "Favorite axe of the king of one-upmanship"
@@ -1183,6 +1183,43 @@ S_______WORTOX.ANNOUNCE_DETACH_BUFF_L_EFFORTLUCK = "The road is long and winding
 -- S_________WURT.ANNOUNCE_DETACH_BUFF_L_EFFORTLUCK = ""
 -- S_______WALTER.ANNOUNCE_DETACH_BUFF_L_EFFORTLUCK = ""
 S________WANDA.ANNOUNCE_DETACH_BUFF_L_EFFORTLUCK = "Luck will always run out."
+
+--怜悯debuff
+S______GENERIC.ANNOUNCE_ATTACH_BUFF_L_MERCIFUL = "I suddenly feel that the enemies are all very pitiful."
+S_______WILLOW.ANNOUNCE_ATTACH_BUFF_L_MERCIFUL = "I have lost my temper, only mercy."
+-- S_____WOLFGANG.ANNOUNCE_ATTACH_BUFF_L_MERCIFUL = ""
+S________WENDY.ANNOUNCE_ATTACH_BUFF_L_MERCIFUL = "Will they feel better if I apologize?"
+-- S_________WX78.ANNOUNCE_ATTACH_BUFF_L_MERCIFUL = ""
+-- S_WICKERBOTTOM.ANNOUNCE_ATTACH_BUFF_L_MERCIFUL = ""
+-- S_______WOODIE.ANNOUNCE_ATTACH_BUFF_L_MERCIFUL = ""
+-- S______WAXWELL.ANNOUNCE_ATTACH_BUFF_L_MERCIFUL = ""
+-- S___WATHGRITHR.ANNOUNCE_ATTACH_BUFF_L_MERCIFUL = ""
+-- S_______WEBBER.ANNOUNCE_ATTACH_BUFF_L_MERCIFUL = ""
+-- S_______WINONA.ANNOUNCE_ATTACH_BUFF_L_MERCIFUL = ""
+-- S_______WORTOX.ANNOUNCE_ATTACH_BUFF_L_MERCIFUL = ""
+-- S_____WORMWOOD.ANNOUNCE_ATTACH_BUFF_L_MERCIFUL = ""
+-- S________WARLY.ANNOUNCE_ATTACH_BUFF_L_MERCIFUL = ""
+-- S_________WURT.ANNOUNCE_ATTACH_BUFF_L_MERCIFUL = ""
+-- S_______WALTER.ANNOUNCE_ATTACH_BUFF_L_MERCIFUL = ""
+-- S________WANDA.ANNOUNCE_ATTACH_BUFF_L_MERCIFUL = ""
+--
+S______GENERIC.ANNOUNCE_DETACH_BUFF_L_MERCIFUL = "I have no mercy towards the enemy!"
+S_______WILLOW.ANNOUNCE_DETACH_BUFF_L_MERCIFUL = "My anger is burning again!"
+-- S_____WOLFGANG.ANNOUNCE_DETACH_BUFF_L_MERCIFUL = ""
+S________WENDY.ANNOUNCE_DETACH_BUFF_L_MERCIFUL = "There is nothing left, no mercy!"
+-- S_________WX78.ANNOUNCE_DETACH_BUFF_L_MERCIFUL = ""
+-- S_WICKERBOTTOM.ANNOUNCE_DETACH_BUFF_L_MERCIFUL = ""
+-- S_______WOODIE.ANNOUNCE_DETACH_BUFF_L_MERCIFUL = ""
+-- S______WAXWELL.ANNOUNCE_DETACH_BUFF_L_MERCIFUL = ""
+-- S___WATHGRITHR.ANNOUNCE_DETACH_BUFF_L_MERCIFUL = ""
+-- S_______WEBBER.ANNOUNCE_DETACH_BUFF_L_MERCIFUL = ""
+-- S_______WINONA.ANNOUNCE_DETACH_BUFF_L_MERCIFUL = ""
+-- S_______WORTOX.ANNOUNCE_DETACH_BUFF_L_MERCIFUL = ""
+-- S_____WORMWOOD.ANNOUNCE_DETACH_BUFF_L_MERCIFUL = ""
+-- S________WARLY.ANNOUNCE_DETACH_BUFF_L_MERCIFUL = ""
+-- S_________WURT.ANNOUNCE_DETACH_BUFF_L_MERCIFUL = ""
+-- S_______WALTER.ANNOUNCE_DETACH_BUFF_L_MERCIFUL = ""
+-- S________WANDA.ANNOUNCE_DETACH_BUFF_L_MERCIFUL = ""
 
 --------------------------------------------------------------------------
 --[[ the sacrifice of rain ]]--[[ 祈雨祭 ]]

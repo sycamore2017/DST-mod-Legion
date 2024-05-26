@@ -6,9 +6,10 @@ local TOOLS_L = require("tools_legion")
 --------------------------------------------------------------------------
 
 local TIME_MAX = TUNING.SEG_TIME*30
+local TIME_MAX_HALF = TUNING.SEG_TIME*15
 local oppositeBuffs = {
-    buff_hungerretarder = { buff_oilflow = true },
-    buff_oilflow = { buff_hungerretarder = true }
+    buff_l_hungerretarder = { buff_l_oilflow = true },
+    buff_l_oilflow = { buff_l_hungerretarder = true }
 }
 
 local function BuffTalk_start(target, buff)
@@ -36,8 +37,8 @@ local function CheckOppositeBuff(buff, target) --去除相克的buff，不让某
     for k, _ in pairs(nobuffs) do
         abuff = target:GetDebuff(k)
         if abuff ~= nil then
-            if abuff.oppositefn_l ~= nil then
-                abuff.oppositefn_l(abuff, buff, target)
+            if abuff.legionfn_oppositebuff ~= nil then --buff被抵消时，可能会有特殊逻辑要触发
+                abuff.legionfn_oppositebuff(abuff, buff, target)
             end
             target:RemoveDebuff(k)
         end
@@ -258,7 +259,7 @@ MakeBuff({
 MakeBuff({
     name = "buff_l_bestappetite",
     -- assets = nil, prefabs = nil, notimer = nil,
-    sets = { value = TUNING.SEG_TIME*2, max = TUNING.SEG_TIME*15 },
+    sets = { value = TUNING.SEG_TIME*2, max = TIME_MAX_HALF },
     fn_start = function(buff, target, followsymbol, followoffset, sets)
         BuffTalk_start(target, buff)
         target.legiontag_bestappetite = true --做标记。此处并没有别的操作，因为已经修改全局食性组件了，有这个buff就会启用
@@ -571,31 +572,31 @@ MakeBuff({
 --------------------------------------------------------------------------
 
 MakeBuff({
-    name = "buff_attackreduce", --buff_l_merciful
-    assets = nil,
-    prefabs = nil,
-    time_key = "time_l_attackreduce",
-    time_default = TUNING.SEG_TIME*2, --1分钟
-    notimer = nil,
+    name = "buff_l_merciful",
+    -- assets = nil, prefabs = nil, notimer = nil,
+    sets = { value = TUNING.SEG_TIME*2, max = TIME_MAX_HALF },
     fn_start = function(buff, target, followsymbol, followoffset, sets)
         -- if target.components.damagetypebonus == nil then --通过这个组件能使得弱化效果能同时应用给普攻和特攻
         --     target:AddComponent("damagetypebonus")
         -- end
-        -- target.components.damagetypebonus:AddBonus("_health", target, 0.7, "buff_attackreduce")
+        -- target.components.damagetypebonus:AddBonus("_health", target, 0.7, "buff_l_merciful")
         --"inspectable"标签覆盖范围比"_health"标签广
-        -- target.components.damagetypebonus:AddBonus("inspectable", target, 0.7, "buff_attackreduce")
-        TOOLS_L.AddBonusAll(target, "buff_attackreduce", 0.7)
+        -- target.components.damagetypebonus:AddBonus("inspectable", target, 0.7, "buff_l_merciful")
+        BuffTalk_start(target, buff)
+        TOOLS_L.AddBonusAll(target, "buff_l_merciful", 0.7)
         target.AnimState:SetMultColour(165/255, 188/255, 47/255, 1)
     end,
     fn_again = function(buff, target, followsymbol, followoffset, sets)
+        BuffTalk_start(target, buff)
         target.AnimState:SetMultColour(165/255, 188/255, 47/255, 1)
     end,
     fn_end = function(buff, target)
         -- if target.components.damagetypebonus ~= nil then
-            -- target.components.damagetypebonus:RemoveBonus("_health", target, "buff_attackreduce")
-            -- target.components.damagetypebonus:RemoveBonus("inspectable", target, "buff_attackreduce")
+            -- target.components.damagetypebonus:RemoveBonus("_health", target, "buff_l_merciful")
+            -- target.components.damagetypebonus:RemoveBonus("inspectable", target, "buff_l_merciful")
         -- end
-        TOOLS_L.RemoveBonusAll(target, "buff_attackreduce")
+        BuffTalk_end(target, buff)
+        TOOLS_L.RemoveBonusAll(target, "buff_l_merciful")
         target.AnimState:SetMultColour(1, 1, 1, 1)
     end
 })
@@ -613,36 +614,32 @@ local function OnChangeFollowSymbol(inst, target, followsymbol, followoffset)
     end
 end
 
-MakeBuff({
-    name = "debuff_panicvolcano",
+MakeBuff({ --这个buff的代码借鉴的毒菌蟾蜍的孢子技能
+    name = "buff_l_panicvolcano",
     assets = {
-        Asset("ANIM", "anim/debuff_panicvolcano.zip"),
+        Asset("ANIM", "anim/debuff_panicvolcano.zip")
     },
-    prefabs = nil,
-    time_key = nil,
-    time_default = nil,
-    notimer = true,
-    addnetwork = true,
-    fn_start = function(buff, target, followsymbol, followoffset)
+    notimer = true, addnetwork = true,
+    fn_start = function(buff, target, followsymbol, followoffset, sets)
         buff.entity:SetParent(target.entity)
         OnChangeFollowSymbol(buff, target, followsymbol, followoffset)
-        if buff._followtask ~= nil then
-            buff._followtask:Cancel()
+        if buff.task_l_follow ~= nil then
+            buff.task_l_follow:Cancel()
         end
-        buff._followtask = buff:DoPeriodicTask(0, AlignToTarget, nil, target)
+        buff.task_l_follow = buff:DoPeriodicTask(0, AlignToTarget, nil, target)
         AlignToTarget(buff, target)
 
         target:PushEvent("bevolcanopaniced")
     end,
-    fn_again = nil,
+    -- fn_again = nil,
     fn_end = function(buff, target)
         local player = buff.entity:GetParent()
-        if player ~= nil and player.components.talker ~= nil then
+        if player ~= nil and player.components.talker ~= nil and player:HasTag("player") then
             player.components.talker:Say(GetString(player, "DESCRIBE", { "DISH_SUGARLESSTRICKMAKERCUPCAKES", "TRICKED" }))
         end
-        if buff._followtask ~= nil then
-            buff._followtask:Cancel()
-            buff._followtask = nil
+        if buff.task_l_follow ~= nil then
+            buff.task_l_follow:Cancel()
+            buff.task_l_follow = nil
         end
     end,
     fn_common = function(buff)
@@ -658,14 +655,14 @@ MakeBuff({
         buff.AnimState:PlayAnimation("anim")
         buff.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
         buff.AnimState:SetFinalOffset(3)
+        buff.AnimState:SetLightOverride(0.2)
     end,
     fn_server = function(buff)
         buff.components.debuff:SetChangeFollowSymbolFn(OnChangeFollowSymbol)
-
         buff:ListenForEvent("animover", function(fx)
             fx.components.debuff:Stop()
         end)
-    end,
+    end
 })
 
 --------------------------------------------------------------------------
@@ -673,105 +670,103 @@ MakeBuff({
 --------------------------------------------------------------------------
 
 local function StartOilFlowing(buff, inst)
-    if buff.task ~= nil then
-        buff.task:Cancel()
+    if buff.task_l ~= nil then
+        buff.task_l:Cancel()
     end
-    buff.task = inst:DoPeriodicTask(2, function(inst)
+    buff.task_l = inst:DoPeriodicTask(2, function(inst)
         if not IsAlive(inst) then
             buff.components.debuff:Stop()
             return
         end
-        if math.random() < 0.6 then
-            local poopname = "poop"
-            if math.random() < 0.005 then
-                poopname = "beeswax"
-            elseif inst:HasTag("spider") then
-                poopname = "silk"
-            elseif inst:HasTag("bat") then
-                poopname = "guano"
-            end
-            local poop = SpawnPrefab(poopname)
-            if poop ~= nil then
-                ------让粑粑飞
-                local x1, y1, z1 = inst.Transform:GetWorldPosition()
-                local angle = inst.Transform:GetRotation() + 20 - math.random()*40
-                local theta = (angle+180)*DEGREES
-                poop.Transform:SetPosition(x1, y1+0.5, z1)
-                --Tip：SetMotorVel()会一直给加速度，SetVel()则会受到摩擦阻力和重力影响
-                poop.Physics:SetVel(2.5*math.cos(theta), 2, -2.5*math.sin(theta))
+        if math.random() >= 0.6 then
+            return
+        end
+        local poopname = "poop"
+        if math.random() < 0.005 then
+            poopname = "beeswax"
+        elseif inst:HasTag("spider") then
+            poopname = "silk"
+        elseif inst:HasTag("bat") then
+            poopname = "guano"
+        -- else --将来要是还有合适的生物，也可以拉一些特殊的排泄物
+        end
+        local poop = SpawnPrefab(poopname)
+        if poop ~= nil then
+            ------让粑粑飞
+            local x1, y1, z1 = inst.Transform:GetWorldPosition()
+            local angle = inst.Transform:GetRotation() + 20 - math.random()*40
+            local theta = (angle+180)*DEGREES
+            poop.Transform:SetPosition(x1, y1+0.5, z1)
+            --Tip：SetMotorVel()会一直给加速度，SetVel()则会受到摩擦阻力和重力影响
+            poop.Physics:SetVel(2.5*math.cos(theta), 2, -2.5*math.sin(theta))
 
-                if inst:HasTag("player") then
-                    ------说尴尬的话
-                    if inst.components.talker ~= nil and not inst:HasTag("mime") and math.random() < 0.4 then
-                        local words = STRINGS.CHARACTERS[string.upper(inst.prefab)]
-                        if words ~= nil and words.BUFF_OILFLOW ~= nil then
-                            words = words.BUFF_OILFLOW
-                        else
-                            words = STRINGS.CHARACTERS.GENERIC.BUFF_OILFLOW
-                        end
-                        inst.components.talker:Say(GetRandomItem(words))
+            if inst:HasTag("player") then
+                ------说尴尬的话
+                if inst.components.talker ~= nil and not inst:HasTag("mime") and math.random() < 0.4 then
+                    local words = STRINGS.CHARACTERS[string.upper(inst.prefab)]
+                    if words ~= nil and words.BUFF_L_OILFLOW ~= nil then
+                        words = words.BUFF_L_OILFLOW
+                    else
+                        words = STRINGS.CHARACTERS.GENERIC.BUFF_L_OILFLOW
                     end
+                    inst.components.talker:Say(GetRandomItem(words))
+                end
 
-                    ------让玩家向前推进
-                    inst:PushEvent("awkwardpropeller", { angle = angle })
-                else
-                    ------让对象向前推进
-                    if inst.sg == nil or not inst.sg:HasStateTag("busy") then
-                        inst:PushEvent("attacked", { damage = 0 })
-                        if inst.Physics ~= nil then
-                            inst.Transform:SetRotation(angle)
-                            inst.Physics:SetVel(5, 0, 0)
-                        end
+                ------让玩家向前推进
+                inst:PushEvent("awkwardpropeller", { angle = angle })
+            else
+                ------让对象向前推进
+                if inst.sg == nil or not inst.sg:HasStateTag("busy") then
+                    inst:PushEvent("attacked", { damage = 0 })
+                    if inst.Physics ~= nil then
+                        inst.Transform:SetRotation(angle)
+                        inst.Physics:SetVel(5, 0, 0)
                     end
                 end
-
-                ------增加潮湿度
-                if inst.components.moisture ~= nil then
-                    inst.components.moisture:DoDelta(0.5)
-                end
-
-                ------饥饿值消耗
-                if inst.components.hunger ~= nil and not inst.components.hunger:IsStarving() then
-                    inst.components.hunger:DoDelta(-3.5)
-                else
-                    inst.components.health:DoDelta(-5, false, buff.prefab)
-                end
-
-                inst:PushEvent("on_poop", { doer = buff, hungerdelta = -3.5, item = poop })
             end
+
+            ------增加潮湿度
+            if inst.components.moisture ~= nil then
+                inst.components.moisture:DoDelta(0.5)
+            end
+
+            ------饥饿值消耗
+            if inst.components.hunger ~= nil and not inst.components.hunger:IsStarving() then
+                inst.components.hunger:DoDelta(-3.5)
+            else
+                inst.components.health:DoDelta(-5, false, buff.prefab)
+            end
+
+            inst:PushEvent("on_poop", { doer = buff, hungerdelta = -3.5, item = poop })
         end
     end, 3+5*math.random())
 end
 
 MakeBuff({
-    name = "buff_oilflow",
-    assets = nil,
-    prefabs = { "poop", "beeswax" },
-    time_key = "time_l_oilflow",
-    time_default = TUNING.SEG_TIME*3, --1.5分钟
-    notimer = nil,
-    fn_start = function(buff, target)
+    name = "buff_l_oilflow",
+    -- assets = nil, prefabs = nil, notimer = nil,
+    sets = { value = TUNING.SEG_TIME*3, max = TIME_MAX_HALF },
+    fn_start = function(buff, target, followsymbol, followoffset, sets)
         CheckOppositeBuff(buff, target)
         BuffTalk_start(target, buff)
         StartOilFlowing(buff, target)
     end,
-    fn_again = function(buff, target)
+    fn_again = function(buff, target, followsymbol, followoffset, sets)
         CheckOppositeBuff(buff, target)
         BuffTalk_start(target, buff)
         StartOilFlowing(buff, target)
     end,
     fn_end = function(buff, target)
         BuffTalk_end(target, buff)
-        if buff.task ~= nil then
-            buff.task:Cancel()
-            buff.task = nil
+        if buff.task_l ~= nil then
+            buff.task_l:Cancel()
+            buff.task_l = nil
         end
-    end,
-    fn_server = nil
+    end
 })
 
 --------------------------------------------------------------------------
---[[ 肠道堵塞：减少饱食度下降速度 ]]
+--[[ 肠道堵塞：饱食度下降速度降低90% ]]
 --------------------------------------------------------------------------
 
 local function OnSave_hungerretarder(inst, data)
@@ -789,31 +784,28 @@ local function Task_hungerretarder(buff)
 end
 
 MakeBuff({
-    name = "buff_hungerretarder",
-    assets = nil,
-    prefabs = nil,
-    time_key = "time_l_hungerretarder",
-    time_default = TUNING.SEG_TIME*10, --5分钟
-    notimer = nil,
-    fn_start = function(buff, target)
+    name = "buff_l_hungerretarder",
+    -- assets = nil, prefabs = nil, notimer = nil,
+    sets = { value = TUNING.SEG_TIME*10, max = TUNING.TOTAL_DAY_TIME*50 },
+    fn_start = function(buff, target, followsymbol, followoffset, sets)
         CheckOppositeBuff(buff, target)
         BuffTalk_start(target, buff)
         if target.components.hunger ~= nil then
-            target.components.hunger.burnratemodifiers:SetModifier(buff, 0.1) --饥饿值消耗速度降为0.1倍
+            target.components.hunger.burnratemodifiers:SetModifier(buff, 0.1) --饱食度下降速度降为0.1倍
         end
 
-        if buff.task_block ~= nil then
-            buff.task_block:Cancel()
-            buff.task_block = nil
+        if buff.task_l_block ~= nil then
+            buff.task_l_block:Cancel()
+            buff.task_l_block = nil
         end
         if target.components.periodicspawner ~= nil then
             local cpt = target.components.periodicspawner
             local t = cpt.basetime + 0.5*cpt.randtime
-            buff.task_block = buff:DoPeriodicTask(t, Task_hungerretarder, 1+9*math.random())
+            buff.task_l_block = buff:DoPeriodicTask(t, Task_hungerretarder, 1+9*math.random())
             cpt:Stop() --憋住！
         end
     end,
-    fn_again = function(buff, target)
+    fn_again = function(buff, target, followsymbol, followoffset, sets)
         CheckOppositeBuff(buff, target)
         BuffTalk_start(target, buff)
         if target.components.periodicspawner ~= nil then
@@ -826,9 +818,9 @@ MakeBuff({
             target.components.hunger.burnratemodifiers:RemoveModifier(buff)
         end
 
-        if buff.task_block ~= nil then
-            buff.task_block:Cancel()
-            buff.task_block = nil
+        if buff.task_l_block ~= nil then
+            buff.task_l_block:Cancel()
+            buff.task_l_block = nil
         end
         local poopname = "poop"
         if target.components.periodicspawner ~= nil then

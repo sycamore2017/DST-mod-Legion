@@ -493,19 +493,19 @@ local function ForceStopHeavyLifting(inst)
 end
 
 --[ 无视防御的攻击 ]--
-local function GetResist_dtr(self, attacker, weapon, ...)
+local function GetResist_l(self, attacker, weapon, ...)
     local mult = 1
-    if self.all_l_v ~= nil then
-        mult = self.all_l_v
-        if self.inst.flag_undefended_l == 1 then
+    if self.all_legion_v ~= nil then
+        mult = self.all_legion_v
+        if self.inst.legiontag_undefended == 1 then
             if mult < 1 then --大于1 是代表增伤。这里需要忽略的是减伤
                 mult = 1
             end
         end
     end
-    if self.GetResist_l_base ~= nil then
-        local mult2 = self.GetResist_l_base(self, attacker, weapon, ...)
-        if self.inst.flag_undefended_l == 1 then
+    if self.GetResist_legion ~= nil then
+        local mult2 = self.GetResist_legion(self, attacker, weapon, ...)
+        if self.inst.legiontag_undefended == 1 then
             if mult2 < 1 then --大于1 是代表增伤。这里需要忽略的是减伤
                 mult2 = 1
             end
@@ -514,16 +514,90 @@ local function GetResist_dtr(self, attacker, weapon, ...)
     end
     return mult
 end
-local function RecalculateModifier_combat_l(inst)
+local function inventory_ApplyDamage_l(self, damage, attacker, weapon, spdamage, ...)
+    if self.inst.legiontag_undefended == 1 then --虽然其中可能会有增伤机制，但太复杂了，不好改，直接原样返回吧
+        return damage, spdamage
+    end
+    if self.ApplyDamage_legion ~= nil then
+        return self.ApplyDamage_legion(self, damage, attacker, weapon, spdamage, ...)
+    end
+    return damage, spdamage
+end
+local function combat_mult_RecalculateModifier_l(inst)
     local m = inst._base
     for source, src_params in pairs(inst._modifiers) do
-        for k, v in pairs(src_params.modifiers) do
+        for k, v in pairs(src_params.modifiers) do --externaldamagetakenmultipliers 用的乘法，所以这里只考虑乘法的情况
             if v > 1 then --大于1 是代表增伤。这里需要忽略的是减伤
                 m = inst._fn(m, v)
             end
         end
     end
-    inst._modifier_l = m
+    inst._modifier_legion = m
+end
+local function combat_mult_Get_l(self, ...)
+    if self.inst.legiontag_undefended == 1 then
+        return self._modifier_legion or 1
+    end
+    if self.Get_legion ~= nil then
+        return self.Get_legion(self, ...)
+    end
+    return 1
+end
+local function combat_mult_SetModifier_l(self, ...)
+    if self.SetModifier_legion ~= nil then
+        self.SetModifier_legion(self, ...)
+    end
+    combat_mult_RecalculateModifier_l(self)
+end
+local function combat_mult_RemoveModifier_l(self, ...)
+    if self.RemoveModifier_legion ~= nil then
+        self.RemoveModifier_legion(self, ...)
+    end
+    combat_mult_RecalculateModifier_l(self)
+end
+local function combat_GetAttacked_l(self, ...)
+    local notblocked
+    if self.GetAttacked_legion ~= nil then
+        notblocked = self.GetAttacked_legion(self, ...)
+    end
+    if self.inst.legiontag_undefended == 1 then
+        self.inst.legiontag_undefended = 0
+    end
+    return notblocked
+end
+local function health_DoDelta_l(self, amount, overtime, cause, ignore_invincible, afflicter, ignore_absorb, ...)
+    if self.DoDelta_legion ~= nil then
+        if self.inst.legiontag_undefended == 1 then
+            ignore_invincible = true
+            ignore_absorb = true
+        end
+        return self.DoDelta_legion(self, amount, overtime, cause, ignore_invincible, afflicter, ignore_absorb, ...)
+    end
+    return amount
+end
+local function health_DoDelta_player(self, amount, overtime, cause, ignore_invincible, afflicter, ignore_absorb, ...)
+    if self.DoDelta_legion ~= nil then
+        if self.inst.legiontag_undefended == 1 then
+            -- ignore_invincible = true --对于玩家，无敌是有效的
+            ignore_absorb = true
+        end
+        return self.DoDelta_legion(self, amount, overtime, cause, ignore_invincible, afflicter, ignore_absorb, ...)
+    end
+    return amount
+end
+local function planarentity_AbsorbDamage_l(self, damage, attacker, weapon, spdmg, ...)
+    if self.AbsorbDamage_legion == nil then
+        return damage, spdmg
+    end
+    if self.inst.legiontag_undefended == 1 then
+        local damage2, spdamage2 = self.AbsorbDamage_legion(self, damage, attacker, weapon, spdmg, ...)
+        if damage2 < damage then --如果最终值小于之前的值，说明有减免，那就不准减免
+            return damage, spdamage2
+        else --兼容别的mod的逻辑
+            return damage2, spdamage2
+        end
+    end
+    return self.AbsorbDamage_legion(self, damage, attacker, weapon, spdmg, ...)
 end
 local function UndefendedATK(inst, data)
     if data == nil or data.target == nil then
@@ -532,133 +606,59 @@ local function UndefendedATK(inst, data)
     local target = data.target
 
     if
-        target.ban_l_undefended or --其他mod兼容：这个变量能防止被破防攻击
+        target.legiontag_ban_undefended or --其他mod兼容：这个变量能防止被破防攻击
         target.prefab == "laozi" --无法伤害神话书说里的太上老君
     then
         return
     end
 
-    local health = target.components.health
-
-    if target.flag_undefended_l == nil then
+    if target.legiontag_undefended == nil then
         --修改物品栏护甲机制
-        if target.components.inventory ~= nil and not target:HasTag("player") then --不改玩家的
-            local ApplyDamage_old = target.components.inventory.ApplyDamage
-            target.components.inventory.ApplyDamage = function(self, damage, attacker, weapon, spdamage, ...)
-                if self.inst.flag_undefended_l == 1 then --虽然其中可能会有增伤机制，但太复杂了，不好改，直接原样返回吧
-                    return damage, spdamage
-                end
-                return ApplyDamage_old(self, damage, attacker, weapon, spdamage, ...)
-            end
+        if target.components.inventory ~= nil and target.components.inventory.ApplyDamage_legion == nil then
+            target.components.inventory.ApplyDamage_legion = target.components.inventory.ApplyDamage
+            target.components.inventory.ApplyDamage = inventory_ApplyDamage_l
         end
 
         --修改战斗机制
         if target.components.combat ~= nil then
             local combat = target.components.combat
             local mult = combat.externaldamagetakenmultipliers
-            local mult_Get = mult.Get
-            local mult_SetModifier = mult.SetModifier
-            local mult_RemoveModifier = mult.RemoveModifier
-            mult.Get = function(self, ...)
-                if self.inst.flag_undefended_l == 1 then
-                    return self._modifier_l or 1
-                end
-                return mult_Get(self, ...)
-            end
-            mult.SetModifier = function(self, ...)
-                mult_SetModifier(self, ...)
-                RecalculateModifier_combat_l(self)
-            end
-            mult.RemoveModifier = function(self, ...)
-                mult_RemoveModifier(self, ...)
-                RecalculateModifier_combat_l(self)
-            end
-            RecalculateModifier_combat_l(mult) --主动更新一次
-
-            local GetAttacked_old = combat.GetAttacked
-            combat.GetAttacked = function(self, ...)
-                if self.inst.flag_undefended_l == 1 then
-                    local notblocked = GetAttacked_old(self, ...)
-                    self.inst.flag_undefended_l = 0
-                    if --攻击完毕，恢复其防御力
-                        self.inst.health_l_undefended ~= nil and
-                        self.inst.components.health ~= nil --不要判断死亡(玩家)
-                    then
-                        local healthcpt = self.inst.components.health
-                        local param = self.inst.health_l_undefended
-                        if param.absorb ~= nil and healthcpt.absorb == 0 then --说明被打后没变化，所以可以直接恢复
-                            healthcpt.absorb = param.absorb
-                        end
-                        if param.playerabsorb ~= nil and healthcpt.playerabsorb == 0 then
-                            healthcpt.playerabsorb = param.playerabsorb
-                        end
-                    end
-                    self.inst.health_l_undefended = nil
-                    return notblocked
-                else
-                    return GetAttacked_old(self, ...)
-                end
+            mult.Get_legion = mult.Get
+            mult.Get = combat_mult_Get_l
+            mult.SetModifier_legion = mult.SetModifier
+            mult.SetModifier = combat_mult_SetModifier_l
+            mult.RemoveModifier_legion = mult.RemoveModifier
+            mult.RemoveModifier = combat_mult_RemoveModifier_l
+            combat_mult_RecalculateModifier_l(mult) --主动更新一次
+            if combat.GetAttacked_legion == nil then
+                combat.GetAttacked_legion = combat.GetAttacked
+                combat.GetAttacked = combat_GetAttacked_l
             end
         end
 
         --修改生命机制
-        if health ~= nil then
-            local mult2 = health.externalabsorbmodifiers
-            local mult2_Get = mult2.Get
-            mult2.Get = function(self, ...)
-                if self.inst.flag_undefended_l == 1 then
-                    return 0
-                end
-                return mult2_Get(self, ...)
-            end
-
-            if not target:HasTag("player") then --玩家无敌时，是不改的
-                local IsInvincible_old = health.IsInvincible
-                health.IsInvincible = function(self, ...)
-                    if self.inst.flag_undefended_l == 1 then
-                        return false
-                    end
-                    return IsInvincible_old(self, ...)
-                end
+        if target.components.health ~= nil and target.components.health.DoDelta_legion == nil then
+            target.components.health.DoDelta_legion = target.components.health.DoDelta
+            if target:HasTag("player") then
+                target.components.health.DoDelta = health_DoDelta_player
+            else
+                target.components.health.DoDelta = health_DoDelta_l
             end
         end
 
         --修改位面实体机制
-        if target.components.planarentity ~= nil then
-            local AbsorbDamage_old = target.components.planarentity.AbsorbDamage
-            target.components.planarentity.AbsorbDamage = function(self, damage, attacker, weapon, spdmg, ...)
-                if self.inst.flag_undefended_l == 1 then
-                    local damage2, spdamage2 = AbsorbDamage_old(self, damage, attacker, weapon, spdmg, ...)
-                    if damage2 < damage then --如果最终值小于之前的值，说明有减免，那就不准减免
-                        return damage, spdamage2
-                    else --兼容别的mod的逻辑
-                        return damage2, spdamage2
-                    end
-                end
-                return AbsorbDamage_old(self, damage, attacker, weapon, spdmg, ...)
-            end
+        if target.components.planarentity ~= nil and target.components.planarentity.AbsorbDamage_legion == nil then
+            target.components.planarentity.AbsorbDamage_legion = target.components.planarentity.AbsorbDamage
+            target.components.planarentity.AbsorbDamage = planarentity_AbsorbDamage_l
         end
 
         --修改防御的标签系数机制
-        if target.components.damagetyperesist ~= nil and target.components.damagetyperesist.GetResist_l_base == nil then
-            target.components.damagetyperesist.GetResist_l_base = target.components.damagetyperesist.GetResist
-            target.components.damagetyperesist.GetResist = fns.GetResist_dtr
+        if target.components.damagetyperesist ~= nil and target.components.damagetyperesist.GetResist_legion == nil then
+            target.components.damagetyperesist.GetResist_legion = target.components.damagetyperesist.GetResist
+            target.components.damagetyperesist.GetResist = fns.GetResist_l
         end
     end
-
-    target.flag_undefended_l = 1
-    if health ~= nil then
-        local param = {}
-        if health.absorb ~= 0 then
-            param.absorb = health.absorb
-            health.absorb = 0
-        end
-        if health.playerabsorb ~= 0 then
-            param.playerabsorb = health.playerabsorb
-            health.playerabsorb = 0
-        end
-        target.health_l_undefended = param
-    end
+    target.legiontag_undefended = 1
 end
 
 --[ 兼容性标签管理 ]--
@@ -953,10 +953,10 @@ local function MakeNoLossRepairableEquipment(inst, data)
 end
 
 --[ 全能攻击系数的管理(普通和特殊) ]--
-local function GetBonus_dtb(self, target, ...)
-    local mult = self.all_l_v or 1
-    if self.GetBonus_l_base ~= nil then
-        mult = mult * self.GetBonus_l_base(self, target, ...)
+local function GetBonus_l(self, target, ...)
+    local mult = self.all_legion_v or 1
+    if self.GetBonus_legion ~= nil then
+        mult = mult * self.GetBonus_legion(self, target, ...)
     end
     return mult
 end
@@ -965,15 +965,15 @@ local function AddBonusAll(inst, key, value)
         inst:AddComponent("damagetypebonus")
     end
     local cpt = inst.components.damagetypebonus
-    if cpt.GetBonus_l_base == nil then
-        cpt.GetBonus_l_base = cpt.GetBonus
-        cpt.GetBonus = GetBonus_dtb
+    if cpt.GetBonus_legion == nil then
+        cpt.GetBonus_legion = cpt.GetBonus
+        cpt.GetBonus = fns.GetBonus_l
     end
-    fns.AddEntValue(cpt, "all_l", key, 2, value) --乘法系数
+    fns.AddEntValue(cpt, "all_legion", key, 2, value) --乘法系数
 end
 local function RemoveBonusAll(inst, key)
     if inst.components.damagetypebonus ~= nil then
-        fns.RemoveEntValue(inst.components.damagetypebonus, "all_l", key, 2)
+        fns.RemoveEntValue(inst.components.damagetypebonus, "all_legion", key, 2)
     end
 end
 
@@ -983,15 +983,15 @@ local function AddResistAll(inst, key, value)
         inst:AddComponent("damagetyperesist")
     end
     local cpt = inst.components.damagetyperesist
-    if cpt.GetResist_l_base == nil then
-        cpt.GetResist_l_base = cpt.GetResist
-        cpt.GetResist = fns.GetResist_dtr
+    if cpt.GetResist_legion == nil then
+        cpt.GetResist_legion = cpt.GetResist
+        cpt.GetResist = fns.GetResist_l
     end
-    fns.AddEntValue(cpt, "all_l", key, 2, value) --乘法系数
+    fns.AddEntValue(cpt, "all_legion", key, 2, value) --乘法系数
 end
 local function RemoveResistAll(inst, key)
     if inst.components.damagetyperesist ~= nil then
-        fns.RemoveEntValue(inst.components.damagetyperesist, "all_l", key, 2)
+        fns.RemoveEntValue(inst.components.damagetyperesist, "all_legion", key, 2)
     end
 end
 
@@ -1154,7 +1154,7 @@ fns = {
     IsEnemy_me = IsEnemy_me, IsEnemy_player = IsEnemy_player,
     MaybeEnemy_me = MaybeEnemy_me, MaybeEnemy_player = MaybeEnemy_player,
     CalcDamage = CalcDamage,
-    GetBonus_dtb = GetBonus_dtb, GetResist_dtr = GetResist_dtr, --这个列出来，方便别的mod改
+    GetBonus_l = GetBonus_l, GetResist_l = GetResist_l, --这个列出来，方便别的mod改
     AddBonusAll = AddBonusAll, RemoveBonusAll = RemoveBonusAll,
     AddResistAll = AddResistAll, RemoveResistAll = RemoveResistAll,
     DoSingleSleep = DoSingleSleep, DoAreaSleep = DoAreaSleep,

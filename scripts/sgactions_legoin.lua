@@ -1322,7 +1322,7 @@ AddStategraphEvent("wilson", EventHandler("awkwardpropeller", function(inst, dat
             --将玩家甩下背（因为被玩家恶心到了）
             local mount = inst.components.rider ~= nil and inst.components.rider:GetMount() or nil
             if mount ~= nil and mount.components.rideable ~= nil then
-                if mount._bucktask ~= nil then
+                if mount._bucktask ~= nil then --rideable:Buck()里应该已经触发这个task取消了，先留着吧
                     mount._bucktask:Cancel()
                     mount._bucktask = nil
                 end

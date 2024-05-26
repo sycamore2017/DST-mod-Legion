@@ -1370,14 +1370,14 @@ local function inventory_ApplyDamage_player(self, damage, attacker, weapon, spda
             end
         end
         --破防攻击
-        if player.flag_undefended_l ~= nil and player.flag_undefended_l == 1 then
+        if player.legiontag_undefended == 1 then
             return damage, spdamage
         end
     end
     if self.ApplyDamage_legion ~= nil then
         return self.ApplyDamage_legion(self, damage, attacker, weapon, spdamage, ...)
     end
-    return 0
+    return damage, spdamage
 end
 local function pinnable_Stick_player(self, ...)
     if self.inst.shield_l_success or self.Stick_legion == nil then
