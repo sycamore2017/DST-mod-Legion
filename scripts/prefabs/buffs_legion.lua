@@ -701,6 +701,7 @@ local function StartOilFlowing(buff, inst)
             poop.Transform:SetPosition(x1, y1+0.5, z1)
             --Tip：SetMotorVel()会一直给加速度，SetVel()则会受到摩擦阻力和重力影响
             poop.Physics:SetVel(2.5*math.cos(theta), 2, -2.5*math.sin(theta))
+            poop:PushEvent("on_loot_dropped", { dropper = nil }) --为了能自动叠加
 
             if inst:HasTag("player") then
                 ------说尴尬的话
