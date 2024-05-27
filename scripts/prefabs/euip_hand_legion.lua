@@ -302,7 +302,7 @@ table.insert(prefs, Prefab("neverfade", function()
     if not TheWorld.ismastersim then return inst end
 
     -- inst.isbroken_l = false
-    inst.atkcounter_l_l = 0
+    inst.atkcounter_l = 0
     inst.foliageath_data = foliageath_data_never
 
     Fn_server(inst, "neverfade", OnEquip_never, OnUnequip_never)

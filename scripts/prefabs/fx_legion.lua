@@ -354,8 +354,9 @@ MakeFx({ --庇佑蝴蝶：护佑
         inst.AnimState:SetBuild("buff_l_butterflybless_fx")
         inst.AnimState:PlayAnimation("ground_hit_"..tostring(math.random(3)))
         inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
-        inst.AnimState:SetLightOverride(.5)
+        inst.AnimState:SetLightOverride(.2)
         inst.AnimState:SetFinalOffset(3)
+        inst.AnimState:SetScale(1.2, 1.2, 1.2)
     end
 })
 MakeFx({ --庇佑蝴蝶：护佑边线
@@ -369,8 +370,9 @@ MakeFx({ --庇佑蝴蝶：护佑边线
         inst.AnimState:SetBuild("buff_l_butterflybless_fx")
         inst.AnimState:PlayAnimation("shield")
         inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
-        inst.AnimState:SetLightOverride(.5)
+        inst.AnimState:SetLightOverride(.2)
         inst.AnimState:SetFinalOffset(3)
+        inst.AnimState:SetScale(1.2, 1.2, 1.2)
     end
 })
 -- MakeFx({ --施咒蔷薇：火花爆炸

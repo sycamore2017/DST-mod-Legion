@@ -26,7 +26,7 @@ local function Fn()
     inst.AnimState:SetBuild("neverfade_butterfly")
     inst.AnimState:PlayAnimation("idle")
     -- inst.AnimState:SetRayTestOnBB(true)
-    inst.AnimState:SetLightOverride(.6)
+    inst.AnimState:SetLightOverride(.2)
     inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
     -- inst.AnimState:SetFinalOffset(3)
 

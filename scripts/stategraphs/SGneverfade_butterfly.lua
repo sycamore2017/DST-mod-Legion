@@ -45,7 +45,8 @@ local states = {
             else
                 inst.AnimState:PlayAnimation("land")
             end
-            inst:DoTaskInTime(0.5, ErodeAway)
+            inst.AnimState:ClearBloomEffectHandle() --不清除光晕的话，ErodeAway就会出现一个短时间的滞留残影
+            inst:DoTaskInTime(0, ErodeAway)
         end,
         -- timeline = {
         --     TimeEvent(10 * FRAMES, LandFlyingCreature)

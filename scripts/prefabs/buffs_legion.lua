@@ -351,7 +351,7 @@ local function OnButterflyBlessed(doer)
         fx1.Transform:SetPosition(x, y, z)
     end
     if fx2 ~= nil then
-        fx2.Transform:SetPosition(x, y, z)
+        fx2.Transform:SetPosition(x, y-1, z) --高度居然可以是负数
     end
 
     local buff = doer.components.debuffable:GetDebuff("buff_l_butterflybless")
