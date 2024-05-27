@@ -1797,7 +1797,7 @@ if not TheNet:IsDedicated() then --不受 CONFIGS_LEGION.MOUSEINFO 影响
             pststr1 = self.fn_l_namedetail(self)
         end
         --固定内容
-        if self:HasTag("fireproof_l") then
+        if self:HasTag("fireproof_legion") then
             pststr2 = AssembleStr(pststr2, STRINGS.NAMEDETAIL_L.FIREPROOF)
         end
         --问题皮肤

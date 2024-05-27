@@ -147,29 +147,18 @@ local function SpawnRoot(bird, x, z, delaytime)
     end
 end
 local function SetTreeBuff(inst, value)
-    value = inst.sign_l_treehalo + value
-    if value > 3 then
-        value = 3
-    elseif value < 0 then
-        value = 0
-    end
-    if inst.sign_l_treehalo == value then
+    if value == 0 then
         return
     end
-    if inst.sign_l_treehalo <= 0 then --第一次加buff时
+    local count = value + (inst.legion_numtreehalo or 0)
+    if count <= 0 then --层数没了，说明要清除buff了
         inst.count_toolatk = 0
-    end
-    inst.sign_l_treehalo = value
-
-    if value == 0 then --说明要清除buff了
-        inst.count_toolatk = 0
-        if not inst.components.debuffable:HasDebuff("buff_treehalo") then
-            return --既然还没有buff，那就不用做什么
+        if not inst.components.debuffable:HasDebuff("buff_l_treehalo") then --既然还没有buff，那就不用再加buff
+            inst.legion_numtreehalo = nil
+            return
         end
     end
-
-    --即使是清除buff，也是通过赋值 sign_l_treehalo=0 后 AddDebuff 来解除buff
-    inst:AddDebuff("buff_treehalo", "buff_treehalo")
+    inst:AddDebuff("buff_l_treehalo", "buff_l_treehalo", { value = value })
 end
 local function SetBehaviorTree(inst, done)
     if done == "atk" then
@@ -203,66 +192,56 @@ local SOUNDBLOCKINGHATS = {
     voidclothhat = true --虚空风帽
 }
 local function MagicWarble(inst) --魔音绕梁
+    local sets
+    local isgrief = inst.isgrief
     local x, y, z = inst.Transform:GetWorldPosition()
     local ents = TheSim:FindEntities(x, 0, z, DIST_REMOTE,
-        { "_combat", "_inventory" }, TOOLS_L.TagsCombat1({ "siving", "noears_l" })
+        { "_combat" }, TOOLS_L.TagsCombat1({ "siving", "noears_l" }) --"_inventory"
     )
     for _, v in ipairs(ents) do
         if
-            v.entity:IsVisible() and
-            (v.components.health == nil or not v.components.health:IsDead()) and
-            v.components.inventory ~= nil and
-            v.components.locomotor ~= nil
+            v.entity:IsVisible() and v.legion_boxopener == nil and
+            (v.components.locomotor ~= nil or v.components.inventory ~= nil) and
+            (v.components.health == nil or not v.components.health:IsDead())
         then
             local inv = v.components.inventory
             local hasprotect = false
-            if inst.isgrief then --悲愤状态：必定脱装备
-                for slot, item in pairs(inv.equipslots) do
-                    if slot ~= EQUIPSLOTS.BEARD then --可不能把威尔逊的“胡子”给吼下来了
-                        if SOUNDBLOCKINGHATS[item.prefab] or item.protect_l_magicwarble then
-                            hasprotect = true
-                        else
-                            inv:DropItem(item, true, true)
-                        end
-                    end
-                end
-            else
-                for slot, item in pairs(inv.equipslots) do
-                    if slot ~= EQUIPSLOTS.BEARD then
-                        if SOUNDBLOCKINGHATS[item.prefab] or item.protect_l_magicwarble then
-                            hasprotect = true
-                            break
-                        end
-                    end
-                end
-                if not hasprotect then
+            if inv ~= nil then
+                if isgrief then --悲愤状态：必定脱装备
                     for slot, item in pairs(inv.equipslots) do
                         if slot ~= EQUIPSLOTS.BEARD then --可不能把威尔逊的“胡子”给吼下来了
-                            inv:DropItem(item, true, true)
+                            if SOUNDBLOCKINGHATS[item.prefab] or item.legiontag_ban_magicwarble then
+                                hasprotect = true
+                            else
+                                inv:DropItem(item, true, true)
+                            end
+                        end
+                    end
+                else
+                    for slot, item in pairs(inv.equipslots) do
+                        if slot ~= EQUIPSLOTS.BEARD then
+                            if SOUNDBLOCKINGHATS[item.prefab] or item.legiontag_ban_magicwarble then
+                                hasprotect = true
+                                break
+                            end
+                        end
+                    end
+                    if not hasprotect then
+                        for slot, item in pairs(inv.equipslots) do
+                            if slot ~= EQUIPSLOTS.BEARD then --可不能把威尔逊的“胡子”给吼下来了
+                                inv:DropItem(item, true, true)
+                            end
                         end
                     end
                 end
             end
-            if not hasprotect then --后续的debuff
-                if TIME_BUFF_WARBLE > 0 then
-                    v.time_l_magicwarble = { replace_min = TIME_BUFF_WARBLE }
-                    v:AddDebuff("debuff_magicwarble", "debuff_magicwarble")
-
-                    if inst.isgrief then --悲愤状态：附加睡醒的移速缓慢状态
-                        if v.task_groggy_warble ~= nil then
-                            v.task_groggy_warble:Cancel()
-                        end
-                        v:AddTag("groggy") --添加标签，走路会摇摇晃晃
-                        v.components.locomotor:SetExternalSpeedMultiplier(v, "magicwarble", 0.4)
-                        v.task_groggy_warble = v:DoTaskInTime(TIME_BUFF_WARBLE, function(v)
-                            if v.components.locomotor ~= nil then
-                                v.components.locomotor:RemoveExternalSpeedMultiplier(v, "magicwarble")
-                            end
-                            v:RemoveTag("groggy")
-                            v.task_groggy_warble = nil
-                        end)
-                    end
+            if not hasprotect and TIME_BUFF_WARBLE > 0 then --后续的debuff
+                if v:HasTag("player") then
+                    sets = { value = TIME_BUFF_WARBLE, kind = 3, dogroggy = isgrief }
+                else
+                    sets = { value = TIME_BUFF_WARBLE, kind = 3, dogroggy = true } --非玩家对象必定会减速
                 end
+                v:AddDebuff("buff_l_magicwarble", "buff_l_magicwarble", sets)
             end
         end
     end
@@ -391,7 +370,7 @@ local function MakeBoss(data)
         TOOLS_L.AddEntValue(inst, "siv_blood_l_reducer", data.name, 1, 0.75) --窃血抵抗
 
         inst.sounds = BossSounds
-        inst.sign_l_treehalo = 0
+        -- inst.legion_numtreehalo = 0
         inst.count_toolatk = 0 --被镐子类工具攻击次数
         inst.tree = nil
         inst.mate = nil --另一个伴侣
@@ -673,7 +652,10 @@ local function MakeBoss(data)
                     inst.mate.components.combat:SetTarget(lasttarget)
                 end
             end
-            if inst.sign_l_treehalo > 0 and IsTreeHaloCrusher(data.attacker, data.weapon) then
+            if
+                inst.legion_numtreehalo ~= nil and inst.legion_numtreehalo > 0 and
+                IsTreeHaloCrusher(data.attacker, data.weapon)
+            then
                 inst.count_toolatk = inst.count_toolatk + 1
                 if inst.count_toolatk >= 4 then --达到4次就减少一层buff
                     SetTreeBuff(inst, -1)
@@ -691,22 +673,10 @@ local function MakeBoss(data)
             end
         end)
 
-        inst.OnSave = function(inst, data)
-            if inst.sign_l_treehalo > 0 then
-                data.sign_l_treehalo = inst.sign_l_treehalo
-            end
-        end
         inst.OnPreLoad = function(inst, data) --防止保存时正在飞起或降落导致重载时位置不对
             local x, y, z = inst.Transform:GetWorldPosition()
             if y > 0 then
                 inst.Transform:SetPosition(x, 0, z)
-            end
-        end
-        inst.OnLoad = function(inst, data)
-            if data ~= nil and data.sign_l_treehalo ~= nil then
-                inst:DoTaskInTime(0.2, function(inst)
-                    SetTreeBuff(inst, data.sign_l_treehalo)
-                end)
             end
         end
         inst.OnEntitySleep = function(inst)
@@ -723,7 +693,7 @@ local function MakeBoss(data)
         Asset("ANIM", "anim/buzzard_basic.zip"), --官方秃鹫动画模板
         Asset("ANIM", "anim/"..data.name..".zip"),
     }, {
-        "debuff_magicwarble",
+        "buff_l_magicwarble",
         "siving_boss_flowerfx",
         "siving_boss_eye",
         "siving_bossfea_real",
@@ -731,7 +701,7 @@ local function MakeBoss(data)
         "siving_boss_taunt_fx",
         "siving_boss_caw_fx",
         "siving_boss_root",
-        "buff_treehalo"
+        "buff_l_treehalo"
     }))
 end
 

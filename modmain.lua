@@ -556,8 +556,8 @@ modimport("scripts/recipes_legion.lua")
 ------容器相关
 modimport("scripts/containers_legion.lua")
 ------幻化相关
+modimport("scripts/fengl_userdatahook.lua")
 if _G.CONFIGS_LEGION.DRESSUP then
-    modimport("scripts/fengl_userdatahook.lua")
     modimport("scripts/dressup_legion.lua")
 end
 ------皮肤相关

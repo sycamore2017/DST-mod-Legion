@@ -385,7 +385,6 @@ local foods_legion = {
         float = { 0.02, "small", 0.2, 1.2 },
         prefabs = { "buff_l_radiantskin" },
         oneatenfn = function(inst, eater)
-            eater.time_l_radiantskin = { add = TUNING.SEG_TIME*16, max = TUNING.SEG_TIME*30 }
             eater:AddDebuff("buff_l_radiantskin", "buff_l_radiantskin")
         end,
 
@@ -845,16 +844,13 @@ local foods_legion = {
         cooktime = 2.5,
         potlevel = "low",
         float = { nil, "small", 0.2, 1.05 },
-        prefabs = { "buff_l_hungerretarder" },
+        prefabs = { "buff_l_hungerretarder", "buff_l_holdbackpoop" },
         oneatenfn = function(inst, eater)
-            if eater.components.hunger ~= nil or eater.components.periodicspawner ~= nil then
-                local sets
-                if not eater:HasTag("player") and eater.components.periodicspawner ~= nil then
-                    sets = { value = TUNING.TOTAL_DAY_TIME*5 }
-                else
-                    sets = { max = TUNING.SEG_TIME*50 }
-                end
-                eater:AddDebuff("buff_l_hungerretarder", "buff_l_hungerretarder", sets)
+            if eater.components.hunger ~= nil then
+                eater:AddDebuff("buff_l_hungerretarder", "buff_l_hungerretarder")
+            end
+            if eater.components.periodicspawner ~= nil then
+                eater:AddDebuff("buff_l_holdbackpoop", "buff_l_holdbackpoop")
             end
         end,
 

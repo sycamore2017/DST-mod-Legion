@@ -900,9 +900,9 @@ local function GiveTissue(inst, picker, name)
 end
 
 ------仙人掌的
-local function onpickedfn_cactus(inst, picker, ...)
-    if inst.pickable_onpickedfn_l ~= nil then
-        inst.pickable_onpickedfn_l(inst, picker, ...)
+local function pickable_onpickedfn_cactus(inst, picker, ...)
+    if inst.legion_pickable_onpickedfn ~= nil then
+        inst.legion_pickable_onpickedfn(inst, picker, ...)
     end
     if not TheWorld.state.israining or math.random() >= (CONFIGS_LEGION.TISSUECACTUSCHANCE or 0.05) then
         return
@@ -910,18 +910,18 @@ local function onpickedfn_cactus(inst, picker, ...)
     GiveTissue(inst, picker, "tissue_l_cactus")
 end
 local function FnSet_cactus(inst)
-    if inst.pickable_onpickedfn_l == nil and inst.components.pickable ~= nil then
-        inst.pickable_onpickedfn_l = inst.components.pickable.onpickedfn
-        inst.components.pickable.onpickedfn = onpickedfn_cactus
+    if inst.legion_pickable_onpickedfn == nil and inst.components.pickable ~= nil then
+        inst.legion_pickable_onpickedfn = inst.components.pickable.onpickedfn
+        inst.components.pickable.onpickedfn = pickable_onpickedfn_cactus
     end
 end
 AddPrefabPostInit("cactus", FnSet_cactus)
 AddPrefabPostInit("oasis_cactus", FnSet_cactus)
 
 ------浆果丛的
-local function onpickedfn_berrybush(inst, picker, ...)
-    if inst.pickable_onpickedfn_l ~= nil then
-        inst.pickable_onpickedfn_l(inst, picker, ...)
+local function pickable_onpickedfn_berrybush(inst, picker, ...)
+    if inst.legion_pickable_onpickedfn ~= nil then
+        inst.legion_pickable_onpickedfn(inst, picker, ...)
     end
     if not TheWorld.state.isdusk or math.random() >= (CONFIGS_LEGION.TISSUEBERRIESCHANCE or 0.01) then
         return
@@ -929,9 +929,9 @@ local function onpickedfn_berrybush(inst, picker, ...)
     GiveTissue(inst, picker, "tissue_l_berries")
 end
 local function FnSet_berry(inst)
-    if inst.pickable_onpickedfn_l == nil and inst.components.pickable ~= nil then
-        inst.pickable_onpickedfn_l = inst.components.pickable.onpickedfn
-        inst.components.pickable.onpickedfn = onpickedfn_berrybush
+    if inst.legion_pickable_onpickedfn == nil and inst.components.pickable ~= nil then
+        inst.legion_pickable_onpickedfn = inst.components.pickable.onpickedfn
+        inst.components.pickable.onpickedfn = pickable_onpickedfn_berrybush
     end
 end
 AddPrefabPostInit("berrybush", FnSet_berry)
@@ -1385,7 +1385,7 @@ for _, v in pairs(lootsMap_tumbleweed) do
 end
 chance = nil
 
-local function OnPicked_tumbleweed(inst, picker)
+local function pickable_onpickedfn_tumbleweed(inst, picker, ...)
     if inst.loot ~= nil then
         local rand = math.random()
         local newloot = nil
@@ -1413,8 +1413,8 @@ local function OnPicked_tumbleweed(inst, picker)
     end
 
     local x, y, z = inst.Transform:GetWorldPosition()
-    if inst.pickable_onpickedfn_l ~= nil then
-        inst.pickable_onpickedfn_l(inst, picker)
+    if inst.legion_pickable_onpickedfn ~= nil then
+        inst.legion_pickable_onpickedfn(inst, picker, ...)
     end
 
     --为了让风滚草掉落物也能自动叠加
@@ -1430,9 +1430,9 @@ local function OnPicked_tumbleweed(inst, picker)
     return true
 end
 AddPrefabPostInit("tumbleweed", function(inst)
-    if inst.pickable_onpickedfn_l == nil and inst.components.pickable ~= nil then
-        inst.pickable_onpickedfn_l = inst.components.pickable.onpickedfn
-        inst.components.pickable.onpickedfn = OnPicked_tumbleweed
+    if inst.legion_pickable_onpickedfn == nil and inst.components.pickable ~= nil then
+        inst.legion_pickable_onpickedfn = inst.components.pickable.onpickedfn
+        inst.components.pickable.onpickedfn = pickable_onpickedfn_tumbleweed
     end
 end)
 
@@ -1440,62 +1440,62 @@ end)
 --[[ 修改燃烧组件，达到条件就不会燃烧 ]]
 --------------------------------------------------------------------------
 
-local function Ignite_fireproof(self, ...)
-    if self.fireproof_l or self.inst.fireproof_l ~= nil then
+local function burnable_Ignite_l(self, ...)
+    if self.fireproof_legion or self.inst.legiontag_fireproof ~= nil then
         return
     end
-    if self.Ignite_l_fireproof ~= nil then
-        self.Ignite_l_fireproof(self, ...)
+    if self.Ignite_legion ~= nil then
+        self.Ignite_legion(self, ...)
     end
 end
-local function StartWildfire_fireproof(self, ...)
-    if self.fireproof_l or self.inst.fireproof_l ~= nil then
+local function burnable_StartWildfire_l(self, ...)
+    if self.fireproof_legion or self.inst.legiontag_fireproof ~= nil then
         return
     end
-    if self.StartWildfire_l_fireproof ~= nil then
-        self.StartWildfire_l_fireproof(self, ...)
+    if self.StartWildfire_legion ~= nil then
+        self.StartWildfire_legion(self, ...)
     end
 end
-local function OnSave_fireproof(self, ...)
+local function burnable_OnSave_l(self, ...)
     local data, refs
-    if self.OnSave_l_fireproof ~= nil then
-        data, refs = self.OnSave_l_fireproof(self, ...)
+    if self.OnSave_legion ~= nil then
+        data, refs = self.OnSave_legion(self, ...)
     end
-    if self.fireproof_l then
+    if self.fireproof_legion then
         if type(data) == "table" then
-            data.fireproof_l = true
+            data.fireproof_legion = true
         else
-            data = { fireproof_l = true }
+            data = { fireproof_legion = true }
         end
     end
     return data, refs
 end
-local function OnLoad_fireproof(self, data, ...)
-    if self.OnLoad_l_fireproof ~= nil then
-        self.OnLoad_l_fireproof(self, data, ...)
+local function burnable_OnLoad_l(self, data, ...)
+    if self.OnLoad_legion ~= nil then
+        self.OnLoad_legion(self, data, ...)
     end
-    if data ~= nil and data.fireproof_l then
-        self.fireproof_l = true
-        TOOLS_L.AddTag(self.inst, "fireproof_l", "fireproof_base")
+    if data ~= nil and data.fireproof_legion then
+        self.fireproof_legion = true
+        TOOLS_L.AddTag(self.inst, "fireproof_legion", "fireproof_base")
         -- self.canlight = false --官方用的多，直接改怕出问题，还是算了
     end
 end
 
 AddComponentPostInit("burnable", function(self)
-    if self.Ignite_l_fireproof == nil then
-        self.Ignite_l_fireproof = self.Ignite
-        self.Ignite = Ignite_fireproof
+    if self.Ignite_legion == nil then
+        self.Ignite_legion = self.Ignite
+        self.Ignite = burnable_Ignite_l
     end
-    if self.StartWildfire_l_fireproof == nil then
-        self.StartWildfire_l_fireproof = self.StartWildfire
-        self.StartWildfire = StartWildfire_fireproof
+    if self.StartWildfire_legion == nil then
+        self.StartWildfire_legion = self.StartWildfire
+        self.StartWildfire = burnable_StartWildfire_l
     end
-    if self.OnSave_l_fireproof == nil then
-        self.OnSave_l_fireproof = self.OnSave
-        self.OnSave = OnSave_fireproof
+    if self.OnSave_legion == nil then
+        self.OnSave_legion = self.OnSave
+        self.OnSave = burnable_OnSave_l
     end
-    if self.OnLoad_l_fireproof == nil then
-        self.OnLoad_l_fireproof = self.OnLoad
-        self.OnLoad = OnLoad_fireproof
+    if self.OnLoad_legion == nil then
+        self.OnLoad_legion = self.OnLoad
+        self.OnLoad = burnable_OnLoad_l
     end
 end)

@@ -449,7 +449,7 @@ local CA_U_INVENTORYITEM_L = {
     end,
     function(inst, doer, target, actions, right) --物品右键放入子圭·育
         if
-            right and
+            -- right and
             -- (inst.prefab == "siving_rocks" or TRANS_DATA_LEGION[inst.prefab] ~= nil) and
             target:HasTag("genetrans") and
             not (doer.replica.inventory ~= nil and doer.replica.inventory:IsHeavyLifting()) and
@@ -460,9 +460,9 @@ local CA_U_INVENTORYITEM_L = {
         end
         return false
     end,
-    function(inst, doer, target, actions, right) --物品右键剑鞘尝试入鞘
+    function(inst, doer, target, actions, right) --物品左键剑鞘尝试入鞘
         if
-            right and target:HasTag("swordscabbard") and
+            not right and target:HasTag("swordscabbard") and
             not (doer.replica.inventory ~= nil and doer.replica.inventory:IsHeavyLifting())
         then
             if target.replica.inventoryitem ~= nil and target.replica.inventoryitem:IsGrandOwner(doer) then

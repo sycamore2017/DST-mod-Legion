@@ -874,7 +874,6 @@ local function FnSmear_sivbloodreduce(inst, doer, target)
         target.net_lifeless_l:set(true)
         target.components.childspawner:StopSpawning()
     else
-        target.time_l_sivbloodreduce = { add = TUNING.SEG_TIME*12, max = TUNING.SEG_TIME*30 }
         target:AddDebuff("buff_l_sivbloodreduce", "buff_l_sivbloodreduce")
     end
 end
@@ -900,7 +899,7 @@ local function FnCheck_fireproof(inst, doer, target)
     if target.components.burnable == nil or target:HasTag("burnt") then
         return false, "NOUSE"
     end
-    if target.components.burnable.fireproof_l then
+    if target.components.burnable.fireproof_legion then
         return false, "NONEED"
     end
     if target.components.health ~= nil and target.components.health:IsDead() then
@@ -915,13 +914,12 @@ local function FnSmear_fireproof(inst, doer, target)
         target.components.health == nil or target.components.combat == nil
     then
         local burnable = target.components.burnable
-        burnable.fireproof_l = true
-        TOOLS_L.AddTag(target, "fireproof_l", "fireproof_base")
+        burnable.fireproof_legion = true
+        TOOLS_L.AddTag(target, "fireproof_legion", "fireproof_base")
         if burnable:IsBurning() or burnable:IsSmoldering() then
             burnable:Extinguish(true, -4) --涂抹完成，顺便灭火
         end
     else --是生物
-        target.time_l_fireproof = { add = TUNING.SEG_TIME*12, max = TUNING.SEG_TIME*30 }
         target:AddDebuff("buff_l_fireproof", "buff_l_fireproof")
     end
 end

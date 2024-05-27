@@ -9,7 +9,8 @@ local TIME_MAX = TUNING.SEG_TIME*30
 local TIME_MAX_HALF = TUNING.SEG_TIME*15
 local oppositeBuffs = {
     buff_l_hungerretarder = { buff_l_oilflow = true },
-    buff_l_oilflow = { buff_l_hungerretarder = true }
+    buff_l_holdbackpoop = { buff_l_oilflow = true },
+    buff_l_oilflow = { buff_l_hungerretarder = true, buff_l_holdbackpoop = true }
 }
 
 local function BuffTalk_start(target, buff)
@@ -44,11 +45,12 @@ local function CheckOppositeBuff(buff, target) --去除相克的buff，不让某
         end
     end
 end
-local function EndBuffSafely(buff)
-    if buff.task_l_end ~= nil then
+local function EndBuffSafely(buff, delaytime)
+    if buff.task_l_end ~= nil then --该buff已经在移除中了，就不管了
         return
     end
-    buff.task_l_end = buff:DoTaskInTime(0, function(fx) --下一帧再执行，不然加buff的函数里移除buff可能会崩
+    buff.task_l_end = buff:DoTaskInTime(delaytime or 0, function(fx) --至少下一帧再执行，不然加buff的函数里移除buff可能会崩
+        fx.task_l_end = nil
         fx.components.debuff:Stop()
     end)
 end
@@ -769,58 +771,74 @@ MakeBuff({
 --[[ 肠道堵塞：饱食度下降速度降低90% ]]
 --------------------------------------------------------------------------
 
-local function OnSave_hungerretarder(inst, data)
-    if inst.count_blocked_l > 0 then
-        data.count_blocked_l = inst.count_blocked_l
-    end
-end
-local function OnLoad_hungerretarder(inst, data)
-    if data ~= nil then
-        inst.count_blocked_l = data.count_blocked_l or 0
-    end
-end
-local function Task_hungerretarder(buff)
-    buff.count_blocked_l = buff.count_blocked_l + 1
-end
-
 MakeBuff({
     name = "buff_l_hungerretarder",
     -- assets = nil, prefabs = nil, notimer = nil,
-    sets = { value = TUNING.SEG_TIME*10, max = TUNING.TOTAL_DAY_TIME*50 },
+    sets = { value = TUNING.SEG_TIME*10, max = TUNING.SEG_TIME*50 },
     fn_start = function(buff, target, followsymbol, followoffset, sets)
         CheckOppositeBuff(buff, target)
         BuffTalk_start(target, buff)
         if target.components.hunger ~= nil then
             target.components.hunger.burnratemodifiers:SetModifier(buff, 0.1) --饱食度下降速度降为0.1倍
         end
-
-        if buff.task_l_block ~= nil then
-            buff.task_l_block:Cancel()
-            buff.task_l_block = nil
-        end
-        if target.components.periodicspawner ~= nil then
-            local cpt = target.components.periodicspawner
-            local t = cpt.basetime + 0.5*cpt.randtime
-            buff.task_l_block = buff:DoPeriodicTask(t, Task_hungerretarder, 1+9*math.random())
-            cpt:Stop() --憋住！
-        end
     end,
     fn_again = function(buff, target, followsymbol, followoffset, sets)
         CheckOppositeBuff(buff, target)
         BuffTalk_start(target, buff)
-        if target.components.periodicspawner ~= nil then
-            target.components.periodicspawner:Stop()
-        end
     end,
     fn_end = function(buff, target)
         BuffTalk_end(target, buff)
         if target.components.hunger ~= nil then
             target.components.hunger.burnratemodifiers:RemoveModifier(buff)
         end
+    end
+})
 
-        if buff.task_l_block ~= nil then
-            buff.task_l_block:Cancel()
-            buff.task_l_block = nil
+--------------------------------------------------------------------------
+--[[ 憋住：憋住粑粑，结束时一次性拉出 ]]
+--------------------------------------------------------------------------
+
+local function Task_holdbackpoop(buff)
+    buff.count_held_l = buff.count_held_l + 1
+end
+local function OnSave_holdbackpoop(inst, data)
+    if inst.count_held_l > 0 then
+        data.count_held_l = inst.count_held_l
+    end
+end
+local function OnLoad_holdbackpoop(inst, data)
+    if data ~= nil then
+        inst.count_held_l = data.count_held_l or 0
+    end
+end
+
+MakeBuff({
+    name = "buff_l_holdbackpoop",
+    -- assets = nil, prefabs = nil, notimer = nil,
+    sets = { value = TUNING.TOTAL_DAY_TIME*5, max = TUNING.TOTAL_DAY_TIME*50 },
+    fn_start = function(buff, target, followsymbol, followoffset, sets)
+        CheckOppositeBuff(buff, target)
+        if buff.task_l_hold ~= nil then
+            buff.task_l_hold:Cancel()
+            buff.task_l_hold = nil
+        end
+        if target.components.periodicspawner ~= nil then
+            local cpt = target.components.periodicspawner
+            local t = cpt.basetime + 0.5*cpt.randtime
+            buff.task_l_hold = buff:DoPeriodicTask(t, Task_holdbackpoop, 1+9*math.random())
+            cpt:Stop() --憋住！
+        end
+    end,
+    fn_again = function(buff, target, followsymbol, followoffset, sets)
+        CheckOppositeBuff(buff, target)
+        if target.components.periodicspawner ~= nil then
+            target.components.periodicspawner:Stop()
+        end
+    end,
+    fn_end = function(buff, target)
+        if buff.task_l_hold ~= nil then
+            buff.task_l_hold:Cancel()
+            buff.task_l_hold = nil
         end
         local poopname = "poop"
         if target.components.periodicspawner ~= nil then
@@ -830,11 +848,11 @@ MakeBuff({
                 poopname = poopname(target)
             end
         end
-        if buff.count_blocked_l > 0 then
+        if buff.count_held_l > 0 then
             local pos = target:GetPosition()
             local rot = target.Transform:GetRotation()
             local poops = {}
-            TOOLS_L.SpawnStackDrop(poopname or "poop", buff.count_blocked_l, pos, nil, poops, { dropper = target })
+            TOOLS_L.SpawnStackDrop(poopname or "poop", buff.count_held_l, pos, nil, poops, { dropper = target })
             for _, v in ipairs(poops) do
                 local theta = (rot + 20 - math.random()*40 + 180)*DEGREES
                 v.Transform:SetPosition(pos.x, pos.y+0.5, pos.z)
@@ -843,9 +861,9 @@ MakeBuff({
         end
     end,
     fn_server = function(buff)
-        buff.count_blocked_l = 0
-        buff.OnSave = OnSave_hungerretarder
-        buff.OnLoad = OnLoad_hungerretarder
+        buff.count_held_l = 0
+        buff.OnSave = OnSave_holdbackpoop
+        buff.OnLoad = OnLoad_holdbackpoop
     end
 })
 
@@ -868,32 +886,47 @@ local function DropEquipment_magicwarble(v)
 end
 
 MakeBuff({
-    name = "debuff_magicwarble",
-    assets = nil,
-    prefabs = nil,
-    time_key = "time_l_magicwarble",
-    time_default = TUNING.SEG_TIME, --0.5分钟
-    notimer = nil,
-    fn_start = function(buff, target)
-        if target.task_l_magicwarble ~= nil then
-            target.task_l_magicwarble:Cancel()
-            target.task_l_magicwarble = nil
+    name = "buff_l_magicwarble",
+    -- assets = nil, prefabs = nil, notimer = nil,
+    sets = { value = 6, max = TUNING.SEG_TIME },
+    fn_start = function(buff, target, followsymbol, followoffset, sets)
+        if target.legiontask_magicwarble ~= nil then
+            target.legiontask_magicwarble:Cancel()
+            target.legiontask_magicwarble = nil
         end
         if target.components.inventory ~= nil then
-            target.task_l_magicwarble = target:DoPeriodicTask(0.9, DropEquipment_magicwarble, 1)
+            target.legiontask_magicwarble = target:DoPeriodicTask(0.9, DropEquipment_magicwarble, 1)
+        end
+        if sets ~= nil and sets.dogroggy and target.components.locomotor ~= nil then
+            if target.components.grogginess ~= nil then --一般这个组件只有玩家才有
+                --不想用 Grogginess:AddGrogginess 的官方逻辑，字太多，不想看
+                target:AddTag("groggy") --添加标签，走路会摇摇晃晃
+            end
+            target.components.locomotor:SetExternalSpeedMultiplier(target, "buff_l_magicwarble", 0.4)
         end
     end,
-    fn_again = nil,
+    fn_again = function(buff, target, followsymbol, followoffset, sets)
+        if sets ~= nil and not sets.dogroggy then
+            target:RemoveTag("groggy")
+            if target.components.locomotor ~= nil then
+                target.components.locomotor:RemoveExternalSpeedMultiplier(target, "buff_l_magicwarble")
+            end
+        end
+    end,
     fn_end = function(buff, target)
-        if target.task_l_magicwarble ~= nil then
-            target.task_l_magicwarble:Cancel()
-            target.task_l_magicwarble = nil
+        if target.legiontask_magicwarble ~= nil then
+            target.legiontask_magicwarble:Cancel()
+            target.legiontask_magicwarble = nil
+        end
+        target:RemoveTag("groggy") --不想用 Grogginess组件 的官方逻辑，出问题就出吧，问题不大，影响播放的动画而已
+        if target.components.locomotor ~= nil then
+            target.components.locomotor:RemoveExternalSpeedMultiplier(target, "buff_l_magicwarble")
         end
     end
 })
 
 --------------------------------------------------------------------------
---[[ 神木光辉：增加防御力 ]]
+--[[ 神木光辉：增加全能防御力 ]]
 --------------------------------------------------------------------------
 
 local function OnChangeFollowSymbol_tree(inst, target, followsymbol, followoffset)
@@ -914,101 +947,86 @@ local function SetStateSymbol(buff, state)
         buff.AnimState:OverrideSymbol("insidetooth2", "siving_treehalo_fx", "base3")
     end
 end
-local function BuffSet_tree(buff, target)
-    local state = target.sign_l_treehalo --不要清除这个变量，我还要管理呢
-    if state == nil then --很可能是加载时
-        state = buff.state_l
-        buff.state_l = 0 --这样就可以把逻辑走完了
-        target.sign_l_treehalo = state
+local function BuffSet_tree(buff, target, dt)
+    if buff._count_load_l ~= nil then
+        dt = buff._count_load_l
+        buff._count_load_l = nil
     end
-
-    if state == 0 then
-        buff.state_l = 0
+    dt = math.min(buff._count_l + dt, 3)
+    if dt <= 0 then --新的层数为0，结束buff
+        buff._count_l = 0
+        target.legion_numtreehalo = nil
         if buff:IsAsleep() then
             EndBuffSafely(buff)
         else
-            buff.AnimState:PlayAnimation("pst")
-            buff:ListenForEvent("animover", function(fx)
-                fx.components.debuff:Stop()
-            end)
+            if buff.task_l_end == nil then
+                buff.AnimState:PlayAnimation("pst")
+                EndBuffSafely(buff, buff.AnimState:GetCurrentAnimationLength()) --动画播放结束再删除buff
+            end
         end
         return
     end
-
-    if buff.state_l ~= state then
-        if buff.state_l > 0 then
-            buff.AnimState:PlayAnimation("exchange")
-            if buff.task_ex ~= nil then
-                buff.task_ex:Cancel()
-            end
-            buff.task_ex = buff:DoTaskInTime(0.3, function(buff)
-                buff.task_ex = nil
-                SetStateSymbol(buff, buff.state_l)
-            end)
-        else
-            SetStateSymbol(buff, state)
-            buff.AnimState:PlayAnimation("pre")
+    if buff._count_l == dt then --层数没变化，就不继续执行了
+        return
+    end
+    if buff._count_l > 0 then --当前有层数，所以动画为“变化”
+        buff.AnimState:PlayAnimation("exchange")
+        if buff.task_l_animex ~= nil then
+            buff.task_l_animex:Cancel()
         end
-        buff.AnimState:PushAnimation("loop", true)
-        buff.state_l = state
-
-        -- if target.components.damagetyperesist == nil then --通过这个组件能使得防御效果能同时应用给普防和特防
-        --     target:AddComponent("damagetyperesist")
-        -- end
-        --"inspectable"标签覆盖范围比"_health"标签广
-        if state >= 3 then
-            -- target.components.damagetyperesist:AddResist("inspectable", target, 0.01, "buff_treehalo")
-            TOOLS_L.AddResistAll(target, "buff_treehalo", 0.01)
-        elseif state >= 2 then
-            -- target.components.damagetyperesist:AddResist("inspectable", target, 0.34, "buff_treehalo")
-            TOOLS_L.AddResistAll(target, "buff_treehalo", 0.34)
-        elseif state >= 1 then
-            -- target.components.damagetyperesist:AddResist("inspectable", target, 0.67, "buff_treehalo")
-            TOOLS_L.AddResistAll(target, "buff_treehalo", 0.67)
-        end
-        -- if target.components.combat ~= nil then --externaldamagetakenmultipliers机制只能影响普防
-        --     if state == 3 then
-        --         target.components.combat.externaldamagetakenmultipliers:SetModifier(buff, 0.01)
-        --     elseif state == 2 then
-        --         target.components.combat.externaldamagetakenmultipliers:SetModifier(buff, 0.34)
-        --     elseif state == 1 then
-        --         target.components.combat.externaldamagetakenmultipliers:SetModifier(buff, 0.67)
-        --     end
-        -- end
+        buff.task_l_animex = buff:DoTaskInTime(0.3, function(fx)
+            fx.task_l_animex = nil
+            SetStateSymbol(fx, fx._count_l)
+        end)
+    else --当前无层数，说明是一开始产生buff的，动画为“开始”
+        SetStateSymbol(buff, dt)
+        buff.AnimState:PlayAnimation("pre")
+    end
+    buff.AnimState:PushAnimation("loop", true)
+    buff._count_l = dt
+    target.legion_numtreehalo = dt
+    if dt >= 3 then
+        TOOLS_L.AddResistAll(target, "buff_l_treehalo", 0.01)
+    elseif dt >= 2 then
+        TOOLS_L.AddResistAll(target, "buff_l_treehalo", 0.34)
+    else
+        TOOLS_L.AddResistAll(target, "buff_l_treehalo", 0.67)
     end
 end
 
 MakeBuff({
-    name = "buff_treehalo",
+    name = "buff_l_treehalo",
     assets = {
-        Asset("ANIM", "anim/siving_treehalo_fx.zip"),
+        Asset("ANIM", "anim/siving_treehalo_fx.zip")
     },
-    prefabs = nil,
-    time_key = nil,
-    time_default = nil,
-    notimer = true,
-    addnetwork = true,
-    fn_start = function(buff, target, followsymbol, followoffset)
+    notimer = true, addnetwork = true,
+    -- sets = { value = 1, max = 3 },
+    fn_start = function(buff, target, followsymbol, followoffset, sets)
         buff.entity:SetParent(target.entity)
         OnChangeFollowSymbol_tree(buff, target, followsymbol, followoffset)
-        BuffSet_tree(buff, target)
+        BuffSet_tree(buff, target, sets and sets.value or 1)
     end,
-    fn_again = function(buff, target, followsymbol, followoffset)
-        if buff.state_l > 0 then --结束动画有一阵子，期间再来就不算了
-            BuffSet_tree(buff, target)
+    fn_again = function(buff, target, followsymbol, followoffset, sets)
+        local dt = sets and sets.value or 1
+        if buff.task_l_end ~= nil then --buff在准备删除中
+            if dt > 0 then --如果是增加层数，则可以取消删除
+                buff.task_l_end:Cancel()
+                buff.task_l_end = nil
+            else
+                return
+            end
         end
+        BuffSet_tree(buff, target, dt)
     end,
     fn_end = function(buff, target)
-        if buff.task_ex ~= nil then
-            buff.task_ex:Cancel()
-            buff.task_ex = nil
+        if buff.task_l_animex ~= nil then
+            buff.task_l_animex:Cancel()
+            buff.task_l_animex = nil
         end
-        -- if target:IsValid() and target.components.damagetyperesist ~= nil then
-            -- target.components.combat.externaldamagetakenmultipliers:RemoveModifier(buff)
-            -- target.components.damagetyperesist:RemoveResist("inspectable", target, "buff_treehalo")
-        -- end
+        buff._count_l = 0
+        target.legion_numtreehalo = nil
         if target:IsValid() then
-            TOOLS_L.RemoveResistAll(target, "buff_treehalo")
+            TOOLS_L.RemoveResistAll(target, "buff_l_treehalo")
         end
     end,
     fn_common = function(buff)
@@ -1022,22 +1040,15 @@ MakeBuff({
         buff.AnimState:PlayAnimation("loop", true)
         buff.AnimState:SetScale(0.35, 0.35)
         buff.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
+        buff.AnimState:SetLightOverride(0.6)
         buff.AnimState:SetFinalOffset(-3) --让这个动画位于父体层级底部
     end,
     fn_server = function(buff)
         buff.components.debuff:SetChangeFollowSymbolFn(OnChangeFollowSymbol_tree)
 
-        buff.state_l = 0
-        buff.OnSave = function(inst, data)
-            if inst.state_l > 0 then
-                data.state_l = inst.state_l
-            end
-        end
-        buff.OnLoad = function(inst, data) --这个比OnAttached更早执行
-            if data ~= nil and data.state_l ~= nil then
-                inst.state_l = data.state_l
-            end
-        end
+        buff._count_l = 0
+        buff.OnSave = OnSave_count
+        buff.OnLoad = OnLoad_count
     end
 })
 
@@ -1050,21 +1061,21 @@ local step_radiant = FRAMES*2
 local radius_radiant = 3
 local steprad_radiant = radius_radiant/time_radiant
 local function LightFading_radiant(buff)
-    buff.time_fade = buff.time_fade - step_radiant
-    if buff.time_fade > 0 then
-        buff.Light:SetRadius(steprad_radiant*buff.time_fade)
+    buff.time_fade_l = buff.time_fade_l - step_radiant
+    if buff.time_fade_l > 0 then
+        buff.Light:SetRadius(steprad_radiant*buff.time_fade_l)
     else
         buff.Light:Enable(false)
-        if buff.task_fade ~= nil then
-            buff.task_fade:Cancel()
-            buff.task_fade = nil
+        if buff.task_l_fade ~= nil then
+            buff.task_l_fade:Cancel()
+            buff.task_l_fade = nil
         end
     end
 end
-local function BuffSet_radiant(buff, target)
-    if buff.task_fade ~= nil then
-        buff.task_fade:Cancel()
-        buff.task_fade = nil
+local function BuffSet_radiant(buff, target, followsymbol, followoffset, sets)
+    if buff.task_l_fade ~= nil then
+        buff.task_l_fade:Cancel()
+        buff.task_l_fade = nil
     end
 
     local timeleft = buff.components.timer:GetTimeLeft("buffover") or 0
@@ -1073,27 +1084,24 @@ local function BuffSet_radiant(buff, target)
         return
     end
     if timeleft > time_radiant then
-        buff.time_fade = time_radiant
+        buff.time_fade_l = time_radiant
         timeleft = timeleft - time_radiant
     else
-        buff.time_fade = timeleft
+        buff.time_fade_l = timeleft
         timeleft = 0
     end
-    buff.Light:SetRadius(steprad_radiant*buff.time_fade)
+    buff.Light:SetRadius(steprad_radiant*buff.time_fade_l)
     buff.Light:Enable(true)
-    buff.task_fade = buff:DoPeriodicTask(step_radiant, LightFading_radiant, timeleft)
+    buff.task_l_fade = buff:DoPeriodicTask(step_radiant, LightFading_radiant, timeleft)
 end
 
 MakeBuff({
     name = "buff_l_radiantskin",
-    assets = nil,
-    prefabs = nil,
-    time_key = "time_l_radiantskin",
-    time_default = TUNING.SEG_TIME*16, --8分钟
-    notimer = nil,
+    -- assets = nil, prefabs = nil, notimer = nil,
     addnetwork = true,
-    fn_start = function(buff, target)
-        BuffSet_radiant(buff, target)
+    sets = { value = TUNING.SEG_TIME*16, max = TIME_MAX },
+    fn_start = function(buff, target, followsymbol, followoffset, sets)
+        BuffSet_radiant(buff, target, followsymbol, followoffset, sets)
         if target.components.bloomer ~= nil then
             target.components.bloomer:PushBloom(buff, "shaders/anim.ksh", 0.33)
         else
@@ -1102,9 +1110,9 @@ MakeBuff({
     end,
     fn_again = BuffSet_radiant,
     fn_end = function(buff, target)
-        if buff.task_fade ~= nil then
-            buff.task_fade:Cancel()
-            buff.task_fade = nil
+        if buff.task_l_fade ~= nil then
+            buff.task_l_fade:Cancel()
+            buff.task_l_fade = nil
         end
         if target.components.bloomer ~= nil then
             target.components.bloomer:PopBloom(buff)
@@ -1129,19 +1137,16 @@ MakeBuff({
 
 MakeBuff({
     name = "buff_l_fireproof",
-    assets = nil,
-    prefabs = nil,
-    time_key = "time_l_fireproof",
-    time_default = TUNING.SEG_TIME*12, --6分钟
-    notimer = nil,
+    -- assets = nil, prefabs = nil, notimer = nil,
+    sets = { value = TUNING.SEG_TIME*12, max = TIME_MAX },
     fn_start = function(buff, target)
         BuffTalk_start(target, buff)
         if target.components.health ~= nil then --免疫火焰伤
             target.components.health.externalfiredamagemultipliers:SetModifier(buff, 0)
         end
-        TOOLS_L.AddEntValue(target, "fireproof_l", buff.prefab, nil, 1)
+        TOOLS_L.AddEntValue(target, "legiontag_fireproof", buff.prefab, nil, 1)
         if not target:HasTag("player") then --为了方便玩家观察
-            TOOLS_L.AddTag(target, "fireproof_l", "fireproof_base")
+            TOOLS_L.AddTag(target, "fireproof_legion", "fireproof_buff")
         end
         if
             target.components.burnable ~= nil and
@@ -1164,8 +1169,8 @@ MakeBuff({
         if target.components.health ~= nil then
             target.components.health.externalfiredamagemultipliers:RemoveModifier(buff)
         end
-        TOOLS_L.RemoveEntValue(target, "fireproof_l", buff.prefab, nil)
-        TOOLS_L.RemoveTag(target, "fireproof_l", "fireproof_base")
+        TOOLS_L.RemoveEntValue(target, "legiontag_fireproof", buff.prefab, nil)
+        TOOLS_L.RemoveTag(target, "fireproof_legion", "fireproof_buff")
     end
 })
 
@@ -1175,11 +1180,8 @@ MakeBuff({
 
 MakeBuff({
     name = "buff_l_sivbloodreduce",
-    assets = nil,
-    prefabs = nil,
-    time_key = "time_l_sivbloodreduce",
-    time_default = TUNING.SEG_TIME*12, --6分钟
-    notimer = nil,
+    -- assets = nil, prefabs = nil, notimer = nil,
+    sets = { value = TUNING.SEG_TIME*12, max = TIME_MAX },
     fn_start = function(buff, target)
         BuffTalk_start(target, buff)
         TOOLS_L.AddEntValue(target, "siv_blood_l_reducer", "buff_l_sivbloodreduce", 1, 0.5)
@@ -1205,13 +1207,16 @@ MakeBuff({
     fn_start = function(buff, target, followsymbol, followoffset, sets)
         BuffTalk_start(target, buff)
         UpdateCount(buff, target, sets)
+        target.legion_numeffortluck = buff._count_l
     end,
     fn_again = function(buff, target, followsymbol, followoffset, sets)
         BuffTalk_start(target, buff)
         UpdateCount(buff, target, sets)
+        target.legion_numeffortluck = buff._count_l
     end,
     fn_end = function(buff, target)
         BuffTalk_end(target, buff)
+        target.legion_numeffortluck = nil
     end,
     fn_server = function(buff)
         buff.OnSave = OnSave_count

@@ -1238,6 +1238,7 @@ end, {
 --[[ 子圭·系 ]]
 --------------------------------------------------------------------------
 
+local dapperness_opener = 100/(TUNING.DAY_TIME_DEFAULT*2)
 local function CP_Open_opener(self, doer, ...)
     self.Open_l(self, doer, ...)
     if
@@ -1276,22 +1277,24 @@ local function AttachContainer_opener(inst)
 end
 local function UpdateSanityHelper_opener(owner)
     if owner.components.sanity ~= nil then
-        local bonus = TUNING.DAPPERNESS_LARGE
+        local bonus = dapperness_opener
         if owner.components.sanity:IsLunacyMode() then
             bonus = -bonus
         end
         owner.components.sanity.externalmodifiers:SetModifier("sanityhelper_l", bonus, "boxopener_l")
     end
 end
-local function SetSanityHelper_opener(owner, isadd)
+local function SetFunction_opener(owner, isadd)
     if isadd then
         owner:ListenForEvent("sanitymodechanged", UpdateSanityHelper_opener)
         UpdateSanityHelper_opener(owner)
+        TOOLS_L.AddEntValue(owner, "siv_blood_l_reducer", "siving_boxopener", 1, 0.25)
     else
         owner:RemoveEventCallback("sanitymodechanged", UpdateSanityHelper_opener)
         if owner.components.sanity ~= nil then
             owner.components.sanity.externalmodifiers:RemoveModifier("sanityhelper_l", "boxopener_l")
         end
+        TOOLS_L.RemoveEntValue(owner, "siv_blood_l_reducer", "siving_boxopener", 1)
     end
 end
 local function OnOwnerChange_opener(inst, owner, newowners)
@@ -1301,11 +1304,11 @@ local function OnOwnerChange_opener(inst, owner, newowners)
 
     --先取消以前的对象
     local ownerold = inst.owner_l
-    if ownerold ~= nil and ownerold:IsValid() and ownerold:HasTag("player") then
-        if ownerold._boxopener_l ~= nil then
+    if ownerold ~= nil and ownerold:IsValid() then
+        if ownerold.legion_boxopener ~= nil then
             local newtbl
-            ownerold._boxopener_l[inst] = nil
-            for k, _ in pairs(ownerold._boxopener_l) do
+            ownerold.legion_boxopener[inst] = nil
+            for k, _ in pairs(ownerold.legion_boxopener) do
                 if k:IsValid() then
                     if newtbl == nil then
                         newtbl = {}
@@ -1314,23 +1317,21 @@ local function OnOwnerChange_opener(inst, owner, newowners)
                 end
             end
             if newtbl == nil then
-                SetSanityHelper_opener(ownerold, false)
+                SetFunction_opener(ownerold, false)
             end
-            ownerold._boxopener_l = newtbl
+            ownerold.legion_boxopener = newtbl
         else
-            SetSanityHelper_opener(ownerold, false)
+            SetFunction_opener(ownerold, false)
         end
     end
 
     --再尝试设置目前的对象
     inst.owner_l = owner
-    if owner:HasTag("player") then
-        if owner._boxopener_l == nil then
-            owner._boxopener_l = {}
-            SetSanityHelper_opener(owner, true)
-        end
-        owner._boxopener_l[inst] = true
+    if owner.legion_boxopener == nil then
+        owner.legion_boxopener = {}
+        SetFunction_opener(owner, true)
     end
+    owner.legion_boxopener[inst] = true
 end
 local function OnRemove_opener(inst)
     OnOwnerChange_opener(inst, inst)
