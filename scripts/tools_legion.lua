@@ -785,7 +785,7 @@ local function SpawnStackDrop(name, num, pos, doer, items, sets)
 			end
         end
 
-        if sets == nil or not sets.noevent then
+        if sets ~= nil and not sets.noevent then
             item:PushEvent("on_loot_dropped", { dropper = sets.dropper })
             if sets.dropper ~= nil then
                 sets.dropper:PushEvent("loot_prefab_spawned", { loot = item })

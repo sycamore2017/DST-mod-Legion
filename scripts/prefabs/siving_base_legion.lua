@@ -50,31 +50,38 @@ local function TryDropRock(inst, chance)
     end
 end
 local function GrowRock(inst, num)
-    local x, y, z = inst.Transform:GetWorldPosition()
-    local ents = TheSim:FindEntities(x,y,z, 6, { "_inventoryitem" }, { "INLIMBO", "NOCLICK" }, nil)
-    local numloot = 0
-    local stackitem = nil
+    local pos = inst:GetPosition()
+    local ents = TheSim:FindEntities(pos.x, pos.y, pos.z, 6, { "_inventoryitem" }, { "INLIMBO", "NOCLICK" }, nil)
+    local numfullrock = 0
     for _, ent in ipairs(ents) do
-        if ent.prefab == "siving_rocks" and ent.components.inventoryitem.canbepickedup then
-            numloot = numloot + 1
-            if stackitem == nil and not ent.components.stackable:IsFull() then
-                stackitem = ent
-            end
-            if numloot >= 4 then
-                if stackitem ~= nil then
-                    break
-                else --周围的子圭石最多只能4组
+        if
+            ent.prefab == "siving_rocks" and ent.components.inventoryitem ~= nil and
+            ent.components.inventoryitem.canbepickedup and
+            ent.components.stackable ~= nil
+        then
+            local stack = ent.components.stackable
+            if stack:IsFull() then
+                numfullrock = numfullrock + 1
+                if numfullrock >= 8 then --周围的子圭石最多只能8组
+                    return
+                end
+            else
+                local newtotal = stack.stacksize + num
+                if newtotal > stack.maxsize then
+                    num = newtotal - stack.maxsize
+                    stack:SetStackSize(stack.maxsize)
+                else
+                    num = 0
+                    stack:SetStackSize(newtotal)
+                end
+                if num <= 0 then
                     return
                 end
             end
         end
     end
-    for i = 1, num, 1 do
-        if stackitem == nil or stackitem.components.stackable:IsFull() then
-            TryDropRock(inst, 1)
-        else
-            stackitem.components.stackable:SetStackSize(stackitem.components.stackable:StackSize()+1)
-        end
+    if num > 0 then
+        TOOLS_L.SpawnStackDrop("siving_rocks", num, pos, nil, nil, { dropper = inst })
     end
 end
 local function SetAnim_dt(inst, name)
@@ -97,7 +104,7 @@ local function OnWork_dt1(inst, worker, workleft)
     if workleft > 0 then
         TryDropRock(inst, 0.02)
     else
-        TryDropRock(inst, 1)
+        TOOLS_L.SpawnStackDrop("siving_rocks", math.random(1, 2), inst:GetPosition(), nil, nil, { dropper = inst })
         inst.components.growable:SetStage(inst.components.growable:GetStage() - 1)
         inst.components.growable:StartGrowing()
     end
@@ -106,8 +113,7 @@ local function OnWork_dt2(inst, worker, workleft)
     if workleft > 0 then
         TryDropRock(inst, 0.03)
     else
-        TryDropRock(inst, 1)
-        TryDropRock(inst, 1)
+        TOOLS_L.SpawnStackDrop("siving_rocks", math.random(2, 3), inst:GetPosition(), nil, nil, { dropper = inst })
         inst.components.growable:SetStage(inst.components.growable:GetStage() - 1)
         inst.components.growable:StartGrowing()
     end
@@ -116,9 +122,7 @@ local function OnWork_dt3(inst, worker, workleft)
     if workleft > 0 then
         TryDropRock(inst, 0.04)
     else
-        TryDropRock(inst, 1)
-        TryDropRock(inst, 1)
-        TryDropRock(inst, 1)
+        TOOLS_L.SpawnStackDrop("siving_rocks", math.random(3, 4), inst:GetPosition(), nil, nil, { dropper = inst })
         inst.components.timer:StopTimer("fallenleaf")
         inst.components.growable:SetStage(inst.components.growable:GetStage() - 1)
         inst.components.growable:StartGrowing()
@@ -132,13 +136,13 @@ local function OnGrow_dt(inst)
         return
     end
     if inst.tradeditems.light >= 1 and inst.tradeditems.health >= 1 then
-        GrowRock(inst, 2)
+        GrowRock(inst, math.random(4, 6))
         inst.ComputTraded(inst, -1, -1)
     elseif inst.tradeditems.light >= 1 then
-        GrowRock(inst, 1)
+        GrowRock(inst, math.random(2, 3))
         inst.ComputTraded(inst, -1, 0)
     elseif inst.tradeditems.health >= 1 then
-        GrowRock(inst, 1)
+        GrowRock(inst, math.random(2, 3))
         inst.ComputTraded(inst, 0, -1)
     end
 end
@@ -319,20 +323,20 @@ local function TimerDone_dt(inst, data)
         inst.components.timer:StartTimer("fallenleaf", cpt.stages[4].time(inst, 4, cpt.stages[4]))
 
         if inst.tradeditems == nil then
-            GrowRock(inst, 1)
+            GrowRock(inst, math.random(2, 3))
             return
         end
         if inst.tradeditems.light >= 1 and inst.tradeditems.health >= 1 then
-            GrowRock(inst, 3)
+            GrowRock(inst, math.random(6, 9))
             inst.ComputTraded(inst, -1, -1)
         elseif inst.tradeditems.light >= 1 then
-            GrowRock(inst, 2)
+            GrowRock(inst, math.random(4, 6))
             inst.ComputTraded(inst, -1, 0)
         elseif inst.tradeditems.health >= 1 then
-            GrowRock(inst, 2)
+            GrowRock(inst, math.random(4, 6))
             inst.ComputTraded(inst, 0, -1)
         else
-            GrowRock(inst, 1)
+            GrowRock(inst, math.random(2, 3))
         end
     end
 end

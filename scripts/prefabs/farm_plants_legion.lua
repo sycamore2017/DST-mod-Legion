@@ -1000,7 +1000,7 @@ local function ComputDigest(inst, namemap, items_free)
 			end
 		end
 		if number2 >= 1 then
-			TOOLS_L.SpawnStackDrop(name, number2, inst:GetPosition(), nil, items_free, { noevent = true })
+			TOOLS_L.SpawnStackDrop(name, number2, inst:GetPosition(), nil, items_free, nil)
 		end
 	end
 
@@ -1081,7 +1081,7 @@ local function DoDigest(inst, doer)
 		item:Remove()
 	end
 	for name, number in pairs(lootmap) do --生成被吞生物的掉落物
-		TOOLS_L.SpawnStackDrop(name, number, inst:GetPosition(), nil, items_free, { noevent = true })
+		TOOLS_L.SpawnStackDrop(name, number, inst:GetPosition(), nil, items_free, nil)
 	end
 	for _, item in pairs(items_free) do --将无法消化物品和消化产物都放回巨食草里
 		if item:IsValid() and item.components.inventoryitem ~= nil then
@@ -1170,7 +1170,7 @@ local function DoSwallow(inst)
 	end
 
 	for name, number in pairs(lootmap) do --生成被吞生物的掉落物
-		TOOLS_L.SpawnStackDrop(name, number, inst:GetPosition(), nil, newitems, { noevent = true })
+		TOOLS_L.SpawnStackDrop(name, number, inst:GetPosition(), nil, newitems, nil)
 	end
 
 	inst.components.health:SetPercent(1)

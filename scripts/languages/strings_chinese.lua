@@ -621,44 +621,50 @@ S_______WEBBER.DESCRIBE.DISH_POMEGRANATEJELLY = "我们喜欢果冻！"
 --S_______WINONA.DESCRIBE.DISH_POMEGRANATEJELLY = ""
 
 S_NAMES.DISH_MEDICINALLIQUOR = "药酒"
-STRINGS.UI.COOKBOOK.DISH_MEDICINALLIQUOR = "大战之前来它一碗，提升士气"
+STRINGS.UI.COOKBOOK.DISH_MEDICINALLIQUOR = "强化肌肉"
 S______GENERIC.DESCRIBE.DISH_MEDICINALLIQUOR = {
     GENERIC = "喝完也许能打出醉拳呢。",
-    DRUNK = "我才没醉！",
+    DRUNK = "我才没醉！"
 }
 S_______WILLOW.DESCRIBE.DISH_MEDICINALLIQUOR = {
     GENERIC = "能给我的力量加把火。",
-    DRUNK = "就这？",
+    DRUNK = "就这？"
 }
 S_____WOLFGANG.DESCRIBE.DISH_MEDICINALLIQUOR = {
     GENERIC = "沃尔夫冈可喜欢喝酒了。",
-    DRUNK = "沃尔夫冈酒量好得不行。",
+    DRUNK = "沃尔夫冈酒量好得不行。"
 }
 S________WENDY.DESCRIBE.DISH_MEDICINALLIQUOR = {
     GENERIC = "我不想喝这个。",
-    DRUNK = "我就不该喝这个。",
+    DRUNK = "我就不该喝这个。"
 }
 S_________WX78.DESCRIBE.DISH_MEDICINALLIQUOR = {
-    GENERIC = "可以模拟宿醉状态",
-    DRUNK = "状态模拟结束",
+    GENERIC = "可以模拟宿醉状态的液体。",
+    DRUNK = "宿醉状态开……哦，一毫秒内就结束了。"
 }
---S_WICKERBOTTOM.DESCRIBE.DISH_MEDICINALLIQUOR =
+S_WICKERBOTTOM.DESCRIBE.DISH_MEDICINALLIQUOR = {
+    GENERIC = "酒精含量几乎没有，但其药效会很醉人，可能是有微毒。",
+    DRUNK = "开始醉了。"
+}
 S_______WOODIE.DESCRIBE.DISH_MEDICINALLIQUOR = {
     GENERIC = "三碗不过岗。",
-    DRUNK = "我很清醒，不会去打老虎的。",
+    DRUNK = "我很清醒，不会去打老虎的。"
 }
 --S______WAXWELL.DESCRIBE.DISH_MEDICINALLIQUOR =
 S___WATHGRITHR.DESCRIBE.DISH_MEDICINALLIQUOR = {
     GENERIC = "喝下决战酒！战死方休！",
-    DRUNK = "像水一样，没啥感觉。",
+    DRUNK = "像水一样，没啥感觉。"
 }
 S_______WEBBER.DESCRIBE.DISH_MEDICINALLIQUOR = {
     GENERIC = "以前妈妈警告过我不要喝酒。",
-    DRUNK = "我们好困呀...",
+    DRUNK = "我们好困呀..."
 }
 -- S_______WINONA.DESCRIBE.DISH_MEDICINALLIQUOR =
 -- S_______WORTOX.DESCRIBE.DISH_MEDICINALLIQUOR =
--- S_____WORMWOOD.DESCRIBE.DISH_MEDICINALLIQUOR =
+S_____WORMWOOD.DESCRIBE.DISH_MEDICINALLIQUOR = {
+    GENERIC = "辣辣的药水。",
+    DRUNK = "头一点也不晕诶。"
+}
 -- S________WARLY.DESCRIBE.DISH_MEDICINALLIQUOR =
 -- S_________WURT.DESCRIBE.DISH_MEDICINALLIQUOR =
 -- S_______WALTER.DESCRIBE.DISH_MEDICINALLIQUOR =

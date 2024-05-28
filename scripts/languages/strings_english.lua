@@ -505,38 +505,47 @@ S_______WEBBER.DESCRIBE.DISH_POMEGRANATEJELLY = "We like Jellys!"
 --S_______WINONA.DESCRIBE.DISH_POMEGRANATEJELLY = ""
 
 S_NAMES.DISH_MEDICINALLIQUOR = "Medicinal Liquor" --药酒
-STRINGS.UI.COOKBOOK.DISH_MEDICINALLIQUOR = "Boost morale"
+STRINGS.UI.COOKBOOK.DISH_MEDICINALLIQUOR = "Strengthening muscles"
 S______GENERIC.DESCRIBE.DISH_MEDICINALLIQUOR = {
     GENERIC = "Maybe you can get drunk after drinking.",
-    DRUNK = "I'm not drunk!",
+    DRUNK = "I'm not drunk!"
 }
 S_______WILLOW.DESCRIBE.DISH_MEDICINALLIQUOR = {
     GENERIC = "This can add fire to my strength.",
-    DRUNK = "That's it?",
+    DRUNK = "That's it?"
 }
 S_____WOLFGANG.DESCRIBE.DISH_MEDICINALLIQUOR = {
     GENERIC = "Wolfgang loves drinking.",
-    DRUNK = "Wolfgang won't get drunk.",
+    DRUNK = "Wolfgang won't get drunk."
 }
 S________WENDY.DESCRIBE.DISH_MEDICINALLIQUOR = {
     GENERIC = "I don't want to drink this.",
-    DRUNK = "I shouldn't have drunk this.",
+    DRUNK = "I shouldn't have drunk this."
 }
--- S_________WX78.DESCRIBE.DISH_MEDICINALLIQUOR =
---S_WICKERBOTTOM.DESCRIBE.DISH_MEDICINALLIQUOR =
+S_________WX78.DESCRIBE.DISH_MEDICINALLIQUOR = {
+    GENERIC = "A LIQUID THAT CAN SIMULATE A HANGOVER STATE.",
+    DRUNK = "THE HANGOVER STATE IS ON... OH, IT'S OVER IN A MILLISECOND."
+}
+S_WICKERBOTTOM.DESCRIBE.DISH_MEDICINALLIQUOR = {
+    GENERIC = "It has almost no alcohol, but its efficacy can be intoxicating.",
+    DRUNK = "I'm starting to get drunk."
+}
 --S_______WOODIE.DESCRIBE.DISH_MEDICINALLIQUOR =
 --S______WAXWELL.DESCRIBE.DISH_MEDICINALLIQUOR =
 S___WATHGRITHR.DESCRIBE.DISH_MEDICINALLIQUOR = {
     GENERIC = "Feel no pain! Fight to the death!",
-    DRUNK = "Oh, just water!",
+    DRUNK = "Oh, just water!"
 }
 S_______WEBBER.DESCRIBE.DISH_MEDICINALLIQUOR = {
     GENERIC = "My mom warned me not to drink before.",
-    DRUNK = "Mom, We are so sleeeeee...",
+    DRUNK = "Mom, We are so sleeeeee..."
 }
 -- S_______WINONA.DESCRIBE.DISH_MEDICINALLIQUOR =
 -- S_______WORTOX.DESCRIBE.DISH_MEDICINALLIQUOR =
--- S_____WORMWOOD.DESCRIBE.DISH_MEDICINALLIQUOR =
+S_____WORMWOOD.DESCRIBE.DISH_MEDICINALLIQUOR = {
+    GENERIC = "A spicy potion.",
+    DRUNK = "Not dizzy at all."
+}
 -- S________WARLY.DESCRIBE.DISH_MEDICINALLIQUOR =
 -- S_________WURT.DESCRIBE.DISH_MEDICINALLIQUOR =
 -- S_______WALTER.DESCRIBE.DISH_MEDICINALLIQUOR =
