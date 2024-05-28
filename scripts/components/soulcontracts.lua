@@ -62,11 +62,11 @@ local SoulContracts = Class(function(self, inst)
             return
         end
         if
-            data and data.target and not data.target.mark_contract_l and
+            data and data.target and not data.target.legiontag_mark_contract and
             data.target:IsValid() and
             data.target.components.health ~= nil
         then
-            data.target.mark_contract_l = true
+            data.target.legiontag_mark_contract = true
             if self.lvl >= 85 then
                 if data.target.components.health:IsDead() then --攻击时就已经死了，就不需要监听了
                     OnTargetDeath2(data.target)

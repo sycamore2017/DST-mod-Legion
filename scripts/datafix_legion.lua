@@ -966,7 +966,7 @@ local mapseeds = {
         fruitnum_min = 1, fruitnum_max = 1, genekey = "foliageath"
     }
 }
-for k,v in pairs(mapseeds) do
+for k, v in pairs(mapseeds) do
     _G.TRANS_DATA_LEGION[k] = v
 end
 mapseeds = nil
@@ -1122,10 +1122,35 @@ local digest_data_l = {
     uncompromising_packrat = { lvl = lvls[4], attract = true, loot = { boneshard = 1 } }, --老鼠(背包)
     pied_rat = { lvl = lvls[7], attract = true, loot = { boneshard = 1 } }, --吹笛魔鼠
 }
-for k,v in pairs(digest_data_l) do
+for k, v in pairs(digest_data_l) do
     _G.DIGEST_DATA_LEGION[k] = v
 end
 digest_data_l = nil
+
+--------------------------------------------------------------------------
+--[[ 幸运buff的数据表 ]]
+--------------------------------------------------------------------------
+
+if not _G.rawget(_G, "LUCK_DATA_LEGION") then
+    _G.LUCK_DATA_LEGION = {}
+end
+
+local luck_data_l = {
+    walrus = {
+        walrushat = {
+            chance = 0.25, --这个物品的原始掉率
+            cost = 1 --一旦掉落后对幸运值的消耗量。不写就是1
+        },
+        walrus_tusk = { chance = 0.5, cost = 0.5 }
+    },
+    little_walrus = {
+        walrus_tusk = { chance = 0.2, cost = 0.5 }
+    },
+}
+for k, v in pairs(luck_data_l) do
+    _G.LUCK_DATA_LEGION[k] = v
+end
+luck_data_l = nil
 
 --------------------------------------------------------------------------
 --[[ 添加新的世界唯一型容器 ]]
