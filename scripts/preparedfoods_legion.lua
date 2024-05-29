@@ -714,8 +714,8 @@ local foods_legion = {
         card_def = { ingredients = { {"tallbirdegg",2}, {"red_cap",1}, {"blue_cap",1} } },
         priority = priority_med,
         foodtype = FOODTYPE.GOODIES,
-        hunger = 75, sanity = 10, health = 0,
-        perishtime = TUNING.PERISH_FAST, --6天
+        hunger = 55, sanity = 10, health = 0,
+        perishtime = 3*TUNING.PERISH_MED, --30天
         cooktime = 0.5,
         potlevel = "low",
         float = { 0.02, "small", 0.2, 1.1 },

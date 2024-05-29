@@ -1128,24 +1128,141 @@ end
 digest_data_l = nil
 
 --------------------------------------------------------------------------
---[[ 幸运buff的数据表 ]]
+--[[ 好事多蘑的数据表 ]]
 --------------------------------------------------------------------------
 
 if not _G.rawget(_G, "LUCK_DATA_LEGION") then
     _G.LUCK_DATA_LEGION = {}
 end
 
+local function OnSpawn_dragonfly_gem(doer, items)
+    local loot = { "orangegem", "yellowgem", "greengem" }
+    return loot[math.random(#loot)]
+end
+local function OnSpawn_mushroomhat_bp(doer, items)
+    local loot = { "red_mushroomhat_blueprint", "green_mushroomhat_blueprint", "blue_mushroomhat_blueprint" }
+    return loot[math.random(#loot)]
+end
+local function OnSpawn_mushroomlight_bp(doer, items)
+    return math.random() < 0.67 and "mushroom_light2_blueprint" or "mushroom_light_blueprint"
+end
+local function OnSpawn_stalker_atrium(doer, items)
+    local loot = { "thurible", "armorskeleton", "skeletonhat" }
+    return loot[math.random(#loot)]
+end
+
 local luck_data_l = {
-    walrus = {
+    walrus = { --海象
         walrushat = {
             chance = 0.25, --这个物品的原始掉率
-            cost = 1 --一旦掉落后对幸运值的消耗量。不写就是1
+            cost = 0.5 --一旦掉落后对幸运值的消耗量。不写就是1
         },
         walrus_tusk = { chance = 0.5, cost = 0.5 }
     },
-    little_walrus = {
-        walrus_tusk = { chance = 0.2, cost = 0.5 }
+    little_walrus = { walrus_tusk = { chance = 0.2, cost = 0.5 } }, --小海象
+    krampus = { krampus_sack = { chance = 0.01 } }, --坎普斯
+    klaus = { krampus_sack = { chance = 0.1 } }, --克劳斯
+    dragonfly = { --龙蝇
+        dragon_scales = { chance = 0.33, cost = 1.5 },
+        lavae_egg = { chance = 0.33, cost = 0.5 },
+        dragonfly_gem = { chance = 0.5, cost = 0.5, fn_spawn = OnSpawn_dragonfly_gem }
     },
+    bearger = { --熊獾
+        bearger_fur = { chance = 0.33, cost = 1.5 },
+        backcub = { chance = _G.CONFIGS_LEGION.BACKCUBCHANCE }
+    },
+    deerclops = { --独眼巨鹿
+        deerclops_eyeball = { chance = 0.33, cost = 1.5 },
+        winter_ornament_light1 = { chance = 0.2, cost = 1 }
+    },
+    antlion = { townportaltalisman = { chance = 1, cost = 0.2 } }, --蚁狮
+    eyeofterror = { --恐怖之眼
+        eyemaskhat = { chance = 0.33, cost = 1.5 },
+        milkywhites = { chance = 0.5, cost = 0.5 }
+    },
+    twinofterror1 = { --激光眼
+        shieldofterror = { chance = 0.17, cost = 1.5 },
+        yellowgem = { chance = 0.1, cost = 0.5 }
+    },
+    twinofterror2 = { --魔焰眼
+        shieldofterror = { chance = 0.17, cost = 1.5 },
+        greengem = { chance = 0.1, cost = 0.5 }
+    },
+    malbatross = { --邪天翁
+        malbatross_beak = { chance = 0.33, cost = 1.5 },
+        yellowgem = { chance = 0.05, cost = 0.5 }
+    },
+    toadstool = { --毒菌蟾蜍
+        shroom_skin = { chance = 0.33, cost = 1.5 },
+        mushroomhat_bp = { chance = 0.33, cost = 1.5, fn_spawn = OnSpawn_mushroomhat_bp },
+        mushroomlight_bp = { chance = 0.33, cost = 1.5, fn_spawn = OnSpawn_mushroomlight_bp }
+    },
+    toadstool_dark = { --悲惨的毒菌蟾蜍
+        shroom_skin = { chance = 0.4, cost = 1.5 },
+        mushroomhat_bp = { chance = 0.4, cost = 1.5, fn_spawn = OnSpawn_mushroomhat_bp },
+        mushroomlight_bp = { chance = 0.4, cost = 1.5, fn_spawn = OnSpawn_mushroomlight_bp }
+    },
+    crabking = { trident_blueprint = { chance = 0.33, cost = 1.5 } }, --帝王蟹
+    minotaur = { minotaurhorn = { chance = 0.33, cost = 1.5 } }, --远古守护者
+    stalker_atrium = { --远古织影者
+        stalker_atrium = { chance = 0.4, cost = 3, fn_spawn = OnSpawn_stalker_atrium }
+    },
+    alterguardian_phase3 = { --天体英雄(3阶段)
+        alterguardianhat = { chance = 0.1, cost = 6 },
+        alterguardianhatshard = { chance = 0.4, cost = 3 }
+    },
+    beefalo = { horn = { chance = 0.33, cost = 0.5 } }, --皮弗娄牛
+    babybeefalo = { horn = { chance = 0.1, cost = 0.5 } }, --小皮弗娄牛
+    tentacle = { --触手
+        tentaclespike = { chance = 0.5, cost = 0.5 },
+        tentaclespots = { chance = 0.2, cost = 0.5 }
+    },
+    tentacle_pillar = { --大触手
+        tentaclespike = { chance = 0.5, cost = 0.5 },
+        tentaclespots = { chance = 0.4, cost = 0.5 }
+    },
+    catcoon = { coontail = { chance = 0.33, cost = 0.5 } }, --浣猫
+    lightninggoat = { lightninggoathorn = { chance = 0.25 } }, --伏特羊
+    canary = { feather_canary = { chance = 0.1/1.1, cost = 0.25 } }, --金丝雀
+    cookiecutter = { cookiecuttershell = { chance = 0.75, cost = 0.2 } }, --饼干切割机
+    gnarwail = { gnarwail_horn = { chance = 0.5 } }, --一角鲸
+    gnarwail_attack_horn = { gnarwail_horn = { chance = 0.5 } }, --一角鲸(刺穿船时)
+    spat = { steelwool = { chance = 0.5, cost = 0.25 } }, --钢羊
+    gingerbreadwarg = { wintersfeastfuel = { chance = 0.5, cost = 0.2 } }, --姜饼座狼
+    glommer = { --格罗姆
+        glommerfuel = { chance = 0.5, cost = 0.25 },
+        glommerwings = { chance = 0.4, cost = 0.5 }
+    },
+    slurper = { --啜食者
+        slurper_pelt = { chance = 0.5, cost = 0.5 }
+    },
+    tissue_l_cactus = { tissue_l_cactus = { chance = _G.CONFIGS_LEGION.TISSUECACTUSCHANCE } },
+    tissue_l_berries = { tissue_l_berries = { chance = _G.CONFIGS_LEGION.TISSUEBERRIESCHANCE } },
+    tree_l_sparse = { --臃肿常青树
+        foliageath = { chance = _G.CONFIGS_LEGION.FOLIAGEATHCHANCE }
+    },
+    leif_sparse = { --臃肿常青树的树精守卫
+        foliageath = { chance = 10*_G.CONFIGS_LEGION.FOLIAGEATHCHANCE }
+    },
+    rosebush = {
+        cutted_rosebush = { chance = 0.05 },
+        rosorns = { chance = _G.CONFIGS_LEGION.FLOWERWEAPONSCHANCE }
+    },
+    lilybush = {
+        cutted_lilybush = { chance = 0.05 },
+        lileaves = { chance = _G.CONFIGS_LEGION.FLOWERWEAPONSCHANCE }
+    },
+    orchidbush = {
+        cutted_orchidbush = { chance = 0.05 },
+        orchitwigs = { chance = _G.CONFIGS_LEGION.FLOWERWEAPONSCHANCE }
+    },
+    butterfly = { butter = { chance = 0.1/5.1, cost = 0.5 } }, --蝴蝶
+    slurtle = { slurtlehat = { chance = 0.1 } }, --蛞蝓龟
+    snurtle = { armorsnurtleshell = { chance = 0.75 } }, --蜗牛龟
+    tallbird = { tallbirdegg = { chance = 0.2, cost = 0.5 } }, --高脚鸟
+    smallbird = { tallbirdegg = { chance = 0.05, cost = 0.5 } }, --高脚鸟(小)
+    teenbird = { tallbirdegg = { chance = 0.1, cost = 0.5 } }, --高脚鸟(青年)
+    hedgehound = { cutted_rosebush = { chance = 0.1 } }, --蔷薇狼
 }
 for k, v in pairs(luck_data_l) do
     _G.LUCK_DATA_LEGION[k] = v
@@ -1411,6 +1528,7 @@ local function pinnable_Stick_player(self, ...)
     return self.Stick_legion(self, ...)
 end
 local function OnSave_player(inst, data)
+    --灵魂契约数据
     if inst._contracts_l ~= nil and inst._contracts_l:IsValid() then
         local book = inst._contracts_l
         if book.components.inventoryitem ~= nil then
@@ -1422,6 +1540,22 @@ local function OnSave_player(inst, data)
     elseif inst.contracts_record_l ~= nil then
         data.contracts_l = inst.contracts_record_l
     end
+    --好事多蘑数据
+    if inst.legion_luckdata ~= nil then
+        local newluckdd
+        for itemname, v in pairs(inst.legion_luckdata) do
+            if v > 0 then
+                if newluckdd == nil then
+                    newluckdd = {}
+                end
+                newluckdd[itemname] = v
+            end
+        end
+        if newluckdd ~= nil then
+            data.legion_luckdata = newluckdd
+        end
+    end
+
     if inst.OnSave_legion ~= nil then --OnSave是可能有返回的
         return inst.OnSave_legion(inst, data)
     end
@@ -1433,6 +1567,7 @@ local function OnLoad_player(inst, data, ...)
     if data == nil then
         return
     end
+    --灵魂契约数据
     if data.contracts_l ~= nil then
         local contracts_slot_l = data.contracts_slot_l --提前缓存下来，因为等会就会清除了
         local contracts_l = data.contracts_l
@@ -1453,18 +1588,26 @@ local function OnLoad_player(inst, data, ...)
             inst.task_contracts_l = nil
         end)
     end
+    --好事多蘑数据
+    if data.legion_luckdata ~= nil then
+        inst.legion_luckdata = data.legion_luckdata
+    end
 end
 local function SaveForReroll_player(inst, ...)
     local data
     if inst.SaveForReroll_legion ~= nil then
         data = inst.SaveForReroll_legion(inst, ...)
     end
+    if data == nil then
+        data = {}
+    end
+    --爱意数据
     if inst.components.eater ~= nil and inst.components.eater.lovemap_l ~= nil then
-        if data == nil then
-            data = { lovemap_l = inst.components.eater.lovemap_l }
-        else
-            data.lovemap_l = inst.components.eater.lovemap_l
-        end
+        data.lovemap_l = inst.components.eater.lovemap_l
+    end
+    --好事多蘑数据
+    if inst.legion_luckdata ~= nil then
+        data.legion_luckdata = inst.legion_luckdata
     end
     return data
 end
@@ -1472,8 +1615,15 @@ local function LoadForReroll_player(inst, data, ...)
     if inst.LoadForReroll_legion ~= nil then
         inst.LoadForReroll_legion(inst, data, ...)
     end
-    if data ~= nil and data.lovemap_l ~= nil and inst.components.eater ~= nil then
-        inst.components.eater.lovemap_l = data.lovemap_l
+    if data ~= nil then
+        --爱意数据
+        if data.lovemap_l ~= nil and inst.components.eater ~= nil then
+            inst.components.eater.lovemap_l = data.lovemap_l
+        end
+        --好事多蘑数据
+        if data.legion_luckdata ~= nil then
+            inst.legion_luckdata = data.legion_luckdata
+        end
     end
 end
 local function foodmemory_GetMemoryCount_player(self, ...)
@@ -1570,7 +1720,7 @@ AddPlayerPostInit(function(inst)
         inst.LoadForReroll = LoadForReroll_player
     end
 
-    --下线时记录灵魂契约数据
+    --下线时记录特殊数据
     if inst.OnSave_legion == nil then
         inst.OnSave_legion = inst.OnSave
         inst.OnSave = OnSave_player

@@ -272,13 +272,13 @@ end)
 local function OnDeath_hedge(inst)
     local dropnum = 0
     if TheWorld then
-        if TheWorld.deathcount_l_hedgehound == nil then
-            TheWorld.deathcount_l_hedgehound = 1
+        if TheWorld.legion_numdeath_hedgehound == nil then
+            TheWorld.legion_numdeath_hedgehound = 1
         else
-            TheWorld.deathcount_l_hedgehound = TheWorld.deathcount_l_hedgehound + 1
-            if TheWorld.deathcount_l_hedgehound >= 6 then
+            TheWorld.legion_numdeath_hedgehound = TheWorld.legion_numdeath_hedgehound + 1
+            if TheWorld.legion_numdeath_hedgehound >= 6 then
                 dropnum = 1
-                TheWorld.deathcount_l_hedgehound = nil
+                TheWorld.legion_numdeath_hedgehound = nil
             end
         end
     end
@@ -312,21 +312,24 @@ if _G.CONFIGS_LEGION.FOLIAGEATHCHANCE > 0 then
         "evergreen_sparse_tall",
         "evergreen_sparse_short"
     }
-    local function OnFinish_evergreen_sparse(inst, chopper)
+    local function OnWorked_evergreen_sparse(inst, data)
+        if
+            inst:HasTag("stump") or data == nil or
+            data.workleft == nil or data.workleft > 0
+        then
+            return
+        end
         if inst.components.lootdropper ~= nil then
             if math.random() < CONFIGS_LEGION.FOLIAGEATHCHANCE then
                 inst.components.lootdropper:SpawnLootPrefab("foliageath")
             end
         end
-        if inst.workable_onfinish_l ~= nil then
-            inst.workable_onfinish_l(inst, chopper)
-        end
+        TheWorld:PushEvent("legion_luckydo", { inst = inst, luckkey = "tree_l_sparse" })
     end
     local function FnSet_evergreen(inst)
-        if inst.workable_onfinish_l == nil and inst.components.workable ~= nil then
-            inst.workable_onfinish_l = inst.components.workable.onfinish
-            inst.components.workable:SetOnFinishCallback(OnFinish_evergreen_sparse)
-        end
+        --workable.onfinish 容易被官方逻辑替换掉，所以用事件机制更保险
+        --"workfinished"事件在 workable.onfinish执行后才触发，inst已经是被remove的状态，没法执行我的逻辑了
+        inst:ListenForEvent("worked", OnWorked_evergreen_sparse)
     end
     for _, v in pairs(trees) do
         AddPrefabPostInit(v, FnSet_evergreen)
@@ -812,41 +815,41 @@ end)
 --[[ 修改浣猫，让猫薄荷对其产生特殊作用 ]]
 --------------------------------------------------------------------------
 
-local function OnAccept_catcoon(cat, giver, item)
-    if cat.trader_onaccept_l ~= nil then
-        cat.trader_onaccept_l(cat, giver, item)
+local function trader_onaccept_catcoon(cat, giver, item)
+    if cat.legionfn_trader_onaccept ~= nil then
+        cat.legionfn_trader_onaccept(cat, giver, item)
     end
     if item:HasTag("catmint") then
-        cat.count_mint_l = (cat.count_mint_l or 0) + 1
+        cat.legion_count_mint = (cat.legion_count_mint or 0) + 1
         if cat.components.follower ~= nil and cat.components.follower.task ~= nil then
             cat.components.follower:AddLoyaltyTime(cat.components.follower.maxfollowtime or TUNING.CATCOON_LOYALTY_MAXTIME)
         end
     end
 end
 local function PickRandomGift_catcoon(cat, tier)
-    if cat.count_mint_l ~= nil then
-        if cat.count_mint_l <= 1 then
-            cat.count_mint_l = nil
+    if cat.legion_count_mint ~= nil then
+        if cat.legion_count_mint <= 1 then
+            cat.legion_count_mint = nil
         else
-            cat.count_mint_l = cat.count_mint_l - 1
+            cat.legion_count_mint = cat.legion_count_mint - 1
         end
         if math.random() < 0.5 then
             return "cattenball"
         end
     end
-    if cat.PickRandomGift_l ~= nil then
-        return cat.PickRandomGift_l(cat, tier)
+    if cat.legionfn_PickRandomGift ~= nil then
+        return cat.legionfn_PickRandomGift(cat, tier)
     end
 end
 
 local didfriendgift = nil
 AddPrefabPostInit("catcoon", function(inst)
-    if inst.trader_onaccept_l == nil then
-        inst.trader_onaccept_l = inst.components.trader.onaccept
-        inst.components.trader.onaccept = OnAccept_catcoon
+    if inst.legionfn_trader_onaccept == nil then
+        inst.legionfn_trader_onaccept = inst.components.trader.onaccept
+        inst.components.trader.onaccept = trader_onaccept_catcoon
     end
-    if inst.PickRandomGift_l == nil then
-        inst.PickRandomGift_l = inst.PickRandomGift
+    if inst.legionfn_PickRandomGift == nil then
+        inst.legionfn_PickRandomGift = inst.PickRandomGift
         inst.PickRandomGift = PickRandomGift_catcoon
     end
     if not didfriendgift then --由于索引效果，这一改会永久修改所有的表，所以这里只需要改一次就行
@@ -904,10 +907,16 @@ local function pickable_onpickedfn_cactus(inst, picker, ...)
     if inst.legion_pickable_onpickedfn ~= nil then
         inst.legion_pickable_onpickedfn(inst, picker, ...)
     end
-    if not TheWorld.state.israining or math.random() >= (CONFIGS_LEGION.TISSUECACTUSCHANCE or 0.05) then
+    if not TheWorld.state.israining then
         return
     end
-    GiveTissue(inst, picker, "tissue_l_cactus")
+    if math.random() < (CONFIGS_LEGION.TISSUECACTUSCHANCE or 0.05) then
+        GiveTissue(inst, picker, "tissue_l_cactus")
+    end
+    TheWorld:PushEvent("legion_luckydo", { inst = inst, luckkey = "tissue_l_cactus" })
+    inst.legion_luckdoers = nil --记得清理数据
+    inst.legiontag_luckdone = nil
+    inst.legion_luckcheck = nil
 end
 local function FnSet_cactus(inst)
     if inst.legion_pickable_onpickedfn == nil and inst.components.pickable ~= nil then
@@ -923,10 +932,16 @@ local function pickable_onpickedfn_berrybush(inst, picker, ...)
     if inst.legion_pickable_onpickedfn ~= nil then
         inst.legion_pickable_onpickedfn(inst, picker, ...)
     end
-    if not TheWorld.state.isdusk or math.random() >= (CONFIGS_LEGION.TISSUEBERRIESCHANCE or 0.01) then
+    if not TheWorld.state.isdusk then
         return
     end
-    GiveTissue(inst, picker, "tissue_l_berries")
+    if math.random() < (CONFIGS_LEGION.TISSUEBERRIESCHANCE or 0.01) then
+        GiveTissue(inst, picker, "tissue_l_berries")
+    end
+    TheWorld:PushEvent("legion_luckydo", { inst = inst, luckkey = "tissue_l_berries" })
+    inst.legion_luckdoers = nil --记得清理数据
+    inst.legiontag_luckdone = nil
+    inst.legion_luckcheck = nil
 end
 local function FnSet_berry(inst)
     if inst.legion_pickable_onpickedfn == nil and inst.components.pickable ~= nil then

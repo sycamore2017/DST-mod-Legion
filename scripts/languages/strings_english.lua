@@ -1140,58 +1140,56 @@ S_NAMES.DISH_MUSHEDEGGS = "Double-Mushed Eggs" --双菇烩蛋
 STRINGS.UI.COOKBOOK.DISH_MUSHEDEGGS = "Effort will pay off"
 S______GENERIC.DESCRIBE.DISH_MUSHEDEGGS = "Tasting it will bring good things to happen, really?"
 -- S_______WILLOW.DESCRIBE.DISH_MUSHEDEGGS = ""
--- S_____WOLFGANG.DESCRIBE.DISH_MUSHEDEGGS = ""
+S_____WOLFGANG.DESCRIBE.DISH_MUSHEDEGGS = "Wolfgang's good days are coming!"
 -- S________WENDY.DESCRIBE.DISH_MUSHEDEGGS = ""
 -- S_________WX78.DESCRIBE.DISH_MUSHEDEGGS = ""
 -- S_WICKERBOTTOM.DESCRIBE.DISH_MUSHEDEGGS = ""
 -- S_______WOODIE.DESCRIBE.DISH_MUSHEDEGGS = ""
 -- S______WAXWELL.DESCRIBE.DISH_MUSHEDEGGS = ""
--- S___WATHGRITHR.DESCRIBE.DISH_MUSHEDEGGS = ""
+S___WATHGRITHR.DESCRIBE.DISH_MUSHEDEGGS = "Luck is a part of your strength."
 -- S_______WEBBER.DESCRIBE.DISH_MUSHEDEGGS = ""
 -- S_______WINONA.DESCRIBE.DISH_MUSHEDEGGS = ""
 -- S_______WORTOX.DESCRIBE.DISH_MUSHEDEGGS = ""
 -- S_____WORMWOOD.DESCRIBE.DISH_MUSHEDEGGS = ""
--- S________WARLY.DESCRIBE.DISH_MUSHEDEGGS = ""
+S________WARLY.DESCRIBE.DISH_MUSHEDEGGS = "Magical cuisine not only fills the stomach, but also brings good luck."
 -- S_________WURT.DESCRIBE.DISH_MUSHEDEGGS = ""
 -- S_______WALTER.DESCRIBE.DISH_MUSHEDEGGS = ""
--- S________WANDA.DESCRIBE.DISH_MUSHEDEGGS = ""
+S________WANDA.DESCRIBE.DISH_MUSHEDEGGS = "Good luck can help me reduce my dependence on time."
 
 --好事多蘑buff
-S______GENERIC.ANNOUNCE_ATTACH_BUFF_L_EFFORTLUCK = "Effort will definitely pay off!"
--- S_______WILLOW.ANNOUNCE_ATTACH_BUFF_L_EFFORTLUCK = ""
--- S_____WOLFGANG.ANNOUNCE_ATTACH_BUFF_L_EFFORTLUCK = ""
--- S________WENDY.ANNOUNCE_ATTACH_BUFF_L_EFFORTLUCK = ""
--- S_________WX78.ANNOUNCE_ATTACH_BUFF_L_EFFORTLUCK = ""
-S_WICKERBOTTOM.ANNOUNCE_ATTACH_BUFF_L_EFFORTLUCK = "Fortune doesn't favor fools."
--- S_______WOODIE.ANNOUNCE_ATTACH_BUFF_L_EFFORTLUCK = ""
--- S______WAXWELL.ANNOUNCE_ATTACH_BUFF_L_EFFORTLUCK = ""
--- S___WATHGRITHR.ANNOUNCE_ATTACH_BUFF_L_EFFORTLUCK = ""
-S_______WEBBER.ANNOUNCE_ATTACH_BUFF_L_EFFORTLUCK = "We need to keep going!"
-S_______WINONA.ANNOUNCE_ATTACH_BUFF_L_EFFORTLUCK = "I believe that diligence can make up for weakness."
-S_______WORTOX.ANNOUNCE_ATTACH_BUFF_L_EFFORTLUCK = "Diligence leads to the path of success."
--- S_____WORMWOOD.ANNOUNCE_ATTACH_BUFF_L_EFFORTLUCK = ""
--- S________WARLY.ANNOUNCE_ATTACH_BUFF_L_EFFORTLUCK = ""
--- S_________WURT.ANNOUNCE_ATTACH_BUFF_L_EFFORTLUCK = ""
--- S_______WALTER.ANNOUNCE_ATTACH_BUFF_L_EFFORTLUCK = ""
-S________WANDA.ANNOUNCE_ATTACH_BUFF_L_EFFORTLUCK = "Try a few more times, good luck will come."
---
-S______GENERIC.ANNOUNCE_DETACH_BUFF_L_EFFORTLUCK = "My efforts are no longer guaranteed."
--- S_______WILLOW.ANNOUNCE_DETACH_BUFF_L_EFFORTLUCK = ""
--- S_____WOLFGANG.ANNOUNCE_DETACH_BUFF_L_EFFORTLUCK = ""
--- S________WENDY.ANNOUNCE_DETACH_BUFF_L_EFFORTLUCK = ""
--- S_________WX78.ANNOUNCE_DETACH_BUFF_L_EFFORTLUCK = ""
-S_WICKERBOTTOM.ANNOUNCE_DETACH_BUFF_L_EFFORTLUCK = "Don't get cocky."
--- S_______WOODIE.ANNOUNCE_DETACH_BUFF_L_EFFORTLUCK = ""
--- S______WAXWELL.ANNOUNCE_DETACH_BUFF_L_EFFORTLUCK = ""
--- S___WATHGRITHR.ANNOUNCE_DETACH_BUFF_L_EFFORTLUCK = ""
-S_______WEBBER.ANNOUNCE_DETACH_BUFF_L_EFFORTLUCK = "We can't exchange our sweat for anything."
-S_______WINONA.ANNOUNCE_DETACH_BUFF_L_EFFORTLUCK = "Without luck, I can continue to work steadfastly!"
-S_______WORTOX.ANNOUNCE_DETACH_BUFF_L_EFFORTLUCK = "The road is long and winding."
--- S_____WORMWOOD.ANNOUNCE_DETACH_BUFF_L_EFFORTLUCK = ""
--- S________WARLY.ANNOUNCE_DETACH_BUFF_L_EFFORTLUCK = ""
--- S_________WURT.ANNOUNCE_DETACH_BUFF_L_EFFORTLUCK = ""
--- S_______WALTER.ANNOUNCE_DETACH_BUFF_L_EFFORTLUCK = ""
-S________WANDA.ANNOUNCE_DETACH_BUFF_L_EFFORTLUCK = "Luck will always run out."
+S______GENERIC.ANNOUNCE_BUFF_L_EFFORTLUCK = {
+    ATTACH = "My luck is up! There are {luck} lucky points.",
+    COST = "Good luck time! {luck} lucky points left.",
+    DETACH = "Looking forward to good luck next time!"
+}
+-- S_______WILLOW.ANNOUNCE_BUFF_L_EFFORTLUCK = ""
+-- S_____WOLFGANG.ANNOUNCE_BUFF_L_EFFORTLUCK = ""
+-- S________WENDY.ANNOUNCE_BUFF_L_EFFORTLUCK = ""
+-- S_________WX78.ANNOUNCE_BUFF_L_EFFORTLUCK = ""
+S_WICKERBOTTOM.ANNOUNCE_BUFF_L_EFFORTLUCK = {
+    ATTACH = "Fortune doesn't favor fools. I have {luck} lucky points.",
+    COST = "Take fortune when it comes. {luck} lucky points left.",
+    DETACH = "My luck has run out."
+}
+-- S_______WOODIE.ANNOUNCE_BUFF_L_EFFORTLUCK = ""
+-- S______WAXWELL.ANNOUNCE_BUFF_L_EFFORTLUCK = ""
+-- S___WATHGRITHR.ANNOUNCE_BUFF_L_EFFORTLUCK = ""
+-- S_______WEBBER.ANNOUNCE_BUFF_L_EFFORTLUCK = ""
+S_______WINONA.ANNOUNCE_BUFF_L_EFFORTLUCK = {
+    ATTACH = "Diligence redeems stupidity. There are {luck} lucky points.",
+    COST = "Aha! I still have {luck} lucky points left.",
+    DETACH = "Without luck, I will continue to work diligently!"
+}
+-- S_______WORTOX.ANNOUNCE_BUFF_L_EFFORTLUCK = ""
+S_____WORMWOOD.ANNOUNCE_BUFF_L_EFFORTLUCK = {
+    ATTACH = "Lucky break. {luck} lucky points.",
+    COST = "Great! {luck} lucky points left.",
+    DETACH = "Luck is gone."
+}
+-- S________WARLY.ANNOUNCE_BUFF_L_EFFORTLUCK = ""
+-- S_________WURT.ANNOUNCE_BUFF_L_EFFORTLUCK = ""
+-- S_______WALTER.ANNOUNCE_BUFF_L_EFFORTLUCK = ""
+-- S________WANDA.ANNOUNCE_BUFF_L_EFFORTLUCK = ""
 
 --怜悯debuff
 S______GENERIC.ANNOUNCE_ATTACH_BUFF_L_MERCIFUL = "I suddenly feel that the enemies are all very pitiful."

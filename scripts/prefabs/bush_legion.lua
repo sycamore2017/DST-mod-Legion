@@ -277,6 +277,10 @@ local function SpawnSpecialLoot_rose(inst, picker, mustdrop)
     if math.random() < CONFIGS_LEGION.FLOWERWEAPONSCHANCE then --3%几率掉落剑
         SpawnStackDrop("rosorns", 1, inst, picker, true, true)
     end
+    TheWorld:PushEvent("legion_luckydo", { inst = inst, luckkey = inst.prefab })
+    inst.legion_luckdoers = nil --记得清理数据
+    inst.legiontag_luckdone = nil
+    inst.legion_luckcheck = nil
 end
 local function OnPicked_rose(inst, picker)
     OnPicked(inst, picker)
@@ -376,6 +380,10 @@ local function SpawnSpecialLoot_lily(inst, picker, mustdrop)
     if math.random() < CONFIGS_LEGION.FLOWERWEAPONSCHANCE then --3%几率掉落剑
         SpawnStackDrop("lileaves", 1, inst, picker, true, true)
     end
+    TheWorld:PushEvent("legion_luckydo", { inst = inst, luckkey = inst.prefab })
+    inst.legion_luckdoers = nil --记得清理数据
+    inst.legiontag_luckdone = nil
+    inst.legion_luckcheck = nil
 end
 local function OnPicked_lily(inst, picker)
     OnPicked(inst, picker)
@@ -450,6 +458,10 @@ local function SpawnSpecialLoot_orchid(inst, picker, mustdrop)
     if math.random() < CONFIGS_LEGION.FLOWERWEAPONSCHANCE then --3%几率掉落剑
         SpawnStackDrop("orchitwigs", 1, inst, picker, true, true)
     end
+    TheWorld:PushEvent("legion_luckydo", { inst = inst, luckkey = inst.prefab })
+    inst.legion_luckdoers = nil --记得清理数据
+    inst.legiontag_luckdone = nil
+    inst.legion_luckcheck = nil
 end
 local function OnPicked_orchid(inst, picker)
     OnPicked(inst, picker)

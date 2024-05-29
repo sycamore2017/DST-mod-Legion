@@ -1200,59 +1200,117 @@ MakeBuff({
 --[[ 好事多蘑：增加稀有掉落物的掉落概率 ]]
 --------------------------------------------------------------------------
 
-local function DropLoot_effortluck(itemname, doer)
+local function BuffTalk_effortluck(buff, target, key)
+    if target.components.talker ~= nil then
+        local str = GetString(target, "ANNOUNCE_BUFF_L_EFFORTLUCK", key)
+        if str ~= nil then
+            if key ~= "DETACH" then
+                str = subfmt(str, { luck = tostring(buff._count_l) })
+            end
+            target.components.talker:Say(str)
+        end
+    end
+end
+local function DropLoot_effortluck(itemname, doer, v)
     local items = {}
-    TOOLS_L.SpawnStackDrop(itemname, 1, doer:GetPosition(), nil, items, nil)
+    if v ~= nil and v.fn_spawn ~= nil then
+        itemname = v.fn_spawn(doer, items)
+        if itemname ~= nil then
+            TOOLS_L.SpawnStackDrop(itemname, 1, doer:GetPosition(), nil, items, nil)
+        end
+    else
+        TOOLS_L.SpawnStackDrop(itemname, 1, doer:GetPosition(), nil, items, nil)
+    end
+    for _, item in pairs(items) do
+        local fx = SpawnPrefab("buff_l_effortluck_fx")
+        if fx ~= nil then
+            fx.entity:SetParent(item.entity)
+            -- fx.Transform:SetPosition(0, 0, 0)
+        end
+        -- item.AnimState:SetMultColour(255/255, 211/255, 66/255, 1)
+        item.AnimState:SetAddColour(255/255, 184/255, 54/255, 0)
+    end
 end
 local function OnEntityDropLoot_effortluck(buff, target, data) --entity_droploot 一般是死亡或者被破坏时触发
-    local victim = data.inst
+    local victim = data and data.inst or nil
+    local luckpoint = buff._count_l or 0
     if
-        victim ~= nil and victim:IsValid() and not victim.legiontag_luckend and
-        LUCK_DATA_LEGION[victim.prefab] ~= nil and target:IsNear(victim, 30)
+        victim ~= nil and victim:IsValid() and
+        luckpoint > 0 and
+        not victim.legiontag_luckdone and
+        (victim.legion_luckdoers == nil or not victim.legion_luckdoers[target]) and
+        LUCK_DATA_LEGION[data.luckkey or victim.prefab] ~= nil and target:IsNear(victim, 28)
     then
-        local doit = false --undo 还得记录不用的玩家的不同成功判定数据
-        local ddbase = LUCK_DATA_LEGION[victim.prefab]
+        local doit = false
+        local checkedall = true
+        local itemcheck = victim.legion_luckcheck or {}
+        local ddbase = LUCK_DATA_LEGION[data.luckkey or victim.prefab]
         local dddoer = target.legion_luckdata or {}
         for itemname, v in pairs(ddbase) do
-            if (v.cost or 1) <= buff._count_l then --剩余幸运值需要足够才行
-                local count = dddoer[itemname] or 0
-                if math.random() < v.chance then
-                    count = 0
-                    DropLoot_effortluck(itemname, victim)
-                    buff._count_l = buff._count_l - (v.cost or 1)
-                else
-                    count = count + v.chance
-                    if count >= 1 then --达到保底要求
-                        count = count - 1
-                        DropLoot_effortluck(itemname, victim)
+            if itemcheck[itemname] == nil then --说明该项物品还没判定过
+                if (v.cost or 1) <= luckpoint then --剩余幸运值需要足够才行
+                    local count = dddoer[itemname] or 0
+                    if math.random() < v.chance then
+                        count = 0
+                        DropLoot_effortluck(itemname, victim, v)
+                        luckpoint = luckpoint - (v.cost or 1)
+                    else
+                        count = count + v.chance
+                        if count >= 1 then --达到保底要求
+                            count = count - 1
+                            DropLoot_effortluck(itemname, victim, v)
+                            luckpoint = luckpoint - (v.cost or 1)
+                        end
                     end
+                    dddoer[itemname] = count > 0 and count or nil
+                    itemcheck[itemname] = true
+                    doit = true
+                else
+                    checkedall = false
                 end
-                dddoer[itemname] = count > 0 and count or nil
-                doit = true
             end
         end
-        target.legion_luckdata = dddoer
         if doit then
-            victim.legiontag_luckend = true
+            target.legion_luckdata = dddoer
+            victim.legion_luckcheck = itemcheck
+            if luckpoint ~= buff._count_l then
+                buff._count_l = luckpoint
+                target.legion_numeffortluck = luckpoint
+                if luckpoint > 0 then
+                    BuffTalk_effortluck(buff, target, "COST")
+                end
+            end
+        end
+        if checkedall then
+            victim.legiontag_luckdone = true
+        else --可不能一个玩家触发多次
+            if victim.legion_luckdoers == nil then
+                victim.legion_luckdoers = {}
+            end
+            victim.legion_luckdoers[target] = true
+        end
+        if luckpoint <= 0 then
+            EndBuffSafely(buff)
         end
     end
 end
 local function OnEntityDeath_effortluck(buff, target, data)
-    
+    --貌似也没啥好改的
+    OnEntityDropLoot_effortluck(buff, target, data)
 end
 
 MakeBuff({
     name = "buff_l_effortluck",
     -- assets = nil, prefabs = nil,
     notimer = true,
-    sets = { value = 1, max = 5 },
+    sets = { value = 1, max = 20 },
     fn_start = function(buff, target, followsymbol, followoffset, sets)
-        BuffTalk_start(target, buff)
         UpdateCount(buff, target, sets)
         target.legion_numeffortluck = buff._count_l
         if buff._count_l <= 0 then
             return
         end
+        BuffTalk_effortluck(buff, target, "ATTACH")
         if target.legionfn_luck_entityloot == nil then
             target.legionfn_luck_entityloot = function(src, data) OnEntityDropLoot_effortluck(buff, target, data) end
             target:ListenForEvent("entity_droploot", target.legionfn_luck_entityloot, TheWorld)
@@ -1261,14 +1319,21 @@ MakeBuff({
             target.legionfn_luck_entitydeath = function(src, data) OnEntityDeath_effortluck(buff, target, data) end
             target:ListenForEvent("entity_death", target.legionfn_luck_entitydeath, TheWorld)
         end
+        if target.legionfn_luck_do == nil then --自定义的监听
+            target.legionfn_luck_do = function(src, data) OnEntityDropLoot_effortluck(buff, target, data) end
+            target:ListenForEvent("legion_luckydo", target.legionfn_luck_do, TheWorld)
+        end
     end,
     fn_again = function(buff, target, followsymbol, followoffset, sets)
-        BuffTalk_start(target, buff)
         UpdateCount(buff, target, sets)
         target.legion_numeffortluck = buff._count_l
+        if buff._count_l <= 0 then
+            return
+        end
+        BuffTalk_effortluck(buff, target, "ATTACH")
     end,
     fn_end = function(buff, target)
-        BuffTalk_end(target, buff)
+        BuffTalk_effortluck(buff, target, "DETACH")
         target.legion_numeffortluck = nil
         if target.legionfn_luck_entityloot ~= nil then
             target:RemoveEventCallback("entity_droploot", target.legionfn_luck_entityloot, TheWorld)
@@ -1277,6 +1342,10 @@ MakeBuff({
         if target.legionfn_luck_entitydeath ~= nil then
             target:RemoveEventCallback("entity_death", target.legionfn_luck_entitydeath, TheWorld)
             target.legionfn_luck_entitydeath = nil
+        end
+        if target.legionfn_luck_do ~= nil then
+            target:RemoveEventCallback("legion_luckydo", target.legionfn_luck_do, TheWorld)
+            target.legionfn_luck_do = nil
         end
     end,
     fn_server = function(buff)

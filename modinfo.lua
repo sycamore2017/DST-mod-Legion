@@ -523,14 +523,14 @@ configuration_options = L and {
         options = {
             {description = "100%", data = 1},
             {description = "85%", data = 0.85},
-            {description = "70%(default)", data = 0.7},
-            {description = "55%", data = 0.55},
-            {description = "40%", data = 0.4},
+            {description = "65%", data = 0.65},
+            {description = "50%(default)", data = 0.5},
+            {description = "35%", data = 0.35},
             {description = "25%", data = 0.25},
             {description = "10%", data = 0.1},
             {description = "0%", data = 0}
         },
-        default = 0.7
+        default = 0.5
     },
     {   name = "ShieldRechargeTime",
         label = "Cooldown Time of Shield",
@@ -1061,14 +1061,14 @@ configuration_options = L and {
         options = {
             {description = "总是掉落", data = 1},
             {description = "85%", data = 0.85},
-            {description = "70%(默认)", data = 0.7},
-            {description = "55%", data = 0.55},
-            {description = "40%", data = 0.4},
+            {description = "65%", data = 0.65},
+            {description = "50%(默认)", data = 0.5},
+            {description = "35%", data = 0.35},
             {description = "25%", data = 0.25},
             {description = "10%", data = 0.1},
             {description = "不会掉落", data = 0}
         },
-        default = 0.7
+        default = 0.5
     },
     {   name = "ShieldRechargeTime",
         label = "盾牌冷却时间",
