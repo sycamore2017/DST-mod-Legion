@@ -1318,7 +1318,8 @@ end)
 
 if _G.CONFIGS_LEGION.AUTOSTACKEDLOOT then
     local function CanAutoStack(inst)
-        return (inst.components.bait == nil or inst.components.bait:IsFree()) and
+        return not inst.legiontag_goldenloot and --金色传说诶，不要叠加！
+            (inst.components.bait == nil or inst.components.bait:IsFree()) and
             (inst.components.burnable == nil or not inst.components.burnable:IsBurning()) and
             (inst.components.stackable and not inst.components.stackable:IsFull()) and
             (inst.components.inventoryitem and not inst.components.inventoryitem:IsHeld()) and
@@ -1327,7 +1328,7 @@ if _G.CONFIGS_LEGION.AUTOSTACKEDLOOT then
             -- Vector3(self.inst.Physics:GetVelocity()):LengthSq() < 1
     end
     local function DoAutoStack(inst)
-        inst.task_autostack_l = nil
+        inst.legiontask_autostack = nil
         -- if not CanAutoStack(inst) then --不用提前判定
         --     return
         -- end
@@ -1353,9 +1354,9 @@ if _G.CONFIGS_LEGION.AUTOSTACKEDLOOT then
 
         local maxsize = inst.components.stackable.maxsize
         for _, v in ipairs(ents_same) do
-            if v.task_autostack_l ~= nil then
-                v.task_autostack_l:Cancel()
-                v.task_autostack_l = nil
+            if v.legiontask_autostack ~= nil then
+                v.legiontask_autostack:Cancel()
+                v.legiontask_autostack = nil
             end
             if numall > 0 then
                 if numall > maxsize then
@@ -1372,8 +1373,8 @@ if _G.CONFIGS_LEGION.AUTOSTACKEDLOOT then
         end
     end
     local function OnLootDrop_tryStack(inst, data)
-        if inst.task_autostack_l == nil and CanAutoStack(inst) then
-            inst.task_autostack_l = inst:DoTaskInTime(0.5+math.random(), DoAutoStack)
+        if inst.legiontask_autostack == nil and CanAutoStack(inst) then
+            inst.legiontask_autostack = inst:DoTaskInTime(0.5+math.random(), DoAutoStack)
         end
     end
     AddComponentPostInit("stackable", function(self)

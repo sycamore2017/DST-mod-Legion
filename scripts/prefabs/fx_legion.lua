@@ -293,26 +293,20 @@ MakeFx({ --玫瑰酥：非常多的气氛烘托特效(特殊)
     end,
     fn_remove = nil
 })
-MakeFx({ --好事多蘑：发光
-    name = "buff_l_effortluck_fx",
+MakeFx({ --金色传说：特效结束
+    name = "buff_l_goldenloot_fx",
     assets = {
-        Asset("ANIM", "anim/lavaarena_item_pickup_fx.zip"), --官方的动画模板
-        -- Asset("ANIM", "anim/buff_l_butterflybless_fx.zip")
+        Asset("ANIM", "anim/lavaarena_item_pickup_fx.zip") --官方的动画模板
     },
     fn_anim = function(inst)
         inst.AnimState:SetBank("lavaarena_item_pickup_fx")
         inst.AnimState:SetBuild("lavaarena_item_pickup_fx")
-        inst.AnimState:PlayAnimation("pre")
-        inst.AnimState:PushAnimation("loop", true)
+        inst.AnimState:PlayAnimation("pst")
         inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
         inst.AnimState:SetLightOverride(.4)
         inst.AnimState:SetFinalOffset(1)
-        -- inst.AnimState:SetAddColour(255/255, 211/255, 66/255, 0)
         inst.AnimState:SetMultColour(255/255, 211/255, 66/255, 1)
         inst.AnimState:SetScale(0.6, 0.6, 0.6)
-    end,
-    fn_remove = function(inst)
-       inst:DoTaskInTime(100, inst.Remove)
     end
 })
 
