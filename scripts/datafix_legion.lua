@@ -1225,7 +1225,10 @@ local luck_data_l = {
         deerclops_eyeball = { chance = 0.33, cost = 2 },
         winter_ornament_light1 = { chance = 0.2 }
     },
-    antlion = { townportaltalisman = { chance = 0.33, cost = 0.5, num_random = {3,4} } }, --蚁狮
+    antlion = { --蚁狮
+        antlionhat = { chance = 0.33, cost = 2 },
+        townportaltalisman = { chance = 0.33, cost = 0.5, num_random = {3,4} }
+    },
     eyeofterror = { --恐怖之眼
         eyemaskhat = { chance = 0.33, cost = 2 },
         milkywhites = { chance = 0.5, cost = 0.5, num_random = {1,2} }
@@ -1276,6 +1279,33 @@ local luck_data_l = {
         alterguardianhat = { chance = 0.1, cost = 8 },
         alterguardianhatshard = { chance = 0.4, cost = 3 }
     },
+    mutateddeerclops = { --晶体独眼巨鹿
+        purebrilliance = { chance = 0.33, num_random = {2,3} },
+        spoiled_food = { chance = 0.2, cost = 0.2, num_random = {2,3} },
+        security_pulse_cage = { chance = 0.1, cost = 3 }
+    },
+    mutatedbearger = { --装甲熊獾
+        purebrilliance = { chance = 0.33, num_random = {2,3} },
+        spoiled_food = { chance = 0.2, cost = 0.2, num_random = {2,3} },
+        security_pulse_cage = { chance = 0.1, cost = 3 }
+    },
+    mutatedwarg = { --附身座狼
+        purebrilliance = { chance = 0.33, cost = 0.5, num_random = {1,2} },
+        spoiled_food = { chance = 0.2, cost = 0.2, num_random = {2,3} },
+        security_pulse_cage = { chance = 0.05, cost = 3 }
+    },
+    elecarmet = { --莱克阿米特
+        fimbul_axe = { chance = 0.33, cost = 2 },
+        tourmalineshard = { chance = 0.33, num_random = {2,3} }
+    },
+    siving_foenix = { --子圭玄鸟（雄）
+        siving_feather_fake = { chance = 0.33, cost = 3, num_random = {4,5} },
+        siving_rocks = { chance = 0.17, cost = 0.5, num = 3 }
+    },
+    siving_moenix = { --子圭玄鸟（雌）
+        siving_derivant_item = { chance = 0.33, cost = 3 },
+        siving_rocks = { chance = 0.17, cost = 0.5, num = 3 }
+    },
     beefalo = { horn = { chance = 0.33, cost = 0.5 } }, --皮弗娄牛
     babybeefalo = { horn = { chance = 0.1, cost = 0.5 } }, --小皮弗娄牛
     tentacle = { --触手
@@ -1292,7 +1322,10 @@ local luck_data_l = {
     cookiecutter = { cookiecuttershell = { chance = 0.75, cost = 0.2 } }, --饼干切割机
     gnarwail = { gnarwail_horn = { chance = 0.5 } }, --一角鲸
     gnarwail_attack_horn = { gnarwail_horn = { chance = 0.5 } }, --一角鲸(刺穿船时)
-    spat = { steelwool = { chance = 0.5, cost = 0.5, num_random = {2,3} } }, --钢羊
+    spat = { --钢羊
+        steelwool = { chance = 0.5, cost = 0.5, num_random = {2,3} },
+        phlegm = { chance = 0.4, cost = 0.25, num_random = {1,2} }
+    },
     gingerbreadwarg = { wintersfeastfuel = { chance = 0.5, cost = 0.5, num_random = {3,4} } }, --姜饼座狼
     glommer = { --格罗姆
         glommerfuel = { chance = 0.5, cost = 0.5, num_random = {2,3} },
@@ -1311,6 +1344,10 @@ local luck_data_l = {
         livinglog = { chance = 0.2, cost = 0.5, num_random = {2,3} }
     },
     leif = { livinglog = { chance = 0.2, cost = 0.5, num_random = {2,3} } }, --树精守卫
+    spiderqueen = { --蜘蛛女王
+        spiderhat = { chance = 0.2 },
+        spidereggsack = { chance = 0.2 }
+    },
     rosebush = {
         cutted_rosebush = { chance = 0.05 },
         rosorns = { chance = _G.CONFIGS_LEGION.FLOWERWEAPONSCHANCE, fn_spawn = OnSpawn_rosorns }
@@ -1329,7 +1366,41 @@ local luck_data_l = {
     tallbird = { tallbirdegg = { chance = 0.25, cost = 0.25 } }, --高脚鸟
     smallbird = { tallbirdegg = { chance = 0.1, cost = 0.25 } }, --高脚鸟(小)
     teenbird = { tallbirdegg = { chance = 0.15, cost = 0.25 } }, --高脚鸟(青年)
+    hound = { --猎犬
+        houndstooth = { chance = 0.1, cost = 0.2 },
+        monstermeat = { chance = 0.1, cost = 0.2 }
+    },
     hedgehound = { cutted_rosebush = { chance = 0.1 } }, --蔷薇狼
+    firehound = { redgem = { chance = 0.2, cost = 0.5 } }, --红色猎犬
+    icehound = { bluegem = { chance = 0.2, cost = 0.5 } }, --蓝色猎犬
+    clayhound = { redpouch = { chance = 0.2, cost = 0.5 } }, --黏土猎犬
+    mutatedhound = { houndstooth = { chance = 0.2, cost = 0.2 } }, --恐怖猎犬
+    pigman = { pigskin = { chance = 0.25, cost = 0.5 } }, --猪人
+    pigguard = { pigskin = { chance = 0.25, cost = 0.5, num_random = {1,2} } }, --猪人守卫
+    moonpig = { --猪人(月台)
+        pigskin = { chance = 0.3, cost = 0.5 },
+        moonrocknugget = { chance = 0.3, cost = 0.25 }
+    },
+    bunnyman = { --兔人
+        manrabbit_tail = { chance = 0.25, cost = 0.5 },
+        carrot = { chance = 0.25, cost = 0.2 }
+    },
+    merm = { --鱼人
+        merm_scales = { chance = 0.1, cost = 0.5 },
+        pondfish = { chance = 0.2, cost = 0.25 }
+    },
+    mermguard = { --忠诚鱼人守卫。它的数据和消耗都偏低，主要是怕鱼妹玩家的幸运值容易被这个消耗
+        merm_scales = { chance = 0.05, cost = 0.25 },
+        froglegs = { chance = 0.02, cost = 0.2 }
+    },
+    koalefant_summer = { --考拉象(夏)
+        trunk_summer = { chance = 0.33 },
+        meat = { chance = 0.2, cost = 0.5, num = 2 }
+    },
+    koalefant_winter = { --考拉象(冬)
+        trunk_winter = { chance = 0.33 },
+        meat = { chance = 0.2, cost = 0.5, num = 2 }
+    },
 }
 for k, v in pairs(luck_data_l) do
     _G.LUCK_DATA_LEGION[k] = v

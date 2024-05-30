@@ -1214,6 +1214,7 @@ end
 local function DropLoot_effortluck(itemname, dropper, v, doer)
     local items = {}
     local num = 1
+    local noinf
     if v ~= nil then
         if v.fn_spawn ~= nil then
             itemname = v.fn_spawn(dropper, doer, items)
@@ -1223,12 +1224,17 @@ local function DropLoot_effortluck(itemname, dropper, v, doer)
         elseif v.num_random ~= nil then
             num = math.random(v.num_random[1], v.num_random[2])
         end
+        noinf = v.noinf
     end
     if itemname ~= nil then
         TOOLS_L.SpawnStackDrop(itemname, num, dropper:GetPosition(), nil, items, nil)
     end
     for _, item in pairs(items) do
-        item:AddDebuff("buff_l_goldenloot", "buff_l_goldenloot")
+        if noinf then
+            item:AddDebuff("buff_l_goldenloot", "buff_l_goldenloot")
+        else
+            item:AddDebuff("buff_l_goldenloot_inf", "buff_l_goldenloot_inf")
+        end
     end
 end
 local function OnEntityDropLoot_effortluck(buff, target, data) --entity_droploot 一般是死亡或者被破坏时触发
@@ -1359,56 +1365,70 @@ MakeBuff({
 --[[ 金色传说：金色并且有光子特效 ]]
 --------------------------------------------------------------------------
 
+local assets_goldenloot = {
+    Asset("ANIM", "anim/lavaarena_item_pickup_fx.zip") --官方的动画模板
+}
+local function BuffSet_goldenloot(buff, target, followsymbol, followoffset, sets)
+    if target.components.bloomer ~= nil then
+        target.components.bloomer:PushBloom(buff, "shaders/anim.ksh", 0.33)
+    else
+        target.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
+    end
+    target.AnimState:SetAddColour(166/255, 119/255, 32/255, 0) --第四个参数不知道什么意思
+    target.legiontag_goldenloot = true
+    buff.AnimState:PlayAnimation("pre")
+    buff.AnimState:PushAnimation("loop", true)
+    --因为buff是target的子实体，所以target被删除时，buff也会被直接删除，所以不用再考虑buff的删除残留
+end
+local function BuffEnd_goldenloot(buff, target)
+    if target.components.bloomer ~= nil then
+        target.components.bloomer:PopBloom(buff)
+    else
+        target.AnimState:ClearBloomEffectHandle()
+    end
+    target.AnimState:SetAddColour(0, 0, 0, 0) --设为纯黑色rbg就是清除颜色滤镜
+    target.legiontag_goldenloot = nil
+    if not target:IsAsleep() then
+        local fx = SpawnPrefab("buff_l_goldenloot_fx")
+        if fx ~= nil then
+            fx.Transform:SetPosition(target.Transform:GetWorldPosition())
+        end
+    end
+end
+local function BuffCommon_goldenloot(buff)
+    buff.entity:AddAnimState()
+    buff.AnimState:SetBank("lavaarena_item_pickup_fx")
+    buff.AnimState:SetBuild("lavaarena_item_pickup_fx")
+    -- buff.AnimState:PlayAnimation("pre")
+    -- buff.AnimState:PushAnimation("loop", true)
+    buff.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
+    buff.AnimState:SetLightOverride(.4)
+    buff.AnimState:SetFinalOffset(1)
+    buff.AnimState:SetMultColour(255/255, 211/255, 66/255, 1)
+    buff.AnimState:SetScale(0.6, 0.6, 0.6)
+end
+
 MakeBuff({
     name = "buff_l_goldenloot",
-    assets = {
-        Asset("ANIM", "anim/lavaarena_item_pickup_fx.zip") --官方的动画模板
-    },
+    assets = assets_goldenloot,
     prefabs = { "buff_l_goldenloot_fx" },
     -- notimer = nil,
     addnetwork = true,
     sets = { value = TUNING.TOTAL_DAY_TIME, max = TUNING.TOTAL_DAY_TIME },
-    -- sets = { value = 10, max = 10 },
-    fn_start = function(buff, target, followsymbol, followoffset, sets)
-        if target.components.bloomer ~= nil then
-            target.components.bloomer:PushBloom(buff, "shaders/anim.ksh", 0.33)
-        else
-            target.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
-        end
-        target.AnimState:SetAddColour(166/255, 119/255, 32/255, 0) --第四个参数不知道什么意思
-        target.legiontag_goldenloot = true
-        buff.AnimState:PlayAnimation("pre")
-        buff.AnimState:PushAnimation("loop", true)
-        --因为buff是target的子实体，所以target被删除时，buff也会被直接删除，所以不用再考虑buff的删除残留
-    end,
+    fn_start = BuffSet_goldenloot,
     -- fn_again = nil,
-    fn_end = function(buff, target)
-        if target.components.bloomer ~= nil then
-            target.components.bloomer:PopBloom(buff)
-        else
-            target.AnimState:ClearBloomEffectHandle()
-        end
-        target.AnimState:SetAddColour(0, 0, 0, 0) --设为纯黑色rbg就是清除颜色滤镜
-        target.legiontag_goldenloot = nil
-        if not target:IsAsleep() then
-            local fx = SpawnPrefab("buff_l_goldenloot_fx")
-            if fx ~= nil then
-                fx.Transform:SetPosition(target.Transform:GetWorldPosition())
-            end
-        end
-    end,
-    fn_common = function(buff)
-        buff.entity:AddAnimState()
-        buff.AnimState:SetBank("lavaarena_item_pickup_fx")
-        buff.AnimState:SetBuild("lavaarena_item_pickup_fx")
-        -- buff.AnimState:PlayAnimation("pre")
-        -- buff.AnimState:PushAnimation("loop", true)
-        buff.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
-        buff.AnimState:SetLightOverride(.4)
-        buff.AnimState:SetFinalOffset(1)
-        buff.AnimState:SetMultColour(255/255, 211/255, 66/255, 1)
-        buff.AnimState:SetScale(0.6, 0.6, 0.6)
-    end
+    fn_end = BuffEnd_goldenloot,
+    fn_common = BuffCommon_goldenloot
+})
+MakeBuff({
+    name = "buff_l_goldenloot_inf",
+    assets = assets_goldenloot,
+    prefabs = { "buff_l_goldenloot_fx" },
+    notimer = true, addnetwork = true,
+    fn_start = BuffSet_goldenloot,
+    -- fn_again = nil,
+    fn_end = BuffEnd_goldenloot,
+    fn_common = BuffCommon_goldenloot
 })
 
 --------------------
