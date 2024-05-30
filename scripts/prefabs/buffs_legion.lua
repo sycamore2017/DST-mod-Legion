@@ -1211,15 +1211,21 @@ local function BuffTalk_effortluck(buff, target, key)
         end
     end
 end
-local function DropLoot_effortluck(itemname, doer, v)
+local function DropLoot_effortluck(itemname, dropper, v, doer)
     local items = {}
-    if v ~= nil and v.fn_spawn ~= nil then
-        itemname = v.fn_spawn(doer, items)
-        if itemname ~= nil then
-            TOOLS_L.SpawnStackDrop(itemname, 1, doer:GetPosition(), nil, items, nil)
+    local num = 1
+    if v ~= nil then
+        if v.fn_spawn ~= nil then
+            itemname = v.fn_spawn(dropper, doer, items)
         end
-    else
-        TOOLS_L.SpawnStackDrop(itemname, 1, doer:GetPosition(), nil, items, nil)
+        if v.num ~= nil then
+            num = v.num
+        elseif v.num_random ~= nil then
+            num = math.random(v.num_random[1], v.num_random[2])
+        end
+    end
+    if itemname ~= nil then
+        TOOLS_L.SpawnStackDrop(itemname, num, dropper:GetPosition(), nil, items, nil)
     end
     for _, item in pairs(items) do
         item:AddDebuff("buff_l_goldenloot", "buff_l_goldenloot")
@@ -1246,13 +1252,13 @@ local function OnEntityDropLoot_effortluck(buff, target, data) --entity_droploot
                     local count = dddoer[itemname] or 0
                     if math.random() < v.chance then
                         count = 0
-                        DropLoot_effortluck(itemname, victim, v)
+                        DropLoot_effortluck(itemname, victim, v, target)
                         luckpoint = luckpoint - (v.cost or 1)
                     else
                         count = count + v.chance
                         if count >= 1 then --达到保底要求
                             count = count - 1
-                            DropLoot_effortluck(itemname, victim, v)
+                            DropLoot_effortluck(itemname, victim, v, target)
                             luckpoint = luckpoint - (v.cost or 1)
                         end
                     end
@@ -1369,7 +1375,7 @@ MakeBuff({
         else
             target.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
         end
-        target.AnimState:SetAddColour(166/255, 119/255, 32/255, 0)
+        target.AnimState:SetAddColour(166/255, 119/255, 32/255, 0) --第四个参数不知道什么意思
         target.legiontag_goldenloot = true
         buff.AnimState:PlayAnimation("pre")
         buff.AnimState:PushAnimation("loop", true)

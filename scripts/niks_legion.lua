@@ -3649,7 +3649,8 @@ local SkinsOverride = {
     chest_whitewood = true, chest_whitewood_big = true
 }
 local nocopykeys = {
-    skin_id = true, skin_idx = true, onlyownedshow = true, mustonwedshow = true, overridekeys = true
+    skin_id = true, skin_idx = true, onlyownedshow = true, mustonwedshow = true, overridekeys = true,
+    linkedskins = true
 }
 CopySkinedData(ls_skineddata, SKIN_DEFAULT_LEGION, nocopykeys)
 CopySkinedData(ls_skineddata, SKINS_LEGION, nocopykeys)
@@ -4755,6 +4756,14 @@ local function SetSkinEx(inst) --这样做是为了在切换皮肤时，更新�
         end
     end
 end
+local function LS_C_SetLinkedSkin(self, newinst, linkedkey, doer)
+    local skindata = C_GetSkinData(self, self.skin)
+    if skindata == nil or skindata.linkedskins == nil or skindata.linkedskins[linkedkey] == nil then
+        return false
+    end
+    LS_C_SetSkin(newinst.components.skinedlegion, skindata.linkedskins[linkedkey],
+        self.userid or (LS_IsValidPlayer(doer) and doer.userid or nil))
+end
 LS_C_SetSkin = function(self, skinname, userid)
     if not IsServer or self.skin == skinname then
 		return true
@@ -4875,10 +4884,11 @@ LSFNS = {
     LS_StartPeriodicPatrol = LS_StartPeriodicPatrol,
     LS_C_Set = LS_C_Set,
     LS_C_Init = LS_C_Init,
+    LS_C_SetLinkedSkin = LS_C_SetLinkedSkin,
     LS_C_SetSkin = LS_C_SetSkin,
     LS_C_OnLoad = LS_C_OnLoad,
     LS_C_UserID = LS_C_UserID,
-    LS_UI_ResetItems = LS_UI_ResetItems,
+    LS_UI_ResetItems = LS_UI_ResetItems
 }
 for fnname, fn in pairs(LSFNS) do --将数据暴露出去
     _G[fnname] = fn

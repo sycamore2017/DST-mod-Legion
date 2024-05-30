@@ -11,13 +11,7 @@ end
 
 ------以下均为【服务器】环境
 
-function SkinedLegion:SetLinkedSkin(newinst, linkedkey, doer)
-	local linkdata = self.skineddata and self.skineddata.linkedskins or nil
-	if linkdata ~= nil and linkdata[linkedkey] ~= nil then
-		newinst.components.skinedlegion:SetSkin(linkdata[linkedkey], self.userid or (doer and doer.userid or nil))
-	end
-end
-
+SkinedLegion.SetLinkedSkin = LS_C_SetLinkedSkin
 SkinedLegion.SetSkin = LS_C_SetSkin
 
 function SkinedLegion:OnSave()

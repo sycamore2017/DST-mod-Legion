@@ -1135,20 +1135,68 @@ if not _G.rawget(_G, "LUCK_DATA_LEGION") then
     _G.LUCK_DATA_LEGION = {}
 end
 
-local function OnSpawn_dragonfly_gem(doer, items)
+local function OnSpawn_linkedskin(dropper, doer, items, itemname, linkedkey, num)
+    TOOLS_L.SpawnStackDrop(itemname, num or 1, dropper:GetPosition(), nil, items, nil)
+    if dropper.components.skinedlegion ~= nil and doer ~= nil and doer.userid ~= nil then
+        for _, item in pairs(items) do
+            dropper.components.skinedlegion:SetLinkedSkin(item, linkedkey, doer)
+        end
+    end
+end
+local function OnSpawn_bp(doer, recipenames) --优先掉落没学过的蓝图
+    if doer.components.builder ~= nil then
+        local newrecipenames
+        for _, recipename in ipairs(recipenames) do
+            if not doer.components.builder:KnowsRecipe(recipename) then
+                if newrecipenames == nil then
+                    newrecipenames = {}
+                end
+                table.insert(newrecipenames, recipename)
+            end
+        end
+        if newrecipenames ~= nil then
+            return newrecipenames
+        end
+    end
+    return recipenames
+end
+
+local function OnSpawn_mushroomhat_bp(dropper, doer, items)
+    local loot = OnSpawn_bp(doer, { "red_mushroomhat", "green_mushroomhat", "blue_mushroomhat" })
+    return loot[math.random(#loot)].."_blueprint"
+end
+local function OnSpawn_mushroomlight_bp(dropper, doer, items)
+    local loot = OnSpawn_bp(doer, { "mushroom_light2", "mushroom_light" })
+    return loot[math.random(#loot)].."_blueprint"
+end
+local function OnSpawn_stalker_atrium(dropper, doer, items)
+    local loot = { "thurible", "armorskeleton", "skeletonhat" }
+    return loot[math.random(#loot)]
+end
+local function OnSpawn_dragonfly_gem(dropper, doer, items)
     local loot = { "orangegem", "yellowgem", "greengem" }
     return loot[math.random(#loot)]
 end
-local function OnSpawn_mushroomhat_bp(doer, items)
-    local loot = { "red_mushroomhat_blueprint", "green_mushroomhat_blueprint", "blue_mushroomhat_blueprint" }
+local function OnSpawn_rosorns(dropper, doer, items)
+    OnSpawn_linkedskin(dropper, doer, items, "rosorns", "sword", 1)
+end
+local function OnSpawn_lileaves(dropper, doer, items)
+    OnSpawn_linkedskin(dropper, doer, items, "lileaves", "sword", 1)
+end
+local function OnSpawn_orchitwigs(dropper, doer, items)
+    OnSpawn_linkedskin(dropper, doer, items, "orchitwigs", "sword", 1)
+end
+local function OnSpawn_beequeen_honey(dropper, doer, items)
+    local loot = { "royal_jelly", "honeycomb" }
     return loot[math.random(#loot)]
 end
-local function OnSpawn_mushroomlight_bp(doer, items)
-    return math.random() < 0.67 and "mushroom_light2_blueprint" or "mushroom_light_blueprint"
-end
-local function OnSpawn_stalker_atrium(doer, items)
-    local loot = { "thurible", "armorskeleton", "skeletonhat" }
+local function OnSpawn_daywalker_armor(dropper, doer, items)
+    local loot = { "armordreadstone", "dreadstonehat" }
     return loot[math.random(#loot)]
+end
+local function OnSpawn_daywalker2_bp(dropper, doer, items)
+    local loot = OnSpawn_bp(doer, { "wagpunkhat", "armorwagpunk", "chestupgrade_stacksize", "wagpunkbits_kit" })
+    return loot[math.random(#loot)].."_blueprint"
 end
 
 local luck_data_l = {
@@ -1162,53 +1210,70 @@ local luck_data_l = {
     little_walrus = { walrus_tusk = { chance = 0.2, cost = 0.5 } }, --小海象
     krampus = { krampus_sack = { chance = 0.01 } }, --坎普斯
     klaus = { krampus_sack = { chance = 0.1 } }, --克劳斯
+    moose = { goose_feather = { chance = 0.33, num = 3 } }, --麋鹿鹅
+    mossling = { goose_feather = { chance = 0.33, cost = 0.25 } }, --麋鹿鹅幼崽
     dragonfly = { --龙蝇
-        dragon_scales = { chance = 0.33, cost = 1.5 },
+        dragon_scales = { chance = 0.33, cost = 2 },
         lavae_egg = { chance = 0.33, cost = 0.5 },
         dragonfly_gem = { chance = 0.5, cost = 0.5, fn_spawn = OnSpawn_dragonfly_gem }
     },
     bearger = { --熊獾
-        bearger_fur = { chance = 0.33, cost = 1.5 },
+        bearger_fur = { chance = 0.33, cost = 2 },
         backcub = { chance = _G.CONFIGS_LEGION.BACKCUBCHANCE }
     },
     deerclops = { --独眼巨鹿
-        deerclops_eyeball = { chance = 0.33, cost = 1.5 },
-        winter_ornament_light1 = { chance = 0.2, cost = 1 }
+        deerclops_eyeball = { chance = 0.33, cost = 2 },
+        winter_ornament_light1 = { chance = 0.2 }
     },
-    antlion = { townportaltalisman = { chance = 1, cost = 0.2 } }, --蚁狮
+    antlion = { townportaltalisman = { chance = 0.33, cost = 0.5, num_random = {3,4} } }, --蚁狮
     eyeofterror = { --恐怖之眼
-        eyemaskhat = { chance = 0.33, cost = 1.5 },
-        milkywhites = { chance = 0.5, cost = 0.5 }
+        eyemaskhat = { chance = 0.33, cost = 2 },
+        milkywhites = { chance = 0.5, cost = 0.5, num_random = {1,2} }
     },
     twinofterror1 = { --激光眼
-        shieldofterror = { chance = 0.17, cost = 1.5 },
+        shieldofterror = { chance = 0.17, cost = 2 },
         yellowgem = { chance = 0.1, cost = 0.5 }
     },
     twinofterror2 = { --魔焰眼
-        shieldofterror = { chance = 0.17, cost = 1.5 },
+        shieldofterror = { chance = 0.17, cost = 2 },
         greengem = { chance = 0.1, cost = 0.5 }
     },
     malbatross = { --邪天翁
-        malbatross_beak = { chance = 0.33, cost = 1.5 },
+        malbatross_beak = { chance = 0.33, cost = 2 },
         yellowgem = { chance = 0.05, cost = 0.5 }
     },
+    beequeen = { --蜂王
+        hivehat = { chance = 0.33, cost = 2 },
+        beequeen_honey = { chance = 0.5, num = 2, fn_spawn = OnSpawn_beequeen_honey },
+    },
     toadstool = { --毒菌蟾蜍
-        shroom_skin = { chance = 0.33, cost = 1.5 },
+        shroom_skin = { chance = 0.33, cost = 3 },
         mushroomhat_bp = { chance = 0.33, cost = 1.5, fn_spawn = OnSpawn_mushroomhat_bp },
         mushroomlight_bp = { chance = 0.33, cost = 1.5, fn_spawn = OnSpawn_mushroomlight_bp }
     },
     toadstool_dark = { --悲惨的毒菌蟾蜍
-        shroom_skin = { chance = 0.4, cost = 1.5 },
+        shroom_skin = { chance = 0.4, cost = 3, num_random = {1,2} },
         mushroomhat_bp = { chance = 0.4, cost = 1.5, fn_spawn = OnSpawn_mushroomhat_bp },
         mushroomlight_bp = { chance = 0.4, cost = 1.5, fn_spawn = OnSpawn_mushroomlight_bp }
     },
-    crabking = { trident_blueprint = { chance = 0.33, cost = 1.5 } }, --帝王蟹
-    minotaur = { minotaurhorn = { chance = 0.33, cost = 1.5 } }, --远古守护者
+    daywalker = { --梦魇疯猪
+        daywalker_armor = { chance = 0.33, cost = 3, fn_spawn = OnSpawn_daywalker_armor },
+        horrorfuel = { chance = 0.33, num_random = {2,3} }
+    },
+    daywalker2 = { --拾荒疯猪
+        daywalker2_bp = { chance = 0.33, cost = 1.5, fn_spawn = OnSpawn_daywalker2_bp },
+        wagpunk_bits = { chance = 0.33, num_random = {2,3} }
+    },
+    crabking = { --帝王蟹
+        trident = { chance = 0.33, cost = 2 },
+        trident_blueprint = { chance = 0.33, cost = 1.5 }
+    },
+    minotaur = { minotaurhorn = { chance = 0.33, cost = 3 } }, --远古守护者
     stalker_atrium = { --远古织影者
-        stalker_atrium = { chance = 0.4, cost = 3, fn_spawn = OnSpawn_stalker_atrium }
+        stalker_atrium = { chance = 0.4, cost = 5, fn_spawn = OnSpawn_stalker_atrium }
     },
     alterguardian_phase3 = { --天体英雄(3阶段)
-        alterguardianhat = { chance = 0.1, cost = 6 },
+        alterguardianhat = { chance = 0.1, cost = 8 },
         alterguardianhatshard = { chance = 0.4, cost = 3 }
     },
     beefalo = { horn = { chance = 0.33, cost = 0.5 } }, --皮弗娄牛
@@ -1227,10 +1292,10 @@ local luck_data_l = {
     cookiecutter = { cookiecuttershell = { chance = 0.75, cost = 0.2 } }, --饼干切割机
     gnarwail = { gnarwail_horn = { chance = 0.5 } }, --一角鲸
     gnarwail_attack_horn = { gnarwail_horn = { chance = 0.5 } }, --一角鲸(刺穿船时)
-    spat = { steelwool = { chance = 0.5, cost = 0.25 } }, --钢羊
-    gingerbreadwarg = { wintersfeastfuel = { chance = 0.5, cost = 0.2 } }, --姜饼座狼
+    spat = { steelwool = { chance = 0.5, cost = 0.5, num_random = {2,3} } }, --钢羊
+    gingerbreadwarg = { wintersfeastfuel = { chance = 0.5, cost = 0.5, num_random = {3,4} } }, --姜饼座狼
     glommer = { --格罗姆
-        glommerfuel = { chance = 0.5, cost = 0.25 },
+        glommerfuel = { chance = 0.5, cost = 0.5, num_random = {2,3} },
         glommerwings = { chance = 0.4, cost = 0.5 }
     },
     slurper = { --啜食者
@@ -1242,26 +1307,28 @@ local luck_data_l = {
         foliageath = { chance = _G.CONFIGS_LEGION.FOLIAGEATHCHANCE }
     },
     leif_sparse = { --臃肿常青树的树精守卫
-        foliageath = { chance = 10*_G.CONFIGS_LEGION.FOLIAGEATHCHANCE }
+        foliageath = { chance = 10*_G.CONFIGS_LEGION.FOLIAGEATHCHANCE },
+        livinglog = { chance = 0.2, cost = 0.5, num_random = {2,3} }
     },
+    leif = { livinglog = { chance = 0.2, cost = 0.5, num_random = {2,3} } }, --树精守卫
     rosebush = {
         cutted_rosebush = { chance = 0.05 },
-        rosorns = { chance = _G.CONFIGS_LEGION.FLOWERWEAPONSCHANCE }
+        rosorns = { chance = _G.CONFIGS_LEGION.FLOWERWEAPONSCHANCE, fn_spawn = OnSpawn_rosorns }
     },
     lilybush = {
         cutted_lilybush = { chance = 0.05 },
-        lileaves = { chance = _G.CONFIGS_LEGION.FLOWERWEAPONSCHANCE }
+        lileaves = { chance = _G.CONFIGS_LEGION.FLOWERWEAPONSCHANCE, fn_spawn = OnSpawn_lileaves }
     },
     orchidbush = {
         cutted_orchidbush = { chance = 0.05 },
-        orchitwigs = { chance = _G.CONFIGS_LEGION.FLOWERWEAPONSCHANCE }
+        orchitwigs = { chance = _G.CONFIGS_LEGION.FLOWERWEAPONSCHANCE, fn_spawn = OnSpawn_orchitwigs }
     },
     butterfly = { butter = { chance = 0.1/5.1, cost = 0.5 } }, --蝴蝶
     slurtle = { slurtlehat = { chance = 0.1 } }, --蛞蝓龟
     snurtle = { armorsnurtleshell = { chance = 0.75 } }, --蜗牛龟
-    tallbird = { tallbirdegg = { chance = 0.2, cost = 0.5 } }, --高脚鸟
-    smallbird = { tallbirdegg = { chance = 0.05, cost = 0.5 } }, --高脚鸟(小)
-    teenbird = { tallbirdegg = { chance = 0.1, cost = 0.5 } }, --高脚鸟(青年)
+    tallbird = { tallbirdegg = { chance = 0.25, cost = 0.25 } }, --高脚鸟
+    smallbird = { tallbirdegg = { chance = 0.1, cost = 0.25 } }, --高脚鸟(小)
+    teenbird = { tallbirdegg = { chance = 0.15, cost = 0.25 } }, --高脚鸟(青年)
     hedgehound = { cutted_rosebush = { chance = 0.1 } }, --蔷薇狼
 }
 for k, v in pairs(luck_data_l) do
