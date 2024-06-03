@@ -1197,7 +1197,7 @@ MakeBuff({
 })
 
 --------------------------------------------------------------------------
---[[ 好事多蘑：增加稀有掉落物的掉落概率 ]]
+--[[ 好事多蘑：额外判定某些掉落物是否掉落并且有保底次数 ]]
 --------------------------------------------------------------------------
 
 local function BuffTalk_effortluck(buff, target, key)
@@ -1238,19 +1238,29 @@ local function DropLoot_effortluck(itemname, dropper, v, doer)
     end
 end
 local function OnEntityDropLoot_effortluck(buff, target, data) --entity_droploot 一般是死亡或者被破坏时触发
-    local victim = data and data.inst or nil
+    if data == nil then
+        return
+    end
+    local victim = data.inst
     local luckpoint = buff._count_l or 0
+    if victim == nil or not victim:IsValid() or luckpoint <= 0 then
+        return
+    end
+    local luckkey
+    if victim.legiontag_moonprotector then
+        luckkey = "moonprotector_l"
+    else
+        luckkey = data.luckkey or victim.prefab
+    end
     if
-        victim ~= nil and victim:IsValid() and
-        luckpoint > 0 and
         not victim.legiontag_luckdone and
         (victim.legion_luckdoers == nil or not victim.legion_luckdoers[target]) and
-        LUCK_DATA_LEGION[data.luckkey or victim.prefab] ~= nil and target:IsNear(victim, 28)
+        LUCK_DATA_LEGION[luckkey] ~= nil and target:IsNear(victim, 28)
     then
         local doit = false
         local checkedall = true
         local itemcheck = victim.legion_luckcheck or {}
-        local ddbase = LUCK_DATA_LEGION[data.luckkey or victim.prefab]
+        local ddbase = LUCK_DATA_LEGION[luckkey]
         local dddoer = target.legion_luckdata or {}
         for itemname, v in pairs(ddbase) do
             if itemcheck[itemname] == nil then --说明该项物品还没判定过
@@ -1376,8 +1386,10 @@ local function BuffSet_goldenloot(buff, target, followsymbol, followoffset, sets
     end
     target.AnimState:SetAddColour(166/255, 119/255, 32/255, 0) --第四个参数不知道什么意思
     target.legiontag_goldenloot = true
-    buff.AnimState:PlayAnimation("pre")
-    buff.AnimState:PushAnimation("loop", true)
+    -- buff.AnimState:PlayAnimation("pre")
+    -- buff.AnimState:PushAnimation("loop", true)
+    buff.AnimState:PlayAnimation("loop", true)
+    buff.AnimState:SetFrame(math.random(buff.AnimState:GetCurrentAnimationNumFrames()) - 1)
     --因为buff是target的子实体，所以target被删除时，buff也会被直接删除，所以不用再考虑buff的删除残留
 end
 local function BuffEnd_goldenloot(buff, target)

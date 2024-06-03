@@ -1198,6 +1198,10 @@ local function OnSpawn_daywalker2_bp(dropper, doer, items)
     local loot = OnSpawn_bp(doer, { "wagpunkhat", "armorwagpunk", "chestupgrade_stacksize", "wagpunkbits_kit" })
     return loot[math.random(#loot)].."_blueprint"
 end
+local function OnSpawn_moontreasure_l_bp(dropper, doer, items)
+    local loot = OnSpawn_bp(doer, { "hiddenmoonlight_item", "revolvedmoonlight_item" })
+    return loot[math.random(#loot)].."_blueprint"
+end
 
 local luck_data_l = {
     walrus = { --海象
@@ -1334,6 +1338,7 @@ local luck_data_l = {
     slurper = { --啜食者
         slurper_pelt = { chance = 0.5, cost = 0.5 }
     },
+    moonprotector_l = { moontreasure_l_bp = { chance = 0.0225, cost = 1.5, fn_spawn = OnSpawn_moontreasure_l_bp } },
     tissue_l_cactus = { tissue_l_cactus = { chance = _G.CONFIGS_LEGION.TISSUECACTUSCHANCE } },
     tissue_l_berries = { tissue_l_berries = { chance = _G.CONFIGS_LEGION.TISSUEBERRIESCHANCE } },
     tree_l_sparse = { --臃肿常青树

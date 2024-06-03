@@ -356,11 +356,12 @@ local function GetDungeonProtector(inst, protector, protdata)
         elseif math.random() >= protdata.realLootOdds then --代替它原本的掉落物
             monster.components.lootdropper:SetLoot(nil)
             monster.components.lootdropper:SetChanceLootTable('dungeon_loot_5')
+            monster.legiontag_moonprotector = true
         end
         monster.components.lootdropper:AddChanceLoot("hiddenmoonlight_item_blueprint", 0.0225)
         monster.components.lootdropper:AddChanceLoot("revolvedmoonlight_item_blueprint", 0.0225)
     end
-    monster.persists = false    --这个变量用于退出游戏时，如果为false，就不进行自身的保存，默认为true
+    monster.persists = false --Tip: 这个变量用于退出游戏时，如果为false，就不进行自身的保存，默认为true
 
     return monster
 end
