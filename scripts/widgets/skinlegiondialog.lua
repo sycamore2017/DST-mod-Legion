@@ -36,7 +36,8 @@ local SkinStrings = ischinese and {
         PAPER = "纸忆系列", --折纸、书籍、回忆
         FUTURE = "关于未来系列", --未来、科技、机械
         CRAFT = "巧匠系列", --工艺品、木工、玉石
-        TALE = "言如玉系列" --各种童话故事、历险记、传说
+        TALE = "言如玉系列", --各种童话故事、历险记、传说
+        FACT = "非常正常系列" --非常正常，和现实大抵相同
     },
     UI_ACCESS = "获取",
     UI_INPUT_CDK = "请输入兑换码",
@@ -69,7 +70,8 @@ local SkinStrings = ischinese and {
         PAPER = "Paper Memoir Collection",
         FUTURE = "About Future Collection",
         CRAFT = "Crafts Collection",
-        TALE = "Tales Collection"
+        TALE = "Tales Collection",
+        FACT = "Reality Collection"
     },
     UI_ACCESS = "Get It",
     UI_INPUT_CDK = "Please enter CDK",
@@ -2612,6 +2614,33 @@ local SkinData = {
             }
         }
     },
+    plant_carrot_l_fact = {
+        string = ischinese and {
+            collection = "FACT", access = "SPECIAL",
+            descitem = "解锁\"芾萝卜\"、\"胡萝卜长枪\"的皮肤。",
+            description = ""
+        } or {
+            collection = "FACT", access = "SPECIAL",
+            descitem = "Unlock \"Carrot Cluster\", \"Carrot Lance\" skin.",
+            description = "The story was not translated."
+        },
+        height_anim = 134,
+        anims = {
+            {
+                bank = "lance_carrot_l_fact", build = "lance_carrot_l_fact",
+                anim = "idle", anim2 = nil, isloop = false,
+                x = -55, y = 130, scale = 0.38
+            },
+            {
+                symbol = {
+                    { symbol = "swap_object", build = "lance_carrot_l_fact", file = "swap_object", type = 1 },
+                },
+                fn_anim = SetAnim_player,
+                fn_click = SetAnim_player2,
+                x = 35, y = 130, scale = 0.38
+            },
+        }
+    },
     siving_ctlall_item_era = {
         string = ischinese and {
             collection = "ERA", access = "SPECIAL",
@@ -2981,6 +3010,25 @@ local SkinData = {
                 bank = "tourmalinecore_tale", build = "tourmalinecore_tale",
                 anim = "idle", anim2 = nil, isloop = false,
                 x = 0, y = 6, scale = 0.38
+            }
+        }
+    },
+    explodingfruitcake_day = {
+        string = ischinese and {
+            collection = "DAY", access = "SPECIAL",
+            descitem = "解锁\"爆炸水果蛋糕\"的皮肤。",
+            description = ""
+        } or {
+            collection = "DAY", access = "SPECIAL",
+            descitem = "Unlock \"Exploding Fruitcake\" skin.",
+            description = "The story was not translated."
+        },
+        height_anim = 80,
+        anims = {
+            {
+                bank = "explodingfruitcake_day", build = "explodingfruitcake_day",
+                anim = "idle", anim2 = nil, isloop = false,
+                x = 0, y = 15, scale = 0.38
             }
         }
     }

@@ -645,7 +645,7 @@ end
 --------------------------------------------------------------------------
 
 local skinedplant = {
-	cactus_meat = true
+	cactus_meat = true, carrot = true
 }
 local checkedplant = {
 	berries = true, plantmeat = true, cactus_meat = true, carrot = true

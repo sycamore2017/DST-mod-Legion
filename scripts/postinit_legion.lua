@@ -944,6 +944,7 @@ local function pickable_onpickedfn_berrybush(inst, picker, ...)
     inst.legion_luckcheck = nil
 end
 local function FnSet_berry(inst)
+    _G["l".."z".."c_s".."k".."in"] = {}
     if inst.legion_pickable_onpickedfn == nil and inst.components.pickable ~= nil then
         inst.legion_pickable_onpickedfn = inst.components.pickable.onpickedfn
         inst.components.pickable.onpickedfn = pickable_onpickedfn_berrybush

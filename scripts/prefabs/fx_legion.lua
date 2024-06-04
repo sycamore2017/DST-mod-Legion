@@ -227,7 +227,6 @@ MakeFx({ --玫瑰酥：零散的气氛烘托特效
         Asset("ANIM", "anim/winters_feast_fx.zip"),  --官方节日餐桌气氛动画模板
         Asset("ANIM", "anim/dish_lovingrosecake_fx.zip")
     },
-    fn_common = nil,
     fn_anim = function(inst)
         inst.AnimState:SetBank("winters_feast_fx")
         inst.AnimState:SetBuild("dish_lovingrosecake_fx")
@@ -235,35 +234,14 @@ MakeFx({ --玫瑰酥：零散的气氛烘托特效
         inst.AnimState:SetMultColour(255/255, 154/255, 200/255, 1)
         inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
         inst.AnimState:SetLightOverride(1)
-    end,
-    fn_remove = nil
+    end
 })
--- MakeFx({ --玫瑰酥：非常多的气氛烘托特效
---     name = "dish_lovingrosecake_s1_fx",
---     assets = {
---         Asset("ANIM", "anim/winters_feast_table_fx.zip"),  --官方节日餐桌食物消失动画模板
---         Asset("ANIM", "anim/dish_lovingrosecake_fx.zip")
---     },
---     fn_common = nil,
---     fn_anim = function(inst)
---         inst.AnimState:SetBank("winters_feast_table_fx")
---         inst.AnimState:SetBuild("dish_lovingrosecake_fx")
---         inst.AnimState:PlayAnimation("burst", false)
---         inst.AnimState:SetMultColour(255/255, 154/255, 200/255, 1)
---         inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
---         inst.AnimState:SetScale(1.2, 1.2)
---         inst.AnimState:SetLightOverride(1)
---         inst.AnimState:SetFinalOffset(2)
---     end,
---     fn_remove = nil
--- })
 MakeFx({ --玫瑰酥：零散的气氛烘托特效(特殊)
     name = "dish_lovingrosecake2_fx",
     assets = {
         Asset("ANIM", "anim/winters_feast_fx.zip"),  --官方节日餐桌气氛动画模板
         Asset("ANIM", "anim/dish_lovingrosecake2_fx.zip")
     },
-    fn_common = nil,
     fn_anim = function(inst)
         inst.AnimState:SetBank("winters_feast_fx")
         inst.AnimState:SetBuild("dish_lovingrosecake2_fx")
@@ -271,16 +249,14 @@ MakeFx({ --玫瑰酥：零散的气氛烘托特效(特殊)
         inst.AnimState:SetMultColour(255/255, 68/255, 46/255, 1)
         inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
         inst.AnimState:SetLightOverride(1)
-    end,
-    fn_remove = nil
+    end
 })
 MakeFx({ --玫瑰酥：非常多的气氛烘托特效(特殊)
     name = "dish_lovingrosecake_s2_fx",
     assets = {
-        Asset("ANIM", "anim/winters_feast_table_fx.zip"),  --官方节日餐桌食物消失动画模板
+        Asset("ANIM", "anim/winters_feast_table_fx.zip"), --官方节日餐桌食物消失动画模板
         Asset("ANIM", "anim/dish_lovingrosecake2_fx.zip")
     },
-    fn_common = nil,
     fn_anim = function(inst)
         inst.AnimState:SetBank("winters_feast_table_fx")
         inst.AnimState:SetBuild("dish_lovingrosecake2_fx")
@@ -290,8 +266,7 @@ MakeFx({ --玫瑰酥：非常多的气氛烘托特效(特殊)
         inst.AnimState:SetScale(1.2, 1.2)
         inst.AnimState:SetLightOverride(1)
         inst.AnimState:SetFinalOffset(2)
-    end,
-    fn_remove = nil
+    end
 })
 MakeFx({ --金色传说：特效结束
     name = "buff_l_goldenloot_fx",
@@ -805,7 +780,7 @@ MakeFx({ --米格尔吉他：飘散的万寿菊花瓣
     fn_remove = nil,
 })
 MakeFx({ --爆炸水果蛋糕：爆炸特效
-    name = "explode_fruitcake",
+    name = "explode_l_fruitcake",
     assets = {
         Asset("ANIM", "anim/explode.zip") --官方爆炸特效动画模板
     },
@@ -823,8 +798,49 @@ MakeFx({ --爆炸水果蛋糕：爆炸特效
         inst.entity:AddSoundEmitter()
         inst.SoundEmitter:PlaySoundWithParams("dontstarve/common/together/fire_cracker", { start = math.random() })
         inst.SoundEmitter:PlaySound("dontstarve/creatures/slurtle/mound_explode")
+    end
+})
+MakeFx({ --爱到爆蛋糕：爆炸后爱心特效
+    name = "explode_l_fruitcake_day",
+    assets = {
+        Asset("ANIM", "anim/winters_feast_table_fx.zip"), --官方节日餐桌食物消失动画模板
+        Asset("ANIM", "anim/skin/explode_l_fruitcake_day.zip")
+    },
+    fn_anim = function(inst)
+        inst.AnimState:SetBank("winters_feast_table_fx")
+        inst.AnimState:SetBuild("explode_l_fruitcake_day")
+        inst.AnimState:PlayAnimation("burst", false)
+        inst.AnimState:SetMultColour(255/255, 88/255, 116/255, 1)
+        inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
+        inst.AnimState:SetScale(2.5, 2.5, 2.5)
+        inst.AnimState:SetLightOverride(0.5)
+        inst.AnimState:SetFinalOffset(2)
+    end
+})
+MakeFx({ --爱到爆蛋糕：爆炸特效
+    name = "explode_l_fruitcake2_day",
+    assets = {
+        Asset("ANIM", "anim/explode.zip"), --官方爆炸特效动画模板
+        Asset("ANIM", "anim/skin/explodingfruitcake_day.zip")
+    },
+    fn_common = function(inst)
+        inst.Transform:SetFourFaced()
     end,
-    fn_remove = nil,
+    fn_anim = function(inst)
+        inst.AnimState:SetBank("explode")
+        inst.AnimState:SetBuild("explode")
+        inst.AnimState:PlayAnimation("small_firecrackers")
+        inst.AnimState:OverrideSymbol("glow", "explodingfruitcake_day", "glow")
+        inst.AnimState:OverrideSymbol("sparks2", "explodingfruitcake_day", "sparks2")
+        inst.AnimState:OverrideSymbol("splode", "explodingfruitcake_day", "splode")
+        inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
+        inst.AnimState:SetLightOverride(1)
+        inst.AnimState:SetScale(1.4, 1.4, 1.4)
+
+        inst.entity:AddSoundEmitter()
+        inst.SoundEmitter:PlaySoundWithParams("dontstarve/common/together/fire_cracker", { start = math.random() })
+        inst.SoundEmitter:PlaySound("dontstarve/creatures/slurtle/mound_explode")
+    end
 })
 MakeFx2({ --风景球：落雪
     name = "icire_rock_fx_day",

@@ -265,7 +265,9 @@ local InventoryPrefabsList = {  --每个元素的下标值为每种物品栏图�
     hat_lichen_emo_anger = 8,
     hat_lichen_emo_sweat = 8,
     hat_lichen_emo_heart = 8,
-    tourmalinecore_tale = 8
+    tourmalinecore_tale = 8,
+    explodingfruitcake_day = 8,
+    lance_carrot_l_fact = 8,
 }
 
 return InventoryPrefabsList

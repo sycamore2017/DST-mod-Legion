@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<spriter_data scml_version="1.0" generator="BrashMonkey Spriter" generator_version="r7">
+    <folder id="0" name="agronssword_taste">
+        <file id="0" name="agronssword_taste/agronssword_taste.png" width="256" height="256" pivot_x="0.5" pivot_y="0.5"/>
+    </folder>
+    <folder id="1" name="agronssword_taste2">
+        <file id="0" name="agronssword_taste2/agronssword_taste2.png" width="256" height="256" pivot_x="0.5" pivot_y="0.5"/>
+    </folder>
+    <folder id="2" name="siving_feather_fake_paper">
+        <file id="0" name="siving_feather_fake_paper/siving_feather_fake_paper.png" width="256" height="256" pivot_x="0.5" pivot_y="0.5"/>
+    </folder>
+    <folder id="3" name="siving_feather_real_paper">
+        <file id="0" name="siving_feather_real_paper/siving_feather_real_paper.png" width="256" height="256" pivot_x="0.5" pivot_y="0.5"/>
+    </folder>
+    <folder id="4" name="soul_contracts_taste">
+        <file id="0" name="soul_contracts_taste/soul_contracts_taste.png" width="256" height="256" pivot_x="0.5" pivot_y="0.5"/>
+    </folder>
+    <folder id="5" name="revolvedmoonlight_item_taste">
+        <file id="0" name="revolvedmoonlight_item_taste/revolvedmoonlight_item_taste.png" width="256" height="256" pivot_x="0.5" pivot_y="0.5"/>
+    </folder>
+    <folder id="6" name="revolvedmoonlight_item_taste2">
+        <file id="0" name="revolvedmoonlight_item_taste2/revolvedmoonlight_item_taste2.png" width="256" height="256" pivot_x="0.5" pivot_y="0.5"/>
+    </folder>
+    <folder id="7" name="revolvedmoonlight_item_taste3">
+        <file id="0" name="revolvedmoonlight_item_taste3/revolvedmoonlight_item_taste3.png" width="256" height="256" pivot_x="0.5" pivot_y="0.5"/>
+    </folder>
+    <folder id="8" name="revolvedmoonlight_item_taste4">
+        <file id="0" name="revolvedmoonlight_item_taste4/revolvedmoonlight_item_taste4.png" width="256" height="256" pivot_x="0.5" pivot_y="0.5"/>
+    </folder>
+    <folder id="9" name="revolvedmoonlight_pro_taste">
+        <file id="0" name="revolvedmoonlight_pro_taste/revolvedmoonlight_pro_taste.png" width="256" height="256" pivot_x="0.5" pivot_y="0.5"/>
+    </folder>
+    <folder id="10" name="revolvedmoonlight_pro_taste2">
+        <file id="0" name="revolvedmoonlight_pro_taste2/revolvedmoonlight_pro_taste2.png" width="256" height="256" pivot_x="0.5" pivot_y="0.5"/>
+    </folder>
+    <folder id="11" name="revolvedmoonlight_pro_taste3">
+        <file id="0" name="revolvedmoonlight_pro_taste3/revolvedmoonlight_pro_taste3.png" width="256" height="256" pivot_x="0.5" pivot_y="0.5"/>
+    </folder>
+    <folder id="12" name="revolvedmoonlight_pro_taste4">
+        <file id="0" name="revolvedmoonlight_pro_taste4/revolvedmoonlight_pro_taste4.png" width="256" height="256" pivot_x="0.5" pivot_y="0.5"/>
+    </folder>
+    <folder id="13" name="revolvedmoonlight_taste">
+        <file id="0" name="revolvedmoonlight_taste/revolvedmoonlight_taste.png" width="256" height="256" pivot_x="0.5" pivot_y="0.5"/>
+    </folder>
+    <folder id="14" name="revolvedmoonlight_taste2">
+        <file id="0" name="revolvedmoonlight_taste2/revolvedmoonlight_taste2.png" width="256" height="256" pivot_x="0.5" pivot_y="0.5"/>
+    </folder>
+    <folder id="15" name="revolvedmoonlight_taste3">
+        <file id="0" name="revolvedmoonlight_taste3/revolvedmoonlight_taste3.png" width="256" height="256" pivot_x="0.5" pivot_y="0.5"/>
+    </folder>
+    <folder id="16" name="revolvedmoonlight_taste4">
+        <file id="0" name="revolvedmoonlight_taste4/revolvedmoonlight_taste4.png" width="256" height="256" pivot_x="0.5" pivot_y="0.5"/>
+    </folder>
+    <folder id="17" name="pinkstaff_tvplay">
+        <file id="0" name="pinkstaff_tvplay/pinkstaff_tvplay.png" width="256" height="256" pivot_x="0.5" pivot_y="0.5"/>
+    </folder>
+    <folder id="18" name="siving_feather_real_collector">
+        <file id="0" name="siving_feather_real_collector/siving_feather_real_collector.png" width="256" height="256" pivot_x="0.5" pivot_y="0.5"/>
+    </folder>
+    <folder id="19" name="siving_feather_fake_collector">
+        <file id="0" name="siving_feather_fake_collector/siving_feather_fake_collector.png" width="256" height="256" pivot_x="0.5" pivot_y="0.5"/>
+    </folder>
+    <folder id="20" name="siving_ctlwater_item_era">
+        <file id="0" name="siving_ctlwater_item_era/siving_ctlwater_item_era.png" width="256" height="256" pivot_x="0.5" pivot_y="0.5"/>
+    </folder>
+    <folder id="21" name="siving_ctldirt_item_era">
+        <file id="0" name="siving_ctldirt_item_era/siving_ctldirt_item_era.png" width="256" height="256" pivot_x="0.5" pivot_y="0.5"/>
+    </folder>
+    <folder id="22" name="siving_ctlall_item_era">
+        <file id="0" name="siving_ctlall_item_era/siving_ctlall_item_era.png" width="256" height="256" pivot_x="0.5" pivot_y="0.5"/>
+    </folder>
+    <folder id="23" name="siving_mask_era">
+        <file id="0" name="siving_mask_era/siving_mask_era.png" width="256" height="256" pivot_x="0.5" pivot_y="0.5"/>
+    </folder>
+    <folder id="24" name="siving_mask_gold_era">
+        <file id="0" name="siving_mask_gold_era/siving_mask_gold_era.png" width="256" height="256" pivot_x="0.5" pivot_y="0.5"/>
+    </folder>
+    <folder id="25" name="siving_mask_era2">
+        <file id="0" name="siving_mask_era2/siving_mask_era2.png" width="256" height="256" pivot_x="0.5" pivot_y="0.5"/>
+    </folder>
+    <folder id="26" name="siving_mask_gold_era2">
+        <file id="0" name="siving_mask_gold_era2/siving_mask_gold_era2.png" width="256" height="256" pivot_x="0.5" pivot_y="0.5"/>
+    </folder>
+    <folder id="27" name="fishhomingtool_normal_taste">
+        <file id="0" name="fishhomingtool_normal_taste/fishhomingtool_normal_taste.png" width="256" height="256" pivot_x="0.5" pivot_y="0.5"/>
+    </folder>
+    <folder id="28" name="fishhomingtool_awesome_taste">
+        <file id="0" name="fishhomingtool_awesome_taste/fishhomingtool_awesome_taste.png" width="256" height="256" pivot_x="0.5" pivot_y="0.5"/>
+    </folder>
+    <folder id="29" name="fishhomingbait1_taste">
+        <file id="0" name="fishhomingbait1_taste/fishhomingbait1_taste.png" width="256" height="256" pivot_x="0.5" pivot_y="0.5"/>
+    </folder>
+    <folder id="30" name="fishhomingbait2_taste">
+        <file id="0" name="fishhomingbait2_taste/fishhomingbait2_taste.png" width="256" height="256" pivot_x="0.5" pivot_y="0.5"/>
+    </folder>
+    <folder id="31" name="fishhomingbait3_taste">
+        <file id="0" name="fishhomingbait3_taste/fishhomingbait3_taste.png" width="256" height="256" pivot_x="0.5" pivot_y="0.5"/>
+    </folder>
+    <folder id="32" name="siving_soil_item_law">
+        <file id="0" name="siving_soil_item_law/siving_soil_item_law.png" width="256" height="256" pivot_x="0.5" pivot_y="0.5"/>
+    </folder>
+    <folder id="33" name="siving_soil_item_law2">
+        <file id="0" name="siving_soil_item_law2/siving_soil_item_law2.png" width="256" height="256" pivot_x="0.5" pivot_y="0.5"/>
+    </folder>
+    <folder id="34" name="siving_soil_item_law3">
+        <file id="0" name="siving_soil_item_law3/siving_soil_item_law3.png" width="256" height="256" pivot_x="0.5" pivot_y="0.5"/>
+    </folder>
+    <folder id="35" name="refractedmoonlight_taste">
+        <file id="0" name="refractedmoonlight_taste/refractedmoonlight_taste.png" width="256" height="256" pivot_x="0.5" pivot_y="0.5"/>
+    </folder>
+    <folder id="36" name="refractedmoonlight_taste2">
+        <file id="0" name="refractedmoonlight_taste2/refractedmoonlight_taste2.png" width="256" height="256" pivot_x="0.5" pivot_y="0.5"/>
+    </folder>
+    <folder id="37" name="siving_mask_gold_marble">
+        <file id="0" name="siving_mask_gold_marble/siving_mask_gold_marble.png" width="256" height="256" pivot_x="0.5" pivot_y="0.5"/>
+    </folder>
+    <folder id="38" name="siving_suit_gold_marble">
+        <file id="0" name="siving_suit_gold_marble/siving_suit_gold_marble.png" width="256" height="256" pivot_x="0.5" pivot_y="0.5"/>
+    </folder>
+    <folder id="39" name="hiddenmoonlight_item_paper">
+        <file id="0" name="hiddenmoonlight_item_paper/hiddenmoonlight_item_paper.png" width="256" height="256" pivot_x="0.5" pivot_y="0.5"/>
+    </folder>
+    <folder id="40" name="hat_lichen_emo_3shock">
+        <file id="0" name="hat_lichen_emo_3shock/hat_lichen_emo_3shock.png" width="256" height="256" pivot_x="0.5" pivot_y="0.5"/>
+    </folder>
+    <folder id="41" name="hat_lichen_emo_shock">
+        <file id="0" name="hat_lichen_emo_shock/hat_lichen_emo_shock.png" width="256" height="256" pivot_x="0.5" pivot_y="0.5"/>
+    </folder>
+    <folder id="42" name="hat_lichen_emo_anger">
+        <file id="0" name="hat_lichen_emo_anger/hat_lichen_emo_anger.png" width="256" height="256" pivot_x="0.5" pivot_y="0.5"/>
+    </folder>
+    <folder id="43" name="hat_lichen_emo_sweat">
+        <file id="0" name="hat_lichen_emo_sweat/hat_lichen_emo_sweat.png" width="256" height="256" pivot_x="0.5" pivot_y="0.5"/>
+    </folder>
+    <folder id="44" name="hat_lichen_emo_heart">
+        <file id="0" name="hat_lichen_emo_heart/hat_lichen_emo_heart.png" width="256" height="256" pivot_x="0.5" pivot_y="0.5"/>
+    </folder>
+    <folder id="45" name="tourmalinecore_tale">
+        <file id="0" name="tourmalinecore_tale/tourmalinecore_tale.png" width="256" height="256" pivot_x="0.5" pivot_y="0.5"/>
+    </folder>
+    <folder id="46" name="explodingfruitcake_day">
+        <file id="0" name="explodingfruitcake_day/explodingfruitcake_day.png" width="256" height="256" pivot_x="0.5" pivot_y="0.5"/>
+    </folder>
+    <folder id="47" name="lance_carrot_l_fact">
+        <file id="0" name="lance_carrot_l_fact/lance_carrot_l_fact.png" width="256" height="256" pivot_x="0.5" pivot_y="0.5"/>
+    </folder>
+    <entity id="0" name="images_minisign_skins2">
+        <animation id="0" name="anim" length="1000" interval="100">
+            <mainline>
+                <key id="0">
+                    <object_ref id="0" timeline="0" key="0" z_index="0"/>
+                </key>
+            </mainline>
+            <timeline id="0" name="agronssword_taste">
+                <key id="0" spin="0">
+                    <object folder="0" file="0" angle="0"/>
+                </key>
+            </timeline>
+        </animation>
+    </entity>
+</spriter_data>

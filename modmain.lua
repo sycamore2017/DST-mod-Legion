@@ -542,7 +542,7 @@ end
 --------------------------------------------------------------------------
 
 ------热更新机制
--- modimport("scripts/hotreload_legion.lua")
+modimport("scripts/hotreload_legion.lua")
 ------专用数据相关
 modimport("scripts/datafix_legion.lua")
 ------组件与预制物相关

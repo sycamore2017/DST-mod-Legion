@@ -4,9 +4,8 @@ local assets = {
     Asset("IMAGE", "images/inventoryimages/explodingfruitcake.tex"),
     Asset("ATLAS_BUILD", "images/inventoryimages/explodingfruitcake.xml", 256)
 }
-
 local prefabs = {
-    "explode_fruitcake"
+    "explode_l_fruitcake"
 }
 
 local function OnIgniteFn(inst)
@@ -19,18 +18,20 @@ local function OnExtinguishFn(inst)
 end
 local function OnExplodeFn(inst)
     inst.SoundEmitter:KillSound("hiss")
-    local fx = SpawnPrefab("explode_fruitcake")
-    if fx ~= nil then
-        fx.Transform:SetPosition(inst.Transform:GetWorldPosition())
+    if inst._dd_fxfn ~= nil then
+        inst._dd_fxfn(inst)
+    else
+        local fx = SpawnPrefab("explode_l_fruitcake")
+        if fx ~= nil then
+            fx.Transform:SetPosition(inst.Transform:GetWorldPosition())
+        end
     end
 end
-
 local function OnPutInInv(inst, owner)
     if owner.prefab == "mole" then
         inst.components.explosive:OnBurnt()
     end
 end
-
 local function OnEaten(inst, eater) --注意：该函数执行后，才会执行食物的删除操作
     --如果是一次性吃完类型的对象，直接爆炸吧，反正都要整体删除了
     if eater.components.eater and eater.components.eater.eatwholestack then
@@ -39,18 +40,19 @@ local function OnEaten(inst, eater) --注意：该函数执行后，才会执行
     end
 
     --由于食用时会主动消耗一个，而爆炸会消耗全部，为了达到一次吃只炸一个的效果，新生成一个完成爆炸效果
+    local fxfn = inst._dd_fxfn
     eater:DoTaskInTime(1.5+math.random(), function()
         if eater:IsValid() and not eater:IsInLimbo() then
             local cake = SpawnPrefab("explodingfruitcake")
+            cake._dd_fxfn = fxfn
             cake.Transform:SetPosition(eater.Transform:GetWorldPosition())
             cake.components.explosive:OnBurnt()
         end
     end)
 end
 
-local function fn()
+local function Fn()
     local inst = CreateEntity()
-
     inst.entity:AddTransform()
     inst.entity:AddAnimState()
     inst.entity:AddSoundEmitter()
@@ -66,6 +68,8 @@ local function fn()
     inst:AddTag("explosive")
     inst:AddTag("pre-preparedfood")
 
+    LS_C_Init(inst, "explodingfruitcake", false)
+
     inst.entity:SetPristine()
     if not TheWorld.ismastersim then return inst end
 
@@ -74,7 +78,7 @@ local function fn()
 
     inst:AddComponent("inspectable")
 
-    MakeSmallBurnable(inst, 3 + math.random() * 3)
+    MakeSmallBurnable(inst, 3 + math.random()*3)
     MakeSmallPropagator(inst)
     --V2C: Remove default OnBurnt handler, as it conflicts with
     --explosive component's OnBurnt handler for removing itself
@@ -111,4 +115,4 @@ local function fn()
     return inst
 end
 
-return Prefab("explodingfruitcake", fn, assets, prefabs)
+return Prefab("explodingfruitcake", Fn, assets, prefabs)

@@ -913,6 +913,19 @@ local SKIN_DEFAULT_LEGION = {
         exchangefx = { prefab = nil, offset_y = nil, scale = 1.5 }
     },
 
+    plant_carrot_l = {
+        anim = { bank = "crop_legion_carrot", build = "crop_legion_carrot", anim = 0 },
+        exchangefx = { prefab = nil, offset_y = nil, scale = 1.5 }
+    },
+    lance_carrot_l = {
+        image = { name = nil, atlas = nil, setable = true },
+        anim = { bank = nil, build = nil, anim = nil, animpush = nil, isloop = nil },
+        fn_start = Fn_start_equip,
+        equip = { symbol = "swap_object", build = "lance_carrot_l", file = "swap_object" },
+        exchangefx = { prefab = nil, offset_y = nil, scale = nil },
+        floater = { cut = 0.15, size = "small", offset_y = 0.4, scale = 0.5, nofx = nil }
+    },
+
     siving_ctlwater_item = {
         image = { name = nil, atlas = nil, setable = true },
         anim = { bank = "siving_ctlwater", build = "siving_ctlwater", anim = "item", animpush = nil, isloop = nil },
@@ -1090,6 +1103,12 @@ local SKIN_DEFAULT_LEGION = {
         image = { name = nil, atlas = nil, setable = true },
         anim = { bank = nil, build = nil, anim = nil, animpush = nil, isloop = nil },
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 }
+    },
+
+    explodingfruitcake = {
+        image = { name = nil, atlas = nil, setable = true },
+        anim = { bank = nil, build = nil, anim = nil, animpush = nil, isloop = nil },
+        exchangefx = { prefab = nil, offset_y = nil, scale = nil }
     },
 }
 local SKINS_LEGION = {
@@ -2726,6 +2745,36 @@ local SKINS_LEGION = {
         end
     },
 
+    plant_carrot_l_fact = {
+        base_prefab = "plant_carrot_l", skin_id = "665f12e7ce45c22cf18e7082", onlyownedshow = true,
+		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
+		assets = {
+			Asset("ANIM", "anim/skin/plant_carrot_l_fact.zip")
+		},
+        string = ischinese and { name = "非常正常的胡萝卜" } or { name = "Realistic Carrot" },
+        anim = { bank = nil, build = nil, anim = 0 },
+        exchangefx = { prefab = nil, offset_y = nil, scale = nil },
+        linkedskins = { weapon = "lance_carrot_l_fact" },
+        fn_placer = function(inst)
+            inst.AnimState:SetBank("plant_carrot_l_fact")
+            inst.AnimState:SetBuild("plant_carrot_l_fact")
+        end
+    },
+    lance_carrot_l_fact = {
+        base_prefab = "lance_carrot_l", skin_id = "665f12e7ce45c22cf18e7082", noshopshow = true,
+		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
+		assets = {
+			Asset("ANIM", "anim/skin/lance_carrot_l_fact.zip")
+		},
+        image = { name = nil, atlas = nil, setable = true },
+        string = ischinese and { name = "绑一块儿的胡萝卜" } or { name = "Carrots Tied Together" },
+		anim = { bank = nil, build = nil, anim = nil, animpush = nil, isloop = nil },
+        fn_start = Fn_start_equip,
+        equip = { symbol = "swap_object", build = "lance_carrot_l_fact", file = "swap_object" },
+        exchangefx = { prefab = nil, offset_y = nil, scale = nil },
+        floater = { cut = 0.15, size = "small", offset_y = 0.4, scale = 0.5, nofx = nil }
+    },
+
     siving_ctlwater_item_era = {
         base_prefab = "siving_ctlwater_item", skin_id = "64759cc569b4f368be452b14", noshopshow = true,
 		type = "item", skin_tags = {}, release_group = 555, rarity = raritySpecial,
@@ -3271,6 +3320,35 @@ local SKINS_LEGION = {
         end,
         fxdata = { name = "eleccore_spark_fx_tale", y = nil, y_rand = nil },
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 }
+    },
+
+    explodingfruitcake_day = {
+        base_prefab = "explodingfruitcake", skin_id = "665eb9ffce45c22cf18e6d75", onlyownedshow = true,
+		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
+		assets = {
+			Asset("ANIM", "anim/skin/explodingfruitcake_day.zip")
+		},
+		image = { name = nil, atlas = nil, setable = true },
+        string = ischinese and { name = "爱到爆蛋糕" } or { name = "Exploding Love Cake" },
+        anim = { bank = nil, build = nil, anim = 0 },
+		fn_start = function(inst, skined)
+            inst._dd_fxfn = skined and skined.fxfn
+        end,
+        fn_end = function(inst, skined)
+            inst._dd_fxfn = nil
+        end,
+        fxfn = function(inst)
+            local x, y, z = inst.Transform:GetWorldPosition()
+            local fx = SpawnPrefab("explode_l_fruitcake_day")
+            if fx ~= nil then
+                fx.Transform:SetPosition(x, y-4, z)
+            end
+            fx = SpawnPrefab("explode_l_fruitcake2_day")
+            if fx ~= nil then
+                fx.Transform:SetPosition(x, y, z)
+            end
+        end,
+        exchangefx = { prefab = nil, offset_y = nil, scale = nil }
     }
 }
 local SKIN_IDS_LEGION = {
@@ -3334,8 +3412,11 @@ local SKIN_IDS_LEGION = {
         tourmalinecore_tale = true
     },
     -- ["660579cace45c22cf18e4a87"] = nil, --前六期全部
-    -- ["61627d927bbb727be174c4a0"] = { --7开得胜
-    -- }
+    ["61627d927bbb727be174c4a0"] = { --7开得胜
+        explodingfruitcake_day = true,
+        plant_carrot_l_fact = true, lance_carrot_l_fact = true,
+    },
+    -- ["665eb8a8ce45c22cf18e6d24"] = {}, --8面玲珑
     -- ["6278c409c340bf24ab311522"] = nil --余生
 }
 local SKIN_IDX_LEGION = {
@@ -3347,26 +3428,26 @@ local AddSkins = function(skins, baseskins)
         skins[skinname] = true
     end
 end
-local ddskins = {}
+local ddskins = {
+    backcub_fans2 = true, fishhomingtool_awesome_taste = true,
+    fishhomingtool_normal_taste = true, fishhomingbait_taste = true
+}
 AddSkins(ddskins, SKIN_IDS_LEGION["6278c487c340bf24ab31152c"])
 AddSkins(ddskins, SKIN_IDS_LEGION["6278c4acc340bf24ab311530"])
 AddSkins(ddskins, SKIN_IDS_LEGION["6278c4eec340bf24ab311534"])
 AddSkins(ddskins, SKIN_IDS_LEGION["637f07a28c2f781db2f7f1e8"])
 AddSkins(ddskins, SKIN_IDS_LEGION["642c14d9f2b67d287a35d439"])
 AddSkins(ddskins, SKIN_IDS_LEGION["61f15bf4db102b0b8a529c66"])
-ddskins.backcub_fans2 = true
-ddskins.fishhomingtool_awesome_taste = true
-ddskins.fishhomingtool_normal_taste = true
-ddskins.fishhomingbait_taste = true
 SKIN_IDS_LEGION["660579cace45c22cf18e4a87"] = ddskins
 
 ddskins = { siving_turn_collector = true }
-AddSkins(ddskins, SKIN_IDS_LEGION["660579cace45c22cf18e4a87"])
+AddSkins(ddskins, SKIN_IDS_LEGION["660579cace45c22cf18e4a87"]) --前六期全部
+AddSkins(ddskins, SKIN_IDS_LEGION["61627d927bbb727be174c4a0"]) --第七期
+-- AddSkins(ddskins, SKIN_IDS_LEGION["665eb8a8ce45c22cf18e6d24"]) --第八期
 --后续记得继续补充
 SKIN_IDS_LEGION["6278c409c340bf24ab311522"] = ddskins
 ddskins = nil
 AddSkins = nil
-
 
 local dirty_cache = true --代表皮肤数据是否需要保存成文件
 local ls_cache = { --所有玩家的已有皮肤缓存
@@ -3469,7 +3550,7 @@ local skinidxes = {
     "tourmalinecore_tale",
     "siving_turn_future", "siving_turn_future2",
     "hiddenmoonlight_item_paper", "siving_feather_real_paper", "siving_feather_fake_paper",
-    "icire_rock_day",
+    "explodingfruitcake_day", "icire_rock_day",
     "siving_soil_item_law", "siving_soil_item_law2", "siving_soil_item_law3",
     "carpet_whitewood_law", "carpet_whitewood_big_law", "carpet_whitewood_law2", "carpet_whitewood_big_law2",
     "refractedmoonlight_taste", "agronssword_taste", "soul_contracts_taste",
@@ -3481,6 +3562,7 @@ local skinidxes = {
     "plant_cactus_meat_l_world", "orchidbush_disguiser", "boltwingout_disguiser",
     "siving_mask_gold_marble", "siving_suit_gold_marble",
     "rosebush_marble", "rosorns_marble", "lilybush_marble", "lileaves_marble", "orchidbush_marble", "orchitwigs_marble",
+    "plant_carrot_l_fact", "lance_carrot_l_fact",
     "hat_lichen_emo_3shock", "hat_lichen_emo_shock", "hat_lichen_emo_anger", "hat_lichen_emo_sweat",
     "hat_lichen_emo_heart", "shield_l_log_emo_fist", "hat_lichen_emo_que",
 
@@ -5290,7 +5372,7 @@ if not TheNet:IsDedicated() and _G.CONFIGS_LEGION.LANGUAGES == "chinese" then
     -- local PlayerAvatarPopup = require "widgets/playeravatarpopup"
     local PlayerInfoPopup = require "screens/playerinfopopupscreen"
     local TEMPLATES = require "widgets/templates"
-    local SkinLegionDialog = require "widgets/skinlegiondialog"
+    -- local SkinLegionDialog = require "widgets/skinlegiondialog"
 
     local MakeBG_old = PlayerInfoPopup.MakeBG
     PlayerInfoPopup.MakeBG = function(self, ...)
@@ -5313,7 +5395,7 @@ if not TheNet:IsDedicated() and _G.CONFIGS_LEGION.LANGUAGES == "chinese" then
                 if rightroot.skinshop_l ~= nil then
                     rightroot.skinshop_l:Kill()
                 end
-                -- local SkinLegionDialog = _G.require("widgets/skinlegiondialog") --test：动态更新
+                local SkinLegionDialog = _G.require("widgets/skinlegiondialog") --test：动态更新
                 rightroot.skinshop_l = rightroot:AddChild(SkinLegionDialog(self.owner))
                 rightroot.skinshop_l:SetPosition(-380, 0)
                 -- self:Kill() --直接删除并不能去除暂停状态

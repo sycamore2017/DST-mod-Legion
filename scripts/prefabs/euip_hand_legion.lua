@@ -1209,9 +1209,12 @@ local function OnOwnerItemChange_carl(owner, data)
 	end
 end
 local function OnEquip_carl(inst, owner)
-    owner.AnimState:OverrideSymbol("swap_object", "lance_carrot_l", "swap_object")
-    owner.AnimState:Show("ARM_carry")
-    owner.AnimState:Hide("ARM_normal")
+    if inst._dd ~= nil then
+        owner.AnimState:OverrideSymbol("swap_object", inst._dd.build, inst._dd.file)
+    else
+        owner.AnimState:OverrideSymbol("swap_object", "lance_carrot_l", "swap_object")
+    end
+    OnEquip_base(inst, owner)
 
 	if owner:HasTag("equipmentmodel") then return end --假人
 
@@ -1225,8 +1228,7 @@ local function OnEquip_carl(inst, owner)
     end
 end
 local function OnUnequip_carl(inst, owner)
-    owner.AnimState:Hide("ARM_carry")
-    owner.AnimState:Show("ARM_normal")
+    OnUnequip_base(inst, owner)
 
 	if owner:HasTag("equipmentmodel") then return end --假人
 
@@ -1257,8 +1259,7 @@ table.insert(prefs, Prefab("lance_carrot_l", function()
     inst:AddTag("rp_carrot_l")
     inst:AddTag("weapon")
 
-    -- LS_C_Init(inst, "lance_carrot_l", true)
-    SetFloatable(inst, { 0.15, "small", 0.4, 0.5 })
+    LS_C_Init(inst, "lance_carrot_l", true)
 
     inst.entity:SetPristine()
     if not TheWorld.ismastersim then
