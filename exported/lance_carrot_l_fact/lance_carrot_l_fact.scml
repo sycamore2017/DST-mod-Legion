@@ -1,7 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <spriter_data scml_version="1.0" generator="BrashMonkey Spriter" generator_version="r7">
     <folder id="0" name="swap_object">
-        <file id="0" name="swap_object/swap_object-0.png" width="111" height="364" pivot_x="0.477477" pivot_y="0.273481"/>
+        <file id="0" name="swap_object/swap_object-0.png" width="111" height="364" pivot_x="0.468" pivot_y="0.28"/>
+        <file id="1" name="swap_object/swap_object-0.png" width="111" height="364" pivot_x="0.468" pivot_y="0.28"/>
+        <file id="2" name="swap_object/swap_object-0.png" width="111" height="364" pivot_x="0.468" pivot_y="0.28"/>
+        <file id="3" name="swap_object/swap_object-0.png" width="111" height="364" pivot_x="0.468" pivot_y="0.28"/>
+        <file id="4" name="swap_object/swap_object-0.png" width="111" height="364" pivot_x="0.468" pivot_y="0.28"/>
+        <file id="5" name="swap_object/swap_object-0.png" width="111" height="364" pivot_x="0.468" pivot_y="0.28"/>
+        <file id="6" name="swap_object/swap_object-0.png" width="111" height="364" pivot_x="0.468" pivot_y="0.28"/>
+        <file id="7" name="swap_object/swap_object-0.png" width="111" height="364" pivot_x="0.468" pivot_y="0.28"/>
+        <file id="8" name="swap_object/swap_object-0.png" width="111" height="364" pivot_x="0.468" pivot_y="0.28"/>
+        <file id="9" name="swap_object/swap_object-0.png" width="111" height="364" pivot_x="0.468" pivot_y="0.28"/>
+        <file id="10" name="swap_object/swap_object-0.png" width="111" height="364" pivot_x="0.468" pivot_y="0.28"/>
+        <file id="11" name="swap_object/swap_object-0.png" width="111" height="364" pivot_x="0.468" pivot_y="0.28"/>
+        <file id="12" name="swap_object/swap_object-0.png" width="111" height="364" pivot_x="0.468" pivot_y="0.28"/>
+        <file id="13" name="swap_object/swap_object-0.png" width="111" height="364" pivot_x="0.468" pivot_y="0.28"/>
+        <file id="14" name="swap_object/swap_object-0.png" width="111" height="364" pivot_x="0.468" pivot_y="0.28"/>
+        <file id="15" name="swap_object/swap_object-0.png" width="111" height="364" pivot_x="0.468" pivot_y="0.28"/>
+        <file id="16" name="swap_object/swap_object-0.png" width="111" height="364" pivot_x="0.468" pivot_y="0.28"/>
+        <file id="17" name="swap_object/swap_object-0.png" width="111" height="364" pivot_x="0.468" pivot_y="0.28"/>
+        <file id="18" name="swap_object/swap_object-0.png" width="111" height="364" pivot_x="0.468" pivot_y="0.28"/>
+        <file id="19" name="swap_object/swap_object-0.png" width="111" height="364" pivot_x="0.468" pivot_y="0.28"/>
+        <file id="20" name="swap_object/swap_object-0.png" width="111" height="364" pivot_x="0.468" pivot_y="0.28"/>
     </folder>
     <folder id="1" name="SWAP_ICON">
         <file id="0" name="SWAP_ICON/SWAP_ICON-0.png" width="180" height="180" pivot_x="0.5" pivot_y="0.5"/>
