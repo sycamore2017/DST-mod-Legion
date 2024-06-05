@@ -472,6 +472,15 @@ _G.CROPS_DATA_LEGION.carrot = {
                 self:AddLoot(loots, "lance_carrot_l", 1)
             end
         end
+    end,
+    fn_lootset = function(self, doer, ispicked, isburnt, loot)
+        if doer ~= nil and (TheWorld == doer or doer.userid ~= nil) then
+            for _, item in pairs(loot) do
+                if item.prefab == "lance_carrot_l" then
+                    self.inst.components.skinedlegion:SetLinkedSkin(item, "weapon", doer)
+                end
+            end
+        end
     end
 }
 _G.CROPS_DATA_LEGION.corn = {

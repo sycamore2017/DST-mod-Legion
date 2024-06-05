@@ -624,6 +624,25 @@ local function SetAnim_chest_whitewood_craft(self, anim, data)
     end
 end
 
+local function SetClick_plant_carrot(self, anim, data)
+    local animstate = anim:GetAnimState()
+    local tag = anim.tag_anim or data.tag_start
+
+    if tag == nil or tag == 4 then
+        animstate:PlayAnimation("dead1")
+        anim.tag_anim = 1
+    elseif tag == 1 then
+        animstate:PlayAnimation("level1", true)
+        anim.tag_anim = 2
+    elseif tag == 2 then
+        animstate:PlayAnimation("level2", true)
+        anim.tag_anim = 3
+    else
+        animstate:PlayAnimation("level3_3", true)
+        anim.tag_anim = 4
+    end
+end
+
 local width_skininfo = 260
 local SkinData = {
     rosebush_marble = {
@@ -2624,12 +2643,18 @@ local SkinData = {
             descitem = "Unlock \"Carrot Cluster\", \"Carrot Lance\" skin.",
             description = "The story was not translated."
         },
-        height_anim = 134,
+        height_anim = 145,
         anims = {
+            {
+                bank = "plant_carrot_l_fact", build = "plant_carrot_l_fact",
+                anim = "level3_3", anim2 = nil, isloop = true,
+                fn_click = SetClick_plant_carrot,
+                x = -75, y = 3, scale = 0.38
+            },
             {
                 bank = "lance_carrot_l_fact", build = "lance_carrot_l_fact",
                 anim = "idle", anim2 = nil, isloop = false,
-                x = -55, y = 130, scale = 0.38
+                x = -25, y = 0, scale = 0.38
             },
             {
                 symbol = {
@@ -2637,8 +2662,8 @@ local SkinData = {
                 },
                 fn_anim = SetAnim_player,
                 fn_click = SetAnim_player2,
-                x = 35, y = 130, scale = 0.38
-            },
+                x = 45, y = 0, scale = 0.38
+            }
         }
     },
     siving_ctlall_item_era = {

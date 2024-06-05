@@ -181,6 +181,7 @@ function PerennialCrop2:SetUp(cropprefab, data, data2)
 	self.fn_growth = data.fn_growth
 	self.fn_overripe = data.fn_overripe
 	self.fn_loot = data.fn_loot
+	self.fn_lootset = data.fn_lootset
 	self.fn_pick = data.fn_pick
 	self.fn_stage = data.fn_stage
 	self.fn_season = data.fn_season
@@ -985,6 +986,9 @@ function PerennialCrop2:GenerateLoot(doer, ispicked, isburnt) --生成收获物
 		if num > 0 then
 			TOOLS_L.SpawnStackDrop(name, num, pos, nil, loot, { dropper = self.inst })
 		end
+	end
+	if self.fn_lootset ~= nil then
+		self.fn_lootset(self, doer, ispicked, isburnt, loot)
 	end
 	if ispicked then
 		if self.fn_pick ~= nil then
