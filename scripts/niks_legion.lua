@@ -923,7 +923,7 @@ local SKIN_DEFAULT_LEGION = {
         fn_start = Fn_start_equip,
         equip = { symbol = "swap_object", build = "lance_carrot_l", file = "swap_object" },
         exchangefx = { prefab = nil, offset_y = nil, scale = nil },
-        floater = { cut = 0.15, size = "small", offset_y = 0.4, scale = 0.5, nofx = nil }
+        floater = { cut = 0.1, size = "small", offset_y = 0.3, scale = 0.6, nofx = nil }
     },
 
     siving_ctlwater_item = {
@@ -2772,7 +2772,7 @@ local SKINS_LEGION = {
         fn_start = Fn_start_equip,
         equip = { symbol = "swap_object", build = "lance_carrot_l_fact", file = "swap_object" },
         exchangefx = { prefab = nil, offset_y = nil, scale = nil },
-        floater = { cut = 0.15, size = "small", offset_y = 0.4, scale = 0.5, nofx = nil }
+        floater = { cut = 0.1, size = "small", offset_y = 0.3, scale = 0.6, nofx = nil }
     },
 
     siving_ctlwater_item_era = {

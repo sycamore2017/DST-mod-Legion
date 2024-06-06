@@ -2643,7 +2643,7 @@ local SkinData = {
             descitem = "Unlock \"Carrot Cluster\", \"Carrot Lance\" skin.",
             description = "The story was not translated."
         },
-        height_anim = 145,
+        height_anim = 160,
         anims = {
             {
                 bank = "plant_carrot_l_fact", build = "plant_carrot_l_fact",
