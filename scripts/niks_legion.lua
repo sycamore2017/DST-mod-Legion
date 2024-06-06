@@ -20,6 +20,7 @@ local skininvs = {
     "agronssword_taste", "agronssword_taste2",
     "siving_turn_collector", "siving_turn_future", "siving_turn_future2",
     "refractedmoonlight_taste", "refractedmoonlight_taste2",
+    "refractedmoonlight_moon", "refractedmoonlight_moon2",
     "chest_whitewood_craft", "chest_whitewood_big_craft", "chest_whitewood_craft2", "chest_whitewood_big_craft2",
     "revolvedmoonlight_taste", "revolvedmoonlight_pro_taste",
     "revolvedmoonlight_taste2", "revolvedmoonlight_pro_taste2",
@@ -450,6 +451,10 @@ local function Fn_end_revolved_pro(inst)
     inst.AnimState:SetScale(1, 1, 1)
     inst.components.container:Close()
     inst.components.container:WidgetSetup("revolvedmoonlight_pro")
+end
+
+local function Fn_end_refractedmoonlight_moon(inst, skined)
+    
 end
 
 ------
@@ -3133,6 +3138,27 @@ local SKINS_LEGION = {
         },
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 }
     },
+    refractedmoonlight_moon = {
+        base_prefab = "refractedmoonlight", skin_id = "6661d08bce45c22cf18e720c", onlyownedshow = true,
+		type = "item", skin_tags = {}, release_group = 555, rarity = raritySpecial,
+		assets = {
+			Asset("ANIM", "anim/skin/refractedmoonlight_moon.zip")
+		},
+        string = ischinese and { name = "月辉虹隙刃" } or { name = "Lunar Gap Blade" },
+        anim = { bank = nil, build = nil, anim = 0 },
+        fn_start = Fn_start_refractedmoonlight,
+        fn_end = Fn_end_refractedmoonlight_moon,
+        equip = {
+            img_tex = "refractedmoonlight_moon", img_atlas = "images/inventoryimages_skin/refractedmoonlight_moon.xml",
+            img_tex2 = "refractedmoonlight_moon2", img_atlas2 = "images/inventoryimages_skin/refractedmoonlight_moon2.xml",
+            build = "refractedmoonlight_moon",
+            fxfn = function(inst)
+                
+            end,
+            fxendfn = Fn_end_refractedmoonlight_moon
+        },
+        exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 }
+    },
 
     hiddenmoonlight_item_paper = {
         base_prefab = "hiddenmoonlight_item", skin_id = "655a18f6adf8ac0fd863e900", onlyownedshow = true,
@@ -3415,6 +3441,7 @@ local SKIN_IDS_LEGION = {
     ["61627d927bbb727be174c4a0"] = { --7开得胜
         explodingfruitcake_day = true,
         plant_carrot_l_fact = true, lance_carrot_l_fact = true,
+        refractedmoonlight_moon = true,
     },
     -- ["665eb8a8ce45c22cf18e6d24"] = {}, --8面玲珑
     -- ["6278c409c340bf24ab311522"] = nil --余生
@@ -3539,6 +3566,7 @@ local ls_buildmap = { --prefab，build与皮肤的对应表，用以比对动画
 
 ------皮肤排序
 local skinidxes = {
+    "refractedmoonlight_moon",
     "chest_whitewood_craft", "chest_whitewood_big_craft", "chest_whitewood_craft2", "chest_whitewood_big_craft2",
     "siving_ctlwater_item_era", "siving_ctldirt_item_era", "siving_ctlall_item_era",
     "neverfade_thanks", "neverfadebush_thanks", "siving_derivant_thanks", "siving_derivant_thanks2",
@@ -4322,7 +4350,7 @@ local function CheckCodeSafety()
             siving_turn_collector = true, siving_turn_future = true, siving_turn_future2 = true
         },
         refractedmoonlight = {
-            refractedmoonlight_taste = true
+            refractedmoonlight_taste = true, refractedmoonlight_moon = true
         },
         chest_whitewood_big = {
             chest_whitewood_big_craft = true, chest_whitewood_big_craft2 = true

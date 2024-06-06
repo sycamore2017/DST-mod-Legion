@@ -268,6 +268,8 @@ local InventoryPrefabsList = {  --每个元素的下标值为每种物品栏图�
     tourmalinecore_tale = 8,
     explodingfruitcake_day = 8,
     lance_carrot_l_fact = 8,
+    refractedmoonlight_moon = 8,
+    refractedmoonlight_moon2 = 8,
 }
 
 return InventoryPrefabsList

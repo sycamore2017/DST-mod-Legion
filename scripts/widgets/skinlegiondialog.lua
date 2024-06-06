@@ -37,7 +37,8 @@ local SkinStrings = ischinese and {
         FUTURE = "关于未来系列", --未来、科技、机械
         CRAFT = "巧匠系列", --工艺品、木工、玉石
         TALE = "言如玉系列", --各种童话故事、历险记、传说
-        FACT = "非常正常系列" --非常正常，和现实大抵相同
+        FACT = "非常正常系列", --非常正常，和现实大抵相同
+        SUNMOON = "日月同辉系列" --太阳、月亮、发光
     },
     UI_ACCESS = "获取",
     UI_INPUT_CDK = "请输入兑换码",
@@ -71,7 +72,8 @@ local SkinStrings = ischinese and {
         FUTURE = "About Future Collection",
         CRAFT = "Crafts Collection",
         TALE = "Tales Collection",
-        FACT = "Reality Collection"
+        FACT = "Reality Collection",
+        SUNMOON = "Sun-moon Collection"
     },
     UI_ACCESS = "Get It",
     UI_INPUT_CDK = "Please enter CDK",
@@ -2927,6 +2929,52 @@ local SkinData = {
             {
                 symbol = {
                     { symbol = "swap_object", build = "refractedmoonlight_taste", file = "swap2", type = 1 },
+                },
+                fn_anim = SetAnim_player,
+                fn_click = SetAnim_player2,
+                x = 35, y = 0, scale = 0.38
+            },
+            {
+                bank = "alterguardian_meteor", build = "siving_boss_caw_fx",
+                anim = "meteorground_pre", anim2 = "meteorground_loop", isloop = true,
+                fn_anim = SetAnim_refracted_taste_fx,
+                x = -55, y = 66, scale = 0.152
+            }
+        }
+    },
+    refractedmoonlight_moon = {
+        string = ischinese and {
+            collection = "SUNMOON", access = "SPECIAL",
+            descitem = "解锁\"月折宝剑\"的皮肤。",
+            description = ""
+        } or {
+            collection = "SUNMOON", access = "SPECIAL",
+            descitem = "Unlock \"Refracted Moonlight\" skin.",
+            description = "The story was not translated."
+        },
+        height_anim = 275,
+        anims = {
+            {
+                bank = "refractedmoonlight_moon", build = "refractedmoonlight_moon",
+                anim = "idle", anim2 = nil, isloop = true,
+                x = -55, y = 133, scale = 0.38
+            },
+            {
+                symbol = {
+                    { symbol = "swap_object", build = "refractedmoonlight_moon", file = "swap1", type = 1 },
+                },
+                fn_anim = SetAnim_player,
+                fn_click = SetAnim_player2,
+                x = 35, y = 130, scale = 0.38
+            },
+            {
+                bank = "refractedmoonlight_moon", build = "refractedmoonlight_moon",
+                anim = "idle2", anim2 = nil, isloop = true,
+                x = -55, y = 0, scale = 0.38
+            },
+            {
+                symbol = {
+                    { symbol = "swap_object", build = "refractedmoonlight_moon", file = "swap2", type = 1 },
                 },
                 fn_anim = SetAnim_player,
                 fn_click = SetAnim_player2,

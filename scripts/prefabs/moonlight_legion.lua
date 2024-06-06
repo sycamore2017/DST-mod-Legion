@@ -1013,29 +1013,33 @@ local function TrySetOwnerSymbol(inst, doer, revolt)
 end
 local function TriggerRevolt(inst, doer, doit)
     if doit then
-        if inst._task_fx == nil then
-            inst._task_fx = inst:DoPeriodicTask(0.7, function(inst)
-                local owner = inst.components.inventoryitem:GetGrandOwner() or inst
-                if owner:IsAsleep() then
-                    return
-                end
-
-                local fx = SpawnPrefab(inst._dd.fx or "refracted_l_spark_fx")
-                if fx ~= nil then
-                    if not owner:HasTag("player") then
-                        local xx, yy, zz = owner.Transform:GetWorldPosition()
-                        fx.Transform:SetPosition(xx, yy+1.4, zz)
+        if inst._dd.fxfn ~= nil then
+            inst._dd.fxfn(inst)
+        else
+            if inst._task_fx == nil then
+                inst._task_fx = inst:DoPeriodicTask(0.7, function(inst)
+                    local owner = inst.components.inventoryitem:GetGrandOwner() or inst
+                    if owner:IsAsleep() then
                         return
                     end
-                    fx.entity:SetParent(owner.entity)
-                    if inst._equip_l then
-                        fx.entity:AddFollower()
-                        fx.Follower:FollowSymbol(owner.GUID, "swap_object", 10, -80, 0)
-                    else
-                        fx.Transform:SetPosition(0, 1.4, 0)
+
+                    local fx = SpawnPrefab(inst._dd.fx or "refracted_l_spark_fx")
+                    if fx ~= nil then
+                        if not owner:HasTag("player") then
+                            local xx, yy, zz = owner.Transform:GetWorldPosition()
+                            fx.Transform:SetPosition(xx, yy+1.4, zz)
+                            return
+                        end
+                        fx.entity:SetParent(owner.entity)
+                        if inst._equip_l then
+                            fx.entity:AddFollower()
+                            fx.Follower:FollowSymbol(owner.GUID, "swap_object", 10, -80, 0)
+                        else
+                            fx.Transform:SetPosition(0, 1.4, 0)
+                        end
                     end
-                end
-            end, math.random())
+                end, math.random())
+            end
         end
 
         inst._atk = atk_rf_buff
@@ -1053,6 +1057,9 @@ local function TriggerRevolt(inst, doer, doit)
         if inst._task_fx ~= nil then
             inst._task_fx:Cancel()
             inst._task_fx = nil
+        end
+        if inst._dd.fxendfn ~= nil then
+            inst._dd.fxendfn(inst)
         end
 
         inst._atk = atk_rf
