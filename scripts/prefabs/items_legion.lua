@@ -1112,6 +1112,7 @@ end
 MakeTissue("cactus")
 MakeTissue("lureplant")
 MakeTissue("berries")
+MakeTissue("lightbulb")
 
 --------------------------------------------------------------------------
 --[[ 玩具 ]]

@@ -3001,6 +3001,7 @@ S_____WORMWOOD.DESCRIBE.TISSUE_L = "A part of a friend."
 S_NAMES.TISSUE_L_CACTUS = "Living Tissue of Cactus" --仙人掌活性组织
 S_NAMES.TISSUE_L_LUREPLANT = "Living Tissue of Lureplant" --食人花活性组织
 S_NAMES.TISSUE_L_BERRIES = "Living Tissue of Berry Bush" --浆果丛活性组织
+S_NAMES.TISSUE_L_LIGHTBULB = "Living Tissue of Light Flowers" --荧光花活性组织
 
 S_NAMES.OINTMENT_L_SIVBLOODREDUCE = "Weak Skin Ointment" --弱肤药膏
 S_RECIPE_DESC.OINTMENT_L_SIVBLOODREDUCE = "A ointment that can resist blood theft after application."

@@ -25,6 +25,7 @@ local ctlFuledItems = {
     tissue_l_cactus = { moisture = nil, nutrients = { 8, nil, 8 } },
     tissue_l_lureplant = { moisture = nil, nutrients = { 8, nil, 8 } },
     tissue_l_berries = { moisture = nil, nutrients = { 8, nil, 8 } },
+    tissue_l_lightbulb = { moisture = nil, nutrients = { 8, nil, 8 } },
 
     --【猥琐联盟】
     weisuo_coppery_kela = { moisture = nil, nutrients = { 2, 2, 2 } },

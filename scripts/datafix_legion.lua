@@ -1347,9 +1347,13 @@ local luck_data_l = {
     slurper = { --啜食者
         slurper_pelt = { chance = 0.5, cost = 0.5 }
     },
+    squid = { --鱿鱼
+        tissue_l_lightbulb = { chance = 10*_G.CONFIGS_LEGION.TISSUELIGHTBULBCHANCE }
+    },
     moonprotector_l = { moontreasure_l_bp = { chance = 0.0225, cost = 1.5, fn_spawn = OnSpawn_moontreasure_l_bp } },
     tissue_l_cactus = { tissue_l_cactus = { chance = _G.CONFIGS_LEGION.TISSUECACTUSCHANCE } },
     tissue_l_berries = { tissue_l_berries = { chance = _G.CONFIGS_LEGION.TISSUEBERRIESCHANCE } },
+    tissue_l_lightbulb = { tissue_l_lightbulb = { chance = _G.CONFIGS_LEGION.TISSUELIGHTBULBCHANCE } },
     tree_l_sparse = { --臃肿常青树
         foliageath = { chance = _G.CONFIGS_LEGION.FOLIAGEATHCHANCE }
     },

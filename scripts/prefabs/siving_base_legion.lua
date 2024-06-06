@@ -38,9 +38,10 @@ local tradableItems_siv = {
     dish_lovingrosecake = { kind = 2, value_dt = 4, value = 0.25, needall = true },
     pocketwatch_heal = { kind = 2, value_dt = 5, value = 0.5 },
     reviver = { kind = 2, value_dt = 2, value = 0.25 },
-    tissue_l_cactus = { kind = 2, value_dt = 3, value = 0.2 },
-    tissue_l_lureplant = { kind = 2, value_dt = 3, value = 0.2 },
-    tissue_l_berries = { kind = 2, value_dt = 3, value = 0.2 },
+    tissue_l_cactus = { kind = 2, value_dt = 3, value = 0.2, needall = true },
+    tissue_l_lureplant = { kind = 2, value_dt = 3, value = 0.2, needall = true },
+    tissue_l_berries = { kind = 2, value_dt = 3, value = 0.2, needall = true },
+    tissue_l_lightbulb = { kind = 2, value_dt = 3, value = 0.2, needall = true },
     -- siving_mask_gold = { kind = 2, value_dt = 1, value = 0.15 }
 }
 

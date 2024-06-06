@@ -441,6 +441,27 @@ configuration_options = L and {
         },
         default = 0.01
     },
+    {   name = "TissueLightbulbChance",
+        label = "Tissue of Light Flowers Chance",
+        hover = "Set the chance to get Living Tissue of Light Flowers.",
+        options = {
+            {description = "0.5%", data = 0.005},
+            {description = "0.8%(default)", data = 0.008},
+            {description = "1%", data = 0.01},
+            {description = "2%", data = 0.02},
+            {description = "3.5%", data = 0.035},
+            {description = "5%", data = 0.05},
+            {description = "7%", data = 0.07},
+            {description = "10%", data = 0.1},
+            {description = "15%", data = 0.15},
+            {description = "20%", data = 0.2},
+            {description = "30%", data = 0.3},
+            {description = "50%", data = 0.5},
+            {description = "80%", data = 0.8},
+            {description = "100%", data = 1.0}
+        },
+        default = 0.008
+    },
 
     {name = "Title", label = "", options = {{description = "", data = ""}}, default = ""},
     {name = "Title", label = "Flash and Crush", options = {{description = "", data = ""}}, default = ""},
@@ -978,6 +999,27 @@ configuration_options = L and {
             {description = "100%", data = 1.0}
         },
         default = 0.01
+    },
+    {   name = "TissueLightbulbChance",
+        label = "荧光花活性组织掉落几率",
+        hover = "设置荧光花活性组织的掉落几率。叮~",
+        options = {
+            {description = "0.5%", data = 0.005},
+            {description = "0.8%(默认)", data = 0.008},
+            {description = "1%", data = 0.01},
+            {description = "2%", data = 0.02},
+            {description = "3.5%", data = 0.035},
+            {description = "5%", data = 0.05},
+            {description = "7%", data = 0.07},
+            {description = "10%", data = 0.1},
+            {description = "15%", data = 0.15},
+            {description = "20%", data = 0.2},
+            {description = "30%", data = 0.3},
+            {description = "50%", data = 0.5},
+            {description = "80%", data = 0.8},
+            {description = "100%", data = 1.0}
+        },
+        default = 0.008
     },
 
     {name = "Title", label = "", options = {{description = "", data = ""}}, default = ""},

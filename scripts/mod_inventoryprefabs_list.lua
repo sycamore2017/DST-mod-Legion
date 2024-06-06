@@ -76,7 +76,7 @@ local InventoryPrefabsList = {  --每个元素的下标值为每种物品栏图�
     shyerrylog = 3,
     -- farmingdungball_item = 3, --旧物品，留作纪念
     pineananas = 3,
-    --?
+    tissue_l_lightbulb = 3,
 
     pineananas_cooked = 4,
     pineananas_seeds = 4,

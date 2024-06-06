@@ -910,7 +910,7 @@ local function pickable_onpickedfn_cactus(inst, picker, ...)
     if not TheWorld.state.israining then
         return
     end
-    if math.random() < (CONFIGS_LEGION.TISSUECACTUSCHANCE or 0.05) then
+    if math.random() < CONFIGS_LEGION.TISSUECACTUSCHANCE then
         GiveTissue(inst, picker, "tissue_l_cactus")
     end
     TheWorld:PushEvent("legion_luckydo", { inst = inst, luckkey = "tissue_l_cactus" })
@@ -935,7 +935,7 @@ local function pickable_onpickedfn_berrybush(inst, picker, ...)
     if not TheWorld.state.isdusk then
         return
     end
-    if math.random() < (CONFIGS_LEGION.TISSUEBERRIESCHANCE or 0.01) then
+    if math.random() < CONFIGS_LEGION.TISSUEBERRIESCHANCE then
         GiveTissue(inst, picker, "tissue_l_berries")
     end
     TheWorld:PushEvent("legion_luckydo", { inst = inst, luckkey = "tissue_l_berries" })
@@ -953,6 +953,44 @@ end
 AddPrefabPostInit("berrybush", FnSet_berry)
 AddPrefabPostInit("berrybush2", FnSet_berry)
 AddPrefabPostInit("berrybush_juicy", FnSet_berry)
+
+------荧光花的
+local function pickable_onpickedfn_lightflower(inst, picker, ...)
+    if inst.legion_pickable_onpickedfn ~= nil then
+        inst.legion_pickable_onpickedfn(inst, picker, ...)
+    end
+    if TheWorld.state.nightmarephase == "calm" then
+        return
+    end
+    if math.random() < CONFIGS_LEGION.TISSUELIGHTBULBCHANCE then
+        GiveTissue(inst, picker, "tissue_l_lightbulb")
+    end
+    TheWorld:PushEvent("legion_luckydo", { inst = inst, luckkey = "tissue_l_lightbulb" })
+    inst.legion_luckdoers = nil --记得清理数据
+    inst.legiontag_luckdone = nil
+    inst.legion_luckcheck = nil
+end
+local function FnSet_lightflower(inst)
+    if inst.legion_pickable_onpickedfn == nil and inst.components.pickable ~= nil then
+        inst.legion_pickable_onpickedfn = inst.components.pickable.onpickedfn
+        inst.components.pickable.onpickedfn = pickable_onpickedfn_lightflower
+    end
+end
+AddPrefabPostInit("flower_cave", FnSet_lightflower)
+AddPrefabPostInit("flower_cave_double", FnSet_lightflower)
+AddPrefabPostInit("flower_cave_triple", FnSet_lightflower)
+
+------鱿鱼有几率掉荧光花活性组织
+local function OnDeath_squid(inst, data)
+    if inst.components.lootdropper ~= nil then
+        if math.random() < 10*CONFIGS_LEGION.TISSUELIGHTBULBCHANCE then
+            inst.components.lootdropper:SpawnLootPrefab("tissue_l_lightbulb")
+        end
+    end
+end
+AddPrefabPostInit("squid", function(inst)
+    inst:ListenForEvent("death", OnDeath_squid)
+end)
 
 ------果蝇们会掉落虫翅碎片
 local function LootSetup_fruitfly(lootdropper)
