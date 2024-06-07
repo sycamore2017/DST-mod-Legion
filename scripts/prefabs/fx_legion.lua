@@ -562,6 +562,26 @@ MakeFx({ --烤肠大王：闪闪月耀
     end,
     fn_remove = nil
 })
+MakeFx2({ --月辉虹隙刃：闪闪月耀
+    name = "refracted_l_spark_moon_fx",
+    assets = {
+        Asset("ANIM", "anim/purebrilliance.zip") --官方纯粹辉煌动画
+    },
+    fn_common = function(inst)
+        inst.entity:AddFollower()
+
+        inst.AnimState:SetBank("purebrilliance")
+        inst.AnimState:SetBuild("purebrilliance")
+        inst.AnimState:PlayAnimation("idle", true)
+        inst.AnimState:HideSymbol("glow")
+        inst.AnimState:HideSymbol("pb_part")
+        inst.AnimState:HideSymbol("pb_shad")
+        inst.AnimState:HideSymbol("SparkleBit")
+        inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
+        inst.AnimState:SetLightOverride(1)
+        inst.AnimState:SetMultColour(1, 1, 1, 0.1)
+    end
+})
 MakeFx({ --月轮宝盘：光韵特效
     name = "revolvedmoonlight_fx",
     assets = {

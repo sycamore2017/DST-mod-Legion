@@ -980,7 +980,7 @@ local function SetAtk_refracted(inst)
 end
 local function SetLight_refracted(inst)
     if inst._lvl >= lvls_refracted[4] then
-        inst._light.Light:SetRadius(inst._task_fx == nil and 1 or 4)
+        inst._light.Light:SetRadius(inst._revolt_l and 4 or 1)
         EnableLight(inst._light)
     else
         DisableLight(inst._light)
@@ -1011,35 +1011,39 @@ local function TrySetOwnerSymbol(inst, doer, revolt)
         inst.AnimState:PlayAnimation("idle", true)
     end
 end
+local function DoFxTask_refracted(inst)
+    if inst._task_fx == nil then
+        inst._task_fx = inst:DoPeriodicTask(0.7, function(inst)
+            local owner = inst.components.inventoryitem:GetGrandOwner() or inst
+            if owner:IsAsleep() then
+                return
+            end
+
+            local fx = SpawnPrefab(inst._dd.fx or "refracted_l_spark_fx")
+            if fx ~= nil then
+                if not owner:HasTag("player") then
+                    local xx, yy, zz = owner.Transform:GetWorldPosition()
+                    fx.Transform:SetPosition(xx, yy+1.4, zz)
+                    return
+                end
+                fx.entity:SetParent(owner.entity)
+                if inst._equip_l then
+                    fx.entity:AddFollower()
+                    fx.Follower:FollowSymbol(owner.GUID, "swap_object", 10, -80, 0)
+                else
+                    fx.Transform:SetPosition(0, 1.4, 0)
+                end
+            end
+        end, math.random())
+    end
+end
 local function TriggerRevolt(inst, doer, doit)
+    inst._revolt_l = doit
     if doit then
         if inst._dd.fxfn ~= nil then
             inst._dd.fxfn(inst)
         else
-            if inst._task_fx == nil then
-                inst._task_fx = inst:DoPeriodicTask(0.7, function(inst)
-                    local owner = inst.components.inventoryitem:GetGrandOwner() or inst
-                    if owner:IsAsleep() then
-                        return
-                    end
-
-                    local fx = SpawnPrefab(inst._dd.fx or "refracted_l_spark_fx")
-                    if fx ~= nil then
-                        if not owner:HasTag("player") then
-                            local xx, yy, zz = owner.Transform:GetWorldPosition()
-                            fx.Transform:SetPosition(xx, yy+1.4, zz)
-                            return
-                        end
-                        fx.entity:SetParent(owner.entity)
-                        if inst._equip_l then
-                            fx.entity:AddFollower()
-                            fx.Follower:FollowSymbol(owner.GUID, "swap_object", 10, -80, 0)
-                        else
-                            fx.Transform:SetPosition(0, 1.4, 0)
-                        end
-                    end
-                end, math.random())
-            end
+            DoFxTask_refracted(inst)
         end
 
         inst._atk = atk_rf_buff
@@ -1134,10 +1138,10 @@ local function OnUnequip_refracted(inst, owner) --卸下武器时
     end
 end
 local function OnAttack_refracted(inst, owner, target)
-    if inst._task_fx == nil or inst._lvl >= lvls_refracted[10] then
+    if not inst._revolt_l or inst._lvl >= lvls_refracted[10] then
         SetCount_refracted(inst, inst._count + (inst._lvl >= lvls_refracted[12] and 0.1 or 0.05))
     end
-    if inst._lvl >= lvls_refracted[6] and inst._task_fx ~= nil then
+    if inst._lvl >= lvls_refracted[6] and inst._revolt_l then
         if target ~= nil and target:IsValid() then
             local fx = SpawnPrefab(inst._dd.fx or "refracted_l_spark_fx")
             if fx ~= nil then
@@ -1187,7 +1191,7 @@ local function OnStageUp_refracted(inst)
         inst._atk_sp_lvl = 0
         inst.components.workable:SetWorkable(false) --0级时不可以被锤
     end
-    TriggerRevolt(inst, nil, inst._task_fx ~= nil or inst.components.timer:TimerExists("moonsurge"))
+    TriggerRevolt(inst, nil, inst._revolt_l or inst.components.timer:TimerExists("moonsurge"))
 end
 local function TimerDone_refracted(inst, data)
     if data.name == "moonsurge" then
@@ -1283,8 +1287,9 @@ table.insert(prefs, Prefab("refractedmoonlight", function()
         img_tex2 = "refractedmoonlight2", img_atlas2 = "images/inventoryimages/refractedmoonlight2.xml",
         build = "refractedmoonlight", fx = "refracted_l_spark_fx"
     }
-    inst._equip_l = nil
-    inst._task_fx = nil
+    -- inst._equip_l = nil
+    -- inst._task_fx = nil
+    -- inst._revolt_l = nil
     inst._atk = atk_rf
     inst._atk_sp = atk2_rf
     inst._atk_lvl = 0
@@ -1314,6 +1319,7 @@ table.insert(prefs, Prefab("refractedmoonlight", function()
         end
     end
     inst.fn_tryRevolt = TryRevolt_refracted
+    inst.fn_doFxTask = DoFxTask_refracted
 
     inst:AddComponent("inspectable")
 

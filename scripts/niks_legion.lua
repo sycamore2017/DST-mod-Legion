@@ -453,8 +453,207 @@ local function Fn_end_revolved_pro(inst)
     inst.components.container:WidgetSetup("revolvedmoonlight_pro")
 end
 
-local function Fn_end_refractedmoonlight_moon(inst, skined)
-    
+------
+
+local function Equipped_refractedmoonlight_moon(inst, data)
+    if inst.fx_l_dec ~= nil then
+        for _, fx in pairs(inst.fx_l_dec) do
+            fx.entity:SetParent(data.owner.entity)
+            fx.Follower:FollowSymbol(data.owner.GUID, "swap_object", fx.fx_offset_x2 or 0, fx.fx_offset2 or 0, 0)
+        end
+    elseif inst.fx_l_dec2 ~= nil then
+        for _, fx in pairs(inst.fx_l_dec2) do
+            fx.entity:SetParent(data.owner.entity)
+            fx.Follower:FollowSymbol(data.owner.GUID, "swap_object", fx.fx_offset_x2 or 0, fx.fx_offset2 or 0, 0)
+        end
+    end
+end
+local function Unequipped_refractedmoonlight_moon(inst, data)
+    if inst.fx_l_dec ~= nil then
+        for _, fx in pairs(inst.fx_l_dec) do
+            fx.entity:SetParent(inst.entity)
+            fx.Follower:FollowSymbol(inst.GUID, "base", fx.fx_offset_x or 0, fx.fx_offset or 0, 0)
+        end
+    elseif inst.fx_l_dec2 ~= nil then
+        for _, fx in pairs(inst.fx_l_dec2) do
+            fx.entity:SetParent(inst.entity)
+            fx.Follower:FollowSymbol(inst.GUID, "base", fx.fx_offset_x or 0, fx.fx_offset or 0, 0)
+        end
+    end
+end
+local function FxStart2_refractedmoonlight_moon(inst)
+    if inst.fx_l_dec2 ~= nil then
+        return
+    end
+    inst.fx_l_dec2 = {}
+    local fx = SpawnPrefab("refracted_l_spark_moon_fx")
+    -- fx.fx_offset_x = 0
+    fx.fx_offset = -50
+    fx.fx_offset_x2 = 20
+    fx.fx_offset2 = -10
+    fx.AnimState:SetScale(1.2, 1.2, 1.2)
+    fx.AnimState:SetFinalOffset(2)
+    inst.fx_l_dec2[1] = fx
+
+    fx = SpawnPrefab("refracted_l_spark_moon_fx")
+    fx.fx_offset_x = 0
+    fx.fx_offset = -60
+    fx.fx_offset_x2 = 20
+    -- fx.fx_offset2 = 0
+    fx.AnimState:SetFrame(math.max(0, math.ceil(fx.AnimState:GetCurrentAnimationNumFrames()*0.5)-1))
+    fx.AnimState:SetScale(0.8, 0.8, 0.8)
+    fx.AnimState:SetFinalOffset(2)
+    inst.fx_l_dec2[2] = fx
+
+    local owner = inst.components.inventoryitem:GetGrandOwner()
+    if owner ~= nil and inst.components.equippable:IsEquipped() then
+        Equipped_refractedmoonlight_moon(inst, { owner = owner })
+    else
+        Unequipped_refractedmoonlight_moon(inst, { owner = owner })
+    end
+end
+local function FxEnd2_refractedmoonlight_moon(inst)
+    if inst.fx_l_dec2 ~= nil then
+        for _, fx in pairs(inst.fx_l_dec2) do
+            fx:Remove()
+        end
+        inst.fx_l_dec2 = nil
+    end
+end
+local function FxEnd_refractedmoonlight_moon(inst)
+    if inst.fx_l_dec ~= nil then
+        for _, fx in pairs(inst.fx_l_dec) do
+            fx:Remove()
+        end
+        inst.fx_l_dec = nil
+    end
+    if inst._task_fxdec ~= nil then
+        inst._task_fxdec:Cancel()
+        inst._task_fxdec = nil
+    end
+end
+local function FxStart_refractedmoonlight_moon(inst)
+    if inst.fx_l_dec ~= nil then
+        return
+    end
+    FxEnd2_refractedmoonlight_moon(inst)
+    local per
+    inst.fx_l_dec = {}
+
+    local fx = SpawnPrefab("refracted_l_spark_moon_fx")
+    -- fx.fx_offset_x = 0
+    fx.fx_offset = -50
+    fx.fx_offset_x2 = 20
+    fx.fx_offset2 = -10
+    fx.AnimState:SetScale(1.2, 1.2, 1.2)
+    fx.AnimState:SetFinalOffset(2)
+    inst.fx_l_dec[1] = fx
+    per = fx.AnimState:GetCurrentAnimationNumFrames()
+
+    fx = SpawnPrefab("refracted_l_spark_moon_fx")
+    fx.fx_offset_x = 0
+    fx.fx_offset = -60
+    fx.fx_offset_x2 = 20
+    -- fx.fx_offset2 = 0
+    fx.AnimState:SetFrame(math.max(0, math.ceil(per*0.5)-1))
+    fx.AnimState:SetScale(0.8, 0.8, 0.8)
+    fx.AnimState:SetFinalOffset(2)
+    inst.fx_l_dec[2] = fx
+
+    fx = SpawnPrefab("refracted_l_spark_moon_fx")
+    -- fx.fx_offset_x = 0
+    fx.fx_offset = -110
+    fx.fx_offset_x2 = 20
+    fx.fx_offset2 = -100
+    fx.AnimState:SetFrame(math.max(0, math.ceil(per*0.75)-1))
+    fx.AnimState:SetScale(2, 2, 2)
+    fx.AnimState:SetFinalOffset(-1)
+    inst.fx_l_dec[3] = fx
+
+    fx = SpawnPrefab("refracted_l_spark_moon_fx")
+    -- fx.fx_offset_x = 0
+    fx.fx_offset = -140
+    fx.fx_offset_x2 = 10
+    fx.fx_offset2 = -130
+    fx.AnimState:SetFrame(math.max(0, math.ceil(per*0.25)-1))
+    fx.AnimState:SetFinalOffset(-1)
+    inst.fx_l_dec[4] = fx
+
+    local owner = inst.components.inventoryitem:GetGrandOwner()
+    if owner ~= nil and inst.components.equippable:IsEquipped() then
+        Equipped_refractedmoonlight_moon(inst, { owner = owner })
+    else
+        Unequipped_refractedmoonlight_moon(inst, { owner = owner })
+    end
+
+    if inst._task_fxdec == nil then
+        local kind = 3
+        local colors = { 0.204, 1, 1 } --0.204=52/255
+        local uptrend = false
+        inst._task_fxdec = inst:DoPeriodicTask(0.5, function(inst)
+            if inst.fx_l_dec == nil then
+                return
+            end
+            if uptrend then --向上
+                colors[kind] = colors[kind] + 0.05
+                if colors[kind] >= 1 then
+                    colors[kind] = 1
+                    uptrend = false
+                    if kind >= 3 then
+                        kind = 1
+                    else
+                        kind = kind + 1
+                    end
+                end
+            else --向下
+                colors[kind] = colors[kind] - 0.05
+                if colors[kind] <= 0.204 then
+                    colors[kind] = 0.204
+                    uptrend = true
+                    if kind >= 3 then
+                        kind = 1
+                    else
+                        kind = kind + 1
+                    end
+                end
+            end
+            for _, ffx in pairs(inst.fx_l_dec) do
+                ffx.AnimState:SetMultColour(colors[1], colors[2], colors[3], 0.1)
+            end
+        end, 0.5)
+    end
+end
+local function Fn_start_refractedmoonlight(inst, skined)
+    if skined ~= nil then
+        inst._dd = skined.equip
+    else
+        inst._dd = {}
+        CopySkinedData(inst._dd, dd_refractedmoonlight)
+    end
+    if inst.components.timer:TimerExists("moonsurge") then
+        inst.components.inventoryitem.atlasname = inst._dd.img_atlas2
+        inst.components.inventoryitem:ChangeImageName(inst._dd.img_tex2)
+        if inst._dd.fxfn ~= nil then
+            inst._dd.fxfn(inst)
+            if inst._task_fx ~= nil then
+                inst._task_fx:Cancel()
+                inst._task_fx = nil
+            end
+        else
+            inst.fn_doFxTask(inst)
+        end
+    else
+        inst.components.inventoryitem.atlasname = inst._dd.img_atlas
+        inst.components.inventoryitem:ChangeImageName(inst._dd.img_tex)
+        if inst._task_fx ~= nil then
+            inst._task_fx:Cancel()
+            inst._task_fx = nil
+        end
+    end
+end
+local function Fn_end_refractedmoonlight_moon(inst)
+    FxEnd_refractedmoonlight_moon(inst)
+    FxEnd2_refractedmoonlight_moon(inst)
 end
 
 ------
@@ -605,21 +804,6 @@ local function Fn_start_siving_suit(inst, skined)
     else
         inst._dd = nil
         inst.suitfxoverride_l = nil
-    end
-end
-local function Fn_start_refractedmoonlight(inst, skined)
-    if skined ~= nil then
-        inst._dd = skined.equip
-    else
-        inst._dd = {}
-        CopySkinedData(inst._dd, dd_refractedmoonlight)
-    end
-    if inst.components.timer:TimerExists("moonsurge") then
-        inst.components.inventoryitem.atlasname = inst._dd.img_atlas2
-        inst.components.inventoryitem:ChangeImageName(inst._dd.img_tex2)
-    else
-        inst.components.inventoryitem.atlasname = inst._dd.img_atlas
-        inst.components.inventoryitem:ChangeImageName(inst._dd.img_tex)
     end
 end
 
@@ -3146,16 +3330,30 @@ local SKINS_LEGION = {
 		},
         string = ischinese and { name = "月辉虹隙刃" } or { name = "Lunar Gap Blade" },
         anim = { bank = nil, build = nil, anim = 0 },
-        fn_start = Fn_start_refractedmoonlight,
-        fn_end = Fn_end_refractedmoonlight_moon,
+        fn_start = function(inst, skined)
+            Fn_start_refractedmoonlight(inst, skined)
+            if not inst.components.timer:TimerExists("moonsurge") then
+                FxStart2_refractedmoonlight_moon(inst)
+            end
+            inst:ListenForEvent("equipped", Equipped_refractedmoonlight_moon)
+            inst:ListenForEvent("unequipped", Unequipped_refractedmoonlight_moon)
+            inst:ListenForEvent("onremove", Fn_end_refractedmoonlight_moon)
+        end,
+        fn_end = function(inst, skined)
+            Fn_end_refractedmoonlight_moon(inst)
+            inst:RemoveEventCallback("equipped", Equipped_refractedmoonlight_moon)
+            inst:RemoveEventCallback("unequipped", Unequipped_refractedmoonlight_moon)
+            inst:RemoveEventCallback("onremove", Fn_end_refractedmoonlight_moon)
+        end,
         equip = {
             img_tex = "refractedmoonlight_moon", img_atlas = "images/inventoryimages_skin/refractedmoonlight_moon.xml",
             img_tex2 = "refractedmoonlight_moon2", img_atlas2 = "images/inventoryimages_skin/refractedmoonlight_moon2.xml",
             build = "refractedmoonlight_moon",
-            fxfn = function(inst)
-                
-            end,
-            fxendfn = Fn_end_refractedmoonlight_moon
+            fxfn = FxStart_refractedmoonlight_moon,
+            fxendfn = function(inst)
+                FxEnd_refractedmoonlight_moon(inst)
+                FxStart2_refractedmoonlight_moon(inst)
+            end
         },
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 }
     },
