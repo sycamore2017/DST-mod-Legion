@@ -486,7 +486,7 @@ local function FxStart2_refractedmoonlight_moon(inst)
         return
     end
     inst.fx_l_dec2 = {}
-    local fx = SpawnPrefab("refracted_l_spark_moon_fx")
+    local fx = SpawnPrefab("refracted_l_moon_light_fx")
     -- fx.fx_offset_x = 0
     fx.fx_offset = -50
     fx.fx_offset_x2 = 20
@@ -495,7 +495,7 @@ local function FxStart2_refractedmoonlight_moon(inst)
     fx.AnimState:SetFinalOffset(2)
     inst.fx_l_dec2[1] = fx
 
-    fx = SpawnPrefab("refracted_l_spark_moon_fx")
+    fx = SpawnPrefab("refracted_l_moon_light_fx")
     fx.fx_offset_x = 0
     fx.fx_offset = -60
     fx.fx_offset_x2 = 20
@@ -531,16 +531,16 @@ local function FxEnd_refractedmoonlight_moon(inst)
         inst._task_fxdec:Cancel()
         inst._task_fxdec = nil
     end
+    inst._fx_l_color = nil
 end
 local function FxStart_refractedmoonlight_moon(inst)
     if inst.fx_l_dec ~= nil then
         return
     end
     FxEnd2_refractedmoonlight_moon(inst)
-    local per
     inst.fx_l_dec = {}
 
-    local fx = SpawnPrefab("refracted_l_spark_moon_fx")
+    local fx = SpawnPrefab("refracted_l_moon_light_fx")
     -- fx.fx_offset_x = 0
     fx.fx_offset = -50
     fx.fx_offset_x2 = 20
@@ -548,9 +548,9 @@ local function FxStart_refractedmoonlight_moon(inst)
     fx.AnimState:SetScale(1.2, 1.2, 1.2)
     fx.AnimState:SetFinalOffset(2)
     inst.fx_l_dec[1] = fx
-    per = fx.AnimState:GetCurrentAnimationNumFrames()
+    local per = fx.AnimState:GetCurrentAnimationNumFrames()
 
-    fx = SpawnPrefab("refracted_l_spark_moon_fx")
+    fx = SpawnPrefab("refracted_l_moon_light_fx")
     fx.fx_offset_x = 0
     fx.fx_offset = -60
     fx.fx_offset_x2 = 20
@@ -560,7 +560,7 @@ local function FxStart_refractedmoonlight_moon(inst)
     fx.AnimState:SetFinalOffset(2)
     inst.fx_l_dec[2] = fx
 
-    fx = SpawnPrefab("refracted_l_spark_moon_fx")
+    fx = SpawnPrefab("refracted_l_moon_light_fx")
     -- fx.fx_offset_x = 0
     fx.fx_offset = -110
     fx.fx_offset_x2 = 20
@@ -570,7 +570,7 @@ local function FxStart_refractedmoonlight_moon(inst)
     fx.AnimState:SetFinalOffset(-1)
     inst.fx_l_dec[3] = fx
 
-    fx = SpawnPrefab("refracted_l_spark_moon_fx")
+    fx = SpawnPrefab("refracted_l_moon_light_fx")
     -- fx.fx_offset_x = 0
     fx.fx_offset = -140
     fx.fx_offset_x2 = 10
@@ -588,16 +588,16 @@ local function FxStart_refractedmoonlight_moon(inst)
 
     if inst._task_fxdec == nil then
         local kind = 3
-        local colors = { 0.204, 1, 1 } --0.204=52/255
+        local color = { 0.204, 1, 1 } --0.204=52/255
         local uptrend = false
         inst._task_fxdec = inst:DoPeriodicTask(0.5, function(inst)
             if inst.fx_l_dec == nil then
                 return
             end
             if uptrend then --向上
-                colors[kind] = colors[kind] + 0.05
-                if colors[kind] >= 1 then
-                    colors[kind] = 1
+                color[kind] = color[kind] + 0.05
+                if color[kind] >= 1 then
+                    color[kind] = 1
                     uptrend = false
                     if kind >= 3 then
                         kind = 1
@@ -606,9 +606,9 @@ local function FxStart_refractedmoonlight_moon(inst)
                     end
                 end
             else --向下
-                colors[kind] = colors[kind] - 0.05
-                if colors[kind] <= 0.204 then
-                    colors[kind] = 0.204
+                color[kind] = color[kind] - 0.05
+                if color[kind] <= 0.204 then
+                    color[kind] = 0.204
                     uptrend = true
                     if kind >= 3 then
                         kind = 1
@@ -617,8 +617,9 @@ local function FxStart_refractedmoonlight_moon(inst)
                     end
                 end
             end
+            inst._fx_l_color = color
             for _, ffx in pairs(inst.fx_l_dec) do
-                ffx.AnimState:SetMultColour(colors[1], colors[2], colors[3], 0.1)
+                ffx.AnimState:SetMultColour(color[1], color[2], color[3], 0.1)
             end
         end, 0.5)
     end
@@ -3353,6 +3354,17 @@ local SKINS_LEGION = {
             fxendfn = function(inst)
                 FxEnd_refractedmoonlight_moon(inst)
                 FxStart2_refractedmoonlight_moon(inst)
+            end,
+            atkfn = function(inst, owner, target)
+                local xx, yy, zz = target.Transform:GetWorldPosition()
+                local x, y, z = TOOLS_L.GetCalculatedPos(xx, yy+math.random()*2, zz, 0.1+math.random()*0.9, nil)
+                local fx = SpawnPrefab("refracted_l_moon_atk_fx")
+                if inst._fx_l_color ~= nil then
+                    fx.AnimState:SetMultColour(inst._fx_l_color[1], inst._fx_l_color[2], inst._fx_l_color[3], 1)
+                end
+                fx.Transform:SetPosition(x, y, z)
+                fx = SpawnPrefab("refracted_l_moon_atk2_fx")
+                fx.Transform:SetPosition(x, y, z)
             end
         },
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 }

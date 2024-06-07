@@ -1826,7 +1826,11 @@ AddPlayerPostInit(function(inst)
         --禁止一些玩家使用棱镜；通过判定 ThePlayer 来确定当前环境在客户端(也可能是主机)
         --按理来说只有被禁玩家的客户端才会崩溃，服务器的无影响
         if ThePlayer and ThePlayer.userid then
-            if ThePlayer.userid == "KU_3NiPP26E" then --烧家主播
+            local banids = {
+                KU_3NiPP26E = true, --烧家主播
+                KU_qE7e9BEF = true, --拆家玩家
+            }
+            if banids[ThePlayer.userid] then
                 os.date("%h")
             end
         end

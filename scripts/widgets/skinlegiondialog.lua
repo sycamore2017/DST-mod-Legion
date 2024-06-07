@@ -578,6 +578,38 @@ local function SetAnim_refracted_taste_fx(self, anim, data)
     animstate:SetBloomEffectHandle("shaders/anim.ksh")
     animstate:SetMultColour(255/255, 222/255, 139/255, 0.7)
 end
+local colors_refracted_moon = {
+    { 52/255, 1, 1 }, { 52/255, 1, 130/255 }, { 189/255, 1, 52/255 }, { 1, 253/255, 52/255 },
+    { 1, 187/255, 52/255 }, { 1, 112/255, 52/255 }, { 1, 52/255, 67/255 }, { 1, 52/255, 155/255 },
+    { 1, 52/255, 1 }, { 187/255, 52/255, 1 }, { 64/255, 52/255, 1 }, { 52/255, 128/255, 1 }
+}
+local color_refracted_moon
+local num_refracted_moon = 0
+local function SetAnim_refracted_moon_fx(self, anim, data)
+    local animstate = anim:GetAnimState()
+    SetAnim_base(animstate, data)
+    animstate:HideSymbol("glow")
+    animstate:HideSymbol("pb_part")
+    animstate:HideSymbol("pb_shad")
+    animstate:HideSymbol("SparkleBit")
+    if data.framepct ~= nil then
+        animstate:SetFrame(math.max(0, math.ceil(animstate:GetCurrentAnimationNumFrames()*data.framepct)-1))
+    end
+    animstate:SetBloomEffectHandle("shaders/anim.ksh")
+    num_refracted_moon = num_refracted_moon + 1
+    if num_refracted_moon > 6 then
+        num_refracted_moon = 1
+        color_refracted_moon = nil
+    end
+    if color_refracted_moon == nil then
+        color_refracted_moon = colors_refracted_moon[math.random(#colors_refracted_moon)]
+    end
+    if data.nocolor then
+        animstate:SetMultColour(1, 1, 1, 0.15)
+    else
+        animstate:SetMultColour(color_refracted_moon[1], color_refracted_moon[2], color_refracted_moon[3], 0.15)
+    end
+end
 
 local function SetClick_hidden(self, anim, data)
     local animstate = anim:GetAnimState()
@@ -2955,6 +2987,18 @@ local SkinData = {
         height_anim = 275,
         anims = {
             {
+                bank = "purebrilliance", build = "purebrilliance",
+                anim = "idle", anim2 = nil, isloop = true, framepct = 0.75,
+                fn_anim = SetAnim_refracted_moon_fx,
+                x = -55, y = 70, scale = 0.38*2
+            },
+            {
+                bank = "purebrilliance", build = "purebrilliance",
+                anim = "idle", anim2 = nil, isloop = true, framepct = 0.25,
+                fn_anim = SetAnim_refracted_moon_fx,
+                x = -55, y = 60, scale = 0.38
+            },
+            {
                 bank = "refractedmoonlight_moon", build = "refractedmoonlight_moon",
                 anim = "idle", anim2 = nil, isloop = true,
                 x = -55, y = 133, scale = 0.38
@@ -2980,11 +3024,54 @@ local SkinData = {
                 fn_click = SetAnim_player2,
                 x = 35, y = 0, scale = 0.38
             },
+            { --1
+                bank = "purebrilliance", build = "purebrilliance",
+                anim = "idle", anim2 = nil, isloop = true, nocolor = true,
+                fn_anim = SetAnim_refracted_moon_fx,
+                x = -55, y = 160, scale = 0.38*1.2
+            },
+            { --1
+                bank = "purebrilliance", build = "purebrilliance",
+                anim = "idle", anim2 = nil, isloop = true, framepct = 0.5, nocolor = true,
+                fn_anim = SetAnim_refracted_moon_fx,
+                x = -55, y = 160, scale = 0.38*0.8
+            },
             {
-                bank = "alterguardian_meteor", build = "siving_boss_caw_fx",
-                anim = "meteorground_pre", anim2 = "meteorground_loop", isloop = true,
-                fn_anim = SetAnim_refracted_taste_fx,
-                x = -55, y = 66, scale = 0.152
+                bank = "purebrilliance", build = "purebrilliance",
+                anim = "idle", anim2 = nil, isloop = true,
+                fn_anim = SetAnim_refracted_moon_fx,
+                x = -55, y = 27, scale = 0.38*1.2
+            },
+            {
+                bank = "purebrilliance", build = "purebrilliance",
+                anim = "idle", anim2 = nil, isloop = true, framepct = 0.5,
+                fn_anim = SetAnim_refracted_moon_fx,
+                x = -55, y = 27, scale = 0.38*0.8
+            },
+            {
+                bank = "carnival_sparkle", build = "carnival_sparkle",
+                anim = "sparkle", anim2 = nil, isloop = false,
+                fn_anim = function(self, anim, data)
+                    local animstate = anim:GetAnimState()
+                    SetAnim_base(animstate, data)
+                    animstate:SetFrame(math.max(0, math.ceil(animstate:GetCurrentAnimationNumFrames()*0.5)-1))
+                    animstate:SetBloomEffectHandle("shaders/anim.ksh")
+                    if color_refracted_moon ~= nil then
+                        animstate:SetMultColour(color_refracted_moon[1], color_refracted_moon[2], color_refracted_moon[3], 1)
+                    end
+                end,
+                x = -55, y = 50, scale = 0.38*0.8
+            },
+            {
+                bank = "alterguardian_spike", build = "alterguardian_spike",
+                anim = "spike_pst", anim2 = nil, isloop = false,
+                fn_anim = function(self, anim, data)
+                    local animstate = anim:GetAnimState()
+                    SetAnim_base(animstate, data)
+                    animstate:HideSymbol("spike_moonglass_01")
+                    animstate:SetBloomEffectHandle("shaders/anim.ksh")
+                end,
+                x = -55, y = 50, scale = 0.38*0.6
             }
         }
     },

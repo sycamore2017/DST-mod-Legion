@@ -510,7 +510,6 @@ MakeFx({ --月折宝剑：月耀
         Asset("ANIM", "anim/siving_boss_caw_fx.zip"),
         Asset("ANIM", "anim/alterguardian_meteor.zip") --官方月晶石陷阱动画模板
     },
-    fn_common = nil,
     fn_anim = function(inst)
         inst.AnimState:SetBank("alterguardian_meteor")
         inst.AnimState:SetBuild("siving_boss_caw_fx")
@@ -521,8 +520,7 @@ MakeFx({ --月折宝剑：月耀
         inst.AnimState:SetScale(0.8, 0.8)
         inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
         inst.AnimState:SetFinalOffset(2)
-    end,
-    fn_remove = nil
+    end
 })
 MakeFx({ --月折宝剑：闪闪月耀
     name = "refracted_l_spark_fx",
@@ -530,7 +528,6 @@ MakeFx({ --月折宝剑：闪闪月耀
         Asset("ANIM", "anim/siving_boss_caw_fx.zip"),
         Asset("ANIM", "anim/alterguardian_meteor.zip") --官方月晶石陷阱动画模板
     },
-    fn_common = nil,
     fn_anim = function(inst)
         inst.AnimState:SetBank("alterguardian_meteor")
         inst.AnimState:SetBuild("siving_boss_caw_fx")
@@ -540,8 +537,7 @@ MakeFx({ --月折宝剑：闪闪月耀
         inst.AnimState:SetMultColour(131/255, 250/255, 230/255, 0.7)
         inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
         inst.AnimState:SetFinalOffset(2)
-    end,
-    fn_remove = nil
+    end
 })
 MakeFx({ --烤肠大王：闪闪月耀
     name = "refracted_l_spark_taste_fx",
@@ -549,7 +545,6 @@ MakeFx({ --烤肠大王：闪闪月耀
         Asset("ANIM", "anim/siving_boss_caw_fx.zip"),
         Asset("ANIM", "anim/alterguardian_meteor.zip") --官方月晶石陷阱动画模板
     },
-    fn_common = nil,
     fn_anim = function(inst)
         inst.AnimState:SetBank("alterguardian_meteor")
         inst.AnimState:SetBuild("siving_boss_caw_fx")
@@ -559,11 +554,10 @@ MakeFx({ --烤肠大王：闪闪月耀
         inst.AnimState:SetMultColour(255/255, 222/255, 139/255, 0.7)
         inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
         inst.AnimState:SetFinalOffset(2)
-    end,
-    fn_remove = nil
+    end
 })
 MakeFx2({ --月辉虹隙刃：闪闪月耀
-    name = "refracted_l_spark_moon_fx",
+    name = "refracted_l_moon_light_fx",
     assets = {
         Asset("ANIM", "anim/purebrilliance.zip") --官方纯粹辉煌动画
     },
@@ -578,8 +572,43 @@ MakeFx2({ --月辉虹隙刃：闪闪月耀
         inst.AnimState:HideSymbol("pb_shad")
         inst.AnimState:HideSymbol("SparkleBit")
         inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
-        inst.AnimState:SetLightOverride(1)
+        inst.AnimState:SetLightOverride(0.7)
         inst.AnimState:SetMultColour(1, 1, 1, 0.1)
+    end
+})
+MakeFx2({ --月辉虹隙刃：攻击特效
+    name = "refracted_l_moon_atk_fx",
+    assets = {
+        Asset("ANIM", "anim/carnival_sparkle.zip") --官方动画模板
+    },
+    fn_common = function(inst)
+        inst.AnimState:SetBank("carnival_sparkle")
+        inst.AnimState:SetBuild("carnival_sparkle")
+        inst.AnimState:PlayAnimation("sparkle")
+        inst.AnimState:SetFrame(math.max(0, math.ceil(inst.AnimState:GetCurrentAnimationNumFrames()*0.5)-1))
+        inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
+        inst.AnimState:SetLightOverride(0.7)
+        inst.AnimState:SetFinalOffset(2)
+        inst.AnimState:SetScale(0.8, 0.8, 0.8)
+    end,
+    fn_server = function(inst)
+        inst:ListenForEvent("animover", inst.Remove)
+    end
+})
+MakeFx({ --月辉虹隙刃：攻击特效2
+    name = "refracted_l_moon_atk2_fx",
+    assets = {
+        Asset("ANIM", "anim/alterguardian_spike.zip") --官方动画模板
+    },
+    fn_anim = function(inst)
+        inst.AnimState:SetBank("alterguardian_spike")
+        inst.AnimState:SetBuild("alterguardian_spike")
+        inst.AnimState:PlayAnimation("spike_pst")
+        inst.AnimState:HideSymbol("spike_moonglass_01")
+        inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
+        inst.AnimState:SetLightOverride(0.5)
+        inst.AnimState:SetFinalOffset(3)
+        inst.AnimState:SetScale(0.6, 0.6, 0.6)
     end
 })
 MakeFx({ --月轮宝盘：光韵特效

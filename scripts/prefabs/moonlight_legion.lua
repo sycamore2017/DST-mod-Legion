@@ -1143,11 +1143,15 @@ local function OnAttack_refracted(inst, owner, target)
     end
     if inst._lvl >= lvls_refracted[6] and inst._revolt_l then
         if target ~= nil and target:IsValid() then
-            local fx = SpawnPrefab(inst._dd.fx or "refracted_l_spark_fx")
-            if fx ~= nil then
-                local xx, yy, zz = target.Transform:GetWorldPosition()
-                local x, y, z = TOOLS_L.GetCalculatedPos(xx, yy, zz, 0.1+math.random()*0.9, nil)
-                fx.Transform:SetPosition(x, y+math.random()*2, z)
+            if inst._dd.atkfn ~= nil then
+                inst._dd.atkfn(inst, owner, target)
+            else
+                local fx = SpawnPrefab(inst._dd.fx or "refracted_l_spark_fx")
+                if fx ~= nil then
+                    local xx, yy, zz = target.Transform:GetWorldPosition()
+                    local x, y, z = TOOLS_L.GetCalculatedPos(xx, yy, zz, 0.1+math.random()*0.9, nil)
+                    fx.Transform:SetPosition(x, y+math.random()*2, z)
+                end
             end
         end
         if owner.components.health and owner.components.health:GetPercent() < 1 then
