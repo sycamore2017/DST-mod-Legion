@@ -18,6 +18,7 @@ table.insert(PrefabFiles, "skinprefabs_legion")
 
 local skininvs = {
     "agronssword_taste", "agronssword_taste2",
+    "agronssword_sun", "agronssword_sun2",
     "siving_turn_collector", "siving_turn_future", "siving_turn_future2",
     "refractedmoonlight_taste", "refractedmoonlight_taste2",
     "refractedmoonlight_moon", "refractedmoonlight_moon2",
@@ -657,6 +658,41 @@ local function Fn_end_refractedmoonlight_moon(inst)
     FxEnd2_refractedmoonlight_moon(inst)
 end
 
+local function FxEnd_agronssword_sun(inst)
+    if inst._task_fxdec ~= nil then
+        inst._task_fxdec:Cancel()
+        inst._task_fxdec = nil
+    end
+end
+local function Fn_start_agronssword(inst, skined)
+    if skined ~= nil then
+        inst._dd = skined.equip
+    else
+        inst._dd = {}
+        CopySkinedData(inst._dd, dd_agronssword)
+    end
+    if inst.components.timer:TimerExists("revolt") then
+        inst.components.inventoryitem.atlasname = inst._dd.img_atlas2
+        inst.components.inventoryitem:ChangeImageName(inst._dd.img_tex2)
+        if inst._dd.fxfn ~= nil then
+            inst._dd.fxfn(inst)
+            if inst._task_fx ~= nil then
+                inst._task_fx:Cancel()
+                inst._task_fx = nil
+            end
+        else
+            inst.fn_doFxTask(inst)
+        end
+    else
+        inst.components.inventoryitem.atlasname = inst._dd.img_atlas
+        inst.components.inventoryitem:ChangeImageName(inst._dd.img_tex)
+        if inst._task_fx ~= nil then
+            inst._task_fx:Cancel()
+            inst._task_fx = nil
+        end
+    end
+end
+
 ------
 
 local function SetTarget_hidden(inst)
@@ -745,21 +781,6 @@ local function Fn_start_fishhomingbait(inst, skined)
     end
     if inst.components.fishhomingbait and inst.components.fishhomingbait.oninitfn then
         inst.components.fishhomingbait.oninitfn(inst)
-    end
-end
-local function Fn_start_agronssword(inst, skined)
-    if skined ~= nil then
-        inst._dd = skined.equip
-    else
-        inst._dd = {}
-        CopySkinedData(inst._dd, dd_agronssword)
-    end
-    if inst.components.timer:TimerExists("revolt") then
-        inst.components.inventoryitem.atlasname = inst._dd.img_atlas2
-        inst.components.inventoryitem:ChangeImageName(inst._dd.img_tex2)
-    else
-        inst.components.inventoryitem.atlasname = inst._dd.img_atlas
-        inst.components.inventoryitem:ChangeImageName(inst._dd.img_tex)
     end
 end
 local function Fn_start_siving_ctlwater(inst, skined)
@@ -2016,23 +2037,6 @@ local SKINS_LEGION = {
         fn_start = Fn_start_equip,
         equip = { isshield = true, symbol = "lantern_overlay", build = "shield_l_sand_op", file = "swap_shield" },
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 }
-    },
-
-    agronssword_taste = {
-        base_prefab = "agronssword", skin_id = "637f66d88c2f781db2f7f2d0", onlyownedshow = true,
-		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
-		assets = {
-			Asset("ANIM", "anim/skin/agronssword_taste.zip")
-		},
-        string = ischinese and { name = "糖霜法棍" } or { name = "Frosting Baguette" },
-        anim = { bank = nil, build = nil, anim = 0 },
-        fn_start = Fn_start_agronssword,
-        equip = {
-            img_tex = "agronssword_taste", img_atlas = "images/inventoryimages_skin/agronssword_taste.xml",
-            img_tex2 = "agronssword_taste2", img_atlas2 = "images/inventoryimages_skin/agronssword_taste2.xml",
-            build = "agronssword_taste", fx = "agronssword_fx_taste"
-        },
-        exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 },
     },
 
     icire_rock_era = {
@@ -3307,6 +3311,58 @@ local SKINS_LEGION = {
         }
     },
 
+    agronssword_taste = {
+        base_prefab = "agronssword", skin_id = "637f66d88c2f781db2f7f2d0", onlyownedshow = true,
+		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
+		assets = {
+			Asset("ANIM", "anim/skin/agronssword_taste.zip")
+		},
+        string = ischinese and { name = "糖霜法棍" } or { name = "Frosting Baguette" },
+        anim = { bank = nil, build = nil, anim = 0 },
+        fn_start = Fn_start_agronssword,
+        equip = {
+            img_tex = "agronssword_taste", img_atlas = "images/inventoryimages_skin/agronssword_taste.xml",
+            img_tex2 = "agronssword_taste2", img_atlas2 = "images/inventoryimages_skin/agronssword_taste2.xml",
+            build = "agronssword_taste", fx = "agronssword_taste_fx"
+        },
+        exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 }
+    },
+    agronssword_sun = {
+        base_prefab = "agronssword", skin_id = "666442a0ce45c22cf18e72f2", onlyownedshow = true,
+		type = "item", skin_tags = {}, release_group = 555, rarity = raritySpecial,
+		assets = {
+			Asset("ANIM", "anim/skin/agronssword_sun.zip")
+		},
+        string = ischinese and { name = "日辉轮刺盾" } or { name = "Solar Sting Shield" },
+        anim = { bank = nil, build = nil, anim = 0 },
+        fn_start = function(inst, skined)
+            Fn_start_agronssword(inst, skined)
+        end,
+        fn_end = function(inst, skined)
+            FxEnd_agronssword_sun(inst)
+        end,
+        equip = {
+            img_tex = "agronssword_sun", img_atlas = "images/inventoryimages_skin/agronssword_sun.xml",
+            img_tex2 = "agronssword_sun2", img_atlas2 = "images/inventoryimages_skin/agronssword_sun2.xml",
+            build = "agronssword_sun", fx = "agronssword_sun_fx",
+            fxfn = function(inst)
+                if inst._task_fxdec == nil then
+                    inst._task_fxdec = inst:DoPeriodicTask(0.4, function(inst)
+                        local doer = inst.components.inventoryitem:GetGrandOwner() or inst
+                        local xx, yy, zz = doer.Transform:GetWorldPosition()
+                        local x, y, z = TOOLS_L.GetCalculatedPos(xx, yy+math.random()*2, zz, math.random()*0.5, nil)
+                        local fx = SpawnPrefab("agronssword_sun_fx")
+                        fx.Transform:SetPosition(x, y, z)
+                    end, math.random())
+                end
+            end,
+            fxendfn = function(inst)
+                FxEnd_agronssword_sun(inst)
+            end
+        },
+        exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 }
+    },
+
     refractedmoonlight_taste = {
         base_prefab = "refractedmoonlight", skin_id = "6558639aadf8ac0fd863e7f6", onlyownedshow = true,
 		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
@@ -3355,14 +3411,17 @@ local SKINS_LEGION = {
                 FxEnd_refractedmoonlight_moon(inst)
                 FxStart2_refractedmoonlight_moon(inst)
             end,
-            atkfn = function(inst, owner, target)
+            atkfn = function(inst, owner, target, notnormal)
                 local xx, yy, zz = target.Transform:GetWorldPosition()
                 local x, y, z = TOOLS_L.GetCalculatedPos(xx, yy+math.random()*2, zz, 0.1+math.random()*0.9, nil)
-                local fx = SpawnPrefab("refracted_l_moon_atk_fx")
-                if inst._fx_l_color ~= nil then
-                    fx.AnimState:SetMultColour(inst._fx_l_color[1], inst._fx_l_color[2], inst._fx_l_color[3], 1)
+                local fx
+                if notnormal then
+                    fx = SpawnPrefab("refracted_l_moon_atk_fx")
+                    if inst._fx_l_color ~= nil then
+                        fx.AnimState:SetMultColour(inst._fx_l_color[1], inst._fx_l_color[2], inst._fx_l_color[3], 1)
+                    end
+                    fx.Transform:SetPosition(x, y, z)
                 end
-                fx.Transform:SetPosition(x, y, z)
                 fx = SpawnPrefab("refracted_l_moon_atk2_fx")
                 fx.Transform:SetPosition(x, y, z)
             end
@@ -3651,7 +3710,7 @@ local SKIN_IDS_LEGION = {
     ["61627d927bbb727be174c4a0"] = { --7开得胜
         explodingfruitcake_day = true,
         plant_carrot_l_fact = true, lance_carrot_l_fact = true,
-        refractedmoonlight_moon = true,
+        refractedmoonlight_moon = true, agronssword_sun = true,
     },
     -- ["665eb8a8ce45c22cf18e6d24"] = {}, --8面玲珑
     -- ["6278c409c340bf24ab311522"] = nil --余生
@@ -3776,7 +3835,7 @@ local ls_buildmap = { --prefab，build与皮肤的对应表，用以比对动画
 
 ------皮肤排序
 local skinidxes = {
-    "refractedmoonlight_moon",
+    "agronssword_sun", "refractedmoonlight_moon",
     "chest_whitewood_craft", "chest_whitewood_big_craft", "chest_whitewood_craft2", "chest_whitewood_big_craft2",
     "siving_ctlwater_item_era", "siving_ctldirt_item_era", "siving_ctlall_item_era",
     "neverfade_thanks", "neverfadebush_thanks", "siving_derivant_thanks", "siving_derivant_thanks2",

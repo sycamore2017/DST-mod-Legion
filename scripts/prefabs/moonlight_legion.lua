@@ -1144,7 +1144,7 @@ local function OnAttack_refracted(inst, owner, target)
     if inst._lvl >= lvls_refracted[6] and inst._revolt_l then
         if target ~= nil and target:IsValid() then
             if inst._dd.atkfn ~= nil then
-                inst._dd.atkfn(inst, owner, target)
+                inst._dd.atkfn(inst, owner, target, true)
             else
                 local fx = SpawnPrefab(inst._dd.fx or "refracted_l_spark_fx")
                 if fx ~= nil then
@@ -1157,6 +1157,12 @@ local function OnAttack_refracted(inst, owner, target)
         if owner.components.health and owner.components.health:GetPercent() < 1 then
             owner.components.health:DoDelta(1.5, true, "debug_key", true, nil, true) --对旺达回血要特定原因才行
             return
+        end
+    else
+        if inst._dd.atkfn ~= nil then
+            if target ~= nil and target:IsValid() then
+                inst._dd.atkfn(inst, owner, target)
+            end
         end
     end
     if inst._atkmult == atkmult_rf_hurt then

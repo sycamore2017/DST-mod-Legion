@@ -437,52 +437,72 @@ MakeFx({ --落薇剪：一剪没
 MakeFx({ --艾力冈的剑：燃血
     name = "agronssword_fx",
     assets = {
-        Asset("ANIM", "anim/lavaarena_boarrior_fx.zip"), --需要官方的动画模板
-        Asset("ANIM", "anim/agronssword_fx.zip"),
+        Asset("ANIM", "anim/lavaarena_boarrior_fx.zip"), --官方的动画模板
+        Asset("ANIM", "anim/agronssword_fx.zip")
     },
-    fn_common = nil,
     fn_anim = function(inst)
         inst.AnimState:SetBank("lavaarena_boarrior_fx")
         inst.AnimState:SetBuild("agronssword_fx")
-        inst.AnimState:PlayAnimation("ground_hit_1")
+        inst.AnimState:PlayAnimation("ground_hit_"..tostring(math.random(2)))
         inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
+        inst.AnimState:SetLightOverride(0.5)
         inst.AnimState:SetFinalOffset(1)
-    end,
-    fn_remove = nil,
+    end
 })
 MakeFx({ --糖霜法棍：燃血
-    name = "agronssword_fx_taste",
+    name = "agronssword_taste_fx",
     assets = {
-        Asset("ANIM", "anim/lavaarena_boarrior_fx.zip"), --需要官方的动画模板
+        Asset("ANIM", "anim/lavaarena_boarrior_fx.zip"), --官方的动画模板
         Asset("ANIM", "anim/skin/agronssword_fx_taste.zip")
     },
-    fn_common = nil,
     fn_anim = function(inst)
         inst.AnimState:SetBank("lavaarena_boarrior_fx")
         inst.AnimState:SetBuild("agronssword_fx_taste")
-        inst.AnimState:PlayAnimation("ground_hit_1")
+        inst.AnimState:PlayAnimation("ground_hit_"..tostring(math.random(2)))
         inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
+        inst.AnimState:SetLightOverride(0.5)
         inst.AnimState:SetFinalOffset(1)
-    end,
-    fn_remove = nil,
+    end
+})
+MakeFx({ --日辉轮刺盾：燃血
+    name = "agronssword_sun_fx",
+    assets = {
+        Asset("ANIM", "anim/shadowrift_portal.zip") --官方的动画模板
+    },
+    fn_anim = function(inst)
+        inst.AnimState:SetBank("shadowrift_portal")
+        inst.AnimState:SetBuild("shadowrift_portal")
+        local siz = math.random(3)
+        inst.AnimState:PlayAnimation("particle_"..tostring(siz).."_loop")
+        if siz == 2 then
+            siz = 0.8
+        elseif siz == 3 then
+            siz = 0.6
+        else
+            siz = 1.3
+        end
+        inst.AnimState:SetScale(siz, siz)
+        inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
+        inst.AnimState:SetLightOverride(0.5)
+        inst.AnimState:SetFinalOffset(1)
+    end
 })
 
 MakeFx({ --月折宝剑：涌动
     name = "refracted_l_wave_fx",
     assets = {
-        Asset("ANIM", "anim/lavaarena_boarrior_fx.zip"),    --需要官方的动画模板
+        Asset("ANIM", "anim/lavaarena_boarrior_fx.zip"), --需要官方的动画模板
         Asset("ANIM", "anim/refractedmoonlight_fx.zip")
     },
-    fn_common = nil,
     fn_anim = function(inst)
         inst.AnimState:SetBank("lavaarena_boarrior_fx")
         inst.AnimState:SetBuild("refractedmoonlight_fx")
         inst.AnimState:PlayAnimation("ground_hit_1")
         inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
         inst.AnimState:SetScale(1.5, 1.5)
+        inst.AnimState:SetLightOverride(0.5)
         inst.AnimState:SetFinalOffset(1)
-    end,
-    fn_remove = nil,
+    end
 })
 MakeFx({ --月折宝剑：月耀注入
     name = "refracted_l_skylight_fx",
@@ -500,6 +520,7 @@ MakeFx({ --月折宝剑：月耀注入
         inst.AnimState:OverrideSymbol("blue_splode", "alterguardian_meteor", "blue_splode")
         inst.AnimState:SetScale(0.8, 0.8)
         inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
+        inst.AnimState:SetLightOverride(0.5)
         inst.AnimState:SetFinalOffset(2)
     end,
     fn_remove = nil
@@ -519,6 +540,7 @@ MakeFx({ --月折宝剑：月耀
         -- inst.AnimState:OverrideSymbol("blue_splode", "alterguardian_meteor", "blue_splode")
         inst.AnimState:SetScale(0.8, 0.8)
         inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
+        inst.AnimState:SetLightOverride(0.5)
         inst.AnimState:SetFinalOffset(2)
     end
 })
@@ -536,6 +558,7 @@ MakeFx({ --月折宝剑：闪闪月耀
         inst.AnimState:SetScale(0.4, 0.4)
         inst.AnimState:SetMultColour(131/255, 250/255, 230/255, 0.7)
         inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
+        inst.AnimState:SetLightOverride(0.5)
         inst.AnimState:SetFinalOffset(2)
     end
 })
@@ -553,6 +576,7 @@ MakeFx({ --烤肠大王：闪闪月耀
         inst.AnimState:SetScale(0.4, 0.4)
         inst.AnimState:SetMultColour(255/255, 222/255, 139/255, 0.7)
         inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
+        inst.AnimState:SetLightOverride(0.5)
         inst.AnimState:SetFinalOffset(2)
     end
 })
@@ -617,7 +641,6 @@ MakeFx({ --月轮宝盘：光韵特效
         Asset("ANIM", "anim/terrariumchest_fx.zip"), --官方盒中泰拉箱子的特效
         Asset("ANIM", "anim/revolvedmoonlight_fx.zip")
     },
-    fn_common = nil,
     fn_anim = function(inst)
         inst.AnimState:SetBank("terrariumchest_fx")
         inst.AnimState:SetBuild("revolvedmoonlight_fx")
@@ -629,9 +652,9 @@ MakeFx({ --月轮宝盘：光韵特效
         end
         inst.AnimState:SetScale(1.2, 1.2)
         inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
+        inst.AnimState:SetLightOverride(0.5)
         inst.AnimState:SetFinalOffset(3)
-    end,
-    fn_remove = nil,
+    end
 })
 
 ------

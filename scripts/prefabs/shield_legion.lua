@@ -491,8 +491,10 @@ local function OnAttack_agron(inst, owner, target)
     if
         owner.components.health ~= nil and owner.components.health:GetPercent() > 0.3
     then
+        local xx, yy, zz = owner.Transform:GetWorldPosition()
+        local x, y, z = TOOLS_L.GetCalculatedPos(xx, yy+math.random()*0.5, zz, math.random()*0.5, nil)
         local fx = SpawnPrefab(inst._dd.fx or "agronssword_fx") --燃血特效
-        fx.Transform:SetPosition(owner.Transform:GetWorldPosition())
+        fx.Transform:SetPosition(x, y, z)
         owner.components.health:DoDelta(-1.5, true, "agronssword")
     end
 end
@@ -528,8 +530,20 @@ local function TrySetOwnerSymbol(inst, doer, revolt)
         inst.AnimState:PlayAnimation("idle")
     end
 end
-local function DoRevolt(inst, doer)
+local function DoFxTask_agron(inst)
     if inst._task_fx == nil then
+        inst._task_fx = inst:DoPeriodicTask(0.25, function(inst)
+            local doer = inst.components.inventoryitem:GetGrandOwner() or inst
+            local xx, yy, zz = doer.Transform:GetWorldPosition()
+            local x, y, z = TOOLS_L.GetCalculatedPos(xx, yy+math.random()*0.5, zz, math.random()*0.5, nil)
+            local fx = SpawnPrefab(inst._dd.fx or "agronssword_fx")
+            fx.Transform:SetPosition(x, y, z)
+        end, math.random())
+    end
+end
+local function DoRevolt(inst, doer)
+    if not inst._revolt_l then
+        inst._revolt_l = true
         inst._basedamage = damage_sword
         inst.components.weapon:SetDamage(damage_sword)
         inst.components.armor:SetAbsorption(absorb_sword)
@@ -540,10 +554,11 @@ local function DoRevolt(inst, doer)
 
         TrySetOwnerSymbol(inst, doer, true)
 
-        inst._task_fx = inst:DoPeriodicTask(0.25, function(inst)
-            local fx = SpawnPrefab(inst._dd.fx or "agronssword_fx")
-            fx.Transform:SetPosition((inst.components.inventoryitem:GetGrandOwner() or inst).Transform:GetWorldPosition())
-        end, math.random())
+        if inst._dd.fxfn ~= nil then
+            inst._dd.fxfn(inst)
+        else
+            DoFxTask_agron(inst)
+        end
     end
 end
 local function OnLoad_agron(inst, data)
@@ -553,6 +568,7 @@ local function OnLoad_agron(inst, data)
 end
 local function TimerDone_agron(inst, data)
     if data.name == "revolt" then
+        inst._revolt_l = nil
         inst._basedamage = damage_shield
         inst.components.weapon:SetDamage(damage_shield)
         inst.components.armor:SetAbsorption(absorb_shield)
@@ -566,6 +582,9 @@ local function TimerDone_agron(inst, data)
         if inst._task_fx ~= nil then
             inst._task_fx:Cancel()
             inst._task_fx = nil
+        end
+        if inst._dd.fxendfn ~= nil then
+            inst._dd.fxendfn(inst)
         end
     end
 end
@@ -609,7 +628,7 @@ local function ShieldAtk_agron(inst, doer, attacker, data)
     --先加攻击力，这样输出高一点
     local timeleft = inst.components.timer:GetTimeLeft("revolt") or 0
     inst.components.timer:StopTimer("revolt")
-    inst.components.timer:StartTimer("revolt", math.min(120, timeleft+10))
+    inst.components.timer:StartTimer("revolt", math.min(120, timeleft+100))
     DoRevolt(inst, doer)
 
     Counterattack_base(inst, doer, attacker, data, 8, 1.3)
@@ -649,8 +668,10 @@ MakeShield({
             img_tex2 = "agronssword2", img_atlas2 = "images/inventoryimages/agronssword2.xml",
             build = "agronssword", fx = "agronssword_fx"
         }
-        inst._task_fx = nil
+        -- inst._task_fx = nil
+        -- inst._revolt_l = nil
         inst._basedamage = damage_shield
+        inst.fn_doFxTask = DoFxTask_agron
         inst.fn_onHealthDelta = function(owner, data)
             local percent = 1.0
             if data and data.newpercent then
