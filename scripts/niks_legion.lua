@@ -664,6 +664,32 @@ local function FxEnd_agronssword_sun(inst)
         inst._task_fxdec = nil
     end
 end
+local function FxStart_agronssword_sun(inst)
+    if inst._task_fxdec == nil then
+        inst._task_fxdec = inst:DoPeriodicTask(0.4, function(inst)
+            local doer = inst.components.inventoryitem:GetGrandOwner() or inst
+            local xx, yy, zz = doer.Transform:GetWorldPosition()
+            local x, y, z = TOOLS_L.GetCalculatedPos(xx, yy+math.random()*2, zz, math.random()*0.5, nil)
+            local fx = SpawnPrefab("agronssword_sun_fx")
+            fx.Transform:SetPosition(x, y, z)
+        end, math.random())
+    end
+end
+local function CATKFxFn_agronssword_sun(cpt, doer)
+    local fx = SpawnPrefab("agronssword_sun_catk2_fx")
+    fx.entity:SetParent(doer.entity)
+    fx.entity:AddFollower()
+    fx.Follower:FollowSymbol(doer.GUID, "lantern_overlay", 10, -15, 0)
+    fx = SpawnPrefab("agronssword_sun_catk_fx")
+    fx.entity:SetParent(doer.entity)
+    fx.entity:AddFollower()
+    fx.Follower:FollowSymbol(doer.GUID, "lantern_overlay", 20, 30, 0)
+    doer.SoundEmitter:PlaySound("dontstarve/wilson/fireball_explo", nil, 0.7)
+end
+local function CATKImpactFxFn_agronssword_sun(inst, doer, attacker)
+    local snap = SpawnPrefab("agronssword_sun_catk3_fx")
+    return snap
+end
 local function Fn_start_agronssword(inst, skined)
     if skined ~= nil then
         inst._dd = skined.equip
@@ -3337,28 +3363,24 @@ local SKINS_LEGION = {
         anim = { bank = nil, build = nil, anim = 0 },
         fn_start = function(inst, skined)
             Fn_start_agronssword(inst, skined)
+            inst._dd_fxfn = CATKImpactFxFn_agronssword_sun
+            if inst.components.shieldlegion ~= nil then
+                inst.components.shieldlegion._catkfxfn = CATKFxFn_agronssword_sun
+            end
         end,
         fn_end = function(inst, skined)
             FxEnd_agronssword_sun(inst)
+            inst._dd_fxfn = nil
+            if inst.components.shieldlegion ~= nil then
+                inst.components.shieldlegion._catkfxfn = nil
+            end
         end,
         equip = {
             img_tex = "agronssword_sun", img_atlas = "images/inventoryimages_skin/agronssword_sun.xml",
             img_tex2 = "agronssword_sun2", img_atlas2 = "images/inventoryimages_skin/agronssword_sun2.xml",
             build = "agronssword_sun", fx = "agronssword_sun_fx",
-            fxfn = function(inst)
-                if inst._task_fxdec == nil then
-                    inst._task_fxdec = inst:DoPeriodicTask(0.4, function(inst)
-                        local doer = inst.components.inventoryitem:GetGrandOwner() or inst
-                        local xx, yy, zz = doer.Transform:GetWorldPosition()
-                        local x, y, z = TOOLS_L.GetCalculatedPos(xx, yy+math.random()*2, zz, math.random()*0.5, nil)
-                        local fx = SpawnPrefab("agronssword_sun_fx")
-                        fx.Transform:SetPosition(x, y, z)
-                    end, math.random())
-                end
-            end,
-            fxendfn = function(inst)
-                FxEnd_agronssword_sun(inst)
-            end
+            fxfn = FxStart_agronssword_sun,
+            fxendfn = FxEnd_agronssword_sun
         },
         exchangefx = { prefab = nil, offset_y = nil, scale = 0.8 }
     },

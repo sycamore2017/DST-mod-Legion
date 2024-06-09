@@ -167,8 +167,11 @@ function ShieldLegion:GetAttacked(doer, attacker, damage, weapon, spdamage, stim
             self.issuccess = true
             doer.shield_l_success = true --让玩家实体也能直接识别是否处于盾反成功中
         end
-
-        self:SetFollowedFx(doer, self.fxdata) --盾保特效
+        if self._catkfxfn ~= nil then
+            self._catkfxfn(self, doer)
+        else
+            self:SetFollowedFx(doer, self.fxdata) --盾保特效
+        end
         DoShieldSound(doer, self.inst.hurtsoundoverride)
         self:ArmorTakeDamage(doer, attacker, data)
         return true

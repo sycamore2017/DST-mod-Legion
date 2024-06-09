@@ -188,37 +188,20 @@ end
 ---------------
 ---------------
 
--- MakeFx({ --举盾：护盾图标
---     name = "shield_protect_l_fx",
---     assets = {
---         Asset("ANIM", "anim/lavaarena_sunder_armor.zip"), --官方的熔炉破甲buff特效动画
---     },
---     fn_common = nil,
---     fn_anim = function(inst)
---         inst.AnimState:SetBank("lavaarena_sunder_armor")
---         inst.AnimState:SetBuild("lavaarena_sunder_armor")
---         inst.AnimState:PlayAnimation("pre")
---         inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
---         inst.AnimState:SetFinalOffset(3)
---         inst.AnimState:SetScale(0.7, 0.7)
---     end,
---     fn_remove = nil,
--- })
 MakeFx({ --举盾：盾反成功特效
     name = "shield_attack_l_fx",
     assets = {
-        Asset("ANIM", "anim/lavaarena_beetletaur_fx.zip"), --官方的熔炉甲虫猪防御特效动画
+        Asset("ANIM", "anim/lavaarena_beetletaur_fx.zip") --官方的熔炉甲虫猪防御特效动画
     },
-    fn_common = nil,
     fn_anim = function(inst)
         inst.AnimState:SetBank("lavaarena_beetletaur_fx")
         inst.AnimState:SetBuild("lavaarena_beetletaur_fx")
         inst.AnimState:PlayAnimation("defend_fx")
         inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
         inst.AnimState:SetFinalOffset(3)
+        inst.AnimState:SetLightOverride(0.2)
         inst.AnimState:SetScale(0.6, 0.6)
-    end,
-    fn_remove = nil,
+    end
 })
 
 MakeFx({ --玫瑰酥：零散的气氛烘托特效
@@ -345,7 +328,7 @@ MakeFx({ --庇佑蝴蝶：护佑
         inst.AnimState:SetBuild("buff_l_butterflybless_fx")
         inst.AnimState:PlayAnimation("ground_hit_"..tostring(math.random(3)))
         inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
-        inst.AnimState:SetLightOverride(.2)
+        inst.AnimState:SetLightOverride(0.2)
         inst.AnimState:SetFinalOffset(3)
         inst.AnimState:SetScale(1.2, 1.2, 1.2)
     end
@@ -445,7 +428,7 @@ MakeFx({ --艾力冈的剑：燃血
         inst.AnimState:SetBuild("agronssword_fx")
         inst.AnimState:PlayAnimation("ground_hit_"..tostring(math.random(2)))
         inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
-        inst.AnimState:SetLightOverride(0.5)
+        inst.AnimState:SetLightOverride(0.2)
         inst.AnimState:SetFinalOffset(1)
     end
 })
@@ -453,38 +436,79 @@ MakeFx({ --糖霜法棍：燃血
     name = "agronssword_taste_fx",
     assets = {
         Asset("ANIM", "anim/lavaarena_boarrior_fx.zip"), --官方的动画模板
-        Asset("ANIM", "anim/skin/agronssword_fx_taste.zip")
+        Asset("ANIM", "anim/skin/agronssword_taste_fx.zip")
     },
     fn_anim = function(inst)
         inst.AnimState:SetBank("lavaarena_boarrior_fx")
-        inst.AnimState:SetBuild("agronssword_fx_taste")
+        inst.AnimState:SetBuild("agronssword_taste_fx")
         inst.AnimState:PlayAnimation("ground_hit_"..tostring(math.random(2)))
         inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
-        inst.AnimState:SetLightOverride(0.5)
+        inst.AnimState:SetLightOverride(0.2)
         inst.AnimState:SetFinalOffset(1)
     end
 })
 MakeFx({ --日辉轮刺盾：燃血
     name = "agronssword_sun_fx",
     assets = {
-        Asset("ANIM", "anim/shadowrift_portal.zip") --官方的动画模板
+        Asset("ANIM", "anim/shadowrift_portal.zip"), --官方的动画模板
+        Asset("ANIM", "anim/skin/agronssword_sun_fx.zip")
     },
     fn_anim = function(inst)
         inst.AnimState:SetBank("shadowrift_portal")
-        inst.AnimState:SetBuild("shadowrift_portal")
-        local siz = math.random(3)
-        inst.AnimState:PlayAnimation("particle_"..tostring(siz).."_loop")
-        if siz == 2 then
-            siz = 0.8
-        elseif siz == 3 then
-            siz = 0.6
-        else
-            siz = 1.3
-        end
-        inst.AnimState:SetScale(siz, siz)
+        inst.AnimState:SetBuild("agronssword_sun_fx")
+        inst.AnimState:PlayAnimation("particle_3_loop") --和particle_1_loop、particle_2_loop是一样的，大小不同而已
+        inst.AnimState:SetScale(0.5, 0.5+math.random()*0.3)
         inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
-        inst.AnimState:SetLightOverride(0.5)
+        inst.AnimState:SetLightOverride(0.2)
         inst.AnimState:SetFinalOffset(1)
+    end
+})
+MakeFx({ --日辉轮刺盾：盾反成功特效
+    name = "agronssword_sun_catk_fx",
+    assets = {
+        Asset("ANIM", "anim/fx_dock_crackleandpop.zip") --官方动画
+    },
+    fn_anim = function(inst)
+        inst.AnimState:SetBank("fx_dock_crackleandpop")
+        inst.AnimState:SetBuild("fx_dock_crackleandpop")
+        inst.AnimState:PlayAnimation("pop")
+        inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
+        inst.AnimState:SetFinalOffset(3)
+        inst.AnimState:SetLightOverride(0.2)
+        inst.AnimState:SetScale(0.5, 0.5)
+    end
+})
+MakeFx({ --日辉轮刺盾：盾反成功火纹特效
+    name = "agronssword_sun_catk2_fx",
+    assets = {
+        Asset("ANIM", "anim/deer_fire_charge.zip") --官方动画
+    },
+    fn_anim = function(inst)
+        inst.AnimState:SetBank("deer_fire_charge")
+        inst.AnimState:SetBuild("deer_fire_charge")
+        inst.AnimState:PlayAnimation("blast")
+        inst.AnimState:HideSymbol("fire_puff_fx")
+        inst.AnimState:HideSymbol("glow_")
+        inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
+        inst.AnimState:SetMultColour(255/255, 122/255, 113/255, 0.8)
+        inst.AnimState:SetFinalOffset(3)
+        inst.AnimState:SetLightOverride(0.2)
+        inst.AnimState:SetScale(0.8, 0.8)
+    end
+})
+MakeFx({ --日辉轮刺盾：盾反成功敌人特效
+    name = "agronssword_sun_catk3_fx",
+    assets = {
+        Asset("ANIM", "anim/fx_dock_crackleandpop.zip") --官方动画
+    },
+    fn_anim = function(inst)
+        inst.AnimState:SetBank("fx_dock_crackleandpop")
+        inst.AnimState:SetBuild("fx_dock_crackleandpop")
+        inst.AnimState:PlayAnimation("pop")
+        inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
+        inst.AnimState:SetFinalOffset(3)
+        inst.AnimState:SetLightOverride(0.2)
+        inst.AnimState:SetScale(0.8, 0.8)
     end
 })
 
@@ -558,7 +582,7 @@ MakeFx({ --月折宝剑：闪闪月耀
         inst.AnimState:SetScale(0.4, 0.4)
         inst.AnimState:SetMultColour(131/255, 250/255, 230/255, 0.7)
         inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
-        inst.AnimState:SetLightOverride(0.5)
+        inst.AnimState:SetLightOverride(0.2)
         inst.AnimState:SetFinalOffset(2)
     end
 })
@@ -576,7 +600,7 @@ MakeFx({ --烤肠大王：闪闪月耀
         inst.AnimState:SetScale(0.4, 0.4)
         inst.AnimState:SetMultColour(255/255, 222/255, 139/255, 0.7)
         inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
-        inst.AnimState:SetLightOverride(0.5)
+        inst.AnimState:SetLightOverride(0.2)
         inst.AnimState:SetFinalOffset(2)
     end
 })
@@ -652,7 +676,7 @@ MakeFx({ --月轮宝盘：光韵特效
         end
         inst.AnimState:SetScale(1.2, 1.2)
         inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
-        inst.AnimState:SetLightOverride(0.5)
+        inst.AnimState:SetLightOverride(0.2)
         inst.AnimState:SetFinalOffset(3)
     end
 })

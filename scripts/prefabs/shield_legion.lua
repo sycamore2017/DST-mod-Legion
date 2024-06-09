@@ -21,10 +21,14 @@ local function GetAssets(name, other)
 end
 
 local function Counterattack_base(inst, doer, attacker, data, range, atk)
-    local snap = SpawnPrefab("impact")
     local x, y, z = doer.Transform:GetWorldPosition()
-    snap.Transform:SetScale(2, 2, 2)
-
+    local snap
+    if inst._dd_fxfn ~= nil then
+        snap = inst._dd_fxfn(inst, doer, attacker)
+    else
+        snap = SpawnPrefab("impact")
+        snap.Transform:SetScale(1.5, 1.5, 1.5)
+    end
     if inst.components.shieldlegion:Counterattack(doer, attacker, data, range, atk) then
         local x1, y1, z1 = attacker.Transform:GetWorldPosition()
         local angle = -math.atan2(z1 - z, x1 - x)
