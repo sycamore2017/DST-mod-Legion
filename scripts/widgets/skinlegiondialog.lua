@@ -677,6 +677,23 @@ local function SetClick_plant_carrot(self, anim, data)
     end
 end
 
+local function SetAnim_agronssword_sun_catk2_fx(self, anim, data)
+    local animstate = anim:GetAnimState()
+    SetAnim_base(animstate, data)
+    animstate:HideSymbol("fire_puff_fx")
+    animstate:HideSymbol("glow_")
+    animstate:SetBloomEffectHandle("shaders/anim.ksh")
+    animstate:SetMultColour(255/255, 122/255, 113/255, 0.8)
+end
+local function SetAnim_agronssword_fx(self, anim, data)
+    local animstate = anim:GetAnimState()
+    SetAnim_base(animstate, data)
+    if data.framepct ~= nil then
+        animstate:SetFrame(math.max(0, math.ceil(animstate:GetCurrentAnimationNumFrames()*data.framepct)-1))
+    end
+    animstate:SetBloomEffectHandle("shaders/anim.ksh")
+end
+
 local width_skininfo = 260
 local SkinData = {
     rosebush_marble = {
@@ -2044,10 +2061,40 @@ local SkinData = {
                 fn_click = SetAnim_player2,
                 x = 35, y = 130, scale = 0.38
             },
+            { --物1
+                bank = "lavaarena_boarrior_fx", build = "agronssword_taste_fx",
+                anim = "ground_hit_"..tostring(math.random(2)), anim2 = nil, isloop = true, framepct = 0.75,
+                fn_anim = SetAnim_agronssword_fx,
+                x = -55, y = 12, scale = 0.38
+            },
+            { --人1
+                bank = "lavaarena_boarrior_fx", build = "agronssword_taste_fx",
+                anim = "ground_hit_"..tostring(math.random(2)), anim2 = nil, isloop = true, framepct = 0.5,
+                fn_anim = SetAnim_agronssword_fx,
+                x = 35, y = 12, scale = 0.38
+            },
             {
                 bank = "agronssword_taste", build = "agronssword_taste",
                 anim = "idle2", anim2 = nil, isloop = false,
                 x = -55, y = 12, scale = 0.38
+            },
+            { --物2
+                bank = "lavaarena_boarrior_fx", build = "agronssword_taste_fx",
+                anim = "ground_hit_"..tostring(math.random(2)), anim2 = nil, isloop = true,
+                fn_anim = SetAnim_agronssword_fx,
+                x = -60, y = 12, scale = 0.38
+            },
+            { --物3
+                bank = "lavaarena_boarrior_fx", build = "agronssword_taste_fx",
+                anim = "ground_hit_"..tostring(math.random(2)), anim2 = nil, isloop = true, framepct = 0.5,
+                fn_anim = SetAnim_agronssword_fx,
+                x = -50, y = 17, scale = 0.38
+            },
+            { --物4
+                bank = "lavaarena_boarrior_fx", build = "agronssword_taste_fx",
+                anim = "ground_hit_"..tostring(math.random(2)), anim2 = nil, isloop = true, framepct = 0.25,
+                fn_anim = SetAnim_agronssword_fx,
+                x = -65, y = 6, scale = 0.38
             },
             {
                 symbol = {
@@ -2057,15 +2104,131 @@ local SkinData = {
                 fn_click = SetAnim_player2,
                 x = 35, y = 0, scale = 0.38
             },
+            { --人2
+                bank = "lavaarena_boarrior_fx", build = "agronssword_taste_fx",
+                anim = "ground_hit_"..tostring(math.random(2)), anim2 = nil, isloop = true, framepct = 0.75,
+                fn_anim = SetAnim_agronssword_fx,
+                x = 40, y = 12, scale = 0.38
+            },
+            { --人3
+                bank = "lavaarena_boarrior_fx", build = "agronssword_taste_fx",
+                anim = "ground_hit_"..tostring(math.random(2)), anim2 = nil, isloop = true,
+                fn_anim = SetAnim_agronssword_fx,
+                x = 30, y = 6, scale = 0.38
+            },
+            { --人4
+                bank = "lavaarena_boarrior_fx", build = "agronssword_taste_fx",
+                anim = "ground_hit_"..tostring(math.random(2)), anim2 = nil, isloop = true, framepct = 0.25,
+                fn_anim = SetAnim_agronssword_fx,
+                x = 25, y = 12, scale = 0.38
+            },
             {
                 bank = "lavaarena_beetletaur_fx", build = "lavaarena_beetletaur_fx",
                 anim = "defend_fx", anim2 = nil, isloop = false,
-                x = -55, y = 165, scale = 0.22
+                x = -55, y = 170, scale = 0.22
             },
             {
                 bank = "lavaarena_beetletaur_fx", build = "lavaarena_beetletaur_fx",
                 anim = "defend_fx", anim2 = nil, isloop = false,
                 x = -55, y = 50, scale = 0.22
+            }
+        }
+    },
+    agronssword_sun = {
+        string = ischinese and {
+            collection = "SUNMOON", access = "SPECIAL",
+            descitem = "解锁\"艾力冈的剑\"的皮肤。",
+            description = ""
+        } or {
+            collection = "SUNMOON", access = "SPECIAL",
+            descitem = "Unlock \"Agron's Sword\" skin.",
+            description = "The story was not translated."
+        },
+        height_anim = 265,
+        anims = {
+            {
+                bank = "agronssword_sun", build = "agronssword_sun",
+                anim = "idle", anim2 = nil, isloop = false,
+                x = -55, y = 135, scale = 0.38
+            },
+            {
+                symbol = {
+                    { symbol = "lantern_overlay", build = "agronssword_sun", file = "swap1", type = 1 },
+                },
+                fn_anim = SetAnim_player,
+                fn_click = SetAnim_player2,
+                x = 35, y = 130, scale = 0.38
+            },
+            { --物1
+                bank = "shadowrift_portal", build = "agronssword_sun_fx",
+                anim = "particle_3_loop", anim2 = nil, isloop = true, framepct = 0.6,
+                fn_anim = SetAnim_agronssword_fx,
+                x = -55, y = 60, scale = 0.38*0.4
+            },
+            { --人1
+                bank = "shadowrift_portal", build = "agronssword_sun_fx",
+                anim = "particle_3_loop", anim2 = nil, isloop = true, framepct = 0.5,
+                fn_anim = SetAnim_agronssword_fx,
+                x = 35, y = 60, scale = 0.38*0.6
+            },
+            {
+                bank = "agronssword_sun", build = "agronssword_sun",
+                anim = "idle2", anim2 = nil, isloop = false,
+                x = -55, y = 2, scale = 0.38
+            },
+            { --物2
+                bank = "shadowrift_portal", build = "agronssword_sun_fx",
+                anim = "particle_3_loop", anim2 = nil, isloop = true,
+                fn_anim = SetAnim_agronssword_fx,
+                x = -55, y = 40, scale = 0.38*0.5
+            },
+            { --物3
+                bank = "shadowrift_portal", build = "agronssword_sun_fx",
+                anim = "particle_3_loop", anim2 = nil, isloop = true, framepct = 0.5,
+                fn_anim = SetAnim_agronssword_fx,
+                x = -55, y = 10, scale = 0.38*0.4
+            },
+            {
+                symbol = {
+                    { symbol = "lantern_overlay", build = "agronssword_sun", file = "swap2", type = 1 },
+                },
+                fn_anim = SetAnim_player,
+                fn_click = SetAnim_player2,
+                x = 35, y = 0, scale = 0.38
+            },
+            { --人2
+                bank = "shadowrift_portal", build = "agronssword_sun_fx",
+                anim = "particle_3_loop", anim2 = nil, isloop = true, framepct = 0.6,
+                fn_anim = SetAnim_agronssword_fx,
+                x = 35, y = 10, scale = 0.38*0.5
+            },
+            { --人3
+                bank = "shadowrift_portal", build = "agronssword_sun_fx",
+                anim = "particle_3_loop", anim2 = nil, isloop = true,
+                fn_anim = SetAnim_agronssword_fx,
+                x = 35, y = 40, scale = 0.38*0.6
+            },
+            {
+                bank = "deer_fire_charge", build = "deer_fire_charge",
+                anim = "blast", anim2 = nil, isloop = false,
+                fn_anim = SetAnim_agronssword_sun_catk2_fx,
+                x = -55, y = 175, scale = 0.38*0.8
+            },
+            {
+                bank = "fx_dock_crackleandpop", build = "fx_dock_crackleandpop",
+                anim = "pop", anim2 = nil, isloop = false,
+                x = -55, y = 165, scale = 0.19
+            },
+            {
+                bank = "deer_fire_charge", build = "deer_fire_charge",
+                anim = "blast", anim2 = nil, isloop = false,
+                fn_anim = SetAnim_agronssword_sun_catk2_fx,
+                x = -55, y = 50, scale = 0.38*0.8
+            },
+            {
+                bank = "fx_dock_crackleandpop", build = "fx_dock_crackleandpop",
+                anim = "pop", anim2 = nil, isloop = false,
+                x = -55, y = 40, scale = 0.19
             }
         }
     },

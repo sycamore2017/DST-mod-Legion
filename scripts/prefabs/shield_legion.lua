@@ -632,7 +632,7 @@ local function ShieldAtk_agron(inst, doer, attacker, data)
     --先加攻击力，这样输出高一点
     local timeleft = inst.components.timer:GetTimeLeft("revolt") or 0
     inst.components.timer:StopTimer("revolt")
-    inst.components.timer:StartTimer("revolt", math.min(120, timeleft+100))
+    inst.components.timer:StartTimer("revolt", math.min(120, timeleft+10))
     DoRevolt(inst, doer)
 
     Counterattack_base(inst, doer, attacker, data, 8, 1.3)
