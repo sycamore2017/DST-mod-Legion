@@ -1,6 +1,7 @@
 local _G = GLOBAL
 local IsServer = TheNet:GetIsServer() or TheNet:IsDedicated()
 local TOOLS_L = require("tools_legion")
+local cooking = require("cooking")
 
 --监听函数修改工具，超强der大佬写滴！
 -- local upvaluehelper = require "hua_upvaluehelper"
@@ -1560,49 +1561,194 @@ end)
 --------------------------------------------------------------------------
 
 local stewer_ls_items = {
-    -- dish_tomahawksteak = true --test
+    -- dish_tomahawksteak = "dish_tomahawksteak",
+    -- dish_tomahawksteak_spice_garlic = "dish_tomahawksteak", dish_tomahawksteak_spice_sugar = "dish_tomahawksteak",
+    -- dish_tomahawksteak_spice_chili = "dish_tomahawksteak", dish_tomahawksteak_spice_salt = "dish_tomahawksteak",
+    -- dish_tomahawksteak_spice_voltjelly = "dish_tomahawksteak", dish_tomahawksteak_spice_phosphor = "dish_tomahawksteak",
+    -- dish_tomahawksteak_spice_cactus_flower = "dish_tomahawksteak",
+    -- dish_tomahawksteak_spice_rage_blood_sugar = "dish_tomahawksteak",
+    -- dish_tomahawksteak_spice_potato_starch = "dish_tomahawksteak"
 }
+local function TrySetStewerFoodSkin(inst, stewer)
+    if
+        stewer.ls_foodskin ~= 1 and --1 代表已经判定过了，且是原皮或没皮肤。所以就不用做什么了
+        stewer.product ~= nil and stewer.product ~= stewer.spoiledproduct --代表有未腐烂料理
+    then
+        local dd = stewer.ls_foodskin
+        if dd == nil then
+            if stewer_ls_items[stewer.product] == nil then
+                stewer.ls_foodskin = 1
+                stewer.ls_ingredient = nil
+                return
+            end
+            local skinprefab = stewer_ls_items[stewer.product]
+            if stewer.ls_ingredient ~= nil and stewer.ls_ingredient[skinprefab] ~= nil then --优先食材的
+                dd = stewer.ls_ingredient[skinprefab]
+            elseif stewer.chef_id ~= nil then --其次才是烹饪者的
+                skinprefab = LS_LastChosenSkin(skinprefab, stewer.chef_id)
+                if skinprefab ~= nil then
+                    dd = { skin = skinprefab, userid = stewer.chef_id }
+                else
+                    stewer.ls_foodskin = 1
+                    stewer.ls_ingredient = nil
+                    return
+                end
+            end
+            stewer.ls_foodskin = dd
+            stewer.ls_ingredient = nil
+        end
+        dd = ls_skineddata[dd.skin]
+        if dd.fn_stewer ~= nil then
+            dd.fn_stewer(inst, stewer)
+        end
+    end
+end
+local function stewer_onstartcooking(inst, ...) --开始烹饪时继承食材皮肤
+    local stewer = inst.components.stewer
+    if stewer.onstartcooking_legion ~= nil then
+        stewer.onstartcooking_legion(inst, ...)
+    end
+    stewer.ls_ingredient = nil
+    if inst:HasTag("burnt") then return end
+    if stewer.targettime == nil and inst.components.container ~= nil then
+        local dd
+        local skins
+        for _, v in pairs(inst.components.container.slots) do --为了兼容香料站
+            dd = v.components.skinedlegion
+            if dd ~= nil and dd.skin ~= nil then
+                if skins == nil then
+                    skins = {}
+                end
+                skins[dd.prefab] = { skin = dd.skin, userid = dd.userid }
+            end
+		end
+        stewer.ls_ingredient = skins
+    end
+end
 local function stewer_oncontinuedone(inst, ...)
     local stewer = inst.components.stewer
     if stewer.oncontinuedone_legion ~= nil then
         stewer.oncontinuedone_legion(inst, ...)
     end
-    if not inst:HasTag("burnt") then
-        if stewer.product ~= nil and stewer.product ~= stewer.spoiledproduct then --代表有未腐烂料理
-            local dd
-            if stewer_ls_items[stewer.product] then
-                dd = stewer.product
-            elseif stewer.ingredient_prefabs ~= nil then --这个是为了识别香料站
-                for _, name in pairs(stewer.ingredient_prefabs) do
-                    if stewer_ls_items[name] then
-                        dd = name
-                        break
-                    end
-                end
-            end
-            if dd == nil then return end
-        end
-    end
+    if inst:HasTag("burnt") then return end
+    TrySetStewerFoodSkin(inst, stewer)
 end
 local function stewer_ondonecooking(inst, ...)
     local stewer = inst.components.stewer
     if stewer.ondonecooking_legion ~= nil then
         stewer.ondonecooking_legion(inst, ...)
     end
-    if not inst:HasTag("burnt") then
-        
-    end
-end
-local function stewer_onharvest(inst, ...) --收获时进行结束操作
-    local stewer = inst.components.stewer
-    if stewer.onharvest_legion ~= nil then
-        stewer.onharvest_legion(inst, ...)
-    end
+    if inst:HasTag("burnt") then return end
+    TrySetStewerFoodSkin(inst, stewer)
 end
 local function stewer_onspoil(inst, ...) --腐烂时进行结束操作
     local stewer = inst.components.stewer
     if stewer.onspoil_legion ~= nil then
         stewer.onspoil_legion(inst, ...)
+    end
+    stewer.ls_foodskin = 1
+    if stewer.ls_foodent ~= nil then
+        stewer.ls_foodent:Remove()
+        stewer.ls_foodent = nil
+    end
+end
+local function stewer_Harvest(self, harvester, ...)
+    if
+        self.done and self.product ~= nil and self.product ~= self.spoiledproduct
+        and self.ls_foodskin ~= nil and self.ls_foodskin ~= 1
+    then
+        local loot = SpawnPrefab(self.product, self.ls_foodskin.skin, nil, self.ls_foodskin.userid)
+        if loot ~= nil then
+            local recipe = cooking.GetRecipe(self.inst.prefab, self.product)
+            if
+                harvester ~= nil and self.chef_id == harvester.userid and
+                recipe ~= nil and recipe.cookbook_category ~= nil and
+                cooking.cookbook_recipes[recipe.cookbook_category] ~= nil and
+                cooking.cookbook_recipes[recipe.cookbook_category][self.product] ~= nil
+            then
+                harvester:PushEvent("learncookbookrecipe", {product = self.product, ingredients = self.ingredient_prefabs})
+            end
+            if loot.components.stackable ~= nil then
+                local stacksize = recipe and recipe.stacksize or 1
+                if stacksize > 1 then
+                    loot.components.stackable:SetStackSize(stacksize)
+                end
+            end
+            if self.spoiltime ~= nil and loot.components.perishable ~= nil then
+                local spoilpercent = self:GetTimeToSpoil() / self.spoiltime
+                loot.components.perishable:SetPercent(self.product_spoilage * spoilpercent)
+                loot.components.perishable:StartPerishing()
+            end
+            if harvester ~= nil and harvester.components.inventory ~= nil then
+                harvester.components.inventory:GiveItem(loot, nil, self.inst:GetPosition())
+            else
+                LaunchAt(loot, self.inst, nil, 1, 1)
+            end
+        end
+        self.product = nil
+    end
+    self.ls_foodskin = nil
+    if self.ls_foodent ~= nil then
+        self.ls_foodent:Remove()
+        self.ls_foodent = nil
+    end
+    if self.Harvest_legion ~= nil then
+        self.Harvest_legion(self, harvester, ...)
+    end
+end
+local function stewer_StopCooking(self, ...)
+    self.ls_foodskin = nil
+    if self.ls_foodent ~= nil then
+        self.ls_foodent:Remove()
+        self.ls_foodent = nil
+    end
+    if self.StopCooking_legion ~= nil then
+        self.StopCooking_legion(self, ...)
+    end
+end
+local function stewer_OnSave(self, ...)
+    local data
+    if self.OnSave_legion ~= nil then
+        data = self.OnSave_legion(self, ...)
+    end
+    if self.ls_foodskin ~= nil or self.ls_ingredient ~= nil then
+        if data == nil then
+            data = {}
+        end
+        if self.ls_foodskin ~= nil then
+            data.ls_foodskin = self.ls_foodskin
+        end
+        if self.ls_ingredient ~= nil then
+            data.ls_ingredient = self.ls_ingredient
+        end
+    end
+    return data
+end
+local function stewer_OnLoad(self, data, ...)
+    if self.OnLoad_legion ~= nil then
+        self.OnLoad_legion(self, data, ...)
+    end
+    if data and data.product ~= nil then
+        if data.ls_foodskin ~= nil then
+            if
+                data.ls_foodskin == 1 or
+                (data.ls_foodskin.skin and ls_skineddata[data.ls_foodskin.skin]) --判定皮肤有效性
+            then
+                self.ls_foodskin = data.ls_foodskin
+            end
+        end
+        if data.ls_ingredient ~= nil then
+            local skins
+            for prefab, v in pairs(data.ls_ingredient) do
+                if v.skin and ls_skineddata[v.skin] then --判定皮肤有效性
+                    if skins == nil then
+                        skins = {}
+                    end
+                    skins[prefab] = { skin = v.skin, userid = v.userid }
+                end
+            end
+            self.ls_ingredient = skins
+        end
     end
 end
 
@@ -1610,24 +1756,38 @@ AddComponentPostInit("stewer", function(self) --改组件而不是改预制物�
     if self.legiontag_stewerfix then
         return
     end
-    -- if self.inst.prefab == "portablespicer" then --香料站不需要
-    --     return
-    -- end
+    if self.Harvest_legion == nil then
+        self.Harvest_legion = self.Harvest
+        self.Harvest = stewer_Harvest
+    end
+    if self.StopCooking_legion == nil then
+        self.StopCooking_legion = self.StopCooking
+        self.StopCooking = stewer_StopCooking
+    end
+    if self.OnSave_legion == nil then
+        self.OnSave_legion = self.OnSave
+        self.OnSave = stewer_OnSave
+    end
+    if self.OnLoad_legion == nil then
+        self.OnLoad_legion = self.OnLoad
+        self.OnLoad = stewer_OnLoad
+    end
     --该逻辑执行在实体生成组件时，此时“烹饪锅”还没定义好所需的关键函数，
     --但为了兼容性，也没法用 AddPrefabPostInit() 来修改，所以就搞个延时操作吧
-    self.inst:DoTaskInTime(FRAMES*3, function(inst)
+    self.inst:DoTaskInTime(FRAMES*4, function(inst)
         if self.legiontag_stewerfix then
             return
         end
         self.legiontag_stewerfix = true
+        self.onstartcooking_legion = self.onstartcooking
+        self.onstartcooking = stewer_onstartcooking
         self.oncontinuedone_legion = self.oncontinuedone
         self.oncontinuedone = stewer_oncontinuedone
         self.ondonecooking_legion = self.ondonecooking
         self.ondonecooking = stewer_ondonecooking
-        self.onharvest_legion = self.onharvest
-        self.onharvest = stewer_onharvest
         self.onspoil_legion = self.onspoil
         self.onspoil = stewer_onspoil
-        --undo 再更新当前的情况
+        if inst:HasTag("burnt") or not self.done then return end
+        TrySetStewerFoodSkin(inst, self) --更新当前的情况
     end)
 end)
