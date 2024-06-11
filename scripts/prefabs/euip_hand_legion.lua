@@ -1380,7 +1380,15 @@ local function TrySingleFight(inst, owner, target)
 end
 
 local function OnEquip_steak_pre(inst, owner)
-    owner.AnimState:OverrideSymbol("swap_object", "dish_tomahawksteak", "swap")
+    if inst._dd ~= nil then
+        if inst._dd.startfn ~= nil then
+            inst._dd.startfn(inst, owner)
+        else
+            owner.AnimState:OverrideSymbol("swap_object", inst._dd.build, inst._dd.file)
+        end
+    else
+        owner.AnimState:OverrideSymbol("swap_object", "dish_tomahawksteak", "swap")
+    end
     OnEquip_base(inst, owner)
 end
 local function OnEquip_steak_pst(inst, owner)
@@ -1398,7 +1406,11 @@ local function OnEquip_steak(inst, owner)
 end
 local function OnUnequip_steak(inst, owner)
     OnUnequip_base(inst, owner)
-
+    if inst._dd ~= nil then
+        if inst._dd.endfn ~= nil then
+            inst._dd.endfn(inst, owner)
+        end
+    end
     if inst._UpdateAxe then
         inst._UpdateAxe(inst)
     end
@@ -1476,12 +1488,12 @@ local function MakeSteak(data)
             inst:SetPrefabNameOverride(basename)
             inst.displaynamefn = DisplayName_steak
 
-            SetFloatable(inst, { nil, "med", 0.05, {0.8, 0.7, 0.8} })
+            -- SetFloatable(inst, { nil, "med", 0.05, {0.8, 0.7, 0.8} })
         else
             inst.AnimState:SetBank(basename)
             inst.AnimState:SetBuild(basename)
 
-            MakeInventoryFloatable(inst, "small", 0.2, 0.75)
+            -- MakeInventoryFloatable(inst, "small", 0.2, 0.75)
         end
         inst.AnimState:PlayAnimation("idle")
 
@@ -1492,6 +1504,7 @@ local function MakeSteak(data)
         inst:AddTag("tool")
         inst:AddTag("weapon")
 
+        LS_C_Init(inst, basename, true, "data_spice", data.spicename and "x" or basename)
         if data.fn_common ~= nil then
             data.fn_common(inst)
         end
@@ -1504,10 +1517,10 @@ local function MakeSteak(data)
 
         inst.foliageath_data = foliageath_data_steak
 
-        inst._damage = nil --基础攻击力
-        inst._chopvalue = nil --基础砍伐效率
-        inst._chopchance = nil --直接砍倒树的几率
-        inst._UpdateAxe = nil
+        -- inst._damage = nil --基础攻击力
+        -- inst._chopvalue = nil --基础砍伐效率
+        -- inst._chopchance = nil --直接砍倒树的几率
+        -- inst._UpdateAxe = nil
 
         inst:AddComponent("inspectable")
 

@@ -104,6 +104,7 @@ local dd_refractedmoonlight = {
     img_tex2 = "refractedmoonlight2", img_atlas2 = "images/inventoryimages/refractedmoonlight2.xml",
     build = "refractedmoonlight", fx = "refracted_l_spark_fx"
 }
+local img_dish_tomahawksteak = { atlas = "images/inventoryimages/dish_tomahawksteak.xml", image = "dish_tomahawksteak.tex" }
 
 local function CopyValue(data, nokeys)
     if data == nil or type(data) ~= "table" then
@@ -854,6 +855,32 @@ local function Fn_start_siving_suit(inst, skined)
         inst.suitfxoverride_l = nil
     end
 end
+local function Fn_start_dish_tomahawksteak(inst, skined)
+    if skined ~= nil then
+        inst._dd = skined.equip
+        inst.inv_image_bg = skined.inv_image_bg
+    else
+        inst._dd = nil
+        inst.inv_image_bg = {}
+        CopySkinedData(inst.inv_image_bg, img_dish_tomahawksteak)
+    end
+    inst:PushEvent("imagechange") --Event应该不含网络的帧同步，所以客户端的交给 fn_start_c 就好
+    -- if inst.legiontask_lsimg ~= nil then
+    --     inst.legiontask_lsimg:Cancel()
+    -- end
+    -- inst.legiontask_lsimg = inst:DoTaskInTime(FRAMES*2, function() --等会再更新，因为需要兼容客户端
+    --     inst:PushEvent("imagechange")
+    -- end)
+end
+local function Fn_start_c_dish_tomahawksteak(inst, skined)
+    if skined ~= nil then
+        inst.inv_image_bg = skined.inv_image_bg
+    else
+        inst.inv_image_bg = {}
+        CopySkinedData(inst.inv_image_bg, img_dish_tomahawksteak)
+    end
+    inst:PushEvent("imagechange")
+end
 
 --------------------------------------------------------------------------
 --[[ 皮肤数据，以及官方数据修改 ]]
@@ -1346,6 +1373,25 @@ local SKIN_DEFAULT_LEGION = {
         image = { name = nil, atlas = nil, setable = true },
         anim = { bank = nil, build = nil, anim = nil, animpush = nil, isloop = nil },
         exchangefx = { prefab = nil, offset_y = nil, scale = nil }
+    },
+
+    dish_tomahawksteak = {
+        image = { name = nil, atlas = nil, setable = true },
+        anim = { bank = nil, build = nil, anim = nil, animpush = nil, isloop = nil },
+        fn_start = Fn_start_equip,
+        equip = { symbol = "swap_object", build = "dish_tomahawksteak", file = "swap" },
+        exchangefx = { prefab = nil, offset_y = nil, scale = nil },
+        floater = { cut = nil, size = "small", offset_y = 0.2, scale = 0.75, nofx = nil },
+
+        overridekeys = { "data_spice" },
+        data_spice = {
+            floater = { cut = nil, size = "med", offset_y = 0.05, scale = {0.8, 0.7, 0.8}, nofx = nil },
+            anim = { bank = "plate_food", build = "plate_food", anim = "idle" },
+            equip = { symbol = "swap_object", build = "dish_tomahawksteak", file = "swap" },
+            inv_image_bg = img_dish_tomahawksteak,
+            fn_start = Fn_start_dish_tomahawksteak,
+            fn_start_c = Fn_start_c_dish_tomahawksteak
+        }
     },
 }
 local SKINS_LEGION = {
@@ -4047,7 +4093,7 @@ end
 local SkinsOverride = {
 	siving_soil_item = true, hiddenmoonlight_item = true, revolvedmoonlight_item = true,
     siving_ctlwater_item = true, siving_ctldirt_item = true, siving_ctlall_item = true,
-    chest_whitewood = true, chest_whitewood_big = true
+    chest_whitewood = true, chest_whitewood_big = true, dish_tomahawksteak = true
 }
 local nocopykeys = {
     skin_id = true, skin_idx = true, onlyownedshow = true, mustonwedshow = true, overridekeys = true,
