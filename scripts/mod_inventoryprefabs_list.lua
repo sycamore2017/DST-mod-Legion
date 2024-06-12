@@ -271,7 +271,9 @@ local InventoryPrefabsList = {  --每个元素的下标值为每种物品栏图�
     refractedmoonlight_moon = 8,
     refractedmoonlight_moon2 = 8,
     agronssword_sun = 8,
-    agronssword_sun2 = 8
+    agronssword_sun2 = 8,
+    dish_tomahawksteak_twist = 8,
+    foliageath_dish_tomahawksteak_twist = 8
 }
 
 return InventoryPrefabsList

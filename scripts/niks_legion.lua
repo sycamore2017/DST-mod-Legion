@@ -860,6 +860,9 @@ local function Fn_start_siving_suit(inst, skined)
         inst.suitfxoverride_l = nil
     end
 end
+
+------
+
 local function Fn_start_dish_tomahawksteak(inst, skined)
     if skined ~= nil then
         inst._dd = skined.equip
@@ -888,6 +891,34 @@ local function Fn_start_c_dish_tomahawksteak(inst, skined)
     end
     inst:PushEvent("imagechange")
 end
+local function Fn_equip_dish_tomahawksteak_twist(inst, owner)
+    owner.AnimState:OverrideSymbol("swap_object", "dish_tomahawksteak_twist", "xx")
+    Fn_setFollowFx(owner, "legion_steak_twist_fofx", "dish_tomahawksteak_twist_fofx")
+end
+local function Fn_unequip_dish_tomahawksteak_twist(inst, owner)
+    Fn_removeFollowFx(owner, "legion_steak_twist_fofx")
+    print("卸下了这个")
+end
+local function Fn_end_dish_tomahawksteak_twist(inst, skined)
+    local owner = GetEquippedOwner(inst)
+    if owner ~= nil then
+        Fn_unequip_dish_tomahawksteak_twist(inst, owner)
+    end
+end
+local function Fn_atk_dish_tomahawksteak_twist(inst, owner, target)
+    
+end
+local dd_dish_tomahawksteak_twist = {
+    symbol = "swap_object", build = "dish_tomahawksteak_twist", file = "xx",
+    scabbard = {
+        anim = "idle_cover", isloop = true, bank = "dish_tomahawksteak_twist", build = "dish_tomahawksteak_twist",
+        image = "foliageath_dish_tomahawksteak_twist",
+        atlas = "images/inventoryimages_skin/foliageath_dish_tomahawksteak_twist.xml"
+    },
+    startfn = Fn_equip_dish_tomahawksteak_twist,
+    endfn = Fn_unequip_dish_tomahawksteak_twist,
+    atkfn = Fn_atk_dish_tomahawksteak_twist
+}
 
 --------------------------------------------------------------------------
 --[[ 皮肤数据，以及官方数据修改 ]]
@@ -3730,15 +3761,8 @@ local SKINS_LEGION = {
         image = { name = nil, atlas = nil, setable = true },
         string = ischinese and { name = "朽目撕裂者" } or { name = "Rotten Eyes Ripper" },
 		anim = { bank = nil, build = nil, anim = nil, animpush = nil, isloop = true },
-        equip = {
-            symbol = "swap_object", build = "dish_tomahawksteak_twist", file = "xx",
-            startfn = function(inst, owner)
-                -- Fn_setFollowFx(owner, "fx_l_sivfea_real", "sivfea_real_collector_fofx")
-            end,
-            endfn = function(inst, owner)
-                -- Fn_removeFollowFx(owner, "fx_l_sivfea_real")
-            end
-        },
+        equip = dd_dish_tomahawksteak_twist,
+        fn_end = Fn_end_dish_tomahawksteak_twist,
         exchangefx = { prefab = nil, offset_y = nil, scale = nil },
         floater = { cut = nil, size = "small", offset_y = 0.2, scale = 0.75, nofx = nil },
         fn_stewer = function(inst, stewer)
@@ -3750,15 +3774,7 @@ local SKINS_LEGION = {
         data_spice = {
             anim = { bank = "plate_food", build = "plate_food", anim = "idle" },
             floater = { cut = nil, size = "small", offset_y = 0.2, scale = 0.75, nofx = nil },
-            equip = {
-                symbol = "swap_object", build = "dish_tomahawksteak_twist", file = "xx",
-                startfn = function(inst, owner)
-                    -- Fn_setFollowFx(owner, "fx_l_sivfea_real", "sivfea_real_collector_fofx")
-                end,
-                endfn = function(inst, owner)
-                    -- Fn_removeFollowFx(owner, "fx_l_sivfea_real")
-                end
-            },
+            equip = dd_dish_tomahawksteak_twist,
             inv_image_bg = img_dish_tomahawksteak_twist, anim_swap = swap_dish_tomahawksteak_twist,
             fn_start = function(inst, skined)
                 Fn_start_dish_tomahawksteak(inst, skined)
@@ -3766,6 +3782,7 @@ local SKINS_LEGION = {
             end,
             fn_end = function(inst, skined)
                 Fn_removeFollowFx(inst, "fx_l_twist_sc")
+                Fn_end_dish_tomahawksteak_twist(inst, skined)
             end,
             fn_start_c = Fn_start_c_dish_tomahawksteak
         }

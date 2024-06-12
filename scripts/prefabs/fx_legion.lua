@@ -96,9 +96,18 @@ end
 ------
 
 local function OnRemove_followfx(inst)
-	for i, v in ipairs(inst.fx) do
-		v:Remove()
-	end
+    if inst.fx ~= nil then
+        for _, v in ipairs(inst.fx) do
+            v:Remove()
+        end
+    end
+end
+local function ColorChanged_followfx(inst, r, g, b, a)
+    if inst.fx ~= nil then
+        for _, v in ipairs(inst.fx) do
+            v.AnimState:SetAddColour(r, g, b, a)
+        end
+    end
 end
 local function CreateNonNetInst(v)
     local inst = CreateEntity()
@@ -134,6 +143,7 @@ local function SpawnFollowFxForOwner(inst, owner, fxdd)
         fx.components.highlightchild:SetOwner(owner)
         table.insert(inst.fx, fx)
     end
+    inst.components.colouraddersync:SetColourChangedFn(ColorChanged_followfx)
 	inst.OnRemoveEntity = OnRemove_followfx
 end
 local function MakeFxFollow(data) --绑定式特效
@@ -153,11 +163,12 @@ local function MakeFxFollow(data) --绑定式特效
 
     table.insert(prefs, Prefab(data.name, function()
         local inst = CreateEntity()
-
         inst.entity:AddTransform()
         inst.entity:AddNetwork()
 
         inst:AddTag("FX")
+
+        inst:AddComponent("colouraddersync")
 
         if data.fn_common ~= nil then
             data.fn_common(inst)
@@ -1707,6 +1718,16 @@ MakeFxFollow({ --朽目撕裂者：在烹饪锅里的动画
     fx = { {
         fn_anim = SetAnim_base, symbol = "swap_cooked", randomanim = true,
         build = "dish_tomahawksteak_twist", anim = "idle", isloop = true
+    } }
+})
+MakeFxFollow({ --朽目撕裂者：在手里的动画
+    name = "dish_tomahawksteak_twist_fofx",
+    assets = {
+        Asset("ANIM", "anim/skin/dish_tomahawksteak_twist.zip")
+    },
+    fx = { {
+        fn_anim = SetAnim_base, symbol = "swap_object",
+        build = "dish_tomahawksteak_twist", anim = "swap1", isloop = true
     } }
 })
 
