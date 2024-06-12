@@ -151,38 +151,33 @@ local function MakeFxFollow(data) --绑定式特效
 		end
 	end
 
-    table.insert(prefs, Prefab(
-        data.name,
-        function()
-            local inst = CreateEntity()
+    table.insert(prefs, Prefab(data.name, function()
+        local inst = CreateEntity()
 
-            inst.entity:AddTransform()
-		    inst.entity:AddNetwork()
+        inst.entity:AddTransform()
+        inst.entity:AddNetwork()
 
-            inst:AddTag("FX")
+        inst:AddTag("FX")
 
-            if data.fn_common ~= nil then
-				data.fn_common(inst)
-			end
+        if data.fn_common ~= nil then
+            data.fn_common(inst)
+        end
 
-            inst.entity:SetPristine()
-            if not TheWorld.ismastersim then
-                inst.OnEntityReplicated = OnEntityReplicated
-                return inst
-            end
-
-            inst.persists = false
-            inst.AttachToOwner = AttachToOwner
-
-            if data.fn_server ~= nil then
-				data.fn_server(inst)
-			end
-
+        inst.entity:SetPristine()
+        if not TheWorld.ismastersim then
+            inst.OnEntityReplicated = OnEntityReplicated
             return inst
-        end,
-        data.assets,
-        nil
-    ))
+        end
+
+        inst.persists = false
+        inst.AttachToOwner = AttachToOwner
+
+        if data.fn_server ~= nil then
+            data.fn_server(inst)
+        end
+
+        return inst
+    end, data.assets, nil))
 end
 
 ---------------
@@ -1693,6 +1688,26 @@ MakeFxFollow({ --巫酋毒骨面
             build = "siving_mask_gold_era2", anim = "idle3", isloop = true
         }
     }
+})
+MakeFxFollow({ --朽目撕裂者：调料后的地面动画
+    name = "dish_tomahawksteak_twist_sc_fofx",
+    assets = {
+        Asset("ANIM", "anim/skin/dish_tomahawksteak_twist.zip")
+    },
+    fx = { {
+        fn_anim = SetAnim_base, symbol = "swap_food", randomanim = true,
+        build = "dish_tomahawksteak_twist", anim = "idle", isloop = true
+    } }
+})
+MakeFxFollow({ --朽目撕裂者：在烹饪锅里的动画
+    name = "dish_tomahawksteak_twist_cp_fofx",
+    assets = {
+        Asset("ANIM", "anim/skin/dish_tomahawksteak_twist.zip")
+    },
+    fx = { {
+        fn_anim = SetAnim_base, symbol = "swap_cooked", randomanim = true,
+        build = "dish_tomahawksteak_twist", anim = "idle", isloop = true
+    } }
 })
 
 --各种普通小猫咪

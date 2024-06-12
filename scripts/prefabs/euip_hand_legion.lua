@@ -1504,7 +1504,11 @@ local function MakeSteak(data)
         inst:AddTag("tool")
         inst:AddTag("weapon")
 
-        LS_C_Init(inst, basename, true, "data_spice", data.spicename and "x" or basename)
+        if data.spicename ~= nil then
+            LS_C_Init(inst, basename, true, "data_spice", "xx")
+        else
+            LS_C_Init(inst, basename, true)
+        end
         if data.fn_common ~= nil then
             data.fn_common(inst)
         end

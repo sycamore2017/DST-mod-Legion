@@ -1647,9 +1647,9 @@ local function stewer_onspoil(inst, ...) --腐烂时进行结束操作
         stewer.onspoil_legion(inst, ...)
     end
     stewer.ls_foodskin = 1
-    if stewer.ls_foodent ~= nil then
-        stewer.ls_foodent:Remove()
-        stewer.ls_foodent = nil
+    if inst.legion_dishfofx ~= nil then
+        inst.legion_dishfofx:Remove()
+        inst.legion_dishfofx = nil
     end
 end
 local function stewer_Harvest(self, harvester, ...)
@@ -1688,9 +1688,9 @@ local function stewer_Harvest(self, harvester, ...)
         self.product = nil
     end
     self.ls_foodskin = nil
-    if self.ls_foodent ~= nil then
-        self.ls_foodent:Remove()
-        self.ls_foodent = nil
+    if self.inst.legion_dishfofx ~= nil then
+        self.inst.legion_dishfofx:Remove()
+        self.inst.legion_dishfofx = nil
     end
     if self.Harvest_legion ~= nil then
         self.Harvest_legion(self, harvester, ...)
@@ -1698,9 +1698,9 @@ local function stewer_Harvest(self, harvester, ...)
 end
 local function stewer_StopCooking(self, ...)
     self.ls_foodskin = nil
-    if self.ls_foodent ~= nil then
-        self.ls_foodent:Remove()
-        self.ls_foodent = nil
+    if self.inst.legion_dishfofx ~= nil then
+        self.inst.legion_dishfofx:Remove()
+        self.inst.legion_dishfofx = nil
     end
     if self.StopCooking_legion ~= nil then
         self.StopCooking_legion(self, ...)

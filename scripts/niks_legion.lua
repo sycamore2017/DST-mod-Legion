@@ -35,7 +35,7 @@ local skininvs = {
     "icire_rock2_era", "icire_rock3_era", "icire_rock4_era", "icire_rock5_era", "icire_rock1_collector",
     "icire_rock2_collector", "icire_rock3_collector", "icire_rock4_collector", "icire_rock5_collector",
     "icire_rock1_day", "icire_rock2_day", "icire_rock3_day", "icire_rock4_day", "icire_rock5_day",
-    "foliageath_lileaves_era", "foliageath_rosorns_collector",
+    "foliageath_lileaves_era", "foliageath_rosorns_collector", "foliageath_dish_tomahawksteak_twist",
 }
 
 --------------------------------------------------------------------------
@@ -105,6 +105,11 @@ local dd_refractedmoonlight = {
     build = "refractedmoonlight", fx = "refracted_l_spark_fx"
 }
 local img_dish_tomahawksteak = { atlas = "images/inventoryimages/dish_tomahawksteak.xml", image = "dish_tomahawksteak.tex" }
+local swap_dish_tomahawksteak = { build = "dish_tomahawksteak", file = "base" }
+local img_dish_tomahawksteak_twist = {
+    atlas = "images/inventoryimages_skin/dish_tomahawksteak_twist.xml", image = "dish_tomahawksteak_twist.tex"
+}
+local swap_dish_tomahawksteak_twist = { build = "dish_tomahawksteak_twist", file = "xx" }
 
 local function CopyValue(data, nokeys)
     if data == nil or type(data) ~= "table" then
@@ -859,10 +864,12 @@ local function Fn_start_dish_tomahawksteak(inst, skined)
     if skined ~= nil then
         inst._dd = skined.equip
         inst.inv_image_bg = skined.inv_image_bg
+        inst.AnimState:OverrideSymbol("swap_food", skined.anim_swap.build, skined.anim_swap.file)
     else
         inst._dd = nil
         inst.inv_image_bg = {}
         CopySkinedData(inst.inv_image_bg, img_dish_tomahawksteak)
+        inst.AnimState:OverrideSymbol("swap_food", swap_dish_tomahawksteak.build, swap_dish_tomahawksteak.file)
     end
     inst:PushEvent("imagechange") --Event应该不含网络的帧同步，所以客户端的交给 fn_start_c 就好
     -- if inst.legiontask_lsimg ~= nil then
@@ -1388,7 +1395,7 @@ local SKIN_DEFAULT_LEGION = {
             floater = { cut = nil, size = "med", offset_y = 0.05, scale = {0.8, 0.7, 0.8}, nofx = nil },
             anim = { bank = "plate_food", build = "plate_food", anim = "idle" },
             equip = { symbol = "swap_object", build = "dish_tomahawksteak", file = "swap" },
-            inv_image_bg = img_dish_tomahawksteak,
+            inv_image_bg = img_dish_tomahawksteak, anim_swap = swap_dish_tomahawksteak,
             fn_start = Fn_start_dish_tomahawksteak,
             fn_start_c = Fn_start_c_dish_tomahawksteak
         }
@@ -3712,6 +3719,56 @@ local SKINS_LEGION = {
             end
         end,
         exchangefx = { prefab = nil, offset_y = nil, scale = nil }
+    },
+
+    dish_tomahawksteak_twist = {
+        base_prefab = "dish_tomahawksteak", skin_id = "666958ddce45c22cf18e7529", onlyownedshow = true,
+		type = "item", skin_tags = {}, release_group = 555, rarity = raritySpecial,
+		assets = {
+			Asset("ANIM", "anim/skin/dish_tomahawksteak_twist.zip")
+		},
+        image = { name = nil, atlas = nil, setable = true },
+        string = ischinese and { name = "朽目撕裂者" } or { name = "Rotten Eyes Ripper" },
+		anim = { bank = nil, build = nil, anim = nil, animpush = nil, isloop = true },
+        equip = {
+            symbol = "swap_object", build = "dish_tomahawksteak_twist", file = "xx",
+            startfn = function(inst, owner)
+                -- Fn_setFollowFx(owner, "fx_l_sivfea_real", "sivfea_real_collector_fofx")
+            end,
+            endfn = function(inst, owner)
+                -- Fn_removeFollowFx(owner, "fx_l_sivfea_real")
+            end
+        },
+        exchangefx = { prefab = nil, offset_y = nil, scale = nil },
+        floater = { cut = nil, size = "small", offset_y = 0.2, scale = 0.75, nofx = nil },
+        fn_stewer = function(inst, stewer)
+            inst.AnimState:OverrideSymbol("swap_cooked", "dish_tomahawksteak_twist", "xx")
+            Fn_setFollowFx(inst, "legion_dishfofx", "dish_tomahawksteak_twist_cp_fofx")
+        end,
+
+        overridekeys = { "data_spice" },
+        data_spice = {
+            anim = { bank = "plate_food", build = "plate_food", anim = "idle" },
+            floater = { cut = nil, size = "small", offset_y = 0.2, scale = 0.75, nofx = nil },
+            equip = {
+                symbol = "swap_object", build = "dish_tomahawksteak_twist", file = "xx",
+                startfn = function(inst, owner)
+                    -- Fn_setFollowFx(owner, "fx_l_sivfea_real", "sivfea_real_collector_fofx")
+                end,
+                endfn = function(inst, owner)
+                    -- Fn_removeFollowFx(owner, "fx_l_sivfea_real")
+                end
+            },
+            inv_image_bg = img_dish_tomahawksteak_twist, anim_swap = swap_dish_tomahawksteak_twist,
+            fn_start = function(inst, skined)
+                Fn_start_dish_tomahawksteak(inst, skined)
+                Fn_setFollowFx(inst, "fx_l_twist_sc", "dish_tomahawksteak_twist_sc_fofx")
+            end,
+            fn_end = function(inst, skined)
+                Fn_removeFollowFx(inst, "fx_l_twist_sc")
+            end,
+            fn_start_c = Fn_start_c_dish_tomahawksteak
+        }
     }
 }
 local SKIN_IDS_LEGION = {
@@ -3779,6 +3836,7 @@ local SKIN_IDS_LEGION = {
         explodingfruitcake_day = true,
         plant_carrot_l_fact = true, lance_carrot_l_fact = true,
         refractedmoonlight_moon = true, agronssword_sun = true,
+        dish_tomahawksteak_twist = true,
     },
     -- ["665eb8a8ce45c22cf18e6d24"] = {}, --8面玲珑
     -- ["6278c409c340bf24ab311522"] = nil --余生
@@ -3912,6 +3970,7 @@ local skinidxes = {
     "siving_feather_real_collector", "siving_feather_fake_collector",
     "siving_turn_collector", "icire_rock_collector", "fimbul_axe_collector", "rosebush_collector", "rosorns_collector",
     "neverfade_paper", "neverfadebush_paper", "neverfade_paper2", "neverfadebush_paper2",
+    "dish_tomahawksteak_twist",
     "tourmalinecore_tale",
     "siving_turn_future", "siving_turn_future2",
     "hiddenmoonlight_item_paper", "siving_feather_real_paper", "siving_feather_fake_paper",
