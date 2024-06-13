@@ -354,10 +354,8 @@ local function OnUnequip_rose(inst, owner)
     owner:RemoveEventCallback("onattackother", TOOLS_L.UndefendedATK)
 end
 local function OnAttack_rose(inst, owner, target)
-    if target ~= nil and target:IsValid() then
-        if inst._dd ~= nil and inst._dd.atkfn ~= nil then
-            inst._dd.atkfn(inst, owner, target)
-        end
+    if inst._dd ~= nil and inst._dd.atkfn ~= nil and target ~= nil and target:IsValid() then
+        inst._dd.atkfn(inst, owner, target)
     end
 end
 
@@ -1422,6 +1420,9 @@ local function OnAttack_steak(inst, owner, target)
         inst._UpdateAxe(inst)
     end
     TrySingleFight(inst, owner, target)
+    if inst._dd ~= nil and inst._dd.atkfn ~= nil and target ~= nil and target:IsValid() then
+        inst._dd.atkfn(inst, owner, target)
+    end
 end
 local function OnLoad_steak(inst, data)
     if inst._UpdateAxe then

@@ -3762,6 +3762,7 @@ local SKINS_LEGION = {
         string = ischinese and { name = "朽目撕裂者" } or { name = "Rotten Eyes Ripper" },
 		anim = { bank = nil, build = nil, anim = nil, animpush = nil, isloop = true },
         equip = dd_dish_tomahawksteak_twist,
+        fn_start = Fn_start_equip,
         fn_end = Fn_end_dish_tomahawksteak_twist,
         exchangefx = { prefab = nil, offset_y = nil, scale = nil },
         floater = { cut = nil, size = "small", offset_y = 0.2, scale = 0.75, nofx = nil },
