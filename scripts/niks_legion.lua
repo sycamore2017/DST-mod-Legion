@@ -3765,7 +3765,7 @@ local SKINS_LEGION = {
         fn_start = Fn_start_equip,
         fn_end = Fn_end_dish_tomahawksteak_twist,
         exchangefx = { prefab = nil, offset_y = nil, scale = nil },
-        floater = { cut = nil, size = "small", offset_y = 0.2, scale = 0.75, nofx = nil },
+        floater = { cut = 0.05, size = "med", offset_y = 0.2, scale = 0.6, nofx = nil },
         fn_stewer = function(inst, stewer)
             inst.AnimState:OverrideSymbol("swap_cooked", "dish_tomahawksteak_twist", "xx")
             Fn_setFollowFx(inst, "legion_dishfofx", "dish_tomahawksteak_twist_cp_fofx")
@@ -3774,7 +3774,7 @@ local SKINS_LEGION = {
         overridekeys = { "data_spice" },
         data_spice = {
             anim = { bank = "plate_food", build = "plate_food", anim = "idle" },
-            floater = { cut = nil, size = "small", offset_y = 0.2, scale = 0.75, nofx = nil },
+            floater = { cut = nil, size = "med", offset_y = 0.05, scale = {0.8, 0.7, 0.8}, nofx = nil },
             equip = dd_dish_tomahawksteak_twist,
             inv_image_bg = img_dish_tomahawksteak_twist, anim_swap = swap_dish_tomahawksteak_twist,
             fn_start = function(inst, skined)

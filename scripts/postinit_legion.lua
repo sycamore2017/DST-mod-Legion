@@ -1561,13 +1561,13 @@ end)
 --------------------------------------------------------------------------
 
 local stewer_ls_items = {
-    -- dish_tomahawksteak = "dish_tomahawksteak",
-    -- dish_tomahawksteak_spice_garlic = "dish_tomahawksteak", dish_tomahawksteak_spice_sugar = "dish_tomahawksteak",
-    -- dish_tomahawksteak_spice_chili = "dish_tomahawksteak", dish_tomahawksteak_spice_salt = "dish_tomahawksteak",
-    -- dish_tomahawksteak_spice_voltjelly = "dish_tomahawksteak", dish_tomahawksteak_spice_phosphor = "dish_tomahawksteak",
-    -- dish_tomahawksteak_spice_cactus_flower = "dish_tomahawksteak",
-    -- dish_tomahawksteak_spice_rage_blood_sugar = "dish_tomahawksteak",
-    -- dish_tomahawksteak_spice_potato_starch = "dish_tomahawksteak"
+    dish_tomahawksteak = "dish_tomahawksteak",
+    dish_tomahawksteak_spice_garlic = "dish_tomahawksteak", dish_tomahawksteak_spice_sugar = "dish_tomahawksteak",
+    dish_tomahawksteak_spice_chili = "dish_tomahawksteak", dish_tomahawksteak_spice_salt = "dish_tomahawksteak",
+    dish_tomahawksteak_spice_voltjelly = "dish_tomahawksteak", dish_tomahawksteak_spice_phosphor = "dish_tomahawksteak",
+    dish_tomahawksteak_spice_cactus_flower = "dish_tomahawksteak",
+    dish_tomahawksteak_spice_rage_blood_sugar = "dish_tomahawksteak",
+    dish_tomahawksteak_spice_potato_starch = "dish_tomahawksteak"
 }
 local function TrySetStewerFoodSkin(inst, stewer)
     if
@@ -1693,8 +1693,9 @@ local function stewer_Harvest(self, harvester, ...)
         self.inst.legion_dishfofx = nil
     end
     if self.Harvest_legion ~= nil then
-        self.Harvest_legion(self, harvester, ...)
+        return self.Harvest_legion(self, harvester, ...)
     end
+    return true
 end
 local function stewer_StopCooking(self, ...)
     self.ls_foodskin = nil
