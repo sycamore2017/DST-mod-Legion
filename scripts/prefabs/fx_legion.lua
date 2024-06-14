@@ -1555,6 +1555,12 @@ local anims_smallbird = {
     { "walk_pre", "walk_loop", "walk_loop", "walk_loop", "walk_pst" },
     "idle", "idle", "idle", "idle", "idle", "idle", "idle"
 }
+local anims_steak_twist = { "idle1", "idle2" }
+local anims_steak_twist_swap = {
+    "swap1", "swap2", "swap1", "swap1", "swap3", "swap4", "swap4", "swap4",
+    { "swap1", "swap2" }, { "swap1", "swap3" },
+    { "swap4", "swap2" }, { "swap4", "swap3" }
+}
 
 ------随机仿sg的动画
 local function DoSgAnim(inst)
@@ -1633,6 +1639,15 @@ local function SetAnim_tallbirdegg(inst, data)
     inst.AnimState:PlayAnimation(data.anim, true)
     inst.AnimState:HideSymbol("shdw")
 end
+local function SetAnim_steak_twist(inst, data)
+    inst.entity:AddFollower()
+    inst.AnimState:SetBank("dish_tomahawksteak_twist")
+    inst.AnimState:SetBuild("dish_tomahawksteak_twist")
+    inst.AnimState:PlayAnimation(data.anim or "idle1")
+    inst.AnimState:SetSymbolBloom("eye")
+    inst.AnimState:SetSymbolLightOverride("eye", 0.5)
+    SetSgSkinAnim(inst, data.sg)
+end
 
 MakeFxFollow({ --旅星猫：蓝色猫猫
     name = "sivfea_real_collector_fofx",
@@ -1705,20 +1720,14 @@ MakeFxFollow({ --朽目撕裂者：调料后的地面动画
     assets = {
         Asset("ANIM", "anim/skin/dish_tomahawksteak_twist.zip")
     },
-    fx = { {
-        fn_anim = SetAnim_base, symbol = "swap_food", randomanim = true,
-        build = "dish_tomahawksteak_twist", anim = "idle", isloop = true
-    } }
+    fx = { { fn_anim = SetAnim_steak_twist, symbol = "swap_food", randomanim = true, sg = anims_steak_twist } }
 })
 MakeFxFollow({ --朽目撕裂者：在烹饪锅里的动画
     name = "dish_tomahawksteak_twist_cp_fofx",
     assets = {
         Asset("ANIM", "anim/skin/dish_tomahawksteak_twist.zip")
     },
-    fx = { {
-        fn_anim = SetAnim_base, symbol = "swap_cooked", randomanim = true,
-        build = "dish_tomahawksteak_twist", anim = "idle", isloop = true
-    } }
+    fx = { { fn_anim = SetAnim_steak_twist, symbol = "swap_cooked", randomanim = true, sg = anims_steak_twist } }
 })
 MakeFxFollow({ --朽目撕裂者：在手里的动画
     name = "dish_tomahawksteak_twist_fofx",
@@ -1726,8 +1735,8 @@ MakeFxFollow({ --朽目撕裂者：在手里的动画
         Asset("ANIM", "anim/skin/dish_tomahawksteak_twist.zip")
     },
     fx = { {
-        fn_anim = SetAnim_base, symbol = "swap_object",
-        build = "dish_tomahawksteak_twist", anim = "swap1", isloop = true
+        fn_anim = SetAnim_steak_twist, symbol = "swap_object", randomanim = true,
+        anim = "swap1", sg = anims_steak_twist_swap
     } }
 })
 

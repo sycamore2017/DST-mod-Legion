@@ -911,7 +911,7 @@ end
 local dd_dish_tomahawksteak_twist = {
     symbol = "swap_object", build = "dish_tomahawksteak_twist", file = "xx",
     scabbard = {
-        anim = "idle_cover", isloop = true, bank = "dish_tomahawksteak_twist", build = "dish_tomahawksteak_twist",
+        anim = "idle_cover1", isloop = true, bank = "dish_tomahawksteak_twist", build = "dish_tomahawksteak_twist",
         image = "foliageath_dish_tomahawksteak_twist",
         atlas = "images/inventoryimages_skin/foliageath_dish_tomahawksteak_twist.xml"
     },
@@ -3760,10 +3760,22 @@ local SKINS_LEGION = {
 		},
         image = { name = nil, atlas = nil, setable = true },
         string = ischinese and { name = "朽目撕裂者" } or { name = "Rotten Eyes Ripper" },
-		anim = { bank = nil, build = nil, anim = nil, animpush = nil, isloop = true },
+		-- anim = { bank = nil, build = nil, anim = "idle1", animpush = nil, isloop = nil },
         equip = dd_dish_tomahawksteak_twist,
-        fn_start = Fn_start_equip,
-        fn_end = Fn_end_dish_tomahawksteak_twist,
+        fn_anim = function(inst)
+            SetSgSkinAnim(inst, { "idle1", "idle2" })
+        end,
+        fn_start = function(inst, skined)
+            Fn_start_equip(inst, skined)
+            inst.AnimState:SetSymbolBloom("eye")
+            inst.AnimState:SetSymbolLightOverride("eye", 0.5)
+        end,
+        fn_end = function(inst, skined)
+            Fn_end_dish_tomahawksteak_twist(inst, skined)
+            CancelSgSkinAnim(inst)
+            inst.AnimState:ClearSymbolBloom("eye")
+            inst.AnimState:SetSymbolLightOverride("eye", 0)
+        end,
         exchangefx = { prefab = nil, offset_y = nil, scale = nil },
         floater = { cut = 0.05, size = "med", offset_y = 0.2, scale = 0.6, nofx = nil },
         fn_stewer = function(inst, stewer)
