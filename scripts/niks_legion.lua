@@ -2,6 +2,7 @@ local _G = GLOBAL
 local IsServer = TheNet:GetIsServer() or TheNet:IsDedicated()
 local ischinese = _G.CONFIGS_LEGION.LANGUAGES == "chinese"
 local TOOLS_L = require("tools_legion")
+local TOOLS2_L = require("tools2_legion")
 
 local rarityRepay = "ProofOfPurchase"
 local rarityFree = "Distinguished"
@@ -110,6 +111,10 @@ local img_dish_tomahawksteak_twist = {
     atlas = "images/inventoryimages_skin/dish_tomahawksteak_twist.xml", image = "dish_tomahawksteak_twist.tex"
 }
 local swap_dish_tomahawksteak_twist = { build = "dish_tomahawksteak_twist", file = "xx" }
+local fxsets_dish_tomahawksteak_twist = {
+    fx_held = "dish_tomahawksteak_twist_heldfx", fx_ground = "dish_tomahawksteak_twist_groundfx",
+    follow_dd = { x = 67, y = -7 }
+}
 
 local function CopyValue(data, nokeys)
     if data == nil or type(data) ~= "table" then
@@ -3760,7 +3765,7 @@ local SKINS_LEGION = {
 		},
         image = { name = nil, atlas = nil, setable = true },
         string = ischinese and { name = "朽目撕裂者" } or { name = "Rotten Eyes Ripper" },
-        equip = dd_dish_tomahawksteak_twist,
+        equip = dd_dish_tomahawksteak_twist, fxsets = fxsets_dish_tomahawksteak_twist,
         fn_anim = function(inst)
             SetSgSkinAnim(inst, { "idle1", "idle2" })
         end,
@@ -3770,14 +3775,18 @@ local SKINS_LEGION = {
             inst.AnimState:SetBuild("dish_tomahawksteak_twist")
             inst.AnimState:SetSymbolBloom("eye")
             inst.AnimState:SetSymbolLightOverride("eye", 0.5)
-            FxInit(inst, { "", "dish_tomahawksteak_twist_trailfx" }, nil, { "steak_twist_trail" })
+            -- FxInit(inst, { "", "dish_tomahawksteak_twist_trailfx" }, nil, { "steak_twist_trail" })
+            -- if skined ~= nil and skined.fxsets ~= nil then
+            --     TOOLS2_L.Fx1_init(inst, skined.fxsets)
+            -- end
         end,
         fn_end = function(inst, skined)
             Fn_end_dish_tomahawksteak_twist(inst, skined)
             CancelSgSkinAnim(inst)
             inst.AnimState:ClearSymbolBloom("eye")
             inst.AnimState:SetSymbolLightOverride("eye", 0)
-            FxClear(inst)
+            -- FxClear(inst)
+            -- TOOLS2_L.Fx1_clear(inst)
         end,
         exchangefx = { prefab = nil, offset_y = nil, scale = nil },
         floater = { cut = 0.05, size = "med", offset_y = 0.2, scale = 0.6, nofx = nil },
@@ -3790,17 +3799,21 @@ local SKINS_LEGION = {
         data_spice = {
             anim = { bank = "plate_food", build = "plate_food", anim = "idle" },
             floater = { cut = nil, size = "med", offset_y = 0.05, scale = {0.8, 0.7, 0.8}, nofx = nil },
-            equip = dd_dish_tomahawksteak_twist,
+            equip = dd_dish_tomahawksteak_twist, fxsets = fxsets_dish_tomahawksteak_twist,
             inv_image_bg = img_dish_tomahawksteak_twist, anim_swap = swap_dish_tomahawksteak_twist,
             fn_start = function(inst, skined)
                 Fn_start_dish_tomahawksteak(inst, skined)
                 Fn_setFollowFx(inst, "fx_l_twist_sc", "dish_tomahawksteak_twist_sc_fofx")
-                FxInit(inst, { "", "dish_tomahawksteak_twist_trailfx" }, nil, { "steak_twist_trail" })
+                -- FxInit(inst, { "", "dish_tomahawksteak_twist_trailfx" }, nil, { "steak_twist_trail" })
+                -- if skined ~= nil and skined.fxsets ~= nil then
+                --     TOOLS2_L.Fx1_init(inst, skined.fxsets)
+                -- end
             end,
             fn_end = function(inst, skined)
                 Fn_removeFollowFx(inst, "fx_l_twist_sc")
                 Fn_end_dish_tomahawksteak_twist(inst, skined)
-                FxClear(inst)
+                -- FxClear(inst)
+                -- TOOLS2_L.Fx1_clear(inst)
             end,
             fn_start_c = Fn_start_c_dish_tomahawksteak
         }
