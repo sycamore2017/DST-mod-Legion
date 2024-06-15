@@ -132,7 +132,6 @@ end
 
 ------特效设置
 
-local TRAIL_FLAGS = { "shadowtrail" }
 local function cane_do_trail(inst)
     local owner = inst.components.inventoryitem:GetGrandOwner() or inst
     if not owner.entity:IsVisible() then
@@ -156,7 +155,7 @@ local function cane_do_trail(inst)
             local pt = Vector3(x + offset.x, 0, z + offset.z)
             return map:IsPassableAtPoint(pt:Get())
                 and not map:IsPointNearHole(pt)
-                and #TheSim:FindEntities(pt.x, 0, pt.z, .7, TRAIL_FLAGS) <= 0
+                and #TheSim:FindEntities(pt.x, 0, pt.z, .7, inst.trail_fx_tag) <= 0
         end
     )
 
@@ -188,9 +187,10 @@ local function cane_unequipped(inst, owner)
     end
 end
 
-local function FxInit(inst, data, vfx_fx_offset)
+local function FxInit(inst, data, vfx_fx_offset, trail_fx_tag)
     inst.vfx_fx = data[1] ~= nil and data[1]:len() > 0 and data[1] or nil
     inst.trail_fx = data[2]
+    inst.trail_fx_tag = trail_fx_tag
     if inst.vfx_fx ~= nil or inst.trail_fx ~= nil then
         inst:ListenForEvent("equipped", cane_equipped)
         inst:ListenForEvent("unequipped", cane_unequipped)
@@ -2086,7 +2086,7 @@ local SKINS_LEGION = {
         },
         fn_start = function(inst, skined)
             Fn_start_equip(inst, skined)
-            FxInit(inst, {"fx_ranimbowspark"}, -10)
+            FxInit(inst, { "fx_ranimbowspark" }, -10)
         end,
         fn_end = FxClear
     },
@@ -3760,21 +3760,24 @@ local SKINS_LEGION = {
 		},
         image = { name = nil, atlas = nil, setable = true },
         string = ischinese and { name = "朽目撕裂者" } or { name = "Rotten Eyes Ripper" },
-		-- anim = { bank = nil, build = nil, anim = "idle1", animpush = nil, isloop = nil },
         equip = dd_dish_tomahawksteak_twist,
         fn_anim = function(inst)
             SetSgSkinAnim(inst, { "idle1", "idle2" })
         end,
         fn_start = function(inst, skined)
             Fn_start_equip(inst, skined)
+            inst.AnimState:SetBank("dish_tomahawksteak_twist")
+            inst.AnimState:SetBuild("dish_tomahawksteak_twist")
             inst.AnimState:SetSymbolBloom("eye")
             inst.AnimState:SetSymbolLightOverride("eye", 0.5)
+            FxInit(inst, { "", "dish_tomahawksteak_twist_trailfx" }, nil, { "steak_twist_trail" })
         end,
         fn_end = function(inst, skined)
             Fn_end_dish_tomahawksteak_twist(inst, skined)
             CancelSgSkinAnim(inst)
             inst.AnimState:ClearSymbolBloom("eye")
             inst.AnimState:SetSymbolLightOverride("eye", 0)
+            FxClear(inst)
         end,
         exchangefx = { prefab = nil, offset_y = nil, scale = nil },
         floater = { cut = 0.05, size = "med", offset_y = 0.2, scale = 0.6, nofx = nil },
@@ -3792,10 +3795,12 @@ local SKINS_LEGION = {
             fn_start = function(inst, skined)
                 Fn_start_dish_tomahawksteak(inst, skined)
                 Fn_setFollowFx(inst, "fx_l_twist_sc", "dish_tomahawksteak_twist_sc_fofx")
+                FxInit(inst, { "", "dish_tomahawksteak_twist_trailfx" }, nil, { "steak_twist_trail" })
             end,
             fn_end = function(inst, skined)
                 Fn_removeFollowFx(inst, "fx_l_twist_sc")
                 Fn_end_dish_tomahawksteak_twist(inst, skined)
+                FxClear(inst)
             end,
             fn_start_c = Fn_start_c_dish_tomahawksteak
         }
@@ -3986,7 +3991,8 @@ local ls_buildmap = { --prefab，build与皮肤的对应表，用以比对动画
     },
     chest_whitewood_big_inf = {
         chest_whitewood_big_inf = 0, chest_whitewood_big_inf_craft = "chest_whitewood_big_craft"
-    }
+    },
+    dish_tomahawksteak = { dish_tomahawksteak = 0, dish_tomahawksteak_twist = "dish_tomahawksteak_twist" }
 }
 
 ------皮肤排序

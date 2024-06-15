@@ -1488,13 +1488,9 @@ local function MakeSteak(data)
 
             inst:SetPrefabNameOverride(basename)
             inst.displaynamefn = DisplayName_steak
-
-            -- SetFloatable(inst, { nil, "med", 0.05, {0.8, 0.7, 0.8} })
         else
             inst.AnimState:SetBank(basename)
             inst.AnimState:SetBuild(basename)
-
-            -- MakeInventoryFloatable(inst, "small", 0.2, 0.75)
         end
         inst.AnimState:PlayAnimation("idle")
 

@@ -53,7 +53,7 @@ local function MakeFx(data) --不需要网络功能
 			if not TheWorld.ismastersim then return inst end
 
 			inst.persists = false
-			inst:DoTaskInTime(1, inst.Remove)
+			inst:DoTaskInTime(data.removetime or 1, inst.Remove)
 
 			return inst
 		end,
@@ -1176,7 +1176,6 @@ MakeFx({ --子圭寄生花：消失特效
         Asset("ANIM", "anim/lavaarena_boarrior_fx.zip"), --官方的动画
         Asset("ANIM", "anim/siving_boss_flower_fx.zip"),
     },
-    fn_common = nil,
     fn_anim = function(inst)
         inst.AnimState:SetBank("lavaarena_boarrior_fx")
         inst.AnimState:SetBuild("siving_boss_flower_fx")
@@ -1184,8 +1183,7 @@ MakeFx({ --子圭寄生花：消失特效
         inst.AnimState:SetBloomEffectHandle("shaders/anim.ksh")
         inst.AnimState:SetFinalOffset(1)
         inst.AnimState:SetMultColour(1/255, 248/255, 255/255, 1)
-    end,
-    fn_remove = nil
+    end
 })
 MakeFx({ --魔音绕梁：音波特效
     name = "siving_boss_taunt_fx",
@@ -1557,9 +1555,9 @@ local anims_smallbird = {
 }
 local anims_steak_twist = { "idle1", "idle2" }
 local anims_steak_twist_swap = {
-    "swap1", "swap2", "swap1", "swap1", "swap3", "swap4", "swap4", "swap4",
+    "swap1", "swap2", "swap1", "swap1", "swap3", "swap4", "swap4", "swap4", "atk1", "atk1",
     { "swap1", "swap2" }, { "swap1", "swap3" },
-    { "swap4", "swap2" }, { "swap4", "swap3" }
+    { "swap4", "swap2" }, { "swap4", "swap3" }, "atk1"
 }
 
 ------随机仿sg的动画
@@ -1738,6 +1736,34 @@ MakeFxFollow({ --朽目撕裂者：在手里的动画
         fn_anim = SetAnim_steak_twist, symbol = "swap_object", randomanim = true,
         anim = "swap1", sg = anims_steak_twist_swap
     } }
+})
+MakeFx({ --朽目撕裂者：足迹特效
+    name = "dish_tomahawksteak_twist_trailfx",
+    assets = {
+        Asset("ANIM", "anim/skin/dish_tomahawksteak_twist_trailfx.zip")
+    },
+    removetime = 1.5,
+    fn_common = function(inst)
+        inst:AddTag("steak_twist_trail")
+    end,
+    fn_anim = function(inst)
+        inst.AnimState:SetBank("dish_tomahawksteak_twist_trailfx")
+        inst.AnimState:SetBuild("dish_tomahawksteak_twist_trailfx")
+        inst.kind_l = tostring(math.random(8))
+        inst.AnimState:PlayAnimation("idle"..inst.kind_l)
+        local scale = math.random()*0.4 + 0.9
+        if math.random() >= 0.5 then
+            inst.AnimState:SetScale(scale, scale)
+        else
+            inst.AnimState:SetScale(-scale, scale) --还能左右相反，差点忘了
+        end
+    end,
+    fn_remove = function(inst)
+        inst:DoTaskInTime(math.random()+1.5, function()
+            inst.AnimState:PlayAnimation("pst"..inst.kind_l)
+            inst:ListenForEvent("animover", inst.Remove)
+        end)
+    end
 })
 
 --各种普通小猫咪
