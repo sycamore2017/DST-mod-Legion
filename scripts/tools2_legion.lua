@@ -1,7 +1,7 @@
 
 local fns
 
---[ 设置掉落散开型特效。借鉴于提灯的皮肤特效 ]--
+--[ 设置掉落散开型特效。借鉴于提灯的皮肤特效代码。但是因为提灯皮肤的特效动画没法做修改，所以整个逻辑都没用了，先留着吧 ]--
 local function Fx1_remove(fx)
     fx._lantern._lit_fx_inst = nil
 end

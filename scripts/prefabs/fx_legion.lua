@@ -1734,7 +1734,7 @@ MakeFxFollow({ --朽目撕裂者：在手里的动画
         anim = "swap1", sg = anims_steak_twist_swap
     } }
 })
-MakeFx({ --朽目撕裂者：足迹特效
+--[[MakeFx({ --朽目撕裂者：足迹特效
     name = "dish_tomahawksteak_twist_trailfx",
     assets = {
         Asset("ANIM", "anim/skin/dish_tomahawksteak_twist_trailfx.zip")
@@ -1760,6 +1760,41 @@ MakeFx({ --朽目撕裂者：足迹特效
             inst.AnimState:PlayAnimation("pst"..inst.kind_l)
             inst:ListenForEvent("animover", inst.Remove)
         end)
+    end
+})]]--
+MakeFx({ --朽目撕裂者：攻击特效
+    name = "dish_tomahawksteak_twist_atkfx",
+    assets = {
+        Asset("ANIM", "anim/skin/dish_tomahawksteak_twist_atkfx.zip")
+    },
+    fn_anim = function(inst)
+        inst.AnimState:SetBank("dish_tomahawksteak_twist_atkfx")
+        inst.AnimState:SetBuild("dish_tomahawksteak_twist_atkfx")
+        inst.AnimState:PlayAnimation("idle"..tostring(math.random(6)))
+        local scale = math.random()*0.5 + 1.2
+        if math.random() >= 0.5 then
+            inst.AnimState:SetScale(scale, scale)
+        else
+            inst.AnimState:SetScale(-scale, scale) --还能左右相反，差点忘了
+        end
+        inst.AnimState:SetSymbolBloom("eye")
+        inst.AnimState:SetSymbolLightOverride("eye", 0.5)
+        inst.AnimState:SetFinalOffset(3)
+    end
+})
+MakeFx({ --朽目撕裂者：攻击特效2
+    name = "dish_tomahawksteak_twist_atkfx2",
+    assets = {
+        Asset("ANIM", "anim/crystalblast_fx.zip"), --官方动画模板
+        Asset("ANIM", "anim/skin/dish_tomahawksteak_twist_atkfx.zip")
+    },
+    fn_anim = function(inst)
+        inst.AnimState:SetBank("crystalblast")
+        inst.AnimState:SetBuild("dish_tomahawksteak_twist_atkfx")
+        inst.AnimState:PlayAnimation("blast")
+        inst.AnimState:SetLightOverride(0.5)
+        inst.AnimState:SetFinalOffset(2)
+        inst.AnimState:SetScale(0.6, 0.6)
     end
 })
 
@@ -1976,130 +2011,6 @@ MakeFxFollow({ --高脚鸟蛋（冷）
         { anim = "idle_cold", fn_anim = SetAnim_tallbirdegg, symbol = "swap_hat", idx = 1, x = -20, y = -145, z = 0 },
         { anim = "idle_cold", fn_anim = SetAnim_tallbirdegg, symbol = "swap_hat", idx = 2, x = -20, y = -145, z = 0 }
     }
-})
-
-------
-
-local function IsMovingStep(step)
-    return step ~= 0 and step ~= 3
-end
-local function OnFxAnimOver(inst)
-    if inst.petalemitter:IsValid() then
-        if IsMovingStep(inst.step) then
-            if inst.petalemitter.ismoving then
-                inst:Show()
-            else
-                inst:Hide()
-            end
-        end
-        inst.Transform:SetPosition(inst.petalemitter.Transform:GetWorldPosition())
-        inst.AnimState:PlayAnimation(inst.anim)
-    else
-        inst:Remove()
-    end
-end
-local function AFx_steak_twist(petalemitter, variation, step)
-    local inst = CreateEntity()
-
-    inst:AddTag("FX")
-    --[[Non-networked entity]]
-    inst.entity:SetCanSleep(false)
-    inst.persists = false
-
-    inst.entity:AddTransform()
-    inst.entity:AddAnimState()
-
-    inst.AnimState:SetBank("lantern_flower_fx")
-    inst.AnimState:SetBuild("lantern")
-    inst.AnimState:OverrideItemSkinSymbol("petal", "lantern_flower", "petal", 0, "lantern")
-    -- inst.AnimState:OverrideSymbol("petal", "agronssword_taste_fx", "spark")
-    inst.AnimState:SetFinalOffset(1)
-
-    inst.petalemitter = petalemitter
-    inst.anim = "petalfall"..tostring(variation)
-    inst.step = step
-    inst:ListenForEvent("animover", OnFxAnimOver)
-    OnFxAnimOver(inst)
-
-    return inst
-end
-local function CheckMoving(inst)
-    local parent = inst.entity:GetParent()
-    if parent ~= nil then
-        local newpos = parent:GetPosition()
-        inst.ismoving = inst.prevpos ~= nil and inst.prevpos ~= newpos
-        inst.prevpos = newpos
-    else
-        inst.ismoving = false
-    end
-end
-MakeFx2({ --朽目撕裂者：手持特效
-    name = "dish_tomahawksteak_twist_heldfx",
-    assets = {
-        -- Asset("ANIM", "anim/skin/dish_tomahawksteak_twist_heldfx.zip")
-    },
-    noanim = true,
-    fn_common = function(inst)
-        if not TheNet:IsDedicated() then
-            for i = 0, 5 do
-                local delay = i * 86 / 6 * FRAMES
-                inst:DoTaskInTime(delay + 1 * FRAMES, AFx_steak_twist, 1, i)
-                inst:DoTaskInTime(delay + 7 * FRAMES, AFx_steak_twist, 2, i)
-                inst:DoTaskInTime(delay + 13 * FRAMES, AFx_steak_twist, 3, i)
-                inst:DoTaskInTime(delay + 30 * FRAMES, AFx_steak_twist, 4, i)
-                inst:DoTaskInTime(delay + 41 * FRAMES, AFx_steak_twist, 5, i)
-                inst:DoTaskInTime(delay + 58 * FRAMES, AFx_steak_twist, 6, i)
-                inst:DoTaskInTime(delay + 67 * FRAMES, AFx_steak_twist, 7, i)
-            end
-            inst.ismoving = false
-            inst:DoPeriodicTask(0, CheckMoving)
-        end
-    end
-})
-
-local function KillFX(inst)
-    if inst:GetTimeAlive() > 0 then
-        inst.killed = true
-    else
-        inst:Remove()
-    end
-end
-local function OnGroundAnimOver_steak_twist(inst)
-    if not inst.killed then
-        if not inst.AnimState:IsCurrentAnimation("petal_pre") then
-            inst.AnimState:Show("hidepre")
-        end
-        inst.AnimState:PlayAnimation("petal_loop")
-    elseif inst.AnimState:IsCurrentAnimation("petal_pst") then
-        inst:Remove()
-    else
-        inst.AnimState:PlayAnimation("petal_pst")
-    end
-end
-MakeFx2({ --朽目撕裂者：地面特效
-    name = "dish_tomahawksteak_twist_groundfx",
-    assets = {
-        -- Asset("ANIM", "anim/skin/dish_tomahawksteak_twist_heldfx.zip")
-    },
-    fn_common = function(inst)
-        inst.AnimState:SetBank("lantern_crystal_fx")
-        -- inst.AnimState:SetBank("lantern_flower_fx")
-        inst.AnimState:SetBuild("lantern")
-        -- inst.AnimState:OverrideSymbol("petal", "agronssword_taste_fx", "spark")
-        -- inst.AnimState:OverrideItemSkinSymbol("petal", "lantern_flower", "petal", 0, "lantern")
-        -- inst.AnimState:Hide("hidepre")
-        -- inst.AnimState:PlayAnimation("petal_pre")
-        inst.AnimState:SetFinalOffset(1)
-        inst.AnimState:PlayAnimation("idle_ground", true)
-    end,
-    fn_server = function(inst)
-        -- if POPULATING then
-        --     inst.AnimState:PlayAnimation("petal_loop")
-        --     inst.AnimState:SetFrame(math.random(inst.AnimState:GetCurrentAnimationNumFrames()) - 1)
-        -- end
-        -- inst:ListenForEvent("animover", OnGroundAnimOver_steak_twist)
-        inst.KillFX = KillFX
-    end
 })
 
 ---------------
