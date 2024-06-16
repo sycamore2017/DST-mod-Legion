@@ -2,7 +2,7 @@ local _G = GLOBAL
 local IsServer = TheNet:GetIsServer() or TheNet:IsDedicated()
 local ischinese = _G.CONFIGS_LEGION.LANGUAGES == "chinese"
 local TOOLS_L = require("tools_legion")
-local TOOLS2_L = require("tools2_legion")
+-- local TOOLS2_L = require("tools2_legion")
 
 local rarityRepay = "ProofOfPurchase"
 local rarityFree = "Distinguished"

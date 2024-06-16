@@ -38,7 +38,8 @@ local SkinStrings = ischinese and {
         CRAFT = "巧匠系列", --工艺品、木工、玉石
         TALE = "言如玉系列", --各种童话故事、历险记、传说
         FACT = "非常正常系列", --非常正常，和现实大抵相同
-        SUNMOON = "日月同辉系列" --太阳、月亮、发光
+        SUNMOON = "日月同辉系列", --太阳、月亮、发光
+        TWIST = "扭曲系列", --邪恶、神秘、克苏鲁、混沌
     },
     UI_ACCESS = "获取",
     UI_INPUT_CDK = "请输入兑换码",
@@ -46,7 +47,7 @@ local SkinStrings = ischinese and {
     ACCESS = {
         UNKNOWN = "无法获取",
         DONATE = "通过回忆获取",
-        FREE = "自动获取",
+        FREE = "自动解锁",
         SPECIAL = "通过特殊方式获取",
         REWARD = "链锁奖励",
         LUCK = "幸运眷顾"
@@ -73,7 +74,8 @@ local SkinStrings = ischinese and {
         CRAFT = "Crafts Collection",
         TALE = "Tales Collection",
         FACT = "Reality Collection",
-        SUNMOON = "Sun-moon Collection"
+        SUNMOON = "Sun-moon Collection",
+        TWIST = "Arrival Collection"
     },
     UI_ACCESS = "Get It",
     UI_INPUT_CDK = "Please enter CDK",
@@ -698,13 +700,10 @@ local width_skininfo = 260
 local SkinData = {
     rosebush_marble = {
         string = ischinese and {
-            collection = "MARBLE", access = "DONATE",
-            descitem = "解锁\"蔷薇花丛\"的皮肤。",
+            collection = "MARBLE", access = "DONATE", descitem = "解锁\"蔷薇花丛\"的皮肤。",
             description = "“什么事？”王后慵懒地挑选着名贵的珠宝首饰，眼皮都不愿抬起一下。一盆夺目的蔷薇被摆在梳妆台上，王后瞥了一眼，见蔷薇开得确实美，有心取一朵添妆。“嘶——”指尖一滴鲜血滑落，眼前突然浮现前日游行时，骑士长剑上滴落的鲜血。国王却对她说，贱民而已。她突然寒从胆边生，退后仔细端详。蔷薇无言，却绽放得猩红恣意。",
         } or {
-            collection = "MARBLE", access = "DONATE",
-            descitem = "Unlock \"Rose Bush\" skin.",
-            description = "The story was not translated.",
+            collection = "MARBLE", access = "DONATE", descitem = "Unlock \"Rose Bush\" skin.", description = "Emmm."
         },
         height_anim = 160, --动画区域高度。默认150
         anims = {
@@ -726,13 +725,10 @@ local SkinData = {
     },
     rosorns_marble = {
         string = ischinese and {
-            collection = "MARBLE", access = "SPECIAL",
-            descitem = "解锁\"带刺蔷薇\"以及入鞘后的皮肤。",
+            collection = "MARBLE", access = "SPECIAL", descitem = "解锁\"带刺蔷薇\"以及入鞘后的皮肤。",
             description = "昔日王后的御剪如今竟然被用来剪去死刑犯的头发，据说这是为了防止刽子手砍头时，受到头发阻力拖泥带水，反而不美。究其原因，是王后修剪花丛时不慎被剪刀扎伤，这才特此给这把剪刀这样的“美差”。如今唯一能证明其身份的就是上面那精致的红蔷花纹，不过如今都被污迹遮住了大半。"
         } or {
-            collection = "MARBLE", access = "SPECIAL",
-            descitem = "Unlock \"Rosorns\" skin.",
-            description = "The story was not translated."
+            collection = "MARBLE", access = "SPECIAL", descitem = "Unlock \"Rosorns\" skin.", description = "Emmm."
         },
         height_anim = 140, --带角色的高度最好是140起底
         anims = {
@@ -763,13 +759,10 @@ local SkinData = {
     },
     lilybush_marble = {
         string = ischinese and {
-            collection = "MARBLE", access = "DONATE",
-            descitem = "解锁\"蹄莲花丛\"的皮肤。",
+            collection = "MARBLE", access = "DONATE", descitem = "解锁\"蹄莲花丛\"的皮肤。",
             description = "少女坐在马车内，欢喜地看着怀中被精心打理过的蹄莲。阳光穿透层层阴云，照进这暗无天日的城镇，落在这一盆娇嫩的花上，露珠熠熠生辉，隐隐反射出彩虹的光芒，一如今晨那座新落成的哥特式大教堂中那复杂繁华的琉璃透射的光芒一样美丽。偌大的庄园，少女只将花摆在窗前，快乐地起舞，透过窗子依稀可见一街之隔的处刑场，囚犯被关在笼中已成枯骨，垂下的骨指刚好触及窗内蹄莲洁白的花瓣，仿佛拼死都要抚摸这份美好。"
         } or {
-            collection = "MARBLE", access = "DONATE",
-            descitem = "Unlock \"Lily Bush\" skin.",
-            description = "The story was not translated."
+            collection = "MARBLE", access = "DONATE", descitem = "Unlock \"Lily Bush\" skin.", description = "Emmm."
         },
         height_anim = 110,
         anims = {
@@ -791,13 +784,10 @@ local SkinData = {
     },
     lileaves_marble = {
         string = ischinese and {
-            collection = "MARBLE", access = "SPECIAL",
-            descitem = "解锁\"蹄莲翠叶\"以及入鞘后的皮肤。",
+            collection = "MARBLE", access = "SPECIAL", descitem = "解锁\"蹄莲翠叶\"以及入鞘后的皮肤。",
             description = "他照着少女赠与的蹄莲的样子制了一把大理石长枪，本想建功立业，为国家开疆拓土，却没想到最后挥向的竟然是老鼠和饥肠辘辘苦求进城却不幸感染鼠疫的子民。昔日的铮光发亮的鞘如今已然锈迹斑斑，他虽如今已身获爵位，却也早已说不清那鞘上到底是铁锈还是血锈。"
         } or {
-            collection = "MARBLE", access = "SPECIAL",
-            descitem = "Unlock \"Lileaves\" skin.",
-            description = "The story was not translated."
+            collection = "MARBLE", access = "SPECIAL", descitem = "Unlock \"Lileaves\" skin.", description = "Emmm."
         },
         height_anim = 145,
         anims = {
@@ -823,13 +813,10 @@ local SkinData = {
     },
     orchidbush_marble = {
         string = ischinese and {
-            collection = "MARBLE", access = "DONATE",
-            descitem = "解锁\"兰草花丛\"的皮肤。",
+            collection = "MARBLE", access = "DONATE", descitem = "解锁\"兰草花丛\"的皮肤。",
             description = "他将一束精心打理过的兰花放入这亲手打造的铁艺花架之中赠与她，一丝微笑渐渐攀上她的嘴角，正如这兰草瀑布般攀援在架子上灿烂动人。然而今日他却收到噩耗，奴隶主要求她在新婚之夜将这束兰花亲自送入奴隶主的庄园。在这个人贱于牲畜的时代，他无力反抗。好在隔壁庄园的奴隶主曾被他挽救于鼠疫之中，便答应买下两人收入自己庄园当差。"
         } or {
-            collection = "MARBLE", access = "DONATE",
-            descitem = "Unlock \"Orchid Bush\" skin.",
-            description = "The story was not translated."
+            collection = "MARBLE", access = "DONATE", descitem = "Unlock \"Orchid Bush\" skin.", description = "Emmm."
         },
         height_anim = 175,
         anims = {
@@ -851,13 +838,10 @@ local SkinData = {
     },
     orchitwigs_marble = {
         string = ischinese and {
-            collection = "MARBLE", access = "SPECIAL",
-            descitem = "解锁\"兰草花穗\"以及入鞘后的皮肤。",
+            collection = "MARBLE", access = "SPECIAL", descitem = "解锁\"兰草花穗\"以及入鞘后的皮肤。",
             description = "婚礼虽不隆重却令人心安，如今他为新奴隶主看家护院，她为奴隶主的家眷莳花弄草，新铸的剑配上爱人所赠的兰花配饰，他紧握手中剑，誓死捍卫属于自己的一方安宁。听说隔壁庄园因奴隶暴动，看守松懈，庄园外墙已被涂满大大的“P”字母，（在黑死病时期，p代表不要靠近，有黑死病人）他一语不发，将擦拭好的剑推回剑鞘。"
         } or {
-            collection = "MARBLE", access = "SPECIAL",
-            descitem = "Unlock \"Orchitwigs\" skin.",
-            description = "The story was not translated.",
+            collection = "MARBLE", access = "SPECIAL", descitem = "Unlock \"Orchitwigs\" skin.", description = "Emmm."
         },
         height_anim = 145,
         anims = {
@@ -888,13 +872,10 @@ local SkinData = {
     },
     orchidbush_disguiser = {
         string = ischinese and {
-            collection = "DISGUISER", access = "SPECIAL",
-            descitem = "解锁\"兰草花丛\"的皮肤。",
+            collection = "DISGUISER", access = "SPECIAL", descitem = "解锁\"兰草花丛\"的皮肤。",
             description = "昨夜雨疏风骤，猎人不知所踪，仅留下这片茂盛的兰花丛纪念着曾经的点点滴滴。已不知是多少个春秋，花开花落，鸟去还回，它的等待始终落得一场空。恍惚间风吹过，摆动的兰花像极了猎人的身影，然而它也不知那潇洒果决的狩猎者是否还会归来……",
         } or {
-            collection = "DISGUISER", access = "SPECIAL",
-            descitem = "Unlock \"Orchid Bush\" skin.",
-            description = "The story was not translated.",
+            collection = "DISGUISER", access = "SPECIAL", descitem = "Unlock \"Orchid Bush\" skin.", description = "Emmm."
         },
         height_anim = 105,
         anims = {
@@ -916,13 +897,10 @@ local SkinData = {
     },
     orchitwigs_disguiser = {
         string = ischinese and {
-            collection = "DISGUISER", access = "FREE",
-            descitem = "解锁\"兰草花穗\"以及入鞘后的皮肤。",
+            collection = "DISGUISER", access = "FREE", descitem = "解锁\"兰草花穗\"以及入鞘后的皮肤。",
             description = "花色清浅，嫣粉各异，它隐匿其中，随着环境变化调整隐身衣的颜色，静候时机。若有猎物在此歇脚，它便踮起拟态为兰花瓣的步肢悄然靠近，只待猎物放松警惕，倏然伸出利爪，又消失在粉色的芬芳中。尽管有人批评它菩萨面蛇蝎心，但是待到下一次追猎时，它仍然会全力以赴。",
         } or {
-            collection = "DISGUISER", access = "FREE",
-            descitem = "Unlock \"Orchitwigs\" skin.",
-            description = "The story was not translated.",
+            collection = "DISGUISER", access = "FREE", descitem = "Unlock \"Orchitwigs\" skin.", description = "Emmm."
         },
         height_anim = 155,
         anims = {
@@ -953,13 +931,11 @@ local SkinData = {
     },
     neverfade_thanks = {
         string = ischinese and {
-            collection = "THANKS", access = "SPECIAL",
-            descitem = "解锁\"永不凋零\"、\"永不凋零花丛\"、\"庇佑蝴蝶\"以及入鞘后的皮肤。",
+            collection = "THANKS", access = "SPECIAL", descitem = "解锁\"永不凋零\"、\"永不凋零花丛\"、\"庇佑蝴蝶\"以及入鞘后的皮肤。",
             description = "“话说，这夜京郊外小竹林中，那是充满了肃杀之气，本是人来人往的入城必经之路，此刻却连只鸟儿都没有。只见有一双身影在其中对峙，两人遮步相互打量了半晌，那女子方才立起剑来。这剑可大有名堂，唤作青玉扶伤，通体碧色，光洁如玉，敲之竟闻金铁之声，最厉害之处在于此剑有灵，能够护主。而这女子对面的敌人也是毫不示弱，双手缓缓拔出这雌雄双刀。江湖中人皆知，这习武之人大部分都是右利手，这刀疤脸男子却不同，他自小苦练，终成就双手皆能惯用，这一双雌雄狂刀，雌刀薄，攻在速，取敌不备；雄刀厚，攻在力，更可防守。这两人将武器亮出，霎时间那是天地变色，狂风大作，竹林之中落叶飞舞，竟在刀疤脸上留下一丝血痕，反观那女子衣服也多有破口，原是这两人在用内力较劲。刀疤脸冷笑一声，刀光一闪，就冲上前去，招招皆冲着柳氏的命门而去，这柳氏也不甘示弱，见招拆招，身边青蝶环绕护体，却又见缝插针地进攻刀疤脸的要害，两人正是势均力敌难解难分，然而只听得‘叮咛’一声，玉剑折断，一纤长身影艰难起身，逐渐隐没在渐起的夜雾之中。正是，十年冤案无处诉，玉剑傍身除恶徒！”",
         } or {
             collection = "THANKS", access = "SPECIAL",
-            descitem = "Unlock \"Neverfade\", \"Neverfade Bush\", and \"Neverfade Butterfly\" skin.",
-            description = "The story was not translated.",
+            descitem = "Unlock \"Neverfade\", \"Neverfade Bush\", and \"Neverfade Butterfly\" skin.", description = "Emmm."
         },
         height_anim = 270,
         anims = {
@@ -1014,13 +990,10 @@ local SkinData = {
     },
     hat_lichen_emo_que = {
         string = ischinese and {
-            collection = "EMOTICON", access = "DONATE",
-            descitem = "解锁\"苔衣发卡\"的皮肤。",
+            collection = "EMOTICON", access = "DONATE", descitem = "解锁\"苔衣发卡\"的皮肤。",
             description = "你知道哲学的基本问题吗？你认为意识和物质的关系是怎样的呢？你是唯心主义者还是唯物主义者？你支持意识能够正确认识物质的可知论，还是意识不能正确认识物质的不可知论呢？你对人类的存在是宇宙增墒这一判断有何看法？你认为人活着的意义是什么？什么？你什么都不知道？",
         } or {
-            collection = "EMOTICON", access = "DONATE",
-            descitem = "Unlock \"Lichen Hairpin\" skin.",
-            description = "The story was not translated.",
+            collection = "EMOTICON", access = "DONATE", descitem = "Unlock \"Lichen Hairpin\" skin.", description = "Emmm."
         },
         height_anim = 145,
         anims = {
@@ -1041,13 +1014,10 @@ local SkinData = {
     },
     hat_lichen_disguiser = {
         string = ischinese and {
-            collection = "DISGUISER", access = "FREE",
-            descitem = "解锁\"苔衣发卡\"的皮肤。",
+            collection = "DISGUISER", access = "FREE", descitem = "解锁\"苔衣发卡\"的皮肤。",
             description = "洋流之下，是暗流涌动的深渊。终年阴暗，偶有一点光明便格外显眼。远处突然出现忽闪忽闪的淡蓝色光点，小小鱼虾们好奇前去追寻。越游越近，突现一张长满尖牙的恐怖大嘴一口咬了下来。",
         } or {
-            collection = "DISGUISER", access = "FREE",
-            descitem = "Unlock \"Lichen Hairpin\" skin.",
-            description = "The story was not translated.",
+            collection = "DISGUISER", access = "FREE", descitem = "Unlock \"Lichen Hairpin\" skin.", description = "Emmm."
         },
         height_anim = 150,
         anims = {
@@ -1068,15 +1038,11 @@ local SkinData = {
     },
     hat_lichen_emo_3shock = {
         string = ischinese and {
-            name = "情绪化",
-            collection = "EMOTICON", access = "SPECIAL",
-            descitem = "解锁\"苔衣发卡\"的5套皮肤。",
+            name = "情绪化", collection = "EMOTICON", access = "SPECIAL", descitem = "解锁\"苔衣发卡\"的5套皮肤。",
             description = "突然间，眼前的景象让我有些惊讶得说不出话来。那种心动，就像是突然被一阵暖风拂过，让整个世界都变得明亮而美好。可随之而来的，却是一种紧张的情绪，就像是踏上未知的路途，不安与期待交织。\n然后，情感如暴风雨一般激荡，那种愤怒仿佛是从心底涌出的怒火，让每个细胞都在生气的烈焰中颤抖。这一系列情绪，像是一场短暂的旋律，快速切换，让生活充满了未知的惊喜与波澜。"
         } or {
-            name = "Moody",
-            collection = "EMOTICON", access = "SPECIAL",
-            descitem = "Unlock \"Lichen Hairpin\" skin.",
-            description = "The story was not translated."
+            name = "Moody", collection = "EMOTICON", access = "SPECIAL", descitem = "Unlock \"Lichen Hairpin\" skin.",
+            description = "Emmm."
         },
         height_anim = 265,
         anims = {
@@ -1149,13 +1115,10 @@ local SkinData = {
     },
     hat_cowboy_tvplay = {
         string = ischinese and {
-            collection = "TVPLAY", access = "FREE",
-            descitem = "解锁\"牛仔帽\"的皮肤。",
+            collection = "TVPLAY", access = "FREE", descitem = "解锁\"牛仔帽\"的皮肤。",
             description = "卡尔与伙伴一同返回基地途中，因发生争论无心警惕周围，他们拐过树丛时被突然冲出的五个丧尸扑倒。两人慌乱中解决了麻烦。但卡尔突然感到肚子刺痛，掀起衬衣发现自己已被咬伤……年过三十的卡尔梦中惊醒，看了看还在熟睡的妻女，又望了望桌上警徽虽早已脱落但保养还算完好的警帽，感叹还好只是梦一场。",
         } or {
-            collection = "TVPLAY", access = "FREE",
-            descitem = "Unlock \"Stetson\" skin.",
-            description = "The story was not translated.",
+            collection = "TVPLAY", access = "FREE", descitem = "Unlock \"Stetson\" skin.", description = "Emmm."
         },
         height_anim = 150,
         anims = {
@@ -1177,13 +1140,11 @@ local SkinData = {
     },
     boltwingout_disguiser = {
         string = ischinese and {
-            collection = "DISGUISER", access = "DONATE",
-            descitem = "解锁\"脱壳之翅\"、\"羽化后的壳\"的皮肤。",
+            collection = "DISGUISER", access = "DONATE", descitem = "解锁\"脱壳之翅\"、\"羽化后的壳\"的皮肤。",
             description = "它进化出了一对枯叶般的翅膀。饿了，花丛中有黄叶辗转；恋了，风中有木下双双飞舞；累了，树干上有翠减停留。这不夺人耳目的一生，最终也会悄悄离场。",
         } or {
-            collection = "DISGUISER", access = "DONATE",
-            descitem = "Unlock \"Boltwing-out\", \"Post-eclosion Shuck\" skin.",
-            description = "The story was not translated.",
+            collection = "DISGUISER", access = "DONATE", descitem = "Unlock \"Boltwing-out\", \"Post-eclosion Shuck\" skin.",
+            description = "Emmm."
         },
         height_anim = 140,
         anims = {
@@ -1221,7 +1182,7 @@ local SkinData = {
         } or {
             collection = "THANKS", access = "SPECIAL",
             descitem = "Unlock \"Fish-homing Bait Maker\", \"Fish-homing Bait Maker+\", and \"Fish-homing Bait\" skin.",
-            description = "The story was not translated.",
+            description = "Emmm."
         },
         height_anim = 280,
         anims = {
@@ -1270,15 +1231,13 @@ local SkinData = {
     },
     fishhomingtool_awesome_taste = {
         string = ischinese and {
-            name = "茶之恋",
-            collection = "TASTE", access = "REWARD",
+            name = "茶之恋", collection = "TASTE", access = "REWARD",
             descitem = "解锁\"简易打窝饵制作器\"、\"专业打窝饵制作器\"和\"打窝饵\"的皮肤。",
             description = "我俩在学校附近的街角开了一家茶饮店，店面不大，种类不多，人手就我们两个。我除了做成品之外，还负责跑外卖，每天忙忙碌碌停停歇歇，过的非常充实。\n店里最热卖的饮品有三款，一款“爱鸭桃桃”，清新桃芳，好似恋之初体验；一款“芋泥百转”，辗转滋味，好似恋之时经历；一款“大橘奶茶”，奶香醇厚，好似恋之后回望来时路的感慨万千。\n我俩的故事起于这家茶饮店，但肯定不会止步于此，我们对未来还有更多期待，还有很多美好事物想要一起体验！"
         } or {
-            name = "Tea Heart",
-            collection = "TASTE", access = "REWARD",
+            name = "Tea Heart", collection = "TASTE", access = "REWARD",
             descitem = "Unlock \"Fish-homing Bait Maker\", \"Fish-homing Bait Maker+\", and \"Fish-homing Bait\" skin.",
-            description = "The story was not translated."
+            description = "Emmm."
         },
         height_anim = 280,
         anims = {
@@ -1327,13 +1286,11 @@ local SkinData = {
     },
     shield_l_log_emo_pride = {
         string = ischinese and {
-            collection = "EMOTICON", access = "FREE",
-            descitem = "解锁\"木盾\"的皮肤。",
+            collection = "EMOTICON", access = "FREE", descitem = "解锁\"木盾\"的皮肤。",
             description = "多一丝宽容，你就少一份疑惑；多一丝爱心，你就少一份怨恨；多一丝理解，你就少一份紧张。你我都是独一无二，为自己骄傲吧。"
         } or {
-            collection = "EMOTICON", access = "FREE",
-            descitem = "Unlock \"Log Shield\" skin.",
-            description = "More tolerance,less doubt.More love,less resentment.More understanding,less nervousness.You and I are unique.Be proud of yourself.",
+            collection = "EMOTICON", access = "FREE", descitem = "Unlock \"Log Shield\" skin.",
+            description = "More tolerance, less doubt. More love, less resentment. More understanding, less nervousness. You and I are unique. Be proud of yourself."
         },
         height_anim = 140,
         anims = {
@@ -1359,13 +1316,10 @@ local SkinData = {
     },
     shield_l_log_emo_fist = {
         string = ischinese and {
-            collection = "EMOTICON", access = "SPECIAL",
-            descitem = "解锁\"木盾\"的皮肤。",
+            collection = "EMOTICON", access = "SPECIAL", descitem = "解锁\"木盾\"的皮肤。",
             description = "观点不一，骂Ta；羡慕嫉妒，恨Ta；没有黑点？监视Ta。不管发生什么，敲起键盘如同打拳，咬文嚼字断章取义也能搞得鸡飞狗跳。非我皆是恶，活在自己的世界，这就是拳的意义。打的就是你，陌生人。"
         } or {
-            collection = "EMOTICON", access = "SPECIAL",
-            descitem = "Unlock \"Log Shield\" skin.",
-            description = "The story was not translated.",
+            collection = "EMOTICON", access = "SPECIAL", descitem = "Unlock \"Log Shield\" skin.", description = "Emmm."
         },
         height_anim = 140,
         anims = {
@@ -1391,13 +1345,10 @@ local SkinData = {
     },
     shield_l_log_era = {
         string = ischinese and {
-            collection = "ERA", access = "SPECIAL",
-            descitem = "解锁\"木盾\"的皮肤。",
+            collection = "ERA", access = "SPECIAL", descitem = "解锁\"木盾\"的皮肤。",
             description = "他们是生命的奇迹，在寒武纪那个物种大爆发的时代，他们不甘籍籍无名，最早进化出了眼睛，试图看清这洪流般的时代，还进化出了坚硬的外壳，保护自己的族群生生不息。可惜的是，他们引以为傲的甲胄最终在三亿年的进化中成为了积重难返的弊端，最终被自然淘汰。平凡的他们常常以背景或被猎杀的对象出现在纪录片中，如同英雄故事里籍籍无名的平民百姓，然而历经三亿年荣辱兴衰的他们却为研究不同时期的自然环境留下了无法估量的价值。"
         } or {
-            collection = "ERA", access = "SPECIAL",
-            descitem = "Unlock \"Log Shield\" skin.",
-            description = "The story was not translated.",
+            collection = "ERA", access = "SPECIAL", descitem = "Unlock \"Log Shield\" skin.", description = "Emmm."
         },
         height_anim = 140,
         anims = {
@@ -1423,13 +1374,10 @@ local SkinData = {
     },
     shield_l_sand_era = {
         string = ischinese and {
-            collection = "ERA", access = "SPECIAL",
-            descitem = "解锁\"砂之抵御\"的皮肤。",
+            collection = "ERA", access = "SPECIAL", descitem = "解锁\"砂之抵御\"的皮肤。",
             description = "在洞穴深处一个不起眼的角落，它孤独着。它的头骨暴露在外，与古旧的头部甲胄融为一体，身体早已腐朽，只留下部分残缺的脊椎。它骨头上道道触目惊心的伤疤诉说着生前如何无数次顽强地抵御捕食者，它的下颌张开，仿佛在拼命呼唤着族群与希望。在生命的尽头，大地之母听见了它最后的低鸣，拥抱并亲吻了它的遗骨。",
         } or {
-            collection = "ERA", access = "SPECIAL",
-            descitem = "Unlock \"Desert Defense\" skin.",
-            description = "The story was not translated.",
+            collection = "ERA", access = "SPECIAL", descitem = "Unlock \"Desert Defense\" skin.", description = "Emmm."
         },
         height_anim = 140,
         anims = {
@@ -1455,13 +1403,10 @@ local SkinData = {
     },
     shield_l_sand_op = {
         string = ischinese and {
-            collection = "OLDPIC", access = "FREE",
-            descitem = "解锁\"砂之抵御\"的皮肤。",
+            collection = "OLDPIC", access = "FREE", descitem = "解锁\"砂之抵御\"的皮肤。",
             description = "画完就觉得左右貌似不太整齐，但是都画好，不想再改。现在我绘画时会不时左右翻转来查看画面的问题，也算是一个进步吧。贴图上结合了沙之石的纹路以及大量向外突出的晶石，中间是金块，现在想想金块不足以被摆在中间好像很重要似的。",
         } or {
-            collection = "OLDPIC", access = "FREE",
-            descitem = "Unlock \"Desert Defense\" skin.",
-            description = "The story was not translated.",
+            collection = "OLDPIC", access = "FREE", descitem = "Unlock \"Desert Defense\" skin.", description = "Emmm."
         },
         height_anim = 140,
         anims = {
@@ -1487,13 +1432,10 @@ local SkinData = {
     },
     icire_rock_era = {
         string = ischinese and {
-            collection = "ERA", access = "SPECIAL",
-            descitem = "解锁\"鸳鸯石\"的皮肤。",
+            collection = "ERA", access = "SPECIAL", descitem = "解锁\"鸳鸯石\"的皮肤。",
             description = "一颗苍天大树拔地而起，直冲云霄，然而在这地洞之内更显得蔚为壮观。更奇特的是，继续考察后，我们在树下的枯枝中发现一颗精美的琥珀。仔细清理之下，这才看到里面还有一只不知品类的有翅昆虫，琥珀将其包裹得如此完好，仿佛仍能听到窸窸窣窣的昆虫振翅声，而下一秒它就能活过来飞出琥珀似的。在火把的包围中，琥珀竟然渐渐变色，而其中的昆虫开始发出微弱的光芒，令人诧异的是，我突然感受到了它对生命瞬间凝滞的不甘……",
         } or {
-            collection = "ERA", access = "SPECIAL",
-            descitem = "Unlock \"Icire Stone\" skin.",
-            description = "The story was not translated.",
+            collection = "ERA", access = "SPECIAL", descitem = "Unlock \"Icire Stone\" skin.", description = "Emmm."
         },
         height_anim = 170,
         anims = {
@@ -1556,13 +1498,10 @@ local SkinData = {
     },
     icire_rock_collector = {
         string = ischinese and {
-            collection = "COLLECTOR", access = "SPECIAL",
-            descitem = "解锁\"鸳鸯石\"的皮肤。",
+            collection = "COLLECTOR", access = "SPECIAL", descitem = "解锁\"鸳鸯石\"的皮肤。",
             description = "我族世代守护占星石，并流传着一个不可思议的秘密。占星石每三百年都会选中一位族人，只有他能读懂占星预言。到那时只要听从星的指导，就能让我族发扬兴盛，摆脱命运安排。然而，距离上一位族人逝去已过快四百年，占星石也只剩隐隐的光。"
         } or {
-            collection = "COLLECTOR", access = "SPECIAL",
-            descitem = "Unlock \"Icire Stone\" skin.",
-            description = "The story was not translated.",
+            collection = "COLLECTOR", access = "SPECIAL", descitem = "Unlock \"Icire Stone\" skin.", description = "Emmm."
         },
         height_anim = 160,
         anims = {
@@ -1605,13 +1544,10 @@ local SkinData = {
     },
     lilybush_era = {
         string = ischinese and {
-            collection = "ERA", access = "SPECIAL",
-            descitem = "解锁\"蹄莲花丛\"、\"蹄莲翠叶\"以及入鞘后的皮肤。",
+            collection = "ERA", access = "SPECIAL", descitem = "解锁\"蹄莲花丛\"、\"蹄莲翠叶\"以及入鞘后的皮肤。",
             description = "沿着地下河道一路向前，我们在巨大地洞的入口处发现一片蓝色荧光花海，这里的植被花萼巨大，花瓣柔软光滑，金、蓝、紫相隔相接，却不甚芬芳。不知是不是我们的到来惊动了它们，花海仿佛有了生命，从我们身周开始，缓缓催动起波涛，迷幻的色彩摄人心魄，细长的蕨叶互相摩擦，传来木叶婆娑之声，仿佛在轻声欢迎我们的到来。"
         } or {
-            collection = "ERA", access = "SPECIAL",
-            descitem = "Unlock \"Lily Bush\", \"Lileaves\" skin.",
-            description = "The story was not translated.",
+            collection = "ERA", access = "SPECIAL", descitem = "Unlock \"Lily Bush\", \"Lileaves\" skin.", description = "Emmm."
         },
         height_anim = 280,
         anims = {
@@ -1651,15 +1587,11 @@ local SkinData = {
     },
     triplegoldenshovelaxe_era = {
         string = ischinese and {
-            name = "叮叮铛铛考古镐",
-            collection = "ERA", access = "SPECIAL",
-            descitem = "解锁\"斧铲-三用型\"、\"斧铲-黄金三用型\"的皮肤。",
+            name = "叮叮铛铛考古镐", collection = "ERA", access = "SPECIAL", descitem = "解锁\"斧铲-三用型\"、\"斧铲-黄金三用型\"的皮肤。",
             description = "在参加这一次的考古活动前，我们无论如何都想不到接下来我们将有怎样的奇遇。在深山中我们找到了一支新的古老河道，河道与山体相接，可惜被一块顽石堵住，老师和同学们齐心协力，终于在一片叮叮咚咚声中打开了新世界的入口，顺着河道进入山洞，不远处发现了奇怪的图腾，暗示我们顺流而下，越往前走地势便愈发低，而河流中也渐渐出现蓝色的荧光物，终于在河流尽头，我们发现了一片蓝色荧光瀑布和瀑布之下那个神秘的地洞入口。"
         } or {
-            name = "Era Explorers",
-            collection = "ERA", access = "SPECIAL",
-            descitem = "Unlock \"Triple-shovelaxe\", \"Snazzy Triple-shovelaxe\" skin.",
-            description = "The story was not translated.",
+            name = "Era Explorers", collection = "ERA", access = "SPECIAL",
+            descitem = "Unlock \"Triple-shovelaxe\", \"Snazzy Triple-shovelaxe\" skin.", description = "Emmm."
         },
         height_anim = 265,
         anims = {
@@ -1693,13 +1625,10 @@ local SkinData = {
     },
     rosebush_collector = {
         string = ischinese and {
-            collection = "COLLECTOR", access = "SPECIAL",
-            descitem = "解锁\"蔷薇花丛\"、\"带刺蔷薇\"以及入鞘后的皮肤。",
+            collection = "COLLECTOR", access = "SPECIAL", descitem = "解锁\"蔷薇花丛\"、\"带刺蔷薇\"以及入鞘后的皮肤。",
             description = "作为银河系最大的军阀统领，从小便渴望权利与力量。他用尽半生精力，终于在极其遥远的星云残骸中找到传说中能贯穿星辰的神剑。他带着贯星剑回到了自己的星球，憧憬着一统宇宙成为唯一的神……\n他高傲自豪地在高台上举起贯星剑，正准备发起向其他银河统领的宣战时，剑体却突然碎裂开来，化作无数金色光束向地面射去。在众人诧异中，地面开始朽化龟裂，水晶般的荆棘开始迅速长出，不断往周围蔓延。整个星球失去了生机，他也在崩坏与腐朽中失踪。",
         } or {
-            collection = "COLLECTOR", access = "SPECIAL",
-            descitem = "Unlock \"Rose Bush\", \"Rosorns\" skin.",
-            description = "The story was not translated.",
+            collection = "COLLECTOR", access = "SPECIAL", descitem = "Unlock \"Rose Bush\", \"Rosorns\" skin.", description = "Emmm."
         },
         height_anim = 320,
         anims = {
@@ -1744,13 +1673,10 @@ local SkinData = {
     },
     fimbul_axe_collector = {
         string = ischinese and {
-            collection = "COLLECTOR", access = "SPECIAL",
-            descitem = "解锁\"芬布尔斧\"的皮肤。",
+            collection = "COLLECTOR", access = "SPECIAL", descitem = "解锁\"芬布尔斧\"的皮肤。",
             description = "十七年前，盛夏流星群过后，一对夫妻在自己营地附近捡到一名戴着星星吊坠的女婴。现在，女婴已长大，每晚望着璀璨的星空着迷，但夫妻太爱这个孩子，不忍告诉她的来历，并藏起了属于她的吊坠。\n盛夏时节，女孩忽然有某种感应跑到楼顶，原来是流星群再次来临。女孩眼睛瞪得老大，欣赏着这场视觉的盛宴，留下了眼泪。\n夫妻觉得离别的时刻已经到来，把吊坠还给了女孩。吊坠交到女孩手里的那一刻，女孩理解了一切。她跃向天空，在耀眼的光芒过后，化作了流星群的一员飞出目光尽头，留下夫妻二人黯然神伤。\n两年后某个盛夏的夜晚，夫妻二人仍然依照往日习惯在楼顶看星星，此时一颗星星从天上划落，熟悉的少女身影闪现在夫妻眼前，三人默契相拥……"
         } or {
-            collection = "COLLECTOR", access = "SPECIAL",
-            descitem = "Unlock \"Fimbul's Axe\" skin.",
-            description = "The story was not translated.",
+            collection = "COLLECTOR", access = "SPECIAL", descitem = "Unlock \"Fimbul's Axe\" skin.", description = "Emmm."
         },
         height_anim = 265,
         anims = {
@@ -1809,13 +1735,10 @@ local SkinData = {
     },
     siving_turn_collector = {
         string = ischinese and {
-            collection = "COLLECTOR", access = "LUCK",
-            descitem = "解锁\"子圭·育\"的皮肤。",
+            collection = "COLLECTOR", access = "LUCK", descitem = "解锁\"子圭·育\"的皮肤。",
             description = "自从飞船失控，他被困在这片星漩中已过去3周。他无数次尝试与总部沟通，皆以失败告终。每每失落之际，他都会望着那颗最近的星球，星体一开始如黑洞般深邃，但又会逐渐闪耀起来，如同他的遭遇。“真好，你一直在我身边”，望着这颗美丽的星球他总能重燃信心，“你就是我的希望”。如今弹尽粮绝，飞船内的氧气也低到极限，他瘫倒在甲板，恍惚间，他好像发现很多生物的残骸漂浮在星环中，“为什么3周以来我都没看到过？”，他心生疑问。三周前，飞船突然收到求救讯号，然后他决定脱离航线前去救援，到达救援坐标后，飞船突然失控，那颗暗星也开始了光与暗的循环。在昏迷前，他终于理解这颗星球的秘密，“来吧，来吧，投入我的怀抱……”。昏迷的他，居然打开了舱门，向那颗星球跳去，很快便隐没在星环之中。",
         } or {
-            collection = "COLLECTOR", access = "LUCK",
-            descitem = "Unlock \"Siving-Mutator\" skin.",
-            description = "The story was not translated.",
+            collection = "COLLECTOR", access = "LUCK", descitem = "Unlock \"Siving-Mutator\" skin.", description = "Emmm."
         },
         height_anim = 190,
         anims = {
@@ -1843,13 +1766,10 @@ local SkinData = {
     },
     siving_turn_future = {
         string = ischinese and {
-            collection = "FUTURE", access = "SPECIAL",
-            descitem = "解锁\"子圭·育\"的皮肤。",
+            collection = "FUTURE", access = "SPECIAL", descitem = "解锁\"子圭·育\"的皮肤。",
             description = "以后的以后会发生什么，我们总是充满遐想，今天给大家讲个故事，关于未来。\n那时候，人们都依赖高科技已达到近乎长生不老的地步，也没有了更高尚的追求。而且你要知道很多动植物都在人类科技发展过程中灭绝了，甚至包括人类的爱犬，那是一段黑暗的时期，这里就不讲啦，继续讲今天的主题，幸好人类有喜欢存档的习惯，各种或消失或灭绝的动植物基因都被保留了下来。\n一个无聊的民间科学家无意间翻到一张自己祖先抱着一只非常可爱的生物的照片，于是去基因档案所窃取了这个生物的基因，并违规制造了生化打印器。很快，几只可爱的汪汪叫狗狗重现人间，科学家和狗狗玩的很开心呢。不过未来世界很难有不透风的纳米墙，科学家很快就被举报，他的所有成果都被没收，他自己也被关了起来……"
         } or {
-            collection = "FUTURE", access = "SPECIAL",
-            descitem = "Unlock \"Siving-Mutator\" skin.",
-            description = "The story was not translated."
+            collection = "FUTURE", access = "SPECIAL", descitem = "Unlock \"Siving-Mutator\" skin.", description = "Emmm."
         },
         height_anim = 155,
         anims = {
@@ -1878,13 +1798,10 @@ local SkinData = {
     },
     siving_turn_future2 = {
         string = ischinese and {
-            collection = "FUTURE", access = "SPECIAL",
-            descitem = "解锁\"子圭·育\"的皮肤。",
+            collection = "FUTURE", access = "SPECIAL", descitem = "解锁\"子圭·育\"的皮肤。",
             description = "关于未来的故事还有下文。\n近百年来突然掀起一场宠物选美潮流，不时有各种宠物选美大赛冲入人们视野。可能那时人类无聊至极，开始培养新的兴趣。在赛场上，可以看到各种名流展示着自己的爱宠，越是有权有威望人士的爱宠会更加“美丽动人”，但说实话，这些人并不爱他们的爱宠，只是把它当做炫耀的工具。所有宠物都由一家神秘机构负责创造，可根据卖家的想法来培育宠物。机构里有一台改装过的仪器，叫做基因诱变舱。机构人员其实并不是它的建造者，但会用就够了。他们会往里面注入各种动植物的基因，然后链接在一起，短短8小时，便能打印出新的生物。\n有一天一位外星流浪客，带着古老星系的生物基因找到这个神秘机构，机构由于只接受宠物创造，所以不得以将猫的基因也加了进来……于是，在这个洁白的舱体里，第一只全身布满金色星纹，闪着金光的，星猫，诞生了！毫无疑问，外星流浪客带着它赢了很多次选美比赛，他和星猫引起了多次全球轰动，可真是让人羡慕得不行……"
         } or {
-            collection = "FUTURE", access = "SPECIAL",
-            descitem = "Unlock \"Siving-Mutator\" skin.",
-            description = "The story was not translated."
+            collection = "FUTURE", access = "SPECIAL", descitem = "Unlock \"Siving-Mutator\" skin.", description = "Emmm."
         },
         height_anim = 155,
         anims = {
@@ -1913,13 +1830,10 @@ local SkinData = {
     },
     siving_derivant_thanks = {
         string = ischinese and {
-            collection = "THANKS", access = "SPECIAL",
-            descitem = "解锁\"子圭奇型岩\"的2套皮肤。",
+            collection = "THANKS", access = "SPECIAL", descitem = "解锁\"子圭奇型岩\"的2套皮肤。",
             description = "“上回说到，柳氏重伤，扶伤也已玉碎，她拖着残躯跌跌撞撞回到梨花洞，这洞外虽然是郁郁葱葱，却只是普通森林景致，不比里面别有洞天。洞中有几棵奇异的银叶树，散发着青绿色的微光，虽不甚亮堂却堪堪能够照亮整个洞穴。洞穴正中有一阵法，柳氏将断剑插入阵眼，只见银叶树上的微光竟然活泛起来，逐渐向阵眼汇集，刹那间，阵法其光大盛，从阵眼中渐渐生出嫩绿枝芽，攀在剑身，逐渐将整柄剑包裹起来，而那断剑似乎活了般一明一暗地发出白色微光，似在呼吸，剑身上的裂痕也肉眼可见地被修复消失。而柳氏盘腿席地而坐，青光一片中，她身上的伤口也在快速结痂愈合。原来这银叶树名曰青冥梨花树，有生死人肉白骨之效，又与这青玉扶伤剑同宗同源，故而能够医治扶伤剑痕和剑主肉躯。这可真是，玉人妙运天不绝，洞中八卦有乾坤！”"
         } or {
-            collection = "THANKS", access = "SPECIAL",
-            descitem = "Unlock all \"Siving Derivant\" skin.",
-            description = "The story was not translated."
+            collection = "THANKS", access = "SPECIAL", descitem = "Unlock all \"Siving Derivant\" skin.", description = "Emmm."
         },
         height_anim = 255,
         anims = {
@@ -1939,13 +1853,10 @@ local SkinData = {
     },
     backcub_fans = {
         string = ischinese and {
-            collection = "FANS", access = "SPECIAL",
-            descitem = "解锁\"靠背熊\"的皮肤。",
+            collection = "FANS", access = "SPECIAL", descitem = "解锁\"靠背熊\"的皮肤。",
             description = "他叫饭仔，有着简单的几个爱好。吃饭饭，能吃就行；睡觉觉，要抱着他最爱的偶像抱枕才睡得着；不过，他最喜欢的还是给朋友们爱的抱抱。\n--感谢白饭的绘制",
         } or {
-            collection = "FANS", access = "SPECIAL",
-            descitem = "Unlock \"Backcub\" skin.",
-            description = "The story was not translated.",
+            collection = "FANS", access = "SPECIAL", descitem = "Unlock \"Backcub\" skin.", description = "Emmm."
         },
         height_anim = 140,
         anims = {
@@ -1966,13 +1877,10 @@ local SkinData = {
     },
     backcub_thanks = {
         string = ischinese and {
-            collection = "THANKS", access = "SPECIAL",
-            descitem = "解锁\"靠背熊\"的皮肤。",
+            collection = "THANKS", access = "SPECIAL", descitem = "解锁\"靠背熊\"的皮肤。",
             description = "“这江湖中早有竹居食铁兽这种奇兽的传闻，言此兽贪食，因而肚量巨大，得之认主后可借兽腹容纳万物。正所谓匹夫无罪，怀璧其罪，很快便有人盯上了它们。当夜竹林中人头攒动，火把几乎照亮了半边天。要说这食铁兽一家也是自然之灵长，为了护幼舍命与猎人们周旋，长者们硬生生抗住漫天箭雨，幼兽方才安然逃出。眼见幼兽逃出天罗地网，老兽们自然更不会俯首称臣，由最年长者带头，只见它们齐齐祭出修炼多年的灵丹，以多年修为引动自爆。那爆炸声惊天动地，毁去了大半竹林，更带走了泰半猎人的性命，剩下的人也只是一息尚存苟延残喘。据说，后来当其他人在他们面前再提起食铁兽时，他们无一不浑身颤抖如临大敌。正所谓父母之爱子，则为之计深远，老兽们正是以壮烈之举彻底打消了后人想猎取它们的幼子的念头，真乃可叹可惜也！而今幼兽孑然一身，举目无亲，只得潜藏于农神山。这农神山因森林茂密，地形奇崛，罕有人迹。不过，这一天，兽子却在农神山山涧发现一名重伤昏迷的女子。这兽子本性纯良，虽经历灭族惨案，仍心怀善念，不欲见有生灵逝于前，便将这女子驮至其藏身的梨花洞，借梨花洞内天地灵气为女子愈合伤口，奇妙的是，这剑竟然也能自主吸取天地精华缓慢修复。女子醒来后出于感谢，用玉竹炼制背篓，容兽子隐息藏身，而在女子养伤过程中，一人一兽逐渐建立了对彼此的信任，遂为兽子起名为浮生儿，一起在洞中修行八年，直到这一日出山。这可谓，浮沉尘世见险恶，生死度外结善缘！”"
         } or {
-            collection = "THANKS", access = "SPECIAL",
-            descitem = "Unlock \"Backcub\" skin.",
-            description = "The story was not translated."
+            collection = "THANKS", access = "SPECIAL", descitem = "Unlock \"Backcub\" skin.", description = "Emmm."
         },
         height_anim = 170,
         anims = {
@@ -2002,13 +1910,10 @@ local SkinData = {
     },
     backcub_fans2 = {
         string = ischinese and {
-            collection = "FANS", access = "REWARD",
-            descitem = "解锁\"靠背熊\"的皮肤。",
+            collection = "FANS", access = "REWARD", descitem = "解锁\"靠背熊\"的皮肤。",
             description = "饭豆子睡着时思想喜欢飘向各处。暴雨来临，孩童们都被雷声吓得噩梦不断。饭豆子放下自己的美梦而去帮助他们改善梦境。一觉醒来，孩子们终记不得它的模样，只记得那沙子般细腻的柔软。\n--感谢白饭的绘制",
         } or {
-            collection = "FANS", access = "REWARD",
-            descitem = "Unlock \"Backcub\" skin.",
-            description = "The story was not translated."
+            collection = "FANS", access = "REWARD", descitem = "Unlock \"Backcub\" skin.", description = "Emmm."
         },
         height_anim = 185,
         anims = {
@@ -2038,13 +1943,10 @@ local SkinData = {
     },
     agronssword_taste = {
         string = ischinese and {
-            collection = "TASTE", access = "SPECIAL",
-            descitem = "解锁\"艾力冈的剑\"的皮肤。",
+            collection = "TASTE", access = "SPECIAL", descitem = "解锁\"艾力冈的剑\"的皮肤。",
             description = "米歇尔凌晨就起床，在厨房和面、醒面、擀面，还用上了烤箱。很快来到早上，丈夫奥多穿着整洁的军装下楼，米歇尔赶紧端上来一大盘法棍，并往法棍上撒上一层糖霜，她知道奥多最喜欢加这个。两人的早餐是糖霜法棍，美味夹杂着别离，因为奥多马上要应征上战场，在如今非常动荡的时期。奥多怀揣家国情怀，觉得这是一份荣耀；米歇尔担心丈夫，期盼他一定要安全归来……"
         } or {
-            collection = "TASTE", access = "SPECIAL",
-            descitem = "Unlock \"Agron's Sword\" skin.",
-            description = "The story was not translated."
+            collection = "TASTE", access = "SPECIAL", descitem = "Unlock \"Agron's Sword\" skin.", description = "Emmm."
         },
         height_anim = 265,
         anims = {
@@ -2136,13 +2038,10 @@ local SkinData = {
     },
     agronssword_sun = {
         string = ischinese and {
-            collection = "SUNMOON", access = "SPECIAL",
-            descitem = "解锁\"艾力冈的剑\"的皮肤。",
+            collection = "SUNMOON", access = "SPECIAL", descitem = "解锁\"艾力冈的剑\"的皮肤。",
             description = ""
         } or {
-            collection = "SUNMOON", access = "SPECIAL",
-            descitem = "Unlock \"Agron's Sword\" skin.",
-            description = "The story was not translated."
+            collection = "SUNMOON", access = "SPECIAL", descitem = "Unlock \"Agron's Sword\" skin.", description = "Emmm."
         },
         height_anim = 265,
         anims = {
@@ -2234,15 +2133,11 @@ local SkinData = {
     },
     carpet_whitewood_law = {
         string = ischinese and {
-            name = "西洋棋棋盘",
-            collection = "LAW", access = "SPECIAL",
-            descitem = "解锁\"白木地垫\"、\"白木地毯\"的皮肤。",
+            name = "西洋棋棋盘", collection = "LAW", access = "SPECIAL", descitem = "解锁\"白木地垫\"、\"白木地毯\"的皮肤。",
             description = "不大不小的棋盘上，我方对方。每一颗棋子都是我的工具，让我在每一个方格上施展自己的权谋。不管是开局，结局，残局，败局，我都心思缜密，处变不惊。一横一竖的棋盘上，进攻防御，不到最后一刻都不要放弃！带领自己的棋子冲破封锁，进攻还是防御，都有我个人风格。"
         } or {
-            name = "Chessboard",
-            collection = "LAW", access = "SPECIAL",
-            descitem = "Unlock \"White Wood Mat\", \"White Wood Carpet\" skin.",
-            description = "The story was not translated."
+            name = "Chessboard", collection = "LAW", access = "SPECIAL",
+            descitem = "Unlock \"White Wood Mat\", \"White Wood Carpet\" skin.", description = "Emmm."
         },
         height_anim = 140,
         anims = {
@@ -2260,15 +2155,11 @@ local SkinData = {
     },
     carpet_whitewood_law2 = {
         string = ischinese and {
-            name = "西洋棋黑棋盘",
-            collection = "LAW", access = "SPECIAL",
-            descitem = "解锁\"白木地垫\"、\"白木地毯\"的皮肤。",
+            name = "西洋棋黑棋盘", collection = "LAW", access = "SPECIAL", descitem = "解锁\"白木地垫\"、\"白木地毯\"的皮肤。",
             description = "一横一竖的棋盘上，我方对方。每一颗棋子都是我的工具，让我在每一个方格上施展自己的权谋。不管是开局，结局，残局，败局，我都心思缜密，处变不惊。一黑一白的棋盘上，进攻防御，不到最后一刻都不要放弃！带领自己的棋子冲破封锁，进攻还是防御，都有我独特个性。"
         } or {
-            name = "Black Chessboard",
-            collection = "LAW", access = "SPECIAL",
-            descitem = "Unlock \"White Wood Mat\", \"White Wood Carpet\" skin.",
-            description = "The story was not translated."
+            name = "Black Chessboard", collection = "LAW", access = "SPECIAL",
+            descitem = "Unlock \"White Wood Mat\", \"White Wood Carpet\" skin.", description = "Emmm."
         },
         height_anim = 140,
         anims = {
@@ -2286,13 +2177,10 @@ local SkinData = {
     },
     soul_contracts_taste = {
         string = ischinese and {
-            collection = "TASTE", access = "SPECIAL",
-            descitem = "解锁\"灵魂契约\"的皮肤。",
+            collection = "TASTE", access = "SPECIAL", descitem = "解锁\"灵魂契约\"的皮肤。",
             description = "他才二十岁出头，就成为了当地知名高级餐厅的主厨。都说每位成功的大厨都有自己的拿手好菜，他自然也不例外。一般人也许会猜是焗蜗牛、北极贝寿司这类奢华的菜品，而他的出名作却是普普通通的芝士三明治。他烤出来的三明治既酥脆又软绵，入口回甘。内陷里一边是新鲜的生菜搭配微熏火腿肉，爽脆喷香，另一边是牛肉边角料剁碎后煎出来的肉饼，然后用完全融化的芝士贯浇两边，将两部分完美融合为一体。无论是用料还是做法都和平常的一致，但只有他的芝士三明治，因为他特殊的细节把控，有着超出预料的口感使人难以忘怀。\n其他人都是想着探究料理的做法，而我好奇他的童年，是什么样的经历能磨炼并诞生出这样一位三明治烹饪大师。或许他已出卖了灵魂，为了治愈自己，为了填补曾经的遗憾！"
         } or {
-            collection = "TASTE", access = "SPECIAL",
-            descitem = "Unlock \"Soul Contracts\" skin.",
-            description = "The story was not translated."
+            collection = "TASTE", access = "SPECIAL", descitem = "Unlock \"Soul Contracts\" skin.", description = "Emmm."
         },
         height_anim = 110,
         anims = {
@@ -2312,13 +2200,10 @@ local SkinData = {
     },
     icire_rock_day = {
         string = ischinese and {
-            collection = "DAY", access = "SPECIAL",
-            descitem = "解锁\"鸳鸯石\"的皮肤。",
+            collection = "DAY", access = "SPECIAL", descitem = "解锁\"鸳鸯石\"的皮肤。",
             description = "圣诞节礼物？！我最想要的是一颗雪景球。轻拿起它，快速摇动，雪花飘落，透过玻璃，尽收美景。在那几秒内，我看尽欢愉，短暂脱离枯槁的现实。此刻你将得到一颗能变化球内景色的风景球，不同的画面有着不同欢乐氛围。在这重要时节，我希望你快乐……"
         } or {
-            collection = "DAY", access = "SPECIAL",
-            descitem = "Unlock \"Icire Stone\" skin.",
-            description = "The story was not translated."
+            collection = "DAY", access = "SPECIAL", descitem = "Unlock \"Icire Stone\" skin.", description = "Emmm."
         },
         height_anim = 170,
         anims = {
@@ -2375,13 +2260,11 @@ local SkinData = {
     },
     neverfade_paper = {
         string = ischinese and {
-            collection = "PAPER", access = "SPECIAL",
-            descitem = "解锁\"永不凋零\"、\"永不凋零花丛\"、\"庇佑蝴蝶\"以及入鞘后的皮肤。",
+            collection = "PAPER", access = "SPECIAL", descitem = "解锁\"永不凋零\"、\"永不凋零花丛\"、\"庇佑蝴蝶\"以及入鞘后的皮肤。",
             description = "先在纸的边缘画上浅蓝色花纹，然后折成纸扇，再把外端稍稍压平。按照这个方式多做一些不同大小的，把所有拼凑在一起粘起来。最后做三个纸蝴蝶插上去，一捧花丛扇就做好了。佩柏细细欣赏着自己新的作品。\n“你怎么又在做这些垃圾！？给我好好做功课去！”佩柏的父亲吼他，当着他的面把他的新作品捏成团丢进垃圾桶，“给我把作业写了。”随后扬长而去。\n当晚，佩柏偷偷在被窝里开着手电。“妈，我想你”，佩柏在白纸上写了这几个字，折成了一个纸蝴蝶，然后又折了一把纸剑，他将纸蝴蝶黏在纸剑上，不知不觉居然睡着了。“我说了你不听是不是！”睡梦中的佩柏突然被父亲从床上拽起，当着他的面把蝴蝶纸剑撕得粉碎，“以后我见一次撕一次！”父亲说完就出去了。佩柏小声啜泣起来。",
         } or {
             collection = "PAPER", access = "SPECIAL",
-            descitem = "Unlock \"Neverfade\", \"Neverfade Bush\", and \"Neverfade Butterfly\" skin.",
-            description = "The story was not translated.",
+            descitem = "Unlock \"Neverfade\", \"Neverfade Bush\", and \"Neverfade Butterfly\" skin.", description = "Emmm."
         },
         height_anim = 300,
         anims = {
@@ -2437,13 +2320,11 @@ local SkinData = {
     },
     neverfade_paper2 = {
         string = ischinese and {
-            collection = "PAPER", access = "SPECIAL",
-            descitem = "解锁\"永不凋零\"、\"永不凋零花丛\"、\"庇佑蝴蝶\"以及入鞘后的皮肤。",
+            collection = "PAPER", access = "SPECIAL", descitem = "解锁\"永不凋零\"、\"永不凋零花丛\"、\"庇佑蝴蝶\"以及入鞘后的皮肤。",
             description = "佩柏把自己的折纸作品都藏在了床下盒子里，他不敢让父亲知道。一天放学回家，发现父亲正在屋外烧自己的折纸。父亲见佩柏回来，拿起木棍准备打人。佩柏立即激动起来，压抑的情绪终于爆发，“要是妈还在，她才不会让你这样对我！”“呜…”佩柏哭起来，“都怪你这个酒鬼…对我最好的妈妈已经不在了！”佩柏放声大哭。父亲愣住了，放下手里的木棍，想抱住佩柏。佩柏躲开了，跑向屋里。父亲掩面哭泣，他知道他错了，但他不会改。佩柏是这样认为的。\n从那之后，佩柏不再尝试折纸，不再尝试倾注情感于他物，所有的折纸都藏进了心里！",
         } or {
             collection = "PAPER", access = "SPECIAL",
-            descitem = "Unlock \"Neverfade\", \"Neverfade Bush\", and \"Neverfade Butterfly\" skin.",
-            description = "The story was not translated.",
+            descitem = "Unlock \"Neverfade\", \"Neverfade Bush\", and \"Neverfade Butterfly\" skin.", description = "Emmm."
         },
         height_anim = 300,
         anims = {
@@ -2499,15 +2380,11 @@ local SkinData = {
     },
     siving_feather_real_paper = {
         string = ischinese and {
-            name = "十字四方纸镖",
-            collection = "PAPER", access = "SPECIAL",
-            descitem = "解锁\"子圭·翰\"、\"子圭玄鸟绒羽\"的皮肤。",
+            name = "十字四方纸镖", collection = "PAPER", access = "SPECIAL", descitem = "解锁\"子圭·翰\"、\"子圭玄鸟绒羽\"的皮肤。",
             description = "“啊，我的眼睛！”，一位同学的眼睛被纸飞镖戳伤，肇事者逃之夭夭。班主任知道后为这位同学主持公道，看到地上的纸飞镖，精致不一般，立马就觉得这是佩柏的“杰作”，把这件事告诉了佩柏的父亲。\n佩柏的纸飞镖本来放在自己的书包里，他课间休息时总喜欢偷偷拿出来把玩，被身后的同学瞄到。于是他趁着佩柏上厕所，擅自拿走了纸飞镖，跑到人头攒动的走廊玩耍，一不小心就戳到了一位同学的眼睛，知道闯祸的他迅速离开“案发现场”。\n当天佩柏放学回到家，父亲早就守在门口。父亲责怪他不知道努力学习，就搞些没用的纸玩意，佩柏很郁闷，但无力反驳。佩柏被罚不准吃晚饭，于是趁着父亲吃饭的时机，再次折起纸来。由于自己的纸飞镖被没收，他决定重新做一个。这次的纸飞镖，工序更复杂更繁美，每一折每一转都是他的心事流露。"
         } or {
-            name = "Cross Square Paper Dart",
-            collection = "PAPER", access = "SPECIAL",
-            descitem = "Unlock \"Siving-Plume\", \"Siving Feather\" skin.",
-            description = "The story was not translated."
+            name = "Cross Square Paper Dart", collection = "PAPER", access = "SPECIAL",
+            descitem = "Unlock \"Siving-Plume\", \"Siving Feather\" skin.", description = "Emmm."
         },
         height_anim = 265,
         anims = {
@@ -2541,13 +2418,11 @@ local SkinData = {
     },
     siving_feather_real_collector = {
         string = ischinese and {
-            collection = "COLLECTOR", access = "SPECIAL",
-            descitem = "解锁\"子圭·翰\"、\"子圭玄鸟绒羽\"的皮肤。",
+            collection = "COLLECTOR", access = "SPECIAL", descitem = "解锁\"子圭·翰\"、\"子圭玄鸟绒羽\"的皮肤。",
             description = "传说宇宙里有种强大的四维生物，能穿梭于时间位面，只在一些古老星系里偶尔出没。一个幸运至极的人类，在从飞船中投身古星环后濒死之际，意外撞上了它。青光一闪，这个人突然回到了自己飞船迷路之前，手里还多了一片青光闪耀的鳞片。几年间，他靠着鳞片，带着自己的族人发展壮大，寿终正寝前将鳞片做成了占星石，希望占星石能继续引导族人。几百年后，族内有人叛变，窃取了占星石中的基因，逃往他星……\n此时此刻，到处地面塌陷，并不断长出暗红色的水晶荆棘。一个被基因改造过的星猫和其主人逃走途中，星猫掉进地缝，主人自顾不暇选择直接逃走，而星猫却意外接触到了荆棘的核心，核心里的能量居然被星猫吸收。顿时，它身体迸发出一股能量波，星猫从金色变成了青色，毛发也更加突出和光耀。它进化了，觉醒的古老基因让它通晓了一切。\n星猫飘向空中，俯瞰崩溃中的星球，为了报答诞生之恩，果断选择回到过去，拯救面前的未来……"
         } or {
-            collection = "COLLECTOR", access = "SPECIAL",
-            descitem = "Unlock \"Siving-Plume\", \"Siving Feather\" skin.",
-            description = "The story was not translated."
+            collection = "COLLECTOR", access = "SPECIAL", descitem = "Unlock \"Siving-Plume\", \"Siving Feather\" skin.",
+            description = "Emmm."
         },
         height_anim = 265,
         anims = {
@@ -2619,13 +2494,11 @@ local SkinData = {
     },
     revolvedmoonlight_item_taste = {
         string = ischinese and {
-            collection = "TASTE", access = "SPECIAL",
-            descitem = "解锁\"月轮宝盘套件\"、\"月轮宝盘\"的皮肤。",
+            collection = "TASTE", access = "SPECIAL", descitem = "解锁\"月轮宝盘套件\"、\"月轮宝盘\"的皮肤。",
             description = "近几月冰之国总是遭到蘑怪的侵扰。冰灵损失惨重，因为被蘑怪抓伤后会逐渐长满菌丝绒毛而死。冰王不得已加快了冰灵的创造，用料和做工也不再那么细心。小芒就是冰王用低廉的冰激凌底料，普通黄桃以及滥大街的芒果而创造出来的冰灵，然后马上就被派到了边哨站岗。\n芒队长每天都认真教授小芒等队员如何与蘑怪对抗。芒队长已经见证了太多队友的离别，所以格外强调，最重要的是如何活下来！\n没过几天，夜里警报响起！小芒虽然知道自己是粗制滥造出来的劣质冰灵，浑身发抖，但为了王国，坚定了信念，还是冲了出去……",
         } or {
             collection = "TASTE", access = "SPECIAL",
-            descitem = "Unlock \"Revolved Moonlight Kit\", \"Revolved Moonlight\" skin.",
-            description = "The story was not translated.",
+            descitem = "Unlock \"Revolved Moonlight Kit\", \"Revolved Moonlight\" skin.", description = "Emmm."
         },
         height_anim = 180,
         anims = {
@@ -2655,13 +2528,11 @@ local SkinData = {
     },
     revolvedmoonlight_item_taste2 = {
         string = ischinese and {
-            collection = "TASTE", access = "SPECIAL",
-            descitem = "解锁\"月轮宝盘套件\"、\"月轮宝盘\"的皮肤。",
+            collection = "TASTE", access = "SPECIAL", descitem = "解锁\"月轮宝盘套件\"、\"月轮宝盘\"的皮肤。",
             description = "红主色调，黑色是点缀。草莓圣代，巧克力为其新增一种高级感。酸酸甜甜，如青春的可爱。",
         } or {
             collection = "TASTE", access = "SPECIAL",
-            descitem = "Unlock \"Revolved Moonlight Kit\", \"Revolved Moonlight\" skin.",
-            description = "The story was not translated.",
+            descitem = "Unlock \"Revolved Moonlight Kit\", \"Revolved Moonlight\" skin.", description = "Emmm."
         },
         height_anim = 180,
         anims = {
@@ -2691,13 +2562,11 @@ local SkinData = {
     },
     revolvedmoonlight_item_taste3 = {
         string = ischinese and {
-            collection = "TASTE", access = "SPECIAL",
-            descitem = "解锁\"月轮宝盘套件\"、\"月轮宝盘\"的皮肤。",
+            collection = "TASTE", access = "SPECIAL", descitem = "解锁\"月轮宝盘套件\"、\"月轮宝盘\"的皮肤。",
             description = "绿主色调，黄色是点缀。柠檬圣代，奇异果为其新增一种搞怪感。清新酸拧，如跳脱的思维。",
         } or {
             collection = "TASTE", access = "SPECIAL",
-            descitem = "Unlock \"Revolved Moonlight Kit\", \"Revolved Moonlight\" skin.",
-            description = "The story was not translated.",
+            descitem = "Unlock \"Revolved Moonlight Kit\", \"Revolved Moonlight\" skin.", description = "Emmm."
         },
         height_anim = 180,
         anims = {
@@ -2727,13 +2596,11 @@ local SkinData = {
     },
     revolvedmoonlight_item_taste4 = {
         string = ischinese and {
-            collection = "TASTE", access = "SPECIAL",
-            descitem = "解锁\"月轮宝盘套件\"、\"月轮宝盘\"的皮肤。",
+            collection = "TASTE", access = "SPECIAL", descitem = "解锁\"月轮宝盘套件\"、\"月轮宝盘\"的皮肤。",
             description = "黑主色调，蓝色是点缀。黑巧圣代，蓝莓为其新增一种活跃感。丝滑香软，如随性的心态。",
         } or {
             collection = "TASTE", access = "SPECIAL",
-            descitem = "Unlock \"Revolved Moonlight Kit\", \"Revolved Moonlight\" skin.",
-            description = "The story was not translated.",
+            descitem = "Unlock \"Revolved Moonlight Kit\", \"Revolved Moonlight\" skin.", description = "Emmm."
         },
         height_anim = 180,
         anims = {
@@ -2763,13 +2630,10 @@ local SkinData = {
     },
     pinkstaff_tvplay = {
         string = ischinese and {
-            collection = "TVPLAY", access = "FREE",
-            descitem = "解锁\"幻象法杖\"的皮肤。",
+            collection = "TVPLAY", access = "FREE", descitem = "解锁\"幻象法杖\"的皮肤。",
             description = "无人的街道旁蓝光闪过，一位年老的绅士从一个老旧的电话亭里匆忙走出……\n他最近总是收到一个穿越时空传来的警告信号，于是，怀揣不安的心情来到了3202年的地球。\n由于太阳因未知原因而熄灭，地球环境已经破败不堪。他立即前往信号来源，一个空旷的地下农场。在一排排次世代人工培育箱中穿梭，光线强弱不一看不太清，他被突然跳下来的黑影打倒在地……\n“啧啧，约翰·史密斯，啊不，还是该叫你神秘博士”，恍惚中他看到一个满脸疤痕异常渗人的怪物站在自己面前，“好久不见，我猜你肯定不认识我了”。他正准备使用一个钢笔样的东西脱身，却被这个怪物一下打掉，“哈哈，别以为我不知道你的能耐，之前我可被你害惨了！”。他吃痛回复道，“是吗，让你尝尝我这一世的新花样吧”，然后被打飞的那个东西一瞬间发出了强烈的电光……"
         } or {
-            collection = "TVPLAY", access = "FREE",
-            descitem = "Unlock \"Illusion Staff\" skin.",
-            description = "The story was not translated."
+            collection = "TVPLAY", access = "FREE", descitem = "Unlock \"Illusion Staff\" skin.", description = "Emmm."
         },
         height_anim = 145,
         anims = {
@@ -2801,13 +2665,10 @@ local SkinData = {
     },
     plant_cactus_meat_l_world = {
         string = ischinese and {
-            collection = "DISGUISER", access = "SPECIAL",
-            descitem = "解锁\"仙人柱\"的皮肤。",
+            collection = "DISGUISER", access = "SPECIAL", descitem = "解锁\"仙人柱\"的皮肤。",
             description = "如果要我选什么花最美，我觉得，不是春日里的繁花似锦，也不是夏日里的娇艳欲滴，而是滚滚黄沙里，干旱沙漠中，险恶环境下开出的花儿！\n在每个清晨，它布满纤毛的球刺会从晨风中借来一缕缕露水；\n在每个正午，厚实的皮质会牢牢锁住水分，不给烈日抢走的机会；\n在偶尔午夜，小小的身体迸开巨大花蕾，不与争艳，在第一束阳光拜访前默默收起所有美丽痕迹。"
         } or {
-            collection = "DISGUISER", access = "SPECIAL",
-            descitem = "Unlock \"Cactaceae\" skin.",
-            description = "The story was not translated."
+            collection = "DISGUISER", access = "SPECIAL", descitem = "Unlock \"Cactaceae\" skin.", description = "Emmm."
         },
         height_anim = 134,
         anims = {
@@ -2832,13 +2693,11 @@ local SkinData = {
     },
     plant_carrot_l_fact = {
         string = ischinese and {
-            collection = "FACT", access = "SPECIAL",
-            descitem = "解锁\"芾萝卜\"、\"胡萝卜长枪\"的皮肤。",
+            collection = "FACT", access = "SPECIAL", descitem = "解锁\"芾萝卜\"、\"胡萝卜长枪\"的皮肤。",
             description = ""
         } or {
-            collection = "FACT", access = "SPECIAL",
-            descitem = "Unlock \"Carrot Cluster\", \"Carrot Lance\" skin.",
-            description = "The story was not translated."
+            collection = "FACT", access = "SPECIAL", descitem = "Unlock \"Carrot Cluster\", \"Carrot Lance\" skin.",
+            description = "Emmm."
         },
         height_anim = 160,
         anims = {
@@ -2865,13 +2724,12 @@ local SkinData = {
     },
     siving_ctlall_item_era = {
         string = ischinese and {
-            collection = "ERA", access = "SPECIAL",
-            descitem = "解锁\"子圭·利川\"、\"子圭·益矩\"、\"子圭·崇溟\"的皮肤。",
+            collection = "ERA", access = "SPECIAL", descitem = "解锁\"子圭·利川\"、\"子圭·益矩\"、\"子圭·崇溟\"的皮肤。",
             description = "在遥远古代，人类还处在部落阶段。在海滨旁，在密林里，在高原上，以大大小小的部落分而居之。\n海滨部落敬畏无垠大海。他们渴望探索翻涌的海洋，但总有一个极限，无情的洋流总能将他们拍落。于是他们树起图腾，关于海，关于他们在海里见过的庞大造物。\n密林部落崇敬广袤山川。他们勇于在一山又一山中寻觅并建立新的栖息地，但总有一个极限，连绵山川阻碍了他们的联系与团结。于是他们树起图腾，关于山，关于他们想要团结，想要走遍大地。\n高原部落向往自由蓝天。恶劣的生存环境让他们信仰魂魄能翱翔天空。于是他们树起图腾，关于天，关于美好生活和每天都能望见的自由飞鸟。"
         } or {
             collection = "ERA", access = "SPECIAL",
             descitem = "Unlock \"Siving-Irrigator\", \"Siving-Fertilizer\", \"Siving-Agriculture\" skin.",
-            description = "The story was not translated."
+            description = "Emmm."
         },
         height_anim = 226,
         anims = {
@@ -2912,15 +2770,11 @@ local SkinData = {
     },
     siving_mask_gold_era = {
         string = ischinese and {
-            name = "巫族骨面",
-            collection = "ERA", access = "SPECIAL",
-            descitem = "解锁\"子圭·汲\"、\"子圭·歃\"的2套皮肤。",
+            name = "巫族骨面", collection = "ERA", access = "SPECIAL", descitem = "解锁\"子圭·汲\"、\"子圭·歃\"的2套皮肤。",
             description = "在密林深处，最靠近大地中心的地方，出生了一个被诅咒的婴儿，他面目狰狞丑陋，皮肤枯干发绿，族人们都想处死这不祥之兆，只有他生母舍命抵抗，死前他被藏进枯木中，顺着河流漂向无人处。\n一只野猪冲向了被搁浅在河边的他，因为他啼哭声让野猪狂躁。然而野猪肉眼可见逐渐消瘦，半途就没了气息。婴儿爬了出来，皮肤已不那么枯瘦。很快，周围的飞禽走兽都纷纷倒地，奇异的符号从这些动物身上慢慢散出，流向这个刚出生的婴儿，他的容貌已和正常婴儿无异。\n不知何时，一位头戴绳坠兽骨身批叶袍的女巫出现在他面前，对他耳语几句，婴儿周围奇怪的现象停了下来。她将婴儿的手掌划破，又窃窃私语，血液飘进她的骨面具中，绿纹被染成血色。女巫疯笑着，抱走了婴儿，消失在森林中……"
         } or {
-            name = "Witch Bone Mask",
-            collection = "ERA", access = "SPECIAL",
-            descitem = "Unlock \"Siving-Leakage\", \"Siving-Thaumaturgy\" skin.",
-            description = "The story was not translated."
+            name = "Witch Bone Mask", collection = "ERA", access = "SPECIAL",
+            descitem = "Unlock \"Siving-Leakage\", \"Siving-Thaumaturgy\" skin.", description = "Emmm."
         },
         height_anim = 265,
         anims = {
@@ -2980,15 +2834,11 @@ local SkinData = {
     },
     siving_mask_gold_marble = {
         string = ischinese and {
-            name = "圣女的纱袍",
-            collection = "MARBLE", access = "SPECIAL",
-            descitem = "解锁\"子圭·歃\"、\"子圭·釜\"的皮肤。",
+            name = "圣女的纱袍", collection = "MARBLE", access = "SPECIAL", descitem = "解锁\"子圭·歃\"、\"子圭·釜\"的皮肤。",
             description = "她虔诚地伫立在教堂五彩琉璃光芒之下，在晨曦中那容貌竟与圣母雕像一般无二，她看向十字架上的蔷薇，面容上满是欢欣——她对主的爱至诚无疑。\n圣水从杨柳枝叶挥洒，落在她的睫毛之上，突然间有人高声呼喊：“是圣母在流泪！”她震惊地发现众人竟转而向她跪拜，唱诗班的孩童齐聚她身边亲吻她的衣裙，华贵的乐章倏然在空中响起，松针的冷香从远处飘来，随着风，被裹挟而来的还有一片火刑架的灰烬。"
         } or {
-            name = "Holy Suit",
-            collection = "MARBLE", access = "SPECIAL",
-            descitem = "Unlock \"Siving-Thaumaturgy\", \"Siving-Cauldron\" skin.",
-            description = "The story was not translated."
+            name = "Holy Suit", collection = "MARBLE", access = "SPECIAL",
+            descitem = "Unlock \"Siving-Thaumaturgy\", \"Siving-Cauldron\" skin.", description = "Emmm."
         },
         height_anim = 170,
         anims = {
@@ -3015,15 +2865,11 @@ local SkinData = {
     },
     siving_soil_item_law = {
         string = ischinese and {
-            name = "春泥",
-            collection = "LAW", access = "SPECIAL",
-            descitem = "解锁\"子圭·垄\"的2套皮肤。",
+            name = "春泥", collection = "LAW", access = "SPECIAL", descitem = "解锁\"子圭·垄\"的2套皮肤。",
             description = "繁花如雪，在微风的吻中纷纷坠落，如羽毛般轻柔，仿佛花开的瞬间已经注定了它们轻盈的陨落。\n这并非终结，每一片花瓣都被温暖地接纳。融入春泥的沉寂，化作春末的生机。\n离别并非终结，是下一场盛夏的开始！"
         } or {
-            name = "Spring Mud",
-            collection = "LAW", access = "SPECIAL",
-            descitem = "Unlock \"Siving-Soil\" skin.",
-            description = "The story was not translated."
+            name = "Spring Mud", collection = "LAW", access = "SPECIAL", descitem = "Unlock \"Siving-Soil\" skin.",
+            description = "Emmm."
         },
         height_anim = 325,
         anims = {
@@ -3063,13 +2909,10 @@ local SkinData = {
     },
     siving_soil_item_law3 = {
         string = ischinese and {
-            collection = "LAW", access = "SPECIAL",
-            descitem = "解锁\"子圭·垄\"的皮肤。",
+            collection = "LAW", access = "SPECIAL", descitem = "解锁\"子圭·垄\"的皮肤。",
             description = "秋风轻抚，树叶如金，悠然而下。它们舞动在空中，如翩翩起舞的旧时舞者，最后，轻轻降落，归根成土。\n一场自然的别离，落叶在飘零中找到了回家的路。它们归根，如同生命循环的奏章，告别是为了更深的相遇。在这个季节的交响中，落叶的离去并非终结，而是融入了大地的怀抱，成为了生命的延续。"
         } or {
-            collection = "LAW", access = "SPECIAL",
-            descitem = "Unlock \"Siving-Soil\" skin.",
-            description = "The story was not translated."
+            collection = "LAW", access = "SPECIAL", descitem = "Unlock \"Siving-Soil\" skin.", description = "Emmm."
         },
         height_anim = 175,
         anims = {
@@ -3093,13 +2936,10 @@ local SkinData = {
     },
     refractedmoonlight_taste = {
         string = ischinese and {
-            collection = "TASTE", access = "SPECIAL",
-            descitem = "解锁\"月折宝剑\"的皮肤。",
+            collection = "TASTE", access = "SPECIAL", descitem = "解锁\"月折宝剑\"的皮肤。",
             description = "在灰蒙的城市街角，有一位孤独的烤肠大王。他沉默地翻转着烤叉，眼神深邃，仿佛迷失在过往的回忆中。每一根烤肠都是他心灵的投影，孤寂忧郁回味深重。\n深夜刚下班的顾客，常会来摊前驻足，享受深夜椒香，将生活的疲惫抛给孤独，自己独占惊艳味蕾。"
         } or {
-            collection = "TASTE", access = "SPECIAL",
-            descitem = "Unlock \"Refracted Moonlight\" skin.",
-            description = "The story was not translated."
+            collection = "TASTE", access = "SPECIAL", descitem = "Unlock \"Refracted Moonlight\" skin.", description = "Emmm."
         },
         height_anim = 265,
         anims = {
@@ -3139,13 +2979,10 @@ local SkinData = {
     },
     refractedmoonlight_moon = {
         string = ischinese and {
-            collection = "SUNMOON", access = "SPECIAL",
-            descitem = "解锁\"月折宝剑\"的皮肤。",
+            collection = "SUNMOON", access = "SPECIAL", descitem = "解锁\"月折宝剑\"的皮肤。",
             description = ""
         } or {
-            collection = "SUNMOON", access = "SPECIAL",
-            descitem = "Unlock \"Refracted Moonlight\" skin.",
-            description = "The story was not translated."
+            collection = "SUNMOON", access = "SPECIAL", descitem = "Unlock \"Refracted Moonlight\" skin.", description = "Emmm."
         },
         height_anim = 275,
         anims = {
@@ -3246,7 +3083,7 @@ local SkinData = {
         } or {
             collection = "PAPER", access = "SPECIAL",
             descitem = "Unlock \"Hidden Moonlight Kit\", \"Hidden Moonlight\", \"Infinite Hidden Moonlight\" skin.",
-            description = "The story was not translated."
+            description = "Emmm."
         },
         height_anim = 155,
         anims = {
@@ -3275,15 +3112,13 @@ local SkinData = {
     },
     chest_whitewood_craft = {
         string = ischinese and {
-            name = "花梨木展柜",
-            collection = "CRAFT", access = "SPECIAL",
+            name = "花梨木展柜", collection = "CRAFT", access = "SPECIAL",
             descitem = "解锁\"白木展示台\"、\"白木展示柜\"、\"白木展示台·无限\"、\"白木展示柜·无限\"的2套皮肤。",
             description = "花梨木展柜的制作是一场沉默的精湛艺术表演。\n木匠首先精选上佳的花梨木，剔除瑕疵，保留天然的美感。在悉心设计的蓝图下，巧手雕琢，将木材塑造成优雅的柜体，榫卯精准相扣，确保结构牢固。手工雕刻细节，赋予其独特纹理和精致的花纹。最后，经过多次打磨和上漆，使表面光滑如玉，散发着淡淡木香。\n每一步骤都是匠心独运，呈现出一件精致而高贵的花梨木展柜。"
         } or {
-            name = "Rosewood Showcase",
-            collection = "CRAFT", access = "SPECIAL",
+            name = "Rosewood Showcase", collection = "CRAFT", access = "SPECIAL",
             descitem = "Unlock \"White Wood Cabinet\", \"White Wood Showcase\", \"Infinite White Wood Cabinet\", \"Infinite White Wood Showcase\" skin.",
-            description = "The story was not translated."
+            description = "Emmm."
         },
         height_anim = 320,
         anims = {
@@ -3319,13 +3154,10 @@ local SkinData = {
     },
     tourmalinecore_tale = {
         string = ischinese and {
-            collection = "TALE", access = "SPECIAL",
-            descitem = "解锁\"电气石\"的皮肤。",
+            collection = "TALE", access = "SPECIAL", descitem = "解锁\"电气石\"的皮肤。",
             description = "雷霆之势袭来，沙漠狂风呼啸。\n大萨满高举神灯，摩擦灯身，试图吸收雷暴的力量，以保一方人民。一阵灯光闪耀，雷霆之力化解其中，然而，神灯并非神器，强大的自然力量让灯身出现裂纹，大萨满无奈取下自己的命石镶在灯盖上以压住狂躁霹雳，并用自己的血肉修复裂纹。雷暴渐歇，大萨满虽完成任务，但只剩一具白骨。\n此后，每百年需献祭一名法力强大的萨满，固神灯力量，保世代平安！"
         } or {
-            collection = "TALE", access = "SPECIAL",
-            descitem = "Unlock \"Tourmaline\" skin.",
-            description = "The story was not translated.",
+            collection = "TALE", access = "SPECIAL", descitem = "Unlock \"Tourmaline\" skin.", description = "Emmm."
         },
         height_anim = 70,
         anims = {
@@ -3338,13 +3170,10 @@ local SkinData = {
     },
     explodingfruitcake_day = {
         string = ischinese and {
-            collection = "DAY", access = "SPECIAL",
-            descitem = "解锁\"爆炸水果蛋糕\"的皮肤。",
+            collection = "DAY", access = "SPECIAL", descitem = "解锁\"爆炸水果蛋糕\"的皮肤。",
             description = ""
         } or {
-            collection = "DAY", access = "SPECIAL",
-            descitem = "Unlock \"Exploding Fruitcake\" skin.",
-            description = "The story was not translated."
+            collection = "DAY", access = "SPECIAL", descitem = "Unlock \"Exploding Fruitcake\" skin.", description = "Emmm."
         },
         height_anim = 80,
         anims = {
@@ -3354,7 +3183,46 @@ local SkinData = {
                 x = 0, y = 15, scale = 0.38
             }
         }
-    }
+    },
+    dish_tomahawksteak_twist = {
+        string = ischinese and {
+            collection = "TWIST", access = "SPECIAL", descitem = "解锁\"牛排战斧\"以及入鞘后的皮肤。",
+            description = ""
+        } or {
+            collection = "TWIST", access = "SPECIAL", descitem = "Unlock \"Steak Tomahawk\" skin.", description = "Emmm."
+        },
+        height_anim = 155,
+        anims = {
+            {
+                bank = "dish_tomahawksteak_twist", build = "dish_tomahawksteak_twist",
+                anim = "idle_cover1", anim2 = nil, isloop = true,
+                x = -30, y = 75, scale = 0.3
+            },
+            {
+                bank = "crystalblast", build = "dish_tomahawksteak_twist_atkfx",
+                anim = "blast", anim2 = nil, isloop = false,
+                x = -30, y = 80, scale = 0.38*0.5
+            },
+            {
+                bank = "dish_tomahawksteak_twist", build = "dish_tomahawksteak_twist",
+                anim = "idle"..tostring(math.random(2)), anim2 = nil, isloop = true,
+                x = -75, y = 4, scale = 0.38
+            },
+            {
+                symbol = {
+                    { symbol = "swap_object", build = "dish_tomahawksteak_twist", file = "swap_show", type = 1 },
+                },
+                fn_anim = SetAnim_player,
+                fn_click = SetAnim_player2,
+                x = 24, y = 0, scale = 0.38
+            },
+            {
+                bank = "crystalblast", build = "dish_tomahawksteak_twist_atkfx",
+                anim = "blast", anim2 = nil, isloop = false,
+                x = -50, y = 5, scale = 0.38*0.5
+            }
+        }
+    },
 }
 
 local function GetName(skin)
