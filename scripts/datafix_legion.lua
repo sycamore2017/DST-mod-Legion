@@ -860,6 +860,17 @@ _G.CROPS_DATA_LEGION.log = {
 		placer.AnimState:Hide("base3")
     end
 }
+_G.CROPS_DATA_LEGION.lightbulb = {
+    growthmults = { 1.2, 0.8, 1.2, 0.5 }, --春x秋冬
+    regrowstage = 1, cangrowindrak = true, nogrowinlight = true, dataonly = true,
+    bank = "crop_legion_lightbulb", build = "crop_legion_lightbulb",
+    leveldata = {
+        { anim = "level1", time = time_day1*6.5*0.4, deadanim = "dead1", witheredprefab = nil },
+        { anim = "level2", time = time_day1*6.5*0.6, deadanim = "dead1", witheredprefab = {"twigs"} },
+        { anim = "level3", time = nil, deadanim = "dead1", witheredprefab = {"twigs", "twigs"}, bloom = true }
+    },
+    cluster_size = { 1, 1.5 }
+}
 
 --------------------------------------------------------------------------
 --[[ 子圭·育转化数据表 ]]
@@ -973,6 +984,16 @@ local mapseeds = {
         swap = { build = "crop_legion_pine", file = "swap_turn", symboltype = "1" },
         fruit = "seeds_log_l",
         fruitnum_min = 1, fruitnum_max = 1, genekey = "foliageath"
+    },
+    lightcrab = {
+        swap = { build = "crop_legion_lightbulb", file = "swap_turn1", symboltype = "1" },
+        fruit = "seeds_lightbulb_l", time = 3,
+        fruitnum_min = 2, fruitnum_max = 3, genekey = "tissue_l_lightbulb"
+    },
+    lightflier = {
+        swap = { build = "crop_legion_lightbulb", file = "swap_turn2", symboltype = "1" },
+        fruit = "seeds_lightbulb_l", time = 3,
+        fruitnum_min = 2, fruitnum_max = 3, genekey = "tissue_l_lightbulb"
     }
 }
 for k, v in pairs(mapseeds) do

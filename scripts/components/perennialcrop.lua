@@ -179,29 +179,23 @@ local function OnBurnt(inst)
 	inst:Remove()
 end
 
-local function IsTooDarkToGrow(inst)
-	if inst.components.perennialcrop:CanGrowInDark() then
-		return false
-	end
-	return TOOLS_L.IsTooDarkToGrow(inst)
-end
 local function UpdateGrowing(inst)
-	if IsTooDarkToGrow(inst) then
+	if not inst.components.perennialcrop:CanGrowInDark() and TOOLS_L.IsTooDarkToGrow(inst) then
 		inst.components.perennialcrop:SetPauseReason("indark", true)
 	else
 		inst.components.perennialcrop:SetPauseReason("indark", nil)
 	end
 end
-local function OnIsDark(inst)
+local function OnIsDark(inst, isit)
 	UpdateGrowing(inst)
-	if TheWorld.state.isnight then
-		if inst.nighttask == nil then
-			inst.nighttask = inst:DoPeriodicTask(5, UpdateGrowing, 1+5*math.random())
+	if isit then
+		if inst.task_l_testgrow == nil then
+			inst.task_l_testgrow = inst:DoPeriodicTask(5, UpdateGrowing, 1+5*math.random())
 		end
 	else
-		if inst.nighttask ~= nil then
-			inst.nighttask:Cancel()
-			inst.nighttask = nil
+		if inst.task_l_testgrow ~= nil then
+			inst.task_l_testgrow:Cancel()
+			inst.task_l_testgrow = nil
 		end
 	end
 end
@@ -305,19 +299,22 @@ function PerennialCrop:TriggerGowable(isadd) --控制是否能魔法催熟
 end
 function PerennialCrop:TriggerGrowInDark(isadd) --控制是否能在黑暗中生长
 	local inst = self.inst
+	if inst.task_l_trytestgrow ~= nil then
+		inst.task_l_trytestgrow:Cancel()
+	end
 	if isadd then
 		self.cangrowindrak = true
-
 		inst:StopWatchingWorldState("isnight", OnIsDark)
-		inst:DoTaskInTime(math.random(), function(inst)
-			OnIsDark(inst)
+		inst.task_l_trytestgrow = inst:DoTaskInTime(math.random(), function(inst)
+			inst.task_l_trytestgrow = nil
+			OnIsDark(inst, false)
 		end)
 	else
 		self.cangrowindrak = nil
-
 		inst:WatchWorldState("isnight", OnIsDark)
-		inst:DoTaskInTime(math.random(), function(inst)
-			OnIsDark(inst)
+		inst.task_l_trytestgrow = inst:DoTaskInTime(math.random(), function(inst)
+			inst.task_l_trytestgrow = nil
+			OnIsDark(inst, TheWorld.state.isnight)
 		end)
 	end
 end

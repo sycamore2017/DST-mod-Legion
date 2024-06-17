@@ -3112,6 +3112,50 @@ S_____WORMWOOD.DESCRIBE.PLANT_CARROT_L = {
 -- S_______WALTER.DESCRIBE.PLANT_CARROT_L = ""
 -- S________WANDA.DESCRIBE.PLANT_CARROT_L = ""
 
+S_NAMES.PLANT_LIGHTBULB_L = "夜盏花"
+S______GENERIC.DESCRIBE.PLANT_LIGHTBULB_L = {
+    GROWING = "它会开奇妙的发光花。",
+    READY = "成熟了，真是亮眼。",
+    WITHERED = "你在我心中依然是最闪耀的。",
+    BLOOMY = "开花了，真是亮眼。"
+}
+S_______WILLOW.DESCRIBE.PLANT_LIGHTBULB_L = {
+    GROWING = "我倒要看看这株草怎么像火一样发亮。",
+    READY = "成熟了，真是亮眼。",
+    WITHERED = "这个鬼样子，干脆烧掉吧。",
+    BLOOMY = "它虽然会发光，但还不够火热。"
+}
+-- S_____WOLFGANG.DESCRIBE.PLANT_LIGHTBULB_L = ""
+-- S________WENDY.DESCRIBE.PLANT_LIGHTBULB_L = ""
+-- S_________WX78.DESCRIBE.PLANT_LIGHTBULB_L = ""
+S_WICKERBOTTOM.DESCRIBE.PLANT_LIGHTBULB_L = {
+    GROWING = "它不依靠光合作用，阳光反而会阻碍其生长。",
+    READY = "成熟了，真是亮眼。",
+    WITHERED = "枯萎只是暂时的。",
+    BLOOMY = "花朵里含有大量发光物质。"
+}
+-- S_______WOODIE.DESCRIBE.PLANT_LIGHTBULB_L = ""
+-- S______WAXWELL.DESCRIBE.PLANT_LIGHTBULB_L = ""
+-- S___WATHGRITHR.DESCRIBE.PLANT_LIGHTBULB_L = ""
+-- S_______WEBBER.DESCRIBE.PLANT_LIGHTBULB_L = ""
+-- S_______WINONA.DESCRIBE.PLANT_LIGHTBULB_L = ""
+S_______WORTOX.DESCRIBE.PLANT_LIGHTBULB_L = {
+    GROWING = "快亮起来吧，小花。",
+    READY = "成熟了，真是亮眼。",
+    WITHERED = "醒醒，起来重睡。",
+    BLOOMY = "哇哇哇，简直亮瞎我的狗眼。"
+}
+S_____WORMWOOD.DESCRIBE.PLANT_LIGHTBULB_L = {
+    GROWING = "它不喜欢阳光。",
+    READY = "朋友好耀眼。",
+    WITHERED = "朋友累了。",
+    BLOOMY = "有朋友照着我真好！"
+}
+-- S________WARLY.DESCRIBE.PLANT_LIGHTBULB_L = ""
+-- S_________WURT.DESCRIBE.PLANT_LIGHTBULB_L = ""
+-- S_______WALTER.DESCRIBE.PLANT_LIGHTBULB_L = ""
+-- S________WANDA.DESCRIBE.PLANT_LIGHTBULB_L = ""
+
 S______GENERIC.DESCRIBE.TISSUE_L = "鲜活的植物组织能用于研究。"
 -- S_______WILLOW.DESCRIBE.TISSUE_L = ""
 -- S_____WOLFGANG.DESCRIBE.TISSUE_L = ""

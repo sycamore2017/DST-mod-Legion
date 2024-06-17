@@ -141,31 +141,45 @@ local function OnBurnt(inst)
 	inst:Remove()
 end
 
-local function IsTooDarkToGrow(inst)
-	if inst.components.perennialcrop2:CanGrowInDark() then
-		return false
-	end
-	return TOOLS_L.IsTooDarkToGrow(inst)
-end
-local function UpdateGrowing(inst)
-	if IsTooDarkToGrow(inst) then
+local function UpdateGrow_dark(inst)
+	if not inst.components.perennialcrop2:CanGrowInDark() and TOOLS_L.IsTooDarkToGrow(inst) then
 		inst.components.perennialcrop2:SetPauseReason("indark", true)
 	else
 		inst.components.perennialcrop2:SetPauseReason("indark", nil)
 	end
 end
-local function OnIsDark(inst)
-	UpdateGrowing(inst)
-	if TheWorld.state.isnight then
-		if inst.nighttask == nil then
-			inst.nighttask = inst:DoPeriodicTask(5, UpdateGrowing, 1+5*math.random())
+local function OnIsDark(inst, isit)
+	UpdateGrow_dark(inst)
+	if isit then --黑暗时判定是否有光源来帮助生长
+		if inst.task_l_testgrow == nil then
+			inst.task_l_testgrow = inst:DoPeriodicTask(10, UpdateGrow_dark, 1+5*math.random())
 		end
-	else
-		if inst.nighttask ~= nil then
-			inst.nighttask:Cancel()
-			inst.nighttask = nil
+	else --非夜晚肯定能生长，所以取消监听
+		if inst.task_l_testgrow ~= nil then
+			inst.task_l_testgrow:Cancel()
+			inst.task_l_testgrow = nil
 		end
 	end
+end
+local function UpdateGrow_light(inst)
+	if not inst.components.perennialcrop2:CanGrowInLight() and TOOLS_L.IsTooBrightToGrow(inst) then
+		inst.components.perennialcrop2:SetPauseReason("inlight", true)
+	else
+		inst.components.perennialcrop2:SetPauseReason("inlight", nil)
+	end
+end
+local function OnIsDay(inst, isit)
+	UpdateGrow_light(inst)
+    if isit then --白天必定无法生长，所以直接取消监听
+        if inst.task_l_testgrow2 ~= nil then
+			inst.task_l_testgrow2:Cancel()
+			inst.task_l_testgrow2 = nil
+		end
+    else --非白天判定是否有光源来阻碍生长
+        if inst.task_l_testgrow2 == nil then
+			inst.task_l_testgrow2 = inst:DoPeriodicTask(10, UpdateGrow_light, 1+5*math.random())
+		end
+    end
 end
 
 function PerennialCrop2:SetUp(cropprefab, data, data2)
@@ -214,8 +228,19 @@ function PerennialCrop2:SetUp(cropprefab, data, data2)
 	end
 	if data2.cangrowindrak then
 		self.cangrowindrak = true
-	else
-		self:TriggerGrowInDark(false)
+	end
+	if data2.nogrowinlight then
+		self.nogrowinlight = true
+	end
+	if not self.cangrowindrak or self.nogrowinlight then
+		self.inst:DoTaskInTime(math.random(), function(inst)
+			if not self.cangrowindrak then
+				self:TriggerGrowInDark(false)
+			end
+			if self.nogrowinlight then
+				self:TriggerGrowInLight(false)
+			end
+		end)
 	end
 end
 function PerennialCrop2:TriggerMoisture(isadd) --控制浇水机制
@@ -327,18 +352,24 @@ function PerennialCrop2:TriggerGrowInDark(isadd) --控制是否能在黑暗中�
 	local inst = self.inst
 	if isadd then
 		self.cangrowindrak = true
-
 		inst:StopWatchingWorldState("isnight", OnIsDark)
-		inst:DoTaskInTime(math.random(), function(inst)
-			OnIsDark(inst)
-		end)
+		OnIsDark(inst, false)
 	else
 		self.cangrowindrak = nil
-
-		inst:WatchWorldState("isnight", OnIsDark)
-		inst:DoTaskInTime(math.random(), function(inst)
-			OnIsDark(inst)
-		end)
+		inst:WatchWorldState("isnight", OnIsDark) --虽然洞穴里 isnight 必定是true，但要是哪天会改了呢，所以还是监听上
+		OnIsDark(inst, TheWorld.state.isnight)
+	end
+end
+function PerennialCrop2:TriggerGrowInLight(isadd) --控制是否能在阳光下生长
+	local inst = self.inst
+	if isadd then
+		self.nogrowinlight = nil
+		inst:StopWatchingWorldState("isday", OnIsDay)
+		OnIsDay(inst, true)
+	else
+		self.nogrowinlight = true
+		inst:WatchWorldState("isday", OnIsDay) --虽然洞穴里 isday 必定是false，但要是哪天会改了呢，所以还是监听上
+		OnIsDay(inst, TheWorld.state.isday)
 	end
 end
 function PerennialCrop2:TriggerSeasonListen(isadd) --控制是否要监听四季变化
@@ -355,6 +386,10 @@ end
 function PerennialCrop2:CanGrowInDark() --是否能在黑暗中生长
 	--枯萎、成熟时(要算过熟)，在黑暗中也要计算时间了
 	return self.cangrowindrak or self.isrotten or self.stage == self.stage_max
+end
+function PerennialCrop2:CanGrowInLight() --是否能在阳光下生长
+	--枯萎、成熟时(要算过熟)，在阳光下也要计算时间了
+	return not self.nogrowinlight or self.isrotten or self.stage == self.stage_max
 end
 function PerennialCrop2:SetNoFunction() --只是需要一些数值，而不是需要生长等机制
 	local function EmptyCptFn(self, ...)end

@@ -866,7 +866,8 @@ local function MakePlant2(cropprefab, sets)
 
 		inst.components.perennialcrop2:SetUp(cropprefab, sets, {
 			moisture = true, nutrient = true, tendable = true, seasonlisten = true,
-			nomagicgrow = sets.nomagicgrow, fireproof = sets.fireproof, cangrowindrak = sets.cangrowindrak
+			nomagicgrow = sets.nomagicgrow, fireproof = sets.fireproof,
+			cangrowindrak = sets.cangrowindrak, nogrowinlight = sets.nogrowinlight
 		})
 		inst.components.perennialcrop2:SetStage(1, false)
 
@@ -1380,9 +1381,10 @@ local function Fn_getdata_nep(inst)
 	return data
 end
 
+local dd_nep = CROPS_DATA_LEGION["plantmeat"]
 table.insert(prefs, Prefab("plant_nepenthes_l", function()
 	local inst = CreateEntity()
-	Fn_common_p2(inst, CROPS_DATA_LEGION["plantmeat"])
+	Fn_common_p2(inst, dd_nep)
 	inst:SetPhysicsRadiusOverride(.5)
 	MakeObstaclePhysics(inst, inst.physicsradiusoverride)
 	inst.MiniMapEntity:SetIcon("plant_crop_l.tex")
@@ -1441,7 +1443,7 @@ table.insert(prefs, Prefab("plant_nepenthes_l", function()
 	inst.components.perennialcrop2.fn_cluster = OnCluster_nep
 	inst.components.perennialcrop2.infested_max = 50 --我可不想它直接被害虫干掉了
 	inst.components.perennialcrop2:SetNoFunction()
-	inst.components.perennialcrop2:SetUp("plantmeat", CROPS_DATA_LEGION["plantmeat"], {
+	inst.components.perennialcrop2:SetUp("plantmeat", dd_nep, {
 		-- moisture = nil, nutrient = nil, tendable = nil, seasonlisten = nil,
 		nomagicgrow = true, fireproof = true, cangrowindrak = true
 	})
@@ -1473,6 +1475,7 @@ end, {
 --[[ 云青松 ]]
 --------------------------------------------------------------------------
 
+local dd_pine = CROPS_DATA_LEGION["log"]
 local function OnRemoveEntity_pine(inst)
 	if TheWorld.components.boxcloudpine ~= nil then
 		TheWorld.components.boxcloudpine:ManageEnt(inst, false, nil)
@@ -1638,9 +1641,8 @@ local function AttachContainer_pine(inst)
 end
 local function Fn_dealdata_pine(inst, data)
 	local str, strpst
-	local def = CROPS_DATA_LEGION[inst.xeedkey]
     local dd = {
-        st = tostring(data.st or 1), stmax = tostring(#def.leveldata),
+        st = tostring(data.st or 1), stmax = tostring(#dd_pine.leveldata),
 		c = tostring(data.c or 0), cmax = tostring(data.cmax or 99),
 		it = tostring(data.it or 0), itmax = tostring(data.itmax or 10)
     }
@@ -1725,7 +1727,7 @@ end
 
 table.insert(prefs, Prefab("plant_log_l", function()
 	local inst = CreateEntity()
-	Fn_common_p2(inst, CROPS_DATA_LEGION["log"])
+	Fn_common_p2(inst, dd_pine)
 	inst:SetPhysicsRadiusOverride(TUNING.FARM_PLANT_PHYSICS_RADIUS)
 	inst.MiniMapEntity:SetIcon("plant_crop_l.tex")
 
@@ -1751,9 +1753,10 @@ table.insert(prefs, Prefab("plant_log_l", function()
 	inst:AddComponent("workable")
 
 	inst.components.perennialcrop2.fn_cluster = OnCluster_pine
-	inst.components.perennialcrop2:SetUp("log", CROPS_DATA_LEGION["log"], {
-		moisture = true, nutrient = true, tendable = true, seasonlisten = nil,
-		nomagicgrow = nil, fireproof = nil, cangrowindrak = true
+	inst.components.perennialcrop2:SetUp("log", dd_pine, {
+		moisture = true, nutrient = true, tendable = true, seasonlisten = true,
+		nomagicgrow = dd_pine.nomagicgrow, fireproof = dd_pine.fireproof,
+		cangrowindrak = dd_pine.cangrowindrak, nogrowinlight = dd_pine.nogrowinlight
 	})
 	inst.components.perennialcrop2.fn_stage = OnStage_pine
 	inst.components.perennialcrop2.fn_loot = OnLoot_pine
@@ -1772,6 +1775,76 @@ table.insert(prefs, Prefab("plant_log_l", function()
 
 	return inst
 end, { Asset("ANIM", "anim/crop_legion_pine.zip") }, nil))
+
+--------------------------------------------------------------------------
+--[[ 夜盏花 ]]
+--------------------------------------------------------------------------
+
+local function OnEntityReplicated_lightbulb(inst)
+    if inst.replica.container ~= nil then
+        inst.replica.container:WidgetSetup("plant_lightbulb_l")
+    end
+end
+
+local dd_lightbulb = CROPS_DATA_LEGION["lightbulb"]
+table.insert(prefs, Prefab("plant_lightbulb_l", function()
+	local inst = CreateEntity()
+	inst.entity:AddLight()
+	Fn_common_p2(inst, dd_lightbulb)
+	inst:SetPhysicsRadiusOverride(TUNING.FARM_PLANT_PHYSICS_RADIUS)
+	inst.MiniMapEntity:SetIcon("plant_crop_l.tex")
+
+	inst:AddTag("plant")
+	inst:AddTag("not2bright_l") --棱镜专属标签
+
+	inst.Light:SetColour(0.65, 0.65, 0.5)
+	inst.Light:Enable(false)
+
+	inst.xeedkey = "lightbulb"
+	-- TOOLS_L.InitMouseInfo(inst, Fn_dealdata_pine, Fn_getdata_pine, 2)
+
+	inst.entity:SetPristine()
+	if not TheWorld.ismastersim then
+		inst.OnEntityReplicated = OnEntityReplicated_lightbulb
+		return inst
+	end
+
+	Fn_server_p2(inst)
+
+	inst.components.inspectable.getstatus = GetStatus_p2
+
+	inst:AddComponent("hauntable")
+	inst.components.hauntable:SetHauntValue(TUNING.HAUNT_TINY)
+	inst.components.hauntable:SetOnHauntFn(OnHaunt_p2)
+
+	inst:AddComponent("workable")
+	inst.components.workable:SetWorkAction(ACTIONS.DIG)
+	inst.components.workable:SetWorkLeft(1)
+	inst.components.workable:SetOnFinishCallback(OnWorkedFinish_p2)
+
+	inst:AddComponent("container")
+    inst.components.container:WidgetSetup("plant_lightbulb_l")
+
+	inst:AddComponent("preserver")
+	inst.components.preserver:SetPerishRateMultiplier(0)
+
+	-- inst.components.perennialcrop2.fn_cluster = OnCluster_pine
+	inst.components.perennialcrop2:SetUp("lightbulb", dd_lightbulb, {
+		moisture = true, nutrient = true, tendable = true, seasonlisten = true,
+		nomagicgrow = dd_lightbulb.nomagicgrow, fireproof = dd_lightbulb.fireproof,
+		cangrowindrak = dd_lightbulb.cangrowindrak, nogrowinlight = dd_lightbulb.nogrowinlight
+	})
+	-- inst.components.perennialcrop2.fn_stage = OnStage_pine
+	-- inst.components.perennialcrop2.fn_loot = OnLoot_pine
+	inst.components.perennialcrop2:SetStage(1, false)
+
+	inst.fn_planted = OnPlant_p2
+
+	-- inst:ListenForEvent("itemget", UpdateLightState)
+	-- inst:ListenForEvent("itemlose", UpdateLightState)
+
+	return inst
+end, { Asset("ANIM", "anim/crop_legion_lightbulb.zip"), Asset("ANIM", "anim/ui_lamp_1x4.zip") }, nil))
 
 --------------------
 --------------------

@@ -300,13 +300,13 @@ end
 local function OnIsDark_dt(inst)
     UpdateGrowing_dt(inst)
     if TheWorld.state.isnight then
-        if inst.nighttask == nil then
-            inst.nighttask = inst:DoPeriodicTask(5, UpdateGrowing_dt, 1+5*math.random())
+        if inst.task_l_testgrow == nil then
+            inst.task_l_testgrow = inst:DoPeriodicTask(5, UpdateGrowing_dt, 1+5*math.random())
         end
     else
-        if inst.nighttask ~= nil then
-            inst.nighttask:Cancel()
-            inst.nighttask = nil
+        if inst.task_l_testgrow ~= nil then
+            inst.task_l_testgrow:Cancel()
+            inst.task_l_testgrow = nil
         end
     end
 end
@@ -481,7 +481,7 @@ table.insert(prefs, Prefab("siving_derivant", function()
     inst.entity:SetPristine()
     if not TheWorld.ismastersim then return inst end
 
-    -- inst.nighttask = nil
+    -- inst.task_l_testgrow = nil
     inst.treeState = 0
     -- inst.tradeditems = nil
     -- inst.ispolluted = nil

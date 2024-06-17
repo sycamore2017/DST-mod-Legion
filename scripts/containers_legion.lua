@@ -515,6 +515,30 @@ table.insert(params.cloudpine_box_l1.widget.slotpos, Vector3(-114 + 75 , 0, 0))
 table.insert(params.cloudpine_box_l1.widget.slotpos, Vector3(-114 + 150, 0, 0))
 table.insert(params.cloudpine_box_l1.widget.slotpos, Vector3(-114 + 225, 0, 0))
 
+------
+--夜盏花
+------
+
+params.plant_lightbulb_l = {
+    widget = {
+        slotpos = {
+            Vector3(0, 64 + 32 + 8 + 4, 0),
+            Vector3(0, 32 + 4, 0),
+            Vector3(0, -(32 + 4), 0),
+            Vector3(0, -(64 + 32 + 8 + 4), 0)
+        },
+        animbank = "ui_lamp_1x4",
+        animbuild = "ui_lamp_1x4",
+        pos = Vector3(200, 0, 0),
+        side_align_tip = 100
+    },
+    acceptsstacks = false,
+    type = "cooker",
+    itemtestfn = function(container, item, slot)
+        return item:HasTag("lightbattery") or item:HasTag("spore") or item:HasTag("lightcontainer")
+    end
+}
+
 --------------------------------------------------------------------------
 --[[ 修改容器注册函数 ]]
 --------------------------------------------------------------------------
@@ -536,7 +560,7 @@ params = nil
 local showmeneed = { --这里的名字是指容器所属预制物的名字，不是指容器本身的名字
     "backcub", "beefalo", "giantsfoot",
     "hiddenmoonlight", "hiddenmoonlight_inf", "revolvedmoonlight", "revolvedmoonlight_pro",
-    "boltwingout", "plant_nepenthes_l",
+    "boltwingout", "plant_nepenthes_l", "plant_lightbulb_l",
     "chest_whitewood", "chest_whitewood_big", "chest_whitewood_inf", "chest_whitewood_big_inf",
     "siving_suit_gold"
 }

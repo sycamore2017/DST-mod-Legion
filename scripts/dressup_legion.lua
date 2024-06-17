@@ -1151,7 +1151,20 @@ local dressup_data = {
             return itemswap
         end
     },
-    dish_tomahawksteak = { isnoskin = true, buildfile = "dish_tomahawksteak", buildsymbol = "swap" },
+    dish_tomahawksteak = {
+        isnoskin = true, buildfile = "dish_tomahawksteak", buildsymbol = "swap",
+        equipfn = function(owner, item)
+            if item._dd ~= nil and item._dd.build == "dish_tomahawksteak_twist" then
+                Fn_setFollowFx(owner, "fx_d_steak_twist", "dish_tomahawksteak_twist_fofx")
+            end
+        end,
+        unequipfn = function(owner, item)
+            Fn_removeFollowFx(owner, "fx_d_steak_twist")
+        end,
+        onequipfn = function(owner, item)
+            Fn_removeFollowFx(owner, "legion_steak_twist_fofx")
+        end
+    },
     siving_feather_fake = {
         isnoskin = true, buildfile = "siving_feather_fake", buildsymbol = "swap",
         equipfn = function(owner, item)

@@ -2980,6 +2980,50 @@ S_____WORMWOOD.DESCRIBE.PLANT_CARROT_L = {
 -- S_______WALTER.DESCRIBE.PLANT_CARROT_L = ""
 -- S________WANDA.DESCRIBE.PLANT_CARROT_L = ""
 
+S_NAMES.PLANT_LIGHTBULB_L = "Night Bright Flower"
+S______GENERIC.DESCRIBE.PLANT_LIGHTBULB_L = {
+    GROWING = "It will bloom interesting glowing flowers.",
+    READY = "It's matured and really bright.",
+    WITHERED = "You are still the most shining in my heart.",
+    BLOOMY = "Its flowers are really eye-catching."
+}
+S_______WILLOW.DESCRIBE.PLANT_LIGHTBULB_L = {
+    GROWING = "I want to see how this grass shines like fire.",
+    READY = "It's matured and really bright.",
+    WITHERED = "It looks like this, why not burn it.",
+    BLOOMY = "Although it's bright, it's not hot enough."
+}
+-- S_____WOLFGANG.DESCRIBE.PLANT_LIGHTBULB_L = ""
+-- S________WENDY.DESCRIBE.PLANT_LIGHTBULB_L = ""
+-- S_________WX78.DESCRIBE.PLANT_LIGHTBULB_L = ""
+S_WICKERBOTTOM.DESCRIBE.PLANT_LIGHTBULB_L = {
+    GROWING = "It doesn't rely on photosynthesis, and sunlight can actually hinder its growth.",
+    READY = "It's matured and really bright.",
+    WITHERED = "Its withering is temporary.",
+    BLOOMY = "Its flowers contain a large amount of luminescent substances."
+}
+-- S_______WOODIE.DESCRIBE.PLANT_LIGHTBULB_L = ""
+-- S______WAXWELL.DESCRIBE.PLANT_LIGHTBULB_L = ""
+-- S___WATHGRITHR.DESCRIBE.PLANT_LIGHTBULB_L = ""
+-- S_______WEBBER.DESCRIBE.PLANT_LIGHTBULB_L = ""
+-- S_______WINONA.DESCRIBE.PLANT_LIGHTBULB_L = ""
+S_______WORTOX.DESCRIBE.PLANT_LIGHTBULB_L = {
+    GROWING = "Light up quickly, little flower.",
+    READY = "It's matured and really bright.",
+    WITHERED = "Wake up, and go back to sleep.",
+    BLOOMY = "Wow, it's so bright that it can make you blind."
+}
+S_____WORMWOOD.DESCRIBE.PLANT_LIGHTBULB_L = {
+    GROWING = "Friend doesn't like sunlight.",
+    READY = "So dazzling.",
+    WITHERED = "Friend is tired.",
+    BLOOMY = "It's great to have a bright friend!"
+}
+-- S________WARLY.DESCRIBE.PLANT_LIGHTBULB_L = ""
+-- S_________WURT.DESCRIBE.PLANT_LIGHTBULB_L = ""
+-- S_______WALTER.DESCRIBE.PLANT_LIGHTBULB_L = ""
+-- S________WANDA.DESCRIBE.PLANT_LIGHTBULB_L = ""
+
 S______GENERIC.DESCRIBE.TISSUE_L = "This fresh plant tissue can be used for research."
 -- S_______WILLOW.DESCRIBE.TISSUE_L = ""
 -- S_____WOLFGANG.DESCRIBE.TISSUE_L = ""

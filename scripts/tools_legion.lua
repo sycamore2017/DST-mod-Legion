@@ -389,10 +389,13 @@ end
 
 --[ 光照监听 ]--
 local function IsTooDarkToGrow(inst)
-	if TheWorld.state.isnight then
+    --Tip：洞穴里 isnight 必定为true，isday 和 isdusk 必定为false
+    --如果想判定洞穴的真实时间段，只能用 iscaveday、iscavedusk、iscavenight
+	if TheWorld.state.isnight then --黑暗时判定是否有光源来帮助生长
 		local x, y, z = inst.Transform:GetWorldPosition()
-		for i, v in ipairs(TheSim:FindEntities(x, 0, z, TUNING.DAYLIGHT_SEARCH_RANGE, { "daylight", "lightsource" })) do
-			local lightrad = v.Light:GetCalculatedRadius() * .7
+        local ents = TheSim:FindEntities(x, 0, z, TUNING.DAYLIGHT_SEARCH_RANGE, { "daylight", "lightsource" })
+		for _, v in ipairs(ents) do
+			local lightrad = v.Light:GetCalculatedRadius() * 0.7
 			if v:GetDistanceSqToPoint(x, y, z) < lightrad * lightrad then
 				return false
 			end
@@ -400,6 +403,23 @@ local function IsTooDarkToGrow(inst)
 		return true
 	end
 	return false
+end
+local function IsTooBrightToGrow(inst)
+    --Tip：洞穴里 isnight 必定为true，isday 和 isdusk 必定为false
+    --如果想判定洞穴的真实时间段，只能用 iscaveday、iscavedusk、iscavenight
+	if not TheWorld.state.isday then --非白天判定是否有光源来阻碍生长
+		local x, y, z = inst.Transform:GetWorldPosition()
+        local ents = TheSim:FindEntities(x, 0, z, TUNING.DAYLIGHT_SEARCH_RANGE,
+            { "daylight", "lightsource" }, { "not2bright_l" })
+		for _, v in ipairs(ents) do
+			local lightrad = v.Light:GetCalculatedRadius() * 0.7
+			if v:GetDistanceSqToPoint(x, y, z) < lightrad * lightrad then
+				return true
+			end
+		end
+		return false
+	end
+	return true
 end
 
 --[ 植株寻求保护 ]--
@@ -1130,7 +1150,7 @@ end
 fns = {
 	-- MakeSnowCovered_comm = MakeSnowCovered_comm,
 	MakeSnowCovered_serv = MakeSnowCovered_serv,
-	IsTooDarkToGrow = IsTooDarkToGrow,
+	IsTooDarkToGrow = IsTooDarkToGrow, IsTooBrightToGrow = IsTooBrightToGrow,
     CallPlantDefender = CallPlantDefender,
 	GetCalculatedPos = GetCalculatedPos,
 	FallingItem = FallingItem,
