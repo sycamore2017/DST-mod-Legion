@@ -9,7 +9,7 @@ local BoxCloudPine = Class(function(self, inst)
     self.ents = {}
     self.openers = {}
     self.boxkey = nil
-    -- self.task_load = nil
+    self.boxkeyidx = nil
 end)
 
 function BoxCloudPine:CanBeOpened()
@@ -44,10 +44,6 @@ function BoxCloudPine:ManageEnt(ent, isadd, value)
 end
 
 function BoxCloudPine:UpdateBox(doer)
-    if self.task_load ~= nil then
-        return
-    end
-
     local noent = true
     local dropper
     local lvl = 0
@@ -72,14 +68,19 @@ function BoxCloudPine:UpdateBox(doer)
     local oldbox = self.boxkey
     if noent then
         self.boxkey = nil
+        self.boxkeyidx = nil
     elseif lvl >= 80 then
         self.boxkey = boxkeys[4]
+        self.boxkeyidx = 4
     elseif lvl >= 60 then
         self.boxkey = boxkeys[3]
+        self.boxkeyidx = 3
     elseif lvl >= 30 then
         self.boxkey = boxkeys[2]
+        self.boxkeyidx = 2
     else
         self.boxkey = boxkeys[1]
+        self.boxkeyidx = 1
     end
     if oldbox ~= self.boxkey then
         --关闭所有正在打开的世界容器
@@ -121,7 +122,7 @@ function BoxCloudPine:UpdateBox(doer)
         else
             x, y, z = dropper.Transform:GetWorldPosition()
         end
-        if x == nil or z == nil then
+        if x == nil or z == nil or (x == 0 and z == 0) then --坐标原点就不掉落了，免得落海里
             return
         end
 
@@ -164,20 +165,26 @@ function BoxCloudPine:UpdateBox(doer)
     end
 end
 
--- function BoxCloudPine:OnSave()
---     -- return {}
+--Tip：对于组件，必需 OnSave 有非空表的数据返回，才能使得世界启动时对应组件的 OnLoad() 和 LoadPostPass() 能被执行
+function BoxCloudPine:OnSave()
+    -- local data
+    -- if self.boxkeyidx ~= nil then
+    --     data = { idx = self.boxkeyidx }
+    -- end
+    -- return data
+    return { idx = 4 }
+end
+-- function BoxCloudPine:OnLoad(data, newents)
+--     if data == nil then
+--         return
+--     end
+--     if data.idx ~= nil and boxkeys[data.idx] ~= nil then
+--         self.boxkeyidx = data.idx
+--         self.boxkey = boxkeys[data.idx]
+--     end
 -- end
-
-function BoxCloudPine:OnLoad(data)
-	-- if data ~= nil then
-	-- end
-    if self.task_load ~= nil then
-        self.task_load:Cancel()
-    end
-    self.task_load = self.inst:DoTaskInTime(3, function()
-        self.task_load = nil
-        self:UpdateBox()
-    end)
+function BoxCloudPine:LoadPostPass(newents, data)
+    self:UpdateBox()
 end
 
 return BoxCloudPine

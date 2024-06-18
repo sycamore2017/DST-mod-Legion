@@ -1271,9 +1271,9 @@ local function CP_OnClose_opener(self, doer, ...)
         end
     end
 end
-local function AttachContainer_opener(inst)
+local function OnLoadPostPass_opener(inst) --世界启动时，向世界容器注册自己
 	if TheWorld.components.boxcloudpine ~= nil then
-		TheWorld.components.boxcloudpine:SetMaster(inst)
+		TheWorld.components.boxcloudpine.openers[inst] = true
 	end
 end
 local function UpdateSanityHelper_opener(owner)
@@ -1370,15 +1370,17 @@ table.insert(prefs, Prefab("siving_boxopener", function()
     container_proxy.Open = CP_Open_opener
     container_proxy.OnClose = CP_OnClose_opener
 
+    MakeHauntableLaunch(inst)
+
     -- inst.owner_l = nil
     TOOLS_L.ListenOwnerChange(inst, OnOwnerChange_opener, OnRemove_opener)
 
-    inst.OnLoadPostPass = AttachContainer_opener
+    inst.OnLoadPostPass = OnLoadPostPass_opener
 	if not POPULATING then
-		AttachContainer_opener(inst)
+		if TheWorld.components.boxcloudpine ~= nil then
+            TheWorld.components.boxcloudpine:SetMaster(inst)
+        end
 	end
-
-    MakeHauntableLaunch(inst)
 
     return inst
 end, {

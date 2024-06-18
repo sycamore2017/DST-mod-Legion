@@ -637,9 +637,9 @@ local function CP_OnClose_nut(self, doer, ...)
         end
     end
 end
-local function AttachContainer_nut(inst)
+local function OnLoadPostPass_nut(inst) --世界启动时，向世界容器注册自己
 	if TheWorld.components.boxcloudpine ~= nil then
-		TheWorld.components.boxcloudpine:SetMaster(inst)
+		TheWorld.components.boxcloudpine.openers[inst] = true
 	end
 end
 table.insert(prefs, Prefab("boxopener_l", function() ------云松子
@@ -664,9 +664,11 @@ table.insert(prefs, Prefab("boxopener_l", function() ------云松子
     container_proxy.Open = CP_Open_nut
     container_proxy.OnClose = CP_OnClose_nut
 
-    inst.OnLoadPostPass = AttachContainer_nut
+    inst.OnLoadPostPass = OnLoadPostPass_nut
 	if not POPULATING then
-		AttachContainer_nut(inst)
+		if TheWorld.components.boxcloudpine ~= nil then
+            TheWorld.components.boxcloudpine:SetMaster(inst)
+        end
 	end
 
     return inst

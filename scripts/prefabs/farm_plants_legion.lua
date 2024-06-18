@@ -1634,9 +1634,9 @@ local function OnClose_pine(inst)
 	inst.AnimState:PushAnimation("idle", true)
 	inst.SoundEmitter:PlaySound("maxwell_rework/magician_chest/close")
 end
-local function AttachContainer_pine(inst)
+local function OnLoadPostPass_pine(inst) --世界启动时，向世界容器注册自己
 	if TheWorld.components.boxcloudpine ~= nil then
-		TheWorld.components.boxcloudpine:SetMaster(inst)
+		TheWorld.components.boxcloudpine.openers[inst] = true
 	end
 end
 local function Fn_dealdata_pine(inst, data)
@@ -1721,7 +1721,10 @@ end
 local function OnCluster_pine(cpt, now)
 	if TheWorld.components.boxcloudpine ~= nil then
 		TheWorld.components.boxcloudpine:ManageEnt(cpt.inst, true, now)
-		TheWorld.components.boxcloudpine:UpdateBox(cpt.inst)
+		--世界启动状态时，不要做这个操作，免得物品掉坐标原点了。而且这里执行时，确实可能是没有设置好真实坐标的
+		if not POPULATING then
+			TheWorld.components.boxcloudpine:UpdateBox(cpt.inst)
+		end
 	end
 end
 
@@ -1768,9 +1771,11 @@ table.insert(prefs, Prefab("plant_log_l", function()
 	inst.fn_planted = OnPlant_p2
 
 	inst.OnRemoveEntity = OnRemoveEntity_pine
-	inst.OnLoadPostPass = AttachContainer_pine
+	inst.OnLoadPostPass = OnLoadPostPass_pine
 	if not POPULATING then
-		AttachContainer_pine(inst)
+		if TheWorld.components.boxcloudpine ~= nil then
+			TheWorld.components.boxcloudpine:SetMaster(inst)
+		end
 	end
 
 	return inst
