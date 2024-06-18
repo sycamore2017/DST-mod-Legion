@@ -1780,10 +1780,133 @@ end, { Asset("ANIM", "anim/crop_legion_pine.zip") }, nil))
 --[[ 夜盏花 ]]
 --------------------------------------------------------------------------
 
+local COLOURED_LIGHTS = {
+    red = {
+        [MUSHTREE_SPORE_RED] = true,
+        ["winter_ornament_light1"] = true,
+        ["winter_ornament_light5"] = true
+    },
+    green = {
+        [MUSHTREE_SPORE_GREEN] = true,
+        ["winter_ornament_light2"] = true,
+        ["winter_ornament_light6"] = true
+    },
+    blue = {
+        [MUSHTREE_SPORE_BLUE] = true,
+        ["winter_ornament_light3"] = true,
+        ["winter_ornament_light7"] = true
+    }
+}
+local colour_tint = { 0.4, 0.3, 0.25, 0.2, 0.1 }
+local mult_tint = { 0.7, 0.6, 0.55, 0.5, 0.45 }
+
+local function UpdateLight_lightbulb(inst)
+	if inst.isday_l then --白天时自动关灯
+		inst.Light:Enable(false)
+		inst.AnimState:SetMultColour(1, 1, 1, 1)
+	else
+		if inst.lightmult_l == nil then --现在不是能发光的阶段
+			inst.Light:Enable(false)
+			inst.AnimState:SetMultColour(1, 1, 1, 1)
+		else
+			inst.Light:SetRadius(inst.lightrad_l * inst.lightmult_l)
+			inst.Light:Enable(true)
+			if inst.color_l ~= nil then
+				local r = inst.color_l.r
+				local g = inst.color_l.g
+				local b = inst.color_l.b
+				if r+g+b > 0 then
+					inst.AnimState:SetMultColour(mult_tint[g+b + 1], mult_tint[r+b + 1], mult_tint[r+g + 1], 1)
+				else
+					inst.AnimState:SetMultColour(1, 1, 1, 1)
+				end
+			else
+				inst.AnimState:SetMultColour(1, 1, 1, 1)
+			end
+		end
+	end
+end
+local function OnIsDay_lightbulb(inst, isit) --白天时会自动关灯
+	if isit then
+		inst.isday_l = true
+	else
+		inst.isday_l = nil
+	end
+	UpdateLight_lightbulb(inst)
+end
+local function OnCluster_lightbulb(cpt, now) --发光半径随等级变化
+	if now <= 50 then --前50级，发光半径随等级变化明显
+		cpt.inst.lightrad_l = Remap(now, 0, 50, 2, 17) --0.294
+	else
+		cpt.inst.lightrad_l = Remap(now, 51, cpt.cluster_max, 17.06, 20) --0.06
+	end
+	if not POPULATING then
+		UpdateLight_lightbulb(cpt.inst)
+	end
+end
+local function IsRedSpore(item)
+    if COLOURED_LIGHTS.red[item.prefab] then
+        return true
+    elseif item.components.container ~= nil then
+        return item.components.container:FindItem(IsRedSpore) ~= nil
+    else
+        return false
+    end
+end
+local function IsGreenSpore(item)
+    if COLOURED_LIGHTS.green[item.prefab] then
+        return true
+    elseif item.components.container ~= nil then
+        return item.components.container:FindItem(IsGreenSpore) ~= nil
+    else
+        return false
+    end
+end
+local function IsBlueSpore(item)
+    if COLOURED_LIGHTS.blue[item.prefab] then
+        return true
+    elseif item.components.container ~= nil then
+        return item.components.container:FindItem(IsBlueSpore) ~= nil
+    else
+        return false
+    end
+end
+local function ItemChange_lightbulb(inst) --根据物品改变发光颜色
+	local r = #inst.components.container:FindItems(IsRedSpore)
+	local g = #inst.components.container:FindItems(IsGreenSpore)
+	local b = #inst.components.container:FindItems(IsBlueSpore)
+	inst.Light:SetColour(colour_tint[g+b + 1] + r/11, colour_tint[r+b + 1] + g/11, colour_tint[r+g + 1] + b/11)
+	inst.color_l = { r = r, g = g, b = b }
+	if inst.Light:IsEnabled() then
+		if r+g+b > 0 then
+			inst.AnimState:SetMultColour(mult_tint[g+b + 1], mult_tint[r+b + 1], mult_tint[r+g + 1], 1)
+		else
+			inst.AnimState:SetMultColour(1, 1, 1, 1)
+		end
+	end
+end
 local function OnEntityReplicated_lightbulb(inst)
     if inst.replica.container ~= nil then
         inst.replica.container:WidgetSetup("plant_lightbulb_l")
     end
+end
+local function OnStage_lightbulb(cpt) --非启动时初始化从这里开始
+	local inst = cpt.inst
+	if cpt.isrotten or cpt.stage == 1 then
+		inst.lightmult_l = nil
+	elseif cpt.stage == cpt.stage_max then
+		inst.lightmult_l = 1
+	else
+		inst.lightmult_l = 0.4
+	end
+	if not POPULATING then
+		OnIsDay_lightbulb(inst, TheWorld.state.isday)
+	end
+end
+local function OnLoadPostPass_lightbulb(inst, newents, savedata) --启动时初始化从这里开始
+	inst:DoTaskInTime(math.random(), function(inst)
+		OnIsDay_lightbulb(inst, TheWorld.state.isday)
+	end)
 end
 
 local dd_lightbulb = CROPS_DATA_LEGION["lightbulb"]
@@ -1797,17 +1920,26 @@ table.insert(prefs, Prefab("plant_lightbulb_l", function()
 	inst:AddTag("plant")
 	inst:AddTag("not2bright_l") --棱镜专属标签
 
-	inst.Light:SetColour(0.65, 0.65, 0.5)
+	inst.Light:SetFalloff(0.85)
+	inst.Light:SetIntensity(0.75)
+	inst.Light:SetColour(colour_tint[1], colour_tint[1], colour_tint[1])
 	inst.Light:Enable(false)
 
 	inst.xeedkey = "lightbulb"
-	-- TOOLS_L.InitMouseInfo(inst, Fn_dealdata_pine, Fn_getdata_pine, 2)
+	TOOLS_L.InitMouseInfo(inst, Fn_dealdata_p2, Fn_getdata_p2, 3)
+
+	LS_C_Init(inst, "plant_lightbulb_l", false)
 
 	inst.entity:SetPristine()
 	if not TheWorld.ismastersim then
 		inst.OnEntityReplicated = OnEntityReplicated_lightbulb
 		return inst
 	end
+
+	-- inst.color_l = nil
+	-- inst.lightmult_l = nil
+	inst.lightrad_l = 2
+	-- inst.isday_l = nil
 
 	Fn_server_p2(inst)
 
@@ -1828,20 +1960,21 @@ table.insert(prefs, Prefab("plant_lightbulb_l", function()
 	inst:AddComponent("preserver")
 	inst.components.preserver:SetPerishRateMultiplier(0)
 
-	-- inst.components.perennialcrop2.fn_cluster = OnCluster_pine
+	inst.components.perennialcrop2.fn_cluster = OnCluster_lightbulb
 	inst.components.perennialcrop2:SetUp("lightbulb", dd_lightbulb, {
 		moisture = true, nutrient = true, tendable = true, seasonlisten = true,
 		nomagicgrow = dd_lightbulb.nomagicgrow, fireproof = dd_lightbulb.fireproof,
 		cangrowindrak = dd_lightbulb.cangrowindrak, nogrowinlight = dd_lightbulb.nogrowinlight
 	})
-	-- inst.components.perennialcrop2.fn_stage = OnStage_pine
-	-- inst.components.perennialcrop2.fn_loot = OnLoot_pine
+	inst.components.perennialcrop2.fn_stage = OnStage_lightbulb
 	inst.components.perennialcrop2:SetStage(1, false)
 
 	inst.fn_planted = OnPlant_p2
+	inst.OnLoadPostPass = OnLoadPostPass_lightbulb
 
-	-- inst:ListenForEvent("itemget", UpdateLightState)
-	-- inst:ListenForEvent("itemlose", UpdateLightState)
+	inst:ListenForEvent("itemget", ItemChange_lightbulb)
+	inst:ListenForEvent("itemlose", ItemChange_lightbulb)
+	inst:WatchWorldState("isday", OnIsDay_lightbulb)
 
 	return inst
 end, { Asset("ANIM", "anim/crop_legion_lightbulb.zip"), Asset("ANIM", "anim/ui_lamp_1x4.zip") }, nil))

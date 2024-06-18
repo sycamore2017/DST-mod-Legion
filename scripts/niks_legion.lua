@@ -1226,6 +1226,11 @@ local SKIN_DEFAULT_LEGION = {
         floater = { cut = 0.1, size = "small", offset_y = 0.3, scale = 0.6, nofx = nil }
     },
 
+    plant_lightbulb_l = {
+        anim = { bank = "crop_legion_lightbulb", build = "crop_legion_lightbulb", anim = 0 },
+        exchangefx = { prefab = nil, offset_y = nil, scale = 1.5 }
+    },
+
     siving_ctlwater_item = {
         image = { name = nil, atlas = nil, setable = true },
         anim = { bank = "siving_ctlwater", build = "siving_ctlwater", anim = "item", animpush = nil, isloop = nil },
