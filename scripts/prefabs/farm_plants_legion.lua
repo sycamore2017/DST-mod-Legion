@@ -1797,36 +1797,21 @@ local COLOURED_LIGHTS = {
         ["winter_ornament_light7"] = true
     }
 }
-local colour_tint = { 0.4, 0.3, 0.25, 0.2, 0.1 }
-local mult_tint = { 0.7, 0.6, 0.55, 0.5, 0.45 }
+local colour_tint = { 0.65, 0.5, 0.35, 0.2, 0.05 }
 
 local function UpdateLight_lightbulb(inst)
-	if inst.isday_l then --白天时自动关灯
+	if inst.lightmult_l == nil then --现在不是能发光的阶段
 		inst.Light:Enable(false)
-		inst.AnimState:SetMultColour(1, 1, 1, 1)
 	else
-		if inst.lightmult_l == nil then --现在不是能发光的阶段
-			inst.Light:Enable(false)
-			inst.AnimState:SetMultColour(1, 1, 1, 1)
+		if inst.isday_l then --白天发光半径大幅降低，为了不影响白天的视野
+			inst.Light:SetRadius(inst.lightrad_l * inst.lightmult_l * 0.2)
 		else
 			inst.Light:SetRadius(inst.lightrad_l * inst.lightmult_l)
-			inst.Light:Enable(true)
-			if inst.color_l ~= nil then
-				local r = inst.color_l.r
-				local g = inst.color_l.g
-				local b = inst.color_l.b
-				if r+g+b > 0 then
-					inst.AnimState:SetMultColour(mult_tint[g+b + 1], mult_tint[r+b + 1], mult_tint[r+g + 1], 1)
-				else
-					inst.AnimState:SetMultColour(1, 1, 1, 1)
-				end
-			else
-				inst.AnimState:SetMultColour(1, 1, 1, 1)
-			end
 		end
+		inst.Light:Enable(true)
 	end
 end
-local function OnIsDay_lightbulb(inst, isit) --白天时会自动关灯
+local function OnIsDay_lightbulb(inst, isit)
 	if isit then
 		inst.isday_l = true
 	else
@@ -1835,10 +1820,10 @@ local function OnIsDay_lightbulb(inst, isit) --白天时会自动关灯
 	UpdateLight_lightbulb(inst)
 end
 local function OnCluster_lightbulb(cpt, now) --发光半径随等级变化
-	if now <= 50 then --前50级，发光半径随等级变化明显
-		cpt.inst.lightrad_l = Remap(now, 0, 50, 2, 17) --0.294
+	if now <= 30 then --前30级，发光半径随等级变化明显
+		cpt.inst.lightrad_l = Remap(now, 0, 30, 2, 7.5) --0.177
 	else
-		cpt.inst.lightrad_l = Remap(now, 51, cpt.cluster_max, 17.06, 20) --0.06
+		cpt.inst.lightrad_l = Remap(now, 31, cpt.cluster_max, 7.536, 10) --0.036
 	end
 	if not POPULATING then
 		UpdateLight_lightbulb(cpt.inst)
@@ -1875,15 +1860,7 @@ local function ItemChange_lightbulb(inst) --根据物品改变发光颜色
 	local r = #inst.components.container:FindItems(IsRedSpore)
 	local g = #inst.components.container:FindItems(IsGreenSpore)
 	local b = #inst.components.container:FindItems(IsBlueSpore)
-	inst.Light:SetColour(colour_tint[g+b + 1] + r/11, colour_tint[r+b + 1] + g/11, colour_tint[r+g + 1] + b/11)
-	inst.color_l = { r = r, g = g, b = b }
-	if inst.Light:IsEnabled() then
-		if r+g+b > 0 then
-			inst.AnimState:SetMultColour(mult_tint[g+b + 1], mult_tint[r+b + 1], mult_tint[r+g + 1], 1)
-		else
-			inst.AnimState:SetMultColour(1, 1, 1, 1)
-		end
-	end
+	inst.Light:SetColour(colour_tint[g+b + 1] + r/9, colour_tint[r+b + 1] + g/9, colour_tint[r+g + 1] + b/9)
 end
 local function OnEntityReplicated_lightbulb(inst)
     if inst.replica.container ~= nil then
@@ -1908,6 +1885,20 @@ local function OnLoadPostPass_lightbulb(inst, newents, savedata) --启动时初�
 		OnIsDay_lightbulb(inst, TheWorld.state.isday)
 	end)
 end
+local function OnIsDay2_lightbulb(inst, isit)
+	if inst.task_l_isday ~= nil then
+		inst.task_l_isday:Cancel()
+		inst.task_l_isday = nil
+	end
+	if isit then
+		inst.task_l_isday = inst:DoTaskInTime(math.random()*2+1, function()
+			inst.task_l_isday = nil
+			OnIsDay_lightbulb(inst, TheWorld.state.isday)
+		end)
+	else
+		OnIsDay_lightbulb(inst, isit)
+	end
+end
 
 local dd_lightbulb = CROPS_DATA_LEGION["lightbulb"]
 table.insert(prefs, Prefab("plant_lightbulb_l", function()
@@ -1920,8 +1911,8 @@ table.insert(prefs, Prefab("plant_lightbulb_l", function()
 	inst:AddTag("plant")
 	inst:AddTag("not2bright_l") --棱镜专属标签
 
-	inst.Light:SetFalloff(0.85)
-	inst.Light:SetIntensity(0.75)
+	inst.Light:SetFalloff(0.7)
+	inst.Light:SetIntensity(0.7)
 	inst.Light:SetColour(colour_tint[1], colour_tint[1], colour_tint[1])
 	inst.Light:Enable(false)
 
@@ -1936,7 +1927,6 @@ table.insert(prefs, Prefab("plant_lightbulb_l", function()
 		return inst
 	end
 
-	-- inst.color_l = nil
 	-- inst.lightmult_l = nil
 	inst.lightrad_l = 2
 	-- inst.isday_l = nil
@@ -1974,7 +1964,7 @@ table.insert(prefs, Prefab("plant_lightbulb_l", function()
 
 	inst:ListenForEvent("itemget", ItemChange_lightbulb)
 	inst:ListenForEvent("itemlose", ItemChange_lightbulb)
-	inst:WatchWorldState("isday", OnIsDay_lightbulb)
+	inst:WatchWorldState("isday", OnIsDay2_lightbulb)
 
 	return inst
 end, { Asset("ANIM", "anim/crop_legion_lightbulb.zip"), Asset("ANIM", "anim/ui_lamp_1x4.zip") }, nil))
