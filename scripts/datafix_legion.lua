@@ -866,11 +866,16 @@ _G.CROPS_DATA_LEGION.lightbulb = {
     regrowstage = 1, cangrowindrak = true, nogrowinlight = true, dataonly = true,
     bank = "crop_legion_lightbulb", build = "crop_legion_lightbulb",
     leveldata = {
-        { anim = "level1", time = time_day1*6.5*0.4, deadanim = "dead1", witheredprefab = nil },
-        { anim = "level2", time = time_day1*6.5*0.6, deadanim = "dead1", witheredprefab = {"twigs"} },
+        { anim = "level3", time = time_day1*6*0.4, deadanim = "dead1", witheredprefab = nil },
+        { anim = "level3", time = time_day1*6*0.6, deadanim = "dead1", witheredprefab = {"twigs"} },
         { anim = "level3", time = nil, deadanim = "dead1", witheredprefab = {"twigs", "twigs"}, bloom = true, pickable = -1 }
     },
-    cluster_size = { 0.9, 1.5 }
+    cluster_size = { 0.9, 1.5 },
+    fn_placer = function(placer)
+        placer.AnimState:HideSymbol("fruit2")
+        placer.AnimState:HideSymbol("light2")
+        placer.AnimState:HideSymbol("stem")
+    end
 }
 
 --------------------------------------------------------------------------

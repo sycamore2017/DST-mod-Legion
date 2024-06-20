@@ -130,7 +130,7 @@ CreatePlacer("cutted_lumpyevergreen", "pinecone", "pinecone", "idle_planted2")
 
 ----异种
 local skinedplant = {
-	cactus_meat = true, carrot = true
+	cactus_meat = true, carrot = true, lightbulb = true
 }
 local function GetPlacerAnim(anims)
     if type(anims) == 'table' then

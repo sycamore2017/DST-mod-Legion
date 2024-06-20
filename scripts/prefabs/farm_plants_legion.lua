@@ -1874,11 +1874,26 @@ local function OnEntityReplicated_lightbulb(inst)
 end
 local function OnStage_lightbulb(cpt) --非启动时初始化从这里开始
 	local inst = cpt.inst
+	if cpt.stage == 1 then
+		inst.AnimState:HideSymbol("fruit2")
+        inst.AnimState:HideSymbol("light2")
+        inst.AnimState:HideSymbol("stem")
+		-- inst.AnimState:ClearSymbolBloom("fruit2")
+	else
+		inst.AnimState:ShowSymbol("fruit2")
+        inst.AnimState:ShowSymbol("light2")
+        inst.AnimState:ShowSymbol("stem")
+		-- inst.AnimState:SetSymbolBloom("fruit2") --太亮了，还是算了
+	end
 	if cpt.isrotten or cpt.stage == 1 then
 		inst.lightmult_l = nil
 	elseif cpt.stage == cpt.stage_max then
+		inst.AnimState:ClearOverrideSymbol("fruit2")
+		inst.AnimState:ClearOverrideSymbol("light2")
 		inst.lightmult_l = 1
 	else
+		inst.AnimState:OverrideSymbol("fruit2", inst.AnimState:GetBuild(), "fruit1")
+		inst.AnimState:OverrideSymbol("light2", inst.AnimState:GetBuild(), "light1")
 		inst.lightmult_l = 0.4
 	end
 	if not POPULATING then
