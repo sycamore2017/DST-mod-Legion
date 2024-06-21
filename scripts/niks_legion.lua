@@ -900,7 +900,11 @@ local dd_dish_tomahawksteak_twist = {
     scabbard = {
         anim = "idle_cover1", isloop = true, bank = "dish_tomahawksteak_twist", build = "dish_tomahawksteak_twist",
         image = "foliageath_dish_tomahawksteak_twist",
-        atlas = "images/inventoryimages_skin/foliageath_dish_tomahawksteak_twist.xml"
+        atlas = "images/inventoryimages_skin/foliageath_dish_tomahawksteak_twist.xml",
+        startfn = function(inst, sword)
+            inst.AnimState:SetSymbolBloom("eye")
+            inst.AnimState:SetSymbolLightOverride("eye", 0.5)
+        end
     },
     startfn = function(inst, owner)
         owner.AnimState:OverrideSymbol("swap_object", "dish_tomahawksteak_twist", "xx")
@@ -3082,6 +3086,49 @@ local SKINS_LEGION = {
         floater = { cut = 0.1, size = "small", offset_y = 0.3, scale = 0.6, nofx = nil }
     },
 
+    plant_lightbulb_l_world = {
+        base_prefab = "plant_lightbulb_l", skin_id = "667572c3ce45c22cf18e7875", onlyownedshow = true,
+		type = "item", skin_tags = {}, release_group = 555, rarity = rarityRepay,
+		assets = {
+			Asset("ANIM", "anim/skin/plant_lightbulb_l_world.zip")
+		},
+        string = ischinese and { name = "夜里铃兰" } or { name = "Lily of The Night" },
+        anim = { bank = nil, build = nil, anim = 0 },
+        exchangefx = { prefab = nil, offset_y = nil, scale = 1.5 },
+        fn_placer = function(inst)
+            inst.AnimState:SetBank("plant_lightbulb_l_world")
+            inst.AnimState:SetBuild("plant_lightbulb_l_world")
+        end
+    },
+    -- plant_lightbulb_l_sun = {
+    --     base_prefab = "plant_lightbulb_l", skin_id = "667572ddce45c22cf18e7879", onlyownedshow = true,
+	-- 	type = "item", skin_tags = {}, release_group = 555, rarity = raritySpecial,
+	-- 	assets = {
+	-- 		Asset("ANIM", "anim/skin/plant_lightbulb_l_sun.zip")
+	-- 	},
+    --     string = ischinese and { name = "日辉铃兰" } or { name = "Lily of The Sun" },
+    --     anim = { bank = nil, build = nil, anim = 0 },
+    --     exchangefx = { prefab = nil, offset_y = nil, scale = 1.5 },
+    --     fn_placer = function(inst)
+    --         inst.AnimState:SetBank("plant_lightbulb_l_sun")
+    --         inst.AnimState:SetBuild("plant_lightbulb_l_sun")
+    --     end
+    -- },
+    -- plant_lightbulb_l_moon = {
+    --     base_prefab = "plant_lightbulb_l", skin_id = "667572ddce45c22cf18e7879", noshopshow = true,
+	-- 	type = "item", skin_tags = {}, release_group = 555, rarity = raritySpecial,
+	-- 	assets = {
+	-- 		Asset("ANIM", "anim/skin/plant_lightbulb_l_moon.zip")
+	-- 	},
+    --     string = ischinese and { name = "月辉铃兰" } or { name = "Lily of The Moon" },
+    --     anim = { bank = nil, build = nil, anim = 0 },
+    --     exchangefx = { prefab = nil, offset_y = nil, scale = 1.5 },
+    --     fn_placer = function(inst)
+    --         inst.AnimState:SetBank("plant_lightbulb_l_moon")
+    --         inst.AnimState:SetBuild("plant_lightbulb_l_moon")
+    --     end
+    -- },
+
     siving_ctlwater_item_era = {
         base_prefab = "siving_ctlwater_item", skin_id = "64759cc569b4f368be452b14", noshopshow = true,
 		type = "item", skin_tags = {}, release_group = 555, rarity = raritySpecial,
@@ -3871,6 +3918,7 @@ local SKIN_IDS_LEGION = {
         plant_carrot_l_fact = true, lance_carrot_l_fact = true,
         refractedmoonlight_moon = true, agronssword_sun = true,
         dish_tomahawksteak_twist = true,
+        plant_lightbulb_l_world = true,
     },
     -- ["665eb8a8ce45c22cf18e6d24"] = {}, --8面玲珑
     -- ["6278c409c340bf24ab311522"] = nil --余生
@@ -4018,7 +4066,7 @@ local skinidxes = {
     "siving_mask_era", "siving_mask_era2", "siving_mask_gold_era", "siving_mask_gold_era2",
     "triplegoldenshovelaxe_era", "tripleshovelaxe_era", "lilybush_era", "lileaves_era", "shield_l_log_era",
     "icire_rock_era", "shield_l_sand_era",
-    "plant_cactus_meat_l_world", "orchidbush_disguiser", "boltwingout_disguiser",
+    "plant_lightbulb_l_world", "plant_cactus_meat_l_world", "orchidbush_disguiser", "boltwingout_disguiser",
     "siving_mask_gold_marble", "siving_suit_gold_marble",
     "rosebush_marble", "rosorns_marble", "lilybush_marble", "lileaves_marble", "orchidbush_marble", "orchitwigs_marble",
     "plant_carrot_l_fact", "lance_carrot_l_fact",

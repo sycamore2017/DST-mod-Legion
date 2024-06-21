@@ -20,6 +20,9 @@ function SwordScabbard:SetAnim(sword)
             self.inst.AnimState:SetBuild(dd.build)
         end
         self.inst.AnimState:PlayAnimation(dd.anim, dd.isloop)
+        if dd.startfn ~= nil then
+            dd.startfn(self.inst, sword)
+        end
     else
         self.inst.components.inventoryitem.atlasname = "images/inventoryimages/foliageath_"..sword.prefab..".xml"
         self.inst.components.inventoryitem:ChangeImageName("foliageath_"..sword.prefab)
