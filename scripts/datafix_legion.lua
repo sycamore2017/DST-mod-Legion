@@ -870,7 +870,7 @@ _G.CROPS_DATA_LEGION.lightbulb = {
         { anim = "level3", time = time_day1*6*0.6, deadanim = "dead1", witheredprefab = {"twigs"} },
         { anim = "level3", time = nil, deadanim = "dead1", witheredprefab = {"twigs", "twigs"}, bloom = true, pickable = -1 }
     },
-    cluster_size = { 0.9, 1.5 },
+    cluster_size = { 0.9, 1.4 },
     fn_placer = function(placer)
         placer.AnimState:HideSymbol("fruit2")
         placer.AnimState:HideSymbol("light2")

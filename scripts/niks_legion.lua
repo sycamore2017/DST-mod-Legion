@@ -771,6 +771,53 @@ end
 
 ------
 
+local function Fn_start_plant_lightbulb(inst, skined)
+    if skined ~= nil then
+        inst._dd_stage = skined.fn_stage
+    else
+        inst._dd_stage = nil
+    end
+    local cpt = inst.components.perennialcrop2
+    if cpt ~= nil and inst._dd_stage ~= nil then
+        inst._dd_stage(inst, cpt)
+    end
+end
+local function Fn_stage_plant_lightbulb_l_world(inst, cpt)
+    if not cpt.isrotten then
+        if cpt.stage == 1 then
+			inst.AnimState:HideSymbol("fruit2")
+			inst.AnimState:HideSymbol("light2")
+			inst.AnimState:HideSymbol("stem")
+			inst.AnimState:ShowSymbol("sprout")
+		else
+			inst.AnimState:ShowSymbol("fruit2")
+			inst.AnimState:ShowSymbol("light2")
+			inst.AnimState:ShowSymbol("stem")
+            inst.AnimState:HideSymbol("sprout")
+			if cpt.stage == cpt.stage_max then
+				inst.AnimState:ClearOverrideSymbol("fruit2")
+				inst.AnimState:ClearOverrideSymbol("light2")
+			else
+				inst.AnimState:OverrideSymbol("fruit2", inst.AnimState:GetBuild(), "fruit1")
+				inst.AnimState:OverrideSymbol("light2", inst.AnimState:GetBuild(), "light1")
+			end
+		end
+    end
+end
+local function Fn_end_plant_lightbulb_l_world(inst, skined)
+    inst._dd_stage = nil
+    inst.AnimState:HideSymbol("sprout")
+    local cpt = inst.components.perennialcrop2
+    if cpt ~= nil and not cpt.isrotten then
+        if cpt.stage == 2 then
+            inst.AnimState:OverrideSymbol("fruit2", "crop_legion_lightbulb", "fruit1")
+            inst.AnimState:OverrideSymbol("light2", "crop_legion_lightbulb", "light1")
+        end
+    end
+end
+
+------
+
 local function Fn_start_equip(inst, skined)
     if skined ~= nil then
         inst._dd = skined.equip
@@ -3095,6 +3142,9 @@ local SKINS_LEGION = {
         string = ischinese and { name = "夜里铃兰" } or { name = "Lily of The Night" },
         anim = { bank = nil, build = nil, anim = 0 },
         exchangefx = { prefab = nil, offset_y = nil, scale = 1.5 },
+        fn_stage = Fn_stage_plant_lightbulb_l_world,
+        fn_start = Fn_start_plant_lightbulb,
+        fn_end = Fn_end_plant_lightbulb_l_world,
         fn_placer = function(inst)
             inst.AnimState:SetBank("plant_lightbulb_l_world")
             inst.AnimState:SetBuild("plant_lightbulb_l_world")
