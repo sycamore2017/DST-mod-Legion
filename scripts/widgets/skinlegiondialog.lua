@@ -482,7 +482,6 @@ end
 local function SetClick_plant_cactus(self, anim, data)
     local animstate = anim:GetAnimState()
     local tag = anim.tag_anim or data.tag_start
-
     if tag == nil or tag == 5 then
         animstate:PlayAnimation("dead1")
         anim.tag_anim = 1
@@ -499,6 +498,41 @@ local function SetClick_plant_cactus(self, anim, data)
         animstate:PlayAnimation("level4_3")
         anim.tag_anim = 5
     end
+end
+
+local function SetClick_plant_lightbulb_l_world(self, anim, data)
+    local animstate = anim:GetAnimState()
+    local tag = anim.tag_anim or data.tag_anim
+    if tag == nil or tag == 1 then
+        animstate:HideSymbol("fruit2")
+        animstate:HideSymbol("light2")
+        animstate:HideSymbol("stem")
+        animstate:ShowSymbol("sprout")
+        animstate:PlayAnimation("level3", true)
+        anim.tag_anim = 2
+    elseif tag == 4 then
+        animstate:PlayAnimation("dead1")
+        anim.tag_anim = 1
+    else
+        animstate:ShowSymbol("fruit2")
+        animstate:ShowSymbol("light2")
+        animstate:ShowSymbol("stem")
+        animstate:HideSymbol("sprout")
+        if tag == 3 then
+            animstate:ClearOverrideSymbol("fruit2")
+            animstate:ClearOverrideSymbol("light2")
+            anim.tag_anim = 4
+        else
+            animstate:OverrideSymbol("fruit2", animstate:GetBuild(), "fruit1")
+            animstate:OverrideSymbol("light2", animstate:GetBuild(), "light1")
+            anim.tag_anim = 3
+        end
+    end
+end
+local function SetAnim_plant_lightbulb_l_world(self, anim, data)
+    local animstate = anim:GetAnimState()
+    SetAnim_base(animstate, data)
+    SetClick_plant_lightbulb_l_world(self, anim, data)
 end
 
 local function SetClick_siving_ctl(self, anim, data)
@@ -2719,6 +2753,32 @@ local SkinData = {
                 fn_anim = SetAnim_player,
                 fn_click = SetAnim_player2,
                 x = 45, y = 0, scale = 0.38
+            }
+        }
+    },
+    plant_lightbulb_l_world = {
+        string = ischinese and {
+            collection = "DISGUISER", access = "SPECIAL", descitem = "解锁\"夜盏花\"的皮肤。",
+            description = ""
+        } or {
+            collection = "DISGUISER", access = "SPECIAL", descitem = "Unlock \"Night Bright Flower\" skin.",
+            description = "Emmm."
+        },
+        height_anim = 124,
+        anims = {
+            {
+                bank = "plant_lightbulb_l_world", build = "plant_lightbulb_l_world",
+                anim = "level3", anim2 = nil, isloop = true,
+                fn_anim = SetAnim_plant_lightbulb_l_world, tag_anim = 3,
+                fn_click = SetClick_plant_lightbulb_l_world,
+                x = -52, y = 5, scale = 0.32
+            },
+            {
+                bank = "plant_lightbulb_l_world", build = "plant_lightbulb_l_world",
+                anim = "level3", anim2 = nil, isloop = true,
+                fn_anim = SetAnim_plant_lightbulb_l_world,
+                fn_click = SetClick_plant_lightbulb_l_world,
+                x = 50, y = 5, scale = 0.32
             }
         }
     },

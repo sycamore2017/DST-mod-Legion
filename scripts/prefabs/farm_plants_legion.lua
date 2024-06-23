@@ -1872,29 +1872,35 @@ local function OnEntityReplicated_lightbulb(inst)
         inst.replica.container:WidgetSetup("plant_lightbulb_l")
     end
 end
+local function Fn_stage_plant_lightbulb_l(inst, cpt)
+	if cpt.isrotten then
+		return
+	end
+	if cpt.stage == 1 then
+		inst.AnimState:HideSymbol("fruit2")
+		inst.AnimState:HideSymbol("light2")
+		inst.AnimState:HideSymbol("stem")
+		-- inst.AnimState:ClearSymbolBloom("fruit2")
+	else
+		inst.AnimState:ShowSymbol("fruit2")
+		inst.AnimState:ShowSymbol("light2")
+		inst.AnimState:ShowSymbol("stem")
+		-- inst.AnimState:SetSymbolBloom("fruit2") --太亮了，还是算了
+		if cpt.stage == cpt.stage_max then
+			inst.AnimState:ClearOverrideSymbol("fruit2")
+			inst.AnimState:ClearOverrideSymbol("light2")
+		else
+			inst.AnimState:OverrideSymbol("fruit2", inst.AnimState:GetBuild(), "fruit1")
+			inst.AnimState:OverrideSymbol("light2", inst.AnimState:GetBuild(), "light1")
+		end
+	end
+end
 local function OnStage_lightbulb(cpt) --非启动时初始化从这里开始
 	local inst = cpt.inst
 	if inst._dd_stage ~= nil then
 		inst._dd_stage(inst, cpt)
-	elseif not cpt.isrotten then
-		if cpt.stage == 1 then
-			inst.AnimState:HideSymbol("fruit2")
-			inst.AnimState:HideSymbol("light2")
-			inst.AnimState:HideSymbol("stem")
-			-- inst.AnimState:ClearSymbolBloom("fruit2")
-		else
-			inst.AnimState:ShowSymbol("fruit2")
-			inst.AnimState:ShowSymbol("light2")
-			inst.AnimState:ShowSymbol("stem")
-			-- inst.AnimState:SetSymbolBloom("fruit2") --太亮了，还是算了
-			if cpt.stage == cpt.stage_max then
-				inst.AnimState:ClearOverrideSymbol("fruit2")
-				inst.AnimState:ClearOverrideSymbol("light2")
-			else
-				inst.AnimState:OverrideSymbol("fruit2", inst.AnimState:GetBuild(), "fruit1")
-				inst.AnimState:OverrideSymbol("light2", inst.AnimState:GetBuild(), "light1")
-			end
-		end
+	else
+		Fn_stage_plant_lightbulb_l(inst, cpt)
 	end
 	if cpt.isrotten or cpt.stage == 1 then
 		inst.lightmult_l = nil
@@ -1956,6 +1962,7 @@ table.insert(prefs, Prefab("plant_lightbulb_l", function()
 
 	-- inst.lightmult_l = nil
 	inst.lightrad_l = 2
+	inst.fn_l_stage = Fn_stage_plant_lightbulb_l
 	-- inst.isday_l = nil
 
 	Fn_server_p2(inst)

@@ -771,15 +771,19 @@ end
 
 ------
 
-local function Fn_start_plant_lightbulb(inst, skined)
+local function Fn_start_plant_lightbulb_l(inst, skined)
     if skined ~= nil then
         inst._dd_stage = skined.fn_stage
     else
         inst._dd_stage = nil
     end
     local cpt = inst.components.perennialcrop2
-    if cpt ~= nil and inst._dd_stage ~= nil then
-        inst._dd_stage(inst, cpt)
+    if cpt ~= nil then
+        if inst._dd_stage ~= nil then
+            inst._dd_stage(inst, cpt)
+        elseif inst.fn_l_stage ~= nil then
+            inst.fn_l_stage(inst, cpt)
+        end
     end
 end
 local function Fn_stage_plant_lightbulb_l_world(inst, cpt)
@@ -802,17 +806,6 @@ local function Fn_stage_plant_lightbulb_l_world(inst, cpt)
 				inst.AnimState:OverrideSymbol("light2", inst.AnimState:GetBuild(), "light1")
 			end
 		end
-    end
-end
-local function Fn_end_plant_lightbulb_l_world(inst, skined)
-    inst._dd_stage = nil
-    inst.AnimState:HideSymbol("sprout")
-    local cpt = inst.components.perennialcrop2
-    if cpt ~= nil and not cpt.isrotten then
-        if cpt.stage == 2 then
-            inst.AnimState:OverrideSymbol("fruit2", "crop_legion_lightbulb", "fruit1")
-            inst.AnimState:OverrideSymbol("light2", "crop_legion_lightbulb", "light1")
-        end
     end
 end
 
@@ -1279,7 +1272,8 @@ local SKIN_DEFAULT_LEGION = {
 
     plant_lightbulb_l = {
         anim = { bank = "crop_legion_lightbulb", build = "crop_legion_lightbulb", anim = 0 },
-        exchangefx = { prefab = nil, offset_y = nil, scale = 1.5 }
+        exchangefx = { prefab = nil, offset_y = nil, scale = 1.5 },
+        fn_start = Fn_start_plant_lightbulb_l
     },
 
     siving_ctlwater_item = {
@@ -3143,8 +3137,7 @@ local SKINS_LEGION = {
         anim = { bank = nil, build = nil, anim = 0 },
         exchangefx = { prefab = nil, offset_y = nil, scale = 1.5 },
         fn_stage = Fn_stage_plant_lightbulb_l_world,
-        fn_start = Fn_start_plant_lightbulb,
-        fn_end = Fn_end_plant_lightbulb_l_world,
+        fn_start = Fn_start_plant_lightbulb_l,
         fn_placer = function(inst)
             inst.AnimState:SetBank("plant_lightbulb_l_world")
             inst.AnimState:SetBuild("plant_lightbulb_l_world")

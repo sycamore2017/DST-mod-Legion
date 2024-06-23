@@ -2980,7 +2980,7 @@ S_____WORMWOOD.DESCRIBE.PLANT_CARROT_L = {
 -- S_______WALTER.DESCRIBE.PLANT_CARROT_L = ""
 -- S________WANDA.DESCRIBE.PLANT_CARROT_L = ""
 
-S_NAMES.PLANT_LIGHTBULB_L = "Night Bright Flower"
+S_NAMES.PLANT_LIGHTBULB_L = "Night Bright Flower" --夜盏花
 S______GENERIC.DESCRIBE.PLANT_LIGHTBULB_L = {
     GROWING = "It will bloom interesting glowing flowers.",
     READY = "It's matured and really bright.",
