@@ -1880,12 +1880,12 @@ local function Fn_stage_plant_lightbulb_l(inst, cpt)
 		inst.AnimState:HideSymbol("fruit2")
 		inst.AnimState:HideSymbol("light2")
 		inst.AnimState:HideSymbol("stem")
-		-- inst.AnimState:ClearSymbolBloom("fruit2")
+		-- inst.AnimState:ClearSymbolBloom("light2")
 	else
 		inst.AnimState:ShowSymbol("fruit2")
 		inst.AnimState:ShowSymbol("light2")
 		inst.AnimState:ShowSymbol("stem")
-		-- inst.AnimState:SetSymbolBloom("fruit2") --太亮了，还是算了
+		-- inst.AnimState:SetSymbolBloom("light2") --太亮了，还是算了
 		if cpt.stage == cpt.stage_max then
 			inst.AnimState:ClearOverrideSymbol("fruit2")
 			inst.AnimState:ClearOverrideSymbol("light2")

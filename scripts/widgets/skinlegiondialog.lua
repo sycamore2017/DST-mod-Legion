@@ -533,6 +533,7 @@ local function SetAnim_plant_lightbulb_l_world(self, anim, data)
     local animstate = anim:GetAnimState()
     SetAnim_base(animstate, data)
     SetClick_plant_lightbulb_l_world(self, anim, data)
+    animstate:SetFrame(math.random(animstate:GetCurrentAnimationNumFrames()) - 1)
 end
 
 local function SetClick_siving_ctl(self, anim, data)
@@ -2764,21 +2765,61 @@ local SkinData = {
             collection = "DISGUISER", access = "SPECIAL", descitem = "Unlock \"Night Bright Flower\" skin.",
             description = "Emmm."
         },
-        height_anim = 124,
+        height_anim = 140,
         anims = {
             {
                 bank = "plant_lightbulb_l_world", build = "plant_lightbulb_l_world",
                 anim = "level3", anim2 = nil, isloop = true,
                 fn_anim = SetAnim_plant_lightbulb_l_world, tag_anim = 3,
                 fn_click = SetClick_plant_lightbulb_l_world,
-                x = -52, y = 5, scale = 0.32
+                x = -52, y = 0, scale = 0.38
             },
             {
                 bank = "plant_lightbulb_l_world", build = "plant_lightbulb_l_world",
                 anim = "level3", anim2 = nil, isloop = true,
                 fn_anim = SetAnim_plant_lightbulb_l_world,
                 fn_click = SetClick_plant_lightbulb_l_world,
-                x = 50, y = 5, scale = 0.32
+                x = 50, y = 0, scale = 0.38
+            }
+        }
+    },
+    plant_lightbulb_l_sun = {
+        string = ischinese and {
+            name = "辉光铃兰", collection = "SUNMOON", access = "SPECIAL", descitem = "解锁\"夜盏花\"的2套皮肤。",
+            description = ""
+        } or {
+            name = "Lily of The Light", collection = "SUNMOON", access = "SPECIAL",
+            descitem = "Unlock \"Night Bright Flower\" skin.", description = "Emmm."
+        },
+        height_anim = 210,
+        anims = {
+            {
+                bank = "plant_lightbulb_l_world", build = "plant_lightbulb_l_sun",
+                anim = "level3", anim2 = nil, isloop = true,
+                fn_anim = SetAnim_plant_lightbulb_l_world, tag_anim = 3,
+                fn_click = SetClick_plant_lightbulb_l_world,
+                x = -62, y = 70, scale = 0.38
+            },
+            {
+                bank = "plant_lightbulb_l_world", build = "plant_lightbulb_l_moon",
+                anim = "level3", anim2 = nil, isloop = true,
+                fn_anim = SetAnim_plant_lightbulb_l_world, tag_anim = 3,
+                fn_click = SetClick_plant_lightbulb_l_world,
+                x = 30, y = 70, scale = 0.38
+            },
+            {
+                bank = "plant_lightbulb_l_world", build = "plant_lightbulb_l_moon",
+                anim = "level3", anim2 = nil, isloop = true,
+                fn_anim = SetAnim_plant_lightbulb_l_world,
+                fn_click = SetClick_plant_lightbulb_l_world,
+                x = -25, y = 0, scale = 0.38
+            },
+            {
+                bank = "plant_lightbulb_l_world", build = "plant_lightbulb_l_sun",
+                anim = "level3", anim2 = nil, isloop = true,
+                fn_anim = SetAnim_plant_lightbulb_l_world,
+                fn_click = SetClick_plant_lightbulb_l_world,
+                x = 67, y = 0, scale = 0.38
             }
         }
     },

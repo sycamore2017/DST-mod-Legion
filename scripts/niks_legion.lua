@@ -3143,34 +3143,38 @@ local SKINS_LEGION = {
             inst.AnimState:SetBuild("plant_lightbulb_l_world")
         end
     },
-    -- plant_lightbulb_l_sun = {
-    --     base_prefab = "plant_lightbulb_l", skin_id = "667572ddce45c22cf18e7879", onlyownedshow = true,
-	-- 	type = "item", skin_tags = {}, release_group = 555, rarity = raritySpecial,
-	-- 	assets = {
-	-- 		Asset("ANIM", "anim/skin/plant_lightbulb_l_sun.zip")
-	-- 	},
-    --     string = ischinese and { name = "日辉铃兰" } or { name = "Lily of The Sun" },
-    --     anim = { bank = nil, build = nil, anim = 0 },
-    --     exchangefx = { prefab = nil, offset_y = nil, scale = 1.5 },
-    --     fn_placer = function(inst)
-    --         inst.AnimState:SetBank("plant_lightbulb_l_sun")
-    --         inst.AnimState:SetBuild("plant_lightbulb_l_sun")
-    --     end
-    -- },
-    -- plant_lightbulb_l_moon = {
-    --     base_prefab = "plant_lightbulb_l", skin_id = "667572ddce45c22cf18e7879", noshopshow = true,
-	-- 	type = "item", skin_tags = {}, release_group = 555, rarity = raritySpecial,
-	-- 	assets = {
-	-- 		Asset("ANIM", "anim/skin/plant_lightbulb_l_moon.zip")
-	-- 	},
-    --     string = ischinese and { name = "月辉铃兰" } or { name = "Lily of The Moon" },
-    --     anim = { bank = nil, build = nil, anim = 0 },
-    --     exchangefx = { prefab = nil, offset_y = nil, scale = 1.5 },
-    --     fn_placer = function(inst)
-    --         inst.AnimState:SetBank("plant_lightbulb_l_moon")
-    --         inst.AnimState:SetBuild("plant_lightbulb_l_moon")
-    --     end
-    -- },
+    plant_lightbulb_l_sun = {
+        base_prefab = "plant_lightbulb_l", skin_id = "667572ddce45c22cf18e7879", onlyownedshow = true,
+		type = "item", skin_tags = {}, release_group = 555, rarity = raritySpecial,
+		assets = {
+			Asset("ANIM", "anim/skin/plant_lightbulb_l_sun.zip")
+		},
+        string = ischinese and { name = "日辉铃兰" } or { name = "Lily of The Sun" },
+        anim = { bank = "plant_lightbulb_l_world", build = nil, anim = 0 },
+        exchangefx = { prefab = nil, offset_y = nil, scale = 1.5 },
+        fn_stage = Fn_stage_plant_lightbulb_l_world,
+        fn_start = Fn_start_plant_lightbulb_l,
+        fn_placer = function(inst)
+            inst.AnimState:SetBank("plant_lightbulb_l_world")
+            inst.AnimState:SetBuild("plant_lightbulb_l_sun")
+        end
+    },
+    plant_lightbulb_l_moon = {
+        base_prefab = "plant_lightbulb_l", skin_id = "667572ddce45c22cf18e7879", noshopshow = true,
+		type = "item", skin_tags = {}, release_group = 555, rarity = raritySpecial,
+		assets = {
+			Asset("ANIM", "anim/skin/plant_lightbulb_l_moon.zip")
+		},
+        string = ischinese and { name = "月辉铃兰" } or { name = "Lily of The Moon" },
+        anim = { bank = "plant_lightbulb_l_world", build = nil, anim = 0 },
+        exchangefx = { prefab = nil, offset_y = nil, scale = 1.5 },
+        fn_stage = Fn_stage_plant_lightbulb_l_world,
+        fn_start = Fn_start_plant_lightbulb_l,
+        fn_placer = function(inst)
+            inst.AnimState:SetBank("plant_lightbulb_l_world")
+            inst.AnimState:SetBuild("plant_lightbulb_l_moon")
+        end
+    },
 
     siving_ctlwater_item_era = {
         base_prefab = "siving_ctlwater_item", skin_id = "64759cc569b4f368be452b14", noshopshow = true,
@@ -3962,6 +3966,7 @@ local SKIN_IDS_LEGION = {
         refractedmoonlight_moon = true, agronssword_sun = true,
         dish_tomahawksteak_twist = true,
         plant_lightbulb_l_world = true,
+        plant_lightbulb_l_sun = true, plant_lightbulb_l_moon = true
     },
     -- ["665eb8a8ce45c22cf18e6d24"] = {}, --8面玲珑
     -- ["6278c409c340bf24ab311522"] = nil --余生
@@ -4087,7 +4092,7 @@ local ls_buildmap = { --prefab，build与皮肤的对应表，用以比对动画
 
 ------皮肤排序
 local skinidxes = {
-    "agronssword_sun", "refractedmoonlight_moon",
+    "agronssword_sun", "refractedmoonlight_moon", "plant_lightbulb_l_sun", "plant_lightbulb_l_moon",
     "chest_whitewood_craft", "chest_whitewood_big_craft", "chest_whitewood_craft2", "chest_whitewood_big_craft2",
     "siving_ctlwater_item_era", "siving_ctldirt_item_era", "siving_ctlall_item_era",
     "neverfade_thanks", "neverfadebush_thanks", "siving_derivant_thanks", "siving_derivant_thanks2",
