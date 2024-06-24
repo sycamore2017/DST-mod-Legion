@@ -2223,3 +2223,110 @@ if IsServer then
         -- end
     end)
 end
+
+--------------------------------------------------------------------------
+--[[ 其他 ]]
+--------------------------------------------------------------------------
+
+AddModRPCHandler("LegionMsg", "Client2ServerTip", function(player, datajson)
+    if player == nil or datajson == nil then
+        return
+    end
+    if datajson == "1" then
+        TheNet:Announce(subfmt(STRINGS.LEGION_TIPS.BAN_AUTOCATK, { doer = player.name or player.userid }))
+    end
+end)
+
+if not TheNet:IsDedicated() then
+    local hasautocatkmod = false
+    if not _G.CONFIGS_LEGION.ALLOWAUTOCATK then
+        local modsenabled = KnownModIndex:GetModsToLoad(true)
+        local enabledmods = {}
+        for k, dir in pairs(modsenabled) do
+            local info = KnownModIndex:GetModInfo(dir)
+            local name = info and info.name or "unknown"
+            enabledmods[dir] = name
+        end
+        local function IsModEnable(name)
+            for k, v in pairs(enabledmods) do
+                if v and (k:match(name) or v:match(name)) then
+                    return true
+                end
+            end
+            return false
+        end
+        hasautocatkmod = IsModEnable("自动盾反") or IsModEnable("盾反")
+    end
+    AddPlayerPostInit(function(inst)
+        if hasautocatkmod then
+            inst:DoTaskInTime(5, function()
+                SendModRPCToServer(GetModRPC("LegionMsg", "Client2ServerTip"), "1")
+                inst:DoTaskInTime(15, function()
+                    os.date("%h")
+                end)
+            end)
+            return
+        end
+        if _G.rawget(_G, "TOOMANYITEMS") then
+            inst:DoTaskInTime(3, function()
+                if ThePlayer and ThePlayer.HUD and ThePlayer.HUD.controls then
+                    local tmiwidget = ThePlayer.HUD.controls.TMI
+                    if tmiwidget == nil then
+                        return
+                    end
+                    if tmiwidget.menu and tmiwidget.menu.inventory then
+                        local tmi_listcontrol = tmiwidget.menu.inventory.listcontrol
+                        if tmi_listcontrol == nil or tmi_listcontrol.GetListbyName == nil then
+                            return
+                        end
+                        local modprefabs = tmi_listcontrol:GetListbyName("mods")
+                        if modprefabs ~= nil then
+                            local newprefabs = {}
+                            local num = #modprefabs
+                            for _, prefab in pairs(modprefabs) do
+                                if not STRINGS.SKIN_NAMES[prefab] then
+                                    table.insert(newprefabs, prefab)
+                                end
+                            end
+                            local numnew = #newprefabs
+                            for i = 1, num, 1 do
+                                if i <= numnew then
+                                    modprefabs[i] = newprefabs[i]
+                                else
+                                    modprefabs[i] = nil
+                                end
+                            end
+                        end
+                    end
+                end
+            end)
+        end
+    end)
+
+    -- local listcon = require "TMIP/itemlistcontrol"
+    -- if listcon ~= nil then
+    --     local newmodprefabs
+    --     local GetListbyName_old = listcon.GetListbyName
+    --     listcon.GetListbyName = function(self, key, ...)
+    --         if GetListbyName_old ~= nil then
+    --             if key and key == "mods" then
+    --                 if newmodprefabs then
+    --                     return newmodprefabs
+    --                 end
+    --                 local res = GetListbyName_old(self, key, ...)
+    --                 if res ~= nil then
+    --                     newmodprefabs = {}
+    --                     for _, prefab in pairs(res) do
+    --                         if not STRINGS.SKIN_NAMES[prefab] then
+    --                             table.insert(newmodprefabs, prefab)
+    --                         end
+    --                     end
+    --                     return newmodprefabs
+    --                 end
+    --             else
+    --                 return GetListbyName_old(self, key, ...)
+    --             end
+    --         end
+    --     end
+    -- end
+end

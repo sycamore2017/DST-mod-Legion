@@ -3167,6 +3167,7 @@ local SKINS_LEGION = {
 		},
         string = ischinese and { name = "月辉铃兰" } or { name = "Lily of The Moon" },
         anim = { bank = "plant_lightbulb_l_world", build = nil, anim = 0 },
+        build_name_override = "plant_lightbulb_l_sun",
         exchangefx = { prefab = nil, offset_y = nil, scale = 1.5 },
         fn_stage = Fn_stage_plant_lightbulb_l_world,
         fn_start = Fn_start_plant_lightbulb_l,
@@ -4749,7 +4750,7 @@ local function CheckCodeSafety()
             linkids = {
                 ["637f07a28c2f781db2f7f1e8"] = true, --4
                 ["6278c409c340bf24ab311522"] = true,
-                ["660579cace45c22cf18e4a87"] = true, --前六
+                ["660579cace45c22cf18e4a87"] = true --前六
             }
         },
         revolvedmoonlight_item_taste2 = {
@@ -4757,7 +4758,7 @@ local function CheckCodeSafety()
             linkids = {
                 ["6278c4eec340bf24ab311534"] = true, --3
                 ["6278c409c340bf24ab311522"] = true,
-                ["660579cace45c22cf18e4a87"] = true, --前六
+                ["660579cace45c22cf18e4a87"] = true --前六
             }
         },
         rosebush_collector = {
@@ -4766,7 +4767,7 @@ local function CheckCodeSafety()
                 ["6278c4eec340bf24ab311534"] = true, --3
                 ["62eb7b148c2f781db2f79cf8"] = true, --花
                 ["6278c409c340bf24ab311522"] = true,
-                ["660579cace45c22cf18e4a87"] = true, --前六
+                ["660579cace45c22cf18e4a87"] = true --前六
             }
         },
         rosebush_marble = {
@@ -4776,7 +4777,7 @@ local function CheckCodeSafety()
                 ["62eb7b148c2f781db2f79cf8"] = true, --花
                 ["6278c450c340bf24ab311528"] = true, --忆
                 ["6278c409c340bf24ab311522"] = true,
-                ["660579cace45c22cf18e4a87"] = true, --前六
+                ["660579cace45c22cf18e4a87"] = true --前六
             }
         },
         lilybush_era = {
@@ -4785,7 +4786,7 @@ local function CheckCodeSafety()
                 ["6278c4acc340bf24ab311530"] = true, --2
                 ["62eb7b148c2f781db2f79cf8"] = true, --花
                 ["6278c409c340bf24ab311522"] = true,
-                ["660579cace45c22cf18e4a87"] = true, --前六
+                ["660579cace45c22cf18e4a87"] = true --前六
             }
         },
         icire_rock_collector = {
@@ -4802,14 +4803,14 @@ local function CheckCodeSafety()
             id = "6309c6e88c2f781db2f7ae20",
             linkids = {
                 ["6278c409c340bf24ab311522"] = true,
-                ["660579cace45c22cf18e4a87"] = true, --前六
+                ["660579cace45c22cf18e4a87"] = true --前六
             }
         },
         fishhomingbait_taste = {
             id = "61ff45880a30fc7fca0db5e5",
             linkids = {
                 ["6278c409c340bf24ab311522"] = true,
-                ["660579cace45c22cf18e4a87"] = true, --前六
+                ["660579cace45c22cf18e4a87"] = true --前六
             }
         },
         soul_contracts_taste = {
@@ -4817,7 +4818,7 @@ local function CheckCodeSafety()
             linkids = {
                 ["637f07a28c2f781db2f7f1e8"] = true, --4
                 ["6278c409c340bf24ab311522"] = true,
-                ["660579cace45c22cf18e4a87"] = true, --前六
+                ["660579cace45c22cf18e4a87"] = true --前六
             }
         },
         siving_ctlall_item_era = {
@@ -4825,7 +4826,7 @@ local function CheckCodeSafety()
             linkids = {
                 ["642c14d9f2b67d287a35d439"] = true, --5
                 ["6278c409c340bf24ab311522"] = true,
-                ["660579cace45c22cf18e4a87"] = true, --前六
+                ["660579cace45c22cf18e4a87"] = true --前六
             }
         },
         siving_soil_item_law3 = {
@@ -4833,7 +4834,7 @@ local function CheckCodeSafety()
             linkids = {
                 ["61f15bf4db102b0b8a529c66"] = true, --6
                 ["6278c409c340bf24ab311522"] = true,
-                ["660579cace45c22cf18e4a87"] = true, --前六
+                ["660579cace45c22cf18e4a87"] = true --前六
             }
         },
         chest_whitewood_craft = {
@@ -4841,7 +4842,14 @@ local function CheckCodeSafety()
             linkids = {
                 ["61f15bf4db102b0b8a529c66"] = true, --6
                 ["6278c409c340bf24ab311522"] = true,
-                ["660579cace45c22cf18e4a87"] = true, --前六
+                ["660579cace45c22cf18e4a87"] = true --前六
+            }
+        },
+        plant_lightbulb_l_sun = {
+            id = "667572ddce45c22cf18e7879",
+            linkids = {
+                ["61627d927bbb727be174c4a0"] = true, --7
+                ["6278c409c340bf24ab311522"] = true
             }
         }
     }
@@ -4881,6 +4889,12 @@ local function CheckCodeSafety()
         },
         chest_whitewood_big = {
             chest_whitewood_big_craft = true, chest_whitewood_big_craft2 = true
+        },
+        plant_lightbulb_l = {
+            plant_lightbulb_l_world = true, plant_lightbulb_l_sun = true, plant_lightbulb_l_moon = true
+        },
+        dish_tomahawksteak = {
+            dish_tomahawksteak_twist = true
         }
     }
     for name, v in pairs(skinsmap) do --不准私自给皮肤改名

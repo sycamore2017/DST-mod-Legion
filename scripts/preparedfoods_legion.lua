@@ -702,14 +702,20 @@ local foods_legion = {
     },
     dish_mushedeggs = { --双菇烩蛋
         test = function(cooker, names, tags)
-            return ((names.tallbirdegg or 0) + (names.tallbirdegg_cooked or 0)) >= 2
-                and (
-                    ((names.red_cap or names.red_cap_cooked) and 1 or 0) +
-                    ((names.green_cap or names.green_cap_cooked) and 1 or 0) +
-                    ((names.blue_cap or names.blue_cap_cooked) and 1 or 0) +
-                    ((names.moon_cap or names.moon_cap_cooked) and 1 or 0) +
-                    ((names.albicans_cap or names.albicans_cap_cooked) and 1 or 0)
-                ) >= 2
+            local nn = {}
+            for k, v in pairs(names) do --Tip: 对于工艺锅（Craft Pot）模组，换个变量来判定，才能不用被展示
+                nn[k] = v
+            end
+            local mush = ((nn.red_cap or nn.red_cap_cooked) and 1 or 0) +
+                ((nn.green_cap or nn.green_cap_cooked) and 1 or 0) +
+                ((nn.blue_cap or nn.blue_cap_cooked) and 1 or 0) +
+                ((nn.moon_cap or nn.moon_cap_cooked) and 1 or 0) +
+                ((nn.albicans_cap or nn.albicans_cap_cooked) and 1 or 0)
+            local egg = (nn.tallbirdegg or 0) + (nn.tallbirdegg_cooked or 0)
+            return ( --实在没办法了，就这样吧，将就用，反正我不想为了兼容料理展示模组而修改这个配方
+                    tags.tallbirdegg_legion and tags.tallbirdegg_legion >= 2 and
+                    tags.mushroom_legion and tags.mushroom_legion >= 2
+                ) or (mush >= 2 and egg >= 2)
         end,
         card_def = { ingredients = { {"tallbirdegg",2}, {"red_cap",1}, {"blue_cap",1} } },
         priority = priority_med,

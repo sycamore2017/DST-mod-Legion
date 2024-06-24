@@ -251,6 +251,10 @@ Assets = {
     Asset("IMAGE", "images/foodtags/foodtag_gel.tex"),
     Asset("ATLAS", "images/foodtags/foodtag_petals.xml"),
     Asset("IMAGE", "images/foodtags/foodtag_petals.tex"),
+    Asset("ATLAS", "images/foodtags/foodtag_mushroom.xml"),
+    Asset("IMAGE", "images/foodtags/foodtag_mushroom.tex"),
+    Asset("ATLAS", "images/foodtags/foodtag_tallbirdegg.xml"),
+    Asset("IMAGE", "images/foodtags/foodtag_tallbirdegg.tex"),
     Asset("ATLAS", "images/foodtags/foodtag_fallfullmoon.xml"),
     Asset("IMAGE", "images/foodtags/foodtag_fallfullmoon.tex"),
     Asset("ATLAS", "images/foodtags/foodtag_winterfeast.xml"),
@@ -329,6 +333,7 @@ _G.CONFIGS_LEGION = {
     BACKCUBCHANCE = GetModConfigData("BackCubChance"), --靠背熊掉落几率
     SHIELDRECHARGETIME = GetModConfigData("ShieldRechargeTime"), --盾牌冷却时间
     AGRONRECHARGETIME = GetModConfigData("AgronRechargeTime"), --艾力冈的剑冷却时间
+    ALLOWAUTOCATK = GetModConfigData("AllowAutoCATK"), --禁用自动盾反
 }
 
 ------台词文本
@@ -505,8 +510,16 @@ local ingredients_l = {
 }
 local ingredients_map = {}
 for _, ing in ipairs(ingredients_l) do
+    local cancook = ing[3]
+    local candry = ing[4]
     for _, name in pairs(ing[1]) do
         ingredients_map[name] = true
+        if cancook then
+            ingredients_map[name.."_cooked"] = true
+        end
+        if candry then
+            ingredients_map[name.."_dried"] = true
+        end
     end
 end
 
@@ -572,8 +585,7 @@ modimport("scripts/fengl_userdatahook.lua")
 if _G.CONFIGS_LEGION.DRESSUP then
     modimport("scripts/dressup_legion.lua")
 end
-------皮肤相关
-modimport("scripts/niks_legion.lua")
+modimport("scripts/skkii_legion.lua")
 
 --------------------------------------------------------------------------
 --[[ mod之间的兼容，以及其他 ]]
@@ -624,10 +636,9 @@ AddSimPostInit(function()
     local ingredients_base = cooking.ingredients
     if ingredients_base then
         for _, ing in ipairs(ingredients_l) do
+            local cancook = ing[3]
+            local candry = ing[4]
             for _, name in pairs(ing[1]) do
-                local cancook = ing[3]
-                local candry = ing[4]
-
                 if ingredients_base[name] == nil then
                     ingredients_base[name] = { tags={} }
                 end
@@ -1118,12 +1129,16 @@ AddSimPostInit(function()
             winterfeast = 1,
             hallowednights = 1,
             newmoon = 1,
+            mushroom_legion = 1,
+            tallbirdegg_legion = 1
         }, false, false)
 
         if _G.CONFIGS_LEGION.LANGUAGES == "chinese" then
             STRINGS.NAMES_LEGION = {
                 GEL = "黏液度",
                 PETALS_LEGION = "花度",
+                TALLBIRDEGG_LEGION = "(烤)高脚鸟蛋",
+                MUSHROOM_LEGION = "蘑菇种类",
                 FALLFULLMOON = "秋季月圆天专属",
                 WINTERSFEAST = "冬季盛宴专属",
                 HALLOWEDNIGHTS = "疯狂万圣专属",
@@ -1149,6 +1164,8 @@ AddSimPostInit(function()
             STRINGS.NAMES_LEGION = {
                 GEL = "Gel",
                 PETALS_LEGION = "Petals",
+                TALLBIRDEGG_LEGION = "(Cooked)Tallbird Egg",
+                MUSHROOM_LEGION = "kinds of mushrooms",
                 FALLFULLMOON = "specific to Fall FullMoon Day",
                 WINTERSFEAST = "specific to Winter Feast",
                 HALLOWEDNIGHTS = "specific to Hallowed Nights",
@@ -1165,6 +1182,16 @@ AddSimPostInit(function()
             name = STRINGS.NAMES_LEGION.PETALS_LEGION,
             tex = "foodtag_petals.tex",
             atlas = "images/foodtags/foodtag_petals.xml"
+        })
+        AddFoodTag('mushroom_legion', {
+            name = STRINGS.NAMES_LEGION.MUSHROOM_LEGION,
+            tex = "foodtag_mushroom.tex",
+            atlas = "images/foodtags/foodtag_mushroom.xml"
+        })
+        AddFoodTag('tallbirdegg_legion', {
+            name = STRINGS.NAMES_LEGION.TALLBIRDEGG_LEGION,
+            tex = "foodtag_tallbirdegg.tex",
+            atlas = "images/foodtags/foodtag_tallbirdegg.xml"
         })
         AddFoodTag('fallfullmoon', {
             name = STRINGS.NAMES_LEGION.FALLFULLMOON,

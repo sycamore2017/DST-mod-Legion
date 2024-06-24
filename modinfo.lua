@@ -6,7 +6,7 @@ local L = locale ~= "zh" and locale ~= "zhr" --true-英文; false-中文
 --     zh = "[DST] 棱镜",
 -- })
 
-name = L and "[DST] Legion" or "[DST] 棱镜"
+name = L and "[DST] Legion-test" or "[DST] 棱镜-测试"
 author = "ti_Tout"
 version = "7.4.3" --每次更新时为了上传必须更改
 description =
@@ -553,6 +553,15 @@ configuration_options = L and {
         },
         default = 0.5
     },
+    {   name = "AllowAutoCATK",
+        label = "Ban Auto Shield Up",
+        hover = "Set to ban the mod of auto shield up.",
+        options = {
+            {description = "Allow", data = true},
+            {description = "Ban(default)", data = false}
+        },
+        default = false
+    },
     {   name = "ShieldRechargeTime",
         label = "Cooldown Time of Shield",
         hover = "Set the cooldown time required to lift the shield again after each lift.",
@@ -600,7 +609,7 @@ configuration_options = L and {
             {description = "480 sec", data = 480}
         },
         default = 0
-    },
+    }
 } or {
     {name = "Title", label = "特殊设置", options = {{description = "", data = ""},}, default = ""},
     {   name = "Language",
@@ -1112,6 +1121,15 @@ configuration_options = L and {
         },
         default = 0.5
     },
+    {   name = "AllowAutoCATK",
+        label = "禁用自动盾反",
+        hover = "是否禁用自动盾反模组。唉。",
+        options = {
+            {description = "不禁用", data = true},
+            {description = "禁用(默认)", data = false}
+        },
+        default = false
+    },
     {   name = "ShieldRechargeTime",
         label = "盾牌冷却时间",
         hover = "设置每次举盾结束后能再次举盾所需的冷却时间。盾太重了？",
@@ -1159,5 +1177,5 @@ configuration_options = L and {
             {description = "480秒", data = 480}
         },
         default = 0
-    },
+    }
 }

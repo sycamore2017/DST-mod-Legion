@@ -4526,6 +4526,10 @@ STRINGS.NAMEDETAIL_L = {
     FISHHOMING = "{fi} {ch}%",
 }
 
+STRINGS.LEGION_TIPS = {
+    BAN_AUTOCATK = "[{doer}] has enabled the mod of auto shield up, and will be forced to exit in 15 seconds."
+}
+
 STRINGS.ACTIONS.SETMODE_L = {
     GENERIC = "Switch",
     MYSTERY = "Whisper",
