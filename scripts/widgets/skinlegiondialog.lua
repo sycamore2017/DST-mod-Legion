@@ -3288,7 +3288,7 @@ local SkinData = {
     dish_tomahawksteak_twist = {
         string = ischinese and {
             collection = "TWIST", access = "SPECIAL", descitem = "解锁\"牛排战斧\"以及入鞘后的皮肤。",
-            description = ""
+            description = "传说中，它因贪婪地腐朽事物，被古神驱逐到了其他维度。它真正的模样也不得而知，但它的事迹流传了下来。\n近乎疯狂的教徒们使用代代相传的古老咒语和法阵，让生灵在特殊液体中腐烂，不断积累代表它的黑色腐朽力量。\n如今它也感受到了教徒们的召唤。法阵中刚放入一批新的献祭体，突然咒语飘起，形成大大小小的次元裂隙，恶臭的黑色液体从裂隙中渗出，慢慢包裹了献祭体，肉体坍缩化作枯木样，空洞的身体上长出了赤色之眼，任何被它注视到的生物都会变得麻木混沌……\n现在它的力量再次回到这个世界，它将快速蔓延壮大，与其他被称为神的力量一起支配这个世界。"
         } or {
             collection = "TWIST", access = "SPECIAL", descitem = "Unlock \"Steak Tomahawk\" skin.", description = "Emmm."
         },
