@@ -5941,7 +5941,7 @@ if not TheNet:IsDedicated() and _G.CONFIGS_LEGION.LANGUAGES == "chinese" then
     -- local PlayerAvatarPopup = require "widgets/playeravatarpopup"
     local PlayerInfoPopup = require "screens/playerinfopopupscreen"
     local TEMPLATES = require "widgets/templates"
-    -- local SkinLegionDialog = require "widgets/skinlegiondialog"
+    local SkinLegionDialog = require "widgets/skinlegiondialog"
 
     local MakeBG_old = PlayerInfoPopup.MakeBG
     PlayerInfoPopup.MakeBG = function(self, ...)
@@ -5964,7 +5964,7 @@ if not TheNet:IsDedicated() and _G.CONFIGS_LEGION.LANGUAGES == "chinese" then
                 if rightroot.skinshop_l ~= nil then
                     rightroot.skinshop_l:Kill()
                 end
-                local SkinLegionDialog = _G.require("widgets/skinlegiondialog") --test：动态更新
+                -- local SkinLegionDialog = _G.require("widgets/skinlegiondialog") --test：动态更新
                 rightroot.skinshop_l = rightroot:AddChild(SkinLegionDialog(self.owner))
                 rightroot.skinshop_l:SetPosition(-380, 0)
                 -- self:Kill() --直接删除并不能去除暂停状态

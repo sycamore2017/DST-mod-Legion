@@ -90,9 +90,9 @@ local SkinStrings = ischinese and {
     }
 }
 
-local AnimModels = TEST and { "wes" } or {
+local AnimModels = TEST and { "woodie" } or {
     "wilson", "willow", "wendy", "wolfgang", "wx78", "wickerbottom", "woodie", "waxwell", "wathgrithr",
-    "webber", "winona", "warly", "wes"
+    "webber", "winona", "warly", "wes", "walter"
 }
 local AnimNames = {
     "research", "emoteXL_sad", "emoteXL_annoyed", "emoteXL_happycheer", "emoteXL_waving4",

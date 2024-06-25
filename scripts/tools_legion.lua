@@ -591,6 +591,7 @@ local function health_DoDelta_l(self, amount, overtime, cause, ignore_invincible
             ignore_invincible = true
             ignore_absorb = true
         end
+        print("shim:"..tostring(ignore_invincible))
         return self.DoDelta_legion(self, amount, overtime, cause, ignore_invincible, afflicter, ignore_absorb, ...)
     end
     return amount
@@ -604,6 +605,14 @@ local function health_DoDelta_player(self, amount, overtime, cause, ignore_invin
         return self.DoDelta_legion(self, amount, overtime, cause, ignore_invincible, afflicter, ignore_absorb, ...)
     end
     return amount
+end
+local function health_IsInvincible_l(self, ...)
+    if self.inst.legiontag_undefended == 1 then
+        return self.inst.sg and self.inst.sg:HasStateTag("temp_invincible")
+    end
+    if self.IsInvincible_legion ~= nil then
+        return self.IsInvincible_legion(self, ...)
+    end
 end
 local function planarentity_AbsorbDamage_l(self, damage, attacker, weapon, spdmg, ...)
     if self.AbsorbDamage_legion == nil then
@@ -657,12 +666,19 @@ local function UndefendedATK(inst, data)
         end
 
         --修改生命机制
-        if target.components.health ~= nil and target.components.health.DoDelta_legion == nil then
-            target.components.health.DoDelta_legion = target.components.health.DoDelta
-            if target:HasTag("player") then
-                target.components.health.DoDelta = health_DoDelta_player
-            else
-                target.components.health.DoDelta = health_DoDelta_l
+        local healthcpt = target.components.health
+        if healthcpt ~= nil then
+            if healthcpt.DoDelta_legion == nil then
+                healthcpt.DoDelta_legion = healthcpt.DoDelta
+                if target:HasTag("player") then
+                    healthcpt.DoDelta = health_DoDelta_player
+                else
+                    healthcpt.DoDelta = health_DoDelta_l
+                end
+            end
+            if healthcpt.IsInvincible_legion == nil and not target:HasTag("player") then
+                healthcpt.IsInvincible_legion = healthcpt.IsInvincible
+                healthcpt.IsInvincible = health_IsInvincible_l
             end
         end
 
