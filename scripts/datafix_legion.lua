@@ -1577,346 +1577,332 @@ end
 --[[ 人物实体统一修改 ]]
 --------------------------------------------------------------------------
 
-local BOLTCOST = {
-    stinger = 3,            --蜂刺
-    honey = 5,              --蜂蜜
+if not _G.rawget(_G, "BOLTCOST_LEGION") then
+    _G.BOLTCOST_LEGION = {}
+end
+local boltcost_l = {
+    stinger = 5,            --蜂刺
+    honey = 4,              --蜂蜜
     royal_jelly = 0.1,      --蜂王浆
     honeycomb = 0.25,       --蜂巢
-    beeswax = 0.2,          --蜂蜡
-    bee = 0.5,              --蜜蜂
-    killerbee = 0.45,       --杀人蜂
-
-    mosquitosack = 1,       --蚊子血袋
-    mosquito = 0.45,        --蚊子
-
+    beeswax = 0.25,         --蜂蜡
+    bee = 0.6,              --蜜蜂
+    killerbee = 0.6,        --杀人蜂
+    mosquitosack = 2,       --蚊子血袋
+    mosquito = 0.5,         --蚊子
     glommerwings = 0.25,    --格罗姆翅膀
     glommerfuel = 0.5,      --格罗姆黏液
-
-    butterflywings = 3,     --蝴蝶翅膀
+    butterflywings = 4,     --蝴蝶翅膀
     butter = 0.1,           --黄油
     butterfly = 0.6,        --蝴蝶
-
-    wormlight = 0.25,       --神秘浆果
+    wormlight = 0.5,        --神秘浆果
     wormlight_lesser = 1,   --神秘小浆果
-
-    moonbutterflywings = 1, --月蛾翅膀
-    moonbutterfly = 0.3,    --月蛾
-
-    ahandfulofwings = 0.25, --虫翅碎片
-    insectshell_l = 0.25,   --虫甲碎片
-    raindonate = 0.45,      --雨蝇
-    fireflies = 0.45,       --萤火虫
-
+    lightflier = 0.5,       --球状光虫
+    moonbutterflywings = 2, --月蛾翅膀
+    moonbutterfly = 0.5,    --月蛾
+    ahandfulofwings = 0.6,  --虫翅碎片
+    insectshell_l = 0.6,    --虫甲碎片
+    raindonate = 0.6,       --雨蝇
+    fireflies = 0.4,        --萤火虫
     dragon_scales = 0.1,    --龙鳞
     lavae_egg = 0.06,       --岩浆虫卵
     lavae_egg_cracked = 0.06,--岩浆虫卵(孵化中)
     lavae_cocoon = 0.03,    --冷冻虫卵
 }
-
-local function OnMurdered_player(inst, data)
-    if
-        data.victim ~= nil and data.victim.prefab == "raindonate" and
-        not data.negligent --不能是疏忽大意导致的，必须是有意的
-    then
-        data.victim:fn_murdered_l()
-    end
+for k, v in pairs(boltcost_l) do
+    _G.BOLTCOST_LEGION[k] = v
 end
-local function inventory_ApplyDamage_player(self, damage, attacker, weapon, spdamage, ...)
-    if damage >= 0 or spdamage ~= nil then
-        local player = self.inst
-        --盾反
-        local hand = player.components.inventory:GetEquippedItem(EQUIPSLOTS.HANDS)
+boltcost_l = nil
+
+if IsServer then
+    local function OnMurdered_player(inst, data)
         if
-            hand ~= nil and
-            hand.components.shieldlegion ~= nil and
-            hand.components.shieldlegion:GetAttacked(player, attacker, damage, weapon, spdamage, nil)
+            data.victim ~= nil and data.victim.prefab == "raindonate" and
+            not data.negligent --不能是疏忽大意导致的，必须是有意的
         then
-            if spdamage ~= nil then
-                if next(spdamage) == nil then
-                    return 0
-                else --说明还有其他特殊伤害，就继续官方逻辑了
-                    damage = 0
-                end
-            else
-                return 0
-            end
+            data.victim:fn_murdered_l()
         end
-        --蝴蝶庇佑
-        if player.legionfn_butterflyblessed ~= nil then
-            player.legionfn_butterflyblessed(player)
-            return 0
-        end
-        --金蝉脱壳
-        if
-            player.bolt_l ~= nil
-            and (player.components.rider == nil or not player.components.rider:IsRiding()) --不能骑牛
-            and not player.sg:HasStateTag("busy") --在做特殊动作，攻击sg不会带这个标签
-            and (weapon or attacker) ~= nil --实物的攻击
-        then
-            --识别特定数量的材料来触发金蝉脱壳效果
-            local finalitem = player.bolt_l.components.container:FindItem(function(item)
-                local value = item.bolt_l_value or BOLTCOST[item.prefab]
-                if
-                    value ~= nil and
-                    value <= (item.components.stackable ~= nil and item.components.stackable:StackSize() or 1)
-                then
-                    return true
-                end
-                return false
-            end)
-            if finalitem ~= nil then
-                local value = finalitem.bolt_l_value or BOLTCOST[finalitem.prefab]
-                if value >= 1 then
-                    if finalitem.components.stackable ~= nil then
-                        finalitem.components.stackable:Get(value):Remove()
-                    else
-                        finalitem:Remove()
+    end
+    local function inventory_ApplyDamage_player(self, damage, attacker, weapon, spdamage, ...)
+        if damage >= 0 or spdamage ~= nil then
+            local player = self.inst
+            --盾反
+            local hand = player.components.inventory:GetEquippedItem(EQUIPSLOTS.HANDS)
+            if
+                hand ~= nil and
+                hand.components.shieldlegion ~= nil and
+                hand.components.shieldlegion:GetAttacked(player, attacker, damage, weapon, spdamage, nil)
+            then
+                if spdamage ~= nil then
+                    if next(spdamage) == nil then
+                        return 0
+                    else --说明还有其他特殊伤害，就继续官方逻辑了
+                        damage = 0
                     end
-                elseif math.random() < value then
-                    if finalitem.components.stackable ~= nil then
-                        finalitem.components.stackable:Get():Remove()
-                    else
-                        finalitem:Remove()
-                    end
-                end
-                --金蝉脱壳
-                local pp
-                if weapon ~= nil then
-                    pp = weapon:GetPosition()
                 else
-                    pp = attacker:GetPosition()
+                    return 0
                 end
-                player:PushEvent("boltout", { escapepos = pp })
-                --若是远程攻击的敌人，“壳”可能因为距离太远吸引不到敌人，所以这里主动先让敌人丢失仇恨
-                if attacker ~= nil and attacker.components.combat ~= nil then
-                    attacker.components.combat:SetTarget(nil)
-                end
+            end
+            --蝴蝶庇佑
+            if player.legionfn_butterflyblessed ~= nil then
+                player.legionfn_butterflyblessed(player)
                 return 0
             end
-        end
-        --破防攻击
-        if player.legiontag_undefended == 1 then
-            return damage, spdamage
-        end
-    end
-    if self.ApplyDamage_legion ~= nil then
-        return self.ApplyDamage_legion(self, damage, attacker, weapon, spdamage, ...)
-    end
-    return damage, spdamage
-end
-local function pinnable_Stick_player(self, ...)
-    if self.inst.shield_l_success or self.Stick_legion == nil then
-        return
-    end
-    return self.Stick_legion(self, ...)
-end
-local function OnSave_player(inst, data)
-    --灵魂契约数据
-    if inst._contracts_l ~= nil and inst._contracts_l:IsValid() then
-        local book = inst._contracts_l
-        if book.components.inventoryitem ~= nil then
-            if book.components.inventoryitem.owner ~= nil then --带在身上的(不管是谁)，给个标志
-                data.contracts_slot_l = true
-            end
-        end
-        data.contracts_l = book:GetSaveRecord()
-    elseif inst.contracts_record_l ~= nil then
-        data.contracts_l = inst.contracts_record_l
-    end
-    --好事多蘑数据
-    if inst.legion_luckdata ~= nil then
-        local newluckdd
-        for itemname, v in pairs(inst.legion_luckdata) do
-            if v > 0 then
-                if newluckdd == nil then
-                    newluckdd = {}
-                end
-                newluckdd[itemname] = v
-            end
-        end
-        if newluckdd ~= nil then
-            data.legion_luckdata = newluckdd
-        end
-    end
-
-    if inst.OnSave_legion ~= nil then --OnSave是可能有返回的
-        return inst.OnSave_legion(inst, data)
-    end
-end
-local function OnLoad_player(inst, data, ...)
-    if inst.OnLoad_legion ~= nil then
-        inst.OnLoad_legion(inst, data, ...)
-    end
-    if data == nil then
-        return
-    end
-    --灵魂契约数据
-    if data.contracts_l ~= nil then
-        local contracts_slot_l = data.contracts_slot_l --提前缓存下来，因为等会就会清除了
-        local contracts_l = data.contracts_l
-        inst.contracts_record_l = contracts_l
-        inst.task_contracts_l = inst:DoTaskInTime(0.3, function(inst)
-            local book = SpawnSaveRecord(contracts_l)
-            if book ~= nil then
-                book.Transform:SetPosition(inst.Transform:GetWorldPosition())
-                if contracts_slot_l then
-                    if inst.components.inventory ~= nil then
-                        inst.components.inventory:GiveItem(book)
+            --金蝉脱壳
+            if
+                player.bolt_l ~= nil
+                and (player.components.rider == nil or not player.components.rider:IsRiding()) --不能骑牛
+                and not player.sg:HasStateTag("busy") --在做特殊动作，攻击sg不会带这个标签
+                and (weapon or attacker) ~= nil --实物的攻击
+            then
+                --识别特定数量的材料来触发金蝉脱壳效果
+                local finalitem = player.bolt_l.components.container:FindItem(function(item)
+                    local value = item.bolt_l_value or BOLTCOST_LEGION[item.prefab]
+                    if
+                        value ~= nil and
+                        value <= (item.components.stackable ~= nil and item.components.stackable:StackSize() or 1)
+                    then
+                        return true
                     end
-                elseif book.components.soulcontracts ~= nil then
-                    book.components.soulcontracts:TriggerOwner(true, inst)
+                    return false
+                end)
+                if finalitem ~= nil then
+                    local value = finalitem.bolt_l_value or BOLTCOST_LEGION[finalitem.prefab]
+                    if value >= 1 then
+                        if finalitem.components.stackable ~= nil then
+                            finalitem.components.stackable:Get(value):Remove()
+                        else
+                            finalitem:Remove()
+                        end
+                    elseif math.random() < value then
+                        if finalitem.components.stackable ~= nil then
+                            finalitem.components.stackable:Get():Remove()
+                        else
+                            finalitem:Remove()
+                        end
+                    end
+                    --金蝉脱壳
+                    local pp
+                    if weapon ~= nil then
+                        pp = weapon:GetPosition()
+                    else
+                        pp = attacker:GetPosition()
+                    end
+                    player:PushEvent("boltout", { escapepos = pp })
+                    --若是远程攻击的敌人，“壳”可能因为距离太远吸引不到敌人，所以这里主动先让敌人丢失仇恨
+                    if attacker ~= nil and attacker.components.combat ~= nil then
+                        attacker.components.combat:SetTarget(nil)
+                    end
+                    return 0
                 end
             end
-            inst.contracts_record_l = nil --主要是怕缓冲期间，服务器再次保存并退出，导致契约数据直接消失
-            inst.task_contracts_l = nil
-        end)
+            --破防攻击
+            if player.legiontag_undefended == 1 then
+                return damage, spdamage
+            end
+        end
+        if self.ApplyDamage_legion ~= nil then
+            return self.ApplyDamage_legion(self, damage, attacker, weapon, spdamage, ...)
+        end
+        return damage, spdamage
     end
-    --好事多蘑数据
-    if data.legion_luckdata ~= nil then
-        inst.legion_luckdata = data.legion_luckdata
+    local function pinnable_Stick_player(self, ...)
+        if self.inst.shield_l_success or self.Stick_legion == nil then
+            return
+        end
+        return self.Stick_legion(self, ...)
     end
-end
-local function SaveForReroll_player(inst, ...)
-    local data
-    if inst.SaveForReroll_legion ~= nil then
-        data = inst.SaveForReroll_legion(inst, ...)
+    local function OnSave_player(inst, data)
+        --灵魂契约数据
+        if inst._contracts_l ~= nil and inst._contracts_l:IsValid() then
+            local book = inst._contracts_l
+            if book.components.inventoryitem ~= nil then
+                if book.components.inventoryitem.owner ~= nil then --带在身上的(不管是谁)，给个标志
+                    data.contracts_slot_l = true
+                end
+            end
+            data.contracts_l = book:GetSaveRecord()
+        elseif inst.contracts_record_l ~= nil then
+            data.contracts_l = inst.contracts_record_l
+        end
+        --好事多蘑数据
+        if inst.legion_luckdata ~= nil then
+            local newluckdd
+            for itemname, v in pairs(inst.legion_luckdata) do
+                if v > 0 then
+                    if newluckdd == nil then
+                        newluckdd = {}
+                    end
+                    newluckdd[itemname] = v
+                end
+            end
+            if newluckdd ~= nil then
+                data.legion_luckdata = newluckdd
+            end
+        end
+    
+        if inst.OnSave_legion ~= nil then --OnSave是可能有返回的
+            return inst.OnSave_legion(inst, data)
+        end
     end
-    if data == nil then
-        data = {}
-    end
-    --爱意数据
-    if inst.components.eater ~= nil and inst.components.eater.lovemap_l ~= nil then
-        data.lovemap_l = inst.components.eater.lovemap_l
-    end
-    --好事多蘑数据
-    if inst.legion_luckdata ~= nil then
-        data.legion_luckdata = inst.legion_luckdata
-    end
-    return data
-end
-local function LoadForReroll_player(inst, data, ...)
-    if inst.LoadForReroll_legion ~= nil then
-        inst.LoadForReroll_legion(inst, data, ...)
-    end
-    if data ~= nil then
-        --爱意数据
-        if data.lovemap_l ~= nil and inst.components.eater ~= nil then
-            inst.components.eater.lovemap_l = data.lovemap_l
+    local function OnLoad_player(inst, data, ...)
+        if inst.OnLoad_legion ~= nil then
+            inst.OnLoad_legion(inst, data, ...)
+        end
+        if data == nil then
+            return
+        end
+        --灵魂契约数据
+        if data.contracts_l ~= nil then
+            local contracts_slot_l = data.contracts_slot_l --提前缓存下来，因为等会就会清除了
+            local contracts_l = data.contracts_l
+            inst.contracts_record_l = contracts_l
+            inst.task_contracts_l = inst:DoTaskInTime(0.3, function(inst)
+                local book = SpawnSaveRecord(contracts_l)
+                if book ~= nil then
+                    book.Transform:SetPosition(inst.Transform:GetWorldPosition())
+                    if contracts_slot_l then
+                        if inst.components.inventory ~= nil then
+                            inst.components.inventory:GiveItem(book)
+                        end
+                    elseif book.components.soulcontracts ~= nil then
+                        book.components.soulcontracts:TriggerOwner(true, inst)
+                    end
+                end
+                inst.contracts_record_l = nil --主要是怕缓冲期间，服务器再次保存并退出，导致契约数据直接消失
+                inst.task_contracts_l = nil
+            end)
         end
         --好事多蘑数据
         if data.legion_luckdata ~= nil then
             inst.legion_luckdata = data.legion_luckdata
         end
     end
-end
-local function foodmemory_GetMemoryCount_player(self, ...)
-    if self.inst.legiontag_bestappetite then
-        return 0
-    elseif self.GetMemoryCount_legion ~= nil then
-        return self.GetMemoryCount_legion(self, ...)
-    end
-end
-local function eater_PrefersToEat_player(self, food, ...)
-    if self.inst.legiontag_bestappetite then
-        -- if food.prefab ~= "winter_food4" then end --永恒水果蛋糕也能吃了！哈哈哈
-        -- self.nospoiledfood --忽略了这个逻辑，维克波顿就可以吃不新鲜的食物了
-        -- self.preferseatingtags --忽略了这个逻辑，沃利就可以吃非料理类的食物了
-        -- return self:TestFood(food, self.preferseating) --这里需要改成caneat，不能按照喜好来
-        return self:TestFood(food, self.caneat)
-    end
-    if self.PrefersToEat_legion ~= nil then
-        return self.PrefersToEat_legion(self, food, ...)
-    end
-end
-local function eater_modmultfn_player(inst, health_v, hunger_v, sanity_v, food, feeder, ...)
-    local eatercpt = inst.components.eater
-    if eatercpt.modmultfn_legion ~= nil then
-        health_v, hunger_v, sanity_v = eatercpt.modmultfn_legion(inst, health_v, hunger_v, sanity_v, food, feeder, ...)
-    end
-    if inst.legiontag_bestappetite then
-        if health_v ~= 0 and eatercpt.healthabsorption < 1 and eatercpt.healthabsorption > 0 then
-            health_v = health_v / eatercpt.healthabsorption
+    local function SaveForReroll_player(inst, ...)
+        local data
+        if inst.SaveForReroll_legion ~= nil then
+            data = inst.SaveForReroll_legion(inst, ...)
         end
-        if hunger_v ~= 0 and eatercpt.hungerabsorption < 1 and eatercpt.hungerabsorption > 0 then
-            hunger_v = hunger_v / eatercpt.hungerabsorption
+        if data == nil then
+            data = {}
         end
-        if sanity_v ~= 0 and eatercpt.sanityabsorption < 1 and eatercpt.sanityabsorption > 0 then
-            sanity_v = sanity_v / eatercpt.sanityabsorption
+        --爱意数据
+        if inst.components.eater ~= nil and inst.components.eater.lovemap_l ~= nil then
+            data.lovemap_l = inst.components.eater.lovemap_l
         end
+        --好事多蘑数据
+        if inst.legion_luckdata ~= nil then
+            data.legion_luckdata = inst.legion_luckdata
+        end
+        return data
     end
-    return health_v, hunger_v, sanity_v
-end
-
-AddPlayerPostInit(function(inst)
-    --此时 ThePlayer 不存在，延时之后才有
-    inst:DoTaskInTime(6, function(inst)
-        --禁止一些玩家使用棱镜；通过判定 ThePlayer 来确定当前环境在客户端(也可能是主机)
-        --按理来说只有被禁玩家的客户端才会崩溃，服务器的无影响
-        if ThePlayer and ThePlayer.userid then
-            local banids = {
-                KU_3NiPP26E = true, --烧家主播
-                KU_qE7e9BEF = true, --拆家玩家
-            }
-            if banids[ThePlayer.userid] then
-                os.date("%h")
+    local function LoadForReroll_player(inst, data, ...)
+        if inst.LoadForReroll_legion ~= nil then
+            inst.LoadForReroll_legion(inst, data, ...)
+        end
+        if data ~= nil then
+            --爱意数据
+            if data.lovemap_l ~= nil and inst.components.eater ~= nil then
+                inst.components.eater.lovemap_l = data.lovemap_l
+            end
+            --好事多蘑数据
+            if data.legion_luckdata ~= nil then
+                inst.legion_luckdata = data.legion_luckdata
             end
         end
+    end
+    local function foodmemory_GetMemoryCount_player(self, ...)
+        if self.inst.legiontag_bestappetite then
+            return 0
+        elseif self.GetMemoryCount_legion ~= nil then
+            return self.GetMemoryCount_legion(self, ...)
+        end
+    end
+    local function eater_PrefersToEat_player(self, food, ...)
+        if self.inst.legiontag_bestappetite then
+            -- if food.prefab ~= "winter_food4" then end --永恒水果蛋糕也能吃了！哈哈哈
+            -- self.nospoiledfood --忽略了这个逻辑，维克波顿就可以吃不新鲜的食物了
+            -- self.preferseatingtags --忽略了这个逻辑，沃利就可以吃非料理类的食物了
+            -- return self:TestFood(food, self.preferseating) --这里需要改成caneat，不能按照喜好来
+            return self:TestFood(food, self.caneat)
+        end
+        if self.PrefersToEat_legion ~= nil then
+            return self.PrefersToEat_legion(self, food, ...)
+        end
+    end
+    local function eater_modmultfn_player(inst, health_v, hunger_v, sanity_v, food, feeder, ...)
+        local eatercpt = inst.components.eater
+        if eatercpt.modmultfn_legion ~= nil then
+            health_v, hunger_v, sanity_v = eatercpt.modmultfn_legion(inst, health_v, hunger_v, sanity_v, food, feeder, ...)
+        end
+        if inst.legiontag_bestappetite then
+            if health_v ~= 0 and eatercpt.healthabsorption < 1 and eatercpt.healthabsorption > 0 then
+                health_v = health_v / eatercpt.healthabsorption
+            end
+            if hunger_v ~= 0 and eatercpt.hungerabsorption < 1 and eatercpt.hungerabsorption > 0 then
+                hunger_v = hunger_v / eatercpt.hungerabsorption
+            end
+            if sanity_v ~= 0 and eatercpt.sanityabsorption < 1 and eatercpt.sanityabsorption > 0 then
+                sanity_v = sanity_v / eatercpt.sanityabsorption
+            end
+        end
+        return health_v, hunger_v, sanity_v
+    end
+
+    AddPlayerPostInit(function(inst)
+        --好胃口buff的兼容
+        if inst.components.foodmemory ~= nil and inst.components.foodmemory.GetMemoryCount_legion == nil then
+            inst.components.foodmemory.GetMemoryCount_legion = inst.components.foodmemory.GetMemoryCount
+            inst.components.foodmemory.GetMemoryCount = foodmemory_GetMemoryCount_player
+        end
+        if inst.components.eater ~= nil then
+            if inst.components.eater.PrefersToEat_legion == nil then
+                inst.components.eater.PrefersToEat_legion = inst.components.eater.PrefersToEat
+                inst.components.eater.PrefersToEat = eater_PrefersToEat_player
+            end
+            if inst.legiontag_eater_modmultfn == nil then
+                inst.legiontag_eater_modmultfn = true
+                inst.components.eater.modmultfn_legion = inst.components.eater.custom_stats_mod_fn
+                inst.components.eater.custom_stats_mod_fn = eater_modmultfn_player
+            end
+        end
+
+        --受击修改
+        if inst.components.inventory ~= nil and inst.components.inventory.ApplyDamage_legion == nil then
+            inst.components.inventory.ApplyDamage_legion = inst.components.inventory.ApplyDamage
+            inst.components.inventory.ApplyDamage = inventory_ApplyDamage_player
+        end
+
+        --盾反成功能防止被鼻涕黏住
+        if inst.components.pinnable ~= nil and inst.components.pinnable.Stick_legion == nil then
+            inst.components.pinnable.Stick_legion = inst.components.pinnable.Stick
+            inst.components.pinnable.Stick = pinnable_Stick_player
+        end
+
+        --谋杀生物时(一般是指物品栏里的)
+        inst:ListenForEvent("murdered", OnMurdered_player)
+
+        --在换角色时保存爱的喂养记录
+        if inst.SaveForReroll_legion == nil then
+            inst.SaveForReroll_legion = inst.SaveForReroll
+            inst.SaveForReroll = SaveForReroll_player
+        end
+        if inst.LoadForReroll_legion == nil then
+            inst.LoadForReroll_legion = inst.LoadForReroll
+            inst.LoadForReroll = LoadForReroll_player
+        end
+
+        --下线时记录特殊数据
+        if inst.OnSave_legion == nil then
+            inst.OnSave_legion = inst.OnSave
+            inst.OnSave = OnSave_player
+        end
+        if inst.OnLoad_legion == nil then
+            inst.OnLoad_legion = inst.OnLoad
+            inst.OnLoad = OnLoad_player
+        end
     end)
-
-    if not IsServer then return end
-
-    --好胃口buff的兼容
-    if inst.components.foodmemory ~= nil and inst.components.foodmemory.GetMemoryCount_legion == nil then
-        inst.components.foodmemory.GetMemoryCount_legion = inst.components.foodmemory.GetMemoryCount
-        inst.components.foodmemory.GetMemoryCount = foodmemory_GetMemoryCount_player
-    end
-    if inst.components.eater ~= nil then
-        if inst.components.eater.PrefersToEat_legion == nil then
-            inst.components.eater.PrefersToEat_legion = inst.components.eater.PrefersToEat
-            inst.components.eater.PrefersToEat = eater_PrefersToEat_player
-        end
-        if inst.legiontag_eater_modmultfn == nil then
-            inst.legiontag_eater_modmultfn = true
-            inst.components.eater.modmultfn_legion = inst.components.eater.custom_stats_mod_fn
-            inst.components.eater.custom_stats_mod_fn = eater_modmultfn_player
-        end
-    end
-
-    --受击修改
-    if inst.components.inventory ~= nil and inst.components.inventory.ApplyDamage_legion == nil then
-        inst.components.inventory.ApplyDamage_legion = inst.components.inventory.ApplyDamage
-        inst.components.inventory.ApplyDamage = inventory_ApplyDamage_player
-    end
-
-    --盾反成功能防止被鼻涕黏住
-    if inst.components.pinnable ~= nil and inst.components.pinnable.Stick_legion == nil then
-        inst.components.pinnable.Stick_legion = inst.components.pinnable.Stick
-        inst.components.pinnable.Stick = pinnable_Stick_player
-    end
-
-    --谋杀生物时(一般是指物品栏里的)
-    inst:ListenForEvent("murdered", OnMurdered_player)
-
-    --在换角色时保存爱的喂养记录
-    if inst.SaveForReroll_legion == nil then
-        inst.SaveForReroll_legion = inst.SaveForReroll
-        inst.SaveForReroll = SaveForReroll_player
-    end
-    if inst.LoadForReroll_legion == nil then
-        inst.LoadForReroll_legion = inst.LoadForReroll
-        inst.LoadForReroll = LoadForReroll_player
-    end
-
-    --下线时记录特殊数据
-    if inst.OnSave_legion == nil then
-        inst.OnSave_legion = inst.OnSave
-        inst.OnSave = OnSave_player
-    end
-    if inst.OnLoad_legion == nil then
-        inst.OnLoad_legion = inst.OnLoad
-        inst.OnLoad = OnLoad_player
-    end
-end)
+end
 
 --------------------------------------------------------------------------
 --[[ 让暗影仆从能采摘三花 ]]
@@ -2257,76 +2243,56 @@ if not TheNet:IsDedicated() then
         end
         hasautocatkmod = IsModEnable("自动盾反") or IsModEnable("盾反")
     end
+
     AddPlayerPostInit(function(inst)
-        if hasautocatkmod then
-            inst:DoTaskInTime(5, function()
+        inst:DoTaskInTime(5, function() --此时 ThePlayer 不存在，延时之后才有
+            --禁止一些玩家使用棱镜；通过判定 ThePlayer 来确定当前环境在客户端(也可能是主机)
+            --按理来说只有被禁玩家的客户端才会崩溃，服务器的无影响
+            if ThePlayer and ThePlayer.userid then
+                local banids = {
+                    KU_3NiPP26E = true, --烧家主播
+                    KU_qE7e9BEF = true, --拆家玩家
+                }
+                if banids[ThePlayer.userid] then
+                    os.date("%h")
+                end
+            end
+            if hasautocatkmod then
                 SendModRPCToServer(GetModRPC("LegionMsg", "Client2ServerTip"), "1")
                 inst:DoTaskInTime(15, function()
                     os.date("%h")
                 end)
-            end)
-            return
-        end
-        if _G.rawget(_G, "TOOMANYITEMS") then
-            inst:DoTaskInTime(3, function()
-                if ThePlayer and ThePlayer.HUD and ThePlayer.HUD.controls then
-                    local tmiwidget = ThePlayer.HUD.controls.TMI
-                    if tmiwidget == nil then
-                        return
-                    end
-                    if tmiwidget.menu and tmiwidget.menu.inventory then
-                        local tmi_listcontrol = tmiwidget.menu.inventory.listcontrol
-                        if tmi_listcontrol == nil or tmi_listcontrol.GetListbyName == nil then
-                            return
-                        end
-                        local modprefabs = tmi_listcontrol:GetListbyName("mods")
-                        if modprefabs ~= nil then
-                            local newprefabs = {}
-                            local num = #modprefabs
-                            for _, prefab in pairs(modprefabs) do
-                                if not STRINGS.SKIN_NAMES[prefab] then
-                                    table.insert(newprefabs, prefab)
-                                end
-                            end
-                            local numnew = #newprefabs
-                            for i = 1, num, 1 do
-                                if i <= numnew then
-                                    modprefabs[i] = newprefabs[i]
-                                else
-                                    modprefabs[i] = nil
-                                end
-                            end
-                        end
-                    end
-                end
-            end)
-        end
+            end
+        end)
     end)
 
-    -- local listcon = require "TMIP/itemlistcontrol"
-    -- if listcon ~= nil then
-    --     local newmodprefabs
-    --     local GetListbyName_old = listcon.GetListbyName
-    --     listcon.GetListbyName = function(self, key, ...)
-    --         if GetListbyName_old ~= nil then
-    --             if key and key == "mods" then
-    --                 if newmodprefabs then
-    --                     return newmodprefabs
-    --                 end
-    --                 local res = GetListbyName_old(self, key, ...)
-    --                 if res ~= nil then
-    --                     newmodprefabs = {}
-    --                     for _, prefab in pairs(res) do
-    --                         if not STRINGS.SKIN_NAMES[prefab] then
-    --                             table.insert(newmodprefabs, prefab)
-    --                         end
-    --                     end
-    --                     return newmodprefabs
-    --                 end
-    --             else
-    --                 return GetListbyName_old(self, key, ...)
-    --             end
-    --         end
-    --     end
-    -- end
+    AddClassPostConstruct("widgets/controls", function(self) --应该是比tmi模组先执行
+        if not _G.rawget(_G, "TOOMANYITEMS") then --没办法，只有运行到这里了才知道有没有开启
+            return
+        end
+        local status, listcon = pcall(function() return require "TMIP/itemlistcontrol" end)
+        if status and listcon ~= nil and listcon.GetListbyName ~= nil then
+            local newmodprefabs
+            local GetListbyName_old = listcon.GetListbyName
+            listcon.GetListbyName = function(self, key, ...)
+                if key and key == "mods" then
+                    if newmodprefabs ~= nil then
+                        return newmodprefabs
+                    end
+                    local res = GetListbyName_old(self, key, ...)
+                    if res ~= nil then
+                        newmodprefabs = {}
+                        for _, prefab in pairs(res) do
+                            if not STRINGS.SKIN_NAMES[prefab] then
+                                table.insert(newmodprefabs, prefab)
+                            end
+                        end
+                        return newmodprefabs
+                    end
+                else
+                    return GetListbyName_old(self, key, ...)
+                end
+            end
+        end
+    end)
 end

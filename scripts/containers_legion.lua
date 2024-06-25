@@ -238,42 +238,7 @@ params.boltwingout = {
     type = "pack",
     openlimit = 1,
     priorityfn = function(container, item, slot)
-        local costs = {
-            stinger = 3,            --蜂刺
-            honey = 5,              --蜂蜜
-            royal_jelly = 0.1,      --蜂王浆
-            honeycomb = 0.25,       --蜂巢
-            beeswax = 0.2,          --蜂蜡
-            bee = 0.5,              --蜜蜂
-            killerbee = 0.45,       --杀人蜂
-
-            mosquitosack = 1,       --蚊子血袋
-            mosquito = 0.45,        --蚊子
-
-            glommerwings = 0.25,    --格罗姆翅膀
-            glommerfuel = 0.5,      --格罗姆黏液
-
-            butterflywings = 3,     --蝴蝶翅膀
-            butter = 0.1,           --黄油
-            butterfly = 0.6,        --蝴蝶
-
-            wormlight = 0.25,       --神秘浆果
-            wormlight_lesser = 1,   --神秘小浆果
-
-            moonbutterflywings = 1, --月蛾翅膀
-            moonbutterfly = 0.3,    --月蛾
-
-            ahandfulofwings = 0.25, --虫翅碎片
-            insectshell_l = 0.25,   --虫甲碎片
-            raindonate = 0.45,      --雨蝇
-            fireflies = 0.45,       --萤火虫
-
-            dragon_scales = 0.1,    --龙鳞
-            lavae_egg = 0.06,       --岩浆虫卵
-            lavae_egg_cracked = 0.06,--岩浆虫卵(孵化中)
-            lavae_cocoon = 0.03,    --冷冻虫卵
-        }
-        return costs[item.prefab] ~= nil or item:HasTag("yes_boltout")
+        return BOLTCOST_LEGION[item.prefab] ~= nil or item:HasTag("yes_boltout")
     end
 }
 for y = 0, 5 do

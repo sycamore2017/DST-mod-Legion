@@ -1465,5 +1465,4 @@ AddSimPostInit(function()
             }
         end
     end
-
 end)
