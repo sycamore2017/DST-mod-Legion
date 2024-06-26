@@ -2074,7 +2074,7 @@ local SkinData = {
     agronssword_sun = {
         string = ischinese and {
             collection = "SUNMOON", access = "SPECIAL", descitem = "解锁\"艾力冈的剑\"的皮肤。",
-            description = ""
+            description = "手持太阳盾的勇者，散发着炽热的光辉，坚固可靠，以勇气面对侵蚀家园的旧日余孽。\n阵阵光点火花溅射，每次看着他被打倒，又倔强地站起身来，仿佛有使不完的力量。然而，就像太阳终将落下，黄昏来临时，勇者力量散尽，坚持不住重重倒下，就要丧命，却见虹光突闪，月之勇者替他挡下致命一击。"
         } or {
             collection = "SUNMOON", access = "SPECIAL", descitem = "Unlock \"Agron's Sword\" skin.", description = "Emmm."
         },
@@ -2729,7 +2729,7 @@ local SkinData = {
     plant_carrot_l_fact = {
         string = ischinese and {
             collection = "FACT", access = "SPECIAL", descitem = "解锁\"芾萝卜\"、\"胡萝卜长枪\"的皮肤。",
-            description = ""
+            description = "在一片农田里，生长着很多普通的胡萝卜。大多数胡萝卜静静地生长，深深扎根于土地，成为人们餐桌上的美味食材。\n有时，幸运的采摘者会发现一些奇特的胡萝卜，它们生长时纠缠在一起，形成了独特的形状。他们会把这些独特的胡萝卜挂在稻草人上，当做丰收与好运的象征。"
         } or {
             collection = "FACT", access = "SPECIAL", descitem = "Unlock \"Carrot Cluster\", \"Carrot Lance\" skin.",
             description = "Emmm."
@@ -2760,7 +2760,7 @@ local SkinData = {
     plant_lightbulb_l_world = {
         string = ischinese and {
             collection = "DISGUISER", access = "SPECIAL", descitem = "解锁\"夜盏花\"的皮肤。",
-            description = ""
+            description = "无垠之海的彼端，长有一片神秘的铃兰花海。\n永恒之夜，花朵们在微风中轻轻摇曳，散发点点荧光，仿佛银河倒映在大地。旅人们会采摘这些奇花，制成燃料，照亮他们漂泊的灵魂。"
         } or {
             collection = "DISGUISER", access = "SPECIAL", descitem = "Unlock \"Night Bright Flower\" skin.",
             description = "Emmm."
@@ -2786,7 +2786,7 @@ local SkinData = {
     plant_lightbulb_l_sun = {
         string = ischinese and {
             name = "辉光铃兰", collection = "SUNMOON", access = "SPECIAL", descitem = "解锁\"夜盏花\"的2套皮肤。",
-            description = ""
+            description = "两株双生铃兰被古神倾注了力量，化作辉光铃兰。随后被勇者找到，勇者将其种在了家园中心。\n日辉铃兰散发的光芒温暖强烈，能使众人重拾信念，坚定活下去的勇气；月辉铃兰散发的光彩细腻柔和，能让众人清醒理智，冷静地面对黑暗。\n旧日残余势力依然在不断影响这里，凡人和勇者也只能在这样的时代苦苦坚持……"
         } or {
             name = "Lily of The Light", collection = "SUNMOON", access = "SPECIAL",
             descitem = "Unlock \"Night Bright Flower\" skin.", description = "Emmm."
@@ -3081,7 +3081,7 @@ local SkinData = {
     refractedmoonlight_moon = {
         string = ischinese and {
             collection = "SUNMOON", access = "SPECIAL", descitem = "解锁\"月折宝剑\"的皮肤。",
-            description = ""
+            description = "这把由月光凝成的刀刃，泛着冰冷的银辉。初时，轻盈如风，锋利无比，但随着战斗的进行，逐渐进入癫狂状态，光芒狂野，虹彩熠熠，每一次挥砍都带着疯狂与毁灭。\n月之勇者携此刃在黑夜中游荡，保护并照耀黑暗中的人们，直到黎明的到来。"
         } or {
             collection = "SUNMOON", access = "SPECIAL", descitem = "Unlock \"Refracted Moonlight\" skin.", description = "Emmm."
         },
@@ -3272,7 +3272,7 @@ local SkinData = {
     explodingfruitcake_day = {
         string = ischinese and {
             collection = "DAY", access = "SPECIAL", descitem = "解锁\"爆炸水果蛋糕\"的皮肤。",
-            description = ""
+            description = "爱要坦荡荡，不要装模作样到天长。要你的诚实自然，要你的温暖善良。你也不必太紧张，只需等待这气氛发酵，爱的种子终要发芽。我就是爱你爱到爆！！！"
         } or {
             collection = "DAY", access = "SPECIAL", descitem = "Unlock \"Exploding Fruitcake\" skin.", description = "Emmm."
         },
