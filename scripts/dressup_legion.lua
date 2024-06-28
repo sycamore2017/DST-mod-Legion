@@ -435,11 +435,15 @@ local dressup_data = {
     houndstooth_blowpipe = { buildfile = "swap_houndstooth_blowpipe", buildsymbol = "swap_blowdart_pipe" }, --嚎弹炮
     wathgrithr_shield = { isshield = true, buildfile = "swap_wathgrithr_shield", buildsymbol = "swap_shield" }, --战斗圆盾
     beeswax_spray = { buildfile = "plant_spray", buildsymbol = "swap_plant_spray" }, --防腐喷雾
+    mosquitobomb = { isnoskin = true, buildfile = "swap_mosquitobomb", buildsymbol = "swap_mosquitobomb" }, --蚊子炸弹。看来这东西不会有皮肤了
+    wurt_swampitem_lunar = { isnoskin = true, buildfile = "swap_wurt_swampbomb", buildsymbol = "swap_lunar" }, --光芒投泥带。看来这东西不会有皮肤了
+    wurt_swampitem_shadow = { isnoskin = true, buildfile = "swap_wurt_swampbomb", buildsymbol = "swap_shadow" }, --绝望投泥带。看来这东西不会有皮肤了
     -- minifan = { buildfile = "swap_minifan", buildsymbol = "swap_minifan" }, --有贴图之外的实体，不做幻化
     -- redlantern = { buildfile = "swap_redlantern", buildsymbol = "swap_redlantern" }, --有贴图之外的实体，不做幻化
     -- thurible = { buildfile = "swap_thurible", buildsymbol = "swap_thurible" }, --暗影香炉。有贴图之外的实体，不做幻化
     -- lucy = { buildfile = "swap_lucy_axe", buildsymbol = "swap_lucy_axe" }, --露西斧，伍迪只有一把，不做幻化
-    -- propsign = { isnoskin = true, buildfile = "swap_sign_elite", buildsymbol = "swap_sign_elite" }, --猪王比赛的木牌：会在重启后自动消失，所以不幻化
+    -- propsign = { isnoskin = true, buildfile = "swap_sign_elite", buildsymbol = "swap_sign_elite" }, --猪王比赛的木牌：会在重启后自动消失，不能做幻化
+    -- winona_telebrella = { buildfile = "winona_telebrella", buildsymbol = "swap_winona_telebrella" }, --传送伞。因为特效和逻辑嵌在一起，不能做幻化
 
     -------------------------------
     --头部-------------------------
@@ -751,8 +755,10 @@ local dressup_data = {
         end
     },
     moon_mushroomhat = { buildfile = "hat_moon_mushroom", buildsymbol = "swap_hat" },
-    scrap_monoclehat = { isopentop = true, buildfile = "hat_scrap_monocle", buildsymbol = "swap_hat" },
-    scraphat = { buildfile = "hat_scrap", buildsymbol = "swap_hat" },
+    scrap_monoclehat = { isopentop = true, buildfile = "hat_scrap_monocle", buildsymbol = "swap_hat" }, --视界扩展器
+    scraphat = { buildfile = "hat_scrap", buildsymbol = "swap_hat" }, --拾荒尖帽
+    -- inspectacleshat = { buildfile = "hat_inspectacles", buildsymbol = "swap_hat" }, --检查专用镜。因为特效和逻辑嵌在一起，不能做幻化
+    roseglasseshat = { isopentop = true, buildfile = "hat_roseglasses", buildsymbol = "swap_hat" }, --玫瑰色眼镜
 
     -------------------------------
     --身体-------------------------

@@ -32,7 +32,8 @@ local function TagsSiving(othertags) --子圭系列的窃血标签
     return CombineTags({
         "INLIMBO", "NOCLICK", "notarget", "noattack", "playerghost", --"invisible"
         "wall", "structure", "balloon",
-        "shadowminion", "ghost" --"shadow"
+        "shadowminion", "ghost", --"shadow"
+        "angry_when_rowed" --水獭掠夺者窝点 会有的标签，因为这个东西没有以上别的标签，所以只能用这个
     }, othertags)
 end
 local function TagsWorkable1(othertags) --常见的可砍、挖、砸、凿标签(不包含“捕捉”)
@@ -89,7 +90,7 @@ local function IsEnemyPre(inst, ent)
     then
         return true
     end
-    if ent.sg ~= nil and (ent.sg:HasStateTag("flight") or ent.sg:HasStateTag("invisible")) then
+    if ent.sg ~= nil and (ent.sg:HasStateTag("invisible")) then --ent.sg:HasStateTag("flight")
         return true
     end
 end
@@ -133,7 +134,7 @@ local function MaybeEnemyPre(inst, ent)
     then
         return true
     end
-    if ent.sg ~= nil and (ent.sg:HasStateTag("flight") or ent.sg:HasStateTag("invisible")) then
+    if ent.sg ~= nil and (ent.sg:HasStateTag("invisible")) then --ent.sg:HasStateTag("flight")
         return true
     end
 end

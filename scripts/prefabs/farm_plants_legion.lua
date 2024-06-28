@@ -1932,6 +1932,13 @@ local function OnIsDay2_lightbulb(inst, isit)
 		OnIsDay_lightbulb(inst, isit)
 	end
 end
+local function OnWorkedFinish_lightbulb(inst, worker)
+	if inst.components.container ~= nil then
+		inst.components.container:DropEverything()
+		inst.components.container:Close()
+	end
+	OnWorkedFinish_p2(inst, worker)
+end
 
 local dd_lightbulb = CROPS_DATA_LEGION["lightbulb"]
 table.insert(prefs, Prefab("plant_lightbulb_l", function()
@@ -1976,7 +1983,7 @@ table.insert(prefs, Prefab("plant_lightbulb_l", function()
 	inst:AddComponent("workable")
 	inst.components.workable:SetWorkAction(ACTIONS.DIG)
 	inst.components.workable:SetWorkLeft(1)
-	inst.components.workable:SetOnFinishCallback(OnWorkedFinish_p2)
+	inst.components.workable:SetOnFinishCallback(OnWorkedFinish_lightbulb)
 
 	inst:AddComponent("container")
     inst.components.container:WidgetSetup("plant_lightbulb_l")

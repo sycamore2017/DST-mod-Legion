@@ -1136,6 +1136,7 @@ local digest_data_l = {
     powder_monkey = { lvl = lvls[8], attract = nil, loot = { boneshard = 1 } }, --火药猴
     mushgnome = { lvl = lvls[8], attract = nil, loot = { spore_moon = 4, livinglog = 4 } }, --蘑菇地精
     little_walrus = { lvl = lvls[8], attract = nil, loot = { boneshard = 1, walrus_tusk = 0.2 } }, --小海象
+    otter = { lvl = lvls[8], attract = nil, loot = { boneshard = 1, messagebottle = 0.1 } }, --水獭掠夺者
     deer = { lvl = lvls[8], attract = nil, loot = { boneshard = 2, deer_antler1 = 0.1, deer_antler2 = 0.1, deer_antler3 = 0.1 } }, --无眼鹿
     deer_red = { lvl = lvls[9], attract = nil, loot = { boneshard = 4, deer_antler1 = 0.1, deer_antler2 = 0.1, deer_antler3 = 0.1 } }, --无眼鹿(红)
     deer_blue = { lvl = lvls[9], attract = nil, loot = { boneshard = 4, deer_antler1 = 0.1, deer_antler2 = 0.1, deer_antler3 = 0.1 } }, --无眼鹿(蓝)
@@ -1446,6 +1447,7 @@ local luck_data_l = {
         trunk_winter = { chance = 0.33 },
         meat = { chance = 0.2, cost = 0.5, num = 2 }
     },
+    otter = { messagebottle = { chance = 0.05 } }, --水獭掠夺者
 }
 for k, v in pairs(luck_data_l) do
     _G.LUCK_DATA_LEGION[k] = v
@@ -1588,15 +1590,15 @@ local boltcost_l = {
     beeswax = 0.25,         --蜂蜡
     bee = 0.6,              --蜜蜂
     killerbee = 0.6,        --杀人蜂
-    mosquitosack = 2,       --蚊子血袋
+    mosquitosack = 2,       --蚊子血囊
     mosquito = 0.5,         --蚊子
     glommerwings = 0.25,    --格罗姆翅膀
     glommerfuel = 0.5,      --格罗姆黏液
     butterflywings = 4,     --蝴蝶翅膀
     butter = 0.1,           --黄油
     butterfly = 0.6,        --蝴蝶
-    wormlight = 0.5,        --神秘浆果
-    wormlight_lesser = 1,   --神秘小浆果
+    wormlight = 0.5,        --发光浆果
+    wormlight_lesser = 1,   --小发光浆果
     lightflier = 0.5,       --球状光虫
     moonbutterflywings = 2, --月蛾翅膀
     moonbutterfly = 0.5,    --月蛾

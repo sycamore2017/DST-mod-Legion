@@ -1600,9 +1600,11 @@ local function TrySetStewerFoodSkin(inst, stewer)
             stewer.ls_foodskin = dd
             stewer.ls_ingredient = nil
         end
-        dd = ls_skineddata[dd.skin]
-        if dd.fn_stewer ~= nil then
-            dd.fn_stewer(inst, stewer)
+        if dd ~= nil then
+            dd = ls_skineddata[dd.skin]
+            if dd ~= nil and dd.fn_stewer ~= nil then
+                dd.fn_stewer(inst, stewer)
+            end
         end
     end
 end

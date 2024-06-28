@@ -57,23 +57,24 @@ local function ReleaseSporesEffect(inst, owner)
         if ent.entity:IsVisible() then
             if ent:HasTag("player") then
                 ent:AddDebuff("buff_l_sporeresistance", "buff_l_sporeresistance")
-            elseif ent.prefab == "mushroom_light2" then
-                if ent.components.container ~= nil then
+            elseif ent.prefab == "mushroom_light2" or ent.prefab == "plant_lightbulb_l" then
+                if not ent:HasTag("burnt") and ent.components.container ~= nil then
                     local numitems = ent.components.container:NumItems()
                     local numslots = ent.components.container:GetNumSlots()
                     if numitems < numslots then
                         local num = numslots - numitems
                         for i = 1, num do
                             local spore = SpawnPrefab(GetRandomItem({
-                                "spore_small",
-                                "spore_medium",
-                                "spore_tall",
+                                "spore_small", "spore_medium", "spore_tall"
                             }))
                             if spore ~= nil then
                                 ent.components.container:GiveItem(spore)
                             end
                         end
                     end
+                end
+                if ent.components.perennialcrop2 ~= nil then
+                    ent.components.perennialcrop2:Cure(owner)
                 end
             elseif ent.prefab == "mushroom_farm" then
                 if ent.components.trader ~= nil and ent.components.trader.enabled and ent.remainingharvests ~= 0 then
