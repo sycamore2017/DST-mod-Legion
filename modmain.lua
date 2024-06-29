@@ -333,7 +333,6 @@ _G.CONFIGS_LEGION = {
     BACKCUBCHANCE = GetModConfigData("BackCubChance"), --靠背熊掉落几率
     SHIELDRECHARGETIME = GetModConfigData("ShieldRechargeTime"), --盾牌冷却时间
     AGRONRECHARGETIME = GetModConfigData("AgronRechargeTime"), --艾力冈的剑冷却时间
-    ALLOWAUTOCATK = GetModConfigData("AllowAutoCATK"), --禁用自动盾反
 }
 
 ------台词文本

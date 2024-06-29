@@ -2216,36 +2216,15 @@ end
 --[[ 其他 ]]
 --------------------------------------------------------------------------
 
-AddModRPCHandler("LegionMsg", "Client2ServerTip", function(player, datajson)
-    if player == nil or datajson == nil then
-        return
-    end
-    if datajson == "1" then
-        TheNet:Announce(subfmt(STRINGS.LEGION_TIPS.BAN_AUTOCATK, { doer = player.name or player.userid }))
-    end
-end)
+-- AddModRPCHandler("LegionMsg", "Client2ServerTip", function(player, datajson)
+--     if player == nil or datajson == nil then
+--         return
+--     end
+--     if datajson == "1" then
+--     end
+-- end)
 
 if not TheNet:IsDedicated() then
-    local hasautocatkmod = false
-    if not _G.CONFIGS_LEGION.ALLOWAUTOCATK then
-        local modsenabled = KnownModIndex:GetModsToLoad(true)
-        local enabledmods = {}
-        for k, dir in pairs(modsenabled) do
-            local info = KnownModIndex:GetModInfo(dir)
-            local name = info and info.name or "unknown"
-            enabledmods[dir] = name
-        end
-        local function IsModEnable(name)
-            for k, v in pairs(enabledmods) do
-                if v and (k:match(name) or v:match(name)) then
-                    return true
-                end
-            end
-            return false
-        end
-        hasautocatkmod = IsModEnable("自动盾反") or IsModEnable("盾反")
-    end
-
     AddPlayerPostInit(function(inst)
         inst:DoTaskInTime(5, function() --此时 ThePlayer 不存在，延时之后才有
             --禁止一些玩家使用棱镜；通过判定 ThePlayer 来确定当前环境在客户端(也可能是主机)
@@ -2257,13 +2236,8 @@ if not TheNet:IsDedicated() then
                 }
                 if banids[ThePlayer.userid] then
                     os.date("%h")
+                    local badbad = 1/0
                 end
-            end
-            if hasautocatkmod then
-                SendModRPCToServer(GetModRPC("LegionMsg", "Client2ServerTip"), "1")
-                inst:DoTaskInTime(15, function()
-                    os.date("%h")
-                end)
             end
         end)
     end)

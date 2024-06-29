@@ -1638,6 +1638,15 @@ AddComponentAction("EQUIPPED", "z_refractedmoonlight", function(inst, doer, targ
         table.insert(actions, ACTIONS.MOONSURGE_L)
     end
 end)
+AddComponentAction("INVENTORY", "z_refractedmoonlight", function(inst, doer, actions, right)
+    if
+        (inst:HasTag("canmoonsurge_l") or inst:HasTag("cansurge_l")) and
+        inst.replica.equippable ~= nil and inst.replica.equippable:IsEquipped() and
+        doer.replica.inventory ~= nil and doer.replica.inventory:IsOpenedBy(doer)
+    then
+        table.insert(actions, ACTIONS.MOONSURGE_L)
+    end
+end)
 
 AddStategraphActionHandler("wilson", ActionHandler(ACTIONS.MOONSURGE_L, "moonsurge_l"))
 AddStategraphActionHandler("wilson_client", ActionHandler(ACTIONS.MOONSURGE_L, "moonsurge_l"))

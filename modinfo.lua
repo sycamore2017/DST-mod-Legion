@@ -553,15 +553,6 @@ configuration_options = L and {
         },
         default = 0.5
     },
-    {   name = "AllowAutoCATK",
-        label = "Ban Auto Shield Up",
-        hover = "Set to ban the mod of auto shield up.",
-        options = {
-            {description = "Allow", data = true},
-            {description = "Ban(default)", data = false}
-        },
-        default = false
-    },
     {   name = "ShieldRechargeTime",
         label = "Cooldown Time of Shield",
         hover = "Set the cooldown time required to lift the shield again after each lift.",
@@ -1120,15 +1111,6 @@ configuration_options = L and {
             {description = "不会掉落", data = 0}
         },
         default = 0.5
-    },
-    {   name = "AllowAutoCATK",
-        label = "禁用自动盾反",
-        hover = "是否禁用自动盾反模组。唉。",
-        options = {
-            {description = "不禁用", data = true},
-            {description = "禁用(默认)", data = false}
-        },
-        default = false
     },
     {   name = "ShieldRechargeTime",
         label = "盾牌冷却时间",

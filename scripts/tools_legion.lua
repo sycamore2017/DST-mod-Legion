@@ -83,69 +83,86 @@ local function IsPlayerFollower(ent)
     end
     return false
 end
-local function IsEnemyPre(inst, ent)
-    if
-        ent.components.health == nil or ent.components.health:IsDead() or
-        ent.components.combat == nil or ent.components.combat.target == nil
-    then
-        return true
-    end
-    if ent.sg ~= nil and (ent.sg:HasStateTag("invisible")) then --ent.sg:HasStateTag("flight")
-        return true
-    end
-end
-local function IsEnemy_me(inst, ent) --是否为 inst 的当前敌人
-    if IsEnemyPre(inst, ent) then
-        return false
-    end
-    if inst == nil then
-        return true
-    end
-    if ent.components.combat.target == inst then --仇视自己的对象，肯定是敌人
-        return true
-    end
-    if fns.IsMyFollower(inst, ent) then --ent 跟随着我，就不要攻击了，防止后面逻辑引起跟随者内战
-        return false
-    end
-    if fns.IsMyFollower(inst, ent.components.combat.target) then --ent 想攻击我的跟随者，打它！
-        return true
-    end
-    return false
-end
-local function IsEnemy_player(inst, ent) --是否为 全体玩家 的当前敌人
-    if IsEnemyPre(inst, ent) then
-        return false
-    end
-    if ent.components.combat.target:HasTag("player") then --仇视玩家的对象，肯定是敌人
-        return true
-    end
-    if fns.IsPlayerFollower(ent) then --ent 跟随着玩家，就不要攻击了，防止后面逻辑引起跟随者内战
-        return false
-    end
-    if fns.IsPlayerFollower(ent.components.combat.target) then --ent 想攻击玩家的跟随者，打它！
-        return true
-    end
-    return false
-end
-local function MaybeEnemyPre(inst, ent)
+local function IsEnemyPre(ent)
     if
         ent.components.health == nil or ent.components.health:IsDead() or
         ent.components.combat == nil
     then
         return true
     end
-    if ent.sg ~= nil and (ent.sg:HasStateTag("invisible")) then --ent.sg:HasStateTag("flight")
+    if ent.sg ~= nil and (ent.sg:HasStateTag("flight") or ent.sg:HasStateTag("invisible")) then
         return true
     end
 end
-local function MaybeEnemy_me(inst, ent, playerside) --是否为 inst 的潜在或当前敌人
-    if MaybeEnemyPre(inst, ent) then
-        return false
-    end
-    if inst == nil then
+local function IsEnemy_me(inst, ent) --是否为 inst 的当前敌人
+    if IsEnemyPre(ent) then return false end
+    if inst == nil then return true end
+
+    local ent_target = ent.components.combat.target
+    if ent_target == inst then --仇视自己，肯定是敌人
         return true
     end
-    if ent.components.combat.target == nil then
+
+    -- local inst_cpt = inst.components.combat
+    -- if inst_cpt ~= nil and inst_cpt.lastattacker == ent then
+    --     --部分生物的攻击是另类的，无法以 combat.target 来识别
+    --     if inst_cpt.lastwasattackedtime == nil or (GetTime()-inst_cpt.lastwasattackedtime)<=5 then
+    --         return true
+    --     end
+    -- end
+
+    local team_threat
+    if ent.components.teamattacker ~= nil and ent.components.teamattacker.teamleader ~= nil then
+        team_threat = ent.components.teamattacker.teamleader.threat
+        if team_threat == inst then --被团队仇视，肯定是敌人。主要是蝙蝠、企鹅在用这个机制
+            return true
+        end
+    end
+    if fns.IsMyFollower(inst, ent) then --ent 跟随着我，就不要攻击了，防止后面逻辑引起跟随者内战
+        return false
+    end
+    if ent_target ~= nil and fns.IsMyFollower(inst, ent_target) then --ent 想攻击我的跟随者，打它！
+        return true
+    end
+    if team_threat ~= nil and fns.IsMyFollower(inst, team_threat) then --ent 想攻击我的跟随者，打它！
+        return true
+    end
+    return false
+end
+local function IsEnemy_player(inst, ent) --是否为 全体玩家 的当前敌人
+    if IsEnemyPre(ent) then return false end
+    -- if inst == nil then return true end
+
+    local ent_target = ent.components.combat.target
+    if ent_target ~= nil and ent_target:HasTag("player") then --仇视玩家，肯定是敌人
+        return true
+    end
+
+    local team_threat
+    if ent.components.teamattacker ~= nil and ent.components.teamattacker.teamleader ~= nil then
+        team_threat = ent.components.teamattacker.teamleader.threat
+        if team_threat ~= nil and team_threat:HasTag("player") then --团队仇视玩家，肯定是敌人。主要是蝙蝠、企鹅在用这个机制
+            return true
+        end
+    end
+
+    if fns.IsPlayerFollower(ent) then --ent 跟随着玩家，就不要攻击了，防止后面逻辑引起跟随者内战
+        return false
+    end
+    if ent_target ~= nil and fns.IsPlayerFollower(ent_target) then --ent 想攻击玩家的跟随者，打它！
+        return true
+    end
+    if team_threat ~= nil and fns.IsPlayerFollower(team_threat) then --ent 想攻击玩家的跟随者，打它！
+        return true
+    end
+    return false
+end
+local function MaybeEnemy_me(inst, ent, playerside) --是否为 inst 的潜在或当前敌人
+    if IsEnemyPre(ent) then return false end
+    if inst == nil then return true end
+
+    local ent_target = ent.components.combat.target
+    if ent_target == nil then
         if fns.IsMyFollower(inst, ent) then --ent 跟随着我，就不攻击
             return false
         end
@@ -154,23 +171,23 @@ local function MaybeEnemy_me(inst, ent, playerside) --是否为 inst 的潜在�
             return false
         end
     else
-        if ent.components.combat.target == inst then --仇视自己的对象，肯定是敌人
+        if ent_target == inst then --仇视自己，肯定是敌人
             return true
         end
         if fns.IsMyFollower(inst, ent) then --ent 跟随着我，就不攻击
             return false
         end
         if playerside and ent.components.domesticatable ~= nil and ent.components.domesticatable:IsDomesticated() then
-            return fns.IsMyFollower(inst, ent.components.combat.target) --ent 想攻击我的跟随者，打它！
+            return fns.IsMyFollower(inst, ent_target) --ent 想攻击我的跟随者，打它！
         end
     end
     return true
 end
 local function MaybeEnemy_player(inst, ent, playerside) --是否为 全体玩家 的潜在或当前敌人
-    if MaybeEnemyPre(inst, ent) then
-        return false
-    end
-    if ent.components.combat.target == nil then
+    if IsEnemyPre(ent) then return false end
+
+    local ent_target = ent.components.combat.target
+    if ent_target == nil then
         if fns.IsPlayerFollower(ent) then --ent 跟随着玩家，就不攻击
             return false
         end
@@ -179,14 +196,14 @@ local function MaybeEnemy_player(inst, ent, playerside) --是否为 全体玩家
             return false
         end
     else
-        if ent.components.combat.target:HasTag("player") then --仇视玩家的对象，肯定是敌人
+        if ent_target:HasTag("player") then --仇视玩家，肯定是敌人
             return true
         end
         if fns.IsPlayerFollower(ent) then --ent 跟随着玩家，就不攻击
             return false
         end
         if ent.components.domesticatable ~= nil and ent.components.domesticatable:IsDomesticated() then
-            return fns.IsPlayerFollower(ent.components.combat.target) --ent 想攻击玩家的跟随者，打它！
+            return fns.IsPlayerFollower(ent_target) --ent 想攻击玩家的跟随者，打它！
         end
     end
     return true

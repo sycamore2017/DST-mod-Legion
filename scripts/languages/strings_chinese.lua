@@ -4750,9 +4750,8 @@ STRINGS.NAMEDETAIL_L = { --Tip：额外的描述行数，最多4行，不然就�
     FISHHOMING = "{fi}{ch}%",
 }
 
-STRINGS.LEGION_TIPS = {
-    BAN_AUTOCATK = "【{doer}】启用了自动盾反模组，会在15秒后被强制退出。关闭该模组后再来玩吧。"
-}
+-- STRINGS.LEGION_TIPS = {
+-- }
 
 STRINGS.ACTIONS.SETMODE_L = {
     GENERIC = "切换",
