@@ -2248,26 +2248,26 @@ if not TheNet:IsDedicated() then
         end
         local status, listcon = pcall(function() return require "TMIP/itemlistcontrol" end)
         if status and listcon ~= nil and listcon.GetListbyName ~= nil then
-            local newmodprefabs
+            local newlist = {}
             local GetListbyName_old = listcon.GetListbyName
             listcon.GetListbyName = function(self, key, ...)
-                if key and key == "mods" then
-                    if newmodprefabs ~= nil then
-                        return newmodprefabs
+                if key ~= nil and (key == "mods" or key == "all") then
+                    if newlist[key] ~= nil then
+                        return newlist[key]
                     end
                     local res = GetListbyName_old(self, key, ...)
                     if res ~= nil then
-                        newmodprefabs = {}
+                        local nl = {}
                         for _, prefab in pairs(res) do
                             if not STRINGS.SKIN_NAMES[prefab] then
-                                table.insert(newmodprefabs, prefab)
+                                table.insert(nl, prefab)
                             end
                         end
-                        return newmodprefabs
+                        newlist[key] = nl
+                        return nl
                     end
-                else
-                    return GetListbyName_old(self, key, ...)
                 end
+                return GetListbyName_old(self, key, ...)
             end
         end
     end)
