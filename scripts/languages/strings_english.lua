@@ -229,31 +229,33 @@ S______GENERIC.DESCRIBE.NEVERFADEBUSH = {
 S_NAMES.NEVERFADE = "Neverfade"    --永不凋零
 S_RECIPE_DESC.NEVERFADE = "The power of flowers!"
 S______GENERIC.DESCRIBE.NEVERFADE = "Divity... purity... and power!"
---S_______WILLOW.DESCRIBE.NEVERFADE = "This is the opposite of burning."
---S_____WOLFGANG.DESCRIBE.NEVERFADE = "Wolfgang can eat in one bite!"
+--S_______WILLOW.DESCRIBE.NEVERFADE = ""
+--S_____WOLFGANG.DESCRIBE.NEVERFADE = ""
 S________WENDY.DESCRIBE.NEVERFADE = "It's not love, but it still is eternal..."
---S_________WX78.DESCRIBE.NEVERFADE = "STICK ADDON INSTALLED"
---S_WICKERBOTTOM.DESCRIBE.NEVERFADE = "Well, isn't that refreshing?"
---S_______WOODIE.DESCRIBE.NEVERFADE = "I'd prefer maple taffy..."
+--S_________WX78.DESCRIBE.NEVERFADE = ""
+--S_WICKERBOTTOM.DESCRIBE.NEVERFADE = ""
+--S_______WOODIE.DESCRIBE.NEVERFADE = ""
 S______WAXWELL.DESCRIBE.NEVERFADE = "Hm... this is something created by another force in the world."
---S___WATHGRITHR.DESCRIBE.NEVERFADE = "I've somehow found a way to make it even LESS appealing!"
---S_______WEBBER.DESCRIBE.NEVERFADE = "Yaaay! Popsicle, popsicle!"
---S_______WINONA.DESCRIBE.NEVERFADE = "Great to cool off after some hard physical labor."
+--S___WATHGRITHR.DESCRIBE.NEVERFADE = ""
+--S_______WEBBER.DESCRIBE.NEVERFADE = ""
+--S_______WINONA.DESCRIBE.NEVERFADE = ""
 S_____WORMWOOD.DESCRIBE.NEVERFADE = "Strong friend."
+
+S_NAMES.BUFF_L_BUTTERFLYBLESS = "Butterfly's Blessings"
 
 S_NAMES.SACHET = "Sachet"    --香包
 S_RECIPE_DESC.SACHET = "Hides your scent."
 S______GENERIC.DESCRIBE.SACHET = "Should I smell like flowers?"
---S_______WILLOW.DESCRIBE.SACHET = "This is the opposite of burning."
+--S_______WILLOW.DESCRIBE.SACHET = ""
 S_____WOLFGANG.DESCRIBE.SACHET = "To be honest, this is too feminine..."
---S________WENDY.DESCRIBE.SACHET = "I used to eat these with Abigail..."
---S_________WX78.DESCRIBE.SACHET = "STICK ADDON INSTALLED"
---S_WICKERBOTTOM.DESCRIBE.SACHET = "Well, isn't that refreshing?"
---S_______WOODIE.DESCRIBE.SACHET = "I'd prefer maple taffy..."
---S______WAXWELL.DESCRIBE.SACHET = "Hm... I don't know what I was expecting."
---S___WATHGRITHR.DESCRIBE.SACHET = "I've somehow found a way to make it even LESS appealing!"
+--S________WENDY.DESCRIBE.SACHET = ""
+--S_________WX78.DESCRIBE.SACHET = ""
+--S_WICKERBOTTOM.DESCRIBE.SACHET = ""
+--S_______WOODIE.DESCRIBE.SACHET = ""
+--S______WAXWELL.DESCRIBE.SACHET = ""
+--S___WATHGRITHR.DESCRIBE.SACHET = ""
 S_______WEBBER.DESCRIBE.SACHET = "Great! We smell sweet!"
---S_______WINONA.DESCRIBE.SACHET = "Great to cool off after some hard physical labor."
+--S_______WINONA.DESCRIBE.SACHET = ""
 S_____WORMWOOD.DESCRIBE.SACHET = "Friend inside?"
 
 S______GENERIC.ANNOUNCE_PICK_ROSEBUSH = "I wish I could help you."
@@ -421,6 +423,8 @@ S______GENERIC.DESCRIBE.DISH_FLESHNAPOLEON = "The brightest star in the night sk
 --S___WATHGRITHR.DESCRIBE.DISH_FLESHNAPOLEON = ""
 --S_______WEBBER.DESCRIBE.DISH_FLESHNAPOLEON = ""
 --S_______WINONA.DESCRIBE.DISH_FLESHNAPOLEON = ""
+
+S_NAMES.BUFF_L_RADIANTSKIN = "Radiant Skin"
 
 S_NAMES.DISH_BEGGINGMEAT = "Begging Meat" --叫花焖肉
 STRINGS.UI.COOKBOOK.DISH_BEGGINGMEAT = "Extra hunger in an emergency"
@@ -638,68 +642,63 @@ S_________WX78.DESCRIBE.DISH_SHYERRYJAM = "NO DESSERT, JUST EAT IT DIRECTLY."
 -- S_______WINONA.DESCRIBE.DISH_SHYERRYJAM = ""
 -- S_______WORTOX.DESCRIBE.DISH_SHYERRYJAM = ""
 
+S_NAMES.BUFF_L_HEALTHSTORAGE = "Health Storage"
+
 S_NAMES.DISH_SUGARLESSTRICKMAKERCUPCAKES = "Sugarless Trickster Cupcakes" --无糖捣蛋鬼纸杯蛋糕
 STRINGS.UI.COOKBOOK.DISH_SUGARLESSTRICKMAKERCUPCAKES = "Naughty elves will help you"
-S______GENERIC.DESCRIBE.DISH_SUGARLESSTRICKMAKERCUPCAKES =
-{
+S______GENERIC.DESCRIBE.DISH_SUGARLESSTRICKMAKERCUPCAKES = {
     GENERIC = "Trick or treat!",
     TRICKED = "Scared me silly.",
-    TREAT = "Here's your candy.",
+    TREAT = "Here's your candy."
 }
 -- S_______WILLOW.DESCRIBE.DISH_SUGARLESSTRICKMAKERCUPCAKES = ""
-S_____WOLFGANG.DESCRIBE.DISH_SUGARLESSTRICKMAKERCUPCAKES =
-{
+S_____WOLFGANG.DESCRIBE.DISH_SUGARLESSTRICKMAKERCUPCAKES = {
     GENERIC = "Wolfgang only wants sugar, not to play tricks.",
     TRICKED = "It scared Wolfgang too much.",
-    TREAT = "Wolfgang will share the happiness.",
+    TREAT = "Wolfgang will share the happiness."
 }
-S________WENDY.DESCRIBE.DISH_SUGARLESSTRICKMAKERCUPCAKES =
-{
+S________WENDY.DESCRIBE.DISH_SUGARLESSTRICKMAKERCUPCAKES = {
     GENERIC = "Maybe I'm too mature to ask for sugar.",
     TRICKED = "Scared me silly.",
-    TREAT = "Would Abigail want candy, too?",
+    TREAT = "Would Abigail want candy, too?"
 }
-S_________WX78.DESCRIBE.DISH_SUGARLESSTRICKMAKERCUPCAKES =
-{
+S_________WX78.DESCRIBE.DISH_SUGARLESSTRICKMAKERCUPCAKES = {
     GENERIC = "MY BODY CRAVES DEOXYRIBOSE.",
     TRICKED = "SUDDEN WARNING!",
-    TREAT = "I'LL JUST GIVE YOU SOMTHING I DON'T WANT.",
+    TREAT = "I'LL JUST GIVE YOU SOMTHING I DON'T WANT."
 }
-S_WICKERBOTTOM.DESCRIBE.DISH_SUGARLESSTRICKMAKERCUPCAKES =
-{
+S_WICKERBOTTOM.DESCRIBE.DISH_SUGARLESSTRICKMAKERCUPCAKES = {
     GENERIC = "I believe it's a trick.",
     TRICKED = "That's not allowed in a library!",
-    TREAT = "Here's your candy.",
+    TREAT = "Here's your candy."
 }
 -- S_______WOODIE.DESCRIBE.DISH_SUGARLESSTRICKMAKERCUPCAKES = ""
 -- S______WAXWELL.DESCRIBE.DISH_SUGARLESSTRICKMAKERCUPCAKES = ""
 -- S___WATHGRITHR.DESCRIBE.DISH_SUGARLESSTRICKMAKERCUPCAKES = ""
-S_______WEBBER.DESCRIBE.DISH_SUGARLESSTRICKMAKERCUPCAKES =
-{
+S_______WEBBER.DESCRIBE.DISH_SUGARLESSTRICKMAKERCUPCAKES = {
     GENERIC = "We just want sweety sugar and candy!",
     TRICKED = "You made everyone laugh.",
-    TREAT = "We're the ones who want the sugar.",
+    TREAT = "We're the ones who want the sugar."
 }
 -- S_______WINONA.DESCRIBE.DISH_SUGARLESSTRICKMAKERCUPCAKES = ""
-S_______WORTOX.DESCRIBE.DISH_SUGARLESSTRICKMAKERCUPCAKES =
-{
+S_______WORTOX.DESCRIBE.DISH_SUGARLESSTRICKMAKERCUPCAKES = {
     GENERIC = "Hey, don't steal my thunder!!!",
     TRICKED = "Hah, small trick.",
-    TREAT = "What if I don't give sugar.",
+    TREAT = "What if I don't give sugar."
 }
-S_____WORMWOOD.DESCRIBE.DISH_SUGARLESSTRICKMAKERCUPCAKES =
-{
+S_____WORMWOOD.DESCRIBE.DISH_SUGARLESSTRICKMAKERCUPCAKES = {
     GENERIC = "Nectar, please?",
     TRICKED = "It made my leaves tremble.",
-    TREAT = "Is today the pollination day?",
+    TREAT = "Is today the pollination day?"
 }
-S________WARLY.DESCRIBE.DISH_SUGARLESSTRICKMAKERCUPCAKES =
-{
+S________WARLY.DESCRIBE.DISH_SUGARLESSTRICKMAKERCUPCAKES = {
     GENERIC = "What a timely snack!",
     TRICKED = "It made my pot shake.",
-    TREAT = "This chef is going to treat the guests well.",
+    TREAT = "This chef is going to treat the guests well."
 }
 -- S_________WURT.DESCRIBE.DISH_SUGARLESSTRICKMAKERCUPCAKES = ""
+
+S_NAMES.BUFF_L_PANICVOLCANO = "Troubler Scare"
 
 S_NAMES.DISH_FLOWERMOONCAKE = "Flower Mooncake" --鲜花月饼
 STRINGS.UI.COOKBOOK.DISH_FLOWERMOONCAKE = "Obtain power from longing"
@@ -844,7 +843,7 @@ S_________WURT.DESCRIBE.DISH_FRIEDFISHWITHPUREE = "Those who eat fish will be pu
 -- S_______WALTER.DESCRIBE.DISH_FRIEDFISHWITHPUREE = ""
 S________WANDA.DESCRIBE.DISH_FRIEDFISHWITHPUREE = "Haha, not only your time is passing."
 
---蝙蝠伪装buff
+S_NAMES.BUFF_L_BATDISGUISE = "Bat Disguise" --buff本身是不需要名字的，为了兼容能力勋章的buff显示而写的
 S______GENERIC.ANNOUNCE_ATTACH_BUFF_L_BATDISGUISE = "I won't be detected by bats for now."
 -- S_______WILLOW.ANNOUNCE_ATTACH_BUFF_L_BATDISGUISE = ""
 -- S_____WOLFGANG.ANNOUNCE_ATTACH_BUFF_L_BATDISGUISE = ""
@@ -881,7 +880,7 @@ S_____WORMWOOD.ANNOUNCE_DETACH_BUFF_L_BATDISGUISE = "I can't be friends with bat
 -- S_______WALTER.ANNOUNCE_DETACH_BUFF_L_BATDISGUISE = ""
 -- S________WANDA.ANNOUNCE_DETACH_BUFF_L_BATDISGUISE = ""
 
---好胃口buff
+S_NAMES.BUFF_L_BESTAPPETITE = "Best Appetite"
 S______GENERIC.ANNOUNCE_ATTACH_BUFF_L_BESTAPPETITE = "Suddenly, I want to have a big meal."
 -- S_______WILLOW.ANNOUNCE_ATTACH_BUFF_L_BESTAPPETITE = ""
 -- S_____WOLFGANG.ANNOUNCE_ATTACH_BUFF_L_BESTAPPETITE = ""
@@ -918,7 +917,7 @@ S______GENERIC.ANNOUNCE_DETACH_BUFF_L_BESTAPPETITE = "My appetite has returned t
 -- S_______WALTER.ANNOUNCE_DETACH_BUFF_L_BESTAPPETITE = ""
 -- S________WANDA.ANNOUNCE_DETACH_BUFF_L_BESTAPPETITE = ""
 
---胃梗塞buff
+S_NAMES.BUFF_L_HUNGERRETARDER = "Bowel Infarction"
 S______GENERIC.ANNOUNCE_ATTACH_BUFF_L_HUNGERRETARDER = "No appetite at all."
 -- S_______WILLOW.ANNOUNCE_ATTACH_BUFF_L_HUNGERRETARDER = ""
 -- S_____WOLFGANG.ANNOUNCE_ATTACH_BUFF_L_HUNGERRETARDER = ""
@@ -955,7 +954,9 @@ S_______WINONA.ANNOUNCE_DETACH_BUFF_L_HUNGERRETARDER = "Even if you're hungry, y
 -- S_______WALTER.ANNOUNCE_DETACH_BUFF_L_HUNGERRETARDER = ""
 -- S________WANDA.ANNOUNCE_DETACH_BUFF_L_HUNGERRETARDER = ""
 
---力量增幅buff
+S_NAMES.BUFF_L_HOLDBACKPOOP = "Hold Back Poop"
+
+S_NAMES.BUFF_L_STRENGTHENHANCER = "Strength Up"
 -- S______GENERIC.ANNOUNCE_ATTACH_BUFF_L_STRENGTHENHANCER = "" --属于药酒的buff，但是药酒已经会让玩家说话了，所以这里不再重复说
 --
 S______GENERIC.ANNOUNCE_DETACH_BUFF_L_STRENGTHENHANCER = "The power enhancement effect has faded."
@@ -976,7 +977,7 @@ S________WARLY.ANNOUNCE_DETACH_BUFF_L_STRENGTHENHANCER = "Extra power has been c
 -- S_______WALTER.ANNOUNCE_DETACH_BUFF_L_STRENGTHENHANCER = ""
 S________WANDA.ANNOUNCE_DETACH_BUFF_L_STRENGTHENHANCER = "I should go back and regain my strength."
 
---腹得流油buff
+S_NAMES.BUFF_L_OILFLOW = "Oil Diarrhea"
 S______GENERIC.ANNOUNCE_ATTACH_BUFF_L_OILFLOW = "Seems nothing happened."
 -- S_______WILLOW.ANNOUNCE_ATTACH_BUFF_L_OILFLOW = ""
 S_____WOLFGANG.ANNOUNCE_ATTACH_BUFF_L_OILFLOW = "Wolfgang want to go to the bathroom."
@@ -1156,7 +1157,7 @@ S________WARLY.DESCRIBE.DISH_MUSHEDEGGS = "Magical cuisine not only fills the st
 -- S_______WALTER.DESCRIBE.DISH_MUSHEDEGGS = ""
 S________WANDA.DESCRIBE.DISH_MUSHEDEGGS = "Good luck can help me reduce my dependence on time."
 
---好事多蘑buff
+S_NAMES.BUFF_L_EFFORTLUCK = "Effort Luck"
 S______GENERIC.ANNOUNCE_BUFF_L_EFFORTLUCK = {
     ATTACH = "My luck is up! There are {luck} lucky points.",
     COST = "Good luck time! {luck} lucky points left.",
@@ -1191,7 +1192,10 @@ S_____WORMWOOD.ANNOUNCE_BUFF_L_EFFORTLUCK = {
 -- S_______WALTER.ANNOUNCE_BUFF_L_EFFORTLUCK = ""
 -- S________WANDA.ANNOUNCE_BUFF_L_EFFORTLUCK = ""
 
---怜悯debuff
+S_NAMES.BUFF_L_GOLDENLOOT = "Golden Loot"
+S_NAMES.BUFF_L_GOLDENLOOT_INF = "Infinite Golden Loot"
+
+S_NAMES.BUFF_L_MERCIFUL = "Mercy"
 S______GENERIC.ANNOUNCE_ATTACH_BUFF_L_MERCIFUL = "I suddenly feel that the enemies are all very pitiful."
 S_______WILLOW.ANNOUNCE_ATTACH_BUFF_L_MERCIFUL = "I have lost my temper, only mercy."
 -- S_____WOLFGANG.ANNOUNCE_ATTACH_BUFF_L_MERCIFUL = ""
@@ -2651,6 +2655,9 @@ S________WANDA.DESCRIBE.SIVING_PHOENIX = {
     GRIEF = "It fell into grief and indignation, as always."
 }
 
+S_NAMES.BUFF_L_MAGICWARBLE = "Magic Warble"
+S_NAMES.BUFF_L_TREEHALO = "Siving Halo"
+
 S_NAMES.SIVING_BOSS_FLOWER = "Siving Petalsite" --子圭寄生花
 S______GENERIC.DESCRIBE.SIVING_BOSS_FLOWER = "It grew out of my head. How terrible."
 S_______WILLOW.DESCRIBE.SIVING_BOSS_FLOWER = "I'm going to tear it up!"
@@ -3067,7 +3074,7 @@ S_____WORMWOOD.DESCRIBE.OINTMENT_L_SIVBLOODREDUCE = "I don't want to smear."
 -- S_______WALTER.DESCRIBE.OINTMENT_L_SIVBLOODREDUCE = ""
 S________WANDA.DESCRIBE.OINTMENT_L_SIVBLOODREDUCE = "What a coincidence it takes for them to create this thing."
 
---窃血抵抗buff
+S_NAMES.BUFF_L_SIVBLOODREDUCE = "Dead Skin"
 S______GENERIC.ANNOUNCE_ATTACH_BUFF_L_SIVBLOODREDUCE = "I feel my skin is very uncomfortable."
 -- S_______WILLOW.ANNOUNCE_ATTACH_BUFF_L_SIVBLOODREDUCE = ""
 -- S_____WOLFGANG.ANNOUNCE_ATTACH_BUFF_L_SIVBLOODREDUCE = ""
@@ -3418,49 +3425,44 @@ S________WANDA.DESCRIBE.TRIPLEGOLDENSHOVELAXE = "I don't mind taking one with me
 
 S_NAMES.HAT_ALBICANS_MUSHROOM = "Albicans Funcap"    --素白蘑菇帽
 S_RECIPE_DESC.HAT_ALBICANS_MUSHROOM = "Let lots of antibiotics stick to your head."
-S______GENERIC.DESCRIBE.HAT_ALBICANS_MUSHROOM =
-{
+S______GENERIC.DESCRIBE.HAT_ALBICANS_MUSHROOM = {
     GENERIC = "A hat made of antibiotic-rich fungi.",
-    HUNGER = "I'm too hungry, I don't have the energy to do this.",
+    HUNGER = "I'm too hungry, I don't have the energy to do this."
 }
 -- S_______WILLOW.DESCRIBE.HAT_ALBICANS_MUSHROOM = ""
 -- S_____WOLFGANG.DESCRIBE.HAT_ALBICANS_MUSHROOM = ""
 -- S________WENDY.DESCRIBE.HAT_ALBICANS_MUSHROOM = ""
-S_________WX78.DESCRIBE.HAT_ALBICANS_MUSHROOM =
-{
+S_________WX78.DESCRIBE.HAT_ALBICANS_MUSHROOM = {
     GENERIC = "SOME CREATURES CROWD OUT OTHERS.",
-    HUNGER = "I HAVE RUN OUT OF FUEL!",
+    HUNGER = "I HAVE RUN OUT OF FUEL!"
 }
-S_WICKERBOTTOM.DESCRIBE.HAT_ALBICANS_MUSHROOM =
-{
+S_WICKERBOTTOM.DESCRIBE.HAT_ALBICANS_MUSHROOM = {
     GENERIC = "It has a good resistance to harmful bacteria.",
-    HUNGER = "What if someone is allergic to antibiotics.",
+    HUNGER = "What if someone is allergic to antibiotics."
 }
 -- S_______WOODIE.DESCRIBE.HAT_ALBICANS_MUSHROOM = ""
 -- S______WAXWELL.DESCRIBE.HAT_ALBICANS_MUSHROOM = ""
 -- S___WATHGRITHR.DESCRIBE.HAT_ALBICANS_MUSHROOM = ""
-S_______WEBBER.DESCRIBE.HAT_ALBICANS_MUSHROOM =
-{
+S_______WEBBER.DESCRIBE.HAT_ALBICANS_MUSHROOM = {
     GENERIC = "The head shakes and the disease escapes.",
-    HUNGER = "We are so hungry.",
+    HUNGER = "We are so hungry."
 }
 -- S_______WINONA.DESCRIBE.HAT_ALBICANS_MUSHROOM = ""
 -- S_______WORTOX.DESCRIBE.HAT_ALBICANS_MUSHROOM = ""
-S_____WORMWOOD.DESCRIBE.HAT_ALBICANS_MUSHROOM =
-{
+S_____WORMWOOD.DESCRIBE.HAT_ALBICANS_MUSHROOM = {
     GENERIC = "My friends, we are saved.",
-    HUNGER = "My stomach is empty!",
+    HUNGER = "My stomach is empty!"
 }
-S________WARLY.DESCRIBE.HAT_ALBICANS_MUSHROOM =
-{
+S________WARLY.DESCRIBE.HAT_ALBICANS_MUSHROOM = {
     GENERIC = "Can I break a piece and cook it?",
-    HUNGER = "Nothing magic is ever done on an empty stomach!",
+    HUNGER = "Nothing magic is ever done on an empty stomach!"
 }
-S_________WURT.DESCRIBE.HAT_ALBICANS_MUSHROOM =
-{
+S_________WURT.DESCRIBE.HAT_ALBICANS_MUSHROOM = {
     GENERIC = "Maybe it can treat plants infected with fungi.",
-    HUNGER = "I need fresh food!",
+    HUNGER = "I need fresh food!"
 }
+
+S_NAMES.BUFF_L_SPORERESISTANCE = "Spore Resistance"
 
 S_NAMES.ALBICANS_CAP = "Albicans Cap" --采摘的素白菇
 S______GENERIC.DESCRIBE.ALBICANS_CAP = "It's the first time I've seen such delicacies."
@@ -4064,7 +4066,7 @@ S________WENDY.DESCRIBE.OINTMENT_L_FIREPROOF = "This is rejecting the invitation
 -- S_______WALTER.DESCRIBE.OINTMENT_L_FIREPROOF = ""
 -- S________WANDA.DESCRIBE.OINTMENT_L_FIREPROOF = ""
 
---防火buff
+S_NAMES.BUFF_L_FIREPROOF = "Fire Resistant Skin"
 S______GENERIC.ANNOUNCE_ATTACH_BUFF_L_FIREPROOF = "Afterwards, the flames couldn't harm me."
 S_______WILLOW.ANNOUNCE_ATTACH_BUFF_L_FIREPROOF = "Flames never hurt me at all."
 -- S_____WOLFGANG.ANNOUNCE_ATTACH_BUFF_L_FIREPROOF = ""
