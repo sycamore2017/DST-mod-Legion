@@ -1,13 +1,6 @@
 local SpDamageUtil = require("components/spdamageutil")
 local TOOLS_L = require("tools_legion")
 
-local function oncanatk(self)
-    if self.canatk then
-        self.inst:AddTag("canshieldatk")
-    else
-        self.inst:RemoveTag("canshieldatk")
-    end
-end
 local function DoShieldSound(doer, sound)
     if sound then
         doer.SoundEmitter:PlaySound(sound, nil, doer.hurtsoundvolume)
@@ -43,7 +36,10 @@ local ShieldLegion = Class(function(self, inst)
     self.delta = 8 * FRAMES --FRAMES为0.033秒。并且举盾sg动画总时长为 13*FRAMES，最好小于这个值
     self.armormult_success = 1 --盾反成功时的损害系数
 
-    -- self.time_charge = nil --举盾的冷却时间
+    -- self.shieldkey = nil
+    self.time_charge = CONFIGS_LEGION.SHIELDRECHARGETIME --举盾的冷却时间
+    self.time_change = CONFIGS_LEGION.SHIELDEXCHANGETIME --盾牌切换的冷却时间
+
     -- self.startfn = nil
     -- self.atkfn = nil
     -- self.atkstayingfn = nil
@@ -52,11 +48,22 @@ local ShieldLegion = Class(function(self, inst)
 end,
 nil,
 {
-    canatk = oncanatk
+    -- canatk = oncanatk
 })
 
 function ShieldLegion:CanAttack(doer) --只能在sg里用，不也能用于平常的判断
     return self.canatk and self.time == nil and not self.inst:HasTag("broken")
+end
+
+function ShieldLegion:Equip(doer)
+    if self.time_change > 0 then
+        if doer.legion_shieldtime ~= nil and doer.legion_shieldtime[self.shieldkey or "shield"] ~= nil then
+            
+        end
+    end
+end
+function ShieldLegion:Unequip(doer)
+    
 end
 
 function ShieldLegion:StartAttack(doer)

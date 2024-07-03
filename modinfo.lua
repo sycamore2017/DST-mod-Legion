@@ -554,8 +554,8 @@ configuration_options = L and {
         default = 0.5
     },
     {   name = "ShieldRechargeTime",
-        label = "Cooldown Time of Shield",
-        hover = "Set the cooldown time required to lift the shield again after each lift.",
+        label = "Cooldown of Lifting Shield",
+        hover = "Set the cooldown time required to lift the shield again after each successful lifting.",
         options = {
             {description = "1 sec", data = 1},
             {description = "1.5 sec", data = 1.5},
@@ -577,9 +577,28 @@ configuration_options = L and {
         },
         default = 0
     },
+    {   name = "ShieldExchangeTime",
+        label = "Cooldown of Equipping Shield",
+        hover = "Set the cooldown time when equipping a shield, during which it cannot be successfully lifted.",
+        options = {
+            {description = "No cooldown(default)", data = 0},
+            {description = "1 sec", data = 1},
+            {description = "1.5 sec", data = 1.5},
+            {description = "2 sec", data = 2},
+            {description = "2.5 sec", data = 2.5},
+            {description = "3 sec", data = 3},
+            {description = "4 sec", data = 4},
+            {description = "5 sec", data = 5},
+            {description = "6 sec", data = 6},
+            {description = "10 sec", data = 10},
+            {description = "30 sec", data = 30},
+            {description = "60 sec", data = 60}
+        },
+        default = 0
+    },
     {   name = "AgronRechargeTime",
-        label = "Cooldown Time of Agron's Sword",
-        hover = "Set the cooldown time required to lift the Agron's Sword again after each lift.",
+        label = "Cooldown of Lifting Agron's Sword",
+        hover = "Set the cooldown time required to lift the Agron's Sword again after each successful lifting.",
         options = {
             {description = "1 sec", data = 1},
             {description = "1.5 sec", data = 1.5},
@@ -598,6 +617,25 @@ configuration_options = L and {
             {description = "120 sec", data = 120},
             {description = "240 sec", data = 240},
             {description = "480 sec", data = 480}
+        },
+        default = 0
+    },
+    {   name = "AgronExchangeTime",
+        label = "Cooldown of Equipping Agron's Sword",
+        hover = "Set the cooldown time when equipping the Agron's Sword, during which it cannot be successfully lifted.",
+        options = {
+            {description = "No cooldown(default)", data = 0},
+            {description = "1 sec", data = 1},
+            {description = "1.5 sec", data = 1.5},
+            {description = "2 sec", data = 2},
+            {description = "2.5 sec", data = 2.5},
+            {description = "3 sec", data = 3},
+            {description = "4 sec", data = 4},
+            {description = "5 sec", data = 5},
+            {description = "6 sec", data = 6},
+            {description = "10 sec", data = 10},
+            {description = "30 sec", data = 30},
+            {description = "60 sec", data = 60}
         },
         default = 0
     }
@@ -1113,8 +1151,8 @@ configuration_options = L and {
         default = 0.5
     },
     {   name = "ShieldRechargeTime",
-        label = "盾牌冷却时间",
-        hover = "设置每次举盾结束后能再次举盾所需的冷却时间。盾太重了？",
+        label = "盾牌举盾冷却时间",
+        hover = "设置每次成功举盾结束后能再次举盾所需的冷却时间。盾太重了？",
         options = {
             {description = "1秒", data = 1},
             {description = "1.5秒", data = 1.5},
@@ -1136,9 +1174,28 @@ configuration_options = L and {
         },
         default = 0
     },
+    {   name = "ShieldExchangeTime",
+        label = "盾牌切换冷却时间",
+        hover = "设置每次装备盾牌时默认的冷却时间，期间是无法举盾成功的。盾太慢了？",
+        options = {
+            {description = "无冷却(默认)", data = 0},
+            {description = "1秒", data = 1},
+            {description = "1.5秒", data = 1.5},
+            {description = "2秒", data = 2},
+            {description = "2.5秒", data = 2.5},
+            {description = "3秒", data = 3},
+            {description = "4秒", data = 4},
+            {description = "5秒", data = 5},
+            {description = "6秒", data = 6},
+            {description = "10秒", data = 10},
+            {description = "30秒", data = 30},
+            {description = "60秒", data = 60}
+        },
+        default = 0
+    },
     {   name = "AgronRechargeTime",
-        label = "艾力冈的剑冷却时间",
-        hover = "设置每次艾力冈的剑举盾结束后能再次举盾所需的冷却时间。能力越大，约束越大。",
+        label = "艾力冈的剑举盾冷却时间",
+        hover = "设置每次艾力冈的剑成功举盾结束后能再次举盾所需的冷却时间。能力越大，约束越大。",
         options = {
             {description = "1秒", data = 1},
             {description = "1.5秒", data = 1.5},
@@ -1157,6 +1214,25 @@ configuration_options = L and {
             {description = "120秒", data = 120},
             {description = "240秒", data = 240},
             {description = "480秒", data = 480}
+        },
+        default = 0
+    },
+    {   name = "AgronExchangeTime",
+        label = "艾力冈的剑切换冷却时间",
+        hover = "设置每次装备艾力冈的剑时默认的冷却时间，期间是无法举盾成功的。能力越大，准备越多。",
+        options = {
+            {description = "无冷却(默认)", data = 0},
+            {description = "1秒", data = 1},
+            {description = "1.5秒", data = 1.5},
+            {description = "2秒", data = 2},
+            {description = "2.5秒", data = 2.5},
+            {description = "3秒", data = 3},
+            {description = "4秒", data = 4},
+            {description = "5秒", data = 5},
+            {description = "6秒", data = 6},
+            {description = "10秒", data = 10},
+            {description = "30秒", data = 30},
+            {description = "60秒", data = 60}
         },
         default = 0
     }

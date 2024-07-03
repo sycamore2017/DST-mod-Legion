@@ -177,32 +177,11 @@ local function ShieldAtkStay_terror(inst, doer, attacker, data)
     inst.components.shieldlegion:Counterattack(doer, attacker, data, 8, 0.5)
 end
 
-local function OnCharged_shield(inst)
-    if inst.components.shieldlegion ~= nil then
-        inst.components.shieldlegion.canatk = true
-    end
-end
-local function OnDischarged_shield(inst)
-	if inst.components.shieldlegion ~= nil then
-        inst.components.shieldlegion.canatk = false
-    end
-end
-local function SetRechargeable_shield(inst, time)
-    if time == nil or time <= 0 then
-        return
-    end
-    if inst.components.rechargeable == nil then
-        inst:AddComponent("rechargeable")
-    end
-    inst.components.rechargeable:SetOnDischargedFn(OnDischarged_shield)
-	inst.components.rechargeable:SetOnChargedFn(OnCharged_shield)
-    inst.components.shieldlegion.time_charge = time
-end
-
 AddPrefabPostInit("shieldofterror", function(inst)
     inst:AddTag("allow_action_on_impassable")
     inst:AddTag("shield_l")
     inst:RemoveTag("toolpunch")
+    inst:AddTag("rechargeable")
 
     if IsServer then
         inst:AddComponent("shieldlegion")
@@ -211,18 +190,18 @@ AddPrefabPostInit("shieldofterror", function(inst)
         inst.components.shieldlegion.atkfn = ShieldAtk_terror
         inst.components.shieldlegion.atkstayingfn = ShieldAtkStay_terror
         -- inst.components.shieldlegion.atkfailfn = function(inst, doer, attacker, data) end
+        inst.components.shieldlegion.time_charge = CONFIGS_LEGION.SHIELDRECHARGETIME
+        inst.components.shieldlegion.time_change = CONFIGS_LEGION.SHIELDEXCHANGETIME
 
-        SetRechargeable_shield(inst, CONFIGS_LEGION.SHIELDRECHARGETIME)
+        inst:AddComponent("rechargeable") --这个组件只是为了给玩家提示而已，不对盾反有实际影响
 
         -- if inst.components.planardefense == nil then
         --     inst:AddComponent("planardefense")
 	    --     inst.components.planardefense:SetBaseDefense(10)
         -- end
 
-        if inst.components.equippable ~= nil then
-            inst:ListenForEvent("equipped", Equipped_shieldofterror)
-            inst:ListenForEvent("unequipped", Unequipped_shieldofterror)
-        end
+        inst:ListenForEvent("equipped", Equipped_shieldofterror)
+        inst:ListenForEvent("unequipped", Unequipped_shieldofterror)
     end
 end)
 

@@ -331,8 +331,10 @@ _G.CONFIGS_LEGION = {
     DRESSUP = GetModConfigData("DressUp"), --启用幻化机制
 
     BACKCUBCHANCE = GetModConfigData("BackCubChance"), --靠背熊掉落几率
-    SHIELDRECHARGETIME = GetModConfigData("ShieldRechargeTime"), --盾牌冷却时间
-    AGRONRECHARGETIME = GetModConfigData("AgronRechargeTime"), --艾力冈的剑冷却时间
+    SHIELDRECHARGETIME = GetModConfigData("ShieldRechargeTime"), --盾牌举盾冷却时间
+    SHIELDEXCHANGETIME = GetModConfigData("ShieldExchangeTime"), --盾牌切换冷却时间
+    AGRONRECHARGETIME = GetModConfigData("AgronRechargeTime"), --艾力冈的剑举盾冷却时间
+    AGRONEXCHANGETIME = GetModConfigData("AgronExchangeTime"), --艾力冈的剑切换冷却时间
 }
 
 ------台词文本

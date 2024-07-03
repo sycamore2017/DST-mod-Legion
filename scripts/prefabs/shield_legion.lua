@@ -55,13 +55,11 @@ local function OnEquipFn(inst, owner)
 
     --本来是想让这个和书本的攻击一样来低频率高伤害的方式攻击，但是由于会导致读书时也用本武器来显示动画，所以干脆去除了
     --owner.AnimState:OverrideSymbol("book_open", "swap_book_elemental", "book_open")
-    --owner.AnimState:OverrideSymbol("book_closed", "swap_desertdefense_combat", "book_closed")    --替换book_closed就能正确显示特殊攻击动画
+    --owner.AnimState:OverrideSymbol("book_closed", "swap_desertdefense_combat", "book_closed") --替换book_closed就能正确显示特殊攻击动画
     --owner.AnimState:OverrideSymbol("book_open_pages", "swap_book_elemental", "book_open_pages")
 
-    owner.AnimState:Show("ARM_carry") --显示持物手
-    owner.AnimState:Hide("ARM_normal") --隐藏普通的手
-
-    -- if owner:HasTag("equipmentmodel") then return end --假人
+    owner.AnimState:Show("ARM_carry")
+    owner.AnimState:Hide("ARM_normal")
 end
 local function OnUnequipFn(inst, owner)
     --owner.AnimState:ClearOverrideSymbol("book_closed")
@@ -72,28 +70,8 @@ local function OnUnequipFn(inst, owner)
     owner.AnimState:ClearOverrideSymbol("swap_shield")
     owner.AnimState:Hide("LANTERN_OVERLAY")
     owner.AnimState:ShowSymbol("swap_object")
-end
 
-local function OnCharged(inst)
-    if inst.components.shieldlegion ~= nil then
-        inst.components.shieldlegion.canatk = true
-    end
-end
-local function OnDischarged(inst)
-	if inst.components.shieldlegion ~= nil then
-        inst.components.shieldlegion.canatk = false
-    end
-end
-local function SetRechargeable(inst, time)
-    if time == nil or time <= 0 then
-        return
-    end
-    if inst.components.rechargeable == nil then
-        inst:AddComponent("rechargeable")
-    end
-    inst.components.rechargeable:SetOnDischargedFn(OnDischarged)
-	inst.components.rechargeable:SetOnChargedFn(OnCharged)
-    inst.components.shieldlegion.time_charge = time
+    inst.components.shieldlegion:Unequip(owner)
 end
 
 local function MakeShield(data)
@@ -111,9 +89,8 @@ local function MakeShield(data)
 
         inst:AddTag("allow_action_on_impassable")
         inst:AddTag("shield_l")
-
-        --weapon (from weapon component) added to pristine state for optimization
         inst:AddTag("weapon")
+        inst:AddTag("rechargeable")
 
         if data.fn_common ~= nil then
             data.fn_common(inst)
@@ -136,6 +113,10 @@ local function MakeShield(data)
         inst:AddComponent("weapon")
 
         inst:AddComponent("armor")
+
+        inst:AddComponent("rechargeable") --这个组件只是为了给玩家提示而已，不对盾反有实际影响
+        -- inst.components.rechargeable:SetOnDischargedFn(OnDischarged)
+        -- inst.components.rechargeable:SetOnChargedFn(OnCharged)
 
         MakeHauntableLaunch(inst)
 
@@ -256,6 +237,7 @@ end
 local function OnEquip_sand(inst, owner)
     OnEquipFn(inst, owner)
     if owner:HasTag("equipmentmodel") then return end --假人
+    inst.components.shieldlegion:Equip(owner)
 
     onisraining(inst) --装备时先更新一次
 
@@ -341,8 +323,6 @@ MakeShield({
         inst.components.shieldlegion.atkstayingfn = ShieldAtkStay_sand
         -- inst.components.shieldlegion.atkfailfn = function(inst, doer, attacker, data) end
 
-        SetRechargeable(inst, CONFIGS_LEGION.SHIELDRECHARGETIME)
-
         inst.components.weapon:SetDamage(damage_normal)
 
         inst.components.armor:InitCondition(1050, absorb_normal) --150*10*0.7= 1050防具耐久
@@ -361,6 +341,11 @@ end
 local function ShieldAtkStay_log(inst, doer, attacker, data)
     inst.components.shieldlegion:Counterattack(doer, attacker, data, 6, 0.8)
 end
+local function OnEquip_log(inst, owner)
+    OnEquipFn(inst, owner)
+    if owner:HasTag("equipmentmodel") then return end --假人
+    inst.components.shieldlegion:Equip(owner)
+end
 
 MakeShield({
     name = "shield_l_log",
@@ -370,7 +355,7 @@ MakeShield({
         LS_C_Init(inst, "shield_l_log", true)
     end,
     fn_server = function(inst)
-        inst.components.equippable:SetOnEquip(OnEquipFn)
+        inst.components.equippable:SetOnEquip(OnEquip_log)
         inst.components.equippable:SetOnUnequip(OnUnequipFn)
 
         inst.hurtsoundoverride = "dontstarve/wilson/hit_armour"
@@ -378,8 +363,6 @@ MakeShield({
         inst.components.shieldlegion.atkfn = ShieldAtk_log
         inst.components.shieldlegion.atkstayingfn = ShieldAtkStay_log
         -- inst.components.shieldlegion.atkfailfn = function(inst, doer, attacker, data) end
-
-        SetRechargeable(inst, CONFIGS_LEGION.SHIELDRECHARGETIME)
 
         inst.components.weapon:SetDamage(27.2) --34*0.8
 
@@ -604,6 +587,7 @@ local function OnEquip_agron(inst, owner)
     owner.AnimState:Hide("ARM_normal")
 
     if owner:HasTag("equipmentmodel") then return end --假人
+    inst.components.shieldlegion:Equip(owner)
 
     SetOwnerDefense(inst, owner, revolt)
     if owner.components.health ~= nil then
@@ -722,8 +706,9 @@ MakeShield({
         inst.components.shieldlegion.atkfn = ShieldAtk_agron
         inst.components.shieldlegion.atkstayingfn = ShieldAtkStay_agron
         -- inst.components.shieldlegion.atkfailfn = function(inst, doer, attacker, data) end
-
-        SetRechargeable(inst, CONFIGS_LEGION.AGRONRECHARGETIME)
+        inst.components.shieldlegion.shieldkey = "agronssword"
+        inst.components.shieldlegion.time_charge = CONFIGS_LEGION.AGRONRECHARGETIME
+        inst.components.shieldlegion.time_change = CONFIGS_LEGION.AGRONEXCHANGETIME
 
         inst.OnLoad = OnLoad_agron
     end
