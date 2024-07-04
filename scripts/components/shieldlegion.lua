@@ -1,6 +1,13 @@
 local SpDamageUtil = require("components/spdamageutil")
 local TOOLS_L = require("tools_legion")
 
+local function oncanatk(self)
+    if self.canatk then
+        self.inst:AddTag("canshieldatk")
+    else
+        self.inst:RemoveTag("canshieldatk")
+    end
+end
 local function DoShieldSound(doer, sound)
     if sound then
         doer.SoundEmitter:PlaySound(sound, nil, doer.hurtsoundvolume)
@@ -48,22 +55,44 @@ local ShieldLegion = Class(function(self, inst)
 end,
 nil,
 {
-    -- canatk = oncanatk
+    canatk = oncanatk
 })
 
-function ShieldLegion:CanAttack(doer) --只能在sg里用，不也能用于平常的判断
+function ShieldLegion:CanAttack(doer) --只能在sg里用，不能用于平常的判断
     return self.canatk and self.time == nil and not self.inst:HasTag("broken")
 end
 
 function ShieldLegion:Equip(doer)
-    if self.time_change > 0 then
-        if doer.legion_shieldtime ~= nil and doer.legion_shieldtime[self.shieldkey or "shield"] ~= nil then
-            
+    local timenow = GetTime()
+    local key = self.shieldkey or "shield"
+    local timecool = 0
+    if doer.legion_shieldtime == nil then
+        doer.legion_shieldtime = {}
+    end
+    local timethat = doer.legion_shieldtime[key]
+    if timethat == nil then --没在举盾冷却，那就是装备切换冷却
+        timecool = self.time_change
+    else
+        timethat = timethat - timenow --计算出剩余冷却时间。大于0代表还在冷却中
+        if timethat <= self.time_change then --进入装备切换冷却
+            timecool = self.time_change
+        else --还在举盾冷却
+            timecool = timethat
         end
     end
-end
-function ShieldLegion:Unequip(doer)
-    
+    if timecool > 0 then
+        if timecool == self.time_change then
+            doer.legion_shieldtime[key] = timenow + timecool
+        end
+        if self.inst.components.rechargeable ~= nil then
+            self.inst.components.rechargeable:Discharge(timecool)
+        end
+    else --如果玩家没有冷却，那就把当前盾牌的冷却清除了
+        doer.legion_shieldtime[key] = nil
+        if self.inst.components.rechargeable ~= nil then
+            self.inst.components.rechargeable:SetPercent(1)
+        end
+    end
 end
 
 function ShieldLegion:StartAttack(doer)
@@ -124,35 +153,37 @@ function ShieldLegion:GetAttacked(doer, attacker, damage, weapon, spdamage, stim
         spdamage = spdamage,
         weapon = weapon,
         stimuli = stimuli,
-        israngedweapon = false,
+        -- israngedweapon = false,
         issuccess = false, --本次盾反是否成功
         isstay = false --是否为后续盾反
     }
 
     if self.issuccess then --一次sg的时间，盾反成功后完全无敌
         if doer.sg:HasStateTag("atk_shield") then --重新检查是否有效
-            data.issuccess = true
+            if stimuli ~= "darkness" then
+                data.issuccess = true
+            end
             data.isstay = true
         else --如果因为数据问题进入这里，就校正数据
             self:FinishAttack(doer)
         end
     elseif self.canatk and self.time ~= nil then
-        if GetTime()-self.time < self.delta then --达成盾反条件
+        if GetTime()-self.time <= self.delta and stimuli ~= "darkness" then --达成盾反条件
             data.issuccess = true
         else
             self:FinishAttack(doer)
         end
     end
 
-    if --远程武器分为两类，一类是有projectile组件、一类是weapon组件中有projectile属性
-        weapon ~= nil and (
-            weapon.components.projectile ~= nil or
-            weapon:HasTag("rangedweapon") or
-            (weapon.components.weapon ~= nil and weapon.components.weapon.projectile ~= nil)
-        )
-    then
-        data.israngedweapon = true
-    end
+    -- if --远程武器分为两类，一类是有projectile组件、一类是weapon组件中有projectile属性
+    --     weapon ~= nil and (
+    --         weapon.components.projectile ~= nil or
+    --         weapon:HasTag("rangedweapon") or
+    --         (weapon.components.weapon ~= nil and weapon.components.weapon.projectile ~= nil)
+    --     )
+    -- then
+    --     data.israngedweapon = true
+    -- end
 
     if data.issuccess then
         if spdamage ~= nil then
@@ -182,13 +213,13 @@ function ShieldLegion:GetAttacked(doer, attacker, damage, weapon, spdamage, stim
         DoShieldSound(doer, self.inst.hurtsoundoverride)
         self:ArmorTakeDamage(doer, attacker, data)
         return true
-    elseif data.israngedweapon then --完全抵御远程攻击
-        if spdamage ~= nil then
-            data.otherdamage = ComputSpDamage(self, doer, spdamage)
-        end
-        DoShieldSound(doer, self.inst.hurtsoundoverride)
-        self:ArmorTakeDamage(doer, attacker, data)
-        return true
+    -- elseif data.israngedweapon then --完全抵御远程攻击
+    --     if spdamage ~= nil then
+    --         data.otherdamage = ComputSpDamage(self, doer, spdamage)
+    --     end
+    --     DoShieldSound(doer, self.inst.hurtsoundoverride)
+    --     self:ArmorTakeDamage(doer, attacker, data)
+    --     return true
     else
         if self.atkfailfn ~= nil then
             self.atkfailfn(self.inst, doer, attacker, data)
@@ -205,17 +236,18 @@ function ShieldLegion:FinishAttack(doer, issgend)
         -- end
     end
     if self.issuccess then --只有成功盾反了，才会进入冷却
-        if self.time_charge ~= nil and self.time_charge > 0 and self.inst.components.rechargeable ~= nil then
-            self.inst.components.rechargeable:Discharge(self.time_charge)
+        if self.time_charge > 0 then
+            if doer.legion_shieldtime == nil then
+                doer.legion_shieldtime = {}
+            end
+            doer.legion_shieldtime[self.shieldkey or "shield"] = GetTime() + self.time_charge
+            if self.inst.components.rechargeable ~= nil then
+                self.inst.components.rechargeable:Discharge(self.time_charge)
+            end
         end
         self.issuccess = false
     end
     doer.shield_l_success = nil
-
-    -- if self.fx_protect ~= nil and self.fx_protect:IsValid() then
-    --     self.fx_protect:Remove()
-    --     self.fx_protect = nil
-    -- end
 end
 
 return ShieldLegion

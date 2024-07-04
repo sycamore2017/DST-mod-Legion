@@ -491,7 +491,7 @@ local CA_S_INSPECTABLE_L = {
     function(inst, doer, actions, right) --盾反
         if right then
             local item = doer.replica.inventory:GetEquippedItem(EQUIPSLOTS.HANDS)
-            if item ~= nil and item:HasTag("shield_l") then
+            if item ~= nil and item:HasTag("canshieldatk") then
                 table.insert(actions, ACTIONS.ATTACK_SHIELD_L)
                 return true
             end
@@ -1119,7 +1119,7 @@ AddStategraphState("wilson_client", State{ name = "atk_shield_l",
         -- end
 
         local equip = inst.replica.inventory:GetEquippedItem(EQUIPSLOTS.HANDS)
-        if equip == nil or not equip:HasTag("shield_l") then
+        if equip == nil or not equip:HasTag("canshieldatk") then
             inst.sg:RemoveStateTag("abouttoattack")
             inst:ClearBufferedAction()
             inst.sg:GoToState("idle", true)
@@ -1179,7 +1179,7 @@ AddAction(ATTACK_SHIELD_L)
 
 AddComponentAction("POINT", "shieldlegion", function(inst, doer, pos, actions, right)
     if
-        right and
+        right and inst:HasTag("canshieldatk") and
         not TheWorld.Map:IsGroundTargetBlocked(pos) and
         not doer:HasTag("steeringboat")
     then
@@ -1202,6 +1202,7 @@ AddStategraphActionHandler("wilson_client", ActionHandler(ACTIONS.ATTACK_SHIELD_
     if
         inst.sg:HasStateTag("atk_shield") or inst:HasTag("busy") or
         (action.invobject == nil and action.target == nil)
+        -- or not action.invobject:HasTag("canshieldatk")
     then
         return
     end

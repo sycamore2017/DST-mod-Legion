@@ -70,8 +70,16 @@ local function OnUnequipFn(inst, owner)
     owner.AnimState:ClearOverrideSymbol("swap_shield")
     owner.AnimState:Hide("LANTERN_OVERLAY")
     owner.AnimState:ShowSymbol("swap_object")
-
-    inst.components.shieldlegion:Unequip(owner)
+end
+local function OnCharged(inst)
+    if inst.components.shieldlegion ~= nil then
+        inst.components.shieldlegion.canatk = true
+    end
+end
+local function OnDischarged(inst)
+	if inst.components.shieldlegion ~= nil then
+        inst.components.shieldlegion.canatk = false
+    end
 end
 
 local function MakeShield(data)
@@ -114,9 +122,9 @@ local function MakeShield(data)
 
         inst:AddComponent("armor")
 
-        inst:AddComponent("rechargeable") --这个组件只是为了给玩家提示而已，不对盾反有实际影响
-        -- inst.components.rechargeable:SetOnDischargedFn(OnDischarged)
-        -- inst.components.rechargeable:SetOnChargedFn(OnCharged)
+        inst:AddComponent("rechargeable")
+        inst.components.rechargeable:SetOnDischargedFn(OnDischarged)
+        inst.components.rechargeable:SetOnChargedFn(OnCharged)
 
         MakeHauntableLaunch(inst)
 

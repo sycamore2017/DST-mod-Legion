@@ -1742,7 +1742,24 @@ if IsServer then
                 data.legion_luckdata = newluckdd
             end
         end
-    
+        --盾反冷却时间
+        if inst.legion_shieldtime ~= nil then
+            local timenow = GetTime()
+            local timedd
+            for k, timethat in pairs(inst.legion_shieldtime) do
+                timethat = timethat - timenow
+                if timethat > 0 then
+                    if timedd == nil then
+                        timedd = {}
+                    end
+                    timedd[k] = timethat
+                end
+            end
+            if timedd ~= nil then
+                data.legion_shieldtime = timedd
+            end
+        end
+
         if inst.OnSave_legion ~= nil then --OnSave是可能有返回的
             return inst.OnSave_legion(inst, data)
         end
@@ -1778,6 +1795,20 @@ if IsServer then
         --好事多蘑数据
         if data.legion_luckdata ~= nil then
             inst.legion_luckdata = data.legion_luckdata
+        end
+        --盾反冷却时间
+        if data.legion_shieldtime ~= nil then
+            local timenow = GetTime()
+            local timedd
+            for k, dt in pairs(data.legion_shieldtime) do
+                if timedd == nil then
+                    timedd = {}
+                end
+                timedd[k] = timenow + dt
+            end
+            if timedd ~= nil then
+                inst.legion_shieldtime = timedd
+            end
         end
     end
     local function SaveForReroll_player(inst, ...)

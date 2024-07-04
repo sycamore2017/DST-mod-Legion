@@ -106,11 +106,14 @@ end
 --------------------------------------------------------------------------
 
 local function Equipped_shieldofterror(inst, data)
-    if data == nil or data.owner == nil then
+    if data == nil or data.owner == nil or data.owner:HasTag("equipmentmodel") then
         return
     end
     if data.owner.components.planardefense ~= nil then
         data.owner.components.planardefense:AddBonus(inst, 10)
+    end
+    if inst.components.shieldlegion ~= nil then
+        inst.components.shieldlegion:Equip(data.owner)
     end
 end
 local function Unequipped_shieldofterror(inst, data)
@@ -119,6 +122,16 @@ local function Unequipped_shieldofterror(inst, data)
     end
     if data.owner.components.planardefense ~= nil then
         data.owner.components.planardefense:RemoveBonus(inst, nil)
+    end
+end
+local function OnCharged_shield(inst)
+    if inst.components.shieldlegion ~= nil then
+        inst.components.shieldlegion.canatk = true
+    end
+end
+local function OnDischarged_shield(inst)
+	if inst.components.shieldlegion ~= nil then
+        inst.components.shieldlegion.canatk = false
     end
 end
 
@@ -193,7 +206,9 @@ AddPrefabPostInit("shieldofterror", function(inst)
         inst.components.shieldlegion.time_charge = CONFIGS_LEGION.SHIELDRECHARGETIME
         inst.components.shieldlegion.time_change = CONFIGS_LEGION.SHIELDEXCHANGETIME
 
-        inst:AddComponent("rechargeable") --这个组件只是为了给玩家提示而已，不对盾反有实际影响
+        inst:AddComponent("rechargeable")
+        inst.components.rechargeable:SetOnDischargedFn(OnDischarged_shield)
+	    inst.components.rechargeable:SetOnChargedFn(OnCharged_shield)
 
         -- if inst.components.planardefense == nil then
         --     inst:AddComponent("planardefense")
