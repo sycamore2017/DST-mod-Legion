@@ -1045,6 +1045,7 @@ table.insert(prefs, Prefab("siving_mask_gold", function()
     -- inst:AddTag("open_top_hat")
     inst:AddTag("siv_mask2") --给特殊动作用
     inst:AddTag("modemystery_l")
+    inst:AddTag("nobrokesg_l")
 
     inst.entity:SetPristine()
     if not TheWorld.ismastersim then return inst end

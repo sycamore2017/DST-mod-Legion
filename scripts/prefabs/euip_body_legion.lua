@@ -980,6 +980,8 @@ table.insert(prefs, Prefab("siving_suit", function()
     TOOLS_L.InitMouseInfo(inst, Fn_dealdata_sivsuit, Fn_getdata_sivsuit)
     LS_C_Init(inst, "siving_suit", false)
 
+    inst:AddTag("nobrokesg_l")
+
     inst.entity:SetPristine()
     if not TheWorld.ismastersim then return inst end
 
@@ -1117,6 +1119,7 @@ table.insert(prefs, Prefab("siving_suit_gold", function()
 
     inst:AddTag("cansetmode_l")
     inst:AddTag("modemystery_l")
+    inst:AddTag("nobrokesg_l")
 
     inst.entity:SetPristine()
     if not TheWorld.ismastersim then return inst end

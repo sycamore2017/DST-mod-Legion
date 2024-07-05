@@ -690,55 +690,77 @@ end
 AddStategraphPostInit("wilson", function(sg)
     --受击无硬直
     local eve1 = sg.events["attacked"]
-    local event_fn_attacked = eve1.fn
-    eve1.fn = function(inst, data, ...)
-        if not inst.components.health:IsDead() and not inst.sg:HasStateTag("drowning") then
-            if not inst.sg:HasStateTag("sleeping") then --睡袋貌似有自己的特殊机制
-                if inst:HasTag("stable_l") then
-                    inst.SoundEmitter:PlaySound("dontstarve/wilson/hit")
-                    DoHurtSound(inst)
-                    return
+    if eve1 then
+        local event_fn_attacked = eve1.fn
+        eve1.fn = function(inst, data, ...)
+            if not inst.components.health:IsDead() and not inst.sg:HasStateTag("drowning") then
+                if not inst.sg:HasStateTag("sleeping") then --睡袋貌似有自己的特殊机制
+                    if inst:HasTag("stable_l") then
+                        inst.SoundEmitter:PlaySound("dontstarve/wilson/hit")
+                        DoHurtSound(inst)
+                        return
+                    end
                 end
             end
+            return event_fn_attacked(inst, data, ...)
         end
-        return event_fn_attacked(inst, data, ...)
     end
 
     --防击退
     local eve2 = sg.events["knockback"]
-    local event_fn_knockback = eve2.fn
-    eve2.fn = function(inst, data, ...)
-        if --盾反+厚重=防击退
-            inst.shield_l_success and inst.components.inventory ~= nil and
-            (inst.components.inventory:EquipHasTag("heavyarmor") or inst:HasTag("heavybody"))
-        then
-            return
+    if eve2 then
+        local event_fn_knockback = eve2.fn
+        eve2.fn = function(inst, data, ...)
+            if --盾反+厚重=防击退
+                inst.shield_l_success and inst.components.inventory ~= nil and
+                (inst.components.inventory:EquipHasTag("heavyarmor") or inst:HasTag("heavybody"))
+            then
+                return
+            end
+            if inst:HasTag("firmbody_l") then --特殊标签防击退
+                return
+            end
+            return event_fn_knockback(inst, data, ...)
         end
-        if inst:HasTag("firmbody_l") then --特殊标签防击退
-            return
-        end
-        return event_fn_knockback(inst, data, ...)
     end
 
     --移动时自动切换加速装备
     local eve3 = sg.events["locomote"]
-    local event_fn_locomote = eve3.fn
-    eve3.fn = function(inst, data, ...)
-        if inst.needrun then
-            if inst.sg:HasStateTag("busy") then
+    if eve3 then
+        local event_fn_locomote = eve3.fn
+        eve3.fn = function(inst, data, ...)
+            if inst.needrun then
+                if inst.sg:HasStateTag("busy") then
+                    return
+                end
+                local is_moving = inst.sg:HasStateTag("moving")
+                local should_move = inst.components.locomotor:WantsToMoveForward()
+
+                if not (inst.sg:HasStateTag("bedroll") or inst.sg:HasStateTag("tent") or inst.sg:HasStateTag("waking"))
+                    and not (is_moving and not should_move)
+                    and (not is_moving and should_move)
+                then
+                    EquipSpeedItem(inst) --行走之前先换加速装备
+                end
+            end
+            return event_fn_locomote(inst, data, ...)
+        end
+    end
+
+    --修复子圭护甲与死亡不掉落的兼容问题，这个事件会在角色刚死时后一帧触发，但本身没做死亡判定，导致离开死亡状态而让游戏崩溃
+    --但因为游戏本身是死亡会掉落的，装备也会掉落，所以这个概率事件本不该触发到玩家上的
+    local eve4 = sg.events["armorbroke"]
+    if eve4 then
+        local event_fn_armorbroke = eve4.fn
+        eve4.fn = function(inst, data, ...)
+            if inst.sg:HasStateTag("dead") then
                 return
             end
-            local is_moving = inst.sg:HasStateTag("moving")
-            local should_move = inst.components.locomotor:WantsToMoveForward()
-
-            if not (inst.sg:HasStateTag("bedroll") or inst.sg:HasStateTag("tent") or inst.sg:HasStateTag("waking"))
-                and not (is_moving and not should_move)
-                and (not is_moving and should_move)
-            then
-                EquipSpeedItem(inst) --行走之前先换加速装备
+            if data and data.armor and data.armor:HasTag("nobrokesg_l") then --某些护甲损坏时不应该发出声音
+                return
             end
+            return event_fn_armorbroke(inst, data, ...)
         end
-        return event_fn_locomote(inst, data, ...)
     end
 
     --攻击时自动切换武器
@@ -1200,7 +1222,7 @@ AddStategraphActionHandler("wilson", ActionHandler(ACTIONS.ATTACK_SHIELD_L, func
 end))
 AddStategraphActionHandler("wilson_client", ActionHandler(ACTIONS.ATTACK_SHIELD_L, function(inst, action)
     if
-        inst.sg:HasStateTag("atk_shield") or inst:HasTag("busy") or
+        inst.sg:HasStateTag("atk_shield") or inst.sg:HasStateTag("busy") or inst:HasTag("busy") or
         (action.invobject == nil and action.target == nil)
         -- or not action.invobject:HasTag("canshieldatk")
     then
@@ -3122,3 +3144,50 @@ end)
 
 AddStategraphActionHandler("wilson", ActionHandler(ACTIONS.BOXOPENER_L, "doshortaction"))
 AddStategraphActionHandler("wilson_client", ActionHandler(ACTIONS.BOXOPENER_L, "doshortaction"))
+
+--------------------------------------------------------------------------
+--[[ 按键响应 ]]
+--------------------------------------------------------------------------
+
+local function IsScreen_HUD()
+    local active_screen = TheFrontEnd:GetActiveScreen()
+    if active_screen ~= nil and active_screen.name == "HUD" then
+        return true
+    end
+end
+
+TheInput:AddKeyUpHandler(KEY_L, function()
+    if
+        IsScreen_HUD() and --在主hud，没在打字或者有弹窗在最上面之类的
+        ThePlayer and not ThePlayer:HasTag("playerghost") and not ThePlayer:HasTag("busy") and
+        -- ThePlayer.sg and not (ThePlayer.sg:HasStateTag("atk_shield") or ThePlayer.sg:HasStateTag("busy")) and
+        ThePlayer.HUD and ThePlayer.HUD.writeablescreen == nil and --是指小木牌写字这种？
+        ThePlayer.components.playercontroller and ThePlayer.components.playercontroller:IsEnabled()
+        and ThePlayer.replica.inventory
+    then
+        local item = ThePlayer.replica.inventory:GetEquippedItem(EQUIPSLOTS.HANDS)
+        if item ~= nil and item:HasTag("canshieldatk") then
+            local x, y, z = ThePlayer.Transform:GetWorldPosition()
+            local facing_angle = ThePlayer.Transform:GetRotation() * DEGREES
+            x, y, z = TOOLS_L.GetCalculatedPos(x, y, z, 1, facing_angle)
+            local act = BufferedAction(ThePlayer, nil, ACTIONS.ATTACK_SHIELD_L, item, Vector3(x, y, z))
+            local controller = ThePlayer.components.playercontroller
+            --以下逻辑原理参考 components\playercontroller.lua 的 OnRightClick()
+            if not controller.ismastersim then --这里本来就是客户端才会触发，ismastersim 只是为了判断是否为单纯的客户端
+                if controller.locomotor == nil then
+                    if act.action.pre_action_cb ~= nil then
+                        act.action.pre_action_cb(act)
+                    end
+                    SendRPCToServer(RPC.RightClick, act.action.code, x, z, nil,
+                        act.rotation, true, nil, act.action.canforce, act.action.mod_name)
+                elseif controller:CanLocomote() then
+                    act.preview_cb = function()
+                        SendRPCToServer(RPC.RightClick, act.action.code, x, z, nil,
+                            act.rotation, true, nil, act.action.canforce, act.action.mod_name)
+                    end
+                end
+            end
+            controller:DoAction(act)
+        end
+    end
+end)
