@@ -3156,7 +3156,13 @@ local function IsScreen_HUD()
     end
 end
 
-TheInput:AddKeyUpHandler(KEY_L, function()
+local pressed_shieldkey
+--监听按键按下时就触发，这样更快一点
+TheInput:AddKeyDownHandler(_G.CONFIGS_LEGION.SHIELDKEY or KEY_L, function()
+    if pressed_shieldkey then --这个监听只要按着就会不断触发，不想这样设定
+        return
+    end
+    pressed_shieldkey = true
     if
         IsScreen_HUD() and --在主hud，没在打字或者有弹窗在最上面之类的
         ThePlayer and not ThePlayer:HasTag("playerghost") and not ThePlayer:HasTag("busy") and
@@ -3190,4 +3196,7 @@ TheInput:AddKeyUpHandler(KEY_L, function()
             controller:DoAction(act)
         end
     end
+end)
+TheInput:AddKeyUpHandler(_G.CONFIGS_LEGION.SHIELDKEY or KEY_L, function()
+    pressed_shieldkey = nil
 end)

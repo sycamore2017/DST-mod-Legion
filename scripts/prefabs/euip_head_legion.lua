@@ -551,7 +551,7 @@ local function StealHealth(inst, owner, ismask2, isfriendly)
         x, y, z = owner.Transform:GetWorldPosition()
         target = inst.lifetarget
         if --吸血对象失效了，重新找新对象
-            target == nil or not target:IsValid() or
+            target == nil or not target:IsValid() or target:IsInLimbo() or
             not IsValidVictim(target, owner, isfriendly) or
             target:GetDistanceSqToPoint(x, y, z) > 400 --20*20
         then
