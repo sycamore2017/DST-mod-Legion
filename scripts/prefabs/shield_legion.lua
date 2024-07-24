@@ -152,58 +152,57 @@ local mult_success_sandstorms = 0.1
 local mult_success_normal = 0.2
 local mult_success_raining = 0.5
 
-local function OnBlocked(owner, data)
-    -- owner.SoundEmitter:PlaySound("dontstarve/common/together/teleport_sand/out")    --被攻击时播放像沙的声音
-    owner.SoundEmitter:PlaySound("dontstarve/wilson/hit_scalemail")
-
-    if not TheWorld.state.israining then    --没下雨时被攻击就释放法术
-        if
-            data.attacker ~= nil and
-            data.attacker.components.combat ~= nil and --攻击者有战斗组件
-            data.attacker.components.health ~= nil and --攻击者有生命组件
-            not data.attacker.components.health:IsDead() and --攻击者没死亡
-            (data.weapon == nil or ((data.weapon.components.weapon == nil or data.weapon.components.weapon.projectile == nil) and data.weapon.components.projectile == nil)) and --不是远程武器
-            not data.redirected
-        then
-            local map = TheWorld.Map
-            local x, y, z = data.attacker.Transform:GetWorldPosition()
-            if not map:IsVisualGroundAtPoint(x, 0, z) then --攻击者在水中，被动无效
-                return
-            end
-
-            local num = 1
-            local plus = 1.2
-            if (owner.components.areaaware ~= nil and owner.components.areaaware:CurrentlyInTag("sandstorm"))
-                and (not TheWorld:HasTag("cave") and TheWorld.state.issummer)
-            then
-                plus = 2.4
-                num = math.random(3, 6)
-            else
-                num = math.random(1, 2)
-            end
-
-            for i = 1, num do
-                local rad = math.random() * plus
-                local angle = math.random() * 2 * PI
-                local xxx = x + rad * math.cos(angle)
-                local zzz = z - rad * math.sin(angle)
-
-                if map:IsVisualGroundAtPoint(xxx, 0, zzz) then --不在水中
-                    local sspike = SpawnPrefab("sandspike_legion")
-                    if sspike ~= nil then
-                        sspike.iscounterattack = true
-                        sspike.Transform:SetPosition(xxx, 0, zzz)
-                    end
+local function SetSandSpike(attacker, num)
+    if
+        attacker ~= nil and attacker:IsValid()
+        -- attacker.components.combat ~= nil and --攻击者有战斗组件
+        -- attacker.components.health ~= nil and not attacker.components.health:IsDead() --攻击者有生命组件
+    then
+        local map = TheWorld.Map
+        local x, y, z = attacker.Transform:GetWorldPosition()
+        if not map:IsVisualGroundAtPoint(x, 0, z) then --敌人在水中，无法产生沙之咬
+            return
+        end
+        local plus = num <= 2 and 1.2 or 2
+        for i = 1, num do
+            local rad = math.random() * plus
+            local angle = math.random() * 2 * PI
+            local xxx = x + rad * math.cos(angle)
+            local zzz = z - rad * math.sin(angle)
+            if map:IsVisualGroundAtPoint(xxx, 0, zzz) then --不在水中
+                local spike = SpawnPrefab("sandspike_legion")
+                if spike ~= nil then
+                    spike.Transform:SetPosition(xxx, 0, zzz)
                 end
             end
         end
     end
 end
-local function onsandstorm(owner, area, weapon) --沙尘暴中属性上升
-    local shield = nil
-    if weapon ~= nil and weapon.prefab == "shield_l_sand" then
-        shield = weapon
+local function IsOnSand(owner)
+    if
+        TheWorld.state.issummer and
+        owner.components.areaaware ~= nil and owner.components.areaaware:CurrentlyInTag("sandstorm")
+    then
+        return true
     else
+        local x, y, z = owner.Transform:GetWorldPosition()
+        local tile = TheWorld.Map:GetTileAtPoint(x, 0, z)
+        if tile == GROUND.DESERT_DIRT then
+            return true
+        end
+    end
+end
+local function OnAttacked_sand(owner, data)
+    -- owner.SoundEmitter:PlaySound("dontstarve/common/together/teleport_sand/out") --被攻击时播放像沙的声音
+    -- owner.SoundEmitter:PlaySound("dontstarve/wilson/hit_scalemail")
+    if not TheWorld.state.israining and data.attacker ~= nil then --不能下雨
+        if math.random() >= 0.67 or IsOnSand(owner) then
+            SetSandSpike(data.attacker, 1)
+        end
+    end
+end
+local function OnChangeArea_sand(owner, area, shield)
+    if shield == nil then
         shield = owner ~= nil and owner.components.inventory:GetEquippedItem(EQUIPSLOTS.HANDS) or nil
         if shield == nil or shield.prefab ~= "shield_l_sand" then
             return
@@ -224,21 +223,29 @@ local function onsandstorm(owner, area, weapon) --沙尘暴中属性上升
     shield.components.armor:SetAbsorption(absorb_normal)
     shield.components.shieldlegion.armormult_success = mult_success_normal
 end
-local function onisraining(inst) --下雨时属性降低
-    local owner = inst.components.inventoryitem.owner
-
-    if TheWorld.state.israining then
-        if owner ~= nil then owner:RemoveEventCallback("changearea", onsandstorm) end
+local function OnIsRaining_sand(inst, israining)
+    local owner = inst.components.inventoryitem.owner --因为这里只在装备状态下才触发，所以直接获取owner即可
+    if israining then
+        if owner ~= nil then owner:RemoveEventCallback("changearea", OnChangeArea_sand) end
         inst.components.weapon:SetDamage(damage_raining)
         inst.components.armor:SetAbsorption(absorb_raining)
         inst.components.shieldlegion.armormult_success = mult_success_raining
     else
-        onsandstorm(owner, nil, inst) --不下雨时就刷新一次
+        OnChangeArea_sand(owner, nil, inst)
         if not TheWorld:HasTag("cave") and TheWorld.state.issummer then --不是在洞穴里，并且夏天时才会开始沙尘暴的监听
             if owner ~= nil then
-                owner:ListenForEvent("changearea", onsandstorm) --因为这个消息由玩家发出，所以只好由玩家来监听了
+                owner:ListenForEvent("changearea", OnChangeArea_sand)
             end
         end
+    end
+end
+local function locomotor_SetExternalSpeedMultiplier_sand(self, source, key, m, ...)
+    if self.inst.legiontag_sandrunner and key == "sandstorm" then
+        self:RemoveExternalSpeedMultiplier(self.inst, "sandstorm")
+        return
+    end
+    if self.SetExternalSpeedMultiplier_legion ~= nil then
+        return self.SetExternalSpeedMultiplier_legion(self, source, key, m, ...)
     end
 end
 
@@ -247,48 +254,46 @@ local function OnEquip_sand(inst, owner)
     if owner:HasTag("equipmentmodel") then return end --假人
     inst.components.shieldlegion:Equip(owner)
 
-    onisraining(inst) --装备时先更新一次
+    OnIsRaining_sand(inst, TheWorld.state.israining)
 
-    inst:ListenForEvent("blocked", OnBlocked, owner)
-    inst:ListenForEvent("attacked", OnBlocked, owner)
-    inst:WatchWorldState("israining", onisraining)
-    inst:WatchWorldState("issummer", onisraining)
+    -- inst:ListenForEvent("blocked", OnAttacked_sand, owner)
+    inst:ListenForEvent("attacked", OnAttacked_sand, owner)
+    inst:WatchWorldState("israining", OnIsRaining_sand)
+    inst:WatchWorldState("issummer", OnIsRaining_sand)
 
-    --能在沙暴中不减速行走
-    if owner.components.locomotor ~= nil then
-        if owner._runinsandstorm == nil then
-            local oldfn = owner.components.locomotor.SetExternalSpeedMultiplier
-            owner.components.locomotor.SetExternalSpeedMultiplier = function(self, source, key, m)
-                if self.inst._runinsandstorm and key == "sandstorm" then
-                    self:RemoveExternalSpeedMultiplier(self.inst, "sandstorm")
-                    return
-                end
-                oldfn(self, source, key, m)
-            end
+    if owner.components.locomotor ~= nil then --能在沙暴中不减速行走
+        local locomotor = owner.components.locomotor
+        if locomotor.SetExternalSpeedMultiplier_legion == nil then
+            locomotor.SetExternalSpeedMultiplier_legion = locomotor.SetExternalSpeedMultiplier
+            locomotor.SetExternalSpeedMultiplier = locomotor_SetExternalSpeedMultiplier_sand
         end
-        -- owner.components.locomotor:RemoveExternalSpeedMultiplier(owner, "sandstorm") --切换装备时，下一帧会自动更新移速
-        owner._runinsandstorm = true
+        -- locomotor:RemoveExternalSpeedMultiplier(owner, "sandstorm") --切换装备时，下一帧会自动更新移速
+        owner.legiontag_sandrunner = true
     end
 end
 local function OnUnequip_sand(inst, owner)
     OnUnequipFn(inst, owner)
     if owner:HasTag("equipmentmodel") then return end --假人
 
-    inst:RemoveEventCallback("blocked", OnBlocked, owner)
-    inst:RemoveEventCallback("attacked", OnBlocked, owner)
-    owner:RemoveEventCallback("changearea", onsandstorm)
-    inst:StopWatchingWorldState("israining", onisraining)
-    inst:StopWatchingWorldState("issummer", onisraining)
-
-    if owner.components.locomotor ~= nil then
-        owner._runinsandstorm = false
+    -- inst:RemoveEventCallback("blocked", OnAttacked_sand, owner)
+    inst:RemoveEventCallback("attacked", OnAttacked_sand, owner)
+    owner:RemoveEventCallback("changearea", OnChangeArea_sand)
+    inst:StopWatchingWorldState("israining", OnIsRaining_sand)
+    inst:StopWatchingWorldState("issummer", OnIsRaining_sand)
+    if owner.legiontag_sandrunner ~= nil then
+        owner.legiontag_sandrunner = false
     end
 end
 local function ShieldAtk_sand(inst, doer, attacker, data)
-    OnBlocked(doer, { attacker = attacker })
+    if not TheWorld.state.israining and attacker ~= nil then --不能下雨
+        SetSandSpike(attacker, IsOnSand(doer) and math.random(3, 6) or math.random(2))
+    end
     Counterattack_base(inst, doer, attacker, data, 8, 3)
 end
 local function ShieldAtkStay_sand(inst, doer, attacker, data)
+    if not TheWorld.state.israining and attacker ~= nil then --不能下雨
+        SetSandSpike(attacker, IsOnSand(doer) and 2 or 1)
+    end
     inst.components.shieldlegion:Counterattack(doer, attacker, data, 8, 1.5)
 end
 
@@ -310,8 +315,8 @@ MakeShield({
     name = "shield_l_sand",
     assets = GetAssets("shield_l_sand", nil),
     prefabs = {
-        "sandspike_legion",    --对玩家友好的沙之咬
-        "shield_attack_l_fx",
+        "sandspike_legion", --对玩家友好的沙之咬
+        "shield_attack_l_fx"
     },
     fn_common = function(inst)
         inst:AddTag("rp_sand_l")
