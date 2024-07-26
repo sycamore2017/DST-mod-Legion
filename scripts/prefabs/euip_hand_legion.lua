@@ -1722,6 +1722,192 @@ if TUNING.FUNCTIONAL_MEDAL_IS_OPEN then --能力勋章兼容
     })
 end
 
+--------------------------------------------------------------------------
+--[[ 子圭羽毛 ]]
+--------------------------------------------------------------------------
+
+local LineMap = {
+    silk = 2,
+    beardhair = 4,
+    steelwool = 20,
+    cattenball = 15
+}
+local throwednum = CONFIGS_LEGION.SIVFEATHROWEDNUM or 5
+
+local function OnEquip_fea(inst, owner)
+    if inst._dd ~= nil then
+        local dd = inst._dd
+        owner.AnimState:OverrideSymbol(dd.symbol, dd.build, dd.file)
+        if dd.isshield then
+            owner.AnimState:OverrideSymbol("swap_shield", dd.build, dd.file)
+            owner.AnimState:Show("LANTERN_OVERLAY")
+            owner.AnimState:HideSymbol("swap_object")
+            owner.AnimState:ClearOverrideSymbol("swap_object")
+        end
+        if dd.startfn ~= nil then
+            dd.startfn(inst, owner)
+        end
+    else
+        owner.AnimState:OverrideSymbol("swap_object", inst.prefab, "swap")
+    end
+    owner.AnimState:Show("ARM_carry")
+    owner.AnimState:Hide("ARM_normal")
+
+    if owner:HasTag("equipmentmodel") then return end --假人
+
+    owner:AddTag("s_l_throw") --skill_legion_throw
+    owner:AddTag("siv_feather")
+end
+local function OnUnequip_fea(inst, owner)
+    if inst._dd ~= nil then
+        owner.AnimState:ClearOverrideSymbol(inst._dd.symbol)
+        if inst._dd.isshield then
+            owner.AnimState:ClearOverrideSymbol("swap_shield")
+            owner.AnimState:Hide("LANTERN_OVERLAY")
+            owner.AnimState:ShowSymbol("swap_object")
+        end
+        if inst._dd.endfn ~= nil then
+            inst._dd.endfn(inst, owner)
+        end
+    else
+        owner.AnimState:ClearOverrideSymbol("swap_object")
+    end
+    owner.AnimState:Hide("ARM_carry")
+    owner.AnimState:Show("ARM_normal")
+
+    owner:RemoveTag("s_l_throw") --skill_legion_throw
+    owner:RemoveTag("siv_feather")
+end
+local function OnPickedUp_fea(inst, pickupguy, src_pos)
+    if pickupguy and pickupguy.Transform then
+        inst.Transform:SetRotation(pickupguy.Transform:GetRotation())
+    end
+end
+local function FnSpell_fea(inst, caster, pos, options)
+    if caster.components.inventory == nil then
+        return false
+    end
+    local ctl = SpawnPrefab("sivfeatherctl")
+    local ctlcpt = ctl.components.sivfeatherctl
+    local costt = inst.fea_hpcost or 3
+    ctlcpt.shootrange = inst.fea_range or 10
+
+    --查询是否有能拉回的材料
+    local lines = caster.components.inventory:FindItems(function(i)
+        if i.legion_sivfea_line ~= nil or LineMap[i.prefab] then
+            return true
+        end
+    end)
+    if #lines <= 0 then
+        lines = false
+    else
+        lines = true
+    end
+
+    local items = nil --需要丢出去的羽毛
+    local num = inst.components.stackable:StackSize()
+    if num <= throwednum then
+        items = caster.components.inventory:RemoveItem(inst, true)
+    else
+        items = inst.components.stackable:Get(throwednum)
+        items.components.inventoryitem:OnRemoved() --由于此时还处于物品栏状态，需要恢复为非物品栏状态
+        num = throwednum
+    end
+
+    ctlcpt:Throw(items, caster, pos, num, items.skinname or items.prefab, lines, inst.projectiledelay)
+end
+
+local function MakeSivFeather(data)
+    local fea_damage
+    local fea_range
+    local fea_hpcost
+    if data.isreal then
+        fea_damage = CONFIGS_LEGION.SIVFEADAMAGE or 26
+        fea_range = 13
+        fea_hpcost = CONFIGS_LEGION.SIVFEAHEALTHCOST or 1.5
+    else
+        fea_damage = 30.6 --34*0.9
+        fea_range = 10
+        fea_hpcost = 3
+    end
+
+    table.insert(prefs, Prefab(data.name, function() ------手持物品
+        local inst = CreateEntity()
+
+        Fn_common(inst, data.name, nil, nil, nil)
+        inst.Transform:SetEightFaced()
+
+        inst:AddTag("sharp")
+        inst:AddTag("s_l_throw") --skill_legion_throw
+        inst:AddTag("allow_action_on_impassable")
+        inst:AddTag("moistureimmunity") --禁止潮湿：EntityScript:GetIsWet()
+        inst:AddTag("weapon")
+
+        LS_C_Init(inst, data.name, true)
+
+        inst.projectiledelay = 2 * FRAMES --不能大于7帧
+
+        inst.entity:SetPristine()
+        if not TheWorld.ismastersim then return inst end
+
+        inst.fea_range = fea_range
+        inst.fea_hpcost = fea_hpcost
+
+        Fn_server(inst, data.name, OnEquip_fea, OnUnequip_fea)
+        inst.components.equippable.equipstack = true --装备时可以叠加装备
+
+        inst.components.inventoryitem.TryToSink = function(self, ...)end --防止在虚空里消失
+        inst.components.inventoryitem:EnableMoisture(false) --禁止潮湿：官方的代码有问题，会导致潮湿攻击滑落时叠加数变为1
+        inst.components.inventoryitem:SetOnPickupFn(OnPickedUp_fea) --被捡起时，修改自己的旋转角度
+
+        inst:AddComponent("stackable")
+        inst.components.stackable.maxsize = TUNING.STACK_SIZE_MEDITEM
+
+        inst:AddComponent("savedrotation") --保存旋转角度的组件
+
+        SetWeapon(inst, fea_damage, nil)
+        inst.components.weapon:SetRange(-1, -1) --人物默认攻击距离为3、3
+
+        inst:AddComponent("skillspelllegion") --右键技能
+        inst.components.skillspelllegion.fn_spell = FnSpell_fea
+
+        MakeHauntableLaunch(inst)
+
+        return inst
+    end, {
+        Asset("ANIM", "anim/"..data.name..".zip"),
+        Asset("ATLAS", "images/inventoryimages/"..data.name..".xml"),
+        Asset("IMAGE", "images/inventoryimages/"..data.name..".tex"),
+        Asset("ATLAS_BUILD", "images/inventoryimages/"..data.name..".xml", 256)
+    }, {
+        data.name.."_fly",
+        data.name.."_blk",
+        "siving_feather_line", "sivfeatherctl"
+    }))
+end
+
+table.insert(prefs, Prefab("sivfeatherctl", function() --子圭羽毛发射管理器
+    local inst = CreateEntity()
+    inst.entity:AddTransform()
+    inst.entity:AddNetwork()
+
+    -- inst:AddTag("FX")
+
+    inst.entity:SetPristine()
+    if not TheWorld.ismastersim then return inst end
+
+    inst:AddComponent("sivfeatherctl")
+
+    return inst
+end, nil, nil))
+
+MakeSivFeather({
+    name = "siving_feather_real", isreal = true
+})
+MakeSivFeather({
+    name = "siving_feather_fake"
+})
+
 --------------------
 --------------------
 
