@@ -1791,6 +1791,9 @@ local function FnSpell_fea(inst, caster, pos, options)
     local ctlcpt = ctl.components.sivfeatherctl
     local costt = inst.fea_hpcost or 3
     ctlcpt.shootrange = inst.fea_range or 10
+    ctlcpt.name_base = inst.prefab
+    ctlcpt.name_fly = (inst.skinname or inst.prefab).."_fly"
+    ctlcpt.name_blk = (inst.skinname or inst.prefab).."_blk"
 
     --查询是否有能拉回的材料
     local lines = caster.components.inventory:FindItems(function(i)
@@ -1814,7 +1817,7 @@ local function FnSpell_fea(inst, caster, pos, options)
         num = throwednum
     end
 
-    ctlcpt:Throw(items, caster, pos, num, items.skinname or items.prefab, lines, inst.projectiledelay)
+    ctlcpt:Throw(items, caster, pos, num, lines, inst.projectiledelay)
 end
 
 local function MakeSivFeather(data)

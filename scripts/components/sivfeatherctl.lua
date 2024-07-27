@@ -16,7 +16,10 @@ local SivFeatherCtl = Class(function(self, inst)
     -- self.realfeas = nil --真正的羽毛实体
     -- self.hasline = nil --是否有丝线
     self.num = 0 --当前羽毛发射数量
-    -- self.basename = nil --羽毛基础代码名
+    -- self.name_base = nil --羽毛本体代码名
+    -- self.name_fly = nil --羽毛飞行体代码名
+    -- self.name_blk = nil --羽毛滞留体代码名
+    -- self.damage = nil --原本的羽毛攻击力
 
 	self.shootrange = 20 --最远飞行距离
 	-- self.isgoback = nil --是否为返回玩家
@@ -27,7 +30,7 @@ local SivFeatherCtl = Class(function(self, inst)
     -- self.fn_hit = nil
 end)
 
-function SivFeatherCtl:Throw(feas, caster, pos, num, basename, hasline, hidetime)
+function SivFeatherCtl:Throw(feas, caster, pos, num, hasline, hidetime)
 	local doerpos = caster:GetPosition()
     doerpos.y = 0 --必须为0，防止玩家是腾云状态而向量出错，导致无法收回之类的问题
     local angles = {}
@@ -71,7 +74,7 @@ function SivFeatherCtl:Throw(feas, caster, pos, num, basename, hasline, hidetime
 
 	local feathers = {}
 	for i,v in ipairs(angles) do
-		local fly = SpawnPrefab(basename.."_fly")
+		local fly = SpawnPrefab(self.name_fly)
 		fly.feaidx = i
 		fly.Transform:SetPosition(doerpos:Get())
         -- fly.Physics:ClearCollidesWith(COLLISION.LIMITS)
@@ -92,9 +95,12 @@ function SivFeatherCtl:Throw(feas, caster, pos, num, basename, hasline, hidetime
     self.tempfeas = feathers
     self.hasline = hasline
     self.num = num
-    self.basename = basename
 
     if feas ~= nil then --妥善处理一下真实的羽毛
+        if num > 1 and feas.components.weapon ~= nil then --伤害是按照发射总数量算的，就不用一个羽毛一个对象各自进行攻击逻辑了
+            self.damage = feas.components.weapon.damage
+            feas.components.weapon.damage = self.damage*num
+        end
         self.inst:AddChild(feas)
         feas:RemoveFromScene()
         feas.Transform:SetPosition(0, 0, 0) --一旦有父实体了，再设置坐标就是相对于父实体的坐标了，应该是这样吧
@@ -163,20 +169,65 @@ local function IsOwnerValid(one)
     return one:IsValid() and
         one.components.health ~= nil and not one.components.health:IsDead()
 end
+local function RestoreWeaponAtk(self, fea)
+    if self.damage ~= nil and fea.components.weapon ~= nil then
+        fea.components.weapon.damage = self.damage
+    end
+end
 function SivFeatherCtl:StopFlying(fe)
     if self.hasline and IsOwnerValid(self.owner) then --有线，那就先以滞留体形式存在
-        local blk = SpawnPrefab(self.basename.."_blk")
+        local blk = SpawnPrefab(self.name_blk)
         blk.feaidx = fe.feaidx
         self.tempfeas[fe.feaidx] = blk
         blk.Transform:SetRotation(fe.Transform:GetRotation())
         blk.Transform:SetPosition(fe.Transform:GetWorldPosition())
         blk:PushEvent("on_landed")
-    else --没有线，立即变回正常的羽毛
-        local fea = SpawnPrefab(inst.feather_name, inst.feather_skin)
-        fea.Transform:SetRotation(fe.Transform:GetRotation())
-        fea.Transform:SetPosition(fe.Transform:GetWorldPosition())
+    elseif self.num > 0 then --没有线，立即变回正常的羽毛
+        local fea
+        if self.realfeas == nil then --没有真实羽毛，生成一个别的
+            if self.name_base ~= nil then
+                fea = SpawnPrefab(self.name_base)
+            end
+            self.num = self.num - 1
+        else
+            if not self.realfeas:IsValid() then --羽毛因未知原因被删了，那就重新生成
+                self.realfeas = SpawnPrefab(self.realfeas.prefab, self.realfeas.skinname, self.realfeas.skin_id)
+                if self.num > 1 then --新的实体需要重新隐藏起来
+                    self.inst:AddChild(self.realfeas)
+                    self.realfeas:RemoveFromScene()
+                    self.realfeas.Transform:SetPosition(0, 0, 0)
+                end
+            end
+            if self.realfeas.components.stackable == nil then
+                fea = self.realfeas
+                self.inst:RemoveChild(fea)
+                fea:ReturnToScene()
+                self.num = 0
+            else
+                if self.realfeas.components.stackable:StackSize() ~= self.num then --修正叠加数
+                    self.realfeas.components.stackable:SetStackSize(self.num)
+                end
+                if self.num == 1 then
+                    fea = self.realfeas
+                    self.inst:RemoveChild(fea)
+                    fea:ReturnToScene()
+                else
+                    fea = self.realfeas.components.stackable:Get(1) --优先生成被叠加的实体，self.realfeas本身先不动
+                end
+                self.num = self.num - 1
+            end
+            RestoreWeaponAtk(self, fea) --stackable:Get 可能也会被别的模组改成继承已有的攻击加成之类的，所以这里都得恢复攻击
+        end
+        if fea ~= nil then
+            fea.Transform:SetRotation(fe.Transform:GetRotation())
+            fea.Transform:SetPosition(fe.Transform:GetWorldPosition())
+        end
     end
     fe:Remove()
+end
+
+function SivFeatherCtl:Finish()
+    
 end
 
 function SivFeatherCtl:DoFeatherUpdate(dt, fe)
@@ -196,24 +247,33 @@ function SivFeatherCtl:DoFeatherUpdate(dt, fe)
     end
     if self.isgoback then
 		if distsq(self.pos, posnow) <= (self.bulletradius*self.bulletradius + 0.8) then
-			--拉回成功
+            fe:Remove() --拉回成功
 		end
 	elseif distsq(self.pos, posnow) >= self.shootrange*self.shootrange then
-		self:StopFlying(fe)
+		self:StopFlying(fe) --发射成功
 	end
 end
 function SivFeatherCtl:OnUpdate(dt)
     if self.tempfeas == nil or self.num <= 0 then
-        --停止吧
+        self:Finish()
         return
     end
+    local hasvalid
     for _, fe in pairs(self.tempfeas) do
-        if fe:IsValid() and fe.isflyobj then --只有飞行体才进行检测
-            self:DoFeatherUpdate(dt, fe)
+        if fe:IsValid() then
+            if fe.isflyobj then --只有飞行体才进行检测
+                self:DoFeatherUpdate(dt, fe)
+            end
+            if not hasvalid then --检测一下是否还需要继续执行逻辑
+                local ff = self.tempfeas[fe.feaidx]
+                if ff and ff:IsValid() then
+                    hasvalid = true
+                end
+            end
         end
     end
-    if self.num <= 0 then
-        --停止吧
+    if not hasvalid then
+        self:Finish()
         return
     end
 end
