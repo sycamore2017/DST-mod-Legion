@@ -121,8 +121,14 @@ function SivFeatherCtl:Throw(feas, caster, pos, num, hasline, hidetime)
         end
     end)
 
-    self:TryFeatherAttack(self.tempfeas[num], doerpos) --当前帧不会进行战斗检测，但等开始检测时可能羽毛已飞远，所以这里提前尝试攻击
+    --当前帧不会进行战斗检测，但等开始检测时可能羽毛已飞远，所以这里提前尝试攻击
+    --虽然可以用 self:OnUpdate()，但是此时所有飞行体都在一个位置的，没必要都判定一遍
+    self:TryFeatherAttack(self.tempfeas[num], doerpos)
     self.inst:StartUpdatingComponent(self)
+end
+
+function SivFeatherCtl:ThrowBack()
+    
 end
 
 function SivFeatherCtl:TryFeatherAttack(flyobj, posnow)
@@ -227,7 +233,42 @@ function SivFeatherCtl:StopFlying(fe)
 end
 
 function SivFeatherCtl:Finish()
-    
+    if self.num > 0 and self.realfeas ~= nil then --还有真实羽毛因未知原因没有处理，这里就直接还给owner
+        if not self.realfeas:IsValid() then --羽毛因未知原因被删了，那就重新生成
+            self.realfeas = SpawnPrefab(self.realfeas.prefab, self.realfeas.skinname, self.realfeas.skin_id)
+        else
+            self.inst:RemoveChild(self.realfeas)
+            self.realfeas:ReturnToScene()
+        end
+        if self.realfeas.components.stackable ~= nil then
+            if self.realfeas.components.stackable:StackSize() ~= self.num then --修正叠加数
+                self.realfeas.components.stackable:SetStackSize(self.num)
+            end
+        end
+        RestoreWeaponAtk(self, self.realfeas)
+        if self.owner:IsValid() then
+            self.realfeas.Transform:SetPosition(self.owner.Transform:GetWorldPosition())
+        else
+            self.realfeas.Transform:SetPosition(self.pos:Get())
+        end
+        if IsOwnerValid(self.owner) and self.owner.components.inventory ~= nil then
+            local inv = self.owner.components.inventory
+            if inv:GetEquippedItem(EQUIPSLOTS.HANDS) == nil then --手里没别的装备
+                if not inv:Equip(self.realfeas) then
+                    inv:GiveItem(self.realfeas)
+                end
+            else
+                inv:GiveItem(self.realfeas)
+            end
+        end
+    end
+    if self.tempfeas ~= nil then --清理掉剩余的实体
+        for _, fe in pairs(self.tempfeas) do
+            if fe:IsValid() then
+                fe:Remove()
+            end
+        end
+    end
 end
 
 function SivFeatherCtl:DoFeatherUpdate(dt, fe)
@@ -256,6 +297,7 @@ end
 function SivFeatherCtl:OnUpdate(dt)
     if self.tempfeas == nil or self.num <= 0 then
         self:Finish()
+        self.inst:Remove()
         return
     end
     local hasvalid
@@ -274,6 +316,7 @@ function SivFeatherCtl:OnUpdate(dt)
     end
     if not hasvalid then
         self:Finish()
+        self.inst:Remove()
         return
     end
 end
