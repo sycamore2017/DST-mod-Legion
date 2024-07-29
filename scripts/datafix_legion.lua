@@ -1339,12 +1339,12 @@ local luck_data_l = {
         fimbul_axe = { chance = 0.33, cost = 2 },
         tourmalineshard = { chance = 0.33, num_random = {2,3} }
     },
-    siving_foenix = { --子圭玄鸟（雄）
-        siving_feather_fake = { chance = 0.33, cost = 3, num_random = {4,5} },
+    siving_foenix = { --子圭玄鸟（雌）
+        siving_derivant_item = { chance = 0.33, cost = 3 },
         siving_rocks = { chance = 0.17, cost = 0.5, num = 3 }
     },
-    siving_moenix = { --子圭玄鸟（雌）
-        siving_derivant_item = { chance = 0.33, cost = 3 },
+    siving_moenix = { --子圭玄鸟（雄）
+        siving_feather_fake = { chance = 0.33, cost = 3, num_random = {4,5} },
         siving_rocks = { chance = 0.17, cost = 0.5, num = 3 }
     },
     beefalo = { horn = { chance = 0.33, cost = 0.5 } }, --皮弗娄牛

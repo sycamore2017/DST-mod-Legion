@@ -1,11 +1,3 @@
-local LineMap = {
-    silk = 2,
-    beardhair = 4,
-    steelwool = 20,
-    cattenball = 15
-}
-local throwednum = CONFIGS_LEGION.SIVFEATHROWEDNUM or 5
-
 local SivFeatherCtl = Class(function(self, inst)
     self.inst = inst
 	-- self.owner = nil --发射者
@@ -14,7 +6,7 @@ local SivFeatherCtl = Class(function(self, inst)
     -- self.trytargets = {} --已尝试的对象
     -- self.tempfeas = nil --暂时的羽毛：飞行体和滞留体
     -- self.realfeas = nil --真正的羽毛实体
-    -- self.hasline = nil --是否有丝线
+    -- self.line = nil --用来拉回的丝线
     self.num = 0 --当前羽毛发射数量
     -- self.name_base = nil --羽毛本体代码名
     -- self.name_fly = nil --羽毛飞行体代码名
@@ -30,16 +22,16 @@ local SivFeatherCtl = Class(function(self, inst)
     -- self.fn_hit = nil
 end)
 
-function SivFeatherCtl:Throw(feas, caster, pos, num, hasline, hidetime)
+function SivFeatherCtl:Throw(feas, caster, pos, num, line, hidetime)
 	local doerpos = caster:GetPosition()
     doerpos.y = 0 --必须为0，防止玩家是腾云状态而向量出错，导致无法收回之类的问题
     local angles = {}
     local poss = {}
     local direction = (pos - doerpos):GetNormalized() --单位向量
-    local angle = math.acos(direction:Dot(Vector3(1, 0, 0))) / DEGREES --这个角度是动画的，不能用来做物理的角度
+    local angle = math.acos(direction:Dot(Vector3(1, 0, 0))) / DEGREES --单位:度，比如33。这个角度是动画的，不能用来做物理的角度
 
 	if num == 1 then
-        angles = { 0 }
+        angles = { angle }
         poss[1] = pos
     else
         local ang_lag = 2.5
@@ -63,26 +55,26 @@ function SivFeatherCtl:Throw(feas, caster, pos, num, hasline, hidetime)
             angles = { -9*ang_lag, -7*ang_lag, -5*ang_lag, -3*ang_lag, -ang_lag, ang_lag, 3*ang_lag, 5*ang_lag, 7*ang_lag, 9*ang_lag }
         end
 
-        local ang = caster:GetAngleToPoint(pos.x, pos.y, pos.z) --原始角度，单位:度，比如33
-        for i,v in ipairs(angles) do
-            v = v + math.random()*2 - 1
+        -- local ang = caster:GetAngleToPoint(pos.x, pos.y, pos.z) --原始角度，单位:度，比如33
+        for i, v in ipairs(angles) do
+            v = angle + v + math.random()*2 - 1
             angles[i] = v
-            local an = (ang+v)*DEGREES
+            local an = v*DEGREES
             poss[i] = Vector3(doerpos.x+math.cos(an), 0, doerpos.z-math.sin(an))
         end
     end
 
 	local feathers = {}
-	for i,v in ipairs(angles) do
+	for i, v in ipairs(angles) do
 		local fly = SpawnPrefab(self.name_fly)
 		fly.feaidx = i
 		fly.Transform:SetPosition(doerpos:Get())
         -- fly.Physics:ClearCollidesWith(COLLISION.LIMITS)
-		fly.Transform:SetRotation(angle+v) --动画旋转
+		fly.Transform:SetRotation(v) --动画旋转
 		fly:FacePoint(poss[i]) --实体朝向
         fly.Physics:SetMotorVel(self.speed, 0, 0) --朝向已确定，给一个正加速即可
         if fly.fn_onthrown ~= nil then
-            fly.fn_onthrown(fly, caster, poss[i])
+            fly.fn_onthrown(fly, caster, v, poss[i])
         end
         fly:Hide() --先隐藏飞行体，兼容动画，不然投射物会出现在角色坐标位置，可能会比较奇怪
 		feathers[i] = fly
@@ -93,7 +85,7 @@ function SivFeatherCtl:Throw(feas, caster, pos, num, hasline, hidetime)
 	self.owner = caster
 	self.pos = doerpos
     self.tempfeas = feathers
-    self.hasline = hasline
+    self.line = line
     self.num = num
 
     if feas ~= nil then --妥善处理一下真实的羽毛
@@ -107,11 +99,11 @@ function SivFeatherCtl:Throw(feas, caster, pos, num, hasline, hidetime)
         self.realfeas = feas
     end
 
-    if self.hidetask ~= nil then
-        self.hidetask:Cancel()
+    if self.task_hide ~= nil then
+        self.task_hide:Cancel()
     end
-    self.hidetask = self.inst:DoTaskInTime(hidetime, function() --显示出飞行体
-        self.hidetask = nil
+    self.task_hide = self.inst:DoTaskInTime(hidetime, function() --显示出飞行体
+        self.task_hide = nil
         if self.tempfeas ~= nil then
             for _, fe in pairs(self.tempfeas) do
                 if fe:IsValid() and fe.isflyobj then
@@ -123,12 +115,57 @@ function SivFeatherCtl:Throw(feas, caster, pos, num, hasline, hidetime)
 
     --当前帧不会进行战斗检测，但等开始检测时可能羽毛已飞远，所以这里提前尝试攻击
     --虽然可以用 self:OnUpdate()，但是此时所有飞行体都在一个位置的，没必要都判定一遍
-    self:TryFeatherAttack(self.tempfeas[num], doerpos)
+    -- self:TryFeatherAttack(self.tempfeas[num], doerpos)
     self.inst:StartUpdatingComponent(self)
 end
 
 function SivFeatherCtl:ThrowBack()
-    
+    if self.isgoback or self.tempfeas == nil or self.num <= 0 or not self.owner:IsValid() then
+        return
+    end
+    if self.task_hide ~= nil then
+        self.task_hide:Cancel()
+        self.task_hide = nil
+    end
+
+    local doerpos = self.owner:GetPosition()
+    doerpos.y = 0 --必须为0，防止玩家是腾云状态而向量出错，导致无法收回之类的问题
+    self.isgoback = true
+    self.hittargets = {}
+    self.trytargets = {}
+    self.pos = doerpos
+    self.line = nil
+    for _, fe in pairs(self.tempfeas) do
+        if fe:IsValid() then
+            local newfe
+            local fepos = fe:GetPosition()
+            if fe.isflyobj then --飞行体只需要掉转方向即可
+                newfe = fe
+            else --滞留体就得删除了，再生成新的飞行体
+                newfe = SpawnPrefab(self.name_fly)
+                newfe.feaidx = fe.feaidx
+                newfe.Transform:SetPosition(fepos:Get())
+                self.tempfeas[fe.feaidx] = newfe
+                fe:Remove()
+            end
+            local direction = (doerpos - fepos):GetNormalized()
+            local an = math.acos(direction:Dot(Vector3(1, 0, 0))) / DEGREES
+            newfe.Transform:SetRotation(an) --动画旋转
+            newfe:FacePoint(doerpos) --实体朝向
+            newfe.Physics:SetMotorVel(self.speed, 0, 0) --朝向已确定，给一个正加速即可
+            if newfe.fn_onthrown ~= nil then
+                newfe.fn_onthrown(newfe, self.owner, an, doerpos)
+            end
+        end
+    end
+    if
+        self.damage ~= nil and self.realfeas ~= nil and
+        self.realfeas.components.weapon ~= nil --伤害是按照发射总数量算的，就不用一个羽毛一个对象各自进行攻击逻辑了
+    then
+        self.realfeas.components.weapon.damage = self.damage*self.num
+    end
+    self:OnUpdate(0) --当前帧不会进行战斗检测，但等开始检测时可能羽毛已飞远，所以这里提前尝试攻击
+    return true
 end
 
 function SivFeatherCtl:TryFeatherAttack(flyobj, posnow)
@@ -180,8 +217,49 @@ local function RestoreWeaponAtk(self, fea)
         fea.components.weapon.damage = self.damage
     end
 end
+local function BeRealFeather(self, fe)
+    local fea
+    if self.realfeas == nil then --没有真实羽毛，生成一个别的
+        if self.name_base ~= nil then
+            fea = SpawnPrefab(self.name_base)
+        end
+        self.num = self.num - 1
+    else
+        if not self.realfeas:IsValid() then --羽毛因未知原因被删了，那就重新生成
+            self.realfeas = SpawnPrefab(self.realfeas.prefab, self.realfeas.skinname, self.realfeas.skin_id)
+            if self.num > 1 then --新的实体需要重新隐藏起来
+                self.inst:AddChild(self.realfeas)
+                self.realfeas:RemoveFromScene()
+                self.realfeas.Transform:SetPosition(0, 0, 0)
+            end
+        end
+        if self.realfeas.components.stackable == nil then
+            fea = self.realfeas
+            self.inst:RemoveChild(fea)
+            fea:ReturnToScene()
+            self.num = 0
+        else
+            if self.realfeas.components.stackable:StackSize() ~= self.num then --修正叠加数
+                self.realfeas.components.stackable:SetStackSize(self.num)
+            end
+            if self.num == 1 then
+                fea = self.realfeas
+                self.inst:RemoveChild(fea)
+                fea:ReturnToScene()
+            else
+                fea = self.realfeas.components.stackable:Get(1) --优先生成被叠加的实体，self.realfeas本身先不动
+            end
+            self.num = self.num - 1
+        end
+        RestoreWeaponAtk(self, fea) --stackable:Get 可能也会被别的模组改成继承已有的攻击加成之类的，所以这里都得恢复攻击
+    end
+    if fea ~= nil then
+        fea.Transform:SetRotation(fe.Transform:GetRotation())
+        fea.Transform:SetPosition(fe.Transform:GetWorldPosition())
+    end
+end
 function SivFeatherCtl:StopFlying(fe)
-    if self.hasline and IsOwnerValid(self.owner) then --有线，那就先以滞留体形式存在
+    if self.line ~= nil and IsOwnerValid(self.owner) then --有线，那就先以滞留体形式存在
         local blk = SpawnPrefab(self.name_blk)
         blk.feaidx = fe.feaidx
         self.tempfeas[fe.feaidx] = blk
@@ -189,50 +267,35 @@ function SivFeatherCtl:StopFlying(fe)
         blk.Transform:SetPosition(fe.Transform:GetWorldPosition())
         blk:PushEvent("on_landed")
     elseif self.num > 0 then --没有线，立即变回正常的羽毛
-        local fea
-        if self.realfeas == nil then --没有真实羽毛，生成一个别的
-            if self.name_base ~= nil then
-                fea = SpawnPrefab(self.name_base)
-            end
-            self.num = self.num - 1
-        else
-            if not self.realfeas:IsValid() then --羽毛因未知原因被删了，那就重新生成
-                self.realfeas = SpawnPrefab(self.realfeas.prefab, self.realfeas.skinname, self.realfeas.skin_id)
-                if self.num > 1 then --新的实体需要重新隐藏起来
-                    self.inst:AddChild(self.realfeas)
-                    self.realfeas:RemoveFromScene()
-                    self.realfeas.Transform:SetPosition(0, 0, 0)
-                end
-            end
-            if self.realfeas.components.stackable == nil then
-                fea = self.realfeas
-                self.inst:RemoveChild(fea)
-                fea:ReturnToScene()
-                self.num = 0
-            else
-                if self.realfeas.components.stackable:StackSize() ~= self.num then --修正叠加数
-                    self.realfeas.components.stackable:SetStackSize(self.num)
-                end
-                if self.num == 1 then
-                    fea = self.realfeas
-                    self.inst:RemoveChild(fea)
-                    fea:ReturnToScene()
-                else
-                    fea = self.realfeas.components.stackable:Get(1) --优先生成被叠加的实体，self.realfeas本身先不动
-                end
-                self.num = self.num - 1
-            end
-            RestoreWeaponAtk(self, fea) --stackable:Get 可能也会被别的模组改成继承已有的攻击加成之类的，所以这里都得恢复攻击
-        end
-        if fea ~= nil then
-            fea.Transform:SetRotation(fe.Transform:GetRotation())
-            fea.Transform:SetPosition(fe.Transform:GetWorldPosition())
-        end
+        BeRealFeather(self, fe)
     end
     fe:Remove()
 end
 
 function SivFeatherCtl:Finish()
+    if self.task_hide ~= nil then
+        self.task_hide:Cancel()
+        self.task_hide = nil
+    end
+    if self.tempfeas ~= nil then --先处理暂时的实体
+        if self.isgoback then --拉回时，直接删除全部
+            for _, fe in pairs(self.tempfeas) do
+                if fe:IsValid() then
+                    fe:Remove()
+                end
+            end
+        else --非拉回时，暂时体都尽量改成真实羽毛
+            for _, fe in pairs(self.tempfeas) do
+                if fe:IsValid() then
+                    if self.num > 0 then
+                        BeRealFeather(self, fe)
+                    end
+                    fe:Remove()
+                end
+            end
+        end
+        self.tempfeas = nil
+    end
     if self.num > 0 and self.realfeas ~= nil then --还有真实羽毛因未知原因没有处理，这里就直接还给owner
         if not self.realfeas:IsValid() then --羽毛因未知原因被删了，那就重新生成
             self.realfeas = SpawnPrefab(self.realfeas.prefab, self.realfeas.skinname, self.realfeas.skin_id)
@@ -261,13 +324,12 @@ function SivFeatherCtl:Finish()
                 inv:GiveItem(self.realfeas)
             end
         end
+        self.realfeas = nil
+        return
     end
-    if self.tempfeas ~= nil then --清理掉剩余的实体
-        for _, fe in pairs(self.tempfeas) do
-            if fe:IsValid() then
-                fe:Remove()
-            end
-        end
+    if self.realfeas ~= nil and self.realfeas:IsValid() then --需要清理多余的真实羽毛
+        self.realfeas:Remove()
+        self.realfeas = nil
     end
 end
 
@@ -287,9 +349,13 @@ function SivFeatherCtl:DoFeatherUpdate(dt, fe)
         return
     end
     if self.isgoback then
-		if distsq(self.pos, posnow) <= (self.bulletradius*self.bulletradius + 0.8) then
+        local dist = distsq(self.pos, posnow)
+        if
+            dist >= 1600 or --不能超过10地皮距离
+            dist <= (self.bulletradius*self.bulletradius + 0.8) --到达目的地
+        then
             fe:Remove() --拉回成功
-		end
+        end
 	elseif distsq(self.pos, posnow) >= self.shootrange*self.shootrange then
 		self:StopFlying(fe) --发射成功
 	end

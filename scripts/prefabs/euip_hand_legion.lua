@@ -1785,9 +1785,9 @@ local function OnPickedUp_fea(inst, pickupguy, src_pos)
 end
 local function FnSpell_fea(inst, caster, pos, options)
     if caster.components.inventory == nil then
-        return false
+        return
     end
-    local ctl = SpawnPrefab("sivfeatherctl")
+    local ctl = SpawnPrefab("siving_feather_ctl")
     local ctlcpt = ctl.components.sivfeatherctl
     local costt = inst.fea_hpcost or 3
     ctlcpt.shootrange = inst.fea_range or 10
@@ -1807,7 +1807,7 @@ local function FnSpell_fea(inst, caster, pos, options)
         lines = true
     end
 
-    local items = nil --需要丢出去的羽毛
+    local items --需要丢出去的羽毛
     local num = inst.components.stackable:StackSize()
     if num <= throwednum then
         items = caster.components.inventory:RemoveItem(inst, true)
@@ -1815,6 +1815,33 @@ local function FnSpell_fea(inst, caster, pos, options)
         items = inst.components.stackable:Get(throwednum)
         items.components.inventoryitem:OnRemoved() --由于此时还处于物品栏状态，需要恢复为非物品栏状态
         num = throwednum
+    end
+
+    if caster.components.health ~= nil and not caster.components.health:IsDead() then
+        if costt > 0 and caster.siv_blood_l_reducer_v ~= nil then
+            if caster.siv_blood_l_reducer_v >= 1 then
+                costt = 0
+            else
+                costt = costt * (1-caster.siv_blood_l_reducer_v)
+            end
+        end
+        if costt > 0 then
+            caster.components.health:DoDelta(-costt*num, true, inst.prefab, false, nil, true)
+        end
+        if lines then
+            if caster.components.health:IsDead() then
+                lines = false
+            else
+                local line = SpawnPrefab("siving_feather_line")
+                line.sivfeatherctl = ctl
+                if not caster.components.inventory:Equip(line) then
+                    line:Remove()
+                    lines = false
+                end
+            end
+        end
+    else
+        lines = false
     end
 
     ctlcpt:Throw(items, caster, pos, num, lines, inst.projectiledelay)
@@ -1885,11 +1912,11 @@ local function MakeSivFeather(data)
     }, {
         data.name.."_fly",
         data.name.."_blk",
-        "siving_feather_line", "sivfeatherctl"
+        "siving_feather_line", "siving_feather_ctl"
     }))
 end
 
-table.insert(prefs, Prefab("sivfeatherctl", function() --子圭羽毛发射管理器
+table.insert(prefs, Prefab("siving_feather_ctl", function() --子圭羽毛发射管理器
     local inst = CreateEntity()
     inst.entity:AddTransform()
     inst.entity:AddNetwork()
@@ -1904,12 +1931,52 @@ table.insert(prefs, Prefab("sivfeatherctl", function() --子圭羽毛发射管�
     return inst
 end, nil, nil))
 
-MakeSivFeather({
-    name = "siving_feather_real", isreal = true
-})
-MakeSivFeather({
-    name = "siving_feather_fake"
-})
+table.insert(prefs, Prefab("siving_feather_line", function() --临时的羽刃拉回器
+    local inst = CreateEntity()
+    inst.entity:AddTransform() --Tip：AddAnimState 组件 必需在该组件之后，否则会崩溃
+
+    --这个prefab我本来不准备加动画机制的，但是【Super Wall】mod 里会因此崩溃：它的机制默认装备物品是有这个组件的
+    inst.entity:AddAnimState()
+
+    inst.entity:AddNetwork()
+
+    MakeInventoryPhysics(inst)
+
+    inst:AddTag("s_l_pull") --skill_legion_pull
+    inst:AddTag("siv_line")
+    inst:AddTag("allow_action_on_impassable")
+
+    inst.entity:SetPristine()
+    if not TheWorld.ismastersim then return inst end
+
+    inst.persists = false
+    inst.linedoer = nil --指发起这个动作的玩家
+
+    inst:AddComponent("inspectable")
+
+    inst:AddComponent("inventoryitem")
+    inst.components.inventoryitem.imagename = "siving_feather_line"
+    inst.components.inventoryitem.atlasname = "images/inventoryimages/siving_feather_line.xml"
+    inst.components.inventoryitem:SetOnDroppedFn(RemoveLine)
+
+    inst:AddComponent("equippable")
+    inst.components.equippable:SetOnEquip(OnEquip_line)
+    inst.components.equippable:SetOnUnequip(OnUnequip_line)
+
+    inst:AddComponent("skillspelllegion")
+    inst.components.skillspelllegion.fn_spell = Fn_spell_line
+
+    inst.task_remove = inst:DoTaskInTime(3.5, RemoveLine)
+
+    return inst
+end, {
+    Asset("ATLAS", "images/inventoryimages/siving_feather_line.xml"),
+    Asset("IMAGE", "images/inventoryimages/siving_feather_line.tex"),
+    -- Asset("ATLAS_BUILD", "images/inventoryimages/siving_feather_line.xml", 256) --不需要这个
+}, nil))
+
+MakeSivFeather({ name = "siving_feather_real", isreal = true }) --子圭·翰
+MakeSivFeather({ name = "siving_feather_fake" }) --子圭玄鸟绒羽
 
 --------------------
 --------------------
