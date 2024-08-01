@@ -93,7 +93,7 @@ function SivFeatherCtl:Throw(feas, caster, pos, num, line, hidetime)
             self.damage = feas.components.weapon.damage
             feas.components.weapon.damage = self.damage*num
         end
-        self.inst:AddChild(feas)
+        self.inst:AddChild(feas) --Tip: 有父实体的实体，不会被游戏自动保存，只能在别的地方手动保存(比如在这个组件里保存)
         feas:RemoveFromScene()
         feas.Transform:SetPosition(0, 0, 0) --一旦有父实体了，再设置坐标就是相对于父实体的坐标了，应该是这样吧
         self.realfeas = feas
@@ -120,13 +120,14 @@ function SivFeatherCtl:Throw(feas, caster, pos, num, line, hidetime)
 end
 
 function SivFeatherCtl:ThrowBack()
+    self.line = nil
     if self.isgoback or self.tempfeas == nil or self.num <= 0 or not self.owner:IsValid() then
         return
     end
-    if self.task_hide ~= nil then
-        self.task_hide:Cancel()
-        self.task_hide = nil
-    end
+    -- if self.task_hide ~= nil then
+    --     self.task_hide:Cancel()
+    --     self.task_hide = nil
+    -- end
 
     local doerpos = self.owner:GetPosition()
     doerpos.y = 0 --必须为0，防止玩家是腾云状态而向量出错，导致无法收回之类的问题
@@ -134,7 +135,6 @@ function SivFeatherCtl:ThrowBack()
     self.hittargets = {}
     self.trytargets = {}
     self.pos = doerpos
-    self.line = nil
     for _, fe in pairs(self.tempfeas) do
         if fe:IsValid() then
             local newfe
@@ -217,7 +217,7 @@ local function RestoreWeaponAtk(self, fea)
         fea.components.weapon.damage = self.damage
     end
 end
-local function BeRealFeather(self, fe)
+function SivFeatherCtl:BeRealFeather(fe)
     local fea
     if self.realfeas == nil then --没有真实羽毛，生成一个别的
         if self.name_base ~= nil then
@@ -267,7 +267,7 @@ function SivFeatherCtl:StopFlying(fe)
         blk.Transform:SetPosition(fe.Transform:GetWorldPosition())
         blk:PushEvent("on_landed")
     elseif self.num > 0 then --没有线，立即变回正常的羽毛
-        BeRealFeather(self, fe)
+        self:BeRealFeather(fe)
     end
     fe:Remove()
 end
@@ -288,7 +288,7 @@ function SivFeatherCtl:Finish()
             for _, fe in pairs(self.tempfeas) do
                 if fe:IsValid() then
                     if self.num > 0 then
-                        BeRealFeather(self, fe)
+                        self:BeRealFeather(fe)
                     end
                     fe:Remove()
                 end
@@ -361,7 +361,7 @@ function SivFeatherCtl:DoFeatherUpdate(dt, fe)
 	end
 end
 function SivFeatherCtl:OnUpdate(dt)
-    if self.tempfeas == nil or self.num <= 0 then
+    if self.tempfeas == nil or self.num <= 0 or not self.owner:IsValid() then
         self:Finish()
         self.inst:Remove()
         return
@@ -385,6 +385,55 @@ function SivFeatherCtl:OnUpdate(dt)
         self.inst:Remove()
         return
     end
+end
+
+function SivFeatherCtl:OnSave()
+    local data = {}
+	if self.num > 0 and self.realfeas ~= nil then
+        data.num = self.num
+        if self.realfeas:IsValid() then
+            data.fea_data = self.realfeas:GetSaveRecord()
+        else
+            data.fea_name = self.realfeas.prefab
+            data.fea_skin = self.realfeas.skinname
+            data.fea_skinid = self.realfeas.skin_id --应该不需要吧
+        end
+        data.damage = self.damage
+
+        local pos
+        if self.owner:IsValid() then
+            pos = self.owner:GetPosition()
+        else
+            pos = self.pos
+        end
+        data.x = pos.x
+        -- data.y = pos.y --只能为0
+        data.z = pos.z
+    end
+    return data
+end
+function SivFeatherCtl:OnLoad(data)
+    if data ~= nil and data.num ~= nil and data.x ~= nil and data.z ~= nil then
+        local fea
+        if data.fea_data ~= nil then
+            fea = SpawnSaveRecord(data.fea_data)
+        elseif data.fea_name ~= nil then
+            fea = SpawnPrefab(data.fea_name, data.fea_skin, data.fea_skinid)
+        end
+        if fea ~= nil then
+            if fea.components.stackable ~= nil then
+                if fea.components.stackable:StackSize() ~= data.num then --修正叠加数
+                    fea.components.stackable:SetStackSize(data.num)
+                end
+            end
+            self.damage = data.damage
+            RestoreWeaponAtk(self, fea)
+            fea.Transform:SetPosition(data.x, 0, data.z)
+        end
+    end
+    self.inst:DoTaskInTime(0, function()
+        self.inst:Remove()
+    end)
 end
 
 return SivFeatherCtl

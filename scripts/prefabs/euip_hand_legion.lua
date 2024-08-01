@@ -1795,18 +1795,6 @@ local function FnSpell_fea(inst, caster, pos, options)
     ctlcpt.name_fly = (inst.skinname or inst.prefab).."_fly"
     ctlcpt.name_blk = (inst.skinname or inst.prefab).."_blk"
 
-    --查询是否有能拉回的材料
-    local lines = caster.components.inventory:FindItems(function(i)
-        if i.legion_sivfea_line ~= nil or LineMap[i.prefab] then
-            return true
-        end
-    end)
-    if #lines <= 0 then
-        lines = false
-    else
-        lines = true
-    end
-
     local items --需要丢出去的羽毛
     local num = inst.components.stackable:StackSize()
     if num <= throwednum then
@@ -1817,6 +1805,7 @@ local function FnSpell_fea(inst, caster, pos, options)
         num = throwednum
     end
 
+    local line
     if caster.components.health ~= nil and not caster.components.health:IsDead() then
         if costt > 0 and caster.siv_blood_l_reducer_v ~= nil then
             if caster.siv_blood_l_reducer_v >= 1 then
@@ -1828,23 +1817,24 @@ local function FnSpell_fea(inst, caster, pos, options)
         if costt > 0 then
             caster.components.health:DoDelta(-costt*num, true, inst.prefab, false, nil, true)
         end
-        if lines then
-            if caster.components.health:IsDead() then
-                lines = false
-            else
-                local line = SpawnPrefab("siving_feather_line")
+        if not caster.components.health:IsDead() then
+            local lines = caster.components.inventory:FindItems(function(i) --查询是否有能拉回的材料
+                if i.legion_sivfea_line ~= nil or LineMap[i.prefab] then
+                    return true
+                end
+            end)
+            if #lines > 0 then
+                line = SpawnPrefab("siving_feather_line")
                 line.sivfeatherctl = ctl
                 if not caster.components.inventory:Equip(line) then
                     line:Remove()
-                    lines = false
+                    line = nil
                 end
             end
         end
-    else
-        lines = false
     end
 
-    ctlcpt:Throw(items, caster, pos, num, lines, inst.projectiledelay)
+    ctlcpt:Throw(items, caster, pos, num, line, inst.projectiledelay)
 end
 
 local function MakeSivFeather(data)
@@ -1916,6 +1906,11 @@ local function MakeSivFeather(data)
     }))
 end
 
+MakeSivFeather({ name = "siving_feather_real", isreal = true }) --子圭·翰
+MakeSivFeather({ name = "siving_feather_fake" }) --子圭玄鸟绒羽
+
+------
+
 table.insert(prefs, Prefab("siving_feather_ctl", function() --子圭羽毛发射管理器
     local inst = CreateEntity()
     inst.entity:AddTransform()
@@ -1930,6 +1925,103 @@ table.insert(prefs, Prefab("siving_feather_ctl", function() --子圭羽毛发射
 
     return inst
 end, nil, nil))
+
+------
+
+local function Remove_sivline(inst)
+    if inst.task_doremove ~= nil then
+        return
+    end
+    if inst.sivfeatherctl ~= nil and inst.sivfeatherctl:IsValid() then
+        local ctlcpt = inst.sivfeatherctl.components.sivfeatherctl
+        ctlcpt.line = nil
+        if ctlcpt.tempfeas ~= nil then
+            for _, fe in pairs(ctlcpt.tempfeas) do
+                if fe:IsValid() and not fe.isflyobj then --飞行体不管，让它继续飞，得把滞留体变回真实羽毛
+                    if ctlcpt.num > 0 then
+                        ctlcpt:BeRealFeather(fe)
+                    end
+                    fe:Remove()
+                end
+            end
+        end
+        if ctlcpt.num <= 0 then
+            ctlcpt:Finish()
+            inst.sivfeatherctl:Remove()
+        end
+    end
+    inst.sivfeatherctl = nil
+    if inst.task_remove ~= nil then
+        inst.task_remove:Cancel()
+        inst.task_remove = nil
+    end
+    inst.task_doremove = inst:DoTaskInTime(0, function()
+        inst:Remove()
+    end)
+end
+local function OnEquip_sivline(inst, owner)
+    owner:AddTag("s_l_pull") --skill_legion_pull
+    owner:AddTag("siv_line")
+end
+local function OnUnequip_sivline(inst, owner)
+    owner:RemoveTag("s_l_pull")
+    owner:RemoveTag("siv_line")
+    Remove_sivline(inst)
+end
+local function FnSpell_sivline(inst, doer, pos, options)
+    if
+        inst.sivfeatherctl == nil or not inst.sivfeatherctl:IsValid() or
+        doer.components.inventory == nil
+    then
+        return
+    end
+
+    if inst.sivfeatherctl.components.sivfeatherctl:ThrowBack() then --先拉回羽毛
+        --找到所有拉回羽毛会消耗的材料
+        local lines = doer.components.inventory:FindItems(function(i)
+            if i.legion_sivfea_line ~= nil or LineMap[i.prefab] then
+                return true
+            end
+        end)
+        --消耗材料
+        local cost = (doer.legion_sivfea_line or 0) + 1
+        for _, v in ipairs(lines) do
+            local value = v.legion_sivfea_line or LineMap[v.prefab]
+            if cost < value then --还未到消耗之时
+                break
+            end
+            if v.components.stackable == nil then
+                local costitem = doer.components.inventory:RemoveItem(v, nil, true)
+                if costitem then
+                    costitem:Remove()
+                end
+                cost = cost - value
+            else
+                local num = v.components.stackable:StackSize()
+                for i = 1, num, 1 do
+                    local costitem = doer.components.inventory:RemoveItem(v, nil, true)
+                    if costitem then
+                        costitem:Remove()
+                    end
+                    cost = cost - value
+                    if cost < value then
+                        break
+                    end
+                end
+            end
+            if cost < value then
+                break
+            end
+        end
+        if cost <= 0 then
+            doer.legion_sivfea_line = nil
+        else
+            doer.legion_sivfea_line = cost
+        end
+    end
+    inst.sivfeatherctl = nil
+    Remove_sivline(inst)
+end
 
 table.insert(prefs, Prefab("siving_feather_line", function() --临时的羽刃拉回器
     local inst = CreateEntity()
@@ -1950,23 +2042,23 @@ table.insert(prefs, Prefab("siving_feather_line", function() --临时的羽刃�
     if not TheWorld.ismastersim then return inst end
 
     inst.persists = false
-    inst.linedoer = nil --指发起这个动作的玩家
+    -- inst.sivfeatherctl = nil
 
     inst:AddComponent("inspectable")
 
     inst:AddComponent("inventoryitem")
     inst.components.inventoryitem.imagename = "siving_feather_line"
     inst.components.inventoryitem.atlasname = "images/inventoryimages/siving_feather_line.xml"
-    inst.components.inventoryitem:SetOnDroppedFn(RemoveLine)
+    inst.components.inventoryitem:SetOnDroppedFn(Remove_sivline)
 
     inst:AddComponent("equippable")
-    inst.components.equippable:SetOnEquip(OnEquip_line)
-    inst.components.equippable:SetOnUnequip(OnUnequip_line)
+    inst.components.equippable:SetOnEquip(OnEquip_sivline)
+    inst.components.equippable:SetOnUnequip(OnUnequip_sivline)
 
     inst:AddComponent("skillspelllegion")
-    inst.components.skillspelllegion.fn_spell = Fn_spell_line
+    inst.components.skillspelllegion.fn_spell = FnSpell_sivline
 
-    inst.task_remove = inst:DoTaskInTime(3.5, RemoveLine)
+    inst.task_remove = inst:DoTaskInTime(3.5, Remove_sivline)
 
     return inst
 end, {
@@ -1974,9 +2066,6 @@ end, {
     Asset("IMAGE", "images/inventoryimages/siving_feather_line.tex"),
     -- Asset("ATLAS_BUILD", "images/inventoryimages/siving_feather_line.xml", 256) --不需要这个
 }, nil))
-
-MakeSivFeather({ name = "siving_feather_real", isreal = true }) --子圭·翰
-MakeSivFeather({ name = "siving_feather_fake" }) --子圭玄鸟绒羽
 
 --------------------
 --------------------
