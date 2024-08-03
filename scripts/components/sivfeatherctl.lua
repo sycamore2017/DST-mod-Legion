@@ -95,6 +95,7 @@ function SivFeatherCtl:Throw(feas, caster, pos, num, line, hidetime)
         end
         self.inst:AddChild(feas) --Tip: 有父实体的实体，不会被游戏自动保存，只能在别的地方手动保存(比如在这个组件里保存)
         feas:RemoveFromScene()
+        feas:AddTag("rangedweapon") --这个状态下，是远程武器
         feas.Transform:SetPosition(0, 0, 0) --一旦有父实体了，再设置坐标就是相对于父实体的坐标了，应该是这样吧
         self.realfeas = feas
     end
@@ -230,6 +231,7 @@ function SivFeatherCtl:BeRealFeather(fe)
             if self.num > 1 then --新的实体需要重新隐藏起来
                 self.inst:AddChild(self.realfeas)
                 self.realfeas:RemoveFromScene()
+                self.realfeas:AddTag("rangedweapon")
                 self.realfeas.Transform:SetPosition(0, 0, 0)
             end
         end
@@ -237,6 +239,7 @@ function SivFeatherCtl:BeRealFeather(fe)
             fea = self.realfeas
             self.inst:RemoveChild(fea)
             fea:ReturnToScene()
+            fea:RemoveTag("rangedweapon")
             self.num = 0
         else
             if self.realfeas.components.stackable:StackSize() ~= self.num then --修正叠加数
@@ -246,6 +249,7 @@ function SivFeatherCtl:BeRealFeather(fe)
                 fea = self.realfeas
                 self.inst:RemoveChild(fea)
                 fea:ReturnToScene()
+                fea:RemoveTag("rangedweapon")
             else
                 fea = self.realfeas.components.stackable:Get(1) --优先生成被叠加的实体，self.realfeas本身先不动
             end
@@ -302,6 +306,7 @@ function SivFeatherCtl:Finish()
         else
             self.inst:RemoveChild(self.realfeas)
             self.realfeas:ReturnToScene()
+            self.realfeas:RemoveTag("rangedweapon")
         end
         if self.realfeas.components.stackable ~= nil then
             if self.realfeas.components.stackable:StackSize() ~= self.num then --修正叠加数
@@ -427,7 +432,7 @@ function SivFeatherCtl:OnLoad(data)
                 end
             end
             self.damage = data.damage
-            RestoreWeaponAtk(self, fea)
+            RestoreWeaponAtk(self, fea) --防止武器攻击力有保存机制
             fea.Transform:SetPosition(data.x, 0, data.z)
         end
     end

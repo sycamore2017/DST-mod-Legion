@@ -699,8 +699,8 @@ local function ClearBattlefield(inst) --打扫战场
     local x, y, z = inst.Transform:GetWorldPosition()
     local ents = TheSim:FindEntities(x, y, z, DIST_HEALTH+15, { "siv_boss_block" }, { "INLIMBO" })
     for _, v in ipairs(ents) do
-        if v.fn_onClear ~= nil then
-            v:fn_onClear()
+        if v.fn_clear ~= nil then
+            v:fn_clear()
         end
     end
 end
