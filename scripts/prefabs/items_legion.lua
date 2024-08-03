@@ -160,9 +160,9 @@ local function SetTradable(inst, goldvalue, rocktribute) --交易组件
     end
 end
 
-local function OnLandedClient(self, ...)
-    if self.OnLandedClient_l_base ~= nil then
-        self.OnLandedClient_l_base(self, ...)
+local function OnLandedClient_new(self, ...)
+    if self.OnLandedClient_legion ~= nil then
+        self.OnLandedClient_legion(self, ...)
     end
     if self.floatparam_l ~= nil then
         self.inst.AnimState:SetFloatParams(self.floatparam_l, 1, self.bob_percent)
@@ -172,9 +172,11 @@ local function SetFloatable(inst, float) --漂浮组件
     MakeInventoryFloatable(inst, float[2], float[3], float[4])
     if float[1] ~= nil then
         local floater = inst.components.floater
-        floater.OnLandedClient_l_base = floater.OnLandedClient
+        if floater.OnLandedClient_legion == nil then
+            floater.OnLandedClient_legion = floater.OnLandedClient
+            floater.OnLandedClient = OnLandedClient_new
+        end
         floater.floatparam_l = float[1]
-        floater.OnLandedClient = OnLandedClient
     end
 end
 

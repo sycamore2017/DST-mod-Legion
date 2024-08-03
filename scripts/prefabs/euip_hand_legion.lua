@@ -81,9 +81,9 @@ local function SetDeployable(inst, ondeploy, mode, spacing) --摆放组件
     end
 end
 
-local function OnLandedClient(self, ...)
-    if self.OnLandedClient_l_base ~= nil then
-        self.OnLandedClient_l_base(self, ...)
+local function OnLandedClient_new(self, ...)
+    if self.OnLandedClient_legion ~= nil then
+        self.OnLandedClient_legion(self, ...)
     end
     if self.floatparam_l ~= nil then
         self.inst.AnimState:SetFloatParams(self.floatparam_l, 1, self.bob_percent)
@@ -93,9 +93,11 @@ local function SetFloatable(inst, float) --漂浮组件
     MakeInventoryFloatable(inst, float[2], float[3], float[4])
     if float[1] ~= nil then
         local floater = inst.components.floater
-        floater.OnLandedClient_l_base = floater.OnLandedClient
+        if floater.OnLandedClient_legion == nil then
+            floater.OnLandedClient_legion = floater.OnLandedClient
+            floater.OnLandedClient = OnLandedClient_new
+        end
         floater.floatparam_l = float[1]
-        floater.OnLandedClient = OnLandedClient
     end
 end
 
@@ -1783,6 +1785,17 @@ local function OnPickedUp_fea(inst, pickupguy, src_pos)
         inst.Transform:SetRotation(pickupguy.Transform:GetRotation())
     end
 end
+local function OnHit_fly_fake(cpt, ent, flyobj, weapon)
+    if math.random() < 0.05 then
+        flyobj:Remove()
+    end
+end
+local function Fn_validhit_fea_pvp(self, ent) --PVP模式下，只关注自己
+    return TOOLS_L.MaybeEnemy_me(self.owner, ent, true)
+end
+local function Fn_validhit_fea(self, ent) --非PVP，就要关注所有玩家
+    return TOOLS_L.MaybeEnemy_player(self.owner, ent, true)
+end
 local function FnSpell_fea(inst, caster, pos, options)
     if caster.components.inventory == nil then
         return
@@ -1791,9 +1804,25 @@ local function FnSpell_fea(inst, caster, pos, options)
     local ctlcpt = ctl.components.sivfeatherctl
     local costt = inst.fea_hpcost or 3
     ctlcpt.shootrange = inst.fea_range or 10
+    -- ctlcpt.speed = 45
     ctlcpt.name_base = inst.prefab
     ctlcpt.name_fly = (inst.skinname or inst.prefab).."_fly"
     ctlcpt.name_blk = (inst.skinname or inst.prefab).."_blk"
+    if not inst.isreal then
+        ctlcpt.fn_hit = OnHit_fly_fake
+    end
+    if TheNet:GetPVPEnabled() then
+        ctlcpt.fn_validhit = Fn_validhit_fea_pvp
+        ctlcpt.exclude_tags = TOOLS_L.TagsCombat1({
+            "wall", "structure", "companion", "glommer", "friendlyfruitfly", "shadowminion"
+        })
+    else
+        ctlcpt.fn_validhit = Fn_validhit_fea
+        ctlcpt.exclude_tags = TOOLS_L.TagsCombat1({
+            "wall", "structure", "companion", "glommer", "friendlyfruitfly", "shadowminion",
+            "player", "abigail"
+        })
+    end
 
     local items --需要丢出去的羽毛
     local num = inst.components.stackable:StackSize()
@@ -1825,8 +1854,9 @@ local function FnSpell_fea(inst, caster, pos, options)
             end)
             if #lines > 0 then
                 line = SpawnPrefab("siving_feather_line")
-                line.sivfeatherctl = ctl
-                if not caster.components.inventory:Equip(line) then
+                if caster.components.inventory:Equip(line) then
+                    line.sivfeatherctl = ctl
+                else
                     line:Remove()
                     line = nil
                 end
@@ -1837,6 +1867,119 @@ local function FnSpell_fea(inst, caster, pos, options)
     ctlcpt:Throw(items, caster, pos, num, line, inst.projectiledelay)
 end
 
+local function OnThrown_fly(inst, owner, angle, pos)
+    inst.SoundEmitter:PlaySound("dontstarve/creatures/leif/swipe", nil, 0.2)
+end
+
+local function SetAnim_fly_collector(inst)
+    if math.random() < 0.4 then
+        inst.AnimState:PlayAnimation("jump_loop")
+        inst.AnimState:PushAnimation("jump_pst", false)
+    else
+        inst.AnimState:PlayAnimation("jump_out")
+        inst.AnimState:PushAnimation("idle_loop", true)
+    end
+end
+local function SetAnim_blk_collector(inst)
+    local ran = math.random()
+    if ran < 0.25 then
+        inst.AnimState:PlayAnimation("emote_lick")
+        inst.AnimState:PushAnimation("idle_loop", true)
+    elseif ran < 0.5 then
+        inst.AnimState:PlayAnimation("emote_stretch")
+        inst.AnimState:PushAnimation("idle_loop", true)
+    else
+        inst.AnimState:PlayAnimation("idle_loop", true)
+    end
+end
+local function OnThrown_fly_collector(inst, owner, angle, pos)
+    local rand = math.random()
+    if rand < 0.33 then
+        inst.SoundEmitter:PlaySound("dontstarve_DLC001/creatures/catcoon/hiss_pre", nil, 0.5)
+    elseif rand < 0.66 then
+        inst.SoundEmitter:PlaySound("dontstarve_DLC001/creatures/catcoon/attack", nil, 0.5)
+    else
+        inst.SoundEmitter:PlaySound("dontstarve_DLC001/creatures/catcoon/pounce", nil, 0.5)
+    end
+end
+local function SpawnFx_collector(inst)
+    local x, y, z = inst.Transform:GetWorldPosition()
+    for i = 1, math.random(2), 1 do
+        local fx = SpawnPrefab(inst.skinfx)
+        if fx ~= nil then
+            local x1, y1, z1 = TOOLS_L.GetCalculatedPos(x, y, z, math.random()*2, nil)
+            fx.Transform:SetPosition(x1, y1, z1)
+        end
+    end
+end
+
+local function MakeSivFeather_replace(data)
+    table.insert(prefs, Prefab(data.name.."_fly", function() ------飞行体
+        local inst = CreateEntity()
+        inst.entity:AddTransform()
+        inst.entity:AddAnimState()
+        inst.entity:AddSoundEmitter()
+        inst.entity:AddNetwork()
+
+        MakeProjectilePhysics(inst)
+
+        inst.AnimState:SetBank(data.name)
+        inst.AnimState:SetBuild(data.name)
+
+        inst:AddTag("FX")
+        inst:AddTag("NOCLICK")
+
+        if data.fn_common_fly ~= nil then
+            data.fn_common_fly(inst)
+        end
+
+        inst.entity:SetPristine()
+        if not TheWorld.ismastersim then return inst end
+
+        inst.persists = false
+        inst.isflyobj = true
+        -- inst.feaidx = 1
+        inst.fn_onthrown = OnThrown_fly
+
+        if data.fn_server_fly ~= nil then
+            data.fn_server_fly(inst)
+        end
+
+        return inst
+    end, nil, nil))
+    table.insert(prefs, Prefab(data.name.."_blk", function() ------滞留体
+        local inst = CreateEntity()
+        inst.entity:AddTransform()
+        inst.entity:AddAnimState()
+        inst.entity:AddNetwork()
+
+        MakeInventoryPhysics(inst)
+        RemovePhysicsColliders(inst)
+        -- MakeProjectilePhysics(inst)
+
+        inst.AnimState:SetBank(data.name)
+        inst.AnimState:SetBuild(data.name)
+        inst.Transform:SetEightFaced()
+
+        inst:AddTag("NOCLICK")
+
+        if data.fn_common_blk ~= nil then
+            data.fn_common_blk(inst)
+        end
+
+        inst.entity:SetPristine()
+        if not TheWorld.ismastersim then return inst end
+
+        inst.persists = false
+        -- inst.feaidx = 1
+
+        if data.fn_server_blk ~= nil then
+            data.fn_server_blk(inst)
+        end
+
+        return inst
+    end, nil, nil))
+end
 local function MakeSivFeather(data)
     local fea_damage
     local fea_range
@@ -1870,6 +2013,7 @@ local function MakeSivFeather(data)
         inst.entity:SetPristine()
         if not TheWorld.ismastersim then return inst end
 
+        inst.isreal = data.isreal
         inst.fea_range = fea_range
         inst.fea_hpcost = fea_hpcost
 
@@ -1904,6 +2048,57 @@ local function MakeSivFeather(data)
         data.name.."_blk",
         "siving_feather_line", "siving_feather_ctl"
     }))
+
+    MakeSivFeather_replace({
+        name = data.name,
+        fn_common_fly = function(inst)
+            inst.AnimState:PlayAnimation("shoot", false)
+            inst.AnimState:SetOrientation(ANIM_ORIENTATION.OnGround)
+        end,
+        -- fn_server_fly = function(inst)end,
+        fn_common_blk = function(inst)
+            inst.AnimState:PlayAnimation("idle", false)
+            SetFloatable(inst, { 0.04, "small", 0.2, 0.5 })
+        end,
+        -- fn_server_blk = function(inst)end
+    })
+
+    MakeSivFeather_replace({
+        name = data.name.."_paper",
+        fn_common_fly = function(inst)
+            inst.Transform:SetFourFaced()
+            inst.AnimState:PlayAnimation("shoot", true)
+        end,
+        -- fn_server_fly = function(inst)end,
+        fn_common_blk = function(inst)
+            inst.AnimState:PlayAnimation("idle", false)
+            SetFloatable(inst, { 0.04, "small", 0.2, 0.5 })
+        end,
+        -- fn_server_blk = function(inst)end
+    })
+
+    MakeSivFeather_replace({
+        name = data.name.."_collector",
+        fn_common_fly = function(inst)
+            inst.AnimState:SetBank("kitcoon")
+            inst.Transform:SetSixFaced()
+            inst.AnimState:SetScale(0.9, 0.9)
+            SetAnim_fly_collector(inst)
+        end,
+        fn_server_fly = function(inst)
+            inst.fn_onthrown = OnThrown_fly_collector
+            inst.skinfx = data.name.."_collector_flyfx"
+            inst.task_skinfx = inst:DoPeriodicTask(0.1, SpawnFx_collector, 0)
+        end,
+        fn_common_blk = function(inst)
+            inst.AnimState:SetBank("kitcoon")
+            inst.Transform:SetSixFaced()
+            inst.AnimState:SetScale(0.9, 0.9)
+            SetAnim_blk_collector(inst)
+            SetFloatable(inst, { nil, "med", 0.1, 0.5 })
+        end,
+        -- fn_server_blk = function(inst)end
+    })
 end
 
 MakeSivFeather({ name = "siving_feather_real", isreal = true }) --子圭·翰

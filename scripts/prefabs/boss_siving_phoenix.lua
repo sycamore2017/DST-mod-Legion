@@ -926,21 +926,23 @@ local function InitFeaFx(inst)
         inst:Remove()
     end
 end
-local function OnLandedClient(self, ...)
-    if self.OnLandedClient_l_base ~= nil then
-        self.OnLandedClient_l_base(self, ...)
+local function OnLandedClient_new(self, ...)
+    if self.OnLandedClient_legion ~= nil then
+        self.OnLandedClient_legion(self, ...)
     end
     if self.floatparam_l ~= nil then
         self.inst.AnimState:SetFloatParams(self.floatparam_l, 1, self.bob_percent)
     end
 end
-local function SetFloatable(inst, float)
+local function SetFloatable(inst, float) --漂浮组件
     MakeInventoryFloatable(inst, float[2], float[3], float[4])
     if float[1] ~= nil then
         local floater = inst.components.floater
-        floater.OnLandedClient_l_base = floater.OnLandedClient
+        if floater.OnLandedClient_legion == nil then
+            floater.OnLandedClient_legion = floater.OnLandedClient
+            floater.OnLandedClient = OnLandedClient_new
+        end
         floater.floatparam_l = float[1]
-        floater.OnLandedClient = OnLandedClient
     end
 end
 local function MakeWeapon_replace(data)
@@ -1361,18 +1363,17 @@ local function MakeBossWeapon(data)
         inst.entity:AddSoundEmitter()
         inst.entity:AddNetwork()
 
-        MakeInventoryPhysics(inst)
-        RemovePhysicsColliders(inst)
+        MakeProjectilePhysics(inst)
 
         inst.Transform:SetScale(scale, scale, scale)
         inst.AnimState:SetOrientation(ANIM_ORIENTATION.OnGround)
 
         inst:AddTag("sharp")
-
-        --weapon (from weapon component) added to pristine state for optimization
         inst:AddTag("weapon")
+        inst:AddTag("NOCLICK")
+        -- inst:AddTag("moistureimmunity") --禁止潮湿：EntityScript:GetIsWet()
 
-        inst.projectiledelay = 3 * FRAMES
+        -- inst.projectiledelay = 3 * FRAMES
 
         if data.fn_common ~= nil then
             data.fn_common(inst)
@@ -1383,26 +1384,30 @@ local function MakeBossWeapon(data)
 
         inst.persists = false
 
+        -- inst:AddComponent("inventoryitem") --还是加个这个组件防止出问题
+        -- inst.components.inventoryitem:EnableMoisture(false) --禁止潮湿：官方的代码有问题，会导致潮湿攻击滑落时叠加数变为1
+        -- inst.components.inventoryitem.pushlandedevents = false
+        -- inst.components.inventoryitem.canbepickedup = false
+
         inst:AddComponent("weapon")
 
-        inst:AddComponent("projectilelegion")
-        inst.components.projectilelegion.speed = 45
-        inst.components.projectilelegion.shootrange = DIST_FLAP
-        inst.components.projectilelegion.exclude_tags = TAGS_CANT_BOSSFEA
-        inst.components.projectilelegion.fn_validhit = Fn_validhit_bossfea
-        inst.components.projectilelegion.onthrown = OnThrown_bossfea
-        inst.components.projectilelegion.onmiss = function(inst, targetpos, attacker)
-            local x, y, z = inst.Transform:GetWorldPosition()
-            -- if TheWorld.Map:IsVisualGroundAtPoint(x, 0, z) then --仅限陆地
-            if TheWorld.Map:IsAboveGroundAtPoint(x, 0, z) or TheWorld.Map:IsOceanTileAtPoint(x, 0, z) then
-                local block = SpawnPrefab(data.name.."_block")
-                if block ~= nil then
-                    block.Transform:SetRotation(inst.Transform:GetRotation())
-                    block.Transform:SetPosition(x, y, z)
-                end
-            end
-            inst:Remove()
-        end
+        -- inst:AddComponent("projectilelegion")
+        -- inst.components.projectilelegion.shootrange = DIST_FLAP
+        -- inst.components.projectilelegion.exclude_tags = TAGS_CANT_BOSSFEA
+        -- inst.components.projectilelegion.fn_validhit = Fn_validhit_bossfea
+        -- inst.components.projectilelegion.onthrown = OnThrown_bossfea
+        -- inst.components.projectilelegion.onmiss = function(inst, targetpos, attacker)
+        --     local x, y, z = inst.Transform:GetWorldPosition()
+        --     -- if TheWorld.Map:IsVisualGroundAtPoint(x, 0, z) then --仅限陆地
+        --     if TheWorld.Map:IsAboveGroundAtPoint(x, 0, z) or TheWorld.Map:IsOceanTileAtPoint(x, 0, z) then
+        --         local block = SpawnPrefab(data.name.."_block")
+        --         if block ~= nil then
+        --             block.Transform:SetRotation(inst.Transform:GetRotation())
+        --             block.Transform:SetPosition(x, y, z)
+        --         end
+        --     end
+        --     inst:Remove()
+        -- end
 
         if data.fn_server ~= nil then
             data.fn_server(inst)
@@ -1461,7 +1466,7 @@ local function MakeBossWeapon(data)
         end
 
         return inst
-    end, data.assets, data.prefabs2))
+    end, data.assets, nil))
 end
 
 --------------------------------------------------------------------------
@@ -2427,16 +2432,9 @@ end, {
 }, nil))
 
 --------------------------------------------------------------------------
---[[ 子圭·翰 ]]
+--[[ 精致子圭翎羽 ]]
 --------------------------------------------------------------------------
 
---玩家武器
-MakeWeapon({
-    name = "siving_feather_real",
-    isreal = true
-})
-
---BOSS产物：精致子圭翎羽
 local function AddWeaponLight(inst)
     inst.entity:AddLight()
     inst.Light:Enable(true)
@@ -2518,7 +2516,6 @@ MakeBossWeapon({
     fn_server = function(inst)
         inst.components.weapon:SetDamage(ATK_FEA_REAL)
     end,
-    prefabs2 = { "explode_small_slurtle" },
     fn_common2 = function(inst)
         AddWeaponLight(inst)
         inst.AnimState:SetBank("siving_feather_real")
@@ -2535,14 +2532,8 @@ MakeBossWeapon({
 })
 
 --------------------------------------------------------------------------
---[[ 子圭玄鸟绒羽 ]]
+--[[ 子圭翎羽 ]]
 --------------------------------------------------------------------------
-
---玩家武器
-MakeWeapon({
-    name = "siving_feather_fake",
-    isreal = nil
-})
 
 local function OnFinished_bossfea2(inst, worker)
     if inst.explode_chain_l then --被连锁爆炸
@@ -2563,7 +2554,6 @@ local function Fn_onClear_bossfea2(inst)
     ErodeAway(inst)
 end
 
---BOSS产物：子圭翎羽
 MakeBossWeapon({
     name = "siving_bossfea_fake",
     assets = {
@@ -2577,7 +2567,6 @@ MakeBossWeapon({
     fn_server = function(inst)
         inst.components.weapon:SetDamage(ATK_FEA)
     end,
-    prefabs2 = { "explode_small_slurtle" },
     fn_common2 = function(inst)
         inst.AnimState:SetBank("siving_feather_fake")
         inst.AnimState:SetBuild("siving_feather_fake")

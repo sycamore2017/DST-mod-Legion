@@ -13,11 +13,11 @@ local SivFeatherCtl = Class(function(self, inst)
     -- self.name_blk = nil --羽毛滞留体代码名
     -- self.damage = nil --原本的羽毛攻击力
 
-	self.shootrange = 20 --最远飞行距离
+	self.shootrange = 10 --最远飞行距离
 	-- self.isgoback = nil --是否为返回玩家
 	self.bulletradius = 1.2 --子弹半径(影响击中的最小距离)
-	self.speed = 20 --抛射速度
-    self.exclude_tags = { "INLIMBO", "NOCLICK", "notarget", "noattack", "invisible", "playerghost" }
+	self.speed = 45 --飞行速度
+    -- self.exclude_tags = { "INLIMBO", "NOCLICK", "notarget", "noattack", "invisible", "playerghost" }
     -- self.fn_validhit = nil
     -- self.fn_hit = nil
 end)
