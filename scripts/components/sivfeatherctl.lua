@@ -3,7 +3,6 @@ local SivFeatherCtl = Class(function(self, inst)
 	-- self.owner = nil --发射者
 	-- self.pos = nil --发射时的初始坐标，拉回时则是代表拉动者的位置
     -- self.hittargets = {} --已击中的对象
-    -- self.trytargets = {} --已尝试的对象
     -- self.tempfeas = nil --暂时的羽毛：飞行体和滞留体
     -- self.realfeas = nil --真正的羽毛实体
     -- self.line = nil --用来拉回的丝线
@@ -27,9 +26,9 @@ function SivFeatherCtl:Throw(feas, caster, pos, num, line, hidetime)
     doerpos.y = 0 --必须为0，防止玩家是腾云状态而向量出错，导致无法收回之类的问题
     local angles = {}
     local poss = {}
-    local direction = (pos - doerpos):GetNormalized() --单位向量
-    local angle = math.acos(direction:Dot(Vector3(1, 0, 0))) / DEGREES --单位:度，比如33。这个角度是动画的，不能用来做物理的角度
-
+    local angle = caster:GetAngleToPoint(pos.x, pos.y, pos.z) --原始角度，单位:度，比如33
+    -- local direction = (pos - doerpos):GetNormalized() --单位向量
+    -- local angle = math.acos(direction:Dot(Vector3(1, 0, 0))) / DEGREES --单位:度，比如33。这个角度是动画的，不能用来做物理的角度
 	if num == 1 then
         angles = { angle }
         poss[1] = pos
@@ -54,8 +53,6 @@ function SivFeatherCtl:Throw(feas, caster, pos, num, line, hidetime)
         else
             angles = { -9*ang_lag, -7*ang_lag, -5*ang_lag, -3*ang_lag, -ang_lag, ang_lag, 3*ang_lag, 5*ang_lag, 7*ang_lag, 9*ang_lag }
         end
-
-        -- local ang = caster:GetAngleToPoint(pos.x, pos.y, pos.z) --原始角度，单位:度，比如33
         for i, v in ipairs(angles) do
             v = angle + v + math.random()*2 - 1
             angles[i] = v
@@ -69,8 +66,7 @@ function SivFeatherCtl:Throw(feas, caster, pos, num, line, hidetime)
 		local fly = SpawnPrefab(self.name_fly)
 		fly.feaidx = i
 		fly.Transform:SetPosition(doerpos:Get())
-        -- fly.Physics:ClearCollidesWith(COLLISION.LIMITS)
-		fly.Transform:SetRotation(v) --动画旋转
+		fly.Transform:SetRotation(math.abs(v)) --动画旋转(测试了，只要是角度的绝对值就可以了)
 		fly:FacePoint(poss[i]) --实体朝向
         fly.Physics:SetMotorVel(self.speed, 0, 0) --朝向已确定，给一个正加速即可
         if fly.fn_onthrown ~= nil then
@@ -81,7 +77,6 @@ function SivFeatherCtl:Throw(feas, caster, pos, num, line, hidetime)
 	end
 
     self.hittargets = {}
-    self.trytargets = {}
 	self.owner = caster
 	self.pos = doerpos
     self.tempfeas = feathers
@@ -134,7 +129,6 @@ function SivFeatherCtl:ThrowBack()
     doerpos.y = 0 --必须为0，防止玩家是腾云状态而向量出错，导致无法收回之类的问题
     self.isgoback = true
     self.hittargets = {}
-    self.trytargets = {}
     self.pos = doerpos
     for _, fe in pairs(self.tempfeas) do
         if fe:IsValid() then
@@ -178,32 +172,29 @@ function SivFeatherCtl:TryFeatherAttack(flyobj, posnow)
     end
     local ents = TheSim:FindEntities(posnow.x, posnow.y, posnow.z, 7, { "_combat" }, self.exclude_tags)
 	for _, ent in ipairs(ents) do
-        if not self.trytargets[ent] then
-            self.trytargets[ent] = true
-            if
-                ent ~= self.owner and not self.hittargets[ent] and ent.entity:IsVisible() and --有效
-                ent.components.combat ~= nil and --有 _combat 标签不一定会有战斗组件，因为别的mod的生物可能不遵循这个规则
-                (self.bulletradius+ent:GetPhysicsRadius(0))^2 >= distsq(posnow, ent:GetPosition()) and --范围内
-                ent.components.combat:CanBeAttacked(self.owner) and --防止 owner 打到不该打到的对象
-                (self.fn_validhit == nil or self.fn_validhit(self, ent))
-            then
-                self.hittargets[ent] = true
-                if self.owner.components.combat ~= nil then
-                    if self.owner.components.combat.ignorehitrange then
-                        self.owner.components.combat:DoAttack(ent, weapon, flyobj)
-                    else
-                        self.owner.components.combat.ignorehitrange = true
-                        self.owner.components.combat:DoAttack(ent, weapon, flyobj)
-                        self.owner.components.combat.ignorehitrange = false
-                    end
+        if
+            ent ~= self.owner and not self.hittargets[ent] and ent.entity:IsVisible() and --有效
+            ent.components.combat ~= nil and --有 _combat 标签不一定会有战斗组件，因为别的mod的生物可能不遵循这个规则
+            (self.bulletradius+ent:GetPhysicsRadius(0))^2 >= distsq(posnow, ent:GetPosition()) and --范围内
+            ent.components.combat:CanBeAttacked(self.owner) and --防止 owner 打到不该打到的对象
+            (self.fn_validhit == nil or self.fn_validhit(self, ent))
+        then
+            self.hittargets[ent] = true
+            if self.owner.components.combat ~= nil then
+                if self.owner.components.combat.ignorehitrange then
+                    self.owner.components.combat:DoAttack(ent, weapon, flyobj)
+                else
+                    self.owner.components.combat.ignorehitrange = true
+                    self.owner.components.combat:DoAttack(ent, weapon, flyobj)
+                    self.owner.components.combat.ignorehitrange = false
                 end
-                if self.fn_hit ~= nil then
-                    self.fn_hit(self, ent, flyobj, weapon)
-                end
-                if not flyobj:IsValid() then
-                    self.num = self.num - 1
-                    return
-                end
+            end
+            if self.fn_hit ~= nil then
+                self.fn_hit(self, ent, flyobj, weapon)
+            end
+            if not flyobj:IsValid() then
+                self.num = self.num - 1
+                return
             end
         end
 	end
@@ -241,6 +232,7 @@ function SivFeatherCtl:BeRealFeather(fe)
             fea:ReturnToScene()
             fea:RemoveTag("rangedweapon")
             self.num = 0
+            self.realfeas = nil
         else
             if self.realfeas.components.stackable:StackSize() ~= self.num then --修正叠加数
                 self.realfeas.components.stackable:SetStackSize(self.num)
@@ -250,6 +242,7 @@ function SivFeatherCtl:BeRealFeather(fe)
                 self.inst:RemoveChild(fea)
                 fea:ReturnToScene()
                 fea:RemoveTag("rangedweapon")
+                self.realfeas = nil
             else
                 fea = self.realfeas.components.stackable:Get(1) --优先生成被叠加的实体，self.realfeas本身先不动
             end
@@ -300,40 +293,40 @@ function SivFeatherCtl:Finish()
         end
         self.tempfeas = nil
     end
-    if self.num > 0 and self.realfeas ~= nil then --还有真实羽毛因未知原因没有处理，这里就直接还给owner
-        if not self.realfeas:IsValid() then --羽毛因未知原因被删了，那就重新生成
-            self.realfeas = SpawnPrefab(self.realfeas.prefab, self.realfeas.skinname, self.realfeas.skin_id)
-        else
-            self.inst:RemoveChild(self.realfeas)
-            self.realfeas:ReturnToScene()
-            self.realfeas:RemoveTag("rangedweapon")
-        end
-        if self.realfeas.components.stackable ~= nil then
-            if self.realfeas.components.stackable:StackSize() ~= self.num then --修正叠加数
-                self.realfeas.components.stackable:SetStackSize(self.num)
+    if self.realfeas ~= nil then
+        if self.num > 0 then --还有真实羽毛因未知原因没有处理，这里就直接还给owner
+            if not self.realfeas:IsValid() then --羽毛因未知原因被删了，那就重新生成
+                self.realfeas = SpawnPrefab(self.realfeas.prefab, self.realfeas.skinname, self.realfeas.skin_id)
+            else
+                self.inst:RemoveChild(self.realfeas)
+                self.realfeas:ReturnToScene()
+                self.realfeas:RemoveTag("rangedweapon")
             end
-        end
-        RestoreWeaponAtk(self, self.realfeas)
-        if self.owner:IsValid() then
-            self.realfeas.Transform:SetPosition(self.owner.Transform:GetWorldPosition())
-        else
-            self.realfeas.Transform:SetPosition(self.pos:Get())
-        end
-        if IsOwnerValid(self.owner) and self.owner.components.inventory ~= nil then
-            local inv = self.owner.components.inventory
-            if inv:GetEquippedItem(EQUIPSLOTS.HANDS) == nil then --手里没别的装备
-                if not inv:Equip(self.realfeas) then
+            if self.realfeas.components.stackable ~= nil then
+                if self.realfeas.components.stackable:StackSize() ~= self.num then --修正叠加数
+                    self.realfeas.components.stackable:SetStackSize(self.num)
+                end
+            end
+            RestoreWeaponAtk(self, self.realfeas)
+            if self.owner:IsValid() then
+                self.realfeas.Transform:SetPosition(self.owner.Transform:GetWorldPosition())
+            else
+                self.realfeas.Transform:SetPosition(self.pos:Get())
+            end
+            if IsOwnerValid(self.owner) and self.owner.components.inventory ~= nil then
+                local inv = self.owner.components.inventory
+                local hand = inv:GetEquippedItem(EQUIPSLOTS.HANDS)
+                if hand == nil or hand.prefab == "siving_feather_line" then --手里没别的装备
+                    if not inv:Equip(self.realfeas) then
+                        inv:GiveItem(self.realfeas)
+                    end
+                else
                     inv:GiveItem(self.realfeas)
                 end
-            else
-                inv:GiveItem(self.realfeas)
             end
+        elseif self.realfeas:IsValid() then --需要清理多余的真实羽毛
+            self.realfeas:Remove()
         end
-        self.realfeas = nil
-        return
-    end
-    if self.realfeas ~= nil and self.realfeas:IsValid() then --需要清理多余的真实羽毛
-        self.realfeas:Remove()
         self.realfeas = nil
     end
 end

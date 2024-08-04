@@ -1926,7 +1926,6 @@ local function MakeSivFeather_replace(data)
         inst.AnimState:SetBank(data.name)
         inst.AnimState:SetBuild(data.name)
 
-        inst:AddTag("FX")
         inst:AddTag("NOCLICK")
 
         if data.fn_common_fly ~= nil then
@@ -2110,8 +2109,6 @@ table.insert(prefs, Prefab("siving_feather_ctl", function() --子圭羽毛发射
     local inst = CreateEntity()
     inst.entity:AddTransform()
     inst.entity:AddNetwork()
-
-    -- inst:AddTag("FX")
 
     inst.entity:SetPristine()
     if not TheWorld.ismastersim then return inst end
